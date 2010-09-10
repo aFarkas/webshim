@@ -1,0 +1,38 @@
+.placeholder-visible {
+	color: #999;
+}
+.validity-alert {
+	position: absolute;
+	background: #fff;
+	border: 1px solid #f00;
+	padding: 5px;
+}
+
+.step-controls {
+	position: relative;
+	display: inline-block;
+	top: 4px;
+	width: 8px;
+	height: 1.2em;
+}
+.step-controls span {
+	position: absolute;
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	border: 1px solid #666;
+	cursor: pointer;
+}
+.step-controls span.step-up {
+	top: 0;
+}
+.step-controls span.step-down {
+	bottom: 0;
+}
+/* ToDo */
+.step-controls.disabled span,
+.step-controls span.disabled {
+	border-color: #aaa;
+	opacity: 0.8;
+	cursor: default;
+}

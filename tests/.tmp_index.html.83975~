@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>jQuery Test Suite</title>
+	
+	<link rel="stylesheet" href="qunit/qunit.css" type="text/css" media="screen">
+	
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	
+	<script src="qunit/qunit.js"></script>
+	
+	<script src="../src/html-ext.js"></script>
+	<script src="../src/features.js"></script>
+	<script>
+		(function(){
+			var _reset = QUnit.reset;
+			QUnit.reset = function(){
+				var ret = _reset.apply(this, arguments);
+				$.htmlExt.triggerDomUpdate($("#main, #qunit-fixture"));
+				return ret;
+			};
+		})();
+	</script>
+	
+	<script src="unit/placeholder.js"></script>
+	<script src="unit/validity.js"></script>
+	
+	
+	<script>
+		$.htmlExt.loader.basePath += 'shims/';
+		$.htmlExt.loader.loadList();
+	</script>
+	<style type="text/css">
+		html { border: 0; }
+		#qunit-fixture {
+			position: static;
+			left: auto;
+			top: auto;
+		}
+	</style>
+</head>
+<body class="flora">
+
+<h1 id="qunit-header">QUnit Test Suite</h1>
+<h2 id="qunit-banner"></h2>
+<div id="qunit-testrunner-toolbar"></div>
+<h2 id="qunit-userAgent"></h2>
+<ol id="qunit-tests"></ol>
+<div id="qunit-fixture">
+	
+	<div class="form-wrapper">
+	    <form id="form-1" action="" method="post">
+	        <!-- hidden fields should not be visible -->
+			<div class="form-item-hidden">
+	            <input type="hidden" name="test1" />
+	            <input type="hidden" name="test2" />
+	            <input type="hidden" name="test3" />
+	            <input type="hidden" name="test4" />
+			</div>
+	        <fieldset>
+	            <div>
+	                <label for="name">
+	                    Name: <dfn title="required">*</dfn>
+					</label>
+	                <input name="name" required="" type="text" id="name" />
+	            </div>
+	            <div>
+	                <label for="email">
+	                    E-Mail: <dfn title="required">*</dfn>
+					</label>
+	               	<input name="email" required="required" class="email" type="email" id="email" />
+	                <span>Lorem ipsum dolor sit amet adipiscing elit.</span>
+	            </div>
+	            <div>
+	            	<div class="form-item-s">
+	                    <label for="number">
+	                        number:
+						 </label>
+	                     <input name="number" type="NUMBER" id="number" />
+	               	</div>
+					<div class="form-item-l">
+	                	<label for="pattern">
+	                    	pattern:
+						</label>
+	                    <input type="text" PATTERN="[0-9][A-Z]{3}" name="pattern" id="pattern" />
+					</div>
+	            </div>
+	            <div>
+					<div class="form-item-m">
+					    <label for="date">
+					        date:
+					    </label>
+					    <input type="date" name="date" id="date" />
+					</div>
+				    <div class="form-item-m">
+					    <label for="time">:
+							time
+					    </label>
+					    <input name="time" type="time" id="time" />
+				    </div>
+				</div>
+				<div  class="multiple-labels">
+	                <fieldset>
+	                    <div class="form-item-m">
+							<label class="m" for="datetime-local">
+	                            datetime-local:
+							</label>
+	                        <input name="datetime-local" type="datetime-local" id="datetime-local" />
+	                    </div>
+						<div class="form-item-m">
+	                        <label class="m" for="placeholder">
+	                            placeholder:
+							</label>
+	                        <input placeholder="hello" name="placeholder" type="text" id="placeholder" />
+						</div>
+	               	</fieldset>
+				</div>
+	            <div>
+	            	<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
+	            	<fieldset class="mod">
+	            		<legend>Legend Short Labels  <dfn title="required">*</dfn></legend>
+	                    <div class="form-item">
+	                        <input required="required" type="radio" id="field6-1" name="radio-grp1-1" />
+							<label for="field6-1">
+	                            Radiooption 2
+	                        </label>
+						</div>
+						<div class="form-item">
+	                        <input required="" type="radio" id="field7-1" name="radio-grp1-1" />
+	                       	<label for="field7-1"> 
+								Radiooption 2
+	                    	</label>
+						</div>
+						<div class="form-item">
+	                        <input required="required" type="radio" id="field8-1" name="radio-grp1-1" />
+							<label for="field8-1">
+	                        	Radiooption 3
+	                    	</label>
+						</div>
+	                </fieldset>
+	            </div>
+	            <div>
+	            	<label for="field9">
+	                    Lorem ipsum  <dfn title="required">*</dfn>
+					</label>
+	                <select name="field9" id="field9">
+	                	<option value="">Please Choose</option>
+	                	<optgroup label="group1">
+	                    	<option>Option 1</option>
+	                        <option>Option 2</option>
+	                        <option>Option 3</option>
+	                    </optgroup>
+	                    <optgroup label="group2">
+	                    	<option>Option 4</option>
+	                        <option>Option 5</option>
+	                        <option>Option 6</option>
+	                    </optgroup>
+	                </select>
+	            </div>
+				<div>
+	            	<label for="range">
+	                    Lorem ipsum  <dfn title="required">*</dfn>
+					</label>
+	                <input type="range" name="range" id="range" />
+	            </div>
+	            
+	            <div class="button-wrapper">
+	            	<input type="submit" value="Send" />
+	            </div>
+	        </fieldset>
+	    </form>
+	</div><!-- end form --> 
+	
+	<form id="form-2" action="#" novalidate="">
+		<div>
+			<input type="text" required="" name="test-2" />
+		</div>
+	</form> 
+</div>
+
+
+</body>
+</html>

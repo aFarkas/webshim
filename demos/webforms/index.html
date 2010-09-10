@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+    
+	<style>
+		#wrapper {
+			margin: auto;
+			width: 800px;
+			max-width: 85%;
+		}
+		fieldset div {
+			overflow: hidden;
+			zoom: 1;
+			padding: 5px;
+			border: 1px solid #000;
+			margin: 5px 0;
+		}
+		button.feature {
+			float: right;
+		}
+		/* valid + invalid classes */
+		
+		.invalid {
+			border-color: #933;
+		}
+		.valid {
+			border-color: #393;
+		}
+		
+	</style>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<!-- 
+		main web shim extension fiels
+		Note: you can combine/concat/rename them with your other files, but you have to include them in the head without a defer/async attribute!
+	 -->
+	<script src="../../dist/minified/html-ext.js"></script>
+	<script src="../../dist/minified/features.js"></script>
+	
+    <script type="text/javascript" class="example">
+    	//basePath = url form html-ext.js (you can rename it) + relative url to shim folder
+    	$.htmlExt.loader.basePath += 'shims/';
+		
+		//load all shims
+		//$.htmlExt.loader.loadList();
+		//or load webform 2.0 shims
+		$.htmlExt.loader.loadList(['validity', 'placeholder', 'validation-message']);
+		
+		$(function(){
+			var markValidity = {
+				invalid: function(elem){
+					$(elem).closest('fieldset, .form-element')
+						.addClass('invalid')
+						.removeClass('valid')
+					;
+				},
+				valid: function(elem){
+					$(elem).closest('fieldset, .form-element')
+						.addClass('valid')
+						.removeClass('invalid')
+					;
+				}
+			};
+			$('form')
+				.bind('focusout', function(e){
+					if(!$(e.target).attr('willValidate')){return;}
+					if($(e.target).attr('validity').valid){
+						markValidity.valid(e.target);
+					} else {
+						markValidity.invalid(e.target);
+					}
+				})
+				.bind('invalid', function(e){
+					markValidity.invalid(e.target);
+				})
+			;
+		});
+		
+		// button features
+        $(function(){
+			if(!window.console){
+				window.console = {log: window.alert};
+			}
+			$('button.feature').bind('click', function(e){
+				var elem = $(this).parent().find(':input');
+				e.preventDefault();
+				if($(this).attr('data-action') === 'method'){
+					var ret = elem[$(this).attr('data-name')]();
+					if(ret !== elem){
+						console.log(ret);
+					}
+				} else {
+					console.log(elem.attr($(this).attr('data-name')));
+				} 
+				return false;
+			});
+        });
+		
+    </script>
+	
+	<title>playing</title>
+	    
+</head>
+
+<body class="js-off">         
+
+<div id="wrapper">	
+	
+            <form action="#" method="post">
+            	<p>buttons at the right do log to console (open Firebug and reload)</p>
+                <!-- hidden fields should not be visible -->
+				<div class="form-item-hidden">
+                    <input type="hidden" name="test1" />
+                    <input type="hidden" name="test2" />
+                    <input type="hidden" name="test3" />
+                    <input type="hidden" name="test4" />
+				</div>
+                <p class="required"><span>*</span> Required fields</p>
+                <fieldset>
+                    <h2>Personal information</h2>
+                    <div class="form-element">
+                        <label for="name">
+                            Required: <dfn title="required">*</dfn>
+						</label>
+                        <input name="name" required="required" type="text" value="" id="name" />
+						<button class="feature" data-action="attr" data-name="validity">$(this).attr('validity')</button>
+                    </div>
+                    <div class="form-element">
+                        <label for="email">
+                            E-Mail: <dfn title="required">*</dfn>
+						</label>
+                       	<input name="email" required="required" class="email" type="email" id="email" />
+						<button class="feature" data-action="method" data-name="checkValidity">$(this).checkValidity()</button>
+                    </div>
+                   
+                	<div class="form-element">
+                        <label for="number">
+                            Number:
+						 </label>
+                         <input class="digits" type="number" value="5" id="number" name="number" />
+						 <button class="feature" data-action="method" data-name="checkValidity">$(this).checkValidity()</button>
+                   	</div>
+					<div class="form-element">
+                    	<label for="time">
+                        	time:
+						</label>
+                        <input type="time" name="time" placeholder="hh:mm" id="time" />
+						 <button class="feature" data-action="attr" data-name="valueAsDate">$(this).attr('valueAsDate')</button>
+					</div>
+					
+					<div class="form-element">
+                    	<label for="timeval">
+                        	time (min: 13:00, max: 22:00, step: 300, required): <dfn title="required">*</dfn>
+						</label>
+                        <input type="time" name="timeval" placeholder="hh:mm" id="timeval" min="13:00" max="22:00" step="300" required />
+						<button class="feature" data-action="attr" data-name="validity">$(this).attr('validity')</button>
+					</div>
+                
+               
+					<div class="form-element">
+					    <label for="date">
+					        date:
+					    </label>
+					    <input type="date" value="2009-12-13" placeholder="yyyy-mm-dd" name="date" id="date" />
+						<button class="feature" data-action="attr" data-name="valueAsDate">$(this).attr('valueAsDate')</button>
+						 <button class="feature" data-action="attr" data-name="valueAsNumber">$(this).attr('valueAsNumber')</button>
+					</div>
+				    <div class="form-element">
+					    <label for="datetime-local">
+					        datetime-local:
+					    </label>
+					    <input value="1999-12-09T20:10" placeholder="yyyy-mm-ddThh:mm" name="datetime-local" type="datetime-local" id="datetime-local" />
+						<button class="feature" data-action="method" data-name="checkValidity">$(this).checkValidity()</button>
+				    </div>
+					
+					
+                    <div>
+                    	<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
+                    	<fieldset class="mod">
+                    		<legend>Legend Short Labels  <dfn title="required">*</dfn></legend>
+                            <div class="form-item">
+                                <input type="radio" id="field6-1" name="radio-grp1-1" required />
+								<label for="field6-1">
+                                    Radiooption 2
+                                </label>
+								<button class="feature" data-action="method" data-name="checkValidity">$(this).checkValidity()</button>
+							</div>
+							<div class="form-item">
+                                <input type="radio" id="field7-1" name="radio-grp1-1" />
+                               	<label for="field7-1"> 
+									Radiooption 2
+                            	</label>
+								<button class="feature" data-action="attr" data-name="validity">$(this).attr('validity')</button>
+							</div>
+							<div class="form-item">
+                                <input type="radio" id="field8-1" name="radio-grp1-1" />
+								<label for="field8-1">
+                                	Radiooption 3
+                            	</label>
+							</div>
+                        </fieldset>
+                    </div>
+                    
+                    <div class="button-wrapper">
+                    	<input type="submit" value="Send" />
+                    </div>
+                </fieldset>
+            </form>
+       </div>
+</body>
+</html> 

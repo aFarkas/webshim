@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+    
+	
+	<style>
+		.invalid-dialog {
+			position: absolute;
+			margin: 10px 0 0;
+			border: 1px solid #933;
+			padding: 8px;
+			max-width: 350px;
+			-moz-border-radius: 5px;
+			border-radius: 5px;
+			-moz-box-shadow: 3px 3px 4px #333, inset 1px 1px 5px rgba(99, 99, 99, 0.5), inset -1px -1px 5px rgba(99, 99, 99, 0.5);
+			background: #fff;
+			background: rgba(255, 255, 255, 0.95);
+		}
+	</style>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/jquery-ui.min.js"></script>
+	<script src="../src/html-ext.js"></script>
+	<script src="../src/features.js"></script>
+	
+    <script type="text/javascript" class="example">
+    	
+		//path is path of html-ext.js + shims/
+    	$.htmlExt.loader.basePath += 'shims/';
+		//load all defined modules (look into features
+		//or load only a specific feature with $.htmlExt.loader.loadList('feature-name');
+		$.htmlExt.loader.loadList();
+        $(function(){
+			
+			var validationsDialog = (function(){
+				var dialog = $('<div class="invalid-dialog" role="alert" />')
+					.hide()
+					.appendTo('body'),
+					hideTimer
+				;
+				$.extend(dialog, {
+					openDialogAt: function(elem, hideAfter){
+						dialog.stop().hide().position({of: elem, at: 'left bottom', my: 'left top'}).fadeIn();
+						if(hideAfter){
+							clearTimeout(hideTimer);
+							hideTimer = setTimeout(function(){
+								dialog.closeDialog();
+							}, hideAfter);
+						}
+					},
+					closeDialog: function(){
+						clearTimeout(hideTimer);
+						dialog.stop().fadeOut();
+					}
+				});
+				return dialog;
+			})();
+			
+			var stopSubmit, 
+				firstInvalidElem = true,
+				dialog = validationsDialog,
+				submitTimer
+			;
+			$('form')
+				.bind('submit', function(){
+					if(stopSubmit){
+						return false;
+					}
+				})
+				.bind('invalid', function(e){
+					
+					if(firstInvalidElem){
+						firstInvalidElem = false;
+						stopSubmit = true;
+						dialog.html($(e.target).attr('validationMessage')).openDialogAt(e.target, 4000);
+						$(e.target).focus().one('blur', function(){
+							dialog.closeDialog();
+						});
+					}
+					
+					clearTimeout(submitTimer);
+					submitTimer = setTimeout(function(){
+						stopSubmit = false;
+						firstInvalidElem = true
+					}, 9);
+					return false;
+				})
+			;
+			
+        });
+    </script>
+	
+	<title>playing</title>
+	    
+</head>
+
+<body>         
+
+	
+<form action="#" method="post">
+    
+    <fieldset>
+        <h2>Personal information</h2>
+        <div>
+            <label for="name">
+                Name: <dfn title="required">*</dfn>
+			</label>
+            <input name="fdsfds3" required="required" type="text" value="" id="name" />
+        </div>
+        <div>
+            <label for="email">
+                E-Mail: <dfn title="required">*</dfn>
+			</label>
+           	<input name="fdsfds" required="required" class="email" type="email" id="email" />
+            <span>Lorem ipsum dolor sit amet adipiscing elit.</span>
+        </div>
+        <div>
+        	<div class="form-item-s">
+                <label for="number">
+                    Zip (Zahlen):
+				 </label>
+                 <input class="digits" type="number" value="5.5" step="0.5" min="4" id="number" name="number" />
+           	</div>
+			<div class="form-item-l">
+            	<label for="time">
+                	time:
+				</label>
+                <input type="time" name="time" value="21:50:30" id="time" />
+			</div>
+        </div>
+        <div>
+			<div class="form-item-m">
+			    <label for="date">
+			        Fieldname:
+			    </label>
+			    <input type="date" value="2009-12-13" name="date" id="date" />
+			</div>
+		    <div class="form-item-m">
+			    <label for="datetime-local">
+			        Fieldname (wiederholen):
+			    </label>
+			    <input value="1999-12-09T20:11T" name="datetime-local" type="datetime-local" id="datetime-local" />
+		    </div>
+		</div>
+		<div  class="multiple-labels">
+			<h4>Long Label Headline  <dfn title="required">*</dfn></h4>
+            <fieldset>
+            	<legend>short Label Headline <dfn title="required">*</dfn></legend>
+                <div class="form-item-m">
+					<label class="m" for="field-multiple-label-1">
+                        From <em>Date</em>:
+					</label>
+                    <input aria-required="true" class="date" type="text" id="field-multiple-label-1" />
+                </div>
+				<div class="form-item-m">
+                    <label class="m" for="field-multiple-label-2">
+                        To <em>Date</em>:
+					</label>
+                    <input aria-required="true" class="date data-greater-field-multiple-label-1" type="text" id="field-multiple-label-2" />
+				</div>
+           	</fieldset>
+		</div>
+        <div>
+        	<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
+        	<fieldset class="mod">
+        		<legend>Legend Short Labels  <dfn title="required">*</dfn></legend>
+                <div class="form-item">
+                    <input aria-required="true" type="radio" id="field6-1" name="radio-grp1-1" />
+					<label for="field6-1">
+                        Radiooption 2
+                    </label>
+				</div>
+				<div class="form-item">
+                    <input aria-required="true" type="radio" id="field7-1" name="radio-grp1-1" />
+                   	<label for="field7-1"> 
+						Radiooption 2
+                	</label>
+				</div>
+				<div class="form-item">
+                    <input aria-required="true" type="radio" id="field8-1" name="radio-grp1-1" />
+					<label for="field8-1">
+                    	Radiooption 3
+                	</label>
+				</div>
+            </fieldset>
+        </div>
+        <div>
+        	<label for="field9">
+                Lorem ipsum  <dfn title="required">*</dfn>
+			</label>
+            <select aria-required="true" id="field9">
+            	<option value="">Please Choose</option>
+            	<optgroup label="group1">
+                	<option>Option 1</option>
+                    <option>Option 2</option>
+                    <option>Option 3</option>
+                </optgroup>
+                <optgroup label="group2">
+                	<option>Option 4</option>
+                    <option>Option 5</option>
+                    <option>Option 6</option>
+                </optgroup>
+            </select>
+        </div>
+        
+        <div class="button-wrapper">
+        	<input type="submit" value="Send" />
+        </div>
+    </fieldset>
+</form>
+       
+</body>
+</html>   

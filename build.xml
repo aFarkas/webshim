@@ -1,0 +1,48 @@
+<project name="WebExtlib" default="WebExtlib" basedir=".">
+    
+    <property name="dist" value="./dist"/>
+    <property name="src" value="./src"/>
+    
+    <taskdef resource="net/sf/antcontrib/antlib.xml">
+        <classpath>
+            <pathelement location="build/ant-contrib-1.0b3.jar"/>
+        </classpath>
+    </taskdef>
+    
+    <target name="WebExtlib">
+    	
+        <mkdir dir="${dist}" />
+		<mkdir dir="${dist}" />
+        <copy todir="${dist}/dev" overwrite="true">
+            <fileset dir="${src}" />
+        </copy>
+        
+        <mkdir dir="${dist}/minified"/>
+		<copy todir="${dist}/minified" overwrite="true">
+            <fileset dir="${dist}/dev" />
+        </copy>
+        <for param="file">
+            <path>
+            	<fileset dir="${dist}/minified">
+	                <include name="*.js"/>
+	            </fileset>
+	            <fileset dir="${dist}/minified/shims">
+	                <include name="*.js"/>
+	            </fileset>
+            </path>
+            <sequential>
+                <java failonerror="true" jar="build/compiler.jar" fork="true">
+                    <arg value="--warning_level"/>
+                    <arg value="QUIET"/>
+                    <arg value="--js"/>
+                    <arg value="@{file}"/>
+                    <arg value="--js_output_file"/>
+                    <arg value="${dist}/minified/foo.js"/>
+                </java>
+				<move file="${dist}/minified/foo.js" tofile="@{file}" />
+            </sequential>
+        </for>
+        
+    </target>
+    
+</project>

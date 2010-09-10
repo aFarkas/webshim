@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+    
+	<style>
+		canvas {
+			border: 1px solid #000;
+		}
+		.validity-alert {
+			position: absolute;
+			margin: 3px 0 0;
+			border: 1px solid #933;
+			padding: 8px;
+			max-width: 350px;
+			-moz-border-radius: 5px;
+			border-radius: 5px;
+			-moz-box-shadow: 3px 3px 4px #333, inset 1px 1px 5px rgba(99, 99, 99, 0.5), inset -1px -1px 5px rgba(99, 99, 99, 0.5);
+			-webkit-box-shadow: 3px 3px 4px #333, inset 1px 1px 5px rgba(99, 99, 99, 0.5), inset -1px -1px 5px rgba(99, 99, 99, 0.5);
+			box-shadow: 3px 3px 4px #333, inset 1px 1px 5px rgba(99, 99, 99, 0.5), inset -1px -1px 5px rgba(99, 99, 99, 0.5);
+			background: #fff;
+			background: rgba(255, 255, 255, 0.95);
+		}
+	</style>
+	
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="../src/html-ext.js"></script>
+	<script src="../src/features.js"></script>
+	
+    <script type="text/javascript" class="example">
+    	$.htmlExt.loader.basePath += 'shims/';
+		$.htmlExt.loader.loadList();
+		
+        $(function(){
+			
+			$('form').bind('submit', function(){
+				//alert('f')
+			});
+			
+        });
+		
+    </script>
+	
+    <script type="text/javascript">
+        $.htmlExt.readyModules('ready canvasReady', function(){
+			$('canvas.mouse-test').each(function(){
+				var elem = this;
+				var context = $(this).getContext('2d');
+				var dim = {
+					height: this.height / 2,
+					width: this.width / 2
+				};
+				context.clearRect(0, 0, elem.width, elem.height);
+				context.fillStyle = "rgba(0, 0, 255, 0.8)";
+				context.fillRect(225, 125, 50, 50);
+				
+				
+				$(elem).bind('mousemove', function(e){
+					var pos = $(elem).offset();
+					pos.top = e.pageY - pos.top;
+					pos.left = e.pageX - pos.left;
+					pos.top = (dim.height > pos.top) ? 
+						dim.height - pos.top : pos.top - dim.height;
+					pos.left = (dim.width > pos.left) ? 
+						dim.width - pos.left : pos.left - dim.width;
+					context.clearRect(0, 0, elem.width, elem.height);
+					pos.top *= 2;
+					pos.left *= 2;
+					context.fillRect(dim.width - (pos.left / 2), dim.height - (pos.top / 2), pos.left, pos.top);
+				});
+			});
+			
+			$('canvas.peter').each(function(){
+				var animate = function(ax, ay, adx, ady, bx, by, bdx, bdy){
+					setTimeout(function(){
+						//Bewegen und Abprallen für Quadrat A
+						if(ax == 150){
+							adx = -1;
+						}
+						else{
+							if(ax == 0){
+								adx = 1;
+							}
+						}
+						if(ay == 150){
+							ady = -1;
+						}
+						else{
+							if(ay == 0){
+								ady = 1;
+							}
+						}
+						ax = ax+adx;
+						ay = ay+ady;
+						//Bewegen und Abprallen für Quadrat B
+						if(bx == 150){
+							bdx = -1;
+						}
+						else{
+							if(bx == 0){
+								bdx = 1;
+							}
+						}
+						if(by == 150){
+							bdy = -1;
+						}
+						else{
+							if(by == 0){
+								bdy = 1;
+							}
+						}
+						bx = bx+bdx;
+						by = by+bdy;
+						// Alles neu zeichnen
+						context.clearRect(0, 0, 200, 200);
+						context.fillStyle = "rgba(0, 0, 255, 0.5)";
+						context.fillRect(ax, ay, 50, 50);
+						context.fillStyle = "rgba(0, 255, 0, 0.5)";
+						context.fillRect(bx, by, 50, 50);
+						animate(ax, ay, adx, ady, bx, by, bdx, bdy);
+					}, 30);
+				};
+				var context = $(this).getContext('2d');
+				animate(31, 69, 1, -1, 8, 25, 1, 1);
+			});
+			
+
+        });
+		
+    </script>
+	
+	<title>playing</title>
+	    
+</head>
+
+<body>         
+<canvas class="mouse-test" width="500" height="300">
+	
+</canvas>
+
+<canvas class="peter" width="200" height="200">
+	Dein Browser kann diese Grafik nicht darstellen.
+</canvas>
+       
+</body>
+</html>   
