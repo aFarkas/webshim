@@ -62,7 +62,7 @@
 		//load all shims
 		//$.htmlExt.loader.loadList();
 		//or load webform 2.0 shims only
-		$.htmlExt.loader.loadList(['validity', 'placeholder', 'validation-message']);
+		$.htmlExt.loader.loadList(['validity', 'placeholder', 'validation-message', 'input-ui']);
 		
 		$(function(){
 			var markValidity = {
@@ -93,7 +93,7 @@
 				})
 				//additional custom event, wich makes the constraint validation api more usefull
 				.bind('firstinvalid', function(e){
-					//tell the api, that we will handle the invalid event
+					//tell the api, that we will handle the invalid event -> this will preventDefault all comming invalid events in this event loop
 					e.preventDefault();
 					//custom method for simple validationAlerts (you can overwrite this or write your own */
 					$.htmlExt.validityAlert.showFor(e.target);
@@ -168,6 +168,12 @@
 			    <input value="1999-12-09T20:10" placeholder="yyyy-mm-ddThh:mm" name="datetime-local" type="datetime-local" id="datetime-local" />
 		    </div>
 			
+		    <div>
+			    <label for="range">
+			        range:
+			    </label>
+			    <input name="range" type="range" id="range" />
+		    </div>
 			
             <div>
             	<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>

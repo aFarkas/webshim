@@ -2,6 +2,7 @@
     
     <property name="dist" value="./dist"/>
     <property name="src" value="./src"/>
+	<property name="shims" value="./src/shims"/>
     
     <taskdef resource="net/sf/antcontrib/antlib.xml">
         <classpath>
@@ -10,7 +11,26 @@
     </taskdef>
     
     <target name="WebExtlib">
-    	
+    	<concat destfile="${shims}/combined-forms.js">
+            <fileset file="${shims}/placeholder.js" />
+            <fileset file="${shims}/validity.js" />
+            <fileset file="${shims}/validation-message.js" />
+            <fileset file="${shims}/input-ui.js" />
+        </concat>
+		
+		<concat destfile="${shims}/combined-x.js">
+            <fileset file="${shims}/geolocation.js" />
+            <fileset file="${shims}/combined-forms.js" />
+            <fileset file="${shims}/canvas.js" />
+        </concat>
+		
+		<concat destfile="${shims}/combined-all.js">
+            <fileset file="${shims}/combined-x.js" />
+            <fileset file="${shims}/json-storage.js" />
+        </concat>
+		
+		
+		
         <mkdir dir="${dist}" />
 		<mkdir dir="${dist}" />
         <copy todir="${dist}/dev" overwrite="true">

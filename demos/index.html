@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="../src/html-ext.js"></script>
+	<script src="../src/features.js"></script>
+	
+    <script type="text/javascript" class="example">
+    	
+		//path is path of html-ext.js + shims/
+    	$.htmlExt.loader.basePath += 'shims/';
+		//load all defined modules (look into features.js)
+		//or load only a specific feature with $.htmlExt.loader.loadList('feature-name');
+		$.htmlExt.loader.loadList();
+        
+    </script>
+	
+	<title>webshims lib</title>
+	    
+</head>
+
+<body>
+	<div id="wrapper">    
+		<h1>Webshims Lib</h1>
+		<h2>About</h2>
+		<p>Webshims Lib enables some of the latest Browserfeatures also known as "HTML5-Features" in non capable Browsers. It is build on Top of jQuery.</p>
+		<h3>Main concepts</h3>
+		<ul>
+			<li><strong>Capability based loading</strong>: lightweight for good browsers / heavyweight for really bad browsers (I really like this)</li>
+			<li><strong>almost pure native HTML5 | no/less abstractions</strong>: Helps you to learn HTML5 (Markup-/DOM-APIs) and to build usefull abstractions and extensions on top of the standard. Documentation is the <a href="http://dev.w3.org/html5/html-author/">HTML5 W3C Specification</a></li>
+			<li><strong>futureproof Feature-Detection</strong>: We try to feature detect everything instead of browsersniffing to be more futureproof</li>
+		</ul>
+		<h2>How to</h2>
+		<h3>Embedding and configuring the script</h3>
+		
+		<p></p>
+		
+		<h3>When is a feature ready to use?</h3>
+		
+		<h3>minor Abstraction to DOM-Attributes, DOM-Methods and DOM-Events</h3>
+		
+		<h3>How to build an abstraction/extension, that works with and without webshims lib?</h3>
+		
+		
+		<h2>Simple and ugly Demos: You are the developer. Improve HTML/CSS/JS etc.</h2>
+		
+		<h3>Semantic Structure</h3>
+		<p>section, articel, footer, nav etc. (+Dynamic injection)</p>
+		
+		<h3>Geolocation</h3>
+		<button class="geolocation">Where am I?</button>
+		
+		<h3>Canvas</h3>
+		
+		<canvas class="peter" width="200" height="200"></canvas>
+		
+		<h3>HTML5 constraint validation + input-type Widgets</h3>
+		
+		<form action="#">
+			<div class="form-element">
+                <label for="email">
+                    E-Mail:
+				</label>
+               	<input name="email" class="email" type="email" id="email" placeholder="yourmail@host.de" />
+            </div>
+			<div>
+			    <label for="range">
+			        range:
+			    </label>
+			    <input name="range" type="range" id="range" />
+		    </div>
+			<div>
+				<input type="submit" />
+			</div>
+		</form>
+		<p><a href="webforms/index.html">More Demos &amp; Information on the webforms module</a></p>
+		<h3>JSON.parse/JSON.stringify &amp; localStorage/sessionStorage</h3>
+		
+		
+		<h2>Further Development</h2>
+		
+		
+		
+		
+		
+    </div> 
+	
+	<script type="text/javascript">
+		$.htmlExt.readyModules('ready geolocation', function(){
+			$('button.geolocation').click(function(){
+				navigator.geolocation.getCurrentPosition(function(pos){
+					alert('I think you are @ latitude: '+ pos.coords.latitude +'/longitude: ' + pos.coords.longitude);
+				}, function(){
+					alert('Oops, something went wrong');
+				});
+			});
+		});
+		
+		//canvas feature
+        $.htmlExt.readyModules('ready canvas', function(){
+			$('canvas.peter').each(function(){
+				var animate = function(ax, ay, adx, ady, bx, by, bdx, bdy){
+					setTimeout(function(){
+						//Bewegen und Abprallen für Quadrat A
+						if(ax == 150){
+							adx = -1;
+						}
+						else{
+							if(ax == 0){
+								adx = 1;
+							}
+						}
+						if(ay == 150){
+							ady = -1;
+						}
+						else{
+							if(ay == 0){
+								ady = 1;
+							}
+						}
+						ax = ax+adx;
+						ay = ay+ady;
+						//Bewegen und Abprallen für Quadrat B
+						if(bx == 150){
+							bdx = -1;
+						}
+						else{
+							if(bx == 0){
+								bdx = 1;
+							}
+						}
+						if(by == 150){
+							bdy = -1;
+						}
+						else{
+							if(by == 0){
+								bdy = 1;
+							}
+						}
+						bx = bx+bdx;
+						by = by+bdy;
+						// Alles neu zeichnen
+						context.clearRect(0, 0, 200, 200);
+						context.fillStyle = "rgba(0, 0, 255, 0.5)";
+						context.fillRect(ax, ay, 50, 50);
+						context.fillStyle = "rgba(0, 255, 0, 0.5)";
+						context.fillRect(bx, by, 50, 50);
+						animate(ax, ay, adx, ady, bx, by, bdx, bdy);
+					}, 30);
+				};
+				var context = $(this).getContext('2d');
+				animate(31, 69, 1, -1, 8, 25, 1, 1);
+			});
+			
+
+        });
+		
+    </script>
+</body>
+</html>   

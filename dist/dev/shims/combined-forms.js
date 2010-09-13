@@ -1,3 +1,164 @@
+/*
+ * HTML5 placeholder-enhancer
+ * version: 2.0.2
+ * including a11y-name fallback
+ * 
+ * Simply use the HTML5 placeholder attribute 
+ * <input type="text" id="birthday" placeholder="dd.mm.yyyy" />
+ * 
+ * http://www.protofunc.com/2009/08/16/meinung-zu-html5/, 
+ * http://robertnyman.com/2010/06/17/adding-html5-placeholder-attribute-support-through-progressive-enhancement/
+ * 
+ */
+
+
+(function($){
+	if($.support.placeholder){
+		return;
+	}
+	$.support.placeholder = 'shim';
+	
+	var pHolder = (function(){
+		var showPlaceholder = function(){
+				if(!this.value){
+					$(this).addClass('placeholder-visible');
+					this.value = this.getAttribute('placeholder') || '';
+				}
+			},
+			hidePlaceHolder = function(){
+				if( $(this).hasClass('placeholder-visible') ){
+					this.value = '';
+					$(this).removeClass('placeholder-visible');
+				}
+			},
+			placeholderID 	= 0,
+			delReg 	= /\n|\r|\f|\t/g
+		;
+		
+		return {
+			create: function(elem){
+				if($.data(elem, 'placeHolder')){return;}
+				var remove = function(){
+					hidePlaceHolder.apply(elem);
+				};
+				placeholderID++;
+				$.data(elem, 'placeHolder', placeholderID);
+				$(elem)
+					.bind('blur', showPlaceholder)
+					.bind('focus', hidePlaceHolder)
+				;
+				$(window).bind('unload.id-'+placeholderID, remove);
+				$(elem.form).bind('submit.id-'+placeholderID, remove);
+			},
+			changesValidity: function(elem, val){
+				if($.support.validity === true && $.attr(elem, 'willValidate')){
+					if( $.attr(elem, 'required') ){return true;}
+					var oldVal 	= $.attr(elem, 'value'),
+						ret 	= false
+					;
+					$.attr(elem, 'value', val);
+					ret = !($.attr(elem, 'validity') || {valid: true}).valid;
+					$.attr(elem, 'value', oldVal);
+				}
+				return false;
+			},
+			update: function(elem, val){
+				if(!val){
+					pHolder.destroy(elem);
+					elem.removeAttribute('placeholder');
+					return;
+				}
+				
+				var input = $(elem);
+				val = val.replace(delReg, '');
+				elem.setAttribute('placeholder', val);
+				
+				if( pHolder.changesValidity(elem, val) ){
+					pHolder.destroy(elem);
+					return;
+				}
+				pHolder.create(elem);
+				if(!input.val()){
+					input.addClass('placeholder-visible');
+					elem.value = val;
+				}
+			},
+			destroy: function(elem){
+				var id = $.data(elem, 'placeHolder');
+				if(!id){return;}
+				$.data(elem, 'placeHolder', false);
+				$(elem)
+					.unbind('blur', showPlaceholder)
+					.unbind('focus', hidePlaceHolder)
+				;
+				$(window).unbind('unload.id-'+id);
+				$(elem.form).unbind('submit.id-'+id);
+				hidePlaceHolder.apply(this);
+			}
+		};
+	})();
+	
+	
+	$.htmlExt.attr('placeholder', {
+		elementNames: ['input', 'textarea'],
+		setter: function(elem, val){
+			pHolder.update(elem, val);
+		},
+		getter: function(elem){
+			return elem.getAttribute('placeholder');
+		}
+	});
+		
+	var value = {
+		elementNames: ['input', 'textarea'],
+		setter: function(elem, value, oldFn){
+			var placeholder = elem.getAttribute('placeholder');
+			if(placeholder && 'value' in elem){
+				if(value){
+					$(elem).removeClass('placeholder-visible');
+				} else {
+					pHolder.update(elem, placeholder);
+				}
+			}
+			oldFn();
+		},
+		getter: function(elem, oldFn){
+			if($(elem).hasClass('placeholder-visible')){
+				return '';
+			}
+			return oldFn();
+		}
+	};
+	
+	$.htmlExt.attr('value', value);
+	
+	var oldVal = $.fn.val;
+	$.fn.val = function(val){
+		if(val === undefined){
+			if(this[0] && $(this[0]).hasClass('placeholder-visible')){
+				return '';
+			}
+			return oldVal.apply(this, arguments);
+		} else {
+			var that 	= this,
+				ret 	= oldVal.apply(this, arguments)
+			;
+			this.each(function(){
+				if( this.nodeType === 1 && this.getAttribute('placeholder') ){
+					value.setter(this, val, $.noop);
+				}
+			});
+			return ret;
+		}
+	};
+			
+	$.htmlExt.addReady(function(context){
+		$('input[placeholder], textarea[placeholder]', context).attr('placeholder', function(i, holder){
+			return holder;
+		});
+	});
+	
+})(jQuery);
 (function($){
 if($.support.validity){
 	return;
@@ -802,3 +963,309 @@ $.support.fieldsetValidation = 'shim';
 	;
 })(jQuery);
 
+(function($){
+	if($.support.validationMessage){
+		return;
+	}
+	$.support.validationMessage = 'shim';
+	
+	
+	$.htmlExt.validityMessages = [];
+	
+	$.htmlExt.validityMessages['de'] = {
+		typeMismatch: {
+			email: '{%value} ist keine zulässige E-Mail-Adresse',
+			url: '{%value} ist keine zulässige Webadresse',
+			number: '{%value}  ist keine Nummer!',
+			date: '{%value} ist kein Datum',
+			time: '{%value} ist keine Uhrzeit',
+			range: '{%value}  ist keine Nummer!',
+			"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
+		},
+		rangeUnderflow: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.',
+		rangeOverflow: '{%value} ist zu hoch. {%max} ist der oberste Wert, den Sie benutzen können.',
+		stepMismatch: 'Der Wert {%value} ist in diesem Feld nicht zulässig. Hier sind nur bestimmte Werte zulässig. {%title}',
+		tooLong: 'Der eingegebene Text ist zu lang! Sie haben {%valueLen} Buchstaben eingegeben, dabei sind {%maxlength} das Maximum.',
+		
+		patternMismatch: '{%value} hat für diese Seite ein falsches Format! {%title}',
+		valueMissing: 'Sie müssen einen Wert eingeben'
+	};
+	
+	$.htmlExt.validityMessages[''] = $.htmlExt.validityMessages['de'];
+	
+	var validiyMessages;
+	$(document).bind('htmlExtLangChange', function(){
+		$.htmlExt.activeLang($.htmlExt.validityMessages, 'validation-message', function(langObj){
+			validiyMessages = langObj;
+		});
+	});
+	
+	$.htmlExt.attr('validationMessage', {
+		elementNames: ['input', 'select', 'textarea'],
+		getter: function(elem){
+			var message = '';
+			if(!$.attr(elem, 'willValidate')){
+				return message;
+			}
+			message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
+			if(message){return message;}
+			var validity = $.attr(elem, 'validity') || {valid: 1};
+			if(validity.valid){return '';}
+			$.each(validity, function(name, prop){
+				if(name == 'valid' || !prop){return;}
+				message = validiyMessages[name];
+				if(message && typeof message !== 'string'){
+					message = message[ (elem.getAttribute('type') || '').toLowerCase() ];
+				}
+				if(message){
+					return false;
+				}
+			});
+			if(message){
+				$.each(['value', 'min', 'max', 'title', 'maxlength'], function(i, attr){
+					var val = $.attr(elem, attr) || '';
+					message = message.replace('{%'+ attr +'}', val);
+					if('value' == attr){
+						message = message.replace('{%valueLen}', val.length);
+					}
+				});
+			}
+			return message || '';
+		}
+	});
+})(jQuery);
+
+(function($){
+	if($.support.validity !== true || $.support.fieldsetValidation || window.noHTMLExtFixes){
+		return;
+	}
+	$.support.fieldsetValidation = 'shim';
+	$.htmlExt.addMethod('checkValidity', function(error){
+		if($.nodeName(this, 'fieldset')){
+			var ret = true;
+			$(this.elements || 'input, textarea, select', this)
+				.each(function(){
+					 if(this.checkValidity){
+						if(!this.checkValidity()){
+							ret = false;
+						}
+					}
+				})
+			;
+			return ret;
+		} else if(this.checkValidity){
+			return this.checkValidity();
+		}
+	});
+})(jQuery);
+(function($){
+	$.support.inputUI = 'shim';
+	
+	var options = $.htmlExt.loader.modules['input-ui'].options;
+	options.availabeLangs = 'af ar az bg bs cs da de el en-GB eo es et eu fa fi fo fr fr-CH he hr hu hy id is it ja ko it lt lv ms nl no pl pt-BR ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' ');
+	
+	if(options.juiSrc && (!$.fn.slider || !!$.fn.datepicker)){
+		$.htmlExt.loader.loadScript(options.juiSrc, false, 'jquery-ui');
+	} else {
+		$.htmlExt.createReadyEvent('jquery-ui');
+	}
+	
+	var replaceInputUI = function(context){
+		$('input', context).each(function(){
+			var type = $.attr(this, 'type');
+			if(replaceInputUI[type]){
+				replaceInputUI[type]($(this));
+			}
+		});
+	};
+	
+	replaceInputUI.common = function(orig, shim, methods){
+		if(options.nativeIsReplaced){
+			orig.bind('invalid', function(e){
+				setTimeout(function(){
+					if(!e.isDefaultPrevented()){
+						throw('you have to handle invalid events, if you replace native input-widgets.');
+					}
+				}, 0);
+			});
+		}
+		
+		var attr = {
+			css: {
+				marginRight: orig.css('marginRight'),
+				marginLeft: orig.css('marginLeft')
+			},
+			outerWidth: orig.outerWidth()
+		};
+		shim.addClass(orig[0].className).data('html5element', orig);
+		orig
+			.after(shim)
+			.data('inputUIReplace', {visual: shim, methods: methods})
+			.hide()
+		;
+		
+		return attr;
+	};
+	
+	replaceInputUI.date = function(elem){
+		var date = $('<input type="text" class="input-date" />'),
+			attr  = this.common(elem, date, replaceInputUI.date.attrs)
+		;
+		
+		if(attr.css){
+			date.css(attr.css);
+			if(attr.outerWidth){
+				date.outerWidth(attr.outerWidth);
+			}
+		}
+		date
+			.datepicker($.extend({}, options.date, {
+				onSelect: function(val, ui){
+					replaceInputUI.date.blockAttr = true;
+					elem.attr('value', $.datepicker.formatDate( 'yy-mm-dd', date.datepicker('getDate') ));
+					replaceInputUI.date.blockAttr = false;
+					elem.trigger('change');
+				}
+			}))
+			.data('datepicker')
+			.dpDiv
+			.addClass('input-date-datepicker-control')
+		;
+		$.each(['disabled', 'min', 'max', 'value'], function(i, name){
+			elem.attr(name, function(i, value){return value || '';});
+		});
+	};
+	
+	replaceInputUI.date.attrs = {
+		disabled: function(orig, shim, value){
+			shim.datepicker( "option", "disabled", !!value );
+		},
+		min: function(orig, shim, value){
+			try {
+				value = $.datepicker.parseDate('yy-mm-dd', value );
+			} catch(e){value = false;}
+			if(value){
+				shim.datepicker( 'option', 'minDate', value );
+			}
+		},
+		max: function(orig, shim, value){
+			try {
+				value = $.datepicker.parseDate('yy-mm-dd', value );
+			} catch(e){value = false;}
+			if(value){
+				shim.datepicker( 'option', 'maxDate', value );
+			}
+		},
+		value: function(orig, shim, value){
+			if(!replaceInputUI.date.blockAttr){
+				try {
+					var dateValue = $.datepicker.parseDate('yy-mm-dd', value );
+				} catch(e){var dateValue = false;}
+				if(dateValue){
+					shim.datepicker( "setDate", dateValue );
+				} else {
+					shim.attr( "value", value );
+				}
+			}
+		}
+	};
+	
+	replaceInputUI.range = function(elem){
+		var range = $('<span class="input-range" />'),
+			attr  = this.common(elem, range, replaceInputUI.range.attrs)
+		;
+		
+		if(attr.css){
+			range.css(attr.css);
+			if(attr.outerWidth){
+				range.outerWidth(attr.outerWidth);
+			}
+		}
+		range.slider($.extend(options.slider, {
+			change: function(e, ui){
+				if(e.originalEvent){
+					replaceInputUI.range.blockAttr = true;
+					elem.attr('value', ui.value);
+					replaceInputUI.range.blockAttr = false;
+					elem.trigger('change');
+				}
+			}
+		}));
+		
+		$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
+			elem.attr(name, function(i, value){return value || '';});
+		});
+	};
+	
+	replaceInputUI.range.attrs = {
+		disabled: function(orig, shim, value){
+			shim.slider( "option", "disabled", !!value );
+		},
+		min: function(orig, shim, value){
+			value = (value) ? value * 1 || 0 : 0;
+			shim.slider( "option", "min", value );
+		},
+		max: function(orig, shim, value){
+			value = (value || value === 0) ? value * 1 || 100 : 100;
+			shim.slider( "option", "max", value );
+		},
+		value: function(orig, shim, value){
+			value = $(orig).attr('valueAsNumber');
+			if(isNaN(value)){
+				value = (shim.slider('option', 'max') - shim.slider('option', 'min')) / 2;
+				orig.value = value;
+			}
+			if(!replaceInputUI.range.blockAttr){
+				shim.slider( "option", "value", value );
+			}
+		},
+		step: function(orig, shim, value){
+			value = (value) ? value * 1 || 1 : 1;
+			shim.slider( "option", "step", value );
+		}
+	};
+	
+	$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, attr){
+		$.htmlExt.attr(attr, {
+			elementNames: ['input'],
+			setter: function(elem, val, fn){
+				var widget = $.data(elem, 'inputUIReplace');
+				fn();
+				if(widget && widget.methods[attr]){
+					val = widget.methods[attr](elem, widget.visual, val);
+				}
+			},
+			getter: true
+		});
+	});
+	
+	
+	(function($){
+		
+		var changeDefaults = function(langObj){
+			if(!langObj){return;}
+			var opts = $.extend({}, langObj, options.date);
+			$('input.input-date.hasDatepicker').datepicker('option', opts).each(function(){
+				var orig = $.data(this, 'html5element');
+				if(orig){
+					$.each(['disabled', 'min', 'max', 'value'], function(i, name){
+						orig.attr(name, function(i, value){return value || '';});
+					});
+				}
+			});
+			$.datepicker.setDefaults(opts);
+		};
+		
+		$(document).one('jquery-uiReady', function(){
+			$(document).bind('htmlExtLangChange', function(){
+				$.htmlExt.activeLang($.datepicker.regional, 'input-ui', changeDefaults);
+			});
+		});
+	})(jQuery);
+	
+	$.htmlExt.addReady(function(context){
+		$(document).bind('jquery-uiReady', function(){
+			replaceInputUI(context);
+		});
+	});
+})(jQuery);

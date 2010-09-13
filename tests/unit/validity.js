@@ -82,7 +82,10 @@ asyncTest("validity Modul", function(){
 	willValidate.filter(':eq(2)').attr('disabled', true);
 	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate disabled' );
 	willValidate.filter(':eq(2)').attr('disabled', false);
-	
+	equals( $('#form-1 input:willValidate').length, total, 'willValidate enabled' );
+	form1.find('#name').removeAttr('name');
+	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate: false without name' );
+	form1.find('#name').attr('name', 'name');
 	//invalid
 	var invalid = $('input, textarea, select', form1).filter(':invalid');
 	equals( invalid.length, 5, 'total invalid' );
@@ -316,6 +319,12 @@ asyncTest("validity Modul", function(){
 		},
 		{
 			attrs: {
+				value: '2010-10-31'
+			},
+			trueState: 'valid'
+		},
+		{
+			attrs: {
 				value: '1488-12-11'
 			},
 			trueState: 'valid'
@@ -383,7 +392,7 @@ asyncTest("validity Modul", function(){
 		}
 	],
 	createTestMethodA('date'));
-	
+
 	$.each([
 		{
 			attrs: {
@@ -662,9 +671,72 @@ asyncTest("validity Modul", function(){
 		
 	})();
 	
+	QUnit.reset();
+	$.each([
+		{
+			id: 'number',
+			value: '34',
+			result: 34
+		},
+		{
+			id: 'number',
+			value: '34.56',
+			result: 34.56
+		},
+		{
+			id: 'number',
+			value: '1e2',
+			result: 100
+		},
+		{
+			id: 'number',
+			value: '1d2'
+		},
+		{
+			id: 'date',
+			value: '1999-12-12',
+			result: 944956800000
+		},
+		{
+			id: 'date',
+			value: '1899-12-12',
+			result: -2210716800000
+		},
+		{
+			id: 'date',
+			value: '1899-12-32'
+		},
+		{
+			id: 'date',
+			value: '1899-12-12-'
+		},
+		{
+			id: 'date',
+			value: '2010-12-31',
+			result: 1293753600000
+		},
+		{
+			id: 'datetime-local',
+			value: '2010-12-31',
+			result: 1293753600000
+		}
+	], function(i, data){
+		var elem = $('#'+data.id);
+		elem.attr('value', data.value);
+		if($.support.validity ===  true && data.value != elem.attr('value')){
+			return;
+		}
+		if(data.result === undefined){
+			ok(isNaN(elem.attr('valueAsNumber')), data.value+' is as number NaN, element: '+ data.id);
+		} else {
+			ok(elem.attr('valueAsNumber') === data.result, data.value+' is AsNumber: '+ data.result +', element: '+ data.id);
+		}
+	});
 	//valueAsNumber + valueAsDate
 	//invalid event + manual testpage
 });
-$(document).bind('validityReady', function(){
-	start();
+$(window).load(function(){
+	$.htmlExt.readyModules('validity input-ui validation-message', function(){
+		start();
+	});
 });

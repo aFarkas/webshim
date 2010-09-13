@@ -35,7 +35,7 @@
 		main web shim extension fiels
 		Note: you can combine/concat/rename them with your other files, but you have to include them in the head without a defer/async attribute!
 	 -->
-	<script src="../../dist/minified/html-ext.js"></script>
+	<script src="../../dist/dev/html-ext.js"></script>
 	<script src="../../dist/minified/features.js"></script>
 	
     <script type="text/javascript" class="example">
@@ -44,58 +44,8 @@
 		
 		//load all shims
 		//$.htmlExt.loader.loadList();
-		//or load webform 2.0 shims
-		$.htmlExt.loader.loadList(['validity', 'placeholder', 'validation-message']);
-		
-		$(function(){
-			var markValidity = {
-				invalid: function(elem){
-					$(elem).closest('fieldset, .form-element')
-						.addClass('invalid')
-						.removeClass('valid')
-					;
-				},
-				valid: function(elem){
-					$(elem).closest('fieldset, .form-element')
-						.addClass('valid')
-						.removeClass('invalid')
-					;
-				}
-			};
-			$('form')
-				.bind('focusout', function(e){
-					if(!$(e.target).attr('willValidate')){return;}
-					if($(e.target).attr('validity').valid){
-						markValidity.valid(e.target);
-					} else {
-						markValidity.invalid(e.target);
-					}
-				})
-				.bind('invalid', function(e){
-					markValidity.invalid(e.target);
-				})
-			;
-		});
-		
-		// button features
-        $(function(){
-			if(!window.console){
-				window.console = {log: window.alert};
-			}
-			$('button.feature').bind('click', function(e){
-				var elem = $(this).parent().find(':input');
-				e.preventDefault();
-				if($(this).attr('data-action') === 'method'){
-					var ret = elem[$(this).attr('data-name')]();
-					if(ret !== elem){
-						console.log(ret);
-					}
-				} else {
-					console.log(elem.attr($(this).attr('data-name')));
-				} 
-				return false;
-			});
-        });
+		//or load webform 2.0 shims $.htmlExt.loader.loadList(['validity', 'placeholder', 'validation-message', 'input-ui']);
+		$.htmlExt.loader.loadList();
 		
     </script>
 	
@@ -174,6 +124,12 @@
 						<button class="feature" data-action="method" data-name="checkValidity">$(this).checkValidity()</button>
 				    </div>
 					
+				    <div>
+					    <label for="range">
+					        range:
+					    </label>
+					    <input name="range" type="range" id="range" />
+				    </div>
 					
                     <div>
                     	<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
@@ -208,5 +164,27 @@
                 </fieldset>
             </form>
        </div>
+	   
+	   <script>
+	   	// button features: no need to copy this
+        $(function(){
+			if(!window.console){
+				window.console = {log: window.alert};
+			}
+			$('button.feature').bind('click', function(e){
+				var elem = $(this).parent().find(':input');
+				e.preventDefault();
+				if($(this).attr('data-action') === 'method'){
+					var ret = elem[$(this).attr('data-name')]();
+					if(ret !== elem){
+						console.log(ret);
+					}
+				} else {
+					console.log(elem.attr($(this).attr('data-name')));
+				} 
+				return false;
+			});
+        });
+	   </script>
 </body>
 </html> 

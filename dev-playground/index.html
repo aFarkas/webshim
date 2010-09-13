@@ -19,50 +19,7 @@
 		button.feature {
 			float: right;
 		}
-		.placeholder-visible {
-			color: #999;
-		}
-		.validity-alert {
-			position: absolute;
-			margin: 3px 0 0;
-			border: 1px solid #933;
-			padding: 8px;
-			max-width: 350px;
-			-moz-border-radius: 5px;
-			border-radius: 5px;
-			-moz-box-shadow: 3px 3px 4px #333, inset 1px 1px 5px rgba(99, 99, 99, 0.5), inset -1px -1px 5px rgba(99, 99, 99, 0.5);
-			-webkit-box-shadow: 3px 3px 4px #333, inset 1px 1px 5px rgba(99, 99, 99, 0.5), inset -1px -1px 5px rgba(99, 99, 99, 0.5);
-			box-shadow: 3px 3px 4px #333, inset 1px 1px 5px rgba(99, 99, 99, 0.5), inset -1px -1px 5px rgba(99, 99, 99, 0.5);
-			background: #fff;
-			background: rgba(255, 255, 255, 0.95);
-		}
 		
-		.step-controls {
-			position: relative;
-			top: 4px;
-			width: 8px;
-			height: 1.2em;
-		}
-		.step-controls span {
-			position: absolute;
-			width: 6px;
-			height: 6px;
-			border: 1px solid #666;
-			cursor: pointer;
-		}
-		.step-controls span.step-up {
-			top: 0;
-		}
-		.step-controls span.step-down {
-			bottom: 0;
-		}
-		/* ToDo */
-		.step-controls.disabled span,
-		.step-controls span.disabled {
-			border-color: #aaa;
-			opacity: 0.8;
-			cursor: default;
-		}
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
@@ -85,14 +42,11 @@
 				} 
 				return false;
 			});
-			
-			
-			
-//			$('form').bind('firstinvalid', function(e){
-//				$.htmlExt.validityAlert.showFor(e.target);
-//				return false;
-//			});
-			
+			$(function(){
+				$('form').bind('submit', function(){
+					alert('submit')
+				})
+			})
         });
 		
 		$.htmlExt.readyModules('ready geolocation', function(){
@@ -115,7 +69,7 @@
 
 <div id="wrapper">	
 	
-            <form action="#" method="post">
+            <form action="index.html" method="post">
             	<p>buttons at the right do log to console (open Firebug and reload)</p>
                 <!-- hidden fields should not be visible -->
 				<div class="form-item-hidden">
@@ -180,6 +134,12 @@
 						    </label>
 						    <input value="1999-12-09T20:10" placeholder="yyyy-mm-ddThh:mm" name="datetime-local" type="datetime-local" id="datetime-local" />
 							<button class="feature" data-action="method" data-name="checkValidity">$(this).checkValidity()</button>
+					    </div>
+					    <div>
+						    <label for="range">
+						        range:
+						    </label>
+						    <input name="range" type="range" id="range" />
 					    </div>
 					
 					
