@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+    
+	
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script>
+		(function(){
+			if(location.hash.replace('#', '') == 'noCapableBugfixes'){
+				window.noHTMLExtFixes = true; 
+			}
+			$(function(){
+				$('#bugfixes')
+					.attr('checked', !!window.noHTMLExtFixes)
+					.bind('click', function(){
+						location.hash = this.checked ? 'noCapableBugfixes' : '';
+						location.reload();
+					})
+				;
+			});
+		})();
+	</script>
+	<!-- 
+		main web shim extension fiels
+		Note: you can combine/concat/rename them with your other files, but you have to include them in the head without a defer/async attribute!
+	 -->
+	<script src="../demos/js-webshim/minified/html-ext.js"></script>
+	<script src="../demos/js-webshim/minified/features.js"></script>
+	
+    <script>
+    	//basePath = url form html-ext.js (you can rename it) + relative url to shim folder
+    	$.htmlExt.loader.basePath += 'shims/';
+		
+		//load all shims
+		//$.htmlExt.loader.loadList();
+		//or load webform 2.0 shims $.htmlExt.loader.loadList(['validity', 'placeholder', 'validation-message', 'input-ui']);
+		$.htmlExt.loader.loadList();
+		
+		$(function(){
+			var invalidEvents, submitEvents, preventInvalid;
+			
+			function equals(is, should, message){
+				message = $('<li>'+ message +' | was: '+ is +' expected: '+ should+'</li>').appendTo('#test-result');
+				message.css('backgroundColor', (is === should) ? '#090' : '#900');
+			}
+			
+			function reset(){
+				invalidEvents = 0;
+				submitEvents = 0;
+				preventInvalid = false;
+				submitPrevent = true;
+				$('#test-result').empty();
+			}
+					
+			
+			$('input.invalid-submit').click(function(){
+				reset();
+				$('input[type=text]').attr('value', '');
+				setTimeout(function(){
+					equals(submitEvents, 0, 'no submit events');
+					equals(invalidEvents, 2, 'two invalid events');
+				}, 10);
+			});
+			
+			$('input.invalid-prevent-submit-without-submit-prevention').click(function(){
+				reset();
+				preventInvalid = true;
+				submitPrevent = false;
+				$('input[type=text]').attr('value', '');
+				setTimeout(function(){
+					equals(submitEvents, 0, 'no submit events');
+					equals(invalidEvents, 2, 'two invalid events');
+				}, 10);
+			});
+			
+			$('input.invalid-prevent-submit').click(function(){
+				reset();
+				preventInvalid = true;
+				$('input[type=text]').attr('value', '');
+				setTimeout(function(){
+					equals(submitEvents, 0, 'no submit events');
+					equals(invalidEvents, 2, 'two invalid events');
+				}, 10);
+			});
+			
+			$('input.valid-submit').click(function(){
+				reset();
+				preventInvalid = true;
+				$('input.text').attr('value', 'some value');
+				setTimeout(function(){
+					equals(submitEvents, 1, '1 submit events');
+					equals(invalidEvents, 0, 'no invalid events');
+				}, 10);
+			});
+			
+			
+			$('form').bind('submit invalid', function(e){
+				if(e.type == 'submit'){
+					submitEvents++;
+					if(submitPrevent){
+						e.preventDefault();
+					}
+				} else if(e.type == 'invalid'){
+					invalidEvents++;
+					if(preventInvalid){
+						e.preventDefault();
+					}
+				}
+			});
+		});
+    </script>
+	
+	<title>submit-test</title>
+	    
+</head>
+
+<body>        
+<div>
+	<input type="checkbox" id="bugfixes" /> <label for="bugfixes"><strong>without</strong> (capable browser) bugfixes</label>
+</div>
+<ul id="test-result">
+	
+</ul>
+<div id="wrapper">	
+	
+    <form action="bigfail.html">
+    	<input name="test-1" class="text" type="text" required />
+		<input name="test-2" class="text" type="text" required />
+		<input type="submit" class="invalid-submit" value="try invalid submit" />
+		<input type="submit" class="invalid-prevent-submit-without-submit-prevention" value="try invalid-prevented submit (no submit prevention)" />
+		<input type="submit" class="invalid-prevent-submit" value="try invalid-prevented submit" />
+		<input type="submit" class="valid-submit" value="try valid  submit" />
+    </form>
+</div>
+	   
+	   
+</body>
+</html> 
