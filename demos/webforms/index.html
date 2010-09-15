@@ -35,10 +35,10 @@
 		main web shim extension fiels
 		Note: you can combine/concat/rename them with your other files, but you have to include them in the head without a defer/async attribute!
 	 -->
-	<script src="../../dist/dev/html-ext.js"></script>
-	<script src="../../dist/minified/features.js"></script>
+	<script src="../js-webshim/minified/html-ext.js"></script>
+	<script src="../js-webshim/minified//features.js"></script>
 	
-    <script type="text/javascript" class="example">
+    <script>
     	//basePath = url form html-ext.js (you can rename it) + relative url to shim folder
     	$.htmlExt.loader.basePath += 'shims/';
 		
@@ -53,7 +53,7 @@
 	    
 </head>
 
-<body class="js-off">         
+<body>         
 
 <div id="wrapper">	
 	

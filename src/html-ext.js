@@ -238,7 +238,8 @@
 					e = $.event.fix( e );
 					return $.event.handle.call( this, e );
 				};
-				$.htmlExt.event(name, {
+				$.event.special[name] = $.event.special[name] || {};
+				$.extend($.event.special[name], {
 					setup: function() {
 						this.addEventListener(name, handler, true);
 					}, 

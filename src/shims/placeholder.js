@@ -32,12 +32,22 @@
 				}
 			},
 			placeholderID 	= 0,
-			delReg 	= /\n|\r|\f|\t/g
+			delReg 	= /\n|\r|\f|\t/g,
+			allowedPlaceholder = {
+				text: 1,
+				search: 1,
+				url: 1,
+				email: 1,
+				password: 1,
+				tel: 1,
+				url: 1
+			}
 		;
 		
 		return {
 			create: function(elem){
-				if($.data(elem, 'placeHolder')){return;}
+				var type = $.attr(elem, 'type');
+				if($.data(elem, 'placeHolder') || (!allowedPlaceHolder[type] && !$.nodeName('textarea', elem)) ){return;}
 				var remove = function(){
 					hidePlaceHolder.apply(elem);
 				};

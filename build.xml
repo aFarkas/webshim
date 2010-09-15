@@ -1,6 +1,6 @@
 <project name="WebExtlib" default="WebExtlib" basedir=".">
     
-    <property name="dist" value="./dist"/>
+    <property name="dist" value="./demos/js-webshim"/>
     <property name="src" value="./src"/>
 	<property name="shims" value="./src/shims"/>
     

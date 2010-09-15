@@ -32,16 +32,7 @@
 	/*
 	 * HTML5 FORM-Features
 	 */
-	/* placeholder */
-	$.support.placeholder = ('placeholder'  in $('<input type="text" />')[0]);
-	$.htmlExt.addModule('placeholder', {
-		test: function(){
-			return $.support.placeholder;
-		},
-		css: 'shim.css',
-		combination: ['combined-all', 'combined-x', 'combined-forms']
-	});
-	/* END: placeholder */
+	
 	
 	/* html5 constraint validation */
 	$.support.validity = ('checkValidity' in $('<form action="#" />')[0]);
@@ -232,6 +223,17 @@
 		}
 	};
 	$.htmlExt.validityAlert = new ValidityAlert();
+	
+	/* placeholder */
+	$.support.placeholder = ('placeholder'  in $('<input type="text" />')[0]);
+	$.htmlExt.addModule('placeholder', {
+		test: function(){
+			return $.support.placeholder;
+		},
+		css: 'shim.css',
+		combination: ['combined-all', 'combined-x', 'combined-forms']
+	});
+	/* END: placeholder */
 	
 	/* END: html5 constraint validation */
 	

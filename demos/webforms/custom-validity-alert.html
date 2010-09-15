@@ -52,17 +52,18 @@
 		main web shim extension fiels
 		Note: you can combine/concat/rename them with your other files, but you have to include them in the head without a defer/async attribute!
 	 -->
-	<script src="../../dist/minified/html-ext.js"></script>
-	<script src="../../dist/minified/features.js"></script>
+	<script src="../js-webshim/minified/html-ext.js"></script>
+	<script src="../js-webshim/minified/features.js"></script>
 	
-    <script type="text/javascript" class="example">
+    <script>
     	//basePath = url form html-ext.js (you can rename it) + relative url to shim folder
     	$.htmlExt.loader.basePath += 'shims/';
 		
 		//load all shims
-		//$.htmlExt.loader.loadList();
+		$.htmlExt.loader.loadList();
+		
 		//or load webform 2.0 shims only
-		$.htmlExt.loader.loadList(['validity', 'placeholder', 'validation-message', 'input-ui']);
+		//$.htmlExt.loader.loadList(['validity', 'placeholder', 'validation-message', 'input-ui']);
 		
 		$(function(){
 			var markValidity = {
@@ -82,6 +83,7 @@
 			$('form')
 				.bind('focusout', function(e){
 					if(!$(e.target).attr('willValidate')){return;}
+					//you can also use the HTML5 Selectors :valid/:invalid + handy custom :willValidate ($(e.target).is(':valid');)
 					if($(e.target).attr('validity').valid){
 						markValidity.valid(e.target);
 					} else {
@@ -95,7 +97,7 @@
 				.bind('firstinvalid', function(e){
 					//tell the api, that we will handle the invalid event -> this will preventDefault all comming invalid events in this event loop
 					e.preventDefault();
-					//custom method for simple validationAlerts (you can overwrite this or write your own */
+					//custom method for simple validationAlerts (you can overwrite this or write your own)
 					$.htmlExt.validityAlert.showFor(e.target);
 				})
 			;
@@ -107,7 +109,7 @@
 	    
 </head>
 
-<body class="js-off">         
+<body>         
 
 <div id="wrapper">	
     <form action="#" method="post">
