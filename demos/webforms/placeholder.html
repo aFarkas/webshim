@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+    
+	<style>
+		#wrapper {
+			margin: auto;
+			width: 800px;
+			max-width: 85%;
+		}
+		fieldset div {
+			overflow: hidden;
+			zoom: 1;
+			padding: 5px;
+			border: 1px solid #000;
+			margin: 5px 0;
+		}
+		
+	</style>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<!-- 
+		main web shim extension fiels
+		Note: you can combine/concat/rename them with your other files, but you have to include them in the head without a defer/async attribute!
+	 -->
+	<script src="../js-webshim/minified/html-ext.js"></script>
+	<script src="../js-webshim/minified/features.js"></script>
+	
+    <script>
+    	//basePath = url form html-ext.js (you can rename it) + relative url to shim folder
+    	$.htmlExt.loader.basePath += 'shims/';
+		
+		//load all shims
+		//$.htmlExt.loader.loadList();
+		//or load webform 2.0 shims $.htmlExt.loader.loadList(['validity', 'placeholder', 'validation-message', 'input-ui']);
+		$.htmlExt.loader.loadList();
+		
+    </script>
+	
+	<title>playing</title>
+	    
+</head>
+
+<body>         
+
+<div id="wrapper">	
+	
+            <form action="#" method="post">
+            	<p>buttons at the right do log to console (open Firebug and reload)</p>
+               
+                <fieldset>
+                    <h2>Personal information</h2>
+                    <div class="form-element">
+                        <label for="text">
+                            required text: <dfn title="required">*</dfn>
+						</label>
+                        <input name="text" placeholder="some text" required="required" type="text" id="text" />
+                    </div>
+                    <div class="form-element">
+                        <label for="email">
+                            E-Mail: <dfn title="required">*</dfn>
+						</label>
+                       	<input name="email" placeholder="your email" required="required" class="email" type="email" id="email" />
+                    </div>
+                   
+                	<div class="form-element">
+                        <label for="url">
+                            url:
+						 </label>
+                         <input placeholder="http://" pattern="^http" type="url" id="url" name="url" />
+                   	</div>
+					
+					<div class="form-element">
+                        <label for="password">
+                            password:
+						 </label>
+                         <input placeholder="a password" type="password" id="password" name="password" />
+                   	</div>
+					<div class="form-element">
+                    	<label for="search">
+                        	search:
+						</label>
+                        <input type="search" name="search" placeholder="a keyword" id="search" />
+					</div>
+					
+					<div class="form-element">
+                    	<label for="tel">
+                        	tel:
+						</label>
+                        <input type="tel" name="tel" placeholder="your phone number" id="tel" />
+					</div>
+                
+               
+					<div class="form-element">
+					    <label for="date">
+					        textarea:
+					    </label>
+					    <textarea placeholder="some longer text"></textarea>
+					</div>
+				    
+                    <div class="button-wrapper">
+                    	<input type="submit" value="Send" />
+                    </div>
+                </fieldset>
+            </form>
+       </div>
+	   
+	   <script>
+	   	// button features: no need to copy this
+        $(function(){
+			if(!window.console){
+				window.console = {log: window.alert};
+			}
+			$('button.feature').bind('click', function(e){
+				var elem = $(this).parent().find(':input');
+				e.preventDefault();
+				if($(this).attr('data-action') === 'method'){
+					var ret = elem[$(this).attr('data-name')]();
+					if(ret !== elem){
+						console.log(ret);
+					}
+				} else {
+					console.log(elem.attr($(this).attr('data-name')));
+				} 
+				return false;
+			});
+        });
+	   </script>
+</body>
+</html> 

@@ -1,0 +1,67 @@
+.placeholder-visible {
+	color: #999;
+}
+.validity-alert {
+	position: absolute;
+	background: #fff;
+	border: 1px solid #f00;
+	padding: 5px;
+}
+
+.step-controls {
+	position: relative;
+	zoom: 1;
+	overflow: hidden;
+	display: inline-block;
+	top: 0.15em;
+	height: 1em;
+	width: 0.6em;
+}
+.step-controls span {
+	position: absolute;
+	display: inline-block;
+	overflow: hidden;
+	width: 0.4em;
+	height: 0.4em;
+	border: 0.08em solid #666;
+	cursor: pointer;
+	font-size: 1em;
+	line-height: 0;
+}
+.step-controls span.step-up {
+	top: 0;
+}
+.step-controls span.step-down {
+	bottom: 0;
+}
+/* disabled or readonly */
+.step-controls.disabled-step-control span {
+	border-color: #aaa;
+	opacity: 0.8;
+	cursor: default;
+}
+.input-range {
+	position: relative;
+	display: inline-block;
+	zoom: 1;
+	margin: 0 0.35em;
+	border: 1px solid #000;
+	height: 0.3em;
+	width: 155px;
+	border-radius: 0.1em;
+	-moz-border-radius: 0.1em;
+}
+.input-range .ui-slider-handle {
+	position: absolute;
+	margin: -0.2em 0 0 -0.35em;;
+	height: 0.7em;
+	width: 0.7em;
+	background-color: #666;
+	cursor: pointer;
+	border-radius: 0.35em;
+	-moz-border-radius: 0.35em;
+}
+.input-date-datepicker-control {
+	display: none;
+	background-color: #fff;
+}
