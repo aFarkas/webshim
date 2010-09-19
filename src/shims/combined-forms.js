@@ -1,174 +1,3 @@
-/*
- * HTML5 placeholder-enhancer
- * version: 2.0.2
- * including a11y-name fallback
- * 
- * Simply use the HTML5 placeholder attribute 
- * <input type="text" id="birthday" placeholder="dd.mm.yyyy" />
- * 
- * http://www.protofunc.com/2009/08/16/meinung-zu-html5/, 
- * http://robertnyman.com/2010/06/17/adding-html5-placeholder-attribute-support-through-progressive-enhancement/
- * 
- */
-
-
-(function($){
-	if($.support.placeholder){
-		return;
-	}
-	$.support.placeholder = 'shim';
-	
-	var pHolder = (function(){
-		var showPlaceholder = function(){
-				if(!this.value){
-					$(this).addClass('placeholder-visible');
-					this.value = this.getAttribute('placeholder') || '';
-				}
-			},
-			hidePlaceHolder = function(){
-				if( $(this).hasClass('placeholder-visible') ){
-					this.value = '';
-					$(this).removeClass('placeholder-visible');
-				}
-			},
-			placeholderID 	= 0,
-			delReg 	= /\n|\r|\f|\t/g,
-			allowedPlaceholder = {
-				text: 1,
-				search: 1,
-				url: 1,
-				email: 1,
-				password: 1,
-				tel: 1,
-				url: 1
-			}
-		;
-		
-		return {
-			create: function(elem){
-				var type = $.attr(elem, 'type');
-				if($.data(elem, 'placeHolder') || (!allowedPlaceholder[type] && !$.nodeName('textarea', elem)) ){return;}
-				var remove = function(){
-					hidePlaceHolder.apply(elem);
-				};
-				placeholderID++;
-				$.data(elem, 'placeHolder', placeholderID);
-				$(elem)
-					.bind('blur', showPlaceholder)
-					.bind('focus', hidePlaceHolder)
-				;
-				$(window).bind('unload.id-'+placeholderID, remove);
-				$(elem.form).bind('submit.id-'+placeholderID, remove);
-			},
-			changesValidity: function(elem, val){
-				if($.support.validity === true && $.attr(elem, 'willValidate')){
-					if( $.attr(elem, 'required') ){return true;}
-					var oldVal 	= $.attr(elem, 'value'),
-						ret 	= false
-					;
-					$.attr(elem, 'value', val);
-					ret = !($.attr(elem, 'validity') || {valid: true}).valid;
-					$.attr(elem, 'value', oldVal);
-				}
-				return false;
-			},
-			update: function(elem, val){
-				if(!val){
-					pHolder.destroy(elem);
-					elem.removeAttribute('placeholder');
-					return;
-				}
-				
-				var input = $(elem);
-				val = val.replace(delReg, '');
-				elem.setAttribute('placeholder', val);
-				
-				if( pHolder.changesValidity(elem, val) ){
-					pHolder.destroy(elem);
-					return;
-				}
-				pHolder.create(elem);
-				if(!input.val()){
-					input.addClass('placeholder-visible');
-					elem.value = val;
-				}
-			},
-			destroy: function(elem){
-				var id = $.data(elem, 'placeHolder');
-				if(!id){return;}
-				$.data(elem, 'placeHolder', false);
-				$(elem)
-					.unbind('blur', showPlaceholder)
-					.unbind('focus', hidePlaceHolder)
-				;
-				$(window).unbind('unload.id-'+id);
-				$(elem.form).unbind('submit.id-'+id);
-				hidePlaceHolder.apply(this);
-			}
-		};
-	})();
-	
-	
-	$.htmlExt.attr('placeholder', {
-		elementNames: ['input', 'textarea'],
-		setter: function(elem, val){
-			pHolder.update(elem, val);
-		},
-		getter: function(elem){
-			return elem.getAttribute('placeholder');
-		}
-	});
-		
-	var value = {
-		elementNames: ['input', 'textarea'],
-		setter: function(elem, value, oldFn){
-			var placeholder = elem.getAttribute('placeholder');
-			if(placeholder && 'value' in elem){
-				if(value){
-					$(elem).removeClass('placeholder-visible');
-				} else {
-					pHolder.update(elem, placeholder);
-				}
-			}
-			oldFn();
-		},
-		getter: function(elem, oldFn){
-			if($(elem).hasClass('placeholder-visible')){
-				return '';
-			}
-			return oldFn();
-		}
-	};
-	
-	$.htmlExt.attr('value', value);
-	
-	var oldVal = $.fn.val;
-	$.fn.val = function(val){
-		if(val === undefined){
-			if(this[0] && $(this[0]).hasClass('placeholder-visible')){
-				return '';
-			}
-			return oldVal.apply(this, arguments);
-		} else {
-			var that 	= this,
-				ret 	= oldVal.apply(this, arguments)
-			;
-			this.each(function(){
-				if( this.nodeType === 1 && this.getAttribute('placeholder') ){
-					value.setter(this, val, $.noop);
-				}
-			});
-			return ret;
-		}
-	};
-			
-	$.htmlExt.addReady(function(context){
-		$('input[placeholder], textarea[placeholder]', context).attr('placeholder', function(i, holder){
-			return holder;
-		});
-	});
-	
-})(jQuery);
 (function($){
 if($.support.validity){
 	return;
@@ -536,9 +365,16 @@ $.htmlExt.attr('valueAsNumber', {
 	setter: function(elem, val, fn){
 		var type = getType(elem);
 		if(typeModels[type] && typeModels[type].numberToString){
+			//is NaN a number?
+			if(isNaN(val)){
+				$.attr(elem, 'value', '');
+				return;
+			}
 			var set = typeModels[type].numberToString(val);
 			if(set !==  false){
 				$.attr(elem, 'value', set);
+			} else {
+				throw('INVALID_STATE_ERR: DOM Exception 11');
 			}
 		} else {
 			fn();
@@ -557,9 +393,15 @@ $.htmlExt.attr('valueAsDate', {
 	setter: function(elem, value, fn){
 		var type = getType(elem);
 		if(typeModels[type] && typeModels[type].dateToString){
+			if(value === null){
+				$.attr(elem, 'value', '');
+				return;
+			}
 			var set = typeModels[type].dateToString(value);
 			if(set !== false){
 				$.attr(elem, 'value', set);
+			} else {
+				throw('INVALID_STATE_ERR: DOM Exception 11');
 			}
 		} else {
 			fn();
@@ -621,6 +463,11 @@ $.htmlExt.addInputType('range', $.extend({}, typeModels.number, {
 	maxDefault: 100
 }));
 
+var transformDate = function(date){
+	var offset = date.getTimezoneOffset();
+	return new Date(date.getTime() + offset + 3600060);
+};
+
 $.htmlExt.addInputType('date', {
 	mismatch: function(val){
 		if(!val || !val.split || !(/\d$/.test(val))){return true;}
@@ -646,27 +493,21 @@ $.htmlExt.addInputType('date', {
 		if(!_noMismatch && this.mismatch(val)){
 			return null;
 		}
-		val = val.split(/\u002D/);
-		
-		var date = new Date();
-		date.setUTCMilliseconds(0);
-		date.setUTCSeconds(0);
-		date.setUTCMinutes(0);
-		date.setUTCHours(0);
-		date.setUTCDate(val[2]);
-		date.setUTCMonth(val[1] - 1);
-		date.setUTCFullYear(val[0]);
-		return date;
+		return new Date(this.asNumber(val, true));
 	},
-	asNumber: function(str){
-		str = this.asDate(str);
-		return (str === null) ? nan : str.getTime();
+	asNumber: function(str, _noMismatch){
+		var ret = nan;
+		if(_noMismatch || !this.mismatch(str)){
+			str = str.split(/\u002D/);
+			ret = Date.UTC(str[0], str[1] - 1, str[2]);
+		}
+		return ret;
 	},
 	numberToString: function(num){
 		return (isNumber(num)) ? this.dateToString(new Date(num)) : false;
 	},
 	dateToString: function(date){
-		return (date && date.getUTCFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
+		return (date && date.getFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
 	}
 });
 
@@ -680,7 +521,7 @@ $.htmlExt.addInputType('time', $.extend({}, typeModels.date,
 				sFraction;
 			if(val[2]){
 				val[2] = val[2].split(/\u002E/);
-				sFraction = val[2][1];
+				sFraction = parseInt(val[2][1], 10);
 				val[2] = val[2][0];
 			}
 			$.each(val, function(i, part){
@@ -696,8 +537,15 @@ $.htmlExt.addInputType('time', $.extend({}, typeModels.date,
 			if(val[2] && (val[2] > 59 || val[2] < 0 )){
 				return true;
 			}
-			if(sFraction && !isNumber(sFraction)){
+			if(sFraction && isNaN(sFraction)){
 				return true;
+			}
+			if(sFraction){
+				if(sFraction < 100){
+					sFraction *= 100;
+				} else if(sFraction < 10){
+					sFraction *= 10;
+				}
 			}
 			return (_getParsed === true) ? [val, sFraction] : false;
 		},
@@ -705,24 +553,24 @@ $.htmlExt.addInputType('time', $.extend({}, typeModels.date,
 		stepBase: 0,
 		stepScaleFactor:  1000,
 		asDate: function(val){
+			val = new Date(this.asNumber(val));
+			return (isNaN(val)) ? null : val;
+		},
+		asNumber: function(val){
+			var ret = nan;
 			val = this.mismatch(val, true);
-			if(val === true){
-				return null;
+			if(val !== true){
+				ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
+				if(val[1]){
+					ret += val[1];
+				}
 			}
-			var date = new Date();
-			date.setUTCMilliseconds(val[1] || 0);
-			date.setUTCSeconds(val[0][2] || 0);
-			date.setUTCMinutes(val[0][1]);
-			date.setUTCHours(val[0][0]);
-			date.setUTCDate('1');
-			date.setUTCMonth(0);
-			date.setUTCFullYear('1970');
-			return date;
+			return ret;
 		},
 		dateToString: function(date){
 			if(date && date.getUTCHours){
 				var str = addleadingZero(date.getUTCHours(), 2) +':'+ addleadingZero(date.getUTCMinutes(), 2),
-					tmp = date.getUTCSeconds()
+					tmp = date.getSeconds()
 				;
 				if(tmp != "0"){
 					str += ':'+ addleadingZero(tmp, 2);
@@ -748,24 +596,21 @@ $.htmlExt.addInputType('datetime-local', $.extend({}, typeModels.time,
 		},
 		noAsDate: true,
 		asDate: function(val){
+			val = new Date(this.asNumber(val));
+			
+			return (isNaN(val)) ? null : val;
+		},
+		asNumber: function(val){
+			var ret = nan;
 			var time = this.mismatch(val, true);
-			if(time === true){
-				return null;
+			if(time !== true){
+				val = val.split(/\u0054/)[0].split(/\u002D/);
+				ret = Date.UTC(val[2], val[1] - 1, val[0], time[0][0], time[0][1], time[0][2] || 0);
+				if(time[1]){
+					ret += time[1];
+				}
 			}
-			
-			var date = new Date();
-			
-			date.setUTCMilliseconds(time[1] || 0);
-			date.setUTCSeconds(time[0][2] || 0);
-			date.setUTCMinutes(time[0][1]);
-			date.setUTCHours(time[0][0]);
-			
-			val = val.split(/\u0054/)[0].split(/\u002D/);
-			date.setUTCDate(val[2]);
-			date.setUTCMonth(val[1] - 1);
-			date.setUTCFullYear(val[0]);
-			
-			return date;
+			return ret;
 		},
 		dateToString: function(date, _getParsed){
 			return typeModels.date.dateToString(date) +'T'+ typeModels.time.dateToString(date, _getParsed);
@@ -982,14 +827,33 @@ $.support.fieldsetValidation = 'shim';
 	
 	$.htmlExt.validityMessages = [];
 	
+	$.htmlExt.validityMessages[''] = {
+		typeMismatch: {
+			email: '{%value} is not a legal email address',
+			url: '{%value} is not a valid web address',
+			number: '{%value} is not a number!',
+			date: '{%value} is not a date',
+			time: '{%value} is not a time',
+			range: '{%value} is not a number!',
+			"datetime-local": '{%value} is not a correct date-time format.'
+		},
+		rangeUnderflow: '{%value} is too low. The lowest value you can use is {%min}.',
+		rangeOverflow: '{%value}  is too high. The highest value you can use is {%max}.',
+		stepMismatch: 'The value {%value} is not allowed for this form. Only certain values are allowed for this field. {%title}',
+		tooLong: 'The entered text is too large! You used {%valueLen} letters and the limit is {%maxlength}.',
+		
+		patternMismatch: '{%value} is not in the format this page requires! {%title}',
+		valueMissing: 'You have to specify a value'
+	};
+	
 	$.htmlExt.validityMessages['de'] = {
 		typeMismatch: {
 			email: '{%value} ist keine zulässige E-Mail-Adresse',
 			url: '{%value} ist keine zulässige Webadresse',
-			number: '{%value}  ist keine Nummer!',
+			number: '{%value} ist keine Nummer!',
 			date: '{%value} ist kein Datum',
 			time: '{%value} ist keine Uhrzeit',
-			range: '{%value}  ist keine Nummer!',
+			range: '{%value} ist keine Nummer!',
 			"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
 		},
 		rangeUnderflow: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.',
@@ -1001,7 +865,7 @@ $.support.fieldsetValidation = 'shim';
 		valueMissing: 'Sie müssen einen Wert eingeben'
 	};
 	
-	$.htmlExt.validityMessages[''] = $.htmlExt.validityMessages['de'];
+	
 	
 	var validiyMessages;
 	$(document).bind('htmlExtLangChange', function(){
@@ -1025,7 +889,7 @@ $.support.fieldsetValidation = 'shim';
 				if(name == 'valid' || !prop){return;}
 				message = validiyMessages[name];
 				if(message && typeof message !== 'string'){
-					message = message[ (elem.getAttribute('type') || '').toLowerCase() ];
+					message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
 				}
 				if(message){
 					return false;
@@ -1033,6 +897,7 @@ $.support.fieldsetValidation = 'shim';
 			});
 			if(message){
 				$.each(['value', 'min', 'max', 'title', 'maxlength'], function(i, attr){
+					if(message.indexOf('%'+attr) === -1){return;}
 					var val = $.attr(elem, attr) || '';
 					message = message.replace('{%'+ attr +'}', val);
 					if('value' == attr){
@@ -1074,9 +939,9 @@ $.support.fieldsetValidation = 'shim';
 	var options = $.htmlExt.loader.modules['input-ui'].options;
 	options.availabeLangs = 'af ar az bg bs cs da de el en-GB eo es et eu fa fi fo fr fr-CH he hr hu hy id is it ja ko it lt lv ms nl no pl pt-BR ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' ');
 	
-	if(options.juiSrc && (!$.fn.slider || !!$.fn.datepicker)){
+	if(options.juiSrc && (!$.fn.slider || !$.fn.datepicker)){
 		$.htmlExt.loader.loadScript(options.juiSrc, false, 'jquery-ui');
-	} else {
+	} else if($.fn.slider && $.fn.datepicker){
 		$.htmlExt.createReadyEvent('jquery-ui');
 	}
 	
@@ -1118,8 +983,15 @@ $.support.fieldsetValidation = 'shim';
 	};
 	
 	replaceInputUI.date = function(elem){
+		if(!$.fn.datepicker){return;}
 		var date = $('<input type="text" class="input-date" />'),
-			attr  = this.common(elem, date, replaceInputUI.date.attrs)
+			attr  = this.common(elem, date, replaceInputUI.date.attrs),
+			change = function(val, ui){
+				replaceInputUI.date.blockAttr = true;
+				elem.attr('value', $.datepicker.formatDate( 'yy-mm-dd', date.datepicker('getDate') ));
+				replaceInputUI.date.blockAttr = false;
+				elem.trigger('change');
+			}
 		;
 		
 		if(attr.css){
@@ -1130,13 +1002,9 @@ $.support.fieldsetValidation = 'shim';
 		}
 		date
 			.datepicker($.extend({}, options.date, {
-				onSelect: function(val, ui){
-					replaceInputUI.date.blockAttr = true;
-					elem.attr('value', $.datepicker.formatDate( 'yy-mm-dd', date.datepicker('getDate') ));
-					replaceInputUI.date.blockAttr = false;
-					elem.trigger('change');
-				}
+				onSelect: change
 			}))
+			.bind('change', change)
 			.data('datepicker')
 			.dpDiv
 			.addClass('input-date-datepicker-control')
@@ -1181,6 +1049,7 @@ $.support.fieldsetValidation = 'shim';
 	};
 	
 	replaceInputUI.range = function(elem){
+		if(!$.fn.slider){return;}
 		var range = $('<span class="input-range" />'),
 			attr  = this.common(elem, range, replaceInputUI.range.attrs)
 		;
@@ -1278,4 +1147,176 @@ $.support.fieldsetValidation = 'shim';
 			replaceInputUI(context);
 		});
 	});
+})(jQuery);
+/*
+ * HTML5 placeholder-enhancer
+ * version: 2.0.2
+ * including a11y-name fallback
+ * 
+ * Simply use the HTML5 placeholder attribute 
+ * <input type="text" id="birthday" placeholder="dd.mm.yyyy" />
+ * 
+ * http://www.protofunc.com/2009/08/16/meinung-zu-html5/, 
+ * http://robertnyman.com/2010/06/17/adding-html5-placeholder-attribute-support-through-progressive-enhancement/
+ * 
+ */
+
+
+(function($){
+	if($.support.placeholder){
+		return;
+	}
+	$.support.placeholder = 'shim';
+	
+	var pHolder = (function(){
+		var showPlaceholder = function(force){
+				if(!this.value || force === true){
+					$(this).addClass('placeholder-visible');
+					this.value = this.getAttribute('placeholder') || '';
+				}
+			},
+			hidePlaceHolder = function(){
+				if( $(this).hasClass('placeholder-visible') ){
+					this.value = '';
+					$(this).removeClass('placeholder-visible');
+				}
+			},
+			placeholderID 	= 0,
+			delReg 	= /\n|\r|\f|\t/g,
+			allowedPlaceholder = {
+				text: 1,
+				search: 1,
+				url: 1,
+				email: 1,
+				password: 1,
+				tel: 1,
+				url: 1
+			}
+		;
+		
+		return {
+			create: function(elem){
+				
+				if($.data(elem, 'placeHolder')){return;}
+				var remove = function(){
+					hidePlaceHolder.apply(elem);
+				};
+				placeholderID++;
+				$.data(elem, 'placeHolder', placeholderID);
+				$(elem)
+					.bind('blur', showPlaceholder)
+					.bind('focus', hidePlaceHolder)
+				;
+				$(window).bind('unload.id-'+placeholderID, remove);
+				$(elem.form).bind('submit.id-'+placeholderID, remove);
+			},
+			changesValidity: function(elem, val){
+				if($.support.validity === true && $.attr(elem, 'willValidate')){
+					if( $.attr(elem, 'required') ){return true;}
+					var oldVal 	= $.attr(elem, 'value'),
+						ret 	= false
+					;
+					$.attr(elem, 'value', val);
+					ret = !($.attr(elem, 'validity') || {valid: true}).valid;
+					$.attr(elem, 'value', oldVal);
+				}
+				return false;
+			},
+			update: function(elem, val){
+				var type = $.attr(elem, 'type');
+				if(!allowedPlaceholder[type] && !$.nodeName(elem, 'textarea')){return;}
+				if(!val){
+					pHolder.destroy(elem);
+					elem.removeAttribute('placeholder');
+					return;
+				}
+				
+				var input = $(elem);
+				val = val.replace(delReg, '');
+				elem.setAttribute('placeholder', val);
+				
+				if( pHolder.changesValidity(elem, val) ){
+					pHolder.destroy(elem);
+					return;
+				}
+				pHolder.create(elem);
+				if(!input.val()){
+					showPlaceholder.call(elem, true);
+				}
+			},
+			destroy: function(elem){
+				var id = $.data(elem, 'placeHolder');
+				if(!id){return;}
+				$.data(elem, 'placeHolder', false);
+				$(elem)
+					.unbind('blur', showPlaceholder)
+					.unbind('focus', hidePlaceHolder)
+				;
+				$(window).unbind('unload.id-'+id);
+				$(elem.form).unbind('submit.id-'+id);
+				hidePlaceHolder.apply(this);
+			}
+		};
+	})();
+	
+	
+	$.htmlExt.attr('placeholder', {
+		elementNames: ['input', 'textarea'],
+		setter: function(elem, val){
+			pHolder.update(elem, val);
+		},
+		getter: function(elem){
+			return elem.getAttribute('placeholder');
+		}
+	});
+		
+	var value = {
+		elementNames: ['input', 'textarea'],
+		setter: function(elem, value, oldFn){
+			var placeholder = elem.getAttribute('placeholder');
+			if(placeholder && 'value' in elem){
+				if(value){
+					$(elem).removeClass('placeholder-visible');
+				} else {
+					pHolder.update(elem, placeholder);
+				}
+			}
+			oldFn();
+		},
+		getter: function(elem, oldFn){
+			if($(elem).hasClass('placeholder-visible')){
+				return '';
+			}
+			return oldFn();
+		}
+	};
+	
+	$.htmlExt.attr('value', value);
+	
+	var oldVal = $.fn.val;
+	$.fn.val = function(val){
+		if(val === undefined){
+			if(this[0] && $(this[0]).hasClass('placeholder-visible')){
+				return '';
+			}
+			return oldVal.apply(this, arguments);
+		} else {
+			var that 	= this,
+				ret 	= oldVal.apply(this, arguments)
+			;
+			this.each(function(){
+				if( this.nodeType === 1 && this.getAttribute('placeholder') ){
+					value.setter(this, val, $.noop);
+				}
+			});
+			return ret;
+		}
+	};
+			
+	$.htmlExt.addReady(function(context){
+		$('input[placeholder], textarea[placeholder]', context).attr('placeholder', function(i, holder){
+			return holder;
+		});
+	});
+	
 })(jQuery);

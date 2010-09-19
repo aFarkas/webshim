@@ -16,7 +16,12 @@
 			border: 1px solid #000;
 			margin: 5px 0;
 		}
-		
+		.feature {
+			float: right;
+		}
+		.feature.setter {
+			float: none;
+		}
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
@@ -56,12 +61,14 @@
                             required text: <dfn title="required">*</dfn>
 						</label>
                         <input name="text" placeholder="some text" required="required" type="text" id="text" />
+						<button class="feature" data-name="value">$(this).attr('value');</button>
                     </div>
                     <div class="form-element">
                         <label for="email">
                             E-Mail: <dfn title="required">*</dfn>
 						</label>
                        	<input name="email" placeholder="your email" required="required" class="email" type="email" id="email" />
+						<button class="feature method" data-name="val">$(this).val();</button>
                     </div>
                    
                 	<div class="form-element">
@@ -69,7 +76,19 @@
                             url:
 						 </label>
                          <input placeholder="http://" pattern="^http" type="url" id="url" name="url" />
+						 <hr />
+						 $(this).val(<input id="input-1" />)
+						 <button class="feature method setter" data-val="#input-1" data-name="val">change value</button>
                    	</div>
+					<div class="form-element">
+                    	<label for="search">
+                        	search:
+						</label>
+                        <input type="search" name="search" placeholder="a keyword" id="search" />
+						<hr />
+						 $(this).attr("placeholder", <input id="input-2" />)
+						 <button class="feature setter" data-val="#input-2" data-name="placeholder">change placeholder</button>
+					</div>
 					
 					<div class="form-element">
                         <label for="password">
@@ -77,12 +96,7 @@
 						 </label>
                          <input placeholder="a password" type="password" id="password" name="password" />
                    	</div>
-					<div class="form-element">
-                    	<label for="search">
-                        	search:
-						</label>
-                        <input type="search" name="search" placeholder="a keyword" id="search" />
-					</div>
+					
 					
 					<div class="form-element">
                     	<label for="tel">
@@ -113,16 +127,21 @@
 				window.console = {log: window.alert};
 			}
 			$('button.feature').bind('click', function(e){
-				var elem = $(this).parent().find(':input');
+				var elem = $(this).parent().find('input:first');
+				var val = $(this).attr('data-val');
+				var ret;
+				if(val){
+					val = $(val).val();
+				}
 				e.preventDefault();
-				if($(this).attr('data-action') === 'method'){
-					var ret = elem[$(this).attr('data-name')]();
-					if(ret !== elem){
-						console.log(ret);
-					}
+				if($(this).is('.method')){
+					ret = elem[$(this).attr('data-name')](val);
 				} else {
-					console.log(elem.attr($(this).attr('data-name')));
+					ret = elem.attr($(this).attr('data-name'), val);
 				} 
+				if(ret !== elem){
+					console.log(ret);
+				}
 				return false;
 			});
         });

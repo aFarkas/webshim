@@ -19,8 +19,8 @@
 	$.support.placeholder = 'shim';
 	
 	var pHolder = (function(){
-		var showPlaceholder = function(){
-				if(!this.value){
+		var showPlaceholder = function(force){
+				if(!this.value || force === true){
 					$(this).addClass('placeholder-visible');
 					this.value = this.getAttribute('placeholder') || '';
 				}
@@ -46,8 +46,8 @@
 		
 		return {
 			create: function(elem){
-				var type = $.attr(elem, 'type');
-				if($.data(elem, 'placeHolder') || (!allowedPlaceholder[type] && !$.nodeName('textarea', elem)) ){return;}
+				
+				if($.data(elem, 'placeHolder')){return;}
 				var remove = function(){
 					hidePlaceHolder.apply(elem);
 				};
@@ -73,6 +73,8 @@
 				return false;
 			},
 			update: function(elem, val){
+				var type = $.attr(elem, 'type');
+				if(!allowedPlaceholder[type] && !$.nodeName(elem, 'textarea')){return;}
 				if(!val){
 					pHolder.destroy(elem);
 					elem.removeAttribute('placeholder');
@@ -89,8 +91,7 @@
 				}
 				pHolder.create(elem);
 				if(!input.val()){
-					input.addClass('placeholder-visible');
-					elem.value = val;
+					showPlaceholder.call(elem, true);
 				}
 			},
 			destroy: function(elem){

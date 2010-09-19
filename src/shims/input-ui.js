@@ -4,9 +4,9 @@
 	var options = $.htmlExt.loader.modules['input-ui'].options;
 	options.availabeLangs = 'af ar az bg bs cs da de el en-GB eo es et eu fa fi fo fr fr-CH he hr hu hy id is it ja ko it lt lv ms nl no pl pt-BR ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' ');
 	
-	if(options.juiSrc && (!$.fn.slider || !!$.fn.datepicker)){
+	if(options.juiSrc && (!$.fn.slider || !$.fn.datepicker)){
 		$.htmlExt.loader.loadScript(options.juiSrc, false, 'jquery-ui');
-	} else {
+	} else if($.fn.slider && $.fn.datepicker){
 		$.htmlExt.createReadyEvent('jquery-ui');
 	}
 	
@@ -48,8 +48,15 @@
 	};
 	
 	replaceInputUI.date = function(elem){
+		if(!$.fn.datepicker){return;}
 		var date = $('<input type="text" class="input-date" />'),
-			attr  = this.common(elem, date, replaceInputUI.date.attrs)
+			attr  = this.common(elem, date, replaceInputUI.date.attrs),
+			change = function(val, ui){
+				replaceInputUI.date.blockAttr = true;
+				elem.attr('value', $.datepicker.formatDate( 'yy-mm-dd', date.datepicker('getDate') ));
+				replaceInputUI.date.blockAttr = false;
+				elem.trigger('change');
+			}
 		;
 		
 		if(attr.css){
@@ -60,13 +67,9 @@
 		}
 		date
 			.datepicker($.extend({}, options.date, {
-				onSelect: function(val, ui){
-					replaceInputUI.date.blockAttr = true;
-					elem.attr('value', $.datepicker.formatDate( 'yy-mm-dd', date.datepicker('getDate') ));
-					replaceInputUI.date.blockAttr = false;
-					elem.trigger('change');
-				}
+				onSelect: change
 			}))
+			.bind('change', change)
 			.data('datepicker')
 			.dpDiv
 			.addClass('input-date-datepicker-control')
@@ -111,6 +114,7 @@
 	};
 	
 	replaceInputUI.range = function(elem){
+		if(!$.fn.slider){return;}
 		var range = $('<span class="input-range" />'),
 			attr  = this.common(elem, range, replaceInputUI.range.attrs)
 		;

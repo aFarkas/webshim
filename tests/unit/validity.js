@@ -49,7 +49,7 @@ var createTestMethodA = function(id){
 	};
 };
 
-asyncTest("validity Modul", function(){
+asyncTest("general validity Modul", function(){
 	
 	QUnit.reset();
 	
@@ -151,7 +151,13 @@ asyncTest("validity Modul", function(){
 		ok($('#email').is(':'+state), val+' is '+state+' mail');
 	});
 	
+	start();
 	
+	//valueAsNumber + valueAsDate
+	//invalid event + manual testpage
+});
+
+asyncTest('step number/date module specific validity', function(){
 	
 	$.each([
 		{
@@ -566,7 +572,11 @@ asyncTest("validity Modul", function(){
 	], 
 	createTestMethodA('range'));
 	
+	start();
 	
+});
+
+asyncTest('email, url, pattern, maxlength', function(){
 	$.each({
 		'http://bla.de': 'valid', 
 		'http://www.bla.de': 'valid', 
@@ -614,6 +624,10 @@ asyncTest("validity Modul", function(){
 	$('#pattern').val('1DHT');
 	ok($('#pattern').is(':valid'), '1DHT is valid pattern');
 	
+	start();
+});
+
+asyncTest('validationMessage/setCustomValidity', function(){
 	//select + customValidity
 	ok($('#select').is(':valid'), 'select is valid');
 	$('#select').setCustomValidity('has an error');
@@ -625,53 +639,60 @@ asyncTest("validity Modul", function(){
 	$('#select').attr('disabled', false).setCustomValidity('');
 	ok(( $('#select').is(':valid') && $('#select').attr('willValidate') ), 'select is set valid again');
 	
-	(function(){
-		QUnit.reset();
-		var invalids = 0;
-		$('#form-1').bind('invalid', function(){
-			invalids++;
-		});
-		ok(!$('#form-1').checkValidity(), 'validity is false for form-element (form)');
-		equals(invalids, 5, 'there were 5 invalid events (form)');
-		
-		invalids = 0;
-		ok(!$('#form-1 fieldset.check').checkValidity(), 'validity is false for fieldset-element (fieldset)');
-		equals(invalids, 5, 'there were 5 invalid events (fieldset)');
-		
-		invalids = 0;
-		ok(!$('#name').checkValidity(), 'validity is false for #name (element)');
-		equals(invalids, 1, 'there was 1 invalid event (element)');
-		$.each([
-			{
-				id: '#name',
-				val: 'some name'
-			},
-			{
-				id: '#email',
-				val: 'some@name.com'
-			},
-			{
-				id: '#email',
-				val: 'some@name.com'
-			},
-			{
-				id: '#field6-1'
-			}
-		], function(i, data){
-			if(data.val){
-				$(data.id).attr('value', data.val);
-				
-			} else {
-				$(data.id).attr('checked', true);
-			}
-		});
-		invalids = 0;
-		ok($('#form-1').checkValidity(), 'validity is true for form-element');
-		equals(invalids, 0, 'there were 0 invalid events');
-		
-	})();
-	
+	start();
+});
+
+asyncTest('checkValidity/invalid event', function(){
 	QUnit.reset();
+	var invalids = 0;
+	$('#form-1').bind('invalid', function(){
+		invalids++;
+	});
+	ok(!$('#form-1').checkValidity(), 'validity is false for form-element (form)');
+	equals(invalids, 5, 'there were 5 invalid events (form)');
+	
+	invalids = 0;
+	ok(!$('#form-1 fieldset.check').checkValidity(), 'validity is false for fieldset-element (fieldset)');
+	equals(invalids, 5, 'there were 5 invalid events (fieldset)');
+	
+	invalids = 0;
+	ok(!$('#name').checkValidity(), 'validity is false for #name (element)');
+	equals(invalids, 1, 'there was 1 invalid event (element)');
+	$.each([
+		{
+			id: '#name',
+			val: 'some name'
+		},
+		{
+			id: '#email',
+			val: 'some@name.com'
+		},
+		{
+			id: '#email',
+			val: 'some@name.com'
+		},
+		{
+			id: '#field6-1'
+		}
+	], function(i, data){
+		if(data.val){
+			$(data.id).attr('value', data.val);
+			
+		} else {
+			$(data.id).attr('checked', true);
+		}
+	});
+	invalids = 0;
+	ok($('#form-1').checkValidity(), 'validity is true for form-element');
+	equals(invalids, 0, 'there were 0 invalid events');
+		
+	start();
+});
+
+asyncTest('valueAsDate/valueAsNumber', function(){
+	QUnit.reset();
+	
+	//getting valueAsNumber
 	$.each([
 		{
 			id: 'number',
@@ -717,8 +738,46 @@ asyncTest("validity Modul", function(){
 		},
 		{
 			id: 'datetime-local',
-			value: '2010-12-31',
+			value: '2010-12-31T23:59',
+			result: 1293839940000
+		},
+		{
+			id: 'datetime-local',
+			value: '2010-12-31T00:00',
 			result: 1293753600000
+		},
+		{
+			id: 'datetime-local',
+			value: '2010-12-31T02:00',
+			result: 1293760800000
+		},
+		{
+			id: 'datetime-local',
+			value: '2010-12-31B2:00'
+		},
+		{
+			id: 'time',
+			value: '13:00',
+			result: 46800000
+		},
+		{
+			id: 'time',
+			value: '13:45',
+			result: 49500000
+		},
+		{
+			id: 'time',
+			value: '13:45:30',
+			result: 49530000
+		},
+		{
+			id: 'time',
+			value: '13:30:30.5',
+			result: 48630500
+		},
+		{
+			id: 'time',
+			value: '13:30:30,5'
 		}
 	], function(i, data){
 		var elem = $('#'+data.id);
@@ -727,13 +786,138 @@ asyncTest("validity Modul", function(){
 			return;
 		}
 		if(data.result === undefined){
-			ok(isNaN(elem.attr('valueAsNumber')), data.value+' is as number NaN, element: '+ data.id);
+			var asVal = elem.attr('valueAsNumber');
+			ok(isNaN(asVal), data.value+' is as number NaN, element: '+ data.id+ ', was: '+ asVal +', type: '+ (typeof asVal));
 		} else {
-			ok(elem.attr('valueAsNumber') === data.result, data.value+' is AsNumber: '+ data.result +', element: '+ data.id);
+			ok(elem.attr('valueAsNumber') === data.result, data.value+' is AsNumber: '+ data.result +', element: '+ data.id+ ', was: '+ elem.attr('valueAsNumber'));
 		}
 	});
-	//valueAsNumber + valueAsDate
-	//invalid event + manual testpage
+	
+	
+	//setting valueAsNumber
+	$.each([
+		{
+			id: 'time',
+			result: '13:30:30.5',
+			value: 48630500
+		},
+		{
+			id: 'datetime-local',
+			result: '2010-12-31T00:00',
+			value: 1293753600000
+		},
+		{
+			id: 'date',
+			result: '2010-12-31',
+			value: 1293753600000
+		}
+	], function(i, data){
+		var elem = $('#'+data.id);
+		elem.attr('valueAsNumber', data.value);
+		
+		if($.support.validity ===  true && data.value != elem.attr('valueAsNumber')){
+			return;
+		}
+		var val = elem.attr('value');
+		ok(function(){
+			if(data.id == 'time' || data.id == 'datetime-local'){
+				if(val && val.indexOf('.') !== -1 && data.result.length < val.length){
+					var lenDif = val.length - data.result.length;
+					while(lenDif--){
+						data.result += '0';
+					}
+				}
+			} 
+			return (val === data.result);
+		}(), data.value+' is as value: '+ data.result +', element: '+ data.id+ ', was: '+ val);
+	});
+	
+	//setting valueAsDate (webkit orientated, not sure these test are right)
+	$.each([
+		{
+			id: 'date',
+			value: function(){
+				return new Date(2010, 11, 31, 0, 0);
+			},
+			resultVal: '2010-12-30',
+			resultNumber: 1293667200000
+		},
+		{
+			id: 'date',
+			value: function(){
+				return new Date(1999, 0, 1, 0, 0);
+			},
+			resultVal: '1998-12-31',
+			resultNumber: 915062400000
+		},
+		{
+			id: 'date',
+			value: function(){
+				return new Date(1999, 0, 1, 10, 10);
+			},
+			resultVal: '1999-01-01',
+			resultNumber: 915148800000
+		},
+		{
+			id: 'date',
+			value: function(){
+				return null;
+			},
+			resultVal: ''
+		},
+		{
+			id: 'date',
+			value: function(){
+				var date = new Date();
+				date.setUTCDate(31);
+				date.setUTCMonth(11);
+				date.setUTCFullYear(2010);
+				return date;
+			},
+			resultVal: '2010-12-01',
+			resultNumber: 1291161600000
+		},
+		{
+			id: 'date',
+			value: function(){
+				var date = new Date();
+				date.setUTCDate(1);
+				date.setUTCMonth(0);
+				date.setUTCFullYear(1999);
+				return date;
+			},
+			resultVal: '1999-01-01',
+			resultNumber: 915148800000
+		},
+		{
+			id: 'time',
+			value: function(){
+				return new Date(1999, 0, 1, 20, 30);
+			},
+			resultVal: '19:30',
+			resultNumber: 70200000
+		},
+		{
+			id: 'time',
+			value: function(){
+				var date = new Date(1999, 0, 1, 20, 30);
+				date.setSeconds(1);
+				return date;
+			},
+			resultVal: '19:30:01',
+			resultNumber: 70201000
+		}
+	], function(i, data){
+		var elem = $('#'+data.id);
+		elem.attr('valueAsDate', data.value());
+		
+		ok(elem.attr('value') === data.resultVal,'expected val: '+ data.resultVal +', element: '+ data.id+ ', was: '+ elem.attr('value'));
+		if(data.resultNumber === undefined){
+			ok(isNaN(elem.attr('valueAsNumber')), ' expected number: NaN, element: '+ data.id+ ', was: '+ elem.attr('valueAsNumber'));
+		} else {
+			ok(elem.attr('valueAsNumber') === data.resultNumber, ' expected number: '+ data.resultNumber +', element: '+ data.id+ ', was: '+ elem.attr('valueAsNumber'));
+		}
+	});
 });
 $(window).load(function(){
 	$.htmlExt.readyModules('validity input-ui validation-message', function(){

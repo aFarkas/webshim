@@ -7,14 +7,33 @@
 	
 	$.htmlExt.validityMessages = [];
 	
+	$.htmlExt.validityMessages[''] = {
+		typeMismatch: {
+			email: '{%value} is not a legal email address',
+			url: '{%value} is not a valid web address',
+			number: '{%value} is not a number!',
+			date: '{%value} is not a date',
+			time: '{%value} is not a time',
+			range: '{%value} is not a number!',
+			"datetime-local": '{%value} is not a correct date-time format.'
+		},
+		rangeUnderflow: '{%value} is too low. The lowest value you can use is {%min}.',
+		rangeOverflow: '{%value}  is too high. The highest value you can use is {%max}.',
+		stepMismatch: 'The value {%value} is not allowed for this form. Only certain values are allowed for this field. {%title}',
+		tooLong: 'The entered text is too large! You used {%valueLen} letters and the limit is {%maxlength}.',
+		
+		patternMismatch: '{%value} is not in the format this page requires! {%title}',
+		valueMissing: 'You have to specify a value'
+	};
+	
 	$.htmlExt.validityMessages['de'] = {
 		typeMismatch: {
 			email: '{%value} ist keine zulässige E-Mail-Adresse',
 			url: '{%value} ist keine zulässige Webadresse',
-			number: '{%value}  ist keine Nummer!',
+			number: '{%value} ist keine Nummer!',
 			date: '{%value} ist kein Datum',
 			time: '{%value} ist keine Uhrzeit',
-			range: '{%value}  ist keine Nummer!',
+			range: '{%value} ist keine Nummer!',
 			"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
 		},
 		rangeUnderflow: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.',
@@ -26,7 +45,7 @@
 		valueMissing: 'Sie müssen einen Wert eingeben'
 	};
 	
-	$.htmlExt.validityMessages[''] = $.htmlExt.validityMessages['de'];
+	
 	
 	var validiyMessages;
 	$(document).bind('htmlExtLangChange', function(){
@@ -50,7 +69,7 @@
 				if(name == 'valid' || !prop){return;}
 				message = validiyMessages[name];
 				if(message && typeof message !== 'string'){
-					message = message[ (elem.getAttribute('type') || '').toLowerCase() ];
+					message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
 				}
 				if(message){
 					return false;
@@ -58,6 +77,7 @@
 			});
 			if(message){
 				$.each(['value', 'min', 'max', 'title', 'maxlength'], function(i, attr){
+					if(message.indexOf('%'+attr) === -1){return;}
 					var val = $.attr(elem, attr) || '';
 					message = message.replace('{%'+ attr +'}', val);
 					if('value' == attr){

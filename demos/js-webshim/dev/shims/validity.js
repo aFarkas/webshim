@@ -365,9 +365,16 @@ $.htmlExt.attr('valueAsNumber', {
 	setter: function(elem, val, fn){
 		var type = getType(elem);
 		if(typeModels[type] && typeModels[type].numberToString){
+			//is NaN a number?
+			if(isNaN(val)){
+				$.attr(elem, 'value', '');
+				return;
+			}
 			var set = typeModels[type].numberToString(val);
 			if(set !==  false){
 				$.attr(elem, 'value', set);
+			} else {
+				throw('INVALID_STATE_ERR: DOM Exception 11');
 			}
 		} else {
 			fn();
@@ -386,9 +393,15 @@ $.htmlExt.attr('valueAsDate', {
 	setter: function(elem, value, fn){
 		var type = getType(elem);
 		if(typeModels[type] && typeModels[type].dateToString){
+			if(value === null){
+				$.attr(elem, 'value', '');
+				return;
+			}
 			var set = typeModels[type].dateToString(value);
 			if(set !== false){
 				$.attr(elem, 'value', set);
+			} else {
+				throw('INVALID_STATE_ERR: DOM Exception 11');
 			}
 		} else {
 			fn();
@@ -450,6 +463,11 @@ $.htmlExt.addInputType('range', $.extend({}, typeModels.number, {
 	maxDefault: 100
 }));
 
+var transformDate = function(date){
+	var offset = date.getTimezoneOffset();
+	return new Date(date.getTime() + offset + 3600060);
+};
+
 $.htmlExt.addInputType('date', {
 	mismatch: function(val){
 		if(!val || !val.split || !(/\d$/.test(val))){return true;}
@@ -475,27 +493,21 @@ $.htmlExt.addInputType('date', {
 		if(!_noMismatch && this.mismatch(val)){
 			return null;
 		}
-		val = val.split(/\u002D/);
-		
-		var date = new Date();
-		date.setUTCMilliseconds(0);
-		date.setUTCSeconds(0);
-		date.setUTCMinutes(0);
-		date.setUTCHours(0);
-		date.setUTCDate(val[2]);
-		date.setUTCMonth(val[1] - 1);
-		date.setUTCFullYear(val[0]);
-		return date;
+		return new Date(this.asNumber(val, true));
 	},
-	asNumber: function(str){
-		str = this.asDate(str);
-		return (str === null) ? nan : str.getTime();
+	asNumber: function(str, _noMismatch){
+		var ret = nan;
+		if(_noMismatch || !this.mismatch(str)){
+			str = str.split(/\u002D/);
+			ret = Date.UTC(str[0], str[1] - 1, str[2]);
+		}
+		return ret;
 	},
 	numberToString: function(num){
 		return (isNumber(num)) ? this.dateToString(new Date(num)) : false;
 	},
 	dateToString: function(date){
-		return (date && date.getUTCFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
+		return (date && date.getFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
 	}
 });
 
@@ -509,7 +521,7 @@ $.htmlExt.addInputType('time', $.extend({}, typeModels.date,
 				sFraction;
 			if(val[2]){
 				val[2] = val[2].split(/\u002E/);
-				sFraction = val[2][1];
+				sFraction = parseInt(val[2][1], 10);
 				val[2] = val[2][0];
 			}
 			$.each(val, function(i, part){
@@ -525,8 +537,15 @@ $.htmlExt.addInputType('time', $.extend({}, typeModels.date,
 			if(val[2] && (val[2] > 59 || val[2] < 0 )){
 				return true;
 			}
-			if(sFraction && !isNumber(sFraction)){
+			if(sFraction && isNaN(sFraction)){
 				return true;
+			}
+			if(sFraction){
+				if(sFraction < 100){
+					sFraction *= 100;
+				} else if(sFraction < 10){
+					sFraction *= 10;
+				}
 			}
 			return (_getParsed === true) ? [val, sFraction] : false;
 		},
@@ -534,24 +553,24 @@ $.htmlExt.addInputType('time', $.extend({}, typeModels.date,
 		stepBase: 0,
 		stepScaleFactor:  1000,
 		asDate: function(val){
+			val = new Date(this.asNumber(val));
+			return (isNaN(val)) ? null : val;
+		},
+		asNumber: function(val){
+			var ret = nan;
 			val = this.mismatch(val, true);
-			if(val === true){
-				return null;
+			if(val !== true){
+				ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
+				if(val[1]){
+					ret += val[1];
+				}
 			}
-			var date = new Date();
-			date.setUTCMilliseconds(val[1] || 0);
-			date.setUTCSeconds(val[0][2] || 0);
-			date.setUTCMinutes(val[0][1]);
-			date.setUTCHours(val[0][0]);
-			date.setUTCDate('1');
-			date.setUTCMonth(0);
-			date.setUTCFullYear('1970');
-			return date;
+			return ret;
 		},
 		dateToString: function(date){
 			if(date && date.getUTCHours){
 				var str = addleadingZero(date.getUTCHours(), 2) +':'+ addleadingZero(date.getUTCMinutes(), 2),
-					tmp = date.getUTCSeconds()
+					tmp = date.getSeconds()
 				;
 				if(tmp != "0"){
 					str += ':'+ addleadingZero(tmp, 2);
@@ -577,24 +596,21 @@ $.htmlExt.addInputType('datetime-local', $.extend({}, typeModels.time,
 		},
 		noAsDate: true,
 		asDate: function(val){
+			val = new Date(this.asNumber(val));
+			
+			return (isNaN(val)) ? null : val;
+		},
+		asNumber: function(val){
+			var ret = nan;
 			var time = this.mismatch(val, true);
-			if(time === true){
-				return null;
+			if(time !== true){
+				val = val.split(/\u0054/)[0].split(/\u002D/);
+				ret = Date.UTC(val[2], val[1] - 1, val[0], time[0][0], time[0][1], time[0][2] || 0);
+				if(time[1]){
+					ret += time[1];
+				}
 			}
-			
-			var date = new Date();
-			
-			date.setUTCMilliseconds(time[1] || 0);
-			date.setUTCSeconds(time[0][2] || 0);
-			date.setUTCMinutes(time[0][1]);
-			date.setUTCHours(time[0][0]);
-			
-			val = val.split(/\u0054/)[0].split(/\u002D/);
-			date.setUTCDate(val[2]);
-			date.setUTCMonth(val[1] - 1);
-			date.setUTCFullYear(val[0]);
-			
-			return date;
+			return ret;
 		},
 		dateToString: function(date, _getParsed){
 			return typeModels.date.dateToString(date) +'T'+ typeModels.time.dateToString(date, _getParsed);

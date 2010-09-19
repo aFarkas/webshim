@@ -128,15 +128,28 @@
 			stopSubmitTimer,
 			form
 		;
+		
+		//opera fix
+		//opera thorws a submit-event and then the invalid events,
+		//the following code will trigger the invalid events first and webkitfix will stopImmediatePropagation
+		if($.support.validity === true && document.addEventListener && !window.noHTMLExtFixes && window.opera){
+			document.addEventListener('submit', function(e){
+				if(e.target.checkValidity){
+					e.target.checkValidity();
+				}
+			}, true);
+		}
 		$(document).bind('invalid', function(e){
 			if(!firstEvent){
-				//webkitfix
+				//webkitfix 
+				//chrome/safari submits an invalid form, if you prevent all invalid events
+				//this also prevents opera from throwing a submit event if form isn't valid
 				form = e.target.form;
 				if ($.support.validity === true && form && !window.noHTMLExtFixes){
 					var submitEvents = $(form)
-						.bind('submit.preventInvalidSubmit', function(){
+						.bind('submit.preventInvalidSubmit', function(submitEvent){
 							if( !$.attr(form, 'novalidate') ){
-								e.stopImmediatePropagation();
+								submitEvent.stopImmediatePropagation();
 								return false;
 							}
 						})

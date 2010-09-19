@@ -26,12 +26,13 @@
 	<script src="../src/html-ext.js"></script>
 	<script src="../src/features.js"></script>
 	
+	<script src="../src/shims/validity.js"></script>
+	
     <script type="text/javascript" class="example">
     	$.htmlExt.loader.basePath += 'shims/';
 		$.htmlExt.loader.loadList();
 		
         $(function(){
-			
 			$('button.feature').bind('click', function(e){
 				var elem = $(this).parent().find(':input');
 				e.preventDefault();
@@ -108,6 +109,7 @@
                             	time:
 							</label>
                             <input type="time" name="time" placeholder="hh:mm" id="time" />
+							<button class="feature" data-action="attr" data-name="valueAsNumber">$(this).attr('valueAsNumber')</button>
 							 <button class="feature" data-action="attr" data-name="valueAsDate">$(this).attr('valueAsDate')</button>
 						</div>
 						
@@ -116,6 +118,9 @@
                             	time (min: 13:00, max: 22:00, step: 300, required): <dfn title="required">*</dfn>
 							</label>
                             <input type="time" name="timeval" placeholder="hh:mm" id="timeval" min="13:00" max="22:00" step="300" required />
+							
+							
+							<button class="feature" data-action="attr" data-name="valueAsNumber">$(this).attr('valueAsNumber')</button>
 							<button class="feature" data-action="attr" data-name="validity">$(this).attr('validity')</button>
 						</div>
                     
@@ -124,15 +129,17 @@
 						    <label for="date">
 						        date:
 						    </label>
-						    <input type="date" value="2009-12-13" placeholder="yyyy-mm-dd" name="date" id="date" />
+						    <input type="date" value="2010-10-31" placeholder="yyyy-mm-dd" name="date" id="date" />
 							<button class="feature" data-action="attr" data-name="valueAsDate">$(this).attr('valueAsDate')</button>
-							 <button class="feature" data-action="attr" data-name="valueAsNumber">$(this).attr('valueAsNumber')</button>
+							<button class="feature" data-action="attr" data-name="valueAsNumber">$(this).attr('valueAsNumber')</button>
+							<button class="feature" data-action="attr" data-name="validity">$(this).attr('validity')</button>
 						</div>
 					    <div>
 						    <label for="datetime-local">
 						        datetime-local:
 						    </label>
 						    <input value="1999-12-09T20:10" placeholder="yyyy-mm-ddThh:mm" name="datetime-local" type="datetime-local" id="datetime-local" />
+							<button class="feature" data-action="attr" data-name="valueAsNumber">$(this).attr('valueAsNumber')</button>
 							<button class="feature" data-action="method" data-name="checkValidity">$(this).checkValidity()</button>
 					    </div>
 					    <div>

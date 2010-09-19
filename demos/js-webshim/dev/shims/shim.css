@@ -4,8 +4,10 @@
 .validity-alert {
 	position: absolute;
 	background: #fff;
+	color: #000;
 	border: 1px solid #f00;
 	padding: 5px;
+	z-index: 10000;
 }
 
 .step-controls {

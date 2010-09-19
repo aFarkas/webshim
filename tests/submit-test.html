@@ -26,8 +26,8 @@
 		main web shim extension fiels
 		Note: you can combine/concat/rename them with your other files, but you have to include them in the head without a defer/async attribute!
 	 -->
-	<script src="../demos/js-webshim/minified/html-ext.js"></script>
-	<script src="../demos/js-webshim/minified/features.js"></script>
+	<script src="../src/html-ext.js"></script>
+	<script src="../src/features.js"></script>
 	
     <script>
     	//basePath = url form html-ext.js (you can rename it) + relative url to shim folder
@@ -128,7 +128,7 @@
     <form action="bigfail.html">
     	<input name="test-1" class="text" type="text" required />
 		<input name="test-2" class="text" type="text" required />
-		<input type="submit" class="invalid-submit" value="try invalid submit" />
+		<input type="submit" class="invalid-submit" value="try invalid submit (with submit prevention)" />
 		<input type="submit" class="invalid-prevent-submit-without-submit-prevention" value="try invalid-prevented submit (no submit prevention)" />
 		<input type="submit" class="invalid-prevent-submit" value="try invalid-prevented submit" />
 		<input type="submit" class="valid-submit" value="try valid  submit" />
