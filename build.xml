@@ -14,7 +14,6 @@
     	<concat destfile="${shims}/combined-forms.js">
             <fileset file="${shims}/validity.js" />
             <fileset file="${shims}/validation-message.js" />
-            <fileset file="${shims}/input-ui.js" />
 			<fileset file="${shims}/placeholder.js" />
         </concat>
 		
