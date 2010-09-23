@@ -102,10 +102,13 @@
 					}
 					parent = parent || doc.getElementsByTagName('head')[0] || doc.body;
 					loadedSrcs.push(src);
-					$('<link />', {
-						href: src,
-						rel: 'stylesheet'
-					}).prependTo(parent);
+					$(doc.createElement('link'))
+						.prependTo(parent)
+						.attr({
+							href: src,
+							rel: 'stylesheet'
+						})
+					;
 				};
 			})(),
 			loadScript: (function(){
