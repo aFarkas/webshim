@@ -105,7 +105,7 @@
 	});
 	
 	//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
-$.htmlExt.attr('valueAsNumber', {
+$.webshims.attr('valueAsNumber', {
 	elementNames: ['input'],
 	getter: function(elem, fn){
 		var type = getType(elem);
@@ -133,7 +133,7 @@ $.htmlExt.attr('valueAsNumber', {
 	}
 });
 
-$.htmlExt.attr('valueAsDate', {
+$.webshims.attr('valueAsDate', {
 	elementNames: ['input'],
 	getter: function(elem, fn){
 		var type = getType(elem);
@@ -160,7 +160,7 @@ $.htmlExt.attr('valueAsDate', {
 	}
 });
 
-$.htmlExt.addInputType('number', {
+$.webshims.addInputType('number', {
 	mismatch: function(val){
 		return !(isNumber(val));
 	},
@@ -176,12 +176,12 @@ $.htmlExt.addInputType('number', {
 });
 
 
-$.htmlExt.addInputType('range', $.extend({}, typeModels.number, {
+$.webshims.addInputType('range', $.extend({}, typeModels.number, {
 	minDefault: 0,
 	maxDefault: 100
 }));
 
-$.htmlExt.addInputType('date', {
+$.webshims.addInputType('date', {
 	mismatch: function(val){
 		if(!val || !val.split || !(/\d$/.test(val))){return true;}
 		var valA = val.split(/\u002D/);
@@ -224,7 +224,7 @@ $.htmlExt.addInputType('date', {
 	}
 });
 
-$.htmlExt.addInputType('time', $.extend({}, typeModels.date, 
+$.webshims.addInputType('time', $.extend({}, typeModels.date, 
 	{
 		mismatch: function(val, _getParsed){
 			if(!val || !val.split || !(/\d$/.test(val))){return true;}
@@ -300,7 +300,7 @@ $.htmlExt.addInputType('time', $.extend({}, typeModels.date,
 	})
 );
 
-$.htmlExt.addInputType('datetime-local', $.extend({}, typeModels.time, 
+$.webshims.addInputType('datetime-local', $.extend({}, typeModels.time, 
 	{
 		mismatch: function(val, _getParsed){
 			if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
@@ -333,7 +333,7 @@ $.htmlExt.addInputType('datetime-local', $.extend({}, typeModels.time,
 );
 
 (function(){
-	var options = $.htmlExt.loader.modules.validity.options;
+	var options = $.webshims.loader.modules.validity.options;
 	var getNextStep = function(input, upDown, cache){
 		
 		cache = cache || {};
@@ -405,12 +405,12 @@ $.htmlExt.addInputType('datetime-local', $.extend({}, typeModels.time,
 				}
 			}
 		};
-		$.htmlExt.attr('disabled', disabledReadonly);
-		$.htmlExt.attr('readonly', disabledReadonly);
+		$.webshims.attr('disabled', disabledReadonly);
+		$.webshims.attr('readonly', disabledReadonly);
 		
 	}
 	
-	$.htmlExt.addReady(function(context){
+	$.webshims.addReady(function(context){
 		
 		//ui for numeric values
 		if(options.stepArrows){

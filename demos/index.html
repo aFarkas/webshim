@@ -3,103 +3,219 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta charset="utf-8"/>
+	<link href="css/styles.css" rel="stylesheet" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script src="js-webshim/minified/html-ext.js"></script>
-	<script src="js-webshim/minified/features.js"></script>
+	<script src="js-webshim/dev/html-ext.js"></script>
+	<script src="js-webshim/dev/features.js"></script>
 	
-    <script type="text/javascript" class="example">
+    <script class="example">
     	
 		//path is path of html-ext.js + shims/
-    	$.htmlExt.loader.basePath += 'shims/';
+    	$.webshims.loader.basePath += 'shims/';
 		//load all defined modules (look into features.js)
-		//or load only a specific feature with $.htmlExt.loader.loadList('feature-name');
-		$.htmlExt.loader.loadList();
+		//or load only a specific feature with $.webshims.polyfill('feature-name');
+		$.webshims.polyfill();
         
     </script>
 	
-	<title>webshims lib</title>
+	<title>webshims lib - the polyfilling capability based JS libary</title>
 	    
 </head>
 
 <body>
-	<div id="wrapper">    
-		<h1>Webshims Lib</h1>
-		<h2>About</h2>
-		<p>Webshims Lib enables some of the latest Browserfeatures also known as "HTML5-Features" in non capable Browsers. It is build on Top of jQuery.</p>
-		<h3>Main concepts</h3>
-		<ul>
-			<li><strong>Capability based loading</strong>: lightweight for good browsers / heavyweight for really bad browsers (I really like this)</li>
-			<li><strong>almost pure native HTML5 | no/less abstractions</strong>: Helps you to learn HTML5 (Markup-/DOM-APIs) and to build usefull abstractions and extensions on top of the standard. Documentation is the <a href="http://dev.w3.org/html5/html-author/">HTML5 W3C Specification</a></li>
-			<li><strong>futureproof Feature-Detection</strong>: We try to feature detect everything instead of browsersniffing to be more futureproof</li>
-		</ul>
-		<h2>How to</h2>
-		<h3>Embedding and configuring the script</h3>
-		
-		<p></p>
-		
-		<h3>When is a feature ready to use?</h3>
-		
-		<h3>minor Abstraction to DOM-Attributes, DOM-Methods and DOM-Events</h3>
-		
-		<h3>How to build an abstraction/extension, that works with and without webshims lib?</h3>
-		
-		
-		<h2>Simple and ugly Demos: You are the developer. Improve HTML/CSS/JS etc.</h2>
-		
-		<h3>Semantic Structure</h3>
-		<p>section, articel, footer, nav etc. (+Dynamic injection)</p>
-		
-		<h3>Geolocation</h3>
-		<button class="geolocation">Where am I?</button>
-		
-		<h3>Canvas</h3>
-		
-		<canvas class="peter" width="200" height="200"></canvas>
-		
-		<h3>HTML5 constraint validation + input-type Widgets</h3>
-		
-		<form action="#">
-			<div class="form-element">
-                <label for="email">
-                    E-Mail:
-				</label>
-               	<input name="email" class="email" type="email" id="email" placeholder="yourmail@host.de" />
-            </div>
-			<div>
-			    <label for="range">
-			        range:
-			    </label>
-			    <input name="range" type="range" id="range" />
-		    </div>
-			<div>
-				<input type="submit" />
-			</div>
-		</form>
-		<p><a href="webforms/index.html">More Demos &amp; Information on the webforms module</a></p>
-		<h3>JSON.parse/JSON.stringify &amp; localStorage/sessionStorage</h3>
-		
-		
-		<h2>Further Development</h2>
-		
-		
-		
-		
-		
-    </div> 
+	<section id="wrapper"> 
+		<header>
+			<hgroup>
+				<h1>Webshims Lib</h1>
+				<h2>Polyfill only the uncapable browsers</h2>
+			</hgroup>
+		</header>
+		<section>
+			<h2>About</h2>
+			<p>Webshims Lib enables / polyfills some of the latest Browserfeatures also known as "HTML5-Features" in non capable Browsers. It is build on Top of jQuery.</p>
+			<h3>Main concepts</h3>
+			<ul>
+				<li><strong>Capability based loading</strong>: lightweight for good browsers / heavyweight for really bad browsers (I really like this)</li>
+				<li><strong>almost pure native APIs | no/less abstractions</strong>: Helps you to learn HTML5 (Markup-/DOM/JS-APIs) and to build usefull abstractions and extensions on top of the standard. Documentation is the specification (i.e.: <a href="http://dev.w3.org/html5/html-author/">HTML5 W3C Specification</a>)</li>
+				<li><strong>futureproof Feature-Detection</strong>: We try to feature detect everything instead of browsersniffing to be more futureproof (We know, that we will fail on this)</li>
+			</ul>
+		</section>
+		<section>
+			<h2>Simple and ugly Demos: You are the developer. Improve HTML/CSS/JS etc.</h2>
+			<section>
+				<h1>Semantic Structure</h1>
+				<p>Implements parsing/styling of HTML5 elements like section, articel, footer, nav in IE8- through the famous HTML5 shiv and an innerShiv implementations. <a href="shiv/index.html">more Information on shiv solution</a></p>
+			</section>
+			<section>
+				<h3>Canvas</h3>
+				<canvas class="peter" width="200" height="200"></canvas>
+			</section>
+			
+			<section>
+				<h3>HTML5 constraint validation</h3>
+				<form action="#">
+					<div class="form-element">
+		                <label for="email">
+		                    Name *:
+						</label>
+		               	<input name="name" required="required" type="text" id="name" placeholder="your name" />
+		            </div>
+					<div class="form-element">
+		                <label for="email">
+		                    E-Mail:
+						</label>
+		               	<input name="email" required="required" type="email" id="email" placeholder="yourmail@host.de" />
+		            </div>
+					<div class="form-element">
+		                <label for="url">
+		                    your website:
+						</label>
+		               	<input name="url" type="url" id="url" value="http://" placeholder="your website" />
+		            </div>
+					<div>
+						<input type="submit" />
+					</div>
+				</form>
+				<p><a href="webforms/index.html">More Demos &amp; Information on the webforms module</a></p>
+			</section>
+			
+			<section>
+				<h3>JSON.parse/JSON.stringify &amp; localStorage/sessionStorage</h3>
+			</section>
+			<section>
+				<h3>Geolocation</h3>
+				<div id="geolocation"></div>
+				<button class="geolocation">Where am I?</button>
+			</section>
+		</section>
+		<section>
+			<h2>How to</h2>
+			<h3>Embedding and configuring the script</h3>
+			
+			<ul>
+				<li>Take the 'js-webshim' folder and add it to your project (You will find a minified and a dev-folder there)</li>
+				<li>Embed the html-ext.js and features.js into your HTML-Page (you can concat these files with your other js, at least the html-ext.js has to be included into the head)</li>
+				<li>Configure the webshims folder (<code>$.webshims.loader.basePath</code>) and load your features (<code>$.webshims.polyfill();</code>).</li>
+			</ul>
+			
+<code class="block">
+&lt;script src="js-webshim/minified/html-ext.js"&gt;&lt;/script&gt;
+&lt;script src="js-webshim/minified/features.js"&gt;&lt;/script&gt;
+
+&lt;script&gt;
+	//path is path of html-ext.js + shims/
+	$.webshims.loader.basePath += 'shims/';
+	//load and implement all unsupported features
+	$.webshims.polyfill();
+&lt;/script&gt;	
+</code>
+			<p>If you only want to implement a certain feature, simply pass the feature-name(s) you want to use to the polyfill-method (seperated by a whitespace):</p>
+<code class="block">
+&lt;script&gt;
+	//add support for canvas, JSON and localStorage/sessionsStorage
+	$.webshims.polyfill('canvas json-storage');
+&lt;/script&gt;	
+</code>
+			
+			<h3>When is a feature ready to use?</h3>
+			<p>Not every feature is ready immediately in all browsers. To get started, if a feature is ready, simply name the features you want to use and pass a callback-function to <code>$.webshims.readyModules</code></p>
+<code class="block">
+&lt;script&gt;
+	$.webshims.readyModules('geolocation', function(){
+		//work with geolocation
+	});
+&lt;/script&gt;	
+</code>		
+			<p>If you want to use multiple features in your callback-function pass the feature list seperated by a whitespace:</p>
+<code class="block">
+&lt;script&gt;
+	$.webshims.readyModules('geolocation json-storage', function(){
+		//work with geolocation, JSON and localStorage
+	});
+&lt;/script&gt;	
+</code>	
+			<p>Note that this callback function may be called before DOM-Ready. If you want to use a feature after DOM-Ready, simply pass the string ready:</p>
+<code class="block">
+&lt;script&gt;
+	$.webshims.readyModules('ready canvas', function(){
+		//work with the canvas in the document
+	});
 	
-	<script type="text/javascript">
-		$.htmlExt.readyModules('ready geolocation', function(){
+	//this is equal to
+	
+	//$(function(){
+	//	$.webshims.readyModules('canvas', function(){
+	//		//work with the canvas in the document
+	//	});
+	//});
+&lt;/script&gt;	
+</code>	
+			
+			
+			<h3>minor Abstraction to DOM-Attributes, DOM-Methods and DOM-Events</h3>
+			<p>Due to the fact, that we can not extend the prototype of elements in all browsers, we always use jQuery as an extension-wrapper.</p>
+			<ul>
+				<li>
+					<p>Accessing DOM-Properties/Attribut IDLs: if the feature allows accessing a specific property, always use jQuery's built in <code>$.attr</code>-method:</p>
+<code class="block">
+//instead of accessing a property directly (i.e.: this.validity) 
+//use $.fn.attr 
+$(this).attr('validity');
+//or $.attr
+//$.attr(this, 'validity');
+</code>
+				</li>
+				<li>
+					<p>calling a DOM-Method: If the standard defines a DOM-Method, webshims lib has generated a jQuery-Method, wich wraps this feature for you:</p>
+<code class="block">
+//instead of calling a DOM-method directly (i.e.: this.checkValidity() ) 
+//use the jQuery-Plugin method 
+$(this).checkValidity();
+</code>
+					<p>If you pass a list of nodes and the method doesn't return anything, the method will be called on each element in this list, otherwise it will be called on the first element.</p>
+				</li>
+				<li>
+					<p>Most events in the HTML5 specification are so called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery can not really distinguish between the event phases (capturing/propagation), we use almost event capturing in the native implementation and $.fn.trigger in the shim.</p>
+				</li>
+			</ul>
+			<h3>How to build an abstraction/extension, that works with and without webshims lib?</h3>
+			
+			<h3>How to write a new feature implementation?</h3>
+		</section>
+		
+			
+		<section>
+			<h3>Further Development</h3>
+			<ul>
+				<li>Webforms 2.0: datetime-local, date, time, number and range (with step, max, min attributes and valueAsDate/valueAsNumber properties)</li>
+				<li>simple audio/video implementation</li>
+				<li>improved audio/video implementation</li>
+			</ul>
+		</section>
+		
+		<small>
+			Note: every shim is a hack! working with native cutting edge technology is also a hack!
+		</small>
+    </section> 
+	
+	<script>
+		$.webshims.readyModules('ready geolocation', function(){
 			$('button.geolocation').click(function(){
+				var elem = $(this).attr('disabled', true).addClass('loader');
+				$('#geolocation').html('please wait calculating position');
 				navigator.geolocation.getCurrentPosition(function(pos){
-					alert('I think you are @ latitude: '+ pos.coords.latitude +'/longitude: ' + pos.coords.longitude);
+					elem.removeClass('loader');
+					$('#geolocation').html('I think you are @ latitude: '+ pos.coords.latitude +'/longitude: ' + pos.coords.longitude);
 				}, function(){
-					alert('Oops, something went wrong');
+					elem.removeClass('loader');
+					$('#geolocation').html('Oops, something went wrong');
 				});
 			});
 		});
 		
 		//canvas feature
-        $.htmlExt.readyModules('ready canvas', function(){
+        $.webshims.readyModules('ready canvas', function(){
+			//example from http://www.peterkroener.de/eine-kleine-canvas-einfuehrung/
 			$('canvas.peter').each(function(){
 				var animate = function(ax, ay, adx, ady, bx, by, bdx, bdy){
 					setTimeout(function(){
@@ -153,10 +269,7 @@
 				var context = $(this).getContext('2d');
 				animate(31, 69, 1, -1, 8, 25, 1, 1);
 			});
-			
-
         });
-		
     </script>
 </body>
 </html>   

@@ -21,7 +21,7 @@ var getNames = function(elem){
 
 //API to add new input types
 var typeModels = {};
-$.htmlExt.addInputType = function(type, obj){
+$.webshims.addInputType = function(type, obj){
 	typeModels[type] = obj;
 };
 
@@ -84,7 +84,7 @@ var validityRules = {
 	}
 ;
 
-$.htmlExt.addMethod('checkValidity', (function(){
+$.webshims.addMethod('checkValidity', (function(){
 	var unhandledInvalids;
 	var testValidity = function(elem){
 		var e,
@@ -100,7 +100,7 @@ $.htmlExt.addMethod('checkValidity', (function(){
 			var jElm = $(elem).trigger(e);
 			if(!e.isDefaultPrevented()){
 				if(!unhandledInvalids){
-					$.htmlExt.validityAlert.showFor(jElm);
+					$.webshims.validityAlert.showFor(jElm);
 				}
 				unhandledInvalids = true;
 			}
@@ -166,7 +166,7 @@ $.event.special.invalid = {
 };
 
 // IDLs for constrain validation API
-$.htmlExt.attr('validity', {
+$.webshims.attr('validity', {
 	elementNames: ['input', 'select', 'textarea'],
 	getter: function(elem){
 		var validityState = $.data(elem, 'cachedValidity');
@@ -203,12 +203,12 @@ $.htmlExt.attr('validity', {
 	}
 });
 
-$.htmlExt.addMethod('setCustomValidity', function(error){
+$.webshims.addMethod('setCustomValidity', function(error){
 	$.data(this, 'customvalidationMessage', ''+error);
 });
 
 //this will be extended
-$.htmlExt.attr('validationMessage', {
+$.webshims.attr('validationMessage', {
 	elementNames: ['input', 'select', 'textarea'],
 	getter: function(elem, fn){
 		var message = fn() || $.data(elem, 'customvalidationMessage');
@@ -219,9 +219,9 @@ $.htmlExt.attr('validationMessage', {
 	}
 });
 
-$.htmlExt.createBooleanAttrs('required', ['input', 'textarea']);
+$.webshims.createBooleanAttrs('required', ['input', 'textarea']);
 
-$.htmlExt.attr('willValidate', {
+$.webshims.attr('willValidate', {
 	elementNames: ['input', 'select', 'textarea'],
 	getter: (function(){
 		var types = {
@@ -243,7 +243,7 @@ $.htmlExt.attr('willValidate', {
 
 // add support for new input-types
 
-$.htmlExt.attr('type', {
+$.webshims.attr('type', {
 	elementNames: ['input'],
 	getter: function(elem, fn){
 		var type = getType(elem);
@@ -253,7 +253,7 @@ $.htmlExt.attr('type', {
 	setter: true
 });
 
-$.htmlExt.addInputType('email', {
+$.webshims.addInputType('email', {
 	mismatch: (function(){
 		//taken from scott gonzales
 		var test = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|(\x22((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?\x22))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)*(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i;
@@ -263,7 +263,7 @@ $.htmlExt.addInputType('email', {
 	})()
 });
 
-$.htmlExt.addInputType('url', {
+$.webshims.addInputType('url', {
 	mismatch: (function(){
 		//taken from scott gonzales
 		var test = /^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
@@ -274,7 +274,7 @@ $.htmlExt.addInputType('url', {
 	})()
 });
 
-$.htmlExt.addReady(function(context){
+$.webshims.addReady(function(context){
 	//start constrain-validation
 	$('form', context).bind('invalid', $.noop);
 });
@@ -345,6 +345,122 @@ $.support.fieldsetValidation = 'shim';
 	;
 })(jQuery);
 
+/* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
+(function($){
+	var firstEvent,
+		stopSubmitTimer,
+		form
+	;
+	
+	//opera fix
+	//opera thorws a submit-event and then the invalid events,
+	//the following code will trigger the invalid events first and webkitfix will stopImmediatePropagation of submit event
+	if($.support.validity === true && document.addEventListener && !window.noHTMLExtFixes && window.opera){
+		document.addEventListener('submit', function(e){
+			if(e.target.checkValidity){
+				e.target.checkValidity();
+			}
+		}, true);
+	}
+	$(document).bind('invalid', function(e){
+		if(!firstEvent){
+			//webkitfix 
+			//chrome/safari submits an invalid form, if you prevent all invalid events
+			//this also prevents opera from throwing a submit event if form isn't valid
+			form = e.target.form;
+			if ($.support.validity === true && form && !window.noHTMLExtFixes){
+				var submitEvents = $(form)
+					.bind('submit.preventInvalidSubmit', function(submitEvent){
+						if( !$.attr(form, 'novalidate') ){
+							submitEvent.stopImmediatePropagation();
+							return false;
+						}
+					})
+					.data('events').submit
+				;
+				//add this handler as first executing handler
+				if (submitEvents && submitEvents.length > 1) {
+					submitEvents.unshift(submitEvents.pop());
+				}
+			}
+			
+			//trigger firstinvalid
+			firstEvent = $.Event('firstinvalid');
+			$(e.target).trigger(firstEvent);
+		}
+		//if firstinvalid was prevented all invalids will be also prevented
+		if( firstEvent && firstEvent.isDefaultPrevented() ){
+			e.preventDefault();
+		}
+		
+		clearTimeout(stopSubmitTimer);
+		stopSubmitTimer = setTimeout(function(){
+			//reset firstinvalid
+			firstEvent = false;
+			//remove webkitfix
+			$(form).unbind('submit.preventInvalidSubmit');
+		}, 9);
+		
+	});
+	
+	
+	/* some extra validation UI */
+	var ValidityAlert = function(){this._create();};
+	
+	ValidityAlert.prototype = {
+		_create: function(){
+			this.alert = $('<div class="validity-alert"><div class="va-box" /></div>').css({position: 'absolute', display: 'none'});
+			this.hideTimer = false;
+			this.boundHide = $.proxy(this, 'hide');
+		},
+		hideDelay: 5000,
+		createAlert: function(){
+			if(this.created){return;}
+			this.created = true;
+			var that = this;
+			$(function(){that.alert.appendTo('body');});
+		},
+		showFor: function(elem, noFocus){
+			elem = $(elem);
+			var widget = elem.data('inputUIReplace');
+			if(widget){
+				elem = widget.visual;
+			}
+			this.createAlert();
+			this.clear();
+			this.getMessage(elem);
+			this.position(elem);
+			this.show();
+			if(!noFocus){
+				elem.focus();
+			}
+			this.hideTimer = setTimeout(this.boundHide, this.hideDelay);
+			$(document).bind('focusout.validityalert', this.boundHide);
+		},
+		getMessage: function(elem){
+			$('> div', this.alert).html(elem.attr('validationMessage'));
+		},
+		position: function(elem){
+			var offset = elem.offset();
+			offset.top += elem.outerHeight();
+			this.alert.css(offset);
+		},
+		clear: function(){
+			clearTimeout(this.hideTimer);
+			$(document).unbind('focusout.validityalert');
+			this.alert.stop().css({opacity: ''});
+		},
+		show: function(){
+			this.alert.fadeIn();
+		},
+		hide: function(){
+			this.clear();
+			this.alert.fadeOut();
+		}
+	};
+	$.webshims.validityAlert = new ValidityAlert();
+})(jQuery);
+
 (function($){
 	if($.support.validationMessage){
 		return;
@@ -352,9 +468,9 @@ $.support.fieldsetValidation = 'shim';
 	$.support.validationMessage = 'shim';
 	
 	
-	$.htmlExt.validityMessages = [];
+	$.webshims.validityMessages = [];
 	
-	$.htmlExt.validityMessages[''] = {
+	$.webshims.validityMessages[''] = {
 		typeMismatch: {
 			email: '{%value} is not a legal email address',
 			url: '{%value} is not a valid web address',
@@ -373,7 +489,7 @@ $.support.fieldsetValidation = 'shim';
 		valueMissing: 'You have to specify a value'
 	};
 	
-	$.htmlExt.validityMessages['de'] = {
+	$.webshims.validityMessages['de'] = {
 		typeMismatch: {
 			email: '{%value} ist keine zulässige E-Mail-Adresse',
 			url: '{%value} ist keine zulässige Webadresse',
@@ -396,12 +512,12 @@ $.support.fieldsetValidation = 'shim';
 	
 	var validiyMessages;
 	$(document).bind('htmlExtLangChange', function(){
-		$.htmlExt.activeLang($.htmlExt.validityMessages, 'validation-message', function(langObj){
+		$.webshims.activeLang($.webshims.validityMessages, 'validation-base', function(langObj){
 			validiyMessages = langObj;
 		});
 	});
 	
-	$.htmlExt.attr('validationMessage', {
+	$.webshims.attr('validationMessage', {
 		elementNames: ['input', 'select', 'textarea'],
 		getter: function(elem){
 			var message = '';
@@ -442,7 +558,7 @@ $.support.fieldsetValidation = 'shim';
 		return;
 	}
 	$.support.fieldsetValidation = 'shim';
-	$.htmlExt.addMethod('checkValidity', function(error){
+	$.webshims.addMethod('checkValidity', function(error){
 		if($.nodeName(this, 'fieldset')){
 			var ret = true;
 			$(this.elements || 'input, textarea, select', this)
@@ -572,7 +688,7 @@ $.support.fieldsetValidation = 'shim';
 	})();
 	
 	
-	$.htmlExt.attr('placeholder', {
+	$.webshims.attr('placeholder', {
 		elementNames: ['input', 'textarea'],
 		setter: function(elem, val){
 			pHolder.update(elem, val);
@@ -603,7 +719,7 @@ $.support.fieldsetValidation = 'shim';
 		}
 	};
 	
-	$.htmlExt.attr('value', value);
+	$.webshims.attr('value', value);
 	
 	var oldVal = $.fn.val;
 	$.fn.val = function(val){
@@ -625,7 +741,7 @@ $.support.fieldsetValidation = 'shim';
 		}
 	};
 			
-	$.htmlExt.addReady(function(context){
+	$.webshims.addReady(function(context){
 		$('input[placeholder], textarea[placeholder]', context).attr('placeholder', function(i, holder){
 			return holder;
 		});

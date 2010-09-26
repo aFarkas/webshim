@@ -30,8 +30,8 @@
 	<script src="../../src/shims/json-storage.js"></script>
 	
 	<script>
-		$.htmlExt.loader.basePath += 'shims/';
-		$.htmlExt.loader.loadList();
+		$.webshims.loader.basePath += 'shims/';
+		$.webshims.loader.loadList();
 		
 		test("extensions loaded", function(){
 			ok( $.support.validity, "validity" );

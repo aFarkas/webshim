@@ -4,15 +4,17 @@
 	'abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section source summary time track video'.replace(/\w+/g,function(n){doc.createElement(n);});
 	$.support.dynamicHTML5 =  !!($('<video><div></div></video>')[0].innerHTML);
 	
-	var isReady = function(names, noReady){
+	var isReady = function(names, noReady, noForce){
 		if(!names){return;}
 		if(!$.isArray(names)){
 			names = [names];
 		}
 		$.each(names, function(i, name){
+			if(noForce && $.webshims.loader.modules[name] && $.webshims.loader.modules[name].noAutoCallback ){return;}
 			if(!noReady){
 				name = name +'Ready';
 			}
+			if($.event.special[name] && $.event.special[name].add){return;}
 			$.event.trigger(name);
 			$.event.special[name] = {
 				add: function( details ) {
@@ -21,7 +23,26 @@
 			};
 		});
 	};
-	$.htmlExt = {
+	$.webshims = {
+		version: 'not versioned yet',
+		fixHTML5: (function(){
+			var d, b;
+			return ($.support.dynamicHTML5) ? 
+				function(h){return h;} :
+				function(h) {
+					if (!d) {
+						b = document.body;
+						d = document.createElement('div');
+						d.style.display = 'none';
+					}
+					var e = d.cloneNode(false);
+					b.appendChild(e);
+					e.innerHTML = h;
+					b.removeChild(e);
+					return e.childNodes;
+				}
+			;
+		})(),
 		createReadyEvent: isReady,
 		loader: {
 			basePath: (function(){
@@ -33,19 +54,16 @@
 			combinations: {},
 			moduleList: [],
 			modules: {},
+			features: {},
+			featureList: [],
 			addModule: function(name, ext){
-				this.moduleList.push(name);
 				this.modules[name] = ext;
 			},
 			loadList: (function(){
 				var loadedModules = [];
 				return function(list){
-					list = list || this.moduleList;
-					if (typeof list == 'string') {
-						list = [list];
-					}
 					var toLoad = [],
-						loader = $.htmlExt.loader
+						loader = $.webshims.loader
 					;
 					$.each(list, function(i, name){
 						var module = loader.modules[name];
@@ -60,7 +78,7 @@
 					});
 					
 					
-					$.each(loader.combinations, function(combi, combiModules){
+					$.each(loader.combinations || [], function(combi, combiModules){
 						var loadCombi = true;
 						$.each(combiModules, function(i, combinedModule){
 							if ($.inArray(combinedModule, toLoad) === -1 || $.inArray(combinedModule, loadedModules) !== -1) {
@@ -68,6 +86,7 @@
 								return false;
 							}
 						});
+						
 						if(loadCombi){
 							loadedModules = loadedModules.concat(combiModules);
 							loader.loadScript(combi, false, combiModules);
@@ -76,7 +95,7 @@
 					});
 					$.each(toLoad, function(i, loadName){
 						if ($.inArray(loadName, loadedModules) == -1) {
-							loader.loadScript(loadName, false, loadName);
+							loader.loadScript(loader.modules[loadName].src || loadName, false, loadName);
 						}
 					});
 				};
@@ -89,7 +108,7 @@
 				if(src.indexOf('.js') == -1 && src.indexOf('.css') == -1){
 					src += '.js';
 				}
-				return $.htmlExt.loader.basePath + src;
+				return $.webshims.loader.basePath + src;
 			},
 			loadCSS: (function(){
 				var parent, 
@@ -114,14 +133,14 @@
 				;
 				return function(src, callback, name){
 					
-					src = $.htmlExt.loader.makePath(src);
+					src = $.webshims.loader.makePath(src);
 					if($.inArray(src, loadedSrcs) != -1){
 						return;
 					}
 					parent = parent || doc.getElementsByTagName('head')[0] || doc.body;
 					if(!parent || !parent.appendChild){
 						setTimeout(function(){
-							$.htmlExt.loader.loadScript(src, callback);
+							$.webshims.loader.loadScript(src, callback);
 						}, 10);
 						return;
 					}
@@ -137,7 +156,7 @@
 								if(callback){
 									callback(e, this);
 								}
-								isReady(name);
+								isReady(name, false, true);
 								script = null;
 							}
 						}
@@ -151,25 +170,14 @@
 				};
 			})()
 		},
-//		event: function(name, obj){
-//			var e = $.event.special[name];
-//			if(!e){
-//				$.event.special[name] = obj;
-//				return;
-//			}
-//			
-//			$.each(obj, function(n, fn){
-//				var oFn = e[n];
-//				e[n] = (!oFn) ? fn : function(){
-//					oFn.apply(this, arguments);
-//					return fn.apply(this, arguments);
-//				};
-//			});
-//		},
-		readyModules: function(events, fn){
+		readyModules: function(events, fn, _create){
 			if(typeof events == 'string'){
-				events = $.map(events.split(' '), function(e){
-					return ($.htmlExt.loader.modules[e]) ? e +'Ready' : e;
+				events = events.split(' ');
+				_create = true;
+			}
+			if(_create){
+				events = $.map(events, function(e){
+					return ($.webshims.loader.modules[e] || $.webshims.loader.features[e]) ? e +'Ready' : e;
 				});
 			}
 			if(!events.length){
@@ -178,56 +186,9 @@
 			}
 			
 			$(doc).one(events.shift(), function(){
-				$.htmlExt.readyModules(events, fn);
+				$.webshims.readyModules(events, fn);
 			});
 		},
-		activeLang: (function(){
-			var langs = [navigator.browserLanguage || navigator.language || ''];
-			if(langs[0] == 'en-US'){
-				langs[0] = 'en';
-			}
-			var paLang = $('html').attr('lang');
-			if(paLang){
-				langs.push(paLang);
-			}
-			return function(lang, module, fn){
-				if(lang){
-					if(!module || !fn){
-						lang = (lang == 'en-US') ? '' : lang;
-						langs[0] = lang;
-						$(doc).triggerHandler('htmlExtLangChange', langs);
-					} else {
-						module = $.htmlExt.loader.modules[module].options;
-						var langObj = lang,
-							loadRemoteLang = function(lang){
-								if($.inArray(lang, remoteLangs) !== -1){
-									$.htmlExt.loader.loadScript(module.langSrc+lang+'.js', function(){
-										if(langObj[lang]){
-											fn(langObj[lang]);
-										}
-									});
-									return true;
-								}
-								return false;
-							},
-							remoteLangs = module && module.availabeLangs
-						;
-						
-						$.each(langs, function(i, lang){
-							var shortLang = lang.split('-')[0];
-							if(langObj[lang] || langObj[shortLang]){
-								fn(langObj[lang] || langObj[shortLang]);
-								return false;
-							}
-							if(remoteLangs && module.langSrc !== undefined && (loadRemoteLang(lang) || loadRemoteLang(shortLang))){
-								return false;
-							}
-						});
-					}
-				}
-				return langs;
-			};
-		})(),
 		capturingEvents: function(names){
 			if(!doc.addEventListener){return;}
 			if(typeof names == 'string'){
@@ -317,7 +278,7 @@
 			
 			$.each(names, function(i, name){
 				
-				$.htmlExt.attr(name, {
+				$.webshims.attr(name, {
 					elementNames: elementNames,
 					getter: function(elem){
 						return (typeof elem[name] == 'boolean') ? elem[name] : !!( (elem.attributes[name] || {}).specified );
@@ -381,19 +342,22 @@
 			};
 			return function(name, cfg){
 				cfg = cfg || {};
-				
-				$.htmlExt.loader.addModule(name, cfg);
-				
-				$(doc).one(name + 'Ready', function(){
-					$('html').addClass(name +'-ready');
-				});
-				var combinations = $.htmlExt.loader.combinations;
+				var feature 		= cfg.feature || name,
+					loader 			= $.webshims.loader,
+					combinations 	= loader.combinations
+				;
+				if(!loader.features[feature]){
+					loader.features[feature] = [];
+					loader.featureList.push(feature);
+				}
+				loader.features[feature].push(name);
+				loader.addModule(name, cfg);
+				loader.moduleList.push(name);
 				$.each(cfg.combination || [], function(i, combi){
-//					;;;return;;;;
 					if(!combinations[combi]){
 						combinations[combi] = [name];
 					} else {
-						$.htmlExt.loader.combinations[combi].push(name);
+						loader.combinations[combi].push(name);
 					}
 				});
 				if(cfg.methodNames) {
@@ -405,12 +369,79 @@
 					});
 				}
 			};
+		})(),
+		
+		polyfill: function(features){
+			var loader 	= $.webshims.loader,
+				toLoadFeatures = []
+			;
+			features = features || loader.featureList;
+			if (typeof features == 'string') {
+				features = features.split(' ');
+			}
+			
+			$.each(features, function(i, feature){
+				if(feature !== loader.features[feature][0]){
+					$.webshims.readyModules(loader.features[feature], function(){
+						isReady(feature);
+					}, true);
+				}
+				toLoadFeatures = toLoadFeatures.concat(loader.features[feature]);
+			});
+			loader.loadList(toLoadFeatures);
+		},
+		activeLang: (function(){
+			var langs = [navigator.browserLanguage || navigator.language || ''];
+			if(langs[0] == 'en-US'){
+				langs[0] = 'en';
+			}
+			var paLang = $('html').attr('lang');
+			if(paLang){
+				langs.push(paLang);
+			}
+			return function(lang, module, fn){
+				if(lang){
+					if(!module || !fn){
+						lang = (lang == 'en-US') ? '' : lang;
+						langs[0] = lang;
+						$(doc).triggerHandler('htmlExtLangChange', langs);
+					} else {
+						module = $.webshims.loader.modules[module].options;
+						var langObj = lang,
+							loadRemoteLang = function(lang){
+								if($.inArray(lang, remoteLangs) !== -1){
+									$.webshims.loader.loadScript(module.langSrc+lang+'.js', function(){
+										if(langObj[lang]){
+											fn(langObj[lang]);
+										}
+									});
+									return true;
+								}
+								return false;
+							},
+							remoteLangs = module && module.availabeLangs
+						;
+						
+						$.each(langs, function(i, lang){
+							var shortLang = lang.split('-')[0];
+							if(langObj[lang] || langObj[shortLang]){
+								fn(langObj[lang] || langObj[shortLang]);
+								return false;
+							}
+							if(remoteLangs && module.langSrc !== undefined && (loadRemoteLang(lang) || loadRemoteLang(shortLang))){
+								return false;
+							}
+						});
+					}
+				}
+				return langs;
+			};
 		})()
 	};
 	
 	(function(){
 		var readyFns = [];
-		$.extend($.htmlExt, {
+		$.extend($.webshims, {
 			addReady: function(fn){
 				var readyFn = function(context){
 					$(function(){fn(context);});
@@ -428,8 +459,30 @@
 		
 	})();
 	if(!$.support.dynamicHTML5 && document.attachEvent){
-		$.htmlExt.loader.loadScript('http://html5shim.googlecode.com/svn/trunk/html5.js');
+		$.webshims.loader.loadScript('http://html5shim.googlecode.com/svn/trunk/html5.js');
 	}
+	$.fn.htmlWebshim = function(a){
+		var ret = this.html((a) ? $.webshims.fixHTML5(a) : a);
+		if(ret === this && $.isReady){
+			this.each(function(){
+				$.webshims.triggerDomUpdate(this);
+			});
+		}
+		return ret;
+	};
+	
+	$.each(['after', 'before', 'append', 'prepend'], function(i, name){
+		$.fn[name+'Webshim'] = function(a){
+			var elems = $($.webshims.fixHTML5(a));
+			this[name](elems);
+			if($.isReady){
+				elems.each(function(){
+					$.webshims.triggerDomUpdate(this);
+				});
+			}
+			return this;
+		};
+	});
 	
 	isReady('htmlExtLangChange', true);
 })(jQuery);

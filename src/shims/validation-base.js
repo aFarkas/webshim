@@ -1,3 +1,119 @@
+/* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
+(function($){
+	var firstEvent,
+		stopSubmitTimer,
+		form
+	;
+	
+	//opera fix
+	//opera thorws a submit-event and then the invalid events,
+	//the following code will trigger the invalid events first and webkitfix will stopImmediatePropagation of submit event
+	if($.support.validity === true && document.addEventListener && !window.noHTMLExtFixes && window.opera){
+		document.addEventListener('submit', function(e){
+			if(e.target.checkValidity){
+				e.target.checkValidity();
+			}
+		}, true);
+	}
+	$(document).bind('invalid', function(e){
+		if(!firstEvent){
+			//webkitfix 
+			//chrome/safari submits an invalid form, if you prevent all invalid events
+			//this also prevents opera from throwing a submit event if form isn't valid
+			form = e.target.form;
+			if ($.support.validity === true && form && !window.noHTMLExtFixes){
+				var submitEvents = $(form)
+					.bind('submit.preventInvalidSubmit', function(submitEvent){
+						if( !$.attr(form, 'novalidate') ){
+							submitEvent.stopImmediatePropagation();
+							return false;
+						}
+					})
+					.data('events').submit
+				;
+				//add this handler as first executing handler
+				if (submitEvents && submitEvents.length > 1) {
+					submitEvents.unshift(submitEvents.pop());
+				}
+			}
+			
+			//trigger firstinvalid
+			firstEvent = $.Event('firstinvalid');
+			$(e.target).trigger(firstEvent);
+		}
+		//if firstinvalid was prevented all invalids will be also prevented
+		if( firstEvent && firstEvent.isDefaultPrevented() ){
+			e.preventDefault();
+		}
+		
+		clearTimeout(stopSubmitTimer);
+		stopSubmitTimer = setTimeout(function(){
+			//reset firstinvalid
+			firstEvent = false;
+			//remove webkitfix
+			$(form).unbind('submit.preventInvalidSubmit');
+		}, 9);
+		
+	});
+	
+	
+	/* some extra validation UI */
+	var ValidityAlert = function(){this._create();};
+	
+	ValidityAlert.prototype = {
+		_create: function(){
+			this.alert = $('<div class="validity-alert"><div class="va-box" /></div>').css({position: 'absolute', display: 'none'});
+			this.hideTimer = false;
+			this.boundHide = $.proxy(this, 'hide');
+		},
+		hideDelay: 5000,
+		createAlert: function(){
+			if(this.created){return;}
+			this.created = true;
+			var that = this;
+			$(function(){that.alert.appendTo('body');});
+		},
+		showFor: function(elem, noFocus){
+			elem = $(elem);
+			var widget = elem.data('inputUIReplace');
+			if(widget){
+				elem = widget.visual;
+			}
+			this.createAlert();
+			this.clear();
+			this.getMessage(elem);
+			this.position(elem);
+			this.show();
+			if(!noFocus){
+				elem.focus();
+			}
+			this.hideTimer = setTimeout(this.boundHide, this.hideDelay);
+			$(document).bind('focusout.validityalert', this.boundHide);
+		},
+		getMessage: function(elem){
+			$('> div', this.alert).html(elem.attr('validationMessage'));
+		},
+		position: function(elem){
+			var offset = elem.offset();
+			offset.top += elem.outerHeight();
+			this.alert.css(offset);
+		},
+		clear: function(){
+			clearTimeout(this.hideTimer);
+			$(document).unbind('focusout.validityalert');
+			this.alert.stop().css({opacity: ''});
+		},
+		show: function(){
+			this.alert.fadeIn();
+		},
+		hide: function(){
+			this.clear();
+			this.alert.fadeOut();
+		}
+	};
+	$.webshims.validityAlert = new ValidityAlert();
+})(jQuery);
+
 (function($){
 	if($.support.validationMessage){
 		return;
@@ -5,9 +121,9 @@
 	$.support.validationMessage = 'shim';
 	
 	
-	$.htmlExt.validityMessages = [];
+	$.webshims.validityMessages = [];
 	
-	$.htmlExt.validityMessages[''] = {
+	$.webshims.validityMessages[''] = {
 		typeMismatch: {
 			email: '{%value} is not a legal email address',
 			url: '{%value} is not a valid web address',
@@ -26,7 +142,7 @@
 		valueMissing: 'You have to specify a value'
 	};
 	
-	$.htmlExt.validityMessages['de'] = {
+	$.webshims.validityMessages['de'] = {
 		typeMismatch: {
 			email: '{%value} ist keine zulässige E-Mail-Adresse',
 			url: '{%value} ist keine zulässige Webadresse',
@@ -49,12 +165,12 @@
 	
 	var validiyMessages;
 	$(document).bind('htmlExtLangChange', function(){
-		$.htmlExt.activeLang($.htmlExt.validityMessages, 'validation-message', function(langObj){
+		$.webshims.activeLang($.webshims.validityMessages, 'validation-base', function(langObj){
 			validiyMessages = langObj;
 		});
 	});
 	
-	$.htmlExt.attr('validationMessage', {
+	$.webshims.attr('validationMessage', {
 		elementNames: ['input', 'select', 'textarea'],
 		getter: function(elem){
 			var message = '';
@@ -95,7 +211,7 @@
 		return;
 	}
 	$.support.fieldsetValidation = 'shim';
-	$.htmlExt.addMethod('checkValidity', function(error){
+	$.webshims.addMethod('checkValidity', function(error){
 		if($.nodeName(this, 'fieldset')){
 			var ret = true;
 			$(this.elements || 'input, textarea, select', this)

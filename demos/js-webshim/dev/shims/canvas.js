@@ -957,7 +957,7 @@ if (!document.createElement('canvas').getContext) {
 	G_vmlCanvasManager.fixDynamicElement = function(el){
 		return G_vmlCanvasManager.initElement(G_vmlCanvasManager.fixElement_(el));
 	};
-	$.htmlExt.addMethod('getContext', function(ctxName){
+	$.webshims.addMethod('getContext', function(ctxName){
 		if(!this.getContext){
 			G_vmlCanvasManager_.fixDynamicElement(this);
 		}

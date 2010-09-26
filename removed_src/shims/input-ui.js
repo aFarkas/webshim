@@ -1,13 +1,13 @@
 (function($){
 	$.support.inputUI = 'shim';
 	
-	var options = $.htmlExt.loader.modules['input-ui'].options;
+	var options = $.webshims.loader.modules['input-ui'].options;
 	options.availabeLangs = 'af ar az bg bs cs da de el en-GB eo es et eu fa fi fo fr fr-CH he hr hu hy id is it ja ko it lt lv ms nl no pl pt-BR ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' ');
 	
 	if(options.juiSrc && (!$.fn.slider || !$.fn.datepicker)){
-		$.htmlExt.loader.loadScript(options.juiSrc, false, 'jquery-ui');
+		$.webshims.loader.loadScript(options.juiSrc, false, 'jquery-ui');
 	} else if($.fn.slider && $.fn.datepicker){
-		$.htmlExt.createReadyEvent('jquery-ui');
+		$.webshims.createReadyEvent('jquery-ui');
 	}
 	
 	var replaceInputUI = function(context){
@@ -170,7 +170,7 @@
 	};
 	
 	$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, attr){
-		$.htmlExt.attr(attr, {
+		$.webshims.attr(attr, {
 			elementNames: ['input'],
 			setter: function(elem, val, fn){
 				var widget = $.data(elem, 'inputUIReplace');
@@ -202,12 +202,12 @@
 		
 		$(document).one('jquery-uiReady', function(){
 			$(document).bind('htmlExtLangChange', function(){
-				$.htmlExt.activeLang($.datepicker.regional, 'input-ui', changeDefaults);
+				$.webshims.activeLang($.datepicker.regional, 'input-ui', changeDefaults);
 			});
 		});
 	})(jQuery);
 	
-	$.htmlExt.addReady(function(context){
+	$.webshims.addReady(function(context){
 		$(document).bind('jquery-uiReady', function(){
 			replaceInputUI(context);
 		});

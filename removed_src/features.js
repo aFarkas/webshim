@@ -1,7 +1,7 @@
 (function($){
 	
 	$.support.inputUI = ($('<input type="range" />')[0].type == 'range' && $('<input type="date" />')[0].type == 'date');
-	$.htmlExt.addModule('input-ui', {
+	$.webshims.addModule('input-ui', {
 		test: function(){return $.support.inputUI;},
 		combination: ['combined-all', 'combined-x', 'combined-forms'],
 		options: {
@@ -14,11 +14,11 @@
 			replaceNative: function(replace){
 				this.nativeIsReplaced = replace;
 				if(replace){
-					$.htmlExt.loader.modules['input-ui'].test = function(){
+					$.webshims.loader.modules['input-ui'].test = function(){
 						return false;
 					};
 				} else {
-					$.htmlExt.loader.modules['input-ui'].test = function(){
+					$.webshims.loader.modules['input-ui'].test = function(){
 						return $.support.inputUI;
 					};
 				}

@@ -8,7 +8,6 @@ asyncTest("general validity Modul", function(){
 	
 	var form1 = $('#form-1');
 	
-	ok($('html').hasClass('validity-ready'), 'html-class');
 	
 	/*
 	 * novalidate
@@ -218,8 +217,6 @@ asyncTest('checkValidity/invalid event', function(){
 	equals(invalids, 0, 'there were 0 invalid events');
 });
 
-$(window).load(function(){
-	$.htmlExt.readyModules('validity validation-message', function(){
-		start();
-	});
+$.webshims.readyModules('form2 ready', function(){
+	start();
 });

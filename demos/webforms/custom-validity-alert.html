@@ -57,13 +57,13 @@
 	
     <script>
     	//basePath = url form html-ext.js (you can rename it) + relative url to shim folder
-    	$.htmlExt.loader.basePath += 'shims/';
+    	$.webshims.loader.basePath += 'shims/';
 		
 		//load all shims
-		$.htmlExt.loader.loadList();
+		$.webshims.loader.polyfill();
 		
 		//or load webform 2.0 shims only
-		//$.htmlExt.loader.loadList(['validity', 'placeholder', 'validation-message', 'input-ui']);
+		//$.webshims.loader.loadList('feature-name');
 		
 		$(function(){
 			var markValidity = {
@@ -98,7 +98,7 @@
 					//tell the api, that we will handle the invalid event -> this will preventDefault all comming invalid events in this event loop
 					e.preventDefault();
 					//custom method for simple validationAlerts (you can overwrite this or write your own)
-					$.htmlExt.validityAlert.showFor(e.target);
+					$.webshims.validityAlert.showFor(e.target);
 				})
 			;
 		});

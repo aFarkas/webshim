@@ -110,7 +110,7 @@
 	})();
 	
 	
-	$.htmlExt.attr('placeholder', {
+	$.webshims.attr('placeholder', {
 		elementNames: ['input', 'textarea'],
 		setter: function(elem, val){
 			pHolder.update(elem, val);
@@ -141,7 +141,7 @@
 		}
 	};
 	
-	$.htmlExt.attr('value', value);
+	$.webshims.attr('value', value);
 	
 	var oldVal = $.fn.val;
 	$.fn.val = function(val){
@@ -163,7 +163,7 @@
 		}
 	};
 			
-	$.htmlExt.addReady(function(context){
+	$.webshims.addReady(function(context){
 		$('input[placeholder], textarea[placeholder]', context).attr('placeholder', function(i, holder){
 			return holder;
 		});

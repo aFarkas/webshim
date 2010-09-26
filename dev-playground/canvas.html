@@ -29,8 +29,8 @@
 	<script src="../src/features.js"></script>
 	
     <script type="text/javascript" class="example">
-    	$.htmlExt.loader.basePath += 'shims/';
-		$.htmlExt.loader.loadList();
+    	$.webshims.loader.basePath += 'shims/';
+		$.webshims.loader.loadList();
 		
         $(function(){
 			
@@ -43,7 +43,7 @@
     </script>
 	
     <script type="text/javascript">
-        $.htmlExt.readyModules('ready canvasReady', function(){
+        $.webshims.readyModules('ready canvasReady', function(){
 			$('canvas.mouse-test').each(function(){
 				var elem = this;
 				var context = $(this).getContext('2d');

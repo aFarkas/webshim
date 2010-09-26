@@ -2,7 +2,9 @@
 	if(navigator.geolocation){return;}
 	$.support.geolocation = 'shim';
 	var domWrite = function(){
-			throw('document.write is overwritten by geolocation shim. This method is incompatibel with this plugin');
+			setTimeout(function(){
+				throw('document.write is overwritten by geolocation shim. This method is incompatibel with this plugin');
+			}, 1);
 		},
 		id = 0
 	;
@@ -37,12 +39,12 @@
 				;
 				if(!window.google || !google.loader){
 					//destroys document.write!!!
-					if($.htmlExt.loader.modules.geolocation.options.destroyWrite){
+					if($.webshims.loader.modules.geolocation.options.destroyWrite){
 						document.write = domWrite;
 						document.writeln = domWrite;
 					}
 					$(document).one('google-loaderReady', callback);
-					$.htmlExt.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
+					$.webshims.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
 				} else {
 					setTimeout(callback, 1);
 					return;
@@ -89,7 +91,7 @@ var getNames = function(elem){
 
 //API to add new input types
 var typeModels = {};
-$.htmlExt.addInputType = function(type, obj){
+$.webshims.addInputType = function(type, obj){
 	typeModels[type] = obj;
 };
 
@@ -152,7 +154,7 @@ var validityRules = {
 	}
 ;
 
-$.htmlExt.addMethod('checkValidity', (function(){
+$.webshims.addMethod('checkValidity', (function(){
 	var unhandledInvalids;
 	var testValidity = function(elem){
 		var e,
@@ -168,7 +170,7 @@ $.htmlExt.addMethod('checkValidity', (function(){
 			var jElm = $(elem).trigger(e);
 			if(!e.isDefaultPrevented()){
 				if(!unhandledInvalids){
-					$.htmlExt.validityAlert.showFor(jElm);
+					$.webshims.validityAlert.showFor(jElm);
 				}
 				unhandledInvalids = true;
 			}
@@ -234,7 +236,7 @@ $.event.special.invalid = {
 };
 
 // IDLs for constrain validation API
-$.htmlExt.attr('validity', {
+$.webshims.attr('validity', {
 	elementNames: ['input', 'select', 'textarea'],
 	getter: function(elem){
 		var validityState = $.data(elem, 'cachedValidity');
@@ -271,12 +273,12 @@ $.htmlExt.attr('validity', {
 	}
 });
 
-$.htmlExt.addMethod('setCustomValidity', function(error){
+$.webshims.addMethod('setCustomValidity', function(error){
 	$.data(this, 'customvalidationMessage', ''+error);
 });
 
 //this will be extended
-$.htmlExt.attr('validationMessage', {
+$.webshims.attr('validationMessage', {
 	elementNames: ['input', 'select', 'textarea'],
 	getter: function(elem, fn){
 		var message = fn() || $.data(elem, 'customvalidationMessage');
@@ -287,9 +289,9 @@ $.htmlExt.attr('validationMessage', {
 	}
 });
 
-$.htmlExt.createBooleanAttrs('required', ['input', 'textarea']);
+$.webshims.createBooleanAttrs('required', ['input', 'textarea']);
 
-$.htmlExt.attr('willValidate', {
+$.webshims.attr('willValidate', {
 	elementNames: ['input', 'select', 'textarea'],
 	getter: (function(){
 		var types = {
@@ -311,7 +313,7 @@ $.htmlExt.attr('willValidate', {
 
 // add support for new input-types
 
-$.htmlExt.attr('type', {
+$.webshims.attr('type', {
 	elementNames: ['input'],
 	getter: function(elem, fn){
 		var type = getType(elem);
@@ -321,7 +323,7 @@ $.htmlExt.attr('type', {
 	setter: true
 });
 
-$.htmlExt.addInputType('email', {
+$.webshims.addInputType('email', {
 	mismatch: (function(){
 		//taken from scott gonzales
 		var test = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|(\x22((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?\x22))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)*(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i;
@@ -331,7 +333,7 @@ $.htmlExt.addInputType('email', {
 	})()
 });
 
-$.htmlExt.addInputType('url', {
+$.webshims.addInputType('url', {
 	mismatch: (function(){
 		//taken from scott gonzales
 		var test = /^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
@@ -342,7 +344,7 @@ $.htmlExt.addInputType('url', {
 	})()
 });
 
-$.htmlExt.addReady(function(context){
+$.webshims.addReady(function(context){
 	//start constrain-validation
 	$('form', context).bind('invalid', $.noop);
 });
@@ -413,6 +415,122 @@ $.support.fieldsetValidation = 'shim';
 	;
 })(jQuery);
 
+/* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
+(function($){
+	var firstEvent,
+		stopSubmitTimer,
+		form
+	;
+	
+	//opera fix
+	//opera thorws a submit-event and then the invalid events,
+	//the following code will trigger the invalid events first and webkitfix will stopImmediatePropagation of submit event
+	if($.support.validity === true && document.addEventListener && !window.noHTMLExtFixes && window.opera){
+		document.addEventListener('submit', function(e){
+			if(e.target.checkValidity){
+				e.target.checkValidity();
+			}
+		}, true);
+	}
+	$(document).bind('invalid', function(e){
+		if(!firstEvent){
+			//webkitfix 
+			//chrome/safari submits an invalid form, if you prevent all invalid events
+			//this also prevents opera from throwing a submit event if form isn't valid
+			form = e.target.form;
+			if ($.support.validity === true && form && !window.noHTMLExtFixes){
+				var submitEvents = $(form)
+					.bind('submit.preventInvalidSubmit', function(submitEvent){
+						if( !$.attr(form, 'novalidate') ){
+							submitEvent.stopImmediatePropagation();
+							return false;
+						}
+					})
+					.data('events').submit
+				;
+				//add this handler as first executing handler
+				if (submitEvents && submitEvents.length > 1) {
+					submitEvents.unshift(submitEvents.pop());
+				}
+			}
+			
+			//trigger firstinvalid
+			firstEvent = $.Event('firstinvalid');
+			$(e.target).trigger(firstEvent);
+		}
+		//if firstinvalid was prevented all invalids will be also prevented
+		if( firstEvent && firstEvent.isDefaultPrevented() ){
+			e.preventDefault();
+		}
+		
+		clearTimeout(stopSubmitTimer);
+		stopSubmitTimer = setTimeout(function(){
+			//reset firstinvalid
+			firstEvent = false;
+			//remove webkitfix
+			$(form).unbind('submit.preventInvalidSubmit');
+		}, 9);
+		
+	});
+	
+	
+	/* some extra validation UI */
+	var ValidityAlert = function(){this._create();};
+	
+	ValidityAlert.prototype = {
+		_create: function(){
+			this.alert = $('<div class="validity-alert"><div class="va-box" /></div>').css({position: 'absolute', display: 'none'});
+			this.hideTimer = false;
+			this.boundHide = $.proxy(this, 'hide');
+		},
+		hideDelay: 5000,
+		createAlert: function(){
+			if(this.created){return;}
+			this.created = true;
+			var that = this;
+			$(function(){that.alert.appendTo('body');});
+		},
+		showFor: function(elem, noFocus){
+			elem = $(elem);
+			var widget = elem.data('inputUIReplace');
+			if(widget){
+				elem = widget.visual;
+			}
+			this.createAlert();
+			this.clear();
+			this.getMessage(elem);
+			this.position(elem);
+			this.show();
+			if(!noFocus){
+				elem.focus();
+			}
+			this.hideTimer = setTimeout(this.boundHide, this.hideDelay);
+			$(document).bind('focusout.validityalert', this.boundHide);
+		},
+		getMessage: function(elem){
+			$('> div', this.alert).html(elem.attr('validationMessage'));
+		},
+		position: function(elem){
+			var offset = elem.offset();
+			offset.top += elem.outerHeight();
+			this.alert.css(offset);
+		},
+		clear: function(){
+			clearTimeout(this.hideTimer);
+			$(document).unbind('focusout.validityalert');
+			this.alert.stop().css({opacity: ''});
+		},
+		show: function(){
+			this.alert.fadeIn();
+		},
+		hide: function(){
+			this.clear();
+			this.alert.fadeOut();
+		}
+	};
+	$.webshims.validityAlert = new ValidityAlert();
+})(jQuery);
+
 (function($){
 	if($.support.validationMessage){
 		return;
@@ -420,9 +538,9 @@ $.support.fieldsetValidation = 'shim';
 	$.support.validationMessage = 'shim';
 	
 	
-	$.htmlExt.validityMessages = [];
+	$.webshims.validityMessages = [];
 	
-	$.htmlExt.validityMessages[''] = {
+	$.webshims.validityMessages[''] = {
 		typeMismatch: {
 			email: '{%value} is not a legal email address',
 			url: '{%value} is not a valid web address',
@@ -441,7 +559,7 @@ $.support.fieldsetValidation = 'shim';
 		valueMissing: 'You have to specify a value'
 	};
 	
-	$.htmlExt.validityMessages['de'] = {
+	$.webshims.validityMessages['de'] = {
 		typeMismatch: {
 			email: '{%value} ist keine zulässige E-Mail-Adresse',
 			url: '{%value} ist keine zulässige Webadresse',
@@ -464,12 +582,12 @@ $.support.fieldsetValidation = 'shim';
 	
 	var validiyMessages;
 	$(document).bind('htmlExtLangChange', function(){
-		$.htmlExt.activeLang($.htmlExt.validityMessages, 'validation-message', function(langObj){
+		$.webshims.activeLang($.webshims.validityMessages, 'validation-base', function(langObj){
 			validiyMessages = langObj;
 		});
 	});
 	
-	$.htmlExt.attr('validationMessage', {
+	$.webshims.attr('validationMessage', {
 		elementNames: ['input', 'select', 'textarea'],
 		getter: function(elem){
 			var message = '';
@@ -510,7 +628,7 @@ $.support.fieldsetValidation = 'shim';
 		return;
 	}
 	$.support.fieldsetValidation = 'shim';
-	$.htmlExt.addMethod('checkValidity', function(error){
+	$.webshims.addMethod('checkValidity', function(error){
 		if($.nodeName(this, 'fieldset')){
 			var ret = true;
 			$(this.elements || 'input, textarea, select', this)
@@ -640,7 +758,7 @@ $.support.fieldsetValidation = 'shim';
 	})();
 	
 	
-	$.htmlExt.attr('placeholder', {
+	$.webshims.attr('placeholder', {
 		elementNames: ['input', 'textarea'],
 		setter: function(elem, val){
 			pHolder.update(elem, val);
@@ -671,7 +789,7 @@ $.support.fieldsetValidation = 'shim';
 		}
 	};
 	
-	$.htmlExt.attr('value', value);
+	$.webshims.attr('value', value);
 	
 	var oldVal = $.fn.val;
 	$.fn.val = function(val){
@@ -693,7 +811,7 @@ $.support.fieldsetValidation = 'shim';
 		}
 	};
 			
-	$.htmlExt.addReady(function(context){
+	$.webshims.addReady(function(context){
 		$('input[placeholder], textarea[placeholder]', context).attr('placeholder', function(i, holder){
 			return holder;
 		});
@@ -1659,7 +1777,7 @@ if (!document.createElement('canvas').getContext) {
 	G_vmlCanvasManager.fixDynamicElement = function(el){
 		return G_vmlCanvasManager.initElement(G_vmlCanvasManager.fixElement_(el));
 	};
-	$.htmlExt.addMethod('getContext', function(ctxName){
+	$.webshims.addMethod('getContext', function(ctxName){
 		if(!this.getContext){
 			G_vmlCanvasManager_.fixDynamicElement(this);
 		}
@@ -1671,6 +1789,10 @@ if (!document.createElement('canvas').getContext) {
 if(!jQuery.support.jsonStorage){
 	jQuery.support.jsonStorage = 'shim';
 }
+
+//JSON
+(function(){if('JSON'in window){return;}if(!this.JSON){this.JSON={};}(function(){function f(n){return n<10?'0'+n:n;}if(typeof Date.prototype.toJSON!=='function'){Date.prototype.toJSON=function(key){return isFinite(this.valueOf())?this.getUTCFullYear()+'-'+f(this.getUTCMonth()+1)+'-'+f(this.getUTCDate())+'T'+f(this.getUTCHours())+':'+f(this.getUTCMinutes())+':'+f(this.getUTCSeconds())+'Z':null;};String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(key){return this.valueOf();};}var cx=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,gap,indent,meta={'\b':'\\b','\t':'\\t','\n':'\\n','\f':'\\f','\r':'\\r','"':'\\"','\\':'\\\\'},rep;function quote(string){escapable.lastIndex=0;return escapable.test(string)?'"'+string.replace(escapable,function(a){var c=meta[a];return typeof c==='string'?c:'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4);})+'"':'"'+string+'"';}function str(key,holder){var i,k,v,length,mind=gap,partial,value=holder[key];if(value&&typeof value==='object'&&typeof value.toJSON==='function'){value=value.toJSON(key);}if(typeof rep==='function'){value=rep.call(holder,key,value);}switch(typeof value){case'string':return quote(value);case'number':return isFinite(value)?String(value):'null';case'boolean':case'null':return String(value);case'object':if(!value){return'null';}gap+=indent;partial=[];if(Object.prototype.toString.apply(value)==='[object Array]'){length=value.length;for(i=0;i<length;i+=1){partial[i]=str(i,value)||'null';}v=partial.length===0?'[]':gap?'[\n'+gap+partial.join(',\n'+gap)+'\n'+mind+']':'['+partial.join(',')+']';gap=mind;return v;}if(rep&&typeof rep==='object'){length=rep.length;for(i=0;i<length;i+=1){k=rep[i];if(typeof k==='string'){v=str(k,value);if(v){partial.push(quote(k)+(gap?': ':':')+v);}}}}else{for(k in value){if(Object.hasOwnProperty.call(value,k)){v=str(k,value);if(v){partial.push(quote(k)+(gap?': ':':')+v);}}}}v=partial.length===0?'{}':gap?'{\n'+gap+partial.join(',\n'+gap)+'\n'+mind+'}':'{'+partial.join(',')+'}';gap=mind;return v;}}if(typeof JSON.stringify!=='function'){JSON.stringify=function(value,replacer,space){var i;gap='';indent='';if(typeof space==='number'){for(i=0;i<space;i+=1){indent+=' ';}}else if(typeof space==='string'){indent=space;}rep=replacer;if(replacer&&typeof replacer!=='function'&&(typeof replacer!=='object'||typeof replacer.length!=='number')){throw new Error('JSON.stringify');}return str('',{'':value});};}if(typeof JSON.parse!=='function'){JSON.parse=function(text,reviver){var j;function walk(holder,key){var k,v,value=holder[key];if(value&&typeof value==='object'){for(k in value){if(Object.hasOwnProperty.call(value,k)){v=walk(value,k);if(v!==undefined){value[k]=v;}else{delete value[k];}}}}return reviver.call(holder,key,value);}text=String(text);cx.lastIndex=0;if(cx.test(text)){text=text.replace(cx,function(a){return'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4);});}if(/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,'@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,']').replace(/(?:^|:|,)(?:\s*\[)+/g,''))){j=eval('('+text+')');return typeof reviver==='function'?walk({'':j},''):j;}throw new SyntaxError('JSON.parse');};}}());})();
+
 //modified version from http://gist.github.com/350433
 //using window.name for sessionStorage and cookies for localStorage
 if (!window.localStorage || !window.sessionStorage){
@@ -1765,11 +1887,59 @@ var Storage = function (type) {
   };
 };
 
-if (!window.localStorage) {window.localStorage = new Storage('local');}
-if (!window.sessionStorage){window.sessionStorage = new Storage('session');}
+if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
+
+
+
+
+$.webshims.loader.loadList(['swfobject']);
+(function(){
+	var swfTimer;
+	$.webshims.localStorageSwfCallback = function(){
+		clearTimeout(swfTimer);
+		if(window.localStorage){
+			$.webshims.createReadyEvent('json-storage');
+			return;
+		}
+		var shim = document.getElementById('swflocalstorageshim');
+		//brute force flash getter
+		
+		if( !shim || typeof shim.GetVariable == 'undefined' ){
+			shim = document.swflocalstorageshim;
+		}
+		if( !shim || typeof shim.GetVariable == 'undefined'){
+			shim = window.localstorageshim;
+		}
+		if( !shim || typeof shim.GetVariable == 'undefined'){
+			window.localStorage = new Storage('local');
+		} else {
+			window.localStorage = {};
+			$.each(['key', 'setItem', 'getItem', 'removeItem', 'clear'], function(i, fn){
+				window.localStorage[fn] = shim[fn];
+			});
+		}
+		if(window.localStorage){
+			$.webshims.createReadyEvent('json-storage');
+		}
+	};
+	
+	$.webshims.readyModules('ready swfobject', function(){
+		if(swfobject.hasFlashPlayerVersion('8.0.0')){
+			swfobject.createCSS('#swflocalstorageshim', 'position: absolute; top: -1px; left: -1px; overflow: hidden; height: 1px; width: 1px;');
+			$('body').after('<div id="swflocalstorageshim" />');
+			swfobject.embedSWF($.webshims.loader.basePath +'localStorage.swf', 'swflocalstorageshim', '1', '1', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'localstorageshim'}, function(e){
+				if(!e.success && !window.localStorage){
+					$.webshims.localStorageSwfCallback();
+				}
+			});
+			swfTimer = setTimeout($.webshims.localStorageSwfCallback, 9999);
+		} else if(!window.localStorage){
+			window.localStorage = new Storage('local');
+			$.webshims.createReadyEvent('json-storage');
+		}
+	});
+})();
+
 
 })();
 }
-
-//JSON
-(function(){if('JSON'in window){return;}if(!this.JSON){this.JSON={};}(function(){function f(n){return n<10?'0'+n:n;}if(typeof Date.prototype.toJSON!=='function'){Date.prototype.toJSON=function(key){return isFinite(this.valueOf())?this.getUTCFullYear()+'-'+f(this.getUTCMonth()+1)+'-'+f(this.getUTCDate())+'T'+f(this.getUTCHours())+':'+f(this.getUTCMinutes())+':'+f(this.getUTCSeconds())+'Z':null;};String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(key){return this.valueOf();};}var cx=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,gap,indent,meta={'\b':'\\b','\t':'\\t','\n':'\\n','\f':'\\f','\r':'\\r','"':'\\"','\\':'\\\\'},rep;function quote(string){escapable.lastIndex=0;return escapable.test(string)?'"'+string.replace(escapable,function(a){var c=meta[a];return typeof c==='string'?c:'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4);})+'"':'"'+string+'"';}function str(key,holder){var i,k,v,length,mind=gap,partial,value=holder[key];if(value&&typeof value==='object'&&typeof value.toJSON==='function'){value=value.toJSON(key);}if(typeof rep==='function'){value=rep.call(holder,key,value);}switch(typeof value){case'string':return quote(value);case'number':return isFinite(value)?String(value):'null';case'boolean':case'null':return String(value);case'object':if(!value){return'null';}gap+=indent;partial=[];if(Object.prototype.toString.apply(value)==='[object Array]'){length=value.length;for(i=0;i<length;i+=1){partial[i]=str(i,value)||'null';}v=partial.length===0?'[]':gap?'[\n'+gap+partial.join(',\n'+gap)+'\n'+mind+']':'['+partial.join(',')+']';gap=mind;return v;}if(rep&&typeof rep==='object'){length=rep.length;for(i=0;i<length;i+=1){k=rep[i];if(typeof k==='string'){v=str(k,value);if(v){partial.push(quote(k)+(gap?': ':':')+v);}}}}else{for(k in value){if(Object.hasOwnProperty.call(value,k)){v=str(k,value);if(v){partial.push(quote(k)+(gap?': ':':')+v);}}}}v=partial.length===0?'{}':gap?'{\n'+gap+partial.join(',\n'+gap)+'\n'+mind+'}':'{'+partial.join(',')+'}';gap=mind;return v;}}if(typeof JSON.stringify!=='function'){JSON.stringify=function(value,replacer,space){var i;gap='';indent='';if(typeof space==='number'){for(i=0;i<space;i+=1){indent+=' ';}}else if(typeof space==='string'){indent=space;}rep=replacer;if(replacer&&typeof replacer!=='function'&&(typeof replacer!=='object'||typeof replacer.length!=='number')){throw new Error('JSON.stringify');}return str('',{'':value});};}if(typeof JSON.parse!=='function'){JSON.parse=function(text,reviver){var j;function walk(holder,key){var k,v,value=holder[key];if(value&&typeof value==='object'){for(k in value){if(Object.hasOwnProperty.call(value,k)){v=walk(value,k);if(v!==undefined){value[k]=v;}else{delete value[k];}}}}return reviver.call(holder,key,value);}text=String(text);cx.lastIndex=0;if(cx.test(text)){text=text.replace(cx,function(a){return'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4);});}if(/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,'@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,']').replace(/(?:^|:|,)(?:\s*\[)+/g,''))){j=eval('('+text+')');return typeof reviver==='function'?walk({'':j},''):j;}throw new SyntaxError('JSON.parse');};}}());})();

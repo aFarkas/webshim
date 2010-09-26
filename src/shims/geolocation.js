@@ -2,7 +2,9 @@
 	if(navigator.geolocation){return;}
 	$.support.geolocation = 'shim';
 	var domWrite = function(){
-			throw('document.write is overwritten by geolocation shim. This method is incompatibel with this plugin');
+			setTimeout(function(){
+				throw('document.write is overwritten by geolocation shim. This method is incompatibel with this plugin');
+			}, 1);
 		},
 		id = 0
 	;
@@ -37,12 +39,12 @@
 				;
 				if(!window.google || !google.loader){
 					//destroys document.write!!!
-					if($.htmlExt.loader.modules.geolocation.options.destroyWrite){
+					if($.webshims.loader.modules.geolocation.options.destroyWrite){
 						document.write = domWrite;
 						document.writeln = domWrite;
 					}
 					$(document).one('google-loaderReady', callback);
-					$.htmlExt.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
+					$.webshims.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
 				} else {
 					setTimeout(callback, 1);
 					return;

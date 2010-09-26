@@ -1,7 +1,7 @@
 module("placeholder");
 asyncTest("placeholder Modul", function(){
 	QUnit.reset();
-	ok($('html').hasClass('placeholder-ready'), 'html-class');
+	
 	
 	equals( $('#placeholder').val(), "", '$.fn.val is empty' );
 	equals( $('#placeholder').attr('value'), "", '$.fn.attr(value) is empty' );

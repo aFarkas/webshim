@@ -33,13 +33,8 @@
 	<script src="../js-webshim/minified/features.js"></script>
 	
     <script>
-    	//basePath = url form html-ext.js (you can rename it) + relative url to shim folder
-    	$.htmlExt.loader.basePath += 'shims/';
-		
-		//load all shims
-		//$.htmlExt.loader.loadList();
-		//or load webform 2.0 shims $.htmlExt.loader.loadList(['validity', 'placeholder', 'validation-message', 'input-ui']);
-		$.htmlExt.loader.loadList();
+    	$.webshims.loader.basePath += 'shims/';
+		$.webshims.polyfill();
 		
     </script>
 	

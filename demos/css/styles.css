@@ -1,0 +1,99 @@
+* {}
+* {
+    margin: 0;
+    padding: 0;
+}
+section, articel, footer, nav, header, footer, hgroup {display: block;}
+li {
+	list-style: none;
+}
+
+fieldset {
+    border: 0 solid #fff;
+}
+del {
+    font-weight: normal;
+}
+address {
+    font-size: 120%;
+    font-style: normal;
+}
+img {
+	display: block;
+	border: 0;
+}
+form textarea {
+	height: 140px;
+	font-family: arial, helvetica, sans-serif;
+	font-size: 120%;
+}
+h1, h2, h3, h4, h5, h6, table, input, textarea, label {
+	font-size: 100%;
+}
+
+body {
+    font: 100.1% arial, helvetica, sans-serif;
+}
+#wrapper {
+	margin: 10px auto;
+	border: 2px solid #000;
+	padding: 0 20px 20px;
+	width: 80%;
+	min-width: 400px;
+	max-width: 50em;
+	
+	-moz-border-radius: 9px;
+	border-radius: 9px;
+	
+}
+section {margin: 20px 0;}
+#wrapper > section,
+header {
+	margin: 25px 0;
+	padding: 10px;
+	border: 2px solid #000;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+h1 {
+	font-size: 180%;
+	margin: 30px 0 20px;
+}
+h2 {
+	font-size: 150%;
+	margin: 25px 0 15px;
+}
+h3 {
+	font-size: 125%;
+	margin: 25px 0 10px;
+}
+h4 {
+	font-size: 110%;
+	margin: 12px 0 5px;
+}
+h1:first-child,
+h2:first-child,
+h3:first-child,
+h4:first-child {
+	margin-top: 1px;
+}
+ul,
+ol {
+	margin: 15px 0 15px 20px;
+}
+ul > li {
+	list-style: disc;
+}
+ul > li {
+	margin: 2px 0;
+	
+}
+p {
+	margin: 15px 0;
+}
+code.block {
+	display: block;
+	overflow: auto;
+	margin: -5px 20px 15px;
+	white-space: pre;
+}

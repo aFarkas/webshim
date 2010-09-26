@@ -29,8 +29,8 @@
 	<script src="../src/shims/validity.js"></script>
 	
     <script type="text/javascript" class="example">
-    	$.htmlExt.loader.basePath += 'shims/';
-		$.htmlExt.loader.loadList();
+    	$.webshims.loader.basePath += 'shims/';
+		$.webshims.loader.loadList();
 		
         $(function(){
 			$('button.feature').bind('click', function(e){
@@ -50,7 +50,7 @@
 			})
         });
 		
-		$.htmlExt.readyModules('ready geolocation', function(){
+		$.webshims.readyModules('ready geolocation', function(){
 			navigator.geolocation.getCurrentPosition(function(pos){
 				console.log(pos.coords.latitude +'|'+ pos.coords.longitude);
 				console.log(pos.timestamp)

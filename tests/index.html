@@ -32,7 +32,7 @@
 			var _reset = QUnit.reset;
 			QUnit.reset = function(){
 				var ret = _reset.apply(this, arguments);
-				$.htmlExt.triggerDomUpdate($("#main, #qunit-fixture"));
+				$.webshims.triggerDomUpdate($("#main, #qunit-fixture"));
 				return ret;
 			};
 		})();
@@ -40,11 +40,11 @@
 	
 	<script src="unit/placeholder.js"></script>
 	<script src="unit/validity.js"></script>
-	
+	<script src="unit/dynamic-webshim.js"></script>
 	
 	<script>
-		$.htmlExt.loader.basePath += 'shims/';
-		$.htmlExt.loader.loadList();
+		$.webshims.loader.basePath += 'shims/';
+		$.webshims.polyfill();
 		
 		
 	</script>

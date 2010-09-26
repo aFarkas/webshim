@@ -1,21 +1,38 @@
 (function($){
+	/* general modules */
+	/* change path $.webshims.loader.modules[moduleName].src */
+	$.webshims.loader.addModule('jquery-ui', {
+		src: 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js',
+		test: function(){
+			return !!($.ui && $.widget && ($.fn.datepicker || $.fn.slider));
+		}
+	});
+	
+	$.webshims.loader.addModule('swfobject', {
+		src: 'http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js',
+		test: function(){
+			return ('swfobject' in window);
+		}
+	});
+	
+	/* 
+	 * polyfill-Modules 
+	 */
 	
 	/* geolocation */
 	$.support.geolocation = ('geolocation'  in navigator);
-	$.htmlExt.addModule('geolocation', {
+	$.webshims.addModule('geolocation', {
 		test: function(){
 			return $.support.geolocation;
 		},
-		options: {
-			destroyWrite: true
-		},
-		combination: ['combined-all', 'combined-x']
+		options: {destroyWrite: true},
+		combination: ['combined-all', 'combined-x', 'combined-xx']
 	});
 	/* END: geolocation */
 	
 	/* canvas */
 	$.support.canvas = ('getContext'  in $('<canvas />')[0]);
-	$.htmlExt.addModule('canvas', {
+	$.webshims.addModule('canvas', {
 		test: function(){
 			return $.support.canvas;
 		},
@@ -33,10 +50,10 @@
 	 * HTML5 FORM-Features
 	 */
 	
-	
 	/* html5 constraint validation */
 	$.support.validity = ('checkValidity' in $('<form action="#" />')[0]);
-	$.htmlExt.addModule('validity', {
+	$.webshims.addModule('validity', {
+		feature: 'form2',
 		test: function(){
 			return $.support.validity;
 		},
@@ -52,13 +69,13 @@
 			}
 		],
 		options: {},
-		combination: ['combined-all', 'combined-x', 'combined-forms']
+		combination: ['combined-all', 'combined-x', 'combined-xx', 'combined-forms']
 	});
 	
 	
 	if($.support.validity === true){
 		//create bubbling-like invalid event
-		$.htmlExt.capturingEvents(['invalid', 'input']);
+		$.webshims.capturingEvents(['invalid', 'input']);
 	}
 	
 	$.extend($.expr.filters, {
@@ -73,146 +90,33 @@
 		}
 	});
 	
-	$.htmlExt.createBooleanAttrs('novalidate', 'form');
+	$.webshims.createBooleanAttrs('novalidate', 'form');
 	
 	
-	/* validation-message + fieldset.checkValidity pack */
+	/* bugfixes, validation-message + fieldset.checkValidity pack */
 	(function(){
 		var form = $('<form action="#"><fieldset><input name="a" required /></fieldset></form>');
 		$.support.validationMessage = !!(form.find('input').attr('validationMessage'));
 		$.support.fieldsetValidation = !!($('fieldset', form)[0].elements && $('fieldset', form).checkValidity() === false);
-		$.htmlExt.addModule('validation-message', {
+		$.webshims.addModule('validation-base', {
+			feature: 'form2',
 			test: function(){
-				return ($.support.validationMessage && $.support.fieldsetValidation);
+				//always load
+				return false; //($.support.validationMessage && $.support.fieldsetValidation);
 			},
-			combination: ['combined-all', 'combined-x', 'combined-forms']
+			combination: ['combined-all', 'combined-x', 'combined-xx', 'combined-forms']
 		});
 	})();
-	
-	
-	/* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
-	(function(){
-		var firstEvent,
-			stopSubmitTimer,
-			form
-		;
-		
-		//opera fix
-		//opera thorws a submit-event and then the invalid events,
-		//the following code will trigger the invalid events first and webkitfix will stopImmediatePropagation
-		if($.support.validity === true && document.addEventListener && !window.noHTMLExtFixes && window.opera){
-			document.addEventListener('submit', function(e){
-				if(e.target.checkValidity){
-					e.target.checkValidity();
-				}
-			}, true);
-		}
-		$(document).bind('invalid', function(e){
-			if(!firstEvent){
-				//webkitfix 
-				//chrome/safari submits an invalid form, if you prevent all invalid events
-				//this also prevents opera from throwing a submit event if form isn't valid
-				form = e.target.form;
-				if ($.support.validity === true && form && !window.noHTMLExtFixes){
-					var submitEvents = $(form)
-						.bind('submit.preventInvalidSubmit', function(submitEvent){
-							if( !$.attr(form, 'novalidate') ){
-								submitEvent.stopImmediatePropagation();
-								return false;
-							}
-						})
-						.data('events').submit
-					;
-					//add this handler as first executing handler
-					if (submitEvents && submitEvents.length > 1) {
-						submitEvents.unshift(submitEvents.pop());
-					}
-				}
-				
-				//trigger firstinvalid
-				firstEvent = $.Event('firstinvalid');
-				$(e.target).trigger(firstEvent);
-			}
-			//if firstinvalid was prevented all invalids will be also prevented
-			if( firstEvent && firstEvent.isDefaultPrevented() ){
-				e.preventDefault();
-			}
-			
-			clearTimeout(stopSubmitTimer);
-			stopSubmitTimer = setTimeout(function(){
-				//reset firstinvalid
-				firstEvent = false;
-				//remove webkitfix
-				$(form).unbind('submit.preventInvalidSubmit');
-			}, 9);
-			
-		});
-	})();
-	
-	/* some extra validation UI */
-	var ValidityAlert = function(){this._create();};
-	
-	ValidityAlert.prototype = {
-		_create: function(){
-			this.alert = $('<div class="validity-alert"><div class="va-box" /></div>').css({position: 'absolute', display: 'none'});
-			this.hideTimer = false;
-			this.hideDelay = 5000;
-			this.boundHide = $.proxy(this, 'hide');
-		},
-		createAlert: function(){
-			if(this.created){return;}
-			this.created = true;
-			var that = this;
-			$(function(){that.alert.appendTo('body');});
-		},
-		showFor: function(elem, noFocus){
-			elem = $(elem);
-			var widget = elem.data('inputUIReplace');
-			if(widget){
-				elem = widget.visual;
-			}
-			this.createAlert();
-			this.clear();
-			this.getMessage(elem);
-			this.position(elem);
-			this.show();
-			if(!noFocus){
-				elem.focus();
-			}
-			this.hideTimer = setTimeout(this.boundHide, this.hideDelay);
-			$(document).bind('focusout.validityalert', this.boundHide);
-		},
-		getMessage: function(elem){
-			$('> div', this.alert).html(elem.attr('validationMessage'));
-		},
-		position: function(elem){
-			var offset = elem.offset();
-			offset.top += elem.outerHeight();
-			this.alert.css(offset);
-		},
-		clear: function(){
-			clearTimeout(this.hideTimer);
-			$(document).unbind('focusout.validityalert');
-			this.alert.stop().css({opacity: ''});
-		},
-		show: function(){
-			this.alert.fadeIn();
-		},
-		hide: function(){
-			this.clear();
-			this.alert.fadeOut();
-		}
-	};
-	$.htmlExt.validityAlert = new ValidityAlert();
 	
 	/* placeholder */
 	$.support.placeholder = ('placeholder'  in $('<input type="text" />')[0]);
-	$.htmlExt.addModule('placeholder', {
+	$.webshims.addModule('placeholder', {
+		feature: 'form2',
 		test: function(){
 			return $.support.placeholder;
 		},
 		css: 'shim.css',
-		combination: ['combined-all', 'combined-x', 'combined-forms']
+		combination: ['combined-all', 'combined-x', 'combined-xx', 'combined-forms']
 	});
 	/* END: placeholder */
 	
@@ -220,10 +124,11 @@
 	
 	/* json + loacalStorage */
 	$.support.jsonStorage = ('JSON' in window && 'localStorage' in window && 'sessionStorage' in window);
-	$.htmlExt.addModule('json-storage', 
-		{test: function(){
+	$.webshims.addModule('json-storage', {
+		test: function(){
 			return $.support.jsonStorage;
 		},
+		noAutoCallback: true,
 		combination: ['combined-all']
 	});
 	/* END: json + loacalStorage */

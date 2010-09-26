@@ -11,18 +11,27 @@
     </taskdef>
     
     <target name="WebExtlib">
-    	<concat destfile="${shims}/combined-forms.js">
+    	<!-- first we create some feature combinations, to minimize http-requests -->
+		<!-- good for FF3.x -->
+		<concat destfile="${shims}/combined-forms.js">
             <fileset file="${shims}/validity.js" />
-            <fileset file="${shims}/validation-message.js" />
+            <fileset file="${shims}/validation-base.js" />
 			<fileset file="${shims}/placeholder.js" />
         </concat>
 		
-		<concat destfile="${shims}/combined-x.js">
+		<!-- good for ie9 -->
+		<concat destfile="${shims}/combined-xx.js">
             <fileset file="${shims}/geolocation.js" />
             <fileset file="${shims}/combined-forms.js" />
+        </concat>
+		
+		<!-- good for ie8 -->
+		<concat destfile="${shims}/combined-x.js">
+            <fileset file="${shims}/combined-xx.js" />
             <fileset file="${shims}/canvas.js" />
         </concat>
 		
+		<!-- good for ie6/ie7 -->
 		<concat destfile="${shims}/combined-all.js">
             <fileset file="${shims}/combined-x.js" />
             <fileset file="${shims}/json-storage.js" />
