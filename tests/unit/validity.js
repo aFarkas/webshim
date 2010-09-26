@@ -22,8 +22,6 @@ asyncTest("general validity Modul", function(){
 	form1.attr('novalidate', false);
 	equals( form1.attr('novalidate'), false, 'novalidate is set to false' );
 	
-	
-	
 	equals(form1.find('#name').attr('required'), true, 'name is required');
 	
 	//willValidate
@@ -52,6 +50,9 @@ asyncTest("general validity Modul", function(){
 	equals(form1.find('#name').attr('required'), false, "name isn't required");
 	equals(form1.find('#name').is(':invalid'), false, 'name is valid');
 	form1.find('#name').attr('required', true);
+	
+	ok($('#field8-1').attr('required'), 'radio is required if another element of group is required');
+	ok($('#field8-1').is(':invalid'), 'radio is invalid');
 	
 	//validityState
 	//what is the problem here?
