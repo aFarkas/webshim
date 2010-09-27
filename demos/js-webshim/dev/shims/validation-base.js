@@ -24,7 +24,7 @@
 			if ($.support.validity === true && form && !window.noHTMLExtFixes){
 				var submitEvents = $(form)
 					.bind('submit.preventInvalidSubmit', function(submitEvent){
-						if( !$.attr(form, 'novalidate') ){
+						if( $.attr(form, 'novalidate') === undefined ){
 							submitEvent.stopImmediatePropagation();
 							return false;
 						}

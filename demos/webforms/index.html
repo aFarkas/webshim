@@ -48,23 +48,24 @@
 		</header>
 		<section>
 			<h2>Demo/About/Documentation of HTML5 constraint validation API</h2>
-			<p>The <code>form2</code> feature of the webshim lib adds support for the constraint validation API + the placeholder-Attribut.</p>
+			<p>The <code>form2</code> feature of the webshim lib adds support for the <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#the-constraint-validation-api">constraint validation API</a> + the placeholder-Attribut.</p>
 			<section>
 				<h3>Implemented attributes, properties, methods, events</h3>
 				<ul>
-					<li><strong>types</strong>: email, url (datetime-local, date, time, number, range will come soon)</li>
-					<li><strong>attributes (with IDL, if existing)</strong>: novalidate, required, pattern, maxlength (step, max, min will come soon)</li>
-					<li><strong>properties</strong>: willValidate, validity, validationMessage (valueAsNumber, valueAsDate will come soon)</li>
-					<li><strong>methods</strong>: setCustomValidity, checkValidity</li>
-					<li><strong>events</strong>: invalid, input</li>
+					<li><strong>types</strong>: <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#e-mail-state">email</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#url-state">url</a> (datetime-local, date, time, number, range will come soon)</li>
+					<li><strong>attributes (with IDL, if existing)</strong>: <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-placeholder">placeholder</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-novalidate">novalidate</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-required">required</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-pattern">pattern</a>, <a href="http://www.w3.org/TR/html5/the-button-element.html#attr-textarea-maxlength">maxlength</a> (step, max, min will come soon)</li>
+					<li><strong>properties</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-willvalidate">willValidate</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validity">validity</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validationmessage">validationMessage</a> (valueAsNumber, valueAsDate will come soon)</li>
+					<li><strong>methods</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-setcustomvalidity">setCustomValidity</a>, <a href="http://www.w3.org/TR/html5/forms.html#dom-form-checkvalidity">checkValidity</a></li>
+					<li><strong>events</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#constraint-validation">invalid</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#event-input-input">input</a></li>
 					<li><strong>selectors</strong>: :invalid, :valid</li>
 				</ul>
 				
-				<h3>Changed/extended behavior</h3>
+				<h3>Extensions/Abstractions to the standard</h3>
 				<ul>
-					<li><strong>novalidate</strong>: although novalidate is only a content attribute, it will behave like an property (i.e.: $('form').attr('novalidate') returns boolean and $('form').attr('novalidate', boolean [true|false]) will set the attribute</li>
-					<li><strong>firstinvalid</strong>: <code>firstinvalid</code> is a handy event, wich is triggered on the first invalid form element, if at least one invalid event occurs. Preventing the default of firstinvalid will automatically prevent default behavior of all associated invalid events.</li>
-					<li><strong>$.webshims.validityAlert.showFor</strong>: takes a DOM-Object/Selector/jQuery-Object and shows the invalid message for this element. (simply look into the prototype i.e. <code>console.log($.webshims.validityAlert)</code>)</li>
+					<li><strong>event: firstinvalid</strong>: <code>firstinvalid</code> is a simple, bubbling event, wich is triggered on the first invalid form element. Preventing the default of firstinvalid will automatically prevent the default behavior of all current invalid elements.</li>
+					<li><strong>event: lastinvalid</strong>: <code>lastinvalid</code> is an extended, bubbling, (but) uncancelable event, wich is triggered on the last invalid form element. The property <code>invalidlist</code> is a jQuery-collection of all current invalid elements.</li>
+					<li><strong>helper: $.webshims.validityAlert.showFor</strong>: takes a DOM-Object/Selector/jQuery-Object and shows the invalid message for this element. (simply look into the prototype i.e. <code>console.log($.webshims.validityAlert)</code>) to make changes</li>
+					<li><strong>selectors</strong>: :willValidate</li>
 				</ul>
 			</section>
 			<section>

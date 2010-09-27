@@ -90,8 +90,6 @@
 		}
 	});
 	
-	$.webshims.createBooleanAttrs('novalidate', 'form');
-	
 	
 	/* bugfixes, validation-message + fieldset.checkValidity pack */
 	(function(){

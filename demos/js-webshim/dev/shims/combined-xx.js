@@ -223,7 +223,7 @@ $.event.special.invalid = {
 		;
 	},
 	handler: function(e, d){
-		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') ){return;}
+		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') !== undefined ){return;}
 		var notValid = !($(e.target).checkValidity());
 		if(notValid){
 			if(!e.originalEvent && !window.debugValidityShim && window.console && console.log){
@@ -306,7 +306,7 @@ $.webshims.attr('willValidate', {
 			}
 		;
 		return function(elem){
-			return !!( elem.name && elem.form && !elem.disabled && !elem.readonly && !types[elem.type] && !$.attr(elem.form, 'novalidate') );
+			return !!( elem.name && elem.form && !elem.disabled && !elem.readonly && !types[elem.type] && $.attr(elem.form, 'novalidate') === undefined );
 		};
 	})()
 });
@@ -441,7 +441,7 @@ $.support.fieldsetValidation = 'shim';
 			if ($.support.validity === true && form && !window.noHTMLExtFixes){
 				var submitEvents = $(form)
 					.bind('submit.preventInvalidSubmit', function(submitEvent){
-						if( !$.attr(form, 'novalidate') ){
+						if( $.attr(form, 'novalidate') === undefined ){
 							submitEvent.stopImmediatePropagation();
 							return false;
 						}
@@ -679,6 +679,7 @@ $.support.fieldsetValidation = 'shim';
 					$(this).removeClass('placeholder-visible');
 				}
 			},
+			
 			placeholderID 	= 0,
 			delReg 	= /\n|\r|\f|\t/g,
 			allowedPlaceholder = {
@@ -687,8 +688,7 @@ $.support.fieldsetValidation = 'shim';
 				url: 1,
 				email: 1,
 				password: 1,
-				tel: 1,
-				url: 1
+				tel: 1
 			}
 		;
 		

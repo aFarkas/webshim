@@ -1,6 +1,7 @@
 /* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
 (function($){
 	var firstEvent,
+		invalids = [],
 		stopSubmitTimer,
 		form
 	;
@@ -24,7 +25,7 @@
 			if ($.support.validity === true && form && !window.noHTMLExtFixes){
 				var submitEvents = $(form)
 					.bind('submit.preventInvalidSubmit', function(submitEvent){
-						if( !$.attr(form, 'novalidate') ){
+						if( $.attr(form, 'novalidate') === undefined ){
 							submitEvent.stopImmediatePropagation();
 							return false;
 						}
@@ -45,13 +46,16 @@
 		if( firstEvent && firstEvent.isDefaultPrevented() ){
 			e.preventDefault();
 		}
-		
+		invalids.push(e.target);
 		clearTimeout(stopSubmitTimer);
 		stopSubmitTimer = setTimeout(function(){
+			var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
 			//reset firstinvalid
 			firstEvent = false;
 			//remove webkitfix
 			$(form).unbind('submit.preventInvalidSubmit');
+			invalids = [];
+			$(e.target).trigger(lastEvent, lastEvent);
 		}, 9);
 		
 	});

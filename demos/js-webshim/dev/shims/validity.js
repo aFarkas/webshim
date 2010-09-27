@@ -153,7 +153,7 @@ $.event.special.invalid = {
 		;
 	},
 	handler: function(e, d){
-		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') ){return;}
+		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') !== undefined ){return;}
 		var notValid = !($(e.target).checkValidity());
 		if(notValid){
 			if(!e.originalEvent && !window.debugValidityShim && window.console && console.log){
@@ -236,7 +236,7 @@ $.webshims.attr('willValidate', {
 			}
 		;
 		return function(elem){
-			return !!( elem.name && elem.form && !elem.disabled && !elem.readonly && !types[elem.type] && !$.attr(elem.form, 'novalidate') );
+			return !!( elem.name && elem.form && !elem.disabled && !elem.readonly && !types[elem.type] && $.attr(elem.form, 'novalidate') === undefined );
 		};
 	})()
 });
