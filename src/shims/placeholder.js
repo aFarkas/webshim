@@ -31,6 +31,7 @@
 					$(this).removeClass('placeholder-visible');
 				}
 			},
+			
 			placeholderID 	= 0,
 			delReg 	= /\n|\r|\f|\t/g,
 			allowedPlaceholder = {
@@ -39,8 +40,7 @@
 				url: 1,
 				email: 1,
 				password: 1,
-				tel: 1,
-				url: 1
+				tel: 1
 			}
 		;
 		
