@@ -470,7 +470,6 @@ asyncTest('step number/date module specific validity', function(){
 
 
 asyncTest('valueAsDate/valueAsNumber', function(){
-	QUnit.reset();
 	
 	//getting valueAsNumber
 	$.each([

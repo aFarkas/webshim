@@ -242,7 +242,7 @@
 	};
 	
 	var validityRules = {};
-	$.webshims.addvalidityRule = function(type, fn){
+	$.webshims.addValidityRule = function(type, fn){
 		validityRules[type] = fn;
 	};
 })(jQuery);
@@ -295,7 +295,7 @@
 			EPS = 1e-7
 		;
 		
-		$.webshims.addvalidityRule('stepMismatch', function(input, val, cache){
+		$.webshims.addValidityRule('stepMismatch', function(input, val, cache){
 			if(val === ''){return false;}
 			if(!('type' in cache)){
 				cache.type = getType(input[0]);
@@ -333,7 +333,7 @@
 		
 		
 		$.each([{name: 'rangeOverflow', attr: 'max', factor: 1}, {name: 'rangeUnderflow', attr: 'min', factor: -1}], function(i, data){
-			$.webshims.addvalidityRule(data.name, function(input, val, cache) {
+			$.webshims.addValidityRule(data.name, function(input, val, cache) {
 				var ret = false;
 				if(val === ''){return ret;}
 				if (!('type' in cache)) {
@@ -728,7 +728,9 @@
 		});
 	};
 	
-	if($.support.validity === true){
+	if($.webshims.addValidityRule){
+		implementTypes();
+	}else if($.support.validity === true){
 		$.webshims.readyModules('implement-types',implementTypes);
 	} else {
 		$.webshims.readyModules('validity',implementTypes);
