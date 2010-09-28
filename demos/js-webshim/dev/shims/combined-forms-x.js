@@ -117,7 +117,7 @@
 	};
 	$.webshims.validityAlert = new ValidityAlert();
 	
-	$.webshims.validityMessages[''] = {
+	$.webshims.validityMessages['en'] = $.webshims.validityMessages['en'] || $.webshims.validityMessages['en-US'] || {
 		typeMismatch: {
 			email: '{%value} is not a legal email address',
 			url: '{%value} is not a valid web address',
@@ -136,7 +136,10 @@
 		valueMissing: 'You have to specify a value'
 	};
 	
-	$.webshims.validityMessages['de'] = {
+	$.webshims.validityMessages['en-US'] = $.webshims.validityMessages['en-US'] || $.webshims.validityMessages['en'];
+	$.webshims.validityMessages[''] = $.webshims.validityMessages[''] || $.webshims.validityMessages['en'];
+	
+	$.webshims.validityMessages['de'] = $.webshims.validityMessages['de'] || {
 		typeMismatch: {
 			email: '{%value} ist keine zulässige E-Mail-Adresse',
 			url: '{%value} ist keine zulässige Webadresse',

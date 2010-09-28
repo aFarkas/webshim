@@ -699,6 +699,6 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		}
 	});
 });
-$.webshims.readyModules('form2 ready', function(){
+$.webshims.readyModules('forms ready', function(){
 	start();
 });

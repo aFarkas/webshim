@@ -53,7 +53,7 @@
 	/* html5 constraint validation */
 	$.support.validity = ('checkValidity' in $('<form action="#" />')[0]);
 	$.webshims.addModule('validity', {
-		feature: 'form2',
+		feature: 'forms',
 		test: function(){
 			return $.support.validity;
 		},
@@ -99,7 +99,7 @@
 		$.support.validationMessage = !!(form.find('input').attr('validationMessage'));
 		$.support.fieldsetValidation = !!($('fieldset', form)[0].elements && $('fieldset', form)[0].checkValidity && 'disabled' in $('fieldset', form)[0] && !$('fieldset', form)[0].checkValidity() );
 		$.webshims.addModule('validation-base', {
-			feature: 'form2',
+			feature: 'forms',
 			test: function(){
 				//always load
 				return false; //($.support.validationMessage && $.support.fieldsetValidation);
@@ -109,7 +109,7 @@
 	})();
 	
 	$.webshims.addModule('implement-types', {
-		feature: 'form2',
+		feature: 'forms',
 		test: function(){
 			return !($.support.validity === true && ( $('<input type="datetime-local" />').attr('type') !== 'datetime-local' || $('<input type="range" />').attr('type') !== 'range' ) );
 		},
@@ -118,7 +118,7 @@
 	
 	
 	$.webshims.addModule('number-date-type', {
-		feature: 'form2',
+		feature: 'forms',
 		test: function(){
 			return ($('<input type="datetime-local" />').attr('type') === 'datetime-local' && $('<input type="range" />').attr('type') === 'range');
 		},
@@ -129,7 +129,7 @@
 	/* placeholder */
 	$.support.placeholder = ('placeholder'  in $('<input type="text" />')[0]);
 	$.webshims.addModule('placeholder', {
-		feature: 'form2',
+		feature: 'forms',
 		test: function(){
 			return $.support.placeholder;
 		},

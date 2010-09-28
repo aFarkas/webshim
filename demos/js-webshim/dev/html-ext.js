@@ -395,19 +395,22 @@
 		},
 		activeLang: (function(){
 			var langs = [navigator.browserLanguage || navigator.language || ''];
-			if(langs[0] == 'en-US'){
-				langs[0] = 'en';
-			}
 			var paLang = $('html').attr('lang');
+			var timer;
+			
 			if(paLang){
 				langs.push(paLang);
 			}
 			return function(lang, module, fn){
 				if(lang){
 					if(!module || !fn){
-						lang = (lang == 'en-US') ? '' : lang;
-						langs[0] = lang;
-						$(doc).triggerHandler('htmlExtLangChange', langs);
+						if(lang !== langs[0]){
+							langs[0] = lang;
+							clearTimeout(timer);
+							timer = setTimeout(function(){
+								$(doc).triggerHandler('htmlExtLangChange', langs);
+							}, 9);
+						}
 					} else {
 						module = $.webshims.loader.modules[module].options;
 						var langObj = lang,

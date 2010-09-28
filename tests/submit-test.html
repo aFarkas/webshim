@@ -36,7 +36,7 @@
 		//load all shims
 		//$.webshims.loader.loadList();
 		//or load webform 2.0 shims $.webshims.loader.loadList(['validity', 'placeholder', 'validation-message', 'input-ui']);
-		$.webshims.loader.loadList();
+		$.webshims.polyfill();
 		
 		$(function(){
 			var invalidEvents, submitEvents, preventInvalid;

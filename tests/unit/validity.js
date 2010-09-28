@@ -212,6 +212,6 @@ asyncTest('checkValidity/invalid event', function(){
 	equals(invalids, 0, 'there were 0 invalid events');
 });
 
-$.webshims.readyModules('form2 ready', function(){
+$.webshims.readyModules('forms ready', function(){
 	start();
 });
