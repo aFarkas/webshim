@@ -85,7 +85,7 @@ var validityRules = {
 	}
 ;
 
-$.webshims.addvalidityRule = function(type, fn){
+$.webshims.addValidityRule = function(type, fn){
 	validityRules[type] = fn;
 };
 
