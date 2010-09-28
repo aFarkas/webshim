@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<link href="../css/styles.css" rel="stylesheet" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="../js-webshim/minified/html-ext.js"></script>
+	<script src="../js-webshim/minified/features.js"></script>
+	
+    <script class="example">
+    	
+		//path is path of html-ext.js + shims/
+    	$.webshims.loader.basePath += 'shims/';
+		//load all defined modules (look into features.js)
+		//or load only a specific feature with $.webshims.polyfill('feature-name');
+		$.webshims.polyfill();
+        
+    </script>
+	<script src="../demo-js/demo.js"></script>
+	<title>HTML5 shiv and dynamic shiv : webshims lib - the polyfilling capability based JS libary</title>
+	    
+</head>
+
+<body>
+	<section id="wrapper"> 
+		<header>
+			<hgroup>
+				<h1>Webshims Lib</h1>
+				<h2>Polyfill only the uncapable browsers</h2>
+			</hgroup>
+			<nav>
+				<ul>
+					<li><strong>HTML5 shiv and innerShiv</strong></li>
+					<li><a href="webforms.html">constraint validation and input widgets</a></li>
+					<li><a href="canvas.html">canvas</a></li>
+					<li><a href="json-storage.html">storage and JSON</a></li>
+					<li><a href="geolocation.html">geolocation API</a></li>
+				</ul>
+			</nav>
+		</header>
+		<section>
+			<h2>Demo/About/Documentation HTML5 shiv</h2>
+			<p>IE8- isn't capable of rendering HTML5 elements. Webshims lib automatically fixes this issue. The only thing you have to do is to add an HTML5 reset stylesheet, wich will add display: block to some of the blockbuilding new HTML5 elements.</p>
+			<p>Additionally it implements the following Manipulation methods <code>.htmlWebshim()</code>, <code>.appendWebshim()</code>, <code>.prependWebshim()</code>, <code>.afterWebshim()</code> and <code>.beforeWebshim()</code> to also allow dynamic creation of HTML5 elements in IE8-.</p>
+<code class="block run-once">
+$('#my-id').appendWebshim('&lt;section&gt;&lt;form action="#"&gt;&lt;input type="text" placeholder="hello this is required" required="required" name="test" /&gt;&lt;input type="submit" /&gt;&lt;/form&gt;&lt;/section&gt;');
+</code>
+			<div id="my-id"></div>
+			
+			<aside>
+				<h3>Links about shiv</h3>
+				<ul>
+					<li><a href="http://remysharp.com/2009/01/07/html5-enabling-script/">HTML5 enabling script by Remy Sharp</a></li>
+					<li><a href="http://remysharp.com/2009/01/07/html5-enabling-script/">HTML5 Shiv by John Resig</a></li>
+					<li><a href="http://jdbartlett.github.com/innershiv/">innerShiv by Joe Bartlett</a></li>
+				</ul>
+			</aside>
+		</section>
+				
+		<small>
+			Note: every shim is a hack! working with native cutting edge technology is also a hack!
+		</small>
+    </section> 
+	
+</body>
+</html>   

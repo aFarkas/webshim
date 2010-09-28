@@ -12,11 +12,20 @@
     
     <target name="WebExtlib">
     	<!-- first we create some feature combinations, to minimize http-requests -->
+		
 		<!-- good for FF3.x -->
 		<concat destfile="${shims}/combined-forms.js">
-            <fileset file="${shims}/validity.js" />
             <fileset file="${shims}/validation-base.js" />
+            <fileset file="${shims}/validity.js" />
+			<fileset file="${shims}/number-date-type.js" />
 			<fileset file="${shims}/placeholder.js" />
+        </concat>
+		
+		<!-- good for FF4.x -->
+		<concat destfile="${shims}/combined-forms-x.js">
+            <fileset file="${shims}/validation-base.js" />
+            <fileset file="${shims}/implement-types.js" />
+			<fileset file="${shims}/number-date-type.js" />
         </concat>
 		
 		<!-- good for ie9 -->

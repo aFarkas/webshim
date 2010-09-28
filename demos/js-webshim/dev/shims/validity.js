@@ -10,6 +10,7 @@ var getNames = function(elem){
 	isNumber = function(string){
 		return (typeof string == 'number' || (string && string == string * 1));
 	},
+	typeModels = $.webshims.inputTypes,
 	checkTypes = {
 		radio: 1,
 		checkbox: 1		
@@ -20,7 +21,7 @@ var getNames = function(elem){
 ;
 
 //API to add new input types
-var typeModels = {};
+var typeModels = $.webshims.inputTypes || {};
 $.webshims.addInputType = function(type, obj){
 	typeModels[type] = obj;
 };
@@ -83,6 +84,10 @@ var validityRules = {
 		}
 	}
 ;
+
+$.webshims.addvalidityRule = function(type, fn){
+	validityRules[type] = fn;
+};
 
 $.webshims.addMethod('checkValidity', (function(){
 	var unhandledInvalids;
@@ -241,18 +246,6 @@ $.webshims.attr('willValidate', {
 	})()
 });
 
-// add support for new input-types
-
-$.webshims.attr('type', {
-	elementNames: ['input'],
-	getter: function(elem, fn){
-		var type = getType(elem);
-		return (typeModels[type]) ? type : elem.type || elem.getAttribute('type');
-	},
-	//don't change setter
-	setter: true
-});
-
 $.webshims.addInputType('email', {
 	mismatch: (function(){
 		//taken from scott gonzales
@@ -288,7 +281,7 @@ if($.support.validity === true){
 	return;
 }
 $.support.validity = 'shim';
-$.support.fieldsetValidation = 'shim';
+
 
 	var elements = {
 			input: 1,

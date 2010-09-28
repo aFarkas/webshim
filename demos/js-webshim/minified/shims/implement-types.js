@@ -1,0 +1,1 @@
+(function(a){if(!(a.support.validity===true&&(a('<input type="datetime-local" />').attr("type")!=="datetime-local"||a('<input type="range" />').attr("type")!=="range"))){var d=a.webshims.inputTypes;a.webshims.addInputType=function(b,c){d[b]=c};var e={};a.webshims.addvalidityRule=function(b,c){e[b]=c}}})(jQuery);

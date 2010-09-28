@@ -457,8 +457,6 @@ $.webshims.addInputType('datetime-local', $.extend({}, typeModels.time,
 				}
 			});
 		}
-		
-		
 	});
 })();
 

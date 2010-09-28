@@ -3,7 +3,7 @@
     margin: 0;
     padding: 0;
 }
-section, articel, footer, nav, header, footer, hgroup {display: block;}
+section, articel, footer, nav, header, footer, hgroup, aside {display: block;}
 li {
 	list-style: none;
 }
@@ -46,7 +46,10 @@ body {
 	border-radius: 9px;
 	
 }
-section {margin: 20px 0;}
+section, articel, aside {margin: 20px 0; overflow: hidden; zoom: 1;}
+articel {
+	margin: 30px 0;
+}
 #wrapper > section,
 header {
 	margin: 25px 0;
@@ -91,9 +94,26 @@ ul > li {
 p {
 	margin: 15px 0;
 }
+
 code.block {
 	display: block;
 	overflow: auto;
 	margin: -5px 20px 15px;
 	white-space: pre;
+}
+
+.teaser-example {
+	float: left;
+	max-width: 400px;
+	margin: 0 15px 2px 0;
+}
+.te-webforms label {
+	display: block;
+	margin: 3px 0;
+}
+.te-webforms .form-element {
+	margin: 8px 0;
+}
+.te-webforms .form-element:first-child {
+	margin-top: 0;
 }

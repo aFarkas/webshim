@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<link href="../css/styles.css" rel="stylesheet" />
+	
+	<style>
+		
+		fieldset div {
+			overflow: hidden;
+			zoom: 1;
+			padding: 5px;
+			border: 1px solid #000;
+			margin: 5px 0;
+		}
+		
+	</style>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="../../src/html-ext.js"></script>
+	<script src="../../src/features.js"></script>
+	
+    <script class="example">
+    	
+		//path is path of html-ext.js + shims/
+    	$.webshims.loader.basePath += 'shims/';
+		//load all defined modules (look into features.js)
+		//or load only a specific feature with $.webshims.polyfill('feature-name');
+		$.webshims.polyfill();
+        
+    </script>
+	<script src="../demo-js/demo.js"></script>
+	<title>HTML5 form/Web Forms 2.0 widgets and constraint validation API : webshims lib - the polyfilling capability based JS libary</title>
+	    
+</head>
+
+<body>
+	<section id="wrapper"> 
+		<header>
+			<hgroup>
+				<h1>Webshims Lib</h1>
+				<h2>Polyfill only the uncapable browsers</h2>
+			</hgroup>
+			<nav>
+				<ul>
+					<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
+					<li><strong>constraint validation and input widgets</strong></li>
+					<li><a href="canvas.html">canvas</a></li>
+					<li><a href="json-storage.html">storage and JSON</a></li>
+					<li><a href="geolocation.html">geolocation API</a></li>
+				</ul>
+			</nav>
+		</header>
+		<section>
+			<h2>Demo/About/Documentation of HTML5 constraint validation API</h2>
+			<p>The <code>form2</code> feature of the webshim lib adds support for the <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#the-constraint-validation-api">constraint validation API</a>, some input widgets and the placeholder-Attribut.</p>
+			<section>
+				<h3>Implemented attributes, properties, methods, events</h3>
+				<ul>
+					<li><strong>types</strong>: <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#e-mail-state">email</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#url-state">url</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#local-date-and-time-state">datetime-local</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#date-state">date</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#time-state">time</a>, <a href="http://www.w3.org/TR/html5/number-state.html#number-state">number</a>, <a href="http://www.w3.org/TR/html5/number-state.html#range-state">range</a></li>
+					<li><strong>attributes (and IDL, if existing)</strong>: <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-placeholder">placeholder</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-novalidate">novalidate</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-required">required</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-pattern">pattern</a>, <a href="http://www.w3.org/TR/html5/the-button-element.html#attr-textarea-maxlength">maxlength</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-step">step</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-max">max</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-min">min</a></li>
+					<li><strong>properties/IDLs</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-willvalidate">willValidate</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validity">validity</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validationmessage">validationMessage</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasnumber">valueAsNumber</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasdate">valueAsDate</a></li>
+					<li><strong>methods</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-setcustomvalidity">setCustomValidity</a>, <a href="http://www.w3.org/TR/html5/forms.html#dom-form-checkvalidity">checkValidity</a></li>
+					<li><strong>events</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#constraint-validation">invalid</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#event-input-input">input</a></li>
+					<li><strong>selectors</strong>: :invalid, :valid (not for CSS)</li>
+				</ul>
+				
+			<aside>
+				<h3>Links about Webforms</h3>
+				<ul>
+					<li><a href="http://diveintohtml5.org/forms.html">A Form of Madness (Dive Into HTML5)</a></li>
+					<li><a href="http://dev.opera.com/articles/view/improve-your-forms-using-html5/">Improve your forms using HTML5! by Anne van Kesteren</a></li>
+					<li><a href="http://www.alistapart.com/articles/forward-thinking-form-validation/">Forward Thinking Form Validation by Ryan Seddon</a></li>
+				</ul>
+			</aside>
+			</section>
+			<section>
+				<h3>Simple Demo</h3>
+				<form action="#" method="post">
+	            	<p>buttons after &lt;hr /&gt; do log to console (open Firebug and reload)</p>
+	               
+	                <p class="required"><span>*</span> Required fields</p>
+	                <fieldset>
+	                    <div class="form-element">
+	                        <label for="name">
+	                            Required: <dfn title="required">*</dfn>
+							</label>
+	                        <input placeholder="hello world" name="name" required="required" type="text" value="" id="name" />
+							<hr />
+							<button class="feature method" data-name="checkValidity">$(this).checkValidity()</button>
+	                    </div>
+	                    <div class="form-element">
+	                        <label for="email">
+	                            E-Mail: <dfn title="required">*</dfn>
+							</label>
+	                       	<input name="email" required="required" type="email" id="email" />
+							<hr />
+							$(this).setCustomValidity(<input id="input-0" />);
+						 	<button class="feature method setter" data-val="#input-0" data-name="setCustomValidity">setCustomValidity</button>
+							<button class="feature" data-name="validationMessage">$(this).attr('validationMessage')</button>
+							<button class="feature method" data-name="checkValidity">$(this).checkValidity()</button>
+	                    </div>
+						
+	                    <div class="form-element">
+	                        <label for="date">
+	                            date: <dfn title="required">*</dfn>
+							</label>
+	                       	<input name="date" required="required" type="date" id="date" />
+							<hr />
+							<button class="feature" data-name="validity">$(this).attr('validity')</button>
+							<button class="feature" data-name="valueAsNumber">$(this).attr('valueAsNumber')</button>
+	                    </div>
+						
+						<div class="form-element">
+	                        <label for="datetime-local">
+	                            datetime-local: 
+							</label>
+	                       	<input value="2010-12-31T23:59" name="datetime-local" type="datetime-local" id="datetime-local" />
+							<hr />
+							$(this).attr("valueAsNumber", <input id="input-2" />);
+						 	<button class="feature setter" data-val="#input-2" data-name="valueAsNumber">change valueAsNumber</button>
+							<button class="feature" data-name="validity">$(this).attr('validity')</button>
+							<button class="feature" data-name="valueAsNumber">$(this).attr('valueAsNumber')</button>
+	                    </div>
+												
+	                    <div class="form-element">
+	                        <label for="number">
+	                            number: <dfn title="required">*</dfn>
+							</label>
+	                       	<input name="number" required="required" type="number" id="number" />
+							<hr />
+							$(this).attr("step", <input id="input-3" />);
+						 	<button class="feature setter" data-val="#input-3" data-name="step">change step</button>
+							<button class="feature" data-name="validity">$(this).attr('validity')</button>
+							<button class="feature method" data-name="checkValidity">$(this).checkValidity()</button>
+	                    </div>
+	                   
+						
+						<div class="form-element">
+	                        <label for="time">
+	                            time: 
+							</label>
+	                       	<input name="time" type="time" id="time" />
+							<hr />
+							$(this).attr("min", <input id="input-4" />);
+						 	<button class="feature setter" data-val="#input-4" data-name="min">change min</button>
+							<button class="feature" data-name="validity">$(this).attr('validity')</button>
+							<button class="feature" data-name="valueAsNumber">$(this).attr('valueAsNumber')</button>
+	                    </div>
+						
+						
+						<div class="form-element">
+	                        <label for="password">
+	                            password: 
+							</label>
+	                       	<input placeholder="password" name="password" type="password" id="password" />
+							<hr />
+							$(this).attr("placeholder", <input id="input-5" />);
+						 	<button class="feature setter" data-val="#input-5" data-name="placeholder">change placeholder</button>
+							<button class="feature" data-name="value">$(this).attr('value')</button>
+							$(this).attr("value", <input id="input-6" />);
+						 	<button class="feature setter" data-val="#input-6" data-name="value">change value</button>
+	                    </div>
+						
+	                    <div>
+	                    	<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
+	                    	<fieldset class="mod">
+	                    		<legend>Legend Short Labels  <dfn title="required">*</dfn></legend>
+	                            <div class="form-item">
+	                                <input type="radio" id="field6-1" name="radio-grp1-1" required />
+									<label for="field6-1">
+	                                    Radiooption 2
+	                                </label>
+									<hr />
+									<button class="feature method" data-name="checkValidity">$(this).checkValidity()</button>
+								</div>
+								<div class="form-item">
+	                                <input type="radio" id="field7-1" name="radio-grp1-1" />
+	                               	<label for="field7-1"> 
+										Radiooption 2
+	                            	</label>
+									<hr />
+									<button class="feature" data-name="validity">$(this).attr('validity')</button>
+								</div>
+								<div class="form-item">
+	                                <input type="radio" id="field8-1" name="radio-grp1-1" />
+									<label for="field8-1">
+	                                	Radiooption 3
+	                            	</label>
+								</div>
+	                        </fieldset>
+	                    </div>
+	                    
+	                    <div class="button-wrapper">
+	                    	<input type="submit" value="Send" />
+	                    </div>
+	                </fieldset>
+	            </form>
+			</section>
+			
+			<section>
+				<h3>Configuration</h3>
+				<ul>
+					<li>i18n: additional languages/custom messages</li>
+					<li>custom stylable widgets for capable browsers</li>
+				</ul>
+			</section>
+			
+			<section>
+				<h3>Extensions/Abstractions to the standard</h3>
+				<ul>
+					<li><strong>event: firstinvalid</strong>: <code>firstinvalid</code> is a simple, bubbling event, wich is triggered on the first invalid form element. Preventing the default of firstinvalid will automatically prevent the default behavior of all current invalid elements.</li>
+					<li><strong>event: lastinvalid</strong>: <code>lastinvalid</code> is an extended, bubbling, (but) uncancelable event, wich is triggered on the last invalid form element. The property <code>invalidlist</code> is a jQuery-collection of all current invalid elements.</li>
+					<li><strong>property: customValidationMessage</strong>: very similiar to the standard validationMessage, but always uses built-in custom validation messages, wich can be better controlled.</li>
+					<li><strong>helper: $.webshims.validityAlert.showFor</strong>: takes a DOM-Object/Selector/jQuery-Object and shows the invalid message for this element. (simply look into the prototype i.e. <code>console.log($.webshims.validityAlert)</code> to make changes)</li>
+					<li><strong>selectors</strong>: :willValidate</li>
+				</ul>
+			</section>
+			
+	</section>
+				
+		<small>
+			Note: every shim is a hack! working with native cutting edge technology is also a hack!
+		</small>
+    </section> 
+	
+</body>
+</html>   

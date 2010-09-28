@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<link href="../css/styles.css" rel="stylesheet" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="../js-webshim/minified/html-ext.js"></script>
+	<script src="../js-webshim/minified/features.js"></script>
+	
+    <script class="example">
+    	
+		//path is path of html-ext.js + shims/
+    	$.webshims.loader.basePath += 'shims/';
+		//load all defined modules (look into features.js)
+		//or load only a specific feature with $.webshims.polyfill('feature-name');
+		$.webshims.polyfill();
+        
+    </script>
+	<script src="../demo-js/demo.js"></script>
+	<title>HTML5 canvas : webshims lib - the polyfilling capability based JS libary</title>
+	    
+</head>
+
+<body>
+	<section id="wrapper"> 
+		<header>
+			<hgroup>
+				<h1>Webshims Lib</h1>
+				<h2>Polyfill only the uncapable browsers</h2>
+				<nav>
+				<ul>
+					<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
+					<li><a href="webforms.html">constraint validation and input widgets</a></li>
+					<li><strong>canvas</strong></li>
+					<li><a href="json-storage.html">storage and JSON</a></li>
+					<li><a href="geolocation.html">geolocation API</a></li>
+				</ul>
+			</nav>
+			</hgroup>
+		</header>
+		<section>
+			<h2>Demo/About/Documentation HTML5 canvas</h2>
+			<p>Webshim Lib for canvas implements one simple jQuery-method <code>.getContext()</code> on Top of <a href="http://code.google.com/p/explorercanvas/">excanvas</a>.</p>
+			<canvas id="my-canvas" width="80" height="80"></canvas>
+<code class="block run-once">
+$.webshims.readyModules('canvas', function(){
+	var ctx = $('#my-canvas').getContext('2d');
+	ctx.fillStyle = "rgb(200,0,0)";  
+	ctx.fillRect (10, 10, 55, 50);  
+	 
+	ctx.fillStyle = "rgba(0, 0, 200, 0.5)";  
+	ctx.fillRect (30, 30, 55, 50);
+});
+</code>
+			
+			<aside>
+				<h3>Links about canvas</h3>
+				<ul>
+					<li><a href="http://dev.w3.org/html5/canvas-api/canvas-2d-api.html">Canvas 2D API (W3C)</a></li>
+					<li><a href="https://developer.mozilla.org/en/Canvas_tutorial">Canvas tutorial (MDC)</a></li>
+					<li><a href="http://www.peterkroener.de/eine-kleine-canvas-einfuehrung/">Eine kleine Canvas-Einführung by Peter Kröner (german)</a></li>
+				</ul>
+			</aside>
+		</section>
+				
+		<small>
+			Note: every shim is a hack! working with native cutting edge technology is also a hack!
+		</small>
+    </section> 
+	
+</body>
+</html>   

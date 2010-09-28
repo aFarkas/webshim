@@ -40,13 +40,12 @@
 	
 	<script src="unit/placeholder.js"></script>
 	<script src="unit/validity.js"></script>
+	<script src="unit/number-date.js"></script>
 	<script src="unit/dynamic-webshim.js"></script>
-	
+	<!-- todo: canvas / geolocation and json-storage -->
 	<script>
 		$.webshims.loader.basePath += 'shims/';
 		$.webshims.polyfill();
-		
-		
 	</script>
 	<style type="text/css">
 		html { border: 0; }
@@ -84,6 +83,36 @@
 	                    Name: <dfn title="required">*</dfn>
 					</label>
 	                <input name="name" required="" type="text" id="name" />
+	            </div>
+				<div>
+	                <label for="number">
+	                    number: 
+					</label>
+	                <input name="number" type="number" id="number" />
+	            </div>
+				<div>
+	                <label for="date">
+	                    date: 
+					</label>
+	                <input name="date" type="date" id="date" />
+	            </div>
+				<div>
+	                <label for="datetime-local">
+	                    datetime-local: 
+					</label>
+	                <input name="datetime-local" type="datetime-local" id="datetime-local" />
+	            </div>
+				<div>
+	                <label for="time">
+	                    time: 
+					</label>
+	                <input name="time" type="time" id="time" />
+	            </div>
+				<div>
+	                <label for="range">
+	                    range: 
+					</label>
+	                <input name="range" type="range" id="range" />
 	            </div>
 	            <div>
 	                <label for="email">

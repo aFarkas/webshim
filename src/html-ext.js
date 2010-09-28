@@ -464,6 +464,7 @@
 	if(!$.support.dynamicHTML5 && document.attachEvent){
 		$.webshims.loader.loadScript('http://html5shim.googlecode.com/svn/trunk/html5.js');
 	}
+	
 	$.fn.htmlWebshim = function(a){
 		var ret = this.html((a) ? $.webshims.fixHTML5(a) : a);
 		if(ret === this && $.isReady){

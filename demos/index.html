@@ -7,7 +7,6 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script src="js-webshim/dev/html-ext.js"></script>
 	<script src="js-webshim/dev/features.js"></script>
-	
     <script class="example">
     	
 		//path is path of html-ext.js + shims/
@@ -37,56 +36,64 @@
 			<ul>
 				<li><strong>Capability based loading</strong>: lightweight for good browsers / heavyweight for really bad browsers (I really like this)</li>
 				<li><strong>almost pure native APIs | no/less abstractions</strong>: Helps you to learn HTML5 (Markup-/DOM/JS-APIs) and to build usefull abstractions and extensions on top of the standard. Documentation is the specification (i.e.: <a href="http://dev.w3.org/html5/html-author/">HTML5 W3C Specification</a>)</li>
-				<li><strong>futureproof Feature-Detection</strong>: We try to feature detect everything instead of browsersniffing to be more futureproof (We know, that we will fail on this)</li>
+				<li><strong>futureproof Feature-Detection</strong>: We try to feature detect everything instead of browsersniffing to be more futureproof</li>
 			</ul>
 		</section>
 		<section>
 			<h2>Simple and ugly Demos: You are the developer. Improve HTML/CSS/JS etc.</h2>
-			<section>
-				<h1>Semantic Structure</h1>
-				<p>Implements parsing/styling of HTML5 elements like section, articel, footer, nav in IE8- through the famous HTML5 shiv and an innerShiv implementations. <a href="shiv/index.html">more Information on shiv solution</a></p>
-			</section>
-			<section>
+			<articel>
+				<h1>Semantic Structure: Shiv solution</h1>
+				<p>Implements parsing/styling of HTML5 elements like section, articel, footer, nav in IE8-. <a href="demos/shiv.html">more Information on shiv solution</a></p>
+			</articel>
+			<articel>
 				<h3>Canvas</h3>
-				<canvas class="peter" width="200" height="200"></canvas>
-			</section>
+				<div  class="te-canvas teaser-example">
+					<canvas class="peter" width="200" height="200"></canvas>
+				</div>
+				<p>Implements canvas. <a href="#">more Information on canvas and canvas text solution</a></p>
+			</articel>
 			
-			<section>
-				<h3>HTML5 constraint validation</h3>
-				<form action="#">
-					<div class="form-element">
-		                <label for="email">
-		                    Name *:
-						</label>
-		               	<input name="name" required="required" type="text" id="name" placeholder="your name" />
-		            </div>
-					<div class="form-element">
-		                <label for="email">
-		                    E-Mail:
-						</label>
-		               	<input name="email" required="required" type="email" id="email" placeholder="yourmail@host.de" />
-		            </div>
-					<div class="form-element">
-		                <label for="url">
-		                    your website:
-						</label>
-		               	<input name="url" type="url" id="url" value="http://" placeholder="your website" />
-		            </div>
-					<div>
-						<input type="submit" />
-					</div>
-				</form>
-				<p><a href="webforms/index.html">More Demos &amp; Information on the webforms module</a></p>
-			</section>
+			<articel>
+				<h3>HTML5 constraint validation + input type widgets</h3>
+				<div class="te-webforms teaser-example">
+					<form action="#">
+						<div class="form-element">
+			                <label for="email">
+			                    Name *:
+							</label>
+			               	<input name="name" required="required" type="text" id="name" placeholder="your name" />
+			            </div>
+						<div class="form-element">
+			                <label for="email">
+			                    E-Mail:
+							</label>
+			               	<input name="email" required="required" type="email" id="email" placeholder="yourmail@host.de" />
+			            </div>
+						<div class="form-element">
+			                <label for="range">
+			                    range:
+							</label>
+			               	<input name="range" type="range" id="range" />
+			            </div>
+						<div>
+							<input type="submit" />
+						</div>
+					</form>
+				</div>
+				<p>Implements some HTML5 form features (aka Web forms 2.0) like constraint validation and some input[type] widgets. <a href="demos/webforms.html">more Information on HTML5 form soultion</a></p>
+				
+			</articel>
 			
-			<section>
+			<articel>
 				<h3>JSON.parse/JSON.stringify &amp; localStorage/sessionStorage</h3>
-			</section>
-			<section>
+			</articel>
+			<articel>
 				<h3>Geolocation</h3>
-				<div id="geolocation"></div>
-				<button class="geolocation">Where am I?</button>
-			</section>
+				<div class="te-geolcation teaser-example">
+					<div id="geolocation"></div>
+					<button class="geolocation">Where am I?</button>
+				</div>
+			</articel>
 		</section>
 		<section>
 			<h2>How to</h2>
@@ -179,15 +186,16 @@ $(this).checkValidity();
 				</li>
 			</ul>
 			<h3>How to build an abstraction/extension, that works with and without webshims lib?</h3>
-			
+			<p>TBD</p>
 			<h3>How to write a new feature implementation?</h3>
+			<p>TBD</p>
 		</section>
 		
 			
 		<section>
 			<h3>Further Development</h3>
+			<p>Feel free to fork, collaborate, test develope extensions :-).</p>
 			<ul>
-				<li>Webforms 2.0: datetime-local, date, time, number and range (with step, max, min attributes and valueAsDate/valueAsNumber properties)</li>
 				<li>simple audio/video implementation</li>
 				<li>improved audio/video implementation</li>
 			</ul>

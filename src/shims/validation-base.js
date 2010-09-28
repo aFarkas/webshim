@@ -7,7 +7,7 @@
 	;
 	
 	//opera fix
-	//opera thorws a submit-event and then the invalid events,
+	//opera throws a submit-event and then the invalid events,
 	//the following code will trigger the invalid events first and webkitfix will stopImmediatePropagation of submit event
 	if($.support.validity === true && document.addEventListener && !window.noHTMLExtFixes && window.opera){
 		document.addEventListener('submit', function(e){
@@ -66,7 +66,7 @@
 	
 	ValidityAlert.prototype = {
 		_create: function(){
-			this.alert = $('<div class="validity-alert"><div class="va-box" /></div>').css({position: 'absolute', display: 'none'});
+			this.alert = $('<div class="validity-alert" role="alert"><div class="va-box" /></div>').css({position: 'absolute', display: 'none'});
 			this.hideTimer = false;
 			this.boundHide = $.proxy(this, 'hide');
 		},
@@ -116,16 +116,6 @@
 		}
 	};
 	$.webshims.validityAlert = new ValidityAlert();
-})(jQuery);
-
-(function($){
-	if($.support.validationMessage){
-		return;
-	}
-	$.support.validationMessage = 'shim';
-	
-	
-	$.webshims.validityMessages = [];
 	
 	$.webshims.validityMessages[''] = {
 		typeMismatch: {
@@ -166,48 +156,55 @@
 	};
 	
 	
-	
 	var validiyMessages;
 	$(document).bind('htmlExtLangChange', function(){
 		$.webshims.activeLang($.webshims.validityMessages, 'validation-base', function(langObj){
 			validiyMessages = langObj;
 		});
 	});
-	
-	$.webshims.attr('validationMessage', {
-		elementNames: ['input', 'select', 'textarea'],
-		getter: function(elem){
-			var message = '';
-			if(!$.attr(elem, 'willValidate')){
-				return message;
-			}
-			message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
-			if(message){return message;}
-			var validity = $.attr(elem, 'validity') || {valid: 1};
-			if(validity.valid){return '';}
-			$.each(validity, function(name, prop){
-				if(name == 'valid' || !prop){return;}
-				message = validiyMessages[name];
-				if(message && typeof message !== 'string'){
-					message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
+		
+	$.each(($.support.validationMessage) ? ['customValidationMessage'] : ['customValidationMessage', 'validationMessage'], function(i, fn){
+		$.webshims.attr(fn, {
+			elementNames: ['input', 'select', 'textarea'],
+			getter: function(elem){
+				var message = '';
+				if(!$.attr(elem, 'willValidate')){
+					return message;
 				}
-				if(message){
-					return false;
+				
+				var validity = $.attr(elem, 'validity') || {valid: 1};
+				if(validity.valid){return message;}
+				if(validity.customError || fn === 'validationMessage'){
+					message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
+					if(message){return message;}
 				}
-			});
-			if(message){
-				$.each(['value', 'min', 'max', 'title', 'maxlength'], function(i, attr){
-					if(message.indexOf('%'+attr) === -1){return;}
-					var val = $.attr(elem, attr) || '';
-					message = message.replace('{%'+ attr +'}', val);
-					if('value' == attr){
-						message = message.replace('{%valueLen}', val.length);
+				$.each(validity, function(name, prop){
+					if(name == 'valid' || !prop){return;}
+					message = validiyMessages[name];
+					if(message && typeof message !== 'string'){
+						message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
+					}
+					if(message){
+						return false;
 					}
 				});
+				if(message){
+					$.each(['value', 'min', 'max', 'title', 'maxlength', 'label'], function(i, attr){
+						if(message.indexOf('%'+attr) === -1){return;}
+						var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$/, '') : $.attr(elem, attr)) || '';
+						message = message.replace('{%'+ attr +'}', val);
+						if('value' == attr){
+							message = message.replace('{%valueLen}', val.length);
+						}
+					});
+				}
+				return message || '';
 			}
-			return message || '';
-		}
-	});
+		});
+	} );
+	
+	
+	$.support.validationMessage = 'shim';
 })(jQuery);
 
 (function($){

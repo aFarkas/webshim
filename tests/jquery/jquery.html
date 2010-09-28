@@ -25,13 +25,19 @@
 	
 	<script src="../../src/html-ext.js"></script>
 	<script src="../../src/features.js"></script>
+	
 	<script src="../../src/shims/placeholder.js"></script>
+	<script src="../../src/shims/validation-base.js"></script>
+	<script src="../../src/shims/implement-types.js"></script>
+	<script src="../../src/shims/implement-types.js"></script>
 	<script src="../../src/shims/validity.js"></script>
+	<script src="../../src/shims/geolocation.js"></script>
+	<script src="../../src/shims/canvas.js"></script>
 	<script src="../../src/shims/json-storage.js"></script>
 	
 	<script>
 		$.webshims.loader.basePath += 'shims/';
-		$.webshims.loader.loadList();
+		$.webshims.polyfill();
 		
 		test("extensions loaded", function(){
 			ok( $.support.validity, "validity" );

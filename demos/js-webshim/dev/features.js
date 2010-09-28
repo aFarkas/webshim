@@ -93,9 +93,11 @@
 	
 	/* bugfixes, validation-message + fieldset.checkValidity pack */
 	(function(){
+		$.webshims.validityMessages = [];
+		$.webshims.inputTypes = {};
 		var form = $('<form action="#"><fieldset><input name="a" required /></fieldset></form>');
 		$.support.validationMessage = !!(form.find('input').attr('validationMessage'));
-		$.support.fieldsetValidation = !!($('fieldset', form)[0].elements && $('fieldset', form).checkValidity() === false);
+		$.support.fieldsetValidation = !!($('fieldset', form)[0].elements && $('fieldset', form)[0].checkValidity && 'disabled' in $('fieldset', form)[0] && !$('fieldset', form)[0].checkValidity() );
 		$.webshims.addModule('validation-base', {
 			feature: 'form2',
 			test: function(){
@@ -105,6 +107,24 @@
 			combination: ['combined-all', 'combined-x', 'combined-xx', 'combined-forms']
 		});
 	})();
+	
+	$.webshims.addModule('implement-types', {
+		feature: 'form2',
+		test: function(){
+			return !($.support.validity === true && ( $('<input type="datetime-local" />').attr('type') !== 'datetime-local' || $('<input type="range" />').attr('type') !== 'range' ) );
+		},
+		combination: ['combined-forms-x']
+	});
+	
+	
+	$.webshims.addModule('number-date-type', {
+		feature: 'form2',
+		test: function(){
+			return ($('<input type="datetime-local" />').attr('type') === 'datetime-local' && $('<input type="range" />').attr('type') === 'range');
+		},
+		combination: ['combined-all', 'combined-x', 'combined-xx', 'combined-forms'],
+		options: {stepArrows: {number: 1, time: 1}}
+	});
 	
 	/* placeholder */
 	$.support.placeholder = ('placeholder'  in $('<input type="text" />')[0]);
