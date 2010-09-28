@@ -98,7 +98,9 @@ asyncTest("general validity Modul", function(){
 		ok($('#email').is(':'+state), val+' is '+state+' mail');
 	});
 	
-	start();
+	$.webshims.readyModules('forms ready', function(){
+		start();
+	});
 });
 
 asyncTest('email, url, pattern, maxlength', function(){
@@ -149,7 +151,9 @@ asyncTest('email, url, pattern, maxlength', function(){
 	$('#pattern').val('1DHT');
 	ok($('#pattern').is(':valid'), '1DHT is valid pattern');
 	
-	start();
+	$.webshims.readyModules('forms ready', function(){
+		start();
+	});
 });
 
 asyncTest('validationMessage/setCustomValidity', function(){
@@ -164,7 +168,9 @@ asyncTest('validationMessage/setCustomValidity', function(){
 	$('#select').attr('disabled', false).setCustomValidity('');
 	ok(( $('#select').is(':valid') && $('#select').attr('willValidate') ), 'select is set valid again');
 	
-	start();
+	$.webshims.readyModules('forms ready', function(){
+		start();
+	});
 });
 
 asyncTest('checkValidity/invalid event', function(){
@@ -210,8 +216,8 @@ asyncTest('checkValidity/invalid event', function(){
 	invalids = 0;
 	ok($('#form-1').checkValidity(), 'validity is true for form-element');
 	equals(invalids, 0, 'there were 0 invalid events');
-});
-
-$.webshims.readyModules('forms ready', function(){
-	start();
+	
+	$.webshims.readyModules('forms ready', function(){
+		start();
+	});
 });

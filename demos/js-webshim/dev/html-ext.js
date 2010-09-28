@@ -182,15 +182,21 @@
 				events = $.map(events, function(e){
 					return ($.webshims.loader.modules[e] || $.webshims.loader.features[e]) ? e +'Ready' : e;
 				});
+				
 			}
 			if(!events.length){
 				fn();
 				return;
 			}
-			
-			$(doc).one(events.shift(), function(){
+			var readyEv = events.shift(),
+				readyFn = function(){
 				$.webshims.readyModules(events, fn);
-			});
+			};
+			if(readyEv == 'ready'){
+				$(readyFn);
+			} else {
+				$(doc).one(readyEv, readyFn);
+			}
 		},
 		capturingEvents: function(names){
 			if(!doc.addEventListener){return;}

@@ -52,7 +52,8 @@ asyncTest("placeholder Modul", function(){
 		ok($('#placeholder').hasClass('placeholder-visible'), 'placeholder-class is added');
 	}
 	
-});
-$(document).bind('placeholderReady', function(){
-	start();
+	
+	$(document).bind('placeholderReady', function(){
+		start();
+	});
 });

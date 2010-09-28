@@ -464,7 +464,10 @@ asyncTest('step number/date module specific validity', function(){
 	], 
 	createTestMethodA('range'));
 	
-	start();
+	
+	$.webshims.readyModules('forms ready', function(){
+		start();
+	});
 	
 });
 
@@ -697,7 +700,8 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			ok(elem.attr('valueAsNumber') === data.resultNumber, ' expected number: '+ data.resultNumber +', element: '+ data.id+ ', was: '+ elem.attr('valueAsNumber'));
 		}
 	});
-});
-$.webshims.readyModules('forms ready', function(){
-	start();
+	
+	$.webshims.readyModules('forms ready', function(){
+		start();
+	});
 });
