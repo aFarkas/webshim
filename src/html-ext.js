@@ -324,61 +324,56 @@
 			$.fn[name].elementNames = elementNames;
 			$.fn[name].shim = true;
 		},
-		addModule: (function(){
-			var addMethodName = function(moduleName, name, elementNames, bugFix){
-							
-				var fn = bugFix || function(elem, args){
-					if(elem[name]){
-						return elem[name].apply(elem, args);
-					}
-				};
-				
-				$.fn[name] = function(){
-					var args = arguments,
-						ret
-					;
-					this.each(function(){
-						ret = fn(this, args);
+		addMethodName: function(name, elementNames){
+			if($.fn[name] && 'shim' in $.fn[name]){return;}
+			$.fn[name] = function(){
+				var args = arguments,
+					ret
+				;
+				this.each(function(){
+					if(this[name]){
+						ret = this[name].apply(this, args);
 						if(ret !== undefined){
 							return false;
 						}
-					});
-					return (ret !== undefined) ? ret : this;
-				};
-				$.fn[name].shim = false; 
-				$.fn[name].elementNames = elementNames;
-				
-			};
-			return function(name, cfg){
-				cfg = cfg || {};
-				var feature 		= cfg.feature || name,
-					loader 			= $.webshims.loader,
-					combinations 	= loader.combinations
-				;
-				if(!loader.features[feature]){
-					loader.features[feature] = [];
-					loader.featureList.push(feature);
-				}
-				loader.features[feature].push(name);
-				loader.addModule(name, cfg);
-				loader.moduleList.push(name);
-				$.each(cfg.combination || [], function(i, combi){
-					if(!combinations[combi]){
-						combinations[combi] = [name];
-					} else {
-						loader.combinations[combi].push(name);
 					}
 				});
-				if(cfg.methodNames) {
-					if (!$.isArray(cfg.methodNames)) {
-						cfg.methodNames = [cfg.methodNames];
-					}
-					$.each(cfg.methodNames, function(i, methodName){
-						addMethodName(name, methodName.name, methodName.elementNames, methodName.bugFix);
-					});
-				}
+				return (ret !== undefined) ? ret : this;
 			};
-		})(),
+			$.fn[name].shim = false; 
+			$.fn[name].elementNames = elementNames;
+			
+		},
+		addModule: function(name, cfg){
+			cfg = cfg || {};
+			var feature 		= cfg.feature || name,
+				loader 			= $.webshims.loader,
+				combinations 	= loader.combinations
+			;
+			if(!loader.features[feature]){
+				loader.features[feature] = [];
+				loader.featureList.push(feature);
+			}
+			loader.features[feature].push(name);
+			loader.addModule(name, cfg);
+			loader.moduleList.push(name);
+			$.each(cfg.combination || [], function(i, combi){
+				if(!combinations[combi]){
+					combinations[combi] = [name];
+				} else {
+					loader.combinations[combi].push(name);
+				}
+			});
+			if(cfg.methodNames) {
+				if (!$.isArray(cfg.methodNames)) {
+					cfg.methodNames = [cfg.methodNames];
+				}
+				
+				$.each(cfg.methodNames, function(i, methodName){
+					$.webshims.addMethodName(methodName.name, methodName.elementNames);
+				});
+			}
+		},
 		
 		polyfill: function(features){
 			var loader 	= $.webshims.loader,
@@ -450,7 +445,7 @@
 			};
 		})()
 	};
-	
+	$.webshims.ready =  $.webshims.readyModules;
 	(function(){
 		var readyFns = [];
 		$.extend($.webshims, {

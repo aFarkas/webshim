@@ -264,7 +264,7 @@
 				if(message){
 					$.each(['value', 'min', 'max', 'title', 'maxlength', 'label'], function(i, attr){
 						if(message.indexOf('%'+attr) === -1){return;}
-						var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$/, '') : $.attr(elem, attr)) || '';
+						var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
 						message = message.replace('{%'+ attr +'}', val);
 						if('value' == attr){
 							message = message.replace('{%valueLen}', val.length);

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<link href="../../css/styles.css" rel="stylesheet" />
+	
+	<style>
+		
+		fieldset div {
+			overflow: hidden;
+			zoom: 1;
+			padding: 5px;
+			border: 1px solid #000;
+			margin: 5px 0;
+		}
+		.invalid {
+			border: 1px solid #900;
+		}
+		.valid {
+			border: 1px solid #090;
+		}
+	</style>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="../../../src/html-ext.js"></script>
+	<script src="../../../src/features.js"></script>
+	
+    <script class="example">
+    	
+		//path is path of html-ext.js + shims/
+    	$.webshims.loader.basePath += 'shims/';
+		
+		//change language in all browsers to en
+		$.webshims.activeLang('en');
+		
+		//load all defined modules (look into features.js)
+		$.webshims.polyfill();
+		
+		
+		$.webshims.ready('ready forms', function(){
+			
+			//change validationMessage to customValidationMessage
+			$.webshims.validityAlert.getMessage = function(elem){
+				$('> div', this.alert).html(elem.attr('customValidationMessage'));
+			};
+			
+			$('form').bind('firstinvalid', function(e){
+				$.webshims.validityAlert.showFor(e.target);
+				return false;
+			});
+		});
+        
+    </script>
+	<script src="../../demo-js/demo.js"></script>
+	<title>HTML5 form/Web Forms 2.0 widgets and constraint validation API : webshims lib - the polyfilling capability based JS libary</title>
+	    
+</head>
+
+<body>
+	<section id="wrapper"> 
+		<header>
+			<hgroup>
+				<h1>Webshims Lib</h1>
+				<h2>Polyfill only the uncapable browsers</h2>
+			</hgroup>
+			<nav>
+				<ul>
+					<li><a href="../shiv.html">HTML5 shiv and innerShiv</a></li>
+					<li><a href="../webforms.html">constraint validation and input widgets</a></li>
+					<li><a href="../canvas.html">canvas</a></li>
+					<li><a href="../json-storage.html">storage and JSON</a></li>
+					<li><a href="../geolocation.html">geolocation API</a></li>
+				</ul>
+			</nav>
+		</header>
+		<section>
+			<h2>Documentation adding/changing validation messages with webshims constraint validation</h2>
+			<p>This demo shows how you can <strong>use</strong> customized validation messages. There is also a demo, wich shows you, how to <strong>add/change</strong> the validation messages. Note, that this demo uses some extensions (<code>firstinvalid</code>, <code>customValidationMessage</code> and <code>$.webshims.validityAlert</code>) and is not pure HTML5.</p>
+			
+<code class="block">
+//path is path of html-ext.js + shims/
+$.webshims.loader.basePath += 'shims/';
+
+//change language in all browsers to en (default is browser language)
+$.webshims.activeLang('en');
+
+//load all defined modules (look into features.js)
+$.webshims.polyfill();
+
+
+$.webshims.ready('ready forms', function(){
+	
+	//change validationMessage (HTML5 property) to customValidationMessage (custom abstraction)
+	$.webshims.validityAlert.getMessage = function(elem){
+		$('> div', this.alert).html(elem.attr('customValidationMessage'));
+	};
+	
+	//custom event, wich is fired on the first invalid element
+	//preventing firstinvalid will prevent all invalid events
+	$('form').bind('firstinvalid', function(e){
+		$.webshims.validityAlert.showFor(e.target);
+		return false;
+	});
+});
+</code>	
+
+		<p>Now you can add some extras to your form validation:</p>
+<code class="block run-once">	
+//forms 
+$(function(){
+	//on focusout / blur
+	$('form').bind('focusout', function(e){
+		// get target element
+		var $elem = $(e.target);
+		//if the element is a candidate for constraint
+		if($elem.attr('willValidate')){
+			//test wether it is valid and set/remove the classes
+			if($elem.is(':valid')){
+				$elem
+					.closest('.form-element, fieldset')
+					.addClass('valid')
+					.removeClass('invalid')
+				;
+			} else {
+				$elem
+					.closest('.form-element, fieldset')
+					.addClass('invalid')
+					.removeClass('valid')
+				;
+			}	
+		}
+	});
+});
+</code>			
+			<section>
+				<h3>Simple Demo</h3>
+				<form action="#" method="post">
+	            	<p>buttons after &lt;hr /&gt; do log to console (open Firebug and reload)</p>
+	               
+	                <p class="required"><span>*</span> Required fields</p>
+	                <fieldset>
+	                    <div class="form-element">
+	                        <label for="name">
+	                            name: <dfn title="required">*</dfn> 
+							</label>
+	                        <input required="required" placeholder="hello world" name="name" type="text" value="" id="name" />
+	                    </div>
+	                    <div class="form-element">
+	                        <label for="email">
+	                            E-Mail:
+							</label>
+	                       	<input name="email" type="email" id="email" />
+	                    </div>
+						
+	                    <div class="form-element">
+	                        <label for="date">
+	                            date:
+							</label>
+							 (min="2010-12-10") <dfn title="required">*</dfn>
+	                       	<input min="2010-12-10" name="date" required="required" type="date" id="date" />
+	                    </div>
+						
+						<div class="form-element">
+	                        <label for="datetime-local">
+	                            datetime-local: 
+							</label>
+	                       	<input value="2010-12-31T23:59" name="datetime-local" type="datetime-local" id="datetime-local" />
+	                    </div>
+												
+	                    <div class="form-element">
+	                        <label for="number">
+	                            number:
+							</label>
+							(min="3") <dfn title="required">*</dfn>
+	                       	<input min="3" name="number" required="required" type="number" id="number" />
+	                    </div>
+	                   
+						
+						<div class="form-element">
+	                        <label for="time">
+	                            time: 
+							</label>
+	                       	<input name="time" type="time" id="time" />
+	                    </div>
+						
+						
+						<div class="form-element">
+	                        <label for="password">
+	                            password: 
+							</label>
+	                       	<input placeholder="password" name="password" type="password" id="password" />
+	                    </div>
+						
+	                    <div>
+	                    	<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
+	                    	<fieldset class="mod">
+	                    		<legend>Legend Short Labels  <dfn title="required">*</dfn></legend>
+	                            <div class="form-item">
+	                                <input type="radio" id="field6-1" name="radio-grp1-1" required />
+									<label for="field6-1">
+	                                    Radiooption 2
+	                                </label>
+								</div>
+								<div class="form-item">
+	                                <input type="radio" id="field7-1" name="radio-grp1-1" />
+	                               	<label for="field7-1"> 
+										Radiooption 2
+	                            	</label>
+								</div>
+								<div class="form-item">
+	                                <input type="radio" id="field8-1" name="radio-grp1-1" />
+									<label for="field8-1">
+	                                	Radiooption 3
+	                            	</label>
+								</div>
+	                        </fieldset>
+	                    </div>
+	                    
+	                    <div class="button-wrapper">
+	                    	<input type="submit" value="Send" />
+	                    </div>
+	                </fieldset>
+	            </form>
+			</section>
+	</section>
+				
+		<small>
+			Note: every shim is a hack! working with native cutting edge technology is also a hack!
+		</small>
+    </section> 
+	
+</body>
+</html>   

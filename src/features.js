@@ -127,7 +127,7 @@
 	});
 	
 	/* placeholder */
-	$.support.placeholder = ('placeholder'  in $('<input type="text" />')[0]);
+	$.support.placeholder = ($('<input type="text" />').attr('placeholder') !== undefined);
 	$.webshims.addModule('placeholder', {
 		feature: 'forms',
 		test: function(){

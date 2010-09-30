@@ -125,10 +125,10 @@
 </code>
 			
 			<h3>When is a feature ready to use?</h3>
-			<p>Not every feature is ready immediately in all browsers. To get started, if a feature is ready, simply name the features you want to use and pass a callback-function to <code>$.webshims.readyModules</code></p>
+			<p>Not every feature is ready immediately in all browsers. To get started, if a feature is ready, simply name the features you want to use and pass a callback-function to <code>$.webshims.ready</code></p>
 <code class="block">
 &lt;script&gt;
-	$.webshims.readyModules('geolocation', function(){
+	$.webshims.ready('geolocation', function(){
 		//work with geolocation
 	});
 &lt;/script&gt;	
@@ -136,7 +136,7 @@
 			<p>If you want to use multiple features in your callback-function pass the feature list seperated by a whitespace:</p>
 <code class="block">
 &lt;script&gt;
-	$.webshims.readyModules('geolocation json-storage', function(){
+	$.webshims.ready('geolocation json-storage', function(){
 		//work with geolocation, JSON and localStorage
 	});
 &lt;/script&gt;	
@@ -144,14 +144,14 @@
 			<p>Note that this callback function may be called before DOM-Ready. If you want to use a feature after DOM-Ready, simply pass the string ready:</p>
 <code class="block">
 &lt;script&gt;
-	$.webshims.readyModules('ready canvas', function(){
+	$.webshims.ready('ready canvas', function(){
 		//work with the canvas in the document
 	});
 	
 	//this is equal to
 	
 	//$(function(){
-	//	$.webshims.readyModules('canvas', function(){
+	//	$.webshims.ready('canvas', function(){
 	//		//work with the canvas in the document
 	//	});
 	//});
@@ -207,7 +207,7 @@ $(this).checkValidity();
     </section> 
 	
 	<script>
-		$.webshims.readyModules('ready geolocation', function(){
+		$.webshims.ready('ready geolocation', function(){
 			$('button.geolocation').click(function(){
 				var elem = $(this).attr('disabled', true).addClass('loader');
 				$('#geolocation').html('please wait calculating position');
@@ -222,7 +222,7 @@ $(this).checkValidity();
 		});
 		
 		//canvas feature
-        $.webshims.readyModules('ready canvas', function(){
+        $.webshims.ready('ready canvas', function(){
 			//example from http://www.peterkroener.de/eine-kleine-canvas-einfuehrung/
 			$('canvas.peter').each(function(){
 				var animate = function(ax, ay, adx, ady, bx, by, bdx, bdy){
