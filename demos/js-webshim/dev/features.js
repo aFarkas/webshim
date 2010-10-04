@@ -82,9 +82,11 @@
 	(function(){
 		$.webshims.validityMessages = [];
 		$.webshims.inputTypes = {};
-		var form = $('<form action="#"><fieldset><input name="a" required /></fieldset></form>');
+		var form = $('<form action="#"><fieldset><input name="a" required /></fieldset></form>'),
+			field = $('fieldset', form)[0]
+		;
 		$.support.validationMessage = !!(form.find('input').attr('validationMessage'));
-		$.support.fieldsetValidation = !!($('fieldset', form)[0].elements && $('fieldset', form)[0].checkValidity && 'disabled' in $('fieldset', form)[0] && !$('fieldset', form)[0].checkValidity() );
+		$.support.fieldsetValidation = !!(field.elements && field.checkValidity && 'disabled' in field && !field.checkValidity() );
 		$.webshims.addPolyfill('validation-base', {
 			feature: 'forms',
 			test: function(){

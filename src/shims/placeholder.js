@@ -82,6 +82,7 @@
 						.bind('mousedown.placeholder', function(){
 							changePlaceholderVisibility(this, false, false, data, 'focus' );
 							elem.focus();
+							return false;
 						})
 					;
 					
