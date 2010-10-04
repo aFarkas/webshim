@@ -149,7 +149,7 @@ $.webshims.loader.loadList(['swfobject']);
 			window.localStorage = new Storage('local');
 			$.webshims.createReadyEvent('json-storage');
 		}
-	});
+	}, true, true);
 })();
 
 

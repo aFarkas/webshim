@@ -42,10 +42,15 @@
 	<script src="unit/validity.js"></script>
 	<script src="unit/number-date.js"></script>
 	<script src="unit/dynamic-webshim.js"></script>
+	<script src="unit/canvas.js"></script>
+	<script src="unit/storage.js"></script>
 	<!-- todo: canvas / geolocation and json-storage -->
 	<script>
-		$.webshims.loader.basePath += 'shims/';
-		$.webshims.polyfill();
+		
+		$(window).load(function(){
+			$.webshims.loader.basePath += 'shims/';
+			$.webshims.polyfill();
+		});
 	</script>
 	<style type="text/css">
 		html { border: 0; }
@@ -65,7 +70,10 @@
 <div id="qunit-testrunner-toolbar"></div>
 <h2 id="qunit-userAgent"></h2>
 <ol id="qunit-tests"></ol>
-
+<p><a href="persistence.html#testsession">Test persistence</a></p>
+<div id="outside-test">
+	<canvas></canvas>
+</div>
 <div id="qunit-fixture">
 	
 	<div class="form-wrapper">
@@ -148,6 +156,12 @@
 	                            placeholder:
 							</label>
 	                        <input placeholder="hello" name="placeholder" type="text" id="placeholder" />
+						</div>
+						<div class="form-item-m">
+	                        <label class="m" for="placeholder-empty">
+	                            placeholder-empty:
+							</label>
+	                        <input name="placeholder-empty" type="text" id="placeholder-empty" />
 						</div>
 	               	</fieldset>
 				</div>

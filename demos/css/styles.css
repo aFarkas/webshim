@@ -3,7 +3,7 @@
     margin: 0;
     padding: 0;
 }
-section, articel, footer, nav, header, footer, hgroup, aside {display: block;}
+section, article, footer, nav, header, footer, hgroup, aside {display: block;}
 li {
 	list-style: none;
 }
@@ -33,30 +33,36 @@ h1, h2, h3, h4, h5, h6, table, input, textarea, label {
 
 body {
     font: 100.1% arial, helvetica, sans-serif;
+	background: #d9cfa0;
 }
 #wrapper {
 	margin: 10px auto;
-	border: 2px solid #000;
 	padding: 0 20px 20px;
 	width: 80%;
 	min-width: 400px;
 	max-width: 50em;
 	
-	-moz-border-radius: 9px;
-	border-radius: 9px;
-	
 }
-section, articel, aside {margin: 20px 0; overflow: hidden; zoom: 1;}
-articel {
-	margin: 30px 0;
+section, article, aside {margin: 20px 0; overflow: hidden; zoom: 1;}
+div.article-wrapper {
+	margin: 0 -20px;
+}
+article {
+	margin: 30px 20px;
+	width: 340px;
+	display: inline-block;
+	vertical-align: top;
 }
 #wrapper > section,
 header {
 	margin: 25px 0;
-	padding: 10px;
-	border: 2px solid #000;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
+	padding: 20px;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+	background:	#f1efd6;
+}
+a {
+	color: #3a5953;
 }
 h1 {
 	font-size: 180%;
@@ -94,14 +100,43 @@ ul > li {
 p {
 	margin: 15px 0;
 }
+header h1 {
+	margin-bottom: 5px;
+}
+header h2 {
+	margin: 0 0 5px;
+	font-size: 120%;
+}
 
 code.block {
 	display: block;
 	overflow: auto;
-	margin: -5px 20px 15px;
+	margin: -2px 0px 5px;
+	padding: 5px 10px 10px;
 	white-space: pre;
+	background: #fffde2;
 }
-
+.feature-example {
+	padding: 10px;
+	border: 3px solid #fffde2;
+	background: #fffde2;
+}
+.feature-example:hover {
+	border-color: #1c2b28;
+}
+.feature-example form {
+	margin: 5px 20px 10px 0;
+	float: left;
+}
+.feature-example p {
+	padding-right: 80px;
+	overflow: hidden;
+}
+#placeholder-text {
+	vertical-align: text-top;
+	border: none;
+	border-bottom: 1px solid #000;
+}
 .teaser-example {
 	float: left;
 	max-width: 400px;

@@ -2,7 +2,7 @@
 if($.support.validity){
 	return;
 }
-
+$.webshims.inputTypes = $.webshims.inputTypes || {};
 //some helper-functions
 var getNames = function(elem){
 		return (elem.form && elem.name) ? elem.form[elem.name] : [];
@@ -21,7 +21,6 @@ var getNames = function(elem){
 ;
 
 //API to add new input types
-var typeModels = $.webshims.inputTypes || {};
 $.webshims.addInputType = function(type, obj){
 	typeModels[type] = obj;
 };
@@ -56,11 +55,6 @@ var validityRules = {
 			;
 			if(len && maxLen >= 0 && val.replace && isNumber(maxLen)){
 				ret = (len > maxLen);
-				if(ret){return ret;}
-				val.replace(/\u0A/g, function(){
-					len++;
-				});
-				ret = (len > maxLen);
 			}
 			return ret;
 		},
@@ -92,6 +86,7 @@ $.webshims.addValidityRule = function(type, fn){
 $.webshims.addMethod('checkValidity', (function(){
 	var unhandledInvalids;
 	var testValidity = function(elem){
+		
 		var e,
 			v = $.attr(elem, 'validity')
 		;
@@ -158,7 +153,7 @@ $.event.special.invalid = {
 		;
 	},
 	handler: function(e, d){
-		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') !== undefined ){return;}
+		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') !== undefined || $.data(e.target, 'novalidate') ){return;}
 		var notValid = !($(e.target).checkValidity());
 		if(notValid){
 			if(!e.originalEvent && !window.debugValidityShim && window.console && console.log){
@@ -267,9 +262,30 @@ $.webshims.addInputType('url', {
 	})()
 });
 
+var noValidate = function(){
+		var elem = this;
+		if(!elem.form){return;}
+		$.data(elem.form, 'novalidate', true);
+		setTimeout(function(){
+			$.data(elem.form, 'novalidate', false);
+		}, 1);
+	}, 
+	submitterTypes = {submit: 1, button: 1}
+;
+
+$(document).bind('click', function(e){
+	if(e.target && e.target.form && submitterTypes[e.target.type] && $.attr(e.target, 'formnovalidate') !== undefined){
+		noValidate.call(e.target);
+	}
+});
+
 $.webshims.addReady(function(context){
 	//start constrain-validation
-	$('form', context).bind('invalid', $.noop);
+	$('form', context)
+		.bind('invalid', $.noop)
+		.find('button[formnovalidate]')
+		.bind('click', noValidate)
+	;
 });
 
 

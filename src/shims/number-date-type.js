@@ -8,6 +8,9 @@
 			isNumber = function(string){
 				return (typeof string == 'number' || ($.trim(string) && string == string * 1));
 			},
+			supportsType = function(type){
+				return ($('<input type="'+type+'" />').attr('type') === type);
+			},
 			getType = function(elem){
 				return (elem.getAttribute('type') || '').toLowerCase();
 			},
@@ -123,6 +126,9 @@
 			setter: function(elem, val, fn){
 				var type = getType(elem);
 				if(typeModels[type] && typeModels[type].numberToString){
+					if(!window.noHTMLExtFixes) {
+						throw("there are some serious issues in opera's implementation. don't use!");
+					}
 					//is NaN a number?
 					if(isNaN(val)){
 						$.attr(elem, 'value', '');
@@ -151,6 +157,9 @@
 			setter: function(elem, value, fn){
 				var type = getType(elem);
 				if(typeModels[type] && typeModels[type].dateToString){
+					if(!window.noHTMLExtFixes) {
+						throw("there are some serious issues in opera's implementation. don't use!");
+					}
 					if(value === null){
 						$.attr(elem, 'value', '');
 						return;
@@ -167,179 +176,184 @@
 			}
 		});
 		
-		$.webshims.addInputType('number', {
-			mismatch: function(val){
-				return !(isNumber(val));
-			},
-			step: 1,
-			//stepBase: 0, 0 = default
-			stepScaleFactor: 1,
-			asNumber: function(str){
-				return (isNumber(str)) ? str * 1 : nan;
-			},
-			numberToString: function(num){
-				return (isNumber(num)) ? num : false;
-			}
-		});
-		
-		
-		$.webshims.addInputType('range', $.extend({}, typeModels.number, {
-			minDefault: 0,
-			maxDefault: 100
-		}));
-		
-		$.webshims.addInputType('date', {
-			mismatch: function(val){
-				if(!val || !val.split || !(/\d$/.test(val))){return true;}
-				var valA = val.split(/\u002D/);
-				if(valA.length !== 3){return true;}
-				var ret = false;
-				$.each(valA, function(i, part){
-					if(!isDateTimePart(part)){
-						ret = true;
-						return false;
-					}
-				});
-				if(ret){return ret;}
-				if(valA[0].length !== 4 || valA[1].length != 2 || valA[1] > 12 || valA[2].length != 2 || valA[2] > 33){
-					ret = true;
+		if(!supportsType('number')){
+			$.webshims.addInputType('number', {
+				mismatch: function(val){
+					return !(isNumber(val));
+				},
+				step: 1,
+				//stepBase: 0, 0 = default
+				stepScaleFactor: 1,
+				asNumber: function(str){
+					return (isNumber(str)) ? str * 1 : nan;
+				},
+				numberToString: function(num){
+					return (isNumber(num)) ? num : false;
 				}
-				return (val !== this.dateToString( this.asDate(val, true) ) );
-			},
-			step: 1,
-			//stepBase: 0, 0 = default
-			stepScaleFactor:  86400000,
-			asDate: function(val, _noMismatch){
-				if(!_noMismatch && this.mismatch(val)){
-					return null;
-				}
-				return new Date(this.asNumber(val, true));
-			},
-			asNumber: function(str, _noMismatch){
-				var ret = nan;
-				if(_noMismatch || !this.mismatch(str)){
-					str = str.split(/\u002D/);
-					ret = Date.UTC(str[0], str[1] - 1, str[2]);
-				}
-				return ret;
-			},
-			numberToString: function(num){
-				return (isNumber(num)) ? this.dateToString(new Date( num * 1)) : false;
-			},
-			dateToString: function(date){
-				return (date && date.getFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
-			}
-		});
+			});
+		}
 		
-		$.webshims.addInputType('time', $.extend({}, typeModels.date, 
-			{
-				mismatch: function(val, _getParsed){
+		if(!supportsType('number') && typeModels.number){
+			$.webshims.addInputType('range', $.extend({}, typeModels.number, {
+				minDefault: 0,
+				maxDefault: 100
+			}));
+		}
+		if(!supportsType('date') && typeModels.number){
+			$.webshims.addInputType('date', {
+				mismatch: function(val){
 					if(!val || !val.split || !(/\d$/.test(val))){return true;}
-					val = val.split(/\u003A/);
-					if(val.length < 2 || val.length > 3){return true;}
-					var ret = false,
-						sFraction;
-					if(val[2]){
-						val[2] = val[2].split(/\u002E/);
-						sFraction = parseInt(val[2][1], 10);
-						val[2] = val[2][0];
-					}
-					$.each(val, function(i, part){
-						if(!isDateTimePart(part) || part.length !== 2){
+					var valA = val.split(/\u002D/);
+					if(valA.length !== 3){return true;}
+					var ret = false;
+					$.each(valA, function(i, part){
+						if(!isDateTimePart(part)){
 							ret = true;
 							return false;
 						}
 					});
-					if(ret){return true;}
-					if(val[0] > 23 || val[0] < 0 || val[1] > 59 || val[1] < 0){
-						return true;
+					if(ret){return ret;}
+					if(valA[0].length !== 4 || valA[1].length != 2 || valA[1] > 12 || valA[2].length != 2 || valA[2] > 33){
+						ret = true;
 					}
-					if(val[2] && (val[2] > 59 || val[2] < 0 )){
-						return true;
-					}
-					if(sFraction && isNaN(sFraction)){
-						return true;
-					}
-					if(sFraction){
-						if(sFraction < 100){
-							sFraction *= 100;
-						} else if(sFraction < 10){
-							sFraction *= 10;
-						}
-					}
-					return (_getParsed === true) ? [val, sFraction] : false;
+					return (val !== this.dateToString( this.asDate(val, true) ) );
 				},
-				step: 60,
-				stepBase: 0,
-				stepScaleFactor:  1000,
-				asDate: function(val){
-					val = new Date(this.asNumber(val));
-					return (isNaN(val)) ? null : val;
+				step: 1,
+				//stepBase: 0, 0 = default
+				stepScaleFactor:  86400000,
+				asDate: function(val, _noMismatch){
+					if(!_noMismatch && this.mismatch(val)){
+						return null;
+					}
+					return new Date(this.asNumber(val, true));
 				},
-				asNumber: function(val){
+				asNumber: function(str, _noMismatch){
 					var ret = nan;
-					val = this.mismatch(val, true);
-					if(val !== true){
-						ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
-						if(val[1]){
-							ret += val[1];
-						}
+					if(_noMismatch || !this.mismatch(str)){
+						str = str.split(/\u002D/);
+						ret = Date.UTC(str[0], str[1] - 1, str[2]);
 					}
 					return ret;
+				},
+				numberToString: function(num){
+					return (isNumber(num)) ? this.dateToString(new Date( num * 1)) : false;
 				},
 				dateToString: function(date){
-					if(date && date.getUTCHours){
-						var str = addleadingZero(date.getUTCHours(), 2) +':'+ addleadingZero(date.getUTCMinutes(), 2),
-							tmp = date.getSeconds()
-						;
-						if(tmp != "0"){
-							str += ':'+ addleadingZero(tmp, 2);
-						}
-						tmp = date.getUTCMilliseconds();
-						if(tmp != "0"){
-							str += '.'+ addleadingZero(tmp, 3);
-						}
-						return str;
-					} else {
-						return false;
-					}
+					return (date && date.getFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
 				}
-			})
-		);
+			});
+		}
+		if(!supportsType('time') && typeModels.number && typeModels.date){
+			$.webshims.addInputType('time', $.extend({}, typeModels.date, 
+				{
+					mismatch: function(val, _getParsed){
+						if(!val || !val.split || !(/\d$/.test(val))){return true;}
+						val = val.split(/\u003A/);
+						if(val.length < 2 || val.length > 3){return true;}
+						var ret = false,
+							sFraction;
+						if(val[2]){
+							val[2] = val[2].split(/\u002E/);
+							sFraction = parseInt(val[2][1], 10);
+							val[2] = val[2][0];
+						}
+						$.each(val, function(i, part){
+							if(!isDateTimePart(part) || part.length !== 2){
+								ret = true;
+								return false;
+							}
+						});
+						if(ret){return true;}
+						if(val[0] > 23 || val[0] < 0 || val[1] > 59 || val[1] < 0){
+							return true;
+						}
+						if(val[2] && (val[2] > 59 || val[2] < 0 )){
+							return true;
+						}
+						if(sFraction && isNaN(sFraction)){
+							return true;
+						}
+						if(sFraction){
+							if(sFraction < 100){
+								sFraction *= 100;
+							} else if(sFraction < 10){
+								sFraction *= 10;
+							}
+						}
+						return (_getParsed === true) ? [val, sFraction] : false;
+					},
+					step: 60,
+					stepBase: 0,
+					stepScaleFactor:  1000,
+					asDate: function(val){
+						val = new Date(this.asNumber(val));
+						return (isNaN(val)) ? null : val;
+					},
+					asNumber: function(val){
+						var ret = nan;
+						val = this.mismatch(val, true);
+						if(val !== true){
+							ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
+							if(val[1]){
+								ret += val[1];
+							}
+						}
+						return ret;
+					},
+					dateToString: function(date){
+						if(date && date.getUTCHours){
+							var str = addleadingZero(date.getUTCHours(), 2) +':'+ addleadingZero(date.getUTCMinutes(), 2),
+								tmp = date.getSeconds()
+							;
+							if(tmp != "0"){
+								str += ':'+ addleadingZero(tmp, 2);
+							}
+							tmp = date.getUTCMilliseconds();
+							if(tmp != "0"){
+								str += '.'+ addleadingZero(tmp, 3);
+							}
+							return str;
+						} else {
+							return false;
+						}
+					}
+				})
+			);
+		}
 		
-		$.webshims.addInputType('datetime-local', $.extend({}, typeModels.time, 
-			{
-				mismatch: function(val, _getParsed){
-					if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
-					val = val.split(/\u0054/);
-					return ( typeModels.date.mismatch(val[0]) || typeModels.time.mismatch(val[1], _getParsed) );
-				},
-				noAsDate: true,
-				asDate: function(val){
-					val = new Date(this.asNumber(val));
-					
-					return (isNaN(val)) ? null : val;
-				},
-				asNumber: function(val){
-					var ret = nan;
-					var time = this.mismatch(val, true);
-					if(time !== true){
-						val = val.split(/\u0054/)[0].split(/\u002D/);
+		if(!supportsType('datetime-local') && typeModels.number && typeModels.time){
+			$.webshims.addInputType('datetime-local', $.extend({}, typeModels.time, 
+				{
+					mismatch: function(val, _getParsed){
+						if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
+						val = val.split(/\u0054/);
+						return ( typeModels.date.mismatch(val[0]) || typeModels.time.mismatch(val[1], _getParsed) );
+					},
+					noAsDate: true,
+					asDate: function(val){
+						val = new Date(this.asNumber(val));
 						
-						ret = Date.UTC(val[0], val[1] - 1, val[2], time[0][0], time[0][1], time[0][2] || 0);
-						if(time[1]){
-							ret += time[1];
+						return (isNaN(val)) ? null : val;
+					},
+					asNumber: function(val){
+						var ret = nan;
+						var time = this.mismatch(val, true);
+						if(time !== true){
+							val = val.split(/\u0054/)[0].split(/\u002D/);
+							
+							ret = Date.UTC(val[0], val[1] - 1, val[2], time[0][0], time[0][1], time[0][2] || 0);
+							if(time[1]){
+								ret += time[1];
+							}
 						}
+						return ret;
+					},
+					dateToString: function(date, _getParsed){
+						return typeModels.date.dateToString(date) +'T'+ typeModels.time.dateToString(date, _getParsed);
 					}
-					return ret;
-				},
-				dateToString: function(date, _getParsed){
-					return typeModels.date.dateToString(date) +'T'+ typeModels.time.dateToString(date, _getParsed);
-				}
-				
-			})
-		);
-		
+				})
+			);
+		}
 		(function(){
 			var options = $.webshims.loader.modules['number-date-type'].options;
 			var getNextStep = function(input, upDown, cache){
@@ -483,9 +497,9 @@
 	if($.webshims.addValidityRule){
 		implementTypes();
 	}else if($.support.validity === true){
-		$.webshims.readyModules('implement-types',implementTypes);
+		$.webshims.readyModules('implement-types', implementTypes, true, true);
 	} else {
-		$.webshims.readyModules('validity',implementTypes);
+		$.webshims.readyModules('validity', implementTypes, true, true);
 	}
 	
 })(jQuery);

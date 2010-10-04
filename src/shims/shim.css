@@ -1,5 +1,62 @@
-.placeholder-visible {
+article,aside,canvas,details,figcaption,figure,
+footer,header,hgroup,menu,nav,section,summary { 
+    display:block;
+}
+mark {
+    background-color:#ff9;
+    color:#000; 
+    font-style:italic;
+    font-weight:bold;
+}
+/* reset */
+form span.placeholder-box,
+.placeholder-box,
+.placeholder-text,
+form span.placeholder-text,
+form label.placeholder-text {
+ 	margin: 0;
+	padding: 0;
+	border: none;
+	background: transparent none;
+ }
+
+.placeholder-box {
+	position: relative;
+	display: inline-block;
+	zoom: 1;
+	overflow: hidden;
+}
+.placeholder-box-input {
+	vertical-align: middle;
+}
+.placeholder-box-textarea {
+	vertical-align: text-bottom;
+}
+.placeholder-box-left {
+	float: left;
+}
+.placeholder-box-right {
+	float: right;
+}
+
+.placeholder-text {
+	position: absolute;
+	display: none;
+	top: 0;
+	left: 0;
+	overflow: hidden;
 	color: #999;
+	line-height: 1;
+	cursor: text;
+}
+.placeholder-box-input .placeholder-text {
+	white-space: nowrap;
+}
+.placeholder-box-textarea .placeholder-text {
+	white-space: pre;
+}
+.placeholder-visible .placeholder-text {
+	display: inline-block;
 }
 .validity-alert {
 	position: absolute;
@@ -15,8 +72,8 @@
 	zoom: 1;
 	overflow: hidden;
 	display: inline-block;
-	top: 0.15em;
-	height: 1em;
+	vertical-align: middle;
+	height: 1.1em;
 	width: 0.6em;
 }
 .step-controls span {
@@ -45,8 +102,8 @@
 .input-range {
 	position: relative;
 	display: inline-block;
+	vertical-align: middle;
 	zoom: 1;
-	margin: 0 0.35em;
 	border: 1px solid #000;
 	height: 0.3em;
 	width: 155px;

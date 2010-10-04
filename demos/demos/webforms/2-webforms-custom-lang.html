@@ -23,8 +23,8 @@
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script src="../../../src/html-ext.js"></script>
-	<script src="../../../src/features.js"></script>
+	<script src="../../js-webshim/minified/html-ext.js"></script>
+	<script src="../../js-webshim/minified/features.js"></script>
 	
     <script class="example">
     	
@@ -136,7 +136,6 @@ $(function(){
 			<section>
 				<h3>Simple Demo</h3>
 				<form action="#" method="post">
-	            	<p>buttons after &lt;hr /&gt; do log to console (open Firebug and reload)</p>
 	               
 	                <p class="required"><span>*</span> Required fields</p>
 	                <fieldset>
@@ -172,8 +171,8 @@ $(function(){
 	                        <label for="number">
 	                            number:
 							</label>
-							(min="3") <dfn title="required">*</dfn>
-	                       	<input min="3" name="number" required="required" type="number" id="number" />
+							(min="3" max="120" step="0.5") <dfn title="required">*</dfn>
+	                       	<input min="3" max="120" step="0.5" name="number" required="required" type="number" id="number" />
 	                    </div>
 	                   
 						
@@ -181,7 +180,8 @@ $(function(){
 	                        <label for="time">
 	                            time: 
 							</label>
-	                       	<input name="time" type="time" id="time" />
+							(step="300")
+	                       	<input step="300" name="time" type="time" id="time" />
 	                    </div>
 						
 						

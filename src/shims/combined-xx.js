@@ -70,66 +70,95 @@
 })(jQuery);
 /* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
 (function($){
-	var firstEvent,
-		invalids = [],
-		stopSubmitTimer,
-		form
-	;
 	
-	//opera fix
-	//opera throws a submit-event and then the invalid events,
-	//the following code will trigger the invalid events first and webkitfix will stopImmediatePropagation of submit event
-	if($.support.validity === true && document.addEventListener && !window.noHTMLExtFixes && window.opera){
-		document.addEventListener('submit', function(e){
-			if(e.target.checkValidity){
-				e.target.checkValidity();
-			}
-		}, true);
-	}
-	$(document).bind('invalid', function(e){
-		if(!firstEvent){
-			//webkitfix 
-			//chrome/safari submits an invalid form, if you prevent all invalid events
-			//this also prevents opera from throwing a submit event if form isn't valid
-			form = e.target.form;
-			if ($.support.validity === true && form && !window.noHTMLExtFixes){
-				var submitEvents = $(form)
-					.bind('submit.preventInvalidSubmit', function(submitEvent){
-						if( $.attr(form, 'novalidate') === undefined ){
-							submitEvent.stopImmediatePropagation();
-							return false;
-						}
-					})
-					.data('events').submit
-				;
-				//add this handler as first executing handler
-				if (submitEvents && submitEvents.length > 1) {
-					submitEvents.unshift(submitEvents.pop());
-				}
-			}
-			
-			//trigger firstinvalid
-			firstEvent = $.Event('firstinvalid');
-			$(e.target).trigger(firstEvent);
-		}
-		//if firstinvalid was prevented all invalids will be also prevented
-		if( firstEvent && firstEvent.isDefaultPrevented() ){
-			e.preventDefault();
-		}
-		invalids.push(e.target);
-		clearTimeout(stopSubmitTimer);
-		stopSubmitTimer = setTimeout(function(){
-			var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
-			//reset firstinvalid
-			firstEvent = false;
-			//remove webkitfix
-			$(form).unbind('submit.preventInvalidSubmit');
-			invalids = [];
-			$(e.target).trigger(lastEvent, lastEvent);
-		}, 9);
+	(function(){
+		var firstEvent,
+			firstOriginal,
+			invalids = [],
+			stopSubmitTimer,
+			form
+//			,doubled
+		;
 		
-	});
+		//opera fix
+		//opera throws a submit-event and then the invalid events,
+		//chrome7 has disabled invalid events, this brings them back
+		if($.support.validity === true && document.addEventListener && !window.noHTMLExtFixes){
+			document.addEventListener('submit', function(e){
+				if(e.target.checkValidity && $.attr(e.target, 'novalidate') === undefined){
+					e.target.checkValidity();
+				}
+			}, true);
+		}
+		$(document).bind('invalid', function(e){
+			if(!firstEvent){
+				//webkitfix 
+				//chrome 6/safari5.0 submits an invalid form, if you prevent all invalid events
+				//this also prevents opera from throwing a submit event if form isn't valid
+				form = e.target.form;
+				if ($.support.validity === true && form && !window.noHTMLExtFixes){
+					var submitEvents = $(form)
+						.bind('submit.preventInvalidSubmit', function(submitEvent){
+							if( $.attr(form, 'novalidate') === undefined ){
+								submitEvent.stopImmediatePropagation();
+								return false;
+							}
+						})
+						.data('events').submit
+					;
+					//add this handler as first executing handler
+					if (submitEvents && submitEvents.length > 1) {
+						submitEvents.unshift(submitEvents.pop());
+					}
+				}
+				
+				//trigger firstinvalid
+				firstEvent = $.Event('firstinvalid');
+				firstOriginal = e;
+				$(e.target).trigger(firstEvent);
+			}
+			//if firstinvalid was prevented all invalids will be also prevented
+			if( firstEvent && firstEvent.isDefaultPrevented() ){
+				e.preventDefault();
+			}
+			//prevent doubble invalids
+			if($.support.validity !== true || $.inArray(e.target, invalids) == -1){
+				invalids.push(e.target);
+			} else {
+//				doubled = true;
+				e.stopImmediatePropagation();
+			}
+			clearTimeout(stopSubmitTimer);
+			stopSubmitTimer = setTimeout(function(){
+				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
+//				if( $.browser.webkit && !doubled && !firstOriginal.isDefaultPrevented() && firstEvent.target !== document.activeElement ){
+//					$.webshims.validityAlert.showFor(firstEvent.target);
+//				}
+				//reset firstinvalid
+//				doubled = false;
+				firstEvent = false;
+				firstOriginal = false;
+				invalids = [];
+				//remove webkitfix
+				$(form).unbind('submit.preventInvalidSubmit');
+				$(e.target).trigger(lastEvent, lastEvent);
+			}, 0);
+			
+		});
+	})();
 	
+	
+	$.extend($.expr.filters, {
+		valid: function(elem){
+			return ($.attr(elem, 'validity') || {valid: true}).valid;
+		},
+		invalid: function(elem){
+			return !$.expr.filters.valid(elem);
+		},
+		willValidate: function(elem){
+			return $.attr(elem, 'willValidate');
+		}
+	});
 	
 	/* some extra validation UI */
 	var ValidityAlert = function(){this._create();};
@@ -229,10 +258,10 @@
 	};
 	
 	
-	var validiyMessages;
+	$.webshims.activeValidationMessages = $.webshims.validityMessages[''];
 	$(document).bind('htmlExtLangChange', function(){
 		$.webshims.activeLang($.webshims.validityMessages, 'validation-base', function(langObj){
-			validiyMessages = langObj;
+			$.webshims.activeValidationMessages = langObj;
 		});
 	});
 		
@@ -253,7 +282,7 @@
 				}
 				$.each(validity, function(name, prop){
 					if(name == 'valid' || !prop){return;}
-					message = validiyMessages[name];
+					message = $.webshims.activeValidationMessages[name];
 					if(message && typeof message !== 'string'){
 						message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
 					}
@@ -263,7 +292,7 @@
 				});
 				if(message){
 					$.each(['value', 'min', 'max', 'title', 'maxlength', 'label'], function(i, attr){
-						if(message.indexOf('%'+attr) === -1){return;}
+						if(message.indexOf('{%'+attr) === -1){return;}
 						var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
 						message = message.replace('{%'+ attr +'}', val);
 						if('value' == attr){
@@ -307,7 +336,7 @@
 if($.support.validity){
 	return;
 }
-
+$.webshims.inputTypes = $.webshims.inputTypes || {};
 //some helper-functions
 var getNames = function(elem){
 		return (elem.form && elem.name) ? elem.form[elem.name] : [];
@@ -326,7 +355,6 @@ var getNames = function(elem){
 ;
 
 //API to add new input types
-var typeModels = $.webshims.inputTypes || {};
 $.webshims.addInputType = function(type, obj){
 	typeModels[type] = obj;
 };
@@ -361,11 +389,6 @@ var validityRules = {
 			;
 			if(len && maxLen >= 0 && val.replace && isNumber(maxLen)){
 				ret = (len > maxLen);
-				if(ret){return ret;}
-				val.replace(/\u0A/g, function(){
-					len++;
-				});
-				ret = (len > maxLen);
 			}
 			return ret;
 		},
@@ -397,6 +420,7 @@ $.webshims.addValidityRule = function(type, fn){
 $.webshims.addMethod('checkValidity', (function(){
 	var unhandledInvalids;
 	var testValidity = function(elem){
+		
 		var e,
 			v = $.attr(elem, 'validity')
 		;
@@ -463,7 +487,7 @@ $.event.special.invalid = {
 		;
 	},
 	handler: function(e, d){
-		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') !== undefined ){return;}
+		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') !== undefined || $.data(e.target, 'novalidate') ){return;}
 		var notValid = !($(e.target).checkValidity());
 		if(notValid){
 			if(!e.originalEvent && !window.debugValidityShim && window.console && console.log){
@@ -572,9 +596,30 @@ $.webshims.addInputType('url', {
 	})()
 });
 
+var noValidate = function(){
+		var elem = this;
+		if(!elem.form){return;}
+		$.data(elem.form, 'novalidate', true);
+		setTimeout(function(){
+			$.data(elem.form, 'novalidate', false);
+		}, 1);
+	}, 
+	submitterTypes = {submit: 1, button: 1}
+;
+
+$(document).bind('click', function(e){
+	if(e.target && e.target.form && submitterTypes[e.target.type] && $.attr(e.target, 'formnovalidate') !== undefined){
+		noValidate.call(e.target);
+	}
+});
+
 $.webshims.addReady(function(context){
 	//start constrain-validation
-	$('form', context).bind('invalid', $.noop);
+	$('form', context)
+		.bind('invalid', $.noop)
+		.find('button[formnovalidate]')
+		.bind('click', noValidate)
+	;
 });
 
 
@@ -652,6 +697,9 @@ $.support.validity = 'shim';
 			typeModels = $.webshims.inputTypes,
 			isNumber = function(string){
 				return (typeof string == 'number' || ($.trim(string) && string == string * 1));
+			},
+			supportsType = function(type){
+				return ($('<input type="'+type+'" />').attr('type') === type);
 			},
 			getType = function(elem){
 				return (elem.getAttribute('type') || '').toLowerCase();
@@ -768,6 +816,9 @@ $.support.validity = 'shim';
 			setter: function(elem, val, fn){
 				var type = getType(elem);
 				if(typeModels[type] && typeModels[type].numberToString){
+					if(!window.noHTMLExtFixes) {
+						throw("there are some serious issues in opera's implementation. don't use!");
+					}
 					//is NaN a number?
 					if(isNaN(val)){
 						$.attr(elem, 'value', '');
@@ -796,6 +847,9 @@ $.support.validity = 'shim';
 			setter: function(elem, value, fn){
 				var type = getType(elem);
 				if(typeModels[type] && typeModels[type].dateToString){
+					if(!window.noHTMLExtFixes) {
+						throw("there are some serious issues in opera's implementation. don't use!");
+					}
 					if(value === null){
 						$.attr(elem, 'value', '');
 						return;
@@ -812,179 +866,184 @@ $.support.validity = 'shim';
 			}
 		});
 		
-		$.webshims.addInputType('number', {
-			mismatch: function(val){
-				return !(isNumber(val));
-			},
-			step: 1,
-			//stepBase: 0, 0 = default
-			stepScaleFactor: 1,
-			asNumber: function(str){
-				return (isNumber(str)) ? str * 1 : nan;
-			},
-			numberToString: function(num){
-				return (isNumber(num)) ? num : false;
-			}
-		});
-		
-		
-		$.webshims.addInputType('range', $.extend({}, typeModels.number, {
-			minDefault: 0,
-			maxDefault: 100
-		}));
-		
-		$.webshims.addInputType('date', {
-			mismatch: function(val){
-				if(!val || !val.split || !(/\d$/.test(val))){return true;}
-				var valA = val.split(/\u002D/);
-				if(valA.length !== 3){return true;}
-				var ret = false;
-				$.each(valA, function(i, part){
-					if(!isDateTimePart(part)){
-						ret = true;
-						return false;
-					}
-				});
-				if(ret){return ret;}
-				if(valA[0].length !== 4 || valA[1].length != 2 || valA[1] > 12 || valA[2].length != 2 || valA[2] > 33){
-					ret = true;
+		if(!supportsType('number')){
+			$.webshims.addInputType('number', {
+				mismatch: function(val){
+					return !(isNumber(val));
+				},
+				step: 1,
+				//stepBase: 0, 0 = default
+				stepScaleFactor: 1,
+				asNumber: function(str){
+					return (isNumber(str)) ? str * 1 : nan;
+				},
+				numberToString: function(num){
+					return (isNumber(num)) ? num : false;
 				}
-				return (val !== this.dateToString( this.asDate(val, true) ) );
-			},
-			step: 1,
-			//stepBase: 0, 0 = default
-			stepScaleFactor:  86400000,
-			asDate: function(val, _noMismatch){
-				if(!_noMismatch && this.mismatch(val)){
-					return null;
-				}
-				return new Date(this.asNumber(val, true));
-			},
-			asNumber: function(str, _noMismatch){
-				var ret = nan;
-				if(_noMismatch || !this.mismatch(str)){
-					str = str.split(/\u002D/);
-					ret = Date.UTC(str[0], str[1] - 1, str[2]);
-				}
-				return ret;
-			},
-			numberToString: function(num){
-				return (isNumber(num)) ? this.dateToString(new Date( num * 1)) : false;
-			},
-			dateToString: function(date){
-				return (date && date.getFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
-			}
-		});
+			});
+		}
 		
-		$.webshims.addInputType('time', $.extend({}, typeModels.date, 
-			{
-				mismatch: function(val, _getParsed){
+		if(!supportsType('number') && typeModels.number){
+			$.webshims.addInputType('range', $.extend({}, typeModels.number, {
+				minDefault: 0,
+				maxDefault: 100
+			}));
+		}
+		if(!supportsType('date') && typeModels.number){
+			$.webshims.addInputType('date', {
+				mismatch: function(val){
 					if(!val || !val.split || !(/\d$/.test(val))){return true;}
-					val = val.split(/\u003A/);
-					if(val.length < 2 || val.length > 3){return true;}
-					var ret = false,
-						sFraction;
-					if(val[2]){
-						val[2] = val[2].split(/\u002E/);
-						sFraction = parseInt(val[2][1], 10);
-						val[2] = val[2][0];
-					}
-					$.each(val, function(i, part){
-						if(!isDateTimePart(part) || part.length !== 2){
+					var valA = val.split(/\u002D/);
+					if(valA.length !== 3){return true;}
+					var ret = false;
+					$.each(valA, function(i, part){
+						if(!isDateTimePart(part)){
 							ret = true;
 							return false;
 						}
 					});
-					if(ret){return true;}
-					if(val[0] > 23 || val[0] < 0 || val[1] > 59 || val[1] < 0){
-						return true;
+					if(ret){return ret;}
+					if(valA[0].length !== 4 || valA[1].length != 2 || valA[1] > 12 || valA[2].length != 2 || valA[2] > 33){
+						ret = true;
 					}
-					if(val[2] && (val[2] > 59 || val[2] < 0 )){
-						return true;
-					}
-					if(sFraction && isNaN(sFraction)){
-						return true;
-					}
-					if(sFraction){
-						if(sFraction < 100){
-							sFraction *= 100;
-						} else if(sFraction < 10){
-							sFraction *= 10;
-						}
-					}
-					return (_getParsed === true) ? [val, sFraction] : false;
+					return (val !== this.dateToString( this.asDate(val, true) ) );
 				},
-				step: 60,
-				stepBase: 0,
-				stepScaleFactor:  1000,
-				asDate: function(val){
-					val = new Date(this.asNumber(val));
-					return (isNaN(val)) ? null : val;
+				step: 1,
+				//stepBase: 0, 0 = default
+				stepScaleFactor:  86400000,
+				asDate: function(val, _noMismatch){
+					if(!_noMismatch && this.mismatch(val)){
+						return null;
+					}
+					return new Date(this.asNumber(val, true));
 				},
-				asNumber: function(val){
+				asNumber: function(str, _noMismatch){
 					var ret = nan;
-					val = this.mismatch(val, true);
-					if(val !== true){
-						ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
-						if(val[1]){
-							ret += val[1];
-						}
+					if(_noMismatch || !this.mismatch(str)){
+						str = str.split(/\u002D/);
+						ret = Date.UTC(str[0], str[1] - 1, str[2]);
 					}
 					return ret;
+				},
+				numberToString: function(num){
+					return (isNumber(num)) ? this.dateToString(new Date( num * 1)) : false;
 				},
 				dateToString: function(date){
-					if(date && date.getUTCHours){
-						var str = addleadingZero(date.getUTCHours(), 2) +':'+ addleadingZero(date.getUTCMinutes(), 2),
-							tmp = date.getSeconds()
-						;
-						if(tmp != "0"){
-							str += ':'+ addleadingZero(tmp, 2);
-						}
-						tmp = date.getUTCMilliseconds();
-						if(tmp != "0"){
-							str += '.'+ addleadingZero(tmp, 3);
-						}
-						return str;
-					} else {
-						return false;
-					}
+					return (date && date.getFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
 				}
-			})
-		);
+			});
+		}
+		if(!supportsType('time') && typeModels.number && typeModels.date){
+			$.webshims.addInputType('time', $.extend({}, typeModels.date, 
+				{
+					mismatch: function(val, _getParsed){
+						if(!val || !val.split || !(/\d$/.test(val))){return true;}
+						val = val.split(/\u003A/);
+						if(val.length < 2 || val.length > 3){return true;}
+						var ret = false,
+							sFraction;
+						if(val[2]){
+							val[2] = val[2].split(/\u002E/);
+							sFraction = parseInt(val[2][1], 10);
+							val[2] = val[2][0];
+						}
+						$.each(val, function(i, part){
+							if(!isDateTimePart(part) || part.length !== 2){
+								ret = true;
+								return false;
+							}
+						});
+						if(ret){return true;}
+						if(val[0] > 23 || val[0] < 0 || val[1] > 59 || val[1] < 0){
+							return true;
+						}
+						if(val[2] && (val[2] > 59 || val[2] < 0 )){
+							return true;
+						}
+						if(sFraction && isNaN(sFraction)){
+							return true;
+						}
+						if(sFraction){
+							if(sFraction < 100){
+								sFraction *= 100;
+							} else if(sFraction < 10){
+								sFraction *= 10;
+							}
+						}
+						return (_getParsed === true) ? [val, sFraction] : false;
+					},
+					step: 60,
+					stepBase: 0,
+					stepScaleFactor:  1000,
+					asDate: function(val){
+						val = new Date(this.asNumber(val));
+						return (isNaN(val)) ? null : val;
+					},
+					asNumber: function(val){
+						var ret = nan;
+						val = this.mismatch(val, true);
+						if(val !== true){
+							ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
+							if(val[1]){
+								ret += val[1];
+							}
+						}
+						return ret;
+					},
+					dateToString: function(date){
+						if(date && date.getUTCHours){
+							var str = addleadingZero(date.getUTCHours(), 2) +':'+ addleadingZero(date.getUTCMinutes(), 2),
+								tmp = date.getSeconds()
+							;
+							if(tmp != "0"){
+								str += ':'+ addleadingZero(tmp, 2);
+							}
+							tmp = date.getUTCMilliseconds();
+							if(tmp != "0"){
+								str += '.'+ addleadingZero(tmp, 3);
+							}
+							return str;
+						} else {
+							return false;
+						}
+					}
+				})
+			);
+		}
 		
-		$.webshims.addInputType('datetime-local', $.extend({}, typeModels.time, 
-			{
-				mismatch: function(val, _getParsed){
-					if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
-					val = val.split(/\u0054/);
-					return ( typeModels.date.mismatch(val[0]) || typeModels.time.mismatch(val[1], _getParsed) );
-				},
-				noAsDate: true,
-				asDate: function(val){
-					val = new Date(this.asNumber(val));
-					
-					return (isNaN(val)) ? null : val;
-				},
-				asNumber: function(val){
-					var ret = nan;
-					var time = this.mismatch(val, true);
-					if(time !== true){
-						val = val.split(/\u0054/)[0].split(/\u002D/);
+		if(!supportsType('datetime-local') && typeModels.number && typeModels.time){
+			$.webshims.addInputType('datetime-local', $.extend({}, typeModels.time, 
+				{
+					mismatch: function(val, _getParsed){
+						if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
+						val = val.split(/\u0054/);
+						return ( typeModels.date.mismatch(val[0]) || typeModels.time.mismatch(val[1], _getParsed) );
+					},
+					noAsDate: true,
+					asDate: function(val){
+						val = new Date(this.asNumber(val));
 						
-						ret = Date.UTC(val[0], val[1] - 1, val[2], time[0][0], time[0][1], time[0][2] || 0);
-						if(time[1]){
-							ret += time[1];
+						return (isNaN(val)) ? null : val;
+					},
+					asNumber: function(val){
+						var ret = nan;
+						var time = this.mismatch(val, true);
+						if(time !== true){
+							val = val.split(/\u0054/)[0].split(/\u002D/);
+							
+							ret = Date.UTC(val[0], val[1] - 1, val[2], time[0][0], time[0][1], time[0][2] || 0);
+							if(time[1]){
+								ret += time[1];
+							}
 						}
+						return ret;
+					},
+					dateToString: function(date, _getParsed){
+						return typeModels.date.dateToString(date) +'T'+ typeModels.time.dateToString(date, _getParsed);
 					}
-					return ret;
-				},
-				dateToString: function(date, _getParsed){
-					return typeModels.date.dateToString(date) +'T'+ typeModels.time.dateToString(date, _getParsed);
-				}
-				
-			})
-		);
-		
+				})
+			);
+		}
 		(function(){
 			var options = $.webshims.loader.modules['number-date-type'].options;
 			var getNextStep = function(input, upDown, cache){
@@ -1128,9 +1187,9 @@ $.support.validity = 'shim';
 	if($.webshims.addValidityRule){
 		implementTypes();
 	}else if($.support.validity === true){
-		$.webshims.readyModules('implement-types',implementTypes);
+		$.webshims.readyModules('implement-types', implementTypes, true, true);
 	} else {
-		$.webshims.readyModules('validity',implementTypes);
+		$.webshims.readyModules('validity', implementTypes, true, true);
 	}
 	
 })(jQuery);
@@ -1139,11 +1198,6 @@ $.support.validity = 'shim';
  * version: 2.0.2
  * including a11y-name fallback
  * 
- * Simply use the HTML5 placeholder attribute 
- * <input type="text" id="birthday" placeholder="dd.mm.yyyy" />
- * 
- * http://www.protofunc.com/2009/08/16/meinung-zu-html5/, 
- * http://robertnyman.com/2010/06/17/adding-html5-placeholder-attribute-support-through-progressive-enhancement/
  * 
  */
 
@@ -1153,97 +1207,117 @@ $.support.validity = 'shim';
 		return;
 	}
 	$.support.placeholder = 'shim';
-	
-	var pHolder = (function(){
-		var showPlaceholder = function(force){
-				if(!this.value || force === true){
-					$(this).addClass('placeholder-visible');
-					this.value = this.getAttribute('placeholder') || '';
-				}
-			},
-			hidePlaceHolder = function(){
-				if( $(this).hasClass('placeholder-visible') ){
-					this.value = '';
-					$(this).removeClass('placeholder-visible');
-				}
-			},
+	var changePlaceholderVisibility = function(elem, value, placeholderTxt, data, type){
+			if(!data){
+				data = $.data(elem, 'placeHolder');
+				if(!data){return;}
+			}
+			if(type == 'focus'){
+				data.box.removeClass('placeholder-visible');
+				return;
+			}
+			if(value === false){
+				value = $.attr(elem, 'value');
+			}
+			if(value){
+				data.box.removeClass('placeholder-visible');
+				return;
+			}
+			if(placeholderTxt === false){
+				placeholderTxt = $.attr(elem, 'placeholder');
+			}
 			
-			placeholderID 	= 0,
-			delReg 	= /\n|\r|\f|\t/g,
-			allowedPlaceholder = {
-				text: 1,
-				search: 1,
-				url: 1,
-				email: 1,
-				password: 1,
-				tel: 1
-			}
-		;
-		
-		return {
-			create: function(elem){
-				
-				if($.data(elem, 'placeHolder')){return;}
-				var remove = function(){
-					hidePlaceHolder.apply(elem);
-				};
+			data.box[(placeholderTxt && !value) ? 'addClass' : 'removeClass']('placeholder-visible');
+		},
+		placeholderID 	= 0,
+		createPlaceholder = function(elem){
+			elem = $(elem);
+			var id 			= elem.attr('id'),
+				hasLabel	= !!(elem.attr('title') || elem.attr('aria-labeledby')),
+				pHolderTxt
+			;
+			if(!hasLabel && id){
+				hasLabel = !!($('label[for='+ id +']', elem[0].form)[0]);
+			} else if(!id){
 				placeholderID++;
-				$.data(elem, 'placeHolder', placeholderID);
-				$(elem)
-					.bind('blur', showPlaceholder)
-					.bind('focus', hidePlaceHolder)
-				;
-				$(window).bind('unload.id-'+placeholderID, remove);
-				$(elem.form).bind('submit.id-'+placeholderID, remove);
-			},
-			changesValidity: function(elem, val){
-				if($.support.validity === true && $.attr(elem, 'willValidate')){
-					if( $.attr(elem, 'required') ){return true;}
-					var oldVal 	= $.attr(elem, 'value'),
-						ret 	= false
-					;
-					$.attr(elem, 'value', val);
-					ret = !($.attr(elem, 'validity') || {valid: true}).valid;
-					$.attr(elem, 'value', oldVal);
-				}
-				return false;
-			},
-			update: function(elem, val){
-				var type = $.attr(elem, 'type');
-				if(!allowedPlaceholder[type] && !$.nodeName(elem, 'textarea')){return;}
-				if(!val){
-					pHolder.destroy(elem);
-					elem.removeAttribute('placeholder');
-					return;
-				}
-				
-				var input = $(elem);
-				val = val.replace(delReg, '');
-				elem.setAttribute('placeholder', val);
-				
-				if( pHolder.changesValidity(elem, val) ){
-					pHolder.destroy(elem);
-					return;
-				}
-				pHolder.create(elem);
-				if(!input.val()){
-					showPlaceholder.call(elem, true);
-				}
-			},
-			destroy: function(elem){
-				var id = $.data(elem, 'placeHolder');
-				if(!id){return;}
-				$.data(elem, 'placeHolder', false);
-				$(elem)
-					.unbind('blur', showPlaceholder)
-					.unbind('focus', hidePlaceHolder)
-				;
-				$(window).unbind('unload.id-'+id);
-				$(elem.form).unbind('submit.id-'+id);
-				hidePlaceHolder.apply(this);
+				id = 'input-placeholder-id-'+ placeholderID;
+				elem.attr('id', id);
 			}
-		};
-	})();
+			return $((hasLabel) ? '<span class="placeholder-text"></span>' : '<label for="'+ id +'" class="placeholder-text"></label>');
+		},
+		pHolder = (function(){
+			var delReg 	= /\n|\r|\f|\t/g,
+				allowedPlaceholder = {
+					text: 1,
+					search: 1,
+					url: 1,
+					email: 1,
+					password: 1,
+					tel: 1
+				}
+			;
+			
+			return {
+				create: function(elem){
+					var data = $.data(elem, 'placeHolder');
+					if(data){return data;}
+					data = $.data(elem, 'placeHolder', {
+						text: createPlaceholder(elem)
+					});
+					data.box = $(elem)
+						.wrap('<span class="placeholder-box placeholder-box-'+ (elem.nodeName || '').toLowerCase() +'" />')
+						.bind('focus.placeholder blur.placeholder', function(e){
+							changePlaceholderVisibility(this, false, false, data, e.type );
+						})
+						.parent()
+					;
+
+					data.text
+						.insertAfter(elem)
+						.bind('mousedown.placeholder', function(){
+							changePlaceholderVisibility(this, false, false, data, 'focus' );
+							elem.focus();
+						})
+					;
+					
+					
+	
+					$.each(['Left', 'Top'], function(i, side){
+						var size = (parseInt($.curCSS(elem, 'padding'+ side), 10) || 0) + Math.max((parseInt($.curCSS(elem, 'margin'+ side), 10) || 0), 0) + (parseInt($.curCSS(elem, 'border'+ side +'Width'), 10) || 0);
+						data.text.css('padding'+ side, size);
+					});
+					var lineHeight 	= $.curCSS(elem, 'lineHeight'),
+						dims 		= {
+							width: $(elem).width() || parseInt($.curCSS(elem, 'width'), 10),
+							height: $(elem).height() || parseInt($.curCSS(elem, 'height'), 10)
+						},
+						cssFloat 		= $.curCSS(elem, 'float')
+					;
+					if(data.text.css('lineHeight') !== lineHeight){
+						data.text.css('lineHeight', lineHeight);
+					}
+					if(dims.width && dims.height){
+						data.text.css(dims);
+					}
+					if(cssFloat !== 'none'){
+						data.box.addClass('placeholder-box-'+cssFloat);
+					}
+					
+					return data;
+				},
+				update: function(elem, val){
+					if(!allowedPlaceholder[$.attr(elem, 'type')] && !$.nodeName(elem, 'textarea')){return;}
+					if($.nodeName(elem, 'input')){
+						val = val.replace(delReg, '');
+					}
+					var data = pHolder.create(elem);
+					elem.setAttribute('placeholder', val);
+					data.text.text(val);
+					changePlaceholderVisibility(elem, false, val, data);
+				}
+			};
+		})()
+	;
 	
 	
 	$.webshims.attr('placeholder', {
@@ -1252,7 +1326,7 @@ $.support.validity = 'shim';
 			pHolder.update(elem, val);
 		},
 		getter: function(elem){
-			return elem.getAttribute('placeholder');
+			return elem.getAttribute('placeholder') || '';
 		}
 	});
 		
@@ -1261,42 +1335,25 @@ $.support.validity = 'shim';
 		setter: function(elem, value, oldFn){
 			var placeholder = elem.getAttribute('placeholder');
 			if(placeholder && 'value' in elem){
-				if(value){
-					$(elem).removeClass('placeholder-visible');
-				} else {
-					pHolder.update(elem, placeholder);
-				}
+				changePlaceholderVisibility(elem, value, placeholder);
 			}
 			oldFn();
 		},
-		getter: function(elem, oldFn){
-			if($(elem).hasClass('placeholder-visible')){
-				return '';
-			}
-			return oldFn();
-		}
+		getter: true
 	};
 	
 	$.webshims.attr('value', value);
 	
 	var oldVal = $.fn.val;
 	$.fn.val = function(val){
-		if(val === undefined){
-			if(this[0] && $(this[0]).hasClass('placeholder-visible')){
-				return '';
-			}
-			return oldVal.apply(this, arguments);
-		} else {
-			var that 	= this,
-				ret 	= oldVal.apply(this, arguments)
-			;
+		if(val !== undefined){
 			this.each(function(){
-				if( this.nodeType === 1 && this.getAttribute('placeholder') ){
+				if( this.nodeType === 1 ){
 					value.setter(this, val, $.noop);
 				}
 			});
-			return ret;
 		}
+		return oldVal.apply(this, arguments);
 	};
 			
 	$.webshims.addReady(function(context){

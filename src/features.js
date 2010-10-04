@@ -21,7 +21,7 @@
 	
 	/* geolocation */
 	$.support.geolocation = ('geolocation'  in navigator);
-	$.webshims.addModule('geolocation', {
+	$.webshims.addPolyfill('geolocation', {
 		test: function(){
 			return $.support.geolocation;
 		},
@@ -32,7 +32,7 @@
 	
 	/* canvas */
 	$.support.canvas = ('getContext'  in $('<canvas />')[0]);
-	$.webshims.addModule('canvas', {
+	$.webshims.addPolyfill('canvas', {
 		test: function(){
 			return $.support.canvas;
 		},
@@ -52,12 +52,11 @@
 	
 	/* html5 constraint validation */
 	$.support.validity = ('checkValidity' in $('<form action="#" />')[0]);
-	$.webshims.addModule('validity', {
+	$.webshims.addPolyfill('validity', {
 		feature: 'forms',
 		test: function(){
 			return $.support.validity;
 		},
-		css: 'shim.css',
 		methodNames: [
 			{
 				name: 'setCustomValidity',
@@ -78,19 +77,6 @@
 		$.webshims.capturingEvents(['invalid', 'input']);
 	}
 	
-	$.extend($.expr.filters, {
-		valid: function(elem){
-			return ($.attr(elem, 'validity') || {valid: true}).valid;
-		},
-		invalid: function(elem){
-			return !$.expr.filters.valid(elem);
-		},
-		willValidate: function(elem){
-			return $.attr(elem, 'willValidate');
-		}
-	});
-	
-	
 	/* bugfixes, validation-message + fieldset.checkValidity pack */
 	(function(){
 		$.webshims.validityMessages = [];
@@ -98,17 +84,17 @@
 		var form = $('<form action="#"><fieldset><input name="a" required /></fieldset></form>');
 		$.support.validationMessage = !!(form.find('input').attr('validationMessage'));
 		$.support.fieldsetValidation = !!($('fieldset', form)[0].elements && $('fieldset', form)[0].checkValidity && 'disabled' in $('fieldset', form)[0] && !$('fieldset', form)[0].checkValidity() );
-		$.webshims.addModule('validation-base', {
+		$.webshims.addPolyfill('validation-base', {
 			feature: 'forms',
 			test: function(){
 				//always load
 				return false; //($.support.validationMessage && $.support.fieldsetValidation);
 			},
-			combination: ['combined-all', 'combined-x', 'combined-xx', 'combined-forms']
+			combination: ['combined-all', 'combined-x', 'combined-xx', 'combined-forms', 'combined-forms-x']
 		});
 	})();
 	
-	$.webshims.addModule('implement-types', {
+	$.webshims.addPolyfill('implement-types', {
 		feature: 'forms',
 		test: function(){
 			return !($.support.validity === true && ( $('<input type="datetime-local" />').attr('type') !== 'datetime-local' || $('<input type="range" />').attr('type') !== 'range' ) );
@@ -117,23 +103,22 @@
 	});
 	
 	
-	$.webshims.addModule('number-date-type', {
+	$.webshims.addPolyfill('number-date-type', {
 		feature: 'forms',
 		test: function(){
 			return ($('<input type="datetime-local" />').attr('type') === 'datetime-local' && $('<input type="range" />').attr('type') === 'range');
 		},
-		combination: ['combined-all', 'combined-x', 'combined-xx', 'combined-forms'],
+		combination: ['combined-all', 'combined-x', 'combined-xx', 'combined-forms', 'combined-forms-x'],
 		options: {stepArrows: {number: 1, time: 1}}
 	});
 	
 	/* placeholder */
 	$.support.placeholder = ($('<input type="text" />').attr('placeholder') !== undefined);
-	$.webshims.addModule('placeholder', {
+	$.webshims.addPolyfill('placeholder', {
 		feature: 'forms',
 		test: function(){
 			return $.support.placeholder;
 		},
-		css: 'shim.css',
 		combination: ['combined-all', 'combined-x', 'combined-xx', 'combined-forms']
 	});
 	/* END: placeholder */
@@ -142,7 +127,7 @@
 	
 	/* json + loacalStorage */
 	$.support.jsonStorage = ('JSON' in window && 'localStorage' in window && 'sessionStorage' in window);
-	$.webshims.addModule('json-storage', {
+	$.webshims.addPolyfill('json-storage', {
 		test: function(){
 			return $.support.jsonStorage;
 		},

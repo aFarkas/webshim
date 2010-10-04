@@ -13,7 +13,7 @@
 			}
 		},
 		capturingEvents: function(names){
-			if(!doc.addEventListener){return;}
+			if(!document.addEventListener){return;}
 			if(typeof names == 'string'){
 				names = [names];
 			}

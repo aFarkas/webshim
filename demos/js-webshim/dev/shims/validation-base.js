@@ -1,65 +1,94 @@
 /* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
 (function($){
-	var firstEvent,
-		invalids = [],
-		stopSubmitTimer,
-		form
-	;
 	
-	//opera fix
-	//opera throws a submit-event and then the invalid events,
-	//the following code will trigger the invalid events first and webkitfix will stopImmediatePropagation of submit event
-	if($.support.validity === true && document.addEventListener && !window.noHTMLExtFixes && window.opera){
-		document.addEventListener('submit', function(e){
-			if(e.target.checkValidity){
-				e.target.checkValidity();
-			}
-		}, true);
-	}
-	$(document).bind('invalid', function(e){
-		if(!firstEvent){
-			//webkitfix 
-			//chrome/safari submits an invalid form, if you prevent all invalid events
-			//this also prevents opera from throwing a submit event if form isn't valid
-			form = e.target.form;
-			if ($.support.validity === true && form && !window.noHTMLExtFixes){
-				var submitEvents = $(form)
-					.bind('submit.preventInvalidSubmit', function(submitEvent){
-						if( $.attr(form, 'novalidate') === undefined ){
-							submitEvent.stopImmediatePropagation();
-							return false;
-						}
-					})
-					.data('events').submit
-				;
-				//add this handler as first executing handler
-				if (submitEvents && submitEvents.length > 1) {
-					submitEvents.unshift(submitEvents.pop());
-				}
-			}
-			
-			//trigger firstinvalid
-			firstEvent = $.Event('firstinvalid');
-			$(e.target).trigger(firstEvent);
-		}
-		//if firstinvalid was prevented all invalids will be also prevented
-		if( firstEvent && firstEvent.isDefaultPrevented() ){
-			e.preventDefault();
-		}
-		invalids.push(e.target);
-		clearTimeout(stopSubmitTimer);
-		stopSubmitTimer = setTimeout(function(){
-			var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
-			//reset firstinvalid
-			firstEvent = false;
-			//remove webkitfix
-			$(form).unbind('submit.preventInvalidSubmit');
-			invalids = [];
-			$(e.target).trigger(lastEvent, lastEvent);
-		}, 9);
+	(function(){
+		var firstEvent,
+			firstOriginal,
+			invalids = [],
+			stopSubmitTimer,
+			form
+//			,doubled
+		;
 		
-	});
+		//opera fix
+		//opera throws a submit-event and then the invalid events,
+		//chrome7 has disabled invalid events, this brings them back
+		if($.support.validity === true && document.addEventListener && !window.noHTMLExtFixes){
+			document.addEventListener('submit', function(e){
+				if(e.target.checkValidity && $.attr(e.target, 'novalidate') === undefined){
+					e.target.checkValidity();
+				}
+			}, true);
+		}
+		$(document).bind('invalid', function(e){
+			if(!firstEvent){
+				//webkitfix 
+				//chrome 6/safari5.0 submits an invalid form, if you prevent all invalid events
+				//this also prevents opera from throwing a submit event if form isn't valid
+				form = e.target.form;
+				if ($.support.validity === true && form && !window.noHTMLExtFixes){
+					var submitEvents = $(form)
+						.bind('submit.preventInvalidSubmit', function(submitEvent){
+							if( $.attr(form, 'novalidate') === undefined ){
+								submitEvent.stopImmediatePropagation();
+								return false;
+							}
+						})
+						.data('events').submit
+					;
+					//add this handler as first executing handler
+					if (submitEvents && submitEvents.length > 1) {
+						submitEvents.unshift(submitEvents.pop());
+					}
+				}
+				
+				//trigger firstinvalid
+				firstEvent = $.Event('firstinvalid');
+				firstOriginal = e;
+				$(e.target).trigger(firstEvent);
+			}
+			//if firstinvalid was prevented all invalids will be also prevented
+			if( firstEvent && firstEvent.isDefaultPrevented() ){
+				e.preventDefault();
+			}
+			//prevent doubble invalids
+			if($.support.validity !== true || $.inArray(e.target, invalids) == -1){
+				invalids.push(e.target);
+			} else {
+//				doubled = true;
+				e.stopImmediatePropagation();
+			}
+			clearTimeout(stopSubmitTimer);
+			stopSubmitTimer = setTimeout(function(){
+				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
+//				if( $.browser.webkit && !doubled && !firstOriginal.isDefaultPrevented() && firstEvent.target !== document.activeElement ){
+//					$.webshims.validityAlert.showFor(firstEvent.target);
+//				}
+				//reset firstinvalid
+//				doubled = false;
+				firstEvent = false;
+				firstOriginal = false;
+				invalids = [];
+				//remove webkitfix
+				$(form).unbind('submit.preventInvalidSubmit');
+				$(e.target).trigger(lastEvent, lastEvent);
+			}, 0);
+			
+		});
+	})();
 	
+	
+	$.extend($.expr.filters, {
+		valid: function(elem){
+			return ($.attr(elem, 'validity') || {valid: true}).valid;
+		},
+		invalid: function(elem){
+			return !$.expr.filters.valid(elem);
+		},
+		willValidate: function(elem){
+			return $.attr(elem, 'willValidate');
+		}
+	});
 	
 	/* some extra validation UI */
 	var ValidityAlert = function(){this._create();};
@@ -159,10 +188,10 @@
 	};
 	
 	
-	var validiyMessages;
+	$.webshims.activeValidationMessages = $.webshims.validityMessages[''];
 	$(document).bind('htmlExtLangChange', function(){
 		$.webshims.activeLang($.webshims.validityMessages, 'validation-base', function(langObj){
-			validiyMessages = langObj;
+			$.webshims.activeValidationMessages = langObj;
 		});
 	});
 		
@@ -183,7 +212,7 @@
 				}
 				$.each(validity, function(name, prop){
 					if(name == 'valid' || !prop){return;}
-					message = validiyMessages[name];
+					message = $.webshims.activeValidationMessages[name];
 					if(message && typeof message !== 'string'){
 						message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
 					}
@@ -193,7 +222,7 @@
 				});
 				if(message){
 					$.each(['value', 'min', 'max', 'title', 'maxlength', 'label'], function(i, attr){
-						if(message.indexOf('%'+attr) === -1){return;}
+						if(message.indexOf('{%'+attr) === -1){return;}
 						var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
 						message = message.replace('{%'+ attr +'}', val);
 						if('value' == attr){

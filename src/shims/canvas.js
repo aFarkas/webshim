@@ -925,43 +925,20 @@ if (!document.createElement('canvas').getContext) {
    */
 	$.support.canvas = 'shim';
 	
-	G_vmlCanvasManager.fixElement_ = function (el) { 	 
-	
-		// in IE before version 5.5 we would need to add HTML: to the tag name 	 
-		// but we do not care about IE before version 6 	 
-		var outerHTML = el.outerHTML; 	 
-		
-		var newEl = el.ownerDocument.createElement(outerHTML); 	 
-		// if the tag is still open IE has created the children as siblings and 	 
-		// it has also created a tag with the name "/FOO" 	 
-		
-		if (outerHTML.slice(-2) != "/>") { 	
-		
-			var tagName = "/" + el.tagName; 
-			var ns; 	 
-			// remove content 	 
-			while ((ns = el.nextSibling) && ns.tagName != tagName) {
-				ns.removeNode(); 	 
-			}	 
-			// remove the incorrect closing tag 	 
-			if (ns) { 	 
-				ns.removeNode(); 	 
-			}	 
-		} else {
-			return el;
-		}
-		el.parentNode.replaceChild(newEl, el); 
-		return newEl; 	 
-	};
-	
-	G_vmlCanvasManager.fixDynamicElement = function(el){
-		return G_vmlCanvasManager.initElement(G_vmlCanvasManager.fixElement_(el));
-	};
 	$.webshims.addMethod('getContext', function(ctxName){
 		if(!this.getContext){
-			G_vmlCanvasManager_.fixDynamicElement(this);
+			G_vmlCanvasManager.initElement(this);
 		}
 		return this.getContext(ctxName);
+	});
+	
+	$.webshims.addReady(function(context){
+		if(document === context){return;}
+		$('canvas', context).each(function(){
+			if(!this.getContext){
+				G_vmlCanvasManager.initElement(this);
+			}
+		});
 	});
 })(jQuery);
 

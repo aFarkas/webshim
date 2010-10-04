@@ -30,5 +30,14 @@
 			}
 			return false;
 		});
+		
+		$('div.feature-example').each(function(){
+			var div = $('div.hidden-explanation', this).hide();
+			$('button', this).bind('click', function(){
+				$('#placeholder').attr('placeholder', $('#placeholder-text').val());
+				div.slideDown();
+				return false;
+			});
+		});
 	});
 })(jQuery);

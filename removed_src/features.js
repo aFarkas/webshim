@@ -7,12 +7,15 @@
 		options: {
 			slider: {},
 			date: {},
-			juiSrc: 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/jquery-ui.min.js',
 			langSrc: 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/i18n/jquery.ui.datepicker-',
 			recalcWidth: true,
-			nativeIsReplaced: false,
+			_autoStart: true,
+			autoStart: function(start){
+				this._autoStart = start;
+			},
+			_nativeIsReplaced: false,
 			replaceNative: function(replace){
-				this.nativeIsReplaced = replace;
+				this._nativeIsReplaced = replace;
 				if(replace){
 					$.webshims.loader.modules['input-ui'].test = function(){
 						return false;

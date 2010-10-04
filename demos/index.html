@@ -5,8 +5,8 @@
 	<meta charset="utf-8"/>
 	<link href="css/styles.css" rel="stylesheet" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script src="js-webshim/dev/html-ext.js"></script>
-	<script src="js-webshim/dev/features.js"></script>
+	<script src="js-webshim/minified/html-ext.js"></script>
+	<script src="js-webshim/minified/features.js"></script>
     <script class="example">
     	
 		//path is path of html-ext.js + shims/
@@ -35,65 +35,90 @@
 			<h3>Main concepts</h3>
 			<ul>
 				<li><strong>Capability based loading</strong>: lightweight for good browsers / heavyweight for really bad browsers (I really like this)</li>
-				<li><strong>almost pure native APIs | no/less abstractions</strong>: Helps you to learn HTML5 (Markup-/DOM/JS-APIs) and to build usefull abstractions and extensions on top of the standard. Documentation is the specification (i.e.: <a href="http://dev.w3.org/html5/html-author/">HTML5 W3C Specification</a>)</li>
+				<li><strong>almost pure native and accurate APIs | no/less abstractions</strong>: Helps you to learn HTML5 (Markup-/DOM/JS-APIs) and to build usefull abstractions and extensions on top of the standard. Documentation is the specification (i.e.: <a href="http://dev.w3.org/html5/html-author/">HTML5 W3C Specification</a>)</li>
 				<li><strong>futureproof Feature-Detection</strong>: We try to feature detect everything instead of browsersniffing to be more futureproof</li>
 			</ul>
+			<div class="feature-example">
+				<h3>What makes webshims lib differnt?</h3>
+				
+				<form action="#">
+					<input id="placeholder" placeholder="change me" />
+				</form>
+				<p>Did you ever tried to dynamically add/change the placeholder attribute with one of the other placeholder shims?</p>
+				<code>$("#placeholder").attr("placeholder", "</code><input id="placeholder-text" /><code>");</code> <button>run code</button>
+				<div class="hidden-explanation">
+					<p>Being able to add/change the placeholder of an input element dynamically, isn't that important. It only shows how webshims lib works. With some little constraints you won't be able to recognize a difference between the shim and the native implementation. In some cases the shim will be more compilant, than the current browser implementations.</p>
+				</div>
+			</div>
+			<aside>
+				<h4>Similiar projects &amp; used third party scripts by webshims lib</h4>
+				<ul>
+					<li><a href="http://code.google.com/p/base2/">base2</a> by the grandmaster of webshims <a href="http://dean.edwards.name/">dean edwards</a></li>
+					<li><a href="http://code.google.com/p/html5shim/">html5shim</a> by remy sharp</li>
+					<li><a href="http://jdbartlett.github.com/innershiv/">innerShiv</a> by joe bartlett</li>
+					<li><a href="http://code.google.com/p/explorercanvas/">excanvas</a> by google erik arvidsson</li>
+					<li><a href="http://gist.github.com/350433">storage polyfill</a> by remy sharp</li>
+					<li><a href="http://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-browser-Polyfills">List of shims by modernizr</a></li>
+				</ul>
+			</aside>
 		</section>
 		<section>
 			<h2>Simple and ugly Demos: You are the developer. Improve HTML/CSS/JS etc.</h2>
-			<articel>
-				<h1>Semantic Structure: Shiv solution</h1>
-				<p>Implements parsing/styling of HTML5 elements like section, articel, footer, nav in IE8-. <a href="demos/shiv.html">more Information on shiv solution</a></p>
-			</articel>
-			<articel>
-				<h3>Canvas</h3>
-				<div  class="te-canvas teaser-example">
-					<canvas class="peter" width="200" height="200"></canvas>
-				</div>
-				<p>Implements canvas. <a href="#">more Information on canvas and canvas text solution</a></p>
-			</articel>
-			
-			<articel>
-				<h3>HTML5 constraint validation + input type widgets</h3>
-				<div class="te-webforms teaser-example">
-					<form action="#">
-						<div class="form-element">
-			                <label for="email">
-			                    Name *:
-							</label>
-			               	<input name="name" required="required" type="text" id="name" placeholder="your name" />
-			            </div>
-						<div class="form-element">
-			                <label for="email">
-			                    E-Mail:
-							</label>
-			               	<input name="email" required="required" type="email" id="email" placeholder="yourmail@host.de" />
-			            </div>
-						<div class="form-element">
-			                <label for="range">
-			                    range:
-							</label>
-			               	<input name="range" type="range" id="range" />
-			            </div>
-						<div>
-							<input type="submit" />
-						</div>
-					</form>
-				</div>
-				<p>Implements some HTML5 form features (aka Web forms 2.0) like constraint validation and some input[type] widgets. <a href="demos/webforms.html">more Information on HTML5 form soultion</a></p>
+			<div class="article-wrapper">
+				<article>
+					<h3>Semantic Structure: Shiv solution</h3>
+					<p>Implements parsing/styling of HTML5 elements like section, article, footer, nav in IE8-. <a href="demos/shiv.html">more Information on shiv solution</a></p>
+				</article>
+				<article>
+					<h3>Canvas</h3>
+					<div  class="te-canvas teaser-example">
+						<canvas class="peter" width="200" height="200"></canvas>
+					</div>
+					<p>Implements canvas. <a href="#">more Information on canvas and canvas text solution</a></p>
+				</article>
 				
-			</articel>
-			
-			<articel>
-				<h3>JSON.parse/JSON.stringify &amp; localStorage/sessionStorage</h3>
-			</articel>
-			<articel>
-				<h3>Geolocation</h3>
-				<div class="te-geolcation teaser-example">
-					<div id="geolocation"></div>
-					<button class="geolocation">Where am I?</button>
-				</div>
-			</articel>
+				<article>
+					<h3>HTML5 constraint validation + input type widgets</h3>
+					<div class="te-webforms teaser-example">
+						<form action="#">
+							<div class="form-element">
+				                <label for="name">
+				                    Name *:
+								</label>
+				               	<input name="name" required="required" type="text" id="name" placeholder="your name" />
+				            </div>
+							<div class="form-element">
+				                <label for="email">
+				                    E-Mail:
+								</label>
+				               	<input name="email" required="required" type="email" id="email" placeholder="yourmail@host.de" />
+				            </div>
+							<div class="form-element">
+				                <label for="range">
+				                    range:
+								</label>
+				               	<input name="range" type="range" id="range" />
+				            </div>
+							<div>
+								<input type="submit" />
+							</div>
+						</form>
+					</div>
+					<p>Implements some HTML5 form features (aka Web forms 2.0) like constraint validation and some input[type] widgets. <a href="demos/webforms.html">more Information on HTML5 form soultion</a></p>
+					
+				</article>
+				
+				<article>
+					<h3>JSON.parse/JSON.stringify &amp; localStorage/sessionStorage</h3>
+				</article>
+				<article>
+					<h3>Geolocation</h3>
+					<div class="te-geolcation teaser-example">
+						<div id="geolocation"></div>
+						<button class="geolocation">Where am I?</button>
+					</div>
+				</article>
+			</div>
 		</section>
 		<section>
 			<h2>How to</h2>
@@ -101,7 +126,7 @@
 			
 			<ul>
 				<li>Take the 'js-webshim' folder and add it to your project (You will find a minified and a dev-folder there)</li>
-				<li>Embed the html-ext.js and features.js into your HTML-Page (you can concat these files with your other js, at least the html-ext.js has to be included into the head)</li>
+				<li>Embed the html-ext.js and features.js into your HTML-Page (you can concat/rename these files with your other js, at least the html-ext.js has to be included into the head)</li>
 				<li>Configure the webshims folder (<code>$.webshims.loader.basePath</code>) and load your features (<code>$.webshims.polyfill();</code>).</li>
 			</ul>
 			
@@ -110,7 +135,7 @@
 &lt;script src="js-webshim/minified/features.js"&gt;&lt;/script&gt;
 
 &lt;script&gt;
-	//path is path of html-ext.js + shims/
+	//path is path of html-ext.js-code + shims/
 	$.webshims.loader.basePath += 'shims/';
 	//load and implement all unsupported features
 	$.webshims.polyfill();
@@ -186,9 +211,9 @@ $(this).checkValidity();
 				</li>
 			</ul>
 			<h3>How to build an abstraction/extension, that works with and without webshims lib?</h3>
-			<p>TBD</p>
+			<p>Please read the developer guide for <a href="demos/z-advanced-developer.html#create-extensions">building extensions</a>.</p>
 			<h3>How to write a new feature implementation?</h3>
-			<p>TBD</p>
+			<p>Please read the developer guide for <a href="demos/z-advanced-developer.html#implement-features">implementing new features</a>.</p>
 		</section>
 		
 			
@@ -196,8 +221,9 @@ $(this).checkValidity();
 			<h3>Further Development</h3>
 			<p>Feel free to fork, collaborate, test develope extensions :-).</p>
 			<ul>
-				<li>simple audio/video implementation</li>
-				<li>improved audio/video implementation</li>
+				<li>audio/video implementation</li>
+				<li>ES5 - (maybe <a href="http://github.com/kriskowal/es5-shim/">ES5 shim</a>)</li>
+				<li>history (pushState etc.)/hashchange (maybe <a href="http://benalman.com/projects/jquery-hashchange-plugin/">hashchange</a> / <a href="http://github.com/fortes/history.js/">history</a>)</li>
 			</ul>
 		</section>
 		
@@ -279,5 +305,6 @@ $(this).checkValidity();
 			});
         });
     </script>
+	<script src="demo-js/demo.js"></script>
 </body>
 </html>   

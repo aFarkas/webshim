@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta charset="utf-8"/>
-    
 	<style>
 		#wrapper {
 			margin: auto;
@@ -28,17 +27,21 @@
 	
 	<script src="../src/shims/validity.js"></script>
 	<script src="../src/shims/placeholder.js"></script>
+	<script src="../src/shims/canvas.js"></script>
 	
     <script type="text/javascript" class="example">
+    	//path is path of html-ext.js + shims/
     	$.webshims.loader.basePath += 'shims/';
-		$.webshims.loader.loadList();
+		//load all defined modules (look into features.js)
+		//or load only a specific feature with $.webshims.polyfill('feature-name');
+		$.webshims.polyfill();
 		
         $(function(){
 			$('button.feature').bind('click', function(e){
 				var elem = $(this).parent().find(':input');
 				e.preventDefault();
 				if($(this).attr('data-action') === 'method'){
-					console.log(elem[$(this).attr('data-name')]());
+					console.log(elem[$(this).attr('data-name')]('test'));
 				} else {
 					console.log(elem.attr($(this).attr('data-name')));
 				} 
@@ -52,10 +55,10 @@
         });
 		
 		$.webshims.readyModules('ready geolocation', function(){
-			navigator.geolocation.getCurrentPosition(function(pos){
-				console.log(pos.coords.latitude +'|'+ pos.coords.longitude);
-				console.log(pos.timestamp)
-			});
+//			navigator.geolocation.getCurrentPosition(function(pos){
+//				console.log(pos.coords.latitude +'|'+ pos.coords.longitude);
+//				console.log(pos.timestamp)
+//			});
 		});
 		if(!window.console){
 			window.console = {log: $.noop};

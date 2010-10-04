@@ -121,7 +121,7 @@
 					}
 					parent = parent || doc.getElementsByTagName('head')[0] || doc.body;
 					loadedSrcs.push(src);
-					$(doc.createElement('link'))
+					$('<link rel="stylesheet" href="'+src+'" />')
 						.prependTo(parent)
 						.attr({
 							href: src,
@@ -164,16 +164,22 @@
 							}
 						}
 					;
+//					script.setAttribute('async', 'async');
 					script.src = src;
+					
 					script.onload = onLoad;
 					script.onerror = onLoad;
 					script.onreadystatechange = onLoad;
 					parent.appendChild(script);
+//					script.async = true;
 					loadedSrcs.push(src);
 				};
 			})()
 		},
-		readyModules: function(events, fn, _create){
+		readyModules: function(events, fn /*, _create, _notQueued*/){
+			var _create = arguments[2],
+				_notQueued 	= arguments[3]
+			;
 			if(typeof events == 'string'){
 				events = events.split(' ');
 				_create = true;
@@ -182,16 +188,20 @@
 				events = $.map(events, function(e){
 					return ($.webshims.loader.modules[e] || $.webshims.loader.features[e]) ? e +'Ready' : e;
 				});
-				
 			}
 			if(!events.length){
-				fn();
+				if(_notQueued){
+					fn();
+				} else {
+					setTimeout(fn, 0);
+				}
 				return;
 			}
 			var readyEv = events.shift(),
 				readyFn = function(){
-				$.webshims.readyModules(events, fn);
-			};
+					$.webshims.readyModules(events, fn, false, _notQueued);
+				}
+			;
 			if(readyEv == 'ready'){
 				$(readyFn);
 			} else {
@@ -344,7 +354,7 @@
 			$.fn[name].elementNames = elementNames;
 			
 		},
-		addModule: function(name, cfg){
+		addPolyfill: function(name, cfg){
 			cfg = cfg || {};
 			var feature 		= cfg.feature || name,
 				loader 			= $.webshims.loader,
@@ -392,6 +402,7 @@
 				}
 				toLoadFeatures = toLoadFeatures.concat(loader.features[feature]);
 			});
+			loader.loadCSS('shim.css');
 			loader.loadList(toLoadFeatures);
 		},
 		activeLang: (function(){
