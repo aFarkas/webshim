@@ -54,7 +54,7 @@
 			//prevent doubble invalids
 			if($.support.validity !== true || $.inArray(e.target, invalids) == -1){
 				invalids.push(e.target);
-			} else {
+			} else if(!window.noHTMLExtFixes) {
 //				doubled = true;
 				e.stopImmediatePropagation();
 			}
