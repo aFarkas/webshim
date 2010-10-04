@@ -73,14 +73,13 @@
 	
 	(function(){
 		var firstEvent,
-			firstOriginal,
 			invalids = [],
 			stopSubmitTimer,
-			form
-//			,doubled
+			form,
+			doubled
 		;
 		
-		//opera fix
+		//opera/chrome fix (this will double all invalid events, we have to stop them!)
 		//opera throws a submit-event and then the invalid events,
 		//chrome7 has disabled invalid events, this brings them back
 		if($.support.validity === true && document.addEventListener && !window.noHTMLExtFixes){
@@ -114,7 +113,6 @@
 				
 				//trigger firstinvalid
 				firstEvent = $.Event('firstinvalid');
-				firstOriginal = e;
 				$(e.target).trigger(firstEvent);
 			}
 			//if firstinvalid was prevented all invalids will be also prevented
@@ -125,21 +123,21 @@
 			if($.support.validity !== true || $.inArray(e.target, invalids) == -1){
 				invalids.push(e.target);
 			} else if(!window.noHTMLExtFixes) {
-//				doubled = true;
+				doubled = true;
 				e.stopImmediatePropagation();
 			}
+			e.extraData = 'fix'; 
 			clearTimeout(stopSubmitTimer);
 			stopSubmitTimer = setTimeout(function(){
 				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
-//				if( $.browser.webkit && !doubled && !firstOriginal.isDefaultPrevented() && firstEvent.target !== document.activeElement ){
-//					$.webshims.validityAlert.showFor(firstEvent.target);
-//				}
+				if( $.browser.webkit && !doubled && firstEvent.target !== document.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
+					$.webshims.validityAlert.showFor(firstEvent.target);
+				}
 				//reset firstinvalid
-//				doubled = false;
+				doubled = false;
 				firstEvent = false;
-				firstOriginal = false;
 				invalids = [];
-				//remove webkitfix
+				//remove webkit/operafix
 				$(form).unbind('submit.preventInvalidSubmit');
 				$(e.target).trigger(lastEvent, lastEvent);
 			}, 0);
@@ -306,7 +304,7 @@
 	} );
 	
 	
-	$.support.validationMessage = 'shim';
+	$.support.validationMessage = $.support.validationMessage || 'shim';
 })(jQuery);
 
 (function($){

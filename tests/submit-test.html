@@ -104,6 +104,7 @@
 					}
 				} else if(e.type == 'invalid'){
 					invalidEvents++;
+					e.extraData = 'test'; 
 					if(preventInvalid){
 						e.preventDefault();
 					}

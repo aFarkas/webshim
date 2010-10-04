@@ -73,8 +73,9 @@
 	
 	
 	if($.support.validity === true){
-		//create bubbling-like invalid event
-		$.webshims.capturingEvents(['invalid', 'input']);
+		//create delegatable-like events
+		$.webshims.capturingEvents(['input']);
+		$.webshims.capturingEvents(['invalid'], true);
 	}
 	
 	/* bugfixes, validation-message + fieldset.checkValidity pack */
