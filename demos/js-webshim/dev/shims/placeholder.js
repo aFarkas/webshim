@@ -167,5 +167,4 @@
 			return holder;
 		});
 	});
-	
 })(jQuery);

@@ -496,9 +496,6 @@
 			setter: function(elem, val, fn){
 				var type = getType(elem);
 				if(typeModels[type] && typeModels[type].numberToString){
-					if(!window.noHTMLExtFixes) {
-						throw("there are some serious issues in opera's implementation. don't use!");
-					}
 					//is NaN a number?
 					if(isNaN(val)){
 						$.attr(elem, 'value', '');

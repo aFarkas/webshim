@@ -577,7 +577,6 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 	
 	
 	//setting valueAsNumber
-	if (window.noHTMLExtFixes) {
 		$.each([{
 			id: 'time',
 			result: '13:30:30.5',
@@ -610,7 +609,6 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 				return (val === data.result);
 			}(), data.value + ' is as value: ' + data.result + ', element: ' + data.id + ', was: ' + val);
 		});
-	}
 	//setting valueAsDate (webkit orientated, not sure these test are right + time has a bug in different time zone)
 	if (window.noHTMLExtFixes) {
 		$.each([{
