@@ -3,7 +3,6 @@ module("validity");
 
 
 asyncTest("general validity Modul", function(){
-	
 	QUnit.reset();
 	
 	var form1 = $('#form-1');
@@ -174,7 +173,8 @@ asyncTest('validationMessage/setCustomValidity', function(){
 	});
 });
 
-asyncTest('checkValidity/invalid event', function(){
+//we split checkValidity test, because invalid workaround for chrome produces error || this error is negligible
+asyncTest('checkValidity/invalid event I', function(){
 	QUnit.reset();
 	var invalids = 0;
 	$('#form-1').bind('invalid', function(){
@@ -182,14 +182,51 @@ asyncTest('checkValidity/invalid event', function(){
 	});
 	ok(!$('#form-1').checkValidity(), 'validity is false for form-element (form)');
 	equals(invalids, 5, 'there were 5 invalid events (form)');
+		
+	$.webshims.ready('forms ready', function(){
+		start();
+	});
+});
+asyncTest('checkValidity/invalid event II', function(){
+	QUnit.reset();
+	var invalids = 0;
+	$('#form-1').bind('invalid', function(){
+		invalids++;
+	});
 	
-	invalids = 0;
 	ok(!$('#form-1 fieldset.check').checkValidity(), 'validity is false for fieldset-element (fieldset)');
 	equals(invalids, 5, 'there were 5 invalid events (fieldset)');
 	
-	invalids = 0;
+	
+	$.webshims.ready('forms ready', function(){
+		setTimeout(start, 0);
+	});
+});
+
+asyncTest('checkValidity/invalid event III', function(){
+	QUnit.reset();
+	var invalids = 0;
+	$('#form-1').bind('invalid', function(){
+		invalids++;
+	});
+	
 	ok(!$('#name').checkValidity(), 'validity is false for #name (element)');
 	equals(invalids, 1, 'there was 1 invalid event (element)');
+		
+	$.webshims.ready('forms ready', function(){
+		setTimeout(start, 16);
+	});
+});
+
+
+asyncTest('checkValidity/invalid event IV', function(){
+	QUnit.reset();
+	var invalids = 0;
+	$('#form-1').bind('invalid', function(){
+		invalids++;
+	});
+	
+	
 	$.each([
 		{
 			id: '#name',
@@ -214,11 +251,10 @@ asyncTest('checkValidity/invalid event', function(){
 			$(data.id).attr('checked', true);
 		}
 	});
-	invalids = 0;
 	ok($('#form-1').checkValidity(), 'validity is true for form-element');
 	equals(invalids, 0, 'there were 0 invalid events');
 	
 	$.webshims.ready('forms ready', function(){
-		start();
+		setTimeout(start, 32);
 	});
 });

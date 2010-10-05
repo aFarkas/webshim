@@ -62,7 +62,7 @@ asyncTest("placeholder Modul", function(){
 	placeholder.isVisible($('#placeholder-empty'), true);
 	
 		
-	$.webshims.ready('forms', function(){
+	$.webshims.ready('forms ready', function(){
 		start();
 	});
 });

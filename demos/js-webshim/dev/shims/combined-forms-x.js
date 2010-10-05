@@ -106,14 +106,11 @@
 		},
 		showFor: function(elem, noFocus){
 			elem = $(elem);
-			var widget = elem.data('inputUIReplace');
-			if(widget){
-				elem = widget.visual;
-			}
+			var visual = (elem.data('inputUIReplace') || {visual: elem}).visual;
 			this.createAlert();
 			this.clear();
 			this.getMessage(elem);
-			this.position(elem);
+			this.position(visual);
 			this.show();
 			if(!noFocus){
 				elem.focus();

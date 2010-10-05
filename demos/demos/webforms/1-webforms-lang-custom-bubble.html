@@ -15,6 +15,12 @@
 			margin: 5px 0;
 		}
 		
+		.invalid {
+			border: 1px solid #900;
+		}
+		.valid {
+			border: 1px solid #090;
+		}
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
@@ -28,7 +34,7 @@
 		//load all defined modules (look into features.js)
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
-        
+        		
     </script>
 	<script src="../../demo-js/demo.js"></script>
 	<title>HTML5 form/Web Forms 2.0 widgets and constraint validation API : webshims lib - the polyfilling capability based JS libary</title>
@@ -53,7 +59,8 @@
 			</nav>
 		</header>
 		<section>
-			<h2>Documentation adding/changing validation messages with webshims constraint validation</h2>
+			<h2>Documentation adding/changing and using validation messages with webshims constraint validation</h2>
+			<h3>Changing and Adding validation messages</h3>
 			<p>Webshims Lib validation messages are stored @ <code>$.webshims.validityMessages</code> as an object. The index is the specific language code. Currently there are only validation messages for "en" and "de".</p>
 			<p>Webshims Lib automatically shows the validation message in the detected language of the your browser. If the script doesn't find the right language, it will show the default language wich is stored under the key "".</p>
 			<p>You can easily add/change a language by specifiying a certain language code.</p>
@@ -77,24 +84,70 @@ $.webshims.validityMessages['en'] = {
 	valueMissing: 'changed You have to specify a value'
 };
 </code>
-			<p>There are several placeholders, wich you can use in your validation message: <code>{%label}</code> (the text of a label[for]), <code>{%value}</code>, <code>{%title}</code>, <code>{%min}</code>, <code>{%max}</code>, <code>{%maxlength}</code>, and <code>{%valueLen}</code> </p>
+			<p>There are several placeholders, wich you can use in your validation message: <code>{%label}</code> (the text of the label[for]), <code>{%value}</code>, <code>{%title}</code>, <code>{%min}</code>, <code>{%max}</code>, <code>{%maxlength}</code>, and <code>{%valueLen}</code> </p>
 			
-			<p>It is also possible to add more fine grained messages by providing an error message for a specific type. I.E. The follwoing code changes the validation message for a rangeUnderflow in case of the date-type. But will show a defaultMessage in any other type.</p>
+			<p>It is also possible to add more fine grained messages by providing an error message for a specific type.</p>
+			<p>The following code changes the validation message for a rangeUnderflow in case of the date-type. But will show the <code>defaultMessage</code> in any other type.</p>
 <code class="block run-once">
 	//extend the english
 	$.webshims.validityMessages['en'].rangeUnderflow = {
-		date: '{%value} is too early for {%label}. The earliest date you can use is {%max}.',
+		date: '{%value} is too early for {%label}. The earliest date you can use is {%min}.',
 		defaultMessage: $.webshims.validityMessages['en'].rangeUnderflow
 	};
 	
 	//extend the german
 	$.webshims.validityMessages['de'].rangeUnderflow = {
-		date: '{%value} ist zu früh für {%label}. Das früheste Datum, dass Sie wählen können ist {%max}.',
+		date: '{%value} ist zu früh für {%label}. Das früheste Datum, dass Sie wählen können ist {%min}.',
 		defaultMessage: $.webshims.validityMessages['de'].rangeUnderflow
 	};
 </code>
 			
-			<p>Note: These configurations will change the validation messages accessed by the DOM-property <code>validationMessage</code> and occuring on an invalid event in uncapable browsers. If you additionally want to use them in constraint validation supporting browsers, have a look into the <a href="2-webforms-custom-lang.html">custom validation messages and customizable invalid bubbles demo</a>.</p>
+			<p>Note: These configurations will change the validation messages accessed by the DOM-property <code>validationMessage</code> and occuring on an invalid event in uncapable browsers. If you additionally want to use them in constraint validation supporting browsers, you have to do some extras.</p>
+			
+			<h3>Using custom validationMessages in all browsers</h3>
+			
+			<p>The following code is will explain how to change the language. Although it uses some webshims extensions, it shows how you can easily achieve this with HTML5.</p>
+<code class="block run-once">
+
+//change language in all browsers to en (default is browser language)
+//$.webshims.activeLang('en');
+
+
+$.webshims.ready('ready forms', function(){
+	
+	//change validationMessage (HTML5 property) to customValidationMessage (custom abstraction)
+	//$.webshims.validityAlert is a usefull extension by webshim, wich sows and error bubble at a certain element
+	//simply call $.webshims.validityAlert.showFor(DOM-Element/jQuery-Object/jQuery-Selector);
+	//we override the getMessage-method to use the 'customValidationMessage'-property instead of the HTML5 validationMessage-property
+	$.webshims.validityAlert.getMessage = function(elem){
+		$('> div', this.alert).html(elem.attr('customValidationMessage'));
+	};
+	
+	
+	$('form')
+		//the invalid-event is the standard HTML5 validation event, 
+		//wich is called on every invalid event, if the user trys to submit an invalid form or 
+		//the author calls checkValidity on an invalid element
+		.bind('invalid', function(e){
+			//get the invalid element (e.target) and set the right classes at the nearest ancestor
+			$(e.target)
+				.closest('.form-element, fieldset')
+				.addClass('invalid')
+				.removeClass('valid')
+			;
+			
+			//preventing the default means to cancel the UI-Behavior generated by the browser (so that we can replace it)
+			e.preventDefault();
+		})
+		//custom event, wich is fired on the first invalid element
+		//preventing firstinvalid will prevent all invalid events (but we have already done this)
+		.bind('firstinvalid', function(e){
+			$.webshims.validityAlert.showFor(e.target);
+		})
+	;
+});
+</code>	
+			<p>Please let me know, if you enhance the current messages or add new languages.</p>
 			<section>
 				<h3>Simple Demo</h3>
 				<form action="#" method="post">
@@ -185,6 +238,34 @@ $.webshims.validityMessages['en'] = {
 	                </fieldset>
 	            </form>
 			</section>
+			
+			<h3>Now add some extras:</h3>
+			<p>Add valid/invalid Classes on focusout.</p>
+<code class="block run-once">	
+//on focusout / blur
+$('form').bind('focusout', function(e){
+	// get target element
+	var $elem = $(e.target);
+	//if the element is a candidate for constraint
+	if($elem.attr('willValidate')){
+		//test wether it is valid and set/remove the classes
+		if($elem.is(':valid')){
+			$elem
+				.closest('.form-element, fieldset')
+				.addClass('valid')
+				.removeClass('invalid')
+			;
+		} else {
+			$elem
+				.closest('.form-element, fieldset')
+				.addClass('invalid')
+				.removeClass('valid')
+			;
+		}	
+	}
+});
+</code>	
+
 	</section>
 				
 		<small>

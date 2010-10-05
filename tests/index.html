@@ -35,6 +35,12 @@
 				$.webshims.triggerDomUpdate($("#main, #qunit-fixture"));
 				return ret;
 			};
+			
+			module("init");
+			asyncTest("init", function(){
+				$.webshims.ready('forms ready', start);
+			});
+			
 		})();
 	</script>
 	
