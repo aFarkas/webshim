@@ -208,6 +208,7 @@ $(this).checkValidity();
 				</li>
 				<li>
 					<p>Most events in the HTML5 specification are so called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery can not really distinguish between the event phases (capturing/propagation), we use almost event capturing in the native implementation and $.fn.trigger in the shim.</p>
+					<p>This means, that the HTML5 events go down the DOM-tree in capable browsers and go up the tree in polyfilled browsers. This makes differences, if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default don't use <code>return false;</code> and use <code>event.preventDefault();</code> instead.</p>
 				</li>
 			</ul>
 			<h3>How to build an abstraction/extension, that works with and without webshims lib?</h3>
