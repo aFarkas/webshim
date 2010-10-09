@@ -223,7 +223,7 @@ asyncTest('step number/date module specific validity', function(){
 		},
 		{
 			attrs: {
-				value: '1510-12-11'
+				value: '1488-12-11'
 			},
 			trueState: 'valid'
 		},
