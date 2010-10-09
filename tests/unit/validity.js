@@ -75,7 +75,8 @@ asyncTest("general validity Modul", function(){
 			valid: false
 		}, 'email required');
 	}
-	
+	$('#email').val('some input');
+	ok($('#email').attr('validity').typeMismatch, 'typeMismatch is true for email and value: some input');
 	
 	$.each({
 		'info@c-t.de': 'valid', 

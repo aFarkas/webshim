@@ -94,7 +94,6 @@
 						}
 					});
 					$.each(toLoad, function(i, loadName){
-						
 						if ($.inArray(loadName, loadedModules) == -1) {
 							loader.loadScript(loader.modules[loadName].src || loadName, false, loadName);
 						}

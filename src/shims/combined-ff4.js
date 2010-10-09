@@ -300,12 +300,27 @@
 	});
 	
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
-	
 	var oldVal = $.fn.val;
+	var testValidity = function(elem){
+		if(!typeModels[(elem.getAttribute && elem.getAttribute('type') || '').toLowerCase()]){return;}
+		$.attr(elem, 'validity');
+	};
+	var oldAttr = $.attr;
+	var validityChanger = {value: 1, val: 1, min: 1, max: 1, step: 1};
+	$.attr = function(elem, prop, value){
+		var ret = oldAttr.apply(this, arguments);
+		if(validityChanger[prop] && value !== undefined){
+			testValidity(elem);
+		}
+		return ret;
+	};
+	
 	$.webshims.attr('validity', {
 		elementNames: ['input'],
 		getter: function(elem){
-			var validity = elem.validity;
+			var validity 	= elem.validity,
+				cache 		= {}
+			;
 			if(!validity){
 				return validity;
 			}
@@ -317,10 +332,10 @@
 			if( !$.attr(elem, 'willValidate') ){
 				return validityState;
 			}
-			
+			cache.type = (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase();
+			if(!typeModels[cache.type]){return validityState;}
 			var jElm 			= $(elem),
 				val				= oldVal.call(jElm),
-				cache 			= {},
 				customError 	= !!($.data(elem, 'hasCustomError'))
 			;
 			
@@ -365,22 +380,9 @@
 		error = error+'';
 		this.setCustomValidity(error);
 		$.data(this, 'hasCustomError', !!(error));
+		testValidity(this);
 	});
-	
-	
-	var testValidity = function(elem){
-		if(!typeModels[(elem.getAttribute && elem.getAttribute('type') || '').toLowerCase()]){return;}
-		$.attr(elem, 'validity');
-	};
-	$.webshims.attr('value', {
-		elementNames: ['input'],
-		setter: function(elem, value, oldEval){
-			oldEval();
-			testValidity(elem);
-		},
-		getter: true
-	});
-	
+		
 	
 	$.fn.val = function(val){
 		var ret = oldVal.apply(this, arguments);
