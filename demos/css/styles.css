@@ -45,11 +45,11 @@ body {
 }
 section, article, aside {margin: 20px 0; overflow: hidden; zoom: 1;}
 div.article-wrapper {
-	margin: 0 -20px;
+	margin: 0 -15px;
 }
 article {
-	margin: 30px 20px;
-	width: 340px;
+	margin: 30px 15px;
+	width: 330px;
 	display: inline-block;
 	vertical-align: top;
 }
@@ -142,9 +142,11 @@ code.block {
 	max-width: 400px;
 	margin: 0 15px 2px 0;
 }
+.form-element label,
 .te-webforms label {
 	display: block;
 	margin: 3px 0;
+	width: auto;
 }
 .te-webforms .form-element {
 	margin: 8px 0;
@@ -152,3 +154,4 @@ code.block {
 .te-webforms .form-element:first-child {
 	margin-top: 0;
 }
+

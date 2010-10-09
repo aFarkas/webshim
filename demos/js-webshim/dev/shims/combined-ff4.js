@@ -1,6 +1,176 @@
 /* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
 (function($){
 	
+	/*
+	 * Selectors for all browsers
+	 */
+	$.extend($.expr.filters, {
+		valid: function(elem){
+			return ($.attr(elem, 'validity') || {valid: true}).valid;
+		},
+		invalid: function(elem){
+			return !$.expr.filters.valid(elem);
+		},
+		willValidate: function(elem){
+			return $.attr(elem, 'willValidate');
+		}
+	});
+	
+	/* some extra validation UI */
+	$.webshims.validityAlert = (function(){
+		
+		var api = {
+			hideDelay: 5000,
+			showFor: function(elem, hideOnBlur){
+				elem = $(elem);
+				var visual = (elem.data('inputUIReplace') || {visual: elem}).visual;
+				createAlert();
+				clear();
+				this.getMessage(elem);
+				this.position(visual);
+				this.show();
+				
+				if(this.hideDelay){
+					hideTimer = setTimeout(boundHide, this.hideDelay);
+				}
+				if(!hideOnBlur){
+					elem.focus();
+					$(document).bind('focusout.validityalert', boundHide);
+				}
+			},
+			getMessage: function(elem){
+				$('> div', alert).html(elem.attr('validationMessage'));
+			},
+			position: function(elem){
+				var offset = elem.offset();
+				offset.top += elem.outerHeight();
+				alert.css(offset);
+			},
+			show: function(){
+				if(alert.css('display') === 'none'){
+					alert.fadeIn();
+				} else {
+					alert.fadeTo(1);
+				}
+			},
+			hide: function(){
+				clear();
+				alert.fadeOut();
+			}
+		};
+		
+		var alert = $('<div class="validity-alert" role="alert"><div class="va-box" /></div>').css({position: 'absolute', display: 'none'});
+		var hideTimer = false;
+		var boundHide = $.proxy(api, 'hide');
+		var created = false;
+		var createAlert = function(){
+			if(created){return;}
+			created = true;
+			$(function(){alert.appendTo('body');});
+		};
+		var clear = function(){
+			clearTimeout(hideTimer);
+			$(document).unbind('focusout.validityalert');
+			alert.stop();
+		};
+		return api;
+	})();
+	
+	$.webshims.validityMessages['en'] = $.webshims.validityMessages['en'] || $.webshims.validityMessages['en-US'] || {
+		typeMismatch: {
+			email: '{%value} is not a legal email address',
+			url: '{%value} is not a valid web address',
+			number: '{%value} is not a number!',
+			date: '{%value} is not a date',
+			time: '{%value} is not a time',
+			range: '{%value} is not a number!',
+			"datetime-local": '{%value} is not a correct date-time format.'
+		},
+		rangeUnderflow: '{%value} is too low. The lowest value you can use is {%min}.',
+		rangeOverflow: '{%value}  is too high. The highest value you can use is {%max}.',
+		stepMismatch: 'The value {%value} is not allowed for this form. Only certain values are allowed for this field. {%title}',
+		tooLong: 'The entered text is too large! You used {%valueLen} letters and the limit is {%maxlength}.',
+		
+		patternMismatch: '{%value} is not in the format this page requires! {%title}',
+		valueMissing: 'You have to specify a value'
+	};
+	
+	$.webshims.validityMessages['en-US'] = $.webshims.validityMessages['en-US'] || $.webshims.validityMessages['en'];
+	$.webshims.validityMessages[''] = $.webshims.validityMessages[''] || $.webshims.validityMessages['en'];
+	
+	$.webshims.validityMessages['de'] = $.webshims.validityMessages['de'] || {
+		typeMismatch: {
+			email: '{%value} ist keine zulässige E-Mail-Adresse',
+			url: '{%value} ist keine zulässige Webadresse',
+			number: '{%value} ist keine Nummer!',
+			date: '{%value} ist kein Datum',
+			time: '{%value} ist keine Uhrzeit',
+			range: '{%value} ist keine Nummer!',
+			"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
+		},
+		rangeUnderflow: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.',
+		rangeOverflow: '{%value} ist zu hoch. {%max} ist der oberste Wert, den Sie benutzen können.',
+		stepMismatch: 'Der Wert {%value} ist in diesem Feld nicht zulässig. Hier sind nur bestimmte Werte zulässig. {%title}',
+		tooLong: 'Der eingegebene Text ist zu lang! Sie haben {%valueLen} Buchstaben eingegeben, dabei sind {%maxlength} das Maximum.',
+		
+		patternMismatch: '{%value} hat für diese Seite ein falsches Format! {%title}',
+		valueMissing: 'Sie müssen einen Wert eingeben'
+	};
+	
+	var currentValidationMessage =  $.webshims.validityMessages[''];
+	$(document).bind('htmlExtLangChange', function(){
+		$.webshims.activeLang($.webshims.validityMessages, 'validation-base', function(langObj){
+			currentValidationMessage = langObj;
+		});
+	});
+	
+	$.webshims.createValidationMessage = function(elem, name){
+		var message = currentValidationMessage[name];
+		if(message && typeof message !== 'string'){
+			message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
+		}
+		if(message){
+			$.each(['value', 'min', 'max', 'title', 'maxlength', 'label'], function(i, attr){
+				if(message.indexOf('{%'+attr) === -1){return;}
+				var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
+				message = message.replace('{%'+ attr +'}', val);
+				if('value' == attr){
+					message = message.replace('{%valueLen}', val.length);
+				}
+			});
+		}
+		return message || '';
+	};
+		
+	$.each(($.support.validationMessage) ? ['customValidationMessage'] : ['customValidationMessage', 'validationMessage'], function(i, fn){
+		$.webshims.attr(fn, {
+			elementNames: ['input', 'select', 'textarea'],
+			getter: function(elem){
+				var message = '';
+				if(!$.attr(elem, 'willValidate')){
+					return message;
+				}
+				
+				var validity = $.attr(elem, 'validity') || {valid: 1};
+				if(validity.valid){return message;}
+				if(validity.customError || fn === 'validationMessage'){
+					message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
+					if(message){return message;}
+				}
+				$.each(validity, function(name, prop){
+					if(name == 'valid' || !prop){return;}
+					message = $.webshims.createValidationMessage(elem, name);
+					if(message){
+						return false;
+					}
+				});
+				
+				return message || '';
+			}
+		});
+	} );
+	
+	/* bugfixes */
 	(function(){
 		var firstEvent,
 			invalids = [],
@@ -75,162 +245,6 @@
 		});
 	})();
 	
-	
-	$.extend($.expr.filters, {
-		valid: function(elem){
-			return ($.attr(elem, 'validity') || {valid: true}).valid;
-		},
-		invalid: function(elem){
-			return !$.expr.filters.valid(elem);
-		},
-		willValidate: function(elem){
-			return $.attr(elem, 'willValidate');
-		}
-	});
-	
-	/* some extra validation UI */
-	var ValidityAlert = function(){this._create();};
-	
-	ValidityAlert.prototype = {
-		_create: function(){
-			this.alert = $('<div class="validity-alert" role="alert"><div class="va-box" /></div>').css({position: 'absolute', display: 'none'});
-			this.hideTimer = false;
-			this.boundHide = $.proxy(this, 'hide');
-		},
-		hideDelay: 5000,
-		createAlert: function(){
-			if(this.created){return;}
-			this.created = true;
-			var that = this;
-			$(function(){that.alert.appendTo('body');});
-		},
-		showFor: function(elem, noFocus){
-			elem = $(elem);
-			var visual = (elem.data('inputUIReplace') || {visual: elem}).visual;
-			this.createAlert();
-			this.clear();
-			this.getMessage(elem);
-			this.position(visual);
-			this.show();
-			if(!noFocus){
-				elem.focus();
-			}
-			this.hideTimer = setTimeout(this.boundHide, this.hideDelay);
-			$(document).bind('focusout.validityalert', this.boundHide);
-		},
-		getMessage: function(elem){
-			$('> div', this.alert).html(elem.attr('validationMessage'));
-		},
-		position: function(elem){
-			var offset = elem.offset();
-			offset.top += elem.outerHeight();
-			this.alert.css(offset);
-		},
-		clear: function(){
-			clearTimeout(this.hideTimer);
-			$(document).unbind('focusout.validityalert');
-			this.alert.stop().css({opacity: ''});
-		},
-		show: function(){
-			this.alert.fadeIn();
-		},
-		hide: function(){
-			this.clear();
-			this.alert.fadeOut();
-		}
-	};
-	$.webshims.validityAlert = new ValidityAlert();
-	
-	$.webshims.validityMessages['en'] = $.webshims.validityMessages['en'] || $.webshims.validityMessages['en-US'] || {
-		typeMismatch: {
-			email: '{%value} is not a legal email address',
-			url: '{%value} is not a valid web address',
-			number: '{%value} is not a number!',
-			date: '{%value} is not a date',
-			time: '{%value} is not a time',
-			range: '{%value} is not a number!',
-			"datetime-local": '{%value} is not a correct date-time format.'
-		},
-		rangeUnderflow: '{%value} is too low. The lowest value you can use is {%min}.',
-		rangeOverflow: '{%value}  is too high. The highest value you can use is {%max}.',
-		stepMismatch: 'The value {%value} is not allowed for this form. Only certain values are allowed for this field. {%title}',
-		tooLong: 'The entered text is too large! You used {%valueLen} letters and the limit is {%maxlength}.',
-		
-		patternMismatch: '{%value} is not in the format this page requires! {%title}',
-		valueMissing: 'You have to specify a value'
-	};
-	
-	$.webshims.validityMessages['en-US'] = $.webshims.validityMessages['en-US'] || $.webshims.validityMessages['en'];
-	$.webshims.validityMessages[''] = $.webshims.validityMessages[''] || $.webshims.validityMessages['en'];
-	
-	$.webshims.validityMessages['de'] = $.webshims.validityMessages['de'] || {
-		typeMismatch: {
-			email: '{%value} ist keine zulässige E-Mail-Adresse',
-			url: '{%value} ist keine zulässige Webadresse',
-			number: '{%value} ist keine Nummer!',
-			date: '{%value} ist kein Datum',
-			time: '{%value} ist keine Uhrzeit',
-			range: '{%value} ist keine Nummer!',
-			"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
-		},
-		rangeUnderflow: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.',
-		rangeOverflow: '{%value} ist zu hoch. {%max} ist der oberste Wert, den Sie benutzen können.',
-		stepMismatch: 'Der Wert {%value} ist in diesem Feld nicht zulässig. Hier sind nur bestimmte Werte zulässig. {%title}',
-		tooLong: 'Der eingegebene Text ist zu lang! Sie haben {%valueLen} Buchstaben eingegeben, dabei sind {%maxlength} das Maximum.',
-		
-		patternMismatch: '{%value} hat für diese Seite ein falsches Format! {%title}',
-		valueMissing: 'Sie müssen einen Wert eingeben'
-	};
-	
-	
-	$.webshims.activeValidationMessages = $.webshims.validityMessages[''];
-	$(document).bind('htmlExtLangChange', function(){
-		$.webshims.activeLang($.webshims.validityMessages, 'validation-base', function(langObj){
-			$.webshims.activeValidationMessages = langObj;
-		});
-	});
-		
-	$.each(($.support.validationMessage) ? ['customValidationMessage'] : ['customValidationMessage', 'validationMessage'], function(i, fn){
-		$.webshims.attr(fn, {
-			elementNames: ['input', 'select', 'textarea'],
-			getter: function(elem){
-				var message = '';
-				if(!$.attr(elem, 'willValidate')){
-					return message;
-				}
-				
-				var validity = $.attr(elem, 'validity') || {valid: 1};
-				if(validity.valid){return message;}
-				if(validity.customError || fn === 'validationMessage'){
-					message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
-					if(message){return message;}
-				}
-				$.each(validity, function(name, prop){
-					if(name == 'valid' || !prop){return;}
-					message = $.webshims.activeValidationMessages[name];
-					if(message && typeof message !== 'string'){
-						message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
-					}
-					if(message){
-						return false;
-					}
-				});
-				if(message){
-					$.each(['value', 'min', 'max', 'title', 'maxlength', 'label'], function(i, attr){
-						if(message.indexOf('{%'+attr) === -1){return;}
-						var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
-						message = message.replace('{%'+ attr +'}', val);
-						if('value' == attr){
-							message = message.replace('{%valueLen}', val.length);
-						}
-					});
-				}
-				return message || '';
-			}
-		});
-	} );
-	
-	
 	$.support.validationMessage = $.support.validationMessage || 'shim';
 })(jQuery);
 
@@ -258,7 +272,9 @@
 	});
 })(jQuery);
 (function($){
-	if($.support.validity === true && ( $('<input type="datetime-local" />')[0].type !== 'datetime-local' || $('<input type="range" />')[0].type !== 'range' )){return;}
+	
+	if($.support.validity === true && $('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range' ){return;}
+	
 	//prepare for ff4 have not testet yet
 	var typeModels = $.webshims.inputTypes;
 	$.webshims.addInputType = function(type, obj){
@@ -269,8 +285,23 @@
 	$.webshims.addValidityRule = function(type, fn){
 		validityRules[type] = fn;
 	};
+	
+	$.webshims.addValidityRule('typeMismatch',function (input, val, cache){
+		if(val === ''){return false;}
+		var ret = false;
+		if(!('type' in cache)){
+			cache.type = (input[0].getAttribute('type') || '').toLowerCase();
+		}
+		
+		if(typeModels[cache.type] && typeModels[cache.type].mismatch){
+			ret = typeModels[cache.type].mismatch(val, input);
+		}
+		return ret;
+	});
+	
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	
+	var oldVal = $.fn.val;
 	$.webshims.attr('validity', {
 		elementNames: ['input'],
 		getter: function(elem){
@@ -288,13 +319,25 @@
 			}
 			
 			var jElm 			= $(elem),
-				val				= jElm.val(),
-				cache 			= {}
+				val				= oldVal.call(jElm),
+				cache 			= {},
+				customError 	= !!($.data(elem, 'hasCustomError'))
 			;
 			
-			validityState.customError = !!($.data(elem, 'hasCustomError'));
-			if( validityState.customError ){
+			validityState.customError = customError;
+			if( validityState.valid && validityState.customError ){
 				validityState.valid = false;
+			} else if(!validityState.valid) {
+				var allFalse = true;
+				$.each(validityState, function(name, prop){
+					if(prop){
+						allFalse = false;
+						return false;
+					}
+				});
+				if(allFalse){
+					validityState.valid = true;
+				}
 			}
 			
 			//select
@@ -304,15 +347,10 @@
 			
 			$.each(validityRules, function(rule, fn){
 				var message;
-				if (fn(jElm, val, cache)) {
-					validityState[rule] = true;
-					if(validityState.valid){
-						message = $.webshims.activeValidationMessages[rule];
-						if(message && typeof message !== 'string'){
-							message = message[ cache.type || (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage || rule;
-						}
-						elem.setCustomValidity(message);
-					}
+				validityState[rule] = fn(jElm, val, cache);
+				if(validityState[rule] && validityState.valid) {
+					message = $.webshims.createValidationMessage(elem, rule);
+					elem.setCustomValidity(message);
 					validityState.valid = false;
 				}
 			});
@@ -331,7 +369,7 @@
 	
 	
 	var testValidity = function(elem){
-		if(!typeModels[(elem.getAttribute && this.getAttribute('type') || '').toLowerCase()]){return;}
+		if(!typeModels[(elem.getAttribute && elem.getAttribute('type') || '').toLowerCase()]){return;}
 		$.attr(elem, 'validity');
 	};
 	$.webshims.attr('value', {
@@ -343,7 +381,7 @@
 		getter: true
 	});
 	
-	var oldVal = $.fn.val;
+	
 	$.fn.val = function(val){
 		var ret = oldVal.apply(this, arguments);
 		this.each(function(){
@@ -357,12 +395,13 @@
 			testValidity(e.target);
 		}, true);
 	}
-	
-	$.webshims.addReady(function(context){
-		$('input', context).each(function(){
-			testValidity(this);
+	$.webshims.readyModules('number-date-type', function(){
+		$.webshims.addReady(function(context){
+			$('input', context).each(function(){
+				testValidity(this);
+			});
 		});
-	});
+	}, true, true);
 	
 })(jQuery);
 (function($){

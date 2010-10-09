@@ -14,35 +14,65 @@
     	<!-- first we create some feature combinations, to minimize http-requests -->
 		
 		<!-- good for FF3.x -->
-		<concat destfile="${shims}/combined-forms.js">
+		<concat destfile="${shims}/combined-ff3.js">
+			<fileset file="${shims}/es5.js" />
             <fileset file="${shims}/validation-base.js" />
             <fileset file="${shims}/validity.js" />
 			<fileset file="${shims}/number-date-type.js" />
 			<fileset file="${shims}/placeholder.js" />
         </concat>
 		
+		<!-- good for FF3.x -->
+		<concat destfile="${shims}/combined-ff3-light.js">
+			<fileset file="${shims}/es5.js" />
+            <fileset file="${shims}/validation-base.js" />
+            <fileset file="${shims}/validity.js" />
+			<fileset file="${shims}/placeholder.js" />
+        </concat>
+		
 		<!-- good for FF4.x -->
-		<concat destfile="${shims}/combined-forms-x.js">
+		<concat destfile="${shims}/combined-ff4.js">
             <fileset file="${shims}/validation-base.js" />
             <fileset file="${shims}/implement-types.js" />
 			<fileset file="${shims}/number-date-type.js" />
         </concat>
 		
 		<!-- good for ie9 -->
-		<concat destfile="${shims}/combined-xx.js">
+		<concat destfile="${shims}/combined-ie9.js">
             <fileset file="${shims}/geolocation.js" />
-            <fileset file="${shims}/combined-forms.js" />
+            <fileset file="${shims}/combined-ff3.js" />
+        </concat>
+		
+		<!-- good for ie9 -->
+		<concat destfile="${shims}/combined-ie9-light.js">
+            <fileset file="${shims}/geolocation.js" />
+            <fileset file="${shims}/combined-ff3-light.js" />
         </concat>
 		
 		<!-- good for ie8 -->
-		<concat destfile="${shims}/combined-x.js">
-            <fileset file="${shims}/combined-xx.js" />
+		<concat destfile="${shims}/combined-ie8.js">
+			<fileset file="${shims}/es5.js" />
+            <fileset file="${shims}/combined-ie9.js" />
+            <fileset file="${shims}/canvas.js" />
+        </concat>
+		
+		<!-- good for ie8 -->
+		<concat destfile="${shims}/combined-ie8-light.js">
+			<fileset file="${shims}/es5.js" />
+            <fileset file="${shims}/combined-ie9-light.js" />
             <fileset file="${shims}/canvas.js" />
         </concat>
 		
 		<!-- good for ie6/ie7 -->
-		<concat destfile="${shims}/combined-all.js">
-            <fileset file="${shims}/combined-x.js" />
+		<concat destfile="${shims}/combined-ie7.js">
+            <fileset file="${shims}/combined-ie8.js" />
+            <fileset file="${shims}/json-storage.js" />
+        </concat>
+		
+		
+		<!-- good for ie6/ie7 -->
+		<concat destfile="${shims}/combined-ie7-light.js">
+            <fileset file="${shims}/combined-ie8-light.js" />
             <fileset file="${shims}/json-storage.js" />
         </concat>
 		

@@ -1,5 +1,7 @@
 (function($){
-	if($.support.validity === true && ( $('<input type="datetime-local" />')[0].type !== 'datetime-local' || $('<input type="range" />')[0].type !== 'range' )){return;}
+	
+	if($.support.validity === true && $('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range' ){return;}
+	
 	//prepare for ff4 have not testet yet
 	var typeModels = $.webshims.inputTypes;
 	$.webshims.addInputType = function(type, obj){
@@ -10,8 +12,23 @@
 	$.webshims.addValidityRule = function(type, fn){
 		validityRules[type] = fn;
 	};
+	
+	$.webshims.addValidityRule('typeMismatch',function (input, val, cache){
+		if(val === ''){return false;}
+		var ret = false;
+		if(!('type' in cache)){
+			cache.type = (input[0].getAttribute('type') || '').toLowerCase();
+		}
+		
+		if(typeModels[cache.type] && typeModels[cache.type].mismatch){
+			ret = typeModels[cache.type].mismatch(val, input);
+		}
+		return ret;
+	});
+	
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	
+	var oldVal = $.fn.val;
 	$.webshims.attr('validity', {
 		elementNames: ['input'],
 		getter: function(elem){
@@ -29,13 +46,25 @@
 			}
 			
 			var jElm 			= $(elem),
-				val				= jElm.val(),
-				cache 			= {}
+				val				= oldVal.call(jElm),
+				cache 			= {},
+				customError 	= !!($.data(elem, 'hasCustomError'))
 			;
 			
-			validityState.customError = !!($.data(elem, 'hasCustomError'));
-			if( validityState.customError ){
+			validityState.customError = customError;
+			if( validityState.valid && validityState.customError ){
 				validityState.valid = false;
+			} else if(!validityState.valid) {
+				var allFalse = true;
+				$.each(validityState, function(name, prop){
+					if(prop){
+						allFalse = false;
+						return false;
+					}
+				});
+				if(allFalse){
+					validityState.valid = true;
+				}
 			}
 			
 			//select
@@ -45,15 +74,10 @@
 			
 			$.each(validityRules, function(rule, fn){
 				var message;
-				if (fn(jElm, val, cache)) {
-					validityState[rule] = true;
-					if(validityState.valid){
-						message = $.webshims.activeValidationMessages[rule];
-						if(message && typeof message !== 'string'){
-							message = message[ cache.type || (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage || rule;
-						}
-						elem.setCustomValidity(message);
-					}
+				validityState[rule] = fn(jElm, val, cache);
+				if(validityState[rule] && validityState.valid) {
+					message = $.webshims.createValidationMessage(elem, rule);
+					elem.setCustomValidity(message);
 					validityState.valid = false;
 				}
 			});
@@ -72,7 +96,7 @@
 	
 	
 	var testValidity = function(elem){
-		if(!typeModels[(elem.getAttribute && this.getAttribute('type') || '').toLowerCase()]){return;}
+		if(!typeModels[(elem.getAttribute && elem.getAttribute('type') || '').toLowerCase()]){return;}
 		$.attr(elem, 'validity');
 	};
 	$.webshims.attr('value', {
@@ -84,7 +108,7 @@
 		getter: true
 	});
 	
-	var oldVal = $.fn.val;
+	
 	$.fn.val = function(val){
 		var ret = oldVal.apply(this, arguments);
 		this.each(function(){
@@ -98,11 +122,12 @@
 			testValidity(e.target);
 		}, true);
 	}
-	
-	$.webshims.addReady(function(context){
-		$('input', context).each(function(){
-			testValidity(this);
+	$.webshims.readyModules('number-date-type', function(){
+		$.webshims.addReady(function(context){
+			$('input', context).each(function(){
+				testValidity(this);
+			});
 		});
-	});
+	}, true, true);
 	
 })(jQuery);

@@ -58,6 +58,8 @@
 					<li><a href="http://jdbartlett.github.com/innershiv/">innerShiv</a> by joe bartlett</li>
 					<li><a href="http://code.google.com/p/explorercanvas/">excanvas</a> by google erik arvidsson</li>
 					<li><a href="http://gist.github.com/350433">storage polyfill</a> by remy sharp</li>
+					<li><a href="http://github.com/kriskowal/es5-shim/">ES5 shim</a></li>
+					<li><a href="http://www.useragentman.com/blog/2010/07/27/cross-browser-html5-forms-using-modernizr-webforms2-and-html5widgets/">webforms2 and html5widgets</a> by weston ruter and zoltan hawryluk</li>
 					<li><a href="http://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-browser-Polyfills">List of shims by modernizr</a></li>
 				</ul>
 			</aside>
@@ -208,7 +210,7 @@ $(this).checkValidity();
 				</li>
 				<li>
 					<p>Most events in the HTML5 specification are so called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery can not really distinguish between the event phases (capturing/propagation), we use almost event capturing in the native implementation and $.fn.trigger in the shim.</p>
-					<p>This means, that the HTML5 events go down the DOM-tree in capable browsers and go up the tree in polyfilled browsers. This makes differences, if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default don't use <code>return false;</code> and use <code>event.preventDefault();</code> instead.</p>
+					<p>This means, that the HTML5 events go down the DOM-tree in capable browsers and go up the tree in polyfilled browsers. This can create differences, if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default don't use <code>return false;</code> and use <code>event.preventDefault();</code> instead.</p>
 				</li>
 			</ul>
 			<h3>How to build an abstraction/extension, that works with and without webshims lib?</h3>
@@ -223,7 +225,6 @@ $(this).checkValidity();
 			<p>Feel free to fork, collaborate, test develope extensions :-).</p>
 			<ul>
 				<li>audio/video implementation</li>
-				<li>ES5 - (maybe <a href="http://github.com/kriskowal/es5-shim/">ES5 shim</a>)</li>
 				<li>history (pushState etc.)/hashchange (maybe <a href="http://benalman.com/projects/jquery-hashchange-plugin/">hashchange</a> / <a href="http://github.com/fortes/history.js/">history</a>)</li>
 			</ul>
 		</section>
