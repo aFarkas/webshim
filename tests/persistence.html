@@ -7,22 +7,7 @@
 	<link rel="stylesheet" href="qunit/qunit.css" type="text/css" media="screen">
 	
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script>
-		(function(){
-			if(location.hash.replace('#', '') == 'noCapableBugfixes'){
-				window.noHTMLExtFixes = true; 
-			}
-			$(function(){
-				$('#bugfixes')
-					.attr('checked', !!window.noHTMLExtFixes)
-					.bind('click', function(){
-						location.hash = this.checked ? 'noCapableBugfixes' : '';
-						location.reload();
-					})
-				;
-			});
-		})();
-	</script>
+	
 	<script src="qunit/qunit.js"></script>
 	
 	<script src="../src/html-ext.js"></script>
@@ -56,9 +41,6 @@
 	</style>
 </head>
 <body class="flora">
-<div>
-	<input type="checkbox" id="bugfixes" /> <label for="bugfixes"><strong>without</strong> (capable browser) bugfixes</label>
-</div>
 <h1 id="qunit-header">QUnit Test Suite</h1>
 <h2 id="qunit-banner"></h2>
 <div id="qunit-testrunner-toolbar"></div>

@@ -32,6 +32,11 @@ asyncTest("general validity Modul", function(){
 	form1.find('#name').removeAttr('name');
 	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate: false without name' );
 	form1.find('#name').attr('name', 'name');
+	
+	form1.find('#name').attr('readonly', true);
+	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate: false with readonly' );
+	form1.find('#name').attr('readonly', false);
+	
 	//invalid
 	var invalid = $('input, textarea, select', form1).filter(':invalid');
 	equals( invalid.length, 5, 'total invalid' );
@@ -98,7 +103,7 @@ asyncTest("general validity Modul", function(){
 		ok($('#email').is(':'+state), val+' is '+state+' mail');
 	});
 	
-	$.webshims.readyModules('forms ready', function(){
+	$.webshims.ready('forms ready', function(){
 		start();
 	});
 });
@@ -152,7 +157,7 @@ asyncTest('email, url, pattern, maxlength', function(){
 	$('#pattern').val('1DHT');
 	ok($('#pattern').is(':valid'), '1DHT is valid pattern');
 	
-	$.webshims.readyModules('forms ready', function(){
+	$.webshims.ready('forms ready', function(){
 		start();
 	});
 });
@@ -169,7 +174,7 @@ asyncTest('validationMessage/setCustomValidity', function(){
 	$('#select').attr('disabled', false).setCustomValidity('');
 	ok(( $('#select').is(':valid') && $('#select').attr('willValidate') ), 'select is set valid again');
 	
-	$.webshims.readyModules('forms ready', function(){
+	$.webshims.ready('forms ready', function(){
 		start();
 	});
 });

@@ -711,7 +711,7 @@ if (!String.prototype.trim) {
 
 })();
 /* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
-(function($){
+jQuery.webshims.ready('es5', function($){
 	
 	/*
 	 * Selectors for all browsers
@@ -737,7 +737,8 @@ if (!String.prototype.trim) {
 				elem = $(elem);
 				var visual = (elem.data('inputUIReplace') || {visual: elem}).visual;
 				createAlert();
-				clear();
+				api.clear();
+				alert.attr('for', visual.attr('id'));
 				this.getMessage(elem);
 				this.position(visual);
 				this.show();
@@ -746,12 +747,12 @@ if (!String.prototype.trim) {
 					hideTimer = setTimeout(boundHide, this.hideDelay);
 				}
 				if(!hideOnBlur){
-					elem.focus();
+					visual.focus();
 					$(document).bind('focusout.validityalert', boundHide);
 				}
 			},
 			getMessage: function(elem){
-				$('> div', alert).html(elem.attr('validationMessage'));
+				$('> span', alert).html(elem.attr('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
@@ -762,16 +763,21 @@ if (!String.prototype.trim) {
 				if(alert.css('display') === 'none'){
 					alert.fadeIn();
 				} else {
-					alert.fadeTo(1);
+					alert.fadeTo(400, 1);
 				}
 			},
 			hide: function(){
-				clear();
+				api.clear();
 				alert.fadeOut();
+			},
+			clear: function(){
+				clearTimeout(hideTimer);
+				$(document).unbind('focusout.validityalert');
+				alert.stop().removeAttr('for');
 			}
 		};
 		
-		var alert = $('<div class="validity-alert" role="alert"><div class="va-box" /></div>').css({position: 'absolute', display: 'none'});
+		var alert = $('<label class="validity-alert" role="alert"><span class="va-box" /></label>').css({position: 'absolute', display: 'none'});
 		var hideTimer = false;
 		var boundHide = $.proxy(api, 'hide');
 		var created = false;
@@ -780,14 +786,10 @@ if (!String.prototype.trim) {
 			created = true;
 			$(function(){alert.appendTo('body');});
 		};
-		var clear = function(){
-			clearTimeout(hideTimer);
-			$(document).unbind('focusout.validityalert');
-			alert.stop();
-		};
 		return api;
 	})();
 	
+	/* implements validationMessage and customValidationMessage */
 	$.webshims.validityMessages['en'] = $.webshims.validityMessages['en'] || $.webshims.validityMessages['en-US'] || {
 		typeMismatch: {
 			email: '{%value} is not a legal email address',
@@ -800,7 +802,7 @@ if (!String.prototype.trim) {
 		},
 		rangeUnderflow: '{%value} is too low. The lowest value you can use is {%min}.',
 		rangeOverflow: '{%value}  is too high. The highest value you can use is {%max}.',
-		stepMismatch: 'The value {%value} is not allowed for this form. Only certain values are allowed for this field. {%title}',
+		stepMismatch: 'The value {%value} is not allowed for this form.',
 		tooLong: 'The entered text is too large! You used {%valueLen} letters and the limit is {%maxlength}.',
 		
 		patternMismatch: '{%value} is not in the format this page requires! {%title}',
@@ -882,7 +884,7 @@ if (!String.prototype.trim) {
 		});
 	} );
 	
-	/* bugfixes */
+	/* ugly workaround/bugfixes */
 	(function(){
 		var firstEvent,
 			invalids = [],
@@ -894,8 +896,8 @@ if (!String.prototype.trim) {
 		//opera/chrome fix (this will double all invalid events, we have to stop them!)
 		//opera throws a submit-event and then the invalid events,
 		//chrome7 has disabled invalid events, this brings them back
-		if($.support.validity === true && document.addEventListener && !window.noHTMLExtFixes){
-			document.addEventListener('submit', function(e){
+		if($.support.validity === true && window.addEventListener && !window.noHTMLExtFixes){
+			window.addEventListener('submit', function(e){
 				if(e.target.checkValidity && $.attr(e.target, 'novalidate') === undefined){
 					e.target.checkValidity();
 				}
@@ -942,7 +944,8 @@ if (!String.prototype.trim) {
 			clearTimeout(stopSubmitTimer);
 			stopSubmitTimer = setTimeout(function(){
 				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
-				if( $.browser.webkit && !doubled && firstEvent.target !== document.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
+				//if events aren't dubled, we have a bad implementation, if the event isn't prevented and the first invalid elemenet isn't focused we show custom bubble
+				if( !doubled && firstEvent.target !== document.activeElement && document.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
 					$.webshims.validityAlert.showFor(firstEvent.target);
 				}
 				//reset firstinvalid
@@ -957,36 +960,41 @@ if (!String.prototype.trim) {
 		});
 	})();
 	
-	$.support.validationMessage = $.support.validationMessage || 'shim';
-})(jQuery);
-
-(function($){
-	if($.support.validity !== true || $.support.fieldsetValidation || window.noHTMLExtFixes){
-		return;
-	}
-	$.support.fieldsetValidation = 'shim';
-	$.webshims.addMethod('checkValidity', function(error){
-		if($.nodeName(this, 'fieldset')){
-			var ret = true;
-			$(this.elements || 'input, textarea, select', this)
-				.each(function(){
-					 if(this.checkValidity){
-						if(!this.checkValidity()){
-							ret = false;
-						}
-					}
-				})
-			;
-			return ret;
-		} else if(this.checkValidity){
-			return this.checkValidity();
+	(function(){
+		if($.support.validity !== true || $.support.fieldsetValidation || window.noHTMLExtFixes){
+			return;
 		}
-	});
-})(jQuery);
-(function($){
+		$.support.fieldsetValidation = 'shim';
+		$.webshims.addMethod('checkValidity', function(error){
+			if($.nodeName(this, 'fieldset')){
+				var ret = true;
+				$(this.elements || 'input, textarea, select', this)
+					.each(function(){
+						 if(this.checkValidity){
+							if(!this.checkValidity()){
+								ret = false;
+							}
+						}
+					})
+				;
+				return ret;
+			} else if(this.checkValidity){
+				return this.checkValidity();
+			}
+		});
+	})();
+	
+	$.support.validationMessage = $.support.validationMessage || 'shim';
+	
+	$.webshims.createReadyEvent('validation-base');
+}, true, true);
+
+
+jQuery.webshims.ready('validation-base', function($){
 if($.support.validity){
 	return;
 }
+
 $.webshims.inputTypes = $.webshims.inputTypes || {};
 //some helper-functions
 var getNames = function(elem){
@@ -1221,7 +1229,7 @@ $.webshims.attr('willValidate', {
 			}
 		;
 		return function(elem){
-			return !!( elem.name && elem.form && !elem.disabled && !elem.readonly && !types[elem.type] && $.attr(elem.form, 'novalidate') === undefined );
+			return !!( elem.name && elem.form && !elem.disabled && !elem.readOnly && !types[elem.type] && $.attr(elem.form, 'novalidate') === undefined );
 		};
 	})()
 });
@@ -1273,17 +1281,12 @@ $.webshims.addReady(function(context){
 	;
 });
 
-
-})(jQuery);
-
-(function($){
+(function(){
 	
 if($.support.validity === true){
 	return;
 }
 $.support.validity = 'shim';
-
-
 	var elements = {
 			input: 1,
 			textarea: 1
@@ -1337,7 +1340,13 @@ $.support.validity = 'shim';
 			}
 		})
 	;
-})(jQuery);
+})();
+
+$.webshims.createReadyEvent('validity');
+
+}, true, true); //webshims.ready end
+
+
 
 /*
  * HTML5 placeholder-enhancer

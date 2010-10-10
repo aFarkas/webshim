@@ -352,7 +352,7 @@
 			);
 		}
 		(function(){
-			var options = $.webshims.loader.modules['number-date-type'].options;
+			var options = $.webshims.modules['number-date-type'].options;
 			var getNextStep = function(input, upDown, cache){
 				
 				cache = cache || {};
@@ -477,6 +477,7 @@
 					});
 				}
 			});
+			$.webshims.createReadyEvent('number-date-type');
 		})();
 		// add support for new input-types
 		
@@ -491,12 +492,10 @@
 		});
 	};
 	
-	if($.webshims.addValidityRule){
-		implementTypes();
-	}else if($.support.validity === true){
-		$.webshims.readyModules('implement-types', implementTypes, true, true);
+	if($.support.validity === true){
+		$.webshims.ready('implement-types', implementTypes, true, true);
 	} else {
-		$.webshims.readyModules('validity', implementTypes, true, true);
+		$.webshims.ready('validity', implementTypes, true, true);
 	}
 	
 })(jQuery);

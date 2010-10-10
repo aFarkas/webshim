@@ -19,6 +19,7 @@
             <fileset file="${shims}/validation-base.js" />
             <fileset file="${shims}/validity.js" />
 			<fileset file="${shims}/number-date-type.js" />
+			<fileset file="${shims}/inputUI.js" />
 			<fileset file="${shims}/placeholder.js" />
         </concat>
 		
@@ -35,18 +36,25 @@
             <fileset file="${shims}/validation-base.js" />
             <fileset file="${shims}/implement-types.js" />
 			<fileset file="${shims}/number-date-type.js" />
+			<fileset file="${shims}/inputUI.js" />
         </concat>
 		
 		<!-- good for ie9 -->
 		<concat destfile="${shims}/combined-ie9.js">
             <fileset file="${shims}/geolocation.js" />
-            <fileset file="${shims}/combined-ff3.js" />
+            <fileset file="${shims}/validation-base.js" />
+            <fileset file="${shims}/validity.js" />
+			<fileset file="${shims}/number-date-type.js" />
+			<fileset file="${shims}/inputUI.js" />
+			<fileset file="${shims}/placeholder.js" />
         </concat>
 		
 		<!-- good for ie9 -->
 		<concat destfile="${shims}/combined-ie9-light.js">
             <fileset file="${shims}/geolocation.js" />
-            <fileset file="${shims}/combined-ff3-light.js" />
+            <fileset file="${shims}/validation-base.js" />
+            <fileset file="${shims}/validity.js" />
+			<fileset file="${shims}/placeholder.js" />
         </concat>
 		
 		<!-- good for ie8 -->

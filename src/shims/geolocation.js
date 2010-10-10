@@ -39,7 +39,7 @@
 				;
 				if(!window.google || !google.loader){
 					//destroys document.write!!!
-					if($.webshims.loader.modules.geolocation.options.destroyWrite){
+					if($.webshims.modules.geolocation.options.destroyWrite){
 						document.write = domWrite;
 						document.writeln = domWrite;
 					}

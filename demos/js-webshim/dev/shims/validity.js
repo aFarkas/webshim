@@ -1,7 +1,8 @@
-(function($){
+jQuery.webshims.ready('validation-base', function($){
 if($.support.validity){
 	return;
 }
+
 $.webshims.inputTypes = $.webshims.inputTypes || {};
 //some helper-functions
 var getNames = function(elem){
@@ -236,7 +237,7 @@ $.webshims.attr('willValidate', {
 			}
 		;
 		return function(elem){
-			return !!( elem.name && elem.form && !elem.disabled && !elem.readonly && !types[elem.type] && $.attr(elem.form, 'novalidate') === undefined );
+			return !!( elem.name && elem.form && !elem.disabled && !elem.readOnly && !types[elem.type] && $.attr(elem.form, 'novalidate') === undefined );
 		};
 	})()
 });
@@ -288,17 +289,12 @@ $.webshims.addReady(function(context){
 	;
 });
 
-
-})(jQuery);
-
-(function($){
+(function(){
 	
 if($.support.validity === true){
 	return;
 }
 $.support.validity = 'shim';
-
-
 	var elements = {
 			input: 1,
 			textarea: 1
@@ -352,5 +348,11 @@ $.support.validity = 'shim';
 			}
 		})
 	;
-})(jQuery);
+})();
+
+$.webshims.createReadyEvent('validity');
+
+}, true, true); //webshims.ready end
+
+
 

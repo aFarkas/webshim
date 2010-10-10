@@ -30,6 +30,7 @@
 	<script src="../src/features.js"></script>
 	
     <script>
+    	
     	//basePath = url form html-ext.js (you can rename it) + relative url to shim folder
     	$.webshims.loader.basePath += 'shims/';
 		
@@ -38,8 +39,15 @@
 		//or load webform 2.0 shims $.webshims.loader.loadList(['validity', 'placeholder', 'validation-message', 'input-ui']);
 		$.webshims.polyfill();
 		
+		var capturedSubmitEvents;
+		if (document.addEventListener ) {
+			document.addEventListener('submit', function(e){
+				capturedSubmitEvents++;
+			}, true);
+		}
+		
 		$(function(){
-			var invalidEvents, submitEvents, preventInvalid;
+			var invalidEvents, submitEvents, preventInvalid, firstInvalidEvents;
 			
 			function equals(is, should, message){
 				message = $('<li>'+ message +' | was: '+ is +' expected: '+ should+'</li>').appendTo('#test-result');
@@ -48,7 +56,9 @@
 			
 			function reset(){
 				invalidEvents = 0;
+				firstInvalidEvents = 0;
 				submitEvents = 0;
+				capturedSubmitEvents = 0;
 				preventInvalid = false;
 				submitPrevent = true;
 				$('#test-result').empty();
@@ -61,6 +71,7 @@
 				setTimeout(function(){
 					equals(submitEvents, 0, 'no submit events');
 					equals(invalidEvents, 2, 'two invalid events');
+					equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
 				}, 10);
 			});
 			
@@ -72,6 +83,8 @@
 				setTimeout(function(){
 					equals(submitEvents, 0, 'no submit events');
 					equals(invalidEvents, 2, 'two invalid events');
+					equals(firstInvalidEvents, 1, '1 firstinvalid event');
+					equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
 				}, 10);
 			});
 			
@@ -81,7 +94,9 @@
 				$('input[type=text]').attr('value', '');
 				setTimeout(function(){
 					equals(submitEvents, 0, 'no submit events');
-					equals(invalidEvents, 2, 'two invalid events');
+					equals(invalidEvents, 2, '2 invalid events');
+					equals(firstInvalidEvents, 1, '1 firstinvalid event');
+					equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
 				}, 10);
 			});
 			
@@ -91,24 +106,34 @@
 				$('input.text').attr('value', 'some value');
 				setTimeout(function(){
 					equals(submitEvents, 1, '1 submit events');
+					equals(firstInvalidEvents, 0, 'no firstinvalid event');
 					equals(invalidEvents, 0, 'no invalid events');
+					equals(capturedSubmitEvents, 1, "captured submit events (negligible|won't fix)");
 				}, 10);
 			});
 			
 			
-			$('form').bind('submit invalid', function(e){
-				if(e.type == 'submit'){
-					submitEvents++;
-					if(submitPrevent){
-						e.preventDefault();
-					}
-				} else if(e.type == 'invalid'){
-					invalidEvents++;
-					e.extraData = 'test'; 
-					if(preventInvalid){
-						e.preventDefault();
-					}
+			$('form').bind('submit invalid firstinvalid', function(e){
+				
+				switch(e.type) {
+					case 'submit':
+						submitEvents++;
+						if(submitPrevent){
+							e.preventDefault();
+						}
+						break;
+					case 'invalid':
+						invalidEvents++;
+						e.extraData = 'test'; 
+						if(preventInvalid){
+							e.preventDefault();
+						}
+						break;
+					case 'firstinvalid':
+						firstInvalidEvents++;
+						break;
 				}
+
 			});
 		});
     </script>

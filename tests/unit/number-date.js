@@ -165,6 +165,20 @@ asyncTest('step number/date module specific validity', function(){
 		},
 		{
 			attrs: {
+				value: '5',
+				min: '5'
+			},
+			trueState: 'valid'
+		},
+		{
+			attrs: {
+				value: '6',
+				max: '6'
+			},
+			trueState: 'valid'
+		},
+		{
+			attrs: {
 				value: '-8',
 				max: '6',
 				min: ''
@@ -255,6 +269,20 @@ asyncTest('step number/date module specific validity', function(){
 			attrs: {
 				max: '2010-09-31',
 				value: '2010-10-02'
+			},
+			trueState: 'valid'
+		},
+		{
+			attrs: {
+				max: '2010-09-02',
+				value: '2010-09-02'
+			},
+			trueState: 'valid'
+		},
+		{
+			attrs: {
+				min: '2010-09-02',
+				value: '2010-09-02'
 			},
 			trueState: 'valid'
 		},
@@ -354,10 +382,24 @@ asyncTest('step number/date module specific validity', function(){
 		},
 		{
 			attrs: {
+				value: '01:30',
+				min: '01:20'
+			},
+			trueState: 'valid'
+		},
+		{
+			attrs: {
 				value: '20:30',
 				max: '18:20'
 			},
 			trueState: 'rangeOverflow'
+		},
+		{
+			attrs: {
+				value: '20:30',
+				max: '20:30'
+			},
+			trueState: 'valid'
 		}
 	],
 	createTestMethodA('time'));
@@ -425,6 +467,20 @@ asyncTest('step number/date module specific validity', function(){
 		{
 			attrs: {
 				value: '1999-12-09T20:10',
+				min: '1999-12-09T20:10'
+			},
+			trueState: 'valid'
+		},
+		{
+			attrs: {
+				value: '1999-12-09T20:10',
+				max: '1999-12-09T20:10'
+			},
+			trueState: 'valid'
+		},
+		{
+			attrs: {
+				value: '1999-12-09T20:10',
 				step: '',
 				min: '1999-12-09T20:11',
 				max: '1999-12-09T20:09'
@@ -465,7 +521,7 @@ asyncTest('step number/date module specific validity', function(){
 	createTestMethodA('range'));
 	
 	
-	$.webshims.readyModules('forms ready', function(){
+	$.webshims.ready('forms ready', function(){
 		start();
 	});
 	
@@ -689,7 +745,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			}
 		});
 	}
-	$.webshims.readyModules('forms ready', function(){
+	$.webshims.ready('forms ready', function(){
 		start();
 	});
 });

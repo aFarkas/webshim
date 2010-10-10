@@ -1,7 +1,6 @@
 (function($){
 	
 	if($.support.validity === true && $('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range' ){return;}
-	
 	//prepare for ff4 have not testet yet
 	var typeModels = $.webshims.inputTypes;
 	$.webshims.addInputType = function(type, obj){
@@ -124,12 +123,13 @@
 			testValidity(e.target);
 		}, true);
 	}
-	$.webshims.readyModules('number-date-type', function(){
+	$.webshims.ready('validation-base', function(){
 		$.webshims.addReady(function(context){
 			$('input', context).each(function(){
 				testValidity(this);
 			});
 		});
+		$.webshims.createReadyEvent('implement-types');
 	}, true, true);
 	
 })(jQuery);

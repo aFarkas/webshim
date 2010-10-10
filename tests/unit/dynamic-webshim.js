@@ -23,7 +23,7 @@ asyncTest("dynamic webshim Modul", function(){
 	testElem.remove();
 	
 	
-	$.webshims.readyModules('ready forms', function(){
+	$.webshims.ready('ready forms', function(){
 		start();
 	});
 });

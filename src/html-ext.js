@@ -4,23 +4,28 @@
 	'abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section source summary time track video'.replace(/\w+/g,function(n){doc.createElement(n);});
 	$.support.dynamicHTML5 =  !!($('<video><div></div></video>')[0].innerHTML);
 	
-	var isReady = function(names, noReady, noForce){
+	var isReady = function(names, noReady/*, noForce*/){
+		var noForce = arguments[2];
 		if(!names){return;}
 		if(!$.isArray(names)){
 			names = [names];
 		}
+		
 		$.each(names, function(i, name){
-			if(noForce && $.webshims.loader.modules[name] && $.webshims.loader.modules[name].noAutoCallback ){return;}
+			if(noForce && $.webshims.modules[name] && $.webshims.modules[name].noAutoCallback ){return;}
 			if(!noReady){
 				name = name +'Ready';
 			}
+			
 			if($.event.special[name] && $.event.special[name].add){return;}
-			$.event.trigger(name);
+			
 			$.event.special[name] = {
 				add: function( details ) {
 					details.handler.call(this, $.Event(name));
 				}
 			};
+			$.event.trigger(name);
+			
 		});
 	};
 	$.webshims = {
@@ -44,6 +49,10 @@
 			;
 		})(),
 		createReadyEvent: isReady,
+		moduleList: [],
+		modules: {},
+		features: {},
+		featureList: [],
 		loader: {
 			basePath: (function(){
 				var scripts = $('script'),
@@ -52,12 +61,8 @@
 				return path.slice(0, path.lastIndexOf("/") + 1);
 			})(),
 			combinations: {},
-			moduleList: [],
-			modules: {},
-			features: {},
-			featureList: [],
 			addModule: function(name, ext){
-				this.modules[name] = ext;
+				$.webshims.modules[name] = ext;
 			},
 			loadList: (function(){
 				var loadedModules = [];
@@ -66,7 +71,7 @@
 						loader = $.webshims.loader
 					;
 					$.each(list, function(i, name){
-						var module = loader.modules[name];
+						var module = $.webshims.modules[name];
 						if ('test' in module && module.test()) {
 							isReady(name);
 							return;
@@ -77,25 +82,27 @@
 						toLoad.push(name);
 					});
 					
-					
-					$.each(loader.combinations || [], function(combi, combiModules){
-						var loadCombi = true;
-						$.each(combiModules, function(i, combinedModule){
-							if ($.inArray(combinedModule, toLoad) === -1 || $.inArray(combinedModule, loadedModules) !== -1) {
-								loadCombi = false;
+					if(!$.webshims.debug){
+						$.each(loader.combinations || [], function(combi, combiModules){
+							
+							var loadCombi = true;
+							$.each(combiModules, function(i, combinedModule){
+								if ($.inArray(combinedModule, toLoad) === -1 || $.inArray(combinedModule, loadedModules) !== -1) {
+									loadCombi = false;
+									return false;
+								}
+							});
+							
+							if(loadCombi){
+								loadedModules = loadedModules.concat(combiModules);
+								loader.loadScript(combi, false, combiModules);
 								return false;
 							}
 						});
-						
-						if(loadCombi){
-							loadedModules = loadedModules.concat(combiModules);
-							loader.loadScript(combi, false, combiModules);
-							return false;
-						}
-					});
+					}
 					$.each(toLoad, function(i, loadName){
 						if ($.inArray(loadName, loadedModules) == -1) {
-							loader.loadScript(loader.modules[loadName].src || loadName, false, loadName);
+							loader.loadScript($.webshims.modules[loadName].src || loadName, false, loadName);
 						}
 					});
 				};
@@ -166,7 +173,6 @@
 					;
 					script.setAttribute('async', 'async');
 					script.src = src;
-					
 					script.onload = onLoad;
 					script.onerror = onLoad;
 					script.onreadystatechange = onLoad;
@@ -176,7 +182,7 @@
 				};
 			})()
 		},
-		readyModules: function(events, fn /*, _create, _notQueued*/){
+		ready: function(events, fn /*, _create, _notQueued*/){
 			var _create = arguments[2],
 				_notQueued 	= arguments[3]
 			;
@@ -184,24 +190,33 @@
 				events = events.split(' ');
 				_create = true;
 			}
+			
 			if(_create){
+				
 				events = $.map(events, function(e){
-					return ($.webshims.loader.modules[e] || $.webshims.loader.features[e]) ? e +'Ready' : e;
+					return ($.webshims.modules[e] || $.webshims.features[e]) ? e +'Ready' : e;
 				});
+				wasFormReady = (events.length > 1 && events[0] == 'placeholderReady');
 			}
+			
+			
 			if(!events.length){
+				
 				if(_notQueued){
-					fn();
+					fn($, $.webshims.modules);
 				} else {
-					setTimeout(fn, 0);
+					setTimeout(function(){
+						fn($, $.webshims.modules);
+					}, 0);
 				}
 				return;
 			}
 			var readyEv = events.shift(),
 				readyFn = function(){
-					$.webshims.readyModules(events, fn, false, _notQueued);
+					$.webshims.ready(events, fn, false, _notQueued);
 				}
 			;
+			
 			if(readyEv == 'ready'){
 				$(readyFn);
 			} else {
@@ -372,16 +387,17 @@
 		addPolyfill: function(name, cfg){
 			cfg = cfg || {};
 			var feature 		= cfg.feature || name,
-				loader 			= $.webshims.loader,
+				shims 			= $.webshims,
+				loader 			= shims.loader,
 				combinations 	= loader.combinations
 			;
-			if(!loader.features[feature]){
-				loader.features[feature] = [];
-				loader.featureList.push(feature);
+			if(!shims.features[feature]){
+				shims.features[feature] = [];
+				shims.featureList.push(feature);
 			}
-			loader.features[feature].push(name);
+			shims.features[feature].push(name);
 			loader.addModule(name, cfg);
-			loader.moduleList.push(name);
+			shims.moduleList.push(name);
 			$.each(cfg.combination || [], function(i, combi){
 				if(!combinations[combi]){
 					combinations[combi] = [name];
@@ -401,21 +417,22 @@
 		},
 		
 		polyfill: function(features){
-			var loader 	= $.webshims.loader,
+			var shims 	= this,
+				loader 	= shims.loader,
 				toLoadFeatures = []
 			;
-			features = features || loader.featureList;
+			features = features || shims.featureList;
 			if (typeof features == 'string') {
 				features = features.split(' ');
 			}
 			
 			$.each(features, function(i, feature){
-				if(feature !== loader.features[feature][0]){
-					$.webshims.readyModules(loader.features[feature], function(){
+				if(feature !== shims.features[feature][0]){
+					shims.ready(shims.features[feature], function(){
 						isReady(feature);
-					}, true);
+					}, true, true);
 				}
-				toLoadFeatures = toLoadFeatures.concat(loader.features[feature]);
+				toLoadFeatures = toLoadFeatures.concat(shims.features[feature]);
 			});
 			loader.loadCSS('shim.css');
 			loader.loadList(toLoadFeatures);
@@ -439,7 +456,7 @@
 							}, 9);
 						}
 					} else {
-						module = $.webshims.loader.modules[module].options;
+						module = $.webshims.modules[module].options;
 						var langObj = lang,
 							loadRemoteLang = function(lang){
 								if($.inArray(lang, remoteLangs) !== -1){
@@ -471,7 +488,6 @@
 			};
 		})()
 	};
-	$.webshims.ready =  $.webshims.readyModules;
 	(function(){
 		var readyFns = [];
 		$.extend($.webshims, {

@@ -60,13 +60,16 @@ form label.placeholder-text {
 }
 .validity-alert {
 	position: absolute;
+	display: inline-block;
 	background: #fff;
 	color: #000;
 	border: 1px solid #f00;
 	padding: 5px;
 	z-index: 10000;
 }
-
+.validity-alert span.va-box {
+	display: inline-block;
+}
 .step-controls {
 	position: relative;
 	zoom: 1;
