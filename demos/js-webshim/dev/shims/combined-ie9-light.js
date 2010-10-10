@@ -132,10 +132,11 @@ jQuery.webshims.ready('es5', function($){
 				clearTimeout(hideTimer);
 				$(document).unbind('focusout.validityalert');
 				alert.stop().removeAttr('for');
-			}
+			},
+			alert: $('<label class="validity-alert" role="alert"><span class="va-box" /></label>').css({position: 'absolute', display: 'none'})
 		};
 		
-		var alert = $('<label class="validity-alert" role="alert"><span class="va-box" /></label>').css({position: 'absolute', display: 'none'});
+		var alert = api.alert;
 		var hideTimer = false;
 		var boundHide = $.proxy(api, 'hide');
 		var created = false;
