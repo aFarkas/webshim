@@ -18,11 +18,11 @@
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script src="../../js-webshim/minified/html-ext.js"></script>
+	<script src="../../../src/html-ext.js"></script>
 	<script src="../../js-webshim/minified/features.js"></script>
 	
     <script class="example">
-    	
+    	$.webshims.debug = true;
 		//path is path of html-ext.js + shims/
     	$.webshims.loader.basePath += 'shims/';
 		//load all defined modules (look into features.js)
@@ -86,7 +86,8 @@
 	                        <label for="date">
 	                            date: <dfn title="required">*</dfn>
 							</label>
-	                       	<input name="date" required="required" type="date" id="date" />
+	                       	<input min="2011-10-11" name="date" required="required" type="date" id="date" />
+							(min="2011-10-11")
 							<hr />
 							<button class="feature" data-name="validity">$(this).attr('validity')</button>
 							<button class="feature" data-name="valueAsNumber">$(this).attr('valueAsNumber')</button>
@@ -106,7 +107,8 @@
 	                        <label for="number">
 	                            number: <dfn title="required">*</dfn>
 							</label>
-	                       	<input name="number" required="required" type="number" id="number" />
+	                       	<input min="2" max="4" step="0.5" name="number" required="required" type="number" id="number" />
+							(min="2"  max="4" step="0.5")
 							<hr />
 							$(this).attr("step", <input id="input-3" />);
 						 	<button class="feature setter" data-val="#input-3" data-name="step">change step</button>

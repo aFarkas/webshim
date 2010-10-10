@@ -107,8 +107,7 @@
 					if(isNaN(cache[data.attr+'AsNumber'])){
 						return ret;
 					}
-					
-					ret = ( cache[data.attr+'AsNumber'] * data.factor <=  cache.valueAsNumber * data.factor - EPS );
+					ret = ( cache[data.attr+'AsNumber'] * data.factor <  cache.valueAsNumber * data.factor - EPS );
 				}
 				return ret;
 			});
