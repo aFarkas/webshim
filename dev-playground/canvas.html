@@ -25,8 +25,7 @@
 	</style>
 	
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script src="../src/html-ext.js"></script>
-	<script src="../src/features.js"></script>
+	<script src="../src/polyfiller.js"></script>
 	
     <script type="text/javascript" class="example">
     	$.webshims.loader.basePath += 'shims/';
@@ -43,7 +42,7 @@
     </script>
 	
     <script type="text/javascript">
-        $.webshims.readyModules('ready canvasReady', function(){
+        $.webshims.ready('ready canvasReady', function(){
 			$('canvas.mouse-test').each(function(){
 				var elem = this;
 				var context = $(this).getContext('2d');

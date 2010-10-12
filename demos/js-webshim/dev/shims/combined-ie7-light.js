@@ -961,6 +961,7 @@ jQuery.webshims.ready('es5', function($){
 			invalids = [],
 			stopSubmitTimer,
 			form,
+			invalidTriggeredBySubmit,
 			doubled
 		;
 		
@@ -969,8 +970,8 @@ jQuery.webshims.ready('es5', function($){
 		//chrome7 has disabled invalid events, this brings them back
 		if($.support.validity === true && window.addEventListener && !window.noHTMLExtFixes){
 			window.addEventListener('submit', function(e){
-				if(e.target.checkValidity && $.attr(e.target, 'novalidate') === undefined){
-					e.target.checkValidity();
+				if(e.target.checkValidity && $.attr(e.target, 'novalidate') === undefined && !e.target.checkValidity()){
+					invalidTriggeredBySubmit = true;
 				}
 			}, true);
 		}
@@ -1016,12 +1017,13 @@ jQuery.webshims.ready('es5', function($){
 			stopSubmitTimer = setTimeout(function(){
 				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
 				//if events aren't dubled, we have a bad implementation, if the event isn't prevented and the first invalid elemenet isn't focused we show custom bubble
-				if( !doubled && firstEvent.target !== document.activeElement && document.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
+				if( invalidTriggeredBySubmit && !doubled && firstEvent.target !== document.activeElement && document.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
 					$.webshims.validityAlert.showFor(firstEvent.target);
 				}
 				//reset firstinvalid
 				doubled = false;
 				firstEvent = false;
+				invalidTriggeredBySubmit = false;
 				invalids = [];
 				//remove webkit/operafix
 				$(form).unbind('submit.preventInvalidSubmit');
@@ -1162,10 +1164,8 @@ $.webshims.addMethod('checkValidity', (function(){
 		if( !v.valid ){
 			e = $.Event('invalid');
 			var jElm = $(elem).trigger(e);
-			if(!e.isDefaultPrevented()){
-				if(!unhandledInvalids){
-					$.webshims.validityAlert.showFor(jElm);
-				}
+			if(!unhandledInvalids && !e.isDefaultPrevented()){
+				$.webshims.validityAlert.showFor(jElm);
 				unhandledInvalids = true;
 			}
 		}
@@ -2619,7 +2619,7 @@ var Storage = function (type) {
       clearData();
     },
     getItem: function (key) {
-      return data[key] || null;
+      return (key in data) ? data[key] : null;
     },
     key: function (i) {
       // not perfect, but works
@@ -2649,39 +2649,39 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 
 
 
-$.webshims.loader.loadList(['swfobject']);
 (function(){
 	var swfTimer;
-	$.webshims.localStorageSwfCallback = function(){
+	$.webshims.localStorageSwfCallback = function(type){
 		clearTimeout(swfTimer);
 		if(window.localStorage){
 			$.webshims.createReadyEvent('json-storage');
 			return;
 		}
-		var shim = document.getElementById('swflocalstorageshim');
-		//brute force flash getter
-		
-		if( !shim || typeof shim.GetVariable == 'undefined' ){
-			shim = document.swflocalstorageshim;
+		if(type === 'swf'){
+			var shim = document.getElementById('swflocalstorageshim');
+			//brute force flash getter
+			if( !shim || typeof shim.GetVariable == 'undefined' ){
+				shim = document.swflocalstorageshim;
+			}
+			if( !shim || typeof shim.GetVariable == 'undefined'){
+				shim = window.localstorageshim;
+			}
+			if(shim && typeof shim.GetVariable !== 'undefined'){
+				window.localStorage = {};
+				$.each(['key', 'setItem', 'getItem', 'removeItem', 'clear'], function(i, fn){
+					window.localStorage[fn] = shim[fn];
+				});
+			}
 		}
-		if( !shim || typeof shim.GetVariable == 'undefined'){
-			shim = window.localstorageshim;
-		}
-		if( !shim || typeof shim.GetVariable == 'undefined'){
+		if(!window.localStorage){
 			window.localStorage = new Storage('local');
-		} else {
-			window.localStorage = {};
-			$.each(['key', 'setItem', 'getItem', 'removeItem', 'clear'], function(i, fn){
-				window.localStorage[fn] = shim[fn];
-			});
 		}
-		if(window.localStorage){
-			$.webshims.createReadyEvent('json-storage');
-		}
+		$.webshims.createReadyEvent('json-storage');
 	};
 	
-	$.webshims.readyModules('ready swfobject', function(){
+	$.webshims.ready('ready swfobject', function(){
 		if(swfobject.hasFlashPlayerVersion('8.0.0')){
+			
 			swfobject.createCSS('#swflocalstorageshim', 'position: absolute; top: -1px; left: -1px; overflow: hidden; height: 1px; width: 1px;');
 			$('body').after('<div id="swflocalstorageshim" />');
 			swfobject.embedSWF($.webshims.loader.basePath +'localStorage.swf', 'swflocalstorageshim', '1', '1', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'localstorageshim'}, function(e){
@@ -2691,8 +2691,7 @@ $.webshims.loader.loadList(['swfobject']);
 			});
 			swfTimer = setTimeout($.webshims.localStorageSwfCallback, 9999);
 		} else if(!window.localStorage){
-			window.localStorage = new Storage('local');
-			$.webshims.createReadyEvent('json-storage');
+			$.webshims.localStorageSwfCallback();
 		}
 	}, true, true);
 })();

@@ -5,11 +5,10 @@
 	<meta charset="utf-8"/>
 	<link href="css/styles.css" rel="stylesheet" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script src="js-webshim/minified/html-ext.js"></script>
-	<script src="js-webshim/minified/features.js"></script>
+	<script src="js-webshim/minified/polyfiller.js"></script>
     <script class="example">
     	
-		//path is path of html-ext.js + shims/
+		//path is path of polyfiller.js + shims/
     	$.webshims.loader.basePath += 'shims/';
 		//load all defined modules (look into features.js)
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
@@ -133,16 +132,15 @@
 			
 			<ul>
 				<li>Take the 'js-webshim' folder and add it to your project (You will find a minified and a dev-folder there)</li>
-				<li>Embed the html-ext.js and features.js into your HTML-Page (you can concat/rename these files with your other js, at least the html-ext.js has to be included into the head)</li>
+				<li>Embed the polyfiller.js into your HTML-Page (you can concat/rename these files with your other js, at least the html-ext.js has to be included into the head)</li>
 				<li>Configure the webshims folder (<code>$.webshims.loader.basePath</code>) and load your features (<code>$.webshims.polyfill();</code>).</li>
 			</ul>
 			
 <code class="block">
-&lt;script src="js-webshim/minified/html-ext.js"&gt;&lt;/script&gt;
-&lt;script src="js-webshim/minified/features.js"&gt;&lt;/script&gt;
+&lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
 
 &lt;script&gt;
-	//path is path of html-ext.js-code + shims/
+	//path is path of polyfiller.js-code + shims/
 	$.webshims.loader.basePath += 'shims/';
 	//load and implement all unsupported features
 	$.webshims.polyfill();

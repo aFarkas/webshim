@@ -99,10 +99,8 @@ $.webshims.addMethod('checkValidity', (function(){
 		if( !v.valid ){
 			e = $.Event('invalid');
 			var jElm = $(elem).trigger(e);
-			if(!e.isDefaultPrevented()){
-				if(!unhandledInvalids){
-					$.webshims.validityAlert.showFor(jElm);
-				}
+			if(!unhandledInvalids && !e.isDefaultPrevented()){
+				$.webshims.validityAlert.showFor(jElm);
 				unhandledInvalids = true;
 			}
 		}

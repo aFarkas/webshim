@@ -5,12 +5,11 @@
 	<meta charset="utf-8"/>
 	<link href="../css/styles.css" rel="stylesheet" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script src="../js-webshim/minified/html-ext.js"></script>
-	<script src="../js-webshim/minified/features.js"></script>
+	<script src="../js-webshim/minified/polyfiller.js"></script>
 	
     <script class="example">
     	
-		//path is path of html-ext.js + shims/
+		//path is path of polyfiller.js + shims/
     	$.webshims.loader.basePath += 'shims/';
 		//load all defined modules (look into features.js)
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
@@ -44,7 +43,7 @@
 			<p>Webshim Lib for the feature <code>canvas</code> implements one simple jQuery-method <code>.getContext()</code> on Top of <a href="http://code.google.com/p/explorercanvas/">excanvas</a>.</p>
 			<canvas id="my-canvas" width="80" height="80"></canvas>
 <code class="block run-once">
-$.webshims.readyModules('canvas', function(){
+$.webshims.ready('canvas', function(){
 	var ctx = $('#my-canvas').getContext('2d');
 	ctx.fillStyle = "rgb(200,0,0)";  
 	ctx.fillRect (10, 10, 55, 50);  

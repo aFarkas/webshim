@@ -392,6 +392,7 @@
 				if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
 				$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
 				$(input).unbind('blur.stepeventshim').trigger('input');
+				//readd focus into element: especi
 				if( document.activeElement ){
 					if(document.activeElement !== input){
 						try {input.focus();} catch(e){}
@@ -465,13 +466,14 @@
 							})
 						;
 						
-						if(options.recalcWidth){
-							var padding = controls.outerWidth(true) + (parseInt($(this).css('padding'+dir.side), 10) || 0),
-								border	= parseInt($(this).css('border'+dir.side+'width'), 10) || 0
-							;
-							controls.css(dir.otherSide, (border + padding) * -1);
-							padding++;
-							$(this).css('width', $(this).width() - padding).css('padding'+dir.side, padding);
+						if(options.calculateWidth){
+							var width = $(this).width() || parseInt($(this).css('width'), 10);
+							if(!width){return;}
+							var margin = (parseInt($(this).css('margin'+dir.side), 10) || 0) + (parseInt(controls.css('margin'+dir.side), 10) || 0);
+							$(this).css('width', width - controls.outerWidth(true));
+							if(margin){
+								controls.css('margin'+dir.side, margin);
+							}
 						}
 					});
 				}

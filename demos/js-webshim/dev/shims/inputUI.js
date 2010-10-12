@@ -2,12 +2,6 @@
 	$.support.inputUI = 'shim';
 		
 	var options = $.webshims.modules.inputUI.options;
-	options.startInputUI = function(start){
-		if(start){
-			$.webshims.loader.loadList(['jquery-ui']);
-		}
-	};
-	options.startInputUI(options._autoStart);
 	
 	var replaceInputUI = function(context){
 		$('input', context).each(function(){
@@ -52,10 +46,18 @@
 			attr  = this.common(elem, date, replaceInputUI.date.attrs),
 			change = function(val, ui){
 				replaceInputUI.date.blockAttr = true;
-				elem.attr('value', $.datepicker.formatDate( 'yy-mm-dd', date.datepicker('getDate') ));
+				var value;
+				try {
+					value = $.datepicker.parseDate(data.settings.dateFormat, date.attr('value') );
+					value = (value) ? $.datepicker.formatDate( 'yy-mm-dd', value ) : date.attr('value');
+				} catch(e){
+					value = date.attr('value');
+				}
+				elem.attr('value', value);
 				replaceInputUI.date.blockAttr = false;
 				elem.trigger('change');
-			}
+			},
+			data
 		;
 		
 		if(attr.css){
@@ -64,15 +66,12 @@
 				date.outerWidth(attr.outerWidth);
 			}
 		}
-		date
-			.datepicker($.extend({}, options.date, {
-				onSelect: change
-			}))
+		data = date
+			.datepicker($.extend({}, options.date))
 			.bind('change', change)
 			.data('datepicker')
-			.dpDiv
-			.addClass('input-date-datepicker-control')
 		;
+		data.dpDiv.addClass('input-date-datepicker-control');
 		$.each(['disabled', 'min', 'max', 'value'], function(i, name){
 			elem.attr(name, function(i, value){return value || '';});
 		});
@@ -80,33 +79,33 @@
 	
 	replaceInputUI.date.attrs = {
 		disabled: function(orig, shim, value){
-			shim.datepicker( "option", "disabled", !!value );
+			shim.datepicker('option', 'disabled', !!value);
 		},
 		min: function(orig, shim, value){
 			try {
-				value = $.datepicker.parseDate('yy-mm-dd', value );
+				value = $.datepicker.parseDate('yy-mm-dd', value);
 			} catch(e){value = false;}
 			if(value){
-				shim.datepicker( 'option', 'minDate', value );
+				shim.datepicker('option', 'minDate', value);
 			}
 		},
 		max: function(orig, shim, value){
 			try {
-				value = $.datepicker.parseDate('yy-mm-dd', value );
+				value = $.datepicker.parseDate('yy-mm-dd', value);
 			} catch(e){value = false;}
 			if(value){
-				shim.datepicker( 'option', 'maxDate', value );
+				shim.datepicker('option', 'maxDate', value);
 			}
 		},
 		value: function(orig, shim, value){
 			if(!replaceInputUI.date.blockAttr){
 				try {
-					var dateValue = $.datepicker.parseDate('yy-mm-dd', value );
+					var dateValue = $.datepicker.parseDate('yy-mm-dd', value);
 				} catch(e){var dateValue = false;}
 				if(dateValue){
-					shim.datepicker( "setDate", dateValue );
+					shim.datepicker('setDate', dateValue);
 				} else {
-					shim.attr( "value", value );
+					shim.attr('value', value);
 				}
 			}
 		}
@@ -163,7 +162,7 @@
 			}
 		},
 		step: function(orig, shim, value){
-			value = (value) ? value * 1 || 1 : 1;
+			value = (value && $.trim(value)) ? value * 1 || 1 : 1;
 			shim.slider( "option", "step", value );
 		}
 	};

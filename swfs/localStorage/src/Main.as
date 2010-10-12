@@ -13,7 +13,7 @@ class Main
 		
 		ExternalInterface.addCallback('getItem', null, function(name) {
 			var val = storage.data[name];
-			return (typeof val == 'string') ? val : null;
+			return (typeof val == 'string') ? val || '' : null;
 		});
 		
 		ExternalInterface.addCallback('removeItem', null, function(name) {
@@ -40,8 +40,7 @@ class Main
 			}
 			return null;
 		});
-		ExternalInterface.call('alert', 'json-storage'); 
-		ExternalInterface.call('jQuery.webshims.localStorageSwfCallback', 'json-storage'); 
+		ExternalInterface.call('jQuery.webshims.localStorageSwfCallback', 'swf'); 
 	}
 		
 }

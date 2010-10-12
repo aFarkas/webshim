@@ -83,7 +83,7 @@ var Storage = function (type) {
       clearData();
     },
     getItem: function (key) {
-      return data[key] || null;
+      return (key in data) ? data[key] : null;
     },
     key: function (i) {
       // not perfect, but works
@@ -113,39 +113,39 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 
 
 
-$.webshims.loader.loadList(['swfobject']);
 (function(){
 	var swfTimer;
-	$.webshims.localStorageSwfCallback = function(){
+	$.webshims.localStorageSwfCallback = function(type){
 		clearTimeout(swfTimer);
 		if(window.localStorage){
 			$.webshims.createReadyEvent('json-storage');
 			return;
 		}
-		var shim = document.getElementById('swflocalstorageshim');
-		//brute force flash getter
-		
-		if( !shim || typeof shim.GetVariable == 'undefined' ){
-			shim = document.swflocalstorageshim;
+		if(type === 'swf'){
+			var shim = document.getElementById('swflocalstorageshim');
+			//brute force flash getter
+			if( !shim || typeof shim.GetVariable == 'undefined' ){
+				shim = document.swflocalstorageshim;
+			}
+			if( !shim || typeof shim.GetVariable == 'undefined'){
+				shim = window.localstorageshim;
+			}
+			if(shim && typeof shim.GetVariable !== 'undefined'){
+				window.localStorage = {};
+				$.each(['key', 'setItem', 'getItem', 'removeItem', 'clear'], function(i, fn){
+					window.localStorage[fn] = shim[fn];
+				});
+			}
 		}
-		if( !shim || typeof shim.GetVariable == 'undefined'){
-			shim = window.localstorageshim;
-		}
-		if( !shim || typeof shim.GetVariable == 'undefined'){
+		if(!window.localStorage){
 			window.localStorage = new Storage('local');
-		} else {
-			window.localStorage = {};
-			$.each(['key', 'setItem', 'getItem', 'removeItem', 'clear'], function(i, fn){
-				window.localStorage[fn] = shim[fn];
-			});
 		}
-		if(window.localStorage){
-			$.webshims.createReadyEvent('json-storage');
-		}
+		$.webshims.createReadyEvent('json-storage');
 	};
 	
-	$.webshims.readyModules('ready swfobject', function(){
+	$.webshims.ready('ready swfobject', function(){
 		if(swfobject.hasFlashPlayerVersion('8.0.0')){
+			
 			swfobject.createCSS('#swflocalstorageshim', 'position: absolute; top: -1px; left: -1px; overflow: hidden; height: 1px; width: 1px;');
 			$('body').after('<div id="swflocalstorageshim" />');
 			swfobject.embedSWF($.webshims.loader.basePath +'localStorage.swf', 'swflocalstorageshim', '1', '1', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'localstorageshim'}, function(e){
@@ -155,8 +155,7 @@ $.webshims.loader.loadList(['swfobject']);
 			});
 			swfTimer = setTimeout($.webshims.localStorageSwfCallback, 9999);
 		} else if(!window.localStorage){
-			window.localStorage = new Storage('local');
-			$.webshims.createReadyEvent('json-storage');
+			$.webshims.localStorageSwfCallback();
 		}
 	}, true, true);
 })();

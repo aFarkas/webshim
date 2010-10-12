@@ -961,6 +961,7 @@ jQuery.webshims.ready('es5', function($){
 			invalids = [],
 			stopSubmitTimer,
 			form,
+			invalidTriggeredBySubmit,
 			doubled
 		;
 		
@@ -969,8 +970,8 @@ jQuery.webshims.ready('es5', function($){
 		//chrome7 has disabled invalid events, this brings them back
 		if($.support.validity === true && window.addEventListener && !window.noHTMLExtFixes){
 			window.addEventListener('submit', function(e){
-				if(e.target.checkValidity && $.attr(e.target, 'novalidate') === undefined){
-					e.target.checkValidity();
+				if(e.target.checkValidity && $.attr(e.target, 'novalidate') === undefined && !e.target.checkValidity()){
+					invalidTriggeredBySubmit = true;
 				}
 			}, true);
 		}
@@ -1016,12 +1017,13 @@ jQuery.webshims.ready('es5', function($){
 			stopSubmitTimer = setTimeout(function(){
 				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
 				//if events aren't dubled, we have a bad implementation, if the event isn't prevented and the first invalid elemenet isn't focused we show custom bubble
-				if( !doubled && firstEvent.target !== document.activeElement && document.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
+				if( invalidTriggeredBySubmit && !doubled && firstEvent.target !== document.activeElement && document.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
 					$.webshims.validityAlert.showFor(firstEvent.target);
 				}
 				//reset firstinvalid
 				doubled = false;
 				firstEvent = false;
+				invalidTriggeredBySubmit = false;
 				invalids = [];
 				//remove webkit/operafix
 				$(form).unbind('submit.preventInvalidSubmit');
@@ -1162,10 +1164,8 @@ $.webshims.addMethod('checkValidity', (function(){
 		if( !v.valid ){
 			e = $.Event('invalid');
 			var jElm = $(elem).trigger(e);
-			if(!e.isDefaultPrevented()){
-				if(!unhandledInvalids){
-					$.webshims.validityAlert.showFor(jElm);
-				}
+			if(!unhandledInvalids && !e.isDefaultPrevented()){
+				$.webshims.validityAlert.showFor(jElm);
 				unhandledInvalids = true;
 			}
 		}
@@ -1813,6 +1813,7 @@ $.webshims.createReadyEvent('validity');
 				if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
 				$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
 				$(input).unbind('blur.stepeventshim').trigger('input');
+				//readd focus into element: especi
 				if( document.activeElement ){
 					if(document.activeElement !== input){
 						try {input.focus();} catch(e){}
@@ -1886,13 +1887,14 @@ $.webshims.createReadyEvent('validity');
 							})
 						;
 						
-						if(options.recalcWidth){
-							var padding = controls.outerWidth(true) + (parseInt($(this).css('padding'+dir.side), 10) || 0),
-								border	= parseInt($(this).css('border'+dir.side+'width'), 10) || 0
-							;
-							controls.css(dir.otherSide, (border + padding) * -1);
-							padding++;
-							$(this).css('width', $(this).width() - padding).css('padding'+dir.side, padding);
+						if(options.calculateWidth){
+							var width = $(this).width() || parseInt($(this).css('width'), 10);
+							if(!width){return;}
+							var margin = (parseInt($(this).css('margin'+dir.side), 10) || 0) + (parseInt(controls.css('margin'+dir.side), 10) || 0);
+							$(this).css('width', width - controls.outerWidth(true));
+							if(margin){
+								controls.css('margin'+dir.side, margin);
+							}
 						}
 					});
 				}
@@ -1923,12 +1925,6 @@ $.webshims.createReadyEvent('validity');
 	$.support.inputUI = 'shim';
 		
 	var options = $.webshims.modules.inputUI.options;
-	options.startInputUI = function(start){
-		if(start){
-			$.webshims.loader.loadList(['jquery-ui']);
-		}
-	};
-	options.startInputUI(options._autoStart);
 	
 	var replaceInputUI = function(context){
 		$('input', context).each(function(){
@@ -1973,10 +1969,18 @@ $.webshims.createReadyEvent('validity');
 			attr  = this.common(elem, date, replaceInputUI.date.attrs),
 			change = function(val, ui){
 				replaceInputUI.date.blockAttr = true;
-				elem.attr('value', $.datepicker.formatDate( 'yy-mm-dd', date.datepicker('getDate') ));
+				var value;
+				try {
+					value = $.datepicker.parseDate(data.settings.dateFormat, date.attr('value') );
+					value = (value) ? $.datepicker.formatDate( 'yy-mm-dd', value ) : date.attr('value');
+				} catch(e){
+					value = date.attr('value');
+				}
+				elem.attr('value', value);
 				replaceInputUI.date.blockAttr = false;
 				elem.trigger('change');
-			}
+			},
+			data
 		;
 		
 		if(attr.css){
@@ -1985,15 +1989,12 @@ $.webshims.createReadyEvent('validity');
 				date.outerWidth(attr.outerWidth);
 			}
 		}
-		date
-			.datepicker($.extend({}, options.date, {
-				onSelect: change
-			}))
+		data = date
+			.datepicker($.extend({}, options.date))
 			.bind('change', change)
 			.data('datepicker')
-			.dpDiv
-			.addClass('input-date-datepicker-control')
 		;
+		data.dpDiv.addClass('input-date-datepicker-control');
 		$.each(['disabled', 'min', 'max', 'value'], function(i, name){
 			elem.attr(name, function(i, value){return value || '';});
 		});
@@ -2001,33 +2002,33 @@ $.webshims.createReadyEvent('validity');
 	
 	replaceInputUI.date.attrs = {
 		disabled: function(orig, shim, value){
-			shim.datepicker( "option", "disabled", !!value );
+			shim.datepicker('option', 'disabled', !!value);
 		},
 		min: function(orig, shim, value){
 			try {
-				value = $.datepicker.parseDate('yy-mm-dd', value );
+				value = $.datepicker.parseDate('yy-mm-dd', value);
 			} catch(e){value = false;}
 			if(value){
-				shim.datepicker( 'option', 'minDate', value );
+				shim.datepicker('option', 'minDate', value);
 			}
 		},
 		max: function(orig, shim, value){
 			try {
-				value = $.datepicker.parseDate('yy-mm-dd', value );
+				value = $.datepicker.parseDate('yy-mm-dd', value);
 			} catch(e){value = false;}
 			if(value){
-				shim.datepicker( 'option', 'maxDate', value );
+				shim.datepicker('option', 'maxDate', value);
 			}
 		},
 		value: function(orig, shim, value){
 			if(!replaceInputUI.date.blockAttr){
 				try {
-					var dateValue = $.datepicker.parseDate('yy-mm-dd', value );
+					var dateValue = $.datepicker.parseDate('yy-mm-dd', value);
 				} catch(e){var dateValue = false;}
 				if(dateValue){
-					shim.datepicker( "setDate", dateValue );
+					shim.datepicker('setDate', dateValue);
 				} else {
-					shim.attr( "value", value );
+					shim.attr('value', value);
 				}
 			}
 		}
@@ -2084,7 +2085,7 @@ $.webshims.createReadyEvent('validity');
 			}
 		},
 		step: function(orig, shim, value){
-			value = (value) ? value * 1 || 1 : 1;
+			value = (value && $.trim(value)) ? value * 1 || 1 : 1;
 			shim.slider( "option", "step", value );
 		}
 	};

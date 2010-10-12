@@ -10,8 +10,7 @@
 	
 	<script src="qunit/qunit.js"></script>
 	
-	<script src="../src/html-ext.js"></script>
-	<script src="../src/features.js"></script>
+	<script src="../src/polyfiller.js"></script>
 	<script>
 		(function(){
 			var _reset = QUnit.reset;
@@ -22,7 +21,22 @@
 			};
 		})();
 	</script>
-	
+	<script>
+		(function(){
+			var _reset = QUnit.reset;
+			QUnit.reset = function(){
+				var ret = _reset.apply(this, arguments);
+				$.webshims.triggerDomUpdate($("#main, #qunit-fixture"));
+				return ret;
+			};
+			
+			module("init");
+			asyncTest("init", function(){
+				$.webshims.ready('ready', start);
+			});
+			
+		})();
+	</script>
 	<script src="unit/persistence-storage.js"></script>
 	<script>
 		

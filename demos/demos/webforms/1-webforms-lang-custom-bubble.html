@@ -24,11 +24,10 @@
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script src="../../js-webshim/minified/html-ext.js"></script>
-	<script src="../../js-webshim/minified/features.js"></script>
+	<script src="../../../src/polyfiller.js"></script>
     <script class="example">
-    	
-    	//path is path of html-ext.js + shims/
+    	$.webshims.debug = true;
+    	//path is path of polyfiller.js + shims/
     	$.webshims.loader.basePath += 'shims/';
 		//load all defined modules (look into features.js)
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
@@ -161,6 +160,12 @@ $.webshims.ready('ready forms', function(){
 	                            E-Mail:
 							</label>
 	                       	<input name="email" type="email" id="email" />
+	                    </div>
+						<div class="form-element">
+	                        <label for="range">
+	                            range:
+							</label>
+	                       	<input name="range" type="range" id="range" />
 	                    </div>
 						
 	                    <div class="form-element">

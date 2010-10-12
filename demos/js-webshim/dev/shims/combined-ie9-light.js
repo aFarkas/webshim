@@ -249,6 +249,7 @@ jQuery.webshims.ready('es5', function($){
 			invalids = [],
 			stopSubmitTimer,
 			form,
+			invalidTriggeredBySubmit,
 			doubled
 		;
 		
@@ -257,8 +258,8 @@ jQuery.webshims.ready('es5', function($){
 		//chrome7 has disabled invalid events, this brings them back
 		if($.support.validity === true && window.addEventListener && !window.noHTMLExtFixes){
 			window.addEventListener('submit', function(e){
-				if(e.target.checkValidity && $.attr(e.target, 'novalidate') === undefined){
-					e.target.checkValidity();
+				if(e.target.checkValidity && $.attr(e.target, 'novalidate') === undefined && !e.target.checkValidity()){
+					invalidTriggeredBySubmit = true;
 				}
 			}, true);
 		}
@@ -304,12 +305,13 @@ jQuery.webshims.ready('es5', function($){
 			stopSubmitTimer = setTimeout(function(){
 				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
 				//if events aren't dubled, we have a bad implementation, if the event isn't prevented and the first invalid elemenet isn't focused we show custom bubble
-				if( !doubled && firstEvent.target !== document.activeElement && document.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
+				if( invalidTriggeredBySubmit && !doubled && firstEvent.target !== document.activeElement && document.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
 					$.webshims.validityAlert.showFor(firstEvent.target);
 				}
 				//reset firstinvalid
 				doubled = false;
 				firstEvent = false;
+				invalidTriggeredBySubmit = false;
 				invalids = [];
 				//remove webkit/operafix
 				$(form).unbind('submit.preventInvalidSubmit');
@@ -450,10 +452,8 @@ $.webshims.addMethod('checkValidity', (function(){
 		if( !v.valid ){
 			e = $.Event('invalid');
 			var jElm = $(elem).trigger(e);
-			if(!e.isDefaultPrevented()){
-				if(!unhandledInvalids){
-					$.webshims.validityAlert.showFor(jElm);
-				}
+			if(!unhandledInvalids && !e.isDefaultPrevented()){
+				$.webshims.validityAlert.showFor(jElm);
 				unhandledInvalids = true;
 			}
 		}
