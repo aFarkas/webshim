@@ -1,12 +1,14 @@
 (function($){
 	var doc = document;
 	//simple shiv
+	//http://code.google.com/p/html5shim/
 	'abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section source summary time track video'.replace(/\w+/g,function(n){doc.createElement(n);});
 	$.support.dynamicHTML5 =  !!($('<video><div></div></video>')[0].innerHTML);
 	
 	
 	$.webshims = {
 		version: 'not versioned yet',
+		//http://jdbartlett.github.com/innershiv/
 		fixHTML5: (function(){
 			var d, b;
 			return ($.support.dynamicHTML5) ? 
@@ -25,7 +27,8 @@
 				}
 			;
 		})(),
-		createReadyEvent: function(names, noReady/*, noForce*/){
+		createReadyEvent: function(names/*, noReady, noForce*/){
+			var noReady = arguments[1];
 			var noForce = arguments[2];
 			if(!names){return;}
 			if(!$.isArray(names)){
@@ -194,13 +197,10 @@
 			}
 			
 			if(_create){
-				
 				events = $.map(events, function(e){
 					return (modules[e] || webshims.features[e]) ? e +'Ready' : e;
 				});
-				wasFormReady = (events.length > 1 && events[0] == 'placeholderReady');
 			}
-			
 			
 			if(!events.length){
 				
@@ -422,6 +422,9 @@
 				toLoadFeatures = []
 			;
 			features = features || shims.featureList;
+			if(features == 'lightweight'){
+				features = webshims.light;
+			}
 			if (typeof features == 'string') {
 				features = features.split(' ');
 			}
@@ -717,13 +720,9 @@
 		options: {
 			slider: {},
 			date: {},
-			langSrc: 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/i18n/jquery.ui.datepicker-',
+			langSrc: 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/i18n/jquery.ui.datepicker-',
 			availabeLangs: 'af ar az bg bs cs da de el en-GB eo es et eu fa fi fo fr fr-CH he hr hu hy id is it ja ko it lt lv ms nl no pl pt-BR ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' '),
 			recalcWidth: true,
-			_autoStart: true,
-			startInputUI: function(start){
-				this._autoStart = start;
-			},
 			replaceNative: false
 		}
 	});

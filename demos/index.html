@@ -146,14 +146,18 @@
 	$.webshims.polyfill();
 &lt;/script&gt;	
 </code>
-			<p>If you only want to implement a certain feature, simply pass the feature-name(s) you want to use to the polyfill-method (seperated by a whitespace):</p>
+
+			<p>The polyfill-method can also take a keyword called <code>lightweight</code>, wich will load a filesize-/feature balanced profile. The lightweight-profile currently loads all features, except of the <code>forms-ext</code> feature (numerical and date related web form features). The normal HTML5 <code>forms</code> feature including constraint validation (required, pattern, [type=email]) is loaded in this profile.</p>
 <code class="block">
+&lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
+
 &lt;script&gt;
-	//add support for canvas, JSON and localStorage/sessionsStorage
-	$.webshims.polyfill('canvas json-storage');
+	//path is path of polyfiller.js-code + shims/
+	$.webshims.loader.basePath += 'shims/';
+	//load and implement all unsupported features
+	$.webshims.polyfill('lightweight');
 &lt;/script&gt;	
-</code>
-			
+</code>			
 			<h3>When is a feature ready to use?</h3>
 			<p>Not every feature is ready immediately in all browsers. To get started, if a feature is ready, simply name the features you want to use and pass a callback-function to <code>$.webshims.ready</code></p>
 <code class="block">
@@ -189,7 +193,7 @@
 </code>	
 			
 			
-			<h3>minor Abstraction to DOM-Attributes, DOM-Methods and DOM-Events</h3>
+			<h3>minor Abstractions to DOM-Attributes, DOM-Methods and DOM-Events</h3>
 			<p>Due to the fact, that we can not extend the prototype of elements in all browsers, we always use jQuery as an extension-wrapper.</p>
 			<ul>
 				<li>
