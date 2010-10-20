@@ -41,16 +41,18 @@
 				<h1>Webshims Lib</h1>
 				<h2>Polyfill only the uncapable browsers</h2>
 			</hgroup>
-			<nav>
-				<ul>
-					<li><a href="../shiv.html">HTML5 shiv and innerShiv</a></li>
-					<li><a href="../webforms.html">constraint validation and input widgets</a></li>
-					<li><a href="../canvas.html">canvas</a></li>
-					<li><a href="../json-storage.html">storage and JSON</a></li>
-					<li><a href="../geolocation.html">geolocation API</a></li>
-				</ul>
-			</nav>
+			
 		</header>
+		<nav>
+			<ul>
+				<li><a href="../shiv.html">HTML5 shiv and innerShiv</a></li>
+				<li><a href="../es5.html">ES5/JavaScript 1.8.5</a></li>
+				<li><a href="../webforms.html">constraint validation and input widgets</a></li>
+				<li><a href="../canvas.html">canvas</a></li>
+				<li><a href="../json-storage.html">storage and JSON</a></li>
+				<li><a href="../geolocation.html">geolocation API</a></li>
+			</ul>
+		</nav>
 		<section>
 			<h2>Demo/About/Documentation of HTML5 constraint validation API</h2>
 			
@@ -80,6 +82,18 @@
 							<button class="feature" data-name="validationMessage">$(this).attr('validationMessage')</button>
 							<button class="feature method" data-name="checkValidity">$(this).checkValidity()</button>
 	                    </div>
+						
+						<div class="form-element">
+	                        <label for="date">
+	                            range:
+							</label>
+	                       	<input name="range" type="range" id="range" />
+							<hr />
+							<button class="feature" data-name="value">$(this).attr('value')</button>
+							$(this).attr("value", <input id="range-0" value="14" />);
+						 	<button class="feature setter" data-val="#range-0" data-name="value">set value</button>
+	                    </div>
+						
 						
 	                    <div class="form-element">
 	                        <label for="date">

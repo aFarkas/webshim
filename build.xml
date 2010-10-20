@@ -59,6 +59,7 @@
 		
 		<!-- good for ie8 -->
 		<concat destfile="${shims}/combined-ie8.js">
+			<fileset file="${shims}/html5shiv.js" />
 			<fileset file="${shims}/es5.js" />
             <fileset file="${shims}/combined-ie9.js" />
             <fileset file="${shims}/canvas.js" />
@@ -66,6 +67,7 @@
 		
 		<!-- good for ie8 -->
 		<concat destfile="${shims}/combined-ie8-light.js">
+			<fileset file="${shims}/html5shiv.js" />
 			<fileset file="${shims}/es5.js" />
             <fileset file="${shims}/combined-ie9-light.js" />
             <fileset file="${shims}/canvas.js" />

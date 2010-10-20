@@ -28,24 +28,46 @@
 				<h1>Webshims Lib</h1>
 				<h2>Polyfill only the uncapable browsers</h2>
 			</hgroup>
-			<nav>
-				<ul>
-					<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
-					<li><a href="webforms.html">constraint validation and input widgets</a></li>
-					<li><a href="canvas.html">canvas</a></li>
-					<li><strong>storage and JSON</strong></li>
-					<li><a href="geolocation.html">geolocation API</a></li>
-				</ul>
-			</nav>
+			
 		</header>
+		<nav>
+			<ul>
+				<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
+				<li><a href="es5.html">ES5/JavaScript 1.8.5</a></li>
+				<li><a href="webforms.html">constraint validation and input widgets</a></li>
+				<li><a href="canvas.html">canvas</a></li>
+				<li><strong>storage and JSON</strong></li>
+				<li><a href="geolocation.html">geolocation API</a></li>
+			</ul>
+		</nav>
 		<section>
 			<h2>Demo/About/Documentation JSON and localStorage/sessionStorage</h2>
-			
-			
+			<p>The <code>json-storage</code> feature implements JSON.<a href="https://developer.mozilla.org/En/Using_native_JSON">parse/stringify</a> via <a href="http://www.json.org/js.html">JSON2 script</a> and <a href="https://developer.mozilla.org/en/DOM/Storage">localStorage/sessinStorage</a>.</p>
+			<p>The Storage support is based on the <a href="http://gist.github.com/350433">storage polyfill</a> by Remy Sharp. It uses the window.name-trick to store data for the session and shared object (flash) or a cookie (only, if flash isn't available) for localStorage.</p>
+			<p>The following Storage-interface is implemented:</p>
+			<ul>
+				<li>setItem</li>
+				<li>getItem</li>
+				<li>removeItem</li>
+				<li>clear</li>
+				<li>key</li>
+			</ul>
+			<p>Note: That IDL-attributes and the length property aren't implemented.</p>
+			<p>Note: To use localStorage/sessionStorage you should test your webapp/website in an http-enivroment. IE8 in IE7 mode does have the localStorage-interface, but only works like sessionStorage, we don't fully support this mode.</p>
+<code class="block">
+$.webshims.ready('json-storage', function(){
+	if(localStorage.getItem('do-i-know-you') !== null){
+		//yes
+	}
+});
+</code>			
 			<aside>
 				<h3>Links about JSON and localStorage/sessionStorage</h3>
 				<ul>
-					<li><a href=""></a></li>
+					<li><a href="http://www.json.org/">JSON-Website</a></li>
+					<li><a href="http://dev.w3.org/html5/webstorage/">Webstorage (W3C)</a></li>
+					<li><a href="http://www.smashingmagazine.com/2010/10/11/local-storage-and-how-to-use-it/">Local Storage And How To Use It On Websites</a> (by Chris Heilmann)</li>
+					<li><a href="http://hacks.mozilla.org/2009/06/localstorage/">saving data with localStorage</a> by Christopher Blizzard (uses localStorage + JSON)</li>
 				</ul>
 			</aside>
 		</section>

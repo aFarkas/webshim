@@ -17,7 +17,7 @@
 				data = $.data(elem, 'placeHolder');
 				if(!data){return;}
 			}
-			if(type == 'focus'){
+			if(type == 'focus' || (!type && elem === document.activeElement)){
 				data.box.removeClass('placeholder-visible');
 				return;
 			}
@@ -94,8 +94,8 @@
 					});
 					var lineHeight 	= $.curCSS(elem, 'lineHeight'),
 						dims 		= {
-							width: $(elem).width() || parseInt($.curCSS(elem, 'width'), 10),
-							height: $(elem).height() || parseInt($.curCSS(elem, 'height'), 10)
+							width: $(elem).getwidth(),
+							height: $(elem).getheight()
 						},
 						cssFloat 		= $.curCSS(elem, 'float')
 					;

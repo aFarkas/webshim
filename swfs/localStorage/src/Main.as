@@ -13,14 +13,14 @@ class Main
 		
 		ExternalInterface.addCallback('getItem', null, function(name) {
 			var val = storage.data[name];
-			return (typeof val == 'string') ? val || '' : null;
+			return (typeof val == 'undefined') ? null  : val || '';
 		});
 		
 		ExternalInterface.addCallback('removeItem', null, function(name) {
 			delete storage.data[name];
 		});
 		
-		ExternalInterface.addCallback('setItem', null, function(name, val) {
+		ExternalInterface.addCallback('setItem', null, function(name, val) { 
 			storage.data[name] = '' + val;
 			storage.flush();
 		});

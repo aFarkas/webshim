@@ -21,7 +21,7 @@
 	    
 </head>
 
-<body>
+<body class="home">
 	<section id="wrapper"> 
 		<header>
 			<hgroup>
@@ -30,27 +30,47 @@
 			</hgroup>
 		</header>
 		<section>
-			<h2>About</h2>
-			<p>Webshims Lib enables / polyfills some of the latest Browserfeatures also known as "HTML5-Features" in non capable Browsers. It is build on Top of jQuery.</p>
+			<div class="home-box about-box">
+				<h2>About</h2>
+				<p>Webshims Lib enables / polyfills some of the latest Browserfeatures also known as "HTML5-Features" in non capable Browsers. It is build on Top of jQuery.</p>
+			</div>
+			<div class="home-box download-box">
+				<h3>Download</h3>
+				<p><a href="http://github.com/downloads/aFarkas/webshim/webshims-latest.zip">Webshims polyfilling Libary version 1.0.0beta1 (beta, but stable)</a></p>
+			</div>
+			<div class="home-box">
 			<h3>Main concepts</h3>
-			<ul>
-				<li><strong>Capability based loading</strong>: lightweight for good browsers / heavyweight for really bad browsers (I really like this)</li>
-				<li><strong>almost pure native and accurate APIs | no/less abstractions</strong>: Helps you to learn HTML5 (Markup-/DOM/JS-APIs) and to build usefull abstractions and extensions on top of the standard. Documentation is the specification (i.e.: <a href="http://dev.w3.org/html5/html-author/">HTML5 W3C Specification</a>)</li>
-				<li><strong>futureproof Feature-Detection</strong>: We try to feature detect everything instead of browsersniffing to be more futureproof</li>
-			</ul>
-			<div class="feature-example">
+				<ul>
+					<li><strong>Capability based loading</strong>: lightweight for good browsers / heavyweight for really bad browsers (I really like this)</li>
+					<li><strong>almost pure native and accurate APIs | no/less abstractions</strong>: Helps you to learn HTML5 (Markup-/DOM/JS-APIs) and to build usefull abstractions and extensions on top of the standard. Documentation is the specification (i.e.: <a href="http://dev.w3.org/html5/html-author/">HTML5 W3C Specification</a>)</li>
+					<li><strong>futureproof Feature-Detection</strong>: We try to feature detect everything instead of browsersniffing to be more futureproof</li>
+				</ul>
+			</div>
+			<div class="feature-example home-box">
 				<h3>What makes webshims lib differnt?</h3>
-				
+				<p>Did you ever tried to dynamically add/change the placeholder attribute with one of the other placeholder shims?</p>
 				<form action="#">
 					<input id="placeholder" placeholder="change me" />
 				</form>
-				<p>Did you ever tried to dynamically add/change the placeholder attribute with one of the other placeholder shims?</p>
+				
 				<code>$("#placeholder").attr("placeholder", "</code><input id="placeholder-text" /><code>");</code> <button>run code</button>
 				<div class="hidden-explanation">
 					<p>Being able to add/change the placeholder of an input element dynamically, isn't that important. It only shows how webshims lib works. With some little constraints you won't be able to recognize a difference between the shim and the native implementation. In some cases the shim will be more compilant, than the current browser implementations.</p>
 				</div>
 			</div>
-			<aside>
+			<div class="home-box">
+				<h3>Supported Browsers</h3>
+				<p>Webshims lib is testet in the following browsers (Webshims lib may support more than these):</p>
+				<ul>
+					<li>IE6+</li>
+					<li>Firefox 3.0+</li>
+					<li>Safari 5.0+</li>
+					<li>Chrome 5.0+</li>
+					<li>Opera 10.5+</li>
+				</ul>
+				
+			</div>
+			<aside class="home-box">
 				<h4>Similiar projects &amp; used third party scripts by webshims lib</h4>
 				<ul>
 					<li><a href="http://code.google.com/p/base2/">base2</a> by the grandmaster of webshims <a href="http://dean.edwards.name/">dean edwards</a></li>
@@ -71,12 +91,33 @@
 					<h3>Semantic Structure: Shiv solution</h3>
 					<p>Implements parsing/styling of HTML5 elements like section, article, footer, nav in IE8-. <a href="demos/shiv.html">more Information on shiv solution</a></p>
 				</article>
+				
+				<article>
+					<h3>ES5/JavaScript 1.8.5</h3>
+					<p>Array (some, forEach etc.), Object (keys, create etc.), Function (bind), Date (toJSON, now etc.). <a href="demos/es5.html">more Information on ES5/JavaScript 1.8.5 shim implementation</a></p>
+				</article>
+				
+				
+				<article>
+					<h3>JSON.parse/JSON.stringify &amp; localStorage/sessionStorage</h3>
+					<p>Implements JSON and the Webstorage API. <a href="demos/json-storage.html">more Information on geolocation shim implementation</a></p>
+				</article>
+				<article>
+					<h3>Geolocation</h3>
+					<div class="te-geolcation teaser-example">
+						<div id="geolocation"></div>
+						<button class="geolocation">Where am I?</button>
+					</div>
+					<p>Implements the geolocation API. <a href="demos/geolocation.html">more Information on geolocation shim implementation</a></p>
+				</article>
+				
+				
 				<article>
 					<h3>Canvas</h3>
 					<div  class="te-canvas teaser-example">
 						<canvas class="peter" width="200" height="200"></canvas>
 					</div>
-					<p>Implements canvas. <a href="#">more Information on canvas and canvas text solution</a></p>
+					<p>Implements canvas. <a href="demos/canvas.html">more Information on canvas shim implementation</a></p>
 				</article>
 				
 				<article>
@@ -110,20 +151,6 @@
 					
 				</article>
 				
-				<article>
-					<h3>JSON.parse/JSON.stringify &amp; localStorage/sessionStorage</h3>
-				</article>
-				<article>
-					<h3>Geolocation</h3>
-					<div class="te-geolcation teaser-example">
-						<div id="geolocation"></div>
-						<button class="geolocation">Where am I?</button>
-					</div>
-				</article>
-				<article>
-					<h3>ES5</h3>
-					<p>Array (some, forEach etc.), Object (keys, create etc.), Function (bind), Date (toJSON, now etc.)</p>
-				</article>
 			</div>
 		</section>
 		<section>
@@ -230,9 +257,19 @@ $(this).checkValidity();
 		<section>
 			<h3>Further Development</h3>
 			<p>Feel free to fork, collaborate, test develope extensions :-).</p>
+			<h4>Development for stable 1.0 release</h4>
 			<ul>
-				<li>audio/video implementation</li>
+				<li>improve current implementations</li>
+				<li>find and fix bugs in current implementations</li>
+				<li>improve documentation</li>
+				<li>implement: output-element, forminput-event and formnovalidate-attribute</li>
+			</ul>
+			<h4>Further Development for next major releases</h4>
+			<ul>
+				<li><a href="http://www.w3.org/TR/html5/video.html">audio/video</a> implementation</li>
 				<li>history (pushState etc.)/hashchange (maybe <a href="http://benalman.com/projects/jquery-hashchange-plugin/">hashchange</a> / <a href="http://github.com/fortes/history.js/">history</a>)</li>
+				<li><a href="http://www.w3.org/TR/html5/the-button-element.html#the-datalist-element">datalist-element</a></li>
+				<li><a href="http://www.w3.org/TR/html5/interactive-elements.html">interactive elements</a> (we should wait here, till a native implementation exists)</li>
 			</ul>
 		</section>
 		
@@ -248,7 +285,12 @@ $(this).checkValidity();
 				$('#geolocation').html('please wait calculating position');
 				navigator.geolocation.getCurrentPosition(function(pos){
 					elem.removeClass('loader');
-					$('#geolocation').html('I think you are @ latitude: '+ pos.coords.latitude +'/longitude: ' + pos.coords.longitude);
+					var loc = "I think you are ";
+					if(pos.address && pos.address.city){
+						loc += "in "+ pos.address.city +" ";
+					}
+					loc += "@ latitude: "+ pos.coords.latitude +"/longitude: " + pos.coords.longitude;
+					$('#geolocation').html(loc);
 				}, function(){
 					elem.removeClass('loader');
 					$('#geolocation').html('Oops, something went wrong');

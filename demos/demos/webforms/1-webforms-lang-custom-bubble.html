@@ -24,9 +24,8 @@
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script src="../../../src/polyfiller.js"></script>
+	<script src="../../js-webshim/minified/polyfiller.js"></script>
     <script class="example">
-    	$.webshims.debug = true;
     	//path is path of polyfiller.js + shims/
     	$.webshims.loader.basePath += 'shims/';
 		//load all defined modules (look into features.js)
@@ -45,16 +44,17 @@
 				<h1>Webshims Lib</h1>
 				<h2>Polyfill only the uncapable browsers</h2>
 			</hgroup>
-			<nav>
-				<ul>
-					<li><a href="../shiv.html">HTML5 shiv and innerShiv</a></li>
-					<li><a href="../webforms.html">constraint validation and input widgets</a></li>
-					<li><a href="../canvas.html">canvas</a></li>
-					<li><a href="../json-storage.html">storage and JSON</a></li>
-					<li><a href="../geolocation.html">geolocation API</a></li>
-				</ul>
-			</nav>
 		</header>
+		<nav>
+			<ul>
+				<li><a href="../shiv.html">HTML5 shiv and innerShiv</a></li>
+				<li><a href="../es5.html">ES5/JavaScript 1.8.5</a></li>
+				<li><a href="../webforms.html">constraint validation and input widgets</a></li>
+				<li><a href="../canvas.html">canvas</a></li>
+				<li><a href="../json-storage.html">storage and JSON</a></li>
+				<li><a href="../geolocation.html">geolocation API</a></li>
+			</ul>
+		</nav>
 		<section>
 			<h2>Documentation adding/changing and using validation messages with webshims constraint validation</h2>
 			<h3>Changing and Adding validation messages</h3>

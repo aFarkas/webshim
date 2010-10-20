@@ -1,18 +1,23 @@
 (function($){
+	
 	var doc = document;
 	//simple shiv
 	//http://code.google.com/p/html5shim/
-	'abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section source summary time track video'.replace(/\w+/g,function(n){doc.createElement(n);});
+	'polyfillspan abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section source summary time track video'.replace(/\w+/g,function(n){doc.createElement(n);});
 	$.support.dynamicHTML5 =  !!($('<video><div></div></video>')[0].innerHTML);
 	
+
 	
 	$.webshims = {
-		version: 'not versioned yet',
-		//http://jdbartlett.github.com/innershiv/
+		
+		version: '1.0.0beta1',
+		
 		fixHTML5: (function(){
 			var d, b;
 			return ($.support.dynamicHTML5) ? 
 				function(h){return h;} :
+				
+				
 				function(h) {
 					if (!d) {
 						b = document.body;
@@ -27,9 +32,9 @@
 				}
 			;
 		})(),
-		createReadyEvent: function(names/*, noReady, noForce*/){
-			var noReady = arguments[1];
-			var noForce = arguments[2];
+		
+		createReadyEvent: function(names){
+			var noForce = arguments[1];
 			if(!names){return;}
 			if(!$.isArray(names)){
 				names = [names];
@@ -37,36 +42,44 @@
 			
 			$.each(names, function(i, name){
 				if(noForce && modules[name] && modules[name].noAutoCallback ){return;}
-				if(!noReady){
+				if(modules[name] || webshims.features[name]){
 					name = name +'Ready';
 				}
 				
 				if($.event.special[name] && $.event.special[name].add){return;}
 				
-				$.event.special[name] = {
+				$.event.special[name] = $.extend($.event.special[name] || {}, {
 					add: function( details ) {
 						details.handler.call(this, $.Event(name));
 					}
-				};
+				});
 				$.event.trigger(name);
-				
 			});
 		},
+		
 		moduleList: [],
+		
 		modules: {},
+		
 		features: {},
+		
 		featureList: [],
+		
 		loader: {
+			
 			basePath: (function(){
 				var scripts = $('script'),
 					path 	= scripts[scripts.length - 1].src.split('?')[0]
 				;
 				return path.slice(0, path.lastIndexOf("/") + 1);
 			})(),
+			
 			combinations: {},
+			
 			addModule: function(name, ext){
 				modules[name] = ext;
 			},
+			
 			loadList: (function(){
 				var loadedModules = [];
 				return function(list){
@@ -112,6 +125,7 @@
 					});
 				};
 			})(),
+			
 			makePath: function(src){
 				if(src.indexOf('://') != -1 || src.indexOf('/') === 0){
 					return src;
@@ -122,6 +136,7 @@
 				}
 				return loader.basePath + src;
 			},
+			
 			loadCSS: (function(){
 				var parent, 
 					loadedSrcs = []
@@ -142,6 +157,7 @@
 					;
 				};
 			})(),
+			
 			loadScript: (function(){
 				var parent, 
 					loadedSrcs = []
@@ -171,7 +187,7 @@
 								if(callback){
 									callback(e, this);
 								}
-								isReady(name, false, true);
+								isReady(name, true);
 								script = null;
 							}
 						}
@@ -187,16 +203,16 @@
 				};
 			})()
 		},
-		ready: function(events, fn /*, _create, _notQueued*/){
-			var _create = arguments[2],
-				_notQueued 	= arguments[3]
+		
+		ready: function(events, fn /*, _notQueued, _created*/){
+			var _created = arguments[3],
+				_notQueued 	= arguments[2]
 			;
 			if(typeof events == 'string'){
 				events = events.split(' ');
-				_create = true;
 			}
 			
-			if(_create){
+			if(!_created){
 				events = $.map(events, function(e){
 					return (modules[e] || webshims.features[e]) ? e +'Ready' : e;
 				});
@@ -215,7 +231,7 @@
 			}
 			var readyEv = events.shift(),
 				readyFn = function(){
-					webshims.ready(events, fn, false, _notQueued);
+					webshims.ready(events, fn, _notQueued, true);
 				}
 			;
 			
@@ -225,6 +241,7 @@
 				$(doc).one(readyEv, readyFn);
 			}
 		},
+		
 		capturingEvents: function(names/*, _maybePrevented */){
 			if(!doc.addEventListener){return;}
 			var _maybePrevented = arguments[1];
@@ -261,6 +278,7 @@
 				});
 			});
 		},
+		
 		attr: (function(){
 			var attrFns = [{}];
 			var generateAttr = function(attrNames){
@@ -322,6 +340,7 @@
 				}
 			};
 		})(),
+		
 		createBooleanAttrs: function(names, elementNames){
 			if(typeof name === 'string'){
 				names = [names];
@@ -346,6 +365,7 @@
 				});
 			});
 		},
+		
 		addMethod: function(name, fn){
 			var elementNames = $.fn[name].elementNames || ['*'];
 			if( typeof elementNames == 'string' ){
@@ -366,6 +386,7 @@
 			$.fn[name].elementNames = elementNames;
 			$.fn[name].shim = true;
 		},
+		
 		addMethodName: function(name, elementNames){
 			if($.fn[name] && 'shim' in $.fn[name]){return;}
 			$.fn[name] = function(){
@@ -386,6 +407,7 @@
 			$.fn[name].elementNames = elementNames;
 			
 		},
+		
 		addPolyfill: function(name, cfg){
 			cfg = cfg || {};
 			var feature 		= cfg.feature || name,
@@ -433,13 +455,14 @@
 				if(feature !== shims.features[feature][0]){
 					shims.ready(shims.features[feature], function(){
 						isReady(feature);
-					}, true, true);
+					}, true);
 				}
 				toLoadFeatures = toLoadFeatures.concat(shims.features[feature]);
 			});
 			loader.loadCSS('shim.css');
 			loader.loadList(toLoadFeatures);
 		},
+		
 		activeLang: (function(){
 			var langs = [navigator.browserLanguage || navigator.language || ''];
 			var paLang = $('html').attr('lang');
@@ -520,10 +543,6 @@
 		
 	})();
 	
-	if(!$.support.dynamicHTML5 && document.attachEvent){
-		webshims.loader.loadScript('http://html5shim.googlecode.com/svn/trunk/html5.js');
-	}
-	
 	$.fn.htmlWebshim = function(a){
 		var ret = this.html((a) ? webshims.fixHTML5(a) : a);
 		if(ret === this && $.isReady){
@@ -547,6 +566,25 @@
 		};
 	});
 	
+	$.each({'height': ['height', 'innerHeight', 'outerHeight'], 'width': ['width', 'innerWidth', 'outerWidth']}, function(prop, fns){
+		$.each(fns, function(i, fn){
+			$.fn['get'+ fn] = function(){
+				if(!this[0]){return false;}
+				var ret = $.fn[fn].apply(this, arguments),
+					add
+				;
+				if(!this[0].offsetHeight && !this[0].offsetWidth){
+					add = parseInt(this.css(prop), 10);
+					if(!add){
+						return false;
+					}
+					ret += add;
+				}
+				return ret;
+			};
+		});
+	});
+	
 	isReady('htmlExtLangChange', true);
 	
 	/*
@@ -559,22 +597,23 @@
 	
 	loader.addModule('jquery-ui', {
 		src: 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js',
-		test: function(){
-			return !!($.widget && $.Widget);
-		}
+		test: function(){return !!($.widget && $.Widget);}
 	});
 	
 	loader.addModule('swfobject', {
 		src: 'http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js',
-		test: function(){
-			return ('swfobject' in window);
-		}
+		test: function(){return ('swfobject' in window);}
 	});
 	
 	/* 
 	 * polyfill-Modules 
 	 */
-	
+	addPolyfill('html5shiv', {
+		test: function(){
+			return $.support.dynamicHTML5;
+		},
+		combination: ['combined-ie7', 'combined-ie8', 'combined-ie7-light', 'combined-ie8-light']
+	});
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
 	$.support.es5 = !!(String.prototype.trim && Function.prototype.bind && !isNaN(Date.parse("T00:00")) && Date.now && Date.prototype.toISOString);
 	if($.support.es5){
@@ -731,7 +770,7 @@
 	/* placeholder */
 	
 	$.support.placeholder = ($('<input type="text" />').attr('placeholder') !== undefined);
-	webshims.addPolyfill('placeholder', {
+	addPolyfill('placeholder', {
 		feature: 'forms',
 		test: function(){
 			return $.support.placeholder;
@@ -745,7 +784,7 @@
 	/* json + loacalStorage */
 	
 	$.support.jsonStorage = ('JSON' in window && 'localStorage' in window && 'sessionStorage' in window);
-	webshims.addPolyfill('json-storage', {
+	addPolyfill('json-storage', {
 		test: function(){
 			return $.support.jsonStorage;
 		},
@@ -755,8 +794,10 @@
 		noAutoCallback: true,
 		combination: ['combined-ie7', 'combined-ie7-light']
 	});
+	
+	
 	/* END: json + loacalStorage */
 	//predefined list without input type number/date/time etc.
-	webshims.light = ['es5', 'canvas', 'forms', 'json-storage'];
+	webshims.light = ['html5shiv', 'es5', 'canvas', 'forms', 'json-storage'];
 	
 })(jQuery);

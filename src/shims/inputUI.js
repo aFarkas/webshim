@@ -13,22 +13,22 @@
 	};
 	
 	replaceInputUI.common = function(orig, shim, methods){
-		if(options.replaceNative){
-			orig.bind('invalid', function(e){
-				setTimeout(function(){
-					if(!$.data(e.target, 'maybePreventedinvalid')){
-						throw('you have to handle invalid events, if you replace native input-widgets.');
-					}
-				}, 9);
-			});
-		}
+//		if(options.replaceNative){
+//			orig.bind('invalid', function(e){
+//				setTimeout(function(){
+//					if(!$.data(e.target, 'maybePreventedinvalid')){
+//						throw('you have to handle invalid events, if you replace native input-widgets.');
+//					}
+//				}, 9);
+//			});
+//		}
 		
 		var attr = {
 			css: {
 				marginRight: orig.css('marginRight'),
 				marginLeft: orig.css('marginLeft')
 			},
-			outerWidth: orig.outerWidth()
+			outerWidth: orig.getouterWidth()
 		};
 		shim.addClass(orig[0].className).data('html5element', orig);
 		orig
@@ -38,6 +38,121 @@
 		;
 		
 		return attr;
+	};
+	
+	replaceInputUI['datetime-local'] = function(elem){
+		if(!$.fn.datepicker){return;}
+		var date = $('<span class="input-datetime-local"><input type="text" class="input-datetime-local-date" /><input type="time" class="input-datetime-local-time" /></span>'),
+			attr  = this.common(elem, date, replaceInputUI['datetime-local'].attrs),
+			data
+		;
+		$('input', date).data('html5element', $.data(date[0], 'html5element'));
+		
+		if(attr.css){
+			date.css(attr.css);
+			if(attr.outerWidth){
+				date.outerWidth(attr.outerWidth);
+				var width = date.getwidth();
+				$('input.input-datetime-local-date')
+					.css({marginLeft: 0, marginRight: 2})
+					.outerWidth(Math.floor(width * 0.61))
+				;
+				$('input.input-datetime-local-time')
+					.css({marginLeft: 2, marginRight: 0})
+					.outerWidth(Math.floor(width * 0.37))
+				;
+			}
+		}
+		
+		$.webshims.triggerDomUpdate(date);
+		data = $('input.input-datetime-local-date', date)
+			.datepicker($.extend({}, options.date))
+			.bind('change', function(val, ui){
+				
+				var value, timeVal = $('input.input-datetime-local-time', date).attr('value');
+				try {
+					value = $.datepicker.parseDate(data.settings.dateFormat, $('input.input-datetime-local-date', date).attr('value'));
+					value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : $('input.input-datetime-local-date', date).attr('value');
+				} 
+				catch (e) {
+					value = $('input.input-datetime-local-date', date).attr('value');
+				}
+				if (!$('input.input-datetime-local-time', date).attr('value')) {
+					timeVal = '00:00';
+					$('input.input-datetime-local-time', date).attr('value', timeVal);
+				}
+				replaceInputUI['datetime-local'].blockAttr = true;
+				elem.attr('value', value + 'T' + timeVal);
+				replaceInputUI['datetime-local'].blockAttr = false;
+				elem.trigger('change');
+			})
+			.data('datepicker')
+		;
+		
+		$('input.input-datetime-local-time', date).bind('input change', function(){
+			var val = elem.attr('value').split('T');
+			if(val.length < 2 || !val[0]){
+				val[0] = $.datepicker.formatDate('yy-mm-dd', new Date());
+			}
+			val[1] = $.attr(this, 'value');
+			replaceInputUI['datetime-local'].blockAttr = true;
+			
+			try {
+				$('input.input-datetime-local-date', date).attr('value', $.datepicker.formatDate(data.settings.dateFormat, $.datepicker.parseDate('yy-mm-dd', val[0])));
+			} catch(e){}
+			elem.attr('value', val.join('T'));
+			replaceInputUI['datetime-local'].blockAttr = false;
+			elem.trigger('change');
+		});
+		
+		data.dpDiv.addClass('input-date-datepicker-control');
+		$.each(['disabled', 'min', 'max', 'value'], function(i, name){
+			elem.attr(name, function(i, value){return value || '';});
+		});
+	};
+	
+	replaceInputUI['datetime-local'].attrs = {
+		disabled: function(orig, shim, value){
+			$('input.input-datetime-local-date', shim).datepicker('option', 'disabled', !!value);
+			$('input.input-datetime-local-time', shim).attr('disabled', !!value);
+		},
+		//ToDo: use min also on time
+		min: function(orig, shim, value){
+			value = (value.split) ? value.split('T') : [];
+			try {
+				value = $.datepicker.parseDate('yy-mm-dd', value[0]);
+			} catch(e){value = false;}
+			if(value){
+				$('input.input-datetime-local-date', shim).datepicker('option', 'minDate', value);
+			}
+		},
+		//ToDo: use max also on time
+		max: function(orig, shim, value){
+			value = (value.split) ? value.split('T') : [];
+			try {
+				value = $.datepicker.parseDate('yy-mm-dd', value[0]);
+			} catch(e){value = false;}
+			if(value){
+				$('input.input-datetime-local-date', shim).datepicker('option', 'maxDate', value);
+			}
+		},
+		value: function(orig, shim, value){
+			if(!replaceInputUI['datetime-local'].blockAttr){
+				var dateValue;
+				value = (value.split) ? value.split('T') : [];
+				try {
+					dateValue = $.datepicker.parseDate('yy-mm-dd', value[0]);
+				} catch(e){dateValue = false;}
+				if(dateValue){
+					$('input.input-datetime-local-date', shim).datepicker('setDate', dateValue);
+					$('input.input-datetime-local-time', shim).attr('value', value[1] || '00:00');
+				} else {
+					$('input.input-datetime-local-date', shim).attr('value', value[0] || '');
+					$('input.input-datetime-local-time', shim).attr('value', value[1] || '');
+				}
+				
+			}
+		}
 	};
 	
 	replaceInputUI.date = function(elem){
@@ -185,7 +300,7 @@
 	var changeDefaults = function(langObj){
 		if(!langObj){return;}
 		var opts = $.extend({}, langObj, options.date);
-		$('input.input-date.hasDatepicker').datepicker('option', opts).each(function(){
+		$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', opts).each(function(){
 			var orig = $.data(this, 'html5element');
 			if(orig){
 				$.each(['disabled', 'min', 'max', 'value'], function(i, name){
@@ -216,6 +331,6 @@
 			});
 		});
 		$.webshims.createReadyEvent('inputUI');
-	}, true, true);
+	}, true);
 	
 })(jQuery);

@@ -51,7 +51,7 @@
 				return validity;
 			}
 			var validityState = {};
-			$.each(validityProps, function(i, prop){
+			validityProps.forEach(function(prop){
 				validityState[prop] = validity[prop];
 			});
 			
@@ -130,6 +130,6 @@
 			});
 		});
 		$.webshims.createReadyEvent('implement-types');
-	}, true, true);
+	}, true);
 	
 })(jQuery);

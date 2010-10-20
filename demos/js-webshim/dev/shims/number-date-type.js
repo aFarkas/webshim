@@ -6,7 +6,8 @@
 		var nan = parseInt('NaN', 10),
 			typeModels = $.webshims.inputTypes,
 			isNumber = function(string){
-				return (typeof string == 'number' || ($.trim(string) && string == string * 1));
+				
+				return (typeof string == 'number' || (string && string == string * 1));
 			},
 			supportsType = function(type){
 				return ($('<input type="'+type+'" />').attr('type') === type);
@@ -87,7 +88,7 @@
 		
 		
 		
-		$.each([{name: 'rangeOverflow', attr: 'max', factor: 1}, {name: 'rangeUnderflow', attr: 'min', factor: -1}], function(i, data){
+		[{name: 'rangeOverflow', attr: 'max', factor: 1}, {name: 'rangeUnderflow', attr: 'min', factor: -1}].forEach(function(data, i){
 			$.webshims.addValidityRule(data.name, function(input, val, cache) {
 				var ret = false;
 				if(val === ''){return ret;}
@@ -372,7 +373,6 @@
 				addMinMaxNumberToCache('max', $(input), cache);
 				
 				if(isNaN(cache.valueAsNumber)){
-					//ToDo: make this more usable
 					cache.valueAsNumber = typeModels[cache.type].stepBase || 0;
 				}
 				//make a valid step
@@ -380,7 +380,7 @@
 					cache.valueAsNumber = Math.round( ( cache.valueAsNumber - ((cache.valueAsNumber - (cache.minAsnumber || 0)) % cache.step)) * 1e7) / 1e7;
 				}
 				ret = cache.valueAsNumber + (delta * upDown);
-				//using NUMBER.MIN/MAX is really stupid 
+				//using NUMBER.MIN/MAX is really stupid | ToDo: either use disabled state or make this more usable
 				if(!isNaN(cache.minAsNumber) && ret < cache.minAsNumber){
 					ret = (cache.valueAsNumber * upDown  < cache.minAsNumber) ? cache.minAsNumber : isNaN(cache.maxAsNumber) ? Number.MAX_VALUE : cache.maxAsNumber;
 				} else if(!isNaN(cache.maxAsNumber) && ret > cache.maxAsNumber){
@@ -388,11 +388,14 @@
 				}
 				return ret;
 			};
+			
+			$.webshims.modules['number-date-type'].getNextStep = getNextStep;
+			
 			var doSteps = function(input, type, control){
 				if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
 				$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
 				$(input).unbind('blur.stepeventshim').trigger('input');
-				//readd focus into element: especi
+				//IE workaround: ToDo improve usability of workaround
 				if( document.activeElement ){
 					if(document.activeElement !== input){
 						try {input.focus();} catch(e){}
@@ -478,10 +481,8 @@
 					});
 				}
 			});
-			$.webshims.createReadyEvent('number-date-type');
 		})();
 		// add support for new input-types
-		
 		$.webshims.attr('type', {
 			elementNames: ['input'],
 			getter: function(elem, fn){
@@ -491,12 +492,13 @@
 			//don't change setter
 			setter: true
 		});
+		$.webshims.createReadyEvent('number-date-type');
 	};
 	
 	if($.support.validity === true){
-		$.webshims.ready('implement-types', implementTypes, true, true);
+		$.webshims.ready('implement-types', implementTypes, true);
 	} else {
-		$.webshims.ready('validity', implementTypes, true, true);
+		$.webshims.ready('validity', implementTypes, true);
 	}
 	
 })(jQuery);

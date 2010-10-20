@@ -133,7 +133,7 @@ jQuery.webshims.ready('es5', function($){
 			message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
 		}
 		if(message){
-			$.each(['value', 'min', 'max', 'title', 'maxlength', 'label'], function(i, attr){
+			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
 				if(message.indexOf('{%'+attr) === -1){return;}
 				var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
 				message = message.replace('{%'+ attr +'}', val);
@@ -183,6 +183,7 @@ jQuery.webshims.ready('es5', function($){
 			doubled
 		;
 		
+		//ToDo: This break formnovalidate on submitters
 		//opera/chrome fix (this will double all invalid events, we have to stop them!)
 		//opera throws a submit-event and then the invalid events,
 		//chrome7 has disabled invalid events, this brings them back
@@ -224,7 +225,7 @@ jQuery.webshims.ready('es5', function($){
 				e.preventDefault();
 			}
 			//prevent doubble invalids
-			if($.support.validity !== true || $.inArray(e.target, invalids) == -1){
+			if($.support.validity !== true || invalids.indexOf(e.target) == -1){
 				invalids.push(e.target);
 			} else if(!window.noHTMLExtFixes) {
 				doubled = true;
@@ -278,6 +279,6 @@ jQuery.webshims.ready('es5', function($){
 	$.support.validationMessage = $.support.validationMessage || 'shim';
 	
 	$.webshims.createReadyEvent('validation-base');
-}, true, true);
+}, true);
 
 

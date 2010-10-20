@@ -845,7 +845,7 @@ jQuery.webshims.ready('es5', function($){
 			message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
 		}
 		if(message){
-			$.each(['value', 'min', 'max', 'title', 'maxlength', 'label'], function(i, attr){
+			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
 				if(message.indexOf('{%'+attr) === -1){return;}
 				var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
 				message = message.replace('{%'+ attr +'}', val);
@@ -895,6 +895,7 @@ jQuery.webshims.ready('es5', function($){
 			doubled
 		;
 		
+		//ToDo: This break formnovalidate on submitters
 		//opera/chrome fix (this will double all invalid events, we have to stop them!)
 		//opera throws a submit-event and then the invalid events,
 		//chrome7 has disabled invalid events, this brings them back
@@ -936,7 +937,7 @@ jQuery.webshims.ready('es5', function($){
 				e.preventDefault();
 			}
 			//prevent doubble invalids
-			if($.support.validity !== true || $.inArray(e.target, invalids) == -1){
+			if($.support.validity !== true || invalids.indexOf(e.target) == -1){
 				invalids.push(e.target);
 			} else if(!window.noHTMLExtFixes) {
 				doubled = true;
@@ -990,7 +991,7 @@ jQuery.webshims.ready('es5', function($){
 	$.support.validationMessage = $.support.validationMessage || 'shim';
 	
 	$.webshims.createReadyEvent('validation-base');
-}, true, true);
+}, true);
 
 
 jQuery.webshims.ready('validation-base', function($){
@@ -1150,6 +1151,7 @@ $.event.special.invalid = {
 		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') !== undefined || $.data(e.target, 'novalidate') ){return;}
 		var notValid = !($(e.target).checkValidity());
 		if(notValid){
+			//ToDo
 			if(!e.originalEvent && !window.debugValidityShim && window.console && console.log){
 				console.log('submit');
 			}
@@ -1250,7 +1252,6 @@ $.webshims.addInputType('url', {
 		//taken from scott gonzales
 		var test = /^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
 		return function(val){
-			//taken from scott gonzales
 			return !test.test(val);
 		};
 	})()
@@ -1275,11 +1276,15 @@ $(document).bind('click', function(e){
 
 $.webshims.addReady(function(context){
 	//start constrain-validation
-	$('form', context)
+	var form = $('form', context)
 		.bind('invalid', $.noop)
 		.find('button[formnovalidate]')
 		.bind('click', noValidate)
+		.end()
 	;
+	if(!document.activeElement || !document.activeElement.form){
+		$('input, select, textarea', form).filter('[autofocus]:first').focus();
+	}
 });
 
 (function(){
@@ -1345,7 +1350,7 @@ $.support.validity = 'shim';
 
 $.webshims.createReadyEvent('validity');
 
-}, true, true); //webshims.ready end
+}, true); //webshims.ready end
 
 
 
@@ -1368,7 +1373,7 @@ $.webshims.createReadyEvent('validity');
 				data = $.data(elem, 'placeHolder');
 				if(!data){return;}
 			}
-			if(type == 'focus'){
+			if(type == 'focus' || (!type && elem === document.activeElement)){
 				data.box.removeClass('placeholder-visible');
 				return;
 			}
@@ -1445,8 +1450,8 @@ $.webshims.createReadyEvent('validity');
 					});
 					var lineHeight 	= $.curCSS(elem, 'lineHeight'),
 						dims 		= {
-							width: $(elem).width() || parseInt($.curCSS(elem, 'width'), 10),
-							height: $(elem).height() || parseInt($.curCSS(elem, 'height'), 10)
+							width: $(elem).getwidth(),
+							height: $(elem).getheight()
 						},
 						cssFloat 		= $.curCSS(elem, 'float')
 					;

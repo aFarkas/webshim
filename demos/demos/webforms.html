@@ -18,12 +18,14 @@
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
 	<script src="../js-webshim/minified/polyfiller.js"></script>
 	
     <script class="example">
-    	
+		
 		//path is path of polyfiller.js + shims/
     	$.webshims.loader.basePath += 'shims/';
+		//$.webshims.debug = true;
 		//load all defined modules (look into features.js)
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
@@ -41,16 +43,17 @@
 				<h1>Webshims Lib</h1>
 				<h2>Polyfill only the uncapable browsers</h2>
 			</hgroup>
-			<nav>
-				<ul>
-					<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
-					<li><strong>constraint validation and input widgets</strong></li>
-					<li><a href="canvas.html">canvas</a></li>
-					<li><a href="json-storage.html">storage and JSON</a></li>
-					<li><a href="geolocation.html">geolocation API</a></li>
-				</ul>
-			</nav>
 		</header>
+		<nav>
+			<ul>
+				<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
+				<li><a href="es5.html">ES5/JavaScript 1.8.5</a></li>
+				<li><strong>constraint validation and input widgets</strong></li>
+				<li><a href="canvas.html">canvas</a></li>
+				<li><a href="json-storage.html">storage and JSON</a></li>
+				<li><a href="geolocation.html">geolocation API</a></li>
+			</ul>
+		</nav>
 		<section>
 			<h2>Demo/About/Documentation of HTML5 constraint validation API</h2>
 			<p>The <code>forms</code> (constraint validation without number, date etc.) and <code>forms-ext</code> (number, date, range etc.) features of the webshim lib are implementing support for the <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#the-constraint-validation-api">constraint validation API</a>, some input widgets and the placeholder-Attribut.</p>
@@ -58,7 +61,7 @@
 				<h3>Implemented attributes, properties, methods, events</h3>
 				<ul>
 					<li><strong>types</strong>: <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#e-mail-state">email</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#url-state">url</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#local-date-and-time-state">datetime-local</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#date-state">date</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#time-state">time</a>, <a href="http://www.w3.org/TR/html5/number-state.html#number-state">number</a>, <a href="http://www.w3.org/TR/html5/number-state.html#range-state">range</a></li>
-					<li><strong>attributes (and IDL, if existing)</strong>: <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-placeholder">placeholder</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-novalidate">novalidate</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-required">required</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-pattern">pattern</a>, <a href="http://www.w3.org/TR/html5/the-button-element.html#attr-textarea-maxlength">maxlength</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-step">step</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-max">max</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-min">min</a></li>
+					<li><strong>attributes (and IDL, if existing)</strong>: <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-placeholder">placeholder</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fe-autofocus">autofocus</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-novalidate">novalidate</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-required">required</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-pattern">pattern</a>, <a href="http://www.w3.org/TR/html5/the-button-element.html#attr-textarea-maxlength">maxlength</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-step">step</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-max">max</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-min">min</a></li>
 					<li><strong>properties/IDLs</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-willvalidate">willValidate</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validity">validity</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validationmessage">validationMessage</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasnumber">valueAsNumber</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasdate">valueAsDate</a></li>
 					<li><strong>methods</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-setcustomvalidity">setCustomValidity</a>, <a href="http://www.w3.org/TR/html5/forms.html#dom-form-checkvalidity">checkValidity</a></li>
 					<li><strong>events</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#constraint-validation">invalid</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#event-input-input">input</a></li>
@@ -100,26 +103,18 @@
 							</label>
 	                       	<input name="email" required="required" type="email" id="email" />
 	                    </div>
-						
-	                    <div class="form-element">
-	                        <label for="date">
-	                            date: <dfn title="required">*</dfn>
-							</label>
-	                       	<input name="date" required="required" type="date" id="date" />
-	                    </div>
-						
 						<div class="form-element">
-	                        <label for="datetime-local">
-	                            datetime-local: 
-							</label>
-	                       	<input value="2010-12-31T23:59" name="datetime-local" type="datetime-local" id="datetime-local" />
-	                    </div>
-												
-	                    <div class="form-element">
 	                        <label for="number">
 	                            number: <dfn title="required">*</dfn>
 							</label>
 	                       	<input name="number" required="required" type="number" id="number" />
+	                    </div>
+						
+						<div class="form-element">
+	                        <label for="range">
+	                            range:
+							</label>
+	                       	<input name="range" type="range" id="range" />
 	                    </div>
 	                   
 						
@@ -129,7 +124,19 @@
 							</label>
 	                       	<input name="time" type="time" id="time" />
 	                    </div>
+	                    <div class="form-element">
+	                        <label for="date">
+	                            date: <dfn title="required">*</dfn>
+							</label>
+	                       	<input value="2010-12-31" name="date" required="required" type="date" id="date" />
+	                    </div>
 						
+						<div class="form-element">
+	                        <label for="datetime-local">
+	                            datetime-local: 
+							</label>
+	                       	<input value="2010-12-31T23:59" name="datetime-local" type="datetime-local" id="datetime-local" />
+	                    </div>
 						
 						<div class="form-element">
 	                        <label for="password">
@@ -179,7 +186,7 @@
 			<section>
 				<h3>More demos</h3>
 				<ul>
-					<li><a href="webforms/1-webforms-lang-custom-bubble.html">adding validation messages (i18n) / changing UI</a></li>
+					<li><a href="webforms/1-webforms-lang-custom-bubble.html">adding custom validation messages (i18n) / changing error bubble</a></li>
 					<li><a href="webforms/2-webforms-api.html">playing with the constraint api and new properties</a></li>
 				</ul>
 			</section>

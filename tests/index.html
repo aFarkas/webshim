@@ -47,12 +47,13 @@
 	<script src="unit/placeholder.js"></script>
 	<script src="unit/validity.js"></script>
 	<script src="unit/number-date.js"></script>
+	<script src="unit/stepup-down.js"></script>
 	<script src="unit/dynamic-webshim.js"></script>
 	<script src="unit/canvas.js"></script>
 	<script src="unit/storage.js"></script>
 	<!-- todo: canvas / geolocation and json-storage -->
 	<script>
-		
+		$.webshims.debug = true;
 		$(window).load(function(){
 			$.webshims.loader.basePath += 'shims/';
 			$.webshims.polyfill();

@@ -38,29 +38,43 @@ body {
 #wrapper {
 	margin: 10px auto;
 	padding: 0 20px 20px;
-	width: 80%;
+	width: 90%;
 	min-width: 400px;
-	max-width: 50em;
+	max-width: 65em;
 	
 }
 section, article, aside {margin: 20px 0; overflow: hidden; zoom: 1;}
 div.article-wrapper {
-	margin: 0 -15px;
+	margin: 0;
 }
-article {
-	margin: 30px 15px;
-	width: 330px;
+.home article {
+	margin: 30px 4%;
+	width: 40%;
 	display: inline-block;
 	vertical-align: top;
 }
 #wrapper > section,
+#wrapper > small,
 header {
+	display: block;
 	margin: 25px 0;
 	padding: 20px;
 	-moz-border-radius: 15px;
 	border-radius: 15px;
 	background:	#f1efd6;
 }
+nav {
+	float: left;
+	margin: 0 10px 0 0;
+	padding: 20px;
+	width: 25%;
+	min-width: 8em;
+	max-width: 300px;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+	background:	#f1efd6;
+}
+
 a {
 	color: #3a5953;
 }
@@ -107,6 +121,12 @@ header h2 {
 	margin: 0 0 5px;
 	font-size: 120%;
 }
+.home-box {
+	display: inline-block;
+	vertical-align: top;
+	width: 44.9%;
+	margin: 2.4%;
+}
 
 code.block {
 	display: block;
@@ -117,19 +137,15 @@ code.block {
 	background: #fffde2;
 }
 .feature-example {
-	padding: 10px;
-	border: 3px solid #fffde2;
+	padding: 2%;
+	width: 38.9%;
 	background: #fffde2;
 }
-.feature-example:hover {
-	border-color: #1c2b28;
-}
+
 .feature-example form {
 	margin: 5px 20px 10px 0;
-	float: left;
 }
 .feature-example p {
-	padding-right: 80px;
 	overflow: hidden;
 }
 #placeholder-text {
@@ -154,4 +170,14 @@ code.block {
 .te-webforms .form-element:first-child {
 	margin-top: 0;
 }
-
+@media screen and (max-width: 880px) {
+	.home-box,
+	.feature-example,
+	.home article {
+		width: 100%; 
+		-moz-box-sizing: padding-box;
+		-webkit-box-sizing: padding-box;
+		-o-box-sizing: padding-box;
+		box-sizing: padding-box;
+	}
+}

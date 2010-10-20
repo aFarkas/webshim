@@ -28,24 +28,34 @@
 				<h1>Webshims Lib</h1>
 				<h2>Polyfill only the uncapable browsers</h2>
 			</hgroup>
-			<nav>
-				<ul>
-					<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
-					<li><a href="webforms.html">constraint validation and input widgets</a></li>
-					<li><a href="canvas.html">canvas</a></li>
-					<li><a href="json-storage.html">storage and JSON</a></li>
-					<li><strong>geolocation API</strong></li>
-				</ul>
-			</nav>
 		</header>
+		<nav>
+			<ul>
+				<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
+				<li><a href="es5.html">ES5/JavaScript 1.8.5</a></li>
+				<li><a href="webforms.html">constraint validation and input widgets</a></li>
+				<li><a href="canvas.html">canvas</a></li>
+				<li><a href="json-storage.html">storage and JSON</a></li>
+				<li><strong>geolocation API</strong></li>
+			</ul>
+		</nav>
 		<section>
 			<h2>Demo/About/Documentation geolocation API</h2>
+			<p>The <code>geolocation</code>-feature implements the navigator.geolocation API. The following methods are available:</p>
 			
+			<ul>
+				<li>navigator.getCurrentPosition: successCallback, errorCallback and options ({timeout: number}) are supported</li>
+				<li>navigator.watchPosition: in shim identical to getCurrentPosition, except it returns an useless ID</li>
+				<li>navigator.clearWatch: is noop in shim</li>
+			</ul>
+			
+			<p>The shim uses the geolocation information provided by <a href="http://code.google.com/intl/de-DE/apis/ajax/documentation/#ClientLocation">googles API-Loader</a></p>
 			
 			<aside>
 				<h3>Links about JSON and localStorage/sessionStorage</h3>
 				<ul>
-					<li><a href=""></a></li>
+					<li><a href="http://dev.w3.org/geo/api/spec-source.html">Geolocation API Specification (W3C)</a></li>
+					<li><a href="https://developer.mozilla.org/En/Using_geolocation">Using geolocation</a></li>
 				</ul>
 			</aside>
 		</section>

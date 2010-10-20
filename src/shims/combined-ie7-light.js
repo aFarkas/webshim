@@ -1,4 +1,8 @@
-// -- kriskowal Kris Kowal Copyright (C) 2009-2010 MIT License
+// html5shiv MIT @rem remysharp.com/html5-enabling-script
+// iepp v1.5.1 MIT @jon_neal iecss.com/print-protector
+/*@cc_on(function(p,e){var q=e.createElement("div");q.innerHTML="<z>i</z>";q.childNodes.length!==1&&function(){function r(a,b){if(g[a])g[a].styleSheet.cssText+=b;else{var c=s[l],d=e[j]("style");d.media=a;c.insertBefore(d,c[l]);g[a]=d;r(a,b)}}function t(a,b){for(var c=new RegExp("\\b("+m+")\\b(?!.*[;}])","gi"),d=function(k){return".iepp_"+k},h=-1;++h<a.length;){b=a[h].media||b;t(a[h].imports,b);r(b,a[h].cssText.replace(c,d))}}for(var s=e.documentElement,i=e.createDocumentFragment(),g={},m="abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section summary time video".replace(/ /g, '|'),
+n=m.split("|"),f=[],o=-1,l="firstChild",j="createElement";++o<n.length;){e[j](n[o]);i[j](n[o])}i=i.appendChild(e[j]("div"));p.attachEvent("onbeforeprint",function(){for(var a,b=e.getElementsByTagName("*"),c,d,h=new RegExp("^"+m+"$","i"),k=-1;++k<b.length;)if((a=b[k])&&(d=a.nodeName.match(h))){c=new RegExp("^\\s*<"+d+"(.*)\\/"+d+">\\s*$","i");i.innerHTML=a.outerHTML.replace(/\r|\n/g," ").replace(c,a.currentStyle.display=="block"?"<div$1/div>":"<span$1/span>");c=i.childNodes[0];c.className+=" iepp_"+
+d;c=f[f.length]=[a,c];a.parentNode.replaceChild(c[1],c[0])}t(e.styleSheets,"all")});p.attachEvent("onafterprint",function(){for(var a=-1,b;++a<f.length;)f[a][1].parentNode.replaceChild(f[a][0],f[a][1]);for(b in g)s[l].removeChild(g[b]);g={};f=[]})}()})(this,document);@*/// -- kriskowal Kris Kowal Copyright (C) 2009-2010 MIT License
 // -- tlrobinson Tom Robinson
 // -- dantman Daniel Friesen
 
@@ -722,27 +726,31 @@ if (!String.prototype.trim) {
 	;
 	navigator.geolocation = (function(){
 		var createCoords = function(){
-				if(coords || !window.google || !google.loader || !google.loader.ClientLocation){return;}
+				if(pos || !window.google || !google.loader || !google.loader.ClientLocation){return;}
 				var cl = google.loader.ClientLocation;
-	            coords = {
-	                latitude: cl.latitude,
-	                longitude: cl.longitude,
-	                altitude: null,
-	                accuracy: 43000,
-	                altitudeAccuracy: null,
-	                heading: parseInt('NaN', 10),
-	                velocity: null
+	            pos = {
+					coords: {
+						latitude: cl.latitude,
+		                longitude: cl.longitude,
+		                altitude: null,
+		                accuracy: 43000,
+		                altitudeAccuracy: null,
+		                heading: parseInt('NaN', 10),
+		                velocity: null
+					},
+	                //extension similiar to FF implementation
+					address: $.extend({streetNumber: '', street: '', premises: '', county: '', postalCode: ''}, cl.address)
 	            };
 			},
-			coords
+			pos
 		;
 		var api = {
 			getCurrentPosition: function(success, error, opts){
 				var callback = function(){
 						clearTimeout(timer);
 						createCoords();
-						if(coords){
-							success({coords: coords, timestamp: new Date().getTime()});
+						if(pos){
+							success($.extend(pos, {timestamp: new Date().getTime()}));
 						} else if(error) {
 							error({ code: 2, message: "POSITION_UNAVAILABLE"});
 						}
@@ -755,7 +763,7 @@ if (!String.prototype.trim) {
 						document.write = domWrite;
 						document.writeln = domWrite;
 					}
-					$(document).one('google-loaderReady', callback);
+					$(document).one('google-loader', callback);
 					$.webshims.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
 				} else {
 					setTimeout(callback, 1);
@@ -915,7 +923,7 @@ jQuery.webshims.ready('es5', function($){
 			message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
 		}
 		if(message){
-			$.each(['value', 'min', 'max', 'title', 'maxlength', 'label'], function(i, attr){
+			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
 				if(message.indexOf('{%'+attr) === -1){return;}
 				var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
 				message = message.replace('{%'+ attr +'}', val);
@@ -965,6 +973,7 @@ jQuery.webshims.ready('es5', function($){
 			doubled
 		;
 		
+		//ToDo: This break formnovalidate on submitters
 		//opera/chrome fix (this will double all invalid events, we have to stop them!)
 		//opera throws a submit-event and then the invalid events,
 		//chrome7 has disabled invalid events, this brings them back
@@ -1006,7 +1015,7 @@ jQuery.webshims.ready('es5', function($){
 				e.preventDefault();
 			}
 			//prevent doubble invalids
-			if($.support.validity !== true || $.inArray(e.target, invalids) == -1){
+			if($.support.validity !== true || invalids.indexOf(e.target) == -1){
 				invalids.push(e.target);
 			} else if(!window.noHTMLExtFixes) {
 				doubled = true;
@@ -1060,7 +1069,7 @@ jQuery.webshims.ready('es5', function($){
 	$.support.validationMessage = $.support.validationMessage || 'shim';
 	
 	$.webshims.createReadyEvent('validation-base');
-}, true, true);
+}, true);
 
 
 jQuery.webshims.ready('validation-base', function($){
@@ -1220,6 +1229,7 @@ $.event.special.invalid = {
 		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') !== undefined || $.data(e.target, 'novalidate') ){return;}
 		var notValid = !($(e.target).checkValidity());
 		if(notValid){
+			//ToDo
 			if(!e.originalEvent && !window.debugValidityShim && window.console && console.log){
 				console.log('submit');
 			}
@@ -1320,7 +1330,6 @@ $.webshims.addInputType('url', {
 		//taken from scott gonzales
 		var test = /^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
 		return function(val){
-			//taken from scott gonzales
 			return !test.test(val);
 		};
 	})()
@@ -1345,11 +1354,15 @@ $(document).bind('click', function(e){
 
 $.webshims.addReady(function(context){
 	//start constrain-validation
-	$('form', context)
+	var form = $('form', context)
 		.bind('invalid', $.noop)
 		.find('button[formnovalidate]')
 		.bind('click', noValidate)
+		.end()
 	;
+	if(!document.activeElement || !document.activeElement.form){
+		$('input, select, textarea', form).filter('[autofocus]:first').focus();
+	}
 });
 
 (function(){
@@ -1415,7 +1428,7 @@ $.support.validity = 'shim';
 
 $.webshims.createReadyEvent('validity');
 
-}, true, true); //webshims.ready end
+}, true); //webshims.ready end
 
 
 
@@ -1438,7 +1451,7 @@ $.webshims.createReadyEvent('validity');
 				data = $.data(elem, 'placeHolder');
 				if(!data){return;}
 			}
-			if(type == 'focus'){
+			if(type == 'focus' || (!type && elem === document.activeElement)){
 				data.box.removeClass('placeholder-visible');
 				return;
 			}
@@ -1515,8 +1528,8 @@ $.webshims.createReadyEvent('validity');
 					});
 					var lineHeight 	= $.curCSS(elem, 'lineHeight'),
 						dims 		= {
-							width: $(elem).width() || parseInt($.curCSS(elem, 'width'), 10),
-							height: $(elem).height() || parseInt($.curCSS(elem, 'height'), 10)
+							width: $(elem).getwidth(),
+							height: $(elem).getheight()
 						},
 						cssFloat 		= $.curCSS(elem, 'float')
 					;
@@ -2512,7 +2525,7 @@ if (!document.createElement('canvas').getContext) {
   
   
   /*
-   *htmlExt-Extensions 
+   *webshims-Extensions 
    */
 	$.support.canvas = 'shim';
 	
@@ -2540,7 +2553,7 @@ if(!jQuery.support.jsonStorage){
 
 //JSON
 (function(){
-if('JSON'in window){return;}
+if('JSON'in window && JSON.stringify && JSON.parse){return;}
 
 
 if(!this.JSON){this.JSON={};}(function(){function f(n){return n<10?'0'+n:n;}if(typeof Date.prototype.toJSON!=='function'){Date.prototype.toJSON=function(key){return isFinite(this.valueOf())?this.getUTCFullYear()+'-'+f(this.getUTCMonth()+1)+'-'+f(this.getUTCDate())+'T'+f(this.getUTCHours())+':'+f(this.getUTCMinutes())+':'+f(this.getUTCSeconds())+'Z':null;};String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(key){return this.valueOf();};}var cx=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,gap,indent,meta={'\b':'\\b','\t':'\\t','\n':'\\n','\f':'\\f','\r':'\\r','"':'\\"','\\':'\\\\'},rep;function quote(string){escapable.lastIndex=0;return escapable.test(string)?'"'+string.replace(escapable,function(a){var c=meta[a];return typeof c==='string'?c:'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4);})+'"':'"'+string+'"';}function str(key,holder){var i,k,v,length,mind=gap,partial,value=holder[key];if(value&&typeof value==='object'&&typeof value.toJSON==='function'){value=value.toJSON(key);}if(typeof rep==='function'){value=rep.call(holder,key,value);}switch(typeof value){case'string':return quote(value);case'number':return isFinite(value)?String(value):'null';case'boolean':case'null':return String(value);case'object':if(!value){return'null';}gap+=indent;partial=[];if(Object.prototype.toString.apply(value)==='[object Array]'){length=value.length;for(i=0;i<length;i+=1){partial[i]=str(i,value)||'null';}v=partial.length===0?'[]':gap?'[\n'+gap+partial.join(',\n'+gap)+'\n'+mind+']':'['+partial.join(',')+']';gap=mind;return v;}if(rep&&typeof rep==='object'){length=rep.length;for(i=0;i<length;i+=1){k=rep[i];if(typeof k==='string'){v=str(k,value);if(v){partial.push(quote(k)+(gap?': ':':')+v);}}}}else{for(k in value){if(Object.hasOwnProperty.call(value,k)){v=str(k,value);if(v){partial.push(quote(k)+(gap?': ':':')+v);}}}}v=partial.length===0?'{}':gap?'{\n'+gap+partial.join(',\n'+gap)+'\n'+mind+'}':'{'+partial.join(',')+'}';gap=mind;return v;}}if(typeof JSON.stringify!=='function'){JSON.stringify=function(value,replacer,space){var i;gap='';indent='';if(typeof space==='number'){for(i=0;i<space;i+=1){indent+=' ';}}else if(typeof space==='string'){indent=space;}rep=replacer;if(replacer&&typeof replacer!=='function'&&(typeof replacer!=='object'||typeof replacer.length!=='number')){throw new Error('JSON.stringify');}return str('',{'':value});};}if(typeof JSON.parse!=='function'){JSON.parse=function(text,reviver){var j;function walk(holder,key){var k,v,value=holder[key];if(value&&typeof value==='object'){for(k in value){if(Object.hasOwnProperty.call(value,k)){v=walk(value,k);if(v!==undefined){value[k]=v;}else{delete value[k];}}}}return reviver.call(holder,key,value);}text=String(text);cx.lastIndex=0;if(cx.test(text)){text=text.replace(cx,function(a){return'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4);});}if(/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,'@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,']').replace(/(?:^|:|,)(?:\s*\[)+/g,''))){j=eval('('+text+')');return typeof reviver==='function'?walk({'':j},''):j;}throw new SyntaxError('JSON.parse');};}}());
@@ -2651,6 +2664,7 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 
 (function(){
 	var swfTimer;
+	var emptyString = '(empty string)+1287520303738';
 	$.webshims.localStorageSwfCallback = function(type){
 		clearTimeout(swfTimer);
 		if(window.localStorage){
@@ -2668,9 +2682,23 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 			}
 			if(shim && typeof shim.GetVariable !== 'undefined'){
 				window.localStorage = {};
-				$.each(['key', 'setItem', 'getItem', 'removeItem', 'clear'], function(i, fn){
+				$.each(['key', 'removeItem', 'clear'], function(i, fn){
 					window.localStorage[fn] = shim[fn];
 				});
+				window.localStorage.setItem = function(name, val){
+					val += '';
+					if(!val){
+						val = emptyString;
+					}
+					shim.setItem(name, val);
+				};
+				window.localStorage.getItem = function(name){
+					var val = shim.getItem(name, val);
+					if(val == emptyString){
+						val = '';
+					}
+					return val;
+				};
 			}
 		}
 		if(!window.localStorage){
@@ -2689,11 +2717,11 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 					$.webshims.localStorageSwfCallback();
 				}
 			});
-			swfTimer = setTimeout($.webshims.localStorageSwfCallback, 9999);
+			swfTimer = setTimeout($.webshims.localStorageSwfCallback, (location.protocol.indexOf('file') === 0) ? 500 : 9999);
 		} else if(!window.localStorage){
 			$.webshims.localStorageSwfCallback();
 		}
-	}, true, true);
+	}, true);
 })();
 
 

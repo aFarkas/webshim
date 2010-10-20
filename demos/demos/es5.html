@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<link href="../css/styles.css" rel="stylesheet" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="../js-webshim/minified/polyfiller.js"></script>
+	
+    <script class="example">
+    	
+		//path is path of polyfiller.js + shims/
+    	$.webshims.loader.basePath += 'shims/';
+		//load all defined modules (look into features.js)
+		//or load only a specific feature with $.webshims.polyfill('feature-name');
+		$.webshims.polyfill();
+        
+    </script>
+	<script src="../demo-js/demo.js"></script>
+	<title>ES5 : webshims lib - the polyfilling capability based JS libary</title>
+	    
+</head>
+
+<body>
+	<section id="wrapper"> 
+		<header>
+			<hgroup>
+				<h1>Webshims Lib</h1>
+				<h2>Polyfill only the uncapable browsers</h2>
+			</hgroup>
+		</header>
+		<nav>
+			<ul>
+				<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
+				<li><strong>ES5/JavaScript 1.8.5</strong></li>
+				<li><a href="webforms.html">constraint validation and input widgets</a></li>
+				<li><a href="canvas.html">canvas</a></li>
+				<li><a href="json-storage.html">storage and JSON</a></li>
+				<li><a href="geolocation.html">geolocation API</a></li>
+			</ul>
+		</nav>
+		<section>
+			<h2>Demo/About/Documentation ES5</h2>
+			<p>The <ocde>es5</ocde> feature of Webshims Lib uses the <a href="http://github.com/kriskowal/es5-shim/">ES5 shim</a> by <a href="http://askawizard.blogspot.com/">Kris Kowal</a>.</p>
+			<p>The script implements the following methods:</p>
+			<ul>
+				<li><strong>Object</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/create">create</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/defineProperty">defineProperty</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/defineProperties">defineProperties</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/GetPrototypeOf">getPrototypeOf</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/getOwnPropertyDescriptor">getOwnPropertyDescriptor</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/getOwnPropertyNames">getOwnPropertyNames</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/seal">seal</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/freeze">freeze</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/preventExtensions">preventExtensions</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/isSealed">isSealed</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/isFrozen">isFrozen</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/isExtensible">isExtensible</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/keys">keys</a></li>
+				<li><strong>Array</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/isArray">isArray</a></li>
+				<li><strong>Array.prototype</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/forEach">forEach</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/map">map</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/filter">filter</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/every">every</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/some">some</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/Reduce">reduce</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/ReduceRight">reduceRight</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/indexOf">indexOf</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/lastIndexOf">lastIndexOf</a></li>
+				<li><strong>Date</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/now">now</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/parse">parse</a></li>
+				<li><strong>Date.prototype</strong>: toISOString, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/toJSON">toJSON</a></li>
+				<li><strong>Function.prototype</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind">bind</a></li>
+				<li><strong>String.prototype</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String/Trim">trim</a></li>
+			</ul>
+			<p>Note: Most of the mentioned Object methods can not be fully implemented. This means, you can only use them with caution. All methods added to the prototype object are visible inside of a for in loop, while native implementations aren't enumerable.</p>
+<code class="block">
+$.webshims.ready('es5', function(){
+	[1, 2, 3].forEach(function(){
+		//do stuff
+	});
+});
+</code>
+			<aside>
+				<h3>Links about JSON and localStorage/sessionStorage</h3>
+				<ul>
+					<li><a href="http://github.com/kriskowal/es5-shim/">ES5 shim</a></li>
+				</ul>
+			</aside>
+		</section>
+				
+		<small>
+			Note: every shim is a hack! working with native cutting edge technology is also a hack!
+		</small>
+    </section> 
+	
+</body>
+</html>   

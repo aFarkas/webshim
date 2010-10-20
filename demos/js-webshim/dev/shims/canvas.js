@@ -921,7 +921,7 @@ if (!document.createElement('canvas').getContext) {
   
   
   /*
-   *htmlExt-Extensions 
+   *webshims-Extensions 
    */
 	$.support.canvas = 'shim';
 	

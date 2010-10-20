@@ -11,7 +11,13 @@
 				return false;
 			});
 		});
-		
+		var doConsole = function(m){
+			if(typeof m == 'object'){
+				alert(JSON.stringify(m));
+			} else {
+				alert(m);
+			}
+		};
 		$('button.feature').bind('click', function(e){
 			var elem = $(this).parent().find('input:first');
 			var val = $(this).attr('data-val');
@@ -26,7 +32,15 @@
 				ret = elem.attr($(this).attr('data-name'), val);
 			} 
 			if(ret !== elem){
-				console.log(ret);
+				if(window.console && console.log){
+					try {
+						console.log(ret);
+					} catch(e){
+						doConsole(ret);
+					}
+				} else {
+					doConsole(ret);
+				}
 			}
 			return false;
 		});

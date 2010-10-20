@@ -10,27 +10,31 @@
 	;
 	navigator.geolocation = (function(){
 		var createCoords = function(){
-				if(coords || !window.google || !google.loader || !google.loader.ClientLocation){return;}
+				if(pos || !window.google || !google.loader || !google.loader.ClientLocation){return;}
 				var cl = google.loader.ClientLocation;
-	            coords = {
-	                latitude: cl.latitude,
-	                longitude: cl.longitude,
-	                altitude: null,
-	                accuracy: 43000,
-	                altitudeAccuracy: null,
-	                heading: parseInt('NaN', 10),
-	                velocity: null
+	            pos = {
+					coords: {
+						latitude: cl.latitude,
+		                longitude: cl.longitude,
+		                altitude: null,
+		                accuracy: 43000,
+		                altitudeAccuracy: null,
+		                heading: parseInt('NaN', 10),
+		                velocity: null
+					},
+	                //extension similiar to FF implementation
+					address: $.extend({streetNumber: '', street: '', premises: '', county: '', postalCode: ''}, cl.address)
 	            };
 			},
-			coords
+			pos
 		;
 		var api = {
 			getCurrentPosition: function(success, error, opts){
 				var callback = function(){
 						clearTimeout(timer);
 						createCoords();
-						if(coords){
-							success({coords: coords, timestamp: new Date().getTime()});
+						if(pos){
+							success($.extend(pos, {timestamp: new Date().getTime()}));
 						} else if(error) {
 							error({ code: 2, message: "POSITION_UNAVAILABLE"});
 						}
@@ -43,7 +47,7 @@
 						document.write = domWrite;
 						document.writeln = domWrite;
 					}
-					$(document).one('google-loaderReady', callback);
+					$(document).one('google-loader', callback);
 					$.webshims.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
 				} else {
 					setTimeout(callback, 1);

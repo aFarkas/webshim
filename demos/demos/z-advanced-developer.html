@@ -27,17 +27,18 @@
 			<hgroup>
 				<h1>Webshims Lib</h1>
 				<h2>Polyfill only the uncapable browsers</h2>
-				<nav>
-				<ul>
-					<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
-					<li><a href="webforms.html">constraint validation and input widgets</a></li>
-					<li><a href="canvas.html">canvas</a></li>
-					<li><a href="json-storage.html">storage and JSON</a></li>
-					<li><a href="geolocation.html">geolocation API</a></li>
-				</ul>
-			</nav>
 			</hgroup>
 		</header>
+		<nav>
+			<ul>
+				<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
+				<li><a href="es5.html">ES5/JavaScript 1.8.5</a></li>
+				<li><a href="webforms.html">constraint validation and input widgets</a></li>
+				<li><a href="canvas.html">canvas</a></li>
+				<li><a href="json-storage.html">storage and JSON</a></li>
+				<li><a href="geolocation.html">geolocation API</a></li>
+			</ul>
+		</nav>
 		<section>
 			<h2 id="create-extensions">Creating an extension/abstraction, wich works with and without webshim lib</h2>
 			<p>It is easy to create an extension to a web standard, wich should work with and without webshim lib.</p>
@@ -133,6 +134,74 @@ $.webshims.ready('mediaelements', function(){
 		
 		<h2 id="implement-features">Implementing a new feature to Webshim Lib</h2>
 		<p>TBD</p>
+		
+		<p>Here is a quick example for implementing the details and summary elements.</p>
+		
+<code class="block">
+$.webshims.addPolyfill('details', {
+	test: function(){
+		return ('open' in document.createElement('details'));	
+	}
+});
+</code>
+		<p>Create a file called details.js and put it in your shim-folder:</p>
+		
+<code class="block">
+(function($){
+	//override jQuery's attribute method in case of the open attribute...
+	$.webshims.attr('open', {
+		//.. for all details - elements
+		elementNames: ['details'],
+		setter: function(elem, value, oldFn){
+			//get polyfill-methods
+			var polyfill = $.data(elem, 'detailsPolyfill');
+			//if we haven't polyfilled this element, then do it now
+			if(!polyfill){
+				polyfill = $.data(elem, 'detailsPolyfill', {
+					open: function(){
+						$('> *:not(summary)', elem).show();
+					},
+					close: function(){
+						$('> *:not(summary)', elem).hide();
+					}
+				});
+				$(elem).delegate('summary', 'click', function(){
+					$.attr(elem, 'open', !$.attr(elem, 'open'));
+				});
+			}
+			
+			//convert value to boolean and reflect the content attribute
+			value = !!value;
+			elem.open = value;
+			if(value){
+				elem.setAttribute('open', 'open');
+			} else {
+				elem.removeAttribute('open');
+			}
+									
+			if(value){
+				polyfill.open();
+			} else {
+				polyfill.close();
+			}
+		},
+		getter: function(elem){
+			var isOpen = elem.getAttribute('open');
+			if(isOpen === ""){
+				isOpen = true;
+			}
+			return !!isOpen;
+		}
+	});
+	
+	//on DOM-Ready or appendWebshim htmlWebshim etc.
+	$.webshims.addReady(function(context){
+		$('details', context).attr('open', function(i, isOpen){
+			return isOpen;
+		});
+	});
+})(jQuery);
+</code>
 		</section>
 				
 		<small>
