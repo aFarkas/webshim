@@ -36,9 +36,6 @@
 			readys.push('validity');
 		} 
 		if($('<input type="datetime-local" />')[0].type != 'datetime-local' || $('<input type="range" />')[0].type != 'range'){
-			if($.support.validity){
-				readys.push('implement-types');
-			}
 			readys.push('number-date-type');
 		}
 		

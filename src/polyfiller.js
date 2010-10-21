@@ -724,17 +724,7 @@
 		webshims.capturingEvents(['input']);
 		webshims.capturingEvents(['invalid'], true);
 	}
-	
-	
-	addPolyfill('implement-types', {
-		feature: 'forms-ext',
-		noAutoCallback: true,
-		test: function(){
-			return !($.support.validity === true && ( $('<input type="datetime-local" />').attr('type') !== 'datetime-local' || $('<input type="range" />').attr('type') !== 'range' ) );
-		},
-		combination: ['combined-ff4']
-	});
-	
+		
 	
 	addPolyfill('number-date-type', {
 		feature: 'forms-ext',

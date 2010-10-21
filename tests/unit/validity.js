@@ -51,6 +51,23 @@ asyncTest("general validity Modul", function(){
 	equals(form1.find('#name').attr('required'), false, "name isn't required");
 	equals(form1.find('#name').is(':invalid'), false, 'name is valid');
 	form1.find('#name').attr('required', true);
+	
+	ok($('#select').attr('validity').valid, 'select is valid');
+	$('#select').attr('required', true);
+	ok($('#select').attr('validity').valueMissing, 'required select with first option selected and empty value is invalid');
+	$('#select').attr('selectedIndex', 1);
+	ok($('#select').attr('validity').valid, 'required select with empty value and second option selected is valid');
+	$('#select').attr({
+		'selectedIndex': 0,
+		multiple: true,
+		size: 1
+	});
+	ok($('#select').attr('validity').valid, 'required multiple select with first option selected and empty value is valid');
+	
+	ok($('#select2').attr('validity').valid, 'required select with first option selected, in an optgroup and empty value is valid');
+	
+	ok($('#select3').attr('selectedIndex', 0).attr('validity').valid, 'required select with first option selected and empty value, but size > 1 is valid');
+	
 		
 	//validityState
 	//what is the problem here?

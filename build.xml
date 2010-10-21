@@ -34,7 +34,6 @@
 		<!-- good for FF4.x -->
 		<concat destfile="${shims}/combined-ff4.js">
             <fileset file="${shims}/validation-base.js" />
-            <fileset file="${shims}/implement-types.js" />
 			<fileset file="${shims}/number-date-type.js" />
 			<fileset file="${shims}/inputUI.js" />
         </concat>

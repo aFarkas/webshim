@@ -17,7 +17,7 @@ var getNames = function(elem){
 		checkbox: 1		
 	},
 	getType = function(elem){
-		return (elem.getAttribute('type') || '').toLowerCase();
+		return (elem.getAttribute('type') || elem.type || '').toLowerCase();
 	}
 ;
 
@@ -42,14 +42,25 @@ var validiyPrototype = {
 };
 
 var validityRules = {
-		valueMissing: function(input, val){
+		valueMissing: function(input, val, cache){
 			if(!input.attr('required')){
 				return false;
 			}
-			return ( checkTypes[input[0].type] ) ? !$(getNames(input[0])).filter(':checked')[0] : !(val);
+			var ret = false;
+			if(!('type' in cache)){
+				cache.type = getType(input[0]);
+			}
+			if(cache.nodeName == 'select'){
+				ret = (!val && input[0].type == 'select-one' && input[0].size < 1 && $('> option:first-child', input).attr('selected'));
+			} else if(checkTypes[cache.type]){
+				ret = !$(getNames(input[0])).filter(':checked')[0];
+			} else {
+				ret = !(val);
+			}
+			return ret;
 		},
-		tooLong: function(input, val){
-			if(val === ''){return false;}
+		tooLong: function(input, val, cache){
+			if(val === '' || cache.nodeName == 'select'){return false;}
 			var maxLen 	= input.attr('maxlength'),
 				ret 	= false,
 				len 	= val.length	
@@ -60,7 +71,7 @@ var validityRules = {
 			return ret;
 		},
 		typeMismatch: function (input, val, cache){
-			if(val === ''){return false;}
+			if(val === '' || cache.nodeName == 'select'){return false;}
 			var ret = false;
 			if(!('type' in cache)){
 				cache.type = getType(input[0]);
@@ -71,8 +82,8 @@ var validityRules = {
 			}
 			return ret;
 		},
-		patternMismatch: function(input, val) {
-			if(val === ''){return false;}
+		patternMismatch: function(input, val, cache) {
+			if(val === '' || cache.nodeName == 'select'){return false;}
 			var pattern = input.attr('pattern');
 			if(!pattern){return false;}
 			return !(new RegExp('^(?:' + pattern + ')$').test(val));
@@ -94,7 +105,7 @@ $.webshims.addMethod('checkValidity', (function(){
 		if(v){
 			$.data(elem, 'cachedValidity', v);
 		} else {
-			v = {valid: true};
+			return true;
 		}
 		if( !v.valid ){
 			e = $.Event('invalid');
@@ -118,7 +129,6 @@ $.webshims.addMethod('checkValidity', (function(){
 					ret = false;
 				}
 			}
-			
 			return ret;
 		} else if(this.form){
 			return testValidity(this);
@@ -180,19 +190,14 @@ $.webshims.attr('validity', {
 		}
 		var jElm 			= $(elem),
 			val				= jElm.val(),
-			cache 			= {}
+			cache 			= {nodeName: elem.nodeName.toLowerCase()}
 		;
 		
 		validityState.customError = !!($.data(elem, 'customvalidationMessage'));
 		if( validityState.customError ){
 			validityState.valid = false;
 		}
-		
-		//select
-		if(	(elem.nodeName || '').toLowerCase() == 'select' ){
-			return validityState;
-		}
-		
+						
 		$.each(validityRules, function(rule, fn){
 			if (fn(jElm, val, cache)) {
 				validityState[rule] = true;
@@ -219,7 +224,7 @@ $.webshims.attr('validationMessage', {
 	}
 });
 
-$.webshims.createBooleanAttrs('required', ['input', 'textarea']);
+$.webshims.createBooleanAttrs('required', ['input', 'textarea', 'select']);
 
 $.webshims.attr('willValidate', {
 	elementNames: ['input', 'select', 'textarea'],

@@ -33,33 +33,32 @@
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
 		
-        
-		
-		$.webshims.ready('ready json-storage', function(){
-			$('#storage').val(window.localStorage.getItem('test'));
-			$('form').bind('submit', function(){
-				window.localStorage.setItem('test', $('#storage').val());
-				return false;
-			});
-		});
-		if(!window.console){
-			window.console = {log: $.noop};
-//			alert('open your console and reload');
-		}
     </script>
 	
 	<title>playing</title>
-	    
+	    <script>
+	    	$(function(){
+				$('#test').bind('submit invalid', function(e){
+					
+					console.log($('select').attr('validity'), e);
+					e.preventDefault();
+//					alert('sa')
+//					return false;
+				});
+			});
+	    </script>
 </head>
-
+<script>
+	var test =function(){
+		console.log(this, arguments);
+	};
+</script>
 <body class="js-off">   
-
-<div style="display: none;">
-	<div id="test" style="width: 300px; padding: 10px;"></div>
-</div>      
-<form action="#">
-	
-	<input type="text" id="storage" />
+     
+<form id="test" action="#">
+	<select name="a" required>
+		<option></option>
+	</select>
 	<input type="submit" />	
 </form>
 	
