@@ -8,30 +8,30 @@ How To Use
 * Include the JavaScript:
 
 ---------------
-<script src="js-webshim/minified/polyfiller.js"></script> 
+	<script src="js-webshim/minified/polyfiller.js"></script> 
 
-<script> 
-	//path is path of polyfiller.js-code + shims/ $.webshims.loader.basePath += 'shims/'; 
-	//load and implement all unsupported features 
-	$.webshims.polyfill(); 
-</script>
+	<script> 
+		//path is path of polyfiller.js-code + shims/ $.webshims.loader.basePath += 'shims/'; 
+		//load and implement all unsupported features 
+		$.webshims.polyfill(); 
+	</script>
 ---------------
 
 * Wait till the implementation is ready and work with it:
 
 --------------
-<script> 
-	$.webshims.ready('geolocation json-storage', function(){ 
-		//work with geolocation, JSON and localStorage 
-		var userData = JSON.parse(localStorage.getItem('userData')) || {visits: 0};
-		//...
-		$(function(){
-			//work with geolocation JSON and localStorage *and the DOM*
-			$('#visits').html(userData.visits);
+	<script> 
+		$.webshims.ready('geolocation json-storage', function(){ 
+			//work with geolocation, JSON and localStorage 
+			var userData = JSON.parse(localStorage.getItem('userData')) || {visits: 0};
 			//...
-		});
-	}); 
-</script>
+			$(function(){
+				//work with geolocation JSON and localStorage *and the DOM*
+				$('#visits').html(userData.visits);
+				//...
+			});
+		}); 
+	</script>
 --------------
 
 [more informations and demos](http://aFarkas.github.com/webshim/demos/index.html)
