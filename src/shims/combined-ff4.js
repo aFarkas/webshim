@@ -955,7 +955,7 @@ jQuery.webshims.ready('es5', function($){
 	};
 	
 	if($.support.validity === true){
-		$.webshims.ready('implement-types', implementTypes, true);
+		$.webshims.ready('validation-base', implementTypes, true);
 	} else {
 		$.webshims.ready('validity', implementTypes, true);
 	}

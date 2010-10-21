@@ -1394,7 +1394,7 @@ $.webshims.createReadyEvent('validity');
 	};
 	
 	if($.support.validity === true){
-		$.webshims.ready('implement-types', implementTypes, true);
+		$.webshims.ready('validation-base', implementTypes, true);
 	} else {
 		$.webshims.ready('validity', implementTypes, true);
 	}

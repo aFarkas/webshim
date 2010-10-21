@@ -10,7 +10,7 @@
 	
 	$.webshims = {
 		
-		version: '1.0.0beta1',
+		version: 'pre1.0.0beta2',
 		
 		fixHTML5: (function(){
 			var d, b;
