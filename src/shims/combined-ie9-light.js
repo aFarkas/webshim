@@ -355,8 +355,7 @@ jQuery.webshims.ready('es5', function($){
 	
 	(function(){
 		if($.support.validity !== true){return;}
-		var select = $('<form><select name="test"><option selected required value=""></option></select></form>').find('select');
-		var supportRequiredSelect = !(!('required' in select[0]) && select.attr('validity').valid && !window.noHTMLExtFixes);
+		var supportRequiredSelect = (('required' in document.createElement('select')) || window.noHTMLExtFixes);
 		var supportNumericDate = !!($('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range');
 		select = null;
 		if(supportRequiredSelect && supportNumericDate){return;}
@@ -489,6 +488,11 @@ jQuery.webshims.ready('es5', function($){
 			document.addEventListener('change', function(e){
 				testValidity(e.target);
 			}, true);
+			if (!supportNumericDate) {
+				document.addEventListener('input', function(e){
+					testValidity(e.target);
+				}, true);
+			}
 		}
 		
 		if(!supportRequiredSelect){
@@ -502,7 +506,7 @@ jQuery.webshims.ready('es5', function($){
 						cache.type = jElm[0].type;
 					}
 					
-					if(cache.type == 'select-one' && $('> option:first-child', jElm).attr('selected')){
+					if(cache.type == 'select-one' && $('> option:first-child:not(:disabled)', jElm).attr('selected')){
 						return true;
 					}
 				}
@@ -584,7 +588,7 @@ var validityRules = {
 				cache.type = getType(input[0]);
 			}
 			if(cache.nodeName == 'select'){
-				ret = (!val && input[0].type == 'select-one' && input[0].size < 1 && $('> option:first-child', input).attr('selected'));
+				ret = (!val && input[0].type == 'select-one' && input[0].size < 2 && $('> option:first-child:not(:disabled)', input).attr('selected'));
 			} else if(checkTypes[cache.type]){
 				ret = !$(getNames(input[0])).filter(':checked')[0];
 			} else {
@@ -848,8 +852,8 @@ $.support.validity = 'shim';
 			reset: 1
 			
 			//pro forma
-			,color: 1,
-			range: 1
+			,color: 1
+			//,range: 1
 		},
 		observe = function(input){
 			var timer,

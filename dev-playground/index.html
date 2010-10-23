@@ -39,8 +39,8 @@
 	    <script>
 	    	$(function(){
 				$('#test').bind('submit invalid', function(e){
-					
-					console.log($('select').attr('validity'), e);
+					$('input:first').attr('valueAsNumber', 1293753600000)
+					console.log($('input').attr('valueAsNumber'), $('input').attr('value'), e);
 					e.preventDefault();
 //					alert('sa')
 //					return false;
@@ -56,9 +56,7 @@
 <body class="js-off">   
      
 <form id="test" action="#">
-	<select name="a" required>
-		<option></option>
-	</select>
+	<input name="datetime-local" type="datetime-local" />
 	<input type="submit" />	
 </form>
 	

@@ -1,6 +1,21 @@
 [Webshims Lib](http://aFarkas.github.com/webshim/demos/index.html) - The polyfilling, capability based loading JavaScript Libary
 ================================
 
+Features
+------------------
+
+* HTML5 compilant: correctly and accurately implemented (HTML5) Markup-, JS- and DOM-APIs  
+* capability based loading: extrem lightweight in modern browsers
+* cross-browser support: All A-Graded browsers including last version of Opera are testet
+* extendible: we have not implemented a feature, you want to use. You can easily implement the feature your own
+
+* HTML5 shiv and innerShiv solution
+* canvas
+* HTML5 form features including: constraint validation and form widgets (input[range], input[date], input[time], input[datetime-local], output)
+* JSON (stringify and parse)
+* localStorage/sessionStorage
+* geolocation
+* ECMAScript 5 / JavaScript 1.8.5 features 
 
 
 How To Use

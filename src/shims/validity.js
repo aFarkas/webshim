@@ -51,7 +51,7 @@ var validityRules = {
 				cache.type = getType(input[0]);
 			}
 			if(cache.nodeName == 'select'){
-				ret = (!val && input[0].type == 'select-one' && input[0].size < 1 && $('> option:first-child', input).attr('selected'));
+				ret = (!val && input[0].type == 'select-one' && input[0].size < 2 && $('> option:first-child:not(:disabled)', input).attr('selected'));
 			} else if(checkTypes[cache.type]){
 				ret = !$(getNames(input[0])).filter(':checked')[0];
 			} else {
@@ -315,8 +315,8 @@ $.support.validity = 'shim';
 			reset: 1
 			
 			//pro forma
-			,color: 1,
-			range: 1
+			,color: 1
+			//,range: 1
 		},
 		observe = function(input){
 			var timer,

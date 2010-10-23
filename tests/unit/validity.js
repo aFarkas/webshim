@@ -55,6 +55,11 @@ asyncTest("general validity Modul", function(){
 	ok($('#select').attr('validity').valid, 'select is valid');
 	$('#select').attr('required', true);
 	ok($('#select').attr('validity').valueMissing, 'required select with first option selected and empty value is invalid');
+	
+	$('#select option:first').attr('disabled', true);
+	ok($('#select').attr('validity').valid, 'required select with first disabled option selected and empty value is valid');
+	
+	$('#select option:first').attr('disabled', false);
 	$('#select').attr('selectedIndex', 1);
 	ok($('#select').attr('validity').valid, 'required select with empty value and second option selected is valid');
 	$('#select').attr({

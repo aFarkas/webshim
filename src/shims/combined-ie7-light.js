@@ -1,8 +1,8 @@
 // html5shiv MIT @rem remysharp.com/html5-enabling-script
 // iepp v1.5.1 MIT @jon_neal iecss.com/print-protector
-/*@cc_on(function(p,e){var q=e.createElement("div");q.innerHTML="<z>i</z>";q.childNodes.length!==1&&function(){function r(a,b){if(g[a])g[a].styleSheet.cssText+=b;else{var c=s[l],d=e[j]("style");d.media=a;c.insertBefore(d,c[l]);g[a]=d;r(a,b)}}function t(a,b){for(var c=new RegExp("\\b("+m+")\\b(?!.*[;}])","gi"),d=function(k){return".iepp_"+k},h=-1;++h<a.length;){b=a[h].media||b;t(a[h].imports,b);r(b,a[h].cssText.replace(c,d))}}for(var s=e.documentElement,i=e.createDocumentFragment(),g={},m="abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section summary time video".replace(/ /g, '|'),
+(function(p,e){if(!p.attachEvent){return;}var q=e.createElement("div");q.innerHTML="<z>i</z>";q.childNodes.length!==1&&function(){function r(a,b){if(g[a])g[a].styleSheet.cssText+=b;else{var c=s[l],d=e[j]("style");d.media=a;c.insertBefore(d,c[l]);g[a]=d;r(a,b)}}function t(a,b){for(var c=new RegExp("\\b("+m+")\\b(?!.*[;}])","gi"),d=function(k){return".iepp_"+k},h=-1;++h<a.length;){b=a[h].media||b;t(a[h].imports,b);r(b,a[h].cssText.replace(c,d))}}for(var s=e.documentElement,i=e.createDocumentFragment(),g={},m="abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section summary time video".replace(/ /g, '|'),
 n=m.split("|"),f=[],o=-1,l="firstChild",j="createElement";++o<n.length;){e[j](n[o]);i[j](n[o])}i=i.appendChild(e[j]("div"));p.attachEvent("onbeforeprint",function(){for(var a,b=e.getElementsByTagName("*"),c,d,h=new RegExp("^"+m+"$","i"),k=-1;++k<b.length;)if((a=b[k])&&(d=a.nodeName.match(h))){c=new RegExp("^\\s*<"+d+"(.*)\\/"+d+">\\s*$","i");i.innerHTML=a.outerHTML.replace(/\r|\n/g," ").replace(c,a.currentStyle.display=="block"?"<div$1/div>":"<span$1/span>");c=i.childNodes[0];c.className+=" iepp_"+
-d;c=f[f.length]=[a,c];a.parentNode.replaceChild(c[1],c[0])}t(e.styleSheets,"all")});p.attachEvent("onafterprint",function(){for(var a=-1,b;++a<f.length;)f[a][1].parentNode.replaceChild(f[a][0],f[a][1]);for(b in g)s[l].removeChild(g[b]);g={};f=[]})}()})(this,document);@*/// -- kriskowal Kris Kowal Copyright (C) 2009-2010 MIT License
+d;c=f[f.length]=[a,c];a.parentNode.replaceChild(c[1],c[0])}t(e.styleSheets,"all")});p.attachEvent("onafterprint",function(){for(var a=-1,b;++a<f.length;)f[a][1].parentNode.replaceChild(f[a][0],f[a][1]);for(b in g)s[l].removeChild(g[b]);g={};f=[]})}()})(this,document);// -- kriskowal Kris Kowal Copyright (C) 2009-2010 MIT License
 // -- tlrobinson Tom Robinson
 // -- dantman Daniel Friesen
 
@@ -1071,8 +1071,7 @@ jQuery.webshims.ready('es5', function($){
 	
 	(function(){
 		if($.support.validity !== true){return;}
-		var select = $('<form><select name="test"><option selected required value=""></option></select></form>').find('select');
-		var supportRequiredSelect = !(!('required' in select[0]) && select.attr('validity').valid && !window.noHTMLExtFixes);
+		var supportRequiredSelect = (('required' in document.createElement('select')) || window.noHTMLExtFixes);
 		var supportNumericDate = !!($('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range');
 		select = null;
 		if(supportRequiredSelect && supportNumericDate){return;}
@@ -1205,6 +1204,11 @@ jQuery.webshims.ready('es5', function($){
 			document.addEventListener('change', function(e){
 				testValidity(e.target);
 			}, true);
+			if (!supportNumericDate) {
+				document.addEventListener('input', function(e){
+					testValidity(e.target);
+				}, true);
+			}
 		}
 		
 		if(!supportRequiredSelect){
@@ -1218,7 +1222,7 @@ jQuery.webshims.ready('es5', function($){
 						cache.type = jElm[0].type;
 					}
 					
-					if(cache.type == 'select-one' && $('> option:first-child', jElm).attr('selected')){
+					if(cache.type == 'select-one' && $('> option:first-child:not(:disabled)', jElm).attr('selected')){
 						return true;
 					}
 				}
@@ -1300,7 +1304,7 @@ var validityRules = {
 				cache.type = getType(input[0]);
 			}
 			if(cache.nodeName == 'select'){
-				ret = (!val && input[0].type == 'select-one' && input[0].size < 1 && $('> option:first-child', input).attr('selected'));
+				ret = (!val && input[0].type == 'select-one' && input[0].size < 2 && $('> option:first-child:not(:disabled)', input).attr('selected'));
 			} else if(checkTypes[cache.type]){
 				ret = !$(getNames(input[0])).filter(':checked')[0];
 			} else {
@@ -1564,8 +1568,8 @@ $.support.validity = 'shim';
 			reset: 1
 			
 			//pro forma
-			,color: 1,
-			range: 1
+			,color: 1
+			//,range: 1
 		},
 		observe = function(input){
 			var timer,

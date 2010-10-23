@@ -281,8 +281,7 @@ jQuery.webshims.ready('es5', function($){
 	
 	(function(){
 		if($.support.validity !== true){return;}
-		var select = $('<form><select name="test"><option selected required value=""></option></select></form>').find('select');
-		var supportRequiredSelect = !(!('required' in select[0]) && select.attr('validity').valid && !window.noHTMLExtFixes);
+		var supportRequiredSelect = (('required' in document.createElement('select')) || window.noHTMLExtFixes);
 		var supportNumericDate = !!($('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range');
 		select = null;
 		if(supportRequiredSelect && supportNumericDate){return;}
@@ -415,6 +414,11 @@ jQuery.webshims.ready('es5', function($){
 			document.addEventListener('change', function(e){
 				testValidity(e.target);
 			}, true);
+			if (!supportNumericDate) {
+				document.addEventListener('input', function(e){
+					testValidity(e.target);
+				}, true);
+			}
 		}
 		
 		if(!supportRequiredSelect){
@@ -428,7 +432,7 @@ jQuery.webshims.ready('es5', function($){
 						cache.type = jElm[0].type;
 					}
 					
-					if(cache.type == 'select-one' && $('> option:first-child', jElm).attr('selected')){
+					if(cache.type == 'select-one' && $('> option:first-child:not(:disabled)', jElm).attr('selected')){
 						return true;
 					}
 				}
