@@ -250,7 +250,7 @@ asyncTest('checkValidity/invalid event III', function(){
 asyncTest('checkValidity/invalid event IV', function(){
 	QUnit.reset();
 	var invalids = 0;
-	$('#form-1').bind('invalid', function(){
+	$('#form-1').bind('invalid', function(e){
 		invalids++;
 	});
 	

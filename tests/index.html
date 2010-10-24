@@ -7,25 +7,38 @@
 	<link rel="stylesheet" href="qunit/qunit.css" type="text/css" media="screen">
 	
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	
+	<script src="qunit/qunit.js"></script>
+	
+	<script src="../src/polyfiller.js"></script>
 	<script>
 		(function(){
-			if(location.hash.replace('#', '') == 'noCapableBugfixes'){
+			var hash = location.hash.replace('#', '');
+			if(hash.indexOf('noCapableBugfixes') !== -1){
 				window.noHTMLExtFixes = true; 
 			}
+			if(hash.indexOf('overrideValidationMessages') !== -1){
+				$.webshims.overrideValidationMessages = true; 
+			}
+			
 			$(function(){
-				$('#bugfixes')
-					.attr('checked', !!window.noHTMLExtFixes)
+				$('#bugfixes').attr('checked', !!window.noHTMLExtFixes);
+				$('#overrideValidationMessages').attr('checked', !!$.webshims.overrideValidationMessages);
+				$('input.webshim-config')
 					.bind('click', function(){
-						location.hash = this.checked ? 'noCapableBugfixes' : '';
+						var addHash = '';
+						$('input.webshim-config').each(function(){
+							if(this.checked){
+								addHash += $.attr(this, 'value');
+							}
+						});
+						location.hash = addHash;
 						location.reload();
 					})
 				;
 			});
 		})();
 	</script>
-	<script src="qunit/qunit.js"></script>
-	
-	<script src="../src/polyfiller.js"></script>
 	<script>
 		(function(){
 			var _reset = QUnit.reset;
@@ -70,7 +83,8 @@
 </head>
 <body class="flora">
 <div>
-	<input type="checkbox" id="bugfixes" /> <label for="bugfixes"><strong>without</strong> (capable browser) bugfixes</label>
+	<input type="checkbox" id="bugfixes" value="noCapableBugfixes" class="webshim-config" /> <label for="bugfixes"><strong>without</strong> (capable browser) bugfixes</label>
+	<input type="checkbox" id="overrideValidationMessages" value="overrideValidationMessages" class="webshim-config" /> <label for="overrideValidationMessages">overrideValidationMessages</label>
 </div>
 <h1 id="qunit-header">QUnit Test Suite</h1>
 <h2 id="qunit-banner"></h2>

@@ -208,22 +208,6 @@ $.webshims.attr('validity', {
 	}
 });
 
-$.webshims.addMethod('setCustomValidity', function(error){
-	$.data(this, 'customvalidationMessage', ''+error);
-});
-
-//this will be extended
-$.webshims.attr('validationMessage', {
-	elementNames: ['input', 'select', 'textarea'],
-	getter: function(elem, fn){
-		var message = fn() || $.data(elem, 'customvalidationMessage');
-		return (!message || !$.attr(elem, 'willValidate')) ? 
-			'' :
-			message
-		;
-	}
-});
-
 $.webshims.createBooleanAttrs('required', ['input', 'textarea', 'select']);
 
 $.webshims.attr('willValidate', {
@@ -318,6 +302,13 @@ $.support.validity = 'shim';
 			,color: 1
 			//,range: 1
 		},
+		inlineInput = function(e){
+			if(!e || e.originalEvent){return;}
+			var inline = this.getAttribute('onforminput');
+			if(inline && typeof inline == 'string'){
+				(function(){eval( inline )}).apply(this, arguments);
+			}
+		},
 		observe = function(input){
 			var timer,
 				type 	= input[0].getAttribute('type'),
@@ -343,11 +334,13 @@ $.support.validity = 'shim';
 			;
 			
 			clearInterval(timer);
-			timer = setInterval(trigger, 150);
+			timer = setInterval(trigger, 250);
 			setTimeout(trigger, 9);
 			input.bind('focusout', unbind).bind('input', trigger);
 		}
 	;
+		
+	
 	$(document)
 		.bind('focusin', function(e){
 			if( e.target && e.target.type && !e.target.readonly && !e.target.readOnly && !e.target.disabled && elements[(e.target.nodeName || '').toLowerCase()] && !noInputTypes[e.target.type] ){

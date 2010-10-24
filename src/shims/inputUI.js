@@ -13,15 +13,15 @@
 	};
 	
 	replaceInputUI.common = function(orig, shim, methods){
-//		if(options.replaceNative){
-//			orig.bind('invalid', function(e){
-//				setTimeout(function(){
-//					if(!$.data(e.target, 'maybePreventedinvalid')){
-//						throw('you have to handle invalid events, if you replace native input-widgets.');
-//					}
-//				}, 9);
-//			});
-//		}
+		if($.support.validity === true){
+			orig.bind('firstinvalid', function(e){
+				setTimeout(function(){
+					if(!$.data(e.target, 'maybePreventedinvalid')){
+						$.webshims.validityAlert.showFor(e.target);
+					}
+				}, 30);
+			});
+		}
 		
 		var attr = {
 			css: {
@@ -44,6 +44,7 @@
 		if(!$.fn.datepicker){return;}
 		var date = $('<span class="input-datetime-local"><input type="text" class="input-datetime-local-date" /><input type="time" class="input-datetime-local-time" /></span>'),
 			attr  = this.common(elem, date, replaceInputUI['datetime-local'].attrs),
+			datePicker = $('input.input-datetime-local-date', date),
 			data
 		;
 		$('input', date).data('html5element', $.data(date[0], 'html5element'));
@@ -53,7 +54,7 @@
 			if(attr.outerWidth){
 				date.outerWidth(attr.outerWidth);
 				var width = date.getwidth();
-				$('input.input-datetime-local-date')
+				datePicker
 					.css({marginLeft: 0, marginRight: 2})
 					.outerWidth(Math.floor(width * 0.61))
 				;
@@ -71,11 +72,11 @@
 				
 				var value, timeVal = $('input.input-datetime-local-time', date).attr('value');
 				try {
-					value = $.datepicker.parseDate(data.settings.dateFormat, $('input.input-datetime-local-date', date).attr('value'));
-					value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : $('input.input-datetime-local-date', date).attr('value');
+					value = $.datepicker.parseDate(datePicker.datepicker('option', 'dateFormat'), datePicker.attr('value'));
+					value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : datePicker.attr('value');
 				} 
 				catch (e) {
-					value = $('input.input-datetime-local-date', date).attr('value');
+					value = datePicker.attr('value');
 				}
 				if (!$('input.input-datetime-local-time', date).attr('value')) {
 					timeVal = '00:00';
@@ -98,7 +99,7 @@
 			replaceInputUI['datetime-local'].blockAttr = true;
 			
 			try {
-				$('input.input-datetime-local-date', date).attr('value', $.datepicker.formatDate(data.settings.dateFormat, $.datepicker.parseDate('yy-mm-dd', val[0])));
+				datePicker.attr('value', $.datepicker.formatDate(datePicker.datepicker('option', 'dateFormat'), $.datepicker.parseDate('yy-mm-dd', val[0])));
 			} catch(e){}
 			elem.attr('value', val.join('T'));
 			replaceInputUI['datetime-local'].blockAttr = false;
@@ -163,7 +164,7 @@
 				replaceInputUI.date.blockAttr = true;
 				var value;
 				try {
-					value = $.datepicker.parseDate(data.settings.dateFormat, date.attr('value') );
+					value = $.datepicker.parseDate(date.datepicker('option', 'dateFormat'), date.attr('value') );
 					value = (value) ? $.datepicker.formatDate( 'yy-mm-dd', value ) : date.attr('value');
 				} catch(e){
 					value = date.attr('value');

@@ -29,6 +29,7 @@
     	$.webshims.debug = true;
     	//path is path of html-ext.js + shims/
     	$.webshims.loader.basePath += 'shims/';
+		$.webshims.overrideValidationMessages = true;
 		//load all defined modules (look into features.js)
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
@@ -49,13 +50,14 @@
 	    </script>
 </head>
 <script>
-	var test =function(){
+	var test = function(){
 		console.log(this, arguments);
 	};
 </script>
 <body class="js-off">   
      
 <form id="test" action="#">
+	<input name="t" type="text" required />
 	<input name="datetime-local" type="datetime-local" />
 	<input type="submit" />	
 </form>

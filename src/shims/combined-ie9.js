@@ -194,58 +194,6 @@ jQuery.webshims.ready('es5', function($){
 		valueMissing: 'Sie müssen einen Wert eingeben'
 	};
 	
-	var currentValidationMessage =  $.webshims.validityMessages[''];
-	$(document).bind('htmlExtLangChange', function(){
-		$.webshims.activeLang($.webshims.validityMessages, 'validation-base', function(langObj){
-			currentValidationMessage = langObj;
-		});
-	});
-	
-	$.webshims.createValidationMessage = function(elem, name){
-		var message = currentValidationMessage[name];
-		if(message && typeof message !== 'string'){
-			message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
-		}
-		if(message){
-			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
-				if(message.indexOf('{%'+attr) === -1){return;}
-				var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
-				message = message.replace('{%'+ attr +'}', val);
-				if('value' == attr){
-					message = message.replace('{%valueLen}', val.length);
-				}
-			});
-		}
-		return message || '';
-	};
-		
-	$.each(($.support.validationMessage) ? ['customValidationMessage'] : ['customValidationMessage', 'validationMessage'], function(i, fn){
-		$.webshims.attr(fn, {
-			elementNames: ['input', 'select', 'textarea'],
-			getter: function(elem){
-				var message = '';
-				if(!$.attr(elem, 'willValidate')){
-					return message;
-				}
-				
-				var validity = $.attr(elem, 'validity') || {valid: 1};
-				if(validity.valid){return message;}
-				if(validity.customError || fn === 'validationMessage'){
-					message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
-					if(message){return message;}
-				}
-				$.each(validity, function(name, prop){
-					if(name == 'valid' || !prop){return;}
-					message = $.webshims.createValidationMessage(elem, name);
-					if(message){
-						return false;
-					}
-				});
-				
-				return message || '';
-			}
-		});
-	} );
 	
 	/* ugly workaround/bugfixes */
 	(function(){
@@ -262,11 +210,28 @@ jQuery.webshims.ready('es5', function($){
 		//opera throws a submit-event and then the invalid events,
 		//chrome7 has disabled invalid events, this brings them back
 		if($.support.validity === true && window.addEventListener && !window.noHTMLExtFixes){
+			var formnovalidate = {
+				timer: undefined,
+				prevented: false
+			};
 			window.addEventListener('submit', function(e){
-				if(e.target.checkValidity && $.attr(e.target, 'novalidate') === undefined && !e.target.checkValidity()){
+				if(!formnovalidate.prevented && e.target.checkValidity && $.attr(e.target, 'novalidate') === undefined && !e.target.checkValidity()){
 					invalidTriggeredBySubmit = true;
 				}
 			}, true);
+			var preventValidityTest = function(e){
+				if($.attr(e.target, 'formnovalidate') === undefined){return;}
+				if(formnovalidate.timer){
+					clearTimeout(formnovalidate.timer);
+				}
+				formnovalidate.prevented = true;
+				formnovalidate.timer = setTimeout(function(){
+					formnovalidate.prevented = false;
+				}, 20);
+			};
+			window.addEventListener('click', preventValidityTest, true);
+			window.addEventListener('touchstart', preventValidityTest, true);
+			window.addEventListener('touchend', preventValidityTest, true);
 		}
 		$(document).bind('invalid', function(e){
 			if(!firstEvent){
@@ -350,30 +315,30 @@ jQuery.webshims.ready('es5', function($){
 		});
 	})();
 	
-	$.support.validationMessage = $.support.validationMessage || 'shim';
-	
-	
+	//implements validationMessage in uncapable browser and adds unknown types/attributes in capable browsers/overrides validationMessage in capable browsers
 	(function(){
-		if($.support.validity !== true){return;}
-		var supportRequiredSelect = (('required' in document.createElement('select')) || window.noHTMLExtFixes);
-		var supportNumericDate = !!($('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range');
-		select = null;
-		if(supportRequiredSelect && supportNumericDate){return;}
+		var overrideNativeMessages = ( $.support.validity === true && $.webshims.overrideValidationMessages );
+		var supportRequiredSelect = ( $.support.validity !== true || ('required' in document.createElement('select')) || window.noHTMLExtFixes );
+		var supportNumericDate = !!( $.support.validity !== true || ($('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range') );
+		var overrideValidity = (!supportRequiredSelect || !supportNumericDate || overrideNativeMessages);
 		
 		var typeModels = $.webshims.inputTypes;
 		var validityRules = {};
 		var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 		var oldAttr = $.attr;
 		var oldVal = $.fn.val;
-		var validityChanger = {value: 1};
-		var validityElements = [];
+		var validityChanger = (overrideNativeMessages)? {value: 1, checked: 1} : {value: 1};
+		var validityElements = (overrideNativeMessages) ? ['textarea'] : [];
 		var testValidity = function(elem){
-			var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
-			if((!supportRequiredSelect && type == 'select-one') || !typeModels[type]){return;}
+			if(!elem.form){return;}
+			if(!overrideNativeMessages){
+				var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
+				if((!supportRequiredSelect && type == 'select-one') || !typeModels[type]){return;}
+			}
 			$.attr(elem, 'validity');
 		};
 		
-		if(!supportRequiredSelect){
+		if(!supportRequiredSelect || overrideNativeMessages){
 			$.extend(validityChanger, {
 				required: 1,
 				size: 1,
@@ -382,117 +347,100 @@ jQuery.webshims.ready('es5', function($){
 			});
 			validityElements.push('select');
 		}
-		if(!supportNumericDate){
+		if(!supportNumericDate || overrideNativeMessages){
 			$.extend(validityChanger, {
 				min: 1, max: 1, step: 1
 			});
 			validityElements.push('input');
 		}
 		
-		$.webshims.addInputType = function(type, obj){
-			typeModels[type] = obj;
-		};
+		select = null;
 		
-		
-		$.webshims.addValidityRule = function(type, fn){
-			validityRules[type] = fn;
-		};
-		
-		$.webshims.addValidityRule('typeMismatch',function (input, val, cache, validityState){
-			if(val === ''){return false;}
-			var ret = validityState.typeMismatch;
-			if(!('type' in cache)){
-				cache.type = (input[0].getAttribute('type') || '').toLowerCase();
-			}
-			
-			if(typeModels[cache.type] && typeModels[cache.type].mismatch){
-				ret = typeModels[cache.type].mismatch(val, input);
-			}
-			return ret;
+		var currentValidationMessage =  $.webshims.validityMessages[''];
+		$(document).bind('htmlExtLangChange', function(){
+			$.webshims.activeLang($.webshims.validityMessages, 'validation-base', function(langObj){
+				currentValidationMessage = langObj;
+			});
 		});
 		
+		$.webshims.createValidationMessage = function(elem, name){
+			var message = currentValidationMessage[name];
+			if(message && typeof message !== 'string'){
+				message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
+			}
+			if(message){
+				['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
+					if(message.indexOf('{%'+attr) === -1){return;}
+					var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
+					message = message.replace('{%'+ attr +'}', val);
+					if('value' == attr){
+						message = message.replace('{%valueLen}', val.length);
+					}
+				});
+			}
+			return message || '';
+		};
 		
-		
-		$.webshims.attr('validity', {
-			elementNames: validityElements,
+		$.webshims.attr('validationMessage', {
+			elementNames: ['input', 'select', 'textarea'],
 			getter: function(elem){
-				var validity 	= elem.validity;
-				if(!validity){
-					return validity;
-				}
-				var validityState = {};
-				validityProps.forEach(function(prop){
-					validityState[prop] = validity[prop];
-				});
-				if( !$.attr(elem, 'willValidate') ){
-					return validityState;
-				}
-				var jElm 			= $(elem),
-					cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
-					val				= oldVal.call(jElm),
-					customError 	= !!($.data(elem, 'hasCustomError'))
-				;
-				
-				
-				validityState.customError = customError;
-				if( validityState.valid && validityState.customError ){
-					validityState.valid = false;
-				} else if(!validityState.valid) {
-					var allFalse = true;
-					$.each(validityState, function(name, prop){
-						if(prop){
-							allFalse = false;
-							return false;
-						}
-					});
-					
-					if(allFalse){
-						validityState.valid = true;
-					}
-					
+				var message = '';
+				if(!$.attr(elem, 'willValidate')){
+					return message;
 				}
 				
-				$.each(validityRules, function(rule, fn){
-					var message;
-					validityState[rule] = fn(jElm, val, cache, validityState);
-					if(validityState[rule] && validityState.valid) {
-						message = $.webshims.createValidationMessage(elem, rule);
-						elem.setCustomValidity(message);
-						validityState.valid = false;
+				var validity = $.attr(elem, 'validity') || {valid: 1};
+				if(validity.valid){return message;}
+				message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
+				if(message){return message;}
+				$.each(validity, function(name, prop){
+					if(name == 'valid' || !prop){return;}
+					message = $.webshims.createValidationMessage(elem, name);
+					if(message){
+						return false;
 					}
 				});
-				if(validityState.valid){
-					elem.setCustomValidity('');
-				}
-				return validityState;
+				
+				return message || '';
 			}
 		});
+		$.support.validationMessage = $.support.validationMessage || 'shim';
+		
 		
 		$.webshims.addMethod('setCustomValidity', function(error){
 			error = error+'';
-			this.setCustomValidity(error);
-			$.data(this, 'hasCustomError', !!(error));
-			testValidity(this);
-		});
-			
-		
-		$.fn.val = function(val){
-			var ret = oldVal.apply(this, arguments);
-			this.each(function(){
-				testValidity(this);
-			});
-			return ret;
-		};
-		
-		if(document.addEventListener){
-			document.addEventListener('change', function(e){
-				testValidity(e.target);
-			}, true);
-			if (!supportNumericDate) {
-				document.addEventListener('input', function(e){
-					testValidity(e.target);
-				}, true);
+			if(this.setCustomValidity){
+				this.setCustomValidity(error);
+				if(overrideValidity){
+					$.data(this, 'hasCustomError', !!(error));
+					testValidity(this);
+				}
+			} else {
+				$.data(this, 'customvalidationMessage', ''+error);
 			}
+		});
+		
+		if($.support.validity === true){
+			$.webshims.addInputType = function(type, obj){
+				typeModels[type] = obj;
+			};
+			
+			$.webshims.addValidityRule = function(type, fn){
+				validityRules[type] = fn;
+			};
+			
+			$.webshims.addValidityRule('typeMismatch',function (input, val, cache, validityState){
+				if(val === ''){return false;}
+				var ret = validityState.typeMismatch;
+				if(!('type' in cache)){
+					cache.type = (input[0].getAttribute('type') || '').toLowerCase();
+				}
+				
+				if(typeModels[cache.type] && typeModels[cache.type].mismatch){
+					ret = typeModels[cache.type].mismatch(val, input);
+				}
+				return ret;
+			});
 		}
 		
 		if(!supportRequiredSelect){
@@ -514,19 +462,105 @@ jQuery.webshims.ready('es5', function($){
 			});
 		}
 		
-		$.attr = function(elem, prop, value){
-			var ret = oldAttr.apply(this, arguments);
-			if(validityChanger[prop] && value !== undefined && elem.form){
-				testValidity(elem);
-			}
-			return ret;
-		};
-		
-		$.webshims.addReady(function(context){
-			$('input', context).each(function(){
-				testValidity(this);
+		if(overrideValidity){
+			$.webshims.attr('validity', {
+				elementNames: validityElements,
+				getter: function(elem){
+					var validity 	= elem.validity;
+					if(!validity){
+						return validity;
+					}
+					var validityState = {};
+					validityProps.forEach(function(prop){
+						validityState[prop] = validity[prop];
+					});
+					
+					if( !$.attr(elem, 'willValidate') ){
+						return validityState;
+					}
+					var jElm 			= $(elem),
+						cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
+						val				= oldVal.call(jElm),
+						customError 	= !!($.data(elem, 'hasCustomError')),
+						setCustomMessage
+					;
+					
+					validityState.customError = customError;
+										
+					if( validityState.valid && validityState.customError ){
+						validityState.valid = false;
+					} else if(!validityState.valid) {
+						var allFalse = true;
+						$.each(validityState, function(name, prop){
+							if(prop){
+								allFalse = false;
+								return false;
+							}
+						});
+						
+						if(allFalse){
+							validityState.valid = true;
+						}
+						
+					}
+					
+					$.each(validityRules, function(rule, fn){
+						validityState[rule] = fn(jElm, val, cache, validityState);
+						if( validityState[rule] && (validityState.valid || (!setCustomMessage && overrideNativeMessages)) ) {
+							elem.setCustomValidity($.webshims.createValidationMessage(elem, rule));
+							validityState.valid = false;
+							setCustomMessage = true;
+						}
+					});
+					if(validityState.valid){
+						elem.setCustomValidity('');
+					}
+					return validityState;
+				}
 			});
-		});
+						
+			
+			$.fn.val = function(val){
+				var ret = oldVal.apply(this, arguments);
+				this.each(function(){
+					testValidity(this);
+				});
+				return ret;
+			};
+			
+			$.attr = function(elem, prop, value){
+				var ret = oldAttr.apply(this, arguments);
+				if(validityChanger[prop] && value !== undefined && elem.form){
+					testValidity(elem);
+				}
+				return ret;
+			};
+			
+			if(document.addEventListener){
+				document.addEventListener('change', function(e){
+					testValidity(e.target);
+				}, true);
+				if (!supportNumericDate) {
+					document.addEventListener('input', function(e){
+						testValidity(e.target);
+					}, true);
+				}
+			}
+						
+			$.webshims.addReady(function(context){
+				
+				if(context === document){
+					$(validityElements.join(',')).each(function(){
+						testValidity(this);
+					});
+				} else {
+					$(validityElements.join(','), context).each(function(){
+						testValidity(this);
+					});
+				}
+			});
+			
+		} //end: overrideValidity -> (!supportRequiredSelect || !supportNumericDate || overrideNativeMessages)
 		
 	})();
 	
@@ -745,22 +779,6 @@ $.webshims.attr('validity', {
 	}
 });
 
-$.webshims.addMethod('setCustomValidity', function(error){
-	$.data(this, 'customvalidationMessage', ''+error);
-});
-
-//this will be extended
-$.webshims.attr('validationMessage', {
-	elementNames: ['input', 'select', 'textarea'],
-	getter: function(elem, fn){
-		var message = fn() || $.data(elem, 'customvalidationMessage');
-		return (!message || !$.attr(elem, 'willValidate')) ? 
-			'' :
-			message
-		;
-	}
-});
-
 $.webshims.createBooleanAttrs('required', ['input', 'textarea', 'select']);
 
 $.webshims.attr('willValidate', {
@@ -855,6 +873,13 @@ $.support.validity = 'shim';
 			,color: 1
 			//,range: 1
 		},
+		inlineInput = function(e){
+			if(!e || e.originalEvent){return;}
+			var inline = this.getAttribute('onforminput');
+			if(inline && typeof inline == 'string'){
+				(function(){eval( inline )}).apply(this, arguments);
+			}
+		},
 		observe = function(input){
 			var timer,
 				type 	= input[0].getAttribute('type'),
@@ -880,11 +905,13 @@ $.support.validity = 'shim';
 			;
 			
 			clearInterval(timer);
-			timer = setInterval(trigger, 150);
+			timer = setInterval(trigger, 250);
 			setTimeout(trigger, 9);
 			input.bind('focusout', unbind).bind('input', trigger);
 		}
 	;
+		
+	
 	$(document)
 		.bind('focusin', function(e){
 			if( e.target && e.target.type && !e.target.readonly && !e.target.readOnly && !e.target.disabled && elements[(e.target.nodeName || '').toLowerCase()] && !noInputTypes[e.target.type] ){
@@ -1431,15 +1458,15 @@ $.webshims.createReadyEvent('validity');
 	};
 	
 	replaceInputUI.common = function(orig, shim, methods){
-//		if(options.replaceNative){
-//			orig.bind('invalid', function(e){
-//				setTimeout(function(){
-//					if(!$.data(e.target, 'maybePreventedinvalid')){
-//						throw('you have to handle invalid events, if you replace native input-widgets.');
-//					}
-//				}, 9);
-//			});
-//		}
+		if($.support.validity === true){
+			orig.bind('firstinvalid', function(e){
+				setTimeout(function(){
+					if(!$.data(e.target, 'maybePreventedinvalid')){
+						$.webshims.validityAlert.showFor(e.target);
+					}
+				}, 30);
+			});
+		}
 		
 		var attr = {
 			css: {
@@ -1462,6 +1489,7 @@ $.webshims.createReadyEvent('validity');
 		if(!$.fn.datepicker){return;}
 		var date = $('<span class="input-datetime-local"><input type="text" class="input-datetime-local-date" /><input type="time" class="input-datetime-local-time" /></span>'),
 			attr  = this.common(elem, date, replaceInputUI['datetime-local'].attrs),
+			datePicker = $('input.input-datetime-local-date', date),
 			data
 		;
 		$('input', date).data('html5element', $.data(date[0], 'html5element'));
@@ -1471,7 +1499,7 @@ $.webshims.createReadyEvent('validity');
 			if(attr.outerWidth){
 				date.outerWidth(attr.outerWidth);
 				var width = date.getwidth();
-				$('input.input-datetime-local-date')
+				datePicker
 					.css({marginLeft: 0, marginRight: 2})
 					.outerWidth(Math.floor(width * 0.61))
 				;
@@ -1489,11 +1517,11 @@ $.webshims.createReadyEvent('validity');
 				
 				var value, timeVal = $('input.input-datetime-local-time', date).attr('value');
 				try {
-					value = $.datepicker.parseDate(data.settings.dateFormat, $('input.input-datetime-local-date', date).attr('value'));
-					value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : $('input.input-datetime-local-date', date).attr('value');
+					value = $.datepicker.parseDate(datePicker.datepicker('option', 'dateFormat'), datePicker.attr('value'));
+					value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : datePicker.attr('value');
 				} 
 				catch (e) {
-					value = $('input.input-datetime-local-date', date).attr('value');
+					value = datePicker.attr('value');
 				}
 				if (!$('input.input-datetime-local-time', date).attr('value')) {
 					timeVal = '00:00';
@@ -1516,7 +1544,7 @@ $.webshims.createReadyEvent('validity');
 			replaceInputUI['datetime-local'].blockAttr = true;
 			
 			try {
-				$('input.input-datetime-local-date', date).attr('value', $.datepicker.formatDate(data.settings.dateFormat, $.datepicker.parseDate('yy-mm-dd', val[0])));
+				datePicker.attr('value', $.datepicker.formatDate(datePicker.datepicker('option', 'dateFormat'), $.datepicker.parseDate('yy-mm-dd', val[0])));
 			} catch(e){}
 			elem.attr('value', val.join('T'));
 			replaceInputUI['datetime-local'].blockAttr = false;
@@ -1581,7 +1609,7 @@ $.webshims.createReadyEvent('validity');
 				replaceInputUI.date.blockAttr = true;
 				var value;
 				try {
-					value = $.datepicker.parseDate(data.settings.dateFormat, date.attr('value') );
+					value = $.datepicker.parseDate(date.datepicker('option', 'dateFormat'), date.attr('value') );
 					value = (value) ? $.datepicker.formatDate( 'yy-mm-dd', value ) : date.attr('value');
 				} catch(e){
 					value = date.attr('value');
