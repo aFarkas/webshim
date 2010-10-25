@@ -119,6 +119,20 @@
 				}, 100);
 			});
 			
+			$('input.novalidate-submit').click(function(){
+				reset();
+				preventInvalid = true;
+				$('input.text').attr('value', '');
+				setTimeout(function(){
+					equals(submitEvents, 1, '1 submit events');
+					equals(firstInvalidEvents, 0, 'no firstinvalid event');
+					equals(invalidEvents, 0, 'no invalid events');
+					equals(capturedSubmitEvents, 1, "captured submit events (negligible|won't fix)");
+				}, 100);
+			});
+			
+			
+			
 			
 			$('form').bind('submit invalid firstinvalid', function(e){
 				
@@ -165,6 +179,7 @@
 		<input type="submit" class="invalid-prevent-submit-without-submit-prevention" value="try invalid-prevented submit (no submit prevention)" />
 		<input type="submit" class="invalid-prevent-submit" value="try invalid-prevented submit" />
 		<input type="submit" class="valid-submit" value="try valid  submit" />
+		<input formnovalidate="bla" type="submit" class="novalidate-submit" value="formnovalidate" />
     </form>
 </div>
 	   

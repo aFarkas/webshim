@@ -462,7 +462,19 @@
 			loader.loadCSS('shim.css');
 			loader.loadList(toLoadFeatures);
 		},
-		
+		getID: (function(){
+			var ID = new Date().getTime();
+			return function(elem){
+				elem = $(elem);
+				var id = elem.attr('id');
+				if(!id){
+					ID++;
+					id = 'elem-id-'+ ID;
+					elem.attr('id', id);
+				}
+				return id;
+			};
+		})(),
 		activeLang: (function(){
 			var langs = [navigator.browserLanguage || navigator.language || ''];
 			var paLang = $('html').attr('lang');
@@ -696,6 +708,15 @@
 			combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
 		});
 	})();
+	
+	addPolyfill('output', {
+			feature: 'forms',
+			noAutoCallback: true,
+			test: function(){
+				return ( 'value' in document.createElement('output') );
+			},
+			combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
+		});
 	
 	
 	addPolyfill('validity', {

@@ -34,7 +34,6 @@
 			
 			data.box[(placeholderTxt && !value) ? 'addClass' : 'removeClass']('placeholder-visible');
 		},
-		placeholderID 	= 0,
 		createPlaceholder = function(elem){
 			elem = $(elem);
 			var id 			= elem.attr('id'),
@@ -42,13 +41,9 @@
 				pHolderTxt
 			;
 			if(!hasLabel && id){
-				hasLabel = !!($('label[for='+ id +']', elem[0].form)[0]);
-			} else if(!id){
-				placeholderID++;
-				id = 'input-placeholder-id-'+ placeholderID;
-				elem.attr('id', id);
+				hasLabel = !!( $('label[for='+ id +']', elem[0].form)[0] );
 			}
-			return $((hasLabel) ? '<span class="placeholder-text"></span>' : '<label for="'+ id +'" class="placeholder-text"></label>');
+			return $((hasLabel) ? '<span class="placeholder-text"></span>' : '<label for="'+ (id || $.webshims.getID(elem)) +'" class="placeholder-text"></label>');
 		},
 		pHolder = (function(){
 			var delReg 	= /\n|\r|\f|\t/g,

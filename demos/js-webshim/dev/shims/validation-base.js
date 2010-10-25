@@ -16,6 +16,37 @@ jQuery.webshims.ready('es5', function($){
 		}
 	});
 	
+	$.webshims.triggerInlineForm = (function(){
+		var stringify = function(id){
+			if(typeof id != 'string' || id.indexOf('-') !== -1 || id.indexOf('.') !== -1 || id.indexOf('"') !== -1){return '';}
+			return 'var '+ id +' = this.form["'+ id +'"];';
+		};
+		return function(elem, event){
+			var attr = elem['on'+event] || elem.getAttribute('on'+event) || '';
+			event = $.Event({
+				type: event,
+				target: elem[0],
+				currentTarget: elem[0]
+			});
+			if(attr && typeof attr == 'string' && elem.form && elem.form.elements){
+				var scope = '';
+				$(elem.form.elements).each(function(){
+					var name = this.name;
+					var id = this.id;
+					if(!id && !name){return;}
+					if(name){
+						scope += stringify(name);
+					}
+					if(id && id !== name){
+						scope += stringify(id);
+					}
+				});
+				(function(){eval( scope + attr );}).call(elem, event);
+			}
+			$(elem).trigger(event);
+		};
+	})();
+	
 	/* some extra validation UI */
 	$.webshims.validityAlert = (function(){
 		
@@ -248,10 +279,13 @@ jQuery.webshims.ready('es5', function($){
 	//implements validationMessage in uncapable browser and adds unknown types/attributes in capable browsers/overrides validationMessage in capable browsers
 	(function(){
 		var overrideNativeMessages = ( $.support.validity === true && $.webshims.overrideValidationMessages );
-		var supportRequiredSelect = ( $.support.validity !== true || ('required' in document.createElement('select')) || window.noHTMLExtFixes );
-		var supportNumericDate = !!( $.support.validity !== true || ($('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range') );
+		var supportRequiredSelect = true;
+		var supportNumericDate = true;
+		if($.support.validity === true){
+			supportRequiredSelect = !!( ('required' in document.createElement('select')) || window.noHTMLExtFixes );
+			supportNumericDate = !!(($('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range') );
+		}
 		var overrideValidity = (!supportRequiredSelect || !supportNumericDate || overrideNativeMessages);
-		
 		var typeModels = $.webshims.inputTypes;
 		var validityRules = {};
 		var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
@@ -263,9 +297,9 @@ jQuery.webshims.ready('es5', function($){
 		var testValidity = function(elem, init){
 			if(!elem.form){return;}
 			var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
+			
 			if(!overrideNativeMessages){
-				
-				if((!supportRequiredSelect && type == 'select-one') || !typeModels[type]){return;}
+				if(!(!supportRequiredSelect && type == 'select-one') && !typeModels[type]){return;}
 			}
 			
 			if(overrideNativeMessages && !init && checkTypes[type] && elem.name){
@@ -274,6 +308,7 @@ jQuery.webshims.ready('es5', function($){
 				});
 			} else {
 				$.attr(elem, 'validity');
+				
 			}
 		};
 		

@@ -806,6 +806,37 @@ jQuery.webshims.ready('es5', function($){
 		}
 	});
 	
+	$.webshims.triggerInlineForm = (function(){
+		var stringify = function(id){
+			if(typeof id != 'string' || id.indexOf('-') !== -1 || id.indexOf('.') !== -1 || id.indexOf('"') !== -1){return '';}
+			return 'var '+ id +' = this.form["'+ id +'"];';
+		};
+		return function(elem, event){
+			var attr = elem['on'+event] || elem.getAttribute('on'+event) || '';
+			event = $.Event({
+				type: event,
+				target: elem[0],
+				currentTarget: elem[0]
+			});
+			if(attr && typeof attr == 'string' && elem.form && elem.form.elements){
+				var scope = '';
+				$(elem.form.elements).each(function(){
+					var name = this.name;
+					var id = this.id;
+					if(!id && !name){return;}
+					if(name){
+						scope += stringify(name);
+					}
+					if(id && id !== name){
+						scope += stringify(id);
+					}
+				});
+				(function(){eval( scope + attr );}).call(elem, event);
+			}
+			$(elem).trigger(event);
+		};
+	})();
+	
 	/* some extra validation UI */
 	$.webshims.validityAlert = (function(){
 		
@@ -1038,10 +1069,13 @@ jQuery.webshims.ready('es5', function($){
 	//implements validationMessage in uncapable browser and adds unknown types/attributes in capable browsers/overrides validationMessage in capable browsers
 	(function(){
 		var overrideNativeMessages = ( $.support.validity === true && $.webshims.overrideValidationMessages );
-		var supportRequiredSelect = ( $.support.validity !== true || ('required' in document.createElement('select')) || window.noHTMLExtFixes );
-		var supportNumericDate = !!( $.support.validity !== true || ($('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range') );
+		var supportRequiredSelect = true;
+		var supportNumericDate = true;
+		if($.support.validity === true){
+			supportRequiredSelect = !!( ('required' in document.createElement('select')) || window.noHTMLExtFixes );
+			supportNumericDate = !!(($('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range') );
+		}
 		var overrideValidity = (!supportRequiredSelect || !supportNumericDate || overrideNativeMessages);
-		
 		var typeModels = $.webshims.inputTypes;
 		var validityRules = {};
 		var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
@@ -1053,9 +1087,9 @@ jQuery.webshims.ready('es5', function($){
 		var testValidity = function(elem, init){
 			if(!elem.form){return;}
 			var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
+			
 			if(!overrideNativeMessages){
-				
-				if((!supportRequiredSelect && type == 'select-one') || !typeModels[type]){return;}
+				if(!(!supportRequiredSelect && type == 'select-one') && !typeModels[type]){return;}
 			}
 			
 			if(overrideNativeMessages && !init && checkTypes[type] && elem.name){
@@ -1064,6 +1098,7 @@ jQuery.webshims.ready('es5', function($){
 				});
 			} else {
 				$.attr(elem, 'validity');
+				
 			}
 		};
 		
@@ -1604,26 +1639,18 @@ $.support.validity = 'shim';
 			,color: 1
 			//,range: 1
 		},
-		inlineInput = function(e){
-			if(!e || e.originalEvent){return;}
-			var inline = this.getAttribute('onforminput');
-			if(inline && typeof inline == 'string'){
-				(function(){eval( inline )}).apply(this, arguments);
-			}
-		},
 		observe = function(input){
 			var timer,
-				type 	= input[0].getAttribute('type'),
-				lastVal = input.val(),
+				lastVal = input.attr('value'),
 				trigger = function(e){
 					//input === null
 					if(!input){return;}
-					var newVal = input.val();
+					var newVal = input.attr('value');
 					
 					if(newVal !== lastVal){
 						lastVal = newVal;
 						if(!e || e.type != 'input'){
-							input.trigger('input');
+							$.webshims.triggerInlineForm(input[0], 'input');
 						}
 					}
 				},
@@ -1636,7 +1663,7 @@ $.support.validity = 'shim';
 			;
 			
 			clearInterval(timer);
-			timer = setInterval(trigger, 250);
+			timer = setInterval(trigger, ($.browser.mozilla) ? 250 : 111);
 			setTimeout(trigger, 9);
 			input.bind('focusout', unbind).bind('input', trigger);
 		}
@@ -1658,7 +1685,70 @@ $.webshims.createReadyEvent('validity');
 
 
 
-(function($){
+jQuery.webshims.ready('validation-base', function($){
+	if( 'value' in document.createElement('output') ){return;}
+	var outputCreate = function(elem){
+		if(elem.getAttribute('aria-live')){return;}
+		elem = $(elem);
+		var value = (elem.text() || '').trim();
+		var	id 	= elem.attr('id');
+		var	htmlFor = elem.attr('for');
+		var shim = $('<input class="output-shim" type="hidden" name="'+ (elem.attr('name') || '')+'" value="'+value+'" style="display: none !important;" />').insertAfter(elem);
+		var form = shim[0].form || document;
+		var setValue = function(val){
+			shim[0].value = val;
+			val = shim[0].value;
+			elem.text(val);
+			elem[0].value = val;
+		};
+		
+		elem[0].defaultValue = value;
+		elem[0].value = value;
+		
+		elem.attr({'aria-live': 'polite'});
+		if(id){
+			shim.attr('id', id);
+			elem.attr('aria-labeldby', $.webshims.getID($('label[for='+id+']', form)));
+		}
+		if(htmlFor){
+			id = $.webshims.getID(elem);
+			htmlFor.split(' ').forEach(function(control){
+				control = form.getElementById(control);
+				if(control){
+					control.setAttribute('aria-controls', id);
+				}
+			});
+		}
+		elem.data('outputShim', setValue );
+		shim.data('outputShim', setValue );
+		return setValue;
+	};
+	
+
+	$.webshims.attr('value', {
+		elementNames: ['output', 'input'],
+		getter: true,
+		setter: function(elem, value, oldFn){
+			var setVal = $.data(elem, 'outputShim');
+			if(!setVal){
+				if($.nodeName(elem, 'output')){
+					setVal = outputCreate(elem);
+				} else {
+					return oldFn();
+				}
+			}
+			setVal(value);
+		}
+	});
+	
+	$.webshims.addReady(function(context){
+		$('output', context).each(function(){
+			outputCreate(this);
+		});
+	});
+	
+	$.webshims.createReadyEvent('output');
+}, true);(function($){
 	var isImplemented;
 	var implementTypes = function(){
 		if(isImplemented){return;}
@@ -2211,7 +2301,7 @@ $.webshims.createReadyEvent('validity');
 				outerWidth: orig.getouterWidth(),
 				label: (id) ? $('label[for='+ id +']', orig[0].form) : $([])
 			},
-			curLabelID = attr.label.attr('id')
+			curLabelID =  $.webshims.getID(attr.label)
 		;
 		shim.addClass(orig[0].className).data('html5element', orig);
 		orig
@@ -2219,11 +2309,7 @@ $.webshims.createReadyEvent('validity');
 			.data('inputUIReplace', {visual: shim, methods: methods})
 			.hide()
 		;
-		if(!curLabelID){
-			labelID++;
-			curLabelID = 'label-id-'+ labelID;
-			attr.label.attr('id', curLabelID);
-		}
+		
 		if(shim.length == 1 && !$('*', shim)[0]){
 			shim.attr('aria-labeledby', curLabelID);
 			attr.label.bind('click', function(){
@@ -2428,7 +2514,19 @@ $.webshims.createReadyEvent('validity');
 	replaceInputUI.range = function(elem){
 		if(!$.fn.slider){return;}
 		var range = $('<span class="input-range"><span class="ui-slider-handle" role="slider" tabindex="0" /></span>'),
-			attr  = this.common(elem, range, replaceInputUI.range.attrs)
+			attr  = this.common(elem, range, replaceInputUI.range.attrs),
+			change = function(e, ui){
+				if(e.originalEvent){
+					replaceInputUI.range.blockAttr = true;
+					elem.attr('value', ui.value);
+					replaceInputUI.range.blockAttr = false;
+					if(e.type == 'slidechange'){
+						elem.trigger('change');
+					} else {
+						$.webshims.triggerInlineForm(elem[0], 'input');
+					}
+				}
+			}
 		;
 		
 		$('span', range).attr('aria-labeledby', attr.label.attr('id'));
@@ -2444,14 +2542,8 @@ $.webshims.createReadyEvent('validity');
 			}
 		}
 		range.slider($.extend(options.slider, {
-			change: function(e, ui){
-				if(e.originalEvent){
-					replaceInputUI.range.blockAttr = true;
-					elem.attr('value', ui.value);
-					replaceInputUI.range.blockAttr = false;
-					elem.trigger('change');
-				}
-			}
+			change: change,
+			slide: change
 		}));
 		
 		$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
@@ -2585,7 +2677,6 @@ $.webshims.createReadyEvent('validity');
 			
 			data.box[(placeholderTxt && !value) ? 'addClass' : 'removeClass']('placeholder-visible');
 		},
-		placeholderID 	= 0,
 		createPlaceholder = function(elem){
 			elem = $(elem);
 			var id 			= elem.attr('id'),
@@ -2593,13 +2684,9 @@ $.webshims.createReadyEvent('validity');
 				pHolderTxt
 			;
 			if(!hasLabel && id){
-				hasLabel = !!($('label[for='+ id +']', elem[0].form)[0]);
-			} else if(!id){
-				placeholderID++;
-				id = 'input-placeholder-id-'+ placeholderID;
-				elem.attr('id', id);
+				hasLabel = !!( $('label[for='+ id +']', elem[0].form)[0] );
 			}
-			return $((hasLabel) ? '<span class="placeholder-text"></span>' : '<label for="'+ id +'" class="placeholder-text"></label>');
+			return $((hasLabel) ? '<span class="placeholder-text"></span>' : '<label for="'+ (id || $.webshims.getID(elem)) +'" class="placeholder-text"></label>');
 		},
 		pHolder = (function(){
 			var delReg 	= /\n|\r|\f|\t/g,

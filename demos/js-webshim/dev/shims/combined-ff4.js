@@ -16,6 +16,37 @@ jQuery.webshims.ready('es5', function($){
 		}
 	});
 	
+	$.webshims.triggerInlineForm = (function(){
+		var stringify = function(id){
+			if(typeof id != 'string' || id.indexOf('-') !== -1 || id.indexOf('.') !== -1 || id.indexOf('"') !== -1){return '';}
+			return 'var '+ id +' = this.form["'+ id +'"];';
+		};
+		return function(elem, event){
+			var attr = elem['on'+event] || elem.getAttribute('on'+event) || '';
+			event = $.Event({
+				type: event,
+				target: elem[0],
+				currentTarget: elem[0]
+			});
+			if(attr && typeof attr == 'string' && elem.form && elem.form.elements){
+				var scope = '';
+				$(elem.form.elements).each(function(){
+					var name = this.name;
+					var id = this.id;
+					if(!id && !name){return;}
+					if(name){
+						scope += stringify(name);
+					}
+					if(id && id !== name){
+						scope += stringify(id);
+					}
+				});
+				(function(){eval( scope + attr );}).call(elem, event);
+			}
+			$(elem).trigger(event);
+		};
+	})();
+	
 	/* some extra validation UI */
 	$.webshims.validityAlert = (function(){
 		
@@ -248,10 +279,13 @@ jQuery.webshims.ready('es5', function($){
 	//implements validationMessage in uncapable browser and adds unknown types/attributes in capable browsers/overrides validationMessage in capable browsers
 	(function(){
 		var overrideNativeMessages = ( $.support.validity === true && $.webshims.overrideValidationMessages );
-		var supportRequiredSelect = ( $.support.validity !== true || ('required' in document.createElement('select')) || window.noHTMLExtFixes );
-		var supportNumericDate = !!( $.support.validity !== true || ($('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range') );
+		var supportRequiredSelect = true;
+		var supportNumericDate = true;
+		if($.support.validity === true){
+			supportRequiredSelect = !!( ('required' in document.createElement('select')) || window.noHTMLExtFixes );
+			supportNumericDate = !!(($('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range') );
+		}
 		var overrideValidity = (!supportRequiredSelect || !supportNumericDate || overrideNativeMessages);
-		
 		var typeModels = $.webshims.inputTypes;
 		var validityRules = {};
 		var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
@@ -263,9 +297,9 @@ jQuery.webshims.ready('es5', function($){
 		var testValidity = function(elem, init){
 			if(!elem.form){return;}
 			var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
+			
 			if(!overrideNativeMessages){
-				
-				if((!supportRequiredSelect && type == 'select-one') || !typeModels[type]){return;}
+				if(!(!supportRequiredSelect && type == 'select-one') && !typeModels[type]){return;}
 			}
 			
 			if(overrideNativeMessages && !init && checkTypes[type] && elem.name){
@@ -274,6 +308,7 @@ jQuery.webshims.ready('es5', function($){
 				});
 			} else {
 				$.attr(elem, 'validity');
+				
 			}
 		};
 		
@@ -1063,7 +1098,7 @@ jQuery.webshims.ready('es5', function($){
 				outerWidth: orig.getouterWidth(),
 				label: (id) ? $('label[for='+ id +']', orig[0].form) : $([])
 			},
-			curLabelID = attr.label.attr('id')
+			curLabelID =  $.webshims.getID(attr.label)
 		;
 		shim.addClass(orig[0].className).data('html5element', orig);
 		orig
@@ -1071,11 +1106,7 @@ jQuery.webshims.ready('es5', function($){
 			.data('inputUIReplace', {visual: shim, methods: methods})
 			.hide()
 		;
-		if(!curLabelID){
-			labelID++;
-			curLabelID = 'label-id-'+ labelID;
-			attr.label.attr('id', curLabelID);
-		}
+		
 		if(shim.length == 1 && !$('*', shim)[0]){
 			shim.attr('aria-labeledby', curLabelID);
 			attr.label.bind('click', function(){
@@ -1280,7 +1311,19 @@ jQuery.webshims.ready('es5', function($){
 	replaceInputUI.range = function(elem){
 		if(!$.fn.slider){return;}
 		var range = $('<span class="input-range"><span class="ui-slider-handle" role="slider" tabindex="0" /></span>'),
-			attr  = this.common(elem, range, replaceInputUI.range.attrs)
+			attr  = this.common(elem, range, replaceInputUI.range.attrs),
+			change = function(e, ui){
+				if(e.originalEvent){
+					replaceInputUI.range.blockAttr = true;
+					elem.attr('value', ui.value);
+					replaceInputUI.range.blockAttr = false;
+					if(e.type == 'slidechange'){
+						elem.trigger('change');
+					} else {
+						$.webshims.triggerInlineForm(elem[0], 'input');
+					}
+				}
+			}
 		;
 		
 		$('span', range).attr('aria-labeledby', attr.label.attr('id'));
@@ -1296,14 +1339,8 @@ jQuery.webshims.ready('es5', function($){
 			}
 		}
 		range.slider($.extend(options.slider, {
-			change: function(e, ui){
-				if(e.originalEvent){
-					replaceInputUI.range.blockAttr = true;
-					elem.attr('value', ui.value);
-					replaceInputUI.range.blockAttr = false;
-					elem.trigger('change');
-				}
-			}
+			change: change,
+			slide: change
 		}));
 		
 		$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){

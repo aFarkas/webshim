@@ -18,14 +18,13 @@
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
-	<script src="../js-webshim/minified/polyfiller.js"></script>
+	<script src="../../src/polyfiller.js"></script>
 	
     <script class="example">
 		
 		//path is path of polyfiller.js + shims/
     	$.webshims.loader.basePath += 'shims/';
-		//$.webshims.debug = true;
+		$.webshims.debug = true;
 		//load all defined modules (look into features.js)
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
@@ -116,7 +115,14 @@
 							</label>
 	                       	<input name="range" type="range" id="range" />
 	                    </div>
-	                   
+						
+						<div class="form-element">
+	                        <label for="range2">
+	                            range + output:
+							</label>
+	                       	<input oninput="$(output).attr( 'value', this.value )" name="range2" type="range" id="range2" />
+							<output id="output"></output>
+	                    </div>
 						
 						<div class="form-element">
 	                        <label for="time">
@@ -163,6 +169,17 @@
 								<option>Option 3</option>
 			               	</select>
 			            </div>
+						
+						<div class="form-element">
+	                        <label for="number2">
+	                            number + number = output:
+							</label>
+	                       	<input oninput="$(output2).attr( 'value', ($(this).attr('valueAsNumber') || 0) + ($(number3).attr('valueAsNumber') || 0) )" step="0.5" name="number2" type="number" id="number2" />
+							<input oninput="$(output2).attr( 'value', ($(this).attr('valueAsNumber') || 0) + ($(number2).attr('valueAsNumber') || 0) )" name="number3" step="any" type="number" />
+							<output id="output2"></output>
+	                    </div>
+						
+						
 	                    <div>
 	                    	<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
 	                    	<fieldset class="mod">

@@ -29,7 +29,7 @@
     	$.webshims.debug = true;
     	//path is path of html-ext.js + shims/
     	$.webshims.loader.basePath += 'shims/';
-		$.webshims.overrideValidationMessages = true;
+//		$.webshims.overrideValidationMessages = true;
 		//load all defined modules (look into features.js)
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
@@ -39,18 +39,10 @@
 	<title>playing</title>
 	    <script>
 	    	$(function(){
-				$('#test').bind('submit invalid', function(e){
-					$('input:first').attr('valueAsNumber', 1293753600000)
-					console.log($('input').attr('valueAsNumber'), $('input').attr('value'), e);
-					e.preventDefault();
-//					alert('sa')
-//					return false;
-				});
-				$('button').bind('click', function(){
-					$('input[type=radio]:first').attr('checked', function(i, val){
-						return !val;
-					})
-				});
+				
+				
+				
+				
 			});
 	    </script>
 </head>
@@ -62,11 +54,13 @@
 <body class="js-off">   
      
 <form id="test" action="#">
-	<input name="t" type="radio" required />
-	<input name="t" type="radio" required />
-	<input name="t" type="radio" required />
-	<input name="datetime-local" type="datetime-local" />
-	<input type="submit" />	
+	<div class="form-element">
+        <label for="range2">
+            range + output:
+		</label>
+       	<input oninput="$(output).attr( 'value', this.value )" name="range2" type="range" id="range2" />
+		<output id="output"></output>
+    </div>
 </form>
 	<button>test</button>
             

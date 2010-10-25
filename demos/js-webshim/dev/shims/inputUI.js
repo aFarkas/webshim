@@ -32,7 +32,7 @@
 				outerWidth: orig.getouterWidth(),
 				label: (id) ? $('label[for='+ id +']', orig[0].form) : $([])
 			},
-			curLabelID = attr.label.attr('id')
+			curLabelID =  $.webshims.getID(attr.label)
 		;
 		shim.addClass(orig[0].className).data('html5element', orig);
 		orig
@@ -40,11 +40,7 @@
 			.data('inputUIReplace', {visual: shim, methods: methods})
 			.hide()
 		;
-		if(!curLabelID){
-			labelID++;
-			curLabelID = 'label-id-'+ labelID;
-			attr.label.attr('id', curLabelID);
-		}
+		
 		if(shim.length == 1 && !$('*', shim)[0]){
 			shim.attr('aria-labeledby', curLabelID);
 			attr.label.bind('click', function(){
@@ -249,7 +245,19 @@
 	replaceInputUI.range = function(elem){
 		if(!$.fn.slider){return;}
 		var range = $('<span class="input-range"><span class="ui-slider-handle" role="slider" tabindex="0" /></span>'),
-			attr  = this.common(elem, range, replaceInputUI.range.attrs)
+			attr  = this.common(elem, range, replaceInputUI.range.attrs),
+			change = function(e, ui){
+				if(e.originalEvent){
+					replaceInputUI.range.blockAttr = true;
+					elem.attr('value', ui.value);
+					replaceInputUI.range.blockAttr = false;
+					if(e.type == 'slidechange'){
+						elem.trigger('change');
+					} else {
+						$.webshims.triggerInlineForm(elem[0], 'input');
+					}
+				}
+			}
 		;
 		
 		$('span', range).attr('aria-labeledby', attr.label.attr('id'));
@@ -265,14 +273,8 @@
 			}
 		}
 		range.slider($.extend(options.slider, {
-			change: function(e, ui){
-				if(e.originalEvent){
-					replaceInputUI.range.blockAttr = true;
-					elem.attr('value', ui.value);
-					replaceInputUI.range.blockAttr = false;
-					elem.trigger('change');
-				}
-			}
+			change: change,
+			slide: change
 		}));
 		
 		$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){

@@ -302,26 +302,18 @@ $.support.validity = 'shim';
 			,color: 1
 			//,range: 1
 		},
-		inlineInput = function(e){
-			if(!e || e.originalEvent){return;}
-			var inline = this.getAttribute('onforminput');
-			if(inline && typeof inline == 'string'){
-				(function(){eval( inline )}).apply(this, arguments);
-			}
-		},
 		observe = function(input){
 			var timer,
-				type 	= input[0].getAttribute('type'),
-				lastVal = input.val(),
+				lastVal = input.attr('value'),
 				trigger = function(e){
 					//input === null
 					if(!input){return;}
-					var newVal = input.val();
+					var newVal = input.attr('value');
 					
 					if(newVal !== lastVal){
 						lastVal = newVal;
 						if(!e || e.type != 'input'){
-							input.trigger('input');
+							$.webshims.triggerInlineForm(input[0], 'input');
 						}
 					}
 				},
@@ -334,7 +326,7 @@ $.support.validity = 'shim';
 			;
 			
 			clearInterval(timer);
-			timer = setInterval(trigger, 250);
+			timer = setInterval(trigger, ($.browser.mozilla) ? 250 : 111);
 			setTimeout(trigger, 9);
 			input.bind('focusout', unbind).bind('input', trigger);
 		}
