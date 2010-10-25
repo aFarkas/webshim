@@ -46,6 +46,11 @@
 //					alert('sa')
 //					return false;
 				});
+				$('button').bind('click', function(){
+					$('input[type=radio]:first').attr('checked', function(i, val){
+						return !val;
+					})
+				});
 			});
 	    </script>
 </head>
@@ -57,11 +62,13 @@
 <body class="js-off">   
      
 <form id="test" action="#">
-	<input name="t" type="text" required />
+	<input name="t" type="radio" required />
+	<input name="t" type="radio" required />
+	<input name="t" type="radio" required />
 	<input name="datetime-local" type="datetime-local" />
 	<input type="submit" />	
 </form>
-	
+	<button>test</button>
             
        
 </body>

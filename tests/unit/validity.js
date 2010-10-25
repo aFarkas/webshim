@@ -274,7 +274,6 @@ asyncTest('checkValidity/invalid event IV', function(){
 	], function(i, data){
 		if(data.val){
 			$(data.id).attr('value', data.val);
-			
 		} else {
 			$(data.id).attr('checked', true);
 		}

@@ -21,13 +21,13 @@ jQuery.webshims.ready('es5', function($){
 		
 		var api = {
 			hideDelay: 5000,
-			showFor: function(elem, hideOnBlur){
+			showFor: function(elem, message, hideOnBlur){
 				elem = $(elem);
 				var visual = (elem.data('inputUIReplace') || {visual: elem}).visual;
 				createAlert();
 				api.clear();
 				alert.attr('for', visual.attr('id'));
-				this.getMessage(elem);
+				this.getMessage(elem, message);
 				this.position(visual);
 				this.show();
 				
@@ -39,8 +39,8 @@ jQuery.webshims.ready('es5', function($){
 					$(document).bind('focusout.validityalert', boundHide);
 				}
 			},
-			getMessage: function(elem){
-				$('> span', alert).html(elem.attr('validationMessage'));
+			getMessage: function(elem, message){
+				$('> span', alert).html(message || elem.attr('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
@@ -255,13 +255,22 @@ jQuery.webshims.ready('es5', function($){
 		var oldVal = $.fn.val;
 		var validityChanger = (overrideNativeMessages)? {value: 1, checked: 1} : {value: 1};
 		var validityElements = (overrideNativeMessages) ? ['textarea'] : [];
-		var testValidity = function(elem){
+		var checkTypes = {radio:1,checkbox:1};
+		var testValidity = function(elem, init){
 			if(!elem.form){return;}
+			var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
 			if(!overrideNativeMessages){
-				var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
+				
 				if((!supportRequiredSelect && type == 'select-one') || !typeModels[type]){return;}
 			}
-			$.attr(elem, 'validity');
+			
+			if(overrideNativeMessages && !init && checkTypes[type] && elem.name){
+				$(document.getElementsByName( elem.name )).each(function(){
+					$.attr(this, 'validity');
+				});
+			} else {
+				$.attr(elem, 'validity');
+			}
 		};
 		
 		if(!supportRequiredSelect || overrideNativeMessages){
@@ -375,7 +384,6 @@ jQuery.webshims.ready('es5', function($){
 			$.webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){
 				
 				if(cache.nodeName == 'select' && !val && jElm.attr('required') && jElm[0].size < 2){
-					
 					if(!cache.type){
 						cache.type = jElm[0].type;
 					}
@@ -477,11 +485,11 @@ jQuery.webshims.ready('es5', function($){
 				
 				if(context === document){
 					$(validityElements.join(',')).each(function(){
-						testValidity(this);
+						testValidity(this, true);
 					});
 				} else {
 					$(validityElements.join(','), context).each(function(){
-						testValidity(this);
+						testValidity(this, true);
 					});
 				}
 			});

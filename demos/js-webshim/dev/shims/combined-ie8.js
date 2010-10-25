@@ -1045,13 +1045,21 @@ jQuery.webshims.ready('es5', function($){
 		var oldVal = $.fn.val;
 		var validityChanger = (overrideNativeMessages)? {value: 1, checked: 1} : {value: 1};
 		var validityElements = (overrideNativeMessages) ? ['textarea'] : [];
-		var testValidity = function(elem){
+		var checkTypes = {radio:1,checkbox:1};
+		var testValidity = function(elem, init){
 			if(!elem.form){return;}
 			if(!overrideNativeMessages){
 				var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
 				if((!supportRequiredSelect && type == 'select-one') || !typeModels[type]){return;}
 			}
-			$.attr(elem, 'validity');
+			
+			if(overrideNativeMessages && !init && checkTypes[elem.type]){
+				$(document.getElementsByName( elem.name )).each(function(){
+					$.attr(elem, 'validity');
+				});
+			} else {
+				$.attr(elem, 'validity');
+			}
 		};
 		
 		if(!supportRequiredSelect || overrideNativeMessages){
@@ -1267,11 +1275,11 @@ jQuery.webshims.ready('es5', function($){
 				
 				if(context === document){
 					$(validityElements.join(',')).each(function(){
-						testValidity(this);
+						testValidity(this, true);
 					});
 				} else {
 					$(validityElements.join(','), context).each(function(){
-						testValidity(this);
+						testValidity(this, true);
 					});
 				}
 			});

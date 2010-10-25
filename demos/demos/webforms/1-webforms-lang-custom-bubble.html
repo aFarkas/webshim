@@ -137,9 +137,7 @@ $.webshims.validityMessages['en'] = {
 <code class="block run-once">
 //change language in all browsers to en (default is browser language)
 //$.webshims.activeLang('en');
-alert('f2');
 $.webshims.ready('forms', function(){
-	alert('f');
 	$('form')
 		//the invalid-event is the standard HTML5 validation event, 
 		//wich is called on every invalid event, if the user trys to submit an invalid form or 
@@ -173,9 +171,9 @@ $.webshims.ready('forms', function(){
 	                <fieldset>
 	                    <div class="form-element">
 	                        <label for="name">
-	                            name:
+	                            name: <dfn title="required">*</dfn>
 							</label>
-	                        <input placeholder="hello world" name="name" type="text" value="" id="name" />
+	                        <input required="required" placeholder="hello world" name="name" type="text" value="" id="name" />
 	                    </div>
 	                    <div class="form-element">
 	                        <label for="email">
