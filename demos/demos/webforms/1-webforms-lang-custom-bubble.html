@@ -59,7 +59,11 @@
 		<section>
 			<h2>Documentation adding/changing and using validation messages with webshims constraint validation</h2>
 			<h3>Overriding native validation messages</h3>
-			<p>With HTML5 there are two possible ways to change the validation messages. Preventing the native invalid message to appear and replacing it with your own invalid UI (including own validation message) or changing the messages through the setCustomValidity - method.</p>
+			<p>With HTML5 there are two possible ways to change the validation messages.</p>
+			<ul>
+				<li>Preventing the native invalid message to appear and replacing it with your own invalid UI (including own validation message)</li>
+				<li>changing the messages through the setCustomValidity - method</li>
+			</ul>
 			<p>Preventing the default invalid UI and then replacing it, could look like this:</p>
 <code class="block">
 $('form').bind('invalid', function(e){
@@ -68,31 +72,44 @@ $('form').bind('invalid', function(e){
 	//implement custom UI and custom message according to the validityState $(e.target).attr('validity')
 });
 </code>		
+			<p>Webshims lib gives you three extensions to make this really simple.</p>
+			<ul>
+				<li>firstinvalid (event)</li>
+				<li>customValidationMessage (DOM-Property)</li>
+				<li>$.webshims.validityAlert (Helper Object)</li>
+			</ul>
+			<p>Preventing the default and replacing the invalid-bubble with your own message, could look like this:</p>
+<code class="block">
+$('form').bind('firstinvalid', function(e){
+	//show the invalid alert for first invalid element and pass the custom validation message
+	$.webshims.validityAlert.showFor( e.target, $(e.target).attr('customValidationMessage') );
+	//prevent browser from showing native validation message
+	return false;
+});
+</code>	
+			
 			<p>The problem with this approach is, that Firefox 4.0 also shows an invalid hint on mouseover, wich can't be replaced by this technique.</p>
 			<p>Using the <code>setCustomValidity</code> will fully replace the validation message, while the native validation UI stays. Changing the validation message with setCustomValidity, would look like this:</p>
 			
 <code class="block">
 $('input[required]').setCustomValidity('You have to enter something');
 </code>
-			<p>The problem with <code>setCustomValidity</code> is, that <code>setCustomValidity</code> is a low level API for changing the validityState of an element. This means: The changed validation message is only a side effect and setCustomValidity only works on a single element and also sets the customError-flag to true. The developer has to observe the validityState of an element and has to remove/change the custom validation messsage dynamically as soon as the message isn't relevant anymore, wich can be a real pain in the ass.</p>
+			<p>The problem with <code>setCustomValidity</code> is, that <code>setCustomValidity</code> is a low level API for changing the validityState of an element. This means: The changed validation message is only a side effect, setCustomValidity only works on a single element and also sets the customError-flag to true. The developer has to observe the validityState of an element and has to remove/change the custom validation messsage dynamically as soon as the message isn't relevant anymore, wich can be a real pain in the ass.</p>
 			<p>Another problem is, that Opera adds a prefix-message in front of all custom validation messages changed with the <code>setCustomValidity</code>.</p>
-			<p>This means, that you have to combine both techniques to create real customzied messages with HTML5.</p>
-			
-			
-			<p>Due to the fact, that Webshims Lib already had to implement the setCustomValidity approach to do a lot of bugfixing in capable browsers/implementing in uncapable browsers, webshims lib gives you some helpers to make this simpler. If you want Webshims Lib to replace the native messages with customizable messages (using the <code>setCustomValidity</code>-approach), you can simply configure it to do so. Simply set the <code>$.webshims.overrideValidationMessages</code> to true.</p>
+			<p>This means, that you have to combine both techniques to create real fully customzied messages with HTML5.</p>
+			<p>Due to the fact, that Webshims Lib already had to implement the setCustomValidity approach to do a lot of bugfixing in capable browsers/implementing in uncapable/semi-capable browsers, webshims lib gives you a simple configuration property to dynamically overriding the validationMessage with the customValidationMessage. Simply set the <code>$.webshims.overrideValidationMessages</code> to true, before calling <code>polyfill</code>.</p>
 			
 <code class="block">
 //configure custom validation messages before you call polyfill
 $.webshims.overrideValidationMessages = true;
 
-//or load only a specific feature with $.webshims.polyfill('feature-name');
 $.webshims.polyfill();
 </code>
 			<p>Note: This site is loaded with <code>$.webshims.overrideValidationMessages = true;</code>.</p>
 			
 			<h3>Changing and Adding validation messages</h3>
 			<p>Webshims Lib validation messages are stored @ <code>$.webshims.validityMessages</code> as an object. The index is the specific language code. Currently there are only really bad validation messages for "en" and "de".</p>
-			<p>Webshims Lib automatically shows the validation message in the detected language of the your browser. If the script doesn't find the right language, it will show the default language wich is stored under the key "" (defaults to "en").</p>
+			<p>Webshims Lib automatically shows the validation message in the detected language of the browser. If the script doesn't find the right language, it will show the default language wich is stored under the key "" (defaults to "en").</p>
 			<p>You can easily add/change a language by specifiying a certain language code.</p>
 <code class="block">
 $.webshims.validityMessages['en'] = {
@@ -123,14 +140,23 @@ $.webshims.validityMessages['en'] = {
 	//...
 	rangeUnderflow = {
 		date: '{%value} is too early for {%label}. The earliest date you can use is {%min}.',
-		defaultMessage: $.webshims.validityMessages['en'].rangeUnderflow
+		defaultMessage: '{%value} is too low. The lowest value you can use is {%min}.'
 	}
 	//...
 };
 </code>
-			
-			<p>Note: These configurations will change the validation messages accessed by the DOM-property <code>validationMessage</code> and occuring on an invalid event. If you additionally want to implement your own validation bubble in all browsers, you have to do some extras.</p>
-			
+
+<code class="block">
+$.webshims.validityMessages['en'] = {
+	//...
+	valueMissing = {
+		radio: 'Please check one of these options',
+		defaultMessage: 'You have to specify a value'
+	}
+	//...
+};
+</code>
+			<p><strong>Please let me know, if you enhance the current messages or add new languages.</strong></p>
 			<h3>Create custom error bubbles in all browsers (Preventing native validation bubble)</h3>
 			
 			<p>The following code will explain how to create customized error hints in all browsers. Although it uses some webshims extensions, it shows how you can easily achieve this with HTML5.</p>
@@ -162,7 +188,7 @@ $.webshims.ready('forms', function(){
 	;
 });
 </code>	
-			<p>Please let me know, if you enhance the current messages or add new languages.</p>
+
 			<section>
 				<h3>Simple Demo</h3>
 				<form action="#">

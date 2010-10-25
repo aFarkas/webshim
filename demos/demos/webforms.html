@@ -72,6 +72,7 @@
 				<ul>
 					<li><strong>event: firstinvalid</strong>: <code>firstinvalid</code> is a simple, bubbling event, wich is triggered on the first invalid form element. Preventing the default of firstinvalid will automatically prevent the default behavior of all current invalid elements.</li>
 					<li><strong>event: lastinvalid</strong>: <code>lastinvalid</code> is an extended, bubbling, (but) uncancelable event, wich is triggered on the last invalid form element. The property <code>invalidlist</code> is a jQuery-collection of all current invalid elements.</li>
+					<li><strong>property: customValidationMessage</strong>: very similiar to the standard validationMessage, but always uses built-in custom validation messages, wich can be better controlled.</li>
 					<li><strong>helper: $.webshims.validityAlert.showFor</strong>: takes a DOM-Object/Selector/jQuery-Object and shows the invalid message for this element. (simply look into the prototype i.e. <code>console.log($.webshims.validityAlert)</code> to make changes)</li>
 					<li><strong>selectors</strong>: :willValidate</li>
 				</ul>

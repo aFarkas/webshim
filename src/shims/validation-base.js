@@ -315,29 +315,32 @@ jQuery.webshims.ready('es5', function($){
 			}
 			return message || '';
 		};
-		
-		$.webshims.attr('validationMessage', {
-			elementNames: ['input', 'select', 'textarea'],
-			getter: function(elem){
-				var message = '';
-				if(!$.attr(elem, 'willValidate')){
-					return message;
-				}
-				
-				var validity = $.attr(elem, 'validity') || {valid: 1};
-				if(validity.valid){return message;}
-				message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
-				if(message){return message;}
-				$.each(validity, function(name, prop){
-					if(name == 'valid' || !prop){return;}
-					message = $.webshims.createValidationMessage(elem, name);
-					if(message){
-						return false;
+		$.each(($.support.validationMessage) ? ['customValidationMessage'] : ['customValidationMessage', 'validationMessage'], function(i, fn){
+			$.webshims.attr(fn, {
+				elementNames: ['input', 'select', 'textarea'],
+				getter: function(elem){
+					var message = '';
+					if(!$.attr(elem, 'willValidate')){
+						return message;
 					}
-				});
-				
-				return message || '';
-			}
+					
+					var validity = $.attr(elem, 'validity') || {valid: 1};
+					if(validity.valid){return message;}
+					if(validity.customError || fn === 'validationMessage'){
+						message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
+						if(message){return message;}
+					}
+					$.each(validity, function(name, prop){
+						if(name == 'valid' || !prop){return;}
+						message = $.webshims.createValidationMessage(elem, name);
+						if(message){
+							return false;
+						}
+					});
+					
+					return message || '';
+				}
+			});
 		});
 		$.support.validationMessage = $.support.validationMessage || 'shim';
 		
