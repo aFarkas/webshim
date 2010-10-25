@@ -157,13 +157,30 @@ $.webshims.validityMessages['en'] = {
 };
 </code>
 			<p><strong>Please let me know, if you enhance the current messages or add new languages.</strong></p>
-			<h3>Create custom error bubbles in all browsers (Preventing native validation bubble)</h3>
+			<h3>Create custom error bubbles in all browsers</h3>
 			
 			<p>The following code will explain how to create customized error hints in all browsers. Although it uses some webshims extensions, it shows how you can easily achieve this with HTML5.</p>
 <code class="block run-once">
 //change language in all browsers to en (default is browser language)
 //$.webshims.activeLang('en');
-$.webshims.ready('forms', function(){
+//override native messages
+//$.webshims.overrideValidationMessages = true;
+
+//improve custom messages
+//$.webshims.validityMessages['en'] = {
+//	//...
+//	valueMissing = {
+//		radio: 'Please check one of these options',
+//		defaultMessage: 'You have to specify a value'
+//	}
+//	//...
+//};
+
+//load features
+//$.webshims.polyfill();
+
+//wait for forms-features and DOM-ready
+$.webshims.ready('ready forms', function(){
 	$('form')
 		//the invalid-event is the standard HTML5 validation event, 
 		//wich is called on every invalid event, if the user trys to submit an invalid form or 

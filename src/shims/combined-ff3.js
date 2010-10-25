@@ -747,7 +747,11 @@ jQuery.webshims.ready('es5', function($){
 					hideTimer = setTimeout(boundHide, this.hideDelay);
 				}
 				if(!hideOnBlur){
-					visual.focus();
+					var focusElem = $('input, select, textarea, .ui-slider-handle', visual).filter(':visible:first');
+					if(!focusElem[0]){
+						focusElem = visual;
+					}
+					focusElem.focus();
 					$(document).bind('focusout.validityalert', boundHide);
 				}
 			},
