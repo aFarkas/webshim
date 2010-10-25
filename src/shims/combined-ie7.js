@@ -2125,6 +2125,9 @@ $.webshims.createReadyEvent('validity');
 						;
 						var controls = $('<span class="step-controls"><span class="step-up" /><span class="step-down" tabindex="-1" /></span>')	
 							[dir.action](this)
+							.bind('selectstart dragstart', function(){
+								return false;
+							})
 							.bind('mousedown mousepress', function(e){
 								doSteps(elem, type, e.target);
 								return false;
@@ -2178,7 +2181,7 @@ $.webshims.createReadyEvent('validity');
 	$.support.inputUI = 'shim';
 		
 	var options = $.webshims.modules.inputUI.options;
-	
+	var labelID = 0;
 	var replaceInputUI = function(context){
 		$('input', context).each(function(){
 			var type = $.attr(this, 'type');
@@ -2199,20 +2202,35 @@ $.webshims.createReadyEvent('validity');
 			});
 		}
 		
-		var attr = {
-			css: {
-				marginRight: orig.css('marginRight'),
-				marginLeft: orig.css('marginLeft')
+		var id = orig.attr('id'),
+			attr = {
+				css: {
+					marginRight: orig.css('marginRight'),
+					marginLeft: orig.css('marginLeft')
+				},
+				outerWidth: orig.getouterWidth(),
+				label: (id) ? $('label[for='+ id +']', orig[0].form) : $([])
 			},
-			outerWidth: orig.getouterWidth()
-		};
+			curLabelID = attr.label.attr('id')
+		;
 		shim.addClass(orig[0].className).data('html5element', orig);
 		orig
 			.after(shim)
 			.data('inputUIReplace', {visual: shim, methods: methods})
 			.hide()
 		;
-		
+		if(!curLabelID){
+			labelID++;
+			curLabelID = 'label-id-'+ labelID;
+			attr.label.attr('id', curLabelID);
+		}
+		if(shim.length == 1 && !$('*', shim)[0]){
+			shim.attr('aria-labeledby', curLabelID);
+			attr.label.bind('click', function(){
+				shim.focus();
+				return false;
+			});
+		}
 		return attr;
 	};
 	
@@ -2220,10 +2238,15 @@ $.webshims.createReadyEvent('validity');
 		if(!$.fn.datepicker){return;}
 		var date = $('<span class="input-datetime-local"><input type="text" class="input-datetime-local-date" /><input type="time" class="input-datetime-local-time" /></span>'),
 			attr  = this.common(elem, date, replaceInputUI['datetime-local'].attrs),
-			datePicker = $('input.input-datetime-local-date', date),
-			data
+			datePicker = $('input.input-datetime-local-date', date)
 		;
 		$('input', date).data('html5element', $.data(date[0], 'html5element'));
+		
+		datePicker.attr('aria-labeledby', attr.label.attr('id'));
+		attr.label.bind('click', function(){
+			datePicker.focus();
+			return false;
+		});
 		
 		if(attr.css){
 			date.css(attr.css);
@@ -2242,7 +2265,7 @@ $.webshims.createReadyEvent('validity');
 		}
 		
 		$.webshims.triggerDomUpdate(date);
-		data = $('input.input-datetime-local-date', date)
+		$('input.input-datetime-local-date', date)
 			.datepicker($.extend({}, options.date))
 			.bind('change', function(val, ui){
 				
@@ -2264,6 +2287,7 @@ $.webshims.createReadyEvent('validity');
 				elem.trigger('change');
 			})
 			.data('datepicker')
+			.dpDiv.addClass('input-date-datepicker-control')
 		;
 		
 		$('input.input-datetime-local-time', date).bind('input change', function(){
@@ -2282,7 +2306,6 @@ $.webshims.createReadyEvent('validity');
 			elem.trigger('change');
 		});
 		
-		data.dpDiv.addClass('input-date-datepicker-control');
 		$.each(['disabled', 'min', 'max', 'value'], function(i, name){
 			elem.attr(name, function(i, value){return value || '';});
 		});
@@ -2348,8 +2371,7 @@ $.webshims.createReadyEvent('validity');
 				elem.attr('value', value);
 				replaceInputUI.date.blockAttr = false;
 				elem.trigger('change');
-			},
-			data
+			}
 		;
 		
 		if(attr.css){
@@ -2362,8 +2384,8 @@ $.webshims.createReadyEvent('validity');
 			.datepicker($.extend({}, options.date))
 			.bind('change', change)
 			.data('datepicker')
+			.dpDiv.addClass('input-date-datepicker-control')
 		;
-		data.dpDiv.addClass('input-date-datepicker-control');
 		$.each(['disabled', 'min', 'max', 'value'], function(i, name){
 			elem.attr(name, function(i, value){return value || '';});
 		});
@@ -2405,9 +2427,15 @@ $.webshims.createReadyEvent('validity');
 	
 	replaceInputUI.range = function(elem){
 		if(!$.fn.slider){return;}
-		var range = $('<span class="input-range" />'),
+		var range = $('<span class="input-range"><span class="ui-slider-handle" role="slider" tabindex="0" /></span>'),
 			attr  = this.common(elem, range, replaceInputUI.range.attrs)
 		;
+		
+		$('span', range).attr('aria-labeledby', attr.label.attr('id'));
+		attr.label.bind('click', function(){
+			$('span', range).focus();
+			return false;
+		});
 		
 		if(attr.css){
 			range.css(attr.css);
@@ -2433,15 +2461,24 @@ $.webshims.createReadyEvent('validity');
 	
 	replaceInputUI.range.attrs = {
 		disabled: function(orig, shim, value){
-			shim.slider( "option", "disabled", !!value );
+			value = !!value;
+			shim.slider( "option", "disabled", value );
+			$('span', shim)
+				.attr({
+					'aria-disabled': value+'',
+					'tabindex': (value) ? '-1' : '0'
+				})
+			;
 		},
 		min: function(orig, shim, value){
 			value = (value) ? value * 1 || 0 : 0;
 			shim.slider( "option", "min", value );
+			$('span', shim).attr({'aria-valuemin': value});
 		},
 		max: function(orig, shim, value){
 			value = (value || value === 0) ? value * 1 || 100 : 100;
 			shim.slider( "option", "max", value );
+			$('span', shim).attr({'aria-valuemax': value});
 		},
 		value: function(orig, shim, value){
 			value = $(orig).attr('valueAsNumber');
@@ -2452,6 +2489,7 @@ $.webshims.createReadyEvent('validity');
 			if(!replaceInputUI.range.blockAttr){
 				shim.slider( "option", "value", value );
 			}
+			$('span', shim).attr({'aria-valuenow': value, 'aria-valuetext': value});
 		},
 		step: function(orig, shim, value){
 			value = (value && $.trim(value)) ? value * 1 || 1 : 1;

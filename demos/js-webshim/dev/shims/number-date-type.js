@@ -465,6 +465,9 @@
 						;
 						var controls = $('<span class="step-controls"><span class="step-up" /><span class="step-down" tabindex="-1" /></span>')	
 							[dir.action](this)
+							.bind('selectstart dragstart', function(){
+								return false;
+							})
 							.bind('mousedown mousepress', function(e){
 								doSteps(elem, type, e.target);
 								return false;
