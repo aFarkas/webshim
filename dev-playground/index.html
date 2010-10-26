@@ -23,27 +23,24 @@
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script src="../src/polyfiller.js"></script>
-	
-	
-    <script type="text/javascript" class="example">
-    	$.webshims.debug = true;
-    	//path is path of html-ext.js + shims/
-    	$.webshims.loader.basePath += 'shims/';
-//		$.webshims.overrideValidationMessages = true;
-		//load all defined modules (look into features.js)
-		//or load only a specific feature with $.webshims.polyfill('feature-name');
+	<script>
+//		$.webshims.debug = true;
+		$.webshims.loader.basePath += 'shims/';
 		$.webshims.polyfill();
-		
-    </script>
-	
+	</script>
 	<title>playing</title>
 	    <script>
-	    	$(function(){
-				
-				
-				
-				
+	    	$.webshims.ready('ready forms', function(){
+//				console.log($('output').attr('value'));
+				$('output:first').attr('value', 'hello');
+				$('#select').attr({
+					'selectedIndex': 0,
+					multiple: true,
+					size: 1
+				});
+				alert($('select').attr('type'))
 			});
+			
 	    </script>
 </head>
 <script>
@@ -55,12 +52,18 @@
      
 <form id="test" action="#">
 	<div class="form-element">
-        <label for="range2">
-            range + output:
-		</label>
-       	<input oninput="$(output).attr( 'value', this.value )" name="range2" type="range" id="range2" />
-		<output id="output"></output>
+       <input id="validity-test" required="dfssa"  />
     </div>
+	<div>
+	<select name="kj" required>
+		<option value="" selected>sdsd1</option>
+		<option>sdsd2</option>
+		<option>sdsd3</option>
+	</select>            
+   	<output>jo</output>
+	<label for="labeled-output">output-label</label>
+	<output id="labeled-output" name="outputtest"></output>
+</div>
 </form>
 	<button>test</button>
             

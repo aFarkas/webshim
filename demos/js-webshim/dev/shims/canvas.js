@@ -170,7 +170,7 @@ if (!document.createElement('canvas').getContext) {
 
   function onPropertyChange(e) {
     var el = e.srcElement;
-
+	if(!el.getContext || !('clearRect' in el.getContext())){return;}
     switch (e.propertyName) {
       case 'width':
         el.style.width = el.attributes.width.nodeValue + 'px';

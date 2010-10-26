@@ -1,13 +1,14 @@
 jQuery.webshims.ready('validation-base', function($){
 	if( 'value' in document.createElement('output') ){return;}
+	var doc = document;
 	var outputCreate = function(elem){
 		if(elem.getAttribute('aria-live')){return;}
 		elem = $(elem);
 		var value = (elem.text() || '').trim();
 		var	id 	= elem.attr('id');
 		var	htmlFor = elem.attr('for');
-		var shim = $('<input class="output-shim" type="hidden" name="'+ (elem.attr('name') || '')+'" value="'+value+'" style="display: none !important;" />').insertAfter(elem);
-		var form = shim[0].form || document;
+		var shim = $('<input class="output-shim" type="hidden" name="'+ (elem.attr('name') || '')+'" value="'+value+'" style="display: none" />').insertAfter(elem);
+		var form = shim[0].form || doc;
 		var setValue = function(val){
 			shim[0].value = val;
 			val = shim[0].value;

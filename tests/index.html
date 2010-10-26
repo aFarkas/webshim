@@ -41,11 +41,8 @@
 	</script>
 	<script>
 		(function(){
-			var _reset = QUnit.reset;
 			QUnit.reset = function(){
-				var ret = _reset.apply(this, arguments);
-				$.webshims.triggerDomUpdate($("#main, #qunit-fixture"));
-				return ret;
+				$("#main, #qunit-fixture").htmlWebshim( QUnit.config.fixture );
 			};
 			
 			module("init");
@@ -64,7 +61,6 @@
 	<script src="unit/dynamic-webshim.js"></script>
 	<script src="unit/stepup-down.js"></script>
 	<script src="unit/storage.js"></script>
-	<!-- todo: canvas / geolocation and json-storage -->
 	<script>
 //		$.webshims.debug = true;
 		$(window).load(function(){
@@ -257,6 +253,19 @@
 					</label>
 	                <select name="select3" required="" id="select3" size="3">
 	                    	<option value="">Option 1</option>
+	                        <option>Option 2</option>
+	                        <option>Option 3</option>
+	                    	<option>Option 4</option>
+	                        <option>Option 5</option>
+	                        <option>Option 6</option>
+	                </select>
+	            </div>
+				<div>
+	            	<label for="select4">
+	                    Lorem ipsum  <dfn title="required">*</dfn>
+					</label>
+	                <select name="select4" required="" id="select4" multiple size="1">
+	                    	<option value="" select>Option 1</option>
 	                        <option>Option 2</option>
 	                        <option>Option 3</option>
 	                    	<option>Option 4</option>

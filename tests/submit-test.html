@@ -131,6 +131,62 @@
 				}, 100);
 			});
 			
+			$('input.trigger-checkValidity').click(function(e){
+				reset();
+				$('input.datetime').attr('value', '').checkValidity();
+				setTimeout(function(){
+					equals(submitEvents, 0, '0 submit events');
+					equals(firstInvalidEvents, 1, 'no firstinvalid event');
+					equals(invalidEvents, 1, 'no invalid events');
+					if(document.activeElement){
+						equals((document.activeElement === e.target), false, "focus first invalid");
+					}
+				}, 100);
+				return false;
+			});
+			
+			
+			$('input.trigger-checkValidity-prevent-invalid').click(function(e){
+				reset();
+				preventInvalid = true;
+				$('input.datetime').attr('value', '').checkValidity();
+				setTimeout(function(){
+					equals(submitEvents, 0, '0 submit events');
+					equals(firstInvalidEvents, 1, 'no firstinvalid event');
+					equals(invalidEvents, 1, 'no invalid events');
+					if(document.activeElement){
+						equals(document.activeElement, e.target, "no focus first invalid");
+					}
+				}, 100);
+				return false;
+			});
+			
+			$('input.submit-prevent').click(function(e){
+				reset();
+				preventInvalid = true;
+				$('input.datetime').attr('value', '');
+				setTimeout(function(){
+					equals(submitEvents, 0, '0 submit events');
+					equals(firstInvalidEvents, 1, 'no firstinvalid event');
+					equals(invalidEvents, 1, 'no invalid events');
+					if(document.activeElement){
+						equals(document.activeElement, e.target, "no focus first invalid");
+					}
+				}, 100);
+			});
+			$('input.submit-noprevent').click(function(e){
+				reset();
+				$('input.datetime').attr('value', '');
+				setTimeout(function(){
+					equals(submitEvents, 0, '0 submit events');
+					equals(firstInvalidEvents, 1, 'no firstinvalid event');
+					equals(invalidEvents, 1, 'no invalid events');
+					if(document.activeElement){
+						equals((document.activeElement === e.target), false, "focus first invalid");
+					}
+				}, 100);
+			});
+			
 			
 			
 			
@@ -180,6 +236,16 @@
 		<input type="submit" class="invalid-prevent-submit" value="try invalid-prevented submit" />
 		<input type="submit" class="valid-submit" value="try valid  submit" />
 		<input formnovalidate="bla" type="submit" class="novalidate-submit" value="formnovalidate" />
+    </form>
+	
+	<form action="bigfail.html">
+    	<input name="test-3" class="datetime" type="datetime-local" required />
+		<input type="submit" class="trigger-checkValidity" value="trigger-checkValidity" />
+		<input type="submit" class="trigger-checkValidity-prevent-invalid" value="trigger-checkValidity prevent invalid" />
+		
+		<input type="submit" class="submit-prevent" value="try invalid submit (prevent invalid)" />
+		<input type="submit" class="submit-noprevent" value="try invalid submit (no invalid prevent)" />
+		
     </form>
 </div>
 	   

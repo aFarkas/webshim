@@ -62,12 +62,11 @@ asyncTest("general validity Modul", function(){
 	$('#select option:first').attr('disabled', false);
 	$('#select').attr('selectedIndex', 1);
 	ok($('#select').attr('validity').valid, 'required select with empty value and second option selected is valid');
-	$('#select').attr({
+	$('#select4').attr({
 		'selectedIndex': 0,
-		multiple: true,
 		size: 1
 	});
-	ok($('#select').attr('validity').valid, 'required multiple select with first option selected and empty value is valid');
+	ok($('#select4').attr('validity').valid, 'required multiple select with first option selected and empty value is valid');
 	
 	ok($('#select2').attr('validity').valid, 'required select with first option selected, in an optgroup and empty value is valid');
 	
@@ -211,7 +210,7 @@ asyncTest('output test', function(){
 	
 	$('#labeled-output').attr('value', 'somecontent');
 	if( !('value' in document.createElement('output')) ){
-		equals($('output').text(), 'hello', 'shim shows value');
+		equals($('output:first').text(), 'hello', 'shim shows value');
 		ok(/&outputtest=somecontent&/.test($('form').serialize()), 'finds output serialized in shim');
 	} else {
 		ok(/&outputtest=somecontent&/.test($('form').serialize()), 'finds output serialized in native, if fails jQuery bug');

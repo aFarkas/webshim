@@ -1,27 +1,27 @@
 (function($){
 	
 	var doc = document;
+	var support = $.support;
+	var undefined;
 	//simple shiv
 	//http://code.google.com/p/html5shim/
 	'polyfillspan abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section source summary time track video'.replace(/\w+/g,function(n){doc.createElement(n);});
-	$.support.dynamicHTML5 =  !!($('<video><div></div></video>')[0].innerHTML);
+	support.dynamicHTML5 =  !!($('<video><div></div></video>')[0].innerHTML);
 	
 
 	
 	$.webshims = {
 		
-		version: 'pre1.0.0beta2',
+		version: 'pre1.0.0final',
 		
 		fixHTML5: (function(){
 			var d, b;
-			return ($.support.dynamicHTML5) ? 
+			return (support.dynamicHTML5) ? 
 				function(h){return h;} :
-				
-				
 				function(h) {
 					if (!d) {
-						b = document.body;
-						d = document.createElement('div');
+						b = doc.body;
+						d = doc.createElement('div');
 						d.style.display = 'none';
 					}
 					var e = d.cloneNode(false);
@@ -33,29 +33,35 @@
 			;
 		})(),
 		
-		createReadyEvent: function(names){
-			var noForce = arguments[1];
-			if(!names){return;}
-			if(!$.isArray(names)){
-				names = [names];
-			}
-			
-			$.each(names, function(i, name){
+		createReadyEvent: (function(){
+			var makeReady = function(triggerName, name, noForce){
 				if(noForce && modules[name] && modules[name].noAutoCallback ){return;}
 				if(modules[name] || webshims.features[name]){
-					name = name +'Ready';
+					triggerName = triggerName +'Ready';
 				}
 				
-				if($.event.special[name] && $.event.special[name].add){return;}
+				if($.event.special[triggerName] && $.event.special[triggerName].add){return;}
 				
-				$.event.special[name] = $.extend($.event.special[name] || {}, {
+				$.event.special[triggerName] = $.extend($.event.special[triggerName] || {}, {
 					add: function( details ) {
-						details.handler.call(this, $.Event(name));
+						details.handler.call(this, $.Event(triggerName));
 					}
 				});
-				$.event.trigger(name);
-			});
-		},
+				$.event.trigger(triggerName);
+			};
+			return function(names){
+				var noForce = arguments[1];
+				if(!names){return;}
+				if(!$.isArray(names)){
+					names = [names];
+				}
+				
+				$.each(names, function(i, name){
+					makeReady(name+'SYS', name, noForce);
+					makeReady(name, name, noForce);
+				});
+			};
+		})(),
 		
 		moduleList: [],
 		
@@ -214,19 +220,16 @@
 			
 			if(!_created){
 				events = $.map(events, function(e){
-					return (modules[e] || webshims.features[e]) ? e +'Ready' : e;
+					var evt = e;
+					if(_notQueued){
+						evt += 'SYS';
+					}
+					return (modules[e] || webshims.features[e]) ? evt +'Ready' : evt;
 				});
 			}
 			
 			if(!events.length){
-				
-				if(_notQueued){
-					fn($, modules);
-				} else {
-					setTimeout(function(){
-						fn($, modules);
-					}, 0);
-				}
+				fn($, modules, webshims);
 				return;
 			}
 			var readyEv = events.shift(),
@@ -281,6 +284,7 @@
 		
 		attr: (function(){
 			var attrFns = [{}];
+			var undefined;
 			var generateAttr = function(attrNames){
 				var oldAttr = $.attr;
 				$.attr = function(elem, name, value, pass, extra){
@@ -516,7 +520,7 @@
 								fn(langObj[lang] || langObj[shortLang]);
 								return false;
 							}
-							if(remoteLangs && module.langSrc !== undefined && (loadRemoteLang(lang) || loadRemoteLang(shortLang))){
+							if(remoteLangs && module.langSrc && (loadRemoteLang(lang) || loadRemoteLang(shortLang))){
 								return false;
 							}
 						});
@@ -543,7 +547,7 @@
 					$(function(){fn(context);});
 				};
 				readyFns.push(readyFn);
-				readyFn(document);
+				readyFn(doc);
 			},
 			triggerDomUpdate: function(context){
 				if(!context){return;}
@@ -622,21 +626,21 @@
 	 */
 	addPolyfill('html5shiv', {
 		test: function(){
-			return $.support.dynamicHTML5;
+			return support.dynamicHTML5;
 		},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie7-light', 'combined-ie8-light']
 	});
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
-	$.support.es5 = !!(String.prototype.trim && Function.prototype.bind && !isNaN(Date.parse("T00:00")) && Date.now && Date.prototype.toISOString);
-	if($.support.es5){
+	support.es5 = !!(String.prototype.trim && Function.prototype.bind && !isNaN(Date.parse("T00:00")) && Date.now && Date.prototype.toISOString);
+	if(support.es5){
 		$.each(['filter', 'map', 'every', 'reduce', 'reduceRight', 'lastIndexOf'], function(i, name){
 			if(!Array.prototype[name]){
-				$.support.es5 = false;
+				support.es5 = false;
 				return false;
 			}
 		});
 	}
-	if($.support.es5){
+	if(support.es5){
 		$.each(['keys', 'isExtensible', 'isFrozen', 'isSealed', 'preventExtensions', 'defineProperties', 'create', 'getOwnPropertyNames'], function(i, name){
 			if(!Object[name]){
 				$.support.es5 = false;
@@ -647,17 +651,17 @@
 	
 	addPolyfill('es5', {
 		test: function(){
-			return $.support.es5;
+			return support.es5;
 		},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ff3-light']
 	});
 
 	
 	/* geolocation */
-	$.support.geolocation = ('geolocation'  in navigator);
+	support.geolocation = ('geolocation'  in navigator);
 	addPolyfill('geolocation', {
 		test: function(){
-			return $.support.geolocation;
+			return support.geolocation;
 		},
 		options: {destroyWrite: true},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light']
@@ -665,11 +669,11 @@
 	/* END: geolocation */
 	
 	/* canvas */
-	$.support.canvas = ('getContext'  in $('<canvas />')[0]);
+	support.canvas = ('getContext'  in $('<canvas />')[0]);
 	
 	addPolyfill('canvas', {
 		test: function(){
-			return $.support.canvas;
+			return support.canvas;
 		},
 		methodNames: [
 			{
@@ -686,7 +690,7 @@
 	 */
 	
 	/* html5 constraint validation */
-	$.support.validity = ('checkValidity' in $('<form action="#" />')[0]);
+	support.validity = ('checkValidity' in $('<form action="#" />')[0]);
 	
 	/* bugfixes, validation-message + fieldset.checkValidity pack */
 	
@@ -696,8 +700,8 @@
 		var form = $('<form action="#"><fieldset><input name="a" required /></fieldset></form>'),
 			field = $('fieldset', form)[0]
 		;
-		$.support.validationMessage = !!(form.find('input').attr('validationMessage'));
-		$.support.fieldsetValidation = !!(field.elements && field.checkValidity && 'disabled' in field && !field.checkValidity() );
+		support.validationMessage = !!(form.find('input').attr('validationMessage'));
+		support.fieldsetValidation = !!(field.elements && field.checkValidity && 'disabled' in field && !field.checkValidity() );
 		addPolyfill('validation-base', {
 			feature: 'forms',
 			noAutoCallback: true,
@@ -713,7 +717,7 @@
 			feature: 'forms',
 			noAutoCallback: true,
 			test: function(){
-				return ( 'value' in document.createElement('output') );
+				return ( 'value' in doc.createElement('output') );
 			},
 			combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
 		});
@@ -723,7 +727,7 @@
 		feature: 'forms',
 		noAutoCallback: true,
 		test: function(){
-			return $.support.validity;
+			return support.validity;
 		},
 		methodNames: [
 			{
@@ -740,7 +744,7 @@
 	});
 	
 	
-	if($.support.validity === true){
+	if(support.validity === true){
 		//create delegatable-like events
 		webshims.capturingEvents(['input']);
 		webshims.capturingEvents(['invalid'], true);
@@ -758,10 +762,10 @@
 		options: {stepArrows: {number: 1, time: 1}, calculateWidth: true}
 	});
 	
-	$.support.inputUI = ($('<input type="range" />')[0].type == 'range' && $('<input type="date" />')[0].type == 'date');
+	support.inputUI = ($('<input type="range" />')[0].type == 'range' && $('<input type="date" />')[0].type == 'date');
 	addPolyfill('inputUI', {
 		feature: 'forms-ext',
-		test: function(){return ($.support.inputUI && !modules.inputUI.options.replaceNative);},
+		test: function(){return (support.inputUI && !modules.inputUI.options.replaceNative);},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4'],
 		noAutoCallback: true,
 		loadInit: function(){
@@ -780,11 +784,11 @@
 	
 	/* placeholder */
 	
-	$.support.placeholder = ($('<input type="text" />').attr('placeholder') !== undefined);
+	support.placeholder = ($('<input type="text" />').attr('placeholder') != null);
 	addPolyfill('placeholder', {
 		feature: 'forms',
 		test: function(){
-			return $.support.placeholder;
+			return support.placeholder;
 		},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
 	});
@@ -794,10 +798,10 @@
 	
 	/* json + loacalStorage */
 	
-	$.support.jsonStorage = ('JSON' in window && 'localStorage' in window && 'sessionStorage' in window);
+	support.jsonStorage = ('JSON' in window && 'localStorage' in window && 'sessionStorage' in window);
 	addPolyfill('json-storage', {
 		test: function(){
-			return $.support.jsonStorage;
+			return support.jsonStorage;
 		},
 		loadInit: function(){
 			loader.loadList(['swfobject']);

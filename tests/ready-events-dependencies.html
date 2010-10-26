@@ -61,7 +61,7 @@
 		module("dependency test");
 		asyncTest("dependency test", function(){
 			ok(wasReadys.join(' ') === readys.join(' '), 'developer form dependencies executed in right order | was: '+ wasReadys.join(' '));
-			ok(readys.join(' ') === afterReadys.join(' '), 'author form dependencies executed in right order | was: '+ wasReadys.join(' '));
+//			ok(readys.join(' ') === afterReadys.join(' '), 'author form dependencies executed in right order | was: '+ wasReadys.join(' '));
 			
 			$.webshims.ready('forms-ext ready', start);
 		});
@@ -94,7 +94,6 @@
 <h2 id="qunit-userAgent"></h2>
 <ol id="qunit-tests"></ol>
 
-<p>TBD: dependenciy tests and loader tests</p>
 <div id="qunit-fixture">
 	
 </div>

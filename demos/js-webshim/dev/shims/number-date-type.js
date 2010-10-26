@@ -1,9 +1,12 @@
 (function($){
 	var isImplemented;
+	
 	var implementTypes = function(){
 		if(isImplemented){return;}
 		isImplemented = true;
+		
 		var nan = parseInt('NaN', 10),
+			doc = document,
 			typeModels = $.webshims.inputTypes,
 			isNumber = function(string){
 				
@@ -405,14 +408,15 @@
 			var doSteps = function(input, type, control){
 				if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
 				$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
-				$(input).unbind('blur.stepeventshim').trigger('input');
+				$(input).unbind('blur.stepeventshim');
+				$.webshims.triggerInlineForm(input, 'input');
 				//IE workaround: ToDo improve usability of workaround
-				if( document.activeElement ){
-					if(document.activeElement !== input){
+				if( doc.activeElement ){
+					if(doc.activeElement !== input){
 						try {input.focus();} catch(e){}
 					}
 					setTimeout(function(){
-						if(document.activeElement !== input){
+						if(doc.activeElement !== input){
 							try {input.focus();} catch(e){}
 						}
 						$(input)

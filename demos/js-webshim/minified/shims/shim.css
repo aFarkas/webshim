@@ -3,10 +3,10 @@ footer,header,hgroup,menu,nav,section,summary {
     display:block;
 }
 mark {
-    background-color:#ff9;
-    color:#000; 
-    font-style:italic;
-    font-weight:bold;
+    background-color: #ff9;
+    color: #000; 
+    font-style: italic;
+    font-weight: bold;
 }
 /* reset */
 form span.placeholder-box,
@@ -128,6 +128,8 @@ span.input-datetime-local {
 	cursor: pointer;
 	border-radius: 0.35em;
 	-moz-border-radius: 0.35em;
+	font-size: 1em;
+	line-height: 0;
 }
 .input-date-datepicker-control {
 	display: none;
