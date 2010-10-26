@@ -1559,13 +1559,18 @@ webshims.addReady(function(context){
 		$('input, select, textarea', form).filter('[autofocus]:first').focus();
 	}
 });
+$.support.validity = $.support.validity || 'shim';
 
-(function(){
+webshims.createReadyEvent('validity');
+
+}, true); //webshims.ready end
+
+
+
+jQuery.webshims.ready('validation-base', function($){
+	if( 'value' in document.createElement('output') ){return;}
 	
-if($.support.validity === true){
-	return;
-}
-$.support.validity = 'shim';
+(function(){
 	var elements = {
 			input: 1,
 			textarea: 1
@@ -1621,15 +1626,8 @@ $.support.validity = 'shim';
 		})
 	;
 })();
-
-webshims.createReadyEvent('validity');
-
-}, true); //webshims.ready end
-
-
-
-jQuery.webshims.ready('validation-base', function($){
-	if( 'value' in document.createElement('output') ){return;}
+	
+	
 	var doc = document;
 	var outputCreate = function(elem){
 		if(elem.getAttribute('aria-live')){return;}

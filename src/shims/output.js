@@ -1,5 +1,64 @@
 jQuery.webshims.ready('validation-base', function($){
 	if( 'value' in document.createElement('output') ){return;}
+	
+(function(){
+	var elements = {
+			input: 1,
+			textarea: 1
+		},
+		noInputTypes = {
+			radio: 1,
+			checkbox: 1,
+			submit: 1,
+			button: 1,
+			image: 1,
+			reset: 1
+			
+			//pro forma
+			,color: 1
+			//,range: 1
+		},
+		observe = function(input){
+			var timer,
+				lastVal = input.attr('value'),
+				trigger = function(e){
+					//input === null
+					if(!input){return;}
+					var newVal = input.attr('value');
+					
+					if(newVal !== lastVal){
+						lastVal = newVal;
+						if(!e || e.type != 'input'){
+							webshims.triggerInlineForm(input[0], 'input');
+						}
+					}
+				},
+				unbind = function(){
+					input.unbind('focusout', unbind).unbind('input', trigger);
+					clearInterval(timer);
+					trigger();
+					input = null;
+				}
+			;
+			
+			clearInterval(timer);
+			timer = setInterval(trigger, ($.browser.mozilla) ? 250 : 111);
+			setTimeout(trigger, 9);
+			input.bind('focusout', unbind).bind('input', trigger);
+		}
+	;
+		
+	
+	$(document)
+		.bind('focusin', function(e){
+			if( e.target && e.target.type && !e.target.readonly && !e.target.readOnly && !e.target.disabled && elements[(e.target.nodeName || '').toLowerCase()] && !noInputTypes[e.target.type] ){
+				observe($(e.target));
+			}
+		})
+	;
+})();
+	
+	
 	var doc = document;
 	var outputCreate = function(elem){
 		if(elem.getAttribute('aria-live')){return;}
