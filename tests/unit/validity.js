@@ -201,6 +201,29 @@ asyncTest('validationMessage/setCustomValidity', function(){
 	});
 });
 
+
+asyncTest('output test', function(){
+	QUnit.reset();
+	
+	equals($('output').attr('value'), 'jo', 'first output has initial value');
+	$('output:first').attr('value', 'hello');
+	equals($('output').attr('value'), 'hello', 'first output has changed value');
+	
+	$('#labeled-output').attr('value', 'somecontent');
+	if( !('value' in document.createElement('output')) ){
+		equals($('output').text(), 'hello', 'shim shows value');
+		ok(/&outputtest=somecontent&/.test($('form').serialize()), 'finds output serialized in shim');
+	} else {
+		ok(/&outputtest=somecontent&/.test($('form').serialize()), 'finds output serialized in native, if fails jQuery bug');
+	}
+	
+	
+	
+	$.webshims.ready('forms ready', function(){
+		start();
+	});
+});
+
 //we split checkValidity test, because invalid workaround for chrome produces error || this error is negligible
 asyncTest('checkValidity/invalid event I', function(){
 	QUnit.reset();

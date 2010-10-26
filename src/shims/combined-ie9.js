@@ -123,7 +123,7 @@ jQuery.webshims.ready('es5', function($){
 	
 	/* some extra validation UI */
 	$.webshims.validityAlert = (function(){
-		
+		var alertElem = (!$.browser.msie || parseInt($.browser.version, 10) > 7) ? 'span' : 'label';
 		var api = {
 			hideDelay: 5000,
 			showFor: function(elem, message, hideOnBlur){
@@ -131,7 +131,6 @@ jQuery.webshims.ready('es5', function($){
 				var visual = (elem.data('inputUIReplace') || {visual: elem}).visual;
 				createAlert();
 				api.clear();
-				alert.attr('for', visual.attr('id'));
 				this.getMessage(elem, message);
 				this.position(visual);
 				this.show();
@@ -144,6 +143,7 @@ jQuery.webshims.ready('es5', function($){
 					if(!focusElem[0]){
 						focusElem = visual;
 					}
+					alert.attr('for', $.webshims.getID(focusElem));
 					focusElem.focus();
 					$(document).bind('focusout.validityalert', boundHide);
 				}
@@ -172,7 +172,7 @@ jQuery.webshims.ready('es5', function($){
 				$(document).unbind('focusout.validityalert');
 				alert.stop().removeAttr('for');
 			},
-			alert: $('<label class="validity-alert" role="alert"><span class="va-box" /></label>').css({position: 'absolute', display: 'none'})
+			alert: $('<'+alertElem+' class="validity-alert" role="alert"><span class="va-box" /></'+alertElem+'>').css({position: 'absolute', display: 'none'})
 		};
 		
 		var alert = api.alert;

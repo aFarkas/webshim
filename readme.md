@@ -9,7 +9,7 @@ general Features:
 * HTML5 compilant: correctly and accurately implemented (HTML5) Markup-, JS- and DOM-APIs  
 * capability based loading: extrem lightweight in modern browsers
 * cross-browser support: All A-Graded browsers including last version of Opera are testet
-* extendible: we have not implemented a feature, you want to use. You can easily implement the feature your own
+* extendable: we have not implemented a feature, you want to use. You can easily implement the feature your own
 
 implemented Features:
 
