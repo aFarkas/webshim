@@ -39,14 +39,12 @@
 			readys.push('number-date-type');
 		}
 		
-		var wasReadys = [],
-			afterReadys = [];
+		var wasReadys = [];
 		$.each(readys, function(i, name){
 			$.webshims.ready(name, function(){
 				if($.inArray(name, wasReadys) == -1){
 					wasReadys.push(name+'-queued');
 				}
-				afterReadys.push(name);
 			});
 			$.webshims.ready(name, function(){
 				wasReadys.push(name);
@@ -55,15 +53,13 @@
 		
 		module("init");
 		asyncTest("init", function(){
-			$.webshims.ready('ready', start);
+			$.webshims.ready('forms-ext', start);
 		});
 		
 		module("dependency test");
 		asyncTest("dependency test", function(){
 			ok(wasReadys.join(' ') === readys.join(' '), 'developer form dependencies executed in right order | was: '+ wasReadys.join(' '));
-//			ok(readys.join(' ') === afterReadys.join(' '), 'author form dependencies executed in right order | was: '+ wasReadys.join(' '));
-			
-			$.webshims.ready('forms-ext ready', start);
+			$.webshims.ready('forms-ext', start);
 		});
 		
 		
