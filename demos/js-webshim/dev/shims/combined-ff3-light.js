@@ -711,8 +711,8 @@ if (!String.prototype.trim) {
 
 })();
 /* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
-jQuery.webshims.ready('es5', function($){
-	var webshims = $.webshims;
+jQuery.webshims.ready('es5', function($, webshims, window){
+	"use strict";
 	var validityMessages = webshims.validityMessages;
 	var support = $.support;
 	var fixNative = false;
@@ -1060,8 +1060,6 @@ jQuery.webshims.ready('es5', function($){
 			});
 			validityElements.push('input');
 		}
-		
-		select = null;
 		
 		var currentValidationMessage =  validityMessages[''];
 		$(doc).bind('htmlExtLangChange', function(){
@@ -1567,68 +1565,69 @@ webshims.createReadyEvent('validity');
 
 
 
-jQuery.webshims.ready('validation-base', function($){
+jQuery.webshims.ready('validation-base', function($, webshims){
 	if( 'value' in document.createElement('output') ){return;}
+	var doc = document;	
 	
-(function(){
-	var elements = {
-			input: 1,
-			textarea: 1
-		},
-		noInputTypes = {
-			radio: 1,
-			checkbox: 1,
-			submit: 1,
-			button: 1,
-			image: 1,
-			reset: 1
-			
-			//pro forma
-			,color: 1
-			//,range: 1
-		},
-		observe = function(input){
-			var timer,
-				lastVal = input.attr('value'),
-				trigger = function(e){
-					//input === null
-					if(!input){return;}
-					var newVal = input.attr('value');
-					
-					if(newVal !== lastVal){
-						lastVal = newVal;
-						if(!e || e.type != 'input'){
-							webshims.triggerInlineForm(input[0], 'input');
+	(function(){
+		var elements = {
+				input: 1,
+				textarea: 1
+			},
+			noInputTypes = {
+				radio: 1,
+				checkbox: 1,
+				submit: 1,
+				button: 1,
+				image: 1,
+				reset: 1
+				
+				//pro forma
+				,color: 1
+				//,range: 1
+			},
+			observe = function(input){
+				var timer,
+					lastVal = input.attr('value'),
+					trigger = function(e){
+						//input === null
+						if(!input){return;}
+						var newVal = input.attr('value');
+						
+						if(newVal !== lastVal){
+							lastVal = newVal;
+							if(!e || e.type != 'input'){
+								webshims.triggerInlineForm(input[0], 'input');
+							}
 						}
+					},
+					unbind = function(){
+						input.unbind('focusout', unbind).unbind('input', trigger);
+						clearInterval(timer);
+						trigger();
+						input = null;
 					}
-				},
-				unbind = function(){
-					input.unbind('focusout', unbind).unbind('input', trigger);
-					clearInterval(timer);
-					trigger();
-					input = null;
-				}
-			;
-			
-			clearInterval(timer);
-			timer = setInterval(trigger, ($.browser.mozilla) ? 250 : 111);
-			setTimeout(trigger, 9);
-			input.bind('focusout', unbind).bind('input', trigger);
-		}
-	;
-		
-	
-	$(document)
-		.bind('focusin', function(e){
-			if( e.target && e.target.type && !e.target.readonly && !e.target.readOnly && !e.target.disabled && elements[(e.target.nodeName || '').toLowerCase()] && !noInputTypes[e.target.type] ){
-				observe($(e.target));
+				;
+				
+				clearInterval(timer);
+				timer = setInterval(trigger, ($.browser.mozilla) ? 250 : 111);
+				setTimeout(trigger, 9);
+				input.bind('focusout', unbind).bind('input', trigger);
 			}
-		})
-	;
-})();
+		;
+			
+		
+		$(doc)
+			.bind('focusin', function(e){
+				if( e.target && e.target.type && !e.target.readonly && !e.target.readOnly && !e.target.disabled && elements[(e.target.nodeName || '').toLowerCase()] && !noInputTypes[e.target.type] ){
+					observe($(e.target));
+				}
+			})
+		;
+	})();
 	
 	
-	var doc = document;
+	
 	var outputCreate = function(elem){
 		if(elem.getAttribute('aria-live')){return;}
 		elem = $(elem);
@@ -1650,10 +1649,10 @@ jQuery.webshims.ready('validation-base', function($){
 		elem.attr({'aria-live': 'polite'});
 		if(id){
 			shim.attr('id', id);
-			elem.attr('aria-labeldby', $.webshims.getID($('label[for='+id+']', form)));
+			elem.attr('aria-labeldby', webshims.getID($('label[for='+id+']', form)));
 		}
 		if(htmlFor){
-			id = $.webshims.getID(elem);
+			id = webshims.getID(elem);
 			htmlFor.split(' ').forEach(function(control){
 				control = form.getElementById(control);
 				if(control){
@@ -1667,7 +1666,7 @@ jQuery.webshims.ready('validation-base', function($){
 	};
 	
 
-	$.webshims.attr('value', {
+	webshims.attr('value', {
 		elementNames: ['output', 'input'],
 		getter: true,
 		setter: function(elem, value, oldFn){
@@ -1683,13 +1682,13 @@ jQuery.webshims.ready('validation-base', function($){
 		}
 	});
 	
-	$.webshims.addReady(function(context){
+	webshims.addReady(function(context){
 		$('output', context).each(function(){
 			outputCreate(this);
 		});
 	});
 	
-	$.webshims.createReadyEvent('output');
+	webshims.createReadyEvent('output');
 }, true);/*
  * HTML5 placeholder-enhancer
  * version: 2.0.2

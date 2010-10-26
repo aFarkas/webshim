@@ -1,6 +1,6 @@
 /* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
-jQuery.webshims.ready('es5', function($){
-	var webshims = $.webshims;
+jQuery.webshims.ready('es5', function($, webshims, window){
+	"use strict";
 	var validityMessages = webshims.validityMessages;
 	var support = $.support;
 	var fixNative = false;
@@ -349,8 +349,6 @@ jQuery.webshims.ready('es5', function($){
 			validityElements.push('input');
 		}
 		
-		select = null;
-		
 		var currentValidationMessage =  validityMessages[''];
 		$(doc).bind('htmlExtLangChange', function(){
 			webshims.activeLang(validityMessages, 'validation-base', function(langObj){
@@ -567,15 +565,16 @@ jQuery.webshims.ready('es5', function($){
 
 
 (function($){
+	"use strict";
 	var isImplemented;
 	
-	var implementTypes = function(){
+	var implementTypes = function($, webshims, window){
 		if(isImplemented){return;}
 		isImplemented = true;
 		
 		var nan = parseInt('NaN', 10),
 			doc = document,
-			typeModels = $.webshims.inputTypes,
+			typeModels = webshims.inputTypes,
 			isNumber = function(string){
 				
 				return (typeof string == 'number' || (string && string == string * 1));
@@ -622,7 +621,7 @@ jQuery.webshims.ready('es5', function($){
 			EPS = 1e-7
 		;
 		
-		$.webshims.addValidityRule('stepMismatch', function(input, val, cache){
+		webshims.addValidityRule('stepMismatch', function(input, val, cache){
 			if(val === ''){return false;}
 			if(!('type' in cache)){
 				cache.type = getType(input[0]);
@@ -660,7 +659,7 @@ jQuery.webshims.ready('es5', function($){
 		
 		
 		[{name: 'rangeOverflow', attr: 'max', factor: 1}, {name: 'rangeUnderflow', attr: 'min', factor: -1}].forEach(function(data, i){
-			$.webshims.addValidityRule(data.name, function(input, val, cache) {
+			webshims.addValidityRule(data.name, function(input, val, cache) {
 				var ret = false;
 				if(val === ''){return ret;}
 				if (!('type' in cache)) {
@@ -686,7 +685,7 @@ jQuery.webshims.ready('es5', function($){
 		});
 		
 		//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
-		$.webshims.attr('valueAsNumber', {
+		webshims.attr('valueAsNumber', {
 			elementNames: ['input'],
 			getter: function(elem, fn){
 				var type = getType(elem);
@@ -714,7 +713,7 @@ jQuery.webshims.ready('es5', function($){
 			}
 		});
 		
-		$.webshims.attr('valueAsDate', {
+		webshims.attr('valueAsDate', {
 			elementNames: ['input'],
 			getter: function(elem, fn){
 				var type = getType(elem);
@@ -915,26 +914,26 @@ jQuery.webshims.ready('es5', function($){
 		};
 		
 		if(!supportsType('number')){
-			$.webshims.addInputType('number', typeProtos.number);
+			webshims.addInputType('number', typeProtos.number);
 		}
 		
 		if(!supportsType('range')){
-			$.webshims.addInputType('range', $.extend({}, typeProtos.number, typeProtos.range));
+			webshims.addInputType('range', $.extend({}, typeProtos.number, typeProtos.range));
 		}
 		if(!supportsType('date')){
-			$.webshims.addInputType('date', typeProtos.date);
+			webshims.addInputType('date', typeProtos.date);
 		}
 		if(!supportsType('time')){
-			$.webshims.addInputType('time', $.extend({}, typeProtos.date, typeProtos.time));
+			webshims.addInputType('time', $.extend({}, typeProtos.date, typeProtos.time));
 		}
 		
 		if(!supportsType('datetime-local')){
-			$.webshims.addInputType('datetime-local', $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']));
+			webshims.addInputType('datetime-local', $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']));
 		}
 		
 		//implement set/arrow controls
 		(function(){
-			var options = $.webshims.modules['number-date-type'].options;
+			var options = webshims.modules['number-date-type'].options;
 			var getNextStep = function(input, upDown, cache){
 				
 				cache = cache || {};
@@ -971,13 +970,13 @@ jQuery.webshims.ready('es5', function($){
 				return ret;
 			};
 			
-			$.webshims.modules['number-date-type'].getNextStep = getNextStep;
+			webshims.modules['number-date-type'].getNextStep = getNextStep;
 			
 			var doSteps = function(input, type, control){
 				if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
 				$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
 				$(input).unbind('blur.stepeventshim');
-				$.webshims.triggerInlineForm(input, 'input');
+				webshims.triggerInlineForm(input, 'input');
 				//IE workaround: ToDo improve usability of workaround
 				if( doc.activeElement ){
 					if(doc.activeElement !== input){
@@ -1010,12 +1009,12 @@ jQuery.webshims.ready('es5', function($){
 						}
 					}
 				};
-				$.webshims.attr('disabled', disabledReadonly);
-				$.webshims.attr('readonly', disabledReadonly);
+				webshims.attr('disabled', disabledReadonly);
+				webshims.attr('readonly', disabledReadonly);
 				
 			}
 			
-			$.webshims.addReady(function(context){
+			webshims.addReady(function(context){
 				
 				//ui for numeric values
 				if(options.stepArrows){
@@ -1069,17 +1068,17 @@ jQuery.webshims.ready('es5', function($){
 			});
 		})();
 		// add support for new input-types
-		$.webshims.attr('type', {
+		webshims.attr('type', {
 			elementNames: ['input'],
 			getter: function(elem, fn){
 				var type = getType(elem);
-				return ($.webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
+				return (webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
 			},
 			//don't change setter
 			setter: true
 		});
 		
-		$.webshims.createReadyEvent('number-date-type');
+		webshims.createReadyEvent('number-date-type');
 	};
 	
 	if($.support.validity === true){
@@ -1089,7 +1088,8 @@ jQuery.webshims.ready('es5', function($){
 	}
 	
 })(jQuery);
-(function($){
+jQuery.webshims.ready('number-date-type', function($, webshims){
+	"use strict";
 	$.support.inputUI = 'shim';
 		
 	var options = $.webshims.modules.inputUI.options;
@@ -1108,7 +1108,7 @@ jQuery.webshims.ready('es5', function($){
 			orig.bind('firstinvalid', function(e){
 				setTimeout(function(){
 					if(!$.data(e.target, 'maybePreventedinvalid')){
-						$.webshims.validityAlert.showFor(e.target);
+						webshims.validityAlert.showFor(e.target);
 					}
 				}, 30);
 			});
@@ -1123,7 +1123,7 @@ jQuery.webshims.ready('es5', function($){
 				outerWidth: orig.getouterWidth(),
 				label: (id) ? $('label[for='+ id +']', orig[0].form) : $([])
 			},
-			curLabelID =  $.webshims.getID(attr.label)
+			curLabelID =  webshims.getID(attr.label)
 		;
 		shim.addClass(orig[0].className).data('html5element', orig);
 		orig
@@ -1172,7 +1172,7 @@ jQuery.webshims.ready('es5', function($){
 			}
 		}
 		
-		$.webshims.triggerDomUpdate(date);
+		webshims.triggerDomUpdate(date);
 		$('input.input-datetime-local-date', date)
 			.datepicker($.extend({}, options.date))
 			.bind('change', function(val, ui){
@@ -1288,7 +1288,7 @@ jQuery.webshims.ready('es5', function($){
 				date.outerWidth(attr.outerWidth);
 			}
 		}
-		data = date
+		date
 			.datepicker($.extend({}, options.date))
 			.bind('change', change)
 			.data('datepicker')
@@ -1345,7 +1345,7 @@ jQuery.webshims.ready('es5', function($){
 					if(e.type == 'slidechange'){
 						elem.trigger('change');
 					} else {
-						$.webshims.triggerInlineForm(elem[0], 'input');
+						webshims.triggerInlineForm(elem[0], 'input');
 					}
 				}
 			}
@@ -1412,7 +1412,7 @@ jQuery.webshims.ready('es5', function($){
 	};
 	
 	$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, attr){
-		$.webshims.attr(attr, {
+		webshims.attr(attr, {
 			elementNames: ['input'],
 			setter: function(elem, val, fn){
 				var widget = $.data(elem, 'inputUIReplace');
@@ -1444,22 +1444,20 @@ jQuery.webshims.ready('es5', function($){
 		if(!$.datepicker){return;}
 		$(document)
 			.bind('htmlExtLangChange', function(){
-				$.webshims.activeLang($.datepicker.regional, 'inputUI', changeDefaults);
+				webshims.activeLang($.datepicker.regional, 'inputUI', changeDefaults);
 			})
 			.unbind('jquery-uiReady.langchange input-widgetsReady.langchange')
 		;
 	});
-	$.webshims.ready('number-date-type', function(){
-		$.webshims.addReady(function(context){
-			$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(){
-				if(!$.datepicker && !$.fn.slider){return;}
-				replaceInputUI(context);
-				if($.datepicker && $.fn.slider){
-					$(document).unbind('jquery-uiReady.initinputui input-widgetsReady.initinputui');
-				}
-			});
-		});
-		$.webshims.createReadyEvent('inputUI');
-	}, true);
 	
-})(jQuery);
+	webshims.addReady(function(context){
+		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(){
+			if(!$.datepicker && !$.fn.slider){return;}
+			replaceInputUI(context);
+			if($.datepicker && $.fn.slider){
+				$(document).unbind('jquery-uiReady.initinputui input-widgetsReady.initinputui');
+			}
+		});
+	});
+	webshims.createReadyEvent('inputUI');
+}, true);

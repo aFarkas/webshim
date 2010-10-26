@@ -1,13 +1,14 @@
 (function($){
+	"use strict";
 	var isImplemented;
 	
-	var implementTypes = function(){
+	var implementTypes = function($, webshims, window){
 		if(isImplemented){return;}
 		isImplemented = true;
 		
 		var nan = parseInt('NaN', 10),
 			doc = document,
-			typeModels = $.webshims.inputTypes,
+			typeModels = webshims.inputTypes,
 			isNumber = function(string){
 				
 				return (typeof string == 'number' || (string && string == string * 1));
@@ -54,7 +55,7 @@
 			EPS = 1e-7
 		;
 		
-		$.webshims.addValidityRule('stepMismatch', function(input, val, cache){
+		webshims.addValidityRule('stepMismatch', function(input, val, cache){
 			if(val === ''){return false;}
 			if(!('type' in cache)){
 				cache.type = getType(input[0]);
@@ -92,7 +93,7 @@
 		
 		
 		[{name: 'rangeOverflow', attr: 'max', factor: 1}, {name: 'rangeUnderflow', attr: 'min', factor: -1}].forEach(function(data, i){
-			$.webshims.addValidityRule(data.name, function(input, val, cache) {
+			webshims.addValidityRule(data.name, function(input, val, cache) {
 				var ret = false;
 				if(val === ''){return ret;}
 				if (!('type' in cache)) {
@@ -118,7 +119,7 @@
 		});
 		
 		//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
-		$.webshims.attr('valueAsNumber', {
+		webshims.attr('valueAsNumber', {
 			elementNames: ['input'],
 			getter: function(elem, fn){
 				var type = getType(elem);
@@ -146,7 +147,7 @@
 			}
 		});
 		
-		$.webshims.attr('valueAsDate', {
+		webshims.attr('valueAsDate', {
 			elementNames: ['input'],
 			getter: function(elem, fn){
 				var type = getType(elem);
@@ -347,26 +348,26 @@
 		};
 		
 		if(!supportsType('number')){
-			$.webshims.addInputType('number', typeProtos.number);
+			webshims.addInputType('number', typeProtos.number);
 		}
 		
 		if(!supportsType('range')){
-			$.webshims.addInputType('range', $.extend({}, typeProtos.number, typeProtos.range));
+			webshims.addInputType('range', $.extend({}, typeProtos.number, typeProtos.range));
 		}
 		if(!supportsType('date')){
-			$.webshims.addInputType('date', typeProtos.date);
+			webshims.addInputType('date', typeProtos.date);
 		}
 		if(!supportsType('time')){
-			$.webshims.addInputType('time', $.extend({}, typeProtos.date, typeProtos.time));
+			webshims.addInputType('time', $.extend({}, typeProtos.date, typeProtos.time));
 		}
 		
 		if(!supportsType('datetime-local')){
-			$.webshims.addInputType('datetime-local', $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']));
+			webshims.addInputType('datetime-local', $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']));
 		}
 		
 		//implement set/arrow controls
 		(function(){
-			var options = $.webshims.modules['number-date-type'].options;
+			var options = webshims.modules['number-date-type'].options;
 			var getNextStep = function(input, upDown, cache){
 				
 				cache = cache || {};
@@ -403,13 +404,13 @@
 				return ret;
 			};
 			
-			$.webshims.modules['number-date-type'].getNextStep = getNextStep;
+			webshims.modules['number-date-type'].getNextStep = getNextStep;
 			
 			var doSteps = function(input, type, control){
 				if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
 				$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
 				$(input).unbind('blur.stepeventshim');
-				$.webshims.triggerInlineForm(input, 'input');
+				webshims.triggerInlineForm(input, 'input');
 				//IE workaround: ToDo improve usability of workaround
 				if( doc.activeElement ){
 					if(doc.activeElement !== input){
@@ -442,12 +443,12 @@
 						}
 					}
 				};
-				$.webshims.attr('disabled', disabledReadonly);
-				$.webshims.attr('readonly', disabledReadonly);
+				webshims.attr('disabled', disabledReadonly);
+				webshims.attr('readonly', disabledReadonly);
 				
 			}
 			
-			$.webshims.addReady(function(context){
+			webshims.addReady(function(context){
 				
 				//ui for numeric values
 				if(options.stepArrows){
@@ -501,17 +502,17 @@
 			});
 		})();
 		// add support for new input-types
-		$.webshims.attr('type', {
+		webshims.attr('type', {
 			elementNames: ['input'],
 			getter: function(elem, fn){
 				var type = getType(elem);
-				return ($.webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
+				return (webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
 			},
 			//don't change setter
 			setter: true
 		});
 		
-		$.webshims.createReadyEvent('number-date-type');
+		webshims.createReadyEvent('number-date-type');
 	};
 	
 	if($.support.validity === true){

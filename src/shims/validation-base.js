@@ -1,6 +1,6 @@
 /* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
-jQuery.webshims.ready('es5', function($){
-	var webshims = $.webshims;
+jQuery.webshims.ready('es5', function($, webshims, window){
+	"use strict";
 	var validityMessages = webshims.validityMessages;
 	var support = $.support;
 	var fixNative = false;
@@ -348,8 +348,6 @@ jQuery.webshims.ready('es5', function($){
 			});
 			validityElements.push('input');
 		}
-		
-		select = null;
 		
 		var currentValidationMessage =  validityMessages[''];
 		$(doc).bind('htmlExtLangChange', function(){

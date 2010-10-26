@@ -30,7 +30,7 @@ asyncTest("general validity Modul", function(){
 	willValidate.filter(':eq(2)').attr('disabled', false);
 	equals( $('#form-1 input:willValidate').length, total, 'willValidate enabled' );
 	form1.find('#name').removeAttr('name');
-	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate: false without name' );
+	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate: false without name (negligible in native)' );
 	form1.find('#name').attr('name', 'name');
 	
 	form1.find('#name').attr('readonly', true);

@@ -1,4 +1,5 @@
-(function($){
+jQuery.webshims.ready('number-date-type', function($, webshims){
+	"use strict";
 	$.support.inputUI = 'shim';
 		
 	var options = $.webshims.modules.inputUI.options;
@@ -17,7 +18,7 @@
 			orig.bind('firstinvalid', function(e){
 				setTimeout(function(){
 					if(!$.data(e.target, 'maybePreventedinvalid')){
-						$.webshims.validityAlert.showFor(e.target);
+						webshims.validityAlert.showFor(e.target);
 					}
 				}, 30);
 			});
@@ -32,7 +33,7 @@
 				outerWidth: orig.getouterWidth(),
 				label: (id) ? $('label[for='+ id +']', orig[0].form) : $([])
 			},
-			curLabelID =  $.webshims.getID(attr.label)
+			curLabelID =  webshims.getID(attr.label)
 		;
 		shim.addClass(orig[0].className).data('html5element', orig);
 		orig
@@ -81,7 +82,7 @@
 			}
 		}
 		
-		$.webshims.triggerDomUpdate(date);
+		webshims.triggerDomUpdate(date);
 		$('input.input-datetime-local-date', date)
 			.datepicker($.extend({}, options.date))
 			.bind('change', function(val, ui){
@@ -197,7 +198,7 @@
 				date.outerWidth(attr.outerWidth);
 			}
 		}
-		data = date
+		date
 			.datepicker($.extend({}, options.date))
 			.bind('change', change)
 			.data('datepicker')
@@ -254,7 +255,7 @@
 					if(e.type == 'slidechange'){
 						elem.trigger('change');
 					} else {
-						$.webshims.triggerInlineForm(elem[0], 'input');
+						webshims.triggerInlineForm(elem[0], 'input');
 					}
 				}
 			}
@@ -321,7 +322,7 @@
 	};
 	
 	$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, attr){
-		$.webshims.attr(attr, {
+		webshims.attr(attr, {
 			elementNames: ['input'],
 			setter: function(elem, val, fn){
 				var widget = $.data(elem, 'inputUIReplace');
@@ -353,22 +354,20 @@
 		if(!$.datepicker){return;}
 		$(document)
 			.bind('htmlExtLangChange', function(){
-				$.webshims.activeLang($.datepicker.regional, 'inputUI', changeDefaults);
+				webshims.activeLang($.datepicker.regional, 'inputUI', changeDefaults);
 			})
 			.unbind('jquery-uiReady.langchange input-widgetsReady.langchange')
 		;
 	});
-	$.webshims.ready('number-date-type', function(){
-		$.webshims.addReady(function(context){
-			$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(){
-				if(!$.datepicker && !$.fn.slider){return;}
-				replaceInputUI(context);
-				if($.datepicker && $.fn.slider){
-					$(document).unbind('jquery-uiReady.initinputui input-widgetsReady.initinputui');
-				}
-			});
-		});
-		$.webshims.createReadyEvent('inputUI');
-	}, true);
 	
-})(jQuery);
+	webshims.addReady(function(context){
+		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(){
+			if(!$.datepicker && !$.fn.slider){return;}
+			replaceInputUI(context);
+			if($.datepicker && $.fn.slider){
+				$(document).unbind('jquery-uiReady.initinputui input-widgetsReady.initinputui');
+			}
+		});
+	});
+	webshims.createReadyEvent('inputUI');
+}, true);

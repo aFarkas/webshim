@@ -1,5 +1,5 @@
 (function($){
-	
+	"use strict";
 	var doc = document;
 	var support = $.support;
 	var undefined;
@@ -12,7 +12,7 @@
 	
 	$.webshims = {
 		
-		version: 'pre1.0.0final',
+		version: '1.0.0',
 		
 		fixHTML5: (function(){
 			var d, b;
@@ -229,7 +229,7 @@
 			}
 			
 			if(!events.length){
-				fn($, modules, webshims);
+				fn($, webshims, window, document);
 				return;
 			}
 			var readyEv = events.shift(),
