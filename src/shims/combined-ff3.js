@@ -2183,11 +2183,12 @@ jQuery.webshims.ready('validation-base', function($, webshims){
 						;
 						
 						if(options.calculateWidth){
-							var width = $(this).width() || parseInt($(this).css('width'), 10);
+							var width = $(this).getwidth();
 							if(!width){return;}
 							var margin = (parseInt($(this).css('margin'+dir.side), 10) || 0) + (parseInt(controls.css('margin'+dir.side), 10) || 0);
-							$(this).css('width', width - controls.outerWidth(true));
+							$(this).css('width', width - controls.getouterWidth(true));
 							if(margin){
+								$(this).css('margin'+dir.side, 0);
 								controls.css('margin'+dir.side, margin);
 							}
 						}
@@ -2216,7 +2217,7 @@ jQuery.webshims.ready('validation-base', function($, webshims){
 	}
 	
 })(jQuery);
-jQuery.webshims.ready('number-date-type', function($, webshims){
+jQuery.webshims.ready('number-date-type', function($, webshims, window, document){
 	"use strict";
 	$.support.inputUI = 'shim';
 		
@@ -2342,7 +2343,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims){
 			elem.trigger('change');
 		});
 		
-		$.each(['disabled', 'min', 'max', 'value'], function(i, name){
+		$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
 			elem.attr(name, function(i, value){return value || '';});
 		});
 	};
@@ -2351,6 +2352,9 @@ jQuery.webshims.ready('number-date-type', function($, webshims){
 		disabled: function(orig, shim, value){
 			$('input.input-datetime-local-date', shim).datepicker('option', 'disabled', !!value);
 			$('input.input-datetime-local-time', shim).attr('disabled', !!value);
+		},
+		step: function(orig, shim, value){
+			$('input.input-datetime-local-time', shim).attr('step', value);
 		},
 		//ToDo: use min also on time
 		min: function(orig, shim, value){
@@ -2580,14 +2584,18 @@ jQuery.webshims.ready('number-date-type', function($, webshims){
 	
 	webshims.addReady(function(context){
 		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(){
-			if(!$.datepicker && !$.fn.slider){return;}
-			replaceInputUI(context);
+			if($.datepicker || $.fn.slider){
+				replaceInputUI(context);
+			}
 			if($.datepicker && $.fn.slider){
 				$(document).unbind('jquery-uiReady.initinputui input-widgetsReady.initinputui');
 			}
+			if(context === document){
+				webshims.createReadyEvent('inputUI');
+			}
 		});
 	});
-	webshims.createReadyEvent('inputUI');
+	
 }, true);
 /*
  * HTML5 placeholder-enhancer

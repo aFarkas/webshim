@@ -1,4 +1,4 @@
-jQuery.webshims.ready('number-date-type', function($, webshims){
+jQuery.webshims.ready('number-date-type', function($, webshims, window, document){
 	"use strict";
 	$.support.inputUI = 'shim';
 		
@@ -124,7 +124,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims){
 			elem.trigger('change');
 		});
 		
-		$.each(['disabled', 'min', 'max', 'value'], function(i, name){
+		$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
 			elem.attr(name, function(i, value){return value || '';});
 		});
 	};
@@ -133,6 +133,9 @@ jQuery.webshims.ready('number-date-type', function($, webshims){
 		disabled: function(orig, shim, value){
 			$('input.input-datetime-local-date', shim).datepicker('option', 'disabled', !!value);
 			$('input.input-datetime-local-time', shim).attr('disabled', !!value);
+		},
+		step: function(orig, shim, value){
+			$('input.input-datetime-local-time', shim).attr('step', value);
 		},
 		//ToDo: use min also on time
 		min: function(orig, shim, value){
@@ -362,12 +365,16 @@ jQuery.webshims.ready('number-date-type', function($, webshims){
 	
 	webshims.addReady(function(context){
 		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(){
-			if(!$.datepicker && !$.fn.slider){return;}
-			replaceInputUI(context);
+			if($.datepicker || $.fn.slider){
+				replaceInputUI(context);
+			}
 			if($.datepicker && $.fn.slider){
 				$(document).unbind('jquery-uiReady.initinputui input-widgetsReady.initinputui');
 			}
+			if(context === document){
+				webshims.createReadyEvent('inputUI');
+			}
 		});
 	});
-	webshims.createReadyEvent('inputUI');
+	
 }, true);

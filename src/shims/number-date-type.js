@@ -489,11 +489,12 @@
 						;
 						
 						if(options.calculateWidth){
-							var width = $(this).width() || parseInt($(this).css('width'), 10);
+							var width = $(this).getwidth();
 							if(!width){return;}
 							var margin = (parseInt($(this).css('margin'+dir.side), 10) || 0) + (parseInt(controls.css('margin'+dir.side), 10) || 0);
-							$(this).css('width', width - controls.outerWidth(true));
+							$(this).css('width', width - controls.getouterWidth(true));
 							if(margin){
+								$(this).css('margin'+dir.side, 0);
 								controls.css('margin'+dir.side, margin);
 							}
 						}

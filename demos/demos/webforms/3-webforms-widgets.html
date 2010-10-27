@@ -14,10 +14,18 @@
 			border: 1px solid #000;
 			margin: 5px 0;
 		}
-		
+		span.number {
+			display: inline-block;
+			margin-right: 5px;
+		}
+		span.number input {
+			text-align: center;
+			width: 2.8em;
+		}
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="../../js-webshim/minified/extras/mousepress.js"></script>
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
 	
     <script class="example">
@@ -39,6 +47,21 @@
 		$.webshims.polyfill();
         
     </script>
+	<script>
+		$.webshims.ready('ready forms-ext', function(){
+			$('#range').each(function(){
+				var range = $(this);
+				var number = $('<span class="number"><input class="number" value="'+ range.attr('value') +'" min="0" max="100" type="number" /></span>');
+				range.beforeWebshim(number);
+				number.bind('input', function(){
+					range.attr('value', $('input', this).attr('value'));
+				});
+				range.bind('input', function(){
+					$('input', number).attr('value', $(this).attr('value'));
+				});
+			});
+		});
+	</script>
 	<script src="../../demo-js/demo.js"></script>
 	<title>configuring HTML5 forms/Web Forms 2.0 widgets: webshims lib - the polyfilling capability based JS libary</title>
 	    
@@ -136,7 +159,8 @@ $.webshims.modules["input-widgets"].src = "../jquery-ui.slider-datepicker.min.js
 	                        <label for="datetime-local">
 	                            datetime-local: 
 							</label>
-	                       	<input value="2010-12-31T23:59" name="datetime-local" type="datetime-local" id="datetime-local" />
+	                       	<input value="2010-12-31T21:00" name="datetime-local" type="datetime-local" step="600" id="datetime-local" />
+							(step=600)
 	                    </div>
 												
 	                    <div class="form-element">
