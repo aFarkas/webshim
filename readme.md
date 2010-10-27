@@ -25,7 +25,7 @@ implemented Features:
 How To Use
 ------------------
 
-* Simply [download Webshims Lib](http://github.com/downloads/aFarkas/webshim/webshims-latest.zip/qr_code) and put the js-webshim-folder in your project
+* Simply [download Webshims Lib](http://aFarkas.github.com/webshim/demos/index.html) and put the js-webshim-folder in your project
 * Include the JavaScript:
 
 ---------------

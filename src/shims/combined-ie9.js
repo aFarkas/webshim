@@ -245,9 +245,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		var firstEvent,
 			invalids = [],
 			stopSubmitTimer,
-			form,
-			invalidTriggeredBySubmit,
-			doubled
+			form
 		;
 		
 		
@@ -261,8 +259,8 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 				prevented: false
 			};
 			window.addEventListener('submit', function(e){
-				if(!formnovalidate.prevented && e.target.checkValidity && $.attr(e.target, 'novalidate') == null && !$(e.target).checkValidity()){
-					invalidTriggeredBySubmit = true;
+				if(!formnovalidate.prevented && e.target.checkValidity && $.attr(e.target, 'novalidate') == null){
+					$(e.target).checkValidity();
 				}
 			}, true);
 			var preventValidityTest = function(e){
@@ -320,7 +318,6 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			if(support.validity !== true || invalids.indexOf(e.target) == -1){
 				invalids.push(e.target);
 			} else if(fixNative) {
-				doubled = true;
 				e.stopImmediatePropagation();
 			}
 			e.extraData = 'fix'; 
@@ -328,13 +325,11 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			stopSubmitTimer = setTimeout(function(){
 				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
 				//if events aren't doubled, we have a bad implementation, if the event isn't prevented and the first invalid elemenet isn't focused we show custom bubble
-				if( invalidTriggeredBySubmit && !doubled && firstEvent.target !== doc.activeElement && doc.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
+				if( fixNative && doc.activeElement && firstEvent && firstEvent.target !== doc.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
 					webshims.validityAlert.showFor(firstEvent.target);
 				}
 				//reset firstinvalid
-				doubled = false;
 				firstEvent = false;
-				invalidTriggeredBySubmit = false;
 				invalids = [];
 				//remove webkit/operafix
 				$(form).unbind('submit.preventInvalidSubmit');
@@ -1595,16 +1590,6 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 	};
 	
 	replaceInputUI.common = function(orig, shim, methods){
-		if($.support.validity === true){
-			orig.bind('firstinvalid', function(e){
-				setTimeout(function(){
-					if(!$.data(e.target, 'maybePreventedinvalid')){
-						webshims.validityAlert.showFor(e.target);
-					}
-				}, 30);
-			});
-		}
-		
 		var id = orig.attr('id'),
 			attr = {
 				css: {

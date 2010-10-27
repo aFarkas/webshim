@@ -70,7 +70,7 @@
 					equals(submitEvents, 0, 'no submit events');
 					equals(invalidEvents, 2, 'two invalid events');
 					equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
-					if($.support.validity !== true && document.activeElement){
+					if(document.activeElement){
 						equals(document.activeElement, $('input[type=text]')[0], "focus first invalid");
 					}
 				}, 100);
@@ -139,7 +139,8 @@
 					equals(firstInvalidEvents, 1, 'no firstinvalid event');
 					equals(invalidEvents, 1, 'no invalid events');
 					if(document.activeElement){
-						equals((document.activeElement === e.target), false, "focus first invalid");
+						var type = document.activeElement.type;
+						equals((type == 'text' || type == 'datetime-local'), true, "focus first invalid: "+type);
 					}
 				}, 100);
 				return false;
@@ -152,10 +153,11 @@
 				$('input.datetime').attr('value', '').checkValidity();
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
-					equals(firstInvalidEvents, 1, 'no firstinvalid event');
-					equals(invalidEvents, 1, 'no invalid events');
+					equals(firstInvalidEvents, 1, '1 firstinvalid event');
+					equals(invalidEvents, 1, '1 invalid events');
 					if(document.activeElement){
-						equals(document.activeElement, e.target, "no focus first invalid");
+						var type = document.activeElement.type;
+						equals((type !== 'text' && type !== 'datetime-local'), true, "no focus first invalid: "+type);
 					}
 				}, 100);
 				return false;
@@ -170,7 +172,8 @@
 					equals(firstInvalidEvents, 1, 'no firstinvalid event');
 					equals(invalidEvents, 1, 'no invalid events');
 					if(document.activeElement){
-						equals(document.activeElement, e.target, "no focus first invalid");
+						var type = document.activeElement;
+						equals((type !== 'text' && type !== 'datetime-local'), true, "no focus first invalid: "+type);
 					}
 				}, 100);
 			});
@@ -182,7 +185,8 @@
 					equals(firstInvalidEvents, 1, 'no firstinvalid event');
 					equals(invalidEvents, 1, 'no invalid events');
 					if(document.activeElement){
-						equals((document.activeElement === e.target), false, "focus first invalid");
+						var type = document.activeElement.type;
+						equals((type == 'text' || type == 'datetime-local'), true, "focus first invalid: "+type);
 					}
 				}, 100);
 			});

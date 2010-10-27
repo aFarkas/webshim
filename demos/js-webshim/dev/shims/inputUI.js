@@ -14,16 +14,6 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 	};
 	
 	replaceInputUI.common = function(orig, shim, methods){
-		if($.support.validity === true){
-			orig.bind('firstinvalid', function(e){
-				setTimeout(function(){
-					if(!$.data(e.target, 'maybePreventedinvalid')){
-						webshims.validityAlert.showFor(e.target);
-					}
-				}, 30);
-			});
-		}
-		
 		var id = orig.attr('id'),
 			attr = {
 				css: {
