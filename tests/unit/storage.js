@@ -42,11 +42,11 @@ asyncTest("json-storage", function(){
 	localStorage.setItem('test2', undefined);
 	equals(localStorage.getItem('test2'), 'undefined', 'localStorage test2 is "undefined"');
 	
-	sessionStorage.setItem('t!(){};es.t-3', 'sessionStorage');
-	equals(sessionStorage.getItem('t!(){};es.t-3'), 'sessionStorage', 'sessionStorage: t!(){};es.t-3 is "sessionStorage"');
+	sessionStorage.setItem('t!(){}es.t-3', 'sessionStorage');
+	equals(sessionStorage.getItem('t!(){}es.t-3'), 'sessionStorage', 'sessionStorage: t!(){}es.t-3 is "sessionStorage"');
 	
-	localStorage.setItem('t!(){};es.t-3', 'localStorage');
-	equals(localStorage.getItem('t!(){};es.t-3'), 'localStorage', 'localStorage t!(){};es.t-3 is "localStorage"');
+	localStorage.setItem('t!(){}es.t-3', 'localStorage');
+	equals(localStorage.getItem('t!(){}es.t-3'), 'localStorage', 'localStorage t!(){}es.t-3 is "localStorage"');
 	
 	$.webshims.ready('json-storage', function(){
 		start();

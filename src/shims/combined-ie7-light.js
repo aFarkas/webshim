@@ -2916,94 +2916,118 @@ if(window.localStorage && window.sessionStorage){
 //using window.name for sessionStorage and cookies for localStorage
 if (!window.localStorage || !window.sessionStorage){
 (function () {
-
-var Storage = function (type) {
-  function createCookie(name, value, days) {
-    var date, expires;
-
-    if (days) {
-      date = new Date();
-      date.setTime(date.getTime()+(days*24*60*60*1000));
-      expires = "; expires="+date.toGMTString();
-    } else {
-      expires = "";
-    }
-    document.cookie = name+"="+value+expires+"; path=/";
-  }
-
-  function readCookie(name) {
-    var nameEQ = name + "=",
-        ca = document.cookie.split(';'),
-        i, c;
-
-    for (i=0; i < ca.length; i++) {
-      c = ca[i];
-      while (c.charAt(0)==' ') {
-        c = c.substring(1,c.length);
-      }
-
-      if (c.indexOf(nameEQ) === 0) {
-        return c.substring(nameEQ.length,c.length);
-      }
-    }
-    return null;
-  }
-  
-  function setData(data) {
-    data = JSON.stringify(data);
-    if (type == 'session') {
-      window.top.name = data;
-    } else {
-      createCookie('localStorage', data, 365);
-    }
-  }
-  
-  function clearData() {
-    if (type == 'session') {
-      window.top.name = '';
-    } else {
-      createCookie('localStorage', '', 365);
-    }
-  }
-  
-  function getData() {
-    var data = type == 'session' ? window.top.name : readCookie('localStorage');
-    return data ? JSON.parse(data) : {};
-  }
-
-
-  // initialise if there's already data
-  var data = getData();
-
-  return {
-    clear: function () {
-      data = {};
-      clearData();
-    },
-    getItem: function (key) {
-      return (key in data) ? data[key] : null;
-    },
-    key: function (i) {
-      // not perfect, but works
-      var ctr = 0;
-      for (var k in data) {
-        if (ctr == i) {
-			return k;
+var storageNameError = function(name){
+	if(name && name.indexOf && name.indexOf(';') != -1){
+		setTimeout(function(){
+			throw("Bad key for localStorage: ; in localStorage. name was: "+ name);
+		}, 0);
+	}
+};
+var winData;
+$.each(['opener', 'top', 'parent'], function(i, name){
+	try {
+		winData = window[name];
+		if(winData && 'name' in winData){
+			var test = winData.name;
+			return false;
 		} else {
-			ctr++;
+			winData = false;
 		}
-      }
-      return null;
-    },
-    removeItem: function (key) {
-      delete data[key];
-      setData(data);
-    },
-    setItem: function (key, value) {
-      data[key] = value+''; // forces the value to a string
-      setData(data);
-    }
-  };
+	} catch(e){
+		winData = false;
+	}
+});
+if(!winData){
+	winData = window;
+}
+var Storage = function (type) {
+	function createCookie(name, value, days) {
+		var date, expires;
+		
+		if (days) {
+			date = new Date();
+			date.setTime(date.getTime()+(days*24*60*60*1000));
+			expires = "; expires="+date.toGMTString();
+		} else {
+			expires = "";
+		}
+		document.cookie = name+"="+value+expires+"; path=/";
+	}
+	
+	function readCookie(name) {
+		var nameEQ = name + "=",
+			ca = document.cookie.split(';'),
+			i, c;
+		
+		for (i=0; i < ca.length; i++) {
+			c = ca[i];
+			while (c.charAt(0)==' ') {
+				c = c.substring(1,c.length);
+			}
+			
+			if (c.indexOf(nameEQ) === 0) {
+				return c.substring(nameEQ.length,c.length);
+			}
+		}
+		return null;
+	}
+	
+	function setData(data) {
+		data = JSON.stringify(data);
+		if (type == 'session') {
+			winData.name = data;
+		} else {
+			createCookie('localStorage', data, 365);
+		}
+	}
+	
+	function clearData() {
+		if (type == 'session') {
+			winData.name = '';
+		} else {
+			createCookie('localStorage', '', 365);
+		}
+	}
+	
+	function getData() {
+		var data = type == 'session' ? winData.name : readCookie('localStorage');
+		return data ? JSON.parse(data) : {};
+	}
+	
+	
+	// initialise if there's already data
+	var data = getData();
+	
+		return {
+		clear: function () {
+			data = {};
+			clearData();
+		},
+		getItem: function (key) {
+			return (key in data) ? data[key] : null;
+		},
+		key: function (i) {
+			// not perfect, but works
+			var ctr = 0;
+			for (var k in data) {
+				if (ctr == i) {
+					return k;
+				} else {
+					ctr++;
+				}
+			}
+			return null;
+		},
+		removeItem: function (key) {
+			delete data[key];
+			setData(data);
+		},
+		setItem: function (key, value) {
+			storageNameError(key);
+			data[key] = value+''; // forces the value to a string
+			setData(data);
+		}
+	};
 };
 
 if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
@@ -3014,6 +3038,7 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 (function(){
 	var swfTimer;
 	var emptyString = '(empty string)+1287520303738';
+	
 	$.webshims.localStorageSwfCallback = function(type){
 		clearTimeout(swfTimer);
 		if(window.localStorage){
@@ -3035,6 +3060,7 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 					window.localStorage[fn] = shim[fn];
 				});
 				window.localStorage.setItem = function(name, val){
+					storageNameError(name);
 					val += '';
 					if(!val){
 						val = emptyString;
@@ -3067,7 +3093,7 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 				}
 			});
 			swfTimer = setTimeout($.webshims.localStorageSwfCallback, (location.protocol.indexOf('file') === 0) ? 500 : 9999);
-		} else if(!window.localStorage){
+		} else {
 			$.webshims.localStorageSwfCallback();
 		}
 	}, true);
