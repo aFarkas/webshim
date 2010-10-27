@@ -891,14 +891,15 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		
 		//opera/chrome fix (this will double all invalid events, we have to stop them!)
 		//opera throws a submit-event and then the invalid events,
-		//chrome7 has disabled invalid events, this brings them back
+		//chrome7/safari5.02 has disabled invalid events, this brings them back
+		//safari 5.02 reports false invalid events, if setCustomValidity was used
 		if(fixNative && window.addEventListener){
 			var formnovalidate = {
 				timer: undefined,
 				prevented: false
 			};
 			window.addEventListener('submit', function(e){
-				if(!formnovalidate.prevented && e.target.checkValidity && $.attr(e.target, 'novalidate') == null && !e.target.checkValidity()){
+				if(!formnovalidate.prevented && e.target.checkValidity && $.attr(e.target, 'novalidate') == null && !$(e.target).checkValidity()){
 					invalidTriggeredBySubmit = true;
 				}
 			}, true);
@@ -918,8 +919,9 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		}
 		$(doc).bind('invalid', function(e){
 			//safari 5.0.2 has some serious issues
-			if(fixNative && $.attr(e.target, 'validity').valid){
+			if(fixNative && e.originalEvent && $.attr(e.target, 'validity').valid){
 				e.stopImmediatePropagation();
+				return false;
 			}
 			if(!firstEvent){
 				//webkitfix 
@@ -963,7 +965,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			clearTimeout(stopSubmitTimer);
 			stopSubmitTimer = setTimeout(function(){
 				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
-				//if events aren't dubled, we have a bad implementation, if the event isn't prevented and the first invalid elemenet isn't focused we show custom bubble
+				//if events aren't doubled, we have a bad implementation, if the event isn't prevented and the first invalid elemenet isn't focused we show custom bubble
 				if( invalidTriggeredBySubmit && !doubled && firstEvent.target !== doc.activeElement && doc.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
 					webshims.validityAlert.showFor(firstEvent.target);
 				}
