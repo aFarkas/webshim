@@ -35,7 +35,7 @@
 		
 		createReadyEvent: (function(){
 			var makeReady = function(triggerName, name, noForce){
-				if(noForce && modules[name] && modules[name].noAutoCallback ){return;}
+				
 				if(modules[name] || webshims.features[name]){
 					triggerName = triggerName +'Ready';
 				}
@@ -57,6 +57,7 @@
 				}
 				
 				$.each(names, function(i, name){
+					if(noForce && modules[name] && modules[name].noAutoCallback ){return;}
 					makeReady(name+'SYS', name, noForce);
 					makeReady(name, name, noForce);
 				});
@@ -221,10 +222,13 @@
 			if(!_created){
 				events = $.map(events, function(e){
 					var evt = e;
-					if(_notQueued){
+					if(_notQueued && evt != 'ready'){
 						evt += 'SYS';
 					}
-					return (modules[e] || webshims.features[e]) ? evt +'Ready' : evt;
+					if(modules[e] || webshims.features[e]){
+						evt += 'Ready';
+					}
+					return evt;
 				});
 			}
 			
@@ -675,6 +679,7 @@
 		test: function(){
 			return support.canvas;
 		},
+		noAutoCallback: true,
 		methodNames: [
 			{
 				name: 'getContext',

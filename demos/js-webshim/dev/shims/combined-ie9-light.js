@@ -105,6 +105,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		};
 		return function(elem, event){
 			var attr = elem['on'+event] || elem.getAttribute('on'+event) || '';
+			var ret;
 			event = $.Event({
 				type: event,
 				target: elem[0],
@@ -112,20 +113,20 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			});
 			if(attr && typeof attr == 'string' && elem.form && elem.form.elements){
 				var scope = '';
-				$(elem.form.elements).each(function(){
-					var name = this.name;
-					var id = this.id;
-					if(!id && !name){return;}
+				for(var i = 0, elems = elem.form.elements, len = elems.length; i < len; i++ ){
+					var name = elems[i].name;
+					var id = elems[i].id;
 					if(name){
 						scope += stringify(name);
 					}
 					if(id && id !== name){
 						scope += stringify(id);
 					}
-				});
-				(function(){eval( scope + attr );}).call(elem, event);
+				}
+				ret = (function(){eval( scope + attr );}).call(elem, event);
 			}
 			$(elem).trigger(event);
+			return ret;
 		};
 	})();
 	

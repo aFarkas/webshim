@@ -215,6 +215,9 @@ asyncTest('output test', function(){
 	} else {
 		ok(/&outputtest=somecontent&/.test($('form').serialize()), 'finds output serialized in native, if fails jQuery bug');
 	}
+	$('#rangeId').attr('value', 30);
+	$.webshims.triggerInlineForm($('input.oninput-test')[0], 'input');
+	equals(window.globalInput, '30:30', 'globalInput value was set on trigger');
 	
 	
 	

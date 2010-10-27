@@ -159,7 +159,7 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 	};
 	
 	$.webshims.ready('ready swfobject', function(){
-		if(swfobject.hasFlashPlayerVersion('8.0.0')){
+		if(window.swfobject && swfobject.hasFlashPlayerVersion('8.0.0')){
 			
 			swfobject.createCSS('#swflocalstorageshim', 'position: absolute; top: -1px; left: -1px; overflow: hidden; height: 1px; width: 1px;');
 			$('body').after('<div id="swflocalstorageshim" />');

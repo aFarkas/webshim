@@ -95,6 +95,7 @@ span.input-datetime-local {
 	cursor: pointer;
 	font-size: 1em;
 	line-height: 0;
+	background-color: #fff;
 }
 .step-controls span.step-up {
 	top: 0;
@@ -118,9 +119,13 @@ span.input-datetime-local {
 	width: 155px;
 	border-radius: 0.1em;
 	-moz-border-radius: 0.1em;
+	background-color: #fff;
+	cursor: pointer;
+	font-size: 1em;
 }
 .input-range .ui-slider-handle {
 	position: absolute;
+	overflow: hidden;
 	margin: -0.2em 0 0 -0.35em;;
 	height: 0.7em;
 	width: 0.7em;

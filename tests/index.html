@@ -47,7 +47,7 @@
 			
 			module("init");
 			asyncTest("init", function(){
-				$.webshims.ready('forms ready', start);
+				$.webshims.ready('forms-ext json-storage ready', start);
 			});
 			
 		})();
@@ -101,6 +101,7 @@
 	            <input type="hidden" name="test2" />
 	            <input type="hidden" name="test3" />
 	            <input type="hidden" name="test4" />
+				<input type="hidden" />
 			</div>
 	        <fieldset class="check">
 	            <div>
@@ -184,7 +185,7 @@
 	                        <label class="m" for="placeholder-empty">
 	                            placeholder-empty:
 							</label>
-	                        <input name="placeholder-empty" type="text" id="placeholder-empty" />
+	                        <input class="oninput-test" oninput="window.globalInput = rangeId.value +':'+ rangeName.value;" name="placeholder-empty" type="text" id="placeholder-empty" />
 						</div>
 	               	</fieldset>
 				</div>
@@ -274,10 +275,10 @@
 	                </select>
 	            </div>
 				<div>
-	            	<label for="range">
+	            	<label for="rangeId">
 	                    Lorem ipsum  <dfn title="required">*</dfn>
 					</label>
-	                <input type="range" name="range" id="range" />
+	                <input type="range" name="rangeName" id="rangeId" />
 	            </div>
 	            
 	            <div class="button-wrapper">

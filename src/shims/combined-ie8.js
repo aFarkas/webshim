@@ -821,6 +821,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		};
 		return function(elem, event){
 			var attr = elem['on'+event] || elem.getAttribute('on'+event) || '';
+			var ret;
 			event = $.Event({
 				type: event,
 				target: elem[0],
@@ -828,20 +829,20 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			});
 			if(attr && typeof attr == 'string' && elem.form && elem.form.elements){
 				var scope = '';
-				$(elem.form.elements).each(function(){
-					var name = this.name;
-					var id = this.id;
-					if(!id && !name){return;}
+				for(var i = 0, elems = elem.form.elements, len = elems.length; i < len; i++ ){
+					var name = elems[i].name;
+					var id = elems[i].id;
 					if(name){
 						scope += stringify(name);
 					}
 					if(id && id !== name){
 						scope += stringify(id);
 					}
-				});
-				(function(){eval( scope + attr );}).call(elem, event);
+				}
+				ret = (function(){eval( scope + attr );}).call(elem, event);
 			}
 			$(elem).trigger(event);
+			return ret;
 		};
 	})();
 	
@@ -2921,7 +2922,13 @@ if (!document.createElement('canvas').getContext) {
         // Create a dummy element so that IE will allow canvas elements to be
         // recognized.
         doc.createElement('canvas');
-        $(bind(this.init_, this, doc));
+		
+		//webshims lib modification
+		var that = this;
+		setTimeout(function(){
+			$(bind(that.init_, that, doc));
+		}, 0);
+		
       }
     },
 
@@ -3001,6 +3008,7 @@ if (!document.createElement('canvas').getContext) {
 
   function onPropertyChange(e) {
     var el = e.srcElement;
+	//webshims lib modification
 	if(!el.getContext || !('clearRect' in el.getContext())){return;}
     switch (e.propertyName) {
       case 'width':
@@ -3754,23 +3762,34 @@ if (!document.createElement('canvas').getContext) {
   /*
    *webshims-Extensions 
    */
-	$.support.canvas = 'shim';
-	
-	$.webshims.addMethod('getContext', function(ctxName){
-		if(!this.getContext){
-			G_vmlCanvasManager.initElement(this);
+	(function(){
+		var doc = document;
+		if (!doc.styleSheets || !doc.namespaces){
+			return;
 		}
-		return this.getContext(ctxName);
-	});
-	
-	$.webshims.addReady(function(context){
-		if(document === context){return;}
-		$('canvas', context).each(function(){
+		$.support.canvas = 'shim';
+		
+		$.webshims.addMethod('getContext', function(ctxName){
 			if(!this.getContext){
 				G_vmlCanvasManager.initElement(this);
 			}
+			return this.getContext(ctxName);
 		});
-	});
+		
+		$.webshims.addReady(function(context){
+			if(doc === context){return;}
+			$('canvas', context).each(function(){
+				if(!this.getContext){
+					G_vmlCanvasManager.initElement(this);
+				}
+			});
+		});
+		$(function(){
+			setTimeout(function(){
+				$.webshims.createReadyEvent('canvas');
+			}, 9);
+		});
+	})();
 })(jQuery);
 
 } // if
