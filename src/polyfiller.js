@@ -620,6 +620,13 @@
 		test: function(){return !!($.widget && $.Widget);}
 	});
 	
+	loader.addModule('input-widgets', {
+		src: '',
+		test: function(){
+			return !($.widget && !($.datepicker || $.fn.slider));
+		}
+	});
+	
 	loader.addModule('swfobject', {
 		src: 'http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js',
 		test: function(){return ('swfobject' in window);}
@@ -775,10 +782,13 @@
 		noAutoCallback: true,
 		loadInit: function(){
 			loader.loadList(['jquery-ui']);
+			if(modules['input-widgets'].src){
+				loader.loadList(['input-widgets']);
+			}
 		},
 		options: {
 			slider: {},
-			date: {},
+			datepicker: {},
 			langSrc: 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/i18n/jquery.ui.datepicker-',
 			availabeLangs: 'af ar az bg bs cs da de el en-GB eo es et eu fa fi fo fr fr-CH he hr hu hy id is it ja ko it lt lv ms nl no pl pt-BR ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' '),
 			recalcWidth: true,

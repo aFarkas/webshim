@@ -1664,7 +1664,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims){
 		
 		webshims.triggerDomUpdate(date);
 		$('input.input-datetime-local-date', date)
-			.datepicker($.extend({}, options.date))
+			.datepicker($.extend({}, options.datepicker))
 			.bind('change', function(val, ui){
 				
 				var value, timeVal = $('input.input-datetime-local-time', date).attr('value');
@@ -1779,7 +1779,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims){
 			}
 		}
 		date
-			.datepicker($.extend({}, options.date))
+			.datepicker($.extend({}, options.datepicker))
 			.bind('change', change)
 			.data('datepicker')
 			.dpDiv.addClass('input-date-datepicker-control')

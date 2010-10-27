@@ -9,6 +9,7 @@ mark {
     font-weight: bold;
 }
 /* reset */
+.input-range .ui-slider-range,
 form span.placeholder-box,
 .placeholder-box,
 .placeholder-text,
@@ -123,8 +124,26 @@ span.input-datetime-local {
 	cursor: pointer;
 	font-size: 1em;
 }
+.input-range .ui-slider-range {
+	position: absolute;
+	z-index: 1;
+	overflow: hidden;
+	display: block;
+	background: #999;
+}
+.input-range.ui-slider-horizontal .ui-slider-range {
+	top: 0;
+	height: 100%;
+}
+.input-range.ui-slider-horizontal .ui-slider-range-min {
+	left: 0;
+}
+.input-range.ui-slider-horizontal .ui-slider-range-max {
+	right: 0;
+}
 .input-range .ui-slider-handle {
 	position: absolute;
+	z-index: 10;
 	overflow: hidden;
 	margin: -0.2em 0 0 -0.35em;;
 	height: 0.7em;
@@ -136,7 +155,13 @@ span.input-datetime-local {
 	font-size: 1em;
 	line-height: 0;
 }
+.input-datetime-local-date.hasDatepicker,
+.input-date.hasDatepicker {
+	position: relative;
+	z-index: 100;
+}
 .input-date-datepicker-control {
 	display: none;
 	background-color: #fff;
+	z-index: 100;
 }
