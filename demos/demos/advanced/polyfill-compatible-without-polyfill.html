@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta charset="utf-8"/>
+		<title>custom error bubbles with HTML5 forms and ES5 object.create without polyfiller</title>
+		<style>
+			body {
+				font: 100% arial,helvetica,sans-serif;
+			}
+			.validation-message-bubble {
+				position: absolute;
+				z-index: 9;
+				display: inline-block;
+				visibility: hidden;
+				margin: 0.25em 0 0;
+				padding: 5px;
+				opacity: 0;
+				box-shadow: 2px 2px 5px #E8673B;
+				background: rgba(255, 255, 255, 0.9);
+				color: #000;
+				-moz-transition: opacity 1s;
+				-webkit-transition: opacity 1s;
+				-o-transition: opacity 1s;
+				transition: opacity 1s;
+			}
+			.show-error-bubble {
+				opacity: 1;
+				visibility: visible;
+			}
+			.example {
+				margin: 10px;
+				padding: 1px 8px;
+				background: #fff6c6;
+				border-radius: 10px;
+				width: 320px;
+			}
+			.example > div:after {
+				content: " ";
+				display: block;
+				clear: both;
+			}
+			/* animate all */
+			.example > div,
+			.example input[type=text],
+			.example input[type=email] {
+				-moz-transition-property: all;
+				-moz-transition-duration: 1s;
+				-webkit-transition-property: all;
+				-webkit-transition-duration: 1s;
+				-o-transition-property: all;
+				-o-transition-duration: 1s;
+				-ms-transition-property: all;
+				-ms-transition-duration: 1s;
+				transition-property: all;
+				transition-duration: 1s;
+			}
+			.example > div {
+				margin: 15px 10px;
+				padding: 5px 10px;
+				border-radius: 10px;
+				background: #ffe268;
+				box-shadow: 3px 3px 3px #e0c75b;
+			}
+			.example > div.invalid {
+				background: #e8673b;
+				box-shadow: 3px 3px 3px #e8673b;
+			}
+			.example > div.valid {
+				background: #b0ea74;
+				box-shadow: 3px 3px 3px #a3d96c;
+			}
+			.example input {
+				box-shadow: none;
+			}
+			.example input[type=text],
+			.example input[type=email] {
+				float: right;
+				display: inline-bock;
+				padding: 0.3em;
+				height: 1.1em;
+				width: 180px;
+				border: 1px solid #d8bf58;
+				border-radius: 4px;
+				box-shadow: inset 1px 1px 1px #e0c75b;
+			}
+			.example > div.valid input {
+				border: 1px solid #9bce67;
+				box-shadow: inset 1px 1px 1px #87b45a;
+			}
+			.example > div.invalid input {
+				border: 1px solid #a81107;
+				box-shadow: inset 1px 1px 1px #890e06;
+			}
+			.example label {
+				margin: 0.1em 0 0;
+				cursor: pointer;
+				display: inline-block;
+				vertical-align: middle;
+			}
+			.example input[type=submit] {
+				width: 100%;
+				text-align: center;
+			}
+		</style>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+		<script src="../../js-webshim/minified/extras/webshims-compatibility.js"></script>
+		
+		<script>
+			(function(){
+				"use strict";
+				
+				
+				$.webshims.loader.basePath += 'shims/';
+				//load only lightweight features
+				//in fact we don't load anything, becuase we are using webshims-compatibility.js instead of polyfiller.js
+				$.webshims.polyfill('lightweight');
+				
+				$.webshims.ready('es5 forms', function(){
+					
+					//These thing's aren't nessecary, if you use pollyfiller.js, but they won't hurt, if you use it
+					$.webshims.objectCreate = $.webshims.objectCreate || Object.create;
+					$.webshims.capturingEvents(['invalid']); 
+					
+					//simple test
+					if(!$.webshims.objectCreate){return;}
+					
+					window.validationUI = $.webshims.objectCreate(
+						{
+							init: function(delay){
+								this.delay = delay || 5000;
+								this.bubble = $('<span />');
+								this.hideErrorBubble = this.hideErrorBubble.bind(this);
+								
+								$(document)
+									.bind('invalid', this.handleInvalid.bind(this))
+									.bind('focusout', this.testValidity.bind(this))
+								;
+								$(function(){
+									this.bubble
+										.attr('role', 'alert')
+										.addClass('validation-message-bubble')
+										.appendTo('body')
+									;
+								}.bind(this));
+							},
+							markValid: function(elem){
+								$(elem)
+									.parent()
+									.addClass('valid')
+									.removeClass('invalid')
+								;
+							},
+							markInvalid: function(elem){
+								$(elem).parent()
+									.addClass('invalid')
+									.removeClass('valid')
+								;
+							},
+							showErrorBubble: function(elem){
+								var offset = $(elem).offset();
+								this.hideErrorBubble();
+								this.bubble
+									.html('<span>'+ $(elem).attr('validationMessage') +'</span>')
+									.css({
+										top: offset.top + $(elem).outerHeight(),
+										left: offset.left
+									})
+									.addClass('show-error-bubble')
+								;
+								$(elem).focus();
+								this.hideTimer = setTimeout(this.hideErrorBubble, this.delay);
+								$(document).bind('focusout', this.hideErrorBubble);
+								
+							},
+							hideErrorBubble: function(){
+								this.bubble.removeClass('show-error-bubble');
+								$(document).unbind('focusout', this.hideErrorBubble);
+								clearTimeout(this.hideTimer);
+							}
+						}, 
+						{
+							hideTimer: {value: false, writable: true},
+							firstInvalid: {value: true, writable: true},
+							invalidLoopTimer: {value: false, writable: true},
+							testValidity: {
+								value: function(e){
+									if(!$(e.target).attr('willValidate') || e.target.type == 'submit'){return;}
+									var validity = $(e.target).attr('validity');
+									if( validity.valid ){
+										this.markValid(e.target);
+									} else {
+										this.markInvalid(e.target);
+									}
+								}
+							},
+							handleInvalid: {
+								value: function(e){
+									this.markInvalid(e.target);
+									if(this.firstInvalid){
+										this.showErrorBubble(e.target);
+									}
+									this.firstInvalid = false;
+									
+									clearTimeout(this.invalidLoopTimer);
+									this.invalidLoopTimer = setTimeout(function(){
+										this.firstInvalid = true;
+									}.bind(this), 9);
+									e.preventDefault();
+								}
+							}
+						}
+					);
+					
+					validationUI.init(4000);
+				});
+
+				
+			})();
+		</script>
+	</head>
+	<body>
+		<h2>Demo, wich uses webshims-compatibility.js instead of polyfiller.js</h2>
+		<p>The features used here only work in FF4beta7+. If you run the <a href="polyfill-compatible-with-polyfill.html">same code with polyfiller.js</a>, it will work cross-browser (including IE6).</p>
+		<form class="example">
+			<div>
+				<label for="your-name">Name: *</label>
+				<input type="text" required="required" id="your-name" name="yourName" />
+			</div>
+			<div>
+				<label for="email">email: *</label>
+				<input type="email" required="required" id="email" name="email" />
+			</div>
+			<div>
+				<input type="submit" />
+			</div>
+		</form>
+	</body>
+</html>

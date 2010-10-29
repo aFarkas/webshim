@@ -275,6 +275,7 @@
 					return $.event.handle.call( this, e );
 				};
 				$.event.special[name] = $.event.special[name] || {};
+				if($.event.special[name].setup || $.event.special[name].teardown){return;}
 				$.extend($.event.special[name], {
 					setup: function() {
 						this.addEventListener(name, handler, true);
@@ -642,7 +643,7 @@
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie7-light', 'combined-ie8-light']
 	});
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
-	support.es5 = !!(String.prototype.trim && Function.prototype.bind && !isNaN(Date.parse("T00:00")) && Date.now && Date.prototype.toISOString);
+	support.es5 = !!(Object.keys && String.prototype.trim && Function.prototype.bind && !isNaN(Date.parse("T00:00")) && Date.now && Date.prototype.toISOString);
 	if(support.es5){
 		$.each(['filter', 'map', 'every', 'reduce', 'reduceRight', 'lastIndexOf'], function(i, name){
 			if(!Array.prototype[name]){
@@ -651,14 +652,8 @@
 			}
 		});
 	}
-	if(support.es5){
-		$.each(['keys', 'isExtensible', 'isFrozen', 'isSealed', 'preventExtensions', 'defineProperties', 'create', 'getOwnPropertyNames'], function(i, name){
-			if(!Object[name]){
-				$.support.es5 = false;
-				return false;
-			}
-		});
-	}
+	
+	$.webshims.objectCreate = Object.create;
 	
 	addPolyfill('es5', {
 		test: function(){

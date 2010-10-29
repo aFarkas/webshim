@@ -32,6 +32,9 @@
 
 /*whatsupdoc*/
 
+// this is often accessed, so avoid multiple dereference costs universally
+var has = Object.prototype.hasOwnProperty;
+
 //
 // Array
 // =====
@@ -195,7 +198,7 @@ if (!Array.prototype.indexOf) {
         if (i < 0)
             i += length;
         for (; i < length; i++) {
-            if (!Object.prototype.hasOwnProperty.call(this, i))
+            if (!has.call(this, i))
                 continue;
             if (value === this[i])
                 return i;
@@ -215,7 +218,7 @@ if (!Array.prototype.lastIndexOf) {
             i += length;
         i = Math.min(i, length - 1);
         for (; i >= 0; i--) {
-            if (!Object.prototype.hasOwnProperty.call(this, i))
+            if (!has.call(this, i))
                 continue;
             if (value === this[i])
                 return i;
@@ -228,172 +231,68 @@ if (!Array.prototype.lastIndexOf) {
 // Object
 // ======
 // 
-
-// ES5 15.2.3.2
-if (!Object.getPrototypeOf) {
-    Object.getPrototypeOf = function (object) {
-        return object.__proto__;
-        // or undefined if not available in this engine
-    };
-}
-
-// ES5 15.2.3.3
-if (!Object.getOwnPropertyDescriptor) {
-    Object.getOwnPropertyDescriptor = function (object) {
-        return {}; // XXX
-    };
-}
-
-// ES5 15.2.3.4
-if (!Object.getOwnPropertyNames) {
-    Object.getOwnPropertyNames = function (object) {
-        return Object.keys(object);
-    };
-}
-
-// ES5 15.2.3.5 
-if (!Object.create) {
-    Object.create = function(prototype, properties) {
-        var object;
-        if (prototype === null) {
-            object = {"__proto__": null};
-        } else {
-            if (typeof prototype != "object")
-                throw new TypeError("typeof prototype["+(typeof prototype)+"] != 'object'");
-            var Type = function () {};
-            Type.prototype = prototype;
-            object = new Type();
-        }
-        if (typeof properties !== "undefined")
-            Object.defineProperties(object, properties);
-        return object;
-    };
-}
-
-// ES5 15.2.3.6
-if (!Object.defineProperty) {
-    Object.defineProperty = function(object, property, descriptor) {
-        var has = Object.prototype.hasOwnProperty;
-        if (typeof descriptor == "object" && object.__defineGetter__) {
-            if (has.call(descriptor, "value")) {
-                if (!object.__lookupGetter__(property) && !object.__lookupSetter__(property))
-                    // data property defined and no pre-existing accessors
-                    object[property] = descriptor.value;
-                if (has.call(descriptor, "get") || has.call(descriptor, "set"))
-                    // descriptor has a value property but accessor already exists
-                    throw new TypeError("Object doesn't support this action");
-            }
-            // fail silently if "writable", "enumerable", or "configurable"
-            // are requested but not supported
-            /*
-            // alternate approach:
-            if ( // can't implement these features; allow false but not true
-                !(has.call(descriptor, "writable") ? descriptor.writable : true) ||
-                !(has.call(descriptor, "enumerable") ? descriptor.enumerable : true) ||
-                !(has.call(descriptor, "configurable") ? descriptor.configurable : true)
-            )
-                throw new RangeError(
-                    "This implementation of Object.defineProperty does not " +
-                    "support configurable, enumerable, or writable."
-                );
-            */
-            else if (typeof descriptor.get == "function")
-                object.__defineGetter__(property, descriptor.get);
-            if (typeof descriptor.set == "function")
-                object.__defineSetter__(property, descriptor.set);
-        }
-        return object;
-    };
-}
-
-// ES5 15.2.3.7
-if (!Object.defineProperties) {
-    Object.defineProperties = function(object, properties) {
-        for (var property in properties) {
-            if (Object.prototype.hasOwnProperty.call(properties, property))
-                Object.defineProperty(object, property, properties[property]);
-        }
-        return object;
-    };
-}
-
-// ES5 15.2.3.8
-if (!Object.seal) {
-    Object.seal = function (object) {
-        // this is misleading and breaks feature-detection, but
-        // allows "securable" code to "gracefully" degrade to working
-        // but insecure code.
-        return object;
-    };
-}
-
-// ES5 15.2.3.9
-if (!Object.freeze) {
-    Object.freeze = function (object) {
-        // this is misleading and breaks feature-detection, but
-        // allows "securable" code to "gracefully" degrade to working
-        // but insecure code.
-        return object;
-    };
-}
-
-// detect a Rhino bug and patch it
-try {
-    Object.freeze(function () {});
-} catch (exception) {
-    Object.freeze = (function (freeze) {
-        return function (object) {
-            if (typeof object == "function") {
-                return object;
-            } else {
-                return freeze(object);
-            }
-        };
-    })(Object.freeze);
-}
-
-// ES5 15.2.3.10
-if (!Object.preventExtensions) {
-    Object.preventExtensions = function (object) {
-        // this is misleading and breaks feature-detection, but
-        // allows "securable" code to "gracefully" degrade to working
-        // but insecure code.
-        return object;
-    };
-}
-
-// ES5 15.2.3.11
-if (!Object.isSealed) {
-    Object.isSealed = function (object) {
-        return false;
-    };
-}
-
-// ES5 15.2.3.12
-if (!Object.isFrozen) {
-    Object.isFrozen = function (object) {
-        return false;
-    };
-}
-
-// ES5 15.2.3.13
-if (!Object.isExtensible) {
-    Object.isExtensible = function (object) {
-        return true;
-    };
+var $ = jQuery;
+if(!Object.create){
+	$.webshims.objectCreate = function(proto, props){
+		var f = function(){};
+		if(props){
+			for (var name in props) {
+				if (has.call(props, name) && ('value' in props[name]) && has.call(props[name], 'value')) {
+					proto[name] = props[name].value;
+				}
+			}
+		}
+		f.prototype = proto;
+		return new f();
+	};
 }
 
 // ES5 15.2.3.14
+// http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
 if (!Object.keys) {
+
+    var hasDontEnumBug = true,
+        dontEnums = [
+            'toString',
+            'toLocaleString',
+            'valueOf',
+            'hasOwnProperty',
+            'isPrototypeOf',
+            'propertyIsEnumerable',
+            'constructor'
+        ],
+        dontEnumsLength = dontEnums.length;
+
+    for (var key in {"toString": null})
+        hasDontEnumBug = false;
+
     Object.keys = function (object) {
+
+        if (
+            typeof object !== "object" && typeof object !== "function"
+            || object === null
+        )
+            throw new TypeError("Object.keys called on a non-object");
+
         var keys = [];
         for (var name in object) {
-            if (Object.prototype.hasOwnProperty.call(object, name)) {
+            if (has.call(object, name)) {
                 keys.push(name);
             }
         }
+
+        if (hasDontEnumBug) {
+            for (var i = 0, ii = dontEnumLength; i < ii; i++) {
+                var dontEnum = dontEnums[i];
+                if (has.call(o, dontEnum)) {
+                    keys.push(dontEnum);
+                }
+            }
+        }
+
         return keys;
     };
+
 }
 
 //
@@ -882,6 +781,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 	(function(){
 		var firstEvent,
 			invalids = [],
+			advancedForm = ( 'value' in doc.createElement('output') && 'list' in doc.createElement('input') ),
 			stopSubmitTimer,
 			form
 		;
@@ -917,7 +817,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		}
 		$(doc).bind('invalid', function(e){
 			//safari 5.0.2 has some serious issues
-			if(fixNative && e.originalEvent && $.attr(e.target, 'validity').valid){
+			if(fixNative && $.attr(e.target, 'validity').valid){
 				e.stopImmediatePropagation();
 				return false;
 			}
@@ -962,9 +862,14 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			clearTimeout(stopSubmitTimer);
 			stopSubmitTimer = setTimeout(function(){
 				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
-				//if events aren't doubled, we have a bad implementation, if the event isn't prevented and the first invalid elemenet isn't focused we show custom bubble
-				if( fixNative && doc.activeElement && firstEvent && firstEvent.target !== doc.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
-					webshims.validityAlert.showFor(firstEvent.target);
+				//bad assumption
+				if( fixNative && !advancedForm && doc.activeElement && firstEvent && firstEvent.target !== doc.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
+					//reuse of timer
+					stopSubmitTimer = setTimeout(function(){
+						if(firstEvent.target !== doc.activeElemen){
+							webshims.validityAlert.showFor(firstEvent.target);
+						}
+					}, 100);
 				}
 				//reset firstinvalid
 				firstEvent = false;
@@ -972,7 +877,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 				//remove webkit/operafix
 				$(form).unbind('submit.preventInvalidSubmit');
 				$(e.target).trigger(lastEvent, lastEvent);
-			}, 0);
+			}, 9);
 			
 		});
 	})();
@@ -2081,7 +1986,10 @@ jQuery.webshims.ready('validation-base', function($, webshims){
 				}
 				//make a valid step
 				if(cache.step !== 'any'){
-					cache.valueAsNumber = Math.round( ( cache.valueAsNumber - ((cache.valueAsNumber - (cache.minAsnumber || 0)) % cache.step)) * 1e7) / 1e7;
+					ret = Math.round( ((cache.valueAsNumber - (cache.minAsnumber || 0)) % cache.step) * 1e7 ) / 1e7;
+					if(ret &&  Math.abs(ret) != cache.step){
+						cache.valueAsNumber = cache.valueAsNumber - ret;
+					}
 				}
 				ret = cache.valueAsNumber + (delta * upDown);
 				//using NUMBER.MIN/MAX is really stupid | ToDo: either use disabled state or make this more usable
@@ -2090,7 +1998,7 @@ jQuery.webshims.ready('validation-base', function($, webshims){
 				} else if(!isNaN(cache.maxAsNumber) && ret > cache.maxAsNumber){
 					ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? Number.MIN_VALUE : cache.minAsNumber;
 				}
-				return ret;
+				return Math.round( ret * 1e7)  / 1e7;
 			};
 			
 			webshims.modules['number-date-type'].getNextStep = getNextStep;
@@ -2217,6 +2125,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 	$.support.inputUI = 'shim';
 		
 	var options = $.webshims.modules.inputUI.options;
+	var globalInvalidTimer;
 	var labelID = 0;
 	var replaceInputUI = function(context){
 		$('input', context).each(function(){
@@ -2228,6 +2137,45 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 	};
 	
 	replaceInputUI.common = function(orig, shim, methods){
+		if(options.replaceNative){
+			(function(){
+				var events = [];
+				var timer;
+				var throwError = function(e){
+					if(!$.data(e.target, 'maybePreventedinvalid') && (!events[0] || !events[0].isDefaultPrevented()) && (!events[1] || !events[1].isDefaultPrevented()) ){
+						var elem = e.target;
+						var name = elem.nodeName;
+						if(elem.id){
+							name += '#'+elem.id;
+						}
+						if(elem.name){
+							name += '[name='+ elem.name +']';
+						}
+						if(elem.className){
+							name += '.'+ (elem.className.split(' ').join('.'));
+						}
+						throw(name +' can not be focused. handle the invalid event.');
+					}
+				};
+				orig.bind('firstinvalid invalid', function(e){
+					clearTimeout(timer);
+					events.push(e);
+					timer = setTimeout(function(){
+						throwError(e);
+						events = [];
+					}, 30);
+				});
+			})();
+		} else if($.support.validity === true){
+			orig.bind('firstinvalid', function(e){
+				clearTimeout(globalInvalidTimer);
+				globalInvalidTimer = setTimeout(function(){
+					if(!$.data(e.target, 'maybePreventedinvalid') && !e.isDefaultPrevented()){
+						webshims.validityAlert.showFor( e.target ); 
+					}
+				}, 30);
+			});
+		}
 		var id = orig.attr('id'),
 			attr = {
 				css: {

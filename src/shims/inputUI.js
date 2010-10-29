@@ -3,6 +3,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 	$.support.inputUI = 'shim';
 		
 	var options = $.webshims.modules.inputUI.options;
+	var globalInvalidTimer;
 	var labelID = 0;
 	var replaceInputUI = function(context){
 		$('input', context).each(function(){
@@ -14,6 +15,45 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 	};
 	
 	replaceInputUI.common = function(orig, shim, methods){
+		if(options.replaceNative){
+			(function(){
+				var events = [];
+				var timer;
+				var throwError = function(e){
+					if(!$.data(e.target, 'maybePreventedinvalid') && (!events[0] || !events[0].isDefaultPrevented()) && (!events[1] || !events[1].isDefaultPrevented()) ){
+						var elem = e.target;
+						var name = elem.nodeName;
+						if(elem.id){
+							name += '#'+elem.id;
+						}
+						if(elem.name){
+							name += '[name='+ elem.name +']';
+						}
+						if(elem.className){
+							name += '.'+ (elem.className.split(' ').join('.'));
+						}
+						throw(name +' can not be focused. handle the invalid event.');
+					}
+				};
+				orig.bind('firstinvalid invalid', function(e){
+					clearTimeout(timer);
+					events.push(e);
+					timer = setTimeout(function(){
+						throwError(e);
+						events = [];
+					}, 30);
+				});
+			})();
+		} else if($.support.validity === true){
+			orig.bind('firstinvalid', function(e){
+				clearTimeout(globalInvalidTimer);
+				globalInvalidTimer = setTimeout(function(){
+					if(!$.data(e.target, 'maybePreventedinvalid') && !e.isDefaultPrevented()){
+						webshims.validityAlert.showFor( e.target ); 
+					}
+				}, 30);
+			});
+		}
 		var id = orig.attr('id'),
 			attr = {
 				css: {

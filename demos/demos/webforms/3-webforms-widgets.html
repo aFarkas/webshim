@@ -49,6 +49,12 @@
     </script>
 	<script>
 		$.webshims.ready('ready forms-ext', function(){
+			$('form').bind('firstinvalid', function(e){
+				//show the invalid alert for first invalid element
+				$.webshims.validityAlert.showFor( e.target );
+				//prevent browser from showing his native validation message
+				return false;
+			});
 			$('#range').each(function(){
 				var range = $(this);
 				var number = $('<span class="number"><input class="number" value="'+ range.attr('value') +'" min="0" max="100" type="number" /></span>');

@@ -37,6 +37,33 @@ asyncTest("stepup", function(){
 				step: -1,
 				value: 0
 				
+			},
+			{
+				id: 'number',
+				attrs: {
+					'value': '1',
+					step: '0.2'
+				},
+				step: 1,
+				value: 1.2
+			},
+			{
+				id: 'number',
+				attrs: {
+					'value': '0.8',
+					step: '0.2'
+				},
+				step: -1,
+				value: 0.6
+			},
+			{
+				id: 'number',
+				attrs: {
+					'value': '0.6',
+					step: '0.2'
+				},
+				step: -1,
+				value: 0.4
 			}
 		], function(i, testItem){
 			stepTest(testItem);

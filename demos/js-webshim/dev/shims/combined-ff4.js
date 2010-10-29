@@ -170,6 +170,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 	(function(){
 		var firstEvent,
 			invalids = [],
+			advancedForm = ( 'value' in doc.createElement('output') && 'list' in doc.createElement('input') ),
 			stopSubmitTimer,
 			form
 		;
@@ -205,7 +206,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		}
 		$(doc).bind('invalid', function(e){
 			//safari 5.0.2 has some serious issues
-			if(fixNative && e.originalEvent && $.attr(e.target, 'validity').valid){
+			if(fixNative && $.attr(e.target, 'validity').valid){
 				e.stopImmediatePropagation();
 				return false;
 			}
@@ -250,9 +251,14 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			clearTimeout(stopSubmitTimer);
 			stopSubmitTimer = setTimeout(function(){
 				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
-				//if events aren't doubled, we have a bad implementation, if the event isn't prevented and the first invalid elemenet isn't focused we show custom bubble
-				if( fixNative && doc.activeElement && firstEvent && firstEvent.target !== doc.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
-					webshims.validityAlert.showFor(firstEvent.target);
+				//bad assumption
+				if( fixNative && !advancedForm && doc.activeElement && firstEvent && firstEvent.target !== doc.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
+					//reuse of timer
+					stopSubmitTimer = setTimeout(function(){
+						if(firstEvent.target !== doc.activeElemen){
+							webshims.validityAlert.showFor(firstEvent.target);
+						}
+					}, 100);
 				}
 				//reset firstinvalid
 				firstEvent = false;
@@ -260,7 +266,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 				//remove webkit/operafix
 				$(form).unbind('submit.preventInvalidSubmit');
 				$(e.target).trigger(lastEvent, lastEvent);
-			}, 0);
+			}, 9);
 			
 		});
 	})();
@@ -956,7 +962,10 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 				}
 				//make a valid step
 				if(cache.step !== 'any'){
-					cache.valueAsNumber = Math.round( ( cache.valueAsNumber - ((cache.valueAsNumber - (cache.minAsnumber || 0)) % cache.step)) * 1e7) / 1e7;
+					ret = Math.round( ((cache.valueAsNumber - (cache.minAsnumber || 0)) % cache.step) * 1e7 ) / 1e7;
+					if(ret &&  Math.abs(ret) != cache.step){
+						cache.valueAsNumber = cache.valueAsNumber - ret;
+					}
 				}
 				ret = cache.valueAsNumber + (delta * upDown);
 				//using NUMBER.MIN/MAX is really stupid | ToDo: either use disabled state or make this more usable
@@ -965,7 +974,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 				} else if(!isNaN(cache.maxAsNumber) && ret > cache.maxAsNumber){
 					ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? Number.MIN_VALUE : cache.minAsNumber;
 				}
-				return ret;
+				return Math.round( ret * 1e7)  / 1e7;
 			};
 			
 			webshims.modules['number-date-type'].getNextStep = getNextStep;
@@ -1092,6 +1101,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 	$.support.inputUI = 'shim';
 		
 	var options = $.webshims.modules.inputUI.options;
+	var globalInvalidTimer;
 	var labelID = 0;
 	var replaceInputUI = function(context){
 		$('input', context).each(function(){
@@ -1103,6 +1113,45 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 	};
 	
 	replaceInputUI.common = function(orig, shim, methods){
+		if(options.replaceNative){
+			(function(){
+				var events = [];
+				var timer;
+				var throwError = function(e){
+					if(!$.data(e.target, 'maybePreventedinvalid') && (!events[0] || !events[0].isDefaultPrevented()) && (!events[1] || !events[1].isDefaultPrevented()) ){
+						var elem = e.target;
+						var name = elem.nodeName;
+						if(elem.id){
+							name += '#'+elem.id;
+						}
+						if(elem.name){
+							name += '[name='+ elem.name +']';
+						}
+						if(elem.className){
+							name += '.'+ (elem.className.split(' ').join('.'));
+						}
+						throw(name +' can not be focused. handle the invalid event.');
+					}
+				};
+				orig.bind('firstinvalid invalid', function(e){
+					clearTimeout(timer);
+					events.push(e);
+					timer = setTimeout(function(){
+						throwError(e);
+						events = [];
+					}, 30);
+				});
+			})();
+		} else if($.support.validity === true){
+			orig.bind('firstinvalid', function(e){
+				clearTimeout(globalInvalidTimer);
+				globalInvalidTimer = setTimeout(function(){
+					if(!$.data(e.target, 'maybePreventedinvalid') && !e.isDefaultPrevented()){
+						webshims.validityAlert.showFor( e.target ); 
+					}
+				}, 30);
+			});
+		}
 		var id = orig.attr('id'),
 			attr = {
 				css: {

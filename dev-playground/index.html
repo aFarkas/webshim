@@ -24,21 +24,14 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script src="../src/polyfiller.js"></script>
 	<script>
-//		$.webshims.debug = true;
+		$.webshims.debug = true;
 		$.webshims.loader.basePath += 'shims/';
 		$.webshims.polyfill();
 	</script>
 	<title>playing</title>
 	    <script>
 	    	$.webshims.ready('ready forms', function(){
-//				console.log($('output').attr('value'));
-				$('output:first').attr('value', 'hello');
-				$('#select').attr({
-					'selectedIndex': 0,
-					multiple: true,
-					size: 1
-				});
-				alert($('select').attr('type'))
+//				
 			});
 			
 	    </script>
@@ -51,18 +44,7 @@
 <body class="js-off">   
      
 <form id="test" action="#">
-	<div class="form-element">
-       <input id="validity-test" required="dfssa"  />
-    </div>
-	<div>
-	<select name="kj" required>
-		<option value="" selected>sdsd1</option>
-		<option>sdsd2</option>
-		<option>sdsd3</option>
-	</select>            
-   	<output>jo</output>
-	<label for="labeled-output">output-label</label>
-	<output id="labeled-output" name="outputtest"></output>
+	<input step="0.2" type="number" />
 </div>
 </form>
 	<button>test</button>

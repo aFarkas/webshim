@@ -2,14 +2,18 @@
 	if($.webshims){return;}
 	
 	$.webshims = {
+		loader:{},
 		ready: function(events, fn){
 			if(typeof events == 'string'){
 				events = events.split(' ');
 			}
+			var fn2 = function(){
+				setTimeout(fn, 0, $, $.webshims, window, document);
+			};
 			if($.inArray('ready', events) != -1){
-				$(fn);
+				$(fn2);
 			} else {
-				fn();
+				fn2();
 			}
 		},
 		capturingEvents: function(names){

@@ -170,6 +170,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 	(function(){
 		var firstEvent,
 			invalids = [],
+			advancedForm = ( 'value' in doc.createElement('output') && 'list' in doc.createElement('input') ),
 			stopSubmitTimer,
 			form
 		;
@@ -205,7 +206,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		}
 		$(doc).bind('invalid', function(e){
 			//safari 5.0.2 has some serious issues
-			if(fixNative && e.originalEvent && $.attr(e.target, 'validity').valid){
+			if(fixNative && $.attr(e.target, 'validity').valid){
 				e.stopImmediatePropagation();
 				return false;
 			}
@@ -250,9 +251,14 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			clearTimeout(stopSubmitTimer);
 			stopSubmitTimer = setTimeout(function(){
 				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
-				//if events aren't doubled, we have a bad implementation, if the event isn't prevented and the first invalid elemenet isn't focused we show custom bubble
-				if( fixNative && doc.activeElement && firstEvent && firstEvent.target !== doc.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
-					webshims.validityAlert.showFor(firstEvent.target);
+				//bad assumption
+				if( fixNative && !advancedForm && doc.activeElement && firstEvent && firstEvent.target !== doc.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
+					//reuse of timer
+					stopSubmitTimer = setTimeout(function(){
+						if(firstEvent.target !== doc.activeElemen){
+							webshims.validityAlert.showFor(firstEvent.target);
+						}
+					}, 100);
 				}
 				//reset firstinvalid
 				firstEvent = false;
@@ -260,7 +266,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 				//remove webkit/operafix
 				$(form).unbind('submit.preventInvalidSubmit');
 				$(e.target).trigger(lastEvent, lastEvent);
-			}, 0);
+			}, 9);
 			
 		});
 	})();

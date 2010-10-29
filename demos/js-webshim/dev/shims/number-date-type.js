@@ -392,7 +392,10 @@
 				}
 				//make a valid step
 				if(cache.step !== 'any'){
-					cache.valueAsNumber = Math.round( ( cache.valueAsNumber - ((cache.valueAsNumber - (cache.minAsnumber || 0)) % cache.step)) * 1e7) / 1e7;
+					ret = Math.round( ((cache.valueAsNumber - (cache.minAsnumber || 0)) % cache.step) * 1e7 ) / 1e7;
+					if(ret &&  Math.abs(ret) != cache.step){
+						cache.valueAsNumber = cache.valueAsNumber - ret;
+					}
 				}
 				ret = cache.valueAsNumber + (delta * upDown);
 				//using NUMBER.MIN/MAX is really stupid | ToDo: either use disabled state or make this more usable
@@ -401,7 +404,7 @@
 				} else if(!isNaN(cache.maxAsNumber) && ret > cache.maxAsNumber){
 					ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? Number.MIN_VALUE : cache.minAsNumber;
 				}
-				return ret;
+				return Math.round( ret * 1e7)  / 1e7;
 			};
 			
 			webshims.modules['number-date-type'].getNextStep = getNextStep;

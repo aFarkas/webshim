@@ -109,6 +109,9 @@
 	            <fileset dir="${dist}/minified/shims">
 	                <include name="*.js"/>
 	            </fileset>
+	            <fileset dir="${dist}/minified/extras">
+	                <include name="*.js"/>
+	            </fileset>
             </path>
             <sequential>
                 <java failonerror="true" jar="build/compiler.jar" fork="true">
