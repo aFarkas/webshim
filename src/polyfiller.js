@@ -12,13 +12,14 @@
 	
 	$.webshims = {
 		
-		version: '1.0.0',
+		version: '1.0.1',
 		
 		fixHTML5: (function(){
 			var d, b;
 			return (support.dynamicHTML5) ? 
 				function(h){return h;} :
 				function(h) {
+					if(typeof h != 'string'){return h;}
 					if (!d) {
 						b = doc.body;
 						d = doc.createElement('div');

@@ -253,12 +253,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
 				//bad assumption
 				if( fixNative && !advancedForm && doc.activeElement && firstEvent && firstEvent.target !== doc.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
-					//reuse of timer
-					stopSubmitTimer = setTimeout(function(){
-						if(firstEvent.target !== doc.activeElemen){
-							webshims.validityAlert.showFor(firstEvent.target);
-						}
-					}, 100);
+					webshims.validityAlert.showFor(firstEvent.target);
 				}
 				//reset firstinvalid
 				firstEvent = false;
