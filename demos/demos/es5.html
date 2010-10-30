@@ -53,8 +53,7 @@
 				<li><strong>String.prototype</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String/Trim">trim</a></li>
 			</ul>
 			
-			<h3>Abstractions</h3>
-			<p>Webshims Lib adds $.webshims.objectCreate. Documentation: TBD.</p>
+			
 			<p>Note: All methods added to the prototype object are visible inside of a for in loop, while native implementations aren't enumerable. (use hasOwnProperty)</p>
 <code class="block">
 $.webshims.ready('es5', function(){
@@ -63,8 +62,10 @@ $.webshims.ready('es5', function(){
 	});
 });
 </code>
+			<h3>Abstractions</h3>
+			<p>Webshims Lib adds the following methods: $.webshims.objectCreate, $.webshims.defineProperty, $.webshims.defineProperties and corresponding support flags: $.support.objectAccessor (true in all modern Browsers including IE9) and $.support.domAccessor (true in all modern Browsers including IE8).</p>
 			<aside>
-				<h3>Links about JSON and localStorage/sessionStorage</h3>
+				<h3>Links about ES5</h3>
 				<ul>
 					<li><a href="http://github.com/kriskowal/es5-shim/">ES5 shim</a></li>
 				</ul>

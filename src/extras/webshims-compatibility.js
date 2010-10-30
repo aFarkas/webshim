@@ -7,13 +7,11 @@
 			if(typeof events == 'string'){
 				events = events.split(' ');
 			}
-			var fn2 = function(){
-				setTimeout(fn, 0, $, $.webshims, window, document);
-			};
+			
 			if($.inArray('ready', events) != -1){
-				$(fn2);
+				fn($, $.webshims, window, document);
 			} else {
-				fn2();
+				fn($, $.webshims, window, document);
 			}
 		},
 		capturingEvents: function(names){

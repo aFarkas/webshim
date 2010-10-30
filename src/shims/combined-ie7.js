@@ -235,19 +235,48 @@ if (!Array.prototype.lastIndexOf) {
 // Object
 // ======
 // 
-var $ = jQuery;
-if(!Object.create){
-	$.webshims.objectCreate = function(proto, props){
+
+if(!Object.create && jQuery.webshims){
+	var shims = jQuery.webshims;
+	shims.objectCreate = function(proto, props){
 		var f = function(){};
+		f.prototype = proto;
+		var o = new f();
 		if(props){
-			for (var name in props) {
-				if (has.call(props, name) && ('value' in props[name]) && has.call(props[name], 'value')) {
-					proto[name] = props[name].value;
-				}
+			shims.defineProperties(o, props);
+		}
+		return o;
+	};
+	
+	shims.defineProperties = function(object, props){
+		for (var name in props) {
+			if (has.call(props, name)) {
+				shims.defineProperty(object, name, props[name]);
 			}
 		}
-		f.prototype = proto;
-		return new f();
+		return object;
+	};
+	
+	shims.defineProperty = function(proto, property, descriptor){
+		if(typeof descriptor != "object"){return proto;}
+		if(has.call(descriptor, "value")){
+			proto[property] = descriptor.value;
+			return proto;
+		}
+		if(Object.defineProperty){
+			try{
+				Object.defineProperty(proto, property, descriptor);
+			} catch(e){}
+		}
+		if(proto.__defineGetter__){
+            if (typeof descriptor.get == "function") {
+				proto.__defineGetter__(property, descriptor.get);
+			}
+            if (typeof descriptor.set == "function"){
+                proto.__defineSetter__(property, descriptor.set);
+			}
+        }
+		return proto;
 	};
 }
 

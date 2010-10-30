@@ -2,6 +2,7 @@
 	"use strict";
 	var doc = document;
 	var support = $.support;
+	var special = $.event.special;
 	var undefined;
 	//simple shiv
 	//http://code.google.com/p/html5shim/
@@ -12,7 +13,7 @@
 	
 	$.webshims = {
 		
-		version: '1.0.1',
+		version: 'pre1.0.2',
 		
 		fixHTML5: (function(){
 			var d, b;
@@ -41,9 +42,9 @@
 					triggerName = triggerName +'Ready';
 				}
 				
-				if($.event.special[triggerName] && $.event.special[triggerName].add){return;}
+				if(special[triggerName] && special[triggerName].add){return;}
 				
-				$.event.special[triggerName] = $.extend($.event.special[triggerName] || {}, {
+				special[triggerName] = $.extend(special[triggerName] || {}, {
 					add: function( details ) {
 						details.handler.call(this, $.Event(triggerName));
 					}
@@ -179,8 +180,8 @@
 					parent = parent || doc.getElementsByTagName('head')[0] || doc.body;
 					if(!parent || !parent.appendChild){
 						setTimeout(function(){
-							loader.loadScript(src, callback);
-						}, 10);
+							loader.loadScript(src, callback, name);
+						}, 9);
 						return;
 					}
 					
@@ -275,9 +276,9 @@
 					}
 					return $.event.handle.call( this, e );
 				};
-				$.event.special[name] = $.event.special[name] || {};
-				if($.event.special[name].setup || $.event.special[name].teardown){return;}
-				$.extend($.event.special[name], {
+				special[name] = special[name] || {};
+				if(special[name].setup || special[name].teardown){return;}
+				$.extend(special[name], {
 					setup: function() {
 						this.addEventListener(name, handler, true);
 					}, 
@@ -654,7 +655,12 @@
 		});
 	}
 	
-	$.webshims.objectCreate = Object.create;
+	support.objectAccessor = !!( (Object.create && Object.defineProperties) || Object.prototype.__defineGetter__);
+	support.domAccessor = !!( Object.prototype.__defineGetter__ || ( Object.defineProperty && Object.defineProperty(document.createElement('b'),'x',{get: function(){return true;}}).x));
+	
+	webshims.objectCreate = Object.create;
+	webshims.defineProperty = Object.defineProperties;
+	webshims.defineProperties = Object.defineProperties;
 	
 	addPolyfill('es5', {
 		test: function(){
@@ -824,6 +830,6 @@
 	
 	/* END: json + loacalStorage */
 	//predefined list without input type number/date/time etc.
-	webshims.light = ['html5shiv', 'es5', 'canvas', 'forms', 'json-storage'];
+	webshims.light = ['html5shiv', 'es5', 'canvas', 'geolocation', 'forms', 'json-storage'];
 	
 })(jQuery);
