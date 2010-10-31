@@ -2110,7 +2110,11 @@ jQuery.webshims.ready('validation-base', function($, webshims){
 				$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
 				$(input).unbind('blur.stepeventshim');
 				webshims.triggerInlineForm(input, 'input');
+				
 				//IE workaround: ToDo improve usability of workaround
+				if(evtType == 'mousedown' && $.browser.msie){
+					try {input.focus();} catch(e){}			
+				}
 				if( doc.activeElement ){
 					if(doc.activeElement !== input){
 						try {input.focus();} catch(e){}
@@ -2167,7 +2171,7 @@ jQuery.webshims.ready('validation-base', function($, webshims){
 									otherSide: 'left'
 								}
 						;
-						var controls = $('<span class="step-controls"><span class="step-up" /><span class="step-down" tabindex="-1" /></span>')	
+						var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
 							[dir.action](this)
 							.bind('selectstart dragstart', function(){
 								return false;
