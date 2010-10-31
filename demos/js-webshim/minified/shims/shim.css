@@ -20,6 +20,7 @@ form label.placeholder-text {
 	margin: 0;
 	padding: 0;
 	border: none;
+	width: auto;
 	background: transparent none;
 }
 
@@ -83,8 +84,11 @@ span.input-datetime-local {
 	overflow: hidden;
 	display: inline-block;
 	vertical-align: middle;
+	vertical-align: text-bottom;
 	height: 1.1em;
 	width: 0.6em;
+	min-width: 8px;
+	min-height: 16px;
 }
 .step-controls span {
 	position: absolute;
@@ -92,11 +96,16 @@ span.input-datetime-local {
 	overflow: hidden;
 	width: 0.4em;
 	height: 0.4em;
-	border: 0.08em solid #666;
+	min-width: 6px;
+	min-height: 6px;
+	border: 0.05em solid #999;
 	cursor: pointer;
 	font-size: 1em;
 	line-height: 0;
 	background-color: #fff;
+}
+.step-controls span:hover {
+	border-color: #000;
 }
 .step-controls span.step-up {
 	top: 0;
