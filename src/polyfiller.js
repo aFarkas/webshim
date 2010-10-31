@@ -9,7 +9,7 @@
 	'polyfillspan abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section source summary time track video'.replace(/\w+/g,function(n){doc.createElement(n);});
 	support.dynamicHTML5 =  !!($('<video><div></div></video>')[0].innerHTML);
 	
-
+	$('html').addClass('js-on').removeClass('js-off');
 	
 	$.webshims = {
 		
@@ -449,11 +449,18 @@
 			}
 		},
 		
-		polyfill: function(features){
+		polyfill: function(features, fn){
 			var shims 	= this,
 				loader 	= shims.loader,
-				toLoadFeatures = []
+				toLoadFeatures = [],
+				removeLoader = function(){
+					$('html').removeClass('loading-polyfills');
+					$(window).unbind('load.loadingPolyfills error.loadingPolyfills');
+				}
 			;
+			
+			fn = fn || $.noop;
+			
 			features = features || shims.featureList;
 			if(features == 'lightweight'){
 				features = webshims.light;
@@ -461,6 +468,15 @@
 			if (typeof features == 'string') {
 				features = features.split(' ');
 			}
+			if(!$.isReady){
+				$('html').addClass('loading-polyfills');
+				$(window).bind('load.loadingPolyfills error.loadingPolyfills', removeLoader);
+			}
+			
+			webshims.ready(features, function(){
+				removeLoader();
+				fn($, webshims, window, document);
+			});
 			
 			$.each(features, function(i, feature){
 				if(feature !== shims.features[feature][0]){
