@@ -645,7 +645,7 @@
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie7-light', 'combined-ie8-light']
 	});
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
-	support.es5 = !!(Object.keys && String.prototype.trim && Function.prototype.bind && !isNaN(Date.parse("T00:00")) && Date.now && Date.prototype.toISOString);
+	support.es5 = !!(Object.defineProperties && Object.keys && String.prototype.trim && Function.prototype.bind && !isNaN(Date.parse("T00:00")) && Date.now && Date.prototype.toISOString);
 	if(support.es5){
 		$.each(['filter', 'map', 'every', 'reduce', 'reduceRight', 'lastIndexOf'], function(i, name){
 			if(!Array.prototype[name]){

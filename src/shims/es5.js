@@ -232,7 +232,7 @@ if (!Array.prototype.lastIndexOf) {
 // ======
 // 
 
-if(!Object.create && jQuery.webshims){
+if((!Object.create || !Object.defineProperties) && window.jQuery && jQuery.webshims){
 	var shims = jQuery.webshims;
 	shims.objectCreate = function(proto, props){
 		var f = function(){};
