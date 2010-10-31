@@ -9,7 +9,9 @@
 			}
 			
 			if($.inArray('ready', events) != -1){
-				fn($, $.webshims, window, document);
+				$(function(){
+					fn($, $.webshims, window, document);
+				});
 			} else {
 				fn($, $.webshims, window, document);
 			}
