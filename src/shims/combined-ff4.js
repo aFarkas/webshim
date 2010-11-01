@@ -980,10 +980,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 				$(input).unbind('blur.stepeventshim');
 				webshims.triggerInlineForm(input, 'input');
 				
-				//IE workaround: ToDo improve usability of workaround
-				if(evtType == 'mousedown' && $.browser.msie){
-					try {input.focus();} catch(e){}			
-				}
+				
 				if( doc.activeElement ){
 					if(doc.activeElement !== input){
 						try {input.focus();} catch(e){}
@@ -1019,7 +1016,10 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 				webshims.attr('readonly', disabledReadonly);
 				
 			}
-			
+			var stepKeys = {
+				38: 1,
+				40: -1
+			};
 			webshims.addReady(function(context){
 				
 				//ui for numeric values
@@ -1037,7 +1037,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 								{
 									action: 'insertAfter',
 									side: 'Right',
-									otherSide: 'left'
+									otherSide: 'Left'
 								}
 						;
 						var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
@@ -1058,13 +1058,27 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 								readonly: this.readOnly,
 								disabled: this.disabled
 							})
+							.bind('keypress', function(e){
+								console.log(e.keyCode)
+								if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
+								$.attr(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
+								webshims.triggerInlineForm(this, 'input');
+								return false;
+							})
 						;
 						
 						if(options.calculateWidth){
 							var width = $(this).getwidth();
 							if(!width){return;}
-							var margin = (parseInt($(this).css('margin'+dir.side), 10) || 0) + (parseInt(controls.css('margin'+dir.side), 10) || 0);
-							$(this).css('width', width - controls.getouterWidth(true));
+							var marginControlOS = (parseInt(controls.css('margin'+dir.otherSide), 10) || 0);
+							var marginControl = (parseInt(controls.css('margin'+dir.side), 10) || 0);
+							var margin = (parseInt($(this).css('margin'+dir.side), 10) || 0) + marginControl;
+							var widthCorrect = 0;
+							if( marginControlOS < -1 ){
+								widthCorrect = marginControlOS * -1;
+								$(this).css('padding'+dir.side, (parseInt($(this).css('padding'+dir.side), 10) || 0) + widthCorrect);
+							}
+							$(this).css('width', width - controls.getouterWidth(true) - widthCorrect);
 							if(margin){
 								$(this).css('margin'+dir.side, 0);
 								controls.css('margin'+dir.side, margin);

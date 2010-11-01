@@ -18,7 +18,18 @@
 		button.feature {
 			float: right;
 		}
-		
+		input[type=number] {
+			height: 1.8em;
+		}
+		.step-controls {
+			margin-left: -40px;
+		}
+		.outside .step-controls {
+			margin-left: 2px;
+		}
+		.margin input {
+			margin-right: 10px;
+		}
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
@@ -44,7 +55,18 @@
 <body class="js-off">   
      
 <form id="test" action="#">
-	<input step="0.2" type="number" />
+	<div class="inside">
+		<input name="q" step="0.2" type="number" />test
+	</div>
+	<div class="outside">
+		<input step="0.2" type="number" />test
+	</div>
+	<div class="inside margin">
+		<input step="0.2" type="number" />test
+	</div>
+	<div class="outside margin">
+		<input disabled="disabled" step="0.2" type="number" />test
+	</div>
 </div>
 </form>
 	<button>test</button>

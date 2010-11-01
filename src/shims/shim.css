@@ -85,39 +85,48 @@ span.input-datetime-local {
 	display: inline-block;
 	vertical-align: middle;
 	vertical-align: text-bottom;
-	height: 1.1em;
-	width: 0.6em;
-	min-width: 8px;
-	min-height: 16px;
+	margin-left: -17px;
+	height: 19px;
+	width: 15px;
 }
 .step-controls span {
 	position: absolute;
 	display: inline-block;
 	overflow: hidden;
-	width: 0.4em;
-	height: 0.4em;
-	min-width: 6px;
-	min-height: 6px;
-	border: 0.05em solid #999;
+	width: 15px;
+	height: 9px;
 	cursor: pointer;
-	font-size: 1em;
+	font-size: 0;
 	line-height: 0;
-	background-color: #fff;
+	background: url(arrows.png) no-repeat 0 0;
 }
 .step-controls span:hover {
 	border-color: #000;
 }
 .step-controls span.step-up {
 	top: 0;
+	background-position: 0 0;
+}
+.step-controls span.step-up:hover {
+	background-position: 0 -30px;
 }
 .step-controls span.step-down {
 	bottom: 0;
+	background-position: 0 -90px;
+}
+.step-controls span.step-down:hover {
+	background-position: 0 -120px;
 }
 /* disabled or readonly */
 .step-controls.disabled-step-control span {
-	border-color: #aaa;
-	opacity: 0.8;
+	opacity: 0.95;
 	cursor: default;
+}
+.step-controls.disabled-step-control span.step-up {
+	background-position: 0 -60px;
+}
+.step-controls.disabled-step-control span.step-down {
+	background-position: 0 -150px;
 }
 .input-range {
 	position: relative;
