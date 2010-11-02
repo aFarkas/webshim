@@ -2112,7 +2112,6 @@ jQuery.webshims.ready('validation-base', function($, webshims){
 								disabled: this.disabled
 							})
 							.bind('keypress', function(e){
-								console.log(e.keyCode)
 								if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
 								$.attr(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
 								webshims.triggerInlineForm(this, 'input');
@@ -2121,21 +2120,30 @@ jQuery.webshims.ready('validation-base', function($, webshims){
 						;
 						
 						if(options.calculateWidth){
-							var width = $(this).getwidth();
-							if(!width){return;}
-							var marginControlOS = (parseInt(controls.css('margin'+dir.otherSide), 10) || 0);
-							var marginControl = (parseInt(controls.css('margin'+dir.side), 10) || 0);
-							var margin = (parseInt($(this).css('margin'+dir.side), 10) || 0) + marginControl;
-							var widthCorrect = 0;
-							if( marginControlOS < -1 ){
-								widthCorrect = marginControlOS * -1;
-								$(this).css('padding'+dir.side, (parseInt($(this).css('padding'+dir.side), 10) || 0) + widthCorrect);
+							var jElm = $(this);
+							var inputDim = {
+								w: jElm.getwidth()
+							};
+							if(!inputDim.w){return;}
+							var controlDim = {
+								mL: (parseInt(controls.css('margin'+dir.otherSide), 10) || 0),
+//								mR: (parseInt(controls.css('margin'+dir.side), 10) || 0),
+								w: controls.getouterWidth()
+							};
+							inputDim.mR = (parseInt(jElm.css('margin'+dir.side), 10) || 0);
+							if(inputDim.mR){
+								jElm.css('margin'+dir.side, 0);
 							}
-							$(this).css('width', width - controls.getouterWidth(true) - widthCorrect);
-							if(margin){
-								$(this).css('margin'+dir.side, 0);
-								controls.css('margin'+dir.side, margin);
+							//is inside
+							if( controlDim.mL <= (controlDim.w * -1) ){
+								controls.css('margin'+dir.side, Math.abs(controlDim.w + controlDim.mL) + inputDim.mR);
+								jElm.css('padding'+dir.side, (parseInt($(this).css('padding'+dir.side), 10) || 0) + Math.abs(controlDim.mL));
+								jElm.css('width', inputDim.w + controlDim.mL);
+							} else {
+								controls.css('margin'+dir.side, inputDim.mR);
+								jElm.css('width', inputDim.w - controlDim.mL - controlDim.w);
 							}
+							
 						}
 					});
 				}
