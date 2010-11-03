@@ -102,6 +102,7 @@ input.has-step-controls {
 	overflow: hidden;
 	display: inline-block !important;
 	padding: 0 !important;
+	font-size: 0;
 	vertical-align: middle;
 	vertical-align: text-bottom !important;
 	margin-left: -17px;
@@ -114,6 +115,7 @@ input.has-step-controls {
 	overflow: hidden;
 	margin: 0 !important;
 	padding: 0 !important;
+	font-size: 0;
 	width: 15px;
 	height: 9px;
 	cursor: pointer;
@@ -155,6 +157,7 @@ input.has-step-controls {
 	vertical-align: middle;
 	zoom: 1;
 	border: 1px solid #000;
+	padding: 0 !important;
 	height: 0.3em;
 	width: 155px;
 	border-radius: 0.1em;
@@ -165,6 +168,7 @@ input.has-step-controls {
 }
 .input-range .ui-slider-range {
 	position: absolute;
+	padding: 0 !important;
 	z-index: 1;
 	overflow: hidden;
 	display: block;
@@ -183,6 +187,7 @@ input.has-step-controls {
 .input-range .ui-slider-handle {
 	position: absolute;
 	z-index: 10;
+	padding: 0 !important;
 	overflow: hidden;
 	margin: -0.2em 0 0 -0.35em;;
 	height: 0.7em;
