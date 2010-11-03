@@ -100,14 +100,14 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 			date.css(attr.css);
 			if(attr.outerWidth){
 				date.outerWidth(attr.outerWidth);
-				var width = date.getwidth();
+				var width = date.getwidth() - 4;
 				datePicker
 					.css({marginLeft: 0, marginRight: 2})
-					.outerWidth(Math.floor(width * 0.61))
+					.outerWidth(Math.floor(width * 0.6))
 				;
-				$('input.input-datetime-local-time')
+				$('input.input-datetime-local-time', date)
 					.css({marginLeft: 2, marginRight: 0})
-					.outerWidth(Math.floor(width * 0.37))
+					.outerWidth(Math.floor(width * 0.4))
 				;
 			}
 		}

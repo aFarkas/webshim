@@ -13,7 +13,7 @@
 	
 	$.webshims = {
 		
-		version: '1.0.3',
+		version: 'pre1.0.4',
 		
 		fixHTML5: (function(){
 			var d, b;

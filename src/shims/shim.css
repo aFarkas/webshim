@@ -27,13 +27,14 @@ form label.placeholder-text {
 .placeholder-box {
 	position: relative;
 	display: inline-block;
+	width: auto !important;
+	height: auto !important;
+	margin: 0 !important;
+	padding: 0 !important;
 	zoom: 1;
-	overflow: hidden;
+	overflow: hidden !important;;
 }
-span.input-datetime-local {
-	display: inline-block;
-	vertical-align: middle;
-}
+
 .placeholder-box-input {
 	vertical-align: middle;
 }
@@ -49,7 +50,10 @@ span.input-datetime-local {
 
 .placeholder-text {
 	position: absolute;
-	display: none;
+	margin: 0 !important;
+	padding-right: !important;
+	padding-bottom: !important;
+	display: none !important;
 	top: 0;
 	left: 0;
 	overflow: hidden;
@@ -58,13 +62,24 @@ span.input-datetime-local {
 	cursor: text;
 }
 .placeholder-box-input .placeholder-text {
-	white-space: nowrap;
+	white-space: nowrap !important;
 }
 .placeholder-box-textarea .placeholder-text {
-	white-space: pre;
+	white-space: pre !important;
 }
 .placeholder-visible .placeholder-text {
-	display: inline-block;
+	display: inline-block !important;
+}
+span.input-datetime-local {
+	display: inline-block !important;
+	height: auto !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	border: none !important;
+	vertical-align: middle;
+}
+span.input-datetime-local input {
+	display: inline !important;
 }
 .validity-alert {
 	position: absolute;
@@ -78,13 +93,17 @@ span.input-datetime-local {
 .validity-alert span.va-box {
 	display: inline-block;
 }
+input.has-step-controls {
+	display: inline !important;
+}
 .step-controls {
 	position: relative;
 	zoom: 1;
 	overflow: hidden;
-	display: inline-block;
+	display: inline-block !important;
+	padding: 0 !important;
 	vertical-align: middle;
-	vertical-align: text-bottom;
+	vertical-align: text-bottom !important;
 	margin-left: -17px;
 	height: 19px;
 	width: 15px;
@@ -93,6 +112,8 @@ span.input-datetime-local {
 	position: absolute;
 	display: inline-block;
 	overflow: hidden;
+	margin: 0 !important;
+	padding: 0 !important;
 	width: 15px;
 	height: 9px;
 	cursor: pointer;

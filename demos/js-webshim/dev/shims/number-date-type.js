@@ -509,21 +509,21 @@
 							if(!inputDim.w){return;}
 							var controlDim = {
 								mL: (parseInt(controls.css('margin'+dir.otherSide), 10) || 0),
-//								mR: (parseInt(controls.css('margin'+dir.side), 10) || 0),
 								w: controls.getouterWidth()
 							};
 							inputDim.mR = (parseInt(jElm.css('margin'+dir.side), 10) || 0);
+							controls.css('marginBottom', (parseInt(jElm.css('paddingBottom'), 10) || 0) / -2);
 							if(inputDim.mR){
 								jElm.css('margin'+dir.side, 0);
 							}
 							//is inside
 							if( controlDim.mL <= (controlDim.w * -1) ){
-								controls.css('margin'+dir.side, Math.abs(controlDim.w + controlDim.mL) + inputDim.mR);
+								controls.css('margin'+dir.side,  Math.floor(Math.abs(controlDim.w + controlDim.mL) + inputDim.mR));
 								jElm.css('padding'+dir.side, (parseInt($(this).css('padding'+dir.side), 10) || 0) + Math.abs(controlDim.mL));
-								jElm.css('width', inputDim.w + controlDim.mL);
+								jElm.css('width', Math.floor(inputDim.w + controlDim.mL));
 							} else {
 								controls.css('margin'+dir.side, inputDim.mR);
-								jElm.css('width', inputDim.w - controlDim.mL - controlDim.w);
+								jElm.css('width',  Math.floor(inputDim.w - controlDim.mL - controlDim.w));
 							}
 							
 						}
