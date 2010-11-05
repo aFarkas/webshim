@@ -724,7 +724,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 				}
 			},
 			getMessage: function(elem, message){
-				$('> span', alert).html(message || elem.attr('validationMessage'));
+				$('> span', alert).text(message || elem.attr('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
