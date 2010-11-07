@@ -3,7 +3,7 @@ asyncTest("dynamic webshim Modul", function(){
 	var testElem = $('<div />').appendTo('body');
 	var testStructure = '<div id="webshim-structure"><section><hgroup><input placeholder="hello" /></hgroup></section><section></section></div>';
 	var structureTest = function(fnName){
-		var elemsLength = ($.support.placeholder === 'shim') ? 6 : 4;
+		var elemsLength = (!$.support.placeholder) ? 6 : 4;
 		equals( $('#webshim-structure > *').length, 2, 'structure has two childs with method '+ fnName );
 		equals( $('#webshim-structure *').length, elemsLength, 'structure has 4 descendants with method '+ fnName );
 		if($.support.placeholder === 'shim'){

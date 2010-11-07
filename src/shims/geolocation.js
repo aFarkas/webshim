@@ -1,6 +1,5 @@
 (function($){
 	if(navigator.geolocation){return;}
-	$.support.geolocation = 'shim';
 	var domWrite = function(){
 			setTimeout(function(){
 				throw('document.write is overwritten by geolocation shim. This method is incompatibel with this plugin');

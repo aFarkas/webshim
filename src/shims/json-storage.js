@@ -1,6 +1,3 @@
-if(!jQuery.support.jsonStorage){
-	jQuery.support.jsonStorage = 'shim';
-}
 
 //JSON
 (function(){

@@ -25,7 +25,7 @@ implemented Features:
 How To Use
 ------------------
 
-* Simply [download Webshims Lib](http://aFarkas.github.com/webshim/demos/index.html) and put the js-webshim-folder in your project
+* Simply [download Webshims Lib](https://github.com/aFarkas/webshim/downloads) and put the js-webshim-folder in your project
 * Include the JavaScript:
 
 ---------------
@@ -62,7 +62,7 @@ How To Use
 License
 ---------------------------------------
 
-The Webshims Lib core is licensed under the [MIT-License](http://aFarkas.github.com/webshim/MIT-LICENSE.txt). Note: Webshims Lib uses many greate third party scripts.
+The Webshims Lib core is licensed under the [MIT-License](http://aFarkas.github.com/webshim/MIT-LICENSE.txt). Note: Webshims Lib uses many great third party scripts.
 
 
 

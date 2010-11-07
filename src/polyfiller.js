@@ -14,7 +14,7 @@
 	$.webshims = {
 		
 		version: 'pre1.0.4',
-		
+		fix: {},
 		fixHTML5: (function(){
 			var d, b;
 			return (support.dynamicHTML5) ? 
@@ -723,15 +723,28 @@
 	support.validity = ('checkValidity' in $('<form action="#" />')[0]);
 	
 	/* bugfixes, validation-message + fieldset.checkValidity pack */
+	webshims.validityMessages = [];
+	webshims.inputTypes = {};
 	
 	(function(){
-		webshims.validityMessages = [];
-		webshims.inputTypes = {};
-		var form = $('<form action="#"><fieldset><input name="a" required /></fieldset></form>'),
+		var form = $('<form action="#"><fieldset><input name="a" required /><select><option>y</option></select></fieldset></form>'),
 			field = $('fieldset', form)[0]
 		;
-		support.validationMessage = !!(form.find('input').attr('validationMessage'));
+		
+		support.validationMessage = !!($('input', form).attr('validationMessage'));
 		support.fieldsetValidation = !!(field.elements && field.checkValidity && 'disabled' in field && !field.checkValidity() );
+		support.output = !!( 'value' in doc.createElement('output') );
+		support.inputUI = ($('<input type="range" />')[0].type == 'range' && $('<input type="date" />')[0].type == 'date');
+		support.requiredSelect = ('required' in $('select', form)[0]);
+		
+		//ToDo: these assumption aren't used yet || we have to wait till these bug are fixed
+		//Bug in Safari 5.0.2 and Chrome 7
+		webshims.fix.interactiveValidation = ($.browser.webkit && !support.requiredSelect && !support.output);
+		//Bug in Safari 5.0.2 (isn't used yet)
+		webshims.fix.checkValidity = webshims.fix.interactiveValidation;
+		//Bug in Safari 5.0.2, Chrome 7 and Opera 10
+		webshims.fix.submission = ((window.opera && !support.requiredSelect) || webshims.fix.interactiveValidation);
+		
 		addPolyfill('validation-base', {
 			feature: 'forms',
 			noAutoCallback: true,
@@ -743,11 +756,13 @@
 		});
 	})();
 	
+	
+	
 	addPolyfill('output', {
 			feature: 'forms',
 			noAutoCallback: true,
 			test: function(){
-				return ( 'value' in doc.createElement('output') );
+				return support.output;
 			},
 			combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
 		});
@@ -774,25 +789,24 @@
 	});
 	
 	
-	if(support.validity === true){
+	if(support.validity){
 		//create delegatable-like events
 		webshims.capturingEvents(['input']);
 		webshims.capturingEvents(['invalid'], true);
 	}
 		
-	
 	addPolyfill('number-date-type', {
 		feature: 'forms-ext',
 		noAutoCallback: true,
 		test: function(){
-			return ($('<input type="datetime-local" />').attr('type') === 'datetime-local' && $('<input type="range" />').attr('type') === 'range');
+			return support.inputUI;
 		},
 		
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4'],
 		options: {stepArrows: {number: 1, time: 1}, calculateWidth: true}
 	});
 	
-	support.inputUI = ($('<input type="range" />')[0].type == 'range' && $('<input type="date" />')[0].type == 'date');
+	
 	addPolyfill('inputUI', {
 		feature: 'forms-ext',
 		test: function(){return (support.inputUI && !modules.inputUI.options.replaceNative);},

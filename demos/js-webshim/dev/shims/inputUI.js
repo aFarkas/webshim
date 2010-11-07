@@ -1,6 +1,5 @@
 jQuery.webshims.ready('number-date-type', function($, webshims, window, document){
 	"use strict";
-	$.support.inputUI = 'shim';
 		
 	var options = $.webshims.modules.inputUI.options;
 	var globalInvalidTimer;
@@ -44,7 +43,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 					}, 30);
 				});
 			})();
-		} else if($.support.validity === true){
+		} else if($.support.validity){
 			orig.bind('firstinvalid', function(e){
 				clearTimeout(globalInvalidTimer);
 				globalInvalidTimer = setTimeout(function(){

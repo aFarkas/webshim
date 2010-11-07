@@ -1,8 +1,8 @@
-jQuery.webshims.ready('validation-base', function($){
+jQuery.webshims.ready('validation-base', function($, webshims, window){
 if($.support.validity){
 	return;
 }
-var webshims = $.webshims;
+
 webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
 var getNames = function(elem){
@@ -279,7 +279,6 @@ webshims.addReady(function(context){
 		$('input, select, textarea', form).filter('[autofocus]:first').focus();
 	}
 });
-$.support.validity = $.support.validity || 'shim';
 
 webshims.createReadyEvent('validity');
 

@@ -11,7 +11,6 @@
 	if($.support.placeholder){
 		return;
 	}
-	$.support.placeholder = 'shim';
 	var changePlaceholderVisibility = function(elem, value, placeholderTxt, data, type){
 			if(!data){
 				data = $.data(elem, 'placeHolder');

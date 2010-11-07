@@ -6,7 +6,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 	var fixNative = false;
 	var doc = document;
 	var undefined;
-	if(support.validity === true){
+	if(support.validity){
 		fixNative = !window.noHTMLExtFixes;
 	}
 	/*
@@ -144,7 +144,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 	};
 	
 	validityMessages['en-US'] = validityMessages['en-US'] || validityMessages['en'];
-	validityMessages[''] = validityMessages[''] || validityMessages['en'];
+	validityMessages[''] = validityMessages[''] || validityMessages['en-US'];
 	
 	validityMessages['de'] = validityMessages['de'] || {
 		typeMismatch: {
@@ -164,6 +164,73 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		patternMismatch: '{%value} hat für diese Seite ein falsches Format! {%title}',
 		valueMissing: 'Sie müssen einen Wert eingeben'
 	};
+	
+	var currentValidationMessage =  validityMessages[''];
+	$(doc).bind('htmlExtLangChange', function(){
+		webshims.activeLang(validityMessages, 'validation-base', function(langObj){
+			currentValidationMessage = langObj;
+		});
+	});
+	
+	webshims.createValidationMessage = function(elem, name){
+		var message = currentValidationMessage[name];
+		if(message && typeof message !== 'string'){
+			message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
+		}
+		if(message){
+			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
+				if(message.indexOf('{%'+attr) === -1){return;}
+				var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
+				message = message.replace('{%'+ attr +'}', val);
+				if('value' == attr){
+					message = message.replace('{%valueLen}', val.length);
+				}
+			});
+		}
+		return message || '';
+	};
+	$.each((support.validationMessage) ? ['customValidationMessage'] : ['customValidationMessage', 'validationMessage'], function(i, fn){
+		webshims.attr(fn, {
+			elementNames: ['input', 'select', 'textarea'],
+			getter: function(elem){
+				var message = '';
+				if(!$.attr(elem, 'willValidate')){
+					return message;
+				}
+				
+				var validity = $.attr(elem, 'validity') || {valid: 1};
+				if(validity.valid){return message;}
+				if(validity.customError || fn === 'validationMessage'){
+					message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
+					if(message){return message;}
+				}
+				$.each(validity, function(name, prop){
+					if(name == 'valid' || !prop){return;}
+					message = webshims.createValidationMessage(elem, name);
+					if(message){
+						return false;
+					}
+				});
+				
+				return message || '';
+			}
+		});
+	});
+	
+	
+	var overrideValidity = (support.validity && (webshims.overrideValidationMessages || !support.requiredSelect || !support.inputUI));
+	webshims.addMethod('setCustomValidity', function(error){
+		error = error+'';
+		if(this.setCustomValidity){
+			this.setCustomValidity(error);
+			if(overrideValidity){
+				$.data(this, 'hasCustomError', !!(error));
+				testValidity(this);
+			}
+		} else {
+			$.data(this, 'customvalidationMessage', ''+error);
+		}
+	});
 	
 	
 	/* ugly workaround/bugfixes */
@@ -242,7 +309,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			}
 			
 			//prevent doubble invalids + fix safari bug, where checkValdity returns false
-			if(support.validity !== true || invalids.indexOf(e.target) == -1){
+			if(!support.validity || invalids.indexOf(e.target) == -1){
 				invalids.push(e.target);
 			} else if(fixNative) {
 				e.stopImmediatePropagation();
@@ -267,9 +334,8 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 	})();
 	
 	(function(){
-		if(!fixNative){return;}
-		support.fieldsetValidation = support.fieldsetValidation || 'shim';
-		//safari 5.0.2 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property
+		if(!fixNative || support.fieldsetValidation){return;}
+		//safari 5.0.2 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
 		var checkValidity = function(elem){
 			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
 			if(!valid && elem.checkValidity()){
@@ -296,16 +362,33 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		});
 	})();
 	
-	//implements validationMessage in uncapable browser and adds unknown types/attributes in capable browsers/overrides validationMessage in capable browsers
+	//adds unknown types/attributes in capable browsers/overrides validationMessage in capable browsers
 	(function(){
-		var overrideNativeMessages = ( support.validity === true && webshims.overrideValidationMessages );
-		var supportRequiredSelect = true;
-		var supportNumericDate = true;
-		if(support.validity === true){
-			supportRequiredSelect = !!( ('required' in doc.createElement('select')) || window.noHTMLExtFixes );
-			supportNumericDate = !!(($('<input type="datetime-local" />')[0].type == 'datetime-local' && $('<input type="range" />')[0].type == 'range') );
-		}
-		var overrideValidity = (!supportRequiredSelect || !supportNumericDate || overrideNativeMessages);
+		if(!support.validity){return;}
+		
+		webshims.addInputType = function(type, obj){
+			typeModels[type] = obj;
+		};
+		
+		webshims.addValidityRule = function(type, fn){
+			validityRules[type] = fn;
+		};
+		
+		webshims.addValidityRule('typeMismatch',function (input, val, cache, validityState){
+			if(val === ''){return false;}
+			var ret = validityState.typeMismatch;
+			if(!('type' in cache)){
+				cache.type = (input[0].getAttribute('type') || '').toLowerCase();
+			}
+			
+			if(typeModels[cache.type] && typeModels[cache.type].mismatch){
+				ret = typeModels[cache.type].mismatch(val, input);
+			}
+			return ret;
+		});
+		
+		var overrideNativeMessages = webshims.overrideValidationMessages;	
+		var overrideValidity = (!support.requiredSelect || !support.inputUI || overrideNativeMessages);
 		var typeModels = webshims.inputTypes;
 		var validityRules = {};
 		var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
@@ -319,7 +402,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
 			
 			if(!overrideNativeMessages){
-				if(!(!supportRequiredSelect && type == 'select-one') && !typeModels[type]){return;}
+				if(!(!support.requiredSelect && type == 'select-one') && !typeModels[type]){return;}
 			}
 			
 			if(overrideNativeMessages && !init && checkTypes[type] && elem.name){
@@ -332,7 +415,8 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			}
 		};
 		
-		if(!supportRequiredSelect || overrideNativeMessages){
+		
+		if(!support.requiredSelect || overrideNativeMessages){
 			$.extend(validityChanger, {
 				required: 1,
 				size: 1,
@@ -341,104 +425,14 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			});
 			validityElements.push('select');
 		}
-		if(!supportNumericDate || overrideNativeMessages){
+		if(!support.inputUI || overrideNativeMessages){
 			$.extend(validityChanger, {
 				min: 1, max: 1, step: 1
 			});
 			validityElements.push('input');
 		}
-		
-		var currentValidationMessage =  validityMessages[''];
-		$(doc).bind('htmlExtLangChange', function(){
-			webshims.activeLang(validityMessages, 'validation-base', function(langObj){
-				currentValidationMessage = langObj;
-			});
-		});
-		
-		webshims.createValidationMessage = function(elem, name){
-			var message = currentValidationMessage[name];
-			if(message && typeof message !== 'string'){
-				message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
-			}
-			if(message){
-				['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
-					if(message.indexOf('{%'+attr) === -1){return;}
-					var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
-					message = message.replace('{%'+ attr +'}', val);
-					if('value' == attr){
-						message = message.replace('{%valueLen}', val.length);
-					}
-				});
-			}
-			return message || '';
-		};
-		$.each((support.validationMessage) ? ['customValidationMessage'] : ['customValidationMessage', 'validationMessage'], function(i, fn){
-			webshims.attr(fn, {
-				elementNames: ['input', 'select', 'textarea'],
-				getter: function(elem){
-					var message = '';
-					if(!$.attr(elem, 'willValidate')){
-						return message;
-					}
-					
-					var validity = $.attr(elem, 'validity') || {valid: 1};
-					if(validity.valid){return message;}
-					if(validity.customError || fn === 'validationMessage'){
-						message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
-						if(message){return message;}
-					}
-					$.each(validity, function(name, prop){
-						if(name == 'valid' || !prop){return;}
-						message = webshims.createValidationMessage(elem, name);
-						if(message){
-							return false;
-						}
-					});
-					
-					return message || '';
-				}
-			});
-		});
-		support.validationMessage = support.validationMessage || 'shim';
-		
-		
-		webshims.addMethod('setCustomValidity', function(error){
-			error = error+'';
-			if(this.setCustomValidity){
-				this.setCustomValidity(error);
-				if(overrideValidity){
-					$.data(this, 'hasCustomError', !!(error));
-					testValidity(this);
-				}
-			} else {
-				$.data(this, 'customvalidationMessage', ''+error);
-			}
-		});
-		
-		if(support.validity === true){
-			webshims.addInputType = function(type, obj){
-				typeModels[type] = obj;
-			};
-			
-			webshims.addValidityRule = function(type, fn){
-				validityRules[type] = fn;
-			};
-			
-			webshims.addValidityRule('typeMismatch',function (input, val, cache, validityState){
-				if(val === ''){return false;}
-				var ret = validityState.typeMismatch;
-				if(!('type' in cache)){
-					cache.type = (input[0].getAttribute('type') || '').toLowerCase();
-				}
 				
-				if(typeModels[cache.type] && typeModels[cache.type].mismatch){
-					ret = typeModels[cache.type].mismatch(val, input);
-				}
-				return ret;
-			});
-		}
-		
-		if(!supportRequiredSelect){
+		if(!support.requiredSelect){
 			webshims.createBooleanAttrs('required', ['select']);
 			
 			webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){
@@ -542,16 +536,9 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			}
 						
 			webshims.addReady(function(context){
-				
-				if(context === doc){
-					$(validityElements.join(',')).each(function(){
-						testValidity(this, true);
-					});
-				} else {
-					$(validityElements.join(','), context).each(function(){
-						testValidity(this, true);
-					});
-				}
+				$(validityElements.join(','), context).each(function(){
+					testValidity(this, true);
+				});
 			});
 			
 		} //end: overrideValidity -> (!supportRequiredSelect || !supportNumericDate || overrideNativeMessages)

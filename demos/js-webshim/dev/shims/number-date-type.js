@@ -368,6 +368,7 @@
 		//implement set/arrow controls
 		(function(){
 			var options = webshims.modules['number-date-type'].options;
+			var correctBottom = ($.browser.msie && parseInt($.browser.version, 10) < 8) ? 2 : 0;
 			var getNextStep = function(input, upDown, cache){
 				
 				cache = cache || {};
@@ -491,9 +492,10 @@
 							.data('step-controls', controls)
 							.attr({
 								readonly: this.readOnly,
-								disabled: this.disabled
+								disabled: this.disabled,
+								autocomplete: 'off'
 							})
-							.bind('keypress', function(e){
+							.bind(($.browser.msie) ? 'keydown' : 'keypress', function(e){
 								if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
 								$.attr(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
 								webshims.triggerInlineForm(this, 'input');
@@ -512,7 +514,11 @@
 								w: controls.getouterWidth()
 							};
 							inputDim.mR = (parseInt(jElm.css('margin'+dir.side), 10) || 0);
-							controls.css('marginBottom', (parseInt(jElm.css('paddingBottom'), 10) || 0) / -2);
+							if(!correctBottom){
+								controls.css('marginBottom', (parseInt(jElm.css('paddingBottom'), 10) || 0) / -2 );
+							} else {
+								controls.css('marginBottom', ((jElm.innerHeight() - (controls.height() / 2)) / 2) - 1 );
+							}
 							if(inputDim.mR){
 								jElm.css('margin'+dir.side, 0);
 							}
@@ -545,7 +551,7 @@
 		webshims.createReadyEvent('number-date-type');
 	};
 	
-	if($.support.validity === true){
+	if($.support.validity){
 		$.webshims.ready('validation-base', implementTypes, true);
 	} else {
 		$.webshims.ready('validity', implementTypes, true);

@@ -935,7 +935,6 @@ if (!document.createElement('canvas').getContext) {
 		if (!doc.styleSheets || !doc.namespaces){
 			return;
 		}
-		$.support.canvas = 'shim';
 		
 		$.webshims.addMethod('getContext', function(ctxName){
 			if(!this.getContext){
