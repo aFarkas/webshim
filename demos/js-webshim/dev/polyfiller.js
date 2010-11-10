@@ -265,10 +265,7 @@
 						var preventDefault = e.preventDefault;
 						e.preventDefault =  function(){
 							preventDefault.apply(this, arguments);
-							var timer = $.data(e.target, 'maybePrevented'+e.type);
-							if(timer){
-								clearTimeout(timer);
-							}
+							clearTimeout($.data(e.target, 'maybePrevented'+e.type));
 							$.data(e.target, 'maybePrevented'+e.type, setTimeout(function(){
 								$.removeData(e.target, 'maybePrevented'+e.type);
 							}, 90));
@@ -300,10 +297,6 @@
 						return oldAttr(elem, name, value, pass, extra);
 					}
 					var oldEval = function(){
-						if(value === undefined){
-							var ret = oldAttr(elem, name, value, pass, extra);
-							return ret;
-						}
 						return oldAttr(elem, name, value, pass, extra);
 					};
 					if(value === undefined){

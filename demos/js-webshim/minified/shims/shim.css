@@ -35,6 +35,8 @@ mark {
 	zoom: 1;
 }
 .polyfill-important .placeholder-box {
+	position: relative !important;
+	display: inline-block !important;
 	overflow: hidden !important;
 	margin: 0 !important;
 	padding: 0 !important;
