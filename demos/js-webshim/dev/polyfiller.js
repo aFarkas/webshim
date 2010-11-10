@@ -14,6 +14,7 @@
 	$.webshims = {
 		
 		version: 'pre1.0.4',
+		useImportantStyles: true,
 		fix: {},
 		fixHTML5: (function(){
 			var d, b;
@@ -471,6 +472,9 @@
 			if(!$.isReady){
 				$('html').addClass('loading-polyfills');
 				$(window).bind('load.loadingPolyfills error.loadingPolyfills', removeLoader);
+			}
+			if(webshims.useImportantStyles){
+				$('html').addClass('polyfill-important');
 			}
 			
 			webshims.ready(features, function(){

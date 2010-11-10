@@ -57,6 +57,7 @@ div.article-wrapper {
 .home article {
 	margin: 30px 4%;
 	width: 40%;
+	overflow: visible;
 	display: inline-block;
 	vertical-align: top;
 }

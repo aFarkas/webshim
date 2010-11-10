@@ -10,13 +10,15 @@ mark {
 }
 /* reset */
 .input-range .ui-slider-range,
-form span.placeholder-box,
+.placeholder-box,
 .placeholder-box,
 .placeholder-text,
 .input-datetime-local,
-form span.input-datetime-local,
-form span.placeholder-text,
-form label.placeholder-text {
+.step-controls,
+.step-controls span,
+.input-range,
+.input-range .ui-slider-handle,
+.input-range .ui-slider-range {
 	margin: 0;
 	padding: 0;
 	border: none;
@@ -24,17 +26,21 @@ form label.placeholder-text {
 	background: transparent none;
 }
 
+
+
+/* placeholder */
 .placeholder-box {
 	position: relative;
 	display: inline-block;
-	width: auto !important;
-	height: auto !important;
+	zoom: 1;
+}
+.polyfill-important .placeholder-box {
+	overflow: hidden !important;
 	margin: 0 !important;
 	padding: 0 !important;
-	zoom: 1;
-	overflow: hidden !important;;
+	width: auto !important;
+	height: auto !important;
 }
-
 .placeholder-box-input {
 	vertical-align: middle;
 }
@@ -50,10 +56,7 @@ form label.placeholder-text {
 
 .placeholder-text {
 	position: absolute;
-	margin: 0 !important;
-	padding-right: !important;
-	padding-bottom: !important;
-	display: none !important;
+	display: none;
 	top: 0;
 	left: 0;
 	overflow: hidden;
@@ -61,54 +64,65 @@ form label.placeholder-text {
 	line-height: 1;
 	cursor: text;
 }
+.polyfill-important .placeholder-text { 
+	margin: 0 !important;
+	padding-right: 0 !important;
+	padding-bottom: 0 !important;
+	display: none !important;
+}
 .placeholder-box-input .placeholder-text {
-	white-space: nowrap !important;
+	white-space: nowrap;
 }
 .placeholder-box-textarea .placeholder-text {
-	white-space: pre !important;
+	white-space: pre;
 }
 .placeholder-visible .placeholder-text {
+	display: inline-block;
+}
+.polyfill-important .placeholder-visible .placeholder-text {
 	display: inline-block !important;
 }
-span.input-datetime-local {
-	display: inline-block !important;
+
+/* datetime-local */
+.input-datetime-local {
+	display: inline-block;
 	zoom: 1;
+	vertical-align: middle;
+}
+.polyfill-important .input-datetime-local {
+	display: inline-block !important;
 	height: auto !important;
 	padding: 0 !important;
 	margin: 0 !important;
 	border: none !important;
-	vertical-align: middle;
 }
-span.input-datetime-local input {
+.input-datetime-local input {
 	display: inline !important;
 }
-.validity-alert {
-	position: absolute;
-	display: inline-block;
-	background: #fff;
-	color: #000;
-	border: 1px solid #f00;
-	padding: 5px;
-	z-index: 10000;
+
+/* spinner control for time, number (usable for date, datetime-local) */
+.has-step-controls {
+	display: inline;
 }
-.validity-alert span.va-box {
-	display: inline-block;
-}
-input.has-step-controls {
+.polyfill-important .has-step-controls {
 	display: inline !important;
 }
 .step-controls {
 	position: relative;
 	zoom: 1;
 	overflow: hidden;
-	display: inline-block !important;
-	padding: 0 !important;
+	display: inline-block;
 	font-size: 0;
 	vertical-align: middle;
-	vertical-align: text-bottom !important;
+	vertical-align: text-bottom;
 	margin-left: -17px;
 	height: 19px;
 	width: 15px;
+}
+.polyfill-important .step-controls {
+	display: inline-block !important;
+	padding: 0 !important;
+	vertical-align: text-bottom !important;
 }
 .step-controls span {
 	position: absolute;
@@ -116,7 +130,6 @@ input.has-step-controls {
 	overflow: hidden;
 	margin: 0 !important;
 	padding: 0 !important;
-	font-size: 0;
 	width: 15px;
 	height: 9px;
 	cursor: pointer;
@@ -124,9 +137,16 @@ input.has-step-controls {
 	line-height: 0;
 	background: url(arrows.png) no-repeat 0 0;
 }
-.step-controls span:hover {
-	border-color: #000;
+.polyfill-important .step-controls span {
+	display: inline-block !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	width: 15px;
+	height: 9px;
+	font-size: 0 !important;
+	background: url(arrows.png) no-repeat 0 0;
 }
+
 .step-controls span.step-up {
 	top: 0;
 	background-position: 0 0;
@@ -152,28 +172,56 @@ input.has-step-controls {
 .step-controls.disabled-step-control span.step-down {
 	background-position: 0 -150px;
 }
+
+/* range */
 .input-range {
 	position: relative;
 	display: inline-block;
 	vertical-align: middle;
 	zoom: 1;
 	border: 1px solid #000;
-	padding: 0 !important;
-	height: 0.3em;
+	height: 6px;
 	width: 155px;
-	border-radius: 0.1em;
-	-moz-border-radius: 0.1em;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
 	background-color: #fff;
 	cursor: pointer;
-	font-size: 1em;
+	font-size: 0;
+	line-height: 0;
 }
+.polyfill-important .input-range {
+	display: inline-block !important;
+	padding: 0 !important;
+	font-size: 0 !important;
+}
+.input-range .ui-slider-handle {
+	position: absolute;
+	display: block;
+	z-index: 10;
+	overflow: hidden;
+	margin: -3px 0 0 -6px;
+	height: 12px;
+	width: 12px;
+	background-color: #666;
+	cursor: pointer;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	font-size: 0;
+	line-height: 0;
+}
+
 .input-range .ui-slider-range {
 	position: absolute;
-	padding: 0 !important;
 	z-index: 1;
 	overflow: hidden;
 	display: block;
 	background: #999;
+}
+.input-range .input-range .ui-slider-range,
+.polyfill-important .input-range .ui-slider-handle {
+	position: absolute !important;
+	display: block !important;
+	padding: 0 !important;
 }
 .input-range.ui-slider-horizontal .ui-slider-range {
 	top: 0;
@@ -185,21 +233,7 @@ input.has-step-controls {
 .input-range.ui-slider-horizontal .ui-slider-range-max {
 	right: 0;
 }
-.input-range .ui-slider-handle {
-	position: absolute;
-	z-index: 10;
-	padding: 0 !important;
-	overflow: hidden;
-	margin: -0.2em 0 0 -0.35em;;
-	height: 0.7em;
-	width: 0.7em;
-	background-color: #666;
-	cursor: pointer;
-	border-radius: 0.35em;
-	-moz-border-radius: 0.35em;
-	font-size: 1em;
-	line-height: 0;
-}
+
 .input-datetime-local-date.hasDatepicker,
 .input-date.hasDatepicker {
 	position: relative;
@@ -209,4 +243,18 @@ input.has-step-controls {
 	display: none;
 	background-color: #fff;
 	z-index: 100;
+}
+
+
+.validity-alert {
+	position: absolute;
+	display: inline-block;
+	background: #fff;
+	color: #000;
+	border: 1px solid #f00;
+	padding: 5px;
+	z-index: 10000;
+}
+.validity-alert span.va-box {
+	display: inline-block;
 }
