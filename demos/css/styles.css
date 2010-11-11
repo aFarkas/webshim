@@ -31,16 +31,19 @@ h1, h2, h3, h4, h5, h6, table, input, textarea, label {
 	font-size: 100%;
 }
 
-.loading-polyfills {
-	background: #d9cfa0 url(loading-shims.gif) center 300px no-repeat;
-}
-.loading-polyfills body {
-	visibility: hidden;
-}
 
+html {
+	background: #d9cfa0;
+}
 body {
     font: 100.1% arial, helvetica, sans-serif;
 	background: #d9cfa0;
+}
+html.long-loading-polyfills {
+	background: #d9cfa0 url(loading-shims.gif) center 300px no-repeat;
+}
+html.loading-polyfills body {
+	visibility: hidden;
 }
 #wrapper {
 	margin: 10px auto;

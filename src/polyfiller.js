@@ -448,9 +448,11 @@
 				loader 	= shims.loader,
 				toLoadFeatures = [],
 				removeLoader = function(){
-					$('html').removeClass('loading-polyfills');
+					$('html').removeClass('loading-polyfills long-loading-polyfills');
 					$(window).unbind('load.loadingPolyfills error.loadingPolyfills');
-				}
+					clearTimeout(loadingTimer);
+				},
+				loadingTimer
 			;
 			
 			fn = fn || $.noop;
@@ -465,6 +467,9 @@
 			if(!$.isReady){
 				$('html').addClass('loading-polyfills');
 				$(window).bind('load.loadingPolyfills error.loadingPolyfills', removeLoader);
+				loadingTimer = setTimeout(function(){
+					$('html').addClass('long-loading-polyfills');
+				}, 400);
 			}
 			if(webshims.useImportantStyles){
 				$('html').addClass('polyfill-important');
