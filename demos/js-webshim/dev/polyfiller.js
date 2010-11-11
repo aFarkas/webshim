@@ -464,6 +464,8 @@
 			if (typeof features == 'string') {
 				features = features.split(' ');
 			}
+			
+			
 			if(!$.isReady){
 				$('html').addClass('loading-polyfills');
 				$(window).bind('load.loadingPolyfills error.loadingPolyfills', removeLoader);
@@ -471,10 +473,6 @@
 					$('html').addClass('long-loading-polyfills');
 				}, 400);
 			}
-			if(webshims.useImportantStyles){
-				$('html').addClass('polyfill-important');
-			}
-			
 			webshims.ready(features, function(){
 				removeLoader();
 				fn($, webshims, window, document);
@@ -488,6 +486,10 @@
 				}
 				toLoadFeatures = toLoadFeatures.concat(shims.features[feature]);
 			});
+			
+			if(webshims.useImportantStyles){
+				$('html').addClass('polyfill-important');
+			}
 			loader.loadCSS('shim.css');
 			loader.loadList(toLoadFeatures);
 		},
