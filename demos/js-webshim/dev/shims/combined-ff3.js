@@ -858,21 +858,6 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 	});
 	
 	
-	var overrideValidity = (support.validity && (webshims.overrideValidationMessages || !support.requiredSelect || !support.inputUI));
-	webshims.addMethod('setCustomValidity', function(error){
-		error = error+'';
-		if(this.setCustomValidity){
-			this.setCustomValidity(error);
-			if(overrideValidity){
-				$.data(this, 'hasCustomError', !!(error));
-				testValidity(this);
-			}
-		} else {
-			$.data(this, 'customvalidationMessage', ''+error);
-		}
-	});
-	
-	
 	/* ugly workaround/bugfixes */
 	(function(){
 		var firstEvent,
@@ -1055,6 +1040,19 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 				
 			}
 		};
+		
+		webshims.addMethod('setCustomValidity', function(error){
+			error = error+'';
+			if(this.setCustomValidity){
+				this.setCustomValidity(error);
+				if(overrideValidity){
+					$.data(this, 'hasCustomError', !!(error));
+					testValidity(this);
+				}
+			} else {
+				$.data(this, 'customvalidationMessage', error);
+			}
+		});
 		
 		
 		if(!support.requiredSelect || overrideNativeMessages){
@@ -1330,6 +1328,10 @@ webshims.addMethod('checkValidity', (function(){
 
 	};
 })());
+
+webshims.addMethod('setCustomValidity', function(error){
+	$.data(this, 'customvalidationMessage', ''+error);
+});
 
 $.event.special.invalid = {
 	add: function(){

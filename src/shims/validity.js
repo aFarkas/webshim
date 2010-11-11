@@ -139,6 +139,10 @@ webshims.addMethod('checkValidity', (function(){
 	};
 })());
 
+webshims.addMethod('setCustomValidity', function(error){
+	$.data(this, 'customvalidationMessage', ''+error);
+});
+
 $.event.special.invalid = {
 	add: function(){
 		if( !$.data(this, 'invalidEventShim') ){
