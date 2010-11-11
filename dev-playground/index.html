@@ -36,16 +36,19 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script src="../src/polyfiller.js"></script>
 	<script>
-		$.webshims.debug = true;
-		$.webshims.loader.basePath += 'shims/';
-		$.webshims.polyfill();
+		
 	</script>
 	<title>playing</title>
 	    <script>
-	    	$.webshims.ready('ready forms', function(){
-//				
+	    	$.webshims.ready('ready', function(){
+//				alert('f')
 			});
-			
+			$(document).one('formsReady', function(){
+				alert('bindReady')
+			})
+			$.webshims.debug = true;
+			$.webshims.loader.basePath += 'shims/';
+			$.webshims.polyfill();
 	    </script>
 </head>
 <script>

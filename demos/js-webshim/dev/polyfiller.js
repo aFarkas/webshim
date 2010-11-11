@@ -54,6 +54,7 @@
 			};
 			return function(names){
 				var noForce = arguments[1];
+				
 				if(!names){return;}
 				if(!$.isArray(names)){
 					names = [names];
@@ -198,6 +199,7 @@
 									callback(e, this);
 								}
 								isReady(name, true);
+								
 								script = null;
 							}
 						}

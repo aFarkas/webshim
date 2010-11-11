@@ -366,6 +366,9 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 	(function(){
 		if(!support.validity){return;}
 		
+		var typeModels = webshims.inputTypes;
+		var validityRules = {};
+		
 		webshims.addInputType = function(type, obj){
 			typeModels[type] = obj;
 		};
@@ -389,8 +392,6 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		
 		var overrideNativeMessages = webshims.overrideValidationMessages;	
 		var overrideValidity = (!support.requiredSelect || !support.inputUI || overrideNativeMessages);
-		var typeModels = webshims.inputTypes;
-		var validityRules = {};
 		var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 		var oldAttr = $.attr;
 		var oldVal = $.fn.val;
@@ -507,7 +508,6 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 				}
 			});
 						
-			
 			$.fn.val = function(val){
 				var ret = oldVal.apply(this, arguments);
 				this.each(function(){
@@ -528,7 +528,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 				doc.addEventListener('change', function(e){
 					testValidity(e.target);
 				}, true);
-				if (!supportNumericDate) {
+				if (!support.inputUI) {
 					doc.addEventListener('input', function(e){
 						testValidity(e.target);
 					}, true);
