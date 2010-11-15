@@ -4,15 +4,15 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>jQuery Test Suite</title>
 	
-	<link rel="stylesheet" href="qunit/qunit.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="qunit/qunit.css" media="screen">
 	
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>
 	
 	<script src="qunit/qunit.js"></script>
 	
 	<script src="../src/polyfiller.js"></script>
 	<script>
-		(function(){
+		(function($){
 			var hash = location.hash.replace('#', '');
 			if(hash.indexOf('noCapableBugfixes') !== -1){
 				window.noHTMLExtFixes = true; 
@@ -37,20 +37,23 @@
 					})
 				;
 			});
-		})();
+		})(jQuery);
 	</script>
 	<script>
-		(function(){
-			QUnit.reset = function(){
-				$("#main, #qunit-fixture").htmlWebshim( QUnit.config.fixture );
-			};
+		(function($){
+			$.webshims.ready('html5shiv', function(){
+				QUnit.reset = function(){
+					$("#main, #qunit-fixture").htmlWebshim( QUnit.config.fixture );
+				};
+			});
+			
 			
 			module("init");
 			asyncTest("init", function(){
 				$.webshims.ready('forms-ext json-storage ready', start);
 			});
 			
-		})();
+		})(jQuery);
 	</script>
 	
 	
@@ -62,11 +65,14 @@
 	<script src="unit/stepup-down.js"></script>
 	<script src="unit/storage.js"></script>
 	<script>
-//		$.webshims.debug = true;
-		$(window).load(function(){
-			$.webshims.loader.basePath += 'shims/';
-			$.webshims.polyfill();
-		});
+		jQuery.noConflict();
+		(function($){
+//			$.webshims.debug = true;
+			$(window).load(function(){
+				$.webshims.loader.basePath += 'shims/';
+				$.webshims.polyfill();
+			});
+		})(jQuery);
 	</script>
 	<style type="text/css">
 		html { border: 0; }

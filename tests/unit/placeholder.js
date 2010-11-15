@@ -1,3 +1,5 @@
+(function($){
+	
 //Todo test textarea + \n
 module("placeholder");
 var placeholder = {
@@ -66,3 +68,5 @@ asyncTest("placeholder Modul", function(){
 		start();
 	});
 });
+
+})(jQuery);

@@ -1,3 +1,6 @@
+(function($){
+	
+
 module("canvas + dynamic canvas");
 asyncTest("canvas + dynamic canvas", function(){
 	
@@ -32,3 +35,6 @@ asyncTest("canvas + dynamic canvas", function(){
 		start();
 	});
 });
+
+
+})(jQuery);

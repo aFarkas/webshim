@@ -1,4 +1,4 @@
-jQuery.webshims.ready('validation-base', function($, webshims){
+jQuery.webshims.ready('form-core', function($, webshims){
 	if( 'value' in document.createElement('output') ){return;}
 	var doc = document;	
 	
@@ -115,11 +115,11 @@ jQuery.webshims.ready('validation-base', function($, webshims){
 		}
 	});
 	
-	webshims.addReady(function(context){
-		$('output', context).each(function(){
+	webshims.addReady(function(context, contextElem){
+		$('output', context).add(contextElem.filter('output')).each(function(){
 			outputCreate(this);
 		});
 	});
 	
-	webshims.createReadyEvent('output');
+	webshims.createReadyEvent('form-output');
 }, true);

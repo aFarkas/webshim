@@ -4,25 +4,16 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>jQuery Test Suite</title>
 	
-	<link rel="stylesheet" href="qunit/qunit.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="qunit/qunit.css" media="screen">
 	
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 	
 	<script src="qunit/qunit.js"></script>
 	
 	<script src="../src/polyfiller.js"></script>
+	
 	<script>
-		(function(){
-			var _reset = QUnit.reset;
-			QUnit.reset = function(){
-				var ret = _reset.apply(this, arguments);
-				$.webshims.triggerDomUpdate($("#main, #qunit-fixture"));
-				return ret;
-			};
-		})();
-	</script>
-	<script>
-		(function(){
+		(function($){
 			var _reset = QUnit.reset;
 			QUnit.reset = function(){
 				var ret = _reset.apply(this, arguments);
@@ -35,15 +26,18 @@
 				$.webshims.ready('json-storage', start);
 			});
 			
-		})();
+		})(jQuery);
 	</script>
 	<script src="unit/persistence-storage.js"></script>
 	<script>
+		jQuery.noConflict();
+		(function($){
+			$(window).load(function(){
+				$.webshims.loader.basePath += 'shims/';
+				$.webshims.polyfill();
+			});
+		})(jQuery);
 		
-		$(window).load(function(){
-			$.webshims.loader.basePath += 'shims/';
-			$.webshims.polyfill();
-		});
 	</script>
 	<style type="text/css">
 		html { border: 0; }

@@ -1,3 +1,5 @@
+(function($){
+
 module("storage");
 
 
@@ -21,3 +23,5 @@ asyncTest("json-storage", function(){
 		start();
 	});
 });
+
+})(jQuery);

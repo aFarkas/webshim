@@ -1,11 +1,12 @@
-jQuery.webshims.ready('number-date-type', function($, webshims, window, document){
+/* number-date-ui */
+jQuery.webshims.ready('form-number-date', function($, webshims, window, document){
 	"use strict";
 		
 	var options = $.webshims.modules.inputUI.options;
 	var globalInvalidTimer;
 	var labelID = 0;
-	var replaceInputUI = function(context){
-		$('input', context).each(function(){
+	var replaceInputUI = function(context, elem){
+		$('input', context).add(elem.filter('input')).each(function(){
 			var type = $.attr(this, 'type');
 			if(replaceInputUI[type]  && !$.data(this, 'inputUIReplace')){
 				replaceInputUI[type]($(this));
@@ -59,7 +60,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 					marginRight: orig.css('marginRight'),
 					marginLeft: orig.css('marginLeft')
 				},
-				outerWidth: orig.getouterWidth(),
+				outerWidth: orig.outerWidth(),
 				label: (id) ? $('label[for='+ id +']', orig[0].form) : $([])
 			},
 			curLabelID =  webshims.getID(attr.label)
@@ -99,7 +100,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 			date.css(attr.css);
 			if(attr.outerWidth){
 				date.outerWidth(attr.outerWidth);
-				var width = date.getwidth() - 4;
+				var width = date.width() - 4;
 				datePicker
 					.css({marginLeft: 0, marginRight: 2})
 					.outerWidth(Math.floor(width * 0.6))
@@ -392,10 +393,10 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 		;
 	});
 	
-	webshims.addReady(function(context){
+	webshims.addReady(function(context, elem){
 		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(){
 			if($.datepicker || $.fn.slider){
-				replaceInputUI(context);
+				replaceInputUI(context, elem);
 			}
 			if($.datepicker && $.fn.slider){
 				$(document).unbind('jquery-uiReady.initinputui input-widgetsReady.initinputui');

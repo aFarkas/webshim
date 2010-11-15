@@ -1,3 +1,5 @@
+(function($){
+
 module("dynamic webshim / css load");
 asyncTest("dynamic webshim Modul", function(){
 	var testElem = $('<div />').appendTo('body');
@@ -28,3 +30,4 @@ asyncTest("dynamic webshim Modul", function(){
 	});
 });
 
+})(jQuery);

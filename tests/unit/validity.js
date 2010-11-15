@@ -1,3 +1,5 @@
+(function($){
+
 module("validity");
 
 
@@ -310,3 +312,6 @@ asyncTest('checkValidity/invalid event IV', function(){
 		setTimeout(start, 32);
 	});
 });
+
+
+})(jQuery);
