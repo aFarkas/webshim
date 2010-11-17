@@ -1,6 +1,8 @@
-jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
+
+jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	var support = $.support;
-	if(support.validity && !window.noHTMLExtFixes){return;}
+	
+	if(!support.validity || window.noHTMLExtFixes){return;}
 	
 	
 	var advancedForm = ( 'value' in doc.createElement('output') && 'list' in doc.createElement('input') ),
@@ -63,10 +65,9 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				e.stopImmediatePropagation();
 			}
 		})
-		.bind('lastinvalid', function(e){
-			console.log(arguments);
-			var firstTarget = e.invalidlist[0];
-			if( !advancedForm && document.activeElement && ffirstTarget !== document.activeElement && !$.data(firstTarget, 'maybePreventedinvalid') ){
+		.bind('lastinvalid', function(e, data){
+			var firstTarget = data.invalidlist[0];
+			if( firstTarget && !advancedForm && document.activeElement && firstTarget !== document.activeElement && !$.data(firstTarget, 'maybePreventedinvalid') ){
 				webshims.validityAlert.showFor(firstTarget);
 			}
 			invalids = [];

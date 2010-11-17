@@ -1,5 +1,6 @@
-jQuery.webshims.ready('form-message form-core', function($, webshims, window, document, undefined){
+jQuery.webshims.ready('form-message form-core', function($, webshims, window, doc, undefined){
 	"use strict";
+	var support = $.support;
 	if(!support.validity){return;}
 		
 	var typeModels = webshims.inputTypes;

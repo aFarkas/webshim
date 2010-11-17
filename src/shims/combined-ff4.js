@@ -55,6 +55,16 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc){
 		};
 	})();
 	
+	
+	var setRoot = function(){
+		webshims.scrollRoot = ($.browser.webkit || doc.compatMode == 'BackCompat') ?
+			$(doc.body) : 
+			$(doc.documentElement)
+		;
+	};
+	setRoot();
+	$(setRoot);
+	
 	/* some extra validation UI */
 	webshims.validityAlert = (function(){
 		var alertElem = (!$.browser.msie || parseInt($.browser.version, 10) > 7) ? 'span' : 'label';
@@ -73,14 +83,35 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc){
 					hideTimer = setTimeout(boundHide, this.hideDelay);
 				}
 				if(!hideOnBlur){
-					var focusElem = $('input, select, textarea, .ui-slider-handle', visual).filter(':visible:first');
-					if(!focusElem[0]){
-						focusElem = visual;
-					}
-					alert.attr('for', webshims.getID(focusElem));
-					focusElem.focus();
-					$(doc).bind('focusout.validityalert', boundHide);
+					this.setFocus(visual, elem[0]);
 				}
+			},
+			setFocus: function(visual, elem){
+				var focusElem = $('input, select, textarea, .ui-slider-handle', visual).filter(':visible:first');
+				if(!focusElem[0]){
+					focusElem = visual;
+				}
+				var scrollTop = webshims.scrollRoot.scrollTop();
+				var elemTop = focusElem.offset().top;
+				var labelOff;
+				
+				alert.attr('for', webshims.getID(focusElem));
+				if(scrollTop > elemTop){
+					labelOff = elem.id && $('label[for='+elem.id+']', elem.form).offset();
+					if(labelOff && labelOff.top < elemTop){
+						elemTop = labelOff.top;
+					}
+					webshims.scrollRoot.animate(
+						{scrollTop: elemTop - 5}, 
+						{
+							queue: false, 
+							duration: Math.max( Math.min( 450, (scrollTop - elemTop) * 2 ), 140 )
+						}
+					);
+				}
+				focusElem.focus();
+				webshims.scrollRoot.scrollTop(scrollTop);
+				$(doc).bind('focusout.validityalert', boundHide);
 			},
 			getMessage: function(elem, message){
 				$('> span', alert).text(message || elem.attr('validationMessage'));
@@ -122,7 +153,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc){
 	})();
 	
 	
-	/* ugly workaround/bugfixes */
+	/* extension, but also used to fix native implementation workaround/bugfixes */
 	(function(){
 		var firstEvent,
 			invalids = [],
@@ -140,7 +171,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc){
 			if( firstEvent && firstEvent.isDefaultPrevented() ){
 				e.preventDefault();
 			}
-			
+			invalids.push(e.target);
 			e.extraData = 'fix'; 
 			clearTimeout(stopSubmitTimer);
 			stopSubmitTimer = setTimeout(function(){
@@ -294,8 +325,9 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 			}
 		});
 	});
-}, true);jQuery.webshims.ready('form-message form-core', function($, webshims, window, document, undefined){
+}, true);jQuery.webshims.ready('form-message form-core', function($, webshims, window, doc, undefined){
 	"use strict";
+	var support = $.support;
 	if(!support.validity){return;}
 		
 	var typeModels = webshims.inputTypes;
