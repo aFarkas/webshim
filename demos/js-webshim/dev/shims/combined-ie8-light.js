@@ -736,12 +736,15 @@ if (!String.prototype.trim) {
 	})();
 })(jQuery);
 /* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
-jQuery.webshims.ready('es5', function($, webshims, window, doc){
+jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	"use strict";
 	
 	var support = $.support;
 	var fixNative = false;
-	var undefined;
+	var getVisual = function(elem){
+		elem = $(elem);
+		return (elem.data('inputUIReplace') || {visual: elem}).visual;
+	};
 	if(support.validity){
 		fixNative = !window.noHTMLExtFixes;
 	}
@@ -759,6 +762,46 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc){
 			return $.attr(elem, 'willValidate');
 		}
 	});
+	
+	//CSS selectors for all browsers
+	//ToDo add checkbox/radiobutton handling
+	var oldAttr = $.attr;
+	var changeVals = {selectedIndex: 1, value: 1, checked: 1, disabled: 1, readonly: 1};
+	var stopUIRefresh;
+	$.attr = function(elem, name, val){
+		if(elem.form && changeVals[name] && val !== undefined && $(elem).hasClass('form-ui-invalid')){
+			var ret = oldAttr.apply(this, arguments);
+			if($.expr.filters.valid(elem)){
+				getVisual(elem).removeClass('form-ui-invalid');
+			}
+			return ret;
+		}
+		return oldAttr.apply(this, arguments);
+	};
+	$(document).bind('focusout change refreshValidityStyle', function(e){
+		if(stopUIRefresh || !e.target || !e.target.form){return;}
+		
+		var elem = $.attr(e.target, 'html5element') || e.target;
+		if(!$.attr(elem, 'willValidate')){
+			getVisual(elem).removeClass('form-ui-invalid form-ui-valid');
+			return;
+		}
+		var addClass, removeClass;
+		if($.expr.filters.valid(e.target)){
+			addClass = 'form-ui-valid';
+			removeClass = 'form-ui-invalid';
+		} else {
+			addClass = 'form-ui-invalid';
+			removeClass = 'form-ui-valid';
+		}
+		getVisual(elem).addClass(addClass).removeClass(removeClass);
+		stopUIRefresh = true;
+		setTimeout(function(){
+			stopUIRefresh = false;
+		}, 9);
+	});
+	
+	
 	
 	webshims.triggerInlineForm = (function(){
 		var stringify = function(id){
@@ -809,7 +852,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc){
 			hideDelay: 5000,
 			showFor: function(elem, message, hideOnBlur){
 				elem = $(elem);
-				var visual = (elem.data('inputUIReplace') || {visual: elem}).visual;
+				var visual = getVisual(elem);
 				createAlert();
 				api.clear();
 				this.getMessage(elem, message);
@@ -899,11 +942,13 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc){
 		;
 		
 		$(doc).bind('invalid', function(e){
+			var jElm = $(e.target).addClass('form-ui-invalid').removeClass('form-ui-valid');
 			if(!firstEvent){
 				//trigger firstinvalid
 				firstEvent = $.Event('firstinvalid');
-				$(e.target).trigger(firstEvent);
+				jElm.trigger(firstEvent);
 			}
+			
 			//if firstinvalid was prevented all invalids will be also prevented
 			if( firstEvent && firstEvent.isDefaultPrevented() ){
 				e.preventDefault();
@@ -918,7 +963,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc){
 				invalids = [];
 				//remove webkit/operafix
 				$(form).unbind('submit.preventInvalidSubmit');
-				$(e.target).trigger(lastEvent, lastEvent);
+				jElm.trigger(lastEvent, lastEvent);
 			}, 9);
 			
 		});

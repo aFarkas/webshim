@@ -14,15 +14,29 @@
 			border: 1px solid #000;
 			margin: 5px 0;
 		}
+		.form-ui-invalid {
+			border-color: #800;
+		}
+		.form-ui-valid {
+			border-color: #080;
+		}
+		span.form-ui-invalid {
+			-moz-box-shadow: 1px 1px 1px #800;
+			box-shadow: 1px 1px 1px #800;
+		}
+		span.form-ui-valid {
+			-moz-box-shadow: 1px 1px 1px #080;
+			box-shadow: 1px 1px 1px #080;
+		}
 		
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/mousepress.js"></script>
-	<script src="../js-webshim/minified/polyfiller.js"></script>
+	<script src="../../src/polyfiller.js"></script>
 	
     <script class="example">
-		
+		$.webshims.debug = true;
 		//path is path of polyfiller.js + shims/
     	$.webshims.loader.basePath += 'shims/';
 		//$.webshims.debug = true;
@@ -66,13 +80,14 @@
 					<li><strong>properties/IDLs</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-willvalidate">willValidate</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validity">validity</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validationmessage">validationMessage</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasnumber">valueAsNumber</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasdate">valueAsDate</a></li>
 					<li><strong>methods</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-setcustomvalidity">setCustomValidity</a>, <a href="http://www.w3.org/TR/html5/forms.html#dom-form-checkvalidity">checkValidity</a></li>
 					<li><strong>events</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#constraint-validation">invalid</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#event-input-input">input</a></li>
-					<li><strong>selectors</strong>: :invalid, :valid (not for CSS)</li>
+					<li><strong>selectors</strong>: :invalid, :valid (not for CSS, for CSS see abstraction: form-ui-invalid)</li>
 				</ul>
 				
 				<h3>Extensions/Abstractions to the standard</h3>
 				<ul>
 					<li><strong>event: firstinvalid</strong>: <code>firstinvalid</code> is a simple, bubbling event, wich is triggered on the first invalid form element. Preventing the default of firstinvalid will automatically prevent the default behavior of all current invalid elements.</li>
 					<li><strong>event: lastinvalid</strong>: <code>lastinvalid</code> is an extended, bubbling, (but) uncancelable event, wich is triggered on the last invalid form element. The property <code>invalidlist</code> is a jQuery-collection of all current invalid elements.</li>
+					<li><strong>selectors: .form-ui-valid/.form-ui-invalid</strong>: wich work similiar to -moz-ui-valid/-moz-ui-invalid</li>
 					<li><strong>property: customValidationMessage</strong>: very similiar to the standard validationMessage, but always uses built-in custom validation messages, wich can be better controlled. <strong>Note: You have to either set $.webshims.implement.customValidationMessage to true or $.webshims.overrideValidationMessages to true, before calling the <code>polyfill</code> method, to get this new property.</strong></li>
 					<li><strong>helper: $.webshims.validityAlert.showFor</strong>: takes a DOM-Object/Selector/jQuery-Object and shows the invalid message for this element. (simply look into the prototype i.e. <code>console.log($.webshims.validityAlert)</code> to make changes)</li>
 				</ul>
