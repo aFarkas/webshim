@@ -3717,7 +3717,14 @@ var Storage = function (type) {
 	
 	function getData() {
 		var data = type == 'session' ? winData.name : readCookie('localStorage');
-		return data ? JSON.parse(data) : {};
+		if(data){
+			try {
+				data = JSON.parse(data);
+			} catch(e){
+				data = {};
+			}
+		}
+		return data || {};
 	}
 	
 	
