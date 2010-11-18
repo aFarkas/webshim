@@ -72,13 +72,15 @@
 	})();
 })(jQuery);
 /* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
-jQuery.webshims.ready('es5', function($, webshims, window){
+jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	"use strict";
-	var validityMessages = webshims.validityMessages;
+	
 	var support = $.support;
 	var fixNative = false;
-	var doc = document;
-	var undefined;
+	var getVisual = function(elem){
+		elem = $(elem);
+		return (elem.data('inputUIReplace') || {visual: elem}).visual;
+	};
 	if(support.validity){
 		fixNative = !window.noHTMLExtFixes;
 	}
@@ -96,6 +98,46 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			return $.attr(elem, 'willValidate');
 		}
 	});
+	
+	//CSS selectors for all browsers
+	//ToDo add checkbox/radiobutton handling
+	var oldAttr = $.attr;
+	var changeVals = {selectedIndex: 1, value: 1, checked: 1, disabled: 1, readonly: 1};
+	var stopUIRefresh;
+	$.attr = function(elem, name, val){
+		if(elem.form && changeVals[name] && val !== undefined && $(elem).hasClass('form-ui-invalid')){
+			var ret = oldAttr.apply(this, arguments);
+			if($.expr.filters.valid(elem)){
+				getVisual(elem).removeClass('form-ui-invalid');
+			}
+			return ret;
+		}
+		return oldAttr.apply(this, arguments);
+	};
+	$(document).bind('focusout change refreshValidityStyle', function(e){
+		if(stopUIRefresh || !e.target || !e.target.form){return;}
+		
+		var elem = $.attr(e.target, 'html5element') || e.target;
+		if(!$.attr(elem, 'willValidate')){
+			getVisual(elem).removeClass('form-ui-invalid form-ui-valid');
+			return;
+		}
+		var addClass, removeClass;
+		if($.expr.filters.valid(e.target)){
+			addClass = 'form-ui-valid';
+			removeClass = 'form-ui-invalid';
+		} else {
+			addClass = 'form-ui-invalid';
+			removeClass = 'form-ui-valid';
+		}
+		getVisual(elem).addClass(addClass).removeClass(removeClass);
+		stopUIRefresh = true;
+		setTimeout(function(){
+			stopUIRefresh = false;
+		}, 9);
+	});
+	
+	
 	
 	webshims.triggerInlineForm = (function(){
 		var stringify = function(id){
@@ -129,6 +171,16 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		};
 	})();
 	
+	
+	var setRoot = function(){
+		webshims.scrollRoot = ($.browser.webkit || doc.compatMode == 'BackCompat') ?
+			$(doc.body) : 
+			$(doc.documentElement)
+		;
+	};
+	setRoot();
+	$(setRoot);
+	
 	/* some extra validation UI */
 	webshims.validityAlert = (function(){
 		var alertElem = (!$.browser.msie || parseInt($.browser.version, 10) > 7) ? 'span' : 'label';
@@ -136,7 +188,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			hideDelay: 5000,
 			showFor: function(elem, message, hideOnBlur){
 				elem = $(elem);
-				var visual = (elem.data('inputUIReplace') || {visual: elem}).visual;
+				var visual = getVisual(elem);
 				createAlert();
 				api.clear();
 				this.getMessage(elem, message);
@@ -147,14 +199,35 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 					hideTimer = setTimeout(boundHide, this.hideDelay);
 				}
 				if(!hideOnBlur){
-					var focusElem = $('input, select, textarea, .ui-slider-handle', visual).filter(':visible:first');
-					if(!focusElem[0]){
-						focusElem = visual;
-					}
-					alert.attr('for', webshims.getID(focusElem));
-					focusElem.focus();
-					$(doc).bind('focusout.validityalert', boundHide);
+					this.setFocus(visual, elem[0]);
 				}
+			},
+			setFocus: function(visual, elem){
+				var focusElem = $('input, select, textarea, .ui-slider-handle', visual).filter(':visible:first');
+				if(!focusElem[0]){
+					focusElem = visual;
+				}
+				var scrollTop = webshims.scrollRoot.scrollTop();
+				var elemTop = focusElem.offset().top;
+				var labelOff;
+				
+				alert.attr('for', webshims.getID(focusElem));
+				if(scrollTop > elemTop){
+					labelOff = elem.id && $('label[for='+elem.id+']', elem.form).offset();
+					if(labelOff && labelOff.top < elemTop){
+						elemTop = labelOff.top;
+					}
+					webshims.scrollRoot.animate(
+						{scrollTop: elemTop - 5}, 
+						{
+							queue: false, 
+							duration: Math.max( Math.min( 450, (scrollTop - elemTop) * 2 ), 140 )
+						}
+					);
+				}
+				focusElem.focus();
+				webshims.scrollRoot.scrollTop(scrollTop);
+				$(doc).bind('focusout.validityalert', boundHide);
 			},
 			getMessage: function(elem, message){
 				$('> span', alert).text(message || elem.attr('validationMessage'));
@@ -195,7 +268,82 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		return api;
 	})();
 	
-	/* implements validationMessage and customValidationMessage */
+	
+	/* extension, but also used to fix native implementation workaround/bugfixes */
+	(function(){
+		var firstEvent,
+			invalids = [],
+			stopSubmitTimer,
+			form
+		;
+		
+		$(doc).bind('invalid', function(e){
+			var jElm = $(e.target).addClass('form-ui-invalid').removeClass('form-ui-valid');
+			if(!firstEvent){
+				//trigger firstinvalid
+				firstEvent = $.Event('firstinvalid');
+				jElm.trigger(firstEvent);
+			}
+			
+			//if firstinvalid was prevented all invalids will be also prevented
+			if( firstEvent && firstEvent.isDefaultPrevented() ){
+				e.preventDefault();
+			}
+			invalids.push(e.target);
+			e.extraData = 'fix'; 
+			clearTimeout(stopSubmitTimer);
+			stopSubmitTimer = setTimeout(function(){
+				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
+				//reset firstinvalid
+				firstEvent = false;
+				invalids = [];
+				//remove webkit/operafix
+				$(form).unbind('submit.preventInvalidSubmit');
+				jElm.trigger(lastEvent, lastEvent);
+			}, 9);
+			
+		});
+	})();
+	
+	(function(){
+		if(!fixNative || support.fieldsetValidation){return;}
+		//safari 5.0.2 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
+		var checkValidity = function(elem){
+			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
+			if(!valid && elem.checkValidity()){
+				$(elem).trigger('invalid');
+			}			
+			return valid;
+		};
+		
+		//no current browser supports checkValidity on fieldset
+		webshims.addMethod('checkValidity', function(){
+			if(this.elements || $.nodeName(this, 'fieldset')){
+				var ret = true;
+				$(this.elements || 'input, textarea, select', this)
+					.each(function(){
+						 if(!checkValidity(this)){
+							ret = false;
+						}
+					})
+				;
+				return ret;
+			} else if(this.checkValidity){
+				return checkValidity(this);
+			}
+		});
+	})();
+	
+	
+	webshims.createReadyEvent('form-core');
+}, true);
+
+
+
+jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined){
+	"use strict";
+	var validityMessages = webshims.validityMessages;
+	var support = $.support;
 	
 	validityMessages['en'] = validityMessages['en'] || validityMessages['en-US'] || {
 		typeMismatch: {
@@ -240,7 +388,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 	
 	var currentValidationMessage =  validityMessages[''];
 	$(doc).bind('htmlExtLangChange', function(){
-		webshims.activeLang(validityMessages, 'validation-base', function(langObj){
+		webshims.activeLang(validityMessages, 'form-message', function(langObj){
 			currentValidationMessage = langObj;
 		});
 	});
@@ -262,7 +410,13 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 		}
 		return message || '';
 	};
-	$.each((support.validationMessage) ? ['customValidationMessage'] : ['customValidationMessage', 'validationMessage'], function(i, fn){
+	
+	var implementProperties = (webshims.overrideValidationMessages || webshims.implement.customValidationMessage) ? ['customValidationMessage'] : [];
+	if(!support.validationMessage){
+		implementProperties.push('validationMessage');
+	}
+	
+	$.each(implementProperties, function(i, fn){
 		webshims.attr(fn, {
 			elementNames: ['input', 'select', 'textarea'],
 			getter: function(elem){
@@ -289,339 +443,7 @@ jQuery.webshims.ready('es5', function($, webshims, window){
 			}
 		});
 	});
-	
-	
-	/* ugly workaround/bugfixes */
-	(function(){
-		var firstEvent,
-			invalids = [],
-			advancedForm = ( 'value' in doc.createElement('output') && 'list' in doc.createElement('input') ),
-			stopSubmitTimer,
-			form
-		;
-		
-		
-		//opera/chrome fix (this will double all invalid events, we have to stop them!)
-		//opera throws a submit-event and then the invalid events,
-		//chrome7/safari5.02 has disabled invalid events, this brings them back
-		//safari 5.02 reports false invalid events, if setCustomValidity was used
-		if(fixNative && window.addEventListener){
-			var formnovalidate = {
-				timer: undefined,
-				prevented: false
-			};
-			window.addEventListener('submit', function(e){
-				if(!formnovalidate.prevented && e.target.checkValidity && $.attr(e.target, 'novalidate') == null){
-					$(e.target).checkValidity();
-				}
-			}, true);
-			var preventValidityTest = function(e){
-				if($.attr(e.target, 'formnovalidate') == null){return;}
-				if(formnovalidate.timer){
-					clearTimeout(formnovalidate.timer);
-				}
-				formnovalidate.prevented = true;
-				formnovalidate.timer = setTimeout(function(){
-					formnovalidate.prevented = false;
-				}, 20);
-			};
-			window.addEventListener('click', preventValidityTest, true);
-			window.addEventListener('touchstart', preventValidityTest, true);
-			window.addEventListener('touchend', preventValidityTest, true);
-		}
-		$(doc).bind('invalid', function(e){
-			//safari 5.0.2 has some serious issues
-			if(fixNative && $.attr(e.target, 'validity').valid){
-				e.stopImmediatePropagation();
-				return false;
-			}
-			if(!firstEvent){
-				//webkitfix 
-				//chrome 6/safari5.0 submits an invalid form, if you prevent all invalid events
-				//this also prevents opera from throwing a submit event if form isn't valid
-				form = e.target.form;
-				if (form && fixNative){
-					
-					var submitEvents = $(form)
-						.bind('submit.preventInvalidSubmit', function(submitEvent){
-							if( $.attr(form, 'novalidate') == null ){
-								submitEvent.stopImmediatePropagation();
-								return false;
-							}
-						})
-						.data('events').submit
-					;
-					//add this handler as first executing handler
-					if (submitEvents && submitEvents.length > 1) {
-						submitEvents.unshift(submitEvents.pop());
-					}
-				}
-				
-				//trigger firstinvalid
-				firstEvent = $.Event('firstinvalid');
-				$(e.target).trigger(firstEvent);
-			}
-			//if firstinvalid was prevented all invalids will be also prevented
-			if( firstEvent && firstEvent.isDefaultPrevented() ){
-				e.preventDefault();
-			}
-			
-			//prevent doubble invalids + fix safari bug, where checkValdity returns false
-			if(!support.validity || invalids.indexOf(e.target) == -1){
-				invalids.push(e.target);
-			} else if(fixNative) {
-				e.stopImmediatePropagation();
-			}
-			e.extraData = 'fix'; 
-			clearTimeout(stopSubmitTimer);
-			stopSubmitTimer = setTimeout(function(){
-				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
-				//bad assumption
-				if( fixNative && !advancedForm && doc.activeElement && firstEvent && firstEvent.target !== doc.activeElement && !$.data(firstEvent.target, 'maybePreventedinvalid') ){
-					webshims.validityAlert.showFor(firstEvent.target);
-				}
-				//reset firstinvalid
-				firstEvent = false;
-				invalids = [];
-				//remove webkit/operafix
-				$(form).unbind('submit.preventInvalidSubmit');
-				$(e.target).trigger(lastEvent, lastEvent);
-			}, 9);
-			
-		});
-	})();
-	
-	(function(){
-		if(!fixNative || support.fieldsetValidation){return;}
-		//safari 5.0.2 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
-		var checkValidity = function(elem){
-			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
-			if(!valid && elem.checkValidity()){
-				$(elem).trigger('invalid');
-			}			
-			return valid;
-		};
-		
-		//no current browser supports checkValidity on fieldset
-		webshims.addMethod('checkValidity', function(){
-			if(this.elements || $.nodeName(this, 'fieldset')){
-				var ret = true;
-				$(this.elements || 'input, textarea, select', this)
-					.each(function(){
-						 if(!checkValidity(this)){
-							ret = false;
-						}
-					})
-				;
-				return ret;
-			} else if(this.checkValidity){
-				return checkValidity(this);
-			}
-		});
-	})();
-	
-	//adds unknown types/attributes in capable browsers/overrides validationMessage in capable browsers
-	(function(){
-		if(!support.validity){return;}
-		
-		var typeModels = webshims.inputTypes;
-		var validityRules = {};
-		
-		webshims.addInputType = function(type, obj){
-			typeModels[type] = obj;
-		};
-		
-		webshims.addValidityRule = function(type, fn){
-			validityRules[type] = fn;
-		};
-		
-		webshims.addValidityRule('typeMismatch',function (input, val, cache, validityState){
-			if(val === ''){return false;}
-			var ret = validityState.typeMismatch;
-			if(!('type' in cache)){
-				cache.type = (input[0].getAttribute('type') || '').toLowerCase();
-			}
-			
-			if(typeModels[cache.type] && typeModels[cache.type].mismatch){
-				ret = typeModels[cache.type].mismatch(val, input);
-			}
-			return ret;
-		});
-		
-		var overrideNativeMessages = webshims.overrideValidationMessages;	
-		var overrideValidity = (!support.requiredSelect || !support.inputUI || overrideNativeMessages);
-		var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
-		var oldAttr = $.attr;
-		var oldVal = $.fn.val;
-		var validityChanger = (overrideNativeMessages)? {value: 1, checked: 1} : {value: 1};
-		var validityElements = (overrideNativeMessages) ? ['textarea'] : [];
-		var checkTypes = {radio:1,checkbox:1};
-		var testValidity = function(elem, init){
-			if(!elem.form){return;}
-			var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
-			
-			if(!overrideNativeMessages){
-				if(!(!support.requiredSelect && type == 'select-one') && !typeModels[type]){return;}
-			}
-			
-			if(overrideNativeMessages && !init && checkTypes[type] && elem.name){
-				$(doc.getElementsByName( elem.name )).each(function(){
-					$.attr(this, 'validity');
-				});
-			} else {
-				$.attr(elem, 'validity');
-				
-			}
-		};
-		
-		webshims.addMethod('setCustomValidity', function(error){
-			error = error+'';
-			if(this.setCustomValidity){
-				this.setCustomValidity(error);
-				if(overrideValidity){
-					$.data(this, 'hasCustomError', !!(error));
-					testValidity(this);
-				}
-			} else {
-				$.data(this, 'customvalidationMessage', error);
-			}
-		});
-		
-		
-		if(!support.requiredSelect || overrideNativeMessages){
-			$.extend(validityChanger, {
-				required: 1,
-				size: 1,
-				multiple: 1,
-				selectedIndex: 1
-			});
-			validityElements.push('select');
-		}
-		if(!support.inputUI || overrideNativeMessages){
-			$.extend(validityChanger, {
-				min: 1, max: 1, step: 1
-			});
-			validityElements.push('input');
-		}
-				
-		if(!support.requiredSelect){
-			webshims.createBooleanAttrs('required', ['select']);
-			
-			webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){
-				
-				if(cache.nodeName == 'select' && !val && jElm.attr('required') && jElm[0].size < 2){
-					if(!cache.type){
-						cache.type = jElm[0].type;
-					}
-					
-					if(cache.type == 'select-one' && $('> option:first-child:not(:disabled)', jElm).attr('selected')){
-						return true;
-					}
-				}
-				return validityState.valueMissing;
-			});
-		}
-		
-		if(overrideValidity){
-			webshims.attr('validity', {
-				elementNames: validityElements,
-				getter: function(elem){
-					var validity 	= elem.validity;
-					if(!validity){
-						return validity;
-					}
-					var validityState = {};
-					validityProps.forEach(function(prop){
-						validityState[prop] = validity[prop];
-					});
-					
-					if( !$.attr(elem, 'willValidate') ){
-						return validityState;
-					}
-					var jElm 			= $(elem),
-						cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
-						val				= oldVal.call(jElm),
-						customError 	= !!($.data(elem, 'hasCustomError')),
-						setCustomMessage
-					;
-					
-					validityState.customError = customError;
-										
-					if( validityState.valid && validityState.customError ){
-						validityState.valid = false;
-					} else if(!validityState.valid) {
-						var allFalse = true;
-						$.each(validityState, function(name, prop){
-							if(prop){
-								allFalse = false;
-								return false;
-							}
-						});
-						
-						if(allFalse){
-							validityState.valid = true;
-						}
-						
-					}
-					
-					$.each(validityRules, function(rule, fn){
-						validityState[rule] = fn(jElm, val, cache, validityState);
-						if( validityState[rule] && (validityState.valid || (!setCustomMessage && overrideNativeMessages)) ) {
-							elem.setCustomValidity(webshims.createValidationMessage(elem, rule));
-							validityState.valid = false;
-							setCustomMessage = true;
-						}
-					});
-					if(validityState.valid){
-						elem.setCustomValidity('');
-					}
-					return validityState;
-				}
-			});
-						
-			$.fn.val = function(val){
-				var ret = oldVal.apply(this, arguments);
-				this.each(function(){
-					testValidity(this);
-				});
-				return ret;
-			};
-			
-			$.attr = function(elem, prop, value){
-				var ret = oldAttr.apply(this, arguments);
-				if(validityChanger[prop] && value !== undefined && elem.form){
-					testValidity(elem);
-				}
-				return ret;
-			};
-			
-			if(doc.addEventListener){
-				doc.addEventListener('change', function(e){
-					testValidity(e.target);
-				}, true);
-				if (!support.inputUI) {
-					doc.addEventListener('input', function(e){
-						testValidity(e.target);
-					}, true);
-				}
-			}
-						
-			webshims.addReady(function(context){
-				$(validityElements.join(','), context).each(function(){
-					testValidity(this, true);
-				});
-			});
-			
-		} //end: overrideValidity -> (!supportRequiredSelect || !supportNumericDate || overrideNativeMessages)
-		
-	})();
-	
-	webshims.createReadyEvent('validation-base');
-}, true);
-
-
-
-jQuery.webshims.ready('validation-base', function($, webshims, window){
+}, true);jQuery.webshims.ready('form-core', function($, webshims, window){
 if($.support.validity){
 	return;
 }
@@ -894,9 +716,10 @@ $(document).bind('click', function(e){
 	}
 });
 
-webshims.addReady(function(context){
+webshims.addReady(function(context, contextElem){
 	//start constrain-validation
 	var form = $('form', context)
+		.add(contextElem.filter('form'))
 		.bind('invalid', $.noop)
 		.find('button[formnovalidate]')
 		.bind('click', noValidate)
@@ -907,704 +730,569 @@ webshims.addReady(function(context){
 	}
 });
 
-webshims.createReadyEvent('validity');
+webshims.createReadyEvent('form-extend');
 
 }, true); //webshims.ready end
 
 
 
-jQuery.webshims.ready('validation-base', function($, webshims){
-	if( 'value' in document.createElement('output') ){return;}
-	var doc = document;	
-	
-	(function(){
-		var elements = {
-				input: 1,
-				textarea: 1
-			},
-			noInputTypes = {
-				radio: 1,
-				checkbox: 1,
-				submit: 1,
-				button: 1,
-				image: 1,
-				reset: 1
-				
-				//pro forma
-				,color: 1
-				//,range: 1
-			},
-			observe = function(input){
-				var timer,
-					lastVal = input.attr('value'),
-					trigger = function(e){
-						//input === null
-						if(!input){return;}
-						var newVal = input.attr('value');
-						
-						if(newVal !== lastVal){
-							lastVal = newVal;
-							if(!e || e.type != 'input'){
-								webshims.triggerInlineForm(input[0], 'input');
-							}
-						}
-					},
-					unbind = function(){
-						input.unbind('focusout', unbind).unbind('input', trigger);
-						clearInterval(timer);
-						trigger();
-						input = null;
-					}
-				;
-				
-				clearInterval(timer);
-				timer = setInterval(trigger, ($.browser.mozilla) ? 250 : 111);
-				setTimeout(trigger, 9);
-				input.bind('focusout', unbind).bind('input', trigger);
-			}
-		;
-			
-		
-		$(doc)
-			.bind('focusin', function(e){
-				if( e.target && e.target.type && !e.target.readonly && !e.target.readOnly && !e.target.disabled && elements[(e.target.nodeName || '').toLowerCase()] && !noInputTypes[e.target.type] ){
-					observe($(e.target));
-				}
-			})
-		;
-	})();
-	
-	
-	
-	var outputCreate = function(elem){
-		if(elem.getAttribute('aria-live')){return;}
-		elem = $(elem);
-		var value = (elem.text() || '').trim();
-		var	id 	= elem.attr('id');
-		var	htmlFor = elem.attr('for');
-		var shim = $('<input class="output-shim" type="hidden" name="'+ (elem.attr('name') || '')+'" value="'+value+'" style="display: none" />').insertAfter(elem);
-		var form = shim[0].form || doc;
-		var setValue = function(val){
-			shim[0].value = val;
-			val = shim[0].value;
-			elem.text(val);
-			elem[0].value = val;
-		};
-		
-		elem[0].defaultValue = value;
-		elem[0].value = value;
-		
-		elem.attr({'aria-live': 'polite'});
-		if(id){
-			shim.attr('id', id);
-			elem.attr('aria-labeldby', webshims.getID($('label[for='+id+']', form)));
-		}
-		if(htmlFor){
-			id = webshims.getID(elem);
-			htmlFor.split(' ').forEach(function(control){
-				control = form.getElementById(control);
-				if(control){
-					control.setAttribute('aria-controls', id);
-				}
-			});
-		}
-		elem.data('outputShim', setValue );
-		shim.data('outputShim', setValue );
-		return setValue;
-	};
-	
-
-	webshims.attr('value', {
-		elementNames: ['output', 'input'],
-		getter: true,
-		setter: function(elem, value, oldFn){
-			var setVal = $.data(elem, 'outputShim');
-			if(!setVal){
-				if($.nodeName(elem, 'output')){
-					setVal = outputCreate(elem);
-				} else {
-					return oldFn();
-				}
-			}
-			setVal(value);
-		}
-	});
-	
-	webshims.addReady(function(context){
-		$('output', context).each(function(){
-			outputCreate(this);
-		});
-	});
-	
-	webshims.createReadyEvent('output');
-}, true);(function($){
+jQuery.webshims.ready('form-extend', function($, webshims, window){
 	"use strict";
-	var isImplemented;
 	
-	var implementTypes = function($, webshims, window){
-		if(isImplemented){return;}
-		isImplemented = true;
-		
-		var nan = parseInt('NaN', 10),
-			doc = document,
-			typeModels = webshims.inputTypes,
-			isNumber = function(string){
-				
-				return (typeof string == 'number' || (string && string == string * 1));
-			},
-			supportsType = function(type){
-				return ($('<input type="'+type+'" />').attr('type') === type);
-			},
-			getType = function(elem){
-				return (elem.getAttribute('type') || '').toLowerCase();
-			},
-			isDateTimePart = function(string){
-				return (isNumber(string) || (string && string == '0' + (string * 1)));
-			},
-			//why no step IDL?
-			getStep = function(elem, type){
-				var step = $.attr(elem, 'step');
-				if(step === 'any'){
-					return step;
+	var nan = parseInt('NaN', 10),
+		doc = document,
+		typeModels = webshims.inputTypes,
+		isNumber = function(string){
+			return (typeof string == 'number' || (string && string == string * 1));
+		},
+		supportsType = function(type){
+			return ($('<input type="'+type+'" />').attr('type') === type);
+		},
+		getType = function(elem){
+			return (elem.getAttribute('type') || '').toLowerCase();
+		},
+		isDateTimePart = function(string){
+			return (isNumber(string) || (string && string == '0' + (string * 1)));
+		},
+		//why no step IDL?
+		getStep = function(elem, type){
+			var step = $.attr(elem, 'step');
+			if(step === 'any'){
+				return step;
+			}
+			type = type || getType(elem);
+			if(!typeModels[type] || !typeModels[type].step){
+				return step;
+			}
+			step = typeModels.number.asNumber(step);
+			return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
+		},
+		//why no min/max IDL?
+		addMinMaxNumberToCache = function(attr, elem, cache){
+			if (!(attr+'AsNumber' in cache)) {
+				cache[attr+'AsNumber'] = typeModels[cache.type].asNumber(elem.attr(attr));
+				if(isNaN(cache[attr+'AsNumber']) && (attr+'Default' in typeModels[cache.type])){
+					cache[attr+'AsNumber'] = typeModels[cache.type][attr+'Default'];
 				}
-				type = type || getType(elem);
-				if(!typeModels[type] || !typeModels[type].step){
-					return step;
-				}
-				step = typeModels.number.asNumber(step);
-				return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
-			},
-			//why no min/max IDL?
-			addMinMaxNumberToCache = function(attr, elem, cache){
-				if (!(attr+'AsNumber' in cache)) {
-					cache[attr+'AsNumber'] = typeModels[cache.type].asNumber(elem.attr(attr));
-					if(isNaN(cache[attr+'AsNumber']) && (attr+'Default' in typeModels[cache.type])){
-						cache[attr+'AsNumber'] = typeModels[cache.type][attr+'Default'];
-					}
-				}
-			},
-			addleadingZero = function(val, len){
-				val = ''+val;
-				len = len - val.length;
-				for(var i = 0; i < len; i++){
-					val = '0'+val;
-				}
-				return val;
-			},
-			EPS = 1e-7
-		;
-		
-		webshims.addValidityRule('stepMismatch', function(input, val, cache){
-			if(val === ''){return false;}
-			if(!('type' in cache)){
+			}
+		},
+		addleadingZero = function(val, len){
+			val = ''+val;
+			len = len - val.length;
+			for(var i = 0; i < len; i++){
+				val = '0'+val;
+			}
+			return val;
+		},
+		EPS = 1e-7
+	;
+	
+	webshims.addValidityRule('stepMismatch', function(input, val, cache){
+		if(val === ''){return false;}
+		if(!('type' in cache)){
+			cache.type = getType(input[0]);
+		}
+		//stepmismatch with date is computable, but it would be a typeMismatch (performance)
+		if(cache.type == 'date'){
+			return false;
+		}
+		var ret = false, base;
+		if(typeModels[cache.type] && typeModels[cache.type].step){
+			if( !('step' in cache) ){
+				cache.step = getStep(input[0], cache.type);
+			}
+			
+			if(cache.step == 'any'){return false;}
+			
+			if(!('valueAsNumber' in cache)){
+				cache.valueAsNumber = typeModels[cache.type].asNumber( val );
+			}
+			if(isNaN(cache.valueAsNumber)){return false;}
+			
+			addMinMaxNumberToCache('min', input, cache);
+			base = cache.minAsNumber;
+			if(isNaN(base)){
+				base = typeModels[cache.type].stepBase || 0;
+			}
+			
+			ret =  Math.abs((cache.valueAsNumber - base) % cache.step);
+							
+			ret = !(  ret <= EPS || Math.abs(ret - cache.step) <= EPS  );
+		}
+		return ret;
+	});
+	
+	
+	
+	[{name: 'rangeOverflow', attr: 'max', factor: 1}, {name: 'rangeUnderflow', attr: 'min', factor: -1}].forEach(function(data, i){
+		webshims.addValidityRule(data.name, function(input, val, cache) {
+			var ret = false;
+			if(val === ''){return ret;}
+			if (!('type' in cache)) {
 				cache.type = getType(input[0]);
 			}
-			//stepmismatch with date is computable, but it would be a typeMismatch (performance)
-			if(cache.type == 'date'){
-				return false;
-			}
-			var ret = false, base;
-			if(typeModels[cache.type] && typeModels[cache.type].step){
-				if( !('step' in cache) ){
-					cache.step = getStep(input[0], cache.type);
-				}
-				
-				if(cache.step == 'any'){return false;}
-				
+			if (typeModels[cache.type] && typeModels[cache.type].asNumber) {
 				if(!('valueAsNumber' in cache)){
 					cache.valueAsNumber = typeModels[cache.type].asNumber( val );
 				}
-				if(isNaN(cache.valueAsNumber)){return false;}
-				
-				addMinMaxNumberToCache('min', input, cache);
-				base = cache.minAsNumber;
-				if(isNaN(base)){
-					base = typeModels[cache.type].stepBase || 0;
+				if(isNaN(cache.valueAsNumber)){
+					return false;
 				}
 				
-				ret =  Math.abs((cache.valueAsNumber - base) % cache.step);
-								
-				ret = !(  ret <= EPS || Math.abs(ret - cache.step) <= EPS  );
+				addMinMaxNumberToCache(data.attr, input, cache);
+				
+				if(isNaN(cache[data.attr+'AsNumber'])){
+					return ret;
+				}
+				ret = ( cache[data.attr+'AsNumber'] * data.factor <  cache.valueAsNumber * data.factor - EPS );
 			}
 			return ret;
 		});
-		
-		
-		
-		[{name: 'rangeOverflow', attr: 'max', factor: 1}, {name: 'rangeUnderflow', attr: 'min', factor: -1}].forEach(function(data, i){
-			webshims.addValidityRule(data.name, function(input, val, cache) {
-				var ret = false;
-				if(val === ''){return ret;}
-				if (!('type' in cache)) {
-					cache.type = getType(input[0]);
+	});
+	
+	//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
+	webshims.attr('valueAsNumber', {
+		elementNames: ['input'],
+		getter: function(elem, fn){
+			var type = getType(elem);
+			return (typeModels[type] && typeModels[type].asNumber) ? 
+				typeModels[type].asNumber($.attr(elem, 'value')) :
+				nan;
+		},
+		setter: function(elem, val, fn){
+			var type = getType(elem);
+			if(typeModels[type] && typeModels[type].numberToString){
+				//is NaN a number?
+				if(isNaN(val)){
+					$.attr(elem, 'value', '');
+					return;
 				}
-				if (typeModels[cache.type] && typeModels[cache.type].asNumber) {
-					if(!('valueAsNumber' in cache)){
-						cache.valueAsNumber = typeModels[cache.type].asNumber( val );
-					}
-					if(isNaN(cache.valueAsNumber)){
+				var set = typeModels[type].numberToString(val);
+				if(set !==  false){
+					$.attr(elem, 'value', set);
+				} else {
+					throw('INVALID_STATE_ERR: DOM Exception 11');
+				}
+			} else {
+				fn();
+			}
+		}
+	});
+	
+	webshims.attr('valueAsDate', {
+		elementNames: ['input'],
+		getter: function(elem, fn){
+			var type = getType(elem);
+			return (typeModels[type] && typeModels[type].asDate && !typeModels[type].noAsDate) ? 
+				typeModels[type].asDate($.attr(elem, 'value')) :
+				null;
+		},
+		setter: function(elem, value, fn){
+			var type = getType(elem);
+			if(typeModels[type] && typeModels[type].dateToString){
+				if(!window.noHTMLExtFixes) {
+					throw("there are some serious issues in opera's implementation. don't use!");
+				}
+				if(value === null){
+					$.attr(elem, 'value', '');
+					return;
+				}
+				var set = typeModels[type].dateToString(value);
+				if(set !== false){
+					$.attr(elem, 'value', set);
+				} else {
+					throw('INVALID_STATE_ERR: DOM Exception 11');
+				}
+			} else {
+				fn();
+			}
+		}
+	});
+	
+	var typeProtos = {
+		
+		number: {
+			mismatch: function(val){
+				return !(isNumber(val));
+			},
+			step: 1,
+			//stepBase: 0, 0 = default
+			stepScaleFactor: 1,
+			asNumber: function(str){
+				return (isNumber(str)) ? str * 1 : nan;
+			},
+			numberToString: function(num){
+				return (isNumber(num)) ? num : false;
+			}
+		},
+		
+		range: {
+			minDefault: 0,
+			maxDefault: 100
+		},
+		
+		date: {
+			mismatch: function(val){
+				if(!val || !val.split || !(/\d$/.test(val))){return true;}
+				var valA = val.split(/\u002D/);
+				if(valA.length !== 3){return true;}
+				var ret = false;
+				$.each(valA, function(i, part){
+					if(!isDateTimePart(part)){
+						ret = true;
 						return false;
 					}
-					
-					addMinMaxNumberToCache(data.attr, input, cache);
-					
-					if(isNaN(cache[data.attr+'AsNumber'])){
-						return ret;
-					}
-					ret = ( cache[data.attr+'AsNumber'] * data.factor <  cache.valueAsNumber * data.factor - EPS );
+				});
+				if(ret){return ret;}
+				if(valA[0].length !== 4 || valA[1].length != 2 || valA[1] > 12 || valA[2].length != 2 || valA[2] > 33){
+					ret = true;
+				}
+				return (val !== this.dateToString( this.asDate(val, true) ) );
+			},
+			step: 1,
+			//stepBase: 0, 0 = default
+			stepScaleFactor:  86400000,
+			asDate: function(val, _noMismatch){
+				if(!_noMismatch && this.mismatch(val)){
+					return null;
+				}
+				return new Date(this.asNumber(val, true));
+			},
+			asNumber: function(str, _noMismatch){
+				var ret = nan;
+				if(_noMismatch || !this.mismatch(str)){
+					str = str.split(/\u002D/);
+					ret = Date.UTC(str[0], str[1] - 1, str[2]);
 				}
 				return ret;
-			});
-		});
-		
-		//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
-		webshims.attr('valueAsNumber', {
-			elementNames: ['input'],
-			getter: function(elem, fn){
-				var type = getType(elem);
-				return (typeModels[type] && typeModels[type].asNumber) ? 
-					typeModels[type].asNumber($.attr(elem, 'value')) :
-					nan;
 			},
-			setter: function(elem, val, fn){
-				var type = getType(elem);
-				if(typeModels[type] && typeModels[type].numberToString){
-					//is NaN a number?
-					if(isNaN(val)){
-						$.attr(elem, 'value', '');
-						return;
-					}
-					var set = typeModels[type].numberToString(val);
-					if(set !==  false){
-						$.attr(elem, 'value', set);
-					} else {
-						throw('INVALID_STATE_ERR: DOM Exception 11');
-					}
-				} else {
-					fn();
-				}
+			numberToString: function(num){
+				return (isNumber(num)) ? this.dateToString(new Date( num * 1)) : false;
+			},
+			dateToString: function(date){
+				return (date && date.getFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
 			}
-		});
+		},
 		
-		webshims.attr('valueAsDate', {
-			elementNames: ['input'],
-			getter: function(elem, fn){
-				var type = getType(elem);
-				return (typeModels[type] && typeModels[type].asDate && !typeModels[type].noAsDate) ? 
-					typeModels[type].asDate($.attr(elem, 'value')) :
-					null;
-			},
-			setter: function(elem, value, fn){
-				var type = getType(elem);
-				if(typeModels[type] && typeModels[type].dateToString){
-					if(!window.noHTMLExtFixes) {
-						throw("there are some serious issues in opera's implementation. don't use!");
-					}
-					if(value === null){
-						$.attr(elem, 'value', '');
-						return;
-					}
-					var set = typeModels[type].dateToString(value);
-					if(set !== false){
-						$.attr(elem, 'value', set);
-					} else {
-						throw('INVALID_STATE_ERR: DOM Exception 11');
-					}
-				} else {
-					fn();
+		time: {
+			mismatch: function(val, _getParsed){
+				if(!val || !val.split || !(/\d$/.test(val))){return true;}
+				val = val.split(/\u003A/);
+				if(val.length < 2 || val.length > 3){return true;}
+				var ret = false,
+					sFraction;
+				if(val[2]){
+					val[2] = val[2].split(/\u002E/);
+					sFraction = parseInt(val[2][1], 10);
+					val[2] = val[2][0];
 				}
-			}
-		});
-		
-		var typeProtos = {
-			
-			number: {
-				mismatch: function(val){
-					return !(isNumber(val));
-				},
-				step: 1,
-				//stepBase: 0, 0 = default
-				stepScaleFactor: 1,
-				asNumber: function(str){
-					return (isNumber(str)) ? str * 1 : nan;
-				},
-				numberToString: function(num){
-					return (isNumber(num)) ? num : false;
-				}
-			},
-			
-			range: {
-				minDefault: 0,
-				maxDefault: 100
-			},
-			
-			date: {
-				mismatch: function(val){
-					if(!val || !val.split || !(/\d$/.test(val))){return true;}
-					var valA = val.split(/\u002D/);
-					if(valA.length !== 3){return true;}
-					var ret = false;
-					$.each(valA, function(i, part){
-						if(!isDateTimePart(part)){
-							ret = true;
-							return false;
-						}
-					});
-					if(ret){return ret;}
-					if(valA[0].length !== 4 || valA[1].length != 2 || valA[1] > 12 || valA[2].length != 2 || valA[2] > 33){
+				$.each(val, function(i, part){
+					if(!isDateTimePart(part) || part.length !== 2){
 						ret = true;
-					}
-					return (val !== this.dateToString( this.asDate(val, true) ) );
-				},
-				step: 1,
-				//stepBase: 0, 0 = default
-				stepScaleFactor:  86400000,
-				asDate: function(val, _noMismatch){
-					if(!_noMismatch && this.mismatch(val)){
-						return null;
-					}
-					return new Date(this.asNumber(val, true));
-				},
-				asNumber: function(str, _noMismatch){
-					var ret = nan;
-					if(_noMismatch || !this.mismatch(str)){
-						str = str.split(/\u002D/);
-						ret = Date.UTC(str[0], str[1] - 1, str[2]);
-					}
-					return ret;
-				},
-				numberToString: function(num){
-					return (isNumber(num)) ? this.dateToString(new Date( num * 1)) : false;
-				},
-				dateToString: function(date){
-					return (date && date.getFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
-				}
-			},
-			
-			time: {
-				mismatch: function(val, _getParsed){
-					if(!val || !val.split || !(/\d$/.test(val))){return true;}
-					val = val.split(/\u003A/);
-					if(val.length < 2 || val.length > 3){return true;}
-					var ret = false,
-						sFraction;
-					if(val[2]){
-						val[2] = val[2].split(/\u002E/);
-						sFraction = parseInt(val[2][1], 10);
-						val[2] = val[2][0];
-					}
-					$.each(val, function(i, part){
-						if(!isDateTimePart(part) || part.length !== 2){
-							ret = true;
-							return false;
-						}
-					});
-					if(ret){return true;}
-					if(val[0] > 23 || val[0] < 0 || val[1] > 59 || val[1] < 0){
-						return true;
-					}
-					if(val[2] && (val[2] > 59 || val[2] < 0 )){
-						return true;
-					}
-					if(sFraction && isNaN(sFraction)){
-						return true;
-					}
-					if(sFraction){
-						if(sFraction < 100){
-							sFraction *= 100;
-						} else if(sFraction < 10){
-							sFraction *= 10;
-						}
-					}
-					return (_getParsed === true) ? [val, sFraction] : false;
-				},
-				step: 60,
-				stepBase: 0,
-				stepScaleFactor:  1000,
-				asDate: function(val){
-					val = new Date(this.asNumber(val));
-					return (isNaN(val)) ? null : val;
-				},
-				asNumber: function(val){
-					var ret = nan;
-					val = this.mismatch(val, true);
-					if(val !== true){
-						ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
-						if(val[1]){
-							ret += val[1];
-						}
-					}
-					return ret;
-				},
-				dateToString: function(date){
-					if(date && date.getUTCHours){
-						var str = addleadingZero(date.getUTCHours(), 2) +':'+ addleadingZero(date.getUTCMinutes(), 2),
-							tmp = date.getSeconds()
-						;
-						if(tmp != "0"){
-							str += ':'+ addleadingZero(tmp, 2);
-						}
-						tmp = date.getUTCMilliseconds();
-						if(tmp != "0"){
-							str += '.'+ addleadingZero(tmp, 3);
-						}
-						return str;
-					} else {
 						return false;
 					}
+				});
+				if(ret){return true;}
+				if(val[0] > 23 || val[0] < 0 || val[1] > 59 || val[1] < 0){
+					return true;
 				}
-			},
-			
-			'datetime-local': {
-				mismatch: function(val, _getParsed){
-					if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
-					val = val.split(/\u0054/);
-					return ( typeModels.date.mismatch(val[0]) || typeModels.time.mismatch(val[1], _getParsed) );
-				},
-				noAsDate: true,
-				asDate: function(val){
-					val = new Date(this.asNumber(val));
-					
-					return (isNaN(val)) ? null : val;
-				},
-				asNumber: function(val){
-					var ret = nan;
-					var time = this.mismatch(val, true);
-					if(time !== true){
-						val = val.split(/\u0054/)[0].split(/\u002D/);
-						
-						ret = Date.UTC(val[0], val[1] - 1, val[2], time[0][0], time[0][1], time[0][2] || 0);
-						if(time[1]){
-							ret += time[1];
-						}
+				if(val[2] && (val[2] > 59 || val[2] < 0 )){
+					return true;
+				}
+				if(sFraction && isNaN(sFraction)){
+					return true;
+				}
+				if(sFraction){
+					if(sFraction < 100){
+						sFraction *= 100;
+					} else if(sFraction < 10){
+						sFraction *= 10;
 					}
-					return ret;
-				},
-				dateToString: function(date, _getParsed){
-					return typeModels.date.dateToString(date) +'T'+ typeModels.time.dateToString(date, _getParsed);
+				}
+				return (_getParsed === true) ? [val, sFraction] : false;
+			},
+			step: 60,
+			stepBase: 0,
+			stepScaleFactor:  1000,
+			asDate: function(val){
+				val = new Date(this.asNumber(val));
+				return (isNaN(val)) ? null : val;
+			},
+			asNumber: function(val){
+				var ret = nan;
+				val = this.mismatch(val, true);
+				if(val !== true){
+					ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
+					if(val[1]){
+						ret += val[1];
+					}
+				}
+				return ret;
+			},
+			dateToString: function(date){
+				if(date && date.getUTCHours){
+					var str = addleadingZero(date.getUTCHours(), 2) +':'+ addleadingZero(date.getUTCMinutes(), 2),
+						tmp = date.getSeconds()
+					;
+					if(tmp != "0"){
+						str += ':'+ addleadingZero(tmp, 2);
+					}
+					tmp = date.getUTCMilliseconds();
+					if(tmp != "0"){
+						str += '.'+ addleadingZero(tmp, 3);
+					}
+					return str;
+				} else {
+					return false;
 				}
 			}
-		};
+		},
 		
-		if(!supportsType('number')){
-			webshims.addInputType('number', typeProtos.number);
-		}
-		
-		if(!supportsType('range')){
-			webshims.addInputType('range', $.extend({}, typeProtos.number, typeProtos.range));
-		}
-		if(!supportsType('date')){
-			webshims.addInputType('date', typeProtos.date);
-		}
-		if(!supportsType('time')){
-			webshims.addInputType('time', $.extend({}, typeProtos.date, typeProtos.time));
-		}
-		
-		if(!supportsType('datetime-local')){
-			webshims.addInputType('datetime-local', $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']));
-		}
-		
-		//implement set/arrow controls
-		(function(){
-			var options = webshims.modules['number-date-type'].options;
-			var correctBottom = ($.browser.msie && parseInt($.browser.version, 10) < 8) ? 2 : 0;
-			var getNextStep = function(input, upDown, cache){
+		'datetime-local': {
+			mismatch: function(val, _getParsed){
+				if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
+				val = val.split(/\u0054/);
+				return ( typeModels.date.mismatch(val[0]) || typeModels.time.mismatch(val[1], _getParsed) );
+			},
+			noAsDate: true,
+			asDate: function(val){
+				val = new Date(this.asNumber(val));
 				
-				cache = cache || {};
-				
-				if( !('type' in cache) ){
-					cache.type = getType(input);
-				}
-				if( !('step' in cache) ){
-					cache.step = getStep(input, cache.type);
-				}
-				if( !('valueAsNumber' in cache) ){
-					cache.valueAsNumber = typeModels[cache.type].asNumber($.attr(input, 'value'));
-				}
-				var delta = (cache.step == 'any') ? typeModels[cache.type].step * typeModels[cache.type].stepScaleFactor : cache.step,
-					ret
-				;
-				addMinMaxNumberToCache('min', $(input), cache);
-				addMinMaxNumberToCache('max', $(input), cache);
-				
-				if(isNaN(cache.valueAsNumber)){
-					cache.valueAsNumber = typeModels[cache.type].stepBase || 0;
-				}
-				//make a valid step
-				if(cache.step !== 'any'){
-					ret = Math.round( ((cache.valueAsNumber - (cache.minAsnumber || 0)) % cache.step) * 1e7 ) / 1e7;
-					if(ret &&  Math.abs(ret) != cache.step){
-						cache.valueAsNumber = cache.valueAsNumber - ret;
+				return (isNaN(val)) ? null : val;
+			},
+			asNumber: function(val){
+				var ret = nan;
+				var time = this.mismatch(val, true);
+				if(time !== true){
+					val = val.split(/\u0054/)[0].split(/\u002D/);
+					
+					ret = Date.UTC(val[0], val[1] - 1, val[2], time[0][0], time[0][1], time[0][2] || 0);
+					if(time[1]){
+						ret += time[1];
 					}
 				}
-				ret = cache.valueAsNumber + (delta * upDown);
-				//using NUMBER.MIN/MAX is really stupid | ToDo: either use disabled state or make this more usable
-				if(!isNaN(cache.minAsNumber) && ret < cache.minAsNumber){
-					ret = (cache.valueAsNumber * upDown  < cache.minAsNumber) ? cache.minAsNumber : isNaN(cache.maxAsNumber) ? Number.MAX_VALUE : cache.maxAsNumber;
-				} else if(!isNaN(cache.maxAsNumber) && ret > cache.maxAsNumber){
-					ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? Number.MIN_VALUE : cache.minAsNumber;
+				return ret;
+			},
+			dateToString: function(date, _getParsed){
+				return typeModels.date.dateToString(date) +'T'+ typeModels.time.dateToString(date, _getParsed);
+			}
+		}
+	};
+	
+	if(!supportsType('number')){
+		webshims.addInputType('number', typeProtos.number);
+	}
+	
+	if(!supportsType('range')){
+		webshims.addInputType('range', $.extend({}, typeProtos.number, typeProtos.range));
+	}
+	if(!supportsType('date')){
+		webshims.addInputType('date', typeProtos.date);
+	}
+	if(!supportsType('time')){
+		webshims.addInputType('time', $.extend({}, typeProtos.date, typeProtos.time));
+	}
+	
+	if(!supportsType('datetime-local')){
+		webshims.addInputType('datetime-local', $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']));
+	}
+	
+	//implement set/arrow controls
+	(function(){
+		var options = webshims.modules['form-number-date'].options;
+		var correctBottom = ($.browser.msie && parseInt($.browser.version, 10) < 8) ? 2 : 0;
+		var getNextStep = function(input, upDown, cache){
+			
+			cache = cache || {};
+			
+			if( !('type' in cache) ){
+				cache.type = getType(input);
+			}
+			if( !('step' in cache) ){
+				cache.step = getStep(input, cache.type);
+			}
+			if( !('valueAsNumber' in cache) ){
+				cache.valueAsNumber = typeModels[cache.type].asNumber($.attr(input, 'value'));
+			}
+			var delta = (cache.step == 'any') ? typeModels[cache.type].step * typeModels[cache.type].stepScaleFactor : cache.step,
+				ret
+			;
+			addMinMaxNumberToCache('min', $(input), cache);
+			addMinMaxNumberToCache('max', $(input), cache);
+			
+			if(isNaN(cache.valueAsNumber)){
+				cache.valueAsNumber = typeModels[cache.type].stepBase || 0;
+			}
+			//make a valid step
+			if(cache.step !== 'any'){
+				ret = Math.round( ((cache.valueAsNumber - (cache.minAsnumber || 0)) % cache.step) * 1e7 ) / 1e7;
+				if(ret &&  Math.abs(ret) != cache.step){
+					cache.valueAsNumber = cache.valueAsNumber - ret;
 				}
-				return Math.round( ret * 1e7)  / 1e7;
-			};
+			}
+			ret = cache.valueAsNumber + (delta * upDown);
+			//using NUMBER.MIN/MAX is really stupid | ToDo: either use disabled state or make this more usable
+			if(!isNaN(cache.minAsNumber) && ret < cache.minAsNumber){
+				ret = (cache.valueAsNumber * upDown  < cache.minAsNumber) ? cache.minAsNumber : isNaN(cache.maxAsNumber) ? Number.MAX_VALUE : cache.maxAsNumber;
+			} else if(!isNaN(cache.maxAsNumber) && ret > cache.maxAsNumber){
+				ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? Number.MIN_VALUE : cache.minAsNumber;
+			}
+			return Math.round( ret * 1e7)  / 1e7;
+		};
+		
+		webshims.modules['form-number-date'].getNextStep = getNextStep;
+		
+		var doSteps = function(input, type, control){
+			if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
+			$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
+			$(input).unbind('blur.stepeventshim');
+			webshims.triggerInlineForm(input, 'input');
 			
-			webshims.modules['number-date-type'].getNextStep = getNextStep;
 			
-			var doSteps = function(input, type, control){
-				if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
-				$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
-				$(input).unbind('blur.stepeventshim');
-				webshims.triggerInlineForm(input, 'input');
-				
-				
-				if( doc.activeElement ){
+			if( doc.activeElement ){
+				if(doc.activeElement !== input){
+					try {input.focus();} catch(e){}
+				}
+				setTimeout(function(){
 					if(doc.activeElement !== input){
 						try {input.focus();} catch(e){}
 					}
-					setTimeout(function(){
-						if(doc.activeElement !== input){
-							try {input.focus();} catch(e){}
-						}
-						$(input)
-							.one('blur.stepeventshim', function(){
-								$(input).trigger('change');
-							})
-						;
-					}, 0);
-					
-				}
-			};
-			
-			
-			if(options.stepArrows){
-				var disabledReadonly = {
-					elementNames: ['input'],
-					// don't change getter
-					setter: function(elem, value, fn){
-						fn();
-						var stepcontrols = $.data(elem, 'step-controls');
-						if(stepcontrols){
-							stepcontrols[ (elem.disabled || elem.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
-						}
-					}
-				};
-				webshims.attr('disabled', disabledReadonly);
-				webshims.attr('readonly', disabledReadonly);
+					$(input)
+						.one('blur.stepeventshim', function(){
+							$(input).trigger('change');
+						})
+					;
+				}, 0);
 				
 			}
-			var stepKeys = {
-				38: 1,
-				40: -1
-			};
-			webshims.addReady(function(context){
-				
-				//ui for numeric values
-				if(options.stepArrows){
-					$('input', context).each(function(){
-						var type = getType(this);
-						if(!typeModels[type] || !typeModels[type].asNumber || !options.stepArrows || (options.stepArrows !== true && !options.stepArrows[type])){return;}
-						var elem = this,
-							dir 	= ($(this).css('direction') == 'rtl') ? 
-								{
-									action: 'insertBefore',
-									side: 'Left',
-									otherSide: 'right'
-								} :
-								{
-									action: 'insertAfter',
-									side: 'Right',
-									otherSide: 'Left'
-								}
-						;
-						var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
-							[dir.action](this)
-							.bind('selectstart dragstart', function(){
-								return false;
-							})
-							.bind('mousedown mousepress', function(e){
-								doSteps(elem, type, e.target);
-								return false;
-							})
-						;
-						
-						$(this)
-							.addClass('has-step-controls')
-							.data('step-controls', controls)
-							.attr({
-								readonly: this.readOnly,
-								disabled: this.disabled,
-								autocomplete: 'off'
-							})
-							.bind(($.browser.msie) ? 'keydown' : 'keypress', function(e){
-								if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
-								$.attr(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
-								webshims.triggerInlineForm(this, 'input');
-								return false;
-							})
-						;
-						
-						if(options.calculateWidth){
-							var jElm = $(this);
-							var inputDim = {
-								w: jElm.getwidth()
-							};
-							if(!inputDim.w){return;}
-							var controlDim = {
-								mL: (parseInt(controls.css('margin'+dir.otherSide), 10) || 0),
-								w: controls.getouterWidth()
-							};
-							inputDim.mR = (parseInt(jElm.css('margin'+dir.side), 10) || 0);
-							if(!correctBottom){
-								controls.css('marginBottom', (parseInt(jElm.css('paddingBottom'), 10) || 0) / -2 );
-							} else {
-								controls.css('marginBottom', ((jElm.innerHeight() - (controls.height() / 2)) / 2) - 1 );
-							}
-							if(inputDim.mR){
-								jElm.css('margin'+dir.side, 0);
-							}
-							//is inside
-							if( controlDim.mL <= (controlDim.w * -1) ){
-								controls.css('margin'+dir.side,  Math.floor(Math.abs(controlDim.w + controlDim.mL) + inputDim.mR));
-								jElm.css('padding'+dir.side, (parseInt($(this).css('padding'+dir.side), 10) || 0) + Math.abs(controlDim.mL));
-								jElm.css('width', Math.floor(inputDim.w + controlDim.mL));
-							} else {
-								controls.css('margin'+dir.side, inputDim.mR);
-								jElm.css('width',  Math.floor(inputDim.w - controlDim.mL - controlDim.w));
-							}
-							
-						}
-					});
-				}
-			});
-		})();
-		// add support for new input-types
-		webshims.attr('type', {
-			elementNames: ['input'],
-			getter: function(elem, fn){
-				var type = getType(elem);
-				return (webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
-			},
-			//don't change setter
-			setter: true
-		});
+		};
 		
-		webshims.createReadyEvent('number-date-type');
-	};
+		
+		if(options.stepArrows){
+			var disabledReadonly = {
+				elementNames: ['input'],
+				// don't change getter
+				setter: function(elem, value, fn){
+					fn();
+					var stepcontrols = $.data(elem, 'step-controls');
+					if(stepcontrols){
+						stepcontrols[ (elem.disabled || elem.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
+					}
+				}
+			};
+			webshims.attr('disabled', disabledReadonly);
+			webshims.attr('readonly', disabledReadonly);
+			
+		}
+		var stepKeys = {
+			38: 1,
+			40: -1
+		};
+		webshims.addReady(function(context, contextElem){
+			
+			//ui for numeric values
+			if(options.stepArrows){
+				$('input', context).add(contextElem.filter('input')).each(function(){
+					var type = getType(this);
+					if(!typeModels[type] || !typeModels[type].asNumber || !options.stepArrows || (options.stepArrows !== true && !options.stepArrows[type])){return;}
+					var elem = this,
+						dir 	= ($(this).css('direction') == 'rtl') ? 
+							{
+								action: 'insertBefore',
+								side: 'Left',
+								otherSide: 'right'
+							} :
+							{
+								action: 'insertAfter',
+								side: 'Right',
+								otherSide: 'Left'
+							}
+					;
+					var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
+						[dir.action](this)
+						.bind('selectstart dragstart', function(){
+							return false;
+						})
+						.bind('mousedown mousepress', function(e){
+							doSteps(elem, type, e.target);
+							return false;
+						})
+					;
+					
+					$(this)
+						.addClass('has-step-controls')
+						.data('step-controls', controls)
+						.attr({
+							readonly: this.readOnly,
+							disabled: this.disabled,
+							autocomplete: 'off'
+						})
+						.bind(($.browser.msie) ? 'keydown' : 'keypress', function(e){
+							if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
+							$.attr(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
+							webshims.triggerInlineForm(this, 'input');
+							return false;
+						})
+					;
+					
+					if(options.calculateWidth){
+						var jElm = $(this);
+						var inputDim = {
+							w: jElm.width()
+						};
+						if(!inputDim.w){return;}
+						var controlDim = {
+							mL: (parseInt(controls.css('margin'+dir.otherSide), 10) || 0),
+							w: controls.outerWidth()
+						};
+						inputDim.mR = (parseInt(jElm.css('margin'+dir.side), 10) || 0);
+						if(!correctBottom){
+							controls.css('marginBottom', (parseInt(jElm.css('paddingBottom'), 10) || 0) / -2 );
+						} else {
+							controls.css('marginBottom', ((jElm.innerHeight() - (controls.height() / 2)) / 2) - 1 );
+						}
+						if(inputDim.mR){
+							jElm.css('margin'+dir.side, 0);
+						}
+						//is inside
+						if( controlDim.mL <= (controlDim.w * -1) ){
+							controls.css('margin'+dir.side,  Math.floor(Math.abs(controlDim.w + controlDim.mL) + inputDim.mR));
+							jElm.css('padding'+dir.side, (parseInt($(this).css('padding'+dir.side), 10) || 0) + Math.abs(controlDim.mL));
+							jElm.css('width', Math.floor(inputDim.w + controlDim.mL));
+						} else {
+							controls.css('margin'+dir.side, inputDim.mR);
+							jElm.css('width',  Math.floor(inputDim.w - controlDim.mL - controlDim.w));
+						}
+						
+					}
+				});
+			}
+		});
+	})();
 	
-	if($.support.validity){
-		$.webshims.ready('validation-base', implementTypes, true);
-	} else {
-		$.webshims.ready('validity', implementTypes, true);
-	}
+	// add support for new input-types
+	webshims.attr('type', {
+		elementNames: ['input'],
+		getter: function(elem, fn){
+			var type = getType(elem);
+			return (webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
+		},
+		//don't change setter
+		setter: true
+	});
 	
-})(jQuery);
-jQuery.webshims.ready('number-date-type', function($, webshims, window, document){
+	webshims.createReadyEvent('form-number-date');
+	
+}, true);
+/* number-date-ui */
+jQuery.webshims.ready('form-number-date', function($, webshims, window, document){
 	"use strict";
 		
 	var options = $.webshims.modules.inputUI.options;
 	var globalInvalidTimer;
 	var labelID = 0;
-	var replaceInputUI = function(context){
-		$('input', context).each(function(){
+	var replaceInputUI = function(context, elem){
+		$('input', context).add(elem.filter('input')).each(function(){
 			var type = $.attr(this, 'type');
 			if(replaceInputUI[type]  && !$.data(this, 'inputUIReplace')){
 				replaceInputUI[type]($(this));
@@ -1658,7 +1346,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 					marginRight: orig.css('marginRight'),
 					marginLeft: orig.css('marginLeft')
 				},
-				outerWidth: orig.getouterWidth(),
+				outerWidth: orig.outerWidth(),
 				label: (id) ? $('label[for='+ id +']', orig[0].form) : $([])
 			},
 			curLabelID =  webshims.getID(attr.label)
@@ -1698,7 +1386,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 			date.css(attr.css);
 			if(attr.outerWidth){
 				date.outerWidth(attr.outerWidth);
-				var width = date.getwidth() - 4;
+				var width = date.width() - 4;
 				datePicker
 					.css({marginLeft: 0, marginRight: 2})
 					.outerWidth(Math.floor(width * 0.6))
@@ -1713,42 +1401,50 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 		webshims.triggerDomUpdate(date);
 		$('input.input-datetime-local-date', date)
 			.datepicker($.extend({}, options.datepicker))
-			.bind('change', function(val, ui){
+			.bind('change', function(e){
 				
-				var value, timeVal = $('input.input-datetime-local-time', date).attr('value');
-				try {
-					value = $.datepicker.parseDate(datePicker.datepicker('option', 'dateFormat'), datePicker.attr('value'));
-					value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : datePicker.attr('value');
+				var value = datePicker.attr('value'), 
+					timeVal = $('input.input-datetime-local-time', date).attr('value')
+				;
+				if(value){
+					try {
+						value = $.datepicker.parseDate(datePicker.datepicker('option', 'dateFormat'), value);
+						value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : datePicker.attr('value');
+					} catch (e) {value = datePicker.attr('value');}
+					if (!timeVal) {
+						timeVal = '00:00';
+						$('input.input-datetime-local-time', date).attr('value', timeVal);
+					}
 				} 
-				catch (e) {
-					value = datePicker.attr('value');
-				}
-				if (!$('input.input-datetime-local-time', date).attr('value')) {
-					timeVal = '00:00';
-					$('input.input-datetime-local-time', date).attr('value', timeVal);
-				}
+				value = (!value && !timeVal) ? '' : value + 'T' + timeVal;
 				replaceInputUI['datetime-local'].blockAttr = true;
-				elem.attr('value', value + 'T' + timeVal);
+				elem.attr('value', value);
 				replaceInputUI['datetime-local'].blockAttr = false;
+				e.stopImmediatePropagation();
 				elem.trigger('change');
 			})
 			.data('datepicker')
 			.dpDiv.addClass('input-date-datepicker-control')
 		;
 		
-		$('input.input-datetime-local-time', date).bind('input change', function(){
+		$('input.input-datetime-local-time', date).bind('input change', function(e){
+			var timeVal = $.attr(this, 'value');
 			var val = elem.attr('value').split('T');
-			if(val.length < 2 || !val[0]){
+			if(timeVal && (val.length < 2 || !val[0])){
 				val[0] = $.datepicker.formatDate('yy-mm-dd', new Date());
 			}
-			val[1] = $.attr(this, 'value');
-			replaceInputUI['datetime-local'].blockAttr = true;
+			val[1] = timeVal;
 			
-			try {
-				datePicker.attr('value', $.datepicker.formatDate(datePicker.datepicker('option', 'dateFormat'), $.datepicker.parseDate('yy-mm-dd', val[0])));
-			} catch(e){}
-			elem.attr('value', val.join('T'));
+			if (timeVal) {
+				try {
+					datePicker.attr('value', $.datepicker.formatDate(datePicker.datepicker('option', 'dateFormat'), $.datepicker.parseDate('yy-mm-dd', val[0])));
+				} catch (e) {}
+			}
+			val = (!val[0] && !val[1]) ? '' : val.join('T');
+			replaceInputUI['datetime-local'].blockAttr = true;
+			elem.attr('value', val);
 			replaceInputUI['datetime-local'].blockAttr = false;
+			e.stopImmediatePropagation();
 			elem.trigger('change');
 		});
 		
@@ -1808,7 +1504,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 		if(!$.fn.datepicker){return;}
 		var date = $('<input type="text" class="input-date" />'),
 			attr  = this.common(elem, date, replaceInputUI.date.attrs),
-			change = function(val, ui){
+			change = function(e){
 				replaceInputUI.date.blockAttr = true;
 				var value;
 				try {
@@ -1819,6 +1515,7 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 				}
 				elem.attr('value', value);
 				replaceInputUI.date.blockAttr = false;
+				e.stopImmediatePropagation();
 				elem.trigger('change');
 			}
 		;
@@ -1991,10 +1688,10 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 		;
 	});
 	
-	webshims.addReady(function(context){
+	webshims.addReady(function(context, elem){
 		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(){
 			if($.datepicker || $.fn.slider){
-				replaceInputUI(context);
+				replaceInputUI(context, elem);
 			}
 			if($.datepicker && $.fn.slider){
 				$(document).unbind('jquery-uiReady.initinputui input-widgetsReady.initinputui');
@@ -2096,8 +1793,8 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 					});
 					var lineHeight 	= $.curCSS(elem, 'lineHeight'),
 						dims 		= {
-							width: $(elem).getwidth(),
-							height: $(elem).getheight()
+							width: $(elem).width(),
+							height: $(elem).height()
 						},
 						cssFloat 		= $.curCSS(elem, 'float')
 					;
@@ -2164,9 +1861,137 @@ jQuery.webshims.ready('number-date-type', function($, webshims, window, document
 		return oldVal.apply(this, arguments);
 	};
 			
-	$.webshims.addReady(function(context){
-		$('input[placeholder], textarea[placeholder]', context).attr('placeholder', function(i, holder){
-			return holder;
-		});
+	$.webshims.addReady(function(context, contextElem){
+		$('input[placeholder], textarea[placeholder]', context)
+			.add(contextElem.filter('input[placeholder], textarea[placeholder]'))
+			.attr('placeholder', function(i, holder){
+				return holder;
+			})
+		;
 	});
 })(jQuery);
+jQuery.webshims.ready('form-core', function($, webshims){
+	if( 'value' in document.createElement('output') ){return;}
+	var doc = document;	
+	
+	(function(){
+		var elements = {
+				input: 1,
+				textarea: 1
+			},
+			noInputTypes = {
+				radio: 1,
+				checkbox: 1,
+				submit: 1,
+				button: 1,
+				image: 1,
+				reset: 1
+				
+				//pro forma
+				,color: 1
+				//,range: 1
+			},
+			observe = function(input){
+				var timer,
+					lastVal = input.attr('value'),
+					trigger = function(e){
+						//input === null
+						if(!input){return;}
+						var newVal = input.attr('value');
+						
+						if(newVal !== lastVal){
+							lastVal = newVal;
+							if(!e || e.type != 'input'){
+								webshims.triggerInlineForm(input[0], 'input');
+							}
+						}
+					},
+					unbind = function(){
+						input.unbind('focusout', unbind).unbind('input', trigger);
+						clearInterval(timer);
+						trigger();
+						input = null;
+					}
+				;
+				
+				clearInterval(timer);
+				timer = setInterval(trigger, ($.browser.mozilla) ? 250 : 111);
+				setTimeout(trigger, 9);
+				input.bind('focusout', unbind).bind('input', trigger);
+			}
+		;
+			
+		
+		$(doc)
+			.bind('focusin', function(e){
+				if( e.target && e.target.type && !e.target.readonly && !e.target.readOnly && !e.target.disabled && elements[(e.target.nodeName || '').toLowerCase()] && !noInputTypes[e.target.type] ){
+					observe($(e.target));
+				}
+			})
+		;
+	})();
+	
+	
+	
+	var outputCreate = function(elem){
+		if(elem.getAttribute('aria-live')){return;}
+		elem = $(elem);
+		var value = (elem.text() || '').trim();
+		var	id 	= elem.attr('id');
+		var	htmlFor = elem.attr('for');
+		var shim = $('<input class="output-shim" type="hidden" name="'+ (elem.attr('name') || '')+'" value="'+value+'" style="display: none" />').insertAfter(elem);
+		var form = shim[0].form || doc;
+		var setValue = function(val){
+			shim[0].value = val;
+			val = shim[0].value;
+			elem.text(val);
+			elem[0].value = val;
+		};
+		
+		elem[0].defaultValue = value;
+		elem[0].value = value;
+		
+		elem.attr({'aria-live': 'polite'});
+		if(id){
+			shim.attr('id', id);
+			elem.attr('aria-labeldby', webshims.getID($('label[for='+id+']', form)));
+		}
+		if(htmlFor){
+			id = webshims.getID(elem);
+			htmlFor.split(' ').forEach(function(control){
+				control = form.getElementById(control);
+				if(control){
+					control.setAttribute('aria-controls', id);
+				}
+			});
+		}
+		elem.data('outputShim', setValue );
+		shim.data('outputShim', setValue );
+		return setValue;
+	};
+	
+
+	webshims.attr('value', {
+		elementNames: ['output', 'input'],
+		getter: true,
+		setter: function(elem, value, oldFn){
+			var setVal = $.data(elem, 'outputShim');
+			if(!setVal){
+				if($.nodeName(elem, 'output')){
+					setVal = outputCreate(elem);
+				} else {
+					return oldFn();
+				}
+			}
+			setVal(value);
+		}
+	});
+	
+	webshims.addReady(function(context, contextElem){
+		$('output', context).add(contextElem.filter('output')).each(function(){
+			outputCreate(this);
+		});
+	});
+	
+	webshims.createReadyEvent('form-output');
+}, true);

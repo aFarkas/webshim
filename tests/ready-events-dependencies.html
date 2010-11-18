@@ -6,7 +6,7 @@
 	
 	<link rel="stylesheet" href="qunit/qunit.css" type="text/css" media="screen">
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
 	<script>
 		
@@ -31,12 +31,12 @@
 		$.webshims.features.forms.reverse();
 		$.webshims.featureList.reverse();
 		
-		var readys = ['es5', 'validation-base'];
+		var readys = ['es5', 'form-core'];
 		if(!$.support.validity){
-			readys.push('validity');
+			readys.push('form-extend');
 		} 
 		if($('<input type="datetime-local" />')[0].type != 'datetime-local' || $('<input type="range" />')[0].type != 'range'){
-			readys.push('number-date-type');
+			readys.push('form-number-date');
 		}
 		
 		var wasReadys = [];

@@ -1,3 +1,5 @@
+(function($){
+
 module("numeric/date types: validity");
 //testMethodA tests the validity-property for all input-types with number properties i.e.: number, range, date, time etc.
 var createTestMethodA = function(id){
@@ -749,3 +751,6 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		start();
 	});
 });
+
+
+})(jQuery);

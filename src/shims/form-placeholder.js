@@ -88,8 +88,8 @@
 					});
 					var lineHeight 	= $.curCSS(elem, 'lineHeight'),
 						dims 		= {
-							width: $(elem).getwidth(),
-							height: $(elem).getheight()
+							width: $(elem).width(),
+							height: $(elem).height()
 						},
 						cssFloat 		= $.curCSS(elem, 'float')
 					;
@@ -156,9 +156,12 @@
 		return oldVal.apply(this, arguments);
 	};
 			
-	$.webshims.addReady(function(context){
-		$('input[placeholder], textarea[placeholder]', context).attr('placeholder', function(i, holder){
-			return holder;
-		});
+	$.webshims.addReady(function(context, contextElem){
+		$('input[placeholder], textarea[placeholder]', context)
+			.add(contextElem.filter('input[placeholder], textarea[placeholder]'))
+			.attr('placeholder', function(i, holder){
+				return holder;
+			})
+		;
 	});
 })(jQuery);

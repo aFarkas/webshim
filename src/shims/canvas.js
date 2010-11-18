@@ -943,9 +943,9 @@ if (!document.createElement('canvas').getContext) {
 			return this.getContext(ctxName);
 		});
 		
-		$.webshims.addReady(function(context){
+		$.webshims.addReady(function(context, elem){
 			if(doc === context){return;}
-			$('canvas', context).each(function(){
+			$('canvas', context).add(elem.filter('canvas')).each(function(){
 				if(!this.getContext){
 					G_vmlCanvasManager.initElement(this);
 				}

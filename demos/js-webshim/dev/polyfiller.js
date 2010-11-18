@@ -6,35 +6,17 @@
 	var undefined;
 	//simple shiv
 	//http://code.google.com/p/html5shim/
-	'polyfillspan abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section source summary time track video'.replace(/\w+/g,function(n){doc.createElement(n);});
+	'abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section source summary time track video'.replace(/\w+/g,function(n){doc.createElement(n);});
 	support.dynamicHTML5 =  !!($('<video><div></div></video>')[0].innerHTML);
 	
 	$('html').addClass('js-on').removeClass('js-off');
 	
 	$.webshims = {
-		version: '1.0.4',
+		version: 'pre1.0.5',
 		useImportantStyles: true,
 		fix: {},
-		fixHTML5: (function(){
-			var d, b;
-			return (support.dynamicHTML5) ? 
-				function(h){return h;} :
-				function(h) {
-					if(typeof h != 'string'){return h;}
-					if (!d) {
-						b = doc.body;
-						d = doc.createElement('div');
-						d.style.display = 'none';
-					}
-					var e = d.cloneNode(false);
-					b.appendChild(e);
-					e.innerHTML = h;
-					b.removeChild(e);
-					return e.childNodes;
-				}
-			;
-		})(),
-		
+		implement: {},
+		fixHTML5: function(h){return h;},
 		createReadyEvent: (function(){
 			var makeReady = function(triggerName, name, noForce){
 				
@@ -96,7 +78,7 @@
 					var toLoad = [];
 					$.each(list, function(i, name){
 						var module = modules[name];
-						if ('test' in module && module.test()) {
+						if ('test' in module && module.test(list)) {
 							isReady(name);
 							return;
 						}
@@ -571,16 +553,17 @@
 		var readyFns = [];
 		$.extend(webshims, {
 			addReady: function(fn){
-				var readyFn = function(context){
-					$(function(){fn(context);});
+				var readyFn = function(context, elem){
+					$(function(){fn(context, elem);});
 				};
 				readyFns.push(readyFn);
-				readyFn(doc);
+				readyFn(doc, $([]));
 			},
 			triggerDomUpdate: function(context){
 				if(!context){return;}
+				var elem = (context !== document) ? $(context) : $([]);
 				$.each(readyFns, function(i, fn){
-					fn(context);
+					fn(context, elem);
 				});
 			}
 		});
@@ -609,26 +592,7 @@
 			return this;
 		};
 	});
-	
-	$.each({'height': ['height', 'innerHeight', 'outerHeight'], 'width': ['width', 'innerWidth', 'outerWidth']}, function(prop, fns){
-		$.each(fns, function(i, fn){
-			$.fn['get'+ fn] = function(){
-				if(!this[0]){return false;}
-				var ret = $.fn[fn].apply(this, arguments),
-					add
-				;
-				if(!this[0].offsetHeight && !this[0].offsetWidth){
-					add = parseInt(this.css(prop), 10);
-					if(!add){
-						return false;
-					}
-					ret += add;
-				}
-				return ret;
-			};
-		});
-	});
-	
+		
 	isReady('htmlExtLangChange', true);
 	
 	/*
@@ -725,7 +689,7 @@
 	 */
 	
 	/* html5 constraint validation */
-	support.validity = ('checkValidity' in $('<form action="#" />')[0]);
+	
 	
 	/* bugfixes, validation-message + fieldset.checkValidity pack */
 	webshims.validityMessages = [];
@@ -736,71 +700,106 @@
 			field = $('fieldset', form)[0]
 		;
 		
+		support.validity = ('checkValidity' in form[0]);
 		support.validationMessage = !!($('input', form).attr('validationMessage'));
 		support.fieldsetValidation = !!(field.elements && field.checkValidity && 'disabled' in field && !field.checkValidity() );
 		support.output = !!( 'value' in doc.createElement('output') );
 		support.inputUI = ($('<input type="range" />')[0].type == 'range' && $('<input type="date" />')[0].type == 'date');
 		support.requiredSelect = ('required' in $('select', form)[0]);
 		
-		//ToDo: these assumption aren't used yet || we have to wait till these bug are fixed
-		//Bug in Safari 5.0.2 and Chrome 7
-		webshims.fix.interactiveValidation = ($.browser.webkit && !support.requiredSelect && !support.output);
-		//Bug in Safari 5.0.2 (isn't used yet)
-		webshims.fix.checkValidity = webshims.fix.interactiveValidation;
-		//Bug in Safari 5.0.2, Chrome 7 and Opera 10
-		webshims.fix.submission = ((window.opera && !support.requiredSelect) || webshims.fix.interactiveValidation);
-		
-		addPolyfill('validation-base', {
-			feature: 'forms',
-			noAutoCallback: true,
-			test: function(){
-				//always load
-				return false; //($.support.validationMessage && $.support.fieldsetValidation);
-			},
-			combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
-		});
+		form = null;
+		field = null;
 	})();
 	
+	//ToDo: these assumption aren't used yet || we have to wait till these bug are fixed
+	//Bug in Safari 5.0.2 and Chrome 7
+//	webshims.fix.interactiveValidation = ($.browser.webkit && !support.requiredSelect && !support.output);
+//	//Bug in Safari 5.0.2 (isn't used yet)
+//	webshims.fix.checkValidity = webshims.fix.interactiveValidation;
+//	//Bug in Safari 5.0.2, Chrome 7 and Opera 10
+//	webshims.fix.submission = ((window.opera && !support.requiredSelect) || webshims.fix.interactiveValidation);
 	
-	
-	addPolyfill('output', {
-			feature: 'forms',
-			noAutoCallback: true,
-			test: function(){
-				return support.output;
-			},
-			combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
-		});
-	
-	
-	addPolyfill('validity', {
+	addPolyfill('form-core', {
 		feature: 'forms',
 		noAutoCallback: true,
-		test: function(){
-			return support.validity;
+		loadInit: function(){
+			setTimeout(function(){
+				loader.loadList(['es5']);
+			}, 0);
 		},
-		methodNames: [
-			{
-				name: 'setCustomValidity',
-				elementNames: ['input', 'select', 'textarea']
-			},
-			{
-				name: 'checkValidity',
-				elementNames: ['form', 'fieldset', 'input', 'select', 'textarea']
-			}
-		],
-		options: {},
-		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
+		//no test = always load
+		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
 	});
 	
+	addPolyfill('form-message', {
+		feature: 'forms',
+		test: function(){
+			return (support.validity && support.validationMessage && webshims.implement.customValidationMessage && modules['form-extend']() );
+		},
+		options: {},
+		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
+	});
 	
 	if(support.validity){
 		//create delegatable-like events
 		webshims.capturingEvents(['input']);
 		webshims.capturingEvents(['invalid'], true);
-	}
 		
-	addPolyfill('number-date-type', {
+		addPolyfill('form-extend', {
+			feature: 'forms',
+			src: 'form-native-extend',
+			noAutoCallback: true,
+			test: function(toLoad){
+				return (support.requiredSelect && support.validationMessage && (support.inputUI || $.inArray('form-number-date', toLoad) == -1) && !webshims.overrideValidationMessages );
+			},
+			loadInit: function(){
+				setTimeout(function(){
+					loader.loadList(['form-message']);
+				}, 0);
+			},
+			methodNames: [
+				{
+					name: 'setCustomValidity',
+					elementNames: ['input', 'select', 'textarea']
+				},
+				{
+					name: 'checkValidity',
+					elementNames: ['form', 'fieldset', 'input', 'select', 'textarea']
+				}
+			],
+			combination: ['combined-ff4']
+		});
+		
+		addPolyfill('form-native-fix', {
+			feature: 'forms',
+			test: function(){
+				return support.requiredSelect;
+			}
+		});
+		
+	} else {
+		addPolyfill('form-extend', {
+			feature: 'forms',
+			src: 'form-shim-extend',
+			noAutoCallback: true,
+			test: function(){
+				return false;
+			},
+			methodNames: [
+				{
+					name: 'setCustomValidity',
+					elementNames: ['input', 'select', 'textarea']
+				},
+				{
+					name: 'checkValidity',
+					elementNames: ['form', 'fieldset', 'input', 'select', 'textarea']
+				}
+			],
+			combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
+		});
+	}
+	
+	addPolyfill('form-number-date', {
 		feature: 'forms-ext',
 		noAutoCallback: true,
 		test: function(){
@@ -814,6 +813,7 @@
 	
 	addPolyfill('inputUI', {
 		feature: 'forms-ext',
+		src: 'form-date-range-ui',
 		test: function(){return (support.inputUI && !modules.inputUI.options.replaceNative);},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4'],
 		noAutoCallback: true,
@@ -834,10 +834,19 @@
 	});
 	
 	
+	addPolyfill('form-output', {
+		feature: 'forms',
+		noAutoCallback: true,
+		test: function(){
+			return support.output;
+		},
+		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
+	});
+	
 	/* placeholder */
 	
 	support.placeholder = ($('<input type="text" />').attr('placeholder') != null);
-	addPolyfill('placeholder', {
+	addPolyfill('form-placeholder', {
 		feature: 'forms',
 		test: function(){
 			return support.placeholder;
