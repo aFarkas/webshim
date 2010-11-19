@@ -551,17 +551,18 @@
 	
 	(function(){
 		var readyFns = [];
+		var emptyJ = $([]);
 		$.extend(webshims, {
 			addReady: function(fn){
 				var readyFn = function(context, elem){
 					$(function(){fn(context, elem);});
 				};
 				readyFns.push(readyFn);
-				readyFn(doc, $([]));
+				readyFn(doc, emptyJ);
 			},
 			triggerDomUpdate: function(context){
 				if(!context){return;}
-				var elem = (context !== document) ? $(context) : $([]);
+				var elem = (context !== document) ? $(context) : emptyJ;
 				$.each(readyFns, function(i, fn){
 					fn(context, elem);
 				});

@@ -5,6 +5,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	var options = $.webshims.modules.inputUI.options;
 	var globalInvalidTimer;
 	var labelID = 0;
+	var emptyJ = $([]);
 	var replaceInputUI = function(context, elem){
 		$('input', context).add(elem.filter('input')).each(function(){
 			var type = $.attr(this, 'type');
@@ -61,7 +62,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 					marginLeft: orig.css('marginLeft')
 				},
 				outerWidth: orig.outerWidth(),
-				label: (id) ? $('label[for='+ id +']', orig[0].form) : $([])
+				label: (id) ? $('label[for='+ id +']', orig[0].form) : emptyJ
 			},
 			curLabelID =  webshims.getID(attr.label)
 		;

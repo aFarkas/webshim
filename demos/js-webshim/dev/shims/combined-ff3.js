@@ -648,6 +648,12 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		elem = $(elem);
 		return (elem.data('inputUIReplace') || {visual: elem}).visual;
 	};
+	var groupTypes = {checkbox: 1, radio: 1};
+	var emptyJ = $([]);
+	var getGroupElements = function(elem){
+		elem = $(elem);
+		return (groupTypes[elem[0].type] && elem[0].name) ? $(doc.getElementsByName(elem[0].name)).not(elem[0]) : emptyJ;
+	};
 	if(support.validity){
 		fixNative = !window.noHTMLExtFixes;
 	}
@@ -676,6 +682,9 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 			var ret = oldAttr.apply(this, arguments);
 			if($.expr.filters.valid(elem)){
 				getVisual(elem).removeClass('form-ui-invalid');
+				if(name == 'checked' && val) {
+					getGroupElements(elem).removeClass('form-ui-invalid');
+				}
 			}
 			return ret;
 		}
@@ -693,11 +702,18 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		if($.expr.filters.valid(e.target)){
 			addClass = 'form-ui-valid';
 			removeClass = 'form-ui-invalid';
+			if(groupTypes[e.target.type] && e.target.checked){
+				getGroupElements(elem).removeClass(removeClass);
+			}
 		} else {
 			addClass = 'form-ui-invalid';
 			removeClass = 'form-ui-valid';
+			if(groupTypes[e.target.type] && !e.target.checked){
+				getGroupElements(elem).removeClass(removeClass);
+			}
 		}
 		getVisual(elem).addClass(addClass).removeClass(removeClass);
+		
 		stopUIRefresh = true;
 		setTimeout(function(){
 			stopUIRefresh = false;
@@ -1858,6 +1874,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	var options = $.webshims.modules.inputUI.options;
 	var globalInvalidTimer;
 	var labelID = 0;
+	var emptyJ = $([]);
 	var replaceInputUI = function(context, elem){
 		$('input', context).add(elem.filter('input')).each(function(){
 			var type = $.attr(this, 'type');
@@ -1914,7 +1931,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 					marginLeft: orig.css('marginLeft')
 				},
 				outerWidth: orig.outerWidth(),
-				label: (id) ? $('label[for='+ id +']', orig[0].form) : $([])
+				label: (id) ? $('label[for='+ id +']', orig[0].form) : emptyJ
 			},
 			curLabelID =  webshims.getID(attr.label)
 		;
