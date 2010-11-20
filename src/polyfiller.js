@@ -449,7 +449,7 @@
 			}
 			
 			
-			if(!$.isReady){
+			if(!$.isReady && webshims.removeFOUC){
 				$('html').addClass('loading-polyfills');
 				$(window).bind('load.loadingPolyfills error.loadingPolyfills', removeLoader);
 				loadingTimer = setTimeout(function(){
@@ -631,15 +631,19 @@
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie7-light', 'combined-ie8-light']
 	});
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
-	support.es5 = !!(Object.defineProperties && Object.keys && String.prototype.trim && Function.prototype.bind && !isNaN(Date.parse("T00:00")) && Date.now && Date.prototype.toISOString);
-	if(support.es5){
+	var es5 = [];
+	es5.push( !!(Array.isArray && Object.keys && Object.create && Function.prototype.bind && Object.defineProperties && !isNaN( Date.parse("T00:00") )) );
+	es5.push( !!(String.prototype.trim && Date.now && Date.prototype.toISOString) );
+	
+	if(es5[1]){
 		$.each(['filter', 'map', 'every', 'reduce', 'reduceRight', 'lastIndexOf'], function(i, name){
 			if(!Array.prototype[name]){
-				support.es5 = false;
+				es5[1] = false;
 				return false;
 			}
 		});
 	}
+	support.es5 = (es5[0] && es5[1]);
 	
 	support.objectAccessor = !!( (Object.create && Object.defineProperties) || Object.prototype.__defineGetter__);
 	support.domAccessor = !!( Object.prototype.__defineGetter__ || ( Object.defineProperty && Object.defineProperty(document.createElement('b'),'x',{get: function(){return true;}}).x));
@@ -648,11 +652,20 @@
 	webshims.defineProperty = Object.defineProperties;
 	webshims.defineProperties = Object.defineProperties;
 	
-	addPolyfill('es5', {
+	addPolyfill('es5-1', {
+		feature: 'es5',
 		test: function(){
-			return support.es5;
+			return (es5[1] && es5[0]);
 		},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ff3-light']
+	});
+	
+	addPolyfill('es5-2', {
+		feature: 'es5',
+		test: function(){
+			return es5[1];
+		},
+		combination: ['combined-ie7', 'combined-ie8', 'combined-ie7-light', 'combined-ie8-light']
 	});
 
 	
@@ -725,7 +738,7 @@
 		noAutoCallback: true,
 		loadInit: function(){
 			setTimeout(function(){
-				loader.loadList(['es5']);
+				webshims.polyfill(['es5']);
 			}, 0);
 		},
 		//no test = always load

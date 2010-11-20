@@ -1,5 +1,27 @@
 jQuery.webshims.ready('form-extend', function($, webshims, window){
 	"use strict";
+	//why no step IDL?
+	webshims.getStep = function(elem, type){
+		var step = $.attr(elem, 'step');
+		if(step === 'any'){
+			return step;
+		}
+		type = type || getType(elem);
+		if(!typeModels[type] || !typeModels[type].step){
+			return step;
+		}
+		step = typeModels.number.asNumber(step);
+		return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
+	};
+	//why no min/max IDL?
+	webshims.addMinMaxNumberToCache = function(attr, elem, cache){
+		if (!(attr+'AsNumber' in cache)) {
+			cache[attr+'AsNumber'] = typeModels[cache.type].asNumber(elem.attr(attr));
+			if(isNaN(cache[attr+'AsNumber']) && (attr+'Default' in typeModels[cache.type])){
+				cache[attr+'AsNumber'] = typeModels[cache.type][attr+'Default'];
+			}
+		}
+	};
 	
 	var nan = parseInt('NaN', 10),
 		doc = document,
@@ -16,28 +38,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 		isDateTimePart = function(string){
 			return (isNumber(string) || (string && string == '0' + (string * 1)));
 		},
-		//why no step IDL?
-		getStep = function(elem, type){
-			var step = $.attr(elem, 'step');
-			if(step === 'any'){
-				return step;
-			}
-			type = type || getType(elem);
-			if(!typeModels[type] || !typeModels[type].step){
-				return step;
-			}
-			step = typeModels.number.asNumber(step);
-			return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
-		},
-		//why no min/max IDL?
-		addMinMaxNumberToCache = function(attr, elem, cache){
-			if (!(attr+'AsNumber' in cache)) {
-				cache[attr+'AsNumber'] = typeModels[cache.type].asNumber(elem.attr(attr));
-				if(isNaN(cache[attr+'AsNumber']) && (attr+'Default' in typeModels[cache.type])){
-					cache[attr+'AsNumber'] = typeModels[cache.type][attr+'Default'];
-				}
-			}
-		},
+		addMinMaxNumberToCache = webshims.addMinMaxNumberToCache,
 		addleadingZero = function(val, len){
 			val = ''+val;
 			len = len - val.length;
@@ -61,7 +62,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 		var ret = false, base;
 		if(typeModels[cache.type] && typeModels[cache.type].step){
 			if( !('step' in cache) ){
-				cache.step = getStep(input[0], cache.type);
+				cache.step = webshims.getStep(input[0], cache.type);
 			}
 			
 			if(cache.step == 'any'){return false;}
@@ -358,179 +359,6 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 	if(!supportsType('datetime-local')){
 		webshims.addInputType('datetime-local', $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']));
 	}
-	
-	//implement set/arrow controls
-	(function(){
-		var options = webshims.modules['form-number-date'].options;
-		var correctBottom = ($.browser.msie && parseInt($.browser.version, 10) < 8) ? 2 : 0;
-		var getNextStep = function(input, upDown, cache){
-			
-			cache = cache || {};
-			
-			if( !('type' in cache) ){
-				cache.type = getType(input);
-			}
-			if( !('step' in cache) ){
-				cache.step = getStep(input, cache.type);
-			}
-			if( !('valueAsNumber' in cache) ){
-				cache.valueAsNumber = typeModels[cache.type].asNumber($.attr(input, 'value'));
-			}
-			var delta = (cache.step == 'any') ? typeModels[cache.type].step * typeModels[cache.type].stepScaleFactor : cache.step,
-				ret
-			;
-			addMinMaxNumberToCache('min', $(input), cache);
-			addMinMaxNumberToCache('max', $(input), cache);
-			
-			if(isNaN(cache.valueAsNumber)){
-				cache.valueAsNumber = typeModels[cache.type].stepBase || 0;
-			}
-			//make a valid step
-			if(cache.step !== 'any'){
-				ret = Math.round( ((cache.valueAsNumber - (cache.minAsnumber || 0)) % cache.step) * 1e7 ) / 1e7;
-				if(ret &&  Math.abs(ret) != cache.step){
-					cache.valueAsNumber = cache.valueAsNumber - ret;
-				}
-			}
-			ret = cache.valueAsNumber + (delta * upDown);
-			//using NUMBER.MIN/MAX is really stupid | ToDo: either use disabled state or make this more usable
-			if(!isNaN(cache.minAsNumber) && ret < cache.minAsNumber){
-				ret = (cache.valueAsNumber * upDown  < cache.minAsNumber) ? cache.minAsNumber : isNaN(cache.maxAsNumber) ? Number.MAX_VALUE : cache.maxAsNumber;
-			} else if(!isNaN(cache.maxAsNumber) && ret > cache.maxAsNumber){
-				ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? Number.MIN_VALUE : cache.minAsNumber;
-			}
-			return Math.round( ret * 1e7)  / 1e7;
-		};
-		
-		webshims.modules['form-number-date'].getNextStep = getNextStep;
-		
-		var doSteps = function(input, type, control){
-			if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
-			$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
-			$(input).unbind('blur.stepeventshim');
-			webshims.triggerInlineForm(input, 'input');
-			
-			
-			if( doc.activeElement ){
-				if(doc.activeElement !== input){
-					try {input.focus();} catch(e){}
-				}
-				setTimeout(function(){
-					if(doc.activeElement !== input){
-						try {input.focus();} catch(e){}
-					}
-					$(input)
-						.one('blur.stepeventshim', function(){
-							$(input).trigger('change');
-						})
-					;
-				}, 0);
-				
-			}
-		};
-		
-		
-		if(options.stepArrows){
-			var disabledReadonly = {
-				elementNames: ['input'],
-				// don't change getter
-				setter: function(elem, value, fn){
-					fn();
-					var stepcontrols = $.data(elem, 'step-controls');
-					if(stepcontrols){
-						stepcontrols[ (elem.disabled || elem.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
-					}
-				}
-			};
-			webshims.attr('disabled', disabledReadonly);
-			webshims.attr('readonly', disabledReadonly);
-			
-		}
-		var stepKeys = {
-			38: 1,
-			40: -1
-		};
-		webshims.addReady(function(context, contextElem){
-			
-			//ui for numeric values
-			if(options.stepArrows){
-				$('input', context).add(contextElem.filter('input')).each(function(){
-					var type = getType(this);
-					if(!typeModels[type] || !typeModels[type].asNumber || !options.stepArrows || (options.stepArrows !== true && !options.stepArrows[type])){return;}
-					var elem = this,
-						dir 	= ($(this).css('direction') == 'rtl') ? 
-							{
-								action: 'insertBefore',
-								side: 'Left',
-								otherSide: 'right'
-							} :
-							{
-								action: 'insertAfter',
-								side: 'Right',
-								otherSide: 'Left'
-							}
-					;
-					var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
-						[dir.action](this)
-						.bind('selectstart dragstart', function(){
-							return false;
-						})
-						.bind('mousedown mousepress', function(e){
-							doSteps(elem, type, e.target);
-							return false;
-						})
-					;
-					
-					$(this)
-						.addClass('has-step-controls')
-						.data('step-controls', controls)
-						.attr({
-							readonly: this.readOnly,
-							disabled: this.disabled,
-							autocomplete: 'off'
-						})
-						.bind(($.browser.msie) ? 'keydown' : 'keypress', function(e){
-							if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
-							$.attr(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
-							webshims.triggerInlineForm(this, 'input');
-							return false;
-						})
-					;
-					
-					if(options.calculateWidth){
-						var jElm = $(this);
-						var inputDim = {
-							w: jElm.width()
-						};
-						if(!inputDim.w){return;}
-						var controlDim = {
-							mL: (parseInt(controls.css('margin'+dir.otherSide), 10) || 0),
-							w: controls.outerWidth()
-						};
-						inputDim.mR = (parseInt(jElm.css('margin'+dir.side), 10) || 0);
-						if(!correctBottom){
-							controls.css('marginBottom', (parseInt(jElm.css('paddingBottom'), 10) || 0) / -2 );
-						} else {
-							controls.css('marginBottom', ((jElm.innerHeight() - (controls.height() / 2)) / 2) - 1 );
-						}
-						if(inputDim.mR){
-							jElm.css('margin'+dir.side, 0);
-						}
-						//is inside
-						if( controlDim.mL <= (controlDim.w * -1) ){
-							controls.css('margin'+dir.side,  Math.floor(Math.abs(controlDim.w + controlDim.mL) + inputDim.mR));
-							jElm.css('padding'+dir.side, (parseInt($(this).css('padding'+dir.side), 10) || 0) + Math.abs(controlDim.mL));
-							jElm.css('width', Math.floor(inputDim.w + controlDim.mL));
-						} else {
-							controls.css('margin'+dir.side, inputDim.mR);
-							jElm.css('width',  Math.floor(inputDim.w - controlDim.mL - controlDim.w));
-						}
-						
-					}
-				});
-			}
-		});
-	})();
 	
 	// add support for new input-types
 	webshims.attr('type', {

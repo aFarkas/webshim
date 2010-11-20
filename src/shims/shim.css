@@ -106,10 +106,25 @@ mark {
 	margin: 0 !important;
 	border: none !important;
 }
-.input-datetime-local input {
+.polyfill-important .input-datetime-local input {
 	display: inline !important;
 }
-
+.input-datetime-local-date {
+	margin: 0 2px 0 0;
+}
+.polyfill-important .input-datetime-local-date {
+	margin: 0 2px 0 0 !important;
+}
+.input-datetime-local-time {
+	margin: 0 0 0 2px;
+}
+.polyfill-important .input-datetime-local-time {
+	margin: 0 0 0 2px !important;
+}
+.ui-datepicker-trigger {
+	display: inline;
+	width: 16px;
+}
 /* spinner control for time, number (usable for date, datetime-local) */
 .has-step-controls {
 	display: inline;

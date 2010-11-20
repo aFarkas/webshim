@@ -1,40 +1,15 @@
 // -- kriskowal Kris Kowal Copyright (C) 2009-2010 MIT License
 // -- tlrobinson Tom Robinson
 // -- dantman Daniel Friesen
+// -- aFarkas Alexander Farkas
 
 /*!
     Copyright (c) 2009, 280 North Inc. http://280north.com/
     MIT License. http://github.com/280north/narwhal/blob/master/README.md
 */
-
-(function () {
-
-/**
- * Brings an environment as close to ECMAScript 5 compliance
- * as is possible with the facilities of erstwhile engines.
- *
- * ES5 Draft
- * http://www.ecma-international.org/publications/files/drafts/tc39-2009-050.pdf
- *
- * NOTE: this is a draft, and as such, the URL is subject to change.  If the
- * link is broken, check in the parent directory for the latest TC39 PDF.
- * http://www.ecma-international.org/publications/files/drafts/
- *
- * Previous ES5 Draft
- * http://www.ecma-international.org/publications/files/drafts/tc39-2009-025.pdf
- * This is a broken link to the previous draft of ES5 on which most of the
- * numbered specification references and quotes herein were taken.  Updating
- * these references and quotes to reflect the new document would be a welcome
- * volunteer project.
- * 
- * @module
- */
-
-/*whatsupdoc*/
-
+(function(){
 // this is often accessed, so avoid multiple dereference costs universally
 var has = Object.prototype.hasOwnProperty;
-
 //
 // Array
 // =====
@@ -46,235 +21,11 @@ if (!Array.isArray) {
         return Object.prototype.toString.call(obj) == "[object Array]";
     };
 }
-
-// ES5 15.4.4.18
-if (!Array.prototype.forEach) {
-    Array.prototype.forEach =  function(block, thisObject) {
-        var len = this.length >>> 0;
-        for (var i = 0; i < len; i++) {
-            if (i in this) {
-                block.call(thisObject, this[i], i, this);
-            }
-        }
-    };
-}
-
-// ES5 15.4.4.19
-// https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/map
-if (!Array.prototype.map) {
-    Array.prototype.map = function(fun /*, thisp*/) {
-        var len = this.length >>> 0;
-        if (typeof fun != "function")
-          throw new TypeError();
-
-        var res = new Array(len);
-        var thisp = arguments[1];
-        for (var i = 0; i < len; i++) {
-            if (i in this)
-                res[i] = fun.call(thisp, this[i], i, this);
-        }
-
-        return res;
-    };
-}
-
-// ES5 15.4.4.20
-if (!Array.prototype.filter) {
-    Array.prototype.filter = function (block /*, thisp */) {
-        var values = [];
-        var thisp = arguments[1];
-        for (var i = 0; i < this.length; i++)
-            if (block.call(thisp, this[i]))
-                values.push(this[i]);
-        return values;
-    };
-}
-
-// ES5 15.4.4.16
-if (!Array.prototype.every) {
-    Array.prototype.every = function (block /*, thisp */) {
-        var thisp = arguments[1];
-        for (var i = 0; i < this.length; i++)
-            if (!block.call(thisp, this[i]))
-                return false;
-        return true;
-    };
-}
-
-// ES5 15.4.4.17
-if (!Array.prototype.some) {
-    Array.prototype.some = function (block /*, thisp */) {
-        var thisp = arguments[1];
-        for (var i = 0; i < this.length; i++)
-            if (block.call(thisp, this[i]))
-                return true;
-        return false;
-    };
-}
-
-// ES5 15.4.4.21
-// https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/reduce
-if (!Array.prototype.reduce) {
-    Array.prototype.reduce = function(fun /*, initial*/) {
-        var len = this.length >>> 0;
-        if (typeof fun != "function")
-            throw new TypeError();
-
-        // no value to return if no initial value and an empty array
-        if (len == 0 && arguments.length == 1)
-            throw new TypeError();
-
-        var i = 0;
-        if (arguments.length >= 2) {
-            var rv = arguments[1];
-        } else {
-            do {
-                if (i in this) {
-                    rv = this[i++];
-                    break;
-                }
-
-                // if array contains no values, no initial value to return
-                if (++i >= len)
-                    throw new TypeError();
-            } while (true);
-        }
-
-        for (; i < len; i++) {
-            if (i in this)
-                rv = fun.call(null, rv, this[i], i, this);
-        }
-
-        return rv;
-    };
-}
-
-// ES5 15.4.4.22
-// https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/reduceRight
-if (!Array.prototype.reduceRight) {
-    Array.prototype.reduceRight = function(fun /*, initial*/) {
-        var len = this.length >>> 0;
-        if (typeof fun != "function")
-            throw new TypeError();
-
-        // no value to return if no initial value, empty array
-        if (len == 0 && arguments.length == 1)
-            throw new TypeError();
-
-        var i = len - 1;
-        if (arguments.length >= 2) {
-            var rv = arguments[1];
-        } else {
-            do {
-                if (i in this) {
-                    rv = this[i--];
-                    break;
-                }
-
-                // if array contains no values, no initial value to return
-                if (--i < 0)
-                    throw new TypeError();
-            } while (true);
-        }
-
-        for (; i >= 0; i--) {
-            if (i in this)
-                rv = fun.call(null, rv, this[i], i, this);
-        }
-
-        return rv;
-    };
-}
-
-// ES5 15.4.4.14
-if (!Array.prototype.indexOf) {
-    Array.prototype.indexOf = function (value /*, fromIndex */ ) {
-        var length = this.length;
-        if (!length)
-            return -1;
-        var i = arguments[1] || 0;
-        if (i >= length)
-            return -1;
-        if (i < 0)
-            i += length;
-        for (; i < length; i++) {
-            if (!has.call(this, i))
-                continue;
-            if (value === this[i])
-                return i;
-        }
-        return -1;
-    };
-}
-
-// ES5 15.4.4.15
-if (!Array.prototype.lastIndexOf) {
-    Array.prototype.lastIndexOf = function (value /*, fromIndex */) {
-        var length = this.length;
-        if (!length)
-            return -1;
-        var i = arguments[1] || length;
-        if (i < 0)
-            i += length;
-        i = Math.min(i, length - 1);
-        for (; i >= 0; i--) {
-            if (!has.call(this, i))
-                continue;
-            if (value === this[i])
-                return i;
-        }
-        return -1;
-    };
-}
-
+	
 //
 // Object
 // ======
-// 
-
-if((!Object.create || !Object.defineProperties) && window.jQuery && jQuery.webshims){
-	var shims = jQuery.webshims;
-	shims.objectCreate = function(proto, props){
-		var f = function(){};
-		f.prototype = proto;
-		var o = new f();
-		if(props){
-			shims.defineProperties(o, props);
-		}
-		return o;
-	};
-	
-	shims.defineProperties = function(object, props){
-		for (var name in props) {
-			if (has.call(props, name)) {
-				shims.defineProperty(object, name, props[name]);
-			}
-		}
-		return object;
-	};
-	
-	shims.defineProperty = function(proto, property, descriptor){
-		if(typeof descriptor != "object"){return proto;}
-		if(has.call(descriptor, "value")){
-			proto[property] = descriptor.value;
-			return proto;
-		}
-		if(Object.defineProperty){
-			try{
-				Object.defineProperty(proto, property, descriptor);
-			} catch(e){}
-		}
-		if(proto.__defineGetter__){
-            if (typeof descriptor.get == "function") {
-				proto.__defineGetter__(property, descriptor.get);
-			}
-            if (typeof descriptor.set == "function"){
-                proto.__defineSetter__(property, descriptor.set);
-			}
-        }
-		return proto;
-	};
-}
+//
 
 // ES5 15.2.3.14
 // http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
@@ -322,67 +73,60 @@ if (!Object.keys) {
         return keys;
     };
 
+} 
+
+if((!Object.create || !Object.defineProperties) && window.jQuery && jQuery.webshims){
+	var shims = jQuery.webshims;
+	shims.objectCreate = function(proto, props){
+		var f = function(){};
+		f.prototype = proto;
+		var o = new f();
+		if(props){
+			shims.defineProperties(o, props);
+		}
+		return o;
+	};
+	
+	shims.defineProperties = function(object, props){
+		for (var name in props) {
+			if (has.call(props, name)) {
+				shims.defineProperty(object, name, props[name]);
+			}
+		}
+		return object;
+	};
+	
+	shims.defineProperty = function(proto, property, descriptor){
+		if(typeof descriptor != "object"){return proto;}
+		if(has.call(descriptor, "value")){
+			proto[property] = descriptor.value;
+			return proto;
+		}
+		if(Object.defineProperty){
+			try{
+				Object.defineProperty(proto, property, descriptor);
+			} catch(e){}
+		}
+		if(proto.__defineGetter__){
+            if (typeof descriptor.get == "function") {
+				proto.__defineGetter__(property, descriptor.get);
+			}
+            if (typeof descriptor.set == "function"){
+                proto.__defineSetter__(property, descriptor.set);
+			}
+        }
+		return proto;
+	};
 }
+
+
+
 
 //
 // Date
 // ====
 //
 
-// ES5 15.9.5.43
-// Format a Date object as a string according to a subset of the ISO-8601 standard.
-// Useful in Atom, among other things.
-if (!Date.prototype.toISOString) {
-    Date.prototype.toISOString = function() {
-        return (
-            this.getFullYear() + "-" +
-            (this.getMonth() + 1) + "-" +
-            this.getDate() + "T" +
-            this.getHours() + ":" +
-            this.getMinutes() + ":" +
-            this.getSeconds() + "Z"
-        ); 
-    }
-}
-
-// ES5 15.9.4.4
-if (!Date.now) {
-    Date.now = function () {
-        return new Date().getTime();
-    };
-}
-
-// ES5 15.9.5.44
-if (!Date.prototype.toJSON) {
-    Date.prototype.toJSON = function (key) {
-        // This function provides a String representation of a Date object for
-        // use by JSON.stringify (15.12.3). When the toJSON method is called
-        // with argument key, the following steps are taken:
-
-        // 1.  Let O be the result of calling ToObject, giving it the this
-        // value as its argument.
-        // 2. Let tv be ToPrimitive(O, hint Number).
-        // 3. If tv is a Number and is not finite, return null.
-        // XXX
-        // 4. Let toISO be the result of calling the [[Get]] internal method of
-        // O with argument "toISOString".
-        // 5. If IsCallable(toISO) is false, throw a TypeError exception.
-        if (typeof this.toISOString != "function")
-            throw new TypeError();
-        // 6. Return the result of calling the [[Call]] internal method of
-        // toISO with O as the this value and an empty argument list.
-        return this.toISOString();
-
-        // NOTE 1 The argument is ignored.
-
-        // NOTE 2 The toJSON function is intentionally generic; it does not
-        // require that its this value be a Date object. Therefore, it can be
-        // transferred to other kinds of objects for use as a method. However,
-        // it does require that any such object have a toISOString method. An
-        // object is free to use the argument key to filter its
-        // stringification.
-    };
-}
 
 // 15.9.4.2 Date.parse (string)
 // 15.9.1.15 Date Time String Format
@@ -500,6 +244,7 @@ if (isNaN(Date.parse("T00:00"))) {
         return Date;
     })(Date);
 }
+
 
 // 
 // Function
@@ -621,29 +366,11 @@ if (!Function.prototype.bind) {
         return bound;
     };
 }
-
-//
-// String
-// ======
-//
-
-// ES5 15.5.4.20
-if (!String.prototype.trim) {
-    // http://blog.stevenlevithan.com/archives/faster-trim-javascript
-    var trimBeginRegexp = /^\s\s*/;
-    var trimEndRegexp = /\s\s*$/;
-    String.prototype.trim = function () {
-        return String(this).replace(trimBeginRegexp, '').replace(trimEndRegexp, '');
-    };
-}
-
 })();
-/* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
 jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	"use strict";
 	
 	var support = $.support;
-	var fixNative = false;
 	var getVisual = function(elem){
 		elem = $(elem);
 		return (elem.data('inputUIReplace') || {visual: elem}).visual;
@@ -654,9 +381,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		elem = $(elem);
 		return (groupTypes[elem[0].type] && elem[0].name) ? $(doc.getElementsByName(elem[0].name)).not(elem[0]) : emptyJ;
 	};
-	if(support.validity){
-		fixNative = !window.noHTMLExtFixes;
-	}
+	
 	/*
 	 * Selectors for all browsers
 	 */
@@ -673,7 +398,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	});
 	
 	//CSS selectors for all browsers
-	//ToDo add checkbox/radiobutton handling
+	//ToDo needs testing
 	var oldAttr = $.attr;
 	var changeVals = {selectedIndex: 1, value: 1, checked: 1, disabled: 1, readonly: 1};
 	var stopUIRefresh;
@@ -889,7 +614,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	})();
 	
 	(function(){
-		if(!fixNative || support.fieldsetValidation){return;}
+		if(!support.validity || window.noHTMLExtFixes || support.fieldsetValidation){return;}
 		//safari 5.0.2 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
 		var checkValidity = function(elem){
 			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
@@ -1321,6 +1046,28 @@ webshims.createReadyEvent('form-extend');
 
 jQuery.webshims.ready('form-extend', function($, webshims, window){
 	"use strict";
+	//why no step IDL?
+	webshims.getStep = function(elem, type){
+		var step = $.attr(elem, 'step');
+		if(step === 'any'){
+			return step;
+		}
+		type = type || getType(elem);
+		if(!typeModels[type] || !typeModels[type].step){
+			return step;
+		}
+		step = typeModels.number.asNumber(step);
+		return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
+	};
+	//why no min/max IDL?
+	webshims.addMinMaxNumberToCache = function(attr, elem, cache){
+		if (!(attr+'AsNumber' in cache)) {
+			cache[attr+'AsNumber'] = typeModels[cache.type].asNumber(elem.attr(attr));
+			if(isNaN(cache[attr+'AsNumber']) && (attr+'Default' in typeModels[cache.type])){
+				cache[attr+'AsNumber'] = typeModels[cache.type][attr+'Default'];
+			}
+		}
+	};
 	
 	var nan = parseInt('NaN', 10),
 		doc = document,
@@ -1337,28 +1084,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 		isDateTimePart = function(string){
 			return (isNumber(string) || (string && string == '0' + (string * 1)));
 		},
-		//why no step IDL?
-		getStep = function(elem, type){
-			var step = $.attr(elem, 'step');
-			if(step === 'any'){
-				return step;
-			}
-			type = type || getType(elem);
-			if(!typeModels[type] || !typeModels[type].step){
-				return step;
-			}
-			step = typeModels.number.asNumber(step);
-			return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
-		},
-		//why no min/max IDL?
-		addMinMaxNumberToCache = function(attr, elem, cache){
-			if (!(attr+'AsNumber' in cache)) {
-				cache[attr+'AsNumber'] = typeModels[cache.type].asNumber(elem.attr(attr));
-				if(isNaN(cache[attr+'AsNumber']) && (attr+'Default' in typeModels[cache.type])){
-					cache[attr+'AsNumber'] = typeModels[cache.type][attr+'Default'];
-				}
-			}
-		},
+		addMinMaxNumberToCache = webshims.addMinMaxNumberToCache,
 		addleadingZero = function(val, len){
 			val = ''+val;
 			len = len - val.length;
@@ -1382,7 +1108,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 		var ret = false, base;
 		if(typeModels[cache.type] && typeModels[cache.type].step){
 			if( !('step' in cache) ){
-				cache.step = getStep(input[0], cache.type);
+				cache.step = webshims.getStep(input[0], cache.type);
 			}
 			
 			if(cache.step == 'any'){return false;}
@@ -1680,179 +1406,6 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 		webshims.addInputType('datetime-local', $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']));
 	}
 	
-	//implement set/arrow controls
-	(function(){
-		var options = webshims.modules['form-number-date'].options;
-		var correctBottom = ($.browser.msie && parseInt($.browser.version, 10) < 8) ? 2 : 0;
-		var getNextStep = function(input, upDown, cache){
-			
-			cache = cache || {};
-			
-			if( !('type' in cache) ){
-				cache.type = getType(input);
-			}
-			if( !('step' in cache) ){
-				cache.step = getStep(input, cache.type);
-			}
-			if( !('valueAsNumber' in cache) ){
-				cache.valueAsNumber = typeModels[cache.type].asNumber($.attr(input, 'value'));
-			}
-			var delta = (cache.step == 'any') ? typeModels[cache.type].step * typeModels[cache.type].stepScaleFactor : cache.step,
-				ret
-			;
-			addMinMaxNumberToCache('min', $(input), cache);
-			addMinMaxNumberToCache('max', $(input), cache);
-			
-			if(isNaN(cache.valueAsNumber)){
-				cache.valueAsNumber = typeModels[cache.type].stepBase || 0;
-			}
-			//make a valid step
-			if(cache.step !== 'any'){
-				ret = Math.round( ((cache.valueAsNumber - (cache.minAsnumber || 0)) % cache.step) * 1e7 ) / 1e7;
-				if(ret &&  Math.abs(ret) != cache.step){
-					cache.valueAsNumber = cache.valueAsNumber - ret;
-				}
-			}
-			ret = cache.valueAsNumber + (delta * upDown);
-			//using NUMBER.MIN/MAX is really stupid | ToDo: either use disabled state or make this more usable
-			if(!isNaN(cache.minAsNumber) && ret < cache.minAsNumber){
-				ret = (cache.valueAsNumber * upDown  < cache.minAsNumber) ? cache.minAsNumber : isNaN(cache.maxAsNumber) ? Number.MAX_VALUE : cache.maxAsNumber;
-			} else if(!isNaN(cache.maxAsNumber) && ret > cache.maxAsNumber){
-				ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? Number.MIN_VALUE : cache.minAsNumber;
-			}
-			return Math.round( ret * 1e7)  / 1e7;
-		};
-		
-		webshims.modules['form-number-date'].getNextStep = getNextStep;
-		
-		var doSteps = function(input, type, control){
-			if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
-			$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
-			$(input).unbind('blur.stepeventshim');
-			webshims.triggerInlineForm(input, 'input');
-			
-			
-			if( doc.activeElement ){
-				if(doc.activeElement !== input){
-					try {input.focus();} catch(e){}
-				}
-				setTimeout(function(){
-					if(doc.activeElement !== input){
-						try {input.focus();} catch(e){}
-					}
-					$(input)
-						.one('blur.stepeventshim', function(){
-							$(input).trigger('change');
-						})
-					;
-				}, 0);
-				
-			}
-		};
-		
-		
-		if(options.stepArrows){
-			var disabledReadonly = {
-				elementNames: ['input'],
-				// don't change getter
-				setter: function(elem, value, fn){
-					fn();
-					var stepcontrols = $.data(elem, 'step-controls');
-					if(stepcontrols){
-						stepcontrols[ (elem.disabled || elem.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
-					}
-				}
-			};
-			webshims.attr('disabled', disabledReadonly);
-			webshims.attr('readonly', disabledReadonly);
-			
-		}
-		var stepKeys = {
-			38: 1,
-			40: -1
-		};
-		webshims.addReady(function(context, contextElem){
-			
-			//ui for numeric values
-			if(options.stepArrows){
-				$('input', context).add(contextElem.filter('input')).each(function(){
-					var type = getType(this);
-					if(!typeModels[type] || !typeModels[type].asNumber || !options.stepArrows || (options.stepArrows !== true && !options.stepArrows[type])){return;}
-					var elem = this,
-						dir 	= ($(this).css('direction') == 'rtl') ? 
-							{
-								action: 'insertBefore',
-								side: 'Left',
-								otherSide: 'right'
-							} :
-							{
-								action: 'insertAfter',
-								side: 'Right',
-								otherSide: 'Left'
-							}
-					;
-					var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
-						[dir.action](this)
-						.bind('selectstart dragstart', function(){
-							return false;
-						})
-						.bind('mousedown mousepress', function(e){
-							doSteps(elem, type, e.target);
-							return false;
-						})
-					;
-					
-					$(this)
-						.addClass('has-step-controls')
-						.data('step-controls', controls)
-						.attr({
-							readonly: this.readOnly,
-							disabled: this.disabled,
-							autocomplete: 'off'
-						})
-						.bind(($.browser.msie) ? 'keydown' : 'keypress', function(e){
-							if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
-							$.attr(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
-							webshims.triggerInlineForm(this, 'input');
-							return false;
-						})
-					;
-					
-					if(options.calculateWidth){
-						var jElm = $(this);
-						var inputDim = {
-							w: jElm.width()
-						};
-						if(!inputDim.w){return;}
-						var controlDim = {
-							mL: (parseInt(controls.css('margin'+dir.otherSide), 10) || 0),
-							w: controls.outerWidth()
-						};
-						inputDim.mR = (parseInt(jElm.css('margin'+dir.side), 10) || 0);
-						if(!correctBottom){
-							controls.css('marginBottom', (parseInt(jElm.css('paddingBottom'), 10) || 0) / -2 );
-						} else {
-							controls.css('marginBottom', ((jElm.innerHeight() - (controls.height() / 2)) / 2) - 1 );
-						}
-						if(inputDim.mR){
-							jElm.css('margin'+dir.side, 0);
-						}
-						//is inside
-						if( controlDim.mL <= (controlDim.w * -1) ){
-							controls.css('margin'+dir.side,  Math.floor(Math.abs(controlDim.w + controlDim.mL) + inputDim.mR));
-							jElm.css('padding'+dir.side, (parseInt($(this).css('padding'+dir.side), 10) || 0) + Math.abs(controlDim.mL));
-							jElm.css('width', Math.floor(inputDim.w + controlDim.mL));
-						} else {
-							controls.css('margin'+dir.side, inputDim.mR);
-							jElm.css('width',  Math.floor(inputDim.w - controlDim.mL - controlDim.w));
-						}
-						
-					}
-				});
-			}
-		});
-	})();
-	
 	// add support for new input-types
 	webshims.attr('type', {
 		elementNames: ['input'],
@@ -1868,8 +1421,33 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 	
 }, true);
 /* number-date-ui */
-jQuery.webshims.ready('form-number-date', function($, webshims, window, document){
+jQuery.webshims.ready('form-core', function($, webshims, window, document){
 	"use strict";
+	
+	var adjustInputWithBtn = function(input, button){
+		var inputDim = {
+			w: input.width()
+		};
+		if(!inputDim.w){return;}
+		var controlDim = {
+			mL: (parseInt(button.css('marginLeft'), 10) || 0),
+			w: button.outerWidth()
+		};
+		inputDim.mR = (parseInt(input.css('marginRight'), 10) || 0);
+		
+		if(inputDim.mR){
+			input.css('marginRight', 0);
+		}
+		//is inside
+		if( controlDim.mL <= (controlDim.w * -1) ){
+			button.css('marginRight',  Math.floor(Math.abs(controlDim.w + controlDim.mL) + inputDim.mR));
+			input.css('paddingRight', (parseInt(input.css('paddingRight'), 10) || 0) + Math.abs(controlDim.mL));
+			input.css('width', Math.floor(inputDim.w + controlDim.mL));
+		} else {
+			button.css('marginRight', inputDim.mR);
+			input.css('width',  Math.floor(inputDim.w - controlDim.mL - controlDim.w));
+		}
+	};
 		
 	var options = $.webshims.modules.inputUI.options;
 	var globalInvalidTimer;
@@ -1905,7 +1483,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 						throw(name +' can not be focused. handle the invalid event.');
 					}
 				};
-				orig.bind('firstinvalid invalid', function(e){
+				orig.bind('firstinvalid', function(e){
 					clearTimeout(timer);
 					events.push(e);
 					timer = setTimeout(function(){
@@ -1956,61 +1534,35 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 		if(!$.fn.datepicker){return;}
 		var date = $('<span class="input-datetime-local"><input type="text" class="input-datetime-local-date" /><input type="time" class="input-datetime-local-time" /></span>'),
 			attr  = this.common(elem, date, replaceInputUI['datetime-local'].attrs),
-			datePicker = $('input.input-datetime-local-date', date)
-		;
-		$('input', date).data('html5element', $.data(date[0], 'html5element'));
-		
-		datePicker.attr('aria-labeledby', attr.label.attr('id'));
-		attr.label.bind('click', function(){
-			datePicker.focus();
-			return false;
-		});
-		
-		if(attr.css){
-			date.css(attr.css);
-			if(attr.outerWidth){
-				date.outerWidth(attr.outerWidth);
-				var width = date.width() - 4;
-				datePicker
-					.css({marginLeft: 0, marginRight: 2})
-					.outerWidth(Math.floor(width * 0.6))
-				;
-				$('input.input-datetime-local-time', date)
-					.css({marginLeft: 2, marginRight: 0})
-					.outerWidth(Math.floor(width * 0.4))
-				;
-			}
-		}
-		
-		webshims.triggerDomUpdate(date);
-		$('input.input-datetime-local-date', date)
-			.datepicker($.extend({}, options.datepicker))
-			.bind('change', function(e){
-				
-				var value = datePicker.attr('value'), 
-					timeVal = $('input.input-datetime-local-time', date).attr('value')
-				;
-				if(value){
-					try {
-						value = $.datepicker.parseDate(datePicker.datepicker('option', 'dateFormat'), value);
-						value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : datePicker.attr('value');
-					} catch (e) {value = datePicker.attr('value');}
-					if (!timeVal) {
-						timeVal = '00:00';
-						$('input.input-datetime-local-time', date).attr('value', timeVal);
-					}
-				} 
-				value = (!value && !timeVal) ? '' : value + 'T' + timeVal;
-				replaceInputUI['datetime-local'].blockAttr = true;
-				elem.attr('value', value);
-				replaceInputUI['datetime-local'].blockAttr = false;
-				e.stopImmediatePropagation();
-				elem.trigger('change');
-			})
-			.data('datepicker')
-			.dpDiv.addClass('input-date-datepicker-control')
+			datePicker = $('input.input-datetime-local-date', date),
+			data = datePicker
+				.datepicker($.extend({}, options.datepicker, elem.data('datepicker')))
+				.bind('change', function(e){
+					
+					var value = datePicker.attr('value'), 
+						timeVal = $('input.input-datetime-local-time', date).attr('value')
+					;
+					if(value){
+						try {
+							value = $.datepicker.parseDate(datePicker.datepicker('option', 'dateFormat'), value);
+							value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : datePicker.attr('value');
+						} catch (e) {value = datePicker.attr('value');}
+						if (!timeVal) {
+							timeVal = '00:00';
+							$('input.input-datetime-local-time', date).attr('value', timeVal);
+						}
+					} 
+					value = (!value && !timeVal) ? '' : value + 'T' + timeVal;
+					replaceInputUI['datetime-local'].blockAttr = true;
+					elem.attr('value', value);
+					replaceInputUI['datetime-local'].blockAttr = false;
+					e.stopImmediatePropagation();
+					elem.trigger('change');
+				})
+				.data('datepicker')
 		;
 		
+		data.dpDiv.addClass('input-date-datepicker-control');
 		$('input.input-datetime-local-time', date).bind('input change', function(e){
 			var timeVal = $.attr(this, 'value');
 			var val = elem.attr('value').split('T');
@@ -2031,6 +1583,30 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 			e.stopImmediatePropagation();
 			elem.trigger('change');
 		});
+		
+		$('input', date).data('html5element', $.data(date[0], 'html5element'));
+		
+		datePicker.attr('aria-labeledby', attr.label.attr('id'));
+		attr.label.bind('click', function(){
+			datePicker.focus();
+			return false;
+		});
+		
+		if(attr.css){
+			date.css(attr.css);
+			if(attr.outerWidth){
+				date.outerWidth(attr.outerWidth);
+				var width = date.width();
+				var widthFac = (data.trigger[0]) ? [0.65,0.35] : [0.6,0.4];
+				datePicker.outerWidth(Math.floor(width * widthFac[0]), true);
+				$('input.input-datetime-local-time', date).outerWidth(Math.floor(width * widthFac[1]), true);
+				if(data.trigger[0]){
+					adjustInputWithBtn(datePicker, data.trigger);
+				}
+			}
+		}
+		
+		webshims.triggerDomUpdate(date);
 		
 		$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
 			elem.attr(name, function(i, value){return value || '';});
@@ -2101,21 +1677,25 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 				replaceInputUI.date.blockAttr = false;
 				e.stopImmediatePropagation();
 				elem.trigger('change');
-			}
-		;
+			},
+			data = date
+				.datepicker($.extend({}, options.datepicker, elem.data('datepicker')))
+				.bind('change', change)
+				.data('datepicker')
+				
 		
+		;
+		data.dpDiv.addClass('input-date-datepicker-control');
 		if(attr.css){
 			date.css(attr.css);
 			if(attr.outerWidth){
 				date.outerWidth(attr.outerWidth);
 			}
+			if(data.trigger[0]){
+				adjustInputWithBtn(date, data.trigger);
+			}
 		}
-		date
-			.datepicker($.extend({}, options.datepicker))
-			.bind('change', change)
-			.data('datepicker')
-			.dpDiv.addClass('input-date-datepicker-control')
-		;
+		
 		$.each(['disabled', 'min', 'max', 'value'], function(i, name){
 			elem.attr(name, function(i, value){return value || '';});
 		});
@@ -2185,7 +1765,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 				range.outerWidth(attr.outerWidth);
 			}
 		}
-		range.slider($.extend(options.slider, {
+		range.slider($.extend({}, options.slider, elem.data('slider'), {
 			change: change,
 			slide: change
 		}));
@@ -2286,7 +1866,146 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 		});
 	});
 	
+	
+	//implement set/arrow controls
+jQuery.webshims.ready('form-number-date', function($, webshims, window, doc){
+	var options = webshims.modules['form-number-date'].options;
+	var correctBottom = ($.browser.msie && parseInt($.browser.version, 10) < 8) ? 2 : 0;
+	var typeModels = webshims.inputTypes;
+	var getNextStep = function(input, upDown, cache){
+		
+		cache = cache || {};
+		
+		if( !('type' in cache) ){
+			cache.type = getType(input);
+		}
+		if( !('step' in cache) ){
+			cache.step = webshims.getStep(input, cache.type);
+		}
+		if( !('valueAsNumber' in cache) ){
+			cache.valueAsNumber = typeModels[cache.type].asNumber($.attr(input, 'value'));
+		}
+		var delta = (cache.step == 'any') ? typeModels[cache.type].step * typeModels[cache.type].stepScaleFactor : cache.step,
+			ret
+		;
+		webshims.addMinMaxNumberToCache('min', $(input), cache);
+		webshims.addMinMaxNumberToCache('max', $(input), cache);
+		
+		if(isNaN(cache.valueAsNumber)){
+			cache.valueAsNumber = typeModels[cache.type].stepBase || 0;
+		}
+		//make a valid step
+		if(cache.step !== 'any'){
+			ret = Math.round( ((cache.valueAsNumber - (cache.minAsnumber || 0)) % cache.step) * 1e7 ) / 1e7;
+			if(ret &&  Math.abs(ret) != cache.step){
+				cache.valueAsNumber = cache.valueAsNumber - ret;
+			}
+		}
+		ret = cache.valueAsNumber + (delta * upDown);
+		//using NUMBER.MIN/MAX is really stupid | ToDo: either use disabled state or make this more usable
+		if(!isNaN(cache.minAsNumber) && ret < cache.minAsNumber){
+			ret = (cache.valueAsNumber * upDown  < cache.minAsNumber) ? cache.minAsNumber : isNaN(cache.maxAsNumber) ? Number.MAX_VALUE : cache.maxAsNumber;
+		} else if(!isNaN(cache.maxAsNumber) && ret > cache.maxAsNumber){
+			ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? Number.MIN_VALUE : cache.minAsNumber;
+		}
+		return Math.round( ret * 1e7)  / 1e7;
+	};
+	
+	webshims.modules['form-number-date'].getNextStep = getNextStep;
+	
+	var doSteps = function(input, type, control){
+		if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
+		$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
+		$(input).unbind('blur.stepeventshim');
+		webshims.triggerInlineForm(input, 'input');
+		
+		
+		if( doc.activeElement ){
+			if(doc.activeElement !== input){
+				try {input.focus();} catch(e){}
+			}
+			setTimeout(function(){
+				if(doc.activeElement !== input){
+					try {input.focus();} catch(e){}
+				}
+				$(input)
+					.one('blur.stepeventshim', function(){
+						$(input).trigger('change');
+					})
+				;
+			}, 0);
+			
+		}
+	};
+	
+	
+	if(options.stepArrows){
+		var disabledReadonly = {
+			elementNames: ['input'],
+			// don't change getter
+			setter: function(elem, value, fn){
+				fn();
+				var stepcontrols = $.data(elem, 'step-controls');
+				if(stepcontrols){
+					stepcontrols[ (elem.disabled || elem.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
+				}
+			}
+		};
+		webshims.attr('disabled', disabledReadonly);
+		webshims.attr('readonly', disabledReadonly);
+		
+	}
+	var stepKeys = {
+		38: 1,
+		40: -1
+	};
+	webshims.addReady(function(context, contextElem){
+		
+		//ui for numeric values
+		if(options.stepArrows){
+			$('input', context).add(contextElem.filter('input')).each(function(){
+				var type = $.attr(this, 'type');
+				if(!typeModels[type] || !typeModels[type].asNumber || !options.stepArrows || (options.stepArrows !== true && !options.stepArrows[type])){return;}
+				var elem = this;
+				var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
+					.insertAfter(this)
+					.bind('selectstart dragstart', false)
+					.bind('mousedown mousepress', function(e){
+						doSteps(elem, type, e.target);
+						return false;
+					})
+				;
+				var jElm = $(this)
+					.addClass('has-step-controls')
+					.data('step-controls', controls)
+					.attr({
+						readonly: this.readOnly,
+						disabled: this.disabled,
+						autocomplete: 'off'
+					})
+					.bind(($.browser.msie) ? 'keydown' : 'keypress', function(e){
+						if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
+						$.attr(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
+						webshims.triggerInlineForm(this, 'input');
+						return false;
+					})
+				;
+				
+				if(options.calculateWidth){
+					adjustInputWithBtn(jElm, controls);
+					if(!correctBottom){
+						controls.css('marginBottom', (parseInt(jElm.css('paddingBottom'), 10) || 0) / -2 );
+					} else {
+						controls.css('marginBottom', ((jElm.innerHeight() - (controls.height() / 2)) / 2) - 1 );
+					}
+				}
+			});
+		}
+	});
 }, true);
+	
+}, true);
+
 /*
  * HTML5 placeholder-enhancer
  * version: 2.0.2

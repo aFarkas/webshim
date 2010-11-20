@@ -14,11 +14,9 @@
 			border: 1px solid #000;
 			margin: 5px 0;
 		}
-		span.number {
+		input.number {
 			display: inline-block;
 			margin-right: 5px;
-		}
-		span.number input {
 			text-align: center;
 			width: 2.8em;
 		}
@@ -29,7 +27,7 @@
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
 	
     <script class="example">
-    	
+//    	$.webshims.debug = true;
 		
     	$.webshims.modules.inputUI.options.replaceNative = true;
 		$.webshims.modules.inputUI.options.slider = {
@@ -37,7 +35,10 @@
 			animate: true
 		};
 		$.webshims.modules.inputUI.options.datepicker = {
-			showAnim: 'slideDown'
+			showAnim: 'slideDown',
+			changeMonth: true,
+			changeYear: true,
+			showButtonPanel: true
 		};
 		
 		//path is path of polyfiller.js + shims/
@@ -55,16 +56,20 @@
 				//prevent browser from showing his native validation message
 				return false;
 			});
+			
 			$('#range').each(function(){
 				var range = $(this);
-				var number = $('<span class="number"><input class="number" value="'+ range.attr('value') +'" min="0" max="100" type="number" /></span>');
+				var number = $('<input class="number" value="'+ range.attr('value') +'" min="0" max="100" type="number" />');
 				range.beforeWebshim(number);
+					
 				number.bind('input', function(){
-					range.attr('value', $('input', this).attr('value'));
+					range.attr('value', number.attr('value'));
 				});
-				range.bind('input', function(){
-					$('input', number).attr('value', $(this).attr('value'));
-				});
+				range
+					.bind('input', function(){
+						number.attr('value', $(this).attr('value'));
+					})
+				;
 			});
 		});
 	</script>
@@ -118,9 +123,17 @@ $.webshims.modules.inputUI.options.slider = {
 	animate: true
 };
 $.webshims.modules.inputUI.options.datepicker = {
-	showAnim: 'slideDown'
+	showAnim: 'slideDown',
+	changeMonth: true,
+	changeYear: true,
+	showButtonPanel: true
 };
 </code>
+			<p>You can also override defaults with your markup using data-slider/data-datepicker attributes.</p>
+<code class="block">
+&lt;input type="range" data-slider='{"range": "max"}' /&gt;
+</code>
+
 			<h3>Loading jQuery UI from another source</h3>
 <code class="block">
 // relative from $.webshims.loader.basePath
@@ -151,6 +164,13 @@ $.webshims.modules["input-widgets"].src = "../jquery-ui.slider-datepicker.min.js
 	                       	<input name="range" type="range" id="range" />
 	                    </div>
 						
+						<div class="form-element">
+	                        <label for="range-max">
+	                            range (with data attribute):
+							</label>
+	                       	<input data-slider='{"range": "max"}' name="range-max" type="range" id="range-max" />
+	                    </div>
+						
 						
 	                    <div class="form-element">
 	                        <label for="date">
@@ -162,11 +182,27 @@ $.webshims.modules["input-widgets"].src = "../jquery-ui.slider-datepicker.min.js
 	                    </div>
 						
 						<div class="form-element">
+	                        <label for="date-data">
+	                            date (with data attribute): <dfn title="required">*</dfn>
+							</label>
+							
+	                       	<input data-datepicker='{"showOn": "button", "buttonImage": "../../css/calendar.gif"}' name="date-data" required="required" type="date" id="date-data" />
+	                    </div>
+						
+						<div class="form-element">
 	                        <label for="datetime-local">
 	                            datetime-local: 
 							</label>
 	                       	<input value="2010-12-31T21:00" name="datetime-local" type="datetime-local" step="600" id="datetime-local" />
 							(step=600)
+	                    </div>
+						
+						<div class="form-element">
+	                        <label for="datetime-local-data">
+	                            datetime-local-data: 
+							</label>
+	                       	<input data-datepicker='{"showOn": "both", "buttonImage": "../../css/calendar.gif", "buttonImageOnly": true}' name="datetime-local-data" type="datetime-local" step="900" id="datetime-local-data" />
+							(step=900)
 	                    </div>
 												
 	                    <div class="form-element">

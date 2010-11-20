@@ -71,12 +71,10 @@
 		return api;
 	})();
 })(jQuery);
-/* fix chrome 5/6 and safari 5 implemenation + add some usefull custom invalid event called firstinvalid */
 jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	"use strict";
 	
 	var support = $.support;
-	var fixNative = false;
 	var getVisual = function(elem){
 		elem = $(elem);
 		return (elem.data('inputUIReplace') || {visual: elem}).visual;
@@ -87,9 +85,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		elem = $(elem);
 		return (groupTypes[elem[0].type] && elem[0].name) ? $(doc.getElementsByName(elem[0].name)).not(elem[0]) : emptyJ;
 	};
-	if(support.validity){
-		fixNative = !window.noHTMLExtFixes;
-	}
+	
 	/*
 	 * Selectors for all browsers
 	 */
@@ -106,7 +102,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	});
 	
 	//CSS selectors for all browsers
-	//ToDo add checkbox/radiobutton handling
+	//ToDo needs testing
 	var oldAttr = $.attr;
 	var changeVals = {selectedIndex: 1, value: 1, checked: 1, disabled: 1, readonly: 1};
 	var stopUIRefresh;
@@ -322,7 +318,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	})();
 	
 	(function(){
-		if(!fixNative || support.fieldsetValidation){return;}
+		if(!support.validity || window.noHTMLExtFixes || support.fieldsetValidation){return;}
 		//safari 5.0.2 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
 		var checkValidity = function(elem){
 			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
