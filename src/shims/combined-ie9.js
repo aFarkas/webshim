@@ -223,7 +223,11 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				var scrollTop = webshims.scrollRoot.scrollTop();
 				var elemTop = focusElem.offset().top;
 				var labelOff;
-				
+				var focus =  function(){
+					try {
+						focusElem[0].focus();
+					} catch(e){}
+				};
 				alert.attr('for', webshims.getID(focusElem));
 				
 				if(scrollTop > elemTop){
@@ -235,14 +239,14 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 						{scrollTop: elemTop - 5}, 
 						{
 							queue: false, 
-							duration: Math.max( Math.min( 450, (scrollTop - elemTop) * 2 ), 140 )
+							duration: Math.max( Math.min( 450, (scrollTop - elemTop) * 2 ), 140 ),
+							complete: focus
 						}
 					);
+				} else {
+					focus();
 				}
-				try {
-					focusElem[0].focus();
-				} catch(e){}
-				webshims.scrollRoot.scrollTop(scrollTop);
+				
 				$(doc).bind('focusout.validityalert', boundHide);
 			},
 			getMessage: function(elem, message){
