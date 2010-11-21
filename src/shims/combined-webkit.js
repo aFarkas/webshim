@@ -781,7 +781,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	});
 	
 	var overrideNativeMessages = webshims.overrideValidationMessages;	
-	var overrideValidity = (!support.requiredSelect || !support.inputUI || overrideNativeMessages);
+	var overrideValidity = (!support.requiredSelect || !support.numericDateProps || overrideNativeMessages);
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	var oldAttr = $.attr;
 	var oldVal = $.fn.val;
@@ -829,7 +829,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		});
 		validityElements.push('select');
 	}
-	if(!support.inputUI || overrideNativeMessages){
+	if(!support.numericDateProps || overrideNativeMessages){
 		$.extend(validityChanger, {
 			min: 1, max: 1, step: 1
 		});
@@ -931,7 +931,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 			doc.addEventListener('change', function(e){
 				testValidity(e.target);
 			}, true);
-			if (!support.inputUI) {
+			if (!support.numericDateProps) {
 				doc.addEventListener('input', function(e){
 					testValidity(e.target);
 				}, true);

@@ -12,7 +12,7 @@
 	$('html').addClass('js-on').removeClass('js-off');
 	
 	$.webshims = {
-		version: '1.0.5RC1',
+		version: '1.0.5RC2',
 		useImportantStyles: true,
 		fix: {},
 		implement: {},
@@ -723,18 +723,29 @@
 	
 	(function(){
 		var form = $('<form action="#"><fieldset><input name="a" required /><select><option>y</option></select></fieldset></form>'),
-			field = $('fieldset', form)[0]
+			field = $('fieldset', form)[0],
+			range = $('<input type="range" />')[0],
+			date = $('<input type="date" />')[0]
 		;
 		
 		support.validity = ('checkValidity' in form[0]);
 		support.validationMessage = !!($('input', form).attr('validationMessage'));
 		support.fieldsetValidation = !!(field.elements && field.checkValidity && 'disabled' in field && !field.checkValidity() );
 		support.output = !!( 'value' in doc.createElement('output') );
-		support.inputUI = ($('<input type="range" />')[0].type == 'range' && $('<input type="date" />')[0].type == 'date');
+		support.numericDateProps = (range.type == 'range' && date.type == 'date');
 		support.requiredSelect = ('required' in $('select', form)[0]);
+		
+		support.rangeUI = support.numericDateProps;
+		support.dateUI = support.numericDateProps;
+		if(window.Modernizr){
+			support.rangeUI = Modernizr.inputtypes.range;
+			support.dateUI = Modernizr.inputtypes.date;
+		}
 		
 		form = null;
 		field = null;
+		range = null;
+		date = null;
 	})();
 	
 	//ToDo: these assumption aren't used yet || we have to wait till these bug are fixed
@@ -776,7 +787,7 @@
 			src: 'form-native-extend',
 			noAutoCallback: true,
 			test: function(toLoad){
-				return (support.requiredSelect && support.validationMessage && (support.inputUI || $.inArray('form-number-date', toLoad) == -1) && !webshims.overrideValidationMessages );
+				return (support.requiredSelect && support.validationMessage && (support.numericDateProps || $.inArray('form-number-date', toLoad) == -1) && !webshims.overrideValidationMessages );
 			},
 			loadInit: function(){
 				setTimeout(function(){
@@ -798,9 +809,7 @@
 		
 		addPolyfill('form-native-fix', {
 			feature: 'forms',
-			test: function(){
-				return support.requiredSelect;
-			},
+			test: function(){return support.requiredSelect;},
 			combination: ['combined-webkit']
 		});
 		
@@ -830,7 +839,7 @@
 		feature: 'forms-ext',
 		noAutoCallback: true,
 		test: function(){
-			return support.inputUI;
+			return support.numericDateProps;
 		},
 		
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4'],
@@ -838,10 +847,11 @@
 	});
 	
 	
+			
 	addPolyfill('inputUI', {
 		feature: 'forms-ext',
 		src: 'form-date-range-ui',
-		test: function(){return (support.inputUI && !modules.inputUI.options.replaceNative);},
+		test: function(){return (support.rangeUI && support.dateUI && !modules.inputUI.options.replaceNative);},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4'],
 		noAutoCallback: true,
 		loadInit: function(){
