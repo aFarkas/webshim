@@ -1588,7 +1588,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, doc){
 		cache = cache || {};
 		
 		if( !('type' in cache) ){
-			cache.type = getType(input);
+			cache.type = $.attr(input, 'type');
 		}
 		if( !('step' in cache) ){
 			cache.step = webshims.getStep(input, cache.type);
@@ -1680,7 +1680,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, doc){
 				var elem = this;
 				var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
 					.insertAfter(this)
-					.bind('selectstart dragstart', false)
+					.bind('selectstart dragstart', function(){return false;})
 					.bind('mousedown mousepress', function(e){
 						doSteps(elem, type, e.target);
 						return false;
