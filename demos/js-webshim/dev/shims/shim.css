@@ -1,7 +1,7 @@
-.loading-polyfills body {
+.polyfill-remove-fouc.loading-polyfills body {
 	visibility: hidden;
 }
-.long-loading-polyfills {
+.polyfill-remove-fouc.long-loading-polyfills {
 	background-image: url(polyfill-loader.gif);
 	background-position: center 240px;
 	background-repeat: no-repeat;
@@ -121,8 +121,9 @@ mark {
 .polyfill-important .input-datetime-local-time {
 	margin: 0 0 0 2px !important;
 }
-.ui-datepicker-trigger {
+img.ui-datepicker-trigger {
 	display: inline;
+	width: 16px;
 }
 /* spinner control for time, number (usable for date, datetime-local) */
 .has-step-controls {

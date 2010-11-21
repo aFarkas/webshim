@@ -1127,7 +1127,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 /* number-date-ui */
 jQuery.webshims.ready('form-core', function($, webshims, window, document){
 	"use strict";
-	
+	var triggerInlineForm = webshims.triggerInlineForm;
 	var adjustInputWithBtn = function(input, button){
 		var inputDim = {
 			w: input.width()
@@ -1236,7 +1236,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document){
 	
 	replaceInputUI['datetime-local'] = function(elem){
 		if(!$.fn.datepicker){return;}
-		var date = $('<span class="input-datetime-local"><input type="text" class="input-datetime-local-date" /><input type="time" class="input-datetime-local-time" /></span>'),
+		var date = $('<span role="group" class="input-datetime-local"><input type="text" class="input-datetime-local-date" /><input type="time" class="input-datetime-local-time" /></span>'),
 			attr  = this.common(elem, date, replaceInputUI['datetime-local'].attrs),
 			datePicker = $('input.input-datetime-local-date', date),
 			data = datePicker
@@ -1261,13 +1261,13 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document){
 					elem.attr('value', value);
 					replaceInputUI['datetime-local'].blockAttr = false;
 					e.stopImmediatePropagation();
-					elem.trigger('change');
+					triggerInlineForm(elem[0], 'change');
 				})
 				.data('datepicker')
 		;
 		
 		data.dpDiv.addClass('input-date-datepicker-control');
-		$('input.input-datetime-local-time', date).bind('input change', function(e){
+		$('input.input-datetime-local-time', date).bind('change', function(e){
 			var timeVal = $.attr(this, 'value');
 			var val = elem.attr('value').split('T');
 			if(timeVal && (val.length < 2 || !val[0])){
@@ -1285,12 +1285,12 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document){
 			elem.attr('value', val);
 			replaceInputUI['datetime-local'].blockAttr = false;
 			e.stopImmediatePropagation();
-			elem.trigger('change');
+			triggerInlineForm(elem[0], 'change');
 		});
 		
 		$('input', date).data('html5element', $.data(date[0], 'html5element'));
 		
-		datePicker.attr('aria-labeledby', attr.label.attr('id'));
+		date.attr('aria-labeledby', attr.label.attr('id'));
 		attr.label.bind('click', function(){
 			datePicker.focus();
 			return false;
@@ -1380,7 +1380,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document){
 				elem.attr('value', value);
 				replaceInputUI.date.blockAttr = false;
 				e.stopImmediatePropagation();
-				elem.trigger('change');
+				triggerInlineForm(elem[0], 'change');
 			},
 			data = date
 				.datepicker($.extend({}, options.datepicker, elem.data('datepicker')))
@@ -1449,9 +1449,9 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document){
 					elem.attr('value', ui.value);
 					replaceInputUI.range.blockAttr = false;
 					if(e.type == 'slidechange'){
-						elem.trigger('change');
+						triggerInlineForm(elem[0], 'change');
 					} else {
-						webshims.triggerInlineForm(elem[0], 'input');
+						triggerInlineForm(elem[0], 'input');
 					}
 				}
 			}
@@ -1621,7 +1621,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, doc){
 		if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
 		$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
 		$(input).unbind('blur.stepeventshim');
-		webshims.triggerInlineForm(input, 'input');
+		triggerInlineForm(input, 'input');
 		
 		
 		if( doc.activeElement ){
@@ -1634,7 +1634,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, doc){
 				}
 				$(input)
 					.one('blur.stepeventshim', function(){
-						$(input).trigger('change');
+						triggerInlineForm(input, 'change');
 					})
 				;
 			}, 0);
@@ -1685,12 +1685,13 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, doc){
 					.attr({
 						readonly: this.readOnly,
 						disabled: this.disabled,
-						autocomplete: 'off'
+						autocomplete: 'off',
+						role: 'spinbutton'
 					})
 					.bind(($.browser.msie) ? 'keydown' : 'keypress', function(e){
 						if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
 						$.attr(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
-						webshims.triggerInlineForm(this, 'input');
+						triggerInlineForm(this, 'input');
 						return false;
 					})
 				;

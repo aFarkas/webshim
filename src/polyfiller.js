@@ -12,7 +12,7 @@
 	$('html').addClass('js-on').removeClass('js-off');
 	
 	$.webshims = {
-		version: 'pre1.0.5',
+		version: '1.0.5RC1',
 		useImportantStyles: true,
 		fix: {},
 		implement: {},
@@ -431,7 +431,7 @@
 				loader 	= shims.loader,
 				toLoadFeatures = [],
 				removeLoader = function(){
-					$('html').removeClass('loading-polyfills long-loading-polyfills');
+					$('html').removeClass('loading-polyfills long-loading-polyfills polyfill-remove-fouc');
 					$(window).unbind('load.loadingPolyfills error.loadingPolyfills');
 					clearTimeout(loadingTimer);
 				},
@@ -449,7 +449,10 @@
 			}
 			
 			
-			if(!$.isReady && webshims.removeFOUC){
+			if(!$.isReady){
+				if(webshims.removeFOUC){
+					$('html').addClass('polyfill-remove-fouc');
+				}
 				$('html').addClass('loading-polyfills');
 				$(window).bind('load.loadingPolyfills error.loadingPolyfills', removeLoader);
 				loadingTimer = setTimeout(function(){
@@ -475,6 +478,9 @@
 			}
 			loader.loadCSS('shim.css');
 			loader.loadList(toLoadFeatures);
+			$(function(){
+				loader.loadList(['html5a11y']);
+			});
 		},
 		getID: (function(){
 			var ID = new Date().getTime();
@@ -602,7 +608,13 @@
 	
 	/* general modules */
 	/* change path $.webshims.modules[moduleName].src */
-	
+	var browserVersion = parseFloat($.browser.version, 10);
+	loader.addModule('html5a11y', {
+		src: 'html5a11y',
+		test: function(){
+			return !(($.browser.msie && browserVersion < 10 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 540));
+		}
+	});
 	
 	loader.addModule('jquery-ui', {
 		src: 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js',
@@ -657,7 +669,7 @@
 		test: function(){
 			return (es5[1] && es5[0]);
 		},
-		combination: ['combined-ie7', 'combined-ie8', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ff3-light']
+		combination: ['combined-ie7', 'combined-ie8', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ff3-light', 'combined-webkit']
 	});
 	
 	addPolyfill('es5-2', {
@@ -742,7 +754,7 @@
 			}, 0);
 		},
 		//no test = always load
-		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
+		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light', 'combined-webkit']
 	});
 	
 	addPolyfill('form-message', {
@@ -751,7 +763,7 @@
 			return (support.validity && support.validationMessage && webshims.implement.customValidationMessage && modules['form-extend']() );
 		},
 		options: {},
-		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
+		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light', 'combined-webkit']
 	});
 	
 	if(support.validity){
@@ -781,14 +793,15 @@
 					elementNames: ['form', 'fieldset', 'input', 'select', 'textarea']
 				}
 			],
-			combination: ['combined-ff4']
+			combination: ['combined-ff4', 'combined-webkit']
 		});
 		
 		addPolyfill('form-native-fix', {
 			feature: 'forms',
 			test: function(){
 				return support.requiredSelect;
-			}
+			},
+			combination: ['combined-webkit']
 		});
 		
 	} else {

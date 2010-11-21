@@ -45,6 +45,15 @@
 			<fileset file="${shims}/form-date-range-ui.js" />
         </concat>
 		
+		<!-- good for Safari5, Chrome 9- and Opera 11- -->
+		<concat destfile="${shims}/combined-webkit.js">
+			<fileset file="${shims}/es5-1.js" />
+            <fileset file="${shims}/form-core.js" />
+			<fileset file="${shims}/form-message.js" />
+            <fileset file="${shims}/form-native-extend.js" />
+			<fileset file="${shims}/form-native-fix.js" />
+        </concat>
+		
 		<!-- good for ie9 -->
 		<concat destfile="${shims}/combined-ie9.js">
             <fileset file="${shims}/geolocation.js" />
