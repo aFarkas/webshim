@@ -58,7 +58,7 @@
 		
 		module("dependency test");
 		asyncTest("dependency test", function(){
-			ok(wasReadys.join(' ') === readys.join(' '), 'developer form dependencies executed in right order | was: '+ wasReadys.join(' '));
+			equals(wasReadys.join(' '), readys.join(' '), 'developer form dependencies executed in right order');
 			$.webshims.ready('forms-ext', start);
 		});
 		

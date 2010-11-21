@@ -1421,7 +1421,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 	
 }, true);
 /* number-date-ui */
-jQuery.webshims.ready('form-core', function($, webshims, window, document){
+jQuery.webshims.ready('form-number-date', function($, webshims, window, document){
 	"use strict";
 	var triggerInlineForm = webshims.triggerInlineForm;
 	var adjustInputWithBtn = function(input, button){
@@ -1874,8 +1874,9 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document){
 	
 	
 	//implement set/arrow controls
-jQuery.webshims.ready('form-number-date', function($, webshims, window, doc){
+(function(){
 	if(support.numericDateProps || !webshims.modules['form-number-date']){return;}
+	var doc = document;
 	var options = webshims.modules['form-number-date'].options;
 	var correctBottom = ($.browser.msie && parseInt($.browser.version, 10) < 8) ? 2 : 0;
 	var typeModels = webshims.inputTypes;
@@ -2010,7 +2011,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, doc){
 			});
 		}
 	});
-}, true);
+})();
 	
 }, true);
 
