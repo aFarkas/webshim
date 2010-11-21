@@ -79,7 +79,14 @@ var Storage = function (type) {
 	function setData(data) {
 		data = JSON.stringify(data);
 		if (type == 'session') {
-			winData.name = data;
+			try {
+				winData.name = data;
+			} catch(e){
+				winData = window;
+				try {
+					winData.name = data;
+				} catch(e){}
+			}
 		} else {
 			createCookie('localStorage', data, 365);
 		}
@@ -87,7 +94,14 @@ var Storage = function (type) {
 	
 	function clearData() {
 		if (type == 'session') {
-			winData.name = '';
+			try {
+				winData.name = '';
+			} catch(e){
+				winData = window;
+				try {
+					winData.name = '';
+				} catch(e){}
+			}
 		} else {
 			createCookie('localStorage', '', 365);
 		}

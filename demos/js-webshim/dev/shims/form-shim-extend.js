@@ -166,6 +166,7 @@ $.event.special.invalid = {
 		;
 	},
 	handler: function(e, d){
+		
 		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') != null || $.data(e.target, 'novalidate') ){return;}
 		var notValid = !($(e.target).checkValidity());
 		if(notValid){

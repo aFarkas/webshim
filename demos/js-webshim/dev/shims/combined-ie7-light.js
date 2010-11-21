@@ -234,6 +234,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				if(this.hideDelay){
 					hideTimer = setTimeout(boundHide, this.hideDelay);
 				}
+				
 				if(!hideOnBlur){
 					this.setFocus(visual, elem[0]);
 				}
@@ -248,6 +249,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				var labelOff;
 				
 				alert.attr('for', webshims.getID(focusElem));
+				
 				if(scrollTop > elemTop){
 					labelOff = elem.id && $('label[for='+elem.id+']', elem.form).offset();
 					if(labelOff && labelOff.top < elemTop){
@@ -261,7 +263,9 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 						}
 					);
 				}
-				focusElem.focus();
+				try {
+					focusElem[0].focus();
+				} catch(e){}
 				webshims.scrollRoot.scrollTop(scrollTop);
 				$(doc).bind('focusout.validityalert', boundHide);
 			},
@@ -647,6 +651,7 @@ $.event.special.invalid = {
 		;
 	},
 	handler: function(e, d){
+		
 		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') != null || $.data(e.target, 'novalidate') ){return;}
 		var notValid = !($(e.target).checkValidity());
 		if(notValid){
@@ -2106,7 +2111,14 @@ var Storage = function (type) {
 	function setData(data) {
 		data = JSON.stringify(data);
 		if (type == 'session') {
-			winData.name = data;
+			try {
+				winData.name = data;
+			} catch(e){
+				winData = window;
+				try {
+					winData.name = data;
+				} catch(e){}
+			}
 		} else {
 			createCookie('localStorage', data, 365);
 		}
@@ -2114,7 +2126,14 @@ var Storage = function (type) {
 	
 	function clearData() {
 		if (type == 'session') {
-			winData.name = '';
+			try {
+				winData.name = '';
+			} catch(e){
+				winData = window;
+				try {
+					winData.name = '';
+				} catch(e){}
+			}
 		} else {
 			createCookie('localStorage', '', 365);
 		}

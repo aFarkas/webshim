@@ -506,6 +506,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				if(this.hideDelay){
 					hideTimer = setTimeout(boundHide, this.hideDelay);
 				}
+				
 				if(!hideOnBlur){
 					this.setFocus(visual, elem[0]);
 				}
@@ -520,6 +521,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				var labelOff;
 				
 				alert.attr('for', webshims.getID(focusElem));
+				
 				if(scrollTop > elemTop){
 					labelOff = elem.id && $('label[for='+elem.id+']', elem.form).offset();
 					if(labelOff && labelOff.top < elemTop){
@@ -533,7 +535,9 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 						}
 					);
 				}
-				focusElem.focus();
+				try {
+					focusElem[0].focus();
+				} catch(e){}
 				webshims.scrollRoot.scrollTop(scrollTop);
 				$(doc).bind('focusout.validityalert', boundHide);
 			},
@@ -919,6 +923,7 @@ $.event.special.invalid = {
 		;
 	},
 	handler: function(e, d){
+		
 		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') != null || $.data(e.target, 'novalidate') ){return;}
 		var notValid = !($(e.target).checkValidity());
 		if(notValid){

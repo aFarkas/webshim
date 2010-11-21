@@ -6,6 +6,13 @@
 	
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+	
+	<!-- 
+		main web shim extension fiels
+		Note: you can combine/concat/rename them with your other files, but you have to include them in the head without a defer/async attribute!
+	 -->
+	<script src="../src/polyfiller.js"></script>
+	
 	<script>
 		(function($){
 			var hash = location.hash.replace('#', '');
@@ -34,11 +41,6 @@
 			});
 		})(jQuery);
 	</script>
-	<!-- 
-		main web shim extension fiels
-		Note: you can combine/concat/rename them with your other files, but you have to include them in the head without a defer/async attribute!
-	 -->
-	<script src="../src/polyfiller.js"></script>
 	
     <script>
     	//basePath = url form html-ext.js (you can rename it) + relative url to shim folder
