@@ -108,7 +108,19 @@ var Storage = function (type) {
 	}
 	
 	function getData() {
-		var data = type == 'session' ? winData.name : readCookie('localStorage');
+		var data;
+		if(type == 'session'){
+			try {
+				data = winData.name;
+			} catch(e){
+				winData = window;
+				try {
+					data = winData.name;
+				} catch(e){}
+			}
+		} else {
+			data = readCookie('localStorage');
+		}
 		if(data){
 			try {
 				data = JSON.parse(data);
@@ -123,7 +135,7 @@ var Storage = function (type) {
 	// initialise if there's already data
 	var data = getData();
 	
-		return {
+	return {
 		clear: function () {
 			data = {};
 			clearData();
