@@ -34,12 +34,12 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-1.6.min.js"></script>
 	<script src="../js-webshim/minified/extras/mousepress.js"></script>
-	<script src="../js-webshim/minified/polyfiller.js"></script>
+	<script src="../../src/polyfiller.js"></script>
 	
     <script class="example">
 		//path is path of polyfiller.js + shims/
     	$.webshims.loader.basePath += 'shims/';
-		//$.webshims.debug = true;
+		$.webshims.debug = true;
 		//load all defined modules (look into features.js)
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();

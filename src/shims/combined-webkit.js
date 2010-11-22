@@ -522,6 +522,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				var focus =  function(){
 					try {
 						focusElem[0].focus();
+						$(doc).bind('focusout.validityalert', boundHide);
 					} catch(e){}
 				};
 				alert.attr('for', webshims.getID(focusElem));
@@ -542,8 +543,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				} else {
 					focus();
 				}
-				
-				$(doc).bind('focusout.validityalert', boundHide);
 			},
 			getMessage: function(elem, message){
 				$('> span', alert).text(message || elem.attr('validationMessage'));
