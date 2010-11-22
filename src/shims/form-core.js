@@ -17,18 +17,19 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	 * Selectors for all browsers
 	 */
 	$.extend($.expr.filters, {
-		valid: function(elem){
+		"valid-element": function(elem){
 			return ($.attr(elem, 'validity') || {valid: true}).valid;
 		},
-		invalid: function(elem){
-			return !$.expr.filters.valid(elem);
+		"invalid-element": function(elem){
+			return !isValid(elem);
 		},
 		willValidate: function(elem){
 			return $.attr(elem, 'willValidate');
 		}
 	});
+	var isValid = $.expr.filters["valid-element"];
 	
-	//CSS selectors for all browsers
+	
 	//ToDo needs testing
 	var oldAttr = $.attr;
 	var changeVals = {selectedIndex: 1, value: 1, checked: 1, disabled: 1, readonly: 1};
@@ -36,7 +37,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	$.attr = function(elem, name, val){
 		if(elem.form && changeVals[name] && val !== undefined && $(elem).hasClass('form-ui-invalid')){
 			var ret = oldAttr.apply(this, arguments);
-			if($.expr.filters.valid(elem)){
+			if(isValid(elem)){
 				getVisual(elem).removeClass('form-ui-invalid');
 				if(name == 'checked' && val) {
 					getGroupElements(elem).removeClass('form-ui-invalid');
@@ -55,7 +56,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 			return;
 		}
 		var addClass, removeClass;
-		if($.expr.filters.valid(e.target)){
+		if(isValid(e.target)){
 			addClass = 'form-ui-valid';
 			removeClass = 'form-ui-invalid';
 			if(groupTypes[e.target.type] && e.target.checked){
@@ -150,12 +151,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				var scrollTop = webshims.scrollRoot.scrollTop();
 				var elemTop = focusElem.offset().top;
 				var labelOff;
-				var focus =  function(){
-					try {
-						focusElem[0].focus();
-						$(doc).bind('focusout.validityalert', boundHide);
-					} catch(e){}
-				};
+				var smooth;;
 				alert.attr('for', webshims.getID(focusElem));
 				
 				if(scrollTop > elemTop){
@@ -167,13 +163,18 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 						{scrollTop: elemTop - 5}, 
 						{
 							queue: false, 
-							duration: Math.max( Math.min( 450, (scrollTop - elemTop) * 2 ), 140 ),
-							complete: focus
+							duration: Math.max( Math.min( 450, (scrollTop - elemTop) * 2 ), 140 )
 						}
 					);
-				} else {
-					focus();
+					smooth = true;
 				}
+				try {
+					focusElem[0].focus();
+				} catch(e){}
+				if(smooth){
+					webshims.scrollRoot.scrollTop(scrollTop);
+				}
+				$(doc).bind('focusout.validityalert', boundHide);
 			},
 			getMessage: function(elem, message){
 				$('> span', alert).text(message || elem.attr('validationMessage'));

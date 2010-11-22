@@ -40,18 +40,20 @@ asyncTest("general validity Modul", function(){
 	form1.find('#name').attr('readonly', false);
 	
 	//invalid
-	var invalid = $('input, textarea, select', form1).filter(':invalid');
+	var invalid = $('input, textarea, select', form1).filter(':invalid-element');
 	equals( invalid.length, 5, 'total invalid' );
+	
+	equals( $(':invalid-element', form1).length, 5, 'total invalid' );
 	
 	equals( invalid.filter('[type=radio]').length, 3, 'radio invalid' );
 	invalid.filter('[type=radio]:last').attr('checked', true);
-	equals( invalid.filter('[type=radio]:invalid').length, 0, 'radio changed valid' );
+	equals( invalid.filter('[type=radio]:invalid-element').length, 0, 'radio changed valid' );
 	invalid.filter('[type=radio]:last').attr('checked', false);
 	
-	equals(form1.find('#name').is(':invalid'), true, 'name is invalid');
+	equals(form1.find('#name').is(':invalid-element'), true, 'name is invalid');
 	form1.find('#name').attr('required', false);
 	equals(form1.find('#name').attr('required'), false, "name isn't required");
-	equals(form1.find('#name').is(':invalid'), false, 'name is valid');
+	equals(form1.find('#name').is(':invalid-element'), false, 'name is valid');
 	form1.find('#name').attr('required', true);
 	
 	ok($('#select').attr('validity').valid, 'select is valid');
@@ -107,20 +109,20 @@ asyncTest("general validity Modul", function(){
 	ok($('#email').attr('validity').typeMismatch, 'typeMismatch is true for email and value: some input');
 	
 	$.each({
-		'info@c-t.de': 'valid', 
-		'INFO@CTE.DE': 'valid', 
-		'info@c-t.museum': 'valid',
-		'info@c123t.museum': 'valid',
-		'info@cät.de': 'valid',
-		'info@3com.com': 'valid',
-		'in-f+a{t$o@cpt.de': 'valid',
-		'"in@fo"@3com.com': 'valid',
-		'in\@fo@3com.com': 'valid',
-		'in@fo@3com.com': 'invalid',
-		'info.de': 'invalid'
+		'info@c-t.de': 'valid-element', 
+		'INFO@CTE.DE': 'valid-element', 
+		'info@c-t.museum': 'valid-element',
+		'info@c123t.museum': 'valid-element',
+		'info@cät.de': 'valid-element',
+		'info@3com.com': 'valid-element',
+		'in-f+a{t$o@cpt.de': 'valid-element',
+		'"in@fo"@3com.com': 'valid-element',
+		'in\@fo@3com.com': 'valid-element',
+		'in@fo@3com.com': 'invalid-element',
+		'info.de': 'invalid-element'
 		//we are too lax, but better too lax, then too strict :-)
-//		,'info@des': 'invalid',
-//		'info@des.ä': 'invalid'
+//		,'info@des': 'invalid-element',
+//		'info@des.ä': 'invalid-element'
 	}, function(val, state){
 		$('#email').val(val);
 		ok($('#email').is(':'+state), val+' is '+state+' mail');
@@ -133,16 +135,16 @@ asyncTest("general validity Modul", function(){
 
 asyncTest('email, url, pattern, maxlength', function(){
 	$.each({
-		'http://bla.de': 'valid', 
-		'http://www.bla.de': 'valid', 
-		'http://www.bla.museum': 'valid',
-		'https://www.bla.museum:800': 'valid',
-		'https://www.bla.museum:800/': 'valid',
-		'https://www.bla.co.uk:800/': 'valid',
-		'https://www.3blä.de:800': 'valid',
-		'ftp://www.3blä.de:800': 'valid',
+		'http://bla.de': 'valid-element', 
+		'http://www.bla.de': 'valid-element', 
+		'http://www.bla.museum': 'valid-element',
+		'https://www.bla.museum:800': 'valid-element',
+		'https://www.bla.museum:800/': 'valid-element',
+		'https://www.bla.co.uk:800/': 'valid-element',
+		'https://www.3blä.de:800': 'valid-element',
+		'ftp://www.3blä.de:800': 'valid-element',
 		//ok, almost everything is valid here
-		'htstp//dff': 'invalid'
+		'htstp//dff': 'invalid-element'
 	}, function(val, state){
 		$('#url').val(val);
 		ok($('#url').is(':'+state), val+' is '+state+' url');
@@ -151,13 +153,13 @@ asyncTest('email, url, pattern, maxlength', function(){
 	
 	//maxlength
 	$.each({
-		'Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore mag': 'invalid', 
-		'Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut ': 'valid'
+		'Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore mag': 'invalid-element', 
+		'Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut ': 'valid-element'
 		//don't know
-//		,'Lorem ipsum dolor sit amet, consetetur sadipscing elitr\n,  sed diam nonumy eirmod tempor invidunt u': 'valid',
-//		'Lorem ipsum d\tor s\t amet, c\nsetetur sadipscing elitr\n,  sed ddm nonumdeirmod tempor invidunt u': 'valid',
-//		'Lorem ipsum ddddor sddd amet, c\nsetetur sadipscing elitr\n,  sed dddm nonumddeirmod tempor invidunt ut': 'invalid', 
-//		'Lorem ittum dolor sit amet, consetetur s\nipscing elit\n,  sed diam nonumy eittod tempor invidunt ut ': 'invalid'
+//		,'Lorem ipsum dolor sit amet, consetetur sadipscing elitr\n,  sed diam nonumy eirmod tempor invidunt u': 'valid-element',
+//		'Lorem ipsum d\tor s\t amet, c\nsetetur sadipscing elitr\n,  sed ddm nonumdeirmod tempor invidunt u': 'valid-element',
+//		'Lorem ipsum ddddor sddd amet, c\nsetetur sadipscing elitr\n,  sed dddm nonumddeirmod tempor invidunt ut': 'invalid-element', 
+//		'Lorem ittum dolor sit amet, consetetur s\nipscing elit\n,  sed diam nonumy eittod tempor invidunt ut ': 'invalid-element'
 	}, function(val, state){
 		$('#maxlength').val(val);
 		ok($('#maxlength').is(':'+state), val.length+' is '+state+' maxlength');
@@ -166,8 +168,8 @@ asyncTest('email, url, pattern, maxlength', function(){
 	$('#maxlength').attr('maxlength', 30);
 	
 	$.each({
-		'Lorem ipsum dolor sit amet, con': 'invalid', 
-		'Lorem ipsum dolor sit amet, co': 'valid'
+		'Lorem ipsum dolor sit amet, con': 'invalid-element', 
+		'Lorem ipsum dolor sit amet, co': 'valid-element'
 	}, function(val, state){
 		$('#maxlength').val(val);
 		ok($('#maxlength').is(':'+state), val.length+' is '+state+' maxlength');
@@ -176,9 +178,9 @@ asyncTest('email, url, pattern, maxlength', function(){
 	
 	//pattern
 	$('#pattern').val('test');
-	ok($('#pattern').is(':invalid'), 'test is invalid pattern');
+	ok($('#pattern').is(':invalid-element'), 'test is invalid pattern');
 	$('#pattern').val('1DHT');
-	ok($('#pattern').is(':valid'), '1DHT is valid pattern');
+	ok($('#pattern').is(':valid-element'), '1DHT is valid pattern');
 	
 	$.webshims.ready('forms ready', function(){
 		start();
@@ -187,15 +189,14 @@ asyncTest('email, url, pattern, maxlength', function(){
 
 asyncTest('validationMessage/setCustomValidity', function(){
 	//select + customValidity
-	ok($('#select').is(':valid'), 'select is valid');
+	ok($('#select').is(':valid-element'), 'select is valid');
 	$('#select').setCustomValidity('has an error');
-	ok($('#select').is(':invalid'), 'select is set valid');
-	
+	ok($('#select').is(':invalid-element'), 'select is set invalid');
 	ok($('#select').attr('validity').customError, 'select has customerror');
 	equals($('#select').attr('validationMessage'), 'has an error', 'custom error message set');
 	equals($('#select').attr('disabled', true).attr('validationMessage'), '', 'custom error message is empty, if control is disabled');
 	$('#select').attr('disabled', false).setCustomValidity('');
-	ok(( $('#select').is(':valid') && $('#select').attr('willValidate') ), 'select is set valid again');
+	ok(( $('#select').is(':valid-element') && $('#select').attr('willValidate') ), 'select is set valid again');
 	
 	$.webshims.ready('forms ready', function(){
 		start();
