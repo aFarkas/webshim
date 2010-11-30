@@ -348,7 +348,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		if(message){
 			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
 				if(message.indexOf('{%'+attr) === -1){return;}
-				var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
+				var val = ((attr == 'label') ? $.trim($('label[for="'+ elem.id +'"]', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
 				message = message.replace('{%'+ attr +'}', val);
 				if('value' == attr){
 					message = message.replace('{%valueLen}', val.length);
@@ -598,7 +598,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		if(!typeModels[type] || !typeModels[type].step){
 			return step;
 		}
-		step = typeModels.number.asNumber(step);
+		step = typeProtos.number.asNumber(step);
 		return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
 	};
 	//why no min/max IDL?
@@ -963,6 +963,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	
 }, true);
 /* number-date-ui */
+/* https://github.com/aFarkas/webshim/issues#issue/23 */
 jQuery.webshims.ready('form-number-date', function($, webshims, window, document){
 	"use strict";
 	var triggerInlineForm = webshims.triggerInlineForm;
@@ -1018,7 +1019,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 							name += '#'+elem.id;
 						}
 						if(elem.name){
-							name += '[name='+ elem.name +']';
+							name += '[name="'+ elem.name +'"]';
 						}
 						if(elem.className){
 							name += '.'+ (elem.className.split(' ').join('.'));
@@ -1052,7 +1053,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 					marginLeft: orig.css('marginLeft')
 				},
 				outerWidth: orig.outerWidth(),
-				label: (id) ? $('label[for='+ id +']', orig[0].form) : emptyJ
+				label: (id) ? $('label[for="'+ id +'"]', orig[0].form) : emptyJ
 			},
 			curLabelID =  webshims.getID(attr.label)
 		;

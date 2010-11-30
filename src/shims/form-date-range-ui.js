@@ -1,4 +1,5 @@
 /* number-date-ui */
+/* https://github.com/aFarkas/webshim/issues#issue/23 */
 jQuery.webshims.ready('form-number-date', function($, webshims, window, document){
 	"use strict";
 	var triggerInlineForm = webshims.triggerInlineForm;
@@ -54,7 +55,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 							name += '#'+elem.id;
 						}
 						if(elem.name){
-							name += '[name='+ elem.name +']';
+							name += '[name="'+ elem.name +'"]';
 						}
 						if(elem.className){
 							name += '.'+ (elem.className.split(' ').join('.'));
@@ -88,7 +89,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 					marginLeft: orig.css('marginLeft')
 				},
 				outerWidth: orig.outerWidth(),
-				label: (id) ? $('label[for='+ id +']', orig[0].form) : emptyJ
+				label: (id) ? $('label[for="'+ id +'"]', orig[0].form) : emptyJ
 			},
 			curLabelID =  webshims.getID(attr.label)
 		;

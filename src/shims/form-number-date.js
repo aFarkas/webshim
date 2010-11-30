@@ -10,7 +10,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 		if(!typeModels[type] || !typeModels[type].step){
 			return step;
 		}
-		step = typeModels.number.asNumber(step);
+		step = typeProtos.number.asNumber(step);
 		return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
 	};
 	//why no min/max IDL?

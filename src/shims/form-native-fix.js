@@ -1,4 +1,4 @@
-
+/* https://github.com/aFarkas/webshim/issues#issue/16 */
 jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	var support = $.support;
 	

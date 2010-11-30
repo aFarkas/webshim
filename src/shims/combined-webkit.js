@@ -717,7 +717,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		if(message){
 			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
 				if(message.indexOf('{%'+attr) === -1){return;}
-				var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
+				var val = ((attr == 'label') ? $.trim($('label[for="'+ elem.id +'"]', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
 				message = message.replace('{%'+ attr +'}', val);
 				if('value' == attr){
 					message = message.replace('{%valueLen}', val.length);
@@ -955,7 +955,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		
 	} //end: overrideValidity -> (!supportRequiredSelect || !supportNumericDate || overrideNativeMessages)
 	webshims.createReadyEvent('form-extend');
-}, true);
+}, true);/* https://github.com/aFarkas/webshim/issues#issue/16 */
 jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	var support = $.support;
 	

@@ -40,7 +40,7 @@
 				pHolderTxt
 			;
 			if(!hasLabel && id){
-				hasLabel = !!( $('label[for='+ id +']', elem[0].form)[0] );
+				hasLabel = !!( $('label[for="'+ id +'"]', elem[0].form)[0] );
 			}
 			return $((hasLabel) ? '<span class="placeholder-text"></span>' : '<label for="'+ (id || $.webshims.getID(elem)) +'" class="placeholder-text"></label>');
 		},

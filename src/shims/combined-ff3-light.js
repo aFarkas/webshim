@@ -717,7 +717,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		if(message){
 			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
 				if(message.indexOf('{%'+attr) === -1){return;}
-				var val = ((attr == 'label') ? $.trim($('label[for='+ elem.id +']', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
+				var val = ((attr == 'label') ? $.trim($('label[for="'+ elem.id +'"]', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
 				message = message.replace('{%'+ attr +'}', val);
 				if('value' == attr){
 					message = message.replace('{%valueLen}', val.length);
@@ -1095,7 +1095,7 @@ webshims.createReadyEvent('form-extend');
 				pHolderTxt
 			;
 			if(!hasLabel && id){
-				hasLabel = !!( $('label[for='+ id +']', elem[0].form)[0] );
+				hasLabel = !!( $('label[for="'+ id +'"]', elem[0].form)[0] );
 			}
 			return $((hasLabel) ? '<span class="placeholder-text"></span>' : '<label for="'+ (id || $.webshims.getID(elem)) +'" class="placeholder-text"></label>');
 		},
@@ -1304,7 +1304,7 @@ jQuery.webshims.ready('form-core', function($, webshims){
 		elem.attr({'aria-live': 'polite'});
 		if(id){
 			shim.attr('id', id);
-			elem.attr('aria-labeldby', webshims.getID($('label[for='+id+']', form)));
+			elem.attr('aria-labeldby', webshims.getID($('label[for="'+id+'"]', form)));
 		}
 		if(htmlFor){
 			id = webshims.getID(elem);
