@@ -977,7 +977,6 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 			w: button.outerWidth()
 		};
 		inputDim.mR = (parseInt(input.css('marginRight'), 10) || 0);
-		
 		if(inputDim.mR){
 			input.css('marginRight', 0);
 		}
@@ -1511,48 +1510,49 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 		40: -1
 	};
 	webshims.addReady(function(context, contextElem){
-		
-		//ui for numeric values
-		if(options.stepArrows){
-			$('input', context).add(contextElem.filter('input')).each(function(){
-				var type = $.attr(this, 'type');
-				if(!typeModels[type] || !typeModels[type].asNumber || !options.stepArrows || (options.stepArrows !== true && !options.stepArrows[type])){return;}
-				var elem = this;
-				var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
-					.insertAfter(this)
-					.bind('selectstart dragstart', function(){return false;})
-					.bind('mousedown mousepress', function(e){
-						doSteps(elem, type, e.target);
-						return false;
-					})
-				;
-				var jElm = $(this)
-					.addClass('has-step-controls')
-					.data('step-controls', controls)
-					.attr({
-						readonly: this.readOnly,
-						disabled: this.disabled,
-						autocomplete: 'off',
-						role: 'spinbutton'
-					})
-					.bind(($.browser.msie) ? 'keydown' : 'keypress', function(e){
-						if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
-						$.attr(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
-						triggerInlineForm(this, 'input');
-						return false;
-					})
-				;
-				
-				if(options.calculateWidth){
-					adjustInputWithBtn(jElm, controls);
-					if(!correctBottom){
-						controls.css('marginBottom', (parseInt(jElm.css('paddingBottom'), 10) || 0) / -2 );
-					} else {
-						controls.css('marginBottom', ((jElm.innerHeight() - (controls.height() / 2)) / 2) - 1 );
+		$(document).one('jquery-uiReady', function(){
+			//ui for numeric values
+			if(options.stepArrows){
+				$('input', context).add(contextElem.filter('input')).each(function(){
+					var type = $.attr(this, 'type');
+					if(!typeModels[type] || !typeModels[type].asNumber || !options.stepArrows || (options.stepArrows !== true && !options.stepArrows[type]) || $(this).hasClass('has-step-controls')){return;}
+					var elem = this;
+					var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
+						.insertAfter(this)
+						.bind('selectstart dragstart', function(){return false;})
+						.bind('mousedown mousepress', function(e){
+							doSteps(elem, type, e.target);
+							return false;
+						})
+					;
+					var jElm = $(this)
+						.addClass('has-step-controls')
+						.data('step-controls', controls)
+						.attr({
+							readonly: this.readOnly,
+							disabled: this.disabled,
+							autocomplete: 'off',
+							role: 'spinbutton'
+						})
+						.bind(($.browser.msie) ? 'keydown' : 'keypress', function(e){
+							if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
+							$.attr(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
+							triggerInlineForm(this, 'input');
+							return false;
+						})
+					;
+					
+					if(options.calculateWidth){
+						adjustInputWithBtn(jElm, controls);
+						if(!correctBottom){
+							controls.css('marginBottom', (parseInt(jElm.css('paddingBottom'), 10) || 0) / -2 );
+						} else {
+							controls.css('marginBottom', ((jElm.innerHeight() - (controls.height() / 2)) / 2) - 1 );
+						}
 					}
-				}
-			});
-		}
+				});
+			}
+		});
 	});
 })();
 	
