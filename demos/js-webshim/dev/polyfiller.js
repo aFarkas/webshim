@@ -809,7 +809,7 @@
 		
 		addPolyfill('form-native-fix', {
 			feature: 'forms',
-			test: function(){return support.requiredSelect && !$.browser.opera;},
+			test: function(){return support.requiredSelect;},
 			combination: ['combined-webkit']
 		});
 		

@@ -12,6 +12,7 @@
 	var oldAttr = $.attr;
 	var formReady = false;
 	var blockCustom;
+	var initTest;
 	var onEventTest = function(e){
 		webshims.refreshCustomValidityRules(e.target);
 	};
@@ -31,7 +32,8 @@
 		}
 	};
 	webshims.refreshCustomValidityRules = function(elem){
-		if(!$.attr(elem, 'willValidate')){return;}
+		if(!elem.form || (!initTest && !$.attr(elem, 'willValidate')) ){return;}
+		blockCustom = true;
 		var customMismatchedRule = $.data(elem, 'customMismatchedRule');
 		var validity = oldAttr(elem, 'validity') || {};
 		var message = '';
@@ -42,14 +44,14 @@
 				customMismatchedRule = name;
 				if(message){
 					if(typeof message != 'string'){
-						message = webshims.customErrorMessages[name][webshims.activeLang()[0]] || webshims.customErrorMessages[name][webshims.activeLang()[1]] || webshims.customErrorMessages[name]['']; 
+						message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || webshims.customErrorMessages[name][webshims.activeLang()[0]] || webshims.customErrorMessages[name][webshims.activeLang()[1]] || webshims.customErrorMessages[name]['']; 
 					}
 					return false;
 				}
 			});
 			
 			if(message){
-				blockCustom = true;
+				
 				$.data(elem, 'customMismatchedRule', customMismatchedRule);
 			}
 			$(elem).setCustomValidity(message);
@@ -60,15 +62,15 @@
 	
 	webshims.ready('forms', function(){
 		formReady = true;
+		
 		oldAttr = $.attr;
 				
 		$.attr = function(elem, name){
-			if(name == 'validity'){
+			if(name == 'validity' && !blockCustom){
 				testValidityRules(elem);
 			}
 			return oldAttr.apply(this, arguments);
 		};
-		
 		
 		var oldCustomValidity = $.fn.setCustomValidity || function(message){
 			return this.each(function(){
@@ -93,9 +95,11 @@
 		}
 		
 		webshims.addReady(function(context, selfElement){
+			initTest = true;
 			$('input, select, textarea', context).add(selfElement.filter('input, select, textarea')).each(function(){
 				testValidityRules(this);
 			});
+			initTest = false;
 		});
 		$(document).bind('refreshCustomValidityRules', onEventTest);
 		
@@ -109,7 +113,7 @@
  *  - creditcard-validation: <input class="creditcard-input" />
  *  - several dependent-validation patterns (examples):
  *  	- <input type="email" id="mail" /> <input data-dependent-validation='mail' />
- *  	- <input type="date" id="start" data-dependent-validation='{"from-id": "end", "prop": "max"}' /> <input type="date" id="end" data-dependent-validation='{"from-id": "start", "prop": "min"}' />
+ *  	- <input type="date" id="start" data-dependent-validation='{"from": "end", "prop": "max"}' /> <input type="date" id="end" data-dependent-validation='{"from": "start", "prop": "min"}' />
  *  	- <input type="checkbox" id="check" /> <input data-dependent-validation='checkbox' />
  */
 (function($, window, document, undefined){
@@ -123,7 +127,6 @@
 	
 	addCustomValidityRule('tooShort', function(elem, val){
 		if(!val || !elem.getAttribute('data-minlength')){return;}
-		console.log($(elem).data('minlength') > val.length)
 		return $(elem).data('minlength') > val.length;
 	}, 'Entered value is too short.');
 	
@@ -178,11 +181,11 @@
 		if(!data._init || !data.masterElement){
 			
 			if(typeof data == 'string'){
-				data = {"from-id": data};
+				data = {"from": data};
 			}
 			
 			
-			data.masterElement = document.getElementById(data["from-id"]) || (document.getElementsByName(data["from-id"] || [])[0]);
+			data.masterElement = document.getElementById(data["from"]) || (document.getElementsByName(data["from"] || [])[0]);
 			
 			if (!data.masterElement || !data.masterElement.form) {return;}
 			
@@ -213,5 +216,5 @@
 			return '';
 		}
 		
-	});
+	}, 'The value of this field does not repeat the value of the other field');
 })(jQuery, window, document);

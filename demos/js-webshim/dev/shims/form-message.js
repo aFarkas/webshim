@@ -85,6 +85,8 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 				
 				var validity = $.attr(elem, 'validity') || {valid: 1};
 				if(validity.valid){return message;}
+				message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
+				if(message){return message;}
 				if(validity.customError || fn === 'validationMessage'){
 					message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
 					if(message){return message;}

@@ -197,7 +197,7 @@ webshims.attr('validity', {
 		}
 		validityState 	= $.extend({}, validiyPrototype);
 		
-		if( !$.attr(elem, 'willValidate') ){
+		if( !$.attr(elem, 'willValidate') || elem.type == 'submit' ){
 			return validityState;
 		}
 		var jElm 			= $(elem),
@@ -234,8 +234,7 @@ webshims.attr('willValidate', {
 				remove: 1,
 				'move-up': 1,
 				'move-down': 1,
-				hidden: 1,
-				submit: 1
+				hidden: 1
 			}
 		;
 		return function(elem){

@@ -113,7 +113,7 @@
  *  - creditcard-validation: <input class="creditcard-input" />
  *  - several dependent-validation patterns (examples):
  *  	- <input type="email" id="mail" /> <input data-dependent-validation='mail' />
- *  	- <input type="date" id="start" data-dependent-validation='{"from-id": "end", "prop": "max"}' /> <input type="date" id="end" data-dependent-validation='{"from-id": "start", "prop": "min"}' />
+ *  	- <input type="date" id="start" data-dependent-validation='{"from": "end", "prop": "max"}' /> <input type="date" id="end" data-dependent-validation='{"from": "start", "prop": "min"}' />
  *  	- <input type="checkbox" id="check" /> <input data-dependent-validation='checkbox' />
  */
 (function($, window, document, undefined){
@@ -181,7 +181,7 @@
 		if(!data._init || !data.masterElement){
 			
 			if(typeof data == 'string'){
-				data = {"from-id": data};
+				data = {"from": data};
 			}
 			
 			

@@ -224,11 +224,11 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				var scrollTop = webshims.scrollRoot.scrollTop();
 				var elemTop = focusElem.offset().top;
 				var labelOff;
-				var smooth;;
+				var smooth;
 				alert.attr('for', webshims.getID(focusElem));
 				
 				if(scrollTop > elemTop){
-					labelOff = elem.id && $('label[for='+elem.id+']', elem.form).offset();
+					labelOff = elem.id && $('label[for="'+elem.id+'"]', elem.form).offset();
 					if(labelOff && labelOff.top < elemTop){
 						elemTop = labelOff.top;
 					}
@@ -447,6 +447,8 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 				
 				var validity = $.attr(elem, 'validity') || {valid: 1};
 				if(validity.valid){return message;}
+				message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
+				if(message){return message;}
 				if(validity.customError || fn === 'validationMessage'){
 					message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
 					if(message){return message;}
@@ -662,7 +664,7 @@ webshims.attr('validity', {
 		}
 		validityState 	= $.extend({}, validiyPrototype);
 		
-		if( !$.attr(elem, 'willValidate') ){
+		if( !$.attr(elem, 'willValidate') || elem.type == 'submit' ){
 			return validityState;
 		}
 		var jElm 			= $(elem),
@@ -699,8 +701,7 @@ webshims.attr('willValidate', {
 				remove: 1,
 				'move-up': 1,
 				'move-down': 1,
-				hidden: 1,
-				submit: 1
+				hidden: 1
 			}
 		;
 		return function(elem){
