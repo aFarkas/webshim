@@ -55,8 +55,8 @@
 				$.data(elem, 'customMismatchedRule', customMismatchedRule);
 			}
 			$(elem).setCustomValidity(message);
-			blockCustom = false;
 		}
+		blockCustom = false;
 	};
 	var testValidityRules = webshims.refreshCustomValidityRules;
 	
