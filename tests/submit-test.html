@@ -150,8 +150,8 @@
 				$('input.datetime').attr('value', '').checkValidity();
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
-					equals(firstInvalidEvents, 1, 'no firstinvalid event');
-					equals(invalidEvents, 1, 'no invalid events');
+					equals(firstInvalidEvents, 1, 'firstinvalid event');
+					equals(invalidEvents, 1, 'invalid events');
 					if(document.activeElement){
 						var type = document.activeElement.type;
 						equals((type == 'text' || type == 'datetime-local'), true, "focus first invalid: "+type);
@@ -183,8 +183,8 @@
 				$('input.datetime').attr('value', '');
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
-					equals(firstInvalidEvents, 1, 'no firstinvalid event');
-					equals(invalidEvents, 1, 'no invalid events');
+					equals(firstInvalidEvents, 1, 'firstinvalid event');
+					equals(invalidEvents, 1, 'invalid events');
 					if(document.activeElement){
 						var type = document.activeElement;
 						equals((type !== 'text' && type !== 'datetime-local'), true, "no focus first invalid: "+type);
@@ -196,8 +196,8 @@
 				$('input.datetime').attr('value', '');
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
-					equals(firstInvalidEvents, 1, 'no firstinvalid event');
-					equals(invalidEvents, 1, 'no invalid events');
+					equals(firstInvalidEvents, 1, 'firstinvalid event');
+					equals(invalidEvents, 1, 'invalid events');
 					if(document.activeElement){
 						var type = document.activeElement.type;
 						equals((type == 'text' || type == 'datetime-local'), true, "focus first invalid: "+type);

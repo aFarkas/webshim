@@ -28,6 +28,7 @@ var storageNameError = function(name){
 	}
 };
 var winData;
+var selfWindow = false;
 $.each(['opener', 'top', 'parent'], function(i, name){
 	try {
 		winData = window[name];
@@ -43,7 +44,38 @@ $.each(['opener', 'top', 'parent'], function(i, name){
 });
 if(!winData){
 	winData = window;
+	selfWindow = true;
 }
+var setWindowData = function(data){
+	if(!selfWindow){
+		try {
+			window.name = data;
+		} catch(e){}
+	}
+	try {
+		winData.name = data;
+	} catch(e){
+		winData = window;
+		selfWindow = true;
+	}
+};
+var getWindowData = function(){
+	var data;
+	if(!selfWindow){
+		try {
+			data = window.name;
+		} catch(e){}
+	}
+	if(!data){
+		try {
+			data = winData.name;
+		} catch(e){
+			winData = window;
+			selfWindow = true;
+		}
+	}
+	return data;
+};
 var Storage = function (type) {
 	function createCookie(name, value, days) {
 		var date, expires;
@@ -79,14 +111,7 @@ var Storage = function (type) {
 	function setData(data) {
 		data = JSON.stringify(data);
 		if (type == 'session') {
-			try {
-				winData.name = data;
-			} catch(e){
-				winData = window;
-				try {
-					winData.name = data;
-				} catch(e){}
-			}
+			setWindowData(data);
 		} else {
 			createCookie('localStorage', data, 365);
 		}
@@ -94,14 +119,7 @@ var Storage = function (type) {
 	
 	function clearData() {
 		if (type == 'session') {
-			try {
-				winData.name = '';
-			} catch(e){
-				winData = window;
-				try {
-					winData.name = '';
-				} catch(e){}
-			}
+			setWindowData('');
 		} else {
 			createCookie('localStorage', '', 365);
 		}
@@ -110,14 +128,7 @@ var Storage = function (type) {
 	function getData() {
 		var data;
 		if(type == 'session'){
-			try {
-				data = winData.name;
-			} catch(e){
-				winData = window;
-				try {
-					data = winData.name;
-				} catch(e){}
-			}
+			data = getWindowData();
 		} else {
 			data = readCookie('localStorage');
 		}

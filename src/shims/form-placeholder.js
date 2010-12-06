@@ -93,9 +93,13 @@
 						},
 						cssFloat 		= $.curCSS(elem, 'float')
 					;
-					if(data.text.css('lineHeight') !== lineHeight){
-						data.text.css('lineHeight', lineHeight);
-					}
+					$.each(['lineHeight', 'fontSize', 'fontFamily', 'fontWeight'], function(i, style){
+						var prop = $.curCSS(elem, style);
+						if(data.text.css(style) != prop){
+							data.text.css(style, prop);
+						}
+					});
+					
 					if(dims.width && dims.height){
 						data.text.css(dims);
 					}

@@ -12,7 +12,7 @@
 	$('html').addClass('js-on').removeClass('js-off');
 	
 	$.webshims = {
-		version: '1.0.7',
+		version: 'pre1.0.8',
 		useImportantStyles: true,
 		fix: {},
 		implement: {},
@@ -809,7 +809,7 @@
 		
 		addPolyfill('form-native-fix', {
 			feature: 'forms',
-			test: function(){return support.requiredSelect;},
+			test: function(){return support.requiredSelect && !$.browser.opera;},
 			combination: ['combined-webkit']
 		});
 		

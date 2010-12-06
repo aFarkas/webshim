@@ -508,8 +508,15 @@ var validiyPrototype = {
 
 var validityRules = {
 		valueMissing: function(input, val, cache){
+			var ariaAttr = input[0].getAttribute('aria-required');
 			if(!input.attr('required')){
+				if(ariaAttr == 'true'){
+					input[0].setAttribute('aria-required', 'false');
+				}
 				return false;
+			}
+			if(ariaAttr == 'false'){
+				input[0].setAttribute('aria-required', 'true');
 			}
 			var ret = false;
 			if(!('type' in cache)){
@@ -660,7 +667,8 @@ webshims.attr('validity', {
 		}
 		var jElm 			= $(elem),
 			val				= jElm.val(),
-			cache 			= {nodeName: elem.nodeName.toLowerCase()}
+			cache 			= {nodeName: elem.nodeName.toLowerCase()},
+			ariaInvalid 	= elem.getAttribute('aria-invalid')
 		;
 		
 		validityState.customError = !!($.data(elem, 'customvalidationMessage'));
@@ -674,6 +682,7 @@ webshims.attr('validity', {
 				validityState.valid = false;
 			}
 		});
+		elem.setAttribute('aria-invalid',  validityState.valid ? 'false' : 'true');
 		return validityState;
 	}
 });
@@ -695,7 +704,8 @@ webshims.attr('willValidate', {
 			}
 		;
 		return function(elem){
-			return !!( elem.name && elem.form && !elem.disabled && !elem.readOnly && !types[elem.type] && $.attr(elem.form, 'novalidate') == null );
+			//elem.name && 
+			return !!( elem.form && !elem.disabled && !elem.readOnly && !types[elem.type] && $.attr(elem.form, 'novalidate') == null );
 		};
 	})()
 });
@@ -852,9 +862,13 @@ webshims.createReadyEvent('form-extend');
 						},
 						cssFloat 		= $.curCSS(elem, 'float')
 					;
-					if(data.text.css('lineHeight') !== lineHeight){
-						data.text.css('lineHeight', lineHeight);
-					}
+					$.each(['lineHeight', 'fontSize', 'fontFamily', 'fontWeight'], function(i, style){
+						var prop = $.curCSS(elem, style);
+						if(data.text.css(style) != prop){
+							data.text.css(style, prop);
+						}
+					});
+					
 					if(dims.width && dims.height){
 						data.text.css(dims);
 					}

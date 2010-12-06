@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<link href="../../css/styles.css" rel="stylesheet" />
+	
+	<style>
+		
+		fieldset div {
+			overflow: hidden;
+			zoom: 1;
+			padding: 5px;
+			border: 1px solid #000;
+			margin: 5px 0;
+		}
+	</style>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+	<script src="../../js-webshim/minified/extras/mousepress.js"></script>
+	<script src="../../js-webshim/minified/extras/modernizr-1.6.min.js"></script>
+	<script src="../../js-webshim/dev/polyfiller.js"></script>
+	<script src="../../../src/extras/custom-validity.js"></script>
+    <script class="example">
+//    	$.webshims.debug = true;
+		
+    	//path is path of polyfiller.js + shims/
+    	$.webshims.loader.basePath += 'shims/';
+		//load all defined modules (look into features.js)
+		//or load only a specific feature with $.webshims.polyfill('feature-name');
+		$.webshims.polyfill();
+        $(function(){
+			$('form').bind('submit', function(){
+				console.log('submit')
+				return false;
+			})
+		})
+    </script>
+	
+	<script src="../../demo-js/demo.js"></script>
+	<title>configuring HTML5 forms/Web Forms 2.0 widgets: webshims lib - the polyfilling capability based loading loading JS libary</title>
+	    
+</head>
+
+<body>
+	<section id="wrapper"> 
+		<header>
+			<hgroup>
+				<h1>Webshims Lib</h1>
+				<h2>Polyfill only the uncapable browsers</h2>
+			</hgroup>
+			
+		</header>
+		<nav>
+			<ul>
+				<li><a href="../shiv.html">HTML5 shiv and innerShiv</a></li>
+				<li><a href="../es5.html">ES5/JavaScript 1.8.5</a></li>
+				<li><a href="../webforms.html">constraint validation and input widgets</a></li>
+				<li><a href="../canvas.html">canvas</a></li>
+				<li><a href="../json-storage.html">storage and JSON</a></li>
+				<li><a href="../geolocation.html">geolocation API</a></li>
+			</ul>
+		</nav>
+		<section>
+			<h2>Adding new validation constraints/dynamically changing constraints of HTML5 form elements</h2>
+			<p>There are 3 ways to add/use custom validation constraints with HTML5.</p>
+			<ul>
+				<li>pattern attribute</li>
+				<li>dynamically changing constraints depending on a value/checkedness of another form-control</li>
+				<li>setCustomValidity</li>
+			</ul>
+			<h3>Using custom widgets in all browsers</h3>
+<code class="block">
+</code>
+			
+			<section>
+				<h3>Simple Demo</h3>
+				<form action="#">
+	               
+	                <p class="required"><span>*</span> Required fields</p>
+	                <fieldset>
+	                    
+						<div class="form-element">
+	                        <label for="creditcard">
+	                            creditcard:
+							</label>
+	                       	<input name="creditcard" class="creditcard-input" type="number" id="creditcard" />
+	                    </div>
+						
+						<div class="form-element">
+	                        <label for="data-minlength">
+	                            data-minlength (5):
+							</label>
+	                       	<input data-minlength="5" name="data-minlength" type="text" id="data-minlength" />
+	                    </div>
+						
+						
+	                    <div class="form-element">
+	                        <label for="date">
+	                            data-partial-pattern (foo): 
+							</label>
+							
+	                       	<input data-partial-pattern="foo" name="data-partial-pattern" type="text" id="data-partial-pattern" />
+	                    </div>
+						
+						<div class="form-element">
+	                        <label for="email">
+	                            email: 
+							</label>
+	                       	<input name="email" type="email" id="email" />
+	                    </div>
+						<div class="form-element">
+	                        <label for="email-repeat">
+	                            repeat email (dependent-validation="email"): 
+							</label>
+	                       	<input data-dependent-validation="email" name="email-repeat" type="email" id="email-repeat" />
+	                    </div>
+						
+						<div class="form-element">
+	                        <label for="checkbox">
+	                            checkbox: 
+							</label>
+	                       	<input name="checkbox" type="checkbox" id="checkbox" />
+	                    </div>
+						<div class="form-element">
+	                        <label for="checkbox-fill">
+	                            dependent-validation="checkbox": 
+							</label>
+	                       	<input data-dependent-validation="checkbox" name="checkbox-fill" type="text" required="required" id="checkbox-fill" />
+	                    </div>
+						
+						<div class="form-element">
+	                        <label for="checkbox2">
+	                            checkbox2: 
+							</label>
+	                       	<input name="checkbox2" type="checkbox" id="checkbox2" />
+	                    </div>
+						<div class="form-element">
+	                        <label for="checkbox-fill2">
+	                            dependent-validation='{"from": "checkbox2", "toggle": true}': 
+							</label>
+	                       	<input data-dependent-validation='{"from": "checkbox2", "toggle": true}' name="checkbox-fill2" type="text" required="required" id="checkbox-fill2" />
+	                    </div>
+						
+						<div class="form-element">
+	                        <label for="date-from">
+	                            date-from (dependent-validation='{"from": "date-to", "prop": "max"}'): 
+							</label>
+	                       	<input data-dependent-validation='{"from": "date-to", "prop": "max"}' name="date-from" type="date" id="date-from" />
+	                    </div>
+						<div class="form-element">
+	                        <label for="date-to">
+	                            date-to (dependent-validation='{"from": "date-from", "prop": "min"}'): 
+							</label>
+	                       	<input data-dependent-validation='{"from": "date-from", "prop": "min"}' name="date-to" type="date" id="date-to" />
+	                    </div>
+						
+						
+	                    <div class="button-wrapper">
+	                    	<input type="submit" value="Send" />
+	                    </div>
+	                </fieldset>
+	            </form>
+				
+			</section>
+	</section>
+				
+		<small>
+			Note: every shim is a hack! working with native cutting edge technology is also a hack!
+		</small>
+    </section> 
+	
+</body>
+</html>   

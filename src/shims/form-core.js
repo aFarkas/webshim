@@ -151,7 +151,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				var scrollTop = webshims.scrollRoot.scrollTop();
 				var elemTop = focusElem.offset().top;
 				var labelOff;
-				var smooth;;
+				var smooth;
 				alert.attr('for', webshims.getID(focusElem));
 				
 				if(scrollTop > elemTop){
