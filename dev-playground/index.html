@@ -36,42 +36,87 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 	<script src="../src/polyfiller.js"></script>
 	<script>
-		
+		$.webshims.addPolyfill('datalist', {
+			src: '../../dev-playground/js/datalist.js',
+			test: function(){
+				return 'list' in document.createElement('input');
+			}
+		});
+		$.webshims.attr('list', {
+			elementNames: ['input'],
+			getter: function(elem){
+				var val = elem.list || elem.getAttribute('list');
+				if(val == null){
+					val = undefined;
+				} else if(typeof val == 'string'){
+					val = document.getElementById(val);
+				}
+				return val;
+			},
+			setter: function(elem, value){
+				var dom;
+				if(value && value.getAttribute){
+					dom = value;
+					value = $.webshims.getID(value);
+				}
+				elem.setAttribute('list', value);
+				if($.webshims.createDatalist){
+					$.webshims.createDatalist(elem, value, dom);
+				}
+			}
+		});
 	</script>
 	<title>playing</title>
 	    <script>
 	    	$.webshims.ready('ready', function(){
 //				alert('f')
 			});
-			$(document).one('formsReady', function(){
-				alert('bindReady')
-			})
+			
 			$.webshims.debug = true;
 			$.webshims.loader.basePath += 'shims/';
 			$.webshims.polyfill();
 	    </script>
 </head>
-<script>
-	var test = function(){
-		console.log(this, arguments);
-	};
-</script>
+
 <body class="js-off">   
      
 <form id="test" action="#">
-	<input name="q" step="0.2" type="range" />
-	<div class="inside">
-		<input name="q" step="0.2" type="number" />test
-	</div>
-	<div class="outside">
-		<input step="0.2" type="number" />test
-	</div>
-	<div class="inside margin">
-		<input step="0.2" type="number" />test
-	</div>
-	<div class="outside margin">
-		<input disabled="disabled" step="0.2" type="number" />test
-	</div>
+	<input id="input-list" type="text" list="datalist" />
+	<datalist id="datalist">
+		<select>
+			<option>Test Text 1</option>
+			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
+			<option>Test Text 1</option>
+			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
+			<option>Test Text 1</option>
+			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
+			<option>Test Text 1</option>
+			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
+			<option>Test Text 1</option>
+			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
+			<option>Test Text 1</option>
+			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
+			<option>Test Text 1</option>
+			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
+			<option>Test Text 1</option>
+			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
+			<option>Test Text 1</option>
+			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
+			<option>Test Text 1</option>
+			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
+			<option>Test Text 1</option>
+			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
+			<option>Test Text 1</option>
+			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
+		</select>
+	</datalist>
+	
+	<datalist id="datalist2">
+		<select>
+			<option>2Test Text 1</option>
+			<option value="value of 2">2Test Text 2</option>
+		</select>
+	</datalist>
 </div>
 </form>
 	<button>test</button>

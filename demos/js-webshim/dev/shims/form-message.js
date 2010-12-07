@@ -70,7 +70,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	};
 	
 	var implementProperties = (webshims.overrideValidationMessages || webshims.implement.customValidationMessage) ? ['customValidationMessage'] : [];
-	if(!support.validationMessage){
+	if((!window.noHTMLExtFixes && !support.validationMessage) || !support.validity){
 		implementProperties.push('validationMessage');
 	}
 	

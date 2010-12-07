@@ -290,9 +290,26 @@ webshims.addReady(function(context, contextElem){
 		.bind('click', noValidate)
 		.end()
 	;
-	if(!document.activeElement || !document.activeElement.form){
-		$('input, select, textarea', form).filter('[autofocus]:first').focus();
-	}
+	
+	setTimeout(function(){
+		if (!document.activeElement || !document.activeElement.form) {
+			var first = true;
+			$('input, select, textarea', form).each(function(i){
+				if(!first){return false;}
+				if(this.getAttribute('autofocus') == null){return;}	
+				first = false;
+				var elem = webshims.getVisualInput(this);
+				var focusElem = $('input, select, textarea, .ui-slider-handle', elem).filter(':visible:first');
+				if (!focusElem[0]) {
+					focusElem = elem;
+				}
+				try {
+					focusElem[0].focus();
+				} catch (e) {}
+			});
+		}
+	}, 9);
+	
 });
 
 webshims.createReadyEvent('form-extend');

@@ -1,11 +1,11 @@
 jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	"use strict";
-	
-	var support = $.support;
-	var getVisual = function(elem){
+	webshims.getVisualInput = function(elem){
 		elem = $(elem);
 		return (elem.data('inputUIReplace') || {visual: elem}).visual;
 	};
+	var support = $.support;
+	var getVisual = webshims.getVisualInput;
 	var groupTypes = {checkbox: 1, radio: 1};
 	var emptyJ = $([]);
 	var getGroupElements = function(elem){
@@ -60,7 +60,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 			addClass = 'form-ui-valid';
 			removeClass = 'form-ui-invalid';
 			if(groupTypes[e.target.type] && e.target.checked){
-				getGroupElements(elem).removeClass(removeClass);
+				getGroupElements(elem).removeClass(removeClass).removeAttr('aria-invalid');
 			}
 		} else {
 			addClass = 'form-ui-invalid';
@@ -359,7 +359,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	};
 	
 	var implementProperties = (webshims.overrideValidationMessages || webshims.implement.customValidationMessage) ? ['customValidationMessage'] : [];
-	if(!support.validationMessage){
+	if((!window.noHTMLExtFixes && !support.validationMessage) || !support.validity){
 		implementProperties.push('validationMessage');
 	}
 	
@@ -461,7 +461,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	});
 	
 	
-	if(!support.requiredSelect || overrideNativeMessages){
+	if((!window.noHTMLExtFixes && !support.requiredSelect) || overrideNativeMessages){
 		$.extend(validityChanger, {
 			required: 1,
 			size: 1,

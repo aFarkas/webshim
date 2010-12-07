@@ -97,12 +97,12 @@ d;c=f[f.length]=[a,c];a.parentNode.replaceChild(c[1],c[0])}t(e.styleSheets,"all"
 })(jQuery);
 jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	"use strict";
-	
-	var support = $.support;
-	var getVisual = function(elem){
+	webshims.getVisualInput = function(elem){
 		elem = $(elem);
 		return (elem.data('inputUIReplace') || {visual: elem}).visual;
 	};
+	var support = $.support;
+	var getVisual = webshims.getVisualInput;
 	var groupTypes = {checkbox: 1, radio: 1};
 	var emptyJ = $([]);
 	var getGroupElements = function(elem){
@@ -157,7 +157,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 			addClass = 'form-ui-valid';
 			removeClass = 'form-ui-invalid';
 			if(groupTypes[e.target.type] && e.target.checked){
-				getGroupElements(elem).removeClass(removeClass);
+				getGroupElements(elem).removeClass(removeClass).removeAttr('aria-invalid');
 			}
 		} else {
 			addClass = 'form-ui-invalid';
@@ -456,7 +456,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	};
 	
 	var implementProperties = (webshims.overrideValidationMessages || webshims.implement.customValidationMessage) ? ['customValidationMessage'] : [];
-	if(!support.validationMessage){
+	if((!window.noHTMLExtFixes && !support.validationMessage) || !support.validity){
 		implementProperties.push('validationMessage');
 	}
 	
@@ -781,9 +781,26 @@ webshims.addReady(function(context, contextElem){
 		.bind('click', noValidate)
 		.end()
 	;
-	if(!document.activeElement || !document.activeElement.form){
-		$('input, select, textarea', form).filter('[autofocus]:first').focus();
-	}
+	
+	setTimeout(function(){
+		if (!document.activeElement || !document.activeElement.form) {
+			var first = true;
+			$('input, select, textarea', form).each(function(i){
+				if(!first){return false;}
+				if(this.getAttribute('autofocus') == null){return;}	
+				first = false;
+				var elem = webshims.getVisualInput(this);
+				var focusElem = $('input, select, textarea, .ui-slider-handle', elem).filter(':visible:first');
+				if (!focusElem[0]) {
+					focusElem = elem;
+				}
+				try {
+					focusElem[0].focus();
+				} catch (e) {}
+			});
+		}
+	}, 9);
+	
 });
 
 webshims.createReadyEvent('form-extend');

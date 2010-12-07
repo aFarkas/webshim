@@ -16,6 +16,7 @@ mark {
     font-style: italic;
     font-weight: bold;
 }
+
 /* reset */
 .input-range .ui-slider-range,
 .placeholder-box,
@@ -269,7 +270,43 @@ img.ui-datepicker-trigger {
 	background-color: #fff;
 	z-index: 100;
 }
-
+datalist {
+	display: none;
+}
+.datalist-polyfill {
+	position: absolute;
+	top: 0;
+	left: 0;
+	margin: 0;
+	padding: 0 !important;
+	border: 1px solid #000;
+	display: none;
+	z-index: 1000;
+	max-height: 220px;
+	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
+	
+	-moz-box-shadow: 1px 3px 4px #333;
+	box-shadow: 1px 3px 4px #333;
+}
+.datalist-polyfill ul,
+.datalist-polyfill li {
+	list-style: none !important;
+}
+.datalist-polyfill ul {
+	margin: 0;
+	padding: 2px 0;
+	background: #fff;
+	color: #000;
+	overflow: hidden;
+}
+.datalist-polyfill li {
+	margin: 1px 1px 1px 4px;
+	padding: 2px;
+	overflow: hidden;
+	white-space: nowrap;
+}
 
 .validity-alert {
 	position: absolute;

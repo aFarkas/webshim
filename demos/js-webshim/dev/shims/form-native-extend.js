@@ -67,7 +67,7 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 	});
 	
 	
-	if(!support.requiredSelect || overrideNativeMessages){
+	if((!window.noHTMLExtFixes && !support.requiredSelect) || overrideNativeMessages){
 		$.extend(validityChanger, {
 			required: 1,
 			size: 1,

@@ -156,13 +156,15 @@ asyncTest('email, url, pattern, maxlength', function(){
 		'Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore mag': 'invalid-element', 
 		'Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut ': 'valid-element'
 		//don't know
-//		,'Lorem ipsum dolor sit amet, consetetur sadipscing elitr\n,  sed diam nonumy eirmod tempor invidunt u': 'valid-element',
-//		'Lorem ipsum d\tor s\t amet, c\nsetetur sadipscing elitr\n,  sed ddm nonumdeirmod tempor invidunt u': 'valid-element',
-//		'Lorem ipsum ddddor sddd amet, c\nsetetur sadipscing elitr\n,  sed dddm nonumddeirmod tempor invidunt ut': 'invalid-element', 
-//		'Lorem ittum dolor sit amet, consetetur s\nipscing elit\n,  sed diam nonumy eittod tempor invidunt ut ': 'invalid-element'
+		,'Lorem ipsum dolor sit amet, consetetur sadipscing elitr\n,  sed diam nonumy eirmod tempor invidunt u': 'valid-element',
+		'Lorem ipsum d\tor s\t amet, c\nsetetur sadipscing elitr\n,  sed ddm nonumdeirmod tempor invidunt u': 'valid-element',
+		'Lorem ipsum ddddor sddd amet, c\nsetetur sadipscing elitr\n,  sed dddm nonumddeirmod tempor invidunt ut': 'invalid-element', 
+		'Lorem ittum dolor sit amet, consetetur s\nipscing elit\n,  sed diam nonumy eittod tempor invidunt ut ': 'valid-element'
 	}, function(val, state){
 		$('#maxlength').val(val);
-		ok($('#maxlength').is(':'+state), val.length+' is '+state+' maxlength');
+		if(val == $('#maxlength').val()){
+			ok($('#maxlength').is(':'+state), val.length+' is '+state+' maxlength');
+		}
 	});
 	
 	$('#maxlength').attr('maxlength', 30);
@@ -171,8 +173,11 @@ asyncTest('email, url, pattern, maxlength', function(){
 		'Lorem ipsum dolor sit amet, con': 'invalid-element', 
 		'Lorem ipsum dolor sit amet, co': 'valid-element'
 	}, function(val, state){
+		
 		$('#maxlength').val(val);
-		ok($('#maxlength').is(':'+state), val.length+' is '+state+' maxlength');
+		if (val == $('#maxlength').val()) {
+			ok($('#maxlength').is(':' + state), val.length + ' is ' + state + ' maxlength');
+		}
 	});
 		
 	
@@ -197,7 +202,7 @@ asyncTest('validationMessage/setCustomValidity', function(){
 	equals($('#select').attr('disabled', true).attr('validationMessage'), '', 'custom error message is empty, if control is disabled');
 	$('#select').attr('disabled', false).setCustomValidity('');
 	ok(( $('#select').is(':valid-element') && $('#select').attr('willValidate') ), 'select is set valid again');
-	
+	ok(!!($('input').filter(':invalid-element').attr('validationMessage')), 'validationMessage is a getter for all invalid elements');
 	$.webshims.ready('forms ready', function(){
 		start();
 	});

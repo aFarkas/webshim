@@ -1,4 +1,5 @@
 (function(jQuery, window, document, undefined){
+	"use strict";
 	if(!$.webshims){
 		var langs = [navigator.browserLanguage || navigator.language || '', $('html').attr('lang') || ''];
 		$.webshims = {
@@ -55,8 +56,8 @@
 				$.data(elem, 'customMismatchedRule', customMismatchedRule);
 			}
 			$(elem).setCustomValidity(message);
-			blockCustom = false;
 		}
+		blockCustom = false;
 	};
 	var testValidityRules = webshims.refreshCustomValidityRules;
 	
@@ -117,6 +118,7 @@
  *  	- <input type="checkbox" id="check" /> <input data-dependent-validation='checkbox' />
  */
 (function($, window, document, undefined){
+	"use strict";
 	var addCustomValidityRule = $.webshims.addCustomValidityRule;
 	addCustomValidityRule('partialPattern', function(elem, val){
 		if(!val || !elem.getAttribute('data-partial-pattern')){return;}
