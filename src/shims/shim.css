@@ -279,7 +279,7 @@ datalist {
 	left: 0;
 	margin: 0;
 	padding: 0 !important;
-	border: 1px solid #000;
+	border: 1px solid InactiveBorder;
 	display: none;
 	z-index: 1000;
 	max-height: 220px;
@@ -287,25 +287,39 @@ datalist {
 	overflow-x: hidden;
 	overflow-y: auto;
 	
-	-moz-box-shadow: 1px 3px 4px #333;
-	box-shadow: 1px 3px 4px #333;
+	-moz-box-shadow: 3px 4px 5px #333;
+	box-shadow: 3px 4px 5px #333;
 }
 .datalist-polyfill ul,
 .datalist-polyfill li {
 	list-style: none !important;
 }
 .datalist-polyfill ul {
+	position: static;
 	margin: 0;
 	padding: 2px 0;
+	overflow: hidden;
+	
 	background: #fff;
 	color: #000;
-	overflow: hidden;
+	background: Menu;
+	color: MenuText;
+	
 }
 .datalist-polyfill li {
-	margin: 1px 1px 1px 4px;
-	padding: 2px;
+	margin: 1px 1px 1px 0;
+	padding: 2px 2px 2px 5px;
 	overflow: hidden;
 	white-space: nowrap;
+	cursor: default;
+}
+.datalist-polyfill li.hidden-item {
+	display: none !important;
+}
+.datalist-polyfill li.active-item {
+	background: Highlight;
+	color: HighlightText;
+	cursor: default;
 }
 
 .validity-alert {

@@ -1,4 +1,6 @@
-jQuery.webshims.ready('form-core json-storage', function($, webshims, window, document, undefined){
+jQuery.webshims.ready('form-core es5 json-storage', function($, webshims, window, document, undefined){
+	var listidIndex = 0;
+	
 	var noDatalistSupport = {
 		submit: 1,
 		button: 1,
@@ -10,6 +12,7 @@ jQuery.webshims.ready('form-core json-storage', function($, webshims, window, do
 		color: 1
 	};
 	var noMin = ($.browser.msie && parseInt($.browser.version, 10) < 7);
+	
 	var getStoredOptions = function(name){
 		if(!name){return [];}
 		var data;
@@ -34,113 +37,272 @@ jQuery.webshims.ready('form-core json-storage', function($, webshims, window, do
 		return (elem.textContent || elem.innerText || jQuery.getText([ elem ]) || '');
 	};
 	
-	webshims.createDatalist = function(input, id, datalist){
+	webshims.Datalist = function(input, id, datalist){
 		datalist = datalist || document.getElementById(id);
-		if(!datalist || noDatalistSupport[getType(input)] || $.data(input, 'datalistWidget')){return;}
-		var data = $.data(input, 'datalistWidget', {
-			shadowList: $('<div class="datalist-polyfill" />').appendTo('body'), 
-			id: id,
-			storedOptions: getStoredOptions(input.name || input.id)
-		});
-		updateListOptions(datalist, data.shadowList, input, data.storedOptions);
+		if(!datalist || noDatalistSupport[getType(input)]){return;}
+		var data = $.data(input, 'datalistWidget');
+		if(datalist && data && (data.datalist !== datalist)){
+			data.datalist = datalist;
+			data.id = id;
+			data.needsUpdate = true;
+			return;
+		} 
+		if(!datalist){
+			if(data){
+				data.destroy();
+			}
+			return;
+		}
+		listidIndex++;
+		var that = this;
+		var timedHide = function(){
+			clearTimeout(that.hideTimer);
+			that.hideTimer = setTimeout($.proxy(that, 'hideList'), 9);
+		};
+		this.datalist = datalist;
+		this.id = id;
+		this.idindex = listidIndex;
+		$.data(input, 'datalistWidget', this);
+		this.shadowList = $('<div class="datalist-polyfill" style="display: none;" />').appendTo('body');
+		this.index = -1;
+		this.input = input;
 		
-		$(input).bind('input', function(){
-			var found = showHideOptions(data.shadowList, input);
-		});
-		if(input.form){
-			$(input.form).one('submit', function(){
+		this.storedOptions = getStoredOptions(input.name || input.id);
+		
+		
+		this.shadowList
+			.delegate('li', 'mouseover.datalistWidget mousedown.datalistWidget click.datalistWidget', function(e){
+				var items = $('li:not(.hidden-item)', that.shadowList);
+				var select = (e.type == 'mousedown' || e.type == 'click');
+				that.markItem(items.index(e.target), select, items, 'mouse');
+				if(e.type == 'click'){
+					that.hideList();
+				}
+				return (e.type != 'mousedown');
+			})
+			.bind('focusin', function(){
+				clearTimeout(that.hideTimer);
+			})
+			.bind('focusout', timedHide)
+		;
+		
+		$(input)
+			.attr({
+				autocomplete: 'off', 
+				//role: 'combobox',
+				'aria-haspopup': 'true'
+			})
+			.bind('input.datalistWidget', $.proxy(this, 'showHideOptions'))
+			.bind('keydown.datalistWidget', function(e){
+				var keyCode = e.keyCode;
+				var items;
+				if(keyCode == 40 && !that.showList()){
+					that.markItem(that.index + 1, true);
+					return false;
+				} 
+				
+				if(!that.shadowList.hasClass('datalist-visible')){return;}
+				
+				 
+				if(keyCode == 38){
+					that.markItem(that.index - 1, true);
+					return false;
+				} 
+				if(keyCode == 33 || keyCode == 36){
+					that.markItem(0, true);
+					return false;
+				} 
+				if(keyCode == 34 || keyCode == 35){
+					items = $('li:not(.hidden-item)', that.shadowList);
+					that.markItem(items.length - 1, true, items);
+					return false;
+				} 
+				if(keyCode == 13 || keyCode == 27){
+					that.hideList();
+					return false;
+				}
+
+			})
+			.bind('focus.datalistWidget', function(){
+				clearTimeout(that.hideTimer);
+			})
+			.bind('blur.datalistWidget', timedHide)
+		;
+		
+		$(this.datalist)
+			.unbind('updateDatalist.datalistWidget')
+			.bind('updateDatalist.datalistWidget', function(){
+				that.needsUpdate = true;
+				that.updateTimer = setTimeout(function(){
+					that.updateListOptions();
+				}, 10 *  that.idindex);			
+			})
+			.triggerHandler('updateDatalist')
+		;
+		
+		
+		if(input.form && input.id){
+			$(input.form).one('submit.datalistWidget'+input.id, function(){
 				var val = $.attr(input, 'value');
-				if(val && $.inArray(val, data.storedOptions) == -1){
-					data.storedOptions.push(val);
-					storeOptions(this.name || this.id, data.storedOptions );
+				if(val && $.inArray(val, that.storedOptions) == -1){
+					that.storedOptions.push(val);
+					storeOptions(input.name || input.id, that.storedOptions );
 				}
 			});
 		}
 	};
 	
-	var updateListOptions = function(datalist, shadowList, input, storedOptions){
-		var list = '<ul>';
-		var value;
-		var values = [];
-		var allOptions = [];
-		$('option', datalist).each(function(i){
-			var item = {
-				value: $.attr(this, 'value'),
-				text: getText(this)
-			};
-			values[i] = item.value;
-			allOptions[i] = item;
-		});
-		$.each(storedOptions, function(i, val){
-			if($.inArray(val, values) == -1){
-				allOptions.push({value: val, text: val});
+	webshims.Datalist.prototype = {
+		destroy: function(){
+			$(this.input).unbind('.datalistWidget').removeData('datalistWidget');
+			this.shadowList.remove();
+			if(input.form && input.id){
+				$(input.form).unbind('submit.datalistWidget'+input.id);
 			}
-		});
-		if(shadowList.hasClass('datalist-visible')){
-			value = $.attr(input, 'value');
-			$.each(allOptions, function(i, item){
-				var visibility = '';
-				if(item.text.indexOf('value') == -1){ 
-					visibility = ' style="display: none;"';
+		},
+		updateListOptions: function(){
+			this.needsUpdate = false;
+			clearTimeout(this.updateTimer);
+			var list = '<ul role="list">';
+			var value;
+			var values = [];
+			var allOptions = [];
+			$('option', this.datalist).each(function(i){
+				var item = {
+					value: $.attr(this, 'value'),
+					text: getText(this)
+				};
+				values[i] = item.value;
+				allOptions[i] = item;
+			});
+			$.each(this.storedOptions, function(i, val){
+				if($.inArray(val, values) == -1){
+					allOptions.push({value: val, text: val});
 				}
-				list += '<li'+ visibility +' data-value="'+item.value+'">'+ item.text +'</li>';
 			});
-			
-		} else {
-			$.each(allOptions, function(i, item){
-				list += '<li data-value="'+item.value+'">'+ item.text +'</li>';
-			});
-		}
-		list += '</ul>';
-		shadowList.html(list);
-	};
-	
-	var showHideOptions = function(shadowList, input){
-		if(shadowList.hasClass('list-item-active')){return 'activelist';}
-		var value = $.attr(input, 'value');
-		var found = false;
-		$('li', shadowList).each(function(){
-			if(getText(this).indexOf(value) == -1){
-				this.style.display = 'none';
+			if(this.shadowList.hasClass('datalist-visible')){
+				value = $.attr(this.input, 'value');
+				$.each(allOptions, function(i, item){
+					var visibility = '';
+					if(item.text.indexOf('value') == -1){ 
+						visibility = ' class="hidden-item"';
+					}
+					list += '<li'+ visibility +' role="listitem" tabindex="-1" data-value="'+item.value+'">'+ item.text +'</li>';
+				});
+				
 			} else {
-				this.style.display = 'block';
-				found = true;
+				$.each(allOptions, function(i, item){
+					list += '<li data-value="'+item.value+'" tabindex="-1" role="listitem">'+ item.text +'</li>';
+				});
 			}
-		});
-		if(found){
-			showList(shadowList, input);
-		} else {
-			hideList(shadowList);
+			list += '</ul>';
+			this.shadowList.html(list);
+		},
+		showHideOptions: function(){
+			if(this.shadowList.hasClass('list-item-active')){return 'activelist';}
+			var value = $.attr(this.input, 'value');
+			var found = false;
+			
+			if(value){
+				value = value.toLowerCase();
+				$('li', this.shadowList).each(function(){
+					if(getText(this).toLowerCase().indexOf(value) == -1){
+						$(this).addClass('hidden-item');
+					} else {
+						$(this).removeClass('hidden-item');
+						found = true;
+					}
+				});
+			}
+			if(found){
+				this.showList();
+			} else {
+				this.hideList();
+			}
+			return found;
+		},
+		showList: function(){
+			if(this.shadowList.hasClass('datalist-visible')){return false;}
+			if(this.needsUpdate){
+				this.updateListOptions();
+			}
+			var css = $(this.input).offset();
+			css.top += $(this.input).outerHeight();
+			css.width = $(this.input).outerWidth() - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
+			css.display = 'block';
+			
+			if(noMin){
+				this.shadowList.css('height', 'auto');
+				if(this.shadowList.height() > 250){
+					this.shadowList.css('height', 220);
+				}
+			}
+			this.shadowList.css(css).addClass('datalist-visible');
+			//todo
+//			$(document).bind('focusin.'+this.id, $.proxy(this, functio));
+			return true;
+		},
+		hideList: function(){
+			if(!this.shadowList.hasClass('datalist-visible')){return false;}
+			this.shadowList
+				.removeClass('datalist-visible list-item-active')
+				.scrollTop(0)
+				.css({display: 'none'})
+				.find('li.active-item').removeClass('active-item')
+			;
+			this.index = -1;
+			$(this.input).removeAttr('aria-activedescendant');
+			return true;
+		},
+		markItem: function(index, doValue, items, type){
+			if(index < 0){return;}
+			var activeItem;
+			var goesUp;
+			items = items || $('li:not(.hidden-item)', this.shadowList);
+			if(index >= items.length){return;}
+			items.removeClass('active-item');
+			this.shadowList.addClass('list-item-active');
+			activeItem = items.filter(':eq('+ index +')').addClass('active-item');
+			
+			
+			
+			if(doValue){
+				goesUp = (this.index > index);
+				if(activeItem[0] && activeItem[0].scrollIntoView){
+					if(type !== 'mouse' && (!goesUp || activeItem.position().top < 3)){
+						activeItem[0].scrollIntoView(goesUp);
+					}
+				}
+				$.attr(this.input, 'value', activeItem.attr('data-value'));
+				$.attr(this.input, 'aria-activedescendant', $.webshims.getID(activeItem));
+				
+			}
+			this.index = index;
 		}
-		return found;
 	};
-	
-	var showList = function(shadowList, input){
-		if(shadowList.hasClass('datalist-visible')){return;}
-		var css = $(input).offset();
-		css.top += $(input).outerHeight();
-		css.width = $(input).outerWidth() - (parseInt(shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(shadowList.css('borderRightWidth'), 10)  || 0);
-		css.display = 'block';
-		
-		if(noMin){
-			shadowList.css('height', 'auto');
-			if(shadowList.height() > 250){
-				shadowList.css('height', 220);
+	webshims.defineNodeNameProperty('input', 'list', {
+		get: function(){
+			var val = webshims.contentAttr(this, 'list');
+			if(typeof val == 'string'){
+				val = document.getElementById(val);
+			}
+			return val || null;
+		},
+		set: function(value){
+			var dom;
+			if(value && value.getAttribute){
+				dom = value;
+				value = $.webshims.getID(value);
+			}
+			$.webshims.contentAttr(this, 'list', value);
+			if($.webshims.Datalist){
+				new $.webshims.Datalist(this, value, dom);
 			}
 		}
-		shadowList.css(css).addClass('datalist-visible');
-	};
+	}, true, 'form-htc-list.htc');
 	
-	var hideList = function(shadowList){
-		if(!shadowList.hasClass('datalist-visible')){return;}
-		
-		shadowList.removeClass('datalist-visible list-item-active');
-	};
 	
 	webshims.addReady(function(context, contextElem){
-		$('input[list]', context).add(contextElem.filter('input[list]')).attr('list', function(i, list){
-			return list;
-		});
 		contextElem.filter('select, option').each(function(){
 			var parent = this.parentNode;
 			if(parent && !$.nodeName(parent, 'datalist')){
@@ -149,6 +311,10 @@ jQuery.webshims.ready('form-core json-storage', function($, webshims, window, do
 			if(parent && $.nodeName(parent, 'datalist')){
 				$(parent).triggerHandler('updateDatalist');
 			}
+		});
+//		if(webshims.useDHTMLBehavior && webshims.useMagic){return;}
+		$('input[list]', context).add(contextElem.filter('input[list]')).attr('list', function(i, list){
+			return list;
 		});
 	});
 	

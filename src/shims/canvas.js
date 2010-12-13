@@ -936,13 +936,15 @@ if (!document.createElement('canvas').getContext) {
 			return;
 		}
 		
-		$.webshims.addMethod('getContext', function(ctxName){
-			if(!this.getContext){
-				G_vmlCanvasManager.initElement(this);
+		$.webshims.defineNodeNameProperty('canvas', 'getContext', {
+			value: function(ctxName){
+				if(!this.getContext){
+					G_vmlCanvasManager.initElement(this);
+				}
+				return this.getContext(ctxName);
 			}
-			return this.getContext(ctxName);
 		});
-		
+				
 		$.webshims.addReady(function(context, elem){
 			if(doc === context){return;}
 			$('canvas', context).add(elem.filter('canvas')).each(function(){

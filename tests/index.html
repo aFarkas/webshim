@@ -13,6 +13,12 @@
 	<script src="../src/polyfiller.js"></script>
 	<script>
 		(function($){
+			
+			window.omitTests = window.omitTests || {};
+			omitTests.validity = $.support.validity && !window.noHTMLExtFixes;
+			omitTests.output = $.support.output && !window.noHTMLExtFixes;
+			omitTests.numericDateProps = $.support.numericDateProps && !window.noHTMLExtFixes;
+
 			var hash = location.hash.replace('#', '');
 			if(hash.indexOf('noCapableBugfixes') !== -1){
 				window.noHTMLExtFixes = true; 
@@ -20,10 +26,14 @@
 			if(hash.indexOf('overrideValidationMessages') !== -1){
 				$.webshims.overrideValidationMessages = true; 
 			}
+			if(hash.indexOf('extendNative') !== -1){
+				$.webshims.extendNative = true; 
+			}
 			
 			$(function(){
 				$('#bugfixes').attr('checked', !!window.noHTMLExtFixes);
 				$('#overrideValidationMessages').attr('checked', !!$.webshims.overrideValidationMessages);
+				$('#extendNative').attr('checked', !!$.webshims.extendNative);
 				$('input.webshim-config')
 					.bind('click', function(){
 						var addHash = '';
@@ -50,12 +60,35 @@
 			
 			module("init");
 			asyncTest("init", function(){
-				$.webshims.ready('forms-ext json-storage ready', start);
+				$.webshims.ready('ready', start);
 			});
 			
 		})(jQuery);
 	</script>
 	
+	<script>
+		//polute unknown elements prototype with some used props currently output[value]
+		(function($){
+			$.webshims.defineNodeNameProperty('foobar', 'value', {
+				get: function(){
+					return 'jo da foobar';
+				},
+				set: function(){
+					return 'baz';
+				}
+			}, true);
+//			$.webshims.ready('forms', function(){
+//				$.webshims.defineNodeNameProperty('foobar2', 'value', {
+//					get: function(){
+//						return 'jo da foobar2';
+//					},
+//					set: function(){
+//						return 'bub2';
+//					}
+//				});
+//			}, true);
+		})(jQuery);
+	</script>
 	
 	<script src="unit/placeholder.js"></script>
 	<script src="unit/validity.js"></script>
@@ -64,6 +97,8 @@
 	<script src="unit/dynamic-webshim.js"></script>
 	<script src="unit/stepup-down.js"></script>
 	<script src="unit/storage.js"></script>
+	
+	<script src="unit/boolean-attr.js"></script>
 	<script>
 		jQuery.noConflict();
 		(function($){
@@ -84,9 +119,12 @@
 	</style>
 </head>
 <body class="flora">
+	<foobar></foobar>
+	<foobarbaz></foobarbaz>
 <div>
 	<input type="checkbox" id="bugfixes" value="noCapableBugfixes" class="webshim-config" /> <label for="bugfixes"><strong>without</strong> (capable browser) bugfixes</label>
 	<input type="checkbox" id="overrideValidationMessages" value="overrideValidationMessages" class="webshim-config" /> <label for="overrideValidationMessages">overrideValidationMessages</label>
+	<input type="checkbox" id="extendNative" value="extendNative" class="webshim-config" /> <label for="extendNative">extendNative (does not work on github (needs proper mime-type for .htc-files in IE))</label>
 </div>
 <small>Note: These tests are made to test webshims lib implementation. If there are some failling tests in native implementations, fill a browser bug. We currently only fix heavy/easy to fix errors in native implementations.</small>
 <h1 id="qunit-header">QUnit Test Suite</h1>

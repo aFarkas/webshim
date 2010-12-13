@@ -2,6 +2,7 @@
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
 jQuery.webshims.ready('form-number-date', function($, webshims, window, document){
 	"use strict";
+	
 	var triggerInlineForm = webshims.triggerInlineForm;
 	var adjustInputWithBtn = function(input, button){
 		var inputDim = {
@@ -398,17 +399,17 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	}
 	
 	$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, attr){
-		webshims.attr(attr, {
-			elementNames: ['input'],
-			setter: function(elem, val, fn){
-				var widget = $.data(elem, 'inputUIReplace');
-				fn();
+		var desc = {
+			set: function(val){
+				var widget = $.data(this, 'inputUIReplace');
+				var ret = desc.set._polyfilled.input.apply(this, arguments);
 				if(widget && widget.methods[attr]){
-					val = widget.methods[attr](elem, widget.visual, val);
+					val = widget.methods[attr](this, widget.visual, val);
 				}
-			},
-			getter: true
-		});
+				return ret;
+			}
+		};
+		webshims.defineNodeNameProperty('input', attr, desc);
 	});
 	
 		
@@ -529,17 +530,16 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 		var disabledReadonly = {
 			elementNames: ['input'],
 			// don't change getter
-			setter: function(elem, value, fn){
-				fn();
-				var stepcontrols = $.data(elem, 'step-controls');
+			set: function(value){
+				disabledReadonly.set._polyfilled.input.apply(this, arguments);
+				var stepcontrols = $.data(this, 'step-controls');
 				if(stepcontrols){
-					stepcontrols[ (elem.disabled || elem.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
+					stepcontrols[ (this.disabled || this.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
 				}
 			}
 		};
-		webshims.attr('disabled', disabledReadonly);
-		webshims.attr('readonly', disabledReadonly);
-		
+		webshims.defineNodeNameProperty('input', 'disabled', disabledReadonly);
+		webshims.defineNodeNameProperty('input', 'readonly', disabledReadonly);
 	}
 	var stepKeys = {
 		38: 1,

@@ -257,28 +257,37 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		//safari 5.0.2 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
 		var checkValidity = function(elem){
 			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
-			if(!valid && elem.checkValidity()){
+			var check = checkValidityDescriptor.value._polyfilled[elem.nodeName.toLowerCase()] || elem.checkValidity;
+			if(!valid && check.call(elem)){
 				$(elem).trigger('invalid');
 			}			
 			return valid;
 		};
-		
-		//no current browser supports checkValidity on fieldset
-		webshims.addMethod('checkValidity', function(){
-			if(this.elements || $.nodeName(this, 'fieldset')){
-				var ret = true;
-				$(this.elements || 'input, textarea, select', this)
-					.each(function(){
-						 if(!checkValidity(this)){
-							ret = false;
-						}
-					})
-				;
-				return ret;
-			} else if(this.checkValidity){
-				return checkValidity(this);
+		var checkElems = ['fieldset'];
+		//safari has a stupid bug ToDo: make proper test for safari bug
+		if(!support.output){
+			checkElems = ['input', 'textarea', 'select', 'form', 'fieldset'];
+		}
+		var checkValidityDescriptor = {
+			value: function(){
+				if(this.elements || $.nodeName(this, 'fieldset')){
+					var ret = true;
+					$(this.elements || 'input, textarea, select', this)
+						.each(function(){
+							 if(!checkValidity(this)){
+								ret = false;
+							}
+						})
+					;
+					return ret;
+				} else if(this.checkValidity){
+					return checkValidity(this);
+				}
 			}
-		});
+		};
+		
+		webshims.defineNodeNamesProperty(checkElems, 'checkValidity', checkValidityDescriptor, true);
+		
 	})();
 	
 	

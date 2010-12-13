@@ -10,6 +10,7 @@
 (function(){
 // this is often accessed, so avoid multiple dereference costs universally
 var has = Object.prototype.hasOwnProperty;
+var otoString = Object.prototype.toString;
 //
 // Array
 // =====
@@ -18,7 +19,7 @@ var has = Object.prototype.hasOwnProperty;
 // ES5 15.4.3.2 
 if (!Array.isArray) {
     Array.isArray = function(obj) {
-        return Object.prototype.toString.call(obj) == "[object Array]";
+        return otoString.call(obj) == "[object Array]";
     };
 }
 	
@@ -62,9 +63,9 @@ if (!Object.keys) {
         }
 
         if (hasDontEnumBug) {
-            for (var i = 0, ii = dontEnumLength; i < ii; i++) {
+            for (var i = 0, ii = dontEnumsLength; i < ii; i++) {
                 var dontEnum = dontEnums[i];
-                if (has.call(o, dontEnum)) {
+                if (has.call(object, dontEnum)) {
                     keys.push(dontEnum);
                 }
             }
@@ -75,7 +76,7 @@ if (!Object.keys) {
 
 } 
 
-if((!Object.create || !Object.defineProperties) && window.jQuery && jQuery.webshims){
+if((!Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor) && window.jQuery && jQuery.webshims){
 	var shims = jQuery.webshims;
 	shims.objectCreate = function(proto, props){
 		var f = function(){};
@@ -96,17 +97,24 @@ if((!Object.create || !Object.defineProperties) && window.jQuery && jQuery.websh
 		return object;
 	};
 	
+	
 	shims.defineProperty = function(proto, property, descriptor){
 		if(typeof descriptor != "object"){return proto;}
+		if(Object.defineProperty){
+			try{
+				//IE8 has wrong defaults
+				descriptor.writeable = descriptor.writeable || false;
+				descriptor.configurable = descriptor.configurable || false;
+				descriptor.enumeratable = descriptor.enumeratable || false;
+				Object.defineProperty(proto, property, descriptor);
+				return;
+			} catch(e){}
+		}
 		if(has.call(descriptor, "value")){
 			proto[property] = descriptor.value;
 			return proto;
 		}
-		if(Object.defineProperty){
-			try{
-				Object.defineProperty(proto, property, descriptor);
-			} catch(e){}
-		}
+		
 		if(proto.__defineGetter__){
             if (typeof descriptor.get == "function") {
 				proto.__defineGetter__(property, descriptor.get);
@@ -117,6 +125,51 @@ if((!Object.create || !Object.defineProperties) && window.jQuery && jQuery.websh
         }
 		return proto;
 	};
+	
+	//based on http://www.refactory.org/s/object_getownpropertydescriptor/view/latest 
+	shims.getOwnPropertyDescriptor = function(obj, prop){
+		var descriptor;
+		if(Object.defineProperty && Object.getOwnPropertyDescriptor){
+			try{
+				//IE8
+				descriptor = Object.getOwnPropertyDescriptor(obj, prop);
+				return descriptor;
+			} catch(e){}
+		}
+        descriptor = {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value: undefined
+        };
+		var getter = obj.__lookupGetter__ && obj.__lookupGetter__(prop), 
+			setter = obj.__lookupSetter__ && obj.__lookupSetter__(prop)
+		;
+        
+        if (!getter && !setter) { // not an accessor so return prop
+        	if(!has.call(obj, prop)){
+				return;
+			}
+            descriptor.value = obj[prop];
+            return descriptor;
+        }
+        
+        // there is an accessor, remove descriptor.writable; populate descriptor.get and descriptor.set
+        delete descriptor.writable;
+        delete descriptor.value;
+        descriptor.get = descriptor.set = undefined;
+        
+        if(getter){
+			descriptor.get = getter;
+		}
+        
+        if(setter){
+            descriptor.set = setter;
+		}
+        
+        return descriptor;
+    };
+
 }
 
 

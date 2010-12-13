@@ -2,7 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta charset="utf-8"/>
+	<link href="test.css" rel="stylesheet" />
 	<style>
+		
 		#wrapper {
 			margin: auto;
 			width: 800px;
@@ -31,57 +33,85 @@
 		.margin input {
 			margin-right: 10px;
 		}
+		
+		.d input {background: #000;}
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 	<script src="../src/polyfiller.js"></script>
 	<script>
+//		$.webshims.addPolyfill('iecss', {
+//			src: '../../dev-playground/js/iecss.js',
+//			test: function(){
+//				return !$.browser.msie;
+//			}
+//		});
+		
+		
+		
+		$.support.datalist = ('list' in document.createElement('input'));
+		
 		$.webshims.addPolyfill('datalist', {
 			src: '../../dev-playground/js/datalist.js',
 			test: function(){
-				return 'list' in document.createElement('input');
+				return $.support.datalist;
 			}
 		});
-		$.webshims.attr('list', {
-			elementNames: ['input'],
-			getter: function(elem){
-				var val = elem.list || elem.getAttribute('list');
-				if(val == null){
-					val = undefined;
-				} else if(typeof val == 'string'){
-					val = document.getElementById(val);
-				}
-				return val;
-			},
-			setter: function(elem, value){
-				var dom;
-				if(value && value.getAttribute){
-					dom = value;
-					value = $.webshims.getID(value);
-				}
-				elem.setAttribute('list', value);
-				if($.webshims.createDatalist){
-					$.webshims.createDatalist(elem, value, dom);
-				}
-			}
-		});
+		if($.support.datalist){
+//			$.webshims.attr('list', {
+//				elementNames: ['input'],
+//				getter: function(elem){
+//					var val = $.webshims.contentAttr(elem, 'list');
+//					if(typeof val == 'string'){
+//						val = document.getElementById(val);
+//					}
+//					return val || null;
+//				},
+//				setter: function(elem, value){
+//					var dom;
+//					if(value && value.getAttribute){
+//						dom = value;
+//						value = $.webshims.getID(value);
+//					}
+//					$.webshims.contentAttr(elem, 'list', value);
+//				}
+//			});
+		}
+		
 	</script>
 	<title>playing</title>
 	    <script>
-	    	$.webshims.ready('ready', function(){
-//				alert('f')
-			});
-			
+	    				
 			$.webshims.debug = true;
+			$.webshims.extendNative = true;
 			$.webshims.loader.basePath += 'shims/';
 			$.webshims.polyfill();
+			
+			$.webshims.defineNodeNameProperty('foobar', 'value', {
+				get: function(){
+					return 'jo da foobar';
+				},
+				set: function(){
+					return 'baz';
+				}
+			}, true);
+			
 	    </script>
 </head>
 
-<body class="js-off">   
-     
+<body class="js-off"> 
+
 <form id="test" action="#">
-	<input id="input-list" type="text" list="datalist" />
+	<div>
+		<input type="range" />
+		<input type="date" />
+	<input required type="number" />
+	<input placeholder="saa" required="d" id="input-list" type="text" list="datalist" />
+	<select name="dsa" required>
+		<option></option>
+		<option>dsdas</option>
+	</select>
+	<output></output>
 	<datalist id="datalist">
 		<select>
 			<option>Test Text 1</option>
@@ -118,6 +148,7 @@
 		</select>
 	</datalist>
 </div>
+<input type="submit" />
 </form>
 	<button>test</button>
             

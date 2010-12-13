@@ -1,0 +1,32 @@
+<PUBLIC:COMPONENT lightWeight="true">
+
+<PUBLIC:PROPERTY NAME="list" PUT="listSet" GET="listGet" />
+
+
+<SCRIPT LANGUAGE="JScript">
+var noop = function(){};
+var doProp = function(name, action, arg){
+	 if(!jQuery.webshims.magicProps[name]){
+	 	if(action == 'setter'){ element.setAttribute(name, arg);}
+	 	return ('getter' == action) ? element.getAttribute(name) : undefined;
+	 }
+	 return jQuery.webshims.magicProps[name][action](element, arg);
+};
+var get = function(name){
+	 return doProp(name, 'getter');
+};
+var set = function(name, arg){
+	 return doProp(name, 'setter', arg);
+};
+
+
+
+//placeholder
+var listSet = function(val){
+	set('list', element, val);
+};
+var listGet = function(){
+	return get('list', element);
+};
+</SCRIPT>
+</PUBLIC:COMPONENT>

@@ -136,14 +136,6 @@ asyncTest('step number/date module specific validity', function(){
 		},
 		{
 			attrs: {
-				value: '5.005',
-				step: '0.005',
-				min: '4'
-			},
-			trueState: 'valid'
-		},
-		{
-			attrs: {
 				value: '5.55556',
 				step: 'any',
 				min: '4',
@@ -218,6 +210,19 @@ asyncTest('step number/date module specific validity', function(){
 		
 	], createTestMethodA('number'));
 	
+	if(!omitTests.numericDateProps){
+		$.each([
+			{
+				attrs: {
+					value: '5.005',
+					step: '0.005',
+					min: '4'
+				},
+				trueState: 'valid'
+			}
+		], createTestMethodA('number'));
+	}
+	
 	$.each([
 		{
 			attrs: {
@@ -234,12 +239,6 @@ asyncTest('step number/date module specific validity', function(){
 		{
 			attrs: {
 				value: '2010-10-31'
-			},
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				value: '1488-12-11'
 			},
 			trueState: 'valid'
 		},
@@ -320,6 +319,17 @@ asyncTest('step number/date module specific validity', function(){
 		}
 	],
 	createTestMethodA('date'));
+	
+	if(!omitTests.numericDateProps){
+		$.each([
+			{
+				attrs: {
+					value: '1488-12-11'
+				},
+				trueState: 'valid'
+			}
+		], createTestMethodA('date'));
+	}
 
 	$.each([
 		{

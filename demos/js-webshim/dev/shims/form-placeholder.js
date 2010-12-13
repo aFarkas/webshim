@@ -7,10 +7,8 @@
  */
 
 
-(function($){
-	if($.support.placeholder){
-		return;
-	}
+jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
+	if($.support.placeholder){return;}
 	var changePlaceholderVisibility = function(elem, value, placeholderTxt, data, type){
 			if(!data){
 				data = $.data(elem, 'placeHolder');
@@ -115,52 +113,56 @@
 						val = val.replace(delReg, '');
 					}
 					var data = pHolder.create(elem);
-					elem.setAttribute('placeholder', val);
+					if(webshims.contentAttr(elem, 'placeholder') != val){
+						webshims.contentAttr(elem, 'placeholder', val);
+					}
 					data.text.text(val);
+					
 					changePlaceholderVisibility(elem, false, val, data);
 				}
 			};
 		})()
 	;
 	
-	
-	$.webshims.attr('placeholder', {
-		elementNames: ['input', 'textarea'],
-		setter: function(elem, val){
-			pHolder.update(elem, val);
-		},
-		getter: function(elem){
-			return elem.getAttribute('placeholder') || '';
-		}
-	});
-		
-	var value = {
-		elementNames: ['input', 'textarea'],
-		setter: function(elem, value, oldFn){
-			var placeholder = elem.getAttribute('placeholder');
-			if(placeholder && 'value' in elem){
-				changePlaceholderVisibility(elem, value, placeholder);
-			}
-			oldFn();
-		},
-		getter: true
+	$.webshims.publicMethods = {
+		pHolder: pHolder
 	};
 	
-	$.webshims.attr('value', value);
+	webshims.defineNodeNamesProperty(['input', 'textarea'], 'placeholder', {
+		set: function(val){
+			pHolder.update(this, val);
+		},
+		get: function(){
+			return webshims.contentAttr(this, 'placeholder') || '';
+		}
+	}, true, 'form-htc-placeholder.htc');
+			
+	var valueDescriptor = {
+		set: function(value){
+			var placeholder = webshims.contentAttr(this, 'placeholder');
+			if(placeholder && 'value' in this){
+				changePlaceholderVisibility(this, value, placeholder);
+			}
+			valueDescriptor.set._polyfilled[this.nodeName.toLowerCase()].apply(this, arguments);
+		}
+	};
+	
+	webshims.defineNodeNamesProperty(['input', 'textarea'], 'value', valueDescriptor);
 	
 	var oldVal = $.fn.val;
 	$.fn.val = function(val){
 		if(val !== undefined){
 			this.each(function(){
 				if( this.nodeType === 1 ){
-					value.setter(this, val, $.noop);
+					valueDescriptor.set.call(this, val, $.noop);
 				}
 			});
 		}
 		return oldVal.apply(this, arguments);
 	};
-			
+	
 	$.webshims.addReady(function(context, contextElem){
+		if(webshims.useDHTMLBehavior && webshims.useMagic){return;}	
 		$('input[placeholder], textarea[placeholder]', context)
 			.add(contextElem.filter('input[placeholder], textarea[placeholder]'))
 			.attr('placeholder', function(i, holder){
@@ -168,4 +170,4 @@
 			})
 		;
 	});
-})(jQuery);
+});

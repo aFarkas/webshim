@@ -1,5 +1,6 @@
 (function($){
 
+
 module("validity");
 
 
@@ -113,10 +114,8 @@ asyncTest("general validity Modul", function(){
 		'INFO@CTE.DE': 'valid-element', 
 		'info@c-t.museum': 'valid-element',
 		'info@c123t.museum': 'valid-element',
-		'info@cät.de': 'valid-element',
 		'info@3com.com': 'valid-element',
 		'in-f+a{t$o@cpt.de': 'valid-element',
-		'"in@fo"@3com.com': 'valid-element',
 		'in\@fo@3com.com': 'valid-element',
 		'in@fo@3com.com': 'invalid-element',
 		'info.de': 'invalid-element'
@@ -127,6 +126,16 @@ asyncTest("general validity Modul", function(){
 		$('#email').val(val);
 		ok($('#email').is(':'+state), val+' is '+state+' mail');
 	});
+	if(!omitTests.validity){
+		$.each({
+			'info@cät.de': 'valid-element',
+			'"in@fo"@3com.com': 'valid-element'
+		}, function(val, state){
+			$('#email').val(val);
+			ok($('#email').is(':'+state), val+' is '+state+' mail');
+		});
+	}
+	
 	
 	$.webshims.ready('forms ready', function(){
 		start();
@@ -212,16 +221,19 @@ asyncTest('validationMessage/setCustomValidity', function(){
 asyncTest('output test', function(){
 	QUnit.reset();
 	
+	equals($('foobar').attr('value'), 'jo da foobar', 'same props on multiple unknwon elements work right');
+	equals($('foobarbaz').attr('value'), undefined, "unknown extension don't pollute other unknowns");
+	
 	equals($('output').attr('value'), 'jo', 'first output has initial value');
 	$('output:first').attr('value', 'hello');
 	equals($('output').attr('value'), 'hello', 'first output has changed value');
 	
+	
+	
 	$('#labeled-output').attr('value', 'somecontent');
-	if( !('value' in document.createElement('output')) ){
+	if( !omitTests.output ){
 		equals($('output:first').text(), 'hello', 'shim shows value');
 		ok(/&outputtest=somecontent&/.test($('form').serialize()), 'finds output serialized in shim');
-	} else {
-		ok(/&outputtest=somecontent&/.test($('form').serialize()), 'finds output serialized in native, if fails jQuery bug');
 	}
 	$('#rangeId').attr('value', 30);
 	$.webshims.triggerInlineForm($('input.oninput-test')[0], 'input');

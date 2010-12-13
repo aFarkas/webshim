@@ -1,0 +1,53 @@
+<PUBLIC:COMPONENT lightWeight="true">
+
+<PUBLIC:PROPERTY NAME="validity" PUT="noop" GET="validityGet" />
+<PUBLIC:PROPERTY NAME="willValidate" PUT="noop" GET="willValidateGet" />
+<PUBLIC:PROPERTY NAME="required" PUT="requiredSet" GET="requiredGet" />
+
+<PUBLIC:PROPERTY NAME="validationMessage" PUT="noop" GET="validationMessageGet" />
+
+<PUBLIC:METHOD NAME="checkValidity" />
+<PUBLIC:METHOD NAME="setCustomValidity" />
+
+
+
+<SCRIPT LANGUAGE="JScript">
+
+//FOR all fieldset, input, select, textarea
+
+var noop = function(){};
+var doProp = function(name, action, arg){
+	 if(!jQuery.webshims.magicProps[name]){
+	 	if(action == 'setter'){ element.setAttribute(name, arg);}
+	 	return ('getter' == action) ? element.getAttribute(name) : undefined;
+	 }
+	 return jQuery.webshims.magicProps[name][action](element, arg);
+};
+var get = function(name){
+	 return doProp(name, 'getter');
+};
+var set = function(name, arg){
+	 return doProp(name, 'setter', arg);
+};
+
+
+var validityGet = function(){
+	return get('validity', element);
+};
+var willValidateGet = function(){
+	return get('willValidate', element);
+};
+var requiredGet = function(){
+	return get('required', element);
+};
+var requiredSet = function(){
+	return set('required', element);
+};
+var checkValidity = function(){
+	jQuery(element).checkValidity();
+});
+var setCustomValidity = function(){
+	jQuery(element).setCustomValidity();
+});
+</SCRIPT>
+</PUBLIC:COMPONENT>

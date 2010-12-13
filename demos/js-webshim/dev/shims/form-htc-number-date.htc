@@ -1,0 +1,31 @@
+<PUBLIC:COMPONENT lightWeight="true">
+
+
+<PUBLIC:PROPERTY NAME="valueAsNumber" PUT="valueAsNumberSet" GET="valueAsNumberGet" /></PUBLIC:COMPONENT>
+<PUBLIC:PROPERTY NAME="valueAsDate" PUT="valueAsDateSet" GET="valueAsDateGet" /></PUBLIC:COMPONENT>
+
+<SCRIPT LANGUAGE="JScript">
+var noop = function(){};
+
+
+var get = function(name){
+	return jQuery.attr(element, name);
+};
+var set = function(name, arg){
+	return jQuery.attr(element, name, arg);
+};
+
+
+var valueAsNumberSet = function(val){
+	set('valueAsNumber', val);
+};
+var valueAsNumberGet = function(){
+	return get('valueAsNumber', element);
+};
+var valueAsDateSet = function(val){
+	set('valueAsDate', val);
+};
+var valueAsDateGet = function(){
+	return get('valueAsDate', element);
+};
+</SCRIPT>

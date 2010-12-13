@@ -1,5 +1,5 @@
 jQuery.webshims.ready('form-message form-core', function($, webshims, window, doc, undefined){
-	"use strict";
+//	"use strict";
 	var support = $.support;
 	if(!support.validity){return;}
 		
@@ -49,24 +49,22 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 			});
 		} else {
 			$.attr(elem, 'validity');
-			
 		}
 	};
 	
-	webshims.addMethod('setCustomValidity', function(error){
-		error = error+'';
-		if(this.setCustomValidity){
-			this.setCustomValidity(error);
+	var setCustomValidityDescriptor = {
+		value: function(error){
+			error = error+'';
+			setCustomValidityDescriptor.value._polyfilled[this.nodeName.toLowerCase()].call(this, error);
 			if(overrideValidity){
 				$.data(this, 'hasCustomError', !!(error));
 				testValidity(this);
 			}
-		} else {
-			$.data(this, 'customvalidationMessage', error);
 		}
-	});
+	};
 	
-	
+	webshims.defineNodeNamesProperty(['input', 'textarea', 'select'], 'setCustomValidity', setCustomValidityDescriptor, true);
+		
 	if((!window.noHTMLExtFixes && !support.requiredSelect) || overrideNativeMessages){
 		$.extend(validityChanger, {
 			required: 1,
@@ -84,7 +82,7 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 	}
 			
 	if(!support.requiredSelect){
-		webshims.createBooleanAttrs('required', ['select']);
+		webshims.defineNodeNamesBooleanProperty(['select'], 'required', true);
 		
 		webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){
 			
@@ -102,10 +100,10 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 	}
 	
 	if(overrideValidity){
-		webshims.attr('validity', {
-			elementNames: validityElements,
-			getter: function(elem){
-				var validity 	= elem.validity;
+		var valididyDescriptor =  {
+			get: function(){
+				
+				var validity = valididyDescriptor.get._polyfilled[this.nodeName.toLowerCase()].apply(this, arguments);
 				if(!validity){
 					return validity;
 				}
@@ -114,13 +112,15 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 					validityState[prop] = validity[prop];
 				});
 				
-				if( !$.attr(elem, 'willValidate') ){
+				if( !$.attr(this, 'willValidate') ){
 					return validityState;
 				}
-				var jElm 			= $(elem),
+				var jElm 			= $(this),
+					elem 			= this,
 					cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
 					val				= oldVal.call(jElm),
 					customError 	= !!($.data(elem, 'hasCustomError')),
+					setCustomValidity = setCustomValidityDescriptor.value._polyfilled[elem.nodeName.toLowerCase()] || elem.setCustomValidity,
 					setCustomMessage
 				;
 				
@@ -146,18 +146,22 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 				$.each(validityRules, function(rule, fn){
 					validityState[rule] = fn(jElm, val, cache, validityState);
 					if( validityState[rule] && (validityState.valid || (!setCustomMessage && overrideNativeMessages)) ) {
-						elem.setCustomValidity(webshims.createValidationMessage(elem, rule));
+						
+						setCustomValidity.call(elem, webshims.createValidationMessage(elem, rule));
 						validityState.valid = false;
 						setCustomMessage = true;
 					}
 				});
 				if(validityState.valid){
-					elem.setCustomValidity('');
+					setCustomValidity.call(elem, '');
 				}
 				return validityState;
-			}
-		});
-					
+			},
+			set: $.noop
+			
+		};
+		webshims.defineNodeNamesProperty(validityElements, 'validity', valididyDescriptor, true);
+							
 		$.fn.val = function(val){
 			var ret = oldVal.apply(this, arguments);
 			this.each(function(){
@@ -187,9 +191,7 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 		
 		var validityElementsSel = validityElements.join(',');		
 		webshims.addReady(function(context, elem){
-			$(validityElementsSel, context).add(elem.filter(validityElementsSel)).each(function(){
-				testValidity(this, true);
-			});
+			$(validityElementsSel, context).add(elem.filter(validityElementsSel)).attr('validity');
 		});
 		
 	} //end: overrideValidity -> (!supportRequiredSelect || !supportNumericDate || overrideNativeMessages)

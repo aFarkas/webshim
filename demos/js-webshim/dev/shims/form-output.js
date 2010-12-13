@@ -73,11 +73,11 @@ jQuery.webshims.ready('form-core', function($, webshims){
 			shim[0].value = val;
 			val = shim[0].value;
 			elem.text(val);
-			elem[0].value = val;
+			webshims.contentAttr(elem[0], 'value', val);
 		};
 		
 		elem[0].defaultValue = value;
-		elem[0].value = value;
+		webshims.contentAttr(elem[0], 'value', value);
 		
 		elem.attr({'aria-live': 'polite'});
 		if(id){
@@ -98,22 +98,19 @@ jQuery.webshims.ready('form-core', function($, webshims){
 		return setValue;
 	};
 	
-
-	webshims.attr('value', {
-		elementNames: ['output', 'input'],
-		getter: true,
-		setter: function(elem, value, oldFn){
-			var setVal = $.data(elem, 'outputShim');
-			if(!setVal){
-				if($.nodeName(elem, 'output')){
-					setVal = outputCreate(elem);
-				} else {
-					return oldFn();
-				}
+	webshims.defineNodeNameProperty('output', 'value', {
+		set: function(value){
+			var setVal = $.data(this, 'outputShim');
+			if(setVal == null){
+				setVal = outputCreate(this);
 			}
 			setVal(value);
+		},
+		get: function(){
+			return webshims.contentAttr(this, 'value');
 		}
-	});
+	}, true);
+	
 	
 	webshims.addReady(function(context, contextElem){
 		$('output', context).add(contextElem.filter('output')).each(function(){

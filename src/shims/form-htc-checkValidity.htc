@@ -1,0 +1,13 @@
+<PUBLIC:COMPONENT lightweight="true">
+
+
+<SCRIPT LANGUAGE="JScript">
+
+//FOR all form
+
+
+element.checkValidity = function(){
+	return jQuery(element).checkValidity();
+};
+</SCRIPT>
+</PUBLIC:COMPONENT>
