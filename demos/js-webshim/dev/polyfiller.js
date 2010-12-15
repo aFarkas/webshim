@@ -143,12 +143,9 @@
 					}
 					parent = parent || doc.getElementsByTagName('head')[0] || doc.body;
 					loadedSrcs.push(src);
-					$('<link rel="stylesheet" href="'+src+'" />')
+					$('<link rel="stylesheet" />')
 						.prependTo(parent)
-						.attr({
-							href: src,
-							rel: 'stylesheet'
-						})
+						.attr({href: src})
 					;
 				};
 			})(),
@@ -666,7 +663,7 @@
 					}
 					
 				}
-				console.log(nodeName+':'+prop);
+				
 				['value', 'get', 'set'].forEach(function(descProp){
 					if(desc[descProp]){
 						desc[descProp]._polyfilled = getSup(descProp, oldDesc);
