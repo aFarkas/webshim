@@ -52,18 +52,17 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 		}
 	};
 	
-	var setCustomValidityDescriptor = {
+	
+	webshims.defineNodeNamesProperty(['input', 'textarea', 'select'], 'setCustomValidity', {
 		value: function(error){
 			error = error+'';
-			setCustomValidityDescriptor.value._polyfilled[this.nodeName.toLowerCase()].call(this, error);
+			this.setCustomValidity(error);
 			if(overrideValidity){
 				$.data(this, 'hasCustomError', !!(error));
 				testValidity(this);
 			}
 		}
-	};
-	
-	webshims.defineNodeNamesProperty(['input', 'textarea', 'select'], 'setCustomValidity', setCustomValidityDescriptor, true);
+	});
 		
 	if((!window.noHTMLExtFixes && !support.requiredSelect) || overrideNativeMessages){
 		$.extend(validityChanger, {
@@ -82,7 +81,7 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 	}
 			
 	if(!support.requiredSelect){
-		webshims.defineNodeNamesBooleanProperty(['select'], 'required', true);
+		webshims.defineNodeNamesBooleanProperty(['select'], 'required');
 		
 		webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){
 			
@@ -100,10 +99,10 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 	}
 	
 	if(overrideValidity){
-		var valididyDescriptor =  {
-			get: function(){
+		webshims.defineNodeNamesProperty(validityElements, 'validity', {
+			get: function(elem){
 				
-				var validity = valididyDescriptor.get._polyfilled[this.nodeName.toLowerCase()].apply(this, arguments);
+				var validity = elem.validity;
 				if(!validity){
 					return validity;
 				}
@@ -112,15 +111,13 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 					validityState[prop] = validity[prop];
 				});
 				
-				if( !$.attr(this, 'willValidate') ){
+				if( !$.attr(elem, 'willValidate') ){
 					return validityState;
 				}
-				var jElm 			= $(this),
-					elem 			= this,
+				var jElm 			= $(elem),
 					cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
 					val				= oldVal.call(jElm),
 					customError 	= !!($.data(elem, 'hasCustomError')),
-					setCustomValidity = setCustomValidityDescriptor.value._polyfilled[elem.nodeName.toLowerCase()] || elem.setCustomValidity,
 					setCustomMessage
 				;
 				
@@ -146,21 +143,19 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 				$.each(validityRules, function(rule, fn){
 					validityState[rule] = fn(jElm, val, cache, validityState);
 					if( validityState[rule] && (validityState.valid || (!setCustomMessage && overrideNativeMessages)) ) {
-						
-						setCustomValidity.call(elem, webshims.createValidationMessage(elem, rule));
+						elem.setCustomValidity(webshims.createValidationMessage(elem, rule));
 						validityState.valid = false;
 						setCustomMessage = true;
 					}
 				});
 				if(validityState.valid){
-					setCustomValidity.call(elem, '');
+					elem.setCustomValidity('');
 				}
 				return validityState;
 			},
 			set: $.noop
 			
-		};
-		webshims.defineNodeNamesProperty(validityElements, 'validity', valididyDescriptor, true);
+		});
 							
 		$.fn.val = function(val){
 			var ret = oldVal.apply(this, arguments);

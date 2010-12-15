@@ -113,26 +113,10 @@ asyncTest('step number/date module specific validity', function(){
 		{
 			attrs: {
 				value: '5.5',
-				step: '-0.5',
-				min: '4'
-			},
-			trueState: 'stepMismatch'
-		},
-		{
-			attrs: {
-				value: '5.5',
 				step: '0.5',
 				min: '4'
 			},
 			trueState: 'valid'
-		},
-		{
-			attrs: {
-				value: '5.55556',
-				step: '0.0005',
-				min: '4'
-			},
-			trueState: 'stepMismatch'
 		},
 		{
 			attrs: {
@@ -219,6 +203,22 @@ asyncTest('step number/date module specific validity', function(){
 					min: '4'
 				},
 				trueState: 'valid'
+			},
+			{
+				attrs: {
+					value: '5.55556',
+					step: '0.0005',
+					min: '4'
+				},
+				trueState: 'stepMismatch'
+			},
+			{
+				attrs: {
+					value: '5.5',
+					step: '-0.5',
+					min: '4'
+				},
+				trueState: 'stepMismatch'
 			}
 		], createTestMethodA('number'));
 	}
@@ -463,13 +463,6 @@ asyncTest('step number/date module specific validity', function(){
 		},
 		{
 			attrs: {
-				value: '1999-12-09T20:11',
-				step: 120
-			},
-			trueState: 'stepMismatch'
-		},
-		{
-			attrs: {
 				value: '1999-12-09T20:10',
 				step: '',
 				min: '1999-12-09T20:11'
@@ -509,6 +502,18 @@ asyncTest('step number/date module specific validity', function(){
 			trueState: 'valid'
 		}
 	], createTestMethodA('datetime-local'));
+	
+	if(!omitTests.numericDateProps){
+		$.each([
+			{
+				attrs: {
+					value: '1999-12-09T20:11',
+					step: 120
+				},
+				trueState: 'stepMismatch'
+			}
+		], createTestMethodA('datetime-local'));
+	}
 	
 	$.each([
 		{
@@ -593,11 +598,6 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		},
 		{
 			id: 'datetime-local',
-			value: '2010-12-31T00:00',
-			result: 1293753600000
-		},
-		{
-			id: 'datetime-local',
 			value: '2010-12-31T02:00',
 			result: 1293760800000
 		},
@@ -643,21 +643,72 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		}
 	});
 	
+	if(!omitTests.numericDateProps){
+		$.each([
+			{
+				id: 'datetime-local',
+				value: '2010-12-31T00:00',
+				result: 1293753600000
+			}
+		], function(i, data){
+			var elem = $('#'+data.id);
+			elem.attr('value', data.value);
+			if($.support.validity ===  true && data.value != elem.attr('value')){
+				return;
+			}
+			if(data.result === undefined){
+				var asVal = elem.attr('valueAsNumber');
+				ok(isNaN(asVal), data.value+' is as number NaN, element: '+ data.id+ ', was: '+ asVal +', type: '+ (typeof asVal));
+			} else {
+				ok(elem.attr('valueAsNumber') === data.result, data.value+' is AsNumber: '+ data.result +', element: '+ data.id+ ', was: '+ elem.attr('valueAsNumber'));
+			}
+		});
+	}
+	
 	
 	//setting valueAsNumber
-		$.each([{
-			id: 'time',
-			result: '13:30:30.5',
-			value: 48630500
-		}, {
+	$.each([
+			{
+				id: 'time',
+				result: '13:30:30.5',
+				value: 48630500
+			}, 
+			{
+				id: 'date',
+				result: '2010-12-31',
+				value: 1293753600000
+			}
+		], 
+		function(i, data){
+			var elem = $('#' + data.id);
+			elem.attr('valueAsNumber', data.value);
+			
+			if ($.support.validity === true && data.value != elem.attr('valueAsNumber')) {
+				return;
+			}
+			var val = elem.attr('value');
+			ok(function(){
+				if (data.id == 'time' || data.id == 'datetime-local') {
+					if (val && val.indexOf('.') !== -1 && data.result.length < val.length) {
+						var lenDif = val.length - data.result.length;
+						while (lenDif--) {
+							data.result += '0';
+						}
+					}
+				}
+				return (val === data.result);
+			}(), data.value + ' is as value: ' + data.result + ', element: ' + data.id + ', was: ' + val);
+		}
+	);
+		
+	if(!omitTests.numericDateProps){
+		$.each([
+		 {
 			id: 'datetime-local',
 			result: '2010-12-31T00:00',
 			value: 1293753600000
-		}, {
-			id: 'date',
-			result: '2010-12-31',
-			value: 1293753600000
-		}], function(i, data){
+		}], 
+		function(i, data){
 			var elem = $('#' + data.id);
 			elem.attr('valueAsNumber', data.value);
 			
@@ -677,6 +728,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 				return (val === data.result);
 			}(), data.value + ' is as value: ' + data.result + ', element: ' + data.id + ', was: ' + val);
 		});
+	}
 	//setting valueAsDate (webkit orientated, not sure these test are right + time has a bug in different time zone)
 	if (window.noHTMLExtFixes) {
 		$.each([{

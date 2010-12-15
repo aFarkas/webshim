@@ -188,7 +188,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 				}
 			}
 			
-			webshims.triggerDomUpdate(date);
+			webshims.triggerDomUpdate(date[0]);
 			
 			$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
 				elem.attr(name, function(i, value){return value || '';});
@@ -399,17 +399,14 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	}
 	
 	$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, attr){
-		var desc = {
-			set: function(val){
-				var widget = $.data(this, 'inputUIReplace');
-				var ret = desc.set._polyfilled.input.apply(this, arguments);
+		webshims.onNodeNamesPropertyModify('input', attr, {
+			set: function(elem, val){
+				var widget = $.data(elem, 'inputUIReplace');
 				if(widget && widget.methods[attr]){
-					val = widget.methods[attr](this, widget.visual, val);
+					widget.methods[attr](elem, widget.visual, val);
 				}
-				return ret;
 			}
-		};
-		webshims.defineNodeNameProperty('input', attr, desc);
+		});
 	});
 	
 		
@@ -527,19 +524,25 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	
 	
 	if(options.stepArrows){
-		var disabledReadonly = {
-			elementNames: ['input'],
+		
+		webshims.onNodeNamesPropertyModify('input', 'disabled', {
 			// don't change getter
-			set: function(value){
-				disabledReadonly.set._polyfilled.input.apply(this, arguments);
-				var stepcontrols = $.data(this, 'step-controls');
+			set: function(elem, value){
+				var stepcontrols = $.data(elem, 'step-controls');
 				if(stepcontrols){
-					stepcontrols[ (this.disabled || this.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
+					stepcontrols[ (elem.disabled || elem.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
 				}
 			}
-		};
-		webshims.defineNodeNameProperty('input', 'disabled', disabledReadonly);
-		webshims.defineNodeNameProperty('input', 'readonly', disabledReadonly);
+		});
+		webshims.onNodeNamesPropertyModify('input', 'readonly', {
+			// don't change getter
+			set: function(elem, value){
+				var stepcontrols = $.data(elem, 'step-controls');
+				if(stepcontrols){
+					stepcontrols[ (elem.disabled || elem.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
+				}
+			}
+		});
 	}
 	var stepKeys = {
 		38: 1,

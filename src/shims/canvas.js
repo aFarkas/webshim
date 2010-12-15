@@ -930,13 +930,13 @@ if (!document.createElement('canvas').getContext) {
   /*
    *webshims-Extensions 
    */
-	(function(){
+	jQuery.webshims.ready('es5', function($, webshims, window){
 		var doc = document;
 		if (!doc.styleSheets || !doc.namespaces){
 			return;
 		}
 		
-		$.webshims.defineNodeNameProperty('canvas', 'getContext', {
+		webshims.defineNodeNameProperty('canvas', 'getContext', {
 			value: function(ctxName){
 				if(!this.getContext){
 					G_vmlCanvasManager.initElement(this);
@@ -945,7 +945,7 @@ if (!document.createElement('canvas').getContext) {
 			}
 		});
 				
-		$.webshims.addReady(function(context, elem){
+		webshims.addReady(function(context, elem){
 			if(doc === context){return;}
 			$('canvas', context).add(elem.filter('canvas')).each(function(){
 				if(!this.getContext){
@@ -955,10 +955,10 @@ if (!document.createElement('canvas').getContext) {
 		});
 		$(function(){
 			setTimeout(function(){
-				$.webshims.createReadyEvent('canvas');
+				webshims.createReadyEvent('canvas');
 			}, 9);
 		});
-	})();
+	});
 })(jQuery);
 
 } // if

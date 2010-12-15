@@ -7,6 +7,7 @@ jQuery.webshims.ready('form-core', function($, webshims){
 				input: 1,
 				textarea: 1
 			},
+			noInputTriggerEvts = {updateInput: 1, input: 1},
 			noInputTypes = {
 				radio: 1,
 				checkbox: 1,
@@ -29,13 +30,14 @@ jQuery.webshims.ready('form-core', function($, webshims){
 						
 						if(newVal !== lastVal){
 							lastVal = newVal;
-							if(!e || e.type != 'input'){
+							if(!e || !noInputTriggerEvts[e.type]){
+								console.log(newVal, e)
 								webshims.triggerInlineForm(input[0], 'input');
 							}
 						}
 					},
 					unbind = function(){
-						input.unbind('focusout', unbind).unbind('input', trigger);
+						input.unbind('focusout', unbind).unbind('input', trigger).unbind('updateInput', trigger);
 						clearInterval(timer);
 						trigger();
 						input = null;
@@ -45,7 +47,7 @@ jQuery.webshims.ready('form-core', function($, webshims){
 				clearInterval(timer);
 				timer = setInterval(trigger, ($.browser.mozilla) ? 250 : 111);
 				setTimeout(trigger, 9);
-				input.bind('focusout', unbind).bind('input', trigger);
+				input.bind('focusout', unbind).bind('input updateInput', trigger);
 			}
 		;
 			
@@ -99,18 +101,29 @@ jQuery.webshims.ready('form-core', function($, webshims){
 	};
 	
 	webshims.defineNodeNameProperty('output', 'value', {
-		set: function(value){
-			var setVal = $.data(this, 'outputShim');
-			if(setVal == null){
-				setVal = outputCreate(this);
+		set: function(elem, value){
+			var setVal = $.data(elem, 'outputShim');
+			if(!setVal){
+				setVal = outputCreate(elem);
 			}
 			setVal(value);
 		},
-		get: function(){
-			return webshims.contentAttr(this, 'value');
+		get: function(elem){
+			return webshims.contentAttr(elem, 'value') || $(elem).text() || '';
 		}
-	}, true);
+	});
 	
+	webshims.onNodeNamesPropertyModify('input', 'value', {
+		set: function(elem, value){
+			var setVal = $.data(elem, 'outputShim');
+			if(setVal){
+				setVal(value);
+				return value;
+			}
+			$(elem).triggerHandler('updateInput');
+		}
+	
+	});
 	
 	webshims.addReady(function(context, contextElem){
 		$('output', context).add(contextElem.filter('output')).each(function(){

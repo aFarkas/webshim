@@ -49,7 +49,8 @@
 		
 		
 		
-		$.support.datalist = ('list' in document.createElement('input'));
+		$.support.datalistProp = ('list' in document.createElement('input') && 'options' in document.createElement('datalist'));
+		$.support.datalist = $.support.datalistProp && (!$.browser.webkit || parseInt($.browser.version, 10) > 535);
 		
 		$.webshims.addPolyfill('datalist', {
 			src: '../../dev-playground/js/datalist.js',
@@ -57,25 +58,16 @@
 				return $.support.datalist;
 			}
 		});
-		if($.support.datalist){
-//			$.webshims.attr('list', {
-//				elementNames: ['input'],
-//				getter: function(elem){
-//					var val = $.webshims.contentAttr(elem, 'list');
-//					if(typeof val == 'string'){
-//						val = document.getElementById(val);
-//					}
-//					return val || null;
-//				},
-//				setter: function(elem, value){
-//					var dom;
-//					if(value && value.getAttribute){
-//						dom = value;
-//						value = $.webshims.getID(value);
-//					}
-//					$.webshims.contentAttr(elem, 'list', value);
-//				}
-//			});
+		
+		if($.support.datalistProp){
+			$.webshims.defineNodeNameProperty('input', 'list', {
+				set: function(elem, value){
+					if(value && value.getAttribute){
+						value = $.webshims.getID(value);
+					}
+					elem.list = value;
+				}
+			});
 		}
 		
 	</script>
@@ -83,18 +75,9 @@
 	    <script>
 	    				
 			$.webshims.debug = true;
-			$.webshims.extendNative = true;
 			$.webshims.loader.basePath += 'shims/';
 			$.webshims.polyfill();
 			
-			$.webshims.defineNodeNameProperty('foobar', 'value', {
-				get: function(){
-					return 'jo da foobar';
-				},
-				set: function(){
-					return 'baz';
-				}
-			}, true);
 			
 	    </script>
 </head>
@@ -103,15 +86,19 @@
 
 <form id="test" action="#">
 	<div>
-		<input type="range" />
-		<input type="date" />
-	<input required type="number" />
-	<input placeholder="saa" required="d" id="input-list" type="text" list="datalist" />
-	<select name="dsa" required>
-		<option></option>
-		<option>dsdas</option>
-	</select>
-	<output></output>
+		
+	<input placeholder="saa" required="d" id="input-list" type="text" list="datalist2" />
+	<input id="range" oninput="foo(this, output)" type="range" />
+	<output id="output"></output>
+	<script>
+		var foo = function(elem, e){
+			$(e).attr('value', elem.value);
+			
+		};
+//		$('#range').bind('input', function(){
+//			console.log(this.value)
+//		})
+	</script>
 	<datalist id="datalist">
 		<select>
 			<option>Test Text 1</option>
@@ -143,14 +130,14 @@
 	
 	<datalist id="datalist2">
 		<select>
-			<option>2Test Text 1</option>
-			<option value="value of 2">2Test Text 2</option>
+			<option value="dsa2">2Test Text 1</option>
+			<option value="dsa">2Test Text 2</option>
+			<option label="2Test Text 1 label" value="dsa22"></option>
 		</select>
 	</datalist>
 </div>
-<input type="submit" />
 </form>
-	<button>test</button>
+	
             
        
 </body>

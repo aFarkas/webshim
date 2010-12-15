@@ -162,7 +162,7 @@
 	
 	var dependentDefaults = {
 		//"from": "IDREF || UniqueNAMEREF", //required property: element 
-		"prop": "value", //default: value||checked	(last if "from-prop" is checked)
+		"prop": "value", //default: value||disabled	(last if "from-prop" is checked)
 		"from-prop": "value", //default: value||checked (last if element checkbox or radio)
 		"toggle": false
 	};

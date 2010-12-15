@@ -26,10 +26,7 @@
 			if(hash.indexOf('overrideValidationMessages') !== -1){
 				$.webshims.overrideValidationMessages = true; 
 			}
-			if(hash.indexOf('extendNative') !== -1){
-				$.webshims.extendNative = true; 
-			}
-			
+						
 			$(function(){
 				$('#bugfixes').attr('checked', !!window.noHTMLExtFixes);
 				$('#overrideValidationMessages').attr('checked', !!$.webshims.overrideValidationMessages);
@@ -68,7 +65,7 @@
 	
 	<script>
 		//polute unknown elements prototype with some used props currently output[value]
-		(function($){
+		jQuery.webshims.ready('es5', function($){
 			$.webshims.defineNodeNameProperty('foobar', 'value', {
 				get: function(){
 					return 'jo da foobar';
@@ -87,7 +84,7 @@
 //					}
 //				});
 //			}, true);
-		})(jQuery);
+		});
 	</script>
 	
 	<script src="unit/placeholder.js"></script>
@@ -96,6 +93,7 @@
 	<script src="unit/number-date.js"></script>
 	<script src="unit/dynamic-webshim.js"></script>
 	<script src="unit/stepup-down.js"></script>
+	<script src="unit/input-ui.js"></script>
 	<script src="unit/storage.js"></script>
 	
 	<script src="unit/boolean-attr.js"></script>
@@ -124,7 +122,6 @@
 <div>
 	<input type="checkbox" id="bugfixes" value="noCapableBugfixes" class="webshim-config" /> <label for="bugfixes"><strong>without</strong> (capable browser) bugfixes</label>
 	<input type="checkbox" id="overrideValidationMessages" value="overrideValidationMessages" class="webshim-config" /> <label for="overrideValidationMessages">overrideValidationMessages</label>
-	<input type="checkbox" id="extendNative" value="extendNative" class="webshim-config" /> <label for="extendNative">extendNative (does not work on github (needs proper mime-type for .htc-files in IE))</label>
 </div>
 <small>Note: These tests are made to test webshims lib implementation. If there are some failling tests in native implementations, fill a browser bug. We currently only fix heavy/easy to fix errors in native implementations.</small>
 <h1 id="qunit-header">QUnit Test Suite</h1>

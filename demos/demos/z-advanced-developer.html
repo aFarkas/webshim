@@ -148,35 +148,35 @@ $.webshims.addPolyfill('details', {
 		
 <code class="block">
 (function($){
-	//override jQuery's attribute method in case of the open attribute...
-	$.webshims.attr('open', {
-		//.. for all details - elements
-		elementNames: ['details'],
-		setter: function(elem, value, oldFn){
+	//override jQuery's attribute method for all details - elements...
+	//... in case of the open attribute
+	var openDescriptor = $.webshims.defineNodeNameProperty('details', 'open', {
+		
+		set: function(value){
 			//get polyfill-methods
-			var polyfill = $.data(elem, 'detailsPolyfill');
+			var polyfill = $.data(this, 'detailsPolyfill');
 			//if we haven't polyfilled this element, then do it now
 			if(!polyfill){
-				polyfill = $.data(elem, 'detailsPolyfill', {
+				polyfill = $.data(this, 'detailsPolyfill', {
 					open: function(){
-						$('> *:not(summary)', elem).show();
+						$('> *:not(summary)', this).show();
 					},
 					close: function(){
-						$('> *:not(summary)', elem).hide();
+						$('> *:not(summary)', this).hide();
 					}
 				});
-				$(elem).delegate('summary', 'click', function(){
+				$(this).delegate('summary', 'click', function(){
 					$.attr(elem, 'open', !$.attr(elem, 'open'));
 				});
 			}
 			
 			//convert value to boolean and reflect the content attribute
 			value = !!value;
-			elem.open = value;
+			this.open = value;
 			if(value){
-				elem.setAttribute('open', 'open');
+				this.setAttribute('open', 'open');
 			} else {
-				elem.removeAttribute('open');
+				this.removeAttribute('open');
 			}
 									
 			if(value){
@@ -185,8 +185,8 @@ $.webshims.addPolyfill('details', {
 				polyfill.close();
 			}
 		},
-		getter: function(elem){
-			var isOpen = elem.getAttribute('open');
+		get: function(){
+			var isOpen = this.getAttribute('open');
 			if(isOpen === ""){
 				isOpen = true;
 			}

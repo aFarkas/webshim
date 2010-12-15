@@ -37,7 +37,7 @@
 				});
 			});
 		},
-		addMethodName: function(name, elementNames){
+		addMethodName: function(name){
 			if($.fn[name] && $.fn[name].shim){return;}
 			$.fn[name] = function(){
 				var args = arguments,
@@ -53,8 +53,6 @@
 				});
 				return (ret !== undefined) ? ret : this;
 			};
-			$.fn[name].shim = false; 
-			$.fn[name].elementNames = elementNames;
 		},
 		polyfill: $.noop
 	};

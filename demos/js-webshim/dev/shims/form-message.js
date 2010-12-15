@@ -75,25 +75,23 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	}
 	
 	implementProperties.forEach(function(messageProp){
-		var desc = {
-			get: function(){
+		webshims.defineNodeNamesProperty(['input', 'select', 'textarea', 'fieldset', 'output'], messageProp, {
+			get: function(elem){
 				var message = '';
-				if(!$.attr(this, 'willValidate')){
+				if(!$.attr(elem, 'willValidate')){
 					return message;
 				}
-				
-				var validity = $.attr(this, 'validity') || {valid: 1};
+				var validity = $.attr(elem, 'validity') || {valid: 1};
 				if(validity.valid){return message;}
-				message = this.getAttribute('x-moz-errormessage') || this.getAttribute('data-errormessage') || '';
+				message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
 				if(message){return message;}
-				if(validity.customError && this.nodeName){
-					//('validationMessage' in elem) ? elem.validationMessage : 
-					message = desc.get._polyfilled[this.nodeName.toLowerCase()].call(this) || $.data(this, 'customvalidationMessage');
+				if(validity.customError && elem.nodeName){
+					message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
 					if(message){return message;}
 				}
 				$.each(validity, function(name, prop){
 					if(name == 'valid' || !prop){return;}
-					message = webshims.createValidationMessage(this, name);
+					message = webshims.createValidationMessage(elem, name);
 					if(message){
 						return false;
 					}
@@ -101,8 +99,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 				return message || '';
 			},
 			set: $.noop
-		};
-		webshims.defineNodeNamesProperty(['input', 'select', 'textarea', 'fieldset', 'output'], messageProp, desc, (messageProp == 'validationMessage'));
+		});
 		
 	});
 }, true);

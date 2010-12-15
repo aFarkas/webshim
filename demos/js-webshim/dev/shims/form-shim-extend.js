@@ -145,13 +145,13 @@ webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'form', 'fields
 			}
 		};
 	})()
-}, true, 'form-htc-checkValidity.htc');
+});
 
 webshims.defineNodeNamesProperty(['input', 'textarea', 'select'], 'setCustomValidity', {
 	value: function(error){
 		$.data(this, 'customvalidationMessage', ''+error);
 	}
-}, true, 'form-htc-validity.htc');
+});
 
 
 $.event.special.invalid = {
@@ -194,23 +194,23 @@ $.event.special.invalid = {
 // IDLs for constrain validation API
 webshims.defineNodeNamesProperty(['input', 'select', 'textarea'], 'validity', {
 	set: $.noop,
-	get: function(){
-		var validityState = $.data(this, 'cachedValidity');
+	get: function(elem){
+		var validityState = $.data(elem, 'cachedValidity');
 		if(validityState){
 			return validityState;
 		}
 		validityState 	= $.extend({}, validiyPrototype);
 		
-		if( !$.attr(this, 'willValidate') || this.type == 'submit' ){
+		if( !$.attr(elem, 'willValidate') || elem.type == 'submit' ){
 			return validityState;
 		}
-		var jElm 			= $(this),
+		var jElm 			= $(elem),
 			val				= jElm.val(),
-			cache 			= {nodeName: this.nodeName.toLowerCase()},
-			ariaInvalid 	= this.getAttribute('aria-invalid')
+			cache 			= {nodeName: elem.nodeName.toLowerCase()},
+			ariaInvalid 	= elem.getAttribute('aria-invalid')
 		;
 		
-		validityState.customError = !!($.data(this, 'customvalidationMessage'));
+		validityState.customError = !!($.data(elem, 'customvalidationMessage'));
 		if( validityState.customError ){
 			validityState.valid = false;
 		}
@@ -221,7 +221,7 @@ webshims.defineNodeNamesProperty(['input', 'select', 'textarea'], 'validity', {
 				validityState.valid = false;
 			}
 		});
-		this.setAttribute('aria-invalid',  validityState.valid ? 'false' : 'true');
+		elem.setAttribute('aria-invalid',  validityState.valid ? 'false' : 'true');
 		return validityState;
 	}
 }, true, 'form-htc-validity.htc');
@@ -243,9 +243,9 @@ webshims.defineNodeNamesProperty(['input', 'select', 'textarea', 'fieldset', 'bu
 			}
 		;
 		var barredElems = {fieldset: 1, button: 1, output: 1};
-		return function(){
+		return function(elem){
 			//elem.name && <- we don't use to make it easier for developers
-			return !!( this.form && !this.disabled && !this.readOnly && !types[this.type] && !barredElems[(this.nodeName || '').toLowerCase()] && $.attr(this.form, 'novalidate') == null );
+			return !!( elem.form && !elem.disabled && !elem.readOnly && !types[elem.type] && !barredElems[(elem.nodeName || '').toLowerCase()] && $.attr(elem.form, 'novalidate') == null );
 		};
 	})()
 }, true, 'form-htc-validity.htc');
