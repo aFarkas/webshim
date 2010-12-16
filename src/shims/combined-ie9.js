@@ -71,6 +71,9 @@
 		return api;
 	})();
 })(jQuery);
+jQuery.webshims.gcEval = function(){
+	return (function(){eval( arguments[0] );}).call(arguments[1] || window, arguments[0]);
+};
 jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	"use strict";
 	webshims.getVisualInput = function(elem){
@@ -178,8 +181,11 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 						scope += stringify(id);
 					}
 				}
-//				console.log(elem)
-				ret = (function(){eval( scope + attr );}).call(elem, event);
+				ret = webshims.gcEval(scope + attr, elem);
+			}
+			if(ret === false){
+				event.stopPropagation();
+				event.preventDefault();
 			}
 			$(elem).trigger(event);
 			return ret;

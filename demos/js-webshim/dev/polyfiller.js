@@ -756,8 +756,8 @@
 	}
 	support.es5 = (es5[0] && es5[1]);
 	
-	support.objectAccessor = !!( (Object.create && Object.defineProperties) || Object.prototype.__defineGetter__);
-	support.domAccessor = !!( Object.prototype.__defineGetter__ || ( Object.defineProperty && Object.defineProperty(document.createElement('b'),'x',{get: function(){return true;}}).x));
+	support.objectAccessor = !!( (Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor) || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__));
+	support.domAccessor = !!( (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__) ||  (Object.defineProperty && Object.getOwnPropertyDescriptor));
 	
 	testElem.setAttribute('dataHttpAttr', ':-)');
 	support.contentAttr = !(testElem.dataHttpAttr);

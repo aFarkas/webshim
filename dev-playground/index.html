@@ -83,7 +83,28 @@
 </head>
 
 <body class="js-off"> 
-
+<canvas id="canvas"></canvas>
+<script>
+	$.webshims.ready('canvas', function(){
+		var ctx = $('#canvas').getContext('2d');
+		var fillPattern = function(){
+		
+			// create pattern
+			var ptrn = ctx.createPattern(this, 'repeat');
+			ctx.fillStyle = ptrn;
+			ctx.fillRect(0, 0, 150, 150);
+		};
+		// create new image object to use as pattern
+		var img = $('<img />').attr('src', 'http://protofunc.com/jme/img/play-overlay-mini.png');
+		if(img[0].complete){
+			fillPattern.call(img[0]);
+		} else {
+			img.load(fillPattern);
+		}
+		
+	});
+  
+</script>
 <form id="test" action="#">
 	<div>
 		
