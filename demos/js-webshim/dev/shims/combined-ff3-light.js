@@ -105,7 +105,7 @@ if((!Object.create || !Object.defineProperties || !Object.getOwnPropertyDescript
 				//IE8 has wrong defaults
 				descriptor.writeable = descriptor.writeable || false;
 				descriptor.configurable = descriptor.configurable || false;
-				descriptor.enumeratable = descriptor.enumeratable || false;
+				descriptor.enumeratable = descriptor.enumerable || false;
 				Object.defineProperty(proto, property, descriptor);
 				return;
 			} catch(e){}
