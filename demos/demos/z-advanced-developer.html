@@ -134,8 +134,53 @@ $.webshims.ready('mediaelements', function(){
 		
 		<h2 id="implement-features">Implementing a new feature to Webshim Lib</h2>
 		<p>TBD</p>
+		<p>A Pollyfill always is split into at least 2 parts. First the test and loader definition and second the implementation.</p>
+<code class="block">
+$.webshims.addPolyfill('mediaelement', {
+	test: function(){
+		return ('canPlayType' in document.createElement('video'));	
+	},
+	methodNames: ['play'] //pause, load
+});
+// = load mediaelement.js from shim-folder if test returns false and always create a jQuery-Plugin called play, wich trys to invoke native/polyfilled play
+</code>
+
+		<p>Now put a mediaelement.js inside of your shim folder and start implementing some features:</p>
+<code class="block">
+//Implements a new property on audio, video called currentTime
+$.webshims.defineNodeNamesProperty('audio, video', 'currentTime', {
+	get: function(elem){
+		//your getter implementation (elem refers to the element)
+	},
+	set: function(elem, value){
+		//your setter implementation (elem refers to the element)
+	}
+});
+
+//Implements a new method called play on audio, video
+$.webshims.defineNodeNamesProperty('audio, video', 'play', {
+	value: function(){
+		//your play-method implementation
+		//this refers to the element
+	}
+});
+
+//Implements a new boolean property called controls on audio, video
+$.webshims.defineNodeNamesBooleanProperty('audio, video', 'controls', {
+	//set works more like an onSet:
+	//you don't have to set the value anymore on the domnode, only handle true/false values
+	set: function(elem, value){
+		if(value){
+			//show controls for elem
+		} else {
+			//hide controls for elem
+		}
+	}
+});
+	
+</code>
 		
-		<p>Here is a quick example for implementing the details and summary elements. A Pollyfill always is split into at least 2 parts. First the test and second the implementation.</p>
+		<p>Here is a quick working example for implementing the details and summary elements.</p>
 		<p>Webshims lib uses a sort of client-side browser-specific combination. This combinations aren't very flexible, but easy to use. If you want to develop, you can test the source-files by using <code>$.webshims.debug = true;</code>.</p>
 <code class="block">
 $.webshims.addPolyfill('details', {
@@ -151,13 +196,12 @@ $.webshims.addPolyfill('details', {
 	//override jQuery's attribute method for all details - elements...
 	//... in case of the open attribute
 	$.webshims.defineNodeNamesBooleanProperty('details', 'open', {
-		
-		onSet: function(elem, value){
+		set: function(elem, value){
 			//get polyfill-methods
 			var polyfill = $.data(elem, 'detailsPolyfill');
 			//if we haven't polyfilled this element, then do it now
 			if(!polyfill){
-				polyfill = $.data(this, 'detailsPolyfill', {
+				polyfill = $.data(elem, 'detailsPolyfill', {
 					open: function(){
 						$('> *:not(summary)', elem).show();
 					},
@@ -176,9 +220,14 @@ $.webshims.addPolyfill('details', {
 			} else {
 				polyfill.close();
 			}
-		},
-		//call onSet on all details with open-attribute on DOMReady
-		init: true
+		}
+	});
+	
+	//init open attribute
+	$.webshims.addReady(function(context, contextElem){
+		$('details', context).attr('open', function(i, open){
+			return open;
+		});
 	});
 	
 })(jQuery);

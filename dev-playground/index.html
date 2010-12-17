@@ -50,7 +50,7 @@
 		
 		
 		$.support.datalistProp = ('list' in document.createElement('input') && 'options' in document.createElement('datalist'));
-		$.support.datalist = $.support.datalistProp && (!$.browser.webkit || parseInt($.browser.version, 10) > 535);
+		$.support.datalist = $.support.datalistProp && (!$.browser.webkit || parseInt($.browser.version, 10) > 536);
 		
 		$.webshims.addPolyfill('datalist', {
 			src: '../../dev-playground/js/datalist.js',
@@ -58,6 +58,7 @@
 				return $.support.datalist;
 			}
 		});
+		
 		
 		if($.support.datalistProp){
 			$.webshims.defineNodeNameProperty('input', 'list', {
@@ -106,6 +107,7 @@
   
 </script>
 <form id="test" action="#">
+	
 	<div>
 		
 	<input placeholder="saa" required="d" id="input-list" type="text" list="datalist2" />

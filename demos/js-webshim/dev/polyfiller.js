@@ -13,7 +13,7 @@
 	$('html').addClass('js-on').removeClass('js-off');
 	
 	$.webshims = {
-		version: 'pre1.1.0',
+		version: '1.1.0',
 		useImportantStyles: true,
 		fix: {},
 		implement: {},
@@ -367,7 +367,7 @@
 				}
 				
 				$.each(cfg.methodNames, function(i, methodName){
-					webshims.addMethodName(methodName.name, methodName.elementNames);
+					webshims.addMethodName(methodName);
 				});
 			}
 		},
@@ -804,12 +804,7 @@
 			return support.canvas;
 		},
 		noAutoCallback: true,
-		methodNames: [
-			{
-				name: 'getContext',
-				elementNames: ['canvas']
-			}
-		],
+		methodNames: ['getContext'],
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie7-light', 'combined-ie8-light']
 	});
 	/* END: canvas */
@@ -898,16 +893,7 @@
 					loader.loadList(['form-message']);
 				}, 0);
 			},
-			methodNames: [
-				{
-					name: 'setCustomValidity',
-					elementNames: ['input', 'select', 'textarea']
-				},
-				{
-					name: 'checkValidity',
-					elementNames: ['form', 'fieldset', 'input', 'select', 'textarea']
-				}
-			],
+			methodNames: ['setCustomValidity','checkValidity'],
 			combination: ['combined-ff4', 'combined-webkit']
 		});
 		
@@ -925,16 +911,7 @@
 			test: function(){
 				return false;
 			},
-			methodNames: [
-				{
-					name: 'setCustomValidity',
-					elementNames: ['input', 'select', 'textarea']
-				},
-				{
-					name: 'checkValidity',
-					elementNames: ['form', 'fieldset', 'input', 'select', 'textarea']
-				}
-			],
+			methodNames: ['setCustomValidity','checkValidity'],
 			combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
 		});
 	}
