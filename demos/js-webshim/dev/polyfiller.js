@@ -271,15 +271,12 @@
 		},
 		
 		defineNodeNamesProperty: function(names, prop, desc){
-			webshims.ready('es5', function(){
-				if(typeof names == 'string'){
-					names = names.split(/\s*,\s*/);
-				}
-				names.forEach(function(nodeName){
-					webshims.defineNodeNameProperty(nodeName, prop, desc);
-				});
-				
-			}, true);
+			if(typeof names == 'string'){
+				names = names.split(/\s*,\s*/);
+			}
+			$.each(names, function(i, nodeName){
+				webshims.defineNodeNameProperty(nodeName, prop, desc);
+			});
 		},
 		contentAttr: function(elem, name, val){
 			if(!elem.nodeName){return;}
@@ -561,7 +558,7 @@
 					ret = oldAttr(elem, name, value, arg1, arg3);
 				}
 				if(value !== undefined && modifyProps[nodeName] && modifyProps[nodeName][name]){
-					modifyProps[nodeName][name].forEach(function(fn){
+					$.each(modifyProps[nodeName][name], function(i, fn){
 						fn(elem, value);
 					});
 				}
@@ -576,7 +573,7 @@
 				if($.isFunction(desc)){
 					desc = {set: desc};
 				}
-				nodeNames.forEach(function(name){
+				$.each(nodeNames, function(i, name){
 					if(!modifyProps[name]){
 						modifyProps[name] = {};
 					}
@@ -604,7 +601,7 @@
 						if(contextElem[0] && $.nodeName(contextElem[0], name)){
 							nodeNameCache[name] = nodeNameCache[name].add(contextElem);
 						}
-						props.forEach(function(prop){
+						$.each(props, function(i, prop){
 							nodeNameCache[name].filter('['+ prop +']').attr(prop, function(i, val){
 								return val;
 							});
@@ -664,7 +661,7 @@
 					
 				}
 				
-				['value', 'get', 'set'].forEach(function(descProp){
+				$.each(['value', 'get', 'set'], function(i, descProp){
 					if(desc[descProp]){
 						desc[descProp]._polyfilled = getSup(descProp, oldDesc);
 					}

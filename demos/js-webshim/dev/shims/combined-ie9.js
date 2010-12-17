@@ -451,7 +451,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		implementProperties.push('validationMessage');
 	}
 	
-	implementProperties.forEach(function(messageProp){
+	$.each(implementProperties, function(i, messageProp){
 		webshims.defineNodeNamesProperty(['input', 'select', 'textarea', 'fieldset', 'output'], messageProp, {
 			get: function(elem){
 				var message = '';
