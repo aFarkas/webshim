@@ -13,12 +13,11 @@
 	<script src="../../src/polyfiller.js"></script>
 	<script>
 		(function(){
-			var _reset = QUnit.reset;
-			QUnit.reset = function(){
-				var ret = _reset.apply(this, arguments);
-				$.webshims.triggerDomUpdate($("#main, #qunit-fixture"));
-				return ret;
-			};
+			$.webshims.ready('html5shiv', function(){
+				QUnit.reset = function(){
+					$("#main, #qunit-fixture").htmlWebshim( QUnit.config.fixture );
+				};
+			});
 		})();
 	</script>
 	

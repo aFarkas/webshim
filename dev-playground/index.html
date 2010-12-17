@@ -50,7 +50,7 @@
 		
 		
 		$.support.datalistProp = ('list' in document.createElement('input') && 'options' in document.createElement('datalist'));
-		$.support.datalist = $.support.datalistProp && (!$.browser.webkit || parseInt($.browser.version, 10) > 536);
+		$.support.datalist = ($.support.datalistProp && window.HTMLDataListElement);
 		
 		$.webshims.addPolyfill('datalist', {
 			src: '../../dev-playground/js/datalist.js',

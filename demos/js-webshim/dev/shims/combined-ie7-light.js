@@ -1272,7 +1272,7 @@ if (!document.createElement('canvas').getContext) {
 	  //webshims lib modification
 		var that = this;
 		setTimeout(function(){
-			$(bind(that.init_, that, doc));
+			jQuery(bind(that.init_, that, doc));
 		}, 0);
     },
 

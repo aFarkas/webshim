@@ -896,7 +896,7 @@
 		
 		addPolyfill('form-native-fix', {
 			feature: 'forms',
-			test: function(){return support.requiredSelect;},
+			test: function(){return support.requiredSelect && !$.browser.webkit;},
 			combination: ['combined-webkit']
 		});
 		
