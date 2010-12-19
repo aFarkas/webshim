@@ -76,14 +76,37 @@ if (!Object.keys) {
 
 } 
 
-if((!Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor) && window.jQuery && jQuery.webshims){
+var supportDefineDOMProp = true;
+if(Object.defineProperty && Object.prototype.__defineGetter__){
+	(function(){
+		try {
+			var foo = document.createElement('foo');
+			Object.defineProperty(foo, 'bar', {get: function(){return true;}});
+			supportDefineDOMProp = !!foo.bar;	
+		}catch(e){
+			supportDefineDOMProp = false;
+		}
+	})();
+}
+
+if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor  || !Object.defineProperty) && window.jQuery && jQuery.webshims){
 	var shims = jQuery.webshims;
-	shims.objectCreate = function(proto, props){
+	shims.objectCreate = function(proto, props, opts){
+		var o;
 		var f = function(){};
+		if(Object.create){
+			try {
+				o = Object.create(proto, props);
+				return o;
+			} catch(e){}
+		}
 		f.prototype = proto;
-		var o = new f();
+		o = new f();
 		if(props){
 			shims.defineProperties(o, props);
+		}
+		if(o._create && jQuery.isFunction(o._create)){
+			o._create(opts);
 		}
 		return o;
 	};
@@ -97,9 +120,15 @@ if((!Object.create || !Object.defineProperties || !Object.getOwnPropertyDescript
 		return object;
 	};
 	
-	
+	var descProps = ['configurable', 'enumerable', 'writable'];
 	shims.defineProperty = function(proto, property, descriptor){
 		if(typeof descriptor != "object"){return proto;}
+		
+		for(var i = 0; i < 3; i++){
+			if(!(descProps[i] in descriptor)){
+				descriptor[descProps[i]] = true;
+			}
+		}
 		if(Object.defineProperty){
 			try{
 				//IE8 has wrong defaults

@@ -34,7 +34,7 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-1.6.min.js"></script>
 	<script src="../js-webshim/minified/extras/mousepress.js"></script>
-	<script src="../js-webshim/dev/polyfiller.js"></script>
+	<script src="../js-webshim/minified/polyfiller.js"></script>
 	<!--
 		<script src="../../src/polyfiller.js"></script> 
 		<script>
@@ -79,10 +79,10 @@
 			<section>
 				<h3>Implemented/fixed elements, attributes, properties, methods, events</h3>
 				<ul>
-					<li><strong>elements:</strong> <a href="http://www.w3.org/TR/html5/the-button-element.html#the-output-element">output</a></li>
+					<li><strong>elements:</strong> <a href="http://www.w3.org/TR/html5/the-button-element.html#the-output-element">output</a>, <a href="http://www.w3.org/TR/html5/the-button-element.html#the-datalist-element">datalist</a> (currently not for date and range type)</li>
 					<li><strong>types</strong>: <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#e-mail-state">email</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#url-state">url</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#local-date-and-time-state">datetime-local</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#date-state">date</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#time-state">time</a>, <a href="http://www.w3.org/TR/html5/number-state.html#number-state">number</a>, <a href="http://www.w3.org/TR/html5/number-state.html#range-state">range</a></li>
-					<li><strong>attributes (and IDL, if existing)</strong>: <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-placeholder">placeholder</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fe-autofocus">autofocus</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-novalidate">novalidate</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-formnovalidate">formnovalidate</a> (currently only save on input[type=submit|button], not on button), <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-required">required</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-pattern">pattern</a>, <a href="http://www.w3.org/TR/html5/the-button-element.html#attr-textarea-maxlength">maxlength</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-step">step</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-max">max</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-min">min</a></li>
-					<li><strong>properties/IDLs</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-willvalidate">willValidate</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validity">validity</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validationmessage">validationMessage</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasnumber">valueAsNumber</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasdate">valueAsDate</a></li>
+					<li><strong>attributes (and IDL, if existing)</strong>: <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-placeholder">placeholder</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-list">list</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fe-autofocus">autofocus</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-novalidate">novalidate</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-formnovalidate">formnovalidate</a> (currently only save on input[type=submit|button], not on button), <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-required">required</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-pattern">pattern</a>, <a href="http://www.w3.org/TR/html5/the-button-element.html#attr-textarea-maxlength">maxlength</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-step">step</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-max">max</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-min">min</a></li>
+					<li><strong>properties/IDLs</strong>: <a href="http://www.w3.org/TR/html5/the-button-element.html#dom-datalist-options">options</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-selectedoption">selectedOption</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-willvalidate">willValidate</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validity">validity</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validationmessage">validationMessage</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasnumber">valueAsNumber</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasdate">valueAsDate</a></li>
 					<li><strong>methods</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-setcustomvalidity">setCustomValidity</a>, <a href="http://www.w3.org/TR/html5/forms.html#dom-form-checkvalidity">checkValidity</a></li>
 					<li><strong>events</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#constraint-validation">invalid</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#event-input-input">input</a></li>
 				</ul>
@@ -103,12 +103,7 @@
 					<li><a href="webforms/2-webforms-api.html">playing with the constraint validation api and new properties</a></li>
 					<li><a href="webforms/4-webforms-custom-validity.html">creating custom validation constraints</a></li>
 				</ul>
-				<!--
-				<h3>Informations about Bulletproffness/Futureproffness</h3>
-				<p>Webshims lib implements the properties, events and methods above as accurate as possible according to the current state of the HTML5 specification and also fixed bugs in current browser implementation.</p>
-				<p><strong>The bad news:</strong> There is one missing feature in current webkit implementations - so called "interactive form validation", wich we can't really feature detect. To enable this feature we make some assumption on top of some related informations: the prevented state of the invalid-event, the focusing behavior, implemented other form features. It is likely, that our workaround is futureproof enough, but there is also the possibility, that it is not. What does this mean: If our workaround fails, the browser would show his invalid bubble and webshim lib would also show the invalid bubble shim. But the form validation and form submission will still work properly.</p>
-				<p><strong>The good news: </strong></p>
-				-->
+				
 			</section>
 			<section>
 				<h3>Simple Demo</h3>
@@ -119,9 +114,17 @@
 	                    
 	                    <div class="form-element">
 	                        <label for="email">
-	                            E-Mail: <dfn title="required">*</dfn>
+	                            E-Mail + datalist: <dfn title="required">*</dfn>
 							</label>
-	                       	<input name="email" required="required" type="email" id="email" />
+	                       	<input list="datalist" name="email" required="required" type="email" id="email" />
+							<datalist id="datalist">
+								<select>
+									<option value="yourmail@gmail.com"></option>
+									<option value="yourmail@yahoo.com"></option>
+									<option value="mail@some-example-domain.com"></option>
+									<option value="foo@bar.baz"></option>
+								</select>
+							</datalist>
 	                    </div>
 						<div class="form-element">
 	                        <label for="number">
@@ -139,10 +142,10 @@
 						
 						<div class="form-element">
 	                        <label for="range2">
-	                            range + output:
+	                            range + date:
 							</label>
-	                       	<input oninput="$(output).attr( 'value', this.value )" name="range2" type="range" id="range2" />
-							<output id="output"></output>
+	                       	<input oninput="$(dateRange).attr( 'valueAsNumber', this.value )" value="1323129600000" min="1293840000000" step="86400000" max="1325289600000" name="range2" type="range" id="range2" />
+							<input onchange="$(range2).attr( 'value', $(this).attr('valueAsNumber') || undefined )" id="dateRange" type="date" value="2011-01-06" min="2011-01-01" max="2011-12-31" />
 	                    </div>
 						
 						<div class="form-element">

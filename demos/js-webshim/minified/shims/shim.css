@@ -53,7 +53,7 @@ mark {
 	height: auto !important;
 }
 .placeholder-box-input {
-	vertical-align: middle;
+	vertical-align: bottom;
 }
 .placeholder-box-textarea {
 	vertical-align: text-bottom;
@@ -269,6 +269,10 @@ img.ui-datepicker-trigger {
 	display: none;
 	background-color: #fff;
 	z-index: 100;
+	overflow: visible !important;
+}
+* html .input-date-datepicker-control {
+	width: 1px;
 }
 datalist {
 	display: none;

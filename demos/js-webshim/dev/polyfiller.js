@@ -3,6 +3,7 @@
 	var doc = document;
 	var support = $.support;
 	var special = $.event.special;
+	var has = Object.prototype.hasOwnProperty;
 	var undefined;
 	
 	//simple shiv
@@ -759,10 +760,43 @@
 	testElem.setAttribute('dataHttpAttr', ':-)');
 	support.contentAttr = !(testElem.dataHttpAttr);
 	
-	webshims.objectCreate = Object.create;
-	webshims.defineProperty = Object.defineProperty;
-	webshims.defineProperties = Object.defineProperties;
-	webshims.getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+	(function(){
+		var descProps = ['configurable', 'enumerable', 'writable'];
+		var extendUndefined = function(prop){
+			for(var i = 0; i < 3; i++){
+				if(!(descProps[i] in prop)){
+					prop[descProps[i]] = true;
+				}
+			}
+		};
+		var extendProps = function(props){
+			if(props){
+				for(var i in props){
+					if(has.call(props, i)){
+						extendUndefined(props[i]);
+					}
+				}
+			}
+		};
+		webshims.objectCreate = function(proto, props, opts){
+			extendProps(props);
+			var o = Object.create(proto, props);
+			if(o._create && $.isFunction(o._create)){
+				o._create(opts);
+			}
+			return o;
+		};
+		webshims.defineProperty = function(obj, prop, desc){
+			extendUndefined(desc);
+			return Object.defineProperty(obj, prop, desc);
+		};
+		webshims.defineProperties = function(obj, props){
+			extendProps(props);
+			return Object.defineProperties(obj, props);
+		};
+		webshims.getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+	})();
+	
 		
 	addPolyfill('es5-1', {
 		feature: 'es5',
@@ -828,6 +862,8 @@
 		support.validationMessage = !!($('input', form).attr('validationMessage'));
 		support.fieldsetValidation = !!(field.elements && field.checkValidity && 'disabled' in field && !field.checkValidity() );
 		support.output = !!( 'value' in doc.createElement('output') );
+		support.datalistProp = ('list' in $('input', form)[0] && 'options' in document.createElement('datalist'));
+		support.datalist = (support.datalistProp && window.HTMLDataListElement);
 		support.numericDateProps = (range.type == 'range' && date.type == 'date');
 		support.requiredSelect = ('required' in $('select', form)[0]);
 		
@@ -950,14 +986,25 @@
 	});
 	
 	
-	addPolyfill('form-output', {
+	addPolyfill('form-output-datalist', {
 		feature: 'forms',
 		noAutoCallback: true,
 		test: function(){
-			return support.output;
+			return support.output && support.datalist;
 		},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
 	});
+	
+	if($.support.datalistProp){
+		$.webshims.defineNodeNameProperty('input', 'list', {
+			set: function(elem, value){
+				if(value && value.getAttribute){
+					value = $.webshims.getID(value);
+				}
+				elem.list = value;
+			}
+		});
+	}
 	
 	/* placeholder */
 	

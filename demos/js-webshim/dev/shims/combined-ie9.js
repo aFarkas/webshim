@@ -7,58 +7,146 @@
 		},
 		id = 0
 	;
+	var geoOpts = $.webshims.modules.geolocation.options || {};
 	navigator.geolocation = (function(){
-		var createCoords = function(){
-				if(pos || !window.google || !google.loader || !google.loader.ClientLocation){return;}
-				var cl = google.loader.ClientLocation;
-	            pos = {
-					coords: {
-						latitude: cl.latitude,
-		                longitude: cl.longitude,
-		                altitude: null,
-		                accuracy: 43000,
-		                altitudeAccuracy: null,
-		                heading: parseInt('NaN', 10),
-		                velocity: null
-					},
-	                //extension similiar to FF implementation
-					address: $.extend({streetNumber: '', street: '', premises: '', county: '', postalCode: ''}, cl.address)
-	            };
-			},
-			pos
-		;
+		var pos;
 		var api = {
 			getCurrentPosition: function(success, error, opts){
-				var callback = function(){
-						clearTimeout(timer);
-						createCoords();
+				var locationAPIs = 2,
+					errorTimer,
+					googleTimer,
+					calledEnd,
+					endCallback = function(){
+						if(calledEnd){return;}
 						if(pos){
-							success($.extend(pos, {timestamp: new Date().getTime()}));
-						} else if(error) {
+							calledEnd = true;
+							success($.extend({timestamp: new Date().getTime()}, pos));
+							resetCallback();
+							if(window.JSON && window.sessionStorage){
+								try{
+									sessionStorage.setItem('storedGeolocationData654321', JSON.stringify(pos));
+								} catch(e){}
+							}
+						} else if(error && !locationAPIs) {
+							calledEnd = true;
+							resetCallback();
 							error({ code: 2, message: "POSITION_UNAVAILABLE"});
 						}
 					},
-					timer
-				;
-				if(!window.google || !google.loader){
-					//destroys document.write!!!
-					if($.webshims.modules.geolocation.options.destroyWrite){
-						document.write = domWrite;
-						document.writeln = domWrite;
+					googleCallback = function(){
+						locationAPIs--;
+						getGoogleCoords();
+						endCallback();
+					},
+					resetCallback = function(){
+						$(document).unbind('google-loader', resetCallback);
+						clearTimeout(googleTimer);
+						clearTimeout(errorTimer);
+					},
+					getGoogleCoords = function(){
+						if(pos || !window.google || !google.loader || !google.loader.ClientLocation){return false;}
+						var cl = google.loader.ClientLocation;
+			            pos = {
+							coords: {
+								latitude: cl.latitude,
+				                longitude: cl.longitude,
+				                altitude: null,
+				                accuracy: 43000,
+				                altitudeAccuracy: null,
+				                heading: parseInt('NaN', 10),
+				                velocity: null
+							},
+			                //extension similiar to FF implementation
+							address: $.extend({streetNumber: '', street: '', premises: '', county: '', postalCode: ''}, cl.address)
+			            };
+						return true;
+					},
+					getInitCoords = function(){
+						if(pos){return;}
+						getGoogleCoords();
+						if(pos || !window.JSON || !window.sessionStorage){return;}
+						try{
+							pos = sessionStorage.getItem('storedGeolocationData654321');
+							pos = (pos) ? JSON.parse(pos) : false;
+							if(!pos.coords){pos = false;} 
+						} catch(e){
+							pos = false;
+						}
 					}
-					$(document).one('google-loader', callback);
-					$.webshims.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
+				;
+				
+				getInitCoords();
+				
+				if(!pos){
+					if(geoOpts.confirmText && !confirm(geoOpts.confirmText.replace('{location}', location.hostname))){return;}
+					$.ajax({
+						url: 'http://freegeoip.net/json/',
+						dataType: 'jsonp',
+						cache: true,
+						jsonp: 'callback',
+						success: function(data){
+							locationAPIs--;
+							if(!data){return;}
+							pos = pos || {
+								coords: {
+									latitude: data.latitude,
+					                longitude: data.longitude,
+					                altitude: null,
+					                accuracy: 43000,
+					                altitudeAccuracy: null,
+					                heading: parseInt('NaN', 10),
+					                velocity: null
+								},
+				                //extension similiar to FF implementation
+								address: {
+									city: data.city,
+									country: data.country_name,
+									countryCode: data.country_code,
+									county: "",
+									postalCode: data.zipcode,
+									premises: "",
+									region: data.region_name,
+									street: "",
+									streetNumber: ""
+								}
+				            };
+							endCallback();
+						},
+						error: function(){
+							locationAPIs--;
+							endCallback();
+						}
+					});
+					clearTimeout(googleTimer);
+					if (!window.google || !window.google.loader) {
+						googleTimer = setTimeout(function(){
+							//destroys document.write!!!
+							if (geoOpts.destroyWrite) {
+								document.write = domWrite;
+								document.writeln = domWrite;
+							}
+							$(document).one('google-loader', googleCallback);
+							$.webshims.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
+						}, 800);
+					} else {
+						locationAPIs--;
+					}
 				} else {
-					setTimeout(callback, 1);
+					setTimeout(endCallback, 1);
 					return;
 				}
 				if(opts && opts.timeout){
-					timer = setTimeout(function(){
-						$(document).unbind('google-loader', callback);
+					errorTimer = setTimeout(function(){
+						resetCallback();
 						if(error) {
 							error({ code: 3, message: "TIMEOUT"});
 						}
 					}, opts.timeout);
+				} else {
+					errorTimer = setTimeout(function(){
+						locationAPIs = 0;
+						endCallback();
+					}, 10000);
 				}
 			},
 			clearWatch: $.noop
@@ -71,7 +159,9 @@
 		return api;
 	})();
 })(jQuery);
+//todo use $.globalEval?
 jQuery.webshims.gcEval = function(){
+	"use strict";
 	return (function(){eval( arguments[0] );}).call(arguments[1] || window, arguments[0]);
 };
 jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
@@ -1324,6 +1414,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 						elem.attr('value', value);
 						replaceInputUI['datetime-local'].blockAttr = false;
 						e.stopImmediatePropagation();
+						triggerInlineForm(elem[0], 'input');
 						triggerInlineForm(elem[0], 'change');
 					})
 					.data('datepicker')
@@ -1348,6 +1439,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 				elem.attr('value', val);
 				replaceInputUI['datetime-local'].blockAttr = false;
 				e.stopImmediatePropagation();
+				triggerInlineForm(elem[0], 'input');
 				triggerInlineForm(elem[0], 'change');
 			});
 			
@@ -1443,6 +1535,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 					elem.attr('value', value);
 					replaceInputUI.date.blockAttr = false;
 					e.stopImmediatePropagation();
+					triggerInlineForm(elem[0], 'input');
 					triggerInlineForm(elem[0], 'change');
 				},
 				data = date
@@ -1948,8 +2041,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	};
 	
 });
-jQuery.webshims.ready('form-core', function($, webshims){
-	if( 'value' in document.createElement('output') ){return;}
+jQuery.webshims.ready('form-core', function($, webshims, window, document, undefined){
 	var doc = document;	
 	
 	(function(){
@@ -2011,75 +2103,476 @@ jQuery.webshims.ready('form-core', function($, webshims){
 		;
 	})();
 	
-	
-	
-	var outputCreate = function(elem){
-		if(elem.getAttribute('aria-live')){return;}
-		elem = $(elem);
-		var value = (elem.text() || '').trim();
-		var	id 	= elem.attr('id');
-		var	htmlFor = elem.attr('for');
-		var shim = $('<input class="output-shim" type="hidden" name="'+ (elem.attr('name') || '')+'" value="'+value+'" style="display: none" />').insertAfter(elem);
-		var form = shim[0].form || doc;
-		var setValue = function(val){
-			shim[0].value = val;
-			val = shim[0].value;
-			elem.text(val);
-			webshims.contentAttr(elem[0], 'value', val);
+	(function(){
+		if( 'value' in document.createElement('output') ){return;}
+		var outputCreate = function(elem){
+			if(elem.getAttribute('aria-live')){return;}
+			elem = $(elem);
+			var value = (elem.text() || '').trim();
+			var	id 	= elem.attr('id');
+			var	htmlFor = elem.attr('for');
+			var shim = $('<input class="output-shim" type="hidden" name="'+ (elem.attr('name') || '')+'" value="'+value+'" style="display: none" />').insertAfter(elem);
+			var form = shim[0].form || doc;
+			var setValue = function(val){
+				shim[0].value = val;
+				val = shim[0].value;
+				elem.text(val);
+				webshims.contentAttr(elem[0], 'value', val);
+			};
+			
+			elem[0].defaultValue = value;
+			webshims.contentAttr(elem[0], 'value', value);
+			
+			elem.attr({'aria-live': 'polite'});
+			if(id){
+				shim.attr('id', id);
+				elem.attr('aria-labeldby', webshims.getID($('label[for="'+id+'"]', form)));
+			}
+			if(htmlFor){
+				id = webshims.getID(elem);
+				htmlFor.split(' ').forEach(function(control){
+					control = form.getElementById(control);
+					if(control){
+						control.setAttribute('aria-controls', id);
+					}
+				});
+			}
+			elem.data('outputShim', setValue );
+			shim.data('outputShim', setValue );
+			return setValue;
 		};
 		
-		elem[0].defaultValue = value;
-		webshims.contentAttr(elem[0], 'value', value);
+		webshims.defineNodeNameProperty('output', 'value', {
+			set: function(elem, value){
+				var setVal = $.data(elem, 'outputShim');
+				if(!setVal){
+					setVal = outputCreate(elem);
+				}
+				setVal(value);
+			},
+			get: function(elem){
+				return webshims.contentAttr(elem, 'value') || $(elem).text() || '';
+			}
+		});
 		
-		elem.attr({'aria-live': 'polite'});
-		if(id){
-			shim.attr('id', id);
-			elem.attr('aria-labeldby', webshims.getID($('label[for="'+id+'"]', form)));
-		}
-		if(htmlFor){
-			id = webshims.getID(elem);
-			htmlFor.split(' ').forEach(function(control){
-				control = form.getElementById(control);
-				if(control){
-					control.setAttribute('aria-controls', id);
+		webshims.onNodeNamesPropertyModify('input', 'value', {
+			set: function(elem, value){
+				var setVal = $.data(elem, 'outputShim');
+				if(setVal){
+					setVal(value);
+					return value;
+				}
+				$(elem).triggerHandler('updateInput');
+			}
+		
+		});
+		
+		webshims.addReady(function(context, contextElem){
+			$('output', context).add(contextElem.filter('output')).each(function(){
+				outputCreate(this);
+			});
+		});
+	})();
+	
+	(function(){
+		if($.support.datalist){return;}
+		var listidIndex = 0;
+		
+		var noDatalistSupport = {
+			submit: 1,
+			button: 1,
+			reset: 1, 
+			hidden: 1,
+			
+			//ToDo
+			range: 1,
+			date: 1
+		};
+		var noMin = ($.browser.msie && parseInt($.browser.version, 10) < 7);
+		
+		var getStoredOptions = function(name){
+			if(!name){return [];}
+			var data;
+			try {
+				data = JSON.parse(localStorage.getItem('storedDatalistOptions'+name));
+			} catch(e){
+				data = [];
+			}
+			return data || [];
+		};
+		var storeOptions = function(name, val){
+			if(!name){return;}
+			val = val || [];
+			try {
+				localStorage.setItem( 'storedDatalistOptions'+name, JSON.stringify(val) );
+			} catch(e){}
+		};
+		var getType = function(elem){
+			return (elem.getAttribute('type') || '').toLowerCase() || elem.type;
+		};
+		var getText = function(elem){
+			return (elem.textContent || elem.innerText || $.text([ elem ]) || '');
+		};
+		
+		var Datalist = function(input, id, datalist){
+			this.init(input, id, datalist);
+		};
+		
+		Datalist.prototype = {
+			init: function(input, id, datalist){
+				datalist = datalist || id && document.getElementById(id);
+				if(!datalist || noDatalistSupport[getType(input)]){return;}
+				var data = $.data(input, 'datalistWidget');
+				if(datalist && data && (data.datalist !== datalist)){
+					data.datalist = datalist;
+					data.id = id;
+					data.needsUpdate = true;
+					return;
+				} 
+				if(!datalist){
+					if(data){
+						data.destroy();
+					}
+					return;
+				}
+				listidIndex++;
+				var that = this;
+				this.timedHide = function(){
+					clearTimeout(that.hideTimer);
+					that.hideTimer = setTimeout($.proxy(that, 'hideList'), 9);
+				};
+				this.datalist = datalist;
+				this.id = id;
+				this.idindex = listidIndex;
+				this.hasViewableData = true;
+				this._autocomplete = $.attr(input, 'autocomplete');
+				$.data(input, 'datalistWidget', this);
+				this.shadowList = $('<div class="datalist-polyfill" style="display: none;" />').appendTo('body');
+				this.index = -1;
+				this.input = input;
+				
+				this.storedOptions = getStoredOptions(input.name || input.id);
+				
+				
+				this.shadowList
+					.delegate('li', 'mouseover.datalistWidget mousedown.datalistWidget click.datalistWidget', function(e){
+						var items = $('li:not(.hidden-item)', that.shadowList);
+						var select = (e.type == 'mousedown' || e.type == 'click');
+						that.markItem(items.index(e.target), select, items);
+						if(e.type == 'click'){
+							that.hideList();
+						}
+						return (e.type != 'mousedown');
+					})
+					.bind('focusout', this.timedHide)
+				;
+				
+				input.setAttribute('autocomplete', 'off');
+				
+				$(input)
+					.attr({
+						//role: 'combobox',
+						'aria-haspopup': 'true'
+					})
+					.bind('input.datalistWidget', $.proxy(this, 'showHideOptions'))
+					.bind('keydown.datalistWidget', function(e){
+						var keyCode = e.keyCode;
+						var items;
+						if(keyCode == 40 && !that.showList()){
+							that.markItem(that.index + 1, true);
+							return false;
+						} 
+						
+						if(!that.shadowList.hasClass('datalist-visible')){return;}
+						
+						 
+						if(keyCode == 38){
+							that.markItem(that.index - 1, true);
+							return false;
+						} 
+						if(keyCode == 33 || keyCode == 36){
+							that.markItem(0, true);
+							return false;
+						} 
+						if(keyCode == 34 || keyCode == 35){
+							items = $('li:not(.hidden-item)', that.shadowList);
+							that.markItem(items.length - 1, true, items);
+							return false;
+						} 
+						if(keyCode == 13 || keyCode == 27){
+							that.hideList();
+							return false;
+						}
+		
+					})
+					.bind('blur.datalistWidget', this.timedHide)
+				;
+				
+				$(this.datalist)
+					.unbind('updateDatalist.datalistWidget')
+					.bind('updateDatalist.datalistWidget', function(){
+						that.needsUpdate = true;
+						that.updateTimer = setTimeout(function(){
+							that.updateListOptions();
+						}, 10 *  that.idindex);			
+					})
+					.triggerHandler('updateDatalist')
+				;
+				
+				
+				if(input.form && input.id){
+					$(input.form).bind('submit.datalistWidget'+input.id, function(){
+						var val = $.attr(input, 'value');
+						if(val && $.inArray(val, that.storedOptions) == -1){
+							that.storedOptions.push(val);
+							storeOptions(input.name || input.id, that.storedOptions );
+						}
+					});
+				}
+			},
+			destroy: function(){
+				var autocomplete = $.attr(this.input, 'autocomplete');
+				$(this.input)
+					.unbind('.datalistWidget')
+					.removeData('datalistWidget')
+				;
+				this.shadowList.remove();
+				$(document).unbind('.datalist'+this.id);
+				if(this.input.form && this.input.id){
+					$(this.input.form).unbind('submit.datalistWidget'+this.input.id);
+				}
+				if(autocomplete === undefined){
+					this.input.removeAttribute('autocomplete');
+				} else {
+					$(this.input).attr('autocomplete', autocomplete);
+				}
+			},
+			updateListOptions: function(){
+				this.needsUpdate = false;
+				clearTimeout(this.updateTimer);
+				var list = '<ul role="list">';
+				var value;
+				var values = [];
+				var allOptions = [];
+				$('option', this.datalist).each(function(i){
+					if(this.disabled && this.disabled != 'false'){return;}
+					var item = {
+						value: $.attr(this, 'value'),
+						text: $.trim($.attr(this, 'label') || getText(this))
+					};
+					if(!item.text){
+						item.text = item.value;
+					}
+					values[i] = item.value;
+					allOptions[i] = item;
+				});
+				$.each(this.storedOptions, function(i, val){
+					if($.inArray(val, values) == -1){
+						allOptions.push({value: val, text: val});
+					}
+				});
+				if(this.shadowList.hasClass('datalist-visible')){
+					value = $.attr(this.input, 'value');
+					$.each(allOptions, function(i, item){
+						var visibility = '';
+						if(item.text.indexOf('value') == -1){ 
+							visibility = ' class="hidden-item"';
+						}
+						list += '<li'+ visibility +' role="listitem" tabindex="-1" data-value="'+item.value+'">'+ item.text +'</li>';
+					});
+					this.lastUpdatdValue = value;
+				} else {
+					$.each(allOptions, function(i, item){
+						list += '<li data-value="'+item.value+'" tabindex="-1" role="listitem">'+ item.text +'</li>';
+					});
+					this.lastUpdatdValue = "";
+				}
+				list += '</ul>';
+				this.hasViewableData = true;
+				this.shadowList.html(list);
+			},
+			showHideOptions: function(){
+				var value = $.attr(this.input, 'value');
+				if(value === this.lastUpdatdValue){return;}
+				this.lastUpdatdValue = value;
+				var found = false;
+				
+				if(value){
+					value = value.toLowerCase();
+					$('li', this.shadowList).each(function(){
+						if(getText(this).toLowerCase().indexOf(value) == -1 && ($.attr(this, 'data-value') || '').indexOf(value) == -1){
+							$(this).addClass('hidden-item');
+						} else {
+							$(this).removeClass('hidden-item');
+							found = true;
+						}
+					});
+				} else {
+					$('li', this.shadowList).removeClass('hidden-item');
+					found = true;
+				}
+				if(found){
+					this.hasViewableData = true;
+					this.showList();
+				} else {
+					this.hasViewableData = false;
+					this.hideList();
+				}
+			},
+			showList: function(){
+				if(!this.hasViewableData || this.shadowList.hasClass('datalist-visible')){return false;}
+				if(this.needsUpdate){
+					this.updateListOptions();
+				}
+				this.showHideOptions();
+				var that = this;
+				var css = $(this.input).offset();
+				css.top += $(this.input).outerHeight();
+				css.width = $(this.input).outerWidth() - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
+				css.display = 'block';
+				
+				if(noMin){
+					this.shadowList.css('height', 'auto');
+					if(this.shadowList.height() > 250){
+						this.shadowList.css('height', 220);
+					}
+				}
+				this.shadowList.css(css).addClass('datalist-visible');
+				//todo
+				$(document).bind('mousedown.datalist'+this.id +' focusin.datalist'+this.id, function(e){
+					if(e.target === that.input ||  that.shadowList[0] === e.target || $.contains( that.shadowList[0], e.target )){
+						clearTimeout(that.hideTimer);
+						setTimeout(function(){
+							clearTimeout(that.hideTimer);
+						}, 0);
+					} else {
+						that.timedHide();
+					}
+				});
+				return true;
+			},
+			hideList: function(){
+				if(!this.shadowList.hasClass('datalist-visible')){return false;}
+				this.shadowList
+					.removeClass('datalist-visible list-item-active')
+					.scrollTop(0)
+					.css({display: 'none'})
+					.find('li.active-item').removeClass('active-item')
+				;
+				this.index = -1;
+				$(this.input).removeAttr('aria-activedescendant');
+				$(document).unbind('.datalist'+this.id);
+				return true;
+			},
+			markItem: function(index, doValue, items){
+				if(index < 0){return;}
+				var activeItem;
+				var goesUp;
+				items = items || $('li:not(.hidden-item)', this.shadowList);
+				if(index >= items.length){return;}
+				items.removeClass('active-item');
+				this.shadowList.addClass('list-item-active');
+				activeItem = items.filter(':eq('+ index +')').addClass('active-item');
+				
+				if(doValue){
+					$.attr(this.input, 'value', activeItem.attr('data-value'));
+					$.attr(this.input, 'aria-activedescendant', $.webshims.getID(activeItem));
+				}
+				this.index = index;
+			}
+		};
+		
+		
+		webshims.defineNodeNameProperty('input', 'list', {
+			get: function(elem){
+				var val = webshims.contentAttr(elem, 'list');
+				if(typeof val == 'string'){
+					val = document.getElementById(val);
+				}
+				return val || null;
+			},
+			set: function(elem, value){
+				var dom;
+				if(value && value.getAttribute){
+					dom = value;
+					value = $.webshims.getID(value);
+				}
+				$.webshims.contentAttr(elem, 'list', value);
+				if(Datalist){
+					new Datalist(elem, value, dom);
+				}
+			},
+			init: true
+		});
+		
+		webshims.defineNodeNameProperty('input', 'selectedOption', {
+			get: function(elem){
+				var list = $.attr(elem, 'list');
+				var ret = null;
+				var value, options;
+				if(!list){return ret;}
+				value = $.attr(elem, 'value');
+				if(!value){return ret;}
+				options = $.attr(list, 'options');
+				if(!options.length){return ret;}
+				$.each(options, function(i, option){
+					if(value == $.attr(option, 'value')){
+						ret = option;
+						return false;
+					}
+				});
+				return ret;
+			}
+		});
+			
+		webshims.defineNodeNameProperty('input', 'autocomplete', {
+			get: function(elem){
+				var data = $.data(elem, 'datalistWidget');
+				if(data){
+					return data._autocomplete;
+				}
+				return ('autocomplete' in elem) ? elem.autocomplete : elem.getAttribute('autocomplete');
+			},
+			set: function(elem, value){
+				var data = $.data(elem, 'datalistWidget');
+				if(data){
+					data._autocomplete = value;
+					if(value == 'off'){
+						data.hideList();
+					}
+				} else {
+					if('autocomplete' in elem){
+						elem.autocomplete = value;
+					} else {
+						elem.setAttribute('autocomplete', value);
+					}
+				}
+			}
+		});
+		
+		
+		webshims.defineNodeNameProperty('datalist', 'options', {
+			get: function(elem){
+				var select = $('select', elem);
+				return (select[0]) ? select[0].options : [];
+			}
+		});
+		
+		
+		webshims.addReady(function(context, contextElem){
+			contextElem.filter('select, option').each(function(){
+				var parent = this.parentNode;
+				if(parent && !$.nodeName(parent, 'datalist')){
+					parent = parent.parentNode;
+				}
+				if(parent && $.nodeName(parent, 'datalist')){
+					$(parent).triggerHandler('updateDatalist');
 				}
 			});
-		}
-		elem.data('outputShim', setValue );
-		shim.data('outputShim', setValue );
-		return setValue;
-	};
-	
-	webshims.defineNodeNameProperty('output', 'value', {
-		set: function(elem, value){
-			var setVal = $.data(elem, 'outputShim');
-			if(!setVal){
-				setVal = outputCreate(elem);
-			}
-			setVal(value);
-		},
-		get: function(elem){
-			return webshims.contentAttr(elem, 'value') || $(elem).text() || '';
-		}
-	});
-	
-	webshims.onNodeNamesPropertyModify('input', 'value', {
-		set: function(elem, value){
-			var setVal = $.data(elem, 'outputShim');
-			if(setVal){
-				setVal(value);
-				return value;
-			}
-			$(elem).triggerHandler('updateInput');
-		}
-	
-	});
-	
-	webshims.addReady(function(context, contextElem){
-		$('output', context).add(contextElem.filter('output')).each(function(){
-			outputCreate(this);
 		});
-	});
+		
+	})();
 	
-	webshims.createReadyEvent('form-output');
+	
+	webshims.createReadyEvent('form-output-datalist');
 }, true);

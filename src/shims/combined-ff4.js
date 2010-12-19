@@ -1,4 +1,6 @@
+//todo use $.globalEval?
 jQuery.webshims.gcEval = function(){
+	"use strict";
 	return (function(){eval( arguments[0] );}).call(arguments[1] || window, arguments[0]);
 };
 jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
@@ -1117,6 +1119,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 						elem.attr('value', value);
 						replaceInputUI['datetime-local'].blockAttr = false;
 						e.stopImmediatePropagation();
+						triggerInlineForm(elem[0], 'input');
 						triggerInlineForm(elem[0], 'change');
 					})
 					.data('datepicker')
@@ -1141,6 +1144,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 				elem.attr('value', val);
 				replaceInputUI['datetime-local'].blockAttr = false;
 				e.stopImmediatePropagation();
+				triggerInlineForm(elem[0], 'input');
 				triggerInlineForm(elem[0], 'change');
 			});
 			
@@ -1236,6 +1240,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 					elem.attr('value', value);
 					replaceInputUI.date.blockAttr = false;
 					e.stopImmediatePropagation();
+					triggerInlineForm(elem[0], 'input');
 					triggerInlineForm(elem[0], 'change');
 				},
 				data = date

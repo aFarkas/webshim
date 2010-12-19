@@ -139,6 +139,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 						elem.attr('value', value);
 						replaceInputUI['datetime-local'].blockAttr = false;
 						e.stopImmediatePropagation();
+						triggerInlineForm(elem[0], 'input');
 						triggerInlineForm(elem[0], 'change');
 					})
 					.data('datepicker')
@@ -163,6 +164,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 				elem.attr('value', val);
 				replaceInputUI['datetime-local'].blockAttr = false;
 				e.stopImmediatePropagation();
+				triggerInlineForm(elem[0], 'input');
 				triggerInlineForm(elem[0], 'change');
 			});
 			
@@ -258,6 +260,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 					elem.attr('value', value);
 					replaceInputUI.date.blockAttr = false;
 					e.stopImmediatePropagation();
+					triggerInlineForm(elem[0], 'input');
 					triggerInlineForm(elem[0], 'change');
 				},
 				data = date

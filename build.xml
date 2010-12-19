@@ -23,7 +23,7 @@
 			<fileset file="${shims}/form-number-date.js" />
 			<fileset file="${shims}/form-date-range-ui.js" />
 			<fileset file="${shims}/form-placeholder.js" />
-			<fileset file="${shims}/form-output.js" />
+			<fileset file="${shims}/form-output-datalist.js" />
         </concat>
 		
 		<!-- good for FF3.6 -->
@@ -33,7 +33,7 @@
 			<fileset file="${shims}/form-message.js" />
             <fileset file="${shims}/form-shim-extend.js" />
 			<fileset file="${shims}/form-placeholder.js" />
-			<fileset file="${shims}/form-output.js" />
+			<fileset file="${shims}/form-output-datalist.js" />
         </concat>
 		
 		<!-- good for FF4.x -->
@@ -63,7 +63,7 @@
 			<fileset file="${shims}/form-number-date.js" />
 			<fileset file="${shims}/form-date-range-ui.js" />
 			<fileset file="${shims}/form-placeholder.js" />
-			<fileset file="${shims}/form-output.js" />
+			<fileset file="${shims}/form-output-datalist.js" />
         </concat>
 		
 		<!-- good for ie9 -->
@@ -73,7 +73,7 @@
 			<fileset file="${shims}/form-message.js" />
             <fileset file="${shims}/form-shim-extend.js" />
 			<fileset file="${shims}/form-placeholder.js" />
-			<fileset file="${shims}/form-output.js" />
+			<fileset file="${shims}/form-output-datalist.js" />
         </concat>
 		
 		<!-- good for ie8 -->

@@ -49,27 +49,7 @@
 		
 		
 		
-		$.support.datalistProp = ('list' in document.createElement('input') && 'options' in document.createElement('datalist'));
-		$.support.datalist = ($.support.datalistProp && window.HTMLDataListElement);
 		
-		$.webshims.addPolyfill('datalist', {
-			src: '../../dev-playground/js/datalist.js',
-			test: function(){
-				return $.support.datalist;
-			}
-		});
-		
-		
-		if($.support.datalistProp){
-			$.webshims.defineNodeNameProperty('input', 'list', {
-				set: function(elem, value){
-					if(value && value.getAttribute){
-						value = $.webshims.getID(value);
-					}
-					elem.list = value;
-				}
-			});
-		}
 		
 	</script>
 	<title>playing</title>
@@ -84,44 +64,14 @@
 </head>
 
 <body class="js-off"> 
-<canvas id="canvas"></canvas>
-<script>
-	$.webshims.ready('canvas', function(){
-		var ctx = $('#canvas').getContext('2d');
-		var fillPattern = function(){
-		
-			// create pattern
-			var ptrn = ctx.createPattern(this, 'repeat');
-			ctx.fillStyle = ptrn;
-			ctx.fillRect(0, 0, 150, 150);
-		};
-		// create new image object to use as pattern
-		var img = $('<img />').attr('src', 'http://protofunc.com/jme/img/play-overlay-mini.png');
-		if(img[0].complete){
-			fillPattern.call(img[0]);
-		} else {
-			img.load(fillPattern);
-		}
-		
-	});
-  
-</script>
+
 <form id="test" action="#">
 	
 	<div>
 		
 	<input placeholder="saa" required="d" id="input-list" type="text" list="datalist2" />
-	<input id="range" oninput="foo(this, output)" type="range" />
-	<output id="output"></output>
-	<script>
-		var foo = function(elem, e){
-			$(e).attr('value', elem.value);
-			
-		};
-//		$('#range').bind('input', function(){
-//			console.log(this.value)
-//		})
-	</script>
+	
+	<input placeholder="saa" type="text" />
 	<datalist id="datalist">
 		<select>
 			<option>Test Text 1</option>
@@ -158,6 +108,15 @@
 			<option label="2Test Text 1 label" value="dsa22"></option>
 		</select>
 	</datalist>
+	
+	<button class="options">change options</button>
+	
+	<script>
+		$('button.options').bind('click', function(){
+			var opts = '<option value="option 1" label="Opt 1"></option><option value="option 2" label="Opt 2"></option><option value="option 3" label="Opt 3"></option><option value="option 4" label="Opt 4"></option>';
+			$('#datalist2 select').htmlWebshim(opts)
+		});
+	</script>
 </div>
 </form>
 	
