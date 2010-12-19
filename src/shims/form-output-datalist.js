@@ -170,23 +170,18 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 		var getText = function(elem){
 			return (elem.textContent || elem.innerText || $.text([ elem ]) || '');
 		};
-		
-		var Datalist = function(input, id, datalist){
-			this.init(input, id, datalist);
-		};
-		
-		Datalist.prototype = {
-			init: function(input, id, datalist){
-				datalist = datalist || id && document.getElementById(id);
-				if(!datalist || noDatalistSupport[getType(input)]){return;}
-				var data = $.data(input, 'datalistWidget');
+				
+		var dataListProto = {
+			_create: function(opts){
+				var datalist = opts.datalist || opts.id && document.getElementById(opts.id);
+				if(noDatalistSupport[getType(opts.input)]){return;}
+				var data = $.data(opts.input, 'datalistWidget');
 				if(datalist && data && (data.datalist !== datalist)){
 					data.datalist = datalist;
-					data.id = id;
+					data.id = opts.id;
 					data.needsUpdate = true;
 					return;
-				} 
-				if(!datalist){
+				} else if(!datalist){
 					if(data){
 						data.destroy();
 					}
@@ -199,16 +194,16 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 					that.hideTimer = setTimeout($.proxy(that, 'hideList'), 9);
 				};
 				this.datalist = datalist;
-				this.id = id;
+				this.id = opts.id;
 				this.idindex = listidIndex;
 				this.hasViewableData = true;
-				this._autocomplete = $.attr(input, 'autocomplete');
-				$.data(input, 'datalistWidget', this);
-				this.shadowList = $('<div class="datalist-polyfill" style="display: none;" />').appendTo('body');
+				this._autocomplete = $.attr(opts.input, 'autocomplete');
+				$.data(opts.input, 'datalistWidget', this);
+				this.shadowList = $('<div class="datalist-polyfill" />').appendTo('body');
 				this.index = -1;
-				this.input = input;
+				this.input = opts.input;
 				
-				this.storedOptions = getStoredOptions(input.name || input.id);
+				this.storedOptions = getStoredOptions(opts.input.name || opts.input.id);
 				
 				
 				this.shadowList
@@ -224,9 +219,9 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 					.bind('focusout', this.timedHide)
 				;
 				
-				input.setAttribute('autocomplete', 'off');
+				opts.input.setAttribute('autocomplete', 'off');
 				
-				$(input)
+				$(opts.input)
 					.attr({
 						//role: 'combobox',
 						'aria-haspopup': 'true'
@@ -277,12 +272,12 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				;
 				
 				
-				if(input.form && input.id){
-					$(input.form).bind('submit.datalistWidget'+input.id, function(){
-						var val = $.attr(input, 'value');
+				if(opts.input.form && opts.input.id){
+					$(opts.input.form).bind('submit.datalistWidget'+opts.input.id, function(){
+						var val = $.attr(opts.input, 'value');
 						if(val && $.inArray(val, that.storedOptions) == -1){
 							that.storedOptions.push(val);
-							storeOptions(input.name || input.id, that.storedOptions );
+							storeOptions(opts.input.name || opts.input.id, that.storedOptions );
 						}
 					});
 				}
@@ -377,7 +372,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				}
 			},
 			showList: function(){
-				if(!this.hasViewableData || this.shadowList.hasClass('datalist-visible')){return false;}
+				if(!this.hasViewableData || this.shadowList.hasClass('datalist-visible') || $(this.input).attr('autocomplete') == 'off'){return false;}
 				if(this.needsUpdate){
 					this.updateListOptions();
 				}
@@ -386,7 +381,6 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				var css = $(this.input).offset();
 				css.top += $(this.input).outerHeight();
 				css.width = $(this.input).outerWidth() - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
-				css.display = 'block';
 				
 				if(noMin){
 					this.shadowList.css('height', 'auto');
@@ -413,13 +407,15 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				this.shadowList
 					.removeClass('datalist-visible list-item-active')
 					.scrollTop(0)
-					.css({display: 'none'})
 					.find('li.active-item').removeClass('active-item')
 				;
 				this.index = -1;
 				$(this.input).removeAttr('aria-activedescendant');
 				$(document).unbind('.datalist'+this.id);
 				return true;
+			},
+			scrollIntoView: function(elem){
+				
 			},
 			markItem: function(index, doValue, items){
 				if(index < 0){return;}
@@ -434,6 +430,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				if(doValue){
 					$.attr(this.input, 'value', activeItem.attr('data-value'));
 					$.attr(this.input, 'aria-activedescendant', $.webshims.getID(activeItem));
+					this.scrollIntoView(activeItem);
 				}
 				this.index = index;
 			}
@@ -452,11 +449,11 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				var dom;
 				if(value && value.getAttribute){
 					dom = value;
-					value = $.webshims.getID(value);
+					value = webshims.getID(value);
 				}
-				$.webshims.contentAttr(elem, 'list', value);
-				if(Datalist){
-					new Datalist(elem, value, dom);
+				webshims.contentAttr(elem, 'list', value);
+				if(dataListProto){
+					webshims.objectCreate(dataListProto, undefined, {input: elem, id: value, datalist: dom});
 				}
 			},
 			init: true

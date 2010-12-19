@@ -294,6 +294,9 @@ datalist {
 	-moz-box-shadow: 3px 4px 5px #333;
 	box-shadow: 3px 4px 5px #333;
 }
+.datalist-polyfill.datalist-visible{
+	display: block;
+}
 .datalist-polyfill ul,
 .datalist-polyfill li {
 	list-style: none !important;
