@@ -2748,7 +2748,19 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				return true;
 			},
 			scrollIntoView: function(elem){
-				
+				var ul = $('> ul', this.shadowList);
+				var elemPos = elem.position();
+				var containerHeight;
+				elemPos.top -=  (parseInt(ul.css('paddingTop'), 10) || 0) + (parseInt(ul.css('marginTop'), 10) || 0) + (parseInt(ul.css('borderTopWidth'), 10) || 0);
+				if(elemPos.top < 0){
+					this.shadowList.scrollTop( this.shadowList.scrollTop() + elemPos.top - 2);
+					return;
+				}
+				elemPos.top += elem.outerHeight();
+				containerHeight = this.shadowList.height();
+				if(elemPos.top > containerHeight){
+					this.shadowList.scrollTop( this.shadowList.scrollTop() + (elemPos.top - containerHeight) + 2);
+				}
 			},
 			markItem: function(index, doValue, items){
 				if(index < 0){return;}

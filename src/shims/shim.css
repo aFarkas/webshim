@@ -278,7 +278,7 @@ datalist {
 	display: none;
 }
 .datalist-polyfill {
-	position: absolute;
+	position: absolute !important;
 	top: 0;
 	left: 0;
 	margin: 0;
@@ -288,7 +288,7 @@ datalist {
 	z-index: 1000;
 	max-height: 220px;
 	overflow: hidden;
-	overflow-x: hidden;
+	overflow-x: hidden !important;
 	overflow-y: auto;
 	
 	-moz-box-shadow: 3px 4px 5px #333;
@@ -302,10 +302,11 @@ datalist {
 	list-style: none !important;
 }
 .datalist-polyfill ul {
-	position: static;
+	position: static !important;
+	overflow: hidden;
 	margin: 0;
 	padding: 2px 0;
-	overflow: hidden;
+	height:  auto !important;
 	
 	background: #fff;
 	color: #000;

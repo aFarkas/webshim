@@ -51,6 +51,14 @@
 			
 			<p>The shim uses the geolocation information provided by <a href="http://freegeoip.net">http://freegeoip.net</a> and/or <a href="http://code.google.com/intl/de-DE/apis/ajax/documentation/#ClientLocation">googles API-Loader</a></p>
 			
+			<p>If you configure a confirm-text @ <code>$.webshims.modules.geolocation.options.confirmText</code> the user will be asked, before the geodata is requested.</p>
+			
+<code class="block run-once">
+$.webshims.modules.geolocation.options.confirmText = "{location} wants to know your position. It is Ok to press Ok.";
+navigator.geolocation.getCurrentPosition(function(pos){
+	alert("Thx, you are @ latitude: "+ pos.coords.latitude +"/longitude: " + pos.coords.longitude);
+});
+</code>
 			<aside>
 				<h3>Links about JSON and localStorage/sessionStorage</h3>
 				<ul>
