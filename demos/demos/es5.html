@@ -41,7 +41,7 @@
 		</nav>
 		<section>
 			<h2>Demo/About/Documentation ES5</h2>
-			<p>The <ocde>es5</ocde> feature of Webshims Lib uses the <a href="http://github.com/kriskowal/es5-shim/">ES5 shim</a> by <a href="http://askawizard.blogspot.com/">Kris Kowal</a> (all object methods, wich can't be used cross-browser are removed.).</p>
+			<p>The <code>es5</code> feature of Webshims Lib uses the <a href="http://github.com/kriskowal/es5-shim/">ES5 shim</a> by <a href="http://askawizard.blogspot.com/">Kris Kowal</a> (all object methods, wich can't be used cross-browser are removed.).</p>
 			<p>The script implements the following methods:</p>
 			<ul>
 				<li><strong>Object</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/keys">keys</a></li>
@@ -64,6 +64,70 @@ $.webshims.ready('es5', function(){
 </code>
 			<h3>Abstractions</h3>
 			<p>Webshims Lib adds the following methods: $.webshims.objectCreate, $.webshims.defineProperty, $.webshims.defineProperties, $.webshims.getOwnPropertyDescriptor and corresponding support flags: $.support.objectAccessor (true in all modern Browsers including IE9) and $.support.domAccessor (true in all modern Browsers including IE8).</p>
+			<h4>$.webshims.objectCreate(proto [, propertiesObject, options ])</h4>
+			<p><code>$.webshims.objectCreate</code> works very similiar to <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/create">Object.create</a></p>
+			<p>If <code>propertiesObject</code> is defined, the method goes through this object and sets writeable, enumerable and configurable to true, if the corresponding property is undefined.</p>
+			<p>After this, it will pass <code>proto</code> and <code>propertiesObject</code> to Object.create (if defined) or will use Crockfords <code>begetObject</code>-Method on the <code>proto</code>-object and then calls <code>$.webshims.defineProperties</code> with the returned object and the <code>propertiesObject</code>.</p>
+			<p>If you pass the options parameter and the Object already has a Options-property. The options-property on the object will be deeply extended.</p>
+			<p>If the object has a method called <code>_create</code>, it will call this method with options as first argument.</p>
+			<p>After this, the created object will be returned.</p>
+<code class="block">
+var carProto = {
+	options: {
+		foo: 'bar',
+		baz: 'boom'
+	},
+	wheels: 4, 
+	drive: function(){
+		this.isDriving = true;
+	}
+};
+
+var myCar = Object.create(carProto, {
+	_create: {
+		value: function(){
+			this.drive();
+		}
+	},
+	jumps: {
+		value: function(){
+			//implements jumping
+		}
+	},
+	{baz: 'jo'}
+);
+
+//myCar will look like this:
+
+{
+	//own property:
+	options: { 
+		foo: 'bar',
+		baz: 'jo'
+	},
+	
+	//prototype:
+	wheels: 4, 
+	
+	//prototype
+	drive: function(){
+		this.isDriving = true;
+	},
+	
+	//own property:
+	_create: function(){
+		this.drive();
+	},
+	
+	//own property:
+	jumps: function(){
+		//implements jumping
+	},
+	
+	//own property:
+	isDriving: true
+}
+</code>
 			<aside>
 				<h3>Links about ES5</h3>
 				<ul>

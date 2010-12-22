@@ -4,12 +4,22 @@
  */
 import flash.external.ExternalInterface;
 
+
 class Main 
 {
 	
 	public static function main(swfRoot:MovieClip):Void 
 	{
 		var storage:SharedObject = SharedObject.getLocal('domStorage');
+		var swfIsVissible:Boolean = false;
+				
+		storage.onStatus = function(infoObject:Object) {
+			if(swfIsVissible){
+				swfIsVissible = false;
+				ExternalInterface.call('jQuery.webshims.swfLocalStorage.hide', infoObject.code == "SharedObject.Flush.Success"); 
+			}
+		};
+
 		
 		ExternalInterface.addCallback('getItem', null, function(name) {
 			var val = storage.data[name];
@@ -21,8 +31,17 @@ class Main
 		});
 		
 		ExternalInterface.addCallback('setItem', null, function(name, val) { 
+			var flushStatus = '';
 			storage.data[name] = '' + val;
-			storage.flush();
+			flushStatus = storage.flush();
+			
+            if (flushStatus == 'pending') {
+				if(!swfIsVissible){
+					swfIsVissible = true;
+					ExternalInterface.call('jQuery.webshims.swfLocalStorage.show');
+				}
+            }
+
 		});
 		
 		ExternalInterface.addCallback('clear', null, function() {

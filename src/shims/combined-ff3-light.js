@@ -105,6 +105,10 @@ if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Obje
 		if(props){
 			shims.defineProperties(o, props);
 		}
+		if(o.options && opts){
+			o.options = jQuery.extend(true, {}, o.options, opts);
+			opts = o.options;
+		}
 		if(o._create && jQuery.isFunction(o._create)){
 			o._create(opts);
 		}
@@ -1736,6 +1740,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				var that = this;
 				var css = $(this.input).offset();
 				css.top += $(this.input).outerHeight();
+				
 				css.width = $(this.input).outerWidth() - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
 				
 				if(noMin){

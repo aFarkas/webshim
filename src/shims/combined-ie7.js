@@ -142,6 +142,10 @@ if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Obje
 		if(props){
 			shims.defineProperties(o, props);
 		}
+		if(o.options && opts){
+			o.options = jQuery.extend(true, {}, o.options, opts);
+			opts = o.options;
+		}
 		if(o._create && jQuery.isFunction(o._create)){
 			o._create(opts);
 		}
@@ -3209,6 +3213,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				var that = this;
 				var css = $(this.input).offset();
 				css.top += $(this.input).outerHeight();
+				
 				css.width = $(this.input).outerWidth() - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
 				
 				if(noMin){
@@ -5013,12 +5018,15 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 (function(){
 	var swfTimer;
 	var emptyString = '(empty string)+1287520303738';
+	var blockStorage = false;
+	
 	$.webshims.localStorageSwfCallback = function(type){
 		clearTimeout(swfTimer);
 		if(window.localStorage){
 			$.webshims.createReadyEvent('json-storage');
 			return;
 		}
+		
 		if(type === 'swf'){
 			var shim = document.getElementById('swflocalstorageshim');
 			//brute force flash getter
@@ -5034,6 +5042,7 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 					window.localStorage[fn] = shim[fn];
 				});
 				window.localStorage.setItem = function(name, val){
+					if(blockStorage){return;}
 					storageNameError(name);
 					val += '';
 					if(!val){
@@ -5056,12 +5065,27 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 		$.webshims.createReadyEvent('json-storage');
 	};
 	
+	jQuery.webshims.swfLocalStorage = {
+		show: function(){
+			$('#swflocalstorageshim').css({
+				top: $(window).scrollTop() + 10,
+				left: ($(window).width() / 2) - ($('#swflocalstorageshim').outerWidth() / 2)
+			});
+		},
+		hide: function(success){
+			if(!success){
+				blockStorage = true;
+			}
+			$('#swflocalstorageshim').css({top: '', left: ''});
+		}
+	};
+	
 	$.webshims.ready('ready swfobject', function(){
 		if(window.swfobject && swfobject.hasFlashPlayerVersion('8.0.0')){
 			
-			swfobject.createCSS('#swflocalstorageshim', 'position: absolute; top: -1px; left: -1px; overflow: hidden; height: 1px; width: 1px;');
-			$('body').after('<div id="swflocalstorageshim" />');
-			swfobject.embedSWF($.webshims.loader.basePath +'localStorage.swf', 'swflocalstorageshim', '1', '1', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'localstorageshim'}, function(e){
+			swfobject.createCSS('#swflocalstorageshim', 'position: absolute; top: -140px; left: -300px; overflow: hidden; width: 215px; z-index: 99999999999;');
+			$('body')[$.browser.mozilla ? 'after' : 'append']('<div id="swflocalstorageshim" />');
+			swfobject.embedSWF($.webshims.loader.basePath +'localStorage.swf', 'swflocalstorageshim', '215', '138', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'localstorageshim'}, function(e){
 				if(!e.success && !window.localStorage){
 					$.webshims.localStorageSwfCallback();
 				}

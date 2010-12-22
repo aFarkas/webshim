@@ -105,6 +105,10 @@ if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Obje
 		if(props){
 			shims.defineProperties(o, props);
 		}
+		if(o.options && opts){
+			o.options = jQuery.extend(true, {}, o.options, opts);
+			opts = o.options;
+		}
 		if(o._create && jQuery.isFunction(o._create)){
 			o._create(opts);
 		}

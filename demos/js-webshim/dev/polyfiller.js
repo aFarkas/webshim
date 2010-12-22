@@ -781,6 +781,10 @@
 		webshims.objectCreate = function(proto, props, opts){
 			extendProps(props);
 			var o = Object.create(proto, props);
+			if(o.options && opts){
+				o.options = $.extend(true, {}, o.options, opts);
+				opts = o.options;
+			}
 			if(o._create && $.isFunction(o._create)){
 				o._create(opts);
 			}
