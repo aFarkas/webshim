@@ -52,8 +52,9 @@
 				<li>clear</li>
 				<li>key</li>
 			</ul>
+			<p>If the flash localStorage shim is used and the the storage limit is hit, the flash settings dialog will be placed in to view to request more space for the storage. If the user denies this. localStorage.setItem will be a noop in the current session.</p>
 			<p>Note: That IDL-attributes and the length property aren't implemented.</p>
-			<p>Note: To use localStorage/sessionStorage you should test your webapp/website in an http-enivroment. IE8 in IE7 mode does have the localStorage-interface, but only works like sessionStorage, we don't fully support this mode. In IETester localStorage isn't currently supported.</p>
+			<p>Note: To use localStorage/sessionStorage you should test your webapp/website in an http-enivroment. IE8 in IE7 mode does have the localStorage-interface, but only works like sessionStorage, we don't fully support this mode.</p>
 <code class="block">
 $.webshims.ready('json-storage', function(){
 	if(localStorage.getItem('do-i-know-you') !== null){

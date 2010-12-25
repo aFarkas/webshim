@@ -81,7 +81,12 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 	}
 			
 	if(!support.requiredSelect){
-		webshims.defineNodeNamesBooleanProperty(['select'], 'required');
+		webshims.defineNodeNamesBooleanProperty(['select'], 'required', {
+			set: function(elem, value){
+				elem.setAttribute('aria-required', (value) ? 'true' : 'false');
+			},
+			init: true
+		});
 		
 		webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){
 			

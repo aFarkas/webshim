@@ -184,6 +184,42 @@
 								</div>
 	                        </fieldset>
 	                    </div>
+						
+						<div class="form-element">
+	                        <label for="city">
+	                            Citys with datalist: 
+							</label>
+	                       	<input name="city" type="text" id="city" list="datalist" />
+							
+							<hr />
+							$(this).attr("list", <select id="datalist-select">
+								<option value="datalist">datalist</option>
+								<option value="">"" (empty string)</option>
+								</select>);
+						 	<button class="feature setter" data-val="#datalist-select" data-name="list">change list</button>
+							<datalist id="datalist">
+								<select>
+									<option value="New York City" label="New York City"></option>
+									<option value="London" label="London"></option>
+									<option value="Paris" label="Paris"></option>
+									<option value="Tokio" label="Tokio"></option>
+									<option value="Hongkong" label="Hongkong"></option>
+								</select>
+							</datalist>
+<hr />							
+$('#datalist select').appendWebshim(<textarea style="width: 670px; font-size: 80%;" id="datalist-content">
+<option value="Singapur"></option>
+<option value="Chicago"></option>
+<option value="Seoul"></option>
+<option value="Toronto"></option>
+<option value="Washington, D.C."></option>
+<option value="Peking"></option>
+<option value="Brüssel"></option>
+<option value="Madrid"></option>
+</textarea>);
+						 	<button class="feature method" data-elem="#datalist select" data-val="#datalist-content" data-name="appendWebshim">add suggestions</button>
+							<p>Note: Always use htmlWebshim, appendWebshim, prependWebshim, afterWebshim, beforeWebshim to dynamically set HTML5 content.</p>
+	                    </div>
 	                    
 	                    <div class="button-wrapper">
 	                    	<input type="submit" value="Send" />

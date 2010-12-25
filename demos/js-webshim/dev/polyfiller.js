@@ -14,7 +14,7 @@
 	$('html').addClass('js-on').removeClass('js-off');
 	
 	$.webshims = {
-		version: 'pre1.1.1',
+		version: 'pre1.2.0',
 		useImportantStyles: true,
 		fix: {},
 		implement: {},
@@ -419,6 +419,7 @@
 			
 			if(webshims.useImportantStyles){
 				$('html').addClass('polyfill-important');
+				webshims.useImportantStyles = false;
 			}
 			loader.loadCSS('shim.css');
 			loader.loadList(toLoadFeatures);
@@ -512,7 +513,9 @@
 				readyFn(doc, emptyJ);
 			},
 			triggerDomUpdate: function(context){
-				if(!context){return;}
+				if(!context || !context.nodeType){return;}
+				var type = context.nodeType;
+				if(type != 1 && type != 9){return;}
 				var elem = (context !== document) ? $(context) : emptyJ;
 				$.each(readyFns, function(i, fn){
 					fn(context, elem);
@@ -545,11 +548,7 @@
 				// we got a winner
 				if(desc){
 					if(value === undefined){
-						if(desc.get){
-							return desc.get(elem, value);
-						} 
-						return desc.value;
-						
+						return (desc.get) ? desc.get(elem) : desc.value; 
 					} else if(desc.set) {
 						ret = desc.set(elem, value);
 						handeld = true;
@@ -637,19 +636,9 @@
 					if(descriptor && descriptor[propName]){
 						return descriptor[propName];
 					}
-					return propName == 'value' 
-						? 
-							function(elem){
-								var fn = oldAttr(elem, prop); 
-								if(fn && fn.apply){
-									return fn.apply(elem, arguments);
-								}
-							} 
-						: 
-							function(elem, value){
-								return oldAttr(elem, prop, value);
-							}
-					;
+					return function(elem, value){
+						return oldAttr(elem, prop, value);
+					};
 				};
 				extendedProps[nodeName][prop] = desc;
 				if(desc.value === undefined){
@@ -754,8 +743,9 @@
 	}
 	support.es5 = (es5[0] && es5[1]);
 	
-	support.objectAccessor = !!( (Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor) || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__));
-	support.domAccessor = !!( (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__) ||  (Object.defineProperty && Object.getOwnPropertyDescriptor));
+	support.advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
+	support.objectAccessor = !!( support.advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__));
+	support.domAccessor = !!( support.advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__) ||  (Object.defineProperty && Object.getOwnPropertyDescriptor));
 	
 	testElem.setAttribute('dataHttpAttr', ':-)');
 	support.contentAttr = !(testElem.dataHttpAttr);
@@ -764,7 +754,7 @@
 		var descProps = ['configurable', 'enumerable', 'writable'];
 		var extendUndefined = function(prop){
 			for(var i = 0; i < 3; i++){
-				if(!(descProps[i] in prop)){
+				if(prop[descProps[i]] === undefined && (descProps[i] !== 'writable' || prop.value !== undefined)){
 					prop[descProps[i]] = true;
 				}
 			}
@@ -781,8 +771,8 @@
 		webshims.objectCreate = function(proto, props, opts){
 			extendProps(props);
 			var o = Object.create(proto, props);
-			if(o.options && opts){
-				o.options = $.extend(true, {}, o.options, opts);
+			if(opts){
+				o.options = $.extend(true, {}, o.options  || {}, opts);
 				opts = o.options;
 			}
 			if(o._create && $.isFunction(o._create)){

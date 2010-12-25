@@ -145,7 +145,13 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 					.data('datepicker')
 			;
 			
-			data.dpDiv.addClass('input-date-datepicker-control');
+			data.dpDiv
+				.addClass('input-date-datepicker-control')
+				.css({
+					fontSize: datePicker.css('fontSize'),
+					fontFamily: datePicker.css('fontFamily')
+				})
+			;
 			$('input.input-datetime-local-time', date).bind('change', function(e){
 				var timeVal = $.attr(this, 'value');
 				var val = elem.attr('value').split('T');
@@ -270,7 +276,13 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 					
 			
 			;
-			data.dpDiv.addClass('input-date-datepicker-control');
+			data.dpDiv
+				.addClass('input-date-datepicker-control')
+				.css({
+					fontSize: date.css('fontSize'),
+					fontFamily: date.css('fontFamily')
+				})
+			;
 			if(attr.css){
 				date.css(attr.css);
 				if(attr.outerWidth){
@@ -457,7 +469,6 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	if(support.numericDateProps || !webshims.modules['form-number-date']){return;}
 	var doc = document;
 	var options = webshims.modules['form-number-date'].options;
-	var correctBottom = ($.browser.msie && parseInt($.browser.version, 10) < 8) ? 2 : 0;
 	var typeModels = webshims.inputTypes;
 	var getNextStep = function(input, upDown, cache){
 		
@@ -585,11 +596,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 				
 				if(options.calculateWidth){
 					adjustInputWithBtn(jElm, controls);
-					if(!correctBottom){
-						controls.css('marginBottom', (parseInt(jElm.css('paddingBottom'), 10) || 0) / -2 );
-					} else {
-						controls.css('marginBottom', ((jElm.innerHeight() - (controls.height() / 2)) / 2) - 1 );
-					}
+					controls.css('marginTop', (jElm.outerHeight() - controls.outerHeight())  / 2 );
 				}
 			});
 		}

@@ -21,18 +21,44 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	/*
 	 * Selectors for all browsers
 	 */
+	var rangeTypes = {number: 1, range: 1, date: 1, time: 1, 'datetime-local': 1, datetime: 1, month: 1, week: 1};
 	$.extend($.expr.filters, {
 		"valid-element": function(elem){
-			return ($.attr(elem, 'validity') || {valid: true}).valid;
+			return !!($.attr(elem, 'willValidate') && ($.attr(elem, 'validity') || {valid: true}).valid);
 		},
 		"invalid-element": function(elem){
-			return !isValid(elem);
+			return !!($.attr(elem, 'willValidate') && !isValid(elem));
 		},
-		willValidate: function(elem){
-			return $.attr(elem, 'willValidate');
+		"required-element": function(elem){
+			return !!($.attr(elem, 'willValidate') && $.attr(elem, 'required') === true);
+		},
+		"optional-element": function(elem){
+			return !!($.attr(elem, 'willValidate') && $.attr(elem, 'required') === false);
+		},
+		"in-range": function(elem){
+			if(!rangeTypes[$.attr(elem, 'type')] || !$.attr(elem, 'willValidate')){
+				return false;
+			}
+			var val = $.attr(elem, 'validity');
+			return !!(val && !val.rangeOverflow && !val.rangeUnderflow);
+		},
+		"out-of-range": function(elem){
+			if(!rangeTypes[$.attr(elem, 'type')] || !$.attr(elem, 'willValidate')){
+				return false;
+			}
+			var val = $.attr(elem, 'validity');
+			return !!(val && (val.rangeOverflow || val.rangeUnderflow));
 		}
+		
 	});
-	var isValid = $.expr.filters["valid-element"];
+	//better you use the selectors above
+	['required', 'valid', 'invalid', 'required', 'optional'].forEach(function(name){
+		$.expr.filters[name] = $.expr.filters[name+"-element"];
+	});
+	
+	var isValid = function(elem){
+		return ($.attr(elem, 'validity') || {valid: true}).valid;
+	};
 	
 	
 	//ToDo needs testing
@@ -45,7 +71,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 			if(isValid(elem)){
 				getVisual(elem).removeClass('form-ui-invalid');
 				if(name == 'checked' && val) {
-					getGroupElements(elem).removeClass('form-ui-invalid');
+					getGroupElements(elem).removeClass('form-ui-invalid').removeAttr('aria-invalid');
 				}
 			}
 			return ret;
@@ -53,7 +79,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		return oldAttr.apply(this, arguments);
 	};
 	$(document).bind('focusout change refreshValidityStyle', function(e){
-		if(stopUIRefresh || !e.target || !e.target.form){return;}
+		if(stopUIRefresh || !e.target || !e.target.form || e.target.type == 'submit'){return;}
 		
 		var elem = $.attr(e.target, 'html5element') || e.target;
 		if(!$.attr(elem, 'willValidate')){
@@ -143,6 +169,10 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				api.clear();
 				this.getMessage(elem, message);
 				this.position(visual);
+				alert.css({
+					fontSize: elem.css('fontSize'),
+					fontFamily: elem.css('fontFamily')
+				});
 				this.show();
 				
 				if(this.hideDelay){
@@ -187,7 +217,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				$(doc).bind('focusout.validityalert', boundHide);
 			},
 			getMessage: function(elem, message){
-				$('> span', alert).text(message || elem.attr('validationMessage'));
+				$('> span.va-box', alert).text(message || elem.attr('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
@@ -210,7 +240,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				$(doc).unbind('focusout.validityalert');
 				alert.stop().removeAttr('for');
 			},
-			alert: $('<'+alertElem+' class="validity-alert" role="alert"><span class="va-box" /></'+alertElem+'>').css({position: 'absolute', display: 'none'})
+			alert: $('<'+alertElem+' class="validity-alert" role="alert"><span class="va-arrow"><span class="va-arrow-box" /></span><span class="va-box" /></'+alertElem+'>').css({position: 'absolute', display: 'none'})
 		};
 		
 		var alert = api.alert;

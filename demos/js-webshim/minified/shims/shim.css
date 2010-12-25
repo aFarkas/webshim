@@ -55,9 +55,7 @@ mark {
 .placeholder-box-input {
 	vertical-align: bottom;
 }
-.placeholder-box-textarea {
-	vertical-align: text-bottom;
-}
+
 .placeholder-box-left {
 	float: left;
 }
@@ -84,8 +82,8 @@ mark {
 .placeholder-box-input .placeholder-text {
 	white-space: nowrap;
 }
-.placeholder-box-textarea .placeholder-text {
-	white-space: pre;
+.placeholder-visible {
+	color: #999;
 }
 .placeholder-visible .placeholder-text {
 	display: inline-block;
@@ -140,7 +138,7 @@ img.ui-datepicker-trigger {
 	display: inline-block;
 	font-size: 0;
 	vertical-align: middle;
-	vertical-align: text-bottom;
+	vertical-align: top;
 	margin-left: -17px;
 	height: 19px;
 	width: 15px;
@@ -148,7 +146,7 @@ img.ui-datepicker-trigger {
 .polyfill-important .step-controls {
 	display: inline-block !important;
 	padding: 0 !important;
-	vertical-align: text-bottom !important;
+	vertical-align: top !important;
 }
 .step-controls span {
 	position: absolute;
@@ -266,39 +264,136 @@ img.ui-datepicker-trigger {
 	z-index: 100;
 }
 .input-date-datepicker-control {
+	position: absolute;
+	zoom: 1;
 	display: none;
 	background-color: #fff;
 	z-index: 100;
-	overflow: visible !important;
+	overflow: visible;
+	padding: 5px;
+	font-family: "Lucida Grande", "MS Shell Dlg", "Calibri", sans-serif;
+	font-size: 100%;
+	border: 1px solid #333;
+	-moz-box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
+	box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
 }
-* html .input-date-datepicker-control {
-	width: 1px;
+
+.input-date-datepicker-control .ui-datepicker-header {
+	position: relative;
+	margin: 0 0 3px;
+	padding: 2px 0;
 }
+.input-date-datepicker-control .ui-datepicker-header select {
+    border: 1px solid #333;
+    padding: 1px 2px 2px;
+}
+.input-date-datepicker-control .ui-datepicker-header option {
+	padding-right: 8px;
+}
+.input-date-datepicker-control .ui-datepicker-header .ui-icon {
+	position: absolute;
+	display: block;
+	top: 0.2em;
+	width: 15px;
+	height: 18px;
+	text-indent: -9999em;
+	font-size: 10px;
+	line-height: 0;
+	background: url(date-arrows.png) no-repeat;
+	cursor: pointer;
+}
+.input-date-datepicker-control .ui-datepicker-header .ui-state-disabled .ui-icon {
+	cursor: default;
+}
+.input-date-datepicker-control .ui-datepicker-header .ui-icon-circle-triangle-w {
+	left: 3px;
+	background-position: 2px 3px;
+}
+.input-date-datepicker-control .ui-datepicker-header .ui-icon-circle-triangle-e {
+	right: 3px;
+	background-position: -12px 3px;
+}
+.input-date-datepicker-control table {
+	font-size: 100%;
+}
+.input-date-datepicker-control .ui-datepicker-title {
+	margin: 0 20px;
+}
+.input-date-datepicker-control .ui-datepicker-title,
+.input-date-datepicker-control th {
+	color: #069;
+	text-align: center;
+	font-weight: bold;
+}
+.input-date-datepicker-control td,
+.input-date-datepicker-control th {
+	padding: 0 2px;
+	text-align: center;
+}
+.input-date-datepicker-control td {
+	cursor: pointer;
+	color: #333;
+	border: 1px solid #999;
+}
+
+
+.input-date-datepicker-control td.ui-datepicker-current-day {
+	border-color: #000;
+	background-color: #adf;
+	color: #000;
+}
+
+.input-date-datepicker-control td.ui-datepicker-current-day a {
+	background-color: #adf;
+	color: #000;
+}
+.input-date-datepicker-control td a {
+	color: #333;
+	text-decoration: none;
+}
+.input-date-datepicker-control td:hover,
+.input-date-datepicker-control td:hover a {
+	background-color: #bef;
+}
+.input-date-datepicker-control td.ui-state-disabled {
+	cursor: default;
+	border-color: #ddd;
+	color: #bbb;
+	background-color: transparent;
+}
+
+.input-date-datepicker-control .ui-datepicker-buttonpane {
+	margin: 4px 0 0;
+}
+
 datalist {
 	display: none;
 }
 .datalist-polyfill {
 	position: absolute !important;
+	font-family: "Lucida Grande", "MS Shell Dlg", "Calibri", sans-serif;
+	font-size: 100%;
 	top: 0;
 	left: 0;
 	margin: 0;
 	padding: 0 !important;
-	border: 1px solid InactiveBorder;
+	border: 1px solid #333;
 	display: none;
 	z-index: 1000;
-	max-height: 220px;
+	max-height: 200px;
 	overflow: hidden;
 	overflow-x: hidden !important;
 	overflow-y: auto;
 	
-	-moz-box-shadow: 3px 4px 5px #333;
-	box-shadow: 3px 4px 5px #333;
+	-moz-box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
+	box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
 }
 .datalist-polyfill.datalist-visible{
 	display: block;
 }
 .datalist-polyfill ul,
 .datalist-polyfill li {
+	font-size: 100%;
 	list-style: none !important;
 }
 .datalist-polyfill ul {
@@ -307,7 +402,7 @@ datalist {
 	margin: 0;
 	padding: 2px 0;
 	height:  auto !important;
-	background: #fff;
+	background-color: #fff;
 	color: #000;
 	
 }
@@ -322,7 +417,7 @@ datalist {
 	display: none !important;
 }
 .datalist-polyfill li.active-item {
-	background: #39f;
+	background-color: #39f;
 	color: #fff;
 	cursor: default;
 }
@@ -330,12 +425,45 @@ datalist {
 .validity-alert {
 	position: absolute;
 	display: inline-block;
-	background: #fff;
-	color: #000;
-	border: 1px solid #f00;
-	padding: 5px;
+	padding: 11px 0 0;
 	z-index: 10000;
 }
 .validity-alert span.va-box {
 	display: inline-block;
+	background: #fff;
+	color: #000;
+	border: 2px solid #a33;
+	padding: 5px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	zoom: 1;
+	min-width: 60px;
+}
+
+.validity-alert .va-arrow {
+	position: absolute;
+	top: 2px;
+	left: 20px;
+	display: block;
+	width: 0;
+	height: 0;
+	border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+	border-bottom: 10px solid #a33;
+	border-top: none;
+	zoom: 1;
+	font-size: 0;
+}
+* html .validity-alert .va-arrow {display: none;}
+.validity-alert .va-arrow .va-arrow-box {
+	position: relative;
+	top: 2px;
+	left: -8px;
+	display: block;
+	width: 0;
+	height: 0;
+	border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+	border-bottom: 9px solid #fff;
+	border-top: none;
 }

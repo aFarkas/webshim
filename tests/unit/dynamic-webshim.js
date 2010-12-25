@@ -3,7 +3,7 @@
 module("dynamic webshim / css load");
 asyncTest("dynamic webshim Modul", function(){
 	var testElem = $('<div />').appendTo('body');
-	var testStructure = '<div id="webshim-structure"><section><hgroup><input placeholder="hello" /></hgroup></section><section></section></div>';
+	var testStructure = '<div id="webshim-structure"><section><hgroup><input type="password" placeholder="hello" /></hgroup></section><section></section></div>';
 	var structureTest = function(fnName){
 		var elemsLength = (!$.support.placeholder) ? 6 : 4;
 		equals( $('#webshim-structure > *').length, 2, 'structure has two childs with method '+ fnName );

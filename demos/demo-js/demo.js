@@ -19,7 +19,12 @@
 			}
 		};
 		$('button.feature').bind('click', function(e){
-			var elem = $(this).parent().find('input:first');
+			var elem = $(this).attr('data-elem');
+			if(elem){
+				elem = $(elem);
+			} else {
+				elem = $(this).parent().find('input:first');
+			}
 			var val = $(this).attr('data-val');
 			var ret;
 			if(val){

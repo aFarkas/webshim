@@ -57,7 +57,7 @@
 			
 			module("init");
 			asyncTest("init", function(){
-				$.webshims.ready('ready', start);
+				$.webshims.ready('ready forms canvas json-storage', start);
 			});
 			
 		})(jQuery);
@@ -74,16 +74,6 @@
 					return 'baz';
 				}
 			}, true);
-//			$.webshims.ready('forms', function(){
-//				$.webshims.defineNodeNameProperty('foobar2', 'value', {
-//					get: function(){
-//						return 'jo da foobar2';
-//					},
-//					set: function(){
-//						return 'bub2';
-//					}
-//				});
-//			}, true);
 		});
 	</script>
 	
@@ -95,6 +85,7 @@
 	<script src="unit/stepup-down.js"></script>
 	<script src="unit/input-ui.js"></script>
 	<script src="unit/storage.js"></script>
+	<script src="unit/es5.js"></script>
 	
 	<script src="unit/boolean-attr.js"></script>
 	<script>
@@ -221,13 +212,29 @@
 	                        <label class="m" for="placeholder">
 	                            placeholder:
 							</label>
-	                        <input placeholder="hello" name="placeholder" type="text" id="placeholder" />
+	                        <input placeholder="hello" name="placeholder" type="password" id="placeholder" />
 						</div>
 						<div class="form-item-m">
 	                        <label class="m" for="placeholder-empty">
 	                            placeholder-empty:
 							</label>
-	                        <input class="oninput-test" oninput="window.globalInput = rangeId.value +':'+ rangeName.value;" name="placeholder-empty" type="text" id="placeholder-empty" />
+	                        <input class="oninput-test" oninput="window.globalInput = rangeId.value +':'+ rangeName.value;" name="placeholder-empty" type="password" id="placeholder-empty" />
+						</div>
+	               	</fieldset>
+				</div>
+				<div  class="multiple-labels">
+	                <fieldset>
+						<div class="form-item-m">
+	                        <label class="m" for="placeholder-text">
+	                            placeholder-text:
+							</label>
+	                        <input placeholder="hello" name="placeholder-text" id="placeholder-text" />
+						</div>
+						<div class="form-item-m">
+	                        <label class="m" for="placeholder-empty-text">
+	                            placeholder-empty-text:
+							</label>
+	                        <input name="placeholder-empty-text" id="placeholder-empty-text" />
 						</div>
 	               	</fieldset>
 				</div>

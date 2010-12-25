@@ -123,6 +123,9 @@ if(Object.defineProperty && Object.prototype.__defineGetter__){
 		}catch(e){
 			supportDefineDOMProp = false;
 		}
+		if(!supportDefineDOMProp){
+			jQuery.support.advancedObjectProperties = false;
+		}
 	})();
 }
 
@@ -131,21 +134,18 @@ if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Obje
 	shims.objectCreate = function(proto, props, opts){
 		var o;
 		var f = function(){};
-		if(Object.create){
-			try {
-				o = Object.create(proto, props);
-				return o;
-			} catch(e){}
-		}
+		
 		f.prototype = proto;
 		o = new f();
 		if(props){
 			shims.defineProperties(o, props);
 		}
-		if(o.options && opts){
-			o.options = jQuery.extend(true, {}, o.options, opts);
+		
+		if(opts){
+			o.options = jQuery.extend(true, {}, o.options || {}, opts);
 			opts = o.options;
 		}
+		
 		if(o._create && jQuery.isFunction(o._create)){
 			o._create(opts);
 		}
@@ -165,17 +165,14 @@ if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Obje
 	shims.defineProperty = function(proto, property, descriptor){
 		if(typeof descriptor != "object"){return proto;}
 		
-		for(var i = 0; i < 3; i++){
-			if(!(descProps[i] in descriptor)){
-				descriptor[descProps[i]] = true;
-			}
-		}
+		
 		if(Object.defineProperty){
+			for(var i = 0; i < 3; i++){
+				if(!(descProps[i] in descriptor) && (descProps[i] !== 'writable' || descriptor.value !== undefined)){
+					descriptor[descProps[i]] = true;
+				}
+			}
 			try{
-				//IE8 has wrong defaults
-				descriptor.writeable = descriptor.writeable || false;
-				descriptor.configurable = descriptor.configurable || false;
-				descriptor.enumeratable = descriptor.enumerable || false;
 				Object.defineProperty(proto, property, descriptor);
 				return;
 			} catch(e){}
@@ -972,18 +969,44 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	/*
 	 * Selectors for all browsers
 	 */
+	var rangeTypes = {number: 1, range: 1, date: 1, time: 1, 'datetime-local': 1, datetime: 1, month: 1, week: 1};
 	$.extend($.expr.filters, {
 		"valid-element": function(elem){
-			return ($.attr(elem, 'validity') || {valid: true}).valid;
+			return !!($.attr(elem, 'willValidate') && ($.attr(elem, 'validity') || {valid: true}).valid);
 		},
 		"invalid-element": function(elem){
-			return !isValid(elem);
+			return !!($.attr(elem, 'willValidate') && !isValid(elem));
 		},
-		willValidate: function(elem){
-			return $.attr(elem, 'willValidate');
+		"required-element": function(elem){
+			return !!($.attr(elem, 'willValidate') && $.attr(elem, 'required') === true);
+		},
+		"optional-element": function(elem){
+			return !!($.attr(elem, 'willValidate') && $.attr(elem, 'required') === false);
+		},
+		"in-range": function(elem){
+			if(!rangeTypes[$.attr(elem, 'type')] || !$.attr(elem, 'willValidate')){
+				return false;
+			}
+			var val = $.attr(elem, 'validity');
+			return !!(val && !val.rangeOverflow && !val.rangeUnderflow);
+		},
+		"out-of-range": function(elem){
+			if(!rangeTypes[$.attr(elem, 'type')] || !$.attr(elem, 'willValidate')){
+				return false;
+			}
+			var val = $.attr(elem, 'validity');
+			return !!(val && (val.rangeOverflow || val.rangeUnderflow));
 		}
+		
 	});
-	var isValid = $.expr.filters["valid-element"];
+	//better you use the selectors above
+	['required', 'valid', 'invalid', 'required', 'optional'].forEach(function(name){
+		$.expr.filters[name] = $.expr.filters[name+"-element"];
+	});
+	
+	var isValid = function(elem){
+		return ($.attr(elem, 'validity') || {valid: true}).valid;
+	};
 	
 	
 	//ToDo needs testing
@@ -996,7 +1019,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 			if(isValid(elem)){
 				getVisual(elem).removeClass('form-ui-invalid');
 				if(name == 'checked' && val) {
-					getGroupElements(elem).removeClass('form-ui-invalid');
+					getGroupElements(elem).removeClass('form-ui-invalid').removeAttr('aria-invalid');
 				}
 			}
 			return ret;
@@ -1004,7 +1027,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		return oldAttr.apply(this, arguments);
 	};
 	$(document).bind('focusout change refreshValidityStyle', function(e){
-		if(stopUIRefresh || !e.target || !e.target.form){return;}
+		if(stopUIRefresh || !e.target || !e.target.form || e.target.type == 'submit'){return;}
 		
 		var elem = $.attr(e.target, 'html5element') || e.target;
 		if(!$.attr(elem, 'willValidate')){
@@ -1094,6 +1117,10 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				api.clear();
 				this.getMessage(elem, message);
 				this.position(visual);
+				alert.css({
+					fontSize: elem.css('fontSize'),
+					fontFamily: elem.css('fontFamily')
+				});
 				this.show();
 				
 				if(this.hideDelay){
@@ -1138,7 +1165,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				$(doc).bind('focusout.validityalert', boundHide);
 			},
 			getMessage: function(elem, message){
-				$('> span', alert).text(message || elem.attr('validationMessage'));
+				$('> span.va-box', alert).text(message || elem.attr('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
@@ -1161,7 +1188,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				$(doc).unbind('focusout.validityalert');
 				alert.stop().removeAttr('for');
 			},
-			alert: $('<'+alertElem+' class="validity-alert" role="alert"><span class="va-box" /></'+alertElem+'>').css({position: 'absolute', display: 'none'})
+			alert: $('<'+alertElem+' class="validity-alert" role="alert"><span class="va-arrow"><span class="va-arrow-box" /></span><span class="va-box" /></'+alertElem+'>').css({position: 'absolute', display: 'none'})
 		};
 		
 		var alert = api.alert;
@@ -1404,15 +1431,8 @@ var validiyPrototype = {
 
 var validityRules = {
 		valueMissing: function(input, val, cache){
-			var ariaAttr = input[0].getAttribute('aria-required');
 			if(!input.attr('required')){
-				if(ariaAttr == 'true'){
-					input[0].setAttribute('aria-required', 'false');
-				}
 				return false;
-			}
-			if(ariaAttr == 'false'){
-				input[0].setAttribute('aria-required', 'true');
 			}
 			var ret = false;
 			if(!('type' in cache)){
@@ -1585,11 +1605,16 @@ webshims.defineNodeNamesProperty(['input', 'select', 'textarea'], 'validity', {
 		elem.setAttribute('aria-invalid',  validityState.valid ? 'false' : 'true');
 		return validityState;
 	}
-}, true, 'form-htc-validity.htc');
+});
 
 
 //todo
-webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required');
+webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
+	set: function(elem, value){
+		elem.setAttribute('aria-required', (value) ? 'true' : 'false');
+	},
+	init: true
+});
 
 webshims.defineNodeNamesProperty(['input', 'select', 'textarea', 'fieldset', 'button', 'output'], 'willValidate', {
 	get: (function(){
@@ -2210,7 +2235,13 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 					.data('datepicker')
 			;
 			
-			data.dpDiv.addClass('input-date-datepicker-control');
+			data.dpDiv
+				.addClass('input-date-datepicker-control')
+				.css({
+					fontSize: datePicker.css('fontSize'),
+					fontFamily: datePicker.css('fontFamily')
+				})
+			;
 			$('input.input-datetime-local-time', date).bind('change', function(e){
 				var timeVal = $.attr(this, 'value');
 				var val = elem.attr('value').split('T');
@@ -2335,7 +2366,13 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 					
 			
 			;
-			data.dpDiv.addClass('input-date-datepicker-control');
+			data.dpDiv
+				.addClass('input-date-datepicker-control')
+				.css({
+					fontSize: date.css('fontSize'),
+					fontFamily: date.css('fontFamily')
+				})
+			;
 			if(attr.css){
 				date.css(attr.css);
 				if(attr.outerWidth){
@@ -2522,7 +2559,6 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	if(support.numericDateProps || !webshims.modules['form-number-date']){return;}
 	var doc = document;
 	var options = webshims.modules['form-number-date'].options;
-	var correctBottom = ($.browser.msie && parseInt($.browser.version, 10) < 8) ? 2 : 0;
 	var typeModels = webshims.inputTypes;
 	var getNextStep = function(input, upDown, cache){
 		
@@ -2650,11 +2686,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 				
 				if(options.calculateWidth){
 					adjustInputWithBtn(jElm, controls);
-					if(!correctBottom){
-						controls.css('marginBottom', (parseInt(jElm.css('paddingBottom'), 10) || 0) / -2 );
-					} else {
-						controls.css('marginBottom', ((jElm.innerHeight() - (controls.height() / 2)) / 2) - 1 );
-					}
+					controls.css('marginTop', (jElm.outerHeight() - controls.outerHeight())  / 2 );
 				}
 			});
 		}
@@ -2674,27 +2706,51 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 
 jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	if($.support.placeholder){return;}
-	var changePlaceholderVisibility = function(elem, value, placeholderTxt, data, type){
+	var hidePlaceholder = function(elem, data, value){
+			if(elem.type != 'password'){
+				if(value === false){
+					value = $.attr(elem, 'value');
+				}
+				elem.value = value;
+			}
+			data.box.removeClass('placeholder-visible');
+		},
+		showPlaceholder = function(elem, data, placeholderTxt){
+			if(placeholderTxt === false){
+				placeholderTxt = $.attr(elem, 'placeholder') || '';
+			}
+			
+			if(elem.type != 'password'){
+				elem.value = placeholderTxt;
+			}
+			data.box.addClass('placeholder-visible');
+		},
+		changePlaceholderVisibility = function(elem, value, placeholderTxt, data, type){
 			if(!data){
 				data = $.data(elem, 'placeHolder');
 				if(!data){return;}
 			}
 			if(type == 'focus' || (!type && elem === document.activeElement)){
-				data.box.removeClass('placeholder-visible');
+				if(elem.type == 'password' || $(elem).hasClass('placeholder-visible')){
+					hidePlaceholder(elem, data, '');
+				}
 				return;
 			}
 			if(value === false){
 				value = $.attr(elem, 'value');
 			}
 			if(value){
-				data.box.removeClass('placeholder-visible');
+				hidePlaceholder(elem, data, value);
 				return;
 			}
 			if(placeholderTxt === false){
-				placeholderTxt = $.attr(elem, 'placeholder');
+				placeholderTxt = $.attr(elem, 'placeholder') || '';
 			}
-			
-			data.box[(placeholderTxt && !value) ? 'addClass' : 'removeClass']('placeholder-visible');
+			if(placeholderTxt && !value){
+				showPlaceholder(elem, data, placeholderTxt);
+			} else {
+				hidePlaceholder(elem, data, value);
+			}
 		},
 		createPlaceholder = function(elem){
 			elem = $(elem);
@@ -2705,7 +2761,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 			if(!hasLabel && id){
 				hasLabel = !!( $('label[for="'+ id +'"]', elem[0].form)[0] );
 			}
-			return $((hasLabel) ? '<span class="placeholder-text"></span>' : '<label for="'+ (id || $.webshims.getID(elem)) +'" class="placeholder-text"></label>');
+			return $( hasLabel ? '<span class="placeholder-text"></span>' : '<label for="'+ (id || $.webshims.getID(elem)) +'" class="placeholder-text"></label>');
 		},
 		pHolder = (function(){
 			var delReg 	= /\n|\r|\f|\t/g,
@@ -2726,48 +2782,66 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 					data = $.data(elem, 'placeHolder', {
 						text: createPlaceholder(elem)
 					});
-					data.box = $(elem)
-						.wrap('<span class="placeholder-box placeholder-box-'+ (elem.nodeName || '').toLowerCase() +'" />')
-						.bind('focus.placeholder blur.placeholder', function(e){
-							changePlaceholderVisibility(this, false, false, data, e.type );
-						})
-						.parent()
-					;
-
-					data.text
-						.insertAfter(elem)
-						.bind('mousedown.placeholder', function(){
-							changePlaceholderVisibility(this, false, false, data, 'focus' );
-							elem.focus();
-							return false;
-						})
-					;
 					
+					$(elem).bind('focus.placeholder blur.placeholder', function(e){
+						changePlaceholderVisibility(this, false, false, data, e.type );
+					});
 					
+					if(elem.type == 'password'){
+						data.box = $(elem)
+							.wrap('<span class="placeholder-box placeholder-box-'+ (elem.nodeName || '').toLowerCase() +'" />')
+							.parent()
+						;
 	
-					$.each(['Left', 'Top'], function(i, side){
-						var size = (parseInt($.curCSS(elem, 'padding'+ side), 10) || 0) + Math.max((parseInt($.curCSS(elem, 'margin'+ side), 10) || 0), 0) + (parseInt($.curCSS(elem, 'border'+ side +'Width'), 10) || 0);
-						data.text.css('padding'+ side, size);
-					});
-					var lineHeight 	= $.curCSS(elem, 'lineHeight'),
-						dims 		= {
-							width: $(elem).width(),
-							height: $(elem).height()
-						},
-						cssFloat 		= $.curCSS(elem, 'float')
-					;
-					$.each(['lineHeight', 'fontSize', 'fontFamily', 'fontWeight'], function(i, style){
-						var prop = $.curCSS(elem, style);
-						if(data.text.css(style) != prop){
-							data.text.css(style, prop);
+						data.text
+							.insertAfter(elem)
+							.bind('mousedown.placeholder', function(){
+								changePlaceholderVisibility(this, false, false, data, 'focus' );
+								elem.focus();
+								return false;
+							})
+						;
+						
+						
+		
+						$.each(['Left', 'Top'], function(i, side){
+							var size = (parseInt($.curCSS(elem, 'padding'+ side), 10) || 0) + Math.max((parseInt($.curCSS(elem, 'margin'+ side), 10) || 0), 0) + (parseInt($.curCSS(elem, 'border'+ side +'Width'), 10) || 0);
+							data.text.css('padding'+ side, size);
+						});
+						var lineHeight 	= $.curCSS(elem, 'lineHeight'),
+							dims 		= {
+								width: $(elem).width(),
+								height: $(elem).height()
+							},
+							cssFloat 		= $.curCSS(elem, 'float')
+						;
+						$.each(['lineHeight', 'fontSize', 'fontFamily', 'fontWeight'], function(i, style){
+							var prop = $.curCSS(elem, style);
+							if(data.text.css(style) != prop){
+								data.text.css(style, prop);
+							}
+						});
+						
+						if(dims.width && dims.height){
+							data.text.css(dims);
 						}
-					});
-					
-					if(dims.width && dims.height){
-						data.text.css(dims);
-					}
-					if(cssFloat !== 'none'){
-						data.box.addClass('placeholder-box-'+cssFloat);
+						if(cssFloat !== 'none'){
+							data.box.addClass('placeholder-box-'+cssFloat);
+						}
+					} else {
+						var reset = function(){
+							hidePlaceholder(elem, data, '');
+						};
+						if($.nodeName(data.text[0], 'label')){
+							//if label is dynamically set after we ensure that our label isn't exposed anymore
+							//ie always exposes last label and ff always first
+							data.text.hide()[$.browser.msie ? 'insertBefore' : 'insertAfter'](elem);
+						}
+						$(window).unload(reset);
+						data.box = $(elem);
+						if(elem.form){
+							$(elem.form).submit(reset);
+						}
 					}
 					
 					return data;
@@ -2803,29 +2877,51 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		init: true
 	});
 			
-	
-	
-	webshims.onNodeNamesPropertyModify(['input', 'textarea'], 'value', {
-		set: function(elem, value){
-			var placeholder = webshims.contentAttr(elem, 'placeholder');
-			if(placeholder && 'value' in elem){
-				changePlaceholderVisibility(elem, value, placeholder);
+	$.each(['input', 'textarea'], function(i, name){
+		var desc = webshims.defineNodeNameProperty(name, 'value', {
+			set: function(elem, val){
+				var placeholder = webshims.contentAttr(elem, 'placeholder');
+				if(placeholder && 'value' in elem){
+					changePlaceholderVisibility(elem, val, placeholder);
+				}
+				return desc.set._polyfilled(elem, val);
+			},
+			get: function(elem){
+				return $(elem).hasClass('placeholder-visible') ? '' : desc.get._polyfilled(elem);
 			}
-		}
+		});
 	});
+	
 	
 	
 	var oldVal = $.fn.val;
 	$.fn.val = function(val){
 		if(val !== undefined){
-			this.each(function(){
-				if( this.nodeType === 1 ){
-					var placeholder = this.getAttribute('placeholder');
-					if(placeholder && 'value' in this){
-						changePlaceholderVisibility(this, val, placeholder);
+			var process = (val === '') ? 
+				function(){
+					if( this.nodeType === 1 ){
+						var placeholder = this.getAttribute('placeholder');
+						if(placeholder && 'value' in this){
+							changePlaceholderVisibility(this, val, placeholder);
+						}
+						if(this.type == 'password'){
+							oldVal.call($(this), '');
+						}
+					}
+				} : 
+				function(){
+					if( this.nodeType === 1 ){
+						var placeholder = this.getAttribute('placeholder');
+						if(placeholder && 'value' in this){
+							changePlaceholderVisibility(this, val, placeholder);
+						}
 					}
 				}
-			});
+			;
+			this.each(process);
+			if(val === ''){return this;}
+		} else if(this[0] && this[0].nodeType == 1 && this.hasClass('placeholder-visible')) {
+			return '';
 		}
 		return oldVal.apply(this, arguments);
 	};
@@ -2863,7 +2959,6 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 						if(newVal !== lastVal){
 							lastVal = newVal;
 							if(!e || !noInputTriggerEvts[e.type]){
-								console.log(newVal, e)
 								webshims.triggerInlineForm(input[0], 'input');
 							}
 						}
@@ -3003,7 +3098,8 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 		var getText = function(elem){
 			return (elem.textContent || elem.innerText || $.text([ elem ]) || '');
 		};
-				
+		
+		//ToDo: It's a little bit to complex, maintainability isn't good		
 		var dataListProto = {
 			_create: function(opts){
 				var datalist = opts.datalist || opts.id && document.getElementById(opts.id);
@@ -3035,6 +3131,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				this.shadowList = $('<div class="datalist-polyfill" />').appendTo('body');
 				this.index = -1;
 				this.input = opts.input;
+				this.arrayOptions = [];
 				
 				this.storedOptions = getStoredOptions(opts.input.name || opts.input.id);
 				
@@ -3075,11 +3172,11 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 							that.markItem(that.index - 1, true);
 							return false;
 						} 
-						if(keyCode == 33 || keyCode == 36){
+						if(!e.shiftKey && (keyCode == 33 || keyCode == 36)){
 							that.markItem(0, true);
 							return false;
 						} 
-						if(keyCode == 34 || keyCode == 35){
+						if(!e.shiftKey && (keyCode == 34 || keyCode == 35)){
 							items = $('li:not(.hidden-item)', that.shadowList);
 							that.markItem(items.length - 1, true, items);
 							return false;
@@ -3097,13 +3194,13 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 					.unbind('updateDatalist.datalistWidget')
 					.bind('updateDatalist.datalistWidget', function(){
 						that.needsUpdate = true;
-						that.updateTimer = setTimeout(function(){
-							that.updateListOptions();
-						}, 10 *  that.idindex);			
+						that.lastUpdatedValue = false;
+						that.updateListOptions();
 					})
-					.triggerHandler('updateDatalist')
 				;
-				
+				that.updateTimer = setTimeout(function(){
+					that.updateListOptions();
+				}, 10 *  that.idindex);
 				
 				if(opts.input.form && opts.input.id){
 					$(opts.input.form).bind('submit.datalistWidget'+opts.input.id, function(){
@@ -3126,6 +3223,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				if(this.input.form && this.input.id){
 					$(this.input.form).unbind('submit.datalistWidget'+this.input.id);
 				}
+				this.input.removeAttribute('aria-haspopup');
 				if(autocomplete === undefined){
 					this.input.removeAttribute('autocomplete');
 				} else {
@@ -3135,15 +3233,22 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 			updateListOptions: function(){
 				this.needsUpdate = false;
 				clearTimeout(this.updateTimer);
-				var list = '<ul role="list">';
-				var value;
+				this.shadowList.css({
+					fontSize: $.curCSS(this.input, 'fontSize'),
+					fontFamily: $.curCSS(this.input, 'fontFamily')
+				});
+				var list = '<ul role="list" class="'+ (this.datalist.className || '') +'">';
+				var value = $.attr(this.input, 'value');
+				var hideList = false;
 				var values = [];
 				var allOptions = [];
 				$('option', this.datalist).each(function(i){
-					if(this.disabled && this.disabled != 'false'){return;}
+					if(this.disabled){return;}
 					var item = {
-						value: $.attr(this, 'value'),
-						text: $.trim($.attr(this, 'label') || getText(this))
+						value: $(this).val(),
+						text: $.trim($.attr(this, 'label') || getText(this)),
+						className: this.className || '',
+						style: $.attr(this, 'style') || ''
 					};
 					if(!item.text){
 						item.text = item.value;
@@ -3153,49 +3258,63 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				});
 				$.each(this.storedOptions, function(i, val){
 					if($.inArray(val, values) == -1){
-						allOptions.push({value: val, text: val});
+						allOptions.push({value: val, text: val, className: '', style: ''});
 					}
 				});
-				if(this.shadowList.hasClass('datalist-visible')){
-					value = $.attr(this.input, 'value');
+				if(this.shadowList.hasClass('datalist-visible') && value){
+					hideList = true;
 					$.each(allOptions, function(i, item){
 						var visibility = '';
-						if(item.text.indexOf('value') == -1){ 
+						item.lowerText = item.text.toLowerCase();
+						item.lowerValue = item.value.toLowerCase();
+						if(item.lowerText.indexOf(value) == -1 && item.lowerValue.indexOf(value) == -1){ 
 							visibility = ' class="hidden-item"';
+						} else {
+							hideList = false;
 						}
-						list += '<li'+ visibility +' role="listitem" tabindex="-1" data-value="'+item.value+'">'+ item.text +'</li>';
+						list += '<li'+ visibility +' class="'+ item.className +'" style="'+ item.style +'" role="listitem" tabindex="-1" data-value="'+item.value+'">'+ item.text +'</li>';
 					});
-					this.lastUpdatdValue = value;
+					this.lastUpdatedValue = value;
 				} else {
 					$.each(allOptions, function(i, item){
-						list += '<li data-value="'+item.value+'" tabindex="-1" role="listitem">'+ item.text +'</li>';
+						list += '<li data-value="'+item.value+'" class="'+ item.className +'" style="'+ item.style +'" tabindex="-1" role="listitem">'+ item.text +'</li>';
 					});
-					this.lastUpdatdValue = "";
+					this.lastUpdatedValue = false;
 				}
 				list += '</ul>';
-				this.hasViewableData = true;
+				this.hasViewableData = !hideList;
+				this.arrayOptions = allOptions;
 				this.shadowList.html(list);
+				if(hideList){
+					this.hideList();
+				}
 			},
 			showHideOptions: function(){
 				var value = $.attr(this.input, 'value');
-				if(value === this.lastUpdatdValue){return;}
-				this.lastUpdatdValue = value;
+				if(value === this.lastUpdatedValue){return;}
+				this.lastUpdatedValue = value;
 				var found = false;
-				
+				var lis = $('li', this.shadowList);
 				if(value){
 					value = value.toLowerCase();
-					$('li', this.shadowList).each(function(){
-						if(getText(this).toLowerCase().indexOf(value) == -1 && ($.attr(this, 'data-value') || '').indexOf(value) == -1){
-							$(this).addClass('hidden-item');
-						} else {
-							$(this).removeClass('hidden-item');
+					$.each(this.arrayOptions, function(i, item){
+						if(!('lowerText' in item)){
+							item.lowerText = item.text.toLowerCase();
+							item.lowerValue = item.value.toLowerCase();
+						}
+						
+						if(item.lowerText.indexOf(value) !== -1 || item.lowerValue.indexOf(value) !== -1){
+							$(lis[i]).removeClass('hidden-item');
 							found = true;
+						} else {
+							$(lis[i]).addClass('hidden-item');
 						}
 					});
 				} else {
-					$('li', this.shadowList).removeClass('hidden-item');
+					lis.removeClass('hidden-item');
 					found = true;
 				}
+				
 				if(found){
 					this.hasViewableData = true;
 					this.showList();
@@ -3210,6 +3329,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 					this.updateListOptions();
 				}
 				this.showHideOptions();
+				if(!this.hasViewableData){return false;}
 				var that = this;
 				var css = $(this.input).offset();
 				css.top += $(this.input).outerHeight();

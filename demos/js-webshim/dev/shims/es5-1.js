@@ -86,6 +86,9 @@ if(Object.defineProperty && Object.prototype.__defineGetter__){
 		}catch(e){
 			supportDefineDOMProp = false;
 		}
+		if(!supportDefineDOMProp){
+			jQuery.support.advancedObjectProperties = false;
+		}
 	})();
 }
 
@@ -94,21 +97,18 @@ if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Obje
 	shims.objectCreate = function(proto, props, opts){
 		var o;
 		var f = function(){};
-		if(Object.create){
-			try {
-				o = Object.create(proto, props);
-				return o;
-			} catch(e){}
-		}
+		
 		f.prototype = proto;
 		o = new f();
 		if(props){
 			shims.defineProperties(o, props);
 		}
-		if(o.options && opts){
-			o.options = jQuery.extend(true, {}, o.options, opts);
+		
+		if(opts){
+			o.options = jQuery.extend(true, {}, o.options || {}, opts);
 			opts = o.options;
 		}
+		
 		if(o._create && jQuery.isFunction(o._create)){
 			o._create(opts);
 		}
@@ -128,17 +128,14 @@ if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Obje
 	shims.defineProperty = function(proto, property, descriptor){
 		if(typeof descriptor != "object"){return proto;}
 		
-		for(var i = 0; i < 3; i++){
-			if(!(descProps[i] in descriptor)){
-				descriptor[descProps[i]] = true;
-			}
-		}
+		
 		if(Object.defineProperty){
+			for(var i = 0; i < 3; i++){
+				if(!(descProps[i] in descriptor) && (descProps[i] !== 'writable' || descriptor.value !== undefined)){
+					descriptor[descProps[i]] = true;
+				}
+			}
 			try{
-				//IE8 has wrong defaults
-				descriptor.writeable = descriptor.writeable || false;
-				descriptor.configurable = descriptor.configurable || false;
-				descriptor.enumeratable = descriptor.enumerable || false;
 				Object.defineProperty(proto, property, descriptor);
 				return;
 			} catch(e){}

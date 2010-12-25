@@ -1,5 +1,8 @@
 (function($){
 
+$.expr.filters.willValidate = function(elem){
+	return $.attr(elem, 'willValidate');
+};
 
 module("validity");
 
