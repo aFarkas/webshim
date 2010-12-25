@@ -37,7 +37,7 @@
 		.d input {background: #000;}
 	</style>
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+	<script src="jquery-1.4x.js"></script>
 	<script src="../src/polyfiller.js"></script>
 	<script>
 //		$.webshims.addPolyfill('iecss', {
@@ -107,6 +107,12 @@
 			<option label="2Test Text 1 label" value="dsa22"></option>
 		</select>
 	</datalist>
+	
+	<select multiple id="multiple-test">
+		<option>dsa1</option>
+		<option>dsa2</option>
+		<option>dsa3</option>
+	</select>
 	<div class="input-date-datepicker-control"></div>
 	<script>
 		$(window).load(function(){

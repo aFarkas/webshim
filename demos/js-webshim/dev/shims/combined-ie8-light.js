@@ -1167,6 +1167,10 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				function(){
 					if( this.nodeType === 1 ){
 						var placeholder = this.getAttribute('placeholder');
+						if($.nodeName(this, 'select') || !placeholder){
+							oldVal.call($(this), '');
+							return;
+						}
 						if(placeholder && 'value' in this){
 							changePlaceholderVisibility(this, val, placeholder);
 						}
