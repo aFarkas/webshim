@@ -14,7 +14,7 @@
 	$('html').addClass('js-on').removeClass('js-off');
 	
 	$.webshims = {
-		version: '1.2.0RC',
+		version: '1.2.0',
 		useImportantStyles: true,
 		fix: {},
 		implement: {},
