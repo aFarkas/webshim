@@ -189,25 +189,25 @@
 	                        <label for="city">
 	                            Citys with datalist: 
 							</label>
-	                       	<input name="city" type="text" id="city" list="datalist" />
+	                       	<input name="city" type="text" id="city" list="datalist-id" />
 							
 							<hr />
 							$(this).attr("list", <select id="datalist-select">
-								<option value="datalist">datalist</option>
+								<option>datalist-id</option>
 								<option value="">"" (empty string)</option>
 								</select>);
 						 	<button class="feature setter" data-val="#datalist-select" data-name="list">change list</button>
-							<datalist id="datalist">
+							<datalist id="datalist-id">
 								<select>
-									<option value="New York City" label="New York City"></option>
-									<option value="London" label="London"></option>
-									<option value="Paris" label="Paris"></option>
-									<option value="Tokio" label="Tokio"></option>
-									<option value="Hongkong" label="Hongkong"></option>
+									<option value="New York City"></option>
+									<option value="London"></option>
+									<option value="Paris"></option>
+									<option value="Tokio"></option>
+									<option value="Hongkong"></option>
 								</select>
 							</datalist>
 <hr />							
-$('#datalist select').appendWebshim(<textarea style="width: 670px; font-size: 80%;" id="datalist-content">
+$('#datalist-id select').appendWebshim(<textarea style="width: 670px; font-size: 80%;" id="datalist-content">
 <option value="Singapur"></option>
 <option value="Chicago"></option>
 <option value="Seoul"></option>
@@ -217,7 +217,7 @@ $('#datalist select').appendWebshim(<textarea style="width: 670px; font-size: 80
 <option value="Brüssel"></option>
 <option value="Madrid"></option>
 </textarea>);
-						 	<button class="feature method" data-elem="#datalist select" data-val="#datalist-content" data-name="appendWebshim">add suggestions</button>
+						 	<button class="feature method" data-elem="#datalist-id select" data-val="#datalist-content" data-name="appendWebshim">add suggestions</button>
 							<p>Note: Always use htmlWebshim, appendWebshim, prependWebshim, afterWebshim, beforeWebshim to dynamically set HTML5 content.</p>
 	                    </div>
 	                    
@@ -233,6 +233,12 @@ $('#datalist select').appendWebshim(<textarea style="width: 670px; font-size: 80
 			Note: every shim is a hack! working with native cutting edge technology is also a hack!
 		</small>
     </section> 
-	
+<!--[if lte IE 7]>
+	<div class="browser-support"> 			
+		<div class="browser-support-box"> 				
+			Webshims Lib really cares about cross browser support and supports all A-Graded Browsers including IE6 and newest Opera. But I don't care about Styling/Layout issues in IE7- on this demo page.
+		</div> 		
+	</div>
+<![endif]-->
 </body>
 </html>   

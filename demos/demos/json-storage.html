@@ -52,13 +52,18 @@
 				<li>clear</li>
 				<li>key</li>
 			</ul>
-			<p>If the flash localStorage shim is used and the the storage limit is hit, the flash settings dialog will be placed in to view to request more space for the storage. If the user denies this. localStorage.setItem will be a noop in the current session.</p>
+			<p>If the flash localStorage shim is used and the the storage limit is hit, the flash settings dialog will be placed in to view to request more space for the storage. If the user denies this a DOMexception will be raised (<code>QUOTA_EXCEEDED_ERR: 22</code>).</p>
 			<p>Note: That IDL-attributes and the length property aren't implemented.</p>
-			<p>Note: To use localStorage/sessionStorage you should test your webapp/website in an http-enivroment. IE8 in IE7 mode does have the localStorage-interface, but only works like sessionStorage, we don't fully support this mode.</p>
+			<p>Note: To use localStorage/sessionStorage you should test your webapp/website in an http-enivroment.</p>
 <code class="block">
 $.webshims.ready('json-storage', function(){
 	if(localStorage.getItem('do-i-know-you') !== null){
 		//yes
+	} else {
+		//but now
+		try {
+			localStorage.setItem('do-i-know-you', 'now we can talk');
+		} catch(e){}
 	}
 });
 </code>			
@@ -77,6 +82,12 @@ $.webshims.ready('json-storage', function(){
 			Note: every shim is a hack! working with native cutting edge technology is also a hack!
 		</small>
     </section> 
-	
+<!--[if lte IE 7]>
+	<div class="browser-support"> 			
+		<div class="browser-support-box"> 				
+			Webshims Lib really cares about cross browser support and supports all A-Graded Browsers including IE6 and newest Opera. But I don't care about Styling/Layout issues in IE7- on this demo page.
+		</div> 		
+	</div>
+<![endif]-->
 </body>
 </html>   

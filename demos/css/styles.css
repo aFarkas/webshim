@@ -213,3 +213,19 @@ textarea {
 	-moz-border-radius: 2px;
 	border-radius: 2px;
 }
+.browser-support {
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+.browser-support-box {
+    background: none repeat scroll 0 0 #FFFF66;
+    border: 1px solid #000000;
+    color: #000000;
+    padding: 5px 20px;
+    text-align: center;
+}
+* html .step-controls {
+	top: 1px;
+}

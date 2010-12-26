@@ -141,13 +141,7 @@
 	                       	<input name="range" type="range" id="range" />
 	                    </div>
 						
-						<div class="form-element">
-	                        <label for="range2">
-	                            range + date:
-							</label>
-	                       	<input oninput="$(dateRange).attr( 'valueAsNumber', this.value )" value="1323129600000" min="1293840000000" step="86400000" max="1325289600000" name="range2" type="range" id="range2" />
-							<input onchange="$(range2).attr( 'value', $(this).attr('valueAsNumber') || undefined )" id="dateRange" type="date" value="2011-01-06" min="2011-01-01" max="2011-12-31" />
-	                    </div>
+						
 						
 						<div class="form-element">
 	                        <label for="time">
@@ -261,6 +255,12 @@
 			Note: every shim is a hack! working with native cutting edge technology is also a hack!
 		</small>
     </section> 
-	
+<!--[if lte IE 7]>
+	<div class="browser-support"> 			
+		<div class="browser-support-box"> 				
+			Webshims Lib really cares about cross browser support and supports all A-Graded Browsers including IE6 and newest Opera. But I don't care about Styling/Layout issues in IE7- on this demo page.
+		</div> 		
+	</div>
+<![endif]-->
 </body>
 </html>   

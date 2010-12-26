@@ -186,7 +186,6 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 (function(){
 	var swfTimer;
 	var emptyString = '(empty string)+1287520303738';
-	var blockStorage = false;
 	
 	$.webshims.localStorageSwfCallback = function(type){
 		clearTimeout(swfTimer);
@@ -210,7 +209,6 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 					window.localStorage[fn] = shim[fn];
 				});
 				window.localStorage.setItem = function(name, val){
-					if(blockStorage){return;}
 					storageNameError(name);
 					val += '';
 					if(!val){
@@ -241,10 +239,13 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 			});
 		},
 		hide: function(success){
-			if(!success){
-				blockStorage = true;
-			}
 			$('#swflocalstorageshim').css({top: '', left: ''});
+			if(!success){
+				var err = new Error('DOMException: QUOTA_EXCEEDED_ERR');
+				err.code = 22;
+				err.name = 'DOMException';
+				throw(err);
+			}
 		}
 	};
 	

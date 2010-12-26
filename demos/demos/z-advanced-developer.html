@@ -133,7 +133,6 @@ $.webshims.ready('mediaelements', function(){
 		
 		
 		<h2 id="implement-features">Implementing a new feature to Webshim Lib</h2>
-		<p>TBD</p>
 		<p>A Pollyfill always is split into at least 2 parts. First the test and loader definition and second the implementation.</p>
 <code class="block">
 $.webshims.addPolyfill('mediaelement', {
@@ -145,7 +144,11 @@ $.webshims.addPolyfill('mediaelement', {
 // = load mediaelement.js from shim-folder if test returns false and always create a jQuery-Plugin called play, wich trys to invoke native/polyfilled play
 </code>
 
-		<p>Now put a mediaelement.js inside of your shim folder and start implementing some features:</p>
+		<p>Now put a mediaelement.js inside of your shim folder and start implementing some features. Webshims lib comes with some very usefull implementation helpers. Here are two of them:</p>
+		<ul>
+			<li><code>$.webshims.defineNodeNamesProperty</code> (nodeNames, property, descriptor)</li>
+			<li><code>$.webshims.defineNodeNamesBooleanProperty</code> (nodeNames, property, descriptor)</li>
+		</ul>
 <code class="block">
 //Implements a new property on audio, video called currentTime
 $.webshims.defineNodeNamesProperty('audio, video', 'currentTime', {
@@ -238,6 +241,12 @@ $.webshims.addPolyfill('details', {
 			Note: every shim is a hack! working with native cutting edge technology is also a hack!
 		</small>
     </section> 
-	
+<!--[if lte IE 7]>
+	<div class="browser-support"> 			
+		<div class="browser-support-box"> 				
+			Webshims Lib really cares about cross browser support and supports all A-Graded Browsers including IE6 and newest Opera. But I don't care about Styling/Layout issues in IE7- on this demo page.
+		</div> 		
+	</div>
+<![endif]-->
 </body>
 </html>   

@@ -112,6 +112,11 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	
 	//date and datetime-local implement if we have to replace
 	if(!support.dateUI || options.replaceNative){
+		var datetimeFactor = {
+			trigger: [0.65,0.35],
+			normal: [0.6,0.4]
+		};
+		var subPixelCorrect = (!$.browser.msie || parseInt($.browser.version, 10) > 6) ? 0 : 0.45;
 		replaceInputUI['datetime-local'] = function(elem){
 			if(!$.fn.datepicker){return;}
 			var date = $('<span role="group" class="input-datetime-local"><input type="text" class="input-datetime-local-date" /><input type="time" class="input-datetime-local-time" /></span>'),
@@ -187,9 +192,9 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 				if(attr.outerWidth){
 					date.outerWidth(attr.outerWidth);
 					var width = date.width();
-					var widthFac = (data.trigger[0]) ? [0.65,0.35] : [0.6,0.4];
-					datePicker.outerWidth(Math.floor(width * widthFac[0]), true);
-					$('input.input-datetime-local-time', date).outerWidth(Math.floor(width * widthFac[1]), true);
+					var widthFac = (data.trigger[0]) ? datetimeFactor.trigger : datetimeFactor.normal;
+					datePicker.outerWidth(Math.floor((width * widthFac[0]) - subPixelCorrect), true);
+					$('input.input-datetime-local-time', date).outerWidth(Math.floor((width * widthFac[1]) - subPixelCorrect), true);
 					if(data.trigger[0]){
 						adjustInputWithBtn(datePicker, data.trigger);
 					}

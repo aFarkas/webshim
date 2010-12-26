@@ -77,7 +77,7 @@ $('form').bind('invalid', function(e){
 			<p>Webshims lib gives you three extensions to make this really simple.</p>
 			<ul>
 				<li>firstinvalid (event)</li>
-				<li>customValidationMessage (DOM-Property)</li>
+				<li>customValidationMessage (DOM-Property) (Note: to get this new property either <code>$.webshims.implement.customValidationMessage</code> or <code>$.webshims.overrideValidationMessage</code> has  be set to true before calling <code>$.webshims.polyfill();</code>)</li>
 				<li>$.webshims.validityAlert (Helper Object)</li>
 			</ul>
 			<p>Preventing the default and replacing the invalid-bubble with your own message, could look like this:</p>
@@ -108,6 +108,8 @@ $.webshims.overrideValidationMessages = true;
 $.webshims.polyfill();
 </code>
 			<p>Note: This site is loaded with <code>$.webshims.overrideValidationMessages = true;</code>.</p>
+			
+			<p>Recommendation: Prefer <code>$.webshims.implement.customValidationMessage = true;</code> to <code>$.webshims.overrideValidationMessages = true;</code> </p>
 			
 			<h3>Changing and Adding validation messages</h3>
 			<p>Webshims Lib validation messages are stored @ <code>$.webshims.validityMessages</code> as an object. The index is the specific language code. Currently there are only really bad validation messages for "en" and "de".</p>
@@ -200,14 +202,19 @@ $.webshims.ready('ready forms', function(){
 		//custom event, wich is fired on the first invalid element
 		//preventing firstinvalid will prevent all invalid events (but we have already done this)
 		.bind('firstinvalid', function(e){
-			//$.webshims.validityAlert is a usefull extension by webshim, wich sows and error bubble at a certain element
+			//$.webshims.validityAlert is a usefull extension by webshim, wich shows an error bubble at a certain element
 			//simply call $.webshims.validityAlert.showFor(DOM-Element/jQuery-Object/jQuery-Selector);
 			$.webshims.validityAlert.showFor(e.target);
 		})
 	;
 });
-</code>	
-
+</code>		
+			<h4>Overriding global validation messages on a specific element</h4>
+			<p>You can also set the attribute 'x-moz-errormessage' or 'data-errormessage' to override the global messages.</p>
+<code class="block">
+	&lt;label for="name"&gt;Name:&lt;/label&gt;
+	&lt;input id="name" required data-errormessage="Please tell us your Name" /&gt;
+</code>
 			<section>
 				<h3>Simple Demo</h3>
 				<form action="#">
@@ -339,6 +346,12 @@ $('form').bind('focusout', function(e){
 			Note: every shim is a hack! working with native cutting edge technology is also a hack!
 		</small>
     </section> 
-	
+<!--[if lte IE 7]>
+	<div class="browser-support"> 			
+		<div class="browser-support-box"> 				
+			Webshims Lib really cares about cross browser support and supports all A-Graded Browsers including IE6 and newest Opera. But I don't care about Styling/Layout issues in IE7- on this demo page.
+		</div> 		
+	</div>
+<![endif]-->
 </body>
 </html>   

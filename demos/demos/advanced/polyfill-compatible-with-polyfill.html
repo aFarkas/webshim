@@ -185,7 +185,7 @@
 							invalidLoopTimer: {value: false, writable: true},
 							testValidity: {
 								value: function(e){
-									if(!$(e.target).attr('willValidate') || e.target.type == 'submit'){return;}
+									if(!e.target.form || !$(e.target).attr('willValidate') || e.target.type == 'submit'){return;}
 									var validity = $(e.target).attr('validity');
 									if( validity.valid ){
 										this.markValid(e.target);

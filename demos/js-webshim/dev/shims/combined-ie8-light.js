@@ -1350,9 +1350,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 			var data;
 			try {
 				data = JSON.parse(localStorage.getItem('storedDatalistOptions'+name));
-			} catch(e){
-				data = [];
-			}
+			} catch(e){}
 			return data || [];
 		};
 		var storeOptions = function(name, val){
@@ -1378,7 +1376,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				if(datalist && data && (data.datalist !== datalist)){
 					data.datalist = datalist;
 					data.id = opts.id;
-					data.needsUpdate = true;
+					data._resetListCached();
 					return;
 				} else if(!datalist){
 					if(data){
@@ -1394,7 +1392,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				};
 				this.datalist = datalist;
 				this.id = opts.id;
-				this.idindex = listidIndex;
+				this.lazyIDindex = listidIndex;
 				this.hasViewableData = true;
 				this._autocomplete = $.attr(opts.input, 'autocomplete');
 				$.data(opts.input, 'datalistWidget', this);
@@ -1402,8 +1400,6 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				this.index = -1;
 				this.input = opts.input;
 				this.arrayOptions = [];
-				
-				this.storedOptions = getStoredOptions(opts.input.name || opts.input.id);
 				
 				
 				this.shadowList
@@ -1433,9 +1429,9 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 						if(keyCode == 40 && !that.showList()){
 							that.markItem(that.index + 1, true);
 							return false;
-						} 
-						
-						if(!that.shadowList.hasClass('datalist-visible')){return;}
+						}
+						 
+						if(!that.isListVisible){return;}
 						
 						 
 						if(keyCode == 38){
@@ -1462,19 +1458,15 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				
 				$(this.datalist)
 					.unbind('updateDatalist.datalistWidget')
-					.bind('updateDatalist.datalistWidget', function(){
-						that.needsUpdate = true;
-						that.lastUpdatedValue = false;
-						that.updateListOptions();
-					})
+					.bind('updateDatalist.datalistWidget', $.proxy(this, '_resetListCached'))
 				;
-				that.updateTimer = setTimeout(function(){
-					that.updateListOptions();
-				}, 10 *  that.idindex);
+				
+				this._resetListCached();
 				
 				if(opts.input.form && opts.input.id){
 					$(opts.input.form).bind('submit.datalistWidget'+opts.input.id, function(){
 						var val = $.attr(opts.input, 'value');
+						that.storedOptions = that.storedOptions || getStoredOptions(opts.input.name || opts.input.id);
 						if(val && $.inArray(val, that.storedOptions) == -1){
 							that.storedOptions.push(val);
 							storeOptions(opts.input.name || opts.input.id, that.storedOptions );
@@ -1500,6 +1492,18 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 					$(this.input).attr('autocomplete', autocomplete);
 				}
 			},
+			_resetListCached: function(){
+				var that = this;
+				this.needsUpdate = true;
+				this.lastUpdatedValue = false;
+				this.lastUnfoundValue = '';
+				
+				
+				clearTimeout(this.updateTimer);
+				this.updateTimer = setTimeout(function(){
+					that.updateListOptions();
+				}, this.isListVisible ? 0 : 20 * this.lazyIDindex);
+			},
 			updateListOptions: function(){
 				this.needsUpdate = false;
 				clearTimeout(this.updateTimer);
@@ -1508,8 +1512,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 					fontFamily: $.curCSS(this.input, 'fontFamily')
 				});
 				var list = '<ul role="list" class="'+ (this.datalist.className || '') +'">';
-				var value = $.attr(this.input, 'value');
-				var hideList = false;
+				
 				var values = [];
 				var allOptions = [];
 				$('option', this.datalist).each(function(i){
@@ -1526,48 +1529,35 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 					values[i] = item.value;
 					allOptions[i] = item;
 				});
-				$.each(this.storedOptions, function(i, val){
+				this.storedOptions = this.storedOptions || getStoredOptions(this.input.name || this.input.id);
+				this.storedOptions.forEach(function(val, i){
 					if($.inArray(val, values) == -1){
 						allOptions.push({value: val, text: val, className: '', style: ''});
 					}
 				});
-				if(this.shadowList.hasClass('datalist-visible') && value){
-					hideList = true;
-					$.each(allOptions, function(i, item){
-						var visibility = '';
-						item.lowerText = item.text.toLowerCase();
-						item.lowerValue = item.value.toLowerCase();
-						if(item.lowerText.indexOf(value) == -1 && item.lowerValue.indexOf(value) == -1){ 
-							visibility = ' class="hidden-item"';
-						} else {
-							hideList = false;
-						}
-						list += '<li'+ visibility +' class="'+ item.className +'" style="'+ item.style +'" role="listitem" tabindex="-1" data-value="'+item.value+'">'+ item.text +'</li>';
-					});
-					this.lastUpdatedValue = value;
-				} else {
-					$.each(allOptions, function(i, item){
-						list += '<li data-value="'+item.value+'" class="'+ item.className +'" style="'+ item.style +'" tabindex="-1" role="listitem">'+ item.text +'</li>';
-					});
-					this.lastUpdatedValue = false;
-				}
+				
+				allOptions.forEach(function(item, i){
+					list += '<li data-value="'+item.value+'" class="'+ item.className +'" style="'+ item.style +'" tabindex="-1" role="listitem">'+ item.text +'</li>';
+				});
+				
 				list += '</ul>';
-				this.hasViewableData = !hideList;
 				this.arrayOptions = allOptions;
 				this.shadowList.html(list);
-				if(hideList){
-					this.hideList();
+				if(this.isListVisible){
+					this.showHideOptions();
 				}
 			},
 			showHideOptions: function(){
-				var value = $.attr(this.input, 'value');
-				if(value === this.lastUpdatedValue){return;}
+				var value = $.attr(this.input, 'value').toLowerCase();
+				//first check prevent infinite loop, second creates simple lazy optimization
+				if(value === this.lastUpdatedValue || (this.lastUnfoundValue && value.indexOf(this.lastUnfoundValue) === 0)){
+					return;
+				}
 				this.lastUpdatedValue = value;
 				var found = false;
 				var lis = $('li', this.shadowList);
 				if(value){
-					value = value.toLowerCase();
-					$.each(this.arrayOptions, function(i, item){
+					this.arrayOptions.forEach(function(item, i){
 						if(!('lowerText' in item)){
 							item.lowerText = item.text.toLowerCase();
 							item.lowerValue = item.value.toLowerCase();
@@ -1585,16 +1575,17 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 					found = true;
 				}
 				
+				this.hasViewableData = found;
+				
 				if(found){
-					this.hasViewableData = true;
 					this.showList();
 				} else {
-					this.hasViewableData = false;
+					this.lastUnfoundValue = value;
 					this.hideList();
 				}
 			},
 			showList: function(){
-				if(!this.hasViewableData || this.shadowList.hasClass('datalist-visible') || $(this.input).attr('autocomplete') == 'off'){return false;}
+				if(this.isListVisible){return false;}
 				if(this.needsUpdate){
 					this.updateListOptions();
 				}
@@ -1613,6 +1604,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 					}
 				}
 				this.shadowList.css(css).addClass('datalist-visible');
+				this.isListVisible = true;
 				//todo
 				$(document).bind('mousedown.datalist'+this.id +' focusin.datalist'+this.id, function(e){
 					if(e.target === that.input ||  that.shadowList[0] === e.target || $.contains( that.shadowList[0], e.target )){
@@ -1627,13 +1619,14 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				return true;
 			},
 			hideList: function(){
-				if(!this.shadowList.hasClass('datalist-visible')){return false;}
+				if(!this.isListVisible){return false;}
 				this.shadowList
 					.removeClass('datalist-visible list-item-active')
 					.scrollTop(0)
 					.find('li.active-item').removeClass('active-item')
 				;
 				this.index = -1;
+				this.isListVisible = false;
 				$(this.input).removeAttr('aria-activedescendant');
 				$(document).unbind('.datalist'+this.id);
 				return true;

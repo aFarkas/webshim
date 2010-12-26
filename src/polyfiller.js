@@ -14,7 +14,7 @@
 	$('html').addClass('js-on').removeClass('js-off');
 	
 	$.webshims = {
-		version: 'pre1.2.0',
+		version: '1.2.0RC',
 		useImportantStyles: true,
 		fix: {},
 		implement: {},
@@ -926,7 +926,7 @@
 		
 		addPolyfill('form-native-fix', {
 			feature: 'forms',
-			test: function(){return support.requiredSelect && !$.browser.webkit;},
+			test: function(){return support.requiredSelect && support.validationMessage && support.output && support.datalist;},
 			combination: ['combined-webkit']
 		});
 		
@@ -995,7 +995,7 @@
 				if(value && value.getAttribute){
 					value = $.webshims.getID(value);
 				}
-				elem.list = value;
+				elem.setAttribute('list', value);
 			}
 		});
 	}
