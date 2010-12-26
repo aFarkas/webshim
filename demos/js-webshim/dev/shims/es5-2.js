@@ -51,7 +51,6 @@ if (!Array.prototype.forEach) {
         }
     };
 }
-
 // ES5 15.4.4.19
 // https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/map
 if (!Array.prototype.map) {
