@@ -897,7 +897,7 @@
 	addPolyfill('form-message', {
 		feature: 'forms',
 		test: function(toLoad){
-			return (support.validity && support.validationMessage && webshims.implement.customValidationMessage && modules['form-extend'].test(toLoad) );
+			return (support.validity && support.validationMessage && !webshims.implement.customValidationMessage && modules['form-extend'].test(toLoad) );
 		},
 		options: {},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light', 'combined-webkit']

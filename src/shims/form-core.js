@@ -217,7 +217,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				$(doc).bind('focusout.validityalert', boundHide);
 			},
 			getMessage: function(elem, message){
-				$('> span.va-box', alert).text(message || elem.attr('validationMessage'));
+				$('> span.va-box', alert).text(message || elem.attr('customValidationMessage') || elem.attr('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
