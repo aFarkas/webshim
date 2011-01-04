@@ -99,20 +99,23 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 		};
 		
 		webshims.defineNodeNameProperty('output', 'value', {
-			set: function(elem, value){
+			set: function(value){
+				var elem = this;
 				var setVal = $.data(elem, 'outputShim');
 				if(!setVal){
 					setVal = outputCreate(elem);
 				}
 				setVal(value);
 			},
-			get: function(elem){
+			get: function(){
+				var elem = this;
 				return webshims.contentAttr(elem, 'value') || $(elem).text() || '';
 			}
 		});
 		
 		webshims.onNodeNamesPropertyModify('input', 'value', {
-			set: function(elem, value){
+			set: function(value){
+				var elem = this;
 				var setVal = $.data(elem, 'outputShim');
 				if(setVal){
 					setVal(value);
@@ -468,14 +471,16 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 		
 		
 		webshims.defineNodeNameProperty('input', 'list', {
-			get: function(elem){
+			get: function(){
+				var elem = this;
 				var val = webshims.contentAttr(elem, 'list');
 				if(typeof val == 'string'){
 					val = document.getElementById(val);
 				}
 				return val || null;
 			},
-			set: function(elem, value){
+			set: function(value){
+				var elem = this;
 				var dom;
 				if(value && value.getAttribute){
 					dom = value;
@@ -490,7 +495,8 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 		});
 		
 		webshims.defineNodeNameProperty('input', 'selectedOption', {
-			get: function(elem){
+			get: function(){
+				var elem = this;
 				var list = $.attr(elem, 'list');
 				var ret = null;
 				var value, options;
@@ -510,14 +516,16 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 		});
 			
 		webshims.defineNodeNameProperty('input', 'autocomplete', {
-			get: function(elem){
+			get: function(){
+				var elem = this;
 				var data = $.data(elem, 'datalistWidget');
 				if(data){
 					return data._autocomplete;
 				}
 				return ('autocomplete' in elem) ? elem.autocomplete : elem.getAttribute('autocomplete');
 			},
-			set: function(elem, value){
+			set: function(value){
+				var elem = this;
 				var data = $.data(elem, 'datalistWidget');
 				if(data){
 					data._autocomplete = value;
@@ -536,7 +544,8 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 		
 		
 		webshims.defineNodeNameProperty('datalist', 'options', {
-			get: function(elem){
+			get: function(){
+				var elem = this;
 				var select = $('select', elem);
 				return (select[0]) ? select[0].options : [];
 			}
@@ -558,5 +567,5 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 	})();
 	
 	
-	webshims.createReadyEvent('form-output-datalist');
-}, true);
+	webshims.isReady('form-output-datalist', true);
+});

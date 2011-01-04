@@ -45,7 +45,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	};
 	
 	var currentValidationMessage =  validityMessages[''];
-	$(doc).bind('htmlExtLangChange', function(){
+	$(doc).bind('webshimLocalizationReady', function(){
 		webshims.activeLang(validityMessages, 'form-message', function(langObj){
 			currentValidationMessage = langObj;
 		});
@@ -76,7 +76,8 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	
 	$.each(implementProperties, function(i, messageProp){
 		webshims.defineNodeNamesProperty(['input', 'select', 'textarea', 'fieldset', 'output'], messageProp, {
-			get: function(elem){
+			get: function(){
+				var elem = this;
 				var message = '';
 				if(!$.attr(elem, 'willValidate')){
 					return message;
@@ -102,4 +103,4 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		});
 		
 	});
-}, true);
+});

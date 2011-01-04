@@ -116,13 +116,15 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 	//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
 	
 	var valueAsNumberDescriptor = {
-		get: function(elem){
+		get: function(){
+			var elem = this;
 			var type = getType(elem);
 			return (typeModels[type] && typeModels[type].asNumber) ? 
 				typeModels[type].asNumber($.attr(elem, 'value')) :
 				nan;
 		},
-		set: function(elem, val){
+		set: function(val){
+			var elem = this;
 			var type = getType(elem);
 			if(typeModels[type] && typeModels[type].numberToString){
 				//is NaN a number?
@@ -137,19 +139,21 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 					throw('INVALID_STATE_ERR: DOM Exception 11');
 				}
 			} else {
-				valueAsNumberDescriptor.set._polyfilled(elem, arguments);
+				valueAsNumberDescriptor._supset.call(elem, arguments);
 			}
 		}
 	};
 	
 	var valueAsDateDescriptor = {
-		get: function(elem){
+		get: function(){
+			var elem = this;
 			var type = getType(elem);
 			return (typeModels[type] && typeModels[type].asDate && !typeModels[type].noAsDate) ? 
 				typeModels[type].asDate($.attr(elem, 'value')) :
-				valueAsDateDescriptor.get_polyfilled.call(elem);
+				valueAsDateDescriptor._supget.call(elem);
 		},
-		set: function(elem, value){
+		set: function(value){
+			var elem = this;
 			var type = getType(elem);
 			if(typeModels[type] && typeModels[type].dateToString){
 				if(!window.noHTMLExtFixes) {
@@ -167,7 +171,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 					throw('INVALID_STATE_ERR: DOM Exception 11');
 				}
 			} else {
-				return valueAsDateDescriptor.set._polyfilled(elem, arguments);
+				return valueAsDateDescriptor._supset(elem, arguments);
 			}
 		}
 	};
@@ -366,12 +370,14 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 	
 	// add support for new input-types
 	webshims.defineNodeNameProperty('input', 'type', {
-		get: function(elem){
+		get: function(){
+			var elem = this;
 			var type = getType(elem);
 			return (webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
-		}
+		},
+		set: $.noop
 	});
 	
-	webshims.createReadyEvent('form-number-date');
+	webshims.isReady('form-number-date', true);
 	
-}, true);
+});

@@ -152,11 +152,11 @@ $.webshims.addPolyfill('mediaelement', {
 <code class="block">
 //Implements a new property on audio, video called currentTime
 $.webshims.defineNodeNamesProperty('audio, video', 'currentTime', {
-	get: function(elem){
-		//your getter implementation (elem refers to the element)
+	get: function(){
+		//your getter implementation (this refers to the element)
 	},
-	set: function(elem, value){
-		//your setter implementation (elem refers to the element)
+	set: function(value){
+		//your setter implementation (this refers to the element)
 	}
 });
 
@@ -172,7 +172,7 @@ $.webshims.defineNodeNamesProperty('audio, video', 'play', {
 $.webshims.defineNodeNamesBooleanProperty('audio, video', 'controls', {
 	//set works more like an onSet:
 	//you don't have to set the value anymore on the domnode, only handle true/false values
-	set: function(elem, value){
+	set: function(value){
 		if(value){
 			//show controls for elem
 		} else {
@@ -184,7 +184,7 @@ $.webshims.defineNodeNamesBooleanProperty('audio, video', 'controls', {
 </code>
 		
 		<p>Here is a quick working example for implementing the details and summary elements.</p>
-		<p>Webshims lib uses a sort of client-side browser-specific combination. This combinations aren't very flexible, but easy to use. If you want to develop, you can test the source-files by using <code>$.webshims.debug = true;</code>.</p>
+		
 <code class="block">
 $.webshims.addPolyfill('details', {
 	test: function(){
@@ -199,8 +199,9 @@ $.webshims.addPolyfill('details', {
 	//override jQuery's attribute method for all details - elements...
 	//... in case of the open attribute
 	$.webshims.defineNodeNamesBooleanProperty('details', 'open', {
-		set: function(elem, value){
+		set: function(value){
 			//get polyfill-methods
+			var elem = this;
 			var polyfill = $.data(elem, 'detailsPolyfill');
 			//if we haven't polyfilled this element, then do it now
 			if(!polyfill){
@@ -235,6 +236,7 @@ $.webshims.addPolyfill('details', {
 	
 })(jQuery);
 </code>
+		<p>Webshims lib uses a sort of client-side browser-specific combination. This combinations aren't very flexible, but easy to use. If you want to develop, you can test the source-files by using <code>$.webshims.debug = true;</code>.</p>
 		</section>
 				
 		<small>

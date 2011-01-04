@@ -35,9 +35,10 @@
 		}
 		
 		.d input {background: #000;}
+		
 	</style>
 	
-	<script src="jquery-1.4x.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 	<script src="../src/polyfiller.js"></script>
 	<script>
 //		$.webshims.addPolyfill('iecss', {
@@ -50,14 +51,19 @@
 		
 		
 		
-		
 	</script>
 	<title>playing</title>
 	    <script>
 	    				
 			$.webshims.debug = true;
+			$.webshims.cfg.extendNative = true;
 			$.webshims.loader.basePath += 'shims/';
 			$.webshims.polyfill();
+			
+			$.webshims.ready('ready forms', function(){
+				$('#input-list')[0].required = true;
+//				console.log(.validity.valid);
+			})
 			
 	    </script>
 </head>
@@ -68,7 +74,10 @@
 	<button type="submit">fdsfdsf</button>
 	<div>
 	
-	<input placeholder="saa" required="d" id="input-list" type="password" list="datalist" />
+	<input required="" placeholder="saa" id="input-list" type="password" list="datalist" />
+
+	<input placeholder="saa" id="input-list" type="password" list="datalist" />
+
 
 	<input placeholder="saa" type="text" />
 	<datalist id="datalist">
@@ -113,12 +122,7 @@
 		<option>dsa2</option>
 		<option>dsa3</option>
 	</select>
-	<div class="input-date-datepicker-control"></div>
-	<script>
-		$(window).load(function(){
-			$('div.input-date-datepicker-control').datepicker();
-		})
-	</script>
+	
 	
 	<button type="submit">fdsfdsf</button>
 </div>

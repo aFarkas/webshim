@@ -52,7 +52,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		
 	});
 	//better you use the selectors above
-	['required', 'valid', 'invalid', 'required', 'optional'].forEach(function(name){
+	['valid', 'invalid', 'required', 'optional'].forEach(function(name){
 		$.expr.filters[name] = $.expr.filters[name+"-element"];
 	});
 	
@@ -217,7 +217,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				$(doc).bind('focusout.validityalert', boundHide);
 			},
 			getMessage: function(elem, message){
-				$('> span.va-box', alert).text(message || elem.attr('validationMessage'));
+				$('> span.va-box', alert).text(message || elem.attr('customValidationMessage') || elem.attr('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
@@ -329,8 +329,8 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	})();
 	
 	
-	webshims.createReadyEvent('form-core');
-}, true);
+	webshims.isReady('form-core', true);
+});
 
 
 
@@ -381,7 +381,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	};
 	
 	var currentValidationMessage =  validityMessages[''];
-	$(doc).bind('htmlExtLangChange', function(){
+	$(doc).bind('webshimLocalizationReady', function(){
 		webshims.activeLang(validityMessages, 'form-message', function(langObj){
 			currentValidationMessage = langObj;
 		});
@@ -412,7 +412,8 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	
 	$.each(implementProperties, function(i, messageProp){
 		webshims.defineNodeNamesProperty(['input', 'select', 'textarea', 'fieldset', 'output'], messageProp, {
-			get: function(elem){
+			get: function(){
+				var elem = this;
 				var message = '';
 				if(!$.attr(elem, 'willValidate')){
 					return message;
@@ -438,7 +439,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		});
 		
 	});
-}, true);jQuery.webshims.ready('form-message form-core', function($, webshims, window, doc, undefined){
+});jQuery.webshims.ready('form-message form-core', function($, webshims, window, doc, undefined){
 //	"use strict";
 	var support = $.support;
 	if(!support.validity){return;}
@@ -522,8 +523,8 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 			
 	if(!support.requiredSelect){
 		webshims.defineNodeNamesBooleanProperty(['select'], 'required', {
-			set: function(elem, value){
-				elem.setAttribute('aria-required', (value) ? 'true' : 'false');
+			set: function(value){
+				this.setAttribute('aria-required', (value) ? 'true' : 'false');
 			},
 			init: true
 		});
@@ -544,62 +545,66 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	}
 	
 	if(overrideValidity){
-		webshims.defineNodeNamesProperty(validityElements, 'validity', {
-			get: function(elem){
-				
-				var validity = elem.validity;
-				if(!validity){
-					return validity;
-				}
-				var validityState = {};
-				validityProps.forEach(function(prop){
-					validityState[prop] = validity[prop];
-				});
-				
-				if( !$.attr(elem, 'willValidate') ){
-					return validityState;
-				}
-				var jElm 			= $(elem),
-					cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
-					val				= oldVal.call(jElm),
-					customError 	= !!($.data(elem, 'hasCustomError')),
-					setCustomMessage
-				;
-				
-				validityState.customError = customError;
-									
-				if( validityState.valid && validityState.customError ){
-					validityState.valid = false;
-				} else if(!validityState.valid) {
-					var allFalse = true;
-					$.each(validityState, function(name, prop){
-						if(prop){
-							allFalse = false;
-							return false;
-						}
+		
+		validityElements.forEach(function(nodeName){
+			
+			var oldDesc = webshims.defineNodeNameProperty(nodeName, 'validity', {
+				get: function(){
+					var elem = this;
+					var validity = oldDesc._supget.call(this);
+					if(!validity){
+						return validity;
+					}
+					var validityState = {};
+					validityProps.forEach(function(prop){
+						validityState[prop] = validity[prop];
 					});
 					
-					if(allFalse){
-						validityState.valid = true;
+					if( !$.attr(elem, 'willValidate') ){
+						return validityState;
+					}
+					var jElm 			= $(elem),
+						cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
+						val				= oldVal.call(jElm),
+						customError 	= !!($.data(elem, 'hasCustomError')),
+						setCustomMessage
+					;
+					
+					validityState.customError = customError;
+										
+					if( validityState.valid && validityState.customError ){
+						validityState.valid = false;
+					} else if(!validityState.valid) {
+						var allFalse = true;
+						$.each(validityState, function(name, prop){
+							if(prop){
+								allFalse = false;
+								return false;
+							}
+						});
+						
+						if(allFalse){
+							validityState.valid = true;
+						}
+						
 					}
 					
-				}
-				
-				$.each(validityRules, function(rule, fn){
-					validityState[rule] = fn(jElm, val, cache, validityState);
-					if( validityState[rule] && (validityState.valid || (!setCustomMessage && overrideNativeMessages)) ) {
-						elem.setCustomValidity(webshims.createValidationMessage(elem, rule));
-						validityState.valid = false;
-						setCustomMessage = true;
+					$.each(validityRules, function(rule, fn){
+						validityState[rule] = fn(jElm, val, cache, validityState);
+						if( validityState[rule] && (validityState.valid || (!setCustomMessage && overrideNativeMessages)) ) {
+							elem.setCustomValidity(webshims.createValidationMessage(elem, rule));
+							validityState.valid = false;
+							setCustomMessage = true;
+						}
+					});
+					if(validityState.valid){
+						elem.setCustomValidity('');
 					}
-				});
-				if(validityState.valid){
-					elem.setCustomValidity('');
-				}
-				return validityState;
-			},
-			set: $.noop
-			
+					return validityState;
+				},
+				set: $.noop
+				
+			}, true);
 		});
 							
 		$.fn.val = function(val){
@@ -635,8 +640,8 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		});
 		
 	} //end: overrideValidity -> (!supportRequiredSelect || !supportNumericDate || overrideNativeMessages)
-	webshims.createReadyEvent('form-extend');
-}, true);jQuery.webshims.ready('form-extend', function($, webshims, window){
+	webshims.isReady('form-extend', true);
+});jQuery.webshims.ready('form-extend', function($, webshims, window){
 	"use strict";
 	//why no step IDL?
 	webshims.getStep = function(elem, type){
@@ -754,13 +759,15 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
 	
 	var valueAsNumberDescriptor = {
-		get: function(elem){
+		get: function(){
+			var elem = this;
 			var type = getType(elem);
 			return (typeModels[type] && typeModels[type].asNumber) ? 
 				typeModels[type].asNumber($.attr(elem, 'value')) :
 				nan;
 		},
-		set: function(elem, val){
+		set: function(val){
+			var elem = this;
 			var type = getType(elem);
 			if(typeModels[type] && typeModels[type].numberToString){
 				//is NaN a number?
@@ -775,19 +782,21 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 					throw('INVALID_STATE_ERR: DOM Exception 11');
 				}
 			} else {
-				valueAsNumberDescriptor.set._polyfilled(elem, arguments);
+				valueAsNumberDescriptor._supset.call(elem, arguments);
 			}
 		}
 	};
 	
 	var valueAsDateDescriptor = {
-		get: function(elem){
+		get: function(){
+			var elem = this;
 			var type = getType(elem);
 			return (typeModels[type] && typeModels[type].asDate && !typeModels[type].noAsDate) ? 
 				typeModels[type].asDate($.attr(elem, 'value')) :
-				valueAsDateDescriptor.get_polyfilled.call(elem);
+				valueAsDateDescriptor._supget.call(elem);
 		},
-		set: function(elem, value){
+		set: function(value){
+			var elem = this;
 			var type = getType(elem);
 			if(typeModels[type] && typeModels[type].dateToString){
 				if(!window.noHTMLExtFixes) {
@@ -805,7 +814,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 					throw('INVALID_STATE_ERR: DOM Exception 11');
 				}
 			} else {
-				return valueAsDateDescriptor.set._polyfilled(elem, arguments);
+				return valueAsDateDescriptor._supset(elem, arguments);
 			}
 		}
 	};
@@ -1004,20 +1013,21 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	
 	// add support for new input-types
 	webshims.defineNodeNameProperty('input', 'type', {
-		get: function(elem){
+		get: function(){
+			var elem = this;
 			var type = getType(elem);
 			return (webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
-		}
+		},
+		set: $.noop
 	});
 	
-	webshims.createReadyEvent('form-number-date');
+	webshims.isReady('form-number-date', true);
 	
-}, true);
+});
 /* number-date-ui */
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
 jQuery.webshims.ready('form-number-date', function($, webshims, window, document){
 	"use strict";
-	
 	var triggerInlineForm = webshims.triggerInlineForm;
 	var adjustInputWithBtn = function(input, button){
 		var inputDim = {
@@ -1462,7 +1472,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	$(document).bind('jquery-uiReady.langchange input-widgetsReady.langchange', function(){
 		if(!$.datepicker){return;}
 		$(document)
-			.bind('htmlExtLangChange', function(){
+			.bind('webshimLocalizationReady', function(){
 				webshims.activeLang($.datepicker.regional, 'inputUI', changeDefaults);
 			})
 			.unbind('jquery-uiReady.langchange input-widgetsReady.langchange')
@@ -1470,15 +1480,17 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	});
 	
 	webshims.addReady(function(context, elem){
+		
 		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(){
 			if($.datepicker || $.fn.slider){
 				replaceInputUI(context, elem);
 			}
+			
 			if($.datepicker && $.fn.slider){
 				$(document).unbind('jquery-uiReady.initinputui input-widgetsReady.initinputui');
 			}
 			if(context === document){
-				webshims.createReadyEvent('inputUI');
+				webshims.isReady('inputUI', true);
 			}
 		});
 	});
@@ -1623,5 +1635,5 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	});
 })();
 	
-}, true);
+});
 

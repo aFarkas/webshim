@@ -52,7 +52,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		
 	});
 	//better you use the selectors above
-	['required', 'valid', 'invalid', 'required', 'optional'].forEach(function(name){
+	['valid', 'invalid', 'required', 'optional'].forEach(function(name){
 		$.expr.filters[name] = $.expr.filters[name+"-element"];
 	});
 	
@@ -217,7 +217,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				$(doc).bind('focusout.validityalert', boundHide);
 			},
 			getMessage: function(elem, message){
-				$('> span.va-box', alert).text(message || elem.attr('validationMessage'));
+				$('> span.va-box', alert).text(message || elem.attr('customValidationMessage') || elem.attr('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
@@ -329,8 +329,8 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	})();
 	
 	
-	webshims.createReadyEvent('form-core');
-}, true);
+	webshims.isReady('form-core', true);
+});
 
 
 

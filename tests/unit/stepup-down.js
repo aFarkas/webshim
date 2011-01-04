@@ -69,7 +69,7 @@ asyncTest("stepup", function(){
 			}
 		], function(i, testItem){
 			stepTest(testItem);
-		})
+		});
 	}
 	
 	

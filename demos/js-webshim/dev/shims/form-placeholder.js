@@ -171,26 +171,29 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	};
 	
 	webshims.defineNodeNamesProperty(['input', 'textarea'], 'placeholder', {
-		set: function(elem, val){
+		set: function(val){
+			var elem = this;
 			pHolder.update(elem, val);
 		},
 		get: function(elem){
-			return webshims.contentAttr(elem, 'placeholder') || '';
+			return webshims.contentAttr(this, 'placeholder') || '';
 		},
 		init: true
 	});
 			
 	$.each(['input', 'textarea'], function(i, name){
 		var desc = webshims.defineNodeNameProperty(name, 'value', {
-			set: function(elem, val){
+			set: function(val){
+				var elem = this;
 				var placeholder = webshims.contentAttr(elem, 'placeholder');
 				if(placeholder && 'value' in elem){
 					changePlaceholderVisibility(elem, val, placeholder);
 				}
-				return desc.set._polyfilled(elem, val);
+				return desc._supset.call(elem, val);
 			},
-			get: function(elem){
-				return $(elem).hasClass('placeholder-visible') ? '' : desc.get._polyfilled(elem);
+			get: function(){
+				var elem = this;
+				return $(elem).hasClass('placeholder-visible') ? '' : desc._supget.call(elem);
 			}
 		});
 	});

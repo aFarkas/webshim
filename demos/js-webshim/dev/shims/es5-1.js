@@ -156,12 +156,18 @@ if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Obje
 		return proto;
 	};
 	
+	shims.getPrototypeOf = function (object) {
+        return object.__proto__ || object.constructor.prototype;
+    };
+	
 	//based on http://www.refactory.org/s/object_getownpropertydescriptor/view/latest 
 	shims.getOwnPropertyDescriptor = function(obj, prop){
+		if (typeof obj !== "object" && typeof obj !== "function" || obj === null){
+            throw new TypeError("Object.getOwnPropertyDescriptor called on a non-object");
+		}
 		var descriptor;
 		if(Object.defineProperty && Object.getOwnPropertyDescriptor){
 			try{
-				//IE8
 				descriptor = Object.getOwnPropertyDescriptor(obj, prop);
 				return descriptor;
 			} catch(e){}

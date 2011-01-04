@@ -1448,7 +1448,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc){
 	});
 	$(function(){
 		setTimeout(function(){
-			webshims.createReadyEvent('canvas');
+			webshims.isReady('canvas', true);
 		}, 9);
 	});
 });

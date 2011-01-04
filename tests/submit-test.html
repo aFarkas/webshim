@@ -22,10 +22,14 @@
 			if(hash.indexOf('overrideValidationMessages') !== -1){
 				$.webshims.overrideValidationMessages = true; 
 			}
+			if(hash.indexOf('customValidationMessage') !== -1){
+				$.webshims.implement.customValidationMessage = true; 
+			}
 			
 			$(function(){
 				$('#bugfixes').attr('checked', !!window.noHTMLExtFixes);
 				$('#overrideValidationMessages').attr('checked', !!$.webshims.overrideValidationMessages);
+				$('#customValidationMessage').attr('checked', !!$.webshims.implement.customValidationMessage);
 				$('input.webshim-config')
 					.bind('click', function(){
 						var addHash = '';
@@ -58,7 +62,7 @@
 			}, true);
 		}
 		
-		$(function(){
+		$.webshims.ready('ready forms', function(){
 			var invalidEvents, submitEvents, preventInvalid, firstInvalidEvents;
 			
 			function equals(is, should, message){
@@ -75,7 +79,16 @@
 				submitPrevent = true;
 				$('#test-result').empty();
 			}
-					
+			
+			$('#test-1').attr('value', '');
+			equals(typeof $('#test-1').attr('validationMessage'), 'string', 'validationMessage is a string');
+			equals(!!$('#test-1').attr('validationMessage'), true, 'validationMessage has a value');
+			if($.webshims.implement.customValidationMessage){
+				equals(typeof $('#test-1').attr('customValidationMessage'), 'string', 'customValidationMessage is a string, if implemented');
+				equals(!!$('#test-1').attr('customValidationMessage'), true, 'customValidationMessage has a value, if implemented');
+			} else {
+				equals(typeof $('#test-1').attr('customValidationMessage'), 'undefined', 'customValidationMessage is undefined, if not implemented');
+			}
 			
 			$('input.invalid-submit').click(function(){
 				reset();
@@ -241,6 +254,8 @@
 <div>
 	<input type="checkbox" id="bugfixes" value="noCapableBugfixes" class="webshim-config" /> <label for="bugfixes"><strong>without</strong> (capable browser) bugfixes</label>
 	<input type="checkbox" id="overrideValidationMessages" value="overrideValidationMessages" class="webshim-config" /> <label for="overrideValidationMessages">overrideValidationMessages</label>
+	<input type="checkbox" id="customValidationMessage" value="customValidationMessage" class="webshim-config" /> <label for="customValidationMessage">customValidationMessage</label>
+	
 </div>
 <ul id="test-result">
 	
@@ -248,7 +263,7 @@
 <div id="wrapper">	
 	
     <form action="bigfail.html">
-    	<input name="test-1" class="text" type="text" required />
+    	<input id="test-1" name="test-1" class="text" type="text" required />
 		<input name="test-2" class="text" type="text" required />
 		<input type="submit" class="invalid-submit" value="try invalid submit (with submit prevention)" />
 		<input type="submit" class="invalid-prevent-submit-without-submit-prevention" value="try invalid-prevented submit (no submit prevention)" />
@@ -266,6 +281,7 @@
 		<input type="submit" class="submit-noprevent" value="try invalid submit (no invalid prevent)" />
 		
     </form>
+	
 </div>
 	   
 	   

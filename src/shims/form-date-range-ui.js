@@ -2,7 +2,6 @@
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
 jQuery.webshims.ready('form-number-date', function($, webshims, window, document){
 	"use strict";
-	
 	var triggerInlineForm = webshims.triggerInlineForm;
 	var adjustInputWithBtn = function(input, button){
 		var inputDim = {
@@ -447,7 +446,7 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	$(document).bind('jquery-uiReady.langchange input-widgetsReady.langchange', function(){
 		if(!$.datepicker){return;}
 		$(document)
-			.bind('htmlExtLangChange', function(){
+			.bind('webshimLocalizationReady', function(){
 				webshims.activeLang($.datepicker.regional, 'inputUI', changeDefaults);
 			})
 			.unbind('jquery-uiReady.langchange input-widgetsReady.langchange')
@@ -455,15 +454,17 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	});
 	
 	webshims.addReady(function(context, elem){
+		
 		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(){
 			if($.datepicker || $.fn.slider){
 				replaceInputUI(context, elem);
 			}
+			
 			if($.datepicker && $.fn.slider){
 				$(document).unbind('jquery-uiReady.initinputui input-widgetsReady.initinputui');
 			}
 			if(context === document){
-				webshims.createReadyEvent('inputUI');
+				webshims.isReady('inputUI', true);
 			}
 		});
 	});
@@ -608,5 +609,5 @@ jQuery.webshims.ready('form-number-date', function($, webshims, window, document
 	});
 })();
 	
-}, true);
+});
 

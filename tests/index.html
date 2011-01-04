@@ -26,9 +26,13 @@
 			if(hash.indexOf('overrideValidationMessages') !== -1){
 				$.webshims.overrideValidationMessages = true; 
 			}
+			if(hash.indexOf('customValidationMessage') !== -1){
+				$.webshims.implement.customValidationMessage = true; 
+			}
 						
 			$(function(){
 				$('#bugfixes').attr('checked', !!window.noHTMLExtFixes);
+				$('#customValidationMessage').attr('checked', !!$.webshims.implement.customValidationMessage);
 				$('#overrideValidationMessages').attr('checked', !!$.webshims.overrideValidationMessages);
 				$('#extendNative').attr('checked', !!$.webshims.extendNative);
 				$('input.webshim-config')
@@ -113,6 +117,7 @@
 <div>
 	<input type="checkbox" id="bugfixes" value="noCapableBugfixes" class="webshim-config" /> <label for="bugfixes"><strong>without</strong> (capable browser) bugfixes</label>
 	<input type="checkbox" id="overrideValidationMessages" value="overrideValidationMessages" class="webshim-config" /> <label for="overrideValidationMessages">overrideValidationMessages</label>
+	<input type="checkbox" id="customValidationMessage" value="customValidationMessage" class="webshim-config" /> <label for="customValidationMessage">customValidationMessage</label>
 </div>
 <small>Note: These tests are made to test webshims lib implementation. If there are some failling tests in native implementations, fill a browser bug. We currently only fix heavy/easy to fix errors in native implementations.</small>
 <h1 id="qunit-header">Webshims Lib Test Suite</h1>
