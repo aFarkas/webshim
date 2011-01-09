@@ -7,7 +7,7 @@
  */
 
 
-jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
 	if($.support.placeholder){return;}
 	var hidePlaceholder = function(elem, data, value){
 			if(elem.type != 'password'){
@@ -80,6 +80,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 			
 			return {
 				create: function(elem){
+//					alert(elem.value)
 					var data = $.data(elem, 'placeHolder');
 					if(data){return data;}
 					data = $.data(elem, 'placeHolder', {
@@ -89,6 +90,13 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 					$(elem).bind('focus.placeholder blur.placeholder', function(e){
 						changePlaceholderVisibility(this, false, false, data, e.type );
 					});
+					if(elem.form){
+						$(elem.form).bind('reset.placeholder', function(e){
+							setTimeout(function(){
+								changePlaceholderVisibility(elem, false, false, data, e.type );
+							}, 0);
+						});
+					}
 					
 					if(elem.type == 'password'){
 						data.box = $(elem)
@@ -99,7 +107,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 						data.text
 							.insertAfter(elem)
 							.bind('mousedown.placeholder', function(){
-								changePlaceholderVisibility(this, false, false, data, 'focus' );
+								changePlaceholderVisibility(this, false, false, data, 'focus');
 								elem.focus();
 								return false;
 							})
@@ -132,7 +140,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 							data.box.addClass('placeholder-box-'+cssFloat);
 						}
 					} else {
-						var reset = function(){
+						var reset = function(e){
 							hidePlaceholder(elem, data, '');
 						};
 						if($.nodeName(data.text[0], 'label')){
@@ -140,7 +148,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 							//ie always exposes last label and ff always first
 							data.text.hide()[$.browser.msie ? 'insertBefore' : 'insertAfter'](elem);
 						}
-						$(window).unload(reset);
+						$(window).one('beforeunload', reset);
 						data.box = $(elem);
 						if(elem.form){
 							$(elem.form).submit(reset);
@@ -178,8 +186,8 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		get: function(elem){
 			return webshims.contentAttr(this, 'placeholder') || '';
 		},
-		init: true
-	});
+		contentAttr: true
+	}, true, true, 'form-placeholder');
 			
 	$.each(['input', 'textarea'], function(i, name){
 		var desc = webshims.defineNodeNameProperty(name, 'value', {
@@ -235,5 +243,5 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		}
 		return oldVal.apply(this, arguments);
 	};
-	
+	webshims.isReady('form-placeholder', true);
 });

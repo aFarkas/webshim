@@ -140,7 +140,7 @@ webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'form', 'fields
 	})()
 }, true);
 
-webshims.defineNodeNamesProperty(['input', 'textarea', 'select'], 'setCustomValidity', {
+webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'fieldset', 'button', 'output'], 'setCustomValidity', {
 	value: function(error){
 		$.data(this, 'customvalidationMessage', ''+error);
 	}
@@ -225,7 +225,7 @@ webshims.defineNodeNamesProperty(['input', 'select', 'textarea', 'fieldset', 'bu
 			return !!( elem.form && !elem.disabled && !elem.readOnly && !types[elem.type] && !barredElems[(elem.nodeName || '').toLowerCase()] && $.attr(elem.form, 'novalidate') == null );
 		};
 	})()
-}, true, true, 'form-extend');
+}, true, 'validity-base', 'form-extend');
 
 webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
 	set: function(value){
@@ -235,7 +235,7 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 	contentAttr: true
 }, true, true, 'form-extend');
 
-['input', 'select', 'textarea'].forEach(function(nodeName){
+['input', 'select', 'textarea', 'fieldset', 'button', 'output'].forEach(function(nodeName){
 	webshims.defineNodeNameProperty(nodeName, 'validity', {
 		set: $.noop,
 		get: function(){
@@ -269,7 +269,7 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 			elem.setAttribute('aria-invalid',  validityState.valid ? 'false' : 'true');
 			return validityState;
 		}
-	}, true, true, 'form-extend');
+	}, true, 'validity-base', 'form-extend');
 });
 
 var noValidate = function(){

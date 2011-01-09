@@ -176,8 +176,8 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 		}
 	};
 	
-	webshims.defineNodeNameProperty('input', 'valueAsNumber', valueAsNumberDescriptor);
-	webshims.defineNodeNameProperty('input', 'valueAsDate', valueAsDateDescriptor);
+	webshims.defineNodeNameProperty('input', 'valueAsNumber', valueAsNumberDescriptor, true, 'input-date-number', 'form-number-date');
+	webshims.defineNodeNameProperty('input', 'valueAsDate', valueAsDateDescriptor, true, 'input-date-number', 'form-number-date');
 	
 	
 	var typeProtos = {

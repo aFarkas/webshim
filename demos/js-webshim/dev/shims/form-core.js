@@ -3,7 +3,7 @@ jQuery.webshims.gcEval = function(){
 	"use strict";
 	return (function(){eval( arguments[0] );}).call(arguments[1] || window, arguments[0]);
 };
-jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
 	"use strict";
 	webshims.getVisualInput = function(elem){
 		elem = $(elem);

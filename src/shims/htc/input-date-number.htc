@@ -1,0 +1,18 @@
+<PUBLIC:COMPONENT lightWeight="true">
+<PUBLIC:PROPERTY NAME="valueAsNumber" GET="valueAsNumberGet" PUT="valueAsNumberSet" />
+<PUBLIC:PROPERTY NAME="valueAsDate" GET="valueAsDateGet" PUT="valueAsDateSet" />
+<SCRIPT>
+var valueAsNumberSet = function(){
+	 return jQuery.attr(element, 'valueAsNumber');
+};
+var valueAsNumberGet = function(value){
+	return jQuery.attr(element, 'valueAsNumber', value);
+};
+var valueAsDateGet = function(){
+	 return jQuery.attr(element, 'valueAsDate');
+};
+var valueAsDateSet = function(value){
+	return jQuery.attr(element, 'valueAsDate', value);
+};
+</SCRIPT>
+</PUBLIC:COMPONENT>

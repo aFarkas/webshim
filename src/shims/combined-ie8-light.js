@@ -194,7 +194,7 @@ if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Obje
 	};
 	
 	shims.getPrototypeOf = function (object) {
-        return object.__proto__ || object.constructor.prototype;
+        return Object.getPrototypeOf && Object.getPrototypeOf(object) || object.__proto__ || object.constructor && object.constructor.prototype;
     };
 	
 	//based on http://www.refactory.org/s/object_getownpropertydescriptor/view/latest 
@@ -790,7 +790,897 @@ if (!String.prototype.trim) {
 }
 
 })();
-(function($){
+//DOM-Extension helper
+jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
+	//shortcus
+	var support = $.support;
+	var modules = webshims.modules;
+	var has = Object.prototype.hasOwnProperty;
+	
+	//proxying attribute
+	var oldAttr = $.attr;
+	var extendedProps = {};
+	var modifyProps = {};
+		
+	$.attr = function(elem, name, value, arg1, arg3){
+		var nodeName = (elem.nodeName || '').toLowerCase();
+		if(!nodeName || elem.nodeType !== 1){return oldAttr(elem, name, value, arg1, arg3);}
+		var desc = extendedProps[nodeName];
+		var handeld;
+		var ret;
+		var getSetData;
+						
+		if(desc){
+			desc = desc[name];
+		}
+		if(!desc){
+			desc = extendedProps['*'];
+			if(desc){
+				desc = desc[name];
+			}
+		}
+		
+		// we got a winner
+		if(desc){
+			//getSetData is used for IE8-, to block infinite loops + autointit of DHTML behaviors 
+			getSetData = $.data(elem, '_polyfillblockProperty') || $.data(elem, '_polyfillblockProperty', {get: {}, set: {}, contentInit: {}});
+			if(value === undefined){
+				if(getSetData.get[name]){return;}
+				getSetData.get[name] = true;
+				ret = (desc.get) ? desc.get.call(elem) : desc.value;
+				getSetData.get[name] = false;
+				return ret;
+			} else if(desc.set) {
+				if(getSetData.set[name]){return;}
+				getSetData.set[name] = true;
+				if(elem.readyState === 'loading' && !getSetData.contentInit && !getSetData.get[name] && desc.get && value === webshims.contentAttr(elem, name)){
+					getSetData.contentInit = true;
+					value = desc.get.call(elem);
+				}
+				ret = desc.set.call(elem, value);
+				handeld = true;
+				getSetData.set[name] = false;
+			}
+		}
+		if(!handeld){
+			ret = oldAttr(elem, name, value, arg1, arg3);
+		}
+		if(value !== undefined && modifyProps[nodeName] && modifyProps[nodeName][name]){
+			$.each(modifyProps[nodeName][name], function(i, fn){
+				fn.call(elem, value);
+			});
+		}
+		return ret;
+	};
+	
+	var extendQAttr =  function(nodeName, prop, desc){
+		if(!extendedProps[nodeName]){
+			extendedProps[nodeName] = {};
+		}
+		var oldDesc = extendedProps[nodeName][prop];
+		var getSup = function(propType, descriptor, oDesc){
+			if(descriptor && descriptor[propType]){
+				return descriptor[propType];
+			}
+			if(oDesc && oDesc[propType]){
+				return oDesc[propType];
+			}
+			return function(value){
+				return oldAttr(this, prop, value);
+			};
+		};
+		extendedProps[nodeName][prop] = desc;
+		if(desc.value === undefined){
+			if(!desc.set){
+				desc.set = desc.writeable ? getSup('set', desc, oldDesc) : function(){throw(prop +'is readonly on '+ nodeName);};
+			}
+			if(!desc.get){
+				desc.get = getSup('get', desc, oldDesc);
+			}
+			
+		}
+		
+		$.each(['value', 'get', 'set'], function(i, descProp){
+			if(desc[descProp]){
+				desc['_sup'+descProp] = getSup(descProp, oldDesc);
+			}
+		});
+	};
+	
+	(function(){
+		var preloadElem = document.createElement('span');
+		var preloadStyle = preloadElem.style;
+		var preloaded = {};
+		
+		var processPreload = function(preload){
+			preload.props.forEach(function(htcFile){
+				if(preloaded[htcFile]){return;}
+				preloaded[htcFile] = true;
+				preloadStyle.behavior += ', '+htcFile;
+				if(preload.feature && preloadElem.readyState != 'complete'){
+					webshims.waitReady(preload.feature);
+					$(preloadElem).one('readystatechange', function(){
+						webshims.unwaitReady(preload.feature);
+					});
+				}
+			});
+		};
+		webshims.preloadHTCs.forEach(processPreload);
+		webshims.preloadHTCs = {push: processPreload};
+	})();
+	
+	// resetting properties with magic content attributes
+	var initProp = (function(){
+		var nodeNameCache = {};
+		var initProps = {};
+		
+		var isReady;
+		webshims.addReady(function(context, contextElem){
+			var getElementsByName = function(name){
+				if(!nodeNameCache[name]){
+					nodeNameCache[name] = $(context.getElementsByTagName(name));
+					if(contextElem[0] && $.nodeName(contextElem[0], name)){
+						nodeNameCache[name] = nodeNameCache[name].add(contextElem);
+					}
+				}
+			};
+			nodeNameCache = {};
+			
+			$.each(initProps, function(name, fns){
+				getElementsByName(name);
+				fns.forEach(function(fn){
+					nodeNameCache[name].each(fn);
+				});
+			});
+			isReady = true;
+		});
+		
+
+		var createNodeNameInit = function(nodeName, fn){
+			if(!initProps[nodeName]){
+				initProps[nodeName] = [fn];
+			} else {
+				initProps[nodeName].push(fn);
+			}
+			if(isReady){
+				nodeNameCache[nodeName] = nodeNameCache[nodeName] || $( document.getElementsByTagName(nodeName) );
+				nodeNameCache[nodeName].each(fn);
+			}
+		};
+		
+		var elementExtends = {};
+		var loadedDHTMLFiles = {};
+		return {
+			extend: function(nodeName, prop, desc){
+				if(!elementExtends[prop]){
+					elementExtends[prop] = 0;
+				}
+				elementExtends[prop]++;
+				createNodeNameInit(nodeName, function(){
+					transformDescriptor(this, prop, desc, '_sup'+ prop + elementExtends[prop]);
+					webshims.defineProperty(this, prop, desc);
+				});
+			},
+			extendDHTML: function(nodeName, htcFile, prop, feature){
+				webshims.preloadHTCs.push({feature: feature, props: [htcFile]});
+				if(!loadedDHTMLFiles[nodeName]){
+					loadedDHTMLFiles[nodeName] = '';
+				}
+				if(loadedDHTMLFiles[nodeName].indexOf(htcFile) != -1){return;}
+				loadedDHTMLFiles[nodeName] += htcFile;
+				createNodeNameInit(nodeName, function(){
+					var behavior = this.style.behavior;
+					this.style.behavior += behavior ? ', '+htcFile : htcFile;
+				});
+			},
+			init: function(nodeName, prop, all){
+				createNodeNameInit(nodeName, function(){
+					var jElm = $(this);
+					if(all !== 'all'){
+						jElm = jElm.filter('['+ prop +']');
+					}
+					jElm.attr(prop, function(i, val){
+						return val;
+					});
+				});
+			}
+		};
+	})();
+	
+	
+	var transformDescriptor = function(proto, prop, desc, elementID){
+		var oDesc;
+		
+		var getSup = function(descriptor, accessType){
+			if(descriptor && descriptor[accessType]){
+				return descriptor[accessType];
+			}
+			
+			if(descriptor.value !== undefined){
+				//if original is a value, but we use an accessor
+				if(accessType == 'set'){
+					return(elementID) ? function(val){$.data(proto, elementID).value = val;} : function(val){descriptor.value = val;};
+				}
+				if(accessType == 'get'){
+					return (elementID) ? function(){return $.data(proto, elementID).value;} : function(){return descriptor.value;};
+				}
+			}
+			return function(value){
+				return webshims.contentAttr(this, prop, value);
+			};
+		};
+		
+		if(proto && prop){
+			
+			while(proto && prop in proto && !has.call(proto, prop)){
+				proto = webshims.getPrototypeOf(proto);
+			}
+			
+			oDesc = webshims.getOwnPropertyDescriptor(proto, prop) || {configurable: true};
+			
+			if(!oDesc.configurable && !oDesc.writeable){return false;}
+			if(elementID){
+				$.data(proto, elementID, oDesc);
+			}
+			if(desc.get){
+				desc._supget = getSup(oDesc, 'get');
+			}
+			if(desc.set){
+				desc._supset = getSup(oDesc, 'set');
+			}
+			if(desc.value || oDesc.value !== undefined){
+				desc._supvalue = oDesc.value;
+			}
+		}
+		
+		if(desc.value === undefined){
+			if(!desc.set){
+				desc.set =  desc._supset || (!desc.writeable) ? function(){throw(prop +'is readonly on '+ this.nodeName);} : getSup(desc, 'set');
+			}
+			if(!desc.get){
+				desc.get = desc._supget || getSup(desc, 'get');
+			}
+		}
+		
+		
+		return true;
+	};
+	
+	$.extend(webshims, {
+		defineNodeNameProperty: function(nodeName, prop, desc, extend, htc, feature){
+			desc = $.extend({writeable: true}, desc);
+			var oDesc;
+			var extendedNative = false;
+			var htcHandled;
+			if(webshims.cfg.extendNative && extend){
+				(function(){
+					var element = document.createElement(nodeName);
+					if(support.objectAccessor && support.contentAttr){
+						//ToDo: property on unknown element
+						
+						var proto  = webshims.getPrototypeOf(element);
+						//extend unknown property on known elements prototype
+						if(!(prop in element)){
+							transformDescriptor(false, false, desc);
+							webshims.defineProperty(proto, prop, desc);
+							extendedNative = true;
+							return;
+						}
+						//extend known property on element itself
+						if(has.call(element, prop)){
+							oDesc = webshims.getOwnPropertyDescriptor(element, prop);
+							
+							//abort can not extend native!
+							if(!oDesc.configurable){return;}
+							
+							initProp.extend(nodeName, prop, desc);
+							extendedNative = true;
+							return;
+						}
+						
+						//abort can not extend native!
+						if(!transformDescriptor(proto, prop, desc)){return;}
+						//extend known property on known elements prototype
+						webshims.defineProperty(proto, prop, desc);
+						extendedNative = true;
+						return;
+					} else if(desc.value !== undefined){
+						initProp.extend(nodeName, prop, desc);
+						extendedNative = true;
+						return;
+					} 
+					if(htc && support.dhtmlBehavior && !(prop in element)){
+						extendedNative = true;
+						htcHandled = true;
+						extendQAttr(nodeName, prop, desc);
+						initProp.extendDHTML(nodeName, 'url('+webshims.loader.makePath( 'htc/'+ (typeof htc == 'string' ? htc : prop) +'.htc') +')' , prop, feature);
+						return;
+					}
+				})();
+			}
+			if(!extendedNative){
+				if(extend && webshims.cfg.extendNative){
+					webshims.log("could not extend "+ nodeName +"["+ prop +"] fallback to jQuery extend");
+				}
+				extendQAttr(nodeName, prop, desc);
+			}
+			
+			if((desc.contentAttr && !htcHandled) || desc.init){
+				initProp.init(nodeName, prop);
+			}
+			return desc;
+		},
+		defineNodeNamesProperty: function(names, prop, desc, extend, htc, feature){
+			if(typeof names == 'string'){
+				names = names.split(/\s*,\s*/);
+			}
+			names.forEach(function(nodeName){
+				webshims.defineNodeNameProperty(nodeName, prop, desc, extend, htc, feature);
+			});
+		},
+		onNodeNamesPropertyModify: function(nodeNames, prop, desc){
+			if(typeof nodeNames == 'string'){
+				nodeNames = nodeNames.split(/\s*,\s*/);
+			}
+			if($.isFunction(desc)){
+				desc = {set: desc};
+			}
+			nodeNames.forEach(function(name){
+				if(!modifyProps[name]){
+					modifyProps[name] = {};
+				}
+				if(!modifyProps[name][prop]){
+					modifyProps[name][prop] = [];
+				}
+				if(desc.set){
+					modifyProps[name][prop].push(desc.set);
+				}
+				if(desc.init){
+					initProp.init(name, prop);
+				}
+			});
+		},
+		defineNodeNamesBooleanProperty: function(elementNames, prop, setDesc, extend, htc, feature){
+			var desc = {
+				set: function(val){
+					var elem = this;
+					if(elem.readyState === 'loading' && typeof val == 'string' && val === webshims.contentAttr(this, prop)){
+						val = true;
+					} else {
+						val = !!val;
+					}
+					webshims.contentAttr(elem, prop, val);
+					if(setDesc){
+						setDesc.set.call(elem, val);
+					}
+					
+					return val;
+				},
+				get: function(){
+					return webshims.contentAttr(this, prop) != null;
+				}
+			};
+			webshims.defineNodeNamesProperty(elementNames, prop, desc, extend, htc, feature);
+		},
+		contentAttr: function(elem, name, val){
+			if(!elem.nodeName){return;}
+			if(val === undefined){
+				val = (elem.attributes[name] || {}).value;
+				return (val == null) ? undefined : val;
+			}
+			
+			if(typeof val == 'boolean'){
+				if(!val){
+					elem.removeAttribute(name);
+				} else {
+					elem.setAttribute(name, name);
+				}
+			} else {
+				elem.setAttribute(name, val);
+			}
+		},
+				
+		activeLang: (function(){
+			var langs = [navigator.browserLanguage || navigator.language || ''];
+			var paLang = $('html').attr('lang');
+			var timer;
+			
+			if(paLang){
+				langs.push(paLang);
+			}
+			return function(lang, module, fn){
+				if(lang){
+					if(!module || !fn){
+						if(lang !== langs[0]){
+							langs[0] = lang;
+							clearTimeout(timer);
+							timer = setTimeout(function(){
+								$(document).triggerHandler('webshimLocalizationReady', langs);
+							}, 0);
+						}
+					} else {
+						module = modules[module].options;
+						var langObj = lang,
+							remoteLangs = module && module.availabeLangs,
+							loadRemoteLang = function(lang){
+								if($.inArray(lang, remoteLangs) !== -1){
+									webshims.loader.loadScript(module.langSrc+lang+'.js', function(){
+										if(langObj[lang]){
+											fn(langObj[lang]);
+										}
+									});
+									return true;
+								}
+								return false;
+							}
+						;
+						
+						$.each(langs, function(i, lang){
+							var shortLang = lang.split('-')[0];
+							if(langObj[lang] || langObj[shortLang]){
+								fn(langObj[lang] || langObj[shortLang]);
+								return false;
+							}
+							if(remoteLangs && module.langSrc && (loadRemoteLang(lang) || loadRemoteLang(shortLang))){
+								return false;
+							}
+						});
+					}
+				}
+				return langs;
+			};
+		})()
+	});
+	
+		
+	webshims.isReady('webshimLocalization', true);
+	webshims.isReady('dom-extend', true);
+});//DOM-Extension helper
+jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
+	//shortcus
+	var support = $.support;
+	var modules = webshims.modules;
+	var has = Object.prototype.hasOwnProperty;
+	
+	//proxying attribute
+	var oldAttr = $.attr;
+	var extendedProps = {};
+	var modifyProps = {};
+		
+	$.attr = function(elem, name, value, arg1, arg3){
+		var nodeName = (elem.nodeName || '').toLowerCase();
+		if(!nodeName || elem.nodeType !== 1){return oldAttr(elem, name, value, arg1, arg3);}
+		var desc = extendedProps[nodeName];
+		var handeld;
+		var ret;
+		var getSetData;
+						
+		if(desc){
+			desc = desc[name];
+		}
+		if(!desc){
+			desc = extendedProps['*'];
+			if(desc){
+				desc = desc[name];
+			}
+		}
+		
+		// we got a winner
+		if(desc){
+			//getSetData is used for IE8-, to block infinite loops + autointit of DHTML behaviors 
+			getSetData = $.data(elem, '_polyfillblockProperty') || $.data(elem, '_polyfillblockProperty', {get: {}, set: {}, contentInit: {}});
+			if(value === undefined){
+				if(getSetData.get[name]){return;}
+				getSetData.get[name] = true;
+				ret = (desc.get) ? desc.get.call(elem) : desc.value;
+				getSetData.get[name] = false;
+				return ret;
+			} else if(desc.set) {
+				if(getSetData.set[name]){return;}
+				getSetData.set[name] = true;
+				if(elem.readyState === 'loading' && !getSetData.contentInit && !getSetData.get[name] && desc.get && value === webshims.contentAttr(elem, name)){
+					getSetData.contentInit = true;
+					value = desc.get.call(elem);
+				}
+				ret = desc.set.call(elem, value);
+				handeld = true;
+				getSetData.set[name] = false;
+			}
+		}
+		if(!handeld){
+			ret = oldAttr(elem, name, value, arg1, arg3);
+		}
+		if(value !== undefined && modifyProps[nodeName] && modifyProps[nodeName][name]){
+			$.each(modifyProps[nodeName][name], function(i, fn){
+				fn.call(elem, value);
+			});
+		}
+		return ret;
+	};
+	
+	var extendQAttr =  function(nodeName, prop, desc){
+		if(!extendedProps[nodeName]){
+			extendedProps[nodeName] = {};
+		}
+		var oldDesc = extendedProps[nodeName][prop];
+		var getSup = function(propType, descriptor, oDesc){
+			if(descriptor && descriptor[propType]){
+				return descriptor[propType];
+			}
+			if(oDesc && oDesc[propType]){
+				return oDesc[propType];
+			}
+			return function(value){
+				return oldAttr(this, prop, value);
+			};
+		};
+		extendedProps[nodeName][prop] = desc;
+		if(desc.value === undefined){
+			if(!desc.set){
+				desc.set = desc.writeable ? getSup('set', desc, oldDesc) : function(){throw(prop +'is readonly on '+ nodeName);};
+			}
+			if(!desc.get){
+				desc.get = getSup('get', desc, oldDesc);
+			}
+			
+		}
+		
+		$.each(['value', 'get', 'set'], function(i, descProp){
+			if(desc[descProp]){
+				desc['_sup'+descProp] = getSup(descProp, oldDesc);
+			}
+		});
+	};
+	
+	(function(){
+		var preloadElem = document.createElement('span');
+		var preloadStyle = preloadElem.style;
+		var preloaded = {};
+		
+		var processPreload = function(preload){
+			preload.props.forEach(function(htcFile){
+				if(preloaded[htcFile]){return;}
+				preloaded[htcFile] = true;
+				preloadStyle.behavior += ', '+htcFile;
+				if(preload.feature && preloadElem.readyState != 'complete'){
+					webshims.waitReady(preload.feature);
+					$(preloadElem).one('readystatechange', function(){
+						webshims.unwaitReady(preload.feature);
+					});
+				}
+			});
+		};
+		webshims.preloadHTCs.forEach(processPreload);
+		webshims.preloadHTCs = {push: processPreload};
+	})();
+	
+	// resetting properties with magic content attributes
+	var initProp = (function(){
+		var nodeNameCache = {};
+		var initProps = {};
+		
+		var isReady;
+		webshims.addReady(function(context, contextElem){
+			var getElementsByName = function(name){
+				if(!nodeNameCache[name]){
+					nodeNameCache[name] = $(context.getElementsByTagName(name));
+					if(contextElem[0] && $.nodeName(contextElem[0], name)){
+						nodeNameCache[name] = nodeNameCache[name].add(contextElem);
+					}
+				}
+			};
+			nodeNameCache = {};
+			
+			$.each(initProps, function(name, fns){
+				getElementsByName(name);
+				fns.forEach(function(fn){
+					nodeNameCache[name].each(fn);
+				});
+			});
+			isReady = true;
+		});
+		
+
+		var createNodeNameInit = function(nodeName, fn){
+			if(!initProps[nodeName]){
+				initProps[nodeName] = [fn];
+			} else {
+				initProps[nodeName].push(fn);
+			}
+			if(isReady){
+				nodeNameCache[nodeName] = nodeNameCache[nodeName] || $( document.getElementsByTagName(nodeName) );
+				nodeNameCache[nodeName].each(fn);
+			}
+		};
+		
+		var elementExtends = {};
+		var loadedDHTMLFiles = {};
+		return {
+			extend: function(nodeName, prop, desc){
+				if(!elementExtends[prop]){
+					elementExtends[prop] = 0;
+				}
+				elementExtends[prop]++;
+				createNodeNameInit(nodeName, function(){
+					transformDescriptor(this, prop, desc, '_sup'+ prop + elementExtends[prop]);
+					webshims.defineProperty(this, prop, desc);
+				});
+			},
+			extendDHTML: function(nodeName, htcFile, prop, feature){
+				webshims.preloadHTCs.push({feature: feature, props: [htcFile]});
+				if(!loadedDHTMLFiles[nodeName]){
+					loadedDHTMLFiles[nodeName] = '';
+				}
+				if(loadedDHTMLFiles[nodeName].indexOf(htcFile) != -1){return;}
+				loadedDHTMLFiles[nodeName] += htcFile;
+				createNodeNameInit(nodeName, function(){
+					var behavior = this.style.behavior;
+					this.style.behavior += behavior ? ', '+htcFile : htcFile;
+				});
+			},
+			init: function(nodeName, prop, all){
+				createNodeNameInit(nodeName, function(){
+					var jElm = $(this);
+					if(all !== 'all'){
+						jElm = jElm.filter('['+ prop +']');
+					}
+					jElm.attr(prop, function(i, val){
+						return val;
+					});
+				});
+			}
+		};
+	})();
+	
+	
+	var transformDescriptor = function(proto, prop, desc, elementID){
+		var oDesc;
+		
+		var getSup = function(descriptor, accessType){
+			if(descriptor && descriptor[accessType]){
+				return descriptor[accessType];
+			}
+			
+			if(descriptor.value !== undefined){
+				//if original is a value, but we use an accessor
+				if(accessType == 'set'){
+					return(elementID) ? function(val){$.data(proto, elementID).value = val;} : function(val){descriptor.value = val;};
+				}
+				if(accessType == 'get'){
+					return (elementID) ? function(){return $.data(proto, elementID).value;} : function(){return descriptor.value;};
+				}
+			}
+			return function(value){
+				return webshims.contentAttr(this, prop, value);
+			};
+		};
+		
+		if(proto && prop){
+			
+			while(proto && prop in proto && !has.call(proto, prop)){
+				proto = webshims.getPrototypeOf(proto);
+			}
+			
+			oDesc = webshims.getOwnPropertyDescriptor(proto, prop) || {configurable: true};
+			
+			if(!oDesc.configurable && !oDesc.writeable){return false;}
+			if(elementID){
+				$.data(proto, elementID, oDesc);
+			}
+			if(desc.get){
+				desc._supget = getSup(oDesc, 'get');
+			}
+			if(desc.set){
+				desc._supset = getSup(oDesc, 'set');
+			}
+			if(desc.value || oDesc.value !== undefined){
+				desc._supvalue = oDesc.value;
+			}
+		}
+		
+		if(desc.value === undefined){
+			if(!desc.set){
+				desc.set =  desc._supset || (!desc.writeable) ? function(){throw(prop +'is readonly on '+ this.nodeName);} : getSup(desc, 'set');
+			}
+			if(!desc.get){
+				desc.get = desc._supget || getSup(desc, 'get');
+			}
+		}
+		
+		
+		return true;
+	};
+	
+	$.extend(webshims, {
+		defineNodeNameProperty: function(nodeName, prop, desc, extend, htc, feature){
+			desc = $.extend({writeable: true}, desc);
+			var oDesc;
+			var extendedNative = false;
+			var htcHandled;
+			if(webshims.cfg.extendNative && extend){
+				(function(){
+					var element = document.createElement(nodeName);
+					if(support.objectAccessor && support.contentAttr){
+						//ToDo: property on unknown element
+						
+						var proto  = webshims.getPrototypeOf(element);
+						//extend unknown property on known elements prototype
+						if(!(prop in element)){
+							transformDescriptor(false, false, desc);
+							webshims.defineProperty(proto, prop, desc);
+							extendedNative = true;
+							return;
+						}
+						//extend known property on element itself
+						if(has.call(element, prop)){
+							oDesc = webshims.getOwnPropertyDescriptor(element, prop);
+							
+							//abort can not extend native!
+							if(!oDesc.configurable){return;}
+							
+							initProp.extend(nodeName, prop, desc);
+							extendedNative = true;
+							return;
+						}
+						
+						//abort can not extend native!
+						if(!transformDescriptor(proto, prop, desc)){return;}
+						//extend known property on known elements prototype
+						webshims.defineProperty(proto, prop, desc);
+						extendedNative = true;
+						return;
+					} else if(desc.value !== undefined){
+						initProp.extend(nodeName, prop, desc);
+						extendedNative = true;
+						return;
+					} 
+					if(htc && support.dhtmlBehavior && !(prop in element)){
+						extendedNative = true;
+						htcHandled = true;
+						extendQAttr(nodeName, prop, desc);
+						initProp.extendDHTML(nodeName, 'url('+webshims.loader.makePath( 'htc/'+ (typeof htc == 'string' ? htc : prop) +'.htc') +')' , prop, feature);
+						return;
+					}
+				})();
+			}
+			if(!extendedNative){
+				if(extend && webshims.cfg.extendNative){
+					webshims.log("could not extend "+ nodeName +"["+ prop +"] fallback to jQuery extend");
+				}
+				extendQAttr(nodeName, prop, desc);
+			}
+			
+			if((desc.contentAttr && !htcHandled) || desc.init){
+				initProp.init(nodeName, prop);
+			}
+			return desc;
+		},
+		defineNodeNamesProperty: function(names, prop, desc, extend, htc, feature){
+			if(typeof names == 'string'){
+				names = names.split(/\s*,\s*/);
+			}
+			names.forEach(function(nodeName){
+				webshims.defineNodeNameProperty(nodeName, prop, desc, extend, htc, feature);
+			});
+		},
+		onNodeNamesPropertyModify: function(nodeNames, prop, desc){
+			if(typeof nodeNames == 'string'){
+				nodeNames = nodeNames.split(/\s*,\s*/);
+			}
+			if($.isFunction(desc)){
+				desc = {set: desc};
+			}
+			nodeNames.forEach(function(name){
+				if(!modifyProps[name]){
+					modifyProps[name] = {};
+				}
+				if(!modifyProps[name][prop]){
+					modifyProps[name][prop] = [];
+				}
+				if(desc.set){
+					modifyProps[name][prop].push(desc.set);
+				}
+				if(desc.init){
+					initProp.init(name, prop);
+				}
+			});
+		},
+		defineNodeNamesBooleanProperty: function(elementNames, prop, setDesc, extend, htc, feature){
+			var desc = {
+				set: function(val){
+					var elem = this;
+					if(elem.readyState === 'loading' && typeof val == 'string' && val === webshims.contentAttr(this, prop)){
+						val = true;
+					} else {
+						val = !!val;
+					}
+					webshims.contentAttr(elem, prop, val);
+					if(setDesc){
+						setDesc.set.call(elem, val);
+					}
+					
+					return val;
+				},
+				get: function(){
+					return webshims.contentAttr(this, prop) != null;
+				}
+			};
+			webshims.defineNodeNamesProperty(elementNames, prop, desc, extend, htc, feature);
+		},
+		contentAttr: function(elem, name, val){
+			if(!elem.nodeName){return;}
+			if(val === undefined){
+				val = (elem.attributes[name] || {}).value;
+				return (val == null) ? undefined : val;
+			}
+			
+			if(typeof val == 'boolean'){
+				if(!val){
+					elem.removeAttribute(name);
+				} else {
+					elem.setAttribute(name, name);
+				}
+			} else {
+				elem.setAttribute(name, val);
+			}
+		},
+				
+		activeLang: (function(){
+			var langs = [navigator.browserLanguage || navigator.language || ''];
+			var paLang = $('html').attr('lang');
+			var timer;
+			
+			if(paLang){
+				langs.push(paLang);
+			}
+			return function(lang, module, fn){
+				if(lang){
+					if(!module || !fn){
+						if(lang !== langs[0]){
+							langs[0] = lang;
+							clearTimeout(timer);
+							timer = setTimeout(function(){
+								$(document).triggerHandler('webshimLocalizationReady', langs);
+							}, 0);
+						}
+					} else {
+						module = modules[module].options;
+						var langObj = lang,
+							remoteLangs = module && module.availabeLangs,
+							loadRemoteLang = function(lang){
+								if($.inArray(lang, remoteLangs) !== -1){
+									webshims.loader.loadScript(module.langSrc+lang+'.js', function(){
+										if(langObj[lang]){
+											fn(langObj[lang]);
+										}
+									});
+									return true;
+								}
+								return false;
+							}
+						;
+						
+						$.each(langs, function(i, lang){
+							var shortLang = lang.split('-')[0];
+							if(langObj[lang] || langObj[shortLang]){
+								fn(langObj[lang] || langObj[shortLang]);
+								return false;
+							}
+							if(remoteLangs && module.langSrc && (loadRemoteLang(lang) || loadRemoteLang(shortLang))){
+								return false;
+							}
+						});
+					}
+				}
+				return langs;
+			};
+		})()
+	});
+	
+		
+	webshims.isReady('webshimLocalization', true);
+	webshims.isReady('dom-extend', true);
+});(function($){
 	if(navigator.geolocation){return;}
 	var domWrite = function(){
 			setTimeout(function(){
@@ -956,7 +1846,7 @@ jQuery.webshims.gcEval = function(){
 	"use strict";
 	return (function(){eval( arguments[0] );}).call(arguments[1] || window, arguments[0]);
 };
-jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
 	"use strict";
 	webshims.getVisualInput = function(elem){
 		elem = $(elem);
@@ -1363,32 +2253,34 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		implementProperties.push('validationMessage');
 	}
 	
-	$.each(implementProperties, function(i, messageProp){
-		webshims.defineNodeNamesProperty(['input', 'select', 'textarea', 'fieldset', 'output'], messageProp, {
-			get: function(){
-				var elem = this;
-				var message = '';
-				if(!$.attr(elem, 'willValidate')){
-					return message;
-				}
-				var validity = $.attr(elem, 'validity') || {valid: 1};
-				if(validity.valid){return message;}
-				message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
-				if(message){return message;}
-				if(validity.customError && elem.nodeName){
-					message = ('validationMessage' in elem) ? elem.validationMessage : $.data(elem, 'customvalidationMessage');
-					if(message){return message;}
-				}
-				$.each(validity, function(name, prop){
-					if(name == 'valid' || !prop){return;}
-					message = webshims.createValidationMessage(elem, name);
-					if(message){
-						return false;
+	implementProperties.forEach(function(messageProp){
+		['input', 'select', 'textarea', 'fieldset', 'output', 'button'].forEach(function(nodeName){
+			var desc = webshims.defineNodeNameProperty(nodeName, messageProp, {
+				get: function(){
+					var elem = this;
+					var message = '';
+					if(!$.attr(elem, 'willValidate')){
+						return message;
 					}
-				});
-				return message || '';
-			},
-			set: $.noop
+					var validity = $.attr(elem, 'validity') || {valid: 1};
+					if(validity.valid){return message;}
+					message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
+					if(message){return message;}
+					if(validity.customError && elem.nodeName){
+						message = (support.validationMessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
+						if(message){return message;}
+					}
+					$.each(validity, function(name, prop){
+						if(name == 'valid' || !prop){return;}
+						message = webshims.createValidationMessage(elem, name);
+						if(message){
+							return false;
+						}
+					});
+					return message || '';
+				},
+				set: $.noop
+			}, (messageProp == 'validationMessage'), 'validity-base', 'form-message');
 		});
 		
 	});
@@ -1532,13 +2424,13 @@ webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'form', 'fields
 			}
 		};
 	})()
-});
+}, true);
 
-webshims.defineNodeNamesProperty(['input', 'textarea', 'select'], 'setCustomValidity', {
+webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'fieldset', 'button', 'output'], 'setCustomValidity', {
 	value: function(error){
 		$.data(this, 'customvalidationMessage', ''+error);
 	}
-});
+}, true);
 
 
 $.event.special.invalid = {
@@ -1578,8 +2470,58 @@ $.event.special.invalid = {
 	}
 };
 
+
+webshims.addInputType('email', {
+	mismatch: (function(){
+		//taken from scott gonzales
+		var test = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|(\x22((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?\x22))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)*(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i;
+		return function(val){
+			return !test.test(val);
+		};
+	})()
+});
+
+webshims.addInputType('url', {
+	mismatch: (function(){
+		//taken from scott gonzales
+		var test = /^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
+		return function(val){
+			return !test.test(val);
+		};
+	})()
+});
+
 // IDLs for constrain validation API
-['input', 'select', 'textarea'].forEach(function(nodeName){
+webshims.defineNodeNamesProperty(['input', 'select', 'textarea', 'fieldset', 'button', 'output'], 'willValidate', {
+	get: (function(){
+		var types = {
+				button: 1,
+				reset: 1,
+				add: 1,
+				remove: 1,
+				'move-up': 1,
+				'move-down': 1,
+				hidden: 1
+			}
+		;
+		var barredElems = {fieldset: 1, button: 1, output: 1};
+		return function(){
+			var elem = this;
+			//elem.name && <- we don't use to make it easier for developers
+			return !!( elem.form && !elem.disabled && !elem.readOnly && !types[elem.type] && !barredElems[(elem.nodeName || '').toLowerCase()] && $.attr(elem.form, 'novalidate') == null );
+		};
+	})()
+}, true, 'validity-base', 'form-extend');
+
+webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
+	set: function(value){
+		var elem = this;
+		elem.setAttribute('aria-required', (value) ? 'true' : 'false');
+	},
+	contentAttr: true
+}, true, true, 'form-extend');
+
+['input', 'select', 'textarea', 'fieldset', 'button', 'output'].forEach(function(nodeName){
 	webshims.defineNodeNameProperty(nodeName, 'validity', {
 		set: $.noop,
 		get: function(){
@@ -1613,59 +2555,7 @@ $.event.special.invalid = {
 			elem.setAttribute('aria-invalid',  validityState.valid ? 'false' : 'true');
 			return validityState;
 		}
-	}, true);
-});
-
-
-//todo
-webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
-	set: function(value){
-		var elem = this;
-		elem.setAttribute('aria-required', (value) ? 'true' : 'false');
-	},
-	init: true
-});
-
-webshims.defineNodeNamesProperty(['input', 'select', 'textarea', 'fieldset', 'button', 'output'], 'willValidate', {
-	get: (function(){
-		var types = {
-				button: 1,
-				reset: 1,
-				add: 1,
-				remove: 1,
-				'move-up': 1,
-				'move-down': 1,
-				hidden: 1
-			}
-		;
-		var barredElems = {fieldset: 1, button: 1, output: 1};
-		return function(){
-			var elem = this;
-			//elem.name && <- we don't use to make it easier for developers
-			return !!( elem.form && !elem.disabled && !elem.readOnly && !types[elem.type] && !barredElems[(elem.nodeName || '').toLowerCase()] && $.attr(elem.form, 'novalidate') == null );
-		};
-	})()
-});
-
-
-webshims.addInputType('email', {
-	mismatch: (function(){
-		//taken from scott gonzales
-		var test = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|(\x22((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?\x22))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)*(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i;
-		return function(val){
-			return !test.test(val);
-		};
-	})()
-});
-
-webshims.addInputType('url', {
-	mismatch: (function(){
-		//taken from scott gonzales
-		var test = /^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
-		return function(val){
-			return !test.test(val);
-		};
-	})()
+	}, true, 'validity-base', 'form-extend');
 });
 
 var noValidate = function(){
@@ -1731,7 +2621,7 @@ webshims.isReady('form-extend', true);
  */
 
 
-jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
 	if($.support.placeholder){return;}
 	var hidePlaceholder = function(elem, data, value){
 			if(elem.type != 'password'){
@@ -1804,6 +2694,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 			
 			return {
 				create: function(elem){
+//					alert(elem.value)
 					var data = $.data(elem, 'placeHolder');
 					if(data){return data;}
 					data = $.data(elem, 'placeHolder', {
@@ -1813,6 +2704,13 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 					$(elem).bind('focus.placeholder blur.placeholder', function(e){
 						changePlaceholderVisibility(this, false, false, data, e.type );
 					});
+					if(elem.form){
+						$(elem.form).bind('reset.placeholder', function(e){
+							setTimeout(function(){
+								changePlaceholderVisibility(elem, false, false, data, e.type );
+							}, 0);
+						});
+					}
 					
 					if(elem.type == 'password'){
 						data.box = $(elem)
@@ -1823,7 +2721,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 						data.text
 							.insertAfter(elem)
 							.bind('mousedown.placeholder', function(){
-								changePlaceholderVisibility(this, false, false, data, 'focus' );
+								changePlaceholderVisibility(this, false, false, data, 'focus');
 								elem.focus();
 								return false;
 							})
@@ -1856,7 +2754,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 							data.box.addClass('placeholder-box-'+cssFloat);
 						}
 					} else {
-						var reset = function(){
+						var reset = function(e){
 							hidePlaceholder(elem, data, '');
 						};
 						if($.nodeName(data.text[0], 'label')){
@@ -1864,7 +2762,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 							//ie always exposes last label and ff always first
 							data.text.hide()[$.browser.msie ? 'insertBefore' : 'insertAfter'](elem);
 						}
-						$(window).unload(reset);
+						$(window).one('beforeunload', reset);
 						data.box = $(elem);
 						if(elem.form){
 							$(elem.form).submit(reset);
@@ -1902,8 +2800,8 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		get: function(elem){
 			return webshims.contentAttr(this, 'placeholder') || '';
 		},
-		init: true
-	});
+		contentAttr: true
+	}, true, true, 'form-placeholder');
 			
 	$.each(['input', 'textarea'], function(i, name){
 		var desc = webshims.defineNodeNameProperty(name, 'value', {
@@ -1959,7 +2857,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		}
 		return oldVal.apply(this, arguments);
 	};
-	
+	webshims.isReady('form-placeholder', true);
 });
 jQuery.webshims.ready('form-core', function($, webshims, window, document, undefined){
 	var doc = document;	

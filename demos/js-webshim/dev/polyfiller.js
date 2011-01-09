@@ -8,7 +8,7 @@
 //	});
 	
 	
-	
+	document.createElement('datalist');
 	
 	var special = $.event.special;
 	
@@ -22,13 +22,14 @@
 			extendNative: false
 		},
 		implement: {},
+		preloadHTCs: [],
 		/*
 		 * some data
 		 */
 		modules: {}, features: {}, featureList: [],
-		log: function(message1, message2){
+		log: function(message){
 			if(webshims.debug && window.console && console.log){
-				return console.log.apply(this, arguments);
+				return console.log(message);
 			}
 		},
 		addPolyfill: function(name, cfg){
@@ -128,8 +129,13 @@
 				
 		/*
 		 * handle ready modules
-		 */ 
+		 */
+		
 		isReady: function(name, _set){
+			if(_set && webshims.waitReadys[name]){
+				webshims.waitReadys[name+'ReadyCall'] = true;
+				return false;
+			}
 			name = name+'Ready';
 			if(_set){
 				if(special[name] && special[name].add){return true;}
@@ -143,7 +149,18 @@
 			}
 			return special[name] && special[name].add || false;
 		},
-		
+		waitReadys: {}, 
+		waitReady: function(name){
+			webshims.waitReadys[name] = webshims.waitReadys[name] || 0;
+			webshims.waitReadys[name]++;
+		},
+		unwaitReady: function(name){
+			webshims.waitReadys[name] = webshims.waitReadys[name] || 1;
+			webshims.waitReadys[name]--;
+			if(webshims.waitReadys[name+'ReadyCall'] && !webshims.waitReadys[name]){
+				webshims.isReady(name, true);
+			}
+		},
 		ready: function(events, fn /*, _created*/){
 			var _created = arguments[2];
 			if(typeof events == 'string'){
@@ -589,7 +606,7 @@
 	support.advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
 	support.objectAccessor = !!( support.advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__));
 	support.domAccessor = !!( support.advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__) ||  (Object.defineProperty && Object.getOwnPropertyDescriptor));
-	
+	support.dhtmlBehavior = !!(testElem.addBehavior);
 	testElem.setAttribute('dataContentAttr', ':-)');
 	support.contentAttr = !(testElem.dataContentAttr);
 	
@@ -607,6 +624,18 @@
 			return es5[1];
 		},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie7-light', 'combined-ie8-light']
+	});
+	
+	
+	addPolyfill('dom-extend', {
+		noAutoCallback: true,
+		loadInit: function(){
+			setTimeout(function(){
+				webshims.polyfill(['es5']);
+			}, 0);
+		},
+		//no test = always load
+		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light', 'combined-webkit', 'combined-base']
 	});
 	
 	/* geolocation */
@@ -672,8 +701,7 @@
 		range = null;
 		date = null;
 	})();
-	
-	
+		
 	addPolyfill('form-core', {
 		feature: 'forms',
 		noAutoCallback: true,
@@ -683,7 +711,7 @@
 			}, 0);
 		},
 		//no test = always load
-		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light', 'combined-webkit']
+		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light', 'combined-webkit', 'combined-base']
 	});
 	
 	addPolyfill('form-message', {
@@ -804,6 +832,7 @@
 		test: function(){
 			return support.placeholder;
 		},
+		noAutoCallback: true,
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
 	});
 	/* END: placeholder */
@@ -833,396 +862,6 @@
 	});
 	/* END: json + loacalStorage */
 	//predefined list without input type number/date/time etc.
-	webshims.light = ['es5', 'html5shiv', 'canvas', 'geolocation', 'forms', 'json-storage'];
+	webshims.light = ['es5', 'dom-extend', 'html5shiv', 'canvas', 'geolocation', 'forms', 'json-storage'];
 	
 })(jQuery, this, this.document);
-
-//DOM-Extension helper
-jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
-	//shortcus
-	var support = $.support;
-	var modules = webshims.modules;
-	var has = Object.prototype.hasOwnProperty;
-	
-	//proxying attribute
-	var oldAttr = $.attr;
-	var extendedProps = {};
-	var modifyProps = {};
-		
-	$.attr = function(elem, name, value, arg1, arg3){
-		var nodeName = (elem.nodeName || '').toLowerCase();
-		if(!nodeName || elem.nodeType !== 1){return oldAttr(elem, name, value, arg1, arg3);}
-		var desc = extendedProps[nodeName];
-		var handeld;
-		var ret;
-						
-		if(desc){
-			desc = desc[name];
-		}
-		if(!desc){
-			desc = extendedProps['*'];
-			if(desc){
-				desc = desc[name];
-			}
-		}
-		
-		// we got a winner
-		if(desc){
-			if(value === undefined){
-				return (desc.get) ? desc.get.call(elem) : desc.value; 
-			} else if(desc.set) {
-				ret = desc.set.call(elem, value);
-				handeld = true;
-			}
-		}
-		if(!handeld){
-			ret = oldAttr(elem, name, value, arg1, arg3);
-		}
-		if(value !== undefined && modifyProps[nodeName] && modifyProps[nodeName][name]){
-			$.each(modifyProps[nodeName][name], function(i, fn){
-				fn.call(elem, value);
-			});
-		}
-		return ret;
-	};
-	
-	var extendQAttr =  function(nodeName, prop, desc){
-		if(!extendedProps[nodeName]){
-			extendedProps[nodeName] = {};
-		}
-		var oldDesc = extendedProps[nodeName][prop];
-		var getSup = function(propType, descriptor){
-			if(descriptor && descriptor[propType]){
-				return descriptor[propType];
-			}
-			return function(value){
-				return oldAttr(this, prop, value);
-			};
-		};
-		extendedProps[nodeName][prop] = desc;
-		if(desc.value === undefined){
-			if(!desc.set){
-				desc.set = desc.writeable ? getSup('set', desc) : function(){throw(prop +'is readonly on '+ nodeName);};
-			}
-			if(!desc.get){
-				desc.get = getSup('get', desc);
-			}
-			
-		}
-		
-		$.each(['value', 'get', 'set'], function(i, descProp){
-			if(desc[descProp]){
-				desc['_sup'+descProp] = getSup(descProp, oldDesc);
-			}
-		});
-	};
-	
-	// resetting properties with magic content attributes
-	var initProp = (function(){
-		var nodeNameCache = {};
-		var initProps = {};
-		var initExtendProps = {};
-		var isReady;
-		webshims.addReady(function(context, contextElem){
-			var getElementsByName = function(name){
-				if(!nodeNameCache[name]){
-					nodeNameCache[name] = $(context.getElementsByTagName(name));
-					if(contextElem[0] && $.nodeName(contextElem[0], name)){
-						nodeNameCache[name] = nodeNameCache[name].add(contextElem);
-					}
-				}
-			};
-			nodeNameCache = {};
-			
-			
-			$.each(initExtendProps, function(name, props){
-				getElementsByName(name);
-				$.each(props, function(prop, desc){
-					nodeNameCache[name].each(function(){
-						transformDescriptor(this, prop, desc);
-						webshims.defineProperty(this, prop, desc);
-					});
-				});
-			});
-			
-			$.each(initProps, function(name, props){
-				getElementsByName(name);
-				props.forEach(function(prop){
-					nodeNameCache[name].filter('['+ prop +']').attr(prop, function(i, val){
-						return val;
-					});
-				});
-			});
-			
-			isReady = true;
-		});
-		return {
-			extend: function(nodeName, prop, desc){
-				if(!initExtendProps[nodeName]){
-					initExtendProps[nodeName] = {};
-				} 
-				initExtendProps[nodeName][prop] = desc;
-				if(isReady){
-					nodeNameCache[nodeName] = nodeNameCache[nodeName] || $( document.getElementsByTagName(nodeName) );
-					nodeNameCache[nodeName].each(function(){
-						transformDescriptor(this, prop, desc);
-						webshims.defineProperty(this, prop, desc);
-					});
-				}
-			},
-			init: function(nodeName, prop){
-				if(!initProps[nodeName]){
-					initProps[nodeName] = [prop];
-				} else {
-					initProps[nodeName].push(prop);
-				}
-				if(isReady){
-					nodeNameCache[nodeName] = nodeNameCache[nodeName] || $( document.getElementsByTagName(nodeName) );
-					nodeNameCache[nodeName].filter('['+ prop +']').attr(prop, function(i, val){
-						return val;
-					});
-				}
-			}
-		};
-	})();
-	
-	
-	var transformDescriptor = function(proto, prop, desc){
-		var oDesc;
-		var getSup = function(descriptor, accessType){
-			if(descriptor && descriptor[accessType]){
-				return descriptor[accessType];
-			}
-			
-			if(descriptor.value !== undefined){
-				//if original is a value, but we use an accessor
-				if(accessType == 'set'){
-					return function(val){descriptor.value = val;};
-				}
-				if(accessType == 'get'){
-					return function(){return descriptor.value;};
-				}
-			}
-			return function(value){
-				return webshims.contentAttr(this, prop, value);
-			};
-		};
-		if(desc.value === undefined){
-			if(!desc.set){
-				desc.set =  (!desc.writeable) ? function(){throw(prop +'is readonly on '+ this.nodeName);} : getSup(desc, 'set');
-			}
-			if(!desc.get){
-				desc.get = getSup(desc, 'get');
-			}
-		}
-		
-		if(proto && prop){
-			
-			while(proto && prop in proto && !has.call(proto, prop)){
-				proto = webshims.getPrototypeOf(proto);
-			}
-			
-			oDesc = webshims.getOwnPropertyDescriptor(proto, prop) || {configurable: true};
-			
-			if(!oDesc.configurable && !oDesc.writeable){return false;}
-			if(desc.get){
-				desc._supget = getSup(oDesc, 'get');
-			}
-			if(desc.set){
-				desc._supset = getSup(oDesc, 'set');
-			}
-			if(desc.value || oDesc.value !== undefined){
-				desc._supvalue = oDesc.value;
-			}
-		}
-		return true;
-	};
-	
-	$.extend(webshims, {
-		defineNodeNameProperty: function(nodeName, prop, desc, extend, htc){
-			desc = $.extend({writeable: true}, desc);
-			var oDesc;
-			var extendedNative = false;
-			if(webshims.cfg.extendNative && extend){
-				(function(){
-					var element = document.createElement(nodeName);
-					if(support.objectAccessor && support.contentAttr){
-						//ToDo: property on unknown element
-						
-						var proto  = webshims.getPrototypeOf(element);
-						//extend unknown property on known element
-						if(!(prop in element)){
-							transformDescriptor(false, false, desc);
-							webshims.defineProperty(proto, prop, desc);
-							extendedNative = true;
-							return;
-						}
-						//extend element itself
-						if(has.call(element, prop)){
-							oDesc = webshims.getOwnPropertyDescriptor(element, prop);
-							if(!oDesc.configurable && !oDesc.writeable){return false;}
-							initProp.extend(nodeName, prop, desc);
-							extendedNative = true;
-							return;
-						}
-						
-						if(!transformDescriptor(proto, prop, desc)){return;}
-						webshims.defineProperty(proto, prop, desc);
-						extendedNative = true;
-						return;
-					} else if(htc && support.dhtmlBehavior && !(prop in element)){
-						
-					}
-				})();
-			}
-			if(!extendedNative){
-				if(extend && webshims.cfg.extendNative){
-					webshims.log("could not extend "+ nodeName +"["+ prop +"] fallback to jQuery extend");
-				}
-				extendQAttr(nodeName, prop, desc);
-			}
-			if(desc.init){
-				initProp.init(nodeName, prop);
-			}
-			return desc;
-		},
-		defineNodeNamesProperty: function(names, prop, desc){
-			if(typeof names == 'string'){
-				names = names.split(/\s*,\s*/);
-			}
-			$.each(names, function(i, nodeName){
-				webshims.defineNodeNameProperty(nodeName, prop, desc);
-			});
-		},
-		onNodeNamesPropertyModify: function(nodeNames, prop, desc){
-			if(typeof nodeNames == 'string'){
-				nodeNames = nodeNames.split(/\s*,\s*/);
-			}
-			if($.isFunction(desc)){
-				desc = {set: desc};
-			}
-			$.each(nodeNames, function(i, name){
-				if(!modifyProps[name]){
-					modifyProps[name] = {};
-				}
-				if(!modifyProps[name][prop]){
-					modifyProps[name][prop] = [];
-				}
-				if(desc.set){
-					modifyProps[name][prop].push(desc.set);
-				}
-				if(desc.init){
-					initProp.init(name, prop);
-				}
-			});
-		},
-		defineNodeNamesBooleanProperty: function(elementNames, prop, setDesc){
-			
-			var desc = {
-				set: function(val){
-					var elem = this;
-					val = !!val;
-					elem[prop] = val;
-					webshims.contentAttr(elem, prop, val);
-					return val;
-				},
-				get: function(){
-					var val;
-					var elem = this;
-					if(support.contentAttr && prop in elem){
-						val = !!elem[prop];
-					} else {
-						val = (webshims.contentAttr(elem, prop) != null);
-					}
-					return val;
-				}
-			};
-			webshims.defineNodeNamesProperty(elementNames, prop, desc);
-			if(setDesc){
-				webshims.onNodeNamesPropertyModify(elementNames, prop, setDesc);
-			}
-		},
-		contentAttr: function(elem, name, val){
-			if(!elem.nodeName){return;}
-			if(!support.contentAttr && webshims.cfg.extendNative){
-				if(val === undefined){
-					val = $.data(elem, 'polyfilledProp-'+name);
-					if(val !== undefined){return val;}
-					return elem.attributes[name] && elem.attributes[name].value;
-				} else {
-					$.data(elem, 'polyfilledProp-'+name, val);
-				}
-				return;
-			}
-			
-			if(val === undefined){
-				val = elem.getAttribute(name);
-				return (val == null) ? undefined : val;
-			}
-			if(typeof val == 'boolean'){
-				if(!val){
-					elem.removeAttribute(name);
-				} else {
-					elem.setAttribute(name, name);
-				}
-			} else {
-				elem.setAttribute(name, val);
-			}
-		},
-				
-		activeLang: (function(){
-			var langs = [navigator.browserLanguage || navigator.language || ''];
-			var paLang = $('html').attr('lang');
-			var timer;
-			
-			if(paLang){
-				langs.push(paLang);
-			}
-			return function(lang, module, fn){
-				if(lang){
-					if(!module || !fn){
-						if(lang !== langs[0]){
-							langs[0] = lang;
-							clearTimeout(timer);
-							timer = setTimeout(function(){
-								$(document).triggerHandler('webshimLocalizationReady', langs);
-							}, 0);
-						}
-					} else {
-						module = modules[module].options;
-						var langObj = lang,
-							remoteLangs = module && module.availabeLangs,
-							loadRemoteLang = function(lang){
-								if($.inArray(lang, remoteLangs) !== -1){
-									webshims.loader.loadScript(module.langSrc+lang+'.js', function(){
-										if(langObj[lang]){
-											fn(langObj[lang]);
-										}
-									});
-									return true;
-								}
-								return false;
-							}
-						;
-						
-						$.each(langs, function(i, lang){
-							var shortLang = lang.split('-')[0];
-							if(langObj[lang] || langObj[shortLang]){
-								fn(langObj[lang] || langObj[shortLang]);
-								return false;
-							}
-							if(remoteLangs && module.langSrc && (loadRemoteLang(lang) || loadRemoteLang(shortLang))){
-								return false;
-							}
-						});
-					}
-				}
-				return langs;
-			};
-		})()
-	});
-	
-		
-	webshims.isReady('webshimLocalization', true);
-	webshims.isReady('dom-extend', true);
-});

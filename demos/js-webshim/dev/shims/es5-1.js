@@ -157,7 +157,7 @@ if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Obje
 	};
 	
 	shims.getPrototypeOf = function (object) {
-        return object.__proto__ || object.constructor.prototype;
+        return Object.getPrototypeOf && Object.getPrototypeOf(object) || object.__proto__ || object.constructor && object.constructor.prototype;
     };
 	
 	//based on http://www.refactory.org/s/object_getownpropertydescriptor/view/latest 
