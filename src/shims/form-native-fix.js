@@ -1,5 +1,5 @@
 /* https://github.com/aFarkas/webshim/issues#issue/16 */
-jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
 	var support = $.support;
 	
 	if(!support.validity || window.noHTMLExtFixes){return;}
@@ -77,5 +77,34 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		})
 	;
 		
-
+	(function(){
+		//safari 5.0.2/5.0.3 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
+		if(!$.browser.webkit || parseInt($.browser.version, 10) > 533){return;}
+		var checkValidity = function(elem){
+			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
+			if(!valid && elem.checkValidity && elem.checkValidity()){
+				$(elem).trigger('invalid');
+			}			
+			return valid;
+		};
+		
+		webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'form'], 'checkValidity', {
+			value: function(){
+				if(this.elements || $.nodeName(this, 'fieldset')){
+					var ret = true;
+					$(this.elements || 'input, textarea, select', this)
+						.each(function(){
+							 if(!checkValidity(this)){
+								ret = false;
+							}
+						})
+					;
+					return ret;
+				} else if(this.checkValidity){
+					return checkValidity(this);
+				}
+			}
+		});
+		
+	})();
 }, true);

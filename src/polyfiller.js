@@ -674,7 +674,7 @@
 	webshims.inputTypes = {};
 	
 	(function(){
-		var form = $('<form action="#"><fieldset><input name="a" required /><select><option>y</option></select></fieldset></form>'),
+		var form = $('<form action="#"><input name="a" required /><select><option>y</option></select></form>'),
 			field = $('fieldset', form)[0],
 			range = $('<input type="range" />')[0],
 			date = $('<input type="date" />')[0]
@@ -682,7 +682,6 @@
 		
 		support.validity = ('checkValidity' in form[0]);
 		support.validationMessage = !!($('input', form).attr('validationMessage'));
-		support.fieldsetValidation = !!(field.elements && field.checkValidity && 'disabled' in field && !field.checkValidity() );
 		support.output = !!( 'value' in document.createElement('output') );
 		support.datalistProp = ('list' in $('input', form)[0] && 'options' in document.createElement('datalist'));
 		support.datalist = (support.datalistProp && window.HTMLDataListElement);

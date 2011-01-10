@@ -273,21 +273,6 @@ asyncTest('checkValidity/invalid event I', function(){
 		start();
 	});
 });
-asyncTest('checkValidity/invalid event II', function(){
-	QUnit.reset();
-	var invalids = 0;
-	$('#form-1').bind('invalid', function(){
-		invalids++;
-	});
-	
-	ok(!$('#form-1 fieldset.check').checkValidity(), 'validity is false for fieldset-element (fieldset)');
-	equals(invalids, 5, 'there were 5 invalid events (fieldset)');
-	
-	
-	$.webshims.ready('forms ready', function(){
-		setTimeout(start, 0);
-	});
-});
 
 asyncTest('checkValidity/invalid event III', function(){
 	QUnit.reset();
