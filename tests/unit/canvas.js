@@ -31,7 +31,7 @@ asyncTest("canvas + dynamic canvas", function(){
 	
 	$('#outside-test').remove();
 	
-	$.webshims.ready('ready canvas', function(){
+	$.webshims.ready('DOM canvas', function(){
 		start();
 	});
 });

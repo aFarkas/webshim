@@ -1,6 +1,6 @@
 /* number-date-ui */
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
-jQuery.webshims.ready('form-number-date', function($, webshims, window, document){
+jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, window, document){
 	"use strict";
 	var triggerInlineForm = webshims.triggerInlineForm;
 	var adjustInputWithBtn = function(input, button){

@@ -538,7 +538,7 @@ asyncTest('step number/date module specific validity', function(){
 	createTestMethodA('range'));
 	
 	
-	$.webshims.ready('forms ready', function(){
+	$.webshims.ready('forms DOM', function(){
 		start();
 	});
 	
@@ -809,7 +809,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			}
 		});
 	}
-	$.webshims.ready('forms ready', function(){
+	$.webshims.ready('forms DOM', function(){
 		start();
 	});
 });

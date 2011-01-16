@@ -255,6 +255,17 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 	};
 	
 	$.extend(webshims, {
+		waitReady: function(name){
+			webshims.waitReadys[name] = webshims.waitReadys[name] || 0;
+			webshims.waitReadys[name]++;
+		},
+		unwaitReady: function(name){
+			webshims.waitReadys[name] = webshims.waitReadys[name] || 1;
+			webshims.waitReadys[name]--;
+			if(webshims.waitReadys[name+'ReadyCall'] && !webshims.waitReadys[name]){
+				webshims.isReady(name, true);
+			}
+		},
 		defineNodeNameProperty: function(nodeName, prop, desc, extend, htc, feature){
 			desc = $.extend({writeable: true}, desc);
 			var oDesc;
@@ -448,7 +459,7 @@ jQuery.webshims.gcEval = function(){
 	"use strict";
 	return (function(){eval( arguments[0] );}).call(arguments[1] || window, arguments[0]);
 };
-jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	"use strict";
 	webshims.getVisualInput = function(elem){
 		elem = $(elem);
@@ -736,43 +747,6 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 			
 		});
 	})();
-	
-	(function(){
-		if(!support.validity || window.noHTMLExtFixes || support.fieldsetValidation){return;}
-		//safari 5.0.2 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
-		var checkValidity = function(elem){
-			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
-			if(!valid && elem.checkValidity && elem.checkValidity()){
-				$(elem).trigger('invalid');
-			}			
-			return valid;
-		};
-		var checkElems = ['fieldset'];
-		//safari has a stupid bug ToDo: make proper test for safari bug
-		if(!support.output){
-			checkElems = ['input', 'textarea', 'select', 'form', 'fieldset'];
-		}
-		
-		webshims.defineNodeNamesProperty(checkElems, 'checkValidity', {
-			value: function(){
-				if(this.elements || $.nodeName(this, 'fieldset')){
-					var ret = true;
-					$(this.elements || 'input, textarea, select', this)
-						.each(function(){
-							 if(!checkValidity(this)){
-								ret = false;
-							}
-						})
-					;
-					return ret;
-				} else if(this.checkValidity){
-					return checkValidity(this);
-				}
-			}
-		});
-		
-	})();
-	
 	
 	webshims.isReady('form-core', true);
 });

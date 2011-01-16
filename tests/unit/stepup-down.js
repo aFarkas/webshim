@@ -73,7 +73,7 @@ asyncTest("stepup", function(){
 	}
 	
 	
-	$.webshims.ready('ready forms-ext', function(){
+	$.webshims.ready('DOM forms-ext', function(){
 		start();
 	});
 });

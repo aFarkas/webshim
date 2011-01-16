@@ -35,7 +35,10 @@ How To Use
 		//path is path of polyfiller.js-code + shims/ 
 		$.webshims.loader.basePath += 'shims/'; 
 		//load and implement all unsupported features 
-		$.webshims.polyfill(); 
+		$.webshims.polyfill();
+		
+		//or only load a specific feature
+		//$.webshims.polyfill('geolocation json-storage');
 	</script>
 ---------------
 
@@ -43,16 +46,12 @@ How To Use
 
 --------------
 	<script> 
-		$.webshims.ready('geolocation json-storage', function(){ 
-			//work with geolocation, JSON and localStorage 
+		$(function(){
+			//work with JSON and localStorage 
 			var userData = JSON.parse(localStorage.getItem('userData')) || {visits: 0};
+			$('#visits').html(userData.visits);
 			//...
-			$(function(){
-				//work with geolocation JSON and localStorage *and the DOM*
-				$('#visits').html(userData.visits);
-				//...
-			});
-		}); 
+		});
 	</script>
 --------------
 

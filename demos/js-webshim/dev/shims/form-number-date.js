@@ -114,8 +114,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 	});
 	
 	//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
-	
-	var valueAsNumberDescriptor = {
+	var valueAsNumberDescriptor = webshims.defineNodeNameProperty('input', 'valueAsNumber', {
 		get: function(){
 			var elem = this;
 			var type = getType(elem);
@@ -139,18 +138,18 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 					throw('INVALID_STATE_ERR: DOM Exception 11');
 				}
 			} else {
-				valueAsNumberDescriptor._supset.call(elem, arguments);
+				valueAsNumberDescriptor._supset && valueAsNumberDescriptor._supset.call(elem, arguments);
 			}
 		}
-	};
+	}, true, 'input-date-number', 'form-number-date');
 	
-	var valueAsDateDescriptor = {
+	var valueAsDateDescriptor = webshims.defineNodeNameProperty('input', 'valueAsDate', {
 		get: function(){
 			var elem = this;
 			var type = getType(elem);
 			return (typeModels[type] && typeModels[type].asDate && !typeModels[type].noAsDate) ? 
 				typeModels[type].asDate($.attr(elem, 'value')) :
-				valueAsDateDescriptor._supget.call(elem);
+				valueAsDateDescriptor._supget && valueAsDateDescriptor._supget.call(elem);
 		},
 		set: function(value){
 			var elem = this;
@@ -171,14 +170,10 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 					throw('INVALID_STATE_ERR: DOM Exception 11');
 				}
 			} else {
-				return valueAsDateDescriptor._supset(elem, arguments);
+				return valueAsDateDescriptor._supset && valueAsDateDescriptor._supset(elem, arguments) || null;
 			}
 		}
-	};
-	
-	webshims.defineNodeNameProperty('input', 'valueAsNumber', valueAsNumberDescriptor, true, 'input-date-number', 'form-number-date');
-	webshims.defineNodeNameProperty('input', 'valueAsDate', valueAsDateDescriptor, true, 'input-date-number', 'form-number-date');
-	
+	}, true, 'input-date-number', 'form-number-date');
 	
 	var typeProtos = {
 		

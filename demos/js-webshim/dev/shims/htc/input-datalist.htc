@@ -1,0 +1,18 @@
+<PUBLIC:COMPONENT lightWeight="true">
+<PUBLIC:PROPERTY NAME="list" GET="getList" PUT="setList" />
+<PUBLIC:PROPERTY NAME="selectedOption" GET="getSelectedOption" PUT="setSelectedOption" />
+<SCRIPT>
+var getList = function(){
+	 return jQuery.attr(element, 'list');
+};
+var setList = function(value){
+	return jQuery.attr(element, 'list', value);
+};
+var getSelectedOption = function(){
+	 return jQuery.attr(element, 'selectedOption');
+};
+var setSelectedOption = function(value){
+	return jQuery.attr(element, 'selectedOption', value);
+};
+</SCRIPT>
+</PUBLIC:COMPONENT>

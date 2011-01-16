@@ -125,7 +125,7 @@ if (!document.createElement('canvas').getContext) {
 	  //webshims lib modification
 		var that = this;
 		setTimeout(function(){
-			jQuery(bind(that.init_, that, doc));
+			jQuery.webshims.ready('DOM', bind(that.init_, that, doc));
 		}, 0);
     },
 
@@ -1424,7 +1424,7 @@ if (!document.createElement('canvas').getContext) {
 /*
 *webshims-Extensions 
 */
-jQuery.webshims.ready('es5', function($, webshims, window, doc){
+jQuery.webshims.ready('dom-extend', function($, webshims, window, doc){
 	if (!doc.styleSheets || !doc.namespaces){
 		return;
 	}
@@ -1446,7 +1446,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc){
 			}
 		});
 	});
-	$(function(){
+	$.webshims.ready('DOM', function(){
 		setTimeout(function(){
 			webshims.isReady('canvas', true);
 		}, 9);

@@ -140,7 +140,7 @@ asyncTest("general validity Modul", function(){
 	}
 	
 	
-	$.webshims.ready('forms ready', function(){
+	$.webshims.ready('forms DOM', function(){
 		start();
 	});
 });
@@ -209,7 +209,7 @@ asyncTest('email, url, pattern, maxlength', function(){
 	$('#pattern').val('1DHT');
 	ok($('#pattern').is(':valid-element'), '1DHT is valid pattern');
 	
-	$.webshims.ready('forms ready', function(){
+	$.webshims.ready('forms DOM', function(){
 		start();
 	});
 });
@@ -225,7 +225,7 @@ asyncTest('validationMessage/setCustomValidity', function(){
 	$('#select').attr('disabled', false).setCustomValidity('');
 	ok(( $('#select').is(':valid-element') && $('#select').attr('willValidate') ), 'select is set valid again');
 	ok(!!($('input').filter(':invalid-element').attr('validationMessage')), 'validationMessage is a getter for all invalid elements');
-	$.webshims.ready('forms ready', function(){
+	$.webshims.ready('forms DOM', function(){
 		start();
 	});
 });
@@ -254,7 +254,7 @@ asyncTest('output test', function(){
 	
 	
 	
-	$.webshims.ready('forms ready', function(){
+	$.webshims.ready('forms DOM', function(){
 		start();
 	});
 });
@@ -269,7 +269,7 @@ asyncTest('checkValidity/invalid event I', function(){
 	ok(!$('#form-1').checkValidity(), 'validity is false for form-element (form)');
 	equals(invalids, 5, 'there were 5 invalid events (form)');
 		
-	$.webshims.ready('forms ready', function(){
+	$.webshims.ready('forms DOM', function(){
 		start();
 	});
 });
@@ -284,7 +284,7 @@ asyncTest('checkValidity/invalid event III', function(){
 	ok(!$('#name').checkValidity(), 'validity is false for #name (element)');
 	equals(invalids, 1, 'there was 1 invalid event (element)');
 		
-	$.webshims.ready('forms ready', function(){
+	$.webshims.ready('forms DOM', function(){
 		setTimeout(start, 16);
 	});
 });
@@ -324,7 +324,7 @@ asyncTest('checkValidity/invalid event IV', function(){
 	ok($('#form-1').checkValidity(), 'validity is true for form-element');
 	equals(invalids, 0, 'there were 0 invalid events');
 	
-	$.webshims.ready('forms ready', function(){
+	$.webshims.ready('forms DOM', function(){
 		setTimeout(start, 32);
 	});
 });

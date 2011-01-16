@@ -50,9 +50,23 @@ asyncTest("json-storage", function(){
 	localStorage.setItem('t!(){}es.t-3', 'localStorage');
 	equals(localStorage.getItem('t!(){}es.t-3'), 'localStorage', 'localStorage t!(){}es.t-3 is "localStorage"');
 	
+	localStorage.setItem('numberTest',  JSON.stringify(4));
+	strictEqual(JSON.parse(localStorage.getItem('numberTest')), 4, 'numbers can be used');
+	
+	sessionStorage.setItem('numberTest',  JSON.stringify(4));
+	strictEqual(JSON.parse(sessionStorage.getItem('numberTest')), 4, 'numbers can be used');
+	
+	localStorage.setItem('stringTest',  JSON.stringify('4'));
+	strictEqual(JSON.parse(localStorage.getItem('stringTest')), '4', 'strings can be used');
+	
+	sessionStorage.setItem('stringTest',  JSON.stringify('4'));
+	strictEqual(JSON.parse(sessionStorage.getItem('stringTest')), '4', 'strings can be used');
+	
 	$.webshims.ready('json-storage', function(){
 		start();
 	});
 });
+
+
 
 })(jQuery);

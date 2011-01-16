@@ -4,6 +4,9 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 	var support = $.support;
 	var modules = webshims.modules;
 	var has = Object.prototype.hasOwnProperty;
+	var unknown = $.webshims.getPrototypeOf(document.createElement('foobar'));
+	var htcTest;
+	
 	
 	//proxying attribute
 	var oldAttr = $.attr;
@@ -113,7 +116,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				}
 			});
 		};
-		webshims.preloadHTCs.forEach(processPreload);
+//		webshims.preloadHTCs.forEach(processPreload);
 		webshims.preloadHTCs = {push: processPreload};
 	})();
 	
@@ -255,6 +258,17 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 	};
 	
 	$.extend(webshims, {
+		waitReady: function(name){
+			webshims.waitReadys[name] = webshims.waitReadys[name] || 0;
+			webshims.waitReadys[name]++;
+		},
+		unwaitReady: function(name){
+			webshims.waitReadys[name] = webshims.waitReadys[name] || 1;
+			webshims.waitReadys[name]--;
+			if(webshims.waitReadys[name+'ReadyCall'] && !webshims.waitReadys[name]){
+				webshims.isReady(name, true);
+			}
+		},
 		defineNodeNameProperty: function(nodeName, prop, desc, extend, htc, feature){
 			desc = $.extend({writeable: true}, desc);
 			var oDesc;
@@ -263,10 +277,20 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 			if(webshims.cfg.extendNative && extend){
 				(function(){
 					var element = document.createElement(nodeName);
-					if(support.objectAccessor && support.contentAttr){
-						//ToDo: property on unknown element
+					if(support.objectAccessor && support.contentAttr && unknown){
+						//ToDo extend property on all elements
 						
 						var proto  = webshims.getPrototypeOf(element);
+						
+						
+						
+						//extend property on unknown elements
+						if(unknown === proto){
+							initProp.extend(nodeName, prop, desc);
+							extendedNative = true;
+							return;
+						}
+						
 						//extend unknown property on known elements prototype
 						if(!(prop in element)){
 							transformDescriptor(false, false, desc);
@@ -312,7 +336,24 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				}
 				extendQAttr(nodeName, prop, desc);
 			}
-			
+			if(!htcTest && webshims.debug && extend && webshims.cfg.extendNative && htc){
+				htcTest = true;
+				$.ajax({
+					url: webshims.loader.makePath( 'htc/'+ (typeof htc == 'string' ? htc : prop) +'.htc'),
+					complete: function(xhr){
+						if(xhr.getResponseHeader){
+							var type = xhr.getResponseHeader('Content-Type') || '';
+							if(type != 'text/x-component'){
+								webshims.warn('content-type of htc-files should be "text/x-component", but was "'+ type +'"');
+								webshims.info('you should also let the client cache htc-files. use a proper expire header for htc-files');
+							}
+							if(type.indexOf('text/') !== 0){
+								webshims.warn('Error: content-type of htc-files is not text, this can not work in IE');
+							}
+						}
+					}
+				});
+			}
 			if((desc.contentAttr && !htcHandled) || desc.init){
 				initProp.init(nodeName, prop);
 			}

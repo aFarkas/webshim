@@ -35,7 +35,8 @@
             attr: 'required',
             init: false
         }], booleanJTest);
-        if ($.support.contentAttr || $.webshims.extendNative) {
+		
+        if ($.webshims.cfg.extendNative) {
             QUnit.reset();
             
             $.each([{
@@ -48,7 +49,7 @@
                 init: false
             }], booleanTest);
         }
-        $.webshims.ready('ready forms forms-ext es5 canvas', function(){
+        $.webshims.ready('DOM forms forms-ext es5 canvas', function(){
             start();
         });
     });

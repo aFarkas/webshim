@@ -1,4 +1,4 @@
-jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc, undefined){
 	"use strict";
 	var validityMessages = webshims.validityMessages;
 	var support = $.support;
@@ -105,4 +105,5 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		});
 		
 	});
+	webshims.isReady('form-message', true);
 });

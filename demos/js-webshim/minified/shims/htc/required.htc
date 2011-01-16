@@ -1,0 +1,11 @@
+<PUBLIC:COMPONENT lightWeight="true">
+<PUBLIC:PROPERTY NAME="required" GET="get" PUT="set" />
+<SCRIPT>
+var get = function(){
+	 return jQuery.attr(element, 'required');
+};
+var set = function(value){
+	return jQuery.attr(element, 'required', value);
+};
+</SCRIPT>
+</PUBLIC:COMPONENT>

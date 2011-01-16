@@ -1,0 +1,28 @@
+<PUBLIC:COMPONENT lightWeight="true">
+
+<PUBLIC:PROPERTY NAME="validity" PUT="validitySet" GET="validityGet" />
+<PUBLIC:PROPERTY NAME="willValidate" PUT="willValidateSet" GET="willValidateGet" />
+<PUBLIC:PROPERTY NAME="validationMessage" PUT="validationMessageSet" GET="validationMessageGet" />
+
+<SCRIPT>
+//ToDo validationMessage
+var validityGet = function(){
+	 return jQuery.attr(element, 'validity');
+};
+var validitySet = function(value){
+	return jQuery.noop;
+};
+var willValidateGet = function(){
+	 return jQuery.attr(element, 'willValidate');
+};
+var willValidateSet = function(value){
+	return jQuery.noop;
+};
+var validationMessageGet = function(){
+	 return jQuery.attr(element, 'validationMessage');
+};
+var validationMessageSet = function(value){
+	return jQuery.noop;
+};
+</SCRIPT>
+</PUBLIC:COMPONENT>

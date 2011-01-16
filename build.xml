@@ -13,11 +13,6 @@
     <target name="WebExtlib">
     	<!-- first we create some feature combinations, to minimize http-requests -->
 		
-		<concat destfile="${shims}/combined-base.js">
-			<fileset file="${shims}/dom-extend.js" />
-            <fileset file="${shims}/form-core.js" />
-        </concat>
-		
 		
 		<!-- good for FF3.6 -->
 		<concat destfile="${shims}/combined-ff3.js">
@@ -93,9 +88,7 @@
 			<fileset file="${shims}/html5shiv.js" />
 			<fileset file="${shims}/es5-1.js" />
 			<fileset file="${shims}/es5-2.js" />
-			<fileset file="${shims}/dom-extend.js" />
             <fileset file="${shims}/combined-ie9.js" />
-            <fileset file="${shims}/canvas.js" />
         </concat>
 		
 		<!-- good for ie8 -->
@@ -103,9 +96,7 @@
 			<fileset file="${shims}/html5shiv.js" />
 			<fileset file="${shims}/es5-1.js" />
 			<fileset file="${shims}/es5-2.js" />
-			<fileset file="${shims}/dom-extend.js" />
             <fileset file="${shims}/combined-ie9-light.js" />
-            <fileset file="${shims}/canvas.js" />
         </concat>
 		
 		<!-- good for ie6/ie7 -->

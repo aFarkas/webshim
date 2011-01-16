@@ -1,4 +1,4 @@
-jQuery.webshims.ready('form-core', function($, webshims, window){
+jQuery.webshims.ready('form-core dom-extend', function($, webshims, window){
 if($.support.validity){
 	return;
 }

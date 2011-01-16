@@ -49,7 +49,7 @@
 		equals(desc.enumerable, true, 'getOwnPropertyDescriptor enumerable');
 		
 		
-		$.webshims.ready('ready es5', function(){
+		$.webshims.ready('DOM es5', function(){
 			start();
 		});
 	});
@@ -94,7 +94,7 @@
 			obj.magic = 'foo bar';
 			equals(obj.magic, 'foo bar', 'getter returns changed value');
 			
-			$.webshims.ready('ready es5', function(){
+			$.webshims.ready('DOM es5', function(){
 				start();
 			});
 		});
@@ -132,7 +132,7 @@
 			
 			
 			
-			$.webshims.ready('ready es5', function(){
+			$.webshims.ready('DOM es5', function(){
 				start();
 			});
 		});

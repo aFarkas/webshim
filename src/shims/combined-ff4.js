@@ -4,6 +4,9 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 	var support = $.support;
 	var modules = webshims.modules;
 	var has = Object.prototype.hasOwnProperty;
+	var unknown = $.webshims.getPrototypeOf(document.createElement('foobar'));
+	var htcTest;
+	
 	
 	//proxying attribute
 	var oldAttr = $.attr;
@@ -113,7 +116,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				}
 			});
 		};
-		webshims.preloadHTCs.forEach(processPreload);
+//		webshims.preloadHTCs.forEach(processPreload);
 		webshims.preloadHTCs = {push: processPreload};
 	})();
 	
@@ -255,6 +258,17 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 	};
 	
 	$.extend(webshims, {
+		waitReady: function(name){
+			webshims.waitReadys[name] = webshims.waitReadys[name] || 0;
+			webshims.waitReadys[name]++;
+		},
+		unwaitReady: function(name){
+			webshims.waitReadys[name] = webshims.waitReadys[name] || 1;
+			webshims.waitReadys[name]--;
+			if(webshims.waitReadys[name+'ReadyCall'] && !webshims.waitReadys[name]){
+				webshims.isReady(name, true);
+			}
+		},
 		defineNodeNameProperty: function(nodeName, prop, desc, extend, htc, feature){
 			desc = $.extend({writeable: true}, desc);
 			var oDesc;
@@ -263,10 +277,20 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 			if(webshims.cfg.extendNative && extend){
 				(function(){
 					var element = document.createElement(nodeName);
-					if(support.objectAccessor && support.contentAttr){
-						//ToDo: property on unknown element
+					if(support.objectAccessor && support.contentAttr && unknown){
+						//ToDo extend property on all elements
 						
 						var proto  = webshims.getPrototypeOf(element);
+						
+						
+						
+						//extend property on unknown elements
+						if(unknown === proto){
+							initProp.extend(nodeName, prop, desc);
+							extendedNative = true;
+							return;
+						}
+						
 						//extend unknown property on known elements prototype
 						if(!(prop in element)){
 							transformDescriptor(false, false, desc);
@@ -312,7 +336,24 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				}
 				extendQAttr(nodeName, prop, desc);
 			}
-			
+			if(!htcTest && webshims.debug && extend && webshims.cfg.extendNative && htc){
+				htcTest = true;
+				$.ajax({
+					url: webshims.loader.makePath( 'htc/'+ (typeof htc == 'string' ? htc : prop) +'.htc'),
+					complete: function(xhr){
+						if(xhr.getResponseHeader){
+							var type = xhr.getResponseHeader('Content-Type') || '';
+							if(type != 'text/x-component'){
+								webshims.warn('content-type of htc-files should be "text/x-component", but was "'+ type +'"');
+								webshims.info('you should also let the client cache htc-files. use a proper expire header for htc-files');
+							}
+							if(type.indexOf('text/') !== 0){
+								webshims.warn('Error: content-type of htc-files is not text, this can not work in IE');
+							}
+						}
+					}
+				});
+			}
 			if((desc.contentAttr && !htcHandled) || desc.init){
 				initProp.init(nodeName, prop);
 			}
@@ -448,7 +489,7 @@ jQuery.webshims.gcEval = function(){
 	"use strict";
 	return (function(){eval( arguments[0] );}).call(arguments[1] || window, arguments[0]);
 };
-jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	"use strict";
 	webshims.getVisualInput = function(elem){
 		elem = $(elem);
@@ -737,49 +778,12 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		});
 	})();
 	
-	(function(){
-		if(!support.validity || window.noHTMLExtFixes || support.fieldsetValidation){return;}
-		//safari 5.0.2 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
-		var checkValidity = function(elem){
-			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
-			if(!valid && elem.checkValidity && elem.checkValidity()){
-				$(elem).trigger('invalid');
-			}			
-			return valid;
-		};
-		var checkElems = ['fieldset'];
-		//safari has a stupid bug ToDo: make proper test for safari bug
-		if(!support.output){
-			checkElems = ['input', 'textarea', 'select', 'form', 'fieldset'];
-		}
-		
-		webshims.defineNodeNamesProperty(checkElems, 'checkValidity', {
-			value: function(){
-				if(this.elements || $.nodeName(this, 'fieldset')){
-					var ret = true;
-					$(this.elements || 'input, textarea, select', this)
-						.each(function(){
-							 if(!checkValidity(this)){
-								ret = false;
-							}
-						})
-					;
-					return ret;
-				} else if(this.checkValidity){
-					return checkValidity(this);
-				}
-			}
-		});
-		
-	})();
-	
-	
 	webshims.isReady('form-core', true);
 });
 
 
 
-jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc, undefined){
 	"use strict";
 	var validityMessages = webshims.validityMessages;
 	var support = $.support;
@@ -886,6 +890,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		});
 		
 	});
+	webshims.isReady('form-message', true);
 });jQuery.webshims.ready('form-message form-core', function($, webshims, window, doc, undefined){
 //	"use strict";
 	var support = $.support;
@@ -967,29 +972,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		});
 		validityElements.push('input');
 	}
-			
-	if(!support.requiredSelect){
-		webshims.defineNodeNamesBooleanProperty(['select'], 'required', {
-			set: function(value){
-				this.setAttribute('aria-required', (value) ? 'true' : 'false');
-			},
-			init: true
-		});
-		
-		webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){
-			
-			if(cache.nodeName == 'select' && !val && jElm.attr('required') && jElm[0].size < 2){
-				if(!cache.type){
-					cache.type = jElm[0].type;
-				}
-				
-				if(cache.type == 'select-one' && $('> option:first-child:not(:disabled)', jElm).attr('selected')){
-					return true;
-				}
-			}
-			return validityState.valueMissing;
-		});
-	}
+	
 	
 	if(overrideValidity){
 		
@@ -1204,8 +1187,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 	});
 	
 	//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
-	
-	var valueAsNumberDescriptor = {
+	var valueAsNumberDescriptor = webshims.defineNodeNameProperty('input', 'valueAsNumber', {
 		get: function(){
 			var elem = this;
 			var type = getType(elem);
@@ -1229,18 +1211,18 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 					throw('INVALID_STATE_ERR: DOM Exception 11');
 				}
 			} else {
-				valueAsNumberDescriptor._supset.call(elem, arguments);
+				valueAsNumberDescriptor._supset && valueAsNumberDescriptor._supset.call(elem, arguments);
 			}
 		}
-	};
+	}, true, 'input-date-number', 'form-number-date');
 	
-	var valueAsDateDescriptor = {
+	var valueAsDateDescriptor = webshims.defineNodeNameProperty('input', 'valueAsDate', {
 		get: function(){
 			var elem = this;
 			var type = getType(elem);
 			return (typeModels[type] && typeModels[type].asDate && !typeModels[type].noAsDate) ? 
 				typeModels[type].asDate($.attr(elem, 'value')) :
-				valueAsDateDescriptor._supget.call(elem);
+				valueAsDateDescriptor._supget && valueAsDateDescriptor._supget.call(elem);
 		},
 		set: function(value){
 			var elem = this;
@@ -1261,14 +1243,10 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 					throw('INVALID_STATE_ERR: DOM Exception 11');
 				}
 			} else {
-				return valueAsDateDescriptor._supset(elem, arguments);
+				return valueAsDateDescriptor._supset && valueAsDateDescriptor._supset(elem, arguments) || null;
 			}
 		}
-	};
-	
-	webshims.defineNodeNameProperty('input', 'valueAsNumber', valueAsNumberDescriptor, true, 'input-date-number', 'form-number-date');
-	webshims.defineNodeNameProperty('input', 'valueAsDate', valueAsDateDescriptor, true, 'input-date-number', 'form-number-date');
-	
+	}, true, 'input-date-number', 'form-number-date');
 	
 	var typeProtos = {
 		
@@ -1473,7 +1451,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 });
 /* number-date-ui */
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
-jQuery.webshims.ready('form-number-date', function($, webshims, window, document){
+jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, window, document){
 	"use strict";
 	var triggerInlineForm = webshims.triggerInlineForm;
 	var adjustInputWithBtn = function(input, button){

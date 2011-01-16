@@ -1,0 +1,9 @@
+<PUBLIC:COMPONENT lightWeight="true">
+<PUBLIC:PROPERTY NAME="options" GET="get" PUT="set" />
+<SCRIPT>
+var get = function(){
+	 return jQuery.attr(element, 'options');
+};
+var set = jQuery.noop;
+</SCRIPT>
+</PUBLIC:COMPONENT>

@@ -35,7 +35,10 @@
 		}
 		
 		.d input {background: #000;}
-		
+		:invalid {
+			background: #f00;
+			border: 2px solid #f00;
+		}
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
@@ -55,76 +58,52 @@
 	</script>
 	<title>playing</title>
 	    <script>
-	    				
+	    	
 			$.webshims.debug = true;
 			$.webshims.cfg.extendNative = true;
 			$.webshims.loader.basePath += 'shims/';
+//			window.FlashCanvas = {path: $.webshims.loader.basePath};
 			$.webshims.polyfill();
 			
-			$.webshims.ready('ready forms', function(){
-				$('#input-list')[0].required = true;
+			var start = new Date().getTime();
+			
+			$(function(){
+				console.log('READY', start - new Date().getTime())
+//				alert($('#a')[0].required)
+//				alert($('#a')[0].validity.valid)
+//				alert($('#a').attr('validity').valueMissing)
+//				alert($('#b')[0].required)
+//				alert($('#b')[0].validity.valid)
+//				alert($('#b')[0].validity.valueMissing)
+//				$('#input-list')[0].required = true;
 //				console.log(.validity.valid);
 			})
-			
+			$.webshims.ready('DOM', function(){
+				console.log('domready', start - new Date().getTime())
+			})
+			$.webshims.ready('json-storage', function(){
+				console.log('jsonready', start - new Date().getTime())
+			})
+			$.webshims.ready('forms-ext', function(){
+				console.log('forms-ext', start - new Date().getTime())
+			})
 	    </script>
 </head>
 
 <body class="js-off"> 
-
+<canvas></canvas>
 <form id="test" action="#">
-	<button type="submit">fdsfdsf</button>
-	<div>
-	<input type="date" />
-	<input required="" placeholder="saa" id="input-list" type="password" list="datalist" />
-
-
-
-	<input placeholder="saa" type="text" />
-	<datalist id="datalist">
-		<select>
-			<option>Test Text 1</option>
-			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
-			<option>Test Text 1</option>
-			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
-			<option>Test Text 1</option>
-			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
-			<option>Test Text 1</option>
-			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
-			<option>Test Text 1</option>
-			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
-			<option>Test Text 1</option>
-			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
-			<option>Test Text 1</option>
-			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
-			<option>Test Text 1</option>
-			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
-			<option>Test Text 1</option>
-			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
-			<option>Test Text 1</option>
-			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
-			<option>Test Text 1</option>
-			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
-			<option>Test Text 1</option>
-			<option value="value of 2">Test Text 2Test Text 2Test Text 2Test Text 2</option>
-		</select>
-	</datalist>
-	
-	<datalist id="datalist2">
-		<select>
-			<option value="dsa2">2Test Text 1</option>
-			<option value="dsa">2Test Text 2</option>
-			<option label="2Test Text 1 label" value="dsa22"></option>
-		</select>
-	</datalist>
-	
-	<select multiple id="multiple-test">
-		<option>dsa1</option>
-		<option>dsa2</option>
-		<option>dsa3</option>
+<div>
+	<select name="a" id="a" required>
+		<option value="">a</option>
+		<option value="a">a</option>
 	</select>
-	<input type="reset" />
 	
-	<button type="submit">fdsfdsf</button>
+	<select name="b" id="b">
+		<option value="">a</option>
+		<option value="a">a</option>
+	</select>
+	<input type="submit" />
 </div>
 </form>
 	

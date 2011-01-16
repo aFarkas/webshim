@@ -109,7 +109,7 @@ asyncTest("placeholder Modul", function(){
 	$('#placeholder-empty-text').triggerHandler('blur');
 	textPlaceholder.hasText($('#placeholder-empty-text')[0], 'yes2');
 		
-	$.webshims.ready('forms ready', function(){
+	$.webshims.ready('forms DOM', function(){
 		start();
 	});
 });

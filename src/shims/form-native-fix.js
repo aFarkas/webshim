@@ -107,4 +107,32 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		});
 		
 	})();
-}, true);
+	if(!support.requiredSelect){
+		webshims.ready('form-extend', function(){
+			webshims.defineNodeNamesBooleanProperty(['select'], 'required', {
+				set: function(value){
+					this.setAttribute('aria-required', (value) ? 'true' : 'false');
+				},
+				contentAttr: true
+			}, true);
+			
+			webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){
+				
+				if(cache.nodeName == 'select' && !val && jElm.attr('required') && jElm[0].size < 2){
+					if(!cache.type){
+						cache.type = jElm[0].type;
+					}
+					
+					if(cache.type == 'select-one' && $('> option:first-child:not(:disabled)', jElm).attr('selected')){
+						return true;
+					}
+				}
+				return validityState.valueMissing;
+			});
+			//trigger validity test
+			webshims.ready('DOM', function(){
+				$('select[required]').attr('validity');
+			});
+		});
+	}
+});

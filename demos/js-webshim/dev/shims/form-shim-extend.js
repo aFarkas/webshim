@@ -1,4 +1,4 @@
-jQuery.webshims.ready('form-core', function($, webshims, window){
+jQuery.webshims.ready('form-core dom-extend', function($, webshims, window){
 if($.support.validity){
 	return;
 }
@@ -121,7 +121,7 @@ webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'form', 'fields
 		};
 		return function(){
 			unhandledInvalids = false;
-			if($.nodeName(this, 'form') || $.nodeName(this, 'fieldset')){
+			if($.nodeName(this, 'form')){
 				var ret = true,
 					elems = this.elements || $( 'input, textarea, select', this);
 				
@@ -131,7 +131,7 @@ webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'form', 'fields
 					}
 				}
 				return ret;
-			} else if(this.form){
+			} else if(this.form && !$.nodeName(this, 'fieldset')){
 				return testValidity(this);
 			} else {
 				return true;

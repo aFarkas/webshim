@@ -462,6 +462,9 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 	var support = $.support;
 	var modules = webshims.modules;
 	var has = Object.prototype.hasOwnProperty;
+	var unknown = $.webshims.getPrototypeOf(document.createElement('foobar'));
+	var htcTest;
+	
 	
 	//proxying attribute
 	var oldAttr = $.attr;
@@ -571,7 +574,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				}
 			});
 		};
-		webshims.preloadHTCs.forEach(processPreload);
+//		webshims.preloadHTCs.forEach(processPreload);
 		webshims.preloadHTCs = {push: processPreload};
 	})();
 	
@@ -713,6 +716,17 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 	};
 	
 	$.extend(webshims, {
+		waitReady: function(name){
+			webshims.waitReadys[name] = webshims.waitReadys[name] || 0;
+			webshims.waitReadys[name]++;
+		},
+		unwaitReady: function(name){
+			webshims.waitReadys[name] = webshims.waitReadys[name] || 1;
+			webshims.waitReadys[name]--;
+			if(webshims.waitReadys[name+'ReadyCall'] && !webshims.waitReadys[name]){
+				webshims.isReady(name, true);
+			}
+		},
 		defineNodeNameProperty: function(nodeName, prop, desc, extend, htc, feature){
 			desc = $.extend({writeable: true}, desc);
 			var oDesc;
@@ -721,10 +735,20 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 			if(webshims.cfg.extendNative && extend){
 				(function(){
 					var element = document.createElement(nodeName);
-					if(support.objectAccessor && support.contentAttr){
-						//ToDo: property on unknown element
+					if(support.objectAccessor && support.contentAttr && unknown){
+						//ToDo extend property on all elements
 						
 						var proto  = webshims.getPrototypeOf(element);
+						
+						
+						
+						//extend property on unknown elements
+						if(unknown === proto){
+							initProp.extend(nodeName, prop, desc);
+							extendedNative = true;
+							return;
+						}
+						
 						//extend unknown property on known elements prototype
 						if(!(prop in element)){
 							transformDescriptor(false, false, desc);
@@ -770,7 +794,24 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				}
 				extendQAttr(nodeName, prop, desc);
 			}
-			
+			if(!htcTest && webshims.debug && extend && webshims.cfg.extendNative && htc){
+				htcTest = true;
+				$.ajax({
+					url: webshims.loader.makePath( 'htc/'+ (typeof htc == 'string' ? htc : prop) +'.htc'),
+					complete: function(xhr){
+						if(xhr.getResponseHeader){
+							var type = xhr.getResponseHeader('Content-Type') || '';
+							if(type != 'text/x-component'){
+								webshims.warn('content-type of htc-files should be "text/x-component", but was "'+ type +'"');
+								webshims.info('you should also let the client cache htc-files. use a proper expire header for htc-files');
+							}
+							if(type.indexOf('text/') !== 0){
+								webshims.warn('Error: content-type of htc-files is not text, this can not work in IE');
+							}
+						}
+					}
+				});
+			}
 			if((desc.contentAttr && !htcHandled) || desc.init){
 				initProp.init(nodeName, prop);
 			}
@@ -906,7 +947,7 @@ jQuery.webshims.gcEval = function(){
 	"use strict";
 	return (function(){eval( arguments[0] );}).call(arguments[1] || window, arguments[0]);
 };
-jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	"use strict";
 	webshims.getVisualInput = function(elem){
 		elem = $(elem);
@@ -1195,49 +1236,12 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		});
 	})();
 	
-	(function(){
-		if(!support.validity || window.noHTMLExtFixes || support.fieldsetValidation){return;}
-		//safari 5.0.2 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
-		var checkValidity = function(elem){
-			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
-			if(!valid && elem.checkValidity && elem.checkValidity()){
-				$(elem).trigger('invalid');
-			}			
-			return valid;
-		};
-		var checkElems = ['fieldset'];
-		//safari has a stupid bug ToDo: make proper test for safari bug
-		if(!support.output){
-			checkElems = ['input', 'textarea', 'select', 'form', 'fieldset'];
-		}
-		
-		webshims.defineNodeNamesProperty(checkElems, 'checkValidity', {
-			value: function(){
-				if(this.elements || $.nodeName(this, 'fieldset')){
-					var ret = true;
-					$(this.elements || 'input, textarea, select', this)
-						.each(function(){
-							 if(!checkValidity(this)){
-								ret = false;
-							}
-						})
-					;
-					return ret;
-				} else if(this.checkValidity){
-					return checkValidity(this);
-				}
-			}
-		});
-		
-	})();
-	
-	
 	webshims.isReady('form-core', true);
 });
 
 
 
-jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc, undefined){
 	"use strict";
 	var validityMessages = webshims.validityMessages;
 	var support = $.support;
@@ -1344,7 +1348,8 @@ jQuery.webshims.ready('form-core', function($, webshims, window, doc, undefined)
 		});
 		
 	});
-});jQuery.webshims.ready('form-core', function($, webshims, window){
+	webshims.isReady('form-message', true);
+});jQuery.webshims.ready('form-core dom-extend', function($, webshims, window){
 if($.support.validity){
 	return;
 }
@@ -1467,7 +1472,7 @@ webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'form', 'fields
 		};
 		return function(){
 			unhandledInvalids = false;
-			if($.nodeName(this, 'form') || $.nodeName(this, 'fieldset')){
+			if($.nodeName(this, 'form')){
 				var ret = true,
 					elems = this.elements || $( 'input, textarea, select', this);
 				
@@ -1477,7 +1482,7 @@ webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'form', 'fields
 					}
 				}
 				return ret;
-			} else if(this.form){
+			} else if(this.form && !$.nodeName(this, 'fieldset')){
 				return testValidity(this);
 			} else {
 				return true;
@@ -1788,8 +1793,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 	});
 	
 	//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
-	
-	var valueAsNumberDescriptor = {
+	var valueAsNumberDescriptor = webshims.defineNodeNameProperty('input', 'valueAsNumber', {
 		get: function(){
 			var elem = this;
 			var type = getType(elem);
@@ -1813,18 +1817,18 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 					throw('INVALID_STATE_ERR: DOM Exception 11');
 				}
 			} else {
-				valueAsNumberDescriptor._supset.call(elem, arguments);
+				valueAsNumberDescriptor._supset && valueAsNumberDescriptor._supset.call(elem, arguments);
 			}
 		}
-	};
+	}, true, 'input-date-number', 'form-number-date');
 	
-	var valueAsDateDescriptor = {
+	var valueAsDateDescriptor = webshims.defineNodeNameProperty('input', 'valueAsDate', {
 		get: function(){
 			var elem = this;
 			var type = getType(elem);
 			return (typeModels[type] && typeModels[type].asDate && !typeModels[type].noAsDate) ? 
 				typeModels[type].asDate($.attr(elem, 'value')) :
-				valueAsDateDescriptor._supget.call(elem);
+				valueAsDateDescriptor._supget && valueAsDateDescriptor._supget.call(elem);
 		},
 		set: function(value){
 			var elem = this;
@@ -1845,14 +1849,10 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 					throw('INVALID_STATE_ERR: DOM Exception 11');
 				}
 			} else {
-				return valueAsDateDescriptor._supset(elem, arguments);
+				return valueAsDateDescriptor._supset && valueAsDateDescriptor._supset(elem, arguments) || null;
 			}
 		}
-	};
-	
-	webshims.defineNodeNameProperty('input', 'valueAsNumber', valueAsNumberDescriptor, true, 'input-date-number', 'form-number-date');
-	webshims.defineNodeNameProperty('input', 'valueAsDate', valueAsDateDescriptor, true, 'input-date-number', 'form-number-date');
-	
+	}, true, 'input-date-number', 'form-number-date');
 	
 	var typeProtos = {
 		
@@ -2057,7 +2057,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 });
 /* number-date-ui */
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
-jQuery.webshims.ready('form-number-date', function($, webshims, window, document){
+jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, window, document){
 	"use strict";
 	var triggerInlineForm = webshims.triggerInlineForm;
 	var adjustInputWithBtn = function(input, button){
@@ -2915,7 +2915,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 	};
 	webshims.isReady('form-placeholder', true);
 });
-jQuery.webshims.ready('form-core', function($, webshims, window, document, undefined){
+jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, document, undefined){
 	var doc = document;	
 	
 	(function(){
@@ -3028,21 +3028,8 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				var elem = this;
 				return webshims.contentAttr(elem, 'value') || $(elem).text() || '';
 			}
-		});
-		
-		webshims.onNodeNamesPropertyModify('input', 'value', {
-			set: function(value){
-				var elem = this;
-				var setVal = $.data(elem, 'outputShim');
-				if(setVal){
-					setVal(value);
-					return value;
-				}
-				$(elem).triggerHandler('updateInput');
-			}
-		
-		});
-		
+		}, true, 'output-props', 'form-output-datalist');
+				
 		webshims.addReady(function(context, contextElem){
 			$('output', context).add(contextElem.filter('output')).each(function(){
 				outputCreate(this);
@@ -3408,8 +3395,8 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 					webshims.objectCreate(dataListProto, undefined, {input: elem, id: value, datalist: dom});
 				}
 			},
-			init: true
-		});
+			contentAttr: true
+		}, true, 'input-datalist', 'form-output-datalist');
 		
 		webshims.defineNodeNameProperty('input', 'selectedOption', {
 			get: function(){
@@ -3430,7 +3417,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				});
 				return ret;
 			}
-		});
+		}, true, 'input-datalist', 'form-output-datalist');
 			
 		webshims.defineNodeNameProperty('input', 'autocomplete', {
 			get: function(){
@@ -3466,7 +3453,7 @@ jQuery.webshims.ready('form-core', function($, webshims, window, document, undef
 				var select = $('select', elem);
 				return (select[0]) ? select[0].options : [];
 			}
-		});
+		}, true, 'datalist-props', 'form-output-datalist');
 		
 		
 		webshims.addReady(function(context, contextElem){

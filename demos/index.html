@@ -30,7 +30,7 @@
 		<section>
 			<div class="home-box about-box">
 				<h2>About</h2>
-				<p>Webshims Lib is a DOM-Extension helper, wich enables / polyfills some of the latest Browserfeatures also known as "HTML5-Features" in non capable Browsers. It is build on Top of jQuery.</p>
+				<p>Webshims Lib is a DOM-Extension helper, wich enables / polyfills some of the latest Browserfeatures often called "HTML5-Features" or better <a href="http://www.brucelawson.co.uk/2010/meet-newt-new-exciting-web-technologies/">NEWT</a> in non capable Browsers. It is build on Top of jQuery and Modernizr.</p>
 			</div>
 			<div class="home-box download-box">
 				<h3>Download</h3>
@@ -175,7 +175,7 @@
 &lt;/script&gt;	
 </code>
 
-			<p>The polyfill-method can also take a keyword called <code>lightweight</code>, wich will load a filesize-/feature balanced profile. The lightweight-profile currently loads all features, except of the <code>forms-ext</code> feature (numerical and date related web form features). The normal HTML5 <code>forms</code> feature including constraint validation (required, pattern, [type=email]) is loaded in this profile.</p>
+			<p>The polyfill-method can also take a keyword called <code>lightweight</code>, wich will load a filesize-/feature balanced profile. The lightweight-profile currently loads all features, except of the <code>forms-ext</code> feature (numerical and date related web form features). The normal HTML5 <code>forms</code> feature - including constraint validation (required, pattern, [type=email]) and datalist/output widgets - is loaded in this profile.</p>
 <code class="block">
 &lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
 
@@ -186,16 +186,31 @@
 	$.webshims.polyfill('lightweight');
 &lt;/script&gt;	
 </code>			
+			<p>The polyfill-method can also take a white space seperated list of several features.</p>
+<code class="block">
+&lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
+
+&lt;script&gt;
+	//path is path of polyfiller.js-code + shims/
+	$.webshims.loader.basePath += 'shims/';
+	//load and implement json-storage and geolocation features, if they aren't supported
+	$.webshims.polyfill('json-storage geolocation');
+&lt;/script&gt;	
+</code>	
 			<h3>When is a feature ready to use?</h3>
-			<p>Not every feature is ready immediately in all browsers. To get started, if a feature is ready, simply name the features you want to use and pass a callback-function to <code>$.webshims.ready</code></p>
+			<p>Not every feature is ready immediately in all browsers. To get started, if all features are ready, simply use one of jQuery's ready methods, wich are delayed, till all features are available.</p>
 <code class="block">
 &lt;script&gt;
-	$.webshims.ready('geolocation', function(){
-		//work with geolocation
+	$(function(){
+		//work with DOM + all implemented features
+	});
+	
+	$(doument).ready(function(){
+		//work with DOM + all features
 	});
 &lt;/script&gt;	
 </code>		
-			<p>If you want to use multiple features in your callback-function pass the feature list seperated by a whitespace:</p>
+			<p>If you want to use a feature as soon as possible you can use <code>$.webshims.ready</code> and pass the feature-name[s] and a callback-function:</p>
 <code class="block">
 &lt;script&gt;
 	$.webshims.ready('geolocation json-storage', function(){
@@ -203,20 +218,12 @@
 	});
 &lt;/script&gt;	
 </code>	
-			<p>Note that this callback function may be called before DOM-Ready. If you want to use a feature after DOM-Ready, simply pass the string ready:</p>
+			<p>Note that this callback function may be called before DOM-Ready. If you want to use a feature after DOM-Ready, simply pass the string 'DOM':</p>
 <code class="block">
 &lt;script&gt;
-	$.webshims.ready('ready canvas', function(){
+	$.webshims.ready('DOM canvas', function(){
 		//work with the canvas in the document
 	});
-	
-	//this is equal to
-	
-	//$(function(){
-	//	$.webshims.ready('canvas', function(){
-	//		//work with the canvas in the document
-	//	});
-	//});
 &lt;/script&gt;	
 </code>	
 			
@@ -278,7 +285,7 @@ $(this).checkValidity();
     </section> 
 	
 	<script>
-		$.webshims.ready('ready geolocation', function(){
+		$(function(){
 			$('button.geolocation').click(function(){
 				var elem = $(this).attr('disabled', true).addClass('loader');
 				$('#geolocation').html('please wait calculating position');
@@ -295,10 +302,7 @@ $(this).checkValidity();
 					$('#geolocation').html('Oops, something went wrong');
 				});
 			});
-		});
-		
-		//canvas feature
-        $.webshims.ready('ready canvas', function(){
+			
 			//example from http://www.peterkroener.de/eine-kleine-canvas-einfuehrung/
 			$('canvas.peter').each(function(){
 				var animate = function(ax, ay, adx, ady, bx, by, bdx, bdy){
@@ -353,7 +357,8 @@ $(this).checkValidity();
 				var context = $(this).getContext('2d');
 				animate(31, 69, 1, -1, 8, 25, 1, 1);
 			});
-        });
+		});
+		
     </script>
 	<script src="demo-js/demo.js"></script>
 <!--[if lte IE 7]>
