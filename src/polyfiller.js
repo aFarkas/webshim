@@ -262,11 +262,13 @@
 		loader: {
 			
 			basePath: (function(){
+				var path = $('meta[name="polyfill-path"]').attr('content');
+				if(path){return path;}
 				var script = $('script');
-				var path;
+				
 				script = script[script.length - 1];
 				path = ((!$.browser.msie || document.documentMode >= 8) ? script.src : script.getAttribute("src", 4)).split('?')[0];
-				return path.slice(0, path.lastIndexOf("/") + 1);
+				return path.slice(0, path.lastIndexOf("/") + 1) +'shims/';
 			})(),
 			
 			combinations: {},
@@ -402,12 +404,15 @@
 					}
 					
 					var script = document.createElement('script'),
+						timer,
 						onLoad = function(e){
-							
+							if(e.type === 'error'){
+								webshims.warn('Error: could not find script @'+src +'| configure polyfill-path "$.webshims.loader.basePath" or by using markup: <meta name="polyfill-path" content="path/to/shimsfolder/" />');
+							}
 							if(!this.readyState ||
 										this.readyState == "loaded" || this.readyState == "complete"){
 								script.onload =  null;
-								script.onerror = null;
+								$(script).onerror = null;
 								script.onreadystatechange = null;
 								if(callback){
 									callback(e, this);
@@ -428,18 +433,22 @@
 									});
 									
 								}
-								
 								script = null;
+								clearTimeout(timer);
 							}
 						}
 					;
 					script.setAttribute('async', 'async');
 					script.src = src;
+					timer = setTimeout(function(){
+						onLoad({type: 'error'});
+					}, 20000);
 					script.onload = onLoad;
-					script.onerror = onLoad;
+					$(script).one('error', onLoad);
 					script.onreadystatechange = onLoad;
 					parent.appendChild(script);
 					script.async = true;
+					
 					loadedSrcs.push(src);
 				};
 			})()
@@ -607,7 +616,7 @@
 	var browserVersion = parseFloat($.browser.version, 10);
 	var httpProtocol = (location.protocol == 'https:') ? 'https:' : 'http:';
 	loader.addModule('html5a11y', {
-		src: 'html5a11y',
+		src: 'html5as11y',
 		test: function(){
 			return !(($.browser.msie && browserVersion < 10 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 540));
 		}
@@ -710,42 +719,46 @@
 	/* canvas */
 	support.canvas = ('getContext'  in $('<canvas />')[0]);
 	
-	addPolyfill('canvas', {
+	addPolyfill('flashcanvas', {
+		feature: 'canvas',
 		test: function(){
 			return support.canvas;
 		},
 		noAutoCallback: true,
-//		afterLoad: function(){
-//			var wasReady = document.readyState === 'complete';
-//			webshims.ready('dom-extend', function($, webshims, window, doc){
-//				webshims.defineNodeNameProperty('canvas', 'getContext', {
-//					value: function(ctxName){
-//						if(!this.getContext){
-//							G_vmlCanvasManager.initElement(this);
-//						}
-//						return this.getContext(ctxName);
-//					}
-//				});
-//						
-//				webshims.addReady(function(context, elem){
-//					if(doc === context){
-//						if(wasReady){
-//							isReady('canvas', true);						
-//						} else {
-//							setTimeout(function(){
-//								isReady('canvas', true);
-//							}, 9);
-//						}
-//						return;
-//					}
-//					$('canvas', context).add(elem.filter('canvas')).each(function(){
-//						if(!this.getContext){
-//							G_vmlCanvasManager.initElement(this);
-//						}
-//					});
-//				});
-//			});
-//		},
+		loadInit: function(){
+			
+		},
+		afterLoad: function(){
+			var wasReady = document.readyState === 'complete';
+			webshims.ready('dom-extend', function($, webshims, window, doc){
+				webshims.defineNodeNameProperty('canvas', 'getContext', {
+					value: function(ctxName){
+						if(!this.getContext){
+							G_vmlCanvasManager.initElement(this);
+						}
+						return this.getContext(ctxName);
+					}
+				});
+						
+				webshims.addReady(function(context, elem){
+					if(doc === context){
+						if(wasReady){
+							isReady('canvas', true);						
+						} else {
+							setTimeout(function(){
+								isReady('canvas', true);
+							}, 9);
+						}
+						return;
+					}
+					$('canvas', context).add(elem.filter('canvas')).each(function(){
+						if(!this.getContext){
+							G_vmlCanvasManager.initElement(this);
+						}
+					});
+				});
+			});
+		},
 		methodNames: ['getContext'],
 		dependencies: ['es5', 'dom-support']
 	});

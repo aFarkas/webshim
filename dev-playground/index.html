@@ -61,7 +61,6 @@
 	    	
 			$.webshims.debug = true;
 			$.webshims.cfg.extendNative = true;
-			$.webshims.loader.basePath += 'shims/';
 //			window.FlashCanvas = {path: $.webshims.loader.basePath};
 			$.webshims.polyfill();
 			
@@ -93,6 +92,7 @@
 <body class="js-off"> 
 <canvas></canvas>
 <form id="test" action="#">
+	<input oninput="console.log(value = 10, a, b, this)" />
 <div>
 	<select name="a" id="a" required>
 		<option value="">a</option>

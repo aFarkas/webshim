@@ -40,10 +40,7 @@
 			changeYear: true,
 			showButtonPanel: true
 		};
-		
-		//path is path of polyfiller.js + shims/
-    	$.webshims.loader.basePath += 'shims/';
-		//load all defined modules (look into features.js)
+		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
         
@@ -136,7 +133,7 @@ $.webshims.modules.inputUI.options.datepicker = {
 
 			<h3>Loading jQuery UI from another source</h3>
 <code class="block">
-// relative from $.webshims.loader.basePath
+// relative from shims-folder
 $.webshims.modules["jquery-ui"].src = "../jquery-ui.custom.min.js";
 </code>
 			<h3>Loading partial jQuery UI</h3>

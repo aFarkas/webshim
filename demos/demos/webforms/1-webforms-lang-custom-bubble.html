@@ -28,10 +28,9 @@
 	<script src="../../js-webshim/minified/extras/modernizr-1.6.min.js"></script>
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
     <script>
-    	//path is path of polyfiller.js + shims/
-    	$.webshims.loader.basePath += 'shims/';
+    	//configure
 		$.webshims.overrideValidationMessages = true;
-		//load all defined modules (look into features.js)
+		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
     </script>
