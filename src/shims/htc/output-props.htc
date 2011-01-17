@@ -1,0 +1,11 @@
+<PUBLIC:COMPONENT lightWeight="true">
+<PUBLIC:PROPERTY NAME="value" GET="get" PUT="set" />
+<SCRIPT>
+var get = function(){
+	 return jQuery.attr(element, 'value');
+};
+var set = function(value){
+	return jQuery.attr(element, 'value', value);
+};
+</SCRIPT>
+</PUBLIC:COMPONENT>
