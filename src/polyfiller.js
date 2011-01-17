@@ -263,8 +263,10 @@
 			
 			basePath: (function(){
 				var script = $('script');
+				var path;
 				script = script[script.length - 1];
-				return ((!$.browser.msie || document.documentMode >= 8) ? script.src : script.getAttribute("src", 4)).split('?')[0].slice(0, script.lastIndexOf("/") + 1);
+				path = ((!$.browser.msie || document.documentMode >= 8) ? script.src : script.getAttribute("src", 4)).split('?')[0];
+				return path.slice(0, path.lastIndexOf("/") + 1);
 			})(),
 			
 			combinations: {},
