@@ -262,10 +262,13 @@
 		loader: {
 			
 			basePath: (function(){
-				var scripts = $('script'),
-					path 	= scripts[scripts.length - 1].src.split('?')[0]
-				;
-				return path.slice(0, path.lastIndexOf("/") + 1);
+				var path = $('meta[name="polyfill-path"]').attr('content');
+				if(path){return path;}
+				var script = $('script');
+				
+				script = script[script.length - 1];
+				path = ((!$.browser.msie || document.documentMode >= 8) ? script.src : script.getAttribute("src", 4)).split('?')[0];
+				return path.slice(0, path.lastIndexOf("/") + 1) +'shims/';
 			})(),
 			
 			combinations: {},
@@ -401,12 +404,15 @@
 					}
 					
 					var script = document.createElement('script'),
+						timer,
 						onLoad = function(e){
-							
+							if(e && e.type === 'error'){
+								webshims.warn('Error: could not find script @'+src +'| configure polyfill-path "$.webshims.loader.basePath" or by using markup: <meta name="polyfill-path" content="path/to/shimsfolder/" />');
+							}
 							if(!this.readyState ||
 										this.readyState == "loaded" || this.readyState == "complete"){
 								script.onload =  null;
-								script.onerror = null;
+								$(script).onerror = null;
 								script.onreadystatechange = null;
 								if(callback){
 									callback(e, this);
@@ -417,25 +423,32 @@
 										name = name.split(' ');
 									}
 									$.each(name, function(i, name){
-										
-										if(modules[name] && !modules[name].noAutoCallback){
-											isReady(name, true);
+										if(!modules[name]){return;}
+										if(modules[name].afterLoad){
+											modules[name].afterLoad();
 										}
+										if(!modules[name].noAutoCallback){
+											isReady(name, true);
+										} 
 									});
 									
 								}
-								
 								script = null;
+								clearTimeout(timer);
 							}
 						}
 					;
 					script.setAttribute('async', 'async');
 					script.src = src;
+					timer = setTimeout(function(){
+						onLoad({type: 'error'});
+					}, 20000);
 					script.onload = onLoad;
-					script.onerror = onLoad;
+					$(script).one('error', onLoad);
 					script.onreadystatechange = onLoad;
 					parent.appendChild(script);
 					script.async = true;
+					
 					loadedSrcs.push(src);
 				};
 			})()
@@ -707,14 +720,56 @@
 	support.canvas = ('getContext'  in $('<canvas />')[0]);
 	
 	addPolyfill('canvas', {
+		src: 'excanvas',
 		test: function(){
-			return support.canvas;
+			return false && support.canvas;
 		},
 		noAutoCallback: true,
+		loadInit: function(){
+			var mod = this;
+			if($.webshims.canvasImplementation == 'flash'){
+				window.FlashCanvas = $.extend(window.FlashCanvas || {}, {swfPath: loader.basePath + 'FlashCanvas/'});
+				mod.src = 'FlashCanvas/flashcanvas';
+			}
+			
+		},
+		afterLoad: function(){
+			
+			webshims.ready('dom-extend', function($, webshims, window, doc){
+				webshims.defineNodeNameProperty('canvas', 'getContext', {
+					value: function(ctxName){
+						if(!this.getContext){
+							G_vmlCanvasManager.initElement(this);
+						}
+						return this.getContext(ctxName);
+					}
+				});
+						
+				webshims.addReady(function(context, elem){
+					if(doc === context){
+						$('canvas').each(function(){
+							if(!this.getContext){
+								window.G_vmlCanvasManager && G_vmlCanvasManager.initElement(this);
+							} else {
+								return false;
+							}
+						});
+						console.log('isready')
+						isReady('canvas', true);
+						return;
+					}
+					$('canvas', context).add(elem.filter('canvas')).each(function(){
+						if(!this.getContext){
+							G_vmlCanvasManager.initElement(this);
+						}
+					});
+				});
+			});
+		},
 		methodNames: ['getContext'],
-		dependencies: ['es5', 'dom-support'],
-		combination: ['combined-ie7', 'combined-ie8', 'combined-ie7-light', 'combined-ie8-light']
+		dependencies: ['es5', 'dom-support']
 	});
+	
 	/* END: canvas */
 	
 	/*
@@ -723,8 +778,6 @@
 	
 	/* html5 constraint validation */
 	
-	
-	/* bugfixes, validation-message + fieldset.checkValidity pack */
 	webshims.validityMessages = [];
 	webshims.inputTypes = {};
 	
@@ -740,15 +793,15 @@
 		}
 		support.validationMessage = !!($('input', form).attr('validationMessage'));
 		
-		support.output = !!( 'value' in document.createElement('output') );
-		support.requiredSelect = ('required' in $('select', form)[0]);
-		support.datalistProp = ('list' in $('input', form)[0] && 'options' in document.createElement('datalist'));
+		support.output = !!(support.validity && 'value' in document.createElement('output') );
+		support.requiredSelect = (support.validity && 'required' in $('select', form)[0]);
+		support.datalistProp = (support.validity && 'list' in $('input', form)[0] && 'options' in document.createElement('datalist'));
 		support.datalist = !!(support.datalistProp && window.HTMLDataListElement);
-		support.numericDateProps = (range.type == 'range' && date.type == 'date');
+		support.numericDateProps = (support.validity && range.type == 'range' && date.type == 'date');
 		
 		
-		support.rangeUI = Modernizr.inputtypes.range;
-		support.dateUI = Modernizr.inputtypes.date;
+		support.rangeUI = support.numericDateProps && Modernizr.inputtypes.range;
+		support.dateUI = support.numericDateProps && Modernizr.inputtypes.date;
 		
 		if(support.validity){
 			form.remove();

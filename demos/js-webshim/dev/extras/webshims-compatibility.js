@@ -8,7 +8,7 @@
 				events = events.split(' ');
 			}
 			
-			if($.inArray('ready', events) != -1){
+			if($.inArray('DOM', events) != -1){
 				$(function(){
 					fn($, $.webshims, window, document);
 				});

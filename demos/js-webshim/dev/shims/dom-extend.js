@@ -122,11 +122,12 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 	
 	// resetting properties with magic content attributes
 	var initProp = (function(){
-		var nodeNameCache = {};
+		
 		var initProps = {};
 		
 		var isReady;
 		webshims.addReady(function(context, contextElem){
+			var nodeNameCache = {};
 			var getElementsByName = function(name){
 				if(!nodeNameCache[name]){
 					nodeNameCache[name] = $(context.getElementsByTagName(name));
@@ -135,7 +136,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 					}
 				}
 			};
-			nodeNameCache = {};
+			
 			
 			$.each(initProps, function(name, fns){
 				getElementsByName(name);
@@ -143,6 +144,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 					nodeNameCache[name].each(fn);
 				});
 			});
+			nodeNameCache = null;
 			isReady = true;
 		});
 		
@@ -154,8 +156,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				initProps[nodeName].push(fn);
 			}
 			if(isReady){
-				nodeNameCache[nodeName] = nodeNameCache[nodeName] || $( document.getElementsByTagName(nodeName) );
-				nodeNameCache[nodeName].each(fn);
+				$( document.getElementsByTagName(nodeName) ).each(fn);
 			}
 		};
 		

@@ -406,7 +406,7 @@
 					var script = document.createElement('script'),
 						timer,
 						onLoad = function(e){
-							if(e.type === 'error'){
+							if(e && e.type === 'error'){
 								webshims.warn('Error: could not find script @'+src +'| configure polyfill-path "$.webshims.loader.basePath" or by using markup: <meta name="polyfill-path" content="path/to/shimsfolder/" />');
 							}
 							if(!this.readyState ||
@@ -616,7 +616,7 @@
 	var browserVersion = parseFloat($.browser.version, 10);
 	var httpProtocol = (location.protocol == 'https:') ? 'https:' : 'http:';
 	loader.addModule('html5a11y', {
-		src: 'html5as11y',
+		src: 'html5a11y',
 		test: function(){
 			return !(($.browser.msie && browserVersion < 10 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 540));
 		}
@@ -719,17 +719,22 @@
 	/* canvas */
 	support.canvas = ('getContext'  in $('<canvas />')[0]);
 	
-	addPolyfill('flashcanvas', {
-		feature: 'canvas',
+	addPolyfill('canvas', {
+		src: 'excanvas',
 		test: function(){
-			return support.canvas;
+			return false && support.canvas;
 		},
 		noAutoCallback: true,
 		loadInit: function(){
+			var mod = this;
+			if($.webshims.canvasImplementation == 'flash'){
+				window.FlashCanvas = $.extend(window.FlashCanvas || {}, {swfPath: loader.basePath + 'FlashCanvas/'});
+				mod.src = 'FlashCanvas/flashcanvas';
+			}
 			
 		},
 		afterLoad: function(){
-			var wasReady = document.readyState === 'complete';
+			
 			webshims.ready('dom-extend', function($, webshims, window, doc){
 				webshims.defineNodeNameProperty('canvas', 'getContext', {
 					value: function(ctxName){
@@ -742,13 +747,15 @@
 						
 				webshims.addReady(function(context, elem){
 					if(doc === context){
-						if(wasReady){
-							isReady('canvas', true);						
-						} else {
-							setTimeout(function(){
-								isReady('canvas', true);
-							}, 9);
-						}
+						$('canvas').each(function(){
+							if(!this.getContext){
+								window.G_vmlCanvasManager && G_vmlCanvasManager.initElement(this);
+							} else {
+								return false;
+							}
+						});
+						console.log('isready')
+						isReady('canvas', true);
 						return;
 					}
 					$('canvas', context).add(elem.filter('canvas')).each(function(){

@@ -1,7 +1,10 @@
 //todo use $.globalEval?
 jQuery.webshims.gcEval = function(){
-	"use strict";
-	return (function(){eval( arguments[0] );}).call(arguments[1] || window, arguments[0]);
+	with(arguments[1] && arguments[1].form || window) {
+		with(arguments[1] || window){
+			return (function(){eval( arguments[0] );}).call(arguments[1] || window, arguments[0]);
+		}
+	}
 };
 jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	"use strict";
@@ -110,42 +113,25 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	
 	
 	
-	webshims.triggerInlineForm = (function(){
-		var stringify = function(id){
-			if(typeof id != 'string' || id.indexOf('-') !== -1 || id.indexOf('.') !== -1 || id.indexOf('"') !== -1){return '';}
-			return 'var '+ id +' = this.form["'+ id +'"];';
-		};
-		return function(elem, event){
-			var attr = elem['on'+event] || elem.getAttribute('on'+event) || '';
-			var ret;
-			event = $.Event({
-				type: event,
-				target: elem[0],
-				currentTarget: elem[0]
-			});
-			
-			if(attr && typeof attr == 'string' && elem.form && elem.form.elements){
-				var scope = '';
-				for(var i = 0, elems = elem.form.elements, len = elems.length; i < len; i++ ){
-					var name = elems[i].name;
-					var id = elems[i].id;
-					if(name){
-						scope += stringify(name);
-					}
-					if(id && id !== name){
-						scope += stringify(id);
-					}
-				}
-				ret = webshims.gcEval(scope + attr, elem);
-			}
-			if(ret === false){
-				event.stopPropagation();
-				event.preventDefault();
-			}
-			$(elem).trigger(event);
-			return ret;
-		};
-	})();
+	webshims.triggerInlineForm = function(elem, event){
+		var attr = elem['on'+event] || elem.getAttribute('on'+event) || '';
+		var ret;
+		event = $.Event({
+			type: event,
+			target: elem[0],
+			currentTarget: elem[0]
+		});
+		
+		if(attr && typeof attr == 'string'){
+			ret = webshims.gcEval(attr, elem);
+		}
+		if(ret === false){
+			event.stopPropagation();
+			event.preventDefault();
+		}
+		$(elem).trigger(event);
+		return ret;
+	};
 	
 	
 	var setRoot = function(){

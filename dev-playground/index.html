@@ -62,6 +62,7 @@
 			$.webshims.debug = true;
 			$.webshims.cfg.extendNative = true;
 //			window.FlashCanvas = {path: $.webshims.loader.basePath};
+			$.webshims.canvasImplementation = 'flash';
 			$.webshims.polyfill();
 			
 			var start = new Date().getTime();
@@ -90,7 +91,18 @@
 </head>
 
 <body class="js-off"> 
-<canvas></canvas>
+<canvas id="my-canvas"></canvas>
+
+<script class="block run-once">
+$.webshims.ready('canvas', function(){
+	var ctx = $('#my-canvas').getContext('2d');
+	ctx.fillStyle = "rgb(200,0,0)";  
+	ctx.fillRect (10, 10, 55, 50);  
+	 
+	ctx.fillStyle = "rgba(0, 0, 200, 0.5)";  
+	ctx.fillRect (30, 30, 55, 50);
+});
+</script>
 <form id="test" action="#">
 	<input oninput="console.log(value = 10, a, b, this)" />
 <div>

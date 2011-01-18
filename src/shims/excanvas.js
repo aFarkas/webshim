@@ -1421,35 +1421,5 @@ if (!document.createElement('canvas').getContext) {
   CanvasPattern = CanvasPattern_;
   DOMException = DOMException_;
 })();
-/*
-*webshims-Extensions 
-*/
-jQuery.webshims.ready('dom-extend', function($, webshims, window, doc){
-	if (!doc.styleSheets || !doc.namespaces){
-		return;
-	}
-	
-	webshims.defineNodeNameProperty('canvas', 'getContext', {
-		value: function(ctxName){
-			if(!this.getContext){
-				G_vmlCanvasManager.initElement(this);
-			}
-			return this.getContext(ctxName);
-		}
-	});
-			
-	webshims.addReady(function(context, elem){
-		if(doc === context){return;}
-		$('canvas', context).add(elem.filter('canvas')).each(function(){
-			if(!this.getContext){
-				G_vmlCanvasManager.initElement(this);
-			}
-		});
-	});
-	$.webshims.ready('DOM', function(){
-		setTimeout(function(){
-			webshims.isReady('canvas', true);
-		}, 9);
-	});
-});
+
 } // if
