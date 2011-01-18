@@ -717,58 +717,69 @@
 	/* END: geolocation */
 	
 	/* canvas */
+	webshims.canvasImplementation = 'excanvas'; //default: excanvas | flash | flashpro
 	support.canvas = ('getContext'  in $('<canvas />')[0]);
-	
-	addPolyfill('canvas', {
-		src: 'excanvas',
-		test: function(){
-			return false && support.canvas;
-		},
-		noAutoCallback: true,
-		loadInit: function(){
-			var mod = this;
-			if($.webshims.canvasImplementation == 'flash'){
-				window.FlashCanvas = $.extend(window.FlashCanvas || {}, {swfPath: loader.basePath + 'FlashCanvas/'});
-				mod.src = 'FlashCanvas/flashcanvas';
-			}
-			
-		},
-		afterLoad: function(){
-			
-			webshims.ready('dom-extend', function($, webshims, window, doc){
-				webshims.defineNodeNameProperty('canvas', 'getContext', {
-					value: function(ctxName){
-						if(!this.getContext){
-							G_vmlCanvasManager.initElement(this);
-						}
-						return this.getContext(ctxName);
+	(function(){
+		var flashCanvas = window.FlashCanvas;
+		addPolyfill('canvas', {
+			src: 'excanvas',
+			test: function(){
+				return false && support.canvas;
+			},
+			noAutoCallback: true,
+			loadInit: function(){
+				var mod = this;
+				if(webshims.canvasImplementation && webshims.canvasImplementation.indexOf('flash') !== -1){
+					window.FlashCanvas = window.FlashCanvas || {};
+					flashCanvas = window.FlashCanvas;
+					if(webshims.canvasImplementation == 'flash'){
+						$.extend(flashCanvas, {swfPath: loader.basePath + 'FlashCanvas/'});
+						mod.src = 'FlashCanvas/flashcanvas';
+					} else {
+						$.extend(flashCanvas, {swfPath: loader.basePath + 'FlashCanvasPro/'});
+						mod.src = 'FlashCanvasPro/flashcanvas';
 					}
-				});
-						
-				webshims.addReady(function(context, elem){
-					if(doc === context){
-						$('canvas').each(function(){
+				}
+			},
+			afterLoad: function(){
+				
+				webshims.ready('dom-extend', function($, webshims, window, doc){
+					webshims.defineNodeNameProperty('canvas', 'getContext', {
+						value: function(ctxName){
 							if(!this.getContext){
-								window.G_vmlCanvasManager && G_vmlCanvasManager.initElement(this);
-							} else {
-								return false;
+								G_vmlCanvasManager.initElement(this);
 							}
-						});
-						console.log('isready')
-						isReady('canvas', true);
-						return;
-					}
-					$('canvas', context).add(elem.filter('canvas')).each(function(){
-						if(!this.getContext){
-							G_vmlCanvasManager.initElement(this);
+							return this.getContext(ctxName);
 						}
 					});
+							
+					webshims.addReady(function(context, elem){
+						if(doc === context){
+							if(flashCanvas && window.FlashCanvas){
+								FlashCanvas.setOptions(flashCanvas);
+							}
+							$('canvas').each(function(){
+								if(!this.getContext){
+									window.G_vmlCanvasManager && G_vmlCanvasManager.initElement(this);
+								} else {
+									return false;
+								}
+							});
+							isReady('canvas', true);
+							return;
+						}
+						$('canvas', context).add(elem.filter('canvas')).each(function(){
+							if(!this.getContext){
+								G_vmlCanvasManager.initElement(this);
+							}
+						});
+					});
 				});
-			});
-		},
-		methodNames: ['getContext'],
-		dependencies: ['es5', 'dom-support']
-	});
+			},
+			methodNames: ['getContext'],
+			dependencies: ['es5', 'dom-support']
+		});
+	})();
 	
 	/* END: canvas */
 	
