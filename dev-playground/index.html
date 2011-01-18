@@ -61,14 +61,13 @@
 	    	
 			$.webshims.debug = true;
 			$.webshims.cfg.extendNative = true;
-//			window.FlashCanvas = {path: $.webshims.loader.basePath};
-			$.webshims.canvasImplementation = 'flash';
+			window.FlashCanvas = {disableContextMenu: true};
+			$.webshims.canvasImplementation = 'flashpro';
 			$.webshims.polyfill();
-			
 			var start = new Date().getTime();
 			
-			$(function(){
-				console.log('READY', start - new Date().getTime())
+//			$(function(){
+//				console.log('READY', start - new Date().getTime())
 //				alert($('#a')[0].required)
 //				alert($('#a')[0].validity.valid)
 //				alert($('#a').attr('validity').valueMissing)
@@ -77,16 +76,16 @@
 //				alert($('#b')[0].validity.valueMissing)
 //				$('#input-list')[0].required = true;
 //				console.log(.validity.valid);
-			})
-			$.webshims.ready('DOM', function(){
-				console.log('domready', start - new Date().getTime())
-			})
-			$.webshims.ready('json-storage', function(){
-				console.log('jsonready', start - new Date().getTime())
-			})
-			$.webshims.ready('forms-ext', function(){
-				console.log('forms-ext', start - new Date().getTime())
-			})
+//			})
+//			$.webshims.ready('DOM', function(){
+//				console.log('domready', start - new Date().getTime())
+//			})
+//			$.webshims.ready('json-storage', function(){
+//				console.log('jsonready', start - new Date().getTime())
+//			})
+//			$.webshims.ready('forms-ext', function(){
+//				console.log('forms-ext', start - new Date().getTime())
+//			})
 	    </script>
 </head>
 
