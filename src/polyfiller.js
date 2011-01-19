@@ -14,7 +14,7 @@
 	$('html').addClass('js-on').removeClass('js-off');
 	
 	$.webshims = {
-		version: 'pre1.2.2',
+		version: '1.2.2',
 		useImportantStyles: true,
 		fix: {},
 		implement: {},
@@ -591,18 +591,17 @@
 			
 			
 			var initProp = (function(){
-				var nodeNameCache = {};
 				var initProps = {};
 				var isReady;
 				webshims.addReady(function(context, contextElem){	
 					nodeNameCache = {};
 					$.each(initProps, function(name, props){
-						nodeNameCache[name] = $(context.getElementsByTagName(name));
+						var elems = $(context.getElementsByTagName(name));
 						if(contextElem[0] && $.nodeName(contextElem[0], name)){
-							nodeNameCache[name] = nodeNameCache[name].add(contextElem);
+							elems = elems.add(contextElem);
 						}
 						$.each(props, function(i, prop){
-							nodeNameCache[name].filter('['+ prop +']').attr(prop, function(i, val){
+							elems.filter('['+ prop +']').attr(prop, function(i, val){
 								return val;
 							});
 						});
@@ -617,8 +616,7 @@
 						initProps[nodeName].push(prop);
 					}
 					if(isReady){
-						nodeNameCache[nodeName] = nodeNameCache[nodeName] || $( document.getElementsByTagName(nodeName) );
-						nodeNameCache[nodeName].filter('['+ prop +']').attr(prop, function(i, val){
+						$( document.getElementsByTagName(nodeName) ).filter('['+ prop +']').attr(prop, function(i, val){
 							return val;
 						});
 					}

@@ -213,7 +213,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		
 	});
 	//better you use the selectors above
-	['required', 'valid', 'invalid', 'required', 'optional'].forEach(function(name){
+	['required', 'valid', 'invalid', 'optional'].forEach(function(name){
 		$.expr.filters[name] = $.expr.filters[name+"-element"];
 	});
 	
@@ -378,7 +378,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				$(doc).bind('focusout.validityalert', boundHide);
 			},
 			getMessage: function(elem, message){
-				$('> span.va-box', alert).text(message || elem.attr('customValidationMessage') || elem.attr('validationMessage'));
+				$('> span.va-box', alert).text(message || elem.attr('x-moz-errormessage') || elem.attr('data-errormessage') || elem.attr('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
