@@ -2047,15 +2047,24 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 							data.box.addClass('placeholder-box-'+cssFloat);
 						}
 					} else {
-						var reset = function(){
-							hidePlaceholder(elem, data, '');
+						var reset = function(e){
+							if($(elem).hasClass('placeholder-visible')){
+								hidePlaceholder(elem, data, '');
+								if(e && e.type == 'submit'){
+									setTimeout(function(){
+										if(e.isDefaultPrevented()){
+											changePlaceholderVisibility(elem, false, false, data );
+										}
+									}, 9);
+								}
+							}
 						};
 						if($.nodeName(data.text[0], 'label')){
 							//if label is dynamically set after we ensure that our label isn't exposed anymore
 							//ie always exposes last label and ff always first
 							data.text.hide()[$.browser.msie ? 'insertBefore' : 'insertAfter'](elem);
 						}
-						$(window).unload(reset);
+						$(window).bind('beforeunload', reset);
 						data.box = $(elem);
 						if(elem.form){
 							$(elem.form).submit(reset);

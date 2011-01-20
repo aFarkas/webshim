@@ -14,7 +14,7 @@
 	$('html').addClass('js-on').removeClass('js-off');
 	
 	$.webshims = {
-		version: '1.2.2',
+		version: '1.2.3',
 		useImportantStyles: true,
 		fix: {},
 		implement: {},
@@ -594,7 +594,6 @@
 				var initProps = {};
 				var isReady;
 				webshims.addReady(function(context, contextElem){	
-					nodeNameCache = {};
 					$.each(initProps, function(name, props){
 						var elems = $(context.getElementsByTagName(name));
 						if(contextElem[0] && $.nodeName(contextElem[0], name)){
