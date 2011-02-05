@@ -3,6 +3,7 @@
 jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, window, document){
 	"use strict";
 	var triggerInlineForm = webshims.triggerInlineForm;
+	var modernizrInputTypes = Modernizr.inputtypes;
 	var adjustInputWithBtn = function(input, button){
 		var inputDim = {
 			w: input.width()
@@ -31,7 +32,6 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	var globalInvalidTimer;
 	var labelID = 0;
 	var emptyJ = $([]);
-	var support = $.support;
 	var replaceInputUI = function(context, elem){
 		$('input', context).add(elem.filter('input')).each(function(){
 			var type = $.attr(this, 'type');
@@ -71,7 +71,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 					}, 30);
 				});
 			})();
-		} else if(support.validity){
+		} else if(Modernizr.formvalidation){
 			orig.bind('firstinvalid', function(e){
 				clearTimeout(globalInvalidTimer);
 				globalInvalidTimer = setTimeout(function(){
@@ -110,7 +110,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	};
 	
 	//date and datetime-local implement if we have to replace
-	if(!support.dateUI || options.replaceUI){
+	if(!Modernizr.inputtypes.dateUI || options.replaceUI){
 		var datetimeFactor = {
 			trigger: [0.65,0.35],
 			normal: [0.6,0.4]
@@ -337,7 +337,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 		};
 	}
 	
-	if (!support.rangeUI || options.replaceUI) {
+	if (!modernizrInputTypes.date || !modernizrInputTypes.range || options.replaceUI) {
 		replaceInputUI.range = function(elem){
 			if(!$.fn.slider){return;}
 			var range = $('<span class="input-range"><span class="ui-slider-handle" role="slider" tabindex="0" /></span>'),
@@ -472,7 +472,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	
 	//implement set/arrow controls
 (function(){
-	if(support.numericDateProps || !webshims.modules['form-number-date']){return;}
+	if(Modernizr.input.valueAsNumber || !webshims.modules['form-number-date']){return;}
 	var doc = document;
 	var options = webshims.modules['form-number-date'].options;
 	var typeModels = webshims.inputTypes;

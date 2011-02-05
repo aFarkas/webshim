@@ -1,12 +1,10 @@
 /* https://github.com/aFarkas/webshim/issues#issue/16 */
 jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
-	var support = $.support;
 	
-	if(!support.validity || window.noHTMLExtFixes){return;}
+	if(!Modernizr.formvalidation || window.noHTMLExtFixes || Modernizr.bugfreeformvalidation){return;}
 	
 	
-	var advancedForm = ( 'value' in doc.createElement('output') && 'list' in doc.createElement('input') ),
-		invalids = [],
+	var invalids = [],
 		form
 	;
 	
@@ -67,7 +65,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		})
 		.bind('lastinvalid', function(e, data){
 			var firstTarget = data.invalidlist[0];
-			if( firstTarget && !advancedForm && document.activeElement && firstTarget !== document.activeElement && !$.data(firstTarget, 'maybePreventedinvalid') ){
+			if( firstTarget && $.browser.webkit && document.activeElement && firstTarget !== document.activeElement && !$.data(firstTarget, 'maybePreventedinvalid') ){
 				webshims.validityAlert.showFor(firstTarget);
 			}
 			invalids = [];
@@ -79,7 +77,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		
 	(function(){
 		//safari 5.0.2/5.0.3 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
-		if(!$.browser.webkit || parseInt($.browser.version, 10) > 533){return;}
+		if(!$.browser.webkit || parseFloat($.browser.version, 10) > 534.16){return;}
 		var checkValidity = function(elem){
 			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
 			if(!valid && elem.checkValidity && elem.checkValidity()){
@@ -107,15 +105,8 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		});
 		
 	})();
-	if(!support.requiredSelect){
+	if(!Modernizr.requiredSelect){
 		webshims.ready('form-extend', function(){
-			webshims.defineNodeNamesBooleanProperty(['select'], 'required', {
-				set: function(value){
-					this.setAttribute('aria-required', (value) ? 'true' : 'false');
-				},
-				content: true
-			}, true);
-			
 			webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){
 				
 				if(cache.nodeName == 'select' && !val && jElm.attr('required') && jElm[0].size < 2){
@@ -129,10 +120,15 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 				}
 				return validityState.valueMissing;
 			});
-			//trigger validity test
-			webshims.ready('DOM', function(){
-				$('select[required]').attr('validity');
-			});
+			
+			webshims.defineNodeNamesBooleanProperty(['select'], 'required', {
+				set: function(value){
+					this.setAttribute('aria-required', (value) ? 'true' : 'false');
+					//trigger validity test
+					$.attr(this, 'validity');
+				},
+				content: true
+			}, true);
 		});
 	}
 });

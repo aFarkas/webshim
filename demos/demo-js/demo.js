@@ -11,6 +11,28 @@
 				return false;
 			});
 		});
+		
+		$('div.details').each(function(){
+			var details = $('div.details-block', this).hide();
+			$('button', this)
+				.filter('.details-summary')
+				.attr({'aria-expanded': 'false'})
+				.bind('click', function(){
+					if($.attr(this, 'aria-expanded') == 'true'){
+						details.hide();
+						$.attr(this, 'aria-expanded', 'false');
+						$(this).text( $(this).text().replace('hide', 'show') );
+					} else {
+						details.show();
+						$.attr(this, 'aria-expanded', 'true');
+						$(this).text( $(this).text().replace('show', 'hide') );
+					}
+					return false;
+				})
+			;
+		});
+		
+		
 		var doConsole = function(m){
 			if(typeof m == 'object'){
 				alert(JSON.stringify(m));

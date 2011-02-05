@@ -257,7 +257,7 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 		}
 	};
 	
-	$.ajax({url: $.webshims.loader.basePath +'localStorage.swf', cache: true, dataType: 'text'});
+	
 	$.webshims.ready('DOM swfobject', function(){
 		if(window.swfobject && swfobject.hasFlashPlayerVersion('8.0.0')){
 			

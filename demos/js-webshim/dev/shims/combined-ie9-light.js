@@ -742,7 +742,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		elem = $(elem);
 		return (elem.data('inputUIReplace') || {visual: elem}).visual;
 	};
-	var support = $.support;
 	var getVisual = webshims.getVisualInput;
 	var groupTypes = {checkbox: 1, radio: 1};
 	var emptyJ = $([]);
@@ -1016,7 +1015,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc, undefined){
 	"use strict";
 	var validityMessages = webshims.validityMessages;
-	var support = $.support;
 	var cfg = webshims.cfg.forms;
 	var implementProperties = (cfg.overrideMessages || cfg.customMessages) ? ['customValidationMessage'] : [];
 	
@@ -1087,7 +1085,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	};
 	
 	
-	if((!window.noHTMLExtFixes && !support.validationMessage) || !support.validity){
+	if((!window.noHTMLExtFixes && !Modernizr.validationmessage) || !Modernizr.formvalidation){
 		implementProperties.push('validationMessage');
 	}
 	
@@ -1105,7 +1103,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 					message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
 					if(message){return message;}
 					if(validity.customError && elem.nodeName){
-						message = (support.validationMessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
+						message = (Modernizr.validationmessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
 						if(message){return message;}
 					}
 					$.each(validity, function(name, prop){
@@ -1124,7 +1122,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	});
 	webshims.isReady('form-message', true);
 });jQuery.webshims.ready('form-core dom-extend', function($, webshims, window){
-if($.support.validity){
+if(Modernizr.formvalidation){
 	return;
 }
 
@@ -1461,7 +1459,7 @@ webshims.isReady('form-extend', true);
 
 
 jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
-	if($.support.placeholder){return;}
+	if(Modernizr.input.placeholder){return;}
 	var isOver = (webshims.cfg.forms.placeholderType == 'over');
 	var hidePlaceholder = function(elem, data, value){
 			if(!isOver && elem.type != 'password'){
@@ -1828,7 +1826,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, docu
 	})();
 	
 	(function(){
-		if($.support.datalist){return;}
+		if(Modernizr.datalist){return;}
 		var listidIndex = 0;
 		
 		var noDatalistSupport = {

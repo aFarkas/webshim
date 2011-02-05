@@ -1,7 +1,6 @@
 jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc, undefined){
 	"use strict";
 	var validityMessages = webshims.validityMessages;
-	var support = $.support;
 	var cfg = webshims.cfg.forms;
 	var implementProperties = (cfg.overrideMessages || cfg.customMessages) ? ['customValidationMessage'] : [];
 	
@@ -72,7 +71,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	};
 	
 	
-	if((!window.noHTMLExtFixes && !support.validationMessage) || !support.validity){
+	if((!window.noHTMLExtFixes && !Modernizr.validationmessage) || !Modernizr.formvalidation){
 		implementProperties.push('validationMessage');
 	}
 	
@@ -90,7 +89,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 					message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
 					if(message){return message;}
 					if(validity.customError && elem.nodeName){
-						message = (support.validationMessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
+						message = (Modernizr.validationmessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
 						if(message){return message;}
 					}
 					$.each(validity, function(name, prop){

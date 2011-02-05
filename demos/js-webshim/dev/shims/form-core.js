@@ -12,7 +12,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		elem = $(elem);
 		return (elem.data('inputUIReplace') || {visual: elem}).visual;
 	};
-	var support = $.support;
 	var getVisual = webshims.getVisualInput;
 	var groupTypes = {checkbox: 1, radio: 1};
 	var emptyJ = $([]);

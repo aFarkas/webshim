@@ -30,7 +30,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 			return (typeof string == 'number' || (string && string == string * 1));
 		},
 		supportsType = function(type){
-			return ($('<input type="'+type+'" />').attr('type') === type);
+			return (Modernizr.input.valueAsNumber && $('<input type="'+type+'" />').attr('type') === type);
 		},
 		getType = function(elem){
 			return (elem.getAttribute('type') || '').toLowerCase();

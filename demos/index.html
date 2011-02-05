@@ -170,17 +170,22 @@
 	$.webshims.polyfill();
 &lt;/script&gt;	
 </code>
-			<p>The polyfill-method can also take a white space seperated list of several features.</p>
+			<div class="details">
+				<button class="details-summary">show more examples</button>
+				<div class="details-block">
+					<p>The polyfill-method can also take a white space seperated list of several features.</p>
 <code class="block">
 //load and implement json-storage and geolocation features, if they aren't supported
 $.webshims.polyfill('json-storage geolocation');
 </code>	
 
-			<p>The polyfill-method can also take a keyword called <code>lightweight</code>, wich will load a filesize-/feature balanced profile. The lightweight-profile currently loads all features, except of the <code>forms-ext</code> feature (numerical and date related web form features). The normal HTML5 <code>forms</code> feature - including constraint validation (required, pattern, [type=email]) and datalist/output widgets - is loaded in the <code>lightweight</code> profile.</p>
+					<p>The polyfill-method can also take a keyword called <code>lightweight</code>, wich will load a filesize-/feature balanced profile. The lightweight-profile currently loads all features, except of the <code>forms-ext</code> feature (numerical and date related web form features). The normal HTML5 <code>forms</code> feature - including constraint validation (required, pattern, [type=email]) and datalist/output widgets - is loaded in the <code>lightweight</code> profile.</p>
 <code class="block">
 //load and implement all unsupported features from the lightweight profile
 $.webshims.polyfill('lightweight');
 </code>			
+				</div>
+			</div>	
 
 			<h3>When is a feature ready to use?</h3>
 			<p>Not every feature is ready immediately in all browsers. To get started, if all features are ready, simply use one of jQuery's ready methods, wich are delayed, till all features are available.</p>
@@ -193,28 +198,36 @@ $(doument).ready(function(){
 	//work with DOM + all features
 });
 </code>		
-			<p>If you want to use a feature as soon as possible you can use <code>$.webshims.ready</code> and pass the feature-name[s] and a callback-function:</p>
+
+		<div class="details">
+			<button class="details-summary">show more examples</button>
+			<div class="details-block">
+				<p>If you want to use a feature as soon as possible you can use <code>$.webshims.ready</code> and pass the feature-name[s] and a callback-function:</p>
 <code class="block">
 $.webshims.ready('geolocation json-storage', function(){
 	//work with geolocation, JSON and localStorage
 });
 </code>	
-			<p>Note that this callback function may be called before DOM-Ready. If you want to use a feature after DOM-Ready, simply pass the string 'DOM':</p>
+				<p>Note that this callback function may be called before DOM-Ready. If you want to use a feature after DOM-Ready, simply pass the string 'DOM':</p>
 <code class="block">
 $.webshims.ready('DOM canvas', function(){
 	//work with canvas in the document
 });
 </code>	
+			</div>
+		</div>
 
 			<h3>Setting some options</h3>
-			<p>Some features may have options, you can configure these with the <code>$.webshims.setOptions</code>-method. <code>setOptions</code>-method should be always and only called before the <code>polyfill</code>-method:</p>
+			<p>Some features have additional options, you can configure these with the <code>$.webshims.setOptions</code>-method. <code>setOptions</code>-method should be always and only called before the <code>polyfill</code>-method:</p>
 <code class="block">
 $.webshims.setOptions('canvas', {
 	type: "flash" //use flashcanvas instead of excanvas as polyfill
 });
 </code>		
-
-			<p><code>setOptions</code> can also take an options-parameter only:</p>
+			<div class="details">
+				<button class="details-summary">show more examples</button>
+				<div class="details-block">
+					<p><code>setOptions</code> can also take an options-parameter only:</p>
 <code class="block">
 $.webshims.setOptions({
 	//configure canvas-shim
@@ -228,6 +241,8 @@ $.webshims.setOptions({
 });
 </code>	
 			
+				</div>
+			</div>
 			<h3>minor Abstractions to DOM-Attributes, DOM-Methods and DOM-Events</h3>
 			<p>Due to the fact, that we can not extend the prototype of elements in all browsers, we always use jQuery as an extension-wrapper.</p>
 			<ul>

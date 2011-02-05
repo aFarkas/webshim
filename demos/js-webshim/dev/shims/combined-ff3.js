@@ -76,23 +76,9 @@ if (!Object.keys) {
 
 } 
 
-var supportDefineDOMProp = true;
-if(Object.defineProperty && Object.prototype.__defineGetter__){
-	(function(){
-		try {
-			var foo = document.createElement('foo');
-			Object.defineProperty(foo, 'bar', {get: function(){return true;}});
-			supportDefineDOMProp = !!foo.bar;	
-		}catch(e){
-			supportDefineDOMProp = false;
-		}
-		if(!supportDefineDOMProp){
-			jQuery.support.advancedObjectProperties = false;
-		}
-	})();
-}
 
-if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor  || !Object.defineProperty) && window.jQuery && jQuery.webshims){
+
+if((!Modernizr.advancedObjectProperties || !Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor  || !Object.defineProperty) && window.jQuery && jQuery.webshims){
 	var shims = jQuery.webshims;
 	shims.objectCreate = function(proto, props, opts){
 		var o;
@@ -1034,7 +1020,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		elem = $(elem);
 		return (elem.data('inputUIReplace') || {visual: elem}).visual;
 	};
-	var support = $.support;
 	var getVisual = webshims.getVisualInput;
 	var groupTypes = {checkbox: 1, radio: 1};
 	var emptyJ = $([]);
@@ -1308,7 +1293,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc, undefined){
 	"use strict";
 	var validityMessages = webshims.validityMessages;
-	var support = $.support;
 	var cfg = webshims.cfg.forms;
 	var implementProperties = (cfg.overrideMessages || cfg.customMessages) ? ['customValidationMessage'] : [];
 	
@@ -1379,7 +1363,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	};
 	
 	
-	if((!window.noHTMLExtFixes && !support.validationMessage) || !support.validity){
+	if((!window.noHTMLExtFixes && !Modernizr.validationmessage) || !Modernizr.formvalidation){
 		implementProperties.push('validationMessage');
 	}
 	
@@ -1397,7 +1381,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 					message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
 					if(message){return message;}
 					if(validity.customError && elem.nodeName){
-						message = (support.validationMessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
+						message = (Modernizr.validationmessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
 						if(message){return message;}
 					}
 					$.each(validity, function(name, prop){
@@ -1416,7 +1400,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	});
 	webshims.isReady('form-message', true);
 });jQuery.webshims.ready('form-core dom-extend', function($, webshims, window){
-if($.support.validity){
+if(Modernizr.formvalidation){
 	return;
 }
 
@@ -1775,7 +1759,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 			return (typeof string == 'number' || (string && string == string * 1));
 		},
 		supportsType = function(type){
-			return ($('<input type="'+type+'" />').attr('type') === type);
+			return (Modernizr.input.valueAsNumber && $('<input type="'+type+'" />').attr('type') === type);
 		},
 		getType = function(elem){
 			return (elem.getAttribute('type') || '').toLowerCase();
@@ -2126,6 +2110,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, window, document){
 	"use strict";
 	var triggerInlineForm = webshims.triggerInlineForm;
+	var modernizrInputTypes = Modernizr.inputtypes;
 	var adjustInputWithBtn = function(input, button){
 		var inputDim = {
 			w: input.width()
@@ -2154,7 +2139,6 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	var globalInvalidTimer;
 	var labelID = 0;
 	var emptyJ = $([]);
-	var support = $.support;
 	var replaceInputUI = function(context, elem){
 		$('input', context).add(elem.filter('input')).each(function(){
 			var type = $.attr(this, 'type');
@@ -2194,7 +2178,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 					}, 30);
 				});
 			})();
-		} else if(support.validity){
+		} else if(Modernizr.formvalidation){
 			orig.bind('firstinvalid', function(e){
 				clearTimeout(globalInvalidTimer);
 				globalInvalidTimer = setTimeout(function(){
@@ -2233,7 +2217,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	};
 	
 	//date and datetime-local implement if we have to replace
-	if(!support.dateUI || options.replaceUI){
+	if(!Modernizr.inputtypes.dateUI || options.replaceUI){
 		var datetimeFactor = {
 			trigger: [0.65,0.35],
 			normal: [0.6,0.4]
@@ -2460,7 +2444,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 		};
 	}
 	
-	if (!support.rangeUI || options.replaceUI) {
+	if (!modernizrInputTypes.date || !modernizrInputTypes.range || options.replaceUI) {
 		replaceInputUI.range = function(elem){
 			if(!$.fn.slider){return;}
 			var range = $('<span class="input-range"><span class="ui-slider-handle" role="slider" tabindex="0" /></span>'),
@@ -2595,7 +2579,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	
 	//implement set/arrow controls
 (function(){
-	if(support.numericDateProps || !webshims.modules['form-number-date']){return;}
+	if(Modernizr.input.valueAsNumber || !webshims.modules['form-number-date']){return;}
 	var doc = document;
 	var options = webshims.modules['form-number-date'].options;
 	var typeModels = webshims.inputTypes;
@@ -2744,7 +2728,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 
 
 jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
-	if($.support.placeholder){return;}
+	if(Modernizr.input.placeholder){return;}
 	var isOver = (webshims.cfg.forms.placeholderType == 'over');
 	var hidePlaceholder = function(elem, data, value){
 			if(!isOver && elem.type != 'password'){
@@ -3111,7 +3095,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, docu
 	})();
 	
 	(function(){
-		if($.support.datalist){return;}
+		if(Modernizr.datalist){return;}
 		var listidIndex = 0;
 		
 		var noDatalistSupport = {

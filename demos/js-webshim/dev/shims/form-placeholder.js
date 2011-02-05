@@ -8,7 +8,7 @@
 
 
 jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
-	if($.support.placeholder){return;}
+	if(Modernizr.input.placeholder){return;}
 	var isOver = (webshims.cfg.forms.placeholderType == 'over');
 	var hidePlaceholder = function(elem, data, value){
 			if(!isOver && elem.type != 'password'){

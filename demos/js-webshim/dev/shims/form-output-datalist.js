@@ -121,7 +121,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, docu
 	})();
 	
 	(function(){
-		if($.support.datalist){return;}
+		if(Modernizr.datalist){return;}
 		var listidIndex = 0;
 		
 		var noDatalistSupport = {

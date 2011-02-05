@@ -1,5 +1,5 @@
 jQuery.webshims.ready('form-core dom-extend', function($, webshims, window){
-if($.support.validity){
+if(Modernizr.formvalidation){
 	return;
 }
 

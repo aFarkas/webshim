@@ -70,13 +70,13 @@
 	<title>playing</title>
 	    <script>
 	    	
-			$.webshims.debug = true;
+//			$.webshims.debug = true;
 			$.webshims.setOptions('forms', {
 				placeholderType: 'over'
 			});
 //			$.webshims.cfg.extendNative = true;
 			window.FlashCanvas = {disableContextMenu: true};
-			$.webshims.polyfill();
+			$.webshims.polyfill('lightweight');
 			var start = new Date().getTime();
 			
 //			$(function(){
@@ -136,9 +136,7 @@ $.webshims.ready('canvas', function(){
 });
 $(function(){
 	
-	navigator.geolocation.getCurrentPosition(function(){console.log('f', arguments);}, function(){
-		console.log(this, arguments)
-	})
+	
 })
 </script>
 <form id="test" action="#">

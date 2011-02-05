@@ -76,23 +76,9 @@ if (!Object.keys) {
 
 } 
 
-var supportDefineDOMProp = true;
-if(Object.defineProperty && Object.prototype.__defineGetter__){
-	(function(){
-		try {
-			var foo = document.createElement('foo');
-			Object.defineProperty(foo, 'bar', {get: function(){return true;}});
-			supportDefineDOMProp = !!foo.bar;	
-		}catch(e){
-			supportDefineDOMProp = false;
-		}
-		if(!supportDefineDOMProp){
-			jQuery.support.advancedObjectProperties = false;
-		}
-	})();
-}
 
-if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor  || !Object.defineProperty) && window.jQuery && jQuery.webshims){
+
+if((!Modernizr.advancedObjectProperties || !Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor  || !Object.defineProperty) && window.jQuery && jQuery.webshims){
 	var shims = jQuery.webshims;
 	shims.objectCreate = function(proto, props, opts){
 		var o;

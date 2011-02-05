@@ -576,7 +576,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		elem = $(elem);
 		return (elem.data('inputUIReplace') || {visual: elem}).visual;
 	};
-	var support = $.support;
 	var getVisual = webshims.getVisualInput;
 	var groupTypes = {checkbox: 1, radio: 1};
 	var emptyJ = $([]);
@@ -850,7 +849,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc, undefined){
 	"use strict";
 	var validityMessages = webshims.validityMessages;
-	var support = $.support;
 	var cfg = webshims.cfg.forms;
 	var implementProperties = (cfg.overrideMessages || cfg.customMessages) ? ['customValidationMessage'] : [];
 	
@@ -921,7 +919,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	};
 	
 	
-	if((!window.noHTMLExtFixes && !support.validationMessage) || !support.validity){
+	if((!window.noHTMLExtFixes && !Modernizr.validationmessage) || !Modernizr.formvalidation){
 		implementProperties.push('validationMessage');
 	}
 	
@@ -939,7 +937,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 					message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
 					if(message){return message;}
 					if(validity.customError && elem.nodeName){
-						message = (support.validationMessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
+						message = (Modernizr.validationmessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
 						if(message){return message;}
 					}
 					$.each(validity, function(name, prop){
@@ -959,8 +957,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	webshims.isReady('form-message', true);
 });jQuery.webshims.ready('form-message form-core', function($, webshims, window, doc, undefined){
 //	"use strict";
-	var support = $.support;
-	if(!support.validity){return;}
+	if(!Modernizr.formvalidation){return;}
 		
 	var typeModels = webshims.inputTypes;
 	var validityRules = {};
@@ -987,7 +984,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	});
 	
 	var overrideNativeMessages = webshims.cfg.forms.overrideMessages;	
-	var overrideValidity = (!support.requiredSelect || !support.numericDateProps || overrideNativeMessages);
+	var overrideValidity = (!Modernizr.requiredSelect || !Modernizr.input.valueAsDate || overrideNativeMessages);
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	var oldAttr = $.attr;
 	var oldVal = $.fn.val;
@@ -999,7 +996,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 		var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
 		
 		if(!overrideNativeMessages){
-			if(!(!support.requiredSelect && type == 'select-one') && !typeModels[type]){return;}
+			if(!(!Modernizr.requiredSelect && type == 'select-one') && !typeModels[type]){return;}
 		}
 		
 		if(overrideNativeMessages && !init && checkTypes[type] && elem.name){
@@ -1023,7 +1020,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 		}
 	});
 		
-	if((!window.noHTMLExtFixes && !support.requiredSelect) || overrideNativeMessages){
+	if((!window.noHTMLExtFixes && !Modernizr.requiredSelect) || overrideNativeMessages){
 		$.extend(validityChanger, {
 			required: 1,
 			size: 1,
@@ -1032,7 +1029,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 		});
 		validityElements.push('select');
 	}
-	if(!support.numericDateProps || overrideNativeMessages){
+	if(!Modernizr.input.valueAsNumber || overrideNativeMessages){
 		$.extend(validityChanger, {
 			min: 1, max: 1, step: 1
 		});
@@ -1123,7 +1120,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 			doc.addEventListener('change', function(e){
 				testValidity(e.target);
 			}, true);
-			if (!support.numericDateProps) {
+			if (!Modernizr.input.valueAsNumber) {
 				doc.addEventListener('input', function(e){
 					testValidity(e.target);
 				}, true);
@@ -1135,7 +1132,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 			$(validityElementsSel, context).add(elem.filter(validityElementsSel)).attr('validity');
 		});
 		
-	} //end: overrideValidity -> (!supportRequiredSelect || !supportNumericDate || overrideNativeMessages)
+	} //end: overrideValidity
 	webshims.isReady('form-extend', true);
 });jQuery.webshims.ready('form-extend', function($, webshims, window){
 	"use strict";
@@ -1169,7 +1166,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 			return (typeof string == 'number' || (string && string == string * 1));
 		},
 		supportsType = function(type){
-			return ($('<input type="'+type+'" />').attr('type') === type);
+			return (Modernizr.input.valueAsNumber && $('<input type="'+type+'" />').attr('type') === type);
 		},
 		getType = function(elem){
 			return (elem.getAttribute('type') || '').toLowerCase();
@@ -1520,6 +1517,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, window, document){
 	"use strict";
 	var triggerInlineForm = webshims.triggerInlineForm;
+	var modernizrInputTypes = Modernizr.inputtypes;
 	var adjustInputWithBtn = function(input, button){
 		var inputDim = {
 			w: input.width()
@@ -1548,7 +1546,6 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	var globalInvalidTimer;
 	var labelID = 0;
 	var emptyJ = $([]);
-	var support = $.support;
 	var replaceInputUI = function(context, elem){
 		$('input', context).add(elem.filter('input')).each(function(){
 			var type = $.attr(this, 'type');
@@ -1588,7 +1585,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 					}, 30);
 				});
 			})();
-		} else if(support.validity){
+		} else if(Modernizr.formvalidation){
 			orig.bind('firstinvalid', function(e){
 				clearTimeout(globalInvalidTimer);
 				globalInvalidTimer = setTimeout(function(){
@@ -1627,7 +1624,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	};
 	
 	//date and datetime-local implement if we have to replace
-	if(!support.dateUI || options.replaceUI){
+	if(!Modernizr.inputtypes.dateUI || options.replaceUI){
 		var datetimeFactor = {
 			trigger: [0.65,0.35],
 			normal: [0.6,0.4]
@@ -1854,7 +1851,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 		};
 	}
 	
-	if (!support.rangeUI || options.replaceUI) {
+	if (!modernizrInputTypes.date || !modernizrInputTypes.range || options.replaceUI) {
 		replaceInputUI.range = function(elem){
 			if(!$.fn.slider){return;}
 			var range = $('<span class="input-range"><span class="ui-slider-handle" role="slider" tabindex="0" /></span>'),
@@ -1989,7 +1986,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	
 	//implement set/arrow controls
 (function(){
-	if(support.numericDateProps || !webshims.modules['form-number-date']){return;}
+	if(Modernizr.input.valueAsNumber || !webshims.modules['form-number-date']){return;}
 	var doc = document;
 	var options = webshims.modules['form-number-date'].options;
 	var typeModels = webshims.inputTypes;

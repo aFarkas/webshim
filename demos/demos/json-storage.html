@@ -50,20 +50,31 @@
 				<li>key</li>
 			</ul>
 			<p>If the flash localStorage shim is used and the the storage limit is hit, the flash settings dialog will be placed in to view to request more space for the storage. If the user denies this a DOMexception will be raised (<code>QUOTA_EXCEEDED_ERR: 22</code>).</p>
-			<p>Note: That IDL-attributes and the length property aren't implemented.</p>
+			<p>Note: That IDL-attributes and the length property aren't implemented. You shouldn't rely on them, anyway.</p>
 			<p>Note: To use localStorage/sessionStorage you should test your webapp/website in an http-enivroment.</p>
 <code class="block">
-$.webshims.ready('json-storage', function(){
+$(function(){
 	if(localStorage.getItem('do-i-know-you') !== null){
 		//yes
 	} else {
 		//but now
 		try {
-			localStorage.setItem('do-i-know-you', 'now we can talk');
+			localStorage.setItem('do-i-know-you', 'yes');
 		} catch(e){}
 	}
 });
-</code>			
+</code>		
+			<h3>Options for the swf localStorage (<code>json-storage</code> feature)</h3>
+			<ul>
+				<li><strong>exceededMessage</strong> (string): A message, that will be placed above the flash settings dialog, wich informs the user to allow more storage space for your domain.</li>
+			</ul>
+<code class="block">
+$.webshims.setOptions("json-storage", {
+	exceededMessage: "This application needs more space. Please move the slider to 5MB."
+});
+
+//$.webshims.polyfill();
+</code>	
 			<aside>
 				<h3>Links about JSON and localStorage/sessionStorage</h3>
 				<ul>
@@ -71,6 +82,7 @@ $.webshims.ready('json-storage', function(){
 					<li><a href="http://dev.w3.org/html5/webstorage/">Webstorage (W3C)</a></li>
 					<li><a href="http://www.smashingmagazine.com/2010/10/11/local-storage-and-how-to-use-it/">Local Storage And How To Use It On Websites</a> (by Chris Heilmann)</li>
 					<li><a href="http://hacks.mozilla.org/2009/06/localstorage/">saving data with localStorage</a> by Christopher Blizzard (uses localStorage + JSON)</li>
+					<li><a href="https://gist.github.com/777191">A simple localStorage/sessionStorage extension, wich works with and without webshims lib</a></li>
 				</ul>
 			</aside>
 		</section>

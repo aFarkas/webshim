@@ -76,23 +76,9 @@ if (!Object.keys) {
 
 } 
 
-var supportDefineDOMProp = true;
-if(Object.defineProperty && Object.prototype.__defineGetter__){
-	(function(){
-		try {
-			var foo = document.createElement('foo');
-			Object.defineProperty(foo, 'bar', {get: function(){return true;}});
-			supportDefineDOMProp = !!foo.bar;	
-		}catch(e){
-			supportDefineDOMProp = false;
-		}
-		if(!supportDefineDOMProp){
-			jQuery.support.advancedObjectProperties = false;
-		}
-	})();
-}
 
-if((!supportDefineDOMProp || !Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor  || !Object.defineProperty) && window.jQuery && jQuery.webshims){
+
+if((!Modernizr.advancedObjectProperties || !Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor  || !Object.defineProperty) && window.jQuery && jQuery.webshims){
 	var shims = jQuery.webshims;
 	shims.objectCreate = function(proto, props, opts){
 		var o;
@@ -1034,7 +1020,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		elem = $(elem);
 		return (elem.data('inputUIReplace') || {visual: elem}).visual;
 	};
-	var support = $.support;
 	var getVisual = webshims.getVisualInput;
 	var groupTypes = {checkbox: 1, radio: 1};
 	var emptyJ = $([]);
@@ -1308,7 +1293,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc, undefined){
 	"use strict";
 	var validityMessages = webshims.validityMessages;
-	var support = $.support;
 	var cfg = webshims.cfg.forms;
 	var implementProperties = (cfg.overrideMessages || cfg.customMessages) ? ['customValidationMessage'] : [];
 	
@@ -1379,7 +1363,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	};
 	
 	
-	if((!window.noHTMLExtFixes && !support.validationMessage) || !support.validity){
+	if((!window.noHTMLExtFixes && !Modernizr.validationmessage) || !Modernizr.formvalidation){
 		implementProperties.push('validationMessage');
 	}
 	
@@ -1397,7 +1381,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 					message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
 					if(message){return message;}
 					if(validity.customError && elem.nodeName){
-						message = (support.validationMessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
+						message = (Modernizr.validationmessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
 						if(message){return message;}
 					}
 					$.each(validity, function(name, prop){
@@ -1417,8 +1401,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	webshims.isReady('form-message', true);
 });jQuery.webshims.ready('form-message form-core', function($, webshims, window, doc, undefined){
 //	"use strict";
-	var support = $.support;
-	if(!support.validity){return;}
+	if(!Modernizr.formvalidation){return;}
 		
 	var typeModels = webshims.inputTypes;
 	var validityRules = {};
@@ -1445,7 +1428,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	});
 	
 	var overrideNativeMessages = webshims.cfg.forms.overrideMessages;	
-	var overrideValidity = (!support.requiredSelect || !support.numericDateProps || overrideNativeMessages);
+	var overrideValidity = (!Modernizr.requiredSelect || !Modernizr.input.valueAsDate || overrideNativeMessages);
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	var oldAttr = $.attr;
 	var oldVal = $.fn.val;
@@ -1457,7 +1440,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 		var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
 		
 		if(!overrideNativeMessages){
-			if(!(!support.requiredSelect && type == 'select-one') && !typeModels[type]){return;}
+			if(!(!Modernizr.requiredSelect && type == 'select-one') && !typeModels[type]){return;}
 		}
 		
 		if(overrideNativeMessages && !init && checkTypes[type] && elem.name){
@@ -1481,7 +1464,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 		}
 	});
 		
-	if((!window.noHTMLExtFixes && !support.requiredSelect) || overrideNativeMessages){
+	if((!window.noHTMLExtFixes && !Modernizr.requiredSelect) || overrideNativeMessages){
 		$.extend(validityChanger, {
 			required: 1,
 			size: 1,
@@ -1490,7 +1473,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 		});
 		validityElements.push('select');
 	}
-	if(!support.numericDateProps || overrideNativeMessages){
+	if(!Modernizr.input.valueAsNumber || overrideNativeMessages){
 		$.extend(validityChanger, {
 			min: 1, max: 1, step: 1
 		});
@@ -1581,7 +1564,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 			doc.addEventListener('change', function(e){
 				testValidity(e.target);
 			}, true);
-			if (!support.numericDateProps) {
+			if (!Modernizr.input.valueAsNumber) {
 				doc.addEventListener('input', function(e){
 					testValidity(e.target);
 				}, true);
@@ -1593,17 +1576,15 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 			$(validityElementsSel, context).add(elem.filter(validityElementsSel)).attr('validity');
 		});
 		
-	} //end: overrideValidity -> (!supportRequiredSelect || !supportNumericDate || overrideNativeMessages)
+	} //end: overrideValidity
 	webshims.isReady('form-extend', true);
 });/* https://github.com/aFarkas/webshim/issues#issue/16 */
 jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
-	var support = $.support;
 	
-	if(!support.validity || window.noHTMLExtFixes){return;}
+	if(!Modernizr.formvalidation || window.noHTMLExtFixes || Modernizr.bugfreeformvalidation){return;}
 	
 	
-	var advancedForm = ( 'value' in doc.createElement('output') && 'list' in doc.createElement('input') ),
-		invalids = [],
+	var invalids = [],
 		form
 	;
 	
@@ -1664,7 +1645,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		})
 		.bind('lastinvalid', function(e, data){
 			var firstTarget = data.invalidlist[0];
-			if( firstTarget && !advancedForm && document.activeElement && firstTarget !== document.activeElement && !$.data(firstTarget, 'maybePreventedinvalid') ){
+			if( firstTarget && $.browser.webkit && document.activeElement && firstTarget !== document.activeElement && !$.data(firstTarget, 'maybePreventedinvalid') ){
 				webshims.validityAlert.showFor(firstTarget);
 			}
 			invalids = [];
@@ -1676,7 +1657,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		
 	(function(){
 		//safari 5.0.2/5.0.3 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
-		if(!$.browser.webkit || parseInt($.browser.version, 10) > 533){return;}
+		if(!$.browser.webkit || parseFloat($.browser.version, 10) > 534.16){return;}
 		var checkValidity = function(elem){
 			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
 			if(!valid && elem.checkValidity && elem.checkValidity()){
@@ -1704,15 +1685,8 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		});
 		
 	})();
-	if(!support.requiredSelect){
+	if(!Modernizr.requiredSelect){
 		webshims.ready('form-extend', function(){
-			webshims.defineNodeNamesBooleanProperty(['select'], 'required', {
-				set: function(value){
-					this.setAttribute('aria-required', (value) ? 'true' : 'false');
-				},
-				content: true
-			}, true);
-			
 			webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){
 				
 				if(cache.nodeName == 'select' && !val && jElm.attr('required') && jElm[0].size < 2){
@@ -1726,10 +1700,15 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 				}
 				return validityState.valueMissing;
 			});
-			//trigger validity test
-			webshims.ready('DOM', function(){
-				$('select[required]').attr('validity');
-			});
+			
+			webshims.defineNodeNamesBooleanProperty(['select'], 'required', {
+				set: function(value){
+					this.setAttribute('aria-required', (value) ? 'true' : 'false');
+					//trigger validity test
+					$.attr(this, 'validity');
+				},
+				content: true
+			}, true);
 		});
 	}
 });

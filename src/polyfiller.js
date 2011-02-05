@@ -1,16 +1,112 @@
 (function($, window, document, undefined){
 	"use strict";
 	
-//	$.each(['jQuery', 'Modernizr', 'yepnope'], function(i, dependcy){
-//		if(!window[dependcy]){
-//			throw("you have to include "+ dependcy +" before webshims lib");
-//		}
-//	});
+	$.each(['jQuery', 'Modernizr'], function(i, dependcy){
+		if(!window[dependcy]){
+			throw("you have to include "+ dependcy +" before webshims lib");
+		}
+	});
 	
 	
 	document.createElement('datalist');
 	
 	var special = $.event.special;
+	var modernizrInputAttrs = Modernizr.input;
+	var modernizrInputTypes = Modernizr.inputtypes;
+	var browserVersion = parseFloat($.browser.version, 10);
+	
+	
+	//new Modernizrtests
+	(function(){
+		var addTest = Modernizr.addTest;
+		var form = $('<form action="#"><input name="a" required /><select><option>y</option></select><input required id="date-input-test" type="date" /></form>');
+		var dateElem;
+		
+		//using hole modernizr api
+		addTest('formvalidation', function(){
+			return !!('checkValidity' in form[0]);
+		});
+		
+		addTest('datalist', function(){
+			return !!(modernizrInputAttrs.list && window.HTMLDataListElement);
+		});
+		
+		addTest('validationmessage', function(){
+			if(!Modernizr.formvalidation){
+				return false;
+			}
+			//the form has to be connected in FF4
+			form.appendTo('head');
+			return !!($('input', form).attr('validationMessage'));
+		});
+		
+		addTest('output', function(){
+			if(!Modernizr.formvalidation){
+				return false;
+			}
+			return ('value' in document.createElement('output'));
+		});
+		
+		Modernizr.genericDOM =  !!($('<video><div></div></video>')[0].innerHTML);
+		
+		//using only property api
+		Modernizr.requiredSelect = !!(Modernizr.formvalidation && 'required' in $('select', form)[0]);
+		
+		//bugfree means interactive formvalidation including correct submit-invalid event handling (this can't be detected, we can just guess)
+		Modernizr.bugfreeformvalidation = Modernizr.formvalidation && Modernizr.requiredSelect && Modernizr.validationmessage && (!$.browser.webkit || browserVersion > 534.16);
+		
+		
+		modernizrInputAttrs.valueAsNumber = false;
+		modernizrInputAttrs.valueAsDate = false;
+		
+		if(Modernizr.formvalidation){
+			dateElem = $('#date-input-test', form)[0];
+			modernizrInputAttrs.valueAsNumber = ('valueAsNumber' in  dateElem);
+			modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem);
+			dateElem = null;
+		}
+		
+		if (Modernizr.formvalidation) {
+			form.remove();
+		}
+		form = null;
+		
+		Modernizr.ES5base = !!(String.prototype.trim && Date.now && Date.prototype.toISOString);
+		Modernizr.ES5extras = !!(Array.isArray && Object.keys && Object.create && Function.prototype.bind && Object.defineProperties && !isNaN( Date.parse("T00:00") ));
+		
+		if(Modernizr.ES5base){
+			$.each(['filter', 'map', 'every', 'reduce', 'reduceRight', 'lastIndexOf'], function(i, name){
+				if(!Array.prototype[name]){
+					Modernizr.ES5base = false;
+					return false;
+				}
+			});
+		}
+		
+		Modernizr.ES5 = (Modernizr.ES5base && Modernizr.ES5extras);
+		
+		Modernizr.advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
+		//safari has defineProperty-interface, but it can't be used on dom-object
+		//only do this test in non-IE browsers, because this hurts dhtml-behavior in some IE8 versions
+		if(!$.browser.msie && Object.defineProperty && Object.prototype.__defineGetter__){
+			(function(){
+				try {
+					var foo = document.createElement('foo');
+					Object.defineProperty(foo, 'bar', {get: function(){return true;}});
+					Modernizr.advancedObjectProperties = !!foo.bar;	
+				}catch(e){
+					Modernizr.advancedObjectProperties = false;
+				}
+				foo = null;
+			})();
+		}
+		
+		Modernizr.objectAccessor = !!( Modernizr.advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__));
+		Modernizr.domAccessor = !!( Modernizr.objectAccessor ||  (Object.defineProperty && Object.getOwnPropertyDescriptor));
+	})();
+	
+	
+
 	
 	$.webshims = {
 		
@@ -99,7 +195,7 @@
 				if(addClass[0]){
 					$('html').addClass(addClass.join(' '));
 				}
-				$(window).load(function(){
+				$(function(){
 					loader.loadList(['html5a11y']);
 				});
 				loader.loadCSS('shim.css');
@@ -480,7 +576,6 @@
 	var modules = webshims.modules;
 	var loader = webshims.loader;
 	var combinations = loader.combinations;
-	var support = $.support;
 	
 	$.each(['log', 'error', 'warn', 'info'], function(i, fn){
 		webshims[fn] = function(message){
@@ -594,26 +689,32 @@
 				}
 			}
 		};
-		webshims.objectCreate = function(proto, props, opts){
-			extendProps(props);
-			var o = Object.create(proto, props);
-			if(opts){
-				o.options = $.extend(true, {}, o.options  || {}, opts);
-				opts = o.options;
-			}
-			if(o._create && $.isFunction(o._create)){
-				o._create(opts);
-			}
-			return o;
-		};
-		webshims.defineProperty = function(obj, prop, desc){
-			extendUndefined(desc);
-			return Object.defineProperty(obj, prop, desc);
-		};
-		webshims.defineProperties = function(obj, props){
-			extendProps(props);
-			return Object.defineProperties(obj, props);
-		};
+		if(Object.create){
+			webshims.objectCreate = function(proto, props, opts){
+				extendProps(props);
+				var o = Object.create(proto, props);
+				if(opts){
+					o.options = $.extend(true, {}, o.options  || {}, opts);
+					opts = o.options;
+				}
+				if(o._create && $.isFunction(o._create)){
+					o._create(opts);
+				}
+				return o;
+			};
+		}
+		if(Object.defineProperty){
+			webshims.defineProperty = function(obj, prop, desc){
+				extendUndefined(desc);
+				return Object.defineProperty(obj, prop, desc);
+			};
+		}
+		if(Object.defineProperties){
+			webshims.defineProperties = function(obj, props){
+				extendProps(props);
+				return Object.defineProperties(obj, props);
+			};
+		}
 		webshims.getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 		
 		webshims.getPrototypeOf = Object.getPrototypeOf;
@@ -628,12 +729,11 @@
 	
 	/* general modules */
 	/* change path $.webshims.modules[moduleName].src */
-	var browserVersion = parseFloat($.browser.version, 10);
 	var httpProtocol = (location.protocol == 'https:') ? 'https:' : 'http:';
 	loader.addModule('html5a11y', {
 		src: 'html5a11y',
 		test: function(){
-			return !(($.browser.msie && browserVersion < 10 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 540));
+			return !(($.browser.msie && browserVersion < 9 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 535) || !window.HTMLArticleElement);
 		}
 	});
 	
@@ -663,38 +763,15 @@
 	});
 	
 		
-	var testElem = $('<div />')[0];
-	
 	/* 
 	 * polyfill-Modules 
 	 */
 	
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
-	var es5 = [];
-	es5.push( !!(Array.isArray && Object.keys && Object.create && Function.prototype.bind && Object.defineProperties && !isNaN( Date.parse("T00:00") )) );
-	es5.push( !!(String.prototype.trim && Date.now && Date.prototype.toISOString) );
-	
-	if(es5[1]){
-		$.each(['filter', 'map', 'every', 'reduce', 'reduceRight', 'lastIndexOf'], function(i, name){
-			if(!Array.prototype[name]){
-				es5[1] = false;
-				return false;
-			}
-		});
-	}
-	support.es5 = (es5[0] && es5[1]);
-	
-	support.advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
-	support.objectAccessor = !!( support.advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__));
-	support.domAccessor = !!( support.advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__) ||  (Object.defineProperty && Object.getOwnPropertyDescriptor));
-	support.dhtmlBehavior = !!(testElem.addBehavior);
-	testElem.setAttribute('dataContentAttr', ':-)');
-	support.contentAttr = !(testElem.dataContentAttr);
-	
 	addPolyfill('es5-1', {
 		feature: 'es5',
 		test: function(){
-			return (es5[1] && es5[0]);
+			return (Modernizr.ES5);
 		},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ff3-light', 'combined-webkit']
 	});
@@ -702,7 +779,7 @@
 	addPolyfill('es5-2', {
 		feature: 'es5',
 		test: function(){
-			return es5[1];
+			return Modernizr.ES5base;
 		},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie7-light', 'combined-ie8-light']
 	});
@@ -716,21 +793,19 @@
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light', 'combined-webkit']
 	});
 	
-	//ToDo: This should be part of dom-extend
-	support.dynamicHTML5 =  !!($('<video><div></div></video>')[0].innerHTML);
+	
 	addPolyfill('html5shiv', {
 		feature: 'dom-support',
 		test: function(){
-			return support.dynamicHTML5;
+			return Modernizr.genericDOM;
 		},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie7-light', 'combined-ie8-light']
 	});
 	
 	/* geolocation */
-	support.geolocation = ('geolocation'  in navigator);
 	addPolyfill('geolocation', {
 		test: function(){
-			return support.geolocation;
+			return Modernizr.geolocation;
 		},
 		options: {destroyWrite: true, confirmText: ''},
 		dependencies: ['json-storage'],
@@ -739,28 +814,33 @@
 	/* END: geolocation */
 	
 	/* canvas */
-	support.canvas = ('getContext'  in $('<canvas />')[0]);
 	(function(){
 		var flashCanvas = window.FlashCanvas;
 		addPolyfill('canvas', {
 			src: 'excanvas',
 			test: function(){
-				return support.canvas;
+				return Modernizr.canvas;
 			},
 			options: {type: 'excanvas'}, //excanvas | flash | flashpro
 			noAutoCallback: true,
 			loadInit: function(){
 				var type = this.options.type;
-				if(type.indexOf('flash') !== -1){
+				var src;
+				if(type && type.indexOf('flash') !== -1){
 					window.FlashCanvas = window.FlashCanvas || {};
 					flashCanvas = window.FlashCanvas;
 					if(type == 'flash'){
 						$.extend(flashCanvas, {swfPath: loader.basePath + 'FlashCanvas/'});
 						this.src = 'FlashCanvas/flashcanvas';
+						src = flashCanvas.swfPath + 'flashcanvas.swf';
 					} else {
 						$.extend(flashCanvas, {swfPath: loader.basePath + 'FlashCanvasPro/'});
 						this.src = 'FlashCanvasPro/flashcanvas';
+						//assume, that the user has flash10+
+						src = flashCanvas.swfPath + 'flash10canvas.swf';
 					}
+					//preload swf
+					if(src){$.ajax({url: src, cache: true, dataType: 'text'});}
 				}
 			},
 			afterLoad: function(){
@@ -775,9 +855,7 @@
 						}
 					});
 					webshims.addReady(function(context, elem){
-						if(doc === context && flashCanvas && window.FlashCanvas && FlashCanvas.setOption){
-							FlashCanvas.setOptions(flashCanvas);
-						}
+						
 						$('canvas', context).add(elem.filter('canvas')).each(function(i){
 							if(!this.getContext){
 								G_vmlCanvasManager.initElement(this);
@@ -807,37 +885,7 @@
 	webshims.validityMessages = [];
 	webshims.validationMessages = webshims.validityMessages;
 	webshims.inputTypes = {};
-	
-	(function(){
-		var form = $('<form action="#"><input name="a" required /><select><option>y</option></select></form>'),
-			range = $('<input type="range" />')[0],
-			date = $('<input type="date" />')[0]
-		;
-		
-		support.validity = ('checkValidity' in form[0]);
-		if(support.validity){
-			form.appendTo('head');
-		}
-		support.validationMessage = !!($('input', form).attr('validationMessage'));
-		
-		support.output = !!(support.validity && 'value' in document.createElement('output') );
-		support.requiredSelect = (support.validity && 'required' in $('select', form)[0]);
-		support.datalistProp = (support.validity && 'list' in $('input', form)[0] && 'options' in document.createElement('datalist'));
-		support.datalist = !!(support.datalistProp && window.HTMLDataListElement);
-		support.numericDateProps = (support.validity && range.type == 'range' && date.type == 'date');
-		
-		
-		support.rangeUI = support.numericDateProps && Modernizr.inputtypes.range;
-		support.dateUI = support.numericDateProps && Modernizr.inputtypes.date;
-		
-		if(support.validity){
-			form.remove();
-		}
-		form = null;
-		range = null;
-		date = null;
-	})();
-		
+			
 	addPolyfill('form-core', {
 		feature: 'forms',
 		noAutoCallback: true,
@@ -849,7 +897,7 @@
 	addPolyfill('form-message', {
 		feature: 'forms',
 		test: function(toLoad){
-			return (support.validationMessage && !this.options.customMessages && modules['form-extend'].test(toLoad) );
+			return (Modernizr.validationMessage && !this.options.customMessages && modules['form-extend'].test(toLoad) );
 		},
 		options: {
 			customMessages: false,
@@ -860,7 +908,7 @@
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light', 'combined-webkit']
 	});
 	
-	if(support.validity){
+	if(Modernizr.formvalidation){
 		//create delegatable-like events
 		webshims.capturingEvents(['input']);
 		webshims.capturingEvents(['invalid'], true);
@@ -870,7 +918,7 @@
 			src: 'form-native-extend',
 			noAutoCallback: true,
 			test: function(toLoad){
-				return (support.requiredSelect && support.validationMessage && (support.numericDateProps || $.inArray('form-number-date', toLoad) == -1) && !this.options.overrideMessages );
+				return (Modernizr.requiredSelect && Modernizr.validationMessage && ((modernizrInputAttrs.valueAsNumber && modernizrInputAttrs.valueAsDate) || $.inArray('form-number-date', toLoad) == -1) && !this.options.overrideMessages );
 			},
 			dependencies: ['dom-support'],
 			methodNames: ['setCustomValidity','checkValidity'],
@@ -879,7 +927,7 @@
 		
 		addPolyfill('form-native-fix', {
 			feature: 'forms',
-			test: function(){return support.requiredSelect && support.validationMessage && support.output && support.datalist;},
+			test: function(){return Modernizr.bugfreeformvalidation;},
 			dependencies: ['dom-support'],
 			combination: ['combined-webkit']
 		});
@@ -901,7 +949,7 @@
 		feature: 'forms',
 		noAutoCallback: true,
 		test: function(){
-			return support.output && support.datalist;
+			return Modernizr.output && Modernizr.datalist;
 		},
 		dependencies: ['dom-support', 'json-storage'],
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']
@@ -912,7 +960,7 @@
 		noAutoCallback: true,
 		dependencies: ['es5', 'forms', 'json-storage', 'dom-support'],
 		test: function(){
-			return support.numericDateProps;
+			return modernizrInputAttrs.valueAsNumber && modernizrInputAttrs.valueAsDate;
 		},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4'],
 		options: {stepArrows: {number: 1, time: 1}, calculateWidth: true}
@@ -923,7 +971,7 @@
 	addPolyfill('inputUI', {
 		feature: 'forms-ext',
 		src: 'form-date-range-ui',
-		test: function(){return (support.rangeUI && support.dateUI && !this.options.replaceUI);},
+		test: function(){return (modernizrInputTypes.slider && modernizrInputTypes.date && !this.options.replaceUI);},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4'],
 		noAutoCallback: true,
 		dependencies: ['es5', 'forms','dom-support'],
@@ -936,7 +984,7 @@
 		options: {
 			slider: {},
 			datepicker: {},
-			langSrc: 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/i18n/jquery.ui.datepicker-',
+			langSrc: httpProtocol+'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/i18n/jquery.ui.datepicker-',
 			availabeLangs: 'af ar az bg bs cs da de el en-GB eo es et eu fa fi fo fr fr-CH he hr hu hy id is it ja ko it lt lv ms nl no pl pt-BR ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' '),
 			recalcWidth: true,
 			replaceUI: false
@@ -944,7 +992,7 @@
 	});
 	
 	
-	if($.support.datalistProp){
+	if(modernizrInputAttrs.list){
 		onReady('dom-extend', function(){
 			$.webshims.defineNodeNameProperty('input', 'list', {
 				set: function(value){
@@ -960,11 +1008,10 @@
 	
 	/* placeholder */
 	
-	support.placeholder = ($('<input type="text" />').attr('placeholder') != null);
 	addPolyfill('form-placeholder', {
 		feature: 'forms',
 		test: function(){
-			return support.placeholder;
+			return modernizrInputAttrs.placeholder;
 		},
 		options: {
 			placeholderType: 'value'
@@ -978,13 +1025,14 @@
 	
 	/* json + loacalStorage */
 	
-	support.jsonStorage = ('JSON' in window && 'localStorage' in window && 'sessionStorage' in window);
 	addPolyfill('json-storage', {
 		test: function(){
-			return support.jsonStorage;
+			return Modernizr.localstorage && Modernizr.sessionstorage && 'JSON' in window;
 		},
 		loadInit: function(){
 			loader.loadList(['swfobject']);
+			//preload flash
+			$.ajax({url: loader.basePath +'localStorage.swf', cache: true, dataType: 'text'});
 		},
 		noAutoCallback: true,
 		combination: ['combined-ie7', 'combined-ie7-light']
@@ -992,6 +1040,7 @@
 	
 	/* END: json + loacalStorage */
 	//predefined list without input type number/date/time etc.
+	webshims.xlight = ['es5', 'geolocation', 'forms', 'json-storage'];
 	webshims.light = ['es5', 'canvas', 'geolocation', 'forms', 'json-storage'];
 	
 })(jQuery, this, this.document);
