@@ -2,6 +2,8 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	"use strict";
 	var validityMessages = webshims.validityMessages;
 	var support = $.support;
+	var cfg = webshims.cfg.forms;
+	var implementProperties = (cfg.overrideMessages || cfg.customMessages) ? ['customValidationMessage'] : [];
 	
 	validityMessages['en'] = validityMessages['en'] || validityMessages['en-US'] || {
 		typeMismatch: {
@@ -69,7 +71,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 		return message || '';
 	};
 	
-	var implementProperties = (webshims.overrideValidationMessages || webshims.implement.customValidationMessage) ? ['customValidationMessage'] : [];
+	
 	if((!window.noHTMLExtFixes && !support.validationMessage) || !support.validity){
 		implementProperties.push('validationMessage');
 	}

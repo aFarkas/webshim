@@ -187,7 +187,7 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 	var swfTimer;
 	var emptyString = '(empty string)+1287520303738';
 	
-	$.webshims.localStorageSwfCallback = function(type){
+	var localStorageSwfCallback = function(type){
 		clearTimeout(swfTimer);
 		if(window.localStorage){
 			$.webshims.isReady('json-storage', true);
@@ -230,16 +230,24 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 		}
 		$.webshims.isReady('json-storage', true);
 	};
-	
-	jQuery.webshims.swfLocalStorage = {
+	var storageCFG = $.webshims.cfg['json-storage'];
+	$.webshims.swfLocalStorage = {
 		show: function(){
-			$('#swflocalstorageshim').css({
-				top: $(window).scrollTop() + 10,
-				left: ($(window).width() / 2) - ($('#swflocalstorageshim').outerWidth() / 2)
+			if(storageCFG.exceededMessage){
+				$('#swflocalstorageshim-wrapper').prepend('<div class="polyfill-exceeded-message">'+ storageCFG.exceededMessage +'</div>');
+			}
+			$('#swflocalstorageshim-wrapper').css({
+				top: $(window).scrollTop() + 20,
+				left: ($(window).width() / 2) - ($('#swflocalstorageshim-wrapper').outerWidth() / 2)
 			});
+			
 		},
 		hide: function(success){
-			$('#swflocalstorageshim').css({top: '', left: ''});
+			$('#swflocalstorageshim-wrapper')
+				.css({top: '', left: ''})
+				.find('div.polyfill-exceeded-message')
+				.remove()
+			;
 			if(!success){
 				var err = new Error('DOMException: QUOTA_EXCEEDED_ERR');
 				err.code = 22;
@@ -249,19 +257,22 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 		}
 	};
 	
-	$.webshims.ready('ready swfobject', function(){
+	$.ajax({url: $.webshims.loader.basePath +'localStorage.swf', cache: true, dataType: 'text'});
+	$.webshims.ready('DOM swfobject', function(){
 		if(window.swfobject && swfobject.hasFlashPlayerVersion('8.0.0')){
 			
-			swfobject.createCSS('#swflocalstorageshim', 'position: absolute; top: -140px; left: -300px; overflow: hidden; width: 215px; z-index: 99999999999;');
-			$('body')[$.browser.mozilla ? 'after' : 'append']('<div id="swflocalstorageshim" />');
-			swfobject.embedSWF($.webshims.loader.basePath +'localStorage.swf', 'swflocalstorageshim', '215', '138', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'localstorageshim'}, function(e){
+			$('body')[$.browser.mozilla ? 'after' : 'append']('<div id="swflocalstorageshim-wrapper"><div id="swflocalstorageshim" /></div>');
+			swfobject.embedSWF($.webshims.loader.basePath +'localStorage.swf', 'swflocalstorageshim', '215', '138', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'swflocalstorageshim'}, function(e){
 				if(!e.success && !window.localStorage){
-					$.webshims.localStorageSwfCallback();
+					localStorageSwfCallback();
 				}
 			});
-			swfTimer = setTimeout($.webshims.localStorageSwfCallback, (location.protocol.indexOf('file') === 0) ? 500 : 9999);
+			swfTimer = setTimeout(function(){
+				$.webshims.warn('Add your development-directory to the local-trusted security sandbox: http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html');
+				localStorageSwfCallback();
+			}, (location.protocol.indexOf('file') === 0) ? 500 : 9999);
 		} else {
-			$.webshims.localStorageSwfCallback();
+			localStorageSwfCallback();
 		}
 	}, true);
 })();

@@ -8,6 +8,9 @@
 	<script src="../js-webshim/minified/polyfiller.js"></script>
 	
     <script class="example">
+    	$.webshims.setOptions('geolocation', {
+			confirmText: '{location} wants to know your position. It is Ok to press Ok.'
+		});
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
@@ -48,16 +51,22 @@
 			
 			<p>The shim uses the geolocation information provided by <a href="http://freegeoip.net">http://freegeoip.net</a> and/or <a href="http://code.google.com/intl/de-DE/apis/ajax/documentation/#ClientLocation">googles API-Loader</a></p>
 			
-			<p>If you configure a confirm-text @ <code>$.webshims.modules.geolocation.options.confirmText</code> the user will be asked, before the geodata is requested.</p>
-			
-<code class="block run-once">
-$.webshims.modules.geolocation.options.confirmText = "{location} wants to know your position. It is Ok to press Ok.";
+			<h3>Options for geolocation</h3>
+			<ul>
+				<li><strong>confirmText</strong> (string): confirm text for requesting access to geo data.</li>
+			</ul>
+<code class="block">
+$.webshims.setOptions('geolocation', {
+	confirmText: '{location} wants to know your position. It is Ok to press Ok.'
+});
+</code>			
+<code class="block">
 navigator.geolocation.getCurrentPosition(function(pos){
 	alert("Thx, you are @ latitude: "+ pos.coords.latitude +"/longitude: " + pos.coords.longitude);
 });
 </code>
 			<aside>
-				<h3>Links about JSON and localStorage/sessionStorage</h3>
+				<h3>Links about geolocation</h3>
 				<ul>
 					<li><a href="http://dev.w3.org/geo/api/spec-source.html">Geolocation API Specification (W3C)</a></li>
 					<li><a href="https://developer.mozilla.org/En/Using_geolocation">Using geolocation</a></li>

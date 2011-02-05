@@ -24,10 +24,10 @@
 				window.noHTMLExtFixes = true; 
 			}
 			if(hash.indexOf('overrideValidationMessages') !== -1){
-				$.webshims.overrideValidationMessages = true; 
+				$.webshims.cfg.forms.overrideMessages = true; 
 			}
 			if(hash.indexOf('customValidationMessage') !== -1){
-				$.webshims.implement.customValidationMessage = true; 
+				$.webshims.cfg.forms.customMessages = true; 
 			}
 			if(hash.indexOf('extendNative') !== -1){
 				$.webshims.cfg.extendNative = true; 
@@ -36,8 +36,8 @@
 						
 			$(function(){
 				$('#bugfixes').attr('checked', !!window.noHTMLExtFixes);
-				$('#customValidationMessage').attr('checked', !!$.webshims.implement.customValidationMessage);
-				$('#overrideValidationMessages').attr('checked', !!$.webshims.overrideValidationMessages);
+				$('#customValidationMessage').attr('checked', !!$.webshims.cfg.forms.customMessages);
+				$('#overrideValidationMessages').attr('checked', !!$.webshims.cfg.forms.overrideMessages);
 				$('#extendNative').attr('checked', !!$.webshims.cfg.extendNative);
 				$('input.webshim-config')
 					.bind('click', function(){

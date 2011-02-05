@@ -12,29 +12,40 @@
 	
 	var special = $.event.special;
 	
-	
 	$.webshims = {
 		
 		version: 'pre1.5.0',
 		cfg: {
 			useImportantStyles: true,
 			removeFOUC: true,
-			waitReady: true,
-			extendNative: false
+			waitReady: true
+			//,extendNative: false
 		},
-		implement: {},
 		/*
 		 * some data
 		 */
 		modules: {}, features: {}, featureList: [],
+		setOptions: function(name, opts){
+			if(typeof name == 'string' && opts !== undefined && webshims.cfg[name]){
+				if(typeof opts != 'object'){
+					webshims.cfg[name] = opts;
+				} else {
+					$.extend(true, webshims.cfg[name], opts);
+				}
+			} else if(typeof name == 'object') {
+				$.extend(true, webshims.cfg, name);
+			}
+		},
 		addPolyfill: function(name, cfg){
 			cfg = cfg || {};
 			var feature = cfg.feature || name;
 			if(!webshims.features[feature]){
 				webshims.features[feature] = [];
 				webshims.featureList.push(feature);
+				webshims.cfg[feature] = {};
 			}
 			webshims.features[feature].push(name);
+			cfg.options = $.extend(webshims.cfg[feature], cfg.options);
 			
 			loader.addModule(name, cfg);
 			$.each(cfg.combination || [], function(i, combi){
@@ -59,13 +70,18 @@
 			var firstPolyfillCall = function(features){
 				var loadingTimer;
 				var addClass = [];
+				var onReadyEvts = features;
+				
 				var removeLoader = function(){
 					$('html').removeClass('loading-polyfills long-loading-polyfills polyfill-remove-fouc');
-					$(window).unbind('load.loadingPolyfills error.loadingPolyfills');
+					$(window).unbind('.loadingPolyfills');
 					clearTimeout(loadingTimer);
 				};
 				if(!$.isReady){
 					if(webshims.cfg.removeFOUC){
+						if(webshims.cfg.waitReady){
+							onReadyEvts = onReadyEvts.concat(['DOM']);
+						}
 						addClass.push('polyfill-remove-fouc');
 					}
 					addClass.push('loading-polyfills');
@@ -74,7 +90,7 @@
 						$('html').addClass('long-loading-polyfills');
 					}, 600);
 				} else {
-					webshims.warn('You should call $.webshims.polyfill before DOM-Ready');
+					webshims.info('You should call $.webshims.polyfill before DOM-Ready');
 				}
 				onReady(features, removeLoader);
 				if(webshims.cfg.useImportantStyles){
@@ -407,12 +423,11 @@
 						timer,
 						onLoad = function(e){
 							if(e && e.type === 'error'){
-								webshims.warn('Error: could not find script @'+src +'| configure polyfill-path "$.webshims.loader.basePath" or by using markup: <meta name="polyfill-path" content="path/to/shimsfolder/" />');
+								webshims.warn('Error: could not find script @'+src +'| configure polyfill-path: $.webshims.loader.basePath = "path/to/shims-folder" or by using markup: <meta name="polyfill-path" content="path/to/shims-folder/" />');
 							}
 							if(!this.readyState ||
 										this.readyState == "loaded" || this.readyState == "complete"){
 								script.onload =  null;
-								$(script).onerror = null;
 								script.onreadystatechange = null;
 								if(callback){
 									callback(e, this);
@@ -631,7 +646,14 @@
 		src: '',
 		test: function(){
 			//ToDo: add spinner
-			return !($.widget && !($.fn.datepicker || $.fn.slider));
+			var test = !($.widget && !($.fn.datepicker || $.fn.slider));
+			if(!this.src){
+				if(!test){
+					webshims.warn('jQuery UI Widget factory is already included, but not datepicker or slider. configure src of $.webshims.modules["input-widgets"].src');
+				}
+				return true;
+			}
+			return test;
 		}
 	});
 	
@@ -710,34 +732,34 @@
 		test: function(){
 			return support.geolocation;
 		},
-		options: {destroyWrite: true},
+		options: {destroyWrite: true, confirmText: ''},
 		dependencies: ['json-storage'],
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light']
 	});
 	/* END: geolocation */
 	
 	/* canvas */
-	webshims.canvasImplementation = 'excanvas'; //default: excanvas | flash | flashpro
 	support.canvas = ('getContext'  in $('<canvas />')[0]);
 	(function(){
 		var flashCanvas = window.FlashCanvas;
 		addPolyfill('canvas', {
 			src: 'excanvas',
 			test: function(){
-				return false && support.canvas;
+				return support.canvas;
 			},
+			options: {type: 'excanvas'}, //excanvas | flash | flashpro
 			noAutoCallback: true,
 			loadInit: function(){
-				var mod = this;
-				if(webshims.canvasImplementation && webshims.canvasImplementation.indexOf('flash') !== -1){
+				var type = this.options.type;
+				if(type.indexOf('flash') !== -1){
 					window.FlashCanvas = window.FlashCanvas || {};
 					flashCanvas = window.FlashCanvas;
-					if(webshims.canvasImplementation == 'flash'){
+					if(type == 'flash'){
 						$.extend(flashCanvas, {swfPath: loader.basePath + 'FlashCanvas/'});
-						mod.src = 'FlashCanvas/flashcanvas';
+						this.src = 'FlashCanvas/flashcanvas';
 					} else {
 						$.extend(flashCanvas, {swfPath: loader.basePath + 'FlashCanvasPro/'});
-						mod.src = 'FlashCanvasPro/flashcanvas';
+						this.src = 'FlashCanvasPro/flashcanvas';
 					}
 				}
 			},
@@ -752,27 +774,20 @@
 							return this.getContext(ctxName);
 						}
 					});
-							
 					webshims.addReady(function(context, elem){
-						if(doc === context){
-							if(flashCanvas && window.FlashCanvas){
-								FlashCanvas.setOptions(flashCanvas);
-							}
-							$('canvas').each(function(){
-								if(!this.getContext){
-									window.G_vmlCanvasManager && G_vmlCanvasManager.initElement(this);
-								} else {
-									return false;
-								}
-							});
-							isReady('canvas', true);
-							return;
+						if(doc === context && flashCanvas && window.FlashCanvas && FlashCanvas.setOption){
+							FlashCanvas.setOptions(flashCanvas);
 						}
-						$('canvas', context).add(elem.filter('canvas')).each(function(){
+						$('canvas', context).add(elem.filter('canvas')).each(function(i){
 							if(!this.getContext){
 								G_vmlCanvasManager.initElement(this);
+							} else if(context === doc){
+								return false;
 							}
 						});
+						if(doc === context){
+							isReady('canvas', true);
+						}
 					});
 				});
 			},
@@ -790,6 +805,7 @@
 	/* html5 constraint validation */
 	
 	webshims.validityMessages = [];
+	webshims.validationMessages = webshims.validityMessages;
 	webshims.inputTypes = {};
 	
 	(function(){
@@ -833,9 +849,12 @@
 	addPolyfill('form-message', {
 		feature: 'forms',
 		test: function(toLoad){
-			return (support.validationMessage && !webshims.implement.customValidationMessage && modules['form-extend'].test(toLoad) );
+			return (support.validationMessage && !this.options.customMessages && modules['form-extend'].test(toLoad) );
 		},
-		options: {},
+		options: {
+			customMessages: false,
+			overrideMessages: false
+		},
 		dependencies: ['dom-support'],
 		noAutoCallback: true,
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light', 'combined-webkit']
@@ -851,7 +870,7 @@
 			src: 'form-native-extend',
 			noAutoCallback: true,
 			test: function(toLoad){
-				return (support.requiredSelect && support.validationMessage && (support.numericDateProps || $.inArray('form-number-date', toLoad) == -1) && !webshims.overrideValidationMessages );
+				return (support.requiredSelect && support.validationMessage && (support.numericDateProps || $.inArray('form-number-date', toLoad) == -1) && !this.options.overrideMessages );
 			},
 			dependencies: ['dom-support'],
 			methodNames: ['setCustomValidity','checkValidity'],
@@ -904,7 +923,7 @@
 	addPolyfill('inputUI', {
 		feature: 'forms-ext',
 		src: 'form-date-range-ui',
-		test: function(){return (support.rangeUI && support.dateUI && !modules.inputUI.options.replaceNative);},
+		test: function(){return (support.rangeUI && support.dateUI && !this.options.replaceUI);},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4'],
 		noAutoCallback: true,
 		dependencies: ['es5', 'forms','dom-support'],
@@ -920,7 +939,7 @@
 			langSrc: 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/i18n/jquery.ui.datepicker-',
 			availabeLangs: 'af ar az bg bs cs da de el en-GB eo es et eu fa fi fo fr fr-CH he hr hu hy id is it ja ko it lt lv ms nl no pl pt-BR ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' '),
 			recalcWidth: true,
-			replaceNative: false
+			replaceUI: false
 		}
 	});
 	
@@ -946,6 +965,9 @@
 		feature: 'forms',
 		test: function(){
 			return support.placeholder;
+		},
+		options: {
+			placeholderType: 'value'
 		},
 		noAutoCallback: true,
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ie9-light', 'combined-ff3-light']

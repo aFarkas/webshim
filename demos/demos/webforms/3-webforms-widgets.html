@@ -30,16 +30,19 @@
 //    	$.webshims.debug = true;
 		
     	$.webshims.modules.inputUI.options.replaceNative = true;
-		$.webshims.modules.inputUI.options.slider = {
-			range: 'min',
-			animate: true
-		};
-		$.webshims.modules.inputUI.options.datepicker = {
-			showAnim: 'slideDown',
-			changeMonth: true,
-			changeYear: true,
-			showButtonPanel: true
-		};
+		$.webshims.setOptions('forms-ext', {
+			replaceUI: true,
+			slider: {
+				range: 'min',
+				animate: true
+			},
+			datepicker: {
+				showAnim: 'slideDown',
+				changeMonth: true,
+				changeYear: true,
+				showButtonPanel: true
+			}
+		});
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
@@ -100,6 +103,9 @@
 			<h3>Using custom widgets in all browsers</h3>
 <code class="block">
 $.webshims.modules.inputUI.options.replaceNative = true;
+$.webshims.setOptions('forms-ext', {
+	replaceUI: true
+});
 </code>
 			<p>Note: If you also replace the native input widgets, you should also customize the error-bubble. The fastest way of doing this would look like this:</p>
 			
@@ -115,16 +121,18 @@ $('form').bind('firstinvalid', function(e){
 			<p>The range and date widgets are using <a href="http://jqueryui.com/">jQuery UI</a>. You can use all options for <a href="http://jqueryui.com/demos/slider/">slider</a> and <a href="http://jqueryui.com/demos/datepicker">datepicker</a></p>
 			<p>Note that some options will be overwritten by the native HTML5 elements (disabled, value, max/maxDate, min/minDate, step etc.).</p>
 <code class="block">
-$.webshims.modules.inputUI.options.slider = {
-	range: 'min',
-	animate: true
-};
-$.webshims.modules.inputUI.options.datepicker = {
-	showAnim: 'slideDown',
-	changeMonth: true,
-	changeYear: true,
-	showButtonPanel: true
-};
+$.webshims.setOptions('forms-ext', {
+	slider: {
+		range: 'min',
+		animate: true
+	},
+	datepicker: {
+		showAnim: 'slideDown',
+		changeMonth: true,
+		changeYear: true,
+		showButtonPanel: true
+	}
+});
 </code>
 			<p>You can also override defaults with your markup using data-slider/data-datepicker attributes.</p>
 <code class="block">

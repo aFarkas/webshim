@@ -59,10 +59,10 @@
 				<ul>
 					<li>IE6+</li>
 					<li>Firefox 3.5+</li>
-					<li>Safari 5.0.2+</li>
+					<li>Safari 4+</li>
 					<li>Safari for iOS 4</li>
-					<li>Chrome 6.0+</li>
-					<li>Opera 10.5+</li>
+					<li>Chrome 8.0+</li>
+					<li>Opera 11+</li>
 				</ul>
 				
 			</div>
@@ -72,6 +72,7 @@
 					<li><a href="http://code.google.com/p/base2/">base2</a> by the grandmaster of webshims <a href="http://dean.edwards.name/">dean edwards</a></li>
 					<li><a href="http://code.google.com/p/html5shim/">html5shim</a> by remy sharp</li>
 					<li><a href="http://jdbartlett.github.com/innershiv/">innerShiv</a> by joe bartlett</li>
+					<li><a href="http://flashcanvas.net/">FlashCanvas</a></li>
 					<li><a href="http://code.google.com/p/explorercanvas/">excanvas</a> by google erik arvidsson</li>
 					<li><a href="http://gist.github.com/350433">storage polyfill</a> by remy sharp</li>
 					<li><a href="http://github.com/kriskowal/es5-shim/">ES5 shim</a></li>
@@ -157,7 +158,8 @@
 			
 			<ul>
 				<li>Take the 'js-webshim' folder and add it to your project (You will find a minified and a dev-folder there)</li>
-				<li>Embed the polyfiller.js into your HTML-Page (you can concat/rename this file with your other js. Don't forget to also embed jQuery and Modernizr,)</li>
+				<li>Embed the polyfiller.js into your HTML-Page (you can concat/rename this file with your other js. Don't forget to also embed <a href="http://jquery.com">jQuery</a> and Modernizr)</li>
+				<li>call the polyfill-method</li>
 			</ul>
 			
 <code class="block">
@@ -168,55 +170,63 @@
 	$.webshims.polyfill();
 &lt;/script&gt;	
 </code>
-
-			<p>The polyfill-method can also take a keyword called <code>lightweight</code>, wich will load a filesize-/feature balanced profile. The lightweight-profile currently loads all features, except of the <code>forms-ext</code> feature (numerical and date related web form features). The normal HTML5 <code>forms</code> feature - including constraint validation (required, pattern, [type=email]) and datalist/output widgets - is loaded in this profile.</p>
-<code class="block">
-&lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
-
-&lt;script&gt;
-	//load and implement all unsupported features
-	$.webshims.polyfill('lightweight');
-&lt;/script&gt;	
-</code>			
 			<p>The polyfill-method can also take a white space seperated list of several features.</p>
 <code class="block">
-&lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
-
-&lt;script&gt;
-	//load and implement json-storage and geolocation features, if they aren't supported
-	$.webshims.polyfill('json-storage geolocation');
-&lt;/script&gt;	
+//load and implement json-storage and geolocation features, if they aren't supported
+$.webshims.polyfill('json-storage geolocation');
 </code>	
+
+			<p>The polyfill-method can also take a keyword called <code>lightweight</code>, wich will load a filesize-/feature balanced profile. The lightweight-profile currently loads all features, except of the <code>forms-ext</code> feature (numerical and date related web form features). The normal HTML5 <code>forms</code> feature - including constraint validation (required, pattern, [type=email]) and datalist/output widgets - is loaded in the <code>lightweight</code> profile.</p>
+<code class="block">
+//load and implement all unsupported features from the lightweight profile
+$.webshims.polyfill('lightweight');
+</code>			
+
 			<h3>When is a feature ready to use?</h3>
 			<p>Not every feature is ready immediately in all browsers. To get started, if all features are ready, simply use one of jQuery's ready methods, wich are delayed, till all features are available.</p>
 <code class="block">
-&lt;script&gt;
-	$(function(){
-		//work with DOM + all implemented features
-	});
-	
-	$(doument).ready(function(){
-		//work with DOM + all features
-	});
-&lt;/script&gt;	
+$(function(){
+	//work with DOM + all implemented features
+});
+
+$(doument).ready(function(){
+	//work with DOM + all features
+});
 </code>		
 			<p>If you want to use a feature as soon as possible you can use <code>$.webshims.ready</code> and pass the feature-name[s] and a callback-function:</p>
 <code class="block">
-&lt;script&gt;
-	$.webshims.ready('geolocation json-storage', function(){
-		//work with geolocation, JSON and localStorage
-	});
-&lt;/script&gt;	
+$.webshims.ready('geolocation json-storage', function(){
+	//work with geolocation, JSON and localStorage
+});
 </code>	
 			<p>Note that this callback function may be called before DOM-Ready. If you want to use a feature after DOM-Ready, simply pass the string 'DOM':</p>
 <code class="block">
-&lt;script&gt;
-	$.webshims.ready('DOM canvas', function(){
-		//work with the canvas in the document
-	});
-&lt;/script&gt;	
+$.webshims.ready('DOM canvas', function(){
+	//work with canvas in the document
+});
 </code>	
-			
+
+			<h3>Setting some options</h3>
+			<p>Some features may have options, you can configure these with the <code>$.webshims.setOptions</code>-method. <code>setOptions</code>-method should be always and only called before the <code>polyfill</code>-method:</p>
+<code class="block">
+$.webshims.setOptions('canvas', {
+	type: "flash" //use flashcanvas instead of excanvas as polyfill
+});
+</code>		
+
+			<p><code>setOptions</code> can also take an options-parameter only:</p>
+<code class="block">
+$.webshims.setOptions({
+	//configure canvas-shim
+	canvas: {
+		type: "flash" //use flashcanvas instead of excanvas as polyfill
+	},
+	//configure forms-shim
+	forms: {
+		customMessages: true // implement customValidationMessages - attribute
+	}
+});
+</code>	
 			
 			<h3>minor Abstractions to DOM-Attributes, DOM-Methods and DOM-Events</h3>
 			<p>Due to the fact, that we can not extend the prototype of elements in all browsers, we always use jQuery as an extension-wrapper.</p>
@@ -241,8 +251,8 @@ $(this).checkValidity();
 					<p>If you pass a list of nodes and the method doesn't return anything, the method will be called on each element in this list, otherwise it will be called on the first element.</p>
 				</li>
 				<li>
-					<p>Most events in the HTML5 specification are so called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery can not really distinguish between the event phases (capturing/propagation), we use almost event capturing in the native implementation and $.fn.trigger in the shim.</p>
-					<p>This means, that the HTML5 events go down the DOM-tree in capable browsers and go up the tree in polyfilled browsers. This can create differences, if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default don't use <code>return false;</code> and use <code>event.preventDefault();</code> instead.</p>
+					<p>Most events in the HTML5 specification are so called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery can not distinguish between the event phases (capturing/propagation), we use almost event capturing in the native implementation and $.fn.trigger in the shim.</p>
+					<p>This means, that some "HTML5 events" go down the DOM-tree in capable browsers and go up the tree in polyfilled browsers. This can create differences, if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default don't use <code>return false;</code> and use <code>event.preventDefault();</code> instead.</p>
 				</li>
 			</ul>
 			<h3>How to build an abstraction/extension, that works with and without webshims lib?</h3>
@@ -255,7 +265,7 @@ $(this).checkValidity();
 		<section>
 			<h3>Further Development</h3>
 			<p>Feel free to fork, collaborate, test develope extensions :-).</p>
-			<h4>Development for stable 1.0 release</h4>
+			<h4>Development for stable 1.x release</h4>
 			<ul>
 				<li>improve current implementations</li>
 				<li>find and fix bugs in current implementations</li>

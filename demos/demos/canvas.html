@@ -8,6 +8,9 @@
 	<script src="../js-webshim/minified/polyfiller.js"></script>
 	
     <script class="example">
+    	$.webshims.setOptions('canvas', {
+			type: 'flashpro' //excanvas | flash | flashpro
+		});
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
@@ -40,7 +43,9 @@
 		<section>
 			
 			<h2>Demo/About/Documentation HTML5 canvas</h2>
-			<p>Webshim Lib for the feature <code>canvas</code> implements one simple jQuery-method <code>.getContext()</code> on Top of <a href="http://code.google.com/p/explorercanvas/">excanvas</a>.</p>
+			<p>Webshim Lib for the feature <code>canvas</code> implements one simple jQuery-method <code>.getContext()</code>.</p>
+			
+			
 			<canvas id="my-canvas" width="80" height="80"></canvas>
 <code class="block run-once">
 $.webshims.ready('canvas', function(){
@@ -52,6 +57,17 @@ $.webshims.ready('canvas', function(){
 	ctx.fillRect (30, 30, 55, 50);
 });
 </code>
+			<p>Webshim Lib can implement <a href="http://code.google.com/p/explorercanvas/">excanvas</a> (default) or <a href="http://flashcanvas.net/">FlashCanvas/FlashCanvas Pro</a>:</p>
+<code class="block">
+//always run configuration before calling $.webshims.polyfill();
+$.webshims.setOptions('canvas', {
+	type: 'flashpro' //excanvas(default) | flash | flashpro
+});
+</code>
+			<h3>Options for the <code>canvas</code> feature</h3>
+			<ul>
+				<li><strong>type</strong>: <code>"excanvas"</code> | <code>"flash"</code> | <code>"falshpro"</code></li>
+			</ul>
 			
 			<aside>
 				<h3>Links about canvas</h3>

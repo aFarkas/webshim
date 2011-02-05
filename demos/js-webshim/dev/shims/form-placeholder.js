@@ -9,8 +9,9 @@
 
 jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
 	if($.support.placeholder){return;}
+	var isOver = (webshims.cfg.forms.placeholderType == 'over');
 	var hidePlaceholder = function(elem, data, value){
-			if(elem.type != 'password'){
+			if(!isOver && elem.type != 'password'){
 				if(value === false){
 					value = $.attr(elem, 'value');
 				}
@@ -23,7 +24,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 				placeholderTxt = $.attr(elem, 'placeholder') || '';
 			}
 			
-			if(elem.type != 'password'){
+			if(!isOver && elem.type != 'password'){
 				elem.value = placeholderTxt;
 			}
 			data.box.addClass('placeholder-visible');
@@ -34,7 +35,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 				if(!data){return;}
 			}
 			if(type == 'focus' || (!type && elem === document.activeElement)){
-				if(elem.type == 'password' || $(elem).hasClass('placeholder-visible')){
+				if(elem.type == 'password' || isOver || $(elem).hasClass('placeholder-visible')){
 					hidePlaceholder(elem, data, '');
 				}
 				return;
@@ -80,7 +81,6 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 			
 			return {
 				create: function(elem){
-//					alert(elem.value)
 					var data = $.data(elem, 'placeHolder');
 					if(data){return data;}
 					data = $.data(elem, 'placeHolder', {
@@ -98,7 +98,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 						});
 					}
 					
-					if(elem.type == 'password'){
+					if(elem.type == 'password' || isOver){
 						data.box = $(elem)
 							.wrap('<span class="placeholder-box placeholder-box-'+ (elem.nodeName || '').toLowerCase() +'" />')
 							.parent()
@@ -141,7 +141,16 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 						}
 					} else {
 						var reset = function(e){
-							hidePlaceholder(elem, data, '');
+							if($(elem).hasClass('placeholder-visible')){
+								hidePlaceholder(elem, data, '');
+								if(e && e.type == 'submit'){
+									setTimeout(function(){
+										if(e.isDefaultPrevented()){
+											changePlaceholderVisibility(elem, false, false, data );
+										}
+									}, 9);
+								}
+							}
 						};
 						if($.nodeName(data.text[0], 'label')){
 							//if label is dynamically set after we ensure that our label isn't exposed anymore
@@ -159,13 +168,9 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 				},
 				update: function(elem, val){
 					if(!allowedPlaceholder[$.attr(elem, 'type')] && !$.nodeName(elem, 'textarea')){return;}
-					if($.nodeName(elem, 'input')){
-						val = val.replace(delReg, '');
-					}
+					
 					var data = pHolder.create(elem);
-					if(webshims.contentAttr(elem, 'placeholder') != val){
-						webshims.contentAttr(elem, 'placeholder', val);
-					}
+					
 					data.text.text(val);
 					
 					changePlaceholderVisibility(elem, false, val, data);
@@ -177,17 +182,19 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 	$.webshims.publicMethods = {
 		pHolder: pHolder
 	};
-	
-	webshims.defineNodeNamesProperty(['input', 'textarea'], 'placeholder', {
-		set: function(val){
-			var elem = this;
-			pHolder.update(elem, val);
-		},
-		get: function(elem){
-			return webshims.contentAttr(this, 'placeholder') || '';
-		},
-		contentAttr: true
-	}, true, true, 'form-placeholder');
+	['input', 'textarea'].forEach(function(nodeName){
+		var desc = webshims.defineNodeNameProperty(nodeName, 'placeholder', {
+			set: function(val){
+				var elem = this;
+				webshims.contentAttr(elem, 'placeholder', val);
+				pHolder.update(elem, val);
+			},
+			get: function(){
+				return webshims.contentAttr(this, 'placeholder') || '';
+			},
+			content: true
+		}, true, true, 'form-placeholder');
+	});
 			
 	$.each(['input', 'textarea'], function(i, name){
 		var desc = webshims.defineNodeNameProperty(name, 'value', {
@@ -222,7 +229,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 						if(placeholder && 'value' in this){
 							changePlaceholderVisibility(this, val, placeholder);
 						}
-						if(this.type == 'password'){
+						if(this.type == 'password' || isOver){
 							oldVal.call($(this), '');
 						}
 					}

@@ -809,9 +809,8 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		var nodeName = (elem.nodeName || '').toLowerCase();
 		if(!nodeName || elem.nodeType !== 1){return oldAttr(elem, name, value, arg1, arg3);}
 		var desc = extendedProps[nodeName];
-		var handeld;
 		var ret;
-		var getSetData;
+//		var getSetData;
 						
 		if(desc){
 			desc = desc[name];
@@ -826,26 +825,23 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		// we got a winner
 		if(desc){
 			//getSetData is used for IE8-, to block infinite loops + autointit of DHTML behaviors 
-			getSetData = $.data(elem, '_polyfillblockProperty') || $.data(elem, '_polyfillblockProperty', {get: {}, set: {}, contentInit: {}});
+//			getSetData = $.data(elem, '_polyfillblockProperty') || $.data(elem, '_polyfillblockProperty', {get: {}, set: {}, contentInit: {}});
 			if(value === undefined){
-				if(getSetData.get[name]){return;}
-				getSetData.get[name] = true;
-				ret = (desc.get) ? desc.get.call(elem) : desc.value;
-				getSetData.get[name] = false;
-				return ret;
+//				if(getSetData.get[name]){return;}
+//				getSetData.get[name] = true;
+//				getSetData.get[name] = false;
+				return (desc.get) ? desc.get.call(elem) : desc.value;
 			} else if(desc.set) {
-				if(getSetData.set[name]){return;}
-				getSetData.set[name] = true;
-				if(elem.readyState === 'loading' && !getSetData.contentInit && !getSetData.get[name] && desc.get && value === webshims.contentAttr(elem, name)){
-					getSetData.contentInit = true;
-					value = desc.get.call(elem);
-				}
+//				if(getSetData.set[name]){return;}
+//				getSetData.set[name] = true;
+//				if(elem.readyState === 'loading' && !getSetData.contentInit && !getSetData.get[name] && desc.get && value === webshims.contentAttr(elem, name)){
+//					getSetData.contentInit = true;
+//					value = desc.get.call(elem);
+//				}
 				ret = desc.set.call(elem, value);
-				handeld = true;
-				getSetData.set[name] = false;
+//				getSetData.set[name] = false;
 			}
-		}
-		if(!handeld){
+		} else {
 			ret = oldAttr(elem, name, value, arg1, arg3);
 		}
 		if(value !== undefined && modifyProps[nodeName] && modifyProps[nodeName][name]){
@@ -890,29 +886,34 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		});
 	};
 	
-	(function(){
-		var preloadElem = document.createElement('span');
-		var preloadStyle = preloadElem.style;
-		var preloaded = {};
-		
-		var processPreload = function(preload){
-			preload.props.forEach(function(htcFile){
-				if(preloaded[htcFile]){return;}
-				preloaded[htcFile] = true;
-				preloadStyle.behavior += ', '+htcFile;
-				if(preload.feature && preloadElem.readyState != 'complete'){
-					webshims.waitReady(preload.feature);
-					$(preloadElem).one('readystatechange', function(){
-						webshims.unwaitReady(preload.feature);
-					});
-				}
-			});
-		};
-//		webshims.preloadHTCs.forEach(processPreload);
-		webshims.preloadHTCs = {push: processPreload};
-	})();
+
+/*
+ * Native extension feature
+ */	
+//	(function(){
+//		var preloadElem = document.createElement('span');
+//		var preloadStyle = preloadElem.style;
+//		var preloaded = {};
+//		
+//		var processPreload = function(preload){
+//			preload.props.forEach(function(htcFile){
+//				if(preloaded[htcFile]){return;}
+//				preloaded[htcFile] = true;
+//				preloadStyle.behavior += ', '+htcFile;
+//				if(preload.feature && preloadElem.readyState != 'complete'){
+//					webshims.waitReady(preload.feature);
+//					$(preloadElem).one('readystatechange', function(){
+//						webshims.unwaitReady(preload.feature);
+//					});
+//				}
+//			});
+//		};
+//		webshims.preloadHTCs = {push: processPreload};
+//	})();
+/*
+ * END: Native extension feature
+ */
 	
-	// resetting properties with magic content attributes
 	var initProp = (function(){
 		
 		var initProps = {};
@@ -955,28 +956,35 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		var elementExtends = {};
 		var loadedDHTMLFiles = {};
 		return {
-			extend: function(nodeName, prop, desc){
-				if(!elementExtends[prop]){
-					elementExtends[prop] = 0;
-				}
-				elementExtends[prop]++;
-				createNodeNameInit(nodeName, function(){
-					transformDescriptor(this, prop, desc, '_sup'+ prop + elementExtends[prop]);
-					webshims.defineProperty(this, prop, desc);
-				});
-			},
-			extendDHTML: function(nodeName, htcFile, prop, feature){
-				webshims.preloadHTCs.push({feature: feature, props: [htcFile]});
-				if(!loadedDHTMLFiles[nodeName]){
-					loadedDHTMLFiles[nodeName] = '';
-				}
-				if(loadedDHTMLFiles[nodeName].indexOf(htcFile) != -1){return;}
-				loadedDHTMLFiles[nodeName] += htcFile;
-				createNodeNameInit(nodeName, function(){
-					var behavior = this.style.behavior;
-					this.style.behavior += behavior ? ', '+htcFile : htcFile;
-				});
-			},
+			/*
+			 * Native extension feature
+			 */
+//			extend: function(nodeName, prop, desc){
+//				if(!elementExtends[prop]){
+//					elementExtends[prop] = 0;
+//				}
+//				elementExtends[prop]++;
+//				transformDescriptor(document.createElement(nodeName), prop, desc, '_sup'+ prop + elementExtends[prop]);
+//				createNodeNameInit(nodeName, function(){
+//					transformDescriptor(this, prop, desc, '_sup'+ prop + elementExtends[prop], true);
+//					webshims.defineProperty(this, prop, desc);
+//				});
+//			},
+//			extendDHTML: function(nodeName, htcFile, prop, feature){
+//				webshims.preloadHTCs.push({feature: feature, props: [htcFile]});
+//				if(!loadedDHTMLFiles[nodeName]){
+//					loadedDHTMLFiles[nodeName] = '';
+//				}
+//				if(loadedDHTMLFiles[nodeName].indexOf(htcFile) != -1){return;}
+//				loadedDHTMLFiles[nodeName] += htcFile;
+//				createNodeNameInit(nodeName, function(){
+//					var behavior = this.style.behavior;
+//					this.style.behavior += behavior ? ', '+htcFile : htcFile;
+//				});
+//			},
+			/*
+			 * END: Native extension feature
+			 */
 			init: function(nodeName, prop, all){
 				createNodeNameInit(nodeName, function(){
 					var jElm = $(this);
@@ -991,163 +999,229 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		};
 	})();
 	
-	
-	var transformDescriptor = function(proto, prop, desc, elementID){
-		var oDesc;
-		
-		var getSup = function(descriptor, accessType){
-			if(descriptor && descriptor[accessType]){
-				return descriptor[accessType];
-			}
-			
-			if(descriptor.value !== undefined){
-				//if original is a value, but we use an accessor
-				if(accessType == 'set'){
-					return(elementID) ? function(val){$.data(proto, elementID).value = val;} : function(val){descriptor.value = val;};
-				}
-				if(accessType == 'get'){
-					return (elementID) ? function(){return $.data(proto, elementID).value;} : function(){return descriptor.value;};
-				}
-			}
-			return function(value){
-				return webshims.contentAttr(this, prop, value);
-			};
-		};
-		
-		if(proto && prop){
-			
-			while(proto && prop in proto && !has.call(proto, prop)){
-				proto = webshims.getPrototypeOf(proto);
-			}
-			
-			oDesc = webshims.getOwnPropertyDescriptor(proto, prop) || {configurable: true};
-			
-			if(!oDesc.configurable && !oDesc.writeable){return false;}
-			if(elementID){
-				$.data(proto, elementID, oDesc);
-			}
-			if(desc.get){
-				desc._supget = getSup(oDesc, 'get');
-			}
-			if(desc.set){
-				desc._supset = getSup(oDesc, 'set');
-			}
-			if(desc.value || oDesc.value !== undefined){
-				desc._supvalue = oDesc.value;
-			}
-		}
-		
-		if(desc.value === undefined){
-			if(!desc.set){
-				desc.set =  desc._supset || (!desc.writeable) ? function(){throw(prop +'is readonly on '+ this.nodeName);} : getSup(desc, 'set');
-			}
-			if(!desc.get){
-				desc.get = desc._supget || getSup(desc, 'get');
-			}
-		}
-		
-		
-		return true;
-	};
+	/*
+	 * Native extension feature
+	 */
+//	var transformDescriptor = function(proto, prop, desc, elementID, wasExtended){
+//		var oDesc;
+//		
+//		var getSup = function(descriptor, accessType){
+//			if(descriptor && descriptor[accessType]){
+//				return descriptor[accessType];
+//			}
+//			
+//			if(descriptor.value !== undefined){
+//				//if original is a value, but we use an accessor
+//				if(accessType == 'set'){
+//					return(elementID) ? function(val){$.data(proto, elementID).value = val;} : function(val){descriptor.value = val;};
+//				}
+//				if(accessType == 'get'){
+//					return (elementID) ? function(){return $.data(proto, elementID).value;} : function(){return descriptor.value;};
+//				}
+//			}
+//			return function(value){
+//				return webshims.contentAttr(this, prop, value);
+//			};
+//		};
+//		
+//		if(proto && prop){
+//			
+//			while(proto && prop in proto && !has.call(proto, prop)){
+//				proto = webshims.getPrototypeOf(proto);
+//			}
+//			
+//			oDesc = webshims.getOwnPropertyDescriptor(proto, prop) || {configurable: true};
+//			
+//			if(!oDesc.configurable && !oDesc.writeable){return false;}
+//			if(elementID){
+//				$.data(proto, elementID, oDesc);
+//			}
+//			if(!wasExtended){
+//				if(desc.get){
+//					desc._supget = getSup(oDesc, 'get');
+//				}
+//				if(desc.set){
+//					desc._supset = getSup(oDesc, 'set');
+//				}
+//				if(desc.value || oDesc.value !== undefined){
+//					desc._supvalue = oDesc.value;
+//				}
+//			}
+//		}
+//		
+//		if(desc.value === undefined){
+//			if(!desc.set){
+//				desc.set =  desc._supset || (!desc.writeable) ? function(){throw(prop +'is readonly on '+ this.nodeName);} : getSup(desc, 'set');
+//			}
+//			if(!desc.get){
+//				desc.get = desc._supget || getSup(desc, 'get');
+//			}
+//		}
+//		
+//		return true;
+//	};
+//	
+//	var extendContentAttr = (function(){
+//		var extendedAttr = {};
+//		var contentMethods = {};
+//		var slice = Array.prototype.slice;
+//		return function(nodeName, prop, desc){
+//			if(!desc.remove && desc.defaultValue !== undefined && desc.set){
+//				desc.remove = function(){
+//					return desc.set.call(this, desc.defaultValue);
+//				};
+//			}
+//			if(!extendedAttr[nodeName]){
+//				var attrDesc = {};
+//				extendedAttr[nodeName] = {};
+//				contentMethods[nodeName] = {};
+//				['set', 'get', 'remove'].forEach(function(type){
+//					attrDesc[type] = webshims.defineNodeNameProperty(nodeName, type+'Attribute', {
+//						value: function(name){
+//							if(extendedAttr[nodeName][name] && extendedAttr[nodeName][name][type]){
+//								var args = slice.call(arguments, 1);
+//								return extendedAttr[nodeName][name][type].apply(this, args);
+//							}
+//							return attrDesc[type]._supvalue.apply(this, arguments);
+//						}
+//					}, true);
+//					
+//					contentMethods[nodeName][type] = attrDesc[type]._supvalue;
+//				});
+//				desc.content = contentMethods[nodeName];
+//			} else {
+//				desc.content = contentMethods[nodeName];
+//			}
+//			extendedAttr[nodeName][prop] = desc;
+//		};
+//	})();
+	/*
+	 * END: Native extension feature
+	 */
 	
 	$.extend(webshims, {
-		waitReady: function(name){
-			webshims.waitReadys[name] = webshims.waitReadys[name] || 0;
-			webshims.waitReadys[name]++;
-		},
-		unwaitReady: function(name){
-			webshims.waitReadys[name] = webshims.waitReadys[name] || 1;
-			webshims.waitReadys[name]--;
-			if(webshims.waitReadys[name+'ReadyCall'] && !webshims.waitReadys[name]){
-				webshims.isReady(name, true);
-			}
-		},
+		/*
+		 * Native extension feature
+		 */
+//		waitReady: function(name){
+//			webshims.waitReadys[name] = webshims.waitReadys[name] || 0;
+//			webshims.waitReadys[name]++;
+//		},
+//		unwaitReady: function(name){
+//			webshims.waitReadys[name] = webshims.waitReadys[name] || 1;
+//			webshims.waitReadys[name]--;
+//			if(webshims.waitReadys[name+'ReadyCall'] && !webshims.waitReadys[name]){
+//				webshims.isReady(name, true);
+//			}
+//		},
+		/*
+		 * END: Native extension feature
+		 */
 		defineNodeNameProperty: function(nodeName, prop, desc, extend, htc, feature){
-			desc = $.extend({writeable: true}, desc);
-			var oDesc;
+			desc = $.extend({writeable: true, idl: true}, desc);
+			
+			
+			/*
+			 * Native extension feature
+			 */
 			var extendedNative = false;
 			var htcHandled;
-			if(webshims.cfg.extendNative && extend){
-				(function(){
-					var element = document.createElement(nodeName);
-					if(support.objectAccessor && support.contentAttr && unknown){
-						//ToDo extend property on all elements
-						
-						var proto  = webshims.getPrototypeOf(element);
-						
-						
-						
-						//extend property on unknown elements
-						if(unknown === proto){
-							initProp.extend(nodeName, prop, desc);
-							extendedNative = true;
-							return;
-						}
-						
-						//extend unknown property on known elements prototype
-						if(!(prop in element)){
-							transformDescriptor(false, false, desc);
-							webshims.defineProperty(proto, prop, desc);
-							extendedNative = true;
-							return;
-						}
-						//extend known property on element itself
-						if(has.call(element, prop)){
-							oDesc = webshims.getOwnPropertyDescriptor(element, prop);
-							
-							//abort can not extend native!
-							if(!oDesc.configurable){return;}
-							
-							initProp.extend(nodeName, prop, desc);
-							extendedNative = true;
-							return;
-						}
-						
-						//abort can not extend native!
-						if(!transformDescriptor(proto, prop, desc)){return;}
-						//extend known property on known elements prototype
-						webshims.defineProperty(proto, prop, desc);
-						extendedNative = true;
-						return;
-					} else if(desc.value !== undefined){
-						initProp.extend(nodeName, prop, desc);
-						extendedNative = true;
-						return;
-					} 
-					if(htc && support.dhtmlBehavior && !(prop in element)){
-						extendedNative = true;
-						htcHandled = true;
-						extendQAttr(nodeName, prop, desc);
-						initProp.extendDHTML(nodeName, 'url('+webshims.loader.makePath( 'htc/'+ (typeof htc == 'string' ? htc : prop) +'.htc') +')' , prop, feature);
-						return;
-					}
-				})();
-			}
+//			var oDesc;
+//			
+//			if(webshims.cfg.extendNative && extend){
+//				(function(){
+//					if(desc.content && prop == 'placeholder'){
+//						extendContentAttr(nodeName, prop, desc);
+//					}
+//					var element = document.createElement(nodeName);
+//					if(support.objectAccessor && support.contentAttr && unknown){
+//						//ToDo extend property on all elements
+//						
+//						var proto  = webshims.getPrototypeOf(element);
+//						
+//						//extend property on unknown elements
+//						if(unknown === proto){
+//							initProp.extend(nodeName, prop, desc);
+//							extendedNative = true;
+//							return;
+//						}
+//						
+//						//extend unknown property on known elements prototype
+//						if(!(prop in element)){
+//							transformDescriptor(false, false, desc);
+//							webshims.defineProperty(proto, prop, desc);
+//							extendedNative = true;
+//							return;
+//						}
+//						//extend known property on element itself
+//						if(has.call(element, prop)){
+//							oDesc = webshims.getOwnPropertyDescriptor(element, prop);
+//							
+//							//abort can not extend native!
+//							if(!oDesc.configurable){return;}
+//							
+//							initProp.extend(nodeName, prop, desc);
+//							extendedNative = true;
+//							return;
+//						}
+//						
+//						//abort can not extend native!
+//						if(!transformDescriptor(proto, prop, desc)){return;}
+//						//extend known property on known elements prototype
+//						webshims.defineProperty(proto, prop, desc);
+//						extendedNative = true;
+//						return;
+//					} else if(desc.value !== undefined){
+//						initProp.extend(nodeName, prop, desc);
+//						extendedNative = true;
+//						return;
+//					} 
+//					if(htc && support.dhtmlBehavior && !(prop in element)){
+//						extendedNative = true;
+//						htcHandled = true;
+//						extendQAttr(nodeName, prop, desc);
+//						initProp.extendDHTML(nodeName, 'url('+webshims.loader.makePath( 'htc/'+ (typeof htc == 'string' ? htc : prop) +'.htc') +')' , prop, feature);
+//						return;
+//					}
+//				})();
+//			}
+			/*
+			 * END: Native extension feature
+			 */
 			if(!extendedNative){
 				if(extend && webshims.cfg.extendNative){
 					webshims.log("could not extend "+ nodeName +"["+ prop +"] fallback to jQuery extend");
 				}
 				extendQAttr(nodeName, prop, desc);
 			}
-			if(!htcTest && webshims.debug && extend && webshims.cfg.extendNative && htc){
-				htcTest = true;
-				$.ajax({
-					url: webshims.loader.makePath( 'htc/'+ (typeof htc == 'string' ? htc : prop) +'.htc'),
-					complete: function(xhr){
-						if(xhr.getResponseHeader){
-							var type = xhr.getResponseHeader('Content-Type') || '';
-							if(type != 'text/x-component'){
-								webshims.warn('content-type of htc-files should be "text/x-component", but was "'+ type +'"');
-								webshims.info('you should also let the client cache htc-files. use a proper expire header for htc-files');
-							}
-							if(type.indexOf('text/') !== 0){
-								webshims.warn('Error: content-type of htc-files is not text, this can not work in IE');
-							}
-						}
-					}
-				});
+			/*
+			 * Native extension feature
+			 */
+//			if(!htcTest && webshims.debug && extend && webshims.cfg.extendNative && htc){
+//				htcTest = true;
+//				$.ajax({
+//					url: webshims.loader.makePath( 'htc/'+ (typeof htc == 'string' ? htc : prop) +'.htc'),
+//					complete: function(xhr){
+//						if(xhr.getResponseHeader){
+//							var type = xhr.getResponseHeader('Content-Type') || '';
+//							if(type != 'text/x-component'){
+//								webshims.warn('content-type of htc-files should be "text/x-component", but was "'+ type +'"');
+//								webshims.info('you should also let the client cache htc-files. use a proper expire header for htc-files');
+//							}
+//							if(type.indexOf('text/') !== 0){
+//								webshims.warn('Error: content-type of htc-files is not text, this can not work in IE');
+//							}
+//						}
+//					}
+//				});
+//			}
+			/*
+			 * END: Native extension feature
+			 */
+			if(desc.init){
+				webshims.warn('Error: '+ nodeName +'['+ prop +'] uses desc.init');
 			}
-			if((desc.contentAttr && !htcHandled) || desc.init){
+			if((desc.content && !htcHandled) || desc.init){
 				initProp.init(nodeName, prop);
 			}
 			return desc;
@@ -1178,6 +1252,9 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 					modifyProps[name][prop].push(desc.set);
 				}
 				if(desc.init){
+					webshims.warn('Error: '+ nodeName +'['+ prop +'] uses desc.init');
+				}
+				if(desc.content || desc.init){
 					initProp.init(name, prop);
 				}
 			});
@@ -1286,7 +1363,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		},
 		id = 0
 	;
-	var geoOpts = $.webshims.modules.geolocation.options || {};
+	var geoOpts = $.webshims.cfg.geolocation.options || {};
 	navigator.geolocation = (function(){
 		var pos;
 		var api = {
@@ -1357,7 +1434,12 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				getInitCoords();
 				
 				if(!pos){
-					if(geoOpts.confirmText && !confirm(geoOpts.confirmText.replace('{location}', location.hostname))){return;}
+					if(geoOpts.confirmText && !confirm(geoOpts.confirmText.replace('{location}', location.hostname))){
+						if(error){
+							error({ code: 1, message: "PERMISSION_DENIED"});
+						}
+						return;
+					}
 					$.ajax({
 						url: 'http://freegeoip.net/json/',
 						dataType: 'jsonp',
@@ -1643,7 +1725,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				$(doc).bind('focusout.validityalert', boundHide);
 			},
 			getMessage: function(elem, message){
-				$('> span.va-box', alert).text(message || elem.attr('customValidationMessage') || elem.attr('validationMessage'));
+				$('> span.va-box', alert).text(message || elem.attr('x-moz-errormessage') || elem.attr('data-errormessage') || elem.attr('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
@@ -1727,6 +1809,8 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	"use strict";
 	var validityMessages = webshims.validityMessages;
 	var support = $.support;
+	var cfg = webshims.cfg.forms;
+	var implementProperties = (cfg.overrideMessages || cfg.customMessages) ? ['customValidationMessage'] : [];
 	
 	validityMessages['en'] = validityMessages['en'] || validityMessages['en-US'] || {
 		typeMismatch: {
@@ -1794,7 +1878,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 		return message || '';
 	};
 	
-	var implementProperties = (webshims.overrideValidationMessages || webshims.implement.customValidationMessage) ? ['customValidationMessage'] : [];
+	
 	if((!window.noHTMLExtFixes && !support.validationMessage) || !support.validity){
 		implementProperties.push('validationMessage');
 	}
@@ -2065,7 +2149,7 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 		var elem = this;
 		elem.setAttribute('aria-required', (value) ? 'true' : 'false');
 	},
-	contentAttr: true
+	content: true
 }, true, true, 'form-extend');
 
 ['input', 'select', 'textarea', 'fieldset', 'button', 'output'].forEach(function(nodeName){
@@ -2566,7 +2650,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 		}
 	};
 		
-	var options = $.webshims.modules.inputUI.options;
+	var options = $.webshims.cfg['forms-ext'];
 	var globalInvalidTimer;
 	var labelID = 0;
 	var emptyJ = $([]);
@@ -2649,7 +2733,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	};
 	
 	//date and datetime-local implement if we have to replace
-	if(!support.dateUI || options.replaceNative){
+	if(!support.dateUI || options.replaceUI){
 		var datetimeFactor = {
 			trigger: [0.65,0.35],
 			normal: [0.6,0.4]
@@ -2876,7 +2960,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 		};
 	}
 	
-	if (!support.rangeUI || options.replaceNative) {
+	if (!support.rangeUI || options.replaceUI) {
 		replaceInputUI.range = function(elem){
 			if(!$.fn.slider){return;}
 			var range = $('<span class="input-range"><span class="ui-slider-handle" role="slider" tabindex="0" /></span>'),
@@ -2970,7 +3054,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 		
 	var changeDefaults = function(langObj){
 		if(!langObj){return;}
-		var opts = $.extend({}, langObj, options.date);
+		var opts = $.extend({}, langObj, options.datepicker);
 		$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', opts).each(function(){
 			var orig = $.data(this, 'html5element');
 			if(orig){
@@ -3161,8 +3245,9 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 
 jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
 	if($.support.placeholder){return;}
+	var isOver = (webshims.cfg.forms.placeholderType == 'over');
 	var hidePlaceholder = function(elem, data, value){
-			if(elem.type != 'password'){
+			if(!isOver && elem.type != 'password'){
 				if(value === false){
 					value = $.attr(elem, 'value');
 				}
@@ -3175,7 +3260,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 				placeholderTxt = $.attr(elem, 'placeholder') || '';
 			}
 			
-			if(elem.type != 'password'){
+			if(!isOver && elem.type != 'password'){
 				elem.value = placeholderTxt;
 			}
 			data.box.addClass('placeholder-visible');
@@ -3186,7 +3271,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 				if(!data){return;}
 			}
 			if(type == 'focus' || (!type && elem === document.activeElement)){
-				if(elem.type == 'password' || $(elem).hasClass('placeholder-visible')){
+				if(elem.type == 'password' || isOver || $(elem).hasClass('placeholder-visible')){
 					hidePlaceholder(elem, data, '');
 				}
 				return;
@@ -3232,7 +3317,6 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 			
 			return {
 				create: function(elem){
-//					alert(elem.value)
 					var data = $.data(elem, 'placeHolder');
 					if(data){return data;}
 					data = $.data(elem, 'placeHolder', {
@@ -3250,7 +3334,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 						});
 					}
 					
-					if(elem.type == 'password'){
+					if(elem.type == 'password' || isOver){
 						data.box = $(elem)
 							.wrap('<span class="placeholder-box placeholder-box-'+ (elem.nodeName || '').toLowerCase() +'" />')
 							.parent()
@@ -3293,7 +3377,16 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 						}
 					} else {
 						var reset = function(e){
-							hidePlaceholder(elem, data, '');
+							if($(elem).hasClass('placeholder-visible')){
+								hidePlaceholder(elem, data, '');
+								if(e && e.type == 'submit'){
+									setTimeout(function(){
+										if(e.isDefaultPrevented()){
+											changePlaceholderVisibility(elem, false, false, data );
+										}
+									}, 9);
+								}
+							}
 						};
 						if($.nodeName(data.text[0], 'label')){
 							//if label is dynamically set after we ensure that our label isn't exposed anymore
@@ -3311,13 +3404,9 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 				},
 				update: function(elem, val){
 					if(!allowedPlaceholder[$.attr(elem, 'type')] && !$.nodeName(elem, 'textarea')){return;}
-					if($.nodeName(elem, 'input')){
-						val = val.replace(delReg, '');
-					}
+					
 					var data = pHolder.create(elem);
-					if(webshims.contentAttr(elem, 'placeholder') != val){
-						webshims.contentAttr(elem, 'placeholder', val);
-					}
+					
 					data.text.text(val);
 					
 					changePlaceholderVisibility(elem, false, val, data);
@@ -3329,17 +3418,19 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 	$.webshims.publicMethods = {
 		pHolder: pHolder
 	};
-	
-	webshims.defineNodeNamesProperty(['input', 'textarea'], 'placeholder', {
-		set: function(val){
-			var elem = this;
-			pHolder.update(elem, val);
-		},
-		get: function(elem){
-			return webshims.contentAttr(this, 'placeholder') || '';
-		},
-		contentAttr: true
-	}, true, true, 'form-placeholder');
+	['input', 'textarea'].forEach(function(nodeName){
+		var desc = webshims.defineNodeNameProperty(nodeName, 'placeholder', {
+			set: function(val){
+				var elem = this;
+				webshims.contentAttr(elem, 'placeholder', val);
+				pHolder.update(elem, val);
+			},
+			get: function(){
+				return webshims.contentAttr(this, 'placeholder') || '';
+			},
+			content: true
+		}, true, true, 'form-placeholder');
+	});
 			
 	$.each(['input', 'textarea'], function(i, name){
 		var desc = webshims.defineNodeNameProperty(name, 'value', {
@@ -3374,7 +3465,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 						if(placeholder && 'value' in this){
 							changePlaceholderVisibility(this, val, placeholder);
 						}
-						if(this.type == 'password'){
+						if(this.type == 'password' || isOver){
 							oldVal.call($(this), '');
 						}
 					}
@@ -3877,7 +3968,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, docu
 					webshims.objectCreate(dataListProto, undefined, {input: elem, id: value, datalist: dom});
 				}
 			},
-			contentAttr: true
+			content: true
 		}, true, 'input-datalist', 'form-output-datalist');
 		
 		webshims.defineNodeNameProperty('input', 'selectedOption', {
@@ -4143,7 +4234,7 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 	var swfTimer;
 	var emptyString = '(empty string)+1287520303738';
 	
-	$.webshims.localStorageSwfCallback = function(type){
+	var localStorageSwfCallback = function(type){
 		clearTimeout(swfTimer);
 		if(window.localStorage){
 			$.webshims.isReady('json-storage', true);
@@ -4186,16 +4277,24 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 		}
 		$.webshims.isReady('json-storage', true);
 	};
-	
-	jQuery.webshims.swfLocalStorage = {
+	var storageCFG = $.webshims.cfg['json-storage'];
+	$.webshims.swfLocalStorage = {
 		show: function(){
-			$('#swflocalstorageshim').css({
-				top: $(window).scrollTop() + 10,
-				left: ($(window).width() / 2) - ($('#swflocalstorageshim').outerWidth() / 2)
+			if(storageCFG.exceededMessage){
+				$('#swflocalstorageshim-wrapper').prepend('<div class="polyfill-exceeded-message">'+ storageCFG.exceededMessage +'</div>');
+			}
+			$('#swflocalstorageshim-wrapper').css({
+				top: $(window).scrollTop() + 20,
+				left: ($(window).width() / 2) - ($('#swflocalstorageshim-wrapper').outerWidth() / 2)
 			});
+			
 		},
 		hide: function(success){
-			$('#swflocalstorageshim').css({top: '', left: ''});
+			$('#swflocalstorageshim-wrapper')
+				.css({top: '', left: ''})
+				.find('div.polyfill-exceeded-message')
+				.remove()
+			;
 			if(!success){
 				var err = new Error('DOMException: QUOTA_EXCEEDED_ERR');
 				err.code = 22;
@@ -4205,19 +4304,22 @@ if (!window.sessionStorage) {window.sessionStorage = new Storage('session');}
 		}
 	};
 	
-	$.webshims.ready('ready swfobject', function(){
+	$.ajax({url: $.webshims.loader.basePath +'localStorage.swf', cache: true, dataType: 'text'});
+	$.webshims.ready('DOM swfobject', function(){
 		if(window.swfobject && swfobject.hasFlashPlayerVersion('8.0.0')){
 			
-			swfobject.createCSS('#swflocalstorageshim', 'position: absolute; top: -140px; left: -300px; overflow: hidden; width: 215px; z-index: 99999999999;');
-			$('body')[$.browser.mozilla ? 'after' : 'append']('<div id="swflocalstorageshim" />');
-			swfobject.embedSWF($.webshims.loader.basePath +'localStorage.swf', 'swflocalstorageshim', '215', '138', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'localstorageshim'}, function(e){
+			$('body')[$.browser.mozilla ? 'after' : 'append']('<div id="swflocalstorageshim-wrapper"><div id="swflocalstorageshim" /></div>');
+			swfobject.embedSWF($.webshims.loader.basePath +'localStorage.swf', 'swflocalstorageshim', '215', '138', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'swflocalstorageshim'}, function(e){
 				if(!e.success && !window.localStorage){
-					$.webshims.localStorageSwfCallback();
+					localStorageSwfCallback();
 				}
 			});
-			swfTimer = setTimeout($.webshims.localStorageSwfCallback, (location.protocol.indexOf('file') === 0) ? 500 : 9999);
+			swfTimer = setTimeout(function(){
+				$.webshims.warn('Add your development-directory to the local-trusted security sandbox: http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html');
+				localStorageSwfCallback();
+			}, (location.protocol.indexOf('file') === 0) ? 500 : 9999);
 		} else {
-			$.webshims.localStorageSwfCallback();
+			localStorageSwfCallback();
 		}
 	}, true);
 })();

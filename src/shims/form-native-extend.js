@@ -27,7 +27,7 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 		return ret;
 	});
 	
-	var overrideNativeMessages = webshims.overrideValidationMessages;	
+	var overrideNativeMessages = webshims.cfg.forms.overrideMessages;	
 	var overrideValidity = (!support.requiredSelect || !support.numericDateProps || overrideNativeMessages);
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	var oldAttr = $.attr;

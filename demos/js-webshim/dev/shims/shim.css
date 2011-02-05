@@ -478,3 +478,25 @@ datalist {
 	border-bottom: 9px solid #fff;
 	border-top: none;
 }
+
+/* localStorage */
+#swflocalstorageshim-wrapper {
+	position: absolute; 
+	top: -999px; 
+	left: -9999px; 
+	overflow: hidden; 
+	width: 215px; 
+	min-width: 215px !important;
+	z-index: 99999999999;
+}
+#swflocalstorageshim-wrapper .polyfill-exceeded-message {
+	margin: 0 0 5px;
+	padding: 5px;
+	background: #ffd;
+	color: #000;
+	font-size: 13px;
+}
+#swflocalstorageshim-wrapper object {
+	min-height: 138px !important;
+	min-width: 215px !important;
+}

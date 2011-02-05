@@ -6,7 +6,7 @@
 	
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
-	
+	<script src="../src/extras/modernizr-1.6.min.js"></script>
 	<!-- 
 		main web shim extension fiels
 		Note: you can combine/concat/rename them with your other files, but you have to include them in the head without a defer/async attribute!
@@ -20,16 +20,16 @@
 				window.noHTMLExtFixes = true; 
 			}
 			if(hash.indexOf('overrideValidationMessages') !== -1){
-				$.webshims.overrideValidationMessages = true; 
+				$.webshims.cfg.forms.overrideMessages = true; 
 			}
 			if(hash.indexOf('customValidationMessage') !== -1){
-				$.webshims.implement.customValidationMessage = true; 
+				$.webshims.cfg.forms.customMessages = true; 
 			}
 			
 			$(function(){
 				$('#bugfixes').attr('checked', !!window.noHTMLExtFixes);
-				$('#overrideValidationMessages').attr('checked', !!$.webshims.overrideValidationMessages);
-				$('#customValidationMessage').attr('checked', !!$.webshims.implement.customValidationMessage);
+				$('#customValidationMessage').attr('checked', !!$.webshims.cfg.forms.customMessages);
+				$('#overrideValidationMessages').attr('checked', !!$.webshims.cfg.forms.overrideMessages);
 				$('input.webshim-config')
 					.bind('click', function(){
 						var addHash = '';
@@ -80,7 +80,7 @@
 			$('#test-1').attr('value', '');
 			equals(typeof $('#test-1').attr('validationMessage'), 'string', 'validationMessage is a string');
 			equals(!!$('#test-1').attr('validationMessage'), true, 'validationMessage has a value');
-			if($.webshims.implement.customValidationMessage){
+			if($.webshims.cfg.forms.customMessages){
 				equals(typeof $('#test-1').attr('customValidationMessage'), 'string', 'customValidationMessage is a string, if implemented');
 				equals(!!$('#test-1').attr('customValidationMessage'), true, 'customValidationMessage has a value, if implemented');
 			} else {

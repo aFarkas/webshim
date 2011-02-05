@@ -7,7 +7,7 @@
 		},
 		id = 0
 	;
-	var geoOpts = $.webshims.modules.geolocation.options || {};
+	var geoOpts = $.webshims.cfg.geolocation.options || {};
 	navigator.geolocation = (function(){
 		var pos;
 		var api = {
@@ -78,7 +78,12 @@
 				getInitCoords();
 				
 				if(!pos){
-					if(geoOpts.confirmText && !confirm(geoOpts.confirmText.replace('{location}', location.hostname))){return;}
+					if(geoOpts.confirmText && !confirm(geoOpts.confirmText.replace('{location}', location.hostname))){
+						if(error){
+							error({ code: 1, message: "PERMISSION_DENIED"});
+						}
+						return;
+					}
 					$.ajax({
 						url: 'http://freegeoip.net/json/',
 						dataType: 'jsonp',

@@ -27,7 +27,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 		}
 	};
 		
-	var options = $.webshims.modules.inputUI.options;
+	var options = $.webshims.cfg['forms-ext'];
 	var globalInvalidTimer;
 	var labelID = 0;
 	var emptyJ = $([]);
@@ -110,7 +110,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	};
 	
 	//date and datetime-local implement if we have to replace
-	if(!support.dateUI || options.replaceNative){
+	if(!support.dateUI || options.replaceUI){
 		var datetimeFactor = {
 			trigger: [0.65,0.35],
 			normal: [0.6,0.4]
@@ -337,7 +337,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 		};
 	}
 	
-	if (!support.rangeUI || options.replaceNative) {
+	if (!support.rangeUI || options.replaceUI) {
 		replaceInputUI.range = function(elem){
 			if(!$.fn.slider){return;}
 			var range = $('<span class="input-range"><span class="ui-slider-handle" role="slider" tabindex="0" /></span>'),
@@ -431,7 +431,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 		
 	var changeDefaults = function(langObj){
 		if(!langObj){return;}
-		var opts = $.extend({}, langObj, options.date);
+		var opts = $.extend({}, langObj, options.datepicker);
 		$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', opts).each(function(){
 			var orig = $.data(this, 'html5element');
 			if(orig){

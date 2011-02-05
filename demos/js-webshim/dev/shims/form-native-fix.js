@@ -113,7 +113,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 				set: function(value){
 					this.setAttribute('aria-required', (value) ? 'true' : 'false');
 				},
-				contentAttr: true
+				content: true
 			}, true);
 			
 			webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){

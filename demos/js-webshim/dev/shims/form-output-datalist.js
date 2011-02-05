@@ -478,7 +478,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, docu
 					webshims.objectCreate(dataListProto, undefined, {input: elem, id: value, datalist: dom});
 				}
 			},
-			contentAttr: true
+			content: true
 		}, true, 'input-datalist', 'form-output-datalist');
 		
 		webshims.defineNodeNameProperty('input', 'selectedOption', {

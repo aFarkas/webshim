@@ -39,6 +39,17 @@
 			background: #f00;
 			border: 2px solid #f00;
 		}
+		.box {
+			width: 200px;
+			height: 200px;
+			border: 1px solid #f00;
+		}
+		.test:hover .box {
+			background: red;
+		}
+		.test .box:hover {
+			background: blue;
+		}
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
@@ -60,9 +71,11 @@
 	    <script>
 	    	
 			$.webshims.debug = true;
-			$.webshims.cfg.extendNative = true;
+			$.webshims.setOptions('forms', {
+				placeholderType: 'over'
+			});
+//			$.webshims.cfg.extendNative = true;
 			window.FlashCanvas = {disableContextMenu: true};
-			$.webshims.canvasImplementation = 'flashpro';
 			$.webshims.polyfill();
 			var start = new Date().getTime();
 			
@@ -86,10 +99,30 @@
 //			$.webshims.ready('forms-ext', function(){
 //				console.log('forms-ext', start - new Date().getTime())
 //			})
+
+//			$.webshims.defineNodeNameProperty('input', {
+//				set: function(){
+//					
+//				},
+//				get: function(){
+//					
+//				},
+//				prop: true,
+//				content: true
+//			}, true, true);
 	    </script>
 </head>
 
-<body class="js-off"> 
+<body class="js-off">
+	<div class="test">
+		<button>toggle</button>
+		<div class="box"></div>
+	</div> 
+	<script>
+		$('div.box').bind('propertychange', function(e){
+			console.log(e)
+		});
+	</script>
 <canvas id="my-canvas"></canvas>
 
 <script class="block run-once">
@@ -101,9 +134,15 @@ $.webshims.ready('canvas', function(){
 	ctx.fillStyle = "rgba(0, 0, 200, 0.5)";  
 	ctx.fillRect (30, 30, 55, 50);
 });
+$(function(){
+	
+	navigator.geolocation.getCurrentPosition(function(){console.log('f', arguments);}, function(){
+		console.log(this, arguments)
+	})
+})
 </script>
 <form id="test" action="#">
-	<input oninput="console.log(value = 10, a, b, this)" />
+	<input placeholder="fdsf fdsf" />
 <div>
 	<select name="a" id="a" required>
 		<option value="">a</option>

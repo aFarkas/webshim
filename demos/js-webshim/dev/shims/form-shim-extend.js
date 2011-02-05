@@ -232,7 +232,7 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 		var elem = this;
 		elem.setAttribute('aria-required', (value) ? 'true' : 'false');
 	},
-	contentAttr: true
+	content: true
 }, true, true, 'form-extend');
 
 ['input', 'select', 'textarea', 'fieldset', 'button', 'output'].forEach(function(nodeName){
