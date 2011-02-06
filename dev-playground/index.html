@@ -70,9 +70,12 @@
 	<title>playing</title>
 	    <script>
 	    	
-//			$.webshims.debug = true;
+			$.webshims.debug = true;
 			$.webshims.setOptions('forms', {
 				placeholderType: 'over'
+			});
+			$.webshims.setOptions('canvas', {
+				type: 'flash'
 			});
 //			$.webshims.cfg.extendNative = true;
 			window.FlashCanvas = {disableContextMenu: true};
@@ -119,9 +122,7 @@
 		<div class="box"></div>
 	</div> 
 	<script>
-		$('div.box').bind('propertychange', function(e){
-			console.log(e)
-		});
+		
 	</script>
 <canvas id="my-canvas"></canvas>
 

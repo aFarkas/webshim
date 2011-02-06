@@ -7,7 +7,6 @@
 		}
 	});
 	
-	
 	document.createElement('datalist');
 	
 	var special = $.event.special;
@@ -106,9 +105,9 @@
 	})();
 	
 	
-
+	$.webshims = $.sub();
 	
-	$.webshims = {
+	$.extend($.webshims, {
 		
 		version: 'pre1.5.0',
 		cfg: {
@@ -338,22 +337,7 @@
 			}
 			$.each(names, function(i, name){
 				var handler = function( e ) { 
-					e = $.event.fix( e );
-					
-					//this can be removed with jQuery 1.5
-					if(_maybePrevented){
-						var preventDefault = e.preventDefault;
-						e.preventDefault =  function(){
-							preventDefault.apply(this, arguments);
-							clearTimeout($.data(e.target, 'maybePrevented'+e.type));
-							$.data(e.target, 'maybePrevented'+e.type, setTimeout(function(){
-								$.removeData(e.target, 'maybePrevented'+e.type);
-							}, 90));
-							
-						};
-					}
-					//END: this can be removed with jQuery 1.5
-					return $.event.handle.call( this, e );
+					return $.event.handle.call( this, $.event.fix( e ) );
 				};
 				special[name] = special[name] || {};
 				if(special[name].setup || special[name].teardown){return;}
@@ -565,7 +549,7 @@
 				};
 			})()
 		}
-	};
+	});
 	
 	/*
 	 * shortcuts
@@ -627,7 +611,7 @@
 		});
 		
 		$.fn.htmlWebshim = function(a){
-			var ret = this.html((a) ? webshims.fixHTML5(a) : a);
+			var ret = $.fn.html.call(this, (a) ? webshims.fixHTML5(a) : a);
 			if(ret === this && $.isReady){
 				this.each(function(){
 					if(this.nodeType == 1){
@@ -637,11 +621,12 @@
 			}
 			return ret;
 		};
+		webshims.fn.html = $.fn.htmlWebshim;
 		
-		$.each(['after', 'before', 'append', 'prepend'], function(i, name){
+		$.each(['after', 'before', 'append', 'prepend', 'replaceWith'], function(i, name){
 			$.fn[name+'Webshim'] = function(a){
 				var elems = $(webshims.fixHTML5(a));
-				this[name](elems);
+				$.fn[name].call(this, elems);
 				if($.isReady){
 					elems.each(function(){
 						if (this.nodeType == 1) {
@@ -650,6 +635,35 @@
 					});
 				}
 				return this;
+			};
+			webshims.fn[name] = $.fn[name+'Webshim'];
+		});
+		
+		$.each({
+			appendTo: "append",
+			prependTo: "prepend",
+			insertBefore: "before",
+			insertAfter: "after",
+			replaceAll: "replaceWith"
+		}, function( name, original ) {
+			webshims.fn[ name ] = function( selector ) {
+				var ret = [],
+					insert = webshims( selector ),
+					parent = this.length === 1 && this[0].parentNode;
+				
+				if ( parent && parent.nodeType === 11 && parent.childNodes.length === 1 && insert.length === 1 ) {
+					insert[ original ]( this[0] );
+					return this;
+					
+				} else {
+					for ( var i = 0, l = insert.length; i < l; i++ ) {
+						var elems = (i > 0 ? this.clone(true) : this).get();
+						webshims( insert[i] )[ original ]( elems );
+						ret = ret.concat( elems );
+					}
+				
+					return this.pushStack( ret, name, insert.selector );
+				}
 			};
 		});
 		
@@ -739,7 +753,7 @@
 	});
 	
 	loader.addModule('jquery-ui', {
-		src: httpProtocol+'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js',
+		src: httpProtocol+'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js',
 		test: function(){return !!($.widget && $.Widget);}
 	});
 	
@@ -816,7 +830,7 @@
 	
 	/* canvas */
 	(function(){
-		var flashCanvas = window.FlashCanvas;
+		var flashCanvas;
 		addPolyfill('canvas', {
 			src: 'excanvas',
 			test: function(){
@@ -828,8 +842,8 @@
 				var type = this.options.type;
 				var src;
 				if(type && type.indexOf('flash') !== -1){
-					window.FlashCanvas = window.FlashCanvas || {};
-					flashCanvas = window.FlashCanvas;
+					window.FlashCanvasOptions = window.FlashCanvasOptions || {};
+					flashCanvas = window.FlashCanvasOptions;
 					if(type == 'flash'){
 						$.extend(flashCanvas, {swfPath: loader.basePath + 'FlashCanvas/'});
 						this.src = 'FlashCanvas/flashcanvas';
@@ -968,11 +982,10 @@
 	});
 	
 	
-			
 	addPolyfill('inputUI', {
 		feature: 'forms-ext',
 		src: 'form-date-range-ui',
-		test: function(){return (modernizrInputTypes.slider && modernizrInputTypes.date && !this.options.replaceUI);},
+		test: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && !this.options.replaceUI);},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ie9', 'combined-ff3', 'combined-ff4'],
 		noAutoCallback: true,
 		dependencies: ['es5', 'forms','dom-support'],
@@ -985,8 +998,8 @@
 		options: {
 			slider: {},
 			datepicker: {},
-			langSrc: httpProtocol+'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/i18n/jquery.ui.datepicker-',
-			availabeLangs: 'af ar az bg bs cs da de el en-GB eo es et eu fa fi fo fr fr-CH he hr hu hy id is it ja ko it lt lv ms nl no pl pt-BR ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' '),
+			langSrc: httpProtocol+'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/i18n/jquery.ui.datepicker-',
+			availabeLangs: 'af ar ar-DZ az bg bs ca cs da de el en-AU en-GB en-NZ eo es et eu fa fi fo fr fr-CH gl he hr hu hy id is it ja ko kz lt lv ml ms nl no pl pt-BR rm ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' '),
 			recalcWidth: true,
 			replaceUI: false
 		}

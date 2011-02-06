@@ -3,8 +3,9 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 	
 	if(!Modernizr.formvalidation || window.noHTMLExtFixes || Modernizr.bugfreeformvalidation){return;}
 	
-	
+	var badWebkit = ($.browser.webkit && parseFloat($.browser.version, 10) < 534.16);
 	var invalids = [],
+		firstInvalidEvent,
 		form
 	;
 	
@@ -41,6 +42,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		.bind('firstinvalid', function(e){
 			form = e.target.form;
 			if(!form){return;}
+			firstInvalidEvent = e;
 			var submitEvents = $(form)
 				.unbind('submit.preventInvalidSubmit')
 				.bind('submit.preventInvalidSubmit', function(submitEvent){
@@ -65,7 +67,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		})
 		.bind('lastinvalid', function(e, data){
 			var firstTarget = data.invalidlist[0];
-			if( firstTarget && $.browser.webkit && document.activeElement && firstTarget !== document.activeElement && !$.data(firstTarget, 'maybePreventedinvalid') ){
+			if( firstTarget && badWebkit && document.activeElement && firstTarget !== document.activeElement && !firstInvalidEvent.isDefaultPrevented() ){
 				webshims.validityAlert.showFor(firstTarget);
 			}
 			invalids = [];
@@ -77,7 +79,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		
 	(function(){
 		//safari 5.0.2/5.0.3 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
-		if(!$.browser.webkit || parseFloat($.browser.version, 10) > 534.16){return;}
+		if(!badWebkit){return;}
 		var checkValidity = function(elem){
 			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
 			if(!valid && elem.checkValidity && elem.checkValidity()){

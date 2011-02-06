@@ -1876,7 +1876,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 				var events = [];
 				var timer;
 				var throwError = function(e){
-					if(!$.data(e.target, 'maybePreventedinvalid') && (!events[0] || !events[0].isDefaultPrevented()) && (!events[1] || !events[1].isDefaultPrevented()) ){
+					if((!events[0] || !events[0].isDefaultPrevented()) && (!events[1] || !events[1].isDefaultPrevented()) ){
 						var elem = e.target;
 						var name = elem.nodeName;
 						if(elem.id){
@@ -1904,7 +1904,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 			orig.bind('firstinvalid', function(e){
 				clearTimeout(globalInvalidTimer);
 				globalInvalidTimer = setTimeout(function(){
-					if(!$.data(e.target, 'maybePreventedinvalid') && !e.isDefaultPrevented()){
+					if(!e.isDefaultPrevented()){
 						webshims.validityAlert.showFor( e.target ); 
 					}
 				}, 30);
@@ -1939,7 +1939,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	};
 	
 	//date and datetime-local implement if we have to replace
-	if(!Modernizr.inputtypes.dateUI || options.replaceUI){
+	if(!modernizrInputTypes.datetime || options.replaceUI){
 		var datetimeFactor = {
 			trigger: [0.65,0.35],
 			normal: [0.6,0.4]
@@ -2165,8 +2165,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 			}
 		};
 	}
-	
-	if (!modernizrInputTypes.date || !modernizrInputTypes.range || options.replaceUI) {
+	if (!modernizrInputTypes.range || options.replaceUI) {
 		replaceInputUI.range = function(elem){
 			if(!$.fn.slider){return;}
 			var range = $('<span class="input-range"><span class="ui-slider-handle" role="slider" tabindex="0" /></span>'),
