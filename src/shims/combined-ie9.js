@@ -1,11 +1,119 @@
 //DOM-Extension helper
 jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
+	"use strict";
+	/*
+	 * jQuery-plugins for triggering dom updates can be also very usefull in conjunction with non-HTML5 DOM-Changes (AJAX)
+	 * Example:
+	 * $.webshims.addReady(function(context, insertedElement){
+	 * 		$('div.tabs', context).add(insertedElement.filter('div.tabs')).tabs();
+	 * });
+	 * 
+	 * $.ajax({
+	 * 		success: function(html){
+	 * 			$('#main').htmlWebshim(html);
+	 * 		}
+	 * });
+	 */
+	
+	(function(){
+		var readyFns = [];
+		var emptyJ = $([]);
+		$.extend(webshims, {
+			getID: (function(){
+				var ID = new Date().getTime();
+				return function(elem){
+					elem = $(elem);
+					var id = elem.attr('id');
+					if(!id){
+						ID++;
+						id = 'elem-id-'+ ID;
+						elem.attr('id', id);
+					}
+					return id;
+				};
+			})(),
+			addReady: function(fn){
+				var readyFn = function(context, elem){
+					webshims.ready('DOM', function(){fn(context, elem);});
+				};
+				readyFns.push(readyFn);
+				readyFn(document, emptyJ);
+			},
+			triggerDomUpdate: function(context){
+				if(!context || !context.nodeType){return;}
+				var type = context.nodeType;
+				if(type != 1 && type != 9){return;}
+				var elem = (context !== document) ? $(context) : emptyJ;
+				readyFns.forEach(function(fn){
+					fn(context, elem);
+				});
+			}
+		});
+		
+		$.fn.htmlWebshim = function(a){
+			var ret = $.fn.html.call(this, (a) ? webshims.fixHTML5(a) : a);
+			if(ret === this && $.isDOMReady){
+				this.each(function(){
+					if(this.nodeType == 1){
+						webshims.triggerDomUpdate(this);
+					}
+				});
+			}
+			return ret;
+		};
+		webshims.fn.html = $.fn.htmlWebshim;
+		
+		['after', 'before', 'append', 'prepend', 'replaceWith'].forEach(function(name){
+			$.fn[name+'Webshim'] = function(a){
+				var elems = $(webshims.fixHTML5(a));
+				$.fn[name].call(this, elems);
+				if($.isDOMReady){
+					elems.each(function(){
+						if (this.nodeType == 1) {
+							webshims.triggerDomUpdate(this);
+						}
+					});
+				}
+				return this;
+			};
+			webshims.fn[name] = $.fn[name+'Webshim'];
+		});
+		
+		$.each({
+			appendTo: "append",
+			prependTo: "prepend",
+			insertBefore: "before",
+			insertAfter: "after",
+			replaceAll: "replaceWith"
+		}, function( name, original ) {
+			webshims.fn[ name ] = function( selector ) {
+				var ret = [],
+					insert = webshims( selector ),
+					parent = this.length === 1 && this[0].parentNode;
+				
+				if ( parent && parent.nodeType === 11 && parent.childNodes.length === 1 && insert.length === 1 ) {
+					insert[ original ]( this[0] );
+					return this;
+					
+				} else {
+					for ( var i = 0, l = insert.length; i < l; i++ ) {
+						var elems = (i > 0 ? this.clone(true) : this).get();
+						webshims( insert[i] )[ original ]( elems );
+						ret = ret.concat( elems );
+					}
+				
+					return this.pushStack( ret, name, insert.selector );
+				}
+			};
+		});
+		
+	})();
+	
 	//shortcus
-	var support = $.support;
 	var modules = webshims.modules;
-	var has = Object.prototype.hasOwnProperty;
-	var unknown = $.webshims.getPrototypeOf(document.createElement('foobar'));
-	var htcTest;
+//	var has = Object.prototype.hasOwnProperty;
+//	var unknown = $.webshims.getPrototypeOf(document.createElement('foobar'));
+//	var htcTest;
 	
 	
 	//proxying attribute
@@ -559,7 +667,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		})()
 	});
 	
-		
 	webshims.isReady('webshimLocalization', true);
 	webshims.isReady('dom-extend', true);
 });(function($){

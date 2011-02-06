@@ -1,12 +1,6 @@
 (function($, window, document, undefined){
 	"use strict";
 	
-	$.each(['jQuery', 'Modernizr'], function(i, dependcy){
-		if(!window[dependcy]){
-			throw("you have to include "+ dependcy +" before webshims lib");
-		}
-	});
-	
 	document.createElement('datalist');
 	
 	var special = $.event.special;
@@ -82,7 +76,7 @@
 			});
 		}
 		
-		Modernizr.ES5 = (Modernizr.ES5base && Modernizr.ES5extras);
+		
 		
 		Modernizr.advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
 		//safari has defineProperty-interface, but it can't be used on dom-object
@@ -99,7 +93,7 @@
 				foo = null;
 			})();
 		}
-		
+		Modernizr.ES5 = (Modernizr.ES5base && Modernizr.ES5extras && Modernizr.advancedObjectProperties);
 		Modernizr.objectAccessor = !!( Modernizr.advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__));
 		Modernizr.domAccessor = !!( Modernizr.objectAccessor ||  (Object.defineProperty && Object.getOwnPropertyDescriptor));
 	})();
@@ -142,7 +136,7 @@
 			webshims.features[feature].push(name);
 			cfg.options = $.extend(webshims.cfg[feature], cfg.options);
 			
-			loader.addModule(name, cfg);
+			addModule(name, cfg);
 			$.each(cfg.combination || [], function(i, combi){
 				if(!combinations[combi]){
 					combinations[combi] = [name];
@@ -315,19 +309,7 @@
 				return (ret !== undefined) ? ret : this;
 			};
 		},
-		getID: (function(){
-			var ID = new Date().getTime();
-			return function(elem){
-				elem = $(elem);
-				var id = elem.attr('id');
-				if(!id){
-					ID++;
-					id = 'elem-id-'+ ID;
-					elem.attr('id', id);
-				}
-				return id;
-			};
-		})(),
+		
 		fixHTML5: function(h){return h;},
 		capturingEvents: function(names/*, _maybePrevented */){
 			if(!document.addEventListener){return;}
@@ -453,7 +435,7 @@
 			})(),
 			
 			makePath: function(src){
-				if(src.indexOf('://') != -1 || src.indexOf('/') === 0){
+				if(src.indexOf('//') != -1 || src.indexOf('/') === 0){
 					return src;
 				}
 				
@@ -560,7 +542,15 @@
 	var addPolyfill = webshims.addPolyfill;
 	var modules = webshims.modules;
 	var loader = webshims.loader;
+	var addModule = loader.addModule;
 	var combinations = loader.combinations;
+	var xhrPreloadOption = {
+		cache: true, 
+		dataType: 'text', 
+		error: function(){
+			webshims.warn('could not find: '+ this.url);
+		}
+	};
 	
 	$.each(['log', 'error', 'warn', 'info'], function(i, fn){
 		webshims[fn] = function(message){
@@ -574,97 +564,10 @@
 	 
 	
 	
-	/*
-	 * jQuery-plugins for triggering dom updates can be also very usefull in conjunction with non-HTML5 DOM-Changes (AJAX)
-	 * Example:
-	 * $.webshims.addReady(function(context, insertedElement){
-	 * 		$('div.tabs', context).add(insertedElement.filter('div.tabs')).tabs();
-	 * });
-	 * 
-	 * $.ajax({
-	 * 		success: function(html){
-	 * 			$('#main').htmlWebshim(html);
-	 * 		}
-	 * });
-	 */
-	
+	//Overwrite DOM-Ready and implement a new ready-method
 	(function(){
-		var readyFns = [];
-		var emptyJ = $([]);
-		$.extend(webshims, {
-			addReady: function(fn){
-				var readyFn = function(context, elem){
-					onReady('DOM', function(){fn(context, elem);});
-				};
-				readyFns.push(readyFn);
-				readyFn(document, emptyJ);
-			},
-			triggerDomUpdate: function(context){
-				if(!context || !context.nodeType){return;}
-				var type = context.nodeType;
-				if(type != 1 && type != 9){return;}
-				var elem = (context !== document) ? $(context) : emptyJ;
-				$.each(readyFns, function(i, fn){
-					fn(context, elem);
-				});
-			}
-		});
-		
-		$.fn.htmlWebshim = function(a){
-			var ret = $.fn.html.call(this, (a) ? webshims.fixHTML5(a) : a);
-			if(ret === this && $.isReady){
-				this.each(function(){
-					if(this.nodeType == 1){
-						webshims.triggerDomUpdate(this);
-					}
-				});
-			}
-			return ret;
-		};
-		webshims.fn.html = $.fn.htmlWebshim;
-		
 		$.each(['after', 'before', 'append', 'prepend', 'replaceWith'], function(i, name){
-			$.fn[name+'Webshim'] = function(a){
-				var elems = $(webshims.fixHTML5(a));
-				$.fn[name].call(this, elems);
-				if($.isReady){
-					elems.each(function(){
-						if (this.nodeType == 1) {
-							webshims.triggerDomUpdate(this);
-						}
-					});
-				}
-				return this;
-			};
-			webshims.fn[name] = $.fn[name+'Webshim'];
-		});
-		
-		$.each({
-			appendTo: "append",
-			prependTo: "prepend",
-			insertBefore: "before",
-			insertAfter: "after",
-			replaceAll: "replaceWith"
-		}, function( name, original ) {
-			webshims.fn[ name ] = function( selector ) {
-				var ret = [],
-					insert = webshims( selector ),
-					parent = this.length === 1 && this[0].parentNode;
-				
-				if ( parent && parent.nodeType === 11 && parent.childNodes.length === 1 && insert.length === 1 ) {
-					insert[ original ]( this[0] );
-					return this;
-					
-				} else {
-					for ( var i = 0, l = insert.length; i < l; i++ ) {
-						var elems = (i > 0 ? this.clone(true) : this).get();
-						webshims( insert[i] )[ original ]( elems );
-						ret = ret.concat( elems );
-					}
-				
-					return this.pushStack( ret, name, insert.selector );
-				}
-			};
+			$.fn[name+'Webshim'] = $.fn[name];
 		});
 		
 		$.isDOMReady = $.isReady;
@@ -744,20 +647,19 @@
 	
 	/* general modules */
 	/* change path $.webshims.modules[moduleName].src */
-	var httpProtocol = (location.protocol == 'https:') ? 'https:' : 'http:';
-	loader.addModule('html5a11y', {
+	addModule('html5a11y', {
 		src: 'html5a11y',
 		test: function(){
 			return !(($.browser.msie && browserVersion < 9 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 535) || !window.HTMLArticleElement);
 		}
 	});
 	
-	loader.addModule('jquery-ui', {
-		src: httpProtocol+'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js',
+	addModule('jquery-ui', {
+		src: '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js',
 		test: function(){return !!($.widget && $.Widget);}
 	});
 	
-	loader.addModule('input-widgets', {
+	addModule('input-widgets', {
 		src: '',
 		test: function(){
 			//ToDo: add spinner
@@ -772,8 +674,8 @@
 		}
 	});
 	
-	loader.addModule('swfobject', {
-		src: httpProtocol+'//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js',
+	addModule('swfobject', {
+		src: '//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js',
 		test: function(){return ('swfobject' in window);}
 	});
 	
@@ -786,7 +688,7 @@
 	addPolyfill('es5-1', {
 		feature: 'es5',
 		test: function(){
-			return (Modernizr.ES5);
+			return Modernizr.ES5;
 		},
 		combination: ['combined-ie7', 'combined-ie8', 'combined-ff3', 'combined-ie7-light', 'combined-ie8-light', 'combined-ff3-light', 'combined-webkit']
 	});
@@ -855,7 +757,9 @@
 						src = flashCanvas.swfPath + 'flash10canvas.swf';
 					}
 					//preload swf
-					if(src){$.ajax({url: src, cache: true, dataType: 'text'});}
+					if(src){
+						$.ajax(src, xhrPreloadOption);
+					}
 				}
 			},
 			afterLoad: function(){
@@ -998,7 +902,7 @@
 		options: {
 			slider: {},
 			datepicker: {},
-			langSrc: httpProtocol+'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/i18n/jquery.ui.datepicker-',
+			langSrc: '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/i18n/jquery.ui.datepicker-',
 			availabeLangs: 'af ar ar-DZ az bg bs ca cs da de el en-AU en-GB en-NZ eo es et eu fa fi fo fr fr-CH gl he hr hu hy id is it ja ko kz lt lv ml ms nl no pl pt-BR rm ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' '),
 			recalcWidth: true,
 			replaceUI: false
@@ -1046,7 +950,7 @@
 		loadInit: function(){
 			loader.loadList(['swfobject']);
 			//preload flash
-			$.ajax({url: loader.basePath +'localStorage.swf', cache: true, dataType: 'text'});
+			$.ajax(loader.basePath +'localStorage.swf', xhrPreloadOption);
 		},
 		noAutoCallback: true,
 		combination: ['combined-ie7', 'combined-ie7-light']
@@ -1054,7 +958,7 @@
 	
 	/* END: json + loacalStorage */
 	//predefined list without input type number/date/time etc.
-	webshims.xlight = ['es5', 'geolocation', 'forms', 'json-storage'];
+//	webshims.xlight = ['es5', 'geolocation', 'forms', 'json-storage'];
 	webshims.light = ['es5', 'canvas', 'geolocation', 'forms', 'json-storage'];
 	
 })(jQuery, this, this.document);
