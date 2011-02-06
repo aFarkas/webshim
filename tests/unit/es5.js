@@ -54,7 +54,7 @@
 		});
 	});
 	
-	if($.support.objectAccessor){
+	if(Modernizr.objectAccessor){
 		asyncTest("advanced Object (support.objectAccessor)", function(){	
 			var desc;
 			var obj = $.webshims.objectCreate({
@@ -100,7 +100,7 @@
 		});
 	}
 	
-	if($.support.advancedObjectProperties){
+	if(Modernizr.advancedObjectProperties){
 		asyncTest("extreme advanced Object (support.advancedObjectProperties)", function(){	
 			var desc;
 			var keys = '';

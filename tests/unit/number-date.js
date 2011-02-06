@@ -26,7 +26,7 @@ var createTestMethodA = function(id){
 		
 		//abort test in some cases
 		//todo make all test work also with value sanitation
-		if( $.support.validity === true && obj.trueState[0] !== 'valid' && elem.val() != obj.attrs.value ){
+		if( Modernizr.formvalidation === true && obj.trueState[0] !== 'valid' && elem.val() != obj.attrs.value ){
 			return;
 		}
 		$.each(obj.trueState, function(i, trueState){
@@ -632,7 +632,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 	], function(i, data){
 		var elem = $('#'+data.id);
 		elem.attr('value', data.value);
-		if($.support.validity ===  true && data.value != elem.attr('value')){
+		if(Modernizr.formvalidation ===  true && data.value != elem.attr('value')){
 			return;
 		}
 		if(data.result === undefined){
@@ -653,7 +653,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		], function(i, data){
 			var elem = $('#'+data.id);
 			elem.attr('value', data.value);
-			if($.support.validity ===  true && data.value != elem.attr('value')){
+			if(Modernizr.formvalidation ===  true && data.value != elem.attr('value')){
 				return;
 			}
 			if(data.result === undefined){
@@ -683,7 +683,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			var elem = $('#' + data.id);
 			elem.attr('valueAsNumber', data.value);
 			
-			if ($.support.validity === true && data.value != elem.attr('valueAsNumber')) {
+			if (Modernizr.formvalidation === true && data.value != elem.attr('valueAsNumber')) {
 				return;
 			}
 			var val = elem.attr('value');
@@ -712,7 +712,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			var elem = $('#' + data.id);
 			elem.attr('valueAsNumber', data.value);
 			
-			if ($.support.validity === true && data.value != elem.attr('valueAsNumber')) {
+			if (Modernizr.formvalidation === true && data.value != elem.attr('valueAsNumber')) {
 				return;
 			}
 			var val = elem.attr('value');

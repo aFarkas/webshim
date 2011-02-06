@@ -544,6 +544,7 @@
 									});
 									
 								}
+								$(script).unbind('error.polyfillerror', onLoad);
 								script = null;
 								clearTimeout(timer);
 							}
@@ -555,7 +556,7 @@
 						onLoad({type: 'error'});
 					}, 20000);
 					script.onload = onLoad;
-					$(script).one('error', onLoad);
+					$(script).one('error.polyfillerror', onLoad);
 					script.onreadystatechange = onLoad;
 					parent.appendChild(script);
 					script.async = true;

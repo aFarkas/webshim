@@ -4,31 +4,31 @@
 module("placeholder");
 var placeholder = {
 	isApplied: function(elem, state){
-		if($.support.placeholder) {return;}
+		if(Modernizr.input.placeholder) {return;}
 		var parent = $(elem).parent();
 		equals(parent.is('span.placeholder-box'), state, 'placeholder-box is applied');
 		equals(!!(parent.find('.placeholder-text')[0]), state, 'placeholder-text is applied');
 		
 	},
 	isVisible: function(elem, state){
-		if($.support.placeholder) {return;}
+		if(Modernizr.input.placeholder) {return;}
 		var parent = $(elem).parent();
 		equals(parent.hasClass('placeholder-visible'), state, 'placeholder visible class');
 		equals(parent.find('.placeholder-text').is(':visible'), state, 'placeholder-text is applied');
 	},
 	hasText: function(elem, text){
-		if($.support.placeholder) {return;}
+		if(Modernizr.input.placeholder) {return;}
 		equals($(elem).parent().find('.placeholder-text').text(), text, 'placeholder has text: ');
 	}
 };
 
 var textPlaceholder = {
 	hasText: function(elem, text){
-		if($.support.placeholder) {return;}
+		if(Modernizr.input.placeholder) {return;}
 		equals(elem.value, text, 'placeholder has placeholder text: ');
 	},
 	hasValue: function(elem, value){
-		if($.support.placeholder) {return;}
+		if(Modernizr.input.placeholder) {return;}
 		equals($(elem).attr('value'), value, 'placeholder has text ($.fn.attr): ');
 		equals($(elem).val(), value, 'placeholder has text ($.fn.val): ');
 	}

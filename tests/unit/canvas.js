@@ -11,7 +11,7 @@ asyncTest("canvas + dynamic canvas", function(){
 	
 	$('#outside-test').html('<canvas></canvas>');
 	$('#outside-test canvas').data('canvasnotchanged', true);
-	if($.support.canvas === true){
+	if(Modernizr.canvas === true){
 		ok('strokeStyle' in $('#outside-test canvas')[0].getContext('2d'), 'canvas is applied');
 		ok('strokeStyle' in $('#outside-test canvas')[0].getContext('2d'), 'canvas is applied');
 	} else {

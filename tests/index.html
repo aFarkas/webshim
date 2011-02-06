@@ -15,9 +15,9 @@
 		(function($){
 			
 			window.omitTests = window.omitTests || {};
-			omitTests.validity = $.support.validity && !window.noHTMLExtFixes;
-			omitTests.output = $.support.output && !window.noHTMLExtFixes;
-			omitTests.numericDateProps = $.support.numericDateProps && !window.noHTMLExtFixes;
+			omitTests.validity = Modernizr.formvalidation && !window.noHTMLExtFixes;
+			omitTests.output = Modernizr.output && !window.noHTMLExtFixes;
+			omitTests.numericDateProps = Modernizr.input.valueAsNumber && !window.noHTMLExtFixes;
 
 			var hash = location.hash.replace('#', '');
 			if(hash.indexOf('noCapableBugfixes') !== -1){

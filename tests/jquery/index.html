@@ -8,8 +8,8 @@
 	<!-- Includes -->
 	<script src="data/testinit.js"></script>
 
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>
-	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.js"></script>
+	<script src="../../src/extras/modernizr-1.6.min.js"></script>
 	<script src="../../src/polyfiller.js"></script>
 	
 	<script>
@@ -27,30 +27,32 @@
 	
 	<script>
 		(function($){
-			$.webshims.ready('html5shiv', function(){
-				QUnit.reset = function(){
-					$("#main, #qunit-fixture").htmlWebshim( QUnit.config.fixture );
-				};
-			});
+//			$.webshims.ready('html5shiv', function(){
+//				QUnit.reset = function(){
+//					$("#main, #qunit-fixture").htmlWebshim( QUnit.config.fixture );
+//				};
+//			});
 			
 			
-			module("block tests");
+			module("block tests", { teardown: polyfillTeardown });
 			asyncTest("block", function(){
 				ok(true, 'yes');
-				$.webshims.ready('ready forms canvas json-storage', start);
+				$('DOM json-storage', start);
 			});
 			
 		})(jQuery);
 	</script>
 
 	<script src="unit/core.js"></script>
+	
 	<script src="unit/data.js"></script>
+	
 	<script src="unit/queue.js"></script>
 	<script src="unit/attributes.js"></script>
 	<script src="unit/event.js"></script>
 	<script src="unit/selector.js"></script>
-	<script src="unit/traversing.js"></script>
 	<script src="unit/manipulation.js"></script>
+	
 </head>
 
 <body id="body">
@@ -270,9 +272,9 @@ Z</textarea>
 
 			<div id="slidetogglein" class='chain test'>slideToggleIn<div>slideToggleIn</div></div>
 			<div id="slidetoggleout" class='chain test out'>slideToggleOut<div>slideToggleOut</div></div>
-			
+
 			<div id="fadetogglein" class='chain test'>fadeToggleIn<div>fadeToggleIn</div></div>
-      <div id="fadetoggleout" class='chain test out'>fadeToggleOut<div>fadeToggleOut</div></div>
+			<div id="fadetoggleout" class='chain test out'>fadeToggleOut<div>fadeToggleOut</div></div>
 
 			<div id="fadeto" class='chain test'>fadeTo<div>fadeTo</div></div>
 		</div>
