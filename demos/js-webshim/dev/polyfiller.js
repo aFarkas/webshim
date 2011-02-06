@@ -174,7 +174,7 @@
 						addClass.push('polyfill-remove-fouc');
 					}
 					addClass.push('loading-polyfills');
-					$(window).bind('load.loadingPolyfills error.loadingPolyfills', removeLoader);
+					$(window).bind('load.loadingPolyfills polyfillloaderror.loadingPolyfills  error.loadingPolyfills', removeLoader);
 					loadingTimer = setTimeout(function(){
 						$('html').addClass('long-loading-polyfills');
 					}, 600);
@@ -485,6 +485,7 @@
 						timer,
 						onLoad = function(e){
 							if(e && e.type === 'error'){
+								$(window).triggerHandler('polyfillloaderror');
 								webshims.warn('Error: could not find script @'+src +'| configure polyfill-path: $.webshims.loader.basePath = "path/to/shims-folder" or by using markup: <meta name="polyfill-path" content="path/to/shims-folder/" />');
 							}
 							if(!this.readyState ||

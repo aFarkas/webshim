@@ -132,14 +132,33 @@ $.webshims.ready('mediaelements', function(){
 		
 		<h2 id="implement-features">Implementing a new feature to Webshim Lib</h2>
 		<p>A Pollyfill always is split into at least 2 parts. First the test and loader definition and second the implementation.</p>
+		
+		<p>Assume, that there is a "magic" new method called magicMethod on the window-object. An implementation would look like this:</p>
+<code class="block">
+$.webshims.addPolyfill('magicMethod', {
+	test: function(){
+		return ('magicMethod' in window);	
+	}
+});
+// = load magicMethod.js from shim-folder if test returns false
+</code>		
+		<p>Create a file called magicMethod with your polyfill-code and place it in the shim-folder:</p>	
+<code class="block">
+window.magicMethod = function(){
+	//your polyfill implementation
+};
+</code>		
+
+		<p>In case of a DOM-Extension, webshims lib comes with some usefull extension-methods, that has to be loaded.</p>
 <code class="block">
 $.webshims.addPolyfill('mediaelement', {
 	test: function(){
 		return ('canPlayType' in document.createElement('video'));	
 	},
+	dependencies: ['es5', 'dom-extend'],
 	methodNames: ['play'] //pause, load
 });
-// = load mediaelement.js from shim-folder if test returns false and always create a jQuery-Plugin called play, wich trys to invoke native/polyfilled play
+// = load mediaelement.js, the es5 and DOM-extension features from shim-folder, if test returns false and always create a jQuery-Plugin called play, wich trys to invoke native/polyfilled play
 </code>
 
 		<p>Now put a mediaelement.js inside of your shim folder and start implementing some features. Webshims lib comes with some very usefull implementation helpers. Here are two of them:</p>
@@ -148,92 +167,44 @@ $.webshims.addPolyfill('mediaelement', {
 			<li><code>$.webshims.defineNodeNamesBooleanProperty</code> (nodeNames, property, descriptor)</li>
 		</ul>
 <code class="block">
-//Implements a new property on audio, video called currentTime
-$.webshims.defineNodeNamesProperty('audio, video', 'currentTime', {
-	get: function(){
-		//your getter implementation (this refers to the element)
-	},
-	set: function(value){
-		//your setter implementation (this refers to the element)
-	}
-});
-
-//Implements a new method called play on audio, video
-$.webshims.defineNodeNamesProperty('audio, video', 'play', {
-	value: function(){
-		//your play-method implementation
-		//this refers to the element
-	}
-});
-
-//Implements a new boolean property called controls on audio, video
-$.webshims.defineNodeNamesBooleanProperty('audio, video', 'controls', {
-	//set works more like an onSet:
-	//you don't have to set the value anymore on the domnode, only handle true/false values
-	set: function(value){
-		if(value){
-			//show controls for elem
-		} else {
-			//hide controls for elem
-		}
-	}
-});
+//wait till the DOM-Extension-feature is loaded
+jQuery.webshims.ready('dom-extend', function($, webshims, window, document){
 	
-</code>
-		
-		<p>Here is a quick working example for implementing the details and summary elements.</p>
-		
-<code class="block">
-$.webshims.addPolyfill('details', {
-	test: function(){
-		return ('open' in document.createElement('details'));	
-	}
-});
-</code>
-		<p>Create a file called details.js and put it in your shim-folder:</p>
-		
-<code class="block">
-(function($){
-	//override jQuery's attribute method for all details - elements...
-	//... in case of the open attribute
-	$.webshims.defineNodeNamesBooleanProperty('details', 'open', {
+	//Implements a new IDL property on audio, video called currentTime
+	$.webshims.defineNodeNamesProperty('audio, video', 'currentTime', {
+		get: function(){
+			//your getter implementation (this refers to the element)
+		},
 		set: function(value){
-			//get polyfill-methods
-			var elem = this;
-			var polyfill = $.data(elem, 'detailsPolyfill');
-			//if we haven't polyfilled this element, then do it now
-			if(!polyfill){
-				polyfill = $.data(elem, 'detailsPolyfill', {
-					open: function(){
-						$('> *:not(summary)', elem).show();
-					},
-					close: function(){
-						$('> *:not(summary)', elem).hide();
-					}
-				});
-				$(elem).delegate('summary', 'click', function(){
-					$.attr(elem, 'open', !$.attr(elem, 'open'));
-				});
-			}
-			
-									
-			if(value){
-				polyfill.open();
-			} else {
-				polyfill.close();
-			}
+			//your setter implementation (this refers to the element)
 		}
 	});
 	
-	//init open attribute
-	$.webshims.addReady(function(context, contextElem){
-		$('details', context).attr('open', function(i, open){
-			return open;
-		});
+	//Implements a new method called play on audio, video
+	$.webshims.defineNodeNamesProperty('audio, video', 'play', {
+		value: function(){
+			//your play-method implementation
+			//this refers to the element
+		}
 	});
 	
-})(jQuery);
+	//Implements a new boolean IDL property called controls on audio, video, wich is reflected by a content attribute
+	$.webshims.defineNodeNamesBooleanProperty('audio, video', 'controls', {
+		//set works more like an onSet:
+		//you don't have to set the value anymore on the domnode, only handle true/false values
+		set: function(value){
+			if(value){
+				//show controls for elem
+			} else {
+				//hide controls for elem
+			}
+		},
+		content: true
+	});
+});	
 </code>
+		
+		
 		<p>Webshims lib uses a sort of client-side browser-specific combination. This combinations aren't very flexible, but easy to use. If you want to develop, you can test the source-files by using <code>$.webshims.debug = true;</code>.</p>
 		</section>
 				
