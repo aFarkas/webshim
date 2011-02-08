@@ -71,15 +71,14 @@
 	    <script>
 	    	
 			$.webshims.debug = true;
-			$.webshims.setOptions('forms', {
-				placeholderType: 'over'
-			});
+			
+			
 			$.webshims.setOptions('canvas', {
 				type: 'flash'
 			});
 //			$.webshims.cfg.extendNative = true;
 			window.FlashCanvas = {disableContextMenu: true};
-			$.webshims.polyfill('lightweight');
+			$.webshims.polyfill('forms', true);
 			var start = new Date().getTime();
 			
 //			$(function(){

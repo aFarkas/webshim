@@ -277,7 +277,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		});
 	})();
 	
-	webshims.isReady('form-core', true);
 });
 
 
