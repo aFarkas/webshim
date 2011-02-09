@@ -391,7 +391,6 @@
 							}
 						});
 						if(!module.noAutoCallback){
-							console.log(module)
 							module.noAutoCallback = true;
 							onReady($.merge([module.name+'FileLoaded'], module.dependencies), function(){
 								isReady(module.name, true);
@@ -671,7 +670,7 @@
 				var type = context.nodeType;
 				if(type != 1 && type != 9){return;}
 				var elem = (context !== document) ? $(context) : emptyJ;
-				readyFns.forEach(function(fn){
+				$.each(readyFns, function(i, fn){
 					fn(context, elem);
 				});
 			}
@@ -690,7 +689,7 @@
 		};
 		webshims.fn.html = $.fn.htmlWebshim;
 		
-		['after', 'before', 'append', 'prepend', 'replaceWith'].forEach(function(name){
+		$.each(['after', 'before', 'append', 'prepend', 'replaceWith'], function(name){
 			$.fn[name+'Webshim'] = function(a){
 				var elems = $(webshims.fixHTML5(a));
 				$.fn[name].call(this, elems);

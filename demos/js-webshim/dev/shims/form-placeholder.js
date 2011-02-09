@@ -108,7 +108,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 							.insertAfter(elem)
 							.bind('mousedown.placeholder', function(){
 								changePlaceholderVisibility(this, false, false, data, 'focus');
-								elem.focus();
+								setTimeout(elem.focus, 0);
 								return false;
 							})
 						;
