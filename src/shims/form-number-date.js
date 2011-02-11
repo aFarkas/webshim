@@ -369,8 +369,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 			var elem = this;
 			var type = getType(elem);
 			return (webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
-		},
-		set: $.noop
+		}
 	});
 	
 	webshims.isReady('form-number-date', true);

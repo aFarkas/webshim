@@ -454,13 +454,13 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	
 	webshims.addReady(function(context, elem){
 		
-		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(){
+		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(e){
 			if($.datepicker || $.fn.slider){
 				replaceInputUI(context, elem);
 			}
 			
 			if($.datepicker && $.fn.slider){
-				$(document).unbind('jquery-uiReady.initinputui input-widgetsReady.initinputui');
+				$(document).unbind('.initinputui');
 			}
 			if(context === document){
 				webshims.isReady('inputUI', true);

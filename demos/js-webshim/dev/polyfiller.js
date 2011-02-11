@@ -606,10 +606,6 @@
 	
 	//Overwrite DOM-Ready and implement a new ready-method
 	(function(){
-		$.each(['after', 'before', 'append', 'prepend', 'replaceWith'], function(i, name){
-			$.fn[name+'Webshim'] = $.fn[name];
-		});
-		
 		$.isDOMReady = $.isReady;
 		if(!$.isDOMReady){
 			var $Ready = $.ready;
@@ -689,7 +685,7 @@
 		};
 		webshims.fn.html = $.fn.htmlWebshim;
 		
-		$.each(['after', 'before', 'append', 'prepend', 'replaceWith'], function(name){
+		$.each(['after', 'before', 'append', 'prepend', 'replaceWith'], function(i, name){
 			$.fn[name+'Webshim'] = function(a){
 				var elems = $(webshims.fixHTML5(a));
 				$.fn[name].call(this, elems);

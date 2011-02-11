@@ -98,7 +98,7 @@ test("attr(String)", function() {
 		textNode = document.createTextNode("some text"),
 		obj = {};
 	jQuery.each( [document, attributeNode, commentNode, textNode, obj, "#firstp"], function( i, ele ) {
-		strictEqual( jQuery(ele).attr("nonexisting"), undefined, "attr works correctly for non existing attributes (bug #7500)." );
+		strictEqual( jQuery(ele).attr("nonexisting"), undefined, "attr works correctly for non existing attributes (bug #7500)."+i );
 	});
 });
 
@@ -140,6 +140,7 @@ test("attr(String, Object)", function() {
 
 	for ( var i = 0; i < div.size(); i++ ) {
 		if ( div.get(i).getAttribute('foo') != "bar" ){
+			
 			fail = i;
 			break;
 		}
@@ -224,12 +225,14 @@ test("attr(String, Object)", function() {
 
 	var check = document.createElement("input");
 	var thrown = true;
+	
 	try {
 		jQuery(check).attr('type','checkbox');
 	} catch(e) {
 		thrown = false;
 	}
 	ok( thrown, "Exception thrown when trying to change type property" );
+	
 	equals( "checkbox", jQuery(check).attr('type'), "Verify that you can change the type of an input element that isn't in the DOM" );
 
 	var check = jQuery("<input />");

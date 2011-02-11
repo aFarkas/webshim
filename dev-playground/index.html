@@ -78,7 +78,24 @@
 			});
 //			$.webshims.cfg.extendNative = true;
 			window.FlashCanvas = {disableContextMenu: true};
-			$.webshims.polyfill('forms', true);
+	//add a new feature called formplaceholder
+	$.webshims.addPolyfill('formplaceholder', {
+		//point the implementation source to the standard placeholder-feature
+		src: 'form-placeholder',
+		//load this polyfill, if placeholder is not supported and the standard placeholder is not loaded
+		test: function(list){
+			return ($.inArray('form-placeholder', list) != -1 || Modernizr.input.placeholder);
+		},
+		//load dom-extend, if needed
+		dependencies: ['dom-extend']
+	});
+	//load only placeholder with dependendcies
+	$.webshims.polyfill();
+	
+	$.webshims.setOptions('forms', {
+		placeholderType: 'over'
+	});
+
 			var start = new Date().getTime();
 			
 //			$(function(){
@@ -140,12 +157,14 @@ $(function(){
 })
 </script>
 <form id="test" action="#">
-	<input placeholder="fdsf fdsf" />
+	<input placeholder="fdsf fdsf" list="a" />
 <div>
-	<select name="a" id="a" required>
-		<option value="">a</option>
-		<option value="a">a</option>
-	</select>
+	<datalist>
+		<select name="a" id="a">
+			<option value="">test</option>
+			<option value="test 2 test">a</option>
+		</select>
+	</datalist>
 	
 	<select name="b" id="b">
 		<option value="">a</option>
