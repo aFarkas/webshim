@@ -40,14 +40,10 @@
 		
 		var wasReadys = [];
 		$.each(readys, function(i, name){
-			$.webshims.ready(name, function(){
-				if($.inArray(name, wasReadys) == -1){
-					wasReadys.push(name+'-queued');
-				}
-			});
+			
 			$.webshims.ready(name, function(){
 				wasReadys.push(name);
-			}, true);
+			});
 		});
 		
 		module("init");
@@ -57,7 +53,7 @@
 		
 		module("dependency test");
 		asyncTest("dependency test", function(){
-			equals(wasReadys.join(' '), readys.join(' '), 'developer form dependencies executed in right order');
+			equals(wasReadys.join(' '), readys.join(' '), 'dependencies executed in right order');
 			$.webshims.ready('forms-ext', start);
 		});
 		

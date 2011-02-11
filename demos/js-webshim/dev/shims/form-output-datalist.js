@@ -1,4 +1,4 @@
-jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, document, undefined){
+jQuery.webshims.ready('json-storage dom-extend', function($, webshims, window, document, undefined){
 	var doc = document;	
 	
 	(function(){
@@ -553,6 +553,4 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, docu
 		
 	})();
 	
-	
-	webshims.isReady('form-output-datalist', true);
 });

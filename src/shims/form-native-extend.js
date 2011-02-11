@@ -1,4 +1,4 @@
-jQuery.webshims.ready('form-message form-core', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('form-core form-message form-core', function($, webshims, window, doc, undefined){
 //	"use strict";
 	if(!Modernizr.formvalidation){return;}
 		
@@ -176,5 +176,4 @@ jQuery.webshims.ready('form-message form-core', function($, webshims, window, do
 		});
 		
 	} //end: overrideValidity
-	webshims.isReady('form-extend', true);
 });

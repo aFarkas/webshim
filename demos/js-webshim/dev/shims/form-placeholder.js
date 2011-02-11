@@ -108,7 +108,11 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 							.insertAfter(elem)
 							.bind('mousedown.placeholder', function(){
 								changePlaceholderVisibility(this, false, false, data, 'focus');
-								setTimeout(elem.focus, 0);
+								try {
+									setTimeout(function(){
+										elem.focus();
+									}, 0);
+								} catch(e){}
 								return false;
 							})
 						;
@@ -250,5 +254,4 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		}
 		return oldVal.apply(this, arguments);
 	};
-	webshims.isReady('form-placeholder', true);
 });

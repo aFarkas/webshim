@@ -6,7 +6,7 @@
 	
 	<link rel="stylesheet" href="../qunit/qunit.css" type="text/css" media="screen">
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
 	
 	<script src="../qunit/qunit.js"></script>
 	<script src="../../src/extras/modernizr-1.6.min.js"></script>
@@ -32,7 +32,7 @@
 		
 		module("lightweight loading test");
 		asyncTest("lightweight loading test (don' load widgets, date, number etc.)", function(){
-			var scripts = $('script:not(.inline)').filter('[src*=jquery-ui.min.js], [src*=input-widgets.js]');
+			var scripts = $('script:not(.inline)').filter('[src*="jquery-ui.min.js"], [src*="input-widgets.js"]');
 			var formsExtReady = false;
 			$.webshims.ready('forms-ext', function(){
 				formsExtReady = true;

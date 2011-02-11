@@ -56,6 +56,7 @@
 	<script src="../src/extras/modernizr-1.6.min.js"></script>
 	<script src="../src/polyfiller.js"></script>
 	<script>
+		$.webshims.polyfill();
 //		$.webshims.addPolyfill('iecss', {
 //			src: '../../dev-playground/js/iecss.js',
 //			test: function(){
@@ -68,109 +69,16 @@
 		
 	</script>
 	<title>playing</title>
-	    <script>
-	    	
-			$.webshims.debug = true;
-			
-			
-			$.webshims.setOptions('canvas', {
-				type: 'flash'
-			});
-//			$.webshims.cfg.extendNative = true;
-			window.FlashCanvas = {disableContextMenu: true};
-	//add a new feature called formplaceholder
-	$.webshims.addPolyfill('formplaceholder', {
-		//point the implementation source to the standard placeholder-feature
-		src: 'form-placeholder',
-		//load this polyfill, if placeholder is not supported and the standard placeholder is not loaded
-		test: function(list){
-			return ($.inArray('form-placeholder', list) != -1 || Modernizr.input.placeholder);
-		},
-		//load dom-extend, if needed
-		dependencies: ['dom-extend']
-	});
-	//load only placeholder with dependendcies
-	$.webshims.polyfill();
-	
-	$.webshims.setOptions('forms', {
-		placeholderType: 'over'
-	});
-
-			var start = new Date().getTime();
-			
-//			$(function(){
-//				console.log('READY', start - new Date().getTime())
-//				alert($('#a')[0].required)
-//				alert($('#a')[0].validity.valid)
-//				alert($('#a').attr('validity').valueMissing)
-//				alert($('#b')[0].required)
-//				alert($('#b')[0].validity.valid)
-//				alert($('#b')[0].validity.valueMissing)
-//				$('#input-list')[0].required = true;
-//				console.log(.validity.valid);
-//			})
-//			$.webshims.ready('DOM', function(){
-//				console.log('domready', start - new Date().getTime())
-//			})
-//			$.webshims.ready('json-storage', function(){
-//				console.log('jsonready', start - new Date().getTime())
-//			})
-//			$.webshims.ready('forms-ext', function(){
-//				console.log('forms-ext', start - new Date().getTime())
-//			})
-
-//			$.webshims.defineNodeNameProperty('input', {
-//				set: function(){
-//					
-//				},
-//				get: function(){
-//					
-//				},
-//				prop: true,
-//				content: true
-//			}, true, true);
-	    </script>
+	   
 </head>
 
 <body class="js-off">
-	<div class="test">
-		<button>toggle</button>
-		<div class="box"></div>
-	</div> 
-	<script>
-		
-	</script>
-<canvas id="my-canvas"></canvas>
+	
 
-<script class="block run-once">
-$.webshims.ready('canvas', function(){
-	var ctx = $('#my-canvas').getContext('2d');
-	ctx.fillStyle = "rgb(200,0,0)";  
-	ctx.fillRect (10, 10, 55, 50);  
-	 
-	ctx.fillStyle = "rgba(0, 0, 200, 0.5)";  
-	ctx.fillRect (30, 30, 55, 50);
-});
-$(function(){
-	
-	
-})
-</script>
 <form id="test" action="#">
-	<input placeholder="fdsf fdsf" list="a" />
+	<input type="datetime-local" value="" />
 <div>
-	<datalist>
-		<select name="a" id="a">
-			<option value="">test</option>
-			<option value="test 2 test">a</option>
-		</select>
-	</datalist>
 	
-	<select name="b" id="b">
-		<option value="">a</option>
-		<option value="a">a</option>
-	</select>
-	<input type="submit" />
 </div>
 </form>
 	

@@ -1,4 +1,4 @@
-jQuery.webshims.ready('form-core dom-extend', function($, webshims, window){
+jQuery.webshims.ready('form-core form-message dom-extend', function($, webshims, window){
 if(Modernizr.formvalidation){
 	return;
 }
@@ -319,8 +319,6 @@ webshims.addReady(function(context, contextElem){
 	}, 9);
 	
 });
-
-webshims.isReady('form-extend', true);
 
 }); //webshims.ready end
 

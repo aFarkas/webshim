@@ -106,5 +106,4 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 		});
 		
 	});
-	webshims.isReady('form-message', true);
 });

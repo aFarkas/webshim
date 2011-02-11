@@ -418,10 +418,10 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 	
 	$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, attr){
 		webshims.onNodeNamesPropertyModify('input', attr, {
-			set: function(elem, val){
-				var widget = $.data(elem, 'inputUIReplace');
+			set: function(val){
+				var widget = $.data(this, 'inputUIReplace');
 				if(widget && widget.methods[attr]){
-					widget.methods[attr](elem, widget.visual, val);
+					widget.methods[attr](this, widget.visual, val);
 				}
 			}
 		});

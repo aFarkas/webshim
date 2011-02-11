@@ -372,6 +372,4 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 		}
 	});
 	
-	webshims.isReady('form-number-date', true);
-	
 });

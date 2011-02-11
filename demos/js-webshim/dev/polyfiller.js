@@ -40,7 +40,7 @@
 			return ('value' in document.createElement('output'));
 		});
 		
-		Modernizr.genericDOM =  !!($('<video><div></div></video>')[0].innerHTML);
+		Modernizr.genericDOM =  !!($('<div><div></div></div>')[0].innerHTML);
 		
 		//using only property api
 		Modernizr.requiredSelect = !!(Modernizr.formvalidation && 'required' in $('select', form)[0]);
@@ -237,7 +237,9 @@
 			}
 			name = name+'Ready';
 			if(_set){
-				if(special[name] && special[name].add){return true;}
+				if(special[name] && special[name].add){
+					return true;
+				}
 					
 					special[name] = $.extend(special[name] || {}, {
 						add: function( details ) {
@@ -525,6 +527,7 @@
 						timer,
 						onLoad = function(e){
 							if(e && e.type === 'error'){
+								console.log(e, script)
 								$(window).triggerHandler('polyfillloaderror');
 								webshims.warn('Error: could not find script @'+src +'| configure polyfill-path: $.webshims.loader.basePath = "path/to/shims-folder" or by using markup: <meta name="polyfill-path" content="path/to/shims-folder/" />');
 							}
@@ -556,13 +559,14 @@
 						}
 					;
 					script.setAttribute('async', 'async');
-					script.src = src;
+					
 					timer = setTimeout(function(){
 						onLoad({type: 'error'});
-					}, 20000);
+					}, 2000);
 					script.onload = onLoad;
-					$(script).one('error.polyfillerror', onLoad);
+//					$(script).one('error.polyfillerror', onLoad);
 					script.onreadystatechange = onLoad;
+					script.src = src;
 					parent.appendChild(script);
 					script.async = true;
 					
@@ -957,8 +961,7 @@
 			customMessages: false,
 			overrideMessages: false
 		},
-		dependencies: ['dom-support'],
-		noAutoCallback: true
+		dependencies: ['dom-support']
 	});
 	
 	if(Modernizr.formvalidation){
@@ -969,11 +972,10 @@
 		addPolyfill('form-extend', {
 			feature: 'forms',
 			src: 'form-native-extend',
-			noAutoCallback: true,
 			test: function(toLoad){
 				return (Modernizr.requiredSelect && Modernizr.validationMessage && ((modernizrInputAttrs.valueAsNumber && modernizrInputAttrs.valueAsDate) || $.inArray('form-number-date', toLoad) == -1) && !this.options.overrideMessages );
 			},
-			dependencies: ['dom-support'],
+			dependencies: ['dom-support', 'form-message'],
 			methodNames: ['setCustomValidity','checkValidity']
 		});
 		
@@ -989,16 +991,14 @@
 		addPolyfill('form-extend', {
 			feature: 'forms',
 			src: 'form-shim-extend',
-			noAutoCallback: true,
 			methodNames: ['setCustomValidity','checkValidity'],
-			dependencies: ['dom-support']
+			dependencies: ['dom-support', 'form-message']
 		});
 	}
 	
 	
 	addPolyfill('form-output-datalist', {
 		feature: 'forms',
-		noAutoCallback: true,
 		test: function(){
 			return Modernizr.output && Modernizr.datalist;
 		},
@@ -1007,8 +1007,7 @@
 	
 	addPolyfill('form-number-date', {
 		feature: 'forms-ext',
-		noAutoCallback: true,
-		dependencies: ['es5', 'forms', 'json-storage', 'dom-support'],
+		dependencies: ['es5', 'forms', 'dom-support'],
 		test: function(){
 			return modernizrInputAttrs.valueAsNumber && modernizrInputAttrs.valueAsDate;
 		},
@@ -1063,8 +1062,7 @@
 		},
 		options: {
 			placeholderType: 'value'
-		},
-		noAutoCallback: true
+		}
 	});
 	/* END: placeholder */
 	
