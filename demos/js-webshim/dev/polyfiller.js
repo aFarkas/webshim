@@ -34,13 +34,10 @@
 		});
 		
 		addTest('output', function(){
-			if(!Modernizr.formvalidation){
-				return false;
-			}
-			return ('value' in document.createElement('output'));
+			return (Modernizr.formvalidation && 'value' in document.createElement('output'));
 		});
 		
-		Modernizr.genericDOM =  !!($('<div><div></div></div>')[0].innerHTML);
+		Modernizr.genericDOM =  !!($('<video><div></div></video>')[0].innerHTML);
 		
 		//using only property api
 		Modernizr.requiredSelect = !!(Modernizr.formvalidation && 'required' in $('select', form)[0]);
@@ -645,19 +642,6 @@
 		var readyFns = [];
 		var emptyJ = $([]);
 		$.extend(webshims, {
-			getID: (function(){
-				var ID = new Date().getTime();
-				return function(elem){
-					elem = $(elem);
-					var id = elem.attr('id');
-					if(!id){
-						ID++;
-						id = 'elem-id-'+ ID;
-						elem.attr('id', id);
-					}
-					return id;
-				};
-			})(),
 			addReady: function(fn){
 				var readyFn = function(context, elem){
 					webshims.ready('DOM', function(){fn(context, elem);});
@@ -1000,7 +984,21 @@
 	addPolyfill('form-output-datalist', {
 		feature: 'forms',
 		test: function(){
-			return Modernizr.output && Modernizr.datalist;
+			var result = Modernizr.datalist && modernizrInputAttrs.list;
+			if(result){
+				var oAttr = $.attr;
+				$.attr = function(elem, name, value){
+					if(name == 'list' && elem && (elem.nodeName || '').toLowerCase() == 'input' ){
+						if(value !== undefined){
+							elem.setAttribute(name, value);
+						} else {
+							return elem.getAttribute(name);
+						}
+					}
+					return oAttr.apply(this, arguments);
+				};
+			}
+			return Modernizr.output && result;
 		},
 		dependencies: ['dom-support', 'json-storage']
 	});
@@ -1036,22 +1034,6 @@
 			replaceUI: false
 		}
 	});
-	
-	
-	if(modernizrInputAttrs.list){
-		//jQuery fix has to be used without defineNodeNameProperty
-		onReady('dom-extend', function(){
-			$.webshims.defineNodeNameProperty('input', 'list', {
-				set: function(value){
-					var elem = this;
-					if(value && value.getAttribute){
-						value = $.webshims.getID(value);
-					}
-					elem.setAttribute('list', value);
-				}
-			});
-		});
-	}
 	
 	/* placeholder */
 	

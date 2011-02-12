@@ -459,23 +459,14 @@ jQuery.webshims.ready('json-storage dom-extend', function($, webshims, window, d
 		
 		webshims.defineNodeNameProperty('input', 'list', {
 			get: function(){
-				var elem = this;
-				var val = webshims.contentAttr(elem, 'list');
-				if(typeof val == 'string'){
-					val = document.getElementById(val);
-				}
-				return val || null;
+				var val = webshims.contentAttr(this, 'list');
+				return (val == null) ? undefined : val;
 			},
 			set: function(value){
 				var elem = this;
-				var dom;
-				if(value && value.getAttribute){
-					dom = value;
-					value = webshims.getID(value);
-				}
 				webshims.contentAttr(elem, 'list', value);
 				if(dataListProto){
-					webshims.objectCreate(dataListProto, undefined, {input: elem, id: value, datalist: dom});
+					webshims.objectCreate(dataListProto, undefined, {input: elem, id: value});
 				}
 			},
 			content: true

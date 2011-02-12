@@ -327,6 +327,19 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		/*
 		 * END: Native extension feature
 		 */
+		getID: (function(){
+			var ID = new Date().getTime();
+			return function(elem){
+				elem = $(elem);
+				var id = elem.attr('id');
+				if(!id){
+					ID++;
+					id = 'elem-id-'+ ID;
+					elem.attr('id', id);
+				}
+				return id;
+			};
+		})(),
 		defineNodeNameProperty: function(nodeName, prop, desc, extend, htc, feature){
 			desc = $.extend({writeable: true, idl: true}, desc);
 			
