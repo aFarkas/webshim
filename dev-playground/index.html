@@ -65,6 +65,23 @@
 //		});
 		
 		
+		$(function(){
+//			$('html, form').bind('invalid', function(e){
+//			
+//				setTimeout(function(){
+//					console.log(e.isDefaultPrevented(), e.timeStamp, 'test', e.currentTarget.nodeName)
+//				}, 1);
+//			});
+//			
+//			$('form').bind('submit', function(){
+//				return false;
+//			})
+		
+			$('input').bind('firstinvalid', function(e){
+//				e.preventDefault();
+//				console.log(e.isDefaultPrevented(), e.timeStamp)
+			})
+		})
 		
 		
 	</script>
@@ -76,7 +93,8 @@
 	
 
 <form id="test" action="#">
-	<input type="datetime-local" value="" />
+	<input required name="dsa" value="" />
+	<input type="submit" />
 <div>
 	
 </div>

@@ -299,15 +299,30 @@
 		},
 		
 		fixHTML5: function(h){return h;},
-		capturingEvents: function(names/*, _maybePrevented */){
+		capturingEvents: function(names, _maybePrevented){
 			if(!document.addEventListener){return;}
-			var _maybePrevented = arguments[1];
 			if(typeof names == 'string'){
 				names = [names];
 			}
 			$.each(names, function(i, name){
-				var handler = function( e ) { 
-					return $.event.handle.call( this, $.event.fix( e ) );
+				var handler = function( e ) {
+					e = $.event.fix( e );
+					if(_maybePrevented && !e._isPolyfilled){
+						var isDefaultPrevented = e.isDefaultPrevented;
+						var preventDefault = e.preventDefault;
+						e.preventDefault = function(){
+							clearTimeout($.data(e.target, e.type +'-defaultPrevented'));
+							$.data(e.target, e.type +'-defaultPrevented', setTimeout(function(){
+								$.removeData(e.target, e.type +'-defaultPrevented');
+							}, 30));
+							return preventDefault.apply(this, arguments);
+						};
+						e.isDefaultPrevented = function(){
+							return !!(isDefaultPrevented.apply(this, arguments) || $.data(e.target, e.type +'-defaultPrevented') || false);
+						};
+						e._isPolyfilled = true;
+					}
+					return $.event.handle.call( this, e );
 				};
 				special[name] = special[name] || {};
 				if(special[name].setup || special[name].teardown){return;}
@@ -985,7 +1000,7 @@
 		feature: 'forms',
 		test: function(){
 			var result = Modernizr.datalist && modernizrInputAttrs.list;
-			if(result){
+			if(result && $(document.createElement('input')).attr('list') === null){
 				var oAttr = $.attr;
 				$.attr = function(elem, name, value){
 					if(name == 'list' && elem && (elem.nodeName || '').toLowerCase() == 'input' ){

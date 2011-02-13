@@ -47,7 +47,7 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 				var events = [];
 				var timer;
 				var throwError = function(e){
-					if((!events[0] || !events[0].isDefaultPrevented()) && (!events[1] || !events[1].isDefaultPrevented()) ){
+					if((!events[0] || !events[0].isInvalidUIPrevented()) && (!events[1] || !events[1].isInvalidUIPrevented()) ){
 						var elem = e.target;
 						var name = elem.nodeName;
 						if(elem.id){
@@ -68,17 +68,17 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 					timer = setTimeout(function(){
 						throwError(e);
 						events = [];
-					}, 30);
+					}, 20);
 				});
 			})();
 		} else if(Modernizr.formvalidation){
 			orig.bind('firstinvalid', function(e){
 				clearTimeout(globalInvalidTimer);
 				globalInvalidTimer = setTimeout(function(){
-					if(!e.isDefaultPrevented()){
+					if(!e.isInvalidUIPrevented()){
 						webshims.validityAlert.showFor( e.target ); 
 					}
-				}, 30);
+				}, 20);//timeout has to be less than 30!
 			});
 		}
 		var id = orig.attr('id'),

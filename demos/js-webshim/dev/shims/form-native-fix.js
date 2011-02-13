@@ -67,7 +67,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		})
 		.bind('lastinvalid', function(e, data){
 			var firstTarget = data.invalidlist[0];
-			if( firstTarget && badWebkit && document.activeElement && firstTarget !== document.activeElement && !firstInvalidEvent.isDefaultPrevented() ){
+			if( firstTarget && badWebkit && document.activeElement && firstTarget !== document.activeElement && !firstInvalidEvent.isInvalidUIPrevented() ){
 				webshims.validityAlert.showFor(firstTarget);
 			}
 			invalids = [];

@@ -249,11 +249,12 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 			form
 		;
 		
-		$(doc).bind('invalid', function(e){
+		$('html').bind('invalid', function(e){
 			var jElm = $(e.target).addClass('form-ui-invalid').removeClass('form-ui-valid');
 			if(!firstEvent){
 				//trigger firstinvalid
 				firstEvent = $.Event('firstinvalid');
+				firstEvent.isInvalidUIPrevented = e.isDefaultPrevented;
 				jElm.trigger(firstEvent);
 			}
 			
