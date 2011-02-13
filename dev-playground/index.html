@@ -56,6 +56,9 @@
 	<script src="../src/extras/modernizr-1.6.min.js"></script>
 	<script src="../src/polyfiller.js"></script>
 	<script>
+		$.webshims.setOptions('forms', {
+//			overrideMessages: true
+		});
 		$.webshims.polyfill();
 //		$.webshims.addPolyfill('iecss', {
 //			src: '../../dev-playground/js/iecss.js',
@@ -93,7 +96,10 @@
 	
 
 <form id="test" action="#">
-	<input required name="dsa" value="" />
+	<input required placeholder="fdds" name="dsa" value="" />
+	<input required type="checkbox" name="dswa" value="" />
+	<input required type="checkbox" name="dswa" value="" />
+	<input type="date" name="dsa" min="2012-10-12" value="fdsfsd" />
 	<input type="submit" />
 <div>
 	
@@ -101,7 +107,11 @@
 </form>
 	
             
-       
+     <script>
+     	$(function(){
+//			console.log($('input:required').attr('customValidationMessage'))
+		});
+     </script>  
 </body>
 </html>   
 </html>   

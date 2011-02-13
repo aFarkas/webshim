@@ -53,7 +53,7 @@ var validityRules = {
 			if(cache.nodeName == 'select'){
 				ret = (!val && input[0].type == 'select-one' && input[0].size < 2 && $('> option:first-child:not(:disabled)', input).attr('selected'));
 			} else if(checkTypes[cache.type]){
-				ret = !$(getNames(input[0])).filter(':checked')[0];
+				ret = (cache.type == 'checkbox') ? !input.is(':checked') : !$(getNames(input[0])).filter(':checked')[0];
 			} else {
 				ret = !(val);
 			}

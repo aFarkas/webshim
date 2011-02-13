@@ -1,4 +1,4 @@
-jQuery.webshims.ready('form-core form-message form-core', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('form-core form-message dom-extend', function($, webshims, window, doc, undefined){
 //	"use strict";
 	if(!Modernizr.formvalidation){return;}
 		
@@ -27,6 +27,7 @@ jQuery.webshims.ready('form-core form-message form-core', function($, webshims, 
 	});
 	
 	var overrideNativeMessages = webshims.cfg.forms.overrideMessages;	
+	
 	var overrideValidity = (!Modernizr.requiredSelect || !Modernizr.input.valueAsDate || overrideNativeMessages);
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	var oldAttr = $.attr;
@@ -127,7 +128,8 @@ jQuery.webshims.ready('form-core form-message form-core', function($, webshims, 
 					
 					$.each(validityRules, function(rule, fn){
 						validityState[rule] = fn(jElm, val, cache, validityState);
-						if( validityState[rule] && (validityState.valid || (!setCustomMessage && overrideNativeMessages)) ) {
+						
+						if( validityState[rule] && (validityState.valid || !setCustomMessage) ) {
 							elem.setCustomValidity(webshims.createValidationMessage(elem, rule));
 							validityState.valid = false;
 							setCustomMessage = true;
@@ -135,6 +137,14 @@ jQuery.webshims.ready('form-core form-message form-core', function($, webshims, 
 					});
 					if(validityState.valid){
 						elem.setCustomValidity('');
+						$.data(elem, 'hasCustomError', false);
+					} else if(overrideNativeMessages && !setCustomMessage && !customError){
+						$.each(validityState, function(name, prop){
+							if(name !== 'valid' && prop){
+								elem.setCustomValidity(webshims.createValidationMessage(elem, name));
+								return false;
+							}
+						});
 					}
 					return validityState;
 				},
@@ -170,7 +180,8 @@ jQuery.webshims.ready('form-core form-message form-core', function($, webshims, 
 			}
 		}
 		
-		var validityElementsSel = validityElements.join(',');		
+		var validityElementsSel = validityElements.join(',');	
+		
 		webshims.addReady(function(context, elem){
 			$(validityElementsSel, context).add(elem.filter(validityElementsSel)).attr('validity');
 		});

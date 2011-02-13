@@ -221,6 +221,10 @@ asyncTest('validationMessage/setCustomValidity', function(){
 	ok($('#select').is(':invalid-element'), 'select is set invalid');
 	ok($('#select').attr('validity').customError, 'select has customerror');
 	equals($('#select').attr('validationMessage'), 'has an error', 'custom error message set');
+	if($.webshims.cfg.forms.overrideMessages){
+		var firstInvalid = $('#name').attr('value', '');
+		equals(firstInvalid.attr('validationMessage'), firstInvalid.attr('customValidationMessage'), 'custom message equals native message if messages are overridden');
+	}
 	equals($('#select').attr('disabled', true).attr('validationMessage'), '', 'custom error message is empty, if control is disabled');
 	$('#select').attr('disabled', false).setCustomValidity('');
 	ok(( $('#select').is(':valid-element') && $('#select').attr('willValidate') ), 'select is set valid again');

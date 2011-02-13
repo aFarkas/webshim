@@ -3,7 +3,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	var validityMessages = webshims.validityMessages;
 	var cfg = webshims.cfg.forms;
 	var implementProperties = (cfg.overrideMessages || cfg.customMessages) ? ['customValidationMessage'] : [];
-	
+
 	validityMessages['en'] = validityMessages['en'] || validityMessages['en-US'] || {
 		typeMismatch: {
 			email: '{%value} is not a legal email address',
@@ -14,14 +14,29 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 			range: '{%value} is not a number!',
 			"datetime-local": '{%value} is not a correct date-time format.'
 		},
-		rangeUnderflow: '{%value} is too low. The lowest value you can use is {%min}.',
+		rangeUnderflow: {
+			defaultMessage: '{%value} is too low. The lowest value you can use is {%min}.'
+		},
 		rangeOverflow: '{%value}  is too high. The highest value you can use is {%max}.',
 		stepMismatch: 'The value {%value} is not allowed for this form.',
 		tooLong: 'The entered text is too large! You used {%valueLen} letters and the limit is {%maxlength}.',
 		
 		patternMismatch: '{%value} is not in the format this page requires! {%title}',
-		valueMissing: 'You have to specify a value'
+		valueMissing: {
+			defaultMessage: 'You have to specify a value',
+			checkbox: 'You have to check the box'
+		}
 	};
+	
+	['date', 'time', 'datetime-local'].forEach(function(type){
+		validityMessages['en'].rangeUnderflow[type] = '{%value} is too early. The earliest value you can use is {%min}.';
+	});
+	['date', 'time', 'datetime-local'].forEach(function(type){
+		validityMessages['en'].rangeOverflow[type] = '{%value} ist too late. The value can not be later than {%max}';
+	});
+	['select-one', 'radio'].forEach(function(type){
+		validityMessages['en'].valueMissing[type] = 'Please select an option';
+	});
 	
 	validityMessages['en-US'] = validityMessages['en-US'] || validityMessages['en'];
 	validityMessages[''] = validityMessages[''] || validityMessages['en-US'];
@@ -36,14 +51,30 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 			range: '{%value} ist keine Nummer!',
 			"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
 		},
-		rangeUnderflow: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.',
-		rangeOverflow: '{%value} ist zu hoch. {%max} ist der oberste Wert, den Sie benutzen können.',
+		rangeUnderflow: {
+			defaultMessage: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.'
+		},
+		rangeOverflow: {
+			defaultMessage: '{%value} ist zu hoch. {%max} ist der oberste Wert, den Sie benutzen können.'
+		},
 		stepMismatch: 'Der Wert {%value} ist in diesem Feld nicht zulässig. Hier sind nur bestimmte Werte zulässig. {%title}',
 		tooLong: 'Der eingegebene Text ist zu lang! Sie haben {%valueLen} Buchstaben eingegeben, dabei sind {%maxlength} das Maximum.',
 		
-		patternMismatch: '{%value} hat für diese Seite ein falsches Format! {%title}',
-		valueMissing: 'Sie müssen einen Wert eingeben'
+		patternMismatch: '{%value} hat für dieses Eingabefeld ein falsches Format! {%title}',
+		valueMissing: {
+			defaultMessage: 'Bitte geben Sie einen Wert ein',
+			checkbox: 'Bitte aktivieren Sie das Kästchen'
+		}
 	};
+	['date', 'time', 'datetime-local'].forEach(function(type){
+		validityMessages['de'].rangeUnderflow[type] = '{%value} ist zu früh. {%min} ist die früheste Zeit, die Sie benutzen können.';
+	});
+	['date', 'time', 'datetime-local'].forEach(function(type){
+		validityMessages['de'].rangeOverflow[type] = '{%value} ist zu spät. {%max} ist die späteste Zeit, die Sie benutzen können.';
+	});
+	['select-one', 'radio'].forEach(function(type){
+		validityMessages['de'].valueMissing[type] = 'Bitte wählen Sie eine Option aus';
+	});
 	
 	var currentValidationMessage =  validityMessages[''];
 	$(doc).bind('webshimLocalizationReady', function(){

@@ -377,7 +377,7 @@
 					}
 					var module = modules[name];
 					if(module){
-						if ('test' in module && module.test(list)) {
+						if (module.test === true || (module.test && $.isFunction(module.test) && module.test(list))) {
 							isReady(name, true);
 							return true;
 						} else {
@@ -574,7 +574,7 @@
 					
 					timer = setTimeout(function(){
 						onLoad({type: 'error'});
-					}, 2000);
+					}, 20000);
 					script.onload = onLoad;
 //					$(script).one('error.polyfillerror', onLoad);
 					script.onreadystatechange = onLoad;
@@ -796,9 +796,7 @@
 	/* change path $.webshims.modules[moduleName].src */
 	addModule('html5a11y', {
 		src: 'html5a11y',
-		test: function(){
-			return !(($.browser.msie && browserVersion < 9 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 535) || !window.HTMLArticleElement);
-		}
+		test: !(($.browser.msie && browserVersion < 9 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 535) || !window.HTMLArticleElement)
 	});
 	
 	addModule('jquery-ui', {
@@ -834,16 +832,12 @@
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
 	addPolyfill('es5-1', {
 		feature: 'es5',
-		test: function(){
-			return Modernizr.ES5;
-		}
+		test: Modernizr.ES5
 	});
 	
 	addPolyfill('es5-2', {
 		feature: 'es5',
-		test: function(){
-			return Modernizr.ES5base;
-		}
+		test: Modernizr.ES5base
 	});
 	
 	
@@ -856,16 +850,12 @@
 	
 	addPolyfill('html5shiv', {
 		feature: 'dom-support',
-		test: function(){
-			return Modernizr.genericDOM;
-		}
+		test: Modernizr.genericDOM
 	});
 	
 	/* geolocation */
 	addPolyfill('geolocation', {
-		test: function(){
-			return Modernizr.geolocation;
-		},
+		test: Modernizr.geolocation,
 		options: {destroyWrite: true, confirmText: ''},
 		dependencies: ['json-storage']
 	});
@@ -876,9 +866,7 @@
 		var flashCanvas;
 		addPolyfill('canvas', {
 			src: 'excanvas',
-			test: function(){
-				return Modernizr.canvas;
-			},
+			test: Modernizr.canvas,
 			options: {type: 'excanvas'}, //excanvas | flash | flashpro
 			noAutoCallback: true,
 			loadInit: function(){
@@ -972,15 +960,15 @@
 			feature: 'forms',
 			src: 'form-native-extend',
 			test: function(toLoad){
-				return (Modernizr.requiredSelect && Modernizr.validationMessage && ((modernizrInputAttrs.valueAsNumber && modernizrInputAttrs.valueAsDate) || $.inArray('form-number-date', toLoad) == -1) && !this.options.overrideMessages );
+				return (Modernizr.requiredSelect && Modernizr.validationmessage && ((modernizrInputAttrs.valueAsNumber && modernizrInputAttrs.valueAsDate) || $.inArray('form-number-date', toLoad) == -1) && !this.options.overrideMessages );
 			},
-			dependencies: ['dom-support', 'form-message'],
+			dependencies: ['form-core', 'dom-support', 'form-message'],
 			methodNames: ['setCustomValidity','checkValidity']
 		});
 		
 		addPolyfill('form-native-fix', {
 			feature: 'forms',
-			test: function(){return Modernizr.bugfreeformvalidation;},
+			test: Modernizr.bugfreeformvalidation,
 			dependencies: ['dom-support'],
 			combination: ['combined-webkit']
 		});
@@ -991,7 +979,7 @@
 			feature: 'forms',
 			src: 'form-shim-extend',
 			methodNames: ['setCustomValidity','checkValidity'],
-			dependencies: ['dom-support', 'form-message']
+			dependencies: ['form-core', 'dom-support', 'form-message']
 		});
 	}
 	
@@ -1021,9 +1009,7 @@
 	addPolyfill('form-number-date', {
 		feature: 'forms-ext',
 		dependencies: ['es5', 'forms', 'dom-support'],
-		test: function(){
-			return modernizrInputAttrs.valueAsNumber && modernizrInputAttrs.valueAsDate;
-		},
+		test: modernizrInputAttrs.valueAsNumber && modernizrInputAttrs.valueAsDate,
 		options: {stepArrows: {number: 1, time: 1}, calculateWidth: true}
 	});
 	
@@ -1054,9 +1040,7 @@
 	
 	addPolyfill('form-placeholder', {
 		feature: 'forms',
-		test: function(){
-			return modernizrInputAttrs.placeholder;
-		},
+		test: modernizrInputAttrs.placeholder,
 		options: {
 			placeholderType: 'value'
 		}
@@ -1068,9 +1052,7 @@
 	/* json + loacalStorage */
 	
 	addPolyfill('json-storage', {
-		test: function(){
-			return Modernizr.localstorage && Modernizr.sessionstorage && 'JSON' in window;
-		},
+		test: Modernizr.localstorage && Modernizr.sessionstorage && 'JSON' in window,
 		loadInit: function(){
 			loader.loadList(['swfobject']);
 			//preload flash
