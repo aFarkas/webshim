@@ -250,14 +250,16 @@ asyncTest('output test', function(){
 	$('#labeled-output').attr('value', 'somecontent');
 	if( !omitTests.output ){
 		equals($('output:first').text(), 'hello', 'shim shows value');
+		equals($('#labeled-output').text(), 'somecontent', 'shim shows value');
+		
 		ok(/&outputtest=somecontent&/.test($('form').serialize()), 'finds output serialized in shim');
 	}
 	$('#rangeId').attr('value', 30);
 	$.webshims.triggerInlineForm($('input.oninput-test')[0], 'input');
 	equals(window.globalInput, '30:30', 'globalInput value was set on trigger');
 	
-	
-	
+	$($('#form-1')[0]['outputtest']).attr('value', 'value');
+	equals($('#labeled-output').attr('value'), 'value', 'value is set through form elements');
 	$.webshims.ready('forms DOM', function(){
 		start();
 	});

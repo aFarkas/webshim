@@ -43,7 +43,7 @@
 		Modernizr.requiredSelect = !!(Modernizr.formvalidation && 'required' in $('select', form)[0]);
 		
 		//bugfree means interactive formvalidation including correct submit-invalid event handling (this can't be detected, we can just guess)
-		Modernizr.bugfreeformvalidation = Modernizr.formvalidation && Modernizr.requiredSelect && Modernizr.validationmessage && (!$.browser.webkit || browserVersion > 534.16);
+		Modernizr.bugfreeformvalidation = Modernizr.formvalidation && Modernizr.requiredSelect && Modernizr.validationmessage && (!$.browser.webkit || browserVersion > 534.19);
 		
 		
 		modernizrInputAttrs.valueAsNumber = false;
@@ -62,7 +62,7 @@
 		form = null;
 		
 		Modernizr.ES5base = !!(String.prototype.trim && Date.now && Date.prototype.toISOString);
-		Modernizr.ES5extras = !!(Array.isArray && Object.keys && Object.create && Function.prototype.bind && Object.defineProperties && !isNaN( Date.parse("T00:00") ));
+		Modernizr.ES5extras = !!(Array.isArray && Object.keys && Object.create && Function.prototype.bind && Object.defineProperties);// && !isNaN( Date.parse("T00:00") )
 		
 		if(Modernizr.ES5base){
 			$.each(['filter', 'map', 'every', 'reduce', 'reduceRight', 'lastIndexOf'], function(i, name){
@@ -90,6 +90,7 @@
 				foo = null;
 			})();
 		}
+		
 		Modernizr.ES5 = (Modernizr.ES5base && Modernizr.ES5extras && Modernizr.advancedObjectProperties);
 		Modernizr.objectAccessor = !!( Modernizr.advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__));
 		Modernizr.domAccessor = !!( Modernizr.objectAccessor ||  (Object.defineProperty && Object.getOwnPropertyDescriptor));
@@ -179,7 +180,7 @@
 					$('html').addClass(addClass.join(' '));
 				}
 				$(function(){
-					loader.loadList(['html5a11y']);
+					loader.loadList(['html5a11y', 'html5shiv']);
 				});
 				loader.loadCSS('shim.css');
 				//remove function
@@ -942,7 +943,7 @@
 	addPolyfill('form-message', {
 		feature: 'forms',
 		test: function(toLoad){
-			return (Modernizr.validationMessage && !this.options.customMessages && modules['form-extend'].test(toLoad) );
+			return (Modernizr.validationmessage && !this.options.customMessages && modules['form-extend'].test(toLoad) );
 		},
 		options: {
 			customMessages: false,

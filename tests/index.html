@@ -6,7 +6,7 @@
 	
 	<link rel="stylesheet" href="qunit/qunit.css" media="screen">
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.js"></script>
+	<script src="http://code.jquery.com/jquery-1.5.1rc1.js"></script>
 	<script src="../src/extras/modernizr-1.6.min.js"></script>
 	<script src="qunit/qunit.js"></script>
 	
@@ -18,7 +18,8 @@
 			omitTests.validity = Modernizr.formvalidation && !window.noHTMLExtFixes;
 			omitTests.output = Modernizr.output && !window.noHTMLExtFixes;
 			omitTests.numericDateProps = Modernizr.input.valueAsNumber && !window.noHTMLExtFixes;
-
+			omitTests.requiredSelect = Modernizr.requiredSelect && !window.noHTMLExtFixes;
+			
 			var hash = location.hash.replace('#', '');
 			if(hash.indexOf('noCapableBugfixes') !== -1){
 				window.noHTMLExtFixes = true; 

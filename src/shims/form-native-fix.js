@@ -3,7 +3,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 	
 	if(!Modernizr.formvalidation || window.noHTMLExtFixes || Modernizr.bugfreeformvalidation){return;}
 	
-	var badWebkit = ($.browser.webkit && parseFloat($.browser.version, 10) < 534.16);
+	var badWebkit = ($.browser.webkit && parseFloat($.browser.version, 10) < 534.19);
 	var invalids = [],
 		firstInvalidEvent,
 		form

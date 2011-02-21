@@ -208,6 +208,7 @@ if((!Modernizr.advancedObjectProperties || !Object.create || !Object.definePrope
 // Date.parse
 // based on work shared by Daniel Friesen (dantman)
 // http://gist.github.com/303249
+/*
 if (isNaN(Date.parse("T00:00"))) {
     // XXX global assignment won't work in embeddings that use
     // an alternate object for the context.
@@ -319,7 +320,7 @@ if (isNaN(Date.parse("T00:00"))) {
         return Date;
     })(Date);
 }
-
+*/
 
 // 
 // Function

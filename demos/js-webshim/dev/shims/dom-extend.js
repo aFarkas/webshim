@@ -195,13 +195,9 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 			/*
 			 * END: Native extension feature
 			 */
-			init: function(nodeName, prop, all){
+			init: function(nodeName, prop){
 				createNodeNameInit(nodeName, function(){
-					var jElm = $(this);
-					if(all !== 'all'){
-						jElm = jElm.filter('['+ prop +']');
-					}
-					jElm.attr(prop, function(i, val){
+					$(this).filter('['+ prop +']').attr(prop, function(i, val){
 						return val;
 					});
 				});
@@ -453,10 +449,30 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 			if(typeof names == 'string'){
 				names = names.split(/\s*,\s*/);
 			}
+			
 			names.forEach(function(nodeName){
 				webshims.defineNodeNameProperty(nodeName, prop, desc, extend, htc, feature);
 			});
 		},
+		defineNodeNameProperties: function(name, descs){
+			for(var prop in descs){
+				descs[prop] = webshims.defineNodeNameProperty(name, prop, descs[prop]);
+			}
+			return descs;
+		},
+		defineNodeNamesProperties: function(names, descs){
+			if(typeof names == 'string'){
+				names = names.split(/\s*,\s*/);
+			}
+			names.forEach(function(nodeName){
+				var desc = $.extend({}, descs);
+				webshims.defineNodeNameProperties(nodeName, desc);
+			});
+		},
+//		createElement: function(nodeName, create, descs){
+//			
+//			return webshims.defineNodeNameProperties(nodeName, desces);
+//		},
 		onNodeNamesPropertyModify: function(nodeNames, prop, desc){
 			if(typeof nodeNames == 'string'){
 				nodeNames = nodeNames.split(/\s*,\s*/);

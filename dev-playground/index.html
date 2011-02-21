@@ -59,6 +59,9 @@
 		$.webshims.setOptions('forms', {
 //			overrideMessages: true
 		});
+		$.webshims.ready('DOM', function(){
+			console.log($('input').attr('value'))
+		})
 		$.webshims.polyfill();
 //		$.webshims.addPolyfill('iecss', {
 //			src: '../../dev-playground/js/iecss.js',
@@ -69,6 +72,7 @@
 		
 		
 		$(function(){
+			
 //			$('html, form').bind('invalid', function(e){
 //			
 //				setTimeout(function(){
@@ -96,10 +100,10 @@
 	
 
 <form id="test" action="#">
-	<input required placeholder="fdds" name="dsa" value="" />
-	<input required type="checkbox" name="dswa" value="" />
-	<input required type="checkbox" name="dswa" value="" />
-	<input type="date" name="dsa" min="2012-10-12" value="fdsfsd" />
+	<div>
+	     <input type="date" />
+		 <input type="datetime-local" />    	
+	</div>
 	<input type="submit" />
 <div>
 	

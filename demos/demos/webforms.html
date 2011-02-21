@@ -14,24 +14,28 @@
 			border: 1px solid #000;
 			margin: 5px 0;
 		}
-		.form-ui-invalid {
+		input.form-ui-invalid,
+		select.form-ui-invalid,
+		textarea.form-ui-invalid {
 			border-color: #800;
 		}
-		.form-ui-valid {
+		input.form-ui-valid,
+		select.form-ui-valid,
+		textarea.form-ui-valid {
 			border-color: #080;
 		}
-		span.form-ui-invalid {
+		span.input-datetime-local.form-ui-invalid {
 			-moz-box-shadow: 1px 1px 1px #800;
 			box-shadow: 1px 1px 1px #800;
 		}
-		span.form-ui-valid {
+		span.input-datetime-local.form-ui-valid {
 			-moz-box-shadow: 1px 1px 1px #080;
 			box-shadow: 1px 1px 1px #080;
 		}
 		
 	</style>
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+	<script src="http://code.jquery.com/jquery-1.5.1rc1.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-1.6.min.js"></script>
 	<script src="../js-webshim/minified/extras/mousepress.js"></script>
 	
@@ -89,14 +93,14 @@
 				
 				<h3>Options for the <code>forms</code> feature</h3>
 				<ul>
-					<li><strong>customMessages</strong> (boolean): If <code>customMessages</code> is set to true. Webshims Lib will implement a DOM-Property called customValidationMessage, wich can be changed through the $.webshims.validityMessages-Array.</li>
-					<li><strong>overrideMessages</strong> (boolean): </li>
+					<li><strong>customMessages</strong> (boolean): <code>false</code> (default) || <code>true</code>. If <code>customMessages</code> is set to true. Webshims Lib will implement a DOM-Property called customValidationMessage, wich can be changed through the $.webshims.validityMessages-Array.</li>
+					<li><strong>overrideMessages</strong> (boolean): <code>false</code> (default) || <code>true</code></li>
 					<li><strong>placeholderType</strong> (string): <code>"value"</code> (default) || <code>"over"</code>. If placeholderType is set to "over", the polyfill uses the overLabel technique to create a placeholder and doesn't "polute" the value property.</li>
 				</ul>
 				
 				<h3>Options for the <code>ext-forms</code> feature</h3>
 				<ul>
-					<li><strong>replaceUI</strong> (boolean): </li>
+					<li><strong>replaceUI</strong> (boolean): <code>false</code> (default) || <code>true</code>. If replaceUI is set to true</li>
 					<li><strong>slider</strong> (options): </li>
 					<li><strong>datepicker</strong> (options): </li>
 				</ul>

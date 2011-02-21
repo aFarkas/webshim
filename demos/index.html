@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8"/>
 	<link href="css/styles.css" rel="stylesheet" />
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+	<script src="http://code.jquery.com/jquery-1.5.1rc1.js"></script>
 	
 	<script src="js-webshim/minified/extras/modernizr-1.6.min.js"></script>
 	<script src="js-webshim/minified/polyfiller.js"></script>
@@ -186,7 +186,41 @@ $.webshims.polyfill('json-storage geolocation');
 //load and implement all unsupported features from the lightweight profile
 $.webshims.polyfill('lightweight');
 </code>			
+				
+					<h3>High Performance loading using combo-handler service</h3>
+					<p>Webshims lib supports generating a combohandler - url. Simply pass true or your combohandler options as the second argument. The defaults are fine to use in conjunction with the defaults of the <a href="http://code.google.com/p/minify/">minify - project</a>.</p>
+<code class="block">
+//loads all features with a combohandler
+$.webshims.polyfill(true);
+//loads lightweight with a combohandler
+$.webshims.polyfill('lightweight', true);
+//loads json-storage and geolocation as a combohandler
+$.webshims.polyfill('js-storage geolocation', true);
+</code>
+					<p>You can configure the generated combohandler using the following options</p>
+					<ul>
+						<li><strong>base</strong>: (default: '/min/f=') The base path to your combohandler-middleware.</li>
+						<li><strong>seperator</strong>: (default: ',') the seperator between each js-source</li>
+						<li><strong>maxFiles</strong>: (default: 10) the maximum files, that are combined in one combohandler</li>
+						<li><strong>scriptPath</strong>: (default: dynamically computed absolute script-path to your shims-folder without a starting slash)</li>
+					</ul>
+<code class="block">
+//loads json-storage and geolocation as a combohandler
+$.webshims.polyfill('js-storage geolocation', true);
+//would load in IE7: /min/f=path-to-shims/json-storage.js,path-to-shims/geolocation.js
+//would load in IE8: /min/f=path-to-shims/geolocation.js
+//would load in IE9 and other browsers: nothing :-)
+
+$.webshims.polyfill('js-storage geolocation', {
+	seperator: '&',
+	base: '/minify.jsp?scripts='
+});
+//would load in IE7: /minify.jsp?scripts=path-to-shims/json-storage.js&path-to-shims/geolocation.js
+//would load in IE8: /minify.jsp?scripts=path-to-shims/geolocation.js
+//would load in IE9 and other browsers: nothing :-)
+</code>
 				</div>
+			
 			</div>	
 
 			<h3>When is a feature ready to use?</h3>

@@ -83,7 +83,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 	$(document).bind('focusout change refreshValidityStyle', function(e){
 		if(stopUIRefresh || !e.target || !e.target.form || e.target.type == 'submit'){return;}
 		
-		var elem = $.attr(e.target, 'html5element') || e.target;
+		var elem = ($.data(e.target, 'html5element') || [])[0] || e.target;
 		if(!$.attr(elem, 'willValidate')){
 			getVisual(elem).removeClass('form-ui-invalid form-ui-valid');
 			return;
@@ -102,6 +102,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				getGroupElements(elem).removeClass(removeClass);
 			}
 		}
+		
 		getVisual(elem).addClass(addClass).removeClass(removeClass);
 		
 		stopUIRefresh = true;
@@ -140,7 +141,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 		;
 	};
 	setRoot();
-	$(setRoot);
+	webshims.ready('DOM', setRoot);
 	
 	/* some extra validation UI */
 	webshims.validityAlert = (function(){
@@ -249,7 +250,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 			form
 		;
 		
-		$('html').bind('invalid', function(e){
+		$(document).bind('invalid', function(e){
 			var jElm = $(e.target).addClass('form-ui-invalid').removeClass('form-ui-valid');
 			if(!firstEvent){
 				//trigger firstinvalid

@@ -5,7 +5,7 @@
     
 	
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+	<script src="http://code.jquery.com/jquery-1.5.1rc1.js"></script>
 	<script src="../src/extras/modernizr-1.6.min.js"></script>
 	<!-- 
 		main web shim extension fiels
@@ -110,7 +110,7 @@
 					equals(invalidEvents, 2, 'two invalid events');
 					equals(firstInvalidEvents, 1, '1 firstinvalid event');
 					equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
-					if($.support.validity !== true && document.activeElement){
+					if(!Modernizr.formvalidation && document.activeElement){
 						equals(document.activeElement, e.target, "don't focus first invalid");
 					}
 				}, 100);
@@ -125,7 +125,7 @@
 					equals(invalidEvents, 2, '2 invalid events');
 					equals(firstInvalidEvents, 1, '1 firstinvalid event');
 					equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
-					if($.support.validity !== true && document.activeElement){
+					if(!Modernizr.formvalidation && document.activeElement){
 						equals(document.activeElement, e.target, "don't focus first invalid");
 					}
 				}, 100);
