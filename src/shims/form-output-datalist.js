@@ -178,9 +178,9 @@ jQuery.webshims.ready('json-storage dom-extend', function($, webshims, window, d
 			return (elem.textContent || elem.innerText || $.text([ elem ]) || '');
 		};
 		
-				
 		var dataListProto = {
 			_create: function(opts){
+				
 				if(noDatalistSupport[getType(opts.input)]){return;}
 				var datalist = opts.id && document.getElementById(opts.id);
 				var data = $.data(opts.input, 'datalistWidget');
@@ -501,9 +501,7 @@ jQuery.webshims.ready('json-storage dom-extend', function($, webshims, window, d
 			set: function(value){
 				var elem = this;
 				webshims.contentAttr(elem, 'list', value);
-				if(dataListProto){
-					webshims.objectCreate(dataListProto, undefined, {input: elem, id: value});
-				}
+				webshims.objectCreate(dataListProto, undefined, {input: elem, id: value});
 			},
 			content: true
 		}, true, 'input-datalist', 'form-output-datalist');

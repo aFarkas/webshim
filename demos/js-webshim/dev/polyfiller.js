@@ -101,7 +101,7 @@
 	
 	$.extend($.webshims, {
 		
-		version: 'pre1.5.0',
+		version: '1.5.0RC1',
 		cfg: {
 			useImportantStyles: true,
 			removeFOUC: true,
@@ -227,10 +227,7 @@
 		 */
 		
 		isReady: function(name, _set){
-			if(_set && webshims.waitReadys[name]){
-				webshims.waitReadys[name+'ReadyCall'] = true;
-				return false;
-			}
+			
 			name = name+'Ready';
 			if(_set){
 				if(special[name] && special[name].add){
@@ -246,7 +243,6 @@
 			}
 			return !!(special[name] && special[name].add) || false;
 		},
-		waitReadys: {}, 
 		ready: function(events, fn /*, _created*/){
 			var _created = arguments[2];
 			if(typeof events == 'string'){

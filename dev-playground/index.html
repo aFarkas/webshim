@@ -64,7 +64,7 @@
         <script src="jquery-1.5.1.js">
         </script>
 		<script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
-		<script src="../src/extras/modernizr-1.6.min.js"></script>
+		<script src="../src/extras/modernizr-1.7.min.js"></script>
 		<script src="../src/polyfiller.js"></script>
         <script>
 
@@ -75,10 +75,7 @@
             		$.webshims.polyfill();
 			
 			$(function(){
-				$('#select').attr('required', true);
-//				$('#select option:first').attr('disabled', true)
-//				console.log('selecteda: '+ $('#select > option:first-child:not(:disabled)').attr('selected') );
-				console.log( 'valid: '+$('#select').attr('validationMessage'));
+				alert('ready')
 			})
 					
             		
@@ -93,20 +90,14 @@
 		
         <form id="test" action="#">
             <div>
-                <input type="date" /><input type="datetime-local" />
-				<select name="select" id="select">
-	                	<option value="">Please Choose</option>
-	                	<optgroup label="group1">
-	                    	<option value="">Option 1</option>
-	                        <option>Option 2</option>
-	                        <option>Option 3</option>
-	                    </optgroup>
-	                    <optgroup label="group2">
-	                    	<option>Option 4</option>
-	                        <option>Option 5</option>
-	                        <option>Option 6</option>
-	                    </optgroup>
-	                </select>
+                <input list="data" />
+				<datalist id="data">
+					<select>
+						<option value="jo"></option>
+						<option value="jo2"></option>
+					</select>
+				</datalist>
+				
             </div><input type="submit" />
             <div>
             </div>

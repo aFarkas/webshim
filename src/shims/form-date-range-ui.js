@@ -125,23 +125,18 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 					.datepicker($.extend({}, options.datepicker, elem.data('datepicker')))
 					.bind('change', function(e){
 						
-						var value = datePicker.attr('value'), 
-							timeVal = $('input.input-datetime-local-time', date).attr('value')
+						var value = datePicker.attr('value') || '', 
+							timeVal = ''
 						;
 						if(value){
+							timeVal = $('input.input-datetime-local-time', date).attr('value') || '00:00';
 							try {
 								value = $.datepicker.parseDate(datePicker.datepicker('option', 'dateFormat'), value);
 								value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : datePicker.attr('value');
 							} catch (e) {value = datePicker.attr('value');}
-							if (!timeVal) {
-								timeVal = '00:00';
-								$('input.input-datetime-local-time', date).attr('value', timeVal);
-							}
 						} 
 						value = (!value && !timeVal) ? '' : value + 'T' + timeVal;
-						replaceInputUI['datetime-local'].blockAttr = true;
 						elem.attr('value', value);
-						replaceInputUI['datetime-local'].blockAttr = false;
 						e.stopImmediatePropagation();
 						triggerInlineForm(elem[0], 'input');
 						triggerInlineForm(elem[0], 'change');
@@ -158,21 +153,22 @@ jQuery.webshims.ready('form-number-date dom-extend', function($, webshims, windo
 			;
 			$('input.input-datetime-local-time', date).bind('change', function(e){
 				var timeVal = $.attr(this, 'value');
-				var val = elem.attr('value').split('T');
-				if(timeVal && (val.length < 2 || !val[0])){
-					val[0] = $.datepicker.formatDate('yy-mm-dd', new Date());
-				}
-				val[1] = timeVal;
-				
-				if (timeVal) {
-					try {
-						datePicker.attr('value', $.datepicker.formatDate(datePicker.datepicker('option', 'dateFormat'), $.datepicker.parseDate('yy-mm-dd', val[0])));
-					} catch (e) {}
+				var val = ['', ''];
+				if(timeVal){
+					val = elem.attr('value').split('T');
+					if((val.length < 2 || !val[0])){
+						val[0] = $.datepicker.formatDate('yy-mm-dd', new Date());
+					}
+					val[1] = timeVal;
+					
+					if (timeVal) {
+						try {
+							datePicker.attr('value', $.datepicker.formatDate(datePicker.datepicker('option', 'dateFormat'), $.datepicker.parseDate('yy-mm-dd', val[0])));
+						} catch (e) {}
+					}
 				}
 				val = (!val[0] && !val[1]) ? '' : val.join('T');
-				replaceInputUI['datetime-local'].blockAttr = true;
 				elem.attr('value', val);
-				replaceInputUI['datetime-local'].blockAttr = false;
 				e.stopImmediatePropagation();
 				triggerInlineForm(elem[0], 'input');
 				triggerInlineForm(elem[0], 'change');

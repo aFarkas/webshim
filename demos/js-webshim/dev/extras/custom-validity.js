@@ -104,7 +104,7 @@
 		});
 		$(document).bind('refreshCustomValidityRules', onEventTest);
 		
-	}, true);
+	});
 	
 })(jQuery, window, document);
 

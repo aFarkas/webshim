@@ -128,7 +128,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		
 		var initProps = {};
 		
-		var isReady;
 		webshims.addReady(function(context, contextElem){
 			var nodeNameCache = {};
 			var getElementsByName = function(name){
@@ -148,7 +147,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				});
 			});
 			nodeNameCache = null;
-			isReady = true;
 		});
 		
 
@@ -158,7 +156,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 			} else {
 				initProps[nodeName].push(fn);
 			}
-			if(isReady){
+			if($.isDOMReady){
 				$( document.getElementsByTagName(nodeName) ).each(fn);
 			}
 		};
@@ -196,7 +194,9 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 			 * END: Native extension feature
 			 */
 			init: function(nodeName, prop){
+				
 				createNodeNameInit(nodeName, function(){
+					
 					$(this).filter('['+ prop +']').attr(prop, function(i, val){
 						return val;
 					});
