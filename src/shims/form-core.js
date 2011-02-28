@@ -155,7 +155,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				api.clear();
 				this.getMessage(elem, message);
 				this.position(visual);
-				alert.css({
+				errorBubble.css({
 					fontSize: elem.css('fontSize'),
 					fontFamily: elem.css('fontFamily')
 				});
@@ -178,7 +178,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				var elemTop = focusElem.offset().top;
 				var labelOff;
 				var smooth;
-				alert.attr('for', webshims.getID(focusElem));
+				errorBubble.attr('for', webshims.getID(focusElem));
 				
 				if(scrollTop > elemTop){
 					labelOff = elem.id && $('label[for="'+elem.id+'"]', elem.form).offset();
@@ -200,44 +200,51 @@ jQuery.webshims.ready('es5', function($, webshims, window, doc, undefined){
 				if(smooth){
 					webshims.scrollRoot.scrollTop(scrollTop);
 				}
-				$(doc).bind('focusout.validityalert', boundHide);
+				setTimeout(function(){
+					$(doc).bind('focusout.validityalert', boundHide);
+				}, 10);
 			},
 			getMessage: function(elem, message){
-				$('> span.va-box', alert).text(message || elem.attr('x-moz-errormessage') || elem.attr('data-errormessage') || elem.attr('validationMessage'));
+				$('> span.va-box', errorBubble).text(message || elem.attr('x-moz-errormessage') || elem.attr('data-errormessage') || elem.attr('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
 				offset.top += elem.outerHeight();
-				alert.css(offset);
+				errorBubble.css(offset);
 			},
 			show: function(){
-				if(alert.css('display') === 'none'){
-					alert.fadeIn();
-				} else {
-					alert.fadeTo(400, 1);
+				
+				if(errorBubble.css('display') === 'none'){
+					errorBubble.css({opacity: 0}).show();
 				}
+				errorBubble.fadeTo(400, 1);
 			},
 			hide: function(){
 				api.clear();
-				alert.fadeOut();
+				errorBubble.fadeOut();
 			},
 			clear: function(){
+				clearTimeout(focusTimer);
 				clearTimeout(hideTimer);
 				$(doc).unbind('focusout.validityalert');
-				alert.stop().removeAttr('for');
+				errorBubble.stop().removeAttr('for');
 			},
-			alert: $('<'+alertElem+' class="validity-alert" role="alert"><span class="va-arrow"><span class="va-arrow-box" /></span><span class="va-box" /></'+alertElem+'>').css({position: 'absolute', display: 'none'})
+			errorBubble: $('<'+alertElem+' class="validity-alert" role="alert"><span class="va-arrow"><span class="va-arrow-box"></span></span><span class="va-box"></span></'+alertElem+'>').css({position: 'absolute', display: 'none'})
 		};
 		
-		var alert = api.alert;
+		var errorBubble = api.errorBubble;
 		var hideTimer = false;
+		var focusTimer = false;
 		var boundHide = $.proxy(api, 'hide');
 		var created = false;
 		var createAlert = function(){
 			if(created){return;}
 			created = true;
-			$(function(){alert.appendTo('body');});
+			$(function(){
+				errorBubble = errorBubble.appendTo('body');
+			});
 		};
+		createAlert();
 		return api;
 	})();
 	

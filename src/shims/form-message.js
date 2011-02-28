@@ -86,7 +86,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 	webshims.createValidationMessage = function(elem, name){
 		var message = currentValidationMessage[name];
 		if(message && typeof message !== 'string'){
-			message = message[ (elem.getAttribute('type') || '').toLowerCase() ] || message.defaultMessage;
+			message = message[ (elem.getAttribute('type') || '').toLowerCase() || elem.type || 'defaultMessage' ] || message.defaultMessage;
 		}
 		if(message){
 			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
@@ -115,16 +115,21 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 					if(!$.attr(elem, 'willValidate')){
 						return message;
 					}
+					
 					var validity = $.attr(elem, 'validity') || {valid: 1};
+					
 					if(validity.valid){return message;}
 					message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
+					
 					if(message){return message;}
+					
 					if(validity.customError && elem.nodeName){
 						message = (Modernizr.validationmessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
 						if(message){return message;}
 					}
 					$.each(validity, function(name, prop){
 						if(name == 'valid' || !prop){return;}
+						
 						message = webshims.createValidationMessage(elem, name);
 						if(message){
 							return false;

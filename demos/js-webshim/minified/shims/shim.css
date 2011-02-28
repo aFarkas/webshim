@@ -1,5 +1,6 @@
 .polyfill-remove-fouc.loading-polyfills body {
 	visibility: hidden;
+	
 }
 .polyfill-remove-fouc.long-loading-polyfills {
 	background-image: url(polyfill-loader.gif);

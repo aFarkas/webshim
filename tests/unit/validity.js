@@ -45,9 +45,9 @@ asyncTest("general validity Modul", function(){
 	
 	//invalid
 	var invalid = $('input, textarea, select', form1).filter(':invalid-element');
-	equals( invalid.length, 5, 'total invalid' );
+	equals( invalid.length, 7, 'total invalid' );
 	
-	equals( $(':invalid-element', form1).length, 5, 'total invalid' );
+	equals( $(':invalid-element', form1).length, 7, 'total invalid' );
 	
 	equals( invalid.filter('[type=radio]').length, 3, 'radio invalid' );
 	invalid.filter('[type=radio]:last').attr('checked', true);
@@ -70,14 +70,19 @@ asyncTest("general validity Modul", function(){
 	$('#select option:first').attr('disabled', false);
 	$('#select').attr('selectedIndex', 1);
 	ok($('#select').attr('validity').valid, 'required select with empty value and second option selected is valid');
+	
+	ok(!$('#select4').attr('validity').valid, 'required multiple select with no option selected is invalid');
 	$('#select4').attr({
 		'selectedIndex': 0,
 		size: 1
 	});
 	ok($('#select4').attr('validity').valid, 'required multiple select with first option selected and empty value is valid');
 	
+	
 	ok($('#select2').attr('validity').valid, 'required select with first option selected, in an optgroup and empty value is valid');
 	
+	
+	ok(!$('#select3').attr('validity').valid, 'required select with no option selected is invalid');
 	ok($('#select3').attr('selectedIndex', 0).attr('validity').valid, 'required select with first option selected and empty value, but size > 1 is valid');
 	
 		
@@ -272,9 +277,9 @@ asyncTest('checkValidity/invalid event I', function(){
 	$('#form-1').bind('invalid', function(){
 		invalids++;
 	});
+//	alert($('#form-1 select:invalid-element').length)	
 	ok(!$('#form-1').checkValidity(), 'validity is false for form-element (form)');
-	equals(invalids, 5, 'there were 5 invalid events (form)');
-		
+	equals(invalids, 7, 'there were 7 invalid events (form)');
 	$.webshims.ready('forms DOM', function(){
 		start();
 	});
@@ -304,27 +309,12 @@ asyncTest('checkValidity/invalid event IV', function(){
 	});
 	
 	
-	$.each([
-		{
-			id: '#name',
-			val: 'some name'
-		},
-		{
-			id: '#email',
-			val: 'some@name.com'
-		},
-		{
-			id: '#email',
-			val: 'some@name.com'
-		},
-		{
-			id: '#field6-1'
-		}
-	], function(i, data){
-		if(data.val){
-			$(data.id).attr('value', data.val);
+	$.each(['#name', '#email','#email','#field6-1', '#select3', '#select4'], function(i, id){
+		var elem = $(id);
+		if(elem.attr('type') == 'radio'){
+			elem.attr('checked', true);
 		} else {
-			$(data.id).attr('checked', true);
+			elem.attr('disabled', true);
 		}
 	});
 	ok($('#form-1').checkValidity(), 'validity is true for form-element');

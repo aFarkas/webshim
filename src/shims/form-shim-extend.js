@@ -42,6 +42,14 @@ var validiyPrototype = {
 	valid: true
 };
 
+var isPlaceholderOptionSelected = function(select){
+	if(select.type == 'select-one' && select.size < 2){
+		var option = $('> option:first-child', select);
+		return (!option.attr('disabled') && option.attr('selected'));
+	} 
+	return false;
+};
+
 var validityRules = {
 		valueMissing: function(input, val, cache){
 			if(!input.attr('required')){
@@ -52,7 +60,7 @@ var validityRules = {
 				cache.type = getType(input[0]);
 			}
 			if(cache.nodeName == 'select'){
-				ret = (!val && input[0].type == 'select-one' && input[0].size < 2 && $('> option:first-child:not(:disabled)', input).attr('selected'));
+				ret = (!val && (input[0].selectedIndex < 0 || isPlaceholderOptionSelected(input[0]) ));
 			} else if(checkTypes[cache.type]){
 				ret = (cache.type == 'checkbox') ? !input.is(':checked') : !$(getNames(input[0])).filter(':checked')[0];
 			} else {

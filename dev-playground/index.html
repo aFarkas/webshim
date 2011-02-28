@@ -1,121 +1,121 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-	<meta charset="utf-8"/>
-	<link href="test.css" rel="stylesheet" />
-	<style>
-		
-		#wrapper {
-			margin: auto;
-			width: 800px;
-			max-width: 85%;
-		}
-		fieldset div {
-			overflow: hidden;
-			zoom: 1;
-			padding: 5px;
-			border: 1px solid #000;
-			margin: 5px 0;
-		}
-		button.feature {
-			float: right;
-		}
-		input {
-			height: 1.2em;
-			padding: 4px 2px;
-		}
-		.step-controls {
-			margin-left: -40px;
-		}
-		.outside .step-controls {
-			margin-left: 2px;
-		}
-		.margin input {
-			margin-right: 10px;
-		}
-		
-		.d input {background: #000;}
-		:invalid {
-			background: #f00;
-			border: 2px solid #f00;
-		}
-		.box {
-			width: 200px;
-			height: 200px;
-			border: 1px solid #f00;
-		}
-		.test:hover .box {
-			background: red;
-		}
-		.test .box:hover {
-			background: blue;
-		}
-	</style>
-	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
-	<script src="../src/extras/modernizr-1.6.min.js"></script>
-	<script src="../src/polyfiller.js"></script>
-	<script>
-		$.webshims.setOptions('forms', {
-//			overrideMessages: true
-		});
-		$.webshims.ready('DOM', function(){
-			console.log($('input').attr('value'))
-		})
-		$.webshims.polyfill();
-//		$.webshims.addPolyfill('iecss', {
-//			src: '../../dev-playground/js/iecss.js',
-//			test: function(){
-//				return !$.browser.msie;
-//			}
-//		});
-		
-		
-		$(function(){
-			
-//			$('html, form').bind('invalid', function(e){
-//			
-//				setTimeout(function(){
-//					console.log(e.isDefaultPrevented(), e.timeStamp, 'test', e.currentTarget.nodeName)
-//				}, 1);
-//			});
-//			
-//			$('form').bind('submit', function(){
-//				return false;
-//			})
-		
-			$('input').bind('firstinvalid', function(e){
-//				e.preventDefault();
-//				console.log(e.isDefaultPrevented(), e.timeStamp)
-			})
-		})
-		
-		
-	</script>
-	<title>playing</title>
-	   
-</head>
-
-<body class="js-off">
-	
-
-<form id="test" action="#">
-	<div>
-	     <input type="date" />
-		 <input type="datetime-local" />    	
-	</div>
-	<input type="submit" />
-<div>
-	
-</div>
-</form>
-	
+    <head>
+        <meta charset="utf-8"/>
+        <link href="test.css" rel="stylesheet" />
+        <style>
             
-     <script>
-     	$(function(){
-//			console.log($('input:required').attr('customValidationMessage'))
-		});
-     </script>  
-</body>
-</html>   
-</html>   
+            #wrapper {
+                margin: auto;
+                width: 800px;
+                max-width: 85%;
+            }
+            
+            fieldset div {
+                overflow: hidden;
+                zoom: 1;
+                padding: 5px;
+                border: 1px solid #000;
+                margin: 5px 0;
+            }
+            
+            button.feature {
+                float: right;
+            }
+            
+            input {
+                height: 1.2em;
+                padding: 4px 2px;
+            }
+            
+            .step-controls {
+                margin-left: -40px;
+            }
+            
+            .outside .step-controls {
+                margin-left: 2px;
+            }
+            
+            .margin input {
+                margin-right: 10px;
+            }
+            
+            .d input {
+                background: #000;
+            } :invalid {
+                background: #f00;
+                border: 2px solid #f00;
+            }
+            
+            .box {
+                width: 200px;
+                height: 200px;
+                border: 1px solid #f00;
+            }
+            
+            .test:hover .box {
+                background: red;
+            }
+            
+            .test .box:hover {
+                background: blue;
+            }
+        </style>
+        <script src="jquery-1.5.1.js">
+        </script>
+		<script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+		<script src="../src/extras/modernizr-1.6.min.js"></script>
+		<script src="../src/polyfiller.js"></script>
+        <script>
+
+//            		$.webshims.setOptions('canvas', {
+//            			type: 'flash'
+//            		});
+            		$.webshims.debug = true;
+            		$.webshims.polyfill();
+			
+			$(function(){
+				$('#select').attr('required', true);
+//				$('#select option:first').attr('disabled', true)
+//				console.log('selecteda: '+ $('#select > option:first-child:not(:disabled)').attr('selected') );
+				console.log( 'valid: '+$('#select').attr('validationMessage'));
+			})
+					
+            		
+            		
+            		
+            		
+            	
+        </script>
+        <title>playing</title>
+    </head>
+    <body class="js-off">
+		
+        <form id="test" action="#">
+            <div>
+                <input type="date" /><input type="datetime-local" />
+				<select name="select" id="select">
+	                	<option value="">Please Choose</option>
+	                	<optgroup label="group1">
+	                    	<option value="">Option 1</option>
+	                        <option>Option 2</option>
+	                        <option>Option 3</option>
+	                    </optgroup>
+	                    <optgroup label="group2">
+	                    	<option>Option 4</option>
+	                        <option>Option 5</option>
+	                        <option>Option 6</option>
+	                    </optgroup>
+	                </select>
+            </div><input type="submit" />
+            <div>
+            </div>
+        </form>
+        <script>
+            $(function(){
+                //			console.log($('input:required').attr('customValidationMessage'))
+            });
+        </script>
+    </body>
+</html>
+</html>

@@ -157,6 +157,7 @@
 					$(window).unbind('.loadingPolyfills');
 					clearTimeout(loadingTimer);
 				};
+				
 				if(!$.isReady){
 					if(webshims.cfg.removeFOUC){
 						if(webshims.cfg.waitReady){
@@ -187,12 +188,9 @@
 				firstPolyfillCall = $.noop;
 			};
 			
-			return function(features, combo){
+			return function(features){
 				var toLoadFeatures = [];
-				if(features && ( features === true || $.isPlainObject( features ) ) ){
-					combo = features;
-					features = undefined;
-				}
+				
 				features = features || webshims.featureList;
 				if(features == 'lightweight'){
 					features = webshims.light;
@@ -219,7 +217,7 @@
 				});
 				
 				firstPolyfillCall(features);
-				loader.loadList(toLoadFeatures, combo);
+				loader.loadList(toLoadFeatures);
 				
 			};
 		})(),
@@ -377,11 +375,12 @@
 						return true;
 					}
 					var module = modules[name];
+					var cfg = webshims.cfg[module.feature || name] || {};
 					if(module){
 						if (module.test === true || (module.test && $.isFunction(module.test) && module.test(list))) {
 							isReady(name, true);
 							return true;
-						} else {
+						}  else {
 							return false;
 						}
 					}
@@ -413,48 +412,8 @@
 						}
 					}
 				};
-				var excludeCombo = /\.\/|\/\//;
-				var loadAsCombo = function(toLoad, combo){
-					var fPart = [];
-					var combiNames = [];
-					var len = 0;
-					var l = location;
-					
-					combo = $.extend({
-						seperator: ',',
-						base: '/min/f=',
-						maxFiles: 10,
-						scriptPath: loader.basePath.replace( l.protocol +'//'+ l.host +'/', '')
-					}, typeof combo == 'object' ? combo : {});
-					
-					$.each(toLoad, function(i, loadName){
-						if ($.inArray(loadName, loadedModules) == -1) {
-							var src = (modules[loadName].src || loadName);
-							if(src.indexOf('.') == -1){
-								src += '.js';
-							}
-							if(!excludeCombo.test(src)){
-								len++;
-								src = combo.scriptPath + src;
-								fPart.push(src);
-								combiNames.push(loadName);
-								if(len >= combo.maxFiles){
-									loadScript(combo.base + ( fPart.join(combo.seperator) ), combiNames);
-									fPart = [];
-									combiNames = [];
-									len = 0;
-								}
-							} else {
-								loadScript(src, loadName);
-							}
-						}
-					});
-					if(fPart.length){
-						loadScript(combo.base + ( fPart.join(combo.seperator) ), combiNames);
-					}
-				};
-				return function(list, combo){
-					var toLoad = [];
+				
+				return function(list){
 					var module;
 					//length of list is dynamically
 					for(var i = 0; i < list.length; i++){
@@ -469,21 +428,12 @@
 						if(module.loadInit){
 							module.loadInit();
 						}
-						if(combo){
-							toLoad.push(module.name);
-						}
+										
+						setDependencies(module, list, list);
 						
-						setDependencies(module, (combo) ? toLoad : list, list);
-						
-						if(!combo){
-							loadScript(module.src || module.name, module.name);
-						}
+						loadScript(module.src || module.name, module.name);
 					}
 					
-					
-					if(toLoad.length){
-						loadAsCombo(toLoad, combo);
-					}
 					
 					
 				};
@@ -509,10 +459,10 @@
 					if($.inArray(src, loadedSrcs) != -1){
 						return;
 					}
-					parent = parent || document.getElementsByTagName('head')[0] || document.body;
+					parent = parent || document.getElementsByTagName('script')[0];
 					loadedSrcs.push(src);
 					$('<link rel="stylesheet" />')
-						.prependTo(parent)
+						.insertBefore(parent)
 						.attr({href: src})
 					;
 				};
@@ -528,19 +478,12 @@
 					if($.inArray(src, loadedSrcs) != -1){
 						return;
 					}
-					parent = parent || document.getElementsByTagName('head')[0] || document.body;
-					if(!parent || !parent.appendChild){
-						setTimeout(function(){
-							loader.loadScript(src, callback, name);
-						}, 9);
-						return;
-					}
-					
+					parent = parent || document.getElementsByTagName('script')[0];
+										
 					var script = document.createElement('script'),
 						timer,
 						onLoad = function(e){
 							if(e && e.type === 'error'){
-								console.log(e, script)
 								$(window).triggerHandler('polyfillloaderror');
 								webshims.warn('Error: could not find script @'+src +'| configure polyfill-path: $.webshims.loader.basePath = "path/to/shims-folder" or by using markup: <meta name="polyfill-path" content="path/to/shims-folder/" />');
 							}
@@ -577,10 +520,10 @@
 						onLoad({type: 'error'});
 					}, 20000);
 					script.onload = onLoad;
-//					$(script).one('error.polyfillerror', onLoad);
+					$(script).one('error.polyfillerror', onLoad);
 					script.onreadystatechange = onLoad;
 					script.src = src;
-					parent.appendChild(script);
+					parent.parentNode.insertBefore(script, parent);
 					script.async = true;
 					
 					loadedSrcs.push(src);
@@ -603,8 +546,8 @@
 	var xhrPreloadOption = {
 		cache: true, 
 		dataType: 'text', 
-		error: function(){
-			webshims.warn('could not find: '+ this.url);
+		error: function(data, text){
+			webshims.warn('error with: '+ this.url +' | '+ text);
 		}
 	};
 	
@@ -705,34 +648,6 @@
 			webshims.fn[name] = $.fn[name+'Webshim'];
 		});
 		
-//		$.each({
-//			appendTo: "append",
-//			prependTo: "prepend",
-//			insertBefore: "before",
-//			insertAfter: "after",
-//			replaceAll: "replaceWith"
-//		}, function( name, original ) {
-//			webshims.fn[ name ] = function( selector ) {
-//				var ret = [],
-//					insert = webshims( selector ),
-//					parent = this.length === 1 && this[0].parentNode;
-//				
-//				if ( parent && parent.nodeType === 11 && parent.childNodes.length === 1 && insert.length === 1 ) {
-//					insert[ original ]( this[0] );
-//					return this;
-//					
-//				} else {
-//					for ( var i = 0, l = insert.length; i < l; i++ ) {
-//						var elems = (i > 0 ? this.clone(true) : this).get();
-//						webshims( insert[i] )[ original ]( elems );
-//						ret = ret.concat( elems );
-//					}
-//				
-//					return this.pushStack( ret, name, insert.selector );
-//				}
-//			};
-//		});
-		
 	})();
 	
 	//this might be extended by ES5 shim feature
@@ -801,7 +716,7 @@
 	});
 	
 	addModule('jquery-ui', {
-		src: '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js',
+		src: '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js',
 		test: function(){return !!($.widget && $.Widget);}
 	});
 	
@@ -1030,7 +945,7 @@
 		options: {
 			slider: {},
 			datepicker: {},
-			langSrc: '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/i18n/jquery.ui.datepicker-',
+			langSrc: '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/i18n/jquery.ui.datepicker-',
 			availabeLangs: 'af ar ar-DZ az bg bs ca cs da de el en-AU en-GB en-NZ eo es et eu fa fi fo fr fr-CH gl he hr hu hy id is it ja ko kz lt lv ml ms nl no pl pt-BR rm ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' '),
 			recalcWidth: true,
 			replaceUI: false
@@ -1053,11 +968,9 @@
 	/* json + loacalStorage */
 	
 	addPolyfill('json-storage', {
-		test: Modernizr.localstorage && Modernizr.sessionstorage && 'JSON' in window,
+		test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
 		loadInit: function(){
 			loader.loadList(['swfobject']);
-			//preload flash
-			$.ajax(loader.basePath +'localStorage.swf', xhrPreloadOption);
 		},
 		noAutoCallback: true
 	});

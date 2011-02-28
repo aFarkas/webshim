@@ -100,18 +100,36 @@ jQuery.webshims.ready('json-storage dom-extend', function($, webshims, window, d
 		
 		webshims.defineNodeNameProperty('output', 'value', {
 			set: function(value){
-				var elem = this;
-				var setVal = $.data(elem, 'outputShim');
+				var setVal = $.data(this, 'outputShim');
 				if(!setVal){
-					setVal = outputCreate(elem);
+					setVal = outputCreate(this);
 				}
 				setVal(value);
 			},
 			get: function(){
-				var elem = this;
-				return webshims.contentAttr(elem, 'value') || $(elem).text() || '';
+				return webshims.contentAttr(this, 'value') || $(this).text() || '';
 			}
 		}, true, 'output-props', 'form-output-datalist');
+		
+		var onInputChange = function(value){
+			var setVal = $.data(this, 'outputShim');
+			if(setVal){
+				setVal(value);
+			}
+		};
+		webshims.onNodeNamesPropertyModify('input', 'value', {
+			set: onInputChange
+		});
+		
+		var oldVal = $.fn.val;
+		
+		$.fn.val = function(val){
+			var ret = oldVal.apply(this, arguments);
+			if(this[0] && val !== undefined && $.nodeName(this[0], 'input')){
+				onInputChange.call(this[0], val);
+			}
+			return ret;
+		};
 				
 		webshims.addReady(function(context, contextElem){
 			$('output', context).add(contextElem.filter('output')).each(function(){

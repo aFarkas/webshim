@@ -109,14 +109,22 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 	})();
 	if(!Modernizr.requiredSelect){
 		webshims.ready('form-extend', function(){
+			
+			var isPlaceholderOptionSelected = function(select){
+				if(select.type == 'select-one' && select.size < 2){
+					var option = $('> option:first-child', select);
+					return (!option.attr('disabled') && option.attr('selected'));
+				} 
+				return false;
+			};
 			webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){
 				
-				if(cache.nodeName == 'select' && !val && jElm.attr('required') && jElm[0].size < 2){
+				if(cache.nodeName == 'select' && !val && jElm.attr('required')){
 					if(!cache.type){
 						cache.type = jElm[0].type;
 					}
 					
-					if(cache.type == 'select-one' && $('> option:first-child:not(:disabled)', jElm).attr('selected')){
+					if(!val && (jElm[0].selectedIndex < 0 || isPlaceholderOptionSelected(jElm[0]) )){
 						return true;
 					}
 				}
@@ -126,11 +134,10 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 			webshims.defineNodeNamesBooleanProperty(['select'], 'required', {
 				set: function(value){
 					this.setAttribute('aria-required', (value) ? 'true' : 'false');
-					//trigger validity test
 					$.attr(this, 'validity');
 				},
 				content: true
-			}, true);
+			});
 		});
 	}
 });

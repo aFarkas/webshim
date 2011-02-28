@@ -490,10 +490,8 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				if(desc.set){
 					modifyProps[name][prop].push(desc.set);
 				}
-				if(desc.init){
-					webshims.warn('Error: '+ nodeName +'['+ prop +'] uses desc.init');
-				}
-				if(desc.content || desc.init){
+				
+				if(desc.content){
 					initProp.init(name, prop);
 				}
 			});

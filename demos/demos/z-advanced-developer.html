@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8"/>
 	<link href="../css/styles.css" rel="stylesheet" />
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-1.6.min.js"></script>
 	<script src="../js-webshim/minified/polyfiller.js"></script>
 	
@@ -180,6 +180,11 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, document){
 		}
 	});
 	
+	//Implements a new constant property called HAVE_CURRENT_DATA on audio, video
+	$.webshims.defineNodenamesProperty('audio, video', 'HAVE_CURRENT_DATA', {
+		value: 2
+	});
+	
 	//Implements a new method called play on audio, video
 	$.webshims.defineNodeNamesProperty('audio, video', 'play', {
 		value: function(){
@@ -187,6 +192,8 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, document){
 			//this refers to the element
 		}
 	});
+	
+	
 	
 	//Implements a new boolean IDL property called controls on audio, video, wich is reflected by a content attribute
 	$.webshims.defineNodeNamesBooleanProperty('audio, video', 'controls', {

@@ -19,7 +19,7 @@ class Main
 				ExternalInterface.call('jQuery.webshims.swfLocalStorage.hide', infoObject.code == "SharedObject.Flush.Success"); 
 			}
 		};
-
+		
 		
 		ExternalInterface.addCallback('getItem', null, function(name) {
 			var val = storage.data[name];
@@ -59,7 +59,8 @@ class Main
 			}
 			return null;
 		});
-		ExternalInterface.call('jQuery.webshims.localStorageSwfCallback', 'swf'); 
+		
+		ExternalInterface.call('jQuery.webshims.swfLocalStorage.isReady', 'swf');
 	}
 		
 }

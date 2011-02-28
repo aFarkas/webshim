@@ -1,5 +1,5 @@
 jQuery.webshims.ready('form-core form-message dom-extend', function($, webshims, window, doc, undefined){
-//	"use strict";
+	"use strict";
 	if(!Modernizr.formvalidation){return;}
 		
 	var typeModels = webshims.inputTypes;
@@ -57,6 +57,9 @@ jQuery.webshims.ready('form-core form-message dom-extend', function($, webshims,
 		value: function(error){
 			error = error+'';
 			this.setCustomValidity(error);
+			if(!Modernizr.validationmessage){
+				$.data(this, 'customvalidationMessage', error);
+			}
 			if(overrideValidity){
 				$.data(this, 'hasCustomError', !!(error));
 				testValidity(this);
@@ -155,9 +158,11 @@ jQuery.webshims.ready('form-core form-message dom-extend', function($, webshims,
 							
 		$.fn.val = function(val){
 			var ret = oldVal.apply(this, arguments);
-			this.each(function(){
-				testValidity(this);
-			});
+			if(val !== undefined){
+				this.each(function(){
+					testValidity(this);
+				});
+			}
 			return ret;
 		};
 		
@@ -183,7 +188,9 @@ jQuery.webshims.ready('form-core form-message dom-extend', function($, webshims,
 		var validityElementsSel = validityElements.join(',');	
 		
 		webshims.addReady(function(context, elem){
-			$(validityElementsSel, context).add(elem.filter(validityElementsSel)).attr('validity');
+			$(validityElementsSel, context).add(elem.filter(validityElementsSel)).each(function(){
+				$.attr(this, 'validity');
+			});
 		});
 		
 	} //end: overrideValidity

@@ -53,11 +53,11 @@ function url(value) {
 		oldFragmentsLength = 0,
 		oldTimersLength = 0,
 		oldActive = 0;
-
-
+		
 	this.polyfillTeardown = function(){
 		window.moduleTeardown(true);
 	};
+
 	/**
 	 * Ensures that tests have cleaned up properly after themselves. Should be passed as the
 	 * teardown function on all modules' lifecycle object.
@@ -67,19 +67,21 @@ function url(value) {
 
 		// Allow QUnit.reset to clean up any attached elements before checking for leaks
 		QUnit.reset();
-		
-//		for ( i in jQuery.cache ) {
-//			++cacheLength;
-//		}
+
+		for ( i in jQuery.cache ) {
+			++cacheLength;
+		}
 
 		jQuery.fragments = {};
-
-		for ( i in jQuery.fragments ) {
-			++fragmentsLength;
-		}
+		
 		if(stopTest === true){
 			return;
 		}
+		
+		for ( i in jQuery.fragments ) {
+			++fragmentsLength;
+		}
+
 		// Because QUnit doesn't have a mechanism for retrieving the number of expected assertions for a test,
 		// if we unconditionally assert any of these, the test will fail with too many assertions :|
 //		if ( cacheLength !== oldCacheLength ) {
