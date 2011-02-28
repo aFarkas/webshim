@@ -32,8 +32,6 @@ How To Use
 	<script src="js-webshim/minified/polyfiller.js"></script> 
 
 	<script> 
-		//path is path of polyfiller.js-code + shims/ 
-		$.webshims.loader.basePath += 'shims/'; 
 		//load and implement all unsupported features 
 		$.webshims.polyfill();
 		
