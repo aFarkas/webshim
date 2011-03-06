@@ -106,7 +106,8 @@
 			useImportantStyles: true,
 			removeFOUC: true,
 			waitReady: true,
-			extendNative: false
+			extendNative: false,
+			addCacheBuster: false
 		},
 		/*
 		 * some data
@@ -117,7 +118,7 @@
 			xlightweight: ['es5', 'canvas', 'geolocation', 'json-storage']
 		},
 		setOptions: function(name, opts){
-			if(typeof name == 'string' && opts !== undefined && webCFG[name]){
+			if(typeof name == 'string' && opts !== undefined && name in webCFG){
 				if(typeof opts != 'object'){
 					webCFG[name] = opts;
 				} else {
@@ -448,6 +449,9 @@
 				
 				if(src.indexOf('.') == -1){
 					src += '.js';
+				}
+				if(webCFG.addCacheBuster){
+					src += webCFG.addCacheBuster;
 				}
 				return loader.basePath + src;
 			},
@@ -791,7 +795,7 @@
 			loadInit: function(){
 				var type = this.options.type;
 				var src;
-				if(type && type.indexOf('flash') !== -1){
+				if(type && type.indexOf('flash') !== -1 && (!window.swfobject || swfobject.hasFlashPlayerVersion('9.0.0'))){
 					window.FlashCanvasOptions = window.FlashCanvasOptions || {};
 					flashCanvas = window.FlashCanvasOptions;
 					if(type == 'flash'){
@@ -804,6 +808,10 @@
 						//assume, that the user has flash10+
 						src = flashCanvas.swfPath + 'flash10canvas.swf';
 					}
+					//implement cachbuster for flashcanvas
+//					if(webCFG.addCacheBuster){
+//						src += webCFG.addCacheBuster;
+//					}
 					//preload swf
 					if(src){
 						$.ajax(src, xhrPreloadOption);
@@ -823,10 +831,11 @@
 					});
 					webshims.addReady(function(context, elem){
 						
-						$('canvas', context).add(elem.filter('canvas')).each(function(i){
-							if(!this.getContext){
+						$('canvas', context).add(elem.filter('canvas')).each(function(){
+							var hasContext = this.getContext;
+							if(!hasContext){
 								G_vmlCanvasManager.initElement(this);
-							} else if(context === doc){
+							} else if(context === doc && hasContext){
 								return false;
 							}
 						});

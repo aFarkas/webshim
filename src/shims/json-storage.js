@@ -259,7 +259,7 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 	};
 	
 	$.webshims.ready('DOM swfobject', function(){
-		if(runStart){return;}
+		if(runStart || (('localStorage' in window) && document.getElementById('swflocalstorageshim')) ){return;}
 		runStart = true;
 		if(window.swfobject && swfobject.hasFlashPlayerVersion('8.0.0')){
 			$('body')[$.browser.mozilla ? 'after' : 'append']('<div id="swflocalstorageshim-wrapper"><div id="swflocalstorageshim" /></div>');
@@ -270,7 +270,9 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 			});
 			clearTimeout(swfTimer);
 			swfTimer = setTimeout(function(){
-				$.webshims.warn('Add your development-directory to the local-trusted security sandbox: http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html');
+				if(!('localStorage' in window)){
+					$.webshims.warn('Add your development-directory to the local-trusted security sandbox: http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html');
+				}
 				localStorageSwfCallback();
 			}, (location.protocol.indexOf('file') === 0) ? 500 : 9999);
 		} else {

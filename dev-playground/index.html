@@ -68,14 +68,15 @@
 		<script src="../src/polyfiller.js"></script>
         <script>
 
-//            		$.webshims.setOptions('canvas', {
-//            			type: 'flash'
-//            		});
+//            		$.webshims.setOptions('addCacheBuster', '?fds');
+					$.webshims.setOptions('canvas', {
+						type: 'flash'
+					});
             		$.webshims.debug = true;
             		$.webshims.polyfill();
 			
 			$(function(){
-				alert('ready')
+				
 			})
 					
             		
