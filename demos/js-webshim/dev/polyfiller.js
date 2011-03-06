@@ -101,7 +101,7 @@
 	
 	$.extend($.webshims, {
 		
-		version: '1.5.0RC2',
+		version: '1.5.0RC3',
 		cfg: {
 			useImportantStyles: true,
 			removeFOUC: true,
@@ -196,13 +196,10 @@
 				var toLoadFeatures = [];
 				
 				features = features || webshims.featureList;
-				if(features == 'lightweight'){
-					features = webshims.light;
-				}
+				
 				if (typeof features == 'string') {
 					features = webshims.profiles[features] || features.split(' ');
 				}
-				
 				
 				if(webshims.cfg.waitReady){
 					$.readyWait++;

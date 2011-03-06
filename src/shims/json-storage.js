@@ -183,9 +183,10 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 (function(){
 	var swfTimer;
 	var emptyString = '(empty string)+1287520303738';
-	
+	var runStart;
 	var localStorageSwfCallback = function(type){
 		clearTimeout(swfTimer);
+		
 		if(window.localStorage){
 			$.webshims.isReady('json-storage', true);
 			return;
@@ -258,6 +259,8 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 	};
 	
 	$.webshims.ready('DOM swfobject', function(){
+		if(runStart){return;}
+		runStart = true;
 		if(window.swfobject && swfobject.hasFlashPlayerVersion('8.0.0')){
 			$('body')[$.browser.mozilla ? 'after' : 'append']('<div id="swflocalstorageshim-wrapper"><div id="swflocalstorageshim" /></div>');
 			swfobject.embedSWF($.webshims.loader.basePath +'localStorage.swf', 'swflocalstorageshim', '295', '198', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'swflocalstorageshim'}, function(e){
@@ -265,8 +268,8 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 					localStorageSwfCallback();
 				}
 			});
+			clearTimeout(swfTimer);
 			swfTimer = setTimeout(function(){
-				
 				$.webshims.warn('Add your development-directory to the local-trusted security sandbox: http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html');
 				localStorageSwfCallback();
 			}, (location.protocol.indexOf('file') === 0) ? 500 : 9999);
