@@ -35,17 +35,18 @@ asyncTest("general validity Modul", function(){
 	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate disabled' );
 	willValidate.filter(':eq(2)').attr('disabled', false);
 	equals( $('#form-1 input:willValidate').length, total, 'willValidate enabled' );
-//	form1.find('#name').removeAttr('name');
-//	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate: false without name (negligible in native)' );
-//	form1.find('#name').attr('name', 'name');
+
 	
 	form1.find('#name').attr('readonly', true);
 	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate: false with readonly' );
 	form1.find('#name').attr('readonly', false);
 	
 	//invalid
+	if(omitTests.requiredSelect){
+		$('#select2').attr('disabled', true);
+	}
 	var invalid = $('input, textarea, select', form1).filter(':invalid-element');
-	equals( invalid.length, 7, 'total invalid' );
+	equals( invalid.length, 7, 'total invalid using filter' );
 	
 	equals( $(':invalid-element', form1).length, 7, 'total invalid' );
 	
@@ -64,27 +65,31 @@ asyncTest("general validity Modul", function(){
 	$('#select').attr('required', true);
 	ok($('#select').attr('validity').valueMissing, 'required select with first option selected and empty value is invalid');
 	
-	$('#select option:first').attr('disabled', true);
-	ok($('#select').attr('validity').valid, 'required select with first disabled option selected and empty value is valid');
+	if (!omitTests.requiredSelect) {
 	
-	$('#select option:first').attr('disabled', false);
-	$('#select').attr('selectedIndex', 1);
-	ok($('#select').attr('validity').valid, 'required select with empty value and second option selected is valid');
-	
-	ok(!$('#select4').attr('validity').valid, 'required multiple select with no option selected is invalid');
-	$('#select4').attr({
-		'selectedIndex': 0,
-		size: 1
-	});
-	ok($('#select4').attr('validity').valid, 'required multiple select with first option selected and empty value is valid');
-	
-	
-	ok($('#select2').attr('validity').valid, 'required select with first option selected, in an optgroup and empty value is valid');
-	
-	
-	ok(!$('#select3').attr('validity').valid, 'required select with no option selected is invalid');
-	ok($('#select3').attr('selectedIndex', 0).attr('validity').valid, 'required select with first option selected and empty value, but size > 1 is valid');
-	
+		$('#select option:first').attr('disabled', true);
+		ok($('#select').attr('validity').valid, 'required select with first disabled option selected and empty value is valid');
+		
+		$('#select option:first').attr('disabled', false);
+		
+		
+		$('#select').attr('selectedIndex', 1);
+		ok($('#select').attr('validity').valid, 'required select with empty value and second option selected is valid');
+		
+		ok(!$('#select4').attr('validity').valid, 'required multiple select with no option selected is invalid');
+		$('#select4').attr({
+			'selectedIndex': 0,
+			size: 1
+		});
+		ok($('#select4').attr('validity').valid, 'required multiple select with first option selected and empty value is valid');
+		
+		
+		ok($('#select2').attr('validity').valid, 'required select with first option selected, in an optgroup and empty value is valid');
+		
+		
+		ok(!$('#select3').attr('validity').valid, 'required select with no option selected is invalid');
+		ok($('#select3').attr('selectedIndex', 0).attr('validity').valid, 'required select with first option selected and empty value, but size > 1 is valid');
+	}
 		
 	//validityState
 	//what is the problem here?
@@ -169,13 +174,14 @@ asyncTest('email, url, pattern, maxlength', function(){
 	
 	
 	//maxlength
+	var ti = 0;
 	$.each({
-		'Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore mag': 'invalid-element', 
+		
 		'Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut ': 'valid-element'
 		//don't know
 		,'Lorem ipsum dolor sit amet, consetetur sadipscing elitr\n,  sed diam nonumy eirmod tempor invidunt u': 'valid-element',
-		'Lorem ipsum d\tor s\t amet, c\nsetetur sadipscing elitr\n,  sed ddm nonumdeirmod tempor invidunt u': 'valid-element',
-		'Lorem ipsum ddddor sddd amet, c\nsetetur sadipscing elitr\n,  sed dddm nonumddeirmod tempor invidunt ut': 'invalid-element'
+		'Lorem ipsum d\tor s\t amet, c\nsetetur sadipscing elitr\n,  sed ddm nonumdeirmod tempor invidunt u': 'valid-element'
+		
 	}, function(val, state){
 		$('#maxlength').val(val);
 		if(val == $('#maxlength').val()){
@@ -185,7 +191,9 @@ asyncTest('email, url, pattern, maxlength', function(){
 	
 	if(!omitTests.validity){
 		$.each({
-			'Lorem ittum dolor sit amet, consetetur s\nipscing elit\n,  sed diam nonumy eittod tempor invidunt ut ': 'valid-element'
+			'Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore mag': 'invalid-element', 
+			'Lorem ittum dolor sit amet, consetetur s\nipscing elit\n,  sed diam nonumy eittod tempor invidunt ut ': 'valid-element',
+			'Lorem ipsum ddddor sddd amet, c\nsetetur sadipscing elitr\n,  sed dddm nonumddeirmod tempor invidunt ut': 'invalid-element'
 		}, function(val, state){
 			$('#maxlength').val(val);
 			if(val == $('#maxlength').val()){
@@ -197,7 +205,7 @@ asyncTest('email, url, pattern, maxlength', function(){
 	$('#maxlength').attr('maxlength', 30);
 	
 	$.each({
-		'Lorem ipsum dolor sit amet, con': 'invalid-element', 
+		
 		'Lorem ipsum dolor sit amet, co': 'valid-element'
 	}, function(val, state){
 		
@@ -206,7 +214,17 @@ asyncTest('email, url, pattern, maxlength', function(){
 			ok($('#maxlength').is(':' + state), val.length + ' is ' + state + ' maxlength');
 		}
 	});
-		
+	
+	if(!omitTests.validity){
+		$.each({
+			'Lorem ipsum dolor sit amet, con': 'invalid-element'
+		}, function(val, state){
+			$('#maxlength').val(val);
+			if(val == $('#maxlength').val()){
+				ok($('#maxlength').is(':'+state), val.length+' is '+state+' maxlength');
+			}
+		});
+	}
 	
 	//pattern
 	$('#pattern').val('test');
@@ -277,7 +295,10 @@ asyncTest('checkValidity/invalid event I', function(){
 	$('#form-1').bind('invalid', function(){
 		invalids++;
 	});
-//	alert($('#form-1 select:invalid-element').length)	
+
+	if(omitTests.requiredSelect){
+		$('#select2').attr('disabled', true);
+	}
 	ok(!$('#form-1').checkValidity(), 'validity is false for form-element (form)');
 	equals(invalids, 7, 'there were 7 invalid events (form)');
 	$.webshims.ready('forms DOM', function(){
@@ -309,7 +330,7 @@ asyncTest('checkValidity/invalid event IV', function(){
 	});
 	
 	
-	$.each(['#name', '#email','#email','#field6-1', '#select3', '#select4'], function(i, id){
+	$.each(['#name', '#email','#email','#field6-1', '#select3', '#select4', '#select2'], function(i, id){
 		var elem = $(id);
 		if(elem.attr('type') == 'radio'){
 			elem.attr('checked', true);

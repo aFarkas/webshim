@@ -9,7 +9,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		form
 	;
 	
-	//opera/chrome fix (this will double all invalid events, we have to stop them!)
+	//opera/chrome fix (this will double all invalid events in opera, we have to stop them!)
 	//opera throws a submit-event and then the invalid events,
 	//chrome7/safari5.02 has disabled invalid events, this brings them back
 	//safari 5.02 reports false invalid events, if setCustomValidity was used
@@ -81,6 +81,7 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		//safari 5.0.2/5.0.3 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
 		if(!badWebkit){return;}
 		var checkValidity = function(elem){
+			if(!elem.willValidate){return true;}
 			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
 			if(!valid && elem.checkValidity && elem.checkValidity()){
 				$(elem).trigger('invalid');
@@ -90,9 +91,9 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 		
 		webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'form'], 'checkValidity', {
 			value: function(){
-				if(this.elements || $.nodeName(this, 'fieldset')){
+				if(this.elements){
 					var ret = true;
-					$(this.elements || 'input, textarea, select', this)
+					$(this.elements)
 						.each(function(){
 							 if(!checkValidity(this)){
 								ret = false;

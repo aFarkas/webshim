@@ -141,7 +141,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 				valueAsNumberDescriptor._supset && valueAsNumberDescriptor._supset.call(elem, arguments);
 			}
 		}
-	}, true, 'input-date-number', 'form-number-date');
+	});
 	
 	var valueAsDateDescriptor = webshims.defineNodeNameProperty('input', 'valueAsDate', {
 		get: function(){
@@ -173,7 +173,7 @@ jQuery.webshims.ready('form-extend', function($, webshims, window){
 				return valueAsDateDescriptor._supset && valueAsDateDescriptor._supset(elem, arguments) || null;
 			}
 		}
-	}, true, 'input-date-number', 'form-number-date');
+	});
 	
 	var typeProtos = {
 		

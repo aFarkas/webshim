@@ -47,10 +47,19 @@
 		</script>
 	-->
     <script class="example">
+    	$.webshims.setOptions('forms', { customMessages: true}); 
 		//load all defined
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
-        
+        $(function(){
+			var showHideFormsExt = function(){
+				$('span.forms-ext-feature')[this.checked ? 'show' : 'hide']();
+			};
+			$('#show-forms-ext')
+				.each(showHideFormsExt)
+				.click(showHideFormsExt)
+			;
+		});
     </script>
 	<script src="../demo-js/demo.js"></script>
 	<title>HTML5 form/Web Forms 2.0 widgets and constraint validation API : webshims lib - the polyfilling capability based loading JS libary</title>
@@ -58,13 +67,18 @@
 </head>
 
 <body>
-	<section id="wrapper"> 
 		<header>
 			<hgroup>
 				<h1>Webshims Lib</h1>
 				<h2>Polyfill only the uncapable browsers</h2>
 			</hgroup>
+			<nav>
+				<ul>
+					<li><a href="../index.html">home</a></li>
+				</ul>
+			</nav>
 		</header>
+		<div class="main">
 		<nav>
 			<ul>
 				<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
@@ -75,34 +89,36 @@
 				<li><a href="geolocation.html">geolocation API</a></li>
 			</ul>
 		</nav>
+		<div class="main-box">
 		<section>
 			<h2>Demo/About/Documentation of HTML5 constraint validation API</h2>
 			<p>The <code>forms</code> (constraint validation without number, date etc.) and <code>forms-ext</code> (number, date, range etc.) features of the webshim lib are implementing support for the <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#the-constraint-validation-api">constraint validation API</a>, some input widgets and the placeholder-Attribut.</p>
 			<section>
 				<h3>Implemented/fixed elements, attributes, properties, methods, events</h3>
+				<p><label><input type="checkbox" id="show-forms-ext" checked="checked" /> show/hide <code>forms-ext</code> features</label></p>
 				<ul>
 					<li><strong>elements:</strong> <a href="http://www.w3.org/TR/html5/the-button-element.html#the-output-element">output</a>, <a href="http://www.w3.org/TR/html5/the-button-element.html#the-datalist-element">datalist</a> (currently not for date, number, datetime-local and range type)</li>
-					<li><strong>types</strong>: <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#e-mail-state">email</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#url-state">url</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#local-date-and-time-state">datetime-local</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#date-state">date</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#time-state">time</a>, <a href="http://www.w3.org/TR/html5/number-state.html#number-state">number</a>, <a href="http://www.w3.org/TR/html5/number-state.html#range-state">range</a></li>
-					<li><strong>attributes (and IDL, if existing)</strong>: <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-placeholder">placeholder</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-list">list</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fe-autofocus">autofocus</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-novalidate">novalidate</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-formnovalidate">formnovalidate</a> (currently only save on input[type=submit|button], not on button), <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-required">required</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-pattern">pattern</a>, <a href="http://www.w3.org/TR/html5/the-button-element.html#attr-textarea-maxlength">maxlength</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-step">step</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-max">max</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-min">min</a></li>
-					<li><strong>properties/IDLs</strong>: <a href="http://www.w3.org/TR/html5/the-button-element.html#dom-datalist-options">options</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-selectedoption">selectedOption</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-willvalidate">willValidate</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validity">validity</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validationmessage">validationMessage</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasnumber">valueAsNumber</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasdate">valueAsDate</a></li>
+					<li><strong>types</strong>: <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#e-mail-state">email</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#url-state">url</a><span class="forms-ext-feature">, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#local-date-and-time-state">datetime-local</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#date-state">date</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#time-state">time</a>, <a href="http://www.w3.org/TR/html5/number-state.html#number-state">number</a>, <a href="http://www.w3.org/TR/html5/number-state.html#range-state">range</a></span></li>
+					<li><strong>attributes (and IDL, if existing)</strong>: <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-placeholder">placeholder</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-list">list</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fe-autofocus">autofocus</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-novalidate">novalidate</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-formnovalidate">formnovalidate</a> (currently only save on input[type=submit|button], not on button), <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-required">required</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-pattern">pattern</a>, <a href="http://www.w3.org/TR/html5/the-button-element.html#attr-textarea-maxlength">maxlength</a><span class="forms-ext-feature">, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-step">step</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-max">max</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-min">min</a></span></li>
+					<li><strong>properties/IDLs</strong>: <a href="http://www.w3.org/TR/html5/the-button-element.html#dom-datalist-options">options</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-selectedoption">selectedOption</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-willvalidate">willValidate</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validity">validity</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-validationmessage">validationMessage</a><span class="forms-ext-feature">, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasnumber">valueAsNumber</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#dom-input-valueasdate">valueAsDate</a></span></li>
 					<li><strong>methods</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#dom-cva-setcustomvalidity">setCustomValidity</a>, <a href="http://www.w3.org/TR/html5/forms.html#dom-form-checkvalidity">checkValidity</a></li>
 					<li><strong>events</strong>: <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#constraint-validation">invalid</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#event-input-input">input</a></li>
-					<li><strong>Selectors</strong>: <a href="http://www.w3.org/TR/css3-ui/#pseudo-in-range">:in-range</a>, <a href="http://www.w3.org/TR/css3-ui/#pseudo-out-of-range">:out-of-range</a> (Not for CSS, only for JS, for other selectors like ":required", ":invalid" please look into the abstractions section)</li>
+					<li><strong>Selectors</strong>: <span class="forms-ext-feature"><a href="http://www.w3.org/TR/css3-ui/#pseudo-in-range">:in-range</a>, <a href="http://www.w3.org/TR/css3-ui/#pseudo-out-of-range">:out-of-range</a></span> (Not for CSS, only for JS, for other selectors like ":required", ":invalid" please look into the abstractions section)</li>
 				</ul>
 				
 				
 				<h3>Options for the <code>forms</code> feature</h3>
 				<ul>
 					<li><strong>customMessages</strong> (boolean): <code>false</code> (default) || <code>true</code>. If <code>customMessages</code> is set to true. Webshims Lib will implement a DOM-Property called customValidationMessage, wich can be changed through the $.webshims.validityMessages-Array.</li>
-					<li><strong>overrideMessages</strong> (boolean): <code>false</code> (default) || <code>true</code></li>
+					<li><strong>overrideMessages</strong> (boolean): <code>false</code> (default) || <code>true</code>. Overrides the native messages with the customMessages - using the <code>setCustomValidity</code>-method. This is usefull, if you want to use customMessages with native validation UI. If you want to use custom messages with custom styleable UI. Use the <code>customMessages</code>-option instead.</li>
 					<li><strong>placeholderType</strong> (string): <code>"value"</code> (default) || <code>"over"</code>. If placeholderType is set to "over", the polyfill uses the overLabel technique to create a placeholder and doesn't "polute" the value property.</li>
 				</ul>
 				
-				<h3>Options for the <code>ext-forms</code> feature</h3>
+				<h3>Options for the <code>forms-ext</code> feature</h3>
 				<ul>
-					<li><strong>replaceUI</strong> (boolean): <code>false</code> (default) || <code>true</code>. If replaceUI is set to true</li>
-					<li><strong>slider</strong> (options): </li>
-					<li><strong>datepicker</strong> (options): </li>
+					<li><strong>replaceUI</strong> (boolean): <code>false</code> (default) || <code>true</code>. If replaceUI is set to true the date, datetime and slider Widgets are replaced in all browsers (also in browser, wich have implemented these types). This is usefull, if you want to style the UI in all browsers.</li>
+					<li><strong>slider</strong> (options): <a href="http://jqueryui.com/demos/slider/">jQuery UI Slider-Options</a></li>
+					<li><strong>datepicker</strong> (options): <a href="http://jqueryui.com/demos/datepicker/">jQuery UI Datepicker-Options</a></li>
 				</ul>
 				
 				<h3>Extensions/Abstractions to the standard</h3>
@@ -208,6 +224,13 @@
 							<output id="output2"></output>
 	                    </div>
 						
+						<div class="form-item">
+	                       	<input type="checkbox" required id="checkbox" />
+							<label for="checkbox">
+	                            required checkbox: *
+							</label>
+	                    </div>
+						
 						
 	                    <div>
 	                    	<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
@@ -246,7 +269,6 @@
 				<ul>
 					<li><a href="webforms/1-webforms-lang-custom-bubble.html">add/change custom validation messages (i18n) and style custom validation bubbles</a></li>
 					<li><a href="webforms/3-webforms-widgets.html">configure and style input-widgets (datepicker, range)</a></li>
-					<li><a href="webforms/2-webforms-api.html">playing with the constraint validation api and new properties</a></li>
 					<li><a href="webforms/4-webforms-custom-validity.html">creating custom validation constraints</a></li>
 				</ul>
 			</aside>
@@ -261,11 +283,13 @@
 				</ul>
 			</aside>		
 	</section>
-				
+	</div>
+	</div>
+	<footer>		
 		<small>
 			Note: every shim is a hack! working with native cutting edge technology is also a hack!
 		</small>
-    </section> 
+	</footer>
 <!--[if lte IE 7]>
 	<div class="browser-support"> 			
 		<div class="browser-support-box"> 				

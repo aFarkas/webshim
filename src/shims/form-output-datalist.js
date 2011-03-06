@@ -109,7 +109,7 @@ jQuery.webshims.ready('json-storage dom-extend', function($, webshims, window, d
 			get: function(){
 				return webshims.contentAttr(this, 'value') || $(this).text() || '';
 			}
-		}, true, 'output-props', 'form-output-datalist');
+		});
 		
 		var onInputChange = function(value){
 			var setVal = $.data(this, 'outputShim');
@@ -504,7 +504,7 @@ jQuery.webshims.ready('json-storage dom-extend', function($, webshims, window, d
 				webshims.objectCreate(dataListProto, undefined, {input: elem, id: value});
 			},
 			content: true
-		}, true, 'input-datalist', 'form-output-datalist');
+		});
 		
 		webshims.defineNodeNameProperty('input', 'selectedOption', {
 			get: function(){
@@ -525,7 +525,7 @@ jQuery.webshims.ready('json-storage dom-extend', function($, webshims, window, d
 				});
 				return ret;
 			}
-		}, true, 'input-datalist', 'form-output-datalist');
+		});
 			
 		webshims.defineNodeNameProperty('input', 'autocomplete', {
 			get: function(){
@@ -561,7 +561,7 @@ jQuery.webshims.ready('json-storage dom-extend', function($, webshims, window, d
 				var select = $('select', elem);
 				return (select[0]) ? select[0].options : [];
 			}
-		}, true, 'datalist-props', 'form-output-datalist');
+		});
 		
 		
 		webshims.addReady(function(context, contextElem){

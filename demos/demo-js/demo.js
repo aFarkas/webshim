@@ -1,5 +1,7 @@
 (function($){
-	$(function(){
+	//always load jquery ui
+	$.webshims.loader.loadList(['jquery-ui']);
+	$.webshims.ready('DOM jquery-ui', function(){
 		if(!window.console){
 			window.console = {log: window.alert};
 		}
@@ -11,66 +13,21 @@
 				return false;
 			});
 		});
-		
-		$('div.details').each(function(){
-			var details = $('div.details-block', this).hide();
-			$('button', this)
-				.filter('.details-summary')
-				.attr({'aria-expanded': 'false'})
-				.bind('click', function(){
-					if($.attr(this, 'aria-expanded') == 'true'){
-						details.hide();
-						$.attr(this, 'aria-expanded', 'false');
-						$(this).text( $(this).text().replace('hide', 'show') );
-					} else {
-						details.show();
-						$.attr(this, 'aria-expanded', 'true');
-						$(this).text( $(this).text().replace('show', 'hide') );
-					}
-					return false;
-				})
-			;
-		});
-		
-		
-		var doConsole = function(m){
-			if(typeof m == 'object'){
-				alert(JSON.stringify(m));
-			} else {
-				alert(m);
-			}
-		};
-		$('button.feature').bind('click', function(e){
-			var elem = $(this).attr('data-elem');
-			if(elem){
-				elem = $(elem);
-			} else {
-				elem = $(this).parent().find('input:first');
-			}
-			var val = $(this).attr('data-val');
-			var ret;
-			if(val){
-				val = $(val).val();
-			}
-			e.preventDefault();
-			if($(this).is('.method')){
-				ret = elem[$(this).attr('data-name')](val);
-			} else {
-				ret = elem.attr($(this).attr('data-name'), val);
-			} 
-			if(ret !== elem){
-				if(window.console && console.log){
-					try {
-						console.log(ret);
-					} catch(e){
-						doConsole(ret);
-					}
-				} else {
-					doConsole(ret);
-				}
-			}
-			return false;
-		});
+		var hash = (location.hash || '').replace(/^#/, '');
+		$('div.accordion')
+			.each(function(){
+				var headers = $('h3.button', this);
+				var selected = (hash) ? headers.filter('[id="'+hash+'"]') : 0;
+				if(selected[0]){
+					selected = headers.index(selected[0]);
+				} 
+				$(this).accordion({
+					header: 'h3.button',
+					active: selected,
+					autoHeight: false
+				});
+			})
+		;
 		
 		$('div.feature-example').each(function(){
 			var div = $('div.hidden-explanation', this).hide();

@@ -20,13 +20,18 @@
 </head>
 
 <body>
-	<section id="wrapper"> 
-		<header>
-			<hgroup>
-				<h1>Webshims Lib</h1>
-				<h2>Polyfill only the uncapable browsers</h2>
-			</hgroup>
-		</header>
+	<header>
+		<hgroup>
+			<h1>Webshims Lib</h1>
+			<h2>Polyfill only the uncapable browsers</h2>
+		</hgroup>
+		<nav>
+			<ul>
+				<li><a href="../index.html">home</a></li>
+			</ul>
+		</nav>
+	</header>
+	<div class="main">
 		<nav>
 			<ul>
 				<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
@@ -37,6 +42,7 @@
 				<li><a href="geolocation.html">geolocation API</a></li>
 			</ul>
 		</nav>
+		<div class="main-box">
 		<section>
 			<h2>Demo/About/Documentation ES5</h2>
 			<p>The <code>es5</code> feature of Webshims Lib uses the <a href="http://github.com/kriskowal/es5-shim/">ES5 shim</a> by <a href="http://askawizard.blogspot.com/">Kris Kowal</a> (all object methods, wich can't be used cross-browser are removed.).</p>
@@ -46,7 +52,7 @@
 				<li><strong>Array</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/isArray">isArray</a></li>
 				<li><strong>Array.prototype</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/forEach">forEach</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/map">map</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/filter">filter</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/every">every</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/some">some</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/Reduce">reduce</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/ReduceRight">reduceRight</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/indexOf">indexOf</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/lastIndexOf">lastIndexOf</a></li>
 				<li><strong>Date</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/now">now</a> <!--, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/parse">parse</a> --></li>
-				<li><strong>Date.prototype</strong>: toISOString, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/toJSON">toJSON</a></li>
+				<li><strong>Date.prototype</strong>: <a href="http://msdn.microsoft.com/en-us/library/ff925953%28v=vs.94%29.aspx#Y72">toISOString</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/toJSON">toJSON</a></li>
 				<li><strong>Function.prototype</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind">bind</a></li>
 				<li><strong>String.prototype</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String/Trim">trim</a></li>
 			</ul>
@@ -139,11 +145,13 @@ var myCar = Object.create(carProto, {
 				</ul>
 			</aside>
 		</section>
-				
+	</div>
+	</div>
+	<footer>			
 		<small>
 			Note: every shim is a hack! working with native cutting edge technology is also a hack!
 		</small>
-    </section> 
+	</footer>
 <!--[if lte IE 7]>
 	<div class="browser-support"> 			
 		<div class="browser-support-box"> 				

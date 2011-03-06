@@ -42,23 +42,29 @@
 </head>
 
 <body>
-	<section id="wrapper"> 
-		<header>
-			<hgroup>
-				<h1>Webshims Lib</h1>
-				<h2>Polyfill only the uncapable browsers</h2>
-			</hgroup>
-		</header>
+	<header>
+		<hgroup>
+			<h1>Webshims Lib</h1>
+			<h2>Polyfill only the uncapable browsers</h2>
+		</hgroup>
+		<nav>
+			<ul>
+				<li><a href="../../index.html">home</a></li>
+			</ul>
+		</nav>
+	</header>
+	<div class="main">
 		<nav>
 			<ul>
 				<li><a href="../shiv.html">HTML5 shiv and innerShiv</a></li>
 				<li><a href="../es5.html">ES5/JavaScript 1.8.5</a></li>
-				<li><a href="../webforms.html">constraint validation and input widgets</a></li>
+				<li><a href="../webforms.html" class="active">constraint validation and input widgets</a></li>
 				<li><a href="../canvas.html">canvas</a></li>
 				<li><a href="../json-storage.html">storage and JSON</a></li>
 				<li><a href="../geolocation.html">geolocation API</a></li>
 			</ul>
 		</nav>
+		<div class="main-box">
 		<section>
 			<h2>Documentation adding/changing and using validation messages with webshims constraint validation</h2>
 			<h3>Overriding native validation messages/native validation UI</h3>
@@ -343,11 +349,13 @@ $('form').bind('focusout invalid', function(e){
 </code>	
 	
 	</section>
-				
+	</div>
+</div>
+	<footer>		
 		<small>
 			Note: every shim is a hack! working with native cutting edge technology is also a hack!
 		</small>
-    </section> 
+	</footer>
 <!--[if lte IE 7]>
 	<div class="browser-support"> 			
 		<div class="browser-support-box"> 				

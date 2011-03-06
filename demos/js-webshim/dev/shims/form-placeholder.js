@@ -197,7 +197,7 @@ jQuery.webshims.ready('dom-extend form-core', function($, webshims, window, doc,
 				return webshims.contentAttr(this, 'placeholder') || '';
 			},
 			content: true
-		}, true, true, 'form-placeholder');
+		});
 	});
 			
 	$.each(['input', 'textarea'], function(i, name){

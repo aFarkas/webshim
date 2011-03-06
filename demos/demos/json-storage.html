@@ -20,14 +20,18 @@
 </head>
 
 <body>
-	<section id="wrapper"> 
-		<header>
-			<hgroup>
-				<h1>Webshims Lib</h1>
-				<h2>Polyfill only the uncapable browsers</h2>
-			</hgroup>
-			
-		</header>
+	<header>
+		<hgroup>
+			<h1>Webshims Lib</h1>
+			<h2>Polyfill only the uncapable browsers</h2>
+		</hgroup>
+		<nav>
+			<ul>
+				<li><a href="../index.html">home</a></li>
+			</ul>
+		</nav>
+	</header>
+	<div class="main">
 		<nav>
 			<ul>
 				<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
@@ -38,6 +42,7 @@
 				<li><a href="geolocation.html">geolocation API</a></li>
 			</ul>
 		</nav>
+		<div class="main-box">
 		<section>
 			<h2>Demo/About/Documentation JSON and localStorage/sessionStorage</h2>
 			<p>The <code>json-storage</code> feature implements JSON.<a href="https://developer.mozilla.org/En/Using_native_JSON">parse/stringify</a> via <a href="http://www.json.org/js.html">JSON2 script</a> and <a href="https://developer.mozilla.org/en/DOM/Storage">localStorage/sessinStorage</a>.</p>
@@ -87,11 +92,13 @@ $.webshims.setOptions("json-storage", {
 				</ul>
 			</aside>
 		</section>
-				
+		</div>
+	</div>	
+	<footer>
 		<small>
 			Note: every shim is a hack! working with native cutting edge technology is also a hack!
 		</small>
-    </section> 
+	</footer>
 <!--[if lte IE 7]>
 	<div class="browser-support"> 			
 		<div class="browser-support-box"> 				

@@ -147,13 +147,13 @@ webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'form', 'fields
 			}
 		};
 	})()
-}, true);
+});
 
 webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'fieldset', 'button', 'output'], 'setCustomValidity', {
 	value: function(error){
 		$.data(this, 'customvalidationMessage', ''+error);
 	}
-}, true);
+});
 
 
 $.event.special.invalid = {
@@ -234,7 +234,7 @@ webshims.defineNodeNamesProperty(['input', 'select', 'textarea', 'fieldset', 'bu
 			return !!( elem.form && !elem.disabled && !elem.readOnly && !types[elem.type] && !barredElems[(elem.nodeName || '').toLowerCase()] && $.attr(elem.form, 'novalidate') == null );
 		};
 	})()
-}, true, 'validity-base', 'form-extend');
+});
 
 webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
 	set: function(value){
@@ -242,7 +242,7 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 		elem.setAttribute('aria-required', (value) ? 'true' : 'false');
 	},
 	content: true
-}, true, true, 'form-extend');
+});
 
 ['input', 'select', 'textarea', 'fieldset', 'button', 'output'].forEach(function(nodeName){
 	webshims.defineNodeNameProperty(nodeName, 'validity', {
@@ -278,7 +278,7 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 			elem.setAttribute('aria-invalid',  validityState.valid ? 'false' : 'true');
 			return validityState;
 		}
-	}, true, 'validity-base', 'form-extend');
+	});
 });
 
 var noValidate = function(){

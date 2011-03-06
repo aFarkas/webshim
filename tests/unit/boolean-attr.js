@@ -36,7 +36,7 @@
             init: false
         }], booleanJTest);
 		
-        if ($.webshims.cfg.extendNative) {
+        if (false && $.webshims.cfg.extendNative) {
             QUnit.reset();
             
             $.each([{

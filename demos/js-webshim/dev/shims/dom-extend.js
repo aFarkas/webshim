@@ -5,9 +5,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 	
 	//shortcus
 	var modules = webshims.modules;
-//	var has = Object.prototype.hasOwnProperty;
-//	var unknown = $.webshims.getPrototypeOf(document.createElement('foobar'));
-//	var htcTest;
 	
 	
 	//proxying attribute
@@ -20,7 +17,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		if(!nodeName || elem.nodeType !== 1){return oldAttr(elem, name, value, arg1, arg3);}
 		var desc = extendedProps[nodeName];
 		var ret;
-//		var getSetData;
 						
 		if(desc){
 			desc = desc[name];
@@ -34,22 +30,13 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		
 		// we got a winner
 		if(desc){
-			//getSetData is used for IE8-, to block infinite loops + autointit of DHTML behaviors 
-//			getSetData = $.data(elem, '_polyfillblockProperty') || $.data(elem, '_polyfillblockProperty', {get: {}, set: {}, contentInit: {}});
 			if(value === undefined){
-//				if(getSetData.get[name]){return;}
-//				getSetData.get[name] = true;
-//				getSetData.get[name] = false;
-				return (desc.get) ? desc.get.call(elem) : desc.value;
+				return (desc.get) ? 
+					desc.get.call(elem) : 
+					desc.value
+				;
 			} else if(desc.set) {
-//				if(getSetData.set[name]){return;}
-//				getSetData.set[name] = true;
-//				if(elem.readyState === 'loading' && !getSetData.contentInit && !getSetData.get[name] && desc.get && value === webshims.contentAttr(elem, name)){
-//					getSetData.contentInit = true;
-//					value = desc.get.call(elem);
-//				}
 				ret = desc.set.call(elem, value);
-//				getSetData.set[name] = false;
 			}
 		} else {
 			ret = oldAttr(elem, name, value, arg1, arg3);
@@ -97,33 +84,6 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 	};
 	
 
-/*
- * Native extension feature
- */	
-//	(function(){
-//		var preloadElem = document.createElement('span');
-//		var preloadStyle = preloadElem.style;
-//		var preloaded = {};
-//		
-//		var processPreload = function(preload){
-//			preload.props.forEach(function(htcFile){
-//				if(preloaded[htcFile]){return;}
-//				preloaded[htcFile] = true;
-//				preloadStyle.behavior += ', '+htcFile;
-//				if(preload.feature && preloadElem.readyState != 'complete'){
-//					webshims.waitReady(preload.feature);
-//					$(preloadElem).one('readystatechange', function(){
-//						webshims.unwaitReady(preload.feature);
-//					});
-//				}
-//			});
-//		};
-//		webshims.preloadHTCs = {push: processPreload};
-//	})();
-/*
- * END: Native extension feature
- */
-	
 	var initProp = (function(){
 		
 		var initProps = {};
@@ -162,167 +122,40 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		};
 		
 		var elementExtends = {};
-		var loadedDHTMLFiles = {};
 		return {
-			/*
-			 * Native extension feature
-			 */
-//			extend: function(nodeName, prop, desc){
-//				if(!elementExtends[prop]){
-//					elementExtends[prop] = 0;
-//				}
-//				elementExtends[prop]++;
-//				transformDescriptor(document.createElement(nodeName), prop, desc, '_sup'+ prop + elementExtends[prop]);
-//				createNodeNameInit(nodeName, function(){
-//					transformDescriptor(this, prop, desc, '_sup'+ prop + elementExtends[prop], true);
-//					webshims.defineProperty(this, prop, desc);
-//				});
-//			},
-//			extendDHTML: function(nodeName, htcFile, prop, feature){
-//				webshims.preloadHTCs.push({feature: feature, props: [htcFile]});
-//				if(!loadedDHTMLFiles[nodeName]){
-//					loadedDHTMLFiles[nodeName] = '';
-//				}
-//				if(loadedDHTMLFiles[nodeName].indexOf(htcFile) != -1){return;}
-//				loadedDHTMLFiles[nodeName] += htcFile;
-//				createNodeNameInit(nodeName, function(){
-//					var behavior = this.style.behavior;
-//					this.style.behavior += behavior ? ', '+htcFile : htcFile;
-//				});
-//			},
-			/*
-			 * END: Native extension feature
-			 */
-			init: function(nodeName, prop){
-				
+			content: function(nodeName, prop){
 				createNodeNameInit(nodeName, function(){
-					
 					$(this).filter('['+ prop +']').attr(prop, function(i, val){
 						return val;
+					});
+				});
+			},
+			extendValue: function(nodeName, prop, value){
+				createNodeNameInit(nodeName, function(){
+					$(this).each(function(){
+						var data = $.data(this, '_polyfilledValue') || $.data(this, '_polyfilledValue', {});
+						data[prop] = this[prop];
+						this[prop] = value;
 					});
 				});
 			}
 		};
 	})();
 	
-	/*
-	 * Native extension feature
-	 */
-//	var transformDescriptor = function(proto, prop, desc, elementID, wasExtended){
-//		var oDesc;
-//		
-//		var getSup = function(descriptor, accessType){
-//			if(descriptor && descriptor[accessType]){
-//				return descriptor[accessType];
-//			}
-//			
-//			if(descriptor.value !== undefined){
-//				//if original is a value, but we use an accessor
-//				if(accessType == 'set'){
-//					return(elementID) ? function(val){$.data(proto, elementID).value = val;} : function(val){descriptor.value = val;};
-//				}
-//				if(accessType == 'get'){
-//					return (elementID) ? function(){return $.data(proto, elementID).value;} : function(){return descriptor.value;};
-//				}
-//			}
-//			return function(value){
-//				return webshims.contentAttr(this, prop, value);
-//			};
-//		};
-//		
-//		if(proto && prop){
-//			
-//			while(proto && prop in proto && !has.call(proto, prop)){
-//				proto = webshims.getPrototypeOf(proto);
-//			}
-//			
-//			oDesc = webshims.getOwnPropertyDescriptor(proto, prop) || {configurable: true};
-//			
-//			if(!oDesc.configurable && !oDesc.writeable){return false;}
-//			if(elementID){
-//				$.data(proto, elementID, oDesc);
-//			}
-//			if(!wasExtended){
-//				if(desc.get){
-//					desc._supget = getSup(oDesc, 'get');
-//				}
-//				if(desc.set){
-//					desc._supset = getSup(oDesc, 'set');
-//				}
-//				if(desc.value || oDesc.value !== undefined){
-//					desc._supvalue = oDesc.value;
-//				}
-//			}
-//		}
-//		
-//		if(desc.value === undefined){
-//			if(!desc.set){
-//				desc.set =  desc._supset || (!desc.writeable) ? function(){throw(prop +'is readonly on '+ this.nodeName);} : getSup(desc, 'set');
-//			}
-//			if(!desc.get){
-//				desc.get = desc._supget || getSup(desc, 'get');
-//			}
-//		}
-//		
-//		return true;
-//	};
-//	
-//	var extendContentAttr = (function(){
-//		var extendedAttr = {};
-//		var contentMethods = {};
-//		var slice = Array.prototype.slice;
-//		return function(nodeName, prop, desc){
-//			if(!desc.remove && desc.defaultValue !== undefined && desc.set){
-//				desc.remove = function(){
-//					return desc.set.call(this, desc.defaultValue);
-//				};
-//			}
-//			if(!extendedAttr[nodeName]){
-//				var attrDesc = {};
-//				extendedAttr[nodeName] = {};
-//				contentMethods[nodeName] = {};
-//				['set', 'get', 'remove'].forEach(function(type){
-//					attrDesc[type] = webshims.defineNodeNameProperty(nodeName, type+'Attribute', {
-//						value: function(name){
-//							if(extendedAttr[nodeName][name] && extendedAttr[nodeName][name][type]){
-//								var args = slice.call(arguments, 1);
-//								return extendedAttr[nodeName][name][type].apply(this, args);
-//							}
-//							return attrDesc[type]._supvalue.apply(this, arguments);
-//						}
-//					}, true);
-//					
-//					contentMethods[nodeName][type] = attrDesc[type]._supvalue;
-//				});
-//				desc.content = contentMethods[nodeName];
-//			} else {
-//				desc.content = contentMethods[nodeName];
-//			}
-//			extendedAttr[nodeName][prop] = desc;
-//		};
-//	})();
-	/*
-	 * END: Native extension feature
-	 */
+	var extendNativeValue = function(nodeName, prop, desc){
+		desc._supvalue = function(){
+			var data = $.data(this, '_polyfilledValue');
+			if(data && data[prop].apply){
+				return data[prop].apply(this, arguments);
+			}
+			return data && data[prop];
+		};
+		initProp.extendValue(nodeName, prop, desc.value);
+	};
+	
 	
 	$.extend(webshims, {
-		/*
-		 * Native extension feature
-		 */
-//		waitReady: function(name){
-//			webshims.waitReadys[name] = webshims.waitReadys[name] || 0;
-//			webshims.waitReadys[name]++;
-//		},
-//		unwaitReady: function(name){
-//			webshims.waitReadys[name] = webshims.waitReadys[name] || 1;
-//			webshims.waitReadys[name]--;
-//			if(webshims.waitReadys[name+'ReadyCall'] && !webshims.waitReadys[name]){
-//				webshims.isReady(name, true);
-//			}
-//		},
-		/*
-		 * END: Native extension feature
-		 */
+
 		getID: (function(){
 			var ID = new Date().getTime();
 			return function(elem){
@@ -336,123 +169,30 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				return id;
 			};
 		})(),
-		defineNodeNameProperty: function(nodeName, prop, desc, extend, htc, feature){
+		defineNodeNameProperty: function(nodeName, prop, desc){
 			desc = $.extend({writeable: true, idl: true}, desc);
 			
-			
-			/*
-			 * Native extension feature
-			 */
-			var extendedNative = false;
-			var htcHandled;
-//			var oDesc;
-//			
-//			if(webshims.cfg.extendNative && extend){
-//				(function(){
-//					if(desc.content && prop == 'placeholder'){
-//						extendContentAttr(nodeName, prop, desc);
-//					}
-//					var element = document.createElement(nodeName);
-//					if(support.objectAccessor && support.contentAttr && unknown){
-//						//ToDo extend property on all elements
-//						
-//						var proto  = webshims.getPrototypeOf(element);
-//						
-//						//extend property on unknown elements
-//						if(unknown === proto){
-//							initProp.extend(nodeName, prop, desc);
-//							extendedNative = true;
-//							return;
-//						}
-//						
-//						//extend unknown property on known elements prototype
-//						if(!(prop in element)){
-//							transformDescriptor(false, false, desc);
-//							webshims.defineProperty(proto, prop, desc);
-//							extendedNative = true;
-//							return;
-//						}
-//						//extend known property on element itself
-//						if(has.call(element, prop)){
-//							oDesc = webshims.getOwnPropertyDescriptor(element, prop);
-//							
-//							//abort can not extend native!
-//							if(!oDesc.configurable){return;}
-//							
-//							initProp.extend(nodeName, prop, desc);
-//							extendedNative = true;
-//							return;
-//						}
-//						
-//						//abort can not extend native!
-//						if(!transformDescriptor(proto, prop, desc)){return;}
-//						//extend known property on known elements prototype
-//						webshims.defineProperty(proto, prop, desc);
-//						extendedNative = true;
-//						return;
-//					} else if(desc.value !== undefined){
-//						initProp.extend(nodeName, prop, desc);
-//						extendedNative = true;
-//						return;
-//					} 
-//					if(htc && support.dhtmlBehavior && !(prop in element)){
-//						extendedNative = true;
-//						htcHandled = true;
-//						extendQAttr(nodeName, prop, desc);
-//						initProp.extendDHTML(nodeName, 'url('+webshims.loader.makePath( 'htc/'+ (typeof htc == 'string' ? htc : prop) +'.htc') +')' , prop, feature);
-//						return;
-//					}
-//				})();
-//			}
-			/*
-			 * END: Native extension feature
-			 */
-			if(!extendedNative){
-				if(extend && webshims.cfg.extendNative){
-					webshims.log("could not extend "+ nodeName +"["+ prop +"] fallback to jQuery extend");
-				}
+			if(false && webshims.cfg.extendNative && desc.value && $.isFunction(desc.value)){
+				extendNativeValue(nodeName, prop, desc);
+			} else {
 				extendQAttr(nodeName, prop, desc);
 			}
-			/*
-			 * Native extension feature
-			 */
-//			if(!htcTest && webshims.debug && extend && webshims.cfg.extendNative && htc){
-//				htcTest = true;
-//				$.ajax({
-//					url: webshims.loader.makePath( 'htc/'+ (typeof htc == 'string' ? htc : prop) +'.htc'),
-//					complete: function(xhr){
-//						if(xhr.getResponseHeader){
-//							var type = xhr.getResponseHeader('Content-Type') || '';
-//							if(type != 'text/x-component'){
-//								webshims.warn('content-type of htc-files should be "text/x-component", but was "'+ type +'"');
-//								webshims.info('you should also let the client cache htc-files. use a proper expire header for htc-files');
-//							}
-//							if(type.indexOf('text/') !== 0){
-//								webshims.warn('Error: content-type of htc-files is not text, this can not work in IE');
-//							}
-//						}
-//					}
-//				});
-//			}
-			/*
-			 * END: Native extension feature
-			 */
-			if(desc.init){
-				webshims.warn('Error: '+ nodeName +'['+ prop +'] uses desc.init');
-			}
-			if((desc.content && !htcHandled) || desc.init){
-				initProp.init(nodeName, prop);
+			
+			
+			if(desc.content){
+				initProp.content(nodeName, prop);
 			}
 			return desc;
 		},
-		defineNodeNamesProperty: function(names, prop, desc, extend, htc, feature){
+		defineNodeNamesProperty: function(names, prop, desc){
 			if(typeof names == 'string'){
 				names = names.split(/\s*,\s*/);
 			}
-			
+			var retDesc = {};
 			names.forEach(function(nodeName){
-				webshims.defineNodeNameProperty(nodeName, prop, desc, extend, htc, feature);
+				retDesc[nodeName] = webshims.defineNodeNameProperty(nodeName, prop, desc);
 			});
+			return retDesc;
 		},
 		defineNodeNameProperties: function(name, descs){
 			for(var prop in descs){
@@ -464,10 +204,12 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 			if(typeof names == 'string'){
 				names = names.split(/\s*,\s*/);
 			}
+			var retDesc = {};
 			names.forEach(function(nodeName){
 				var desc = $.extend({}, descs);
-				webshims.defineNodeNameProperties(nodeName, desc);
+				retDesc[nodeName] = webshims.defineNodeNameProperties(nodeName, desc);
 			});
+			return retDesc;
 		},
 //		createElement: function(nodeName, create, descs){
 //			
@@ -492,7 +234,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				}
 				
 				if(desc.content){
-					initProp.init(name, prop);
+					initProp.content(name, prop);
 				}
 			});
 		},

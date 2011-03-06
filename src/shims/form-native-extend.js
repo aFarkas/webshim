@@ -153,7 +153,7 @@ jQuery.webshims.ready('form-core form-message dom-extend', function($, webshims,
 				},
 				set: $.noop
 				
-			}, true);
+			});
 		});
 							
 		$.fn.val = function(val){

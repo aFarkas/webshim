@@ -138,7 +138,7 @@ jQuery.webshims.ready('form-core dom-extend', function($, webshims, window, doc,
 					return message || '';
 				},
 				set: $.noop
-			}, (messageProp == 'validationMessage'), 'validity-base', 'form-message');
+			});
 		});
 		
 	});

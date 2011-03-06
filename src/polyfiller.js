@@ -101,17 +101,21 @@
 	
 	$.extend($.webshims, {
 		
-		version: '1.5.0RC1',
+		version: '1.5.0RC2',
 		cfg: {
 			useImportantStyles: true,
 			removeFOUC: true,
-			waitReady: true
-			//,extendNative: false
+			waitReady: true,
+			extendNative: false
 		},
 		/*
 		 * some data
 		 */
 		modules: {}, features: {}, featureList: [],
+		profiles: {
+			lightweight: ['es5', 'canvas', 'geolocation', 'forms', 'json-storage'],
+			xlightweight: ['es5', 'canvas', 'geolocation', 'json-storage']
+		},
 		setOptions: function(name, opts){
 			if(typeof name == 'string' && opts !== undefined && webCFG[name]){
 				if(typeof opts != 'object'){
@@ -171,7 +175,7 @@
 						$('html').addClass('long-loading-polyfills');
 					}, 600);
 				} else {
-					webshims.info('You should call $.webshims.polyfill before DOM-Ready');
+					webshims.warn('You should call $.webshims.polyfill before DOM-Ready');
 				}
 				onReady(features, removeLoader);
 				if(webshims.cfg.useImportantStyles){
@@ -196,7 +200,7 @@
 					features = webshims.light;
 				}
 				if (typeof features == 'string') {
-					features = features.split(' ');
+					features = webshims.profiles[features] || features.split(' ');
 				}
 				
 				
@@ -372,8 +376,13 @@
 					}
 					var module = modules[name];
 					var cfg = webshims.cfg[module.feature || name] || {};
+					var supported;
 					if(module){
-						if (module.test === true || (module.test && $.isFunction(module.test) && module.test(list))) {
+						supported = (module.test && $.isFunction(module.test)) ?
+							module.test(list) :
+							module.test
+						;
+						if (supported) {
 							isReady(name, true);
 							return true;
 						}  else {
@@ -539,6 +548,7 @@
 	var modules = webshims.modules;
 	var loader = webshims.loader;
 	var addModule = loader.addModule;
+	var importantLogs = {warn: 1, error: 1};
 	var xhrPreloadOption = {
 		cache: true, 
 		dataType: 'text', 
@@ -550,7 +560,7 @@
 	
 	$.each(['log', 'error', 'warn', 'info'], function(i, fn){
 		webshims[fn] = function(message){
-			if(webshims.debug && window.console && console.log){
+			if((importantLogs[fn] || webshims.debug) && window.console && console.log){
 				return console[(console[fn]) ? fn : 'log'](message);
 			}
 		};
@@ -972,8 +982,5 @@
 	});
 	
 	/* END: json + loacalStorage */
-	//predefined list without input type number/date/time etc.
-//	webshims.xlight = ['es5', 'geolocation', 'forms', 'json-storage'];
-	webshims.light = ['es5', 'canvas', 'geolocation', 'forms', 'json-storage'];
 	
 })(jQuery, this, this.document);

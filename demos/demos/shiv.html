@@ -20,14 +20,18 @@
 </head>
 
 <body>
-	<section id="wrapper"> 
-		<header>
-			<hgroup>
-				<h1>Webshims Lib</h1>
-				<h2>Polyfill only the uncapable browsers</h2>
-			</hgroup>
-		</header>
-	
+	<header>
+		<hgroup>
+			<h1>Webshims Lib</h1>
+			<h2>Polyfill only the uncapable browsers</h2>
+		</hgroup>
+		<nav>
+			<ul>
+				<li><a href="../index.html">home</a></li>
+			</ul>
+		</nav>
+	</header>
+	<div class="main">
 		<nav>
 			<ul>
 				<li><strong>HTML5 shiv and innerShiv</strong></li>
@@ -38,6 +42,7 @@
 				<li><a href="geolocation.html">geolocation API</a></li>
 			</ul>
 		</nav>
+		<div class="main-box">
 		<section>
 			<h2>Demo/About/Documentation HTML5 shiv</h2>
 			<p>IE8- isn't capable of rendering HTML5 elements. Webshims lib automatically fixes this issue.</p>
@@ -56,11 +61,14 @@ $('#my-id').appendWebshim('&lt;section&gt;&lt;form action="#"&gt;&lt;input type=
 				</ul>
 			</aside>
 		</section>
-				
+		</div>
+	</div>
+	<footer>	
 		<small>
 			Note: every shim is a hack! working with native cutting edge technology is also a hack!
 		</small>
-    </section> 
+	</footer>
+   
 <!--[if lte IE 7]>
 	<div class="browser-support"> 			
 		<div class="browser-support-box"> 				
