@@ -808,7 +808,7 @@
 						//assume, that the user has flash10+
 						src = flashCanvas.swfPath + 'flash10canvas.swf';
 					}
-					//implement cachbuster for flashcanvas
+					//todo: implement cachbuster for flashcanvas
 //					if(webCFG.addCacheBuster){
 //						src += webCFG.addCacheBuster;
 //					}
