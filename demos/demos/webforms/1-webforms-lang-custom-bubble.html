@@ -23,7 +23,7 @@
 		}
 	</style>
 	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
 	<script src="../../js-webshim/minified/extras/mousepress.js"></script>
 	<script src="../../js-webshim/minified/extras/modernizr-1.7.min.js"></script>
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
@@ -220,8 +220,8 @@ $(function(){
 			<h4>Overriding global validation messages on a specific element</h4>
 			<p>You can also set the attribute 'x-moz-errormessage' or 'data-errormessage' to override the global messages.</p>
 <code class="block">
-	&lt;label for="name"&gt;Name:&lt;/label&gt;
-	&lt;input id="name" required data-errormessage="Please tell us your Name" /&gt;
+&lt;label for="name"&gt;Name:&lt;/label&gt;
+&lt;input id="name" required data-errormessage="Please tell us your Name" /&gt;
 </code>
 			<section>
 				<h3>Simple Demo</h3>
@@ -323,13 +323,13 @@ $(function(){
 			
 			<h3>Now add some extras:</h3>
 			<p>Add valid/invalid Classes on focusout.</p>
-<code class="block run-once">	
+<code class="block">	
 //on focusout / blur
 $('form').bind('focusout invalid', function(e){
 	// get target element
 	var $elem = $(e.target);
 	//if the element is a candidate for constraint
-	if($elem.attr('willValidate')){
+	if($elem.attr('willValidate') && $elem.attr('type') !== 'submit'){
 		//test wether it is valid and set/remove the classes
 		if(e.type !== 'invalid' && $elem.is(':valid-element')){
 			$elem

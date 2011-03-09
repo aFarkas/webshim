@@ -49,15 +49,15 @@ hgroup {
 
 h2 {
 	margin: 20px 0;
-	font-size: 180%;
+	font-size: 28px;
 }
 h3 {
-	margin: 15px 0;
-	font-size: 140%;
+	margin: 15px 0 10px;
+	font-size: 22px;
 }
 h4 {
-	margin: 10px 0;
-	font-size: 120%;
+	margin: 10px 0 5px;
+	font-size: 18px;
 }
 hgroup :first-child {
 	font-family: Times, serif;
@@ -67,16 +67,16 @@ hgroup :not(:first-child) {
 	margin-top: 4px;
 }
 hgroup h2:first-child {
-	font-size: 273%;
+	font-size: 40px;
 }
 hgroup h3:not(:first-child) {
-	font-size: 87.5%;
+	font-size: 15px;
 }
 p {
-	margin: 10px 0;
+	margin: 15px 0;
 }
 ul, ol {
-	margin: 10px 0 10px 15px;
+	margin: 15px 0 15px 30px;
 }
 li {
 	margin: 1px 0;
@@ -93,11 +93,12 @@ code.block {
 	display: block;
 	white-space: pre;
 	padding: 10px;
-	margin: 10px 0;
+	margin: 12px 0;
 	overflow-x: auto;
 	-moz-border-radius: 10px;
 	border-radius: 10px;
 	background: #F2F2F2;
+	font-size: 14px;
 }
 a:hover,
 a:focus,
@@ -152,7 +153,7 @@ option {
 	clear: both;
 }
 body {
-	font: 62.5% Times, serif;
+	font: 16px/1.25 Times, Georgia, serif;
 }
 @media only all and (min-width: 920px) {
 	body {
@@ -165,7 +166,7 @@ body {
 	top: 0;
 	left: 0;
 	width: 100%;
-	font-size: 190%;
+	font-size: 19px;
 	font-family: Arial, sans-serif;
 	background: #ffd;
 	text-align: center;
@@ -179,7 +180,7 @@ div.main {
 	position: relative;
 	width: 940px;
 	margin: 40px auto;
-	font-size: 160%;
+	font-size: 16px;
 }
 div.main > nav {
 	position: absolute;
@@ -233,12 +234,12 @@ body > header > hgroup {
 	text-transform: uppercase;
 }
 body > header h1 {
-	font-size: 600%;
+	font-size: 60px;
 	text-shadow: 6px 4px 1px rgba(99, 99, 99, 0.8);
 }
 body > header h2 {
 	margin: 0;
-	font: 160% arial, helvetica, sans-serif;
+	font: 18px arial, helvetica, sans-serif;
 }
 body > header nav {
 	background: #343742;
@@ -261,7 +262,7 @@ body > header nav a {
 	display: block;
 	color: #fff;
 	font-weight: bold;
-	font-size: 160%;
+	font-size: 16px;
 	padding: 14px 5px 10px 0;
 }
 body > footer {
@@ -274,7 +275,7 @@ body > footer small {
 	display: block;
 	margin: auto;
 	width: 940px;
-	font-size: 180%;
+	font-size: 18px;
 }
 .home-box {
 	display: inline-block;
@@ -283,7 +284,7 @@ body > footer small {
 	width: 430px;
 }
 .about-box {
-	font-size: 140%;
+	font-size: 22px;
 	text-align: center;
 	width: 480px;
 }
@@ -330,6 +331,7 @@ a.download-button {
 	margin: 0 0 3px;
 	color: #00C6FF;
 	font-family: Arial, Helvetica, sans-serif;
+	font-size: 18px;
 }
 .feature-example {
 	width: 410px;
@@ -342,7 +344,7 @@ a.download-button {
 	border-radius: 10px;
 }
 .feature-example code {
-	font-size: 95%;
+	font-size: 13px;
 }
 .feature-example code input {
 	width: 50px;
@@ -393,7 +395,7 @@ a.download-button {
 	padding: 10px;
 	background: #00C6FF;
 	color: #fff;
-	font-size: 80%;
+	font-size: 18px;
 	-moz-border-radius: 10px;
 	border-radius: 10px;
 	text-align: center;

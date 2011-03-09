@@ -104,7 +104,7 @@
 		version: 'pre1.5.0final',
 		cfg: {
 			useImportantStyles: true,
-			removeFOUC: true,
+			removeFOUC: false,
 			waitReady: true,
 			extendNative: false,
 			addCacheBuster: false

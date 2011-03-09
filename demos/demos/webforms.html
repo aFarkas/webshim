@@ -35,7 +35,7 @@
 		
 	</style>
 	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-1.7.min.js"></script>
 	<script src="../js-webshim/minified/extras/mousepress.js"></script>
 	
@@ -265,12 +265,86 @@
 			</section>
 			
 			<aside>
-				<h3>How to (Customized Demos):</h3>
-				<ul>
-					<li><a href="webforms/1-webforms-lang-custom-bubble.html">add/change custom validation messages (i18n) and style custom validation bubbles</a></li>
-					<li><a href="webforms/3-webforms-widgets.html">configure and style input-widgets (datepicker, range)</a></li>
-					<li><a href="webforms/4-webforms-custom-validity.html">creating custom validation constraints</a></li>
-				</ul>
+				<hgroup>
+					<h2>How to...</h2>
+					<h3>Customized Demos / Code Snippets / Tutorials</h3>
+				</hgroup>
+				<div class="accordion">
+					<h3 id="custom-error" class="button">... create custom stylable error messages</h3>
+					<div class="panel">
+						<p>Creating custom stylable error messages is simple:</p>
+						
+<code class="block run-once">
+//bind to the first invalid element in a form
+$('form').bind('firstinvalid', function(e){ 
+	//show the invalid alert for first invalid element
+	$.webshims.validityAlert.showFor( e.target ); 
+	//prevent browser from showing native validation message 
+	return false; 
+});
+</code>
+						<p>Using custom messages instead of native browser messages is also easy. Simply implement the customValidationMessage attribute and use it.</p>
+
+<code class="block">
+//configure webshims to implement new customValidationMessage attribute
+//$.webshims.setOptions('forms', {
+//	customMessages: true
+//});
+
+//load all polyfill features
+//$.webshims.polyfill();
+
+//wait for DOM-Ready
+$(function(){
+	//bind to the first invalid element in a form
+	$('form').bind('firstinvalid', function(e){ 
+		//show the invalid alert for first invalid element and pass the custom validation message 
+		$.webshims.validityAlert.showFor( e.target, $(e.target).attr('customValidationMessage') ); 
+		//prevent browser from showing native validation message 
+		return false; 
+	});
+});
+</code>
+						<p>or use the content attribute API</p>
+<code class="block">
+&lt;label for="name"&gt;Name:&lt;/label&gt;
+&lt;input id="name" required data-errormessage="Please tell us your Name" /&gt;
+&lt;!-- or --&gt;
+&lt;label for="name"&gt;Name:&lt;/label&gt;
+&lt;input id="name" required -x-moz-errormessage="Please tell us your Name" /&gt;
+</code>
+						<p>More information about <a href="webforms/1-webforms-lang-custom-bubble.html">custom error messages/custom error bubbles</a> (also explains how to change the built-in text).</p>
+					</div>
+					<h3 id="custom-widget" class="button">... create/configure custom stylable slider/date widgets in all browser</h3>
+					<div class="panel">
+						<p>Simply change some configuration and you are ready.</p>
+<code class="block">
+configure webshims to use JS-Widgets instead of native widgets
+$.webshims.setOptions('forms-ext', {
+	replaceUI: true
+});
+</code>
+						<p>More information about <a href="webforms/3-webforms-widgets.html">custom error messages/custom error bubbles</a>.</p>
+					</div>
+					<h3 id="custom-widget" class="button">... create custom validation rules</h3>
+					<div class="panel">
+						<p>There are several solution. You can try to use the <code>pattern attribute...</code></p>
+<code class="block">
+&lt;input pattern="[0-9][A-Z]{3}" title="A part number is a digit followed by three uppercase letters." /&gt;
+</code>
+						<p>... and for more complex constraint simply use the <code>setCustomValidity</code>-method:</p>
+<code class="block">
+	var testValidity = function(){
+		if( hasError ) {
+			$(this).setCustomValidity('This field has an error');
+		} else {
+			$(this).setCustomValidity('');
+		}
+	};
+</code>
+						<p>More information about <a href="webforms/4-webforms-custom-validity.html">custom validation constraints</a>.</p>
+					</div>
+				</div>
 			</aside>
 			<aside>
 				<h3>Links about Webforms</h3>
