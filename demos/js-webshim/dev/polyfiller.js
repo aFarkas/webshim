@@ -819,30 +819,16 @@
 				}
 			},
 			afterLoad: function(){
-				
 				webshims.ready('dom-extend', function($, webshims, window, doc){
-					webshims.defineNodeNameProperty('canvas', 'getContext', {
-						value: function(ctxName){
-							if(!this.getContext){
-								G_vmlCanvasManager.initElement(this);
-							}
-							return this.getContext(ctxName);
-						}
-					});
 					webshims.addReady(function(context, elem){
-						
 						$('canvas', context).add(elem.filter('canvas')).each(function(){
 							var hasContext = this.getContext;
 							if(!hasContext){
 								G_vmlCanvasManager.initElement(this);
-							} else if(context === doc && hasContext){
-								return false;
 							}
 						});
-						if(doc === context){
-							isReady('canvas', true);
-						}
 					});
+					isReady('canvas', true);
 				});
 			},
 			methodNames: ['getContext'],
