@@ -102,6 +102,10 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 			
 			$.each(initProps, function(name, fns){
 				getElementsByName(name);
+				if(!fns || !fns.forEach){
+					webshims.warn('Error: with '+ name +'-property. methods: '+ fns);
+					return;
+				}
 				fns.forEach(function(fn){
 					nodeNameCache[name].each(fn);
 				});

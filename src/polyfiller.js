@@ -92,8 +92,8 @@
 		}
 		
 		Modernizr.ES5 = (Modernizr.ES5base && Modernizr.ES5extras && Modernizr.advancedObjectProperties);
-		Modernizr.objectAccessor = !!( Modernizr.advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__));
-		Modernizr.domAccessor = !!( Modernizr.objectAccessor ||  (Object.defineProperty && Object.getOwnPropertyDescriptor));
+		Modernizr.objectAccessor = !!( (Modernizr.advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)) && (!$.browser.opera || browserVersion >= 11) );
+		Modernizr.domAccessor = !!( Modernizr.objectAccessor || (Object.defineProperty && Object.getOwnPropertyDescriptor));
 	})();
 	
 	
