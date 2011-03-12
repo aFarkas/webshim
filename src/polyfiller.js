@@ -101,7 +101,7 @@
 	
 	$.extend($.webshims, {
 		
-		version: 'pre1.5.0rc4',
+		version: '1.5.0rc4',
 		cfg: {
 			useImportantStyles: true,
 			removeFOUC: false,
