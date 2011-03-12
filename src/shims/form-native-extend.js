@@ -61,7 +61,6 @@ jQuery.webshims.ready('form-core form-message dom-extend', function($, webshims,
 				if(!Modernizr.validationmessage){
 					$.data(this, 'customvalidationMessage', error);
 				}
-				console.log('"'+error+'"')
 				if(overrideValidity){
 					$.data(this, 'hasCustomError', !!(error));
 					testValidity(this);
