@@ -43,7 +43,9 @@
 	
 	<script>
 		
-		$.webshims.modules.inputUI.options.replaceNative = true;
+		$.webshims.setOptions('forms-ext', {
+			replaceUI: true
+		});
 		
 		$.webshims.modules['input-widgets'].src = '../../tests/test-ext/input-widgets.js';
 		/* load modules seperate and in reverse order to create race conditions */
