@@ -62,7 +62,7 @@
 		});
     </script>
 	<script src="../demo-js/demo.js"></script>
-	<title>HTML5 form/Web Forms 2.0 widgets and constraint validation API : webshims lib - the polyfilling capability based loading JS libary</title>
+	<title>HTML5 forms/Web Forms 2.0 widgets and constraint validation API : webshims lib - the polyfilling capability based loading JS libary</title>
 	    
 </head>
 
@@ -91,7 +91,10 @@
 		</nav>
 		<div class="main-box">
 		<section>
-			<h2>Demo/About/Documentation of HTML5 constraint validation API</h2>
+			<hgroup>
+				<h2>HTML5 forms</h2>
+				<h3>Demo/About/Documentation of HTML5 constraint validation API</h3>
+			</hgroup>
 			<p>The <code>forms</code> (constraint validation without number, date etc.) and <code>forms-ext</code> (number, date, range etc.) features of the webshim lib are implementing support for the <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#the-constraint-validation-api">constraint validation API</a>, some input widgets and the placeholder-Attribut.</p>
 			<section>
 				<h3>Implemented/fixed elements, attributes, properties, methods, events</h3>
@@ -109,25 +112,25 @@
 				
 				<h3>Options for the <code>forms</code> feature</h3>
 				<ul>
-					<li><strong>customMessages</strong> (boolean): <code>false</code> (default) || <code>true</code>. If <code>customMessages</code> is set to true. Webshims Lib will implement a DOM-Property called customValidationMessage, wich can be changed through the $.webshims.validityMessages-Array.</li>
+					<li><strong>customMessages</strong> (boolean): <code>false</code> (default) || <code>true</code>. If <code>customMessages</code> is set to true. Webshims Lib will implement a DOM-Property called customValidationMessage, which can be changed through the $.webshims.validityMessages-Array.</li>
 					<li><strong>overrideMessages</strong> (boolean): <code>false</code> (default) || <code>true</code>. Overrides the native messages with the customMessages - using the <code>setCustomValidity</code>-method. This is usefull, if you want to use customMessages with native validation UI. If you want to use custom messages with custom styleable UI. Use the <code>customMessages</code>-option instead.</li>
 					<li><strong>placeholderType</strong> (string): <code>"value"</code> (default) || <code>"over"</code>. If placeholderType is set to "over", the polyfill uses the overLabel technique to create a placeholder and doesn't "polute" the value property.</li>
 				</ul>
 				
 				<h3>Options for the <code>forms-ext</code> feature</h3>
 				<ul>
-					<li><strong>replaceUI</strong> (boolean): <code>false</code> (default) || <code>true</code>. If replaceUI is set to true the date, datetime and slider Widgets are replaced in all browsers (also in browser, wich have implemented these types). This is usefull, if you want to style the UI in all browsers.</li>
+					<li><strong>replaceUI</strong> (boolean): <code>false</code> (default) || <code>true</code>. If replaceUI is set to true the date, datetime and slider Widgets are replaced in all browsers (also in browser, which have implemented these types). This is usefull, if you want to style the UI in all browsers.</li>
 					<li><strong>slider</strong> (options): <a href="http://jqueryui.com/demos/slider/">jQuery UI Slider-Options</a></li>
 					<li><strong>datepicker</strong> (options): <a href="http://jqueryui.com/demos/datepicker/">jQuery UI Datepicker-Options</a></li>
 				</ul>
 				
 				<h3>Extensions/Abstractions to the standard</h3>
 				<ul>
-					<li><strong>event: firstinvalid</strong>: <code>firstinvalid</code> is a simple, bubbling event, wich is triggered on the first invalid form element. Preventing the default of firstinvalid will automatically prevent the default behavior of all current invalid elements.</li>
-					<li><strong>event: lastinvalid</strong>: <code>lastinvalid</code> is an extended, bubbling, (but) uncancelable event, wich is triggered on the last invalid form element. The property <code>invalidlist</code> is a jQuery-collection of all current invalid elements.</li>
-					<li><strong>selectors for CSS/JS: .form-ui-valid/.form-ui-invalid</strong>: wich work similiar to -moz-ui-valid/-moz-ui-invalid</li>
+					<li><strong>event: firstinvalid</strong>: <code>firstinvalid</code> is a simple, bubbling event, which is triggered on the first invalid form element. Preventing the default of firstinvalid will automatically prevent the default behavior of all current invalid elements.</li>
+					<li><strong>event: lastinvalid</strong>: <code>lastinvalid</code> is an extended, bubbling, (but) uncancelable event, which is triggered on the last invalid form element. The property <code>invalidlist</code> is a jQuery-collection of all current invalid elements.</li>
+					<li><strong>selectors for CSS/JS: .form-ui-valid/.form-ui-invalid</strong>: which work similiar to -moz-ui-valid/-moz-ui-invalid</li>
 					<li><strong>selectors for JS</strong>: <a href="http://www.w3.org/TR/css3-ui/#pseudo-invalid">:invalid-element</a>, <a href="http://www.w3.org/TR/css3-ui/#pseudo-valid">:valid-element</a>, <a href="http://www.w3.org/TR/css3-ui/#pseudo-required">:required-element</a>, <a href="http://www.w3.org/TR/css3-ui/#pseudo-optional">:optional-element</a></li>
-					<li><strong>property: customValidationMessage</strong>: very similiar to the standard validationMessage, but always uses built-in custom validation messages, wich can be better controlled. <strong>Note: You have to either set <code>customMessages</code> to true or <code>overrideMessages</code> to true, before calling the <code>polyfill</code> method, to get this new property.</strong></li>
+					<li><strong>property: customValidationMessage</strong>: very similiar to the standard validationMessage, but always uses built-in custom validation messages, which can be better controlled. <strong>Note: You have to either set <code>customMessages</code> to true or <code>overrideMessages</code> to true, before calling the <code>polyfill</code> method, to get this new property.</strong></li>
 					<li><strong>helper: $.webshims.validityAlert.showFor</strong>: takes a DOM-Object/Selector/jQuery-Object and shows the invalid message for this element. (simply look into the prototype i.e. <code>console.log($.webshims.validityAlert)</code> to make changes)</li>
 				</ul>
 								

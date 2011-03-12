@@ -142,16 +142,34 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		};
 	})();
 	
-	var extendNativeValue = function(nodeName, prop, desc){
-		desc._supvalue = function(){
-			var data = $.data(this, '_polyfilledValue');
-			if(data && data[prop].apply){
-				return data[prop].apply(this, arguments);
+	var extendNativeValue = (function(){
+		var UNKNOWN = webshims.getPrototypeOf(document.createElement('foobar'));
+		var has = Object.prototype.hasOwnProperty;
+		return function(nodeName, prop, desc){
+			var elem = document.createElement(nodeName);
+			var elemProto = webshims.getPrototypeOf(elem);
+			if( elemProto && UNKNOWN !== elemProto && ( !elem[prop] || !has.call(elem, prop) ) ){
+				var sup = elem[prop];
+				desc._supvalue = function(){
+					if(sup && sup.apply){
+						return sup.apply(this, arguments);
+					}
+					return sup;
+				};
+				elemProto[prop] = desc.value;
+			} else {
+				desc._supvalue = function(){
+					var data = $.data(this, '_polyfilledValue');
+					if(data && data[prop] && data[prop].apply){
+						return data[prop].apply(this, arguments);
+					}
+					return data && data[prop];
+				};
+				initProp.extendValue(nodeName, prop, desc.value);
 			}
-			return data && data[prop];
+			desc.value._supvalue = desc._supvalue;
 		};
-		initProp.extendValue(nodeName, prop, desc.value);
-	};
+	})();
 	
 	
 	$.extend(webshims, {
@@ -172,7 +190,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		defineNodeNameProperty: function(nodeName, prop, desc){
 			desc = $.extend({writeable: true, idl: true}, desc);
 			
-			if(false && webshims.cfg.extendNative && desc.value && $.isFunction(desc.value)){
+			if(nodeName != '*' && webshims.cfg.extendNative && desc.value && $.isFunction(desc.value)){
 				extendNativeValue(nodeName, prop, desc);
 			} else {
 				extendQAttr(nodeName, prop, desc);

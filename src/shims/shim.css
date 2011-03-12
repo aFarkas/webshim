@@ -123,6 +123,7 @@ mark {
 }
 img.ui-datepicker-trigger {
 	display: inline;
+	display: inline-block;
 	width: 16px;
 }
 /* spinner control for time, number (usable for date, datetime-local) */

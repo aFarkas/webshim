@@ -101,12 +101,12 @@
 	
 	$.extend($.webshims, {
 		
-		version: 'pre1.5.0final',
+		version: 'pre1.5.0rc4',
 		cfg: {
 			useImportantStyles: true,
 			removeFOUC: false,
 			waitReady: true,
-			extendNative: false,
+			extendNative: true,
 			addCacheBuster: false
 		},
 		/*

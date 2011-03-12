@@ -68,7 +68,7 @@
 		<script src="../src/polyfiller.js"></script>
         <script>
 
-//            		$.webshims.setOptions('addCacheBuster', '?fds');
+            		$.webshims.setOptions('extendNative', true);
 					$.webshims.setOptions('canvas', {
 						type: 'flash'
 					});
@@ -89,16 +89,19 @@
     </head>
     <body class="js-off">
 		
-        <form id="test" action="#">
+        <form action="#">
             <div>
-                <input list="data" />
+                <input list="data" required />
 				<datalist id="data">
 					<select>
 						<option value="jo"></option>
 						<option value="jo2"></option>
 					</select>
 				</datalist>
-				
+				<select name="test" id="test">
+						<option value="jo">dsad</option>
+						<option value="jo2">dsad</option>
+					</select>
             </div><input type="submit" />
             <div>
             </div>

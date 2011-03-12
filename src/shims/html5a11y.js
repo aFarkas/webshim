@@ -4,7 +4,8 @@
 		article: "article",
 		aside: "complementary",
 		section: "region",
-		nav: "navigation"
+		nav: "navigation",
+		address: "contentinfo"
 	};
 	var addRole = function(elem, role){
 		var hasRole = elem.getAttribute('role');
@@ -19,8 +20,18 @@
 			}
 		});
 		if(context === document){
-			$('header:first').attr('role', 'banner');
-			$('footer:last').attr('role', 'contentinfo');
+			var header = document.getElementsByTagName('header')[0];
+			var footers = document.getElementsByTagName('footer');
+			var footerLen = footers.length;
+			if(header && !$(header).closest('section, article')[0]){
+				addRole(header, 'banner');
+			}
+			if(!footerLen){return;}
+			var footer = footers[footerLen -1];
+			if(!$(footer).closest('section, article')[0]){
+				addRole(footer, 'contentinfo');
+			}
 		}
 	});
-})(jQuery, this.document);
+})(jQuery, document);
+

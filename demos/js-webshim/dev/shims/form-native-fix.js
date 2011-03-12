@@ -80,30 +80,30 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 	(function(){
 		//safari 5.0.2/5.0.3 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
 		if(!badWebkit){return;}
-		var checkValidity = function(elem){
-			if(!elem.willValidate){return true;}
-			var valid = ($.attr(elem, 'validity') || {valid: true}).valid;
-			if(!valid && elem.checkValidity && elem.checkValidity()){
-				$(elem).trigger('invalid');
-			}			
-			return valid;
-		};
-		
-		webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'form'], 'checkValidity', {
-			value: function(){
-				if(this.elements){
-					var ret = true;
-					$(this.elements)
-						.each(function(){
-							 if(!checkValidity(this)){
-								ret = false;
-							}
-						})
-					;
-					return ret;
-				} else if(this.checkValidity){
-					return checkValidity(this);
+		['input', 'textarea', 'select'].forEach(function(name){
+			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
+				value: function(){
+					if(!this.willValidate){return true;}
+					var valid = ($.attr(this, 'validity') || {valid: true}).valid;
+					if(!valid && desc._supvalue && desc._supvalue.call(this)){
+						$(this).trigger('invalid');
+					}			
+					return valid;
 				}
+			});
+		});
+		
+		webshims.defineNodeNameProperty('form', 'checkValidity', {
+			value: function(){
+				var ret = true;
+				$(this.elements || [])
+					.each(function(){
+						 if($(this).checkValidity() === false){
+							ret = false;
+						}
+					})
+				;
+				return ret;
 			}
 		});
 		

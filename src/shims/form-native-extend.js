@@ -52,19 +52,23 @@ jQuery.webshims.ready('form-core form-message dom-extend', function($, webshims,
 		}
 	};
 	
-	
-	webshims.defineNodeNamesProperty(['input', 'textarea', 'select'], 'setCustomValidity', {
-		value: function(error){
-			error = error+'';
-			this.setCustomValidity(error);
-			if(!Modernizr.validationmessage){
-				$.data(this, 'customvalidationMessage', error);
+	var oldSetCustomValidity = {};
+	['input', 'textarea', 'select'].forEach(function(name){
+		var desc = webshims.defineNodeNameProperty(name, 'setCustomValidity', {
+			value: function(error){
+				error = error+'';
+				desc._supvalue.call(this, error);
+				if(!Modernizr.validationmessage){
+					$.data(this, 'customvalidationMessage', error);
+				}
+				console.log('"'+error+'"')
+				if(overrideValidity){
+					$.data(this, 'hasCustomError', !!(error));
+					testValidity(this);
+				}
 			}
-			if(overrideValidity){
-				$.data(this, 'hasCustomError', !!(error));
-				testValidity(this);
-			}
-		}
+		});
+		oldSetCustomValidity[name] = desc._supvalue;
 	});
 		
 	if((!window.noHTMLExtFixes && !Modernizr.requiredSelect) || overrideNativeMessages){
@@ -82,7 +86,6 @@ jQuery.webshims.ready('form-core form-message dom-extend', function($, webshims,
 		});
 		validityElements.push('input');
 	}
-	
 	
 	if(overrideValidity){
 		
@@ -133,18 +136,18 @@ jQuery.webshims.ready('form-core form-message dom-extend', function($, webshims,
 						validityState[rule] = fn(jElm, val, cache, validityState);
 						
 						if( validityState[rule] && (validityState.valid || !setCustomMessage) ) {
-							elem.setCustomValidity(webshims.createValidationMessage(elem, rule));
+							oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, rule));
 							validityState.valid = false;
 							setCustomMessage = true;
 						}
 					});
 					if(validityState.valid){
-						elem.setCustomValidity('');
+						oldSetCustomValidity[nodeName].call(elem, '');
 						$.data(elem, 'hasCustomError', false);
 					} else if(overrideNativeMessages && !setCustomMessage && !customError){
 						$.each(validityState, function(name, prop){
 							if(name !== 'valid' && prop){
-								elem.setCustomValidity(webshims.createValidationMessage(elem, name));
+								oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, name));
 								return false;
 							}
 						});

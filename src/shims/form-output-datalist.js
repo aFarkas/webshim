@@ -242,7 +242,7 @@ jQuery.webshims.ready('json-storage dom-extend', function($, webshims, window, d
 							that.markItem(that.index + 1, true);
 							return false;
 						}
-						 
+						
 						if(!that.isListVisible){return;}
 						
 						 
@@ -260,6 +260,13 @@ jQuery.webshims.ready('json-storage dom-extend', function($, webshims, window, d
 							return false;
 						} 
 						if(keyCode == 13 || keyCode == 27){
+							if (keyCode == 13){
+								var activeItem = $('li.active-item:not(.hidden-item)', that.shadowList);
+								if(activeItem[0]){
+									$.attr(that.input, 'value', activeItem.attr('data-value'));
+									$(that.input).triggerHandler('updateInput');
+								}
+							}
 							that.hideList();
 							return false;
 						}
