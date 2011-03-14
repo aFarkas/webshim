@@ -32,13 +32,13 @@
 		<div class="main">
 			<section>
 				<div class="home-box about-box">
-					<p>Webshims Lib is a DOM-Extension helper, which enables / polyfills some of the latest browserfeatures often called "HTML5-features" or better <a href="http://www.brucelawson.co.uk/2010/meet-newt-new-exciting-web-technologies/">NEWT</a> in non capable browsers. It is build on Top of jQuery and Modernizr.</p>
+					<p>Webshims Lib is a DOM-Extension helper, which enables / polyfills some of the latest browserfeatures often called "HTML5-features" or better <a href="http://www.brucelawson.co.uk/2010/meet-newt-new-exciting-web-technologies/">NEWT</a> in non capable browsers. It is build on Top of <a href="http://jquery.com/">jQuery 1.5.1+</a> and <a href="http://www.modernizr.com/">Modernizr 1.7+</a>.</p>
 				</div>
 				<div class="home-box download-box">
 					<p>
 						<a href="http://github.com/aFarkas/webshim/downloads" class="download-button">
 							<strong>Download Webshims Lib</strong>
-							<span>polyfilling Libary version 1.5.0 RC3</span>
+							<span>polyfilling Libary version 1.5.0</span>
 						</a>
 					</p>
 				</div>
@@ -54,7 +54,7 @@
 				<div class="feature-example home-box">
 					<h3>What makes webshims lib differnt?</h3>
 					<div class="inner-box">
-						<p>Did you ever tried to dynamically add/change the placeholder attribute with one of the other placeholder shims?</p>
+						<p>Did you ever tried to dynamically set orget the placeholder or the value attribute with one of the other placeholder shims?</p>
 						<form action="#">
 							<input class="text" name="placeholder" id="placeholder" placeholder="change me" />
 						</form>
@@ -62,6 +62,11 @@
 						<code>$("#placeholder").attr("placeholder", "<input value="test text" class="text" id="placeholder-text" />");</code> <button>run code</button>
 						<div class="hidden-explanation">
 							<p>Being able to add/change the placeholder of an input element dynamically, isn't that important. It only shows how webshims lib works. With some little constraints you won't be able to recognize a difference between the shim and the native implementation. In some cases the shim will be more compilant, than the current browser implementations.</p>
+							<p>The placeholder polyfill also works with getting and setting the value property (most/all other placeholder-polyfills don't support this properly):</p>
+							<ul>
+								<li>$("#placeholder").attr('value') / $("#placeholder").val()</li>
+								<li>$("#placeholder").attr('value', 'new value') / $("#placeholder").val('new value')</li>
+							</ul>
 						</div>
 					</div>
 				</div>
@@ -69,7 +74,7 @@
 					<h3>Supported Browsers</h3>
 					<ul>
 						<li>IE6+</li>
-						<li>Firefox 3.5+</li>
+						<li>Firefox 3.0+</li>
 						<li>Safari 4+</li>
 						<li>Safari for iOS 4.2</li>
 						<li>Chrome 9.0+</li>
@@ -289,9 +294,9 @@ $.webshims.addPolyfill('magicMethod', {
 });
 // = load magicMethod.js from shim-folder if test returns false
 </code>		
-		<p>If you have setup a dependency, you should wrap your implementation code with <code>$.webshims.ready</code>:</p>	
+		<p>If you have setup a dependencies, you have to register your implementation code with <code>$.webshims.register</code>:</p>	
 <code class="block">
-jQuery.webshims.ready('es5 json-storage', function($, webshims, window, document, undefined){
+jQuery.webshims.register('magicMethod', function($, webshims, window, document, undefined, options){
 	//now you can use es5-feature and json-storage feature	
 	window.magicMethod = function(){
 		//your polyfill implementation
@@ -322,7 +327,7 @@ $.webshims.capturingEvents(['play']);
 		</ul>
 <code class="block">
 //wait till the DOM-Extension-feature is loaded
-jQuery.webshims.ready('dom-support', function($, webshims, window, document){
+jQuery.webshims.register('mediaelement', function($, webshims, window, document, undefined, options){
 	
 	//Implements a new IDL property on audio, video called currentTime
 	$.webshims.defineNodeNamesProperty('audio, video', 'currentTime', {
@@ -380,8 +385,9 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document){
 				<ul>
 					<li>improve current implementations</li>
 					<li><a href="http://www.w3.org/TR/html5/video.html">audio/video</a> implementation</li>
-					<li>history (pushState etc.)/hashchange (maybe <a href="http://benalman.com/projects/jquery-hashchange-plugin/">hashchange</a> / <a href="http://github.com/fortes/history.js/">history</a>)</li>
 					<li><a href="http://www.w3.org/TR/html5/interactive-elements.html">interactive elements</a> (we should wait here, till a <a href="https://bugs.webkit.org/show_bug.cgi?id=51071">native implementation</a> exists)</li>
+					<li>switching to a third party scriptloader (maybe <a href="https://github.com/SlexAxton/yepnope.js">yepnope</a>)</li>
+					<li>history (pushState etc.)/hashchange (maybe <a href="https://github.com/balupton/history.js">history.js</a>)</li>
 				</ul>
 				
 			</section>

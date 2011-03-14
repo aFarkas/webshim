@@ -27,9 +27,9 @@ form textarea {
 	font-family: arial, helvetica, sans-serif;
 	font-size: 120%;
 }
+/* remove FOUC */
 .loading-polyfills body {
 	visibility: hidden;
-	
 }
 html.long-loading-polyfills {
 	background-image: url(polyfill-loader.gif);
@@ -344,7 +344,7 @@ a.download-button {
 	border-radius: 10px;
 }
 .feature-example code {
-	font-size: 13px;
+	font-size: 12px;
 }
 .feature-example code input {
 	width: 50px;

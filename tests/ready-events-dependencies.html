@@ -31,17 +31,21 @@
 		$.webshims.features['forms-ext'].reverse();
 		$.webshims.featureList.reverse();
 		
+//		jQuery.webshims.ready('form-core dom-extend', function(){console.log('form-core dom-extend loaded')})
+//		jQuery.webshims.ready('form-extend', function(){console.log('form-extend loaded')})
+//		jQuery.webshims.ready('form-core', function(){console.log('form-core loaded')})
+//		jQuery.webshims.ready('dom-extend', function(){console.log('dom-extend loaded')})
+		
 		var readys = ['es5', 'form-core'];
 		if(!$.support.validity){
 			readys.push('form-extend');
 		} 
 		if($('<input type="datetime-local" />')[0].type != 'datetime-local' || $('<input type="range" />')[0].type != 'range'){
-			readys.push('form-number-date');
+			readys.push('forms-ext');
 		}
 		
 		var wasReadys = [];
 		$.each(readys, function(i, name){
-			
 			$.webshims.ready(name, function(){
 				wasReadys.push(name);
 			});

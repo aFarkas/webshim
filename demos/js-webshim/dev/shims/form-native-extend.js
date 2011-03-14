@@ -1,7 +1,6 @@
-jQuery.webshims.ready('form-core form-message dom-extend', function($, webshims, window, doc, undefined){
+jQuery.webshims.register('form-extend', function($, webshims, window, doc, undefined){
 	"use strict";
 	if(!Modernizr.formvalidation){return;}
-		
 	var typeModels = webshims.inputTypes;
 	var validityRules = {};
 	

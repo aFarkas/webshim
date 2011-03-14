@@ -1,8 +1,6 @@
 //DOM-Extension helper
-jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
+jQuery.webshims.register('dom-extend', function($, webshims, window, document, undefined){
 	"use strict";
-	
-	
 	//shortcus
 	var modules = webshims.modules;
 	
@@ -137,7 +135,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 			extendValue: function(nodeName, prop, value){
 				createNodeNameInit(nodeName, function(){
 					$(this).each(function(){
-						var data = $.data(this, '_polyfilledValue') || $.data(this, '_polyfilledValue', {});
+						var data = $.data(this, '_oldPolyfilledValue') || $.data(this, '_oldPolyfilledValue', {});
 						data[prop] = this[prop];
 						this[prop] = value;
 					});
@@ -163,7 +161,7 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				elemProto[prop] = desc.value;
 			} else {
 				desc._supvalue = function(){
-					var data = $.data(this, '_polyfilledValue');
+					var data = $.data(this, '_oldPolyfilledValue');
 					if(data && data[prop] && data[prop].apply){
 						return data[prop].apply(this, arguments);
 					}
@@ -194,12 +192,10 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 		defineNodeNameProperty: function(nodeName, prop, desc){
 			desc = $.extend({writeable: true, idl: true}, desc);
 			
+			extendQAttr(nodeName, prop, desc);
 			if(nodeName != '*' && webshims.cfg.extendNative && desc.value && $.isFunction(desc.value)){
 				extendNativeValue(nodeName, prop, desc);
-			} else {
-				extendQAttr(nodeName, prop, desc);
 			}
-			
 			
 			if(desc.content){
 				initProp.content(nodeName, prop);
@@ -260,27 +256,23 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 				}
 			});
 		},
-		defineNodeNamesBooleanProperty: function(elementNames, prop, setDesc, extend, htc, feature){
+		defineNodeNamesBooleanProperty: function(elementNames, prop, setDesc){
+			setDesc = setDesc || {};
 			var desc = {
 				set: function(val){
 					var elem = this;
-					if(elem.readyState === 'loading' && typeof val == 'string' && val === webshims.contentAttr(this, prop)){
-						val = true;
-					} else {
-						val = !!val;
-					}
+					val = !!val;
 					webshims.contentAttr(elem, prop, val);
-					if(setDesc){
+					if(setDesc.set){
 						setDesc.set.call(elem, val);
 					}
-					
 					return val;
 				},
 				get: function(){
 					return webshims.contentAttr(this, prop) != null;
 				}
 			};
-			webshims.defineNodeNamesProperty(elementNames, prop, desc, extend, htc, feature);
+			webshims.defineNodeNamesProperty(elementNames, prop, desc);
 		},
 		contentAttr: function(elem, name, val){
 			if(!elem.nodeName){return;}
@@ -351,7 +343,5 @@ jQuery.webshims.ready('es5', function($, webshims, window, document, undefined){
 			};
 		})()
 	});
-	
 	webshims.isReady('webshimLocalization', true);
-	webshims.isReady('dom-extend', true);
 });

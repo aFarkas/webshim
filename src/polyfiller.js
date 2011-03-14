@@ -75,7 +75,7 @@
 		
 		
 		
-		Modernizr.advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
+		var advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
 		//safari has defineProperty-interface, but it can't be used on dom-object
 		//only do this test in non-IE browsers, because this hurts dhtml-behavior in some IE8 versions
 		if(!$.browser.msie && Object.defineProperty && Object.prototype.__defineGetter__){
@@ -83,17 +83,18 @@
 				try {
 					var foo = document.createElement('foo');
 					Object.defineProperty(foo, 'bar', {get: function(){return true;}});
-					Modernizr.advancedObjectProperties = !!foo.bar;	
+					advancedObjectProperties = !!foo.bar;	
 				}catch(e){
-					Modernizr.advancedObjectProperties = false;
+					advancedObjectProperties = false;
 				}
 				foo = null;
 			})();
 		}
 		
-		Modernizr.ES5 = (Modernizr.ES5base && Modernizr.ES5extras && Modernizr.advancedObjectProperties);
-		Modernizr.objectAccessor = !!( (Modernizr.advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)) && (!$.browser.opera || browserVersion >= 11) );
+		Modernizr.ES5 = (Modernizr.ES5base && Modernizr.ES5extras && advancedObjectProperties);
+		Modernizr.objectAccessor = !!( (advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)) && (!$.browser.opera || browserVersion >= 11) );
 		Modernizr.domAccessor = !!( Modernizr.objectAccessor || (Object.defineProperty && Object.getOwnPropertyDescriptor));
+		Modernizr.advancedObjectProperties = advancedObjectProperties;
 	})();
 	
 	
@@ -101,7 +102,7 @@
 	
 	$.extend($.webshims, {
 		
-		version: '1.5.0rc4',
+		version: '1.5.0',
 		cfg: {
 			useImportantStyles: true,
 			removeFOUC: false,
@@ -236,17 +237,18 @@
 					return true;
 				}
 					
-					special[name] = $.extend(special[name] || {}, {
-						add: function( details ) {
-							details.handler.call(this, $.Event(name));
-						}
-					});
-					$.event.trigger(name);
+				special[name] = $.extend(special[name] || {}, {
+					add: function( details ) {
+						details.handler.call(this, $.Event(name));
+					}
+				});
+				$.event.trigger(name);
 			}
 			return !!(special[name] && special[name].add) || false;
 		},
 		ready: function(events, fn /*, _created*/){
 			var _created = arguments[2];
+			var evt = events;
 			if(typeof events == 'string'){
 				events = events.split(' ');
 			}
@@ -333,7 +335,24 @@
 				});
 			});
 		},
-		
+		register: function(name, fn){
+			var module = modules[name];
+			if(!module){
+				webshims.warn("can't find module: "+ name);
+				return;
+			}
+			if(module.noAutoCallback){
+				var ready = function(){
+					fn($, webshims, window, document, undefined, module.options);
+					isReady(name, true);
+				};
+				if(module.dependencies){
+					onReady(module.dependencies, ready);
+				} else {
+					ready();
+				}
+			}
+		},
 		/*
 		 * loader
 		 */
@@ -409,9 +428,6 @@
 						});
 						if(!module.noAutoCallback){
 							module.noAutoCallback = true;
-							onReady($.merge([module.name+'FileLoaded'], module.dependencies), function(){
-								isReady(module.name, true);
-							});
 						}
 					}
 				};
@@ -493,6 +509,7 @@
 								$(window).triggerHandler('polyfillloaderror');
 								webshims.warn('Error: could not find script @'+src +'| configure polyfill-path: $.webshims.loader.basePath = "path/to/shims-folder" or by using markup: <meta name="polyfill-path" content="path/to/shims-folder/" />');
 							}
+							if(!this){return;}
 							if(!this.readyState ||
 										this.readyState == "loaded" || this.readyState == "complete"){
 								script.onload =  null;
@@ -719,7 +736,7 @@
 	/* change path $.webshims.modules[moduleName].src */
 	addModule('html5a11y', {
 		src: 'html5a11y',
-		test: !(($.browser.msie && browserVersion < 9 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 535) || !window.HTMLArticleElement)
+		test: !(($.browser.msie && browserVersion < 9 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 535))
 	});
 	
 	addModule('jquery-ui', {
@@ -753,16 +770,9 @@
 	 */
 	
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
-	addPolyfill('es5-1', {
-		feature: 'es5',
+	addPolyfill('es5', {
 		test: Modernizr.ES5
 	});
-	
-	addPolyfill('es5-2', {
-		feature: 'es5',
-		test: Modernizr.ES5base
-	});
-	
 	
 	addPolyfill('dom-extend', {
 		feature: 'dom-support',
@@ -850,21 +860,19 @@
 			
 	addPolyfill('form-core', {
 		feature: 'forms',
-		dependencies: ['es5']
-	});
-	
-	addPolyfill('form-message', {
-		feature: 'forms',
-		test: function(toLoad){
-			return (Modernizr.validationmessage && !this.options.customMessages && modules['form-extend'].test(toLoad) );
+		dependencies: ['es5'],
+		loadInit: function(){
+			if(this.options.customMessages || !Modernizr.validationmessage){
+				loader.loadList(["dom-extend"]);
+			}
 		},
 		options: {
+			placeholderType: 'value',
 			customMessages: false,
 			overrideMessages: false
-		},
-		dependencies: ['dom-support']
+		}
 	});
-	
+			
 	if(Modernizr.formvalidation){
 		//create delegatable-like events
 		webshims.capturingEvents(['input']);
@@ -874,9 +882,9 @@
 			feature: 'forms',
 			src: 'form-native-extend',
 			test: function(toLoad){
-				return (Modernizr.requiredSelect && Modernizr.validationmessage && ((modernizrInputAttrs.valueAsNumber && modernizrInputAttrs.valueAsDate) || $.inArray('form-number-date', toLoad) == -1) && !this.options.overrideMessages );
+				return (Modernizr.requiredSelect && Modernizr.validationmessage && ((modernizrInputAttrs.valueAsNumber && modernizrInputAttrs.valueAsDate) || $.inArray('forms-ext', toLoad) == -1) && !this.options.overrideMessages );
 			},
-			dependencies: ['form-core', 'dom-support', 'form-message'],
+			dependencies: ['form-core', 'dom-support'],
 			methodNames: ['setCustomValidity','checkValidity']
 		});
 		
@@ -893,7 +901,7 @@
 			feature: 'forms',
 			src: 'form-shim-extend',
 			methodNames: ['setCustomValidity','checkValidity'],
-			dependencies: ['form-core', 'dom-support', 'form-message']
+			dependencies: ['form-core', 'dom-extend']
 		});
 	}
 	
@@ -920,20 +928,11 @@
 		dependencies: ['dom-support', 'json-storage']
 	});
 	
-	addPolyfill('form-number-date', {
-		feature: 'forms-ext',
-		dependencies: ['es5', 'forms', 'dom-support'],
-		test: modernizrInputAttrs.valueAsNumber && modernizrInputAttrs.valueAsDate,
-		options: {stepArrows: {number: 1, time: 1}, calculateWidth: true}
-	});
-	
-	
-	addPolyfill('inputUI', {
-		feature: 'forms-ext',
-		src: 'form-date-range-ui',
+	addPolyfill('forms-ext', {
+		src: 'form-number-date',
 		test: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && !this.options.replaceUI);},
 		noAutoCallback: true,
-		dependencies: ['es5', 'forms','dom-support'],
+		dependencies: ['es5', 'forms', 'form-extend', 'dom-support'],
 		loadInit: function(){
 			loader.loadList(['jquery-ui']);
 			if(modules['input-widgets'].src){
@@ -941,6 +940,8 @@
 			}
 		},
 		options: {
+			stepArrows: {number: 1, time: 1}, 
+			calculateWidth: true,
 			slider: {},
 			datepicker: {},
 			langSrc: '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/i18n/jquery.ui.datepicker-',
@@ -949,18 +950,7 @@
 			replaceUI: false
 		}
 	});
-	
-	/* placeholder */
-	
-	addPolyfill('form-placeholder', {
-		feature: 'forms',
-		test: modernizrInputAttrs.placeholder,
-		options: {
-			placeholderType: 'value'
-		}
-	});
-	/* END: placeholder */
-	
+		
 	/* END: html5 forms */
 	
 	/* json + loacalStorage */

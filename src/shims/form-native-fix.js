@@ -1,5 +1,5 @@
 /* https://github.com/aFarkas/webshim/issues#issue/16 */
-jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined){
+jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, undefined){
 	
 	if(!Modernizr.formvalidation || window.noHTMLExtFixes || Modernizr.bugfreeformvalidation){return;}
 	
@@ -110,7 +110,6 @@ jQuery.webshims.ready('dom-extend', function($, webshims, window, doc, undefined
 	})();
 	if(!Modernizr.requiredSelect){
 		webshims.ready('form-extend', function(){
-			
 			var isPlaceholderOptionSelected = function(select){
 				if(select.type == 'select-one' && select.size < 2){
 					var option = $('> option:first-child', select);

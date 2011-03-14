@@ -12,14 +12,14 @@ var stepTest = function(obj){
 	});
 	
 	elem.attr(obj.attrs);	
-	elem.attr('value', $.webshims.modules['form-number-date'].getNextStep(elem[0], obj.step));
+	elem.attr('value', $.webshims.modules['forms-ext'].getNextStep(elem[0], obj.step));
 	equals( elem.attr('valueAsNumber'), obj.value, 'step:'+ obj.step +' after: '+ JSON.stringify(obj.attrs) );
 	
 	
 };
 
 asyncTest("stepup", function(){
-	if($.webshims.modules['form-number-date'].getNextStep){
+	if($.webshims.modules['forms-ext'].getNextStep){
 		$.each([
 			{
 				id: 'number',

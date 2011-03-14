@@ -1,4 +1,4 @@
-jQuery.webshims.ready('json-storage dom-extend', function($, webshims, window, document, undefined){
+jQuery.webshims.register('form-output-datalist', function($, webshims, window, document, undefined){
 	var doc = document;	
 	
 	(function(){
@@ -500,68 +500,68 @@ jQuery.webshims.ready('json-storage dom-extend', function($, webshims, window, d
 		};
 		
 		
-		webshims.defineNodeNameProperty('input', 'list', {
-			get: function(){
-				var val = webshims.contentAttr(this, 'list');
-				return (val == null) ? undefined : val;
+		webshims.defineNodeNameProperties('input', {
+			'list': {
+				get: function(){
+					var val = webshims.contentAttr(this, 'list');
+					return (val == null) ? undefined : val;
+				},
+				set: function(value){
+					var elem = this;
+					webshims.contentAttr(elem, 'list', value);
+					webshims.objectCreate(dataListProto, undefined, {input: elem, id: value});
+				},
+				content: true
 			},
-			set: function(value){
-				var elem = this;
-				webshims.contentAttr(elem, 'list', value);
-				webshims.objectCreate(dataListProto, undefined, {input: elem, id: value});
-			},
-			content: true
-		});
-		
-		webshims.defineNodeNameProperty('input', 'selectedOption', {
-			get: function(){
-				var elem = this;
-				var list = $.attr(elem, 'list');
-				var ret = null;
-				var value, options;
-				if(!list){return ret;}
-				value = $.attr(elem, 'value');
-				if(!value){return ret;}
-				options = $.attr(list, 'options');
-				if(!options.length){return ret;}
-				$.each(options, function(i, option){
-					if(value == $.attr(option, 'value')){
-						ret = option;
-						return false;
-					}
-				});
-				return ret;
-			}
-		});
-			
-		webshims.defineNodeNameProperty('input', 'autocomplete', {
-			get: function(){
-				var elem = this;
-				var data = $.data(elem, 'datalistWidget');
-				if(data){
-					return data._autocomplete;
+			selectedOption: {
+				set: $.noop,
+				get: function(){
+					var elem = this;
+					var list = $.attr(elem, 'list');
+					var ret = null;
+					var value, options;
+					if(!list){return ret;}
+					value = $.attr(elem, 'value');
+					if(!value){return ret;}
+					options = $.attr(list, 'options');
+					if(!options.length){return ret;}
+					$.each(options, function(i, option){
+						if(value == $.attr(option, 'value')){
+							ret = option;
+							return false;
+						}
+					});
+					return ret;
 				}
-				return ('autocomplete' in elem) ? elem.autocomplete : elem.getAttribute('autocomplete');
 			},
-			set: function(value){
-				var elem = this;
-				var data = $.data(elem, 'datalistWidget');
-				if(data){
-					data._autocomplete = value;
-					if(value == 'off'){
-						data.hideList();
+			autocomplete: {
+				get: function(){
+					var elem = this;
+					var data = $.data(elem, 'datalistWidget');
+					if(data){
+						return data._autocomplete;
 					}
-				} else {
-					if('autocomplete' in elem){
-						elem.autocomplete = value;
+					return ('autocomplete' in elem) ? elem.autocomplete : elem.getAttribute('autocomplete');
+				},
+				set: function(value){
+					var elem = this;
+					var data = $.data(elem, 'datalistWidget');
+					if(data){
+						data._autocomplete = value;
+						if(value == 'off'){
+							data.hideList();
+						}
 					} else {
-						elem.setAttribute('autocomplete', value);
+						if('autocomplete' in elem){
+							elem.autocomplete = value;
+						} else {
+							elem.setAttribute('autocomplete', value);
+						}
 					}
 				}
 			}
 		});
-		
-		
+					
 		webshims.defineNodeNameProperty('datalist', 'options', {
 			get: function(){
 				var elem = this;
