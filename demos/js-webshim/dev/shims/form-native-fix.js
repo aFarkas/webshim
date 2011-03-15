@@ -39,10 +39,11 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	}
 	
 	$(document)
-		.bind('firstinvalid', function(e){
-			form = e.target.form;
+		.bind('firstinvalidsystem', function(e, data){
+			form = data.form;
 			if(!form){return;}
-			firstInvalidEvent = e;
+			firstInvalidEvent = data;
+			
 			var submitEvents = $(form)
 				.unbind('submit.preventInvalidSubmit')
 				.bind('submit.preventInvalidSubmit', function(submitEvent){
@@ -67,7 +68,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		})
 		.bind('lastinvalid', function(e, data){
 			var firstTarget = data.invalidlist[0];
-			if( firstTarget && badWebkit && document.activeElement && firstTarget !== document.activeElement && !firstInvalidEvent.isInvalidUIPrevented() ){
+			if( firstTarget && badWebkit && document.activeElement && firstTarget !== document.activeElement && firstInvalidEvent && !firstInvalidEvent.isInvalidUIPrevented() ){
 				webshims.validityAlert.showFor(firstTarget);
 			}
 			invalids = [];

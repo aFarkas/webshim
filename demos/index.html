@@ -163,7 +163,16 @@
 <code class="block">
 //load and implement json-storage and geolocation features, if they aren't supported
 $.webshims.polyfill('json-storage geolocation');
-</code>	
+</code>					
+						<h3>List of features</h3>
+						<ul>
+							<li><code>json-storage</code></li>
+							<li><code>es5</code></li>
+							<li><code>geolocation</code></li>
+							<li><code>canvas</code></li>
+							<li><code>froms</code></li>
+							<li><code>forms-ext</code></li>
+						</ul>
 	
 						<p>The polyfill-method can also take a keyword called <code>lightweight</code>, which will load a filesize-/feature balanced profile. The lightweight-profile currently loads all features, except of the <code>forms-ext</code> feature (numerical and date related web form features). The normal HTML5 <code>forms</code> feature - including constraint validation (required, pattern, [type=email]) and datalist/output widgets - is loaded in the <code>lightweight</code> profile.</p>
 <code class="block">
@@ -379,15 +388,15 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 			<section>
 				<hgroup>
 					<h2>Further Development</h2>
-					<h3>Feel free to fork, collaborate, test develope extensions :-).</h3>
+					<h3>Feel free to <a href="https://github.com/aFarkas/webshim">fork</a>, <a href="https://github.com/aFarkas/webshim">collaborate</a>, <a href="https://github.com/aFarkas/webshim/issues">report issues</a>, develope extensions or simply use :-).</h3>
 				</hgroup>
 				
 				<ul>
 					<li>improve current implementations</li>
-					<li><a href="http://www.w3.org/TR/html5/video.html">audio/video</a> implementation</li>
-					<li><a href="http://www.w3.org/TR/html5/interactive-elements.html">interactive elements</a> (we should wait here, till a <a href="https://bugs.webkit.org/show_bug.cgi?id=51071">native implementation</a> exists)</li>
-					<li>switching to a third party scriptloader (maybe <a href="https://github.com/SlexAxton/yepnope.js">yepnope</a>)</li>
-					<li>history (pushState etc.)/hashchange (maybe <a href="https://github.com/balupton/history.js">history.js</a>)</li>
+					<li><a href="http://www.w3.org/TR/html5/interactive-elements.html">interactive elements</a> (<strike>we should wait here, till a <a href="https://bugs.webkit.org/show_bug.cgi?id=51071">native implementation</a> exists</strike> comming with 1.6)</li>
+					<li><a href="http://www.w3.org/TR/html5/video.html">audio/video</a> implementation (comming in 1.7)</li>
+					<li>switching to a third party scriptloader (maybe <a href="https://github.com/SlexAxton/yepnope.js">yepnope</a> (comming in 1.8))</li>
+					<li>history (pushState etc.)/hashchange (maybe <a href="https://github.com/balupton/history.js">history.js</a> (comming in 1.9))</li>
 				</ul>
 				
 			</section>

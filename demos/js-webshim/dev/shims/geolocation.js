@@ -163,4 +163,6 @@
 		};
 		return api;
 	})();
+	
+	$.webshims.isReady('geolocation', true);
 })(jQuery);

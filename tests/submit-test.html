@@ -60,11 +60,13 @@
 		}
 		
 		$.webshims.ready('DOM forms', function(){
-			var invalidEvents, submitEvents, preventInvalid, firstInvalidEvents;
+			var invalidEvents, submitEvents, preventInvalid, firstInvalidEvents, preventFirstInvalid;
 			
 			function equals(is, should, message){
 				message = $('<li>'+ message +' | was: '+ (is.type || is) +' expected: '+ (should.type || should) +'</li>').appendTo('#test-result');
-				message.css('backgroundColor', (is === should) ? '#090' : '#900');
+				if(message.text().indexOf("won't fix") == -1){
+					message.css('backgroundColor', (is === should) ? '#090' : '#900');
+				}
 			}
 			
 			function reset(){
@@ -73,6 +75,7 @@
 				submitEvents = 0;
 				capturedSubmitEvents = 0;
 				preventInvalid = false;
+				preventFirstInvalid = false;
 				submitPrevent = true;
 				$('#test-result').empty();
 			}
@@ -119,6 +122,21 @@
 			$('input.invalid-prevent-submit').click(function(e){
 				reset();
 				preventInvalid = true;
+				$('input[type=text]').attr('value', '');
+				setTimeout(function(){
+					equals(submitEvents, 0, 'no submit events');
+					equals(invalidEvents, 2, '2 invalid events');
+					equals(firstInvalidEvents, 1, '1 firstinvalid event');
+					equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
+					if(!Modernizr.formvalidation && document.activeElement){
+						equals(document.activeElement, e.target, "don't focus first invalid");
+					}
+				}, 100);
+			});
+			
+			$('input.firstinvalid-prevent-submit').click(function(e){
+				reset();
+				preventFirstInvalid = true;
 				$('input[type=text]').attr('value', '');
 				setTimeout(function(){
 					equals(submitEvents, 0, 'no submit events');
@@ -236,10 +254,24 @@
 						break;
 					case 'firstinvalid':
 						firstInvalidEvents++;
+						if(preventFirstInvalid){
+							return false;
+						}
 						break;
 				}
 
 			});
+		});
+		var isDOMReady;
+		$(window).bind('load', function(){
+			setTimeout(function(){
+				if(!isDOMReady){
+					alert('DOM-Ready not called');
+				}
+			}, 500);
+		});
+		$(function(){
+			isDOMReady = true;
 		});
     </script>
 	
@@ -265,7 +297,9 @@
 		<input type="submit" class="invalid-submit" value="try invalid submit (with submit prevention)" />
 		<input type="submit" class="invalid-prevent-submit-without-submit-prevention" value="try invalid-prevented submit (no submit prevention)" />
 		<input type="submit" class="invalid-prevent-submit" value="try invalid-prevented submit" />
+		<input type="submit" class="firstinvalid-prevent-submit" value="try firstinvalid-prevented submit" />
 		<input type="submit" class="valid-submit" value="try valid  submit" />
+		
 		<input formnovalidate="bla" type="submit" class="novalidate-submit" value="formnovalidate" />
     </form>
 	<hr />

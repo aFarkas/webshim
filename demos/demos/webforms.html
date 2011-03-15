@@ -279,17 +279,20 @@
 						
 <code class="block run-once">
 //bind to the first invalid element in a form
-$('form').bind('firstinvalid', function(e){ 
+$('form').bind('firstinvalid.example1', function(e){ 
 	//show the invalid alert for first invalid element
 	$.webshims.validityAlert.showFor( e.target ); 
 	//prevent browser from showing native validation message 
 	return false; 
 });
+
+//unbind event binding from second example:
+$('form').unbind('firstinvalid.example2');
 </code>
 						
 						<p>Using custom messages instead of native browser messages is also easy. Simply implement the customValidationMessage attribute and use it.</p>
 
-<code class="block">
+<code class="block run-once">
 //configure webshims to implement new customValidationMessage attribute
 //$.webshims.setOptions('forms', {
 //	customMessages: true
@@ -301,13 +304,17 @@ $('form').bind('firstinvalid', function(e){
 //wait for DOM-Ready
 $(function(){
 	//bind to the first invalid element in a form
-	$('form').bind('firstinvalid', function(e){ 
+	$('form').bind('firstinvalid.example2', function(e){ 
 		//show the invalid alert for first invalid element and pass the custom validation message 
 		$.webshims.validityAlert.showFor( e.target, $(e.target).attr('customValidationMessage') ); 
 		//prevent browser from showing native validation message 
 		return false; 
 	});
 });
+
+
+//unbind event binding from second example:
+$('form').unbind('firstinvalid.example1');
 </code>
 						<p>or use the content attribute API</p>
 <code class="block">

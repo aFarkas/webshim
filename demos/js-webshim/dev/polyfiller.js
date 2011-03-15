@@ -343,7 +343,7 @@
 			}
 			if(module.noAutoCallback){
 				var ready = function(){
-					fn($, webshims, window, document, undefined);
+					fn($, webshims, window, document, undefined, module.options);
 					isReady(name, true);
 				};
 				if(module.dependencies){
