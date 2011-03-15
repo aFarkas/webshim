@@ -309,7 +309,9 @@ a.download-button {
 	padding: 5px 25px;
 	
 	-moz-border-radius: 5px;
+	border-radius: 5px;
 	-moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+	-webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
 	background: #00C6FF;
 	color: #fff;
