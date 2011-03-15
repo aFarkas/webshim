@@ -199,6 +199,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 				} catch(e){}
 				if(smooth){
 					webshims.scrollRoot.scrollTop(scrollTop);
+					setTimeout(function(){
+						webshims.scrollRoot.scrollTop(scrollTop);
+					}, 0);
 				}
 				setTimeout(function(){
 					$(doc).bind('focusout.validityalert', boundHide);

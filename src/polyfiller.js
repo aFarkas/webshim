@@ -932,7 +932,7 @@
 		src: 'form-number-date',
 		test: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && !this.options.replaceUI);},
 		noAutoCallback: true,
-		dependencies: ['es5', 'forms', 'form-extend', 'dom-support'],
+		dependencies: ['form-extend'],
 		loadInit: function(){
 			loader.loadList(['jquery-ui']);
 			if(modules['input-widgets'].src){
