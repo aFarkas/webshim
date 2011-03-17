@@ -4,8 +4,8 @@
 	document.createElement('datalist');
 	
 	var special = $.event.special;
-	var modernizrInputAttrs = Modernizr.input;
-	var modernizrInputTypes = Modernizr.inputtypes;
+	var modernizrInputAttrs = Modernizr.input || {};
+	var modernizrInputTypes = Modernizr.inputtypes || {};
 	var browserVersion = parseFloat($.browser.version, 10);
 	
 	
