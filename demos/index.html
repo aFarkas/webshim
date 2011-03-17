@@ -54,7 +54,7 @@
 				<div class="feature-example home-box">
 					<h3>What makes webshims lib differnt?</h3>
 					<div class="inner-box">
-						<p>Did you ever tried to dynamically set orget the placeholder or the value attribute with one of the other placeholder shims?</p>
+						<p>Did you ever tried to dynamically set or get the placeholder or the value attribute with one of the other placeholder shims?</p>
 						<form action="#">
 							<input class="text" name="placeholder" id="placeholder" placeholder="change me" />
 						</form>
@@ -269,6 +269,15 @@ this.checkValidity();
 						<li>
 							<p><strong>binding to events</strong>: Always use jQuery's <code>bind</code> method to register your event handlers. <code>addEventListener</code> won't work in polyfilled browsers. Most events in the HTML5 specification are so called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery can not distinguish between the event phases (capturing/propagation), we use almost event capturing in the native implementation and $.fn.trigger in the shim.</p>
 							<p>This means, that some "HTML5 events" go down the DOM-tree in capable browsers and go up the tree in polyfilled browsers. This can create differences, if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default don't use <code>return false;</code> and use <code>event.preventDefault();</code> instead.</p>
+						</li>
+						<li>
+							<p><strong>manipulation methods</strong>: Always use <code>.htmlWebshim()</code>, <code>.appendWebshim()</code>, <code>.prependWebshim()</code>, <code>.afterWebshim()</code>, <code>.beforeWebshim()</code> and <code>.replaceWithWebshim()</code> to insert new HTML5 content:</p>
+<code class="block">
+//three different examples
+$('form').appendWebshim('&lt;input type="date" /&gt;');
+$('#canvas-box').htmlWebshim('&lt;canvas&gt;&lt;/canvas&gt;');
+$('datalist#list select').prependWebshim('&lt;option value="new suggestion item" /&gt;');
+</code>
 						</li>
 					</ul>
 					</div>

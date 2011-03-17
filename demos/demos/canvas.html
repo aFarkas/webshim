@@ -57,14 +57,12 @@
 			
 			<canvas id="my-canvas" width="80" height="80"></canvas>
 <code class="block run-once">
-$.webshims.ready('canvas', function(){
-	var ctx = $('#my-canvas').getContext('2d');
-	ctx.fillStyle = "rgb(200,0,0)";  
-	ctx.fillRect (10, 10, 55, 50);  
-	 
-	ctx.fillStyle = "rgba(0, 0, 200, 0.5)";  
-	ctx.fillRect (30, 30, 55, 50);
-});
+var ctx = $('#my-canvas').getContext('2d');
+ctx.fillStyle = "rgb(200,0,0)";  
+ctx.fillRect (10, 10, 55, 50);  
+ 
+ctx.fillStyle = "rgba(0, 0, 200, 0.5)";  
+ctx.fillRect (30, 30, 55, 50);
 </code>
 			<p>Webshim Lib can implement <a href="http://code.google.com/p/explorercanvas/">excanvas</a> (default) or <a href="http://flashcanvas.net/">FlashCanvas/FlashCanvas Pro</a>:</p>
 <code class="block">
