@@ -81,7 +81,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		});
 	};
 	
-
+	
 	var initProp = (function(){
 		
 		var initProps = {};
@@ -111,7 +111,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			nodeNameCache = null;
 		});
 		
-
+		var tempCache;
+		var emptyQ = $([]);
 		var createNodeNameInit = function(nodeName, fn){
 			if(!initProps[nodeName]){
 				initProps[nodeName] = [fn];
@@ -119,18 +120,30 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				initProps[nodeName].push(fn);
 			}
 			if($.isDOMReady){
-				$( document.getElementsByTagName(nodeName) ).each(fn);
+				(tempCache || $( document.getElementsByTagName(nodeName) )).each(fn);
 			}
 		};
 		
 		var elementExtends = {};
 		return {
+			createTmpCache: function(nodeName){
+				if($.isDOMReady){
+					tempCache = tempCache || $( document.getElementsByTagName(nodeName) );
+				}
+				return tempCache || emptyQ;
+			},
+			flushTmpCache: function(){
+				tempCache = null;
+			},
 			content: function(nodeName, prop){
 				createNodeNameInit(nodeName, function(){
 					$(this).filter('['+ prop +']').attr(prop, function(i, val){
 						return val;
 					});
 				});
+			},
+			createElement: function(nodeName, fn){
+				createNodeNameInit(nodeName, fn);
 			},
 			extendValue: function(nodeName, prop, value){
 				createNodeNameInit(nodeName, function(){
@@ -192,6 +205,23 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		defineNodeNameProperty: function(nodeName, prop, desc){
 			desc = $.extend({writeable: true, idl: true}, desc);
 			
+			if(desc.isBoolean){
+				var oldSet = desc.set;
+				
+				desc.set =  function(val){
+					var elem = this;
+					val = !!val;
+					webshims.contentAttr(elem, prop, val);
+					if(oldSet){
+						oldSet.call(elem, val);
+					}
+					return val;
+				};
+				desc.get = desc.get ||function(){
+					return webshims.contentAttr(this, prop) != null;
+				};
+			}
+			
 			extendQAttr(nodeName, prop, desc);
 			if(nodeName != '*' && webshims.cfg.extendNative && desc.value && $.isFunction(desc.value)){
 				extendNativeValue(nodeName, prop, desc);
@@ -212,9 +242,16 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			});
 			return retDesc;
 		},
-		defineNodeNameProperties: function(name, descs){
+		defineNodeNameProperties: function(name, descs, _noTmpCache){
+			
 			for(var prop in descs){
+				if(!_noTmpCache && descs[prop].content){
+					initProp.createTmpCache(name);
+				}
 				descs[prop] = webshims.defineNodeNameProperty(name, prop, descs[prop]);
+			}
+			if(!_noTmpCache){
+				initProp.flushTmpCache();
 			}
 			return descs;
 		},
@@ -229,10 +266,16 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			});
 			return retDesc;
 		},
-//		createElement: function(nodeName, create, descs){
-//			
-//			return webshims.defineNodeNameProperties(nodeName, desces);
-//		},
+		createElement: function(nodeName, create, descs){
+			var ret;
+			initProp.createTmpCache(nodeName);
+			if(descs){
+				ret = webshims.defineNodeNameProperties(nodeName, descs, true);
+			}
+			initProp.createElement(nodeName, create);
+			initProp.flushTmpCache();
+			return ret;
+		},
 		onNodeNamesPropertyModify: function(nodeNames, prop, desc){
 			if(typeof nodeNames == 'string'){
 				nodeNames = nodeNames.split(/\s*,\s*/);
@@ -258,21 +301,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		},
 		defineNodeNamesBooleanProperty: function(elementNames, prop, setDesc){
 			setDesc = setDesc || {};
-			var desc = {
-				set: function(val){
-					var elem = this;
-					val = !!val;
-					webshims.contentAttr(elem, prop, val);
-					if(setDesc.set){
-						setDesc.set.call(elem, val);
-					}
-					return val;
-				},
-				get: function(){
-					return webshims.contentAttr(this, prop) != null;
-				}
-			};
-			webshims.defineNodeNamesProperty(elementNames, prop, desc);
+			setDesc.isBoolean = true;
+			webshims.defineNodeNamesProperty(elementNames, prop, setDesc);
 		},
 		contentAttr: function(elem, name, val){
 			if(!elem.nodeName){return;}
