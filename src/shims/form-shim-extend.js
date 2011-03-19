@@ -1,8 +1,5 @@
-jQuery.webshims.register('form-extend', function($, webshims, window){
-if(Modernizr.formvalidation){
-	return;
-}
-
+if(!Modernizr.formvalidation){
+jQuery.webshims.register('form-extend', function($, webshims, window, document){
 webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
 var cfg = webshims.cfg.forms;
@@ -338,7 +335,7 @@ webshims.addReady(function(context, contextElem){
 });
 
 }); //webshims.ready end
-
+}//end formvalidation
 /*
  * HTML5 placeholder-enhancer
  * version: 2.0.2
@@ -349,8 +346,12 @@ webshims.addReady(function(context, contextElem){
 
 
 jQuery.webshims.ready('dom-extend form-core', function($, webshims, window, doc, undefined){
-	if(Modernizr.input.placeholder){return;}
+	if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder){return;}
 	var isOver = (webshims.cfg.forms.placeholderType == 'over');
+	var polyfillElements = ['textarea'];
+	if(!Modernizr.input.placeholder){
+		polyfillElements.push('input');
+	}
 	var hidePlaceholder = function(elem, data, value){
 			if(!isOver && elem.type != 'password'){
 				if(value === false){
@@ -527,7 +528,7 @@ jQuery.webshims.ready('dom-extend form-core', function($, webshims, window, doc,
 	$.webshims.publicMethods = {
 		pHolder: pHolder
 	};
-	['input', 'textarea'].forEach(function(nodeName){
+	polyfillElements.forEach(function(nodeName){
 		var desc = webshims.defineNodeNameProperty(nodeName, 'placeholder', {
 			set: function(val){
 				var elem = this;
@@ -541,7 +542,7 @@ jQuery.webshims.ready('dom-extend form-core', function($, webshims, window, doc,
 		});
 	});
 			
-	$.each(['input', 'textarea'], function(i, name){
+	polyfillElements.forEach(function(name){
 		var desc = webshims.defineNodeNameProperty(name, 'value', {
 			set: function(val){
 				var elem = this;
@@ -574,7 +575,7 @@ jQuery.webshims.ready('dom-extend form-core', function($, webshims, window, doc,
 						if(placeholder && 'value' in this){
 							changePlaceholderVisibility(this, val, placeholder);
 						}
-						if(this.type == 'password' || isOver){
+						if(isOver || this.type == 'password'){
 							oldVal.call($(this), '');
 						}
 					}

@@ -39,6 +39,8 @@
 		
 		Modernizr.genericDOM =  !!($('<video><div></div></video>')[0].innerHTML);
 		
+		Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
+		
 		//using only property api
 		Modernizr.requiredSelect = !!(Modernizr.formvalidation && 'required' in $('select', form)[0]);
 		
@@ -102,7 +104,7 @@
 	
 	$.extend($.webshims, {
 		
-		version: '1.5.0',
+		version: '1.5.2',
 		cfg: {
 			useImportantStyles: true,
 			removeFOUC: false,
@@ -559,6 +561,7 @@
 	 * shortcuts
 	 */
 	var webshims = $.webshims;
+	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var webCFG = webshims.cfg;
 	var isReady = webshims.isReady;
 	var onReady = webshims.ready;
@@ -740,7 +743,7 @@
 	});
 	
 	addModule('jquery-ui', {
-		src: '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js',
+		src: protocol+'ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js',
 		test: function(){return !!($.widget && $.Widget);}
 	});
 	
@@ -760,7 +763,7 @@
 	});
 	
 	addModule('swfobject', {
-		src: '//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js',
+		src: protocol+'ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js',
 		test: function(){return ('swfobject' in window);}
 	});
 	
@@ -895,6 +898,13 @@
 			combination: ['combined-webkit']
 		});
 		
+		//this implements placeholder in old opera
+		addPolyfill('placeholder', {
+			feature: 'forms',
+			test: modernizrInputAttrs.placeholder && Modernizr.textareaPlaceholder,
+			src: 'form-shim-extend'
+		});
+		
 	} else {
 		//this also serves as base for non capable browsers
 		addPolyfill('form-extend', {
@@ -944,7 +954,7 @@
 			calculateWidth: true,
 			slider: {},
 			datepicker: {},
-			langSrc: '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/i18n/jquery.ui.datepicker-',
+			langSrc: protocol+'ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/i18n/jquery.ui.datepicker-',
 			availabeLangs: 'af ar ar-DZ az bg bs ca cs da de el en-AU en-GB en-NZ eo es et eu fa fi fo fr fr-CH gl he hr hu hy id is it ja ko kz lt lv ml ms nl no pl pt-BR rm ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' '),
 			recalcWidth: true,
 			replaceUI: false
