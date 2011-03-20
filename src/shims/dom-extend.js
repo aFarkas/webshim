@@ -268,11 +268,21 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		},
 		createElement: function(nodeName, create, descs){
 			var ret;
+			if($.isFunction(create)){
+				create = {
+					after: create
+				};
+			}
 			initProp.createTmpCache(nodeName);
+			if(create.before){
+				initProp.createElement(nodeName, create.before);
+			}
 			if(descs){
 				ret = webshims.defineNodeNameProperties(nodeName, descs, true);
 			}
-			initProp.createElement(nodeName, create);
+			if(create.after){
+				initProp.createElement(nodeName, create.after);
+			}
 			initProp.flushTmpCache();
 			return ret;
 		},

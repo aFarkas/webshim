@@ -502,3 +502,9 @@ datalist {
 	min-height: 138px !important;
 	min-width: 215px !important;
 }
+details {
+	overflow: hidden;
+}
+.closed-details-child {
+	display: none !important;
+}
