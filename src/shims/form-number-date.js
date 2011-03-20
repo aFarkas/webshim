@@ -419,36 +419,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 	};
 	
 	replaceInputUI.common = function(orig, shim, methods){
-		if(options.replaceNative){
-			(function(){
-				var events = [];
-				var timer;
-				var throwError = function(e){
-					if((!events[0] || !events[0].isInvalidUIPrevented()) && (!events[1] || !events[1].isInvalidUIPrevented()) ){
-						var elem = e.target;
-						var name = elem.nodeName;
-						if(elem.id){
-							name += '#'+elem.id;
-						}
-						if(elem.name){
-							name += '[name="'+ elem.name +'"]';
-						}
-						if(elem.className){
-							name += '.'+ (elem.className.split(' ').join('.'));
-						}
-						throw(name +' can not be focused. handle the invalid event.');
-					}
-				};
-				orig.bind('firstinvalid', function(e){
-					clearTimeout(timer);
-					events.push(e);
-					timer = setTimeout(function(){
-						throwError(e);
-						events = [];
-					}, 20);
-				});
-			})();
-		} else if(Modernizr.formvalidation){
+		if(Modernizr.formvalidation){
 			orig.bind('firstinvalid', function(e){
 				clearTimeout(globalInvalidTimer);
 				globalInvalidTimer = setTimeout(function(){

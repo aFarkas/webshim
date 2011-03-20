@@ -64,7 +64,7 @@
 			
 			function equals(is, should, message){
 				message = $('<li>'+ message +' | was: '+ (is.type || is) +' expected: '+ (should.type || should) +'</li>').appendTo('#test-result');
-				if(message.text().indexOf("won't fix") == -1){
+				if(is === should || message.text().indexOf("won't fix") == -1){
 					message.css('backgroundColor', (is === should) ? '#090' : '#900');
 				}
 			}
@@ -265,7 +265,7 @@
 		var isDOMReady;
 		$(window).bind('load', function(){
 			setTimeout(function(){
-				if(!isDOMReady){
+				if(!isDOMReady  && window.parent == window){
 					alert('DOM-Ready not called');
 				}
 			}, 500);
