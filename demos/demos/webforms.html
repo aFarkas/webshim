@@ -47,7 +47,7 @@
 		</script>
 	-->
     <script class="example">
-    	$.webshims.setOptions('forms', { customMessages: true}); 
+    	$.webshims.setOptions('forms', { customMessages: true, textareaPlaceholder: true}); 
 		//load all defined
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
@@ -115,6 +115,8 @@
 					<li><strong>customMessages</strong> (boolean): <code>false</code> (default) || <code>true</code>. If <code>customMessages</code> is set to true. Webshims Lib will implement a DOM-Property called customValidationMessage, which can be changed through the $.webshims.validityMessages-Array.</li>
 					<li><strong>overrideMessages</strong> (boolean): <code>false</code> (default) || <code>true</code>. Overrides the native messages with the customMessages - using the <code>setCustomValidity</code>-method. This is usefull, if you want to use customMessages with native validation UI. If you want to use custom messages with custom styleable UI. Use the <code>customMessages</code>-option instead.</li>
 					<li><strong>placeholderType</strong> (string): <code>"value"</code> (default) || <code>"over"</code>. If placeholderType is set to "over", the polyfill uses the overLabel technique to create a placeholder and doesn't "polute" the value property.</li>
+					<li><strong>textareaPlaceholder</strong> (boolean): <code>false</code> (default) || <code>true</code>. If textareaPlaceholder is set to true, browser, which do support input[placeholder] and constraint validation, but no textarea[placeholder], will be polyfilled (only Opera 11).</li>
+					
 				</ul>
 				
 				<h3>Options for the <code>forms-ext</code> feature</h3>
