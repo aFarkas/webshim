@@ -72,10 +72,8 @@ forum, which can be found here:
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-Releases
-----------
 
-Release 1.5.2RC1
+Release 1.5.2
 ----------
 
 * fix loading external files from file:// protocol (small bug, but webshims seems absolutley broken)
