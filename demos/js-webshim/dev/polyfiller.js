@@ -872,7 +872,8 @@
 		options: {
 			placeholderType: 'value',
 			customMessages: false,
-			overrideMessages: false
+			overrideMessages: false,
+			textareaPlaceholder: false
 		}
 	});
 			
@@ -901,7 +902,9 @@
 		//this implements placeholder in old opera
 		addPolyfill('placeholder', {
 			feature: 'forms',
-			test: modernizrInputAttrs.placeholder && Modernizr.textareaPlaceholder,
+			test: function(){
+				return modernizrInputAttrs.placeholder && (!this.options.textareaPlaceholder || Modernizr.textareaPlaceholder);
+			},
 			src: 'form-shim-extend'
 		});
 		

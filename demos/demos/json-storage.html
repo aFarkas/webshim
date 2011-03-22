@@ -58,6 +58,7 @@
 			<p>If the flash localStorage shim is used and the the storage limit is hit, the flash settings dialog will be placed in to view to request more space for the storage. If the user denies this a DOMexception will be raised (<code>QUOTA_EXCEEDED_ERR: 22</code>).</p>
 			<p>Note: That IDL-attributes and the length property aren't implemented. You shouldn't rely on them, anyway.</p>
 			<p>Note: To use localStorage/sessionStorage you should test your webapp/website in an http-enivroment.</p>
+			<p>Note: For flash localStorage-polyfill: <a href="http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html">Add your development-directory to the local-trusted security sandbox.</a></p>
 <code class="block">
 $(function(){
 	if(localStorage.getItem('do-i-know-you') !== null){

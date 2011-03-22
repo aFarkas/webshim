@@ -71,3 +71,12 @@ forum, which can be found here:
 [http://forum.jquery.com/using-jquery-plugins](http://forum.jquery.com/using-jquery-plugins)
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
+
+
+Release 1.5.2
+----------
+
+* fix loading external files from file:// protocol (small bug, but webshims seems absolutley broken)
+* using jQuery UI 1.8.11
+* performance improvements using defineNodeName[s]Properties
+* improved placeholder 
