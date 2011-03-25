@@ -66,7 +66,12 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		extendedProps[nodeName][prop] = desc;
 		if(desc.value === undefined){
 			if(!desc.set){
-				desc.set = desc.writeable ? getSup('set', desc, oldDesc) : function(){throw(prop +'is readonly on '+ nodeName);};
+				desc.set = desc.writeable ? 
+					getSup('set', desc, oldDesc) : 
+					(webshims.cfg.useStrict) ? 
+						function(){throw(prop +' is readonly on '+ nodeName);} : 
+						$.noop
+				;
 			}
 			if(!desc.get){
 				desc.get = getSup('get', desc, oldDesc);
@@ -232,16 +237,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			}
 			return desc;
 		},
-		defineNodeNamesProperty: function(names, prop, desc){
-			if(typeof names == 'string'){
-				names = names.split(/\s*,\s*/);
-			}
-			var retDesc = {};
-			names.forEach(function(nodeName){
-				retDesc[nodeName] = webshims.defineNodeNameProperty(nodeName, prop, desc);
-			});
-			return retDesc;
-		},
+		
 		defineNodeNameProperties: function(name, descs, _noTmpCache){
 			
 			for(var prop in descs){
@@ -255,17 +251,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			}
 			return descs;
 		},
-		defineNodeNamesProperties: function(names, descs){
-			if(typeof names == 'string'){
-				names = names.split(/\s*,\s*/);
-			}
-			var retDesc = {};
-			names.forEach(function(nodeName){
-				var desc = $.extend({}, descs);
-				retDesc[nodeName] = webshims.defineNodeNameProperties(nodeName, desc);
-			});
-			return retDesc;
-		},
+		
 		createElement: function(nodeName, create, descs){
 			var ret;
 			if($.isFunction(create)){
@@ -383,5 +369,23 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			};
 		})()
 	});
+	
+	$.each({
+		defineNodeNamesProperty: 'defineNodeNameProperty',
+		defineNodeNamesProperties: 'defineNodeNameProperties',
+		createElements: 'createElement'
+	}, function(name, baseMethod){
+		webshims[name] = function(names, a, b){
+			if(typeof names == 'string'){
+				names = names.split(/\s*,\s*/);
+			}
+			var retDesc = {};
+			names.forEach(function(nodeName){
+				retDesc[nodeName] = webshims[baseMethod](nodeName, a, b);
+			});
+			return retDesc;
+		}
+	});
+	
 	webshims.isReady('webshimLocalization', true);
 });
