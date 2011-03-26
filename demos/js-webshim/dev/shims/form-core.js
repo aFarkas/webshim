@@ -300,36 +300,34 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 	
 		validityMessages['en'] = validityMessages['en'] || validityMessages['en-US'] || {
 			typeMismatch: {
-				email: '{%value} is not a legal email address',
-				url: '{%value} is not a valid web address',
-				number: '{%value} is not a number!',
-				date: '{%value} is not a date',
-				time: '{%value} is not a time',
-				range: '{%value} is not a number!',
-				"datetime-local": '{%value} is not a correct date-time format.'
+				email: 'Please enter an email address.',
+				url: 'Please enter a URL.',
+				number: 'Please enter a number.',
+				date: 'Please enter a date.',
+				time: 'Please enter a time.',
+				range: 'Invalid input.',
+				"datetime-local": 'Please enter a datetime.'
 			},
-			rangeUnderflow: {
-				defaultMessage: '{%value} is too low. The lowest value you can use is {%min}.'
-			},
-			rangeOverflow: '{%value}  is too high. The highest value you can use is {%max}.',
-			stepMismatch: 'The value {%value} is not allowed for this form.',
-			tooLong: 'The entered text is too large! You used {%valueLen} letters and the limit is {%maxlength}.',
+			rangeUnderflow: 'Value must be greater than or equal to {%min}.',
+			rangeOverflow: 'Value must be less than or equal to {%max}.',
+			stepMismatch: 'Invalid input.',
+			tooLong: 'Please enter at most {%maxlength} character(s). You entered {%valueLen}.',
 			
-			patternMismatch: '{%value} is not in the format this page requires! {%title}',
+			patternMismatch: 'Invalid input. {%title}',
 			valueMissing: {
-				defaultMessage: 'You have to specify a value',
-				checkbox: 'You have to check the box'
+				defaultMessage: 'Please fill out this field.',
+				checkbox: 'Please check this box if you want to proceed.'
 			}
 		};
 		
 		['date', 'time', 'datetime-local'].forEach(function(type){
-			validityMessages['en'].rangeUnderflow[type] = '{%value} is too early. The earliest value you can use is {%min}.';
+			validityMessages['en'].rangeUnderflow[type] = 'Value must be at or after {%min}.';
 		});
 		['date', 'time', 'datetime-local'].forEach(function(type){
-			validityMessages['en'].rangeOverflow[type] = '{%value} ist too late. The value can not be later than {%max}';
+			validityMessages['en'].rangeOverflow[type] = 'Value must be at or before {%max}.';
 		});
 		['select-one', 'radio'].forEach(function(type){
-			validityMessages['en'].valueMissing[type] = 'Please select an option';
+			validityMessages['en'].valueMissing[type] = 'Please select an option.';
 		});
 		
 		validityMessages['en-US'] = validityMessages['en-US'] || validityMessages['en'];

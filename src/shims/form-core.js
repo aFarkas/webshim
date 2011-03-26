@@ -313,7 +313,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 			stepMismatch: 'Invalid input.',
 			tooLong: 'Please enter at most {%maxlength} character(s). You entered {%valueLen}.',
 			
-			patternMismatch: 'Invalid input.',
+			patternMismatch: 'Invalid input. {%title}',
 			valueMissing: {
 				defaultMessage: 'Please fill out this field.',
 				checkbox: 'Please check this box if you want to proceed.'
