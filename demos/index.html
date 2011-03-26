@@ -167,16 +167,18 @@
 $.webshims.polyfill('json-storage geolocation');
 </code>					
 						<h3>List of features</h3>
+						
 						<ul>
-							<li><code>json-storage</code></li>
-							<li><code>es5</code></li>
-							<li><code>geolocation</code></li>
-							<li><code>canvas</code></li>
-							<li><code>forms</code></li>
+							<li><code>json-storage</code>*</li>
+							<li><code>es5</code>*</li>
+							<li><code>geolocation</code>*</li>
+							<li><code>canvas</code>*</li>
+							<li><code>forms</code>*</li>
 							<li><code>forms-ext</code></li>
 						</ul>
+						<p>The polyfill-method can also take a keyword called <code>lightweight</code>, which will load a filesize-/feature balanced profile</p>
+						<p><small>With an * marked features are part of the lightweight profile</small></p>
 	
-						<p>The polyfill-method can also take a keyword called <code>lightweight</code>, which will load a filesize-/feature balanced profile. The lightweight-profile currently loads all features, except of the <code>forms-ext</code> feature (numerical and date related web form features). The normal HTML5 <code>forms</code> feature - including constraint validation (required, pattern, [type=email]) and datalist/output widgets - is loaded in the <code>lightweight</code> profile.</p>
 <code class="block">
 //load and implement all unsupported features from the lightweight profile
 $.webshims.polyfill('lightweight');
@@ -386,7 +388,7 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 				//hide controls for elem
 			}
 		},
-		content: true
+		initAttr: true
 	});
 });	
 </code>
