@@ -16,7 +16,7 @@
 		
     </script>
 	
-	<title>webshims lib - the polyfilling, capability based loading JS libary</title>
+	<title>Webshims lib - The capability-based polyfill-loading JS library</title>
 	    
 </head>
 
@@ -25,7 +25,7 @@
 		<header>
 			<hgroup>
 				<h1>Webshims Lib.</h1>
-				<h2>Polyfill only the uncapable browsers</h2>
+				<h2>Polyfill only the incapable browsers</h2>
 			</hgroup>
 			<nav>
 				
@@ -34,40 +34,42 @@
 		<div class="main">
 			<section>
 				<div class="home-box about-box">
-					<p>Webshims Lib is a DOM-Extension helper, which enables / polyfills some of the latest browserfeatures often called "HTML5-features" or better <a href="http://www.brucelawson.co.uk/2010/meet-newt-new-exciting-web-technologies/">NEWT</a> in non capable browsers. It is build on Top of <a href="http://jquery.com/">jQuery 1.5.1+</a> and <a href="http://www.modernizr.com/">Modernizr 1.7+</a>.</p>
+					<p>Webshims Lib is a DOM extension helper which <a href="http://remysharp.com/2010/10/08/what-is-a-polyfill/">polyfills</a> the <a href="http://www.brucelawson.co.uk/2010/meet-newt-new-exciting-web-technologies/">latest and greatest web features</a> in browsers that don't support them natively. It is built on top of <a href="http://jquery.com/">jQuery 1.5.1+</a> and <a href="http://www.modernizr.com/">Modernizr 1.7+</a>.</p>
 				</div>
 				<div class="home-box download-box">
 					<p>
 						<a href="http://github.com/aFarkas/webshim/downloads" class="download-button">
 							<strong>Download Webshims Lib</strong>
-							<span>polyfilling Libary version 1.5.2</span>
 						</a>
 					</p>
 				</div>
 				<div class="home-box concept-box">
 				<h3>Main concepts</h3>
 					<ul>
-						<li><strong>Capability based loading:</strong> lightweight for good browsers / heavyweight for really bad browsers</li>
-						<li><strong>almost pure native and accurate APIs | no/less abstractions:</strong> Helps you to learn HTML5 (Markup-/DOM/JS-APIs) and to build usefull abstractions and extensions on top of the standard. Documentation is the specification (i.e.: <a href="http://dev.w3.org/html5/html-author/">HTML5 W3C Specification</a>)</li>
-						<li><strong>futureproof Feature-Detection:</strong> We try to feature detect everything instead of browsersniffing to be more futureproof</li>
-						<li><strong>modular feature implementation:</strong> Only load features, that you need for your webapplication.</li>
+						<li><strong>Capability based loading:</strong> the more features a browser supports natively, the more lightweight webshims will be</li>
+						<li><strong>Modular feature implementation:</strong> Only load features that you need for your application.</li>
+						<li><strong>Future-proof feature detection:</strong> We try to feature detect everything instead of browser sniffing to be more future proof</li>
+						<li><strong>Almost pure native and accurate APIs</strong> Helps you to learn HTML5 (Markup-/DOM/JS-APIs) and to build useful abstractions and extensions on top of the standard. Documentation is the specification (e.g. <a href="http://dev.w3.org/html5/html-author/">HTML5 W3C Specification</a>)</li>
 					</ul>
 				</div>
 				<div class="feature-example home-box">
 					<h3>What makes webshims lib different?</h3>
 					<div class="inner-box">
-						<p>Did you ever tried to dynamically set or get the placeholder or the value attribute with one of the other placeholder shims?</p>
+						<p>Did you ever try to dynamically set or get the placeholder or the value attribute of a text input with one of the other placeholder shims? With many of them it doesn't properly work. Webshims strives to provide a uniform and standards-compliant API in every environment.</p>
+						<p>The following text input uses the html5 placeholder attribute:</p>
 						<form action="#">
 							<input class="text" name="placeholder" id="placeholder" placeholder="change me" />
 						</form>
-						
+						<p>If you're viewing this page in a browser that doesn't support placeholder, Webshims has added this functionality via Javascript, and in a way that preserves your ability to work with the element's properties dynamically:</p>
 						<code>$("#placeholder").attr("placeholder", "<input value="test text" class="text" id="placeholder-text" />");</code> <button>run code</button>
 						<div class="hidden-explanation">
-							<p>Being able to add/change the placeholder of an input element dynamically, isn't that important. It only shows how webshims lib works. With some little constraints you won't be able to recognize a difference between the shim and the native implementation. In some cases the shim will be more compilant, than the current browser implementations.</p>
-							<p>The placeholder polyfill also works with getting and setting the value property (most/all other placeholder-polyfills don't support this properly):</p>
+							<p>Being able to change the placeholder of an input element dynamically isn't  a huge deal, but it shows how webshims lib works. With few exceptions, you won't be able to tell the difference between a shim and a native implementation. In some cases, the shim will even be more standards compliant than some browsers' native implementations.</p>
+							<p>The placeholder polyfill also works with getting and setting the value property (many other placeholder polyfills don't support this properly):</p>
 							<ul>
-								<li>$("#placeholder").attr('value') / $("#placeholder").val()</li>
-								<li>$("#placeholder").attr('value', 'new value') / $("#placeholder").val('new value')</li>
+								<li><code>$("#placeholder").attr('value')</code></li>
+								<li><code>$("#placeholder").val()</code></li>
+								<li><code>$("#placeholder").attr('value', 'new value')</code></li>
+								<li><code>$("#placeholder").val('new value')</code></li>
 							</ul>
 						</div>
 					</div>
@@ -131,11 +133,11 @@
 &lt;script&gt;
 	//implement all unsupported features
 	$.webshims.polyfill();
-	//or load only specific features, you need
+	//or load only specific features you need
 	//$.webshims.polyfill('forms json-storage');
 	
 	$(function(){
-		//use all implemented API-features on DOM-ready
+	//use all implemented API-features on DOM-ready
 	});
 &lt;/script&gt;		
 </code>
@@ -144,9 +146,9 @@
 				<h3 id="embed-polyfill" class="button">Embedding and configuring the script</h3>
 				<div class="panel">
 					<ul>
-						<li>Take the 'js-webshim' folder and add it to your project (You will find a minified and a dev-folder there)</li>
-						<li>Include the polyfiller.js into your HTML-Page (you can concat/rename this file with your other js. Don't forget to also include <a href="http://jquery.com">jQuery</a> and <a href="http://www.modernizr.com/">Modernizr</a>)</li>
-						<li>call the polyfill-method</li>
+						<li>Take the 'js-webshim' folder and add it to your project. (You will find a minified and a dev folder there.)</li>
+						<li>Include the polyfiller.js into your HTML page. You can concatenate this file with your other js and rename. Don't forget to also include <a href="http://jquery.com">jQuery</a> and <a href="http://www.modernizr.com/">Modernizr</a>.</li>
+						<li>call the polyfill method</li>
 					</ul>
 				
 <code class="block">
@@ -161,7 +163,7 @@
 &lt;/script&gt;	
 </code>
 				
-						<p>The polyfill-method can also take a white space seperated list of several features.</p>
+						<p>The polyfill method can also take a whitespace-separated list of several features.</p>
 <code class="block">
 //load and implement json-storage and geolocation features, if they aren't supported
 $.webshims.polyfill('json-storage geolocation');
@@ -176,12 +178,12 @@ $.webshims.polyfill('json-storage geolocation');
 							<li><code>forms-ext</code></li>
 						</ul>
 	
-						<p>The polyfill-method can also take a keyword called <code>lightweight</code>, which will load a filesize-/feature balanced profile. The lightweight-profile currently loads all features, except of the <code>forms-ext</code> feature (numerical and date related web form features). The normal HTML5 <code>forms</code> feature - including constraint validation (required, pattern, [type=email]) and datalist/output widgets - is loaded in the <code>lightweight</code> profile.</p>
+						<p>The polyfill method can also take a keyword called <code>lightweight</code>, which will load a filesize/feature balanced profile. The lightweight profile currently loads all features except for the <code>forms-ext</code> features (numerical and date related web form features). The normal HTML5 <code>forms</code> features&em;including constraint validation (required, pattern, [type=email]) and datalist/output widgets&em;are loaded in the <code>lightweight</code> profile.</p>
 <code class="block">
 //load and implement all unsupported features from the lightweight profile
 $.webshims.polyfill('lightweight');
 </code>			
-						<p>If you have any troubble setting up Webshims lib, set <code>$.webshims.debug</code> to true and open your Console (Don't forget to activate your firebug console):</p>
+						<p>If you have any trouble setting up Webshims lib, set <code>$.webshims.debug</code> to true and open your console:</p>
 <code class="block">							
 &lt;script&gt;
 	$.webshims.debug = true;
@@ -190,9 +192,9 @@ $.webshims.polyfill('lightweight');
 </code>						
 				
 				</div>
-				<h3 id="polyfill-ready" class="button">When is a feature ready to use?</h3>
+				<h3 id="polyfill-ready" class="button">Fire when ready</h3>
 				<div class="panel">
-				<p>Not every feature is ready immediately in all browsers. To get started, if all features are ready, simply use one of jQuery's ready methods, which are delayed, till all features are available.</p>
+				<p>Not every feature is ready immediately in all browsers; some shims might take time to load before you can use them. You can use one of jQuery's <code>ready</code> methods to delay working with elements until the DOM and any necessary shims are ready.</p>
 <code class="block">
 $(function(){
 	//work with DOM + all implemented features
@@ -204,7 +206,7 @@ $(doument).ready(function(){
 </code>		
 	
 			
-					<p>If you want to use a feature as soon as possible you can use <code>$.webshims.ready</code> and pass the feature-name[s] and a callback-function:</p>
+					<p>If you want to use a feature as soon as possible, you can use <code>$.webshims.ready</code> and pass the feature name(s) and a callback function:</p>
 <code class="block">
 $.webshims.ready('geolocation json-storage', function(){
 	//work with geolocation, JSON and localStorage
@@ -217,63 +219,60 @@ $.webshims.ready('DOM canvas', function(){
 });
 </code>	
 				</div>
-				<h3 id="polyfill-options" class="button">Setting feature specific options</h3>
+				<h3 id="polyfill-options" class="button">Setting feature-specific options</h3>
 				<div class="panel">
-					<p>Some features have additional options, you can configure these with the <code>$.webshims.setOptions</code>-method. <code>setOptions</code>-method should be always and only called before the <code>polyfill</code>-method:</p>
+					<p>Some features have additional options which can be configured with the <code>$.webshims.setOptions</code> method. <code>setOptions</code> should always be called before the <code>polyfill</code> method:</p>
 <code class="block">
 $.webshims.setOptions('canvas', {
 	type: "flash" //use flashcanvas instead of excanvas as polyfill
 });
 </code>		
 				
-					<p><code>setOptions</code> can also take an options-parameter only:</p>
+					<p><code>setOptions</code> can also take a single options parameter:</p>
 <code class="block">
 $.webshims.setOptions({
 	//configure canvas-shim
 	canvas: {
-		type: "flash" //use flashcanvas instead of excanvas as polyfill
+		type: "flash" // use flashcanvas instead of excanvas as polyfill
 	},
 	//configure forms-shim
 	forms: {
-		customMessages: true // implement customValidationMessages - attribute
+		customMessages: true // implement customValidationMessages
 	}
 });
 </code>	
 				</div>
-				<h3 id="polyfill-abstractions" class="button">minor Abstractions to DOM-Attributes, DOM-Methods and DOM-Events</h3>
+				<h3 id="polyfill-abstractions" class="button">Minor Abstractions to DOM attributes, DOM methods and DOM events</h3>
 				<div class="panel">
-					<p>Due to the fact, that we can not extend accessors of elements in all browsers, we always use jQuery as an extension-wrapper.</p>
+					<p>Due to the fact that we cannot extend accessors of elements in all browsers, we always use jQuery as an extension-wrapper.</p>
 					<ul>
 						<li>
-							<p><strong>Accessing DOM-Properties/Attribut IDLs</strong>: if the feature allows accessing a specific property, always use jQuery's built in <code>$.attr</code>-method:</p>
+							<p><strong>Accessing DOM properties/attribute IDLs</strong>: if the feature allows accessing a specific property, always use jQuery's built-in <code>$.attr</code> method:</p>
 <code class="block">
-//instead of accessing a property directly (i.e.: this.validity) 
-//use $.fn.attr 
+// instead of accessing a property directly (e.g. this.validity), use $.fn.attr 
 $(this).attr('validity');
-//or $.attr
+// or:
 //$.attr(this, 'validity');
 </code>
 						</li>
 						<li>
-							<p><strong>calling a DOM-Method</strong>: If the standard defines a DOM-Method, webshims lib extends this on the DOM-element or the element's prototype and also generates a jQuery-Plugin, which wraps this feature for you:</p>
+							<p><strong>calling a DOM method</strong>: While DOM properties have to be accessed through jQuery's <code>$.attr</code> method, DOM methods are added to DOM elements themselves, so you can call them directly:</p>
 <code class="block">
-//instead of calling a DOM-method directly (i.e.: this.checkValidity() ) 
-//you can also use the jQuery-Plugin method 
+// "this" refers to a DOM element, not a jQuery object
+this.checkValidity();
+</code>
+							<p>Webshims lib also generates a jQuery plugin which wraps the feature, so you can use jQuery too:</p>
+<code class="block">
 $(this).checkValidity();
 </code>
 							<p>If you pass a list of nodes and the method doesn't return anything, the method will be called on each element in this list, otherwise it will be called on the first element.</p>
-							<p>Note: While DOM-properties have to be accessed through jQuery's attr method. DOM-methods are also extended on the DOM elements itself, so you can still call them directly:</p>
-<code class="block">
-//Note: this refers to a DOM-element not a jQuery object
-this.checkValidity();
-</code>
 						</li>
 						<li>
-							<p><strong>binding to events</strong>: Always use jQuery's <code>bind</code> method to register your event handlers. <code>addEventListener</code> won't work in polyfilled browsers. Most events in the HTML5 specification are so called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery can not distinguish between the event phases (capturing/propagation), we use almost event capturing in the native implementation and $.fn.trigger in the shim.</p>
-							<p>This means, that some "HTML5 events" go down the DOM-tree in capable browsers and go up the tree in polyfilled browsers. This can create differences, if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default don't use <code>return false;</code> and use <code>event.preventDefault();</code> instead.</p>
+							<p><strong>binding to events</strong>: Always use jQuery's <code>bind</code> method to register your event handlers. <code>addEventListener</code> won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use event capturing in the native implementation and <code>$.fn.trigger</code> in the shim.</p>
+							<p>This means that some HTML5 events go down the DOM tree in capable browsers and go up the tree in polyfilled browsers. This can create differences if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default, don't use <code>return false;</code>, use <code>event.preventDefault();</code> instead.</p>
 						</li>
 						<li>
-							<p><strong>manipulation methods</strong>: Always use <code>.htmlWebshim()</code>, <code>.appendWebshim()</code>, <code>.prependWebshim()</code>, <code>.afterWebshim()</code>, <code>.beforeWebshim()</code> and <code>.replaceWithWebshim()</code> to insert new HTML5 content:</p>
+							<p><strong>manipulation methods</strong>: To insert new HTML5 content dynamically, use <code>.htmlWebshim()</code>, <code>.appendWebshim()</code>, <code>.prependWebshim()</code>, <code>.afterWebshim()</code>, <code>.beforeWebshim()</code> and <code>.replaceWithWebshim()</code>:</p>
 <code class="block">
 //three different examples
 $('form').appendWebshim('&lt;input type="date" /&gt;');
@@ -285,25 +284,25 @@ $('datalist#list select').prependWebshim('&lt;option value="new suggestion item"
 					</div>
 					<h3 id="implement-polyfill" class="button">How to write a new feature implementation?</h3>
 					<div class="panel">
-						<p>A Pollyfill is always split into at least 2 parts. First the test and loader definition and second the implementation.</p>
+						<p>A Pollyfill is always split into at least two parts. First the test and loader definition, and then the implementation.</p>
 		
-		<p>Assume, that there is a "magic" new method called magicMethod on the window-object. An implementation would look like this:</p>
+		<p>Assume there is a new method <code>magicMethod</code> on the window object that we want to polyfill if the browser doesn't provide it. An implementation would look like this:</p>
 <code class="block">
 $.webshims.addPolyfill('magicMethod', {
 	test: function(){
 		return ('magicMethod' in window);	
 	}
 });
-// = load magicMethod.js from shim-folder if test returns false
+// loads magicMethod.js from shim-folder if test returns false
 </code>		
-		<p>Create a file called magicMethod with your polyfill-code and place it in the shim-folder:</p>	
+		<p>Create a file called magicMethod with your polyfill code and place it in the shim folder:</p>	
 <code class="block">
 window.magicMethod = function(){
 	//your polyfill implementation
 };
 </code>		
 
-		<p>If your implementation has dependencies to other polyfills/modules. You can create a simple dependency by adding a dependencies-property:</p>
+		<p>If your implementation has dependencies on other polyfills/modules, you can add a dependencies property to make sure they're loaded too:</p>
 		
 <code class="block">
 $.webshims.addPolyfill('magicMethod', {
@@ -312,9 +311,9 @@ $.webshims.addPolyfill('magicMethod', {
 	},
 	dependencies: ['es5', 'json-storage']
 });
-// = load magicMethod.js from shim-folder if test returns false
+// load magicMethod.js and its dependencies if test returns false
 </code>		
-		<p>If you have setup a dependencies, you have to register your implementation code with <code>$.webshims.register</code>:</p>	
+		<p>If your shim has dependencies, you have to register your implementation code with <code>$.webshims.register</code>:</p>	
 <code class="block">
 jQuery.webshims.register('magicMethod', function($, webshims, window, document, undefined, options){
 	//now you can use es5-feature and json-storage feature	
@@ -324,7 +323,7 @@ jQuery.webshims.register('magicMethod', function($, webshims, window, document, 
 });
 </code>	
 
-		<p>In case of a DOM-Extension, webshims lib comes with some usefull extension-methods.</p>
+		<p>In case of a DOM extension, webshims lib comes with some useful extension-methods.</p>
 <code class="block">
 $.webshims.addPolyfill('mediaelement', {
 	test: function(){
@@ -333,29 +332,31 @@ $.webshims.addPolyfill('mediaelement', {
 	dependencies: ['dom-support'],
 	methodNames: ['play'] //pause, load
 });
-// = load mediaelement.js and DOM-extension features from shim-folder, if test returns false and always create a jQuery-Plugin called play, which trys to invoke native/polyfilled play
+// load mediaelement.js and DOM extension features from shim folder
+// if test returns false and always create a jQuery plugin called play,
+// which tries to invoke native or polyfilled play
 
-//listen to 'play' events in the capturing-phase
-//= webdevelopers can use event delegation with jQuery's bind-method
+// listen to 'play' events in the capturing phase
+// can use event delegation with jQuery's bind method
 $.webshims.capturingEvents(['play']);
 </code>
 
-		<p>Now put a mediaelement.js inside of your shim folder and start implementing some features. The <code>dom-support</code> feature of Webshims lib comes with some very usefull implementation helpers. Here are two of them:</p>
+		<p>Now put a mediaelement.js inside of your shim folder and start implementing some features. The <code>dom-support</code> feature of Webshims lib comes with some very useful implementation helpers. Here are two of them:</p>
 		<ul>
 			<li><code>$.webshims.defineNodeNamesProperty</code> (nodeNames, property, descriptor)</li>
 			<li><code>$.webshims.defineNodeNamesBooleanProperty</code> (nodeNames, property, descriptor)</li>
 		</ul>
 <code class="block">
-//wait till the DOM-Extension-feature is loaded
+//wait till the DOM-Extension feature is loaded
 jQuery.webshims.register('mediaelement', function($, webshims, window, document, undefined, options){
 	
 	//Implements a new IDL property on audio, video called currentTime
 	$.webshims.defineNodeNamesProperty('audio, video', 'currentTime', {
 		get: function(){
-			//your getter implementation (this refers to the element)
+			//your getter implementation ("this" refers to the element)
 		},
 		set: function(value){
-			//your setter implementation (this refers to the element)
+			//your setter implementation ("this" refers to the element)
 		}
 	});
 	
@@ -367,7 +368,7 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 	//Implements a new method called play on audio, video
 	$.webshims.defineNodeNamesProperty('audio, video', 'play', {
 		value: function(){
-			//your play-method implementation
+			//your play method implementation
 			//this refers to the element
 		}
 	});
@@ -378,7 +379,7 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 	//which is reflected by a content attribute
 	$.webshims.defineNodeNamesBooleanProperty('audio, video', 'controls', {
 		//set works more like an onSet:
-		//you don't have to set the value anymore on the domnode, only handle true/false values
+		//you don't have to set the value anymore on the DOM node, only handle true/false values
 		set: function(value){
 			if(value){
 				//show controls for elem
@@ -399,22 +400,22 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 			<section>
 				<hgroup>
 					<h2>Further Development</h2>
-					<h3>Feel free to <a href="https://github.com/aFarkas/webshim">fork</a>, <a href="https://github.com/aFarkas/webshim">collaborate</a>, <a href="https://github.com/aFarkas/webshim/issues">report issues</a>, develope extensions or simply use :-).</h3>
+					<h3>Feel free to <a href="https://github.com/aFarkas/webshim#fork_box">fork</a>, <a href="https://github.com/aFarkas/webshim/issues">report issues</a>, develop extensions or simply use :-).</h3>
 				</hgroup>
 				
 				<ul>
 					<li>improve current implementations</li>
-					<li><a href="http://www.w3.org/TR/html5/interactive-elements.html">interactive elements</a> (<strike>we should wait here, till a <a href="https://bugs.webkit.org/show_bug.cgi?id=51071">native implementation</a> exists</strike> comming with 1.6)</li>
-					<li><a href="http://www.w3.org/TR/html5/video.html">audio/video</a> implementation (comming in 1.7)</li>
-					<li>switching to a third party scriptloader (maybe <a href="https://github.com/SlexAxton/yepnope.js">yepnope</a> (comming in 1.8))</li>
-					<li>history (pushState etc.)/hashchange (maybe <a href="https://github.com/balupton/history.js">history.js</a> (comming in 1.9))</li>
+					<li><a href="http://www.w3.org/TR/html5/interactive-elements.html">interactive elements</a> (<strike>we should wait here, till a <a href="https://bugs.webkit.org/show_bug.cgi?id=51071">native implementation</a> exists</strike> coming with 1.6)</li>
+					<li><a href="http://www.w3.org/TR/html5/video.html">audio/video</a> implementation (coming in 1.7)</li>
+					<li>switching to a third party scriptloader (maybe <a href="https://github.com/SlexAxton/yepnope.js">yepnope</a> (coming in 1.8))</li>
+					<li>history (pushState etc.)/hashchange (maybe <a href="https://github.com/balupton/history.js">history.js</a> (coming in 1.9))</li>
 				</ul>
 				
 			</section>
 		</div>
 		<footer>
 			<small>
-				<strong>Note</strong>: every polyfill is a hack! innovative frontend development is and will be always hacky!
+				<strong>Note</strong>: every polyfill is a hack! innovative frontend development is hacky and always will be hacky!
 			</small>
 		</footer>
   
