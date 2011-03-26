@@ -4,16 +4,16 @@
 Features
 ------------------
 
-general Features:
+General Principles:
 
-* HTML5 compilant: correctly and accurately implemented (HTML5) Markup-, JS- and DOM-APIs  
-* capability based loading: extrem lightweight in modern browsers
-* cross-browser support: All A-Graded browsers including last version of Opera are testet
-* extendable: we have not implemented a feature, you want to use. You can easily implement the feature your own
+* HTML5 compliant: correctly and accurately implemented (HTML5) Markup-, JS- and DOM-APIs  
+* capability based loading: extremely lightweight in modern browsers
+* cross-browser support: All A-Graded browsers including latest version of Opera are tested
+* extendable: if we have not implemented a feature you want, you can easily implement it on your own
 
-implemented Features:
+Implemented Features:
 
-* HTML5 shiv and innerShiv solution including basic CSS-Support
+* HTML5 shiv and innerShiv solution including basic CSS-support
 * canvas
 * HTML5 form features including: constraint validation and form widgets (input[range], input[date], input[time], input[datetime-local], output)
 * JSON (stringify and parse)
@@ -40,7 +40,7 @@ How To Use
 	</script>
 ---------------
 
-* Wait till the implementation is ready and work with it:
+* Wait till everything has been loaded and then use it:
 
 --------------
 	<script> 
@@ -53,7 +53,7 @@ How To Use
 	</script>
 --------------
 
-[more informations and demos](http://aFarkas.github.com/webshim/demos/index.html)
+More information and demos [here](http://aFarkas.github.com/webshim/demos/index.html).
 
 
 License
@@ -66,9 +66,8 @@ The Webshims Lib core is licensed under the [MIT-License](http://aFarkas.github.
 Questions?
 ----------
 
-If you have any questions, please feel free to ask them on the Using jQuery Plugins
-forum, which can be found here:  
-[http://forum.jquery.com/using-jquery-plugins](http://forum.jquery.com/using-jquery-plugins)
+If you have any questions, please feel free to ask them on the [Using jQuery Plugins
+forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
@@ -76,7 +75,7 @@ forum, which can be found here:
 Release 1.5.2
 ----------
 
-* fix loading external files from file:// protocol (small bug, but webshims seems absolutley broken)
-* using jQuery UI 1.8.11
+* fix loading external files from file:// protocol
+* use jQuery UI 1.8.11
 * performance improvements using defineNodeName[s]Properties
-* improved placeholder 
+* improved placeholder
