@@ -232,8 +232,12 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				extendNativeValue(nodeName, prop, desc);
 			}
 			
-			if(desc.content){
+			if(desc.initAttr){
 				initProp.content(nodeName, prop);
+			}
+			//ToDo: remove
+			if(desc.content){
+				webshims.warn('old content prop used for '+ nodeName +': '+ prop);
 			}
 			return desc;
 		},
@@ -241,7 +245,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		defineNodeNameProperties: function(name, descs, _noTmpCache){
 			
 			for(var prop in descs){
-				if(!_noTmpCache && descs[prop].content){
+				if(!_noTmpCache && descs[prop].initContent){
 					initProp.createTmpCache(name);
 				}
 				descs[prop] = webshims.defineNodeNameProperty(name, prop, descs[prop]);
@@ -290,7 +294,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					modifyProps[name][prop].push(desc.set);
 				}
 				
-				if(desc.content){
+				if(desc.initContent){
 					initProp.content(name, prop);
 				}
 			});

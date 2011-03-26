@@ -283,7 +283,7 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 		var elem = this;
 		elem.setAttribute('aria-required', (value) ? 'true' : 'false');
 	},
-	content: true
+	initAttr: true
 });
 
 var noValidate = function(){
@@ -538,7 +538,7 @@ jQuery.webshims.ready('dom-extend form-core', function($, webshims, window, doc,
 			get: function(){
 				return webshims.contentAttr(this, 'placeholder') || '';
 			},
-			content: true
+			initAttr: true
 		});
 	});
 			

@@ -137,7 +137,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 					this.setAttribute('aria-required', (value) ? 'true' : 'false');
 					$.attr(this, 'validity');
 				},
-				content: true
+				initAttr: true
 			});
 		});
 	}
