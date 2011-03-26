@@ -350,9 +350,10 @@ $.webshims.capturingEvents(['play']);
 <code class="block">
 //wait till the DOM-Extension-feature is loaded
 jQuery.webshims.register('mediaelement', function($, webshims, window, document, undefined, options){
+	//note: webshims refers to jQuery.webshims in this function
 	
 	//Implements a new IDL property on audio, video called currentTime
-	$.webshims.defineNodeNamesProperty('audio, video', 'currentTime', {
+	webshims.defineNodeNamesProperty('audio, video', 'currentTime', {
 		get: function(){
 			//your getter implementation (this refers to the element)
 		},
@@ -362,12 +363,12 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 	});
 	
 	//Implements a new constant property called HAVE_CURRENT_DATA on audio, video
-	$.webshims.defineNodenamesProperty('audio, video', 'HAVE_CURRENT_DATA', {
+	webshims.defineNodenamesProperty('audio, video', 'HAVE_CURRENT_DATA', {
 		value: 2
 	});
 	
 	//Implements a new method called play on audio, video
-	$.webshims.defineNodeNamesProperty('audio, video', 'play', {
+	webshims.defineNodeNamesProperty('audio, video', 'play', {
 		value: function(){
 			//your play-method implementation
 			//this refers to the element
@@ -378,7 +379,7 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 	
 	//Implements a new boolean IDL property called controls on audio, video
 	//which is reflected by a content attribute
-	$.webshims.defineNodeNamesBooleanProperty('audio, video', 'controls', {
+	webshims.defineNodeNamesBooleanProperty('audio, video', 'controls', {
 		//set works more like an onSet:
 		//you don't have to set the value anymore on the domnode, only handle true/false values
 		set: function(value){

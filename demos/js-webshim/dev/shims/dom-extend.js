@@ -235,9 +235,9 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if(desc.initAttr){
 				initProp.content(nodeName, prop);
 			}
-			
+			//ToDo: remove
 			if(desc.content){
-				alert(nodeName +': '+ prop);
+				webshims.warn('old content prop used for '+ nodeName +': '+ prop);
 			}
 			return desc;
 		},

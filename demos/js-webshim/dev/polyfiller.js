@@ -37,6 +37,10 @@
 			return (Modernizr.formvalidation && 'value' in document.createElement('output'));
 		});
 		
+		addTest('details', function(){
+			return ('open' in document.createElement('details'));
+		});
+		
 		Modernizr.genericDOM =  !!($('<video><div></div></video>')[0].innerHTML);
 		
 		Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
@@ -78,7 +82,7 @@
 		
 		
 		var advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
-		//safari has defineProperty-interface, but it can't be used on dom-object
+		//safari5 has defineProperty-interface, but it can't be used on dom-object
 		//only do this test in non-IE browsers, because this hurts dhtml-behavior in some IE8 versions
 		if(!$.browser.msie && Object.defineProperty && Object.prototype.__defineGetter__){
 			(function(){
@@ -976,5 +980,12 @@
 	});
 	
 	/* END: json + loacalStorage */
-	
+	addPolyfill('details', {
+		test: Modernizr.details,
+		dependencies: ['dom-support'],
+		options: {
+			animate: false,
+			text: 'Details'
+		}
+	});
 })(jQuery, this, this.document);
