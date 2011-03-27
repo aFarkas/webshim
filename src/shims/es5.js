@@ -20,7 +20,7 @@ var otoString = Object.prototype.toString;
 // ES5 15.4.3.2 
 if (!Array.isArray) {
     Array.isArray = function(obj) {
-        return otoString.call(obj) == "[object Array]";
+        return otoString.call(obj) === "[object Array]";
     };
 }
 	
@@ -87,6 +87,11 @@ if((!Modernizr.advancedObjectProperties || !Object.create || !Object.definePrope
 		
 		f.prototype = proto;
 		o = new f();
+		
+		if(!'__proto__' in o){
+			o.__proto__ = proto;
+		}
+		
 		if(props){
 			shims.defineProperties(o, props);
 		}
@@ -330,15 +335,16 @@ if (isNaN(Date.parse("T00:00"))) {
 
 // ES-5 15.3.4.5
 // http://www.ecma-international.org/publications/files/drafts/tc39-2009-025.pdf
-var slice = Array.prototype.slice;
+
 if (!Function.prototype.bind) {
+	var slice = Array.prototype.slice;
     Function.prototype.bind = function (that) { // .length is 1
         // 1. Let Target be the this value.
         var target = this;
         // 2. If IsCallable(Target) is false, throw a TypeError exception.
         // XXX this gets pretty close, for all intents and purposes, letting 
         // some duck-types slide
-        if (typeof target.apply != "function" || typeof target.call != "function")
+        if (typeof target.apply !== "function" || typeof target.call !== "function")
             return new TypeError();
         // 3. Let A be a new (possibly empty) internal list of all of the
         //   argument values provided after thisArg (arg1, arg2 etc), in order.
@@ -405,17 +411,17 @@ if (!Function.prototype.bind) {
         };
         // 5. Set the [[TargetFunction]] internal property of F to Target.
         // extra:
-        bound.bound = target;
+//        bound.bound = target;
         // 6. Set the [[BoundThis]] internal property of F to the value of
         // thisArg.
         // extra:
-        bound.boundTo = that;
+//        bound.boundTo = that;
         // 7. Set the [[BoundArgs]] internal property of F to A.
         // extra:
-        bound.boundArgs = args;
+//        bound.boundArgs = args;
         bound.length = (
             // 14. If the [[Class]] internal property of Target is "Function", then
-            typeof target == "function" ?
+            typeof target === "function" ?
             // a. Let L be the length property of Target minus the length of A.
             // b. Set the length own property of F to either 0 or L, whichever is larger.
             Math.max(target.length - args.length, 0) :
@@ -473,7 +479,7 @@ if (!Array.prototype.forEach) {
 if (!Array.prototype.map) {
     Array.prototype.map = function(fun /*, thisp*/) {
         var len = +this.length;
-        if (typeof fun != "function")
+        if (typeof fun !== "function")
           throw new TypeError();
 
         var res = new Array(len);
@@ -526,11 +532,11 @@ if (!Array.prototype.some) {
 if (!Array.prototype.reduce) {
     Array.prototype.reduce = function(fun /*, initial*/) {
         var len = +this.length;
-        if (typeof fun != "function")
+        if (typeof fun !== "function")
             throw new TypeError();
 
         // no value to return if no initial value and an empty array
-        if (len == 0 && arguments.length == 1)
+        if (len === 0 && arguments.length === 1)
             throw new TypeError();
 
         var i = 0;
@@ -563,11 +569,11 @@ if (!Array.prototype.reduce) {
 if (!Array.prototype.reduceRight) {
     Array.prototype.reduceRight = function(fun /*, initial*/) {
         var len = +this.length;
-        if (typeof fun != "function")
+        if (typeof fun !== "function")
             throw new TypeError();
 
         // no value to return if no initial value, empty array
-        if (len == 0 && arguments.length == 1)
+        if (len === 0 && arguments.length === 1)
             throw new TypeError();
 
         var i = len - 1;

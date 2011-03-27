@@ -185,7 +185,14 @@
 	                <label for="email">
 	                    E-Mail: <dfn title="required">*</dfn>
 					</label>
-	               	<input name="email" required="required" class="email" type="email" id="email" />
+	               	<input list="dlist" name="email" required="required" class="email" type="email" id="email" />
+					<datalist id="dlist">
+						<select>
+							<option value="yes aßäöâ" />
+							<option value='yes "2"'></option>
+							<option value="yes '3'"></option>
+						</select>
+					</datalist>
 	                <span>Lorem ipsum dolor sit amet adipiscing elit.</span>
 	            </div>
 				<div>

@@ -337,7 +337,8 @@ jQuery.webshims.register('form-output-datalist', function($, webshims, window, d
 				clearTimeout(this.updateTimer);
 				this.shadowList.css({
 					fontSize: $.curCSS(this.input, 'fontSize'),
-					fontFamily: $.curCSS(this.input, 'fontFamily')
+					fontFamily: $.curCSS(this.input, 'fontFamily'),
+					id: this.datalist.id +'-polyfill'
 				});
 				var list = '<ul role="list" class="'+ (this.datalist.className || '') +'">';
 				
@@ -346,7 +347,7 @@ jQuery.webshims.register('form-output-datalist', function($, webshims, window, d
 				$('option', this.datalist).each(function(i){
 					if(this.disabled){return;}
 					var item = {
-						value: $(this).val(),
+						value: $(this).val() || '',
 						text: $.trim($.attr(this, 'label') || getText(this)),
 						className: this.className || '',
 						style: $.attr(this, 'style') || ''
@@ -365,7 +366,8 @@ jQuery.webshims.register('form-output-datalist', function($, webshims, window, d
 				});
 				
 				allOptions.forEach(function(item, i){
-					list += '<li data-value="'+item.value+'" class="'+ item.className +'" style="'+ item.style +'" tabindex="-1" role="listitem">'+ item.text +'</li>';
+					var val = item.value.indexOf('"') != -1 ? "'"+ item.value +"'" : '"' + item.value +'"';
+					list += '<li data-value='+ val +' class="'+ item.className +'" style="'+ item.style +'" tabindex="-1" role="listitem">'+ item.text +'</li>';
 				});
 				
 				list += '</ul>';
