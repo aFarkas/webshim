@@ -511,7 +511,7 @@ jQuery.webshims.register('form-output-datalist', function($, webshims, window, d
 					webshims.contentAttr(elem, 'list', value);
 					webshims.objectCreate(dataListProto, undefined, {input: elem, id: value});
 				},
-				content: true
+				initAttr: true
 			},
 			selectedOption: {
 				set: $.noop,

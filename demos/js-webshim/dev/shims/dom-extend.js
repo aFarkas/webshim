@@ -66,7 +66,12 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		extendedProps[nodeName][prop] = desc;
 		if(desc.value === undefined){
 			if(!desc.set){
-				desc.set = desc.writeable ? getSup('set', desc, oldDesc) : function(){throw(prop +'is readonly on '+ nodeName);};
+				desc.set = desc.writeable ? 
+					getSup('set', desc, oldDesc) : 
+					(webshims.cfg.useStrict) ? 
+						function(){throw(prop +' is readonly on '+ nodeName);} : 
+						$.noop
+				;
 			}
 			if(!desc.get){
 				desc.get = getSup('get', desc, oldDesc);
@@ -227,25 +232,20 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				extendNativeValue(nodeName, prop, desc);
 			}
 			
-			if(desc.content){
+			if(desc.initAttr){
 				initProp.content(nodeName, prop);
+			}
+			//ToDo: remove
+			if(desc.content){
+				webshims.warn('old content prop used for '+ nodeName +': '+ prop);
 			}
 			return desc;
 		},
-		defineNodeNamesProperty: function(names, prop, desc){
-			if(typeof names == 'string'){
-				names = names.split(/\s*,\s*/);
-			}
-			var retDesc = {};
-			names.forEach(function(nodeName){
-				retDesc[nodeName] = webshims.defineNodeNameProperty(nodeName, prop, desc);
-			});
-			return retDesc;
-		},
+		
 		defineNodeNameProperties: function(name, descs, _noTmpCache){
 			
 			for(var prop in descs){
-				if(!_noTmpCache && descs[prop].content){
+				if(!_noTmpCache && descs[prop].initContent){
 					initProp.createTmpCache(name);
 				}
 				descs[prop] = webshims.defineNodeNameProperty(name, prop, descs[prop]);
@@ -255,24 +255,24 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			}
 			return descs;
 		},
-		defineNodeNamesProperties: function(names, descs){
-			if(typeof names == 'string'){
-				names = names.split(/\s*,\s*/);
-			}
-			var retDesc = {};
-			names.forEach(function(nodeName){
-				var desc = $.extend({}, descs);
-				retDesc[nodeName] = webshims.defineNodeNameProperties(nodeName, desc);
-			});
-			return retDesc;
-		},
+		
 		createElement: function(nodeName, create, descs){
 			var ret;
+			if($.isFunction(create)){
+				create = {
+					after: create
+				};
+			}
 			initProp.createTmpCache(nodeName);
+			if(create.before){
+				initProp.createElement(nodeName, create.before);
+			}
 			if(descs){
 				ret = webshims.defineNodeNameProperties(nodeName, descs, true);
 			}
-			initProp.createElement(nodeName, create);
+			if(create.after){
+				initProp.createElement(nodeName, create.after);
+			}
 			initProp.flushTmpCache();
 			return ret;
 		},
@@ -294,7 +294,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					modifyProps[name][prop].push(desc.set);
 				}
 				
-				if(desc.content){
+				if(desc.initContent){
 					initProp.content(name, prop);
 				}
 			});
@@ -373,5 +373,23 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			};
 		})()
 	});
+	
+	$.each({
+		defineNodeNamesProperty: 'defineNodeNameProperty',
+		defineNodeNamesProperties: 'defineNodeNameProperties',
+		createElements: 'createElement'
+	}, function(name, baseMethod){
+		webshims[name] = function(names, a, b){
+			if(typeof names == 'string'){
+				names = names.split(/\s*,\s*/);
+			}
+			var retDesc = {};
+			names.forEach(function(nodeName){
+				retDesc[nodeName] = webshims[baseMethod](nodeName, a, b);
+			});
+			return retDesc;
+		}
+	});
+	
 	webshims.isReady('webshimLocalization', true);
 });

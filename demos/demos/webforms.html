@@ -51,6 +51,8 @@
 		//load all defined
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
+		
+		
         $(function(){
 			var showHideFormsExt = function(){
 				$('span.forms-ext-feature')[this.checked ? 'show' : 'hide']();
@@ -359,7 +361,13 @@ $.webshims.setOptions('forms-ext', {
 					</div>
 				</div>
 			</aside>
-			
+			<aside>
+				<h3>Known Issues</h3>
+				<ul>
+					<li>Spinbuttons for type=time and type=number don't show up in Safari 5 on Windows (everything fine on Mac) <a href="https://github.com/aFarkas/webshim/issues#issue/23">Bug</a></li>
+					<li>You can't use "-signs as an options value inside of datalist element</li>
+				</ul>
+			</aside>	
 			<aside>
 				<h3>Links about Webforms</h3>
 				<ul>

@@ -98,6 +98,16 @@ $('form')
 	})
 ;
 </code>	
+
+			<p>Using <code>$.webshims.validityAlert.showFor</code> will generate the following styleable HTML structur:</p>
+			
+<code class="block">
+&lt;!-- note: span.validity-alert is label.validity-alert in old browser, which do not support WAI-ARIA --&gt;
+&lt;span class="validity-alert" role="alert"&gt;
+	&lt;span class="va-arrow"&gt;&lt;span class="va-arrow-box"&gt;&lt;/span&gt;&lt;/span&gt;
+	&lt;span class="va-box"&gt;Error message of the current field&lt;/span&gt;
+&lt;/span&gt;
+</code>
 			
 			<p>The problem with this approach is, that Firefox 4.0 also shows an invalid hint on mouseover, which can't be replaced by this technique. If you want to remove this you can use a title-attribute with an emtpy string.</p>
 			

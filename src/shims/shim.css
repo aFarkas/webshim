@@ -28,7 +28,8 @@ mark {
 .step-controls span,
 .input-range,
 .input-range .ui-slider-handle,
-.input-range .ui-slider-range {
+.input-range .ui-slider-range,
+.details-open-indicator {
 	margin: 0;
 	padding: 0;
 	border: none;
@@ -161,7 +162,7 @@ img.ui-datepicker-trigger {
 	cursor: pointer;
 	font-size: 0;
 	line-height: 0;
-	background: url(arrows.png) no-repeat 0 0;
+	background: url(spinbutton-arrows.png) no-repeat 0 0;
 }
 .polyfill-important .step-controls span {
 	display: inline-block !important;
@@ -170,7 +171,7 @@ img.ui-datepicker-trigger {
 	width: 15px;
 	height: 9px;
 	font-size: 0 !important;
-	background: url(arrows.png) no-repeat 0 0;
+	background: url(spinbutton-arrows.png) no-repeat 0 0;
 }
 
 .step-controls span.step-up {
@@ -501,4 +502,38 @@ datalist {
 #swflocalstorageshim-wrapper object {
 	min-height: 138px !important;
 	min-width: 215px !important;
+}
+details {
+	overflow: hidden;
+}
+.closed-details-child {
+	display: none !important;
+}
+.details-open-indicator {
+	margin: -1px 0 0;
+	display: inline-block;
+	width: 11px;
+	height: 11px;
+	background: url(details-arrows.png) no-repeat 0 0;
+	vertical-align: middle;
+}
+.closed-details-summary .details-open-indicator {
+	background-position: 0 -20px;
+}
+.polyfill-important .details-open-indicator {
+	margin: -1px 0 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	display: inline-block !important;
+	width: 11px !important;
+	height: 11px !important;
+	background: url(details-arrows.png) no-repeat 0 0 !important;
+	vertical-align: middle !important;
+}
+.polyfill-important .closed-details-summary .details-open-indicator {
+	background-position: 0 -20px !important;
+}
+summary.summary-has-focus {
+	outline: 1px dotted #aaa;
+	outline-offset: -1px;
 }
