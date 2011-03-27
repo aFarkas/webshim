@@ -26,12 +26,13 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
 	<script src="../../js-webshim/minified/extras/mousepress.js"></script>
 	<script src="../../js-webshim/minified/extras/modernizr-1.7.min.js"></script>
-	<script src="../../js-webshim/minified/polyfiller.js"></script>
+	<script src="../../../src/polyfiller.js"></script>
     <script>
     	//configure
 		$.webshims.setOptions('forms', {
 			overrideMessages: true
 		});
+		
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
@@ -109,7 +110,7 @@ $('form')
 &lt;/span&gt;
 </code>
 			
-			<p>The problem with this approach is, that Firefox 4.0 also shows an invalid hint on mouseover, which can't be replaced by this technique. If you want to remove this you can use a title-attribute with an emtpy string.</p>
+			<p>Firefox 4.0 also shows an invalid hint on mouseover, which can't be replaced by this technique. If you want to remove this you can use a title-attribute with an emtpy string or use the <a href="https://developer.mozilla.org/en/HTML/element/input#Error_messages">x-moz-errormessage</a> to control the error message.</p>
 			
 			<p>Using instead the <code>setCustomValidity</code> approach will fully replace the validation message, while the native validation UI stays. Changing the validation message with setCustomValidity, would look like this:</p>
 			
@@ -117,8 +118,10 @@ $('form')
 $('input[required]').setCustomValidity('You have to enter something');
 </code>
 			<p>The problem with <code>setCustomValidity</code> is, that <code>setCustomValidity</code> is a low level API for changing the validityState of an element. This means: The changed validation message is only a side effect, setCustomValidity only works on a single element and also sets the customError-flag to true. The developer has to observe the validityState of an element and has to remove/change the custom validation messsage dynamically as soon as the message isn't relevant anymore, which can be a real pain in the ass.</p>
-			<p>Another problem is, that Opera adds a prefix-message in front of all custom validation messages changed with the <code>setCustomValidity</code>.</p>
-			<p>This means, that you either have to combine both techniques to create real fully customzied messages with HTML5 or use the first approach combined with the empty title attribute approach.</p>
+<code class="block">
+//remove customError flag:
+$('input[required]').setCustomValidity('');
+</code>
 			<p>Due to the fact, that Webshims Lib already had to implement the setCustomValidity approach to do a lot of bugfixing in capable browsers/implementing in uncapable/semi-capable browsers, webshims lib gives you a simple configuration property to dynamically overriding the validationMessage with the customValidationMessage. Simply set the <code>overrideMessages</code> to true, before calling <code>polyfill</code>.</p>
 			
 <code class="block">

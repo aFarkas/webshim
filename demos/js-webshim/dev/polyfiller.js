@@ -358,6 +358,7 @@
 				}
 			}
 		},
+		
 		/*
 		 * loader
 		 */
@@ -580,6 +581,21 @@
 			webshims.warn('error with: '+ this.url +' | '+ text);
 		}
 	};
+	
+	//activeLang will be overridden
+	webshims.activeLang = (function(){
+		var args;
+		var that;
+		onReady('webshimLocalization', function(){
+			if(args && that){
+				webshims.activeLang.apply(that, args);
+			}
+		});
+		return function(){
+			that = this;
+			args = arguments;
+		};
+	})();
 	
 	
 	$.each(['log', 'error', 'warn', 'info'], function(i, fn){

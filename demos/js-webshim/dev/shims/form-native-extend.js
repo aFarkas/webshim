@@ -1,4 +1,4 @@
-jQuery.webshims.register('form-extend', function($, webshims, window, doc, undefined){
+jQuery.webshims.register('form-extend', function($, webshims, window, doc, undefined, options){
 	"use strict";
 	if(!Modernizr.formvalidation){return;}
 	var typeModels = webshims.inputTypes;
@@ -25,7 +25,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		return ret;
 	});
 	
-	var overrideNativeMessages = webshims.cfg.forms.overrideMessages;	
+	var overrideNativeMessages =options.overrideMessages;	
 	
 	var overrideValidity = (!Modernizr.requiredSelect || !Modernizr.input.valueAsDate || overrideNativeMessages);
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
@@ -193,6 +193,33 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 				$.attr(this, 'validity');
 			});
 		});
+		if(overrideNativeMessages){
+			webshims.ready('DOM', function(){
+				var lng;
+				$(document).bind('webshimLocalizationReady', function(){
+					var curLng = webshims.activeLang()[0];
+					if(lng != curLng){
+						lng = curLng;
+						$('input, select, textarea')
+							.each(function(){
+								if($.data(this, 'hasCustomError')){return;}
+								var elem = this;
+								var validity = $.attr(elem, 'validity');
+								var nodeName;
+								if(validity.valid){return;}
+								nodeName = (elem.nodeName || '').toLowerCase();
+								$.each(validity, function(name, prop){
+									if(name !== 'valid' && prop){
+										oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, name));
+										return false;
+									}
+								});
+							})
+						;
+					}
+				});
+			});
+		}
 		
 	} //end: overrideValidity
 });
