@@ -810,7 +810,7 @@
 	/* change path $.webshims.modules[moduleName].src */
 	addModule('html5a11y', {
 		src: 'html5a11y',
-		test: !(($.browser.msie && browserVersion < 9 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 535))
+		test: !(($.browser.msie && browserVersion < 10 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 535))
 	});
 	
 	addModule('jquery-ui', {
