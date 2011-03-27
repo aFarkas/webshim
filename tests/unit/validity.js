@@ -238,6 +238,8 @@ asyncTest('email, url, pattern, maxlength', function(){
 });
 
 asyncTest('validationMessage/setCustomValidity', function(){
+	var firstInvalid = $('#name').attr('value', '');
+	var lang = $.webshims.activeLang()[0];
 	//select + customValidity
 	ok($('#select').is(':valid-element'), 'select is valid');
 	$('#select').setCustomValidity('has an error');
@@ -245,9 +247,23 @@ asyncTest('validationMessage/setCustomValidity', function(){
 	ok($('#select').attr('validity').customError, 'select has customerror');
 	equals($('#select').attr('validationMessage'), 'has an error', 'custom error message set');
 	if($.webshims.cfg.forms.overrideMessages){
-		var firstInvalid = $('#name').attr('value', '');
 		equals(firstInvalid.attr('validationMessage'), firstInvalid.attr('customValidationMessage'), 'custom message equals native message if messages are overridden');
+		$.webshims.activeLang('en');
+		equals(firstInvalid.attr('validationMessage'), firstInvalid.attr('customValidationMessage'), 'switched message to en');
+		$.webshims.activeLang('de');
+		equals(firstInvalid.attr('validationMessage'), firstInvalid.attr('customValidationMessage'), 'switched message to de');
+		$.webshims.activeLang(lang);
+		equals(firstInvalid.attr('validationMessage'), firstInvalid.attr('customValidationMessage'), 'switched message to '+ lang);
 	}
+	if($.webshims.cfg.forms.overrideMessages || $.webshims.cfg.forms.customMessages){
+		$.webshims.activeLang('en');
+		var enMessage = firstInvalid.attr('customValidationMessage');
+		$.webshims.activeLang('de');
+		var deMessage = firstInvalid.attr('customValidationMessage');
+		ok(enMessage != deMessage, 'customMessage for en is not equal to customMessage for de');
+		$.webshims.activeLang(lang);
+	}
+	
 	equals($('#select').attr('disabled', true).attr('validationMessage'), '', 'custom error message is empty, if control is disabled');
 	$('#select').attr('disabled', false).setCustomValidity('');
 	ok(( $('#select').is(':valid-element') && $('#select').attr('willValidate') ), 'select is set valid again');

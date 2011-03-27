@@ -335,10 +335,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					if(!module || !fn){
 						if(lang !== langs[0]){
 							langs[0] = lang;
-							clearTimeout(timer);
-							timer = setTimeout(function(){
-								$(document).triggerHandler('webshimLocalizationReady', langs);
-							}, 0);
+							$(document).triggerHandler('webshimLocalizationReady', langs);
 						}
 					} else {
 						module = modules[module].options;
