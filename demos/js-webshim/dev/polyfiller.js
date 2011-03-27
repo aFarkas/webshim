@@ -199,7 +199,11 @@
 				firstPolyfillCall = $.noop;
 			};
 			
-			return function(features){
+			return function(features, combo){
+				if(features && ( features === true || $.isPlainObject( features ) ) ){
+					combo = features;
+					features = undefined;
+				}
 				var toLoadFeatures = [];
 				
 				features = features || webshims.featureList;
@@ -225,7 +229,7 @@
 				});
 				
 				firstPolyfillCall(features);
-				loader.loadList(toLoadFeatures);
+				loader.loadList(toLoadFeatures, combo);
 				
 			};
 		})(),
@@ -438,8 +442,52 @@
 					}
 				};
 				
-				return function(list){
+				var excludeCombo = /\.\/|\/\//;
+				var loadAsCombo = function(toLoad, combo){
+					var fPart = [];
+					var combiNames = [];
+					var len = 0;
+					var l = location;
+					
+					combo = $.extend({
+						seperator: ',',
+						base: '/min/f=',
+						maxFiles: 10,
+						scriptPath: loader.basePath.replace( l.protocol +'//'+ l.host +'/', '')
+					}, typeof combo == 'object' ? combo : {});
+					
+					$.each(toLoad, function(i, loadName){
+						if ($.inArray(loadName, loadedModules) == -1) {
+							var src = (modules[loadName].src || loadName);
+							
+							if(src.indexOf('.') == -1){
+								src += '.js';
+							}
+							if(!excludeCombo.test(src)){
+								len++;
+								src = combo.scriptPath + src;
+								fPart.push(src);
+								combiNames.push(loadName);
+								if(len >= combo.maxFiles){
+									loadScript(combo.base + ( fPart.join(combo.seperator) ), combiNames);
+									fPart = [];
+									combiNames = [];
+									len = 0;
+								}
+							} else {
+								
+								loadScript(src, loadName);
+							}
+						}
+					});
+					if(fPart.length){
+						loadScript(combo.base + ( fPart.join(combo.seperator) ), combiNames);
+					}
+				};
+				
+				return function(list, combo){
 					var module;
+					var loadCombos = [];
 					//length of list is dynamically
 					for(var i = 0; i < list.length; i++){
 						module = modules[list[i]];
@@ -454,13 +502,17 @@
 							module.loadInit();
 						}
 										
-						setDependencies(module, list, list);
-						
-						loadScript(module.src || module.name, module.name);
+						setDependencies(module, list);
+						if(combo){
+							loadCombos.push(module.name);
+						} else {
+							
+							loadScript(module.src || module.name, module.name);
+						}
 					}
-					
-					
-					
+					if(combo){
+						loadAsCombo(loadCombos, combo);
+					}
 				};
 			})(),
 			
@@ -882,9 +934,9 @@
 			
 	addPolyfill('form-core', {
 		feature: 'forms',
-		dependencies: ['es5'],
+		dependencies: (Modernizr.validationmessage) ? ['es5'] : ['es5', 'dom-extend'],
 		loadInit: function(){
-			if(this.options.customMessages || !Modernizr.validationmessage){
+			if(this.options.customMessages && Modernizr.validationmessage){
 				loader.loadList(["dom-extend"]);
 			}
 		},
