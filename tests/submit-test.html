@@ -175,14 +175,14 @@
 			
 			$('input.trigger-checkValidity').click(function(e){
 				reset();
-				$('input.datetime').attr('value', '').checkValidity();
+				$('input:first', this.form).attr('value', '').checkValidity();
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
 					equals(firstInvalidEvents, 1, 'firstinvalid event');
 					equals(invalidEvents, 1, 'invalid events');
 					if(document.activeElement){
 						var type = document.activeElement.type;
-						equals((type == 'text' || type == 'datetime-local'), true, "focus first invalid: "+type);
+						equals((type == 'text' || type == 'datetime-local'), false, "don't focus first invalid: "+type);
 					}
 				}, 100);
 				return false;
@@ -192,7 +192,7 @@
 			$('input.trigger-checkValidity-prevent-invalid').click(function(e){
 				reset();
 				preventInvalid = true;
-				$('input.datetime').attr('value', '').checkValidity();
+				$('input:first', this.form).attr('value', '').checkValidity();
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
 					equals(firstInvalidEvents, 1, '1 firstinvalid event');
@@ -208,7 +208,7 @@
 			$('input.submit-prevent').click(function(e){
 				reset();
 				preventInvalid = true;
-				$('input.datetime').attr('value', '');
+				$('input:first', this.form).attr('value', '');
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
 					equals(firstInvalidEvents, 1, 'firstinvalid event');
@@ -221,7 +221,7 @@
 			});
 			$('input.submit-noprevent').click(function(e){
 				reset();
-				$('input.datetime').attr('value', '');
+				$('input:first', this.form).attr('value', '');
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
 					equals(firstInvalidEvents, 1, 'firstinvalid event');
@@ -305,8 +305,18 @@
 	<hr />
 	<form action="bigfail.html">
     	<input name="test-3" class="datetime" type="datetime-local" required />
-		<input type="submit" class="trigger-checkValidity" value="trigger-checkValidity" />
-		<input type="submit" class="trigger-checkValidity-prevent-invalid" value="trigger-checkValidity prevent invalid" />
+		<input type="button" class="trigger-checkValidity" value="trigger-checkValidity" />
+		<input type="button" class="trigger-checkValidity-prevent-invalid" value="trigger-checkValidity prevent invalid" />
+		
+		<input type="submit" class="submit-prevent" value="try invalid submit (prevent invalid)" />
+		<input type="submit" class="submit-noprevent" value="try invalid submit (no invalid prevent)" />
+		
+    </form>
+	<hr />
+	<form action="bigfail.html">
+    	<input name="test-4" type="text" required />
+		<input type="button" class="trigger-checkValidity" value="trigger-checkValidity" />
+		<input type="button" class="trigger-checkValidity-prevent-invalid" value="trigger-checkValidity prevent invalid" />
 		
 		<input type="submit" class="submit-prevent" value="try invalid submit (prevent invalid)" />
 		<input type="submit" class="submit-noprevent" value="try invalid submit (no invalid prevent)" />
