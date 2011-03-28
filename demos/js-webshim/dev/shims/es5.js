@@ -41,7 +41,8 @@ if (!Object.keys) {
             'hasOwnProperty',
             'isPrototypeOf',
             'propertyIsEnumerable',
-            'constructor'
+            'constructor',
+			'__proto__'
         ],
         dontEnumsLength = dontEnums.length;
 
@@ -81,14 +82,14 @@ if (!Object.keys) {
 
 if((!Modernizr.advancedObjectProperties || !Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor  || !Object.defineProperty) && window.jQuery && jQuery.webshims){
 	var shims = jQuery.webshims;
-	shims.objectCreate = function(proto, props, opts){
+	shims.objectCreate = function(proto, props, opts, no__proto__){
 		var o;
 		var f = function(){};
 		
 		f.prototype = proto;
 		o = new f();
 		
-		if(!'__proto__' in o){
+		if(!no__proto__ && !('__proto__' in o) && !Object.getPrototypeOf){
 			o.__proto__ = proto;
 		}
 		
