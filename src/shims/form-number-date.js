@@ -409,6 +409,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 	var globalInvalidTimer;
 	var labelID = 0;
 	var emptyJ = $([]);
+	var isCheckValidity;
 	var replaceInputUI = function(context, elem){
 		$('input', context).add(elem.filter('input')).each(function(){
 			var type = $.attr(this, 'type');
@@ -422,8 +423,9 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 		if(Modernizr.formvalidation){
 			orig.bind('firstinvalid', function(e){
 				clearTimeout(globalInvalidTimer);
+				if(isCheckValidity){return;}
 				globalInvalidTimer = setTimeout(function(){
-					if(!e.isInvalidUIPrevented()){
+					if(!isCheckValidity && !e.isInvalidUIPrevented()){
 						webshims.validityAlert.showFor( e.target ); 
 					}
 				}, 20);//timeout has to be less than 30!
@@ -456,7 +458,18 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 		}
 		return attr;
 	};
-	
+	if(Modernizr.formvalidation){
+		['input', 'form'].forEach(function(name){
+			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
+				value: function(){
+					isCheckValidity = true;
+					var ret = desc._supvalue.apply(this, arguments);
+					isCheckValidity = false;
+					return ret;
+				}
+			});
+		});
+	}
 	//date and datetime-local implement if we have to replace
 	if(!modernizrInputTypes.datetime || options.replaceUI){
 		var datetimeFactor = {

@@ -3,6 +3,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, document){
 webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
 var cfg = webshims.cfg.forms;
+var isSubmit;
 var getNames = function(elem){
 		return (elem.form && elem.name) ? elem.form[elem.name] : [];
 	},
@@ -126,6 +127,7 @@ $.event.special.invalid = {
 	handler: function(e, d){
 		
 		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') != null || $.data(e.target, 'novalidate') ){return;}
+		isSubmit = true;
 		var notValid = !($(e.target).checkValidity());
 		if(notValid){
 			//ToDo
@@ -133,8 +135,10 @@ $.event.special.invalid = {
 				console.log('submit');
 			}
 			e.stopImmediatePropagation();
+			isSubmit = false;
 			return false;
 		}
+		isSubmit = false;
 	}
 };
 
@@ -195,7 +199,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 				if( !v.valid ){
 					e = $.Event('invalid');
 					var jElm = $(elem).trigger(e);
-					if(!unhandledInvalids && !e.isDefaultPrevented()){
+					if(isSubmit && !unhandledInvalids && !e.isDefaultPrevented()){
 						webshims.validityAlert.showFor(jElm);
 						unhandledInvalids = true;
 					}

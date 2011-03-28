@@ -6,7 +6,8 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	var badWebkit = ($.browser.webkit && parseFloat($.browser.version, 10) < 534.19);
 	var invalids = [],
 		firstInvalidEvent,
-		form
+		form,
+		fromSubmit
 	;
 	
 	//opera/chrome fix (this will double all invalid events in opera, we have to stop them!)
@@ -20,7 +21,10 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		};
 		window.addEventListener('submit', function(e){
 			if(!formnovalidate.prevented && e.target.checkValidity && $.attr(e.target, 'novalidate') == null){
+				fromSubmit = true;
+				
 				$(e.target).checkValidity();
+				fromSubmit = false;
 			}
 		}, true);
 		var preventValidityTest = function(e){
@@ -42,7 +46,8 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		.bind('firstinvalidsystem', function(e, data){
 			form = data.form;
 			if(!form){return;}
-			firstInvalidEvent = data;
+			firstInvalidEvent = false;
+			invalids = [];
 			
 			var submitEvents = $(form)
 				.unbind('submit.preventInvalidSubmit')
@@ -58,8 +63,11 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 			if (submitEvents && submitEvents.length > 1) {
 				submitEvents.unshift(submitEvents.pop());
 			}
+			if(!fromSubmit){return;}
+			firstInvalidEvent = data;
 		})
 		.bind('invalid', function(e){
+			if(!fromSubmit){return;}
 			if(invalids.indexOf(e.target) == -1){
 				invalids.push(e.target);
 			} else {
@@ -71,6 +79,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 			if( firstTarget && badWebkit && document.activeElement && firstTarget !== document.activeElement && firstInvalidEvent && !firstInvalidEvent.isInvalidUIPrevented() ){
 				webshims.validityAlert.showFor(firstTarget);
 			}
+			firstInvalidEvent = false;
 			invalids = [];
 			//remove webkit/operafix
 			if(!form){return;}
@@ -109,6 +118,29 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		});
 		
 	})();
+	
+	(function(){
+		if(!$.browser.opera){return;}
+		var preventDefault = function(e){
+			e.preventDefault();
+		};
+		
+		['form', 'input', 'textarea', 'select'].forEach(function(name){
+			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
+				value: function(){
+					if(!fromSubmit){
+						$(this).bind('invalid', preventDefault);
+					}
+					var ret = desc._supvalue.apply(this, arguments);
+					if(!fromSubmit){
+						$(this).unbind('invalid', preventDefault);
+					}
+					return ret;
+				}
+			});
+		});
+	})();
+	
 	if(!Modernizr.requiredSelect){
 		webshims.ready('form-extend', function(){
 			var isPlaceholderOptionSelected = function(select){
