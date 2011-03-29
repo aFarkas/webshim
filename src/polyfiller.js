@@ -104,7 +104,7 @@
 	})();
 	
 	
-	$.webshims = $.sub();
+	$.webshims = $.sub ? $.sub() : {};
 	
 	$.extend($.webshims, {
 		version: 'pre1.6.0',
@@ -731,8 +731,9 @@
 			}
 			return ret;
 		};
-		webshims.fn.html = $.fn.htmlWebshim;
-		
+		if(webshims.fn) {
+			webshims.fn.html = $.fn.htmlWebshim;
+		}
 		$.each(['after', 'before', 'append', 'prepend', 'replaceWith'], function(i, name){
 			$.fn[name+'Webshim'] = function(a){
 				var elems = $(webshims.fixHTML5(a));
@@ -746,7 +747,9 @@
 				}
 				return this;
 			};
-			webshims.fn[name] = $.fn[name+'Webshim'];
+			if(webshims.fn){
+				webshims.fn[name] = $.fn[name+'Webshim'];
+			}
 		});
 		
 	})();
