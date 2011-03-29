@@ -658,7 +658,7 @@
 	
 	$.each(['log', 'error', 'warn', 'info'], function(i, fn){
 		webshims[fn] = function(message){
-			if((importantLogs[fn] || webshims.debug) && window.console && console.log){
+			if(( (importantLogs[fn] && webshims.debug !== false) || webshims.debug) && window.console && console.log){
 				return console[(console[fn]) ? fn : 'log'](message);
 			}
 		};
