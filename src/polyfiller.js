@@ -453,7 +453,12 @@
 						seperator: ',',
 						base: '/min/f=',
 						maxFiles: 10,
-						scriptPath: loader.basePath.replace( l.protocol +'//'+ l.host +'/', '')
+						scriptPath: loader.basePath.replace( l.protocol +'//'+ l.host +'/', ''),
+						fn: function(base, scriptPath, seperator, srces){
+							return base + $.map(srces, function(src){
+								return scriptPath + src;
+							}).join(seperator);
+						}
 					}, typeof combo == 'object' ? combo : {});
 					
 					$.each(toLoad, function(i, loadName){
@@ -465,23 +470,21 @@
 							}
 							if(!excludeCombo.test(src)){
 								len++;
-								src = combo.scriptPath + src;
 								fPart.push(src);
 								combiNames.push(loadName);
 								if(len >= combo.maxFiles){
-									loadScript(combo.base + ( fPart.join(combo.seperator) ), combiNames);
+									loadScript(combo.fn(combo.base, combo.scriptPath, combo.seperator, fPart), combiNames);
 									fPart = [];
 									combiNames = [];
 									len = 0;
 								}
 							} else {
-								
 								loadScript(src, loadName);
 							}
 						}
 					});
 					if(fPart.length){
-						loadScript(combo.base + ( fPart.join(combo.seperator) ), combiNames);
+						loadScript(combo.fn(combo.base, combo.scriptPath, combo.seperator, fPart), combiNames);
 					}
 				};
 				
