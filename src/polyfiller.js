@@ -4,6 +4,7 @@
 	document.createElement('datalist');
 	
 	var special = $.event.special;
+	var Modernizr = window.Modernizr;
 	var modernizrInputAttrs = Modernizr.input || {};
 	var modernizrInputTypes = Modernizr.inputtypes || {};
 	var browserVersion = parseFloat($.browser.version, 10);
@@ -137,13 +138,13 @@
 		addPolyfill: function(name, cfg){
 			cfg = cfg || {};
 			var feature = cfg.feature || name;
-			if(!webshims.features[feature]){
-				webshims.features[feature] = [];
+			if(!webshimsFeatures[feature]){
+				webshimsFeatures[feature] = [];
 				webshims.featureList.push(feature);
-				webshims.cfg[feature] = {};
+				webCFG[feature] = {};
 			}
-			webshims.features[feature].push(name);
-			cfg.options = $.extend(webshims.cfg[feature], cfg.options);
+			webshimsFeatures[feature].push(name);
+			cfg.options = $.extend(webCFG[feature], cfg.options);
 			
 			addModule(name, cfg);
 			if(cfg.methodNames){
@@ -170,8 +171,8 @@
 				};
 				
 				if(!$.isReady){
-					if(webshims.cfg.removeFOUC){
-						if(webshims.cfg.waitReady){
+					if(webCFG.removeFOUC){
+						if(webCFG.waitReady){
 							onReadyEvts = onReadyEvts.concat(['DOM']);
 						}
 						addClass.push('polyfill-remove-fouc');
@@ -185,14 +186,14 @@
 					webshims.warn('You should call $.webshims.polyfill before DOM-Ready');
 				}
 				onReady(features, removeLoader);
-				if(webshims.cfg.useImportantStyles){
+				if(webCFG.useImportantStyles){
 					addClass.push('polyfill-important');
 				}
 				if(addClass[0]){
 					$('html').addClass(addClass.join(' '));
 				}
 				$(function(){
-					loader.loadList(['html5a11y', 'html5shiv']);
+					loadList(['html5a11y', 'html5shiv']);
 				});
 				loader.loadCSS('shim.css');
 				//remove function
@@ -212,7 +213,7 @@
 					features = webshims.profiles[features] || features.split(' ');
 				}
 				
-				if(webshims.cfg.waitReady){
+				if(webCFG.waitReady){
 					$.readyWait++;
 					onReady(features, function(){
 						$.ready(true);
@@ -220,16 +221,16 @@
 				}
 				
 				$.each(features, function(i, feature){
-					if(feature !== webshims.features[feature][0]){
-						onReady(webshims.features[feature], function(){
+					if(feature !== webshimsFeatures[feature][0]){
+						onReady(webshimsFeatures[feature], function(){
 							isReady(feature, true);
 						});
 					}
-					toLoadFeatures = toLoadFeatures.concat(webshims.features[feature]);
+					toLoadFeatures = toLoadFeatures.concat(webshimsFeatures[feature]);
 				});
 				
 				firstPolyfillCall(features);
-				loader.loadList(toLoadFeatures, combo);
+				loadList(toLoadFeatures, combo);
 				
 			};
 		})(),
@@ -402,7 +403,7 @@
 						return true;
 					}
 					var module = modules[name];
-					var cfg = webshims.cfg[module.feature || name] || {};
+					var cfg = webCFG[module.feature || name] || {};
 					var supported;
 					if(module){
 						supported = (module.test && $.isFunction(module.test)) ?
@@ -429,9 +430,9 @@
 						$.each(module.dependencies , function(i, dependeny){
 							if(modules[dependeny]){
 								addDependency(i, dependeny);
-							} else if(webshims.features[dependeny]){
-								$.each(webshims.features[dependeny], addDependency);
-								onReady(webshims.features[dependeny], function(){
+							} else if(webshimsFeatures[dependeny]){
+								$.each(webshimsFeatures[dependeny], addDependency);
+								onReady(webshimsFeatures[dependeny], function(){
 									isReady(dependeny, true);
 								});
 							}
@@ -622,11 +623,13 @@
 	var webshims = $.webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var webCFG = webshims.cfg;
+	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;
 	var onReady = webshims.ready;
 	var addPolyfill = webshims.addPolyfill;
 	var modules = webshims.modules;
 	var loader = webshims.loader;
+	var loadList = loader.loadList;
 	var addModule = loader.addModule;
 	var importantLogs = {warn: 1, error: 1};
 	var xhrPreloadOption = {
@@ -943,7 +946,7 @@
 		dependencies: (Modernizr.validationmessage) ? ['es5'] : ['es5', 'dom-extend'],
 		loadInit: function(){
 			if(this.options.customMessages && Modernizr.validationmessage){
-				loader.loadList(["dom-extend"]);
+				loadList(["dom-extend"]);
 			}
 		},
 		options: {
@@ -1024,9 +1027,9 @@
 		noAutoCallback: true,
 		dependencies: ['form-extend'],
 		loadInit: function(){
-			loader.loadList(['jquery-ui']);
+			loadList(['jquery-ui']);
 			if(modules['input-widgets'].src){
-				loader.loadList(['input-widgets']);
+				loadList(['input-widgets']);
 			}
 		},
 		options: {
@@ -1048,7 +1051,7 @@
 	addPolyfill('json-storage', {
 		test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
 		loadInit: function(){
-			loader.loadList(['swfobject']);
+			loadList(['swfobject']);
 		},
 		noAutoCallback: true
 	});
