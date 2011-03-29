@@ -41,8 +41,7 @@ if (!Object.keys) {
             'hasOwnProperty',
             'isPrototypeOf',
             'propertyIsEnumerable',
-            'constructor',
-			'__proto__'
+            'constructor'
         ],
         dontEnumsLength = dontEnums.length;
 
@@ -89,7 +88,7 @@ if((!Modernizr.advancedObjectProperties || !Object.create || !Object.definePrope
 		f.prototype = proto;
 		o = new f();
 		
-		if(!no__proto__ && !('__proto__' in o) && !Object.getPrototypeOf){
+		if(!no__proto__ && !('__proto__' in o) && !Modernizr.objectAccessor){
 			o.__proto__ = proto;
 		}
 		

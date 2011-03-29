@@ -178,7 +178,10 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 				var elemTop = focusElem.offset().top;
 				var labelOff;
 				var smooth;
-				errorBubble.attr('for', webshims.getID(focusElem));
+				
+				if(webshims.getID && alertElem == 'label'){
+					errorBubble.attr('for', webshims.getID(focusElem));
+				}
 				
 				if(scrollTop > elemTop){
 					labelOff = elem.id && $('label[for="'+elem.id+'"]', elem.form).offset();
