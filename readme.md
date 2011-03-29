@@ -71,7 +71,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-Release 1.6RC1
+Release 1.6RC3
 ----------
 
 * added details & summary element-support
@@ -82,6 +82,7 @@ Release 1.6RC1
 * fixed checkValidity in Opera and in polyfilled browsers
 * fixed typo ([Seldaek](https://github.com/Seldaek))
 * added support for older jQuery versions
+* fixed IE9 styling issue
 
 Release 1.5.2
 ----------

@@ -36,7 +36,9 @@ mark {
 	width: auto;
 	background: transparent none;
 }
-
+output {
+	position: relative;
+}
 
 
 /* placeholder */
