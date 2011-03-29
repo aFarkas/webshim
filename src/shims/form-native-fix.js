@@ -67,7 +67,6 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 			firstInvalidEvent = data;
 		})
 		.bind('invalid', function(e){
-			if(!fromSubmit){return;}
 			if(invalids.indexOf(e.target) == -1){
 				invalids.push(e.target);
 			} else {
