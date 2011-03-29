@@ -71,6 +71,17 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.6RC1
+----------
+
+* added details & summary element-support
+* improved/clean up documentation, fixed many typos, grammar... ([jab](https://github.com/jab))
+* improved english validationMessages ([jab](https://github.com/jab))
+* re-added combohandler support
+* fixed issue with language switching ($.webshims.activeLang not defined initially)
+* fixed checkValidity in Opera and in polyfilled browsers
+* fixed typo ([Seldaek](https://github.com/Seldaek))
+* added support for older jQuery versions
 
 Release 1.5.2
 ----------
