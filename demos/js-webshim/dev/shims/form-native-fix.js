@@ -3,11 +3,14 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	
 	if(!Modernizr.formvalidation || window.noHTMLExtFixes || Modernizr.bugfreeformvalidation){return;}
 	
-	var badWebkit = ($.browser.webkit && parseFloat($.browser.version, 10) < 534.19);
+	var browserVersion = parseFloat($.browser.version, 10);
+	var badWebkit = ($.browser.webkit && browserVersion < 534.19);
+	var xBadWebkit = badWebkit && browserVersion < 533.18;
 	var invalids = [],
 		firstInvalidEvent,
 		form,
-		fromSubmit
+		fromSubmit,
+		fromCheckValidity
 	;
 	
 	//opera/chrome fix (this will double all invalid events in opera, we have to stop them!)
@@ -63,6 +66,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 			if (submitEvents && submitEvents.length > 1) {
 				submitEvents.unshift(submitEvents.pop());
 			}
+			
 			if(!fromSubmit){return;}
 			firstInvalidEvent = data;
 		})
@@ -75,6 +79,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		})
 		.bind('lastinvalid', function(e, data){
 			var firstTarget = data.invalidlist[0];
+				
 			if( firstTarget && badWebkit && document.activeElement && firstTarget !== document.activeElement && firstInvalidEvent && !firstInvalidEvent.isInvalidUIPrevented() ){
 				webshims.validityAlert.showFor(firstTarget);
 			}
@@ -85,6 +90,18 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 			$(form).unbind('submit.preventInvalidSubmit');
 		})
 	;
+	
+	//safari 5.0.0 and 5.0.1
+	if(xBadWebkit){
+		$(document).bind('firstinvalidsystem', function(e, data){
+			if(fromCheckValidity){return;}
+			setTimeout(function(){
+				if(!data.isInvalidUIPrevented()){
+					webshims.validityAlert.showFor(data.element);
+				}
+			}, 0);
+		});
+	}
 		
 	(function(){
 		//safari 5.0.2/5.0.3 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
@@ -94,9 +111,11 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 				value: function(){
 					if(!this.willValidate){return true;}
 					var valid = ($.attr(this, 'validity') || {valid: true}).valid;
+					fromCheckValidity = true;
 					if(!valid && desc._supvalue && desc._supvalue.call(this)){
 						$(this).trigger('invalid');
-					}			
+					}
+					fromCheckValidity = false;
 					return valid;
 				}
 			});
@@ -130,10 +149,12 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 					if(!fromSubmit){
 						$(this).bind('invalid', preventDefault);
 					}
+					fromCheckValidity = true;
 					var ret = desc._supvalue.apply(this, arguments);
 					if(!fromSubmit){
 						$(this).unbind('invalid', preventDefault);
 					}
+					fromCheckValidity = false;
 					return ret;
 				}
 			});
