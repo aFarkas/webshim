@@ -192,7 +192,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 						{scrollTop: elemTop - 5}, 
 						{
 							queue: false, 
-							duration: Math.max( Math.min( 450, (scrollTop - elemTop) * 2 ), 140 )
+							duration: Math.max( Math.min( 600, (scrollTop - elemTop) * 1.5 ), 80 )
 						}
 					);
 					smooth = true;
