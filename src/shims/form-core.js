@@ -265,6 +265,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 		;
 		
 		$(document).bind('invalid', function(e){
+			if(e.wrongWebkitInvalid){return;}
 			var jElm = $(e.target).addClass('form-ui-invalid').removeClass('form-ui-valid');
 			if(!firstEvent){
 				//trigger firstinvalid
