@@ -1,7 +1,7 @@
 /* https://github.com/aFarkas/webshim/issues#issue/16 */
 jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, undefined){
 	
-	if(!Modernizr.formvalidation || window.noHTMLExtFixes || Modernizr.bugfreeformvalidation){return;}
+	if(!Modernizr.formvalidation || Modernizr.bugfreeformvalidation){return;}
 	
 	var browserVersion = parseFloat($.browser.version, 10);
 	var badWebkit = ($.browser.webkit && browserVersion < 534.19);
@@ -97,7 +97,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		var submitTimer;
 		var trueInvalid;
 		var invalidEvent = $(document).bind('invalid', function(e){
-			if(e.originalEvent && !fromSubmit && !fromCheckValidity && $.attr(e.target, 'validity').valid){
+			if(e.originalEvent && !fromSubmit && !fromCheckValidity && ($.attr(e.target, 'validity') || {}).valid){
 				e.originalEvent.wrongWebkitInvalid = true;
 				e.wrongWebkitInvalid = true;
 				e.stopImmediatePropagation();
@@ -132,7 +132,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	}
 		
 	(function(){
-		//safari 5.0.2/5.0.3 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
+		//safari 5.0.x has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
 		if(!badWebkit){return;}
 		['input', 'textarea', 'select'].forEach(function(name){
 			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {

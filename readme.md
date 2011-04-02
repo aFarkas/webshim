@@ -71,7 +71,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-Release 1.6RC3
+Release 1.6RC4
 ----------
 
 * added details & summary element-support
@@ -83,6 +83,7 @@ Release 1.6RC3
 * fixed typo ([Seldaek](https://github.com/Seldaek))
 * added support for older jQuery versions
 * fixed IE9 styling issue
+* fixed many little bugs in old X-/C-graded browsers
 
 Release 1.5.2
 ----------

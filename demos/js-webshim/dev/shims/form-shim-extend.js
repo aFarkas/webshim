@@ -356,6 +356,17 @@ jQuery.webshims.ready('dom-extend form-core', function($, webshims, window, doc,
 	if(!Modernizr.input.placeholder){
 		polyfillElements.push('input');
 	}
+	
+	var addUnload = function(fn){
+		var old = window.onbeforeunload;
+		window.onbeforeunload = function(){
+			fn.apply(this, arguments);
+			if(old && old.apply){
+				old.apply(this, arguments);
+			}
+			window.onbeforeunload = null;
+		};
+	};
 	var hidePlaceholder = function(elem, data, value){
 			if(!isOver && elem.type != 'password'){
 				if(value === false){
@@ -507,7 +518,7 @@ jQuery.webshims.ready('dom-extend form-core', function($, webshims, window, doc,
 							//ie always exposes last label and ff always first
 							data.text.hide()[$.browser.msie ? 'insertBefore' : 'insertAfter'](elem);
 						}
-						$(window).one('beforeunload', reset);
+						addUnload(reset);
 						data.box = $(elem);
 						if(elem.form){
 							$(elem.form).submit(reset);

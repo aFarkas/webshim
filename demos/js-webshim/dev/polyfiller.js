@@ -42,6 +42,7 @@
 			return ('open' in document.createElement('details'));
 		});
 		
+		Modernizr.deprecatedSessionstorage = !!(Modernizr.sessionstorage && !('clear' in window.sessionStorage));
 		Modernizr.genericDOM =  !!($('<video><div></div></video>')[0].innerHTML);
 		
 		Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
@@ -108,7 +109,7 @@
 	$.webshims = $.sub ? $.sub() : {};
 	
 	$.extend($.webshims, {
-		version: '1.6.0RC3',
+		version: 'pre1.6.0RC4',
 		cfg: {
 			useImportantStyles: true,
 			removeFOUC: false,
@@ -603,7 +604,7 @@
 					
 					timer = setTimeout(function(){
 						onLoad({type: 'error'});
-					}, 20000);
+					}, 60000);
 					script.onload = onLoad;
 					$(script).one('error.polyfillerror', onLoad);
 					script.onreadystatechange = onLoad;
@@ -975,8 +976,7 @@
 		addPolyfill('form-native-fix', {
 			feature: 'forms',
 			test: Modernizr.bugfreeformvalidation,
-			dependencies: ['dom-support'],
-			combination: ['combined-webkit']
+			dependencies: ['dom-support']
 		});
 		
 		//this implements placeholder in old opera

@@ -1,7 +1,7 @@
 /* https://github.com/aFarkas/webshim/issues#issue/16 */
 jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, undefined){
 	
-	if(!Modernizr.formvalidation || window.noHTMLExtFixes || Modernizr.bugfreeformvalidation){return;}
+	if(!Modernizr.formvalidation || Modernizr.bugfreeformvalidation){return;}
 	
 	var browserVersion = parseFloat($.browser.version, 10);
 	var badWebkit = ($.browser.webkit && browserVersion < 534.19);
@@ -15,8 +15,8 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	
 	//opera/chrome fix (this will double all invalid events in opera, we have to stop them!)
 	//opera throws a submit-event and then the invalid events,
-	//chrome7/safari5.02 has disabled invalid events, this brings them back
-	//safari 5.02 reports false invalid events, if setCustomValidity was used
+	//chrome7/safari5.0.2 has disabled invalid events, this brings them back
+	//safari 5.0.2 reports false invalid events, if setCustomValidity was used
 	if(window.addEventListener){
 		var formnovalidate = {
 			timer: undefined,
@@ -88,11 +88,39 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 			//remove webkit/operafix
 			if(!form){return;}
 			$(form).unbind('submit.preventInvalidSubmit');
+			
 		})
 	;
 	
 	//safari 5.0.0 and 5.0.1
 	if(xBadWebkit){
+		var submitTimer;
+		var trueInvalid;
+		var invalidEvent = $(document).bind('invalid', function(e){
+			if(e.originalEvent && !fromSubmit && !fromCheckValidity && ($.attr(e.target, 'validity') || {}).valid){
+				e.originalEvent.wrongWebkitInvalid = true;
+				e.wrongWebkitInvalid = true;
+				e.stopImmediatePropagation();
+				e.preventDefault();
+				return false;
+			} else {
+				trueInvalid = true;
+			}
+			clearTimeout(submitTimer);
+			submitTimer = setTimeout(function(){
+				if(e.target.form && !trueInvalid){
+					trueInvalid = false;
+					$(e.target.form).trigger('submit');
+				}
+				trueInvalid = false;
+			}, 1);
+		})
+		.data('events').invalid;
+		//add this handler as first executing handler
+		if (invalidEvent && invalidEvent.length > 1) {
+			invalidEvent.unshift(invalidEvent.pop());
+		}
+		
 		$(document).bind('firstinvalidsystem', function(e, data){
 			if(fromCheckValidity){return;}
 			setTimeout(function(){
@@ -104,7 +132,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	}
 		
 	(function(){
-		//safari 5.0.2/5.0.3 has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
+		//safari 5.0.x has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
 		if(!badWebkit){return;}
 		['input', 'textarea', 'select'].forEach(function(name){
 			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
