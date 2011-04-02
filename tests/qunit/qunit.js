@@ -14,7 +14,7 @@ var defined = {
 	setTimeout: typeof window.setTimeout !== "undefined",
 	sessionStorage: (function() {
 		try {
-			return !!sessionStorage.getItem;
+			return false;
 		} catch(e){
 			return false;
 		}
@@ -139,7 +139,7 @@ Test.prototype = {
 					config.moduleStats.bad++;
 				}
 			}
-
+			
 			// store result when possible
 			defined.sessionStorage && sessionStorage.setItem("qunit-" + this.testName, bad);
 

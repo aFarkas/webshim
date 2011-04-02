@@ -12,7 +12,7 @@ asyncTest("json-storage", function(){
 	equals(localStorage.getItem('t!(){}es.t-3'), 'localStorage', 'localStorage t!(){};es.t-3 is "localStorage"');
 //	equals(localStorage.length, 3, 'localStorage.length is 3');
 	
-	if((location.hash || '').indexOf('testsession') !== -1){
+	if(!Modernizr.deprecatedSessionstorage && (location.hash || '').indexOf('testsession') !== -1){
 		equals(sessionStorage.getItem('test1'), '', 'sessionStorage test1 is an empty string');
 		equals(sessionStorage.getItem('test2'), 'undefined', 'sessionStorage: test2 is "undefined"');
 		equals(sessionStorage.getItem('t!(){}es.t-3'), 'sessionStorage', 'sessionStorage: t!(){};es.t-3 is "sessionStorage"');

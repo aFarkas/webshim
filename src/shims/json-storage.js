@@ -21,7 +21,7 @@ if ('localStorage' in window && 'sessionStorage' in window) {
 var storageNameError = function(name){
 	if(name && name.indexOf && name.indexOf(';') != -1){
 		setTimeout(function(){
-			throw("Bad key for localStorage: ; in localStorage. name was: "+ name);
+			$.webshims.warn("Bad key for localStorage: ; in localStorage. name was: "+ name);
 		}, 0);
 	}
 };
@@ -176,6 +176,18 @@ var Storage = function (type) {
 	};
 };
 
+//if(('sessionStorage' in window) && window.Storage && window.Storage.prototype && ('key' in sessionStorage) && ('length' in sessionStorage) && !('clear' in sessionStorage)){
+//	window.Storage.prototype.clear = function(){
+//		var items = [];
+//		for(var i = 0, len = this.length || 0; i < len && this.key; i++){
+//			items.push(this.key(i));
+//		}
+//		for(i = 0, len = items.length || 0; i < len && this.removeItem; i++){
+//			this.removeItem(items[i]);
+//		}
+//	};
+//}
+
 if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session');}
 
 
@@ -184,16 +196,17 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 	var swfTimer;
 	var emptyString = '(empty string)+1287520303738';
 	var runStart;
+	var shim;
 	var localStorageSwfCallback = function(type){
 		clearTimeout(swfTimer);
 		
-		if(window.localStorage){
+		if(window.localStorage && (type != 'swf' || (shim && shim.key))){
 			$.webshims.isReady('json-storage', true);
 			return;
 		}
-		
+
 		if(type === 'swf'){
-			var shim = document.getElementById('swflocalstorageshim');
+			shim = document.getElementById('swflocalstorageshim');
 			//brute force flash getter
 			if( !shim || typeof shim.GetVariable == 'undefined' ){
 				shim = document.swflocalstorageshim;
@@ -204,28 +217,43 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 			
 			if(shim && typeof shim.GetVariable !== 'undefined'){
 				window.localStorage = {};
-				$.each(['key', 'removeItem', 'clear'], function(i, fn){
-					window.localStorage[fn] = shim[fn];
-				});
+				
+				window.localStorage.clear = function(){
+					if(shim.clear){shim.clear();}
+				};
+				window.localStorage.key = function(i){
+					if(shim.key){shim.key(i);}
+				};
+				window.localStorage.removeItem = function(name){
+					if(shim.removeItem){shim.removeItem(name);}
+				};
+				
 				window.localStorage.setItem = function(name, val){
 					storageNameError(name);
 					val += '';
 					if(!val){
 						val = emptyString;
 					}
-					shim.setItem(name, val);
+					if(shim.setItem){
+						shim.setItem(name, val);
+					}
 				};
 				window.localStorage.getItem = function(name){
+					if(!shim.getItem){
+						return null;
+					}
 					var val = shim.getItem(name, val);
 					if(val == emptyString){
 						val = '';
 					}
 					return val;
 				};
+				$.webshims.log('flash-localStorage was implemented');
 			}
 		}
 		if(!('localStorage' in window)){
 			window.localStorage = new Storage('local');
+			$.webshims.warn('implement cookie-localStorage');
 		}
 		
 		$.webshims.isReady('json-storage', true);
