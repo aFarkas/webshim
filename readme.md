@@ -83,6 +83,8 @@ Release 1.6RC4
 * fixed typo ([Seldaek](https://github.com/Seldaek))
 * added support for older jQuery versions
 * fixed IE9 styling issue
+* fixed IE reopens datepicker sometimes
+* updated to jQuery 1.5.2
 * fixed many little bugs in old X-/C-graded browsers
 
 Release 1.5.2

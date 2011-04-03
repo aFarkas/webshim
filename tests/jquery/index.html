@@ -16,7 +16,7 @@
 		(function($){
 			
 			//don't load jQuery UI
-			$.webshims.modules.inputUI.test = function(){return true;};
+			$.webshims.modules['forms-ext'].test = function(){return true;};
 			
 			$.webshims.polyfill();
 		})(jQuery);
