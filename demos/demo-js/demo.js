@@ -5,14 +5,17 @@
 		if(!window.console){
 			window.console = {log: window.alert};
 		}
-		$('code.run-once').each(function(){
-			var elem = this;
-			$('<button>run example</button>').insertAfter(elem).click(function(){
-				eval(elem.innerHTML.replace(/&gt;/g, '>').replace(/&lt;/g, '<'));
-				this.disabled = true;
-				return false;
+		if(!$.browser.msie || parseInt($.browser.version, 10) > 7){
+			$('code.run-once').each(function(){
+				var elem = this;
+				$('<button>run example</button>').insertAfter(elem).click(function(){
+					eval(elem.innerHTML.replace(/&gt;/g, '>').replace(/&lt;/g, '<'));
+					this.disabled = true;
+					return false;
+				});
 			});
-		});
+			
+		}
 		var hash = (location.hash || '').replace(/^#/, '');
 		$('div.accordion')
 			.each(function(){
