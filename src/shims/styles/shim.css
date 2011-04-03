@@ -508,6 +508,9 @@ datalist {
 details {
 	overflow: hidden;
 }
+summary {
+	position: relative;
+}
 .closed-details-child {
 	display: none !important;
 }

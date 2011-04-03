@@ -347,11 +347,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 										if(langObj[lang]){
 											fn(langObj[lang]);
 										} else {
-											setTimeout(function(){
+											$(function(){
 												if(langObj[lang]){
 													fn(langObj[lang]);
 												}
-											}, 9);
+											});
 										}
 									});
 									return true;
