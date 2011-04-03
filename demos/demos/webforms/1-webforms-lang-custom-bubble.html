@@ -23,7 +23,7 @@
 		}
 	</style>
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
 	<script src="../../js-webshim/minified/extras/mousepress.js"></script>
 	<script src="../../js-webshim/minified/extras/modernizr-1.7.min.js"></script>
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
@@ -69,10 +69,10 @@
 		<div class="main-box">
 		<section>
 			<h2>Documentation adding/changing and using validation messages with webshims constraint validation</h2>
-			<h3>Overriding native validation messages/native validation UI</h3>
+			<h3 id="change-error-ui-lang">Overriding native validation messages/native validation UI</h3>
 			<p>With HTML5 there are two possible ways to change the validation messages.</p>
 			<ul>
-				<li>Preventing the native invalid message to appear and replacing it with your own invalid UI (including own validation message)</li>
+				<li>Preventing the native invalid message to appear and replacing it with your own invalid UI (including own validation message or native validation message)</li>
 				<li>changing the messages through the setCustomValidity-method - without changing the native UI</li>
 			</ul>
 			<p>A starting point for Preventing the default invalid UI and then replacing it, could look like this:</p>
@@ -136,6 +136,7 @@ $.webshims.polyfill();
 			<p>Note: This site is loaded with <code>overrideMessages = true;</code>.</p>
 			
 			<p>Recommendation: Prefer <code>customMessages = true</code> to <code>overrideMessages = true</code> (less obtrusiv)</p>
+			<p>Or a simple rule: If you want to style the validation tooltip use <code>customMessages</code> and if you want to only change the validationMessage without changing the validation UI use <code>overrideMessages</code>.</p>
 			
 			<h3 id="change-validation-messages">Changing and Adding validation messages</h3>
 			<p>Webshims Lib validation messages are stored @ <code>$.webshims.validityMessages</code> as an object. The index is the specific language code. Currently there are only really bad validation messages for "en" and "de".</p>

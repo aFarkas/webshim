@@ -196,7 +196,7 @@
 				$(function(){
 					loadList(['html5a11y', 'html5shiv']);
 				});
-				loader.loadCSS('shim.css');
+				loader.loadCSS('styles/shim.css');
 				//remove function
 				firstPolyfillCall = $.noop;
 			};

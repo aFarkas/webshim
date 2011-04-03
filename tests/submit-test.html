@@ -5,7 +5,7 @@
     
 	
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
 	<script src="../src/extras/modernizr-1.7.min.js"></script>
 	<!-- 
 		main web shim extension fiels
@@ -282,11 +282,17 @@
 		$(window).bind('load', function(){
 			setTimeout(function(){
 				if(!isDOMReady  && window.parent == window){
-					alert('DOM-Ready not called');
+					$.webshims.warn('DOM-Ready not called');
 				}
 			}, 500);
 		});
 		$(function(){
+			if(window.parent == window){
+				if(!Modernizr.inputtypes['datetime-local'] && !$('input.input-datetime-local-date').length){
+					$.webshims.warn('datetime not implemented');
+				}
+			}
+			
 			isDOMReady = true;
 		});
     </script>

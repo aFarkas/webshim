@@ -479,6 +479,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 		var subPixelCorrect = (!$.browser.msie || parseInt($.browser.version, 10) > 6) ? 0 : 0.45;
 		replaceInputUI['datetime-local'] = function(elem){
 			if(!$.fn.datepicker){return;}
+			
 			var date = $('<span role="group" class="input-datetime-local"><input type="text" class="input-datetime-local-date" /><input type="time" class="input-datetime-local-time" /></span>'),
 				attr  = this.common(elem, date, replaceInputUI['datetime-local'].attrs),
 				datePicker = $('input.input-datetime-local-date', date),
@@ -497,7 +498,9 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 							} catch (e) {value = datePicker.attr('value');}
 						} 
 						value = (!value && !timeVal) ? '' : value + 'T' + timeVal;
+						replaceInputUI['datetime-local'].blockAttr = true;
 						elem.attr('value', value);
+						replaceInputUI['datetime-local'].blockAttr = false;
 						e.stopImmediatePropagation();
 						triggerInlineForm(elem[0], 'input');
 						triggerInlineForm(elem[0], 'change');
@@ -529,7 +532,9 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 					}
 				}
 				val = (!val[0] && !val[1]) ? '' : val.join('T');
+				replaceInputUI['datetime-local'].blockAttr = true;
 				elem.attr('value', val);
+				replaceInputUI['datetime-local'].blockAttr = false;
 				e.stopImmediatePropagation();
 				triggerInlineForm(elem[0], 'input');
 				triggerInlineForm(elem[0], 'change');
@@ -593,21 +598,23 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 				}
 			},
 			value: function(orig, shim, value){
-				if(!replaceInputUI['datetime-local'].blockAttr){
+				
 					var dateValue;
 					value = (value.split) ? value.split('T') : [];
 					try {
 						dateValue = $.datepicker.parseDate('yy-mm-dd', value[0]);
 					} catch(e){dateValue = false;}
 					if(dateValue){
-						$('input.input-datetime-local-date', shim).datepicker('setDate', dateValue);
+						if(!replaceInputUI['datetime-local'].blockAttr){
+							$('input.input-datetime-local-date', shim).datepicker('setDate', dateValue);
+						}
 						$('input.input-datetime-local-time', shim).attr('value', value[1] || '00:00');
 					} else {
 						$('input.input-datetime-local-date', shim).attr('value', value[0] || '');
 						$('input.input-datetime-local-time', shim).attr('value', value[1] || '');
 					}
 					
-				}
+				
 			}
 		};
 		
@@ -634,8 +641,6 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 					.datepicker($.extend({}, options.datepicker, elem.data('datepicker')))
 					.bind('change', change)
 					.data('datepicker')
-					
-			
 			;
 			data.dpDiv
 				.addClass('input-date-datepicker-control')
@@ -786,6 +791,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 	
 		
 	var changeDefaults = function(langObj){
+		
 		if(!langObj){return;}
 		var opts = $.extend({}, langObj, options.datepicker);
 		$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', opts).each(function(){
@@ -796,35 +802,19 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 				});
 			}
 		});
+		
 		$.datepicker.setDefaults(opts);
 	};
-	
-	$(document).bind('jquery-uiReady.langchange input-widgetsReady.langchange', function(){
+	var getDefaults = function(){
 		if(!$.datepicker){return;}
-		$(document)
-			.bind('webshimLocalizationReady', function(){
-				webshims.activeLang($.datepicker.regional, 'forms-ext', changeDefaults);
-			})
-			.unbind('jquery-uiReady.langchange input-widgetsReady.langchange')
-		;
-	});
-	
-	webshims.addReady(function(context, elem){
-		
-		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(e){
-			if($.datepicker || $.fn.slider){
-				replaceInputUI(context, elem);
-			}
-			
-			if($.datepicker && $.fn.slider){
-				$(document).unbind('.initinputui');
-			}
-			if(context === document){
-				webshims.isReady('forms-ext', true);
-			}
+		webshims.ready('webshimLocalization', function(){
+			webshims.activeLang($.datepicker.regional, 'forms-ext', changeDefaults);
 		});
-	});
+		$(document).unbind('jquery-uiReady.langchange input-widgetsReady.langchange');
+	};
 	
+	$(document).bind('jquery-uiReady.langchange input-widgetsReady.langchange', getDefaults);
+	getDefaults();
 	
 	//implement set/arrow controls
 (function(){
@@ -965,5 +955,23 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 	});
 })();
 	
+	if(webshims.cfg.waitReady){
+		$.readyWait++;
+	}
+	webshims.addReady(function(context, elem){
+		
+		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(e){
+			if($.datepicker || $.fn.slider){
+				replaceInputUI(context, elem);
+			}
+			
+			if($.datepicker && $.fn.slider){
+				$(document).unbind('.initinputui');
+			}
+			if(webshims.cfg.waitReady && context === document){
+				$.ready(true);
+			}
+		});
+	});
 });
 

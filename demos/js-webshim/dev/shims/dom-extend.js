@@ -346,6 +346,12 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 									webshims.loader.loadScript(module.langSrc+lang+'.js', function(){
 										if(langObj[lang]){
 											fn(langObj[lang]);
+										} else {
+											setTimeout(function(){
+												if(langObj[lang]){
+													fn(langObj[lang]);
+												}
+											}, 9);
 										}
 									});
 									return true;

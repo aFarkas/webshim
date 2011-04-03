@@ -22,7 +22,7 @@
 		}
 	</style>
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
 	<script src="../../js-webshim/minified/extras/mousepress.js"></script>
 	<script src="../../js-webshim/minified/extras/modernizr-1.7.min.js"></script>
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
@@ -105,7 +105,7 @@
 		<div class="main-box">
 		<section>
 			<h2>Configuring of HTML5 input-widgets</h2>
-			<h3>Using custom widgets in all browsers</h3>
+			<h3 id="replace-ui">Using custom widgets in all browsers</h3>
 <code class="block">
 $.webshims.setOptions('forms-ext', {
 	replaceUI: true
@@ -121,7 +121,7 @@ $('form').bind('firstinvalid', function(e){
 	return false;
 });
 </code>	
-			<h3>Changing default-options for range and date</h3>
+			<h3 id="configure-ui">Changing default-options for range and date</h3>
 			<p>The range and date widgets are using <a href="http://jqueryui.com/">jQuery UI</a>. You can use all options for <a href="http://jqueryui.com/demos/slider/">slider</a> and <a href="http://jqueryui.com/demos/datepicker">datepicker</a></p>
 			<p>Note that some options will be overwritten by the native HTML5 elements (disabled, value, max/maxDate, min/minDate, step etc.).</p>
 <code class="block">
@@ -142,12 +142,12 @@ $.webshims.setOptions('forms-ext', {
 &lt;input type="range" data-slider='{"range": "max"}' /&gt;
 </code>
 
-			<h3>Loading jQuery UI from another source</h3>
+			<h3 id="ui-loading">Loading jQuery UI from another source</h3>
 <code class="block">
 // relative from shims-folder
 $.webshims.modules["jquery-ui"].src = "../jquery-ui.custom.min.js";
 </code>
-			<h3>Loading partial jQuery UI</h3>
+			<h3 id="partial-ui-loading">Loading partial jQuery UI</h3>
 			<p>If jQuery UI's widget-factory is already included, but not slider/datepicker.</p>
 <code class="block">
 $.webshims.modules["input-widgets"].src = "../jquery-ui.slider-datepicker.min.js";

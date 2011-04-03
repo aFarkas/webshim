@@ -35,7 +35,7 @@
 		
 	</style>
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-1.7.min.js"></script>
 	<script src="../js-webshim/minified/extras/mousepress.js"></script>
 	
@@ -232,7 +232,7 @@
 	                            number + number = output:
 							</label>
 	                       	<input oninput="$(output2).attr( 'value', ($(this).attr('valueAsNumber') || 0) + ($(number3).attr('valueAsNumber') || 0) )" step="0.5" name="number2" type="number" id="number2" />
-							<input oninput="$(output2).attr( 'value', ($(this).attr('valueAsNumber') || 0) + ($(number2).attr('valueAsNumber') || 0) )" name="number3" step="any" type="number" />
+							<input oninput="$(output2).attr( 'value', ($(this).attr('valueAsNumber') || 0) + ($(number2).attr('valueAsNumber') || 0) )" name="number3" type="number" />
 							<output id="output2"></output>
 	                    </div>
 						
@@ -369,7 +369,7 @@ $.webshims.setOptions('forms-ext', {
 			<aside>
 				<h3>Known Issues</h3>
 				<ul>
-					<li>Spinbuttons for type=time and type=number don't show up in Safari 5 on Windows (everything fine on Mac) <a href="https://github.com/aFarkas/webshim/issues#issue/23">Bug</a></li>
+					<li>Spinbuttons for type=time and type=number don't show up in Safari 5 on Windows (everything fine on Mac) <a href="https://bugs.webkit.org/show_bug.cgi?id=38381">webkit bug</a>, <a href="https://github.com/aFarkas/webshim/issues#issue/23">webshims bug</a></li>
 				</ul>
 			</aside>	
 			<aside>

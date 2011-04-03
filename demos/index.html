@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8"/>
 	<link href="css/styles.css" rel="stylesheet" />
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
 	
 	<script src="js-webshim/minified/extras/modernizr-1.7.min.js"></script>
 	
@@ -50,7 +50,7 @@
 						<li><strong>Modular feature implementation:</strong> Only load features that you need for your application.</li>
 						<li><strong>Future-proof feature detection:</strong> We try to feature detect everything instead of browser sniffing to be more future proof</li>
 						<li><strong>Almost pure native and accurate APIs</strong> Helps you to learn HTML5 (Markup-/DOM/JS-APIs) and to build useful abstractions and extensions on top of the standard. Documentation is the specification (e.g. <a href="http://dev.w3.org/html5/html-author/">HTML5 W3C Specification</a>)</li>
-						<li><strong>stable and reliable polyfills for current and future x-browser landscape:</strong> webshims lib's polyfills are not only a proof of conept. Polyfills are cross-browser testet and work with incapable, buggy, partial and of course full capable HTML5 implementations.</li>
+						<li><strong>stable and reliable polyfills for current and future x-browser landscape:</strong> webshims lib's polyfills are cross-browser testet and work with incapable, buggy, partial and of course full capable HTML5 implementations.</li>
 					</ul>
 				</div>
 				<div class="feature-example home-box">
@@ -79,7 +79,7 @@
 					<h3>Supported Browsers</h3>
 					<ul>
 						<li>IE6+</li>
-						<li>Firefox 3.0+</li>
+						<li>Firefox 3.6+</li>
 						<li>Safari 4+</li>
 						<li>Safari for iOS 4.3</li>
 						<li>Chrome 9.0+</li>
@@ -229,7 +229,14 @@ $.webshims.polyfill('js-storage geolocation', {
 //would load in IE8: /minify.jsp?scripts=path-to-shims/geolocation.js
 //would load in IE9 and other browsers: nothing :-)
 </code>			
-				
+<!--
+//ToDo: combohandler fn-configuration
+$.webshims.polyfill({
+	fn: function(base, scriptPath, seperator, srces){
+		return base + (srces.join(seperator)) +'&b='+(scriptPath.substr(0, scriptPath.length-1));
+	}
+});	
+-->			
 				</div>
 				<h3 id="polyfill-ready" class="button">Fire when ready</h3>
 				<div class="panel">
@@ -447,8 +454,8 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 					<li>improve current implementations</li>
 					<li>switching to a third party scriptloader (maybe <a href="https://github.com/SlexAxton/yepnope.js">yepnope</a> (coming in 1.7))</li>
 					<li>future jQuery 1.6 (jQuery 1.6 will split attr functionality into attr and prop methods) (coming with 1.7.5)</li>
-					<li><a href="http://www.w3.org/TR/html5/video.html">audio/video</a> implementation (coming in 1.8)</li>
-					<li>history (pushState etc.)/hashchange (maybe <a href="https://github.com/balupton/history.js">history.js</a> (coming in 1.9))</li>
+					<li>history (pushState etc.)/hashchange (maybe <a href="https://github.com/balupton/history.js">history.js</a> (coming in 1.8))</li>
+					<li><a href="http://www.w3.org/TR/html5/video.html">audio/video</a> implementation (coming in 1.9)</li>
 					<li>make everything more native (this will be more awsome!!! coming in 2.0)</li>
 				</ul>
 				
