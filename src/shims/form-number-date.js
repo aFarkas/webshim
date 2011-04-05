@@ -474,7 +474,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 	if(!modernizrInputTypes.datetime || options.replaceUI){
 		var datetimeFactor = {
 			trigger: [0.65,0.35],
-			normal: [0.6,0.4]
+			normal: [0.57,0.43]
 		};
 		var subPixelCorrect = (!$.browser.msie || parseInt($.browser.version, 10) > 6) ? 0 : 0.45;
 		replaceInputUI['datetime-local'] = function(elem){

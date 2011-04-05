@@ -183,7 +183,7 @@ $.webshims.polyfill('json-storage geolocation');
 							<li><code>forms-ext</code></li>
 							<li><code>details</code></li>
 						</ul>
-						<p>The polyfill-method can also take a keyword called <code>lightweight</code>, which will load a filesize-/feature balanced profile</p>
+						<p>The polyfill-method can also take a keyword called <code>lightweight</code>, which will load a filesize-/feature-/stability**- balanced profile</p>
 						<p><small>With an * marked features are part of the lightweight profile</small></p>
 	
 <code class="block">
@@ -440,6 +440,22 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 </code>
 		
 					</div>
+					<h3 id="polyfill-philosophy" class="button">Webshims polyfilling philosophy</h3>
+					<div class="panel">
+						<h4>Abstractions vs. Polyfills</h4>
+						<p>A polyfill is a shim that mimics/replicates a future/standarized API using legacy techniques to older browsers. An "shim-abstraction" is a code, that uses a modern and legacy techniques to create a new unstandardized API.</p>
+						<p>An abstraction can have several advantages over a pure polyfill. One of those advantages is a more clean and more easy-to-use API. Webshims Lib has decided to create/use polyfills (with some extensions on top of the standard, not instead!). This decision has several reasons.</p>
+						<p><strong>Make learning new web technologies easy</strong>: It's an easy question do you want to learn proprietary or standarizred code.</p>
+						<p><strong>Make interoperability easy</strong>: Although Webshims Lib technique to create DOM-Setters and DOM-Getters is a little abstraction (always use $.attr to get/set DOM-Attributes). This abstraction is still HTML5-compatible and makes writing interoperable code easy. Which means, you can use and mix different code of different developers.</p>
+						<p><strong>Make extensions easy</strong>: If you want to create an extension on top of a feature, you always have one code path, because everything (including the low-level API) should be polyfilled. If you want to extend an abstraction, it might be possible, that you have to extend several code paths (modern and legacy code).</p>
+						<p><strong>Let the user/developer choose</strong>: Webshims lib's polyfills are loaded modular by demand, which means you can mix several polyfills. Consider the following:</p>
+						<p>A plugin-author needs a storage API and he chooses abstraction code A, because it is good, has a an awsome API and is only 5kb. Another plugin author also needs an storage API and uses abstraction code B, it's also nice and also just 5kb. And now you need to use both scripts and you are adding 10kb of useless code, because 80% of all browser already support localStorage and JSON (I would say this is a big fail).</p>
+						<h4>Create highquality, stable, reliable polyfills</h4>
+						<p>One big problem in the "polyfilling" world are reliable and production ready polyfills. Webshims Lib takes cross-browser testing very serious.</p>
+						<h4>Improve the standard</h4>
+						<p>While Webshims lib's polyfills only want to polyfill the gaps and in some cases does some extension work. Every developer is invited, to abstract ugly APIs or to write extensions on top of the standard.</p>
+						
+					</div>
 				</div>
 			</section>
 			
@@ -452,9 +468,8 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 				
 				<ul>
 					<li>improve current implementations</li>
-					<li>switching to a third party scriptloader (maybe <a href="https://github.com/SlexAxton/yepnope.js">yepnope</a> (coming in 1.7))</li>
-					<li>future jQuery 1.6 (jQuery 1.6 will split attr functionality into attr and prop methods) (coming with 1.7.5)</li>
-					<li>history (pushState etc.)/hashchange (maybe <a href="https://github.com/balupton/history.js">history.js</a> (coming in 1.8))</li>
+					<li>history (pushState etc.)/hashchange (maybe <a href="https://github.com/balupton/history.js">history.js</a> (coming in 1.7))</li>
+					<li>future jQuery 1.6 (jQuery 1.6 will split attr functionality into attr and prop methods) (coming with 1.8)</li>
 					<li><a href="http://www.w3.org/TR/html5/video.html">audio/video</a> implementation (coming in 1.9)</li>
 					<li>make everything more native (this will be more awsome!!! coming in 2.0)</li>
 				</ul>

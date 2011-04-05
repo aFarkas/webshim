@@ -25,7 +25,6 @@ img {
 form textarea {
 	height: 140px;
 	font-family: arial, helvetica, sans-serif;
-	font-size: 120%;
 }
 /* remove FOUC */
 .loading-polyfills body {
@@ -123,8 +122,9 @@ input[type="email"],
 input[type="url"],
 textarea {
 	border: 1px solid #F2F2F2;
-	height: 1.3em;
 	padding: 2px 5px;
+	height: 1.3em;
+	width: 170px;
 	-moz-box-shadow: 1px 1px 2px rgba(100, 100, 100, 0.9) inset;
 	box-shadow: 1px 1px 2px rgba(100, 100, 100, 0.9) inset;
 	-moz-border-radius: 4px;

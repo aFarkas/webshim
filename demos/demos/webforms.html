@@ -231,8 +231,8 @@
 	                        <label for="number2">
 	                            number + number = output:
 							</label>
-	                       	<input oninput="$(output2).attr( 'value', ($(this).attr('valueAsNumber') || 0) + ($(number3).attr('valueAsNumber') || 0) )" step="0.5" name="number2" type="number" id="number2" />
-							<input oninput="$(output2).attr( 'value', ($(this).attr('valueAsNumber') || 0) + ($(number2).attr('valueAsNumber') || 0) )" name="number3" type="number" />
+	                       	<input oninput="$(output2).attr( 'value', ($(this).attr('valueAsNumber') || 0) + ($(number3).attr('valueAsNumber') || 0) )" step="0.5" value="0" name="number2" type="number" id="number2" />
+							<input oninput="$(output2).attr( 'value', ($(this).attr('valueAsNumber') || 0) + ($(number2).attr('valueAsNumber') || 0) )" name="number3" value="0" type="number" />
 							<output id="output2"></output>
 	                    </div>
 						
@@ -367,9 +367,11 @@ $.webshims.setOptions('forms-ext', {
 				</div>
 			</aside>
 			<aside>
-				<h3>Known Issues</h3>
+				<h3>Known Issues/Constraints (<code>forms-ext</code> only)</h3>
 				<ul>
-					<li>Spinbuttons for type=time and type=number don't show up in Safari 5 on Windows (everything fine on Mac) <a href="https://bugs.webkit.org/show_bug.cgi?id=38381">webkit bug</a>, <a href="https://github.com/aFarkas/webshim/issues#issue/23">webshims bug</a></li>
+					<li>Spinbuttons for type=time and type=number don't show up in Safari 5 on Windows <a href="https://bugs.webkit.org/show_bug.cgi?id=38381">webkit bug</a>, <a href="https://github.com/aFarkas/webshim/issues#issue/23">webshims bug</a></li>
+					<li>Spinbuttons for type=number on Safari 5 Mac has some issue: They have bad usability, if the input starts with an empty value or if you are using step=any.</li>
+					<li>Webshims lib considers a polyfill only as "extreme stable/futureproof", if at least three different browser engines, do support the polyfilled features, while this is true for the <code>forms</code>-feature, it isn't for the <code>forms-ext</code>-feature.</li>
 				</ul>
 			</aside>	
 			<aside>
