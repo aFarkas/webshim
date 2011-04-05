@@ -183,7 +183,7 @@ $.webshims.polyfill('json-storage geolocation');
 							<li><code>forms-ext</code></li>
 							<li><code>details</code></li>
 						</ul>
-						<p>The polyfill-method can also take a keyword called <code>lightweight</code>, which will load a filesize-/feature-/stability**- balanced profile</p>
+						<p>The polyfill-method can also take a keyword called <code>lightweight</code>, which will load a filesize-/feature-/stability- balanced profile</p>
 						<p><small>With an * marked features are part of the lightweight profile</small></p>
 	
 <code class="block">
@@ -451,9 +451,9 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 						<p><strong>Let the user/developer choose</strong>: Webshims lib's polyfills are loaded modular by demand, which means you can mix several polyfills. Consider the following:</p>
 						<p>A plugin-author needs a storage API and he chooses abstraction code A, because it is good, has a an awsome API and is only 5kb. Another plugin author also needs an storage API and uses abstraction code B, it's also nice and also just 5kb. And now you need to use both scripts and you are adding 10kb of useless code, because 80% of all browser already support localStorage and JSON (I would say this is a big fail).</p>
 						<h4>Create highquality, stable, reliable polyfills</h4>
-						<p>One big problem in the "polyfilling" world are reliable and production ready polyfills. Webshims Lib takes cross-browser testing very serious.</p>
+						<p>One big problem in the "polyfilling" world are reliable and production ready polyfills. Webshims Lib takes cross-browser testing and studying the specification very serious.</p>
 						<h4>Improve the standard</h4>
-						<p>While Webshims lib's polyfills only want to polyfill the gaps and in some cases does some extension work. Every developer is invited, to abstract ugly APIs or to write extensions on top of the standard.</p>
+						<p>While Webshims lib's polyfills only want to polyfill the gaps and in some cases do some extension work. Every developer is invited, to abstract ugly APIs, to re-style ugly polyfilled UI components or/and to write extensions on top of the standard. If you are doing this, please be so kind and share your code with others.</p>
 						
 					</div>
 				</div>
