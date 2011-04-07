@@ -779,6 +779,17 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 		};
 	}
 	
+	if(Modernizr.input.valueAsNumberSet && Modernizr.input.valueAsDate && (options.replaceUI || !Modernizr.inputtypes["datetime-local"] || !Modernizr.inputtypes.range)){
+		var reflectFn = function(val){
+			if($.data(this, 'inputUIReplace')){
+				$.attr(this, 'value', $.attr(this, 'value'));
+			}
+		};
+		
+		webshims.onNodeNamesPropertyModify('input', 'valueAsNumber', reflectFn);
+		webshims.onNodeNamesPropertyModify('input', 'valueAsDate', reflectFn);
+	}
+	
 	$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, attr){
 		webshims.onNodeNamesPropertyModify('input', attr, {
 			set: function(val){
