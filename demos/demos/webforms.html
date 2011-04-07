@@ -40,6 +40,7 @@
 	<script src="../js-webshim/minified/extras/mousepress.js"></script>
 	
 	<script src="../js-webshim/minified/polyfiller.js"></script>
+	
 	<!--
 		<script src="../../src/polyfiller.js"></script> 
 		<script>
@@ -121,6 +122,7 @@
 				<ul>
 					<li><strong>customMessages</strong> (boolean): <code>false</code> (default) || <code>true</code>. If <code>customMessages</code> is set to true. Webshims Lib will implement a DOM-Property called customValidationMessage, which can be changed through the $.webshims.validityMessages-Array.</li>
 					<li><strong>overrideMessages</strong> (boolean): <code>false</code> (default) || <code>true</code>. Overrides the native messages with the customMessages - using the <code>setCustomValidity</code>-method. This is usefull, if you want to use customMessages with native validation UI. If you want to use custom messages with custom styleable UI. Use the <code>customMessages</code>-option instead.</li>
+					<li><strong>replaceValidationUI</strong> (boolean): <code>false</code> (default) || <code>true</code>. Replaces the browser validation UI with a custom styleable UI.</li>
 					<li><strong>placeholderType</strong> (string): <code>"value"</code> (default) || <code>"over"</code>. If placeholderType is set to "over", the polyfill uses the overLabel technique to create a placeholder and doesn't "polute" the value property.</li>
 					<li><strong>textareaPlaceholder</strong> (boolean): <code>false</code> (default) || <code>true</code>. If textareaPlaceholder is set to true, browser, which do support input[placeholder] and constraint validation, but no textarea[placeholder], will be polyfilled (only Opera 11).</li>
 					
@@ -236,10 +238,18 @@
 							<output id="output2"></output>
 	                    </div>
 						
+						<div class="form-element">
+							<fieldset>
+								<legend> date +oninput+ range</legend>
+		                       	<input type="date" id="dateControlledByRange" value="2011-01-01" min="2011-01-01" max="2011-12-31" oninput="$.attr( rangeControlledByDate, 'valueAsNumber', $.attr(this, 'valueAsNumber') )" />
+								<input type="range" id="rangeControlledByDate" value="1293840000000" min="1293840000000" max="1325289600000" step="86400000" oninput="$.attr( dateControlledByRange, 'valueAsNumber', $.attr(this, 'valueAsNumber') )" />
+							</fieldset>
+	                    </div>
+						
 						<div class="form-item">
-	                       	<input type="checkbox" required id="checkbox" />
+	                       	<input type="checkbox" required id="checkbox" name="checkbox" />
 							<label for="checkbox">
-	                            required checkbox: *
+	                            required checkbox*
 							</label>
 	                    </div>
 						
@@ -371,7 +381,7 @@ $.webshims.setOptions('forms-ext', {
 				<ul>
 					<li>Spinbuttons for type=time and type=number don't show up in Safari 5 on Windows <a href="https://bugs.webkit.org/show_bug.cgi?id=38381">webkit bug</a>, <a href="https://github.com/aFarkas/webshim/issues#issue/23">webshims bug</a></li>
 					<li>Spinbuttons for type=number on Safari 5 Mac has some issue: They have bad usability, if the input starts with an empty value or if you are using step=any.</li>
-					<li>Webshims lib considers a polyfill only as "extreme stable/futureproof", if at least three different browser engines, do support the polyfilled features, while this is true for the <code>forms</code>-feature, it isn't for the <code>forms-ext</code>-feature.</li>
+					<li>Webshims lib considers a polyfill only as "extreme stable/futureproof", if at least three different browser engines do support the polyfilled features, while this is true for the <code>forms</code>-feature, it isn't for the <code>forms-ext</code>-feature.</li>
 				</ul>
 			</aside>	
 			<aside>
