@@ -80,7 +80,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		.bind('lastinvalid', function(e, data){
 			var firstTarget = data.invalidlist[0];
 				
-			if( firstTarget && badWebkit && document.activeElement && firstTarget !== document.activeElement && firstInvalidEvent && !firstInvalidEvent.isInvalidUIPrevented() ){
+			if( firstTarget && (badWebkit || (!Modernizr.requiredSelect && $.nodeName(firstTarget, 'select'))) && document.activeElement && firstTarget !== document.activeElement && firstInvalidEvent && !firstInvalidEvent.isInvalidUIPrevented() ){
 				webshims.validityAlert.showFor(firstTarget);
 			}
 			firstInvalidEvent = false;

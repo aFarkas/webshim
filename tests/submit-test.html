@@ -175,14 +175,14 @@
 			
 			$('input.trigger-checkValidity').click(function(e){
 				reset();
-				$('input:first', this.form).attr('value', '').checkValidity();
+				$('input, select', this.form).filter(':first').attr('value', '').checkValidity();
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
 					equals(firstInvalidEvents, 1, 'firstinvalid event');
 					equals(invalidEvents, 1, 'invalid events');
 					if(document.activeElement){
 						var type = document.activeElement.type;
-						equals((type == 'text' || type == 'datetime-local'), false, "don't focus first invalid: "+type);
+						equals((type == 'text' || type == 'datetime-local' || type == 'select-one'), false, "don't focus first invalid: "+type);
 					}
 				}, 100);
 				return false;
@@ -190,7 +190,7 @@
 			
 			$('input.trigger-form-checkValidity').click(function(e){
 				reset();
-				$('input:first', this.form).attr('value', '');
+				$('input, select', this.form).filter(':first').attr('value', '');
 				$(this.form).checkValidity();
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
@@ -198,7 +198,7 @@
 					equals(invalidEvents, 1, 'invalid events');
 					if(document.activeElement){
 						var type = document.activeElement.type;
-						equals((type == 'text' || type == 'datetime-local'), false, "don't focus first invalid: "+type);
+						equals((type == 'text' || type == 'datetime-local' || type == 'select-one'), false, "don't focus first invalid: "+type);
 					}
 				}, 100);
 				return false;
@@ -208,14 +208,14 @@
 			$('input.trigger-checkValidity-prevent-invalid').click(function(e){
 				reset();
 				preventInvalid = true;
-				$('input:first', this.form).attr('value', '').checkValidity();
+				$('input, select', this.form).filter(':first').attr('value', '').checkValidity();
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
 					equals(firstInvalidEvents, 1, '1 firstinvalid event');
 					equals(invalidEvents, 1, '1 invalid events');
 					if(document.activeElement){
 						var type = document.activeElement.type;
-						equals((type !== 'text' && type !== 'datetime-local'), true, "no focus first invalid: "+type);
+						equals((type !== 'text' && type !== 'datetime-local' && type !== 'select-one'), true, "no focus first invalid: "+type);
 					}
 				}, 100);
 				return false;
@@ -224,27 +224,27 @@
 			$('input.submit-prevent').click(function(e){
 				reset();
 				preventInvalid = true;
-				$('input:first', this.form).attr('value', '');
+				$('input, select', this.form).filter(':first').attr('value', '');
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
 					equals(firstInvalidEvents, 1, 'firstinvalid event');
 					equals(invalidEvents, 1, 'invalid events');
 					if(document.activeElement){
 						var type = document.activeElement;
-						equals((type !== 'text' && type !== 'datetime-local'), true, "no focus first invalid: "+type);
+						equals((type !== 'text' && type !== 'datetime-local' && type !== 'select-one'), true, "no focus first invalid: "+type);
 					}
 				}, 100);
 			});
 			$('input.submit-noprevent').click(function(e){
 				reset();
-				$('input:first', this.form).attr('value', '');
+				$('input, select', this.form).filter(':first').attr('value', '');
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
 					equals(firstInvalidEvents, 1, 'firstinvalid event');
 					equals(invalidEvents, 1, 'invalid events');
 					if(document.activeElement){
 						var type = document.activeElement.type;
-						equals((type == 'text' || type == 'datetime-local'), true, "focus first invalid: "+type);
+						equals((type == 'text' || type == 'datetime-local' || type == 'select-one'), true, "focus first invalid: "+type);
 					}
 				}, 100);
 			});
@@ -339,6 +339,20 @@
 	<hr />
 	<form action="bigfail.html">
     	<input name="test-4" type="text" required />
+		<input type="button" class="trigger-checkValidity" value="trigger-checkValidity" />
+		<input type="button" class="trigger-checkValidity-prevent-invalid" value="trigger-checkValidity prevent invalid" />
+		<input type="button" class="trigger-form-checkValidity" value="trigger-form.checkValidity" />
+		
+		<input type="submit" class="submit-prevent" value="try invalid submit (prevent invalid)" />
+		<input type="submit" class="submit-noprevent" value="try invalid submit (no invalid prevent)" />
+		
+    </form>
+	
+	<form action="bigfail.html">
+    	<select name="test-5" required>
+    		<option value=""></option>
+			<option value="some value">some value</option>
+    	</select>
 		<input type="button" class="trigger-checkValidity" value="trigger-checkValidity" />
 		<input type="button" class="trigger-checkValidity-prevent-invalid" value="trigger-checkValidity prevent invalid" />
 		<input type="button" class="trigger-form-checkValidity" value="trigger-form.checkValidity" />
