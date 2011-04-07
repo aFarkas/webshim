@@ -1031,7 +1031,7 @@
 			}
 			return Modernizr.output && result;
 		},
-		dependencies: ['dom-support', 'json-storage']
+		dependencies: ['dom-support']
 	});
 	
 	addPolyfill('forms-ext', {

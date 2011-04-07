@@ -155,13 +155,19 @@ jQuery.webshims.register('form-output-datalist', function($, webshims, window, d
 			date: 1
 		};
 		var noMin = ($.browser.msie && parseInt($.browser.version, 10) < 7);
-		
+		var globStoredOptions = {};
 		var getStoredOptions = function(name){
 			if(!name){return [];}
+			if(globStoredOptions[name]){
+				return globStoredOptions[name];
+			}
 			var data;
-			try {
-				data = JSON.parse(localStorage.getItem('storedDatalistOptions'+name));
-			} catch(e){}
+			webshims.ready('json-storage', function(){
+				try {
+					data = JSON.parse(localStorage.getItem('storedDatalistOptions'+name));
+				} catch(e){}
+				globStoredOptions[name] = data || [];
+			});
 			return data || [];
 		};
 		var storeOptions = function(name, val){
@@ -291,7 +297,7 @@ jQuery.webshims.register('form-output-datalist', function($, webshims, window, d
 				if(opts.input.form && opts.input.id){
 					$(opts.input.form).bind('submit.datalistWidget'+opts.input.id, function(){
 						var val = $.attr(opts.input, 'value');
-						that.storedOptions = that.storedOptions || getStoredOptions(opts.input.name || opts.input.id);
+						that.storedOptions = getStoredOptions(opts.input.name || opts.input.id);
 						if(val && $.inArray(val, that.storedOptions) == -1){
 							that.storedOptions.push(val);
 							storeOptions(opts.input.name || opts.input.id, that.storedOptions );
@@ -330,7 +336,7 @@ jQuery.webshims.register('form-output-datalist', function($, webshims, window, d
 				clearTimeout(this.updateTimer);
 				this.updateTimer = setTimeout(function(){
 					that.updateListOptions();
-				}, this.isListVisible ? 0 : 20 * this.lazyIDindex);
+				}, this.isListVisible ? 0 : 40 * this.lazyIDindex);
 			},
 			updateListOptions: function(){
 				this.needsUpdate = false;
@@ -358,7 +364,7 @@ jQuery.webshims.register('form-output-datalist', function($, webshims, window, d
 					values[i] = item.value;
 					allOptions[i] = item;
 				});
-				this.storedOptions = this.storedOptions || getStoredOptions(this.input.name || this.input.id);
+				this.storedOptions = getStoredOptions(this.input.name || this.input.id);
 				this.storedOptions.forEach(function(val, i){
 					if($.inArray(val, values) == -1){
 						allOptions.push({value: val, text: val, className: '', style: ''});
