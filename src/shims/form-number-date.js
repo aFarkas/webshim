@@ -788,8 +788,9 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 			}
 		});
 	});
-	
-		
+	if(!options.availabeLangs){
+		options.availabeLangs = 'af ar ar-DZ az bg bs ca cs da de el en-AU en-GB en-NZ eo es et eu fa fi fo fr fr-CH gl he hr hu hy id is it ja ko kz lt lv ml ms nl no pl pt-BR rm ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' ');
+	}
 	var changeDefaults = function(langObj){
 		
 		if(!langObj){return;}
