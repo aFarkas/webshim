@@ -71,7 +71,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-Release 1.6RC4
+Release 1.6RC5
 ----------
 
 * added details & summary element-support
@@ -86,6 +86,7 @@ Release 1.6RC4
 * fixed IE reopens datepicker sometimes
 * updated to jQuery 1.5.2
 * fixed many little bugs in old X-/C-graded browsers
+* fixed setting valueAsNumber/valueAsDate in Opera
 
 Release 1.5.2
 ----------
