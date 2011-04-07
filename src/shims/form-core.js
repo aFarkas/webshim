@@ -6,7 +6,7 @@ jQuery.webshims.gcEval = function(){
 		}
 	}
 };
-jQuery.webshims.register('form-core', function($, webshims, window, doc, undefined){
+jQuery.webshims.register('form-core', function($, webshims, window, doc, undefined, options){
 	"use strict";
 	webshims.getVisualInput = function(elem){
 		elem = $(elem);
@@ -294,13 +294,23 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 		});
 	})();
 	
+	if(options.replaceValidationUI){
+		$(function(){
+			$(document).bind('firstinvalid', function(e){
+				if(!e.isDefaultPrevented()){
+					e.preventDefault();
+					$.webshims.validityAlert.showFor( e.target, $(e.target).attr('customValidationMessage') ); 
+				}
+			});
+		});
+	}
+	
 	/* form message */
 	(function(){
 		
 		
 		var validityMessages = webshims.validityMessages;
-		var cfg = webshims.cfg.forms;
-		var implementProperties = (cfg.overrideMessages || cfg.customMessages) ? ['customValidationMessage'] : [];
+		var implementProperties = (options.overrideMessages || options.customMessages) ? ['customValidationMessage'] : [];
 	
 		validityMessages['en'] = validityMessages['en'] || validityMessages['en-US'] || {
 			typeMismatch: {

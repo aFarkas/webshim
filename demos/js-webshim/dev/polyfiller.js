@@ -64,7 +64,7 @@
 			dateElem = null;
 		}
 		
-		if (Modernizr.formvalidation) {
+		if(Modernizr.formvalidation){
 			form.remove();
 		}
 		form = null;
@@ -126,12 +126,11 @@
 			xlightweight: ['es5', 'canvas', 'geolocation', 'json-storage']
 		},
 		setOptions: function(name, opts){
-			if(typeof name == 'string' && opts !== undefined && name in webCFG){
-				if(typeof opts != 'object'){
-					webCFG[name] = opts;
-				} else {
-					$.extend(true, webCFG[name], opts);
-				}
+			if(typeof name == 'string' && opts !== undefined){
+				webCFG[name] = (!$.isPlainObject(opts)) ? 
+					opts : 
+					$.extend(true, webCFG[name] || {} , opts)
+				;
 			} else if(typeof name == 'object') {
 				$.extend(true, webCFG, name);
 			}
@@ -167,7 +166,7 @@
 				
 				var removeLoader = function(){
 					$('html').removeClass('loading-polyfills long-loading-polyfills polyfill-remove-fouc');
-					$(window).unbind('.loadingPolyfills');
+					$(window).unbind('.lP');
 					clearTimeout(loadingTimer);
 				};
 				
@@ -179,7 +178,7 @@
 						addClass.push('polyfill-remove-fouc');
 					}
 					addClass.push('loading-polyfills');
-					$(window).bind('load.loadingPolyfills polyfillloaderror.loadingPolyfills  error.loadingPolyfills', removeLoader);
+					$(window).bind('load.lP polyfillloaderror.lP  error.lP', removeLoader);
 					loadingTimer = setTimeout(function(){
 						$('html').addClass('long-loading-polyfills');
 					}, 600);
@@ -938,8 +937,7 @@
 	
 	/* html5 constraint validation */
 	
-	webshims.validityMessages = [];
-	webshims.validationMessages = webshims.validityMessages;
+	webshims.validationMessages = webshims.validityMessages = [];
 	webshims.inputTypes = {};
 			
 	addPolyfill('form-core', {
@@ -951,10 +949,11 @@
 			}
 		},
 		options: {
-			placeholderType: 'value',
-			customMessages: false,
-			overrideMessages: false,
-			textareaPlaceholder: false
+			placeholderType: 'value'
+//			,customMessages: false,
+//			overrideMessages: false,
+//			textareaPlaceholder: false,
+//			replaceValidationUI: false
 		}
 	});
 			
@@ -1038,9 +1037,8 @@
 			slider: {},
 			datepicker: {},
 			langSrc: protocol+'ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/i18n/jquery.ui.datepicker-',
-			availabeLangs: 'af ar ar-DZ az bg bs ca cs da de el en-AU en-GB en-NZ eo es et eu fa fi fo fr fr-CH gl he hr hu hy id is it ja ko kz lt lv ml ms nl no pl pt-BR rm ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' '),
-			recalcWidth: true,
-			replaceUI: false
+			recalcWidth: true
+//			,replaceUI: false
 		}
 	});
 		
