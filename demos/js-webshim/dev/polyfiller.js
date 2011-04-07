@@ -55,11 +55,16 @@
 		
 		
 		modernizrInputAttrs.valueAsNumber = false;
+		modernizrInputAttrs.valueAsNumberSet = false;
 		modernizrInputAttrs.valueAsDate = false;
 		
 		if(Modernizr.formvalidation){
 			dateElem = $('#date-input-test', form)[0];
 			modernizrInputAttrs.valueAsNumber = ('valueAsNumber' in  dateElem);
+			if(modernizrInputAttrs.valueAsNumber){
+				dateElem.valueAsNumber = 1293753600000;
+				modernizrInputAttrs.valueAsNumberSet = (dateElem.value == '2010-12-31');
+			}
 			modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem);
 			dateElem = null;
 		}
@@ -109,21 +114,20 @@
 	$.webshims = $.sub ? $.sub() : {};
 	
 	$.extend($.webshims, {
-		version: '1.6.0',
+		version: 'pre1.6.0RC5',
 		cfg: {
 			useImportantStyles: true,
-			removeFOUC: false,
+//			removeFOUC: false,
+//			addCacheBuster: false,
 			waitReady: true,
-			extendNative: true,
-			addCacheBuster: false
+			extendNative: true
 		},
 		/*
 		 * some data
 		 */
 		modules: {}, features: {}, featureList: [],
 		profiles: {
-			lightweight: ['es5', 'canvas', 'geolocation', 'forms', 'json-storage'],
-			xlightweight: ['es5', 'canvas', 'geolocation', 'json-storage']
+			lightweight: ['es5', 'json-storage', 'canvas', 'geolocation', 'forms']
 		},
 		setOptions: function(name, opts){
 			if(typeof name == 'string' && opts !== undefined){
@@ -510,7 +514,6 @@
 						if(combo){
 							loadCombos.push(module.name);
 						} else {
-							
 							loadScript(module.src || module.name, module.name);
 						}
 					}
@@ -869,6 +872,18 @@
 		test: Modernizr.genericDOM
 	});
 	
+	/* json + loacalStorage */
+	
+	addPolyfill('json-storage', {
+		test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
+		loadInit: function(){
+			loadList(['swfobject']);
+		},
+		noAutoCallback: true
+	});
+	
+	/* END: json + loacalStorage */
+	
 	/* geolocation */
 	addPolyfill('geolocation', {
 		test: Modernizr.geolocation,
@@ -954,7 +969,8 @@
 //			overrideMessages: false,
 //			textareaPlaceholder: false,
 //			replaceValidationUI: false
-		}
+		},
+		methodNames: ['setCustomValidity','checkValidity']
 	});
 			
 	if(Modernizr.formvalidation){
@@ -966,16 +982,15 @@
 			feature: 'forms',
 			src: 'form-native-extend',
 			test: function(toLoad){
-				return (Modernizr.requiredSelect && Modernizr.validationmessage && ((modernizrInputAttrs.valueAsNumber && modernizrInputAttrs.valueAsDate) || $.inArray('forms-ext', toLoad) == -1) && !this.options.overrideMessages );
+				return (Modernizr.bugfreeformvalidation && ((modernizrInputAttrs.valueAsNumberSet && modernizrInputAttrs.valueAsDate) || $.inArray('forms-ext', toLoad) == -1) && !this.options.overrideMessages );
 			},
-			dependencies: ['form-core', 'dom-support'],
-			methodNames: ['setCustomValidity','checkValidity']
+			dependencies: ['form-core', 'dom-support']
 		});
 		
 		addPolyfill('form-native-fix', {
 			feature: 'forms',
 			test: Modernizr.bugfreeformvalidation,
-			dependencies: ['dom-support']
+			dependencies: ['form-extend']
 		});
 		
 		//this implements placeholder in old opera
@@ -992,8 +1007,7 @@
 		addPolyfill('form-extend', {
 			feature: 'forms',
 			src: 'form-shim-extend',
-			methodNames: ['setCustomValidity','checkValidity'],
-			dependencies: ['form-core', 'dom-extend']
+			dependencies: ['form-core', 'dom-support']
 		});
 	}
 	
@@ -1022,10 +1036,12 @@
 	
 	addPolyfill('forms-ext', {
 		src: 'form-number-date',
-		test: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && !this.options.replaceUI);},
+		uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && !this.options.replaceUI);},
+		test: function(){return (modernizrInputAttrs.valueAsNumberSet && this.uiTest());},
 		noAutoCallback: true,
 		dependencies: ['form-extend'],
 		loadInit: function(){
+			if(this.uiTest()){return;}
 			loadList(['jquery-ui']);
 			if(modules['input-widgets'].src){
 				loadList(['input-widgets']);
@@ -1044,22 +1060,11 @@
 		
 	/* END: html5 forms */
 	
-	/* json + loacalStorage */
-	
-	addPolyfill('json-storage', {
-		test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
-		loadInit: function(){
-			loadList(['swfobject']);
-		},
-		noAutoCallback: true
-	});
-	
-	/* END: json + loacalStorage */
 	addPolyfill('details', {
 		test: Modernizr.details,
 		dependencies: ['dom-support'],
 		options: {
-			animate: false,
+//			animate: false,
 			text: 'Details'
 		}
 	});

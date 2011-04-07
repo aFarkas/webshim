@@ -564,10 +564,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			value: '1e2',
 			result: 100
 		},
-		{
-			id: 'number',
-			value: '1d2'
-		},
+		
 		{
 			id: 'date',
 			value: '1999-12-12',
@@ -578,19 +575,8 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			value: '1899-12-12',
 			result: -2210716800000
 		},
-		{
-			id: 'date',
-			value: '1899-12-32'
-		},
-		{
-			id: 'date',
-			value: '1899-12-12-'
-		},
-		{
-			id: 'date',
-			value: '2010-12-31',
-			result: 1293753600000
-		},
+		
+		
 		{
 			id: 'datetime-local',
 			value: '2010-12-31T23:59',
@@ -601,10 +587,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			value: '2010-12-31T02:00',
 			result: 1293760800000
 		},
-		{
-			id: 'datetime-local',
-			value: '2010-12-31B2:00'
-		},
+		
 		{
 			id: 'time',
 			value: '13:00',
@@ -619,22 +602,11 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			id: 'time',
 			value: '13:45:30',
 			result: 49530000
-		},
-		{
-			id: 'time',
-			value: '13:30:30.5',
-			result: 48630500
-		},
-		{
-			id: 'time',
-			value: '13:30:30,5'
 		}
 	], function(i, data){
 		var elem = $('#'+data.id);
 		elem.attr('value', data.value);
-		if(Modernizr.formvalidation ===  true && data.value != elem.attr('value')){
-			return;
-		}
+		
 		if(data.result === undefined){
 			var asVal = elem.attr('valueAsNumber');
 			ok(isNaN(asVal), data.value+' is as number NaN, element: '+ data.id+ ', was: '+ asVal +', type: '+ (typeof asVal));
@@ -649,6 +621,31 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 				id: 'datetime-local',
 				value: '2010-12-31T00:00',
 				result: 1293753600000
+			},
+			{
+				id: 'date',
+				value: '1899-12-32'
+			},
+			{
+				id: 'date',
+				value: '1899-12-12-'
+			},
+			{
+				id: 'date',
+				value: '2010-12-31',
+				result: 1293753600000
+			},
+			{
+				id: 'number',
+				value: '1d2'
+			},
+			{
+				id: 'datetime-local',
+				value: '2010-12-31B2:00'
+			},
+			{
+				id: 'time',
+				value: '13:30:30,5'
 			}
 		], function(i, data){
 			var elem = $('#'+data.id);
@@ -670,8 +667,8 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 	$.each([
 			{
 				id: 'time',
-				result: '13:30:30.5',
-				value: 48630500
+				result: '13:30:30',
+				value: 48630000
 			}, 
 			{
 				id: 'date',
@@ -681,11 +678,12 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		], 
 		function(i, data){
 			var elem = $('#' + data.id);
+			elem.attr('value', '');
 			elem.attr('valueAsNumber', data.value);
 			
-			if (Modernizr.formvalidation === true && data.value != elem.attr('valueAsNumber')) {
-				return;
-			}
+//			if (Modernizr.formvalidation === true && data.value != elem.attr('valueAsNumber')) {
+//				return;
+//			}
 			var val = elem.attr('value');
 			ok(function(){
 				if (data.id == 'time' || data.id == 'datetime-local') {
@@ -712,9 +710,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			var elem = $('#' + data.id);
 			elem.attr('valueAsNumber', data.value);
 			
-			if (Modernizr.formvalidation === true && data.value != elem.attr('valueAsNumber')) {
-				return;
-			}
+			
 			var val = elem.attr('value');
 			ok(function(){
 				if (data.id == 'time' || data.id == 'datetime-local') {
@@ -730,7 +726,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		});
 	}
 	//setting valueAsDate (webkit orientated, not sure these test are right + time has a bug in different time zone)
-	if (window.noHTMLExtFixes) {
+	
 		$.each([{
 			id: 'date',
 			value: function(){
@@ -752,23 +748,6 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			},
 			resultVal: '1999-01-01',
 			resultNumber: 915148800000
-		}, {
-			id: 'date',
-			value: function(){
-				return null;
-			},
-			resultVal: ''
-		}, {
-			id: 'date',
-			value: function(){
-				var date = new Date();
-				date.setUTCDate(31);
-				date.setUTCMonth(11);
-				date.setUTCFullYear(2010);
-				return date;
-			},
-			resultVal: '2010-12-31',
-			resultNumber: 1293753600000
 		}, {
 			id: 'date',
 			value: function(){
@@ -808,7 +787,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 				ok(elem.attr('valueAsNumber') === data.resultNumber, ' expected number: ' + data.resultNumber + ', element: ' + data.id + ', was: ' + elem.attr('valueAsNumber'));
 			}
 		});
-	}
+	
 	$.webshims.ready('forms DOM', function(){
 		start();
 	});

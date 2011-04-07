@@ -1,6 +1,6 @@
 jQuery.webshims.register('forms-ext', function($, webshims, window){
 	"use strict";
-	if(Modernizr.input.valueAsNumber && Modernizr.input.valueAsDate){return;}
+	if(Modernizr.input.valueAsNumberSet && Modernizr.input.valueAsDate){return;}
 	//why no step IDL?
 	webshims.getStep = function(elem, type){
 		var step = $.attr(elem, 'step');
@@ -51,67 +51,79 @@ jQuery.webshims.register('forms-ext', function($, webshims, window){
 		EPS = 1e-7
 	;
 	
-	webshims.addValidityRule('stepMismatch', function(input, val, cache){
-		if(val === ''){return false;}
-		if(!('type' in cache)){
-			cache.type = getType(input[0]);
-		}
-		//stepmismatch with date is computable, but it would be a typeMismatch (performance)
-		if(cache.type == 'date'){
-			return false;
-		}
-		var ret = false, base;
-		if(typeModels[cache.type] && typeModels[cache.type].step){
-			if( !('step' in cache) ){
-				cache.step = webshims.getStep(input[0], cache.type);
-			}
-			
-			if(cache.step == 'any'){return false;}
-			
-			if(!('valueAsNumber' in cache)){
-				cache.valueAsNumber = typeModels[cache.type].asNumber( val );
-			}
-			if(isNaN(cache.valueAsNumber)){return false;}
-			
-			addMinMaxNumberToCache('min', input, cache);
-			base = cache.minAsNumber;
-			if(isNaN(base)){
-				base = typeModels[cache.type].stepBase || 0;
-			}
-			
-			ret =  Math.abs((cache.valueAsNumber - base) % cache.step);
-							
-			ret = !(  ret <= EPS || Math.abs(ret - cache.step) <= EPS  );
-		}
-		return ret;
-	});
-	
-	
-	
-	[{name: 'rangeOverflow', attr: 'max', factor: 1}, {name: 'rangeUnderflow', attr: 'min', factor: -1}].forEach(function(data, i){
-		webshims.addValidityRule(data.name, function(input, val, cache) {
-			var ret = false;
-			if(val === ''){return ret;}
-			if (!('type' in cache)) {
+	if(!Modernizr.input.valueAsNumber || !Modernizr.input.valueAsDate){
+		webshims.addValidityRule('stepMismatch', function(input, val, cache){
+			if(val === ''){return false;}
+			if(!('type' in cache)){
 				cache.type = getType(input[0]);
 			}
-			if (typeModels[cache.type] && typeModels[cache.type].asNumber) {
+			//stepmismatch with date is computable, but it would be a typeMismatch (performance)
+			if(cache.type == 'date'){
+				return false;
+			}
+			var ret = false, base;
+			if(typeModels[cache.type] && typeModels[cache.type].step){
+				if( !('step' in cache) ){
+					cache.step = webshims.getStep(input[0], cache.type);
+				}
+				
+				if(cache.step == 'any'){return false;}
+				
 				if(!('valueAsNumber' in cache)){
 					cache.valueAsNumber = typeModels[cache.type].asNumber( val );
 				}
-				if(isNaN(cache.valueAsNumber)){
-					return false;
+				if(isNaN(cache.valueAsNumber)){return false;}
+				
+				addMinMaxNumberToCache('min', input, cache);
+				base = cache.minAsNumber;
+				if(isNaN(base)){
+					base = typeModels[cache.type].stepBase || 0;
 				}
 				
-				addMinMaxNumberToCache(data.attr, input, cache);
-				
-				if(isNaN(cache[data.attr+'AsNumber'])){
-					return ret;
-				}
-				ret = ( cache[data.attr+'AsNumber'] * data.factor <  cache.valueAsNumber * data.factor - EPS );
+				ret =  Math.abs((cache.valueAsNumber - base) % cache.step);
+								
+				ret = !(  ret <= EPS || Math.abs(ret - cache.step) <= EPS  );
 			}
 			return ret;
 		});
+		
+		
+		
+		[{name: 'rangeOverflow', attr: 'max', factor: 1}, {name: 'rangeUnderflow', attr: 'min', factor: -1}].forEach(function(data, i){
+			webshims.addValidityRule(data.name, function(input, val, cache) {
+				var ret = false;
+				if(val === ''){return ret;}
+				if (!('type' in cache)) {
+					cache.type = getType(input[0]);
+				}
+				if (typeModels[cache.type] && typeModels[cache.type].asNumber) {
+					if(!('valueAsNumber' in cache)){
+						cache.valueAsNumber = typeModels[cache.type].asNumber( val );
+					}
+					if(isNaN(cache.valueAsNumber)){
+						return false;
+					}
+					
+					addMinMaxNumberToCache(data.attr, input, cache);
+					
+					if(isNaN(cache[data.attr+'AsNumber'])){
+						return ret;
+					}
+					ret = ( cache[data.attr+'AsNumber'] * data.factor <  cache.valueAsNumber * data.factor - EPS );
+				}
+				return ret;
+			});
+		});
+	}
+	
+	
+	// add support for new input-types
+	webshims.defineNodeNameProperty('input', 'type', {
+		get: function(){
+			var elem = this;
+			var type = getType(elem);
+			return (webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
+		}
 	});
 	
 	//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
@@ -136,7 +148,7 @@ jQuery.webshims.register('forms-ext', function($, webshims, window){
 				if(set !==  false){
 					$.attr(elem, 'value', set);
 				} else {
-					throw('INVALID_STATE_ERR: DOM Exception 11');
+					webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
 				}
 			} else {
 				valueAsNumberDescriptor._supset && valueAsNumberDescriptor._supset.call(elem, arguments);
@@ -156,9 +168,7 @@ jQuery.webshims.register('forms-ext', function($, webshims, window){
 			var elem = this;
 			var type = getType(elem);
 			if(typeModels[type] && typeModels[type].dateToString){
-				if(!window.noHTMLExtFixes) {
-					throw("there are some serious issues in opera's implementation. don't use!");
-				}
+				
 				if(value === null){
 					$.attr(elem, 'value', '');
 					return '';
@@ -168,7 +178,7 @@ jQuery.webshims.register('forms-ext', function($, webshims, window){
 					$.attr(elem, 'value', set);
 					return set;
 				} else {
-					throw('INVALID_STATE_ERR: DOM Exception 11');
+					webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
 				}
 			} else {
 				return valueAsDateDescriptor._supset && valueAsDateDescriptor._supset(elem, arguments) || null;
@@ -346,33 +356,24 @@ jQuery.webshims.register('forms-ext', function($, webshims, window){
 		}
 	};
 	
-	if(!supportsType('number')){
+	if(!Modernizr.input.valueAsNumberSet || !supportsType('number')){
 		webshims.addInputType('number', typeProtos.number);
 	}
 	
-	if(!supportsType('range')){
+	if(!Modernizr.input.valueAsNumberSet || !supportsType('range')){
 		webshims.addInputType('range', $.extend({}, typeProtos.number, typeProtos.range));
 	}
-	if(!supportsType('date')){
+	if(!Modernizr.input.valueAsNumberSet || !supportsType('date')){
 		webshims.addInputType('date', typeProtos.date);
 	}
-	if(!supportsType('time')){
+	if(!Modernizr.input.valueAsNumberSet || !supportsType('time')){
 		webshims.addInputType('time', $.extend({}, typeProtos.date, typeProtos.time));
 	}
 	
-	if(!supportsType('datetime-local')){
+	if(!Modernizr.input.valueAsNumberSet || !supportsType('datetime-local')){
 		webshims.addInputType('datetime-local', $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']));
 	}
-	
-	// add support for new input-types
-	webshims.defineNodeNameProperty('input', 'type', {
-		get: function(){
-			var elem = this;
-			var type = getType(elem);
-			return (webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
-		}
-	});
-	
+		
 });
 
 /* number-date-ui */
