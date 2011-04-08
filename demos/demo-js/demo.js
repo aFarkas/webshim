@@ -3,7 +3,7 @@
 	$.webshims.loader.loadList(['jquery-ui']);
 	$.webshims.ready('DOM jquery-ui', function(){
 		if(!window.console){
-			window.console = {log: window.alert};
+			window.console = {log: $.noop};
 		}
 		if(!$.browser.msie || parseInt($.browser.version, 10) > 7){
 			$('code.run-once').each(function(){
