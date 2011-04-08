@@ -26,7 +26,7 @@ webshims.addInputType = function(type, obj){
 };
 
 //contsrain-validation-api
-var validiyPrototype = {
+var validityPrototype = {
 	customError: false,
 
 	typeMismatch: false,
@@ -177,7 +177,7 @@ webshims.defineNodeNamesProperties(['button', 'fieldset', 'output'], {
 	validity: {
 		set: $.noop,
 		get: function(){
-			return validiyPrototype;
+			return validityPrototype;
 		}
 	}
 });
@@ -254,7 +254,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 			if(validityState){
 				return validityState;
 			}
-			validityState 	= $.extend({}, validiyPrototype);
+			validityState 	= $.extend({}, validityPrototype);
 			
 			if( !$.attr(elem, 'willValidate') || elem.type == 'submit' ){
 				return validityState;
