@@ -235,17 +235,14 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if(desc.initAttr){
 				initProp.content(nodeName, prop);
 			}
-			//ToDo: remove
-			if(desc.content){
-				webshims.warn('old content prop used for '+ nodeName +': '+ prop);
-			}
+			
 			return desc;
 		},
 		
 		defineNodeNameProperties: function(name, descs, _noTmpCache){
 			
 			for(var prop in descs){
-				if(!_noTmpCache && descs[prop].initContent){
+				if(!_noTmpCache && descs[prop].initAttr){
 					initProp.createTmpCache(name);
 				}
 				descs[prop] = webshims.defineNodeNameProperty(name, prop, descs[prop]);
@@ -294,9 +291,10 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					modifyProps[name][prop].push(desc.set);
 				}
 				
-				if(desc.initContent){
+				if(desc.initAttr){
 					initProp.content(name, prop);
 				}
+				
 			});
 		},
 		defineNodeNamesBooleanProperty: function(elementNames, prop, setDesc){
