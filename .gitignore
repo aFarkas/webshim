@@ -1,2 +1,6 @@
 *.swp
 *.un~
+*.tmp_*~
+todo.txt
+tests/performance.html
+dev-playground/*

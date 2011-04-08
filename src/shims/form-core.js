@@ -248,7 +248,10 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 			created = true;
 			
 			$(function(){
-				errorBubble = errorBubble.appendTo('body');
+				errorBubble.appendTo('body');
+				if($.fn.bgIframe && $.browser.msie && parseInt($.browser.version, 10) < 7){
+					errorBubble.bgIframe();
+				}
 			});
 		};
 		createAlert();
@@ -297,7 +300,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 	if(options.replaceValidationUI){
 		$(function(){
 			$(document).bind('firstinvalid', function(e){
-				if(!e.isDefaultPrevented()){
+				if(!e.isInvalidUIPrevented()){
 					e.preventDefault();
 					$.webshims.validityAlert.showFor( e.target, $(e.target).attr('customValidationMessage') ); 
 				}
