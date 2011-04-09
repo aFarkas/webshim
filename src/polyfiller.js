@@ -114,7 +114,7 @@
 	$.webshims = $.sub ? $.sub() : {};
 	
 	$.extend($.webshims, {
-		version: '1.6.0',
+		version: 'pre1.6.1',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
@@ -1053,7 +1053,8 @@
 			slider: {},
 			datepicker: {},
 			langSrc: protocol+'ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/i18n/jquery.ui.datepicker-',
-			recalcWidth: true
+			recalcWidth: true,
+			lazyDate: true
 //			,replaceUI: false
 		}
 	});

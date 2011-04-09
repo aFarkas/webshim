@@ -71,7 +71,15 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-Release 1.6RC5
+Roadmap for upcomming Release 1.6.1
+----------
+
+* UI for date and datetime-local are polyfilled much faster
+* performance for IE6/IE7/IE8 in general
+* update to Modernizr 1.8 (if available, make this required minimum)
+
+
+Release 1.6
 ----------
 
 * added details & summary element-support
@@ -87,11 +95,5 @@ Release 1.6RC5
 * updated to jQuery 1.5.2
 * fixed many little bugs in old X-/C-graded browsers
 * fixed setting valueAsNumber/valueAsDate in Opera
-
-Release 1.5.2
-----------
-
-* fix loading external files from file:// protocol
-* use jQuery UI 1.8.11
-* performance improvements using defineNodeName[s]Properties
-* improved placeholder
+* added optional - but automatic - bgIframe support for IE6
+* use png8 for details/summary open indicator

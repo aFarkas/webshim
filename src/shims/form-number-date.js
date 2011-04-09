@@ -420,6 +420,22 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 			}
 		});
 	};
+	//set date is extremly slow in IE so we do it lazy
+	var lazySetDate = function(elem, date){
+			if(!options.lazyDate){
+				elem.datepicker('setDate', date);
+				return;
+			}
+			var timer = $.data(elem[0], 'setDateLazyTimer');
+			if(timer){
+				clearTimeout(timer);
+			}
+			$.data(elem[0], 'setDateLazyTimer', setTimeout(function(){
+				elem.datepicker('setDate', date);
+				$.removeData(elem[0], 'setDateLazyTimer');
+			}, 0));
+		}
+	;
 	
 	replaceInputUI.common = function(orig, shim, methods){
 		if(Modernizr.formvalidation){
@@ -609,7 +625,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 					} catch(e){dateValue = false;}
 					if(dateValue){
 						if(!replaceInputUI['datetime-local'].blockAttr){
-							$('input.input-datetime-local-date', shim).datepicker('setDate', dateValue);
+							lazySetDate($('input.input-datetime-local-date', shim), dateValue);
 						}
 						$('input.input-datetime-local-time', shim).attr('value', value[1] || '00:00');
 					} else {
@@ -670,6 +686,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 			}
 		};
 		
+		
 		replaceInputUI.date.attrs = {
 			disabled: function(orig, shim, value){
 				shim.attr('disabled', !!value);
@@ -695,8 +712,9 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 					try {
 						var dateValue = $.datepicker.parseDate('yy-mm-dd', value);
 					} catch(e){var dateValue = false;}
+					
 					if(dateValue){
-						shim.datepicker('setDate', dateValue);
+						lazySetDate(shim, dateValue);
 					} else {
 						shim.attr('value', value);
 					}
