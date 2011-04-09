@@ -84,6 +84,9 @@ li {
 ul li {
 	list-style: disc
 }
+ol li {
+	list-style: decimal;
+}
 a {
 	color: #00C6FF;
 	text-decoration: none;

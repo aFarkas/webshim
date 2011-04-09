@@ -79,7 +79,7 @@
 					<h3>Supported Browsers</h3>
 					<ul>
 						<li>IE6+</li>
-						<li>Firefox 3.6+</li>
+						<li>Firefox 3.5+</li>
 						<li>Safari 4+</li>
 						<li>Safari for iOS 4.3</li>
 						<li>Chrome 9.0+</li>
@@ -231,13 +231,19 @@ $.webshims.polyfill('js-storage geolocation', {
 //would load in IE9 and other browsers: nothing :-)
 </code>			
 <!--
-//ToDo: combohandler fn-configuration
+//ToDo: explain combohandler fn-configuration
 $.webshims.polyfill({
 	fn: function(base, scriptPath, seperator, srces){
 		return base + (srces.join(seperator)) +'&b='+(scriptPath.substr(0, scriptPath.length-1));
 	}
 });	
 -->			
+					<h4>Some information about "Make fewer HTTP requests"</h4>
+					<p>There is a very bad myth, saying that you should combine all your JS into one file is good for performance. In fact this rule can dramatically slow down loading your page. The <a href="http://calendar.perfplanet.com/2010/thoughts-on-performance/">truth is a little bit more complex</a>.</p>
+					<p>Thsi rule was written in 2004 and the reason beyond this rule is that loading JS in old browser like IE6/IE7/FF3.0 do block downloading other resources, do block HTML parsing and do block UI rendering.</p>
+					<p>In newer browsers like IE8+/FF3.5 JS loading do neither block downloading other resources nor block HTML parsing. And in case of using a script loader (and webshims lib is using a script loader) loading plyfill-scripts won't block anything even in IE6/IE7/FF3.0.</p>
+					<p>This said, loading all features with webshims lib without a combohandler service isn't good for network-performance in old browsers, but it's not that bad how yslow says it is.</p>
+					<p>And, If you are using a combohandler service you should make sure, that all browsers load minimum between 3-8 JS files (depends on browser and webpage / use the maxFiles configuration to achieve this).</p>
 				</div>
 				<h3 id="polyfill-ready" class="button">Fire when ready</h3>
 				<div class="panel">
@@ -441,12 +447,48 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 </code>
 		
 					</div>
-					<!--
+					
 					<h3 id="polyfill-foucs" class="button">Dealing with FOUCs</h3>
 					<div class="panel">
+						<p>Webshims lib uses a script loader and loading scripts dynamically always have the potential to create so called Flash of unstyled contents or Flash of unbehaviored contents.</p>
+						<p>There are a lot ways to deal with FOUCs/FOUBCs. The most easiest way to remove FOUCs caused by webshims lib is:</p>
+						<ol>
+							<li>Put your JS into your head and call $.webshims.polyfill() immediately (before DOM-Ready)</li>
+							<li>Put the following CSS in your Stylesheet:
+<code class="block">
+/* 
+The class loading-polyfills is set after you have called polyfill
+and will be removed as soon as all polyfills are loaded and implemented
+*/
+.loading-polyfills body {
+	visibility: hidden;
+}
+/*
+If polyfilling takes longer as 600ms, an additional class called 'long-loading-polyfill' will be set
+It's good practice to show the user that something is going on in this case
+*/
+html.long-loading-polyfills {
+	background-image: url(polyfill-loader.gif);
+	background-position: center 240px;
+	background-repeat: no-repeat;
+}
+</code>
+							</li>
+						</ol>
 						
+						<p>If you still have FOUCs you can additionally change the <code>removeFOUC</code> configuration to true. In this case the loading classes added by webshims lib, won't be removed, if all requested features are loaded and polyfilled. Webshims lib will additionally wait for the DOM-Ready event.</p>
+<code class="block">
+$.webshims.setOptions('removeFOUC', true);
+</code>
+						<p><small>Note: The added classes are bulletproof. In case of an error or window's load event the loading-classes will be removed, even if not all features seem to be implemented.</small></p>
+						
+						<h4>Why you should put your webshims inside of your documents head</h4>
+						<p>There is a lot of misunderstanding about the yslow rule "Put your JavaScript at th bottom". Put your JavaScript at the bottom does not decrease total page load time. The only effect is psychologic. The user sooner sees how the page is loading, because JS blocks the UI rendering.</p>
+						<p>This also means that a FOUC is not a side effect of "Put your JavaScript at the bottom". It is the intended effect of this technique.</p>
+						<p>Using a script loader (and webshims lib uses a script loader) has a very similiar effect and combining both techniques will increase FOUCs.</p>
+						<p>If you use a script loader and put your JS at top you have done everything right about performance. Some versions of yslow recognize that you have used this technique and won't subtract points for this rule. The nice thing about script loaders is, that loading JS-files dynamically will addiotionally decrease page load time, because all browsers can parallelize script loading.</p>
 					</div>
-					-->
+					
 					<h3 id="polyfill-philosophy" class="button">Webshims polyfilling philosophy</h3>
 					<div class="panel">
 						<h4>Abstractions vs. Polyfills</h4>
