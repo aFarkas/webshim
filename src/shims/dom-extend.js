@@ -328,7 +328,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if(paLang){
 				langs.push(paLang);
 			}
-			return function(lang, module, fn){
+			return function(lang, module, fn, noChangeFn){
 				if(lang){
 					if(!module || !fn){
 						if(lang !== langs[0]){
@@ -355,19 +355,25 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 									return true;
 								}
 								return false;
-							}
+							},
+							langChanges
 						;
 						
 						$.each(langs, function(i, lang){
 							var shortLang = lang.split('-')[0];
 							if(langObj[lang] || langObj[shortLang]){
+								langChanges = true;
 								fn(langObj[lang] || langObj[shortLang]);
 								return false;
 							}
 							if(remoteLangs && module.langSrc && (loadRemoteLang(lang) || loadRemoteLang(shortLang))){
+								langChanges = true;
 								return false;
 							}
 						});
+						if(!langChanges && noChangeFn){
+							noChangeFn();
+						}
 					}
 				}
 				return langs;

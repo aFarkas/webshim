@@ -408,6 +408,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 		
 	var options = $.webshims.cfg['forms-ext'];
 	var globalInvalidTimer;
+	var setLangDefaults;
 	var labelID = 0;
 	var emptyJ = $([]);
 	var isCheckValidity;
@@ -564,15 +565,16 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 			}
 			
 			webshims.triggerDomUpdate(date[0]);
-			
-			$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
-				elem.attr(name, function(i, value){return value || '';});
-			});
+			if(setLangDefaults){
+				$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
+					elem.attr(name, function(i, value){return value || '';});
+				});
+			}
 		};
 		
 		replaceInputUI['datetime-local'].attrs = {
 			disabled: function(orig, shim, value){
-				$('input.input-datetime-local-date', shim).datepicker('option', 'disabled', !!value);
+				$('input.input-datetime-local-date', shim).attr('disabled', !!value);
 				$('input.input-datetime-local-time', shim).attr('disabled', !!value);
 			},
 			step: function(orig, shim, value){
@@ -620,6 +622,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 		};
 		
 		replaceInputUI.date = function(elem){
+			
 			if(!$.fn.datepicker){return;}
 			var date = $('<input type="text" class="input-date" />'),
 				attr  = this.common(elem, date, replaceInputUI.date.attrs),
@@ -643,6 +646,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 					.bind('change', change)
 					.data('datepicker')
 			;
+			
 			data.dpDiv
 				.addClass('input-date-datepicker-control')
 				.css({
@@ -659,15 +663,16 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 					adjustInputWithBtn(date, data.trigger);
 				}
 			}
-			
-			$.each(['disabled', 'min', 'max', 'value'], function(i, name){
-				elem.attr(name, function(i, value){return value || '';});
-			});
+			if(setLangDefaults){
+				$.each(['disabled', 'min', 'max', 'value'], function(i, name){
+					elem.attr(name, function(i, value){return value || '';});
+				});
+			}
 		};
 		
 		replaceInputUI.date.attrs = {
 			disabled: function(orig, shim, value){
-				shim.datepicker('option', 'disabled', !!value);
+				shim.attr('disabled', !!value);
 			},
 			min: function(orig, shim, value){
 				try {
@@ -804,7 +809,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 		options.availabeLangs = 'af ar ar-DZ az bg bs ca cs da de el en-AU en-GB en-NZ eo es et eu fa fi fo fr fr-CH gl he hr hu hy id is it ja ko kz lt lv ml ms nl no pl pt-BR rm ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' ');
 	}
 	var changeDefaults = function(langObj){
-		
+		setLangDefaults = true;
 		if(!langObj){return;}
 		var opts = $.extend({}, langObj, options.datepicker);
 		$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', opts).each(function(){
@@ -821,7 +826,9 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 	var getDefaults = function(){
 		if(!$.datepicker){return;}
 		webshims.ready('webshimLocalization', function(){
-			webshims.activeLang($.datepicker.regional, 'forms-ext', changeDefaults);
+			webshims.activeLang($.datepicker.regional, 'forms-ext', changeDefaults, function(){
+				setLangDefaults = true;
+			});
 		});
 		$(document).unbind('jquery-uiReady.langchange input-widgetsReady.langchange');
 	};
