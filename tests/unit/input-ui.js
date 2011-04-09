@@ -5,8 +5,9 @@
 //properties: step, max, min, disabled, valueAsDate
 module("input ui");
 
-asyncTest("range Modul", function(){
+asyncTest("widgets Modul", function(){
 	QUnit.reset();
+	$.webshims.setOptions('forms-ext', {lazyDate: false});
 	var replaceUI = $.webshims.cfg['forms-ext'].replaceUI;
 	var shadow;
 	ok($('#range').attr('value') !== "", "range has always a value");
@@ -31,6 +32,9 @@ asyncTest("range Modul", function(){
 		$('#date').attr('valueAsNumber', 1293753600000);
 		equals(pickerObject.currentYear +'-'+ (pickerObject.currentMonth + 1) +'-'+pickerObject.currentDay, $('#date').attr('value'), "date valueAsNumber is reflected");
 	}
+	
+	
+	$.webshims.setOptions('forms-ext', {lazyDate: true});
 	
 	$.webshims.ready('forms-ext DOM', function(){
 		start();

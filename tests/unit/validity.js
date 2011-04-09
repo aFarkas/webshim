@@ -31,9 +31,9 @@ asyncTest("general validity Modul", function(){
 		total = willValidate.length
 	;
 	
-	willValidate.filter(':eq(2)').attr('disabled', true);
+	willValidate.filter(':eq(0)').attr('disabled', true);
 	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate disabled' );
-	willValidate.filter(':eq(2)').attr('disabled', false);
+	willValidate.filter(':eq(0)').attr('disabled', false);
 	equals( $('#form-1 input:willValidate').length, total, 'willValidate enabled' );
 
 	
