@@ -45,8 +45,6 @@
 		Modernizr.deprecatedSessionstorage = !!(Modernizr.sessionstorage && !('clear' in window.sessionStorage));
 		Modernizr.genericDOM =  !!($('<video><div></div></video>')[0].innerHTML);
 		
-		Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
-		
 		//using only property api
 		Modernizr.requiredSelect = !!(Modernizr.formvalidation && 'required' in $('select', form)[0]);
 		
@@ -196,12 +194,15 @@
 				if(addClass[0]){
 					$('html').addClass(addClass.join(' '));
 				}
-				$(function(){
-					loadList(['html5a11y', 'html5shiv']);
-				});
+				
 				loader.loadCSS('styles/shim.css');
 				//remove function
 				firstPolyfillCall = $.noop;
+				if(!Modernizr.genericDOM){
+					$(function(){
+						loadList(['dom-support']);
+					});
+				}
 			};
 			
 			return function(features, combo){
@@ -820,10 +821,6 @@
 	
 	/* general modules */
 	/* change path $.webshims.modules[moduleName].src */
-	addModule('html5a11y', {
-		src: 'html5a11y',
-		test: !(($.browser.msie && browserVersion < 10 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 535))
-	});
 	
 	addModule('jquery-ui', {
 		src: protocol+'ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js',
@@ -865,13 +862,7 @@
 		noAutoCallback: true,
 		dependencies: ['es5']
 	});
-	
-	
-	addPolyfill('html5shiv', {
-		feature: 'dom-support',
-		test: Modernizr.genericDOM
-	});
-	
+		
 	/* json + loacalStorage */
 	
 	addPolyfill('json-storage', {
@@ -967,7 +958,6 @@
 			placeholderType: 'value'
 //			,customMessages: false,
 //			overrideMessages: false,
-//			textareaPlaceholder: false,
 //			replaceValidationUI: false
 		},
 		methodNames: ['setCustomValidity','checkValidity']
@@ -993,46 +983,38 @@
 			dependencies: ['form-extend']
 		});
 		
-		//this implements placeholder in old opera
-		addPolyfill('placeholder', {
+		addPolyfill('form-output-datalist', {
 			feature: 'forms',
 			test: function(){
-				return modernizrInputAttrs.placeholder && (!this.options.textareaPlaceholder || Modernizr.textareaPlaceholder);
+				var result = Modernizr.datalist && modernizrInputAttrs.list;
+				if(result && $(document.createElement('input')).attr('list') === null){
+					var oAttr = $.attr;
+					$.attr = function(elem, name, value){
+						if(name == 'list' && elem && (elem.nodeName || '').toLowerCase() == 'input' ){
+							if(value !== undefined){
+								elem.setAttribute(name, value);
+							} else {
+								return elem.getAttribute(name);
+							}
+						}
+						return oAttr.apply(this, arguments);
+					};
+				}
+				return Modernizr.output && result;
 			},
-			src: 'form-shim-extend'
+			dependencies: ['dom-support']
 		});
 		
 	} else {
 		//this also serves as base for non capable browsers
 		addPolyfill('form-extend', {
 			feature: 'forms',
-			src: 'form-shim-extend',
+			src: 'form-shim-all',
 			dependencies: ['form-core', 'dom-support']
 		});
 	}
 	
 	
-	addPolyfill('form-output-datalist', {
-		feature: 'forms',
-		test: function(){
-			var result = Modernizr.datalist && modernizrInputAttrs.list;
-			if(result && $(document.createElement('input')).attr('list') === null){
-				var oAttr = $.attr;
-				$.attr = function(elem, name, value){
-					if(name == 'list' && elem && (elem.nodeName || '').toLowerCase() == 'input' ){
-						if(value !== undefined){
-							elem.setAttribute(name, value);
-						} else {
-							return elem.getAttribute(name);
-						}
-					}
-					return oAttr.apply(this, arguments);
-				};
-			}
-			return Modernizr.output && result;
-		},
-		dependencies: ['dom-support']
-	});
 	
 	addPolyfill('forms-ext', {
 		src: 'form-number-date',

@@ -12,8 +12,12 @@
     
     <target name="WebExtlib">
     	
+    	<concat destfile="${src}/shims/form-shim-all.js">
+            <fileset file="${src}/shims/form-shim-extend.js" />
+            <fileset file="${src}/shims/form-output-datalist.js" />
+        </concat>
+		
         <mkdir dir="${dist}" />
-		<mkdir dir="${dist}" />
         <copy todir="${dist}/dev" overwrite="true">
             <fileset dir="${src}" />
         </copy>
@@ -46,7 +50,7 @@
 				<move file="${dist}/minified/foo.js" tofile="@{file}" />
             </sequential>
         </for>
-        
+		
     </target>
     
 </project>

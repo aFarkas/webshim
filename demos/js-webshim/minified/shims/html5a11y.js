@@ -1,2 +1,0 @@
-(function(b,d){var l={article:"article",aside:"complementary",section:"region",nav:"navigation",address:"contentinfo"},f=function(c,e){c.getAttribute("role")||c.setAttribute("role",e)};b.webshims.addReady(function(c,e){b.each(l,function(h,m){for(var i=b(h,c).add(e.filter(h)),g=0,n=i.length;g<n;g++)f(i[g],m)});if(c===d){var a=d.getElementsByTagName("header")[0],j=d.getElementsByTagName("footer"),k=j.length;a&&!b(a).closest("section, article")[0]&&f(a,"banner");if(k){a=j[k-1];b(a).closest("section, article")[0]||
-f(a,"contentinfo")}}})})(jQuery,document);

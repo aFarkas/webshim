@@ -1,4 +1,4 @@
-jQuery.webshims.register('form-output-datalist', function($, webshims, window, document, undefined){
+jQuery.webshims.ready('dom-support', function($, webshims, window, document, undefined){
 	var doc = document;	
 	
 	(function(){
