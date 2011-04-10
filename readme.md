@@ -77,6 +77,8 @@ Roadmap for upcomming Release 1.6.1
 * UI for date and datetime-local are polyfilled much faster
 * performance for IE6/IE7/IE8 in general
 * update to Modernizr 1.8 (if available, make this required minimum)
+* removed placeholder support for old Opera browsers
+* fewer http requests especially for IE8-
 
 
 Release 1.6

@@ -1,4 +1,5 @@
 jQuery.webshims.register('forms-ext', function($, webshims, window){
+	
 	"use strict";
 	if(Modernizr.input.valueAsNumberSet && Modernizr.input.valueAsDate){return;}
 	//why no step IDL?
@@ -378,7 +379,7 @@ jQuery.webshims.register('forms-ext', function($, webshims, window){
 
 /* number-date-ui */
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
-jQuery.webshims.ready('form-core form-extend', function($, webshims, window, document){
+jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, document){
 	"use strict";
 	var triggerInlineForm = webshims.triggerInlineForm;
 	var modernizrInputTypes = Modernizr.inputtypes;
@@ -407,6 +408,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 	};
 		
 	var options = $.webshims.cfg['forms-ext'];
+	var defaultDatepicker = {dateFormat: 'yy-mm-dd'};
 	var globalInvalidTimer;
 	var setLangDefaults;
 	var labelID = 0;
@@ -422,20 +424,20 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 	};
 	//set date is extremly slow in IE so we do it lazy
 	var lazySetDate = function(elem, date){
-			if(!options.lazyDate){
-				elem.datepicker('setDate', date);
-				return;
-			}
-			var timer = $.data(elem[0], 'setDateLazyTimer');
-			if(timer){
-				clearTimeout(timer);
-			}
-			$.data(elem[0], 'setDateLazyTimer', setTimeout(function(){
-				elem.datepicker('setDate', date);
-				$.removeData(elem[0], 'setDateLazyTimer');
-			}, 0));
+		if(!options.lazyDate){
+			elem.datepicker('setDate', date);
+			return;
 		}
-	;
+		var timer = $.data(elem[0], 'setDateLazyTimer');
+		if(timer){
+			clearTimeout(timer);
+		}
+		$.data(elem[0], 'setDateLazyTimer', setTimeout(function(){
+			elem.datepicker('setDate', date);
+			$.removeData(elem[0], 'setDateLazyTimer');
+			elem = null;
+		}, 0));
+	};
 	
 	replaceInputUI.common = function(orig, shim, methods){
 		if(Modernizr.formvalidation){
@@ -476,6 +478,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 		}
 		return attr;
 	};
+	
 	if(Modernizr.formvalidation){
 		['input', 'form'].forEach(function(name){
 			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
@@ -502,12 +505,20 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 				attr  = this.common(elem, date, replaceInputUI['datetime-local'].attrs),
 				datePicker = $('input.input-datetime-local-date', date),
 				data = datePicker
-					.datepicker($.extend({}, options.datepicker, elem.data('datepicker')))
+					.datepicker($.extend(defaultDatepicker, options.datepicker, elem.data('datepicker')))
 					.bind('change', function(e){
 						
 						var value = datePicker.attr('value') || '', 
 							timeVal = ''
 						;
+						if(options.lazyDate){
+							var timer = $.data(datePicker[0], 'setDateLazyTimer');
+							if(timer){
+								clearTimeout(timer);
+								$.removeData(datePicker[0], 'setDateLazyTimer');
+							}
+						}
+						
 						if(value){
 							timeVal = $('input.input-datetime-local-time', date).attr('value') || '00:00';
 							try {
@@ -643,8 +654,16 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 			var date = $('<input type="text" class="input-date" />'),
 				attr  = this.common(elem, date, replaceInputUI.date.attrs),
 				change = function(e){
+					
 					replaceInputUI.date.blockAttr = true;
 					var value;
+					if(options.lazyDate){
+						var timer = $.data(date[0], 'setDateLazyTimer');
+						if(timer){
+							clearTimeout(timer);
+							$.removeData(date[0], 'setDateLazyTimer');
+						}
+					}
 					try {
 						value = $.datepicker.parseDate(date.datepicker('option', 'dateFormat'), date.attr('value') );
 						value = (value) ? $.datepicker.formatDate( 'yy-mm-dd', value ) : date.attr('value');
@@ -658,7 +677,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 					triggerInlineForm(elem[0], 'change');
 				},
 				data = date
-					.datepicker($.extend({}, options.datepicker, elem.data('datepicker')))
+					.datepicker($.extend(defaultDatepicker, options.datepicker, elem.data('datepicker')))
 					.bind('change', change)
 					.data('datepicker')
 			;
@@ -829,8 +848,8 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 	var changeDefaults = function(langObj){
 		setLangDefaults = true;
 		if(!langObj){return;}
-		var opts = $.extend({}, langObj, options.datepicker);
-		$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', opts).each(function(){
+		$.extend(defaultDatepicker, langObj, options.datepicker);
+		$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', defaultDatepicker).each(function(){
 			var orig = $.data(this, 'html5element');
 			if(orig){
 				$.each(['disabled', 'min', 'max', 'value'], function(i, name){
@@ -839,7 +858,6 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 			}
 		});
 		
-		$.datepicker.setDefaults(opts);
 	};
 	var getDefaults = function(){
 		if(!$.datepicker){return;}
@@ -860,6 +878,7 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 	var doc = document;
 	var options = webshims.modules["forms-ext"].options;
 	var typeModels = webshims.inputTypes;
+	
 	var getNextStep = function(input, upDown, cache){
 		
 		cache = cache || {};
@@ -928,25 +947,17 @@ jQuery.webshims.ready('form-core form-extend', function($, webshims, window, doc
 	
 	
 	if(options.stepArrows){
-		
-		webshims.onNodeNamesPropertyModify('input', 'disabled', {
+		var stepDisableEnable = {
 			// don't change getter
-			set: function(elem, value){
-				var stepcontrols = $.data(elem, 'step-controls');
+			set: function(value){
+				var stepcontrols = $.data(this, 'step-controls');
 				if(stepcontrols){
-					stepcontrols[ (elem.disabled || elem.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
+					stepcontrols[ (this.disabled || this.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
 				}
 			}
-		});
-		webshims.onNodeNamesPropertyModify('input', 'readonly', {
-			// don't change getter
-			set: function(elem, value){
-				var stepcontrols = $.data(elem, 'step-controls');
-				if(stepcontrols){
-					stepcontrols[ (elem.disabled || elem.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
-				}
-			}
-		});
+		};
+		webshims.onNodeNamesPropertyModify('input', 'disabled', stepDisableEnable);
+		webshims.onNodeNamesPropertyModify('input', 'readonly', $.extend({}, stepDisableEnable));
 	}
 	var stepKeys = {
 		38: 1,
