@@ -349,7 +349,8 @@ webshims.addReady(function(context, contextElem){
  */
 
 
-jQuery.webshims.ready('dom-extend form-core', function($, webshims, window, doc, undefined){
+jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc, undefined){
+	Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
 	if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder){return;}
 	var isOver = (webshims.cfg.forms.placeholderType == 'over');
 	var polyfillElements = ['textarea'];
