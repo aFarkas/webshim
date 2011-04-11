@@ -302,6 +302,14 @@ $('form').bind('firstinvalid.example1', function(e){
 //unbind event binding from second/next example:
 $('form').unbind('firstinvalid.example2');
 </code>
+						<p>The validityAlert method will create the following custom styleable HTML:</p>
+<code class="block">
+&lt;!-- note: span.validity-alert is label.validity-alert in old browser, which do not support WAI-ARIA --&gt;
+&lt;span class="validity-alert" role="alert"&gt;
+	&lt;span class="va-arrow"&gt;&lt;span class="va-arrow-box"&gt;&lt;/span&gt;&lt;/span&gt;
+	&lt;span class="va-box"&gt;Error message of the current field&lt;/span&gt;
+&lt;/span&gt;
+</code>
 						
 						<p>Using custom messages instead of native browser messages is also easy. Simply implement the customValidationMessage attribute and use it.</p>
 
@@ -329,6 +337,20 @@ $(function(){
 //unbind event binding from first example:
 $('form').unbind('firstinvalid.example1');
 </code>
+						<p>Instead of binding to the events your own, you can also simply set the configuration option <code>replaceValidationUI</code> to true:</p>
+<code class="block">
+//configure webshims to implement new customValidationMessage attribute
+//$.webshims.setOptions('forms', {
+// 	//Use customizeable validation messages
+//	customMessages: true,
+//	//replace validation UI in all browsers
+//	replaceValidationUI: true
+//});
+
+//load all polyfill features
+//$.webshims.polyfill();
+
+</code>
 						<p>or use the content attribute API</p>
 <code class="block">
 &lt;label for="name"&gt;Name:&lt;/label&gt;
@@ -337,6 +359,14 @@ $('form').unbind('firstinvalid.example1');
 &lt;label for="name"&gt;Name:&lt;/label&gt;
 &lt;input id="name" required -x-moz-errormessage="Please tell us your Name" /&gt;
 </code>
+						<p>Note: We want you to learn how this works in HTML5. Instead of simply configuring and using our extensions, you can implement your own validation UI with a totally unique look and feel on top of the HTML5 standard. As a simple start you have to remove the browsers validation UI, which can be achieved by preventing the default behavior of an invalid event.</p>
+<code class="block">
+$('form').bind('invalid', function(e){
+	//implement your validation UI here!!!
+	e.preventDefault();
+});
+</code>
+					
 						<p>More information about <a href="webforms/1-webforms-lang-custom-bubble.html">custom error messages/custom error bubbles</a> (also explains how to change the built-in text).</p>
 					</div>
 					<h3 id="custom-widget" class="button">... create/configure custom stylable slider/date widgets in all browser</h3>
@@ -373,6 +403,7 @@ $.webshims.setOptions('forms-ext', {
 			<aside>
 				<h3>Known Issues/Constraints (most <code>forms-ext</code> only)</h3>
 				<ul>
+					<li>FF4 has a bug with his validation UI on select-elements in Win7 (solution/workaround: remove browsers validation UI and use custom styleable validation UI)</li>
 					<li>placeholder polyfill is only active in browsers, which do not support constraint validation. This means, that older versions of Opera are not polyfilled.</li>
 					<li>Spinbuttons for type=time and type=number don't show up in Safari 5 on Windows <a href="https://bugs.webkit.org/show_bug.cgi?id=38381">webkit bug</a>, <a href="https://github.com/aFarkas/webshim/issues#issue/23">webshims bug</a></li>
 					<li>Spinbuttons for type=number on Safari 5 Mac has some issue: They have bad usability, if the input starts with an empty value or if you are using step=any.</li>
