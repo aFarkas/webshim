@@ -200,7 +200,7 @@
 				firstPolyfillCall = $.noop;
 				if(!Modernizr.genericDOM){
 					$(function(){
-						loadList(['dom-support']);
+						loadList(['dom-extend']);
 					});
 				}
 			};
@@ -500,7 +500,10 @@
 					//length of list is dynamically
 					for(var i = 0; i < list.length; i++){
 						module = modules[list[i]];
-						if (noNeedToLoad(module.name, list)) {
+						if (!module || noNeedToLoad(module.name, list)) {
+							if(!module){
+								webshims.warn('could not find: '+ list[i]);
+							}
 							continue;
 						}
 						if (module.css) {
