@@ -123,7 +123,7 @@ $.event.special.invalid = {
 	teardown: $.noop,
 	handler: function(e, d){
 		
-		if( e.type != 'submit' || e.testedValidity || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') != null ){return;}
+		if( e.type != 'submit' || e.testedValidity || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') != null || $.data(e.target, 'novalidate') ){return;}
 		
 		isSubmit = true;
 		e.testedValidity = true;
@@ -311,7 +311,7 @@ var noValidate = function(){
 		if(!elem.form){return;}
 		$.data(elem.form, 'novalidate', true);
 		setTimeout(function(){
-			$.data(elem.form, 'novalidate', false);
+			$.removeData(elem.form, 'novalidate');
 		}, 1);
 	}, 
 	submitterTypes = {submit: 1, button: 1}

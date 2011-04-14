@@ -281,17 +281,19 @@
 		var isDOMReady;
 		$(window).bind('load', function(){
 			setTimeout(function(){
-				if(!isDOMReady  && window.parent == window){
-					alert('DOM-Ready not called');
+				if(window.parent == window){
+					if(!Modernizr.inputtypes['datetime-local'] && !$('input.input-datetime-local-date').length){
+						$.webshims.warn('datetime not implemented');
+					}
+					if(!isDOMReady){
+						alert('DOM-Ready not called');
+					}
 				}
-			}, 500);
+				
+			}, 999);
 		});
 		$(function(){
-			if(window.parent == window){
-				if(!Modernizr.inputtypes['datetime-local'] && !$('input.input-datetime-local-date').length){
-					$.webshims.warn('datetime not implemented');
-				}
-			}
+			
 			
 			isDOMReady = true;
 		});
