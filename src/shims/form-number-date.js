@@ -1004,25 +1004,17 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	});
 })();
 
-	if(!modernizrInputTypes.date || !modernizrInputTypes.range || options.replaceUI){
-		if(webshims.cfg.waitReady){
-			$.readyWait++;
-		}
-		webshims.addReady(function(context, elem){
-			
-			$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(e){
-				if($.datepicker || $.fn.slider){
-					replaceInputUI(context, elem);
-				}
-				
-				if($.datepicker && $.fn.slider){
-					$(document).unbind('.initinputui');
-				}
-				if(webshims.cfg.waitReady && context === document){
-					$.ready(true);
-				}
-			});
+	
+	webshims.addReady(function(context, elem){
+		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(e){
+			if($.datepicker || $.fn.slider){
+				replaceInputUI(context, elem);
+			}
+			if($.datepicker && $.fn.slider){
+				$(document).unbind('.initinputui');
+			}
 		});
-	}
+	});
+	
 });
 

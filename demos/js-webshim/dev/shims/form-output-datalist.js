@@ -30,7 +30,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 						if(newVal !== lastVal){
 							lastVal = newVal;
 							if(!e || !noInputTriggerEvts[e.type]){
-								webshims.triggerInlineForm(input[0], 'input');
+								webshims.triggerInlineForm && webshims.triggerInlineForm(input[0], 'input');
 							}
 						}
 					},
@@ -592,5 +592,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 		});
 		
 	})();
-	
+	if(webshims.modules['form-output-datalist']){
+		webshims.isReady('form-output-datalist', true);
+	}
 });

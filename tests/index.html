@@ -54,7 +54,7 @@
 	</script>
 	<script>
 		(function($){
-			$.webshims.ready('html5shiv', function(){
+			$.webshims.ready('dom-support', function(){
 				QUnit.reset = function(){
 					$("#main, #qunit-fixture").htmlWebshim( QUnit.config.fixture );
 				};
@@ -85,7 +85,8 @@
 	
 
 	
-	
+
+
 	<script src="unit/placeholder.js"></script>
 	<script src="unit/validity.js"></script>
 	<script src="unit/canvas.js"></script>
@@ -98,10 +99,11 @@
 	<script src="unit/es5.js"></script>
 	<script src="unit/boolean-attr.js"></script>
 
+
 	<script>
 		jQuery.noConflict();
 		(function($){
-			$.webshims.debug = true;
+//			$.webshims.debug = true;
 			$(window).load(function(){
 				$.webshims.polyfill();
 			});

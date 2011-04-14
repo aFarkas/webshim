@@ -517,7 +517,7 @@ summary {
 .details-open-indicator {
 	margin: -1px 0 0;
 	display: inline-block;
-	width: 11px;
+	width: 16px;
 	height: 11px;
 	background: url(details-arrows.png) no-repeat 0 0;
 	vertical-align: middle;
@@ -530,7 +530,7 @@ summary {
 	padding: 0 !important;
 	border: 0 !important;
 	display: inline-block !important;
-	width: 11px !important;
+	width: 16px !important;
 	height: 11px !important;
 	background: url(details-arrows.png) no-repeat 0 0 !important;
 	vertical-align: middle !important;
