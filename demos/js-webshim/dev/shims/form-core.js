@@ -219,7 +219,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 				errorBubble.css(offset);
 			},
 			show: function(){
-				
 				if(errorBubble.css('display') === 'none'){
 					errorBubble.css({opacity: 0}).show();
 				}

@@ -492,7 +492,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		});
 	}
 	//date and datetime-local implement if we have to replace
-	if(!modernizrInputTypes.datetime || options.replaceUI){
+	if(!modernizrInputTypes['datetime-local'] || options.replaceUI){
 		var datetimeFactor = {
 			trigger: [0.65,0.35],
 			normal: [0.57,0.43]
@@ -1003,24 +1003,26 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		}
 	});
 })();
-	
-	if(webshims.cfg.waitReady){
-		$.readyWait++;
-	}
-	webshims.addReady(function(context, elem){
-		
-		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(e){
-			if($.datepicker || $.fn.slider){
-				replaceInputUI(context, elem);
-			}
+
+	if(!modernizrInputTypes.date || !modernizrInputTypes.range || options.replaceUI){
+		if(webshims.cfg.waitReady){
+			$.readyWait++;
+		}
+		webshims.addReady(function(context, elem){
 			
-			if($.datepicker && $.fn.slider){
-				$(document).unbind('.initinputui');
-			}
-			if(webshims.cfg.waitReady && context === document){
-				$.ready(true);
-			}
+			$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(e){
+				if($.datepicker || $.fn.slider){
+					replaceInputUI(context, elem);
+				}
+				
+				if($.datepicker && $.fn.slider){
+					$(document).unbind('.initinputui');
+				}
+				if(webshims.cfg.waitReady && context === document){
+					$.ready(true);
+				}
+			});
 		});
-	});
+	}
 });
 

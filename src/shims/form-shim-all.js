@@ -104,35 +104,37 @@ webshims.addValidityRule = function(type, fn){
 
 $.event.special.invalid = {
 	add: function(){
-		if( !$.data(this, 'invalidEventShim') ){
-			$.event.special.invalid.setup.call(this);
-		}
+		$.event.special.invalid.setup.call(this.form || this);
 	},
 	setup: function(){
-		$(this)
-			.bind('submit', $.event.special.invalid.handler)
+		var form = this.form || this;
+		if( $.data(form, 'invalidEventShim') ){
+			return;
+		}
+		$(form)
 			.data('invalidEventShim', true)
+			.bind('submit', $.event.special.invalid.handler)
 		;
-		var submitEvents = $(this).data('events').submit;
+		var submitEvents = $(form).data('events').submit;
 		if(submitEvents && submitEvents.length > 1){
 			submitEvents.unshift( submitEvents.pop() );
 		}
 	},
-	teardown: function(){
-		$(this)
-			.unbind('submit', $.event.special.invalid.handler)
-			.data('invalidEventShim', false)
-		;
-	},
+	teardown: $.noop,
 	handler: function(e, d){
 		
-		if( e.type != 'submit' || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') != null || $.data(e.target, 'novalidate') ){return;}
+		if( e.type != 'submit' || e.testedValidity || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') != null ){return;}
+		
 		isSubmit = true;
+		e.testedValidity = true;
 		var notValid = !($(e.target).checkValidity());
 		if(notValid){
+			if(this === document){
+				webshims.warn('always embed HTML5 content using .prependWebshim, .appendWebshim, .htmlWebshim etc.');
+			}
 			//ToDo
-			if(!e.originalEvent && window.console && console.log){
-				console.log('submit');
+			if(!e.originalEvent){
+				webshims.warn('tryed to submit invalid form');
 			}
 			e.stopImmediatePropagation();
 			isSubmit = false;
@@ -141,6 +143,20 @@ $.event.special.invalid = {
 		isSubmit = false;
 	}
 };
+
+$(document).bind('invalid', $.noop);
+$.event.special.submit = $.event.special.submit || {setup: function(){return false;}};
+var submitSetup = $.event.special.submit.setup;
+$.extend($.event.special.submit, {
+	setup: function(){
+		if($.nodeName(this, 'form')){
+			$(this).bind('invalid', $.noop);
+		} else {
+			$('form', this).bind('invalid', $.noop);
+		}
+		return submitSetup.apply(this, arguments);
+	}
+});
 
 
 webshims.addInputType('email', {

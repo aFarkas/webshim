@@ -77,11 +77,14 @@ Roadmap for upcomming Release 1.6.1
 * UI for date and datetime-local are polyfilled much faster
 * performance for IE6/IE7/IE8 in general
 * update to Modernizr 1.8 (if available, make this required minimum)
+* fixed bug Opera isn't calling ready-event anymore
 * fewer http requests especially for IE8-
 * added disabled state for spinbuttons
 
 Known Issue/Won't fix
-* removed placeholder support for old Opera dropped textarea[placeholder] for opera
+----------
+* removed placeholder support for old Opera 
+* dropped textarea[placeholder]-support for current Opera
 
 
 Release 1.6

@@ -681,10 +681,16 @@
 		if(!$.isDOMReady){
 			var $Ready = $.ready;
 			$.ready = function(unwait){
-				if(unwait !== true && !$.isDOMReady && document.body){
-					$.isDOMReady = true;
-					isReady('DOM', true);
-					$.ready = $Ready;
+				if(unwait !== true && !$.isDOMReady){
+					if(document.body){
+						$.isDOMReady = true;
+						isReady('DOM', true);
+						$.ready = $Ready;
+					} else {
+						setTimeout(function(){
+							$.ready(unwait);
+						}, 13);
+					}
 				}
 				return $Ready.apply(this, arguments);
 			};
@@ -975,7 +981,7 @@
 			feature: 'forms',
 			src: 'form-native-extend',
 			test: function(toLoad){
-				return (Modernizr.bugfreeformvalidation && ((modernizrInputAttrs.valueAsNumberSet && modernizrInputAttrs.valueAsDate) || $.inArray('forms-ext', toLoad) == -1) && !this.options.overrideMessages );
+				return (Modernizr.bugfreeformvalidation && (modules['forms-ext'].test(toLoad) || $.inArray('forms-ext', toLoad) == -1) && !this.options.overrideMessages );
 			},
 			dependencies: ['form-core', 'dom-support']
 		});
@@ -1024,7 +1030,7 @@
 		uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && !this.options.replaceUI);},
 		test: function(){return (modernizrInputAttrs.valueAsNumberSet && this.uiTest());},
 		noAutoCallback: true,
-		dependencies: ['form-extend'],
+		dependencies: ['forms'],
 		loadInit: function(){
 			if(this.uiTest()){return;}
 			loadList(['jquery-ui']);

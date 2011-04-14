@@ -282,7 +282,7 @@
 		$(window).bind('load', function(){
 			setTimeout(function(){
 				if(!isDOMReady  && window.parent == window){
-					$.webshims.warn('DOM-Ready not called');
+					alert('DOM-Ready not called');
 				}
 			}, 500);
 		});
