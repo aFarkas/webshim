@@ -494,8 +494,8 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	//date and datetime-local implement if we have to replace
 	if(!modernizrInputTypes['datetime-local'] || options.replaceUI){
 		var datetimeFactor = {
-			trigger: [0.65,0.35],
-			normal: [0.57,0.43]
+			trigger: [0.595,0.395],
+			normal: [0.565,0.425]
 		};
 		var subPixelCorrect = (!$.browser.msie || parseInt($.browser.version, 10) > 6) ? 0 : 0.45;
 		replaceInputUI['datetime-local'] = function(elem){
@@ -852,7 +852,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', defaultDatepicker).each(function(){
 			var orig = $.data(this, 'html5element');
 			if(orig){
-				$.each(['disabled', 'min', 'max', 'value'], function(i, name){
+				$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
 					orig.attr(name, function(i, value){return value || '';});
 				});
 			}
