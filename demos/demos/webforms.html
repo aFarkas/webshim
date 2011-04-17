@@ -340,7 +340,6 @@ $('form').unbind('firstinvalid.example1');
 </code>
 						<p>Instead of binding to the events your own, you can also simply set the configuration option <code>replaceValidationUI</code> to true:</p>
 <code class="block">
-//configure webshims to implement new customValidationMessage attribute
 //$.webshims.setOptions('forms', {
 // 	//Use customizeable validation messages
 //	customMessages: true,
@@ -404,8 +403,8 @@ $.webshims.setOptions('forms-ext', {
 			<aside>
 				<h3>Known Issues/Constraints (most <code>forms-ext</code> only)</h3>
 				<ul>
-					<li>FF4 has a bug with his validation UI on select-elements in Win7 (solution/workaround: remove browsers validation UI and use custom styleable validation UI)</li>
-					<li>placeholder polyfill is only active in browsers, which do not support constraint validation. This means, that older versions of Opera are not polyfilled.</li>
+					<li>FF4/Chrom 11 have a bug with their validation UI on select-elements (solution/workaround: remove browsers validation UI and use custom styleable validation UI)</li>
+					<li>placeholder polyfill is only active in browsers, which do not support constraint validation. This means, that older versions of Opera won't show a placeholder. Opera has native support for input[placeholder] since Version 11.0.</li>
 					<li>Spinbuttons for type=time and type=number don't show up in Safari 5 on Windows <a href="https://bugs.webkit.org/show_bug.cgi?id=38381">webkit bug</a>, <a href="https://github.com/aFarkas/webshim/issues#issue/23">webshims bug</a></li>
 					<li>Spinbuttons for type=number on Safari 5 Mac has some issue: They have bad usability, if the input starts with an empty value or if you are using step=any.</li>
 					<li>Webshims lib considers a polyfill only as "extreme stable/futureproof", if at least three different browser engines do support the polyfilled features, while this is true for the <code>forms</code>-feature, it isn't for the <code>forms-ext</code>-feature.</li>

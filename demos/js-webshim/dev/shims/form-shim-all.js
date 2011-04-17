@@ -1011,9 +1011,11 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				list += '</ul>';
 				this.arrayOptions = allOptions;
 				this.shadowList.html(list);
+				
 				if($.fn.bgIframe && lteie6){
-					$('> ul', this.shadowList).bgIframe();
+					this.shadowList.bgIframe();
 				}
+				
 				if(this.isListVisible){
 					this.showHideOptions();
 				}
