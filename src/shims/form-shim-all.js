@@ -786,7 +786,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 			range: 1,
 			date: 1
 		};
-		var noMin = ($.browser.msie && parseInt($.browser.version, 10) < 7);
+		var lteie6 = ($.browser.msie && parseInt($.browser.version, 10) < 7);
 		var globStoredOptions = {};
 		var getStoredOptions = function(name){
 			if(!name){return [];}
@@ -848,6 +848,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				this._autocomplete = $.attr(opts.input, 'autocomplete');
 				$.data(opts.input, 'datalistWidget', this);
 				this.shadowList = $('<div class="datalist-polyfill" />').appendTo('body');
+				
 				this.index = -1;
 				this.input = opts.input;
 				this.arrayOptions = [];
@@ -908,7 +909,6 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 							that.hideList();
 							return false;
 						}
-		
 					})
 					.bind('focus.datalistWidget', function(){
 						if($(this).hasClass('list-focus')){
@@ -1011,6 +1011,9 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				list += '</ul>';
 				this.arrayOptions = allOptions;
 				this.shadowList.html(list);
+				if($.fn.bgIframe && lteie6){
+					$('> ul', this.shadowList).bgIframe();
+				}
 				if(this.isListVisible){
 					this.showHideOptions();
 				}
@@ -1066,7 +1069,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				
 				css.width = $(this.input).outerWidth() - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
 				
-				if(noMin){
+				if(lteie6){
 					this.shadowList.css('height', 'auto');
 					if(this.shadowList.height() > 250){
 						this.shadowList.css('height', 220);
