@@ -71,7 +71,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-Roadmap for upcomming Release 1.6.1
+Release 1.6.1
 ----------
 
 * UI for date and datetime-local are polyfilled much faster
@@ -82,8 +82,7 @@ Roadmap for upcomming Release 1.6.1
 
 Known Issue/Won't fix
 ----------
-* removed placeholder support for old Opera 
-* dropped textarea[placeholder]-support for current Opera
+* removed placeholder support for Opera (Opera 11+ has native input[placeholder] support)
 
 
 Release 1.6

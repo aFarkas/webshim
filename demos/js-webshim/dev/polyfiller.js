@@ -60,8 +60,8 @@
 			dateElem = $('#date-input-test', form)[0];
 			modernizrInputAttrs.valueAsNumber = ('valueAsNumber' in  dateElem);
 			if(modernizrInputAttrs.valueAsNumber){
-				dateElem.valueAsNumber = 1293753600000;
-				modernizrInputAttrs.valueAsNumberSet = (dateElem.value == '2010-12-31');
+				dateElem.valueAsNumber = 0;
+				modernizrInputAttrs.valueAsNumberSet = (dateElem.value == '1970-01-01');
 			}
 			modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem);
 			dateElem = null;
@@ -112,7 +112,7 @@
 	$.webshims = $.sub ? $.sub() : {};
 	
 	$.extend($.webshims, {
-		version: '1.6.1',
+		version: 'pre1.6.2',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
@@ -513,7 +513,7 @@
 						if(module.loadInit){
 							module.loadInit();
 						}
-										
+						module.loaded = true;				
 						setDependencies(module, list);
 						if(combo){
 							loadCombos.push(module.name);
@@ -927,17 +927,15 @@
 				}
 			},
 			afterLoad: function(){
-				webshims.ready('dom-extend', function($, webshims, window, doc){
-					webshims.addReady(function(context, elem){
-						$('canvas', context).add(elem.filter('canvas')).each(function(){
-							var hasContext = this.getContext;
-							if(!hasContext){
-								G_vmlCanvasManager.initElement(this);
-							}
-						});
+				webshims.addReady(function(context, elem){
+					$('canvas', context).add(elem.filter('canvas')).each(function(){
+						var hasContext = this.getContext;
+						if(!hasContext){
+							G_vmlCanvasManager.initElement(this);
+						}
 					});
-					isReady('canvas', true);
 				});
+				isReady('canvas', true);
 			},
 			methodNames: ['getContext'],
 			dependencies: ['es5', 'dom-support']

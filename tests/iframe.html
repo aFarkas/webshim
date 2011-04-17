@@ -4,21 +4,19 @@
 		<title>iframed Webshims Lib tests</title>
 	</head>
 <body>
-	<iframe src="submit-test.html" style="width: 80%; height: 400px;"></iframe>
+	<iframe src="click-test.html" style="width: 80%; height: 400px;"></iframe>
 	
 	<iframe src="index.html?noglobals" style="width: 80%; height: 550px;"></iframe>
 	
 	
-	<iframe src="ready-events-dependencies.html" style="width: 80%; height: 150px;"></iframe>
-	<iframe src="test-ext/lightweight-loading.html" style="width: 80%; height: 150px;"></iframe>
-	<iframe src="test-ext/no-ui-loading.html" style="width: 80%; height: 150px;"></iframe>
-	<iframe src="test-ext/some-ui-loading.html" style="width: 80%; height: 150px;"></iframe>
+	<iframe src="load-test.html" style="width: 80%; height: 150px;"></iframe>
 	<script>
 		if(location.href.indexOf('http://127.0.0.1:8000/webshim/') === 0){
 			document.write('<iframe src="test-ext\/base-tag-loading.html" style="width: 80%; height: 150px;"><\/iframe>');
 		}
 	</script>
-	
+	<!--
 	<iframe src="http://afarkas.github.com/webshim/tests/ready-events-dependencies.html?noglobals" style="width: 80%; height: 300px;"></iframe>
+	-->
 </body>	
 </html>
