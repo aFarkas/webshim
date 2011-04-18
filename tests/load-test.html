@@ -4,39 +4,37 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>jQuery Test Suite</title>
 	
-	<link rel="stylesheet" href="qunit/qunit.css" media="screen">
+	<link rel="stylesheet" href="qunit/qunit.css" type="text/css" media="screen">
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
-	
+	<script>
+		
+	</script>
 	<script src="qunit/qunit.js"></script>
 	<script src="../src/extras/modernizr-1.7.min.js"></script>
 	<script src="../src/extras/loaders/script.min.js"></script>
+	<script src="../src/extras/loaders/require.js"></script>
+	<script src="../src/extras/loaders/yepnope.min.js"></script>
 	<script src="../src/polyfiller.js"></script>
-	
 	<script>
-		(function($){
-			$.webshims.ready('html5shiv', function(){
+		(function(){
+			$.webshims.ready('dom-support', function(){
 				QUnit.reset = function(){
 					$("#main, #qunit-fixture").htmlWebshim( QUnit.config.fixture );
 				};
 			});
-			module("init");
-			asyncTest("init", function(){
-				$.webshims.ready('json-storage', start);
-			});
-			
-		})(jQuery);
+		})();
 	</script>
-	<script src="unit/persistence-storage.js"></script>
+	
+	<script src="test-ext/qunit-loadteser.js"></script>
+	<script src="unit/load-forms.js"></script>
+	
 	<script>
-		jQuery.noConflict();
-		(function($){
-			$(window).load(function(){
-				$.webshims.polyfill();
-			});
-		})(jQuery);
-		
+//		loadTester.debug = 'silent';
+		loadTester.init();
 	</script>
+		
+	
 	<style type="text/css">
 		html { border: 0; }
 		#qunit-fixture {
@@ -47,12 +45,13 @@
 	</style>
 </head>
 <body class="flora">
+
 <h1 id="qunit-header">QUnit Test Suite</h1>
 <h2 id="qunit-banner"></h2>
 <div id="qunit-testrunner-toolbar"></div>
 <h2 id="qunit-userAgent"></h2>
 <ol id="qunit-tests"></ol>
-<p>You have to do <a href="index.html">normal tests</a> before this test!!!</p>
+
 <div id="qunit-fixture">
 	
 </div>

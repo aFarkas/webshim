@@ -118,7 +118,21 @@
 //			removeFOUC: false,
 //			addCacheBuster: false,
 			waitReady: true,
-			extendNative: true
+			extendNative: true,
+			loader: {
+				require: function(src, complete){
+					require([src], complete);
+				},
+				"$script": function(src, complete){
+					$script(src, complete)
+				},
+				yepnope: function(src, complete){
+					yepnope({
+						load: src,
+						callback: complete
+					});
+				}
+			}
 		},
 		/*
 		 * some data
@@ -560,65 +574,44 @@
 			})(),
 			
 			loadScript: (function(){
-				var parent, 
-					loadedSrcs = []
-				;
+				var loadedSrcs = [];
 				return function(src, callback, name){
 					
 					src = loader.makePath(src);
 					if($.inArray(src, loadedSrcs) != -1){
 						return;
 					}
-					parent = parent || document.getElementsByTagName('script')[0];
-										
-					var script = document.createElement('script'),
-						timer,
-						onLoad = function(e){
-							if(e && e.type === 'error'){
-								$(window).triggerHandler('polyfillloaderror');
-								webshims.warn('Error: could not find script @'+src +'| configure polyfill-path: $.webshims.loader.basePath = "path/to/shims-folder" or by using markup: <meta name="polyfill-path" content="path/to/shims-folder/" />');
-							}
-							if(!this){return;}
-							if(!this.readyState ||
-										this.readyState == "loaded" || this.readyState == "complete"){
-								script.onload =  null;
-								script.onreadystatechange = null;
-								if(callback){
-									callback(e, this);
-								}
-								
-								if(name){
-									if(typeof name == 'string'){
-										name = name.split(' ');
-									}
-									$.each(name, function(i, name){
-										if(!modules[name]){return;}
-										if(modules[name].afterLoad){
-											modules[name].afterLoad();
-										}
-										isReady(!modules[name].noAutoCallback ? name : name + 'FileLoaded', true);
-									});
-									
-								}
-								$(script).unbind('error.polyfillerror', onLoad);
-								script = null;
-								clearTimeout(timer);
-							}
+					var done;
+					var complete = function(){
+						if(callback){
+							callback();
 						}
-					;
-					script.setAttribute('async', 'async');
-					
-					timer = setTimeout(function(){
-						onLoad({type: 'error'});
-					}, 60000);
-					script.onload = onLoad;
-					$(script).one('error.polyfillerror', onLoad);
-					script.onreadystatechange = onLoad;
-					script.src = src;
-					parent.parentNode.insertBefore(script, parent);
-					script.async = true;
-					
+						
+						if(name){
+							if(typeof name == 'string'){
+								name = name.split(' ');
+							}
+							$.each(name, function(i, name){
+								if(!modules[name]){return;}
+								if(modules[name].afterLoad){
+									modules[name].afterLoad();
+								}
+								isReady(!modules[name].noAutoCallback ? name : name + 'FileLoaded', true);
+							});
+							
+						}
+					};
 					loadedSrcs.push(src);
+					$.each(webCFG.loader, function(name, fn){
+						if(window[name]){
+							fn(src, complete);
+							done = true;
+							return false;
+						}
+					});
+					if(!done){
+						webshims.warn("you need to include a scriptloader, like RequireJS, $script.js or yepnope.");
+					}
 				};
 			})()
 		}
