@@ -791,17 +791,13 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		{
 			id: 'time',
 			val: '',
-			result: null 
+			result: null,
+			strict: true 
 		},
 		{
 			id: 'time',
 			val: '19:30',
 			result: 70200000 
-		}, 
-		{
-			id: 'date',
-			val: '1999-01-01',
-			result: 915148800000
 		},
 		{
 			id: 'datetime-local',
@@ -817,7 +813,11 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		var elem = $('#' + data.id);
 		elem.attr('value', data.val);
 		if(data.result === null){
-			strictEqual(data.result, elem.attr('valueAsDate'), 'empty value is null '+data.id);
+			if(data.strict){
+				strictEqual(data.result, elem.attr('valueAsDate'), 'empty value is null '+data.id);
+			} else {
+				equal(data.result, elem.attr('valueAsDate'), 'empty value is null/undefined '+data.id);
+			}
 		} else {
 			equal(data.result, elem.attr('valueAsDate').getTime(), 'get valueAsDate on '+data.id);
 		}
