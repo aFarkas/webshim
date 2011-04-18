@@ -123,14 +123,14 @@
 				require: function(src, complete){
 					require([src], complete);
 				},
-				"$script": function(src, complete){
-					$script(src, complete)
-				},
 				yepnope: function(src, complete){
 					yepnope({
 						load: src,
 						callback: complete
 					});
+				},
+				"$script": function(src, complete){
+					$script(src, complete)
 				}
 			}
 		},

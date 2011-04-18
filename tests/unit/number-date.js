@@ -575,8 +575,6 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			value: '1899-12-12',
 			result: -2210716800000
 		},
-		
-		
 		{
 			id: 'datetime-local',
 			value: '2010-12-31T23:59',
@@ -725,68 +723,105 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			}(), data.value + ' is as value: ' + data.result + ', element: ' + data.id + ', was: ' + val);
 		});
 	}
-	//setting valueAsDate (webkit orientated, not sure these test are right + time has a bug in different time zone)
 	
-		$.each([{
-			id: 'date',
-			value: function(){
-				return new Date(2010, 11, 31, 0, 0);
-			},
-			resultVal: '2010-12-30',
-			resultNumber: 1293667200000
-		}, {
-			id: 'date',
-			value: function(){
-				return new Date(1999, 0, 1, 0, 0);
-			},
-			resultVal: '1998-12-31',
-			resultNumber: 915062400000
-		}, {
-			id: 'date',
-			value: function(){
-				return new Date(1999, 0, 1, 10, 10);
-			},
-			resultVal: '1999-01-01',
-			resultNumber: 915148800000
-		}, {
-			id: 'date',
-			value: function(){
-				var date = new Date();
-				date.setUTCDate(1);
-				date.setUTCMonth(0);
-				date.setUTCFullYear(1999);
-				return date;
-			},
-			resultVal: '1999-01-01',
-			resultNumber: 915148800000
-		}, {
+	//setting valueAsDate (webkit orientated, not sure these test are right + time has a bug in different time zone)
+	$.each([{
+		id: 'date',
+		value: function(){
+			return new Date(2010, 11, 31, 0, 0);
+		},
+		resultVal: '2010-12-30',
+		resultNumber: 1293667200000
+	}, {
+		id: 'date',
+		value: function(){
+			return new Date(1999, 0, 1, 0, 0);
+		},
+		resultVal: '1998-12-31',
+		resultNumber: 915062400000
+	}, {
+		id: 'date',
+		value: function(){
+			return new Date(1999, 0, 1, 10, 10);
+		},
+		resultVal: '1999-01-01',
+		resultNumber: 915148800000
+	}, {
+		id: 'date',
+		value: function(){
+			var date = new Date();
+			date.setUTCDate(1);
+			date.setUTCMonth(0);
+			date.setUTCFullYear(1999);
+			return date;
+		},
+		resultVal: '1999-01-01',
+		resultNumber: 915148800000
+	}, {
+		id: 'time',
+		value: function(){
+			return new Date(1999, 0, 1, 20, 30);
+		},
+		resultVal: '19:30',
+		resultNumber: 70200000
+	}, {
+		id: 'time',
+		value: function(){
+			var date = new Date(1999, 0, 1, 20, 30);
+			date.setSeconds(1);
+			return date;
+		},
+		resultVal: '19:30:01',
+		resultNumber: 70201000
+	}], function(i, data){
+		var elem = $('#' + data.id);
+		elem.attr('valueAsDate', data.value());
+		
+		ok(elem.attr('value') === data.resultVal, 'expected val: ' + data.resultVal + ', element: ' + data.id + ', was: ' + elem.attr('value'));
+		if (data.resultNumber === undefined) {
+			ok(isNaN(elem.attr('valueAsNumber')), ' expected number: NaN, element: ' + data.id + ', was: ' + elem.attr('valueAsNumber'));
+		}
+		else {
+			ok(elem.attr('valueAsNumber') === data.resultNumber, ' expected number: ' + data.resultNumber + ', element: ' + data.id + ', was: ' + elem.attr('valueAsNumber'));
+		}
+	});
+	
+	//getting valueAsDate
+	$.each([
+		{
 			id: 'time',
-			value: function(){
-				return new Date(1999, 0, 1, 20, 30);
-			},
-			resultVal: '19:30',
-			resultNumber: 70200000
-		}, {
+			val: '',
+			result: null 
+		},
+		{
 			id: 'time',
-			value: function(){
-				var date = new Date(1999, 0, 1, 20, 30);
-				date.setSeconds(1);
-				return date;
-			},
-			resultVal: '19:30:01',
-			resultNumber: 70201000
-		}], function(i, data){
-			var elem = $('#' + data.id);
-			elem.attr('valueAsDate', data.value());
-			
-			ok(elem.attr('value') === data.resultVal, 'expected val: ' + data.resultVal + ', element: ' + data.id + ', was: ' + elem.attr('value'));
-			if (data.resultNumber === undefined) {
-				ok(isNaN(elem.attr('valueAsNumber')), ' expected number: NaN, element: ' + data.id + ', was: ' + elem.attr('valueAsNumber'));
-			}
-			else {
-				ok(elem.attr('valueAsNumber') === data.resultNumber, ' expected number: ' + data.resultNumber + ', element: ' + data.id + ', was: ' + elem.attr('valueAsNumber'));
-			}
-		});
+			val: '19:30',
+			result: 70200000 
+		}, 
+		{
+			id: 'date',
+			val: '1999-01-01',
+			result: 915148800000
+		},
+		{
+			id: 'datetime-local',
+			value: '',
+			result: null
+		},
+		{
+			id: 'datetime-local',
+			value: '2010-12-31T23:59',
+			result: null
+		}
+	], function(i, data){
+		var elem = $('#' + data.id);
+		elem.attr('value', data.val);
+		if(data.result === null){
+			strictEqual(data.result, elem.attr('valueAsDate'), 'empty value is null '+data.id);
+		} else {
+			equal(data.result, elem.attr('valueAsDate').getTime(), 'get valueAsDate on '+data.id);
+		}
+	});
 	
 	$.webshims.ready('forms DOM', function(){
 		start();

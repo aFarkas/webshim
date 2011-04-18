@@ -168,7 +168,7 @@ jQuery.webshims.register('forms-ext', function($, webshims, window){
 		set: function(value){
 			var elem = this;
 			var type = getType(elem);
-			if(typeModels[type] && typeModels[type].dateToString){
+			if(typeModels[type] && typeModels[type].dateToString && !typeModels[type].noAsDate){
 				
 				if(value === null){
 					$.attr(elem, 'value', '');
