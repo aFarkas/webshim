@@ -9,6 +9,8 @@
 	var modernizrInputAttrs = Modernizr.input || {};
 	var modernizrInputTypes = Modernizr.inputtypes || {};
 	var browserVersion = parseFloat($.browser.version, 10);
+	var Object = window.Object;
+	var defineProperty = 'defineProperty';
 	
 	
 	//new Modernizrtests
@@ -90,11 +92,11 @@
 		var advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
 		//safari5 has defineProperty-interface, but it can't be used on dom-object
 		//only do this test in non-IE browsers, because this hurts dhtml-behavior in some IE8 versions
-		if(!$.browser.msie && Object.defineProperty && Object.prototype.__defineGetter__){
+		if(!$.browser.msie && Object[defineProperty] && Object.prototype.__defineGetter__){
 			(function(){
 				try {
 					var foo = document.createElement('foo');
-					Object.defineProperty(foo, 'bar', {get: function(){return true;}});
+					Object[defineProperty](foo, 'bar', {get: function(){return true;}});
 					advancedObjectProperties = !!foo.bar;	
 				}catch(e){
 					advancedObjectProperties = false;
@@ -105,7 +107,7 @@
 		
 		Modernizr.ES5 = (Modernizr.ES5base && Modernizr.ES5extras && advancedObjectProperties);
 		Modernizr.objectAccessor = !!( (advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)) && (!$.browser.opera || browserVersion >= 11) );
-		Modernizr.domAccessor = !!( Modernizr.objectAccessor || (Object.defineProperty && Object.getOwnPropertyDescriptor));
+		Modernizr.domAccessor = !!( Modernizr.objectAccessor || (Object[defineProperty] && Object.getOwnPropertyDescriptor));
 		Modernizr.advancedObjectProperties = advancedObjectProperties;
 	})();
 	
@@ -646,6 +648,7 @@
 	 */
 	var webshims = $.webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
+	var googleAPIs = protocol+'ajax.googleapis.com/ajax/libs/';
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;
@@ -830,10 +833,10 @@
 				return o;
 			};
 		}
-		if(Object.defineProperty){
-			webshims.defineProperty = function(obj, prop, desc){
+		if(Object[defineProperty]){
+			webshims[defineProperty] = function(obj, prop, desc){
 				extendUndefined(desc);
-				return Object.defineProperty(obj, prop, desc);
+				return Object[defineProperty](obj, prop, desc);
 			};
 		}
 		if(Object.defineProperties){
@@ -858,7 +861,7 @@
 	/* change path $.webshims.modules[moduleName].src */
 	
 	addModule('jquery-ui', {
-		src: protocol+'ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js',
+		src: googleAPIs+'jqueryui/1.8.11/jquery-ui.min.js',
 		test: function(){return !!($.widget && $.Widget);}
 	});
 	
@@ -878,7 +881,7 @@
 	});
 	
 	addModule('swfobject', {
-		src: protocol+'ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js',
+		src: googleAPIs+'swfobject/2.2/swfobject.js',
 		test: function(){return ('swfobject' in window);}
 	});
 	
@@ -931,7 +934,7 @@
 				var src;
 				if(type && type.indexOf('flash') !== -1 && (!window.swfobject || swfobject.hasFlashPlayerVersion('9.0.0'))){
 					window.FlashCanvasOptions = window.FlashCanvasOptions || {};
-					flashCanvas = window.FlashCanvasOptions;
+					flashCanvas = FlashCanvasOptions;
 					if(type == 'flash'){
 						$.extend(flashCanvas, {swfPath: loader.basePath + 'FlashCanvas/'});
 						this.src = 'FlashCanvas/flashcanvas';
@@ -1067,7 +1070,7 @@
 			calculateWidth: true,
 			slider: {},
 			datepicker: {},
-			langSrc: protocol+'ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/i18n/jquery.ui.datepicker-',
+			langSrc: googleAPIs+'jqueryui/1.8.11/i18n/jquery.ui.datepicker-',
 			recalcWidth: true,
 			lazyDate: true
 //			,replaceUI: false

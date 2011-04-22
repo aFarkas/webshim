@@ -164,31 +164,28 @@ img.ui-datepicker-trigger {
 	cursor: pointer;
 	font-size: 0;
 	line-height: 0;
-	background: url(spinbutton-arrows.png) no-repeat 0 0;
+	background: url(forms.png) no-repeat 0 0;
 }
 .polyfill-important .step-controls span {
 	display: inline-block !important;
 	margin: 0 !important;
 	padding: 0 !important;
-	width: 15px;
-	height: 9px;
 	font-size: 0 !important;
-	background: url(spinbutton-arrows.png) no-repeat 0 0;
 }
 
 .step-controls span.step-up {
 	top: 0;
-	background-position: 0 0;
+	background-position: -80px 0;
 }
 .step-controls span.step-up:hover {
-	background-position: 0 -30px;
+	background-position: -105px 0;
 }
 .step-controls span.step-down {
 	bottom: 0;
-	background-position: 0 -90px;
+	background-position: -155px 0;
 }
 .step-controls span.step-down:hover {
-	background-position: 0 -120px;
+	background-position: -180px 0;
 }
 /* disabled or readonly */
 .step-controls.disabled-step-control span {
@@ -196,10 +193,10 @@ img.ui-datepicker-trigger {
 	cursor: default;
 }
 .step-controls.disabled-step-control span.step-up {
-	background-position: 0 -60px;
+	background-position: -130px 0;
 }
 .step-controls.disabled-step-control span.step-down {
-	background-position: 0 -150px;
+	background-position: -205px 0;
 }
 
 /* range */
@@ -208,12 +205,12 @@ img.ui-datepicker-trigger {
 	display: inline-block;
 	vertical-align: middle;
 	zoom: 1;
-	border: 1px solid #000;
-	height: 6px;
+	border: none;
+	height: 4px;
 	width: 155px;
 	border-radius: 2px;
 	-moz-border-radius: 2px;
-	background-color: #fff;
+	background: url(forms.png) 0 100% no-repeat;
 	cursor: pointer;
 	font-size: 0;
 	line-height: 0;
@@ -228,23 +225,36 @@ img.ui-datepicker-trigger {
 	display: block;
 	z-index: 10;
 	overflow: hidden;
-	margin: -3px 0 0 -6px;
-	height: 12px;
-	width: 12px;
-	background-color: #666;
+	margin: -7px 0 0 -8px;
+	height: 22px;
+	width: 17px;
+	background: url(forms.png) 0 0 no-repeat;
 	cursor: pointer;
-	border-radius: 6px;
-	-moz-border-radius: 6px;
+	
 	font-size: 0;
 	line-height: 0;
 }
-
+.input-range .ui-slider-handle:hover,
+.input-range .ui-slider-handle:focus {
+	background-position: -17px 0;
+}
+.input-range .ui-slider-handle.ui-state-active {
+	background-position: -34px 0;
+}
+.input-range.ui-slider-disabled {
+	cursor: default;
+	opacity: 0.95;
+}
+.input-range.ui-slider-disabled .ui-slider-handle {
+	cursor: default;
+	background-position: -51px 0;
+}
 .input-range .ui-slider-range {
 	position: absolute;
 	z-index: 1;
 	overflow: hidden;
 	display: block;
-	background: #999;
+	background: #b6e2fb;
 }
 .input-range .input-range .ui-slider-range,
 .polyfill-important .input-range .ui-slider-handle {
@@ -253,8 +263,8 @@ img.ui-datepicker-trigger {
 	padding: 0 !important;
 }
 .input-range.ui-slider-horizontal .ui-slider-range {
-	top: 0;
-	height: 100%;
+	top: 1px;
+	height: 1px;
 }
 .input-range.ui-slider-horizontal .ui-slider-range-min {
 	left: 0;
@@ -455,8 +465,8 @@ datalist {
 	border-radius: 2px;
 	zoom: 1;
 	min-width: 60px;
-	-moz-box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
-	box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.4);
+	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.4);
 }
 
 .validity-alert .va-arrow {
