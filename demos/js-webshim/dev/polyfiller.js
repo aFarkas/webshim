@@ -4,6 +4,7 @@
 	document.createElement('datalist');
 	
 	var special = $.event.special;
+	var emptyJ = $([]);
 	var Modernizr = window.Modernizr;
 	var modernizrInputAttrs = Modernizr.input || {};
 	var modernizrInputTypes = Modernizr.inputtypes || {};
@@ -120,6 +121,9 @@
 			waitReady: true,
 			extendNative: true,
 			loader: {
+				sssl: function(src, complete){
+					sssl(src, complete);
+				},
 				require: function(src, complete){
 					require([src], complete);
 				},
@@ -128,9 +132,6 @@
 						load: src,
 						callback: complete
 					});
-				},
-				"$script": function(src, complete){
-					$script(src, complete)
 				}
 			}
 		},
@@ -391,8 +392,9 @@
 			basePath: (function(){
 				var path = $('meta[name="polyfill-path"]').attr('content');
 				if(!path){
-					var script = $('script');
-					script = script[script.length - 1];
+					var script = $('script').filter('[src$="polyfiller.js"]');
+					
+					script = script[0] || script.end()[script.end().length - 1];
 					path = ((!$.browser.msie || document.documentMode >= 8) ? script.src : script.getAttribute("src", 4)).split('?')[0];
 					path = path.slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 				}
@@ -575,14 +577,26 @@
 			
 			loadScript: (function(){
 				var loadedSrcs = [];
+				var scriptLoader;
 				return function(src, callback, name){
 					
 					src = loader.makePath(src);
 					if($.inArray(src, loadedSrcs) != -1){
 						return;
 					}
-					var done;
+					var script = emptyJ;
+					var errorTimer;
+					var error = function(){
+						$(window).triggerHandler('polyfillloaderror');
+						webshims.warn('Error: could not find "'+src +'" | configure polyfill-path: $.webshims.loader.basePath = "path/to/shims-folder"');
+						complete();
+					};
 					var complete = function(){
+						clearTimeout(errorTimer);
+						script.unbind('error', error);
+						complete = null;
+						error = null;
+						script = null;
 						if(callback){
 							callback();
 						}
@@ -601,16 +615,26 @@
 							
 						}
 					};
+										
 					loadedSrcs.push(src);
-					$.each(webCFG.loader, function(name, fn){
-						if(window[name]){
-							fn(src, complete);
-							done = true;
-							return false;
+					if(!scriptLoader){
+						$.each(webCFG.loader, function(name, fn){
+							if(window[name]){
+								scriptLoader = fn;
+								return false;
+							}
+						});
+					}
+					if(scriptLoader){
+						scriptLoader(src, complete);
+						if(webshims.debug !== false){
+							setTimeout(function(){
+								script = $('script[src="'+src+'"]').bind('error', error);
+							}, 0);
+							errorTimer = setTimeout(error, 15000);
 						}
-					});
-					if(!done){
-						webshims.warn("you need to include a scriptloader, like RequireJS, $script.js or yepnope.");
+					} else {
+						webshims.warn("you need to include a scriptloader");
 					}
 				};
 			})()
@@ -644,14 +668,24 @@
 	webshims.activeLang = (function(){
 		var args;
 		var that;
+		var langs = [navigator.browserLanguage || navigator.language || '', $('html').attr('lang') || ''];
 		onReady('webshimLocalization', function(){
 			if(args && that){
 				webshims.activeLang.apply(that, args);
 			}
 		});
-		return function(){
+		return function(lang, module, fn){
 			that = this;
 			args = arguments;
+			if(lang){
+				if (!module || !fn) {
+					if (lang !== langs[0]) {
+						langs[0] = lang;
+					}
+				}
+				loadList(['dom-extend']);
+			}
+			return langs;
 		};
 	})();
 	
@@ -709,7 +743,6 @@
 	
 	(function(){
 		var readyFns = [];
-		var emptyJ = $([]);
 		$.extend(webshims, {
 			addReady: function(fn){
 				var readyFn = function(context, elem){

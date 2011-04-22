@@ -441,31 +441,34 @@ datalist {
 .validity-alert {
 	position: absolute;
 	display: inline-block;
-	padding: 11px 0 0;
+	padding: 8px 0 0;
 	z-index: 10000;
+	
 }
 .validity-alert span.va-box {
 	display: inline-block;
-	background: #fff;
+	background: #fafafa;
 	color: #000;
-	border: 2px solid #a33;
+	border: 1px solid #000;
 	padding: 5px;
-	-moz-border-radius: 3px;
-	border-radius: 3px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
 	zoom: 1;
 	min-width: 60px;
+	-moz-box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
+	box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
 }
 
 .validity-alert .va-arrow {
 	position: absolute;
-	top: 2px;
+	top: 1px;
 	left: 20px;
 	display: block;
 	width: 0;
 	height: 0;
-	border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-	border-bottom: 10px solid #a33;
+	border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+	border-bottom: 7px solid #000;
 	border-top: none;
 	zoom: 1;
 	font-size: 0;
@@ -473,14 +476,14 @@ datalist {
 * html .validity-alert .va-arrow {display: none;}
 .validity-alert .va-arrow .va-arrow-box {
 	position: relative;
-	top: 2px;
-	left: -8px;
+	top: 1px;
+	left: -9px;
 	display: block;
 	width: 0;
 	height: 0;
-	border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-	border-bottom: 9px solid #fff;
+	border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+	border-bottom: 7px solid #fafafa;
 	border-top: none;
 }
 

@@ -191,9 +191,9 @@ webshims.defineNodeNamesProperties(['button', 'fieldset', 'output'], {
 		value: $.noop
 	},
 	validity: {
-		set: $.noop,
+		writeable: false,
 		get: function(){
-			return validityPrototype;
+			return $.extend({}, validityPrototype);
 		}
 	}
 });
