@@ -21,6 +21,7 @@
 			var timer;
 			$(this).bind('mousedown.mousepressext', function(e){
 				var elem = $(this);
+				
 				var startIntervall = function(delay){
 					var steps = 0;
 					removeTimer(elem);
@@ -32,13 +33,18 @@
 						}
 					}, delay));
 				};
+				var target = $(e.target).trigger('mousepressstart', [e]);
+				
 				removeTimer(elem);
 				elem.data('mousepresstimer', setTimeout(function(){
 					startIntervall(180);
 				}, 200));
-				elem.bind('mouseup.mousepressext mouseleave.mousepressext', function(){
+				
+				elem.bind('mouseup.mousepressext mouseleave.mousepressext', function(e){
 					removeTimer(elem, true);
+					target.trigger('mousepressend', [e]);
 					elem = null;
+					target = null;
 				});
 			});
 		},

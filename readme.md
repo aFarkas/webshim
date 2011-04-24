@@ -15,7 +15,8 @@ Implemented Features:
 
 * HTML5 shiv and innerShiv solution including basic CSS-support
 * canvas
-* HTML5 form features including: constraint validation and form widgets (input[range], input[date], input[time], input[datetime-local], output)
+* HTML5 form features including: constraint validation and form widgets (input[range], input[date], input[time], input[datetime-local], output, input[list]/datalist)
+* interactive elements: summary/details
 * JSON (stringify and parse)
 * localStorage/sessionStorage
 * geolocation
@@ -70,6 +71,14 @@ If you have any questions, please feel free to ask them on the [Using jQuery Plu
 forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
+
+upcomming Release 1.6.2
+----------
+
+* improved UI for [type=range], [type=date], [type=datetime-local] and constraint validation
+* tweaked bgIframe support for IE6
+* added scriptloader adapter (removed own script loader, less [NIH](http://en.wikipedia.org/wiki/Not_Invented_Here))
+* removed valueAsDate for [type=datetime-local] (nice feature but Spec Violation)
 
 Release 1.6.1
 ----------

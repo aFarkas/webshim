@@ -180,12 +180,18 @@ img.ui-datepicker-trigger {
 .step-controls span.step-up:hover {
 	background-position: -105px 0;
 }
+.step-controls > span.mousepress-ui.step-up {
+	background-position: -105px -20px;
+}
 .step-controls span.step-down {
 	bottom: 0;
 	background-position: -155px 0;
 }
 .step-controls span.step-down:hover {
 	background-position: -180px 0;
+}
+.step-controls > span.mousepress-ui.step-down {
+	background-position: -180px -20px;
 }
 /* disabled or readonly */
 .step-controls.disabled-step-control span {
@@ -208,8 +214,8 @@ img.ui-datepicker-trigger {
 	border: none;
 	height: 4px;
 	width: 155px;
-	border-radius: 2px;
-	-moz-border-radius: 2px;
+	border-radius: 1px;
+	-moz-border-radius: 1px;
 	background: url(forms.png) 0 100% no-repeat;
 	cursor: pointer;
 	font-size: 0;
@@ -289,8 +295,9 @@ img.ui-datepicker-trigger {
 	font-family: "Lucida Grande", "MS Shell Dlg", "Calibri", sans-serif;
 	font-size: 100%;
 	border: 1px solid #333;
-	-moz-box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
-	box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+	-webkit-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
 }
 
 .input-date-datepicker-control .ui-datepicker-header {
@@ -314,7 +321,7 @@ img.ui-datepicker-trigger {
 	text-indent: -9999em;
 	font-size: 10px;
 	line-height: 0;
-	background: url(date-arrows.png) no-repeat;
+	background: url(forms.png) no-repeat;
 	cursor: pointer;
 }
 .input-date-datepicker-control .ui-datepicker-header .ui-state-disabled .ui-icon {
@@ -322,14 +329,21 @@ img.ui-datepicker-trigger {
 }
 .input-date-datepicker-control .ui-datepicker-header .ui-icon-circle-triangle-w {
 	left: 3px;
-	background-position: 2px 3px;
+	background-position: -235px 3px;
+}
+.input-date-datepicker-control .ui-datepicker-header .ui-state-hover .ui-icon-circle-triangle-w {
+	background-position: -235px -17px;
 }
 .input-date-datepicker-control .ui-datepicker-header .ui-icon-circle-triangle-e {
 	right: 3px;
-	background-position: -12px 3px;
+	background-position: -248px 3px;
+}
+.input-date-datepicker-control .ui-datepicker-header .ui-state-hover .ui-icon-circle-triangle-e {
+	background-position: -248px -17px;
 }
 .input-date-datepicker-control table {
 	font-size: 100%;
+	border-spacing: 1px;
 }
 .input-date-datepicker-control .ui-datepicker-title {
 	margin: 0 20px;
@@ -340,39 +354,50 @@ img.ui-datepicker-trigger {
 	text-align: center;
 	font-weight: bold;
 }
+
 .input-date-datepicker-control td,
 .input-date-datepicker-control th {
 	padding: 0 2px;
 	text-align: center;
-}
-.input-date-datepicker-control td {
-	cursor: pointer;
-	color: #333;
-	border: 1px solid #999;
+	font-weight: normal;
 }
 
+.input-date-datepicker-control td {
+	padding: 0 4px;
+	cursor: pointer;
+	text-align: right;
+	border: 1px solid #fff;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+}
 
 .input-date-datepicker-control td.ui-datepicker-current-day {
-	border-color: #000;
 	background-color: #adf;
 	color: #000;
+	border-color: #06c;
+	-moz-box-shadow: 0 3px 9px rgba(255, 255, 255, 0.9) inset;
+	box-shadow: 0 3px 9px rgba(255, 255, 255, 0.9) inset;
 }
-
+.input-date-datepicker-control td.ui-datepicker-today{
+	border-color: #06c;
+}
 .input-date-datepicker-control td.ui-datepicker-current-day a {
-	background-color: #adf;
 	color: #000;
 }
 .input-date-datepicker-control td a {
-	color: #333;
+	color: #000;
 	text-decoration: none;
 }
-.input-date-datepicker-control td:hover,
-.input-date-datepicker-control td:hover a {
+
+.input-date-datepicker-control td:hover {
 	background-color: #bef;
+	border-color: #06c;
+	-moz-box-shadow: 0 3px 9px rgba(255, 255, 255, 0.9) inset;
+	box-shadow: 0 3px 9px rgba(255, 255, 255, 0.9) inset;
 }
 .input-date-datepicker-control td.ui-state-disabled {
 	cursor: default;
-	border-color: #ddd;
+	border-color: #fff;
 	color: #bbb;
 	background-color: transparent;
 }
@@ -411,8 +436,9 @@ datalist {
 	overflow-x: hidden !important;
 	overflow-y: auto;
 	
-	-moz-box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
-	box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+	-webkit-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
 }
 .datalist-polyfill.datalist-visible{
 	display: block;

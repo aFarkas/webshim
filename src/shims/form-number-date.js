@@ -977,6 +977,9 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 						doSteps(elem, type, e.target);
 						return false;
 					})
+					.bind('mousepressstart mousepressend', function(e){
+						$(e.target)[e.type == 'mousepressstart' ? 'addClass' : 'removeClass']('mousepress-ui');
+					})
 				;
 				var jElm = $(this)
 					.addClass('has-step-controls')

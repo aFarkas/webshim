@@ -301,7 +301,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
 	set: function(value){
 		var elem = this;
-		elem.setAttribute('aria-required', (value) ? 'true' : 'false');
+		elem.setAttribute('aria-required', !!(value)+'');
 	},
 	initAttr: true
 });
