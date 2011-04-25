@@ -157,6 +157,8 @@
 			$('script').addClass('direct-included');
 		},
 		expectScriptsLoad: function(scriptDefs, waitFeature){
+			//todo
+			return;
 			if(scriptDefs[browserName+browserVersion]){
 				var scripts = scriptDefs[browserName+browserVersion];
 				
