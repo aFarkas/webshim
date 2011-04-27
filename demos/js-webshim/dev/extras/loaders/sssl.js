@@ -1,6 +1,6 @@
 /*!
  * SSSL: smallest, simpelst script loader
- * version: 1.0
+ * version: 1.0.1
  * 
  * API:
  * Normal usage
@@ -28,7 +28,7 @@
 (function(){
 	var firstScript = document.getElementsByTagName('script')[0];
 	var scriptHead = firstScript.parentNode;
-	var re = /ed|co/;
+	var re = /ded|co/;
 	var onload = 'onload';
 	var onreadystatechange = 'onreadystatechange'; 
 	var readyState = 'readyState';

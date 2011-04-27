@@ -236,7 +236,7 @@ img.ui-datepicker-trigger {
 	width: 17px;
 	background: url(forms.png) 0 0 no-repeat;
 	cursor: pointer;
-	
+	outline: none;
 	font-size: 0;
 	line-height: 0;
 }
