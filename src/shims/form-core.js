@@ -68,7 +68,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 	var changeVals = {selectedIndex: 1, value: 1, checked: 1, disabled: 1, readonly: 1};
 	var stopUIRefresh;
 	$.attr = function(elem, name, val){
-		if(elem.form && changeVals[name] && val !== undefined && $(elem).hasClass('form-ui-invalid')){
+		if(elem && 'form' in elem && changeVals[name] && val !== undefined && $(elem).hasClass('form-ui-invalid')){
 			var ret = oldAttr.apply(this, arguments);
 			if(isValid(elem)){
 				getVisual(elem).removeClass('form-ui-invalid');

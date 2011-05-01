@@ -150,13 +150,14 @@
 				<div class="panel">
 					<ul>
 						<li>Take the 'js-webshim' folder and add it to your project. (You will find a minified and a dev folder there.)</li>
-						<li>Include the polyfiller.js into your HTML page. You can concatenate this file with your other js and rename. Don't forget to also include <a href="http://jquery.com">jQuery</a> and <a href="http://www.modernizr.com/">Modernizr</a>.</li>
+						<li>Include the polyfiller.js into your HTML page. You can concatenate this file with your other js and rename. Don't forget to also include <a href="http://jquery.com">jQuery</a>, <a href="http://www.modernizr.com/">Modernizr</a> and a scriptloader (<a href="http://yepnopejs.com/">yepnope</a>, <a href="https://gist.github.com/936413">SSSL</a> or <a href="http://requirejs.org/">RequireJS</a>).</li>
 						<li>call the polyfill method</li>
 					</ul>
 				
 <code class="block">
 &lt;script src="js/jquery-1.5.2.js"&gt;&lt;/script&gt;
 &lt;script src="js/modernizr.js"&gt;&lt;/script&gt;
+&lt;script src="js/yepnope.js"&gt;&lt;/script&gt;
 &lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
 
 

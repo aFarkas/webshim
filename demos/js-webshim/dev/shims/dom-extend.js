@@ -61,7 +61,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	var modifyProps = {};
 		
 	$.attr = function(elem, name, value, arg1, arg3){
-		var nodeName = (elem.nodeName || '').toLowerCase();
+		var nodeName = ((elem && elem.nodeName) || '').toLowerCase();
 		if(!nodeName || elem.nodeType !== 1){return oldAttr(elem, name, value, arg1, arg3);}
 		var desc = extendedProps[nodeName];
 		var ret;

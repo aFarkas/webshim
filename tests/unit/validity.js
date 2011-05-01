@@ -317,6 +317,7 @@ asyncTest('checkValidity/invalid event I', function(){
 	}
 	ok(!$('#form-1').checkValidity(), 'validity is false for form-element (form)');
 	equals(invalids, 7, 'there were 7 invalid events (form)');
+	strictEqual($('#email-outside').checkValidity(), false, 'email outside of form will be validated');
 	$.webshims.ready('forms DOM', function(){
 		start();
 	});

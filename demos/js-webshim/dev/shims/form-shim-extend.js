@@ -180,6 +180,7 @@ webshims.addInputType('url', {
 });
 
 // IDLs for constrain validation API
+//ToDo: add object to this list
 webshims.defineNodeNamesProperties(['button', 'fieldset', 'output'], {
 	checkValidity: {
 		value: function(){return true;}
@@ -197,6 +198,8 @@ webshims.defineNodeNamesProperties(['button', 'fieldset', 'output'], {
 		}
 	}
 });
+
+
 
 webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 	checkValidity: {
@@ -258,7 +261,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 			return function(){
 				var elem = this;
 				//elem.name && <- we don't use to make it easier for developers
-				return !!( elem.form && !elem.disabled && !elem.readOnly && !types[elem.type] && $.attr(elem.form, 'novalidate') == null );
+				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] && $.attr(elem.form, 'novalidate') == null );
 			};
 		})()
 	},
