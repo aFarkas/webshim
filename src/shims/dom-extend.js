@@ -54,89 +54,150 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	//shortcus
 	var modules = webshims.modules;
 	
+	var oldAttr = $.attr;
 	
 	//proxying attribute
-	var oldAttr = $.attr;
+	var olds = {};
+	var havePolyfill = {};
 	var extendedProps = {};
+	var extendQ = {};
+	
 	var modifyProps = {};
-		
-	$.attr = function(elem, name, value, arg1, arg3){
-		var nodeName = (elem.nodeName || '').toLowerCase();
-		if(!nodeName || elem.nodeType !== 1){return oldAttr(elem, name, value, arg1, arg3);}
-		var desc = extendedProps[nodeName];
-		var ret;
-						
-		if(desc){
-			desc = desc[name];
-		}
-		if(!desc){
-			desc = extendedProps['*'];
+	
+	
+	['removeAttr', 'prop', 'attr'].forEach(function(type){
+		olds[type] = $[type];
+		$[type] = function(elem, name, value, pass){
+			if( !elem || !havePolyfill[name] || elem.nodeType !== 1 || (pass && type == 'attr' && $.attrFn[name]) ){
+				return olds[type].apply(this, arguments);
+			}
+			var nodeName = (elem.nodeName || '').toLowerCase();
+			var desc = extendedProps[nodeName];
+			var curType = (type == 'attr' && (value === false || value === null)) ? 'removeAttr' : type;
+			var propMethod;
+			var ret;
+			
 			if(desc){
 				desc = desc[name];
 			}
-		}
-		
-		// we got a winner
-		if(desc){
-			if(value === undefined){
-				return (desc.get) ? 
-					desc.get.call(elem) : 
-					desc.value
-				;
-			} else if(desc.set) {
-				ret = desc.set.call(elem, value);
+			if(!desc){
+				desc = extendedProps['*'];
+				if(desc){
+					desc = desc[name];
+				}
 			}
-		} else {
-			ret = oldAttr(elem, name, value, arg1, arg3);
-		}
-		if(value !== undefined && modifyProps[nodeName] && modifyProps[nodeName][name]){
-			$.each(modifyProps[nodeName][name], function(i, fn){
-				fn.call(elem, value);
-			});
-		}
-		return ret;
-	};
-	
-	var extendQAttr =  function(nodeName, prop, desc){
-		if(!extendedProps[nodeName]){
-			extendedProps[nodeName] = {};
-		}
-		var oldDesc = extendedProps[nodeName][prop];
-		var getSup = function(propType, descriptor, oDesc){
-			if(descriptor && descriptor[propType]){
-				return descriptor[propType];
-			}
-			if(oDesc && oDesc[propType]){
-				return oDesc[propType];
-			}
-			return function(value){
-				return oldAttr(this, prop, value);
-			};
-		};
-		extendedProps[nodeName][prop] = desc;
-		if(desc.value === undefined){
-			if(!desc.set){
-				desc.set = desc.writeable ? 
-					getSup('set', desc, oldDesc) : 
-					(webshims.cfg.useStrict) ? 
-						function(){throw(prop +' is readonly on '+ nodeName);} : 
-						$.noop
-				;
-			}
-			if(!desc.get){
-				desc.get = getSup('get', desc, oldDesc);
+			if(desc){
+				propMethod = desc[curType];
 			}
 			
-		}
-		
-		$.each(['value', 'get', 'set'], function(i, descProp){
-			if(desc[descProp]){
-				desc['_sup'+descProp] = getSup(descProp, oldDesc);
+			if(propMethod){
+				if(curType === 'removeAttr'){
+					return propMethod.value.call(elem);	
+				} else if(value === undefined){
+					return (propMethod.get) ? 
+						propMethod.get.call(elem) : 
+						propMethod.value
+					;
+				} else if(propMethod.set) {
+					if(type == 'attr' && value === true){
+						value = name;
+					}
+					ret = propMethod.set.call(elem, value);
+				}
+			} else {
+				ret = olds[type](elem, name, value, pass);
 			}
-		});
-	};
+			if((value !== undefined || curType === 'removeAttr') && modifyProps[nodeName] && modifyProps[nodeName][name]){
+				var boolValue;
+				if(curType == 'removeAttr'){
+					boolValue = false;
+				} else if(curType == 'prop'){
+					boolValue = !!(value);
+				} else {
+					boolValue = true;
+				}
+				
+				modifyProps[nodeName][name].forEach(function(fn){
+					fn.call(elem, value, boolValue, curType, type);
+				});
+			}
+			return ret;
+		};
+		
+		extendQ[type] = function(nodeName, prop, desc){
+			if(!extendedProps[nodeName]){
+				extendedProps[nodeName] = {};
+			}
+			if(!extendedProps[nodeName][prop]){
+				extendedProps[nodeName][prop] = {};
+			}
+			var oldDesc = extendedProps[nodeName][prop][type];
+			var getSup = function(propType, descriptor, oDesc){
+				if(descriptor && descriptor[propType]){
+					return descriptor[propType];
+				}
+				if(oDesc && oDesc[propType]){
+					return oDesc[propType];
+				}
+				return function(value){
+					return olds[type](this, prop, value);
+				};
+			};
+			extendedProps[nodeName][prop][type] = desc;
+			if(desc.value === undefined){
+				if(!desc.set){
+					desc.set = desc.writeable ? 
+						getSup('set', desc, oldDesc) : 
+						(webshims.cfg.useStrict) ? 
+							function(){throw(prop +' is readonly on '+ nodeName);} : 
+							$.noop
+					;
+				}
+				if(!desc.get){
+					desc.get = getSup('get', desc, oldDesc);
+				}
+				
+			}
+			
+			['value', 'get', 'set'].forEach(function(descProp){
+				if(desc[descProp]){
+					desc['_sup'+descProp] = getSup(descProp, oldDesc);
+				}
+			});
+		};
+		
+	});
 	
 	
+	var extendNativeValue = (function(){
+		var UNKNOWN = webshims.getPrototypeOf(document.createElement('foobar'));
+		var has = Object.prototype.hasOwnProperty;
+		return function(nodeName, prop, desc){
+			var elem = document.createElement(nodeName);
+			var elemProto = webshims.getPrototypeOf(elem);
+			if( elemProto && UNKNOWN !== elemProto && ( !elem[prop] || !has.call(elem, prop) ) ){
+				var sup = elem[prop];
+				desc._supvalue = function(){
+					if(sup && sup.apply){
+						return sup.apply(this, arguments);
+					}
+					return sup;
+				};
+				elemProto[prop] = desc.value;
+			} else {
+				desc._supvalue = function(){
+					var data = $.data(this, '_oldPolyfilledValue');
+					if(data && data[prop] && data[prop].apply){
+						return data[prop].apply(this, arguments);
+					}
+					return data && data[prop];
+				};
+				initProp.extendValue(nodeName, prop, desc.value);
+			}
+			desc.value._supvalue = desc._supvalue;
+		};
+	})();
+		
 	var initProp = (function(){
 		
 		var initProps = {};
@@ -211,36 +272,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			}
 		};
 	})();
-	
-	var extendNativeValue = (function(){
-		var UNKNOWN = webshims.getPrototypeOf(document.createElement('foobar'));
-		var has = Object.prototype.hasOwnProperty;
-		return function(nodeName, prop, desc){
-			var elem = document.createElement(nodeName);
-			var elemProto = webshims.getPrototypeOf(elem);
-			if( elemProto && UNKNOWN !== elemProto && ( !elem[prop] || !has.call(elem, prop) ) ){
-				var sup = elem[prop];
-				desc._supvalue = function(){
-					if(sup && sup.apply){
-						return sup.apply(this, arguments);
-					}
-					return sup;
-				};
-				elemProto[prop] = desc.value;
-			} else {
-				desc._supvalue = function(){
-					var data = $.data(this, '_oldPolyfilledValue');
-					if(data && data[prop] && data[prop].apply){
-						return data[prop].apply(this, arguments);
-					}
-					return data && data[prop];
-				};
-				initProp.extendValue(nodeName, prop, desc.value);
-			}
-			desc.value._supvalue = desc._supvalue;
-		};
-	})();
-	
+		
 	
 	$.extend(webshims, {
 
@@ -257,36 +289,92 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				return id;
 			};
 		})(),
-		defineNodeNameProperty: function(nodeName, prop, desc){
-			desc = $.extend({writeable: true, idl: true}, desc);
-			
-			if(desc.isBoolean){
-				var oldSet = desc.set;
-				
-				desc.set =  function(val){
-					var elem = this;
-					val = !!val;
-					webshims.contentAttr(elem, prop, val);
-					if(oldSet){
-						oldSet.call(elem, val);
+		defineNodeNameProperty: function(nodeName, prop, descs){
+			havePolyfill[prop] = true;
+			if(descs.get || descs.value){
+				webshims.warn(nodeName +'['+ prop +']'+ 'old API');
+			}
+			if(descs.isBoolean){
+				$.extend(descs, {
+					attr: {
+						set: function(val){
+							descs.attr._supset.call(this, val);
+							if(descs.set){
+								descs.set.call(this, true);
+							}
+						}
+					},
+					prop: {
+						set: function(val){
+							$.attr(this, prop, !!(val));
+						},
+						get: function(){
+							return $.attr(this, prop) != null;
+						}
+					},
+					removeAttr: {
+						value: function(){
+							descs.removeAttr._supvalue.call(this);
+							if(descs.set){
+								descs.set.call(this, false);
+							}
+						}
 					}
-					return val;
-				};
-				desc.get = desc.get ||function(){
-					return webshims.contentAttr(this, prop) != null;
-				};
+				});
+			} else {
+				if(descs.set){
+					webshims.warn(nodeName +'['+ prop +']'+ 'old API');
+				}
+				$.each({reflectIDL: ['attr', 'prop'], reflectContent: ['prop', 'attr']}, function(name, methods){
+					if(descs[name]){
+						if(!descs[methods[0]]){
+							descs[methods[0]] = {};
+						}
+						if(!descs[methods[0]].set){
+							descs[methods[0]].set = function(){
+								return descs[methods[1]].set.apply(this, arguments);
+							};
+						}
+						if(!descs[methods[0]].get){
+							descs[methods[0]].get = function(){
+								return descs[methods[1]].get.apply(this, arguments);
+							};
+						}
+						if(descs.defaultValue !== undefined && !descs.removeAttr && name == 'reflectIDL'){
+							descs.removeAttr = {
+								value: function(){
+									var ret = descs.prop.set.call(this, descs.defaultValue);
+									descs.removeAttr._supvalue.call(this);
+									return ret;
+								}
+							};
+						}
+					}
+				});
 			}
 			
-			extendQAttr(nodeName, prop, desc);
-			if(nodeName != '*' && webshims.cfg.extendNative && desc.value && $.isFunction(desc.value)){
-				extendNativeValue(nodeName, prop, desc);
-			}
-			
-			if(desc.initAttr){
+			['prop', 'attr', 'removeAttr'].forEach(function(type){
+				var desc = descs[type];
+				if(desc){
+					if(type === 'prop'){
+						desc = $.extend({writeable: true}, desc);
+					} else {
+						desc = $.extend({}, desc, {writeable: true});
+					}
+						
+					extendQ[type](nodeName, prop, desc);
+					if(nodeName != '*' && webshims.cfg.extendNative && type == 'prop' && desc.value && $.isFunction(desc.value)){
+						extendNativeValue(nodeName, prop, desc);
+					}
+					descs[type] = desc;
+				}
+				
+			});
+			if(descs.initAttr){
 				initProp.content(nodeName, prop);
 			}
-			
-			return desc;
+			console.log(descs)
+			return descs;
 		},
 		
 		defineNodeNameProperties: function(name, descs, _noTmpCache){

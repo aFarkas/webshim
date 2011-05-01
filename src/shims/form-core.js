@@ -413,43 +413,57 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 		if((!window.noHTMLExtFixes && !Modernizr.validationmessage) || !Modernizr.formvalidation){
 			implementProperties.push('validationMessage');
 		}
-		jQuery.webshims.ready('dom-support', function($, webshims, window, doc, undefined){
+		webshims.ready('dom-support', function($, webshims, window, doc, undefined){
 			implementProperties.forEach(function(messageProp){
 				['input', 'select', 'textarea', 'fieldset', 'output', 'button'].forEach(function(nodeName){
 					var desc = webshims.defineNodeNameProperty(nodeName, messageProp, {
-						get: function(){
-							var elem = this;
-							var message = '';
-							if(!$.attr(elem, 'willValidate')){
-								return message;
-							}
-							
-							var validity = $.attr(elem, 'validity') || {valid: 1};
-							
-							if(validity.valid){return message;}
-							message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
-							
-							if(message){return message;}
-							
-							if(validity.customError && elem.nodeName){
-								message = (Modernizr.validationmessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
-								if(message){return message;}
-							}
-							$.each(validity, function(name, prop){
-								if(name == 'valid' || !prop){return;}
-								
-								message = webshims.createValidationMessage(elem, name);
-								if(message){
-									return false;
+						prop: {
+							get: function(){
+								var elem = this;
+								var message = '';
+								if(!$.attr(elem, 'willValidate')){
+									return message;
 								}
-							});
-							return message || '';
-						},
-						set: $.noop
+								
+								var validity = $.attr(elem, 'validity') || {valid: 1};
+								
+								if(validity.valid){return message;}
+								message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
+								
+								if(message){return message;}
+								
+								if(validity.customError && elem.nodeName){
+									message = (Modernizr.validationmessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
+									if(message){return message;}
+								}
+								$.each(validity, function(name, prop){
+									if(name == 'valid' || !prop){return;}
+									
+									message = webshims.createValidationMessage(elem, name);
+									if(message){
+										return false;
+									}
+								});
+								return message || '';
+							},
+							writeable: false
+						}
 					});
 				});
 				
 			});
+			
+			// add support for new input-types
+			webshims.defineNodeNameProperty('input', 'type', {
+				prop: {
+					get: function(){
+						var elem = this;
+						var type = (elem.getAttribute('type') || '').toLowerCase();
+						return (webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
+					}
+				}
+			});
+			
 		});
 	})();
 });

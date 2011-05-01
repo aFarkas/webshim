@@ -32,7 +32,7 @@ jQuery.webshims.register('forms-ext', function($, webshims, window){
 			return (typeof string == 'number' || (string && string == string * 1));
 		},
 		supportsType = function(type){
-			return (Modernizr.input.valueAsNumber && $('<input type="'+type+'" />').attr('type') === type);
+			return (Modernizr.input.valueAsNumber && $('<input type="'+type+'" />').prop('type') === type);
 		},
 		getType = function(elem){
 			return (elem.getAttribute('type') || '').toLowerCase();
@@ -118,71 +118,66 @@ jQuery.webshims.register('forms-ext', function($, webshims, window){
 	}
 	
 	
-	// add support for new input-types
-	webshims.defineNodeNameProperty('input', 'type', {
-		get: function(){
-			var elem = this;
-			var type = getType(elem);
-			return (webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
-		}
-	});
-	
 	//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
 	var valueAsNumberDescriptor = webshims.defineNodeNameProperty('input', 'valueAsNumber', {
-		get: function(){
-			var elem = this;
-			var type = getType(elem);
-			return (typeModels[type] && typeModels[type].asNumber) ? 
-				typeModels[type].asNumber($.attr(elem, 'value')) :
-				nan;
-		},
-		set: function(val){
-			var elem = this;
-			var type = getType(elem);
-			if(typeModels[type] && typeModels[type].numberToString){
-				//is NaN a number?
-				if(isNaN(val)){
-					$.attr(elem, 'value', '');
-					return;
-				}
-				var set = typeModels[type].numberToString(val);
-				if(set !==  false){
-					$.attr(elem, 'value', set);
+		prop: {
+			get: function(){
+				var elem = this;
+				var type = getType(elem);
+				return (typeModels[type] && typeModels[type].asNumber) ? 
+					typeModels[type].asNumber($.prop(elem, 'value')) :
+					nan;
+			},
+			set: function(val){
+				var elem = this;
+				var type = getType(elem);
+				if(typeModels[type] && typeModels[type].numberToString){
+					//is NaN a number?
+					if(isNaN(val)){
+						$.prop(elem, 'value', '');
+						return;
+					}
+					var set = typeModels[type].numberToString(val);
+					if(set !==  false){
+						$.prop(elem, 'value', set);
+					} else {
+						webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
+					}
 				} else {
-					webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
+					valueAsNumberDescriptor._supset && valueAsNumberDescriptor._supset.call(elem, arguments);
 				}
-			} else {
-				valueAsNumberDescriptor._supset && valueAsNumberDescriptor._supset.call(elem, arguments);
 			}
 		}
 	});
 	
 	var valueAsDateDescriptor = webshims.defineNodeNameProperty('input', 'valueAsDate', {
-		get: function(){
-			var elem = this;
-			var type = getType(elem);
-			return (typeModels[type] && typeModels[type].asDate && !typeModels[type].noAsDate) ? 
-				typeModels[type].asDate($.attr(elem, 'value')) :
-				valueAsDateDescriptor._supget && valueAsDateDescriptor._supget.call(elem);
-		},
-		set: function(value){
-			var elem = this;
-			var type = getType(elem);
-			if(typeModels[type] && typeModels[type].dateToString && !typeModels[type].noAsDate){
-				
-				if(value === null){
-					$.attr(elem, 'value', '');
-					return '';
-				}
-				var set = typeModels[type].dateToString(value);
-				if(set !== false){
-					$.attr(elem, 'value', set);
-					return set;
+		prop: {
+			get: function(){
+				var elem = this;
+				var type = getType(elem);
+				return (typeModels[type] && typeModels[type].asDate && !typeModels[type].noAsDate) ? 
+					typeModels[type].asDate($.prop(elem, 'value')) :
+					valueAsDateDescriptor._supget && valueAsDateDescriptor._supget.call(elem);
+			},
+			set: function(value){
+				var elem = this;
+				var type = getType(elem);
+				if(typeModels[type] && typeModels[type].dateToString && !typeModels[type].noAsDate){
+					
+					if(value === null){
+						$.prop(elem, 'value', '');
+						return '';
+					}
+					var set = typeModels[type].dateToString(value);
+					if(set !== false){
+						$.attr(elem, 'value', set);
+						return set;
+					} else {
+						webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
+					}
 				} else {
-					webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
+					return valueAsDateDescriptor._supset && valueAsDateDescriptor._supset(elem, arguments) || null;
 				}
-			} else {
-				return valueAsDateDescriptor._supset && valueAsDateDescriptor._supset(elem, arguments) || null;
 			}
 		}
 	});
@@ -416,7 +411,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	var isCheckValidity;
 	var replaceInputUI = function(context, elem){
 		$('input', context).add(elem.filter('input')).each(function(){
-			var type = $.attr(this, 'type');
+			var type = $.prop(this, 'type');
 			if(replaceInputUI[type]  && !$.data(this, 'inputUIReplace')){
 				replaceInputUI[type]($(this));
 			}
@@ -482,11 +477,13 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	if(Modernizr.formvalidation){
 		['input', 'form'].forEach(function(name){
 			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
-				value: function(){
-					isCheckValidity = true;
-					var ret = desc._supvalue.apply(this, arguments);
-					isCheckValidity = false;
-					return ret;
+				prop: {
+					value: function(){
+						isCheckValidity = true;
+						var ret = desc.prop._supvalue.apply(this, arguments);
+						isCheckValidity = false;
+						return ret;
+					}
 				}
 			});
 		});
@@ -884,13 +881,13 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		cache = cache || {};
 		
 		if( !('type' in cache) ){
-			cache.type = $.attr(input, 'type');
+			cache.type = $.prop(input, 'type');
 		}
 		if( !('step' in cache) ){
 			cache.step = webshims.getStep(input, cache.type);
 		}
 		if( !('valueAsNumber' in cache) ){
-			cache.valueAsNumber = typeModels[cache.type].asNumber($.attr(input, 'value'));
+			cache.valueAsNumber = typeModels[cache.type].asNumber($.prop(input, 'value'));
 		}
 		var delta = (cache.step == 'any') ? typeModels[cache.type].step * typeModels[cache.type].stepScaleFactor : cache.step,
 			ret
@@ -922,7 +919,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	
 	var doSteps = function(input, type, control){
 		if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
-		$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
+		$.prop(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
 		$(input).unbind('blur.stepeventshim');
 		triggerInlineForm(input, 'input');
 		
@@ -967,7 +964,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		//ui for numeric values
 		if(options.stepArrows){
 			$('input', context).add(contextElem.filter('input')).each(function(){
-				var type = $.attr(this, 'type');
+				var type = $.prop(this, 'type');
 				if(!typeModels[type] || !typeModels[type].asNumber || !options.stepArrows || (options.stepArrows !== true && !options.stepArrows[type]) || $(this).hasClass('has-step-controls')){return;}
 				var elem = this;
 				var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
@@ -992,7 +989,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 					})
 					.bind(($.browser.msie) ? 'keydown' : 'keypress', function(e){
 						if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
-						$.attr(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
+						$.prop(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
 						triggerInlineForm(this, 'input');
 						return false;
 					})
