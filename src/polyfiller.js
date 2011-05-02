@@ -115,7 +115,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.6.2RC1',
+		version: '1.6.2',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
@@ -701,6 +701,9 @@
 		};
 	});
 	
+	if($.prop && $.fn.prop){
+		webshims.warn("webshims 1.6.x does not work with jQuery 1.6+. Please use webshims lib 1.7+");
+	}
 	
 	 
 	
