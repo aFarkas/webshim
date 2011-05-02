@@ -78,7 +78,9 @@ upcomming Release 1.6.2
 * improved UI for [type=range], [type=date], [type=datetime-local] and constraint validation
 * tweaked bgIframe support for IE6
 * added scriptloader adapter (removed own script loader, less [NIH](http://en.wikipedia.org/wiki/Not_Invented_Here))
-* removed valueAsDate for [type=datetime-local] (nice feature but Spec Violation)
+* removed valueAsDate for type=datetime-local (nice feature but Spec Violation)
+* willValidate is true outside of form-element
+* typofix [lukeholder](https://github.com/lukeholder)
 
 Release 1.6.1
 ----------

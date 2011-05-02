@@ -227,11 +227,12 @@ img.ui-datepicker-trigger {
 	font-size: 0 !important;
 }
 .input-range .ui-slider-handle {
+	top: 0;
 	position: absolute;
 	display: block;
 	z-index: 10;
 	overflow: hidden;
-	margin: -7px 0 0 -8px;
+	margin: -8px 0 0 -8px;
 	height: 22px;
 	width: 17px;
 	background: url(forms.png) 0 0 no-repeat;

@@ -21,7 +21,11 @@
 			.each(function(){
 				var headers = $('h3.button', this);
 				var selected = (hash) ? headers.filter('[id="'+hash+'"]') : 0;
-				if(selected[0]){
+				if(selected && selected[0]){
+					var selElem = selected[0];
+					setTimeout(function(){
+						selElem.scrollIntoView();
+					}, 0);
 					selected = headers.index(selected[0]);
 				} 
 				$(this).accordion({

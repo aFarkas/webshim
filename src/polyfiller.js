@@ -112,10 +112,10 @@
 	})();
 	
 	
-	$.webshims = $.sub ? $.sub() : {};
+	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: 'pre1.6.2',
+		version: '1.6.2RC1',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,

@@ -2,7 +2,7 @@
 	if(navigator.geolocation){return;}
 	var domWrite = function(){
 			setTimeout(function(){
-				throw('document.write is overwritten by geolocation shim. This method is incompatibel with this plugin');
+				throw('document.write is overwritten by geolocation shim. This method is incompatible with this plugin');
 			}, 1);
 		},
 		id = 0

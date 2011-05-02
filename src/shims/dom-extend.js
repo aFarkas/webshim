@@ -53,16 +53,31 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	"use strict";
 	//shortcus
 	var modules = webshims.modules;
-	
-	var oldAttr = $.attr;
-	
+		
 	//proxying attribute
 	var olds = {};
 	var havePolyfill = {};
 	var extendedProps = {};
 	var extendQ = {};
-	
 	var modifyProps = {};
+	
+	var oldVal = $.fn.val;
+	var singleVal = function(val){
+		return (val === undefined) ? oldVal.call($(this)) : oldVal.call($(this), val);
+	};
+	$.fn.val = function(val){
+		var elem = this[0];
+		if(!arguments.length){
+			if(!elem || elem.nodeType !== 1){return oldVal.call(this);}
+			return $.prop(elem, 'value', val, 'val');
+		}
+		return this.each(function(){
+			if(this.nodeType === 1){
+				$.prop(this, 'value', val, 'val');
+			}
+		});
+	};
+	
 	
 	
 	['removeAttr', 'prop', 'attr'].forEach(function(type){
@@ -71,6 +86,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if( !elem || !havePolyfill[name] || elem.nodeType !== 1 || (pass && type == 'attr' && $.attrFn[name]) ){
 				return olds[type].apply(this, arguments);
 			}
+			var isVal = (pass == 'val');
+			var oldMethod = isVal ? olds[type] : singleVal;
 			var nodeName = (elem.nodeName || '').toLowerCase();
 			var desc = extendedProps[nodeName];
 			var curType = (type == 'attr' && (value === false || value === null)) ? 'removeAttr' : type;
@@ -105,7 +122,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					ret = propMethod.set.call(elem, value);
 				}
 			} else {
-				ret = olds[type](elem, name, value, pass);
+				ret = oldMethod(elem, name, value, pass);
 			}
 			if((value !== undefined || curType === 'removeAttr') && modifyProps[nodeName] && modifyProps[nodeName][name]){
 				var boolValue;
@@ -118,7 +135,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				}
 				
 				modifyProps[nodeName][name].forEach(function(fn){
-					fn.call(elem, value, boolValue, curType, type);
+					fn.call(elem, value, boolValue, (isVal) ? 'val' : curType, type);
 				});
 			}
 			return ret;
@@ -373,15 +390,17 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if(descs.initAttr){
 				initProp.content(nodeName, prop);
 			}
-			console.log(descs)
 			return descs;
 		},
 		
-		defineNodeNameProperties: function(name, descs, _noTmpCache){
+		defineNodeNameProperties: function(name, descs, propType, _noTmpCache){
 			
 			for(var prop in descs){
 				if(!_noTmpCache && descs[prop].initAttr){
 					initProp.createTmpCache(name);
+				}
+				if(propType){
+					descs[prop][proptype] = descs[prop];
 				}
 				descs[prop] = webshims.defineNodeNameProperty(name, prop, descs[prop]);
 			}
@@ -403,7 +422,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				initProp.createElement(nodeName, create.before);
 			}
 			if(descs){
-				ret = webshims.defineNodeNameProperties(nodeName, descs, true);
+				ret = webshims.defineNodeNameProperties(nodeName, descs, false, true);
 			}
 			if(create.after){
 				initProp.createElement(nodeName, create.after);
@@ -524,13 +543,13 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		defineNodeNamesProperties: 'defineNodeNameProperties',
 		createElements: 'createElement'
 	}, function(name, baseMethod){
-		webshims[name] = function(names, a, b){
+		webshims[name] = function(names, a, b, c){
 			if(typeof names == 'string'){
 				names = names.split(/\s*,\s*/);
 			}
 			var retDesc = {};
 			names.forEach(function(nodeName){
-				retDesc[nodeName] = webshims[baseMethod](nodeName, a, b);
+				retDesc[nodeName] = webshims[baseMethod](nodeName, a, b, c);
 			});
 			return retDesc;
 		}
