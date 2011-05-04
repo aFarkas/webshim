@@ -210,13 +210,14 @@ img.ui-datepicker-trigger {
 	position: relative;
 	display: inline-block;
 	vertical-align: middle;
+	margin: 5px 0;
 	zoom: 1;
 	border: none;
-	height: 4px;
+	height: 9px;
 	width: 155px;
 	border-radius: 1px;
 	-moz-border-radius: 1px;
-	background: url(forms.png) 0 100% no-repeat;
+	background: url(forms.png) 0 -43px no-repeat;
 	cursor: pointer;
 	font-size: 0;
 	line-height: 0;
@@ -232,7 +233,7 @@ img.ui-datepicker-trigger {
 	display: block;
 	z-index: 10;
 	overflow: hidden;
-	margin: -8px 0 0 -8px;
+	margin: -5px 0 0 -8px;
 	height: 22px;
 	width: 17px;
 	background: url(forms.png) 0 0 no-repeat;
