@@ -72,7 +72,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-upcomming Release 1.6.2
+Release 1.6.2
 ----------
 
 * improved UI for [type=range], [type=date], [type=datetime-local] and constraint validation

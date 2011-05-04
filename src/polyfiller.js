@@ -700,13 +700,7 @@
 			}
 		};
 	});
-	
-	if($.prop && $.fn.prop){
-		webshims.warn("webshims 1.6.x does not work with jQuery 1.6+. Please use webshims lib 1.7+");
-	}
-	
-	 
-	
+		
 	
 	//Overwrite DOM-Ready and implement a new ready-method
 	(function(){
@@ -864,7 +858,7 @@
 	/* change path $.webshims.modules[moduleName].src */
 	
 	addModule('jquery-ui', {
-		src: googleAPIs+'jqueryui/1.8.11/jquery-ui.min.js',
+		src: googleAPIs+'jqueryui/1.8.12/jquery-ui.min.js',
 		test: function(){return !!($.widget && $.Widget);}
 	});
 	
@@ -1057,7 +1051,7 @@
 			calculateWidth: true,
 			slider: {},
 			datepicker: {},
-			langSrc: googleAPIs+'jqueryui/1.8.11/i18n/jquery.ui.datepicker-',
+			langSrc: googleAPIs+'jqueryui/1.8.12/i18n/jquery.ui.datepicker-',
 			recalcWidth: true,
 			lazyDate: true
 //			,replaceUI: false

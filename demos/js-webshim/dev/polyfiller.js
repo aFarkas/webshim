@@ -34,7 +34,7 @@
 			}
 			//the form has to be connected in FF4
 			form.appendTo('head');
-			return !!($('input', form).attr('validationMessage'));
+			return !!($('input', form).prop('validationMessage'));
 		});
 		
 		addTest('output', function(){
@@ -112,7 +112,7 @@
 	})();
 	
 	
-	$.webshims = $.sub ? $.sub() : {};
+	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
 		version: '1.6.2',
@@ -317,7 +317,7 @@
 					ret
 				;
 				this.each(function(){
-					var fn = $.attr(this, name);
+					var fn = $.prop(this, name);
 					if(fn && fn.apply){
 						ret = fn.apply(this, args);
 						if(ret !== undefined){
@@ -700,13 +700,7 @@
 			}
 		};
 	});
-	
-	if($.prop && $.fn.prop){
-		webshims.warn("webshims 1.6.x does not work with jQuery 1.6+. Please use webshims lib 1.7+");
-	}
-	
-	 
-	
+		
 	
 	//Overwrite DOM-Ready and implement a new ready-method
 	(function(){
@@ -1024,23 +1018,7 @@
 		
 		addPolyfill('form-output-datalist', {
 			feature: 'forms',
-			test: function(){
-				var result = Modernizr.datalist && modernizrInputAttrs.list;
-				if(result && $(document.createElement('input')).attr('list') === null){
-					var oAttr = $.attr;
-					$.attr = function(elem, name, value){
-						if(name == 'list' && elem && (elem.nodeName || '').toLowerCase() == 'input' ){
-							if(value !== undefined){
-								elem.setAttribute(name, value);
-							} else {
-								return elem.getAttribute(name);
-							}
-						}
-						return oAttr.apply(this, arguments);
-					};
-				}
-				return Modernizr.output && result;
-			},
+			test: Modernizr.output && Modernizr.datalist && modernizrInputAttrs.list,
 			dependencies: ['dom-support']
 		});
 		

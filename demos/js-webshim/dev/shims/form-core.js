@@ -26,29 +26,29 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 	var rangeTypes = {number: 1, range: 1, date: 1, time: 1, 'datetime-local': 1, datetime: 1, month: 1, week: 1};
 	$.extend($.expr.filters, {
 		"valid-element": function(elem){
-			return !!($.attr(elem, 'willValidate') && ($.attr(elem, 'validity') || {valid: true}).valid);
+			return !!($.prop(elem, 'willValidate') && ($.prop(elem, 'validity') || {valid: true}).valid);
 		},
 		"invalid-element": function(elem){
-			return !!($.attr(elem, 'willValidate') && !isValid(elem));
+			return !!($.prop(elem, 'willValidate') && !isValid(elem));
 		},
 		"required-element": function(elem){
-			return !!($.attr(elem, 'willValidate') && $.attr(elem, 'required') === true);
+			return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required') === true);
 		},
 		"optional-element": function(elem){
-			return !!($.attr(elem, 'willValidate') && $.attr(elem, 'required') === false);
+			return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required') === false);
 		},
 		"in-range": function(elem){
-			if(!rangeTypes[$.attr(elem, 'type')] || !$.attr(elem, 'willValidate')){
+			if(!rangeTypes[$.prop(elem, 'type')] || !$.prop(elem, 'willValidate')){
 				return false;
 			}
-			var val = $.attr(elem, 'validity');
+			var val = $.prop(elem, 'validity');
 			return !!(val && !val.rangeOverflow && !val.rangeUnderflow);
 		},
 		"out-of-range": function(elem){
-			if(!rangeTypes[$.attr(elem, 'type')] || !$.attr(elem, 'willValidate')){
+			if(!rangeTypes[$.prop(elem, 'type')] || !$.prop(elem, 'willValidate')){
 				return false;
 			}
-			var val = $.attr(elem, 'validity');
+			var val = $.prop(elem, 'validity');
 			return !!(val && (val.rangeOverflow || val.rangeUnderflow));
 		}
 		
@@ -59,15 +59,15 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 	});
 	
 	var isValid = function(elem){
-		return ($.attr(elem, 'validity') || {valid: true}).valid;
+		return ($.prop(elem, 'validity') || {valid: true}).valid;
 	};
 	
 	
 	//ToDo needs testing
-	var oldAttr = $.attr;
+	var oldAttr = $.prop;
 	var changeVals = {selectedIndex: 1, value: 1, checked: 1, disabled: 1, readonly: 1};
 	var stopUIRefresh;
-	$.attr = function(elem, name, val){
+	$.prop = function(elem, name, val){
 		if(elem && 'form' in elem && changeVals[name] && val !== undefined && $(elem).hasClass('form-ui-invalid')){
 			var ret = oldAttr.apply(this, arguments);
 			if(isValid(elem)){
@@ -84,7 +84,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 		if(stopUIRefresh || !e.target || !e.target.form || e.target.type == 'submit'){return;}
 		
 		var elem = ($.data(e.target, 'html5element') || [])[0] || e.target;
-		if(!$.attr(elem, 'willValidate')){
+		if(!$.prop(elem, 'willValidate')){
 			getVisual(elem).removeClass('form-ui-invalid form-ui-valid');
 			return;
 		}
@@ -211,7 +211,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 				}, 10);
 			},
 			getMessage: function(elem, message){
-				$('> span.va-box', errorBubble).text(message || elem.attr('x-moz-errormessage') || elem.attr('data-errormessage') || elem.attr('validationMessage'));
+				$('> span.va-box', errorBubble).text(message || elem.attr('x-moz-errormessage') || elem.attr('data-errormessage') || elem.prop('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
@@ -301,7 +301,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 			$(document).bind('firstinvalid', function(e){
 				if(!e.isInvalidUIPrevented()){
 					e.preventDefault();
-					$.webshims.validityAlert.showFor( e.target, $(e.target).attr('customValidationMessage') ); 
+					$.webshims.validityAlert.showFor( e.target, $(e.target).prop('customValidationMessage') ); 
 				}
 			});
 		});
@@ -342,7 +342,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 		['date', 'time', 'datetime-local'].forEach(function(type){
 			validityMessages['en'].rangeOverflow[type] = 'Value must be at or before {%max}.';
 		});
-		['select-one', 'radio'].forEach(function(type){
+		['select', 'radio'].forEach(function(type){
 			validityMessages['en'].valueMissing[type] = 'Please select an option.';
 		});
 		
@@ -380,7 +380,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 		['date', 'time', 'datetime-local'].forEach(function(type){
 			validityMessages['de'].rangeOverflow[type] = '{%value} ist zu spät. {%max} ist die späteste Zeit, die Sie benutzen können.';
 		});
-		['select-one', 'radio'].forEach(function(type){
+		['select', 'radio'].forEach(function(type){
 			validityMessages['de'].valueMissing[type] = 'Bitte wählen Sie eine Option aus';
 		});
 		
@@ -394,7 +394,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 		webshims.createValidationMessage = function(elem, name){
 			var message = currentValidationMessage[name];
 			if(message && typeof message !== 'string'){
-				message = message[ (elem.getAttribute('type') || '').toLowerCase() || elem.type || 'defaultMessage' ] || message.defaultMessage;
+				message = message[ $.prop(elem, 'type') || (elem.nodeName || '').toLowerCase() || 'defaultMessage' ];
 			}
 			if(message){
 				['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
@@ -413,43 +413,57 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 		if((!window.noHTMLExtFixes && !Modernizr.validationmessage) || !Modernizr.formvalidation){
 			implementProperties.push('validationMessage');
 		}
-		jQuery.webshims.ready('dom-support', function($, webshims, window, doc, undefined){
+		webshims.ready('dom-support', function($, webshims, window, doc, undefined){
 			implementProperties.forEach(function(messageProp){
 				['input', 'select', 'textarea', 'fieldset', 'output', 'button'].forEach(function(nodeName){
 					var desc = webshims.defineNodeNameProperty(nodeName, messageProp, {
-						get: function(){
-							var elem = this;
-							var message = '';
-							if(!$.attr(elem, 'willValidate')){
-								return message;
-							}
-							
-							var validity = $.attr(elem, 'validity') || {valid: 1};
-							
-							if(validity.valid){return message;}
-							message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
-							
-							if(message){return message;}
-							
-							if(validity.customError && elem.nodeName){
-								message = (Modernizr.validationmessage && desc._supget) ? desc._supget.call(elem) : $.data(elem, 'customvalidationMessage');
-								if(message){return message;}
-							}
-							$.each(validity, function(name, prop){
-								if(name == 'valid' || !prop){return;}
-								
-								message = webshims.createValidationMessage(elem, name);
-								if(message){
-									return false;
+						prop: {
+							get: function(){
+								var elem = this;
+								var message = '';
+								if(!$.prop(elem, 'willValidate')){
+									return message;
 								}
-							});
-							return message || '';
-						},
-						set: $.noop
+								
+								var validity = $.prop(elem, 'validity') || {valid: 1};
+								
+								if(validity.valid){return message;}
+								message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
+								
+								if(message){return message;}
+								
+								if(validity.customError && elem.nodeName){
+									message = (Modernizr.validationmessage && desc.prop._supget) ? desc.prop._supget.call(elem) : $.data(elem, 'customvalidationMessage');
+									if(message){return message;}
+								}
+								$.each(validity, function(name, prop){
+									if(name == 'valid' || !prop){return;}
+									
+									message = webshims.createValidationMessage(elem, name);
+									if(message){
+										return false;
+									}
+								});
+								return message || '';
+							},
+							writeable: false
+						}
 					});
 				});
 				
 			});
+			
+			// add support for new input-types
+			webshims.defineNodeNameProperty('input', 'type', {
+				prop: {
+					get: function(){
+						var elem = this;
+						var type = (elem.getAttribute('type') || '').toLowerCase();
+						return (webshims.inputTypes[type]) ? type : elem.type;
+					}
+				}
+			});
+			
 		});
 	})();
 });

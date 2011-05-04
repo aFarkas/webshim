@@ -197,7 +197,7 @@ webshims.defineNodeNamesProperties(['button', 'fieldset', 'output'], {
 			return $.extend({}, validityPrototype);
 		}
 	}
-});
+}, 'prop');
 
 
 
@@ -299,7 +299,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 			return validityState;
 		}
 	}
-});
+}, 'prop');
 
 webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
 	set: function(value){

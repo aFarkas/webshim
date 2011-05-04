@@ -25,29 +25,27 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		return ret;
 	});
 	
-	var overrideNativeMessages =options.overrideMessages;	
+	var overrideNativeMessages = options.overrideMessages;	
 	
 	var overrideValidity = (!Modernizr.requiredSelect || !Modernizr.input.valueAsDate || overrideNativeMessages);
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
-	var oldAttr = $.attr;
-	var oldVal = $.fn.val;
-	var validityChanger = (overrideNativeMessages)? {value: 1, checked: 1} : {value: 1};
+	
+	var validityChanger = (overrideNativeMessages)? ['value', 'checked'] : ['value'];
 	var validityElements = (overrideNativeMessages) ? ['textarea'] : [];
-	var checkTypes = {radio:1,checkbox:1};
 	var testValidity = function(elem, init){
-		if(!elem.form){return;}
+		if(!elem){return;}
 		var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
 		
 		if(!overrideNativeMessages){
 			if(!(!Modernizr.requiredSelect && type == 'select-one') && !typeModels[type]){return;}
 		}
 		
-		if(overrideNativeMessages && !init && checkTypes[type] && elem.name){
+		if(overrideNativeMessages && !init && type == 'radio' && elem.name){
 			$(doc.getElementsByName( elem.name )).each(function(){
-				$.attr(this, 'validity');
+				$.prop(this, 'validity');
 			});
 		} else {
-			$.attr(elem, 'validity');
+			$.prop(elem, 'validity');
 		}
 	};
 	
@@ -71,20 +69,16 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		oldSetCustomValidity[name] = desc.prop._supvalue;
 	});
 		
-	if((!window.noHTMLExtFixes && !Modernizr.requiredSelect) || overrideNativeMessages){
-		$.extend(validityChanger, {
-			required: 1,
-			size: 1,
-			multiple: 1,
-			selectedIndex: 1
-		});
-		validityElements.push('select');
-	}
+	
 	if(!Modernizr.input.valueAsNumber || overrideNativeMessages){
-		$.extend(validityChanger, {
-			min: 1, max: 1, step: 1
-		});
+		validityChanger.push('min');
+		validityChanger.push('max');
+		validityChanger.push('step');
 		validityElements.push('input');
+		if(overrideNativeMessages){
+			validityChanger.push('required');
+			validityElements.push('select');
+		}
 	}
 	
 	if(overrideValidity){
@@ -161,23 +155,11 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 			});
 		});
 							
-		$.fn.val = function(val){
-			var ret = oldVal.apply(this, arguments);
-			if(val !== undefined){
-				this.each(function(){
-					testValidity(this);
-				});
-			}
-			return ret;
-		};
-		
-		$.attr = function(elem, prop, value){
-			var ret = oldAttr.apply(this, arguments);
-			if(validityChanger[prop] && value !== undefined && elem.form){
-				testValidity(elem);
-			}
-			return ret;
-		};
+		validityChanger.forEach(function(prop){
+			webshims.onNodeNamesPropertyModify(validityElements, prop, function(){
+				testValidity(this);
+			});
+		});
 		
 		if(doc.addEventListener){
 			doc.addEventListener('change', function(e){

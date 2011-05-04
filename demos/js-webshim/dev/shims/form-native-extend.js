@@ -54,19 +54,21 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 	var oldSetCustomValidity = {};
 	['input', 'textarea', 'select'].forEach(function(name){
 		var desc = webshims.defineNodeNameProperty(name, 'setCustomValidity', {
-			value: function(error){
-				error = error+'';
-				desc._supvalue.call(this, error);
-				if(!Modernizr.validationmessage){
-					$.data(this, 'customvalidationMessage', error);
-				}
-				if(overrideValidity){
-					$.data(this, 'hasCustomError', !!(error));
-					testValidity(this);
+			prop: {
+				value: function(error){
+					error = error+'';
+					desc.prop._supvalue.call(this, error);
+					if(!Modernizr.validationmessage){
+						$.data(this, 'customvalidationMessage', error);
+					}
+					if(overrideValidity){
+						$.data(this, 'hasCustomError', !!(error));
+						testValidity(this);
+					}
 				}
 			}
 		});
-		oldSetCustomValidity[name] = desc._supvalue;
+		oldSetCustomValidity[name] = desc.prop._supvalue;
 	});
 		
 	if((!window.noHTMLExtFixes && !Modernizr.requiredSelect) || overrideNativeMessages){
@@ -90,70 +92,72 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		validityElements.forEach(function(nodeName){
 			
 			var oldDesc = webshims.defineNodeNameProperty(nodeName, 'validity', {
-				get: function(){
-					var elem = this;
-					var validity = oldDesc._supget.call(this);
-					if(!validity){
-						return validity;
-					}
-					var validityState = {};
-					validityProps.forEach(function(prop){
-						validityState[prop] = validity[prop];
-					});
-					
-					if( !$.attr(elem, 'willValidate') ){
-						return validityState;
-					}
-					var jElm 			= $(elem),
-						cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
-						val				= oldVal.call(jElm),
-						customError 	= !!($.data(elem, 'hasCustomError')),
-						setCustomMessage
-					;
-					
-					validityState.customError = customError;
-										
-					if( validityState.valid && validityState.customError ){
-						validityState.valid = false;
-					} else if(!validityState.valid) {
-						var allFalse = true;
-						$.each(validityState, function(name, prop){
-							if(prop){
-								allFalse = false;
-								return false;
-							}
+				prop: {
+					get: function(){
+						var elem = this;
+						var validity = oldDesc._supget.call(this);
+						if(!validity){
+							return validity;
+						}
+						var validityState = {};
+						validityProps.forEach(function(prop){
+							validityState[prop] = validity[prop];
 						});
 						
-						if(allFalse){
-							validityState.valid = true;
+						if( !$.attr(elem, 'willValidate') ){
+							return validityState;
 						}
+						var jElm 			= $(elem),
+							cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
+							val				= oldVal.call(jElm),
+							customError 	= !!($.data(elem, 'hasCustomError')),
+							setCustomMessage
+						;
 						
-					}
-					
-					$.each(validityRules, function(rule, fn){
-						validityState[rule] = fn(jElm, val, cache, validityState);
-						
-						if( validityState[rule] && (validityState.valid || !setCustomMessage) ) {
-							oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, rule));
+						validityState.customError = customError;
+											
+						if( validityState.valid && validityState.customError ){
 							validityState.valid = false;
-							setCustomMessage = true;
+						} else if(!validityState.valid) {
+							var allFalse = true;
+							$.each(validityState, function(name, prop){
+								if(prop){
+									allFalse = false;
+									return false;
+								}
+							});
+							
+							if(allFalse){
+								validityState.valid = true;
+							}
+							
 						}
-					});
-					if(validityState.valid){
-						oldSetCustomValidity[nodeName].call(elem, '');
-						$.data(elem, 'hasCustomError', false);
-					} else if(overrideNativeMessages && !setCustomMessage && !customError){
-						$.each(validityState, function(name, prop){
-							if(name !== 'valid' && prop){
-								oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, name));
-								return false;
+						
+						$.each(validityRules, function(rule, fn){
+							validityState[rule] = fn(jElm, val, cache, validityState);
+							
+							if( validityState[rule] && (validityState.valid || !setCustomMessage) ) {
+								oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, rule));
+								validityState.valid = false;
+								setCustomMessage = true;
 							}
 						});
-					}
-					return validityState;
-				},
-				set: $.noop
-				
+						if(validityState.valid){
+							oldSetCustomValidity[nodeName].call(elem, '');
+							$.data(elem, 'hasCustomError', false);
+						} else if(overrideNativeMessages && !setCustomMessage && !customError){
+							$.each(validityState, function(name, prop){
+								if(name !== 'valid' && prop){
+									oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, name));
+									return false;
+								}
+							});
+						}
+						return validityState;
+					},
+					writeable: false
+					
+				}
 			});
 		});
 							

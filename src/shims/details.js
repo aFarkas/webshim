@@ -29,7 +29,7 @@ jQuery.webshims.register('details', function($, webshims, window, doc, undefined
 				}
 			}
 			$.data(details[0], 'summaryElement', summary);
-			details.attr('open', details.attr('open'));
+			details.prop('open', details.prop('open'));
 		}
 	};
 	var getSummary = function(details){
@@ -96,11 +96,12 @@ jQuery.webshims.register('details', function($, webshims, window, doc, undefined
 	webshims.createElement('details', function(){
 		initDetails = true;
 		var summary = getSummary(this);
-		$.attr(this, 'open', $.attr(this, 'open'));
+		$.prop(this, 'open', $.prop(this, 'open'));
 		initDetails = false;
 	}, {
 		'open':{
 			set: function(val){
+				
 				var summary = $($.data(this, 'summaryElement'));
 				if(!summary){return;}
 				var action = (val) ? 'removeClass' : 'addClass';
