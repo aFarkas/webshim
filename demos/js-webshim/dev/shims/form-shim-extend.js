@@ -337,7 +337,13 @@ webshims.addReady(function(context, contextElem){
 	;
 	
 	setTimeout(function(){
-		if (!document.activeElement || !document.activeElement.form) {
+		try {
+			if (document.activeElement && 'form' in document.activeElement) {
+				return;
+			}
+		} catch(er){
+			return;
+		}
 			var first = true;
 			$('input, select, textarea', form).each(function(i){
 				if(!first){return false;}
@@ -352,7 +358,7 @@ webshims.addReady(function(context, contextElem){
 					focusElem[0].focus();
 				} catch (e) {}
 			});
-		}
+		
 	}, 0);
 	
 });
