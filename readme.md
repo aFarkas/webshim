@@ -72,6 +72,12 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+upcomming Release 1.7
+----------
+
+* compaibility with jQuery 1.6.x
+* support for $.fn.prop/$.fn.removeAttr
+
 Release 1.6.2
 ----------
 

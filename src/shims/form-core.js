@@ -6,7 +6,7 @@ jQuery.webshims.gcEval = function(){
 		}
 	}
 };
-jQuery.webshims.register('form-core', function($, webshims, window, doc, undefined, options){
+jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 	webshims.getVisualInput = function(elem){
 		elem = $(elem);
@@ -17,7 +17,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 	var emptyJ = $([]);
 	var getGroupElements = function(elem){
 		elem = $(elem);
-		return (groupTypes[elem[0].type] && elem[0].name) ? $(doc.getElementsByName(elem[0].name)).not(elem[0]) : emptyJ;
+		return (groupTypes[elem[0].type] && elem[0].name) ? $(document.getElementsByName(elem[0].name)).not(elem[0]) : emptyJ;
 	};
 	
 	/*
@@ -81,7 +81,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 		return oldAttr.apply(this, arguments);
 	};
 	$(document).bind('focusout change refreshValidityStyle', function(e){
-		if(stopUIRefresh || !e.target || !e.target.form || e.target.type == 'submit'){return;}
+		if(stopUIRefresh || !e.target || e.target.type == 'submit'){return;}
 		
 		var elem = ($.data(e.target, 'html5element') || [])[0] || e.target;
 		if(!$.prop(elem, 'willValidate')){
@@ -135,9 +135,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 	
 	
 	var setRoot = function(){
-		webshims.scrollRoot = ($.browser.webkit || doc.compatMode == 'BackCompat') ?
-			$(doc.body) : 
-			$(doc.documentElement)
+		webshims.scrollRoot = ($.browser.webkit || document.compatMode == 'BackCompat') ?
+			$(document.body) : 
+			$(document.documentElement)
 		;
 	};
 	setRoot();
@@ -207,7 +207,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 					}, 0);
 				}
 				setTimeout(function(){
-					$(doc).bind('focusout.validityalert', boundHide);
+					$(document).bind('focusout.validityalert', boundHide);
 				}, 10);
 			},
 			getMessage: function(elem, message){
@@ -231,7 +231,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 			clear: function(){
 				clearTimeout(focusTimer);
 				clearTimeout(hideTimer);
-				$(doc).unbind('focusout.validityalert');
+				$(document).unbind('focusout.validityalert');
 				errorBubble.stop().removeAttr('for');
 			},
 			errorBubble: $('<'+alertElem+' class="validity-alert" role="alert"><span class="va-arrow"><span class="va-arrow-box"></span></span><span class="va-box"></span></'+alertElem+'>').css({position: 'absolute', display: 'none'})
@@ -385,7 +385,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 		});
 		
 		var currentValidationMessage =  validityMessages[''];
-		$(doc).bind('webshimLocalizationReady', function(){
+		$(document).bind('webshimLocalizationReady', function(){
 			webshims.activeLang(validityMessages, 'form-core', function(langObj){
 				currentValidationMessage = langObj;
 			});
@@ -413,7 +413,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 		if((!window.noHTMLExtFixes && !Modernizr.validationmessage) || !Modernizr.formvalidation){
 			implementProperties.push('validationMessage');
 		}
-		webshims.ready('dom-support', function($, webshims, window, doc, undefined){
+		webshims.ready('dom-support', function($, webshims, window, document, undefined){
 			implementProperties.forEach(function(messageProp){
 				['input', 'select', 'textarea', 'fieldset', 'output', 'button'].forEach(function(nodeName){
 					var desc = webshims.defineNodeNameProperty(nodeName, messageProp, {

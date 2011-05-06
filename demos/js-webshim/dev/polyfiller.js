@@ -858,7 +858,7 @@
 	/* change path $.webshims.modules[moduleName].src */
 	
 	addModule('jquery-ui', {
-		src: googleAPIs+'jqueryui/1.8.11/jquery-ui.min.js',
+		src: googleAPIs+'jqueryui/1.8.12/jquery-ui.min.js',
 		test: function(){return !!($.widget && $.Widget);}
 	});
 	
@@ -1051,7 +1051,7 @@
 			calculateWidth: true,
 			slider: {},
 			datepicker: {},
-			langSrc: googleAPIs+'jqueryui/1.8.11/i18n/jquery.ui.datepicker-',
+			langSrc: googleAPIs+'jqueryui/1.8.12/i18n/jquery.ui.datepicker-',
 			recalcWidth: true,
 			lazyDate: true
 //			,replaceUI: false

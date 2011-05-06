@@ -136,30 +136,34 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		if(!badWebkit){return;}
 		['input', 'textarea', 'select'].forEach(function(name){
 			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
-				value: function(){
-					if(!this.willValidate){return true;}
-					var valid = ($.attr(this, 'validity') || {valid: true}).valid;
-					fromCheckValidity = true;
-					if(!valid && desc._supvalue && desc._supvalue.call(this)){
-						$(this).trigger('invalid');
+				prop: {
+					value: function(){
+						if(!this.willValidate){return true;}
+						var valid = ($.attr(this, 'validity') || {valid: true}).valid;
+						fromCheckValidity = true;
+						if(!valid && desc._supvalue && desc._supvalue.call(this)){
+							$(this).trigger('invalid');
+						}
+						fromCheckValidity = false;
+						return valid;
 					}
-					fromCheckValidity = false;
-					return valid;
 				}
 			});
 		});
 		
 		webshims.defineNodeNameProperty('form', 'checkValidity', {
-			value: function(){
-				var ret = true;
-				$(this.elements || [])
-					.each(function(){
-						 if($(this).checkValidity() === false){
-							ret = false;
-						}
-					})
-				;
-				return ret;
+			prop: {
+				value: function(){
+					var ret = true;
+					$(this.elements || [])
+						.each(function(){
+							 if($(this).checkValidity() === false){
+								ret = false;
+							}
+						})
+					;
+					return ret;
+				}
 			}
 		});
 		
@@ -173,17 +177,19 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		
 		['form', 'input', 'textarea', 'select'].forEach(function(name){
 			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
-				value: function(){
-					if(!fromSubmit){
-						$(this).bind('invalid', preventDefault);
+				prop: {
+					value: function(){
+						if(!fromSubmit){
+							$(this).bind('invalid', preventDefault);
+						}
+						fromCheckValidity = true;
+						var ret = desc._supvalue.apply(this, arguments);
+						if(!fromSubmit){
+							$(this).unbind('invalid', preventDefault);
+						}
+						fromCheckValidity = false;
+						return ret;
 					}
-					fromCheckValidity = true;
-					var ret = desc._supvalue.apply(this, arguments);
-					if(!fromSubmit){
-						$(this).unbind('invalid', preventDefault);
-					}
-					fromCheckValidity = false;
-					return ret;
 				}
 			});
 		});
@@ -215,7 +221,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 			webshims.defineNodeNamesBooleanProperty(['select'], 'required', {
 				set: function(value){
 					this.setAttribute('aria-required', (value) ? 'true' : 'false');
-					$.attr(this, 'validity');
+					$.prop(this, 'validity');
 				},
 				initAttr: true
 			});
