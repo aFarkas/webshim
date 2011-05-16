@@ -117,6 +117,13 @@
 			left: auto;
 			top: auto;
 		}
+		.htc-test {
+			width: 100px;
+			height: 100px;
+			border: 1px solid #f0f;
+			behavior: url(test-ext/crash.htc);
+			border-radius: 10px;
+		}
 	</style>
 </head>
 <body class="flora">
@@ -138,7 +145,7 @@
 	<canvas></canvas>
 </div>
 <div id="qunit-fixture">
-	
+	<div class="htc-test"></div>
 	<div class="form-wrapper">
 		<input type="email" id="email-outside" name="email-outside" value="ddd" />
 	    <form id="form-1" action="" method="post">
