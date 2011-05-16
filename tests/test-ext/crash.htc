@@ -1,0 +1,7 @@
+
+<PUBLIC:COMPONENT lightWeight="true">
+
+<script type="text/javascript">
+var doc = element.document;
+</script>
+</PUBLIC:COMPONENT>

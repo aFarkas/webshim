@@ -212,13 +212,15 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		};
 	})();
 	
+	//see also: https://github.com/lojjic/PIE/issues/40 | https://prototype.lighthouseapp.com/projects/8886/tickets/1107-ie8-fatal-crash-when-prototypejs-is-loaded-with-rounded-cornershtc
+	var isExtendNativeSave = (!$.browser.msie || parseInt($.browser.version, 10) > 8);
 	var extendNativeValue = (function(){
 		var UNKNOWN = webshims.getPrototypeOf(document.createElement('foobar'));
 		var has = Object.prototype.hasOwnProperty;
 		return function(nodeName, prop, desc){
 			var elem = document.createElement(nodeName);
 			var elemProto = webshims.getPrototypeOf(elem);
-			if( elemProto && UNKNOWN !== elemProto && ( !elem[prop] || !has.call(elem, prop) ) ){
+			if( isExtendNativeSave && elemProto && UNKNOWN !== elemProto && ( !elem[prop] || !has.call(elem, prop) ) ){
 				var sup = elem[prop];
 				desc._supvalue = function(){
 					if(sup && sup.apply){
