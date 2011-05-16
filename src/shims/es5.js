@@ -120,18 +120,6 @@ if((!Modernizr.advancedObjectProperties || !Object.create || !Object.definePrope
 	shims.defineProperty = function(proto, property, descriptor){
 		if(typeof descriptor != "object"){return proto;}
 		
-		
-		if(Object.defineProperty){
-			for(var i = 0; i < 3; i++){
-				if(!(descProps[i] in descriptor) && (descProps[i] !== 'writable' || descriptor.value !== undefined)){
-					descriptor[descProps[i]] = true;
-				}
-			}
-			try{
-				Object.defineProperty(proto, property, descriptor);
-				return;
-			} catch(e){}
-		}
 		if(has.call(descriptor, "value")){
 			proto[property] = descriptor.value;
 			return proto;

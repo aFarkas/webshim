@@ -383,20 +383,10 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 		polyfillElements.push('input');
 	}
 	
-	var addUnload = function(fn){
-		var old = window.onbeforeunload;
-		window.onbeforeunload = function(){
-			fn.apply(this, arguments);
-			if(old && old.apply){
-				old.apply(this, arguments);
-			}
-			window.onbeforeunload = null;
-		};
-	};
 	var hidePlaceholder = function(elem, data, value){
 			if(!isOver && elem.type != 'password'){
 				if(value === false){
-					value = $.attr(elem, 'value');
+					value = $.prop(elem, 'value');
 				}
 				elem.value = value;
 			}
@@ -424,7 +414,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 				return;
 			}
 			if(value === false){
-				value = $.attr(elem, 'value');
+				value = $.prop(elem, 'value');
 			}
 			if(value){
 				hidePlaceholder(elem, data, value);
@@ -441,7 +431,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 		},
 		createPlaceholder = function(elem){
 			elem = $(elem);
-			var id 			= elem.attr('id'),
+			var id 			= elem.prop('id'),
 				hasLabel	= !!(elem.attr('title') || elem.attr('aria-labeledby')),
 				pHolderTxt
 			;
@@ -544,7 +534,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 							//ie always exposes last label and ff always first
 							data.text.hide()[$.browser.msie ? 'insertBefore' : 'insertAfter'](elem);
 						}
-						addUnload(reset);
+						$(window).bind('beforeunload', reset);
 						data.box = $(elem);
 						if(elem.form){
 							$(elem.form).submit(reset);
@@ -554,7 +544,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 					return data;
 				},
 				update: function(elem, val){
-					if(!allowedPlaceholder[$.attr(elem, 'type')] && !$.nodeName(elem, 'textarea')){return;}
+					if(!allowedPlaceholder[$.prop(elem, 'type')] && !$.nodeName(elem, 'textarea')){return;}
 					
 					var data = pHolder.create(elem);
 					
@@ -571,71 +561,44 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 	};
 	polyfillElements.forEach(function(nodeName){
 		var desc = webshims.defineNodeNameProperty(nodeName, 'placeholder', {
-			set: function(val){
-				var elem = this;
-				webshims.contentAttr(elem, 'placeholder', val);
-				pHolder.update(elem, val);
+			attr: {
+				set: function(val){
+					var elem = this;
+					webshims.contentAttr(elem, 'placeholder', val);
+					pHolder.update(elem, val);
+				},
+				get: function(){
+					return webshims.contentAttr(this, 'placeholder');
+				}
 			},
-			get: function(){
-				return webshims.contentAttr(this, 'placeholder') || '';
-			},
+			reflect: true,
 			initAttr: true
 		});
 	});
-			
+	
+	
 	polyfillElements.forEach(function(name){
-		var desc = webshims.defineNodeNameProperty(name, 'value', {
-			set: function(val){
-				var elem = this;
-				var placeholder = webshims.contentAttr(elem, 'placeholder');
-				if(placeholder && 'value' in elem){
-					changePlaceholderVisibility(elem, val, placeholder);
+		var placeholderValueDesc =  {};
+		var desc;
+		['attr', 'prop'].forEach(function(propType){
+			placeholderValueDesc[propType] = {
+				set: function(val){
+					var elem = this;
+					var placeholder = webshims.contentAttr(elem, 'placeholder');
+					var ret = desc[propType]._supset.call(elem, val);
+					if(placeholder && 'value' in elem){
+						changePlaceholderVisibility(elem, val, placeholder);
+					}
+					return ret;
+				},
+				get: function(){
+					var elem = this;
+					return $(elem).hasClass('placeholder-visible') ? '' : desc[propType]._supget.call(elem);
 				}
-				return desc._supset.call(elem, val);
-			},
-			get: function(){
-				var elem = this;
-				return $(elem).hasClass('placeholder-visible') ? '' : desc._supget.call(elem);
-			}
+			};
 		});
+		desc = webshims.defineNodeNameProperty(name, 'value', placeholderValueDesc);
 	});
 	
-	
-	
-	var oldVal = $.fn.val;
-	$.fn.val = function(val){
-		if(val !== undefined){
-			var process = (val === '') ? 
-				function(){
-					if( this.nodeType === 1 ){
-						var placeholder = this.getAttribute('placeholder');
-						if($.nodeName(this, 'select') || !placeholder){
-							oldVal.call($(this), '');
-							return;
-						}
-						if(placeholder && 'value' in this){
-							changePlaceholderVisibility(this, val, placeholder);
-						}
-						if(isOver || this.type == 'password'){
-							oldVal.call($(this), '');
-						}
-					}
-				} : 
-				function(){
-					if( this.nodeType === 1 ){
-						var placeholder = this.getAttribute('placeholder');
-						if(placeholder && 'value' in this){
-							changePlaceholderVisibility(this, val, placeholder);
-						}
-					}
-				}
-			;
-			this.each(process);
-			if(val === ''){return this;}
-		} else if(this[0] && this[0].nodeType == 1 && this.hasClass('placeholder-visible')) {
-			return '';
-		}
-		return oldVal.apply(this, arguments);
-	};
 });
 

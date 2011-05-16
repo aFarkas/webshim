@@ -13,7 +13,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return (elem.data('inputUIReplace') || {visual: elem}).visual;
 	};
 	var getVisual = webshims.getVisualInput;
-	var groupTypes = {checkbox: 1, radio: 1};
+	var groupTypes = {checkbox: 1};
+	var checkypes = {checkbox: 1, radio: 1};
 	var emptyJ = $([]);
 	var getGroupElements = function(elem){
 		elem = $(elem);
@@ -80,7 +81,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		}
 		return oldAttr.apply(this, arguments);
 	};
-	$(document).bind('focusout change refreshValidityStyle', function(e){
+	var switchValidityClass = function(e){
 		if(stopUIRefresh || !e.target || e.target.type == 'submit'){return;}
 		
 		var elem = ($.data(e.target, 'html5element') || [])[0] || e.target;
@@ -89,18 +90,20 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			return;
 		}
 		var addClass, removeClass;
+		$(e.target).unbind('input.form-ui-invalid');
 		if(isValid(e.target)){
 			addClass = 'form-ui-valid';
 			removeClass = 'form-ui-invalid';
-			if(groupTypes[e.target.type] && e.target.checked){
+			if(checkypes[e.target.type] && e.target.checked){
 				getGroupElements(elem).removeClass(removeClass).removeAttr('aria-invalid');
 			}
 		} else {
 			addClass = 'form-ui-invalid';
 			removeClass = 'form-ui-valid';
-			if(groupTypes[e.target.type] && !e.target.checked){
+			if(checkypes[e.target.type] && !e.target.checked){
 				getGroupElements(elem).removeClass(removeClass);
 			}
+			$(e.target).bind('input.form-ui-invalid', switchValidityClass);
 		}
 		
 		getVisual(elem).addClass(addClass).removeClass(removeClass);
@@ -109,7 +112,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		setTimeout(function(){
 			stopUIRefresh = false;
 		}, 9);
-	});
+	};
+	$(document).bind('change refreshvalidityui', switchValidityClass);
 	
 	
 	

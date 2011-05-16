@@ -62,14 +62,14 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	var modifyProps = {};
 	
 	var oldVal = $.fn.val;
-	var singleVal = function(val){
-		return (val === undefined) ? oldVal.call($(this)) : oldVal.call($(this), val);
+	var singleVal = function(elem, name, val, pass, _argless){
+		return (_argless) ? oldVal.call($(elem)) : oldVal.call($(elem), val);
 	};
 	$.fn.val = function(val){
 		var elem = this[0];
 		if(!arguments.length){
 			if(!elem || elem.nodeType !== 1){return oldVal.call(this);}
-			return $.prop(elem, 'value', val, 'val');
+			return $.prop(elem, 'value', val, 'val', true);
 		}
 		return this.each(function(){
 			if(this.nodeType === 1){
@@ -82,12 +82,13 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	
 	['removeAttr', 'prop', 'attr'].forEach(function(type){
 		olds[type] = $[type];
-		$[type] = function(elem, name, value, pass){
-			if( !elem || !havePolyfill[name] || elem.nodeType !== 1 || (pass && type == 'attr' && $.attrFn[name]) ){
-				return olds[type].apply(this, arguments);
-			}
+		$[type] = function(elem, name, value, pass, _argless){
 			var isVal = (pass == 'val');
-			var oldMethod = isVal ? olds[type] : singleVal;
+			var oldMethod = !isVal ? olds[type] : singleVal;
+			if( !elem || !havePolyfill[name] || elem.nodeType !== 1 || (!isVal && pass && type == 'attr' && $.attrFn[name]) ){
+				return oldMethod(elem, name, value, pass, _argless);
+			}
+			
 			var nodeName = (elem.nodeName || '').toLowerCase();
 			var desc = extendedProps[nodeName];
 			var curType = (type == 'attr' && (value === false || value === null)) ? 'removeAttr' : type;
@@ -122,9 +123,10 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					ret = propMethod.set.call(elem, value);
 				}
 			} else {
-				ret = oldMethod(elem, name, value, pass);
+				ret = oldMethod(elem, name, value, pass, _argless);
 			}
 			if((value !== undefined || curType === 'removeAttr') && modifyProps[nodeName] && modifyProps[nodeName][name]){
+				
 				var boolValue;
 				if(curType == 'removeAttr'){
 					boolValue = false;
@@ -135,7 +137,9 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				}
 				
 				modifyProps[nodeName][name].forEach(function(fn){
-					fn.call(elem, value, boolValue, (isVal) ? 'val' : curType, type);
+					if(!fn.only || (fn.only = 'prop' && type == 'prop') || (fn.only == 'attr' && type != 'prop')){
+						fn.call(elem, value, boolValue, (isVal) ? 'val' : curType, type);
+					}
 				});
 			}
 			return ret;
@@ -290,6 +294,19 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		};
 	})();
 		
+	var createPropDefault = function(descs){
+		if(descs.defaultValue === undefined){
+			descs.defaultValue = '';
+		}
+		if(!descs.removeAttr){
+			descs.removeAttr = {
+				value: function(){
+					descs.prop.set.call(this, descs.defaultValue);
+					descs.removeAttr._supvalue.call(this);
+				}
+			};
+		}
+	};
 	
 	$.extend(webshims, {
 
@@ -306,68 +323,98 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				return id;
 			};
 		})(),
+		
+		//http://www.w3.org/TR/html5/common-dom-interfaces.html#reflect
+		propTypes: {
+			standard: function(descs, name){
+				//ToDo
+				if(descs.prop){
+					webshims.log('override prop?');
+					return;
+				}
+				createPropDefault(descs);
+				descs.prop = {
+					set: function(val){
+						descs.attr.set.call(this, ''+val);
+					},
+					get: function(){
+						return descs.attr.get.call(this) || descs.defaultValue;
+					}
+				};
+				
+			},
+			"boolean": function(descs, name){
+				//ToDo
+				if(descs.prop){
+					webshims.log('override prop?');
+					return;
+				}
+				
+				createPropDefault(descs);
+				descs.prop = {
+					set: function(val){
+						if(val){
+							descs.attr.set.call(this, "");
+						} else {
+							descs.removeAttr.value.call(this);
+						}
+					},
+					get: function(){
+						return descs.attr.get.call(this) != null;
+					}
+				};
+			},
+			element: function(descs){
+				//ToDo
+				if(descs.prop){
+					webshims.log('override prop?');
+					return;
+				}
+				createPropDefault(descs);
+				descs.prop = {
+					get: function(){
+						var elem = descs.attr.get.call(this);
+						if(elem){
+							elem = $('#'+elem)[0];
+							if(elem && descs.propNodeName && !$.nodeName(elem, descs.propNodeName)){
+								elem = null;
+							}
+						}
+						return elem[0] || null;
+					},
+					writeable: false
+				};
+			}
+//			,url: (function(){
+//				var anchor = document.createElement('a');
+//				return function(descs){
+//					descs.prop = {
+//						set: function(val){
+//							descs.attr.set.call(this, "" + val);
+//						},
+//						get: function(){
+//							var tmpanchor = (this.ownerDocument === document) ? anchor : this.ownerDocument.createElement('a');
+//							tmpanchor.setAttribute('href', descs.attr.get.call(this));
+//							return tmpanchor[0];
+//						}
+//					};
+//				};
+//			})()
+//			,enumarated: $.noop
+//			,unsignedLong: $.noop
+//			,"doubble": $.noop
+//			,"long": $.noop
+//			,tokenlist: $.noop
+//			,settableTokenlist: $.noop
+		},
+		
 		defineNodeNameProperty: function(nodeName, prop, descs){
 			havePolyfill[prop] = true;
 			if(descs.get || descs.value){
 				webshims.warn(nodeName +'['+ prop +']'+ 'old API');
 			}
-			if(descs.isBoolean){
-				$.extend(descs, {
-					attr: {
-						set: function(val){
-							descs.attr._supset.call(this, val);
-							if(descs.set){
-								descs.set.call(this, true);
-							}
-						}
-					},
-					prop: {
-						set: function(val){
-							$.attr(this, prop, !!(val));
-						},
-						get: function(){
-							return $.attr(this, prop) != null;
-						}
-					},
-					removeAttr: {
-						value: function(){
-							descs.removeAttr._supvalue.call(this);
-							if(descs.set){
-								descs.set.call(this, false);
-							}
-						}
-					}
-				});
-			} else {
-				if(descs.set){
-					webshims.warn(nodeName +'['+ prop +']'+ 'old API');
-				}
-				$.each({reflectIDL: ['attr', 'prop'], reflectContent: ['prop', 'attr']}, function(name, methods){
-					if(descs[name]){
-						if(!descs[methods[0]]){
-							descs[methods[0]] = {};
-						}
-						if(!descs[methods[0]].set){
-							descs[methods[0]].set = function(){
-								return descs[methods[1]].set.apply(this, arguments);
-							};
-						}
-						if(!descs[methods[0]].get){
-							descs[methods[0]].get = function(){
-								return descs[methods[1]].get.apply(this, arguments);
-							};
-						}
-						if(descs.defaultValue !== undefined && !descs.removeAttr && name == 'reflectIDL'){
-							descs.removeAttr = {
-								value: function(){
-									var ret = descs.prop.set.call(this, descs.defaultValue);
-									descs.removeAttr._supvalue.call(this);
-									return ret;
-								}
-							};
-						}
-					}
-				});
+			if(descs.reflect){
+				webshims.propTypes[descs.propType || 'standard'](descs);
 			}
 			
 			['prop', 'attr', 'removeAttr'].forEach(function(type){
@@ -385,7 +432,6 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					}
 					descs[type] = desc;
 				}
-				
 			});
 			if(descs.initAttr){
 				initProp.content(nodeName, prop);
@@ -394,13 +440,23 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		},
 		
 		defineNodeNameProperties: function(name, descs, propType, _noTmpCache){
-			
+			var olddesc;
 			for(var prop in descs){
 				if(!_noTmpCache && descs[prop].initAttr){
 					initProp.createTmpCache(name);
 				}
 				if(propType){
-					descs[prop][proptype] = descs[prop];
+					if(descs[prop][propType]){
+						webshims.log('override: '+ name +'['+prop +'] for '+ propType);
+					} else {
+						descs[prop][propType] = {};
+						['value', 'set', 'get'].forEach(function(copyProp){
+							if(copyProp in descs[prop]){
+								descs[prop][propType] = descs[prop][copyProp];
+								delete descs[prop][copyProp];
+							}
+						});
+					}
 				}
 				descs[prop] = webshims.defineNodeNameProperty(name, prop, descs[prop]);
 			}
@@ -430,34 +486,72 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			initProp.flushTmpCache();
 			return ret;
 		},
-		onNodeNamesPropertyModify: function(nodeNames, prop, desc){
+		onNodeNamesPropertyModify: function(nodeNames, props, desc, only){
 			if(typeof nodeNames == 'string'){
 				nodeNames = nodeNames.split(/\s*,\s*/);
 			}
 			if($.isFunction(desc)){
 				desc = {set: desc};
 			}
+			
 			nodeNames.forEach(function(name){
 				if(!modifyProps[name]){
 					modifyProps[name] = {};
 				}
-				if(!modifyProps[name][prop]){
-					modifyProps[name][prop] = [];
+				if(typeof props == 'string'){
+					props = props.split(/\s*,\s*/);
 				}
-				if(desc.set){
-					modifyProps[name][prop].push(desc.set);
-				}
-				
 				if(desc.initAttr){
-					initProp.content(name, prop);
+					initProp.createTmpCache(name);
 				}
+				props.forEach(function(prop){
+					if(!modifyProps[name][prop]){
+						modifyProps[name][prop] = [];
+					}
+					if(desc.set){
+						if(only){
+							desc.set.only =  only;
+						}
+						modifyProps[name][prop].push(desc.set);
+					}
+					
+					if(desc.initAttr){
+						initProp.content(name, prop);
+					}
+				});
+				initProp.flushTmpCache();
 				
 			});
 		},
-		defineNodeNamesBooleanProperty: function(elementNames, prop, setDesc){
-			setDesc = setDesc || {};
-			setDesc.isBoolean = true;
-			webshims.defineNodeNamesProperty(elementNames, prop, setDesc);
+		defineNodeNamesBooleanProperty: function(elementNames, prop, descs){
+			if($.isFunction(descs)){
+				descs.set = descs;
+			}
+			webshims.defineNodeNamesProperty(elementNames, prop, {
+				attr: {
+					set: function(val){
+						this.setAttribute(prop, val);
+						if(descs.set){
+							descs.set.call(this, true);
+						}
+					},
+					get: function(){
+						var ret = this.getAttribute(prop);
+						return (ret == null) ? undefined : ret;
+					}
+				},
+				removeAttr: {
+					value: function(){
+						this.removeAttribute(prop);
+						if(descs.set){
+							descs.set.call(this, false);
+						}
+					}
+				},
+				reflect: true,
+				propType: 'boolean',
+				initAttr: descs.initAttr
+			});
 		},
 		contentAttr: function(elem, name, val){
 			if(!elem.nodeName){return;}

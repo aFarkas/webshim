@@ -11,7 +11,7 @@
 	var browserVersion = parseFloat($.browser.version, 10);
 	var Object = window.Object;
 	var defineProperty = 'defineProperty';
-	
+	var formvalidation = 'formvalidation';
 	
 	//new Modernizrtests
 	(function(){
@@ -20,7 +20,7 @@
 		var dateElem;
 		
 		//using hole modernizr api
-		addTest('formvalidation', function(){
+		addTest(formvalidation, function(){
 			return !!('checkValidity' in form[0]);
 		});
 		
@@ -29,7 +29,7 @@
 		});
 		
 		addTest('validationmessage', function(){
-			if(!Modernizr.formvalidation){
+			if(!Modernizr[formvalidation]){
 				return false;
 			}
 			//the form has to be connected in FF4
@@ -38,28 +38,27 @@
 		});
 		
 		addTest('output', function(){
-			return (Modernizr.formvalidation && 'value' in document.createElement('output'));
+			return (Modernizr[formvalidation] && 'value' in document.createElement('output'));
 		});
 		
 		addTest('details', function(){
 			return ('open' in document.createElement('details'));
 		});
 		
-		Modernizr.deprecatedSessionstorage = !!(Modernizr.sessionstorage && !('clear' in window.sessionStorage));
 		Modernizr.genericDOM =  !!($('<video><div></div></video>')[0].innerHTML);
 		
 		//using only property api
-		Modernizr.requiredSelect = !!(Modernizr.formvalidation && 'required' in $('select', form)[0]);
+		Modernizr.requiredSelect = !!(Modernizr[formvalidation] && 'required' in $('select', form)[0]);
 		
 		//bugfree means interactive formvalidation including correct submit-invalid event handling (this can't be detected, we can just guess)
-		Modernizr.bugfreeformvalidation = Modernizr.formvalidation && Modernizr.requiredSelect && Modernizr.validationmessage && (!$.browser.webkit || browserVersion > 534.19);
+		Modernizr.bugfreeformvalidation = Modernizr[formvalidation] && Modernizr.requiredSelect && Modernizr.validationmessage && (!$.browser.webkit || browserVersion > 534.19);
 		
 		
 		modernizrInputAttrs.valueAsNumber = false;
 		modernizrInputAttrs.valueAsNumberSet = false;
 		modernizrInputAttrs.valueAsDate = false;
 		
-		if(Modernizr.formvalidation){
+		if(Modernizr[formvalidation]){
 			dateElem = $('#date-input-test', form)[0];
 			modernizrInputAttrs.valueAsNumber = ('valueAsNumber' in  dateElem);
 			if(modernizrInputAttrs.valueAsNumber){
@@ -68,11 +67,9 @@
 			}
 			modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem);
 			dateElem = null;
-		}
-		
-		if(Modernizr.formvalidation){
 			form.remove();
 		}
+		
 		form = null;
 		
 		Modernizr.ES5base = !!(String.prototype.trim && Date.now && Date.prototype.toISOString);
@@ -996,7 +993,7 @@
 		methodNames: ['setCustomValidity','checkValidity']
 	});
 			
-	if(Modernizr.formvalidation){
+	if(Modernizr[formvalidation]){
 		//create delegatable-like events
 		webshims.capturingEvents(['input']);
 		webshims.capturingEvents(['invalid'], true);

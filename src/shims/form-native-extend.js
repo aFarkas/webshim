@@ -82,14 +82,17 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 	}
 	
 	if(overrideValidity){
-		
+		var stopValidity;
 		validityElements.forEach(function(nodeName){
 			
 			var oldDesc = webshims.defineNodeNameProperty(nodeName, 'validity', {
 				prop: {
 					get: function(){
+						if(stopValidity){return;}
 						var elem = this;
-						var validity = oldDesc._supget.call(this);
+						
+						var validity = oldDesc.prop._supget.call(this);
+						
 						if(!validity){
 							return validity;
 						}
@@ -98,16 +101,17 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 							validityState[prop] = validity[prop];
 						});
 						
-						if( !$.attr(elem, 'willValidate') ){
+						if( !$.prop(elem, 'willValidate') ){
 							return validityState;
 						}
+						stopValidity = true;
 						var jElm 			= $(elem),
 							cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
-							val				= oldVal.call(jElm),
+							val				= jElm.val(),
 							customError 	= !!($.data(elem, 'hasCustomError')),
 							setCustomMessage
 						;
-						
+						stopValidity = false;
 						validityState.customError = customError;
 											
 						if( validityState.valid && validityState.customError ){
@@ -129,7 +133,6 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 						
 						$.each(validityRules, function(rule, fn){
 							validityState[rule] = fn(jElm, val, cache, validityState);
-							
 							if( validityState[rule] && (validityState.valid || !setCustomMessage) ) {
 								oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, rule));
 								validityState.valid = false;
@@ -165,11 +168,6 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 			doc.addEventListener('change', function(e){
 				testValidity(e.target);
 			}, true);
-			if (!Modernizr.input.valueAsNumber) {
-				doc.addEventListener('input', function(e){
-					testValidity(e.target);
-				}, true);
-			}
 		}
 		
 		var validityElementsSel = validityElements.join(',');	

@@ -383,20 +383,10 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 		polyfillElements.push('input');
 	}
 	
-	var addUnload = function(fn){
-		var old = window.onbeforeunload;
-		window.onbeforeunload = function(){
-			fn.apply(this, arguments);
-			if(old && old.apply){
-				old.apply(this, arguments);
-			}
-			window.onbeforeunload = null;
-		};
-	};
 	var hidePlaceholder = function(elem, data, value){
 			if(!isOver && elem.type != 'password'){
 				if(value === false){
-					value = $.attr(elem, 'value');
+					value = $.prop(elem, 'value');
 				}
 				elem.value = value;
 			}
@@ -424,7 +414,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 				return;
 			}
 			if(value === false){
-				value = $.attr(elem, 'value');
+				value = $.prop(elem, 'value');
 			}
 			if(value){
 				hidePlaceholder(elem, data, value);
@@ -441,7 +431,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 		},
 		createPlaceholder = function(elem){
 			elem = $(elem);
-			var id 			= elem.attr('id'),
+			var id 			= elem.prop('id'),
 				hasLabel	= !!(elem.attr('title') || elem.attr('aria-labeledby')),
 				pHolderTxt
 			;
@@ -544,7 +534,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 							//ie always exposes last label and ff always first
 							data.text.hide()[$.browser.msie ? 'insertBefore' : 'insertAfter'](elem);
 						}
-						addUnload(reset);
+						$(window).bind('beforeunload', reset);
 						data.box = $(elem);
 						if(elem.form){
 							$(elem.form).submit(reset);
@@ -554,7 +544,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 					return data;
 				},
 				update: function(elem, val){
-					if(!allowedPlaceholder[$.attr(elem, 'type')] && !$.nodeName(elem, 'textarea')){return;}
+					if(!allowedPlaceholder[$.prop(elem, 'type')] && !$.nodeName(elem, 'textarea')){return;}
 					
 					var data = pHolder.create(elem);
 					
@@ -571,72 +561,45 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 	};
 	polyfillElements.forEach(function(nodeName){
 		var desc = webshims.defineNodeNameProperty(nodeName, 'placeholder', {
-			set: function(val){
-				var elem = this;
-				webshims.contentAttr(elem, 'placeholder', val);
-				pHolder.update(elem, val);
+			attr: {
+				set: function(val){
+					var elem = this;
+					webshims.contentAttr(elem, 'placeholder', val);
+					pHolder.update(elem, val);
+				},
+				get: function(){
+					return webshims.contentAttr(this, 'placeholder');
+				}
 			},
-			get: function(){
-				return webshims.contentAttr(this, 'placeholder') || '';
-			},
+			reflect: true,
 			initAttr: true
 		});
 	});
-			
+	
+	
 	polyfillElements.forEach(function(name){
-		var desc = webshims.defineNodeNameProperty(name, 'value', {
-			set: function(val){
-				var elem = this;
-				var placeholder = webshims.contentAttr(elem, 'placeholder');
-				if(placeholder && 'value' in elem){
-					changePlaceholderVisibility(elem, val, placeholder);
+		var placeholderValueDesc =  {};
+		var desc;
+		['attr', 'prop'].forEach(function(propType){
+			placeholderValueDesc[propType] = {
+				set: function(val){
+					var elem = this;
+					var placeholder = webshims.contentAttr(elem, 'placeholder');
+					var ret = desc[propType]._supset.call(elem, val);
+					if(placeholder && 'value' in elem){
+						changePlaceholderVisibility(elem, val, placeholder);
+					}
+					return ret;
+				},
+				get: function(){
+					var elem = this;
+					return $(elem).hasClass('placeholder-visible') ? '' : desc[propType]._supget.call(elem);
 				}
-				return desc._supset.call(elem, val);
-			},
-			get: function(){
-				var elem = this;
-				return $(elem).hasClass('placeholder-visible') ? '' : desc._supget.call(elem);
-			}
+			};
 		});
+		desc = webshims.defineNodeNameProperty(name, 'value', placeholderValueDesc);
 	});
 	
-	
-	
-	var oldVal = $.fn.val;
-	$.fn.val = function(val){
-		if(val !== undefined){
-			var process = (val === '') ? 
-				function(){
-					if( this.nodeType === 1 ){
-						var placeholder = this.getAttribute('placeholder');
-						if($.nodeName(this, 'select') || !placeholder){
-							oldVal.call($(this), '');
-							return;
-						}
-						if(placeholder && 'value' in this){
-							changePlaceholderVisibility(this, val, placeholder);
-						}
-						if(isOver || this.type == 'password'){
-							oldVal.call($(this), '');
-						}
-					}
-				} : 
-				function(){
-					if( this.nodeType === 1 ){
-						var placeholder = this.getAttribute('placeholder');
-						if(placeholder && 'value' in this){
-							changePlaceholderVisibility(this, val, placeholder);
-						}
-					}
-				}
-			;
-			this.each(process);
-			if(val === ''){return this;}
-		} else if(this[0] && this[0].nodeType == 1 && this.hasClass('placeholder-visible')) {
-			return '';
-		}
-		return oldVal.apply(this, arguments);
-	};
 });
 
 jQuery.webshims.ready('dom-support', function($, webshims, window, document, undefined){
@@ -740,38 +703,29 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 		};
 		
 		webshims.defineNodeNameProperty('output', 'value', {
-			set: function(value){
-				var setVal = $.data(this, 'outputShim');
-				if(!setVal){
-					setVal = outputCreate(this);
+			prop: {
+				set: function(value){
+					var setVal = $.data(this, 'outputShim');
+					if(!setVal){
+						setVal = outputCreate(this);
+					}
+					setVal(value);
+				},
+				get: function(){
+					return webshims.contentAttr(this, 'value') || $(this).text() || '';
 				}
-				setVal(value);
-			},
-			get: function(){
-				return webshims.contentAttr(this, 'value') || $(this).text() || '';
 			}
 		});
 		
-		var onInputChange = function(value){
+		
+		webshims.onNodeNamesPropertyModify('input', 'value', function(value, boolVal, type){
+			if(type == 'removeAttr'){return;}
 			var setVal = $.data(this, 'outputShim');
 			if(setVal){
 				setVal(value);
 			}
-		};
-		webshims.onNodeNamesPropertyModify('input', 'value', {
-			set: onInputChange
 		});
-		
-		var oldVal = $.fn.val;
-		
-		$.fn.val = function(val){
-			var ret = oldVal.apply(this, arguments);
-			if(this[0] && val !== undefined && $.nodeName(this[0], 'input')){
-				onInputChange.call(this[0], val);
-			}
-			return ret;
-		};
-				
+						
 		webshims.addReady(function(context, contextElem){
 			$('output', context).add(contextElem.filter('output')).each(function(){
 				outputCreate(this);
@@ -1156,60 +1110,69 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 		
 		webshims.defineNodeNameProperties('input', {
 			'list': {
-				get: function(){
-					var val = webshims.contentAttr(this, 'list');
-					return (val == null) ? undefined : val;
+				attr: {
+					get: function(){
+						var val = webshims.contentAttr(this, 'list');
+						return (val == null) ? undefined : val;
+					},
+					set: function(value){
+						var elem = this;
+						webshims.contentAttr(elem, 'list', value);
+						webshims.objectCreate(dataListProto, undefined, {input: elem, id: value});
+					}
 				},
-				set: function(value){
-					var elem = this;
-					webshims.contentAttr(elem, 'list', value);
-					webshims.objectCreate(dataListProto, undefined, {input: elem, id: value});
-				},
-				initAttr: true
+				initAttr: true,
+				reflect: true,
+				propType: 'element',
+				propNodeName: 'datalist'
 			},
 			selectedOption: {
-				set: $.noop,
-				get: function(){
-					var elem = this;
-					var list = $.attr(elem, 'list');
-					var ret = null;
-					var value, options;
-					if(!list){return ret;}
-					value = $.attr(elem, 'value');
-					if(!value){return ret;}
-					options = $.attr(list, 'options');
-					if(!options.length){return ret;}
-					$.each(options, function(i, option){
-						if(value == $.attr(option, 'value')){
-							ret = option;
-							return false;
-						}
-					});
-					return ret;
+				prop: {
+					writeable: false,
+					get: function(){
+						var elem = this;
+						var list = $.prop(elem, 'list');
+						var ret = null;
+						var value, options;
+						if(!list){return ret;}
+						value = $.attr(elem, 'value');
+						if(!value){return ret;}
+						options = $.prop(list, 'options');
+						if(!options.length){return ret;}
+						$.each(options, function(i, option){
+							if(value == $.prop(option, 'value')){
+								ret = option;
+								return false;
+							}
+						});
+						return ret;
+					}
 				}
 			},
 			autocomplete: {
-				get: function(){
-					var elem = this;
-					var data = $.data(elem, 'datalistWidget');
-					if(data){
-						return data._autocomplete;
-					}
-					return ('autocomplete' in elem) ? elem.autocomplete : elem.getAttribute('autocomplete');
-				},
-				set: function(value){
-					var elem = this;
-					var data = $.data(elem, 'datalistWidget');
-					if(data){
-						data._autocomplete = value;
-						if(value == 'off'){
-							data.hideList();
+				attr: {
+					get: function(){
+						var elem = this;
+						var data = $.data(elem, 'datalistWidget');
+						if(data){
+							return data._autocomplete;
 						}
-					} else {
-						if('autocomplete' in elem){
-							elem.autocomplete = value;
+						return ('autocomplete' in elem) ? elem.autocomplete : elem.getAttribute('autocomplete');
+					},
+					set: function(value){
+						var elem = this;
+						var data = $.data(elem, 'datalistWidget');
+						if(data){
+							data._autocomplete = value;
+							if(value == 'off'){
+								data.hideList();
+							}
 						} else {
-							elem.setAttribute('autocomplete', value);
+							if('autocomplete' in elem){
+								elem.autocomplete = value;
+							} else {
+								elem.setAttribute('autocomplete', value);
+							}
 						}
 					}
 				}
@@ -1217,10 +1180,13 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 		});
 					
 		webshims.defineNodeNameProperty('datalist', 'options', {
-			get: function(){
-				var elem = this;
-				var select = $('select', elem);
-				return (select[0]) ? select[0].options : [];
+			prop: {
+				writeable: false,
+				get: function(){
+					var elem = this;
+					var select = $('select', elem);
+					return (select[0]) ? select[0].options : [];
+				}
 			}
 		});
 		
