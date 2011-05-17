@@ -1,7 +1,7 @@
 (function($){
 
 $.expr.filters.willValidate = function(elem){
-	return $.attr(elem, 'willValidate');
+	return $.prop(elem, 'willValidate');
 };
 
 module("validity");
@@ -24,26 +24,26 @@ asyncTest("general validity Modul", function(){
 	//novalidate setter
 	
 	
-	equals(form1.find('#name').attr('required'), true, 'name is required');
+	webshimtest.reflectAttr(form1.find('#name'), 'required', true, 'boolean');
 	
 	//willValidate
 	var willValidate = $('#form-1 input:willValidate'),
 		total = willValidate.length
 	;
 	
-	willValidate.filter(':eq(0)').attr('disabled', true);
+	willValidate.filter(':eq(0)').prop('disabled', true);
 	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate disabled' );
-	willValidate.filter(':eq(0)').attr('disabled', false);
+	willValidate.filter(':eq(0)').prop('disabled', false);
 	equals( $('#form-1 input:willValidate').length, total, 'willValidate enabled' );
 
 	
-	form1.find('#name').attr('readonly', true);
+	form1.find('#name').prop('readonly', true);
 	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate: false with readonly' );
-	form1.find('#name').attr('readonly', false);
+	form1.find('#name').prop('readonly', false);
 	
 	//invalid
 	if(omitTests.requiredSelect){
-		$('#select2').attr('disabled', true);
+		$('#select2').prop('disabled', true);
 	}
 	var invalid = $('input, textarea, select', form1).filter(':invalid-element');
 	equals( invalid.length, 7, 'total invalid using filter' );
@@ -51,50 +51,52 @@ asyncTest("general validity Modul", function(){
 	equals( $(':invalid-element', form1).length, 7, 'total invalid' );
 	
 	equals( invalid.filter('[type=radio]').length, 3, 'radio invalid' );
-	invalid.filter('[type=radio]:last').attr('checked', true);
+	invalid.filter('[type=radio]:last').prop('checked', true);
 	equals( invalid.filter('[type=radio]:invalid-element').length, 0, 'radio changed valid' );
-	invalid.filter('[type=radio]:last').attr('checked', false);
+	invalid.filter('[type=radio]:last').prop('checked', false);
 	
 	equals(form1.find('#name').is(':invalid-element'), true, 'name is invalid');
-	form1.find('#name').attr('required', false);
-	equals(form1.find('#name').attr('required'), false, "name isn't required");
+	form1.find('#name').prop('required', false);
+	equals(form1.find('#name').prop('required'), false, "name isn't required");
 	equals(form1.find('#name').is(':invalid-element'), false, 'name is valid');
-	form1.find('#name').attr('required', true);
+	form1.find('#name').prop('required', true);
 	
-	ok($('#select').attr('validity').valid, 'select is valid');
-	$('#select').attr('required', true);
-	ok($('#select').attr('validity').valueMissing, 'required select with first option selected and empty value is invalid');
-	
+	ok($('#select').prop('validity').valid, 'select is valid');
+	$('#select').prop('required', true);
+	ok($('#select').prop('validity').valueMissing, 'required select with first option selected and empty value is invalid');
+	$('#select').removeAttr('required');
+	ok(!$('#select').prop('validity').valueMissing, 'remove required works');
+	$('#select').attr('required', 'required');
 	if (!omitTests.requiredSelect) {
 	
-		$('#select option:first').attr('disabled', true);
-		ok($('#select').attr('validity').valid, 'required select with first disabled option selected and empty value is valid');
+		$('#select option:first').prop('disabled', true);
+		ok($('#select').prop('validity').valid, 'required select with first disabled option selected and empty value is valid');
 		
-		$('#select option:first').attr('disabled', false);
+		$('#select option:first').prop('disabled', false);
 		
 		
-		$('#select').attr('selectedIndex', 1);
-		ok($('#select').attr('validity').valid, 'required select with empty value and second option selected is valid');
+		$('#select').prop('selectedIndex', 1);
+		ok($('#select').prop('validity').valid, 'required select with empty value and second option selected is valid');
 		
-		ok(!$('#select4').attr('validity').valid, 'required multiple select with no option selected is invalid');
-		$('#select4').attr({
+		ok(!$('#select4').prop('validity').valid, 'required multiple select with no option selected is invalid');
+		$('#select4').prop({
 			'selectedIndex': 0,
 			size: 1
 		});
-		ok($('#select4').attr('validity').valid, 'required multiple select with first option selected and empty value is valid');
+		ok($('#select4').prop('validity').valid, 'required multiple select with first option selected and empty value is valid');
 		
 		
-		ok($('#select2').attr('validity').valid, 'required select with first option selected, in an optgroup and empty value is valid');
+		ok($('#select2').prop('validity').valid, 'required select with first option selected, in an optgroup and empty value is valid');
 		
 		
-		ok(!$('#select3').attr('validity').valid, 'required select with no option selected is invalid');
-		ok($('#select3').attr('selectedIndex', 0).attr('validity').valid, 'required select with first option selected and empty value, but size > 1 is valid');
+		ok(!$('#select3').prop('validity').valid, 'required select with no option selected is invalid');
+		ok($('#select3').prop('selectedIndex', 0).attr('validity').valid, 'required select with first option selected and empty value, but size > 1 is valid');
 	}
 		
 	//validityState
 	//what is the problem here?
 	if(navigator.userAgent.indexOf('Chrome') === -1){
-		same($('#email').attr('validity'), {
+		same($('#email').prop('validity'), {
 			typeMismatch: false,
 			rangeUnderflow: false,
 			rangeOverflow: false,
@@ -107,7 +109,7 @@ asyncTest("general validity Modul", function(){
 		}, 'email required');
 		
 		$('#email').val('some input');
-		same($('#email').attr('validity'), {
+		same($('#email').prop('validity'), {
 			typeMismatch: true,
 			rangeUnderflow: false,
 			rangeOverflow: false,
@@ -120,7 +122,7 @@ asyncTest("general validity Modul", function(){
 		}, 'email required');
 	}
 	$('#email').val('some input');
-	ok($('#email').attr('validity').typeMismatch, 'typeMismatch is true for email and value: some input');
+	ok($('#email').prop('validity').typeMismatch, 'typeMismatch is true for email and value: some input');
 	
 	$.each({
 		'info@c-t.de': 'valid-element', 
@@ -244,30 +246,33 @@ asyncTest('validationMessage/setCustomValidity', function(){
 	ok($('#select').is(':valid-element'), 'select is valid');
 	$('#select').setCustomValidity('has an error');
 	ok($('#select').is(':invalid-element'), 'select is set invalid');
-	ok($('#select').attr('validity').customError, 'select has customerror');
-	equals($('#select').attr('validationMessage'), 'has an error', 'custom error message set');
+	ok($('#select').prop('validity').customError, 'select has customerror');
+	equals($('#select').prop('validationMessage'), 'has an error', 'custom error message set');
 	if($.webshims.cfg.forms.overrideMessages){
-		equals(firstInvalid.attr('validationMessage'), firstInvalid.attr('customValidationMessage'), 'custom message equals native message if messages are overridden');
+		equals(firstInvalid.prop('validationMessage'), firstInvalid.prop('customValidationMessage'), 'custom message equals native message if messages are overridden');
 		$.webshims.activeLang('en');
-		equals(firstInvalid.attr('validationMessage'), firstInvalid.attr('customValidationMessage'), 'switched message to en');
+		equals(firstInvalid.prop('validationMessage'), firstInvalid.prop('customValidationMessage'), 'switched message to en');
 		$.webshims.activeLang('de');
-		equals(firstInvalid.attr('validationMessage'), firstInvalid.attr('customValidationMessage'), 'switched message to de');
+		equals(firstInvalid.prop('validationMessage'), firstInvalid.prop('customValidationMessage'), 'switched message to de');
 		$.webshims.activeLang(lang);
-		equals(firstInvalid.attr('validationMessage'), firstInvalid.attr('customValidationMessage'), 'switched message to '+ lang);
+		equals(firstInvalid.prop('validationMessage'), firstInvalid.prop('customValidationMessage'), 'switched message to '+ lang);
 	}
 	if($.webshims.cfg.forms.overrideMessages || $.webshims.cfg.forms.customMessages){
 		$.webshims.activeLang('en');
-		var enMessage = firstInvalid.attr('customValidationMessage');
+		var enMessage = firstInvalid.prop('customValidationMessage');
 		$.webshims.activeLang('de');
-		var deMessage = firstInvalid.attr('customValidationMessage');
+		var deMessage = firstInvalid.prop('customValidationMessage');
 		ok(enMessage != deMessage, 'customMessage for en is not equal to customMessage for de');
 		$.webshims.activeLang(lang);
 	}
 	
-	equals($('#select').attr('disabled', true).attr('validationMessage'), '', 'custom error message is empty, if control is disabled');
+	equals($('#select').attr('disabled', true).prop('validationMessage'), '', 'custom error message is empty, if control is disabled');
 	$('#select').attr('disabled', false).setCustomValidity('');
-	ok(( $('#select').is(':valid-element') && $('#select').attr('willValidate') ), 'select is set valid again');
-	ok(!!($('input').filter(':invalid-element').attr('validationMessage')), 'validationMessage is a getter for all invalid elements');
+	ok(( $('#select').is(':valid-element') && $('#select').prop('willValidate') ), 'select is set valid again');
+	$('#select')[0].setCustomValidity('has an error2');
+	ok($('#select').prop('validity').customError, 'select has customerror with native method');
+	$('#select')[0].setCustomValidity('');
+	ok(!!($('input').filter(':invalid-element').prop('validationMessage')), 'validationMessage is a getter for all invalid elements');
 	$.webshims.ready('forms DOM', function(){
 		start();
 	});
@@ -277,20 +282,19 @@ asyncTest('validationMessage/setCustomValidity', function(){
 asyncTest('output test', function(){
 	QUnit.reset();
 	
-	equals($('foobar').attr('value'), 'jo da foobar', 'same props on multiple unknwon elements work right');
-	equals($('foobarbaz').attr('value'), undefined, "unknown extension don't pollute other unknowns");
+	equals($('foobar').prop('value'), 'jo da foobar', 'same props on multiple unknwon elements work right');
+	equals($('foobarbaz').prop('value'), undefined, "unknown extension don't pollute other unknowns");
 	
-	equals($('output').attr('value'), 'jo', 'first output has initial value');
-	$('output:first').attr('value', 'hello');
-	equals($('output').attr('value'), 'hello', 'first output has changed value');
+	equals($('output').prop('value'), 'jo', 'first output has initial value');
+	$('output:first').prop('value', 'hello');
+	equals($('output').prop('value'), 'hello', 'first output has changed value');
 	
 	
 	
-	$('#labeled-output').attr('value', 'somecontent');
+	$('#labeled-output').prop('value', 'somecontent');
 	if( !omitTests.output ){
 		equals($('output:first').text(), 'hello', 'shim shows value');
 		equals($('#labeled-output').text(), 'somecontent', 'shim shows value');
-		
 		ok(/&outputtest=somecontent&/.test($('form').serialize()), 'finds output serialized in shim');
 	}
 	$('#rangeId').attr('value', 30);
@@ -313,8 +317,9 @@ asyncTest('checkValidity/invalid event I', function(){
 	});
 
 	if(omitTests.requiredSelect){
-		$('#select2').attr('disabled', true);
+		$('#select2').prop('disabled', true);
 	}
+	webshimtest.hasMethod($('#form-1'), 'checkValidity');
 	ok(!$('#form-1').checkValidity(), 'validity is false for form-element (form)');
 	equals(invalids, 7, 'there were 7 invalid events (form)');
 	strictEqual($('#email-outside').checkValidity(), false, 'email outside of form will be validated');
@@ -330,7 +335,22 @@ asyncTest('checkValidity/invalid event III', function(){
 		invalids++;
 	});
 	
+	webshimtest.hasMethod($('#name'), 'checkValidity');
 	ok(!$('#name').checkValidity(), 'validity is false for #name (element)');
+	equals(invalids, 1, 'there was 1 invalid event (element)');
+		
+	$.webshims.ready('forms DOM', function(){
+		setTimeout(start, 16);
+	});
+});
+
+asyncTest('native checkValidity/invalid event III', function(){
+	QUnit.reset();
+	var invalids = 0;
+	$('#form-1').bind('invalid', function(){
+		invalids++;
+	});
+	ok(!$('#name')[0].checkValidity(), 'validity is false for #name (element)');
 	equals(invalids, 1, 'there was 1 invalid event (element)');
 		
 	$.webshims.ready('forms DOM', function(){
@@ -349,10 +369,10 @@ asyncTest('checkValidity/invalid event IV', function(){
 	
 	$.each(['#name', '#email','#email','#field6-1', '#select3', '#select4', '#select2'], function(i, id){
 		var elem = $(id);
-		if(elem.attr('type') == 'radio'){
-			elem.attr('checked', true);
+		if(elem.prop('type') == 'radio'){
+			elem.prop('checked', true);
 		} else {
-			elem.attr('disabled', true);
+			elem.prop('disabled', true);
 		}
 	});
 	ok($('#form-1').checkValidity(), 'validity is true for form-element');

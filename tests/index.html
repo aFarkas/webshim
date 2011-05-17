@@ -6,7 +6,7 @@
 	
 	<link rel="stylesheet" href="qunit/qunit.css" media="screen">
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 	<script src="../src/extras/modernizr-1.7.min.js"></script>
 	<script src="../src/extras/loaders/sssl.js"></script>
 	<script src="qunit/qunit.js"></script>
@@ -74,22 +74,25 @@
 		//polute unknown elements prototype with some used props currently output[value]
 		jQuery.webshims.ready('dom-extend', function($){
 			$.webshims.defineNodeNameProperty('foobar', 'value', {
-				get: function(){
-					return 'jo da foobar';
-				},
-				set: function(){
-					return 'baz';
+				prop: {
+					get: function(){
+						return 'jo da foobar';
+					},
+					set: function(){
+						return 'baz';
+					}
 				}
-			}, true);
+			});
 		});
 	</script>
 	
 
+	<script src="test-ext/test-helper.js"></script>
 	
-
-
 	<script src="unit/placeholder.js"></script>
+	
 	<script src="unit/validity.js"></script>
+	<!--
 	<script src="unit/canvas.js"></script>
 	<script src="unit/datalist.js"></script>
 	<script src="unit/number-date.js"></script>
@@ -99,7 +102,7 @@
 	<script src="unit/storage.js"></script>
 	<script src="unit/es5.js"></script>
 	<script src="unit/boolean-attr.js"></script>
-
+	-->
 
 	<script>
 		jQuery.noConflict();
