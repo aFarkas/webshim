@@ -22,7 +22,12 @@
 				var headers = $('h3.button', this);
 				var selected = (hash) ? headers.filter('[id="'+hash+'"]') : 0;
 				if(selected[0]){
+					var focus = selected[0];
 					selected = headers.index(selected[0]);
+					console.log(focus)
+					setTimeout(function(){
+						focus.scrollIntoView();
+					}, 9);
 				} 
 				$(this).accordion({
 					header: 'h3.button',

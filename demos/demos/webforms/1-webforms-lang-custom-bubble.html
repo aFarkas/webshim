@@ -40,7 +40,7 @@
 		$.webshims.polyfill();
     </script>
 	<script src="../../demo-js/demo.js"></script>
-	<title>HTML5 form/Web Forms 2.0 widgets and constraint validation API : webshims lib - the polyfilling capability based loading JS libary</title>
+	<title>styling HTML5 error validation messages / changing text of validation messages : HTML5 forms / Webforms 2.0 constraint validation API</title>
 	    
 </head>
 
@@ -70,7 +70,7 @@
 		</nav>
 		<div class="main-box">
 		<section>
-			<h2>Documentation adding/changing and using validation messages with webshims constraint validation</h2>
+			<h2>Documentation adding/changing/styling validation messages with webshims constraint validation</h2>
 			<h3 id="change-error-ui-lang">Overriding native validation messages/native validation UI</h3>
 			<p>With HTML5 there are two possible ways to change the validation messages.</p>
 			<ul>
@@ -85,11 +85,13 @@ $('form').bind('invalid', function(e){
 	//implement custom UI and custom message according to the validityState $(e.target).attr('validity')
 });
 </code>		
-			<p>Webshims lib gives you three extensions to make this really simple.</p>
+			<p><small>Note: The HTML5 invalid event does not bubble. Webshims lib <a href="../../index.html#polyfill-abstractions">uses event capturing</a> for listening to the invalid event, so that it can be captured on the form/all ancestor elements</small><p>
+			<p>Webshims lib gives you some extensions to make styling validation error message or changing the error-messages really simple.</p>
 			<ul>
 				<li>firstinvalid (event)</li>
 				<li>customValidationMessage (DOM-Property) (Note: to get this new property either <code>customMessages</code> or <code>overrideValidationMessage</code> has to be set to true before calling <code>$.webshims.polyfill();</code>)</li>
 				<li>$.webshims.validityAlert (Helper Object)</li>
+				<li>data-errormessage/-x-moz-errormessage content attributes (are automatically used by validityAlert)</li>
 			</ul>
 			<p>Preventing the default and replacing the invalid-bubble with your own message, could look like this:</p>
 <code class="block run-once">
