@@ -26,14 +26,14 @@
  * });
  */
 (function(){
-	var firstScript = document.getElementsByTagName('script')[0];
-	var scriptHead = firstScript.parentNode;
-	var re = /ded|co/;
-	var onload = 'onload';
-	var onreadystatechange = 'onreadystatechange'; 
-	var readyState = 'readyState';
+	var firstScript = document.getElementsByTagName('script')[0],
+	scriptHead = firstScript.parentNode,
+	re = /ded|co/,
+	onload = 'onload',
+	onreadystatechange = 'onreadystatechange',
+	readyState = 'readyState',
 	
-	var load = function(src, fn){
+	load = function(src, fn){
 		var script = document.createElement('script');
 		script[onload] = script[onreadystatechange] = function(){
 			if(!this[readyState] || re.test(this[readyState])){
