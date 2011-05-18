@@ -211,7 +211,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 				}, 10);
 			},
 			getMessage: function(elem, message){
-				$('> span.va-box', errorBubble).text(message || elem.attr('x-moz-errormessage') || elem.attr('data-errormessage') || elem.attr('validationMessage'));
+				$('> span.va-box', errorBubble).text(message || webshims.getContentValidationMessage(elem) || elem.attr('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
@@ -409,6 +409,34 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 			return message || '';
 		};
 		
+		webshims.getContentValidationMessage = function(elem, validity){
+			
+			
+			var message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
+			if(message && message.indexOf('{')){
+				try {
+					message = jQuery.parseJSON(message);
+				} catch(er){
+					return message;
+				}
+				if(typeof message == 'object'){
+					validity = validity || $.attr(elem, 'validity') || {valid: 1};
+					if(!validity.valid){
+						$.each(validity, function(name, prop){
+							if(prop && name != 'valid' && message[name]){
+								message = message[name];
+								return false;
+							}
+						});
+					}
+				}
+				if(typeof message == 'object'){
+					message = message[defaultMessage];
+				}
+			}
+			return message || '';
+		};
+		
 		
 		if((!window.noHTMLExtFixes && !Modernizr.validationmessage) || !Modernizr.formvalidation){
 			implementProperties.push('validationMessage');
@@ -427,7 +455,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 							var validity = $.attr(elem, 'validity') || {valid: 1};
 							
 							if(validity.valid){return message;}
-							message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
+							message = webshims.getContentValidationMessage(elem, validity);
 							
 							if(message){return message;}
 							
