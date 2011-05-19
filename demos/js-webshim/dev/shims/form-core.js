@@ -432,7 +432,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 				}
 				$.data(elem, 'contentErrorMessage', message);
 				if(typeof message == 'object'){
-					message = message[defaultMessage];
+					message = message.defaultMessage;
 				}
 			}
 			return message || '';
