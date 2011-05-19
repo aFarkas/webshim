@@ -413,7 +413,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 			
 			
 			var message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
-			if(message && message.indexOf('{')){
+			if(message && message.indexOf('{') != -1){
 				try {
 					message = jQuery.parseJSON(message);
 				} catch(er){
@@ -430,6 +430,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 						});
 					}
 				}
+				$.data(elem, 'contentErrorMessage', message);
 				if(typeof message == 'object'){
 					message = message[defaultMessage];
 				}
