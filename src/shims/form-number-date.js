@@ -1,6 +1,70 @@
 jQuery.webshims.register('forms-ext', function($, webshims, window){
-	
 	"use strict";
+	
+	//form messages for forms-ext
+	(function(){
+		var validityMessages = webshims.validityMessages;
+		var extendFormLang = function(obj, ext){
+			$.each(ext, function(name, val){
+				if(!obj[name]){
+					obj[name] = val;
+				} else if(typeof val == 'object'){
+					extendFormLang(obj[name], val);
+				}
+			});
+		};
+		var en = {
+			typeMismatch: {
+				number: 'Please enter a number.',
+				date: 'Please enter a date.',
+				time: 'Please enter a time.',
+				range: 'Invalid input.',
+				"datetime-local": 'Please enter a datetime.'
+			},
+			rangeUnderflow: {
+				defaultMessage: 'Value must be greater than or equal to {%min}.'
+			},
+			rangeOverflow: {
+				defaultMessage: 'Value must be less than or equal to {%max}.'
+			},
+			stepMismatch: 'Invalid input.'
+		};
+		var de = {
+			typeMismatch: {
+				number: '{%value} ist keine Nummer!',
+				date: '{%value} ist kein Datum',
+				time: '{%value} ist keine Uhrzeit',
+				range: '{%value} ist keine Nummer!',
+				"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
+			},
+			rangeUnderflow: {
+				defaultMessage: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.'
+			},
+			rangeOverflow: {
+				defaultMessage: '{%value} ist zu hoch. {%max} ist der oberste Wert, den Sie benutzen können.'
+			},
+			stepMismatch: 'Der Wert {%value} ist in diesem Feld nicht zulässig. Hier sind nur bestimmte Werte zulässig. {%title}'
+		};
+		
+		['date', 'time', 'datetime-local'].forEach(function(type){
+			en.rangeUnderflow[type] = 'Value must be at or after {%min}.';
+		});
+		['date', 'time', 'datetime-local'].forEach(function(type){
+			en.rangeOverflow[type] = 'Value must be at or before {%max}.';
+		});
+		
+		['date', 'time', 'datetime-local'].forEach(function(type){
+			de.rangeUnderflow[type] = '{%value} ist zu früh. {%min} ist die früheste Zeit, die Sie benutzen können.';
+		});
+		['date', 'time', 'datetime-local'].forEach(function(type){
+			de.rangeOverflow[type] = '{%value} ist zu spät. {%max} ist die späteste Zeit, die Sie benutzen können.';
+		});
+		extendFormLang(validityMessages['en'], en);
+		extendFormLang(validityMessages['de'], de);
+		
+	})();
+	
+	
 	if(Modernizr.input.valueAsNumberSet && Modernizr.input.valueAsDate){return;}
 	//why no step IDL?
 	webshims.getStep = function(elem, type){
@@ -1012,6 +1076,8 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 			}
 			if($.datepicker && $.fn.slider){
 				$(document).unbind('.initinputui');
+			} else {
+				webshims.warn('no ui???');
 			}
 		});
 	});

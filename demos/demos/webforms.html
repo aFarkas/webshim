@@ -230,16 +230,16 @@
 	                        <label for="number2">
 	                            number + number = output:
 							</label>
-	                       	<input oninput="$(output2).attr( 'value', ($(this).attr('valueAsNumber') || 0) + ($(number3).attr('valueAsNumber') || 0) )" step="0.5" value="0" name="number2" type="number" id="number2" />
-							<input oninput="$(output2).attr( 'value', ($(this).attr('valueAsNumber') || 0) + ($(number2).attr('valueAsNumber') || 0) )" name="number3" value="0" type="number" />
+	                       	<input oninput="$(output2).prop( 'value', ($(this).prop('valueAsNumber') || 0) + ($(number3).prop('valueAsNumber') || 0) )" step="0.5" value="0" name="number2" type="number" id="number2" />
+							<input oninput="$(output2).prop( 'value', ($(this).prop('valueAsNumber') || 0) + ($(number2).prop('valueAsNumber') || 0) )" name="number3" value="0" type="number" />
 							<output id="output2"></output>
 	                    </div>
 						
 						<div class="form-element">
 							<fieldset>
 								<legend> date +oninput+ range</legend>
-		                       	<input type="date" id="dateControlledByRange" value="2011-01-01" min="2011-01-01" max="2011-12-31" oninput="$.attr( rangeControlledByDate, 'valueAsNumber', $.attr(this, 'valueAsNumber') )" />
-								<input type="range" id="rangeControlledByDate" value="1293840000000" min="1293840000000" max="1325289600000" step="86400000" oninput="$.attr( dateControlledByRange, 'valueAsNumber', $.attr(this, 'valueAsNumber') )" style="margin-left: 5px; width: 400px;" />
+		                       	<input type="date" id="dateControlledByRange" value="2011-01-01" min="2011-01-01" max="2011-12-31" oninput="$.prop( rangeControlledByDate, 'valueAsNumber', $.prop(this, 'valueAsNumber') )" />
+								<input type="range" id="rangeControlledByDate" value="1293840000000" min="1293840000000" max="1325289600000" step="86400000" oninput="$.prop( dateControlledByRange, 'valueAsNumber', $.prop(this, 'valueAsNumber') )" style="margin-left: 5px; width: 400px;" />
 							</fieldset>
 	                    </div>
 						
@@ -330,7 +330,7 @@ $(function(){
 	//bind to the first invalid element in a form
 	$('form').bind('firstinvalid.example2', function(e){ 
 		//show the invalid alert for first invalid element and pass the custom validation message 
-		$.webshims.validityAlert.showFor( e.target, $(e.target).attr('customValidationMessage') ); 
+		$.webshims.validityAlert.showFor( e.target, $(e.target).prop('customValidationMessage') ); 
 		//prevent browser from showing native validation message 
 		return false; 
 	});

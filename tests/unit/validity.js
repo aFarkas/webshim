@@ -90,7 +90,7 @@ asyncTest("general validity Modul", function(){
 		
 		
 		ok(!$('#select3').prop('validity').valid, 'required select with no option selected is invalid');
-		ok($('#select3').prop('selectedIndex', 0).attr('validity').valid, 'required select with first option selected and empty value, but size > 1 is valid');
+		ok($('#select3').prop('selectedIndex', 0).prop('validity').valid, 'required select with first option selected and empty value, but size > 1 is valid');
 	}
 		
 	//validityState
@@ -266,8 +266,8 @@ asyncTest('validationMessage/setCustomValidity', function(){
 		$.webshims.activeLang(lang);
 	}
 	
-	equals($('#select').attr('disabled', true).prop('validationMessage'), '', 'custom error message is empty, if control is disabled');
-	$('#select').attr('disabled', false).setCustomValidity('');
+	equals($('#select').prop('disabled', true).prop('validationMessage'), '', 'custom error message is empty, if control is disabled');
+	$('#select').prop('disabled', false).setCustomValidity('');
 	ok(( $('#select').is(':valid-element') && $('#select').prop('willValidate') ), 'select is set valid again');
 	$('#select')[0].setCustomValidity('has an error2');
 	ok($('#select').prop('validity').customError, 'select has customerror with native method');
@@ -301,8 +301,8 @@ asyncTest('output test', function(){
 	$.webshims.triggerInlineForm($('input.oninput-test')[0], 'input');
 	equals(window.globalInput, '30:30', 'globalInput value was set on trigger');
 	
-	$($('#form-1')[0]['outputtest']).attr('value', 'value');
-	equals($('#labeled-output').attr('value'), 'value', 'value is set through form elements');
+	$($('#form-1')[0]['outputtest']).prop('value', 'value');
+	equals($('#labeled-output').prop('value'), 'value', 'value is set through form elements');
 	$.webshims.ready('forms DOM', function(){
 		start();
 	});

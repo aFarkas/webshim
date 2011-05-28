@@ -71,14 +71,36 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if(!elem || elem.nodeType !== 1){return oldVal.call(this);}
 			return $.prop(elem, 'value', val, 'val', true);
 		}
-		return this.each(function(){
+		if($.isArray(val)){
+			return oldVal.apply(this, arguments);
+		}
+		var isFunction = $.isFunction(val);
+		return this.each(function(i){
 			if(this.nodeType === 1){
-				$.prop(this, 'value', val, 'val');
+				if(isFunction){
+					$.prop(this, 'value', val.call( this, i, $.prop(this, 'value', undefined, 'val', true)), 'val') ;
+				} else {
+					$.prop(this, 'value', val, 'val');
+				}
 			}
 		});
 	};
 	
-	
+	var elementData = function(elem, key, val){
+		elem = elem.jquery ? elem[0] : elem;
+		if(!elem){return val || {};}
+		
+		var data = $.data(elem.jquery ? elem[0] : elem, '_webshimsLib');
+		if(val !== undefined){
+			if(!data){
+				data = $.data(elem.jquery ? elem[0] : elem, '_webshimsLib', {});
+			}
+			if(key){
+				data[key] = val;
+			}
+		}
+		return key ? data && data[key] : data;
+	};
 	
 	['removeAttr', 'prop', 'attr'].forEach(function(type){
 		olds[type] = $[type];
@@ -95,20 +117,20 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			var propMethod;
 			var ret;
 			
-			if(desc){
-				desc = desc[name];
-			}
+			
 			if(!desc){
 				desc = extendedProps['*'];
 				if(desc){
 					desc = desc[name];
 				}
+				
 			}
 			if(desc){
 				propMethod = desc[curType];
 			}
 			
 			if(propMethod){
+				
 				if(curType === 'removeAttr'){
 					return propMethod.value.call(elem);	
 				} else if(value === undefined){
@@ -120,6 +142,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					if(type == 'attr' && value === true){
 						value = name;
 					}
+					
 					ret = propMethod.set.call(elem, value);
 				}
 			} else {
@@ -208,7 +231,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				elemProto[prop] = desc.value;
 			} else {
 				desc._supvalue = function(){
-					var data = $.data(this, '_oldPolyfilledValue');
+					var data = elementData(this, 'propValue');
 					if(data && data[prop] && data[prop].apply){
 						return data[prop].apply(this, arguments);
 					}
@@ -286,7 +309,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			extendValue: function(nodeName, prop, value){
 				createNodeNameInit(nodeName, function(){
 					$(this).each(function(){
-						var data = $.data(this, '_oldPolyfilledValue') || $.data(this, '_oldPolyfilledValue', {});
+						var data = elementData(this, 'propValue', {});
 						data[prop] = this[prop];
 						this[prop] = value;
 					});
@@ -295,14 +318,14 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		};
 	})();
 		
-	var createPropDefault = function(descs){
+	var createPropDefault = function(descs, removeType){
 		if(descs.defaultValue === undefined){
 			descs.defaultValue = '';
 		}
 		if(!descs.removeAttr){
 			descs.removeAttr = {
 				value: function(){
-					descs.prop.set.call(this, descs.defaultValue);
+					descs[removeType || 'prop'].set.call(this, descs.defaultValue);
 					descs.removeAttr._supvalue.call(this);
 				}
 			};
@@ -326,14 +349,12 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		})(),
 		
 		//http://www.w3.org/TR/html5/common-dom-interfaces.html#reflect
+		createPropDefault: createPropDefault,
+		data: elementData,
 		propTypes: {
 			standard: function(descs, name){
-				//ToDo
-				if(descs.prop){
-					webshims.log('override prop?');
-					return;
-				}
 				createPropDefault(descs);
+				if(descs.prop){return;}
 				descs.prop = {
 					set: function(val){
 						descs.attr.set.call(this, ''+val);
@@ -345,13 +366,9 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				
 			},
 			"boolean": function(descs, name){
-				//ToDo
-				if(descs.prop){
-					webshims.log('override prop?');
-					return;
-				}
 				
 				createPropDefault(descs);
+				if(descs.prop){return;}
 				descs.prop = {
 					set: function(val){
 						if(val){
@@ -364,28 +381,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						return descs.attr.get.call(this) != null;
 					}
 				};
-			},
-			element: function(descs){
-				//ToDo
-				if(descs.prop){
-					webshims.log('override prop?');
-					return;
-				}
-				createPropDefault(descs);
-				descs.prop = {
-					get: function(){
-						var elem = descs.attr.get.call(this);
-						if(elem){
-							elem = $('#'+elem)[0];
-							if(elem && descs.propNodeName && !$.nodeName(elem, descs.propNodeName)){
-								elem = null;
-							}
-						}
-						return elem[0] || null;
-					},
-					writeable: false
-				};
 			}
+			
 //			,url: (function(){
 //				var anchor = document.createElement('a');
 //				return function(descs){
@@ -408,7 +405,6 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 //			,tokenlist: $.noop
 //			,settableTokenlist: $.noop
 		},
-		
 		defineNodeNameProperty: function(nodeName, prop, descs){
 			havePolyfill[prop] = true;
 			if(descs.get || descs.value){
@@ -453,7 +449,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						descs[prop][propType] = {};
 						['value', 'set', 'get'].forEach(function(copyProp){
 							if(copyProp in descs[prop]){
-								descs[prop][propType] = descs[prop][copyProp];
+								descs[prop][propType][copyProp] = descs[prop][copyProp];
 								delete descs[prop][copyProp];
 							}
 						});
@@ -538,7 +534,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					},
 					get: function(){
 						var ret = this.getAttribute(prop);
-						return (ret == null) ? undefined : ret;
+						return (ret == null) ? undefined : prop;
 					}
 				},
 				removeAttr: {
@@ -647,7 +643,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				retDesc[nodeName] = webshims[baseMethod](nodeName, a, b, c);
 			});
 			return retDesc;
-		}
+		};
 	});
 	
 	webshims.isReady('webshimLocalization', true);

@@ -189,14 +189,15 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		
 	});
 	
-	
+	//see also: https://github.com/lojjic/PIE/issues/40 | https://prototype.lighthouseapp.com/projects/8886/tickets/1107-ie8-fatal-crash-when-prototypejs-is-loaded-with-rounded-cornershtc
+	var isExtendNativeSave = (!$.browser.msie || parseInt($.browser.version, 10) > 8);
 	var extendNativeValue = (function(){
 		var UNKNOWN = webshims.getPrototypeOf(document.createElement('foobar'));
 		var has = Object.prototype.hasOwnProperty;
 		return function(nodeName, prop, desc){
 			var elem = document.createElement(nodeName);
 			var elemProto = webshims.getPrototypeOf(elem);
-			if( elemProto && UNKNOWN !== elemProto && ( !elem[prop] || !has.call(elem, prop) ) ){
+			if( isExtendNativeSave && elemProto && UNKNOWN !== elemProto && ( !elem[prop] || !has.call(elem, prop) ) ){
 				var sup = elem[prop];
 				desc._supvalue = function(){
 					if(sup && sup.apply){
@@ -294,14 +295,14 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		};
 	})();
 		
-	var createPropDefault = function(descs){
+	var createPropDefault = function(descs, removeType){
 		if(descs.defaultValue === undefined){
 			descs.defaultValue = '';
 		}
 		if(!descs.removeAttr){
 			descs.removeAttr = {
 				value: function(){
-					descs.prop.set.call(this, descs.defaultValue);
+					descs[removeType || 'prop'].set.call(this, descs.defaultValue);
 					descs.removeAttr._supvalue.call(this);
 				}
 			};
@@ -325,14 +326,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		})(),
 		
 		//http://www.w3.org/TR/html5/common-dom-interfaces.html#reflect
+		createPropDefault: createPropDefault,
 		propTypes: {
 			standard: function(descs, name){
-				//ToDo
-				if(descs.prop){
-					webshims.log('override prop?');
-					return;
-				}
 				createPropDefault(descs);
+				if(descs.prop){return;}
 				descs.prop = {
 					set: function(val){
 						descs.attr.set.call(this, ''+val);
@@ -344,13 +342,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				
 			},
 			"boolean": function(descs, name){
-				//ToDo
-				if(descs.prop){
-					webshims.log('override prop?');
-					return;
-				}
+				
+				
 				
 				createPropDefault(descs);
+				if(descs.prop){return;}
 				descs.prop = {
 					set: function(val){
 						if(val){
@@ -363,28 +359,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						return descs.attr.get.call(this) != null;
 					}
 				};
-			},
-			element: function(descs){
-				//ToDo
-				if(descs.prop){
-					webshims.log('override prop?');
-					return;
-				}
-				createPropDefault(descs);
-				descs.prop = {
-					get: function(){
-						var elem = descs.attr.get.call(this);
-						if(elem){
-							elem = $('#'+elem)[0];
-							if(elem && descs.propNodeName && !$.nodeName(elem, descs.propNodeName)){
-								elem = null;
-							}
-						}
-						return elem[0] || null;
-					},
-					writeable: false
-				};
 			}
+			
 //			,url: (function(){
 //				var anchor = document.createElement('a');
 //				return function(descs){
@@ -452,7 +428,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						descs[prop][propType] = {};
 						['value', 'set', 'get'].forEach(function(copyProp){
 							if(copyProp in descs[prop]){
-								descs[prop][propType] = descs[prop][copyProp];
+								descs[prop][propType][copyProp] = descs[prop][copyProp];
 								delete descs[prop][copyProp];
 							}
 						});
@@ -537,7 +513,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					},
 					get: function(){
 						var ret = this.getAttribute(prop);
-						return (ret == null) ? undefined : ret;
+						return (ret == null) ? undefined : prop;
 					}
 				},
 				removeAttr: {

@@ -17,9 +17,7 @@
 	<script>
 		(function($){
 			var hash = location.hash.replace('#', '');
-			if(hash.indexOf('noCapableBugfixes') !== -1){
-				window.noHTMLExtFixes = true; 
-			}
+			
 			if(hash.indexOf('overrideValidationMessages') !== -1){
 				$.webshims.cfg.forms.overrideMessages = true; 
 			}
@@ -28,7 +26,6 @@
 			}
 			
 			$(function(){
-				$('#bugfixes').attr('checked', !!window.noHTMLExtFixes);
 				$('#customValidationMessage').attr('checked', !!$.webshims.cfg.forms.customMessages);
 				$('#overrideValidationMessages').attr('checked', !!$.webshims.cfg.forms.overrideMessages);
 				$('input.webshim-config')
@@ -306,7 +303,6 @@
 
 <body>        
 <div>
-	<input type="checkbox" id="bugfixes" value="noCapableBugfixes" class="webshim-config" /> <label for="bugfixes"><strong>without</strong> (capable browser) bugfixes</label>
 	<input type="checkbox" id="overrideValidationMessages" value="overrideValidationMessages" class="webshim-config" /> <label for="overrideValidationMessages">overrideValidationMessages</label>
 	<input type="checkbox" id="customValidationMessage" value="customValidationMessage" class="webshim-config" /> <label for="customValidationMessage">customValidationMessage</label>
 	

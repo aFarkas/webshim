@@ -300,7 +300,7 @@ $.webshims.setOptions({
 					<p>Due to the fact that we cannot extend accessors of elements in all browsers, we always use jQuery as an extension-wrapper.</p>
 					<ul>
 						<li>
-							<p><strong>Accessing DOM properties/attribute IDLs</strong>: if the feature allows accessing a specific attribute or property, always use jQuery's built-in <code>$.attr</code> (in case of content attributes), <code>$.prop</code> (in case of IDL attributes/properties) or <code>$.removeAttr</code> method:</p>
+							<p><strong>Accessing DOM properties/attribute IDLs</strong>: if the feature allows accessing a specific attribute or property, always use jQuery's built-in <code>$.prop</code> (in case of IDL attributes/properties) or <code>$.attr</code>/<code>$.removeAttr</code> (in case of content attributes) method:</p>
 <code class="block">
 // instead of accessing a property directly (e.g. this.validity), use $.fn.prop 
 $(this).prop('validity');

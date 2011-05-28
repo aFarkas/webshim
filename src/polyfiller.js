@@ -565,7 +565,7 @@
 					if($.inArray(src, loadedSrcs) != -1){
 						return;
 					}
-					parent = parent || document.getElementsByTagName('script')[0];
+					parent = parent || $('link, style')[0] || $('script')[0];
 					loadedSrcs.push(src);
 					$('<link rel="stylesheet" />')
 						.insertBefore(parent)
@@ -646,6 +646,7 @@
 	var webshims = $.webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var googleAPIs = protocol+'ajax.googleapis.com/ajax/libs/';
+	var uiLib = googleAPIs+'jqueryui/1.8.13/';
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;
@@ -855,22 +856,14 @@
 	/* change path $.webshims.modules[moduleName].src */
 	
 	addModule('jquery-ui', {
-		src: googleAPIs+'jqueryui/1.8.13/jquery-ui.min.js',
+		src: uiLib+'jquery-ui.min.js',
 		test: function(){return !!($.widget && $.Widget);}
 	});
 	
 	addModule('input-widgets', {
 		src: '',
 		test: function(){
-			//ToDo: add spinner
-			var test = !($.widget && !($.fn.datepicker || $.fn.slider));
-			if(!this.src){
-				if(!test){
-					webshims.warn('jQuery UI Widget factory is already included, but not datepicker or slider. configure src of $.webshims.modules["input-widgets"].src');
-				}
-				return true;
-			}
-			return test;
+			return !this.src || !($.widget && !($.fn.datepicker || $.fn.slider));
 		}
 	});
 	
@@ -1048,7 +1041,7 @@
 			calculateWidth: true,
 			slider: {},
 			datepicker: {},
-			langSrc: googleAPIs+'jqueryui/1.8.13/i18n/jquery.ui.datepicker-',
+			langSrc: uiLib+'i18n/jquery.ui.datepicker-',
 			recalcWidth: true,
 			lazyDate: true
 //			,replaceUI: false

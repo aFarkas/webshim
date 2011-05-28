@@ -208,7 +208,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 			var testValidity = function(elem){
 				
 				var e,
-					v = $.attr(elem, 'validity')
+					v = $.prop(elem, 'validity')
 				;
 				if(v){
 					$.data(elem, 'cachedValidity', v);
@@ -223,7 +223,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 						unhandledInvalids = true;
 					}
 				}
-				$.data(elem, 'cachedValidity', false);
+				$.removeData(elem, 'cachedValidity', false);
 				return v.valid;
 			};
 			return function(){
@@ -261,7 +261,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 			return function(){
 				var elem = this;
 				//elem.name && <- we don't use to make it easier for developers
-				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] && $.attr(elem.form, 'novalidate') == null );
+				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] && ( !elem.form || $.attr(elem.form, 'novalidate') == null) );
 			};
 		})()
 	},
@@ -275,13 +275,12 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 			}
 			validityState 	= $.extend({}, validityPrototype);
 			
-			if( !$.attr(elem, 'willValidate') || elem.type == 'submit' ){
+			if( !$.prop(elem, 'willValidate') || elem.type == 'submit' ){
 				return validityState;
 			}
 			var jElm 			= $(elem),
 				val				= jElm.val(),
-				cache 			= {nodeName: elem.nodeName.toLowerCase()},
-				ariaInvalid 	= elem.getAttribute('aria-invalid')
+				cache 			= {nodeName: elem.nodeName.toLowerCase()}
 			;
 			
 			validityState.customError = !!($.data(elem, 'customvalidationMessage'));

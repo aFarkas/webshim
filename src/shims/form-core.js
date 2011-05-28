@@ -20,6 +20,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		elem = $(elem);
 		return (groupTypes[elem[0].type] && elem[0].name) ? $(document.getElementsByName(elem[0].name)).not(elem[0]) : emptyJ;
 	};
+	var getContentValidationMessage;
 	
 	/*
 	 * Selectors for all browsers
@@ -27,13 +28,13 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	var rangeTypes = {number: 1, range: 1, date: 1, time: 1, 'datetime-local': 1, datetime: 1, month: 1, week: 1};
 	$.extend($.expr.filters, {
 		"valid-element": function(elem){
-			return !!($.prop(elem, 'willValidate') && ($.prop(elem, 'validity') || {valid: true}).valid);
+			return !!($.prop(elem, 'willValidate') && ($.prop(elem, 'validity') || {valid: 1}).valid);
 		},
 		"invalid-element": function(elem){
 			return !!($.prop(elem, 'willValidate') && !isValid(elem));
 		},
 		"required-element": function(elem){
-			return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required') === true);
+			return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required'));
 		},
 		"optional-element": function(elem){
 			return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required') === false);
@@ -60,7 +61,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	});
 	
 	var isValid = function(elem){
-		return ($.prop(elem, 'validity') || {valid: true}).valid;
+		return ($.prop(elem, 'validity') || {valid: 1}).valid;
 	};
 	
 	
@@ -215,7 +216,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				}, 10);
 			},
 			getMessage: function(elem, message){
-				$('> span.va-box', errorBubble).text(message || elem.attr('x-moz-errormessage') || elem.attr('data-errormessage') || elem.prop('validationMessage'));
+				$('> span.va-box', errorBubble).text(message || getContentValidationMessage(elem) || elem.prop('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
@@ -311,7 +312,10 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		});
 	}
 	
+	
+	
 	/* form message */
+	
 	(function(){
 		
 		
@@ -321,16 +325,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		validityMessages['en'] = validityMessages['en'] || validityMessages['en-US'] || {
 			typeMismatch: {
 				email: 'Please enter an email address.',
-				url: 'Please enter a URL.',
-				number: 'Please enter a number.',
-				date: 'Please enter a date.',
-				time: 'Please enter a time.',
-				range: 'Invalid input.',
-				"datetime-local": 'Please enter a datetime.'
+				url: 'Please enter a URL.'
 			},
-			rangeUnderflow: 'Value must be greater than or equal to {%min}.',
-			rangeOverflow: 'Value must be less than or equal to {%max}.',
-			stepMismatch: 'Invalid input.',
+			
 			tooLong: 'Please enter at most {%maxlength} character(s). You entered {%valueLen}.',
 			
 			patternMismatch: 'Invalid input. {%title}',
@@ -340,12 +337,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			}
 		};
 		
-		['date', 'time', 'datetime-local'].forEach(function(type){
-			validityMessages['en'].rangeUnderflow[type] = 'Value must be at or after {%min}.';
-		});
-		['date', 'time', 'datetime-local'].forEach(function(type){
-			validityMessages['en'].rangeOverflow[type] = 'Value must be at or before {%max}.';
-		});
+		
 		['select', 'radio'].forEach(function(type){
 			validityMessages['en'].valueMissing[type] = 'Please select an option.';
 		});
@@ -356,34 +348,16 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		validityMessages['de'] = validityMessages['de'] || {
 			typeMismatch: {
 				email: '{%value} ist keine zulässige E-Mail-Adresse',
-				url: '{%value} ist keine zulässige Webadresse',
-				number: '{%value} ist keine Nummer!',
-				date: '{%value} ist kein Datum',
-				time: '{%value} ist keine Uhrzeit',
-				range: '{%value} ist keine Nummer!',
-				"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
+				url: '{%value} ist keine zulässige Webadresse'
 			},
-			rangeUnderflow: {
-				defaultMessage: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.'
-			},
-			rangeOverflow: {
-				defaultMessage: '{%value} ist zu hoch. {%max} ist der oberste Wert, den Sie benutzen können.'
-			},
-			stepMismatch: 'Der Wert {%value} ist in diesem Feld nicht zulässig. Hier sind nur bestimmte Werte zulässig. {%title}',
 			tooLong: 'Der eingegebene Text ist zu lang! Sie haben {%valueLen} Buchstaben eingegeben, dabei sind {%maxlength} das Maximum.',
-			
 			patternMismatch: '{%value} hat für dieses Eingabefeld ein falsches Format! {%title}',
 			valueMissing: {
 				defaultMessage: 'Bitte geben Sie einen Wert ein',
 				checkbox: 'Bitte aktivieren Sie das Kästchen'
 			}
 		};
-		['date', 'time', 'datetime-local'].forEach(function(type){
-			validityMessages['de'].rangeUnderflow[type] = '{%value} ist zu früh. {%min} ist die früheste Zeit, die Sie benutzen können.';
-		});
-		['date', 'time', 'datetime-local'].forEach(function(type){
-			validityMessages['de'].rangeOverflow[type] = '{%value} ist zu spät. {%max} ist die späteste Zeit, die Sie benutzen können.';
-		});
+		
 		['select', 'radio'].forEach(function(type){
 			validityMessages['de'].valueMissing[type] = 'Bitte wählen Sie eine Option aus';
 		});
@@ -414,9 +388,42 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		};
 		
 		
-		if((!window.noHTMLExtFixes && !Modernizr.validationmessage) || !Modernizr.formvalidation){
+		if(!Modernizr.validationmessage || !Modernizr.formvalidation){
 			implementProperties.push('validationMessage');
 		}
+		webshims.getContentValidationMessage = function(elem, validity){
+			var message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
+			if(message && message.indexOf('{') != -1){
+				try {
+					message = jQuery.parseJSON(message);
+				} catch(er){
+					return message;
+				}
+				if(typeof message == 'object'){
+					validity = validity || $.prop(elem, 'validity') || {valid: 1};
+					if(!validity.valid){
+						$.each(validity, function(name, prop){
+							if(prop && name != 'valid' && message[name]){
+								message = message[name];
+								return false;
+							}
+						});
+					}
+				}
+				if(message){
+					$.data(elem, 'contentErrorMessage', message);
+				} else {
+					$.removeData(elem, 'contentErrorMessage', message);
+				}
+				if(typeof message == 'object'){
+					message = message.defaultMessage;
+				}
+			}
+			return message || '';
+		};
+		
+		getContentValidationMessage = webshims.getContentValidationMessage;
+		
 		webshims.ready('dom-support', function($, webshims, window, document, undefined){
 			implementProperties.forEach(function(messageProp){
 				['input', 'select', 'textarea', 'fieldset', 'output', 'button'].forEach(function(nodeName){
@@ -432,7 +439,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 								var validity = $.prop(elem, 'validity') || {valid: 1};
 								
 								if(validity.valid){return message;}
-								message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
+								message = getContentValidationMessage(elem, validity);
 								
 								if(message){return message;}
 								
