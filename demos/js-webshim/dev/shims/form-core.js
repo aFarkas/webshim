@@ -211,7 +211,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 				}, 10);
 			},
 			getMessage: function(elem, message){
-				$('> span.va-box', errorBubble).text(message || webshims.getContentValidationMessage(elem) || elem.attr('validationMessage'));
+				$('> span.va-box', errorBubble).text(message || webshims.getContentValidationMessage(elem[0]) || elem.attr('validationMessage'));
 			},
 			position: function(elem){
 				var offset = elem.offset();
@@ -410,8 +410,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, doc, undefin
 		};
 		
 		webshims.getContentValidationMessage = function(elem, validity){
-			
-			
 			var message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
 			if(message && message.indexOf('{') != -1){
 				try {
