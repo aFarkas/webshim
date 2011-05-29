@@ -179,6 +179,8 @@ jQuery.webshims.register('forms-ext', function($, webshims, window){
 				return ret;
 			});
 		});
+		
+		webshims.reflectProperties(['input'], ['max', 'min', 'step']);
 	}
 	
 	

@@ -308,6 +308,8 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 	initAttr: true
 });
 
+webshims.reflectProperties(['input'], ['pattern']);
+
 var noValidate = function(){
 		var elem = this;
 		if(!elem.form){return;}

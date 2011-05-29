@@ -53,6 +53,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	"use strict";
 	//shortcus
 	var modules = webshims.modules;
+	var listReg = /\s*,\s*/;
 		
 	//proxying attribute
 	var olds = {};
@@ -405,6 +406,21 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 //			,tokenlist: $.noop
 //			,settableTokenlist: $.noop
 		},
+		reflectProperties: function(nodeNames, props){
+			if(typeof props == 'string'){
+				props = props.split(listReg);
+			}
+			props.forEach(function(prop){
+				webshims.defineNodeNamesProperty(nodeNames, prop, {
+					set: function(val){
+						$.attr(this, prop, val);
+					},
+					get: function(){
+						return $.attr(this, prop) || '';
+					}
+				}, 'prop');
+			});
+		},
 		defineNodeNameProperty: function(nodeName, prop, descs){
 			havePolyfill[prop] = true;
 			if(descs.get || descs.value){
@@ -485,7 +501,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		},
 		onNodeNamesPropertyModify: function(nodeNames, props, desc, only){
 			if(typeof nodeNames == 'string'){
-				nodeNames = nodeNames.split(/\s*,\s*/);
+				nodeNames = nodeNames.split(listReg);
 			}
 			if($.isFunction(desc)){
 				desc = {set: desc};
@@ -496,7 +512,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					modifyProps[name] = {};
 				}
 				if(typeof props == 'string'){
-					props = props.split(/\s*,\s*/);
+					props = props.split(listReg);
 				}
 				if(desc.initAttr){
 					initProp.createTmpCache(name);
@@ -636,7 +652,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	}, function(name, baseMethod){
 		webshims[name] = function(names, a, b, c){
 			if(typeof names == 'string'){
-				names = names.split(/\s*,\s*/);
+				names = names.split(listReg);
 			}
 			var retDesc = {};
 			names.forEach(function(nodeName){
