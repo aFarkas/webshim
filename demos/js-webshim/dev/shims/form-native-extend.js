@@ -57,10 +57,10 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 					error = error+'';
 					desc.prop._supvalue.call(this, error);
 					if(!Modernizr.validationmessage){
-						$.data(this, 'customvalidationMessage', error);
+						webshims.data(this, 'customvalidationMessage', error);
 					}
 					if(overrideValidity){
-						$.data(this, 'hasCustomError', !!(error));
+						webshims.data(this, 'hasCustomError', !!(error));
 						testValidity(this);
 					}
 				}
@@ -108,7 +108,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 						var jElm 			= $(elem),
 							cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
 							val				= jElm.val(),
-							customError 	= !!($.data(elem, 'hasCustomError')),
+							customError 	= !!(webshims.data(elem, 'hasCustomError')),
 							setCustomMessage
 						;
 						stopValidity = false;
@@ -141,7 +141,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 						});
 						if(validityState.valid){
 							oldSetCustomValidity[nodeName].call(elem, '');
-							$.data(elem, 'hasCustomError', false);
+							webshims.data(elem, 'hasCustomError', false);
 						} else if(overrideNativeMessages && !setCustomMessage && !customError){
 							$.each(validityState, function(name, prop){
 								if(name !== 'valid' && prop){
@@ -186,9 +186,9 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 						lng = curLng;
 						$('input, select, textarea')
 							.each(function(){
-								if($.data(this, 'hasCustomError')){return;}
+								if(webshims.data(this, 'hasCustomError')){return;}
 								var elem = this;
-								var validity = $.attr(elem, 'validity');
+								var validity = $.prop(elem, 'validity');
 								var nodeName;
 								if(validity.valid){return;}
 								nodeName = (elem.nodeName || '').toLowerCase();

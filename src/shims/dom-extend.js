@@ -90,18 +90,28 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	var elementData = function(elem, key, val){
 		elem = elem.jquery ? elem[0] : elem;
 		if(!elem){return val || {};}
-		
-		var data = $.data(elem.jquery ? elem[0] : elem, '_webshimsLib');
+		var data = $.data(elem, '_webshimsLib');
 		if(val !== undefined){
 			if(!data){
-				data = $.data(elem.jquery ? elem[0] : elem, '_webshimsLib', {});
+				data = $.data(elem, '_webshimsLib', {});
 			}
 			if(key){
 				data[key] = val;
 			}
 		}
+		
 		return key ? data && data[key] : data;
 	};
+
+
+	[{name: 'getNativeElement', prop: 'nativeElement'}, {name: 'getShadowElement', prop: 'hasShadow'}].forEach(function(data){
+		$.fn[data.name] = function(){
+			return this.map(function(){
+				return elementData(this, data.prop) || this;
+			});
+		};
+	});
+	
 	
 	['removeAttr', 'prop', 'attr'].forEach(function(type){
 		olds[type] = $[type];
@@ -116,22 +126,25 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			var desc = extendedProps[nodeName];
 			var curType = (type == 'attr' && (value === false || value === null)) ? 'removeAttr' : type;
 			var propMethod;
+			var oldValMethod;
 			var ret;
 			
 			
 			if(!desc){
 				desc = extendedProps['*'];
-				if(desc){
-					desc = desc[name];
-				}
-				
+			}
+			if(desc){
+				desc = desc[name];
 			}
 			if(desc){
 				propMethod = desc[curType];
 			}
 			
 			if(propMethod){
-				
+				if(name == 'value'){
+					oldValMethod = propMethod.isVal;
+					propMethod.isVal = isVal;
+				}
 				if(curType === 'removeAttr'){
 					return propMethod.value.call(elem);	
 				} else if(value === undefined){
@@ -145,6 +158,9 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					}
 					
 					ret = propMethod.set.call(elem, value);
+				}
+				if(name == 'value'){
+					propMethod.isVal = oldValMethod;
 				}
 			} else {
 				ret = oldMethod(elem, name, value, pass, _argless);
@@ -193,7 +209,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				if(!desc.set){
 					desc.set = desc.writeable ? 
 						getSup('set', desc, oldDesc) : 
-						(webshims.cfg.useStrict) ? 
+						(webshims.cfg.useStrict && prop == 'prop') ? 
 							function(){throw(prop +' is readonly on '+ nodeName);} : 
 							$.noop
 					;
@@ -352,6 +368,29 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		//http://www.w3.org/TR/html5/common-dom-interfaces.html#reflect
 		createPropDefault: createPropDefault,
 		data: elementData,
+		addShadowDom: function(nativeElem, shadowElem, opts){
+			opts = opts || {};
+			if(nativeElem.jquery){
+				nativeElem = nativeElem[0];
+			}
+			if(shadowElem.jquery){
+				shadowElem = shadowElem[0];
+			}
+			
+			var nativeData = $.data(nativeElem, '_webshimsLib') || $.data(nativeElem, '_webshimsLib', {});
+			var shadowData = $.data(shadowElem, '_webshimsLib') || $.data(shadowElem, '_webshimsLib', {});
+			nativeData.hasShadow = shadowElem;
+			shadowData.nativeElement = nativeElem;
+			shadowData.shadowData = nativeData.shadowData = {
+				nativeElement: nativeElem,
+				shadowElement: shadowElem
+			};
+			if(opts.data){
+				
+				nativeData.shadowData.data = opts.data;
+				shadowData.shadowData.data = opts.data;
+			}
+		},
 		propTypes: {
 			standard: function(descs, name){
 				createPropDefault(descs);
@@ -412,13 +451,15 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			}
 			props.forEach(function(prop){
 				webshims.defineNodeNamesProperty(nodeNames, prop, {
-					set: function(val){
-						$.attr(this, prop, val);
-					},
-					get: function(){
-						return $.attr(this, prop) || '';
+					prop: {
+						set: function(val){
+							$.attr(this, prop, val);
+						},
+						get: function(){
+							return $.attr(this, prop) || '';
+						}
 					}
-				}, 'prop');
+				});
 			});
 		},
 		defineNodeNameProperty: function(nodeName, prop, descs){
@@ -520,6 +561,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				props.forEach(function(prop){
 					if(!modifyProps[name][prop]){
 						modifyProps[name][prop] = [];
+						havePolyfill[prop] = true;
 					}
 					if(desc.set){
 						if(only){

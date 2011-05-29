@@ -246,7 +246,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 	},
 	setCustomValidity: {
 		value: function(error){
-			$.data(this, 'customvalidationMessage', ''+error);
+			webshims.data(this, 'customvalidationMessage', ''+error);
 		}
 	},
 	willValidate: {
@@ -283,7 +283,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 				cache 			= {nodeName: elem.nodeName.toLowerCase()}
 			;
 			
-			validityState.customError = !!($.data(elem, 'customvalidationMessage'));
+			validityState.customError = !!(webshims.data(elem, 'customvalidationMessage'));
 			if( validityState.customError ){
 				validityState.valid = false;
 			}
@@ -307,6 +307,8 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 	},
 	initAttr: true
 });
+
+webshims.reflectProperties(['input'], ['pattern']);
 
 var noValidate = function(){
 		var elem = this;
@@ -1197,8 +1199,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 	 */
 	(function(){
 		var elements = {
-				input: 1,
-				textarea: 1
+				input: 1
 			},
 			noInputTriggerEvts = {updateInput: 1, input: 1},
 			noInputTypes = {
@@ -1207,7 +1208,8 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				submit: 1,
 				button: 1,
 				image: 1,
-				reset: 1
+				reset: 1,
+				file: 1
 				
 				//pro forma
 				,color: 1
@@ -1229,24 +1231,27 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 						}
 					},
 					unbind = function(){
-						input.unbind('focusout', unbind).unbind('input', trigger).unbind('updateInput', trigger);
+						input.unbind('focusout', unbind).unbind('input', trigger).unbind('change', trigger).unbind('updateInput', trigger);
 						clearInterval(timer);
-						trigger();
-						input = null;
+						setTimeout(function(){
+							trigger();
+							input = null;
+						}, 1);
+						
 					}
 				;
 				
 				clearInterval(timer);
-				timer = setInterval(trigger, ($.browser.mozilla) ? 250 : 111);
+				timer = setInterval(trigger, ($.browser.mozilla) ? 120 : 99);
 				setTimeout(trigger, 9);
-				input.bind('focusout', unbind).bind('input updateInput', trigger);
+				input.bind('focusout', unbind).bind('input updateInput change', trigger);
 			}
 		;
 			
 		
 		$(doc)
 			.bind('focusin', function(e){
-				if( e.target && e.target.type && !e.target.readonly && !e.target.readOnly && !e.target.disabled && elements[(e.target.nodeName || '').toLowerCase()] && !noInputTypes[e.target.type] ){
+				if( e.target && e.target.type && !e.target.readOnly && !e.target.disabled && elements[(e.target.nodeName || '').toLowerCase()] && !noInputTypes[e.target.type] ){
 					observe($(e.target));
 				}
 			})

@@ -327,9 +327,7 @@ asyncTest('step number/date module specific validity', function(){
 
 	$.each([
 		{
-			attrs: {
-				
-			},
+			attrs: {},
 			value: '20:30',
 			trueState: 'valid'
 		},

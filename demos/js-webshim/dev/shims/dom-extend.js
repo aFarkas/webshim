@@ -53,6 +53,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	"use strict";
 	//shortcus
 	var modules = webshims.modules;
+	var listReg = /\s*,\s*/;
 		
 	//proxying attribute
 	var olds = {};
@@ -71,13 +72,45 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if(!elem || elem.nodeType !== 1){return oldVal.call(this);}
 			return $.prop(elem, 'value', val, 'val', true);
 		}
-		return this.each(function(){
+		if($.isArray(val)){
+			return oldVal.apply(this, arguments);
+		}
+		var isFunction = $.isFunction(val);
+		return this.each(function(i){
 			if(this.nodeType === 1){
-				$.prop(this, 'value', val, 'val');
+				if(isFunction){
+					$.prop(this, 'value', val.call( this, i, $.prop(this, 'value', undefined, 'val', true)), 'val') ;
+				} else {
+					$.prop(this, 'value', val, 'val');
+				}
 			}
 		});
 	};
 	
+	var elementData = function(elem, key, val){
+		elem = elem.jquery ? elem[0] : elem;
+		if(!elem){return val || {};}
+		var data = $.data(elem, '_webshimsLib');
+		if(val !== undefined){
+			if(!data){
+				data = $.data(elem, '_webshimsLib', {});
+			}
+			if(key){
+				data[key] = val;
+			}
+		}
+		
+		return key ? data && data[key] : data;
+	};
+
+
+	[{name: 'getNativeElement', prop: 'nativeElement'}, {name: 'getShadowElement', prop: 'hasShadow'}].forEach(function(data){
+		$.fn[data.name] = function(){
+			return this.map(function(){
+				return elementData(this, data.prop) || this;
+			});
+		};
+	});
 	
 	
 	['removeAttr', 'prop', 'attr'].forEach(function(type){
@@ -93,22 +126,25 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			var desc = extendedProps[nodeName];
 			var curType = (type == 'attr' && (value === false || value === null)) ? 'removeAttr' : type;
 			var propMethod;
+			var oldValMethod;
 			var ret;
 			
-			if(desc){
-				desc = desc[name];
-			}
+			
 			if(!desc){
 				desc = extendedProps['*'];
-				if(desc){
-					desc = desc[name];
-				}
+			}
+			if(desc){
+				desc = desc[name];
 			}
 			if(desc){
 				propMethod = desc[curType];
 			}
 			
 			if(propMethod){
+				if(name == 'value'){
+					oldValMethod = propMethod.isVal;
+					propMethod.isVal = isVal;
+				}
 				if(curType === 'removeAttr'){
 					return propMethod.value.call(elem);	
 				} else if(value === undefined){
@@ -120,7 +156,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					if(type == 'attr' && value === true){
 						value = name;
 					}
+					
 					ret = propMethod.set.call(elem, value);
+				}
+				if(name == 'value'){
+					propMethod.isVal = oldValMethod;
 				}
 			} else {
 				ret = oldMethod(elem, name, value, pass, _argless);
@@ -169,7 +209,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				if(!desc.set){
 					desc.set = desc.writeable ? 
 						getSup('set', desc, oldDesc) : 
-						(webshims.cfg.useStrict) ? 
+						(webshims.cfg.useStrict && prop == 'prop') ? 
 							function(){throw(prop +' is readonly on '+ nodeName);} : 
 							$.noop
 					;
@@ -208,7 +248,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				elemProto[prop] = desc.value;
 			} else {
 				desc._supvalue = function(){
-					var data = $.data(this, '_oldPolyfilledValue');
+					var data = elementData(this, 'propValue');
 					if(data && data[prop] && data[prop].apply){
 						return data[prop].apply(this, arguments);
 					}
@@ -286,7 +326,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			extendValue: function(nodeName, prop, value){
 				createNodeNameInit(nodeName, function(){
 					$(this).each(function(){
-						var data = $.data(this, '_oldPolyfilledValue') || $.data(this, '_oldPolyfilledValue', {});
+						var data = elementData(this, 'propValue', {});
 						data[prop] = this[prop];
 						this[prop] = value;
 					});
@@ -327,6 +367,30 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		
 		//http://www.w3.org/TR/html5/common-dom-interfaces.html#reflect
 		createPropDefault: createPropDefault,
+		data: elementData,
+		addShadowDom: function(nativeElem, shadowElem, opts){
+			opts = opts || {};
+			if(nativeElem.jquery){
+				nativeElem = nativeElem[0];
+			}
+			if(shadowElem.jquery){
+				shadowElem = shadowElem[0];
+			}
+			
+			var nativeData = $.data(nativeElem, '_webshimsLib') || $.data(nativeElem, '_webshimsLib', {});
+			var shadowData = $.data(shadowElem, '_webshimsLib') || $.data(shadowElem, '_webshimsLib', {});
+			nativeData.hasShadow = shadowElem;
+			shadowData.nativeElement = nativeElem;
+			shadowData.shadowData = nativeData.shadowData = {
+				nativeElement: nativeElem,
+				shadowElement: shadowElem
+			};
+			if(opts.data){
+				
+				nativeData.shadowData.data = opts.data;
+				shadowData.shadowData.data = opts.data;
+			}
+		},
 		propTypes: {
 			standard: function(descs, name){
 				createPropDefault(descs);
@@ -342,8 +406,6 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				
 			},
 			"boolean": function(descs, name){
-				
-				
 				
 				createPropDefault(descs);
 				if(descs.prop){return;}
@@ -383,7 +445,23 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 //			,tokenlist: $.noop
 //			,settableTokenlist: $.noop
 		},
-		
+		reflectProperties: function(nodeNames, props){
+			if(typeof props == 'string'){
+				props = props.split(listReg);
+			}
+			props.forEach(function(prop){
+				webshims.defineNodeNamesProperty(nodeNames, prop, {
+					prop: {
+						set: function(val){
+							$.attr(this, prop, val);
+						},
+						get: function(){
+							return $.attr(this, prop) || '';
+						}
+					}
+				});
+			});
+		},
 		defineNodeNameProperty: function(nodeName, prop, descs){
 			havePolyfill[prop] = true;
 			if(descs.get || descs.value){
@@ -464,7 +542,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		},
 		onNodeNamesPropertyModify: function(nodeNames, props, desc, only){
 			if(typeof nodeNames == 'string'){
-				nodeNames = nodeNames.split(/\s*,\s*/);
+				nodeNames = nodeNames.split(listReg);
 			}
 			if($.isFunction(desc)){
 				desc = {set: desc};
@@ -475,7 +553,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					modifyProps[name] = {};
 				}
 				if(typeof props == 'string'){
-					props = props.split(/\s*,\s*/);
+					props = props.split(listReg);
 				}
 				if(desc.initAttr){
 					initProp.createTmpCache(name);
@@ -483,6 +561,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				props.forEach(function(prop){
 					if(!modifyProps[name][prop]){
 						modifyProps[name][prop] = [];
+						havePolyfill[prop] = true;
 					}
 					if(desc.set){
 						if(only){
@@ -615,14 +694,14 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	}, function(name, baseMethod){
 		webshims[name] = function(names, a, b, c){
 			if(typeof names == 'string'){
-				names = names.split(/\s*,\s*/);
+				names = names.split(listReg);
 			}
 			var retDesc = {};
 			names.forEach(function(nodeName){
 				retDesc[nodeName] = webshims[baseMethod](nodeName, a, b, c);
 			});
 			return retDesc;
-		}
+		};
 	});
 	
 	webshims.isReady('webshimLocalization', true);

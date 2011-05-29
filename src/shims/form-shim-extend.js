@@ -246,7 +246,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 	},
 	setCustomValidity: {
 		value: function(error){
-			$.data(this, 'customvalidationMessage', ''+error);
+			webshims.data(this, 'customvalidationMessage', ''+error);
 		}
 	},
 	willValidate: {
@@ -283,7 +283,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 				cache 			= {nodeName: elem.nodeName.toLowerCase()}
 			;
 			
-			validityState.customError = !!($.data(elem, 'customvalidationMessage'));
+			validityState.customError = !!(webshims.data(elem, 'customvalidationMessage'));
 			if( validityState.customError ){
 				validityState.valid = false;
 			}

@@ -11,9 +11,9 @@ var stepTest = function(obj){
 		elem.removeAttr(attr);
 	});
 	
-	elem.attr(obj.attrs);	
-	elem.attr('value', $.webshims.modules['forms-ext'].getNextStep(elem[0], obj.step));
-	equals( elem.attr('valueAsNumber'), obj.value, 'step:'+ obj.step +' after: '+ JSON.stringify(obj.attrs) );
+	elem.prop(obj.attrs);	
+	elem.prop('value', $.webshims.modules['forms-ext'].getNextStep(elem[0], obj.step));
+	equals( elem.prop('valueAsNumber'), obj.value, 'step:'+ obj.step +' after: '+ JSON.stringify(obj.attrs) );
 	
 	
 };

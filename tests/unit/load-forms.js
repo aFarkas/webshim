@@ -1,10 +1,10 @@
 (function($){
 var path = location.pathname.substr(0, location.pathname.lastIndexOf('/')) +'/';
 loadTester.addImplementationTest('forms', function(){
-	strictEqual($('<input required />').attr('required'), true, "required implemented");
+	strictEqual($('<input required />').prop('required'), true, "required implemented");
 });
 loadTester.addImplementationTest('forms-ext', function(){
-	equals($('<input type="date" />').attr('valueAsNumber', 0).attr('value'), "1970-01-01", "valueAsNumber succesful integrated");
+	equals($('<input type="date" />').prop('valueAsNumber', 0).prop('value'), "1970-01-01", "valueAsNumber succesful integrated");
 });
 	
 loadTester.addProfile({

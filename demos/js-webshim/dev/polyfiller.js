@@ -112,7 +112,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.6.2',
+		version: 'pre1.7.0',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
@@ -127,10 +127,14 @@
 					require([src], complete);
 				},
 				yepnope: function(src, complete){
-					yepnope({
-						load: src,
-						callback: complete
-					});
+					if(yepnope.injectJs){
+						yepnope.injectJs(src, complete);
+					} else {
+						yepnope({
+							load: src,
+							callback: complete
+						});
+					}
 				}
 			}
 		},
@@ -790,6 +794,11 @@
 			if(webshims.fn){
 				webshims.fn[name] = $.fn[name+'Webshim'];
 			}
+		});
+		$.each(['getNativeElement', 'getShadowElement'], function(i, name){
+			$.fn[name] = function(){
+				return this;
+			};
 		});
 		
 	})();

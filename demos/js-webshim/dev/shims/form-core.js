@@ -8,13 +8,9 @@ jQuery.webshims.gcEval = function(){
 };
 jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
-	webshims.getVisualInput = function(elem){
-		elem = $(elem);
-		return (elem.data('inputUIReplace') || {visual: elem}).visual;
-	};
-	var getVisual = webshims.getVisualInput;
-	var groupTypes = {checkbox: 1};
-	var checkypes = {checkbox: 1, radio: 1};
+	
+	var groupTypes = {radio: 1};
+	var checkTypes = {checkbox: 1, radio: 1};
 	var emptyJ = $([]);
 	var getGroupElements = function(elem){
 		elem = $(elem);
@@ -70,51 +66,65 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	var changeVals = {selectedIndex: 1, value: 1, checked: 1, disabled: 1, readonly: 1};
 	var stopUIRefresh;
 	$.prop = function(elem, name, val){
+		var ret = oldAttr.apply(this, arguments);
 		if(elem && 'form' in elem && changeVals[name] && val !== undefined && $(elem).hasClass('form-ui-invalid')){
-			var ret = oldAttr.apply(this, arguments);
 			if(isValid(elem)){
-				getVisual(elem).removeClass('form-ui-invalid');
+				$(elem).getShadowElement().removeClass('form-ui-invalid');
 				if(name == 'checked' && val) {
 					getGroupElements(elem).removeClass('form-ui-invalid').removeAttr('aria-invalid');
 				}
 			}
-			return ret;
 		}
-		return oldAttr.apply(this, arguments);
+		return ret;
 	};
 	var switchValidityClass = function(e){
 		if(stopUIRefresh || !e.target || e.target.type == 'submit'){return;}
 		
-		var elem = ($.data(e.target, 'html5element') || [])[0] || e.target;
+		var elem = $(e.target).getNativeElement()[0];
+		
 		if(!$.prop(elem, 'willValidate')){
-			getVisual(elem).removeClass('form-ui-invalid form-ui-valid');
+			$(elem).getShadowElement().removeClass('form-ui-invalid form-ui-valid');
 			return;
 		}
-		var addClass, removeClass;
-		$(e.target).unbind('input.form-ui-invalid');
-		if(isValid(e.target)){
-			addClass = 'form-ui-valid';
-			removeClass = 'form-ui-invalid';
-			if(checkypes[e.target.type] && e.target.checked){
-				getGroupElements(elem).removeClass(removeClass).removeAttr('aria-invalid');
+		var shadowElem = $(elem).getShadowElement();
+		var addClass, removeClass, trigger;
+		
+		if(isValid(elem)){
+			if(!shadowElem.hasClass('form-ui-valid')){
+				addClass = 'form-ui-valid';
+				removeClass = 'form-ui-invalid';
+				trigger = 'changedvalid';
+				if(checkTypes[elem.type] && elem.checked){
+					getGroupElements(elem).removeClass(removeClass).removeAttr('aria-invalid');
+				}
+				$(e.target).unbind('input.form-ui-invalid');
 			}
 		} else {
-			addClass = 'form-ui-invalid';
-			removeClass = 'form-ui-valid';
-			if(checkypes[e.target.type] && !e.target.checked){
-				getGroupElements(elem).removeClass(removeClass);
+			if(!shadowElem.hasClass('form-ui-invalid')){
+				addClass = 'form-ui-invalid';
+				removeClass = 'form-ui-valid';
+				if (checkTypes[elem.type] && !elem.checked) {
+					getGroupElements(elem).removeClass(removeClass);
+				}
+				trigger = 'changedinvalid';
+				$(e.target)
+					.unbind('input.form-ui-invalid')
+					.bind('input.form-ui-invalid', switchValidityClass)
+				;
 			}
-			$(e.target).bind('input.form-ui-invalid', switchValidityClass);
 		}
-		
-		getVisual(elem).addClass(addClass).removeClass(removeClass);
+		if(addClass){
+			shadowElem.addClass(addClass).removeClass(removeClass);
+			$(elem).trigger(trigger);
+		}
 		
 		stopUIRefresh = true;
 		setTimeout(function(){
 			stopUIRefresh = false;
 		}, 9);
+		elem = shadowElem = null;
 	};
-	$(document).bind('change refreshvalidityui', switchValidityClass);
+	$(document).bind('change focusout refreshvalidityui', switchValidityClass);
 	
 	
 	
@@ -155,7 +165,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			hideDelay: 5000,
 			showFor: function(elem, message, hideOnBlur){
 				elem = $(elem);
-				var visual = getVisual(elem);
+				var visual = $(elem).getShadowElement();
 				createAlert();
 				api.clear();
 				this.getMessage(elem, message);
@@ -410,11 +420,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 						});
 					}
 				}
-				if(message){
-					$.data(elem, 'contentErrorMessage', message);
-				} else {
-					$.removeData(elem, 'contentErrorMessage', message);
-				}
+				webshims.data(elem, 'contentErrorMessage', message);
 				if(typeof message == 'object'){
 					message = message.defaultMessage;
 				}
@@ -444,7 +450,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 								if(message){return message;}
 								
 								if(validity.customError && elem.nodeName){
-									message = (Modernizr.validationmessage && desc.prop._supget) ? desc.prop._supget.call(elem) : $.data(elem, 'customvalidationMessage');
+									message = (Modernizr.validationmessage && desc.prop._supget) ? desc.prop._supget.call(elem) : webshims.data(elem, 'customvalidationMessage');
 									if(message){return message;}
 								}
 								$.each(validity, function(name, prop){
