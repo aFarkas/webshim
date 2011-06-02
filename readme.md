@@ -78,6 +78,12 @@ upcomming Release 1.7
 * compaibility with jQuery 1.6.x
 * support for $.fn.prop/$.fn.removeAttr
 
+Release 1.6.3
+----------
+
+* improved data-errormessage (can handle JSON messages)
+* better compatibility with htc behaviors like pie.htc
+
 Release 1.6.2
 ----------
 
