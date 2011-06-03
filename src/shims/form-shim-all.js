@@ -197,7 +197,7 @@ webshims.defineNodeNamesProperties(['button', 'fieldset', 'output'], {
 			return $.extend({}, validityPrototype);
 		}
 	}
-});
+}, 'prop');
 
 
 
@@ -208,7 +208,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 			var testValidity = function(elem){
 				
 				var e,
-					v = $.attr(elem, 'validity')
+					v = $.prop(elem, 'validity')
 				;
 				if(v){
 					$.data(elem, 'cachedValidity', v);
@@ -223,7 +223,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 						unhandledInvalids = true;
 					}
 				}
-				$.data(elem, 'cachedValidity', false);
+				$.removeData(elem, 'cachedValidity', false);
 				return v.valid;
 			};
 			return function(){
@@ -246,7 +246,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 	},
 	setCustomValidity: {
 		value: function(error){
-			$.data(this, 'customvalidationMessage', ''+error);
+			webshims.data(this, 'customvalidationMessage', ''+error);
 		}
 	},
 	willValidate: {
@@ -261,7 +261,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 			return function(){
 				var elem = this;
 				//elem.name && <- we don't use to make it easier for developers
-				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] && $.attr(elem.form, 'novalidate') == null );
+				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] && ( !elem.form || $.attr(elem.form, 'novalidate') == null) );
 			};
 		})()
 	},
@@ -275,16 +275,15 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 			}
 			validityState 	= $.extend({}, validityPrototype);
 			
-			if( !$.attr(elem, 'willValidate') || elem.type == 'submit' ){
+			if( !$.prop(elem, 'willValidate') || elem.type == 'submit' ){
 				return validityState;
 			}
 			var jElm 			= $(elem),
 				val				= jElm.val(),
-				cache 			= {nodeName: elem.nodeName.toLowerCase()},
-				ariaInvalid 	= elem.getAttribute('aria-invalid')
+				cache 			= {nodeName: elem.nodeName.toLowerCase()}
 			;
 			
-			validityState.customError = !!($.data(elem, 'customvalidationMessage'));
+			validityState.customError = !!(webshims.data(elem, 'customvalidationMessage'));
 			if( validityState.customError ){
 				validityState.valid = false;
 			}
@@ -299,7 +298,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 			return validityState;
 		}
 	}
-});
+}, 'prop');
 
 webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
 	set: function(value){
@@ -308,6 +307,8 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 	},
 	initAttr: true
 });
+
+webshims.reflectProperties(['input'], ['pattern']);
 
 var noValidate = function(){
 		var elem = this;
@@ -383,20 +384,10 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 		polyfillElements.push('input');
 	}
 	
-	var addUnload = function(fn){
-		var old = window.onbeforeunload;
-		window.onbeforeunload = function(){
-			fn.apply(this, arguments);
-			if(old && old.apply){
-				old.apply(this, arguments);
-			}
-			window.onbeforeunload = null;
-		};
-	};
 	var hidePlaceholder = function(elem, data, value){
 			if(!isOver && elem.type != 'password'){
 				if(value === false){
-					value = $.attr(elem, 'value');
+					value = $.prop(elem, 'value');
 				}
 				elem.value = value;
 			}
@@ -424,7 +415,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 				return;
 			}
 			if(value === false){
-				value = $.attr(elem, 'value');
+				value = $.prop(elem, 'value');
 			}
 			if(value){
 				hidePlaceholder(elem, data, value);
@@ -441,7 +432,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 		},
 		createPlaceholder = function(elem){
 			elem = $(elem);
-			var id 			= elem.attr('id'),
+			var id 			= elem.prop('id'),
 				hasLabel	= !!(elem.attr('title') || elem.attr('aria-labeledby')),
 				pHolderTxt
 			;
@@ -544,7 +535,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 							//ie always exposes last label and ff always first
 							data.text.hide()[$.browser.msie ? 'insertBefore' : 'insertAfter'](elem);
 						}
-						addUnload(reset);
+						$(window).bind('beforeunload', reset);
 						data.box = $(elem);
 						if(elem.form){
 							$(elem.form).submit(reset);
@@ -554,7 +545,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 					return data;
 				},
 				update: function(elem, val){
-					if(!allowedPlaceholder[$.attr(elem, 'type')] && !$.nodeName(elem, 'textarea')){return;}
+					if(!allowedPlaceholder[$.prop(elem, 'type')] && !$.nodeName(elem, 'textarea')){return;}
 					
 					var data = pHolder.create(elem);
 					
@@ -571,137 +562,99 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 	};
 	polyfillElements.forEach(function(nodeName){
 		var desc = webshims.defineNodeNameProperty(nodeName, 'placeholder', {
-			set: function(val){
-				var elem = this;
-				webshims.contentAttr(elem, 'placeholder', val);
-				pHolder.update(elem, val);
+			attr: {
+				set: function(val){
+					var elem = this;
+					webshims.contentAttr(elem, 'placeholder', val);
+					pHolder.update(elem, val);
+				},
+				get: function(){
+					return webshims.contentAttr(this, 'placeholder');
+				}
 			},
-			get: function(){
-				return webshims.contentAttr(this, 'placeholder') || '';
-			},
+			reflect: true,
 			initAttr: true
 		});
 	});
-			
+	
+	
 	polyfillElements.forEach(function(name){
-		var desc = webshims.defineNodeNameProperty(name, 'value', {
-			set: function(val){
-				var elem = this;
-				var placeholder = webshims.contentAttr(elem, 'placeholder');
-				if(placeholder && 'value' in elem){
-					changePlaceholderVisibility(elem, val, placeholder);
+		var placeholderValueDesc =  {};
+		var desc;
+		['attr', 'prop'].forEach(function(propType){
+			placeholderValueDesc[propType] = {
+				set: function(val){
+					var elem = this;
+					var placeholder = webshims.contentAttr(elem, 'placeholder');
+					var ret = desc[propType]._supset.call(elem, val);
+					if(placeholder && 'value' in elem){
+						changePlaceholderVisibility(elem, val, placeholder);
+					}
+					return ret;
+				},
+				get: function(){
+					var elem = this;
+					return $(elem).hasClass('placeholder-visible') ? '' : desc[propType]._supget.call(elem);
 				}
-				return desc._supset.call(elem, val);
-			},
-			get: function(){
-				var elem = this;
-				return $(elem).hasClass('placeholder-visible') ? '' : desc._supget.call(elem);
-			}
+			};
 		});
+		desc = webshims.defineNodeNameProperty(name, 'value', placeholderValueDesc);
 	});
 	
-	
-	
-	var oldVal = $.fn.val;
-	$.fn.val = function(val){
-		if(val !== undefined){
-			var process = (val === '') ? 
-				function(){
-					if( this.nodeType === 1 ){
-						var placeholder = this.getAttribute('placeholder');
-						if($.nodeName(this, 'select') || !placeholder){
-							oldVal.call($(this), '');
-							return;
-						}
-						if(placeholder && 'value' in this){
-							changePlaceholderVisibility(this, val, placeholder);
-						}
-						if(isOver || this.type == 'password'){
-							oldVal.call($(this), '');
-						}
-					}
-				} : 
-				function(){
-					if( this.nodeType === 1 ){
-						var placeholder = this.getAttribute('placeholder');
-						if(placeholder && 'value' in this){
-							changePlaceholderVisibility(this, val, placeholder);
-						}
-					}
-				}
-			;
-			this.each(process);
-			if(val === ''){return this;}
-		} else if(this[0] && this[0].nodeType == 1 && this.hasClass('placeholder-visible')) {
-			return '';
-		}
-		return oldVal.apply(this, arguments);
-	};
 });
 
 jQuery.webshims.ready('dom-support', function($, webshims, window, document, undefined){
 	var doc = document;	
 	
-	(function(){
-		var elements = {
-				input: 1,
-				textarea: 1
-			},
-			noInputTriggerEvts = {updateInput: 1, input: 1},
-			noInputTypes = {
-				radio: 1,
-				checkbox: 1,
-				submit: 1,
-				button: 1,
-				image: 1,
-				reset: 1
-				
-				//pro forma
-				,color: 1
-				//,range: 1
-			},
-			observe = function(input){
-				var timer,
-					lastVal = input.attr('value'),
-					trigger = function(e){
-						//input === null
-						if(!input){return;}
-						var newVal = input.attr('value');
-						
-						if(newVal !== lastVal){
-							lastVal = newVal;
-							if(!e || !noInputTriggerEvts[e.type]){
-								webshims.triggerInlineForm && webshims.triggerInlineForm(input[0], 'input');
-							}
-						}
-					},
-					unbind = function(){
-						input.unbind('focusout', unbind).unbind('input', trigger).unbind('updateInput', trigger);
-						clearInterval(timer);
-						trigger();
-						input = null;
+	/*
+	 * implement propType "element" currently only used for list-attribute (will be moved to dom-extend, if needed)
+	 */
+	webshims.propTypes.element = function(descs){
+		webshims.createPropDefault(descs, 'attr');
+		if(descs.prop){return;}
+		descs.prop = {
+			get: function(){
+				var elem = descs.attr.get.call(this);
+				if(elem){
+					elem = $('#'+elem)[0];
+					if(elem && descs.propNodeName && !$.nodeName(elem, descs.propNodeName)){
+						elem = null;
 					}
-				;
-				
-				clearInterval(timer);
-				timer = setInterval(trigger, ($.browser.mozilla) ? 250 : 111);
-				setTimeout(trigger, 9);
-				input.bind('focusout', unbind).bind('input updateInput', trigger);
-			}
-		;
-			
-		
-		$(doc)
-			.bind('focusin', function(e){
-				if( e.target && e.target.type && !e.target.readonly && !e.target.readOnly && !e.target.disabled && elements[(e.target.nodeName || '').toLowerCase()] && !noInputTypes[e.target.type] ){
-					observe($(e.target));
 				}
-			})
-		;
-	})();
+				return elem || null;
+			},
+			writeable: false
+		};
+	};
+	
 	
 	(function(){
 		if( 'value' in document.createElement('output') ){return;}
+		
+		webshims.defineNodeNameProperty('output', 'value', {
+			prop: {
+				set: function(value){
+					var setVal = $.data(this, 'outputShim');
+					if(!setVal){
+						setVal = outputCreate(this);
+					}
+					setVal(value);
+				},
+				get: function(){
+					return webshims.contentAttr(this, 'value') || $(this).text() || '';
+				}
+			}
+		});
+		
+		
+		webshims.onNodeNamesPropertyModify('input', 'value', function(value, boolVal, type){
+			if(type == 'removeAttr'){return;}
+			var setVal = $.data(this, 'outputShim');
+			if(setVal){
+				setVal(value);
+			}
+		});
+		
 		var outputCreate = function(elem){
 			if(elem.getAttribute('aria-live')){return;}
 			elem = $(elem);
@@ -738,40 +691,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 			shim.data('outputShim', setValue );
 			return setValue;
 		};
-		
-		webshims.defineNodeNameProperty('output', 'value', {
-			set: function(value){
-				var setVal = $.data(this, 'outputShim');
-				if(!setVal){
-					setVal = outputCreate(this);
-				}
-				setVal(value);
-			},
-			get: function(){
-				return webshims.contentAttr(this, 'value') || $(this).text() || '';
-			}
-		});
-		
-		var onInputChange = function(value){
-			var setVal = $.data(this, 'outputShim');
-			if(setVal){
-				setVal(value);
-			}
-		};
-		webshims.onNodeNamesPropertyModify('input', 'value', {
-			set: onInputChange
-		});
-		
-		var oldVal = $.fn.val;
-		
-		$.fn.val = function(val){
-			var ret = oldVal.apply(this, arguments);
-			if(this[0] && val !== undefined && $.nodeName(this[0], 'input')){
-				onInputChange.call(this[0], val);
-			}
-			return ret;
-		};
-				
+						
 		webshims.addReady(function(context, contextElem){
 			$('output', context).add(contextElem.filter('output')).each(function(){
 				outputCreate(this);
@@ -781,8 +701,125 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 	
 	
 	
+	
+	/*
+	 * Implements datalist element and list attribute
+	 */
+	
 	(function(){
 		if(Modernizr.datalist){return;}
+		
+			var initializeDatalist =  function(){
+				
+				webshims.defineNodeNameProperties('input', {
+				'list': {
+					attr: {
+						get: function(){
+							var val = webshims.contentAttr(this, 'list');
+							return (val == null) ? undefined : val;
+						},
+						set: function(value){
+							var elem = this;
+							webshims.contentAttr(elem, 'list', value);
+							webshims.objectCreate(shadowListProto, undefined, {input: elem, id: value, datalist: $.prop(elem, 'list')});
+						}
+					},
+					initAttr: true,
+					reflect: true,
+					propType: 'element',
+					propNodeName: 'datalist'
+				},
+				
+				//currently not supported x-browser (FF4 has not implemented and is not polyfilled )
+				selectedOption: {
+					prop: {
+						writeable: false,
+						get: function(){
+							var elem = this;
+							var list = $.prop(elem, 'list');
+							var ret = null;
+							var value, options;
+							if(!list){return ret;}
+							value = $.attr(elem, 'value');
+							if(!value){return ret;}
+							options = $.prop(list, 'options');
+							if(!options.length){return ret;}
+							$.each(options, function(i, option){
+								if(value == $.prop(option, 'value')){
+									ret = option;
+									return false;
+								}
+							});
+							return ret;
+						}
+					}
+				},
+				
+				//override autocomplete
+				autocomplete: {
+					attr: {
+						get: function(){
+							var elem = this;
+							var data = $.data(elem, 'datalistWidget');
+							if(data){
+								return data._autocomplete;
+							}
+							return ('autocomplete' in elem) ? elem.autocomplete : elem.getAttribute('autocomplete');
+						},
+						set: function(value){
+							var elem = this;
+							var data = $.data(elem, 'datalistWidget');
+							if(data){
+								data._autocomplete = value;
+								if(value == 'off'){
+									data.hideList();
+								}
+							} else {
+								if('autocomplete' in elem){
+									elem.autocomplete = value;
+								} else {
+									elem.setAttribute('autocomplete', value);
+								}
+							}
+						}
+					}
+				}
+			});
+						
+			webshims.defineNodeNameProperty('datalist', 'options', {
+				prop: {
+					writeable: false,
+					get: function(){
+						var elem = this;
+						var select = $('select', elem);
+						return (select[0]) ? select[0].options : [];
+					}
+				}
+			});
+			
+			
+			
+			webshims.addReady(function(context, contextElem){
+				contextElem.filter('select, option').each(function(){
+					var parent = this.parentNode;
+					var isDatalist = $.nodeName(parent, 'datalist');
+					if(parent && !isDatalist){
+						parent = parent.parentNode;
+						isDatalist = $.nodeName(parent, 'datalist');
+					}
+					if(parent && isDatalist){
+						$(parent).triggerHandler('updateDatalist');
+					}
+				});
+			});
+			
+			
+		};
+		
+		
+		/*
+		 * ShadowList
+		 */
 		var listidIndex = 0;
 		
 		var noDatalistSupport = {
@@ -825,11 +862,11 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 			return (elem.textContent || elem.innerText || $.text([ elem ]) || '');
 		};
 		
-		var dataListProto = {
+		var shadowListProto = {
 			_create: function(opts){
 				
 				if(noDatalistSupport[getType(opts.input)]){return;}
-				var datalist = opts.id && document.getElementById(opts.id);
+				var datalist = opts.datalist;
 				var data = $.data(opts.input, 'datalistWidget');
 				if(datalist && data && data.datalist !== datalist){
 					data.datalist = datalist;
@@ -974,20 +1011,23 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				this.lastUnfoundValue = '';
 				
 				
-				clearTimeout(this.updateTimer);
-				this.updateTimer = setTimeout(function(){
-					that.updateListOptions();
-				}, this.isListVisible ? 0 : 40 * this.lazyIDindex);
+				if(!this.updateTimer){
+					this.updateTimer = setTimeout(function(){
+						that.updateListOptions();
+					}, this.isListVisible || window.QUnit ? 0 : 40 * this.lazyIDindex);
+				}
 			},
 			updateListOptions: function(){
 				this.needsUpdate = false;
 				clearTimeout(this.updateTimer);
-				this.shadowList.css({
-					fontSize: $.curCSS(this.input, 'fontSize'),
-					fontFamily: $.curCSS(this.input, 'fontFamily'),
-					id: this.datalist.id +'-polyfill'
-				});
-				var list = '<ul role="list" class="'+ (this.datalist.className || '') +'">';
+				this.updateTimer = false;
+				this.shadowList
+					.css({
+						fontSize: $.curCSS(this.input, 'fontSize'),
+						fontFamily: $.curCSS(this.input, 'fontFamily')
+					})
+				;
+				var list = '<ul role="list" class="'+ (this.datalist.className || '') + ' '+ this.datalist.id +'-shadowdom' +'">';
 				
 				var values = [];
 				var allOptions = [];
@@ -1153,91 +1193,76 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 			}
 		};
 		
-		
-		webshims.defineNodeNameProperties('input', {
-			'list': {
-				get: function(){
-					var val = webshims.contentAttr(this, 'list');
-					return (val == null) ? undefined : val;
-				},
-				set: function(value){
-					var elem = this;
-					webshims.contentAttr(elem, 'list', value);
-					webshims.objectCreate(dataListProto, undefined, {input: elem, id: value});
-				},
-				initAttr: true
-			},
-			selectedOption: {
-				set: $.noop,
-				get: function(){
-					var elem = this;
-					var list = $.attr(elem, 'list');
-					var ret = null;
-					var value, options;
-					if(!list){return ret;}
-					value = $.attr(elem, 'value');
-					if(!value){return ret;}
-					options = $.attr(list, 'options');
-					if(!options.length){return ret;}
-					$.each(options, function(i, option){
-						if(value == $.attr(option, 'value')){
-							ret = option;
-							return false;
-						}
-					});
-					return ret;
-				}
-			},
-			autocomplete: {
-				get: function(){
-					var elem = this;
-					var data = $.data(elem, 'datalistWidget');
-					if(data){
-						return data._autocomplete;
-					}
-					return ('autocomplete' in elem) ? elem.autocomplete : elem.getAttribute('autocomplete');
-				},
-				set: function(value){
-					var elem = this;
-					var data = $.data(elem, 'datalistWidget');
-					if(data){
-						data._autocomplete = value;
-						if(value == 'off'){
-							data.hideList();
-						}
-					} else {
-						if('autocomplete' in elem){
-							elem.autocomplete = value;
-						} else {
-							elem.setAttribute('autocomplete', value);
-						}
-					}
-				}
-			}
-		});
-					
-		webshims.defineNodeNameProperty('datalist', 'options', {
-			get: function(){
-				var elem = this;
-				var select = $('select', elem);
-				return (select[0]) ? select[0].options : [];
-			}
-		});
-		
-		
-		webshims.addReady(function(context, contextElem){
-			contextElem.filter('select, option').each(function(){
-				var parent = this.parentNode;
-				if(parent && !$.nodeName(parent, 'datalist')){
-					parent = parent.parentNode;
-				}
-				if(parent && $.nodeName(parent, 'datalist')){
-					$(parent).triggerHandler('updateDatalist');
-				}
-			});
-		});
-		
+		//init datalist update
+		initializeDatalist();
+			
 	})();
+	
+	
+	/*
+	 * Implements input event in all browsers
+	 */
+	(function(){
+		var elements = {
+				input: 1
+			},
+			noInputTriggerEvts = {updateInput: 1, input: 1},
+			noInputTypes = {
+				radio: 1,
+				checkbox: 1,
+				submit: 1,
+				button: 1,
+				image: 1,
+				reset: 1,
+				file: 1
+				
+				//pro forma
+				,color: 1
+				//,range: 1
+			},
+			observe = function(input){
+				var timer,
+					lastVal = input.attr('value'),
+					trigger = function(e){
+						//input === null
+						if(!input){return;}
+						var newVal = input.attr('value');
+						
+						if(newVal !== lastVal){
+							lastVal = newVal;
+							if(!e || !noInputTriggerEvts[e.type]){
+								webshims.triggerInlineForm && webshims.triggerInlineForm(input[0], 'input');
+							}
+						}
+					},
+					unbind = function(){
+						input.unbind('focusout', unbind).unbind('input', trigger).unbind('change', trigger).unbind('updateInput', trigger);
+						clearInterval(timer);
+						setTimeout(function(){
+							trigger();
+							input = null;
+						}, 1);
+						
+					}
+				;
+				
+				clearInterval(timer);
+				timer = setInterval(trigger, ($.browser.mozilla) ? 120 : 99);
+				setTimeout(trigger, 9);
+				input.bind('focusout', unbind).bind('input updateInput change', trigger);
+			}
+		;
+			
+		
+		$(doc)
+			.bind('focusin', function(e){
+				if( e.target && e.target.type && !e.target.readOnly && !e.target.disabled && elements[(e.target.nodeName || '').toLowerCase()] && !noInputTypes[e.target.type] ){
+					observe($(e.target));
+				}
+			})
+		;
+	})();
+	
 	if(webshims.modules['form-output-datalist']){
 		webshims.isReady('form-output-datalist', true);
 	}

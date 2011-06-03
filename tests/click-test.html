@@ -5,7 +5,7 @@
     
 	
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 	<script src="../src/extras/modernizr-1.7.min.js"></script>
 	<script src="../src/extras/loaders/sssl.js"></script>
 	<!-- 
@@ -17,9 +17,7 @@
 	<script>
 		(function($){
 			var hash = location.hash.replace('#', '');
-			if(hash.indexOf('noCapableBugfixes') !== -1){
-				window.noHTMLExtFixes = true; 
-			}
+			
 			if(hash.indexOf('overrideValidationMessages') !== -1){
 				$.webshims.cfg.forms.overrideMessages = true; 
 			}
@@ -28,7 +26,6 @@
 			}
 			
 			$(function(){
-				$('#bugfixes').attr('checked', !!window.noHTMLExtFixes);
 				$('#customValidationMessage').attr('checked', !!$.webshims.cfg.forms.customMessages);
 				$('#overrideValidationMessages').attr('checked', !!$.webshims.cfg.forms.overrideMessages);
 				$('input.webshim-config')
@@ -81,14 +78,14 @@
 				$('#test-result').empty();
 			}
 			
-			$('#test-1').attr('value', '');
-			equals(typeof $('#test-1').attr('validationMessage'), 'string', 'validationMessage is a string');
-			equals(!!$('#test-1').attr('validationMessage'), true, 'validationMessage has a value');
+			$('#test-1').val('');
+			equals(typeof $('#test-1').prop('validationMessage'), 'string', 'validationMessage is a string');
+			equals(!!$('#test-1').prop('validationMessage'), true, 'validationMessage has a value');
 			if($.webshims.cfg.forms.customMessages){
-				equals(typeof $('#test-1').attr('customValidationMessage'), 'string', 'customValidationMessage is a string, if implemented');
-				equals(!!$('#test-1').attr('customValidationMessage'), true, 'customValidationMessage has a value, if implemented');
+				equals(typeof $('#test-1').prop('customValidationMessage'), 'string', 'customValidationMessage is a string, if implemented');
+				equals(!!$('#test-1').prop('customValidationMessage'), true, 'customValidationMessage has a value, if implemented');
 			} else {
-				equals(typeof $('#test-1').attr('customValidationMessage'), 'undefined', 'customValidationMessage is undefined, if not implemented');
+				equals(typeof $('#test-1').prop('customValidationMessage'), 'undefined', 'customValidationMessage is undefined, if not implemented');
 			}
 			
 			$('input.invalid-submit').click(function(){
@@ -306,7 +303,6 @@
 
 <body>        
 <div>
-	<input type="checkbox" id="bugfixes" value="noCapableBugfixes" class="webshim-config" /> <label for="bugfixes"><strong>without</strong> (capable browser) bugfixes</label>
 	<input type="checkbox" id="overrideValidationMessages" value="overrideValidationMessages" class="webshim-config" /> <label for="overrideValidationMessages">overrideValidationMessages</label>
 	<input type="checkbox" id="customValidationMessage" value="customValidationMessage" class="webshim-config" /> <label for="customValidationMessage">customValidationMessage</label>
 	

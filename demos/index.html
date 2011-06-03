@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8"/>
 	<link href="css/styles.css" rel="stylesheet" />
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 	
 	<script src="js-webshim/minified/extras/modernizr-1.7.min.js"></script>
 	<script src="js-webshim/minified/extras/loaders/sssl.js"></script>
@@ -66,9 +66,9 @@
 							<p>Being able to change the placeholder of an input element dynamically isn't  a huge deal, but it shows how webshims lib works. With few exceptions, you won't be able to tell the difference between a shim and a native implementation. In some cases, the shim will even be more standards compliant than some browsers' native implementations.</p>
 							<p>The placeholder polyfill also works with getting and setting the value property (many other placeholder polyfills don't support this properly):</p>
 							<ul>
-								<li><code>$("#placeholder").attr('value')</code></li>
+								<li><code>$("#placeholder").prop('value')</code></li>
 								<li><code>$("#placeholder").val()</code></li>
-								<li><code>$("#placeholder").attr('value', 'new value')</code></li>
+								<li><code>$("#placeholder").prop('value', 'new value')</code></li>
 								<li><code>$("#placeholder").val('new value')</code></li>
 							</ul>
 						</div>
@@ -78,9 +78,9 @@
 					<h3>Supported Browsers</h3>
 					<ul>
 						<li>IE6+</li>
-						<li>Firefox 3.5+</li>
+						<li>Firefox 3.6+</li>
 						<li>Safari 4+</li>
-						<li>Safari for iOS 4.3</li>
+						<li>Safari for iOS 4.2+</li>
 						<li>Chrome 11.0+</li>
 						<li>Opera 11+</li>
 					</ul>
@@ -300,16 +300,16 @@ $.webshims.setOptions({
 					<p>Due to the fact that we cannot extend accessors of elements in all browsers, we always use jQuery as an extension-wrapper.</p>
 					<ul>
 						<li>
-							<p><strong>Accessing DOM properties/attribute IDLs</strong>: if the feature allows accessing a specific property, always use jQuery's built-in <code>$.attr</code> method:</p>
+							<p><strong>Accessing DOM properties/attribute IDLs</strong>: if the feature allows accessing a specific attribute or property, always use jQuery's built-in <code>$.prop</code> (in case of IDL attributes/properties) or <code>$.attr</code>/<code>$.removeAttr</code> (in case of content attributes) method:</p>
 <code class="block">
-// instead of accessing a property directly (e.g. this.validity), use $.fn.attr 
-$(this).attr('validity');
+// instead of accessing a property directly (e.g. this.validity), use $.fn.prop 
+$(this).prop('validity');
 // or:
-//$.attr(this, 'validity');
+//$.prop(this, 'validity');
 </code>
 						</li>
 						<li>
-							<p><strong>calling a DOM method</strong>: While DOM properties have to be accessed through jQuery's <code>$.attr</code> method, DOM methods are added to DOM elements themselves, so you can call them directly:</p>
+							<p><strong>calling a DOM method</strong>: While DOM properties have to be accessed through jQuery's <code>$.prop/$.attr</code> methods, DOM methods are added to DOM elements themselves, so you can call them directly:</p>
 <code class="block">
 // "this" refers to a DOM element, not a jQuery object
 this.checkValidity();
@@ -321,7 +321,7 @@ $(this).checkValidity();
 							<p>If you pass a list of nodes and the method doesn't return anything, the method will be called on each element in this list, otherwise it will be called on the first element.</p>
 						</li>
 						<li>
-							<p><strong>binding to events</strong>: Always use jQuery's <code>bind</code> method to register your event handlers. <code>addEventListener</code> won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use <a href="http://www.quirksmode.org/js/events_order.html">event capturing</a> (<a href="https://developer.mozilla.org/en/DOM/element.addEventListener">useCapture</a>) in the native implementation and <code>$.fn.trigger</code> in the shim.</p>
+							<p><strong>binding to events</strong>: Always use jQuery's <code>bind</code> method to register your event handlers. <code>addEventListener</code> won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use event capturing in the native implementation and <code>$.fn.trigger</code> in the shim.</p>
 							<p>This means that some HTML5 events go down the DOM tree in capable browsers and go up the tree in polyfilled browsers. This can create differences if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default, don't use <code>return false;</code>, use <code>event.preventDefault();</code> instead.</p>
 						</li>
 						<li>
@@ -407,24 +407,30 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 	
 	//Implements a new IDL property on audio, video called currentTime
 	webshims.defineNodeNamesProperty('audio, video', 'currentTime', {
-		get: function(){
-			//your getter implementation ("this" refers to the element)
-		},
-		set: function(value){
-			//your setter implementation ("this" refers to the element)
+		prop: {
+			get: function(){
+				//your getter implementation ("this" refers to the element)
+			},
+			set: function(value){
+				//your setter implementation ("this" refers to the element)
+			}
 		}
 	});
 	
 	//Implements a new constant property called HAVE_CURRENT_DATA on audio, video
 	webshims.defineNodenamesProperty('audio, video', 'HAVE_CURRENT_DATA', {
-		value: 2
+		prop: {
+			value: 2
+		}
 	});
 	
 	//Implements a new method called play on audio, video
 	webshims.defineNodeNamesProperty('audio, video', 'play', {
-		value: function(){
-			//your play method implementation
-			//this refers to the element
+		prop: {
+			value: function(){
+				//your play method implementation
+				//this refers to the element
+			}
 		}
 	});
 	

@@ -11,7 +11,7 @@
 	var browserVersion = parseFloat($.browser.version, 10);
 	var Object = window.Object;
 	var defineProperty = 'defineProperty';
-	
+	var formvalidation = 'formvalidation';
 	
 	//new Modernizrtests
 	(function(){
@@ -20,7 +20,7 @@
 		var dateElem;
 		
 		//using hole modernizr api
-		addTest('formvalidation', function(){
+		addTest(formvalidation, function(){
 			return !!('checkValidity' in form[0]);
 		});
 		
@@ -29,37 +29,36 @@
 		});
 		
 		addTest('validationmessage', function(){
-			if(!Modernizr.formvalidation){
+			if(!Modernizr[formvalidation]){
 				return false;
 			}
 			//the form has to be connected in FF4
 			form.appendTo('head');
-			return !!($('input', form).attr('validationMessage'));
+			return !!($('input', form).prop('validationMessage'));
 		});
 		
 		addTest('output', function(){
-			return (Modernizr.formvalidation && 'value' in document.createElement('output'));
+			return (Modernizr[formvalidation] && 'value' in document.createElement('output'));
 		});
 		
 		addTest('details', function(){
 			return ('open' in document.createElement('details'));
 		});
 		
-		Modernizr.deprecatedSessionstorage = !!(Modernizr.sessionstorage && !('clear' in window.sessionStorage));
 		Modernizr.genericDOM =  !!($('<video><div></div></video>')[0].innerHTML);
 		
 		//using only property api
-		Modernizr.requiredSelect = !!(Modernizr.formvalidation && 'required' in $('select', form)[0]);
+		Modernizr.requiredSelect = !!(Modernizr[formvalidation] && 'required' in $('select', form)[0]);
 		
 		//bugfree means interactive formvalidation including correct submit-invalid event handling (this can't be detected, we can just guess)
-		Modernizr.bugfreeformvalidation = Modernizr.formvalidation && Modernizr.requiredSelect && Modernizr.validationmessage && (!$.browser.webkit || browserVersion > 534.19);
+		Modernizr.bugfreeformvalidation = Modernizr[formvalidation] && Modernizr.requiredSelect && Modernizr.validationmessage && (!$.browser.webkit || browserVersion > 534.19);
 		
 		
 		modernizrInputAttrs.valueAsNumber = false;
 		modernizrInputAttrs.valueAsNumberSet = false;
 		modernizrInputAttrs.valueAsDate = false;
 		
-		if(Modernizr.formvalidation){
+		if(Modernizr[formvalidation]){
 			dateElem = $('#date-input-test', form)[0];
 			modernizrInputAttrs.valueAsNumber = ('valueAsNumber' in  dateElem);
 			if(modernizrInputAttrs.valueAsNumber){
@@ -68,11 +67,9 @@
 			}
 			modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem);
 			dateElem = null;
-		}
-		
-		if(Modernizr.formvalidation){
 			form.remove();
 		}
+		
 		form = null;
 		
 		Modernizr.ES5base = !!(String.prototype.trim && Date.now && Date.prototype.toISOString);
@@ -112,10 +109,10 @@
 	})();
 	
 	
-	$.webshims = $.sub ? $.sub() : {};
+	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.6.3',
+		version: 'pre1.7.0',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
@@ -130,10 +127,14 @@
 					require([src], complete);
 				},
 				yepnope: function(src, complete){
-					yepnope({
-						load: src,
-						callback: complete
-					});
+					if(yepnope.injectJs){
+						yepnope.injectJs(src, complete);
+					} else {
+						yepnope({
+							load: src,
+							callback: complete
+						});
+					}
 				}
 			}
 		},
@@ -317,7 +318,7 @@
 					ret
 				;
 				this.each(function(){
-					var fn = $.attr(this, name);
+					var fn = $.prop(this, name);
 					if(fn && fn.apply){
 						ret = fn.apply(this, args);
 						if(ret !== undefined){
@@ -568,7 +569,7 @@
 					if($.inArray(src, loadedSrcs) != -1){
 						return;
 					}
-					parent = parent || document.getElementsByTagName('script')[0];
+					parent = parent || $('link, style')[0] || $('script')[0];
 					loadedSrcs.push(src);
 					$('<link rel="stylesheet" />')
 						.insertBefore(parent)
@@ -649,6 +650,7 @@
 	var webshims = $.webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var googleAPIs = protocol+'ajax.googleapis.com/ajax/libs/';
+	var uiLib = googleAPIs+'jqueryui/1.8.13/';
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;
@@ -700,13 +702,7 @@
 			}
 		};
 	});
-	
-	if($.prop && $.fn.prop){
-		webshims.warn("webshims 1.6.x does not work with jQuery 1.6+. Please use webshims lib 1.7+");
-	}
-	
-	 
-	
+		
 	
 	//Overwrite DOM-Ready and implement a new ready-method
 	(function(){
@@ -799,6 +795,11 @@
 				webshims.fn[name] = $.fn[name+'Webshim'];
 			}
 		});
+		$.each(['getNativeElement', 'getShadowElement'], function(i, name){
+			$.fn[name] = function(){
+				return this;
+			};
+		});
 		
 	})();
 	
@@ -864,22 +865,14 @@
 	/* change path $.webshims.modules[moduleName].src */
 	
 	addModule('jquery-ui', {
-		src: googleAPIs+'jqueryui/1.8.11/jquery-ui.min.js',
+		src: uiLib+'jquery-ui.min.js',
 		test: function(){return !!($.widget && $.Widget);}
 	});
 	
 	addModule('input-widgets', {
 		src: '',
 		test: function(){
-			//ToDo: add spinner
-			var test = !($.widget && !($.fn.datepicker || $.fn.slider));
-			if(!this.src){
-				if(!test){
-					webshims.warn('jQuery UI Widget factory is already included, but not datepicker or slider. configure src of $.webshims.modules["input-widgets"].src');
-				}
-				return true;
-			}
-			return test;
+			return !this.src || !($.widget && !($.fn.datepicker || $.fn.slider));
 		}
 	});
 	
@@ -1002,7 +995,7 @@
 		methodNames: ['setCustomValidity','checkValidity']
 	});
 			
-	if(Modernizr.formvalidation){
+	if(Modernizr[formvalidation]){
 		//create delegatable-like events
 		webshims.capturingEvents(['input']);
 		webshims.capturingEvents(['invalid'], true);
@@ -1024,23 +1017,7 @@
 		
 		addPolyfill('form-output-datalist', {
 			feature: 'forms',
-			test: function(){
-				var result = Modernizr.datalist && modernizrInputAttrs.list;
-				if(result && $(document.createElement('input')).attr('list') === null){
-					var oAttr = $.attr;
-					$.attr = function(elem, name, value){
-						if(name == 'list' && elem && (elem.nodeName || '').toLowerCase() == 'input' ){
-							if(value !== undefined){
-								elem.setAttribute(name, value);
-							} else {
-								return elem.getAttribute(name);
-							}
-						}
-						return oAttr.apply(this, arguments);
-					};
-				}
-				return Modernizr.output && result;
-			},
+			test: Modernizr.output && Modernizr.datalist && modernizrInputAttrs.list,
 			dependencies: ['dom-support']
 		});
 		
@@ -1073,7 +1050,7 @@
 			calculateWidth: true,
 			slider: {},
 			datepicker: {},
-			langSrc: googleAPIs+'jqueryui/1.8.11/i18n/jquery.ui.datepicker-',
+			langSrc: uiLib+'i18n/jquery.ui.datepicker-',
 			recalcWidth: true,
 			lazyDate: true
 //			,replaceUI: false

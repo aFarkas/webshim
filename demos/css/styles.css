@@ -159,6 +159,7 @@ option {
 }
 body {
 	font: 16px/1.25 Times, Georgia, serif;
+	background: #fff;
 }
 @media only all and (min-width: 920px) {
 	body {

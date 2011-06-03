@@ -29,7 +29,7 @@ jQuery.webshims.register('details', function($, webshims, window, doc, undefined
 				}
 			}
 			$.data(details[0], 'summaryElement', summary);
-			details.attr('open', details.attr('open'));
+			details.prop('open', details.prop('open'));
 		}
 	};
 	var getSummary = function(details){
@@ -93,41 +93,37 @@ jQuery.webshims.register('details', function($, webshims, window, doc, undefined
 	});
 	
 	var initDetails;
+	webshims.defineNodeNamesBooleanProperty('details', 'open', function(val){
+		var summary = $($.data(this, 'summaryElement'));
+		if(!summary){return;}
+		var action = (val) ? 'removeClass' : 'addClass';
+		var details = $(this);
+		if (!initDetails && options.animate){
+			details.stop().css({width: '', height: ''});
+			var start = {
+				width: details.width(),
+				height: details.height()
+			};
+		}
+		summary.attr('aria-expanded', ''+val);
+		details[action]('closed-details-summary').children().not(summary[0])[action]('closed-details-child');
+		if(!initDetails && options.animate){
+			var end = {
+				width: details.width(),
+				height: details.height()
+			};
+			details.css(start).animate(end, {
+				complete: function(){
+					$(this).css({width: '', height: ''});
+				}
+			});
+		}
+		
+	});
 	webshims.createElement('details', function(){
 		initDetails = true;
 		var summary = getSummary(this);
-		$.attr(this, 'open', $.attr(this, 'open'));
+		$.prop(this, 'open', $.prop(this, 'open'));
 		initDetails = false;
-	}, {
-		'open':{
-			set: function(val){
-				var summary = $($.data(this, 'summaryElement'));
-				if(!summary){return;}
-				var action = (val) ? 'removeClass' : 'addClass';
-				var details = $(this);
-				if (!initDetails && options.animate){
-					details.stop().css({width: '', height: ''});
-					var start = {
-						width: details.width(),
-						height: details.height()
-					};
-				}
-				summary.attr('aria-expanded', ''+val);
-				details[action]('closed-details-summary').children().not(summary[0])[action]('closed-details-child');
-				if(!initDetails && options.animate){
-					var end = {
-						width: details.width(),
-						height: details.height()
-					};
-					details.css(start).animate(end, {
-						complete: function(){
-							$(this).css({width: '', height: ''});
-						}
-					});
-				}
-				
-			},
-			isBoolean: true
-		}
 	});
 });

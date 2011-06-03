@@ -1,6 +1,70 @@
 jQuery.webshims.register('forms-ext', function($, webshims, window){
-	
 	"use strict";
+	
+	//form messages for forms-ext
+	(function(){
+		var validityMessages = webshims.validityMessages;
+		var extendFormLang = function(obj, ext){
+			$.each(ext, function(name, val){
+				if(!obj[name]){
+					obj[name] = val;
+				} else if(typeof val == 'object'){
+					extendFormLang(obj[name], val);
+				}
+			});
+		};
+		var en = {
+			typeMismatch: {
+				number: 'Please enter a number.',
+				date: 'Please enter a date.',
+				time: 'Please enter a time.',
+				range: 'Invalid input.',
+				"datetime-local": 'Please enter a datetime.'
+			},
+			rangeUnderflow: {
+				defaultMessage: 'Value must be greater than or equal to {%min}.'
+			},
+			rangeOverflow: {
+				defaultMessage: 'Value must be less than or equal to {%max}.'
+			},
+			stepMismatch: 'Invalid input.'
+		};
+		var de = {
+			typeMismatch: {
+				number: '{%value} ist keine Nummer!',
+				date: '{%value} ist kein Datum',
+				time: '{%value} ist keine Uhrzeit',
+				range: '{%value} ist keine Nummer!',
+				"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
+			},
+			rangeUnderflow: {
+				defaultMessage: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.'
+			},
+			rangeOverflow: {
+				defaultMessage: '{%value} ist zu hoch. {%max} ist der oberste Wert, den Sie benutzen können.'
+			},
+			stepMismatch: 'Der Wert {%value} ist in diesem Feld nicht zulässig. Hier sind nur bestimmte Werte zulässig. {%title}'
+		};
+		
+		['date', 'time', 'datetime-local'].forEach(function(type){
+			en.rangeUnderflow[type] = 'Value must be at or after {%min}.';
+		});
+		['date', 'time', 'datetime-local'].forEach(function(type){
+			en.rangeOverflow[type] = 'Value must be at or before {%max}.';
+		});
+		
+		['date', 'time', 'datetime-local'].forEach(function(type){
+			de.rangeUnderflow[type] = '{%value} ist zu früh. {%min} ist die früheste Zeit, die Sie benutzen können.';
+		});
+		['date', 'time', 'datetime-local'].forEach(function(type){
+			de.rangeOverflow[type] = '{%value} ist zu spät. {%max} ist die späteste Zeit, die Sie benutzen können.';
+		});
+		extendFormLang(validityMessages['en'], en);
+		extendFormLang(validityMessages['de'], de);
+		
+	})();
+	
+	
 	if(Modernizr.input.valueAsNumberSet && Modernizr.input.valueAsDate){return;}
 	//why no step IDL?
 	webshims.getStep = function(elem, type){
@@ -32,7 +96,7 @@ jQuery.webshims.register('forms-ext', function($, webshims, window){
 			return (typeof string == 'number' || (string && string == string * 1));
 		},
 		supportsType = function(type){
-			return (Modernizr.input.valueAsNumber && $('<input type="'+type+'" />').attr('type') === type);
+			return (Modernizr.input.valueAsNumber && $('<input type="'+type+'" />').prop('type') === type);
 		},
 		getType = function(elem){
 			return (elem.getAttribute('type') || '').toLowerCase();
@@ -115,74 +179,71 @@ jQuery.webshims.register('forms-ext', function($, webshims, window){
 				return ret;
 			});
 		});
+		
+		webshims.reflectProperties(['input'], ['max', 'min', 'step']);
 	}
 	
 	
-	// add support for new input-types
-	webshims.defineNodeNameProperty('input', 'type', {
-		get: function(){
-			var elem = this;
-			var type = getType(elem);
-			return (webshims.inputTypes[type]) ? type : elem.type || elem.getAttribute('type');
-		}
-	});
-	
 	//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
 	var valueAsNumberDescriptor = webshims.defineNodeNameProperty('input', 'valueAsNumber', {
-		get: function(){
-			var elem = this;
-			var type = getType(elem);
-			return (typeModels[type] && typeModels[type].asNumber) ? 
-				typeModels[type].asNumber($.attr(elem, 'value')) :
-				nan;
-		},
-		set: function(val){
-			var elem = this;
-			var type = getType(elem);
-			if(typeModels[type] && typeModels[type].numberToString){
-				//is NaN a number?
-				if(isNaN(val)){
-					$.attr(elem, 'value', '');
-					return;
-				}
-				var set = typeModels[type].numberToString(val);
-				if(set !==  false){
-					$.attr(elem, 'value', set);
+		prop: {
+			get: function(){
+				var elem = this;
+				var type = getType(elem);
+				return (typeModels[type] && typeModels[type].asNumber) ? 
+					typeModels[type].asNumber($.prop(elem, 'value')) :
+					nan;
+			},
+			set: function(val){
+				var elem = this;
+				var type = getType(elem);
+				if(typeModels[type] && typeModels[type].numberToString){
+					//is NaN a number?
+					if(isNaN(val)){
+						$.prop(elem, 'value', '');
+						return;
+					}
+					var set = typeModels[type].numberToString(val);
+					if(set !==  false){
+						$.prop(elem, 'value', set);
+					} else {
+						webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
+					}
 				} else {
-					webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
+					valueAsNumberDescriptor.prop._supset && valueAsNumberDescriptor.prop._supset.call(elem, arguments);
 				}
-			} else {
-				valueAsNumberDescriptor._supset && valueAsNumberDescriptor._supset.call(elem, arguments);
 			}
 		}
 	});
 	
 	var valueAsDateDescriptor = webshims.defineNodeNameProperty('input', 'valueAsDate', {
-		get: function(){
-			var elem = this;
-			var type = getType(elem);
-			return (typeModels[type] && typeModels[type].asDate && !typeModels[type].noAsDate) ? 
-				typeModels[type].asDate($.attr(elem, 'value')) :
-				valueAsDateDescriptor._supget && valueAsDateDescriptor._supget.call(elem);
-		},
-		set: function(value){
-			var elem = this;
-			var type = getType(elem);
-			if(typeModels[type] && typeModels[type].dateToString && !typeModels[type].noAsDate){
-				
-				if(value === null){
-					$.attr(elem, 'value', '');
-					return '';
-				}
-				var set = typeModels[type].dateToString(value);
-				if(set !== false){
-					$.attr(elem, 'value', set);
-					return set;
+		prop: {
+			get: function(){
+				var elem = this;
+				var type = getType(elem);
+				return (typeModels[type] && typeModels[type].asDate && !typeModels[type].noAsDate) ? 
+					typeModels[type].asDate($.prop(elem, 'value')) :
+					valueAsDateDescriptor.prop._supget && valueAsDateDescriptor.prop._supget.call(elem);
+			},
+			set: function(value){
+				var elem = this;
+				var type = getType(elem);
+				if(typeModels[type] && typeModels[type].dateToString && !typeModels[type].noAsDate){
+					
+					if(value === null){
+						$.prop(elem, 'value', '');
+						return '';
+					}
+					var set = typeModels[type].dateToString(value);
+					if(set !== false){
+						$.prop(elem, 'value', set);
+						return set;
+					} else {
+						webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
+					}
 				} else {
-					webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
+					return valueAsDateDescriptor.prop._supset && valueAsDateDescriptor.prop._supset(elem, arguments) || null;
 				}
-			} else {
-				return valueAsDateDescriptor._supset && valueAsDateDescriptor._supset(elem, arguments) || null;
 			}
 		}
 	});
@@ -416,8 +477,8 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	var isCheckValidity;
 	var replaceInputUI = function(context, elem){
 		$('input', context).add(elem.filter('input')).each(function(){
-			var type = $.attr(this, 'type');
-			if(replaceInputUI[type]  && !$.data(this, 'inputUIReplace')){
+			var type = $.prop(this, 'type');
+			if(replaceInputUI[type]  && !webshims.data(this, 'shadowData')){
 				replaceInputUI[type]($(this));
 			}
 		});
@@ -462,10 +523,13 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 			},
 			curLabelID =  webshims.getID(attr.label)
 		;
-		shim.addClass(orig[0].className).data('html5element', orig);
+		shim.addClass(orig[0].className);
+		webshims.addShadowDom(orig, shim, {
+			data: methods || {}
+		});
+		
 		orig
 			.after(shim)
-			.data('inputUIReplace', {visual: shim, methods: methods})
 			.hide()
 		;
 		
@@ -482,11 +546,13 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	if(Modernizr.formvalidation){
 		['input', 'form'].forEach(function(name){
 			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
-				value: function(){
-					isCheckValidity = true;
-					var ret = desc._supvalue.apply(this, arguments);
-					isCheckValidity = false;
-					return ret;
+				prop: {
+					value: function(){
+						isCheckValidity = true;
+						var ret = desc.prop._supvalue.apply(this, arguments);
+						isCheckValidity = false;
+						return ret;
+					}
 				}
 			});
 		});
@@ -508,7 +574,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 					.datepicker($.extend(defaultDatepicker, options.datepicker, elem.data('datepicker')))
 					.bind('change', function(e){
 						
-						var value = datePicker.attr('value') || '', 
+						var value = datePicker.prop('value') || '', 
 							timeVal = ''
 						;
 						if(options.lazyDate){
@@ -520,15 +586,15 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 						}
 						
 						if(value){
-							timeVal = $('input.input-datetime-local-time', date).attr('value') || '00:00';
+							timeVal = $('input.input-datetime-local-time', date).prop('value') || '00:00';
 							try {
 								value = $.datepicker.parseDate(datePicker.datepicker('option', 'dateFormat'), value);
-								value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : datePicker.attr('value');
-							} catch (e) {value = datePicker.attr('value');}
+								value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : datePicker.prop('value');
+							} catch (e) {value = datePicker.prop('value');}
 						} 
 						value = (!value && !timeVal) ? '' : value + 'T' + timeVal;
 						replaceInputUI['datetime-local'].blockAttr = true;
-						elem.attr('value', value);
+						elem.prop('value', value);
 						replaceInputUI['datetime-local'].blockAttr = false;
 						e.stopImmediatePropagation();
 						triggerInlineForm(elem[0], 'input');
@@ -545,10 +611,10 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 				})
 			;
 			$('input.input-datetime-local-time', date).bind('change', function(e){
-				var timeVal = $.attr(this, 'value');
+				var timeVal = $.prop(this, 'value');
 				var val = ['', ''];
 				if(timeVal){
-					val = elem.attr('value').split('T');
+					val = elem.prop('value').split('T');
 					if((val.length < 2 || !val[0])){
 						val[0] = $.datepicker.formatDate('yy-mm-dd', new Date());
 					}
@@ -556,20 +622,22 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 					
 					if (timeVal) {
 						try {
-							datePicker.attr('value', $.datepicker.formatDate(datePicker.datepicker('option', 'dateFormat'), $.datepicker.parseDate('yy-mm-dd', val[0])));
+							datePicker.prop('value', $.datepicker.formatDate(datePicker.datepicker('option', 'dateFormat'), $.datepicker.parseDate('yy-mm-dd', val[0])));
 						} catch (e) {}
 					}
 				}
 				val = (!val[0] && !val[1]) ? '' : val.join('T');
 				replaceInputUI['datetime-local'].blockAttr = true;
-				elem.attr('value', val);
+				elem.prop('value', val);
 				replaceInputUI['datetime-local'].blockAttr = false;
 				e.stopImmediatePropagation();
 				triggerInlineForm(elem[0], 'input');
 				triggerInlineForm(elem[0], 'change');
 			});
 			
-			$('input', date).data('html5element', $.data(date[0], 'html5element'));
+			$('input', date).each(function(){
+				webshims.data(this, 'nativeElement', elem[0]);
+			});
 			
 			date.attr('aria-labeledby', attr.label.attr('id'));
 			attr.label.bind('click', function(){
@@ -593,8 +661,11 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 			
 			webshims.triggerDomUpdate(date[0]);
 			if(setLangDefaults){
-				$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
-					elem.attr(name, function(i, value){return value || '';});
+				['disabled', 'min', 'max', 'value', 'step'].forEach(function(name){
+					var val = elem.attr(name);
+					if(val != null){
+						elem.attr(name, val);
+					}
 				});
 			}
 		};
@@ -609,40 +680,48 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 			},
 			//ToDo: use min also on time
 			min: function(orig, shim, value){
-				value = (value.split) ? value.split('T') : [];
-				try {
-					value = $.datepicker.parseDate('yy-mm-dd', value[0]);
-				} catch(e){value = false;}
 				if(value){
-					$('input.input-datetime-local-date', shim).datepicker('option', 'minDate', value);
+					value = (value.split) ? value.split('T') : [];
+					try {
+						value = $.datepicker.parseDate('yy-mm-dd', value[0]);
+					} catch(e){value = false;}
 				}
+				if(!value){
+					value = null;
+				}
+				$('input.input-datetime-local-date', shim).datepicker('option', 'minDate', value);
+				
 			},
 			//ToDo: use max also on time
 			max: function(orig, shim, value){
-				value = (value.split) ? value.split('T') : [];
-				try {
-					value = $.datepicker.parseDate('yy-mm-dd', value[0]);
-				} catch(e){value = false;}
 				if(value){
-					$('input.input-datetime-local-date', shim).datepicker('option', 'maxDate', value);
+					value = (value.split) ? value.split('T') : [];
+					try {
+						value = $.datepicker.parseDate('yy-mm-dd', value[0]);
+					} catch(e){value = false;}
 				}
+				if(!value){
+					value = null;
+				}
+				$('input.input-datetime-local-date', shim).datepicker('option', 'maxDate', value);
 			},
 			value: function(orig, shim, value){
-				
-					var dateValue;
+				var dateValue;
+				if(value){
 					value = (value.split) ? value.split('T') : [];
 					try {
 						dateValue = $.datepicker.parseDate('yy-mm-dd', value[0]);
 					} catch(e){dateValue = false;}
-					if(dateValue){
-						if(!replaceInputUI['datetime-local'].blockAttr){
-							lazySetDate($('input.input-datetime-local-date', shim), dateValue);
-						}
-						$('input.input-datetime-local-time', shim).attr('value', value[1] || '00:00');
-					} else {
-						$('input.input-datetime-local-date', shim).attr('value', value[0] || '');
-						$('input.input-datetime-local-time', shim).attr('value', value[1] || '');
+				}
+				if(dateValue){
+					if(!replaceInputUI['datetime-local'].blockAttr){
+						lazySetDate($('input.input-datetime-local-date', shim), dateValue);
 					}
+					$('input.input-datetime-local-time', shim).prop('value', value[1] || '00:00');
+				} else {
+					$('input.input-datetime-local-date', shim).prop('value', value[0] || '');
+					$('input.input-datetime-local-time', shim).prop('value', value[1] || '');
+				}
 					
 				
 			}
@@ -665,12 +744,12 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 						}
 					}
 					try {
-						value = $.datepicker.parseDate(date.datepicker('option', 'dateFormat'), date.attr('value') );
-						value = (value) ? $.datepicker.formatDate( 'yy-mm-dd', value ) : date.attr('value');
+						value = $.datepicker.parseDate(date.datepicker('option', 'dateFormat'), date.prop('value') );
+						value = (value) ? $.datepicker.formatDate( 'yy-mm-dd', value ) : date.prop('value');
 					} catch(e){
-						value = date.attr('value');
+						value = date.prop('value');
 					}
-					elem.attr('value', value);
+					elem.prop('value', value);
 					replaceInputUI.date.blockAttr = false;
 					e.stopImmediatePropagation();
 					triggerInlineForm(elem[0], 'input');
@@ -699,8 +778,11 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 				}
 			}
 			if(setLangDefaults){
-				$.each(['disabled', 'min', 'max', 'value'], function(i, name){
-					elem.attr(name, function(i, value){return value || '';});
+				['disabled', 'min', 'max', 'value'].forEach(function(name){
+					var val = elem.attr(name);
+					if(val != null){
+						elem.attr(name, val);
+					}
 				});
 			}
 		};
@@ -708,14 +790,14 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		
 		replaceInputUI.date.attrs = {
 			disabled: function(orig, shim, value){
-				shim.attr('disabled', !!value);
+				$.prop(shim, 'disabled', !!value);
 			},
 			min: function(orig, shim, value){
 				try {
 					value = $.datepicker.parseDate('yy-mm-dd', value);
 				} catch(e){value = false;}
 				if(value){
-					shim.datepicker('option', 'minDate', value);
+					$(shim).datepicker('option', 'minDate', value);
 				}
 			},
 			max: function(orig, shim, value){
@@ -723,7 +805,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 					value = $.datepicker.parseDate('yy-mm-dd', value);
 				} catch(e){value = false;}
 				if(value){
-					shim.datepicker('option', 'maxDate', value);
+					$(shim).datepicker('option', 'maxDate', value);
 				}
 			},
 			value: function(orig, shim, value){
@@ -733,9 +815,9 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 					} catch(e){var dateValue = false;}
 					
 					if(dateValue){
-						lazySetDate(shim, dateValue);
+						lazySetDate($(shim), dateValue);
 					} else {
-						shim.attr('value', value);
+						$.prop(shim, 'value', value);
 					}
 				}
 			}
@@ -749,7 +831,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 				change = function(e, ui){
 					if(e.originalEvent){
 						replaceInputUI.range.blockAttr = true;
-						elem.attr('value', ui.value);
+						elem.prop('value', ui.value);
 						replaceInputUI.range.blockAttr = false;
 						if(e.type == 'slidechange'){
 							triggerInlineForm(elem[0], 'change');
@@ -760,7 +842,12 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 				}
 			;
 			
-			$('span', range).attr('aria-labeledby', attr.label.attr('id'));
+			$('span', range)
+				.each(function(){
+					webshims.data(this, 'nativeElement', elem[0]);
+				})
+				.attr('aria-labeledby', attr.label.attr('id'))
+			;
 			attr.label.bind('click', function(){
 				$('span', range).focus();
 				return false;
@@ -777,15 +864,26 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 				slide: change
 			}));
 			
-			$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
-				elem.attr(name, function(i, value){return value || '';});
+			['disabled', 'min', 'max', 'value', 'step'].forEach(function(name){
+				var val = elem.attr(name);
+				var shadow;
+				if(name == 'value' && !val){
+					
+					shadow = elem.getShadowElement();
+					if(shadow){
+						val = ($(shadow).slider('option', 'max') - $(shadow).slider('option', 'min')) / 2;
+					}
+				}
+				if(val != null){
+					elem.attr(name, val);
+				}
 			});
 		};
 		
 		replaceInputUI.range.attrs = {
 			disabled: function(orig, shim, value){
 				value = !!value;
-				shim.slider( "option", "disabled", value );
+				$(shim).slider( "option", "disabled", value );
 				$('span', shim)
 					.attr({
 						'aria-disabled': value+'',
@@ -795,36 +893,34 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 			},
 			min: function(orig, shim, value){
 				value = (value) ? value * 1 || 0 : 0;
-				shim.slider( "option", "min", value );
+				$(shim).slider( "option", "min", value );
 				$('span', shim).attr({'aria-valuemin': value});
 			},
 			max: function(orig, shim, value){
 				value = (value || value === 0) ? value * 1 || 100 : 100;
-				shim.slider( "option", "max", value );
+				$(shim).slider( "option", "max", value );
 				$('span', shim).attr({'aria-valuemax': value});
 			},
 			value: function(orig, shim, value){
-				value = $(orig).attr('valueAsNumber');
-				if(isNaN(value)){
-					value = (shim.slider('option', 'max') - shim.slider('option', 'min')) / 2;
-					orig.value = value;
+				value = $(orig).prop('valueAsNumber');
+				if(!isNaN(value)){
+					if(!replaceInputUI.range.blockAttr){
+						$(shim).slider( "option", "value", value );
+					}
+					$('span', shim).attr({'aria-valuenow': value, 'aria-valuetext': value});
 				}
-				if(!replaceInputUI.range.blockAttr){
-					shim.slider( "option", "value", value );
-				}
-				$('span', shim).attr({'aria-valuenow': value, 'aria-valuetext': value});
 			},
 			step: function(orig, shim, value){
 				value = (value && $.trim(value)) ? value * 1 || 1 : 1;
-				shim.slider( "option", "step", value );
+				$(shim).slider( "option", "step", value );
 			}
 		};
 	}
 	
 	if(Modernizr.input.valueAsNumberSet && Modernizr.input.valueAsDate && (options.replaceUI || !Modernizr.inputtypes["datetime-local"] || !Modernizr.inputtypes.range)){
 		var reflectFn = function(val){
-			if($.data(this, 'inputUIReplace')){
-				$.attr(this, 'value', $.attr(this, 'value'));
+			if(webshims.data(this, 'hasShadow')){
+				$.prop(this, 'value', $.prop(this, 'value'));
 			}
 		};
 		
@@ -833,14 +929,13 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	}
 	
 	$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, attr){
-		webshims.onNodeNamesPropertyModify('input', attr, {
-			set: function(val){
-				var widget = $.data(this, 'inputUIReplace');
-				if(widget && widget.methods[attr]){
-					widget.methods[attr](this, widget.visual, val);
+		webshims.onNodeNamesPropertyModify('input', attr, function(val){
+				var shadowData = webshims.data(this, 'shadowData');
+				if(shadowData && shadowData.data && shadowData.data[attr] && shadowData.shadowElement !== this){
+					shadowData.data[attr](this, shadowData.shadowElement, val);
 				}
 			}
-		});
+		);
 	});
 	if(!options.availabeLangs){
 		options.availabeLangs = 'af ar ar-DZ az bg bs ca cs da de el en-AU en-GB en-NZ eo es et eu fa fi fo fr fr-CH gl he hr hu hy id is it ja ko kz lt lv ml ms nl no pl pt-BR rm ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' ');
@@ -850,10 +945,10 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		if(!langObj){return;}
 		$.extend(defaultDatepicker, langObj, options.datepicker);
 		$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', defaultDatepicker).each(function(){
-			var orig = $.data(this, 'html5element');
+			var orig = webshims.data(this, 'nativeElement');
 			if(orig){
 				$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
-					orig.attr(name, function(i, value){return value || '';});
+					$(orig).attr(name, function(i, value){return value;});
 				});
 			}
 		});
@@ -884,13 +979,13 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		cache = cache || {};
 		
 		if( !('type' in cache) ){
-			cache.type = $.attr(input, 'type');
+			cache.type = $.prop(input, 'type');
 		}
 		if( !('step' in cache) ){
 			cache.step = webshims.getStep(input, cache.type);
 		}
 		if( !('valueAsNumber' in cache) ){
-			cache.valueAsNumber = typeModels[cache.type].asNumber($.attr(input, 'value'));
+			cache.valueAsNumber = typeModels[cache.type].asNumber($.prop(input, 'value'));
 		}
 		var delta = (cache.step == 'any') ? typeModels[cache.type].step * typeModels[cache.type].stepScaleFactor : cache.step,
 			ret
@@ -922,7 +1017,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	
 	var doSteps = function(input, type, control){
 		if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}
-		$.attr(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
+		$.prop(input, 'value',  typeModels[type].numberToString(getNextStep(input, ($(control).hasClass('step-up')) ? 1 : -1, {type: type})));
 		$(input).unbind('blur.stepeventshim');
 		triggerInlineForm(input, 'input');
 		
@@ -950,7 +1045,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		var stepDisableEnable = {
 			// don't change getter
 			set: function(value){
-				var stepcontrols = $.data(this, 'step-controls');
+				var stepcontrols = webshims.data(this, 'step-controls');
 				if(stepcontrols){
 					stepcontrols[ (this.disabled || this.readonly) ? 'addClass' : 'removeClass' ]('disabled-step-control');
 				}
@@ -967,7 +1062,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		//ui for numeric values
 		if(options.stepArrows){
 			$('input', context).add(contextElem.filter('input')).each(function(){
-				var type = $.attr(this, 'type');
+				var type = $.prop(this, 'type');
 				if(!typeModels[type] || !typeModels[type].asNumber || !options.stepArrows || (options.stepArrows !== true && !options.stepArrows[type]) || $(this).hasClass('has-step-controls')){return;}
 				var elem = this;
 				var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
@@ -983,7 +1078,6 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 				;
 				var jElm = $(this)
 					.addClass('has-step-controls')
-					.data('step-controls', controls)
 					.attr({
 						readonly: this.readOnly,
 						disabled: this.disabled,
@@ -992,12 +1086,12 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 					})
 					.bind(($.browser.msie) ? 'keydown' : 'keypress', function(e){
 						if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
-						$.attr(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
+						$.prop(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
 						triggerInlineForm(this, 'input');
 						return false;
 					})
 				;
-				
+				webshims.data(this, 'step-controls', controls);
 				if(options.calculateWidth){
 					adjustInputWithBtn(jElm, controls);
 					controls.css('marginTop', (jElm.outerHeight() - controls.outerHeight())  / 2 );
@@ -1015,6 +1109,8 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 			}
 			if($.datepicker && $.fn.slider){
 				$(document).unbind('.initinputui');
+			} else if(!webshims.modules["input-widgets"].src){
+				webshims.warn('jQuery UI Widget factory is already included, but not datepicker or slider. configure src of $.webshims.modules["input-widgets"].src');
 			}
 		});
 	});

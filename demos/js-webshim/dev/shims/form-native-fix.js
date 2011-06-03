@@ -97,7 +97,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		var submitTimer;
 		var trueInvalid;
 		var invalidEvent = $(document).bind('invalid', function(e){
-			if(e.originalEvent && !fromSubmit && !fromCheckValidity && ($.attr(e.target, 'validity') || {}).valid){
+			if(e.originalEvent && !fromSubmit && !fromCheckValidity && ($.prop(e.target, 'validity') || {}).valid){
 				e.originalEvent.wrongWebkitInvalid = true;
 				e.wrongWebkitInvalid = true;
 				e.stopImmediatePropagation();
@@ -136,30 +136,34 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		if(!badWebkit){return;}
 		['input', 'textarea', 'select'].forEach(function(name){
 			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
-				value: function(){
-					if(!this.willValidate){return true;}
-					var valid = ($.attr(this, 'validity') || {valid: true}).valid;
-					fromCheckValidity = true;
-					if(!valid && desc._supvalue && desc._supvalue.call(this)){
-						$(this).trigger('invalid');
+				prop: {
+					value: function(){
+						if(!this.willValidate){return true;}
+						var valid = ($.prop(this, 'validity') || {valid: true}).valid;
+						fromCheckValidity = true;
+						if(!valid && desc.prop._supvalue && desc.prop._supvalue.call(this)){
+							$(this).trigger('invalid');
+						}
+						fromCheckValidity = false;
+						return valid;
 					}
-					fromCheckValidity = false;
-					return valid;
 				}
 			});
 		});
 		
 		webshims.defineNodeNameProperty('form', 'checkValidity', {
-			value: function(){
-				var ret = true;
-				$(this.elements || [])
-					.each(function(){
-						 if($(this).checkValidity() === false){
-							ret = false;
-						}
-					})
-				;
-				return ret;
+			prop: {
+				value: function(){
+					var ret = true;
+					$(this.elements || [])
+						.each(function(){
+							 if($(this).checkValidity() === false){
+								ret = false;
+							}
+						})
+					;
+					return ret;
+				}
 			}
 		});
 		
@@ -173,17 +177,19 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		
 		['form', 'input', 'textarea', 'select'].forEach(function(name){
 			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
-				value: function(){
-					if(!fromSubmit){
-						$(this).bind('invalid', preventDefault);
+				prop: {
+					value: function(){
+						if(!fromSubmit){
+							$(this).bind('invalid', preventDefault);
+						}
+						fromCheckValidity = true;
+						var ret = desc.prop._supvalue.apply(this, arguments);
+						if(!fromSubmit){
+							$(this).unbind('invalid', preventDefault);
+						}
+						fromCheckValidity = false;
+						return ret;
 					}
-					fromCheckValidity = true;
-					var ret = desc._supvalue.apply(this, arguments);
-					if(!fromSubmit){
-						$(this).unbind('invalid', preventDefault);
-					}
-					fromCheckValidity = false;
-					return ret;
 				}
 			});
 		});
@@ -191,16 +197,17 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	
 	if(!Modernizr.requiredSelect){
 		webshims.ready('form-extend', function(){
+			
 			var isPlaceholderOptionSelected = function(select){
 				if(select.type == 'select-one' && select.size < 2){
 					var option = $('> option:first-child', select);
-					return (!option.attr('disabled') && option.attr('selected'));
+					return (!option.prop('disabled') && option.prop('selected'));
 				} 
 				return false;
 			};
 			webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){
 				
-				if(cache.nodeName == 'select' && !val && jElm.attr('required')){
+				if(cache.nodeName == 'select' && !val && jElm.prop('required')){
 					if(!cache.type){
 						cache.type = jElm[0].type;
 					}
@@ -215,7 +222,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 			webshims.defineNodeNamesBooleanProperty(['select'], 'required', {
 				set: function(value){
 					this.setAttribute('aria-required', (value) ? 'true' : 'false');
-					$.attr(this, 'validity');
+					$.prop(this, 'validity');
 				},
 				initAttr: true
 			});

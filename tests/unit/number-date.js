@@ -13,13 +13,15 @@ var createTestMethodA = function(id){
 		});
 		
 		elem.attr(obj.attrs);
-		validity = elem.attr('validity');
+		elem.val(obj.value);
+		validity = elem.prop('validity');
 		
 		$.each(obj.attrs, function(name, val){
 			attrs.push(name+': "'+val+'"');
 		});
 		
 		attrs = attrs.join(', ');
+		attrs = ' and value: '+ obj.value;
 		if(!$.isArray(obj.trueState)){
 			obj.trueState = [obj.trueState];
 		}
@@ -56,10 +58,10 @@ asyncTest('step number/date module specific validity', function(){
 	$.each([
 		{
 			attrs: {
-				value: '523',
 				step: '',
 				min: ''
 			},
+			value: '523',
 			trueState: 'valid'
 		},
 		{
@@ -68,127 +70,127 @@ asyncTest('step number/date module specific validity', function(){
 				step: '',
 				min: ''
 			},
+			value: '5ed',
 			trueState: 'typeMismatch'
 		},
 		{
 			attrs: {
-				value: '5.5',
 				step: '',
 				min: ''
 			},
+			value: '5.5',
 			trueState: 'stepMismatch'
 		},
 		{
 			attrs: {
-				value: '5.5',
 				step: '0.5',
 				min: ''
 			},
+			value: '5.5',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '5.5',
 				step: '0.6',
 				min: '4.3'
 			},
+			value: '5.5',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '5.5',
 				step: '0.6e',
 				min: '4.3'
 			},
+			value: '5.5',
 			trueState: 'stepMismatch'
 		},
 		{
 			attrs: {
-				value: '5.5',
 				step: '0.6',
 				min: '4.3e'
 			},
+			value: '5.5',
 			trueState: 'stepMismatch'
 		},
 		{
 			attrs: {
-				value: '5.5',
 				step: '0.5',
 				min: '4'
 			},
+			value: '5.5',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '5.55556',
 				step: 'any',
 				min: '4',
 				max: ''
 			},
+			value: '5.55556',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '5',
 				min: '6'
 			},
+			value: '5',
 			trueState: 'rangeUnderflow'
 		},
 		{
 			attrs: {
-				value: '8',
 				max: '6'
 			},
+			value: '8',
 			trueState: 'rangeOverflow'
 		},
 		{
 			attrs: {
-				value: '5',
 				min: '5'
 			},
+			value: '5',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '6',
 				max: '6'
 			},
+			value: '6',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '-8',
 				max: '6',
 				min: ''
 			},
+			value: '-8',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '8',
 				max: '6e'
 			},
+			value: '8',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '8',
 				max: '8',
 				min: 8
 			},
+			value: '8',
+			trueState: 'valid'
+		},
+		{
+			attrs: {},
+			value: '8e2',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '8e2'
-			},
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				value: '8e2',
 				min: '9e2'
 			},
+			value: '8e2',
 			trueState: 'rangeUnderflow'
 		}
 		
@@ -198,26 +200,26 @@ asyncTest('step number/date module specific validity', function(){
 		$.each([
 			{
 				attrs: {
-					value: '5.005',
 					step: '0.005',
 					min: '4'
 				},
+				value: '5.005',
 				trueState: 'valid'
 			},
 			{
 				attrs: {
-					value: '5.55556',
 					step: '0.0005',
 					min: '4'
 				},
+				value: '5.55556',
 				trueState: 'stepMismatch'
 			},
 			{
 				attrs: {
-					value: '5.5',
 					step: '-0.5',
 					min: '4'
 				},
+				value: '5.5',
 				trueState: 'stepMismatch'
 			}
 		], createTestMethodA('number'));
@@ -225,59 +227,52 @@ asyncTest('step number/date module specific validity', function(){
 	
 	$.each([
 		{
-			attrs: {
-				value: '1988-12-11'
-			},
+			attrs: {},
+			value: '1988-12-11',
 			trueState: 'valid'
 		},
 		{
-			attrs: {
-				value: '1988-12-11-'
-			},
+			attrs: {},
+			value: '1988-12-11-',
+			trueState: 'typeMismatch'
+		},
+		{
+			attrs: {},
+			value: '2010-10-31',
+			trueState: 'valid'
+		},
+		{
+			attrs: {},
+			value: '1888-12-11',
+			trueState: 'valid'
+		},
+		{
+			attrs: {},
+			value: '1988-12-61',
+			trueState: 'typeMismatch'
+		},
+		{
+			attrs: {},
+			value: '2010-09-30',
+			trueState: 'valid'
+		},
+		{
+			attrs: {},
+			value: '2010-09-31',
 			trueState: 'typeMismatch'
 		},
 		{
 			attrs: {
-				value: '2010-10-31'
+				max: '2010-09-31'
 			},
+			value: '2010-10-02',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '1888-12-11'
+				max: '2010-09-02'
 			},
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				value: '1988-12-61'
-			},
-			trueState: 'typeMismatch'
-		},
-		{
-			attrs: {
-				value: '2010-09-30'
-			},
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				value: '2010-09-31'
-			},
-			trueState: 'typeMismatch'
-		},
-		{
-			attrs: {
-				max: '2010-09-31',
-				value: '2010-10-02'
-			},
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				max: '2010-09-02',
-				value: '2010-09-02'
-			},
+			value: '2010-09-02',
 			trueState: 'valid'
 		},
 		{
@@ -289,32 +284,32 @@ asyncTest('step number/date module specific validity', function(){
 		},
 		{
 			attrs: {
-				value: '2010-09-12',
 				min: '2010-09-13'
 			},
+			value: '2010-09-12',
 			trueState: 'rangeUnderflow'
 		},
 		{
 			attrs: {
-				value: '2010-09-12',
 				max: '2010-08-12'
 			},
+			value: '2010-09-12',
 			trueState: 'rangeOverflow'
 		},
 		{
 			attrs: {
-				value: '2010-09-12',
 				max: '2010-09-11',
 				min: '2010-09-11'
 			},
+			value: '2010-09-12',
 			trueState: 'rangeOverflow'
 		},
 		{
 			attrs: {
-				value: '2010-09-12',
 				max: '2010-10-12',
 				min: '2010-09-11'
 			},
+			value: '2010-09-12',
 			trueState: 'valid'
 		}
 	],
@@ -323,9 +318,8 @@ asyncTest('step number/date module specific validity', function(){
 	if(!omitTests.numericDateProps){
 		$.each([
 			{
-				attrs: {
-					value: '1488-12-11'
-				},
+				attrs: {},
+				value: '1488-12-11',
 				trueState: 'valid'
 			}
 		], createTestMethodA('date'));
@@ -333,84 +327,83 @@ asyncTest('step number/date module specific validity', function(){
 
 	$.each([
 		{
-			attrs: {
-				value: '20:30'
-			},
+			attrs: {},
+			value: '20:30',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '20:30:03',
 				step: 'any'
 			},
+			value: '20:30:03',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '20:30:03.500',
 				step: 'any'
 			},
+			value: '20:30:03.500',
 			trueState: 'valid'
 		},
 		{
-			attrs: {
-				value: '24:30'
-			},
+			attrs: {},
+			value: '24:30',
 			trueState: 'typeMismatch'
 		},
 		{
 			attrs: {
-				value: '23:30:40'
+				
 			},
+			value: '23:30:40',
 			trueState: 'stepMismatch'
 		},
 		{
 			attrs: {
-				value: '23:30:40',
 				step: '10'
 			},
+			value: '23:30:40',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '23:35',
 				step: '300'
 			},
+			value: '23:35',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '23:36',
 				step: '300'
 			},
+			value: '23:36',
 			trueState: 'stepMismatch'
 		},
 		{
 			attrs: {
-				value: '01:30',
 				min: '02:20'
 			},
+			value: '01:30',
 			trueState: 'rangeUnderflow'
 		},
 		{
 			attrs: {
-				value: '01:30',
 				min: '01:20'
 			},
+			value: '01:30',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '20:30',
 				max: '18:20'
 			},
+			value: '20:30',
 			trueState: 'rangeOverflow'
 		},
 		{
 			attrs: {
-				value: '20:30',
 				max: '20:30'
 			},
+			value: '20:30',
 			trueState: 'valid'
 		}
 	],
@@ -419,86 +412,91 @@ asyncTest('step number/date module specific validity', function(){
 	$.each([
 		{
 			attrs: {
-				value: '1999-12-09T20:30'
+				
 			},
+			value: '1999-12-09T20:30',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '1999-12-09T20|30'
+				
 			},
+			value: '1999-12-09T20|30',
 			trueState: 'typeMismatch'
 		},
 		{
 			attrs: {
-				value: '1999-12-09T20:0'
+				
 			},
+			value: '1999-12-09T20:0',
 			trueState: 'typeMismatch'
 		},
 		{
 			attrs: {
-				value: '1999-12-09T20:1'
+				
 			},
+			value: '1999-12-09T20:1',
 			trueState: 'typeMismatch'
 		},
 		{
 			attrs: {
-				value: '1939-12-09T20:10:01'
+				
 			},
+			value: '1939-12-09T20:10:01',
 			trueState: 'stepMismatch'
 		},
 		{
 			attrs: {
-				value: '1999-12-09T20:10:01',
 				step: 1
 			},
+			value: '1999-12-09T20:10:01',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '1999-12-09T20:12',
 				step: 120
 			},
+			value: '1999-12-09T20:12',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '1999-12-09T20:10',
 				step: '',
 				min: '1999-12-09T20:11'
 			},
+			value: '1999-12-09T20:10',
 			trueState: 'rangeUnderflow'
 		},
 		{
 			attrs: {
-				value: '1999-12-09T20:10',
 				min: '1999-12-09T20:10'
 			},
+			value: '1999-12-09T20:10',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '1999-12-09T20:10',
 				max: '1999-12-09T20:10'
 			},
+			value: '1999-12-09T20:10',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '1999-12-09T20:10',
 				step: '',
 				min: '1999-12-09T20:11',
 				max: '1999-12-09T20:09'
 			},
+			value: '1999-12-09T20:10',
 			trueState: ['rangeUnderflow', 'rangeOverflow']
 		},
 		{
 			attrs: {
-				value: '1999-12-09T20:10',
 				step: '',
 				min: '1999-12-09T20:11T',
 				max: '1999-12-09T20:09:'
 			},
+			value: '1999-12-09T20:10',
 			trueState: 'valid'
 		}
 	], createTestMethodA('datetime-local'));
@@ -507,9 +505,9 @@ asyncTest('step number/date module specific validity', function(){
 		$.each([
 			{
 				attrs: {
-					value: '1999-12-09T20:11',
 					step: 120
 				},
+				value: '1999-12-09T20:11',
 				trueState: 'stepMismatch'
 			}
 		], createTestMethodA('datetime-local'));
@@ -518,20 +516,23 @@ asyncTest('step number/date module specific validity', function(){
 	$.each([
 		{
 			attrs: {
-				value: '4'
+				
 			},
+			value: '4',
 			trueState: 'valid'
 		},
 		{
 			attrs: {
-				value: '144'
+				
 			},
+			value: '144',
 			trueState: 'rangeOverflow'
 		},
 		{
 			attrs: {
-				value: '-10'
+				
 			},
+			value: '-10',
 			trueState: 'rangeUnderflow'
 		}
 	], 
@@ -544,6 +545,7 @@ asyncTest('step number/date module specific validity', function(){
 	
 });
 
+return;
 
 asyncTest('valueAsDate/valueAsNumber', function(){
 	
@@ -603,13 +605,13 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		}
 	], function(i, data){
 		var elem = $('#'+data.id);
-		elem.attr('value', data.value);
+		elem.prop('value', data.value);
 		
 		if(data.result === undefined){
-			var asVal = elem.attr('valueAsNumber');
+			var asVal = elem.prop('valueAsNumber');
 			ok(isNaN(asVal), data.value+' is as number NaN, element: '+ data.id+ ', was: '+ asVal +', type: '+ (typeof asVal));
 		} else {
-			ok(elem.attr('valueAsNumber') === data.result, data.value+' is AsNumber: '+ data.result +', element: '+ data.id+ ', was: '+ elem.attr('valueAsNumber'));
+			ok(elem.prop('valueAsNumber') === data.result, data.value+' is AsNumber: '+ data.result +', element: '+ data.id+ ', was: '+ elem.prop('valueAsNumber'));
 		}
 	});
 	
@@ -647,15 +649,15 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			}
 		], function(i, data){
 			var elem = $('#'+data.id);
-			elem.attr('value', data.value);
-			if(Modernizr.formvalidation ===  true && data.value != elem.attr('value')){
+			elem.prop('value', data.value);
+			if(Modernizr.formvalidation ===  true && data.value != elem.prop('value')){
 				return;
 			}
 			if(data.result === undefined){
-				var asVal = elem.attr('valueAsNumber');
+				var asVal = elem.prop('valueAsNumber');
 				ok(isNaN(asVal), data.value+' is as number NaN, element: '+ data.id+ ', was: '+ asVal +', type: '+ (typeof asVal));
 			} else {
-				ok(elem.attr('valueAsNumber') === data.result, data.value+' is AsNumber: '+ data.result +', element: '+ data.id+ ', was: '+ elem.attr('valueAsNumber'));
+				ok(elem.prop('valueAsNumber') === data.result, data.value+' is AsNumber: '+ data.result +', element: '+ data.id+ ', was: '+ elem.prop('valueAsNumber'));
 			}
 		});
 	}
@@ -676,13 +678,13 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		], 
 		function(i, data){
 			var elem = $('#' + data.id);
-			elem.attr('value', '');
-			elem.attr('valueAsNumber', data.value);
+			elem.prop('value', '');
+			elem.prop('valueAsNumber', data.value);
 			
 //			if (Modernizr.formvalidation === true && data.value != elem.attr('valueAsNumber')) {
 //				return;
 //			}
-			var val = elem.attr('value');
+			var val = elem.prop('value');
 			ok(function(){
 				if (data.id == 'time' || data.id == 'datetime-local') {
 					if (val && val.indexOf('.') !== -1 && data.result.length < val.length) {
@@ -706,10 +708,10 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		}], 
 		function(i, data){
 			var elem = $('#' + data.id);
-			elem.attr('valueAsNumber', data.value);
+			elem.prop('valueAsNumber', data.value);
 			
 			
-			var val = elem.attr('value');
+			var val = elem.prop('value');
 			ok(function(){
 				if (data.id == 'time' || data.id == 'datetime-local') {
 					if (val && val.indexOf('.') !== -1 && data.result.length < val.length) {
@@ -775,14 +777,14 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		resultNumber: 70201000
 	}], function(i, data){
 		var elem = $('#' + data.id);
-		elem.attr('valueAsDate', data.value());
+		elem.prop('valueAsDate', data.value());
 		
-		ok(elem.attr('value') === data.resultVal, 'expected val: ' + data.resultVal + ', element: ' + data.id + ', was: ' + elem.attr('value'));
+		ok(elem.prop('value') === data.resultVal, 'expected val: ' + data.resultVal + ', element: ' + data.id + ', was: ' + elem.prop('value'));
 		if (data.resultNumber === undefined) {
-			ok(isNaN(elem.attr('valueAsNumber')), ' expected number: NaN, element: ' + data.id + ', was: ' + elem.attr('valueAsNumber'));
+			ok(isNaN(elem.attr('valueAsNumber')), ' expected number: NaN, element: ' + data.id + ', was: ' + elem.prop('valueAsNumber'));
 		}
 		else {
-			ok(elem.attr('valueAsNumber') === data.resultNumber, ' expected number: ' + data.resultNumber + ', element: ' + data.id + ', was: ' + elem.attr('valueAsNumber'));
+			ok(elem.prop('valueAsNumber') === data.resultNumber, ' expected number: ' + data.resultNumber + ', element: ' + data.id + ', was: ' + elem.prop('valueAsNumber'));
 		}
 	});
 	
@@ -814,12 +816,12 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		elem.attr('value', data.val);
 		if(data.result === null){
 			if(data.strict){
-				strictEqual(data.result, elem.attr('valueAsDate'), 'empty value is null '+data.id);
+				strictEqual(data.result, elem.prop('valueAsDate'), 'empty value is null '+data.id);
 			} else {
-				equal(data.result, elem.attr('valueAsDate'), 'empty value is null/undefined '+data.id);
+				equal(data.result, elem.prop('valueAsDate'), 'empty value is null/undefined '+data.id);
 			}
 		} else {
-			equal(data.result, elem.attr('valueAsDate').getTime(), 'get valueAsDate on '+data.id);
+			equal(data.result, elem.prop('valueAsDate').getTime(), 'get valueAsDate on '+data.id);
 		}
 	});
 	

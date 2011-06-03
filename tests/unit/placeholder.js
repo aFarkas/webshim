@@ -29,14 +29,15 @@ var textPlaceholder = {
 	},
 	hasValue: function(elem, value){
 		if(Modernizr.input.placeholder) {return;}
-		equals($(elem).attr('value'), value, 'placeholder has text ($.fn.attr): ');
-		equals($(elem).val(), value, 'placeholder has text ($.fn.val): ');
+		strictEqual($(elem).attr('value'), value, 'placeholder has text ($.fn.attr): ');
+		strictEqual($(elem).prop('value'), value, 'placeholder has text ($.fn.prop): ');
+		strictEqual($(elem).val(), value, 'placeholder has text ($.fn.val): ');
 	}
 };
 asyncTest("placeholder Modul", function(){
 	QUnit.reset();
 	
-	equals( $('#placeholder').attr('value'), "", '$.fn.attr(value) is empty' );
+	equals( $('#placeholder').prop('value'), "", '$.fn.prop(value) is empty' );
 	
 	
 	placeholder.isApplied($('#placeholder'), true);
@@ -56,13 +57,25 @@ asyncTest("placeholder Modul", function(){
 	
 	$('#placeholder').attr("value", "foo");
 	placeholder.isVisible($('#placeholder'), false);
-	equals( $('#placeholder').attr('placeholder'), "hello", '$.attr(placeholder) is hello' );
+	
+	webshimtest.reflectAttr($('#placeholder'), 'placeholder', "hello");
 	
 	$('#placeholder').val("").attr('placeholder', "bar");
 	equals( $('#placeholder').attr('placeholder'), "bar", '$.attr(placeholder) is bar' );
 	
 	placeholder.isVisible($('#placeholder'), true);
 	placeholder.hasText($('#placeholder'), 'bar');
+	
+	$('#placeholder').removeAttr('placeholder');
+	placeholder.isVisible($('#placeholder'), false);
+	
+	webshimtest.reflectAttr($('#placeholder'), 'placeholder', "");
+	
+	$('#placeholder').prop('placeholder', 'bar2');
+	
+	placeholder.isVisible($('#placeholder'), true);
+	placeholder.hasText($('#placeholder'), 'bar2');
+	
 		
 		
 	placeholder.isApplied($('#placeholder-empty'), false);
@@ -78,26 +91,27 @@ asyncTest("placeholder Modul", function(){
 	
 	textPlaceholder.hasText($('#placeholder-text')[0], 'hello');
 	textPlaceholder.hasValue($('#placeholder-text')[0], '');
-	$('#placeholder-text').attr('placeholder', 'yes changed');
+	webshimtest.reflectAttr($('#placeholder-text'), 'placeholder', "hello");
 	
+	$('#placeholder-text').prop('placeholder', 'yes changed');
 	textPlaceholder.hasText($('#placeholder-text')[0], 'yes changed');
 	textPlaceholder.hasValue($('#placeholder-text')[0], '');
-	$('#placeholder-text').attr('value', 'jo');
+	$('#placeholder-text').prop('value', 'jo');
 	textPlaceholder.hasValue($('#placeholder-text')[0], 'jo');
 	
-	$('#placeholder-text').attr('value', '');
+	$('#placeholder-text').prop('value', '');
 	textPlaceholder.hasValue($('#placeholder-text')[0], '');
 	
 	$('#placeholder-empty-text').attr('placeholder', 'yes');
-	$('#placeholder-empty-text').attr('value', 'jo');
+	$('#placeholder-empty-text').prop('value', 'jo');
 	textPlaceholder.hasValue($('#placeholder-empty-text')[0], 'jo');
 	textPlaceholder.hasText($('#placeholder-empty-text')[0], 'jo');
 	$('#placeholder-empty-text').val('');
 	textPlaceholder.hasValue($('#placeholder-empty-text')[0], '');
 	textPlaceholder.hasText($('#placeholder-empty-text')[0], 'yes');
 	
-	$('#placeholder-empty-text').attr('placeholder', 'yes2');
-	$('#placeholder-empty-text').attr('value', 'yes2');
+	$('#placeholder-empty-text').prop('placeholder', 'yes2');
+	$('#placeholder-empty-text').prop('value', 'yes2');
 	textPlaceholder.hasValue($('#placeholder-empty-text')[0], 'yes2');
 	textPlaceholder.hasText($('#placeholder-empty-text')[0], 'yes2');
 	$('#placeholder-empty-text').val('');
