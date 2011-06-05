@@ -165,8 +165,17 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		});
 		
 		if(doc.addEventListener){
+			var inputThrottle;
 			doc.addEventListener('change', function(e){
+				clearTimeout(inputThrottle);
 				testValidity(e.target);
+			}, true);
+			
+			doc.addEventListener('input', function(e){
+				clearTimeout(inputThrottle);
+				inputThrottle = setTimeout(function(){
+					testValidity(e.target);
+				}, 290);
 			}, true);
 		}
 		
@@ -174,7 +183,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		
 		webshims.addReady(function(context, elem){
 			$(validityElementsSel, context).add(elem.filter(validityElementsSel)).each(function(){
-				$.attr(this, 'validity');
+				$.prop(this, 'validity');
 			});
 		});
 		if(overrideNativeMessages){

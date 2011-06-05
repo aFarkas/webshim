@@ -18,8 +18,8 @@ asyncTest("general validity Modul", function(){
 	 * novalidate
 	 */
 	//novalidate getter
-	equals( form1.attr('novalidate'), undefined, 'novalidate is undefined' );
-	ok($('#form-2').attr('novalidate') !== undefined, 'novalidate is not undefined' );
+	strictEqual( form1.attr('novalidate'), undefined, 'novalidate is undefined' );
+	strictEqual( $('#form-2').attr('novalidate'), "", 'novalidate is not undefined' );
 	
 	//novalidate setter
 	
@@ -297,8 +297,11 @@ asyncTest('output test', function(){
 		equals($('#labeled-output').text(), 'somecontent', 'shim shows value');
 		ok(/&outputtest=somecontent&/.test($('form').serialize()), 'finds output serialized in shim');
 	}
+	
 	$('#rangeId').attr('value', 30);
+	
 	$.webshims.triggerInlineForm($('input.oninput-test')[0], 'input');
+	
 	equals(window.globalInput, '30:30', 'globalInput value was set on trigger');
 	
 	$($('#form-1')[0]['outputtest']).prop('value', 'value');

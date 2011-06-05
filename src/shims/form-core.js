@@ -97,7 +97,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				if(checkTypes[elem.type] && elem.checked){
 					getGroupElements(elem).removeClass(removeClass).removeAttr('aria-invalid');
 				}
-				$(e.target).unbind('input.form-ui-invalid');
+				$(e.target).unbind('.form-ui-invalid');
 			}
 		} else {
 			if(!shadowElem.hasClass('form-ui-invalid')){
@@ -108,43 +108,61 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				}
 				trigger = 'changedinvalid';
 				$(e.target)
-					.unbind('input.form-ui-invalid')
-					.bind('input.form-ui-invalid', switchValidityClass)
+					.unbind('.form-ui-invalid')
+//					.bind('input.form-ui-invalid focusout.form-ui-invalid', switchValidityClass)
 				;
 			}
 		}
 		if(addClass){
 			shadowElem.addClass(addClass).removeClass(removeClass);
-			$(elem).trigger(trigger);
+			//jQuery 1.6.1 IE9 bug (doubble trigger bug)
+			setTimeout(function(){
+				$(elem).trigger(trigger);
+			}, 0);
 		}
 		
 		stopUIRefresh = true;
 		setTimeout(function(){
 			stopUIRefresh = false;
+			elem = shadowElem = null;
 		}, 9);
-		elem = shadowElem = null;
+		
 	};
-	$(document).bind('change focusout refreshvalidityui', switchValidityClass);
+	
+//	$(document).bind('change refreshvalidityui', switchValidityClass);
 	
 	
 	
 	webshims.triggerInlineForm = function(elem, event){
-		var attr = elem['on'+event] || elem.getAttribute('on'+event) || '';
+		if(elem.jquery){
+			elem = elem[0];
+		}
+		var onEvent = 'on'+event;
+		var attr = elem[onEvent] || elem.getAttribute(onEvent) || '';
+		var removed;
 		var ret;
 		event = $.Event({
 			type: event,
-			target: elem[0],
-			currentTarget: elem[0]
+			target: elem,
+			currentTarget: elem
 		});
 		
 		if(attr && typeof attr == 'string'){
 			ret = webshims.gcEval(attr, elem);
+			if(elem[onEvent]){
+				removed = true;
+				elem[onEvent] = false;
+			}
+			
 		}
 		if(ret === false){
 			event.stopPropagation();
 			event.preventDefault();
 		}
 		$(elem).trigger(event);
+		if(removed){
+			elem[onEvent] = attr;
+		}
 		return ret;
 	};
 	

@@ -8,7 +8,7 @@
 	<!-- Includes -->
 	<script src="data/testinit.js"></script>
 
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
 	
 	<script src="../../src/extras/modernizr-1.7.min.js"></script>
 	<script src="../../src/extras/loaders/sssl.js"></script>
@@ -19,7 +19,7 @@
 			
 			//don't load jQuery UI
 			$.webshims.modules['forms-ext'].test = function(){return true;};
-			
+//			
 			$.webshims.polyfill();
 		})(jQuery);
 	</script>
@@ -43,13 +43,21 @@
 				$('DOM json-storage', start);
 			});
 			
+
+			
 		})(jQuery);
 	</script>
+	
 	<script src="unit/core.js"></script>
+	
 	<script src="unit/data.js"></script>
+	
 	<script src="unit/attributes.js"></script>
+	
 	<script src="unit/event.js"></script>
+
 	<script src="unit/traversing.js"></script>
+
 	<script src="unit/manipulation.js"></script>
 
 </head>

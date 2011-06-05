@@ -310,6 +310,59 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 
 webshims.reflectProperties(['input'], ['pattern']);
 
+webshims.defineNodeNameProperty('textarea', 'maxlength', {
+	attr: {
+		set: function(val){
+			this.setAttribute('maxlength', ''+val);
+		},
+		get: function(){
+			var ret = this.getAttribute('maxlength');
+			return ret == null ? undefined : ret;
+		}
+	},
+	prop: {
+		set: function(val){
+			if(isNumber(val)){
+				if(val < 0){
+					throw('INDEX_SIZE_ERR');
+				}
+				this.setAttribute('maxlength', parseInt(val, 10));
+				return;
+			}
+			this.setAttribute('maxlength', ''+ 0);
+		},
+		get: function(){
+			var val = this.getAttribute('maxlength');
+			return (isNumber(val) && val >= 0) ? parseInt(val, 10) : -1; 
+			
+		}
+	}
+});
+webshims.defineNodeNameProperty('textarea', 'maxLength', {
+	prop: {
+		set: function(val){
+			$.prop(this, 'maxlength', val);
+		},
+		get: function(){
+			return $.prop(this, 'maxlength');
+		}
+	}
+});
+
+if(!$.support.getSetAttribute && $('<form novalidate></form>').attr('novalidate') == null){
+	webshims.defineNodeNameProperty('form', 'novalidate', {
+		attr: {
+			set: function(val){
+				this.setAttribute('novalidate', ''+val);
+			},
+			get: function(){
+				var ret = this.getAttribute('novalidate');
+				return ret == null ? undefined : ret;
+			}
+		}
+	});
+}
+
 var noValidate = function(){
 		var elem = this;
 		if(!elem.form){return;}
@@ -973,14 +1026,16 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				this._resetListCached();
 				
 				if(opts.input.form && opts.input.id){
-					$(opts.input.form).bind('submit.datalistWidget'+opts.input.id, function(){
-						var val = $.attr(opts.input, 'value');
-						that.storedOptions = getStoredOptions(opts.input.name || opts.input.id);
-						if(val && $.inArray(val, that.storedOptions) == -1){
-							that.storedOptions.push(val);
-							storeOptions(opts.input.name || opts.input.id, that.storedOptions );
-						}
-					});
+					try  {
+						$(opts.input.form).bind('submit.datalistWidget'+opts.input.id, function(){
+							var val = $.prop(opts.input, 'value');
+							that.storedOptions = getStoredOptions(opts.input.name || opts.input.id);
+							if(val && $.inArray(val, that.storedOptions) == -1){
+								that.storedOptions.push(val);
+								storeOptions(opts.input.name || opts.input.id, that.storedOptions );
+							}
+						});
+					} catch(er){}
 				}
 				$(window).bind('unload', function(){
 					that.destroy();

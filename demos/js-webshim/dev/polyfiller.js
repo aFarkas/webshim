@@ -112,7 +112,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: 'pre1.7.0',
+		version: '1.7.0beta1',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
@@ -343,14 +343,14 @@
 						var isDefaultPrevented = e.isDefaultPrevented;
 						var preventDefault = e.preventDefault;
 						e.preventDefault = function(){
-							clearTimeout($.data(e.target, e.type +'-defaultPrevented'));
-							$.data(e.target, e.type +'-defaultPrevented', setTimeout(function(){
-								$.removeData(e.target, e.type +'-defaultPrevented');
+							clearTimeout($.data(e.target, e.type +'DefaultPrevented'));
+							$.data(e.target, e.type +'DefaultPrevented', setTimeout(function(){
+								$.removeData(e.target, e.type +'DefaultPrevented');
 							}, 30));
 							return preventDefault.apply(this, arguments);
 						};
 						e.isDefaultPrevented = function(){
-							return !!(isDefaultPrevented.apply(this, arguments) || $.data(e.target, e.type +'-defaultPrevented') || false);
+							return !!(isDefaultPrevented.apply(this, arguments) || $.data(e.target, e.type +'DefaultPrevented') || false);
 						};
 						e._isPolyfilled = true;
 					}

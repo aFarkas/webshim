@@ -140,6 +140,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 					value: function(){
 						if(!this.willValidate){return true;}
 						var valid = ($.prop(this, 'validity') || {valid: true}).valid;
+						
 						fromCheckValidity = true;
 						if(!valid && desc.prop._supvalue && desc.prop._supvalue.call(this)){
 							$(this).trigger('invalid');
@@ -182,6 +183,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 						if(!fromSubmit){
 							$(this).bind('invalid', preventDefault);
 						}
+						
 						fromCheckValidity = true;
 						var ret = desc.prop._supvalue.apply(this, arguments);
 						if(!fromSubmit){
@@ -196,6 +198,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	})();
 	
 	if(!Modernizr.requiredSelect){
+		
 		webshims.ready('form-extend', function(){
 			
 			var isPlaceholderOptionSelected = function(select){
@@ -205,6 +208,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 				} 
 				return false;
 			};
+			
 			webshims.addValidityRule('valueMissing', function(jElm, val, cache, validityState){
 				
 				if(cache.nodeName == 'select' && !val && jElm.prop('required')){

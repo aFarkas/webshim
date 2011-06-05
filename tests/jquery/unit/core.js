@@ -555,20 +555,7 @@ test("jQuery('html', context)", function() {
 	equals($span.length, 1, "Verify a span created with a div context works, #1763");
 });
 
-if ( !isLocal ) {
-test("jQuery(selector, xml).text(str) - Loaded via XML document", function() {
-	expect(2);
-	stop();
-	jQuery.get("data/dashboard.xml", function(xml) {
-		// tests for #1419 where IE was a problem
-		var tab = jQuery("tab", xml).eq(0);
-		equals( tab.text(), "blabla", "Verify initial text correct" );
-		tab.text("newtext");
-		equals( tab.text(), "newtext", "Verify new text correct" );
-		start();
-	});
-});
-}
+
 
 test("end()", function() {
 	expect(3);
@@ -872,7 +859,7 @@ test("jQuery.each(Object,Function)", function() {
 	jQuery.each(document.styleSheets, function(i){
 		stylesheet_count++;
 	});
-	equals(stylesheet_count, 3, "should not throw an error in IE while looping over document.styleSheets and return proper amount");
+	ok(stylesheet_count > 2 && stylesheet_count < 6, "should not throw an error in IE while looping over document.styleSheets and return proper amount");
 
 });
 
@@ -984,123 +971,3 @@ test("jQuery.parseJSON", function(){
 	}
 });
 
-test("jQuery.sub() - Static Methods", function(){
-    expect(18);
-    var Subclass = jQuery.sub();
-    Subclass.extend({
-        topLevelMethod: function() {return this.debug;},
-        debug: false,
-        config: {
-            locale: "en_US"
-        },
-        setup: function(config) {
-            this.extend(true, this.config, config);
-        }
-    });
-    Subclass.fn.extend({subClassMethod: function() { return this;}});
-
-    //Test Simple Subclass
-    ok(Subclass.topLevelMethod() === false, "Subclass.topLevelMethod thought debug was true");
-    ok(Subclass.config.locale == "en_US", Subclass.config.locale + " is wrong!");
-    same(Subclass.config.test, undefined, "Subclass.config.test is set incorrectly");
-    equal(jQuery.ajax, Subclass.ajax, "The subclass failed to get all top level methods");
-
-    //Create a SubSubclass
-    var SubSubclass = Subclass.sub();
-
-    //Make Sure the SubSubclass inherited properly
-    ok(SubSubclass.topLevelMethod() === false, "SubSubclass.topLevelMethod thought debug was true");
-    ok(SubSubclass.config.locale == "en_US", SubSubclass.config.locale + " is wrong!");
-    same(SubSubclass.config.test, undefined, "SubSubclass.config.test is set incorrectly");
-    equal(jQuery.ajax, SubSubclass.ajax, "The subsubclass failed to get all top level methods");
-
-    //Modify The Subclass and test the Modifications
-    SubSubclass.fn.extend({subSubClassMethod: function() { return this;}});
-    SubSubclass.setup({locale: "es_MX", test: "worked"});
-    SubSubclass.debug = true;
-    SubSubclass.ajax = function() {return false;};
-    ok(SubSubclass.topLevelMethod(), "SubSubclass.topLevelMethod thought debug was false");
-    same(SubSubclass(document).subClassMethod, Subclass.fn.subClassMethod, "Methods Differ!");
-    ok(SubSubclass.config.locale == "es_MX", SubSubclass.config.locale + " is wrong!");
-    ok(SubSubclass.config.test == "worked", "SubSubclass.config.test is set incorrectly");
-    notEqual(jQuery.ajax, SubSubclass.ajax, "The subsubclass failed to get all top level methods");
-
-    //This shows that the modifications to the SubSubClass did not bubble back up to it's superclass
-    ok(Subclass.topLevelMethod() === false, "Subclass.topLevelMethod thought debug was true");
-    ok(Subclass.config.locale == "en_US", Subclass.config.locale + " is wrong!");
-    same(Subclass.config.test, undefined, "Subclass.config.test is set incorrectly");
-    same(Subclass(document).subSubClassMethod, undefined, "subSubClassMethod set incorrectly");
-    equal(jQuery.ajax, Subclass.ajax, "The subclass failed to get all top level methods");
-});
-
-test("jQuery.sub() - .fn Methods", function(){
-	expect(378);
-
-	var Subclass = jQuery.sub(),
-			SubclassSubclass = Subclass.sub(),
-			jQueryDocument = jQuery(document),
-			selectors, contexts, methods, method, arg, description;
-
-	jQueryDocument.toString = function(){ return "jQueryDocument"; };
-
-	Subclass.fn.subclassMethod = function(){};
-	SubclassSubclass.fn.subclassSubclassMethod = function(){};
-
-	selectors = [
-		"body",
-		"html, body",
-		"<div></div>"
-	];
-
-	methods = [ // all methods that return a new jQuery instance
-		["eq", 1],
-		["add", document],
-		["end"],
-		["has"],
-		["closest", "div"],
-		["filter", document],
-		["find", "div"]
-	];
-
-	contexts = [undefined, document, jQueryDocument];
-
-	jQuery.each(selectors, function(i, selector){
-
-		jQuery.each(methods, function(){
-			method = this[0];
-			arg = this[1];
-
-			jQuery.each(contexts, function(i, context){
-
-				description = "(\""+selector+"\", "+context+")."+method+"("+(arg||"")+")";
-
-				same(
-					jQuery(selector, context)[method](arg).subclassMethod, undefined,
-					"jQuery"+description+" doesn't have Subclass methods"
-				);
-				same(
-					jQuery(selector, context)[method](arg).subclassSubclassMethod, undefined,
-					"jQuery"+description+" doesn't have SubclassSubclass methods"
-				);
-				same(
-					Subclass(selector, context)[method](arg).subclassMethod, Subclass.fn.subclassMethod,
-					"Subclass"+description+" has Subclass methods"
-				);
-				same(
-					Subclass(selector, context)[method](arg).subclassSubclassMethod, undefined,
-					"Subclass"+description+" doesn't have SubclassSubclass methods"
-				);
-				same(
-					SubclassSubclass(selector, context)[method](arg).subclassMethod, Subclass.fn.subclassMethod,
-					"SubclassSubclass"+description+" has Subclass methods"
-				);
-				same(
-					SubclassSubclass(selector, context)[method](arg).subclassSubclassMethod, SubclassSubclass.fn.subclassSubclassMethod,
-					"SubclassSubclass"+description+" has SubclassSubclass methods"
-				);
-
-			});
-		});
-	});
-
-});

@@ -68,6 +68,9 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	};
 	$.fn.val = function(val){
 		var elem = this[0];
+		if(arguments.length && val == null){
+			val = '';
+		}
 		if(!arguments.length){
 			if(!elem || elem.nodeType !== 1){return oldVal.call(this);}
 			return $.prop(elem, 'value', val, 'val', true);
@@ -77,11 +80,16 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		}
 		var isFunction = $.isFunction(val);
 		return this.each(function(i){
-			if(this.nodeType === 1){
+			elem = this;
+			if(elem.nodeType === 1){
 				if(isFunction){
-					$.prop(this, 'value', val.call( this, i, $.prop(this, 'value', undefined, 'val', true)), 'val') ;
+					var genVal = val.call( elem, i, $.prop(elem, 'value', undefined, 'val', true));
+					if(genVal == null){
+						genVal = '';
+					}
+					$.prop(elem, 'value', genVal, 'val') ;
 				} else {
-					$.prop(this, 'value', val, 'val');
+					$.prop(elem, 'value', val, 'val');
 				}
 			}
 		});
@@ -199,6 +207,15 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				}
 				if(oDesc && oDesc[propType]){
 					return oDesc[propType];
+				}
+				if(type == 'prop' && prop == 'value'){
+					return function(value){
+						var elem = this;
+						return (desc.isVal) ? 
+							singleVal(elem, prop, value, false, (arguments.length === 0)) : 
+							olds[type](elem, prop, value)
+						;
+					};
 				}
 				return function(value){
 					return olds[type](this, prop, value);
