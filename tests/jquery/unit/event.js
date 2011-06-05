@@ -760,50 +760,6 @@ test("mouseover triggers mouseenter", function() {
 	elem.remove();
 });
 
-test("trigger() shortcuts", function() {
-	expect(6);
-
-	var elem = jQuery("<li><a href='#'>Change location</a></li>").prependTo("#firstUL");
-	elem.find("a").bind("click", function() {
-		var close = jQuery("spanx", this); // same with jQuery(this).find("span");
-		equals( close.length, 0, "Context element does not exist, length must be zero" );
-		ok( !close[0], "Context element does not exist, direct access to element must return undefined" );
-		return false;
-	}).click();
-
-	// manually clean up detached elements
-	elem.remove();
-
-	jQuery("#check1").click(function() {
-		ok( true, "click event handler for checkbox gets fired twice, see #815" );
-	}).click();
-
-	var counter = 0;
-	jQuery("#firstp")[0].onclick = function(event) {
-		counter++;
-	};
-	jQuery("#firstp").click();
-	equals( counter, 1, "Check that click, triggers onclick event handler also" );
-
-	var clickCounter = 0;
-	jQuery("#simon1")[0].onclick = function(event) {
-		clickCounter++;
-	};
-	jQuery("#simon1").click();
-	equals( clickCounter, 1, "Check that click, triggers onclick event handler on an a tag also" );
-
-	elem = jQuery("<img />").load(function(){
-		ok( true, "Trigger the load event, using the shortcut .load() (#2819)");
-	}).load();
-
-	// manually clean up detached elements
-	elem.remove();
-
-	// test that special handlers do not blow up with VML elements (#7071)
-	jQuery('<xml:namespace ns="urn:schemas-microsoft-com:vml" prefix="v" />').appendTo('head');
-	jQuery('<v:oval id="oval" style="width:100pt;height:75pt;" fillcolor="red"> </v:oval>').appendTo('#form');
-	jQuery("#oval").click().keydown();
-});
 
 test("trigger() bubbling", function() {
 	expect(17);

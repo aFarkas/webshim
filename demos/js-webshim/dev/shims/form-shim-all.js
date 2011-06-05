@@ -1026,16 +1026,14 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				this._resetListCached();
 				
 				if(opts.input.form && opts.input.id){
-					try  {
-						$(opts.input.form).bind('submit.datalistWidget'+opts.input.id, function(){
-							var val = $.prop(opts.input, 'value');
-							that.storedOptions = getStoredOptions(opts.input.name || opts.input.id);
-							if(val && $.inArray(val, that.storedOptions) == -1){
-								that.storedOptions.push(val);
-								storeOptions(opts.input.name || opts.input.id, that.storedOptions );
-							}
-						});
-					} catch(er){}
+					$(opts.input.form).bind('submit.datalistWidget'+opts.input.id, function(){
+						var val = $.prop(opts.input, 'value');
+						that.storedOptions = getStoredOptions(opts.input.name || opts.input.id);
+						if(val && $.inArray(val, that.storedOptions) == -1){
+							that.storedOptions.push(val);
+							storeOptions(opts.input.name || opts.input.id, that.storedOptions );
+						}
+					});
 				}
 				$(window).bind('unload', function(){
 					that.destroy();

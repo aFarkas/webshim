@@ -19,8 +19,9 @@
 			
 			//don't load jQuery UI
 			$.webshims.modules['forms-ext'].test = function(){return true;};
-//			
-			$.webshims.polyfill();
+			$(window).load(function(){
+				$.webshims.polyfill();
+			});
 		})(jQuery);
 	</script>
 	
@@ -30,18 +31,8 @@
 	
 	<script>
 		(function($){
-//			$.webshims.ready('html5shiv', function(){
-//				QUnit.reset = function(){
-//					$("#main, #qunit-fixture").htmlWebshim( QUnit.config.fixture );
-//				};
-//			});
+
 			
-			
-			module("block tests");
-			asyncTest("block", function(){
-				ok(true, 'yes');
-				$('DOM json-storage', start);
-			});
 			
 
 			
