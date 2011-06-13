@@ -295,7 +295,7 @@ img.ui-datepicker-trigger {
 	overflow: visible;
 	padding: 5px;
 	font-family: "Lucida Grande", "MS Shell Dlg", "Calibri", sans-serif;
-	font-size: 100%;
+	font-size: 14px;
 	border: 1px solid #333;
 	-moz-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
 	-webkit-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);

@@ -114,6 +114,9 @@ label {
 	display: block;
 	margin: 0 0 3px;
 }
+input {
+	box-shadow: none;
+}
 input.text,
 input[type="text"],
 input[type="number"],

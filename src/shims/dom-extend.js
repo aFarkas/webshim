@@ -144,6 +144,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if(desc){
 				desc = desc[name];
 			}
+			
 			if(desc){
 				propMethod = desc[curType];
 			}
@@ -484,6 +485,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if(descs.get || descs.value){
 				webshims.warn(nodeName +'['+ prop +']'+ 'old API');
 			}
+			
 			if(descs.reflect){
 				webshims.propTypes[descs.propType || 'standard'](descs);
 			}

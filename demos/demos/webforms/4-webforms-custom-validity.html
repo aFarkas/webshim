@@ -18,7 +18,7 @@
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 	<script src="../../js-webshim/minified/extras/mousepress.js"></script>
-	<script src="../../js-webshim/minified/extras/modernizr-1.7.min.js"></script>
+	<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
 	<script src="../../js-webshim/minified/extras/loaders/sssl.js"></script>
 	
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
@@ -104,13 +104,16 @@ $.webshims.customErrorMessages.testname['de'] = 'Sie müßen "foo bar baz" einge
 //the minimum length is 6
 &lt;input data-minlength="6" /&gt;
 </code>
+			
+			<h4>group-required</h4>
+			<p>If a checkbox has the class 'group-required' at least one of the checkboxes with the same name inside the form/document has to be checked.</p>
 			<h4>dependent</h4>
 			<p>Dependent validation dynamically changes the validation constraints depending on another elements value.</p>
 			<p>The attribute data-dependent-validation either takes an IDREF or a JSON-String with the dependency options.</p>
 			<p>The options are as follows:</p>
 			<ul>
 				<li>from (required): IDREF (ID or name of the element)</li>
-				<li>prop (optional): property, which should be changed | default: value/disabled (depends on type of from-element</li>
+				<li>prop (optional): property, which should be changed | default: value/disabled (depends on type of from-element disabled, if from-element is a checkbox/radiobutton, value otherwise)</li>
 				<li>from-prop (optional): default value/checked (depends on type)</li>
 				<li>toggle (optional): reverts the prop-state (only if from-prop equals checked)</li>
 			</ul>
@@ -183,39 +186,49 @@ $.webshims.customErrorMessages.testname['de'] = 'Sie müßen "foo bar baz" einge
 	                    </div>
 						
 						<div class="form-element">
+	                        <label for="checkbox-group-id">
+	                           checkbox-group: 
+							</label>
+	                       	<input name="checkbox-group" type="checkbox" class="group-required" id="checkbox-group-id" />
+							<input name="checkbox-group" type="checkbox" />
+							<input name="checkbox-group" type="checkbox" />
+							<input name="checkbox-group" type="checkbox" />
+							<input name="checkbox-group" type="checkbox" />
+	                    </div>
+						
+						<div class="form-element">
 	                        <label for="checkbox">
-	                            checkbox: 
+	                            checkbox: (used as from-prop) 
 							</label>
 	                       	<input name="checkbox" type="checkbox" id="checkbox" />
-	                    </div>
-						<div class="form-element">
-	                        <label for="checkbox-fill">
+							<br />
+							 <label for="checkbox-fill">
 	                            dependent-validation="checkbox": 
 							</label>
 	                       	<input data-dependent-validation="checkbox" name="checkbox-fill" type="text" required="required" id="checkbox-fill" />
 	                    </div>
 						
+						
 						<div class="form-element">
 	                        <label for="checkbox2">
-	                            checkbox2: 
+	                            checkbox2: (used as from-prop)
 							</label>
 	                       	<input name="checkbox2" type="checkbox" id="checkbox2" />
-	                    </div>
-						<div class="form-element">
-	                        <label for="checkbox-fill2">
+							<br />
+							<label for="checkbox-fill2">
 	                            dependent-validation='{"from": "checkbox2", "toggle": true}': 
 							</label>
 	                       	<input data-dependent-validation='{"from": "checkbox2", "toggle": true}' name="checkbox-fill2" type="text" required="required" id="checkbox-fill2" />
 	                    </div>
+						
 						
 						<div class="form-element">
 	                        <label for="date-from">
 	                            date-from (dependent-validation='{"from": "date-to", "prop": "max"}'): 
 							</label>
 	                       	<input data-dependent-validation='{"from": "date-to", "prop": "max"}' name="date-from" type="date" id="date-from" />
-	                    </div>
-						<div class="form-element">
-	                        <label for="date-to">
+							<br />
+							<label for="date-to">
 	                            date-to (dependent-validation='{"from": "date-from", "prop": "min"}'): 
 							</label>
 	                       	<input data-dependent-validation='{"from": "date-from", "prop": "min"}' name="date-to" type="date" id="date-to" />

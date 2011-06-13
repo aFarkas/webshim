@@ -6,7 +6,7 @@
 	<link href="css/styles.css" rel="stylesheet" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 	
-	<script src="js-webshim/minified/extras/modernizr-1.7.min.js"></script>
+	<script src="js-webshim/minified/extras/modernizr-custom.js"></script>
 	<script src="js-webshim/minified/extras/loaders/sssl.js"></script>
 	
 	<script src="js-webshim/minified/polyfiller.js"></script>
@@ -155,8 +155,8 @@
 					</ul>
 				
 <code class="block">
-&lt;script src="js/jquery-1.5.2.js"&gt;&lt;/script&gt;
-&lt;script src="js/modernizr.js"&gt;&lt;/script&gt;
+&lt;script src="js/jquery-1.6.1.js"&gt;&lt;/script&gt;
+&lt;script src="js/modernizr-custom.js"&gt;&lt;/script&gt;
 &lt;script src="js/yepnope.js"&gt;&lt;/script&gt;
 &lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
 
@@ -198,6 +198,8 @@ $.webshims.polyfill('lightweight');
 &lt;/script&gt;	
 </code>			
 					<p>If you dont want any log messsages, simply set <code>$.webshims.debug</code> explicitly to <code>false</code>.</p>
+					<h3>Custom Modernizr build</h3>
+					<p>Webshims lib does not need every Modernizr test and supports creating a <a href="http://www.modernizr.com/download/#-canvas-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest">custom Modernizr build</a> (All required tests are pre-checked.) (If you want to use yepnope as your script loader please additionally <a href="http://www.modernizr.com/download/#-canvas-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-load">check Modernizr.load</a>).</p>
 					<h3>High Performance loading using combo-handler service</h3>
 					<p>Webshims lib supports generating a combohandler - url. Simply pass true or your combohandler options as the second argument. The defaults are fine to use in conjunction with the defaults of the <a href="http://code.google.com/p/minify/">minify - project</a>.</p>
 <code class="block">
@@ -331,6 +333,14 @@ $(this).checkValidity();
 $('form').appendWebshim('&lt;input type="date" /&gt;');
 $('#canvas-box').htmlWebshim('&lt;canvas&gt;&lt;/canvas&gt;');
 $('datalist#list select').prependWebshim('&lt;option value="new suggestion item" /&gt;');
+</code>
+						</li>
+						<li>
+							<p><strong>no shadowdom</strong>: Webshims lib sometime has to add additional DOM elements to mimic the UI of HTML5 elements. This can sometimes create differences, between polyfilled and non polyfilled browsers. Webshims lib gives you a method called 'getShadowElement' to access the shadowelement from the native element and a method called 'getNativeElement' to access the native element from the shadowelement. If the element has no shadowelement the element itself is returned.</p>
+							
+<code class="block">
+//animate the width of all date - inputs to a width of 300
+$('input[type="date"]').getShadowElement().animate({width: 300});
 </code>
 						</li>
 					</ul>
@@ -525,9 +535,8 @@ $.webshims.setOptions('removeFOUC', true);
 				
 				<ul>
 					<li>improve current implementations</li>
-					<li>history (pushState etc.)/hashchange (maybe <a href="https://github.com/balupton/history.js">history.js</a> (coming in 1.7))</li>
-					<li>future jQuery 1.6 (jQuery 1.6 will split attr functionality into attr and prop methods) (coming with 1.8)</li>
 					<li><a href="http://www.w3.org/TR/html5/video.html">audio/video</a> implementation (coming in 1.9)</li>
+					<li>history (pushState etc.)/hashchange (maybe <a href="https://github.com/balupton/history.js">history.js</a> (coming in 1.9))</li>
 					<li>make everything more native (this will be more awsome!!! coming in 2.0)</li>
 				</ul>
 				

@@ -118,7 +118,7 @@ if((!Modernizr.advancedObjectProperties || !Object.create || !Object.definePrope
 	
 	var descProps = ['configurable', 'enumerable', 'writable'];
 	shims.defineProperty = function(proto, property, descriptor){
-		if(typeof descriptor != "object"){return proto;}
+		if(typeof descriptor != "object" || descriptor === null){return proto;}
 		
 		if(has.call(descriptor, "value")){
 			proto[property] = descriptor.value;
@@ -415,7 +415,7 @@ if (!Function.prototype.bind) {
             Math.max(target.length - args.length, 0) :
             // 15. Else set the length own property of F to 0.
             0
-        )
+        );
         // 16. The length own property of F is given attributes as specified in
         //   15.3.5.1.
         // TODO

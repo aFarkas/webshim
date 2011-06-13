@@ -14,7 +14,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	var emptyJ = $([]);
 	var getGroupElements = function(elem){
 		elem = $(elem);
-		return (groupTypes[elem[0].type] && elem[0].name) ? $(document.getElementsByName(elem[0].name)).not(elem[0]) : emptyJ;
+		var name = elem[0].name;
+		return (groupTypes[elem[0].type] && name) ? $((elem[0].form && elem[0].form[name]) || document.getElementsByName(name)).not(elem[0]) : emptyJ;
 	};
 	var getContentValidationMessage;
 	
@@ -78,7 +79,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return ret;
 	};
 	var switchValidityClass = function(e){
-		if(stopUIRefresh || !e.target || e.target.type == 'submit'){return;}
+		if(stopUIRefresh || !e.target || !'form' in e.target){return;}
 		
 		var elem = $(e.target).getNativeElement()[0];
 		
@@ -95,7 +96,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				removeClass = 'form-ui-invalid';
 				trigger = 'changedvalid';
 				if(checkTypes[elem.type] && elem.checked){
-					getGroupElements(elem).removeClass(removeClass).removeAttr('aria-invalid');
+					getGroupElements(elem).removeClass(removeClass).addClass(addClass).removeAttr('aria-invalid');
 				}
 				$(e.target).unbind('.form-ui-invalid');
 			}
@@ -104,12 +105,11 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				addClass = 'form-ui-invalid';
 				removeClass = 'form-ui-valid';
 				if (checkTypes[elem.type] && !elem.checked) {
-					getGroupElements(elem).removeClass(removeClass);
+					getGroupElements(elem).removeClass(removeClass).addClass(addClass);
 				}
 				trigger = 'changedinvalid';
 				$(e.target)
 					.unbind('.form-ui-invalid')
-//					.bind('input.form-ui-invalid focusout.form-ui-invalid', switchValidityClass)
 				;
 			}
 		}
@@ -129,7 +129,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		
 	};
 	
-//	$(document).bind('change refreshvalidityui', switchValidityClass);
+	$(document).bind('change refreshvalidityui', switchValidityClass);
 	
 	
 	

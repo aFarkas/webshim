@@ -1,4 +1,4 @@
-(function(jQuery, window, document, undefined){
+(function($, window, document, undefined){
 	"use strict";
 	if(!$.webshims){
 		var langs = [navigator.browserLanguage || navigator.language || '', $('html').attr('lang') || ''];
@@ -10,7 +10,7 @@
 	} 
 	var webshims = $.webshims;
 	var customValidityRules = {};
-	var oldAttr = $.attr;
+	var oldProp = $.prop;
 	var formReady = false;
 	var blockCustom;
 	var initTest;
@@ -33,10 +33,10 @@
 		}
 	};
 	webshims.refreshCustomValidityRules = function(elem){
-		if(!elem.form || (!initTest && !$.attr(elem, 'willValidate')) ){return;}
+		if(!elem.form || (!initTest && !$.prop(elem, 'willValidate')) ){return;}
 		blockCustom = true;
 		var customMismatchedRule = $.data(elem, 'customMismatchedRule');
-		var validity = oldAttr(elem, 'validity') || {};
+		var validity = oldProp(elem, 'validity') || {};
 		var message = '';
 		if(customMismatchedRule || !validity.customError){
 			var val = $(elem).val();
@@ -52,7 +52,6 @@
 			});
 			
 			if(message){
-				
 				$.data(elem, 'customMismatchedRule', customMismatchedRule);
 			}
 			$(elem).setCustomValidity(message);
@@ -64,13 +63,13 @@
 	webshims.ready('forms', function(){
 		formReady = true;
 		
-		oldAttr = $.attr;
+		oldProp = $.prop;
 				
-		$.attr = function(elem, name){
+		$.prop = function(elem, name){
 			if(name == 'validity' && !blockCustom){
 				testValidityRules(elem);
 			}
-			return oldAttr.apply(this, arguments);
+			return oldProp.apply(this, arguments);
 		};
 		
 		var oldCustomValidity = $.fn.setCustomValidity || function(message){
@@ -132,6 +131,29 @@
 		return $(elem).data('minlength') > val.length;
 	}, 'Entered value is too short.');
 	
+	var groupTimer = {};
+	addCustomValidityRule('group-required', function(elem, val){
+		var name = elem.name;
+		if(!name || elem.type !== 'checkbox' || !$(elem).hasClass('group-required')){return;}
+		var checkboxes = $( (elem.form && elem.form[name]) || document.getElementsByName(name));
+		var isValid = checkboxes.filter(':checked');
+		if(groupTimer[name]){
+			clearTimeout(groupTimer[name]);
+		}
+		groupTimer[name] = setTimeout(function(){
+			checkboxes
+				.unbind('click.groupRequired')
+				.bind('click.groupRequired', function(){
+					checkboxes.filter('.group-required').each(function(){
+						$.webshims.refreshCustomValidityRules(this);
+					});
+				})
+			;
+		}, 9);
+		
+		return !(isValid[0]);
+	}, 'Please check one of these checkboxes.');
+	
 	//based on jörn zaefferes validiation plugin
 	// http://docs.jquery.com/Plugins/Validation/Methods/creditcard
 	// based on http://en.wikipedia.org/wiki/Luhn
@@ -170,14 +192,14 @@
 		
 		if( !elem.getAttribute('data-dependent-validation') ){return;}
 		
-		var data = $(elem).data('dependent-validation');
+		var data = $(elem).data('dependentValidation');
 		if(!data){return;}
 		var depFn = function(e){
 			var val = $.attr(data.masterElement, data["from-prop"]);
 			if(data.toggle){
 				val = !val;
 			}
-			$.attr( elem, data.prop, val);
+			$.prop( elem, data.prop, val);
 		};
 		
 		if(!data._init || !data.masterElement){
@@ -200,7 +222,7 @@
 				}
 			}
 			
-			data = $.data(elem, 'dependent-validation', $.extend({_init: true}, dependentDefaults, data));
+			data = $.data(elem, 'dependentValidation', $.extend({_init: true}, dependentDefaults, data));
 			
 			if(data.prop !== "value"){
 				$(data.masterElement).bind('change', depFn);
@@ -212,7 +234,7 @@
 		}
 
 		if(data.prop == "value"){
-			return ($.attr(data.masterElement, 'value') != val);
+			return ($.prop(data.masterElement, 'value') != val);
 		} else {
 			depFn();
 			return '';

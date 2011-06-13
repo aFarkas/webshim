@@ -1,8 +1,6 @@
 (function($, window, document, undefined){
 	"use strict";
 	
-	document.createElement('datalist');
-	
 	var special = $.event.special;
 	var emptyJ = $([]);
 	var Modernizr = window.Modernizr;
@@ -112,7 +110,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.7.0RC1',
+		version: '1.7.0',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
@@ -138,6 +136,7 @@
 				}
 			}
 		},
+		browserVersion: browserVersion,
 		/*
 		 * some data
 		 */
@@ -1051,8 +1050,8 @@
 			slider: {},
 			datepicker: {},
 			langSrc: uiLib+'i18n/jquery.ui.datepicker-',
-			recalcWidth: true,
-			lazyDate: true
+			recalcWidth: true
+//			,lazyDate: undefined // true for IE8- false for fast browser 
 //			,replaceUI: false
 		}
 	});

@@ -500,6 +500,12 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		}, 0));
 	};
 	
+	if(options.lazyDate === undefined){
+		try {
+			options.lazyDate = ($.browser.msie && webshims.browserVersion < 9) || ($(window).width() < 500 && $(window).height() < 500);
+		} catch(er){}
+	}
+	
 	replaceInputUI.common = function(orig, shim, methods){
 		if(Modernizr.formvalidation){
 			orig.bind('firstinvalid', function(e){
@@ -563,16 +569,40 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 			trigger: [0.595,0.395],
 			normal: [0.565,0.425]
 		};
-		var subPixelCorrect = (!$.browser.msie || parseInt($.browser.version, 10) > 6) ? 0 : 0.45;
+		var subPixelCorrect = (!$.browser.msie || webshims.browserVersion > 6) ? 0 : 0.45;
+		
+		var configureDatePicker = function(elem, datePicker, change, _wrapper){
+			var data = datePicker
+				.datepicker($.extend(defaultDatepicker, options.datepicker, elem.data('datepicker')))
+				.bind('change', change)
+				.data('datepicker')
+			;
+			data.dpDiv.addClass('input-date-datepicker-control');
+			
+			if(_wrapper){
+				$('input', _wrapper).each(function(){
+					webshims.data(this, 'nativeElement', elem[0]);
+				});
+				webshims.triggerDomUpdate(_wrapper[0]);	
+			}
+			if(setLangDefaults){
+				['disabled', 'min', 'max', 'value', 'step'].forEach(function(name){
+					var val = elem.prop(name);
+					if(val !== "" && (name != 'disabled' || !val)){
+						elem.prop(name, val);
+					}
+				});
+			}
+			return data;
+		};
+		
 		replaceInputUI['datetime-local'] = function(elem){
 			if(!$.fn.datepicker){return;}
 			
 			var date = $('<span role="group" class="input-datetime-local"><input type="text" class="input-datetime-local-date" /><input type="time" class="input-datetime-local-time" /></span>'),
 				attr  = this.common(elem, date, replaceInputUI['datetime-local'].attrs),
 				datePicker = $('input.input-datetime-local-date', date),
-				data = datePicker
-					.datepicker($.extend(defaultDatepicker, options.datepicker, elem.data('datepicker')))
-					.bind('change', function(e){
+				datePickerChange = function(e){
 						
 						var value = datePicker.prop('value') || '', 
 							timeVal = ''
@@ -599,17 +629,11 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 						e.stopImmediatePropagation();
 						triggerInlineForm(elem[0], 'input');
 						triggerInlineForm(elem[0], 'change');
-					})
-					.data('datepicker')
+					},
+				data = configureDatePicker(elem, datePicker, datePickerChange, date)
 			;
 			
-			data.dpDiv
-				.addClass('input-date-datepicker-control')
-				.css({
-					fontSize: datePicker.css('fontSize'),
-					fontFamily: datePicker.css('fontFamily')
-				})
-			;
+			
 			$('input.input-datetime-local-time', date).bind('change', function(e){
 				var timeVal = $.prop(this, 'value');
 				var val = ['', ''];
@@ -635,9 +659,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 				triggerInlineForm(elem[0], 'change');
 			});
 			
-			$('input', date).each(function(){
-				webshims.data(this, 'nativeElement', elem[0]);
-			});
+			
 			
 			date.attr('aria-labeledby', attr.label.attr('id'));
 			attr.label.bind('click', function(){
@@ -659,21 +681,13 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 				}
 			}
 			
-			webshims.triggerDomUpdate(date[0]);
-			if(setLangDefaults){
-				['disabled', 'min', 'max', 'value', 'step'].forEach(function(name){
-					var val = elem.attr(name);
-					if(val != null){
-						elem.attr(name, val);
-					}
-				});
-			}
+			
 		};
 		
 		replaceInputUI['datetime-local'].attrs = {
 			disabled: function(orig, shim, value){
-				$('input.input-datetime-local-date', shim).attr('disabled', !!value);
-				$('input.input-datetime-local-time', shim).attr('disabled', !!value);
+				$('input.input-datetime-local-date', shim).prop('disabled', !!value);
+				$('input.input-datetime-local-time', shim).prop('disabled', !!value);
 			},
 			step: function(orig, shim, value){
 				$('input.input-datetime-local-time', shim).attr('step', value);
@@ -755,19 +769,10 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 					triggerInlineForm(elem[0], 'input');
 					triggerInlineForm(elem[0], 'change');
 				},
-				data = date
-					.datepicker($.extend(defaultDatepicker, options.datepicker, elem.data('datepicker')))
-					.bind('change', change)
-					.data('datepicker')
+				data = configureDatePicker(elem, date, change)
+				
 			;
 			
-			data.dpDiv
-				.addClass('input-date-datepicker-control')
-				.css({
-					fontSize: date.css('fontSize'),
-					fontFamily: date.css('fontFamily')
-				})
-			;
 			if(attr.css){
 				date.css(attr.css);
 				if(attr.outerWidth){
@@ -777,14 +782,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 					adjustInputWithBtn(date, data.trigger);
 				}
 			}
-			if(setLangDefaults){
-				['disabled', 'min', 'max', 'value'].forEach(function(name){
-					var val = elem.attr(name);
-					if(val != null){
-						elem.attr(name, val);
-					}
-				});
-			}
+			
 		};
 		
 		
