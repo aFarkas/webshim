@@ -1,5 +1,4 @@
 (function($){
-	var badAria = parseInt($.webshims.browserVersion, 10) == 8 && $.browser.msie;
 
 module("datalist");
 asyncTest("datalist", function(){
@@ -31,7 +30,7 @@ asyncTest("datalist", function(){
 	strictEqual($('#email').prop('list'), null, 'list property is null, if element is not a datalist');
 	
 	if(!Modernizr.datalist){
-		strictEqual($('#email').attr('aria-haspopup'), badAria ? '' : undefined, 'aria was removed on input:not([list])');
+		equals($('#email').attr('aria-haspopup'), undefined, 'aria was removed on input:not([list])');
 	}
 	
 	$('#email').attr('list', 'dlist2');
@@ -43,7 +42,7 @@ asyncTest("datalist", function(){
 				
 		
 		$('#email').removeAttr('list');
-		strictEqual($('#email').attr('aria-haspopup'), badAria  ? '' : undefined, 'removed list attribute removes aria in shim');
+		equals($('#email').attr('aria-haspopup'), undefined, 'removed list attribute removes aria in shim');
 		
 	}
 	$.webshims.ready('DOM forms', function(){
