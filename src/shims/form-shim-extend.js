@@ -123,7 +123,7 @@ $.event.special.invalid = {
 	teardown: $.noop,
 	handler: function(e, d){
 		
-		if( e.type != 'submit' || e.testedValidity || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') != null || $.data(e.target, 'novalidate') ){return;}
+		if( e.type != 'submit' || e.testedValidity || !e.originalEvent || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') != null || $.data(e.target, 'novalidate') ){return;}
 		
 		isSubmit = true;
 		e.testedValidity = true;
@@ -132,10 +132,7 @@ $.event.special.invalid = {
 			if(this === document){
 				webshims.warn('always embed HTML5 content using .prependWebshim, .appendWebshim, .htmlWebshim etc.');
 			}
-			//ToDo
-			if(!e.originalEvent){
-				webshims.warn('tryed to submit invalid form');
-			}
+			
 			e.stopImmediatePropagation();
 			isSubmit = false;
 			return false;

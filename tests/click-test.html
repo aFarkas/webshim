@@ -58,7 +58,7 @@
 		}
 		
 		$.webshims.ready('DOM forms', function(){
-			var invalidEvents, submitEvents, preventInvalid, firstInvalidEvents, preventFirstInvalid;
+			var invalidEvents, submitEvents, preventInvalid, firstInvalidEvents, preventFirstInvalid, submitPrevent;
 			
 			function equals(is, should, message){
 				message = $('<li>'+ message +' | was: '+ (is.type || is) +' expected: '+ (should.type || should) +'</li>').appendTo('#test-result');
@@ -173,7 +173,7 @@
 			
 			$('input.trigger-checkValidity').click(function(e){
 				reset();
-				$('input, select', this.form).filter(':first').attr('value', '').checkValidity();
+				$('input, select', this.form).filter(':first').prop('value', '').checkValidity();
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
 					equals(firstInvalidEvents, 1, 'firstinvalid event');
@@ -188,7 +188,7 @@
 			
 			$('input.trigger-form-checkValidity').click(function(e){
 				reset();
-				$('input, select', this.form).filter(':first').attr('value', '');
+				$('input, select', this.form).filter(':first').prop('value', '');
 				$(this.form).checkValidity();
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
@@ -206,7 +206,7 @@
 			$('input.trigger-checkValidity-prevent-invalid').click(function(e){
 				reset();
 				preventInvalid = true;
-				$('input, select', this.form).filter(':first').attr('value', '').checkValidity();
+				$('input, select', this.form).filter(':first').prop('value', '').checkValidity();
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
 					equals(firstInvalidEvents, 1, '1 firstinvalid event');
@@ -222,7 +222,7 @@
 			$('input.submit-prevent').click(function(e){
 				reset();
 				preventInvalid = true;
-				$('input, select', this.form).filter(':first').attr('value', '');
+				$('input, select', this.form).filter(':first').prop('value', '');
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
 					equals(firstInvalidEvents, 1, 'firstinvalid event');
@@ -235,7 +235,7 @@
 			});
 			$('input.submit-noprevent').click(function(e){
 				reset();
-				$('input, select', this.form).filter(':first').attr('value', '');
+				$('input, select', this.form).filter(':first').prop('value', '');
 				setTimeout(function(){
 					equals(submitEvents, 0, '0 submit events');
 					equals(firstInvalidEvents, 1, 'firstinvalid event');
@@ -244,6 +244,19 @@
 						var type = document.activeElement.type;
 						equals((type == 'text' || type == 'datetime-local' || type == 'select-one'), true, "focus first invalid: "+type);
 					}
+				}, 100);
+			});
+			
+			$('input.scripted-submit').click(function(){
+				reset();
+				var form = $(this).prev('form');
+				$('input:required-element', form).prop('value', '');
+				submitPrevent = true;
+				form.submit();
+				setTimeout(function(){
+					equals(submitEvents, 1, '1 submit events');
+					equals(firstInvalidEvents, 0, '0 firstinvalid event');
+					equals(invalidEvents, 0, '0 invalid events');
 				}, 100);
 			});
 			
@@ -329,12 +342,11 @@
 		<input type="button" class="trigger-checkValidity" value="trigger-checkValidity" />
 		<input type="button" class="trigger-checkValidity-prevent-invalid" value="trigger-checkValidity prevent invalid" />
 		<input type="button" class="trigger-form-checkValidity" value="trigger-form.checkValidity" />
-		
-		
 		<input type="submit" class="submit-prevent" value="try invalid submit (prevent invalid)" />
 		<input type="submit" class="submit-noprevent" value="try invalid submit (no invalid prevent)" />
 		
     </form>
+	
 	<hr />
 	<form action="bigfail.html">
     	<input name="test-4" type="text" required />
@@ -346,7 +358,7 @@
 		<input type="submit" class="submit-noprevent" value="try invalid submit (no invalid prevent)" />
 		
     </form>
-	
+	<input type="button" class="scripted-submit" value="scripted submit" />
 	<form action="bigfail.html">
     	<select name="test-5" required>
     		<option value=""></option>

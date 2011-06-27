@@ -404,10 +404,10 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				shadowElement: shadowElem
 			};
 			if(opts.data){
-				
 				nativeData.shadowData.data = opts.data;
 				shadowData.shadowData.data = opts.data;
 			}
+			
 		},
 		propTypes: {
 			standard: function(descs, name){
