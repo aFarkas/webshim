@@ -30,7 +30,7 @@ asyncTest("datalist", function(){
 	strictEqual($('#email').prop('list'), null, 'list property is null, if element is not a datalist');
 	
 	if(!Modernizr.datalist){
-		equals($('#email').attr('aria-haspopup'), undefined, 'aria was removed on input:not([list])');
+		ok(!$('#email').attr('aria-haspopup'), 'aria was removed on input:not([list])');
 	}
 	
 	$('#email').attr('list', 'dlist2');
@@ -42,7 +42,7 @@ asyncTest("datalist", function(){
 				
 		
 		$('#email').removeAttr('list');
-		equals($('#email').attr('aria-haspopup'), undefined, 'removed list attribute removes aria in shim');
+		ok(!$('#email').attr('aria-haspopup'), 'removed list attribute removes aria in shim');
 		
 	}
 	$.webshims.ready('DOM forms', function(){

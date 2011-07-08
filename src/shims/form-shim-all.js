@@ -222,7 +222,7 @@ webshims.defineNodeNameProperty('form', 'checkValidity', {
 		value: function(){
 			
 			var ret = true,
-				elems = $(this.elements).filter(function(){
+				elems = $('input,textarea,select', this).filter(function(){
 					return !webshims.data(this, 'nativeElement');
 				})
 			;
