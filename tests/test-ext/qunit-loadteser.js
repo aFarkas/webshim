@@ -137,8 +137,8 @@
 		initTest: function(index){
 			if(profiles[index]){
 				if(profiles[index + 1] || scriptLoaders[currentLoader + 1]){
-					QUnit.done = function(failure, passed){
-						if((loadTester.debug == 'silent' && failure === 0 && passed) || confirm(index +' load profile had '+ failure +' failures. Do next load?')){
+					QUnit.done = function(data){
+						if((loadTester.debug == 'silent' && data.failed === 0 && data.passed) || confirm(index +' load profile had '+ data.failed +' failures. Do next load?')){
 							if(profiles[index + 1]){
 								loadTester.loadNext(index + 1);
 							} else if(scriptLoaders[currentLoader + 1]) {

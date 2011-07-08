@@ -13,20 +13,32 @@
 	<script src="../../src/extras/modernizr-custom.js"></script>
 	<script src="../../src/extras/loaders/sssl.js"></script>
 	<script src="../../src/polyfiller.js"></script>
+	
+	<script src="../qunit/qunit.js"></script>
+	<script src="data/testrunner.js"></script>
+
 
 	<script>
 		(function($){
-			
 			//don't load jQuery UI
 			$.webshims.modules['forms-ext'].test = function(){return true;};
-			$(window).load(function(){
-				$.webshims.polyfill();
+			
+			module("block init");
+			asyncTest("block init", function(){
+				$.webshims.ready('DOM forms canvas json-storage', start);
 			});
+			
+			if(jQuery.support.hrefNormalized){
+				$.webshims.polyfill();
+			} else {
+				$(window).load(function(){
+					$.webshims.polyfill();
+				});
+			}
 		})(jQuery);
 	</script>
 
-	<script src="../qunit/qunit.js"></script>
-	<script src="data/testrunner.js"></script>
+	
 
 	<script src="unit/core.js"></script>
 	<script src="unit/data.js"></script>

@@ -856,10 +856,6 @@ test("trigger() shortcuts", function() {
 	// manually clean up detached elements
 	elem.remove();
 
-	// test that special handlers do not blow up with VML elements (#7071)
-	jQuery('<xml:namespace ns="urn:schemas-microsoft-com:vml" prefix="v" />').appendTo('head');
-	jQuery('<v:oval id="oval" style="width:100pt;height:75pt;" fillcolor="red"> </v:oval>').appendTo('#form');
-	jQuery("#oval").click().keydown();
 });
 
 test("trigger() bubbling", function() {
