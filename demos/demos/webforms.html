@@ -35,7 +35,7 @@
 		
 	</style>
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
 	<script src="../js-webshim/minified/extras/loaders/sssl.js"></script>
 	
@@ -414,7 +414,7 @@ $.webshims.setOptions('forms-ext', {
 			<aside>
 				<h3>Known Issues/Constraints (most <code>forms-ext</code> only)</h3>
 				<ul>
-					<li>FF4/Chrom 11 have a bug with their validation UI on select-elements (solution/workaround: remove browsers validation UI and use custom styleable validation UI)</li>
+					<li>FF4/5 have a bug with their validation UI on select-elements (solution/workaround: remove browsers validation UI and use custom styleable validation UI, <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=647813">Mozilla Bug</a>)</li>
 					<li>placeholder polyfill is only active in browsers, which do not support constraint validation. This means, that older versions of Opera won't show a placeholder. Opera has native support for input[placeholder] since Version 11.0.</li>
 					<li>Spinbuttons for type=time and type=number don't show up in Safari 5 on Windows <a href="https://bugs.webkit.org/show_bug.cgi?id=38381">webkit bug</a>, <a href="https://github.com/aFarkas/webshim/issues#issue/23">webshims bug</a></li>
 					<li>Spinbuttons for type=number on Safari 5 Mac has some issue: They have bad usability, if the input starts with an empty value or if you are using step=any.</li>

@@ -64,33 +64,5 @@ function url(value) {
 		// Allow QUnit.reset to clean up any attached elements before checking for leaks
 		QUnit.reset();
 
-//		for ( i in jQuery.cache ) {
-//			++cacheLength;
-//		}
-//
-//		jQuery.fragments = {};
-//
-//		for ( i in jQuery.fragments ) {
-//			++fragmentsLength;
-//		}
-//
-//		// Because QUnit doesn't have a mechanism for retrieving the number of expected assertions for a test,
-//		// if we unconditionally assert any of these, the test will fail with too many assertions :|
-//		if ( cacheLength !== oldCacheLength ) {
-//			equals( cacheLength, oldCacheLength, "No unit tests leak memory in jQuery.cache" );
-//			oldCacheLength = cacheLength;
-//		}
-//		if ( fragmentsLength !== oldFragmentsLength ) {
-//			equals( fragmentsLength, oldFragmentsLength, "No unit tests leak memory in jQuery.fragments" );
-//			oldFragmentsLength = fragmentsLength;
-//		}
-//		if ( jQuery.timers.length !== oldTimersLength ) {
-//			equals( jQuery.timers.length, oldTimersLength, "No timers are still running" );
-//			oldTimersLength = jQuery.timers.length;
-//		}
-//		if ( jQuery.active !== oldActive ) {
-//			equals( jQuery.active, 0, "No AJAX requests are still active" );
-//			oldActive = jQuery.active;
-//		}
 	}
 }());

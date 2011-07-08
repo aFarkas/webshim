@@ -203,27 +203,7 @@ test( "globalEval", function() {
 	window.globalEvalTest = undefined;
 });
 
-//if ( !isLocal ) {
-//test("browser", function() {
-//	stop();
-//
-//	jQuery.get("data/ua.txt", function(data){
-//		var uas = data.split("\n");
-//		expect( (uas.length - 1) * 2 );
-//
-//		jQuery.each(uas, function(){
-//			var parts = this.split("\t");
-//			if ( parts[2] ) {
-//				var ua = jQuery.uaMatch( parts[2] );
-//				equals( ua.browser, parts[0], "Checking browser for " + parts[2] );
-//				equals( ua.version, parts[1], "Checking version string for " + parts[2] );
-//			}
-//		});
-//
-//		start();
-//	});
-//});
-//}
+
 
 test("noConflict", function() {
 	expect(7);
@@ -467,18 +447,6 @@ test("isXMLDoc - HTML", function() {
 	document.body.removeChild( iframe );
 });
 
-if ( !isLocal ) {
-test("isXMLDoc - XML", function() {
-	expect(3);
-	stop();
-	jQuery.get("data/dashboard.xml", function(xml) {
-		ok( jQuery.isXMLDoc( xml ), "XML document" );
-		ok( jQuery.isXMLDoc( xml.documentElement ), "XML documentElement" );
-		ok( jQuery.isXMLDoc( jQuery("tab", xml)[0] ), "XML Tab Element" );
-		start();
-	});
-});
-}
 
 test("isWindow", function() {
 	expect( 12 );
@@ -554,7 +522,6 @@ test("jQuery('html', context)", function() {
 	var $span = jQuery("<span/>", $div);
 	equals($span.length, 1, "Verify a span created with a div context works, #1763");
 });
-
 
 
 test("end()", function() {
@@ -859,7 +826,7 @@ test("jQuery.each(Object,Function)", function() {
 	jQuery.each(document.styleSheets, function(i){
 		stylesheet_count++;
 	});
-	ok(stylesheet_count > 2 && stylesheet_count < 6, "should not throw an error in IE while looping over document.styleSheets and return proper amount");
+	ok(stylesheet_count > 1 && stylesheet_count < 6, "should not throw an error in IE while looping over document.styleSheets and return proper amount");
 
 });
 
@@ -971,3 +938,17 @@ test("jQuery.parseJSON", function(){
 	}
 });
 
+
+test("jQuery.camelCase()", function() {
+
+	var tests = {
+		"foo-bar": "fooBar", 
+		"foo-bar-baz": "fooBarBaz"
+	};
+
+	expect(2);
+
+	jQuery.each( tests, function( key, val ) {
+		equal( jQuery.camelCase( key ), val, "Converts: " + key + " => " + val );
+	});
+});

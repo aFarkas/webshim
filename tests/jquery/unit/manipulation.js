@@ -465,6 +465,40 @@ test("append the same fragment with events (Bug #6997, 5566)", function () {
 	jQuery("#listWithTabIndex li.test6997").eq(1).click();
 });
 
+test("append(xml)", function() {
+	expect( 1 );
+
+	function createXMLDoc() {
+		// Initialize DOM based upon latest installed MSXML or Netscape
+		var elem,
+			aActiveX =
+				[ "MSXML6.DomDocument",
+				"MSXML3.DomDocument",
+				"MSXML2.DomDocument",
+				"MSXML.DomDocument",
+				"Microsoft.XmlDom" ];
+
+		if ( document.implementation && "createDocument" in document.implementation ) {
+			return document.implementation.createDocument( "", "", null );
+		} else {
+			// IE
+			for ( var n = 0, len = aActiveX.length; n < len; n++ ) {
+				try {
+					elem = new ActiveXObject( aActiveX[ n ] );
+					return elem;
+				} catch(_){};
+			}
+		}
+	}
+
+	var xmlDoc = createXMLDoc(),
+		xml1 = xmlDoc.createElement("head"),
+		xml2 = xmlDoc.createElement("test");
+
+	ok( jQuery( xml1 ).append( xml2 ), "Append an xml element to another without raising an exception." );
+
+});
+
 test("appendTo(String|Element|Array&lt;Element&gt;|jQuery)", function() {
 	expect(16);
 
@@ -1002,8 +1036,8 @@ test("clone()", function() {
 //	equals( clone.length, 1, "One element cloned" );
 //	equals( clone.html(), div.html(), "Element contents cloned" );
 //	equals( clone[0].nodeName.toUpperCase(), "DIV", "DIV element cloned" );
-
-	// and here's a valid one.
+//
+//	// and here's a valid one.
 //	div = jQuery("<div/>").html("<object height='355' width='425' type='application/x-shockwave-flash' data='http://www.youtube.com/v/3KANI2dpXLw&amp;hl=en'>  <param name='movie' value='http://www.youtube.com/v/3KANI2dpXLw&amp;hl=en'>  <param name='wmode' value='transparent'> </object>");
 //
 //	clone = div.clone(true);
@@ -1393,7 +1427,7 @@ test("jQuery.buildFragment - no plain-text caching (Bug #6779)", function() {
 		}
 		catch(e) {}
 	}
-    equals($f.text(), bad.join(""), "Cached strings that match Object properties");
+	equals($f.text(), bad.join(""), "Cached strings that match Object properties");
 	$f.remove();
 });
 
@@ -1420,4 +1454,14 @@ test( "jQuery.html - execute scripts escaped with html comment or CDATA (#9221)"
 	         '//--><!]]>',
 	         '</script>'
 	     ].join ( "\n" ) ).appendTo( "#qunit-fixture" );
+});
+
+test("jQuery.buildFragment - plain objects are not a document #8950", function() {
+	expect(1);
+
+	try {
+		jQuery('<input type="hidden">', {});
+		ok( true, "Does not allow attribute object to be treated like a doc object");
+	} catch (e) {}
+
 });

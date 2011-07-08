@@ -40,7 +40,7 @@ test("jQuery.attrFix/jQuery.propFix integrity test", function() {
 });
 
 test("attr(String)", function() {
-	expect(37);
+	expect(45);
 
 	equals( jQuery("#text1").attr("type"), "text", "Check for type attribute" );
 	equals( jQuery("#radio1").attr("type"), "radio", "Check for type attribute" );
@@ -54,6 +54,7 @@ test("attr(String)", function() {
 	equals( jQuery("#text1").attr("name"), "action", "Check for name attribute" );
 	ok( jQuery("#form").attr("action").indexOf("formaction") >= 0, "Check for action attribute" );
 	equals( jQuery("#text1").attr("value", "t").attr("value"), "t", "Check setting the value attribute" );
+	equals( jQuery("<div value='t'></div>").attr("value"), "t", "Check setting custom attr named 'value' on a div" );
 	equals( jQuery("#form").attr("blah", "blah").attr("blah"), "blah", "Set non-existant attribute on a form" );
 	equals( jQuery("#foo").attr("height"), undefined, "Non existent height attribute should return undefined" );
 	
@@ -92,6 +93,12 @@ test("attr(String)", function() {
 
 	body.removeAttribute("foo"); // Cleanup
 
+	var select = document.createElement("select"), optgroup = document.createElement("optgroup"), option = document.createElement("option");
+	optgroup.appendChild( option );
+	select.appendChild( optgroup );
+
+	equal( jQuery( option ).attr("selected"), "selected", "Make sure that a single option is selected, even when in an optgroup." );
+
 	var $img = jQuery("<img style='display:none' width='215' height='53' src='http://static.jquery.com/files/rocker/images/logo_jquery_215x53.gif'/>").appendTo("body");
 	equals( $img.attr("width"), "215", "Retrieve width attribute an an element with display:none." );
 	equals( $img.attr("height"), "53", "Retrieve height attribute an an element with display:none." );
@@ -109,17 +116,28 @@ test("attr(String)", function() {
 	equals( jQuery("#table").attr("test:attrib"), undefined, "Retrieving a non-existent attribute on a table with a colon does not throw an error." );
 	equals( jQuery("#table").attr("test:attrib", "foobar").attr("test:attrib"), "foobar", "Setting an attribute on a table with a colon does not throw an error." );
 
+	var $form = jQuery("<form class='something'></form>").appendTo("#qunit-fixture");
+	equal( $form.attr("class"), "something", "Retrieve the class attribute on a form." );
+
+	var $a = jQuery("<a href='#' onclick='something()'>Click</a>").appendTo("#qunit-fixture");
+	equal( $a.attr("onclick"), "something()", "Retrieve ^on attribute without anonymous function wrapper." );
+
 	ok( jQuery("<div/>").attr("doesntexist") === undefined, "Make sure undefined is returned when no attribute is found." );
+	ok( jQuery("<div/>").attr("title") === undefined, "Make sure undefined is returned when no attribute is found." );
+	equal( jQuery("<div/>").attr("title", "something").attr("title"), "something", "Set the title attribute." );
 	ok( jQuery().attr("doesntexist") === undefined, "Make sure undefined is returned when no element is there." );
+	equal( jQuery("<div/>").attr("value"), undefined, "An unset value on a div returns undefined." );
+	equal( jQuery("<input/>").attr("value"), "", "An unset value on an input returns current value." );
 });
 
 if ( !isLocal ) {
 	test("attr(String) in XML Files", function() {
-		expect(2);
+		expect(3);
 		stop();
 		jQuery.get("data/dashboard.xml", function( xml ) {
-			equals( jQuery( "locations", xml ).attr("class"), "foo", "Check class attribute in XML document" );
-			equals( jQuery( "location", xml ).attr("for"), "bar", "Check for attribute in XML document" );
+			equal( jQuery( "locations", xml ).attr("class"), "foo", "Check class attribute in XML document" );
+			equal( jQuery( "location", xml ).attr("for"), "bar", "Check for attribute in XML document" );
+			equal( jQuery( "location", xml ).attr("checked"), "different", "Check that hooks are not attached in XML document" );
 			start();
 		});
 	});
@@ -144,7 +162,7 @@ test("attr(Hash)", function() {
 });
 
 test("attr(String, Object)", function() {
-	expect(66);
+	expect(69);
 
 	var div = jQuery("div").attr("foo", "bar"),
 		fail = false;
@@ -192,6 +210,11 @@ test("attr(String, Object)", function() {
 	equals( document.getElementById("check2").checked, false, "Set checked attribute" );
 	equals( jQuery("#check2").prop("checked"), false, "Set checked attribute" );
 	equals( jQuery("#check2").attr("checked"), undefined, "Set checked attribute" );
+
+	jQuery("#check2").attr("checked", "checked");
+	equal( document.getElementById("check2").checked, true, "Set checked attribute with 'checked'" );
+	equal( jQuery("#check2").prop("checked"), true, "Set checked attribute" );
+	equal( jQuery("#check2").attr("checked"), "checked", "Set checked attribute" );
 
 	jQuery("#text1").prop("readOnly", true);
 	equals( document.getElementById("text1").readOnly, true, "Set readonly attribute" );
@@ -589,6 +612,30 @@ test("val()", function() {
 	equals( jQuery("<option/>").val("test").attr("value"), "test", "Setting value sets the value attribute" );
 });
 
+if ( "value" in document.createElement("meter") && 
+			"value" in document.createElement("progress") ) {
+
+	test("val() respects numbers without exception (Bug #9319)", function() {
+
+		expect(4);
+
+		var $meter = jQuery("<meter min='0' max='10' value='5.6'></meter>"),
+			$progress = jQuery("<progress max='10' value='1.5'></progress>");
+
+		try {
+			equal( typeof $meter.val(), "number", "meter, returns a number and does not throw exception" );
+			equal( $meter.val(), $meter[0].value, "meter, api matches host and does not throw exception" );
+
+			equal( typeof $progress.val(), "number", "progress, returns a number and does not throw exception" );
+			equal( $progress.val(), $progress[0].value, "progress, api matches host and does not throw exception" );
+
+		} catch(e) {}
+
+		$meter.remove();
+		$progress.remove();
+	});
+}
+
 var testVal = function(valueObj) {
 	expect(8);
 
@@ -715,12 +762,15 @@ test("val(select) after form.reset() (Bug #2551)", function() {
 }); 
 
 var testAddClass = function(valueObj) {
-	expect(5);
+	expect(9);
+
 	var div = jQuery("div");
 	div.addClass( valueObj("test") );
 	var pass = true;
 	for ( var i = 0; i < div.size(); i++ ) {
-	 if ( div.get(i).className.indexOf("test") == -1 ) pass = false;
+		if ( !~div.get(i).className.indexOf("test") ) {
+			pass = false;
+		}
 	}
 	ok( pass, "Add Class" );
 
@@ -741,6 +791,19 @@ var testAddClass = function(valueObj) {
 	div.attr("class", "foo");
 	div.addClass( valueObj("bar baz") );
 	equals( div.attr("class"), "foo bar baz", "Make sure there isn't too much trimming." );
+	
+	div.removeClass();
+	div.addClass( valueObj("foo") ).addClass( valueObj("foo") )
+	equal( div.attr("class"), "foo", "Do not add the same class twice in separate calls." );
+
+	div.addClass( valueObj("fo") );
+	equal( div.attr("class"), "foo fo", "Adding a similar class does not get interrupted." );
+	div.removeClass().addClass("wrap2");
+	ok( div.addClass("wrap").hasClass("wrap"), "Can add similarly named classes");
+
+	div.removeClass();
+	div.addClass( valueObj("bar bar") );
+	equal( div.attr("class"), "bar", "Do not add the same class twice in the same call." );
 };
 
 test("addClass(String)", function() {
@@ -752,7 +815,7 @@ test("addClass(Function)", function() {
 });
 
 test("addClass(Function) with incoming value", function() {
-//	expect(45);
+	
 	var div = jQuery("div"), old = div.map(function(){
 		return jQuery(this).attr("class") || "";
 	});
@@ -824,7 +887,7 @@ test("removeClass(Function) - simple", function() {
 });
 
 test("removeClass(Function) with incoming value", function() {
-//	expect(45);
+	
 
 	var $divs = jQuery("div").addClass("test"), old = $divs.map(function(){
 		return jQuery(this).attr("class");
@@ -903,7 +966,7 @@ test("toggleClass(Function[, boolean])", function() {
 test("toggleClass(Fucntion[, boolean]) with incoming value", function() {
 	expect(14);
 
-	var e = jQuery("#firstp"), old = e.attr("class");
+	var e = jQuery("#firstp"), old = e.attr("class") || "";
 	ok( !e.is(".test"), "Assert class not present" );
 
 	e.toggleClass(function(i, val) {

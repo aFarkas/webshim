@@ -110,7 +110,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.7.0',
+		version: '1.7.1',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
@@ -649,7 +649,7 @@
 	var webshims = $.webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var googleAPIs = protocol+'ajax.googleapis.com/ajax/libs/';
-	var uiLib = googleAPIs+'jqueryui/1.8.13/';
+	var uiLib = googleAPIs+'jqueryui/1.8.14/';
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;

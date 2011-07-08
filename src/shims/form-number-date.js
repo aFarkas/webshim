@@ -863,11 +863,8 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 						replaceInputUI.range.blockAttr = true;
 						elem.prop('value', ui.value);
 						replaceInputUI.range.blockAttr = false;
-						if(e.type == 'slidechange'){
-							triggerInlineForm(elem[0], 'change');
-						} else {
-							triggerInlineForm(elem[0], 'input');
-						}
+						triggerInlineForm(elem[0], 'input');
+						triggerInlineForm(elem[0], 'change');
 					}
 				}
 			;
@@ -890,7 +887,6 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 				}
 			}
 			range.slider($.extend({}, options.slider, elem.data('slider'), {
-				change: change,
 				slide: change
 			}));
 			

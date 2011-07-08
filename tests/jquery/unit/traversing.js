@@ -189,7 +189,6 @@ test("closest()", function() {
 	same( jQuery("#qunit-fixture").closest("span,#html").get(), q("html"), "closest(span,#html)" );
 
 	same( jQuery("div:eq(1)").closest("div:first").get(), [], "closest(div:first)" );
-//	same( jQuery("div").closest("body:first div:last").get(), q("fx-tests"), "closest(body:first div:last)" );
 
 	// Test .closest() limited by the context
 	var jq = jQuery("#nothiddendivchild");

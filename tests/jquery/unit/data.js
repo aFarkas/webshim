@@ -9,8 +9,6 @@ test("expando", function(){
 
 
 
-
-
 test(".data()", function() {
 	expect(5);
 
@@ -344,4 +342,21 @@ test("jQuery.data should follow html5 specification regarding camel casing", fun
 	equals(div.data("foo-bar"), "d", "Verify updated data-* key");
 
 	div.remove();
+});
+
+test("jQuery.data should not miss data with preset hyphenated property names", function() {
+
+	expect(2);
+
+	var div = jQuery("<div/>", { id: "hyphened" }).appendTo("#qunit-fixture"),
+		test = {
+			"camelBar": "camelBar",
+			"hyphen-foo": "hyphen-foo"
+		};
+
+	div.data( test );
+
+	jQuery.each( test , function(i, k) {
+		equal( div.data(k), k, "data with property '"+k+"' was correctly found");
+	});
 });

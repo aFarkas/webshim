@@ -14,6 +14,26 @@ test("null or undefined handler", function() {
 	} catch (e) {}
 });
 
+test("bind(),live(),delegate() with non-null,defined data", function() {
+
+	expect(3);
+
+	var handler = function( event, data ) {
+				equal( data, 0, "non-null, defined data (zero) is correctly passed" );
+			};
+
+	jQuery("#foo").bind("foo", handler);
+	jQuery("#foo").live("foo", handler);
+	jQuery("div").delegate("#foo", "foo", handler);
+
+	jQuery("#foo").trigger("foo", 0);
+
+	jQuery("#foo").unbind("foo", handler);
+	jQuery("#foo").die("foo", handler);
+	jQuery("div").undelegate("#foo", "foo");
+
+});
+
 test("bind(), with data", function() {
 	expect(4);
 	var handler = function(event) {
@@ -760,6 +780,87 @@ test("mouseover triggers mouseenter", function() {
 	elem.remove();
 });
 
+test("withinElement implemented with jQuery.contains()", function() {
+
+	expect(1);
+
+	jQuery("#qunit-fixture").append('<div id="jc-outer"><div id="jc-inner"></div></div>');
+
+	jQuery("#jc-outer").bind("mouseenter mouseleave", function( event ) {
+
+		equal( this.id, "jc-outer", this.id + " " + event.type );
+
+	}).trigger("mouseenter");
+
+	jQuery("#jc-inner").trigger("mousenter");
+
+	jQuery("#jc-outer").unbind("mouseenter mouseleave").remove();
+	jQuery("#jc-inner").remove();
+
+});
+
+test("mouseenter, mouseleave don't catch exceptions", function() {
+	expect(2);
+
+	var elem = jQuery("#firstp").hover(function() { throw "an Exception"; });
+
+	try {
+		elem.mouseenter();
+	} catch (e) {
+		equals( e, "an Exception", "mouseenter doesn't catch exceptions" );
+	}
+
+	try {
+		elem.mouseleave();
+	} catch (e) {
+		equals( e, "an Exception", "mouseleave doesn't catch exceptions" );
+	}
+});
+
+test("trigger() shortcuts", function() {
+	expect(6);
+
+	var elem = jQuery("<li><a href='#'>Change location</a></li>").prependTo("#firstUL");
+	elem.find("a").bind("click", function() {
+		var close = jQuery("spanx", this); // same with jQuery(this).find("span");
+		equals( close.length, 0, "Context element does not exist, length must be zero" );
+		ok( !close[0], "Context element does not exist, direct access to element must return undefined" );
+		return false;
+	}).click();
+
+	// manually clean up detached elements
+	elem.remove();
+
+	jQuery("#check1").click(function() {
+		ok( true, "click event handler for checkbox gets fired twice, see #815" );
+	}).click();
+
+	var counter = 0;
+	jQuery("#firstp")[0].onclick = function(event) {
+		counter++;
+	};
+	jQuery("#firstp").click();
+	equals( counter, 1, "Check that click, triggers onclick event handler also" );
+
+	var clickCounter = 0;
+	jQuery("#simon1")[0].onclick = function(event) {
+		clickCounter++;
+	};
+	jQuery("#simon1").click();
+	equals( clickCounter, 1, "Check that click, triggers onclick event handler on an a tag also" );
+
+	elem = jQuery("<img />").load(function(){
+		ok( true, "Trigger the load event, using the shortcut .load() (#2819)");
+	}).load();
+
+	// manually clean up detached elements
+	elem.remove();
+
+	// test that special handlers do not blow up with VML elements (#7071)
+	jQuery('<xml:namespace ns="urn:schemas-microsoft-com:vml" prefix="v" />').appendTo('head');
+	jQuery('<v:oval id="oval" style="width:100pt;height:75pt;" fillcolor="red"> </v:oval>').appendTo('#form');
+	jQuery("#oval").click().keydown();
+});
 
 test("trigger() bubbling", function() {
 	expect(17);
