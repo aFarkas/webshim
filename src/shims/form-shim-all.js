@@ -196,50 +196,53 @@ webshims.defineNodeNamesProperties(['button', 'fieldset', 'output'], {
 	}
 }, 'prop');
 
+var baseCheckValidity = function(elem){
+	var e,
+		v = $.prop(elem, 'validity')
+	;
+	if(v){
+		$.data(elem, 'cachedValidity', v);
+	} else {
+		return true;
+	}
+	if( !v.valid ){
+		e = $.Event('invalid');
+		var jElm = $(elem).trigger(e);
+		if(isSubmit && !baseCheckValidity.unhandledInvalids && !e.isDefaultPrevented()){
+			webshims.validityAlert.showFor(jElm);
+			baseCheckValidity.unhandledInvalids = true;
+		}
+	}
+	$.removeData(elem, 'cachedValidity', false);
+	return v.valid;
+};
 
+webshims.defineNodeNameProperty('form', 'checkValidity', {
+	prop: {
+		value: function(){
+			
+			var ret = true,
+				elems = $(this.elements).filter(function(){
+					return !webshims.data(this, 'nativeElement');
+				})
+			;
+			baseCheckValidity.unhandledInvalids = false;
+			for(var i = 0, len = elems.length; i < len; i++){
+				if( !baseCheckValidity(elems[i]) ){
+					ret = false;
+				}
+			}
+			return ret;
+		}
+	}
+});
 
-webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
+webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 	checkValidity: {
-		value: (function(){
-			var unhandledInvalids;
-			var testValidity = function(elem){
-				
-				var e,
-					v = $.prop(elem, 'validity')
-				;
-				if(v){
-					$.data(elem, 'cachedValidity', v);
-				} else {
-					return true;
-				}
-				if( !v.valid ){
-					e = $.Event('invalid');
-					var jElm = $(elem).trigger(e);
-					if(isSubmit && !unhandledInvalids && !e.isDefaultPrevented()){
-						webshims.validityAlert.showFor(jElm);
-						unhandledInvalids = true;
-					}
-				}
-				$.removeData(elem, 'cachedValidity', false);
-				return v.valid;
-			};
-			return function(){
-				unhandledInvalids = false;
-				if($.nodeName(this, 'form')){
-					var ret = true,
-						elems = this.elements || $( 'input, textarea, select', this);
-					
-					for(var i = 0, len = elems.length; i < len; i++){
-						if( !testValidity(elems[i]) ){
-							ret = false;
-						}
-					}
-					return ret;
-				} else {
-					return testValidity(this);
-				}
-			};
-		})()
+		value: function(){
+			baseCheckValidity.unhandledInvalids = false;
+			return baseCheckValidity($(this).getNativeElement()[0]);
+		}
 	},
 	setCustomValidity: {
 		value: function(error){
@@ -256,7 +259,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 				}
 			;
 			return function(){
-				var elem = this;
+				var elem = $(this).getNativeElement()[0];
 				//elem.name && <- we don't use to make it easier for developers
 				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] && ( !elem.form || $.attr(elem.form, 'novalidate') == null) );
 			};
@@ -265,7 +268,8 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 	validity: {
 		set: $.noop,
 		get: function(){
-			var elem = this;
+			var jElm = $(this).getNativeElement();
+			var elem = jElm[0];
 			var validityState = $.data(elem, 'cachedValidity');
 			if(validityState){
 				return validityState;
@@ -275,8 +279,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 			if( !$.prop(elem, 'willValidate') || elem.type == 'submit' ){
 				return validityState;
 			}
-			var jElm 			= $(elem),
-				val				= jElm.val(),
+			var val				= jElm.val(),
 				cache 			= {nodeName: elem.nodeName.toLowerCase()}
 			;
 			
@@ -292,6 +295,8 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 				}
 			});
 			elem.setAttribute('aria-invalid',  validityState.valid ? 'false' : 'true');
+			jElm = null;
+			elem = null;
 			return validityState;
 		}
 	}
@@ -998,7 +1003,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 							if (keyCode == 13){
 								var activeItem = $('li.active-item:not(.hidden-item)', that.shadowList);
 								if(activeItem[0]){
-									$.attr(that.input, 'value', activeItem.attr('data-value'));
+									$.prop(that.input, 'value', activeItem.attr('data-value'));
 									$(that.input).triggerHandler('updateInput');
 								}
 							}
@@ -1120,7 +1125,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				}
 			},
 			showHideOptions: function(){
-				var value = $.attr(this.input, 'value').toLowerCase();
+				var value = $.prop(this.input, 'value').toLowerCase();
 				//first check prevent infinite loop, second creates simple lazy optimization
 				if(value === this.lastUpdatedValue || (this.lastUnfoundValue && value.indexOf(this.lastUnfoundValue) === 0)){
 					return;
@@ -1234,7 +1239,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				activeItem = items.filter(':eq('+ index +')').addClass('active-item');
 				
 				if(doValue){
-					$.attr(this.input, 'value', activeItem.attr('data-value'));
+					$.prop(this.input, 'value', activeItem.attr('data-value'));
 					$.attr(this.input, 'aria-activedescendant', $.webshims.getID(activeItem));
 					$(this.input).triggerHandler('updateInput');
 					this.scrollIntoView(activeItem);
@@ -1253,10 +1258,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 	 * Implements input event in all browsers
 	 */
 	(function(){
-		var elements = {
-				input: 1
-			},
-			noInputTriggerEvts = {updateInput: 1, input: 1},
+		var noInputTriggerEvts = {updateInput: 1, input: 1},
 			noInputTypes = {
 				radio: 1,
 				checkbox: 1,
@@ -1272,11 +1274,11 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 			},
 			observe = function(input){
 				var timer,
-					lastVal = input.attr('value'),
+					lastVal = input.prop('value'),
 					trigger = function(e){
 						//input === null
 						if(!input){return;}
-						var newVal = input.attr('value');
+						var newVal = input.prop('value');
 						
 						if(newVal !== lastVal){
 							lastVal = newVal;
@@ -1285,8 +1287,13 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 							}
 						}
 					},
+					extraTimer,
+					extraTest = function(){
+						clearTimeout(extraTimer);
+						extraTimer = setTimeout(trigger, 9);
+					},
 					unbind = function(){
-						input.unbind('focusout', unbind).unbind('input', trigger).unbind('change', trigger).unbind('updateInput', trigger);
+						input.unbind('focusout', unbind).unbind('keyup keypress keydown paste cut', extraTest).unbind('input change updateInput', trigger);
 						clearInterval(timer);
 						setTimeout(function(){
 							trigger();
@@ -1297,16 +1304,16 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				;
 				
 				clearInterval(timer);
-				timer = setInterval(trigger, ($.browser.mozilla) ? 120 : 99);
-				setTimeout(trigger, 9);
-				input.bind('focusout', unbind).bind('input updateInput change', trigger);
+				timer = setInterval(trigger, 99);
+				extraTest();
+				input.bind('keyup keypress keydown paste cut', extraTest).bind('focusout', unbind).bind('input updateInput change', trigger);
 			}
 		;
 			
 		
 		$(doc)
 			.bind('focusin', function(e){
-				if( e.target && e.target.type && !e.target.readOnly && !e.target.disabled && elements[(e.target.nodeName || '').toLowerCase()] && !noInputTypes[e.target.type] ){
+				if( e.target && e.target.type && !e.target.readOnly && !e.target.disabled && (e.target.nodeName || '').toLowerCase() == 'input' && !noInputTypes[e.target.type] ){
 					observe($(e.target));
 				}
 			})

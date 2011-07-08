@@ -55,13 +55,14 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 			prop: {
 				value: function(error){
 					error = error+'';
-					desc.prop._supvalue.call(this, error);
+					var elem = (name == 'input') ? $(this).getNativeElement()[0] : this;
+					desc.prop._supvalue.call(elem, error);
 					if(!Modernizr.validationmessage){
-						webshims.data(this, 'customvalidationMessage', error);
+						webshims.data(elem, 'customvalidationMessage', error);
 					}
 					if(overrideValidity){
-						webshims.data(this, 'hasCustomError', !!(error));
-						testValidity(this);
+						webshims.data(elem, 'hasCustomError', !!(error));
+						testValidity(elem);
 					}
 				}
 			}
@@ -89,9 +90,9 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 				prop: {
 					get: function(){
 						if(stopValidity){return;}
-						var elem = this;
+						var elem = (nodeName == 'input') ? $(this).getNativeElement()[0] : this;
 						
-						var validity = oldDesc.prop._supget.call(this);
+						var validity = oldDesc.prop._supget.call(elem);
 						
 						if(!validity){
 							return validity;

@@ -565,6 +565,8 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	}
 	//date and datetime-local implement if we have to replace
 	if(!modernizrInputTypes['datetime-local'] || options.replaceUI){
+		
+		
 		var datetimeFactor = {
 			trigger: [0.595,0.395],
 			normal: [0.565,0.425]
@@ -572,8 +574,37 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		var subPixelCorrect = (!$.browser.msie || webshims.browserVersion > 6) ? 0 : 0.45;
 		
 		var configureDatePicker = function(elem, datePicker, change, _wrapper){
+			var stopFocusout;
+			var focusedOut;
+			var resetFocusHandler = function(){
+				data.dpDiv.unbind('mousedown.webshimsmousedownhandler');
+				stopFocusout = false;
+				focusedOut = false;
+			};
 			var data = datePicker
-				.datepicker($.extend(defaultDatepicker, options.datepicker, elem.data('datepicker')))
+				.bind('focusin', function(){
+					resetFocusHandler();
+					data.dpDiv.unbind('mousedown.webshimsmousedownhandler').bind('mousedown.webshimsmousedownhandler', function(){
+						stopFocusout = true;
+					});
+				})
+				.bind('focusout blur', function(e){
+					if(stopFocusout){
+						focusedOut = true;
+						e.stopImmediatePropagation();
+					}
+				})
+				.datepicker($.extend({
+					onClose: function(){
+						if(focusedOut && document.activeElement !== datePicker[0]){
+							resetFocusHandler();
+							datePicker.trigger('focusout');
+							datePicker.triggerHandler('blur');
+						} else {
+							resetFocusHandler();
+						}
+					}
+				}, defaultDatepicker, options.datepicker, elem.data('datepicker')))
 				.bind('change', change)
 				.data('datepicker')
 			;
@@ -740,11 +771,12 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 				
 			}
 		};
+			
 		
 		replaceInputUI.date = function(elem){
 			
 			if(!$.fn.datepicker){return;}
-			var date = $('<input type="text" class="input-date" />'),
+			var date = $('<input class="input-date" />'),
 				attr  = this.common(elem, date, replaceInputUI.date.attrs),
 				change = function(e){
 					
@@ -772,7 +804,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 				data = configureDatePicker(elem, date, change)
 				
 			;
-			
+						
 			if(attr.css){
 				date.css(attr.css);
 				if(attr.outerWidth){

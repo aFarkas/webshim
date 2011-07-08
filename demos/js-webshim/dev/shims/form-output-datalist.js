@@ -343,7 +343,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 							if (keyCode == 13){
 								var activeItem = $('li.active-item:not(.hidden-item)', that.shadowList);
 								if(activeItem[0]){
-									$.attr(that.input, 'value', activeItem.attr('data-value'));
+									$.prop(that.input, 'value', activeItem.attr('data-value'));
 									$(that.input).triggerHandler('updateInput');
 								}
 							}
@@ -465,7 +465,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				}
 			},
 			showHideOptions: function(){
-				var value = $.attr(this.input, 'value').toLowerCase();
+				var value = $.prop(this.input, 'value').toLowerCase();
 				//first check prevent infinite loop, second creates simple lazy optimization
 				if(value === this.lastUpdatedValue || (this.lastUnfoundValue && value.indexOf(this.lastUnfoundValue) === 0)){
 					return;
@@ -579,7 +579,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				activeItem = items.filter(':eq('+ index +')').addClass('active-item');
 				
 				if(doValue){
-					$.attr(this.input, 'value', activeItem.attr('data-value'));
+					$.prop(this.input, 'value', activeItem.attr('data-value'));
 					$.attr(this.input, 'aria-activedescendant', $.webshims.getID(activeItem));
 					$(this.input).triggerHandler('updateInput');
 					this.scrollIntoView(activeItem);
@@ -598,10 +598,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 	 * Implements input event in all browsers
 	 */
 	(function(){
-		var elements = {
-				input: 1
-			},
-			noInputTriggerEvts = {updateInput: 1, input: 1},
+		var noInputTriggerEvts = {updateInput: 1, input: 1},
 			noInputTypes = {
 				radio: 1,
 				checkbox: 1,
@@ -617,11 +614,11 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 			},
 			observe = function(input){
 				var timer,
-					lastVal = input.attr('value'),
+					lastVal = input.prop('value'),
 					trigger = function(e){
 						//input === null
 						if(!input){return;}
-						var newVal = input.attr('value');
+						var newVal = input.prop('value');
 						
 						if(newVal !== lastVal){
 							lastVal = newVal;
@@ -630,8 +627,13 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 							}
 						}
 					},
+					extraTimer,
+					extraTest = function(){
+						clearTimeout(extraTimer);
+						extraTimer = setTimeout(trigger, 9);
+					},
 					unbind = function(){
-						input.unbind('focusout', unbind).unbind('input', trigger).unbind('change', trigger).unbind('updateInput', trigger);
+						input.unbind('focusout', unbind).unbind('keyup keypress keydown paste cut', extraTest).unbind('input change updateInput', trigger);
 						clearInterval(timer);
 						setTimeout(function(){
 							trigger();
@@ -642,16 +644,16 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				;
 				
 				clearInterval(timer);
-				timer = setInterval(trigger, ($.browser.mozilla) ? 120 : 99);
-				setTimeout(trigger, 9);
-				input.bind('focusout', unbind).bind('input updateInput change', trigger);
+				timer = setInterval(trigger, 99);
+				extraTest();
+				input.bind('keyup keypress keydown paste cut', extraTest).bind('focusout', unbind).bind('input updateInput change', trigger);
 			}
 		;
 			
 		
 		$(doc)
 			.bind('focusin', function(e){
-				if( e.target && e.target.type && !e.target.readOnly && !e.target.disabled && elements[(e.target.nodeName || '').toLowerCase()] && !noInputTypes[e.target.type] ){
+				if( e.target && e.target.type && !e.target.readOnly && !e.target.disabled && (e.target.nodeName || '').toLowerCase() == 'input' && !noInputTypes[e.target.type] ){
 					observe($(e.target));
 				}
 			})

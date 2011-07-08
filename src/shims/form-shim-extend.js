@@ -196,50 +196,53 @@ webshims.defineNodeNamesProperties(['button', 'fieldset', 'output'], {
 	}
 }, 'prop');
 
+var baseCheckValidity = function(elem){
+	var e,
+		v = $.prop(elem, 'validity')
+	;
+	if(v){
+		$.data(elem, 'cachedValidity', v);
+	} else {
+		return true;
+	}
+	if( !v.valid ){
+		e = $.Event('invalid');
+		var jElm = $(elem).trigger(e);
+		if(isSubmit && !baseCheckValidity.unhandledInvalids && !e.isDefaultPrevented()){
+			webshims.validityAlert.showFor(jElm);
+			baseCheckValidity.unhandledInvalids = true;
+		}
+	}
+	$.removeData(elem, 'cachedValidity', false);
+	return v.valid;
+};
 
+webshims.defineNodeNameProperty('form', 'checkValidity', {
+	prop: {
+		value: function(){
+			
+			var ret = true,
+				elems = $(this.elements).filter(function(){
+					return !webshims.data(this, 'nativeElement');
+				})
+			;
+			baseCheckValidity.unhandledInvalids = false;
+			for(var i = 0, len = elems.length; i < len; i++){
+				if( !baseCheckValidity(elems[i]) ){
+					ret = false;
+				}
+			}
+			return ret;
+		}
+	}
+});
 
-webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
+webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 	checkValidity: {
-		value: (function(){
-			var unhandledInvalids;
-			var testValidity = function(elem){
-				
-				var e,
-					v = $.prop(elem, 'validity')
-				;
-				if(v){
-					$.data(elem, 'cachedValidity', v);
-				} else {
-					return true;
-				}
-				if( !v.valid ){
-					e = $.Event('invalid');
-					var jElm = $(elem).trigger(e);
-					if(isSubmit && !unhandledInvalids && !e.isDefaultPrevented()){
-						webshims.validityAlert.showFor(jElm);
-						unhandledInvalids = true;
-					}
-				}
-				$.removeData(elem, 'cachedValidity', false);
-				return v.valid;
-			};
-			return function(){
-				unhandledInvalids = false;
-				if($.nodeName(this, 'form')){
-					var ret = true,
-						elems = this.elements || $( 'input, textarea, select', this);
-					
-					for(var i = 0, len = elems.length; i < len; i++){
-						if( !testValidity(elems[i]) ){
-							ret = false;
-						}
-					}
-					return ret;
-				} else {
-					return testValidity(this);
-				}
-			};
-		})()
+		value: function(){
+			baseCheckValidity.unhandledInvalids = false;
+			return baseCheckValidity($(this).getNativeElement()[0]);
+		}
 	},
 	setCustomValidity: {
 		value: function(error){
@@ -256,7 +259,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 				}
 			;
 			return function(){
-				var elem = this;
+				var elem = $(this).getNativeElement()[0];
 				//elem.name && <- we don't use to make it easier for developers
 				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] && ( !elem.form || $.attr(elem.form, 'novalidate') == null) );
 			};
@@ -265,7 +268,8 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 	validity: {
 		set: $.noop,
 		get: function(){
-			var elem = this;
+			var jElm = $(this).getNativeElement();
+			var elem = jElm[0];
 			var validityState = $.data(elem, 'cachedValidity');
 			if(validityState){
 				return validityState;
@@ -275,8 +279,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 			if( !$.prop(elem, 'willValidate') || elem.type == 'submit' ){
 				return validityState;
 			}
-			var jElm 			= $(elem),
-				val				= jElm.val(),
+			var val				= jElm.val(),
 				cache 			= {nodeName: elem.nodeName.toLowerCase()}
 			;
 			
@@ -292,6 +295,8 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select', 'form'], {
 				}
 			});
 			elem.setAttribute('aria-invalid',  validityState.valid ? 'false' : 'true');
+			jElm = null;
+			elem = null;
 			return validityState;
 		}
 	}
