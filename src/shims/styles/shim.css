@@ -271,7 +271,7 @@ img.ui-datepicker-trigger {
 	padding: 0 !important;
 }
 .input-range.ui-slider-horizontal .ui-slider-range {
-	top: 1px;
+	top: 4px;
 	height: 1px;
 }
 .input-range.ui-slider-horizontal .ui-slider-range-min {
