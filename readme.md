@@ -72,6 +72,16 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.7.1
+----------
+
+* fixed autofocus issue
+* updated "placeholder label option"-algorithm (changed spec)
+* scripted submit is not prevented anymore
+* delegate validity property from shadowelement to native element
+* delayed focusout/blur event on date-input, if user is interacting with datepicker
+
+
 Release 1.7
 ----------
 
