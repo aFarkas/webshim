@@ -43,7 +43,7 @@ var validityPrototype = {
 var isPlaceholderOptionSelected = function(select){
 	if(select.type == 'select-one' && select.size < 2){
 		var option = $('> option:first-child', select);
-		return (!option.attr('disabled') && option.attr('selected'));
+		return !!option.prop('selected');
 	} 
 	return false;
 };
@@ -405,7 +405,7 @@ webshims.addReady(function(context, contextElem){
 				if(!first){return false;}
 				if(this.getAttribute('autofocus') == null){return;}	
 				first = false;
-				var elem = webshims.getVisualInput(this);
+				var elem = $(this).getShadowElement();
 				var focusElem = $('input, select, textarea, .ui-slider-handle', elem).filter(':visible:first');
 				if (!focusElem[0]) {
 					focusElem = elem;

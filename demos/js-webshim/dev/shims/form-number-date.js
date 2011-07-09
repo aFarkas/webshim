@@ -539,6 +539,13 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 			.hide()
 		;
 		
+		if(orig[0].form){
+			$(orig[0].form).bind('reset', function(e){
+				if(e.originalEvent && !e.isDefaultPrevented()){
+					setTimeout(function(){orig.prop( 'value', orig.prop('value') );}, 0);
+				}
+			});
+		}
 		if(shim.length == 1 && !$('*', shim)[0]){
 			shim.attr('aria-labeledby', curLabelID);
 			attr.label.bind('click', function(){
@@ -890,7 +897,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 				slide: change
 			}));
 			
-			['disabled', 'min', 'max', 'value', 'step'].forEach(function(name){
+			['disabled', 'min', 'max', 'step', 'value'].forEach(function(name){
 				var val = elem.attr(name);
 				var shadow;
 				if(name == 'value' && !val){

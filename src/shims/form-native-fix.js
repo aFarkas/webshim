@@ -157,6 +157,9 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 				value: function(){
 					var ret = true;
 					$(this.elements || [])
+						.filter(function(){
+							return this.willValidate && !webshims.data(this, 'nativeElement');
+						})
 						.each(function(){
 							 if($(this).checkValidity() === false){
 								ret = false;
@@ -204,7 +207,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 			var isPlaceholderOptionSelected = function(select){
 				if(select.type == 'select-one' && select.size < 2){
 					var option = $('> option:first-child', select);
-					return (!option.prop('disabled') && option.prop('selected'));
+					return option.prop('selected');
 				} 
 				return false;
 			};

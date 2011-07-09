@@ -69,15 +69,6 @@ asyncTest("general validity Modul", function(){
 	$('#select').attr('required', 'required');
 	if (!omitTests.requiredSelect) {
 	
-		$('#select option:first').prop('disabled', true);
-		
-		//chrome hasn't implemented this, it's not fixed because it's negligible
-		if(!$.browser.webkit){
-			ok($('#select').prop('validity').valid, 'required select with first disabled option selected and empty value is valid');
-		}
-		
-		$('#select option:first').prop('disabled', false);
-		
 		
 		$('#select').prop('selectedIndex', 1);
 		ok($('#select').prop('validity').valid, 'required select with empty value and second option selected is valid');
