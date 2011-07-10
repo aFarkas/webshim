@@ -10,12 +10,14 @@
 	var Object = window.Object;
 	var defineProperty = 'defineProperty';
 	var formvalidation = 'formvalidation';
+	var valueAsNumber = 'valueAsNumber';
+	var validationmessage = 'validationmessage';
 	
 	//new Modernizrtests
 	(function(){
 		var addTest = Modernizr.addTest;
-		var form = $('<form action="#"><input name="a" required /><select><option>y</option></select><input required id="date-input-test" type="date" /></form>');
-		var dateElem;
+		var form = $('<form action="#"><select /><input type="date" required name="a" /></form>');
+		var dateElem = $('input', form);
 		
 		//using hole modernizr api
 		addTest(formvalidation, function(){
@@ -26,13 +28,13 @@
 			return !!(modernizrInputAttrs.list && window.HTMLDataListElement);
 		});
 		
-		addTest('validationmessage', function(){
+		addTest(validationmessage, function(){
 			if(!Modernizr[formvalidation]){
 				return false;
 			}
 			//the form has to be connected in FF4
 			form.appendTo('head');
-			return !!($('input', form).prop('validationMessage'));
+			return !!(dateElem.prop('validationMessage'));
 		});
 		
 		addTest('output', function(){
@@ -49,26 +51,24 @@
 		Modernizr.requiredSelect = !!(Modernizr[formvalidation] && 'required' in $('select', form)[0]);
 		
 		//bugfree means interactive formvalidation including correct submit-invalid event handling (this can't be detected, we can just guess)
-		Modernizr.bugfreeformvalidation = Modernizr[formvalidation] && Modernizr.requiredSelect && Modernizr.validationmessage && (!$.browser.webkit || browserVersion > 534.19);
+		Modernizr.bugfreeformvalidation = Modernizr[formvalidation] && Modernizr.requiredSelect && Modernizr[validationmessage] && (!$.browser.webkit || browserVersion > 534.19);
 		
 		
-		modernizrInputAttrs.valueAsNumber = false;
+		modernizrInputAttrs[valueAsNumber] = false;
 		modernizrInputAttrs.valueAsNumberSet = false;
 		modernizrInputAttrs.valueAsDate = false;
 		
 		if(Modernizr[formvalidation]){
-			dateElem = $('#date-input-test', form)[0];
-			modernizrInputAttrs.valueAsNumber = ('valueAsNumber' in  dateElem);
-			if(modernizrInputAttrs.valueAsNumber){
-				dateElem.valueAsNumber = 0;
+			modernizrInputAttrs[valueAsNumber] = (valueAsNumber in dateElem[0]);
+			if(modernizrInputAttrs[valueAsNumber]){
+				dateElem[valueAsNumber] = 0;
 				modernizrInputAttrs.valueAsNumberSet = (dateElem.value == '1970-01-01');
 			}
 			modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem);
-			dateElem = null;
 			form.remove();
 		}
 		
-		form = null;
+		form = dateElem = null;
 		
 		Modernizr.ES5base = !!(String.prototype.trim && Date.now && Date.prototype.toISOString);
 		Modernizr.ES5extras = !!(Array.isArray && Object.keys && Object.create && Function.prototype.bind && Object.defineProperties);// && !isNaN( Date.parse("T00:00") )
@@ -110,7 +110,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.7.1',
+		version: 'pre1.7.2',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
@@ -167,10 +167,6 @@
 			
 			addModule(name, cfg);
 			if(cfg.methodNames){
-				if (!$.isArray(cfg.methodNames)) {
-					cfg.methodNames = [cfg.methodNames];
-				}
-				
 				$.each(cfg.methodNames, function(i, methodName){
 					webshims.addMethodName(methodName);
 				});
@@ -979,9 +975,9 @@
 			
 	addPolyfill('form-core', {
 		feature: 'forms',
-		dependencies: (Modernizr.validationmessage) ? ['es5'] : ['es5', 'dom-extend'],
+		dependencies: (Modernizr[validationmessage]) ? ['es5'] : ['es5', 'dom-extend'],
 		loadInit: function(){
-			if(this.options.customMessages && Modernizr.validationmessage){
+			if(this.options.customMessages && Modernizr[validationmessage]){
 				loadList(["dom-extend"]);
 			}
 		},

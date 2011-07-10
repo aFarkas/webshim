@@ -129,7 +129,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		
 	};
 	
-	$(document).bind('change refreshvalidityui', switchValidityClass);
+	$(document).bind('focusout refreshvalidityui', switchValidityClass);
 	
 	
 	
