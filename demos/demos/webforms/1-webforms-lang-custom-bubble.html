@@ -98,7 +98,7 @@ $('form').bind('invalid', function(e){
 $('form')
 	.bind('firstinvalid', function(e){
 		//show the invalid alert for first invalid element and pass the custom validation message
-		$.webshims.validityAlert.showFor( e.target, $(e.target).attr('customValidationMessage') );
+		$.webshims.validityAlert.showFor( e.target, $(e.target).prop('customValidationMessage') );
 		//prevent browser from showing native validation message
 		return false;
 	})

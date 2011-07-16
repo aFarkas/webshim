@@ -1,6 +1,5 @@
 .polyfill-important.polyfill-remove-fouc.loading-polyfills body {
 	visibility: hidden;
-	
 }
 .polyfill-important.polyfill-remove-fouc.long-loading-polyfills {
 	background-image: url(polyfill-loader.gif);
@@ -10,6 +9,20 @@
 article,aside,canvas,details,figcaption,figure,
 footer,header,hgroup,menu,nav,section,summary { 
     display:block;
+}
+audio.controls,
+video {
+	display: inline-block;
+	width: 300px;
+	height: 150px;
+}
+audio {
+	height: 30px;
+}
+audio[controls] {
+	display: inline-block;
+	width: 300px;
+	height: 30px;
 }
 mark {
     background-color: #ff9;

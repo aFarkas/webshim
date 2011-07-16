@@ -179,15 +179,17 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	/* some extra validation UI */
 	webshims.validityAlert = (function(){
 		var alertElem = (!$.browser.msie || parseInt($.browser.version, 10) > 7) ? 'span' : 'label';
+		var posReg = /^(?:relative|absolute|fixed)$/;
 		var api = {
 			hideDelay: 5000,
 			showFor: function(elem, message, hideOnBlur){
 				elem = $(elem);
 				var visual = $(elem).getShadowElement();
+				var offset = api.getOffsetFromBody(visual);
 				createAlert();
 				api.clear();
 				this.getMessage(elem, message);
-				this.position(visual);
+				this.position(visual, offset);
 				errorBubble.css({
 					fontSize: elem.css('fontSize'),
 					fontFamily: elem.css('fontFamily')
@@ -199,17 +201,26 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				}
 				
 				if(!hideOnBlur){
-					this.setFocus(visual, elem[0]);
+					this.setFocus(visual, elem[0], offset);
 				}
 			},
-			setFocus: function(visual, elem){
+			getOffsetFromBody: function(elem){
+				var offset = $(elem).offset();
+				[document.documentElement, document.body].forEach(function(offsetElem){
+					if(offsetElem && posReg.test( $(offsetElem).css('position') )){
+						offset.top -= (parseInt( $(offsetElem).css('top'), 10 ) || 0) + (parseInt( $(offsetElem).css('marginTop'), 10 ) || 0);
+						offset.left -= (parseInt( $(offsetElem).css('left'), 10 ) || 0) + (parseInt( $(offsetElem).css('marginLeft'), 10 ) || 0);
+					}
+				});
+				return offset;
+			},
+			setFocus: function(visual, elem, offset){
 				var focusElem = $('input, select, textarea, .ui-slider-handle', visual).filter(':visible:first');
 				if(!focusElem[0]){
 					focusElem = visual;
 				}
 				var scrollTop = webshims.scrollRoot.scrollTop();
-				var elemTop = focusElem.offset().top;
-				var labelOff;
+				var elemTop = ((offset || focusElem.offset()).top) - 20;
 				var smooth;
 				
 				if(webshims.getID && alertElem == 'label'){
@@ -217,10 +228,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				}
 				
 				if(scrollTop > elemTop){
-					labelOff = elem.id && $('label[for="'+elem.id+'"]', elem.form).offset();
-					if(labelOff && labelOff.top < elemTop){
-						elemTop = labelOff.top;
-					}
+					
 					webshims.scrollRoot.animate(
 						{scrollTop: elemTop - 5}, 
 						{
@@ -246,8 +254,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			getMessage: function(elem, message){
 				$('> span.va-box', errorBubble).text(message || getContentValidationMessage(elem[0]) || elem.prop('validationMessage'));
 			},
-			position: function(elem){
-				var offset = elem.offset();
+			position: function(elem, offset){
+				offset = offset || api.getOffsetFromBody(elem);
 				offset.top += elem.outerHeight();
 				errorBubble.css(offset);
 			},
