@@ -8,7 +8,6 @@ jQuery.webshims.gcEval = function(){
 };
 jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
-	
 	var groupTypes = {radio: 1};
 	var checkTypes = {checkbox: 1, radio: 1};
 	var emptyJ = $([]);
@@ -179,9 +178,12 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	/* some extra validation UI */
 	webshims.validityAlert = (function(){
 		var alertElem = (!$.browser.msie || parseInt($.browser.version, 10) > 7) ? 'span' : 'label';
-		var posReg = /^(?:relative|absolute|fixed)$/;
+		var bodyOffset = {top: 0, left: 0};
 		var api = {
 			hideDelay: 5000,
+			getBodyOffset: function(){
+				bodyOffset = errorBubble.offset();
+			},
 			showFor: function(elem, message, hideOnBlur){
 				elem = $(elem);
 				var visual = $(elem).getShadowElement();
@@ -206,12 +208,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			},
 			getOffsetFromBody: function(elem){
 				var offset = $(elem).offset();
-				[document.documentElement, document.body].forEach(function(offsetElem){
-					if(offsetElem && posReg.test( $(offsetElem).css('position') )){
-						offset.top -= (parseInt( $(offsetElem).css('top'), 10 ) || 0) + (parseInt( $(offsetElem).css('marginTop'), 10 ) || 0);
-						offset.left -= (parseInt( $(offsetElem).css('left'), 10 ) || 0) + (parseInt( $(offsetElem).css('marginLeft'), 10 ) || 0);
-					}
-				});
+				$.swap(errorBubble[0], {visibility: 'hidden', display: 'inline-block', left: 0, top: 0}, api.getBodyOffset);
+				offset.top -= bodyOffset.top;
+				offset.left -= bodyOffset.left;
 				return offset;
 			},
 			setFocus: function(visual, elem, offset){
@@ -220,7 +219,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					focusElem = visual;
 				}
 				var scrollTop = webshims.scrollRoot.scrollTop();
-				var elemTop = ((offset || focusElem.offset()).top) - 20;
+				var elemTop = ((offset || focusElem.offset()).top) - 30;
 				var smooth;
 				
 				if(webshims.getID && alertElem == 'label'){
@@ -255,7 +254,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				$('> span.va-box', errorBubble).text(message || getContentValidationMessage(elem[0]) || elem.prop('validationMessage'));
 			},
 			position: function(elem, offset){
-				offset = offset || api.getOffsetFromBody(elem);
+				offset = offset ? $.extend({}, offset) : api.getOffsetFromBody(elem);
 				offset.top += elem.outerHeight();
 				errorBubble.css(offset);
 			},
@@ -287,7 +286,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			if(created){return;}
 			created = true;
 			
-			$(function(){
+			webshims.ready('DOM', function(){
 				errorBubble.appendTo('body');
 				if($.fn.bgIframe && $.browser.msie && parseInt($.browser.version, 10) < 7){
 					errorBubble.bgIframe();
@@ -338,7 +337,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	})();
 	
 	if(options.replaceValidationUI){
-		$(function(){
+		webshims.ready('DOM', function(){
 			$(document).bind('firstinvalid', function(e){
 				if(!e.isInvalidUIPrevented()){
 					e.preventDefault();
