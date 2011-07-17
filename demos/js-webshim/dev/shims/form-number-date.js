@@ -531,7 +531,9 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		;
 		shim.addClass(orig[0].className);
 		webshims.addShadowDom(orig, shim, {
-			data: methods || {}
+			data: methods || {},
+			shadowFocusElement: $('input.input-datetime-local-date, span.ui-slider-handle', shim)[0],
+			shadowChilds: $('input, span.ui-slider-handle', shim)
 		});
 		
 		orig
@@ -618,9 +620,6 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 			data.dpDiv.addClass('input-date-datepicker-control');
 			
 			if(_wrapper){
-				$('input', _wrapper).each(function(){
-					webshims.data(this, 'nativeElement', elem[0]);
-				});
 				webshims.triggerDomUpdate(_wrapper[0]);	
 			}
 			if(setLangDefaults){
@@ -877,9 +876,6 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 			;
 			
 			$('span', range)
-				.each(function(){
-					webshims.data(this, 'nativeElement', elem[0]);
-				})
 				.attr('aria-labeledby', attr.label.attr('id'))
 			;
 			attr.label.bind('click', function(){
@@ -964,7 +960,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, attr){
 		webshims.onNodeNamesPropertyModify('input', attr, function(val){
 				var shadowData = webshims.data(this, 'shadowData');
-				if(shadowData && shadowData.data && shadowData.data[attr] && shadowData.shadowElement !== this){
+				if(shadowData && shadowData.data && shadowData.data[attr] && shadowData.nativeElement === this){
 					shadowData.data[attr](this, shadowData.shadowElement, val);
 				}
 			}
@@ -978,10 +974,10 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		if(!langObj){return;}
 		$.extend(defaultDatepicker, langObj, options.datepicker);
 		$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', defaultDatepicker).each(function(){
-			var orig = webshims.data(this, 'nativeElement');
-			if(orig){
+			var orig = webshims.data(this, 'shadowData') || {};
+			if(orig.nativeElement){
 				$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
-					$(orig).attr(name, function(i, value){return value;});
+					$(orig.nativeElement).attr(name, function(i, value){return value;});
 				});
 			}
 		});

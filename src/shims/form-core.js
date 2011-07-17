@@ -203,7 +203,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				}
 				
 				if(!hideOnBlur){
-					this.setFocus(visual, elem[0], offset);
+					this.setFocus(visual, offset);
 				}
 			},
 			getOffsetFromBody: function(elem){
@@ -213,11 +213,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				offset.left -= bodyOffset.left;
 				return offset;
 			},
-			setFocus: function(visual, elem, offset){
-				var focusElem = $('input, select, textarea, .ui-slider-handle', visual).filter(':visible:first');
-				if(!focusElem[0]){
-					focusElem = visual;
-				}
+			setFocus: function(visual, offset){
+				var focusElem = $(visual).getShadowFocusElement();
 				var scrollTop = webshims.scrollRoot.scrollTop();
 				var elemTop = ((offset || focusElem.offset()).top) - 30;
 				var smooth;

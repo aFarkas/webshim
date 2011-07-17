@@ -72,6 +72,14 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.7.2
+----------
+
+* improved error balloon positioning
+* .form-ui-valid/.form-ui-invalid behave now more similiar to :-moz-ui-valid/:-moz-ui-invalid 
+* some little performance improvements
+* started mediaelement support (next major release)
+
 Release 1.7.1
 ----------
 
@@ -89,51 +97,3 @@ Release 1.7
 * support for $.fn.prop/$.fn.removeAttr
 * added custom events to webforms *changedvalid* / *changedinvalid*
 
-Release 1.6.3
-----------
-
-* improved data-errormessage (can handle JSON messages)
-* better compatibility with htc behaviors like pie.htc
-
-Release 1.6.2
-----------
-
-* improved UI for [type=range], [type=date], [type=datetime-local] and constraint validation
-* tweaked bgIframe support for IE6
-* added scriptloader adapter (removed own script loader, less [NIH](http://en.wikipedia.org/wiki/Not_Invented_Here))
-* removed valueAsDate for type=datetime-local (nice feature but Spec Violation)
-* willValidate is true outside of form-element
-* typofix [lukeholder](https://github.com/lukeholder)
-
-Release 1.6.1
-----------
-
-* UI for date and datetime-local are polyfilled much faster
-* performance for IE6/IE7/IE8 in general
-* fixed bug Opera isn't calling ready-event anymore
-* fewer http requests especially for IE8-
-* added disabled state for spinbuttons
-
-Known Issue/Won't fix
-----------
-* removed placeholder support for Opera (Opera 11+ has native input[placeholder] support)
-
-
-Release 1.6
-----------
-
-* added details & summary element-support
-* improved/clean up documentation, fixed many typos, grammar... ([jab](https://github.com/jab))
-* improved english validationMessages ([jab](https://github.com/jab))
-* re-added combohandler support
-* fixed issue with language switching ($.webshims.activeLang not defined initially)
-* fixed checkValidity in Opera and in polyfilled browsers
-* fixed typo ([Seldaek](https://github.com/Seldaek))
-* added support for older jQuery versions
-* fixed IE9 styling issue
-* fixed IE reopens datepicker sometimes
-* updated to jQuery 1.5.2
-* fixed many little bugs in old X-/C-graded browsers
-* fixed setting valueAsNumber/valueAsDate in Opera
-* added optional - but automatic - bgIframe support for IE6
-* use png8 for details/summary open indicator

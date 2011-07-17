@@ -112,13 +112,16 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	};
 
 
-	[{name: 'getNativeElement', prop: 'nativeElement'}, {name: 'getShadowElement', prop: 'hasShadow'}].forEach(function(data){
+	[{name: 'getNativeElement', prop: 'nativeElement'}, {name: 'getShadowElement', prop: 'shadowElement'}, {name: 'getShadowFocusElement', prop: 'shadowFocusElement'}].forEach(function(data){
 		$.fn[data.name] = function(){
 			return this.map(function(){
-				return elementData(this, data.prop) || this;
+				var shadowData = elementData(this, 'shadowData');
+				return shadowData && shadowData[data.prop] || this;
 			});
 		};
 	});
+	
+	
 	
 	
 	['removeAttr', 'prop', 'attr'].forEach(function(type){
@@ -394,20 +397,29 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if(shadowElem.jquery){
 				shadowElem = shadowElem[0];
 			}
-			
+			if(!opts.shadowFocusElement){
+				opts.shadowFocusElement = shadowElem;
+			}
 			var nativeData = $.data(nativeElem, '_webshimsLib') || $.data(nativeElem, '_webshimsLib', {});
 			var shadowData = $.data(shadowElem, '_webshimsLib') || $.data(shadowElem, '_webshimsLib', {});
 			nativeData.hasShadow = shadowElem;
 			shadowData.nativeElement = nativeElem;
 			shadowData.shadowData = nativeData.shadowData = {
 				nativeElement: nativeElem,
-				shadowElement: shadowElem
+				shadowElement: shadowElem,
+				shadowFocusElement: opts.shadowFocusElement
 			};
+			if(opts.shadowChilds){
+				opts.shadowChilds.each(function(){
+					elementData(this, 'shadowData', shadowData.shadowData);
+				});
+			}
+			
 			if(opts.data){
 				nativeData.shadowData.data = opts.data;
 				shadowData.shadowData.data = opts.data;
 			}
-			
+			opts = null;
 		},
 		propTypes: {
 			standard: function(descs, name){

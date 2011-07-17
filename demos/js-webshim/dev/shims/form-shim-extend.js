@@ -405,14 +405,13 @@ webshims.addReady(function(context, contextElem){
 				if(!first){return false;}
 				if(this.getAttribute('autofocus') == null){return;}	
 				first = false;
-				var elem = $(this).getShadowElement();
-				var focusElem = $('input, select, textarea, .ui-slider-handle', elem).filter(':visible:first');
-				if (!focusElem[0]) {
-					focusElem = elem;
-				}
+				var focusElem = $(this).getShadowFocusElement();
+				
 				try {
 					focusElem[0].focus();
 				} catch (e) {}
+				focusElem = null;
+				return false;
 			});
 		
 	}, 0);
