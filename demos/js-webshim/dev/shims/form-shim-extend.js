@@ -223,7 +223,8 @@ webshims.defineNodeNameProperty('form', 'checkValidity', {
 			
 			var ret = true,
 				elems = $('input,textarea,select', this).filter(function(){
-					return !webshims.data(this, 'nativeElement');
+					var shadowData = webshims.data(this, 'shadowData');
+					return !shadowData || !shadowData.nativeElement || shadowData.nativeElement === this;
 				})
 			;
 			baseCheckValidity.unhandledInvalids = false;

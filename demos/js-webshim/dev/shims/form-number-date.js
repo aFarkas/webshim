@@ -782,7 +782,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		replaceInputUI.date = function(elem){
 			
 			if(!$.fn.datepicker){return;}
-			var date = $('<input class="input-date" type="date" />'),
+			var date = $('<input class="input-date" type="text" />'),
 				attr  = this.common(elem, date, replaceInputUI.date.attrs),
 				change = function(e){
 					
