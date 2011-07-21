@@ -264,9 +264,11 @@ asyncTest('validationMessage/setCustomValidity', function(){
 	equals($('#select').prop('disabled', true).prop('validationMessage'), '', 'custom error message is empty, if control is disabled');
 	$('#select').prop('disabled', false).setCustomValidity('');
 	ok(( $('#select').is(':valid-element') && $('#select').prop('willValidate') ), 'select is set valid again');
-	$('#select')[0].setCustomValidity('has an error2');
-	ok($('#select').prop('validity').customError, 'select has customerror with native method');
-	$('#select')[0].setCustomValidity('');
+	if($.webshims.cfg.extendNative){
+		$('#select')[0].setCustomValidity('has an error2');
+		ok($('#select').prop('validity').customError, 'select has customerror with native method');
+		$('#select')[0].setCustomValidity('');
+	}
 	ok(!!($('input').filter(':invalid-element').prop('validationMessage')), 'validationMessage is a getter for all invalid elements');
 	$.webshims.ready('forms DOM', function(){
 		start();
@@ -342,19 +344,21 @@ asyncTest('checkValidity/invalid event III', function(){
 	});
 });
 
-asyncTest('native checkValidity/invalid event III', function(){
-	QUnit.reset();
-	var invalids = 0;
-	$('#form-1').bind('invalid', function(){
-		invalids++;
+if($.webshims.cfg.extendNative){
+	asyncTest('native checkValidity/invalid event III', function(){
+		QUnit.reset();
+		var invalids = 0;
+		$('#form-1').bind('invalid', function(){
+			invalids++;
+		});
+		ok(!$('#name')[0].checkValidity(), 'validity is false for #name (element)');
+		equals(invalids, 1, 'there was 1 invalid event (element)');
+			
+		$.webshims.ready('forms DOM', function(){
+			setTimeout(start, 16);
+		});
 	});
-	ok(!$('#name')[0].checkValidity(), 'validity is false for #name (element)');
-	equals(invalids, 1, 'there was 1 invalid event (element)');
-		
-	$.webshims.ready('forms DOM', function(){
-		setTimeout(start, 16);
-	});
-});
+}
 
 
 asyncTest('checkValidity/invalid event IV', function(){

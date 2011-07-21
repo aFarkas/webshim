@@ -63,8 +63,6 @@ loadTester.addProfile({
 			equals(1, scripts.filter('[src*="input-widgets.js"]').length, 'load input-widgets');
 			$.webshims.ready('forms-ext', start);
 		});
-		
-		
 	}
 });
 

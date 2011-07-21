@@ -110,7 +110,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.7.2alpha2',
+		version: '1.7.2beta1',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
@@ -314,6 +314,7 @@
 				;
 				this.each(function(){
 					var fn = $.prop(this, name);
+					
 					if(fn && fn.apply){
 						ret = fn.apply(this, args);
 						if(ret !== undefined){
@@ -790,7 +791,7 @@
 				webshims.fn[name] = $.fn[name+'Webshim'];
 			}
 		});
-		$.each(['getNativeElement', 'getShadowElement'], function(i, name){
+		$.each(['getNativeElement', 'getShadowElement', 'getShadowFocusElement'], function(i, name){
 			$.fn[name] = function(){
 				return this;
 			};

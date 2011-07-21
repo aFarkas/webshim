@@ -198,6 +198,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		};
 		
 		extendQ[type] = function(nodeName, prop, desc){
+			
 			if(!extendedProps[nodeName]){
 				extendedProps[nodeName] = {};
 			}
@@ -219,6 +220,15 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 							singleVal(elem, prop, value, false, (arguments.length === 0)) : 
 							olds[type](elem, prop, value)
 						;
+					};
+				}
+				if(type == 'prop' && propType == 'value' && desc.value.apply){
+					return  function(value){
+						var sup = olds[type](this, prop);
+						if(sup && sup.apply){
+							sup = sup.apply(this, arguments);
+						} 
+						return sup;
 					};
 				}
 				return function(value){

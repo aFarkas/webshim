@@ -28,19 +28,21 @@
 			if(hash.indexOf('customValidationMessage') !== -1){
 				$.webshims.cfg.forms.customMessages = true; 
 			}
-			
+			if(hash.indexOf('noNativeMethods') !== -1){
+				$.webshims.cfg.extendNative = false; 
+			}
 			
 						
 			$(function(){
-				$('#customValidationMessage').attr('checked', !!$.webshims.cfg.forms.customMessages);
-				$('#overrideValidationMessages').attr('checked', !!$.webshims.cfg.forms.overrideMessages);
-				
+				$('#customValidationMessage').prop('checked', !!$.webshims.cfg.forms.customMessages);
+				$('#overrideValidationMessages').prop('checked', !!$.webshims.cfg.forms.overrideMessages);
+				$('#noNativeMethods').prop('checked', !$.webshims.cfg.extendNative);
 				$('input.webshim-config')
 					.bind('click', function(){
 						var addHash = '';
 						$('input.webshim-config').each(function(){
 							if(this.checked){
-								addHash += $.attr(this, 'value');
+								addHash += $.prop(this, 'value');
 							}
 						});
 						location.hash = addHash;
@@ -130,6 +132,8 @@
 <div>
 	<input type="checkbox" id="overrideValidationMessages" value="overrideValidationMessages" class="webshim-config" /> <label for="overrideValidationMessages">overrideValidationMessages</label>
 	<input type="checkbox" id="customValidationMessage" value="customValidationMessage" class="webshim-config" /> <label for="customValidationMessage">customValidationMessage</label>
+	<input type="checkbox" id="noNativeMethods" value="noNativeMethods" class="webshim-config" /> <label for="noNativeMethods">noNativeMethods</label>
+	
 </div>
 <small>Note: These tests are made to test webshims lib implementation. If there are some failling tests in native implementations, fill a browser bug. We currently only fix heavy/easy to fix errors in native implementations.</small>
 <h1 id="qunit-header">Webshims Lib Test Suite</h1>

@@ -39,8 +39,10 @@
 			var elemSel = getElementSel(elem);
 			var fn = elem.prop(methodName);
 			ok(fn && fn.call && fn.apply, elemSel+' has method as prop '+ methodName);
-			fn = elem[0][methodName];
-			ok(fn && fn.call && fn.apply, elemSel+' has method as native '+ methodName);
+			if($.webshims.cfg.extendNative){
+				fn = elem[0][methodName];
+				ok(fn && fn.call && fn.apply, elemSel+' has method as native '+ methodName);
+			}
 		}
 	};
 })(jQuery);

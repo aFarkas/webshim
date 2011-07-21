@@ -158,7 +158,11 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 					var ret = true;
 					$(this.elements || [])
 						.filter(function(){
-							return this.willValidate && !webshims.data(this, 'nativeElement');
+							if(!this.willValidate){
+								return false;
+							}
+							var shadowData = webshims.data(this, 'shadowData');
+							return !shadowData || !shadowData.nativeElement || shadowData.nativeElement === this;
 						})
 						.each(function(){
 							 if($(this).checkValidity() === false){
