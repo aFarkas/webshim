@@ -12,6 +12,11 @@
 		main web shim extension fiels
 		Note: you can combine/concat/rename them with your other files, but you have to include them in the head without a defer/async attribute!
 	 -->
+	 <script>
+	 	if(location.hash.replace('#', '').indexOf('testGoodWithFix') !== -1){
+			window.testGoodWithFix = true; 
+		}
+	</script>
 	<script src="../src/polyfiller.js"></script>
 	
 	<script>
@@ -25,9 +30,12 @@
 				$.webshims.cfg.forms.customMessages = true; 
 			}
 			
+			
+			
 			$(function(){
-				$('#customValidationMessage').attr('checked', !!$.webshims.cfg.forms.customMessages);
-				$('#overrideValidationMessages').attr('checked', !!$.webshims.cfg.forms.overrideMessages);
+				$('#customValidationMessage').prop('checked', !!$.webshims.cfg.forms.customMessages);
+				$('#overrideValidationMessages').prop('checked', !!$.webshims.cfg.forms.overrideMessages);
+				$('#testGoodWithFix').prop('checked', !!window.testGoodWithFix);
 				$('input.webshim-config')
 					.bind('click', function(){
 						var addHash = '';
@@ -318,6 +326,8 @@
 <div>
 	<input type="checkbox" id="overrideValidationMessages" value="overrideValidationMessages" class="webshim-config" /> <label for="overrideValidationMessages">overrideValidationMessages</label>
 	<input type="checkbox" id="customValidationMessage" value="customValidationMessage" class="webshim-config" /> <label for="customValidationMessage">customValidationMessage</label>
+	<input type="checkbox" id="testGoodWithFix" value="testGoodWithFix" class="webshim-config" /> <label for="testGoodWithFix">testGoodWithFix</label>
+	
 	
 </div>
 <ul id="test-result">

@@ -51,7 +51,7 @@
 		Modernizr.requiredSelect = !!(Modernizr[formvalidation] && 'required' in $('select', form)[0]);
 		
 		//bugfree means interactive formvalidation including correct submit-invalid event handling (this can't be detected, we can just guess)
-		Modernizr.bugfreeformvalidation = Modernizr[formvalidation] && Modernizr.requiredSelect && Modernizr[validationmessage] && (!$.browser.webkit || browserVersion > 534.19);
+		Modernizr.bugfreeformvalidation = Modernizr[formvalidation] && Modernizr.requiredSelect && Modernizr[validationmessage] && (!$.browser.webkit || (navigator.userAgent.indexOf('hrome') != -1 && browserVersion > 534.19)) && !window.testGoodWithFix;
 		
 		
 		modernizrInputAttrs[valueAsNumber] = false;
