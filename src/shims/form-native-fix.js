@@ -1,11 +1,10 @@
-/* https://github.com/aFarkas/webshim/issues#issue/16 */
+
 jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, undefined){
 	
 	if(!Modernizr.formvalidation || Modernizr.bugfreeformvalidation){return;}
 	
-	var browserVersion = parseFloat($.browser.version, 10);
-	var badWebkit = ($.browser.webkit && browserVersion < 534.19);
-	var xBadWebkit = badWebkit && browserVersion < 533.18;
+	var badWebkit = $.browser.webkit;
+	var xBadWebkit = badWebkit && parseFloat($.browser.version, 10) < 533.18;
 	var invalids = [],
 		firstInvalidEvent,
 		form,

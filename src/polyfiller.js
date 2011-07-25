@@ -52,8 +52,7 @@
 		Modernizr.requiredSelect = !!(Modernizr.formvalidation && 'required' in $('select', form)[0]);
 		
 		//bugfree means interactive formvalidation including correct submit-invalid event handling (this can't be detected, we can just guess)
-		Modernizr.bugfreeformvalidation = Modernizr.formvalidation && Modernizr.requiredSelect && Modernizr.validationmessage && (!$.browser.webkit || browserVersion > 534.19);
-		
+		Modernizr.bugfreeformvalidation = Modernizr.formvalidation && Modernizr.requiredSelect && Modernizr.validationmessage && (!$.browser.webkit || (navigator.userAgent.indexOf('hrome') != -1 && browserVersion > 534.19));
 		
 		modernizrInputAttrs.valueAsNumber = false;
 		modernizrInputAttrs.valueAsNumberSet = false;
@@ -69,7 +68,9 @@
 			modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem);
 			dateElem = null;
 		}
-		
+		if(modernizrInputAttrs.valueAsNumber && !modernizrInputAttrs.valueAsNumberSet){
+			Modernizr.bugfreeformvalidation = false;
+		}
 		if(Modernizr.formvalidation){
 			form.remove();
 		}
@@ -115,7 +116,7 @@
 	$.webshims = $.sub ? $.sub() : {};
 	
 	$.extend($.webshims, {
-		version: '1.6.3',
+		version: '1.6.4',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,

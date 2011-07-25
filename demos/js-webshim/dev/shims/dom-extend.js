@@ -109,6 +109,16 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if(oDesc && oDesc[propType]){
 				return oDesc[propType];
 			}
+			
+			if(propType == 'value' && desc.value.apply){
+				return  function(value){
+					var sup = oldAttr(this, prop);
+					if(sup && sup.apply){
+						sup = sup.apply(this, arguments);
+					} 
+					return sup;
+				};
+			}
 			return function(value){
 				return oldAttr(this, prop, value);
 			};
