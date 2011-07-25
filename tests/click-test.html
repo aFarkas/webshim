@@ -35,7 +35,7 @@
 			$(function(){
 				$('#customValidationMessage').prop('checked', !!$.webshims.cfg.forms.customMessages);
 				$('#overrideValidationMessages').prop('checked', !!$.webshims.cfg.forms.overrideMessages);
-				$('#testGoodWithFix').prop('checked', !!window.testGoodWithFix);
+				$('#testGoodWithFixInput').prop('checked', !!window.testGoodWithFix);
 				$('input.webshim-config')
 					.bind('click', function(){
 						var addHash = '';
@@ -326,7 +326,7 @@
 <div>
 	<input type="checkbox" id="overrideValidationMessages" value="overrideValidationMessages" class="webshim-config" /> <label for="overrideValidationMessages">overrideValidationMessages</label>
 	<input type="checkbox" id="customValidationMessage" value="customValidationMessage" class="webshim-config" /> <label for="customValidationMessage">customValidationMessage</label>
-	<input type="checkbox" id="testGoodWithFix" value="testGoodWithFix" class="webshim-config" /> <label for="testGoodWithFix">testGoodWithFix</label>
+	<input type="checkbox" id="testGoodWithFixInput" value="testGoodWithFix" class="webshim-config" /> <label for="testGoodWithFixInput">testGoodWithFix</label>
 	
 	
 </div>

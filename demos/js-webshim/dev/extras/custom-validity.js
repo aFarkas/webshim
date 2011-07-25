@@ -195,7 +195,7 @@
 		var data = $(elem).data('dependentValidation');
 		if(!data){return;}
 		var depFn = function(e){
-			var val = $.attr(data.masterElement, data["from-prop"]);
+			var val = $.prop(data.masterElement, data["from-prop"]);
 			if(data.toggle){
 				val = !val;
 			}

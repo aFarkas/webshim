@@ -78,14 +78,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return ret;
 	};
 	var switchValidityClass = function(e){
-		if(stopUIRefresh || !e.target || !'form' in e.target){return;}
+		if(stopUIRefresh || !e.target || !'form' in e.target || e.target.type == 'submit'){return;}
 		
 		var elem = $(e.target).getNativeElement()[0];
-		
-		if(!$.prop(elem, 'willValidate')){
-			$(elem).getShadowElement().removeClass('form-ui-invalid form-ui-valid');
-			return;
-		}
 		var shadowElem = $(elem).getShadowElement();
 		var addClass, removeClass, trigger;
 		

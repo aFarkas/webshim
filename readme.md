@@ -75,6 +75,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 Release 1.7.2
 ----------
 
+* fixed bad feature detection for interactive form validation in Safari 5.1
 * improved error balloon positioning
 * .form-ui-valid/.form-ui-invalid behave now more similiar to :-moz-ui-valid/:-moz-ui-invalid 
 * some little performance improvements

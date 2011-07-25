@@ -61,13 +61,17 @@
 		if(Modernizr[formvalidation]){
 			modernizrInputAttrs[valueAsNumber] = (valueAsNumber in dateElem[0]);
 			if(modernizrInputAttrs[valueAsNumber]){
-				dateElem[valueAsNumber] = 0;
-				modernizrInputAttrs.valueAsNumberSet = (dateElem.value == '1970-01-01');
+				dateElem[0][valueAsNumber] = 0;
+				modernizrInputAttrs.valueAsNumberSet = (dateElem[0].value == '1970-01-01');
+				
 			}
-			modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem);
+			modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem[0]);
 			form.remove();
 		}
 		
+		if(modernizrInputAttrs[valueAsNumber] && !modernizrInputAttrs.valueAsNumberSet){
+			Modernizr.bugfreeformvalidation = false;
+		}
 		form = dateElem = null;
 		
 		Modernizr.ES5base = !!(String.prototype.trim && Date.now && Date.prototype.toISOString);
@@ -110,7 +114,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.7.2beta1',
+		version: '1.7.2',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
@@ -750,7 +754,14 @@
 				readyFn(document, emptyJ);
 			},
 			triggerDomUpdate: function(context){
-				if(!context || !context.nodeType){return;}
+				if(!context || !context.nodeType){
+					if(context.jquery){
+						context.each(function(){
+							webshims.triggerDomUpdate(this);
+						});
+					}
+					return;
+				}
 				var type = context.nodeType;
 				if(type != 1 && type != 9){return;}
 				var elem = (context !== document) ? $(context) : emptyJ;

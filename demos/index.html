@@ -81,7 +81,7 @@
 						<li>Firefox 3.6+</li>
 						<li>Safari 4+</li>
 						<li>Safari for iOS 4.2+</li>
-						<li>Chrome 11.0+</li>
+						<li>Chrome 12.0+</li>
 						<li>Opera 11+</li>
 					</ul>
 					
@@ -512,7 +512,7 @@ $.webshims.setOptions('removeFOUC', true);
 						<p>A polyfill is a shim that mimics/replicates a future/standarized API using legacy techniques to older browsers. A "shim-abstraction" is a code that uses modern and legacy techniques to create a new unstandardized API.</p>
 						<p>An abstraction can have several advantages over a pure polyfill. One of those advantages is a more clean and more easy-to-use API. Webshims Lib has decided to create/use polyfills (with some extensions on top of the standard, not instead!). This decision has several reasons.</p>
 						<p><strong>Make learning new web technologies easy</strong>: It's an easy question: Do you want to learn proprietary or standardized code.</p>
-						<p><strong>Make interoperability easy</strong>: Although Webshims Lib technique to create DOM-Setters and DOM-Getters is an abstraction (always use $.attr to get/set DOM-Attributes). This abstraction is compatible to HTML5-browsers and makes writing interoperable code easy. Which means, you can use and mix different code of different developers.</p>
+						<p><strong>Make interoperability easy</strong>: Although Webshims Lib technique to create DOM-Setters and DOM-Getters is an abstraction (always use $.prop/$.attr to get/set DOM-Attributes). This abstraction is compatible to HTML5-browsers and makes writing interoperable code easy. Which means, you can use and mix different code of different developers.</p>
 						<p><strong>Make extensions easy</strong>: If you want to create an extension on top of a feature, you always have one code path, because everything (including the low-level API) should be polyfilled. If you want to extend an abstraction, it might be possible, that you have to extend several code paths (modern and legacy code).</p>
 						<p><strong>Let the user/developer choose</strong>: Webshims lib's polyfills are loaded modular by demand, which means you can mix several polyfills. Consider the following:</p>
 						<p>A plugin-author needs a storage API and he chooses abstraction code A, because it is good, has an awsome API and is only 5kb. Another plugin author also needs an storage API and uses abstraction code B, it's also nice and also just 5kb. And now you need to use both scripts and you are adding 10kb of useless code, because 80% of all browser already support localStorage and JSON (I would say this is a big fail).</p>
