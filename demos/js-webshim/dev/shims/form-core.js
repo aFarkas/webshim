@@ -78,7 +78,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return ret;
 	};
 	var switchValidityClass = function(e){
-		if(stopUIRefresh || !e.target || !'form' in e.target || e.target.type == 'submit'){return;}
+		if(stopUIRefresh || !e.target || e.target.type == 'submit' || !$.prop(e.target, 'willValidate')){return;}
 		
 		var elem = $(e.target).getNativeElement()[0];
 		var shadowElem = $(elem).getShadowElement();
@@ -299,7 +299,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		
 		$(document).bind('invalid', function(e){
 			if(e.wrongWebkitInvalid){return;}
-			var jElm = $(e.target).addClass('form-ui-invalid').removeClass('form-ui-valid');
+			var jElm = $(e.target);
+			jElm.getShadowElement().addClass('form-ui-invalid').removeClass('form-ui-valid');
 			if(!firstEvent){
 				//trigger firstinvalid
 				firstEvent = $.Event('firstinvalid');

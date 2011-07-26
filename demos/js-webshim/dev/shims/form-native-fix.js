@@ -1,4 +1,3 @@
-/* https://github.com/aFarkas/webshim/issues#issue/16 */
 jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, undefined){
 	
 	if(!Modernizr.formvalidation || Modernizr.bugfreeformvalidation){return;}

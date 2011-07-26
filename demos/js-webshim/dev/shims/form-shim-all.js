@@ -93,7 +93,9 @@ var validityRules = {
 			if(val === '' || cache.nodeName == 'select'){return false;}
 			var pattern = input.attr('pattern');
 			if(!pattern){return false;}
-			return !(new RegExp('^(?:' + pattern + ')$').test(val));
+			pattern = new RegExp('^(?:' + pattern + ')$');
+			if(!pattern){return false;}
+			return !(pattern.test(val));
 		}
 	}
 ;

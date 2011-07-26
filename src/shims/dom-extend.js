@@ -389,13 +389,19 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				var id = elem.attr('id');
 				if(!id){
 					ID++;
-					id = 'elem-id-'+ ID;
+					id = 'ID-'+ ID;
 					elem.attr('id', id);
 				}
 				return id;
 			};
 		})(),
-		
+		extendUNDEFProp: function(obj, props){
+			$.each(props, function(name, prop){
+				if( !(name in obj) ){
+					obj[name] = prop;
+				}
+			});
+		},
 		//http://www.w3.org/TR/html5/common-dom-interfaces.html#reflect
 		createPropDefault: createPropDefault,
 		data: elementData,
