@@ -738,7 +738,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 			if(htmlFor){
 				id = webshims.getID(elem);
 				htmlFor.split(' ').forEach(function(control){
-					control = form.getElementById(control);
+					control = document.getElementById(control);
 					if(control){
 						control.setAttribute('aria-controls', id);
 					}
