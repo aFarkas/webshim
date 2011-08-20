@@ -125,7 +125,7 @@ $.event.special.invalid = {
 	teardown: $.noop,
 	handler: function(e, d){
 		
-		if( e.type != 'submit' || e.testedValidity || !e.originalEvent || !$.nodeName(e.target, 'form') || $.attr(e.target, 'novalidate') != null || $.data(e.target, 'novalidate') ){return;}
+		if( e.type != 'submit' || e.testedValidity || !e.originalEvent || !$.nodeName(e.target, 'form') || $.prop(e.target, 'noValidate') || $.data(e.target, 'novalidate') ){return;}
 		
 		isSubmit = true;
 		e.testedValidity = true;
@@ -239,6 +239,37 @@ webshims.defineNodeNameProperty('form', 'checkValidity', {
 		}
 	}
 });
+webshims.defineNodeNameProperty('form', 'noValidate', {
+	prop: {
+		set: function(val){
+			val = !!val;
+			if(val){
+				$.attr(this, 'novalidate', 'novalidate');
+			} else {
+				$(this).removeAttr('novalidate');
+			}
+		},
+		get: function(){
+			return $.attr(this, 'novalidate') != null;
+		}
+	}
+});
+
+webshims.defineNodeNamesProperty(['input', 'button'], 'formNoValidate', {
+	prop: {
+		set: function(val){
+			val = !!val;
+			if(val){
+				$.attr(this, 'formnovalidate', 'formnovalidate');
+			} else {
+				$(this).removeAttr('formnovalidate');
+			}
+		},
+		get: function(){
+			return $.attr(this, 'formnovalidate') != null;
+		}
+	}
+});
 
 webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 	checkValidity: {
@@ -258,13 +289,14 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 			var types = {
 					button: 1,
 					reset: 1,
-					hidden: 1
+					hidden: 1,
+					image: 1
 				}
 			;
 			return function(){
 				var elem = $(this).getNativeElement()[0];
 				//elem.name && <- we don't use to make it easier for developers
-				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] && ( !elem.form || $.attr(elem.form, 'novalidate') == null) );
+				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] && ( !elem.form || !$.prop(elem.form, 'noValidate')) );
 			};
 		})()
 	},
@@ -380,7 +412,7 @@ var noValidate = function(){
 ;
 
 $(document).bind('click', function(e){
-	if(e.target && e.target.form && submitterTypes[e.target.type] && $.attr(e.target, 'formnovalidate') != null){
+	if(e.target && 'form' in e.target && submitterTypes[e.target.type] && $.prop(e.target, 'formNoValidate')){
 		noValidate.call(e.target);
 	}
 });

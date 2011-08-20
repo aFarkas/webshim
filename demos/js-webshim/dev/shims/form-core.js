@@ -92,7 +92,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				if(checkTypes[elem.type] && elem.checked){
 					getGroupElements(elem).removeClass(removeClass).addClass(addClass).removeAttr('aria-invalid');
 				}
-				$(e.target).unbind('.form-ui-invalid');
 			}
 		} else {
 			if(!shadowElem.hasClass('form-ui-invalid')){
@@ -102,9 +101,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					getGroupElements(elem).removeClass(removeClass).addClass(addClass);
 				}
 				trigger = 'changedinvalid';
-				$(e.target)
-					.unbind('.form-ui-invalid')
-				;
 			}
 		}
 		if(addClass){
@@ -123,7 +119,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		
 	};
 	
-	$(document).bind('focusout refreshvalidityui', switchValidityClass);
+	$(document).bind('focusout change refreshvalidityui', switchValidityClass);
 	
 	
 	
@@ -300,7 +296,14 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		$(document).bind('invalid', function(e){
 			if(e.wrongWebkitInvalid){return;}
 			var jElm = $(e.target);
-			jElm.getShadowElement().addClass('form-ui-invalid').removeClass('form-ui-valid');
+			var shadowElem = jElm.getShadowElement();
+			if(!shadowElem.hasClass('form-ui-invalid')){
+				shadowElem.addClass('form-ui-invalid').removeClass('form-ui-valid');
+				setTimeout(function(){
+					$(e.target).trigger('changedinvalid');
+				}, 0);
+			}
+			
 			if(!firstEvent){
 				//trigger firstinvalid
 				firstEvent = $.Event('firstinvalid');
@@ -322,9 +325,10 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				//reset firstinvalid
 				firstEvent = false;
 				invalids = [];
-				jElm.trigger(lastEvent, lastEvent);
+				$(e.target).trigger(lastEvent, lastEvent);
 			}, 9);
-			
+			jElm = null;
+			shadowElem = null;
 		});
 	})();
 	

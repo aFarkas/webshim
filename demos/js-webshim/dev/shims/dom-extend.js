@@ -469,21 +469,6 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				};
 			}
 			
-//			,url: (function(){
-//				var anchor = document.createElement('a');
-//				return function(descs){
-//					descs.prop = {
-//						set: function(val){
-//							descs.attr.set.call(this, "" + val);
-//						},
-//						get: function(){
-//							var tmpanchor = (this.ownerDocument === document) ? anchor : this.ownerDocument.createElement('a');
-//							tmpanchor.setAttribute('href', descs.attr.get.call(this));
-//							return tmpanchor[0];
-//						}
-//					};
-//				};
-//			})()
 //			,enumarated: $.noop
 //			,unsignedLong: $.noop
 //			,"doubble": $.noop
@@ -510,10 +495,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		},
 		defineNodeNameProperty: function(nodeName, prop, descs){
 			havePolyfill[prop] = true;
-			if(descs.get || descs.value){
-				webshims.warn(nodeName +'['+ prop +']'+ 'old API');
-			}
-			
+						
 			if(descs.reflect){
 				webshims.propTypes[descs.propType || 'standard'](descs);
 			}
@@ -626,6 +608,9 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			});
 		},
 		defineNodeNamesBooleanProperty: function(elementNames, prop, descs){
+			if(!descs){
+				descs = {};
+			}
 			if($.isFunction(descs)){
 				descs.set = descs;
 			}
@@ -652,7 +637,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				},
 				reflect: true,
 				propType: 'boolean',
-				initAttr: descs.initAttr
+				initAttr: descs.initAttr || false
 			});
 		},
 		contentAttr: function(elem, name, val){

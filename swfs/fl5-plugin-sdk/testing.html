@@ -1,0 +1,435 @@
+<html>
+<head>
+	<title>JW Player Testing</title>
+	<link rel="stylesheet" href="files/style.css" type="text/css">
+	<script type="text/javascript" src="files/jquery.js"></script>
+	<script type="text/javascript" src="files/swfobject.js"></script>
+	<script type="text/javascript" src="files/settings.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		$.extend({
+			/** Insert a new example in the page. **/
+			insert: function(evt) {
+				evt.preventDefault();
+				var obj = settings.examples[$('#examples :selected').text()];
+				var arr = [];
+				if(obj['plugins']) {
+					arr = obj['plugins'].split(',');
+				}
+				$('#plugins').val(arr);
+				$.fieldsets();
+				$.fillout("flashvarsform");
+			},
+			/** Fill out the flashvars with example data. **/
+			fillout: function(set) {
+				var obj = settings.examples[$('#examples :selected').text()];
+				var arr = $("#"+set).find('input');
+				for(var i=0; i<arr.length; i++) {
+					var nam = $(arr[i]).attr('name');
+					if(obj[nam] == null) {
+						$(arr[i]).val('');
+					} else {
+						$(arr[i]).val(obj[nam]);
+					}
+				}
+				$("#flashvarsform").submit();
+			},
+			/** Set the tab functions. **/
+			tabs: function() {
+				$('li').click(function() {
+					$('li').removeClass('active');
+					$(this).addClass('active');
+					var itm = $(this).text().toLowerCase();
+					$.tab($.trim(itm));
+				});
+			},
+			/** Flip to a tab. **/
+			tab: function(itm) {
+				var arr = $("#flashvarsform").find('fieldset');
+				for(var i=0; i<arr.length; i++) {
+					if($(arr[i]).attr('id') == itm) {
+						$(arr[i]).css('display','block');
+					} else {
+						$(arr[i]).css('display','none');
+					}
+				}
+			},
+			/** Check for inserting of fieldsets. **/
+			fieldsets: function(evt) {
+				$("#fieldsettabs > .plugin").remove();
+				$("#fieldsetspan").empty();
+				var str = $("#plugins").val();
+				if(str != null) {
+					arr = str.toString().split(',');
+					for (var i=0; i<arr.length; i++) {
+						var swf = settings.plugins[arr[i]].swf;
+						var xml = settings.plugins[arr[i]].xml;
+						$.fieldset(xml,arr[i]);
+					}
+				}
+			},
+			/** Insert a specific plugin fieldset. **/
+			fieldset: function(url,nam) {
+				$.get(url,{},function(xml) {
+					var arr = $('flashvars',xml).find('flashvar');
+					if(arr.length > 0) {
+						var tit = nam.substr(0,1).toUpperCase()+nam.substr(1);
+						$("#fieldsettabs").append('<li class="plugin">'+tit+'</li>');
+						$.tabs();
+						var set = '<fieldset id="'+nam+'">';
+						for (var i=0; i<arr.length; i++) {
+							var val = $('name',arr[i]).text();
+							set +='<label>'+nam+'.'+val+'</label><input type="text" name="'+nam+'.'+val+'" />';
+						}
+						set += '</fieldset>';
+						$('#fieldsetspan').append(set);
+						$.fillout(nam);
+					}
+				});
+			},
+			/** Reload the flashvars into the player. **/
+			reload: function(evt) {
+				evt.preventDefault();
+				var vrs = {};
+				var arr = $("#flashvarsform").find('input');
+				for(var i=0; i<arr.length; i++) {
+					if($(arr[i]).val()) {
+						vrs[$(arr[i]).attr('name')] = $(arr[i]).val();
+					}
+				}
+				if($("#skins").val() != 'none') {
+					vrs['skin'] = settings.skins[$("#skins").val()];
+				}
+				if($("#plugins").val() != null) {
+					var plg = '';
+					var arr = $("#plugins").val();
+					for(var i=0; i<arr.length; i++) {
+						plg += settings.plugins[arr[i]].swf+',';
+					}
+					vrs['plugins'] = plg.substr(0,plg.length-1);
+				}
+				$('#preview').css('height',vrs['height']);
+				$('#preview').html('<div id="container"></div>');
+				swfobject.embedSWF(
+					settings.players[$('#players').val()],
+					'container',
+					vrs['width'],
+					vrs['height'],
+					'9.0.0',
+					null,
+					vrs,
+					{allowfullscreen:'true',allowscriptaccess:'always'},
+					{id:'ply',name:'ply'}
+				);
+			},
+			/** Get a variable from the player. **/
+			getVariable: function(evt) {
+				evt.preventDefault();
+				switch($('#vartype').val().toString()) {
+					case 'config':
+						var obj = player.getConfig();
+						break;
+					case 'playlist':
+						var obj = player.getPlaylist();
+						break;
+					case 'plugin.config':
+						var obj = player.getPluginConfig($('#configplugin').val());
+						break;
+				}
+				$.alert(obj);
+			},
+			/** Send an event to the player. **/
+			sendEvent: function(evt) {
+				evt.preventDefault();
+				var typ = $('#sendevent').val();
+				var dat = $('#sendeventdata').val();
+				if(typ == 'LOAD' && dat.indexOf(':') > 0) {
+					var arr = new Array();
+					var ply = dat.split(';');
+					for(var i=0; i<ply.length; i++) {
+						var obj = new Object();
+						var itm = ply[i].split(',');
+						for(var j=0; j<itm.length; j++) {
+							obj[itm[j].split(':')[0]] = itm[j].split(':')[1];
+						}
+						arr.push(obj);
+					}
+					if(arr.length > 1) {
+						dat = arr;
+					} else { 
+						dat = obj;
+					}
+				}
+				player.sendEvent(typ,dat);
+			},
+			/** Set a listener to the player. **/
+			setListener: function(evt) {
+				evt.preventDefault();
+				var arr = $('#eventtype').val().toString().split(': ');
+				var sel = $('#addremove').val().toString();
+				var fcn = '$.alert';
+				if(arr.length == 2 && sel == 'add') {
+					if(arr[0] == 'Model') {
+						player.addModelListener(arr[1],fcn);
+					} else { 
+						player.addControllerListener(arr[1],fcn);
+					}
+				} else if(arr.length == 2 && sel == 'remove') {
+					if(arr[0] == 'Model') { 
+						player.removeModelListener(arr[1],fcn);
+					} else {
+						player.removeControllerListener(arr[1],fcn);
+					}
+				}
+			},
+			/** Alert responses from the player. **/
+			alert: function(obj) {
+				var txt = '';
+				for (itm in obj) {
+					if(typeof(obj[itm]) == 'object') {
+						txt += itm+':\n';
+						for (ent in obj[itm]) {
+							txt += '  '+ent+': '+obj[itm][ent]+'\n';
+						}
+					} else {
+						txt += itm+': '+obj[itm]+'\n';
+					}
+				}
+				alert(txt);
+			}
+		});
+		/** Attach handlers to all buttons and select fields. **/
+		$("#examples").change(function(evt) { $.insert(evt); });
+		$("#players").change(function(evt) { $.reload(evt); });
+		$("#skins").change(function(evt) { $.reload(evt); });
+		$("#plugins").change(function(evt) { $.fieldsets(evt); });
+		$("#examplesform").submit(function(evt) { $.insert(evt); });
+		$("#flashvarsform").submit(function(evt) { $.reload(evt); });
+		$("#variablesform").submit(function(evt) { $.getVariable(evt); });
+		$("#sendeventform").submit(function(evt) { $.sendEvent(evt); });
+		$("#listenersform").submit(function(evt) { $.setListener(evt); });
+		/** Load all settings into the player. **/
+		for (dct in settings) {
+			for (itm in settings[dct]) {
+				$("#"+dct).append("<option>"+itm+"</option>");
+			}
+		}
+		$.tabs();
+		$('#examplesform').css('display','block');
+		$('#sources').css('display','block');
+	});
+	</script>
+
+</head>
+<body>
+
+
+<form id="examplesform">
+	<fieldset>
+		<label>Example</label>
+		<select name="examples" id="examples"></select>
+	</fieldset>
+	<button type="submit" id="examplesbutton">Insert example</button>
+</form>
+
+
+
+
+<div id="javascript">
+	<form id="variablesform">
+		<fieldset>
+			<label>Variable</label>
+			<select type="text" id="vartype">
+				<option>config</option>
+				<option>playlist</option>
+				<option>plugin.config</option>
+			</select>
+			<label>Plugin</label>
+			<input type="text" id="configplugin" />
+		</fieldset>
+		<button type="submit" id="variablesbutton">Get variable</button>
+	</form>
+	<form id="sendeventform">
+		<fieldset>
+			<label>Event</label>
+			<select type="text" id="sendevent">
+				<option>ITEM</option>
+				<option>LINK</option>
+				<option>LOAD</option>
+				<option>MUTE</option>
+				<option>NEXT</option>
+				<option>PLAY</option>
+				<option>PREV</option>
+				<option>REDRAW</option>
+				<option>SEEK</option>
+				<option>STOP</option>
+				<option>VOLUME</option>
+			</select>
+			<label>Data</label>
+			<input type="text" id="sendeventdata" />
+		</fieldset>
+		<button type="submit" id="sendeventbutton">Send event</button>
+	</form>
+	<form id="listenersform">
+		<fieldset>
+			<label>Type</label>
+			<select type="text" id="addremove">
+				<option>add</option>
+				<option>remove</option>
+			</select>
+			<label>Event</label>
+			<select type="text" id="eventtype">
+				<option>Controller: ERROR</option>
+				<option>Controller: ITEM</option>
+				<option>Controller: MUTE</option>
+				<option>Controller: PLAY</option>
+				<option>Controller: PLAYLIST</option>
+				<option>Controller: RESIZE</option>
+				<option>Controller: SEEK</option>
+				<option>Controller: STOP</option>
+				<option>Controller: VOLUME</option>
+				<option></option>
+				<option>Model: BUFFER</option>
+				<option>Model: ERROR</option>
+				<option>Model: LOADED</option>
+				<option>Model: META</option>
+				<option>Model: STATE</option>
+				<option>Model: TIME</option>
+			</select>
+		</fieldset>
+		<button type="submit" id="listenersbutton">Set listener</button>
+	</form>
+</div>
+
+
+
+
+<div id="preview">
+<p>Testing is simple: choose an example, change the flashvars and see if it works.<br/>
+You can also download this testing page as part of the <a href="http://developer.longtailvideo.com/trac/changeset/HEAD/trunk/sdk?old_path=/&format=zip">plugin development SDK</a>.</p>
+<p>Please note, if you're running this page from a local file, the testing tool won't work.  You'll need to run it from a local or remote web server.</p>
+</div>
+
+<script type="text/javascript">
+	var player;
+	function playerReady(obj) {
+		player = document.getElementById(obj['id']);
+		$('#javascript').css('display','block');
+	};
+</script>
+
+
+
+
+
+<form id="flashvarsform">
+	<ul id="fieldsettabs">
+		<li class="active">Sources</li>
+		<li>Properties</li>
+		<li>Layout</li>
+		<li>Behaviour</li>
+		<li>Miscellaneous</li>
+	</ul>
+	<fieldset></fieldset>
+	<fieldset id="sources">
+		<label>player</label>
+		<select id="players"></select>
+		<label>skin</label>
+		<select id="skins"></select>
+		<label>plugins</label>
+		<select multiple="multiple" id="plugins"></select>
+	</fieldset>
+	<fieldset id="properties">
+		<label>author</label>
+		<input type="text" name="date" />
+		<label>date</label>
+		<input type="text" name="author" />
+		<label>description</label>
+		<input type="text" name="description" />
+		<label>duration</label>
+		<input type="text" name="duration" />
+		<label>file</label>
+		<input type="text" name="file" />
+		<label>image</label>
+		<input type="text" name="image" />
+		<label>link</label>
+		<input type="text" name="link" />
+		<label>start</label>
+		<input type="text" name="start" />
+		<label>streamer</label>
+		<input type="text" name="streamer" />
+		<label>tags</label>
+		<input type="text" name="tags" />
+		<label>title</label>
+		<input type="text" name="title" />
+		<label>type</label>
+		<input type="text" name="type" />
+	</fieldset>
+	<fieldset id="layout">
+		<label>backcolor</label>
+		<input type="text" name="backcolor" />
+		<label>controlbar</label>
+		<input type="text" name="controlbar" />
+		<label>dock</label>
+		<input type="text" name="dock" />
+		<label>frontcolor</label>
+		<input type="text" name="frontcolor" />
+		<label>height</label>
+		<input type="text" name="height" value="260" />
+		<label>icons</label>
+		<input type="text" name="icons" />
+		<label>lightcolor</label>
+		<input type="text" name="lightcolor" />
+		<label>playlist</label>
+		<input type="text" name="playlist" />
+		<label>playlistsize</label>
+		<input type="text" name="playlistsize" />
+		<label>screencolor</label>
+		<input type="text" name="screencolor" />
+		<label>width</label>
+		<input type="text" name="width" value="400" />
+	</fieldset>
+	<fieldset id="behaviour">
+		<label>autostart</label>
+		<input type="text" name="autostart" />
+		<label>bufferlength</label>
+		<input type="text" name="bufferlength" />
+		<label>displayclick</label>
+		<input type="text" name="displayclick" />
+		<label>displaytitle</label>
+		<input type="text" name="displaytitle" />
+		<label>item</label>
+		<input type="text" name="item" />
+		<label>linktarget</label>
+		<input type="text" name="linktarget" />
+		<label>logo</label>
+		<input type="text" name="logo" />
+		<label>mute</label>
+		<input type="text" name="mute" />
+		<label>repeat</label>
+		<input type="text" name="repeat" />
+		<label>shuffle</label>
+		<input type="text" name="shuffle" />
+		<label>smoothing</label>
+		<input type="text" name="smoothing" />
+		<label>stretching</label>
+		<input type="text" name="stretching" />
+		<label>volume</label>
+		<input type="text" name="volume" />
+	</fieldset>
+	<fieldset id="miscellaneous">
+		<label>config</label>
+		<input type="text" name="config" />
+		<label>debug</label>
+		<input type="text" name="debug" />
+		<label>id</label>
+		<input type="text" name="id" />
+	</fieldset>
+	<span id="fieldsetspan"></span>
+	<button type="submit" id="flashvarsbutton">Reload player</button>
+</form>
+
+
+
+</body>
+</html>

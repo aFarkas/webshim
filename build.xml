@@ -17,6 +17,18 @@
             <fileset file="${src}/shims/form-output-datalist.js" />
         </concat>
 		
+		<concat destfile="${src}/shims/mediaelement-native-all.js">
+			<fileset file="${src}/shims/mediaelement-swf.js" />
+            <fileset file="${src}/shims/mediaelement-core.js" />
+        </concat>
+		
+		<concat destfile="${src}/shims/mediaelement-shim-all.js">
+            <fileset file="${src}/shims/mediaelement-shim.js" />
+            <fileset file="${src}/shims/mediaelement-native-all.js" />
+        </concat>
+		
+		
+		
         <mkdir dir="${dist}" />
         <copy todir="${dist}/dev" overwrite="true">
             <fileset dir="${src}" />

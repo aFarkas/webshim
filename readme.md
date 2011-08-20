@@ -72,6 +72,13 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.8.0
+----------
+
+*
+* updated jQuery UI path 
+* fixed label for putput element
+
 Release 1.7.2
 ----------
 

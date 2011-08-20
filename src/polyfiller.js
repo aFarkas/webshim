@@ -110,11 +110,17 @@
 		Modernizr.advancedObjectProperties = advancedObjectProperties;
 	})();
 	
+	if(!window.iepp && !Modernizr.genericDOM && !$.isReady){
+		$.each(['datalist', 'source', 'video', 'audio', 'details', 'summary', 'canvas', 'output'], function(i, name){
+			document.createElement(name);
+		});
+	}
+	
 	
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: 'pre1.7.3(2)',
+		version: 'pre1.8',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
@@ -311,13 +317,21 @@
 		 * basic DOM-/jQuery-Helpers
 		 */
 		addMethodName: function(name){
+			name = name.split(':');
+			var prop = name[1];
+			if(name.length == 1){
+				prop = name[0];
+				name = name[0];
+			} else {
+				name = name[0];
+			}
 			if($.fn[name] && 'shim' in $.fn[name]){return;}
 			$.fn[name] = function(){
 				var args = arguments,
 					ret
 				;
 				this.each(function(){
-					var fn = $.prop(this, name);
+					var fn = $.prop(this, prop);
 					
 					if(fn && fn.apply){
 						ret = fn.apply(this, args);
@@ -650,7 +664,7 @@
 	var webshims = $.webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var googleAPIs = protocol+'ajax.googleapis.com/ajax/libs/';
-	var uiLib = googleAPIs+'jqueryui/1.8.14/';
+	var uiLib = googleAPIs+'jqueryui/1.8.15/';
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;
@@ -668,6 +682,7 @@
 			webshims.warn('error with: '+ this.url +' | '+ text);
 		}
 	};
+	webshims.xhrPreloadOption = xhrPreloadOption;
 	
 	//activeLang will be overridden
 	webshims.activeLang = (function(){
@@ -726,7 +741,9 @@
 		} else {
 			isReady('DOM', true);
 		}
-		
+		$(window).load(function(){
+			isReady('WINDOWLOAD', true);
+		});
 	})();
 	
 	/*
@@ -1073,4 +1090,55 @@
 			text: 'Details'
 		}
 	});
+	if('audio' in Modernizr && 'video' in Modernizr){
+		webshims.mediaelement = {};
+		var swfOptions = {
+			
+			options: {
+				hasToPlay: 'any',
+				preferFlash: false,
+				jwVars: {},
+				jwParams: {},
+				jwAttrs: {},
+				changeJW: $.noop
+			},
+			methodNames: ['play', 'pause', 'canPlayType', 'mediaLoad:load'],
+			dependencies: ['swfobject', 'dom-support']
+		};
+		if (Modernizr.audio && Modernizr.video) {
+			addPolyfill('mediaelement-core', {
+				feature: 'mediaelement',
+				test: function(){
+					var swfModule = modules['mediaelement-swf'];
+					if (swfModule.test) {
+						return !swfModule.test.apply(swfModule, arguments);
+					}
+					return false;
+				},
+				noAutoCallback: true,
+				
+				dependencies: ['dom-support']
+			});
+			addPolyfill('mediaelement-swf', $.extend({
+				feature: 'mediaelement',
+				
+				test: function(){
+					var options = this.options;
+					var hasToPlay = options.hasToPlay;
+					
+					if (options.preferFlash || (hasToPlay != 'any' && !Modernizr.video[options.hasToPlay] && !Modernizr.audio[options.hasToPlay])) {
+						this.src = 'mediaelement-native-all';
+						return false;
+					}
+					return true;
+				}
+			}, swfOptions));
+		} else {
+			addPolyfill('mediaelement-swf', $.extend({
+				feature: 'mediaelement',
+				src: 'mediaelement-shim-all'
+			}, swfOptions));
+		}
+	}
+	
 })(jQuery, this, this.document);
