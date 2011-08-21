@@ -125,7 +125,7 @@ $.event.special.invalid = {
 	teardown: $.noop,
 	handler: function(e, d){
 		
-		if( e.type != 'submit' || e.testedValidity || !e.originalEvent || !$.nodeName(e.target, 'form') || $.prop(e.target, 'noValidate') || $.data(e.target, 'novalidate') ){return;}
+		if( e.type != 'submit' || e.testedValidity || !e.originalEvent || !$.nodeName(e.target, 'form') || $.prop(e.target, 'noValidate') ){return;}
 		
 		isSubmit = true;
 		e.testedValidity = true;
@@ -236,37 +236,6 @@ webshims.defineNodeNameProperty('form', 'checkValidity', {
 				}
 			}
 			return ret;
-		}
-	}
-});
-webshims.defineNodeNameProperty('form', 'noValidate', {
-	prop: {
-		set: function(val){
-			val = !!val;
-			if(val){
-				$.attr(this, 'novalidate', 'novalidate');
-			} else {
-				$(this).removeAttr('novalidate');
-			}
-		},
-		get: function(){
-			return $.attr(this, 'novalidate') != null;
-		}
-	}
-});
-
-webshims.defineNodeNamesProperty(['input', 'button'], 'formNoValidate', {
-	prop: {
-		set: function(val){
-			val = !!val;
-			if(val){
-				$.attr(this, 'formnovalidate', 'formnovalidate');
-			} else {
-				$(this).removeAttr('formnovalidate');
-			}
-		},
-		get: function(){
-			return $.attr(this, 'formnovalidate') != null;
 		}
 	}
 });
@@ -386,6 +355,159 @@ webshims.defineNodeNameProperty('textarea', 'maxLength', {
 	}
 });
 
+
+
+
+var submitterTypes = {submit: 1, button: 1, image: 1};
+var formSubmitterDescriptors = {};
+[
+	{
+		name: "enctype",
+		limitedTo: {
+			"application/x-www-form-urlencoded": 1,
+			"multipart/form-data": 1,
+			"text/plain": 1
+		},
+		defaultProp: "application/x-www-form-urlencoded",
+		proptype: "enum"
+	},
+	{
+		name: "method",
+		limitedTo: {
+			"get": 1,
+			"post": 1
+		},
+		defaultProp: "get",
+		proptype: "enum"
+	},
+	{
+		name: "action",
+		proptype: "url"
+	},
+	{
+		name: "target"
+	},
+	{
+		name: "novalidate",
+		propName: "noValidate",
+		proptype: "boolean"
+	}
+].forEach(function(desc){
+	var propName = 'form'+ (desc.propName || desc.name).replace(/^[a-z]/, function(f){
+		return f.toUpperCase();
+	});
+	var attrName = 'form'+ desc.name;
+	var formName = desc.name;
+	var eventName = 'click.webshimssubmittermutate'+formName;
+	
+	var changeSubmitter = function(){
+		var elem = this;
+		if( !('form' in elem) || !submitterTypes[elem.type] ){return;}
+		var form = $.prop(elem, 'form');
+		if(!form){return;}
+		var attr = $.attr(elem, attrName);
+		if(attr != null && ( !desc.limitedTo || attr.toLowerCase() === $.prop(elem, propName))){
+			
+			var oldAttr = $.attr(form, formName);
+			
+			$.attr(form, formName, attr);
+			setTimeout(function(){
+				if(oldAttr != null){
+					$.attr(form, formName, oldAttr);
+				} else {
+					$(form).removeAttr(formName);
+				}
+			}, 9);
+		}
+	};
+	
+	
+
+switch(desc.proptype) {
+		case "url":
+			var urlForm = document.createElement('form');
+			formSubmitterDescriptors[propName] = {
+				prop: {
+					set: function(value){
+						$.attr(this, attrName, value);
+					},
+					get: function(){
+						var value = $.attr(this, attrName);
+						if(value == null){return '';}
+						urlForm.setAttribute('action', value);
+						return urlForm.action;
+					}
+				}
+			};
+			break;
+		case "boolean":
+			formSubmitterDescriptors[propName] = {
+				prop: {
+					set: function(val){
+						val = !!val;
+						if(val){
+							$.attr(this, 'formnovalidate', 'formnovalidate');
+						} else {
+							$(this).removeAttr('formnovalidate');
+						}
+					},
+					get: function(){
+						return $.attr(this, 'formnovalidate') != null;
+					}
+				}
+			};
+			break;
+		case "enum":
+			formSubmitterDescriptors[propName] = {
+				prop: {
+					set: function(value){
+						$.attr(this, attrName, value);
+					},
+					get: function(){
+						var value = $.attr(this, attrName);
+						return (!value || ( (value = value.toLowerCase()) && !desc.limitedTo[value] )) ? desc.defaultProp : value;
+					}
+				}
+		};
+		break;
+		default:
+			formSubmitterDescriptors[propName] = {
+				prop: {
+					set: function(value){
+						$.attr(this, attrName, value);
+					},
+					get: function(){
+						var value = $.attr(this, attrName);
+						return (value != null) ? value : "";
+					}
+				}
+			};
+	}
+
+
+	if(!formSubmitterDescriptors[attrName]){
+		formSubmitterDescriptors[attrName] = {};
+	}
+	formSubmitterDescriptors[attrName].attr = {
+		set: function(value){
+			formSubmitterDescriptors[attrName].attr._supset.call(this, value);
+			$(this).unbind(eventName).bind(eventName, changeSubmitter);
+		},
+		get: function(){
+			return formSubmitterDescriptors[attrName].attr._supget.call(this);
+		}
+	};
+	formSubmitterDescriptors[attrName].initAttr = true;
+	formSubmitterDescriptors[attrName].removeAttr = {
+		value: function(){
+			$(this).unbind(eventName);
+			formSubmitterDescriptors[attrName].removeAttr._supvalue.call(this);
+		}
+	};
+});
+
+webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors);
+
 if(!$.support.getSetAttribute && $('<form novalidate></form>').attr('novalidate') == null){
 	webshims.defineNodeNameProperty('form', 'novalidate', {
 		attr: {
@@ -400,20 +522,19 @@ if(!$.support.getSetAttribute && $('<form novalidate></form>').attr('novalidate'
 	});
 }
 
-var noValidate = function(){
-		var elem = this;
-		if(!elem.form){return;}
-		$.data(elem.form, 'novalidate', true);
-		setTimeout(function(){
-			$.removeData(elem.form, 'novalidate');
-		}, 1);
-	}, 
-	submitterTypes = {submit: 1, button: 1}
-;
-
-$(document).bind('click', function(e){
-	if(e.target && 'form' in e.target && submitterTypes[e.target.type] && $.prop(e.target, 'formNoValidate')){
-		noValidate.call(e.target);
+webshims.defineNodeNameProperty('form', 'noValidate', {
+	prop: {
+		set: function(val){
+			val = !!val;
+			if(val){
+				$.attr(this, 'novalidate', 'novalidate');
+			} else {
+				$(this).removeAttr('novalidate');
+			}
+		},
+		get: function(){
+			return $.attr(this, 'novalidate') != null;
+		}
 	}
 });
 
@@ -422,9 +543,6 @@ webshims.addReady(function(context, contextElem){
 	var form = $('form', context)
 		.add(contextElem.filter('form'))
 		.bind('invalid', $.noop)
-		.find('button[formnovalidate]')
-		.bind('click', noValidate)
-		.end()
 	;
 	
 	setTimeout(function(){
@@ -436,7 +554,7 @@ webshims.addReady(function(context, contextElem){
 			return;
 		}
 			var first = true;
-			$('input, select, textarea', form).each(function(i){
+			$('input, select, textarea', context).each(function(i){
 				if(!first){return false;}
 				if(this.getAttribute('autofocus') == null){return;}	
 				first = false;
@@ -448,7 +566,7 @@ webshims.addReady(function(context, contextElem){
 				focusElem = null;
 				return false;
 			});
-		
+		form = null;
 	}, 0);
 	
 });
