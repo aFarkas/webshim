@@ -29,7 +29,7 @@
 		});
 		
 		addTest(validationmessage, function(){
-			if(!Modernizr[formvalidation]){
+			if (!Modernizr[formvalidation]) {
 				return false;
 			}
 			//the form has to be connected in FF4
@@ -45,7 +45,7 @@
 			return ('open' in document.createElement('details'));
 		});
 		
-		Modernizr.genericDOM =  !!($('<video><div></div></video>')[0].innerHTML);
+		Modernizr.genericDOM = !!($('<video><div></div></video>')[0].innerHTML);
 		
 		//using only property api
 		Modernizr.requiredSelect = !!(Modernizr[formvalidation] && 'required' in $('select', form)[0]);
@@ -58,9 +58,9 @@
 		modernizrInputAttrs.valueAsNumberSet = false;
 		modernizrInputAttrs.valueAsDate = false;
 		
-		if(Modernizr[formvalidation]){
+		if (Modernizr[formvalidation]) {
 			modernizrInputAttrs[valueAsNumber] = (valueAsNumber in dateElem[0]);
-			if(modernizrInputAttrs[valueAsNumber]){
+			if (modernizrInputAttrs[valueAsNumber]) {
 				dateElem[0][valueAsNumber] = 0;
 				modernizrInputAttrs.valueAsNumberSet = (dateElem[0].value == '1970-01-01');
 				
@@ -69,17 +69,16 @@
 			form.remove();
 		}
 		
-		if(modernizrInputAttrs[valueAsNumber] && !modernizrInputAttrs.valueAsNumberSet){
+		if (modernizrInputAttrs[valueAsNumber] && !modernizrInputAttrs.valueAsNumberSet) {
 			Modernizr.bugfreeformvalidation = false;
 		}
 		form = dateElem = null;
 		
 		Modernizr.ES5base = !!(String.prototype.trim && Date.now && Date.prototype.toISOString);
 		Modernizr.ES5extras = !!(Array.isArray && Object.keys && Object.create && Function.prototype.bind && Object.defineProperties);// && !isNaN( Date.parse("T00:00") )
-		
-		if(Modernizr.ES5base){
+		if (Modernizr.ES5base) {
 			$.each(['filter', 'map', 'every', 'reduce', 'reduceRight', 'lastIndexOf'], function(i, name){
-				if(!Array.prototype[name]){
+				if (!Array.prototype[name]) {
 					Modernizr.ES5base = false;
 					return false;
 				}
@@ -91,13 +90,18 @@
 		var advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
 		//safari5 has defineProperty-interface, but it can't be used on dom-object
 		//only do this test in non-IE browsers, because this hurts dhtml-behavior in some IE8 versions
-		if(!$.browser.msie && Object[defineProperty] && Object.prototype.__defineGetter__){
+		if (!$.browser.msie && Object[defineProperty] && Object.prototype.__defineGetter__) {
 			(function(){
 				try {
 					var foo = document.createElement('foo');
-					Object[defineProperty](foo, 'bar', {get: function(){return true;}});
-					advancedObjectProperties = !!foo.bar;	
-				}catch(e){
+					Object[defineProperty](foo, 'bar', {
+						get: function(){
+							return true;
+						}
+					});
+					advancedObjectProperties = !!foo.bar;
+				} 
+				catch (e) {
 					advancedObjectProperties = false;
 				}
 				foo = null;
@@ -105,12 +109,12 @@
 		}
 		
 		Modernizr.ES5 = (Modernizr.ES5base && Modernizr.ES5extras && advancedObjectProperties);
-		Modernizr.objectAccessor = !!( (advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)) && (!$.browser.opera || browserVersion >= 11) );
-		Modernizr.domAccessor = !!( Modernizr.objectAccessor || (Object[defineProperty] && Object.getOwnPropertyDescriptor));
+		Modernizr.objectAccessor = !!((advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)) && (!$.browser.opera || browserVersion >= 11));
+		Modernizr.domAccessor = !!(Modernizr.objectAccessor || (Object[defineProperty] && Object.getOwnPropertyDescriptor));
 		Modernizr.advancedObjectProperties = advancedObjectProperties;
 	})();
 	
-	if(!window.iepp && !Modernizr.genericDOM && !$.isReady){
+	if (!window.iepp && !Modernizr.genericDOM && !$.isReady) {
 		$.each(['datalist', 'source', 'video', 'audio', 'details', 'summary', 'canvas', 'output'], function(i, name){
 			document.createElement(name);
 		});
@@ -123,8 +127,8 @@
 		version: 'pre1.8',
 		cfg: {
 			useImportantStyles: true,
-//			removeFOUC: false,
-//			addCacheBuster: false,
+			//			removeFOUC: false,
+			//			addCacheBuster: false,
 			waitReady: true,
 			extendNative: true,
 			loader: {
@@ -135,9 +139,10 @@
 					require([src], complete);
 				},
 				yepnope: function(src, complete){
-					if(yepnope.injectJs){
+					if (yepnope.injectJs) {
 						yepnope.injectJs(src, complete);
-					} else {
+					}
+					else {
 						yepnope({
 							load: src,
 							callback: complete
@@ -150,24 +155,25 @@
 		/*
 		 * some data
 		 */
-		modules: {}, features: {}, featureList: [],
+		modules: {},
+		features: {},
+		featureList: [],
 		profiles: {
 			lightweight: ['es5', 'json-storage', 'canvas', 'geolocation', 'forms']
 		},
 		setOptions: function(name, opts){
-			if(typeof name == 'string' && opts !== undefined){
-				webCFG[name] = (!$.isPlainObject(opts)) ? 
-					opts : 
-					$.extend(true, webCFG[name] || {} , opts)
-				;
-			} else if(typeof name == 'object') {
-				$.extend(true, webCFG, name);
+			if (typeof name == 'string' && opts !== undefined) {
+				webCFG[name] = (!$.isPlainObject(opts)) ? opts : $.extend(true, webCFG[name] || {}, opts);
 			}
+			else 
+				if (typeof name == 'object') {
+					$.extend(true, webCFG, name);
+				}
 		},
 		addPolyfill: function(name, cfg){
 			cfg = cfg || {};
 			var feature = cfg.feature || name;
-			if(!webshimsFeatures[feature]){
+			if (!webshimsFeatures[feature]) {
 				webshimsFeatures[feature] = [];
 				webshims.featureList.push(feature);
 				webCFG[feature] = {};
@@ -176,7 +182,7 @@
 			cfg.options = $.extend(webCFG[feature], cfg.options);
 			
 			addModule(name, cfg);
-			if(cfg.methodNames){
+			if (cfg.methodNames) {
 				$.each(cfg.methodNames, function(i, methodName){
 					webshims.addMethodName(methodName);
 				});
@@ -195,9 +201,9 @@
 					clearTimeout(loadingTimer);
 				};
 				
-				if(!$.isReady){
-					if(webCFG.removeFOUC){
-						if(webCFG.waitReady){
+				if (!$.isReady) {
+					if (webCFG.removeFOUC) {
+						if (webCFG.waitReady) {
 							onReadyEvts = onReadyEvts.concat(['DOM']);
 						}
 						addClass.push('polyfill-remove-fouc');
@@ -207,21 +213,22 @@
 					loadingTimer = setTimeout(function(){
 						$('html').addClass('long-loading-polyfills');
 					}, 600);
-				} else {
+				}
+				else {
 					webshims.warn('You should call $.webshims.polyfill before DOM-Ready');
 				}
 				onReady(features, removeLoader);
-				if(webCFG.useImportantStyles){
+				if (webCFG.useImportantStyles) {
 					addClass.push('polyfill-important');
 				}
-				if(addClass[0]){
+				if (addClass[0]) {
 					$('html').addClass(addClass.join(' '));
 				}
 				
 				loader.loadCSS('styles/shim.css');
 				//remove function
 				firstPolyfillCall = $.noop;
-				if(!Modernizr.genericDOM){
+				if (!Modernizr.genericDOM) {
 					$(function(){
 						loadList(['dom-extend']);
 					});
@@ -229,7 +236,7 @@
 			};
 			
 			return function(features, combo){
-				if(features && ( features === true || $.isPlainObject( features ) ) ){
+				if (features && (features === true || $.isPlainObject(features))) {
 					combo = features;
 					features = undefined;
 				}
@@ -241,7 +248,7 @@
 					features = webshims.profiles[features] || features.split(' ');
 				}
 				
-				if(webCFG.waitReady){
+				if (webCFG.waitReady) {
 					$.readyWait++;
 					onReady(features, function(){
 						$.ready(true);
@@ -249,7 +256,7 @@
 				}
 				
 				$.each(features, function(i, feature){
-					if(feature !== webshimsFeatures[feature][0]){
+					if (feature !== webshimsFeatures[feature][0]) {
 						onReady(webshimsFeatures[feature], function(){
 							isReady(feature, true);
 						});
@@ -262,21 +269,20 @@
 				
 			};
 		})(),
-				
+		
 		/*
 		 * handle ready modules
 		 */
-		
 		isReady: function(name, _set){
-			
-			name = name+'Ready';
-			if(_set){
-				if(special[name] && special[name].add){
+		
+			name = name + 'Ready';
+			if (_set) {
+				if (special[name] && special[name].add) {
 					return true;
 				}
-					
+				
 				special[name] = $.extend(special[name] || {}, {
-					add: function( details ) {
+					add: function(details){
 						details.handler.call(this, $.Event(name));
 					}
 				});
@@ -287,28 +293,24 @@
 		ready: function(events, fn /*, _created*/){
 			var _created = arguments[2];
 			var evt = events;
-			if(typeof events == 'string'){
+			if (typeof events == 'string') {
 				events = events.split(' ');
 			}
 			
-			if(!_created){
-				events = $.map(
-					$.grep(events, function(evt){
-						return !isReady(evt);
-					}), function(evt){
-						return evt +'Ready';
-					}
-				);
+			if (!_created) {
+				events = $.map($.grep(events, function(evt){
+					return !isReady(evt);
+				}), function(evt){
+					return evt + 'Ready';
+				});
 			}
-			if(!events.length){
+			if (!events.length) {
 				fn($, webshims, window, document);
 				return;
 			}
-			var readyEv = events.shift(),
-				readyFn = function(){
-					onReady(events, fn, true);
-				}
-			;
+			var readyEv = events.shift(), readyFn = function(){
+				onReady(events, fn, true);
+			};
 			
 			$(document).one(readyEv, readyFn);
 		},
@@ -319,23 +321,24 @@
 		addMethodName: function(name){
 			name = name.split(':');
 			var prop = name[1];
-			if(name.length == 1){
+			if (name.length == 1) {
 				prop = name[0];
 				name = name[0];
-			} else {
+			}
+			else {
 				name = name[0];
 			}
-			if($.fn[name] && 'shim' in $.fn[name]){return;}
+			if ($.fn[name] && 'shim' in $.fn[name]) {
+				return;
+			}
 			$.fn[name] = function(){
-				var args = arguments,
-					ret
-				;
+				var args = arguments, ret;
 				this.each(function(){
 					var fn = $.prop(this, prop);
 					
-					if(fn && fn.apply){
+					if (fn && fn.apply) {
 						ret = fn.apply(this, args);
-						if(ret !== undefined){
+						if (ret !== undefined) {
 							return false;
 						}
 					}
@@ -344,39 +347,45 @@
 			};
 		},
 		
-		fixHTML5: function(h){return h;},
+		fixHTML5: function(h){
+			return h;
+		},
 		capturingEvents: function(names, _maybePrevented){
-			if(!document.addEventListener){return;}
-			if(typeof names == 'string'){
+			if (!document.addEventListener) {
+				return;
+			}
+			if (typeof names == 'string') {
 				names = [names];
 			}
 			$.each(names, function(i, name){
-				var handler = function( e ) {
-					e = $.event.fix( e );
-					if(_maybePrevented && !e._isPolyfilled){
+				var handler = function(e){
+					e = $.event.fix(e);
+					if (_maybePrevented && !e._isPolyfilled) {
 						var isDefaultPrevented = e.isDefaultPrevented;
 						var preventDefault = e.preventDefault;
 						e.preventDefault = function(){
-							clearTimeout($.data(e.target, e.type +'DefaultPrevented'));
-							$.data(e.target, e.type +'DefaultPrevented', setTimeout(function(){
-								$.removeData(e.target, e.type +'DefaultPrevented');
+							clearTimeout($.data(e.target, e.type + 'DefaultPrevented'));
+							$.data(e.target, e.type + 'DefaultPrevented', setTimeout(function(){
+								$.removeData(e.target, e.type + 'DefaultPrevented');
 							}, 30));
 							return preventDefault.apply(this, arguments);
 						};
 						e.isDefaultPrevented = function(){
-							return !!(isDefaultPrevented.apply(this, arguments) || $.data(e.target, e.type +'DefaultPrevented') || false);
+							return !!(isDefaultPrevented.apply(this, arguments) || $.data(e.target, e.type + 'DefaultPrevented') || false);
 						};
 						e._isPolyfilled = true;
 					}
-					return $.event.handle.call( this, e );
+					return $.event.handle.call(this, e);
 				};
 				special[name] = special[name] || {};
-				if(special[name].setup || special[name].teardown){return;}
+				if (special[name].setup || special[name].teardown) {
+					return;
+				}
 				$.extend(special[name], {
-					setup: function() {
+					setup: function(){
 						this.addEventListener(name, handler, true);
-					}, 
-					teardown: function() { 
+					},
+					teardown: function(){
 						this.removeEventListener(name, handler, true);
 					}
 				});
@@ -384,18 +393,19 @@
 		},
 		register: function(name, fn){
 			var module = modules[name];
-			if(!module){
-				webshims.warn("can't find module: "+ name);
+			if (!module) {
+				webshims.warn("can't find module: " + name);
 				return;
 			}
-			if(module.noAutoCallback){
+			if (module.noAutoCallback) {
 				var ready = function(){
 					fn($, webshims, window, document, undefined, module.options);
 					isReady(name, true);
 				};
-				if(module.dependencies){
+				if (module.dependencies) {
 					onReady(module.dependencies, ready);
-				} else {
+				}
+				else {
 					ready();
 				}
 			}
@@ -405,10 +415,10 @@
 		 * loader
 		 */
 		loader: {
-			
+		
 			basePath: (function(){
 				var path = $('meta[name="polyfill-path"]').attr('content');
-				if(!path){
+				if (!path) {
 					var script = $('script').filter('[src$="polyfiller.js"]');
 					
 					script = script[0] || script.end()[script.end().length - 1];
@@ -425,11 +435,11 @@
 			},
 			
 			loadList: (function(){
-				
+			
 				var loadedModules = [];
 				
 				var loadScript = function(src, names){
-					if(typeof names == 'string'){
+					if (typeof names == 'string') {
 						names = [names];
 					}
 					$.merge(loadedModules, names);
@@ -437,21 +447,19 @@
 				};
 				
 				var noNeedToLoad = function(name, list){
-					if(isReady(name) || $.inArray(name, loadedModules) != -1){
+					if (isReady(name) || $.inArray(name, loadedModules) != -1) {
 						return true;
 					}
 					var module = modules[name];
 					var cfg = webCFG[module.feature || name] || {};
 					var supported;
-					if(module){
-						supported = (module.test && $.isFunction(module.test)) ?
-							module.test(list) :
-							module.test
-						;
+					if (module) {
+						supported = (module.test && $.isFunction(module.test)) ? module.test(list) : module.test;
 						if (supported) {
 							isReady(name, true);
 							return true;
-						}  else {
+						}
+						else {
 							return false;
 						}
 					}
@@ -459,23 +467,25 @@
 				};
 				
 				var setDependencies = function(module, list){
-					if(module.dependencies && module.dependencies.length){
+					if (module.dependencies && module.dependencies.length) {
 						var addDependency = function(i, dependency){
-							if(!noNeedToLoad(dependency, list) && $.inArray(dependency, list) == -1){
+							if (!noNeedToLoad(dependency, list) && $.inArray(dependency, list) == -1) {
 								list.push(dependency);
 							}
 						};
-						$.each(module.dependencies , function(i, dependeny){
-							if(modules[dependeny]){
+						$.each(module.dependencies, function(i, dependeny){
+							if (modules[dependeny]) {
 								addDependency(i, dependeny);
-							} else if(webshimsFeatures[dependeny]){
-								$.each(webshimsFeatures[dependeny], addDependency);
-								onReady(webshimsFeatures[dependeny], function(){
-									isReady(dependeny, true);
-								});
 							}
+							else 
+								if (webshimsFeatures[dependeny]) {
+									$.each(webshimsFeatures[dependeny], addDependency);
+									onReady(webshimsFeatures[dependeny], function(){
+										isReady(dependeny, true);
+									});
+								}
 						});
-						if(!module.noAutoCallback){
+						if (!module.noAutoCallback) {
 							module.noAutoCallback = true;
 						}
 					}
@@ -492,9 +502,10 @@
 						seperator: ',',
 						base: '/min/f=',
 						maxFiles: 10,
-						scriptPath: loader.basePath.replace( l.protocol +'//'+ l.host +'/', ''),
+						scriptPath: loader.basePath.replace(l.protocol + '//' + l.host + '/', ''),
 						fn: function(base, scriptPath, seperator, srces){
-							return base + $.map(srces, function(src){
+							return base +
+							$.map(srces, function(src){
 								return scriptPath + src;
 							}).join(seperator);
 						}
@@ -504,25 +515,26 @@
 						if ($.inArray(loadName, loadedModules) == -1) {
 							var src = (modules[loadName].src || loadName);
 							
-							if(src.indexOf('.') == -1){
+							if (src.indexOf('.') == -1) {
 								src += '.js';
 							}
-							if(!excludeCombo.test(src)){
+							if (!excludeCombo.test(src)) {
 								len++;
 								fPart.push(src);
 								combiNames.push(loadName);
-								if(len >= combo.maxFiles){
+								if (len >= combo.maxFiles) {
 									loadScript(combo.fn(combo.base, combo.scriptPath, combo.seperator, fPart), combiNames);
 									fPart = [];
 									combiNames = [];
 									len = 0;
 								}
-							} else {
+							}
+							else {
 								loadScript(src, loadName);
 							}
 						}
 					});
-					if(fPart.length){
+					if (fPart.length) {
 						loadScript(combo.fn(combo.base, combo.scriptPath, combo.seperator, fPart), combiNames);
 					}
 				};
@@ -531,11 +543,11 @@
 					var module;
 					var loadCombos = [];
 					//length of list is dynamically
-					for(var i = 0; i < list.length; i++){
+					for (var i = 0; i < list.length; i++) {
 						module = modules[list[i]];
 						if (!module || noNeedToLoad(module.name, list)) {
-							if(!module){
-								webshims.warn('could not find: '+ list[i]);
+							if (!module) {
+								webshims.warn('could not find: ' + list[i]);
 							}
 							continue;
 						}
@@ -543,52 +555,50 @@
 							loader.loadCSS(module.css);
 						}
 						
-						if(module.loadInit){
+						if (module.loadInit) {
 							module.loadInit();
 						}
-						module.loaded = true;				
+						module.loaded = true;
 						setDependencies(module, list);
-						if(combo){
+						if (combo) {
 							loadCombos.push(module.name);
-						} else {
+						}
+						else {
 							loadScript(module.src || module.name, module.name);
 						}
 					}
-					if(combo){
+					if (combo) {
 						loadAsCombo(loadCombos, combo);
 					}
 				};
 			})(),
 			
 			makePath: function(src){
-				if(src.indexOf('//') != -1 || src.indexOf('/') === 0){
+				if (src.indexOf('//') != -1 || src.indexOf('/') === 0) {
 					return src;
 				}
 				
-				if(src.indexOf('.') == -1){
+				if (src.indexOf('.') == -1) {
 					src += '.js';
 				}
-				if(webCFG.addCacheBuster){
+				if (webCFG.addCacheBuster) {
 					src += webCFG.addCacheBuster;
 				}
 				return loader.basePath + src;
 			},
 			
 			loadCSS: (function(){
-				var parent, 
-					loadedSrcs = []
-				;
+				var parent, loadedSrcs = [];
 				return function(src){
 					src = this.makePath(src);
-					if($.inArray(src, loadedSrcs) != -1){
+					if ($.inArray(src, loadedSrcs) != -1) {
 						return;
 					}
 					parent = parent || $('link, style')[0] || $('script')[0];
 					loadedSrcs.push(src);
-					$('<link rel="stylesheet" />')
-						.insertBefore(parent)
-						.attr({href: src})
-					;
+					$('<link rel="stylesheet" />').insertBefore(parent).attr({
+						href: src
+					});
 				};
 			})(),
 			
@@ -596,16 +606,16 @@
 				var loadedSrcs = [];
 				var scriptLoader;
 				return function(src, callback, name){
-					
+				
 					src = loader.makePath(src);
-					if($.inArray(src, loadedSrcs) != -1){
+					if ($.inArray(src, loadedSrcs) != -1) {
 						return;
 					}
 					var script = emptyJ;
 					var errorTimer;
 					var error = function(){
 						$(window).triggerHandler('polyfillloaderror');
-						webshims.warn('Error: could not find "'+src +'" | configure polyfill-path: $.webshims.loader.basePath = "path/to/shims-folder"');
+						webshims.warn('Error: could not find "' + src + '" | configure polyfill-path: $.webshims.loader.basePath = "path/to/shims-folder"');
 						complete();
 					};
 					var complete = function(){
@@ -614,17 +624,19 @@
 						complete = null;
 						error = null;
 						script = null;
-						if(callback){
+						if (callback) {
 							callback();
 						}
 						
-						if(name){
-							if(typeof name == 'string'){
+						if (name) {
+							if (typeof name == 'string') {
 								name = name.split(' ');
 							}
 							$.each(name, function(i, name){
-								if(!modules[name]){return;}
-								if(modules[name].afterLoad){
+								if (!modules[name]) {
+									return;
+								}
+								if (modules[name].afterLoad) {
 									modules[name].afterLoad();
 								}
 								isReady(!modules[name].noAutoCallback ? name : name + 'FileLoaded', true);
@@ -632,25 +644,26 @@
 							
 						}
 					};
-										
+					
 					loadedSrcs.push(src);
-					if(!scriptLoader){
+					if (!scriptLoader) {
 						$.each(webCFG.loader, function(name, fn){
-							if(window[name]){
+							if (window[name]) {
 								scriptLoader = fn;
 								return false;
 							}
 						});
 					}
-					if(scriptLoader){
+					if (scriptLoader) {
 						scriptLoader(src, complete);
-						if(webshims.debug !== false){
+						if (webshims.debug !== false) {
 							setTimeout(function(){
-								script = $('script[src="'+src+'"]').bind('error', error);
+								script = $('script[src="' + src + '"]').bind('error', error);
 							}, 0);
 							errorTimer = setTimeout(error, 15000);
 						}
-					} else {
+					}
+					else {
 						webshims.warn("you need to include a scriptloader");
 					}
 				};
@@ -663,8 +676,8 @@
 	 */
 	var webshims = $.webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
-	var googleAPIs = protocol+'ajax.googleapis.com/ajax/libs/';
-	var uiLib = googleAPIs+'jqueryui/1.8.15/';
+	var googleAPIs = protocol + 'ajax.googleapis.com/ajax/libs/';
+	var uiLib = googleAPIs + 'jqueryui/1.8.16/';
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;
@@ -674,41 +687,54 @@
 	var loader = webshims.loader;
 	var loadList = loader.loadList;
 	var addModule = loader.addModule;
-	var importantLogs = {warn: 1, error: 1};
+	var importantLogs = {
+		warn: 1,
+		error: 1
+	};
 	var xhrPreloadOption = {
-		cache: true, 
-		dataType: 'text', 
+		cache: true,
+		dataType: 'text',
 		error: function(data, text){
-			webshims.warn('error with: '+ this.url +' | '+ text);
+			webshims.warn('error with: ' + this.url + ' | ' + text);
 		}
 	};
 	webshims.xhrPreloadOption = xhrPreloadOption;
 	
 	//activeLang will be overridden
+
+	
+	//	set current Lang:
+	//		- webshims.activeLang(lang:string);
+	//	get current lang
+	//		- webshims.activeLang();
+	//		- webshims.activeLang({
+	//			module: moduleName:string,
+	//			callback: callback:function,
+	//			langObj: languageObj:array/object
+	//		});
+
 	webshims.activeLang = (function(){
-		var args;
-		var that;
-		var langs = [navigator.browserLanguage || navigator.language || '', $('html').attr('lang') || ''];
+		var curLang = navigator.browserLanguage || navigator.language || '';
 		onReady('webshimLocalization', function(){
-			if(args && that){
-				webshims.activeLang.apply(that, args);
-			}
+			webshims.activeLang(curLang);
+			
 		});
-		return function(lang, module, fn){
-			that = this;
-			args = arguments;
+		return function(lang){
 			if(lang){
-				if (!module || !fn) {
-					if (lang !== langs[0]) {
-						langs[0] = lang;
-					}
+				if (typeof lang == 'string' ) {
+					curLang = lang;
+				} else if(typeof lang == 'object'){
+					var args = arguments;
+					var that = this;
+					onReady('webshimLocalization', function(){
+						webshims.activeLang.apply(that, args);
+					});
 				}
 				loadList(['dom-extend']);
 			}
-			return langs;
+			return curLang;
 		};
 	})();
-	
 	
 	$.each(['log', 'error', 'warn', 'info'], function(i, fn){
 		webshims[fn] = function(message){

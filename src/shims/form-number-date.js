@@ -471,7 +471,6 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	var options = $.webshims.cfg['forms-ext'];
 	var defaultDatepicker = {dateFormat: 'yy-mm-dd'};
 	var globalInvalidTimer;
-	var setLangDefaults;
 	var labelID = 0;
 	var emptyJ = $([]);
 	var isCheckValidity;
@@ -622,14 +621,12 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 			if(_wrapper){
 				webshims.triggerDomUpdate(_wrapper[0]);	
 			}
-			if(setLangDefaults){
-				['disabled', 'min', 'max', 'value', 'step'].forEach(function(name){
-					var val = elem.prop(name);
-					if(val !== "" && (name != 'disabled' || !val)){
-						elem.prop(name, val);
-					}
-				});
-			}
+			['disabled', 'min', 'max', 'value', 'step'].forEach(function(name){
+				var val = elem.prop(name);
+				if(val !== "" && (name != 'disabled' || !val)){
+					elem.prop(name, val);
+				}
+			});
 			return data;
 		};
 		
@@ -969,26 +966,16 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	if(!options.availabeLangs){
 		options.availabeLangs = 'af ar ar-DZ az bg bs ca cs da de el en-AU en-GB en-NZ eo es et eu fa fi fo fr fr-CH gl he hr hu hy id is it ja ko kz lt lv ml ms nl no pl pt-BR rm ro ru sk sl sq sr sr-SR sv ta th tr uk vi zh-CN zh-HK zh-TW'.split(' ');
 	}
-	var changeDefaults = function(langObj){
-		setLangDefaults = true;
-		if(!langObj){return;}
-		$.extend(defaultDatepicker, langObj, options.datepicker);
-		$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', defaultDatepicker).each(function(){
-			var orig = webshims.data(this, 'shadowData') || {};
-			if(orig.nativeElement){
-				$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, name){
-					$(orig.nativeElement).attr(name, function(i, value){return value;});
-				});
-			}
-		});
-		
-	};
+	
 	var getDefaults = function(){
 		if(!$.datepicker){return;}
-		webshims.ready('webshimLocalization', function(){
-			webshims.activeLang($.datepicker.regional, 'forms-ext', changeDefaults, function(){
-				setLangDefaults = true;
-			});
+		
+		webshims.activeLang({
+			langObj: $.datepicker.regional, 
+			module: 'forms-ext', 
+			callback: function(langObj){
+				$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', $.extend(defaultDatepicker, langObj, options.datepicker));
+			}
 		});
 		$(document).unbind('jquery-uiReady.langchange input-widgetsReady.langchange');
 	};

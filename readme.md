@@ -72,10 +72,12 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-Release 1.8.0
+upcomming Release 1.8.0
 ----------
 
-*
+* mediaelement implementation (audio/video)
+* better language support
+* updated es5-shim
 * updated jQuery UI path 
 * fixed label for putput element
 

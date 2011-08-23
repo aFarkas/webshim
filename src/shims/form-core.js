@@ -394,10 +394,12 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		});
 		
 		var currentValidationMessage =  validityMessages[''];
-		$(document).bind('webshimLocalizationReady', function(){
-			webshims.activeLang(validityMessages, 'form-core', function(langObj){
+		webshims.activeLang({
+			langObj: validityMessages, 
+			module: 'form-core', 
+			callback: function(langObj){
 				currentValidationMessage = langObj;
-			});
+			}
 		});
 		
 		webshims.createValidationMessage = function(elem, name){
