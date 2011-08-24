@@ -691,17 +691,17 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				}
 				return false;
 			};
+			
 			var callLang = function(data, _noLoop){
-				
 				if(data.activeLang != currentLang && data.activeLang !== shortLang){
 					var options = modules[data.module].options;
 					if( data.langObj[currentLang] || (shortLang && data.langObj[shortLang]) ){
 						data.activeLang = currentLang;
 						data.callback(data.langObj[currentLang] || data.langObj[shortLang], currentLang);
-					} else if( options && !_noLoop &&
-						!loadRemoteLang(data, currentLang, options) && shortLang ) {
-						loadRemoteLang(data, shortLang, options);
-					} else if(data.langObj[''] && data.activeLang !== ''){
+					} else if( !_noLoop &&
+						!loadRemoteLang(data, currentLang, options) && 
+						shortLang && !loadRemoteLang(data, shortLang, options) && 
+						data.langObj[''] && data.activeLang !== '' ) {
 						data.activeLang = '';
 						data.callback(data.langObj[''], currentLang);
 					}
