@@ -116,7 +116,7 @@
 	$.webshims = $.sub ? $.sub() : {};
 	
 	$.extend($.webshims, {
-		version: '1.6.4',
+		version: '1.6.5',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
@@ -670,26 +670,25 @@
 	
 	//activeLang will be overridden
 	webshims.activeLang = (function(){
-		var args;
-		var that;
-		var langs = [navigator.browserLanguage || navigator.language || '', $('html').attr('lang') || ''];
+		var curLang = navigator.browserLanguage || navigator.language || '';
 		onReady('webshimLocalization', function(){
-			if(args && that){
-				webshims.activeLang.apply(that, args);
-			}
+			webshims.activeLang(curLang);
+			
 		});
-		return function(lang, module, fn){
-			that = this;
-			args = arguments;
+		return function(lang){
 			if(lang){
-				if (!module || !fn) {
-					if (lang !== langs[0]) {
-						langs[0] = lang;
-					}
+				if (typeof lang == 'string' ) {
+					curLang = lang;
+				} else if(typeof lang == 'object'){
+					var args = arguments;
+					var that = this;
+					onReady('webshimLocalization', function(){
+						webshims.activeLang.apply(that, args);
+					});
 				}
 				loadList(['dom-extend']);
 			}
-			return langs;
+			return curLang;
 		};
 	})();
 	

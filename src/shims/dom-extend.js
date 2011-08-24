@@ -383,63 +383,68 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		},
 				
 		activeLang: (function(){
-			var langs = [navigator.browserLanguage || navigator.language || ''];
-			var paLang = $('html').attr('lang');
-			var timer;
-			
-			if(paLang){
-				langs.push(paLang);
-			}
-			return function(lang, module, fn, noChangeFn){
-				if(lang){
-					if(!module || !fn){
-						if(lang !== langs[0]){
-							langs[0] = lang;
-							$(document).triggerHandler('webshimLocalizationReady', langs);
-						}
-					} else {
-						module = modules[module].options;
-						var langObj = lang,
-							remoteLangs = module && module.availabeLangs,
-							loadRemoteLang = function(lang){
-								if($.inArray(lang, remoteLangs) !== -1){
-									webshims.loader.loadScript(module.langSrc+lang+'.js', function(){
-										if(langObj[lang]){
-											fn(langObj[lang]);
-										} else {
-											$(function(){
-												if(langObj[lang]){
-													fn(langObj[lang]);
-												}
-											});
-										}
-									});
-									return true;
+			var callbacks = [];
+			var currentLang;
+			var shortLang;
+			var loadRemoteLang = function(data, lang, options){
+				if($.inArray(lang, options.availabeLangs || []) !== -1){
+					data.loading = true;
+					webshims.loader.loadScript(options.langSrc+lang+'.js', function(){
+						if(data.langObj[lang]){
+							data.loading = false;
+							callLang(data, true);
+						} else {
+							$(function(){
+								if(data.langObj[lang]){
+									callLang(data, true);
 								}
-								return false;
-							},
-							langChanges
-						;
-						
-						$.each(langs, function(i, lang){
-							var shortLang = lang.split('-')[0];
-							if(langObj[lang] || langObj[shortLang]){
-								langChanges = true;
-								fn(langObj[lang] || langObj[shortLang]);
-								return false;
-							}
-							if(remoteLangs && module.langSrc && (loadRemoteLang(lang) || loadRemoteLang(shortLang))){
-								langChanges = true;
-								return false;
-							}
-						});
-						if(!langChanges && noChangeFn){
-							noChangeFn();
+								data.loading = false;
+							});
 						}
+					});
+					return true;
+				}
+				return false;
+			};
+			var callLang = function(data, _noLoop){
+				if(data.activeLang != currentLang && data.activeLang !== shortLang){
+					var options = modules[data.module].options;
+					if( data.langObj[currentLang] || (shortLang && data.langObj[shortLang]) ){
+						data.activeLang = currentLang;
+						data.callback(data.langObj[currentLang] || data.langObj[shortLang], currentLang);
+					} else if( !_noLoop &&
+						!loadRemoteLang(data, currentLang, options) && 
+						shortLang && !loadRemoteLang(data, shortLang, options) && 
+						data.langObj[''] && data.activeLang !== '' ) {
+						data.activeLang = '';
+						data.callback(data.langObj[''], currentLang);
 					}
 				}
-				return langs;
 			};
+			
+			
+			var activeLang = function(lang){
+				
+				if(typeof lang == 'string' && lang !== currentLang){
+					currentLang = lang;
+					shortLang = currentLang.split('-')[0];
+					if(currentLang == shortLang){
+						shortLang = false;
+					}
+					$.each(callbacks, function(i, data){
+						callLang(data);
+					});
+				} else if(typeof lang == 'object'){
+					if(!lang.activeLang){
+						lang.activeLang = '';
+					}
+					callbacks.push(lang);
+					callLang(lang);
+				}
+				return currentLang;
+			};
+			
+			return activeLang;
 		})()
 	});
 	
