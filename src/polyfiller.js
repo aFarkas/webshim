@@ -124,7 +124,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: 'pre1.8',
+		version: '1.8alpha1',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -256,6 +256,11 @@
 				}
 				
 				$.each(features, function(i, feature){
+					if(!webshimsFeatures[feature]){
+						webshims.warn("could not find webshims-feature (aborted): "+ feature);
+						isReady(feature, true);
+						return;
+					}
 					if (feature !== webshimsFeatures[feature][0]) {
 						onReady(webshimsFeatures[feature], function(){
 							isReady(feature, true);
@@ -419,7 +424,7 @@
 			basePath: (function(){
 				var path = $('meta[name="polyfill-path"]').attr('content');
 				if (!path) {
-					var script = $('script').filter('[src$="polyfiller.js"]');
+					var script = $('script').filter('[src="polyfiller.js"]');
 					
 					script = script[0] || script.end()[script.end().length - 1];
 					path = ((!$.browser.msie || document.documentMode >= 8) ? script.src : script.getAttribute("src", 4)).split('?')[0];
@@ -1009,8 +1014,10 @@
 							G_vmlCanvasManager.initElement(this);
 						}
 					});
+					if(context == document){
+						isReady('canvas', true);
+					}
 				});
-				isReady('canvas', true);
 			},
 			methodNames: ['getContext'],
 			dependencies: ['es5', 'dom-support']

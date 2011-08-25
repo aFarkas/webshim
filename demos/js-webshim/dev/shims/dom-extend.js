@@ -672,7 +672,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			var currentLang;
 			var shortLang;
 			var loadRemoteLang = function(data, lang, options){
-				if($.inArray(lang, options.availabeLangs || []) !== -1){
+				if(lang && options && $.inArray(lang, options.availabeLangs || []) !== -1){
 					data.loading = true;
 					webshims.loader.loadScript(options.langSrc+lang+'.js', function(){
 						if(data.langObj[lang]){
@@ -700,7 +700,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						data.callback(data.langObj[currentLang] || data.langObj[shortLang], currentLang);
 					} else if( !_noLoop &&
 						!loadRemoteLang(data, currentLang, options) && 
-						shortLang && !loadRemoteLang(data, shortLang, options) && 
+						!loadRemoteLang(data, shortLang, options) && 
 						data.langObj[''] && data.activeLang !== '' ) {
 						data.activeLang = '';
 						data.callback(data.langObj[''], currentLang);

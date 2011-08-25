@@ -522,8 +522,8 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		}
 		loadedSwf = true;
 		var vars = $.extend({}, options.jwVars, {
-				image: elem.getAttribute('poster') || '',
-				file: canPlaySrc.src
+				image: $.prop(elem, 'poster') || '',
+				file: canPlaySrc.srcProp
 		});
 		var elemVars = $(elem).data('jwvars') || {};
 		
@@ -532,7 +532,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			resetSwfProps(data);
 			data.currentSrc = canPlaySrc.srcProp;
 			$.extend(vars, elemVars);
-			options.changeJW(vars, elem, data, 'load');
+			options.changeJW(vars, elem, canPlaySrc, data, 'load');
 			queueSwfMethod(elem, 'sendEvent', ['LOAD', vars]);
 			
 			return;
@@ -625,7 +625,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		webshims.addShadowDom(elem, box);
 		addMediaToStopEvents(elem);
 		mediaelement.setActive(elem, 'flash', data);
-		options.changeJW(vars, elem, data, 'embed');
+		options.changeJW(vars, elem, canPlaySrc, data, 'embed');
 		startIntrinsicDimension(data);
 		swfobject.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.0", false, vars, params, attrs, function(swfData){
 			if(swfData.success){
