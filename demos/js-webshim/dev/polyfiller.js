@@ -124,7 +124,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.8alpha1',
+		version: '1.8alpha2',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -422,14 +422,11 @@
 		loader: {
 		
 			basePath: (function(){
-				var path = $('meta[name="polyfill-path"]').attr('content');
-				if (!path) {
-					var script = $('script').filter('[src="polyfiller.js"]');
-					
-					script = script[0] || script.end()[script.end().length - 1];
-					path = ((!$.browser.msie || document.documentMode >= 8) ? script.src : script.getAttribute("src", 4)).split('?')[0];
-					path = path.slice(0, path.lastIndexOf("/") + 1) + 'shims/';
-				}
+				var script = $('script').filter('[src="polyfiller.js"]');
+				var path;
+				script = script[0] || script.end()[script.end().length - 1];
+				path = ((!$.browser.msie || document.documentMode >= 8) ? script.src : script.getAttribute("src", 4)).split('?')[0];
+				path = path.slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 				return path;
 			})(),
 			
@@ -1173,5 +1170,26 @@
 			}, swfOptions));
 		}
 	}
+	
+	$('script')
+		.filter('[data-polyfill-path')
+		.each(function(){
+			loader.basePath = $(this).data('pollyfillPath');
+		})
+		.end()
+		.filter('[data-polyfill-cfg]')
+		.each(function(){
+			try {
+				webshims.setOption( $.parseJSON( $(this).data('pollyfillCfg') ) );
+			} catch(e){
+				webshims.warn('error parsing polyfill cfg: '+e);
+			}
+		})
+		.end()
+		.filter('[data-polyfill]')
+		.each(function(){
+			webshims.polyfill( $.trim( $(this).data('pollyfillCfg') || '' ) );
+		})
+	;
 	
 })(jQuery, this, this.document);
