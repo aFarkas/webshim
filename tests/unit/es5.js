@@ -1,5 +1,34 @@
 (function($){
 	module("es5 module");
+	asyncTest("es5 implementation tests", function(){
+		var isInObject = function(prop, obj){
+			ok(prop in obj, prop +' is available in '+obj);
+		};
+		$.each(['isArray'], function(i, name){
+			isInObject(name, Array);
+		});
+		$.each(['keys'], function(i, name){
+			isInObject(name, Object);
+		});
+		$.each('forEach, map, filter, every, some, reduce, reduceRight, indexOf, lastIndexOf'.split(', '), function(i, name){
+			isInObject(name, Array.prototype);
+		});
+		$.each(['now'], function(i, name){
+			isInObject(name, Date);
+		});
+		$.each('toISOString, toJSON'.split(', '), function(i, name){
+			isInObject(name, Date.prototype);
+		});
+		$.each(['bind'], function(i, name){
+			isInObject(name, Function.prototype);
+		});
+		$.each(['trim'], function(i, name){
+			isInObject(name, String.prototype);
+		});
+		$.webshims.ready('DOM es5', function(){
+			start();
+		});
+	});
 	asyncTest("cross-browser create, defineProperty features", function(){	
 		var desc;
 		var obj = $.webshims.objectCreate({
