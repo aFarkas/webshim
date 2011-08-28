@@ -19,6 +19,7 @@
 		var hash = (location.hash || '').replace(/^#/, '');
 		$('div.accordion')
 			.each(function(){
+				var accordion = this;
 				var headers = $('h3.button', this);
 				var selected = (hash) ? headers.filter('[id="'+hash+'"]') : 0;
 				if(selected && selected[0]){
@@ -27,11 +28,22 @@
 						selElem.scrollIntoView();
 					}, 0);
 					selected = headers.index(selected[0]);
-				} 
+				}
+				
 				$(this).accordion({
 					header: 'h3.button',
 					active: selected,
 					autoHeight: false
+				});
+				$(window).bind('hashchange', function(){
+					hash = (location.hash || '').replace(/^#/, '');
+					selected = headers.filter('[id="'+hash+'"]');
+					if(selected[0]){
+						$(accordion).accordion("option", "animated", false).accordion('activate', headers.index(selected[0])).accordion("option", "animated", "slide");
+						setTimeout(function(){
+							selected[0].scrollIntoView();
+						}, 1);
+					}
 				});
 			})
 		;
