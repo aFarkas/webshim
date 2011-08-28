@@ -15,7 +15,7 @@
 		$.webshims.ready('DOM forms', function(){
 			setTimeout(function(){
 				start();
-			}, 10);
+			}, 100);
 			
 		});
 	};
@@ -61,7 +61,7 @@
 		stop();
 		addTest = function(){
 			equals(results.target, '_originaltarget');
-			ok(results.search);
+			equals(results.search, '');
 			equals(results.action, 2);
 			equals(form.prop('method'), "post");
 			equals(form.attr('action'), "test-ext/form-tester-1.html");
