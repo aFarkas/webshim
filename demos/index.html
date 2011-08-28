@@ -155,9 +155,8 @@
 					</ul>
 				
 <code class="block">
-&lt;script src="js/jquery-1.6.1.js"&gt;&lt;/script&gt;
-&lt;script src="js/modernizr-custom.js"&gt;&lt;/script&gt;
-&lt;script src="js/yepnope.js"&gt;&lt;/script&gt;
+&lt;script src="js/jquery-1.6.2.js"&gt;&lt;/script&gt;
+&lt;script src="js/modernizr-yepnope-custom.js"&gt;&lt;/script&gt;
 &lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
 
 
@@ -200,6 +199,18 @@ $.webshims.polyfill('lightweight');
 					<p>If you dont want any log messsages, simply set <code>$.webshims.debug</code> explicitly to <code>false</code>.</p>
 					<h3>Custom Modernizr build</h3>
 					<p>Webshims lib does not need every Modernizr test and supports creating a <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest">custom Modernizr build</a> (All required tests are pre-checked.) (If you want to use yepnope as your script loader please additionally <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-load">check Modernizr.load</a>).</p>
+					
+					<h3>changing Options path to shims folder</h3>
+					
+					<p>Shims folder is computed automatically. If the name of polyfill.js is changed <strong>and</strong> the polyfill-script is loaded async, this computation can be wrong and you have to set the folder manually. This generated path can be changed by changing the <code>basePath</code> configuration with the <code><a href="#polyfill-options" class="tab-opener">setOptions</a></code> method.</p>
+<code class="block">
+$.webshims.setOptions("basePath", "/yourFolderTo/shims/");
+//or:
+$.webshims.setOptions({
+	basePath: "/yourFolderTo/shims/"
+});
+</code>					
+					
 					<h3>High Performance loading using combo-handler service</h3>
 					<p>Webshims lib supports generating a combohandler - url. Simply pass true or your combohandler options as the second argument. The defaults are fine to use in conjunction with the defaults of the <a href="http://code.google.com/p/minify/">minify - project</a>.</p>
 <code class="block">
@@ -246,6 +257,59 @@ $.webshims.polyfill({
 					<p>In newer browsers like IE8+/FF3.5+ JS loading do neither block downloading other resources nor block HTML [pre-]parsing (+ they have between 4-8 simultaneous download slots). And in case of using a script loader (and webshims lib is using a script loader) loading scripts won't block anything even in IE6/IE7/FF3.0.</p>
 					<p>This said, if you are using a combohandler service you should make sure, that all browsers load between 2-8 JS files (depends on browser and webpage / use the maxFiles configuration to achieve this).</p>
 					<p>And if you only want to use some polyfills and not all, you should not use a combohandler, because all polyfill downloads are parallelized.</p>
+					
+					<h3>Loading webshims async</h3>
+					<p>If webshims lib is loaded async, there are some configurations which have to be changed manually:</p>
+					<ul>
+						<li>waitReady: should be changed to false. Note: you can not rely on jQuery's DOM-Ready event anymore.</li>
+						<li>basePath: should be set manually</li>
+					</ul>
+					<p>A typical configuration and usage for webshims lib loading async would look like this:</p>
+<code class="block">&lt;script src="modernizr-yepnope.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+	Modernizr.load([
+		{
+			load: '//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js',
+			complete: function () {
+				if ( !window.jQuery ) {
+					Modernizr.load('/js/libs/jquery-1.6.2.min.js');
+				}
+			}
+		},
+		{
+			// This will wait for the fallback to load and execute
+			load: '/js/libs/combined-package-with-polyfill.js',
+			complete: function () {
+				
+				//The following code can be also inide of your combined-package-with-polyfill.js file package
+				if ( jQuery.webshims ) {
+				
+					//change webshims options
+					jQuery.webshims.setOptions({
+						waitReady: false,
+						basePath: "/js/libs/shims/"
+					});
+					
+					//start polyfilling
+					jQuery.webshims.polyfill('forms canvas');
+					
+					//this is only needed if you want to use polyfilled DOM-features as soon as possible
+					//wait for the normal ready event and...
+					jQuery(function($){
+						//wait until all requested features are implemented
+						$.wehshims.ready('canvas forms', function(){
+							//use polyfilled features
+							var context = $('#myCanvas').getContext("2d");
+						});
+					});
+				}
+				
+			}
+		}
+	]);
+&lt;/script&gt;
+&lt;/body&gt;
+</code>						
 				</div>
 				<h3 id="polyfill-ready" class="button">Fire when ready</h3>
 				<div class="panel">
@@ -274,28 +338,55 @@ $.webshims.ready('DOM canvas', function(){
 });
 </code>	
 				</div>
-				<h3 id="polyfill-options" class="button">Setting feature-specific options</h3>
+				<h3 id="polyfill-options" class="button">Setting options</h3>
 				<div class="panel">
-					<p>Some features have additional options which can be configured with the <code>$.webshims.setOptions</code> method. <code>setOptions</code> should always be called before the <code>polyfill</code> method:</p>
+					<p>Webshims has some general and some feature specific options which can be configured with the <code>$.webshims.setOptions</code> method.</p>
+					<p><code>setOptions</code> should always be called before the <code>polyfill</code> method.</p>
+					<p>The available general options are the following:</p>
+					<ul>
+						<li><strong>waitReady</strong> (default: true): If this option is true, jQuery's ready-event will be delayed until all needed features are ready to use. This option should be only set to false, if webshims lib polyfill.js is loaded asny.</li>
+						<li><strong>basePath</strong> (default: "automatially computed path to the shims folder"): If polyfill.js was renamed <strong>and</strong> is loaded dynamically, the basePath should be changed manually.</li>
+						<li><strong>extendNative</strong> (default: true): Webshims lib will automatically extend DOM-Object with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNativ is set to false, webshims lib won't touch any DOM-Objects and will only implement jQuery plugins.</li>
+					</ul>
 <code class="block">
-$.webshims.setOptions('canvas', {
-	type: "flash" //use flashcanvas instead of excanvas as polyfill
+$.webshims.setOptions("extendNative", false);
+</code>	
+		<p><code>setOptions</code> can also take a single options parameter:</p>			
+<code class="block">
+$.webshims.setOptions({
+	extendNative: false
 });
 </code>		
-				
+					<p>Feature specific options are nested options with the featurename as their key.</p>
 					<p><code>setOptions</code> can also take a single options parameter:</p>
 <code class="block">
 $.webshims.setOptions({
+	//configure generaly option
+	extendNative: false,
+	
 	//configure canvas-shim
 	canvas: {
 		type: "flash" // use flashcanvas instead of excanvas as polyfill
 	},
+	
 	//configure forms-shim
 	forms: {
 		customMessages: true // implement customValidationMessages
 	}
 });
 </code>	
+					<p>The polyfill-options can also be changed by using declarative markup, using a data-polyfill-cfg attriute with a valid JSON string on a script-element:</p>
+<code class="block">
+&lt;script src="some.js" data-polyfill='{
+	"basePath": "pathToYour/shims-folder/",
+	"canvas": {
+		"type": "flash" // use flashcanvas instead of excanvas as polyfill
+	}
+}'&gt;
+
+&lt;/script&gt;
+</code>	
+					
 				</div>
 				<h3 id="polyfill-abstractions" class="button">Minor Abstractions to DOM attributes, DOM methods and DOM events</h3>
 				<div class="panel">
@@ -492,12 +583,6 @@ html.long-loading-polyfills {
 </code>
 							</li>
 						</ol>
-						
-						<p>If you still have FOUCs you can additionally change the <code>removeFOUC</code> configuration to true. In this case the loading classes added by webshims lib, won't be removed, if all requested features are loaded and polyfilled. Webshims lib will additionally wait for the DOM-Ready event.</p>
-<code class="block">
-$.webshims.setOptions('removeFOUC', true);
-</code>
-						<p><small>Note: The added classes are bulletproof. In case of an error or window's load event the loading-classes will be removed, even if not all features seem to be implemented.</small></p>
 						
 						<h4>Why you should put your webshims inside of your documents head</h4>
 						<p>There is a lot of misunderstanding about the yslow rule "Put your JavaScript at the bottom". Put your JavaScript at the bottom does not decrease total page load time. The effect is psychologic. The user sooner sees how the page is loading, because JS blocks the UI rendering.</p>

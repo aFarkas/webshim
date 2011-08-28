@@ -54,88 +54,92 @@
 		});
 	});
 	
-	if(Modernizr.objectAccessor){
-		asyncTest("advanced Object (support.objectAccessor)", function(){	
-			var desc;
-			var obj = $.webshims.objectCreate({
-				foo: 'bar'
-			}, {
-				baz: {
-					set: function(value){
-						this.setTest = value;
-					},
-					get: function(){
-						return 'bar';
-					}
-				}
-			});
-		
-			equals(obj.foo, 'bar', 'access proto');
-			obj.baz = 'setBar';
-			equals(obj.setTest, 'setBar', 'setter invoked with right value');
-			equals(obj.baz, 'bar', 'getter returns right value');
-			desc = $.webshims.getOwnPropertyDescriptor(obj , 'baz');
-			equals(desc.configurable, true, 'getOwnPropertyDescriptor writeable');
-			equals(desc.enumerable, true, 'getOwnPropertyDescriptor enumerable');
-			equals(desc.value, undefined, 'getOwnPropertyDescriptor value');
-			ok($.isFunction(desc.set), 'getOwnPropertyDescriptor set is a function');
-			
-			$.webshims.defineProperty(document.createElement('b').constructor.prototype, 'magic', {
-				set: function(value){
-					this._magic = value;
-				},
-				get: function(){
-					return this._magic || '';
-				}
-			});
-			
-			obj = $('<b />')[0];
-			equals(obj.magic, '', 'getter returns right value');
-			obj.magic = 'foo bar';
-			equals(obj.magic, 'foo bar', 'getter returns changed value');
-			
-			$.webshims.ready('DOM es5', function(){
-				start();
-			});
-		});
-	}
 	
-	if(Modernizr.advancedObjectProperties){
-		asyncTest("extreme advanced Object (support.advancedObjectProperties)", function(){	
-			var desc;
-			var keys = '';
-			var obj = Object.create({
-				foo: 'bar'
-			}, {
-				baz: {
+		asyncTest("advanced Object (support.objectAccessor)", function(){	
+			if (Modernizr.objectAccessor) {
+				var desc;
+				var obj = $.webshims.objectCreate({
+					foo: 'bar'
+				}, {
+					baz: {
+						set: function(value){
+							this.setTest = value;
+						},
+						get: function(){
+							return 'bar';
+						}
+					}
+				});
+				
+				equals(obj.foo, 'bar', 'access proto');
+				obj.baz = 'setBar';
+				equals(obj.setTest, 'setBar', 'setter invoked with right value');
+				equals(obj.baz, 'bar', 'getter returns right value');
+				desc = $.webshims.getOwnPropertyDescriptor(obj, 'baz');
+				equals(desc.configurable, true, 'getOwnPropertyDescriptor writeable');
+				equals(desc.enumerable, true, 'getOwnPropertyDescriptor enumerable');
+				equals(desc.value, undefined, 'getOwnPropertyDescriptor value');
+				ok($.isFunction(desc.set), 'getOwnPropertyDescriptor set is a function');
+				
+				$.webshims.defineProperty(document.createElement('b').constructor.prototype, 'magic', {
 					set: function(value){
-						this.setTest = value;
+						this._magic = value;
 					},
 					get: function(){
-						return 'bar';
-					},
-					enumerable: false,
-					configurable: false
-				}
-			});
-		
-						
-			$.each(obj, function(key, value){
-				keys += key;
-			});
-			
-			equals(keys, 'foo', 'baz is not enumerable');
-			
-			obj.baz = 'setBar';
-			equals(obj.setTest, 'setBar', 'setter invoked with right value');
-			equals(obj.baz, 'bar', 'getter returns right value');
-			
-			
-			
+						return this._magic || '';
+					}
+				});
+				
+				obj = $('<b />')[0];
+				equals(obj.magic, '', 'getter returns right value');
+				obj.magic = 'foo bar';
+				equals(obj.magic, 'foo bar', 'getter returns changed value');
+			}
 			$.webshims.ready('DOM es5', function(){
 				start();
 			});
+			
 		});
-	}
+	
+	
+	
+		asyncTest("extreme advanced Object (support.advancedObjectProperties)", function(){	
+			if (Modernizr.advancedObjectProperties) {
+				var desc;
+				var keys = '';
+				var obj = Object.create({
+					foo: 'bar'
+				}, {
+					baz: {
+						set: function(value){
+							this.setTest = value;
+						},
+						get: function(){
+							return 'bar';
+						},
+						enumerable: false,
+						configurable: false
+					}
+				});
+				
+				
+				$.each(obj, function(key, value){
+					keys += key;
+				});
+				
+				equals(keys, 'foo', 'baz is not enumerable');
+				
+				obj.baz = 'setBar';
+				equals(obj.setTest, 'setBar', 'setter invoked with right value');
+				equals(obj.baz, 'bar', 'getter returns right value');
+				
+			}
+				
+			$.webshims.ready('DOM es5', function(){
+				start();
+			});
+			
+		});
+	
 	
 })(jQuery);

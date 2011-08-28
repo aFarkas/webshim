@@ -581,8 +581,32 @@ var toInteger = function (n) {
 
 
 (function($, shims){
+	var defineProperty = 'defineProperty';
+	var advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
+	//safari5 has defineProperty-interface, but it can't be used on dom-object
+	//only do this test in non-IE browsers, because this hurts dhtml-behavior in some IE8 versions
+	if (advancedObjectProperties && !$.browser.msie && Object[defineProperty] && Object.prototype.__defineGetter__) {
+		(function(){
+			try {
+				var foo = document.createElement('foo');
+				Object[defineProperty](foo, 'bar', {
+					get: function(){
+						return true;
+					}
+				});
+				advancedObjectProperties = !!foo.bar;
+			} 
+			catch (e) {
+				advancedObjectProperties = false;
+			}
+			foo = null;
+		})();
+	}
 	
-if((!Modernizr.advancedObjectProperties || !Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor  || !Object.defineProperty) && window.jQuery && jQuery.webshims){
+	Modernizr.objectAccessor = !!((advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)) && (!$.browser.opera || shims.browserVersion >= 11));
+	Modernizr.advancedObjectProperties = advancedObjectProperties;
+	
+if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor  || !Object.defineProperty)){
 	var call = Function.prototype.call;
 	var prototypeOfObject = Object.prototype;
 	var owns = call.bind(prototypeOfObject.hasOwnProperty);
