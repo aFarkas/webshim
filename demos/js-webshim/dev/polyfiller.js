@@ -438,7 +438,7 @@
 								len++;
 								fPart.push(src);
 								combiNames.push(loadName);
-								if (len >= combo.maxFiles) {
+								if (len >= combo.maxFiles || (len > 9 && fPart.join(',,,,').length > 200)) {
 									loadScript(combo.fn(combo.base, combo.scriptPath, combo.seperator, fPart), combiNames);
 									fPart = [];
 									combiNames = [];
@@ -1111,7 +1111,7 @@
 			.filter('[data-polyfill-cfg]')
 			.each(function(){
 				try {
-					webshims.setOption( $.parseJSON( $(this).data('polyfillCfg') ) );
+					webshims.setOptions( $(this).data('polyfillCfg') );
 				} catch(e){
 					webshims.warn('error parsing polyfill cfg: '+e);
 				}
