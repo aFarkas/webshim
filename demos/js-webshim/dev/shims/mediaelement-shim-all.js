@@ -121,16 +121,12 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		$.event.trigger(evt, undefined, elem);
 	};
 	var stopMutedAnnounce;
-	var jwplugin = webshims.loader.basePath +'swf/jwwebshims.swf';
-	var playerSwfPath = webshims.loader.basePath + "jwplayer/player.swf";
+	var jwplugin = webshims.cfg.basePath +'swf/jwwebshims.swf';
+	var playerSwfPath = webshims.cfg.basePath + "jwplayer/player.swf";
 	if(hasFlash){
 		webshims.ready('WINDOWLOAD', function(){
 			if(!loadedSwf){
-				$.ajax(jwplugin, $.extend({
-					complete: function(){
-						$.ajax(jwplugin, webshims.xhrPreloadOption);
-					}
-				}, webshims.xhrPreloadOption));
+				$.ajax(jwplugin, webshims.xhrPreloadOption);
 			}
 		});
 	}
@@ -203,12 +199,17 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			},
 			META: function(obj, data){
 				
-				if( !('duration' in obj) ){return;}
+				if( !('duration' in obj) && !('youtubequalitylevels' in obj) ){return;}
 				
 				data = data && data.networkState ? data : getSwfDataFromID(obj.id);
 				
 				if(!data || data._metadata ){return;}
 				data._metadata = true;
+				if(data.duration && !('duration' in obj) && ('youtubequalitylevels' in obj) ){
+					trigger(data._elem, 'loadedmetadata');
+					return;
+				}
+				
 				var oldDur = data.duration;
 				data.duration = obj.duration;
 				data.videoHeight = obj.height || 0;
@@ -289,9 +290,24 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				if(!data){return;}
 				mediaelement.setError(elem, obj.message);
 			},
-//			SEEK: function(){
-//				webshims.log('controller', arguments)
-//			},
+			SEEK: function(obj){
+				var data = getSwfDataFromID(obj.id);
+				if(!data){return;}
+				if(data.ended){
+					data.ended = false;
+				}
+				if(data.paused){
+					try {
+						data.jwapi.sendEvent('play', 'false');
+					} catch(er){}
+				}
+				if(data.currentTime != obj.position){
+					data.currentTime = obj.position;
+					trigger(data._elem, 'timeupdate');
+				}
+				
+				
+			},
 			VOLUME: function(obj){
 				var data = getSwfDataFromID(obj.id);
 				if(!data){return;}
@@ -353,14 +369,17 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		var widthAuto;
 		var heightAuto;
 		var shadowElem;
+		var errorTimer;
 		var setSize = function(width, height){
+			if(!height || !width || height < 1 || width < 1 || data.isActive != 'flash'){return;}
 			if(img){
 				img.remove();
 				img = false;
 			}
-			if(!height || !width || height < 1 || width < 1 || data.isActive != 'flash'){return;}
+			clearTimeout(errorTimer);
 			widthAuto = data._elem.style.width == 'auto';
 			heightAuto = data._elem.style.height == 'auto';
+			
 			if(!widthAuto && !heightAuto){return;}
 			shadowElem = shadowElem || $(data._elem).getShadowElement();
 			var cur;
@@ -386,16 +405,42 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				img.remove();
 				img = false;
 			}
-			img = $('<img style="position: absolute; height: 1px; width: 1px; top: 0px; left: 0px; visibility: hidden;" />')
-				.bind('load error alreadycomplete', function(){
-					$(this).css({width: 'auto', height: 'auto'}).unbind();
-					setSize(this.naturalWidth || this.width, this.naturalHeight || this.height);
+			img = $('<img style="position: absolute; height: auto; width: auto; top: 0px; left: 0px; visibility: hidden;" />');
+			img
+				.bind('load error alreadycomplete', function(e){
+					clearTimeout(errorTimer);
+					$(this).unbind();
+					var elem = this;
+					var width = elem.naturalWidth || elem.width || elem.offsetWidth;
+					var height = elem.naturalHeight || elem.height || elem.offsetHeight;
+					
+					if(height && width){
+						setSize(width, height);
+						elem = null;
+					} else {
+						setTimeout(function(){
+							width = elem.naturalWidth || elem.width || elem.offsetWidth;
+							height = elem.naturalHeight || elem.height || elem.offsetHeight;
+							setSize(width, height);
+							if(img){
+								img.remove();
+								img = false;
+							}
+							elem = null;
+						}, 9);
+					}
+					
 				})
 				.prop('src', posterSrc)
 				.appendTo('body')
 				.each(function(){
-					if(this.complete){
+					if(this.complete || this.error){
 						$(this).triggerHandler('alreadycomplete');
+					} else {
+						clearTimeout(errorTimer);
+						errorTimer = setTimeout(function(){
+							$(data._elem).triggerHandler('error');
+						}, 9000);
 					}
 				})
 			;
@@ -421,9 +466,11 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		startAutoPlay(data);
 	});
 	
+	var localConnectionTimer;
 	mediaelement.jwPlayerReady = function(jwData){
 		var data = getSwfDataFromID(jwData.id);
-		if(!data ||  !data.jwapi){return;}
+		if(!data || !data.jwapi){return;}
+		clearTimeout(localConnectionTimer);
 		data.jwData = jwData;
 		if(!data.wasSwfReady){
 			var version = parseFloat( jwData.version, 10);
@@ -632,6 +679,18 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				data.jwapi = swfData.ref;
 				if(!hasControls){
 					$(swfData.ref).attr('tabindex', '-1').css('outline', 'none');
+				}
+				if(!localConnectionTimer){
+					clearTimeout(localConnectionTimer);
+					localConnectionTimer = setTimeout(function(){
+						var elem = $(swfData.ref);
+						if(elem[0].offsetWidth > 1 && elem[0].offsetHeight > 1 && location.protocol.indexOf('file:') === 0){
+							webshims.warn("Add your local development-directory to the local-trusted security sandbox:  http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html")
+						} else {
+							webshims.info("JS-SWF connection can't be established on hidden or unconnected flash objects");
+						}
+						elem = null;
+					}, 8000);
 				}
 			}
 		});
