@@ -7,6 +7,8 @@
 			var submitter = (window.opener || window.parent).submitterTest;
 			if(submitter){
 				submitter(window.name, window.location.search, 1);
+			} else {
+				alert(window.name)
 			}
 			//window.close();
 		</script>

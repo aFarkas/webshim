@@ -385,7 +385,7 @@
 	</form> 
 	
 	
-	<form id="form-buttons" action="test-ext/form-tester-1.html" target="_originaltarget" method="post">
+	<form id="form-buttons" action="test-ext/form-tester-1.html" target="originaltarget" method="post">
 		<input type="hidden" name="test" value="bla" />
 		<input type="image" class="target-image-test" formtarget="image-target" value="fds"/>
 		
@@ -404,12 +404,12 @@
 		<input type="submit"  class="enctype-submit-test"  formenctype="text/plain" formaction="test-ext/form-tester-2.html" value="fds" />
 		
 		
-		<button class="empty-test">
+		<button class="empty-test" type="submit">
 			<span>fdsf</span>
 		</button>
 		
 	</form>
-	<iframe name="_originaltarget" id="_originaltarget"></iframe>
+	<iframe name="originaltarget" id="originaltarget"></iframe>
 	<iframe name="image-target" id="image-target"></iframe>
 </div>
 

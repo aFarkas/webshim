@@ -11,11 +11,12 @@
 		results.target = target;
 		results.search = search;
 		results.action = action;
-		addTest();
+		
 		$.webshims.ready('DOM forms', function(){
 			setTimeout(function(){
+				addTest();
 				start();
-			}, 100);
+			}, 50);
 			
 		});
 	};
@@ -60,7 +61,7 @@
 		$('input.enctype-submit-test', form).click();
 		stop();
 		addTest = function(){
-			equals(results.target, '_originaltarget');
+			equals(results.target, 'originaltarget');
 			equals(results.search, '');
 			equals(results.action, 2);
 			equals(form.prop('method'), "post");
@@ -76,21 +77,22 @@
 	
 	asyncTest("target-dynamic-change-test", function(){
 		var form = $('#form-buttons');
-		$('input.target-image-test', form).removeAttr('formTarget').attr('formmethod', 'get').click();
+		$('input.target-image-test', form).removeAttr('formtarget').attr('formmethod', 'get').click();
 		stop();
 		addTest = function(){
-			equals(results.target, '_originaltarget');
+			equals(results.target, 'originaltarget');
 			ok(results.search);
 			equals(results.action, 1);
 			equals(form.prop('method'), "post");
 			equals(form.attr('action'), "test-ext/form-tester-1.html");
-			equals(form.prop('target'), "_originaltarget");
+			equals(form.prop('target'), "originaltarget");
 		};
 		setTimeout(function(){
 			$.webshims.ready('DOM forms', start);
-		}, 10);
+		}, 20);
 	});
 	
+	//fails in ie7 ToDo:
 	asyncTest("target-test", function(){
 		var form = $('#form-buttons');
 		$('input.target-image-test', form).click();
@@ -101,12 +103,12 @@
 			equals(results.action, 1);
 			equals(form.prop('method'), "post");
 			equals(form.attr('action'), "test-ext/form-tester-1.html");
-			equals(form.prop('target'), "_originaltarget");
+			equals(form.prop('target'), "originaltarget");
 		};
 		
 		setTimeout(function(){
 			$.webshims.ready('DOM forms', start);
-		}, 10);
+		}, 30);
 	});
 	
 	
@@ -115,7 +117,7 @@
 		$('button.empty-test', form).click();
 		stop();
 		addTest = function(){
-			equals(results.target, '_originaltarget');
+			equals(results.target, 'originaltarget');
 			equals(results.search, '');
 			equals(results.action, 1);
 			equals(form.prop('method'), "post");
@@ -124,7 +126,7 @@
 		
 		setTimeout(function(){
 			$.webshims.ready('DOM forms', start);
-		}, 10);
+		}, 40);
 	});
 	
 	

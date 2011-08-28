@@ -176,17 +176,7 @@ var Storage = function (type) {
 	};
 };
 
-//if(('sessionStorage' in window) && window.Storage && window.Storage.prototype && ('key' in sessionStorage) && ('length' in sessionStorage) && !('clear' in sessionStorage)){
-//	window.Storage.prototype.clear = function(){
-//		var items = [];
-//		for(var i = 0, len = this.length || 0; i < len && this.key; i++){
-//			items.push(this.key(i));
-//		}
-//		for(i = 0, len = items.length || 0; i < len && this.removeItem; i++){
-//			this.removeItem(items[i]);
-//		}
-//	};
-//}
+
 
 if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session');}
 
@@ -291,7 +281,7 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 		runStart = true;
 		if(window.swfobject && swfobject.hasFlashPlayerVersion('8.0.0')){
 			$('body')[$.browser.mozilla ? 'after' : 'append']('<div id="swflocalstorageshim-wrapper"><div id="swflocalstorageshim" /></div>');
-			swfobject.embedSWF(webshims.cfg.basePath +'swf/localStorage.swf' +($.webshims.cfg.addCacheBuster || ''), 'swflocalstorageshim', '295', '198', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'swflocalstorageshim'}, function(e){
+			swfobject.embedSWF($.webshims.cfg.basePath +'swf/localStorage.swf' +($.webshims.cfg.addCacheBuster || ''), 'swflocalstorageshim', '295', '198', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'swflocalstorageshim'}, function(e){
 				if(!e.success && !window.localStorage){
 					localStorageSwfCallback();
 				}
