@@ -4,115 +4,23 @@
 	var special = $.event.special;
 	var emptyJ = $([]);
 	var Modernizr = window.Modernizr;
-	var modernizrInputAttrs = Modernizr.input || {};
-	var modernizrInputTypes = Modernizr.inputtypes || {};
+	var modernizrInputAttrs = Modernizr.input;
+	var modernizrInputTypes = Modernizr.inputtypes;
 	var browserVersion = parseFloat($.browser.version, 10);
 	var Object = window.Object;
 	var defineProperty = 'defineProperty';
 	var formvalidation = 'formvalidation';
-	var valueAsNumber = 'valueAsNumber';
-	var validationmessage = 'validationmessage';
+	var addTest = Modernizr.addTest;
 	
 	//new Modernizrtests
-	(function(){
-		var addTest = Modernizr.addTest;
-		var form = $('<form action="#"><select /><input type="date" required name="a" /></form>');
-		var dateElem = $('input', form);
+	addTest('details', function(){
+		return ('open' in document.createElement('details'));
+	});
+	
+	Modernizr.genericDOM = !!($('<video><div></div></video>')[0].innerHTML);
+	
+	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor && Function.prototype.bind);
 		
-		//using hole modernizr api
-		addTest(formvalidation, function(){
-			return !!('checkValidity' in form[0]);
-		});
-		
-		addTest('datalist', function(){
-			return !!(modernizrInputAttrs.list && window.HTMLDataListElement);
-		});
-		
-		addTest(validationmessage, function(){
-			if (!Modernizr[formvalidation]) {
-				return false;
-			}
-			//the form has to be connected in FF4
-			form.appendTo('head');
-			return !!(dateElem.prop('validationMessage'));
-		});
-		
-		addTest('output', function(){
-			return (Modernizr[formvalidation] && 'value' in document.createElement('output'));
-		});
-		
-		addTest('details', function(){
-			return ('open' in document.createElement('details'));
-		});
-		
-		Modernizr.genericDOM = !!($('<video><div></div></video>')[0].innerHTML);
-		
-		//using only property api
-		Modernizr.requiredSelect = !!(Modernizr[formvalidation] && 'required' in $('select', form)[0]);
-		
-		//bugfree means interactive formvalidation including correct submit-invalid event handling (this can't be detected, we can just guess)
-		Modernizr.bugfreeformvalidation = Modernizr[formvalidation] && Modernizr.requiredSelect && Modernizr[validationmessage] && (!$.browser.webkit || (navigator.userAgent.indexOf('hrome') != -1 && browserVersion > 534.19)) && !window.testGoodWithFix;
-		
-		
-		modernizrInputAttrs[valueAsNumber] = false;
-		modernizrInputAttrs.valueAsNumberSet = false;
-		modernizrInputAttrs.valueAsDate = false;
-		
-		if (Modernizr[formvalidation]) {
-			modernizrInputAttrs[valueAsNumber] = (valueAsNumber in dateElem[0]);
-			if (modernizrInputAttrs[valueAsNumber]) {
-				dateElem[0][valueAsNumber] = 0;
-				modernizrInputAttrs.valueAsNumberSet = (dateElem[0].value == '1970-01-01');
-				
-			}
-			modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem[0]);
-			form.remove();
-		}
-		
-		if (modernizrInputAttrs[valueAsNumber] && !modernizrInputAttrs.valueAsNumberSet) {
-			Modernizr.bugfreeformvalidation = false;
-		}
-		form = dateElem = null;
-		
-		Modernizr.ES5base = !!(String.prototype.trim && Date.now && Date.prototype.toISOString);
-		Modernizr.ES5extras = !!(Array.isArray && Object.keys && Object.create && Function.prototype.bind && Object.defineProperties);// && !isNaN( Date.parse("T00:00") )
-		if (Modernizr.ES5base) {
-			$.each(['filter', 'map', 'every', 'reduce', 'reduceRight', 'lastIndexOf'], function(i, name){
-				if (!Array.prototype[name]) {
-					Modernizr.ES5base = false;
-					return false;
-				}
-			});
-		}
-		
-		
-		
-		var advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
-		//safari5 has defineProperty-interface, but it can't be used on dom-object
-		//only do this test in non-IE browsers, because this hurts dhtml-behavior in some IE8 versions
-		if (!$.browser.msie && Object[defineProperty] && Object.prototype.__defineGetter__) {
-			(function(){
-				try {
-					var foo = document.createElement('foo');
-					Object[defineProperty](foo, 'bar', {
-						get: function(){
-							return true;
-						}
-					});
-					advancedObjectProperties = !!foo.bar;
-				} 
-				catch (e) {
-					advancedObjectProperties = false;
-				}
-				foo = null;
-			})();
-		}
-		
-		Modernizr.ES5 = (Modernizr.ES5base && Modernizr.ES5extras && advancedObjectProperties);
-		Modernizr.objectAccessor = !!((advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)) && (!$.browser.opera || browserVersion >= 11));
-		Modernizr.domAccessor = !!(Modernizr.objectAccessor || (Object[defineProperty] && Object.getOwnPropertyDescriptor));
-		Modernizr.advancedObjectProperties = advancedObjectProperties;
-	})();
 	
 	if (!window.iepp && !Modernizr.genericDOM && !$.isReady) {
 		$.each(['datalist', 'source', 'video', 'audio', 'details', 'summary', 'canvas', 'output'], function(i, name){
@@ -124,7 +32,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.8alpha2',
+		version: '1.8alpha4',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -149,7 +57,27 @@
 						});
 					}
 				}
-			}
+			},
+			comboOptions: {
+				seperator: ',',
+				base: '/min/f=',
+				maxFiles: 10,
+				
+				fn: function(base, scriptPath, seperator, srces){
+					return base +
+					$.map(srces, function(src){
+						return scriptPath + src;
+					}).join(seperator);
+				}
+			},
+			basePath: (function(){
+				var script = $('script').filter('[src="polyfiller.js"]');
+				var path;
+				script = script[0] || script.end()[script.end().length - 1];
+				path = ((!$.browser.msie || document.documentMode >= 8) ? script.src : script.getAttribute("src", 4)).split('?')[0];
+				path = path.slice(0, path.lastIndexOf("/") + 1) + 'shims/';
+				return path;
+			})()
 		},
 		browserVersion: browserVersion,
 		/*
@@ -164,6 +92,7 @@
 		setOptions: function(name, opts){
 			if (typeof name == 'string' && opts !== undefined) {
 				webCFG[name] = (!$.isPlainObject(opts)) ? opts : $.extend(true, webCFG[name] || {}, opts);
+				
 			}
 			else 
 				if (typeof name == 'object') {
@@ -191,30 +120,37 @@
 		
 		polyfill: (function(){
 			var firstPolyfillCall = function(features){
-				var loadingTimer;
 				var addClass = [];
 				var onReadyEvts = features;
+				var timers = [];
 				
+				var addLongTimer = function(index, delay){
+					clearTimeout(timers[index]);
+					timers[index] = setTimeout(function(){
+						$('html').addClass('long-loading-polyfills');
+					}, delay);
+				};
 				var removeLoader = function(){
-					$('html').removeClass('loading-polyfills long-loading-polyfills polyfill-remove-fouc');
+					if($('html').hasClass('long-loading-polyfills')){
+						webshims.warn('Polyfilling takes a little bit long');
+					}
+					$('html').removeClass('loading-polyfills long-loading-polyfills');
 					$(window).unbind('.lP');
-					clearTimeout(loadingTimer);
+					$(document).unbind('ready.lP');
+					clearTimeout(timers[0]);
+					clearTimeout(timers[1]);
 				};
 				
 				if (!$.isReady) {
-					if (webCFG.removeFOUC) {
-						if (webCFG.waitReady) {
-							onReadyEvts = onReadyEvts.concat(['DOM']);
-						}
-						addClass.push('polyfill-remove-fouc');
-					}
+					
 					addClass.push('loading-polyfills');
 					$(window).bind('load.lP polyfillloaderror.lP  error.lP', removeLoader);
-					loadingTimer = setTimeout(function(){
-						$('html').addClass('long-loading-polyfills');
-					}, 600);
-				}
-				else {
+					addLongTimer(0, 600);
+					
+					$(document).bind('ready.lP', function(){
+						addLongTimer(1, 300);
+					});
+				} else {
 					webshims.warn('You should call $.webshims.polyfill before DOM-Ready');
 				}
 				onReady(features, removeLoader);
@@ -421,16 +357,6 @@
 		 */
 		loader: {
 		
-			basePath: (function(){
-				var script = $('script').filter('[src="polyfiller.js"]');
-				var path;
-				script = script[0] || script.end()[script.end().length - 1];
-				path = ((!$.browser.msie || document.documentMode >= 8) ? script.src : script.getAttribute("src", 4)).split('?')[0];
-				path = path.slice(0, path.lastIndexOf("/") + 1) + 'shims/';
-				return path;
-			})(),
-			
-			
 			addModule: function(name, ext){
 				modules[name] = ext;
 				ext.name = ext.name || name;
@@ -498,20 +424,8 @@
 					var fPart = [];
 					var combiNames = [];
 					var len = 0;
-					var l = location;
 					
-					combo = $.extend({
-						seperator: ',',
-						base: '/min/f=',
-						maxFiles: 10,
-						scriptPath: loader.basePath.replace(l.protocol + '//' + l.host + '/', ''),
-						fn: function(base, scriptPath, seperator, srces){
-							return base +
-							$.map(srces, function(src){
-								return scriptPath + src;
-							}).join(seperator);
-						}
-					}, typeof combo == 'object' ? combo : {});
+					combo = $.extend({}, webCFG.comboOptions, typeof combo == 'object' ? combo : {});
 					
 					$.each(toLoad, function(i, loadName){
 						if ($.inArray(loadName, loadedModules) == -1) {
@@ -586,7 +500,7 @@
 				if (webCFG.addCacheBuster) {
 					src += webCFG.addCacheBuster;
 				}
-				return loader.basePath + src;
+				return webCFG.basePath + src;
 			},
 			
 			loadCSS: (function(){
@@ -617,7 +531,7 @@
 					var errorTimer;
 					var error = function(){
 						$(window).triggerHandler('polyfillloaderror');
-						webshims.warn('Error: could not find "' + src + '" | configure polyfill-path: $.webshims.loader.basePath = "path/to/shims-folder"');
+						webshims.warn('Error: could not find "' + src + '" | configure polyfill-path: $.webshims.setOptions("basePath", "path/to/shims-folder"');
 						complete();
 					};
 					var complete = function(){
@@ -951,74 +865,85 @@
 		
 	/* json + loacalStorage */
 	
-	addPolyfill('json-storage', {
-		test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
-		loadInit: function(){
-			loadList(['swfobject']);
-		},
-		noAutoCallback: true
-	});
+	if('localstorage' in Modernizr) {
+		addPolyfill('json-storage', {
+			test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
+			loadInit: function(){
+				loadList(['swfobject']);
+			},
+			noAutoCallback: true
+		});
+	}
 	
 	/* END: json + loacalStorage */
 	
 	/* geolocation */
-	addPolyfill('geolocation', {
-		test: Modernizr.geolocation,
-		options: {destroyWrite: true, confirmText: ''},
-		dependencies: ['json-storage']
-	});
+	if('geolocation' in Modernizr){
+		addPolyfill('geolocation', {
+			test: Modernizr.geolocation,
+			options: {
+				destroyWrite: true
+	//			,confirmText: ''
+			},
+			dependencies: ['json-storage']
+		});
+	}
 	/* END: geolocation */
 	
 	/* canvas */
 	(function(){
-		var flashCanvas;
-		addPolyfill('canvas', {
-			src: 'excanvas',
-			test: Modernizr.canvas,
-			options: {type: 'excanvas'}, //excanvas | flash | flashpro
-			noAutoCallback: true,
-			loadInit: function(){
-				var type = this.options.type;
-				var src;
-				if(type && type.indexOf('flash') !== -1 && (!window.swfobject || swfobject.hasFlashPlayerVersion('9.0.0'))){
-					window.FlashCanvasOptions = window.FlashCanvasOptions || {};
-					flashCanvas = FlashCanvasOptions;
-					if(type == 'flash'){
-						$.extend(flashCanvas, {swfPath: loader.basePath + 'FlashCanvas/'});
-						this.src = 'FlashCanvas/flashcanvas';
-						src = flashCanvas.swfPath + 'flashcanvas.swf';
-					} else {
-						$.extend(flashCanvas, {swfPath: loader.basePath + 'FlashCanvasPro/'});
-						this.src = 'FlashCanvasPro/flashcanvas';
-						//assume, that the user has flash10+
-						src = flashCanvas.swfPath + 'flash10canvas.swf';
+		if('canvas' in Modernizr) {
+			var flashCanvas;
+			addPolyfill('canvas', {
+				src: 'excanvas',
+				test: Modernizr.canvas,
+				options: {type: 'excanvas'}, //excanvas | flash | flashpro
+				noAutoCallback: true,
+				loadInit: function(){
+					var type = this.options.type;
+					var src;
+					if(type && type.indexOf('flash') !== -1 && (!window.swfobject || swfobject.hasFlashPlayerVersion('9.0.0'))){
+						window.FlashCanvasOptions = window.FlashCanvasOptions || {};
+						flashCanvas = FlashCanvasOptions;
+						if(type == 'flash'){
+							$.extend(flashCanvas, {
+								swfPath: webCFG.basePath + 'FlashCanvas/'
+							});
+							this.src = 'FlashCanvas/flashcanvas';
+							src = flashCanvas.swfPath + 'flashcanvas.swf';
+						} else {
+							$.extend(flashCanvas, {swfPath: webCFG.basePath + 'FlashCanvasPro/'});
+							this.src = 'FlashCanvasPro/flashcanvas';
+							//assume, that the user has flash10+
+							src = flashCanvas.swfPath + 'flash10canvas.swf';
+						}
+						//todo: implement cachbuster for flashcanvas
+	//					if(webCFG.addCacheBuster){
+	//						src += webCFG.addCacheBuster;
+	//					}
+						//preload swf
+						if(src){
+							$.ajax(src, xhrPreloadOption);
+						}
 					}
-					//todo: implement cachbuster for flashcanvas
-//					if(webCFG.addCacheBuster){
-//						src += webCFG.addCacheBuster;
-//					}
-					//preload swf
-					if(src){
-						$.ajax(src, xhrPreloadOption);
-					}
-				}
-			},
-			afterLoad: function(){
-				webshims.addReady(function(context, elem){
-					$('canvas', context).add(elem.filter('canvas')).each(function(){
-						var hasContext = this.getContext;
-						if(!hasContext){
-							G_vmlCanvasManager.initElement(this);
+				},
+				afterLoad: function(){
+					webshims.addReady(function(context, elem){
+						$('canvas', context).add(elem.filter('canvas')).each(function(){
+							var hasContext = this.getContext;
+							if(!hasContext){
+								G_vmlCanvasManager.initElement(this);
+							}
+						});
+						if(context == document){
+							isReady('canvas', true);
 						}
 					});
-					if(context == document){
-						isReady('canvas', true);
-					}
-				});
-			},
-			methodNames: ['getContext'],
-			dependencies: ['es5', 'dom-support']
-		});
+				},
+				methodNames: ['getContext'],
+				dependencies: ['es5', 'dom-support']
+			});
+		}
 	})();
 	
 	/* END: canvas */
@@ -1028,87 +953,98 @@
 	 */
 	
 	/* html5 constraint validation */
-	
-	webshims.validationMessages = webshims.validityMessages = [];
-	webshims.inputTypes = {};
-			
-	addPolyfill('form-core', {
-		feature: 'forms',
-		dependencies: (Modernizr[validationmessage]) ? ['es5'] : ['es5', 'dom-extend'],
-		loadInit: function(){
-			if(this.options.customMessages && Modernizr[validationmessage]){
-				loadList(["dom-extend"]);
-			}
-		},
-		options: {
-			placeholderType: 'value'
-//			,customMessages: false,
-//			overrideMessages: false,
-//			replaceValidationUI: false
-		},
-		methodNames: ['setCustomValidity','checkValidity']
-	});
-			
-	if(Modernizr[formvalidation]){
-		//create delegatable-like events
-		webshims.capturingEvents(['input']);
-		webshims.capturingEvents(['invalid'], true);
+	if(modernizrInputAttrs && modernizrInputTypes){
+		//using hole modernizr api
+		addTest(formvalidation, function(){
+			return !!(modernizrInputAttrs.required && 'checkValidity' in document.createElement('form'));
+		});
 		
-		addPolyfill('form-extend', {
+		addTest('datalist', function(){
+			return !!(modernizrInputAttrs.list && window.HTMLDataListElement);
+		});
+		
+		
+		addTest('output', function(){
+			return (Modernizr[formvalidation] && 'value' in document.createElement('output'));
+		});
+		
+		webshims.validationMessages = webshims.validityMessages = [];
+		webshims.inputTypes = {};
+				
+		addPolyfill('form-core', {
 			feature: 'forms',
-			src: 'form-native-extend',
-			test: function(toLoad){
-				return (Modernizr.bugfreeformvalidation && (modules['forms-ext'].test(toLoad) || $.inArray('forms-ext', toLoad) == -1) && !this.options.overrideMessages );
+			dependencies: ['es5'],
+			loadInit: function(){
+				if(this.options.customMessages){
+					loadList(["dom-extend"]);
+				}
 			},
-			dependencies: ['form-core', 'dom-support']
+			options: {
+				placeholderType: 'value'
+	//			,customMessages: false,
+	//			overrideMessages: false,
+	//			replaceValidationUI: false
+			},
+			methodNames: ['setCustomValidity','checkValidity']
 		});
+				
+		if(Modernizr[formvalidation]){
+			//create delegatable-like events
+			webshims.capturingEvents(['input']);
+			webshims.capturingEvents(['invalid'], true);
+			
+			//ToDo merge this with form-core (to minimize small requests)
+			addPolyfill('form-extend', {
+				feature: 'forms',
+				src: 'form-native-extend',
+				test: function(toLoad){
+					return ((modules['forms-ext'].test(toLoad) || $.inArray('forms-ext', toLoad) == -1) && !this.options.overrideMessages );
+				},
+				dependencies: ['form-core', 'dom-support']
+			});
+					
+			addPolyfill('form-output-datalist', {
+				feature: 'forms',
+				test: Modernizr.output && Modernizr.datalist && modernizrInputAttrs.list,
+				dependencies: ['dom-support']
+			});
+			
+		} else {
+			
+			//ToDo merge this with form-core:
+			addPolyfill('form-extend', {
+				feature: 'forms',
+				src: 'form-shim-all',
+				dependencies: ['form-core', 'dom-support']
+			});
+		}
 		
-		addPolyfill('form-native-fix', {
-			feature: 'forms',
-			test: Modernizr.bugfreeformvalidation,
-			dependencies: ['form-extend']
-		});
 		
-		addPolyfill('form-output-datalist', {
-			feature: 'forms',
-			test: Modernizr.output && Modernizr.datalist && modernizrInputAttrs.list,
-			dependencies: ['dom-support']
-		});
-		
-	} else {
-		//this also serves as base for non capable browsers
-		addPolyfill('form-extend', {
-			feature: 'forms',
-			src: 'form-shim-all',
-			dependencies: ['form-core', 'dom-support']
+		addPolyfill('forms-ext', {
+			src: 'form-number-date',
+			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && !this.options.replaceUI);},
+			test: function(){return (this.uiTest());},
+			noAutoCallback: true,
+			dependencies: ['forms'],
+			loadInit: function(){
+				if(this.uiTest()){return;}
+				loadList(['jquery-ui']);
+				if(modules['input-widgets'].src){
+					loadList(['input-widgets']);
+				}
+			},
+			options: {
+				stepArrows: {number: 1, time: 1}, 
+				calculateWidth: true,
+				slider: {},
+				datepicker: {},
+				langSrc: uiLib+'i18n/jquery.ui.datepicker-',
+				recalcWidth: true
+	//			,lazyDate: undefined // true for IE8- false for fast browser 
+	//			,replaceUI: false
+			}
 		});
 	}
-	
-	
-	addPolyfill('forms-ext', {
-		src: 'form-number-date',
-		uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && !this.options.replaceUI);},
-		test: function(){return (modernizrInputAttrs.valueAsNumberSet && this.uiTest());},
-		noAutoCallback: true,
-		dependencies: ['forms'],
-		loadInit: function(){
-			if(this.uiTest()){return;}
-			loadList(['jquery-ui']);
-			if(modules['input-widgets'].src){
-				loadList(['input-widgets']);
-			}
-		},
-		options: {
-			stepArrows: {number: 1, time: 1}, 
-			calculateWidth: true,
-			slider: {},
-			datepicker: {},
-			langSrc: uiLib+'i18n/jquery.ui.datepicker-',
-			recalcWidth: true
-//			,lazyDate: undefined // true for IE8- false for fast browser 
-//			,replaceUI: false
-		}
-	});
 		
 	/* END: html5 forms */
 	
@@ -1120,7 +1056,7 @@
 			text: 'Details'
 		}
 	});
-	if('audio' in Modernizr && 'video' in Modernizr){
+	if ('audio' in Modernizr && 'video' in Modernizr){
 		webshims.mediaelement = {};
 		var swfOptions = {
 			
@@ -1135,7 +1071,7 @@
 			methodNames: ['play', 'pause', 'canPlayType', 'mediaLoad:load'],
 			dependencies: ['swfobject', 'dom-support']
 		};
-		if (Modernizr.audio && Modernizr.video) {
+		if(Modernizr.audio && Modernizr.video){
 			addPolyfill('mediaelement-core', {
 				feature: 'mediaelement',
 				test: function(){
@@ -1169,27 +1105,28 @@
 				src: 'mediaelement-shim-all'
 			}, swfOptions));
 		}
+		
+		$('script')
+			
+			.filter('[data-polyfill-cfg]')
+			.each(function(){
+				try {
+					webshims.setOption( $.parseJSON( $(this).data('polyfillCfg') ) );
+				} catch(e){
+					webshims.warn('error parsing polyfill cfg: '+e);
+				}
+			})
+			.end()
+			.filter(function(){
+				return this.getAttribute('data-polyfill') != null;
+			})
+			.each(function(){
+				webshims.polyfill( $.trim( $(this).data('polyfill') || '' ) );
+			})
+		;
 	}
-	
-	$('script')
-		.filter('[data-polyfill-path')
-		.each(function(){
-			loader.basePath = $(this).data('pollyfillPath');
-		})
-		.end()
-		.filter('[data-polyfill-cfg]')
-		.each(function(){
-			try {
-				webshims.setOption( $.parseJSON( $(this).data('pollyfillCfg') ) );
-			} catch(e){
-				webshims.warn('error parsing polyfill cfg: '+e);
-			}
-		})
-		.end()
-		.filter('[data-polyfill]')
-		.each(function(){
-			webshims.polyfill( $.trim( $(this).data('pollyfillCfg') || '' ) );
-		})
-	;
-	
+
+	//set script path for comboOptions
+	var l = location;
+	webCFG.comboOptions.scriptPath = webCFG.basePath.replace(l.protocol + '//' + l.host + '/', '');
 })(jQuery, this, this.document);

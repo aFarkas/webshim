@@ -1,7 +1,7 @@
-.polyfill-important.polyfill-remove-fouc.loading-polyfills body {
+.polyfill-important.loading-polyfills body {
 	visibility: hidden;
 }
-.polyfill-important.polyfill-remove-fouc.long-loading-polyfills {
+.polyfill-important.long-loading-polyfills {
 	background-image: url(polyfill-loader.gif);
 	background-position: center 240px;
 	background-repeat: no-repeat;

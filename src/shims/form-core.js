@@ -8,6 +8,80 @@ jQuery.webshims.gcEval = function(){
 };
 jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
+	
+	//additional tests for partial implementation of forms features
+	(function(){
+		var Modernizr = window.Modernizr;
+		if(!Modernizr.formvalidation){return;}
+		var modernizrInputAttrs = Modernizr.input || {};
+		var modernizrInputTypes = Modernizr.inputtypes || {};
+		var formvalidation = 'formvalidation';
+		var valueAsNumber = 'valueAsNumber';
+		var validationmessage = 'validationmessage';
+		var addTest = Modernizr.addTest;
+		var form = $('<form action="#"><select /><input type="date" required name="a" /></form>');
+		var dateElem = $('input', form);
+		
+		//the form has to be connected in FF4
+		form.appendTo('head');
+		
+		Modernizr[validationmessage] = !!(dateElem.prop('validationMessage'));
+		Modernizr.requiredSelect = !!('required' in $('select', form)[0]);
+		
+		//bugfree means interactive formvalidation including correct submit-invalid event handling (this can't be detected, we can just guess)
+		Modernizr.bugfreeformvalidation = Modernizr[formvalidation] && Modernizr.requiredSelect && Modernizr[validationmessage] && (!$.browser.webkit || (navigator.userAgent.indexOf('hrome') != -1 && webshims.browserVersion > 534.19)) && !window.testGoodWithFix;
+		
+		
+		modernizrInputAttrs[valueAsNumber] = false;
+		modernizrInputAttrs.valueAsNumberSet = false;
+		modernizrInputAttrs.valueAsDate = false;
+		
+		
+		modernizrInputAttrs[valueAsNumber] = (valueAsNumber in dateElem[0]);
+		if (modernizrInputAttrs[valueAsNumber]) {
+			dateElem[0][valueAsNumber] = 0;
+			modernizrInputAttrs.valueAsNumberSet = (dateElem[0].value == '1970-01-01');
+			
+		}
+		modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem[0]);
+		
+		
+		if (modernizrInputAttrs[valueAsNumber] && !modernizrInputAttrs.valueAsNumberSet) {
+			Modernizr.bugfreeformvalidation = false;
+		}
+		
+		form.remove();
+		form = dateElem = null;
+		
+		
+		if(!Modernizr.bugfreeformvalidation){
+			var toLoad = ['form-native-fix'];
+			webshims.addPolyfill('form-native-fix', {
+				feature: 'forms',
+				test: Modernizr.bugfreeformvalidation,
+				dependencies: ['form-extend']
+			});
+			//remove form-extend readyness
+			webshims.modules["form-extend"].test = false;
+			if($.event.special["form-extendReady"]){
+				delete $.event.special["form-extendReady"];
+			}
+			webshims.modules["forms-ext"].test = false;
+			if($.event.special["forms-extReady"]){
+				delete $.event.special["forms-extReady"];
+				toLoad.push('forms-ext');
+			}
+			webshims.loader.loadList(toLoad);
+			if(webshims.waitReady){
+				$.readyWait++;
+				webshims.ready(toLoad, function(){
+					$.ready(true);
+				});
+			}
+		}
+		
+	})();
+	
 	var groupTypes = {radio: 1};
 	var checkTypes = {checkbox: 1, radio: 1};
 	var emptyJ = $([]);
@@ -175,25 +249,27 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			getBodyOffset: function(){
 				bodyOffset = errorBubble.offset();
 			},
-			showFor: function(elem, message, hideOnBlur){
+			showFor: function(elem, message, noFocusElem, noBubble){
 				elem = $(elem);
 				var visual = $(elem).getShadowElement();
 				var offset = api.getOffsetFromBody(visual);
-				createAlert();
-				api.clear();
-				this.getMessage(elem, message);
-				this.position(visual, offset);
-				errorBubble.css({
-					fontSize: elem.css('fontSize'),
-					fontFamily: elem.css('fontFamily')
-				});
-				this.show();
-				
-				if(this.hideDelay){
-					hideTimer = setTimeout(boundHide, this.hideDelay);
+				if(noBubble){
+					this.hide();
+				} else {
+					api.clear();
+					this.getMessage(elem, message);
+					this.position(visual, offset);
+					errorBubble.css({
+						fontSize: elem.css('fontSize'),
+						fontFamily: elem.css('fontFamily')
+					});
+					this.show();
+					if(this.hideDelay){
+						hideTimer = setTimeout(boundHide, this.hideDelay);
+					}
 				}
 				
-				if(!hideOnBlur){
+				if(!noFocusElem){
 					this.setFocus(visual, offset);
 				}
 			},
@@ -268,19 +344,12 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		var hideTimer = false;
 		var focusTimer = false;
 		var boundHide = $.proxy(api, 'hide');
-		var created = false;
-		var createAlert = function(){
-			if(created){return;}
-			created = true;
-			
-			webshims.ready('DOM', function(){
-				errorBubble.appendTo('body');
-				if($.fn.bgIframe && $.browser.msie && parseInt($.browser.version, 10) < 7){
-					errorBubble.bgIframe();
-				}
-			});
-		};
-		createAlert();
+		webshims.ready('DOM', function(){
+			errorBubble.appendTo('body');
+			if($.fn.bgIframe && $.browser.msie && parseInt($.browser.version, 10) < 7){
+				errorBubble.bgIframe();
+			}
+		});
 		return api;
 	})();
 	
