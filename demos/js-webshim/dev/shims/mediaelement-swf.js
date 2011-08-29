@@ -48,6 +48,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	
 	var idRep = /^jwplayer-/;
 	var getSwfDataFromID = function(id){
+		
 		var elem = document.getElementById(id.replace(idRep, ''));
 		if(!elem){return;}
 		var data = webshims.data(elem, 'mediaelement');
@@ -55,6 +56,11 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	};
 	
 	var getSwfDataFromElem = function(elem){
+		try {
+			(elem.nodeName);
+		} catch(er){
+			return null;
+		}
 		var data = webshims.data(elem, 'mediaelement');
 		return (data && data.isActive== 'flash') ? data : null;
 	};

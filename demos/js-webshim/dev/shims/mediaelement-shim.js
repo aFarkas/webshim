@@ -18,7 +18,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 	});
 	
 	
-	['loop', 'autoplay', 'controls'].forEach(function(name){
+	['autoplay', 'controls'].forEach(function(name){
 		webshims.defineNodeNamesBooleanProperty(['audio', 'video'], name);
 	});
 		
