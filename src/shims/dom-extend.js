@@ -95,13 +95,14 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		});
 	};
 	
+	var dataID = '_webshimsLib'+ (Math.round(Math.random() * 1000));
 	var elementData = function(elem, key, val){
 		elem = elem.jquery ? elem[0] : elem;
 		if(!elem){return val || {};}
-		var data = $.data(elem, '_webshimsLib');
+		var data = $.data(elem, dataID);
 		if(val !== undefined){
 			if(!data){
-				data = $.data(elem, '_webshimsLib', {});
+				data = $.data(elem, dataID, {});
 			}
 			if(key){
 				data[key] = val;
