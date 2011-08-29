@@ -72,7 +72,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				toLoad.push('forms-ext');
 			}
 			webshims.loader.loadList(toLoad);
-			if(webshims.waitReady){
+			if(webshims.cfg.waitReady){
 				$.readyWait++;
 				webshims.ready(toLoad, function(){
 					$.ready(true);
