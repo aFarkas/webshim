@@ -10,15 +10,15 @@
 	<script src="../js-webshim/minified/extras/loaders/sssl.js"></script>
 	
 	<script src="../js-webshim/minified/extras/mousepress.js"></script>
-	
-	<script src="../js-webshim/minified/polyfiller.js"></script>
-	
 	<!--
+	<script src="../js-webshim/minified/polyfiller.js"></script>
+	-->
+
 		<script src="../../src/polyfiller.js"></script> 
 		<script>
 			$.webshims.debug = true;
 		</script>
-	-->
+	
     <script class="example">
     	
     	
@@ -26,6 +26,7 @@
 		
 		
         $(function(){
+			//helper for createing throttled get/set functions
 			var createGetSetHandler = function(get, set){
 				var throttleTimer;
 				var blockedTimer;
@@ -52,15 +53,17 @@
 				};
 			};
 			
+			//If you want to buld a simple player the following code can help you
 			$('div.player').each(function(){
 				var player = this;
 				var getSetCurrentTime = createGetSetHandler(
 					function(){
 						$('input.time-slider', player).prop( 'value',  $.prop(this, 'currentTime'));
-						
 					},
 					function(){
-						$('video', player).prop('currentTime', $.prop(this, 'value'));
+						try {
+							$('video', player).prop('currentTime', $.prop(this, 'value'));
+						} catch(er){}
 					}
 				);
 				var getSetVolume = createGetSetHandler(
@@ -73,15 +76,16 @@
 					}
 				);
 				$('video', this)
-					.bind('durationchange', function(){
+					.bind('durationchange updateMediaState', function(){
 						var duration = $.prop(this, 'duration');
+						if(!duration){return;}
 						$('input.time-slider', player).prop({
 							'max': duration,
 							disabled: false
 						});
 						$('span.duration', player).text(duration);
 					})
-					.bind('progress', function(){
+					.bind('progress updateMediaState', function(){
 						var buffered = $.prop(this, 'buffered');
 						if(!buffered || !buffered.length){return;}
 						$('span.progress', player).text( buffered.end(buffered.length -1) );
@@ -100,7 +104,7 @@
 						$('span.height-width', player).text( '-/-' );
 						$('span.progress', player).text('0');
 					})
-					.bind('waiting playing loadedmetadata', function(){
+					.bind('waiting playing loadedmetadata updateMediaState', function(){
 						$('span.network-state', player).text( $.prop(this, 'networkState') );
 						$('span.ready-state', player).text( $.prop(this, 'readyState') );
 					})
@@ -117,10 +121,14 @@
 					.bind('play pause', function(){
 						$('span.paused-state', player).text( $.prop(this, 'paused') );
 					})
-					.bind('loadedmetadata', function(){
+					.bind('loadedmetadata updateMediaState', function(){
 						$('span.height-width', player).text( $.prop(this, 'videoWidth') +'/'+ $.prop(this, 'videoHeight') );
 					})
-					
+					.each(function(){
+						if($.prop(this, 'readyState') > $.prop(this, 'HAVE_NOTHING')){
+							$(this).triggerHandler('updateMediaState');
+						}
+					})
 				;
 				
 				$('input.time-slider', player).bind('input', getSetCurrentTime.set);
@@ -139,6 +147,12 @@
 					$('video', player).prop('controls', $.prop(this, 'checked'));
 				}).triggerHandler('updatecontrols'); 
 				
+				$('select.load-media').bind('change', function(){
+					var src = $('option:selected', this).data('src');
+					if(src){
+						$('video', player).loadMediaSrc(src).play();
+					}
+				}).prop('selectedIndex', 0);
 			});
 			
 		});
@@ -179,26 +193,35 @@
 				<h2>HTML5 audio and video elements</h2>
 				<h3>Demo/About/Documentation audio and video elements</h3>
 			</hgroup>
-			<p>The <code>mediaelement</code> implements the audio, video and source elements including thier API and enables playing mp4, mp3 flv, fla etc. media files in incapable browsers using the <a href="http://www.longtailvideo.com/players/">famous JW Player</a>.</p>
-			<p>Note: The current state of this polyfill is extremly unstable. It's the first basic non-x-browser testet implementation. Do not use in production enviroment.</p>
+			<p>The <code>mediaelement</code> implements the audio, video and source elements including thier API and enables playing mp4, mp3, flv, fla etc. media files and playing rtmp streams in incapable browsers using the <a href="http://www.longtailvideo.com/players/">famous JW Player</a>.</p>
+			<p>Note: The current state of this polyfill is unstable. It's the first basic implementation.</p>
 			<section>
 				<h3>Implemented/fixed elements, attributes, properties, methods, events (ToDo)</h3>
 				<ul>
-					<li><strong>elements:</strong> </li>
-					<li><strong>attributes (and IDL, if existing)</strong>: </li>
-					<li><strong>properties/IDLs</strong>: </li>
-					<li><strong>methods</strong>: </li>
-					<li><strong>events</strong>: </li>
+					<li><strong>elements:</strong> video, audio, source</li>
+					<li><strong>attributes (and IDL, if existing)</strong>: controls, loop, autoplay, src</li>
+					<li><strong>properties/IDLs</strong>: paused, ended, muted, volume, currentTime, buffered, currentSrc, readyState, networkState, videoHeight, videoWidth</li>
+					<li><strong>methods</strong>: play, pause, load (mediaLoad<sup>1</sup>)</li>
+					<li><strong>events</strong>: loadedmetadata, play, pause, playing, ended, waiting, timeupdate, progress, emptied, volumechange, durationchange</li>
 				</ul>
-				
+				<p><small>1. mediaLoad is the jQuery plugin method, which corresponds to the native load method (Webshims lib does not oerride jQuery's own load-method).</small></p>
 				
 				<h3>Options for the <code>mediaelement</code> feature (ToDo)</h3>
 				
-				
+				<ul>
+					<li><strong>hasToPlay</strong> ('any'): </li>
+					<li><strong>preferFlash</strong> (false): </li>
+					<li><strong>jwVars</strong> (Flahsvars Object): </li>
+					<li><strong>jwParams</strong> (Flash/Object params):</li>
+					<li><strong>jwAttrs</strong> (Flash/Object attributes): </li>
+					<li><strong>changeJW</strong> (Manipulation function): </li>
+				</ul>
 				
 				<h3>Extensions/Abstractions to the standard (ToDo)</h3>
+				<ul>
+					<li><strong>loadMediaSrc</strong> method:</li>
+				</ul>
 				
-								
 			</section>
 			<section>
 				<h3>Simple Demo</h3>
@@ -276,9 +299,78 @@
 								<th>volume</th>
 								<td><input class="volume-slider" type="range"  value="1" max="1" step="0.01" /></td>
 							</tr>
+							<tr>
+								<th>loadMediaSrc</th>
+								<td>
+									<select class="load-media">
+										<option>Please choose</option>
+										<option data-src='[{"src": "http://cdn.yayquery.com/ep/23/yayquery_23.ogv", "type": "video/ogg"}, {"src": "http://cdn.yayquery.com/ep/23/yayquery_23.mp4", "type": "video/mp4"}]'>yayQuery - Episode 23 | When Things Are Things</option>
+										<option data-src='[{"src": "http://cdn.yayquery.com/ep/22/yayquery_22.ogv", "type": "video/ogg"}, {"src": "http://cdn.yayquery.com/ep/22/yayquery_22_ipod.mp4", "type": "video/mp4"}]'>yayQuery - Episode 22 | Which Square Can I Take?</option>
+										<option data-src='[{"src": "http://cdn.yayquery.com/ep/21/yayquery_21.ogv", "type": "video/ogg"}, {"src": "http://cdn.yayquery.com/ep/21/yayquery_21.mp4", "type": "video/mp4"}]'>yayQuery - Episode 21 | jQuery 1.5 - The Promise Lands</option>
+										<option data-src="http://www.youtube.com/watch?v=siOHh0uzcuY">Youtube: Introduction to HTML 5</option>
+										
+									</select>
+								</td>
+							</tr>
 						</tbody>
 					</table>
 				</div>
+			</section>
+			
+			<section>
+				<h2>How to...</h2>
+				<h3>Styling the video/audio elements</h3>
+				<h4>Setting dimensions</h4>
+				<p>Webshims lib does not use the width/height content attribute to get </p>
+				<h4>Using additional Styles (margin, background, float etc.)</h4>
+				
+				<h4>Using custom styleable controls</h4>
+				
+				<h2>Cookbook</h2>
+				
+				<h3>Stop other media if media starts to play</h3>
+<code class="block">
+$(document).bind('play', function(e){
+	$('audio, video').not(e.target).pause();
+});
+</code>
+				<h3>Make a simple playlist</h3>
+<code class="block">
+&lt;video src="video-1.mp4" data-palylist='["video-2.mp4", "video-3.mp4"]' controls="controls"&gt;&lt;/video&gt;
+</code>
+<code class="block">
+//get all audio and video files 
+$('video, audio')
+	//with a playlist
+	.filter('[data-playlist]')
+	.each(function(){
+		//get the playlist array form the data-attribute
+		var playlist = $(this).data('playlist');
+		//put first source into the playlist array 
+		playlist.unshift( $.prop(this, 'src') );
+		//remember index
+		var index = 0;
+		
+		//if media ends playing..
+		$(this).bind('ended', function(){
+			// get next index
+			index++;
+			//if there is no source, we loop to first index
+			if(!playlist[index]){
+				index = 0;
+			}
+			$(this)
+				//set new source
+				.prop('src', playlist[index])
+				// load new source
+				.mediaLoad() // instead of prop('src') + mediaLoad you can simply use loadMediaSrc
+				//start playing
+				.play()
+			;
+		});
+	})
+;	
+</code>
 			</section>
 			
 			<aside>
