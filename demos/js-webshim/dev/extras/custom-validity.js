@@ -1,7 +1,7 @@
 (function($, window, document, undefined){
 	"use strict";
 	if(!$.webshims){
-		var langs = [navigator.browserLanguage || navigator.language || '', $('html').attr('lang') || ''];
+		var langs = navigator.browserLanguage || navigator.language || $('html').attr('lang') || '';
 		$.webshims = {
 			addReady: function(fn){$(function(){fn(document, $([]));});},
 			ready: function(n, fn){fn();},
@@ -45,7 +45,7 @@
 				customMismatchedRule = name;
 				if(message){
 					if(typeof message != 'string'){
-						message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || webshims.customErrorMessages[name][webshims.activeLang()[0]] || webshims.customErrorMessages[name][webshims.activeLang()[1]] || webshims.customErrorMessages[name]['']; 
+						message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || webshims.customErrorMessages[name][webshims.activeLang()] || webshims.customErrorMessages[name]['']; 
 					}
 					return false;
 				}
