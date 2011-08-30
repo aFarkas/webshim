@@ -58,7 +58,6 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
  * todo: 
  * - shadowdom switch
  * - flashblocker detect
- * - buffer full event (canplay/canplaythrough)
  * - decouple muted/volume
  */
 
@@ -294,7 +293,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			ERROR: function(obj){
 				var data = getSwfDataFromID(obj.id);
 				if(!data){return;}
-				mediaelement.setError(elem, obj.message);
+				mediaelement.setError(data._elem, obj.message);
 			},
 			SEEK: function(obj){
 				var data = getSwfDataFromID(obj.id);
@@ -551,13 +550,13 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		var resetProtoProps = ['_bufferedEnd', '_bufferedStart', '_metadata', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'videoHeight', 'videoWidth'];
 		var len = resetProtoProps.length;
 		return function(data){
+			
 			if(!data){return;}
 			var lenI = len;
 			var networkState = data.networkState;
 			while(--lenI){
-				delete data[lenI];
+				delete data[resetProtoProps[lenI]];
 			}
-			
 			data.actionQueue = [];
 			data.buffered.length = 0;
 			if(networkState){
@@ -691,7 +690,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 					localConnectionTimer = setTimeout(function(){
 						var elem = $(swfData.ref);
 						if(elem[0].offsetWidth > 1 && elem[0].offsetHeight > 1 && location.protocol.indexOf('file:') === 0){
-							webshims.warn("Add your local development-directory to the local-trusted security sandbox:  http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html")
+							webshims.warn("Add your local development-directory to the local-trusted security sandbox:  http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html");
 						} else {
 							webshims.info("JS-SWF connection can't be established on hidden or unconnected flash objects");
 						}
