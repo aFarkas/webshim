@@ -663,6 +663,12 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 //			- webshims.activeLang(lang:string);
 //		get current lang
 //			- webshims.activeLang();
+//		get current lang
+//			webshims.activeLang({
+//				register: moduleName:string,
+//				callback: callback:function
+//			});
+//		get/set including removeLang
 //			- webshims.activeLang({
 //				module: moduleName:string,
 //				callback: callback:function,
@@ -670,6 +676,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 //			});
 		activeLang: (function(){
 			var callbacks = [];
+			var registeredCallbacks = {};
 			var currentLang;
 			var shortLang;
 			var loadRemoteLang = function(data, lang, options){
@@ -692,19 +699,27 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				}
 				return false;
 			};
-			
+			var callRegister = function(module){
+				if(registeredCallbacks[module]){
+					registeredCallbacks[module].forEach(function(data){
+						data.callback();
+					});
+				}
+			};
 			var callLang = function(data, _noLoop){
 				if(data.activeLang != currentLang && data.activeLang !== shortLang){
 					var options = modules[data.module].options;
 					if( data.langObj[currentLang] || (shortLang && data.langObj[shortLang]) ){
 						data.activeLang = currentLang;
 						data.callback(data.langObj[currentLang] || data.langObj[shortLang], currentLang);
+						callRegister(data.module);
 					} else if( !_noLoop &&
 						!loadRemoteLang(data, currentLang, options) && 
 						!loadRemoteLang(data, shortLang, options) && 
 						data.langObj[''] && data.activeLang !== '' ) {
 						data.activeLang = '';
 						data.callback(data.langObj[''], currentLang);
+						callRegister(data.module);
 					}
 				}
 			};
@@ -722,11 +737,20 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						callLang(data);
 					});
 				} else if(typeof lang == 'object'){
-					if(!lang.activeLang){
-						lang.activeLang = '';
+					
+					if(lang.register){
+						if(!registeredCallbacks[lang.register]){
+							registeredCallbacks[lang.register] = [];
+						}
+						registeredCallbacks[lang.register].push(lang);
+						lang.callback();
+					} else {
+						if(!lang.activeLang){
+							lang.activeLang = '';
+						}
+						callbacks.push(lang);
+						callLang(lang);
 					}
-					callbacks.push(lang);
-					callLang(lang);
 				}
 				return currentLang;
 			};

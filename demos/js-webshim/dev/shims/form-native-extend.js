@@ -187,18 +187,18 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 				$.prop(this, 'validity');
 			});
 		});
+		
+		//ToDo: implement new activeLang feature
 		if(overrideNativeMessages){
 			webshims.ready('DOM', function(){
-				var lng;
-				$(document).bind('webshimLocalizationReady', function(){
-					var curLng = webshims.activeLang()[0];
-					if(lng != curLng){
-						lng = curLng;
+				webshims.activeLang({
+					register: 'form-core',
+					callback: function(){
 						$('input, select, textarea')
 							.each(function(){
 								if(webshims.data(this, 'hasCustomError')){return;}
 								var elem = this;
-								var validity = $.prop(elem, 'validity');
+								var validity = $.prop(elem, 'validity') || {valid: true};
 								var nodeName;
 								if(validity.valid){return;}
 								nodeName = (elem.nodeName || '').toLowerCase();
