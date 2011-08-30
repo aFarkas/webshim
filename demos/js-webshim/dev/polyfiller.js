@@ -32,7 +32,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.8alpha5',
+		version: '1.8alpha6',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -122,34 +122,26 @@
 			var firstPolyfillCall = function(features){
 				var addClass = [];
 				var onReadyEvts = features;
-				var timers = [];
+				var timer;
 				
-				var addLongTimer = function(index, delay){
-					clearTimeout(timers[index]);
-					timers[index] = setTimeout(function(){
-						$('html').addClass('long-loading-polyfills');
-					}, delay);
-				};
+				
 				var removeLoader = function(){
 					if($('html').hasClass('long-loading-polyfills')){
 						webshims.warn('Polyfilling takes a little bit long');
 					}
 					$('html').removeClass('loading-polyfills long-loading-polyfills');
 					$(window).unbind('.lP');
-					$(document).unbind('ready.lP');
-					clearTimeout(timers[0]);
-					clearTimeout(timers[1]);
+					clearTimeout(timer);
 				};
 				
 				if (!$.isReady) {
 					
 					addClass.push('loading-polyfills');
 					$(window).bind('load.lP polyfillloaderror.lP  error.lP', removeLoader);
-					addLongTimer(0, 600);
+					timer = setTimeout(function(){
+						$('html').addClass('long-loading-polyfills');
+					}, 600);
 					
-					$(document).bind('ready.lP', function(){
-						addLongTimer(1, 300);
-					});
 				} else {
 					webshims.warn('You should call $.webshims.polyfill before DOM-Ready');
 				}
