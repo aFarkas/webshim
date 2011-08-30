@@ -417,8 +417,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if(!opts.shadowFocusElement){
 				opts.shadowFocusElement = shadowElem;
 			}
-			var nativeData = $.data(nativeElem, '_webshimsLib') || $.data(nativeElem, '_webshimsLib', {});
-			var shadowData = $.data(shadowElem, '_webshimsLib') || $.data(shadowElem, '_webshimsLib', {});
+			var nativeData = $.data(nativeElem, dataID) || $.data(nativeElem, dataID, {});
+			var shadowData = $.data(shadowElem, dataID) || $.data(shadowElem, dataID, {});
 			nativeData.hasShadow = shadowElem;
 			shadowData.nativeElement = nativeElem;
 			shadowData.shadowData = nativeData.shadowData = {
