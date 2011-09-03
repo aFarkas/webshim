@@ -3,12 +3,12 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>Webshims Lib Test Suite</title>
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js"></script>
 		<script src="../../src/extras/modernizr-custom.js"></script>
 		<script src="../../src/extras/loaders/yepnope.min.js" data-polyfill-cfg='{"extendNative": false, "basePath": "../../src/shims/"}' data-polyfill=""></script>
 		<script>
 			yepnope([ { 
-				load: '//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js' }, { 
+				load: '//ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.js' }, { 
 				load: '../../src/polyfiller.js',
 				complete: function(){
 					$.webshims.ready('mediaelement', function(){

@@ -5,28 +5,28 @@
 	<meta charset="utf-8"/>
 	<link href="../css/styles.css" rel="stylesheet" />
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
 	<script src="../js-webshim/minified/extras/loaders/sssl.js"></script>
 	
 	<script src="../js-webshim/minified/extras/mousepress.js"></script>
-	<!--
+	
 	<script src="../js-webshim/minified/polyfiller.js"></script>
-	-->
-
+	
+	<!--
 		<script src="../../src/polyfiller.js"></script> 
 		<script>
 			$.webshims.debug = true;
 		</script>
-	
-    <script class="example">
+	-->
+    <script>
     	
     	
 		$.webshims.polyfill();
 		
 		
         $(function(){
-			//helper for createing throttled get/set functions
+			//helper for createing throttled get/set functions (good to create time/volume-slider, which are used as getter and setter)
 			var createGetSetHandler = function(get, set){
 				var throttleTimer;
 				var blockedTimer;
@@ -51,6 +51,20 @@
 						}, 0);
 					}
 				};
+			};
+			
+			var getActiveTimeRange = function(range, time){
+				var len = range.length;
+				var index = -1;
+				var start = 0;
+				var end = 0;
+				for(var i = 0; i < len; i++){
+					if(time >= (start = range.start(i)) && time <= (end = range.end(i))){
+						index = i;
+						break;
+					}
+				}
+				return [index, start, end];
 			};
 			
 			//If you want to buld a simple player the following code can help you
@@ -88,7 +102,8 @@
 					.bind('progress updateMediaState', function(){
 						var buffered = $.prop(this, 'buffered');
 						if(!buffered || !buffered.length){return;}
-						$('span.progress', player).text( buffered.end(buffered.length -1) );
+						buffered = getActiveTimeRange( buffered, $.prop(this, 'currentTime') );
+						$('span.progress', player).text( buffered[2] );
 					})
 					.bind('timeupdate', function(){
 						$('span.current-time', player).text( $.prop(this, 'currentTime') );
@@ -131,7 +146,10 @@
 					})
 				;
 				
-				$('input.time-slider', player).bind('input', getSetCurrentTime.set);
+				$('input.time-slider', player)
+					.bind('input', getSetCurrentTime.set)
+					.prop('value', 0)
+				;
 				$('input.volume-slider', player).bind('input', getSetVolume.set);
 				
 				$('input.play', player).bind('click', function(){
@@ -194,41 +212,44 @@
 				<h3>Demo/About/Documentation audio and video elements</h3>
 			</hgroup>
 			<p>The <code>mediaelement</code> implements the audio, video and source elements including thier API and enables playing mp4, mp3, flv, fla etc. media files and playing rtmp streams in incapable browsers using the <a href="http://www.longtailvideo.com/players/">famous JW Player</a>.</p>
-			<p>Note: The current state of this polyfill is unstable. It's the first basic implementation.</p>
 			<section>
-				<h3>Implemented/fixed elements, attributes, properties, methods, events (ToDo)</h3>
+				<h3>Implemented/fixed elements, attributes, properties, methods, events</h3>
 				<ul>
-					<li><strong>elements:</strong> video, audio, source</li>
-					<li><strong>attributes (and IDL, if existing)</strong>: controls, loop, autoplay, src</li>
-					<li><strong>properties/IDLs</strong>: paused, ended, muted, volume, currentTime, buffered, currentSrc, readyState, networkState, videoHeight, videoWidth</li>
-					<li><strong>methods</strong>: play, pause, load (mediaLoad<sup>1</sup>)</li>
-					<li><strong>events</strong>: loadedmetadata, play, pause, playing, ended, waiting, timeupdate, progress, emptied, volumechange, durationchange</li>
+					<li><strong>elements:</strong> <a href="http://www.w3.org/TR/html5/video.html#video">video</a>, <a href="http://www.w3.org/TR/html5/video.html#audio">audio</a>, <a href="http://www.w3.org/TR/html5/video.html#the-source-element">source</a></li>
+					<li><strong>attributes and IDL/properties</strong>: <a href="http://www.w3.org/TR/html5/video.html#attr-media-controls">controls</a>, <a href="http://www.w3.org/TR/html5/video.html#attr-media-loop">loop</a>, <a href="http://www.w3.org/TR/html5/video.html#attr-media-autoplay">autoplay</a>, <a href="http://www.w3.org/TR/html5/video.html#attr-source-src">src</a></li>
+					<li><strong>properties/IDLs</strong>: <a href="http://www.w3.org/TR/html5/video.html#dom-media-paused">paused</a>, <a href="http://www.w3.org/TR/html5/video.html#dom-media-ended">ended</a>, <a href="http://www.w3.org/TR/html5/video.html#dom-media-muted">muted</a>, <a href="http://www.w3.org/TR/html5/video.html#dom-media-volume">volume</a>, <a href="http://www.w3.org/TR/html5/video.html#dom-media-currenttime">currentTime</a>, <a href="http://www.w3.org/TR/html5/video.html#dom-media-duration">duration</a>, <a href="http://www.w3.org/TR/html5/video.html#dom-media-buffered">buffered</a>, <a href="http://www.w3.org/TR/html5/video.html#dom-media-currentsrc">currentSrc</a>, <a href="http://www.w3.org/TR/html5/video.html#dom-media-readystate">readyState</a>, <a href="http://www.w3.org/TR/html5/video.html#dom-media-networkstate">networkState</a>, <a href="http://www.w3.org/TR/html5/video.html#dom-video-videoheight">videoHeight</a>, <a href="http://www.w3.org/TR/html5/video.html#dom-video-videowidth">videoWidth</a></li>
+					<li><strong>methods</strong>: <a href="http://www.w3.org/TR/html5/video.html#dom-media-play">play</a>, <a href="http://www.w3.org/TR/html5/video.html#dom-media-pause">pause</a>, <a href="http://www.w3.org/TR/html5/video.html#dom-media-load">load</a> (mediaLoad<sup>1</sup>)</li>
+					<li><strong>events</strong>: <a href="http://www.w3.org/TR/html5/video.html#event-media-loadedmetadata">loadedmetadata</a>, <a href="http://www.w3.org/TR/html5/video.html#event-media-play">play</a>, <a href="http://www.w3.org/TR/html5/video.html#event-media-pause">pause</a>, <a href="http://www.w3.org/TR/html5/video.html#event-media-playing">playing</a>, <a href="http://www.w3.org/TR/html5/video.html#event-media-canplay">canplay</a>, <a href="http://www.w3.org/TR/html5/video.html#event-media-ended">ended</a>, <a href="http://www.w3.org/TR/html5/video.html#event-media-waiting">waiting</a>, <a href="http://www.w3.org/TR/html5/video.html#event-media-timeupdate">timeupdate</a>, <a href="http://www.w3.org/TR/html5/video.html#event-media-progress">progress</a>, <a href="http://www.w3.org/TR/html5/video.html#event-media-emptied">emptied</a>, <a href="http://www.w3.org/TR/html5/video.html#event-media-volumechange">volumechange</a>, <a href="http://www.w3.org/TR/html5/video.html#event-media-durationchange">durationchange</a></li>
 				</ul>
-				<p><small>1. mediaLoad is the jQuery plugin method, which corresponds to the native load method (Webshims lib does not oerride jQuery's own load-method).</small></p>
+				<p><small>1. mediaLoad is the jQuery plugin method, which corresponds to the native load method (Webshims lib does not override jQuery's own load-method).</small></p>
 				
-				<h3>Options for the <code>mediaelement</code> feature (ToDo)</h3>
+				<h3>Options for the <code>mediaelement</code> feature</h3>
 				
 				<ul>
-					<li><strong>hasToPlay</strong> ('any'): </li>
-					<li><strong>preferFlash</strong> (false): </li>
-					<li><strong>jwVars</strong> (Flahsvars Object): </li>
-					<li><strong>jwParams</strong> (Flash/Object params):</li>
-					<li><strong>jwAttrs</strong> (Flash/Object attributes): </li>
-					<li><strong>changeJW</strong> (Manipulation function): </li>
+					<li><strong>preferFlash</strong> (false): If preferFlash is set to true the mediaelements will be replaced by flash, if flash is available. Otherwise only, if mediaelements aren't supported or the current audio/video container/codec isn't supported by the browser.</li>
+					<li><strong>jwVars</strong> (Flahsvars Object): Object with default flashvars to <a href="http://www.longtailvideo.com/support/jw-player/jw-player-for-flash-v5/12536/configuration-options">configure JWPlayer</a>. This general configuartion con be changed by using a data-jwvars attribute, too.</li>
+					<li><strong>changeJW</strong> (Manipulation function): Callback function to also modify the flashvars object for JWPlayer.</li>
 				</ul>
 				
-				<h3>Extensions/Abstractions to the standard (ToDo)</h3>
+				<h3>Extensions/Abstractions to the standard</h3>
 				<ul>
-					<li><strong>loadMediaSrc</strong> method:</li>
+					<li><strong>loadMediaSrc</strong> (source [, poster]) (jQuery plugin): Removes current audio/video sources adds new source[s] and calls the load method (mediaLoad).</li>
 				</ul>
-				
+<code class="block">
+//simple video
+$("video.my-video").loadMediaSrc("my-video.mp4");
+//or video with type
+$("video.my-video").loadMediaSrc({src: "my-video.mp4", type: "video/mp4"});
+or multiple video sources and new poster
+$("video.my-video").loadMediaSrc([{src: "my-video.mp4", type: "video/mp4"}, "my-video.ogg"], "my-poster.jpg");
+</code>				
 			</section>
 			<section>
 				<h3>Simple Demo</h3>
 				<div class="player">
 					<video controls preload="none" poster="http://protofunc.com/jme/media/bbb_watchtrailer.gif">
-						<source src="http://protofunc.com/jme/media/bbb_trailer_400p.ogg" type="video/ogg" />
 						<source src="http://protofunc.com/jme/media/bbb_trailer_mobile.m4v" type="video/mp4" />
+						<source src="http://protofunc.com/jme/media/bbb_trailer_400p.ogg" type="video/ogg" />
 					</video>
 					<table>
 						<thead>
@@ -321,11 +342,47 @@
 				<h2>How to...</h2>
 				<h3>Styling the video/audio elements</h3>
 				<h4>Setting dimensions</h4>
-				<p>Webshims lib does not use the width/height content attribute to get </p>
-				<h4>Using additional Styles (margin, background, float etc.)</h4>
+				<p>Webshims lib does not use the width/height content attributes to get the dimensions of your audio/video elements. Instead webshims lib mediaelement implementation only looks for the CSS styles.</p>
+				<p>If an width-/height- inline style is used, these properties are taken. In this case also % or em units or the auto values are fully supported. If styles are set through an stylesheet, webshims lib will use the computed styles.</p>
+				<p>If auto is used as a width/height value. A video should always have a valid poster attribute and this poster should have the same ratio as the video.</p>
+<code class="block">
+/*external stylesheet */
+aside.aside video {
+	width: 180px;
+}
+</code>
+<code class="block">
+&lt;!-- videos with fixed width and auto height --&gt;
+&lt;aside class="aside"&gt;
+	&lt;video poster="/img/180x120.jpg" style="height: auto;"&gt;
+		&lt;source src="/video/180x120.mp4" type="video/mp4"&gt;&lt;/source&gt;
+	&lt;/video&gt;
+	
+	&lt;video poster="/img/190x140.jpg" style="height: auto;"&gt;
+		&lt;source src="/video/190x140.mp4" type="video/mp4"&gt;&lt;/source&gt;
+	&lt;/video&gt;
+&lt;/aside&gt;
+</code>
+				<h4>Using additional styles (margin, background, float etc.)</h4>
+				<p>Additional styles like margin, float etc. are not transferred from the audio/video element to the flash-fallback. The best way to use margin, float and other styles is to use an additional wrapper for your mediaelement.</p>
+				<h4>Having controls at bottom and not over the video in JWPlayer</h4>
+				<p>The position of the controls can be configured, using either the general setOptions method or by using the data-jwvars attribute:</p>
 				
+<code class="block">
+$.webshims.setOptions('mediaelement', {
+	jwVars: {
+		controlbar: 'bottom'
+	}
+});
+</code>
+
+<code class="block">
+&lt;video data-jwvars='{"controlbar": "bottom"}' src="my-file.webm" controls&gt;&lt;/video&gt;
+</code>
 				<h4>Using custom styleable controls</h4>
-				
+				<p>Webshims lib does not provide custom styleable controls out of the box. Instead webshims lib polyfills the HTML5 API, so that you can easily build your own controls. Simply have a look into the source code of this site, to see how we have build the controls in our demo.</p>
+				<h4>Updating JWPlayer/Using licensed JWPlayer</h4>
+				<p>Simply place player.swf into your shims/jwplayer folder.</p>
 				<h2>Cookbook</h2>
 				
 				<h3>Stop other media if media starts to play</h3>
@@ -373,13 +430,7 @@ $('video, audio')
 </code>
 			</section>
 			
-			<aside>
-				<hgroup>
-					<h2>How to...</h2>
-					<h3>Customized Demos / Code Snippets / Tutorials</h3>
-				</hgroup>
-				
-			</aside>
+			
 				
 			<aside>
 				<h3>Links about mediaelements (todo)</h3>

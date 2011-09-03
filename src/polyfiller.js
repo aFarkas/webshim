@@ -32,7 +32,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.8alpha6',
+		version: '1.8.0',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -528,7 +528,9 @@
 					};
 					var complete = function(){
 						clearTimeout(errorTimer);
-						script.unbind('error', error);
+						if(script && script[0]){
+							script.unbind('error', error);
+						}
 						complete = null;
 						error = null;
 						script = null;

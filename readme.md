@@ -16,6 +16,7 @@ Implemented Features:
 * HTML5 shiv and innerShiv solution including basic CSS-support
 * canvas
 * HTML5 form features including: constraint validation and form widgets (input[range], input[date], input[time], input[datetime-local], output, input[list]/datalist)
+* HTML5 audio/video implementation
 * interactive elements: summary/details
 * JSON (stringify and parse)
 * localStorage/sessionStorage
@@ -76,6 +77,7 @@ upcomming Release 1.8.0
 ----------
 
 * mediaelement implementation (audio/video)
+* implemented form submitter attributes (formaction, formtarget, formenctype)
 * better language support
 * updated es5-shim
 * updated jQuery UI path 

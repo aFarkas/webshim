@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8"/>
 	<link href="css/styles.css" rel="stylesheet" />
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js"></script>
 	
 	<script src="js-webshim/minified/extras/modernizr-custom.js"></script>
 	<script src="js-webshim/minified/extras/loaders/sssl.js"></script>
@@ -33,7 +33,7 @@
 		<div class="main">
 			<section>
 				<div class="home-box about-box">
-					<p>Webshims Lib is a DOM extension helper which <a href="http://remysharp.com/2010/10/08/what-is-a-polyfill/">polyfills</a> the <a href="http://www.brucelawson.co.uk/2010/meet-newt-new-exciting-web-technologies/">latest and greatest web features</a> in browsers that don't support them natively. It is built on top of <a href="http://jquery.com/">jQuery</a> and <a href="http://www.modernizr.com/">Modernizr 1.7+</a> and needs one of the follwoing script loaders: <a href="http://yepnopejs.com/">yepnope</a>, <a href="https://gist.github.com/936413">SSSL</a> or <a href="http://requirejs.org/">RequireJS</a>.</p>
+					<p>Webshims Lib is a DOM extension helper which <a href="http://remysharp.com/2010/10/08/what-is-a-polyfill/">polyfills</a> the <a href="http://www.brucelawson.co.uk/2010/meet-newt-new-exciting-web-technologies/">latest and greatest web features</a> in browsers that don't support them natively. It is built on top of <a href="http://jquery.com/">jQuery</a> and <a href="http://www.modernizr.com/">Modernizr</a> and needs one of the follwoing script loaders: <a href="http://yepnopejs.com/">yepnope</a>, <a href="https://gist.github.com/936413">SSSL</a> or <a href="http://requirejs.org/">RequireJS</a>.</p>
 				</div>
 				<div class="home-box download-box">
 					<p>
@@ -103,6 +103,10 @@
 					
 					<article>
 						<h3><a href="demos/webforms.html">HTML5 forms / Webforms 2</a></h3>
+					</article>
+					
+					<article>
+						<h3><a href="demos/mediaelement.html">HTML5 mediaelements: audio/video</a></h3>
 					</article>
 										
 					<article>
@@ -180,10 +184,12 @@ $.webshims.polyfill('json-storage geolocation');
 							<li><code>canvas</code>*</li>
 							<li><code>forms</code>*</li>
 							<li><code>forms-ext</code></li>
+							<li><code>mediaelement <sup>1</sup></code></li>
 							<li><code>details</code></li>
 						</ul>
 						<p>The polyfill-method can also take a keyword called <code>lightweight</code>, which will load a filesize-/feature- balanced profile</p>
 						<p><small>With an * marked features are part of the lightweight profile</small></p>
+						<p><small><sup>1</sup> mediaelement feature will added to the lightweight profile with next version of webshims lib</small></p>
 	
 <code class="block">
 //load and implement all unsupported features from the lightweight profile
@@ -269,7 +275,7 @@ $.webshims.polyfill({
 &lt;script&gt;
 	Modernizr.load([
 		{
-			load: '//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js',
+			load: '//ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.js',
 			complete: function () {
 				if ( !window.jQuery ) {
 					Modernizr.load('/js/libs/jquery-1.6.2.min.js');
@@ -567,7 +573,7 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 The class loading-polyfills is set after you have called polyfill
 and will be removed as soon as all polyfills are loaded and implemented
 */
-.loading-polyfills body {
+html.loading-polyfills body {
 	visibility: hidden;
 }
 /*
@@ -619,7 +625,7 @@ html.long-loading-polyfills {
 				
 				<ul>
 					<li>improve current implementations</li>
-					<li><a href="http://www.w3.org/TR/html5/video.html">audio/video</a> implementation (coming in 1.9)</li>
+					<li>add documentation</li>
 					<li>history (pushState etc.)/hashchange (maybe <a href="https://github.com/balupton/history.js">history.js</a> (coming in 1.9))</li>
 					<li>make everything more native (this will be more awsome!!! coming in 2.0)</li>
 				</ul>

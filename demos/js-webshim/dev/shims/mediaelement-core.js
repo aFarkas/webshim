@@ -180,6 +180,7 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 		}
 	};
 	
+	
 	$.fn.loadMediaSrc = function(srces, poster){
 		return this.each(function(){
 			if(poster !== undefined){
@@ -226,14 +227,17 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 		}
 		return ret;
 	};
-	mediaelement.setError = function(elem, message){
+	mediaelement.setError = function(elem, message, baseData){
 		if(!message){
 			message = "can't play sources";
 		}
-		webshims.data(elem, 'mediaelementError', message);
+		if(baseData){
+			baseData = webshims.data(this, 'mediaelementBase', {});
+		}
+		baseData.error = message;
 		webshims.warn('mediaelementError: '+ message);
 		setTimeout(function(){
-			if(webshims.data(elem, 'mediaelementError')){
+			if(baseData.error){
 				$(elem).trigger('mediaerror');
 			}
 		}, 1);
@@ -255,18 +259,18 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 		};
 	})();
 	
-	var selectSource = function(elem, data, useSwf, _srces, _noLoop){
+	var selectSource = function(baseData, elem, data, useSwf, _srces, _noLoop){
 		var ret;
 		_srces = _srces || mediaelement.srces(elem);
-		webshims.data(elem, 'mediaelementError', false);
+		baseData.error = false;
 		if(!_srces.length){return;}
 		if(useSwf || (useSwf !== false && data && data.isActive == 'flash')){
 			ret = mediaelement.canSwfPlaySrces(elem, _srces);
 			if(!ret){
 				if(_noLoop){
-					mediaelement.setError(elem);
+					mediaelement.setError(elem, false, baseData);
 				} else {
-					selectSource(elem, data, false, _srces, true);
+					selectSource(baseData, elem, data, false, _srces, true);
 				}
 			} else {
 				handleSWF(elem, ret, data);
@@ -275,9 +279,9 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 			ret = mediaelement.canNativePlaySrces(elem);
 			if(!ret){
 				if(_noLoop){
-					mediaelement.setError(elem);
+					mediaelement.setError(elem, false, baseData);
 				} else {
-					selectSource(elem, data, true, _srces, true);
+					selectSource(baseData, elem, data, true, _srces, true);
 				}
 			} else if(data && data.isActive == 'flash') {
 				mediaelement.setActive(elem, 'html5', data);
@@ -306,25 +310,38 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 			.each(function(){
 				var parent = this.parentNode;
 				if(parent && stopParent.test(parent.nodeName || '')){return;}
-				
-				selectSource(this, false, options.preferFlash || undefined);
+				var baseData = webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
+				selectSource(baseData, this, false, options.preferFlash || undefined);
 			})
 		;
 	 });
 	
 	['audio', 'video'].forEach(function(nodeName){
-		var sup = webshims.defineNodeNameProperty(nodeName, 'load',  {
+		var supLoad = webshims.defineNodeNameProperty(nodeName, 'load',  {
 			prop: {
 				value: function(){
 					var data = webshims.data(this, 'mediaelement');
-					
-					selectSource(this, data);
-					if(hasNative && (!data || data.isActive == 'html5') && sup.prop._supvalue){
-						sup.prop._supvalue.apply(this, arguments);
+					var baseData = webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
+					clearTimeout(baseData.loadTimer);
+					selectSource(baseData, this, data);
+					if(hasNative && (!data || data.isActive == 'html5') && supLoad.prop._supvalue){
+						supLoad.prop._supvalue.apply(this, arguments);
 					}
 				}
 			}
 		});
+		
+	});
+	webshims.onNodeNamesPropertyModify(['audio', 'video'], 'src', {
+		set: function(){
+			var data = webshims.data(this, 'mediaelement');
+			var elem = this;
+			var baseData = webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
+			clearTimeout(baseData.loadTimer);
+			baseData.loadTimer = setTimeout(function(){
+				selectSource(baseData, elem, data);
+			}, 9);
+		}
 	});
 	
 		
