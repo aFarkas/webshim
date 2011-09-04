@@ -1,8 +1,12 @@
 /*
- * todo: 
+ * todos: 
  * - shadowdom switch
  * - flashblocker detect
  * - decouple muted/volume
+ * - improve buffered-property with youtube/rtmp
+ * - get buffer-full event
+ * - set preload to none, if flash is active
+ * - handle flashresize -> auto
  */
 
 jQuery.webshims.register('mediaelement-swf', function($, webshims, window, document, undefined, options){
@@ -811,7 +815,10 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		getPropKeys.forEach(createGetProp);
 		
 		webshims.onNodeNamesPropertyModify(nodeName, 'controls', function(val, boolProp){
-			queueSwfMethod(this, boolProp ? 'showControls' : 'hideControls');
+			var data = queueSwfMethod(this, boolProp ? 'showControls' : 'hideControls');
+			if(data){
+				$(data.jwapi).attr('tabindex', boolProp ? '0' : '-1');
+			}
 		});
 		
 		mediaSup = webshims.defineNodeNameProperties(nodeName, descs, 'prop');

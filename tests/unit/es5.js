@@ -12,6 +12,8 @@
 		});
 		$.each('forEach, map, filter, every, some, reduce, reduceRight, indexOf, lastIndexOf'.split(', '), function(i, name){
 			isInObject(name, Array.prototype);
+			var a = ['jo', 'jo2'];
+			a[name]($.noop);
 		});
 		$.each(['now'], function(i, name){
 			isInObject(name, Date);
@@ -25,6 +27,19 @@
 		$.each(['trim'], function(i, name){
 			isInObject(name, String.prototype);
 		});
+		
+		ok(Array.isArray([]), 'isarray finds array');
+		ok(!Array.isArray({length: 0, push: $.noop, pop: $.noop}), 'isarray finds array');
+		deepEqual(Object.keys({foo: 'bar', baz: undefined}), ['foo', 'baz'], 'object key do work');
+		
+		equals((new Date(0)).toISOString(), "1970-01-01T00:00:00.000Z", "toISOString works");
+		(new Date()).toJSON();
+		(function(arg1, arg2){
+			equals(this.bla, 'foo', "bind works somehow");
+			equals(arg1, 'jo', "bind works somehow");
+			equals(arg2, 'blub', "bind works somehow");
+		}.bind({bla: 'foo'}, 'jo'))('blub');
+		equals(("  bla  ").trim(), "bla", "trim works somehow");
 		$.webshims.ready('DOM es5', function(){
 			start();
 		});

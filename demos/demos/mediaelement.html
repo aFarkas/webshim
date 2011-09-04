@@ -241,7 +241,13 @@ $("video.my-video").loadMediaSrc("my-video.mp4");
 //or video with type
 $("video.my-video").loadMediaSrc({src: "my-video.mp4", type: "video/mp4"});
 or multiple video sources and new poster
-$("video.my-video").loadMediaSrc([{src: "my-video.mp4", type: "video/mp4"}, "my-video.ogg"], "my-poster.jpg");
+$("video.my-video").loadMediaSrc(
+	[
+		{src: "my-video.mp4", type: "video/mp4"}, 
+		"my-video.ogg"
+	], 
+	"my-poster.jpg"
+);
 </code>				
 			</section>
 			<section>
@@ -324,10 +330,11 @@ $("video.my-video").loadMediaSrc([{src: "my-video.mp4", type: "video/mp4"}, "my-
 								<th>loadMediaSrc</th>
 								<td>
 									<select class="load-media">
-										<option>Please choose</option>
-										<option data-src='[{"src": "http://cdn.yayquery.com/ep/23/yayquery_23.ogv", "type": "video/ogg"}, {"src": "http://cdn.yayquery.com/ep/23/yayquery_23.mp4", "type": "video/mp4"}]'>yayQuery - Episode 23 | When Things Are Things</option>
-										<option data-src='[{"src": "http://cdn.yayquery.com/ep/22/yayquery_22.ogv", "type": "video/ogg"}, {"src": "http://cdn.yayquery.com/ep/22/yayquery_22_ipod.mp4", "type": "video/mp4"}]'>yayQuery - Episode 22 | Which Square Can I Take?</option>
-										<option data-src='[{"src": "http://cdn.yayquery.com/ep/21/yayquery_21.ogv", "type": "video/ogg"}, {"src": "http://cdn.yayquery.com/ep/21/yayquery_21.mp4", "type": "video/mp4"}]'>yayQuery - Episode 21 | jQuery 1.5 - The Promise Lands</option>
+									
+										<option data-src='[{"src": "http://protofunc.com/jme/media/bbb_trailer_mobile.m4v", "type": "video/mp4"}, {"src": "http://protofunc.com/jme/media/bbb_trailer_400p.ogg", "type": "video/ogg"}]'>Big Buck Bunny</option>
+										<option data-src='[{"src": "http://cdn.yayquery.com/ep/23/yayquery_23.mp4", "type": "video/mp4"}, {"src": "http://cdn.yayquery.com/ep/23/yayquery_23.ogv", "type": "video/ogg"}]'>yayQuery - Episode 23 | When Things Are Things</option>
+										
+										
 										<option data-src="http://www.youtube.com/watch?v=siOHh0uzcuY">Youtube: Introduction to HTML 5</option>
 										
 									</select>

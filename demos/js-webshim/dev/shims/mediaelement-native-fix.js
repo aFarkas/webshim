@@ -47,8 +47,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 		}
 	};
 	var removeProgress = function(e){
-		
-		data = getBufferedData(e.target);
+		var data = getBufferedData(e.target);
 		data.buffered.length = 0;
 		data.loaded = 0;
 	};
@@ -69,13 +68,25 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 		});
 	});
 	
-//	webshims.defineNodeNamesProperty(['audio', 'video'], 'buffered', {
-//		prop: {
-//			get: function(){
-//				
-//			}
-//		}
-//	});
+	(function(){
+		var videoElem = document.createElement('video');
+		if( !('preload' in videoElem) && ('autobuffer' in videoElem)){
+			var noBufferProps = {
+				metadata: 1,
+				none: 1
+			};
+			webshims.onNodeNamesPropertyModify(['audio', 'video'], ['preload'], {
+				set: function(value, boolValue, curType){
+					if(noBufferProps[value] || curType == 'removeAttr'){
+						this.autobuffer = false;
+					} else if( !(webshims.data(this, 'mediaelement') || {}).isActive == 'html5') {
+						this.autobuffer = true;
+					}
+				},
+				initAttr: true
+			});
+		}
+	})();
 	
 	webshims.addReady(function(context, insertedElement){
 		$('video, audio', context)

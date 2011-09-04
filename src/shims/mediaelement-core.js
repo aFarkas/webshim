@@ -1,4 +1,5 @@
 (function($, Modernizr, webshims){
+	
 	var hasNative = Modernizr.audio && Modernizr.video;
 	var supportsLoop = false;
 	
@@ -77,7 +78,7 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 	};
 	
 	
-	webshims.ready('WINDOWLOAD', function(){
+	$(function(){
 		webshims.loader.loadList(['swfobject']);
 	});
 	webshims.ready('swfobject', function(){
@@ -332,7 +333,7 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 		});
 		
 	});
-	webshims.onNodeNamesPropertyModify(['audio', 'video'], 'src', {
+	webshims.onNodeNamesPropertyModify(['audio', 'video'], ['src', 'poster'], {
 		set: function(){
 			var data = webshims.data(this, 'mediaelement');
 			var elem = this;

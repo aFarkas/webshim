@@ -55,10 +55,13 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 	
 
 });/*
- * todo: 
+ * todos: 
  * - shadowdom switch
  * - flashblocker detect
  * - decouple muted/volume
+ * - improve buffered-property with youtube/rtmp
+ * - get buffer-full event
+ * - set preload to none, if flash is active
  */
 
 jQuery.webshims.register('mediaelement-swf', function($, webshims, window, document, undefined, options){
@@ -867,7 +870,10 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		getPropKeys.forEach(createGetProp);
 		
 		webshims.onNodeNamesPropertyModify(nodeName, 'controls', function(val, boolProp){
-			queueSwfMethod(this, boolProp ? 'showControls' : 'hideControls');
+			var data = queueSwfMethod(this, boolProp ? 'showControls' : 'hideControls');
+			if(data){
+				$(data.jwapi).attr('tabindex', boolProp ? '0' : '-1');
+			}
 		});
 		
 		mediaSup = webshims.defineNodeNameProperties(nodeName, descs, 'prop');
@@ -875,6 +881,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	
 	
 });(function($, Modernizr, webshims){
+	
 	var hasNative = Modernizr.audio && Modernizr.video;
 	var supportsLoop = false;
 	
@@ -953,7 +960,7 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 	};
 	
 	
-	webshims.ready('WINDOWLOAD', function(){
+	$(function(){
 		webshims.loader.loadList(['swfobject']);
 	});
 	webshims.ready('swfobject', function(){
@@ -1208,7 +1215,7 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 		});
 		
 	});
-	webshims.onNodeNamesPropertyModify(['audio', 'video'], 'src', {
+	webshims.onNodeNamesPropertyModify(['audio', 'video'], ['src', 'poster'], {
 		set: function(){
 			var data = webshims.data(this, 'mediaelement');
 			var elem = this;
