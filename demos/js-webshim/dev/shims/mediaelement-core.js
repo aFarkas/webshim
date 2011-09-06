@@ -228,17 +228,15 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 		}
 		return ret;
 	};
-	mediaelement.setError = function(elem, message, baseData){
+	mediaelement.setError = function(elem, message){
 		if(!message){
 			message = "can't play sources";
 		}
-		if(baseData){
-			baseData = webshims.data(this, 'mediaelementBase', {});
-		}
-		baseData.error = message;
+		
+		$(elem).data('mediaerror', message);
 		webshims.warn('mediaelementError: '+ message);
 		setTimeout(function(){
-			if(baseData.error){
+			if($(elem).data('mediaerror')){
 				$(elem).trigger('mediaerror');
 			}
 		}, 1);
@@ -263,13 +261,13 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 	var selectSource = function(baseData, elem, data, useSwf, _srces, _noLoop){
 		var ret;
 		_srces = _srces || mediaelement.srces(elem);
-		baseData.error = false;
+		$(elem).data('mediaerror', false);
 		if(!_srces.length){return;}
 		if(useSwf || (useSwf !== false && data && data.isActive == 'flash')){
 			ret = mediaelement.canSwfPlaySrces(elem, _srces);
 			if(!ret){
 				if(_noLoop){
-					mediaelement.setError(elem, false, baseData);
+					mediaelement.setError(elem, false);
 				} else {
 					selectSource(baseData, elem, data, false, _srces, true);
 				}
@@ -280,7 +278,7 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 			ret = mediaelement.canNativePlaySrces(elem);
 			if(!ret){
 				if(_noLoop){
-					mediaelement.setError(elem, false, baseData);
+					mediaelement.setError(elem, false);
 				} else {
 					selectSource(baseData, elem, data, true, _srces, true);
 				}

@@ -728,6 +728,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 						stopMutedAnnounce = false;
 					}
 					setTimeout(function(){
+						v /= 100;
 						if(data.volume == v || data.isActive != 'flash'){return;}
 						data.volume = v;
 						trigger(data._elem, 'volumechange');
