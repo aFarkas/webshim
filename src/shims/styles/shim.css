@@ -19,6 +19,10 @@ video {
 audio {
 	height: 30px;
 }
+video *,
+audio * {
+	display: none !important;
+}
 audio[controls] {
 	display: inline-block;
 	width: 300px;
