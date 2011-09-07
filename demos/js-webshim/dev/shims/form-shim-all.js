@@ -868,7 +868,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 			var value = (elem.text() || '').trim();
 			var	id 	= elem.attr('id');
 			var	htmlFor = elem.attr('for');
-			var shim = $('<input class="output-shim" type="hidden" name="'+ (elem.attr('name') || '')+'" value="'+value+'" style="display: none" />').insertAfter(elem);
+			var shim = $('<input class="output-shim" type="text" disabled name="'+ (elem.attr('name') || '')+'" value="'+value+'" style="display: none !important;" />').insertAfter(elem);
 			var form = shim[0].form || doc;
 			var setValue = function(val){
 				shim[0].value = val;

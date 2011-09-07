@@ -292,9 +292,9 @@ asyncTest('output test', function(){
 	if( !omitTests.output ){
 		equals($('output:first').text(), 'hello', 'shim shows value');
 		equals($('#labeled-output').text(), 'somecontent', 'shim shows value');
-		ok(/&outputtest=somecontent&/.test($('form').serialize()), 'finds output serialized in shim');
+		
 	}
-	
+	ok( !/&outputtest=somecontent&/.test($('form').serialize()) , 'does not find output serialized in shim');
 	$('#rangeId').attr('value', 30);
 	
 	$.webshims.triggerInlineForm($('input.oninput-test')[0], 'input');
