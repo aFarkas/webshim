@@ -1,6 +1,5 @@
 /*
  * todos: 
- * - shadowdom switch
  * - flashblocker detect
  * - decouple muted/volume
  * - improve buffered-property with youtube/rtmp
@@ -449,6 +448,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			initEvents(data);
 			
 		} else {
+			$(data._elem).mediaLoad();
 			workActionQueue(data);
 		}
 		data.wasSwfReady = true;
@@ -494,13 +494,16 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		if(type != 'html5' && type != 'flash'){
 			webshims.warn('wrong type for mediaelement activating: '+ type);
 		}
+		var shadowData = webshims.data(elem, 'shadowData');
 		data.activating = type;
 		$(elem).pause();
 		data.isActive = type;
 		if(type == 'flash'){
+			shadowData.shadowElement = shadowData.shadowFocusElement = data.shadowElem[0];
 			$(elem).hide().getShadowElement().show();
 		} else {
 			$(elem).show().getShadowElement().hide();
+			shadowData.shadowElement = shadowData.shadowFocusElement = false;
 		}
 		
 	};
@@ -583,6 +586,9 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		data = webshims.data(elem, 'mediaelement', webshims.objectCreate(playerStateObj, {
 			actionQueue: {
 				value: []
+			},
+			shadowElem: {
+				value: box
 			},
 			_elemNodeName: {
 				value: elemNodeName
