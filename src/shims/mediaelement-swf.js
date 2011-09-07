@@ -96,7 +96,6 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		bgcolor: '#000000'
 	});
 	
-	
 	mediaelement.jwEvents = {
 		View: {
 			
@@ -118,7 +117,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			BUFFER: function(obj){
 				var data = getSwfDataFromID(obj.id);
 				if(!data){return;}
-				if(data._bufferEnd == obj.percentage){return;}
+				if(data._bufferedEnd == obj.percentage){return;}
 				data.networkState = (obj.percentage == 100) ? 1 : 2;
 				if(!data.duration){
 					try {
@@ -148,6 +147,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				if(data._bufferedEnd && (data._bufferedEnd > obj.percentage)){
 					data._bufferedStart = data.currentTime || 0;
 				}
+				
 				data._bufferedEnd = obj.percentage;
 				data.buffered.length = 1;
 				if(obj.percentage == 100){

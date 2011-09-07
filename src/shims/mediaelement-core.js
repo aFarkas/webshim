@@ -64,8 +64,8 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 			if(tmp){
 				src.type = tmp;
 				src.container = tmp;
+				webshims.warn('you should always provide a proper mime-type using the source element. '+ src.src +' detected as: '+ tmp);
 				if($.nodeName(elem[0], 'source')){
-					webshims.warn('you should always provide a proper mime-type. '+ src.src +' detected as: '+ tmp);
 					elem.attr('type', tmp);
 				}
 			}
@@ -78,9 +78,7 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 	};
 	
 	
-	$(function(){
-		webshims.loader.loadList(['swfobject']);
-	});
+	webshims.loader.loadList(['swfobject']);
 	webshims.ready('swfobject', function(){
 		hasSwf = swfobject.hasFlashPlayerVersion('9.0.115');
 		if(hasSwf){
@@ -213,14 +211,17 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 		return ret;
 	};
 	
+	var nativeCanPlayType = {};
 	mediaelement.canNativePlaySrces = function(mediaElem, srces){
 		var ret = '';
 		if(hasNative){
 			mediaElem = $(mediaElem);
+			var nodeName = (mediaElem[0].nodeName || '').toLowerCase();
+			if(!nativeCanPlayType[nodeName]){return ret;}
 			srces = srces || mediaelement.srces(mediaElem);
 			
 			$.each(srces, function(i, src){
-				if(src.type && mediaElem.canPlayType(src.type) ){
+				if(src.type && nativeCanPlayType[nodeName].prop._supvalue.call(mediaElem[0], src.type) ){
 					ret = src;
 					return false;
 				}
@@ -228,6 +229,7 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 		}
 		return ret;
 	};
+	
 	mediaelement.setError = function(elem, message){
 		if(!message){
 			message = "can't play sources";
@@ -329,7 +331,26 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 				}
 			}
 		});
-		
+		nativeCanPlayType[nodeName] = webshims.defineNodeNameProperty(nodeName, 'canPlayType',  {
+			prop: {
+				value: function(type){
+					var ret = '';
+					if(hasNative && nativeCanPlayType[nodeName].prop._supvalue){
+						ret = nativeCanPlayType[nodeName].prop._supvalue.call(this, type);
+						if(ret == 'no'){
+							ret = '';
+						}
+					}
+					if(!ret && hasSwf){
+						type = $.trim(type.split(';')[0]);
+						if(mediaelement.swfMimeTypes.indexOf(type) != -1){
+							ret = 'maybe';
+						}
+					}
+					return ret;
+				}
+			}
+		});
 	});
 	webshims.onNodeNamesPropertyModify(['audio', 'video'], ['src', 'poster'], {
 		set: function(){
