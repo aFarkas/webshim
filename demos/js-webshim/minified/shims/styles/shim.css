@@ -10,13 +10,18 @@ article,aside,canvas,details,figcaption,figure,
 footer,header,hgroup,menu,nav,section,summary { 
     display:block;
 }
-audio.controls,
+audio {
+	display: none;
+	height: 0;
+	width: 0;
+}
+audio.webshims-controls,
 video {
-	display: inline-block;
+	display: block;
 	width: 300px;
 	height: 150px;
 }
-audio {
+audio.webshims-controls {
 	height: 30px;
 }
 video *,
@@ -24,7 +29,7 @@ audio * {
 	display: none !important;
 }
 audio[controls] {
-	display: inline-block;
+	display: block;
 	width: 300px;
 	height: 30px;
 }

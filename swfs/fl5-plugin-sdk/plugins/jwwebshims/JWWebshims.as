@@ -53,7 +53,7 @@ package {
 		}
 		
 		
-		public function hideControls():void {
+		public function hideControls(nodeName:String):void {
 			_layer.width = stage.width;
 			_layer.height = stage.height;
 			try {
@@ -63,13 +63,15 @@ package {
 			} catch(er){}
 		}
 		
-		public function showControls():void {
+		public function showControls(nodeName:String):void {
 			_layer.width = 0;
 			_layer.height = 0;
 			try {
 				_player.controls.controlbar.show();
 				_player.controls.dock.show();
-				_player.controls.display.show();
+				if(nodeName == 'video'){
+					_player.controls.display.show();
+				}
 			} catch(er){}
 		}
 		

@@ -88,8 +88,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		wmode: 'transparent'
 	});
 	webshims.extendUNDEFProp(options.jwVars, {
-		screencolor: 'ffffffff',
-		controlbar: 'over'
+		screencolor: 'ffffffff'
 	});
 	webshims.extendUNDEFProp(options.jwAttrs, {
 		bgcolor: '#000000'
@@ -463,9 +462,9 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			
 		} else {
 			$(data._elem).mediaLoad();
-			workActionQueue(data);
 		}
 		data.wasSwfReady = true;
+		workActionQueue(data);
 		startAutoPlay(data);
 	};
 	
@@ -588,16 +587,21 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			},
 			$(elem).data('jwattrs')
 		);
-		var box = $('<div class="polyfill-'+ (elemNodeName) +'" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
+		var box = $('<div class="polyfill-'+ (elemNodeName) +' polyfill-mediaelement" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
 			.css({
-				width: elem.style.width || $(elem).width(),
-				height: elem.style.height || $(elem).height(),
 				position: 'relative',
 				overflow: 'hidden'
 			})
-			.insertBefore(elem)
 		;
-		
+		if(elemNodeName == 'audio' && !hasControls){
+			box.css({width: 0, height: 0});
+		} else {
+			box.css({
+				width: elem.style.width || $(elem).width(),
+				height: elem.style.height || $(elem).height()
+			});
+		}
+		box.insertBefore(elem);
 		data = webshims.data(elem, 'mediaelement', webshims.objectCreate(playerStateObj, {
 			actionQueue: {
 				value: []
@@ -645,8 +649,8 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		$.extend(vars, 
 			{
 				id: elemId,
-				controlbar: hasControls ? options.jwVars.controlbar || 'over' : 'none',
-				icons: ''+hasControls
+				controlbar: hasControls ? options.jwVars.controlbar || (elemNodeName == 'video' ? 'over' : 'bottom') : 'none',
+				icons: ''+ (hasControls && elemNodeName == 'video')
 			},
 			elemVars,
 			{playerready: 'jQuery.webshims.mediaelement.jwPlayerReady'}
@@ -672,7 +676,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				if(!localConnectionTimer){
 					clearTimeout(localConnectionTimer);
 					localConnectionTimer = setTimeout(function(){
-						var elem = $(swfData.ref);
+						var elem = $(swfData.ref).css({'minHeight': '2px', 'minWidth': '2px', display: 'block'});
 						if(elem[0].offsetWidth > 1 && elem[0].offsetHeight > 1 && location.protocol.indexOf('file:') === 0){
 							webshims.warn("Add your local development-directory to the local-trusted security sandbox:  http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html");
 						} else if(elem[0].offsetWidth < 2 || elem[0].offsetHeight < 2) {
@@ -837,7 +841,9 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		getPropKeys.forEach(createGetProp);
 		
 		webshims.onNodeNamesPropertyModify(nodeName, 'controls', function(val, boolProp){
-			var data = queueSwfMethod(this, boolProp ? 'showControls' : 'hideControls');
+			var data = queueSwfMethod(this, boolProp ? 'showControls' : 'hideControls', [nodeName]);
+			$(this)[boolProp ? 'addClass' : 'removeClass']('webshims-controls');
+			
 			if(data){
 				$(data.jwapi).attr('tabindex', boolProp ? '0' : '-1');
 			}
