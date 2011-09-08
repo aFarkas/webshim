@@ -32,7 +32,6 @@ package {
 		 */
 		public function initPlugin(player:IPlayer, config:PluginConfig):void {
 			_player = player;
-			
 			_layer = new MovieLayer();
 			if(!player.config.icons && player.config.controlbar == "none"){
 				_layer.width = stage.width;
@@ -49,6 +48,8 @@ package {
 				ExternalInterface.addCallback("hideControls", this.hideControls);
 				ExternalInterface.addCallback("showControls", this.showControls);
 			}
+			
+			stage.addEventListener(Event.RESIZE, resizeHandler);
 		}
 		
 		
@@ -85,6 +86,12 @@ package {
 		 */		
 		public function resize(wid:Number, hei:Number):void {
 			
+		}
+		
+		private function resizeHandler(event:Event):void {
+			if(ExternalInterface.available) {
+				ExternalInterface.call("jQuery.webshims.mediaelement.playerResize", _player.config.id);
+			}
 		}
 
 		

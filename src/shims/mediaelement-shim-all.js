@@ -61,7 +61,6 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
  * - improve buffered-property with youtube/rtmp
  * - get buffer-full event
  * - set preload to none, if flash is active
- * - handle flashresize -> auto
  */
 
 jQuery.webshims.register('mediaelement-swf', function($, webshims, window, document, undefined, options){
@@ -112,6 +111,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		var data = webshims.data(elem, 'mediaelement');
 		return data.isActive == 'flash' ? data : null;
 	};
+	
 	
 	var getSwfDataFromElem = function(elem){
 		try {
@@ -380,39 +380,41 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		var img;
 		var widthAuto;
 		var heightAuto;
+		var lastIntrinsicSize = {};
 		var shadowElem;
 		var errorTimer;
-		var lastresize;
 		var blockResize;
+		var lastSize;
 		var setSize = function(width, height){
 			if(!height || !width || height < 1 || width < 1 || data.isActive != 'flash'){return;}
 			if(img){
 				img.remove();
 				img = false;
 			}
+			lastIntrinsicSize.width = width;
+			lastIntrinsicSize.height = height;
 			clearTimeout(errorTimer);
 			widthAuto = data._elem.style.width == 'auto';
 			heightAuto = data._elem.style.height == 'auto';
 			
 			if(!widthAuto && !heightAuto){return;}
-			var curResize = widthAuto + heightAuto + width + height;
-			if(curResize === lastresize){return;}
-			lastresize = curResize;
+			var curSize;
 			shadowElem = shadowElem || $(data._elem).getShadowElement();
 			var cur;
 			if(widthAuto && !heightAuto){
-				cur = $(data._elem).height();
+				cur = shadowElem.height();
 				width *=  cur / height;
 				height = cur;
 			} else if(!widthAuto && heightAuto){
-				cur = $(data._elem).width();
+				cur = shadowElem.width();
 				height *=  cur / width;
 				width = cur;
 			}
 			blockResize = true;
 			setTimeout(function(){
 				blockResize = false;
-			}, 30);
+			}, 9);
+			
 			shadowElem.css({width: width, height: height});
 		};
 		var setPosterSrc = function(){
@@ -467,19 +469,31 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			;
 		};
 		$(data._elem)
-			.bind('loadedmetadata swfstageresize', function(){
+			.bind('loadedmetadata', function(){
 				setSize($.prop(this, 'videoWidth'), $.prop(this, 'videoHeight'));
 			})
 			.bind('emptied', setPosterSrc)
 			.bind('swfstageresize', function(){
 				if(blockResize){return;}
-				setPosterSrc();
-				if($.prop(data._elem, 'readyState')){
-					setSize($.prop(this, 'videoWidth'), $.prop(this, 'videoHeight'));
-				}
+				setSize(lastIntrinsicSize.width, lastIntrinsicSize.height);
 			})
 			.triggerHandler('swfstageresize')
 		;
+		
+		setPosterSrc();
+		if($.prop(data._elem, 'readyState')){
+			setSize($.prop(data._elem, 'videoWidth'), $.prop(data._elem, 'videoHeight'));
+		}
+	};
+	
+	mediaelement.playerResize = function(id){
+		if(!id){return;}
+		var elem = document.getElementById(id.replace(idRep, ''));
+		
+		if(elem){
+			$(elem).triggerHandler('swfstageresize');
+		}
+		elem = null;
 	};
 	
 	
@@ -634,7 +648,8 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			.css({
 				width: elem.style.width || $(elem).width(),
 				height: elem.style.height || $(elem).height(),
-				position: 'relative'
+				position: 'relative',
+				overflow: 'hidden'
 			})
 			.insertBefore(elem)
 		;
