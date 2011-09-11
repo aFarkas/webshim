@@ -429,10 +429,8 @@ $('video, audio')
 				index = 0;
 			}
 			$(this)
-				//set new source
-				.prop('src', playlist[index])
-				// load new source
-				.mediaLoad() // instead of prop('src') + mediaLoad you can simply use loadMediaSrc
+				//renew source elements and call load-method
+				.loadMediaSrc(playlist[index])
 				//start playing
 				.play()
 			;

@@ -55,18 +55,18 @@
 		
 		ok(isNaN(audio.prop('duration')), 'duration is NaN');
         setTimeout(function(){
-	        $.webshims.ready('mediaelement', start);
+	        $.webshims.ready('mediaelement swfobject', start);
 		}, 100);
     });
 	
 	asyncTest("mediaelement playing", function(){
         var video = $('video');
-		var audio = $('audio');
         var readyState;
         video
 			.loadMediaSrc(
 				[
-					"http://protofunc.com/jme/media/bbb_trailer_mobile.m4v"
+					"http://protofunc.com/jme/media/bbb_trailer_mobile.m4v",
+					"http://protofunc.com/jme/media/bbb_trailer_400p.ogg"
 				], 
 				"http://protofunc.com/jme/media/bbb_watchtrailer.gif")
 			.play()
@@ -74,13 +74,52 @@
 		
 		
 		
-		video.bind('loadedmetadata', function(){
-			ok(video.prop('readyState') > 0, "readyState is greater 1 if video loaded metadata");
-			ok(video.prop('duration') > 31 && video.prop('duration') < 34, "video duration is between 31 and 34");
-			setTimeout(function(){
-				start();
-			}, 400);
-		});
-        
+		video
+			.bind('loadedmetadata', function(){
+				ok(video.prop('readyState') > 0, "readyState is greater 1 if video loaded metadata");
+				ok(video.prop('duration') > 31 && video.prop('duration') < 34, "video duration is between 31 and 34");
+				setTimeout(function(){
+					start();
+				}, 400);
+			})
+		
+			.each(function(){
+				if(video.prop('readyState')){
+					video.trigger('loadedmetadata');
+				}
+			})
+		;
     });
+	
+	asyncTest("mediaelement youtube playing", function(){
+		var video = $('video');
+        video
+			.loadMediaSrc(
+				"http://www.youtube.com/watch?v=siOHh0uzcuY", 
+				"http://protofunc.com/jme/media/bbb_watchtrailer.gif"
+			)
+			.play()
+		;
+		if(swfobject.hasFlashPlayerVersion('9.0.115')){
+	        
+			video
+				.bind('loadedmetadata', function(){
+					ok(video.prop('readyState') > 0, "readyState is greater 1 if video loaded metadata");
+					ok(video.prop('duration') > 2510 && video.prop('duration') < 2525, "video duration is between 31 and 34");
+					setTimeout(function(){
+						start();
+					}, 400);
+				})
+				.each(function(){
+					if(video.prop('readyState')){
+						video.trigger('loadedmetadata');
+					}
+				})
+			;
+		} else {
+			ok(video.data('mediaerror'), "video has mediaerror with unknown video sources");
+			start();
+		}
+    });
+	
 })(jQuery);

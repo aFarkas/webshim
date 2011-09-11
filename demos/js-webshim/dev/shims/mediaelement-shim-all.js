@@ -115,6 +115,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		_bufferedEnd: 0,
 		_bufferedStart: 0,
 		_metadata: false,
+		_callMeta: false,
 		currentTime: 0,
 		_ppFlag: undefined
 	}, getProps, getSetProps);
@@ -198,7 +199,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 					} catch(er){}
 					if(data.duration){
 						trigger(data._elem, 'durationchange');
-						if(data._elemNodeName == 'audio'){
+						if(data._elemNodeName == 'audio' || data._callMeta){
 							this.META($.extend({duration: data.duration}, obj), data);
 						}
 					}
@@ -228,17 +229,18 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			},
 			META: function(obj, data){
 				
-				if( !('duration' in obj) && !('youtubequalitylevels' in obj) ){return;}
+				
 				
 				data = data && data.networkState ? data : getSwfDataFromID(obj.id);
-				
-				if(!data || data._metadata ){return;}
-				data._metadata = true;
-				if(data.duration && !('duration' in obj) && ('youtubequalitylevels' in obj) ){
-					trigger(data._elem, 'loadedmetadata');
+				if( !('duration' in obj) ){
+					data._callMeta = true;
 					return;
 				}
 				
+				
+				if(!data || data._metadata ){return;}
+				data._metadata = true;
+								
 				var oldDur = data.duration;
 				data.duration = obj.duration;
 				data.videoHeight = obj.height || 0;
@@ -596,7 +598,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	
 	
 	var resetSwfProps = (function(){
-		var resetProtoProps = ['_bufferedEnd', '_bufferedStart', '_metadata', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'videoHeight', 'videoWidth'];
+		var resetProtoProps = ['_bufferedEnd', '_bufferedStart', '_metadata', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'videoHeight', 'videoWidth', '_callMeta'];
 		var len = resetProtoProps.length;
 		return function(data){
 			
