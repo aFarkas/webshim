@@ -423,10 +423,10 @@ $(this).checkValidity();
 							<p>This means that some HTML5 events go down the DOM tree in capable browsers and go up the tree in polyfilled browsers. This can create differences if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default, don't use <code>return false;</code>, use <code>event.preventDefault();</code> instead.</p>
 						</li>
 						<li>
-							<p><strong>manipulation methods</strong>: To insert new HTML5 content dynamically, use <code>.htmlWebshim()</code>, <code>.appendWebshim()</code>, <code>.prependWebshim()</code>, <code>.afterWebshim()</code>, <code>.beforeWebshim()</code> and <code>.replaceWithWebshim()</code>:</p>
+							<p><strong>manipulation methods</strong>: To insert new HTML5 content dynamically, use <code>.htmlPolyfill()</code>, <code>.appendPolyfill()</code>, <code>.prependPolyfill()</code>, <code>.afterPolyfill()</code>, <code>.beforePolyfill()</code> and <code>.replaceWithPolyfill()</code>:</p>
 <code class="block">
 //three different examples
-$('form').appendWebshim('&lt;input type="date" /&gt;');
+$('form').appendWebshim('&lt;fieldset&gt;&lt;input type="date" /&gt;&lt;/fieldset&gt;');
 $('#canvas-box').htmlWebshim('&lt;canvas&gt;&lt;/canvas&gt;');
 $('datalist#list select').prependWebshim('&lt;option value="new suggestion item" /&gt;');
 </code>

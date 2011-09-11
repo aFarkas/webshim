@@ -708,7 +708,7 @@
 			},
 			triggerDomUpdate: function(context){
 				if(!context || !context.nodeType){
-					if(context.jquery){
+					if(context && context.jquery){
 						context.each(function(){
 							webshims.triggerDomUpdate(this);
 						});
@@ -724,7 +724,7 @@
 			}
 		});
 		
-		$.fn.htmlWebshim = function(a){
+		$.fn.htmlWebshim = $.fn.htmlPolyfill = function(a){
 			var ret = $.fn.html.call(this, (a) ? webshims.fixHTML5(a) : a);
 			if(ret === this && $.isDOMReady){
 				this.each(function(){
@@ -735,11 +735,13 @@
 			}
 			return ret;
 		};
+		
+		
 		if(webshims.fn) {
 			webshims.fn.html = $.fn.htmlWebshim;
 		}
 		$.each(['after', 'before', 'append', 'prepend', 'replaceWith'], function(i, name){
-			$.fn[name+'Webshim'] = function(a){
+			webshims.fn[name] = $.fn[name+'Polyfill'] = $.fn[name+'Webshim'] = function(a){
 				var elems = $(webshims.fixHTML5(a));
 				$.fn[name].call(this, elems);
 				if($.isDOMReady){
@@ -751,10 +753,22 @@
 				}
 				return this;
 			};
-			if(webshims.fn){
-				webshims.fn[name] = $.fn[name+'Webshim'];
-			}
+			
 		});
+		
+		$.each(['insetAfter', 'insertBefore', 'appendTo', 'prependTo', 'replaceAll'], function(i, name){
+			webshims.fn[name] = $.fn[name.replace(/[A-Z]/, function(c){return "Polyfill"+c;})] = function(){
+				$.fn[name].apply(this, arguments);
+				webshims.triggerDomUpdate(this);
+				return this;
+			};
+		});
+		
+		$.fn.polyfillUpdate = function(){
+			webshims.triggerDomUpdate(this);
+			return this;
+		};
+		
 		$.each(['getNativeElement', 'getShadowElement', 'getShadowFocusElement'], function(i, name){
 			$.fn[name] = function(){
 				return this;
