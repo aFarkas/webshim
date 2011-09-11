@@ -871,6 +871,23 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		mediaSup = webshims.defineNodeNameProperties(nodeName, descs, 'prop');
 	});
 	
+	if(hasFlash && $.browser.msie && webshims.borwserVersion < 9){
+		var oldClean = $.cleanData;
+		$.cleanData = function(elems){
+			if(elems && elems[0] && elems[0].nodeType == 1){
+				$('object', elems).add($(elems).filter('object')).each(function(){
+					try {
+						for (var i in this) {
+							if (typeof this[i] == "function") {
+								this[i] = null;
+							}
+						}
+					} catch(er){}
+				});
+			}
+			return oldClean.apply(this, arguments);
+		};
+	}
 	
 });(function($, Modernizr, webshims){
 	
