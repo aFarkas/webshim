@@ -25,7 +25,23 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		videoHeight: 0,
 		videoWidth: 0,
 		error: null,
-		buffered: undefined
+		buffered: {
+			start: function(index){
+				if(index){
+					webshims.error('buffered index size error');
+					return;
+				}
+				return 0;
+			},
+			end: function(index){
+				if(index){
+					webshims.error('buffered index size error');
+					return;
+				}
+				return 0;
+			},
+			length: 0
+		}
 	};
 	var getPropKeys = Object.keys(getProps);
 	
@@ -716,13 +732,16 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		var mediaSup;
 		var createGetProp = function(key){
 			if(nodeName == 'audio' && (key == 'videoHeight' || key == 'videoWidth')){return;}
+			
 			descs[key] = {
 				get: function(){
 					var data = getSwfDataFromElem(this);
 					if(data){
 						return data[key];
-					} else if(mediaSup[key].prop._supget) {
+					} else if(hasNative && mediaSup[key].prop._supget) {
 						return mediaSup[key].prop._supget.apply(this);
+					} else {
+						return playerStateObj[key];
 					}
 				},
 				writeable: false
