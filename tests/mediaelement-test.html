@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="utf-8" />
+	<title>Webshims Lib Test Suite</title>
+	
+	<link rel="stylesheet" href="qunit/qunit.css" media="screen">
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js"></script>
+	<script src="../src/extras/modernizr-custom.js"></script>
+	<script src="../src/extras/loaders/sssl.js"></script>
+	<script src="qunit/qunit.js"></script>
+	
+	<script src="../src/polyfiller.js"></script>
+	
+	<script>
+		(function($){
+			$.webshims.ready('dom-support', function(){
+				QUnit.reset = function(){
+					$("#main, #qunit-fixture").htmlWebshim( QUnit.config.fixture );
+				};
+			});
+			
+			
+			module("init");
+			asyncTest("init", function(){
+				$.webshims.ready('DOM mediaelement', start);
+			});
+			
+		})(jQuery);
+	</script>
+	
+	
+	
+
+	<script src="test-ext/test-helper.js"></script>
+	
+	<script src="unit/mediaelement.js"></script>
+	
+	<script>
+		jQuery.noConflict();
+		(function($){
+//			$.webshims.debug = true;
+			$(window).load(function(){
+				$.webshims.polyfill();
+			});
+		})(jQuery);
+	</script>
+	<style type="text/css">
+		html { border: 0; }
+		#qunit-fixture {
+			position: static;
+			left: auto;
+			top: auto;
+		}
+	</style>
+</head>
+<body class="flora">
+
+<h1 id="qunit-header">Webshims Lib Test Suite</h1>
+<h2 id="qunit-banner"></h2>
+<div id="qunit-testrunner-toolbar"></div>
+<h2 id="qunit-userAgent"></h2>
+<ol id="qunit-tests"></ol>
+
+
+<div id="qunit-fixture">
+	<div id="mediawrapper">
+		<video controls preload="none" src="empty/src.ext" poster="empty/src.ext">
+			<source src="empty/src.ext"></source>
+		</video>
+		
+		<audio controls preload="none" src="empty/src.ext" poster="empty/src.ext">
+			<source src="empty/src.ext"></source>
+		</audio>
+	</div>
+	 
+</div>
+
+
+</body>
+</html>
