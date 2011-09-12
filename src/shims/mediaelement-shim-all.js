@@ -1209,34 +1209,45 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 		};
 	})();
 	
-	var selectSource = function(baseData, elem, data, useSwf, _srces, _noLoop){
+	var stepSources = function(elem, data, useSwf, _srces, _noLoop){
 		var ret;
-		_srces = _srces || mediaelement.srces(elem);
-		$(elem).data('mediaerror', false);
-		if(!_srces.length){return;}
 		if(useSwf || (useSwf !== false && data && data.isActive == 'flash')){
 			ret = mediaelement.canSwfPlaySrces(elem, _srces);
 			if(!ret){
 				if(_noLoop){
 					mediaelement.setError(elem, false);
 				} else {
-					selectSource(baseData, elem, data, false, _srces, true);
+					stepSources(elem, data, false, _srces, true);
 				}
 			} else {
 				handleSWF(elem, ret, data);
 			}
 		} else {
-			ret = mediaelement.canNativePlaySrces(elem);
+			ret = mediaelement.canNativePlaySrces(elem, _srces);
 			if(!ret){
 				if(_noLoop){
 					mediaelement.setError(elem, false);
 				} else {
-					selectSource(baseData, elem, data, true, _srces, true);
+					stepSources(elem, data, true, _srces, true);
 				}
 			} else if(data && data.isActive == 'flash') {
 				mediaelement.setActive(elem, 'html5', data);
 			}
 		}
+	};
+	var stopParent = /^(?:embed|object)$/i;
+	var selectSource = function(elem, data){
+		var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
+		var _srces = mediaelement.srces(elem);
+		var parent = elem.parentNode;
+		
+		clearTimeout(baseData.loadTimer);
+		$.data(elem, 'mediaerror', false);
+		
+		if(!_srces.length){return;}
+		if(!parent || stopParent.test(parent.nodeName || '')){return;}
+		data = data || webshims.data(elem, 'mediaelement');
+		stepSources(elem, data, options.preferFlash || undefined, _srces);
 	};
 	
 	
@@ -1253,15 +1264,12 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 		webshims.defineNodeNamesBooleanProperty(['audio', 'video'], 'loop');
 	}
 	
-	var stopParent = /^(?:embed|object)$/i;
+	
 	webshims.addReady(function(context, insertedElement){
 		$('video, audio', context)
 			.add(insertedElement.filter('video, audio'))
 			.each(function(){
-				var parent = this.parentNode;
-				if(parent && stopParent.test(parent.nodeName || '')){return;}
-				var baseData = webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
-				selectSource(baseData, this, false, options.preferFlash || undefined);
+				selectSource(this);
 			})
 		;
 	 });
@@ -1271,9 +1279,7 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 			prop: {
 				value: function(){
 					var data = webshims.data(this, 'mediaelement');
-					var baseData = webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
-					clearTimeout(baseData.loadTimer);
-					selectSource(baseData, this, data);
+					selectSource(this, data);
 					if(hasNative && (!data || data.isActive == 'html5') && supLoad.prop._supvalue){
 						supLoad.prop._supvalue.apply(this, arguments);
 					}
@@ -1303,12 +1309,12 @@ $.webshims.ready('dom-support', function($, webshims, window, document, undefine
 	});
 	webshims.onNodeNamesPropertyModify(['audio', 'video'], ['src', 'poster'], {
 		set: function(){
-			var data = webshims.data(this, 'mediaelement');
 			var elem = this;
-			var baseData = webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
+			var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
 			clearTimeout(baseData.loadTimer);
 			baseData.loadTimer = setTimeout(function(){
-				selectSource(baseData, elem, data);
+				selectSource(elem);
+				elem = null;
 			}, 9);
 		}
 	});
