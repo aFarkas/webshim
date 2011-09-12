@@ -4,6 +4,78 @@
     var absoluteUrlTest = function(url){
         ok(url.indexOf('://') != -1, 'url is absolute');
     };
+	
+	var generalMediaTest = function(media, options){
+		var events = {
+			loadedmetadata: 0,
+			play: 0,
+			pause: 0,
+			playing: 0,
+			durationchange: 0,
+			emptied: 0,
+			mediaerror: 0
+		};
+		media
+			.bind('loadedmetadata.testevent', function(){
+				events.loadedmetadata++;
+				ok(media.prop('readyState') > 0, "readyState is greater 1 if media loaded metadata");
+				if(options.duration){
+					ok(media.prop('duration') > options.duration - 4 && media.prop('duration') < options.duration + 4, "duration is in range for "+ options.duration +" on loadedmetadata event");
+				}
+				if(options.videoHeight){
+					ok(media.prop('videoHeight') > options.videoHeight - 4 && media.prop('videoHeight') < options.videoHeight + 4, "videoHeight is in range for "+ options.videoHeight +" on loadedmetadata event");
+				}
+				if(options.videoWidth){
+					ok(media.prop('videoWidth') > options.videoWidth - 4 && media.prop('videoWidth') < options.videoWidth + 4, "videoHeight is in range for "+ options.videoHeight +" on loadedmetadata event");
+				}
+			})
+			.bind('durationchange.testevent', function(){
+				events.durationchange++;
+				if(options.duration){
+					ok(media.prop('duration') > options.duration - 4 && media.prop('duration') < options.duration + 4, "duration is in range for "+ options.duration +" on durationchange event");
+				}
+			})
+			.bind('waiting.testevent', function(){
+				ok(media.prop('readyState') <= media.prop('HAVE_CURRENT_DATA'), "readyState is equal or less than HAVE_CURRENT_DATA");
+			})
+			
+			
+			.bind('playing.testevent', function(){
+				events.playing++;
+				ok(!media.prop('paused') && !media.prop('ended') && media.prop('readyState') > media.prop('HAVE_CURRENT_DATA'), "media state accords to currently playing");
+			})
+			.bind('emptied.testevent', function(){
+				events.emptied++;
+			})
+			.bind('play.testevent', function(){
+				events.play++;
+				ok(!media.prop('paused'), "media is not paused");
+			})
+			.bind('pause.testevent', function(){
+				events.pause++;
+				ok(media.prop('paused'), "media is paused");
+			})
+			.bind('mediaerror', function(){
+				events.mediaerror++;
+				ok(media.prop('mediaerror'), "media has error on mediaerror event");
+			})
+		;
+		
+		
+		return function(){
+			media.unbind('.testevent');
+			if(media.canPlayType( options.type[0] ) || (options.type[1] && media.canPlayType( options.type[1] )) ){
+				ok(!media.prop('mediaerror'), "media has no error");
+				$.each(events, function(eventName){
+					if(eventName in options){
+						equals(events[eventName], options[eventName], eventName+ " happend "+events[eventName] +'times');
+					}
+				})
+			} else {
+				
+			}
+		};
+	};
     
     asyncTest("mediaelement properties", function(){
         var video = $('video');
@@ -59,9 +131,15 @@
 		}, 100);
     });
 	
-	asyncTest("mediaelement playing", function(){
+	asyncTest("mediaelement all sources", function(){
         var video = $('video');
-        var readyState;
+        var endTest = generalMediaTest(video, {
+			duration: 32.5,
+			type: ['video/ogg', 'video/mp4'],
+			loadedmetadata: 1, 
+			durationchange: 1,
+			play: 1
+		});
         video
 			.loadMediaSrc(
 				[
@@ -75,12 +153,31 @@
 		
 		
 		video
-			.bind('loadedmetadata', function(){
-				ok(video.prop('readyState') > 0, "readyState is greater 1 if video loaded metadata");
-				ok(video.prop('duration') > 31 && video.prop('duration') < 34, "video duration is between 31 and 34");
-				setTimeout(function(){
-					start();
-				}, 400);
+			.bind('loadedmetadata.testevent mediaerror.testevent', function(){
+				endTest();
+				
+				endTest = generalMediaTest(video, {
+					duration: 2515,
+					type: ['video/youtube'],
+					loadedmetadata: 1, 
+					durationchange: 1
+//					,emptied: 1
+				});
+				video
+					.loadMediaSrc(
+						[
+							"http://www.youtube.com/watch?v=siOHh0uzcuY"
+						], 
+						"http://protofunc.com/jme/media/bbb_watchtrailer.gif")
+					.bind('loadedmetadata.testevent mediaerror.testevent', function(){
+						setTimeout(function(){
+							endTest();
+							setTimeout(start, 9);
+						}, 1);
+						
+					})
+					.play()
+				;
 			})
 		
 			.each(function(){
@@ -91,35 +188,35 @@
 		;
     });
 	
-	asyncTest("mediaelement youtube playing", function(){
-		var video = $('video');
-        video
-			.loadMediaSrc(
-				"http://www.youtube.com/watch?v=siOHh0uzcuY", 
-				"http://protofunc.com/jme/media/bbb_watchtrailer.gif"
-			)
-			.play()
+	
+	asyncTest("mediaelement embed test", function(){
+		var video = $(document.createElement('video'));
+		var endTest = generalMediaTest(video, {
+			duration: 2515,
+			type: ['video/youtube'],
+			loadedmetadata: 1, 
+			durationchange: 1,
+			emptied: 0
+		});
+        video.prop({
+			id: "doubble-check",
+			"src": "http://www.youtube.com/watch?v=siOHh0uzcuY"
+		});
+		video.appendPolyfillTo('#qunit-fixture').play();
+		video
+			.bind('loadedmetadata.testevent mediaerror.testevent', function(e){
+				endTest();
+				if(e.type == 'loadedmetadata'){
+					equals($('div').filter('[id="wrapper-jwplayer-doubble-check"]').length, 1, "one video was generated");
+				}
+				setTimeout(start, 9);
+			})
+			.each(function(){
+				if(video.prop('readyState')){
+					video.trigger('loadedmetadata');
+				}
+			})
 		;
-		if(swfobject.hasFlashPlayerVersion('9.0.115')){
-	        
-			video
-				.bind('loadedmetadata', function(){
-					ok(video.prop('readyState') > 0, "readyState is greater 1 if video loaded metadata");
-					ok(video.prop('duration') > 2510 && video.prop('duration') < 2525, "video duration is between 31 and 34");
-					setTimeout(function(){
-						start();
-					}, 400);
-				})
-				.each(function(){
-					if(video.prop('readyState')){
-						video.trigger('loadedmetadata');
-					}
-				})
-			;
-		} else {
-			ok(video.data('mediaerror'), "video has mediaerror with unknown video sources");
-			start();
-		}
     });
 	
 })(jQuery);

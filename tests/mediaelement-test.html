@@ -24,7 +24,7 @@
 			
 			module("init");
 			asyncTest("init", function(){
-				$.webshims.ready('DOM mediaelement', start);
+				$.webshims.ready('DOM mediaelement swfobject', start);
 			});
 			
 		})(jQuery);
@@ -53,6 +53,9 @@
 			left: auto;
 			top: auto;
 		}
+		.hidden-area {
+			display: none;
+		}
 	</style>
 </head>
 <body class="flora">
@@ -69,6 +72,8 @@
 		<video controls preload="none" src="empty/src.ext" poster="empty/src.ext">
 			<source src="empty/src.ext"></source>
 		</video>
+		
+		<div class="hidden-area"></div>
 		
 		<audio controls preload="none" src="empty/src.ext" poster="empty/src.ext">
 			<source src="empty/src.ext"></source>
