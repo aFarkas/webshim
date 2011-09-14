@@ -111,16 +111,15 @@ $.event.special.invalid = {
 	setup: function(){
 		var form = this.form || this;
 		if( $.data(form, 'invalidEventShim') ){
+			form = null;
 			return;
 		}
 		$(form)
 			.data('invalidEventShim', true)
 			.bind('submit', $.event.special.invalid.handler)
 		;
-		var submitEvents = $(form).data('events').submit;
-		if(submitEvents && submitEvents.length > 1){
-			submitEvents.unshift( submitEvents.pop() );
-		}
+		webshims.moveToFirstEvent(form, 'submit');
+		form = null;
 	},
 	teardown: $.noop,
 	handler: function(e, d){

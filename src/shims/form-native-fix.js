@@ -50,7 +50,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 			firstInvalidEvent = false;
 			invalids = [];
 			
-			var submitEvents = $(form)
+			$(form)
 				.unbind('submit.preventInvalidSubmit')
 				.bind('submit.preventInvalidSubmit', function(submitEvent){
 					if( $.attr(form, 'novalidate') == null ){
@@ -58,12 +58,9 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 						return false;
 					}
 				})
-				.data('events').submit
 			;
-			//add this handler as first executing handler
-			if (submitEvents && submitEvents.length > 1) {
-				submitEvents.unshift(submitEvents.pop());
-			}
+			webshims.moveToFirstEvent(form, 'submit');
+			
 			
 			if(!fromSubmit){return;}
 			firstInvalidEvent = data;
@@ -94,7 +91,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	if(xBadWebkit){
 		var submitTimer;
 		var trueInvalid;
-		var invalidEvent = $(document).bind('invalid', function(e){
+		$(document).bind('invalid', function(e){
 			if(e.originalEvent && !fromSubmit && !fromCheckValidity && ($.prop(e.target, 'validity') || {}).valid){
 				e.originalEvent.wrongWebkitInvalid = true;
 				e.wrongWebkitInvalid = true;
@@ -112,12 +109,9 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 				}
 				trueInvalid = false;
 			}, 1);
-		})
-		.data('events').invalid;
-		//add this handler as first executing handler
-		if (invalidEvent && invalidEvent.length > 1) {
-			invalidEvent.unshift(invalidEvent.pop());
-		}
+		});
+		
+		webshims.moveToFirstEvent(document, 'invalid');
 		
 		$(document).bind('firstinvalidsystem', function(e, data){
 			if(fromCheckValidity){return;}

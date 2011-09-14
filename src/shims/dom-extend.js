@@ -406,6 +406,14 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		//http://www.w3.org/TR/html5/common-dom-interfaces.html#reflect
 		createPropDefault: createPropDefault,
 		data: elementData,
+		//ToDo: use $._data for jQuery 1.7 compatibility
+		moveToFirstEvent: function(elem, eventType){
+			var events = ($.data(elem, 'events') || {})[eventType];
+			if(events && events.length > 1){
+				events.unshift( events.pop() );
+			}
+			elem = null;
+		},
 		addShadowDom: function(nativeElem, shadowElem, opts){
 			opts = opts || {};
 			if(nativeElem.jquery){

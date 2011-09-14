@@ -90,15 +90,9 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		$.event.trigger(evt, undefined, elem);
 	};
 	var stopMutedAnnounce;
-	var jwplugin = webshims.cfg.basePath +'swf/jwwebshims.swf';
 	var playerSwfPath = webshims.cfg.basePath + "jwplayer/player.swf";
-	if(hasFlash){
-		webshims.ready('WINDOWLOAD', function(){
-			if(!loadedSwf){
-				$.ajax(jwplugin, webshims.xhrPreloadOption);
-			}
-		});
-	}
+	var jwplugin = webshims.cfg.basePath +'swf/jwwebshims.swf';
+	
 	webshims.extendUNDEFProp(options.jwParams, {
 		allowscriptaccess: 'always',
 		allowfullscreen: 'true',
