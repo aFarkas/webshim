@@ -22,7 +22,7 @@
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor && Function.prototype.bind);
 		
 	
-	if (!window.iepp && !Modernizr.genericDOM && !$.isReady) {
+	if (!window.iepp && $.browser.msie && browserVersion < 9 && !$.isReady) {
 		$.each(['datalist', 'source', 'video', 'audio', 'details', 'summary', 'canvas', 'output'], function(i, name){
 			document.createElement(name);
 		});
@@ -74,7 +74,7 @@
 				var script = $('script').filter('[src="polyfiller.js"]');
 				var path;
 				script = script[0] || script.end()[script.end().length - 1];
-				path = ((!$.browser.msie || document.documentMode >= 8) ? script.src : script.getAttribute("src", 4)).split('?')[0];
+				path = ( ($.support.hrefNormalized) ? script.src : script.getAttribute("src", 4) ).split('?')[0];
 				path = path.slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 				return path;
 			})()
@@ -1091,7 +1091,7 @@
 				},
 				noAutoCallback: true,
 				
-				dependencies: ['dom-support']
+				dependencies: ['swfobject','dom-support']
 			});
 			addPolyfill('mediaelement-swf', $.extend({
 				feature: 'mediaelement',

@@ -5,6 +5,7 @@
  * - improve buffered-property with youtube/rtmp
  * - get buffer-full event
  * - set preload to none, if flash is active
+ * - use jwplayer5 api instead of old flash4 api (this can be scheduled)
  */
 
 jQuery.webshims.register('mediaelement-swf', function($, webshims, window, document, undefined, options){
@@ -432,6 +433,9 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				if(blockResize){return;}
 				setSize(lastIntrinsicSize.width, lastIntrinsicSize.height);
 			})
+			.bind('emptied', function(){
+				lastIntrinsicSize = {};
+			})
 			.triggerHandler('swfstageresize')
 		;
 		
@@ -486,7 +490,8 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			play: 1,
 			playing: 1
 		};
-		var hidevents = ['play', 'pause', 'playing', 'canplay', 'progress', 'waiting', 'ended', 'loadedmetadata', 'durationchange', 'emptied'].map(function(evt){
+		var hideEvtArray = ['play', 'pause', 'playing', 'canplay', 'progress', 'waiting', 'ended', 'loadedmetadata', 'durationchange', 'emptied'];
+		var hidevents = hideEvtArray.map(function(evt){
 			return evt +'.webshimspolyfill';
 		}).join(' ');
 		
@@ -501,13 +506,17 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				}
 			}
 		};
-		$(document).bind(hidevents, hidePlayerEvents);
+		
 		addMediaToStopEvents = function(elem){
 			$(elem)
 				.unbind(hidevents)
 				.bind(hidevents, hidePlayerEvents)
 			;
+			hideEvtArray.forEach(function(evt){
+				webshims.moveToFirstEvent(elem, evt);
+			});
 		};
+		addMediaToStopEvents(document);
 	}
 	
 	
@@ -867,11 +876,16 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		mediaSup = webshims.defineNodeNameProperties(nodeName, descs, 'prop');
 	});
 	
-	if(hasFlash && $.browser.msie && webshims.borwserVersion < 9){
+	if(hasFlash){
 		var oldClean = $.cleanData;
 		$.cleanData = function(elems){
 			if(elems && elems[0] && elems[0].nodeType == 1){
-				$('object', elems).add($(elems).filter('object')).each(function(){
+				$(elems).filter('object').each(function(){
+					if('sendEvent' in this){
+						try {
+							this.sendEvent('play', false);
+						} catch(er){}
+					}
 					try {
 						for (var i in this) {
 							if (typeof this[i] == "function") {

@@ -5,10 +5,10 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 		webshims.defineNodeNamesProperty(prop == 'src' ? ['audio', 'video', 'source'] : ['video'], prop, {
 			prop: {
 				get: function(){
-					var href = $.attr(this, prop);
+					var href = this.getAttribute(prop);
 					if(href == null){return '';}
-					anchor.setAttribute('href', href);
-					return anchor.href;
+					anchor.setAttribute('href', href+'' );
+					return !$.support.hrefNormalized ? anchor.getAttribute('href', 4) : anchor.href;
 				},
 				set: function(src){
 					$.attr(this, prop, src);

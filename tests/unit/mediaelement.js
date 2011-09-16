@@ -2,7 +2,7 @@
     module("mediaelement API test");
     
     var absoluteUrlTest = function(url){
-        ok(url.indexOf('://') != -1, 'url is absolute');
+        ok(url.indexOf('://') != -1, 'url is absolute. url was: '+ url);
     };
 	
 	var generalMediaTest = function(media, options){
@@ -15,12 +15,14 @@
 			emptied: 0,
 			mediaerror: 0
 		};
+		var duration;
 		media
 			.bind('loadedmetadata.testevent', function(){
 				events.loadedmetadata++;
 				ok(media.prop('readyState') > 0, "readyState is greater 1 if media loaded metadata");
 				if(options.duration){
-					ok(media.prop('duration') > options.duration - 4 && media.prop('duration') < options.duration + 4, "duration is in range for "+ options.duration +" on loadedmetadata event");
+					duration = media.prop('duration');
+					ok(duration > options.duration - 4 && duration < options.duration + 4, "duration is in range for "+ options.duration +" on loadedmetadata event. duration was: "+duration);
 				}
 				if(options.videoHeight){
 					ok(media.prop('videoHeight') > options.videoHeight - 4 && media.prop('videoHeight') < options.videoHeight + 4, "videoHeight is in range for "+ options.videoHeight +" on loadedmetadata event");
@@ -32,7 +34,8 @@
 			.bind('durationchange.testevent', function(){
 				events.durationchange++;
 				if(options.duration){
-					ok(media.prop('duration') > options.duration - 4 && media.prop('duration') < options.duration + 4, "duration is in range for "+ options.duration +" on durationchange event");
+					duration = media.prop('duration');
+					ok(duration > options.duration - 4 && duration < options.duration + 4, "duration is in range for "+ options.duration +" on durationchange event duration was: "+duration);
 				}
 			})
 			.bind('waiting.testevent', function(){
