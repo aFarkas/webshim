@@ -134,7 +134,11 @@
 				<h3 id="quick-install" class="button">Easy &amp; simple Quick install</h3>
 				<div class="panel">
 <code class="block">
-//reference the base script
+&lt;!-- dependencies: jQuery + Modernizr with yepnope --&gt;
+&lt;script src="js/jquery-1.6.4.js"&gt;&lt;/script&gt;
+&lt;script src="js/modernizr-yepnope-custom.js"&gt;&lt;/script&gt;
+	
+&lt;!-- reference the base script --&gt;
 &lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
 	
 &lt;script&gt;
@@ -148,18 +152,19 @@
 	});
 &lt;/script&gt;		
 </code>
+					<p><small>Note: Webshims do not need all Modernizr tests to work, if you ommit a Modernizr - test, which is used by Webshims, Webshims simply won't polyfill this feature. Here you find <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-load">all Modernizr detections, which are used by webshims</a>.</small></p>
 				</div>
 	
 				<h3 id="embed-polyfill" class="button">Embedding and configuring the script</h3>
 				<div class="panel">
 					<ul>
 						<li>Take the 'js-webshim' folder and add it to your project. (You will find a minified and a dev folder there.)</li>
-						<li>Include the polyfiller.js into your HTML page. You can concatenate this file with your other js and rename. Don't forget to also include <a href="http://jquery.com">jQuery</a>, <a href="http://www.modernizr.com/">Modernizr</a> and a scriptloader (<a href="http://yepnopejs.com/">yepnope</a>, <a href="https://gist.github.com/936413">SSSL</a> or <a href="http://requirejs.org/">RequireJS</a>).</li>
+						<li>Include the polyfiller.js into your HTML page. You can concatenate this file with your other js and rename. Don't forget to also include <a href="http://jquery.com">jQuery</a>, <a href="http://www.modernizr.com/">Modernizr</a> and a scriptloader (<a href="http://yepnopejs.com/">yepnope</a> (You can configure Modernizr to include yepnope), <a href="https://gist.github.com/936413">SSSL</a> or <a href="http://requirejs.org/">RequireJS</a>).</li>
 						<li>call the polyfill method</li>
 					</ul>
 				
 <code class="block">
-&lt;script src="js/jquery-1.6.2.js"&gt;&lt;/script&gt;
+&lt;script src="js/jquery-1.6.4.js"&gt;&lt;/script&gt;
 &lt;script src="js/modernizr-yepnope-custom.js"&gt;&lt;/script&gt;
 &lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
 
@@ -352,7 +357,7 @@ $.webshims.ready('DOM canvas', function(){
 					<ul>
 						<li><strong>waitReady</strong> (default: true): If this option is true, jQuery's ready-event will be delayed until all needed features are ready to use. This option should be only set to false, if webshims lib polyfill.js is loaded async (see also Loading webshims async in the <a href="#embed-polyfill">embed documentation</a>).</li>
 						<li><strong>basePath</strong> (default: "automatially computed path to the shims folder"): If polyfill.js was renamed <strong>and</strong> is loaded dynamically, the basePath should be changed manually.</li>
-						<li><strong>extendNative</strong> (default: true): Webshims lib will automatically extend DOM-Object with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNativ is set to false, webshims lib won't touch any DOM-Objects and will only implement jQuery plugins.</li>
+						<li><strong>extendNative</strong> (default: true): Webshims lib will automatically extend DOM-Objects with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNativ is set to false, webshims lib won't touch any DOM-Objects and will only implement jQuery plugins.</li>
 					</ul>
 <code class="block">
 $.webshims.setOptions("extendNative", false);
@@ -432,7 +437,7 @@ $('datalist#list select').prependWebshim('&lt;option value="new suggestion item"
 </code>
 						</li>
 						<li>
-							<p><strong>no shadowdom</strong>: Webshims lib sometime has to add additional DOM elements to mimic the UI of HTML5 elements. This can sometimes create differences, between polyfilled and non polyfilled browsers. Webshims lib gives you a method called 'getShadowElement' to access the shadowelement from the native element and a method called 'getNativeElement' to access the native element from the shadowelement. If the element has no shadowelement the element itself is returned.</p>
+							<p><strong>no shadowdom</strong>: Webshims lib sometimes has to add additional DOM elements to mimic the UI of HTML5 elements. This can sometimes create differences, between polyfilled and non polyfilled browsers. Webshims lib gives you a method called 'getShadowElement' to access the shadowelement from the native element and a method called 'getNativeElement' to access the native element from the shadowelement. If the element has no shadowelement the element itself is returned.</p>
 							
 <code class="block">
 //animate the width of all date - inputs to a width of 300
