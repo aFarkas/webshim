@@ -222,7 +222,7 @@
 				<ul>
 					<li><small>1.buffered is a little bit buggy with youtube videos.</small></li>
 					<li><small>2.videoHeight/videoWidth not supported with youtube videos.</small></li>
-					<li><small>3. mediaLoad is the jQuery plugin method, which corresponds to the native load method (Webshims lib does not override jQuery's own load-method).</small></li>
+					<li><small>3. mediaLoad is the jQuery plugin method, which corresponds to the native load method (Webshims lib does not override jQuery's own load-method), ( $('video')[0].load() === $('video:first').mediaLoad() ).</small></li>
 					<li><small>4. canPlayType returns "maybe" if native player can't play, but Flash can and is installed. (i.e.: $('video').canPlayType('video/flv') might return "mabe")</small></li>
 				</pul>
 				

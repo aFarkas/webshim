@@ -49,13 +49,21 @@
 		<div class="main-box">
 		<section>
 			<h2>Demo/About/Documentation HTML5 shiv</h2>
-			<p>IE8- isn't capable of rendering HTML5 elements. Webshims lib in combination with modernizr automatically fixes this issue.</p>
+			<p>IE8- isn't capable of rendering HTML5 elements. Webshims lib in combination with modernizr automatically fixes this issue and adds WAI-ARIA landmarks to enable accessibility of HTML5.</p>
 			<p>Additionally it implements the following manipulation methods <code>.htmlPolyfill()</code>, <code>.appendPolyfill()</code>, <code>.prependPolyfill()</code>, <code>.afterPolyfill()</code>, <code>.beforePolyfill()</code> and <code>.replaceWithPolyfill()</code> to also allow dynamic creation of HTML5 elements.</p>
 <code class="block run-once">
-$('#my-id').appendWebshim('&lt;section&gt;&lt;form action="#"&gt;&lt;input type="text" placeholder="hello this is required" required="required" name="test" /&gt;&lt;input type="submit" /&gt;&lt;/form&gt;&lt;/section&gt;');
+$('#my-id').appendPolyfill('&lt;section&gt;&lt;form action="#"&gt;&lt;input type="text" placeholder="hello this is required" required="required" name="test" /&gt;&lt;input type="date" required="required" name="test2" /&gt;&lt;input type="submit" /&gt;&lt;/form&gt;&lt;/section&gt;');
 </code>
 			<div id="my-id"></div>
 			
+			<h3>jQuery 1.7+ features</h3>
+			<p>Starting with jQuery 1.7 webshims lib will also fully support the following manipulation methods: <code>.appendPolyfillTo()</code>, <code>.prependPolyfillTo()</code>, <code>.insertPolyfillAfter()</code>, <code>.insertPolyfillBefore()</code> and <code>.replacePolyfillAll()</code>.</p>
+			<p>If a plugin is used, which uses a "normal" jQuery manipulation method instead of the corresponding webshims enhanced manipulation method to generate new HTML5 content  (i.e.: <code>.html()</code> instead of <code>.htmlPolyfill()</code>), the method <code>.updatePolyfill()</code> can be used:</p>
+<code class="block">
+$('#my-dynamic-container').load('ajax/test.html', function(){
+	$(this).updatePolyfill();
+});
+</code>			
 			<aside>
 				<h3>Links about shiv</h3>
 				<ul>
