@@ -406,14 +406,16 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		//http://www.w3.org/TR/html5/common-dom-interfaces.html#reflect
 		createPropDefault: createPropDefault,
 		data: elementData,
-		//ToDo: use $._data for jQuery 1.7 compatibility
-		moveToFirstEvent: function(elem, eventType){
-			var events = ($.data(elem, 'events') || {})[eventType];
-			if(events && events.length > 1){
-				events.unshift( events.pop() );
-			}
-			elem = null;
-		},
+		moveToFirstEvent: (function(){
+			var getData = $._data ? '_data' : 'data';
+			return function(elem, eventType){
+				var events = ($[getData](elem, 'events') || {})[eventType];
+				if(events && events.length > 1){
+					events.unshift( events.pop() );
+				}
+				elem = null;
+			};
+		})(),
 		addShadowDom: function(nativeElem, shadowElem, opts){
 			opts = opts || {};
 			if(nativeElem.jquery){
@@ -788,8 +790,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 });
 //html5a11y
 (function($, document){
-	var browserVersion = parseFloat($.browser.version, 10);
-	if (($.browser.msie && browserVersion < 10 && browserVersion > 7) || ($.browser.mozilla && browserVersion < 2) || ($.browser.webkit && browserVersion < 535)) {
+	var browserVersion = $.webshims.browserVersion;
+	if (!$.browser.msie || (browserVersion < 12 && browserVersion > 7)) {
 		var elemMappings = {
 			article: "article",
 			aside: "complementary",

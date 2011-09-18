@@ -31,6 +31,8 @@ How To Use
 * Include the JavaScript:
 
 ---------------
+	<script src="js/jquery.js"></script>
+	<script src="js/Modernizr-yepnope.js"></script> 
 	<script src="js-webshim/minified/polyfiller.js"></script> 
 
 	<script> 
@@ -73,39 +75,20 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.8.1
+----------
+- improved mediaelement loading
+- fixed small bugs in mediaelement polyfill
+- prepare for jQuery 1.7 compatibility
+- fixed demos
+
+
 Release 1.8.0
 ----------
 
-* mediaelement implementation (audio/video)
+* first mediaelement implementation (audio/video)
 * implemented form submitter attributes (formaction, formtarget, formenctype)
 * better language support
 * updated es5-shim
 * updated jQuery UI path 
 * fixed label for putput element
-
-Release 1.7.2
-----------
-
-* fixed bad feature detection for interactive form validation in Safari 5.1
-* improved error balloon positioning
-* .form-ui-valid/.form-ui-invalid behave now more similiar to :-moz-ui-valid/:-moz-ui-invalid 
-* some little performance improvements
-* started mediaelement support (next major release)
-
-Release 1.7.1
-----------
-
-* fixed autofocus issue
-* updated "placeholder label option"-algorithm (changed spec)
-* scripted submit is not prevented anymore
-* delegate validity property from shadowelement to native element
-* delayed focusout/blur event on date-input, if user is interacting with datepicker
-
-
-Release 1.7
-----------
-
-* compaibility with jQuery 1.6.x
-* support for $.fn.prop/$.fn.removeAttr
-* added custom events to webforms *changedvalid* / *changedinvalid*
-
