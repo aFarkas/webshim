@@ -14,7 +14,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	var swfobject = window.swfobject;
 	var hasNative = Modernizr.audio && Modernizr.video;
 	var hasFlash = swfobject.hasFlashPlayerVersion('9.0.115');
-	var loadedSwf;
+	var loadedSwf = 0;
 	var getProps = {
 		paused: true,
 		ended: false,
@@ -91,8 +91,8 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		$.event.trigger(evt, undefined, elem);
 	};
 	var stopMutedAnnounce;
-	var playerSwfPath = webshims.cfg.basePath + "jwplayer/player.swf";
-	var jwplugin = webshims.cfg.basePath +'swf/jwwebshims.swf';
+	var playerSwfPath = options.playerPath || webshims.cfg.basePath + "jwplayer/" + (options.playerName || "player.swf");
+	var jwplugin = options.pluginPath || webshims.cfg.basePath +'swf/jwwebshims.swf';
 	
 	webshims.extendUNDEFProp(options.jwParams, {
 		allowscriptaccess: 'always',
@@ -570,7 +570,12 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			}, 1);
 			return;
 		}
-		loadedSwf = true;
+		
+		if(loadedSwf < 1){
+			loadedSwf = 1;
+		} else {
+			loadedSwf++;
+		}
 		var vars = $.extend({}, options.jwVars, {
 				image: $.prop(elem, 'poster') || '',
 				file: canPlaySrc.srcProp
@@ -878,22 +883,35 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	
 	if(hasFlash){
 		var oldClean = $.cleanData;
+		var gcBrowser = $.browser.msie && webshims.browserVersion < 9;
+		var flashNames = {
+			object: 1,
+			OBJECT: 1
+		};
 		$.cleanData = function(elems){
-			if(elems && elems[0] && elems[0].nodeType == 1){
-				$(elems).filter('object').each(function(){
-					if('sendEvent' in this){
-						try {
-							this.sendEvent('play', false);
-						} catch(er){}
-					}
-					try {
-						for (var i in this) {
-							if (typeof this[i] == "function") {
-								this[i] = null;
-							}
+			var i, len, prop;
+			if(elems && (len = elems.length) && loadedSwf){
+				
+				for(i = 0; i < len; i++){
+					if(flashNames[elems[i].nodeName]){
+						if(SENDEVENT in elems[i]){
+							loadedSwf--;
+							try {
+								elems[i][SENDEVENT]('play', false);
+							} catch(er){}
 						}
-					} catch(er){}
-				});
+						if(gcBrowser){
+							try {
+								for (prop in elems[i]) {
+									if (typeof elems[i][prop] == "function") {
+										elems[i][prop] = null;
+									}
+								}
+							} catch(er){}
+						}
+					}
+				}
+				
 			}
 			return oldClean.apply(this, arguments);
 		};
