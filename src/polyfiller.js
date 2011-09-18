@@ -32,7 +32,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: 'pre1.8.1',
+		version: '1.8.1',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -71,7 +71,7 @@
 				}
 			},
 			basePath: (function(){
-				var script = $('script').filter('[src="polyfiller.js"]');
+				var script = $('script').filter('[src*="polyfiller.js"]');
 				var path;
 				script = script[0] || script.end()[script.end().length - 1];
 				path = ( ($.support.hrefNormalized) ? script.src : script.getAttribute("src", 4) ).split('?')[0];
@@ -601,6 +601,7 @@
 		warn: 1,
 		error: 1
 	};
+	
 	var xhrPreloadOption = {
 		cache: true,
 		dataType: 'text',
@@ -764,7 +765,7 @@
 			};
 		});
 		
-		$.fn.polyfillUpdate = function(){
+		$.fn.updatePolyfill = function(){
 			webshims.triggerDomUpdate(this);
 			return this;
 		};
@@ -1113,27 +1114,26 @@
 				src: 'mediaelement-shim-all'
 			}, swfOptions));
 		}
-		
-		$('script')
-			
-			.filter('[data-polyfill-cfg]')
-			.each(function(){
-				try {
-					webshims.setOptions( $(this).data('polyfillCfg') );
-				} catch(e){
-					webshims.warn('error parsing polyfill cfg: '+e);
-				}
-			})
-			.end()
-			.filter(function(){
-				return this.getAttribute('data-polyfill') != null;
-			})
-			.each(function(){
-				webshims.polyfill( $.trim( $(this).data('polyfill') || '' ) );
-			})
-		;
 	}
 
+
+	$('script')
+		.filter('[data-polyfill-cfg]')
+		.each(function(){
+			try {
+				webshims.setOptions( $(this).data('polyfillCfg') );
+			} catch(e){
+				webshims.warn('error parsing polyfill cfg: '+e);
+			}
+		})
+		.end()
+		.filter(function(){
+			return this.getAttribute('data-polyfill') != null;
+		})
+		.each(function(){
+			webshims.polyfill( $.trim( $(this).data('polyfill') || '' ) );
+		})
+	;
 	//set script path for comboOptions
 	var l = location;
 	webCFG.comboOptions.scriptPath = webCFG.basePath.replace(l.protocol + '//' + l.host + '/', '');
