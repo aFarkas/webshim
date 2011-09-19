@@ -66,6 +66,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 
 jQuery.webshims.register('mediaelement-swf', function($, webshims, window, document, undefined, options){
 	"use strict";
+	var SENDEVENT = 'sendEvent';
 	var mediaelement = webshims.mediaelement;
 	var swfobject = window.swfobject;
 	var hasNative = Modernizr.audio && Modernizr.video;
@@ -322,7 +323,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				}
 				if(data.paused){
 					try {
-						data.jwapi.sendEvent('play', 'false');
+						data.jwapi[SENDEVENT]('play', 'false');
 					} catch(er){}
 				}
 				if(data.currentTime != obj.position){
@@ -523,6 +524,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		if(!data || !data.jwapi){return;}
 		clearTimeout(localConnectionTimer);
 		data.jwData = jwData;
+		data.shadowElem.removeClass('flashblocker-assumed');
 		if(!data.wasSwfReady){
 			var version = parseFloat( jwData.version, 10);
 			if(version < 5.6 || version >= 6){
@@ -644,7 +646,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			data.currentSrc = canPlaySrc.srcProp;
 			$.extend(vars, elemVars);
 			options.changeJW(vars, elem, canPlaySrc, data, 'load');
-			queueSwfMethod(elem, 'sendEvent', ['LOAD', vars]);
+			queueSwfMethod(elem, SENDEVENT, ['LOAD', vars]);
 			
 			return;
 		}
@@ -750,28 +752,38 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		options.changeJW(vars, elem, canPlaySrc, data, 'embed');
 		startIntrinsicDimension(data);
 		swfobject.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.0", false, vars, params, attrs, function(swfData){
+			
 			if(swfData.success){
 				data.jwapi = swfData.ref;
+				
 				if(!hasControls){
 					$(swfData.ref).attr('tabindex', '-1').css('outline', 'none');
 				}
+				setTimeout(function(){
+					if((!swfData.ref.parentNode && box[0].parentNode) || swfData.ref.style.display == "none"){
+						box.addClass('flashblocker-assumed');
+						$(elem).trigger('flashblocker');
+						webshims.warn("flashblocker assumed");
+					}
+					$(swfData.ref).css({'minHeight': '2px', 'minWidth': '2px', display: 'block'});
+				}, 9);
 				if(!localConnectionTimer){
 					clearTimeout(localConnectionTimer);
 					localConnectionTimer = setTimeout(function(){
-						var elem = $(swfData.ref).css({'minHeight': '2px', 'minWidth': '2px', display: 'block'});
-						if(elem[0].offsetWidth > 1 && elem[0].offsetHeight > 1 && location.protocol.indexOf('file:') === 0){
+						var flash = $(swfData.ref);
+						if(flash[0].offsetWidth > 1 && flash[0].offsetHeight > 1 && location.protocol.indexOf('file:') === 0){
 							webshims.warn("Add your local development-directory to the local-trusted security sandbox:  http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html");
-						} else if(elem[0].offsetWidth < 2 || elem[0].offsetHeight < 2) {
+						} else if(flash[0].offsetWidth < 2 || flash[0].offsetHeight < 2) {
 							webshims.info("JS-SWF connection can't be established on hidden or unconnected flash objects");
 						}
-						elem = null;
+						flash = null;
 					}, 8000);
 				}
 			}
 		});
 	};
 	
-	var SENDEVENT = 'sendEvent';
+	
 	var queueSwfMethod = function(elem, fn, args, data){
 		data = data || getSwfDataFromElem(elem);
 		if(data){
@@ -887,7 +899,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 							trigger(data._elem, 'timeupdate');
 						}
 						try {
-							data.jwapi.sendEvent('play', 'false');
+							data.jwapi[SENDEVENT]('play', 'false');
 						} catch(er){}
 						
 					}

@@ -33,6 +33,10 @@ audio[controls] {
 	width: 300px;
 	height: 30px;
 }
+.flashblocker-assumed {
+	min-height: 20px;
+	min-width: 20px;
+}
 mark {
     background-color: #ff9;
     color: #000; 
