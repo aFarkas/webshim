@@ -56,7 +56,6 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 
 });/*
  * todos: 
- * - flashblocker detect
  * - decouple muted/volume
  * - improve buffered-property with youtube/rtmp
  * - get buffer-full event
@@ -654,8 +653,6 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		
 		var hasControls = $.prop(elem, 'controls');
 		var elemId = 'jwplayer-'+ webshims.getID(elem);
-		
-		
 		var params = $.extend(
 			{},
 			options.jwParams,
@@ -677,6 +674,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				overflow: 'hidden'
 			})
 		;
+		$(elem)[hasControls ? 'addClass' : 'removeClass']('webshims-controls');
 		if(elemNodeName == 'audio' && !hasControls){
 			box.css({width: 0, height: 0});
 		} else {

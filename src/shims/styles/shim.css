@@ -20,18 +20,22 @@ video {
 	display: block;
 	width: 300px;
 	height: 150px;
+	min-height: 45px;
+	min-width: 40px;
 }
-audio.webshims-controls {
-	height: 30px;
-}
+
 video *,
 audio * {
 	display: none !important;
 }
+audio.webshims-controls {
+	height: 45px;
+}
 audio[controls] {
 	display: block;
 	width: 300px;
-	height: 30px;
+	height: 45px;
+	min-height: 45px;
 }
 .flashblocker-assumed {
 	min-height: 20px;
