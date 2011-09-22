@@ -156,11 +156,6 @@
 				loader.loadCSS('styles/shim.css');
 				//remove function
 				firstPolyfillCall = $.noop;
-				if (!Modernizr.genericDOM) {
-					$(function(){
-						loadList(['dom-extend']);
-					});
-				}
 			};
 			
 			return function(features, combo){
