@@ -791,6 +791,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 //html5a11y
 (function($, document){
 	var browserVersion = $.webshims.browserVersion;
+	if($.browser.mozilla && browserVersion > 5){return;}
 	if (!$.browser.msie || (browserVersion < 12 && browserVersion > 7)) {
 		var elemMappings = {
 			article: "article",
