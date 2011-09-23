@@ -194,7 +194,7 @@ $.webshims.polyfill('json-storage geolocation');
 						</ul>
 						<p>The polyfill-method can also take a keyword called <code>lightweight</code>, which will load a filesize-/feature- balanced profile</p>
 						<p><small>With an * marked features are part of the lightweight profile</small></p>
-						<p><small><sup>1</sup> mediaelement feature will added to the lightweight profile with next version of webshims lib</small></p>
+						<p><small><sup>1</sup> mediaelement feature will be added to the lightweight profile with next version of webshims lib</small></p>
 	
 <code class="block">
 //load and implement all unsupported features from the lightweight profile
@@ -355,9 +355,9 @@ $.webshims.ready('DOM canvas', function(){
 					<p><code>setOptions</code> should always be called before the <code>polyfill</code> method.</p>
 					<p>The available general options are the following:</p>
 					<ul>
-						<li><strong>waitReady</strong> (default: true): If this option is true, jQuery's ready-event will be delayed until all needed features are ready to use. This option should be only set to false, if webshims lib polyfiller.js is loaded async (see also Loading webshims async in the <a href="#embed-polyfill">embed documentation</a>).</li>
-						<li><strong>basePath</strong> (default: "automatially computed path to the shims folder"): If polyfiller.js was renamed <strong>and</strong> is loaded dynamically, the basePath should be changed manually.</li>
 						<li><strong>extendNative</strong> (default: true): Webshims lib will automatically extend DOM-Objects with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNativ is set to false, webshims lib won't touch any DOM-Objects and will only implement jQuery plugins.</li>
+						<li><strong>basePath</strong> (default: "automatially computed path to the shims folder"): If polyfiller.js was renamed <strong>and</strong> is loaded dynamically, the basePath should be changed manually.</li>
+						<li><strong>waitReady</strong> (default: true): If this option is true, jQuery's ready-event will be delayed until all needed features are ready to use. This option should be only set to false, if webshims lib polyfiller.js is loaded async (see also Loading webshims async in the <a href="#embed-polyfill">embed documentation</a>).</li>
 					</ul>
 <code class="block">
 $.webshims.setOptions("extendNative", false);
