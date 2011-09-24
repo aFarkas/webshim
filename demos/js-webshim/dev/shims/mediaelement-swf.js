@@ -106,6 +106,21 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		bgcolor: '#000000'
 	});
 	
+	var getDuration = function(data, obj){
+		try {
+			data.duration = data.jwapi.getPlaylist()[0].duration;
+			if(data.duration <= 0 || data.duration === data._lastDuration){
+				data.duration = window.NaN;
+			}
+		} catch(er){}
+		if(data.duration){
+			trigger(data._elem, 'durationchange');
+			if(data._elemNodeName == 'audio' || data._callMeta){
+				mediaelement.jwEvents.Model.META($.extend({duration: data.duration}, obj), data);
+			}
+		}
+	};
+	
 	mediaelement.jwEvents = {
 		View: {
 			
@@ -130,18 +145,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				if(data._bufferedEnd == obj.percentage){return;}
 				data.networkState = (obj.percentage == 100) ? 1 : 2;
 				if(!data.duration){
-					try {
-						data.duration = data.jwapi.getPlaylist()[0].duration;
-						if(data.duration <= 0){
-							data.duration = window.NaN;
-						}
-					} catch(er){}
-					if(data.duration){
-						trigger(data._elem, 'durationchange');
-						if(data._elemNodeName == 'audio' || data._callMeta){
-							this.META($.extend({duration: data.duration}, obj), data);
-						}
-					}
+					getDuration(data, obj);
 				}
 				if(data.ended){
 					data.ended = false;
@@ -168,20 +172,19 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			},
 			META: function(obj, data){
 				
-				
-				
 				data = data && data.networkState ? data : getSwfDataFromID(obj.id);
+				
+				if(!data || data._metadata ){return;}
 				if( !('duration' in obj) ){
 					data._callMeta = true;
 					return;
 				}
-				
-				
-				if(!data || data._metadata ){return;}
 				data._metadata = true;
 								
 				var oldDur = data.duration;
+				
 				data.duration = obj.duration;
+				data._lastDuration = data.duration;
 				data.videoHeight = obj.height || 0;
 				data.videoWidth = obj.width || 0;
 				if(!data.networkState){
@@ -225,6 +228,9 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 					case 'PLAYING':
 						data.paused = false;
 						data._ppFlag = true;
+						if(!data.duration){
+							getDuration(data, obj);
+						}
 						if(data.readyState < 3){
 							data.readyState = 3;
 							trigger(data._elem, 'canplay');
