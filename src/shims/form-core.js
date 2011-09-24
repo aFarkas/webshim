@@ -138,7 +138,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	//ToDo needs testing
 	var oldAttr = $.prop;
 	var changeVals = {selectedIndex: 1, value: 1, checked: 1, disabled: 1, readonly: 1};
-	var stopUIRefresh;
 	$.prop = function(elem, name, val){
 		var ret = oldAttr.apply(this, arguments);
 		if(elem && 'form' in elem && changeVals[name] && val !== undefined && $(elem).hasClass('form-ui-invalid')){
@@ -151,46 +150,49 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		}
 		return ret;
 	};
+	
 	var switchValidityClass = function(e){
-		if(stopUIRefresh || !e.target || e.target.type == 'submit' || !$.prop(e.target, 'willValidate')){return;}
-		
-		var elem = $(e.target).getNativeElement()[0];
-		var shadowElem = $(elem).getShadowElement();
-		var addClass, removeClass, trigger;
-		
-		if(isValid(elem)){
-			if(!shadowElem.hasClass('form-ui-valid')){
-				addClass = 'form-ui-valid';
-				removeClass = 'form-ui-invalid';
-				trigger = 'changedvalid';
-				if(checkTypes[elem.type] && elem.checked){
-					getGroupElements(elem).removeClass(removeClass).addClass(addClass).removeAttr('aria-invalid');
+		if(!e.target || e.target.type == 'submit' || !$.prop(e.target, 'willValidate')){return;}
+		var timer = $.data(e.target, 'webshimsswitchvalidityclass');
+		if(timer){
+			clearTimeout(timer);
+		}
+		$.data(e.target, 'webshimsswitchvalidityclass', setTimeout(function(){
+			
+			var elem = $(e.target).getNativeElement()[0];
+			var shadowElem = $(elem).getShadowElement();
+			var addClass, removeClass, trigger;
+			
+			if(isValid(elem)){
+				if(!shadowElem.hasClass('form-ui-valid')){
+					addClass = 'form-ui-valid';
+					removeClass = 'form-ui-invalid';
+					trigger = 'changedvalid';
+					if(checkTypes[elem.type] && elem.checked){
+						getGroupElements(elem).removeClass(removeClass).addClass(addClass).removeAttr('aria-invalid');
+					}
+				}
+			} else {
+				if(!shadowElem.hasClass('form-ui-invalid')){
+					addClass = 'form-ui-invalid';
+					removeClass = 'form-ui-valid';
+					if (checkTypes[elem.type] && !elem.checked) {
+						getGroupElements(elem).removeClass(removeClass).addClass(addClass);
+					}
+					trigger = 'changedinvalid';
 				}
 			}
-		} else {
-			if(!shadowElem.hasClass('form-ui-invalid')){
-				addClass = 'form-ui-invalid';
-				removeClass = 'form-ui-valid';
-				if (checkTypes[elem.type] && !elem.checked) {
-					getGroupElements(elem).removeClass(removeClass).addClass(addClass);
-				}
-				trigger = 'changedinvalid';
+			if(addClass){
+				shadowElem.addClass(addClass).removeClass(removeClass);
+				//jQuery 1.6.1 IE9 bug (doubble trigger bug)
+				setTimeout(function(){
+					$(elem).trigger(trigger);
+				}, 0);
 			}
-		}
-		if(addClass){
-			shadowElem.addClass(addClass).removeClass(removeClass);
-			//jQuery 1.6.1 IE9 bug (doubble trigger bug)
-			setTimeout(function(){
-				$(elem).trigger(trigger);
-			}, 0);
-		}
-		
-		stopUIRefresh = true;
-		setTimeout(function(){
-			stopUIRefresh = false;
-			elem = shadowElem = null;
-		}, 9);
-		
+			
+			$.removeData(e.target, 'webshimsswitchvalidityclass')
+			
+		}, 9));
 	};
 	
 	$(document).bind('focusout change refreshvalidityui', switchValidityClass);
