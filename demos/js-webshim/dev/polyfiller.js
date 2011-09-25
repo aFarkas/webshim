@@ -32,7 +32,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: 'pre1.8.2',
+		version: '1.8.2beta1',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -1202,8 +1202,7 @@
 				test: function(){
 					var options = this.options;
 					var hasToPlay = options.hasToPlay;
-					
-					if (options.preferFlash || (hasToPlay != 'any' && !Modernizr.video[options.hasToPlay] && !Modernizr.audio[options.hasToPlay])) {
+					if ( (!window.swfobject || window.swfobject.hasFlashPlayerVersion('9.0.115')) && (options.preferFlash || (hasToPlay != 'any' && !Modernizr.video[hasToPlay] && !Modernizr.audio[hasToPlay]))) {
 						this.src = 'mediaelement-native-all';
 						return false;
 					}
