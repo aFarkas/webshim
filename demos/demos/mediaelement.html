@@ -74,7 +74,7 @@
 					},
 					function(){
 						try {
-							$('video', player).prop('currentTime', $.prop(this, 'value'));
+							$('video, audio', player).prop('currentTime', $.prop(this, 'value'));
 						} catch(er){}
 					}
 				);
@@ -84,10 +84,10 @@
 						
 					},
 					function(){
-						$('video', player).prop('volume', $.prop(this, 'value'));
+						$('video, audio', player).prop('volume', $.prop(this, 'value'));
 					}
 				);
-				$('video', this)
+				$('video, audio', this)
 					.bind('durationchange updateMediaState', function(){
 						var duration = $.prop(this, 'duration');
 						if(!duration){return;}
@@ -151,22 +151,22 @@
 				$('input.volume-slider', player).bind('input', getSetVolume.set);
 				
 				$('input.play', player).bind('click', function(){
-					$('video', player).play();
+					$('video, audio', player).play();
 				});
 				$('input.pause', player).bind('click', function(){
-					$('video', player).pause();
+					$('video, audio', player).pause();
 				});
 				$('input.muted', player).bind('click updatemuted', function(){
-					$('video', player).prop('muted', $.prop(this, 'checked'));
+					$('video, audio', player).prop('muted', $.prop(this, 'checked'));
 				}).triggerHandler('updatemuted'); 
-				$('input.controls').bind('click updatecontrols', function(){
-					$('video', player).prop('controls', $.prop(this, 'checked'));
+				$('input.controls', player).bind('click updatecontrols', function(){
+					$('video, audio', player).prop('controls', $.prop(this, 'checked'));
 				}).triggerHandler('updatecontrols'); 
 				
-				$('select.load-media').bind('change', function(){
+				$('select.load-media', player).bind('change', function(){
 					var src = $('option:selected', this).data('src');
 					if(src){
-						$('video', player).loadMediaSrc(src).play();
+						$('video, audio', player).loadMediaSrc(src).play();
 					}
 				}).prop('selectedIndex', 0);
 			});
@@ -255,7 +255,9 @@ $("video.my-video").loadMediaSrc(
 			</section>
 			<section>
 				<h3>Simple Demo</h3>
+				<h4>Video example</h4>
 				<div class="player">
+					
 					<video controls preload="none" poster="http://protofunc.com/jme/media/bbb_watchtrailer.gif">
 						<source src="http://protofunc.com/jme/media/bbb_trailer_mobile.m4v" type="video/mp4" />
 						<source src="http://protofunc.com/jme/media/bbb_trailer_400p.ogg" type="video/ogg" />
@@ -342,6 +344,79 @@ $("video.my-video").loadMediaSrc(
 										
 									</select>
 								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<h4>Audio example using mp3 only</h4>
+				<div class="player">
+					
+					<audio controls preload="none">
+						<source src="http://cdn.yayquery.com/ep/23/yayquery_23.mp3" type="audio/mpeg" />
+					</audio>
+					<table>
+						<thead>
+							<th>property</th>
+							<th>value/control</th>
+						</thead>
+						<tbody>
+							<tr>
+								<th>currentTime</th>
+								<td><span class="current-time"></span></td>
+							</tr>
+							<tr>
+								<th>duration</th>
+								<td><span class="duration"></span></td>
+							</tr>
+							<tr>
+								<th>progress</th>
+								<td><span class="progress">0</span></td>
+							</tr>
+							
+							<tr>
+								<th>paused-state</th>
+								<td><span class="paused-state">true</span></td>
+							</tr>
+							<tr>
+								<th>muted-state</th>
+								<td><span class="muted-state">false</span></td>
+							</tr>
+							<tr>
+								<th>volume</th>
+								<td><span class="volume">1</span></td>
+							</tr>
+														
+							<tr>
+								<th>networkState</th>
+								<td><span class="network-state"></span></td>
+							</tr>
+							<tr>
+								<th>readyState</th>
+								<td><span class="ready-state"></span></td>
+							</tr>
+							<tr>
+								<th>controls</th>
+								<td><input class="controls" type="checkbox" checked /></td>
+							</tr>
+							<tr>
+								<th>currentTime</th>
+								<td><input class="time-slider" type="range" disabled value="0" step="0.01" /></td>
+							</tr>
+							<tr>
+								<th>play</th>
+								<td><input value="play" type="button" class="play" /></td>
+							</tr>
+							<tr>
+								<th>pause</th>
+								<td><input value="pause" type="button" class="pause" /></td>
+							</tr>
+							<tr>
+								<th>muted</th>
+								<td><input class="muted" type="checkbox" /></td>
+							</tr>
+							<tr>
+								<th>volume</th>
+								<td><input class="volume-slider" type="range"  value="1" max="1" step="0.01" /></td>
 							</tr>
 						</tbody>
 					</table>

@@ -428,13 +428,14 @@ $(this).checkValidity();
 							<p>This means that some HTML5 events go down the DOM tree in capable browsers and go up the tree in polyfilled browsers. This can create differences if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default, don't use <code>return false;</code>, use <code>event.preventDefault();</code> instead.</p>
 						</li>
 						<li>
-							<p><strong>manipulation methods</strong>: To insert new HTML5 content dynamically, use <code>.htmlPolyfill()</code>, <code>.appendPolyfill()</code>, <code>.prependPolyfill()</code>, <code>.afterPolyfill()</code>, <code>.beforePolyfill()</code> and <code>.replaceWithPolyfill()</code>:</p>
+							<p><strong>manipulation methods/dynamically adding HTML5 content</strong>: To insert new HTML5 content dynamically, use <code>.htmlPolyfill()</code>, <code>.appendPolyfill()</code>, <code>.prependPolyfill()</code>, <code>.afterPolyfill()</code>, <code>.beforePolyfill()</code> and <code>.replaceWithPolyfill()</code>:</p>
 <code class="block">
 //three different examples
 $('form').appendPolyfill('&lt;fieldset&gt;&lt;input type="date" /&gt;&lt;/fieldset&gt;');
 $('#canvas-box').htmlPolyfill('&lt;canvas&gt;&lt;/canvas&gt;');
 $('datalist#list select').prependPolyfill('&lt;option value="new suggestion item" /&gt;');
 </code>
+							<p><small>See also <a href="demos/shiv.html#dynamic">dynamic HTML5 description</a>.</small></p>
 						</li>
 						<li>
 							<p><strong>no shadowdom</strong>: Webshims lib sometimes has to add additional DOM elements to mimic the UI of HTML5 elements. This can sometimes create differences, between polyfilled and non polyfilled browsers. Webshims lib gives you a method called 'getShadowElement' to access the shadowelement from the native element and a method called 'getNativeElement' to access the native element from the shadowelement. If the element has no shadowelement the element itself is returned.</p>
