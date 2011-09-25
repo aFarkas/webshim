@@ -56,6 +56,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 
 });/*
  * todos: 
+ * - hide audio if controls are removed
  * - decouple muted/volume
  * - improve buffered-property with youtube/rtmp
  * - get buffer-full event
@@ -165,7 +166,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	var getDuration = function(data, obj){
 		try {
 			data.duration = data.jwapi.getPlaylist()[0].duration;
-			if(data.duration <= 0 || data.duration === data._lastDuration){
+			if(!data.duration || data.duration <= 0 || data.duration === data._lastDuration){
 				data.duration = window.NaN;
 			}
 		} catch(er){}
@@ -229,12 +230,13 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			META: function(obj, data){
 				
 				data = data && data.networkState ? data : getSwfDataFromID(obj.id);
-				
-				if(!data || data._metadata ){return;}
+				if(!data){return;}
 				if( !('duration' in obj) ){
 					data._callMeta = true;
 					return;
 				}
+				if( data._metadata && (!obj.height || data.videoHeight == obj.height) ){return;}
+				
 				data._metadata = true;
 								
 				var oldDur = data.duration;
@@ -1077,12 +1079,11 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 				//ogm shouldn´t be used!
 				'audio/ogg': ['ogg','oga', 'ogm'],
 				'audio/mpeg': ['mp2','mp3','mpga','mpega'],
-				'audio/mp4': ['mp4','mpg4', 'm4r'],
+				'audio/mp4': ['mp4','mpg4', 'm4r', 'm4a', 'm4p', 'm4b', 'aac'],
 				'audio/wav': ['wav'],
-				'audio/x-m4a': ['m4a'],
-				'audio/x-m4p': ['m4p'],
 				'audio/3gpp': ['3gp','3gpp'],
-				'audio/webm': ['webm']
+				'audio/webm': ['webm'],
+				'audio/fla': ['flv', 'f4a', 'fla']
 			},
 			video: {
 				//ogm shouldn´t be used!
@@ -1346,7 +1347,11 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 		$('video, audio', context)
 			.add(insertedElement.filter('video, audio'))
 			.each(function(){
-				selectSource(this);
+				if($.browser.msie && webshims.browserVersion > 8 && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay])')){
+					$(this).prop('preload', 'metadata').mediaLoad();
+				} else {
+					selectSource(this);
+				}
 			})
 		;
 	 });	

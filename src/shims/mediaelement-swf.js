@@ -1,5 +1,6 @@
 /*
  * todos: 
+ * - hide audio if controls are removed
  * - decouple muted/volume
  * - improve buffered-property with youtube/rtmp
  * - get buffer-full event
@@ -109,7 +110,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	var getDuration = function(data, obj){
 		try {
 			data.duration = data.jwapi.getPlaylist()[0].duration;
-			if(data.duration <= 0 || data.duration === data._lastDuration){
+			if(!data.duration || data.duration <= 0 || data.duration === data._lastDuration){
 				data.duration = window.NaN;
 			}
 		} catch(er){}
@@ -173,12 +174,13 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			META: function(obj, data){
 				
 				data = data && data.networkState ? data : getSwfDataFromID(obj.id);
-				
-				if(!data || data._metadata ){return;}
+				if(!data){return;}
 				if( !('duration' in obj) ){
 					data._callMeta = true;
 					return;
 				}
+				if( data._metadata && (!obj.height || data.videoHeight == obj.height) ){return;}
+				
 				data._metadata = true;
 								
 				var oldDur = data.duration;
