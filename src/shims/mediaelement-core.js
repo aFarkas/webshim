@@ -86,12 +86,11 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 				//ogm shouldn´t be used!
 				'audio/ogg': ['ogg','oga', 'ogm'],
 				'audio/mpeg': ['mp2','mp3','mpga','mpega'],
-				'audio/mp4': ['mp4','mpg4', 'm4r'],
+				'audio/mp4': ['mp4','mpg4', 'm4r', 'm4a', 'm4p', 'm4b', 'aac'],
 				'audio/wav': ['wav'],
-				'audio/x-m4a': ['m4a'],
-				'audio/x-m4p': ['m4p'],
 				'audio/3gpp': ['3gp','3gpp'],
-				'audio/webm': ['webm']
+				'audio/webm': ['webm'],
+				'audio/fla': ['flv', 'f4a', 'fla']
 			},
 			video: {
 				//ogm shouldn´t be used!
@@ -355,7 +354,11 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 		$('video, audio', context)
 			.add(insertedElement.filter('video, audio'))
 			.each(function(){
-				selectSource(this);
+				if($.browser.msie && webshims.browserVersion > 8 && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay])')){
+					$(this).prop('preload', 'metadata').mediaLoad();
+				} else {
+					selectSource(this);
+				}
 			})
 		;
 	 });	
