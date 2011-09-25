@@ -60,7 +60,7 @@
 			})
 			.bind('mediaerror', function(){
 				events.mediaerror++;
-				ok(media.prop('mediaerror'), "media has error on mediaerror event");
+				ok(media.data('mediaerror'), "media has error on mediaerror event");
 			})
 		;
 		
@@ -205,7 +205,7 @@
 			id: "doubble-check",
 			"src": "http://www.youtube.com/watch?v=siOHh0uzcuY"
 		});
-		video.appendPolyfillTo('#qunit-fixture').play();
+		
 		video
 			.bind('loadedmetadata.testevent mediaerror.testevent', function(e){
 				endTest();
@@ -220,6 +220,7 @@
 				}
 			})
 		;
+		video.appendPolyfillTo('#qunit-fixture').play();
     });
 	
 })(jQuery);
