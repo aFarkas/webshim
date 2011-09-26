@@ -444,29 +444,47 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	"use strict";
 	var triggerInlineForm = webshims.triggerInlineForm;
 	var modernizrInputTypes = Modernizr.inputtypes;
-	var adjustInputWithBtn = function(input, button){
-		var inputDim = {
-			w: input.width()
+	var adjustInputWithBtn = (function(){
+		var fns = {"padding-box": "innerWidth", "border-box": "outerWidth", "content-box": "width"};
+		var boxSizing = Modernizr.prefixed && Modernizr.prefixed("boxSizing");
+		var getWidth = function(input){
+			var widthFn = "width";
+			if(boxSizing){
+				widthFn = fns[input.css(boxSizing)] || widthFn;
+			}
+			
+			return {
+				w: input[widthFn](),
+				add: widthFn == "width"
+			};
+			
 		};
-		if(!inputDim.w){return;}
-		var controlDim = {
-			mL: (parseInt(button.css('marginLeft'), 10) || 0),
-			w: button.outerWidth()
+		
+		
+		return function(input, button){
+			var inputDim = getWidth(input);
+			if(!inputDim.w){return;}
+			var controlDim = {
+				mL: (parseInt(button.css('marginLeft'), 10) || 0),
+				w: button.outerWidth()
+			};
+			inputDim.mR = (parseInt(input.css('marginRight'), 10) || 0);
+			if(inputDim.mR){
+				input.css('marginRight', 0);
+			}
+			//is inside
+			if( controlDim.mL <= (controlDim.w * -1) ){
+				button.css('marginRight',  Math.floor(Math.abs(controlDim.w + controlDim.mL) + inputDim.mR));
+				input.css('paddingRight', (parseInt(input.css('paddingRight'), 10) || 0) + Math.abs(controlDim.mL));
+				if(inputDim.add){
+					input.css('width', Math.floor(inputDim.w + controlDim.mL));
+				}
+			} else {
+				button.css('marginRight', inputDim.mR);
+				input.css('width',  Math.floor(inputDim.w - controlDim.mL - controlDim.w));
+			}
 		};
-		inputDim.mR = (parseInt(input.css('marginRight'), 10) || 0);
-		if(inputDim.mR){
-			input.css('marginRight', 0);
-		}
-		//is inside
-		if( controlDim.mL <= (controlDim.w * -1) ){
-			button.css('marginRight',  Math.floor(Math.abs(controlDim.w + controlDim.mL) + inputDim.mR));
-			input.css('paddingRight', (parseInt(input.css('paddingRight'), 10) || 0) + Math.abs(controlDim.mL));
-			input.css('width', Math.floor(inputDim.w + controlDim.mL));
-		} else {
-			button.css('marginRight', inputDim.mR);
-			input.css('width',  Math.floor(inputDim.w - controlDim.mL - controlDim.w));
-		}
-	};
+	})();
 		
 	var options = $.webshims.cfg['forms-ext'];
 	var defaultDatepicker = {dateFormat: 'yy-mm-dd'};

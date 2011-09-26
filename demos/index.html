@@ -152,7 +152,7 @@
 	});
 &lt;/script&gt;		
 </code>
-					<p><small>Note: Webshims do not need all Modernizr tests to work, if you omit a Modernizr - test, which is used by Webshims, Webshims simply won't polyfill this feature. Here you find <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-load">all Modernizr detections, which are used by webshims</a>.</small></p>
+					<p><small>Note: Webshims do not need all Modernizr tests to work, if you omit a Modernizr - test, which is used by Webshims, Webshims simply won't polyfill this feature. Here you find <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-prefixed-testprop-testallprops-domprefixes-load">all Modernizr detections, which are used by webshims</a>.</small></p>
 				</div>
 	
 				<h3 id="embed-polyfill" class="button">Embedding and configuring the script</h3>
@@ -209,7 +209,7 @@ $.webshims.polyfill('lightweight');
 </code>			
 					<p>If you dont want any log messsages, simply set <code>$.webshims.debug</code> explicitly to <code>false</code>.</p>
 					<h3>Custom Modernizr build</h3>
-					<p>Webshims lib does not need every Modernizr test and supports creating a <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest">custom Modernizr build</a> (All required tests are pre-checked.) (If you want to use yepnope as your script loader please additionally <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-load">check Modernizr.load</a>).</p>
+					<p>Webshims lib does not need every Modernizr test and supports creating a <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-prefixed-testprop-testallprops-domprefixes">custom Modernizr build</a> (All required tests are pre-checked.) (If you want to use yepnope as your script loader please additionally <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-prefixed-testprop-testallprops-domprefixes-load">check Modernizr.load</a>).</p>
 					
 					<h3>changing Options path to shims folder</h3>
 					
@@ -253,15 +253,7 @@ $.webshims.polyfill('js-storage geolocation', {
 //would load in IE7: /minify.jsp?scripts=path-to-shims/json-storage.js&path-to-shims/geolocation.js
 //would load in IE8: /minify.jsp?scripts=path-to-shims/geolocation.js
 //would load in IE9 and other browsers: nothing :-)
-</code>			
-<!--
-//ToDo: explain combohandler fn-configuration
-$.webshims.polyfill({
-	fn: function(base, scriptPath, seperator, srces){
-		return base + (srces.join(seperator)) +'&b='+(scriptPath.substr(0, scriptPath.length-1));
-	}
-});	
--->			
+</code>					
 					<h4>Some information about "Make fewer HTTP requests"</h4>
 					<p>There is a very bad myth, saying that combining all your JS into one file is good for performance. In fact this rule can dramatically slow down loading your page. The <a href="http://calendar.perfplanet.com/2010/thoughts-on-performance/">truth is a little bit more complex</a>.</p>
 					<p>This rule was written in 2004 and the reason beyond this rule is that loading JS in old browser like IE6/IE7/FF3.0 do block downloading other resources, do block HTML parsing and do block UI rendering (+ old browser have normally only 2 simultaneous download slots).</p>
