@@ -211,7 +211,7 @@
 				
 				special[name] = $.extend(special[name] || {}, {
 					add: function(details){
-						details.handler.call(this, $.Event(name));
+						details.handler.call(this, name);
 					}
 				});
 				$.event.trigger(name);
