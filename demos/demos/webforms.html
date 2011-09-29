@@ -318,10 +318,12 @@ $('form').unbind('firstinvalid.example2');
 </code>
 						<p>The validityAlert method will create the following custom styleable HTML:</p>
 <code class="block">
-&lt;!-- note: span.validity-alert is label.validity-alert in old browser, which do not support WAI-ARIA --&gt;
-&lt;span class="validity-alert" role="alert"&gt;
-	&lt;span class="va-arrow"&gt;&lt;span class="va-arrow-box"&gt;&lt;/span&gt;&lt;/span&gt;
-	&lt;span class="va-box"&gt;Error message of the current field&lt;/span&gt;
+&lt;!-- note: span.validity-alert-wrapper is label.validity-alert in old browser, which do not support WAI-ARIA --&gt;
+&lt;span class="validity-alert-wrapper" role="alert"&gt;
+	&lt;span class="validity-alert"&gt;
+		&lt;span class="va-arrow"&gt;&lt;span class="va-arrow-box"&gt;&lt;/span&gt;&lt;/span&gt;
+		&lt;span class="va-box"&gt;Error message of the current field&lt;/span&gt;
+	&lt;/span&gt;
 &lt;/span&gt;
 </code>
 						

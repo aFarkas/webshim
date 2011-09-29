@@ -15,11 +15,15 @@
 			margin: 5px 0;
 		}
 		
-		.invalid {
-			border: 1px solid #900;
+		
+		
+		.validity-alert .va-box,
+		.validity-alert .va-arrow {
+			border-color: #e66;
 		}
-		.valid {
-			border: 1px solid #090;
+		.validity-alert .va-box {
+			font: 12px arial;
+			color: #600;
 		}
 	</style>
 	
@@ -109,10 +113,12 @@ $('form')
 			<p>Using <code>$.webshims.validityAlert.showFor</code> will generate the following styleable HTML structur:</p>
 			
 <code class="block">
-&lt;!-- note: span.validity-alert is label.validity-alert in old browser, which do not support WAI-ARIA --&gt;
-&lt;span class="validity-alert" role="alert"&gt;
-	&lt;span class="va-arrow"&gt;&lt;span class="va-arrow-box"&gt;&lt;/span&gt;&lt;/span&gt;
-	&lt;span class="va-box"&gt;Error message of the current field&lt;/span&gt;
+&lt;!-- note: span.validity-alert-wrapper is label.validity-alert in old browser, which do not support WAI-ARIA --&gt;
+&lt;span class="validity-alert-wrapper" role="alert"&gt;
+	&lt;span class="validity-alert"&gt;
+		&lt;span class="va-arrow"&gt;&lt;span class="va-arrow-box"&gt;&lt;/span&gt;&lt;/span&gt;
+		&lt;span class="va-box"&gt;Error message of the current field&lt;/span&gt;
+	&lt;/span&gt;
 &lt;/span&gt;
 </code>
 			
