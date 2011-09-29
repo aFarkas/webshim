@@ -255,10 +255,10 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				elem = $(elem);
 				var visual = $(elem).getShadowElement();
 				var offset = api.getOffsetFromBody(visual);
+				api.clear();
 				if(noBubble){
 					this.hide();
 				} else {
-					api.clear();
 					this.getMessage(elem, message);
 					this.position(visual, offset);
 					errorBubble.css({
@@ -316,7 +316,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				}, 10);
 			},
 			getMessage: function(elem, message){
-				$('> span.va-box', errorBubble).text(message || getContentValidationMessage(elem[0]) || elem.prop('validationMessage'));
+				$('span.va-box', errorBubble).text(message || getContentValidationMessage(elem[0]) || elem.prop('validationMessage'));
 			},
 			position: function(elem, offset){
 				offset = offset ? $.extend({}, offset) : api.getOffsetFromBody(elem);
@@ -327,11 +327,10 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				if(errorBubble.css('display') === 'none'){
 					errorBubble.css({opacity: 0}).show();
 				}
-				errorBubble.fadeTo(400, 1);
+				errorBubble.addClass('va-visible').fadeTo(400, 1);
 			},
 			hide: function(){
-				api.clear();
-				errorBubble.fadeOut();
+				errorBubble.removeClass('va-visible').fadeOut();
 			},
 			clear: function(){
 				clearTimeout(focusTimer);
@@ -339,7 +338,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				$(document).unbind('focusout.validityalert');
 				errorBubble.stop().removeAttr('for');
 			},
-			errorBubble: $('<'+alertElem+' class="validity-alert" role="alert"><span class="va-arrow"><span class="va-arrow-box"></span></span><span class="va-box"></span></'+alertElem+'>').css({position: 'absolute', display: 'none'})
+			errorBubble: $('<'+alertElem+' class="validity-alert-wrapper" role="alert"><span  class="validity-alert"><span class="va-arrow"><span class="va-arrow-box"></span></span><span class="va-box"></span></span></'+alertElem+'>').css({position: 'absolute', display: 'none'})
 		};
 		
 		var errorBubble = api.errorBubble;
