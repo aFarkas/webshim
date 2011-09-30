@@ -587,6 +587,9 @@
 	};
 	$.fn.callProp = function(prop, args){
 		var ret;
+		if(!args){
+			args = args; 
+		}
 		this.each(function(){
 			var fn = $.prop(this, prop);
 			
@@ -757,7 +760,7 @@
 			
 		});
 		
-		$.each(['insetAfter', 'insertBefore', 'appendTo', 'prependTo', 'replaceAll'], function(i, name){
+		$.each(['insertAfter', 'insertBefore', 'appendTo', 'prependTo', 'replaceAll'], function(i, name){
 			webshims.fn[name] = $.fn[name.replace(/[A-Z]/, function(c){return "Polyfill"+c;})] = function(){
 				$.fn[name].apply(this, arguments);
 				webshims.triggerDomUpdate(this);

@@ -75,6 +75,12 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+comming Release 1.8.2
+----------
+- improved mediaelement
+- improved styleability of errorbubble
+- compatibility with jQuery 1.7
+
 Release 1.8.1
 ----------
 - improved mediaelement loading
