@@ -582,7 +582,7 @@
 		}
 		
 		$.fn[name] = function(){
-			return this.callProp(name, arguments);
+			return this.callProp(prop, arguments);
 		};
 	};
 	$.fn.callProp = function(prop, args){
@@ -599,7 +599,7 @@
 					return false;
 				}
 			} else {
-				webshims.warn("you can not use "+ name +" on "+ this);
+				webshims.warn(prop+ " is not a method of "+ this);
 			}
 		});
 		return (ret !== undefined) ? ret : this;
