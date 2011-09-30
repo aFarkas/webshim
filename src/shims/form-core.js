@@ -252,6 +252,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				bodyOffset = errorBubble.offset();
 			},
 			showFor: function(elem, message, noFocusElem, noBubble){
+				api._create();
 				elem = $(elem);
 				var visual = $(elem).getShadowElement();
 				var offset = api.getOffsetFromBody(visual);
@@ -338,19 +339,23 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				$(document).unbind('focusout.validityalert');
 				errorBubble.stop().removeAttr('for');
 			},
-			errorBubble: $('<'+alertElem+' class="validity-alert-wrapper" role="alert"><span  class="validity-alert"><span class="va-arrow"><span class="va-arrow-box"></span></span><span class="va-box"></span></span></'+alertElem+'>').css({position: 'absolute', display: 'none'})
+			_create: function(){
+				if(errorBubble){return;}
+				errorBubble = api.errorBubble = $('<'+alertElem+' class="validity-alert-wrapper" role="alert"><span  class="validity-alert"><span class="va-arrow"><span class="va-arrow-box"></span></span><span class="va-box"></span></span></'+alertElem+'>').css({position: 'absolute', display: 'none'});
+				webshims.ready('DOM', function(){
+					errorBubble.appendTo('body');
+					if($.fn.bgIframe && $.browser.msie && parseInt($.browser.version, 10) < 7){
+						errorBubble.bgIframe();
+					}
+				});
+			}
 		};
 		
-		var errorBubble = api.errorBubble;
+		var errorBubble;
 		var hideTimer = false;
 		var focusTimer = false;
 		var boundHide = $.proxy(api, 'hide');
-		webshims.ready('DOM', function(){
-			errorBubble.appendTo('body');
-			if($.fn.bgIframe && $.browser.msie && parseInt($.browser.version, 10) < 7){
-				errorBubble.bgIframe();
-			}
-		});
+		
 		return api;
 	})();
 	
