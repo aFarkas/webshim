@@ -11,11 +11,14 @@
 	var defineProperty = 'defineProperty';
 	var formvalidation = 'formvalidation';
 	var addTest = Modernizr.addTest;
+	var slice = Array.prototype.slice;
 	
 	//new Modernizrtests
-	addTest('details', function(){
-		return ('open' in document.createElement('details'));
-	});
+	if(!('details' in Modernizr)){
+		addTest('details', function(){
+			return ('open' in document.createElement('details'));
+		});
+	}
 	
 	Modernizr.genericDOM = !!($('<video><div></div></video>')[0].innerHTML);
 	
@@ -246,34 +249,6 @@
 		/*
 		 * basic DOM-/jQuery-Helpers
 		 */
-		addMethodName: function(name){
-			name = name.split(':');
-			var prop = name[1];
-			if (name.length == 1) {
-				prop = name[0];
-				name = name[0];
-			}
-			else {
-				name = name[0];
-			}
-			if ($.fn[name] && 'shim' in $.fn[name]) {
-				return;
-			}
-			$.fn[name] = function(){
-				var args = arguments, ret;
-				this.each(function(){
-					var fn = $.prop(this, prop);
-					
-					if (fn && fn.apply) {
-						ret = fn.apply(this, args);
-						if (ret !== undefined) {
-							return false;
-						}
-					}
-				});
-				return (ret !== undefined) ? ret : this;
-			};
-		},
 		
 		fixHTML5: function(h){
 			return h;
@@ -596,6 +571,36 @@
 		warn: 1,
 		error: 1
 	};
+	webshims.addMethodName = function(name){
+		name = name.split(':');
+		var prop = name[1];
+		if (name.length == 1) {
+			prop = name[0];
+			name = name[0];
+		} else {
+			name = name[0];
+		}
+		
+		$.fn[name] = function(){
+			return this.callProp(name, arguments);
+		};
+	};
+	$.fn.callProp = function(prop, args){
+		var ret;
+		this.each(function(){
+			var fn = $.prop(this, prop);
+			
+			if (fn && fn.apply) {
+				ret = fn.apply(this, args);
+				if (ret !== undefined) {
+					return false;
+				}
+			} else {
+				webshims.warn("you can not use "+ name +" on "+ this);
+			}
+		});
+		return (ret !== undefined) ? ret : this;
+	};
 	
 	var xhrPreloadOption = {
 		cache: true,
@@ -865,7 +870,6 @@
 			
 			if (!Function.prototype.bind) {
 				var call = Function.prototype.call;
-				var slice = Array.prototype.slice;
 				
 			    Function.prototype.bind = function bind(that) { // .length is 1
 			        // 1. Let Target be the this value.
