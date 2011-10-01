@@ -210,7 +210,6 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				if(!data.duration){
 					return;
 				}
-				
 				if(obj.percentage > 1 && data.readyState < 3){
 					data.readyState = 3;
 					trigger(data._elem, 'canplay');
@@ -224,7 +223,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				if(obj.percentage == 100){
 					data.networkState = 1;
 					data.readyState = 4;
-					getDuration(data, obj);
+					getDuration(data, obj, true);
 				}
 				$.event.trigger('progress', undefined, data._elem, true);
 			},
