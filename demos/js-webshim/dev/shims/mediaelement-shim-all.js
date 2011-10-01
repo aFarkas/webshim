@@ -56,11 +56,9 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 
 });/*
  * todos: 
- * - hide audio if controls are removed
- * - decouple muted/volume
+ * - decouple muted/volume (needs improvement)
+ * - implement video <-> flashcanvas pro API
  * - improve buffered-property with youtube/rtmp
- * - get buffer-full event
- * - set preload to none, if flash is active
  * - use jwplayer5 api instead of old flash4 api (this can be scheduled)
  */
 
@@ -170,7 +168,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				data.duration = window.NaN;
 			}
 		} catch(er){}
-		if(data.duration){
+		if(data.duration != data._lastDuration){
 			trigger(data._elem, 'durationchange');
 			if(data._elemNodeName == 'audio' || data._callMeta){
 				mediaelement.jwEvents.Model.META($.extend({duration: data.duration}, obj), data);
@@ -203,7 +201,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				data.networkState = (obj.percentage == 100) ? 1 : 2;
 				if(!data.duration){
 					getDuration(data, obj);
-				} else if(obj.percentage > 3 && obj.percentage < 10){
+				} else if((obj.percentage > 3 && obj.percentage < 10) || (obj.percentage === 100)){
 					getDuration(data, obj, true);
 				}
 				if(data.ended){
@@ -964,10 +962,15 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		getPropKeys.forEach(createGetProp);
 		
 		webshims.onNodeNamesPropertyModify(nodeName, 'controls', function(val, boolProp){
-			var data = queueSwfMethod(this, boolProp ? 'showControls' : 'hideControls', [nodeName]);
+			var data = getSwfDataFromElem(this);
 			$(this)[boolProp ? 'addClass' : 'removeClass']('webshims-controls');
 			
 			if(data){
+				try {
+					queueSwfMethod(this, boolProp ? 'showControls' : 'hideControls', [nodeName], data);
+				} catch(er){
+					webshims.warn("you need to generate a crossdomain.xml");
+				}
 				if(nodeName == 'audio'){
 					setElementDimension(data, boolProp);
 				}

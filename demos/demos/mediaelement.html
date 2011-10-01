@@ -7,7 +7,6 @@
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
-	<script src="../js-webshim/minified/extras/loaders/sssl.js"></script>
 	
 	<script src="../js-webshim/minified/extras/mousepress.js"></script>
 	
@@ -24,48 +23,9 @@
 		
 		
         $(function(){
-			//helper for createing throttled get/set functions (good to create time/volume-slider, which are used as getter and setter)
-			var createGetSetHandler = function(get, set){
-				var throttleTimer;
-				var blockedTimer;
-				var blocked;
-				return {
-					get: function(){
-						if(blocked){return;}
-						return get.apply(this, arguments);
-					},
-					set: function(){
-						clearTimeout(throttleTimer);
-						clearTimeout(blockedTimer);
-						
-						var that = this;
-						var args = arguments;
-						blocked = true;
-						throttleTimer = setTimeout(function(){
-							set.apply(that, args);
-							blockedTimer = setTimeout(function(){
-								blocked = false;
-							}, 30);
-						}, 0);
-					}
-				};
-			};
 			
-			var getActiveTimeRange = function(range, time){
-				var len = range.length;
-				var index = -1;
-				var start = 0;
-				var end = 0;
-				for(var i = 0; i < len; i++){
-					if(time >= (start = range.start(i)) && time <= (end = range.end(i))){
-						index = i;
-						break;
-					}
-				}
-				return [index, start, end];
-			};
 			
-			//If you want to buld a simple player the following code can help you
+			//If you want to build a simple player the following code can help you
 			$('div.player').each(function(){
 				var player = this;
 				var getSetCurrentTime = createGetSetHandler(
@@ -151,25 +111,89 @@
 				$('input.volume-slider', player).bind('input', getSetVolume.set);
 				
 				$('input.play', player).bind('click', function(){
-					$('video, audio', player).play();
+					$('video, audio', player)[0].play();
 				});
 				$('input.pause', player).bind('click', function(){
-					$('video, audio', player).pause();
+					$('video, audio', player)[0].pause();
 				});
 				$('input.muted', player).bind('click updatemuted', function(){
 					$('video, audio', player).prop('muted', $.prop(this, 'checked'));
 				}).triggerHandler('updatemuted'); 
 				$('input.controls', player).bind('click updatecontrols', function(){
 					$('video, audio', player).prop('controls', $.prop(this, 'checked'));
-				}).triggerHandler('updatecontrols'); 
+				}).prop('checked', true); 
 				
 				$('select.load-media', player).bind('change', function(){
-					var src = $('option:selected', this).data('src');
-					if(src){
-						$('video, audio', player).loadMediaSrc(src).play();
+					var srces = $('option:selected', this).data('src');
+					if(srces){
+						//the following code can be also replaced by the following line
+						//$('video, audio', player).loadMediaSrc(srces).play();
+						
+						$('video, audio', player)
+							.removeAttr('src')
+							.find('source')
+							.remove()
+							.end()
+							.each(function(){
+								var mediaElement = this;
+								if(typeof srces == 'string'){
+									srces = [srces];
+								}
+								$.each(srces, function(i, src){
+									
+									if(typeof src == 'string'){
+										src = {src: src};
+									}
+									$(document.createElement('source')).attr(src).appendTo(mediaElement);
+								});
+							})
+							[0].load()
+						;
+						$('video, audio', player)[0].play();
 					}
 				}).prop('selectedIndex', 0);
 			});
+			
+			//helper for createing throttled get/set functions (good to create time/volume-slider, which are used as getter and setter)
+			function createGetSetHandler(get, set){
+				var throttleTimer;
+				var blockedTimer;
+				var blocked;
+				return {
+					get: function(){
+						if(blocked){return;}
+						return get.apply(this, arguments);
+					},
+					set: function(){
+						clearTimeout(throttleTimer);
+						clearTimeout(blockedTimer);
+						
+						var that = this;
+						var args = arguments;
+						blocked = true;
+						throttleTimer = setTimeout(function(){
+							set.apply(that, args);
+							blockedTimer = setTimeout(function(){
+								blocked = false;
+							}, 30);
+						}, 0);
+					}
+				};
+			};
+			
+			function getActiveTimeRange(range, time){
+				var len = range.length;
+				var index = -1;
+				var start = 0;
+				var end = 0;
+				for(var i = 0; i < len; i++){
+					if(time >= (start = range.start(i)) && time <= (end = range.end(i))){
+						index = i;
+						break;
+					}
+				}
+				return [index, start, end];
+			};
 			
 		});
     </script>
@@ -232,6 +256,7 @@
 					<li><strong>preferFlash</strong> (false): If preferFlash is set to true the mediaelements will be replaced by flash, if flash is available. Otherwise only, if mediaelements aren't supported or the current audio/video container/codec isn't supported by the browser.</li>
 					<li><strong>jwVars</strong> (Flahsvars Object): Object with default flashvars to <a href="http://www.longtailvideo.com/support/jw-player/jw-player-for-flash-v5/12536/configuration-options">configure JWPlayer</a>. This general configuartion can be changed by using a data-jwvars attribute, too.</li>
 					<li><strong>changeJW</strong> (Manipulation function): Callback function to also modify the flashvars object for JWPlayer.</li>
+					<!--<li><strong>hasToPlay</strong> (string default: "any" (or "ogg", "webm", "h264", "flv", "mp3", "wav", "m4a", "fla")): If a page is only using for example h.264 encoded videos, this can be set to <code>"h264"</code>. If a browser does not support h264, mp3 or flv/fla, but this property is set to "any", the video format will be still polyfilled.</li>-->
 				</ul>
 				
 				<h3>Extensions/Abstractions to the standard</h3>
@@ -352,7 +377,7 @@ $("video.my-video").loadMediaSrc(
 				<div class="player">
 					
 					<audio controls preload="none" style="width: 400px; height: 45px;">
-						<source src="http://cdn.yayquery.com/ep/23/yayquery_23.mp3" type="audio/mpeg" />
+						<source src="http://media.libsyn.com/media/sitepoint/sitepointpodcast044.mp3" type="audio/mpeg" />
 					</audio>
 					<table>
 						<thead>

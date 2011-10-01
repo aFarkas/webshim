@@ -79,7 +79,7 @@ comming Release 1.8.2
 ----------
 - improved mediaelement
 - improved styleability of errorbubble
-- compatibility with jQuery 1.7
+- compatibility with jQuery 1.7 (1.8.1 is not compatible with jQuery 1.7)
 
 Release 1.8.1
 ----------

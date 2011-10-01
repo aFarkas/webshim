@@ -7,7 +7,6 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 	
 	<script src="js-webshim/minified/extras/modernizr-custom.js"></script>
-	<script src="js-webshim/minified/extras/loaders/sssl.js"></script>
 	
 	<script src="js-webshim/minified/polyfiller.js"></script>
 	<script src="demo-js/demo.js"></script>
@@ -33,7 +32,7 @@
 		<div class="main">
 			<section>
 				<div class="home-box about-box">
-					<p>Webshims Lib is a DOM extension helper which <a href="http://remysharp.com/2010/10/08/what-is-a-polyfill/">polyfills</a> the <a href="http://www.brucelawson.co.uk/2010/meet-newt-new-exciting-web-technologies/">latest and greatest web features</a> in browsers that don't support them natively. It is built on top of <a href="http://jquery.com/">jQuery</a> and <a href="http://www.modernizr.com/">Modernizr</a> and needs one of the follwoing script loaders: <a href="http://yepnopejs.com/">yepnope</a>, <a href="https://gist.github.com/936413">SSSL</a> or <a href="http://requirejs.org/">RequireJS</a>.</p>
+					<p>Webshims Lib is a modular capability-based <a href="http://remysharp.com/2010/10/08/what-is-a-polyfill/">polyfill</a>-loading library, which focuses on accurate implementations of stable HTML5 features, so that developers can write modern, interoperable and robust code in all browsers. It is built on top of <a href="http://jquery.com/">jQuery</a> and <a href="http://www.modernizr.com/">Modernizr</a>.</p>
 				</div>
 				<div class="home-box download-box">
 					<p>
@@ -159,7 +158,7 @@
 				<div class="panel">
 					<ul>
 						<li>Take the 'js-webshim' folder and add it to your project. (You will find a minified and a dev folder there.)</li>
-						<li>Include the polyfiller.js into your HTML page. You can concatenate this file with your other js and rename. Don't forget to also include <a href="http://jquery.com">jQuery</a>, <a href="http://www.modernizr.com/">Modernizr</a> and a scriptloader (<a href="http://yepnopejs.com/">yepnope</a> (You can configure Modernizr to include yepnope), <a href="https://gist.github.com/936413">SSSL</a> or <a href="http://requirejs.org/">RequireJS</a>).</li>
+						<li>Include the polyfiller.js into your HTML page. You can concatenate this file with your other js and rename. Don't forget to also include <a href="http://jquery.com">jQuery</a>, <a href="http://www.modernizr.com/">Modernizr (including Modernizr.load)</a>.</li>
 						<li>call the polyfill method</li>
 					</ul>
 				
@@ -209,7 +208,7 @@ $.webshims.polyfill('lightweight');
 </code>			
 					<p>If you dont want any log messsages, simply set <code>$.webshims.debug</code> explicitly to <code>false</code>.</p>
 					<h3>Custom Modernizr build</h3>
-					<p>Webshims lib does not need every Modernizr test and supports creating a <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-prefixed-testprop-testallprops-domprefixes">custom Modernizr build</a> (All required tests are pre-checked.) (If you want to use yepnope as your script loader please additionally <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-prefixed-testprop-testallprops-domprefixes-load">check Modernizr.load</a>).</p>
+					<p>Webshims lib does not need every Modernizr test and supports creating a <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-prefixed-testprop-testallprops-domprefixes-load">custom Modernizr build</a>. (Webshims lib uses <a href="http://requirejs.org/">requireJS</a> as a script loader, if this is included, if not it uses Modernizr.load/yepnope.) </p>
 					
 					<h3>changing Options path to shims folder</h3>
 					
@@ -589,7 +588,7 @@ html.long-loading-polyfills {
 						<h4>Why you should put your webshims inside of your documents head</h4>
 						<p>There is a lot of misunderstanding about the yslow rule "Put your JavaScript at the bottom". Put your JavaScript at the bottom does not decrease total page load time. The effect is psychologic. The user sooner sees how the page is loading, because JS blocks the UI rendering.</p>
 						<p>This also means that a FOUC is not a side effect of "Put your JavaScript at the bottom". It is the intended effect of this technique.</p>
-						<p>Using a script loader (and webshims lib uses a script loader) has a very similiar effect and combining both techniques will increase FOUCs.</p>
+						<p>Using a script loader (and webshims lib uses a script loader) has a very similiar effect, because dynamically added scripts won't block the UI anymore. Combining both techniques will increase FOUCs.</p>
 						<p>If you use a script loader and put your JS at top you have done everything right about performance. Some versions of yslow recognize that you have used this technique and won't subtract points for this rule ("Put your JavaScript at the bottom"). The nice thing about script loaders is, that loading JS-files dynamically will additionally decrease page load time, because all browsers can parallelize script loading.</p>
 					</div>
 					

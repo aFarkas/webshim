@@ -544,7 +544,7 @@
 						}
 					}
 					else {
-						webshims.warn("you need to include a scriptloader");
+						webshims.error("include a scriptloader: Modernizr.load/yepnope or requireJS");
 					}
 				};
 			})()
