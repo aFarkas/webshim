@@ -196,10 +196,9 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			
 			BUFFER: function(obj){
 				var data = getSwfDataFromID(obj.id);
-				if(!data){return;}
-				if(data._bufferedEnd == obj.percentage){return;}
+				if(!data || !('percentage' in obj) || data._bufferedEnd == obj.percentage){return;}
 				data.networkState = (obj.percentage == 100) ? 1 : 2;
-				if(!data.duration){
+				if(isNaN(data.duration)){
 					getDuration(data, obj);
 				} else if((obj.percentage > 3 && obj.percentage < 10) || (obj.percentage === 100)){
 					getDuration(data, obj, true);
@@ -295,7 +294,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 						data.paused = false;
 						data._ppFlag = true;
 						if(!data.duration){
-							getDuration(data, obj);
+							getDuration(data, obj, true);
 						}
 						if(data.readyState < 3){
 							data.readyState = 3;
