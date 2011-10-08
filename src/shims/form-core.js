@@ -21,6 +21,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		var addTest = Modernizr.addTest;
 		var form = $('<form action="#"><select /><input type="date" required name="a" /></form>');
 		var dateElem = $('input', form);
+		var formsExtModule = webshims.modules["forms-ext"];
 		var toLoad = [];
 		
 		//the form has to be connected in FF4
@@ -75,8 +76,13 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			if($.event.special["form-extendReady"]){
 				delete $.event.special["form-extendReady"];
 			}
-			webshims.modules["forms-ext"].test = false;
-			if($.event.special["forms-extReady"]){
+			formsExtModule.test = function(){return false};
+			if(formsExtModule.src == 'form-datalist' || $.event.special["forms-extReady"]){
+				if(formsExtModule.src == 'form-datalist'){
+					formsExtModule.src = 'form-number-date';
+				} else if(!Modernizr.datalist){
+					formsExtModule.src = 'form-number-date-datalist';
+				}
 				delete $.event.special["forms-extReady"];
 				toLoad.push('forms-ext');
 			}
