@@ -1,4 +1,4 @@
-jQuery.webshims.register('forms-ext', function($, webshims, window){
+jQuery.webshims.register('forms-ext', function($, webshims, window, document, undefined){
 	"use strict";
 	
 	//form messages for forms-ext

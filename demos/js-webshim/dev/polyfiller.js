@@ -130,7 +130,7 @@
 				
 				var removeLoader = function(){
 					if($('html').hasClass('long-loading-polyfills')){
-						webshims.warn('Polyfilling takes a little bit long');
+						webshims.info('Polyfilling takes a little bit long');
 					}
 					$('html').removeClass('loading-polyfills long-loading-polyfills');
 					$(window).unbind('.lP');
@@ -1059,7 +1059,7 @@
 					});
 				},
 				methodNames: ['getContext'],
-				dependencies: ['es5', 'dom-support']
+				dependencies: ['dom-support']
 			});
 		}
 	})();
@@ -1079,11 +1079,6 @@
 		
 		addTest('datalist', function(){
 			return !!(modernizrInputAttrs.list && window.HTMLDataListElement);
-		});
-		
-		
-		addTest('output', function(){
-			return (Modernizr[formvalidation] && 'value' in document.createElement('output'));
 		});
 		
 		webshims.validationMessages = webshims.validityMessages = [];
@@ -1120,13 +1115,7 @@
 				},
 				dependencies: ['form-core', 'dom-support']
 			});
-					
-			addPolyfill('form-output-datalist', {
-				feature: 'forms',
-				test: Modernizr.output && Modernizr.datalist && modernizrInputAttrs.list,
-				dependencies: ['dom-support']
-			});
-			
+						
 		} else {
 			
 			//ToDo merge this with form-core:
@@ -1141,7 +1130,14 @@
 		addPolyfill('forms-ext', {
 			src: 'form-number-date',
 			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && !this.options.replaceUI);},
-			test: function(){return (this.uiTest());},
+			test: function(){
+				var ret = this.uiTest();
+				if(!Modernizr.datalist){
+					this.src = (ret) ? 'form-datalist' : 'form-number-date-datalist';
+					ret = false;
+				}
+				return ret;
+			},
 			noAutoCallback: true,
 			dependencies: ['forms'],
 			loadInit: function(){

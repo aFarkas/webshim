@@ -78,6 +78,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 comming Release 1.8.2
 ----------
 - improved mediaelement
+- moved input[list]/datalist support form 'forms' to 'forms-ext' feature (more lightweight for Chrome/Safari)
 - improved styleability of errorbubble
 - compatibility with jQuery 1.7 (1.8.1 is not compatible with jQuery 1.7)
 

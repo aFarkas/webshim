@@ -14,7 +14,12 @@
     	
     	<concat destfile="${src}/shims/form-shim-all.js">
             <fileset file="${src}/shims/form-shim-extend.js" />
-            <fileset file="${src}/shims/form-output-datalist.js" />
+            <fileset file="${src}/shims/form-output.js" />
+        </concat>
+		
+		<concat destfile="${src}/shims/form-number-date-datalist.js">
+			<fileset file="${src}/shims/form-datalist.js" />
+            <fileset file="${src}/shims/form-number-date.js" />
         </concat>
 		
 		<concat destfile="${src}/shims/mediaelement-native-all.js">

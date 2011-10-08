@@ -8,10 +8,10 @@ jQuery.webshims.gcEval = function(){
 };
 jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
-	
+	var Modernizr = window.Modernizr;
 	//additional tests for partial implementation of forms features
 	(function(){
-		var Modernizr = window.Modernizr;
+		
 		if(!Modernizr.formvalidation){return;}
 		var modernizrInputAttrs = Modernizr.input || {};
 		var modernizrInputTypes = Modernizr.inputtypes || {};
@@ -21,6 +21,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		var addTest = Modernizr.addTest;
 		var form = $('<form action="#"><select /><input type="date" required name="a" /></form>');
 		var dateElem = $('input', form);
+		var toLoad = [];
 		
 		//the form has to be connected in FF4
 		form.appendTo('head');
@@ -52,10 +53,18 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		
 		form.remove();
 		form = dateElem = null;
-		
+				
+		if(!('value' in document.createElement('output'))){
+			addPolyfill('form-output', {
+				feature: 'forms',
+				test: Modernizr.output,
+				dependencies: ['dom-support']
+			});
+			toLoad.push('form-output');
+		}
 		
 		if(!Modernizr.bugfreeformvalidation){
-			var toLoad = ['form-native-fix'];
+			toLoad.push('form-native-fix');
 			webshims.addPolyfill('form-native-fix', {
 				feature: 'forms',
 				test: Modernizr.bugfreeformvalidation,
@@ -71,6 +80,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				delete $.event.special["forms-extReady"];
 				toLoad.push('forms-ext');
 			}
+		}
+		if(toLoad.length){
 			webshims.loader.loadList(toLoad);
 			if(webshims.cfg.waitReady){
 				$.readyWait++;
