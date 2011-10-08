@@ -130,7 +130,7 @@
 				
 				var removeLoader = function(){
 					if($('html').hasClass('long-loading-polyfills')){
-						webshims.warn('Polyfilling takes a little bit long');
+						webshims.info('Polyfilling takes a little bit long');
 					}
 					$('html').removeClass('loading-polyfills long-loading-polyfills');
 					$(window).unbind('.lP');

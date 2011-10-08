@@ -3,7 +3,7 @@
  * - decouple muted/volume (needs improvement)
  * - implement video <-> flashcanvas pro API
  * - improve buffered-property with youtube/rtmp
- * - use jwplayer5 api instead of old flash4 api (this can be scheduled)
+ * - use jwplayer5 api instead of old flash4 api
  */
 
 jQuery.webshims.register('mediaelement-swf', function($, webshims, window, document, undefined, options){
@@ -59,6 +59,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		_bufferedEnd: 0,
 		_bufferedStart: 0,
 		_metadata: false,
+		_durationCalcs: -1,
 		_callMeta: false,
 		currentTime: 0,
 		_ppFlag: undefined
@@ -105,11 +106,13 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		bgcolor: '#000000'
 	});
 	
-	var getDuration = function(data, obj, _force){
+	var getDuration = function(data, obj){
+		var curDuration = data.duration;
+		if(curDuration && data._durationCalcs > 0){return;}
 		try {
 			data.duration = data.jwapi.getPlaylist()[0].duration;
-			if(!data.duration || data.duration <= 0 || (!_force && data.duration === data._lastDuration)){
-				data.duration = window.NaN;
+			if(!data.duration || data.duration <= 0 || data.duration === data._lastDuration){
+				data.duration = curDuration;
 			}
 		} catch(er){}
 		if(data.duration != data._lastDuration){
@@ -117,6 +120,9 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			if(data._elemNodeName == 'audio' || data._callMeta){
 				mediaelement.jwEvents.Model.META($.extend({duration: data.duration}, obj), data);
 			}
+			data._durationCalcs--;
+		} else {
+			data._durationCalcs++;
 		}
 	};
 	
@@ -142,11 +148,10 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				var data = getSwfDataFromID(obj.id);
 				if(!data || !('percentage' in obj) || data._bufferedEnd == obj.percentage){return;}
 				data.networkState = (obj.percentage == 100) ? 1 : 2;
-				if(isNaN(data.duration)){
+				if(isNaN(data.duration) || (obj.percentage > 5 && obj.percentage < 25) || (obj.percentage === 100)){
 					getDuration(data, obj);
-				} else if((obj.percentage > 3 && obj.percentage < 10) || (obj.percentage === 100)){
-					getDuration(data, obj, true);
 				}
+				
 				if(data.ended){
 					data.ended = false;
 				}
@@ -166,7 +171,6 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				if(obj.percentage == 100){
 					data.networkState = 1;
 					data.readyState = 4;
-					getDuration(data, obj, true);
 				}
 				$.event.trigger('progress', undefined, data._elem, true);
 			},
@@ -210,7 +214,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				if(!data || data.currentTime === obj.position){return;}
 				data.currentTime = obj.position;
 				if(data.duration && data.duration < data.currentTime){
-					getDuration(data, obj, true);
+					getDuration(data, obj);
 				}
 				if(data.readyState < 2){
 					data.readyState = 2;
@@ -238,7 +242,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 						data.paused = false;
 						data._ppFlag = true;
 						if(!data.duration){
-							getDuration(data, obj, true);
+							getDuration(data, obj);
 						}
 						if(data.readyState < 3){
 							data.readyState = 3;
@@ -561,7 +565,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	
 	
 	var resetSwfProps = (function(){
-		var resetProtoProps = ['_bufferedEnd', '_bufferedStart', '_metadata', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'videoHeight', 'videoWidth', '_callMeta'];
+		var resetProtoProps = ['_bufferedEnd', '_bufferedStart', '_metadata', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'videoHeight', 'videoWidth', '_callMeta', '_durationCalcs'];
 		var len = resetProtoProps.length;
 		return function(data){
 			
