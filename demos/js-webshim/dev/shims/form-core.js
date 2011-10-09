@@ -56,7 +56,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		form = dateElem = null;
 				
 		if(!('value' in document.createElement('output'))){
-			addPolyfill('form-output', {
+			webshims.addPolyfill('form-output', {
 				feature: 'forms',
 				test: Modernizr.output,
 				dependencies: ['dom-support']
