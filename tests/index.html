@@ -7,6 +7,17 @@
 	<link rel="stylesheet" href="qunit/qunit.css" media="screen">
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+	<script>
+	(function(){
+		var oldbind = jQuery.fn.bind;
+		jQuery.fn.bind = function(type){
+			if(typeof type == 'string' && /\s{2,9}/.test(type)){
+				alert(type);
+			}
+			return oldbind.apply(this, arguments);
+		};
+	}());
+	</script>
 	<script src="../src/extras/modernizr-custom.js"></script>
 	<script src="qunit/qunit.js"></script>
 	
