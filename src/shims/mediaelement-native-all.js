@@ -115,7 +115,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				data.duration = curDuration;
 			}
 		} catch(er){}
-		if(data.duration != data._lastDuration){
+		if(data.duration && data.duration != data._lastDuration){
 			trigger(data._elem, 'durationchange');
 			if(data._elemNodeName == 'audio' || data._callMeta){
 				mediaelement.jwEvents.Model.META($.extend({duration: data.duration}, obj), data);

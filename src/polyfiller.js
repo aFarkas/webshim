@@ -35,7 +35,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.8.2beta1',
+		version: '1.8.2RC1',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -140,7 +140,7 @@
 				if (!$.isReady) {
 					
 					addClass.push('loading-polyfills');
-					$(window).bind('load.lP polyfillloaderror.lP  error.lP', removeLoader);
+					$(window).bind('load.lP polyfillloaderror.lP error.lP', removeLoader);
 					timer = setTimeout(function(){
 						$('html').addClass('long-loading-polyfills');
 					}, 600);
