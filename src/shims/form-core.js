@@ -41,7 +41,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		
 		modernizrInputAttrs[valueAsNumber] = (valueAsNumber in dateElem[0]);
 		if (modernizrInputAttrs[valueAsNumber]) {
-			dateElem[0][valueAsNumber] = 0;
+			try {
+				dateElem[0][valueAsNumber] = 0;
+			} catch(er){}
 			modernizrInputAttrs.valueAsNumberSet = (dateElem[0].value == '1970-01-01');
 			
 		}
