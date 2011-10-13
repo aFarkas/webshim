@@ -35,7 +35,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.8.2RC1',
+		version: '1.8.2RC2',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -588,7 +588,7 @@
 	$.fn.callProp = function(prop, args){
 		var ret;
 		if(!args){
-			args = args; 
+			args = []; 
 		}
 		this.each(function(){
 			var fn = $.prop(this, prop);

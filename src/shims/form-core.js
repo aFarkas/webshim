@@ -50,7 +50,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem[0]);
 		
 		
-		if (modernizrInputAttrs[valueAsNumber] && !modernizrInputAttrs.valueAsNumberSet) {
+		if (modernizrInputTypes.date && modernizrInputAttrs[valueAsNumber] && !modernizrInputAttrs.valueAsNumberSet) {
 			Modernizr.bugfreeformvalidation = false;
 		}
 		

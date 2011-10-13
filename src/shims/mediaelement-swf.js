@@ -90,7 +90,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		evt.preventDefault();
 		$.event.trigger(evt, undefined, elem);
 	};
-	var stopMutedAnnounce;
+	
 	var playerSwfPath = options.playerPath || webshims.cfg.basePath + "jwplayer/" + (options.playerName || "player.swf");
 	var jwplugin = options.pluginPath || webshims.cfg.basePath +'swf/jwwebshims.swf';
 	
@@ -125,6 +125,24 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			data._durationCalcs++;
 		}
 	};
+	var setReadyState = function(readyState, data){
+		if(readyState < 3){
+			clearTimeout(data._canplaythroughTimer);
+		}
+		if(readyState >= 3 && data.readyState < 3){
+			data.readyState = readyState;
+			trigger(data._elem, 'canplay');
+			clearTimeout(data._canplaythroughTimer);
+			data._canplaythroughTimer = setTimeout(function(){
+				setReadyState(4, data);
+			}, 4000);
+		}
+		if(readyState >= 4 && data.readyState < 4){
+			data.readyState = readyState;
+			trigger(data._elem, 'canplaythrough');
+		}
+		data.readyState = readyState;
+	};
 	
 	mediaelement.jwEvents = {
 		View: {
@@ -158,9 +176,10 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				if(!data.duration){
 					return;
 				}
-				if(obj.percentage > 1 && data.readyState < 3){
-					data.readyState = 3;
-					trigger(data._elem, 'canplay');
+				if(obj.percentage > 2 && obj.percentage < 20){
+					setReadyState(3, data);
+				} else if(obj.percentage > 20){
+					setReadyState(4, data);
 				}
 				if(data._bufferedEnd && (data._bufferedEnd > obj.percentage)){
 					data._bufferedStart = data.currentTime || 0;
@@ -170,7 +189,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				data.buffered.length = 1;
 				if(obj.percentage == 100){
 					data.networkState = 1;
-					data.readyState = 4;
+					setReadyState(4, data);
 				}
 				$.event.trigger('progress', undefined, data._elem, true);
 			},
@@ -201,9 +220,9 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 					data.networkState = 2;
 				}
 				if(data.readyState < 1){
-					data.readyState = 1;
+					setReadyState(1, data);
 				}
-				if(oldDur !== data.duration){
+				if(data.duration && oldDur !== data.duration){
 					trigger(data._elem, 'durationchange');
 				}
 				
@@ -217,7 +236,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 					getDuration(data, obj);
 				}
 				if(data.readyState < 2){
-					data.readyState = 2;
+					setReadyState(2, data);
 				}
 				if(data.ended){
 					data.ended = false;
@@ -230,12 +249,11 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				if(!data){return;}
 				switch(obj.newstate) {
 					case 'BUFFERING':
-						if(data.readyState > 1){
-							data.readyState = 1;
-						}
+						
 						if(data.ended){
 							data.ended = false;
 						}
+						setReadyState(1, data);
 						trigger(data._elem, 'waiting');
 						break;
 					case 'PLAYING':
@@ -245,8 +263,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 							getDuration(data, obj);
 						}
 						if(data.readyState < 3){
-							data.readyState = 3;
-							trigger(data._elem, 'canplay');
+							setReadyState(3, data);
 						}
 						if(data.ended){
 							data.ended = false;
@@ -262,7 +279,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 						break;
 					case 'COMPLETED':
 						if(data.readyState < 4){
-							data.readyState = 4;
+							setReadyState(4, data);
 						}
 						data.ended = true;
 						trigger(data._elem, 'ended');
@@ -304,7 +321,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				trigger(data._elem, 'volumechange');
 			},
 			MUTE: function(obj){
-				if(stopMutedAnnounce && obj.state){return;}
+				if(obj.state){return;}
 				var data = getSwfDataFromID(obj.id);
 				if(!data){return;}
 				if(data.muted == obj.state){return;}
@@ -572,6 +589,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			if(!data){return;}
 			var lenI = len;
 			var networkState = data.networkState;
+			setReadyState(0, data);
 			while(--lenI){
 				delete data[resetProtoProps[lenI]];
 			}
@@ -806,26 +824,22 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			if(data){
 				v *= 100;
 				if(!isNaN(v)){
+					var muted = data.muted;
 					if(v < 0 || v > 100){
 						webshims.error('volume greater or less than allowed '+ (v / 100));
 					}
-					if(data.muted){
-						stopMutedAnnounce = true;
-					}
+					
 					queueSwfMethod(this, SENDEVENT, ['VOLUME', v], data);
-					if(stopMutedAnnounce){
+					if(muted){
 						try {
 							data.jwapi.sendEvent('mute', 'true');
 						} catch(er){}
-						stopMutedAnnounce = false;
 					}
-					setTimeout(function(){
-						v /= 100;
-						if(data.volume == v || data.isActive != 'flash'){return;}
-						data.volume = v;
-						trigger(data._elem, 'volumechange');
-						data = null;
-					}, 1);	
+					v /= 100;
+					if(data.volume == v || data.isActive != 'flash'){return;}
+					data.volume = v;
+					trigger(data._elem, 'volumechange');
+					data = null;
 				} 
 			} else if(mediaSup.volume.prop._supset) {
 				return mediaSup.volume.prop._supset.apply(this, arguments);
@@ -837,12 +851,10 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			if(data){
 				m = !!m;
 				queueSwfMethod(this, SENDEVENT, ['mute', ''+m], data);
-				setTimeout(function(){
-					if(data.muted == m || data.isActive != 'flash'){return;}
-					data.muted = m;
-					trigger(data._elem, 'volumechange');
-					data = null;
-				}, 1); 
+				if(data.muted == m || data.isActive != 'flash'){return;}
+				data.muted = m;
+				trigger(data._elem, 'volumechange');
+				data = null;
 			} else if(mediaSup.muted.prop._supset) {
 				return mediaSup.muted.prop._supset.apply(this, arguments);
 			}

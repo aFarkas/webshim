@@ -55,23 +55,24 @@
 	
 	
 	
-	
-	asyncTest("mixed-test", function(){
-		var form = $('#form-buttons');
-		$('input.enctype-submit-test', form).click();
-		stop();
-		addTest = function(){
-			equals(results.target, 'originaltarget');
-			equals(results.search, '');
-			equals(results.action, 2);
-			equals(form.prop('method'), "post");
-			equals(form.attr('action'), "test-ext/form-tester-1.html");
-		};
-		
-		setTimeout(function(){
-			$.webshims.ready('DOM forms', start);
-		}, 10);
-	});
+	if (location.host.indexOf('github.com') == -1) {
+		asyncTest("mixed-test", function(){
+			var form = $('#form-buttons');
+			$('input.enctype-submit-test', form).click();
+			stop();
+			addTest = function(){
+				equals(results.target, 'originaltarget');
+				equals(results.search, '');
+				equals(results.action, 2);
+				equals(form.prop('method'), "post");
+				equals(form.attr('action'), "test-ext/form-tester-1.html");
+			};
+			
+			setTimeout(function(){
+				$.webshims.ready('DOM forms', start);
+			}, 10);
+		});
+	}
 	
 	
 	
@@ -92,42 +93,42 @@
 		}, 20);
 	});
 	
-	//fails in ie7 ToDo:
-	asyncTest("target-test", function(){
-		var form = $('#form-buttons');
-		$('input.target-image-test', form).click();
-		stop();
-		addTest = function(){
-			equals(results.target, 'image-target');
-			equals(results.search, '');
-			equals(results.action, 1);
-			equals(form.prop('method'), "post");
-			equals(form.attr('action'), "test-ext/form-tester-1.html");
-			equals(form.prop('target'), "originaltarget");
-		};
+	if (location.host.indexOf('github.com') == -1) {
+		asyncTest("target-test", function(){
+			var form = $('#form-buttons');
+			$('input.target-image-test', form).click();
+			stop();
+			addTest = function(){
+				equals(results.target, 'image-target');
+				equals(results.search, '');
+				equals(results.action, 1);
+				equals(form.prop('method'), "post");
+				equals(form.attr('action'), "test-ext/form-tester-1.html");
+				equals(form.prop('target'), "originaltarget");
+			};
+			
+			setTimeout(function(){
+				$.webshims.ready('DOM forms', start);
+			}, 30);
+		});
 		
-		setTimeout(function(){
-			$.webshims.ready('DOM forms', start);
-		}, 30);
-	});
-	
-	
-	asyncTest("empty-test", function(){
-		var form = $('#form-buttons');
-		$('button.empty-test', form).click();
-		stop();
-		addTest = function(){
-			equals(results.target, 'originaltarget');
-			equals(results.search, '');
-			equals(results.action, 1);
-			equals(form.prop('method'), "post");
-			equals(form.attr('action'), "test-ext/form-tester-1.html");
-		};
 		
-		setTimeout(function(){
-			$.webshims.ready('DOM forms', start);
-		}, 40);
-	});
-	
+		asyncTest("empty-test", function(){
+			var form = $('#form-buttons');
+			$('button.empty-test', form).click();
+			stop();
+			addTest = function(){
+				equals(results.target, 'originaltarget');
+				equals(results.search, '');
+				equals(results.action, 1);
+				equals(form.prop('method'), "post");
+				equals(form.attr('action'), "test-ext/form-tester-1.html");
+			};
+			
+			setTimeout(function(){
+				$.webshims.ready('DOM forms', start);
+			}, 40);
+		});
+	}
 	
 })(jQuery);
