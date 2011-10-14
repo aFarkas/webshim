@@ -1123,7 +1123,8 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 				'audio/wav': ['wav'],
 				'audio/3gpp': ['3gp','3gpp'],
 				'audio/webm': ['webm'],
-				'audio/fla': ['flv', 'f4a', 'fla']
+				'audio/fla': ['flv', 'f4a', 'fla'],
+				'application/x-mpegURL': ['m3u8', 'm3u']
 			},
 			video: {
 				//ogm shouldn´t be used!
@@ -1135,7 +1136,9 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 				'video/x-ms-asf': ['asf', 'asx'],
 				'video/flv': ['flv', 'f4v'],
 				'video/3gpp': ['3gp','3gpp'],
-				'video/webm': ['webm']
+				'video/webm': ['webm'],
+				'application/x-mpegURL': ['m3u8', 'm3u'],
+				'video/MP2T': ['ts']
 			}
 		}
 	;
@@ -1256,7 +1259,7 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 			message = "can't play sources";
 		}
 		
-		$(elem).data('mediaerror', message);
+		$(elem).pause().data('mediaerror', message);
 		webshims.warn('mediaelementError: '+ message);
 		setTimeout(function(){
 			if($(elem).data('mediaerror')){
@@ -1299,6 +1302,9 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 			if(!ret){
 				if(_noLoop){
 					mediaelement.setError(elem, false);
+					if(data && data.isActive == 'flash') {
+						mediaelement.setActive(elem, 'html5', data);
+					}
 				} else {
 					stepSources(elem, data, true, _srces, true);
 				}
@@ -1316,8 +1322,7 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 		clearTimeout(baseData.loadTimer);
 		$.data(elem, 'mediaerror', false);
 		
-		if(!_srces.length){return;}
-		if(!parent || stopParent.test(parent.nodeName || '')){return;}
+		if(!_srces.length || !parent || stopParent.test(parent.nodeName || '')){return;}
 		data = data || webshims.data(elem, 'mediaelement');
 		stepSources(elem, data, options.preferFlash || undefined, _srces);
 	};

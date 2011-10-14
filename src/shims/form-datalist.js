@@ -529,6 +529,6 @@ jQuery.webshims.ready('dom-support forms', function($, webshims, window, documen
 				webshims.warn("setting forms-ext ready from datalist");
 				webshims.isReady('forms-ext', true);
 			}
-		}, 9);
+		}, 9999);
 	}
 });

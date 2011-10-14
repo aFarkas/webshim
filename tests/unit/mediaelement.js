@@ -45,7 +45,7 @@
 			
 			.bind('playing.testevent', function(){
 				events.playing++;
-				ok(!media.prop('paused') && !media.prop('ended') && media.prop('readyState') > media.prop('HAVE_CURRENT_DATA'), "media state accords to currently playing");
+				ok(!media.prop('paused') && !media.prop('ended') && media.prop('readyState') >= media.prop('HAVE_CURRENT_DATA'), "media state accords to currently playing");
 			})
 			.bind('emptied.testevent', function(){
 				events.emptied++;
@@ -102,7 +102,7 @@
 		video.prop('loop', true);
 		webshimtest.reflectAttr(video, 'loop', true, 'boolean');
 		
-		ok(isNaN(video.prop('duration')), 'duration is NaN');
+		ok(!video.prop('duration'), 'duration is NaN/0 ');
 		
 		absoluteUrlTest(audio.prop('src'));
 		
@@ -128,7 +128,7 @@
 		audio.prop('loop', true);
 		webshimtest.reflectAttr(audio, 'loop', true, 'boolean');
 		
-		ok(isNaN(audio.prop('duration')), 'duration is NaN');
+		ok(!audio.prop('duration'), 'duration is NaN/0');
         setTimeout(function(){
 	        $.webshims.ready('mediaelement swfobject', start);
 		}, 100);

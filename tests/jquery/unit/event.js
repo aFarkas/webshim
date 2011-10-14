@@ -2246,39 +2246,6 @@ test("custom events with colons (#3533, #8272)", function() {
 
 	noEarlyExecution = order.length == 0;
 
-	// This assumes that QUnit tests are run on DOM ready!
-	test("jQuery ready", function() {
-		expect(10);
-
-		ok(noEarlyExecution, "Handlers bound to DOM ready should not execute before DOM ready");
-
-		// Ensure execution order.
-		same(order, ["a", "b", "d", "e", "c", "f"], "Bound DOM ready handlers should execute in bind-order, but those bound with jQuery(document).bind( 'ready', fn ) will always execute last");
-
-		// Ensure handler argument is correct.
-		equals(args.a, jQuery, "Argument passed to fn in jQuery( fn ) should be jQuery");
-		equals(args.b, jQuery, "Argument passed to fn in jQuery(document).ready( fn ) should be jQuery");
-		ok(args.c instanceof jQuery.Event, "Argument passed to fn in jQuery(document).bind( 'ready', fn ) should be an event object");
-
-		order = [];
-
-		// Now that the ready event has fired, again bind to the ready event
-		// in every possible way. These event handlers should execute immediately.
-		jQuery(makeHandler("g"));
-		equals(order.pop(), "g", "Event handler should execute immediately");
-		equals(args.g, jQuery, "Argument passed to fn in jQuery( fn ) should be jQuery");
-
-		jQuery(document).ready(makeHandler("h"));
-		equals(order.pop(), "h", "Event handler should execute immediately");
-		equals(args.h, jQuery, "Argument passed to fn in jQuery(document).ready( fn ) should be jQuery");
-
-		jQuery(document).bind("ready.readytest", makeHandler("never"));
-		equals(order.length, 0, "Event handler should never execute since DOM ready has already passed");
-
-		// Cleanup.
-		jQuery(document).unbind("ready.readytest");
-	});
-
 })();
 
 /*

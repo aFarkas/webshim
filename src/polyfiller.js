@@ -35,7 +35,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: 'pre1.8.2RC3',
+		version: '1.8.2RC3',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,

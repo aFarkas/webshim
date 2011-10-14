@@ -70,7 +70,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			toLoad.push('form-native-fix');
 			webshims.addPolyfill('form-native-fix', {
 				feature: 'forms',
-				test: Modernizr.bugfreeformvalidation,
 				dependencies: ['form-extend']
 			});
 			//remove form-extend readyness
@@ -78,8 +77,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			if($.event.special["form-extendReady"]){
 				delete $.event.special["form-extendReady"];
 			}
-			formsExtModule.test = function(){return false};
+			
 			if((formsExtModule.src == 'form-datalist' || $.event.special["forms-extReady"]) && (!modernizrInputAttrs[valueAsNumber] || !modernizrInputAttrs.valueAsNumberSet)){
+				formsExtModule.test = function(){return false};
 				if(formsExtModule.src == 'form-datalist'){
 					formsExtModule.src = 'form-number-date';
 				}
