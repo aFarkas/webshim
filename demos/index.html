@@ -221,6 +221,18 @@ $.webshims.setOptions({
 });
 </code>					
 					
+					<h3>Making webshims lib more lightweight (call polyfill conditionally)</h3>
+					<p>Webshims lib can be considered as very lightweight polyfill libary. Feature implementations are only loaded in browsers, which do not support does features without any blocking behavior.</p>
+					<p>The grouping of features in webshims lib however is a balancing act. For grouping features, we take the following aspects into account: filesize vs. HTTP-request (minimize requests vs. parallelise requests), relation between features (JSON has nothing to do with input[placeholder], but with localStorage) and the current featureset of modern browsers (current modern browsers shouldn't load too much).</p>
+					<p>In some cases those grouping decisions - made by webshims lib - do not really fit the needs of a project. An example: If a project only need the input[placeholder] and input[autofocus] features, the <code>forms</code> feature has to be used. But <code>forms</code> does not only implement those needed features, but also constraint validation and some other features like formtarget.</p>
+					<p>This would not hurt a browser, which hasn't implemented anything of this (Due to our minimize requests and non blocking approach, the additional filesize isn't really significant). But it hurts browsers, which have implemented those features, but haven't implemented the other features (For example: Safari 5 has no validation UI. Opera 11.5 has a buggy validation API).</p>
+					<p>To make webshims lib really lightweight in those cases, the <code>polyfill</code> method should be called conditionally:</p>
+<code class="block">
+if(!Modernizr.input.placeholder || !Modernizr.input.autofocus){
+	$.webshims.polyfill('forms');
+}
+</code>					
+					
 					<h3>High Performance loading using combo-handler service</h3>
 					<p>Webshims lib supports generating a combohandler - url. Simply add the polyfiller-comboloader plugin from the extras folder and pass true or your combohandler options as the second argument. The defaults are fine to use in conjunction with the defaults of the <a href="http://code.google.com/p/minify/">minify - project</a>.</p>
 <code class="block">
