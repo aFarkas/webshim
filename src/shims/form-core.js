@@ -488,13 +488,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		});
 		
 		var currentValidationMessage =  validityMessages[''];
-		webshims.activeLang({
-			langObj: validityMessages, 
-			module: 'form-core', 
-			callback: function(langObj){
-				currentValidationMessage = langObj;
-			}
-		});
+		
 		
 		webshims.createValidationMessage = function(elem, name){
 			var message = currentValidationMessage[name];
@@ -548,7 +542,13 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		getContentValidationMessage = webshims.getContentValidationMessage;
 		
 		webshims.ready('dom-support', function($, webshims, window, document, undefined){
-			
+			webshims.activeLang({
+				langObj: validityMessages, 
+				module: 'form-core', 
+				callback: function(langObj){
+					currentValidationMessage = langObj;
+				}
+			});
 			//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
 			if(Modernizr.datalist && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
 				webshims.defineNodeNameProperty('datalist', 'options', {
