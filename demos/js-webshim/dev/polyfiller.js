@@ -61,18 +61,6 @@
 					}
 				}
 			},
-			comboOptions: {
-				seperator: ',',
-				base: '/min/f=',
-				maxFiles: 10,
-				
-				fn: function(base, scriptPath, seperator, srces){
-					return base +
-					$.map(srces, function(src){
-						return scriptPath + src;
-					}).join(seperator);
-				}
-			},
 			basePath: (function(){
 				var script = $('script').filter('[src*="polyfiller.js"]');
 				var path;
@@ -323,18 +311,18 @@
 				modules[name] = ext;
 				ext.name = ext.name || name;
 			},
-			
+			loadedModules: [],
+			_loadScript: function(src, names){
+				if (typeof names == 'string') {
+					names = [names];
+				}
+				$.merge(loader.loadedModules, names);
+				loader.loadScript(src, false, names);
+			},
 			loadList: (function(){
 			
-				var loadedModules = [];
-				
-				var loadScript = function(src, names){
-					if (typeof names == 'string') {
-						names = [names];
-					}
-					$.merge(loadedModules, names);
-					loader.loadScript(src, false, names);
-				};
+				var loadedModules;
+				var loadScript;
 				
 				var noNeedToLoad = function(name, list){
 					if (isReady(name) || $.inArray(name, loadedModules) != -1) {
@@ -381,45 +369,13 @@
 					}
 				};
 				
-				var excludeCombo = /\.\/|\/\//;
-				var loadAsCombo = function(toLoad, combo){
-					var fPart = [];
-					var combiNames = [];
-					var len = 0;
-					
-					combo = $.extend({}, webCFG.comboOptions, typeof combo == 'object' ? combo : {});
-					
-					$.each(toLoad, function(i, loadName){
-						if ($.inArray(loadName, loadedModules) == -1) {
-							var src = (modules[loadName].src || loadName);
-							
-							if (src.indexOf('.') == -1) {
-								src += '.js';
-							}
-							if (!excludeCombo.test(src)) {
-								len++;
-								fPart.push(src);
-								combiNames.push(loadName);
-								if (len >= combo.maxFiles || (len > 9 && fPart.join(',,,,').length > 200)) {
-									loadScript(combo.fn(combo.base, combo.scriptPath, combo.seperator, fPart), combiNames);
-									fPart = [];
-									combiNames = [];
-									len = 0;
-								}
-							}
-							else {
-								loadScript(src, loadName);
-							}
-						}
-					});
-					if (fPart.length) {
-						loadScript(combo.fn(combo.base, combo.scriptPath, combo.seperator, fPart), combiNames);
-					}
-				};
-				
 				return function(list, combo){
 					var module;
 					var loadCombos = [];
+					if(!loadedModules || !loadScript){
+						loadedModules = loader.loadedModules;
+						loadScript = loader._loadScript;
+					}
 					//length of list is dynamically
 					for (var i = 0; i < list.length; i++) {
 						module = modules[list[i]];
@@ -440,13 +396,15 @@
 						setDependencies(module, list);
 						if (combo) {
 							loadCombos.push(module.name);
-						}
-						else {
+						} else {
 							loadScript(module.src || module.name, module.name);
 						}
 					}
-					if (combo) {
-						loadAsCombo(loadCombos, combo);
+					if(combo){
+						if(!webshims.loadAsCombo){
+							webshims.warn("include comboloader plugin");
+						}
+						webshims.loadAsCombo(loadCombos, combo);
 					}
 				};
 			})(),
@@ -1238,7 +1196,5 @@
 			webshims.polyfill( $.trim( $(this).data('polyfill') || '' ) );
 		})
 	;
-	//set script path for comboOptions
-	var l = location;
-	webCFG.comboOptions.scriptPath = webCFG.basePath.replace(l.protocol + '//' + l.host + '/', '');
+	
 })(jQuery, this, this.document);
