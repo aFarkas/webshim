@@ -1,6 +1,6 @@
-jQuery.webshims.ready('dom-support', function($, webshims, window, document, undefined){
+jQuery.webshims.ready('dom-support forms', function($, webshims, window, document, undefined){
 	var doc = document;	
-	
+
 	/*
 	 * implement propType "element" currently only used for list-attribute (will be moved to dom-extend, if needed)
 	 */
@@ -519,8 +519,16 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 		
 		//init datalist update
 		initializeDatalist();
-		if(webshims.modules['forms-ext'].src == 'formm-datalist'){
-			webshims.isReady('forms-ext', true);
-		}
 	})();
+	
+	if(webshims.modules['forms-ext'].src == 'form-datalist'){
+		webshims.isReady('forms-ext', true);
+	} else {
+		setTimeout(function(){
+			if(!webshims.isReady('forms-ext')){
+				webshims.warn("setting forms-ext ready from datalist");
+				webshims.isReady('forms-ext', true);
+			}
+		}, 9);
+	}
 });

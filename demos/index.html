@@ -221,6 +221,7 @@ $.webshims.setOptions({
 					<p>This would not hurt a browser, which hasn't implemented anything of this (Due to our minimize requests and non blocking approach, the additional filesize isn't really significant). But it hurts browsers, which have implemented those features, but haven't implemented the other features (For example: Safari 5 has no validation UI. Opera 11.5 has a buggy validation API).</p>
 					<p>To make webshims lib really lightweight in those cases, the <code>polyfill</code> method should be called conditionally:</p>
 <code class="block">
+//only polyfill forms, if placeholder or autofocus are not supported
 if(!Modernizr.input.placeholder || !Modernizr.input.autofocus){
 	$.webshims.polyfill('forms');
 }
@@ -313,7 +314,7 @@ $.webshims.polyfill('js-storage geolocation', {
 		}
 	]);
 &lt;/script&gt;
-&lt;/body&gt;
+&lt;/head&gt;
 </code>						
 				</div>
 				<h3 id="polyfill-ready" class="button">Fire when ready</h3>

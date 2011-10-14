@@ -79,11 +79,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				delete $.event.special["form-extendReady"];
 			}
 			formsExtModule.test = function(){return false};
-			if(formsExtModule.src == 'form-datalist' || $.event.special["forms-extReady"]){
+			if((formsExtModule.src == 'form-datalist' || $.event.special["forms-extReady"]) && (!modernizrInputAttrs[valueAsNumber] || !modernizrInputAttrs.valueAsNumberSet)){
 				if(formsExtModule.src == 'form-datalist'){
 					formsExtModule.src = 'form-number-date';
-				} else if(!Modernizr.datalist){
-					formsExtModule.src = 'form-number-date-datalist';
 				}
 				delete $.event.special["forms-extReady"];
 				toLoad.push('forms-ext');

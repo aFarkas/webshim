@@ -18,8 +18,8 @@
         </concat>
 		
 		<concat destfile="${src}/shims/form-number-date-datalist.js">
-			<fileset file="${src}/shims/form-datalist.js" />
             <fileset file="${src}/shims/form-number-date.js" />
+			<fileset file="${src}/shims/form-datalist.js" />
         </concat>
 		
 		<concat destfile="${src}/shims/mediaelement-native-all.js">

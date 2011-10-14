@@ -35,7 +35,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.8.2RC3',
+		version: 'pre1.8.2RC3',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -395,6 +395,7 @@
 						if (module.loadInit) {
 							module.loadInit();
 						}
+						
 						module.loaded = true;
 						setDependencies(module, list);
 						if (combo) {
