@@ -1,5 +1,6 @@
 /*
  * simple helper for a mousepress event
+ * used by webshims improving spinbutton controls for input[type=time], input[type=number]...
  * 
  * $(element).bind('mousepress', function(){
  * 	//repeatedly called after mousedown, till mouseleave/mouseup
