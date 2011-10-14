@@ -210,7 +210,6 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				};
 				this.datalist = datalist;
 				this.id = opts.id;
-				this.lazyIDindex = listidIndex;
 				this.hasViewableData = true;
 				this._autocomplete = $.attr(opts.input, 'autocomplete');
 				$.data(opts.input, 'datalistWidget', this);
@@ -297,7 +296,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 					$(opts.input.form).bind('submit.datalistWidget'+opts.input.id, function(){
 						var val = $.prop(opts.input, 'value');
 						that.storedOptions = getStoredOptions(opts.input.name || opts.input.id);
-						if(val && $.inArray(val, that.storedOptions) == -1){
+						if(val && that.storedOptions.indexOf(val) == -1){
 							that.storedOptions.push(val);
 							storeOptions(opts.input.name || opts.input.id, that.storedOptions );
 						}
@@ -325,7 +324,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 					$(this.input).attr('autocomplete', autocomplete);
 				}
 			},
-			_resetListCached: function(){
+			_resetListCached: function(e){
 				var that = this;
 				this.needsUpdate = true;
 				this.lastUpdatedValue = false;
@@ -334,11 +333,12 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				
 				if(!this.updateTimer){
 					this.updateTimer = setTimeout(function(){
-						that.updateListOptions();
-					}, this.isListVisible || window.QUnit ? 0 : 40 * this.lazyIDindex);
+						that.updateListOptions((e && document.activeElement == that.input));
+						that = null;
+					}, 0);
 				}
 			},
-			updateListOptions: function(){
+			updateListOptions: function(_forceShow){
 				this.needsUpdate = false;
 				clearTimeout(this.updateTimer);
 				this.updateTimer = false;
@@ -348,45 +348,48 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 						fontFamily: $.curCSS(this.input, 'fontFamily')
 					})
 				;
-				var list = '<ul role="list" class="'+ (this.datalist.className || '') + ' '+ this.datalist.id +'-shadowdom' +'">';
+				var list = [];
 				
 				var values = [];
 				var allOptions = [];
-				$('option', this.datalist).each(function(i){
-					if(this.disabled){return;}
-					var item = {
-						value: $(this).val() || '',
-						text: $.trim($.attr(this, 'label') || getText(this)),
-						className: this.className || '',
-						style: $.attr(this, 'style') || ''
+				var rElem;
+				var rItem;
+				for(var rOptions = $('option', this.datalist), rI = 0, rLen = $('option', this.datalist).length; rI < rLen; rI++){
+					rElem = rOptions[rI];
+					if(rElem.disabled){return;}
+					rItem = {
+						value: $(rElem).val() || '',
+						text: $.trim($.attr(rElem, 'label') || getText(rElem)),
+						className: rElem.className || '',
+						style: $.attr(rElem, 'style') || ''
 					};
-					if(!item.text){
-						item.text = item.value;
+					if(!rItem.text){
+						rItem.text = rItem.value;
 					}
-					values[i] = item.value;
-					allOptions[i] = item;
-				});
+					values[rI] = rItem.value;
+					allOptions[rI] = rItem;
+				}
+				
 				this.storedOptions = getStoredOptions(this.input.name || this.input.id);
 				this.storedOptions.forEach(function(val, i){
-					if($.inArray(val, values) == -1){
+					if(values.indexOf(val) == -1){
 						allOptions.push({value: val, text: val, className: '', style: ''});
 					}
 				});
 				
 				allOptions.forEach(function(item, i){
 					var val = item.value.indexOf('"') != -1 ? "'"+ item.value +"'" : '"' + item.value +'"';
-					list += '<li data-value='+ val +' class="'+ item.className +'" style="'+ item.style +'" tabindex="-1" role="listitem">'+ item.text +'</li>';
+					list[i] = '<li data-value='+ val +' class="'+ item.className +'" style="'+ item.style +'" tabindex="-1" role="listitem">'+ item.text +'</li>';
 				});
 				
-				list += '</ul>';
 				this.arrayOptions = allOptions;
-				this.shadowList.html(list);
+				this.shadowList.html('<ul role="list" class="'+ (this.datalist.className || '') + ' '+ this.datalist.id +'-shadowdom' +'">'+ list.join("\n") +'</ul>');
 				
 				if($.fn.bgIframe && lteie6){
 					this.shadowList.bgIframe();
 				}
 				
-				if(this.isListVisible){
+				if(_forceShow || this.isListVisible){
 					this.showHideOptions();
 				}
 			},
