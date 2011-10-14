@@ -182,23 +182,16 @@ $.webshims.polyfill('json-storage geolocation');
 						<h3>List of features</h3>
 						
 						<ul>
-							<li><code>json-storage</code>*</li>
-							<li><code>es5</code>*</li>
-							<li><code>geolocation</code>*</li>
-							<li><code>canvas</code>*</li>
-							<li><code>forms</code>*</li>
+							<li><code>json-storage</code></li>
+							<li><code>es5</code></li>
+							<li><code>geolocation</code></li>
+							<li><code>canvas</code></li>
+							<li><code>forms</code></li>
 							<li><code>forms-ext</code></li>
-							<li><code>mediaelement <sup>1</sup></code></li>
+							<li><code>mediaelement</code></li>
 							<li><code>details</code></li>
 						</ul>
-						<p>The polyfill-method can also take a keyword called <code>lightweight</code>, which will load a filesize-/feature- balanced profile</p>
-						<p><small>With an * marked features are part of the lightweight profile</small></p>
-						<p><small><sup>1</sup> mediaelement feature will be added to the lightweight profile with next version of webshims lib</small></p>
-	
-<code class="block">
-//load and implement all unsupported features from the lightweight profile
-$.webshims.polyfill('lightweight');
-</code>			
+		
 						<p>If you have any trouble setting up Webshims lib, set <code>$.webshims.debug</code> to true and open your console:</p>
 <code class="block">							
 &lt;script&gt;
@@ -238,8 +231,6 @@ if(!Modernizr.input.placeholder || !Modernizr.input.autofocus){
 <code class="block">
 //loads all features with a combohandler
 $.webshims.polyfill(true);
-//loads lightweight with a combohandler
-$.webshims.polyfill('lightweight', true);
 //loads json-storage and geolocation as a combohandler
 $.webshims.polyfill('js-storage geolocation', true);
 </code>

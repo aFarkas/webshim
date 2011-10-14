@@ -35,7 +35,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.8.2RC2',
+		version: '1.8.2RC3',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -77,7 +77,9 @@
 		modules: {},
 		features: {},
 		featureList: [],
+		//profiles are deprecated including lightweight
 		profiles: {
+			//deprecated
 			lightweight: ['es5', 'json-storage', 'canvas', 'geolocation', 'forms']
 		},
 		setOptions: function(name, opts){
@@ -159,6 +161,7 @@
 				features = features || webshims.featureList;
 				
 				if (typeof features == 'string') {
+					//profiles are deprecated
 					features = webshims.profiles[features] || features.split(' ');
 				}
 				
