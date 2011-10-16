@@ -77,7 +77,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 Release 1.8.2
 ----------
-- improved mediaelement
+- improved mediaelement (canplaythrough event, http live streaming for iOS)
 - moved input[list]/datalist support from 'forms' to 'forms-ext' feature (more lightweight for Chrome/Safari)
 - improved styleability of errorbubble
 - compatibility with jQuery 1.7 (1.8.1 is not compatible with jQuery 1.7)
