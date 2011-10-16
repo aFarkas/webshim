@@ -21,7 +21,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		var addTest = Modernizr.addTest;
 		var form = $('<form action="#"><select /><input type="date" required name="a" /></form>');
 		var dateElem = $('input', form);
-		var formsExtModule = webshims.modules["forms-ext"];
 		var toLoad = [];
 		
 		//the form has to be connected in FF4
@@ -31,27 +30,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		Modernizr.requiredSelect = !!('required' in $('select', form)[0]);
 		
 		//bugfree means interactive formvalidation including correct submit-invalid event handling (this can't be detected, we can just guess)
-		Modernizr.bugfreeformvalidation = Modernizr[formvalidation] && Modernizr.requiredSelect && Modernizr[validationmessage] && (!$.browser.webkit || (navigator.userAgent.indexOf('hrome') != -1 && webshims.browserVersion > 534.19)) && !window.testGoodWithFix;
-		
-		
-		modernizrInputAttrs[valueAsNumber] = false;
-		modernizrInputAttrs.valueAsNumberSet = false;
-		modernizrInputAttrs.valueAsDate = false;
-		
-		
-		modernizrInputAttrs[valueAsNumber] = (valueAsNumber in dateElem[0]);
-		if (modernizrInputAttrs[valueAsNumber]) {
-			try {
-				dateElem[0][valueAsNumber] = 0;
-			} catch(er){}
-			modernizrInputAttrs.valueAsNumberSet = (dateElem[0].value == '1970-01-01');
-			
-		}
-		modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem[0]);
-		
-		
-		if (modernizrInputTypes.date && modernizrInputAttrs[valueAsNumber] && !modernizrInputAttrs.valueAsNumberSet) {
-			Modernizr.bugfreeformvalidation = false;
+		if( !('bugfreeformvalidation' in Modernizr) ){
+			Modernizr.bugfreeformvalidation = Modernizr[formvalidation] && Modernizr.requiredSelect && Modernizr[validationmessage] && (!$.browser.webkit || (navigator.userAgent.indexOf('hrome') != -1 && webshims.browserVersion > 534.19)) && !window.testGoodWithFix;
 		}
 		
 		form.remove();
@@ -76,15 +56,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			webshims.modules["form-extend"].test = false;
 			if($.event.special["form-extendReady"]){
 				delete $.event.special["form-extendReady"];
-			}
-			
-			if((formsExtModule.src == 'form-datalist' || $.event.special["forms-extReady"]) && (!modernizrInputAttrs[valueAsNumber] || !modernizrInputAttrs.valueAsNumberSet)){
-				formsExtModule.test = function(){return false};
-				if(formsExtModule.src == 'form-datalist'){
-					formsExtModule.src = 'form-number-date';
-				}
-				delete $.event.special["forms-extReady"];
-				toLoad.push('forms-ext');
 			}
 		}
 		if(toLoad.length){

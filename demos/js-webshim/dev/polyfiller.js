@@ -35,7 +35,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.8.2RC3',
+		version: '1.8.2RC4',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -62,7 +62,7 @@
 				}
 			},
 			basePath: (function(){
-				var script = $('script').filter('[src*="polyfiller.js"]');
+				var script = $(document.scripts || 'script').filter('[src*="polyfiller.js"]');
 				var path;
 				script = script[0] || script.end()[script.end().length - 1];
 				path = ( ($.support.hrefNormalized) ? script.src : script.getAttribute("src", 4) ).split('?')[0];
@@ -152,6 +152,7 @@
 			};
 			
 			return function(features, combo){
+				
 				if (features && (features === true || $.isPlainObject(features))) {
 					combo = features;
 					features = undefined;
@@ -1011,7 +1012,7 @@
 					webshims.addReady(function(context, elem){
 						$('canvas', context).add(elem.filter('canvas')).each(function(){
 							var hasContext = this.getContext;
-							if(!hasContext){
+							if(!hasContext && window.G_vmlCanvasManager){
 								G_vmlCanvasManager.initElement(this);
 							}
 						});
@@ -1034,14 +1035,31 @@
 	
 	/* html5 constraint validation */
 	if(modernizrInputAttrs && modernizrInputTypes){
-		//using hole modernizr api
+		
+		var valueAsNumber = 'valueAsNumber';
+		var dateElem = $('<input type="date" required name="a" />')[0];
 		addTest(formvalidation, function(){
-			return !!(modernizrInputAttrs.required && 'checkValidity' in document.createElement('form'));
+			return !!(modernizrInputAttrs.required && 'checkValidity' in dateElem);
 		});
 		
 		addTest('datalist', function(){
 			return !!(modernizrInputAttrs.list && window.HTMLDataListElement);
 		});
+		
+		modernizrInputAttrs.valueAsNumberSet = modernizrInputAttrs[valueAsNumber] = (valueAsNumber in dateElem);
+		
+		if (modernizrInputAttrs[valueAsNumber]) {
+			try {
+				dateElem[0][valueAsNumber] = 0;
+			} catch(er){}
+			modernizrInputAttrs.valueAsNumberSet = (dateElem.value == '1970-01-01');
+			
+		}
+		modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem);
+		
+		if(modernizrInputTypes.date && modernizrInputAttrs[valueAsNumber] && !modernizrInputAttrs.valueAsNumberSet) {
+			Modernizr.bugfreeformvalidation = false;
+		}
 		
 		webshims.validationMessages = webshims.validityMessages = [];
 		webshims.inputTypes = {};
@@ -1073,7 +1091,7 @@
 				feature: 'forms',
 				src: 'form-native-extend',
 				test: function(toLoad){
-					return ((modules['forms-ext'].test(toLoad) || $.inArray('forms-ext', toLoad) == -1) && !this.options.overrideMessages );
+					return ((modules['forms-ext'].test() || $.inArray('forms-ext', toLoad) == -1) && !this.options.overrideMessages );
 				},
 				dependencies: ['form-core', 'dom-support']
 			});
@@ -1091,13 +1109,15 @@
 		
 		addPolyfill('forms-ext', {
 			src: 'form-number-date',
-			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && !this.options.replaceUI);},
+			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && !this.options.replaceUI && modernizrInputAttrs.valueAsNumberSet);},
 			test: function(){
 				var ret = this.uiTest();
+				
 				if(!Modernizr.datalist){
 					this.src = (ret) ? 'form-datalist' : 'form-number-date-datalist';
 					ret = false;
 				}
+				
 				return ret;
 			},
 			noAutoCallback: true,
@@ -1183,7 +1203,7 @@
 	}
 
 
-	$('script')
+	$(document.scripts || 'script')
 		.filter('[data-polyfill-cfg]')
 		.each(function(){
 			try {

@@ -141,5 +141,5 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 			})
 		;
 	})();
-	
+	webshims.isReady('form-output', true);
 });

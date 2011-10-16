@@ -123,6 +123,7 @@
 			} else {
 				currentLoader = 0;
 			}
+			
 			if(!isNaN(testProfile)){
 				loadTester.initTest(testProfile);
 			}	
@@ -202,7 +203,9 @@
 		testGlobalReady: function(){
 			asyncTest("$.ready test", function(){
 				ok($.isReady, 'ready is executed');
-				$(function(){start();});
+				$(function(){
+					start();
+				});
 				
 			});
 			asyncTest("$.isDOMReady test", function(){
