@@ -689,10 +689,16 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			var registeredCallbacks = {};
 			var currentLang;
 			var shortLang;
+			var notLocal = /:\/\/|^\.*\//;
 			var loadRemoteLang = function(data, lang, options){
+				var langSrc;
 				if(lang && options && $.inArray(lang, options.availabeLangs || []) !== -1){
 					data.loading = true;
-					webshims.loader.loadScript(options.langSrc+lang+'.js', function(){
+					langSrc = options.langSrc;
+					if(!notLocal.test(langSrc)){
+						langSrc = webshims.cfg.basePath+langSrc;
+					}
+					webshims.loader.loadScript(langSrc+lang+'.js', function(){
 						if(data.langObj[lang]){
 							data.loading = false;
 							callLang(data, true);
