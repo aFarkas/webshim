@@ -9,25 +9,18 @@ audio {
 }
 audio.webshims-controls,
 video {
-	display: block;
-	width: 300px;
-	height: 150px;
+	display: inline-block;
 	min-height: 45px;
 	min-width: 40px;
 }
-
+audio[controls] {
+	display: inline-block;
+	min-height: 45px;
+	min-width: 40px;
+}
 video *,
 audio * {
 	display: none !important;
-}
-audio.webshims-controls {
-	height: 45px;
-}
-audio[controls] {
-	display: block;
-	width: 300px;
-	height: 45px;
-	min-height: 45px;
 }
 .flashblocker-assumed {
 	min-height: 20px;
