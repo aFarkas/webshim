@@ -75,12 +75,18 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+upcomming Release 1.8.3
+----------
+
+- compatibility with jQuery 1.7 (1.8.2 is not compatible with jQuery 1.7)
+- testet with upcomming yepnope and modernizr versions
+
 Release 1.8.2
 ----------
 - improved mediaelement (canplaythrough event, http live streaming for iOS)
 - moved input[list]/datalist support from 'forms' to 'forms-ext' feature (more lightweight for Chrome/Safari)
 - improved styleability of errorbubble
-- compatibility with jQuery 1.7 (1.8.1 is not compatible with jQuery 1.7)
+- <del>compatibility with jQuery 1.7 (1.8.1 is not compatible with jQuery 1.7)</del>
 
 Release 1.8.1
 ----------
