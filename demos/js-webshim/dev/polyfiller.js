@@ -1075,7 +1075,7 @@
 			options: {
 				placeholderType: 'value',
 				langSrc: 'i18n/errormessages-',
-				availabeLangs: ['ru'] //en and de are directly implemented in core
+				availabeLangs: ['ru', 'fr', 'es'] //en and de are directly implemented in core
 	//			,customMessages: false,
 	//			overrideMessages: false,
 	//			replaceValidationUI: false
