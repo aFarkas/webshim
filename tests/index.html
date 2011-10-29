@@ -117,6 +117,7 @@
 	<script src="unit/boolean-attr.js"></script>
 	<script src="unit/loading.js"></script>
 	<script src="unit/form-submitters.js"></script>
+	<script src="unit/interactive-validation.js"></script>
 	
 	<script>
 		jQuery.noConflict();
@@ -418,6 +419,12 @@
 			<span>fdsf</span>
 		</button>
 		
+	</form>
+	<form action="#" id="click-test-form">
+		<input type="text" name="texta" required />
+		<input type="text" name="textb" required />
+		<input type="date" name="datea" required />
+		<input type="submit" />
 	</form>
 	<iframe name="originaltarget" id="originaltarget"></iframe>
 	<iframe name="image-target" id="image-target"></iframe>
