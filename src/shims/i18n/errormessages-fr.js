@@ -17,10 +17,16 @@ jQuery.webshims.validityMessages.fr = {
         "radio": "Veuillez sélectionner l'une de ces options."
     },
     "rangeUnderflow": {
-        "defaultMessage": "Cette valeur doit être supérieure ou égale à {%min}."
+        "defaultMessage": "Cette valeur doit être supérieure ou égale à {%min}.",
+		"date": "Cette valeur doit être supérieure ou égale à {%min}.",
+        "time": "Cette valeur doit être supérieure ou égale à {%min}.",
+        "datetime-local": "Cette valeur doit être supérieure ou égale à {%min}."
     },
     "rangeOverflow": {
-        "defaultMessage": "Cette valeur doit être inférieure ou égale à {%max}"
+        "defaultMessage": "Cette valeur doit être inférieure ou égale à {%max}",
+		"date": "Cette valeur doit être inférieure ou égale à {%max}",
+        "time": "Cette valeur doit être inférieure ou égale à {%max}",
+        "datetime-local": "Cette valeur doit être inférieure ou égale à {%max}"
     },
     "stepMismatch": "Valeur incorrecte"
 };

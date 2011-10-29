@@ -444,7 +444,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				email: '{%value} ist keine zulässige E-Mail-Adresse',
 				url: '{%value} ist keine zulässige Webadresse'
 			},
-			tooLong: 'Der eingegebene Text ist zu lang! Sie haben {%valueLen} Buchstaben eingegeben, dabei sind {%maxlength} das Maximum.',
+			tooLong: 'Der eingegebene Text ist zu lang! Sie haben {%valueLen} Zeichen eingegeben, dabei sind {%maxlength} das Maximum.',
 			patternMismatch: '{%value} hat für dieses Eingabefeld ein falsches Format! {%title}',
 			valueMissing: {
 				defaultMessage: 'Bitte geben Sie einen Wert ein',

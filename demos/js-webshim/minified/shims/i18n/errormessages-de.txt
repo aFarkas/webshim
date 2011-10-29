@@ -9,7 +9,7 @@ jQuery.webshims.validityMessages.de = {
         "range": "{%value} ist keine Nummer!",
         "datetime-local": "{%value} ist kein Datum-Uhrzeit Format."
     },
-    "tooLong": "Der eingegebene Text ist zu lang! Sie haben {%valueLen} Buchstaben eingegeben, dabei sind {%maxlength} das Maximum.",
+    "tooLong": "Der eingegebene Text ist zu lang! Sie haben {%valueLen} Zeichen eingegeben, dabei sind {%maxlength} das Maximum.",
     "patternMismatch": "{%value} hat für dieses Eingabefeld ein falsches Format! {%title}",
     "valueMissing": {
         "defaultMessage": "Bitte geben Sie einen Wert ein",
