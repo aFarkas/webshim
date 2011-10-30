@@ -1333,6 +1333,7 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 	
 	//init
 	webshims.addReady(function(context, insertedElement){
+		
 		$('video, audio', context)
 			.add(insertedElement.filter('video, audio'))
 			.each(function(){
@@ -1340,6 +1341,46 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 					$(this).prop('preload', 'metadata').mediaLoad();
 				} else {
 					selectSource(this);
+				}
+				
+				
+				
+				if(hasNative){
+					var bufferTimer;
+					var lastBuffered;
+					var elem = this;
+					var getBufferedString = function(){
+						var buffered = $.prop(elem, 'buffered');
+						if(!buffered){return;}
+						var bufferString = "";
+						for(var i = 0, len = buffered.length; i < len;i++){
+							bufferString += buffered.end(i);
+						}
+						return bufferString;
+					};
+					var testBuffer = function(){
+						var buffered = getBufferedString();
+						if(buffered != lastBuffered){
+							lastBuffered = buffered;
+							$(elem).triggerHandler('progress');
+						}
+					};
+					
+					$(this)
+						.bind('play loadstart progress', function(e){
+							if(e.type == 'progress'){
+								lastBuffered = getBufferedString();
+							}
+							clearTimeout(bufferTimer);
+							bufferTimer = setTimeout(testBuffer, 999);
+						})
+						.bind('emptied stalled mediaerror abort suspend', function(e){
+							if(e.type == 'emptied'){
+								lastBuffered = false;
+							}
+							clearTimeout(bufferTimer);
+						})
+					;
 				}
 			})
 		;
