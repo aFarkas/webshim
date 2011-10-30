@@ -2,9 +2,9 @@
 <html>
 	<head>
 		<title>iframed Webshims Lib tests</title>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 	</head>
 <body>
-	<iframe src="click-test.html" style="width: 80%; height: 400px;"></iframe>
 	
 	<iframe src="index.html" style="width: 80%; height: 550px;"></iframe>
 	
@@ -15,7 +15,16 @@
 			document.write('<iframe src="test-ext\/base-tag-loading.html" style="width: 80%; height: 150px;"><\/iframe>');
 		}
 	</script>
-	<iframe src="jquery/index.html" style="width: 80%; height: 300px;"></iframe>
-	<iframe src="http://afarkas.github.com/webshim/tests/load-test.html" style="width: 80%; height: 300px;"></iframe>
+	<script>
+		//performance
+		if(!$.browser.msie || $.browser.version > 8){
+			document.write('<iframe src="jquery\/index.html" style="width: 80%; height: 250px;"><\/iframe>');
+			document.write('<iframe src="http:\/\/afarkas.github.com\/webshim\/tests\/load-test.html" style="width: 80%; height: 250px;"><\/iframe>');
+		} else {
+			document.write('<p><a href="jquery\/index.html">jQuery tests<\/a><\/p>');
+		}
+	</script>
+	<iframe src="click-test.html" style="width: 80%; height: 400px;"></iframe>
+	
 </body>	
 </html>
