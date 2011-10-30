@@ -44,9 +44,11 @@
 			extendNative: true,
 			loader: {
 				sssl: function(src, complete){
+					webshims.warn("sssl is deprecated. use yepnope");
 					sssl(src, complete);
 				},
 				require: function(src, complete){
+					webshims.warn("require is deprecated. use yepnope");
 					require([src], complete);
 				},
 				yepnope: function(src, complete){
