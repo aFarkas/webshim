@@ -488,7 +488,6 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		
 	var options = $.webshims.cfg['forms-ext'];
 	var defaultDatepicker = {dateFormat: 'yy-mm-dd'};
-	var globalInvalidTimer;
 	var labelID = 0;
 	var emptyJ = $([]);
 	var isCheckValidity;
@@ -526,13 +525,15 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	replaceInputUI.common = function(orig, shim, methods){
 		if(Modernizr.formvalidation){
 			orig.bind('firstinvalid', function(e){
-				clearTimeout(globalInvalidTimer);
-				if(isCheckValidity){return;}
-				globalInvalidTimer = setTimeout(function(){
-					if(!isCheckValidity && !e.isInvalidUIPrevented()){
-						webshims.validityAlert.showFor( e.target ); 
+				if(!webshims.fromSubmit && isCheckValidity){return;}
+				orig.unbind('invalid.replacedwidgetbubble').bind('invalid.replacedwidgetbubble', function(evt){
+					if(!e.isInvalidUIPrevented() && !evt.isDefaultPrevented()){
+						webshims.validityAlert.showFor( e.target );
+						e.preventDefault();
+						evt.preventDefault();
 					}
-				}, 20);//timeout has to be less than 30!
+					orig.unbind('invalid.replacedwidgetbubble');
+				});
 			});
 		}
 		var id = orig.attr('id'),

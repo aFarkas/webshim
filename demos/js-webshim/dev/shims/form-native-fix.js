@@ -7,7 +7,6 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	var invalids = [],
 		firstInvalidEvent,
 		form,
-		fromSubmit,
 		fromCheckValidity
 	;
 	
@@ -22,10 +21,9 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		};
 		window.addEventListener('submit', function(e){
 			if(!formnovalidate.prevented && e.target.checkValidity && $.attr(e.target, 'novalidate') == null){
-				fromSubmit = true;
-				
+				webshims.fromSubmit = true;
 				$(e.target).checkValidity();
-				fromSubmit = false;
+				webshims.fromSubmit = false;
 			}
 		}, true);
 		var preventValidityTest = function(e){
@@ -62,7 +60,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 			webshims.moveToFirstEvent(form, 'submit');
 			
 			
-			if(!fromSubmit){return;}
+			if(!webshims.fromSubmit){return;}
 			firstInvalidEvent = data;
 		})
 		.bind('invalid', function(e){
@@ -92,7 +90,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		var submitTimer;
 		var trueInvalid;
 		$(document).bind('invalid', function(e){
-			if(e.originalEvent && !fromSubmit && !fromCheckValidity && ($.prop(e.target, 'validity') || {}).valid){
+			if(e.originalEvent && !webshims.fromSubmit && !fromCheckValidity && ($.prop(e.target, 'validity') || {}).valid){
 				e.originalEvent.wrongWebkitInvalid = true;
 				e.wrongWebkitInvalid = true;
 				e.stopImmediatePropagation();
@@ -179,13 +177,13 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
 				prop: {
 					value: function(){
-						if(!fromSubmit){
+						if(!webshims.fromSubmit){
 							$(this).bind('invalid', preventDefault);
 						}
 						
 						fromCheckValidity = true;
 						var ret = desc.prop._supvalue.apply(this, arguments);
-						if(!fromSubmit){
+						if(!webshims.fromSubmit){
 							$(this).unbind('invalid', preventDefault);
 						}
 						fromCheckValidity = false;
