@@ -408,10 +408,22 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		data: elementData,
 		moveToFirstEvent: (function(){
 			var getData = $._data ? '_data' : 'data';
-			return function(elem, eventType){
+			return function(elem, eventType, bindType){
 				var events = ($[getData](elem, 'events') || {})[eventType];
+				var fn;
+				
 				if(events && events.length > 1){
-					events.unshift( events.pop() );
+					fn = events.pop();
+					if(!bindType){
+						bindType = 'bind';
+					}
+					if(bindType == 'bind' && events.delegateCount){
+						events.splice( events.delegateCount, 0, fn);
+					} else {
+						events.unshift( fn );
+					}
+					
+					
 				}
 				elem = null;
 			};
