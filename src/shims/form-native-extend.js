@@ -195,6 +195,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 					register: 'form-core',
 					callback: function(){
 						$('input, select, textarea')
+							.getNativeElement()
 							.each(function(){
 								if(webshims.data(this, 'hasCustomError')){return;}
 								var elem = this;
