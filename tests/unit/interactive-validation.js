@@ -102,7 +102,6 @@
 		if(!isMobile && document.activeElement && ('focus' in expect)){
 			if(expect.focus){
 				ok( $.inArray( expect.focus, counters.focused) != -1, "first invalid was focused");
-				console.log(expect.focus, counters.focused, $.inArray( expect.focus, counters.focused))
 			} else {
 				ok( $.inArray( document.activeElement, $('#click-test-form  input:not([type="submit"])').get() ) == -1, "no input was focused");
 			}

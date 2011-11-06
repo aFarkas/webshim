@@ -5,8 +5,17 @@
 	<title>Webshims Lib Test Suite</title>
 	
 	<link rel="stylesheet" href="qunit/qunit.css" media="screen">
+	<script>
+		(function(){
+			var hash = location.hash.replace('#', '');
+			if(hash.indexOf('legacyjquery') != -1){
+				document.write('<script src="http:\/\/ajax.googleapis.com\/ajax\/libs\/jquery\/1.6.4\/jquery.min.js"><\/script>');
+			} else {
+				document.write('<script src="http:\/\/code.jquery.com\/jquery-1.7.min.js"><\/script>');
+			}
+		})();
+	</script>
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 	<script>
 	(function(){
 		var oldbind = jQuery.fn.bind;
@@ -40,12 +49,17 @@
 			if(hash.indexOf('noNativeMethods') !== -1){
 				$.webshims.cfg.extendNative = false; 
 			}
+			if(hash.indexOf('useCustomUI') !== -1){
+				$.webshims.setOptions('forms-ext', { replaceUI: true });
+			}
 			
 						
 			$(function(){
 				$('#customValidationMessage').prop('checked', !!$.webshims.cfg.forms.customMessages);
 				$('#overrideValidationMessages').prop('checked', !!$.webshims.cfg.forms.overrideMessages);
 				$('#noNativeMethods').prop('checked', !$.webshims.cfg.extendNative);
+				$('#useCustomUI').prop('checked', $.webshims.cfg['forms-ext'].replaceUI);
+				$('#legacyjquery').prop('checked', (hash.indexOf('legacyjquery') != -1));
 				$('input.webshim-config')
 					.bind('click', function(){
 						var addHash = '';
@@ -151,6 +165,8 @@
 	<input type="checkbox" id="overrideValidationMessages" value="overrideValidationMessages" class="webshim-config" /> <label for="overrideValidationMessages">overrideValidationMessages</label>
 	<input type="checkbox" id="customValidationMessage" value="customValidationMessage" class="webshim-config" /> <label for="customValidationMessage">customValidationMessage</label>
 	<input type="checkbox" id="noNativeMethods" value="noNativeMethods" class="webshim-config" /> <label for="noNativeMethods">noNativeMethods</label>
+	<input type="checkbox" id="useCustomUI" value="useCustomUI" class="webshim-config" /> <label for="useCustomUI">use custom input widgets</label>
+	<input type="checkbox" id="legacyjquery" value="legacyjquery" class="webshim-config" /> <label for="legacyjquery">use legacy jquery</label>
 	
 </div>
 <small>Note: These tests are made to test webshims lib implementation. If there are some failling tests in native implementations, fill a browser bug. We currently only fix heavy/easy to fix errors in native implementations.</small>

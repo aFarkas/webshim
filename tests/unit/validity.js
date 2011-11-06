@@ -37,9 +37,9 @@ asyncTest("general validity Modul", function(){
 	equals( $('#form-1 input:willValidate').length, total, 'willValidate enabled' );
 
 	
-	form1.find('#name').prop('readonly', true);
+	form1.find('#name').prop('readOnly', true);
 	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate: false with readonly' );
-	form1.find('#name').prop('readonly', false);
+	form1.find('#name').prop('readOnly', false);
 	
 	//invalid
 	if(omitTests.requiredSelect){

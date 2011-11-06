@@ -80,6 +80,8 @@ upcomming Release 1.8.3
 
 - compatibility with jQuery 1.7 (1.8.2 is not compatible with jQuery 1.7)
 - testet with upcomming yepnope and modernizr versions
+- added locales for errormessages (If you want to improve [existing messages](https://github.com/aFarkas/webshim/tree/master/src/shims/i18n) or add some errormessages, please send me a pull request or file an issue)
+- improved progress event for older Safari mobile and Firefox
 
 Release 1.8.2
 ----------
