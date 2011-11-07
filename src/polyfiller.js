@@ -35,7 +35,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.8.3RC1',
+		version: '1.8.3RC2',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -1113,7 +1113,7 @@
 		
 		addPolyfill('forms-ext', {
 			src: 'form-number-date',
-			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && !this.options.replaceUI && modernizrInputAttrs.valueAsNumberSet);},
+			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && modernizrInputTypes.time && modernizrInputTypes.number && !this.options.replaceUI && modernizrInputAttrs.valueAsNumberSet);},
 			test: function(){
 				var ret = this.uiTest();
 				

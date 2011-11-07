@@ -65,7 +65,6 @@ jQuery.webshims.register('forms-ext', function($, webshims, window, document, un
 	})();
 	
 	
-	if(Modernizr.input.valueAsNumberSet && Modernizr.input.valueAsDate){return;}
 	//why no step IDL?
 	webshims.getStep = function(elem, type){
 		var step = $.attr(elem, 'step');
@@ -116,72 +115,70 @@ jQuery.webshims.register('forms-ext', function($, webshims, window, document, un
 		EPS = 1e-7
 	;
 	
-	if(!Modernizr.input.valueAsNumber || !Modernizr.input.valueAsDate){
-		webshims.addValidityRule('stepMismatch', function(input, val, cache){
-			if(val === ''){return false;}
-			if(!('type' in cache)){
+	webshims.addValidityRule('stepMismatch', function(input, val, cache){
+		if(val === ''){return false;}
+		if(!('type' in cache)){
+			cache.type = getType(input[0]);
+		}
+		//stepmismatch with date is computable, but it would be a typeMismatch (performance)
+		if(cache.type == 'date'){
+			return false;
+		}
+		var ret = false, base;
+		if(typeModels[cache.type] && typeModels[cache.type].step){
+			if( !('step' in cache) ){
+				cache.step = webshims.getStep(input[0], cache.type);
+			}
+			
+			if(cache.step == 'any'){return false;}
+			
+			if(!('valueAsNumber' in cache)){
+				cache.valueAsNumber = typeModels[cache.type].asNumber( val );
+			}
+			if(isNaN(cache.valueAsNumber)){return false;}
+			
+			addMinMaxNumberToCache('min', input, cache);
+			base = cache.minAsNumber;
+			if(isNaN(base)){
+				base = typeModels[cache.type].stepBase || 0;
+			}
+			
+			ret =  Math.abs((cache.valueAsNumber - base) % cache.step);
+							
+			ret = !(  ret <= EPS || Math.abs(ret - cache.step) <= EPS  );
+		}
+		return ret;
+	});
+	
+	
+	
+	[{name: 'rangeOverflow', attr: 'max', factor: 1}, {name: 'rangeUnderflow', attr: 'min', factor: -1}].forEach(function(data, i){
+		webshims.addValidityRule(data.name, function(input, val, cache) {
+			var ret = false;
+			if(val === ''){return ret;}
+			if (!('type' in cache)) {
 				cache.type = getType(input[0]);
 			}
-			//stepmismatch with date is computable, but it would be a typeMismatch (performance)
-			if(cache.type == 'date'){
-				return false;
-			}
-			var ret = false, base;
-			if(typeModels[cache.type] && typeModels[cache.type].step){
-				if( !('step' in cache) ){
-					cache.step = webshims.getStep(input[0], cache.type);
-				}
-				
-				if(cache.step == 'any'){return false;}
-				
+			if (typeModels[cache.type] && typeModels[cache.type].asNumber) {
 				if(!('valueAsNumber' in cache)){
 					cache.valueAsNumber = typeModels[cache.type].asNumber( val );
 				}
-				if(isNaN(cache.valueAsNumber)){return false;}
-				
-				addMinMaxNumberToCache('min', input, cache);
-				base = cache.minAsNumber;
-				if(isNaN(base)){
-					base = typeModels[cache.type].stepBase || 0;
+				if(isNaN(cache.valueAsNumber)){
+					return false;
 				}
 				
-				ret =  Math.abs((cache.valueAsNumber - base) % cache.step);
-								
-				ret = !(  ret <= EPS || Math.abs(ret - cache.step) <= EPS  );
+				addMinMaxNumberToCache(data.attr, input, cache);
+				
+				if(isNaN(cache[data.attr+'AsNumber'])){
+					return ret;
+				}
+				ret = ( cache[data.attr+'AsNumber'] * data.factor <  cache.valueAsNumber * data.factor - EPS );
 			}
 			return ret;
 		});
-		
-		
-		
-		[{name: 'rangeOverflow', attr: 'max', factor: 1}, {name: 'rangeUnderflow', attr: 'min', factor: -1}].forEach(function(data, i){
-			webshims.addValidityRule(data.name, function(input, val, cache) {
-				var ret = false;
-				if(val === ''){return ret;}
-				if (!('type' in cache)) {
-					cache.type = getType(input[0]);
-				}
-				if (typeModels[cache.type] && typeModels[cache.type].asNumber) {
-					if(!('valueAsNumber' in cache)){
-						cache.valueAsNumber = typeModels[cache.type].asNumber( val );
-					}
-					if(isNaN(cache.valueAsNumber)){
-						return false;
-					}
-					
-					addMinMaxNumberToCache(data.attr, input, cache);
-					
-					if(isNaN(cache[data.attr+'AsNumber'])){
-						return ret;
-					}
-					ret = ( cache[data.attr+'AsNumber'] * data.factor <  cache.valueAsNumber * data.factor - EPS );
-				}
-				return ret;
-			});
-		});
-		
-		webshims.reflectProperties(['input'], ['max', 'min', 'step']);
-	}
+	});
+	
+	webshims.reflectProperties(['input'], ['max', 'min', 'step']);
 	
 	
 	//IDLs and methods, that aren't part of constrain validation, but strongly tight to it

@@ -1,5 +1,7 @@
 jQuery.webshims.register('form-extend', function($, webshims, window, doc, undefined, options){
 	"use strict";
+	var Modernizr = window.Modernizr;
+	var modernizrInputTypes = Modernizr.inputtypes;
 	if(!Modernizr.formvalidation){return;}
 	var typeModels = webshims.inputTypes;
 	var validityRules = {};
@@ -27,7 +29,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 	
 	var overrideNativeMessages = options.overrideMessages;	
 	
-	var overrideValidity = (!Modernizr.requiredSelect || !Modernizr.input.valueAsDate || overrideNativeMessages);
+	var overrideValidity = (!Modernizr.requiredSelect || !Modernizr.input.valueAsDate || !modernizrInputTypes.number || !modernizrInputTypes.time || !modernizrInputTypes.range || overrideNativeMessages);
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	
 	var validityChanger = (overrideNativeMessages)? ['value', 'checked'] : ['value'];

@@ -1113,7 +1113,7 @@
 		
 		addPolyfill('forms-ext', {
 			src: 'form-number-date',
-			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && !this.options.replaceUI && modernizrInputAttrs.valueAsNumberSet);},
+			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && modernizrInputTypes.time && modernizrInputTypes.number && !this.options.replaceUI && modernizrInputAttrs.valueAsNumberSet);},
 			test: function(){
 				var ret = this.uiTest();
 				
