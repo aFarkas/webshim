@@ -62,13 +62,15 @@
 			dateElem = $('#date-input-test', form)[0];
 			modernizrInputAttrs.valueAsNumber = ('valueAsNumber' in  dateElem);
 			if(modernizrInputAttrs.valueAsNumber){
-				dateElem.valueAsNumber = 0;
+				try {
+					dateElem.valueAsNumber = 0;
+				} catch(er){}
 				modernizrInputAttrs.valueAsNumberSet = (dateElem.value == '1970-01-01');
 			}
 			modernizrInputAttrs.valueAsDate = ('valueAsDate' in dateElem);
 			dateElem = null;
 		}
-		if(modernizrInputAttrs.valueAsNumber && !modernizrInputAttrs.valueAsNumberSet){
+		if(modernizrInputTypes.date && modernizrInputAttrs.valueAsNumber && !modernizrInputAttrs.valueAsNumberSet){
 			Modernizr.bugfreeformvalidation = false;
 		}
 		if(Modernizr.formvalidation){
@@ -116,7 +118,7 @@
 	$.webshims = $.sub ? $.sub() : {};
 	
 	$.extend($.webshims, {
-		version: '1.6.5',
+		version: '1.6.6',
 		cfg: {
 			useImportantStyles: true,
 //			removeFOUC: false,
