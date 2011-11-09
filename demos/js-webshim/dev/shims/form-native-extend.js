@@ -27,7 +27,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 	
 	var overrideNativeMessages =options.overrideMessages;	
 	
-	var overrideValidity = (!Modernizr.requiredSelect || !Modernizr.input.valueAsDate || overrideNativeMessages);
+	var overrideValidity = (!Modernizr.requiredSelect || !Modernizr.input.valueAsDate || overrideNativeMessages ||  !Modernizr.inputtypes.date || !Modernizr.inputtypes.number || !Modernizr.inputtypes.time || !Modernizr.inputtypes.range);
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	var oldAttr = $.attr;
 	var oldVal = $.fn.val;
@@ -78,7 +78,8 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		});
 		validityElements.push('select');
 	}
-	if(!Modernizr.input.valueAsNumber || overrideNativeMessages){
+	
+	if(overrideValidity || overrideNativeMessages){
 		$.extend(validityChanger, {
 			min: 1, max: 1, step: 1
 		});
@@ -86,9 +87,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 	}
 	
 	if(overrideValidity){
-		
 		validityElements.forEach(function(nodeName){
-			
 			var oldDesc = webshims.defineNodeNameProperty(nodeName, 'validity', {
 				get: function(){
 					var elem = this;
