@@ -1001,7 +1001,17 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	
 	//implement set/arrow controls
 (function(){
-	if(Modernizr.input.valueAsNumber){return;}
+	var supportsType = (function(){
+		var types = {};
+		return function(type){
+			if(type in types){
+				return types[type];
+			}
+			return (types[type] = ($('<input type="'+type+'" />')[0].type === type));
+		};
+	})();
+	
+	if(Modernizr.input.valueAsNumber && supportsType('number') && supportsType('time')){return;}
 	var doc = document;
 	var options = webshims.modules["forms-ext"].options;
 	var typeModels = webshims.inputTypes;
@@ -1095,7 +1105,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		if(options.stepArrows){
 			$('input', context).add(contextElem.filter('input')).each(function(){
 				var type = $.prop(this, 'type');
-				if(!typeModels[type] || !typeModels[type].asNumber || !options.stepArrows || (options.stepArrows !== true && !options.stepArrows[type]) || $(this).hasClass('has-step-controls')){return;}
+				if(!typeModels[type] || !typeModels[type].asNumber || !options.stepArrows || (options.stepArrows !== true && !options.stepArrows[type]) || supportsType(type) || $(this).hasClass('has-step-controls')){return;}
 				var elem = this;
 				var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
 					.insertAfter(this)
