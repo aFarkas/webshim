@@ -201,6 +201,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 						lng = curLng;
 						$('input, select, textarea')
 							.each(function(){
+								//html5element
 								if($.data(this, 'hasCustomError')){return;}
 								var elem = this;
 								var validity = $.attr(elem, 'validity');
