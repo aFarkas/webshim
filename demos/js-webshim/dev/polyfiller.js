@@ -35,7 +35,7 @@
 	$.webshims = $.sub();
 	
 	$.extend($.webshims, {
-		version: '1.8.3RC2',
+		version: '1.8.3RC3',
 		cfg: {
 			useImportantStyles: true,
 			//			removeFOUC: false,
@@ -1052,7 +1052,7 @@
 		
 		if (modernizrInputAttrs[valueAsNumber]) {
 			try {
-				dateElem[0][valueAsNumber] = 0;
+				dateElem[valueAsNumber] = 0;
 			} catch(er){}
 			modernizrInputAttrs.valueAsNumberSet = (dateElem.value == '1970-01-01');
 			

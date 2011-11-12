@@ -115,7 +115,7 @@ jQuery.webshims.register('forms-ext', function($, webshims, window, document, un
 		EPS = 1e-7
 	;
 	
-	webshims.addValidityRule('stepMismatch', function(input, val, cache){
+	webshims.addValidityRule('stepMismatch', function(input, val, cache, validityState){
 		if(val === ''){return false;}
 		if(!('type' in cache)){
 			cache.type = getType(input[0]);
@@ -124,7 +124,7 @@ jQuery.webshims.register('forms-ext', function($, webshims, window, document, un
 		if(cache.type == 'date'){
 			return false;
 		}
-		var ret = false, base;
+		var ret = (validityState || {}).stepMismatch, base;
 		if(typeModels[cache.type] && typeModels[cache.type].step){
 			if( !('step' in cache) ){
 				cache.step = webshims.getStep(input[0], cache.type);
@@ -153,8 +153,8 @@ jQuery.webshims.register('forms-ext', function($, webshims, window, document, un
 	
 	
 	[{name: 'rangeOverflow', attr: 'max', factor: 1}, {name: 'rangeUnderflow', attr: 'min', factor: -1}].forEach(function(data, i){
-		webshims.addValidityRule(data.name, function(input, val, cache) {
-			var ret = false;
+		webshims.addValidityRule(data.name, function(input, val, cache, validityState) {
+			var ret = (validityState || {})[data.name] || false;
 			if(val === ''){return ret;}
 			if (!('type' in cache)) {
 				cache.type = getType(input[0]);
@@ -187,9 +187,13 @@ jQuery.webshims.register('forms-ext', function($, webshims, window, document, un
 			get: function(){
 				var elem = this;
 				var type = getType(elem);
-				return (typeModels[type] && typeModels[type].asNumber) ? 
+				var ret = (typeModels[type] && typeModels[type].asNumber) ? 
 					typeModels[type].asNumber($.prop(elem, 'value')) :
-					nan;
+					(valueAsNumberDescriptor.prop._supget && valueAsNumberDescriptor.prop._supget.apply(elem, arguments));
+				if(ret == null){
+					ret = nan;
+				}
+				return ret;
 			},
 			set: function(val){
 				var elem = this;
@@ -207,7 +211,7 @@ jQuery.webshims.register('forms-ext', function($, webshims, window, document, un
 						webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
 					}
 				} else {
-					valueAsNumberDescriptor.prop._supset && valueAsNumberDescriptor.prop._supset.call(elem, arguments);
+					valueAsNumberDescriptor.prop._supset && valueAsNumberDescriptor.prop._supset.apply(elem, arguments);
 				}
 			}
 		}
@@ -220,7 +224,7 @@ jQuery.webshims.register('forms-ext', function($, webshims, window, document, un
 				var type = getType(elem);
 				return (typeModels[type] && typeModels[type].asDate && !typeModels[type].noAsDate) ? 
 					typeModels[type].asDate($.prop(elem, 'value')) :
-					valueAsDateDescriptor.prop._supget && valueAsDateDescriptor.prop._supget.call(elem);
+					valueAsDateDescriptor.prop._supget && valueAsDateDescriptor.prop._supget.call(elem) || null;
 			},
 			set: function(value){
 				var elem = this;
@@ -239,7 +243,7 @@ jQuery.webshims.register('forms-ext', function($, webshims, window, document, un
 						webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
 					}
 				} else {
-					return valueAsDateDescriptor.prop._supset && valueAsDateDescriptor.prop._supset(elem, arguments) || null;
+					return valueAsDateDescriptor.prop._supset && valueAsDateDescriptor.prop._supset.apply(elem, arguments) || null;
 				}
 			}
 		}
