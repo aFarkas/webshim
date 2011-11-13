@@ -75,9 +75,10 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-upcomming Release 1.8.3
+Release 1.8.3
 ----------
 
+- chrome/webkit fixes
 - compatibility with jQuery 1.7 (1.8.2 is not compatible with jQuery 1.7)
 - testet with upcomming yepnope and modernizr versions
 - added locales for errormessages (If you want to improve [existing messages](https://github.com/aFarkas/webshim/tree/master/src/shims/i18n) or add some errormessages, please send me a pull request or file an issue)

@@ -660,7 +660,7 @@
 	 * 
 	 * $.ajax({
 	 * 		success: function(html){
-	 * 			$('#main').htmlWebshim(html);
+	 * 			$('#main').htmlPolyfill(html);
 	 * 		}
 	 * });
 	 */
