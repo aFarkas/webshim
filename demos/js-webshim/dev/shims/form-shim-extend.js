@@ -130,10 +130,6 @@ $.event.special.invalid = {
 		e.testedValidity = true;
 		var notValid = !($(e.target).checkValidity());
 		if(notValid){
-			if(this === document){
-				webshims.warn('always embed HTML5 content using .prependWebshim, .appendWebshim, .htmlWebshim etc.');
-			}
-			
 			e.stopImmediatePropagation();
 			isSubmit = false;
 			return false;
