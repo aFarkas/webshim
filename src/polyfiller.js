@@ -1,4 +1,10 @@
-(function($, window, document, undefined){
+(function (factory) {
+	if (typeof define === 'function' && define.amd) {
+		define(['jquery'], factory);
+	} else {
+		factory(jQuery);
+	}
+}(function($){
 	"use strict";
 	
 	var special = $.event.special;
@@ -44,11 +50,10 @@
 			extendNative: true,
 			loader: {
 				sssl: function(src, complete){
-					webshims.warn("sssl is deprecated. use yepnope");
+					webshims.warn("require is deprecated. use yepnope or requireJS");
 					sssl(src, complete);
 				},
 				require: function(src, complete){
-					webshims.warn("require is deprecated. use yepnope");
 					require([src], complete);
 				},
 				yepnope: function(src, complete){
@@ -1225,4 +1230,4 @@
 		})
 	;
 	
-})(jQuery, this, this.document);
+}));
