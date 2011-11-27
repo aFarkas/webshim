@@ -238,7 +238,7 @@ $.webshims.polyfill('js-storage geolocation', true);
 					<p>You can configure the generated combohandler using the following options</p>
 					<ul>
 						<li><strong>base</strong>: (default: '/min/f=') The base path to your combohandler-middleware.</li>
-						<li><strong>seperator</strong>: (default: ',') the seperator between each js-source</li>
+						<li><strong>separator</strong>: (default: ',') the separator between each js-source</li>
 						<li><strong>maxFiles</strong>: (default: 10) the maximum files, that are combined in one combohandler</li>
 						<li><strong>scriptPath</strong>: (default: dynamically computed absolute script-path to your shims-folder without a starting slash)</li>
 					</ul>
@@ -250,7 +250,7 @@ $.webshims.polyfill('js-storage geolocation', true);
 //would load in IE9 and other browsers: nothing :-)
 
 $.webshims.polyfill('js-storage geolocation', {
-	seperator: '&',
+	separator: '&',
 	base: '/minify.jsp?scripts='
 });
 //would load in IE7: /minify.jsp?scripts=path-to-shims/json-storage.js&path-to-shims/geolocation.js

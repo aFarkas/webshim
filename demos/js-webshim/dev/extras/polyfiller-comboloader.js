@@ -10,7 +10,7 @@
 	$.extend(true, webshims, {
 		cfg: {
 			comboOptions: {
-				seperator: ',',
+				separator: ',',
 				base: '/min/f=',
 				maxFiles: 10,
 				//set script path for comboOptions
@@ -18,11 +18,11 @@
 					var l = location;
 					return $.webshims.cfg.basePath.replace(l.protocol + '//' + l.host + '/', '');
 				})(),
-				fn: function(base, scriptPath, seperator, srces){
+				fn: function(base, scriptPath, separator, srces){
 					return base +
 					$.map(srces, function(src){
 						return scriptPath + src;
-					}).join(seperator);
+					}).join(separator);
 				}
 			}
 		},
@@ -47,7 +47,7 @@
 							fPart.push(src);
 							combiNames.push(loadName);
 							if (len >= combo.maxFiles || (len > 9 && fPart.join(',,,,').length > 200)) {
-								loader._loadScript(combo.fn(combo.base, combo.scriptPath, combo.seperator, fPart), combiNames);
+								loader._loadScript(combo.fn(combo.base, combo.scriptPath, combo.separator, fPart), combiNames);
 								fPart = [];
 								combiNames = [];
 								len = 0;
@@ -59,7 +59,7 @@
 					}
 				});
 				if (fPart.length) {
-					loader._loadScript(combo.fn(combo.base, combo.scriptPath, combo.seperator, fPart), combiNames);
+					loader._loadScript(combo.fn(combo.base, combo.scriptPath, combo.separator, fPart), combiNames);
 				}
 			};
 		})()
