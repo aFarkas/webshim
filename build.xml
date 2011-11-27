@@ -12,27 +12,15 @@
     
     <target name="WebExtlib">
     	
+		<concat destfile="${src}/shims/combos/1.js">
+            <fileset file="${src}/shims/form-number-date.js" />
+			<fileset file="${src}/shims/form-core.js" />
+        </concat>
+		
     	<concat destfile="${src}/shims/form-shim-all.js">
             <fileset file="${src}/shims/form-shim-extend.js" />
             <fileset file="${src}/shims/form-output.js" />
         </concat>
-		
-		<concat destfile="${src}/shims/form-number-date-datalist.js">
-            <fileset file="${src}/shims/form-number-date.js" />
-			<fileset file="${src}/shims/form-datalist.js" />
-        </concat>
-		
-		<concat destfile="${src}/shims/mediaelement-native-all.js">
-			<fileset file="${src}/shims/mediaelement-swf.js" />
-            <fileset file="${src}/shims/mediaelement-core.js" />
-        </concat>
-		
-		<concat destfile="${src}/shims/mediaelement-shim-all.js">
-            <fileset file="${src}/shims/mediaelement-shim.js" />
-            <fileset file="${src}/shims/mediaelement-native-all.js" />
-        </concat>
-		
-		
 		
         <mkdir dir="${dist}" />
         <copy todir="${dist}/dev" overwrite="true">

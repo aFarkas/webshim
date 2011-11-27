@@ -1163,7 +1163,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	
 });
 
-jQuery.webshims.ready('dom-support forms', function($, webshims, window, document, undefined){
+jQuery.webshims.register('form-datalist', function($, webshims, window, document, undefined){
 	var doc = document;	
 
 	/*
@@ -1686,14 +1686,4 @@ jQuery.webshims.ready('dom-support forms', function($, webshims, window, documen
 		initializeDatalist();
 	})();
 	
-	if(webshims.modules['forms-ext'].src == 'form-datalist'){
-		webshims.isReady('forms-ext', true);
-	} else {
-		setTimeout(function(){
-			if(!webshims.isReady('forms-ext')){
-				webshims.warn("setting forms-ext ready from datalist");
-				webshims.isReady('forms-ext', true);
-			}
-		}, 9999);
-	}
 });

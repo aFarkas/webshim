@@ -35,17 +35,7 @@
 			return e.childNodes;
 		}
 	;
-	if(webshims.fn && webshims.fn.init){
-		var oldInit = webshims.fn.init;
-		webshims.fn.init = function(sel){
-			if(sel && htmlExp.exec(sel)){
-				arguments[0] = webshims.fixHTML5(sel);
-			}
-			return oldInit.apply(this, arguments);
-		};
-		webshims.fn.init.prototype = oldInit.prototype;
-	}
-	
+
 })(jQuery);
 
 //DOM-Extension helper

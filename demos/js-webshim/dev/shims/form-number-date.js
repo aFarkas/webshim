@@ -1,4 +1,4 @@
-jQuery.webshims.register('forms-ext', function($, webshims, window, document, undefined){
+jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
 	"use strict";
 	
 	//form messages for forms-ext
@@ -992,7 +992,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		
 		webshims.activeLang({
 			langObj: $.datepicker.regional, 
-			module: 'forms-ext', 
+			module: 'form-number-date', 
 			callback: function(langObj){
 				$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', $.extend(defaultDatepicker, langObj, options.datepicker));
 			}
@@ -1017,7 +1017,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 	
 	if(Modernizr.input.valueAsNumber && supportsType('number') && supportsType('time')){return;}
 	var doc = document;
-	var options = webshims.modules["forms-ext"].options;
+	var options = webshims.cfg["forms-ext"];
 	var typeModels = webshims.inputTypes;
 	
 	var getNextStep = function(input, upDown, cache){
@@ -1059,7 +1059,7 @@ jQuery.webshims.ready('forms-ext dom-support', function($, webshims, window, doc
 		return Math.round( ret * 1e7)  / 1e7;
 	};
 	
-	webshims.modules["forms-ext"].getNextStep = getNextStep;
+	webshims.modules["form-number-date"].getNextStep = getNextStep;
 	
 	var doSteps = function(input, type, control){
 		if(input.disabled || input.readOnly || $(control).hasClass('step-controls')){return;}

@@ -32,33 +32,6 @@
 		}
 	];
 	
-	var loadDefs = {
-		forms: {
-			mozilla2: ['form-core'],
-			"mozilla1": ['form-core', 'form-shim-all', 'dom-extend', 'es5'],
-			"webkit534": ['form-core', 'dom-extend', 'form-output-datalist'],
-			"webkit533": ['form-core', 'form-native-extend', 'form-native-fix', 'dom-extend', 'form-output-datalist', 'es5'],
-			msie9: ['form-core', 'form-shim-all', 'dom-extend'],
-			msie8: ['form-core', 'form-shim-all', 'dom-extend', 'es5'],
-			msie7: ['form-core', 'form-shim-all', 'dom-extend', 'es5']
-		},
-//		"forms-ext": {
-//			mozilla2: ['form-core', 'form-native-extend', 'form-number-date', 'jquery-ui.min', '18n/jquery.ui', 'dom-extend'],
-//			"mozilla1": ['form-core', 'form-shim-all', 'dom-extend', 'es5', 'form-number-date', 'jquery-ui.min', '18n/jquery.ui'],
-//			"webkit534": ['form-core', 'dom-extend', 'form-output-datalist', 'form-native-extend', 'form-number-date', 'jquery-ui.min', '18n/jquery.ui'],
-//			"webkit533": ['form-core', 'form-native-extend', 'form-native-fix', 'dom-extend', 'form-output-datalist', 'es5', 'form-number-date', 'jquery-ui.min', '18n/jquery.ui'],
-//			msie9: ['form-core', 'form-shim-all', 'dom-extend', 'form-number-date', 'jquery-ui.min', '18n/jquery.ui'],
-//			msie8: ['form-core', 'form-shim-all', 'dom-extend', 'es5', 'form-number-date', 'jquery-ui.min', '18n/jquery.ui'],
-//			msie7: ['form-core', 'form-shim-all', 'dom-extend', 'es5', 'form-number-date', 'jquery-ui.min', '18n/jquery.ui']
-//		},
-		'json-storage': {
-			mozilla2: [],
-			"webkit534": [],
-			msie9: [],
-			msie8: [],
-			msie7: ['json-storage', 'swfobject']
-		}
-	};
 	
 	$.each($.webshims.features, function(name, splitFeatures){
 		
@@ -84,19 +57,12 @@
 				loadTester.testGlobalReady();
 				
 				loadTester.testFeaturesLoad(splitFeatures, name);
-				if(loadDefs[name]){
-					loadTester.expectScriptsLoad(loadDefs[name], name);
-				}
 			}
 		});
 		
 	});
-	var scriptLoaders = [];
 	
-	$.each($.webshims.cfg.loader, function(name){
-		scriptLoaders.push(name);
-	});
-	var currentLoader = 0;
+	
 	window.loadTester = {
 		init: function(){
 			var search = location.search.split('?')[1];
@@ -112,24 +78,14 @@
 				if(name[0] == 'loadTest' && name[1]){
 					testProfile = parseInt(name[1], 10);
 				}
-				if(name[0] == 'useLoader' && name[1]){
-					currentLoader = parseInt(name[1], 10);
-				}
+				
 			}); 
-			if(!isNaN(currentLoader)){
-				var loader = $.webshims.cfg.loader[scriptLoaders[currentLoader]];
-				$.webshims.cfg.loader = {};
-				$.webshims.cfg.loader[scriptLoaders[currentLoader]] = loader;
-			} else {
-				currentLoader = 0;
-			}
 			
-			if(!isNaN(testProfile)){
-				loadTester.initTest(testProfile);
-			}	
+			
+			loadTester.initTest(testProfile);
 		},
 		loadNext: function(index){
-			location.search = '?loadTest='+index+'&useLoader='+currentLoader;
+			location.search = '?loadTest='+index;
 			
 		},
 		addProfile: function(profile){
@@ -137,14 +93,11 @@
 		},
 		initTest: function(index){
 			if(profiles[index]){
-				if(profiles[index + 1] || scriptLoaders[currentLoader + 1]){
+				if(profiles[index + 1]){
 					QUnit.done = function(data){
 						if((loadTester.debug == 'silent' && data.failed === 0 && data.passed) || confirm(index +' load profile had '+ data.failed +' failures. Do next load?')){
 							if(profiles[index + 1]){
 								loadTester.loadNext(index + 1);
-							} else if(scriptLoaders[currentLoader + 1]) {
-								currentLoader++;
-								loadTester.loadNext(0);
 							}
 						}
 					};
@@ -156,41 +109,6 @@
 		},
 		markScripts: function(){
 			$('script').addClass('direct-included');
-		},
-		expectScriptsLoad: function(scriptDefs, waitFeature){
-			//todo
-			return;
-			if(scriptDefs[browserName+browserVersion]){
-				var scripts = scriptDefs[browserName+browserVersion];
-				
-				asyncTest("scripts loaded", function(){
-					var scriptsLoaded = $('script:not(.direct-included)');
-					equals(scripts.length, scriptsLoaded.length, 'scripts.length are eqal');
-					if(scripts.length != scriptsLoaded.length){
-						scriptsLoaded.each(function(){
-							var src = this.src;
-							var found;
-							
-							$.each(scripts, function(i, scriptName){
-								if((src || '').indexOf(scriptName) !== -1){
-									found = true;
-									return false;
-								}
-							});
-							if(!found){
-								equals('not found', src+' was loaded');
-								$.webshims.warn(this);
-							}
-						});
-					}
-					$.each(scripts, function(i, src){
-						if(scriptsLoaded.filter('[src*="'+  src +'"]').length != 1){
-							ok(false, src +' was not loaded');
-						}
-					});
-					$.webshims.ready(waitFeature, function(){setTimeout(start, 300);});
-				});
-			}
 		},
 		reverseFeatures: function(){
 			$.webshims.featureList.reverse();
