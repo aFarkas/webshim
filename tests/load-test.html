@@ -17,7 +17,7 @@
 		(function(){
 			$.webshims.ready('dom-support', function(){
 				QUnit.reset = function(){
-					$("#main, #qunit-fixture").htmlWebshim( QUnit.config.fixture );
+					$("#main, #qunit-fixture").htmlPolyfill( QUnit.config.fixture );
 				};
 			});
 		})();

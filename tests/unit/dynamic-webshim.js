@@ -16,10 +16,10 @@ asyncTest("dynamic webshim Modul", function(){
 		$('#webshim-structure').remove();
 	};
 	
-	testElem.afterWebshim(testStructure);
+	testElem.afterPolyfill(testStructure);
 	structureTest('afterWebshim');
 	
-	testElem.htmlWebshim(testStructure);
+	testElem.htmlPolyfill(testStructure);
 	structureTest('htmlWebshim');
 	
 	testElem.remove();

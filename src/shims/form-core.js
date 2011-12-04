@@ -6,69 +6,58 @@ jQuery.webshims.gcEval = function(){
 		}
 	}
 };
+//additional tests for partial implementation of forms features
+(function($){
+	var Modernizr = window.Modernizr;
+	var webshims = $.webshims;
+	if(!Modernizr.formvalidation){return;}
+	var modernizrInputAttrs = Modernizr.input || {};
+	var modernizrInputTypes = Modernizr.inputtypes || {};
+	var formvalidation = 'formvalidation';
+	var valueAsNumber = 'valueAsNumber';
+	var validationmessage = 'validationmessage';
+	var addTest = Modernizr.addTest;
+	var form = $('<form action="#"><select /><input type="date" required name="a" /></form>');
+	var dateElem = $('input', form);
+	var toLoad = [];
+	
+	Modernizr[validationmessage] = true;
+	
+	if(window.opera){
+		form.appendTo('head');
+		webshims.bugs.validationMessage = !(dateElem.prop('validationMessage'));
+		try {
+			dateElem.prop(valueAsNumber, 0);
+		} catch(er){}
+		webshims.bugs.valueAsNumberSet = (dateElem.prop('value') != '1970-01-01');
+		form.remove();
+	}
+	Modernizr.requiredSelect = !!('required' in $('select', form)[0]);
+	
+	//bugfree means interactive formvalidation including correct submit-invalid event handling (this can't be detected, we can just guess)
+	if( !('bugfreeformvalidation' in Modernizr) ){
+		Modernizr.bugfreeformvalidation = Modernizr[formvalidation] && Modernizr.requiredSelect && !webshims.bugs.valueAsNumberSet && !webshims.bugs.validationMessage && (!$.browser.webkit || (navigator.userAgent.indexOf('hrome') != -1 && webshims.browserVersion > 534.19)) && !window.testGoodWithFix;
+	}
+	
+	
+	form = dateElem = null;
+	
+	if(!Modernizr.bugfreeformvalidation){
+		webshims.addPolyfill('form-native-fix', {
+			feature: 'forms',
+			dependencies: ['form-extend']
+		});
+		//remove form-extend readyness
+		webshims.modules['form-extend'].test = $.noop;
+	}
+	webshims.reTest(['form-extend', 'form-message', 'form-native-fix']);
+	if(webshims.isReady('form-number-date-api')){
+		webshims.reTest('form-number-date-api');
+	}
+})(jQuery);
+
 jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
-	var Modernizr = window.Modernizr;
-	//additional tests for partial implementation of forms features
-	(function(){
-		
-		if(!Modernizr.formvalidation){return;}
-		var modernizrInputAttrs = Modernizr.input || {};
-		var modernizrInputTypes = Modernizr.inputtypes || {};
-		var formvalidation = 'formvalidation';
-		var valueAsNumber = 'valueAsNumber';
-		var validationmessage = 'validationmessage';
-		var addTest = Modernizr.addTest;
-		var form = $('<form action="#"><select /><input type="date" required name="a" /></form>');
-		var dateElem = $('input', form);
-		var toLoad = [];
-		
-		//the form has to be connected in FF4
-		form.appendTo('head');
-		
-		Modernizr[validationmessage] = !!(dateElem.prop('validationMessage'));
-		Modernizr.requiredSelect = !!('required' in $('select', form)[0]);
-		
-		//bugfree means interactive formvalidation including correct submit-invalid event handling (this can't be detected, we can just guess)
-		if( !('bugfreeformvalidation' in Modernizr) ){
-			Modernizr.bugfreeformvalidation = Modernizr[formvalidation] && Modernizr.requiredSelect && Modernizr[validationmessage] && (!$.browser.webkit || (navigator.userAgent.indexOf('hrome') != -1 && webshims.browserVersion > 534.19)) && !window.testGoodWithFix;
-		}
-		
-		form.remove();
-		form = dateElem = null;
-				
-		if(!('value' in document.createElement('output'))){
-			webshims.addPolyfill('form-output', {
-				feature: 'forms',
-				test: Modernizr.output,
-				dependencies: ['dom-support']
-			});
-			toLoad.push('form-output');
-		}
-		
-		if(!Modernizr.bugfreeformvalidation){
-			toLoad.push('form-native-fix');
-			webshims.addPolyfill('form-native-fix', {
-				feature: 'forms',
-				dependencies: ['form-extend']
-			});
-			//remove form-extend readyness
-			webshims.modules["form-extend"].test = false;
-			if($.event.special["form-extendReady"]){
-				delete $.event.special["form-extendReady"];
-			}
-		}
-		if(toLoad.length){
-			webshims.loader.loadList(toLoad);
-			if(webshims.cfg.waitReady){
-				$.readyWait++;
-				webshims.ready(toLoad, function(){
-					$.ready(true);
-				});
-			}
-		}
-		
-	})();
 	
 	var groupTypes = {radio: 1};
 	var checkTypes = {checkbox: 1, radio: 1};
@@ -406,43 +395,35 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		});
 	}
 	
-	
-	
-	/* form message */
-	
-	(function(){
 		
 		
-		webshims.getContentValidationMessage = function(elem, validity){
-			var message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
-			if(message && message.indexOf('{') != -1){
-				try {
-					message = jQuery.parseJSON(message);
-				} catch(er){
-					return message;
-				}
-				if(typeof message == 'object'){
-					validity = validity || $.prop(elem, 'validity') || {valid: 1};
-					if(!validity.valid){
-						$.each(validity, function(name, prop){
-							if(prop && name != 'valid' && message[name]){
-								message = message[name];
-								return false;
-							}
-						});
-					}
-				}
-				webshims.data(elem, 'contentErrorMessage', message);
-				if(typeof message == 'object'){
-					message = message.defaultMessage;
+	getContentValidationMessage = webshims.getContentValidationMessage = function(elem, validity){
+		var message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
+		if(message && message.indexOf('{') != -1){
+			try {
+				message = jQuery.parseJSON(message);
+			} catch(er){
+				return message;
+			}
+			if(typeof message == 'object'){
+				validity = validity || $.prop(elem, 'validity') || {valid: 1};
+				if(!validity.valid){
+					$.each(validity, function(name, prop){
+						if(prop && name != 'valid' && message[name]){
+							message = message[name];
+							return false;
+						}
+					});
 				}
 			}
-			return message || '';
-		};
-		
-		getContentValidationMessage = webshims.getContentValidationMessage;
-		
-	})();
+			webshims.data(elem, 'contentErrorMessage', message);
+			if(typeof message == 'object'){
+				message = message.defaultMessage;
+			}
+		}
+		return message || '';
+	};
+	
 });
 
 

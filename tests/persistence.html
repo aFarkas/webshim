@@ -16,7 +16,7 @@
 		(function($){
 			$.webshims.ready('html5shiv', function(){
 				QUnit.reset = function(){
-					$("#main, #qunit-fixture").htmlWebshim( QUnit.config.fixture );
+					$("#main, #qunit-fixture").htmlPolyfill( QUnit.config.fixture );
 				};
 			});
 			module("init");

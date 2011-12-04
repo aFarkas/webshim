@@ -17,14 +17,7 @@
 				dependencies: ['dom-support']
 			});
 			
-			if(webshims.cfg.waitReady){
-				$.readyWait++;
-			}
-			webshims.loader.loadScript('mediaelement-native-fix', function(){
-				if(webshims.cfg.waitReady){
-					$.ready(true);
-				}
-			});
+			webshims.reTest('mediaelement-native-fix');
 		}
 	}
 
@@ -69,11 +62,8 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 	var loadSwf = function(){
 		webshims.ready('mediaelement-swf', function(){
 			if(!mediaelement.createSWF){
-				//reset readyness (hacky way)
-				webshims.modules["mediaelement-swf"].test = false;
-				delete $.event.special["mediaelement-swfReady"];
-				//load mediaelement-swf
-				webshims.loader.loadList(["mediaelement-swf"]);
+				webshims.modules["mediaelement-swf"].test = $.noop;
+				webshims.reTest(["mediaelement-swf"]);
 			}
 		});
 	};

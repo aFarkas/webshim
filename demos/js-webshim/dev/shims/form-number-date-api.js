@@ -1,70 +1,6 @@
 jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
 	"use strict";
 	
-	//form messages for forms-ext
-	(function(){
-		var validityMessages = webshims.validityMessages;
-		var extendFormLang = function(obj, ext){
-			$.each(ext, function(name, val){
-				if(!obj[name]){
-					obj[name] = val;
-				} else if(typeof val == 'object'){
-					extendFormLang(obj[name], val);
-				}
-			});
-		};
-		var en = {
-			typeMismatch: {
-				number: 'Please enter a number.',
-				date: 'Please enter a date.',
-				time: 'Please enter a time.',
-				range: 'Invalid input.',
-				"datetime-local": 'Please enter a datetime.'
-			},
-			rangeUnderflow: {
-				defaultMessage: 'Value must be greater than or equal to {%min}.'
-			},
-			rangeOverflow: {
-				defaultMessage: 'Value must be less than or equal to {%max}.'
-			},
-			stepMismatch: 'Invalid input.'
-		};
-		var de = {
-			typeMismatch: {
-				number: '{%value} ist keine Nummer!',
-				date: '{%value} ist kein Datum',
-				time: '{%value} ist keine Uhrzeit',
-				range: '{%value} ist keine Nummer!',
-				"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
-			},
-			rangeUnderflow: {
-				defaultMessage: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.'
-			},
-			rangeOverflow: {
-				defaultMessage: '{%value} ist zu hoch. {%max} ist der oberste Wert, den Sie benutzen können.'
-			},
-			stepMismatch: 'Der Wert {%value} ist in diesem Feld nicht zulässig. Hier sind nur bestimmte Werte zulässig. {%title}'
-		};
-		
-		['date', 'time', 'datetime-local'].forEach(function(type){
-			en.rangeUnderflow[type] = 'Value must be at or after {%min}.';
-		});
-		['date', 'time', 'datetime-local'].forEach(function(type){
-			en.rangeOverflow[type] = 'Value must be at or before {%max}.';
-		});
-		
-		['date', 'time', 'datetime-local'].forEach(function(type){
-			de.rangeUnderflow[type] = '{%value} ist zu früh. {%min} ist die früheste Zeit, die Sie benutzen können.';
-		});
-		['date', 'time', 'datetime-local'].forEach(function(type){
-			de.rangeOverflow[type] = '{%value} ist zu spät. {%max} ist die späteste Zeit, die Sie benutzen können.';
-		});
-		extendFormLang(validityMessages['en'], en);
-		extendFormLang(validityMessages['de'], de);
-		
-	})();
-	
-	
 	//why no step IDL?
 	webshims.getStep = function(elem, type){
 		var step = $.attr(elem, 'step');
@@ -419,21 +355,21 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		}
 	};
 	
-	if(!Modernizr.input.valueAsNumberSet || !supportsType('number')){
+	if(webshims.bugs.valueAsNumberSet || !supportsType('number')){
 		webshims.addInputType('number', typeProtos.number);
 	}
 	
-	if(!Modernizr.input.valueAsNumberSet || !supportsType('range')){
+	if(webshims.bugs.valueAsNumberSet || !supportsType('range')){
 		webshims.addInputType('range', $.extend({}, typeProtos.number, typeProtos.range));
 	}
-	if(!Modernizr.input.valueAsNumberSet || !supportsType('date')){
+	if(webshims.bugs.valueAsNumberSet || !supportsType('date')){
 		webshims.addInputType('date', typeProtos.date);
 	}
-	if(!Modernizr.input.valueAsNumberSet || !supportsType('time')){
+	if(webshims.bugs.valueAsNumberSet || !supportsType('time')){
 		webshims.addInputType('time', $.extend({}, typeProtos.date, typeProtos.time));
 	}
 	
-	if(!Modernizr.input.valueAsNumberSet || !supportsType('datetime-local')){
+	if(webshims.bugs.valueAsNumberSet || !supportsType('datetime-local')){
 		webshims.addInputType('datetime-local', $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']));
 	}
 		

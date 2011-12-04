@@ -53,7 +53,7 @@ if (!Modernizr.datalist) {
 	test("datalist manipulate shadowdom I", function(){
 		stop();
 		$('#email').attr('list', 'dlist2');
-		$('#dlist2 select').appendWebshim('<option value="dynamic appended"></option>');
+		$('#dlist2 select').appendPolyfill('<option value="dynamic appended"></option>');
 		$.webshims.ready('DOM forms', function(){
 			setTimeout(function(){
 				start();
@@ -70,7 +70,7 @@ if (!Modernizr.datalist) {
 	test("datalist manipulate shadowdom II", function(){
 		stop();
 		$('#email').attr('list', 'dlist2');
-		$('#dlist2 select').htmlWebshim('<option value="dynamic appended1"></option><option value="dynamic appended2"></option>');
+		$('#dlist2 select').htmlPolyfill('<option value="dynamic appended1"></option><option value="dynamic appended2"></option>');
 		$.webshims.ready('DOM forms', function(){
 			setTimeout(function(){
 				start();

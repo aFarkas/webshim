@@ -29,7 +29,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 	
 	var overrideNativeMessages = options.overrideMessages;	
 	
-	var overrideValidity = (!Modernizr.requiredSelect || !Modernizr.input.valueAsDate || !modernizrInputTypes.number || !modernizrInputTypes.time || !modernizrInputTypes.range || overrideNativeMessages);
+	var overrideValidity = (!Modernizr.requiredSelect || !modernizrInputTypes.number || !modernizrInputTypes.time || !modernizrInputTypes.range || overrideNativeMessages);
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	
 	var validityChanger = (overrideNativeMessages)? ['value', 'checked'] : ['value'];
@@ -59,7 +59,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 					error = error+'';
 					var elem = (name == 'input') ? $(this).getNativeElement()[0] : this;
 					desc.prop._supvalue.call(elem, error);
-					if(!Modernizr.validationmessage){
+					if(webshims.bugs.validationMessage){
 						webshims.data(elem, 'customvalidationMessage', error);
 					}
 					if(overrideValidity){
@@ -190,9 +190,9 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 			});
 		});
 		
-		//ToDo: implement new activeLang feature
+		
 		if(overrideNativeMessages){
-			webshims.ready('DOM', function(){
+			webshims.ready('DOM form-message', function(){
 				webshims.activeLang({
 					register: 'form-core',
 					callback: function(){

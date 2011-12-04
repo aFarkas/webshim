@@ -17,11 +17,6 @@
 			<fileset file="${src}/shims/form-core.js" />
         </concat>
 		
-    	<concat destfile="${src}/shims/form-shim-all.js">
-            <fileset file="${src}/shims/form-shim-extend.js" />
-            <fileset file="${src}/shims/form-output.js" />
-        </concat>
-		
         <mkdir dir="${dist}" />
         <copy todir="${dist}/dev" overwrite="true">
             <fileset dir="${src}" />

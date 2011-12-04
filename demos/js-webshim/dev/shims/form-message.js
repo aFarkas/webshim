@@ -1,4 +1,4 @@
-jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
+jQuery.webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	var validityMessages = webshims.validityMessages;
 	
 	var implementProperties = (options.overrideMessages || options.customMessages) ? ['customValidationMessage'] : [];
@@ -6,9 +6,20 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	validityMessages['en'] = validityMessages['en'] || validityMessages['en-US'] || {
 		typeMismatch: {
 			email: 'Please enter an email address.',
-			url: 'Please enter a URL.'
+			url: 'Please enter a URL.',
+			number: 'Please enter a number.',
+			date: 'Please enter a date.',
+			time: 'Please enter a time.',
+			range: 'Invalid input.',
+			"datetime-local": 'Please enter a datetime.'
 		},
-		
+		rangeUnderflow: {
+			defaultMessage: 'Value must be greater than or equal to {%min}.'
+		},
+		rangeOverflow: {
+			defaultMessage: 'Value must be less than or equal to {%max}.'
+		},
+		stepMismatch: 'Invalid input.',
 		tooLong: 'Please enter at most {%maxlength} character(s). You entered {%valueLen}.',
 		
 		patternMismatch: 'Invalid input. {%title}',
@@ -23,14 +34,33 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		validityMessages['en'].valueMissing[type] = 'Please select an option.';
 	});
 	
+	['date', 'time', 'datetime-local'].forEach(function(type){
+		validityMessages.en.rangeUnderflow[type] = 'Value must be at or after {%min}.';
+	});
+	['date', 'time', 'datetime-local'].forEach(function(type){
+		validityMessages.en.rangeOverflow[type] = 'Value must be at or before {%max}.';
+	});
+	
 	validityMessages['en-US'] = validityMessages['en-US'] || validityMessages['en'];
 	validityMessages[''] = validityMessages[''] || validityMessages['en-US'];
 	
 	validityMessages['de'] = validityMessages['de'] || {
 		typeMismatch: {
 			email: '{%value} ist keine zulässige E-Mail-Adresse',
-			url: '{%value} ist keine zulässige Webadresse'
+			url: '{%value} ist keine zulässige Webadresse',
+			number: '{%value} ist keine Nummer!',
+			date: '{%value} ist kein Datum',
+			time: '{%value} ist keine Uhrzeit',
+			range: '{%value} ist keine Nummer!',
+			"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
 		},
+		rangeUnderflow: {
+			defaultMessage: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.'
+		},
+		rangeOverflow: {
+			defaultMessage: '{%value} ist zu hoch. {%max} ist der oberste Wert, den Sie benutzen können.'
+		},
+		stepMismatch: 'Der Wert {%value} ist in diesem Feld nicht zulässig. Hier sind nur bestimmte Werte zulässig. {%title}',
 		tooLong: 'Der eingegebene Text ist zu lang! Sie haben {%valueLen} Zeichen eingegeben, dabei sind {%maxlength} das Maximum.',
 		patternMismatch: '{%value} hat für dieses Eingabefeld ein falsches Format! {%title}',
 		valueMissing: {
@@ -41,6 +71,13 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	
 	['select', 'radio'].forEach(function(type){
 		validityMessages['de'].valueMissing[type] = 'Bitte wählen Sie eine Option aus';
+	});
+	
+	['date', 'time', 'datetime-local'].forEach(function(type){
+		validityMessages.de.rangeUnderflow[type] = '{%value} ist zu früh. {%min} ist die früheste Zeit, die Sie benutzen können.';
+	});
+	['date', 'time', 'datetime-local'].forEach(function(type){
+		validityMessages.de.rangeOverflow[type] = '{%value} ist zu spät. {%max} ist die späteste Zeit, die Sie benutzen können.';
 	});
 	
 	var currentValidationMessage =  validityMessages[''];
@@ -65,7 +102,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	};
 	
 	
-	if(!Modernizr.validationmessage || !Modernizr.formvalidation){
+	if(webshims.bugs.validationMessage || !Modernizr.formvalidation){
 		implementProperties.push('validationMessage');
 	}
 	
