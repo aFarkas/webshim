@@ -32,7 +32,7 @@
 		ok(!Array.isArray({length: 0, push: $.noop, pop: $.noop}), 'isarray finds array');
 		deepEqual(Object.keys({foo: 'bar', baz: undefined}), ['foo', 'baz'], 'object key do work');
 		
-		equals((new Date(0)).toISOString(), "1970-01-01T00:00:00.000Z", "toISOString works");
+		ok((new Date(0)).toISOString().indexOf("1970-01-01T00:00:00") === 0, "toISOString works");
 		(new Date()).toJSON();
 		(function(arg1, arg2){
 			equals(this.bla, 'foo', "bind works somehow");

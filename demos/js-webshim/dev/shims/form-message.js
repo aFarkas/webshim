@@ -155,7 +155,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 						var validity = $.prop(elem, 'validity') || {valid: 1};
 						
 						if(validity.valid){return message;}
-						message = getContentValidationMessage(elem, validity);
+						message = webshims.getContentValidationMessage(elem, validity);
 						
 						if(message){return message;}
 						

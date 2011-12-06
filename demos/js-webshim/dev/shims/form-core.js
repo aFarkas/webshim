@@ -67,7 +67,32 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		var name = elem[0].name;
 		return (groupTypes[elem[0].type] && name) ? $((elem[0].form && elem[0].form[name]) || document.getElementsByName(name)).not(elem[0]) : emptyJ;
 	};
-	var getContentValidationMessage;
+	var getContentValidationMessage = webshims.getContentValidationMessage = function(elem, validity){
+		var message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
+		if(message && message.indexOf('{') != -1){
+			try {
+				message = jQuery.parseJSON(message);
+			} catch(er){
+				return message;
+			}
+			if(typeof message == 'object'){
+				validity = validity || $.prop(elem, 'validity') || {valid: 1};
+				if(!validity.valid){
+					$.each(validity, function(name, prop){
+						if(prop && name != 'valid' && message[name]){
+							message = message[name];
+							return false;
+						}
+					});
+				}
+			}
+			webshims.data(elem, 'contentErrorMessage', message);
+			if(typeof message == 'object'){
+				message = message.defaultMessage;
+			}
+		}
+		return message || '';
+	};
 	
 	/*
 	 * Selectors for all browsers
@@ -394,35 +419,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			});
 		});
 	}
-	
-		
-		
-	getContentValidationMessage = webshims.getContentValidationMessage = function(elem, validity){
-		var message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
-		if(message && message.indexOf('{') != -1){
-			try {
-				message = jQuery.parseJSON(message);
-			} catch(er){
-				return message;
-			}
-			if(typeof message == 'object'){
-				validity = validity || $.prop(elem, 'validity') || {valid: 1};
-				if(!validity.valid){
-					$.each(validity, function(name, prop){
-						if(prop && name != 'valid' && message[name]){
-							message = message[name];
-							return false;
-						}
-					});
-				}
-			}
-			webshims.data(elem, 'contentErrorMessage', message);
-			if(typeof message == 'object'){
-				message = message.defaultMessage;
-			}
-		}
-		return message || '';
-	};
 	
 });
 

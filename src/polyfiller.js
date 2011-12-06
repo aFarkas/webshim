@@ -351,15 +351,15 @@
 								list.push(dependency);
 							}
 						};
-						$.each(module.dependencies, function(i, dependeny){
-							if (modules[dependeny]) {
-								addDependency(i, dependeny);
+						$.each(module.dependencies, function(i, dependency){
+							if (modules[dependency]) {
+								addDependency(i, dependency);
 							}
 							else 
-								if (webshimsFeatures[dependeny]) {
-									$.each(webshimsFeatures[dependeny], addDependency);
-									onReady(webshimsFeatures[dependeny], function(){
-										isReady(dependeny, true);
+								if (webshimsFeatures[dependency]) {
+									$.each(webshimsFeatures[dependency], addDependency);
+									onReady(webshimsFeatures[dependency], function(){
+										isReady(dependency, true);
 									});
 								}
 						});
@@ -915,13 +915,15 @@
 			    };
 			}
 			return Modernizr.ES5;
-		}
+		},
+		combos: [10, 1]
 	});
 	
 	addPolyfill('dom-extend', {
 		feature: DOMSUPPORT,
 		noAutoCallback: true,
-		dependencies: ['es5']
+		dependencies: ['es5'],
+		combos: [10, 9, 12, 8, 1, 11, 13]
 	});
 		
 	/* json + loacalStorage */
@@ -932,21 +934,23 @@
 			loadInit: function(){
 				loadList(['swfobject']);
 			},
-			noAutoCallback: true
+			noAutoCallback: true,
+			combos: [14]
 		});
 	}
 	
 	/* END: json + loacalStorage */
 	
 	/* geolocation */
-	if('geolocation' in Modernizr){
+	if('geolocation' in Modernizr && 'localstorage' in Modernizr){
 		addPolyfill('geolocation', {
 			test: Modernizr.geolocation,
 			options: {
 				destroyWrite: true
 	//			,confirmText: ''
 			},
-			dependencies: ['json-storage']
+			dependencies: ['json-storage'],
+			combos: [14, 15]
 		});
 	}
 	/* END: geolocation */
@@ -1026,16 +1030,24 @@
 		addPolyfill('form-core', {
 			feature: 'forms',
 			dependencies: ['es5'],
+			test: function(toLoad){
+				if(this.options.lightweightDatalist && !this.datalistLoaded){
+					this.datalistLoaded = true;
+					toLoad.push('form-datalist');
+				}
+				return false;
+			},
 			options: {
 				placeholderType: 'value',
 				langSrc: 'i18n/errormessages-',
 				availabeLangs: ['ar', 'ch-ZN', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'nl', 'pt-PT', 'ru'] //en and de are directly implemented in core
 	//			,customMessages: false,
 	//			overrideMessages: false,
-	//			replaceValidationUI: false
+	//			replaceValidationUI: false,
+	//			lightweightDatalist: false
 			},
 			methodNames: ['setCustomValidity','checkValidity'],
-			combos: []
+			combos: [3, 2, 59, 5, 4]
 		});
 				
 		if(Modernizr[formvalidation]){
@@ -1050,14 +1062,27 @@
 				test: function(toLoad){
 					return ((modules['form-number-date-api'].test() || $.inArray('form-number-date-api', toLoad) == -1) && !this.options.overrideMessages );
 				},
-				dependencies: ['form-core', DOMSUPPORT, 'form-message']
+				dependencies: ['form-core', DOMSUPPORT, 'form-message'],
+				combos: [7, 59, 5]
 			});
-						
+			addPolyfill('form-dummy', {
+				feature: 'forms',
+				test: true,
+				loaded: true,
+				combos: [2, 3]
+			});	
 		} else {
+			addPolyfill('form-dummy', {
+				feature: 'forms',
+				test: true,
+				loaded: true,
+				combos: [7, 4, 59, 5]
+			});
 			addPolyfill('form-extend', {
 				feature: 'forms',
 				src: 'form-shim-extend',
-				dependencies: ['form-core', DOMSUPPORT]
+				dependencies: ['form-core', DOMSUPPORT],
+				combos: [3, 2]
 			});
 		}
 		
@@ -1066,13 +1091,15 @@
 			test: function(toLoad){
 				return !( this.options.customMessages || !Modernizr[formvalidation] || !modules['form-extend'].test(toLoad) || webshims.bugs.validationMessage );
 			},
-			dependencies: [DOMSUPPORT]
+			dependencies: [DOMSUPPORT],
+			combos: [3, 2, 59, 5, 4]
 		});
 		
 		webshims.addPolyfill('form-output', {
 			feature: 'forms',
 			test: ('value' in document.createElement('output')),
-			dependencies: ['dom-support']
+			dependencies: [DOMSUPPORT],
+			combos: [3, 2]
 		});
 		
 		
@@ -1081,7 +1108,7 @@
 			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && modernizrInputTypes.time && modernizrInputTypes.number);},
 			test: function(){return (this.uiTest() && !webshims.bugs.valueAsNumberSet);},
 			dependencies: ['forms', DOMSUPPORT],
-			combos: []
+			combos: [7, 6]
 		});
 		
 		addPolyfill('form-number-date-ui', {
@@ -1104,13 +1131,15 @@
 	//			,lazyDate: undefined // true for IE8- false for fast browser 
 	//			,replaceUI: false
 			},
-			combos: []
+			combos: [7, 6]
 		});
 		Modernizr.datalist = !!(modernizrInputAttrs.list && window.HTMLDataListElement);
+		
 		addPolyfill('form-datalist', {
 			feature: 'forms-ext',
 			test: Modernizr.datalist,
-			dependencies: ['forms', DOMSUPPORT]
+			dependencies: ['forms', DOMSUPPORT],
+			combos: [3, 59, 11]
 		});
 	}
 		
@@ -1122,8 +1151,10 @@
 		options: {
 //			animate: false,
 			text: 'Details'
-		}
+		},
+		combos: [12, 13, 15]
 	});
+	
 	if ('audio' in Modernizr && 'video' in Modernizr){
 		webshims.mediaelement = {};
 		
@@ -1131,7 +1162,8 @@
 			feature: 'mediaelement',
 			noAutoCallback: true,
 			
-			dependencies: ['swfobject',DOMSUPPORT]
+			dependencies: ['swfobject',DOMSUPPORT],
+			combos: [10, 9, 12, 8]
 		});
 		addPolyfill('mediaelement-swf', {
 			feature: 'mediaelement',
@@ -1152,7 +1184,8 @@
 				var options = this.options;
 				var hasToPlay = options.hasToPlay;
 				return !( (!window.swfobject || window.swfobject.hasFlashPlayerVersion('9.0.115')) && (options.preferFlash || (hasToPlay != 'any' && !Modernizr.video[hasToPlay] && !Modernizr.audio[hasToPlay])));
-			}
+			},
+			combos: [10, 9]
 		});
 		
 	}
