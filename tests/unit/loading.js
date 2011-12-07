@@ -22,7 +22,6 @@
 		addTest = function(){
 			equals(results[0], '../../src/shims/', 'shims folder set correctly');
 			strictEqual(results[1], false, 'cfg is set correctly');
-			ok(results[2] > 0, 'feature is loaded');
 		};
 		
 		setTimeout(function(){
@@ -36,8 +35,6 @@
 		addTest = function(){
 			equals(results[0], '../../src/shims/');
 			strictEqual(results[1], false);
-			strictEqual(results[2], 0, 'feature is not loaded');
-			ok(results[3] > 0, 'feature is loaded');
 		};
 		
 		setTimeout(function(){

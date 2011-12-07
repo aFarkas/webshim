@@ -57,264 +57,267 @@
 		//or load webform 2.0 shims $.webshims.loader.loadList(['validity', 'placeholder', 'validation-message', 'input-ui']);
 		$.webshims.polyfill();
 		
-		var capturedSubmitEvents;
-		if (document.addEventListener ) {
-			document.addEventListener('submit', function(e){
-				capturedSubmitEvents++;
-			}, true);
-		}
+		(function(){
 		
-		$.webshims.ready('DOM forms', function(){
-			var invalidEvents, submitEvents, preventInvalid, firstInvalidEvents, preventFirstInvalid, submitPrevent;
-			
-			function equals(is, should, message){
-				message = $('<li>'+ message +' | was: '+ (is.type || is) +' expected: '+ (should.type || should) +'</li>').appendTo('#test-result');
-				if(is === should || message.text().indexOf("won't fix") == -1){
-					message.css('backgroundColor', (is === should) ? '#090' : '#900');
-				}
+			var capturedSubmitEvents;
+			if (document.addEventListener ) {
+				document.addEventListener('submit', function(e){
+					capturedSubmitEvents++;
+				}, true);
 			}
 			
-			function reset(){
-				invalidEvents = 0;
-				firstInvalidEvents = 0;
-				submitEvents = 0;
-				capturedSubmitEvents = 0;
-				preventInvalid = false;
-				preventFirstInvalid = false;
-				submitPrevent = true;
-				$('#test-result').empty();
-			}
-			
-			$('#test-1').val('');
-			equals(typeof $('#test-1').prop('validationMessage'), 'string', 'validationMessage is a string');
-			equals(!!$('#test-1').prop('validationMessage'), true, 'validationMessage has a value');
-			if($.webshims.cfg.forms.customMessages || $.webshims.cfg.forms.overrideMessages){
-				equals(typeof $('#test-1').prop('customValidationMessage'), 'string', 'customValidationMessage is a string, if implemented');
-				equals(!!$('#test-1').prop('customValidationMessage'), true, 'customValidationMessage has a value, if implemented');
-			} else {
-				equals(typeof $('#test-1').prop('customValidationMessage'), 'undefined', 'customValidationMessage is undefined, if not implemented');
-			}
-			
-			$('input.invalid-submit').click(function(){
-				reset();
-				$('input[type=text]').attr('value', '');
-				setTimeout(function(){
-					equals(submitEvents, 0, 'no submit events');
-					equals(invalidEvents, 2, 'two invalid events');
-					equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
-					if(document.activeElement){
-						equals(document.activeElement, $('input[type=text]')[0], "focus first invalid");
-					}
-				}, 100);
-			});
-			
-			$('input.invalid-prevent-submit-without-submit-prevention').click(function(e){
-				reset();
-				preventInvalid = true;
-				submitPrevent = false;
-				$('input[type=text]').attr('value', '');
-				setTimeout(function(){
-					equals(submitEvents, 0, 'no submit events');
-					equals(invalidEvents, 2, 'two invalid events');
-					equals(firstInvalidEvents, 1, '1 firstinvalid event');
-					equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
-					if(!Modernizr.formvalidation && document.activeElement){
-						equals(document.activeElement, e.target, "don't focus first invalid");
-					}
-				}, 100);
-			});
-			
-			$('input.invalid-prevent-submit').click(function(e){
-				reset();
-				preventInvalid = true;
-				$('input[type=text]').attr('value', '');
-				setTimeout(function(){
-					equals(submitEvents, 0, 'no submit events');
-					equals(invalidEvents, 2, '2 invalid events');
-					equals(firstInvalidEvents, 1, '1 firstinvalid event');
-					equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
-					if(!Modernizr.formvalidation && document.activeElement){
-						equals(document.activeElement, e.target, "don't focus first invalid");
-					}
-				}, 100);
-			});
-			
-			$('input.firstinvalid-prevent-submit').click(function(e){
-				reset();
-				preventFirstInvalid = true;
-				$('input[type=text]').attr('value', '');
-				setTimeout(function(){
-					equals(submitEvents, 0, 'no submit events');
-					equals(invalidEvents, 2, '2 invalid events');
-					equals(firstInvalidEvents, 1, '1 firstinvalid event');
-					equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
-					if(!Modernizr.formvalidation && document.activeElement){
-						equals(document.activeElement, e.target, "don't focus first invalid");
-					}
-				}, 100);
-			});
-			
-			$('input.valid-submit').click(function(){
-				reset();
-				preventInvalid = true;
-				$('input.text').attr('value', 'some value');
-				setTimeout(function(){
-					equals(submitEvents, 1, '1 submit events');
-					equals(firstInvalidEvents, 0, 'no firstinvalid event');
-					equals(invalidEvents, 0, 'no invalid events');
-					equals(capturedSubmitEvents, 1, "captured submit events (negligible|won't fix)");
-				}, 100);
-			});
-			
-			$('input.novalidate-submit').click(function(){
-				reset();
-				preventInvalid = true;
-				$('input.text').attr('value', '');
-				setTimeout(function(){
-					equals(submitEvents, 1, '1 submit events');
-					equals(firstInvalidEvents, 0, 'no firstinvalid event');
-					equals(invalidEvents, 0, 'no invalid events');
-					equals(capturedSubmitEvents, 1, "captured submit events (negligible|won't fix)");
-				}, 100);
-			});
-			
-			$('input.trigger-checkValidity').click(function(e){
-				reset();
-				$('input, select', this.form).filter(':first').prop('value', '').checkValidity();
-				setTimeout(function(){
-					equals(submitEvents, 0, '0 submit events');
-					equals(firstInvalidEvents, 1, 'firstinvalid event');
-					equals(invalidEvents, 1, 'invalid events');
-					if(document.activeElement){
-						var type = document.activeElement.type;
-						equals((type == 'text' || type == 'datetime-local' || type == 'select-one'), false, "don't focus first invalid: "+type);
-					}
-				}, 100);
-				return false;
-			});
-			
-			$('input.trigger-form-checkValidity').click(function(e){
-				reset();
-				$('input, select', this.form).filter(':first').prop('value', '');
-				$(this.form).checkValidity();
-				setTimeout(function(){
-					equals(submitEvents, 0, '0 submit events');
-					equals(firstInvalidEvents, 1, 'firstinvalid event');
-					equals(invalidEvents, 1, 'invalid events');
-					if(document.activeElement){
-						var type = document.activeElement.type;
-						equals((type == 'text' || type == 'datetime-local' || type == 'select-one'), false, "don't focus first invalid: "+type);
-					}
-				}, 100);
-				return false;
-			});
-			
-			
-			$('input.trigger-checkValidity-prevent-invalid').click(function(e){
-				reset();
-				preventInvalid = true;
-				$('input, select', this.form).filter(':first').prop('value', '').checkValidity();
-				setTimeout(function(){
-					equals(submitEvents, 0, '0 submit events');
-					equals(firstInvalidEvents, 1, '1 firstinvalid event');
-					equals(invalidEvents, 1, '1 invalid events');
-					if(document.activeElement){
-						var type = document.activeElement.type;
-						equals((type !== 'text' && type !== 'datetime-local' && type !== 'select-one'), true, "no focus first invalid: "+type);
-					}
-				}, 100);
-				return false;
-			});
-			
-			$('input.submit-prevent').click(function(e){
-				reset();
-				preventInvalid = true;
-				$('input, select', this.form).filter(':first').prop('value', '');
-				setTimeout(function(){
-					equals(submitEvents, 0, '0 submit events');
-					equals(firstInvalidEvents, 1, 'firstinvalid event');
-					equals(invalidEvents, 1, 'invalid events');
-					if(document.activeElement){
-						var type = document.activeElement;
-						equals((type !== 'text' && type !== 'datetime-local' && type !== 'select-one'), true, "no focus first invalid: "+type);
-					}
-				}, 100);
-			});
-			$('input.submit-noprevent').click(function(e){
-				reset();
-				$('input, select', this.form).filter(':first').prop('value', '');
-				setTimeout(function(){
-					equals(submitEvents, 0, '0 submit events');
-					equals(firstInvalidEvents, 1, 'firstinvalid event');
-					equals(invalidEvents, 1, 'invalid events');
-					if(document.activeElement){
-						var type = document.activeElement.type;
-						equals((type == 'text' || type == 'datetime-local' || type == 'select-one'), true, "focus first invalid: "+type);
-					}
-				}, 100);
-			});
-			
-			$('input.scripted-submit').click(function(){
-				reset();
-				var form = $(this).prev('form');
-				$('input:required-element', form).prop('value', '');
-				submitPrevent = true;
-				form.submit();
-				setTimeout(function(){
-					equals(submitEvents, 1, '1 submit events');
-					equals(firstInvalidEvents, 0, '0 firstinvalid event');
-					equals(invalidEvents, 0, '0 invalid events');
-				}, 100);
-			});
-			
-			
-			
-			
-			$('form').bind('submit invalid firstinvalid', function(e){
+			$.webshims.ready('DOM forms', function(){
+				var invalidEvents, submitEvents, preventInvalid, firstInvalidEvents, preventFirstInvalid, submitPrevent;
 				
-				switch(e.type) {
-					case 'submit':
-						submitEvents++;
-						if(submitPrevent){
-							e.preventDefault();
-						}
-						break;
-					case 'invalid':
-						invalidEvents++;
-						e.extraData = 'test'; 
-						if(preventInvalid){
-							e.preventDefault();
-						}
-						break;
-					case 'firstinvalid':
-						firstInvalidEvents++;
-						if(preventFirstInvalid){
-							return false;
-						}
-						break;
-				}
-
-			});
-		});
-		var isDOMReady;
-		$(window).bind('load', function(){
-			setTimeout(function(){
-				if(window.parent == window){
-					if(!Modernizr.inputtypes['datetime-local'] && !$('input.input-datetime-local-date').length){
-						$.webshims.warn('datetime not implemented');
-					}
-					if(!isDOMReady){
-						alert('DOM-Ready not called');
+				function equals(is, should, message){
+					message = $('<li>'+ message +' | was: '+ (is.type || is) +' expected: '+ (should.type || should) +'</li>').appendTo('#test-result');
+					if(is === should || message.text().indexOf("won't fix") == -1){
+						message.css('backgroundColor', (is === should) ? '#090' : '#900');
 					}
 				}
 				
-			}, 999);
-		});
-		$(function(){
-			
-			
-			isDOMReady = true;
-		});
+				function reset(){
+					invalidEvents = 0;
+					firstInvalidEvents = 0;
+					submitEvents = 0;
+					capturedSubmitEvents = 0;
+					preventInvalid = false;
+					preventFirstInvalid = false;
+					submitPrevent = true;
+					$('#test-result').empty();
+				}
+				
+				$('#test-1').val('');
+				equals(typeof $('#test-1').prop('validationMessage'), 'string', 'validationMessage is a string');
+				equals(!!$('#test-1').prop('validationMessage'), true, 'validationMessage has a value');
+				if($.webshims.cfg.forms.customMessages || $.webshims.cfg.forms.overrideMessages){
+					equals(typeof $('#test-1').prop('customValidationMessage'), 'string', 'customValidationMessage is a string, if implemented');
+					equals(!!$('#test-1').prop('customValidationMessage'), true, 'customValidationMessage has a value, if implemented');
+				} else {
+					equals(typeof $('#test-1').prop('customValidationMessage'), 'undefined', 'customValidationMessage is undefined, if not implemented');
+				}
+				
+				$('input.invalid-submit').click(function(){
+					reset();
+					$('input[type=text]').attr('value', '');
+					setTimeout(function(){
+						equals(submitEvents, 0, 'no submit events');
+						equals(invalidEvents, 2, 'two invalid events');
+						equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
+						if(document.activeElement){
+							equals(document.activeElement, $('input[type=text]')[0], "focus first invalid");
+						}
+					}, 100);
+				});
+				
+				$('input.invalid-prevent-submit-without-submit-prevention').click(function(e){
+					reset();
+					preventInvalid = true;
+					submitPrevent = false;
+					$('input[type=text]').attr('value', '');
+					setTimeout(function(){
+						equals(submitEvents, 0, 'no submit events');
+						equals(invalidEvents, 2, 'two invalid events');
+						equals(firstInvalidEvents, 1, '1 firstinvalid event');
+						equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
+						if(!Modernizr.formvalidation && document.activeElement){
+							equals(document.activeElement, e.target, "don't focus first invalid");
+						}
+					}, 100);
+				});
+				
+				$('input.invalid-prevent-submit').click(function(e){
+					reset();
+					preventInvalid = true;
+					$('input[type=text]').attr('value', '');
+					setTimeout(function(){
+						equals(submitEvents, 0, 'no submit events');
+						equals(invalidEvents, 2, '2 invalid events');
+						equals(firstInvalidEvents, 1, '1 firstinvalid event');
+						equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
+						if(!Modernizr.formvalidation && document.activeElement){
+							equals(document.activeElement, e.target, "don't focus first invalid");
+						}
+					}, 100);
+				});
+				
+				$('input.firstinvalid-prevent-submit').click(function(e){
+					reset();
+					preventFirstInvalid = true;
+					$('input[type=text]').attr('value', '');
+					setTimeout(function(){
+						equals(submitEvents, 0, 'no submit events');
+						equals(invalidEvents, 2, '2 invalid events');
+						equals(firstInvalidEvents, 1, '1 firstinvalid event');
+						equals(capturedSubmitEvents, 0, "captured submit events (negligible|won't fix)");
+						if(!Modernizr.formvalidation && document.activeElement){
+							equals(document.activeElement, e.target, "don't focus first invalid");
+						}
+					}, 100);
+				});
+				
+				$('input.valid-submit').click(function(){
+					reset();
+					preventInvalid = true;
+					$('input.text').attr('value', 'some value');
+					setTimeout(function(){
+						equals(submitEvents, 1, '1 submit events');
+						equals(firstInvalidEvents, 0, 'no firstinvalid event');
+						equals(invalidEvents, 0, 'no invalid events');
+						equals(capturedSubmitEvents, 1, "captured submit events (negligible|won't fix)");
+					}, 100);
+				});
+				
+				$('input.novalidate-submit').click(function(){
+					reset();
+					preventInvalid = true;
+					$('input.text').attr('value', '');
+					setTimeout(function(){
+						equals(submitEvents, 1, '1 submit events');
+						equals(firstInvalidEvents, 0, 'no firstinvalid event');
+						equals(invalidEvents, 0, 'no invalid events');
+						equals(capturedSubmitEvents, 1, "captured submit events (negligible|won't fix)");
+					}, 100);
+				});
+				
+				$('input.trigger-checkValidity').click(function(e){
+					reset();
+					$('input, select', this.form).filter(':first').prop('value', '').checkValidity();
+					setTimeout(function(){
+						equals(submitEvents, 0, '0 submit events');
+						equals(firstInvalidEvents, 1, 'firstinvalid event');
+						equals(invalidEvents, 1, 'invalid events');
+						if(document.activeElement){
+							var type = document.activeElement.type;
+							equals((type == 'text' || type == 'datetime-local' || type == 'select-one'), false, "don't focus first invalid: "+type);
+						}
+					}, 100);
+					return false;
+				});
+				
+				$('input.trigger-form-checkValidity').click(function(e){
+					reset();
+					$('input, select', this.form).filter(':first').prop('value', '');
+					$(this.form).checkValidity();
+					setTimeout(function(){
+						equals(submitEvents, 0, '0 submit events');
+						equals(firstInvalidEvents, 1, 'firstinvalid event');
+						equals(invalidEvents, 1, 'invalid events');
+						if(document.activeElement){
+							var type = document.activeElement.type;
+							equals((type == 'text' || type == 'datetime-local' || type == 'select-one'), false, "don't focus first invalid: "+type);
+						}
+					}, 100);
+					return false;
+				});
+				
+				
+				$('input.trigger-checkValidity-prevent-invalid').click(function(e){
+					reset();
+					preventInvalid = true;
+					$('input, select', this.form).filter(':first').prop('value', '').checkValidity();
+					setTimeout(function(){
+						equals(submitEvents, 0, '0 submit events');
+						equals(firstInvalidEvents, 1, '1 firstinvalid event');
+						equals(invalidEvents, 1, '1 invalid events');
+						if(document.activeElement){
+							var type = document.activeElement.type;
+							equals((type !== 'text' && type !== 'datetime-local' && type !== 'select-one'), true, "no focus first invalid: "+type);
+						}
+					}, 100);
+					return false;
+				});
+				
+				$('input.submit-prevent').click(function(e){
+					reset();
+					preventInvalid = true;
+					$('input, select', this.form).filter(':first').prop('value', '');
+					setTimeout(function(){
+						equals(submitEvents, 0, '0 submit events');
+						equals(firstInvalidEvents, 1, 'firstinvalid event');
+						equals(invalidEvents, 1, 'invalid events');
+						if(document.activeElement){
+							var type = document.activeElement;
+							equals((type !== 'text' && type !== 'datetime-local' && type !== 'select-one'), true, "no focus first invalid: "+type);
+						}
+					}, 100);
+				});
+				$('input.submit-noprevent').click(function(e){
+					reset();
+					$('input, select', this.form).filter(':first').prop('value', '');
+					setTimeout(function(){
+						equals(submitEvents, 0, '0 submit events');
+						equals(firstInvalidEvents, 1, 'firstinvalid event');
+						equals(invalidEvents, 1, 'invalid events');
+						if(document.activeElement){
+							var type = document.activeElement.type;
+							equals((type == 'text' || type == 'datetime-local' || type == 'select-one'), true, "focus first invalid: "+type);
+						}
+					}, 100);
+				});
+				
+				$('input.scripted-submit').click(function(){
+					reset();
+					var form = $(this).prev('form');
+					$('input:required-element', form).prop('value', '');
+					submitPrevent = true;
+					form.submit();
+					setTimeout(function(){
+						equals(submitEvents, 1, '1 submit events');
+						equals(firstInvalidEvents, 0, '0 firstinvalid event');
+						equals(invalidEvents, 0, '0 invalid events');
+					}, 100);
+				});
+				
+				
+				
+				
+				$('form').bind('submit invalid firstinvalid', function(e){
+					
+					switch(e.type) {
+						case 'submit':
+							submitEvents++;
+							if(submitPrevent){
+								e.preventDefault();
+							}
+							break;
+						case 'invalid':
+							invalidEvents++;
+							e.extraData = 'test'; 
+							if(preventInvalid){
+								e.preventDefault();
+							}
+							break;
+						case 'firstinvalid':
+							firstInvalidEvents++;
+							if(preventFirstInvalid){
+								return false;
+							}
+							break;
+					}
+	
+				});
+			});
+			var isDOMReady;
+			$(window).bind('load', function(){
+				setTimeout(function(){
+					if(window.parent == window){
+						if(!Modernizr.inputtypes['datetime-local'] && !$('input.input-datetime-local-date').length){
+							$.webshims.warn('datetime not implemented');
+						}
+						if(!isDOMReady){
+							alert('DOM-Ready not called');
+						}
+					}
+					
+				}, 999);
+			});
+			$(function(){
+				
+				
+				isDOMReady = true;
+			});
+		})();
     </script>
 	
 	<title>submit-test</title>

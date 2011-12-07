@@ -11,7 +11,7 @@
 				complete: function(){
 					$.webshims.ready('forms', function(){
 						setTimeout(function(){
-							(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, $.webshims.cfg.extendNative, $('script[src*="shims/mediaelement"]').length, $('script[src*="shims/form"]').length);
+							(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, $.webshims.cfg.extendNative);
 						}, 400);
 					});
 					$.webshims.ready('mediaelement', function(){

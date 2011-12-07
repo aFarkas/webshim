@@ -12,7 +12,7 @@
 				complete: function(){
 					$.webshims.ready('mediaelement', function(){
 						setTimeout(function(){
-							(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, $.webshims.cfg.extendNative, $('script[src*="shims/mediaelement"]').length);
+							(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, $.webshims.cfg.extendNative);
 						}, 10);
 					});
 				}
