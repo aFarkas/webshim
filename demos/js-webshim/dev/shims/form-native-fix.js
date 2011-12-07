@@ -10,6 +10,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		fromCheckValidity
 	;
 	
+	
 	//opera/chrome fix (this will double all invalid events in opera, we have to stop them!)
 	//opera throws a submit-event and then the invalid events,
 	//chrome7/safari5.0.2 has disabled invalid events, this brings them back
@@ -26,6 +27,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 				webshims.fromSubmit = false;
 			}
 		}, true);
+		
 		var preventValidityTest = function(e){
 			if($.attr(e.target, 'formnovalidate') == null){return;}
 			if(formnovalidate.timer){
@@ -53,7 +55,9 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 				.bind('submit.preventInvalidSubmit', function(submitEvent){
 					if( $.attr(form, 'novalidate') == null ){
 						submitEvent.stopImmediatePropagation();
-						return false;
+						if(badWebkit){
+							submitEvent.preventDefault();
+						}
 					}
 				})
 			;
@@ -123,7 +127,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		
 	(function(){
 		//safari 5.0.x has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
-		if(!badWebkit){return;}
+		if(!badWebkit || webshims.browserVersion > 534.5){return;}
 		['input', 'textarea', 'select'].forEach(function(name){
 			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
 				prop: {
