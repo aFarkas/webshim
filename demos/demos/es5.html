@@ -16,7 +16,7 @@
         
     </script>
 	<script src="../demo-js/demo.js"></script>
-	<title>ES5 : webshims lib - the polyfilling capability based loading JS libary</title>
+	<title>ES5 : webshims lib - the polyfilling capability based loading JS library</title>
 	    
 </head>
 
@@ -72,7 +72,7 @@ $.webshims.ready('es5', function(){
 			<h3>Abstractions</h3>
 			<p>Webshims Lib adds the following methods: <code>$.webshims.objectCreate</code>, <code>$.webshims.defineProperty</code>, <code>$.webshims.defineProperties</code>, <code>$.webshims.getOwnPropertyDescriptor</code> and corresponding support flags: <code>Modernizr.objectAccessor</code> (true in all modern Browsers including IE9, getters and setters can be used on all objects) and <code>Modernizr.advancedObjectProperties</code> (true in FF4, IE9, Chrome 10..., the full ES5 specification of defineProperty is implemented (including writeable, enumerable and configurable).</p>
 			<h4>$.webshims.objectCreate(proto [, propertiesObject, options ])</h4>
-			<p><code>$.webshims.objectCreate</code> works very similiar to <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/create">Object.create</a></p>
+			<p><code>$.webshims.objectCreate</code> works very similar to <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/create">Object.create</a></p>
 			<p>If <code>propertiesObject</code> is defined, the method goes through this object and sets writeable, enumerable and configurable to true, if the corresponding property is undefined.</p>
 			<p>After this, it will pass <code>proto</code> and <code>propertiesObject</code> to Object.create (if defined) or will use Crockfords <code>begetObject</code>-Method on the <code>proto</code>-object and then calls <code>$.webshims.defineProperties</code> with the returned object and the <code>propertiesObject</code>.</p>
 			<p>If you pass the options parameter and the Object already has a Options-property. The options-property on the object will be deeply extended otherwise an new options-property will be created.</p>
@@ -136,7 +136,7 @@ var myCar = Object.create(carProto, {
 }
 </code>
 			<h4>$.webshims.defineProperties (object, props)</h4>
-			<p><code>$.webshims.defineProperties</code> works similiar to <a href="https://developer.mozilla.org/en/JavaScript/Reference/global_objects/object/defineproperties">Object.defineProperties</a></p>
+			<p><code>$.webshims.defineProperties</code> works similar to <a href="https://developer.mozilla.org/en/JavaScript/Reference/global_objects/object/defineproperties">Object.defineProperties</a></p>
 			<p>It will go through the props properties and will set writeable, enumerable and configurable to true, if they are undefined.</p>
 			<p>After this either Object.defineProperties will be invoked or legacy code is used.</p>
 			

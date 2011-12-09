@@ -109,7 +109,7 @@ $('form')
 ;
 </code>	
 
-			<p>Using <code>$.webshims.validityAlert.showFor</code> will generate the following styleable HTML structur:</p>
+			<p>Using <code>$.webshims.validityAlert.showFor</code> will generate the following styleable HTML structure:</p>
 			
 <code class="block">
 &lt;!-- note: span.validity-alert-wrapper is label.validity-alert in old browser, which do not support WAI-ARIA --&gt;
@@ -128,7 +128,7 @@ $('form')
 <code class="block">
 $('input[required]').setCustomValidity('You have to enter something');
 </code>
-			<p>The problem with <code>setCustomValidity</code> is, that <code>setCustomValidity</code> is a low level API for changing the validityState of an element. This means: The changed validation message is only a side effect, setCustomValidity only works on a single element and also sets the customError-flag to true. The developer has to observe the validityState of an element and has to remove/change the custom validation messsage dynamically as soon as the message isn't relevant anymore, which can be a real pain in the ass.</p>
+			<p>The problem with <code>setCustomValidity</code> is, that <code>setCustomValidity</code> is a low level API for changing the validityState of an element. This means: The changed validation message is only a side effect, setCustomValidity only works on a single element and also sets the customError-flag to true. The developer has to observe the validityState of an element and has to remove/change the custom validation message dynamically as soon as the message isn't relevant anymore, which can be a real pain in the ass.</p>
 <code class="block">
 //remove customError flag:
 $('input[required]').setCustomValidity('');
@@ -151,7 +151,7 @@ $.webshims.polyfill();
 			<h3 id="change-validation-messages">Changing and Adding validation messages</h3>
 			<p>Webshims Lib validation messages are stored @ <code>$.webshims.validityMessages</code> as an object. The index is the specific language code. Currently there are only really bad validation messages for "en" and "de".</p>
 			<p>Webshims Lib automatically shows the validation message in the detected language of the browser. If the script doesn't find the right language, it will show the default language which is stored under the key "" (defaults to "en").</p>
-			<p>You can easily add/change a language by specifiying a certain language code.</p>
+			<p>You can easily add/change a language by specifying a certain language code.</p>
 <code class="block">
 $.webshims.validityMessages['en'] = {
 	typeMismatch: {
