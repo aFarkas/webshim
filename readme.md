@@ -1,4 +1,4 @@
-[Webshims Lib](http://aFarkas.github.com/webshim/demos/index.html) - The polyfilling, capability based loading JavaScript Libary
+[Webshims Lib](http://aFarkas.github.com/webshim/demos/index.html) - The polyfilling, capability based loading JavaScript Library
 ================================
 
 Features
@@ -106,4 +106,4 @@ Release 1.8.0
 * better language support
 * updated es5-shim
 * updated jQuery UI path 
-* fixed label for putput element
+* fixed label for output element
