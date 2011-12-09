@@ -22,7 +22,7 @@
         
     </script>
 	<script src="../demo-js/demo.js"></script>
-	<title>HTML5 interactive elements: details &amp; summary : webshims lib - the polyfilling capability based loading JS libary</title>
+	<title>HTML5 interactive elements: details &amp; summary : webshims lib - the polyfilling capability based loading JS library</title>
 	    
 </head>
 
@@ -66,7 +66,7 @@
 <code class="block run-once">
 $('details:first').afterPolyfill('&lt;details open="open"&gt;&lt;p&gt;Here is some text&lt;/p&gt;&lt;/details&gt;');
 </code>
-			<p>The openess of a details element can be also scripted. Simply change the open IDL-attribute:</p>
+			<p>The openness of a details element can be also scripted. Simply change the open IDL-attribute:</p>
 <code class="block run-once">
 // set the open attribute of the first details element ...
 // ... to its opposite value
@@ -86,7 +86,7 @@ $.webshims.setOptions('details', {animate: true});
 			<aside>
 				<h3>Constraints of the details polyfill</h3>
 				<ul>
-					<li>The polyfill currently only allows other elements as direct childs of the details. Simple text is not allowed as direct child of details.</li>
+					<li>The polyfill currently only allows other elements as direct children of the details. Simple text is not allowed as direct child of details.</li>
 					<li>The details and summary element can be <strong>considered as experimental</strong>. It is not clear wether and if yes, how a developer can style the summary element. Safari nightly (6) and Chrome 12 are currently the only browsers supporting this element. Note: Please read <a href="http://my.opera.com/ODIN/blog/implementing-html5-details">Bruce Lawson's blog post</a>.</a></li>
 					<li>We currently haven't coded unit tests for this feature</li>
 				</ul>
