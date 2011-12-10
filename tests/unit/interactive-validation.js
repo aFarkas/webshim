@@ -36,6 +36,9 @@
 				counters.boundDocumentSubmit++;
 				
 			})
+		;
+		
+		$('html')
 			.delegate('input', 'invalid.clicktest', function(){
 				counters.delegatedDocumentInvalids++;
 			})
