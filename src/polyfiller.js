@@ -225,7 +225,7 @@
 				onReady(events, fn, true);
 			};
 			
-			$(document).one(readyEv, readyFn);
+			(readyEv=='DOMReady' && $.isReady) ? readyFn() : $(document).one(readyEv, readyFn) ; // If the event is DOMReady and DOMReady has already occurred fire the function immediately. Otherwise bind it to the correct event.
 		},
 		
 		/*
