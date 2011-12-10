@@ -36,6 +36,7 @@
 			//			addCacheBuster: false,
 			waitReady: true,
 			extendNative: true,
+			loadStyles: true,
 			basePath: (function(){
 				var script = $(document.scripts || 'script').filter('[src*="polyfiller.js"]');
 				var path;
@@ -110,8 +111,9 @@
 				if (addClass[0]) {
 					$('html').addClass(addClass.join(' '));
 				}
-				
-				loader.loadCSS('styles/shim.css');
+				if(webCFG.loadStyles){
+					loader.loadCSS('styles/shim.css');
+				}
 				//remove function
 				firstPolyfillCall = $.noop;
 			};
@@ -485,14 +487,19 @@
 					};
 					
 					loadedSrcs.push(src);
-					if (yepnope.injectJs) {
-						yepnope.injectJs(src, complete);
-					} else {
-						yepnope({
-							load: src,
-							callback: complete
-						});
+					if(window.require){
+						require([src], complete);
+					} else if(window.yepnope){
+						if (yepnope.injectJs) {
+							yepnope.injectJs(src, complete);
+						} else {
+							yepnope({
+								load: src,
+								callback: complete
+							});
+						}
 					}
+					
 				};
 			})()
 		}
