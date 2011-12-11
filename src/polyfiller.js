@@ -29,11 +29,11 @@
 		
 	
 	$.webshims = {
-		version: 'pre1.8.4',
+		version: '1.8.4RC1',
 		cfg: {
 			useImportantStyles: true,
-			//			removeFOUC: false,
-			//			addCacheBuster: false,
+			//removeFOUC: false,
+			//addCacheBuster: false,
 			waitReady: true,
 			extendNative: true,
 			loadStyles: true,
