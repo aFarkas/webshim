@@ -410,7 +410,11 @@ var formSubmitterDescriptors = {};
 				if(oldAttr != null){
 					$.attr(form, formName, oldAttr);
 				} else {
-					$(form).removeAttr(formName);
+					try {
+						$(form).removeAttr(formName);
+					} catch(er){
+						form.removeAttribute(formName);
+					}
 				}
 			}, 9);
 		}
