@@ -38,7 +38,7 @@
 			})
 		;
 		
-		$('html')
+		$(document)
 			.delegate('input', 'invalid.clicktest', function(){
 				counters.delegatedDocumentInvalids++;
 			})

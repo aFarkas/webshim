@@ -22,9 +22,30 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		};
 		window.addEventListener('submit', function(e){
 			if(!formnovalidate.prevented && e.target.checkValidity && $.attr(e.target, 'novalidate') == null){
-				webshims.fromSubmit = true;
-				$(e.target).checkValidity();
-				webshims.fromSubmit = false;
+				if(window.opera){
+					
+					if($(':invalid', e.target).length){
+						$(e.target)
+							.unbind('submit.preventInvalidSubmit')
+							.bind('submit.preventInvalidSubmit', function(submitEvent){
+								if( $.attr(e.target, 'novalidate') == null ){
+									submitEvent.stopImmediatePropagation();
+									if(badWebkit){
+										submitEvent.preventDefault();
+									}
+								}
+								if(e.target){
+									$(e.target).unbind('submit.preventInvalidSubmit');
+								}
+							})
+						;
+						webshims.moveToFirstEvent(e.target, 'submit');
+					}
+				} else {
+					webshims.fromSubmit = true;
+					$(e.target).checkValidity();
+					webshims.fromSubmit = false;
+				}
 			}
 		}, true);
 		
@@ -58,6 +79,9 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 						if(badWebkit){
 							submitEvent.preventDefault();
 						}
+					}
+					if(form){
+						$(form).unbind('submit.preventInvalidSubmit');
 					}
 				})
 			;
@@ -172,7 +196,9 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	})();
 	
 	(function(){
-		if(!$.browser.opera || webshims.browserVersion > 11.59){return;}
+		//stupid Opera hasn't fixed this issue right, it's buggy
+		// || webshims.browserVersion > 11.59
+		if(!$.browser.opera){return;}
 		var preventDefault = function(e){
 			e.preventDefault();
 		};
