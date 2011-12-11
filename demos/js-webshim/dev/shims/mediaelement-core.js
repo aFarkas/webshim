@@ -63,7 +63,7 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 		webshims.ready('mediaelement-swf', function(){
 			if(!mediaelement.createSWF){
 				webshims.modules["mediaelement-swf"].test = $.noop;
-				webshims.reTest(["mediaelement-swf"]);
+				webshims.reTest(["mediaelement-swf"], hasNative);
 			}
 		});
 	};

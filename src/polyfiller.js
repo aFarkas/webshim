@@ -29,7 +29,7 @@
 		
 	
 	$.webshims = {
-		version: '1.8.4RC1',
+		version: '1.8.4RC2',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -160,6 +160,7 @@
 		 */
 		reTest: (function(){
 			var resList;
+			var noDelayReady;
 			var reTest = function(i, name){
 				var module = modules[name];
 				var readyName = name+'Ready';
@@ -169,7 +170,7 @@
 						delete special[readyName];
 					}
 					feature = webshimsFeatures[module.feature];
-					if(feature){
+					if(feature && !noDelayReady){
 						feature.delayReady++;
 						onReady(name, function(){
 							feature.delayReady--;
@@ -179,7 +180,8 @@
 					resList.push(name);
 				}
 			};
-			return function(moduleNames){
+			return function(moduleNames, _noDelay){
+				noDelayReady = _noDelay;
 				if(typeof moduleNames == 'string'){
 					moduleNames = moduleNames.split(' ');
 				}
