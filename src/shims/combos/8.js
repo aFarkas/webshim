@@ -1185,7 +1185,9 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 		}
 	});
 	
-	
+	if(hasNative){
+		webshims.isReady('mediaelement-core', true);
+	}
 	//init
 	webshims.addReady(function(context, insertedElement){
 		
@@ -1239,7 +1241,9 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 				}
 			})
 		;
-	 });	
-	webshims.isReady('mediaelement-core', true);
+	});
+	if(!hasNative){
+		webshims.isReady('mediaelement-core', true);
+	}
 });
 })(jQuery, Modernizr, jQuery.webshims);
