@@ -626,6 +626,9 @@
 		} else {
 			isReady('DOM', true);
 		}
+		$(function(){
+			isReady('DOM', true);
+		});
 		$(window).load(function(){
 			isReady('WINDOWLOAD', true);
 		});
