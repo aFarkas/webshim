@@ -227,7 +227,7 @@ if(!Modernizr.input.placeholder || !Modernizr.input.autofocus){
 	$.webshims.polyfill('forms');
 }
 </code>					
-					
+<!--					
 					<h3>High Performance loading using combo-handler service</h3>
 					<p>Webshims lib supports generating a combohandler - url. Simply add the polyfiller-comboloader plugin from the extras folder and pass true or your combohandler options as the second argument. The defaults are fine to use in conjunction with the defaults of the <a href="http://code.google.com/p/minify/">minify - project</a>.</p>
 <code class="block">
@@ -264,7 +264,7 @@ $.webshims.polyfill('js-storage geolocation', {
 					<p>In newer browsers like IE8+/FF3.5+ JS loading do neither block downloading other resources nor block HTML [pre-]parsing (+ they have between 4-8 simultaneous download slots). And in case of using a script loader (and webshims lib is using a script loader) loading scripts won't block anything even in IE6/IE7/FF3.0.</p>
 					<p>This said, if you are using a combohandler service you should make sure, that all browsers load between 2-8 JS files (depends on browser and webpage / use the maxFiles configuration to achieve this).</p>
 					<p>And if you only want to use some polyfills and not all, you should not use a combohandler, because all polyfill downloads are parallelized.</p>
-					
+-->					
 					<h3>Loading webshims async</h3>
 					<p>If webshims lib is loaded async, there are some configurations which have to be changed manually:</p>
 					<ul>
