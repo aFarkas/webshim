@@ -101,6 +101,23 @@
 			<fileset file="${src}/shims/geolocation.js" />
 		</concat>
 		
+		<concat destfile="${src}/shims/combos/16.js">
+			<fileset file="${src}/shims/combos/8.js" />
+			<fileset file="${src}/shims/form-core.js" />
+		</concat>
+		
+		
+		<concat destfile="${src}/shims/combos/17.js">
+			<fileset file="${src}/shims/combos/16.js" />
+			<fileset file="${src}/shims/form-message.js" />
+		</concat>
+		
+		<!-- remove if webkit supports datalist -->
+		<concat destfile="${src}/shims/combos/18.js">
+			<fileset file="${src}/shims/form-datalist.js" />
+			<fileset file="${src}/shims/combos/7.js" />
+		</concat>
+		
         <mkdir dir="${dist}" />
         <copy todir="${dist}/dev" overwrite="true">
             <fileset dir="${src}" />

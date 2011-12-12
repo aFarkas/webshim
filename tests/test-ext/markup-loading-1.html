@@ -10,6 +10,7 @@
 				load: '//ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.js' }, { 
 				load: '../../src/polyfiller.js',
 				complete: function(){
+					
 					$.webshims.ready('mediaelement', function(){
 						setTimeout(function(){
 							(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, $.webshims.cfg.extendNative);

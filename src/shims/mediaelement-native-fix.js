@@ -1,4 +1,4 @@
-jQuery.webshims.ready('dom-support', function($, webshims, window, document, undefined){
+jQuery.webshims.register('mediaelement-native-fix', function($, webshims, window, document, undefined){
 	if(Modernizr.videoBuffered){return;}
 	
 	var getBufferedData = function(elem){

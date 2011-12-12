@@ -909,9 +909,6 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 			}
 		});
 	};
-	if(hasSwf){
-		webshims.ready('WINDOWLOAD', loadSwf);
-	}
 	
 	mediaelement.mimeTypes = {
 		audio: {
@@ -1242,9 +1239,13 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 			})
 		;
 	});
+	
 	if(!hasNative){
 		webshims.isReady('mediaelement-core', true);
+	} else if(hasSwf){
+		webshims.ready('WINDOWLOAD', loadSwf);
 	}
+	
 });
 })(jQuery, Modernizr, jQuery.webshims);/*
  * todos: 
