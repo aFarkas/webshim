@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Webshims Lib Test Suite</title>
+		<script src="require.js"></script>
+		<script src="../../src/extras/modernizr-custom.js"></script>
+		<script>
+			require.config({
+				baseUrl: "../../src/",
+				paths: {
+					"jquery": "http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery"
+				}
+			});
+			window.asyncWebshims = {
+				cfg: {
+					basePath: "../../src/shims/",
+					extendNative: false,
+					waitReady: false,
+					forms: {
+						customMessages: true
+					}
+				},
+				lang: "ru",
+				polyfill: "forms mediaelement"
+			};
+			
+			require( ["jquery", "polyfiller"] );
+		</script>
+	</head>
+	<body>
+	</body>
+</html>
