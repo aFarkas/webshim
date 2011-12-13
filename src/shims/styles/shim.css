@@ -308,10 +308,9 @@ img.ui-datepicker-trigger {
 	z-index: 100;
 	overflow: visible;
 	padding: 5px;
-	font-family: "Lucida Grande", "MS Shell Dlg", "Calibri", sans-serif;
+	font-family: "MS Shell Dlg", "Lucida Grande", "Calibri", sans-serif;
 	font-size: 14px;
 	border: 1px solid #333;
-	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
 }
 
 .input-date-datepicker-control .ui-datepicker-header {
@@ -388,7 +387,6 @@ img.ui-datepicker-trigger {
 	background-color: #adf;
 	color: #000;
 	border-color: #06c;
-	box-shadow: 0 3px 9px rgba(255, 255, 255, 0.9) inset;
 }
 .input-date-datepicker-control td.ui-datepicker-today{
 	border-color: #06c;
@@ -404,7 +402,6 @@ img.ui-datepicker-trigger {
 .input-date-datepicker-control td:hover {
 	background-color: #bef;
 	border-color: #06c;
-	box-shadow: 0 3px 9px rgba(255, 255, 255, 0.9) inset;
 }
 .input-date-datepicker-control td.ui-state-disabled {
 	cursor: default;
@@ -446,8 +443,6 @@ datalist {
 	overflow: hidden;
 	overflow-x: hidden !important;
 	overflow-y: auto;
-	
-	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
 }
 .datalist-polyfill.datalist-visible{
 	display: block;
@@ -503,7 +498,6 @@ datalist {
 	border-radius: 2px;
 	zoom: 1 !important;
 	min-width: 60px;
-	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.4);
 }
 
 .validity-alert .va-arrow {
