@@ -37,7 +37,7 @@ jQuery.webshims.register('details', function($, webshims, window, doc, undefined
 		if(!summary){
 			summary = $('> summary:first-child', details);
 			if(!summary[0]){
-				$(details).prependWebshim('<summary class="fallback-summary">'+ options.text +'</summary>');
+				$(details).prependPolyfill('<summary class="fallback-summary">'+ options.text +'</summary>');
 				summary = $.data(details, 'summaryElement');
 			} else {
 				bindDetailsSummary(summary, details);
