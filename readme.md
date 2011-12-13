@@ -75,11 +75,11 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-upcomming Release 1.8.4
+Release 1.8.4
 ----------
 
 - improved network performance
-- polyfiller supports AMD
+- polyfiller supports AMD + async pre-configuration
 - Opera bugfix
 
 Release 1.8.3
