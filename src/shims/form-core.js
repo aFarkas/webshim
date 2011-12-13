@@ -181,11 +181,13 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					if (checkTypes[elem.type] && !elem.checked) {
 						getGroupElements(elem).removeClass(removeClass).addClass(addClass);
 					}
-					trigger = 'changedinvalid';
 				}
+				trigger = 'changedinvalid';
 			}
 			if(addClass){
 				shadowElem.addClass(addClass).removeClass(removeClass);
+			}
+			if(trigger){
 				//jQuery 1.6.1 IE9 bug (doubble trigger bug)
 				setTimeout(function(){
 					$(elem).trigger(trigger);
@@ -376,10 +378,10 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			var shadowElem = jElm.getShadowElement();
 			if(!shadowElem.hasClass('form-ui-invalid')){
 				shadowElem.addClass('form-ui-invalid').removeClass('form-ui-valid');
-				setTimeout(function(){
-					$(e.target).trigger('changedinvalid');
-				}, 0);
 			}
+			setTimeout(function(){
+				$(e.target).trigger('changedinvalid');
+			}, 0);
 			
 			if(!firstEvent){
 				//trigger firstinvalid
