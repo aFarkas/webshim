@@ -8,9 +8,11 @@
 	"use strict";
 	
 	var DOMSUPPORT = 'dom-support';
+	var jScripts = $(document.scripts || 'script');
 	var special = $.event.special;
 	var emptyJ = $([]);
 	var Modernizr = window.Modernizr;
+	var asyncWebshims = window.asyncWebshims;
 	var addTest = Modernizr.addTest;
 	var browserVersion = parseFloat($.browser.version, 10);
 	var Object = window.Object;
@@ -29,7 +31,7 @@
 		
 	
 	$.webshims = {
-		version: '1.8.4RC4',
+		version: '1.8.4',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -38,7 +40,7 @@
 			extendNative: true,
 			loadStyles: true,
 			basePath: (function(){
-				var script = $(document.scripts || 'script').filter('[src*="polyfiller.js"]');
+				var script = jScripts.filter('[src*="polyfiller.js"]');
 				var path;
 				script = script[0] || script.end()[script.end().length - 1];
 				path = ( ($.support.hrefNormalized) ? script.src : script.getAttribute("src", 4) ).split('?')[0];
@@ -593,7 +595,9 @@
 						webshims.activeLang.apply(that, args);
 					});
 				}
-				loadList(['dom-extend']);
+				setTimeout(function(){
+					loadList(['dom-extend']);
+				}, 1);
 			}
 			return curLang;
 		};
@@ -1205,7 +1209,7 @@
 	}
 
 
-	$(document.scripts || 'script')
+	jScripts
 		.filter('[data-polyfill-cfg]')
 		.each(function(){
 			try {
@@ -1215,12 +1219,20 @@
 			}
 		})
 		.end()
-		.filter(function(){
-			return this.getAttribute('data-polyfill') != null;
-		})
+		.filter('[data-polyfill]')
 		.each(function(){
 			webshims.polyfill( $.trim( $(this).data('polyfill') || '' ) );
 		})
 	;
-	
+	if(asyncWebshims){
+		if(asyncWebshims.cfg){
+			webshims.setOptions(asyncWebshims.cfg);
+		}
+		if(asyncWebshims.lang){
+			webshims.activeLang(asyncWebshims.lang);
+		}
+		if('polyfill' in asyncWebshims){
+			webshims.polyfill(asyncWebshims.polyfill);
+		}
+	}
 }));
