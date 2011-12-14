@@ -153,6 +153,17 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return ret;
 	};
 	
+	var returnValidityCause = function(validity, elem){
+		var ret;
+		$.each(validity, function(name, value){
+			if(value){
+				ret = (name == 'customError') ? $.prop(elem, 'validationMessage') : name;
+				return false;
+			}
+		});
+		return ret;
+	};
+	
 	var switchValidityClass = function(e){
 		if(!e.target || e.target.type == 'submit' || !$.prop(e.target, 'willValidate')){return;}
 		var timer = $.data(e.target, 'webshimsswitchvalidityclass');
@@ -162,19 +173,27 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		$.data(e.target, 'webshimsswitchvalidityclass', setTimeout(function(){
 			
 			var elem = $(e.target).getNativeElement()[0];
+			var validity = $.prop(elem, 'validity');
 			var shadowElem = $(elem).getShadowElement();
-			var addClass, removeClass, trigger;
+			var addClass, removeClass, trigger, generaltrigger, validityCause;
 			
-			if(isValid(elem)){
+			if(validity.valid){
 				if(!shadowElem.hasClass('form-ui-valid')){
 					addClass = 'form-ui-valid';
 					removeClass = 'form-ui-invalid';
+					generaltrigger = 'changedvaliditystate';
 					trigger = 'changedvalid';
 					if(checkTypes[elem.type] && elem.checked){
 						getGroupElements(elem).removeClass(removeClass).addClass(addClass).removeAttr('aria-invalid');
 					}
+					$.removeData(elem, 'webshimsinvalidcause');
 				}
 			} else {
+				validityCause = returnValidityCause(validity, elem);
+				if($.data(elem, 'webshimsinvalidcause') != validityCause){
+					$.data(elem, 'webshimsinvalidcause', validityCause);
+					generaltrigger = 'changedvaliditystate';
+				}
 				if(!shadowElem.hasClass('form-ui-invalid')){
 					addClass = 'form-ui-invalid';
 					removeClass = 'form-ui-valid';
@@ -191,8 +210,12 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					$(elem).trigger(trigger);
 				}, 0);
 			}
-			
-			$.removeData(e.target, 'webshimsswitchvalidityclass')
+			if(generaltrigger){
+				setTimeout(function(){
+					$(elem).trigger(generaltrigger);
+				}, 0);
+			}
+			$.removeData(e.target, 'webshimsswitchvalidityclass');//oh
 			
 		}, 9));
 	};
@@ -377,7 +400,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			if(!shadowElem.hasClass('form-ui-invalid')){
 				shadowElem.addClass('form-ui-invalid').removeClass('form-ui-valid');
 				setTimeout(function(){
-					$(e.target).trigger('changedinvalid');
+					$(e.target).trigger('changedinvalid').trigger('changedvaliditystate');
 				}, 0);
 			}
 			
@@ -420,11 +443,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		});
 	}
 	
-});
-
-
-
-jQuery.webshims.register('form-message', function($, webshims, window, document, undefined, options){
+});jQuery.webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	var validityMessages = webshims.validityMessages;
 	
 	var implementProperties = (options.overrideMessages || options.customMessages) ? ['customValidationMessage'] : [];

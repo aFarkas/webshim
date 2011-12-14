@@ -31,7 +31,7 @@
 		
 	
 	$.webshims = {
-		version: '1.8.4',
+		version: 'pre1.8.5',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -595,9 +595,6 @@
 						webshims.activeLang.apply(that, args);
 					});
 				}
-				setTimeout(function(){
-					loadList(['dom-extend']);
-				}, 1);
 			}
 			return curLang;
 		};
