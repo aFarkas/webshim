@@ -150,16 +150,25 @@ $.webshims.activeLang("ru");
 /*as you can see you can call this also later*/
 </code>		
 			<h3 id="ui-loading">Loading jQuery UI from another source</h3>
+			<p>Webshims lib trys to load the hole jQuery UI. This isn't often usefull and can be changed by augumenting $.webshims.modules["jquery-ui"].src.</p>
 <code class="block">
 // relative from shims-folder
 $.webshims.modules["jquery-ui"].src = "../jquery-ui.custom.min.js";
 </code>
 			<h3 id="partial-ui-loading">Loading partial jQuery UI</h3>
-			<p>If jQuery UI's widget-factory is already included, but not slider/datepicker.</p>
+			<p>If jQuery UI's widget-factory is already included, but not slider/datepicker, Webshims lib won't load the jquery-ui module, but trys to load the input-widgets module, if a src is specified.</p>
 <code class="block">
 $.webshims.modules["input-widgets"].src = "../jquery-ui.slider-datepicker.min.js";
 </code>
-			
+			<h3 id="conditional-loading">Performance tip: conditional loading</h3>
+			<p>In case a project only needs to support type="range" the module "jquery-ui" or "input-widgets" do not need to include datepicker widget. Additionally the polyfilling the forms-ext feature can be made conditionally:</p> 
+<code class="block">
+$.webshims.modules["jquery-ui"].src = "../jquery-ui.slider-custom.min.js";
+//forms-ext feature would also implement datepicker (type=number, type=time, type=date...)
+if(!Modernizr.inputtypes.range){
+	$.webshims.polyfill("forms-ext");
+}
+</code>
 			<section>
 				<h3>Simple Demo</h3>
 				<form action="#">

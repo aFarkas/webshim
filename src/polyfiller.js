@@ -59,7 +59,6 @@
 		setOptions: function(name, opts){
 			if (typeof name == 'string' && opts !== undefined) {
 				webCFG[name] = (!$.isPlainObject(opts)) ? opts : $.extend(true, webCFG[name] || {}, opts);
-				
 			}
 			else 
 				if (typeof name == 'object') {
@@ -68,7 +67,7 @@
 		},
 		addPolyfill: function(name, cfg){
 			cfg = cfg || {};
-			var feature = cfg.feature || name;
+			var feature = cfg.f || name;
 			if (!webshimsFeatures[feature]) {
 				webshimsFeatures[feature] = [];
 				webshimsFeatures[feature].delayReady = 0;
@@ -101,7 +100,7 @@
 				
 				if (!$.isReady) {
 					addClass.push('loading-polyfills');
-					$(window).bind('load.lP polyfillloaderror.lP error.lP', removeLoader);
+					$(window).bind('load.lP error.lP', removeLoader);
 					timer = setTimeout(function(){
 						$('html').addClass('long-loading-polyfills');
 					}, 600);
@@ -171,12 +170,12 @@
 					if(special[readyName]){
 						delete special[readyName];
 					}
-					feature = webshimsFeatures[module.feature];
+					feature = webshimsFeatures[module.f];
 					if(feature && !noDelayReady){
 						feature.delayReady++;
 						onReady(name, function(){
 							feature.delayReady--;
-							isReady(module.feature, true);
+							isReady(module.f, true);
 						});
 					}
 					resList.push(name);
@@ -301,7 +300,7 @@
 				}
 			}
 		},
-		combos: {},
+		c: {},
 		/*
 		 * loader
 		 */
@@ -310,14 +309,14 @@
 			addModule: function(name, ext){
 				modules[name] = ext;
 				ext.name = ext.name || name;
-				if(!ext.combos){
-					ext.combos = [];
+				if(!ext.c){
+					ext.c = [];
 				}
-				$.each(ext.combos, function(i, comboname){
-					if(!webshims.combos[comboname]){
-						webshims.combos[comboname] = []
+				$.each(ext.c, function(i, comboname){
+					if(!webshims.c[comboname]){
+						webshims.c[comboname] = []
 					}
-					webshims.combos[comboname].push(name);
+					webshims.c[comboname].push(name);
 				});
 			},
 			loadList: (function(){
@@ -336,7 +335,7 @@
 						return true;
 					}
 					var module = modules[name];
-					var cfg = webCFG[module.feature || name] || {};
+					var cfg = webCFG[module.f || name] || {};
 					var supported;
 					if (module) {
 						supported = (module.test && $.isFunction(module.test)) ? module.test(list) : module.test;
@@ -383,14 +382,14 @@
 					var foundCombo;
 					var loadCombo = function(j, combo){
 						foundCombo = combo;
-						$.each(webshims.combos[combo], function(i, moduleName){
+						$.each(webshims.c[combo], function(i, moduleName){
 							if($.inArray(moduleName, loadCombos) == -1 || $.inArray(moduleName, loadedModules) != -1){
 								foundCombo = false;
 								return false;
 							}
 						});
 						if(foundCombo){
-							loadScript('combos/'+foundCombo, webshims.combos[foundCombo]);
+							loadScript('combos/'+foundCombo, webshims.c[foundCombo]);
 							return false;
 						}
 					};
@@ -423,7 +422,7 @@
 						module = loadCombos[i];
 						
 						if($.inArray(module, loadedModules) == -1){
-							$.each(modules[module].combos, loadCombo);
+							$.each(modules[module].c, loadCombo);
 							if(!foundCombo){
 								loadScript(modules[module].src || module, module);
 							}
@@ -694,9 +693,6 @@
 		};
 		
 		
-		if(webshims.fn) {
-			webshims.fn.html = $.fn.htmlPolyfill;
-		}
 		$.each(['after', 'before', 'append', 'prepend', 'replaceWith'], function(i, name){
 			$.fn[name+'Polyfill'] = function(a){
 				var elems = $(webshims.fixHTML5(a));
@@ -931,14 +927,14 @@
 			}
 			return Modernizr.ES5;
 		},
-		combos: [10, 1]
+		c: [10, 1]
 	});
 	
 	addPolyfill('dom-extend', {
-		feature: DOMSUPPORT,
+		f: DOMSUPPORT,
 		noAutoCallback: true,
 		dependencies: ['es5'],
-		combos: [10, 9, 12, 17, 16, 8, 1, 11, 13]
+		c: [10, 9, 12, 17, 16, 8, 1, 11, 13]
 	});
 		
 	/* json + loacalStorage */
@@ -950,7 +946,7 @@
 				loadList(['swfobject']);
 			},
 			noAutoCallback: true,
-			combos: [14]
+			c: [14]
 		});
 	}
 	
@@ -965,7 +961,7 @@
 	//			,confirmText: ''
 			},
 			dependencies: ['json-storage'],
-			combos: [14, 15]
+			c: [14, 15]
 		});
 	}
 	/* END: geolocation */
@@ -1043,7 +1039,7 @@
 		webshims.inputTypes = {};
 				
 		addPolyfill('form-core', {
-			feature: 'forms',
+			f: 'forms',
 			dependencies: ['es5'],
 			test: function(toLoad){
 				if(this.options.lightweightDatalist && !this.datalistLoaded){
@@ -1062,7 +1058,7 @@
 	//			lightweightDatalist: false
 			},
 			methodNames: ['setCustomValidity','checkValidity'],
-			combos: [3, 2, 59, 17, 16, 5, 4]
+			c: [3, 2, 59, 17, 16, 5, 4]
 		});
 				
 		if(Modernizr[formvalidation]){
@@ -1072,62 +1068,62 @@
 			
 			//ToDo merge this with form-core (to minimize small requests)
 			addPolyfill('form-extend', {
-				feature: 'forms',
+				f: 'forms',
 				src: 'form-native-extend',
 				test: function(toLoad){
 					return ((modules['form-number-date-api'].test() || $.inArray('form-number-date-api', toLoad) == -1) && !this.options.overrideMessages );
 				},
 				dependencies: ['form-core', DOMSUPPORT, 'form-message'],
-				combos: [18, 7, 59, 5]
+				c: [18, 7, 59, 5]
 			});
 			addPolyfill('form-dummy', {
-				feature: 'forms',
+				f: 'forms',
 				test: true,
 				loaded: true,
-				combos: [2, 3]
+				c: [2, 3]
 			});	
 		} else {
 			addPolyfill('form-dummy', {
-				feature: 'forms',
+				f: 'forms',
 				test: true,
 				loaded: true,
-				combos: [18, 7, 4, 59, 5]
+				c: [18, 7, 4, 59, 5]
 			});
 			addPolyfill('form-extend', {
-				feature: 'forms',
+				f: 'forms',
 				src: 'form-shim-extend',
 				dependencies: ['form-core', DOMSUPPORT],
-				combos: [3, 2]
+				c: [3, 2]
 			});
 		}
 		
 		addPolyfill('form-message', {
-			feature: 'forms',
+			f: 'forms',
 			test: function(toLoad){
 				return !( this.options.customMessages || !Modernizr[formvalidation] || !modules['form-extend'].test(toLoad) || webshims.bugs.validationMessage );
 			},
 			dependencies: [DOMSUPPORT],
-			combos: [3, 2, 59, 17, 5, 4]
+			c: [3, 2, 59, 17, 5, 4]
 		});
 		
 		webshims.addPolyfill('form-output', {
-			feature: 'forms',
+			f: 'forms',
 			test: ('value' in document.createElement('output')),
 			dependencies: [DOMSUPPORT],
-			combos: [3, 2]
+			c: [3, 2]
 		});
 		
 		
 		addPolyfill('form-number-date-api', {
-			feature: 'forms-ext',
+			f: 'forms-ext',
 			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && modernizrInputTypes.time && modernizrInputTypes.number);},
 			test: function(){return (this.uiTest() && !webshims.bugs.valueAsNumberSet);},
 			dependencies: ['forms', DOMSUPPORT],
-			combos: [18, 7, 6]
+			c: [18, 7, 6]
 		});
 		
 		addPolyfill('form-number-date-ui', {
-			feature: 'forms-ext',
+			f: 'forms-ext',
 			test: function(){return modules['form-number-date-api'].test() && !this.options.replaceUI;},
 			dependencies: ['forms', DOMSUPPORT, 'form-number-date-api'],
 			loadInit: function(){
@@ -1146,15 +1142,15 @@
 	//			,lazyDate: undefined // true for IE8- false for fast browser 
 	//			,replaceUI: false
 			},
-			combos: [18, 7, 6]
+			c: [18, 7, 6]
 		});
-		Modernizr.datalist = !!(modernizrInputAttrs.list && window.HTMLDataListElement);
+		modernizrInputAttrs.list = Modernizr.datalist = !!(modernizrInputAttrs.list && window.HTMLDataListElement);
 		
 		addPolyfill('form-datalist', {
-			feature: 'forms-ext',
-			test: Modernizr.datalist,
+			f: 'forms-ext',
+			test: modernizrInputAttrs.list,
 			dependencies: ['forms', DOMSUPPORT],
-			combos: [3, 59, 18, 11]
+			c: [3, 59, 18, 11]
 		});
 	}
 		
@@ -1167,21 +1163,21 @@
 //			animate: false,
 			text: 'Details'
 		},
-		combos: [12, 13, 15]
+		c: [12, 13, 15]
 	});
 	
 	if ('audio' in Modernizr && 'video' in Modernizr){
 		webshims.mediaelement = {};
 		
 		addPolyfill('mediaelement-core', {
-			feature: 'mediaelement',
+			f: 'mediaelement',
 			noAutoCallback: true,
 			
 			dependencies: ['swfobject',DOMSUPPORT],
-			combos: [10, 9, 12, 17, 16, 8]
+			c: [10, 9, 12, 17, 16, 8]
 		});
 		addPolyfill('mediaelement-swf', {
-			feature: 'mediaelement',
+			f: 'mediaelement',
 			options: {
 				hasToPlay: 'any',
 				preferFlash: false,
@@ -1200,7 +1196,7 @@
 				var hasToPlay = options.hasToPlay;
 				return !( (!window.swfobject || window.swfobject.hasFlashPlayerVersion('9.0.115')) && (options.preferFlash || (hasToPlay != 'any' && !Modernizr.video[hasToPlay] && !Modernizr.audio[hasToPlay])));
 			},
-			combos: [10, 9]
+			c: [10, 9]
 		});
 		
 	}

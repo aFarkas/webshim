@@ -12,7 +12,7 @@
 		
 		if(!Modernizr.videoBuffered){
 			webshims.addPolyfill('mediaelement-native-fix', {
-				feature: 'mediaelement',
+				f: 'mediaelement',
 				test: Modernizr.videoBuffered,
 				dependencies: ['dom-support']
 			});

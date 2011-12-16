@@ -854,7 +854,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		
 		if(!Modernizr.videoBuffered){
 			webshims.addPolyfill('mediaelement-native-fix', {
-				feature: 'mediaelement',
+				f: 'mediaelement',
 				test: Modernizr.videoBuffered,
 				dependencies: ['dom-support']
 			});
@@ -1293,7 +1293,7 @@ jQuery.webshims.gcEval = function(){
 	
 	if(!Modernizr.bugfreeformvalidation){
 		webshims.addPolyfill('form-native-fix', {
-			feature: 'forms',
+			f: 'forms',
 			dependencies: ['form-extend']
 		});
 		//remove form-extend readyness

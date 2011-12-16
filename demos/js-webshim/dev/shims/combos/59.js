@@ -265,7 +265,7 @@ jQuery.webshims.gcEval = function(){
 	
 	if(!Modernizr.bugfreeformvalidation){
 		webshims.addPolyfill('form-native-fix', {
-			feature: 'forms',
+			f: 'forms',
 			dependencies: ['form-extend']
 		});
 		//remove form-extend readyness
@@ -780,7 +780,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		}
 	});
 	//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
-	if(Modernizr.datalist && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
+	if(Modernizr.input.list && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
 		webshims.defineNodeNameProperty('datalist', 'options', {
 			prop: {
 				writeable: false,
@@ -887,7 +887,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	 */
 	
 	(function(){
-		if(Modernizr.datalist){return;}
+		if(Modernizr.input.list){return;}
 		
 			var initializeDatalist =  function(){
 				

@@ -370,10 +370,15 @@ $('form').bind('invalid', function(e){
 					<div class="panel">
 						<p>Simply change some configuration and you are ready.</p>
 <code class="block">
-configure webshims to use JS-Widgets instead of native widgets
+//configure webshims to use JS-Widgets instead of native widgets
 $.webshims.setOptions('forms-ext', {
 	replaceUI: true
 });
+</code>
+						<p>Loading jQuery UI from another source:</p>
+<code class="block">
+// load a customized jquery ui build from another source
+$.webshims.modules["jquery-ui"].src = "../jquery-ui.custom.min.js";
 </code>
 						<p>More information about <a href="webforms/3-webforms-widgets.html">custom styleable input widgets</a>.</p>
 					</div>

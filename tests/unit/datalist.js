@@ -13,7 +13,7 @@ asyncTest("datalist", function(){
 	
 	strictEqual($('#email').prop('list'), $('#dlist')[0], 'list property returns right datalist');
 	
-	if(!Modernizr.datalist){
+	if(!Modernizr.input.list){
 		var shadowListItems = $('div.datalist-polyfill li');
 		$.each(['yes aßäöâ', 'yes "2"', "yes '3'"], function(i, val){
 			equals($.attr(shadowListItems[i], 'data-value'), val, 'shadow datalistitems value equals options value');
@@ -29,14 +29,14 @@ asyncTest("datalist", function(){
 	$('#email').attr('list', 'range');
 	strictEqual($('#email').prop('list'), null, 'list property is null, if element is not a datalist');
 	
-	if(!Modernizr.datalist){
+	if(!Modernizr.input.list){
 		ok(!$('#email').attr('aria-haspopup'), 'aria was removed on input:not([list])');
 	}
 	
 	$('#email').attr('list', 'dlist2');
 	strictEqual($('#email').prop('list'), $('#dlist2')[0], 'list property changed through content attribute');
 	
-	if(!Modernizr.datalist){
+	if(!Modernizr.input.list){
 		strictEqual($('#email').attr('aria-haspopup'), 'true', 'input[list] has aria');
 		
 				
@@ -49,7 +49,7 @@ asyncTest("datalist", function(){
 		start();
 	});
 });
-if (!Modernizr.datalist) {
+if (!Modernizr.input.list) {
 	test("datalist manipulate shadowdom I", function(){
 		stop();
 		$('#email').attr('list', 'dlist2');

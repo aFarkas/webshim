@@ -28,7 +28,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 	 */
 	
 	(function(){
-		if(Modernizr.datalist){return;}
+		if(Modernizr.input.list){return;}
 		
 			var initializeDatalist =  function(){
 				

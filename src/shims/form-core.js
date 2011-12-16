@@ -44,7 +44,7 @@ jQuery.webshims.gcEval = function(){
 	
 	if(!Modernizr.bugfreeformvalidation){
 		webshims.addPolyfill('form-native-fix', {
-			feature: 'forms',
+			f: 'forms',
 			dependencies: ['form-extend']
 		});
 		//remove form-extend readyness

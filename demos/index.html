@@ -163,7 +163,7 @@
 					</ul>
 				
 <code class="block">
-&lt;script src="js/jquery-1.6.4.js"&gt;&lt;/script&gt;
+&lt;script src="js/jquery-1.7.1.js"&gt;&lt;/script&gt;
 &lt;script src="js/modernizr-yepnope-custom.js"&gt;&lt;/script&gt;
 &lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
 
@@ -225,38 +225,11 @@ $.webshims.setOptions({
 if(!Modernizr.input.placeholder || !Modernizr.input.autofocus){
 	$.webshims.polyfill('forms');
 }
-</code>					
-<!--					
-					<h3>High Performance loading using combo-handler service</h3>
-					<p>Webshims lib supports generating a combohandler - url. Simply add the polyfiller-comboloader plugin from the extras folder and pass true or your combohandler options as the second argument. The defaults are fine to use in conjunction with the defaults of the <a href="http://code.google.com/p/minify/">minify - project</a>.</p>
-<code class="block">
-//loads all features with a combohandler
-$.webshims.polyfill(true);
-//loads json-storage and geolocation as a combohandler
-$.webshims.polyfill('js-storage geolocation', true);
-</code>
-					<p>You can configure the generated combohandler using the following options</p>
-					<ul>
-						<li><strong>base</strong>: (default: '/min/f=') The base path to your combohandler-middleware.</li>
-						<li><strong>separator</strong>: (default: ',') the separator between each js-source</li>
-						<li><strong>maxFiles</strong>: (default: 10) the maximum files, that are combined in one combohandler</li>
-						<li><strong>scriptPath</strong>: (default: dynamically computed absolute script-path to your shims-folder without a starting slash)</li>
-					</ul>
-<code class="block">
-//loads json-storage and geolocation as a combohandler
-$.webshims.polyfill('js-storage geolocation', true);
-//would load in IE7: /min/f=path-to-shims/json-storage.js,path-to-shims/geolocation.js
-//would load in IE8: /min/f=path-to-shims/geolocation.js
-//would load in IE9 and other browsers: nothing :-)
+</code>	
 
-$.webshims.polyfill('js-storage geolocation', {
-	separator: '&',
-	base: '/minify.jsp?scripts='
-});
-//would load in IE7: /minify.jsp?scripts=path-to-shims/json-storage.js&path-to-shims/geolocation.js
-//would load in IE8: /minify.jsp?scripts=path-to-shims/geolocation.js
-//would load in IE9 and other browsers: nothing :-)
-</code>					
+					
+<!--					
+									
 					<h4>Some information about "Make fewer HTTP requests"</h4>
 					<p>There is a very bad myth, saying that combining all your JS into one file is good for performance. In fact this rule can dramatically slow down loading your page. The <a href="http://calendar.perfplanet.com/2010/thoughts-on-performance/">truth is a little bit more complex</a>.</p>
 					<p>This rule was written in 2004 and the reason beyond this rule is that loading JS in old browser like IE6/IE7/FF3.0 do block downloading other resources, do block HTML parsing and do block UI rendering (+ old browser have normally only 2 simultaneous download slots).</p>
@@ -417,6 +390,14 @@ this.checkValidity();
 $(this).checkValidity();
 </code>
 							<p>If you pass a list of nodes and the method doesn't return anything, the method will be called on each element in this list, otherwise it will be called on the first element.</p>
+							<p>A lot of developers deprecate extending the DOM directly, in those cases the general option <code>extendNative</code> can be set to <code>false</code>.</p>
+<code class="block">
+$.webshims.setOptions("extendNative", false);
+$.webshims.polyfill('forms');
+//...
+//this.checkValidity() does not work cross-browser anymore use: $(this).checkValidity();
+</code>	
+
 						</li>
 						<li>
 							<p><strong>binding to events</strong>: Always use jQuery's <code>bind</code> method to register your event handlers. <code>addEventListener</code> won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use event capturing in the native implementation and <code>$.fn.trigger</code> in the shim.</p>
