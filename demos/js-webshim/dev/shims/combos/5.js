@@ -242,6 +242,9 @@ jQuery.webshims.gcEval = function(){
 	var dateElem = $('input', form);
 	var toLoad = [];
 	
+	
+	
+	
 	Modernizr[validationmessage] = true;
 	
 	if(window.opera){
@@ -461,6 +464,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		
 		if(attr && typeof attr == 'string'){
 			ret = webshims.gcEval(attr, elem);
+			webshims.warn('we will drop inline event handler support, with next release. use event binding: $.bind instead');
 			if(elem[onEvent]){
 				removed = true;
 				elem[onEvent] = false;

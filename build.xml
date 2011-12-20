@@ -118,6 +118,12 @@
 			<fileset file="${src}/shims/combos/7.js" />
 		</concat>
 		
+		<!-- remove if webkit supports datalist -->
+		<concat destfile="${src}/shims/combos/19.js">
+			<fileset file="${src}/shims/combos/11.js" />
+			<fileset file="${src}/shims/form-core.js" />
+		</concat>
+		
         <mkdir dir="${dist}" />
         <copy todir="${dist}/dev" overwrite="true">
             <fileset dir="${src}" />
