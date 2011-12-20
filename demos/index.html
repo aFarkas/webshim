@@ -377,6 +377,11 @@ $.webshims.setOptions({
 $(this).prop('validity');
 // or:
 //$.prop(this, 'validity');
+
+//setting a property
+$('video').prop('currentTime', 200);
+// or:
+//$.prop(videoElement, 'currentTime', 200);
 </code>
 						</li>
 						<li>
@@ -400,7 +405,7 @@ $.webshims.polyfill('forms');
 
 						</li>
 						<li>
-							<p><strong>binding to events</strong>: Always use jQuery's <code>bind</code> method to register your event handlers. <code>addEventListener</code> won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use event capturing in the native implementation and <code>$.fn.trigger</code> in the shim.</p>
+							<p><strong>binding to events</strong>: Always use jQuery's <code>bind</code> method to register your event handlers. <code>addEventListener</code> or inline event handler won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use event capturing in the native implementation and <code>$.fn.trigger</code> in the shim.</p>
 							<p>This means that some HTML5 events go down the DOM tree in capable browsers and go up the tree in polyfilled browsers. This can create differences if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default, don't use <code>return false;</code>, use <code>event.preventDefault();</code> instead.</p>
 						</li>
 						<li>
