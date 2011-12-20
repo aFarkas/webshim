@@ -175,7 +175,7 @@
 						feature.delayReady++;
 						onReady(name, function(){
 							feature.delayReady--;
-							isReady(module.f, true);
+							isReady(module.f, feature.callReady);
 						});
 					}
 					resList.push(name);
@@ -192,7 +192,12 @@
 			};
 		})(),
 		isReady: function(name, _set){
-			if(webshimsFeatures[name] && webshimsFeatures[name].delayReady > 0){return false;}
+			if(webshimsFeatures[name] && webshimsFeatures[name].delayReady > 0){
+				if(_set){
+					webshimsFeatures[name].callReady = true;
+				}
+				return false;
+			}
 			name = name + 'Ready';
 			if (_set) {
 				if (special[name] && special[name].add) {
@@ -934,7 +939,7 @@
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		dependencies: ['es5'],
-		c: [10, 9, 12, 17, 16, 8, 1, 11, 13]
+		c: [10, 9, 12, 17, 16, 8, 1, 19, 11, 13]
 	});
 		
 	/* json + loacalStorage */
@@ -1044,7 +1049,8 @@
 			test: function(toLoad){
 				if(this.options.lightweightDatalist && !this.datalistLoaded){
 					this.datalistLoaded = true;
-					toLoad.push('form-datalist');
+					modules['form-datalist'].f = 'forms';
+					webshims.reTest(['form-datalist']);
 				}
 				return false;
 			},
@@ -1058,7 +1064,7 @@
 	//			lightweightDatalist: false
 			},
 			methodNames: ['setCustomValidity','checkValidity'],
-			c: [3, 2, 59, 17, 16, 5, 4]
+			c: [3, 2, 59, 17, 16, 5, 4, 19]
 		});
 				
 		if(Modernizr[formvalidation]){
@@ -1149,8 +1155,8 @@
 		addPolyfill('form-datalist', {
 			f: 'forms-ext',
 			test: modernizrInputAttrs.list,
-			dependencies: ['forms', DOMSUPPORT],
-			c: [3, 59, 18, 11]
+			dependencies: ['form-core', DOMSUPPORT],
+			c: [3, 59, 18, 19, 11]
 		});
 	}
 		
