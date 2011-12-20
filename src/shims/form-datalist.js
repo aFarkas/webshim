@@ -416,11 +416,10 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				if(value){
 					this.arrayOptions.forEach(function(item, i){
 						if(!('lowerText' in item)){
-							item.lowerText = item.text.toLowerCase();
-							item.lowerValue = item.value.toLowerCase();
+							item.lowerText = item.text.toLowerCase() +  item.value.toLowerCase();
 						}
 						
-						if(item.lowerText.indexOf(value) !== -1 || item.lowerValue.indexOf(value) !== -1){
+						if(item.lowerText.indexOf(value) !== -1){
 							$(lis[i]).removeClass('hidden-item');
 							found = true;
 						} else {
