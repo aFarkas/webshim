@@ -986,11 +986,13 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		ret = cache.valueAsNumber + (delta * upDown);
 		//using NUMBER.MIN/MAX is really stupid | ToDo: either use disabled state or make this more usable
 		if(!isNaN(cache.minAsNumber) && ret < cache.minAsNumber){
-			ret = (cache.valueAsNumber * upDown  < cache.minAsNumber) ? cache.minAsNumber : isNaN(cache.maxAsNumber) ? Number.MAX_VALUE : cache.maxAsNumber;
+			ret = (cache.valueAsNumber * upDown  < cache.minAsNumber) ? cache.minAsNumber : isNaN(cache.maxAsNumber) ? cache.valueAsNumber : cache.maxAsNumber;
 		} else if(!isNaN(cache.maxAsNumber) && ret > cache.maxAsNumber){
-			ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? Number.MIN_VALUE : cache.minAsNumber;
+			ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? cache.valueAsNumber : cache.minAsNumber;
+		} else {
+			ret = Math.round( ret * 1e7)  / 1e7;
 		}
-		return Math.round( ret * 1e7)  / 1e7;
+		return ret;
 	};
 	
 	webshims.modules["form-number-date-ui"].getNextStep = getNextStep;

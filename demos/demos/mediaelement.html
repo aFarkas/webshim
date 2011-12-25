@@ -487,6 +487,11 @@ $.webshims.setOptions('mediaelement', {
 				<p>Webshims lib does not provide custom styleable controls out of the box. Instead webshims lib polyfills the HTML5 API, so that you can easily build your own controls. Simply have a look into the source code of this site, to see how we have build the controls in our demo.</p>
 				<h4>Updating JWPlayer/Using licensed JWPlayer</h4>
 				<p>Simply place player.swf into your shims/jwplayer folder.</p>
+				<h4>Changing path to swfobject</h4>
+<code class="block">
+$.webshims.modules.swfobject.src = "/path/to/swfobject.js";
+</code>
+				
 				<h2>Cookbook</h2>
 				
 				<h3>Stop other media if media starts to play</h3>

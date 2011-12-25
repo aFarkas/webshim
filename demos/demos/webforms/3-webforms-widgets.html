@@ -150,7 +150,7 @@ $.webshims.activeLang("ru");
 /*as you can see you can call this also later*/
 </code>		
 			<h3 id="ui-loading">Loading jQuery UI from another source</h3>
-			<p>Webshims lib trys to load the hole jQuery UI library. This isn't often usefull and can be changed by by changing $.webshims.modules["jquery-ui"].src.</p>
+			<p>Webshims lib trys to load the hole jQuery UI library. This isn't often usefull and can be changed by changing $.webshims.modules["jquery-ui"].src.</p>
 <code class="block">
 // relative from shims-folder
 $.webshims.modules["jquery-ui"].src = "../jquery-ui.custom.min.js";
@@ -161,7 +161,7 @@ $.webshims.modules["jquery-ui"].src = "../jquery-ui.custom.min.js";
 $.webshims.modules["input-widgets"].src = "../jquery-ui.slider-datepicker.min.js";
 </code>
 			<h3 id="conditional-loading">Performance tip: conditional loading</h3>
-			<p>In case a project only needs to support type="range" the module "jquery-ui" or "input-widgets" do not need to include datepicker widget. Additionally the polyfilling the forms-ext feature can be made conditionally:</p> 
+			<p>In case a project only needs to support type="range" the module "jquery-ui" or "input-widgets" do not need to include the datepicker widget (or vice versa). Additionally polyfilling the forms-ext feature can be made conditionally:</p> 
 <code class="block">
 $.webshims.modules["jquery-ui"].src = "../jquery-ui.slider-custom.min.js";
 //forms-ext feature would also implement datepicker (type=number, type=time, type=date...)

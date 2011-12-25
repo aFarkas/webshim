@@ -337,9 +337,10 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			},
 			content: function(nodeName, prop){
 				createNodeNameInit(nodeName, function(){
-					$(this).filter('['+ prop +']').attr(prop, function(i, val){
-						return val;
-					});
+					var val =  $.attr(this, prop);
+					if(val != null){
+						$.attr(this, prop, val);
+					}
 				});
 			},
 			createElement: function(nodeName, fn){
@@ -962,7 +963,10 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				}
 			);
 			
-			
+			if($.event.customEvent){
+				$.event.customEvent.updateDatalist = true;
+				$.event.customEvent.updateInput = true;
+			} 
 			webshims.addReady(function(context, contextElem){
 				contextElem.filter('select, option').each(function(){
 					var parent = this.parentNode;
@@ -1177,13 +1181,13 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				
 				
 				if(!this.updateTimer){
-					if(listidIndex < 2 || window.QUnit || (forceShow = (e && document.activeElement == that.input))){
+					if(window.QUnit || (forceShow = (e && document.activeElement == that.input))){
 						that.updateListOptions(forceShow);
 					} else {
 						this.updateTimer = setTimeout(function(){
 							that.updateListOptions();
 							that = null;
-						}, 100 * listidIndex);
+						}, 300 + (100 * listidIndex));
 					}
 				}
 			},
@@ -1258,7 +1262,11 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				if(value){
 					this.arrayOptions.forEach(function(item, i){
 						if(!('lowerText' in item)){
-							item.lowerText = item.text.toLowerCase() +  item.value.toLowerCase();
+							if(item.text != item.value){
+								item.lowerText = item.text.toLowerCase() +  item.value.toLowerCase();
+							} else {
+								item.lowerText = item.text.toLowerCase();
+							}
 						}
 						
 						if(item.lowerText.indexOf(value) !== -1){
@@ -1384,53 +1392,122 @@ jQuery.webshims.gcEval = function(){
 (function($){
 	var Modernizr = window.Modernizr;
 	var webshims = $.webshims;
+	
+	webshims.capturingEventPrevented = function(e){
+		var isDefaultPrevented = e.isDefaultPrevented;
+		var preventDefault = e.preventDefault;
+		e.preventDefault = function(){
+			clearTimeout($.data(e.target, e.type + 'DefaultPrevented'));
+			$.data(e.target, e.type + 'DefaultPrevented', setTimeout(function(){
+				$.removeData(e.target, e.type + 'DefaultPrevented');
+			}, 30));
+			return preventDefault.apply(this, arguments);
+		};
+		e.isDefaultPrevented = function(){
+			return !!(isDefaultPrevented.apply(this, arguments) || $.data(e.target, e.type + 'DefaultPrevented') || false);
+		};
+		e._isPolyfilled = true;
+	};
+	
 	if(!Modernizr.formvalidation){return;}
-	var modernizrInputAttrs = Modernizr.input || {};
-	var modernizrInputTypes = Modernizr.inputtypes || {};
-	var formvalidation = 'formvalidation';
-	var valueAsNumber = 'valueAsNumber';
-	var validationmessage = 'validationmessage';
-	var addTest = Modernizr.addTest;
-	var form = $('<form action="#"><select /><input type="date" required name="a" /></form>');
-	var dateElem = $('input', form);
-	var toLoad = [];
-	
-	
-	
-	
-	Modernizr[validationmessage] = true;
-	
-	if(window.opera){
+	var form = $('<form action="#" style="width: 1px; height: 1px; overflow: hidden;"><select /><input type="date" required name="a" /><input type="submit" /></form>');
+	Modernizr.bugfreeformvalidation = Modernizr.requiredSelect = !!('required' in $('select', form)[0]);
+	if(window.opera || $.browser.webkit || window.testGoodWithFix){
+		var dateElem = $('input', form);
+		var timer;
+		var loadFormFixes = function(e){
+			if(e){
+				e.preventDefault();
+				e.stopImmediatePropagation();
+			}
+			clearTimeout(timer);
+			if(!form){return;}
+			form.remove();
+			form = dateElem = null;
+			if(!Modernizr.bugfreeformvalidation || !Modernizr.requiredSelect){
+				webshims.addPolyfill('form-native-fix', {
+					f: 'forms',
+					dependencies: ['form-extend']
+				});
+				//remove form-extend readyness
+				webshims.modules['form-extend'].test = $.noop;
+			}
+			webshims.reTest(['form-extend', 'form-message', 'form-native-fix']);
+			
+			if(webshims.isReady('form-number-date-api')){
+				webshims.reTest('form-number-date-api');
+			}
+			
+			//stupid Opera hasn't fixed this issue right, it's buggy
+			// || webshims.browserVersion > 11.59
+			if ($.browser.opera || window.testGoodWithFix) {
+				webshims.loader.loadList(['dom-extend']);
+				webshims.ready('dom-extend', function(){
+					
+					var preventDefault = function(e){
+						e.preventDefault();
+					};
+					
+					['form', 'input', 'textarea', 'select'].forEach(function(name){
+						var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
+							prop: {
+								value: function(){
+									if (!webshims.fromSubmit) {
+										$(this).bind('invalid.checkvalidity', preventDefault);
+									}
+									
+									webshims.fromCheckValidity = true;
+									var ret = desc.prop._supvalue.apply(this, arguments);
+									if (!webshims.fromSubmit) {
+										$(this).unbind('invalid.checkvalidity', preventDefault);
+									}
+									webshims.fromCheckValidity = false;
+									return ret;
+								}
+							}
+						});
+					});
+				});
+			}
+		};
+		
 		form.appendTo('head');
-		webshims.bugs.validationMessage = !(dateElem.prop('validationMessage'));
-		try {
-			dateElem.prop(valueAsNumber, 0);
-		} catch(er){}
-		webshims.bugs.valueAsNumberSet = (dateElem.prop('value') != '1970-01-01');
-		form.remove();
-	}
-	Modernizr.requiredSelect = !!('required' in $('select', form)[0]);
-	
-	//bugfree means interactive formvalidation including correct submit-invalid event handling (this can't be detected, we can just guess)
-	if( !('bugfreeformvalidation' in Modernizr) ){
-		Modernizr.bugfreeformvalidation = Modernizr[formvalidation] && Modernizr.requiredSelect && !webshims.bugs.valueAsNumberSet && !webshims.bugs.validationMessage && (!$.browser.webkit || (navigator.userAgent.indexOf('hrome') != -1 && webshims.browserVersion > 534.19)) && !window.testGoodWithFix;
-	}
-	
-	
-	form = dateElem = null;
-	
-	if(!Modernizr.bugfreeformvalidation){
-		webshims.addPolyfill('form-native-fix', {
-			f: 'forms',
-			dependencies: ['form-extend']
+		if(window.opera || window.testGoodWithFix) {
+			webshims.bugs.validationMessage = !(dateElem.prop('validationMessage'));
+			if((Modernizr.inputtypes || {}).date){
+				try {
+					dateElem.prop('valueAsNumber', 0);
+				} catch(er){}
+				webshims.bugs.valueAsNumberSet = (dateElem.prop('value') != '1970-01-01');
+			}
+			dateElem.prop('value', '');
+		}
+		form.bind('submit', function(e){
+			Modernizr.bugfreeformvalidation = false;
+			loadFormFixes(e);
 		});
-		//remove form-extend readyness
-		webshims.modules['form-extend'].test = $.noop;
+		
+		timer = setTimeout(function(){
+			form && form.triggerHandler('submit');
+		}, 9);
+		//create delegatable events
+		webshims.capturingEvents(['input']);
+		webshims.capturingEvents(['invalid'], true);
+		$('input, select', form).bind('invalid', loadFormFixes)
+			.filter('[type="submit"]')
+			.bind('click', function(e){
+				e.stopImmediatePropagation();
+			})
+			.trigger('click')
+		;
+		
+	} else {
+		//create delegatable events
+		webshims.capturingEvents(['input']);
+		webshims.capturingEvents(['invalid'], true);
 	}
-	webshims.reTest(['form-extend', 'form-message', 'form-native-fix']);
-	if(webshims.isReady('form-number-date-api')){
-		webshims.reTest('form-number-date-api');
-	}
+	
+	
 })(jQuery);
 
 jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
@@ -1509,6 +1586,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		$.expr.filters[name] = $.expr.filters[name+"-element"];
 	});
 	
+	var customEvents = $.event.customEvent || {};
 	var isValid = function(elem){
 		return ($.prop(elem, 'validity') || {valid: 1}).valid;
 	};
@@ -1597,8 +1675,12 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		}, 9));
 	};
 	
-	$(document).bind('focusout change refreshvalidityui', switchValidityClass);
 	
+	$(document).bind('focusout change refreshvalidityui', switchValidityClass);
+	customEvents.changedvaliditystate = true;
+	customEvents.changedvalid = true;
+	customEvents.changedinvalid = true;
+	customEvents.refreshvalidityui = true;
 	
 	
 	webshims.triggerInlineForm = function(elem, event){
@@ -1615,13 +1697,16 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			currentTarget: elem
 		});
 		
-		if(attr && typeof attr == 'string'){
-			ret = webshims.gcEval(attr, elem);
+		if(attr){
 			webshims.warn('we will drop inline event handler support, with next release. use event binding: $.bind instead');
-			if(elem[onEvent]){
-				removed = true;
-				elem[onEvent] = false;
+			if(typeof attr == 'string'){
+				ret = webshims.gcEval(attr, elem);
+				if(elem[onEvent]){
+					removed = true;
+					elem[onEvent] = false;
+				}
 			}
+			
 			
 		}
 		if(ret === false){

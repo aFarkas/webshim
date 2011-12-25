@@ -173,6 +173,16 @@ webshims.addInputType('url', {
 	})()
 });
 
+webshims.defineNodeNameProperty('input', 'type', {
+	prop: {
+		get: function(){
+			var elem = this;
+			var type = (elem.getAttribute('type') || '').toLowerCase();
+			return (webshims.inputTypes[type]) ? type : elem.type;
+		}
+	}
+});
+
 // IDLs for constrain validation API
 //ToDo: add object to this list
 webshims.defineNodeNamesProperties(['button', 'fieldset', 'output'], {
@@ -639,8 +649,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 		createPlaceholder = function(elem){
 			elem = $(elem);
 			var id 			= elem.prop('id'),
-				hasLabel	= !!(elem.attr('title') || elem.attr('aria-labeledby')),
-				pHolderTxt
+				hasLabel	= !!(elem.prop('title') || elem.attr('aria-labeledby'))
 			;
 			if(!hasLabel && id){
 				hasLabel = !!( $('label[for="'+ id +'"]', elem[0].form)[0] );
@@ -739,7 +748,9 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 						if($.nodeName(data.text[0], 'label')){
 							//if label is dynamically set after we ensure that our label isn't exposed anymore
 							//ie always exposes last label and ff always first
-							data.text.hide()[$.browser.msie ? 'insertBefore' : 'insertAfter'](elem);
+							setTimeout(function(){
+								data.text.hide()[$.browser.msie ? 'insertBefore' : 'insertAfter'](elem);
+							}, 9);
 						}
 						$(window).bind('beforeunload', reset);
 						data.box = $(elem);

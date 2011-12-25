@@ -219,4 +219,33 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		}
 		
 	} //end: overrideValidity
+	
+	webshims.defineNodeNameProperty('input', 'type', {
+		prop: {
+			get: function(){
+				var elem = this;
+				var type = (elem.getAttribute('type') || '').toLowerCase();
+				return (webshims.inputTypes[type]) ? type : elem.type;
+			}
+		}
+	});
+	//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
+	if(Modernizr.input.list && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
+		webshims.defineNodeNameProperty('datalist', 'options', {
+			prop: {
+				writeable: false,
+				get: function(){
+					var options = this.options || [];
+					if(!options.length){
+						var elem = this;
+						var select = $('select', elem);
+						if(select[0] && select[0].options && select[0].options.length){
+							options = select[0].options;
+						}
+					}
+					return options;
+				}
+			}
+		});
+	}
 });

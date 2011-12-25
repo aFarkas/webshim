@@ -219,6 +219,35 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		}
 		
 	} //end: overrideValidity
+	
+	webshims.defineNodeNameProperty('input', 'type', {
+		prop: {
+			get: function(){
+				var elem = this;
+				var type = (elem.getAttribute('type') || '').toLowerCase();
+				return (webshims.inputTypes[type]) ? type : elem.type;
+			}
+		}
+	});
+	//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
+	if(Modernizr.input.list && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
+		webshims.defineNodeNameProperty('datalist', 'options', {
+			prop: {
+				writeable: false,
+				get: function(){
+					var options = this.options || [];
+					if(!options.length){
+						var elem = this;
+						var select = $('select', elem);
+						if(select[0] && select[0].options && select[0].options.length){
+							options = select[0].options;
+						}
+					}
+					return options;
+				}
+			}
+		});
+	}
 });jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
 	"use strict";
 	
@@ -1207,11 +1236,13 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		ret = cache.valueAsNumber + (delta * upDown);
 		//using NUMBER.MIN/MAX is really stupid | ToDo: either use disabled state or make this more usable
 		if(!isNaN(cache.minAsNumber) && ret < cache.minAsNumber){
-			ret = (cache.valueAsNumber * upDown  < cache.minAsNumber) ? cache.minAsNumber : isNaN(cache.maxAsNumber) ? Number.MAX_VALUE : cache.maxAsNumber;
+			ret = (cache.valueAsNumber * upDown  < cache.minAsNumber) ? cache.minAsNumber : isNaN(cache.maxAsNumber) ? cache.valueAsNumber : cache.maxAsNumber;
 		} else if(!isNaN(cache.maxAsNumber) && ret > cache.maxAsNumber){
-			ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? Number.MIN_VALUE : cache.minAsNumber;
+			ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? cache.valueAsNumber : cache.minAsNumber;
+		} else {
+			ret = Math.round( ret * 1e7)  / 1e7;
 		}
-		return Math.round( ret * 1e7)  / 1e7;
+		return ret;
 	};
 	
 	webshims.modules["form-number-date-ui"].getNextStep = getNextStep;

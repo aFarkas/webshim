@@ -1,12 +1,11 @@
 (function (factory) {
-	if (typeof define === 'function' && define.amd) {
-		define(['jquery'], factory);
+	if (typeof define === 'function' && define.amd && define.amd.jQuery && !window.jQuery) {
+		define('polyfiller', ['jquery'], factory);
 	} else {
 		factory(jQuery);
 	}
 }(function($){
 	"use strict";
-	
 	var DOMSUPPORT = 'dom-support';
 	var jScripts = $(document.scripts || 'script');
 	var special = $.event.special;
@@ -30,8 +29,8 @@
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
 		
 	
-	$.webshims = {
-		version: 'pre1.8.5',
+	var webshims = {
+		version: '1.8.5RC2',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -255,20 +254,8 @@
 			$.each(names, function(i, name){
 				var handler = function(e){
 					e = $.event.fix(e);
-					if (_maybePrevented && !e._isPolyfilled) {
-						var isDefaultPrevented = e.isDefaultPrevented;
-						var preventDefault = e.preventDefault;
-						e.preventDefault = function(){
-							clearTimeout($.data(e.target, e.type + 'DefaultPrevented'));
-							$.data(e.target, e.type + 'DefaultPrevented', setTimeout(function(){
-								$.removeData(e.target, e.type + 'DefaultPrevented');
-							}, 30));
-							return preventDefault.apply(this, arguments);
-						};
-						e.isDefaultPrevented = function(){
-							return !!(isDefaultPrevented.apply(this, arguments) || $.data(e.target, e.type + 'DefaultPrevented') || false);
-						};
-						e._isPolyfilled = true;
+					if (_maybePrevented && !e._isPolyfilled && webshims.capturingEventPrevented) {
+						webshims.capturingEventPrevented(e);
 					}
 					return $.event.handle.call(this, e);
 				};
@@ -499,16 +486,19 @@
 					loadedSrcs.push(src);
 					if(window.require){
 						require([src], complete);
-					} else if(window.yepnope){
-						if (yepnope.injectJs) {
-							yepnope.injectJs(src, complete);
-						} else {
-							yepnope({
-								load: src,
-								callback: complete
-							});
+					} else if (window.sssl) {
+						sssl(src, complete);
+					} else if (window.yepnope) {
+							if (yepnope.injectJs) {
+								yepnope.injectJs(src, complete);
+							}
+							else {
+								yepnope({
+									load: src,
+									callback: complete
+								});
+							}
 						}
-					}
 					
 				};
 			})()
@@ -518,7 +508,7 @@
 	/*
 	 * shortcuts
 	 */
-	var webshims = $.webshims;
+	$.webshims = webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var googleAPIs = protocol + 'ajax.googleapis.com/ajax/libs/';
 	var uiLib = googleAPIs + 'jqueryui/1.8.16/';
@@ -535,6 +525,7 @@
 		warn: 1,
 		error: 1
 	};
+	
 	webshims.addMethodName = function(name){
 		name = name.split(':');
 		var prop = name[1];
@@ -1068,9 +1059,7 @@
 		});
 				
 		if(Modernizr[formvalidation]){
-			//create delegatable events
-			webshims.capturingEvents(['input']);
-			webshims.capturingEvents(['invalid'], true);
+			
 			
 			//ToDo merge this with form-core (to minimize small requests)
 			addPolyfill('form-extend', {
@@ -1086,7 +1075,7 @@
 				f: 'forms',
 				test: true,
 				loaded: true,
-				c: [2, 3]
+				c: [2, 3, 21]
 			});	
 		} else {
 			addPolyfill('form-dummy', {
@@ -1099,7 +1088,7 @@
 				f: 'forms',
 				src: 'form-shim-extend',
 				dependencies: ['form-core', DOMSUPPORT],
-				c: [3, 2]
+				c: [3, 2, 21]
 			});
 		}
 		
@@ -1109,14 +1098,14 @@
 				return !( this.options.customMessages || !Modernizr[formvalidation] || !modules['form-extend'].test(toLoad) || webshims.bugs.validationMessage );
 			},
 			dependencies: [DOMSUPPORT],
-			c: [3, 2, 59, 17, 5, 4]
+			c: [3, 2, 21, 59, 17, 5, 4]
 		});
 		
 		webshims.addPolyfill('form-output', {
 			f: 'forms',
 			test: ('value' in document.createElement('output')),
 			dependencies: [DOMSUPPORT],
-			c: [3, 2]
+			c: [3, 2, 21]
 		});
 		
 		

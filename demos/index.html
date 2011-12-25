@@ -79,7 +79,7 @@
 						<li>IE6+</li>
 						<li>Firefox 3.6+</li>
 						<li>Safari 4+</li>
-						<li>Safari for iOS 4.2+</li>
+						<li>Safari for iOS 5+</li>
 						<li>Chrome 16.0+</li>
 						<li>Opera 11.6+</li>
 					</ul>
@@ -329,7 +329,7 @@ $(this).checkValidity();
 $.webshims.setOptions("extendNative", false);
 $.webshims.polyfill('forms');
 //...
-//this.checkValidity() does not work cross-browser anymore use: $(this).checkValidity();
+//this.checkValidity() does not work cross-browser anymore use: $(this).checkValidity(); or $(this).callProp('checkValidity');
 </code>	
 
 						</li>
@@ -356,6 +356,117 @@ $('input[type="date"]').getShadowElement().animate({width: 300});
 </code>
 						</li>
 					</ul>
+					</div>
+					<h3 id="polyfill-foucs" class="button">Loading, Performance, FOUCs</h3>
+					<div class="panel">
+						<h3>Making webshims lib more lightweight (call polyfill conditionally)</h3>
+						<p>Webshims lib can be considered as very lightweight polyfill libary. Feature implementations are only loaded in browsers, which do not support those features without any blocking behavior.</p>
+						<p>The grouping of features in webshims lib however is a balancing act. For grouping features, we take the following aspects into account: filesize vs. HTTP-request (minimize requests vs. parallelise requests), relation between features (JSON has nothing to do with input[placeholder], but with localStorage) and the current featureset of modern browsers (current modern browsers shouldn't load too much).</p>
+						<p>In some cases those grouping decisions - made by webshims lib - do not really fit the needs of a project. An example: If a project only need the input[placeholder] and input[autofocus] features, the <code>forms</code> feature has to be used. But <code>forms</code> does not only implement those needed features, but also constraint validation and some other features like formtarget.</p>
+						<p>This would not hurt a browser, which hasn't implemented anything of this (Due to our minimize requests and non blocking approach, the additional filesize isn't really significant). But it hurts browsers, which have implemented those features, but haven't implemented the other features (For example: Safari 5 has no validation UI. Opera 11.5 has a buggy validation API).</p>
+						<p>To make webshims lib really lightweight in those cases, the <code>polyfill</code> method should be called conditionally:</p>
+<code class="block">
+//only polyfill forms, if placeholder or autofocus are not supported
+if(!Modernizr.input.placeholder || !Modernizr.input.autofocus){
+	$.webshims.polyfill('forms');
+}
+</code>				
+						<p>And in case of adding multiple conditionally features:</p>
+<code class="block">
+//always polyfill mediaelement -> mp4, flv, youtube in all browsers
+var polyfillFeatures = ['mediaelement'];
+
+//only polyfill forms, if placeholder or autofocus are not supported
+if(!Modernizr.input.placeholder || !Modernizr.input.autofocus){
+	polyfillFeatures.push('forms');
+}
+//Start polyfilling
+$.webshims.polyfill(polyfillFeatures);
+</code>	
+					<h3>Loading webshims async</h3>
+					<p>If webshims lib is loaded async, there are some configurations which have to be changed manually:</p>
+					<ul>
+						<li>waitReady: should be changed to false. Note: you can not rely on jQuery's DOM-Ready event anymore.</li>
+						<li>basePath: should be set manually</li>
+					</ul>
+					<p>A typical configuration and usage for webshims lib loading async would look like this:</p>
+<code class="block">&lt;script src="modernizr-yepnope.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+	Modernizr.load([
+		{
+			load: '//ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.js',
+			complete: function () {
+				if ( !window.jQuery ) {
+					Modernizr.load('/js/libs/jquery-1.6.2.min.js');
+				}
+			}
+		},
+		{
+			// This will wait for the fallback to load and execute
+			load: '/js/libs/combined-package-with-polyfiller.js',
+			complete: function () {
+				
+				//The following code can be also inside of your combined-package-with-polyfiller.js file package
+				if ( jQuery.webshims ) {
+				
+					//change webshims options
+					jQuery.webshims.setOptions({
+						waitReady: false,
+						basePath: "/js/libs/shims/"
+					});
+					
+					//start polyfilling
+					jQuery.webshims.polyfill('forms canvas');
+					
+					//this is only needed if you want to use polyfilled DOM-features as soon as possible
+					//wait for the normal ready event and...
+					jQuery(function($){
+						//wait until all requested features are implemented
+						$.wehshims.ready('canvas forms', function(){
+							//use polyfilled features
+							var context = $('#myCanvas').getContext("2d");
+						});
+					});
+				}
+				
+			}
+		}
+	]);
+&lt;/script&gt;
+&lt;/head&gt;
+</code>	
+						<h3>Dealing with FOUCs</h3>
+						<p>Webshims lib uses a script loader and loading scripts dynamically always have the potential to create so called Flash of unstyled contents or Flash of unbehaviored contents.</p>
+						<p>There are a lot ways to deal with FOUCs/FOUBCs. The most easiest way to remove FOUCs caused by webshims lib is:</p>
+						<ol>
+							<li>Put your JS into your head and call $.webshims.polyfill() immediately (before DOM-Ready)</li>
+							<li>Put the following CSS in your Stylesheet:
+<code class="block">
+/* 
+The class loading-polyfills is set after you have called polyfill
+and will be removed as soon as all polyfills are loaded and implemented
+*/
+html.loading-polyfills body {
+	visibility: hidden;
+}
+/*
+If polyfilling takes longer as 600ms, an additional class called 'long-loading-polyfill' will be set
+It's good practice to show the user that something is going on in this case
+*/
+html.long-loading-polyfills {
+	background-image: url(polyfill-loader.gif);
+	background-position: center 240px;
+	background-repeat: no-repeat;
+}
+</code>
+							</li>
+						</ol>
+						
+						<h4>Why you should put your webshims inside of your documents head</h4>
+						<p>There is a lot of misunderstanding about the yslow rule "Put your JavaScript at the bottom". Put your JavaScript at the bottom does not decrease total page load time. The effect is psychologic. The user sooner sees how the page is loading, because JS blocks the UI rendering.</p>
+						<p>This also means that a FOUC is not a side effect of "Put your JavaScript at the bottom". It is the intended effect of this technique.</p>
+						<p>Using a script loader (and webshims lib uses a script loader) has a very similiar effect, because dynamically added scripts won't block the UI anymore. Combining both techniques will increase FOUCs.</p>
+						<p>If you use a script loader and put your JS at top you have done everything right about performance. Some versions of yslow recognize that you have used this technique and won't subtract points for this rule ("Put your JavaScript at the bottom"). The nice thing about script loaders is, that loading JS-files dynamically will additionally decrease page load time, because all browsers can parallelize script loading.</p>
 					</div>
 					<h3 id="implement-polyfill" class="button">How to write a new feature implementation?</h3>
 					<div class="panel">
@@ -476,117 +587,7 @@ jQuery.webshims.register('mediaelement', function($, webshims, window, document,
 		
 					</div>
 					
-					<h3 id="polyfill-foucs" class="button">Loading, Performance</h3>
-					<div class="panel">
-						<h3>Making webshims lib more lightweight (call polyfill conditionally)</h3>
-										<p>Webshims lib can be considered as very lightweight polyfill libary. Feature implementations are only loaded in browsers, which do not support those features without any blocking behavior.</p>
-										<p>The grouping of features in webshims lib however is a balancing act. For grouping features, we take the following aspects into account: filesize vs. HTTP-request (minimize requests vs. parallelise requests), relation between features (JSON has nothing to do with input[placeholder], but with localStorage) and the current featureset of modern browsers (current modern browsers shouldn't load too much).</p>
-										<p>In some cases those grouping decisions - made by webshims lib - do not really fit the needs of a project. An example: If a project only need the input[placeholder] and input[autofocus] features, the <code>forms</code> feature has to be used. But <code>forms</code> does not only implement those needed features, but also constraint validation and some other features like formtarget.</p>
-										<p>This would not hurt a browser, which hasn't implemented anything of this (Due to our minimize requests and non blocking approach, the additional filesize isn't really significant). But it hurts browsers, which have implemented those features, but haven't implemented the other features (For example: Safari 5 has no validation UI. Opera 11.5 has a buggy validation API).</p>
-										<p>To make webshims lib really lightweight in those cases, the <code>polyfill</code> method should be called conditionally:</p>
-<code class="block">
-//only polyfill forms, if placeholder or autofocus are not supported
-if(!Modernizr.input.placeholder || !Modernizr.input.autofocus){
-	$.webshims.polyfill('forms');
-}
-</code>				
-
-<code class="block">
-//always polyfill mediaelement -> mp4, flv, youtube in all browsers
-var polyfillFeatures = ['mediaelement'];
-
-//only polyfill forms, if placeholder or autofocus are not supported
-if(!Modernizr.input.placeholder || !Modernizr.input.autofocus){
-	polyfillFeatures.push('forms');
-}
-//Start polyfilling
-$.webshims.polyfill(polyfillFeatures);
-</code>	
-					<h3>Loading webshims async</h3>
-					<p>If webshims lib is loaded async, there are some configurations which have to be changed manually:</p>
-					<ul>
-						<li>waitReady: should be changed to false. Note: you can not rely on jQuery's DOM-Ready event anymore.</li>
-						<li>basePath: should be set manually</li>
-					</ul>
-					<p>A typical configuration and usage for webshims lib loading async would look like this:</p>
-<code class="block">&lt;script src="modernizr-yepnope.js"&gt;&lt;/script&gt;
-&lt;script&gt;
-	Modernizr.load([
-		{
-			load: '//ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.js',
-			complete: function () {
-				if ( !window.jQuery ) {
-					Modernizr.load('/js/libs/jquery-1.6.2.min.js');
-				}
-			}
-		},
-		{
-			// This will wait for the fallback to load and execute
-			load: '/js/libs/combined-package-with-polyfiller.js',
-			complete: function () {
-				
-				//The following code can be also inside of your combined-package-with-polyfiller.js file package
-				if ( jQuery.webshims ) {
-				
-					//change webshims options
-					jQuery.webshims.setOptions({
-						waitReady: false,
-						basePath: "/js/libs/shims/"
-					});
 					
-					//start polyfilling
-					jQuery.webshims.polyfill('forms canvas');
-					
-					//this is only needed if you want to use polyfilled DOM-features as soon as possible
-					//wait for the normal ready event and...
-					jQuery(function($){
-						//wait until all requested features are implemented
-						$.wehshims.ready('canvas forms', function(){
-							//use polyfilled features
-							var context = $('#myCanvas').getContext("2d");
-						});
-					});
-				}
-				
-			}
-		}
-	]);
-&lt;/script&gt;
-&lt;/head&gt;
-</code>	
-						<h3>Dealing with FOUCs</h3>
-						<p>Webshims lib uses a script loader and loading scripts dynamically always have the potential to create so called Flash of unstyled contents or Flash of unbehaviored contents.</p>
-						<p>There are a lot ways to deal with FOUCs/FOUBCs. The most easiest way to remove FOUCs caused by webshims lib is:</p>
-						<ol>
-							<li>Put your JS into your head and call $.webshims.polyfill() immediately (before DOM-Ready)</li>
-							<li>Put the following CSS in your Stylesheet:
-<code class="block">
-/* 
-The class loading-polyfills is set after you have called polyfill
-and will be removed as soon as all polyfills are loaded and implemented
-*/
-html.loading-polyfills body {
-	visibility: hidden;
-}
-/*
-If polyfilling takes longer as 600ms, an additional class called 'long-loading-polyfill' will be set
-It's good practice to show the user that something is going on in this case
-*/
-html.long-loading-polyfills {
-	background-image: url(polyfill-loader.gif);
-	background-position: center 240px;
-	background-repeat: no-repeat;
-}
-</code>
-							</li>
-						</ol>
-						
-						<h4>Why you should put your webshims inside of your documents head</h4>
-						<p>There is a lot of misunderstanding about the yslow rule "Put your JavaScript at the bottom". Put your JavaScript at the bottom does not decrease total page load time. The effect is psychologic. The user sooner sees how the page is loading, because JS blocks the UI rendering.</p>
-						<p>This also means that a FOUC is not a side effect of "Put your JavaScript at the bottom". It is the intended effect of this technique.</p>
-						<p>Using a script loader (and webshims lib uses a script loader) has a very similiar effect, because dynamically added scripts won't block the UI anymore. Combining both techniques will increase FOUCs.</p>
-						<p>If you use a script loader and put your JS at top you have done everything right about performance. Some versions of yslow recognize that you have used this technique and won't subtract points for this rule ("Put your JavaScript at the bottom"). The nice thing about script loaders is, that loading JS-files dynamically will additionally decrease page load time, because all browsers can parallelize script loading.</p>
-					</div>
 					
 					<h3 id="polyfill-philosophy" class="button">Webshims polyfilling philosophy</h3>
 					<div class="panel">

@@ -17,11 +17,17 @@
 			<fileset file="${src}/shims/dom-extend.js" />
 		</concat>
 		
-		<concat destfile="${src}/shims/combos/2.js">
-			<fileset file="${src}/shims/form-core.js" />
+		
+		
+		<concat destfile="${src}/shims/combos/21.js">
 			<fileset file="${src}/shims/form-message.js" />
 			<fileset file="${src}/shims/form-shim-extend.js" />
 			<fileset file="${src}/shims/form-output.js" />
+		</concat>
+		
+		<concat destfile="${src}/shims/combos/2.js">
+			<fileset file="${src}/shims/form-core.js" />
+			<fileset file="${src}/shims/combos/21.js" />
 		</concat>
 		
 		<concat destfile="${src}/shims/combos/3.js">

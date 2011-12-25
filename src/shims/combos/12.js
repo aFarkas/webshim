@@ -337,9 +337,10 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			},
 			content: function(nodeName, prop){
 				createNodeNameInit(nodeName, function(){
-					$(this).filter('['+ prop +']').attr(prop, function(i, val){
-						return val;
-					});
+					var val =  $.attr(this, prop);
+					if(val != null){
+						$.attr(this, prop, val);
+					}
 				});
 			},
 			createElement: function(nodeName, fn){

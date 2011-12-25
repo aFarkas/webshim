@@ -120,7 +120,10 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				}
 			);
 			
-			
+			if($.event.customEvent){
+				$.event.customEvent.updateDatalist = true;
+				$.event.customEvent.updateInput = true;
+			} 
 			webshims.addReady(function(context, contextElem){
 				contextElem.filter('select, option').each(function(){
 					var parent = this.parentNode;
@@ -335,13 +338,13 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				
 				
 				if(!this.updateTimer){
-					if(listidIndex < 2 || window.QUnit || (forceShow = (e && document.activeElement == that.input))){
+					if(window.QUnit || (forceShow = (e && document.activeElement == that.input))){
 						that.updateListOptions(forceShow);
 					} else {
 						this.updateTimer = setTimeout(function(){
 							that.updateListOptions();
 							that = null;
-						}, 100 * listidIndex);
+						}, 300 + (100 * listidIndex));
 					}
 				}
 			},
@@ -416,7 +419,11 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				if(value){
 					this.arrayOptions.forEach(function(item, i){
 						if(!('lowerText' in item)){
-							item.lowerText = item.text.toLowerCase() +  item.value.toLowerCase();
+							if(item.text != item.value){
+								item.lowerText = item.text.toLowerCase() +  item.value.toLowerCase();
+							} else {
+								item.lowerText = item.text.toLowerCase();
+							}
 						}
 						
 						if(item.lowerText.indexOf(value) !== -1){
@@ -751,6 +758,35 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		}
 		
 	} //end: overrideValidity
+	
+	webshims.defineNodeNameProperty('input', 'type', {
+		prop: {
+			get: function(){
+				var elem = this;
+				var type = (elem.getAttribute('type') || '').toLowerCase();
+				return (webshims.inputTypes[type]) ? type : elem.type;
+			}
+		}
+	});
+	//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
+	if(Modernizr.input.list && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
+		webshims.defineNodeNameProperty('datalist', 'options', {
+			prop: {
+				writeable: false,
+				get: function(){
+					var options = this.options || [];
+					if(!options.length){
+						var elem = this;
+						var select = $('select', elem);
+						if(select[0] && select[0].options && select[0].options.length){
+							options = select[0].options;
+						}
+					}
+					return options;
+				}
+			}
+		});
+	}
 });jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
 	"use strict";
 	
@@ -1739,11 +1775,13 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		ret = cache.valueAsNumber + (delta * upDown);
 		//using NUMBER.MIN/MAX is really stupid | ToDo: either use disabled state or make this more usable
 		if(!isNaN(cache.minAsNumber) && ret < cache.minAsNumber){
-			ret = (cache.valueAsNumber * upDown  < cache.minAsNumber) ? cache.minAsNumber : isNaN(cache.maxAsNumber) ? Number.MAX_VALUE : cache.maxAsNumber;
+			ret = (cache.valueAsNumber * upDown  < cache.minAsNumber) ? cache.minAsNumber : isNaN(cache.maxAsNumber) ? cache.valueAsNumber : cache.maxAsNumber;
 		} else if(!isNaN(cache.maxAsNumber) && ret > cache.maxAsNumber){
-			ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? Number.MIN_VALUE : cache.minAsNumber;
+			ret = (cache.valueAsNumber * upDown > cache.maxAsNumber) ? cache.maxAsNumber : isNaN(cache.minAsNumber) ? cache.valueAsNumber : cache.minAsNumber;
+		} else {
+			ret = Math.round( ret * 1e7)  / 1e7;
 		}
-		return Math.round( ret * 1e7)  / 1e7;
+		return ret;
 	};
 	
 	webshims.modules["form-number-date-ui"].getNextStep = getNextStep;

@@ -131,7 +131,9 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				input.bind('keyup keypress keydown paste cut', extraTest).bind('focusout', unbind).bind('input updateInput change', trigger);
 			}
 		;
-			
+		if($.event.customEvent){
+			$.event.customEvent.updateInput = true;
+		} 
 		
 		$(doc)
 			.bind('focusin', function(e){

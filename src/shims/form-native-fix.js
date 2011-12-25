@@ -6,8 +6,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	var xBadWebkit = badWebkit && webshims.browserVersion < 533.18;
 	var invalids = [],
 		firstInvalidEvent,
-		form,
-		fromCheckValidity
+		form
 	;
 	
 	
@@ -118,7 +117,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		var submitTimer;
 		var trueInvalid;
 		$(document).bind('invalid', function(e){
-			if(e.originalEvent && !webshims.fromSubmit && !fromCheckValidity && ($.prop(e.target, 'validity') || {}).valid){
+			if(e.originalEvent && !webshims.fromSubmit && !webshims.fromCheckValidity && ($.prop(e.target, 'validity') || {}).valid){
 				e.originalEvent.wrongWebkitInvalid = true;
 				e.wrongWebkitInvalid = true;
 				e.stopImmediatePropagation();
@@ -140,7 +139,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		webshims.moveToFirstEvent(document, 'invalid');
 		
 		$(document).bind('firstinvalidsystem', function(e, data){
-			if(fromCheckValidity){return;}
+			if(webshims.fromCheckValidity){return;}
 			setTimeout(function(){
 				if(!data.isInvalidUIPrevented()){
 					webshims.validityAlert.showFor(data.element);
@@ -159,11 +158,11 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 						if(!this.willValidate){return true;}
 						var valid = ($.prop(this, 'validity') || {valid: true}).valid;
 						
-						fromCheckValidity = true;
+						webshims.fromCheckValidity = true;
 						if(!valid && desc.prop._supvalue && desc.prop._supvalue.call(this)){
 							$(this).trigger('invalid');
 						}
-						fromCheckValidity = false;
+						webshims.fromCheckValidity = false;
 						return valid;
 					}
 				}
@@ -195,34 +194,6 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		
 	})();
 	
-	(function(){
-		//stupid Opera hasn't fixed this issue right, it's buggy
-		// || webshims.browserVersion > 11.59
-		if(!$.browser.opera){return;}
-		var preventDefault = function(e){
-			e.preventDefault();
-		};
-		
-		['form', 'input', 'textarea', 'select'].forEach(function(name){
-			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
-				prop: {
-					value: function(){
-						if(!webshims.fromSubmit){
-							$(this).bind('invalid', preventDefault);
-						}
-						
-						fromCheckValidity = true;
-						var ret = desc.prop._supvalue.apply(this, arguments);
-						if(!webshims.fromSubmit){
-							$(this).unbind('invalid', preventDefault);
-						}
-						fromCheckValidity = false;
-						return ret;
-					}
-				}
-			});
-		});
-	})();
 	
 	if(!Modernizr.requiredSelect){
 		

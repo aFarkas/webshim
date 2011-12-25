@@ -160,7 +160,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 						if(message){return message;}
 						
 						if(validity.customError && elem.nodeName){
-							message = (Modernizr.validationmessage && desc.prop._supget) ? desc.prop._supget.call(elem) : webshims.data(elem, 'customvalidationMessage');
+							message = (Modernizr.formvalidation && desc.prop._supget) ? desc.prop._supget.call(elem) : webshims.data(elem, 'customvalidationMessage');
 							if(message){return message;}
 						}
 						$.each(validity, function(name, prop){
@@ -179,16 +179,4 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 		});
 		
 	});
-	
-	// add support for new input-types
-	webshims.defineNodeNameProperty('input', 'type', {
-		prop: {
-			get: function(){
-				var elem = this;
-				var type = (elem.getAttribute('type') || '').toLowerCase();
-				return (webshims.inputTypes[type]) ? type : elem.type;
-			}
-		}
-	});
-
 });

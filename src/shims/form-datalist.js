@@ -120,7 +120,10 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				}
 			);
 			
-			
+			if($.event.customEvent){
+				$.event.customEvent.updateDatalist = true;
+				$.event.customEvent.updateInput = true;
+			} 
 			webshims.addReady(function(context, contextElem){
 				contextElem.filter('select, option').each(function(){
 					var parent = this.parentNode;
@@ -335,13 +338,13 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				
 				
 				if(!this.updateTimer){
-					if(listidIndex < 2 || window.QUnit || (forceShow = (e && document.activeElement == that.input))){
+					if(window.QUnit || (forceShow = (e && document.activeElement == that.input))){
 						that.updateListOptions(forceShow);
 					} else {
 						this.updateTimer = setTimeout(function(){
 							that.updateListOptions();
 							that = null;
-						}, 100 * listidIndex);
+						}, 300 + (100 * listidIndex));
 					}
 				}
 			},
@@ -416,7 +419,11 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				if(value){
 					this.arrayOptions.forEach(function(item, i){
 						if(!('lowerText' in item)){
-							item.lowerText = item.text.toLowerCase() +  item.value.toLowerCase();
+							if(item.text != item.value){
+								item.lowerText = item.text.toLowerCase() +  item.value.toLowerCase();
+							} else {
+								item.lowerText = item.text.toLowerCase();
+							}
 						}
 						
 						if(item.lowerText.indexOf(value) !== -1){
