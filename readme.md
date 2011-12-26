@@ -75,6 +75,13 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+upcomming Release 1.8.5
+----------
+
+- improved performance (webshims did it again)
+- much improved bug detection for buggy interactive constraint validation (no more assumptions)
+- updated modernizr
+
 Release 1.8.4
 ----------
 

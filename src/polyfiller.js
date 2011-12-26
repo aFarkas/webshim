@@ -1112,7 +1112,15 @@
 		addPolyfill('form-number-date-api', {
 			f: 'forms-ext',
 			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && modernizrInputTypes.time && modernizrInputTypes.number);},
-			test: function(){return (this.uiTest() && !webshims.bugs.valueAsNumberSet);},
+			test: function(toLoad){
+				if(!this.addedForms && toLoad){
+					this.addedForms = true;
+					if($.inArray('form-core', toLoad) == -1){
+						toLoad.push('form-core');
+					}
+				}
+				return (this.uiTest() && !webshims.bugs.valueAsNumberSet);
+			},
 			dependencies: ['forms', DOMSUPPORT],
 			c: [18, 7, 6]
 		});

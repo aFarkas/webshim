@@ -39,9 +39,11 @@ jQuery.webshims.gcEval = function(){
 				e.stopImmediatePropagation();
 			}
 			clearTimeout(timer);
-			if(!form){return;}
-			form.remove();
-			form = dateElem = null;
+			setTimeout(function(){
+				if(!form){return;}
+				form.remove();
+				form = dateElem = null;
+			}, 9);
 			if(!Modernizr.bugfreeformvalidation || !Modernizr.requiredSelect){
 				webshims.addPolyfill('form-native-fix', {
 					f: 'forms',
