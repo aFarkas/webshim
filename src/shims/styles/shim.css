@@ -477,8 +477,7 @@ datalist {
 	max-width: 100%;
 	text-overflow: ellipsis;
 }
-.datalist-polyfill .option-value,
-.datalist-polyfill li.same-value-label .option-value {
+.datalist-polyfill .option-value {
 	display: none;
 	float: right;
 	text-overflow: ellipsis;

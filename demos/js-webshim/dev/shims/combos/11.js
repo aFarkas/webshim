@@ -1220,9 +1220,8 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					};
 					if(!rItem.text){
 						rItem.text = rItem.value;
-						rItem.className += ' same-value-label';
-					} else if(rItem.text == rItem.value){
-						rItem.className += ' same-value-label';
+					} else if(rItem.text != rItem.value){
+						rItem.className += ' different-label-value';
 					}
 					values[rI] = rItem.value;
 					allOptions[rI] = rItem;
@@ -1234,7 +1233,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				
 				this.storedOptions.forEach(function(val, i){
 					if(values.indexOf(val) == -1){
-						allOptions.push({value: val, text: val, className: 'stored-suggest same-value-label', style: ''});
+						allOptions.push({value: val, text: val, className: 'stored-suggest', style: ''});
 					}
 				});
 				
