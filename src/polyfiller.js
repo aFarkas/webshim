@@ -1150,7 +1150,7 @@
 			},
 			c: [18, 7, 6]
 		});
-		modernizrInputAttrs.list = Modernizr.datalist = !!(modernizrInputAttrs.list && window.HTMLDataListElement);
+		modernizrInputAttrs.list = Modernizr.datalist = !!(modernizrInputAttrs.list && ('HTMLDataListElement' in window));
 		
 		addPolyfill('form-datalist', {
 			f: 'forms-ext',

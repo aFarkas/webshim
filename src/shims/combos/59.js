@@ -1189,9 +1189,10 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				}
 				listidIndex++;
 				var that = this;
+				this.hideList = $.proxy(that, 'hideList');
 				this.timedHide = function(){
 					clearTimeout(that.hideTimer);
-					that.hideTimer = setTimeout($.proxy(that, 'hideList'), 9);
+					that.hideTimer = setTimeout(that.hideList, 9);
 				};
 				this.datalist = datalist;
 				this.id = opts.id;
@@ -1224,7 +1225,13 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 						//role: 'combobox',
 						'aria-haspopup': 'true'
 					})
-					.bind('input.datalistWidget', $.proxy(this, 'showHideOptions'))
+					.bind('input.datalistWidget', function(){
+						if(!that.triggeredByDatalist){
+							that.changedValue = false;
+							that.showHideOptions();
+						}
+					})
+					
 					.bind('keydown.datalistWidget', function(e){
 						var keyCode = e.keyCode;
 						var items;
@@ -1251,11 +1258,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 						} 
 						if(keyCode == 13 || keyCode == 27){
 							if (keyCode == 13){
-								var activeItem = $('li.active-item:not(.hidden-item)', that.shadowList);
-								if(activeItem[0]){
-									$.prop(that.input, 'value', $('span.option-value', activeItem).text());
-									$(that.input).triggerHandler('updateInput');
-								}
+								that.changeValue( $('li.active-item:not(.hidden-item)', that.shadowList) );
 							}
 							that.hideList();
 							return false;
@@ -1379,7 +1382,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				
 				for(rI = 0, rLen = allOptions.length; rI < rLen; rI++){
 					item = allOptions[rI];
-					list[rI] = '<li class="'+ item.className +'" style="'+ item.style +'" tabindex="-1" role="listitem"><span class="option-label">'+ item.text +'</span><span class="option-value"> '+item.value+'</span></li>';
+					list[rI] = '<li class="'+ item.className +'" style="'+ item.style +'" tabindex="-1" role="listitem"><span class="option-label">'+ item.text +'</span> <span class="option-value">'+item.value+'</span></li>';
 				}
 				
 				this.arrayOptions = allOptions;
@@ -1456,7 +1459,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				this.shadowList.css(css).addClass('datalist-visible');
 				this.isListVisible = true;
 				//todo
-				$(document).bind('mousedown.datalist'+this.id +' focusin.datalist'+this.id, function(e){
+				$(document).unbind('.datalist'+this.id).bind('mousedown.datalist'+this.id +' focusin.datalist'+this.id, function(e){
 					if(e.target === that.input ||  that.shadowList[0] === e.target || $.contains( that.shadowList[0], e.target )){
 						clearTimeout(that.hideTimer);
 						setTimeout(function(){
@@ -1470,6 +1473,13 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			},
 			hideList: function(){
 				if(!this.isListVisible){return false;}
+				var that = this;
+				var triggerChange = function(e){
+					if(that.changedValue){
+						$(that.input).trigger('change');
+					}
+					that.changedValue = false;
+				};
 				this.shadowList
 					.removeClass('datalist-visible list-item-active')
 					.scrollTop(0)
@@ -1477,7 +1487,16 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				;
 				this.index = -1;
 				this.isListVisible = false;
-				$(this.input).removeAttr('aria-activedescendant');
+				if(this.changedValue){
+					that.triggeredByDatalist = true;
+					webshims.triggerInlineForm && webshims.triggerInlineForm(this.input, 'input');
+					if(this.input == document.activeElement || $(this.input).is(':focus')){
+						$(this.input).one('blur', triggerChange);
+					} else {
+						triggerChange();
+					}
+					that.triggeredByDatalist = true;
+				}
 				$(document).unbind('.datalist'+this.id);
 				return true;
 			},
@@ -1496,9 +1515,22 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					this.shadowList.scrollTop( this.shadowList.scrollTop() + (elemPos.top - containerHeight) + 2);
 				}
 			},
+			changeValue: function(activeItem){
+				if(!activeItem[0]){return;}
+				var newValue = $('span.option-value', activeItem).text();
+				var oldValue = $.prop(this.input, 'value');
+				if(newValue != oldValue){
+					$(this.input)
+						.prop('value', newValue)
+						.triggerHandler('updateInput')
+					;
+					this.changedValue = true;
+				}
+			},
 			markItem: function(index, doValue, items){
 				var activeItem;
 				var goesUp;
+				
 				items = items || $('li:not(.hidden-item)', this.shadowList);
 				if(!items.length){return;}
 				if(index < 0){
@@ -1511,9 +1543,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				activeItem = items.filter(':eq('+ index +')').addClass('active-item');
 				
 				if(doValue){
-					$.prop(this.input, 'value', $('span.option-value', activeItem).text());
-					$.attr(this.input, 'aria-activedescendant', $.webshims.getID(activeItem));
-					$(this.input).triggerHandler('updateInput');
+					this.changeValue(activeItem);
 					this.scrollIntoView(activeItem);
 				}
 				this.index = index;
