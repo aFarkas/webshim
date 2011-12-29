@@ -341,10 +341,13 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					if(window.QUnit || (forceShow = (e && document.activeElement == that.input))){
 						that.updateListOptions(forceShow);
 					} else {
-						this.updateTimer = setTimeout(function(){
-							that.updateListOptions();
-							that = null;
-						}, 300 + (100 * listidIndex));
+						webshims.ready('WINDOWLOAD', function(){
+							that.updateTimer = setTimeout(function(){
+								that.updateListOptions();
+								that = null;
+								listidIndex = 1;
+							}, 200 + (100 * listidIndex));
+						});
 					}
 				}
 			},

@@ -1497,7 +1497,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			webshims.addPolyfill('mediaelement-native-fix', {
 				f: 'mediaelement',
 				test: Modernizr.videoBuffered,
-				dependencies: ['dom-support']
+				d: ['dom-support']
 			});
 			
 			webshims.reTest('mediaelement-native-fix');

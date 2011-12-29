@@ -34,6 +34,7 @@ jQuery.webshims.gcEval = function(){
 		var dateElem = $('input', form);
 		var timer;
 		var loadFormFixes = function(e){
+			var reTest = ['form-extend', 'form-native-fix'];
 			if(e){
 				e.preventDefault();
 				e.stopImmediatePropagation();
@@ -47,18 +48,21 @@ jQuery.webshims.gcEval = function(){
 			if(!Modernizr.bugfreeformvalidation || !Modernizr.requiredSelect){
 				webshims.addPolyfill('form-native-fix', {
 					f: 'forms',
-					dependencies: ['form-extend']
+					d: ['form-extend']
 				});
 				//remove form-extend readyness
 				webshims.modules['form-extend'].test = $.noop;
 			}
-			webshims.reTest(['form-extend', 'form-message', 'form-native-fix']);
+			
 			
 			if(webshims.isReady('form-number-date-api')){
-				webshims.reTest('form-number-date-api');
+				reTest.push('form-number-date-api');
 			}
-			
-			//stupid Opera hasn't fixed this issue right, it's buggy
+			if(webshims.bugs.validationMessage){
+				reTest.push('form-message');
+			}
+			webshims.reTest(reTest);
+			//Opera hasn't fixed this issue right, it's buggy
 			// || webshims.browserVersion > 11.59
 			if ($.browser.opera || window.testGoodWithFix) {
 				webshims.loader.loadList(['dom-extend']);
@@ -88,6 +92,26 @@ jQuery.webshims.gcEval = function(){
 						});
 					});
 				});
+				
+				//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
+				if(Modernizr.input.list && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
+					webshims.defineNodeNameProperty('datalist', 'options', {
+						prop: {
+							writeable: false,
+							get: function(){
+								var options = this.options || [];
+								if(!options.length){
+									var elem = this;
+									var select = $('select', elem);
+									if(select[0] && select[0].options && select[0].options.length){
+										options = select[0].options;
+									}
+								}
+								return options;
+							}
+						}
+					});
+				}
 			}
 		};
 		

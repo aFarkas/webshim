@@ -495,7 +495,7 @@ $.webshims.addPolyfill('magicMethod', {
 	test: function(){
 		return ('magicMethod' in window);	
 	},
-	dependencies: ['es5', 'json-storage']
+	d: ['es5', 'json-storage'] // d = dependencies
 });
 // load magicMethod.js and its dependencies if test returns false
 </code>		
@@ -515,7 +515,7 @@ $.webshims.addPolyfill('mediaelement', {
 	test: function(){
 		return ('canPlayType' in document.createElement('video'));	
 	},
-	dependencies: ['dom-support'],
+	d: ['dom-support'],
 	methodNames: ['play'] //pause, load
 });
 // load mediaelement.js and DOM extension features from shim folder

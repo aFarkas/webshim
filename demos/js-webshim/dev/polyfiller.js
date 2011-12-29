@@ -284,8 +284,8 @@
 					fn($, webshims, window, document, undefined, module.options);
 					isReady(name, true);
 				};
-				if (module.dependencies) {
-					onReady(module.dependencies, ready);
+				if (module.d) {
+					onReady(module.d, ready);
 				}
 				else {
 					ready();
@@ -342,13 +342,13 @@
 				};
 				
 				var setDependencies = function(module, list){
-					if (module.dependencies && module.dependencies.length) {
+					if (module.d && module.d.length) {
 						var addDependency = function(i, dependency){
 							if (!noNeedToLoad(dependency, list) && $.inArray(dependency, list) == -1) {
 								list.push(dependency);
 							}
 						};
-						$.each(module.dependencies, function(i, dependency){
+						$.each(module.d, function(i, dependency){
 							if (modules[dependency]) {
 								addDependency(i, dependency);
 							}
@@ -628,6 +628,9 @@
 		}
 		$(function(){
 			isReady('DOM', true);
+			setTimeout(function(){
+				isReady('WINDOWLOAD', true);
+			}, 9999);
 		});
 		$(window).load(function(){
 			isReady('WINDOWLOAD', true);
@@ -929,7 +932,7 @@
 	addPolyfill('dom-extend', {
 		f: DOMSUPPORT,
 		noAutoCallback: true,
-		dependencies: ['es5'],
+		d: ['es5'],
 		c: [10, 9, 12, 17, 16, 8, 1, 19, 11, 13]
 	});
 		
@@ -956,7 +959,7 @@
 				destroyWrite: true
 	//			,confirmText: ''
 			},
-			dependencies: ['json-storage'],
+			d: ['json-storage'],
 			c: [14, 15]
 		});
 	}
@@ -1009,7 +1012,7 @@
 					});
 				},
 				methodNames: ['getContext'],
-				dependencies: [DOMSUPPORT]
+				d: [DOMSUPPORT]
 			});
 		}
 	})();
@@ -1036,7 +1039,7 @@
 				
 		addPolyfill('form-core', {
 			f: 'forms',
-			dependencies: ['es5'],
+			d: ['es5'],
 			test: function(toLoad){
 				if(this.options.lightweightDatalist && !this.datalistLoaded){
 					this.datalistLoaded = true;
@@ -1066,9 +1069,9 @@
 				f: 'forms',
 				src: 'form-native-extend',
 				test: function(toLoad){
-					return ((modules['form-number-date-api'].test() || $.inArray('form-number-date-api', toLoad) == -1) && !this.options.overrideMessages );
+					return ((modules['form-number-date-api'].test() || $.inArray('form-number-date-api', toLoad  || []) == -1) && !this.options.overrideMessages );
 				},
-				dependencies: ['form-core', DOMSUPPORT, 'form-message'],
+				d: ['form-core', DOMSUPPORT, 'form-message'],
 				c: [18, 7, 59, 5]
 			});
 			addPolyfill('form-dummy', {
@@ -1087,7 +1090,7 @@
 			addPolyfill('form-extend', {
 				f: 'forms',
 				src: 'form-shim-extend',
-				dependencies: ['form-core', DOMSUPPORT],
+				d: ['form-core', DOMSUPPORT],
 				c: [3, 2, 21]
 			});
 		}
@@ -1097,14 +1100,14 @@
 			test: function(toLoad){
 				return !( this.options.customMessages || !Modernizr[formvalidation] || !modules['form-extend'].test(toLoad) || webshims.bugs.validationMessage );
 			},
-			dependencies: [DOMSUPPORT],
+			d: [DOMSUPPORT],
 			c: [3, 2, 21, 59, 17, 5, 4]
 		});
 		
 		webshims.addPolyfill('form-output', {
 			f: 'forms',
 			test: ('value' in document.createElement('output')),
-			dependencies: [DOMSUPPORT],
+			d: [DOMSUPPORT],
 			c: [3, 2, 21]
 		});
 		
@@ -1121,14 +1124,14 @@
 				}
 				return (this.uiTest() && !webshims.bugs.valueAsNumberSet);
 			},
-			dependencies: ['forms', DOMSUPPORT],
+			d: ['forms', DOMSUPPORT],
 			c: [18, 7, 6]
 		});
 		
 		addPolyfill('form-number-date-ui', {
 			f: 'forms-ext',
 			test: function(){return modules['form-number-date-api'].test() && !this.options.replaceUI;},
-			dependencies: ['forms', DOMSUPPORT, 'form-number-date-api'],
+			d: ['forms', DOMSUPPORT, 'form-number-date-api'],
 			loadInit: function(){
 				loadList(['jquery-ui']);
 				if(modules['input-widgets'].src){
@@ -1152,7 +1155,7 @@
 		addPolyfill('form-datalist', {
 			f: 'forms-ext',
 			test: modernizrInputAttrs.list,
-			dependencies: ['form-core', DOMSUPPORT],
+			d: ['form-core', DOMSUPPORT],
 			c: [3, 59, 18, 19, 11]
 		});
 	}
@@ -1161,7 +1164,7 @@
 	
 	addPolyfill('details', {
 		test: Modernizr.details,
-		dependencies: [DOMSUPPORT],
+		d: [DOMSUPPORT],
 		options: {
 //			animate: false,
 			text: 'Details'
@@ -1176,7 +1179,7 @@
 			f: 'mediaelement',
 			noAutoCallback: true,
 			
-			dependencies: ['swfobject',DOMSUPPORT],
+			d: ['swfobject',DOMSUPPORT],
 			c: [10, 9, 12, 17, 16, 8]
 		});
 		addPolyfill('mediaelement-swf', {
@@ -1190,7 +1193,7 @@
 				changeJW: $.noop
 			},
 			methodNames: ['play', 'pause', 'canPlayType', 'mediaLoad:load'],
-			dependencies: ['swfobject', DOMSUPPORT],
+			d: ['swfobject', DOMSUPPORT],
 			test: function(){
 				if(!Modernizr.audio || !Modernizr.video){
 					return false;

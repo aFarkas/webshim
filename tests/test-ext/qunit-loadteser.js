@@ -166,9 +166,9 @@
 				$.each(features, function(i, name){
 					var dependencyTime;
 					var module = $.webshims.modules[name];
-					if(module && module.dependencies && module.dependencies.length){
+					if(module && module.d && module.d.length){
 						dependencyTime = true;
-						$.webshims.ready(module.dependencies, function(){
+						$.webshims.ready(module.d, function(){
 							dependencyTime = $.now();
 						});
 					}

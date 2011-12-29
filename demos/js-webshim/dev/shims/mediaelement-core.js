@@ -14,7 +14,7 @@
 			webshims.addPolyfill('mediaelement-native-fix', {
 				f: 'mediaelement',
 				test: Modernizr.videoBuffered,
-				dependencies: ['dom-support']
+				d: ['dom-support']
 			});
 			
 			webshims.reTest('mediaelement-native-fix');
