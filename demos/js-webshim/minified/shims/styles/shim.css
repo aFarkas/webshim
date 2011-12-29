@@ -468,6 +468,20 @@ datalist {
 	overflow: hidden;
 	white-space: nowrap;
 	cursor: default;
+	zoom: 1;
+	overflow: hidden;
+}
+.datalist-polyfill .option-label {
+	display: inline-block;
+	float: left;
+	max-width: 100%;
+	text-overflow: ellipsis;
+}
+.datalist-polyfill .option-value,
+.datalist-polyfill li.same-value-label .option-value {
+	display: none;
+	float: right;
+	text-overflow: ellipsis;
 }
 .datalist-polyfill li.hidden-item {
 	display: none !important;

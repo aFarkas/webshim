@@ -1205,10 +1205,10 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				this.arrayOptions = [];
 				
 				this.shadowList
-					.delegate('li', 'mouseover.datalistWidget mousedown.datalistWidget click.datalistWidget', function(e){
+					.delegate('li', 'mouseenter.datalistWidget mousedown.datalistWidget click.datalistWidget', function(e){
 						var items = $('li:not(.hidden-item)', that.shadowList);
 						var select = (e.type == 'mousedown' || e.type == 'click');
-						that.markItem(items.index(e.target), select, items);
+						that.markItem(items.index(e.currentTarget), select, items);
 						if(e.type == 'click'){
 							that.hideList();
 						}
@@ -1253,7 +1253,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 							if (keyCode == 13){
 								var activeItem = $('li.active-item:not(.hidden-item)', that.shadowList);
 								if(activeItem[0]){
-									$.prop(that.input, 'value', activeItem.attr('data-value'));
+									$.prop(that.input, 'value', $('span.option-value', activeItem).text());
 									$(that.input).triggerHandler('updateInput');
 								}
 							}
@@ -1348,9 +1348,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				
 				var values = [];
 				var allOptions = [];
-				var rElem;
-				var rItem;
-				for(var rOptions = $.prop(this.datalist, 'options'), rI = 0, rLen = rOptions.length; rI < rLen; rI++){
+				var rElem, rItem, rOptions, rI, rLen, item;
+				for(rOptions = $.prop(this.datalist, 'options'), rI = 0, rLen = rOptions.length; rI < rLen; rI++){
 					rElem = rOptions[rI];
 					if(rElem.disabled){return;}
 					rItem = {
@@ -1361,6 +1360,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					};
 					if(!rItem.text){
 						rItem.text = rItem.value;
+						rItem.className += ' same-value-label';
+					} else if(rItem.text == rItem.value){
+						rItem.className += ' same-value-label';
 					}
 					values[rI] = rItem.value;
 					allOptions[rI] = rItem;
@@ -1372,14 +1374,14 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				
 				this.storedOptions.forEach(function(val, i){
 					if(values.indexOf(val) == -1){
-						allOptions.push({value: val, text: val, className: 'stored-suggest', style: ''});
+						allOptions.push({value: val, text: val, className: 'stored-suggest same-value-label', style: ''});
 					}
 				});
 				
-				allOptions.forEach(function(item, i){
-					var val = item.value.indexOf('"') != -1 ? "'"+ item.value +"'" : '"' + item.value +'"';
-					list[i] = '<li data-value='+ val +' class="'+ item.className +'" style="'+ item.style +'" tabindex="-1" role="listitem">'+ item.text +'</li>';
-				});
+				for(rI = 0, rLen = allOptions.length; rI < rLen; rI++){
+					item = allOptions[rI];
+					list[rI] = '<li class="'+ item.className +'" style="'+ item.style +'" tabindex="-1" role="listitem"><span class="option-label">'+ item.text +'</span><span class="option-value"> '+item.value+'</span></li>';
+				}
 				
 				this.arrayOptions = allOptions;
 				this.shadowList.html('<ul role="list" class="'+ (this.datalist.className || '') + ' '+ this.datalist.id +'-shadowdom' +'">'+ list.join("\n") +'</ul>');
@@ -1510,7 +1512,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				activeItem = items.filter(':eq('+ index +')').addClass('active-item');
 				
 				if(doValue){
-					$.prop(this.input, 'value', activeItem.attr('data-value'));
+					$.prop(this.input, 'value', $('span.option-value', activeItem).text());
 					$.attr(this.input, 'aria-activedescendant', $.webshims.getID(activeItem));
 					$(this.input).triggerHandler('updateInput');
 					this.scrollIntoView(activeItem);
