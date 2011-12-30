@@ -2198,24 +2198,24 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 					}
 					that.changedValue = false;
 				};
-				this.shadowList
+				that.shadowList
 					.removeClass('datalist-visible list-item-active')
 					.scrollTop(0)
 					.find('li.active-item').removeClass('active-item')
 				;
-				this.index = -1;
-				this.isListVisible = false;
-				if(this.changedValue){
+				that.index = -1;
+				that.isListVisible = false;
+				if(that.changedValue){
 					that.triggeredByDatalist = true;
 					webshims.triggerInlineForm && webshims.triggerInlineForm(this.input, 'input');
-					if(this.input == document.activeElement || $(this.input).is(':focus')){
-						$(this.input).one('blur', triggerChange);
+					if(that.input == document.activeElement || $(that.input).is(':focus')){
+						$(that.input).one('blur', triggerChange);
 					} else {
 						triggerChange();
 					}
-					that.triggeredByDatalist = true;
+					that.triggeredByDatalist = false;
 				}
-				$(document).unbind('.datalist'+this.id);
+				$(document).unbind('.datalist'+that.id);
 				return true;
 			},
 			scrollIntoView: function(elem){
