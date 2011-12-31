@@ -457,6 +457,31 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		} catch(er){}
 	}
 	
+	var noAttrCopy = {
+		className: 1,
+		'class': 1,
+		min: 1,
+		max: 1,
+		step: 1,
+		value: 1,
+		id: 1,
+		name: 1,
+		placeholder: 1,
+		disabled: 1,
+		readonly: 1,
+		readOnly: 1,
+		pattern: 1,
+		required: 1,
+		maxLength: 1,
+		maxlength: 1,
+		type: 1
+	};
+	
+	var focusAttrs = {
+		tabindex: 1,
+		tabIndex: 1
+	};
+	
 	replaceInputUI.common = function(orig, shim, methods){
 		if(Modernizr.formvalidation){
 			orig.bind('firstinvalid', function(e){
@@ -470,6 +495,17 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					orig.unbind('invalid.replacedwidgetbubble');
 				});
 			});
+		}
+		var attrs, length, i, prop, propName;
+		var focusElement = $('input, span.ui-slider-handle', shim);
+		for (attrs = orig[0].attributes, length = attrs.length, i = 0; i < length; ++i) {
+			if ((prop = attrs[i]) && prop.specified && !noAttrCopy[ (propName = prop.nodeName) ]) {
+				if(focusAttrs[propName] && focusElement[0]){
+					focusElement.attr(propName, prop.nodeValue);
+				} else {
+					shim[0].setAttribute(propName, prop.nodeValue);
+				}
+			}
 		}
 		var id = orig.attr('id'),
 			attr = {
@@ -486,7 +522,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		webshims.addShadowDom(orig, shim, {
 			data: methods || {},
 			shadowFocusElement: $('input.input-datetime-local-date, span.ui-slider-handle', shim)[0],
-			shadowChilds: $('input, span.ui-slider-handle', shim)
+			shadowChilds: focusElement
 		});
 		
 		orig
