@@ -193,9 +193,13 @@
 		if( !elem.getAttribute('data-dependent-validation') ){return;}
 		
 		var data = $(elem).data('dependentValidation');
+		var specialVal;
 		if(!data){return;}
 		var depFn = function(e){
 			var val = $.prop(data.masterElement, data["from-prop"]);
+			if(specialVal){
+				val = $.inArray(val, specialVal) !== -1;
+			}
 			if(data.toggle){
 				val = !val;
 			}
@@ -220,11 +224,19 @@
 				if(!data.prop && data["from-prop"] == 'checked'){
 					data.prop = 'disabled';
 				}
+			} else if(!data["from-prop"]){
+				data["from-prop"] = 'value';
+			}
+			
+			if(data["from-prop"].indexOf('value:') === 0){
+				specialVal = data["from-prop"].replace('value:', '').split('||');
+				data["from-prop"] = 'value';
+				
 			}
 			
 			data = $.data(elem, 'dependentValidation', $.extend({_init: true}, dependentDefaults, data));
 			
-			if(data.prop !== "value"){
+			if(data.prop !== "value" || specialVal){
 				$(data.masterElement).bind('change', depFn);
 			} else {
 				$(data.masterElement).bind('change', function(){
@@ -233,7 +245,7 @@
 			}
 		}
 
-		if(data.prop == "value"){
+		if(data.prop == "value" && !specialVal){
 			return ($.prop(data.masterElement, 'value') != val);
 		} else {
 			depFn();

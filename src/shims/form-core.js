@@ -342,7 +342,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		});
 		
 		if(attr){
-			webshims.warn('we will drop inline event handler support, with next release. use event binding: $.bind instead');
+			webshims.warn(onEvent +' used. we will drop inline event handler support, with next release. use event binding: $.bind instead');
 			if(typeof attr == 'string'){
 				ret = webshims.gcEval(attr, elem);
 				if(elem[onEvent]){

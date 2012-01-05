@@ -375,7 +375,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		
 });/* number-date-ui */
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
-jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined){
+jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var triggerInlineForm = webshims.triggerInlineForm;
 	var modernizrInputTypes = Modernizr.inputtypes;
@@ -420,8 +420,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			}
 		};
 	})();
-		
-	var options = $.webshims.cfg['forms-ext'];
+	
+	
 	var defaultDatepicker = {dateFormat: 'yy-mm-dd'};
 	var labelID = 0;
 	var emptyJ = $([]);
@@ -457,30 +457,21 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		} catch(er){}
 	}
 	
-	var noAttrCopy = {
-		className: 1,
-		'class': 1,
-		min: 1,
-		max: 1,
-		step: 1,
-		value: 1,
-		id: 1,
-		name: 1,
-		placeholder: 1,
-		disabled: 1,
-		readonly: 1,
-		readOnly: 1,
-		pattern: 1,
-		required: 1,
-		maxLength: 1,
-		maxlength: 1,
-		type: 1
-	};
-	
-	var focusAttrs = {
+	var copyAttrs = {
 		tabindex: 1,
-		tabIndex: 1
+		tabIndex: 1,
+		title: 1,
+		"aria-required": 1,
+		"aria-invalid": 1
 	};
+	if(!options.copyAttrs){
+		options.copyAttrs = {};
+	}
+	
+	webshims.extendUNDEFProp(options.copyAttrs, copyAttrs);
+	
+	
+	var focusAttrs = copyAttrs;
 	
 	replaceInputUI.common = function(orig, shim, methods){
 		if(Modernizr.formvalidation){
@@ -496,17 +487,19 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				});
 			});
 		}
-		var attrs, length, i, prop, propName;
+		var i, prop;
 		var focusElement = $('input, span.ui-slider-handle', shim);
-		for (attrs = orig[0].attributes, length = attrs.length, i = 0; i < length; ++i) {
-			if ((prop = attrs[i]) && prop.specified && !noAttrCopy[ (propName = prop.nodeName) ]) {
-				if(focusAttrs[propName] && focusElement[0]){
-					focusElement.attr(propName, prop.nodeValue);
+		var attrs = orig[0].attributes;
+		for(i in options.copyAttrs){
+			if ((prop = attrs[i]) && prop.specified) {
+				if(focusAttrs[i] && focusElement[0]){
+					focusElement.attr(i, prop.nodeValue);
 				} else {
-					shim[0].setAttribute(propName, prop.nodeValue);
+					shim[0].setAttribute(i, prop.nodeValue);
 				}
 			}
 		}
+		
 		var id = orig.attr('id'),
 			attr = {
 				css: {

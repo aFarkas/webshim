@@ -303,7 +303,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 					validityState.valid = false;
 				}
 			});
-			elem.setAttribute('aria-invalid',  validityState.valid ? 'false' : 'true');
+			$(this).getShadowFocusElement().attr('aria-invalid',  validityState.valid ? 'false' : 'true');
 			jElm = null;
 			elem = null;
 			return validityState;
@@ -313,10 +313,9 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 
 webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
 	set: function(value){
-		var elem = this;
-		elem.setAttribute('aria-required', !!(value)+'');
+		$(this).getShadowFocusElement().attr('aria-required', !!(value)+'');
 	},
-	initAttr: true
+	initAttr: (!$.browser.msie || webshims.browserVersion > 7)//only if we have aria-support
 });
 
 webshims.reflectProperties(['input'], ['pattern']);

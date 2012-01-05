@@ -1504,7 +1504,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		}
 	}
 
-$.webshims.ready('dom-support swfobject', function($, webshims, window, document, undefined){
+jQuery.webshims.register('mediaelement-core', function($, webshims, window, document, undefined){
 	var mediaelement = webshims.mediaelement;
 	var options = webshims.cfg.mediaelement;
 	var getSrcObj = function(elem, nodeName){
@@ -1823,6 +1823,8 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 		}
 	});
 	
+	
+	//set native implementation ready, before swf api is retested
 	if(hasNative){
 		webshims.isReady('mediaelement-core', true);
 	}
@@ -1881,10 +1883,8 @@ $.webshims.ready('dom-support swfobject', function($, webshims, window, document
 		;
 	});
 	
-	if(!hasNative){
-		webshims.isReady('mediaelement-core', true);
-	} else if(hasSwf){
-		webshims.ready('WINDOWLOAD', loadSwf);
+	if(hasNative && hasSwf){
+		webshims.ready('WINDOWLOAD mediaelement', loadSwf);
 	}
 	
 });

@@ -342,7 +342,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		});
 		
 		if(attr){
-			webshims.warn('we will drop inline event handler support, with next release. use event binding: $.bind instead');
+			webshims.warn(onEvent +' used. we will drop inline event handler support, with next release. use event binding: $.bind instead');
 			if(typeof attr == 'string'){
 				ret = webshims.gcEval(attr, elem);
 				if(elem[onEvent]){
@@ -1036,7 +1036,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 					validityState.valid = false;
 				}
 			});
-			elem.setAttribute('aria-invalid',  validityState.valid ? 'false' : 'true');
+			$(this).getShadowFocusElement().attr('aria-invalid',  validityState.valid ? 'false' : 'true');
 			jElm = null;
 			elem = null;
 			return validityState;
@@ -1046,10 +1046,9 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 
 webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
 	set: function(value){
-		var elem = this;
-		elem.setAttribute('aria-required', !!(value)+'');
+		$(this).getShadowFocusElement().attr('aria-required', !!(value)+'');
 	},
-	initAttr: true
+	initAttr: (!$.browser.msie || webshims.browserVersion > 7)//only if we have aria-support
 });
 
 webshims.reflectProperties(['input'], ['pattern']);
@@ -1866,12 +1865,10 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				return globStoredOptions[name];
 			}
 			var data;
-			webshims.ready('json-storage', function(){
-				try {
-					data = JSON.parse(localStorage.getItem('storedDatalistOptions'+name));
-				} catch(e){}
-				globStoredOptions[name] = data || [];
-			});
+			try {
+				data = JSON.parse(localStorage.getItem('storedDatalistOptions'+name));
+			} catch(e){}
+			globStoredOptions[name] = data || [];
 			return data || [];
 		};
 		var storeOptions = function(name, val){
@@ -2155,6 +2152,13 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 					this.hideList();
 				}
 			},
+			getPos: function(){
+				var css = $(this.input).offset();
+				css.top += $(this.input).outerHeight();
+				
+				css.width = $(this.input).outerWidth() - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
+				return css;
+			},
 			showList: function(){
 				if(this.isListVisible){return false;}
 				if(this.needsUpdate){
@@ -2163,29 +2167,33 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				this.showHideOptions();
 				if(!this.hasViewableData){return false;}
 				var that = this;
-				var css = $(this.input).offset();
-				css.top += $(this.input).outerHeight();
-				
-				css.width = $(this.input).outerWidth() - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
+				var resizeTimer;
+				var css = that.getPos();
 				
 				if(lteie6){
-					this.shadowList.css('height', 'auto');
-					if(this.shadowList.height() > 250){
-						this.shadowList.css('height', 220);
+					that.shadowList.css('height', 'auto');
+					if(that.shadowList.height() > 250){
+						that.shadowList.css('height', 220);
 					}
 				}
-				this.shadowList.css(css).addClass('datalist-visible');
-				this.isListVisible = true;
-				//todo
-				$(document).unbind('.datalist'+this.id).bind('mousedown.datalist'+this.id +' focusin.datalist'+this.id, function(e){
+				that.shadowList.css(css).addClass('datalist-visible');
+				that.isListVisible = true;
+				
+				$(document).unbind('.datalist'+that.id).bind('mousedown.datalist'+that.id +' focusin.datalist'+that.id, function(e){
 					if(e.target === that.input ||  that.shadowList[0] === e.target || $.contains( that.shadowList[0], e.target )){
 						clearTimeout(that.hideTimer);
 						setTimeout(function(){
 							clearTimeout(that.hideTimer);
-						}, 0);
+						}, 9);
 					} else {
 						that.timedHide();
 					}
+				});
+				$(window).unbind('.datalist'+that.id).bind('resize.datalist'+that.id, function(){
+					clearTimeout(resizeTimer);
+					resizeTimer = setTimeout(function(){
+						that.shadowList.css(that.getPos());
+					}, 9);
 				});
 				return true;
 			},
@@ -2207,7 +2215,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				that.isListVisible = false;
 				if(that.changedValue){
 					that.triggeredByDatalist = true;
-					webshims.triggerInlineForm && webshims.triggerInlineForm(this.input, 'input');
+					webshims.triggerInlineForm && webshims.triggerInlineForm(that.input, 'input');
 					if(that.input == document.activeElement || $(that.input).is(':focus')){
 						$(that.input).one('blur', triggerChange);
 					} else {
@@ -2216,6 +2224,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 					that.triggeredByDatalist = false;
 				}
 				$(document).unbind('.datalist'+that.id);
+				$(window).unbind('.datalist'+that.id);
 				return true;
 			},
 			scrollIntoView: function(elem){

@@ -342,7 +342,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		});
 		
 		if(attr){
-			webshims.warn('we will drop inline event handler support, with next release. use event binding: $.bind instead');
+			webshims.warn(onEvent +' used. we will drop inline event handler support, with next release. use event binding: $.bind instead');
 			if(typeof attr == 'string'){
 				ret = webshims.gcEval(attr, elem);
 				if(elem[onEvent]){
@@ -1036,7 +1036,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 					validityState.valid = false;
 				}
 			});
-			elem.setAttribute('aria-invalid',  validityState.valid ? 'false' : 'true');
+			$(this).getShadowFocusElement().attr('aria-invalid',  validityState.valid ? 'false' : 'true');
 			jElm = null;
 			elem = null;
 			return validityState;
@@ -1046,10 +1046,9 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 
 webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
 	set: function(value){
-		var elem = this;
-		elem.setAttribute('aria-required', !!(value)+'');
+		$(this).getShadowFocusElement().attr('aria-required', !!(value)+'');
 	},
-	initAttr: true
+	initAttr: (!$.browser.msie || webshims.browserVersion > 7)//only if we have aria-support
 });
 
 webshims.reflectProperties(['input'], ['pattern']);

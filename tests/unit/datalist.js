@@ -16,7 +16,7 @@ asyncTest("datalist", function(){
 	if(!Modernizr.input.list){
 		var shadowListItems = $('div.datalist-polyfill li');
 		$.each(['yes aßäöâ', 'yes "2"', "yes '3'"], function(i, val){
-			equals($.attr(shadowListItems[i], 'data-value'), val, 'shadow datalistitems value equals options value');
+			equals($('span.option-value', shadowListItems[i]).text(), val, 'shadow datalistitems value equals options value');
 		});
 		strictEqual($('#email').attr('aria-haspopup'), 'true', 'input[list] has aria');
 	}
@@ -54,7 +54,7 @@ asyncTest("datalist", function(){
 			var shadowListItems = $('li', shadowList);
 			strictEqual(shadowList.length, 1, 'there is on dlist2 element');
 			$.each(['secondlist', 'dynamic appended'], function(i, val){
-				equals($.attr(shadowListItems[i], 'data-value'), val, 'shadow datalistitems value equals options value');
+				equals($('span.option-value', shadowListItems[i]).text(), val, 'shadow datalistitems value equals options value');
 			});
 			shadowList.remove();
 		});
@@ -69,7 +69,7 @@ asyncTest("datalist", function(){
 			var shadowListItems = $('li', shadowList);
 			strictEqual(shadowList.length, 1, 'there is on dlist2 element');
 			$.each(['dynamic appended1', 'dynamic appended2'], function(i, val){
-				equals($.attr(shadowListItems[i], 'data-value'), val, 'shadow datalistitems value equals options value');
+				equals($('span.option-value', shadowListItems[i]).text(), val, 'shadow datalistitems value equals options value');
 			});
 			shadowList.remove();
 			

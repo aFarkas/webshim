@@ -165,12 +165,10 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				return globStoredOptions[name];
 			}
 			var data;
-			webshims.ready('json-storage', function(){
-				try {
-					data = JSON.parse(localStorage.getItem('storedDatalistOptions'+name));
-				} catch(e){}
-				globStoredOptions[name] = data || [];
-			});
+			try {
+				data = JSON.parse(localStorage.getItem('storedDatalistOptions'+name));
+			} catch(e){}
+			globStoredOptions[name] = data || [];
 			return data || [];
 		};
 		var storeOptions = function(name, val){
@@ -454,6 +452,13 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					this.hideList();
 				}
 			},
+			getPos: function(){
+				var css = $(this.input).offset();
+				css.top += $(this.input).outerHeight();
+				
+				css.width = $(this.input).outerWidth() - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
+				return css;
+			},
 			showList: function(){
 				if(this.isListVisible){return false;}
 				if(this.needsUpdate){
@@ -462,29 +467,33 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				this.showHideOptions();
 				if(!this.hasViewableData){return false;}
 				var that = this;
-				var css = $(this.input).offset();
-				css.top += $(this.input).outerHeight();
-				
-				css.width = $(this.input).outerWidth() - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
+				var resizeTimer;
+				var css = that.getPos();
 				
 				if(lteie6){
-					this.shadowList.css('height', 'auto');
-					if(this.shadowList.height() > 250){
-						this.shadowList.css('height', 220);
+					that.shadowList.css('height', 'auto');
+					if(that.shadowList.height() > 250){
+						that.shadowList.css('height', 220);
 					}
 				}
-				this.shadowList.css(css).addClass('datalist-visible');
-				this.isListVisible = true;
-				//todo
-				$(document).unbind('.datalist'+this.id).bind('mousedown.datalist'+this.id +' focusin.datalist'+this.id, function(e){
+				that.shadowList.css(css).addClass('datalist-visible');
+				that.isListVisible = true;
+				
+				$(document).unbind('.datalist'+that.id).bind('mousedown.datalist'+that.id +' focusin.datalist'+that.id, function(e){
 					if(e.target === that.input ||  that.shadowList[0] === e.target || $.contains( that.shadowList[0], e.target )){
 						clearTimeout(that.hideTimer);
 						setTimeout(function(){
 							clearTimeout(that.hideTimer);
-						}, 0);
+						}, 9);
 					} else {
 						that.timedHide();
 					}
+				});
+				$(window).unbind('.datalist'+that.id).bind('resize.datalist'+that.id, function(){
+					clearTimeout(resizeTimer);
+					resizeTimer = setTimeout(function(){
+						that.shadowList.css(that.getPos());
+					}, 9);
 				});
 				return true;
 			},
@@ -506,7 +515,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				that.isListVisible = false;
 				if(that.changedValue){
 					that.triggeredByDatalist = true;
-					webshims.triggerInlineForm && webshims.triggerInlineForm(this.input, 'input');
+					webshims.triggerInlineForm && webshims.triggerInlineForm(that.input, 'input');
 					if(that.input == document.activeElement || $(that.input).is(':focus')){
 						$(that.input).one('blur', triggerChange);
 					} else {
@@ -515,6 +524,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					that.triggeredByDatalist = false;
 				}
 				$(document).unbind('.datalist'+that.id);
+				$(window).unbind('.datalist'+that.id);
 				return true;
 			},
 			scrollIntoView: function(elem){
@@ -1198,7 +1208,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		
 });/* number-date-ui */
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
-jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined){
+jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var triggerInlineForm = webshims.triggerInlineForm;
 	var modernizrInputTypes = Modernizr.inputtypes;
@@ -1243,8 +1253,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			}
 		};
 	})();
-		
-	var options = $.webshims.cfg['forms-ext'];
+	
+	
 	var defaultDatepicker = {dateFormat: 'yy-mm-dd'};
 	var labelID = 0;
 	var emptyJ = $([]);
@@ -1280,30 +1290,21 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		} catch(er){}
 	}
 	
-	var noAttrCopy = {
-		className: 1,
-		'class': 1,
-		min: 1,
-		max: 1,
-		step: 1,
-		value: 1,
-		id: 1,
-		name: 1,
-		placeholder: 1,
-		disabled: 1,
-		readonly: 1,
-		readOnly: 1,
-		pattern: 1,
-		required: 1,
-		maxLength: 1,
-		maxlength: 1,
-		type: 1
-	};
-	
-	var focusAttrs = {
+	var copyAttrs = {
 		tabindex: 1,
-		tabIndex: 1
+		tabIndex: 1,
+		title: 1,
+		"aria-required": 1,
+		"aria-invalid": 1
 	};
+	if(!options.copyAttrs){
+		options.copyAttrs = {};
+	}
+	
+	webshims.extendUNDEFProp(options.copyAttrs, copyAttrs);
+	
+	
+	var focusAttrs = copyAttrs;
 	
 	replaceInputUI.common = function(orig, shim, methods){
 		if(Modernizr.formvalidation){
@@ -1319,17 +1320,19 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				});
 			});
 		}
-		var attrs, length, i, prop, propName;
+		var i, prop;
 		var focusElement = $('input, span.ui-slider-handle', shim);
-		for (attrs = orig[0].attributes, length = attrs.length, i = 0; i < length; ++i) {
-			if ((prop = attrs[i]) && prop.specified && !noAttrCopy[ (propName = prop.nodeName) ]) {
-				if(focusAttrs[propName] && focusElement[0]){
-					focusElement.attr(propName, prop.nodeValue);
+		var attrs = orig[0].attributes;
+		for(i in options.copyAttrs){
+			if ((prop = attrs[i]) && prop.specified) {
+				if(focusAttrs[i] && focusElement[0]){
+					focusElement.attr(i, prop.nodeValue);
 				} else {
-					shim[0].setAttribute(propName, prop.nodeValue);
+					shim[0].setAttribute(i, prop.nodeValue);
 				}
 			}
 		}
+		
 		var id = orig.attr('id'),
 			attr = {
 				css: {

@@ -21,7 +21,7 @@
 	<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
 	
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
-	<script src="../../js-webshim/minified/extras/custom-validity.js"></script>
+	<script src="../../js-webshim/dev/extras/custom-validity.js"></script>
 	
     <script class="example">
 //    	$.webshims.debug = true;
@@ -235,6 +235,23 @@ $.webshims.customErrorMessages.testname['de'] = 'Sie müßen "foo bar baz" einge
 	                    </div>
 						
 						
+						<div class="form-element">
+	                        <label for="special1">
+	                            special1: 
+							</label>
+	                       	<select name="special1" id="special1">
+	                       		<option value="test1">test1 (requires special2)</option>
+								<option value="test 2">test 2 (requires special2)</option>
+								<option value="test 3">test 3 (does not require special2)</option>
+							</select>
+							<br />
+							<label for="special2" >
+	                            special2 (dependent-validation='{"from": "special1", "prop": "required", "from-prop": "value:test1||test 2"}'): 
+							</label>
+	                       	<input data-dependent-validation='{"from": "special1", "prop": "required", "from-prop": "value:test1||test 2"}' name="special2" type="text" id="special2" />
+	                    </div>
+						
+						
 	                    <div class="button-wrapper">
 	                    	<input type="submit" value="Send" />
 	                    </div>
@@ -247,7 +264,7 @@ $.webshims.customErrorMessages.testname['de'] = 'Sie müßen "foo bar baz" einge
 </div>
 	<footer>			
 		<small>
-			Note: every shim is a hack! working with native cutting edge technology is also a hack!
+			<strong>Note</strong>: every polyfill is a hack! innovative frontend development is hacky and always will be hacky!
 		</small>
 	</footer>
 <!--[if lte IE 7]>

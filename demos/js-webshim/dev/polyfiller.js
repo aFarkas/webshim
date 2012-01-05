@@ -30,7 +30,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.5RC2',
+		version: '1.8.5RC3',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -414,7 +414,9 @@
 						module = loadCombos[i];
 						
 						if($.inArray(module, loadedModules) == -1){
-							$.each(modules[module].c, loadCombo);
+							if(webshims.debug != 'noCombo'){
+								$.each(modules[module].c, loadCombo);
+							}
 							if(!foundCombo){
 								loadScript(modules[module].src || module, module);
 							}
