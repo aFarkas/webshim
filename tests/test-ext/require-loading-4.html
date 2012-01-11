@@ -4,32 +4,27 @@
 		<meta charset="utf-8" />
 		<title>Webshims Lib Test Suite</title>
 		<script src="require.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
 		<script src="../../src/extras/modernizr-custom.js"></script>
 		<script>
 			require.config({
-				baseUrl: "../../src/",
-				paths: {
-					"jquery": "http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery"
-				}
+				baseUrl: "../../src/"
 			});
 			window.asyncWebshims = {
 				cfg: {
 					basePath: "../../src/shims/",
-					extendNative: false,
 					waitReady: false,
-					loadStyles: false,
 					forms: {
 						customMessages: true
 					}
 				},
-				lang: "ru",
-				polyfill: "forms mediaelement"
+				polyfill: "forms-ext"
 			};
 			(function(){
 				var requireCallback = false;
-				require( ["jquery", "polyfiller"], function(e){
+				require( ["polyfiller"], function(e){
 					requireCallback = true;
-					$.webshims.ready('forms mediaelement', function(){
+					$.webshims.ready('forms-ext', function(){
 						(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, $.webshims.cfg.extendNative);
 					});
 				});

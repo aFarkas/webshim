@@ -1,8 +1,10 @@
 (function (factory) {
-	if (typeof define === 'function' && define.amd && define.amd.jQuery && !window.jQuery) {
-		define('polyfiller', ['jquery'], factory);
-	} else {
+	if(window.jQuery){
 		factory(jQuery);
+		factory = jQuery.noop;
+	}
+	if (typeof define === 'function' && define.amd && define.amd.jQuery) {
+		define('polyfiller', ['jquery'], factory);
 	}
 }(function($){
 	"use strict";
@@ -30,7 +32,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.5RC3',
+		version: 'pre1.8.5',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -513,7 +515,7 @@
 	$.webshims = webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var googleAPIs = protocol + 'ajax.googleapis.com/ajax/libs/';
-	var uiLib = googleAPIs + 'jqueryui/1.8.16/';
+	var uiLib = googleAPIs + 'jqueryui/1.8.17/';
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;

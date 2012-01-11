@@ -4,36 +4,36 @@
 		<meta charset="utf-8" />
 		<title>Webshims Lib Test Suite</title>
 		<script src="require.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
 		<script src="../../src/extras/modernizr-custom.js"></script>
 		<script>
-			require.config({
-				baseUrl: "../../src/",
-				paths: {
-					"jquery": "http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery"
-				}
-			});
 			window.asyncWebshims = {
 				cfg: {
 					basePath: "../../src/shims/",
 					extendNative: false,
 					waitReady: false,
-					loadStyles: false,
 					forms: {
 						customMessages: true
 					}
 				},
-				lang: "ru",
-				polyfill: "forms mediaelement"
+				polyfill: "forms-ext json-storage geolocation"
 			};
+		</script>
+		<script src="../../src/polyfiller.js"></script>
+		<script>
+			
+			
+			
 			(function(){
-				var requireCallback = false;
+				var webshimsReady = false;
 				require( ["jquery", "polyfiller"], function(e){
-					requireCallback = true;
-					$.webshims.ready('forms mediaelement', function(){
-						(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, $.webshims.cfg.extendNative);
+					$.webshims.ready('forms-ext json-storage geolocation', function(){
+						setTimeout(function(){
+							(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, webshimsReady);
+						}, 1);
 					});
 				});
-				
+				webshimsReady = !!$.webshims;
 			})();
 		</script>
 	</head>
