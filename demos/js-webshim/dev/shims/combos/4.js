@@ -374,15 +374,30 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	setRoot();
 	webshims.ready('DOM', setRoot);
 	
+	webshims.getRelOffset = function(posElem, relElem){
+		posElem = $(posElem);
+		var offset = $(relElem).offset();
+		var bodyOffset;
+		$.swap($(posElem)[0], {visibility: 'hidden', display: 'inline-block', left: 0, top: 0}, function(){
+			bodyOffset = posElem.offset();
+		});
+		offset.top -= bodyOffset.top;
+		offset.left -= bodyOffset.left;
+		return offset;
+	};
+	
 	/* some extra validation UI */
 	webshims.validityAlert = (function(){
 		var alertElem = (!$.browser.msie || parseInt($.browser.version, 10) > 7) ? 'span' : 'label';
-		var bodyOffset = {top: 0, left: 0};
+		var errorBubble;
+		var hideTimer = false;
+		var focusTimer = false;
+		var resizeTimer = false;
+		var boundHide;
+		
 		var api = {
 			hideDelay: 5000,
-			getBodyOffset: function(){
-				bodyOffset = errorBubble.offset();
-			},
+			
 			showFor: function(elem, message, noFocusElem, noBubble){
 				api._create();
 				elem = $(elem);
@@ -402,6 +417,14 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					if(this.hideDelay){
 						hideTimer = setTimeout(boundHide, this.hideDelay);
 					}
+					$(window)
+						.bind('resize.validityalert orientationchange.validityalert emchange.validityalert', function(){
+							clearTimeout(resizeTimer);
+							resizeTimer = setTimeout(function(){
+								api.position(visual);
+							}, 9);
+						})
+					;
 				}
 				
 				if(!noFocusElem){
@@ -409,11 +432,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				}
 			},
 			getOffsetFromBody: function(elem){
-				var offset = $(elem).offset();
-				$.swap(errorBubble[0], {visibility: 'hidden', display: 'inline-block', left: 0, top: 0}, api.getBodyOffset);
-				offset.top -= bodyOffset.top;
-				offset.left -= bodyOffset.left;
-				return offset;
+				return webshims.getRelOffset(errorBubble, elem);
 			},
 			setFocus: function(visual, offset){
 				var focusElem = $(visual).getShadowFocusElement();
@@ -468,7 +487,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			clear: function(){
 				clearTimeout(focusTimer);
 				clearTimeout(hideTimer);
-				$(document).unbind('focusout.validityalert');
+				$(document).unbind('.validityalert');
+				$(window).unbind('.validityalert');
 				errorBubble.stop().removeAttr('for');
 			},
 			_create: function(){
@@ -483,10 +503,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			}
 		};
 		
-		var errorBubble;
-		var hideTimer = false;
-		var focusTimer = false;
-		var boundHide = $.proxy(api, 'hide');
+		
+		boundHide = $.proxy(api, 'hide');
 		
 		return api;
 	})();

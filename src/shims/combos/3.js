@@ -374,15 +374,30 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	setRoot();
 	webshims.ready('DOM', setRoot);
 	
+	webshims.getRelOffset = function(posElem, relElem){
+		posElem = $(posElem);
+		var offset = $(relElem).offset();
+		var bodyOffset;
+		$.swap($(posElem)[0], {visibility: 'hidden', display: 'inline-block', left: 0, top: 0}, function(){
+			bodyOffset = posElem.offset();
+		});
+		offset.top -= bodyOffset.top;
+		offset.left -= bodyOffset.left;
+		return offset;
+	};
+	
 	/* some extra validation UI */
 	webshims.validityAlert = (function(){
 		var alertElem = (!$.browser.msie || parseInt($.browser.version, 10) > 7) ? 'span' : 'label';
-		var bodyOffset = {top: 0, left: 0};
+		var errorBubble;
+		var hideTimer = false;
+		var focusTimer = false;
+		var resizeTimer = false;
+		var boundHide;
+		
 		var api = {
 			hideDelay: 5000,
-			getBodyOffset: function(){
-				bodyOffset = errorBubble.offset();
-			},
+			
 			showFor: function(elem, message, noFocusElem, noBubble){
 				api._create();
 				elem = $(elem);
@@ -402,6 +417,14 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					if(this.hideDelay){
 						hideTimer = setTimeout(boundHide, this.hideDelay);
 					}
+					$(window)
+						.bind('resize.validityalert orientationchange.validityalert emchange.validityalert', function(){
+							clearTimeout(resizeTimer);
+							resizeTimer = setTimeout(function(){
+								api.position(visual);
+							}, 9);
+						})
+					;
 				}
 				
 				if(!noFocusElem){
@@ -409,11 +432,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				}
 			},
 			getOffsetFromBody: function(elem){
-				var offset = $(elem).offset();
-				$.swap(errorBubble[0], {visibility: 'hidden', display: 'inline-block', left: 0, top: 0}, api.getBodyOffset);
-				offset.top -= bodyOffset.top;
-				offset.left -= bodyOffset.left;
-				return offset;
+				return webshims.getRelOffset(errorBubble, elem);
 			},
 			setFocus: function(visual, offset){
 				var focusElem = $(visual).getShadowFocusElement();
@@ -468,7 +487,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			clear: function(){
 				clearTimeout(focusTimer);
 				clearTimeout(hideTimer);
-				$(document).unbind('focusout.validityalert');
+				$(document).unbind('.validityalert');
+				$(window).unbind('.validityalert');
 				errorBubble.stop().removeAttr('for');
 			},
 			_create: function(){
@@ -483,10 +503,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			}
 		};
 		
-		var errorBubble;
-		var hideTimer = false;
-		var focusTimer = false;
-		var boundHide = $.proxy(api, 'hide');
+		
+		boundHide = $.proxy(api, 'hide');
 		
 		return api;
 	})();
@@ -1984,6 +2002,11 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 							that.showList();
 						}
 					})
+					.bind('mousedown.datalistWidget', function(){
+						if(this == document.activeElement || $(this).is(':focus')){
+							that.showList();
+						}
+					})
 					.bind('blur.datalistWidget', this.timedHide)
 				;
 				
@@ -2111,7 +2134,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 					this.showHideOptions();
 				}
 			},
-			showHideOptions: function(){
+			showHideOptions: function(_fromShowList){
 				var value = $.prop(this.input, 'value').toLowerCase();
 				//first check prevent infinite loop, second creates simple lazy optimization
 				if(value === this.lastUpdatedValue || (this.lastUnfoundValue && value.indexOf(this.lastUnfoundValue) === 0)){
@@ -2144,19 +2167,19 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				}
 				
 				this.hasViewableData = found;
-				
-				if(found){
+				if(!_fromShowList && found){
 					this.showList();
-				} else {
+				}
+				if(!found){
 					this.lastUnfoundValue = value;
 					this.hideList();
 				}
 			},
-			getPos: function(){
-				var css = $(this.input).offset();
+			setPos: function(){
+				var css = webshims.getRelOffset(this.shadowList, this.input);
 				css.top += $(this.input).outerHeight();
-				
 				css.width = $(this.input).outerWidth() - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
+				this.shadowList.css(css);
 				return css;
 			},
 			showList: function(){
@@ -2164,20 +2187,20 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				if(this.needsUpdate){
 					this.updateListOptions();
 				}
-				this.showHideOptions();
+				this.showHideOptions(true);
 				if(!this.hasViewableData){return false;}
+				this.isListVisible = true;
 				var that = this;
 				var resizeTimer;
-				var css = that.getPos();
 				
+				that.setPos();
 				if(lteie6){
 					that.shadowList.css('height', 'auto');
 					if(that.shadowList.height() > 250){
 						that.shadowList.css('height', 220);
 					}
 				}
-				that.shadowList.css(css).addClass('datalist-visible');
-				that.isListVisible = true;
+				that.shadowList.addClass('datalist-visible');
 				
 				$(document).unbind('.datalist'+that.id).bind('mousedown.datalist'+that.id +' focusin.datalist'+that.id, function(e){
 					if(e.target === that.input ||  that.shadowList[0] === e.target || $.contains( that.shadowList[0], e.target )){
@@ -2189,12 +2212,16 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 						that.timedHide();
 					}
 				});
-				$(window).unbind('.datalist'+that.id).bind('resize.datalist'+that.id, function(){
-					clearTimeout(resizeTimer);
-					resizeTimer = setTimeout(function(){
-						that.shadowList.css(that.getPos());
-					}, 9);
-				});
+				$(window)
+					.unbind('.datalist'+that.id)
+					.bind('resize.datalist'+that.id +'orientationchange.datalist '+that.id +' emchange.datalist'+that.id, function(){
+						clearTimeout(resizeTimer);
+						resizeTimer = setTimeout(function(){
+							that.setPos();
+						}, 9);
+					})
+				;
+				clearTimeout(resizeTimer);
 				return true;
 			},
 			hideList: function(){
