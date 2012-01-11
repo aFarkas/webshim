@@ -1404,7 +1404,13 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 			if(!hasLabel && id){
 				hasLabel = !!( $('label[for="'+ id +'"]', elem[0].form)[0] );
 			}
-			return $( hasLabel ? '<span class="placeholder-text"></span>' : '<label for="'+ (id || $.webshims.getID(elem)) +'" class="placeholder-text"></label>');
+			if(!hasLabel){
+				if(!id){
+					id = $.webshims.getID(elem);
+				}
+				hasLabel = !!($('label #'+ id)[0]);
+			}
+			return $( hasLabel ? '<span class="placeholder-text"></span>' : '<label for="'+ id +'" class="placeholder-text"></label>');
 		},
 		pHolder = (function(){
 			var delReg 	= /\n|\r|\f|\t/g,
