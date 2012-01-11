@@ -134,7 +134,7 @@
 				<div class="panel">
 <code class="block">
 &lt;!-- dependencies: jQuery + Modernizr with yepnope --&gt;
-&lt;script src="js/jquery-1.6.4.js"&gt;&lt;/script&gt;
+&lt;script src="js/jquery-1.7.1.js"&gt;&lt;/script&gt;
 &lt;script src="js/modernizr-yepnope-custom.js"&gt;&lt;/script&gt;
 	
 &lt;!-- reference the base script --&gt;
@@ -254,7 +254,7 @@ $.webshims.ready('DOM canvas', function(){
 					<ul>
 						<li><strong>extendNative</strong> (default: true): Webshims lib will automatically extend DOM-Objects with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNative is set to false, webshims lib won't touch any DOM-Objects and will only implement jQuery plugins.</li>
 						<li><strong>basePath</strong> (default: "automatially computed path to the shims folder"): If polyfiller.js was renamed <strong>and</strong> is loaded dynamically, the basePath should be changed manually.</li>
-						<li><strong>waitReady</strong> (default: true): If this option is true, jQuery's ready-event will be delayed until all needed features are ready to use. This option should be only set to false, if webshims lib polyfiller.js is loaded async (see also Loading webshims async in the <a href="#embed-polyfill">embed documentation</a>).</li>
+						<li><strong>waitReady</strong> (default: true): If this option is true, jQuery's ready-event will be delayed until all needed features are ready to use. This option should be set to false, if webshims lib polyfiller.js is loaded async (see also Loading webshims async in the <a href="#polyfill-foucs">loading documentation</a>).</li>
 					</ul>
 <code class="block">
 $.webshims.setOptions("extendNative", false);

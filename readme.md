@@ -78,9 +78,11 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 upcomming Release 1.8.5
 ----------
 
-- improved performance (webshims did it again)
 - much improved bug detection for buggy interactive constraint validation (no more assumptions)
-- updated modernizr
+- new custom event **changedvaliditystate** for forms feature
+- improved overlay placement (errormessage/datalist)
+- <del>improved performance (webshims did it again)</del>
+- <del>updated modernizr</del>
 
 Release 1.8.4
 ----------
