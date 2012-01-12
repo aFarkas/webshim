@@ -294,12 +294,6 @@ img.ui-datepicker-trigger {
 .input-range.ui-slider-horizontal .ui-slider-range-max {
 	right: 0;
 }
-
-.input-datetime-local-date.hasDatepicker,
-.input-date.hasDatepicker {
-	position: relative;
-	z-index: 100;
-}
 .input-date-datepicker-control {
 	position: absolute;
 	zoom: 1;
