@@ -32,7 +32,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.5RC4',
+		version: '1.8.5RC5',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -631,6 +631,7 @@
 			isReady('DOM', true);
 		}
 		$(function(){
+			$.isDOMReady = true;
 			isReady('DOM', true);
 			setTimeout(function(){
 				isReady('WINDOWLOAD', true);
