@@ -579,18 +579,7 @@ webshims.addReady(function(context, contextElem){
 	
 });
 
-}); //webshims.ready end
-}//end formvalidation
-/*
- * HTML5 placeholder-enhancer
- * version: 2.0.2
- * including a11y-name fallback
- * 
- * 
- */
-
-
-jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc, undefined){
+(function(){
 	Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
 	if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder){return;}
 	var isOver = (webshims.cfg.forms.placeholderType == 'over');
@@ -823,5 +812,7 @@ jQuery.webshims.ready('dom-support form-core', function($, webshims, window, doc
 		desc = webshims.defineNodeNameProperty(name, 'value', placeholderValueDesc);
 	});
 	
-});
+})();
 
+}); //webshims.ready end
+}//end formvalidation
