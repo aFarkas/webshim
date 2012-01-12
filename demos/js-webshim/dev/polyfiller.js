@@ -490,20 +490,21 @@
 					loadedSrcs.push(src);
 					if(window.require){
 						require([src], complete);
+					} else if (window.steal) {
+						steal(src).then(complete);
 					} else if (window.sssl) {
 						sssl(src, complete);
 					} else if (window.yepnope) {
-							if (yepnope.injectJs) {
-								yepnope.injectJs(src, complete);
-							}
-							else {
-								yepnope({
-									load: src,
-									callback: complete
-								});
-							}
+						if (yepnope.injectJs) {
+							yepnope.injectJs(src, complete);
 						}
-					
+						else {
+							yepnope({
+								load: src,
+								callback: complete
+							});
+						}
+					}
 				};
 			})()
 		}
