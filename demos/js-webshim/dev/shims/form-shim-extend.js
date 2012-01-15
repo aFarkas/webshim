@@ -93,7 +93,12 @@ var validityRules = {
 			if(val === '' || cache.nodeName == 'select'){return false;}
 			var pattern = input.attr('pattern');
 			if(!pattern){return false;}
-			pattern = new RegExp('^(?:' + pattern + ')$');
+			try {
+				pattern = new RegExp('^(?:' + pattern + ')$');
+			} catch(er){
+				webshims.error("wrong patter used: "+ er);
+				pattern = false;
+			}
 			if(!pattern){return false;}
 			return !(pattern.test(val));
 		}
