@@ -976,7 +976,7 @@ var baseCheckValidity = function(elem){
 			baseCheckValidity.unhandledInvalids = true;
 		}
 	}
-	$.removeData(elem, 'cachedValidity', false);
+	$.removeData(elem, 'cachedValidity');
 	return v.valid;
 };
 
@@ -1010,6 +1010,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 	},
 	setCustomValidity: {
 		value: function(error){
+			$.removeData(this, 'cachedValidity');
 			webshims.data(this, 'customvalidationMessage', ''+error);
 		}
 	},
@@ -1553,6 +1554,7 @@ webshims.addReady(function(context, contextElem){
 				set: function(val){
 					var elem = this;
 					var placeholder = webshims.contentAttr(elem, 'placeholder');
+					$.removeData(elem, 'cachedValidity');
 					var ret = desc[propType]._supset.call(elem, val);
 					if(placeholder && 'value' in elem){
 						changePlaceholderVisibility(elem, val, placeholder);
