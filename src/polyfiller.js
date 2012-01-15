@@ -32,7 +32,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.5RC5',
+		version: '1.8.5RC6',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -119,7 +119,7 @@
 				//remove function
 				firstPolyfillCall = $.noop;
 			};
-			
+			var loadedFormBase;
 			return function(features){
 				
 				var toLoadFeatures = [];
@@ -128,6 +128,13 @@
 				
 				if (typeof features == 'string') {
 					features = features.split(' ');
+				}
+				if(!loadedFormBase){
+					loadedFormBase = $.inArray('forms', features) !== -1;
+					if(!loadedFormBase && $.inArray('forms-ext', features) !== -1){
+						features.push('forms');
+						loadedFormBase = true;
+					}
 				}
 				
 				if (webCFG.waitReady) {
@@ -1122,12 +1129,6 @@
 			f: 'forms-ext',
 			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && modernizrInputTypes.time && modernizrInputTypes.number);},
 			test: function(toLoad){
-				if(!this.addedForms && toLoad){
-					this.addedForms = true;
-					if($.inArray('form-core', toLoad) == -1){
-						toLoad.push('form-core');
-					}
-				}
 				return (this.uiTest() && !webshims.bugs.valueAsNumberSet);
 			},
 			d: ['forms', DOMSUPPORT],

@@ -27,6 +27,7 @@
 			(function(){
 				var webshimsReady = false;
 				require( ["jquery", "polyfiller"], function(e){
+					
 					$.webshims.ready('forms-ext json-storage geolocation', function(){
 						setTimeout(function(){
 							(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, webshimsReady);
