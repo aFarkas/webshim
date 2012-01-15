@@ -2,6 +2,7 @@
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
 jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
+	
 	var triggerInlineForm = webshims.triggerInlineForm;
 	var modernizrInputTypes = Modernizr.inputtypes;
 	var adjustInputWithBtn = (function(){
@@ -603,7 +604,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 	})();
 	
-	if(Modernizr.input.valueAsNumber && supportsType('number') && supportsType('time')){return;}
+	if(supportsType('number') && supportsType('time')){return;}
 	var doc = document;
 	var options = webshims.cfg["forms-ext"];
 	var typeModels = webshims.inputTypes;

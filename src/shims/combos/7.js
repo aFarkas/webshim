@@ -73,7 +73,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 	});
 		
 	
-	if(overrideValidity || !Modernizr.input.valueAsNumber || overrideNativeMessages){
+	if(overrideValidity || overrideNativeMessages){
 		validityChanger.push('min');
 		validityChanger.push('max');
 		validityChanger.push('step');
@@ -251,28 +251,31 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 });jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
 	"use strict";
 	
-	//why no step IDL?
-	webshims.getStep = function(elem, type){
-		var step = $.attr(elem, 'step');
-		if(step === 'any'){
-			return step;
-		}
-		type = type || getType(elem);
-		if(!typeModels[type] || !typeModels[type].step){
-			return step;
-		}
-		step = typeProtos.number.asNumber(step);
-		return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
-	};
-	//why no min/max IDL?
-	webshims.addMinMaxNumberToCache = function(attr, elem, cache){
-		if (!(attr+'AsNumber' in cache)) {
-			cache[attr+'AsNumber'] = typeModels[cache.type].asNumber(elem.attr(attr));
-			if(isNaN(cache[attr+'AsNumber']) && (attr+'Default' in typeModels[cache.type])){
-				cache[attr+'AsNumber'] = typeModels[cache.type][attr+'Default'];
+	//ToDo
+	if(!webshims.getStep){
+		webshims.getStep = function(elem, type){
+			var step = $.attr(elem, 'step');
+			if(step === 'any'){
+				return step;
 			}
-		}
-	};
+			type = type || getType(elem);
+			if(!typeModels[type] || !typeModels[type].step){
+				return step;
+			}
+			step = typeProtos.number.asNumber(step);
+			return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
+		};
+	}
+	if(!webshims.addMinMaxNumberToCache){
+		webshims.addMinMaxNumberToCache = function(attr, elem, cache){
+			if (!(attr+'AsNumber' in cache)) {
+				cache[attr+'AsNumber'] = typeModels[cache.type].asNumber(elem.attr(attr));
+				if(isNaN(cache[attr+'AsNumber']) && (attr+'Default' in typeModels[cache.type])){
+					cache[attr+'AsNumber'] = typeModels[cache.type][attr+'Default'];
+				}
+			}
+		};
+	}
 	
 	var nan = parseInt('NaN', 10),
 		doc = document,
@@ -281,7 +284,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 			return (typeof string == 'number' || (string && string == string * 1));
 		},
 		supportsType = function(type){
-			return (Modernizr.input.valueAsNumber && $('<input type="'+type+'" />').prop('type') === type);
+			return ($('<input type="'+type+'" />').prop('type') === type);
 		},
 		getType = function(elem){
 			return (elem.getAttribute('type') || '').toLowerCase();
@@ -627,6 +630,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
 jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
+	
 	var triggerInlineForm = webshims.triggerInlineForm;
 	var modernizrInputTypes = Modernizr.inputtypes;
 	var adjustInputWithBtn = (function(){
@@ -1228,7 +1232,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 	})();
 	
-	if(Modernizr.input.valueAsNumber && supportsType('number') && supportsType('time')){return;}
+	if(supportsType('number') && supportsType('time')){return;}
 	var doc = document;
 	var options = webshims.cfg["forms-ext"];
 	var typeModels = webshims.inputTypes;

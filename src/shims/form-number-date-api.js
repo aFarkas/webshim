@@ -1,28 +1,31 @@
 jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
 	"use strict";
 	
-	//why no step IDL?
-	webshims.getStep = function(elem, type){
-		var step = $.attr(elem, 'step');
-		if(step === 'any'){
-			return step;
-		}
-		type = type || getType(elem);
-		if(!typeModels[type] || !typeModels[type].step){
-			return step;
-		}
-		step = typeProtos.number.asNumber(step);
-		return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
-	};
-	//why no min/max IDL?
-	webshims.addMinMaxNumberToCache = function(attr, elem, cache){
-		if (!(attr+'AsNumber' in cache)) {
-			cache[attr+'AsNumber'] = typeModels[cache.type].asNumber(elem.attr(attr));
-			if(isNaN(cache[attr+'AsNumber']) && (attr+'Default' in typeModels[cache.type])){
-				cache[attr+'AsNumber'] = typeModels[cache.type][attr+'Default'];
+	//ToDo
+	if(!webshims.getStep){
+		webshims.getStep = function(elem, type){
+			var step = $.attr(elem, 'step');
+			if(step === 'any'){
+				return step;
 			}
-		}
-	};
+			type = type || getType(elem);
+			if(!typeModels[type] || !typeModels[type].step){
+				return step;
+			}
+			step = typeProtos.number.asNumber(step);
+			return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
+		};
+	}
+	if(!webshims.addMinMaxNumberToCache){
+		webshims.addMinMaxNumberToCache = function(attr, elem, cache){
+			if (!(attr+'AsNumber' in cache)) {
+				cache[attr+'AsNumber'] = typeModels[cache.type].asNumber(elem.attr(attr));
+				if(isNaN(cache[attr+'AsNumber']) && (attr+'Default' in typeModels[cache.type])){
+					cache[attr+'AsNumber'] = typeModels[cache.type][attr+'Default'];
+				}
+			}
+		};
+	}
 	
 	var nan = parseInt('NaN', 10),
 		doc = document,
@@ -31,7 +34,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			return (typeof string == 'number' || (string && string == string * 1));
 		},
 		supportsType = function(type){
-			return (Modernizr.input.valueAsNumber && $('<input type="'+type+'" />').prop('type') === type);
+			return ($('<input type="'+type+'" />').prop('type') === type);
 		},
 		getType = function(elem){
 			return (elem.getAttribute('type') || '').toLowerCase();

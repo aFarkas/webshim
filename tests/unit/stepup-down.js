@@ -19,7 +19,7 @@ var stepTest = function(obj){
 };
 
 asyncTest("stepup", function(){
-	if($.webshims.modules["form-number-date-ui"].getNextStep){
+	if($.webshims.modules["form-number-date-ui"].getNextStep && !Modernizr.inputtypes.number){
 		$.each([
 			{
 				id: 'number',

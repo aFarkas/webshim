@@ -92,7 +92,7 @@
 			$.webshims.ready('forms-ext', function(){
 				omitTests.validity = Modernizr.formvalidation;
 				omitTests.output = Modernizr.output;
-				omitTests.numericDateProps = Modernizr.input.valueAsNumber;
+				omitTests.numericDateProps = Modernizr.inputtypes.number;
 				omitTests.requiredSelect = Modernizr.requiredSelect && $.browser.mozilla;
 			});
 		})(jQuery);
@@ -138,7 +138,7 @@
 	<script>
 		jQuery.noConflict();
 		(function($){
-//			$.webshims.debug = true;
+			$.webshims.debug = "noCombo";
 			$(window).load(function(){
 				$.webshims.polyfill();
 			});

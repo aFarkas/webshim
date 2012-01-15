@@ -73,7 +73,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 	});
 		
 	
-	if(overrideValidity || !Modernizr.input.valueAsNumber || overrideNativeMessages){
+	if(overrideValidity || overrideNativeMessages){
 		validityChanger.push('min');
 		validityChanger.push('max');
 		validityChanger.push('step');
