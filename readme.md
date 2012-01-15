@@ -75,14 +75,12 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-upcomming Release 1.8.5
+Release 1.8.5
 ----------
 
 - much improved bug detection for buggy interactive constraint validation (no more assumptions)
 - new custom event **changedvaliditystate** for forms feature
 - improved overlay placement (errormessage/datalist)
-- <del>improved performance (webshims did it again)</del>
-- <del>updated modernizr</del>
 
 Release 1.8.4
 ----------
