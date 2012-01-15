@@ -277,7 +277,7 @@ var validityRules = {
 			try {
 				pattern = new RegExp('^(?:' + pattern + ')$');
 			} catch(er){
-				webshims.error("wrong patter used: "+ er);
+				webshims.error('invalid pattern value: "'+ pattern +'" | '+ er);
 				pattern = false;
 			}
 			if(!pattern){return false;}
