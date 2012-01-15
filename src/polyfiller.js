@@ -32,7 +32,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.5',
+		version: '1.8.6',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
