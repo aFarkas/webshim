@@ -245,7 +245,7 @@ img.ui-datepicker-trigger {
 	top: 0;
 	position: absolute;
 	display: block;
-	z-index: 10;
+	z-index: 4;
 	overflow: hidden;
 	margin: -5px 0 0 -8px;
 	height: 22px;
@@ -306,7 +306,9 @@ img.ui-datepicker-trigger {
 	font-size: 14px;
 	border: 1px solid #333;
 }
-
+.polyfill-important .input-date-datepicker-control {
+	z-index: 999999999 !important;
+}
 .input-date-datepicker-control .ui-datepicker-header {
 	position: relative;
 	margin: 0 0 3px;
@@ -432,7 +434,7 @@ datalist {
 	padding: 0 !important;
 	border: 1px solid #333;
 	display: none;
-	z-index: 1000;
+	z-index: 999999999;
 	max-height: 200px;
 	overflow: hidden;
 	overflow-x: hidden !important;
@@ -489,7 +491,7 @@ datalist {
 	position: absolute !important;
 	overflow: hidden;
 	padding: 0 6px 6px 0;
-	z-index: 99999;
+	z-index: 1000000000;
 	
 }
 .validity-alert {
@@ -552,7 +554,7 @@ html .validity-alert span.va-arrow {
 	overflow: hidden; 
 	width: 215px; 
 	min-width: 215px !important;
-	z-index: 99999999999;
+	z-index: 2147483647;
 }
 #swflocalstorageshim-wrapper .polyfill-exceeded-message {
 	margin: 0 0 5px;
