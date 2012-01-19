@@ -276,6 +276,10 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 		isReady: localStorageSwfCallback
 	};
 	
+//	$.webshims.swfLocalStorage.storageEvent = function(newVal, oldVal, url){
+//		
+//	};
+	
 	$.webshims.ready('DOM swfobject', function(){
 		if(runStart || (('localStorage' in window) && document.getElementById('swflocalstorageshim')) ){return;}
 		runStart = true;

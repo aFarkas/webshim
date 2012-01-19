@@ -11,6 +11,10 @@
 	<script src="js-webshim/minified/polyfiller.js"></script>
 	<script src="demo-js/demo.js"></script>
     <script class="example">
+    	$.webshims.setOptions({
+			//we do not use any DOM-/JS-APIs on DOM-ready, so we do not need to delay the ready event <- good against fouc
+			waitReady: false
+		});
 		//load all polyfill features
 		$.webshims.polyfill();
 		
@@ -254,7 +258,7 @@ $.webshims.ready('DOM canvas', function(){
 					<ul>
 						<li><strong>extendNative</strong> (default: true): Webshims lib will automatically extend DOM-Objects with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNative is set to false, webshims lib won't touch any DOM-Objects and will only implement jQuery plugins.</li>
 						<li><strong>basePath</strong> (default: "automatially computed path to the shims folder"): If polyfiller.js was renamed <strong>and</strong> is loaded dynamically, the basePath should be changed manually.</li>
-						<li><strong>waitReady</strong> (default: true): If this option is true, jQuery's ready-event will be delayed until all needed features are ready to use. This option should be set to false, if webshims lib polyfiller.js is loaded async (see also Loading webshims async in the <a href="#polyfill-foucs">loading documentation</a>).</li>
+						<li><strong>waitReady</strong> (default: true): If this option is true, jQuery's ready-event will be delayed until all needed features are ready to use. This option should be set to false, if webshims lib polyfiller.js is loaded async (see also Loading webshims async in the <a href="#polyfill-foucs">loading documentation</a>) or from bottom of the body element. This option can also be set to false, ife a website is using only HTML5 markup APIs (pure HTML or $.attr) and do not use any DOM-/JS-APIs on DOM-ready.</li>
 					</ul>
 <code class="block">
 $.webshims.setOptions("extendNative", false);
@@ -383,6 +387,23 @@ if(!Modernizr.input.placeholder || !Modernizr.input.autofocus){
 //Start polyfilling
 $.webshims.polyfill(polyfillFeatures);
 </code>	
+					<h3>Customize Webshims lib's polyfiller.js</h3>
+					<p>While webshims lib comes with a lot of files, the polyfiller.js file is the only file, which has to be embeded directly in the page. The following tool allows you to customize and minimize the polyfiller.js file. (Simply overwrite the polyfiller.js with your customized version. All other files from the download package should stay.):</p>
+					<form action="http://marijnhaverbeke.nl/uglifyjs" method="post" data-polyfillpath="js-webshim/dev/polyfiller.js">
+			    		<fieldset class="config">
+			    			<label><input type="checkbox" checked disabled /> es5</label> 
+							<label><input type="checkbox" checked id="canvas" /> canvas</label>
+							<label><input type="checkbox" checked id="forms" /> forms/forms-ext</label> 
+							<label><input type="checkbox" checked id="mediaelement" /> mediaelement</label> 
+							<label><input type="checkbox" checked id="localstorage" /> json-storage</label> 
+							<label><input type="checkbox" checked id="geolocation" data-dependent="localstorage" /> geolocation</label> 
+							<label><input type="checkbox" checked id="details" /> details</label> 
+			    		</fieldset>
+			    		
+			    		<textarea name="js_code" style="display: none;"></textarea>
+						<input type="hidden" name="download" value="polyfiller.js" />
+						<input type="submit" value="download custom polyfiller" />	
+			    	</form>
 					<h3>Loading webshims async</h3>
 					<p>If webshims lib is loaded async, there are some configurations which have to be changed manually:</p>
 					<ul>

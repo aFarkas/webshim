@@ -58,3 +58,82 @@
 		});
 	});
 })(jQuery);
+(function($){
+	var remove;
+	var regStart = /\/\/<([A-Za-z]+)/;
+	var regEnd = /\/\/>/;
+	var regCombo = /combos\:\s([0-9,\,\s]+)/i;
+	var webshimsBuilder = {
+		data: null,
+		init: function(form){
+			$.webshims.ready('DOM es5', function(){
+				$(form).each(function(){
+					webshimsBuilder.getData(this.getAttribute("data-polyfillpath"));
+					var dependentChecked = function(id){
+						$('#'+id).prop('checked', true).prop('disabled', true);
+					};
+					var dependentUnChecked = function(id){
+						$('#'+id).prop('disabled', false);
+					};
+					$('fieldset.config', this)
+						.delegate('input[data-dependent]', 'click cfginit', function(){
+							$.attr(this, 'data-dependent').split(" ").forEach( $.prop(this, 'checked') ? dependentChecked : dependentUnChecked );
+							
+						})
+						.find('input[data-dependent]')
+						.trigger('cfginit')
+					;
+					
+					$(this).bind('submit', function(e){
+						var features = $('fieldset.config input:checked:not(:disabled)[id]', this).get().map(function(checkbox){
+							return checkbox.id;
+						});
+						webshimsBuilder.buildScript(features, $('textarea[name="js_code"]', this));
+					});
+				});
+			});
+		},
+		getData: function(path){
+			
+			$.ajax(path, {
+				dataType: 'text',
+				success: function(data){
+					webshimsBuilder.data = data;
+				}
+			});
+		},
+		buildScript: function(features, output){
+			var result = [];
+			var combos = [];
+			var data = webshimsBuilder.data.replace(/\t/g, "").split(/[\n\r]/g);
+			data.forEach(function(line){
+				var foundFeature;
+				var featureCombo;
+				
+				if(remove){
+					remove = !(regEnd.exec(line));
+				} else if( !line || !(foundFeature = regStart.exec(line)) || $.inArray(foundFeature[1], features) !== -1 ){
+					if(combos.length && line.indexOf("removeCombos") != -1){
+						line = line.replace(/\/\/>removeCombos</, "removeCombos = removeCombos.concat(["+ combos.join(",") +"]);" );
+						combos = [];
+					}
+					result.push(line);
+				} else if(foundFeature){
+					if( (featureCombo = regCombo.exec(line)) ){
+						featureCombo[1].split(/,/).forEach(function(combo){
+							combo = combo.trim();
+							if($.inArray(combo, combos) == -1){
+								combos.push(combo);
+							}
+						});
+					} 
+					remove = true;
+				}
+			});
+			
+			$(output).val(result.join("\n"));
+		}
+	};
+	
+	webshimsBuilder.init('form[data-polyfillpath]');
+})(jQuery);

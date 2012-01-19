@@ -10,8 +10,12 @@
 	<script src="../js-webshim/minified/polyfiller.js"></script>
 	
     <script class="example">
-    	$.webshims.setOptions('geolocation', {
-			confirmText: '{location} wants to know your position. It is Ok to press Ok.'
+		$.webshims.setOptions({
+			//we do not use any DOM-/JS-APIs on DOM-ready, so we do not need to delay the ready event <- good against fouc
+			waitReady: false,
+			geolocation: {
+				confirmText: '{location} wants to know your position. It is Ok to press Ok.'
+			}
 		});
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');

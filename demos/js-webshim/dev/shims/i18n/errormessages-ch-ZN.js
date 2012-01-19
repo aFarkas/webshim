@@ -8,7 +8,7 @@ jQuery.webshims.validityMessages['zh-CN'] = {
         "range": "值无效。",
         "datetime-local": "值无效。"
     },
-    "tooLong": "Valore non valido.",
+    "tooLong": "值无效。",
     "patternMismatch": "请匹配要求的格式： {%title}。",
     "valueMissing": {
         "defaultMessage": "请填写此字段。",

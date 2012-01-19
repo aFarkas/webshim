@@ -735,35 +735,16 @@ webshims.defineNodeNameProperty('form', 'noValidate', {
 
 webshims.addReady(function(context, contextElem){
 	//start constrain-validation
-	var form = $('form', context)
+	$('form', context)
 		.add(contextElem.filter('form'))
 		.bind('invalid', $.noop)
 	;
-	
-	setTimeout(function(){
+	if (context == document && !('form' in (document.activeElement || {}))) {
 		try {
-			if (document.activeElement && 'form' in document.activeElement) {
-				return;
-			}
-		} catch(er){
-			return;
-		}
-			var first = true;
-			$('input, select, textarea', context).each(function(i){
-				if(!first){return false;}
-				if(this.getAttribute('autofocus') == null){return;}	
-				first = false;
-				var focusElem = $(this).getShadowFocusElement();
-				
-				try {
-					focusElem[0].focus();
-				} catch (e) {}
-				focusElem = null;
-				return false;
-			});
-		form = null;
-	}, 0);
-	
+			$('input[autofocus], select[autofocus], textarea[autofocus]', context).eq(0).getShadowFocusElement()[0].focus();
+		} 
+		catch (er) {}
+	}
 });
 
 (function(){

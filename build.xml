@@ -19,11 +19,7 @@
 		
 		
 		
-		<concat destfile="${src}/shims/combos/21.js">
-			<fileset file="${src}/shims/form-message.js" />
-			<fileset file="${src}/shims/form-shim-extend.js" />
-			<fileset file="${src}/shims/form-output.js" />
-		</concat>
+		
 		
 		<concat destfile="${src}/shims/combos/2.js">
 			<fileset file="${src}/shims/form-core.js" />
@@ -45,11 +41,6 @@
 			<fileset file="${src}/shims/combos/4.js" />
 		</concat>
 		
-		<!-- remove if webkit supports datalist -->
-		<concat destfile="${src}/shims/combos/59.js">
-			<fileset file="${src}/shims/combos/5.js" />
-			<fileset file="${src}/shims/form-datalist.js" />
-		</concat>
 		
 		<concat destfile="${src}/shims/combos/6.js">
 			<fileset file="${src}/shims/form-number-date-api.js" />
@@ -130,6 +121,40 @@
 			<fileset file="${src}/shims/form-core.js" />
 		</concat>
 		
+		<concat destfile="${src}/shims/combos/20.js">
+			
+			<fileset file="${src}/shims/mediaelement-core.js" />
+			<fileset file="${src}/shims/mediaelement-swf.js" />
+		</concat>
+		
+		<concat destfile="${src}/shims/combos/21.js">
+			<fileset file="${src}/shims/form-message.js" />
+			<fileset file="${src}/shims/form-shim-extend.js" />
+			<fileset file="${src}/shims/form-output.js" />
+		</concat>
+		
+		<concat destfile="${src}/shims/combos/22.js">
+			<fileset file="${src}/shims/es5.js" />
+			<fileset file="${src}/shims/combos/20.js" />
+		</concat>
+		
+		<concat destfile="${src}/shims/combos/23.js">
+			<fileset file="${src}/shims/mediaelement-core.js" />
+			<fileset file="${src}/shims/combos/21.js" />
+		</concat>
+		
+		<!-- remove if webkit supports datalist -->
+		<concat destfile="${src}/shims/combos/24.js">
+			<fileset file="${src}/shims/combos/19.js" />
+			<fileset file="${src}/shims/mediaelement-core.js" />
+		</concat>
+		
+		<!-- remove if webkit supports datalist -->
+		<concat destfile="${src}/shims/combos/59.js">
+			<fileset file="${src}/shims/combos/5.js" />
+			<fileset file="${src}/shims/form-datalist.js" />
+		</concat>
+		
         <mkdir dir="${dist}" />
         <copy todir="${dist}/dev" overwrite="true">
             <fileset dir="${src}" />
@@ -151,6 +176,9 @@
 	                <include name="*.js"/>
 	            </fileset>
 	            <fileset dir="${dist}/minified/shims/combos">
+	                <include name="*.js"/>
+	            </fileset>
+	            <fileset dir="${dist}/minified/shims/i18n">
 	                <include name="*.js"/>
 	            </fileset>
 	            

@@ -1,4 +1,5 @@
 (function (factory) {
+	
 	if(window.jQuery){
 		factory(jQuery);
 		factory = jQuery.noop;
@@ -19,20 +20,13 @@
 	var Object = window.Object;
 	var slice = Array.prototype.slice;
 	
-	//new Modernizrtests
-	if(!('details' in Modernizr)){
-		addTest('details', function(){
-			return ('open' in document.createElement('details'));
-		});
-	}
-	
 	Modernizr.genericDOM = !!($('<video><div></div></video>')[0].innerHTML);
 	
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
 		
 	
 	var webshims = {
-		version: '1.8.6',
+		version: 'pre1.8.7',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -533,6 +527,7 @@
 	var loader = webshims.loader;
 	var loadList = loader.loadList;
 	var addModule = loader.addModule;
+	var removeCombos = [];
 	var importantLogs = {
 		warn: 1,
 		error: 1
@@ -939,18 +934,18 @@
 			}
 			return Modernizr.ES5;
 		},
-		c: [10, 1]
+		c: [10, 1, 22]
 	});
 	
 	addPolyfill('dom-extend', {
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		d: ['es5'],
-		c: [10, 9, 12, 17, 16, 8, 1, 19, 11, 13]
+		c: [10, 9, 12, 17, 16, 8, 1, 24, 19, 11, 13]
 	});
 		
-	/* json + loacalStorage */
 	
+	//<localstorage combos: 14
 	if('localstorage' in Modernizr) {
 		addPolyfill('json-storage', {
 			test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
@@ -961,11 +956,11 @@
 			c: [14]
 		});
 	}
+	//>localstorage
 	
-	/* END: json + loacalStorage */
 	
-	/* geolocation */
-	if('geolocation' in Modernizr && 'localstorage' in Modernizr){
+	//<geolocation combos: 14,15
+	if('geolocation' in Modernizr){
 		addPolyfill('geolocation', {
 			test: Modernizr.geolocation,
 			options: {
@@ -976,9 +971,9 @@
 			c: [14, 15]
 		});
 	}
-	/* END: geolocation */
+	//>
 	
-	/* canvas */
+	//<canvas
 	(function(){
 		if('canvas' in Modernizr) {
 			var flashCanvas;
@@ -1029,14 +1024,10 @@
 			});
 		}
 	})();
+	//>
 	
-	/* END: canvas */
 	
-	/*
-	 * HTML5 FORM-Features
-	 */
-	
-	/* html5 constraint validation */
+	//<forms combos: 3, 2, 59, 17, 16, 5, 4, 24, 19, 18, 7, 59, 5, 21, 11, 23
 	var modernizrInputAttrs = Modernizr.input;
 	var modernizrInputTypes = Modernizr.inputtypes;
 	
@@ -1071,13 +1062,11 @@
 	//			lightweightDatalist: false
 			},
 			methodNames: ['setCustomValidity','checkValidity'],
-			c: [3, 2, 59, 17, 16, 5, 4, 19]
+			c: [3, 2, 59, 17, 16, 5, 4, 24, 19]
 		});
 				
 		if(Modernizr[formvalidation]){
 			
-			
-			//ToDo merge this with form-core (to minimize small requests)
 			addPolyfill('form-extend', {
 				f: 'forms',
 				src: 'form-native-extend',
@@ -1087,24 +1076,16 @@
 				d: ['form-core', DOMSUPPORT, 'form-message'],
 				c: [18, 7, 59, 5]
 			});
-			addPolyfill('form-dummy', {
-				f: 'forms',
-				test: true,
-				loaded: true,
-				c: [2, 3, 21]
-			});	
+			removeCombos = removeCombos.concat([2, 3, 23, 21]);
+				
 		} else {
-			addPolyfill('form-dummy', {
-				f: 'forms',
-				test: true,
-				loaded: true,
-				c: [18, 7, 4, 59, 5]
-			});
+			removeCombos = removeCombos.concat([18, 7, 4, 59, 5]);
+			
 			addPolyfill('form-extend', {
 				f: 'forms',
 				src: 'form-shim-extend',
 				d: ['form-core', DOMSUPPORT],
-				c: [3, 2, 21]
+				c: [3, 2, 23, 21]
 			});
 		}
 		
@@ -1114,14 +1095,14 @@
 				return !( this.options.customMessages || !Modernizr[formvalidation] || !modules['form-extend'].test(toLoad) || webshims.bugs.validationMessage );
 			},
 			d: [DOMSUPPORT],
-			c: [3, 2, 21, 59, 17, 5, 4]
+			c: [3, 2, 23, 21, 59, 17, 5, 4]
 		});
 		
 		webshims.addPolyfill('form-output', {
 			f: 'forms',
 			test: ('value' in document.createElement('output')),
 			d: [DOMSUPPORT],
-			c: [3, 2, 21]
+			c: [3, 2, 23, 21]
 		});
 		
 		
@@ -1163,12 +1144,17 @@
 			f: 'forms-ext',
 			test: modernizrInputAttrs.list,
 			d: ['form-core', DOMSUPPORT],
-			c: [3, 59, 18, 19, 11]
+			c: [3, 59, 18, 24, 19, 11]
 		});
 	}
-		
-	/* END: html5 forms */
+	//>
 	
+	//<details combos: 12,13,15
+	if(!('details' in Modernizr)){
+		addTest('details', function(){
+			return ('open' in document.createElement('details'));
+		});
+	}
 	addPolyfill('details', {
 		test: Modernizr.details,
 		d: [DOMSUPPORT],
@@ -1178,7 +1164,9 @@
 		},
 		c: [12, 13, 15]
 	});
+	//>
 	
+	//<mediaelement combos: 10, 9, 12, 17, 16, 8, 20, 22, 23, 24
 	if ('audio' in Modernizr && 'video' in Modernizr){
 		webshims.mediaelement = {};
 		
@@ -1187,7 +1175,7 @@
 			noAutoCallback: true,
 			
 			d: ['swfobject',DOMSUPPORT],
-			c: [10, 9, 12, 17, 16, 8]
+			c: [10, 9, 12, 17, 16, 8, 22, 23, 24, 20]
 		});
 		addPolyfill('mediaelement-swf', {
 			f: 'mediaelement',
@@ -1209,12 +1197,20 @@
 				var hasToPlay = options.hasToPlay;
 				return !( (!window.swfobject || window.swfobject.hasFlashPlayerVersion('9.0.115')) && (options.preferFlash || (hasToPlay != 'any' && !Modernizr.video[hasToPlay] && !Modernizr.audio[hasToPlay])));
 			},
-			c: [10, 9]
+			c: [10, 9, 22, 20]
 		});
 		
 	}
-
-
+	//>
+	
+	
+	//>removeCombos<
+	addPolyfill('feature-dummy', {
+		test: true,
+		loaded: true,
+		c: removeCombos
+	});
+	
 	jScripts
 		.filter('[data-polyfill-cfg]')
 		.each(function(){
