@@ -248,15 +248,7 @@ var validityRules = {
 			return ret;
 		},
 		tooLong: function(input, val, cache){
-			if(val === '' || cache.nodeName == 'select'){return false;}
-			var maxLen 	= input.attr('maxlength'),
-				ret 	= false,
-				len 	= val.length	
-			;
-			if(len && maxLen >= 0 && val.replace && isNumber(maxLen)){
-				ret = (len > maxLen);
-			}
-			return ret;
+			return false;
 		},
 		typeMismatch: function (input, val, cache){
 			if(val === '' || cache.nodeName == 'select'){return false;}
@@ -507,10 +499,63 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 
 webshims.reflectProperties(['input'], ['pattern']);
 
+
+
+var constrainMaxLength = (function(){
+	var timer;
+	var curLength = 0;
+	var lastElement = $([]);
+	var max = 1e9;
+	var constrainLength = function(){
+		var nowValue = lastElement.prop('value');
+		var nowLen = nowValue.length;
+		if(nowLen > curLength && nowLen > max){
+			nowLen = Math.max(curLength, max);
+			lastElement.prop('value', nowValue.substr(0, nowLen ));
+		}
+		curLength = nowLen;
+	};
+	var remove = function(){
+		clearTimeout(timer);
+		lastElement.unbind('.maxlengthconstraint');
+	};
+	return function(element, maxLength){
+		remove();
+		if(maxLength > -1){
+			max = maxLength;
+			curLength = $.prop(element, 'value').length;
+			lastElement = $(element);
+			lastElement.bind('keydown.maxlengthconstraint keypress.maxlengthconstraint paste.maxlengthconstraint cut.maxlengthconstraint', function(e){
+				setTimeout(constrainLength, 0);
+			});
+			lastElement.bind('keyup.maxlengthconstraint', constrainLength);
+			lastElement.bind('blur.maxlengthconstraint', remove);
+			timer = setInterval(constrainLength, 200);
+		}
+	};
+})();
+
+constrainMaxLength.update = function(element, maxLength){
+	if(element === document.activeElement){
+		if(maxLength == null){
+			maxLength = $.prop(element, 'maxlength');
+		}
+		constrainMaxLength(e.target, maxLength);
+	}
+};
+
+$(document).bind('focusin', function(e){
+	var maxLength;
+	if(e.target.nodeName == "TEXTAREA" && (maxLength = $.prop(e.target, 'maxlength')) > -1){
+		constrainMaxLength(e.target, maxLength);
+	}
+});
+
 webshims.defineNodeNameProperty('textarea', 'maxlength', {
 	attr: {
 		set: function(val){
 			this.setAttribute('maxlength', ''+val);
+			constrainMaxLength.update(this);
 		},
 		get: function(){
 			var ret = this.getAttribute('maxlength');
@@ -523,10 +568,13 @@ webshims.defineNodeNameProperty('textarea', 'maxlength', {
 				if(val < 0){
 					throw('INDEX_SIZE_ERR');
 				}
-				this.setAttribute('maxlength', parseInt(val, 10));
+				val = parseInt(val, 10);
+				this.setAttribute('maxlength', val);
+				constrainMaxLength.update(this, val);
 				return;
 			}
 			this.setAttribute('maxlength', ''+ 0);
+			constrainMaxLength.update(this, 0);
 		},
 		get: function(){
 			var val = this.getAttribute('maxlength');
