@@ -12,26 +12,28 @@ jQuery.webshims.gcEval = function(){
 	var webshims = $.webshims;
 	
 	webshims.capturingEventPrevented = function(e){
-		var isDefaultPrevented = e.isDefaultPrevented;
-		var preventDefault = e.preventDefault;
-		e.preventDefault = function(){
-			clearTimeout($.data(e.target, e.type + 'DefaultPrevented'));
-			$.data(e.target, e.type + 'DefaultPrevented', setTimeout(function(){
-				$.removeData(e.target, e.type + 'DefaultPrevented');
-			}, 30));
-			return preventDefault.apply(this, arguments);
-		};
-		e.isDefaultPrevented = function(){
-			return !!(isDefaultPrevented.apply(this, arguments) || $.data(e.target, e.type + 'DefaultPrevented') || false);
-		};
-		e._isPolyfilled = true;
+		if(!e._isPolyfilled){
+			var isDefaultPrevented = e.isDefaultPrevented;
+			var preventDefault = e.preventDefault;
+			e.preventDefault = function(){
+				clearTimeout($.data(e.target, e.type + 'DefaultPrevented'));
+				$.data(e.target, e.type + 'DefaultPrevented', setTimeout(function(){
+					$.removeData(e.target, e.type + 'DefaultPrevented');
+				}, 30));
+				return preventDefault.apply(this, arguments);
+			};
+			e.isDefaultPrevented = function(){
+				return !!(isDefaultPrevented.apply(this, arguments) || $.data(e.target, e.type + 'DefaultPrevented') || false);
+			};
+			e._isPolyfilled = true;
+		}
 	};
 	
 	if(!Modernizr.formvalidation){return;}
 	var form = $('<form action="#" style="width: 1px; height: 1px; overflow: hidden;"><select /><input type="date" required name="a" /><input type="submit" /></form>');
 	Modernizr.bugfreeformvalidation = Modernizr.requiredSelect = !!('required' in $('select', form)[0]);
 	if(window.opera || $.browser.webkit || window.testGoodWithFix){
-		var dateElem = $('input', form);
+		var dateElem = $('input', form).eq(0);
 		var timer;
 		var loadFormFixes = function(e){
 			var reTest = ['form-extend', 'form-native-fix'];
@@ -91,27 +93,28 @@ jQuery.webshims.gcEval = function(){
 							}
 						});
 					});
-				});
-				
-				//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
-				if(Modernizr.input.list && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
-					webshims.defineNodeNameProperty('datalist', 'options', {
-						prop: {
-							writeable: false,
-							get: function(){
-								var options = this.options || [];
-								if(!options.length){
-									var elem = this;
-									var select = $('select', elem);
-									if(select[0] && select[0].options && select[0].options.length){
-										options = select[0].options;
+					
+					//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
+					if(Modernizr.input.list && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
+						webshims.defineNodeNameProperty('datalist', 'options', {
+							prop: {
+								writeable: false,
+								get: function(){
+									var options = this.options || [];
+									if(!options.length){
+										var elem = this;
+										var select = $('select', elem);
+										if(select[0] && select[0].options && select[0].options.length){
+											options = select[0].options;
+										}
 									}
+									return options;
 								}
-								return options;
 							}
-						}
-					});
-				}
+						});
+					}
+					
+				});
 			}
 		};
 		
