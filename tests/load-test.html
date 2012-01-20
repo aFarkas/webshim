@@ -20,6 +20,9 @@
 					$("#main, #qunit-fixture").htmlPolyfill( QUnit.config.fixture );
 				};
 			});
+			$(window).bind('error', function(){
+				alert('error!!!');
+			});
 		})();
 	</script>
 	

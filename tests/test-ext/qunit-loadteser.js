@@ -81,11 +81,12 @@
 				
 			}); 
 			
+			testProfile = testProfile || 0;
 			
 			loadTester.initTest(testProfile);
 		},
 		loadNext: function(index){
-			location.search = '?loadTest='+index;
+			location.search = '?loadTest='+index +'&notrycatch=true';
 			
 		},
 		addProfile: function(profile){
