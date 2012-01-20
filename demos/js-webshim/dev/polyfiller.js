@@ -257,7 +257,7 @@
 			$.each(names, function(i, name){
 				var handler = function(e){
 					e = $.event.fix(e);
-					if (_maybePrevented && !e._isPolyfilled && webshims.capturingEventPrevented) {
+					if (_maybePrevented && webshims.capturingEventPrevented) {
 						webshims.capturingEventPrevented(e);
 					}
 					return $.event.handle.call(this, e);

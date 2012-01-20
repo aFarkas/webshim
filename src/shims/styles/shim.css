@@ -576,6 +576,7 @@ summary {
 .closed-details-child {
 	display: none !important;
 }
+
 .details-open-indicator {
 	margin: -1px 0 0;
 	display: inline-block;

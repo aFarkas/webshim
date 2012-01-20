@@ -46,6 +46,13 @@ jQuery.webshims.register('details', function($, webshims, window, doc, undefined
 		return summary;
 	};
 	
+//	var isOriginalPrevented = function(e){
+//		var src = e.originalEvent;
+//		if(!src){return e.isDefaultPrevented();}
+//		
+//		return src.defaultPrevented || src.returnValue === false ||
+//			src.getPreventDefault && src.getPreventDefault();
+//	};
 	
 	webshims.createElement('summary', function(){
 		var details = isInterActiveSummary(this);
@@ -69,22 +76,19 @@ jQuery.webshims.register('details', function($, webshims, window, doc, undefined
 				var details = isInterActiveSummary(this);
 				if(details){
 					clearTimeout(timer); 
+					
 					timer = setTimeout(function(){
 						if(!e.isDefaultPrevented()){
-							details.attr('open', !details.attr('open'));
+							details.prop('open', !details.prop('open'));
 						}
 					}, 0);
 				}
 			})
 			.bind('keydown.summaryPolyfill', function(e){
-				if(e.keyCode == 13 || e.keyCode == 32){
+				if( (e.keyCode == 13 || e.keyCode == 32) && !e.isDefaultPrevented()){
 					var that = this;
-					clearTimeout(timer); 
-					timer = setTimeout(function(){
-						if(!e.isDefaultPrevented()){
-							$(that).trigger('click');
-						}
-					}, 0);			
+					e.preventDefault();
+					$(that).trigger('click');			
 				}
 			})
 			.attr({tabindex: '0', role: 'button'})
