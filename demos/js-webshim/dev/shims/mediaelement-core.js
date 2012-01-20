@@ -100,7 +100,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 	mediaelement.mimeTypes.source =  $.extend({}, mediaelement.mimeTypes.audio, mediaelement.mimeTypes.video);
 	
 	mediaelement.getTypeForSrc = function(src, nodeName){
-		if(src.indexOf('youtube.com/watch?') != -1){
+		if(src.indexOf('youtube.com/watch?') != -1 || src.indexOf('youtube.com/v/') != -1){
 			return 'video/youtube';
 		}
 		src = src.split('?')[0].split('.');

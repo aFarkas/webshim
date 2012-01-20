@@ -75,6 +75,12 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.8.7
+----------
+
+- fixed Opera error
+- aligned maxlength property to the HTML5 spec
+
 Release 1.8.5/1.8.6
 ----------
 
