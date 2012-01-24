@@ -26,7 +26,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.7',
+		version: 'pre1.8.8',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -93,13 +93,14 @@
 					clearTimeout(timer);
 				};
 				
-				if (!$.isReady) {
-					addClass.push('loading-polyfills');
-					$(window).bind('load.lP error.lP', removeLoader);
-					timer = setTimeout(function(){
-						$('html').addClass('long-loading-polyfills');
-					}, 600);
-				} 
+				addClass.push('loading-polyfills');
+				$(window).bind('load.lP error.lP', removeLoader);
+				timer = setTimeout(function(){
+					$('html').addClass('long-loading-polyfills');
+				}, 600);
+				if (webCFG.waitReady && $.isReady) {
+					webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
+				}
 				onReady(features, removeLoader);
 				if (webCFG.useImportantStyles) {
 					addClass.push('polyfill-important');
@@ -491,10 +492,10 @@
 					loadedSrcs.push(src);
 					if(window.require){
 						require([src], complete);
-					} else if (window.steal) {
-						steal(src).then(complete);
 					} else if (window.sssl) {
 						sssl(src, complete);
+					} else if (window.steal) {
+						steal(src).then(complete);
 					} else if (window.yepnope) {
 						if (yepnope.injectJs) {
 							yepnope.injectJs(src, complete);

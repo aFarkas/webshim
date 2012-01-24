@@ -907,7 +907,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			}
 		}
 	};
-	var stopParent = /^(?:embed|object)$/i;
+	var stopParent = /^(?:embed|object|datalist)$/i;
 	var selectSource = function(elem, data){
 		var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
 		var _srces = mediaelement.srces(elem);
@@ -916,7 +916,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		clearTimeout(baseData.loadTimer);
 		$.data(elem, 'mediaerror', false);
 		
-		if(!_srces.length || !parent || stopParent.test(parent.nodeName || '')){return;}
+		if(!_srces.length || !parent || parent.nodeType != 1 || stopParent.test(parent.nodeName || '')){return;}
 		data = data || webshims.data(elem, 'mediaelement');
 		stepSources(elem, data, options.preferFlash || undefined, _srces);
 	};

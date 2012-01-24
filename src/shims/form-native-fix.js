@@ -3,7 +3,6 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	if(!Modernizr.formvalidation || Modernizr.bugfreeformvalidation){return;}
 	
 	var badWebkit = ($.browser.webkit);
-	var xBadWebkit = badWebkit && webshims.browserVersion < 533.18;
 	var invalids = [],
 		firstInvalidEvent,
 		form
@@ -21,26 +20,26 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		};
 		window.addEventListener('submit', function(e){
 			if(!formnovalidate.prevented && e.target.checkValidity && $.attr(e.target, 'novalidate') == null){
-				if(window.opera){
+				
 					
-					if($(':invalid', e.target).length){
-						$(e.target)
-							.unbind('submit.preventInvalidSubmit')
-							.bind('submit.preventInvalidSubmit', function(submitEvent){
-								if( $.attr(e.target, 'novalidate') == null ){
-									submitEvent.stopImmediatePropagation();
-									if(badWebkit){
-										submitEvent.preventDefault();
-									}
+				if($(':invalid', e.target).length){
+					$(e.target)
+						.unbind('submit.preventInvalidSubmit')
+						.bind('submit.preventInvalidSubmit', function(submitEvent){
+							if( $.attr(e.target, 'novalidate') == null ){
+								submitEvent.stopImmediatePropagation();
+								if(badWebkit){
+									submitEvent.preventDefault();
 								}
-								if(e.target){
-									$(e.target).unbind('submit.preventInvalidSubmit');
-								}
-							})
-						;
-						webshims.moveToFirstEvent(e.target, 'submit');
-					}
-				} else {
+							}
+							if(e.target){
+								$(e.target).unbind('submit.preventInvalidSubmit');
+							}
+						})
+					;
+					webshims.moveToFirstEvent(e.target, 'submit');
+				}
+				if(!window.opera){
 					webshims.fromSubmit = true;
 					$(e.target).checkValidity();
 					webshims.fromSubmit = false;
@@ -69,23 +68,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 			if(!form){return;}
 			firstInvalidEvent = false;
 			invalids = [];
-			
-			$(form)
-				.unbind('submit.preventInvalidSubmit')
-				.bind('submit.preventInvalidSubmit', function(submitEvent){
-					if( $.attr(form, 'novalidate') == null ){
-						submitEvent.stopImmediatePropagation();
-						if(badWebkit){
-							submitEvent.preventDefault();
-						}
-					}
-					if(form){
-						$(form).unbind('submit.preventInvalidSubmit');
-					}
-				})
-			;
-			webshims.moveToFirstEvent(form, 'submit');
-			
+						
 			
 			if(!webshims.fromSubmit){return;}
 			firstInvalidEvent = data;
@@ -112,41 +95,6 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		})
 	;
 	
-	//safari 5.0.0 and 5.0.1
-	if(xBadWebkit){
-		var submitTimer;
-		var trueInvalid;
-		$(document).bind('invalid', function(e){
-			if(e.originalEvent && !webshims.fromSubmit && !webshims.fromCheckValidity && ($.prop(e.target, 'validity') || {}).valid){
-				e.originalEvent.wrongWebkitInvalid = true;
-				e.wrongWebkitInvalid = true;
-				e.stopImmediatePropagation();
-				e.preventDefault();
-				return false;
-			} else {
-				trueInvalid = true;
-			}
-			clearTimeout(submitTimer);
-			submitTimer = setTimeout(function(){
-				if(e.target.form && !trueInvalid){
-					trueInvalid = false;
-					$(e.target.form).trigger('submit');
-				}
-				trueInvalid = false;
-			}, 1);
-		});
-		
-		webshims.moveToFirstEvent(document, 'invalid');
-		
-		$(document).bind('firstinvalidsystem', function(e, data){
-			if(webshims.fromCheckValidity){return;}
-			setTimeout(function(){
-				if(!data.isInvalidUIPrevented()){
-					webshims.validityAlert.showFor(data.element);
-				}
-			}, 0);
-		});
-	}
 		
 	(function(){
 		//safari 5.0.x has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
@@ -174,13 +122,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 				value: function(){
 					var ret = true;
 					$(this.elements || [])
-						.filter(function(){
-							if(!this.willValidate){
-								return false;
-							}
-							var shadowData = webshims.data(this, 'shadowData');
-							return !shadowData || !shadowData.nativeElement || shadowData.nativeElement === this;
-						})
+						.getNativeElement()
 						.each(function(){
 							 if($(this).checkValidity() === false){
 								ret = false;
@@ -231,7 +173,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		});
 	}
 
-	//simply copied from form-shim-extend without novalidate for safari 5.0.1
+//simply copied from form-shim-extend without novalidate for safari 5.0.1
 if( !('formTarget' in document.createElement('input')) ){
 	(function(){
 		

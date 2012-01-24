@@ -26,7 +26,7 @@ form textarea {
 	height: 140px;
 	font-family: arial, helvetica, sans-serif;
 }
-/* remove FOUC */
+/* remove FOUC 
 .loading-polyfills body {
 	visibility: hidden;
 }
@@ -35,6 +35,7 @@ html.long-loading-polyfills {
 	background-position: center 240px;
 	background-repeat: no-repeat;
 }
+*/
 h1, h2, h3, h4, h5, h6, table, input, textarea, label, select {
 	font-size: 100%;
 }

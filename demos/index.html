@@ -82,7 +82,7 @@
 					<ul>
 						<li>IE6+</li>
 						<li>Firefox 3.6+</li>
-						<li>Safari 5.1+</li>
+						<li>Safari 5.0.3+</li>
 						<li>Safari for iOS 5+</li>
 						<li>Chrome 17.0+</li>
 						<li>Opera 12+</li>
@@ -145,7 +145,7 @@
 &lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
 	
 &lt;script&gt;
-	//implement all unsupported features
+	//implement all unsupported features || call polyfill before DOM-Ready to implement everything as soon and as fast as possible
 	$.webshims.polyfill();
 	//or load only specific features you need
 	//$.webshims.polyfill('forms json-storage');
@@ -155,7 +155,7 @@
 	});
 &lt;/script&gt;		
 </code>
-					<p><small>Note: Webshims do not need all Modernizr tests to work, if you omit a Modernizr - test, which is used by Webshims, Webshims simply won't polyfill this feature. Here you find <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-prefixed-testprop-testallprops-domprefixes-load">all Modernizr detections, which are used by webshims</a>.</small></p>
+					<p><small>Note: Webshims do not need all Modernizr tests to work. Here you find <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-prefixed-testprop-testallprops-domprefixes-load">all Modernizr detections, which are used by webshims</a>.</small></p>
 				</div>
 	
 				<h3 id="embed-polyfill" class="button">Embedding and configuring the script</h3>
@@ -173,12 +173,12 @@
 
 
 &lt;script&gt;
-	//load and implement all unsupported features
+	//load and implement all unsupported features || call polyfill before DOM-Ready to implement everything as soon and as fast as possible
 	$.webshims.polyfill();
 &lt;/script&gt;	
 </code>
 				
-						<p>The polyfill method can also take a whitespace-separated list of several features.</p>
+						<p>The polyfill method can also take a whitespace-separated list of several features and should be called as soon as possible (before DOM ready).</p>
 <code class="block">
 //load and implement json-storage and geolocation features, if they aren't supported
 $.webshims.polyfill('json-storage geolocation');
@@ -195,7 +195,7 @@ $.webshims.polyfill('json-storage geolocation');
 							<li><code>mediaelement</code></li>
 							<li><code>details</code></li>
 						</ul>
-		
+						
 						<p>If you have any trouble setting up Webshims lib, set <code>$.webshims.debug</code> to true and open your console:</p>
 <code class="block">							
 &lt;script&gt;
@@ -237,13 +237,13 @@ $(document).ready(function(){
 </code>		
 	
 			
-					<p>If you want to use a feature as soon as possible, you can use <code>$.webshims.ready</code> and pass the feature name(s) and a callback function:</p>
+					<p>If you want to use a feature as soon as possible or you have set the <code>waitReady</code> option to <code>false</code>, you can use <code>$.webshims.ready</code> and pass the feature name(s) and a callback function:</p>
 <code class="block">
 $.webshims.ready('geolocation json-storage', function(){
 	//work with geolocation, JSON and localStorage
 });
 </code>	
-					<p>Note that this callback function may be called before DOM-Ready. If you want to use a feature after DOM-Ready, simply pass the string 'DOM':</p>
+					<p>Note that this callback function may be called before the DOM is ready. If you want to use a feature after DOM-Ready, simply pass the string 'DOM':</p>
 <code class="block">
 $.webshims.ready('DOM canvas', function(){
 	//work with canvas in the document
@@ -256,9 +256,9 @@ $.webshims.ready('DOM canvas', function(){
 					<p><code>setOptions</code> should always be called before the <code>polyfill</code> method.</p>
 					<p>The available general options are the following:</p>
 					<ul>
-						<li><strong>extendNative</strong> (default: true): Webshims lib will automatically extend DOM-Objects with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNative is set to false, webshims lib won't touch any DOM-Objects and will only implement jQuery plugins.</li>
+						<li><strong>extendNative</strong> (default: true): Webshims lib will automatically extend DOM-Objects with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNative is set to false, webshims lib won't touch any DOM-Objects and will only implement jQuery plugins. Setting this option to false, might be also good for DOM performance.</li>
 						<li><strong>basePath</strong> (default: "automatially computed path to the shims folder"): If polyfiller.js was renamed <strong>and</strong> is loaded dynamically, the basePath should be changed manually.</li>
-						<li><strong>waitReady</strong> (default: true): If this option is true, jQuery's ready-event will be delayed until all needed features are ready to use. This option should be set to false, if webshims lib polyfiller.js is loaded async (see also Loading webshims async in the <a href="#polyfill-foucs">loading documentation</a>) or from bottom of the body element. This option can also be set to false, ife a website is using only HTML5 markup APIs (pure HTML or $.attr) and do not use any DOM-/JS-APIs on DOM-ready.</li>
+						<li><strong>waitReady</strong> (default: true): If this option is true, jQuery's ready-event will be delayed until all needed features are ready to use. This option should be set to false, if webshims lib polyfiller.js is loaded async (see also Loading webshims async in the <a href="#polyfill-foucs">loading documentation</a>) or from bottom of the body element. This option can also be set to false, if a website is using only HTML5 markup APIs (pure HTML or $.attr) and do not use any DOM-/JS-APIs on DOM-ready. If this feature is set to false, which might be good against FOUCs, scripted access to polyfilled APIs have to be added inside of a <a href="#polyfill-ready"><code>$.webshims.ready</code></a> callback.</li>
 					</ul>
 <code class="block">
 $.webshims.setOptions("extendNative", false);

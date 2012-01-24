@@ -883,7 +883,16 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 						get: function(){
 							var elem = this;
 							var select = $('select', elem);
-							return (select[0]) ? select[0].options : [];
+							var options;
+							if(select[0]){
+								options = select[0].options;
+							} else {
+								options = $('option', elem).get();
+								if(options.length){
+									webshims.warn('you should wrap you option-elements for a datalist in a select element to support IE and other old browsers.');
+								}
+							}
+							return options;
 						}
 					}
 				});
@@ -968,17 +977,11 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				$.event.customEvent.updateInput = true;
 			} 
 			webshims.addReady(function(context, contextElem){
-				contextElem.filter('select, option').each(function(){
-					var parent = this.parentNode;
-					var isDatalist = $.nodeName(parent, 'datalist');
-					if(parent && !isDatalist){
-						parent = parent.parentNode;
-						isDatalist = $.nodeName(parent, 'datalist');
-					}
-					if(parent && isDatalist){
-						$(parent).triggerHandler('updateDatalist');
-					}
-				});
+				contextElem
+					.filter('datalist > select, datalist')
+					.closest('datalist')
+					.triggerHandler('updateDatalist')
+				;
 			});
 			
 			
@@ -2275,7 +2278,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			}
 		}
 	};
-	var stopParent = /^(?:embed|object)$/i;
+	var stopParent = /^(?:embed|object|datalist)$/i;
 	var selectSource = function(elem, data){
 		var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
 		var _srces = mediaelement.srces(elem);
@@ -2284,7 +2287,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		clearTimeout(baseData.loadTimer);
 		$.data(elem, 'mediaerror', false);
 		
-		if(!_srces.length || !parent || stopParent.test(parent.nodeName || '')){return;}
+		if(!_srces.length || !parent || parent.nodeType != 1 || stopParent.test(parent.nodeName || '')){return;}
 		data = data || webshims.data(elem, 'mediaelement');
 		stepSources(elem, data, options.preferFlash || undefined, _srces);
 	};

@@ -1110,7 +1110,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			}
 		}
 	};
-	var stopParent = /^(?:embed|object)$/i;
+	var stopParent = /^(?:embed|object|datalist)$/i;
 	var selectSource = function(elem, data){
 		var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
 		var _srces = mediaelement.srces(elem);
@@ -1119,7 +1119,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		clearTimeout(baseData.loadTimer);
 		$.data(elem, 'mediaerror', false);
 		
-		if(!_srces.length || !parent || stopParent.test(parent.nodeName || '')){return;}
+		if(!_srces.length || !parent || parent.nodeType != 1 || stopParent.test(parent.nodeName || '')){return;}
 		data = data || webshims.data(elem, 'mediaelement');
 		stepSources(elem, data, options.preferFlash || undefined, _srces);
 	};
@@ -1308,6 +1308,8 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		var details = isInterActiveSummary(this);
 		if(!details || $.data(this, 'detailsElement')){return;}
 		var timer;
+		var stopNativeClickTest;
+		var tabindex = $.attr(this, 'tabIndex') || '0';
 		bindDetailsSummary(this, details);
 		$(this)
 			.bind('focus.summaryPolyfill', function(){
@@ -1325,25 +1327,36 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			.bind('click.summaryPolyfill', function(e){
 				var details = isInterActiveSummary(this);
 				if(details){
-					clearTimeout(timer); 
-					
-					timer = setTimeout(function(){
-						if(!e.isDefaultPrevented()){
-							details.prop('open', !details.prop('open'));
-						}
-					}, 0);
+					if(!stopNativeClickTest && e.originalEvent){
+						stopNativeClickTest = true;
+						e.stopImmediatePropagation();
+						e.preventDefault();
+						$(this).trigger('click');
+						stopNativeClickTest = false;
+						return false;
+					} else {
+						clearTimeout(timer); 
+						
+						timer = setTimeout(function(){
+							if(!e.isDefaultPrevented()){
+								details.prop('open', !details.prop('open'));
+							}
+						}, 0);
+					}
 				}
 			})
 			.bind('keydown.summaryPolyfill', function(e){
 				if( (e.keyCode == 13 || e.keyCode == 32) && !e.isDefaultPrevented()){
-					var that = this;
+					stopNativeClickTest = true;
 					e.preventDefault();
-					$(that).trigger('click');			
+					$(this).trigger('click');
+					stopNativeClickTest = false;
 				}
 			})
-			.attr({tabindex: '0', role: 'button'})
+			.attr({tabindex: tabindex, role: 'button'})
 			.prepend('<span class="details-open-indicator" />')
 		;
+		webshims.moveToFirstEvent(this, 'click');
 	});
 	
 	var initDetails;

@@ -1794,7 +1794,16 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 						get: function(){
 							var elem = this;
 							var select = $('select', elem);
-							return (select[0]) ? select[0].options : [];
+							var options;
+							if(select[0]){
+								options = select[0].options;
+							} else {
+								options = $('option', elem).get();
+								if(options.length){
+									webshims.warn('you should wrap you option-elements for a datalist in a select element to support IE and other old browsers.');
+								}
+							}
+							return options;
 						}
 					}
 				});
@@ -1879,17 +1888,11 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				$.event.customEvent.updateInput = true;
 			} 
 			webshims.addReady(function(context, contextElem){
-				contextElem.filter('select, option').each(function(){
-					var parent = this.parentNode;
-					var isDatalist = $.nodeName(parent, 'datalist');
-					if(parent && !isDatalist){
-						parent = parent.parentNode;
-						isDatalist = $.nodeName(parent, 'datalist');
-					}
-					if(parent && isDatalist){
-						$(parent).triggerHandler('updateDatalist');
-					}
-				});
+				contextElem
+					.filter('datalist > select, datalist')
+					.closest('datalist')
+					.triggerHandler('updateDatalist')
+				;
 			});
 			
 			

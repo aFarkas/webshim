@@ -58,6 +58,8 @@ jQuery.webshims.register('details', function($, webshims, window, doc, undefined
 		var details = isInterActiveSummary(this);
 		if(!details || $.data(this, 'detailsElement')){return;}
 		var timer;
+		var stopNativeClickTest;
+		var tabindex = $.attr(this, 'tabIndex') || '0';
 		bindDetailsSummary(this, details);
 		$(this)
 			.bind('focus.summaryPolyfill', function(){
@@ -75,25 +77,36 @@ jQuery.webshims.register('details', function($, webshims, window, doc, undefined
 			.bind('click.summaryPolyfill', function(e){
 				var details = isInterActiveSummary(this);
 				if(details){
-					clearTimeout(timer); 
-					
-					timer = setTimeout(function(){
-						if(!e.isDefaultPrevented()){
-							details.prop('open', !details.prop('open'));
-						}
-					}, 0);
+					if(!stopNativeClickTest && e.originalEvent){
+						stopNativeClickTest = true;
+						e.stopImmediatePropagation();
+						e.preventDefault();
+						$(this).trigger('click');
+						stopNativeClickTest = false;
+						return false;
+					} else {
+						clearTimeout(timer); 
+						
+						timer = setTimeout(function(){
+							if(!e.isDefaultPrevented()){
+								details.prop('open', !details.prop('open'));
+							}
+						}, 0);
+					}
 				}
 			})
 			.bind('keydown.summaryPolyfill', function(e){
 				if( (e.keyCode == 13 || e.keyCode == 32) && !e.isDefaultPrevented()){
-					var that = this;
+					stopNativeClickTest = true;
 					e.preventDefault();
-					$(that).trigger('click');			
+					$(this).trigger('click');
+					stopNativeClickTest = false;
 				}
 			})
-			.attr({tabindex: '0', role: 'button'})
+			.attr({tabindex: tabindex, role: 'button'})
 			.prepend('<span class="details-open-indicator" />')
 		;
+		webshims.moveToFirstEvent(this, 'click');
 	});
 	
 	var initDetails;
