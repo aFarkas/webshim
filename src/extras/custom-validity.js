@@ -10,7 +10,6 @@
 	} 
 	var webshims = $.webshims;
 	var customValidityRules = {};
-	var oldProp = $.prop;
 	var formReady = false;
 	var blockCustom;
 	var initTest;
@@ -36,7 +35,7 @@
 		if(!elem.form || (!initTest && !$.prop(elem, 'willValidate')) ){return;}
 		blockCustom = true;
 		var customMismatchedRule = $.data(elem, 'customMismatchedRule');
-		var validity = oldProp(elem, 'validity') || {};
+		var validity = $.prop(elem, 'validity') || {};
 		var message = '';
 		if(customMismatchedRule || !validity.customError){
 			var val = $(elem).val();
@@ -62,16 +61,7 @@
 	
 	webshims.ready('forms', function(){
 		formReady = true;
-		
-		oldProp = $.prop;
 				
-		$.prop = function(elem, name){
-			if(name == 'validity' && !blockCustom){
-				testValidityRules(elem);
-			}
-			return oldProp.apply(this, arguments);
-		};
-		
 		var oldCustomValidity = $.fn.setCustomValidity || function(message){
 			return this.each(function(){
 				if(this.setCustomValidity){

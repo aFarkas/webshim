@@ -99,6 +99,10 @@ $.webshims.customErrorMessages.testname['de'] = 'Sie müßen "foo bar baz" einge
 &lt;!-- changing validation message for a specific element, using data-errormessage--&gt;
 &lt;input class="creditcard-input" data-errormessage="Please, enter a valid creditcard number" type="number" /&gt;
 </code>
+			<p>In case of changing a property, which effects the custom validity of the field, simply trigger the 'refreshCustomValidityRules' event on this field:</p>
+<code class="block">
+$('input[data-minlength]').val('some value').trigger('refreshCustomValidityRules');
+</code>			
 			<h3>Predefined custom validity attributes</h3>
 			<h4>creditcard</h4>
 			<p>All elements with the class 'creditcard-input' should have a creditcard number.</p>
