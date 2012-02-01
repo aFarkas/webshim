@@ -499,12 +499,12 @@
 					} else if (window.yepnope) {
 						if (yepnope.injectJs) {
 							yepnope.injectJs(src, complete);
-						}
-						else {
+						} else {
 							yepnope({
 								load: src,
 								callback: complete
 							});
+							webshims.warn("old yepnope detected, use yepnope 1.5 as soon as possible.");
 						}
 					}
 				};
