@@ -1304,15 +1304,15 @@ jQuery.webshims.gcEval = function(){
 				});
 				//remove form-extend readyness
 				webshims.modules['form-extend'].test = $.noop;
+				reTest.push('form-message');
+			} else if(webshims.bugs.validationMessage){
+				reTest.push('form-message');
 			}
-			
 			
 			if(webshims.isReady('form-number-date-api')){
 				reTest.push('form-number-date-api');
 			}
-			if(webshims.bugs.validationMessage){
-				reTest.push('form-message');
-			}
+			
 			webshims.reTest(reTest);
 			//Opera hasn't fixed this issue right, it's buggy
 			// || webshims.browserVersion > 11.59
