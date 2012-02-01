@@ -410,7 +410,7 @@ $.webshims.polyfill(polyfillFeatures);
 						<li>waitReady: should be changed to false. Note: you can not rely on jQuery's DOM-Ready event anymore.</li>
 						<li>basePath: should be set manually</li>
 					</ul>
-					<p>A typical configuration and usage for webshims lib loading async would look like this:</p>
+					<p>A typical configuration and usage for webshims lib loading async (using yepnope) would look like this:</p>
 <code class="block">&lt;script src="modernizr-yepnope.js"&gt;&lt;/script&gt;
 &lt;script&gt;
 	Modernizr.load([
@@ -439,7 +439,6 @@ $.webshims.polyfill(polyfillFeatures);
 					//start polyfilling
 					jQuery.webshims.polyfill('forms canvas');
 					
-					//this is only needed if you want to use polyfilled DOM-features as soon as possible
 					//wait for the normal ready event and...
 					jQuery(function($){
 						//wait until all requested features are implemented
@@ -455,7 +454,40 @@ $.webshims.polyfill(polyfillFeatures);
 	]);
 &lt;/script&gt;
 &lt;/head&gt;
+</code>
+
+						<p>Webshims polyfiller main file also registers as a AMD module. A typical configuration for loading webshims and jQuery async, using requireJS, would look like this:</p>
+						
+<code class="block">&lt;script src="require.js"&gt;&lt;/script&gt;
+&lt;script src="modernizr.custom.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+	//requireJS config
+	//...
+require( ["jquery", "polyfiller"], function(e){
+	//change webshims options
+	jQuery.webshims.setOptions({
+		waitReady: false,
+		basePath: "/js/libs/shims/"
+	});
+	
+	//start polyfilling
+	jQuery.webshims.polyfill('forms canvas');
+	
+	//wait for the normal ready event and...
+	jQuery(function($){
+		//wait until all requested features are implemented
+		$.wehshims.ready('canvas forms', function(){
+			//use polyfilled features
+			var context = $('#myCanvas').getContext("2d");
+		});
+	});
+});
+
+&lt;/script&gt;
+&lt;/head&gt;
 </code>	
+						
+
 						<h3>Dealing with FOUCs</h3>
 						<p>Webshims lib uses a script loader and loading scripts dynamically always have the potential to create so called Flash of unstyled contents or Flash of unbehaviored contents.</p>
 						<p>There are a lot ways to deal with FOUCs/FOUBCs. The most easiest way to remove FOUCs caused by webshims lib is:</p>
