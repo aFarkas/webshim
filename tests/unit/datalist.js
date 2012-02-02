@@ -52,11 +52,27 @@ asyncTest("datalist", function(){
 			start();
 			var shadowList = $('ul.dlist2-shadowdom');
 			var shadowListItems = $('li', shadowList);
-			strictEqual(shadowList.length, 1, 'there is on dlist2 element');
+			strictEqual(shadowList.length, 1, 'there is one dlist2 element');
 			$.each(['secondlist', 'dynamic appended'], function(i, val){
-				equals($('span.option-value', shadowListItems[i]).text(), val, 'shadow datalistitems value equals options value');
+				equals($('span.option-value', shadowListItems.eq(1)).text(), val, 'shadow datalistitems value equals options value');
 			});
 			shadowList.remove();
+			
+		});
+		
+		$.webshims.ready('DOM form-datalist', function(){
+			$('#email').attr('list', 'dlist2');
+			$('#dlist2').htmlPolyfill('<select><option value="dynamic appended" /><option value="dynamic appended"></option></select>');
+			
+			start();
+			var shadowList = $('ul.dlist2-shadowdom');
+			var shadowListItems = $('li', shadowList);
+			strictEqual(shadowList.length, 1, 'there is one dlist2 element');
+			$.each(['secondlist', 'dynamic appended'], function(i, val){
+				equals($('span.option-value', shadowListItems.eq(1)).text(), val, 'shadow datalistitems value equals options value');
+			});
+			shadowList.remove();
+			
 		});
 		
 		
@@ -69,7 +85,7 @@ asyncTest("datalist", function(){
 			var shadowListItems = $('li', shadowList);
 			strictEqual(shadowList.length, 1, 'there is on dlist2 element');
 			$.each(['dynamic appended1', 'dynamic appended2'], function(i, val){
-				equals($('span.option-value', shadowListItems[i]).text(), val, 'shadow datalistitems value equals options value');
+				equals($('span.option-value', shadowListItems.eq(i)).text(), val, 'shadow datalistitems value equals options value');
 			});
 			shadowList.remove();
 			
@@ -77,7 +93,7 @@ asyncTest("datalist", function(){
 		
 	}
 	
-	$.webshims.ready('DOM form-datalist', function(){
+	$.webshims.ready('DOM forms forms-ext', function(){
 		start();
 	});
 });
