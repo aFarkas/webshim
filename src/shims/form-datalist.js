@@ -135,7 +135,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 			} 
 			webshims.addReady(function(context, contextElem){
 				contextElem
-					.filter('datalist > select, datalist')
+					.filter('datalist > select, datalist, datalist > option, datalist > select > option')
 					.closest('datalist')
 					.triggerHandler('updateDatalist')
 				;
@@ -349,10 +349,9 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				this.needsUpdate = true;
 				this.lastUpdatedValue = false;
 				this.lastUnfoundValue = '';
-				
+
 				if(!this.updateTimer){
 					if(window.QUnit || (forceShow = (e && document.activeElement == that.input))){
-						
 						that.updateListOptions(forceShow);
 					} else {
 						webshims.ready('WINDOWLOAD', function(){

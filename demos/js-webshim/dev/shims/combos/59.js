@@ -286,7 +286,7 @@ jQuery.webshims.gcEval = function(){
 		var dateElem = $('input', form).eq(0);
 		var timer;
 		var loadFormFixes = function(e){
-			var reTest = ['form-extend', 'form-native-fix'];
+			var reTest = ['form-extend', 'form-message', 'form-native-fix'];
 			if(e){
 				e.preventDefault();
 				e.stopImmediatePropagation();
@@ -304,10 +304,7 @@ jQuery.webshims.gcEval = function(){
 				});
 				//remove form-extend readyness
 				webshims.modules['form-extend'].test = $.noop;
-				reTest.push('form-message');
-			} else if(webshims.bugs.validationMessage){
-				reTest.push('form-message');
-			}
+			} 
 			
 			if(webshims.isReady('form-number-date-api')){
 				reTest.push('form-number-date-api');
@@ -1139,10 +1136,11 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			} 
 			webshims.addReady(function(context, contextElem){
 				contextElem
-					.filter('datalist > select, datalist')
+					.filter('datalist > select, datalist, datalist > option, datalist > select > option')
 					.closest('datalist')
 					.triggerHandler('updateDatalist')
 				;
+				
 			});
 			
 			
@@ -1199,6 +1197,10 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				if(datalist && data && data.datalist !== datalist){
 					data.datalist = datalist;
 					data.id = opts.id;
+					$(data.datalist)
+						.unbind('updateDatalist.datalistWidget')
+						.bind('updateDatalist.datalistWidget', $.proxy(data, '_resetListCached'))
+					;
 					data._resetListCached();
 					return;
 				} else if(!datalist){
@@ -1348,8 +1350,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				this.needsUpdate = true;
 				this.lastUpdatedValue = false;
 				this.lastUnfoundValue = '';
-				
-				
+
 				if(!this.updateTimer){
 					if(window.QUnit || (forceShow = (e && document.activeElement == that.input))){
 						that.updateListOptions(forceShow);
