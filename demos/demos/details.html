@@ -23,7 +23,16 @@
     </script>
 	<script src="../demo-js/demo.js"></script>
 	<title>HTML5 interactive elements: details &amp; summary : webshims lib - the polyfilling capability based loading JS library</title>
-	    
+	<style>
+		/* a special way to deal with FOUCS | see also: ../index.html#polyfill-foucs */
+		.loading-polyfills.no-details details:not([open]) {
+			max-height: 1.2em;
+			overflow: hidden;
+		}
+		.no-details.loading-polyfills details {
+			visibility: hidden;
+		}
+	</style>
 </head>
 
 <body>
