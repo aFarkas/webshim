@@ -75,6 +75,13 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+upcomming Release 1.8.8
+----------
+
+- updated to Modernizr 2.5.2
+- use of yepnope's 1.5.2 low-level API for better network performance
+- improved scriptability of datalist and details/summary elements
+
 Release 1.8.7
 ----------
 

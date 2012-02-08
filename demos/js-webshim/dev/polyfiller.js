@@ -26,7 +26,7 @@
 		
 	
 	var webshims = {
-		version: 'pre1.8.8',
+		version: '1.8.8',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
