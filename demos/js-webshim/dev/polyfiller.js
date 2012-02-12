@@ -26,7 +26,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.8',
+		version: 'pre1.8.9',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -494,19 +494,11 @@
 						require([src], complete);
 					} else if (window.sssl) {
 						sssl(src, complete);
+					} else if (window.yepnope) {
+						yepnope.injectJs(src, complete);
 					} else if (window.steal) {
 						steal(src).then(complete);
-					} else if (window.yepnope) {
-						if (yepnope.injectJs) {
-							yepnope.injectJs(src, complete);
-						} else {
-							yepnope({
-								load: src,
-								callback: complete
-							});
-							webshims.warn("old yepnope detected, use yepnope 1.5 as soon as possible.");
-						}
-					}
+					} 
 				};
 			})()
 		}
@@ -1029,7 +1021,6 @@
 			},
 			c: [18, 7, 6]
 		});
-		modernizrInputAttrs.list = Modernizr.datalist = !!(modernizrInputAttrs.list && ('HTMLDataListElement' in window));
 		
 		addPolyfill('form-datalist', {
 			f: 'forms-ext',
