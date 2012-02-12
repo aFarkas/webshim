@@ -75,7 +75,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-upcomming Release 1.8.8
+Release 1.8.8
 ----------
 
 - updated to Modernizr 2.5.2

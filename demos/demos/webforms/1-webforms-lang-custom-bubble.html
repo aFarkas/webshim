@@ -30,10 +30,16 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script src="../../js-webshim/minified/extras/mousepress.js"></script>
 	<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
-	
+	<script>
+		// set options for html5shiv
+		if(!window.html5){
+			window.html5 = {}; 
+		}
+		window.html5.shivMethods = false;
+	</script>
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
-    <script>
-    	//configure
+	<script>
+		//configure
 		$.webshims.setOptions('forms', {
 			overrideMessages: true
 		});
@@ -44,10 +50,9 @@
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
-    </script>
+	</script>
 	<script src="../../demo-js/demo.js"></script>
 	<title>styling HTML5 error validation messages / changing text of validation messages : HTML5 forms / Webforms 2.0 constraint validation API</title>
-	    
 </head>
 
 <body>

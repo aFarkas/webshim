@@ -28,8 +28,8 @@
 	
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
 	
-    <script class="example">
-//    	$.webshims.debug = true;
+	<script class="example">
+//		$.webshims.debug = true;
 		
 		$.webshims.setOptions('forms-ext', {
 			replaceUI: true,
@@ -50,8 +50,7 @@
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
-        
-    </script>
+	</script>
 	<script>
 		$.webshims.ready('ready forms-ext', function(){
 			$('form').bind('firstinvalid', function(e){

@@ -7,20 +7,26 @@
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
-	
+	<script>
+		// set options for html5shiv
+		if(!window.html5){
+			window.html5 = {}; 
+		}
+		window.html5.shivMethods = false;
+	</script>
 	<script src="../js-webshim/minified/extras/mousepress.js"></script>
 	
 	<script src="../js-webshim/minified/polyfiller.js"></script>
 	
-    <script>
-    	$.webshims.setOptions({
+	<script>
+		$.webshims.setOptions({
 			//we do not use any DOM-/JS-APIs on DOM-ready, so we do not need to delay the ready event <- good against fouc
 			waitReady: false
 		});
 		$.webshims.polyfill();
 		
 		
-        $(function(){
+		$(function(){
 			
 			
 			//If you want to build a simple player the following code can help you
@@ -194,10 +200,9 @@
 			};
 			
 		});
-    </script>
+	</script>
 	<script src="../demo-js/demo.js"></script>
 	<title>HTML5 mediaelements audio and video : webshims lib - the polyfilling capability based loading JS library</title>
-	    
 </head>
 
 <body>
