@@ -107,6 +107,10 @@ output {
 .placeholder-visible .placeholder-text {
 	display: inline-block;
 }
+.placeholder-focused span,
+.placeholder-focused label {
+	color: #ccc;
+}
 .polyfill-important .placeholder-visible .placeholder-text {
 	display: inline-block !important;
 }

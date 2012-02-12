@@ -1380,18 +1380,29 @@ webshims.addReady(function(context, contextElem){
 		polyfillElements.push('input');
 	}
 	
-	var hidePlaceholder = function(elem, data, value){
+	var hidePlaceholder = function(elem, data, value, _onFocus){
 			if(!isOver && elem.type != 'password'){
 				if(value === false){
 					value = $.prop(elem, 'value');
 				}
 				elem.value = value;
+			} else if(isOver && !value && _onFocus){
+				$(elem)
+					.bind('keydown.placeholderremove keypress.placeholderremove paste.placeholderremove input.placeholderremove', function(){
+						data.box.removeClass('placeholder-visible');
+						$(elem).unbind('.placeholderremove');
+					})
+					.bind('blur.placeholderremove', function(){
+						$(elem).unbind('.placeholderremove');
+					})
+				;
+				return;
 			}
 			data.box.removeClass('placeholder-visible');
 		},
 		showPlaceholder = function(elem, data, placeholderTxt){
 			if(placeholderTxt === false){
-				placeholderTxt = $.attr(elem, 'placeholder') || '';
+				placeholderTxt = $.prop(elem, 'placeholder');
 			}
 			
 			if(!isOver && elem.type != 'password'){
@@ -1406,7 +1417,7 @@ webshims.addReady(function(context, contextElem){
 			}
 			if(type == 'focus' || (!type && elem === document.activeElement)){
 				if(elem.type == 'password' || isOver || $(elem).hasClass('placeholder-visible')){
-					hidePlaceholder(elem, data, '');
+					hidePlaceholder(elem, data, '', true);
 				}
 				return;
 			}
@@ -1464,6 +1475,9 @@ webshims.addReady(function(context, contextElem){
 					
 					$(elem).bind('focus.placeholder blur.placeholder', function(e){
 						changePlaceholderVisibility(this, false, false, data, e.type );
+						if(isOver){
+							data.box[e.type == 'focus' ? 'addClass' : 'removeClass']('placeholder-focused');
+						}
 					});
 					if(elem.form){
 						$(elem.form).bind('reset.placeholder', function(e){
