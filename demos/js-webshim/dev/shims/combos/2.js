@@ -1380,13 +1380,50 @@ webshims.addReady(function(context, contextElem){
 		polyfillElements.push('input');
 	}
 	
+	var setSelection = function(elem){
+		if(elem.setSelectionRange){
+			elem.setSelectionRange(0, 0);
+			return true;
+		} else if(elem){
+			var range = elem.createTextRange();
+			range.collapse(true);
+			range.moveEnd('character', 0);
+			range.moveStart('character', 0);
+			range.select();
+			return true;
+		}
+	};
+	
 	var hidePlaceholder = function(elem, data, value, _onFocus){
+			if(value === false){
+				value = $.prop(elem, 'value');
+			}
 			if(!isOver && elem.type != 'password'){
-				if(value === false){
-					value = $.prop(elem, 'value');
+				if(!value && _onFocus && setSelection(elem)){
+					var selectTimer;
+					$(elem)
+						.bind('keydown.placeholderremove keypress.placeholderremove paste.placeholderremove input.placeholderremove', function(){
+							elem.value = $.prop(elem, 'value');
+							data.box.removeClass('placeholder-visible');
+							clearTimeout(selectTimer);
+							$(elem).unbind('.placeholderremove');
+						})
+						.bind('mousedown.placeholderremove drag.placeholderremove select.placeholderremove', function(e){
+							setSelection(elem);
+							clearTimeout(selectTimer);
+							selectTimer = setTimeout(function(){
+								setSelection(elem);
+							}, 9);
+						})
+						.bind('blur.placeholderremove', function(){
+							clearTimeout(selectTimer);
+							$(elem).unbind('.placeholderremove');
+						})
+					;
+					return;
 				}
 				elem.value = value;
-			} else if(isOver && !value && _onFocus){
+			} else if(!value && _onFocus){
 				$(elem)
 					.bind('keydown.placeholderremove keypress.placeholderremove paste.placeholderremove input.placeholderremove', function(){
 						data.box.removeClass('placeholder-visible');
@@ -1415,6 +1452,7 @@ webshims.addReady(function(context, contextElem){
 				data = $.data(elem, 'placeHolder');
 				if(!data){return;}
 			}
+			$(elem).unbind('.placeholderremove');
 			if(type == 'focus' || (!type && elem === document.activeElement)){
 				if(elem.type == 'password' || isOver || $(elem).hasClass('placeholder-visible')){
 					hidePlaceholder(elem, data, '', true);
@@ -1475,9 +1513,7 @@ webshims.addReady(function(context, contextElem){
 					
 					$(elem).bind('focus.placeholder blur.placeholder', function(e){
 						changePlaceholderVisibility(this, false, false, data, e.type );
-						if(isOver){
-							data.box[e.type == 'focus' ? 'addClass' : 'removeClass']('placeholder-focused');
-						}
+						data.box[e.type == 'focus' ? 'addClass' : 'removeClass']('placeholder-focused');
 					});
 					if(elem.form){
 						$(elem.form).bind('reset.placeholder', function(e){
