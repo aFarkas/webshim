@@ -136,15 +136,7 @@ asyncTest("general validity Modul", function(){
 		$('#email').val(val);
 		ok($('#email').is(':'+state), val+' is '+state+' mail');
 	});
-	if(!omitTests.validity){
-		$.each({
-			'info@cät.de': 'valid-element',
-			'"in@fo"@3com.com': 'valid-element'
-		}, function(val, state){
-			$('#email').val(val);
-			ok($('#email').is(':'+state), val+' is '+state+' mail');
-		});
-	}
+	
 	
 	
 	$.webshims.ready('forms DOM', function(){
