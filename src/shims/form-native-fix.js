@@ -3,6 +3,8 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 	if(!Modernizr.formvalidation || Modernizr.bugfreeformvalidation){return;}
 	
 	var badWebkit = ($.browser.webkit);
+	var badValidity = badWebkit && webshims.browserVersion <= 534.5;
+	var invalidSelector = (badValidity) ? 'input:invalid-element, select:invalid-element, textarea:invalid-element' : ':invalid';
 	var invalids = [],
 		firstInvalidEvent,
 		form
@@ -20,9 +22,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		};
 		window.addEventListener('submit', function(e){
 			if(!formnovalidate.prevented && e.target.checkValidity && $.attr(e.target, 'novalidate') == null){
-				
-					
-				if($(':invalid', e.target).length){
+				if($(invalidSelector, e.target).length){
 					$(e.target)
 						.unbind('submit.preventInvalidSubmit')
 						.bind('submit.preventInvalidSubmit', function(submitEvent){
@@ -95,10 +95,11 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		})
 	;
 	
+	
 		
 	(function(){
 		//safari 5.0.x has serious issues with checkValidity in combination with setCustomValidity so we mimic checkValidity using validity-property (webshims.fix.checkValidity)
-		if(!badWebkit || webshims.browserVersion > 534.5){return;}
+		if(!badValidity){return;}
 		['input', 'textarea', 'select'].forEach(function(name){
 			var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
 				prop: {
