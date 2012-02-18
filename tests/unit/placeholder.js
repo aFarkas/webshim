@@ -55,7 +55,7 @@ asyncTest("placeholder Modul", function(){
 	$('#placeholder').val("");
 	placeholder.isVisible($('#placeholder'), true);
 	
-	$('#placeholder').attr("value", "foo");
+	$('#placeholder').prop("value", "foo");
 	placeholder.isVisible($('#placeholder'), false);
 	
 	webshimtest.reflectAttr($('#placeholder'), 'placeholder', "hello");
@@ -87,6 +87,7 @@ asyncTest("placeholder Modul", function(){
 	//todo: make this testable in jQuery 1.7+
 	if(!$.fn.on){
 		$('#placeholder-empty').trigger('focus');
+		$('#placeholder-empty').triggerHandler('keydown');
 		placeholder.isVisible($('#placeholder-empty'), false);
 		$('#placeholder-empty').trigger('blur');
 		placeholder.isVisible($('#placeholder-empty'), true);
@@ -123,6 +124,7 @@ asyncTest("placeholder Modul", function(){
 	textPlaceholder.hasText($('#placeholder-empty-text')[0], 'yes2');
 	
 	$('#placeholder-empty-text').triggerHandler('focus');
+    $('#placeholder-empty-text').triggerHandler('keydown');
 	textPlaceholder.hasText($('#placeholder-empty-text')[0], '');
 	$('#placeholder-empty-text').triggerHandler('blur');
 	textPlaceholder.hasText($('#placeholder-empty-text')[0], 'yes2');

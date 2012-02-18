@@ -36,6 +36,35 @@ html.long-loading-polyfills {
 	background-repeat: no-repeat;
 }
 */
+
+/* Style the placeholder */
+::-webkit-input-placeholder {
+	color: #999;
+}
+:-ms-input-placeholder  {
+	color: #999;
+}
+:-moz-placeholder {
+	color: #999;
+}
+.placeholder-visible {
+	color: #999;
+}
+
+:focus::-webkit-input-placeholder {
+	color: #ddd;
+}
+:focus:-ms-input-placeholder  {
+	color: #ddd;
+}
+/* not supported yet */
+:focus:-moz-placeholder {
+	color: #ddd;
+}
+.placeholder-focused.placeholder-visible {
+	color: #ddd;
+}
+
 h1, h2, h3, h4, h5, h6, table, input, textarea, label, select {
 	font-size: 100%;
 }
