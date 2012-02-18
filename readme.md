@@ -75,6 +75,14 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.8.9
+----------
+
+- updated to Modernizr 2.5.3 (fixes crash bug in IE8)
+- improved field[placeholder] usability
+- fixed regression for iOS4 (old webkits)
+- updated email validation
+
 Release 1.8.8
 ----------
 
