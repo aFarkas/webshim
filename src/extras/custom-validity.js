@@ -227,7 +227,12 @@
 			data = $.data(elem, 'dependentValidation', $.extend({_init: true}, dependentDefaults, data));
 			
 			if(data.prop !== "value" || specialVal){
-				$(data.masterElement).bind('change', depFn);
+				if(data.masterElement.type === 'radio') {
+					$(data.masterElement).parents('form').find('input[type="radio"][name="' + data.masterElement.name + '"]').bind('change', depFn);
+				}
+				else {
+					$(data.masterElement).bind('change', depFn);
+				}
 			} else {
 				$(data.masterElement).bind('change', function(){
 					$.webshims.refreshCustomValidityRules(elem);
