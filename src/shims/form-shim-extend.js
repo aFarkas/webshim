@@ -4,16 +4,13 @@ webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
 var cfg = webshims.cfg.forms;
 var isSubmit;
-var getNames = function(elem){
-		return (elem.form && elem.name) ? elem.form[elem.name] : [];
-	},
-	isNumber = function(string){
+var isNumber = function(string){
 		return (typeof string == 'number' || (string && string == string * 1));
 	},
 	typeModels = webshims.inputTypes,
 	checkTypes = {
 		radio: 1,
-		checkbox: 1		
+		checkbox: 1
 	},
 	getType = function(elem){
 		return (elem.getAttribute('type') || elem.type || '').toLowerCase();
@@ -60,7 +57,7 @@ var validityRules = {
 			if(cache.nodeName == 'select'){
 				ret = (!val && (input[0].selectedIndex < 0 || isPlaceholderOptionSelected(input[0]) ));
 			} else if(checkTypes[cache.type]){
-				ret = (cache.type == 'checkbox') ? !input.is(':checked') : !$(getNames(input[0])).filter(':checked')[0];
+				ret = (cache.type == 'checkbox') ? !input.is(':checked') : !webshims.modules["form-core"].getGroupElements(input).filter(':checked')[0];
 			} else {
 				ret = !(val);
 			}

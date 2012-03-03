@@ -185,6 +185,12 @@
 	<div class="htc-test"></div>
 	<div class="form-wrapper">
 		<input type="email" id="email-outside" name="email-outside" value="ddd" />
+		
+		<div class="radio-group-outside">
+			<input type="radio" name="radio-outside" required />
+			<input type="radio" name="radio-outside" required />
+			<input type="checkbox" name="radio-outside" />
+		</div>
 	    <form id="form-1" action="" method="post">
 	        <!-- hidden fields should not be visible -->
 			<div class="form-item-hidden">
@@ -288,7 +294,7 @@
 	                        <label class="m" for="placeholder-empty">
 	                            placeholder-empty:
 							</label>
-	                        <input class="oninput-test" oninput="window.globalInput = rangeId.value +':'+ rangeName.value;" name="placeholder-empty" type="password" id="placeholder-empty" />
+	                        <input class="oninput-test" name="placeholder-empty" type="password" id="placeholder-empty" />
 						</div>
 	               	</fieldset>
 				</div>

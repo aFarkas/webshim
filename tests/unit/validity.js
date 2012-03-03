@@ -236,10 +236,6 @@ asyncTest('output test', function(){
 	ok( !/&outputtest=somecontent&/.test($('form').serialize()) , 'does not find output serialized in shim');
 	$('#rangeId').attr('value', 30);
 	
-	$.webshims.triggerInlineForm($('input.oninput-test')[0], 'input');
-	
-	equals(window.globalInput, '30:30', 'globalInput value was set on trigger');
-	
 	$($('#form-1')[0]['outputtest']).prop('value', 'value');
 	equals($('#labeled-output').prop('value'), 'value', 'value is set through form elements');
 	$.webshims.ready('forms DOM', function(){
@@ -262,6 +258,15 @@ asyncTest('checkValidity/invalid event I', function(){
 	ok(!$('#form-1').checkValidity(), 'validity is false for form-element (form)');
 	equals(invalids, 7, 'there were 7 invalid events (form)');
 	strictEqual($('#email-outside').checkValidity(), false, 'email outside of form will be validated');
+	
+	$('div.radio-group-outside').each(function(){
+		strictEqual($('input[type="radio"]', this).checkValidity(), false, 'radio group outside of form will be validated 1');
+		$('input[type="checkbox"]', this).prop('checked', true);
+		strictEqual($('input[type="radio"]', this).checkValidity(), false, 'radio group outside of form will be validated 2');
+		$('input[type="radio"]', this).eq(1).prop('checked', true);
+		strictEqual($('input[type="radio"]', this).checkValidity(), true, 'radio group outside of form will be validated 3');
+	});
+	
 	$.webshims.ready('forms DOM', function(){
 		start();
 	});

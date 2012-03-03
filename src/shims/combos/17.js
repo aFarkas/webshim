@@ -1248,15 +1248,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 	}
 	
 });
-})(jQuery, Modernizr, jQuery.webshims);//todo use $.globalEval?
-jQuery.webshims.gcEval = function(){
-	with(arguments[1] && arguments[1].form || window) {
-		with(arguments[1] || window){
-			return (function(){eval( arguments[0] );}).call(arguments[1] || window, arguments[0]);
-		}
-	}
-};
-//additional tests for partial implementation of forms features
+})(jQuery, Modernizr, jQuery.webshims);//additional tests for partial implementation of forms features
 (function($){
 	var Modernizr = window.Modernizr;
 	var webshims = $.webshims;
@@ -1412,9 +1404,26 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	var emptyJ = $([]);
 	var getGroupElements = function(elem){
 		elem = $(elem);
-		var name = elem[0].name;
-		return (groupTypes[elem[0].type] && name) ? $((elem[0].form && elem[0].form[name]) || document.getElementsByName(name)).not(elem[0]) : emptyJ;
+		var name;
+		var form;
+		var ret = emptyJ;
+		if(groupTypes[elem[0].type]){
+			form = elem.prop('form');
+			name = elem[0].name;
+			if(!name){
+				ret = elem;
+			} else if(form){
+				ret = $(form[name]);
+			} else {
+				ret = $(document.getElementsByName(name)).filter(function(){
+					return !$.prop(this, 'form');
+				});
+			}
+			ret = ret.filter('[type="radio"]');
+		}
+		return ret;
 	};
+	
 	var getContentValidationMessage = webshims.getContentValidationMessage = function(elem, validity){
 		var message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
 		if(message && message.indexOf('{') != -1){
@@ -1495,7 +1504,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			if(isValid(elem)){
 				$(elem).getShadowElement().removeClass('form-ui-invalid');
 				if(name == 'checked' && val) {
-					getGroupElements(elem).removeClass('form-ui-invalid').removeAttr('aria-invalid');
+					getGroupElements(elem).not(elem).removeClass('form-ui-invalid').removeAttr('aria-invalid');
 				}
 			}
 		}
@@ -1533,7 +1542,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					generaltrigger = 'changedvaliditystate';
 					trigger = 'changedvalid';
 					if(checkTypes[elem.type] && elem.checked){
-						getGroupElements(elem).removeClass(removeClass).addClass(addClass).removeAttr('aria-invalid');
+						getGroupElements(elem).not(elem).removeClass(removeClass).addClass(addClass).removeAttr('aria-invalid');
 					}
 					$.removeData(elem, 'webshimsinvalidcause');
 				}
@@ -1547,7 +1556,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					addClass = 'form-ui-invalid';
 					removeClass = 'form-ui-valid';
 					if (checkTypes[elem.type] && !elem.checked) {
-						getGroupElements(elem).removeClass(removeClass).addClass(addClass);
+						getGroupElements(elem).not(elem).removeClass(removeClass).addClass(addClass);
 					}
 					trigger = 'changedinvalid';
 				}
@@ -1578,41 +1587,10 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	
 	
 	webshims.triggerInlineForm = function(elem, event){
-		if(elem.jquery){
-			elem = elem[0];
-		}
-		var onEvent = 'on'+event;
-		var attr = elem[onEvent] || elem.getAttribute(onEvent) || '';
-		var removed;
-		var ret;
-		event = $.Event({
-			type: event,
-			target: elem,
-			currentTarget: elem
-		});
-		
-		if(attr){
-			webshims.warn(onEvent +' used. we will drop inline event handler support, with next release. use event binding: $.bind instead');
-			if(typeof attr == 'string'){
-				ret = webshims.gcEval(attr, elem);
-				if(elem[onEvent]){
-					removed = true;
-					elem[onEvent] = false;
-				}
-			}
-			
-			
-		}
-		if(ret === false){
-			event.stopPropagation();
-			event.preventDefault();
-		}
 		$(elem).trigger(event);
-		if(removed){
-			elem[onEvent] = attr;
-		}
-		return ret;
 	};
+	
+	webshims.modules["form-core"].getGroupElements = getGroupElements;
 	
 	
 	var setRoot = function(){
