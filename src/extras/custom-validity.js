@@ -178,6 +178,11 @@
 		"from-prop": "value", //default: value||checked (last if element checkbox or radio)
 		"toggle": false
 	};
+	
+	var getGroupElements = $.webshims.modules["form-core"].getGroupElements || function(elem) {
+		return $(elem.form[elem.name]).filter('[type="radio"]');
+	};
+	
 	addCustomValidityRule('dependent', function(elem, val){
 		
 		if( !elem.getAttribute('data-dependent-validation') ){return;}
@@ -227,7 +232,7 @@
 			data = $.data(elem, 'dependentValidation', $.extend({_init: true}, dependentDefaults, data));
 			
 			if(data.prop !== "value" || specialVal){
-				$(data.masterElement).bind('change', depFn);
+				(data.masterElement.type === 'radio' && getGroupElements || $)(data.masterElement).bind('change', depFn);
 			} else {
 				$(data.masterElement).bind('change', function(){
 					$.webshims.refreshCustomValidityRules(elem);
