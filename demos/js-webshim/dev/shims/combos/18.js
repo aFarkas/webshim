@@ -1354,16 +1354,21 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		}
 		
 		var id = orig.attr('id'),
-			attr = {
-				css: {
-					marginRight: orig.css('marginRight'),
-					marginLeft: orig.css('marginLeft')
-				},
-				outerWidth: orig.outerWidth(),
-				label: (id) ? $('label[for="'+ id +'"]', orig[0].form) : emptyJ
-			},
-			curLabelID =  webshims.getID(attr.label)
+			attr = (options.calculateWidth) ? 
+				{
+					css: {
+						marginRight: orig.css('marginRight'),
+						marginLeft: orig.css('marginLeft')
+					},
+					outerWidth: orig.outerWidth()
+					
+				} :
+				{},
+			curLabelID
 		;
+		attr.label =  (id) ? $('label[for="'+ id +'"]', orig[0].form) : emptyJ
+		curLabelID =  webshims.getID(attr.label);
+		
 		shim.addClass(orig[0].className);
 		webshims.addShadowDom(orig, shim, {
 			data: methods || {},

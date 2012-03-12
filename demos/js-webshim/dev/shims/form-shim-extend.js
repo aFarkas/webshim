@@ -753,9 +753,7 @@ webshims.addReady(function(context, contextElem){
 				create: function(elem){
 					var data = $.data(elem, 'placeHolder');
 					if(data){return data;}
-					data = $.data(elem, 'placeHolder', {
-						text: createPlaceholder(elem)
-					});
+					data = $.data(elem, 'placeHolder', {});
 					
 					$(elem).bind('focus.placeholder blur.placeholder', function(e){
 						changePlaceholderVisibility(this, false, false, data, e.type );
@@ -770,6 +768,7 @@ webshims.addReady(function(context, contextElem){
 					}
 					
 					if(elem.type == 'password' || isOver){
+						data.text = createPlaceholder(elem);
 						data.box = $(elem)
 							.wrap('<span class="placeholder-box placeholder-box-'+ (elem.nodeName || '').toLowerCase() +'" />')
 							.parent()
@@ -827,13 +826,7 @@ webshims.addReady(function(context, contextElem){
 								}
 							}
 						};
-						if($.nodeName(data.text[0], 'label')){
-							//if label is dynamically set after we ensure that our label isn't exposed anymore
-							//ie always exposes last label and ff always first
-							setTimeout(function(){
-								data.text.hide()[$.browser.msie ? 'insertBefore' : 'insertAfter'](elem);
-							}, 9);
-						}
+						
 						$(window).bind('beforeunload', reset);
 						data.box = $(elem);
 						if(elem.form){
@@ -847,8 +840,9 @@ webshims.addReady(function(context, contextElem){
 					if(!allowedPlaceholder[$.prop(elem, 'type')] && !$.nodeName(elem, 'textarea')){return;}
 					
 					var data = pHolder.create(elem);
-					
-					data.text.text(val);
+					if(data.text){
+						data.text.text(val);
+					}
 					
 					changePlaceholderVisibility(elem, false, val, data);
 				}

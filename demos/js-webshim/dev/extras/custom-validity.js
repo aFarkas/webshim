@@ -179,7 +179,7 @@
 		"toggle": false
 	};
 	
-	var getGroupElements = $.webshims.modules["form-core"].getGroupElements || function(elem) {
+	var getGroupElements = $.webshims.modules && $.webshims.modules["form-core"].getGroupElements || function(elem) {
 		return $(elem.form[elem.name]).filter('[type="radio"]');
 	};
 	
