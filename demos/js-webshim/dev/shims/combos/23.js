@@ -1425,7 +1425,10 @@ webshims.addReady(function(context, contextElem){
 					return data;
 				},
 				update: function(elem, val){
-					if(!allowedPlaceholder[$.prop(elem, 'type')] && !$.nodeName(elem, 'textarea')){return;}
+					if(!allowedPlaceholder[$.prop(elem, 'type')] && !$.nodeName(elem, 'textarea')){
+						webshims.warn("placeholder not allowed on type: "+ $.prop(elem, 'type'));
+						return;
+					}
 					
 					var data = pHolder.create(elem);
 					if(data.text){
