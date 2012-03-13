@@ -1754,15 +1754,14 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		clearTimeout(localConnectionTimer);
 		data.jwData = jwData;
 		data.shadowElem.removeClass('flashblocker-assumed');
+		$.prop(data._elem, 'volume', data.volume);
+		$.prop(data._elem, 'muted', data.muted);
+		initEvents(data);
 		if(!data.wasSwfReady){
 			var version = parseFloat( jwData.version, 10);
 			if(version < 5.6 || version >= 6){
 				webshims.warn('mediaelement-swf is only testet with jwplayer 5.6+');
 			}
-			$.prop(data._elem, 'volume', data.volume);
-			$.prop(data._elem, 'muted', data.muted);
-			initEvents(data);
-			
 		} else {
 			$(data._elem).mediaLoad();
 		}
