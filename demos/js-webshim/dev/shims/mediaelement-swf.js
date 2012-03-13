@@ -973,7 +973,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			return oldClean.apply(this, arguments);
 		};
 	}
-	
+
 	if(!hasNative){
 		var anchor = document.createElement('a');
 		anchor.style.display = "none";
@@ -989,7 +989,10 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 							try {
 								$(anchor).appendTo(this);
 								ret = anchor.getAttribute('href', 4);
-							} catch(er){}
+							} catch(er){
+								ret = anchor.getAttribute('href', 4);
+							}
+							$(anchor).detach();
 						}
 						return ret || anchor.href;
 					},

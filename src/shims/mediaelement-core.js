@@ -340,69 +340,73 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		}
 	});
 	
+	var initMediaElements = function(){
+		webshims.addReady(function(context, insertedElement){
+			$('video, audio', context)
+				.add(insertedElement.filter('video, audio'))
+				.each(function(){
+					if($.browser.msie && webshims.browserVersion > 8 && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay])')){
+						$(this).prop('preload', 'metadata').mediaLoad();
+					} else {
+						selectSource(this);
+					}
+					
+					
+					
+					if(hasNative){
+						var bufferTimer;
+						var lastBuffered;
+						var elem = this;
+						var getBufferedString = function(){
+							var buffered = $.prop(elem, 'buffered');
+							if(!buffered){return;}
+							var bufferString = "";
+							for(var i = 0, len = buffered.length; i < len;i++){
+								bufferString += buffered.end(i);
+							}
+							return bufferString;
+						};
+						var testBuffer = function(){
+							var buffered = getBufferedString();
+							if(buffered != lastBuffered){
+								lastBuffered = buffered;
+								$(elem).triggerHandler('progress');
+							}
+						};
+						
+						$(this)
+							.bind('play loadstart progress', function(e){
+								if(e.type == 'progress'){
+									lastBuffered = getBufferedString();
+								}
+								clearTimeout(bufferTimer);
+								bufferTimer = setTimeout(testBuffer, 999);
+							})
+							.bind('emptied stalled mediaerror abort suspend', function(e){
+								if(e.type == 'emptied'){
+									lastBuffered = false;
+								}
+								clearTimeout(bufferTimer);
+							})
+						;
+					}
+				})
+			;
+		});
+	};
+	
 	
 	//set native implementation ready, before swf api is retested
 	if(hasNative){
 		webshims.isReady('mediaelement-core', true);
+		initMediaElements();
+		if(hasSwf){
+			webshims.ready('WINDOWLOAD mediaelement', loadSwf);
+		}
+	} else {
+		webshims.ready('mediaelement-swf', initMediaElements);
 	}
-	//init
-	webshims.addReady(function(context, insertedElement){
-		
-		$('video, audio', context)
-			.add(insertedElement.filter('video, audio'))
-			.each(function(){
-				if($.browser.msie && webshims.browserVersion > 8 && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay])')){
-					$(this).prop('preload', 'metadata').mediaLoad();
-				} else {
-					selectSource(this);
-				}
-				
-				
-				
-				if(hasNative){
-					var bufferTimer;
-					var lastBuffered;
-					var elem = this;
-					var getBufferedString = function(){
-						var buffered = $.prop(elem, 'buffered');
-						if(!buffered){return;}
-						var bufferString = "";
-						for(var i = 0, len = buffered.length; i < len;i++){
-							bufferString += buffered.end(i);
-						}
-						return bufferString;
-					};
-					var testBuffer = function(){
-						var buffered = getBufferedString();
-						if(buffered != lastBuffered){
-							lastBuffered = buffered;
-							$(elem).triggerHandler('progress');
-						}
-					};
-					
-					$(this)
-						.bind('play loadstart progress', function(e){
-							if(e.type == 'progress'){
-								lastBuffered = getBufferedString();
-							}
-							clearTimeout(bufferTimer);
-							bufferTimer = setTimeout(testBuffer, 999);
-						})
-						.bind('emptied stalled mediaerror abort suspend', function(e){
-							if(e.type == 'emptied'){
-								lastBuffered = false;
-							}
-							clearTimeout(bufferTimer);
-						})
-					;
-				}
-			})
-		;
-	});
 	
-	if(hasNative && hasSwf){
-		webshims.ready('WINDOWLOAD mediaelement', loadSwf);
-	}
 	
 });
 })(jQuery, Modernizr, jQuery.webshims);
