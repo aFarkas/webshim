@@ -977,14 +977,22 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	
 	if(!hasNative){
 		var anchor = document.createElement('a');
+		anchor.style.display = "none";
 		['poster', 'src'].forEach(function(prop){
 			webshims.defineNodeNamesProperty(prop == 'src' ? ['audio', 'video', 'source'] : ['video'], prop, {
 				prop: {
 					get: function(){
 						var href = this.getAttribute(prop);
+						var ret;
 						if(href == null){return '';}
 						anchor.setAttribute('href', href+'' );
-						return !$.support.hrefNormalized ? anchor.getAttribute('href', 4) : anchor.href;
+						if(!$.support.hrefNormalized){
+							try {
+								$(anchor).appendTo(this);
+								ret = anchor.getAttribute('href', 4);
+							} catch(er){}
+						}
+						return ret || anchor.href;
 					},
 					set: function(src){
 						$.attr(this, prop, src);
