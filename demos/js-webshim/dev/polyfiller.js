@@ -18,7 +18,7 @@
 	var addTest = Modernizr.addTest;
 	var browserVersion = parseFloat($.browser.version, 10);
 	var Object = window.Object;
-	
+	var html5 = window.html5 || {};
 	
 	Modernizr.genericDOM = !!($('<video><div></div></video>')[0].innerHTML);
 	
@@ -34,6 +34,7 @@
 			waitReady: true,
 			extendNative: true,
 			loadStyles: true,
+			disableShivMethods: true,
 			basePath: (function(){
 				var script = jScripts.filter('[src*="polyfiller.js"]');
 				var path;
@@ -86,6 +87,9 @@
 				var onReadyEvts = features;
 				var timer;
 				
+				if(webCFG.disableShivMethods && Modernizr.genericDOM && 'html5Clone' in $.support){
+					html5.shivMethods = false;
+				}
 				
 				var removeLoader = function(){
 					$('html').removeClass('loading-polyfills long-loading-polyfills');
@@ -510,7 +514,7 @@
 	$.webshims = webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var googleAPIs = protocol + 'ajax.googleapis.com/ajax/libs/';
-	var uiLib = googleAPIs + 'jqueryui/1.8.17/';
+	var uiLib = googleAPIs + 'jqueryui/1.8.18/';
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;
@@ -918,6 +922,15 @@
 		var formvalidation = 'formvalidation';
 		addTest(formvalidation, function(){
 			return !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern);
+		});
+		
+		addTest('styleableinputrange', function(){
+			if(!modernizrInputTypes.range){
+				return false;
+			}
+			var input = document.createElement('input');
+			input.setAttribute('type', 'range');
+			return input.style.WebkitAppearance !== undefined;
 		});
 		
 		
