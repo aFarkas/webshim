@@ -102,7 +102,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 	};
 	
 	
-	if(webshims.bugs.validationMessage || !Modernizr.formvalidation){
+	if(webshims.bugs.validationMessage || !Modernizr.formvalidation || webshims.bugs.bustedValidity){
 		implementProperties.push('validationMessage');
 	}
 	
@@ -160,7 +160,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 						if(message){return message;}
 						
 						if(validity.customError && elem.nodeName){
-							message = (Modernizr.formvalidation && desc.prop._supget) ? desc.prop._supget.call(elem) : webshims.data(elem, 'customvalidationMessage');
+							message = (Modernizr.formvalidation && !webshims.bugs.bustedValidity && desc.prop._supget) ? desc.prop._supget.call(elem) : webshims.data(elem, 'customvalidationMessage');
 							if(message){return message;}
 						}
 						$.each(validity, function(name, prop){

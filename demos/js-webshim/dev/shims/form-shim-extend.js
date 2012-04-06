@@ -1,4 +1,4 @@
-if(!Modernizr.formvalidation){
+if(!Modernizr.formvalidation || jQuery.webshims.bugs.bustedValidity){
 jQuery.webshims.register('form-extend', function($, webshims, window, document){
 webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
@@ -47,9 +47,7 @@ var isPlaceholderOptionSelected = function(select){
 
 var validityRules = {
 		valueMissing: function(input, val, cache){
-			if(!input.attr('required')){
-				return false;
-			}
+			if(!input.prop('required')){return false;}
 			var ret = false;
 			if(!('type' in cache)){
 				cache.type = getType(input[0]);
@@ -113,6 +111,13 @@ $.event.special.invalid = {
 			.bind('submit', $.event.special.invalid.handler)
 		;
 		webshims.moveToFirstEvent(form, 'submit');
+		if(webshims.bugs.bustedValidity && $.nodeName(form, 'form')){
+			(function(){
+				var noValidate = form.getAttribute('novalidate');
+				form.setAttribute('novalidate', 'novalidate');
+				webshims.data(form, 'bustedNoValidate', (noValidate == null) ? null : noValidate);
+			})();
+		}
 		form = null;
 	},
 	teardown: $.noop,
@@ -316,99 +321,100 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 webshims.reflectProperties(['input'], ['pattern']);
 
 
-
-var constrainMaxLength = (function(){
-	var timer;
-	var curLength = 0;
-	var lastElement = $([]);
-	var max = 1e9;
-	var constrainLength = function(){
-		var nowValue = lastElement.prop('value');
-		var nowLen = nowValue.length;
-		if(nowLen > curLength && nowLen > max){
-			nowLen = Math.max(curLength, max);
-			lastElement.prop('value', nowValue.substr(0, nowLen ));
-		}
-		curLength = nowLen;
-	};
-	var remove = function(){
-		clearTimeout(timer);
-		lastElement.unbind('.maxlengthconstraint');
-	};
-	return function(element, maxLength){
-		remove();
-		if(maxLength > -1){
-			max = maxLength;
-			curLength = $.prop(element, 'value').length;
-			lastElement = $(element);
-			lastElement.bind('keydown.maxlengthconstraint keypress.maxlengthconstraint paste.maxlengthconstraint cut.maxlengthconstraint', function(e){
-				setTimeout(constrainLength, 0);
-			});
-			lastElement.bind('keyup.maxlengthconstraint', constrainLength);
-			lastElement.bind('blur.maxlengthconstraint', remove);
-			timer = setInterval(constrainLength, 200);
-		}
-	};
-})();
-
-constrainMaxLength.update = function(element, maxLength){
-	if(element === document.activeElement){
-		if(maxLength == null){
-			maxLength = $.prop(element, 'maxlength');
-		}
-		constrainMaxLength(e.target, maxLength);
-	}
-};
-
-$(document).bind('focusin', function(e){
-	var maxLength;
-	if(e.target.nodeName == "TEXTAREA" && (maxLength = $.prop(e.target, 'maxlength')) > -1){
-		constrainMaxLength(e.target, maxLength);
-	}
-});
-
-webshims.defineNodeNameProperty('textarea', 'maxlength', {
-	attr: {
-		set: function(val){
-			this.setAttribute('maxlength', ''+val);
-			constrainMaxLength.update(this);
-		},
-		get: function(){
-			var ret = this.getAttribute('maxlength');
-			return ret == null ? undefined : ret;
-		}
-	},
-	prop: {
-		set: function(val){
-			if(isNumber(val)){
-				if(val < 0){
-					throw('INDEX_SIZE_ERR');
-				}
-				val = parseInt(val, 10);
-				this.setAttribute('maxlength', val);
-				constrainMaxLength.update(this, val);
-				return;
+if( !('maxLength' in document.createElement('textarea')) ){
+	var constrainMaxLength = (function(){
+		var timer;
+		var curLength = 0;
+		var lastElement = $([]);
+		var max = 1e9;
+		var constrainLength = function(){
+			var nowValue = lastElement.prop('value');
+			var nowLen = nowValue.length;
+			if(nowLen > curLength && nowLen > max){
+				nowLen = Math.max(curLength, max);
+				lastElement.prop('value', nowValue.substr(0, nowLen ));
 			}
-			this.setAttribute('maxlength', ''+ 0);
-			constrainMaxLength.update(this, 0);
-		},
-		get: function(){
-			var val = this.getAttribute('maxlength');
-			return (isNumber(val) && val >= 0) ? parseInt(val, 10) : -1; 
-			
+			curLength = nowLen;
+		};
+		var remove = function(){
+			clearTimeout(timer);
+			lastElement.unbind('.maxlengthconstraint');
+		};
+		return function(element, maxLength){
+			remove();
+			if(maxLength > -1){
+				max = maxLength;
+				curLength = $.prop(element, 'value').length;
+				lastElement = $(element);
+				lastElement.bind('keydown.maxlengthconstraint keypress.maxlengthconstraint paste.maxlengthconstraint cut.maxlengthconstraint', function(e){
+					setTimeout(constrainLength, 0);
+				});
+				lastElement.bind('keyup.maxlengthconstraint', constrainLength);
+				lastElement.bind('blur.maxlengthconstraint', remove);
+				timer = setInterval(constrainLength, 200);
+			}
+		};
+	})();
+	
+	constrainMaxLength.update = function(element, maxLength){
+		if(element === document.activeElement){
+			if(maxLength == null){
+				maxLength = $.prop(element, 'maxlength');
+			}
+			constrainMaxLength(e.target, maxLength);
 		}
-	}
-});
-webshims.defineNodeNameProperty('textarea', 'maxLength', {
-	prop: {
-		set: function(val){
-			$.prop(this, 'maxlength', val);
-		},
-		get: function(){
-			return $.prop(this, 'maxlength');
+	};
+	
+	$(document).bind('focusin', function(e){
+		var maxLength;
+		if(e.target.nodeName == "TEXTAREA" && (maxLength = $.prop(e.target, 'maxlength')) > -1){
+			constrainMaxLength(e.target, maxLength);
 		}
-	}
-});
+	});
+	
+	webshims.defineNodeNameProperty('textarea', 'maxlength', {
+		attr: {
+			set: function(val){
+				this.setAttribute('maxlength', ''+val);
+				constrainMaxLength.update(this);
+			},
+			get: function(){
+				var ret = this.getAttribute('maxlength');
+				return ret == null ? undefined : ret;
+			}
+		},
+		prop: {
+			set: function(val){
+				if(isNumber(val)){
+					if(val < 0){
+						throw('INDEX_SIZE_ERR');
+					}
+					val = parseInt(val, 10);
+					this.setAttribute('maxlength', val);
+					constrainMaxLength.update(this, val);
+					return;
+				}
+				this.setAttribute('maxlength', ''+ 0);
+				constrainMaxLength.update(this, 0);
+			},
+			get: function(){
+				var val = this.getAttribute('maxlength');
+				return (isNumber(val) && val >= 0) ? parseInt(val, 10) : -1; 
+				
+			}
+		}
+	});
+	webshims.defineNodeNameProperty('textarea', 'maxLength', {
+		prop: {
+			set: function(val){
+				$.prop(this, 'maxlength', val);
+			},
+			get: function(){
+				return $.prop(this, 'maxlength');
+			}
+		}
+	});
+} 
 
 
 
@@ -579,6 +585,23 @@ if(!$.support.getSetAttribute && $('<form novalidate></form>').attr('novalidate'
 			}
 		}
 	});
+} else if(webshims.bugs.bustedValidity){
+	webshims.defineNodeNameProperty('form', 'novalidate', {
+		attr: {
+			set: function(val){
+				webshims.data(this, 'bustedNoValidate', ''+val);
+			},
+			get: function(){
+				var ret = webshims.data(this, 'bustedNoValidate');
+				return ret == null ? undefined : ret;
+			}
+		},
+		removeAttr: {
+			value: function(){
+				webshims.data(this, 'bustedNoValidate', null);
+			}
+		}
+	});
 }
 
 webshims.defineNodeNameProperty('form', 'noValidate', {
@@ -605,15 +628,15 @@ webshims.addReady(function(context, contextElem){
 		.bind('invalid', $.noop)
 	;
 	
-		try {
-			if(context == document && !('form' in (document.activeElement || {}))) {
-				focusElem = $('input[autofocus], select[autofocus], textarea[autofocus]', context).eq(0).getShadowFocusElement()[0];
-				if (focusElem && focusElem.offsetHeight && focusElem.offsetWidth) {
-					focusElem.focus();
-				}
+	try {
+		if(context == document && !('form' in (document.activeElement || {}))) {
+			focusElem = $('input[autofocus], select[autofocus], textarea[autofocus]', context).eq(0).getShadowFocusElement()[0];
+			if (focusElem && focusElem.offsetHeight && focusElem.offsetWidth) {
+				focusElem.focus();
 			}
-		} 
-		catch (er) {}
+		}
+	} 
+	catch (er) {}
 	
 });
 

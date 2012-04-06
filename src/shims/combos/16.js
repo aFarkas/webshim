@@ -1275,7 +1275,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		}
 	};
 	
-	if(!Modernizr.formvalidation){return;}
+	if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){return;}
 	var form = $('<form action="#" style="width: 1px; height: 1px; overflow: hidden;"><select /><input type="date" required name="a" /><input type="submit" /></form>');
 	Modernizr.bugfreeformvalidation = Modernizr.requiredSelect = !!('required' in $('select', form)[0]);
 	if(window.opera || $.browser.webkit || window.testGoodWithFix){

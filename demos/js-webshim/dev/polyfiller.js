@@ -924,6 +924,10 @@
 			return !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern);
 		});
 		
+		if(Modernizr[formvalidation]){
+			webshims.bugs.bustedValidity = !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid;
+		}
+		
 		addTest('styleableinputrange', function(){
 			if(!modernizrInputTypes.range){
 				return false;
@@ -961,12 +965,13 @@
 			c: [3, 2, 59, 17, 16, 5, 4, 24, 19]
 		});
 				
-		if(Modernizr[formvalidation]){
+		if(Modernizr[formvalidation] && !webshims.bugs.bustedValidity){
 			
 			addPolyfill('form-extend', {
 				f: 'forms',
 				src: 'form-native-extend',
 				test: function(toLoad){
+					
 					return ((modules['form-number-date-api'].test() || $.inArray('form-number-date-api', toLoad  || []) == -1) && !this.options.overrideMessages );
 				},
 				d: ['form-core', DOMSUPPORT, 'form-message'],
@@ -980,6 +985,9 @@
 			addPolyfill('form-extend', {
 				f: 'forms',
 				src: 'form-shim-extend',
+				test: function(){
+					return false;
+				},
 				d: ['form-core', DOMSUPPORT],
 				c: [3, 2, 23, 21]
 			});

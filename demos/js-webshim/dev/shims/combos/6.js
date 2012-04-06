@@ -51,7 +51,8 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			}
 			return val;
 		},
-		EPS = 1e-7
+		EPS = 1e-7,
+		typeBugs = webshims.bugs.valueAsNumberSet || webshims.bugs.bustedValidity
 	;
 	
 	webshims.addValidityRule('stepMismatch', function(input, val, cache, validityState){
@@ -358,21 +359,21 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		}
 	};
 	
-	if(webshims.bugs.valueAsNumberSet || !supportsType('number')){
+	if(typeBugs || !supportsType('number')){
 		webshims.addInputType('number', typeProtos.number);
 	}
 	
-	if(webshims.bugs.valueAsNumberSet || !supportsType('range')){
+	if(typeBugs || !supportsType('range')){
 		webshims.addInputType('range', $.extend({}, typeProtos.number, typeProtos.range));
 	}
-	if(webshims.bugs.valueAsNumberSet || !supportsType('date')){
+	if(typeBugs || !supportsType('date')){
 		webshims.addInputType('date', typeProtos.date);
 	}
-	if(webshims.bugs.valueAsNumberSet || !supportsType('time')){
+	if(typeBugs || !supportsType('time')){
 		webshims.addInputType('time', $.extend({}, typeProtos.date, typeProtos.time));
 	}
 	
-	if(webshims.bugs.valueAsNumberSet || !supportsType('datetime-local')){
+	if(typeBugs || !supportsType('datetime-local')){
 		webshims.addInputType('datetime-local', $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']));
 	}
 		

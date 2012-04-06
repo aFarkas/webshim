@@ -1,9 +1,9 @@
 jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, undefined){
 	
-	if(!Modernizr.formvalidation || Modernizr.bugfreeformvalidation){return;}
+	if(!Modernizr.formvalidation || Modernizr.bugfreeformvalidation || webshims.bugs.bustedValidity){return;}
 	
 	var badWebkit = ($.browser.webkit);
-	var badValidity = badWebkit && webshims.browserVersion <= 534.5;
+	var badValidity = badWebkit && webshims.browserVersion <= 534.4;
 	var invalidSelector = (badValidity) ? 'input:invalid-element, select:invalid-element, textarea:invalid-element' : ':invalid';
 	var invalids = [],
 		firstInvalidEvent,

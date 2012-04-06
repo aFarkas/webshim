@@ -21,7 +21,7 @@
 		}
 	};
 	
-	if(!Modernizr.formvalidation){return;}
+	if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){return;}
 	var form = $('<form action="#" style="width: 1px; height: 1px; overflow: hidden;"><select /><input type="date" required name="a" /><input type="submit" /></form>');
 	Modernizr.bugfreeformvalidation = Modernizr.requiredSelect = !!('required' in $('select', form)[0]);
 	if(window.opera || $.browser.webkit || window.testGoodWithFix){
@@ -650,7 +650,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	};
 	
 	
-	if(webshims.bugs.validationMessage || !Modernizr.formvalidation){
+	if(webshims.bugs.validationMessage || !Modernizr.formvalidation || webshims.bugs.bustedValidity){
 		implementProperties.push('validationMessage');
 	}
 	
@@ -708,7 +708,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 						if(message){return message;}
 						
 						if(validity.customError && elem.nodeName){
-							message = (Modernizr.formvalidation && desc.prop._supget) ? desc.prop._supget.call(elem) : webshims.data(elem, 'customvalidationMessage');
+							message = (Modernizr.formvalidation && !webshims.bugs.bustedValidity && desc.prop._supget) ? desc.prop._supget.call(elem) : webshims.data(elem, 'customvalidationMessage');
 							if(message){return message;}
 						}
 						$.each(validity, function(name, prop){

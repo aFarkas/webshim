@@ -3,7 +3,7 @@
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>Webshims Lib Test Suite</title>
-	
+	<script src="../src/extras/modernizr-custom.js"></script>
 	<link rel="stylesheet" href="qunit/qunit.css" media="screen">
 	<script>
 		(function(){
@@ -11,7 +11,7 @@
 			if(hash.indexOf('legacyjquery') != -1){
 				document.write('<script src="http:\/\/ajax.googleapis.com\/ajax\/libs\/jquery\/1.6.4\/jquery.js"><\/script>');
 			} else {
-				document.write('<script src="http:\/\/code.jquery.com\/jquery-1.7.1.js"><\/script>');
+				document.write('<script src="http:\/\/code.jquery.com\/jquery-1.7.2.js"><\/script>');
 			}
 		})();
 	</script>
@@ -27,7 +27,7 @@
 		};
 	}());
 	</script>
-	<script src="../src/extras/modernizr-custom.js"></script>
+	
 	<script src="qunit/qunit.js"></script>
 	
 	<script src="../src/polyfiller.js"></script>
@@ -121,7 +121,6 @@
 	<script src="unit/placeholder.js"></script>
 	<script src="unit/validity.js"></script>
 	<script src="unit/canvas.js"></script>
-	
 	<script src="unit/number-date.js"></script>
 	<script src="unit/dynamic-webshim.js"></script>
 	<script src="unit/stepup-down.js"></script>
@@ -135,6 +134,7 @@
 	
 	<!-- last test: -->
 	<script src="unit/datalist.js"></script>
+	
 	<script>
 		jQuery.noConflict();
 		(function($){

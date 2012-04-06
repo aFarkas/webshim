@@ -2,7 +2,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 	"use strict";
 	var Modernizr = window.Modernizr;
 	var modernizrInputTypes = Modernizr.inputtypes;
-	if(!Modernizr.formvalidation){return;}
+	if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){return;}
 	var typeModels = webshims.inputTypes;
 	var validityRules = {};
 	
