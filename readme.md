@@ -75,6 +75,14 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+upcomming Release 1.8.10
+----------
+
+- fixed validity issues with old webkits (Safari 5.0.0 - 5.0.2)
+- improved flash reframeing handling
+- improved spinbutton usability
+- auto disable html5shiv's innerShiv, if jQuery 1.7+ is used
+
 Release 1.8.9
 ----------
 
