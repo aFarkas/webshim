@@ -1084,10 +1084,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		if(options.stepArrows){
 			$('input', context).add(contextElem.filter('input')).each(function(){
 				var type = $.prop(this, 'type');
-				if(!typeModels[type] || !typeModels[type].asNumber || !options.stepArrows || (options.stepArrows !== true && !options.stepArrows[type]) || supportsType(type) || $(this).hasClass('has-step-controls')){return;}
+				if(!typeModels[type] || !typeModels[type].asNumber || !options.stepArrows || (options.stepArrows !== true && !options.stepArrows[type]) || supportsType(type) || $(elem).hasClass('has-step-controls')){return;}
 				var elem = this;
 				var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
-					.insertAfter(this)
+					.insertAfter(elem)
 					.bind('selectstart dragstart', function(){return false;})
 					.bind('mousedown mousepress', function(e){
 						doSteps(elem, type, e.target);
@@ -1097,22 +1097,43 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						$(e.target)[e.type == 'mousepressstart' ? 'addClass' : 'removeClass']('mousepress-ui');
 					})
 				;
-				var jElm = $(this)
+				var mwheelUpDown = function(e, d){
+					if(elem.disabled || elem.readOnly){return;}
+					$.prop(elem, 'value',  typeModels[type].numberToString(getNextStep(elem, d, {type: type})));
+					triggerInlineForm(elem, 'input');
+					return false;
+				};
+				var jElm = $(elem)
 					.addClass('has-step-controls')
 					.attr({
-						readonly: this.readOnly,
-						disabled: this.disabled,
+						readonly: elem.readOnly,
+						disabled: elem.disabled,
 						autocomplete: 'off',
 						role: 'spinbutton'
 					})
 					.bind(($.browser.msie) ? 'keydown' : 'keypress', function(e){
-						if(this.disabled || this.readOnly || !stepKeys[e.keyCode]){return;}
-						$.prop(this, 'value',  typeModels[type].numberToString(getNextStep(this, stepKeys[e.keyCode], {type: type})));
-						triggerInlineForm(this, 'input');
+						if(elem.disabled || elem.readOnly || !stepKeys[e.keyCode]){return;}
+						$.prop(elem, 'value',  typeModels[type].numberToString(getNextStep(elem, stepKeys[e.keyCode], {type: type})));
+						triggerInlineForm(elem, 'input');
 						return false;
 					})
 				;
-				webshims.data(this, 'step-controls', controls);
+				
+				if($.fn.mwheelIntent){
+					jElm.add(controls).bind('mwheelIntent', mwheelUpDown);
+				} else {
+					jElm
+						.bind('focus', function(){
+							jElm.add(controls).unbind('.mwhellwebshims')
+								.bind('mousewheel.mwhellwebshims', mwheelUpDown)
+							;
+						})
+						.bind('blur', function(){
+							$(elem).add(controls).unbind('.mwhellwebshims');
+						})
+					;
+				}
+				webshims.data(elem, 'step-controls', controls);
 				if(options.calculateWidth){
 					adjustInputWithBtn(jElm, controls);
 					controls.css('marginTop', (jElm.outerHeight() - controls.outerHeight())  / 2 );

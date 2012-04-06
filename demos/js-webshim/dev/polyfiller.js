@@ -966,12 +966,10 @@
 		});
 				
 		if(Modernizr[formvalidation] && !webshims.bugs.bustedValidity){
-			
 			addPolyfill('form-extend', {
 				f: 'forms',
 				src: 'form-native-extend',
 				test: function(toLoad){
-					
 					return ((modules['form-number-date-api'].test() || $.inArray('form-number-date-api', toLoad  || []) == -1) && !this.options.overrideMessages );
 				},
 				d: ['form-core', DOMSUPPORT, 'form-message'],
