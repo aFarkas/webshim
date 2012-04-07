@@ -82,6 +82,7 @@ upcomming Release 1.8.10
 - improved flash reframeing handling
 - improved spinbutton usability
 - auto disable html5shiv's innerShiv, if jQuery 1.7+ is used
+- added test for custom styleable input[type="range"] (styleableinputrange)
 
 Release 1.8.9
 ----------
