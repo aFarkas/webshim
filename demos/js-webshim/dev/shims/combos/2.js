@@ -2,6 +2,20 @@
 (function($){
 	var Modernizr = window.Modernizr;
 	var webshims = $.webshims;
+	var bugs = webshims.bugs;
+	var form = $('<form action="#" style="width: 1px; height: 1px; overflow: hidden;"><select name="b" required /><input type="date" required name="a" /><input type="submit" /></form>');
+	var testRequiredFind = function(){
+		if(form[0].querySelector){
+			try {
+				bugs.findRequired = !(form[0].querySelector('select:required'));
+			} catch(er){
+				bugs.findRequired = false;
+			}
+		}
+	};
+	bugs.findRequired = false;
+	bugs.validationMessage = false;
+	bugs.valueAsNumberSet = false;
 	
 	webshims.capturingEventPrevented = function(e){
 		if(!e._isPolyfilled){
@@ -21,9 +35,12 @@
 		}
 	};
 	
-	if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){return;}
-	var form = $('<form action="#" style="width: 1px; height: 1px; overflow: hidden;"><select /><input type="date" required name="a" /><input type="submit" /></form>');
-	Modernizr.bugfreeformvalidation = Modernizr.requiredSelect = !!('required' in $('select', form)[0]);
+	if(!Modernizr.formvalidation || bugs.bustedValidity){
+		testRequiredFind();
+		return;
+	}
+	
+	Modernizr.bugfreeformvalidation = false;
 	if(window.opera || $.browser.webkit || window.testGoodWithFix){
 		var dateElem = $('input', form).eq(0);
 		var timer;
@@ -39,7 +56,7 @@
 				form.remove();
 				form = dateElem = null;
 			}, 9);
-			if(!Modernizr.bugfreeformvalidation || !Modernizr.requiredSelect){
+			if(!Modernizr.bugfreeformvalidation){
 				webshims.addPolyfill('form-native-fix', {
 					f: 'forms',
 					d: ['form-extend']
@@ -109,12 +126,13 @@
 		
 		form.appendTo('head');
 		if(window.opera || window.testGoodWithFix) {
-			webshims.bugs.validationMessage = !(dateElem.prop('validationMessage'));
+			testRequiredFind();
+			bugs.validationMessage = !(dateElem.prop('validationMessage'));
 			if((Modernizr.inputtypes || {}).date){
 				try {
 					dateElem.prop('valueAsNumber', 0);
 				} catch(er){}
-				webshims.bugs.valueAsNumberSet = (dateElem.prop('value') != '1970-01-01');
+				bugs.valueAsNumberSet = (dateElem.prop('value') != '1970-01-01');
 			}
 			dateElem.prop('value', '');
 		}
@@ -152,6 +170,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	var groupTypes = {radio: 1};
 	var checkTypes = {checkbox: 1, radio: 1};
 	var emptyJ = $([]);
+	var bugs = webshims.bugs;
 	var getGroupElements = function(elem){
 		elem = $(elem);
 		var name;
@@ -244,6 +263,40 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return ($.prop(elem, 'validity') || {valid: 1}).valid;
 	};
 	
+	if (bugs.bustedValidity || bugs.findRequired) {
+		(function(){
+			var find = $.find;
+			var matchesSelector = $.find.matchesSelector;
+			
+			var regExp = /(\:valid|\:invalid|\:optional|\:required|\:in-range|\:out-of-range)(?=[\s\[\~\.\+\>\:\#*]|$)/ig;
+			var regFn = function(sel){
+				return sel + '-element';
+			};
+			
+			$.find = (function(){
+				var slice = Array.prototype.slice;
+				var fn = function(sel){
+					var ar = arguments;
+					ar = slice.call(ar, 1, ar.length);
+					ar.unshift(sel.replace(regExp, regFn));
+					return find.apply(this, ar);
+				};
+				for (var i in find) {
+					if(find.hasOwnProperty(i)){
+						fn[i] = find[i];
+					}
+				}
+				return fn;
+			})();
+			if(!Modernizr.prefixed || Modernizr.prefixed("matchesSelector", document.documentElement)){
+				$.find.matchesSelector = function(node, expr){
+					expr = expr.replace(regExp, regFn);
+					return matchesSelector.call(this, node, expr);
+				};
+			}
+			
+		})();
+	}
 	
 	//ToDo needs testing
 	var oldAttr = $.prop;
@@ -999,7 +1052,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 			return function(){
 				var elem = $(this).getNativeElement()[0];
 				//elem.name && <- we don't use to make it easier for developers
-				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] && ( !elem.form || !$.prop(elem.form, 'noValidate')) );
+				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] );
 			};
 		})()
 	},
@@ -1315,6 +1368,7 @@ if(!$.support.getSetAttribute && $('<form novalidate></form>').attr('novalidate'
 		}
 	});
 } else if(webshims.bugs.bustedValidity){
+	
 	webshims.defineNodeNameProperty('form', 'novalidate', {
 		attr: {
 			set: function(val){
@@ -1400,7 +1454,9 @@ webshims.addReady(function(context, contextElem){
 				if(!value && _onFocus && setSelection(elem)){
 					var selectTimer;
 					$(elem)
-						.bind('keydown.placeholderremove keypress.placeholderremove paste.placeholderremove input.placeholderremove', function(){
+						.unbind('.placeholderremove')
+						.bind('keydown.placeholderremove keypress.placeholderremove paste.placeholderremove input.placeholderremove', function(e){
+							if(e && (e.keyCode == 17 || e.keyCode == 16)){return;}
 							elem.value = $.prop(elem, 'value');
 							data.box.removeClass('placeholder-visible');
 							clearTimeout(selectTimer);
@@ -1423,7 +1479,9 @@ webshims.addReady(function(context, contextElem){
 				elem.value = value;
 			} else if(!value && _onFocus){
 				$(elem)
-					.bind('keydown.placeholderremove keypress.placeholderremove paste.placeholderremove input.placeholderremove', function(){
+					.unbind('.placeholderremove')
+					.bind('keydown.placeholderremove keypress.placeholderremove paste.placeholderremove input.placeholderremove', function(e){
+						if(e && (e.keyCode == 17 || e.keyCode == 16)){return;}
 						data.box.removeClass('placeholder-visible');
 						$(elem).unbind('.placeholderremove');
 					})

@@ -270,7 +270,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 			return function(){
 				var elem = $(this).getNativeElement()[0];
 				//elem.name && <- we don't use to make it easier for developers
-				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] && ( !elem.form || !$.prop(elem.form, 'noValidate')) );
+				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] );
 			};
 		})()
 	},
@@ -586,6 +586,7 @@ if(!$.support.getSetAttribute && $('<form novalidate></form>').attr('novalidate'
 		}
 	});
 } else if(webshims.bugs.bustedValidity){
+	
 	webshims.defineNodeNameProperty('form', 'novalidate', {
 		attr: {
 			set: function(val){
@@ -671,7 +672,9 @@ webshims.addReady(function(context, contextElem){
 				if(!value && _onFocus && setSelection(elem)){
 					var selectTimer;
 					$(elem)
-						.bind('keydown.placeholderremove keypress.placeholderremove paste.placeholderremove input.placeholderremove', function(){
+						.unbind('.placeholderremove')
+						.bind('keydown.placeholderremove keypress.placeholderremove paste.placeholderremove input.placeholderremove', function(e){
+							if(e && (e.keyCode == 17 || e.keyCode == 16)){return;}
 							elem.value = $.prop(elem, 'value');
 							data.box.removeClass('placeholder-visible');
 							clearTimeout(selectTimer);
@@ -694,7 +697,9 @@ webshims.addReady(function(context, contextElem){
 				elem.value = value;
 			} else if(!value && _onFocus){
 				$(elem)
-					.bind('keydown.placeholderremove keypress.placeholderremove paste.placeholderremove input.placeholderremove', function(){
+					.unbind('.placeholderremove')
+					.bind('keydown.placeholderremove keypress.placeholderremove paste.placeholderremove input.placeholderremove', function(e){
+						if(e && (e.keyCode == 17 || e.keyCode == 16)){return;}
 						data.box.removeClass('placeholder-visible');
 						$(elem).unbind('.placeholderremove');
 					})

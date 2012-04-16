@@ -20,7 +20,8 @@ asyncTest("general validity Modul", function(){
 	//novalidate getter
 	strictEqual( form1.attr('novalidate'), undefined, 'novalidate is undefined' );
 	strictEqual( $('#form-2').attr('novalidate'), "", 'novalidate is not undefined' );
-	
+	//todo novalidate shouldn't be filtered
+	equals( $(':required').length, 14, 'found 14 required elements' );
 	//novalidate setter
 	
 	
@@ -45,25 +46,27 @@ asyncTest("general validity Modul", function(){
 	if(omitTests.requiredSelect){
 		$('#select2').prop('disabled', true);
 	}
-	var invalid = $('input, textarea, select', form1).filter(':invalid-element');
+	var invalid = $('input, textarea, select', form1).filter(':invalid');
 	equals( invalid.length, 7, 'total invalid using filter' );
 	
-	equals( $(':invalid-element', form1).length, 7, 'total invalid' );
+	equals( $(':invalid', form1).length, 7, 'total invalid' );
 	
 	equals( invalid.filter('[type=radio]').length, 3, 'radio invalid' );
 	invalid.filter('[type=radio]:last').prop('checked', true);
-	equals( invalid.filter('[type=radio]:invalid-element').length, 0, 'radio changed valid' );
+	equals( invalid.filter('[type=radio]:invalid').length, 0, 'radio changed valid' );
 	invalid.filter('[type=radio]:last').prop('checked', false);
 	
-	equals(form1.find('#name').is(':invalid-element'), true, 'name is invalid');
+	equals(form1.find('#name').is(':invalid'), true, 'name is invalid');
 	form1.find('#name').prop('required', false);
 	equals(form1.find('#name').prop('required'), false, "name isn't required");
-	equals(form1.find('#name').is(':invalid-element'), false, 'name is valid');
+	equals(form1.find('#name').is(':invalid'), false, 'name is valid');
 	form1.find('#name').prop('required', true);
 	
 	ok($('#select').prop('validity').valid, 'select is valid');
 	$('#select').prop('required', true);
 	ok($('#select').prop('validity').valueMissing, 'required select with first option selected and empty value is invalid');
+	ok($('#select').is(':required'), 'required select matches selector required');
+	equals($('#select:required').length, 1, 'find required select');
 	$('#select').removeAttr('required');
 	ok(!$('#select').prop('validity').valueMissing, 'remove required works');
 	$('#select').attr('required', 'required');
@@ -120,18 +123,15 @@ asyncTest("general validity Modul", function(){
 	ok($('#email').prop('validity').typeMismatch, 'typeMismatch is true for email and value: some input');
 	
 	$.each({
-		'info@c-t.de': 'valid-element', 
-		'INFO@CTE.DE': 'valid-element', 
-		'info@c-t.museum': 'valid-element',
-		'info@c123t.museum': 'valid-element',
-		'info@3com.com': 'valid-element',
-		'in-f+a{t$o@cpt.de': 'valid-element',
-		'in\@fo@3com.com': 'valid-element',
-		'in@fo@3com.com': 'invalid-element',
-		'info.de': 'invalid-element'
-		//we are too lax, but better too lax, then too strict :-)
-//		,'info@des': 'invalid-element',
-//		'info@des.ä': 'invalid-element'
+		'info@c-t.de': 'valid', 
+		'INFO@CTE.DE': 'valid', 
+		'info@c-t.museum': 'valid',
+		'info@c123t.museum': 'valid',
+		'info@3com.com': 'valid',
+		'in-f+a{t$o@cpt.de': 'valid',
+		'in\@fo@3com.com': 'valid',
+		'in@fo@3com.com': 'invalid',
+		'info.de': 'invalid'
 	}, function(val, state){
 		$('#email').val(val);
 		ok($('#email').is(':'+state), val+' is '+state+' mail');
@@ -146,16 +146,16 @@ asyncTest("general validity Modul", function(){
 
 asyncTest('email, url, pattern, maxlength', function(){
 	$.each({
-		'http://bla.de': 'valid-element', 
-		'http://www.bla.de': 'valid-element', 
-		'http://www.bla.museum': 'valid-element',
-		'https://www.bla.museum:800': 'valid-element',
-		'https://www.bla.museum:800/': 'valid-element',
-		'https://www.bla.co.uk:800/': 'valid-element',
-		'https://www.3blä.de:800': 'valid-element',
-		'ftp://www.3blä.de:800': 'valid-element',
+		'http://bla.de': 'valid', 
+		'http://www.bla.de': 'valid', 
+		'http://www.bla.museum': 'valid',
+		'https://www.bla.museum:800': 'valid',
+		'https://www.bla.museum:800/': 'valid',
+		'https://www.bla.co.uk:800/': 'valid',
+		'https://www.3blä.de:800': 'valid',
+		'ftp://www.3blä.de:800': 'valid',
 		//ok, almost everything is valid here
-		'htstp//dff': 'invalid-element'
+		'htstp//dff': 'invalid'
 	}, function(val, state){
 		$('#url').val(val);
 		ok($('#url').is(':'+state), val+' is '+state+' url');
@@ -164,9 +164,9 @@ asyncTest('email, url, pattern, maxlength', function(){
 	
 	//pattern
 	$('#pattern').val('test');
-	ok($('#pattern').is(':invalid-element'), 'test is invalid pattern');
+	ok($('#pattern').is(':invalid'), 'test is invalid pattern');
 	$('#pattern').val('1DHT');
-	ok($('#pattern').is(':valid-element'), '1DHT is valid pattern');
+	ok($('#pattern').is(':valid'), '1DHT is valid pattern');
 	
 	$.webshims.ready('forms DOM', function(){
 		start();
@@ -177,9 +177,9 @@ asyncTest('validationMessage/setCustomValidity', function(){
 	var firstInvalid = $('#name').attr('value', '');
 	var lang = $.webshims.activeLang()[0];
 	//select + customValidity
-	ok($('#select').is(':valid-element'), 'select is valid');
+	ok($('#select').is(':valid'), 'select is valid');
 	$('#select').setCustomValidity('has an error');
-	ok($('#select').is(':invalid-element'), 'select is set invalid');
+	ok($('#select').is(':invalid'), 'select is set invalid');
 	ok($('#select').prop('validity').customError, 'select has customerror');
 	equals($('#select').prop('validationMessage'), 'has an error', 'custom error message set');
 	if($.webshims.cfg.forms.overrideMessages){
@@ -202,13 +202,13 @@ asyncTest('validationMessage/setCustomValidity', function(){
 	
 	equals($('#select').prop('disabled', true).prop('validationMessage'), '', 'custom error message is empty, if control is disabled');
 	$('#select').prop('disabled', false).setCustomValidity('');
-	ok(( $('#select').is(':valid-element') && $('#select').prop('willValidate') ), 'select is set valid again');
+	ok(( $('#select').is(':valid') && $('#select').prop('willValidate') ), 'select is set valid again');
 	if($.webshims.cfg.extendNative){
 		$('#select')[0].setCustomValidity('has an error2');
 		ok($('#select').prop('validity').customError, 'select has customerror with native method');
 		$('#select')[0].setCustomValidity('');
 	}
-	ok(!!($('input').filter(':invalid-element').prop('validationMessage')), 'validationMessage is a getter for all invalid elements');
+	ok(!!($('input').filter(':invalid').prop('validationMessage')), 'validationMessage is a getter for all invalid elements');
 	$.webshims.ready('forms DOM', function(){
 		start();
 	});

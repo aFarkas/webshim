@@ -2,57 +2,31 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr" id="html">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>jQuery Test Suite</title>
+	<title>Sizzle Test Suite</title>
 	<link rel="Stylesheet" media="screen" href="../qunit/qunit.css" />
-	<link rel="Stylesheet" media="screen" href="data/testsuite.css" />
-	<!-- Includes -->
-	<script src="data/testinit.js"></script>
-
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
+	<script type="text/javascript" src="data/testinit.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js"></script>
+	<script type="text/javascript" src="sizzle.js"></script>
+	<script type="text/javascript" src="data/sizzle-jquery.js"></script>
 	
 	<script src="../../src/extras/modernizr-custom.js"></script>
 	<script src="../../src/polyfiller.js"></script>
-	
-	<script src="../qunit/qunit.js"></script>
-	<script src="data/testrunner.js"></script>
-	
-
 	<script>
-		(function($){
-			//don't load jQuery UI
-			$.webshims.modules['form-number-date-ui'].test = function(){return true;};
-			
-			module("block init");
-			asyncTest("block init", function(){
-				$.webshims.ready('DOM forms canvas json-storage', start);
-			});
-			
-			if(jQuery.support.hrefNormalized){
-				$.webshims.polyfill();
-			} else {
-				$(window).load(function(){
-					$.webshims.polyfill();
-				});
-			}
-		})(jQuery);
+		jQuery.webshims.polyfill();
 	</script>
-
 	
-
-	<script src="unit/core.js"></script>
-	<script src="unit/data.js"></script>
-	<script src="unit/attributes.js"></script>
-	<script src="unit/event.js"></script>
-	<script src="unit/traversing.js"></script>
-	<script src="unit/manipulation.js"></script>
-	
+	<script type="text/javascript" src="../qunit/qunit.js"></script>
+	<script>
+		module("block init");
+		asyncTest("block init", function(){
+			$.webshims.ready('DOM forms canvas json-storage', start);
+		});
+	</script>
+	<script type="text/javascript" src="unit/selector.js"></script>
 </head>
 
 <body id="body">
-	
-	<h1 id="qunit-header"><a href="/jquery/test/index.html">jQuery Test Suite</a>
-		<a href="?jquery=min">(minified)</a>
-	</h1>
+	<h1 id="qunit-header">Sizzle Test Suite</h1>
 	<h2 id="qunit-banner"></h2>
 	<div id="qunit-testrunner-toolbar"></div>
 	<h2 id="qunit-userAgent"></h2>
@@ -62,10 +36,9 @@
 	<div id="nothiddendiv" style="height:1px;background:white;" class="nothiddendiv">
 		<div id="nothiddendivchild"></div>
 	</div>
-	<!-- this iframe is outside the #qunit-fixture so it won't reload constantly wasting time, but it means the tests must be "safe" and clean up after themselves -->
-	<iframe id="loadediframe" name="loadediframe" style="display:none;" src="data/iframe.html"></iframe>
-	<dl id="dl" style="position:absolute;top:-32767px;left:-32767px;width:1px">
-	<div id="qunit-fixture">
+	
+	<dl id="dl" style="position:absolute;top:-32767px;left:-32767px;">
+	<div id="main">
 		<p id="firstp">See <a id="simon1" href="http://simon.incutio.com/archive/2003/03/25/#getElementsBySelector" rel="bookmark">this blog entry</a> for more information.</p>
 		<p id="ap">
 			Here are some links in a normal paragraph: <a id="google" href="http://www.google.com/" title="Google!">Google</a>,
@@ -207,10 +180,6 @@ Z</textarea>
 			<select name="D4" disabled="disabled">
 				<option selected="selected" value="NO">NO</option>
 			</select>
-			<input id="list-test" type="text" />
-			<datalist id="datalist">
-				<option value="option"></option>
-			</datalist>
 		</form>
 		<div id="moretests">
 			<form>

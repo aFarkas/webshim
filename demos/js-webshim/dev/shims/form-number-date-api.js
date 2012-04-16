@@ -332,7 +332,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			mismatch: function(val, _getParsed){
 				if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
 				val = val.split(/\u0054/);
-				return ( typeModels.date.mismatch(val[0]) || typeModels.time.mismatch(val[1], _getParsed) );
+				return ( typeProtos.date.mismatch(val[0]) || typeProtos.time.mismatch(val[1], _getParsed) );
 			},
 			noAsDate: true,
 			asDate: function(val){
@@ -354,27 +354,33 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 				return ret;
 			},
 			dateToString: function(date, _getParsed){
-				return typeModels.date.dateToString(date) +'T'+ typeModels.time.dateToString(date, _getParsed);
+				return typeProtos.date.dateToString(date) +'T'+ typeProtos.time.dateToString(date, _getParsed);
 			}
 		}
 	};
+	
+	if(typeBugs || !supportsType('range') || !supportsType('time') || !supportsType('datetime-local')){
+		typeProtos.range = $.extend({}, typeProtos.number, typeProtos.range);
+		typeProtos.time = $.extend({}, typeProtos.date, typeProtos.time);
+		typeProtos['datetime-local'] = $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']);
+	}
 	
 	if(typeBugs || !supportsType('number')){
 		webshims.addInputType('number', typeProtos.number);
 	}
 	
 	if(typeBugs || !supportsType('range')){
-		webshims.addInputType('range', $.extend({}, typeProtos.number, typeProtos.range));
+		webshims.addInputType('range', typeProtos.range);
 	}
 	if(typeBugs || !supportsType('date')){
 		webshims.addInputType('date', typeProtos.date);
 	}
 	if(typeBugs || !supportsType('time')){
-		webshims.addInputType('time', $.extend({}, typeProtos.date, typeProtos.time));
+		webshims.addInputType('time', typeProtos.time);
 	}
-	
+
 	if(typeBugs || !supportsType('datetime-local')){
-		webshims.addInputType('datetime-local', $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']));
+		webshims.addInputType('datetime-local', typeProtos['datetime-local']);
 	}
 		
 });

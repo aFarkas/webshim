@@ -26,7 +26,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.10RC2',
+		version: '1.8.10RC3',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -638,6 +638,7 @@
 			}, 9999);
 		});
 		$(window).load(function(){
+			isReady('DOM', true);
 			isReady('WINDOWLOAD', true);
 		});
 	})();
@@ -925,7 +926,7 @@
 		});
 		
 		if(Modernizr[formvalidation]){
-			webshims.bugs.bustedValidity = !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid;
+			webshims.bugs.bustedValidity = !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in $('<select />')[0]);
 		}
 		
 		addTest('styleableinputrange', function(){

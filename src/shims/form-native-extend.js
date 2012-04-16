@@ -29,17 +29,17 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 	
 	var overrideNativeMessages = options.overrideMessages;	
 	
-	var overrideValidity = (!Modernizr.requiredSelect || !modernizrInputTypes.number || !modernizrInputTypes.time || !modernizrInputTypes.range || overrideNativeMessages);
+	var overrideValidity = (!modernizrInputTypes.number || !modernizrInputTypes.time || !modernizrInputTypes.range || overrideNativeMessages);
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	
 	var validityChanger = (overrideNativeMessages)? ['value', 'checked'] : ['value'];
-	var validityElements = (overrideNativeMessages) ? ['textarea'] : [];
+	var validityElements = [];
 	var testValidity = function(elem, init){
 		if(!elem){return;}
 		var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
 		
-		if(!overrideNativeMessages){
-			if(!(!Modernizr.requiredSelect && type == 'select-one') && !typeModels[type]){return;}
+		if(!overrideNativeMessages && !typeModels[type]){
+			return;
 		}
 		
 		if(overrideNativeMessages && !init && type == 'radio' && elem.name){
@@ -59,6 +59,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 					error = error+'';
 					var elem = (name == 'input') ? $(this).getNativeElement()[0] : this;
 					desc.prop._supvalue.call(elem, error);
+					
 					if(webshims.bugs.validationMessage){
 						webshims.data(elem, 'customvalidationMessage', error);
 					}
@@ -79,9 +80,11 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		validityChanger.push('step');
 		validityElements.push('input');
 	}
-	if(!Modernizr.requiredSelect || overrideNativeMessages){
+	if(overrideNativeMessages){
 		validityChanger.push('required');
+		validityChanger.push('pattern');
 		validityElements.push('select');
+		validityElements.push('textarea');
 	}
 	
 	if(overrideValidity){
@@ -136,7 +139,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 						
 						$.each(validityRules, function(rule, fn){
 							validityState[rule] = fn(jElm, val, cache, validityState);
-							if( validityState[rule] && (validityState.valid || !setCustomMessage) ) {
+							if( validityState[rule] && (validityState.valid || !setCustomMessage) && (overrideNativeMessages || (typeModels[cache.type] && typeModels[cache.type].mismatch)) ) {
 								oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, rule));
 								validityState.valid = false;
 								setCustomMessage = true;
@@ -160,9 +163,9 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 				}
 			});
 		});
-							
+
 		validityChanger.forEach(function(prop){
-			webshims.onNodeNamesPropertyModify(validityElements, prop, function(){
+			webshims.onNodeNamesPropertyModify(validityElements, prop, function(s){
 				testValidity(this);
 			});
 		});

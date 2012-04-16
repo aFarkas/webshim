@@ -545,7 +545,7 @@ asyncTest('step number/date module specific validity', function(){
 	
 });
 
-return;
+
 
 asyncTest('valueAsDate/valueAsNumber', function(){
 	
@@ -759,14 +759,16 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		},
 		resultVal: '1999-01-01',
 		resultNumber: 915148800000
-	}, {
-		id: 'time',
-		value: function(){
-			return new Date(1999, 0, 1, 20, 30);
-		},
-		resultVal: '19:30',
-		resultNumber: 70200000
-	}, {
+	}, 
+//	{
+//		id: 'time',
+//		value: function(){
+//			return new Date(1999, 0, 1, 20, 30);
+//		},
+//		resultVal: '19:30',
+//		resultNumber: 70200000
+//	}, 
+	{
 		id: 'time',
 		value: function(){
 			var date = new Date(1999, 0, 1, 20, 30);
