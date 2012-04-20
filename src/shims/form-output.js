@@ -51,7 +51,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 			elem.attr({'aria-live': 'polite'});
 			if(id){
 				shim.attr('id', id);
-				elem.attr('aria-labeldby', webshims.getID($('label[for="'+id+'"]', form)));
+				elem.attr('aria-labelledby', webshims.getID($('label[for="'+id+'"]', form)));
 			}
 			if(htmlFor){
 				id = webshims.getID(elem);
