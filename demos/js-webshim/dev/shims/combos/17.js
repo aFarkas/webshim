@@ -1294,7 +1294,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		return;
 	}
 	
-	Modernizr.bugfreeformvalidation = false;
+	Modernizr.bugfreeformvalidation = true;
 	if(window.opera || $.browser.webkit || window.testGoodWithFix){
 		var dateElem = $('input', form).eq(0);
 		var timer;
@@ -1390,6 +1390,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			}
 			dateElem.prop('value', '');
 		}
+		
 		form.bind('submit', function(e){
 			Modernizr.bugfreeformvalidation = false;
 			loadFormFixes(e);
@@ -1409,11 +1410,11 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			.trigger('click')
 		;
 		
-	} else {
-		//create delegatable events
-		webshims.capturingEvents(['input']);
-		webshims.capturingEvents(['invalid'], true);
 	}
+	
+	//create delegatable events
+	webshims.capturingEvents(['input']);
+	webshims.capturingEvents(['invalid'], true);
 	
 	
 })(jQuery);

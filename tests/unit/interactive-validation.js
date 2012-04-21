@@ -186,7 +186,7 @@
 		stop();
 		var counters = setupClickTest();
 		setTimeout(function(){
-			$('#click-test-form input[type="submit"]').prop('formNoValidate', true).trigger('click');
+			$('#click-test-form input[type="submit"]').attr('formnovalidate', 'formnovalidate').trigger('click');
 			setTimeout(function(){
 				testClickTest(counters, {firstinvalid: 0, invalid: 0, submit: 1, focus: false});
 				setTimeout(start, 50);

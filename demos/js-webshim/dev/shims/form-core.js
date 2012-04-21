@@ -40,7 +40,7 @@
 		return;
 	}
 	
-	Modernizr.bugfreeformvalidation = false;
+	Modernizr.bugfreeformvalidation = true;
 	if(window.opera || $.browser.webkit || window.testGoodWithFix){
 		var dateElem = $('input', form).eq(0);
 		var timer;
@@ -136,6 +136,7 @@
 			}
 			dateElem.prop('value', '');
 		}
+		
 		form.bind('submit', function(e){
 			Modernizr.bugfreeformvalidation = false;
 			loadFormFixes(e);
@@ -155,11 +156,11 @@
 			.trigger('click')
 		;
 		
-	} else {
-		//create delegatable events
-		webshims.capturingEvents(['input']);
-		webshims.capturingEvents(['invalid'], true);
 	}
+	
+	//create delegatable events
+	webshims.capturingEvents(['input']);
+	webshims.capturingEvents(['invalid'], true);
 	
 	
 })(jQuery);
