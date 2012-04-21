@@ -752,7 +752,7 @@ webshims.addReady(function(context, contextElem){
 		createPlaceholder = function(elem){
 			elem = $(elem);
 			var id 			= elem.prop('id'),
-				hasLabel	= !!(elem.prop('title') || elem.attr('aria-labeledby'))
+				hasLabel	= !!(elem.prop('title') || elem.attr('aria-labelledby'))
 			;
 			if(!hasLabel && id){
 				hasLabel = !!( $('label[for="'+ id +'"]', elem[0].form)[0] );

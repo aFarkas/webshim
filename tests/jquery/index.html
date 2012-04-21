@@ -18,6 +18,7 @@
 	
 
 	<script>
+		html5.shivMethods = false;
 		(function($){
 			//don't load jQuery UI
 			$.webshims.modules['form-number-date-ui'].test = function(){return true;};
@@ -27,13 +28,9 @@
 				$.webshims.ready('DOM forms canvas json-storage', start);
 			});
 			
-			if(jQuery.support.hrefNormalized){
+			$(window).load(function(){
 				$.webshims.polyfill();
-			} else {
-				$(window).load(function(){
-					$.webshims.polyfill();
-				});
-			}
+			});
 		})(jQuery);
 	</script>
 

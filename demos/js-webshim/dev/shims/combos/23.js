@@ -1344,7 +1344,7 @@ webshims.addReady(function(context, contextElem){
 		createPlaceholder = function(elem){
 			elem = $(elem);
 			var id 			= elem.prop('id'),
-				hasLabel	= !!(elem.prop('title') || elem.attr('aria-labeledby'))
+				hasLabel	= !!(elem.prop('title') || elem.attr('aria-labelledby'))
 			;
 			if(!hasLabel && id){
 				hasLabel = !!( $('label[for="'+ id +'"]', elem[0].form)[0] );
@@ -1575,7 +1575,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 			elem.attr({'aria-live': 'polite'});
 			if(id){
 				shim.attr('id', id);
-				elem.attr('aria-labeldby', webshims.getID($('label[for="'+id+'"]', form)));
+				elem.attr('aria-labelledby', webshims.getID($('label[for="'+id+'"]', form)));
 			}
 			if(htmlFor){
 				id = webshims.getID(elem);

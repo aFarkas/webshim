@@ -800,7 +800,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			});
 		}
 		if(shim.length == 1 && !$('*', shim)[0]){
-			shim.attr('aria-labeledby', curLabelID);
+			shim.attr('aria-labelledby', curLabelID);
 			attr.label.bind('click', function(){
 				shim.focus();
 				return false;
@@ -947,7 +947,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			
 			
 			
-			date.attr('aria-labeledby', attr.label.attr('id'));
+			date.attr('aria-labelledby', attr.label.attr('id'));
 			attr.label.bind('click', function(){
 				datePicker.focus();
 				return false;
@@ -1125,7 +1125,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			;
 			
 			$('span', range)
-				.attr('aria-labeledby', attr.label.attr('id'))
+				.attr('aria-labelledby', attr.label.attr('id'))
 			;
 			attr.label.bind('click', function(){
 				$('span', range).focus();
