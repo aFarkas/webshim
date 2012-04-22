@@ -79,10 +79,13 @@ upcomming Release 1.8.10
 ----------
 
 - fixed validity issues with old webkits (Safari 5.0.0 - 5.0.2)
-- improved flash reframeing handling
+- improved object/flash reframe handling for mediaelement
 - improved spinbutton usability
 - auto disable html5shiv's innerShiv, if jQuery 1.7+ is used
-- added test for custom styleable input[type="range"] (styleableinputrange)
+- fixed input/change event for input widgets on iOS5
+- improved :required/:valid/:invalid pseudoselectos
+- added possibility for custom styleable datalists (in capable browsers)
+- added test for custom styleable input[type="range"]
 
 Release 1.8.9
 ----------

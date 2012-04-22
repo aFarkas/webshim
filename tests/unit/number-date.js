@@ -760,14 +760,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		resultVal: '1999-01-01',
 		resultNumber: 915148800000
 	}, 
-//	{
-//		id: 'time',
-//		value: function(){
-//			return new Date(1999, 0, 1, 20, 30);
-//		},
-//		resultVal: '19:30',
-//		resultNumber: 70200000
-//	}, 
+ 
 	{
 		id: 'time',
 		value: function(){
@@ -792,12 +785,12 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 	
 	//getting valueAsDate
 	$.each([
-		{
-			id: 'time',
-			val: '',
-			result: null,
-			strict: true 
-		},
+//		{
+//			id: 'time',
+//			val: '',
+//			result: null,
+//			strict: true 
+//		},
 		{
 			id: 'time',
 			val: '19:30',
