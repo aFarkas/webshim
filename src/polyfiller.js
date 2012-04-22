@@ -26,7 +26,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.10RC4',
+		version: '1.8.10RC5',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -921,6 +921,7 @@
 	
 	if(modernizrInputAttrs && modernizrInputTypes){
 		var formvalidation = 'formvalidation';
+		var formOptions;
 		addTest(formvalidation, function(){
 			return !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern);
 		});
@@ -946,7 +947,7 @@
 			f: 'forms',
 			d: ['es5'],
 			test: function(toLoad){
-				if(this.options.lightweightDatalist && !this.datalistLoaded){
+				if(formOptions.lightweightDatalist && !this.datalistLoaded){
 					this.datalistLoaded = true;
 					modules['form-datalist'].f = 'forms';
 					webshims.reTest(['form-datalist']);
@@ -965,13 +966,15 @@
 			methodNames: ['setCustomValidity','checkValidity'],
 			c: [3, 2, 59, 17, 16, 5, 4, 24, 19]
 		});
+		
+		formOptions = webCFG.forms;
 				
 		if(Modernizr[formvalidation] && !webshims.bugs.bustedValidity){
 			addPolyfill('form-extend', {
 				f: 'forms',
 				src: 'form-native-extend',
 				test: function(toLoad){
-					return ((modules['form-number-date-api'].test() || $.inArray('form-number-date-api', toLoad  || []) == -1) && !this.options.overrideMessages );
+					return ((modules['form-number-date-api'].test() || $.inArray('form-number-date-api', toLoad  || []) == -1) && !formOptions.overrideMessages );
 				},
 				d: ['form-core', DOMSUPPORT, 'form-message'],
 				c: [18, 7, 59, 5]
@@ -995,7 +998,7 @@
 		addPolyfill('form-message', {
 			f: 'forms',
 			test: function(toLoad){
-				return !( this.options.customMessages || !Modernizr[formvalidation] || !modules['form-extend'].test(toLoad) || webshims.bugs.validationMessage );
+				return !( formOptions.customMessages || !Modernizr[formvalidation] || !modules['form-extend'].test(toLoad) || webshims.bugs.validationMessage );
 			},
 			d: [DOMSUPPORT],
 			c: [3, 2, 23, 21, 59, 17, 5, 4]
@@ -1044,7 +1047,9 @@
 		
 		addPolyfill('form-datalist', {
 			f: 'forms-ext',
-			test: modernizrInputAttrs.list,
+			test: function(){
+				return modernizrInputAttrs.list && !formOptions.customDatalist;
+			},
 			d: ['form-core', DOMSUPPORT],
 			c: [3, 59, 18, 24, 19, 11]
 		});

@@ -27,10 +27,10 @@ audio * {
 	min-width: 20px;
 }
 mark {
-    background-color: #ff9;
-    color: #000; 
-    font-style: italic;
-    font-weight: bold;
+	background-color: #ff9;
+	color: #000; 
+	font-style: italic;
+	font-weight: bold;
 }
 
 /* reset */
@@ -413,15 +413,15 @@ img.ui-datepicker-trigger {
 	margin: 4px 0 0;
 }
 .input-date-datepicker-control .ui-datepicker-cover {
-    display: none; /*sorry for IE5*/
-    display/**/: block; /*sorry for IE5*/
-    position: absolute; /*must have*/
-    z-index: -1; /*must have*/
-    filter: mask(); /*must have*/
-    top: -4px; /*must have*/
-    left: -4px; /*must have*/
-    width: 200px; /*must have*/
-    height: 200px; /*must have*/
+	display: none; /*sorry for IE5*/
+	display/**/: block; /*sorry for IE5*/
+	position: absolute; /*must have*/
+	z-index: -1; /*must have*/
+	filter: mask(); /*must have*/
+	top: -4px; /*must have*/
+	left: -4px; /*must have*/
+	width: 200px; /*must have*/
+	height: 200px; /*must have*/
 }
 
 datalist {
@@ -435,17 +435,22 @@ datalist {
 	left: 0;
 	margin: 0;
 	padding: 0 !important;
-	border: 1px solid #333;
 	display: none;
 	z-index: 999999999;
+}
+.datalist-polyfill.datalist-visible{
+	display: block;
+}
+.datalist-polyfill div {
+	margin: 0;
+	padding: 0;
+	border: 1px solid #333;
 	max-height: 200px;
 	overflow: hidden;
 	overflow-x: hidden !important;
 	overflow-y: auto;
 }
-.datalist-polyfill.datalist-visible{
-	display: block;
-}
+
 .datalist-polyfill ul,
 .datalist-polyfill li {
 	font-size: 100%;
@@ -520,7 +525,7 @@ datalist {
 	width: 0;
 	height: 0;
 	border-left: 9px solid transparent;
-    border-right: 9px solid transparent;
+	border-right: 9px solid transparent;
 	
 	border-bottom: 7px solid #000;
 	border-top: none;
@@ -544,7 +549,7 @@ html .validity-alert span.va-arrow {
 	width: 0;
 	height: 0;
 	border-left: 9px solid transparent;
-    border-right: 9px solid transparent;
+	border-right: 9px solid transparent;
 	border-bottom: 7px solid #fafafa;
 	border-top: none;
 }
