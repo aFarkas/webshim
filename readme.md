@@ -86,6 +86,7 @@ upcomming Release 1.8.10
 - improved :required/:valid/:invalid pseudoselectos
 - added possibility for custom styleable datalists (in capable browsers)
 - added test for custom styleable input[type="range"]
+- temporarily removed support for time and datetime-local widgets
 
 Release 1.8.9
 ----------
