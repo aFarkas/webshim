@@ -252,117 +252,115 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			dateToString: function(date){
 				return (date && date.getFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
 			}
-		},
-		
-		time: {
-			mismatch: function(val, _getParsed){
-				if(!val || !val.split || !(/\d$/.test(val))){return true;}
-				val = val.split(/\u003A/);
-				if(val.length < 2 || val.length > 3){return true;}
-				var ret = false,
-					sFraction;
-				if(val[2]){
-					val[2] = val[2].split(/\u002E/);
-					sFraction = parseInt(val[2][1], 10);
-					val[2] = val[2][0];
-				}
-				$.each(val, function(i, part){
-					if(!isDateTimePart(part) || part.length !== 2){
-						ret = true;
-						return false;
-					}
-				});
-				if(ret){return true;}
-				if(val[0] > 23 || val[0] < 0 || val[1] > 59 || val[1] < 0){
-					return true;
-				}
-				if(val[2] && (val[2] > 59 || val[2] < 0 )){
-					return true;
-				}
-				if(sFraction && isNaN(sFraction)){
-					return true;
-				}
-				if(sFraction){
-					if(sFraction < 100){
-						sFraction *= 100;
-					} else if(sFraction < 10){
-						sFraction *= 10;
-					}
-				}
-				return (_getParsed === true) ? [val, sFraction] : false;
-			},
-			step: 60,
-			stepBase: 0,
-			stepScaleFactor:  1000,
-			asDate: function(val){
-				val = new Date(this.asNumber(val));
-				return (isNaN(val)) ? null : val;
-			},
-			asNumber: function(val){
-				var ret = nan;
-				val = this.mismatch(val, true);
-				if(val !== true){
-					ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
-					if(val[1]){
-						ret += val[1];
-					}
-				}
-				return ret;
-			},
-			dateToString: function(date){
-				if(date && date.getUTCHours){
-					var str = addleadingZero(date.getUTCHours(), 2) +':'+ addleadingZero(date.getUTCMinutes(), 2),
-						tmp = date.getSeconds()
-					;
-					if(tmp != "0"){
-						str += ':'+ addleadingZero(tmp, 2);
-					}
-					tmp = date.getUTCMilliseconds();
-					if(tmp != "0"){
-						str += '.'+ addleadingZero(tmp, 3);
-					}
-					return str;
-				} else {
-					return false;
-				}
-			}
-		},
-		
-		'datetime-local': {
-			mismatch: function(val, _getParsed){
-				if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
-				val = val.split(/\u0054/);
-				return ( typeProtos.date.mismatch(val[0]) || typeProtos.time.mismatch(val[1], _getParsed) );
-			},
-			noAsDate: true,
-			asDate: function(val){
-				val = new Date(this.asNumber(val));
-				
-				return (isNaN(val)) ? null : val;
-			},
-			asNumber: function(val){
-				var ret = nan;
-				var time = this.mismatch(val, true);
-				if(time !== true){
-					val = val.split(/\u0054/)[0].split(/\u002D/);
-					
-					ret = Date.UTC(val[0], val[1] - 1, val[2], time[0][0], time[0][1], time[0][2] || 0);
-					if(time[1]){
-						ret += time[1];
-					}
-				}
-				return ret;
-			},
-			dateToString: function(date, _getParsed){
-				return typeProtos.date.dateToString(date) +'T'+ typeProtos.time.dateToString(date, _getParsed);
-			}
 		}
+//		,time: {
+//			mismatch: function(val, _getParsed){
+//				if(!val || !val.split || !(/\d$/.test(val))){return true;}
+//				val = val.split(/\u003A/);
+//				if(val.length < 2 || val.length > 3){return true;}
+//				var ret = false,
+//					sFraction;
+//				if(val[2]){
+//					val[2] = val[2].split(/\u002E/);
+//					sFraction = parseInt(val[2][1], 10);
+//					val[2] = val[2][0];
+//				}
+//				$.each(val, function(i, part){
+//					if(!isDateTimePart(part) || part.length !== 2){
+//						ret = true;
+//						return false;
+//					}
+//				});
+//				if(ret){return true;}
+//				if(val[0] > 23 || val[0] < 0 || val[1] > 59 || val[1] < 0){
+//					return true;
+//				}
+//				if(val[2] && (val[2] > 59 || val[2] < 0 )){
+//					return true;
+//				}
+//				if(sFraction && isNaN(sFraction)){
+//					return true;
+//				}
+//				if(sFraction){
+//					if(sFraction < 100){
+//						sFraction *= 100;
+//					} else if(sFraction < 10){
+//						sFraction *= 10;
+//					}
+//				}
+//				return (_getParsed === true) ? [val, sFraction] : false;
+//			},
+//			step: 60,
+//			stepBase: 0,
+//			stepScaleFactor:  1000,
+//			asDate: function(val){
+//				val = new Date(this.asNumber(val));
+//				return (isNaN(val)) ? null : val;
+//			},
+//			asNumber: function(val){
+//				var ret = nan;
+//				val = this.mismatch(val, true);
+//				if(val !== true){
+//					ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
+//					if(val[1]){
+//						ret += val[1];
+//					}
+//				}
+//				return ret;
+//			},
+//			dateToString: function(date){
+//				if(date && date.getUTCHours){
+//					var str = addleadingZero(date.getUTCHours(), 2) +':'+ addleadingZero(date.getUTCMinutes(), 2),
+//						tmp = date.getSeconds()
+//					;
+//					if(tmp != "0"){
+//						str += ':'+ addleadingZero(tmp, 2);
+//					}
+//					tmp = date.getUTCMilliseconds();
+//					if(tmp != "0"){
+//						str += '.'+ addleadingZero(tmp, 3);
+//					}
+//					return str;
+//				} else {
+//					return false;
+//				}
+//			}
+//		}
+//		,'datetime-local': {
+//			mismatch: function(val, _getParsed){
+//				if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
+//				val = val.split(/\u0054/);
+//				return ( typeProtos.date.mismatch(val[0]) || typeProtos.time.mismatch(val[1], _getParsed) );
+//			},
+//			noAsDate: true,
+//			asDate: function(val){
+//				val = new Date(this.asNumber(val));
+//				
+//				return (isNaN(val)) ? null : val;
+//			},
+//			asNumber: function(val){
+//				var ret = nan;
+//				var time = this.mismatch(val, true);
+//				if(time !== true){
+//					val = val.split(/\u0054/)[0].split(/\u002D/);
+//					
+//					ret = Date.UTC(val[0], val[1] - 1, val[2], time[0][0], time[0][1], time[0][2] || 0);
+//					if(time[1]){
+//						ret += time[1];
+//					}
+//				}
+//				return ret;
+//			},
+//			dateToString: function(date, _getParsed){
+//				return typeProtos.date.dateToString(date) +'T'+ typeProtos.time.dateToString(date, _getParsed);
+//			}
+//		}
 	};
 	
-	if(typeBugs || !supportsType('range') || !supportsType('time') || !supportsType('datetime-local')){
+	if(typeBugs || !supportsType('range') || !supportsType('time')){
 		typeProtos.range = $.extend({}, typeProtos.number, typeProtos.range);
-		typeProtos.time = $.extend({}, typeProtos.date, typeProtos.time);
-		typeProtos['datetime-local'] = $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']);
+//		typeProtos.time = $.extend({}, typeProtos.date, typeProtos.time);
+//		typeProtos['datetime-local'] = $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']);
 	}
 	
 	if(typeBugs || !supportsType('number')){
@@ -375,13 +373,13 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 	if(typeBugs || !supportsType('date')){
 		webshims.addInputType('date', typeProtos.date);
 	}
-	if(typeBugs || !supportsType('time')){
-		webshims.addInputType('time', typeProtos.time);
-	}
+//	if(typeBugs || !supportsType('time')){
+//		webshims.addInputType('time', typeProtos.time);
+//	}
 
-	if(typeBugs || !supportsType('datetime-local')){
-		webshims.addInputType('datetime-local', typeProtos['datetime-local']);
-	}
+//	if(typeBugs || !supportsType('datetime-local')){
+//		webshims.addInputType('datetime-local', typeProtos['datetime-local']);
+//	}
 		
 });/* number-date-ui */
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
@@ -571,7 +569,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		});
 	}
 	//date and datetime-local implement if we have to replace
-	if(!modernizrInputTypes['datetime-local'] || options.replaceUI){
+	if(!modernizrInputTypes['date'] /*||!modernizrInputTypes['datetime-local']*/ || options.replaceUI){
 		
 		
 		var datetimeFactor = {
@@ -629,150 +627,150 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			return data;
 		};
 		
-		replaceInputUI['datetime-local'] = function(elem){
-			if(!$.fn.datepicker){return;}
-			
-			var date = $('<span role="group" class="input-datetime-local"><input type="text" class="input-datetime-local-date" /><input type="time" class="input-datetime-local-time" /></span>'),
-				attr  = this.common(elem, date, replaceInputUI['datetime-local'].attrs),
-				datePicker = $('input.input-datetime-local-date', date),
-				datePickerChange = function(e){
-						
-						var value = datePicker.prop('value') || '', 
-							timeVal = ''
-						;
-						if(options.lazyDate){
-							var timer = $.data(datePicker[0], 'setDateLazyTimer');
-							if(timer){
-								clearTimeout(timer);
-								$.removeData(datePicker[0], 'setDateLazyTimer');
-							}
-						}
-						
-						if(value){
-							timeVal = $('input.input-datetime-local-time', date).prop('value') || '00:00';
-							try {
-								value = $.datepicker.parseDate(datePicker.datepicker('option', 'dateFormat'), value);
-								value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : datePicker.prop('value');
-							} catch (e) {value = datePicker.prop('value');}
-						} 
-						value = (!value && !timeVal) ? '' : value + 'T' + timeVal;
-						replaceInputUI['datetime-local'].blockAttr = true;
-						elem.prop('value', value);
-						replaceInputUI['datetime-local'].blockAttr = false;
-						e.stopImmediatePropagation();
-						triggerInlineForm(elem[0], 'input');
-						triggerInlineForm(elem[0], 'change');
-					},
-				data = configureDatePicker(elem, datePicker, datePickerChange, date)
-			;
-			
-			
-			$('input.input-datetime-local-time', date).bind('change', function(e){
-				var timeVal = $.prop(this, 'value');
-				var val = ['', ''];
-				if(timeVal){
-					val = elem.prop('value').split('T');
-					if((val.length < 2 || !val[0])){
-						val[0] = $.datepicker.formatDate('yy-mm-dd', new Date());
-					}
-					val[1] = timeVal;
-					
-					if (timeVal) {
-						try {
-							datePicker.prop('value', $.datepicker.formatDate(datePicker.datepicker('option', 'dateFormat'), $.datepicker.parseDate('yy-mm-dd', val[0])));
-						} catch (e) {}
-					}
-				}
-				val = (!val[0] && !val[1]) ? '' : val.join('T');
-				replaceInputUI['datetime-local'].blockAttr = true;
-				elem.prop('value', val);
-				replaceInputUI['datetime-local'].blockAttr = false;
-				e.stopImmediatePropagation();
-				triggerInlineForm(elem[0], 'input');
-				triggerInlineForm(elem[0], 'change');
-			});
-			
-			
-			
-			date.attr('aria-labelledby', attr.label.attr('id'));
-			attr.label.bind('click', function(){
-				datePicker.focus();
-				return false;
-			});
-			
-			if(attr.css){
-				date.css(attr.css);
-				if(attr.outerWidth){
-					date.outerWidth(attr.outerWidth);
-					var width = date.width();
-					var widthFac = (data.trigger[0]) ? datetimeFactor.trigger : datetimeFactor.normal;
-					datePicker.outerWidth(Math.floor((width * widthFac[0]) - subPixelCorrect), true);
-					$('input.input-datetime-local-time', date).outerWidth(Math.floor((width * widthFac[1]) - subPixelCorrect), true);
-					if(data.trigger[0]){
-						adjustInputWithBtn(datePicker, data.trigger);
-					}
-				}
-			}
-			
-			
-		};
-		
-		replaceInputUI['datetime-local'].attrs = {
-			disabled: function(orig, shim, value){
-				$('input.input-datetime-local-date', shim).prop('disabled', !!value);
-				$('input.input-datetime-local-time', shim).prop('disabled', !!value);
-			},
-			step: function(orig, shim, value){
-				$('input.input-datetime-local-time', shim).attr('step', value);
-			},
-			//ToDo: use min also on time
-			min: function(orig, shim, value){
-				if(value){
-					value = (value.split) ? value.split('T') : [];
-					try {
-						value = $.datepicker.parseDate('yy-mm-dd', value[0]);
-					} catch(e){value = false;}
-				}
-				if(!value){
-					value = null;
-				}
-				$('input.input-datetime-local-date', shim).datepicker('option', 'minDate', value);
-				
-			},
-			//ToDo: use max also on time
-			max: function(orig, shim, value){
-				if(value){
-					value = (value.split) ? value.split('T') : [];
-					try {
-						value = $.datepicker.parseDate('yy-mm-dd', value[0]);
-					} catch(e){value = false;}
-				}
-				if(!value){
-					value = null;
-				}
-				$('input.input-datetime-local-date', shim).datepicker('option', 'maxDate', value);
-			},
-			value: function(orig, shim, value){
-				var dateValue;
-				if(value){
-					value = (value.split) ? value.split('T') : [];
-					try {
-						dateValue = $.datepicker.parseDate('yy-mm-dd', value[0]);
-					} catch(e){dateValue = false;}
-				}
-				if(dateValue){
-					if(!replaceInputUI['datetime-local'].blockAttr){
-						lazySetDate($('input.input-datetime-local-date', shim), dateValue);
-					}
-					$('input.input-datetime-local-time', shim).prop('value', value[1] || '00:00');
-				} else {
-					$('input.input-datetime-local-date', shim).prop('value', value[0] || '');
-					$('input.input-datetime-local-time', shim).prop('value', value[1] || '');
-				}
-					
-				
-			}
-		};
+//		replaceInputUI['datetime-local'] = function(elem){
+//			if(!$.fn.datepicker){return;}
+//			
+//			var date = $('<span role="group" class="input-datetime-local"><input type="text" class="input-datetime-local-date" /><input type="time" class="input-datetime-local-time" /></span>'),
+//				attr  = this.common(elem, date, replaceInputUI['datetime-local'].attrs),
+//				datePicker = $('input.input-datetime-local-date', date),
+//				datePickerChange = function(e){
+//						
+//						var value = datePicker.prop('value') || '', 
+//							timeVal = ''
+//						;
+//						if(options.lazyDate){
+//							var timer = $.data(datePicker[0], 'setDateLazyTimer');
+//							if(timer){
+//								clearTimeout(timer);
+//								$.removeData(datePicker[0], 'setDateLazyTimer');
+//							}
+//						}
+//						
+//						if(value){
+//							timeVal = $('input.input-datetime-local-time', date).prop('value') || '00:00';
+//							try {
+//								value = $.datepicker.parseDate(datePicker.datepicker('option', 'dateFormat'), value);
+//								value = (value) ? $.datepicker.formatDate('yy-mm-dd', value) : datePicker.prop('value');
+//							} catch (e) {value = datePicker.prop('value');}
+//						} 
+//						value = (!value && !timeVal) ? '' : value + 'T' + timeVal;
+//						replaceInputUI['datetime-local'].blockAttr = true;
+//						elem.prop('value', value);
+//						replaceInputUI['datetime-local'].blockAttr = false;
+//						e.stopImmediatePropagation();
+//						triggerInlineForm(elem[0], 'input');
+//						triggerInlineForm(elem[0], 'change');
+//					},
+//				data = configureDatePicker(elem, datePicker, datePickerChange, date)
+//			;
+//			
+//			
+//			$('input.input-datetime-local-time', date).bind('change', function(e){
+//				var timeVal = $.prop(this, 'value');
+//				var val = ['', ''];
+//				if(timeVal){
+//					val = elem.prop('value').split('T');
+//					if((val.length < 2 || !val[0])){
+//						val[0] = $.datepicker.formatDate('yy-mm-dd', new Date());
+//					}
+//					val[1] = timeVal;
+//					
+//					if (timeVal) {
+//						try {
+//							datePicker.prop('value', $.datepicker.formatDate(datePicker.datepicker('option', 'dateFormat'), $.datepicker.parseDate('yy-mm-dd', val[0])));
+//						} catch (e) {}
+//					}
+//				}
+//				val = (!val[0] && !val[1]) ? '' : val.join('T');
+//				replaceInputUI['datetime-local'].blockAttr = true;
+//				elem.prop('value', val);
+//				replaceInputUI['datetime-local'].blockAttr = false;
+//				e.stopImmediatePropagation();
+//				triggerInlineForm(elem[0], 'input');
+//				triggerInlineForm(elem[0], 'change');
+//			});
+//			
+//			
+//			
+//			date.attr('aria-labelledby', attr.label.attr('id'));
+//			attr.label.bind('click', function(){
+//				datePicker.focus();
+//				return false;
+//			});
+//			
+//			if(attr.css){
+//				date.css(attr.css);
+//				if(attr.outerWidth){
+//					date.outerWidth(attr.outerWidth);
+//					var width = date.width();
+//					var widthFac = (data.trigger[0]) ? datetimeFactor.trigger : datetimeFactor.normal;
+//					datePicker.outerWidth(Math.floor((width * widthFac[0]) - subPixelCorrect), true);
+//					$('input.input-datetime-local-time', date).outerWidth(Math.floor((width * widthFac[1]) - subPixelCorrect), true);
+//					if(data.trigger[0]){
+//						adjustInputWithBtn(datePicker, data.trigger);
+//					}
+//				}
+//			}
+//			
+//			
+//		};
+//		
+//		replaceInputUI['datetime-local'].attrs = {
+//			disabled: function(orig, shim, value){
+//				$('input.input-datetime-local-date', shim).prop('disabled', !!value);
+//				$('input.input-datetime-local-time', shim).prop('disabled', !!value);
+//			},
+//			step: function(orig, shim, value){
+//				$('input.input-datetime-local-time', shim).attr('step', value);
+//			},
+//			//ToDo: use min also on time
+//			min: function(orig, shim, value){
+//				if(value){
+//					value = (value.split) ? value.split('T') : [];
+//					try {
+//						value = $.datepicker.parseDate('yy-mm-dd', value[0]);
+//					} catch(e){value = false;}
+//				}
+//				if(!value){
+//					value = null;
+//				}
+//				$('input.input-datetime-local-date', shim).datepicker('option', 'minDate', value);
+//				
+//			},
+//			//ToDo: use max also on time
+//			max: function(orig, shim, value){
+//				if(value){
+//					value = (value.split) ? value.split('T') : [];
+//					try {
+//						value = $.datepicker.parseDate('yy-mm-dd', value[0]);
+//					} catch(e){value = false;}
+//				}
+//				if(!value){
+//					value = null;
+//				}
+//				$('input.input-datetime-local-date', shim).datepicker('option', 'maxDate', value);
+//			},
+//			value: function(orig, shim, value){
+//				var dateValue;
+//				if(value){
+//					value = (value.split) ? value.split('T') : [];
+//					try {
+//						dateValue = $.datepicker.parseDate('yy-mm-dd', value[0]);
+//					} catch(e){dateValue = false;}
+//				}
+//				if(dateValue){
+//					if(!replaceInputUI['datetime-local'].blockAttr){
+//						lazySetDate($('input.input-datetime-local-date', shim), dateValue);
+//					}
+//					$('input.input-datetime-local-time', shim).prop('value', value[1] || '00:00');
+//				} else {
+//					$('input.input-datetime-local-date', shim).prop('value', value[0] || '');
+//					$('input.input-datetime-local-time', shim).prop('value', value[1] || '');
+//				}
+//					
+//				
+//			}
+//		};
 			
 		
 		replaceInputUI.date = function(elem){
@@ -942,7 +940,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 	}
 	
-	if(!webshims.bugs.valueAsNumberSet && (options.replaceUI || !Modernizr.inputtypes.date || !Modernizr.inputtypes["datetime-local"] || !Modernizr.inputtypes.range)){
+	if(!webshims.bugs.valueAsNumberSet && (options.replaceUI || !Modernizr.inputtypes.date /*|| !Modernizr.inputtypes["datetime-local"]*/ || !Modernizr.inputtypes.range)){
 		var reflectFn = function(val){
 			if(webshims.data(this, 'hasShadow')){
 				$.prop(this, 'value', $.prop(this, 'value'));
@@ -994,7 +992,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 	})();
 	
-	if(supportsType('number') && supportsType('time')){return;}
+	if(supportsType('number')/* && supportsType('time')*/){return;}
 	var doc = document;
 	var options = webshims.cfg["forms-ext"];
 	var typeModels = webshims.inputTypes;

@@ -271,99 +271,99 @@ $.webshims.activeLang("en");
 			<section>
 				<h3>Simple Demo</h3>
 				<form action="#">
-	               
-	                <p class="required"><span>*</span> Required fields</p>
-	                <fieldset>
-	                    <div class="form-element">
-	                        <label for="name">
-	                            name: <dfn title="required">*</dfn>
-							</label>
-	                        <input required="required" placeholder="hello world" name="name" type="text" value="" id="name" />
-	                    </div>
-	                    <div class="form-element">
-	                        <label for="email">
-	                            E-Mail:
-							</label>
-	                       	<input name="email" type="email" id="email" />
-	                    </div>
+				   
+					<p class="required"><span>*</span> Required fields</p>
+					<fieldset>
 						<div class="form-element">
-	                        <label for="range">
-	                            range:
+							<label for="name">
+								name: <dfn title="required">*</dfn>
 							</label>
-	                       	<input name="range" type="range" id="range" />
-	                    </div>
+							<input required="required" placeholder="hello world" name="name" type="text" value="" id="name" />
+						</div>
+						<div class="form-element">
+							<label for="email">
+								E-Mail:
+							</label>
+						   	<input name="email" type="email" id="email" />
+						</div>
+						<div class="form-element">
+							<label for="range">
+								range:
+							</label>
+						   	<input name="range" type="range" id="range" />
+						</div>
 						
-	                    <div class="form-element">
-	                        <label for="date">
-	                            date: <dfn title="required">*</dfn>
+						<div class="form-element">
+							<label for="date">
+								date: <dfn title="required">*</dfn>
 							</label>
 							
-	                       	<input min="2010-12-10" max="2016-01-01" name="date" required="required" type="date" id="date" />
+						   	<input min="2010-12-10" max="2016-01-01" name="date" required="required" type="date" id="date" />
 							(min="2010-12-10" max="2016-01-01")
-	                    </div>
-						
+						</div>
+						<!--
 						<div class="form-element">
-	                        <label for="datetime-local">
-	                            datetime-local: 
+							<label for="datetime-local">
+								datetime-local: 
 							</label>
-	                       	<input value="2010-12-31T23:59" name="datetime-local" type="datetime-local" id="datetime-local" />
-	                    </div>
-												
-	                    <div class="form-element">
-	                        <label for="number">
-	                            number: <dfn title="required">*</dfn>
+						   	<input value="2010-12-31T23:59" name="datetime-local" type="datetime-local" id="datetime-local" />
+						</div>
+						-->						
+						<div class="form-element">
+							<label for="number">
+								number: <dfn title="required">*</dfn>
 							</label>
 							
-	                       	<input min="3" name="number" required="required" type="number" id="number" />
+						   	<input min="3" name="number" required="required" type="number" id="number" />
 							(min="3")
-	                    </div>
-	                   
+						</div>
+					   
+						<!--
+						<div class="form-element">
+							<label for="time">
+								time: 
+							</label>
+						   	<input name="time" type="time" id="time" />
+						</div>
+						-->
 						
 						<div class="form-element">
-	                        <label for="time">
-	                            time: 
+							<label for="password">
+								password: 
 							</label>
-	                       	<input name="time" type="time" id="time" />
-	                    </div>
+						   	<input placeholder="password" name="password" type="password" id="password" />
+						</div>
 						
-						
-						<div class="form-element">
-	                        <label for="password">
-	                            password: 
-							</label>
-	                       	<input placeholder="password" name="password" type="password" id="password" />
-	                    </div>
-						
-	                    <div>
-	                    	<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
-	                    	<fieldset class="mod">
-	                    		<legend>Legend Short Labels  <dfn title="required">*</dfn></legend>
-	                            <div class="form-item">
-	                                <input type="radio" id="field6-1" name="radio-grp1-1" required />
+						<div>
+							<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
+							<fieldset class="mod">
+								<legend>Legend Short Labels  <dfn title="required">*</dfn></legend>
+								<div class="form-item">
+									<input type="radio" id="field6-1" name="radio-grp1-1" required />
 									<label for="field6-1">
-	                                    Radiooption 2
-	                                </label>
-								</div>
-								<div class="form-item">
-	                                <input type="radio" id="field7-1" name="radio-grp1-1" />
-	                               	<label for="field7-1"> 
 										Radiooption 2
-	                            	</label>
+									</label>
 								</div>
 								<div class="form-item">
-	                                <input type="radio" id="field8-1" name="radio-grp1-1" />
-									<label for="field8-1">
-	                                	Radiooption 3
-	                            	</label>
+									<input type="radio" id="field7-1" name="radio-grp1-1" />
+								   	<label for="field7-1"> 
+										Radiooption 2
+									</label>
 								</div>
-	                        </fieldset>
-	                    </div>
-	                    
-	                    <div class="button-wrapper">
-	                    	<input type="submit" value="Send" />
-	                    </div>
-	                </fieldset>
-	            </form>
+								<div class="form-item">
+									<input type="radio" id="field8-1" name="radio-grp1-1" />
+									<label for="field8-1">
+										Radiooption 3
+									</label>
+								</div>
+							</fieldset>
+						</div>
+						
+						<div class="button-wrapper">
+							<input type="submit" value="Send" />
+						</div>
+					</fieldset>
+				</form>
 			</section>
 			
 			<h3>Now add some extras:</h3>

@@ -158,118 +158,118 @@ $('input[data-minlength]').val('some value').trigger('refreshCustomValidityRules
 			<section>
 				<h3>Simple Demo</h3>
 				<form action="#">
-	               
-	                <p class="required"><span>*</span> Required fields</p>
-	                <fieldset>
-	                    
-						<div class="form-element">
-	                        <label for="creditcard">
-	                            creditcard:
-							</label>
-	                       	<input name="creditcard" class="creditcard-input" type="number" id="creditcard" />
-	                    </div>
+				   
+					<p class="required"><span>*</span> Required fields</p>
+					<fieldset>
 						
 						<div class="form-element">
-	                        <label for="data-minlength">
-	                            data-minlength (5):
+							<label for="creditcard">
+								creditcard:
 							</label>
-	                       	<input data-minlength="5" name="data-minlength" type="text" id="data-minlength" />
-	                    </div>
+						   	<input name="creditcard" class="creditcard-input" type="number" id="creditcard" />
+						</div>
+						
+						<div class="form-element">
+							<label for="data-minlength">
+								data-minlength (5):
+							</label>
+						   	<input data-minlength="5" name="data-minlength" type="text" id="data-minlength" />
+						</div>
 						
 						
-	                    <div class="form-element">
-	                        <label for="date">
-	                            data-partial-pattern (foo): 
+						<div class="form-element">
+							<label for="date">
+								data-partial-pattern (foo): 
 							</label>
 							
-	                       	<input data-partial-pattern="foo" name="data-partial-pattern" type="text" id="data-partial-pattern" />
-	                    </div>
+						   	<input data-partial-pattern="foo" name="data-partial-pattern" type="text" id="data-partial-pattern" />
+						</div>
 						
 						<div class="form-element">
-	                        <label for="email">
-	                            email: 
+							<label for="email">
+								email: 
 							</label>
-	                       	<input name="email" type="email" id="email" />
-	                    </div>
+						   	<input name="email" type="email" id="email" />
+						</div>
 						<div class="form-element">
-	                        <label for="email-repeat">
-	                            repeat email (dependent-validation="email"): 
+							<label for="email-repeat">
+								repeat email (dependent-validation="email"): 
 							</label>
-	                       	<input x-moz-errormessage="Please repeat the email field" data-dependent-validation="email" name="email-repeat" type="email" id="email-repeat" />
-	                    </div>
+						   	<input x-moz-errormessage="Please repeat the email field" data-dependent-validation="email" name="email-repeat" type="email" id="email-repeat" />
+						</div>
 						
 						<div class="form-element">
-	                        <label for="checkbox-group-id">
-	                           checkbox-group: 
+							<label for="checkbox-group-id">
+							   checkbox-group: 
 							</label>
-	                       	<input name="checkbox-group" type="checkbox" class="group-required" id="checkbox-group-id" />
+						   	<input name="checkbox-group" type="checkbox" class="group-required" id="checkbox-group-id" />
 							<input name="checkbox-group" type="checkbox" />
 							<input name="checkbox-group" type="checkbox" />
 							<input name="checkbox-group" type="checkbox" />
 							<input name="checkbox-group" type="checkbox" />
-	                    </div>
+						</div>
 						
 						<div class="form-element">
-	                        <label for="checkbox">
-	                            checkbox: (used as from-prop) 
+							<label for="checkbox">
+								checkbox: (used as from-prop) 
 							</label>
-	                       	<input name="checkbox" type="checkbox" id="checkbox" />
+						   	<input name="checkbox" type="checkbox" id="checkbox" />
 							<br />
 							 <label for="checkbox-fill">
-	                            dependent-validation="checkbox": 
+								dependent-validation="checkbox": 
 							</label>
-	                       	<input data-dependent-validation="checkbox" name="checkbox-fill" type="text" required="required" id="checkbox-fill" />
-	                    </div>
+						   	<input data-dependent-validation="checkbox" name="checkbox-fill" type="text" required="required" id="checkbox-fill" />
+						</div>
 						
 						
 						<div class="form-element">
-	                        <label for="checkbox2">
-	                            checkbox2: (used as from-prop)
+							<label for="checkbox2">
+								checkbox2: (used as from-prop)
 							</label>
-	                       	<input name="checkbox2" type="checkbox" id="checkbox2" />
+						   	<input name="checkbox2" type="checkbox" id="checkbox2" />
 							<br />
 							<label for="checkbox-fill2">
-	                            dependent-validation='{"from": "checkbox2", "toggle": true}': 
+								dependent-validation='{"from": "checkbox2", "toggle": true}': 
 							</label>
-	                       	<input data-dependent-validation='{"from": "checkbox2", "toggle": true}' name="checkbox-fill2" type="text" required="required" id="checkbox-fill2" />
-	                    </div>
+						   	<input data-dependent-validation='{"from": "checkbox2", "toggle": true}' name="checkbox-fill2" type="text" required="required" id="checkbox-fill2" />
+						</div>
 						
 						
 						<div class="form-element">
-	                        <label for="date-from">
-	                            date-from (dependent-validation='{"from": "date-to", "prop": "max"}'): 
+							<label for="date-from">
+								date-from (dependent-validation='{"from": "date-to", "prop": "max"}'): 
 							</label>
-	                       	<input data-dependent-validation='{"from": "date-to", "prop": "max"}' name="date-from" type="date" id="date-from" />
+						   	<input data-dependent-validation='{"from": "date-to", "prop": "max"}' name="date-from" type="date" id="date-from" />
 							<br />
 							<label for="date-to">
-	                            date-to (dependent-validation='{"from": "date-from", "prop": "min"}'): 
+								date-to (dependent-validation='{"from": "date-from", "prop": "min"}'): 
 							</label>
-	                       	<input data-dependent-validation='{"from": "date-from", "prop": "min"}' name="date-to" type="date" id="date-to" />
-	                    </div>
+						   	<input data-dependent-validation='{"from": "date-from", "prop": "min"}' name="date-to" type="date" id="date-to" />
+						</div>
 						
 						
 						<div class="form-element">
-	                        <label for="special1">
-	                            special1: 
+							<label for="special1">
+								special1: 
 							</label>
-	                       	<select name="special1" id="special1">
-	                       		<option value="test1">test1 (requires special2)</option>
+						   	<select name="special1" id="special1">
+						   		<option value="test1">test1 (requires special2)</option>
 								<option value="test 2">test 2 (requires special2)</option>
 								<option value="test 3">test 3 (does not require special2)</option>
 							</select>
 							<br />
 							<label for="special2" >
-	                            special2 (dependent-validation='{"from": "special1", "prop": "required", "from-prop": "value:test1||test 2"}'): 
+								special2 (dependent-validation='{"from": "special1", "prop": "required", "from-prop": "value:test1||test 2"}'): 
 							</label>
-	                       	<input data-dependent-validation='{"from": "special1", "prop": "required", "from-prop": "value:test1||test 2"}' name="special2" type="text" id="special2" />
-	                    </div>
+							<input data-dependent-validation='{"from": "special1", "prop": "required", "from-prop": "value:test1||test 2"}' name="special2" type="text" id="special2" />
+						</div>
 						
 						
-	                    <div class="button-wrapper">
-	                    	<input type="submit" value="Send" />
-	                    </div>
-	                </fieldset>
-	            </form>
+						<div class="button-wrapper">
+							<input type="submit" value="Send" />
+						</div>
+					</fieldset>
+				</form>
 				
 			</section>
 	</section>

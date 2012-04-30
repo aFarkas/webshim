@@ -302,9 +302,9 @@
 			$(window).bind('load', function(){
 				setTimeout(function(){
 					if(window.parent == window){
-						if(!Modernizr.inputtypes['datetime-local'] && !$('input.input-datetime-local-date').length){
-							$.webshims.warn('datetime not implemented');
-						}
+//						if(!Modernizr.inputtypes['date'] && !$('input.input-datetime-local-date').length){
+//							$.webshims.warn('datetime not implemented');
+//						}
 						if(!isDOMReady){
 							alert('DOM-Ready not called');
 						}

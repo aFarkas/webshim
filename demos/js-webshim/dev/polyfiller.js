@@ -26,7 +26,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.10RC5',
+		version: '1.8.10RC6',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -1014,7 +1014,7 @@
 		
 		addPolyfill('form-number-date-api', {
 			f: 'forms-ext',
-			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && modernizrInputTypes.time && modernizrInputTypes.number);},
+			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date /*&& modernizrInputTypes.time*/ && modernizrInputTypes.number);},
 			test: function(toLoad){
 				return (this.uiTest() && !webshims.bugs.valueAsNumberSet);
 			},
@@ -1044,6 +1044,10 @@
 			},
 			c: [18, 7, 6]
 		});
+		
+//		if(!modernizrInputAttrs.list && browserVersion > 536.7 && $.browser.webkit && ('list') in $('<input />')[0]){
+//			modernizrInputAttrs.list = true;
+//		}
 		
 		addPolyfill('form-datalist', {
 			f: 'forms-ext',

@@ -70,12 +70,14 @@
 			}
 			
 			webshims.reTest(reTest);
-			//Opera hasn't fixed this issue right, it's buggy
-			// || webshims.browserVersion > 11.59
+			
+			
 			if ($.browser.opera || window.testGoodWithFix) {
 				webshims.loader.loadList(['dom-extend']);
 				webshims.ready('dom-extend', function(){
 					
+					//Opera shows native validation bubbles in case of input.checkValidity()
+					// Opera 11.6/12 hasn't fixed this issue right, it's buggy
 					var preventDefault = function(e){
 						e.preventDefault();
 					};
@@ -224,7 +226,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	/*
 	 * Selectors for all browsers
 	 */
-	var rangeTypes = {number: 1, range: 1, date: 1, time: 1, 'datetime-local': 1, datetime: 1, month: 1, week: 1};
+	var rangeTypes = {number: 1, range: 1, date: 1/*, time: 1, 'datetime-local': 1, datetime: 1, month: 1, week: 1*/};
 	$.extend($.expr.filters, {
 		"valid-element": function(elem){
 			return !!($.prop(elem, 'willValidate') && ($.prop(elem, 'validity') || {valid: 1}).valid);

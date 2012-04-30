@@ -325,193 +325,193 @@ asyncTest('step number/date module specific validity', function(){
 		], createTestMethodA('date'));
 	}
 
-	$.each([
-		{
-			attrs: {},
-			value: '20:30',
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				step: 'any'
-			},
-			value: '20:30:03',
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				step: 'any'
-			},
-			value: '20:30:03.500',
-			trueState: 'valid'
-		},
-		{
-			attrs: {},
-			value: '24:30',
-			trueState: 'typeMismatch'
-		},
-		{
-			attrs: {
-				
-			},
-			value: '23:30:40',
-			trueState: 'stepMismatch'
-		},
-		{
-			attrs: {
-				step: '10'
-			},
-			value: '23:30:40',
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				step: '300'
-			},
-			value: '23:35',
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				step: '300'
-			},
-			value: '23:36',
-			trueState: 'stepMismatch'
-		},
-		{
-			attrs: {
-				min: '02:20'
-			},
-			value: '01:30',
-			trueState: 'rangeUnderflow'
-		},
-		{
-			attrs: {
-				min: '01:20'
-			},
-			value: '01:30',
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				max: '18:20'
-			},
-			value: '20:30',
-			trueState: 'rangeOverflow'
-		},
-		{
-			attrs: {
-				max: '20:30'
-			},
-			value: '20:30',
-			trueState: 'valid'
-		}
-	],
-	createTestMethodA('time'));
+//	$.each([
+//		{
+//			attrs: {},
+//			value: '20:30',
+//			trueState: 'valid'
+//		},
+//		{
+//			attrs: {
+//				step: 'any'
+//			},
+//			value: '20:30:03',
+//			trueState: 'valid'
+//		},
+//		{
+//			attrs: {
+//				step: 'any'
+//			},
+//			value: '20:30:03.500',
+//			trueState: 'valid'
+//		},
+//		{
+//			attrs: {},
+//			value: '24:30',
+//			trueState: 'typeMismatch'
+//		},
+//		{
+//			attrs: {
+//				
+//			},
+//			value: '23:30:40',
+//			trueState: 'stepMismatch'
+//		},
+//		{
+//			attrs: {
+//				step: '10'
+//			},
+//			value: '23:30:40',
+//			trueState: 'valid'
+//		},
+//		{
+//			attrs: {
+//				step: '300'
+//			},
+//			value: '23:35',
+//			trueState: 'valid'
+//		},
+//		{
+//			attrs: {
+//				step: '300'
+//			},
+//			value: '23:36',
+//			trueState: 'stepMismatch'
+//		},
+//		{
+//			attrs: {
+//				min: '02:20'
+//			},
+//			value: '01:30',
+//			trueState: 'rangeUnderflow'
+//		},
+//		{
+//			attrs: {
+//				min: '01:20'
+//			},
+//			value: '01:30',
+//			trueState: 'valid'
+//		},
+//		{
+//			attrs: {
+//				max: '18:20'
+//			},
+//			value: '20:30',
+//			trueState: 'rangeOverflow'
+//		},
+//		{
+//			attrs: {
+//				max: '20:30'
+//			},
+//			value: '20:30',
+//			trueState: 'valid'
+//		}
+//	],
+//	createTestMethodA('time'));
 	
-	$.each([
-		{
-			attrs: {
-				
-			},
-			value: '1999-12-09T20:30',
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				
-			},
-			value: '1999-12-09T20|30',
-			trueState: 'typeMismatch'
-		},
-		{
-			attrs: {
-				
-			},
-			value: '1999-12-09T20:0',
-			trueState: 'typeMismatch'
-		},
-		{
-			attrs: {
-				
-			},
-			value: '1999-12-09T20:1',
-			trueState: 'typeMismatch'
-		},
-		{
-			attrs: {
-				
-			},
-			value: '1939-12-09T20:10:01',
-			trueState: 'stepMismatch'
-		},
-		{
-			attrs: {
-				step: 1
-			},
-			value: '1999-12-09T20:10:01',
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				step: 120
-			},
-			value: '1999-12-09T20:12',
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				step: '',
-				min: '1999-12-09T20:11'
-			},
-			value: '1999-12-09T20:10',
-			trueState: 'rangeUnderflow'
-		},
-		{
-			attrs: {
-				min: '1999-12-09T20:10'
-			},
-			value: '1999-12-09T20:10',
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				max: '1999-12-09T20:10'
-			},
-			value: '1999-12-09T20:10',
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				step: '',
-				min: '1999-12-09T20:11',
-				max: '1999-12-09T20:09'
-			},
-			value: '1999-12-09T20:10',
-			trueState: ['rangeUnderflow', 'rangeOverflow']
-		},
-		{
-			attrs: {
-				step: '',
-				min: '1999-12-09T20:11T',
-				max: '1999-12-09T20:09:'
-			},
-			value: '1999-12-09T20:10',
-			trueState: 'valid'
-		}
-	], createTestMethodA('datetime-local'));
-	
-	if(!omitTests.numericDateProps){
-		$.each([
-			{
-				attrs: {
-					step: 120
-				},
-				value: '1999-12-09T20:11',
-				trueState: 'stepMismatch'
-			}
-		], createTestMethodA('datetime-local'));
-	}
+//	$.each([
+//		{
+//			attrs: {
+//				
+//			},
+//			value: '1999-12-09T20:30',
+//			trueState: 'valid'
+//		},
+//		{
+//			attrs: {
+//				
+//			},
+//			value: '1999-12-09T20|30',
+//			trueState: 'typeMismatch'
+//		},
+//		{
+//			attrs: {
+//				
+//			},
+//			value: '1999-12-09T20:0',
+//			trueState: 'typeMismatch'
+//		},
+//		{
+//			attrs: {
+//				
+//			},
+//			value: '1999-12-09T20:1',
+//			trueState: 'typeMismatch'
+//		},
+//		{
+//			attrs: {
+//				
+//			},
+//			value: '1939-12-09T20:10:01',
+//			trueState: 'stepMismatch'
+//		},
+//		{
+//			attrs: {
+//				step: 1
+//			},
+//			value: '1999-12-09T20:10:01',
+//			trueState: 'valid'
+//		},
+//		{
+//			attrs: {
+//				step: 120
+//			},
+//			value: '1999-12-09T20:12',
+//			trueState: 'valid'
+//		},
+//		{
+//			attrs: {
+//				step: '',
+//				min: '1999-12-09T20:11'
+//			},
+//			value: '1999-12-09T20:10',
+//			trueState: 'rangeUnderflow'
+//		},
+//		{
+//			attrs: {
+//				min: '1999-12-09T20:10'
+//			},
+//			value: '1999-12-09T20:10',
+//			trueState: 'valid'
+//		},
+//		{
+//			attrs: {
+//				max: '1999-12-09T20:10'
+//			},
+//			value: '1999-12-09T20:10',
+//			trueState: 'valid'
+//		},
+//		{
+//			attrs: {
+//				step: '',
+//				min: '1999-12-09T20:11',
+//				max: '1999-12-09T20:09'
+//			},
+//			value: '1999-12-09T20:10',
+//			trueState: ['rangeUnderflow', 'rangeOverflow']
+//		},
+//		{
+//			attrs: {
+//				step: '',
+//				min: '1999-12-09T20:11T',
+//				max: '1999-12-09T20:09:'
+//			},
+//			value: '1999-12-09T20:10',
+//			trueState: 'valid'
+//		}
+//	], createTestMethodA('datetime-local'));
+//	
+//	if(!omitTests.numericDateProps){
+//		$.each([
+//			{
+//				attrs: {
+//					step: 120
+//				},
+//				value: '1999-12-09T20:11',
+//				trueState: 'stepMismatch'
+//			}
+//		], createTestMethodA('datetime-local'));
+//	}
 	
 	$.each([
 		{
@@ -576,33 +576,33 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			id: 'date',
 			value: '1899-12-12',
 			result: -2210716800000
-		},
-		{
-			id: 'datetime-local',
-			value: '2010-12-31T23:59',
-			result: 1293839940000
-		},
-		{
-			id: 'datetime-local',
-			value: '2010-12-31T02:00',
-			result: 1293760800000
-		},
-		
-		{
-			id: 'time',
-			value: '13:00',
-			result: 46800000
-		},
-		{
-			id: 'time',
-			value: '13:45',
-			result: 49500000
-		},
-		{
-			id: 'time',
-			value: '13:45:30',
-			result: 49530000
 		}
+//		,{
+//			id: 'datetime-local',
+//			value: '2010-12-31T23:59',
+//			result: 1293839940000
+//		},
+//		{
+//			id: 'datetime-local',
+//			value: '2010-12-31T02:00',
+//			result: 1293760800000
+//		},
+		
+//		{
+//			id: 'time',
+//			value: '13:00',
+//			result: 46800000
+//		},
+//		{
+//			id: 'time',
+//			value: '13:45',
+//			result: 49500000
+//		},
+//		{
+//			id: 'time',
+//			value: '13:45:30',
+//			result: 49530000
+//		}
 	], function(i, data){
 		var elem = $('#'+data.id);
 		elem.prop('value', data.value);
@@ -617,11 +617,11 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 	
 	if(!omitTests.numericDateProps){
 		$.each([
-			{
-				id: 'datetime-local',
-				value: '2010-12-31T00:00',
-				result: 1293753600000
-			},
+//			{
+//				id: 'datetime-local',
+//				value: '2010-12-31T00:00',
+//				result: 1293753600000
+//			},
 			{
 				id: 'date',
 				value: '1899-12-32'
@@ -634,19 +634,19 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 				id: 'date',
 				value: '2010-12-31',
 				result: 1293753600000
-			},
-			{
-				id: 'number',
-				value: '1d2'
-			},
-			{
-				id: 'datetime-local',
-				value: '2010-12-31B2:00'
-			},
-			{
-				id: 'time',
-				value: '13:30:30,5'
 			}
+//			,{
+//				id: 'number',
+//				value: '1d2'
+//			},
+//			{
+//				id: 'datetime-local',
+//				value: '2010-12-31B2:00'
+//			},
+//			{
+//				id: 'time',
+//				value: '13:30:30,5'
+//			}
 		], function(i, data){
 			var elem = $('#'+data.id);
 			elem.prop('value', data.value);
@@ -665,11 +665,11 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 	
 	//setting valueAsNumber
 	$.each([
-			{
-				id: 'time',
-				result: '13:30:30',
-				value: 48630000
-			}, 
+//			{
+//				id: 'time',
+//				result: '13:30:30',
+//				value: 48630000
+//			}, 
 			{
 				id: 'date',
 				result: '2010-12-31',
@@ -699,32 +699,32 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		}
 	);
 		
-	if(!omitTests.numericDateProps){
-		$.each([
-		 {
-			id: 'datetime-local',
-			result: '2010-12-31T00:00',
-			value: 1293753600000
-		}], 
-		function(i, data){
-			var elem = $('#' + data.id);
-			elem.prop('valueAsNumber', data.value);
-			
-			
-			var val = elem.prop('value');
-			ok(function(){
-				if (data.id == 'time' || data.id == 'datetime-local') {
-					if (val && val.indexOf('.') !== -1 && data.result.length < val.length) {
-						var lenDif = val.length - data.result.length;
-						while (lenDif--) {
-							data.result += '0';
-						}
-					}
-				}
-				return (val === data.result);
-			}(), data.value + ' is as value: ' + data.result + ', element: ' + data.id + ', was: ' + val);
-		});
-	}
+//	if(!omitTests.numericDateProps){
+//		$.each([
+//		 {
+//			id: 'datetime-local',
+//			result: '2010-12-31T00:00',
+//			value: 1293753600000
+//		}], 
+//		function(i, data){
+//			var elem = $('#' + data.id);
+//			elem.prop('valueAsNumber', data.value);
+//			
+//			
+//			var val = elem.prop('value');
+//			ok(function(){
+//				if (data.id == 'time' || data.id == 'datetime-local') {
+//					if (val && val.indexOf('.') !== -1 && data.result.length < val.length) {
+//						var lenDif = val.length - data.result.length;
+//						while (lenDif--) {
+//							data.result += '0';
+//						}
+//					}
+//				}
+//				return (val === data.result);
+//			}(), data.value + ' is as value: ' + data.result + ', element: ' + data.id + ', was: ' + val);
+//		});
+//	}
 	
 	//setting valueAsDate (webkit orientated, not sure these test are right + time has a bug in different time zone)
 	$.each([{
@@ -759,18 +759,18 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		},
 		resultVal: '1999-01-01',
 		resultNumber: 915148800000
-	}, 
- 
-	{
-		id: 'time',
-		value: function(){
-			var date = new Date(1999, 0, 1, 20, 30);
-			date.setSeconds(1);
-			return date;
-		},
-		resultVal: '19:30:01',
-		resultNumber: 70201000
-	}], function(i, data){
+	}
+//	,{
+//		id: 'time',
+//		value: function(){
+//			var date = new Date(1999, 0, 1, 20, 30);
+//			date.setSeconds(1);
+//			return date;
+//		},
+//		resultVal: '19:30:01',
+//		resultNumber: 70201000
+//	}
+	], function(i, data){
 		var elem = $('#' + data.id);
 		elem.prop('valueAsDate', data.value());
 		
@@ -784,41 +784,41 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 	});
 	
 	//getting valueAsDate
-	$.each([
+//	$.each([
 //		{
 //			id: 'time',
 //			val: '',
 //			result: null,
 //			strict: true 
 //		},
-		{
-			id: 'time',
-			val: '19:30',
-			result: 70200000 
-		},
-		{
-			id: 'datetime-local',
-			value: '',
-			result: null
-		},
-		{
-			id: 'datetime-local',
-			value: '2010-12-31T23:59',
-			result: null
-		}
-	], function(i, data){
-		var elem = $('#' + data.id);
-		elem.attr('value', data.val);
-		if(data.result === null){
-			if(data.strict){
-				strictEqual(data.result, elem.prop('valueAsDate'), 'empty value is null '+data.id);
-			} else {
-				equal(data.result, elem.prop('valueAsDate'), 'empty value is null/undefined '+data.id);
-			}
-		} else {
-			equal(data.result, elem.prop('valueAsDate').getTime(), 'get valueAsDate on '+data.id);
-		}
-	});
+//		{
+//			id: 'time',
+//			val: '19:30',
+//			result: 70200000 
+//		}
+//		,{
+//			id: 'datetime-local',
+//			value: '',
+//			result: null
+//		},
+//		{
+//			id: 'datetime-local',
+//			value: '2010-12-31T23:59',
+//			result: null
+//		}
+//	], function(i, data){
+//		var elem = $('#' + data.id);
+//		elem.attr('value', data.val);
+//		if(data.result === null){
+//			if(data.strict){
+//				strictEqual(data.result, elem.prop('valueAsDate'), 'empty value is null '+data.id);
+//			} else {
+//				equal(data.result, elem.prop('valueAsDate'), 'empty value is null/undefined '+data.id);
+//			}
+//		} else {
+//			equal(data.result, elem.prop('valueAsDate').getTime(), 'get valueAsDate on '+data.id);
+//		}
+//	});
 	
 	$.webshims.ready('forms DOM', function(){
 		start();

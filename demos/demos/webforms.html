@@ -121,8 +121,8 @@
 				<h3>Implemented/fixed elements, attributes, properties, methods, events</h3>
 				<p><label><input type="checkbox" id="show-forms-ext" checked="checked" /> show/hide <code>forms-ext</code> features</label></p>
 				<ul>
-					<li><strong>elements:</strong> <a href="http://www.w3.org/TR/html5/the-button-element.html#the-output-element">output</a><span class="forms-ext-feature">, <a href="http://www.w3.org/TR/html5/the-button-element.html#the-datalist-element">datalist*</a> (currently not for date, number, datetime-local and range type)</span></li>
-					<li><strong>types</strong>: <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#e-mail-state">email</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#url-state">url</a><span class="forms-ext-feature">, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#local-date-and-time-state">datetime-local</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#date-state">date</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#time-state">time</a>, <a href="http://www.w3.org/TR/html5/number-state.html#number-state">number</a>, <a href="http://www.w3.org/TR/html5/number-state.html#range-state">range</a></span></li>
+					<li><strong>elements:</strong> <a href="http://www.w3.org/TR/html5/the-button-element.html#the-output-element">output</a><span class="forms-ext-feature">, <a href="http://www.w3.org/TR/html5/the-button-element.html#the-datalist-element">datalist*</a> (currently not for date, number<!--, datetime-local--> and range type)</span></li>
+					<li><strong>types</strong>: <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#e-mail-state">email</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#url-state">url</a><span class="forms-ext-feature"><!--, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#local-date-and-time-state">datetime-local</a>, <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#time-state">time</a>, --> <a href="http://www.w3.org/TR/html5/states-of-the-type-attribute.html#date-state">date</a>, <a href="http://www.w3.org/TR/html5/number-state.html#number-state">number</a>, <a href="http://www.w3.org/TR/html5/number-state.html#range-state">range</a></span></li>
 					<li><strong>content attributes and properties (IDL attributes)</strong>: <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-placeholder">placeholder</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-list">list</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fe-autofocus">autofocus</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-novalidate">novalidate (noValidate)</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-required">required</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-pattern">pattern</a>, <a href="http://www.w3.org/TR/html5/the-button-element.html#attr-textarea-maxlength">maxlength</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-formnovalidate">formnovalidate (formNoValidate)</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-formaction">formaction (formAction)</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-formenctype">formenctype (formEnctype)</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-formmethod">formmethod (formMethod)</a>, <a href="http://www.w3.org/TR/html5/association-of-controls-and-forms.html#attr-fs-formtarget">formtarget (formTarget)</a><span class="forms-ext-feature">, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-step">step</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-max">max</a>, <a href="http://www.w3.org/TR/html5/common-input-element-attributes.html#attr-input-min">min</a></span></li>
 					<li><strong>properties/IDLs</strong>: <a href="http://www.w3.org/TR/html5/the-button-element.html#dom-datalist-options">options</a>, 
 <!--
@@ -147,7 +147,7 @@
 				
 				<h3>Options for the <code>forms-ext</code> feature</h3>
 				<ul>
-					<li><strong>replaceUI</strong> (boolean): <code>false</code> (default) || <code>true</code>. If replaceUI is set to true the date, datetime and slider Widgets are replaced in all browsers (also in browser, which have implemented these types). This is useful, if you want to style the UI in all browsers.</li>
+					<li><strong>replaceUI</strong> (boolean): <code>false</code> (default) || <code>true</code>. If replaceUI is set to true the date <!--, datetime --> and slider Widgets are replaced in all browsers (also in browser, which have implemented these types). This is useful, if you want to style the UI in all browsers.</li>
 					<li><strong>slider</strong> (options): <a href="http://jqueryui.com/demos/slider/">jQuery UI Slider-Options</a></li>
 					<li><strong>datepicker</strong> (options): <a href="http://jqueryui.com/demos/datepicker/">jQuery UI Datepicker-Options</a></li>
 				</ul>
@@ -168,15 +168,15 @@
 			<section>
 				<h3>Simple Demo</h3>
 				<form action="#" method="post">
-	               
-	                <p class="required"><span>*</span> Required fields</p>
-	                <fieldset>
-	                    
-	                    <div class="form-element">
-	                        <label for="email">
-	                            E-Mail + datalist: <dfn title="required">*</dfn>
+				   
+					<p class="required"><span>*</span> Required fields</p>
+					<fieldset>
+						
+						<div class="form-element">
+							<label for="email">
+								E-Mail + datalist: <dfn title="required">*</dfn>
 							</label>
-	                       	<input list="datalist" name="email" required="required" type="email" id="email" />
+						   	<input list="datalist" name="email" required="required" type="email" id="email" />
 							<datalist id="datalist">
 								<select>
 									<option value="yourmail@gmail.com"></option>
@@ -185,59 +185,59 @@
 									<option value="foo@bar.baz"></option>
 								</select>
 							</datalist>
-	                    </div>
+						</div>
 						<div class="form-element">
-	                        <label for="number">
-	                            number: <dfn title="required">*</dfn>
+							<label for="number">
+								number: <dfn title="required">*</dfn>
 							</label>
-	                       	<input name="number" required="required" type="number" id="number" />
-	                    </div>
+						   	<input name="number" required="required" type="number" id="number" />
+						</div>
 						
 						<div class="form-element">
-	                        <label for="range">
-	                            range:
+							<label for="range">
+								range:
 							</label>
-	                       	<input name="range" type="range" id="range" />
-	                    </div>
+						   	<input name="range" type="range" id="range" />
+						</div>
 						
 						<div class="form-element">
-	                        <label for="date">
-	                            date: *
+							<label for="date">
+								date: *
 							</label>
-	                       	<input name="date" type="date" id="date" required />
-	                    </div>
-	                    			
+						   	<input name="date" type="date" id="date" required />
+						</div>
+									
 						<div class="form-element">
-	                        <label for="password">
-	                            password: 
+							<label for="password">
+								password: 
 							</label>
-	                       	<input placeholder="password" name="password" type="password" id="password" />
-	                    </div>
+						   	<input placeholder="password" name="password" type="password" id="password" />
+						</div>
 						
 						<div class="form-element">
-			                <label for="textarea">
-			                    textarea: * ([maxlength="6"])
+							<label for="textarea">
+								textarea: * ([maxlength="6"])
 							</label>
-			               	<textarea placeholder="hello this is a textbox" maxlength="6" required="required" name="textarea" id="textarea"></textarea>
-			            </div>
+						   	<textarea placeholder="hello this is a textbox" maxlength="6" required="required" name="textarea" id="textarea"></textarea>
+						</div>
 						
 						<div class="form-element">
-			                <label for="select">
-			                    select: *
+							<label for="select">
+								select: *
 							</label>
-			               	<select required="required" name="select" id="select">
-			               		<option value="">Please choose</option>
+						   	<select required="required" name="select" id="select">
+						   		<option value="">Please choose</option>
 								<option>Option 1</option>
 								<option>Option 2</option>
 								<option>Option 3</option>
-			               	</select>
-			            </div>
+						   	</select>
+						</div>
 						
 						<div class="form-element">
-	                        <label for="number2">
-	                            number + number = output:
+							<label for="number2">
+								number + number = output:
 							</label>
-	                       	<input step="0.5" value="0" name="number2" type="number" id="number2" />
+						   	<input step="0.5" value="0" name="number2" type="number" id="number2" />
 							<input name="number3" id="number3" value="0" type="number" />
 							<output id="output2"></output>
 							
@@ -250,12 +250,12 @@
 									$('#output2').prop( 'value', ($(this).prop('valueAsNumber') || 0) + ($('#number2').prop('valueAsNumber') || 0) );
 								});
 							</script>
-	                    </div>
+						</div>
 						
 						<div class="form-element">
 							<fieldset>
 								<legend> date +oninput+ range</legend>
-		                       	<input type="date" id="dateControlledByRange" value="2011-01-01" min="2011-01-01" max="2011-12-31" />
+							   	<input type="date" id="dateControlledByRange" value="2011-01-01" min="2011-01-01" max="2011-12-31" />
 								<input type="range" id="rangeControlledByDate" value="1293840000000" min="1293840000000" max="1325289600000" step="86400000" style="margin-left: 5px; width: 400px;" />
 								
 								<script>
@@ -268,46 +268,46 @@
 								});
 							</script>
 							</fieldset>
-	                    </div>
+						</div>
 						
 						<div class="form-item">
-	                       	<input type="checkbox" required id="checkbox" name="checkbox" />
+						   	<input type="checkbox" required id="checkbox" name="checkbox" />
 							<label for="checkbox">
-	                            required checkbox*
+								required checkbox*
 							</label>
-	                    </div>
+						</div>
 						
 						
-	                    <div>
-	                    	<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
-	                    	<fieldset class="mod">
-	                    		<legend>Legend Short Labels  <dfn title="required">*</dfn></legend>
-	                            <div class="form-item">
-	                                <input type="radio" id="field6-1" name="radio-grp1-1" required />
+						<div>
+							<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
+							<fieldset class="mod">
+								<legend>Legend Short Labels  <dfn title="required">*</dfn></legend>
+								<div class="form-item">
+									<input type="radio" id="field6-1" name="radio-grp1-1" required />
 									<label for="field6-1">
-	                                    Radiooption 2
-	                                </label>
-								</div>
-								<div class="form-item">
-	                                <input type="radio" id="field7-1" name="radio-grp1-1" />
-	                               	<label for="field7-1"> 
 										Radiooption 2
-	                            	</label>
+									</label>
 								</div>
 								<div class="form-item">
-	                                <input type="radio" id="field8-1" name="radio-grp1-1" />
-									<label for="field8-1">
-	                                	Radiooption 3
-	                            	</label>
+									<input type="radio" id="field7-1" name="radio-grp1-1" />
+								   	<label for="field7-1"> 
+										Radiooption 2
+									</label>
 								</div>
-	                        </fieldset>
-	                    </div>
-	                    
-	                    <div class="button-wrapper">
-	                    	<input type="submit" value="Send" />
-	                    </div>
-	                </fieldset>
-	            </form>
+								<div class="form-item">
+									<input type="radio" id="field8-1" name="radio-grp1-1" />
+									<label for="field8-1">
+										Radiooption 3
+									</label>
+								</div>
+							</fieldset>
+						</div>
+						
+						<div class="button-wrapper">
+							<input type="submit" value="Send" />
+						</div>
+					</fieldset>
+				</form>
 			</section>
 			
 			<aside>
@@ -321,15 +321,15 @@
 						<p>Creating custom stylable error messages is simple (You won't see a difference in polyfilled browsers):</p>
 						
 <code class="block run-once">
-//bind to the first invalid element in a form
+/*bind to the first invalid element in a form*/
 $('form').bind('firstinvalid.example1', function(e){ 
-	//show the invalid alert for first invalid element
+	/*show the invalid alert for first invalid element*/
 	$.webshims.validityAlert.showFor( e.target ); 
-	//prevent browser from showing native validation message 
+	/*prevent browser from showing native validation message */
 	return false; 
 });
 
-//unbind event binding from second/next example:
+/*unbind event binding from second/next example:*/
 $('form').unbind('firstinvalid.example2');
 </code>
 						<p>The validityAlert method will create the following custom styleable HTML:</p>
@@ -346,27 +346,27 @@ $('form').unbind('firstinvalid.example2');
 						<p>Using custom messages instead of native browser messages is also easy. Simply implement the customValidationMessage attribute and use it.</p>
 
 <code class="block run-once">
-//configure webshims to implement new customValidationMessage attribute
-//$.webshims.setOptions('forms', {
-//	customMessages: true
-//});
+/*configure webshims to implement new customValidationMessage attribute
+$.webshims.setOptions('forms', {
+	customMessages: true
+});*/
 
-//load all polyfill features
-//$.webshims.polyfill();
+/* load all polyfill features
+ $.webshims.polyfill();*/
 
-//wait for DOM-Ready
+/* wait for DOM-Ready */
 $(function(){
-	//bind to the first invalid element in a form
+	/*bind to the first invalid element in a form*/
 	$('form').bind('firstinvalid.example2', function(e){ 
-		//show the invalid alert for first invalid element and pass the custom validation message 
+		/* show the invalid alert for first invalid element and pass the custom validation message */
 		$.webshims.validityAlert.showFor( e.target, $(e.target).prop('customValidationMessage') ); 
-		//prevent browser from showing native validation message 
+		/* prevent browser from showing native validation message */
 		return false; 
 	});
 });
 
 
-//unbind event binding from first example:
+/*unbind event binding from first example:*/
 $('form').unbind('firstinvalid.example1');
 </code>
 						<p>Instead of binding to the events your own, you can also simply set the configuration option <code>replaceValidationUI</code> to true:</p>
@@ -404,17 +404,33 @@ $('form').bind('invalid', function(e){
 					<div class="panel">
 						<p>Simply change some configuration and you are ready.</p>
 <code class="block">
-//configure webshims to use JS-Widgets instead of native widgets
+/*configure webshims to use JS-Widgets instead of native widgets*/
 $.webshims.setOptions('forms-ext', {
 	replaceUI: true
 });
 </code>
-						<p>Loading jQuery UI from another source:</p>
+					<p>Loading jQuery UI from another source:</p>
 <code class="block">
-// load a customized jquery ui build from another source
+/*load a customized jquery ui build from another source */
 $.webshims.modules["jquery-ui"].src = "../jquery-ui.custom.min.js";
 </code>
-						<p>More information about <a href="webforms/3-webforms-widgets.html">custom styleable input widgets</a>.</p>
+					<p>Loading 'forms-ext' conditionally (for performance)</p>
+<code class="block">
+/*load a customized and more lightweight jquery ui build from another source */
+$.webshims.modules["jquery-ui"].src = "../jquery-ui.custom.min.js";
+
+/*add forms to the features list*/
+var features = ['forms'];
+
+/* only add forms-ext, if input[type="range"] is not supported */
+if( !Modernizr.inputtypes.range ){
+	features.push('forms-ext');
+}
+
+/* Load all features */
+$.webshims.polyfill(features);
+</code>
+					<p>More information about <a href="webforms/3-webforms-widgets.html">custom styleable input widgets</a>.</p>
 					</div>
 					<h3 id="custom-widget" class="button">... create custom validation rules</h3>
 					<div class="panel">

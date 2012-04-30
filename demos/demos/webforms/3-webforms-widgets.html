@@ -84,7 +84,7 @@
 	</script>
 	<script src="../../demo-js/demo.js"></script>
 	<title>configuring HTML5 forms/Web Forms 2.0 widgets: webshims lib - the polyfilling capability based loading JS library</title>
-	    
+		
 </head>
 
 <body>
@@ -181,80 +181,80 @@ if(!Modernizr.inputtypes.range){
 			<section>
 				<h3>Simple Demo</h3>
 				<form action="#">
-	               
-	                <p class="required"><span>*</span> Required fields</p>
-	                <fieldset>
-	                    
-						<div class="form-element">
-	                        <label for="range">
-	                            range:
-							</label>
-	                       	<input name="range" type="range" id="range" />
-	                    </div>
+				   
+					<p class="required"><span>*</span> Required fields</p>
+					<fieldset>
 						
 						<div class="form-element">
-	                        <label for="range-max">
-	                            range (with data attribute):
+							<label for="range">
+								range:
 							</label>
-	                       	<input data-slider='{"range": "max"}' name="range-max" type="range" id="range-max" />
-	                    </div>
+						   	<input name="range" type="range" id="range" />
+						</div>
+						
+						<div class="form-element">
+							<label for="range-max">
+								range (with data attribute):
+							</label>
+						   	<input data-slider='{"range": "max"}' name="range-max" type="range" id="range-max" />
+						</div>
 						
 						
-	                    <div class="form-element">
-	                        <label for="date">
-	                            date: <dfn title="required">*</dfn>
+						<div class="form-element">
+							<label for="date">
+								date: <dfn title="required">*</dfn>
 							</label>
 							
-	                       	<input min="2010-12-10" max="2016-01-01" name="date" required="required" type="date" id="date" />
+						   	<input min="2010-12-10" max="2016-01-01" name="date" required="required" type="date" id="date" />
 							(min="2010-12-10" max="2016-01-01")
-	                    </div>
+						</div>
 						
 						<div class="form-element">
-	                        <label for="date-data">
-	                            date (with data attribute): <dfn title="required">*</dfn>
+							<label for="date-data">
+								date (with data attribute): <dfn title="required">*</dfn>
 							</label>
 							
-	                       	<input data-datepicker='{"showOn": "button", "buttonImage": "../../css/calendar.gif", "buttonImageOnly": true}' name="date-data" required="required" type="date" id="date-data" />
-	                    </div>
-						
+						   	<input data-datepicker='{"showOn": "button", "buttonImage": "../../css/calendar.gif", "buttonImageOnly": true}' name="date-data" required="required" type="date" id="date-data" />
+						</div>
+						<!--
 						<div class="form-element">
-	                        <label for="datetime-local">
-	                            datetime-local: 
+							<label for="datetime-local">
+								datetime-local: 
 							</label>
-	                       	<input value="2010-12-31T21:00" name="datetime-local" type="datetime-local" step="600" id="datetime-local" />
+						   	<input value="2010-12-31T21:00" name="datetime-local" type="datetime-local" step="600" id="datetime-local" />
 							(step=600)
-	                    </div>
+						</div>
 						
 						<div class="form-element">
-	                        <label for="datetime-local-data">
-	                            datetime-local-data: 
+							<label for="datetime-local-data">
+								datetime-local-data: 
 							</label>
-	                       	<input data-datepicker='{"showOn": "both", "buttonImage": "../../css/calendar.gif", "buttonImageOnly": true}' name="datetime-local-data" type="datetime-local" step="900" id="datetime-local-data" />
+						   	<input data-datepicker='{"showOn": "both", "buttonImage": "../../css/calendar.gif", "buttonImageOnly": true}' name="datetime-local-data" type="datetime-local" step="900" id="datetime-local-data" />
 							(step=900)
-	                    </div>
-												
-	                    <div class="form-element">
-	                        <label for="number">
-	                            number: <dfn title="required">*</dfn>
+						</div>
+						-->			
+						<div class="form-element">
+							<label for="number">
+								number: <dfn title="required">*</dfn>
 							</label>
 							
-	                       	<input min="3" name="number" required="required" type="number" id="number" />
+							<input min="3" name="number" required="required" type="number" id="number" />
 							(min="3")
-	                    </div>
-	                   
-						
+						</div>
+
+						<!--
 						<div class="form-element">
-	                        <label for="time">
-	                            time: 
+							<label for="time">
+								time: 
 							</label>
-	                       	<input name="time" type="time" id="time" />
-	                    </div>
-						
-	                    <div class="button-wrapper">
-	                    	<input type="submit" value="Send" />
-	                    </div>
-	                </fieldset>
-	            </form>
+							<input name="time" type="time" id="time" />
+						</div>
+						-->
+						<div class="button-wrapper">
+							<input type="submit" value="Send" />
+						</div>
+					</fieldset>
+				</form>
 				<!--
 				<h3>Change/Override base styles</h3>
 				<p>Most of the input widgets (placeholder, date, datetime-local, range and spinner controls for time and number) do change the DOM and/or your styles a little bit. </p>
@@ -267,7 +267,7 @@ if(!Modernizr.inputtypes.range){
 		<small>
 			<strong>Note</strong>: every polyfill is a hack! innovative frontend development is hacky and always will be hacky!
 		</small>
-    </footer>
+	</footer>
 <!--[if lte IE 7]>
 	<div class="browser-support"> 			
 		<div class="browser-support-box"> 				
