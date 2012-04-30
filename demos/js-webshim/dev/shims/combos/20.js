@@ -743,11 +743,18 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	};
 	
 	var initEvents = function(data){
+		var passed = true;
 		$.each(mediaelement.jwEvents, function(mvcName, evts){
 			$.each(evts, function(evtName){
-				data.jwapi['add'+ mvcName +'Listener'](evtName, 'jQuery.webshims.mediaelement.jwEvents.'+ mvcName +'.'+ evtName);
+				try {
+					data.jwapi['add'+ mvcName +'Listener'](evtName, 'jQuery.webshims.mediaelement.jwEvents.'+ mvcName +'.'+ evtName);
+				} catch(er){
+					passed = false;
+					return false;
+				}
 			});
 		});
+		return passed;
 	};
 	
 	var workActionQueue = function(data){
@@ -911,24 +918,48 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	var localConnectionTimer;
 	mediaelement.jwPlayerReady = function(jwData){
 		var data = getSwfDataFromID(jwData.id);
+		var passed = true;
+		var i = 0;
+		var doneFn = function(){
+			if(i > 9){return;}
+			i++;
+			if(initEvents(data)){
+				if(!data.wasSwfReady){
+					var version = parseFloat( jwData.version, 10);
+					if(version < 5.6 || version >= 6){
+						webshims.warn('mediaelement-swf is only testet with jwplayer 5.6+');
+					}
+				} else {
+					$(data._elem).mediaLoad();
+					
+				}
+				data.wasSwfReady = true;
+				data.tryedReframeing = 0;
+				workActionQueue(data);
+				startAutoPlay(data);
+			} else {
+				clearTimeout(data.reframeTimer);
+				data.reframeTimer = setTimeout(doneFn, 9 * i);
+				if(i > 2 && data.tryedReframeing < 9){
+					data.tryedReframeing++;
+					data.shadowElem.css({overflow: 'visible'});
+					setTimeout(function(){
+						data.shadowElem.css({overflow: 'hidden'});
+					}, 16);
+				}
+			}
+		};
 		if(!data || !data.jwapi){return;}
+		if(!data.tryedReframeing){
+			data.tryedReframeing = 0;
+		}
 		clearTimeout(localConnectionTimer);
 		data.jwData = jwData;
 		data.shadowElem.removeClass('flashblocker-assumed');
 		$.prop(data._elem, 'volume', data.volume);
 		$.prop(data._elem, 'muted', data.muted);
-		initEvents(data);
-		if(!data.wasSwfReady){
-			var version = parseFloat( jwData.version, 10);
-			if(version < 5.6 || version >= 6){
-				webshims.warn('mediaelement-swf is only testet with jwplayer 5.6+');
-			}
-		} else {
-			$(data._elem).mediaLoad();
-		}
-		data.wasSwfReady = true;
-		workActionQueue(data);
-		startAutoPlay(data);
+		doneFn();
+		
 	};
 	
 	var addMediaToStopEvents = $.noop;
