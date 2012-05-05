@@ -1528,10 +1528,18 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		return;
 	}
 	
+	//create delegatable events
+	webshims.capturingEvents(['input']);
+	webshims.capturingEvents(['invalid'], true);
+	
 	Modernizr.bugfreeformvalidation = true;
 	if(window.opera || $.browser.webkit || window.testGoodWithFix){
 		var dateElem = $('input', form).eq(0);
 		var timer;
+		var onDomextend = function(fn){
+			webshims.loader.loadList(['dom-extend']);
+			webshims.ready('dom-extend', fn);
+		};
 		var loadFormFixes = function(e){
 			var reTest = ['form-extend', 'form-message', 'form-native-fix'];
 			if(e){
@@ -1559,10 +1567,25 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 			
 			webshims.reTest(reTest);
 			
+			if(dateElem){
+				try {
+					if(dateElem.prop({disabled: true, value: ''}).prop('disabled', false).is(':valid')){
+						onDomextend(function(){
+							webshims.onNodeNamesPropertyModify(['input', 'textarea', 'select'], ['disabled', 'readonly'], {
+								set: function(){
+									var elem = this;
+									if(!elem.disabled){
+										$(elem).val( $(elem).val() );
+									}
+								}
+							});
+						});
+					}
+				} catch(er){}
+			}
 			
 			if ($.browser.opera || window.testGoodWithFix) {
-				webshims.loader.loadList(['dom-extend']);
-				webshims.ready('dom-extend', function(){
+				onDomextend(function(){
 					
 					//Opera shows native validation bubbles in case of input.checkValidity()
 					// Opera 11.6/12 hasn't fixed this issue right, it's buggy
@@ -1635,9 +1658,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		timer = setTimeout(function(){
 			form && form.triggerHandler('submit');
 		}, 9);
-		//create delegatable events
-		webshims.capturingEvents(['input']);
-		webshims.capturingEvents(['invalid'], true);
+		
 		$('input, select', form).bind('invalid', loadFormFixes)
 			.filter('[type="submit"]')
 			.bind('click', function(e){
@@ -1648,9 +1669,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		
 	}
 	
-	//create delegatable events
-	webshims.capturingEvents(['input']);
-	webshims.capturingEvents(['invalid'], true);
+	
 	
 	
 })(jQuery);
