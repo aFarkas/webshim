@@ -26,7 +26,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.10',
+		version: '1.8.11pre',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -922,12 +922,13 @@
 	if(modernizrInputAttrs && modernizrInputTypes){
 		var formvalidation = 'formvalidation';
 		var formOptions;
+		var select = $('<select required name="a"><option disabled /></select>')[0];
 		addTest(formvalidation, function(){
 			return !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern);
 		});
 		
 		if(Modernizr[formvalidation]){
-			webshims.bugs.bustedValidity = !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in $('<select />')[0]);
+			webshims.bugs.bustedValidity = !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
 		}
 		
 		addTest('styleableinputrange', function(){
