@@ -168,7 +168,9 @@
 		});
 		
 		timer = setTimeout(function(){
-			form && form.triggerHandler('submit');
+			if (form) {
+				form.triggerHandler('submit');
+			}
 		}, 9);
 		
 		$('input, select', form).bind('invalid', loadFormFixes)
@@ -180,9 +182,6 @@
 		;
 		
 	}
-	
-	
-	
 	
 })(jQuery);
 
@@ -215,29 +214,25 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return ret;
 	};
 	
-	var getContentValidationMessage = webshims.getContentValidationMessage = function(elem, validity){
-		var message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
-		if(message && message.indexOf('{') != -1){
-			try {
-				message = jQuery.parseJSON(message);
-			} catch(er){
-				return message;
+	var getContentValidationMessage = webshims.getContentValidationMessage = function(elem, validity, key){
+		var message = $(elem).data('errormessage') || elem.getAttribute('x-moz-errormessage') || '';
+		if(key && message[key]){
+			message = message[key];
+		}
+		if(typeof message == 'object'){
+			validity = validity || $.prop(elem, 'validity') || {valid: 1};
+			if(!validity.valid){
+				$.each(validity, function(name, prop){
+					if(prop && name != 'valid' && message[name]){
+						message = message[name];
+						return false;
+					}
+				});
 			}
-			if(typeof message == 'object'){
-				validity = validity || $.prop(elem, 'validity') || {valid: 1};
-				if(!validity.valid){
-					$.each(validity, function(name, prop){
-						if(prop && name != 'valid' && message[name]){
-							message = message[name];
-							return false;
-						}
-					});
-				}
-			}
-			webshims.data(elem, 'contentErrorMessage', message);
-			if(typeof message == 'object'){
-				message = message.defaultMessage;
-			}
+		}
+		webshims.data(elem, 'contentErrorMessage', message);
+		if(typeof message == 'object'){
+			message = message.defaultMessage;
 		}
 		return message || '';
 	};
@@ -1424,6 +1419,88 @@ webshims.defineNodeNameProperty('form', 'noValidate', {
 		}
 	}
 });
+
+
+if($.browser.webkit && Modernizr.inputtypes.date){
+	(function(){
+		var noInputTriggerEvts = {updateInput: 1, input: 1},
+			fixInputTypes = {
+				date: 1,
+				time: 1,
+				"datetime-local": 1
+			},
+			noFocusEvents = {
+				focusout: 1,
+				blur: 1
+			},
+			changeEvts = {
+				updateInput: 1,
+				change: 1
+			},
+			observe = function(input){
+				var timer,
+					focusedin = true,
+					lastInputVal = input.prop('value'),
+					lastChangeVal = lastInputVal,
+					trigger = function(e){
+						//input === null
+						if(!input){return;}
+						var newVal = input.prop('value');
+						
+						if(newVal !== lastInputVal){
+							lastInputVal = newVal;
+							if(!e || !noInputTriggerEvts[e.type]){
+								input.trigger('input');
+							}
+						}
+						if(e && changeEvts[e.type]){
+							lastChangeVal = newVal;
+						}
+						if(!focusedin && newVal !== lastChangeVal){
+							input.trigger('change');
+						}
+					},
+					extraTimer,
+					extraTest = function(){
+						clearTimeout(extraTimer);
+						extraTimer = setTimeout(trigger, 9);
+					},
+					unbind = function(e){
+						clearInterval(timer);
+						setTimeout(function(){
+							if(e && noFocusEvents[e.type]){
+								focusedin = false;
+							}
+							if(input){
+								input.unbind('focusout blur', unbind).unbind('input change updateInput', trigger);
+								trigger();
+							}
+							input = null;
+						}, 1);
+						
+					}
+				;
+				
+				clearInterval(timer);
+				timer = setInterval(trigger, 160);
+				extraTest();
+				input.unbind('focusout blur', unbind).unbind('input change updateInput', trigger);
+				input.bind('focusout blur', unbind).bind('input updateInput change', trigger);
+			}
+		;
+		if($.event.customEvent){
+			$.event.customEvent.updateInput = true;
+		} 
+		
+		$(document)
+			.bind('focusin', function(e){
+				if( e.target && fixInputTypes[e.target.type] && !e.target.readOnly && !e.target.disabled ){
+					observe($(e.target));
+				}
+			})
+		;
+	})();
+}
 
 webshims.addReady(function(context, contextElem){
 	//start constrain-validation

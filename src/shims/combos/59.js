@@ -423,7 +423,9 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		});
 		
 		timer = setTimeout(function(){
-			form && form.triggerHandler('submit');
+			if (form) {
+				form.triggerHandler('submit');
+			}
 		}, 9);
 		
 		$('input, select', form).bind('invalid', loadFormFixes)
@@ -435,9 +437,6 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		;
 		
 	}
-	
-	
-	
 	
 })(jQuery);
 
@@ -470,29 +469,25 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return ret;
 	};
 	
-	var getContentValidationMessage = webshims.getContentValidationMessage = function(elem, validity){
-		var message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || '';
-		if(message && message.indexOf('{') != -1){
-			try {
-				message = jQuery.parseJSON(message);
-			} catch(er){
-				return message;
+	var getContentValidationMessage = webshims.getContentValidationMessage = function(elem, validity, key){
+		var message = $(elem).data('errormessage') || elem.getAttribute('x-moz-errormessage') || '';
+		if(key && message[key]){
+			message = message[key];
+		}
+		if(typeof message == 'object'){
+			validity = validity || $.prop(elem, 'validity') || {valid: 1};
+			if(!validity.valid){
+				$.each(validity, function(name, prop){
+					if(prop && name != 'valid' && message[name]){
+						message = message[name];
+						return false;
+					}
+				});
 			}
-			if(typeof message == 'object'){
-				validity = validity || $.prop(elem, 'validity') || {valid: 1};
-				if(!validity.valid){
-					$.each(validity, function(name, prop){
-						if(prop && name != 'valid' && message[name]){
-							message = message[name];
-							return false;
-						}
-					});
-				}
-			}
-			webshims.data(elem, 'contentErrorMessage', message);
-			if(typeof message == 'object'){
-				message = message.defaultMessage;
-			}
+		}
+		webshims.data(elem, 'contentErrorMessage', message);
+		if(typeof message == 'object'){
+			message = message.defaultMessage;
 		}
 		return message || '';
 	};
