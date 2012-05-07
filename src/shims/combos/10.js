@@ -1636,10 +1636,6 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			if(tmp){
 				src.type = tmp;
 				src.container = tmp;
-				webshims.warn('you should always provide a proper mime-type using the source element. '+ src.src +' detected as: '+ tmp);
-				if($.nodeName(elem[0], 'source')){
-					elem.attr('type', tmp);
-				}
 			}
 		}
 		tmp = elem.attr('media');

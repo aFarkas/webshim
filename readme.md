@@ -75,11 +75,6 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-upcomming Release 1.8.11
-----------
-
-- fixed 
-
 
 Release 1.8.10
 ----------
