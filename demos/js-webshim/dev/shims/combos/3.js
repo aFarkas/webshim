@@ -2103,6 +2103,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 							} else {
 								val = $.data(this, 'datalistListAttr');
 							}
+							
 							return (val == null) ? undefined : val;
 						},
 						set: function(value){
@@ -2215,7 +2216,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				this.hasViewableData = true;
 				this._autocomplete = $.attr(opts.input, 'autocomplete');
 				$.data(opts.input, 'datalistWidget', this);
-				this.shadowList = $('<div class="datalist-polyfill" />');
+				this.shadowList = $('<div class="datalist-polyfill '+ (this.datalist.className || '') + ' '+ this.datalist.id +'-shadowdom' +'" />');
 				
 				if(formsCFG.positionDatalist){
 					this.shadowList.insertAfter(opts.input);
@@ -2326,7 +2327,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 						}
 					});
 				}
-				$(window).bind('unload', function(){
+				$(window).bind('unload.datalist'+this.id+' beforeunload.datalist'+this.id, function(){
 					that.destroy();
 				});
 			},
@@ -2338,6 +2339,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				;
 				this.shadowList.remove();
 				$(document).unbind('.datalist'+this.id);
+				$(window).unbind('.datalist'+this.id);
 				if(this.input.form && this.input.id){
 					$(this.input.form).unbind('submit.datalistWidget'+this.input.id);
 				}
@@ -2420,7 +2422,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				}
 				
 				this.arrayOptions = allOptions;
-				this.shadowList.html('<div><ul role="list" class="'+ (this.datalist.className || '') + ' '+ this.datalist.id +'-shadowdom' +'">'+ list.join("\n") +'</ul></div>');
+				this.shadowList.html('<div class="datalist-outer-box"><div class="datalist-box"><ul role="list">'+ list.join("\n") +'</ul></div></div>');
 				
 				if($.fn.bgIframe && lteie6){
 					this.shadowList.bgIframe();
@@ -2475,10 +2477,11 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				}
 			},
 			setPos: function(){
+				this.shadowList.css({marginTop: 0, marginLeft: 0, marginRight: 0, marginBottom: 0});
 				var css = (formsCFG.positionDatalist) ? $(this.input).position() : webshims.getRelOffset(this.shadowList, this.input);
 				css.top += $(this.input).outerHeight();
 				css.width = $(this.input).outerWidth() - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
-				this.shadowList.css(css);
+				this.shadowList.css({marginTop: '', marginLeft: '', marginRight: '', marginBottom: ''}).css(css);
 				return css;
 			},
 			showList: function(){
@@ -2493,7 +2496,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				var resizeTimer;
 				
 				that.setPos();
-				that.shadowList.addClass('datalist-visible');
+				that.shadowList.addClass('datalist-visible').find('li.active-item').removeClass('active-item');
 				
 				$(document).unbind('.datalist'+that.id).bind('mousedown.datalist'+that.id +' focusin.datalist'+that.id, function(e){
 					if(e.target === that.input ||  that.shadowList[0] === e.target || $.contains( that.shadowList[0], e.target )){
@@ -2507,7 +2510,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				});
 				$(window)
 					.unbind('.datalist'+that.id)
-					.bind('resize.datalist'+that.id +'orientationchange.datalist '+that.id +' emchange.datalist'+that.id, function(){
+					.bind('resize.datalist'+that.id +' orientationchange.datalist '+that.id +' emchange.datalist'+that.id, function(){
 						clearTimeout(resizeTimer);
 						resizeTimer = setTimeout(function(){
 							that.setPos();
@@ -2526,11 +2529,8 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 					}
 					that.changedValue = false;
 				};
-				that.shadowList
-					.removeClass('datalist-visible list-item-active')
-					.scrollTop(0)
-					.find('li.active-item').removeClass('active-item')
-				;
+				
+				that.shadowList.removeClass('datalist-visible list-item-active');
 				that.index = -1;
 				that.isListVisible = false;
 				if(that.changedValue){
@@ -2544,12 +2544,18 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 					that.triggeredByDatalist = false;
 				}
 				$(document).unbind('.datalist'+that.id);
-				$(window).unbind('.datalist'+that.id);
+				$(window)
+					.unbind('.datalist'+that.id)
+					.bind('resize.datalist'+that.id +' orientationchange.datalist '+that.id +' emchange.datalist'+that.id, function(){
+						that.shadowList.css({top: 0, left: 0});
+						$(window).unbind('.datalist'+that.id);
+					})
+				;
 				return true;
 			},
 			scrollIntoView: function(elem){
 				var ul = $('ul', this.shadowList);
-				var div = $('div', this.shadowList);
+				var div = $('div.datalist-box', this.shadowList);
 				var elemPos = elem.position();
 				var containerHeight;
 				elemPos.top -=  (parseInt(ul.css('paddingTop'), 10) || 0) + (parseInt(ul.css('marginTop'), 10) || 0) + (parseInt(ul.css('borderTopWidth'), 10) || 0);

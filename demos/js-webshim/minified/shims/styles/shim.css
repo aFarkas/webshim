@@ -434,7 +434,7 @@ datalist {
 	top: 0;
 	left: 0;
 	margin: 0;
-	padding: 0 !important;
+	padding: 0;
 	display: none;
 	z-index: 999999999;
 }
@@ -444,13 +444,14 @@ datalist {
 .datalist-polyfill div {
 	margin: 0;
 	padding: 0;
+}
+.datalist-polyfill .datalist-box {
 	border: 1px solid #333;
 	max-height: 200px;
 	overflow: hidden;
 	overflow-x: hidden !important;
 	overflow-y: auto;
 }
-
 .datalist-polyfill ul,
 .datalist-polyfill li {
 	font-size: 100%;
@@ -486,10 +487,10 @@ datalist {
 	float: right;
 	text-overflow: ellipsis;
 }
-.datalist-polyfill li.hidden-item {
+.datalist-polyfill .hidden-item {
 	display: none !important;
 }
-.datalist-polyfill li.active-item {
+.datalist-polyfill .active-item {
 	background-color: #39f;
 	color: #fff;
 	cursor: default;

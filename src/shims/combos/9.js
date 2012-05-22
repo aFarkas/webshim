@@ -1722,7 +1722,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				setSize($.prop(this, 'videoWidth'), $.prop(this, 'videoHeight'));
 			})
 			.bind('emptied', setPosterSrc)
-			.bind('swfstageresize', function(){
+			.bind('swfstageresize updatemediaelementdimensions', function(){
 				if(blockResize){return;}
 				setSize(lastIntrinsicSize.width, lastIntrinsicSize.height);
 			})
@@ -1914,6 +1914,10 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		});
 		var elemVars = $(elem).data('jwvars') || {};
 		
+		if(!data){
+			data = webshims.data(elem, 'mediaelement');
+		}
+		
 		if(data && data.swfCreated){
 			mediaelement.setActive(elem, 'flash', data);
 			resetSwfProps(data);
@@ -1921,7 +1925,6 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			$.extend(vars, elemVars);
 			options.changeJW(vars, elem, canPlaySrc, data, 'load');
 			queueSwfMethod(elem, SENDEVENT, ['LOAD', vars]);
-			
 			return;
 		}
 		
@@ -2015,10 +2018,19 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		
 		
 		webshims.addShadowDom(elem, box);
+		
 		addMediaToStopEvents(elem);
+		
 		mediaelement.setActive(elem, 'flash', data);
+		
 		options.changeJW(vars, elem, canPlaySrc, data, 'embed');
+		
+		$(elem).bind('updatemediaelementdimensions', function(){
+			setElementDimension(data, $.prop(elem, 'controls'));
+		});
+		
 		startIntrinsicDimension(data);
+		
 		swfobject.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.0", false, vars, params, attrs, function(swfData){
 			
 			if(swfData.success){
