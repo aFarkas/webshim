@@ -173,8 +173,16 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		if(doc.addEventListener){
 			var inputThrottle;
 			doc.addEventListener('change', function(e){
+				var form = e.target.form;
 				clearTimeout(inputThrottle);
 				testValidity(e.target);
+				if(form && overrideNativeMessages){
+					$('input', form).each(function(){
+						if(this.type == 'password'){
+							testValidity(this);
+						}
+					});
+				}
 			}, true);
 			
 			doc.addEventListener('input', function(e){
@@ -338,11 +346,21 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 				try {
 					if(dateElem.prop({disabled: true, value: ''}).prop('disabled', false).is(':valid')){
 						onDomextend(function(){
-							webshims.onNodeNamesPropertyModify(['input', 'textarea', 'select'], ['disabled', 'readonly'], {
-								set: function(){
+							webshims.onNodeNamesPropertyModify(['input', 'textarea'], ['disabled', 'readonly'], {
+								set: function(val){
 									var elem = this;
-									if(!elem.disabled){
-										$(elem).val( $(elem).val() );
+									if(!val && elem){
+										$.prop(elem, 'value', $.prop(elem, 'value'));
+									}
+								}
+							});
+							webshims.onNodeNamesPropertyModify(['select'], ['disabled', 'readonly'], {
+								set: function(val){
+									var elem = this;
+									if(!val && elem){
+										val = $(elem).val();
+										($('option:last-child', elem)[0] || {}).selected = true;
+										$(elem).val( val );
 									}
 								}
 							});
@@ -859,6 +877,15 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			shadowElem = null;
 		});
 	})();
+	
+	$.fn.getErrorMessage = function(){
+		var message = '';
+		var elem = this[0];
+		if(elem){
+			message = getContentValidationMessage(elem) || $.prop(elem, 'customValidationMessage') || $.prop(elem, 'validationMessage');
+		}
+		return message;
+	};
 	
 	if(options.replaceValidationUI){
 		webshims.ready('DOM', function(){

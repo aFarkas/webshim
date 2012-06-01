@@ -231,6 +231,13 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				if(datalist && data && data.datalist !== datalist){
 					data.datalist = datalist;
 					data.id = opts.id;
+					
+					data.shadowList.prop('className', 'datalist-polyfill '+ (data.datalist.className || '') + ' '+ data.datalist.id +'-shadowdom');
+					if(formsCFG.positionDatalist){
+						data.shadowList.insertAfter(opts.input);
+					} else {
+						data.shadowList.appendTo('body');
+					}
 					$(data.datalist)
 						.unbind('updateDatalist.datalistWidget')
 						.bind('updateDatalist.datalistWidget', $.proxy(data, '_resetListCached'))

@@ -173,8 +173,16 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		if(doc.addEventListener){
 			var inputThrottle;
 			doc.addEventListener('change', function(e){
+				var form = e.target.form;
 				clearTimeout(inputThrottle);
 				testValidity(e.target);
+				if(form && overrideNativeMessages){
+					$('input', form).each(function(){
+						if(this.type == 'password'){
+							testValidity(this);
+						}
+					});
+				}
 			}, true);
 			
 			doc.addEventListener('input', function(e){
