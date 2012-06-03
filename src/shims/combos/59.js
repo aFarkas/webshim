@@ -618,12 +618,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	var switchValidityClass = function(e){
 		if(!e.target || e.target.type == 'submit' || !$.prop(e.target, 'willValidate')){return;}
 		var timer = $.data(e.target, 'webshimsswitchvalidityclass');
-		if(timer){
-			clearTimeout(timer);
-		}
-		$.data(e.target, 'webshimsswitchvalidityclass', setTimeout(function(){
+		var switchClass = function(){
 			
-			var elem = $(e.target).getNativeElement()[0];
+			var elem = $(e.target).getNativeElement().trigger('refreshCustomValidityRules')[0];
 			var validity = $.prop(elem, 'validity');
 			var shadowElem = $(elem).getShadowElement();
 			var addClass, removeClass, trigger, generaltrigger, validityCause;
@@ -666,14 +663,22 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					$(elem).trigger(generaltrigger);
 				}, 0);
 			}
-			$.removeData(e.target, 'webshimsswitchvalidityclass');//oh
+			$.removeData(e.target, 'webshimsswitchvalidityclass');
 			
-		}, 9));
+		};
+		if(timer){
+			clearTimeout(timer);
+		}
+		if(e.type == 'refreshvalidityui'){
+			switchClass();
+		} else {
+			$.data(e.target, 'webshimsswitchvalidityclass', setTimeout(switchClass, 9));
+		}
 	};
 	
-	
-	$(document).bind('focusout change refreshvalidityui', switchValidityClass);
+	$(document).bind(options.validityUIEvents || 'focusout change refreshvalidityui', switchValidityClass);
 	customEvents.changedvaliditystate = true;
+	customEvents.refreshCustomValidityRules = true;
 	customEvents.changedvalid = true;
 	customEvents.changedinvalid = true;
 	customEvents.refreshvalidityui = true;
