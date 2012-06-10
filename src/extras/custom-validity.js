@@ -80,9 +80,7 @@
 		
 		
 		//if constraint validation is supported, we have to change validityState as soon as possible
-		if(document.addEventListener && document.createElement('form').checkValidity){
-			document.addEventListener('change', onEventTest, true);
-		}
+		$(document).bind('change', onEventTest);
 		
 		webshims.addReady(function(context, selfElement){
 			initTest = true;
