@@ -26,7 +26,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.11beta3',
+		version: '1.8.11RC1',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -514,7 +514,7 @@
 	$.webshims = webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var googleAPIs = protocol + 'ajax.googleapis.com/ajax/libs/';
-	var uiLib = googleAPIs + 'jqueryui/1.8.19/';
+	var uiLib = googleAPIs + 'jqueryui/1.8.21/';
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;

@@ -254,6 +254,8 @@ var validityRules = {
 			
 			if(typeModels[cache.type] && typeModels[cache.type].mismatch){
 				ret = typeModels[cache.type].mismatch(val, input);
+			} else if('validity' in input[0]){
+				ret = input[0].validity.typeMismatch;
 			}
 			return ret;
 		},
@@ -784,6 +786,13 @@ if(!$.support.getSetAttribute && $('<form novalidate></form>').attr('novalidate'
 			}
 		}
 	});
+	
+	$.each(['rangeUnderflow', 'rangeOverflow', 'stepMismatch'], function(i, name){
+		validityRules[name] = function(elem){
+			return (elem[0].validity || {})[name] || false;
+		};
+	});
+	
 }
 
 webshims.defineNodeNameProperty('form', 'noValidate', {
