@@ -51,13 +51,13 @@
 	<!--
 		<script src="../../src/polyfiller.js"></script> 
 		<script>
-			$.webshims.debug = true;
+			$.webshims.debug = 'noCombo';
 		</script>
 	-->
 	<script class="example">
 		$.webshims.setOptions('forms', { 
 			customMessages: true,
-			placeholderType: 'over'
+			placeholderType: 'over' 
 		}); 
 		$.webshims.setOptions({
 			//we do not use any DOM-/JS-APIs on DOM-ready, so we do not need to delay the ready event <- good against fouc
