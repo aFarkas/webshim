@@ -503,7 +503,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				});
 			}
 		}
-		webshims.data(elem, 'contentErrorMessage', message);
+		
 		if(typeof message == 'object'){
 			message = message.defaultMessage;
 		}
