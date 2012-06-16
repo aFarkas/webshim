@@ -734,7 +734,9 @@ webshims.addReady(function(context, contextElem){
 
 (function(){
 	Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
-	if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder){return;}
+	var bustedTextarea = $.browser.webkit && Modernizr.textareaPlaceholder;
+	if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder && !bustedTextarea){return;}
+	
 	var isOver = (webshims.cfg.forms.placeholderType == 'over');
 	var polyfillElements = ['textarea'];
 	if(!Modernizr.input.placeholder){
@@ -980,11 +982,17 @@ webshims.addReady(function(context, contextElem){
 			attr: {
 				set: function(val){
 					var elem = this;
-					webshims.contentAttr(elem, 'placeholder', val);
+					if(bustedTextarea){
+						webshims.data(elem, 'textareaPlaceholder', val);
+						elem.placeholder = '';
+					} else {
+						webshims.contentAttr(elem, 'placeholder', val);
+					}
 					pHolder.update(elem, val);
 				},
 				get: function(){
-					return webshims.contentAttr(this, 'placeholder');
+					var ret = (bustedTextarea) ? webshims.data(this, 'textareaPlaceholder') : '';
+					return ret || webshims.contentAttr(this, 'placeholder');
 				}
 			},
 			reflect: true,
@@ -1000,7 +1008,13 @@ webshims.addReady(function(context, contextElem){
 			placeholderValueDesc[propType] = {
 				set: function(val){
 					var elem = this;
-					var placeholder = webshims.contentAttr(elem, 'placeholder');
+					var placeholder;
+					if(bustedTextarea){
+						placeholder = webshims.data(elem, 'textareaPlaceholder');
+					} 
+					if(!placeholder){
+						placeholder = webshims.contentAttr(elem, 'placeholder');
+					}
 					$.removeData(elem, 'cachedValidity');
 					var ret = desc[propType]._supset.call(elem, val);
 					if(placeholder && 'value' in elem){
