@@ -503,7 +503,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				});
 			}
 		}
-		webshims.data(elem, 'contentErrorMessage', message);
+		
 		if(typeof message == 'object'){
 			message = message.defaultMessage;
 		}
@@ -543,7 +543,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		}
 		
 	});
-	//better you use the selectors above
+	
 	['valid', 'invalid', 'required', 'optional'].forEach(function(name){
 		$.expr.filters[name] = $.expr.filters[name+"-element"];
 	});

@@ -895,6 +895,10 @@
 					}
 				},
 				afterLoad: function(){
+					var wasReady = $.isReady;
+					var triggerReady = function(){
+						isReady('canvas', true);
+					};
 					webshims.addReady(function(context, elem){
 						$('canvas', context).add(elem.filter('canvas')).each(function(){
 							var hasContext = this.getContext;
@@ -903,7 +907,11 @@
 							}
 						});
 						if(context == document){
-							isReady('canvas', true);
+							if(wasReady){
+								triggerReady();
+							} else {
+								setTimeout(triggerReady,0);
+							}
 						}
 					});
 				},
