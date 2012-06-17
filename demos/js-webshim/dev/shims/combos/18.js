@@ -364,14 +364,16 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				
 				if(opts.input.form && opts.input.id){
 					$(opts.input.form).bind('submit.datalistWidget'+opts.input.id, function(){
-						var val = $.prop(opts.input, 'value');
-						var name = (opts.input.name || opts.input.id) + $.prop(opts.input, 'type');
-						if(!that.storedOptions){
-							that.storedOptions = getStoredOptions( name );
-						}
-						if(val && that.storedOptions.indexOf(val) == -1){
-							that.storedOptions.push(val);
-							storeOptions(name, that.storedOptions );
+						if(!$(opts.input).hasClass('no-datalist-cache')){
+							var val = $.prop(opts.input, 'value');
+							var name = (opts.input.name || opts.input.id) + $.prop(opts.input, 'type');
+							if(!that.storedOptions){
+								that.storedOptions = getStoredOptions( name );
+							}
+							if(val && that.storedOptions.indexOf(val) == -1){
+								that.storedOptions.push(val);
+								storeOptions(name, that.storedOptions );
+							}
 						}
 					});
 				}
@@ -455,7 +457,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				}
 				
 				if(!this.storedOptions){
-					this.storedOptions = getStoredOptions((this.input.name || this.input.id) + $.prop(this.input, 'type'));
+					this.storedOptions = ($(this.input).hasClass('no-datalist-cache')) ? [] : getStoredOptions((this.input.name || this.input.id) + $.prop(this.input, 'type'));
 				}
 				
 				this.storedOptions.forEach(function(val, i){
