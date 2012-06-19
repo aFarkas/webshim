@@ -531,7 +531,13 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				}, 10);
 			},
 			getMessage: function(elem, message){
-				$('span.va-box', errorBubble).text(message || getContentValidationMessage(elem[0]) || elem.prop('validationMessage'));
+				if (message === '') {
+					this.hide();
+				}
+				else {
+					$('span.va-box', errorBubble).text(message || getContentValidationMessage(elem[0]) || elem.prop('validationMessage'));
+				}
+				
 			},
 			position: function(elem, offset){
 				offset = offset ? $.extend({}, offset) : api.getOffsetFromBody(elem);
