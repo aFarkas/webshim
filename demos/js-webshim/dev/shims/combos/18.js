@@ -832,7 +832,8 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		
 		if(doc.addEventListener){
 			var inputThrottle;
-			doc.addEventListener('change', function(e){
+			var testPassValidity = function(e){
+				if(!('form' in e.target)){return;}
 				var form = e.target.form;
 				clearTimeout(inputThrottle);
 				testValidity(e.target);
@@ -843,7 +844,17 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 						}
 					});
 				}
-			}, true);
+			};
+			
+			doc.addEventListener('change', testPassValidity, true);
+			
+			if(overrideNativeMessages){
+				doc.addEventListener('blur', testPassValidity, true);
+				doc.addEventListener('keydown', function(e){
+					if(e.keyCode != 13){return;}
+					testPassValidity(e);
+				}, true);
+			}
 			
 			doc.addEventListener('input', function(e){
 				clearTimeout(inputThrottle);

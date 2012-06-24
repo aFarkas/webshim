@@ -172,7 +172,8 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		
 		if(doc.addEventListener){
 			var inputThrottle;
-			doc.addEventListener('change', function(e){
+			var testPassValidity = function(e){
+				if(!('form' in e.target)){return;}
 				var form = e.target.form;
 				clearTimeout(inputThrottle);
 				testValidity(e.target);
@@ -183,7 +184,17 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 						}
 					});
 				}
-			}, true);
+			};
+			
+			doc.addEventListener('change', testPassValidity, true);
+			
+			if(overrideNativeMessages){
+				doc.addEventListener('blur', testPassValidity, true);
+				doc.addEventListener('keydown', function(e){
+					if(e.keyCode != 13){return;}
+					testPassValidity(e);
+				}, true);
+			}
 			
 			doc.addEventListener('input', function(e){
 				clearTimeout(inputThrottle);
@@ -794,7 +805,15 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				}, 10);
 			},
 			getMessage: function(elem, message){
-				$('span.va-box', errorBubble).text(message || getContentValidationMessage(elem[0]) || elem.prop('validationMessage'));
+				if (!message) {
+					message = getContentValidationMessage(elem[0]) || elem.prop('validationMessage');
+				}
+				if (message) {
+					$('span.va-box', errorBubble).text(message);
+				}
+				else {
+					this.hide();
+				}
 			},
 			position: function(elem, offset){
 				offset = offset ? $.extend({}, offset) : api.getOffsetFromBody(elem);
