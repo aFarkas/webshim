@@ -2368,7 +2368,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				
 				this._resetListCached();
 				
-				if(opts.input.form && opts.input.id){
+				if(opts.input.form && (opts.input.name || opts.input.id)){
 					$(opts.input.form).bind('submit.datalistWidget'+opts.input.id, function(){
 						if(!$(opts.input).hasClass('no-datalist-cache')){
 							var val = $.prop(opts.input, 'value');

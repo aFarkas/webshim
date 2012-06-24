@@ -26,7 +26,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.11RC1',
+		version: '1.8.11pre',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -895,11 +895,12 @@
 					}
 				},
 				afterLoad: function(){
-					var wasReady = $.isReady;
-					var triggerReady = function(){
-						isReady('canvas', true);
-					};
 					webshims.addReady(function(context, elem){
+						if(context == document){
+							if(window.G_vmlCanvasManager && G_vmlCanvasManager.init_ ){
+								G_vmlCanvasManager.init_(document);
+							}
+						}
 						$('canvas', context).add(elem.filter('canvas')).each(function(){
 							var hasContext = this.getContext;
 							if(!hasContext && window.G_vmlCanvasManager){
@@ -907,11 +908,7 @@
 							}
 						});
 						if(context == document){
-							if(wasReady){
-								triggerReady();
-							} else {
-								setTimeout(triggerReady,0);
-							}
+							isReady('canvas', true);
 						}
 					});
 				},
