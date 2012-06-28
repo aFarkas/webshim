@@ -285,6 +285,15 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		$.expr.filters[name] = $.expr.filters[name+"-element"];
 	});
 	
+	
+	$.expr.filters.focus = function( elem ) {
+		try {
+			var doc = elem.ownerDocument;
+			return elem === doc.activeElement && (!doc.hasFocus || doc.hasFocus());
+		} catch(e){}
+		return false;
+	};
+	
 	var customEvents = $.event.customEvent || {};
 	var isValid = function(elem){
 		return ($.prop(elem, 'validity') || {valid: 1}).valid;
@@ -1190,7 +1199,7 @@ if( !('maxLength' in document.createElement('textarea')) ){
 	})();
 	
 	constrainMaxLength.update = function(element, maxLength){
-		if(element === document.activeElement){
+		if($(element).is(':focus')){
 			if(maxLength == null){
 				maxLength = $.prop(element, 'maxlength');
 			}
@@ -1651,7 +1660,7 @@ webshims.addReady(function(context, contextElem){
 				if(!data){return;}
 			}
 			$(elem).unbind('.placeholderremove');
-			if(type == 'focus' || (!type && elem === document.activeElement)){
+			if(type == 'focus' || (!type && $(elem).is(':focus'))){
 				if(elem.type == 'password' || isOver || $(elem).hasClass('placeholder-visible')){
 					hidePlaceholder(elem, data, '', true);
 				}

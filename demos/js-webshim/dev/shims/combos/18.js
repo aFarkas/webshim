@@ -347,7 +347,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 						}
 					})
 					.bind('mousedown.datalistWidget', function(){
-						if(this == document.activeElement || $(this).is(':focus')){
+						if($(this).is(':focus')){
 							that.showList();
 						}
 					})
@@ -586,7 +586,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				if(that.changedValue){
 					that.triggeredByDatalist = true;
 					webshims.triggerInlineForm && webshims.triggerInlineForm(that.input, 'input');
-					if(that.input == document.activeElement || $(that.input).is(':focus')){
+					if($(that.input).is(':focus')){
 						$(that.input).one('blur', triggerChange);
 					} else {
 						triggerChange();
@@ -1535,7 +1535,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				})
 				.datepicker($.extend({
 					onClose: function(){
-						if(focusedOut && document.activeElement !== datePicker[0]){
+						if(focusedOut && datePicker.not(':focus')){
 							resetFocusHandler();
 							datePicker.trigger('focusout');
 							datePicker.triggerHandler('blur');

@@ -83,7 +83,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		.bind('lastinvalid', function(e, data){
 			var firstTarget = data.invalidlist[0];
 				
-			if( firstTarget && (badWebkit || ($.nodeName(firstTarget, 'select'))) && document.activeElement && firstTarget !== document.activeElement && firstInvalidEvent && !firstInvalidEvent.isInvalidUIPrevented() ){
+			if( firstTarget && (badWebkit || ($.nodeName(firstTarget, 'select'))) && $(firstTarget).not(':focus') && firstInvalidEvent && !firstInvalidEvent.isInvalidUIPrevented() ){
 				webshims.validityAlert.showFor(firstTarget);
 			}
 			firstInvalidEvent = false;

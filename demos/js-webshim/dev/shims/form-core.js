@@ -285,6 +285,15 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		$.expr.filters[name] = $.expr.filters[name+"-element"];
 	});
 	
+	
+	$.expr.filters.focus = function( elem ) {
+		try {
+			var doc = elem.ownerDocument;
+			return elem === doc.activeElement && (!doc.hasFocus || doc.hasFocus());
+		} catch(e){}
+		return false;
+	};
+	
 	var customEvents = $.event.customEvent || {};
 	var isValid = function(elem){
 		return ($.prop(elem, 'validity') || {valid: 1}).valid;

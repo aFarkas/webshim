@@ -1190,7 +1190,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 						}
 					})
 					.bind('mousedown.datalistWidget', function(){
-						if(this == document.activeElement || $(this).is(':focus')){
+						if($(this).is(':focus')){
 							that.showList();
 						}
 					})
@@ -1429,7 +1429,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				if(that.changedValue){
 					that.triggeredByDatalist = true;
 					webshims.triggerInlineForm && webshims.triggerInlineForm(that.input, 'input');
-					if(that.input == document.activeElement || $(that.input).is(':focus')){
+					if($(that.input).is(':focus')){
 						$(that.input).one('blur', triggerChange);
 					} else {
 						triggerChange();

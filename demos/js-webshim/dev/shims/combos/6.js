@@ -601,7 +601,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				})
 				.datepicker($.extend({
 					onClose: function(){
-						if(focusedOut && document.activeElement !== datePicker[0]){
+						if(focusedOut && datePicker.not(':focus')){
 							resetFocusHandler();
 							datePicker.trigger('focusout');
 							datePicker.triggerHandler('blur');

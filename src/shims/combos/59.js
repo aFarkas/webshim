@@ -559,6 +559,15 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		$.expr.filters[name] = $.expr.filters[name+"-element"];
 	});
 	
+	
+	$.expr.filters.focus = function( elem ) {
+		try {
+			var doc = elem.ownerDocument;
+			return elem === doc.activeElement && (!doc.hasFocus || doc.hasFocus());
+		} catch(e){}
+		return false;
+	};
+	
 	var customEvents = $.event.customEvent || {};
 	var isValid = function(elem){
 		return ($.prop(elem, 'validity') || {valid: 1}).valid;
@@ -1452,7 +1461,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 						}
 					})
 					.bind('mousedown.datalistWidget', function(){
-						if(this == document.activeElement || $(this).is(':focus')){
+						if($(this).is(':focus')){
 							that.showList();
 						}
 					})
@@ -1691,7 +1700,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				if(that.changedValue){
 					that.triggeredByDatalist = true;
 					webshims.triggerInlineForm && webshims.triggerInlineForm(that.input, 'input');
-					if(that.input == document.activeElement || $(that.input).is(':focus')){
+					if($(that.input).is(':focus')){
 						$(that.input).one('blur', triggerChange);
 					} else {
 						triggerChange();
