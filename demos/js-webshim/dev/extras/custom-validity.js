@@ -79,7 +79,6 @@
 		};
 		
 		
-		//if constraint validation is supported, we have to change validityState as soon as possible
 		$(document).bind('change', onEventTest);
 		
 		webshims.addReady(function(context, selfElement){
@@ -228,9 +227,9 @@
 			}
 			
 			data = $.data(elem, 'dependentValidation', $.extend({_init: true}, dependentDefaults, data));
-			
+			console.log($(data.masterElement.type === 'radio' && getGroupElements(data.masterElement) || data.masterElement))
 			if(data.prop !== "value" || specialVal){
-				(data.masterElement.type === 'radio' && getGroupElements || $)(data.masterElement).bind('change', depFn);
+				$(data.masterElement.type === 'radio' && getGroupElements(data.masterElement) || data.masterElement).bind('change', depFn);
 			} else {
 				$(data.masterElement).bind('change', function(){
 					$.webshims.refreshCustomValidityRules(elem);
