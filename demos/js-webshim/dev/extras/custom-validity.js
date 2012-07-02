@@ -227,12 +227,15 @@
 			}
 			
 			data = $.data(elem, 'dependentValidation', $.extend({_init: true}, dependentDefaults, data));
-			console.log($(data.masterElement.type === 'radio' && getGroupElements(data.masterElement) || data.masterElement))
+
 			if(data.prop !== "value" || specialVal){
 				$(data.masterElement.type === 'radio' && getGroupElements(data.masterElement) || data.masterElement).bind('change', depFn);
 			} else {
 				$(data.masterElement).bind('change', function(){
 					$.webshims.refreshCustomValidityRules(elem);
+					if($(elem).is('.form-ui-invalid, .form-ui-valid')){
+						$(elem).trigger('refreshvalidityui');
+					}
 				});
 			}
 		}
