@@ -235,6 +235,9 @@
 				$(data.masterElement).bind('change', function(){
 					$.webshims.refreshCustomValidityRules(elem);
 				});
+        $(elem).bind('change', function(){
+          $.webshims.refreshCustomValidityRules(elem);
+        });
 			}
 		}
 
