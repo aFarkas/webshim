@@ -883,9 +883,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					range.outerWidth(attr.outerWidth);
 				}
 			}
-			range.slider($.extend({}, options.slider, elem.data('slider'), {
-				slide: change
-			}));
+			range.slider($.extend(true, {}, options.slider, elem.data('slider'))).bind('slide', change);
 			
 			['disabled', 'min', 'max', 'step', 'value'].forEach(function(name){
 				var val = elem.attr(name);
