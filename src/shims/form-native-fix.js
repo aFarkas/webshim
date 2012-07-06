@@ -10,6 +10,8 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		form
 	;
 	
+	var isChangeSubmit;
+	
 	
 	//opera/chrome fix (this will double all invalid events in opera, we have to stop them!)
 	//opera throws a submit-event and then the invalid events,
@@ -22,6 +24,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		};
 		window.addEventListener('submit', function(e){
 			if(!formnovalidate.prevented && e.target.checkValidity && $.attr(e.target, 'novalidate') == null){
+				isChangeSubmit = true;
 				if($(invalidSelector, e.target).length){
 					$(e.target)
 						.unbind('submit.preventInvalidSubmit')
@@ -39,11 +42,13 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 					;
 					webshims.moveToFirstEvent(e.target, 'submit');
 				}
+				isChangeSubmit = false;
 				if(!window.opera){
 					webshims.fromSubmit = true;
 					$(e.target).checkValidity();
 					webshims.fromSubmit = false;
 				}
+				
 			}
 		}, true);
 		
@@ -174,6 +179,83 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 					}
 				})
 			;
+		})();
+		
+		(function(){
+			var badVal = '2010-1-1';
+			if($('<input name="t" type="date" />').prop('value', badVal) == badVal){
+				var correctValue = function(elem){
+					var i = 1;
+					var len = 3;
+					var abort, val;
+					if(elem.type == 'date' && (isChangeSubmit || !$(elem).is(':focus'))){
+						val = elem.value;
+						if(val && val.length < 10 && (val = val.split('-')) && val.length == len){
+							for(; i < len; i++){
+								if(val[i].length == 1){
+									val[i] = '0'+val[i];
+								} else if(val[i].length != 2){
+									abort = true;
+									break;
+								}
+							}
+							if(!abort){
+								val = val.join('-');
+								$.prop(elem, 'value', val);
+								return val;
+							}
+						}
+					}
+				};
+				var inputCheckValidityDesc, formCheckValidityDesc, inputValueDesc, inputValidityDesc;
+				
+				inputCheckValidityDesc = webshims.defineNodeNameProperty('input', 'checkValidity', {
+					prop: {
+						value: function(){
+							correctValue(this);
+							return inputCheckValidityDesc.prop._supvalue.apply(this, arguments);
+						}
+					}
+				});
+				
+				formCheckValidityDesc = webshims.defineNodeNameProperty('form', 'checkValidity', {
+					prop: {
+						value: function(){
+							$('input', this).each(function(){
+								correctValue(this);
+							});
+							return formCheckValidityDesc.prop._supvalue.apply(this, arguments);
+						}
+					}
+				});
+				
+				inputValueDesc = webshims.defineNodeNameProperty('input', 'value', {
+					prop: {
+						set: function(){
+							return inputValueDesc.prop._supset.apply(this, arguments);
+						},
+						get: function(){
+							return correctValue(this) || inputValueDesc.prop._supget.apply(this, arguments);
+						}
+					}
+				});
+				
+				inputValidityDesc = webshims.defineNodeNameProperty('input', 'validity', {
+					prop: {
+						writeable: false,
+						get: function(){
+							correctValue(this);
+							return inputValidityDesc.prop._supget.apply(this, arguments);
+						}
+					}
+				});
+				
+				$(document).bind('change', function(e){
+					isChangeSubmit = true;
+					correctValue(e.target);
+					isChangeSubmit = false;
+				});
+			}
 		})();
 	}
 	
