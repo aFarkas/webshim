@@ -441,7 +441,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 		}
 	},
 	willValidate: {
-		set: $.noop,
+		writeable: false,
 		get: (function(){
 			var types = {
 					button: 1,
@@ -458,7 +458,7 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 		})()
 	},
 	validity: {
-		set: $.noop,
+		writeable: false,
 		get: function(){
 			var jElm = $(this).getNativeElement();
 			var elem = jElm[0];

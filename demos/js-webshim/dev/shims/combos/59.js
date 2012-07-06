@@ -573,7 +573,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return ($.prop(elem, 'validity') || {valid: 1}).valid;
 	};
 	
-	if (bugs.bustedValidity || bugs.findRequired) {
+	if (bugs.bustedValidity || bugs.findRequired || Modernizr.bugfreeformvalidation) {
 		(function(){
 			var find = $.find;
 			var matchesSelector = $.find.matchesSelector;
