@@ -183,7 +183,7 @@ jQuery.webshims.register('form-native-fix', function($, webshims, window, doc, u
 		
 		(function(){
 			var badVal = '2010-1-1';
-			if($('<input name="t" type="date" />').prop('value', badVal) == badVal){
+			if($('<input name="t" type="date" />').prop('value', badVal).prop('value') == badVal){
 				var correctValue = function(elem){
 					var i = 1;
 					var len = 3;
