@@ -48,7 +48,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	})();
 	
 	
-	var defaultDatepicker = {dateFormat: 'yy-mm-dd'};
+	var defaultDatepicker = {};
 	var labelID = 0;
 	var emptyJ = $([]);
 	var isCheckValidity;

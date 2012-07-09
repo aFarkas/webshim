@@ -1548,12 +1548,12 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	var isValid = function(elem){
 		return ($.prop(elem, 'validity') || {valid: 1}).valid;
 	};
-	console.log('das')
+	
 	if (bugs.bustedValidity || bugs.findRequired || !Modernizr.bugfreeformvalidation) {
 		(function(){
 			var find = $.find;
 			var matchesSelector = $.find.matchesSelector;
-			console.log('das2')
+			
 			var regExp = /(\:valid|\:invalid|\:optional|\:required|\:in-range|\:out-of-range)(?=[\s\[\~\.\+\>\:\#*]|$)/ig;
 			var regFn = function(sel){
 				return sel + '-element';
