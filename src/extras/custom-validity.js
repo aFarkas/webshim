@@ -43,8 +43,13 @@
 				message = test(elem, val) || '';
 				customMismatchedRule = name;
 				if(message){
+					
 					if(typeof message != 'string'){
-						message = elem.getAttribute('x-moz-errormessage') || elem.getAttribute('data-errormessage') || webshims.customErrorMessages[name][webshims.activeLang()] || webshims.customErrorMessages[name]['']; 
+						message = $(elem).data('errormessage') || elem.getAttribute('x-moz-errormessage') || webshims.customErrorMessages[name][webshims.activeLang()] || webshims.customErrorMessages[name]['']; 
+					}
+					
+					if(typeof message == 'object'){
+						message = message[name] || message.customError || message.defaultMessage;
 					}
 					return false;
 				}
@@ -176,9 +181,14 @@
 		"toggle": false
 	};
 	
-	var getGroupElements = $.webshims.modules && $.webshims.modules["form-core"].getGroupElements || function(elem) {
+	var getGroupElements = function(elem) {
 		return $(elem.form[elem.name]).filter('[type="radio"]');
 	};
+	$.webshims.ready('form-core', function(){
+		if($.webshims.modules){
+			getGroupElements = $.webshims.modules["form-core"].getGroupElements || getGroupElements;
+		}
+	});
 	
 	addCustomValidityRule('dependent', function(elem, val){
 		
