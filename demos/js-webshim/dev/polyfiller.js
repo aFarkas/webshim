@@ -927,7 +927,7 @@
 	if(modernizrInputAttrs && modernizrInputTypes){
 		var formvalidation = 'formvalidation';
 		var formOptions;
-		var select = $('<select required name="a"><option disabled /></select>')[0];
+		var select = $('<select required="" name="a"><option disabled="" /></select>')[0];
 		addTest(formvalidation, function(){
 			return !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern);
 		});

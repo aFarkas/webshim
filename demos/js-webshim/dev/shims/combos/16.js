@@ -1253,7 +1253,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 	var Modernizr = window.Modernizr;
 	var webshims = $.webshims;
 	var bugs = webshims.bugs;
-	var form = $('<form action="#" style="width: 1px; height: 1px; overflow: hidden;"><select name="b" required /><input type="date" required name="a" /><input type="submit" /></form>');
+	var form = $('<form action="#" style="width: 1px; height: 1px; overflow: hidden;"><select name="b" required="" /><input type="date" required="" name="a" /><input type="submit" /></form>');
 	var testRequiredFind = function(){
 		if(form[0].querySelector){
 			try {
