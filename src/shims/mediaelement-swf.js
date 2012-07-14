@@ -71,7 +71,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		var elem = document.getElementById(id.replace(idRep, ''));
 		if(!elem){return;}
 		var data = webshims.data(elem, 'mediaelement');
-		return data.isActive == 'flash' ? data : null;
+		return data.isActive == 'third' ? data : null;
 	};
 	
 	
@@ -82,7 +82,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			return null;
 		}
 		var data = webshims.data(elem, 'mediaelement');
-		return (data && data.isActive== 'flash') ? data : null;
+		return (data && data.isActive== 'third') ? data : null;
 	};
 	
 	var trigger = function(elem, evt){
@@ -350,7 +350,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		var actionLen = data.actionQueue.length;
 		var i = 0;
 		var operation;
-		if(actionLen && data.isActive == 'flash'){
+		if(actionLen && data.isActive == 'third'){
 			while(data.actionQueue.length && actionLen > i){
 				i++;
 				operation = data.actionQueue.shift();
@@ -365,7 +365,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		if(!data){return;}
 		if( (data._ppFlag === undefined && ($.prop(data._elem, 'autoplay')) || !data.paused)){
 			setTimeout(function(){
-				if(data.isActive == 'flash' && (data._ppFlag === undefined || !data.paused)){
+				if(data.isActive == 'third' && (data._ppFlag === undefined || !data.paused)){
 					try {
 						$(data._elem).play();
 					} catch(er){}
@@ -385,7 +385,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		var blockResize;
 		var lastSize;
 		var setSize = function(width, height){
-			if(!height || !width || height < 1 || width < 1 || data.isActive != 'flash'){return;}
+			if(!height || !width || height < 1 || width < 1 || data.isActive != 'third'){return;}
 			if(img){
 				img.remove();
 				img = false;
@@ -417,7 +417,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			shadowElem.css({width: width, height: height});
 		};
 		var setPosterSrc = function(){
-			if(data.isActive != 'flash' || ($.prop(data._elem, 'readyState') && $.prop(this, 'videoWidth'))){return;}
+			if(data.isActive != 'third' || ($.prop(data._elem, 'readyState') && $.prop(this, 'videoWidth'))){return;}
 			var posterSrc = $.prop(data._elem, 'poster');
 			if(!posterSrc){return;}
 			widthAuto = data._elem.style.width == 'auto';
@@ -566,7 +566,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			var data = webshims.data(event.target, 'mediaelement');
 			if(!data){return;}
 			var isNativeHTML5 = ( event.originalEvent && event.originalEvent.type === event.type );
-			if( isNativeHTML5 == (data.activating == 'flash') ){
+			if( isNativeHTML5 == (data.activating == 'third') ){
 				event.stopImmediatePropagation();
 				if(stopEvents[event.type] && data.isActive != data.activating){
 					$(event.target).pause();
@@ -592,14 +592,14 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			data = webshims.data(elem, 'mediaelement');
 		}
 		if(!data || data.isActive == type){return;}
-		if(type != 'html5' && type != 'flash'){
+		if(type != 'html5' && type != 'third'){
 			webshims.warn('wrong type for mediaelement activating: '+ type);
 		}
 		var shadowData = webshims.data(elem, 'shadowData');
 		data.activating = type;
 		$(elem).pause();
 		data.isActive = type;
-		if(type == 'flash'){
+		if(type == 'third'){
 			shadowData.shadowElement = shadowData.shadowFocusElement = data.shadowElem[0];
 			$(elem).hide().getShadowElement().show();
 		} else {
@@ -669,7 +669,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		}
 		
 		if(data && data.swfCreated){
-			mediaelement.setActive(elem, 'flash', data);
+			mediaelement.setActive(elem, 'third', data);
 			resetSwfProps(data);
 			data.currentSrc = canPlaySrc.srcProp;
 			$.extend(vars, elemVars);
@@ -771,7 +771,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		
 		addMediaToStopEvents(elem);
 		
-		mediaelement.setActive(elem, 'flash', data);
+		mediaelement.setActive(elem, 'third', data);
 		
 		options.changeJW(vars, elem, canPlaySrc, data, 'embed');
 		
@@ -878,7 +878,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 						} catch(er){}
 					}
 					v /= 100;
-					if(data.volume == v || data.isActive != 'flash'){return;}
+					if(data.volume == v || data.isActive != 'third'){return;}
 					data.volume = v;
 					trigger(data._elem, 'volumechange');
 					data = null;
@@ -893,7 +893,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			if(data){
 				m = !!m;
 				queueSwfMethod(this, SENDEVENT, ['mute', ''+m], data);
-				if(data.muted == m || data.isActive != 'flash'){return;}
+				if(data.muted == m || data.isActive != 'third'){return;}
 				data.muted = m;
 				trigger(data._elem, 'volumechange');
 				data = null;
@@ -944,7 +944,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 						}
 						queueSwfMethod(this, SENDEVENT, ['play', fn == 'play'], data);
 						setTimeout(function(){
-							if(data.isActive == 'flash'){
+							if(data.isActive == 'third'){
 								data._ppFlag = true;
 								if(data.paused != (fn != 'play')){
 									data.paused = fn != 'play';
