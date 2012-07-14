@@ -1171,18 +1171,18 @@ webshims.addReady(function(context, contextElem){
 						
 		
 						$.each(['Left', 'Top'], function(i, side){
-							var size = (parseInt($.curCSS(elem, 'padding'+ side), 10) || 0) + Math.max((parseInt($.curCSS(elem, 'margin'+ side), 10) || 0), 0) + (parseInt($.curCSS(elem, 'border'+ side +'Width'), 10) || 0);
+							var size = (parseInt($.css(elem, 'padding'+ side), 10) || 0) + Math.max((parseInt($.css(elem, 'margin'+ side), 10) || 0), 0) + (parseInt($.css(elem, 'border'+ side +'Width'), 10) || 0);
 							data.text.css('padding'+ side, size);
 						});
-						var lineHeight 	= $.curCSS(elem, 'lineHeight'),
+						var lineHeight 	= $.css(elem, 'lineHeight'),
 							dims 		= {
 								width: $(elem).width(),
 								height: $(elem).height()
 							},
-							cssFloat 		= $.curCSS(elem, 'float')
+							cssFloat 		= $.css(elem, 'float')
 						;
 						$.each(['lineHeight', 'fontSize', 'fontFamily', 'fontWeight'], function(i, style){
-							var prop = $.curCSS(elem, style);
+							var prop = $.css(elem, style);
 							if(data.text.css(style) != prop){
 								data.text.css(style, prop);
 							}

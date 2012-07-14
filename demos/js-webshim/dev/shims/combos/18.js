@@ -427,8 +427,8 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				this.updateTimer = false;
 				this.shadowList
 					.css({
-						fontSize: $.curCSS(this.input, 'fontSize'),
-						fontFamily: $.curCSS(this.input, 'fontFamily')
+						fontSize: $.css(this.input, 'fontSize'),
+						fontFamily: $.css(this.input, 'fontFamily')
 					})
 				;
 				this.searchStart = $(this.input).hasClass('search-start');

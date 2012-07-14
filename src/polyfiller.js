@@ -26,7 +26,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.11RC3',
+		version: '1.8.11RC4',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -627,6 +627,7 @@
 				}
 				return $Ready.apply(this, arguments);
 			};
+			$.ready.promise = $Ready.promise;
 		} else {
 			isReady('DOM', true);
 		}
