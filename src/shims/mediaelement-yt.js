@@ -137,7 +137,7 @@ var addYtAPI = function(mediaElm, elemId, data, ytID){
 				},
 				'onStateChange': function(e){
 					if(!data._metadata){
-						var duration = data._ytAPI.getDuration();
+						var duration = e.target.getDuration();
 						if(duration){
 							data._metadata = true;
 							$(mediaElm)
