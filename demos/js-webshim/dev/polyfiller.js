@@ -26,7 +26,7 @@
 		
 	
 	var webshims = {
-		version: '1.8.11RC4',
+		version: '1.8.11',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -869,7 +869,7 @@
 			addPolyfill('canvas', {
 				src: 'excanvas',
 				test: Modernizr.canvas,
-				options: {type: 'excanvas'}, //excanvas | flash | flashpro
+				options: {type: 'flash'}, //excanvas | flash | flashpro
 				noAutoCallback: true,
 				loadInit: function(){
 					var type = this.options.type;

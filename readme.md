@@ -75,6 +75,16 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.8.11
+----------
+
+- updated to Modernizr 2.6.0/html5shiv 3.6.0
+- fixed Samsung's datepicker implementation 
+- updated jQuery UI
+- basic support for jQuery 1.8.0
+- improved implementation of excanvas
+- switch default canvas implementation from excanvas to flashcanvas (because it is so much better)
+- fixed :focus implementation in jQuery 1.6+
 
 Release 1.8.10
 ----------
@@ -97,62 +107,3 @@ Release 1.8.9
 - fixed regression for iOS4 (old webkits)
 - updated email validation
 
-Release 1.8.8
-----------
-
-- updated to Modernizr 2.5.2
-- use of yepnope's 1.5.2 low-level API for better network performance
-- improved scriptability of datalist and details/summary elements
-
-Release 1.8.7
-----------
-
-- fixed Opera error
-- aligned maxlength property to the HTML5 spec
-
-Release 1.8.5/1.8.6
-----------
-
-- much improved bug detection for buggy interactive constraint validation (no more assumptions)
-- new custom event **changedvaliditystate** for forms feature
-- improved overlay placement (errormessage/datalist)
-
-Release 1.8.4
-----------
-
-- improved network performance
-- polyfiller supports AMD + async pre-configuration
-- Opera bugfix
-
-Release 1.8.3
-----------
-
-- chrome/webkit fixes
-- full compatibility with jQuery 1.7
-- added locales for errormessages (If you want to improve [existing messages](https://github.com/aFarkas/webshim/tree/master/src/shims/i18n) or add some errormessages, please send me a pull request or file an issue)
-- improved progress event for older Safari mobile and Firefox
-
-Release 1.8.2
-----------
-- improved mediaelement (canplaythrough event, http live streaming for iOS)
-- moved input[list]/datalist support from 'forms' to 'forms-ext' feature (more lightweight for Chrome/Safari)
-- improved styleability of errorbubble
-- <del>compatibility with jQuery 1.7 (1.8.1 is not compatible with jQuery 1.7)</del>
-
-Release 1.8.1
-----------
-- improved mediaelement loading
-- fixed small bugs in mediaelement polyfill
-- prepare for jQuery 1.7 compatibility
-- fixed demos
-
-
-Release 1.8.0
-----------
-
-* first mediaelement implementation (audio/video)
-* implemented form submitter attributes (formaction, formtarget, formenctype)
-* better language support
-* updated es5-shim
-* updated jQuery UI path 
-* fixed label for output element

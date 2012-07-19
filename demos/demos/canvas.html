@@ -23,9 +23,7 @@
 			//we do not use any DOM-/JS-APIs on DOM-ready, so we do not need to delay the ready event <- good against fouc
 			waitReady: false
 		});
-		$.webshims.setOptions('canvas', {
-			type: 'flash' //excanvas | flash | flashpro
-		});
+		
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
@@ -77,7 +75,7 @@ ctx.fillRect (10, 10, 55, 50);
 ctx.fillStyle = "rgba(0, 0, 200, 0.5)";  
 ctx.fillRect (30, 30, 55, 50);
 </code>
-			<p>Webshim Lib can implement <a href="http://code.google.com/p/explorercanvas/">excanvas</a> (default) or <a href="http://flashcanvas.net/">FlashCanvas/FlashCanvas Pro</a>:</p>
+			<p>Webshim Lib can implement <a href="http://code.google.com/p/explorercanvas/">excanvas</a> or <a href="http://flashcanvas.net/">FlashCanvas (default)/FlashCanvas Pro</a>:</p>
 <code class="block">
 //always run configuration before calling $.webshims.polyfill();
 window.FlashCanvasOptions = {
@@ -89,7 +87,7 @@ $.webshims.setOptions('canvas', {
 </code>
 			<h3>Options for the <code>canvas</code> feature</h3>
 			<ul>
-				<li><strong>type</strong>: <code>"excanvas"</code> | <code>"flash"</code> | <code>"falshpro"</code></li>
+				<li><strong>type</strong>: <code>"flash"</code> | <code>"falshpro"</code> | <code>"excanvas"</code></li>
 			</ul>
 			
 			<aside>
