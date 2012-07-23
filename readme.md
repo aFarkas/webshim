@@ -75,10 +75,10 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-Release 1.8.11
+Release 1.8.11/1.8.12
 ----------
 
-- updated to Modernizr 2.6.0/html5shiv 3.6.0
+- updated to Modernizr 2.6.1/html5shiv 3.6.0
 - fixed Samsung's datepicker implementation 
 - updated jQuery UI
 - basic support for jQuery 1.8.0
