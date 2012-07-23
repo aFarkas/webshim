@@ -601,12 +601,12 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		data.isActive = type;
 		if(type == 'third'){
 			shadowData.shadowElement = shadowData.shadowFocusElement = data.shadowElem[0];
-			$(elem).hide().getShadowElement().show();
+			$(elem).addClass('swf-api-active nonnative-api-active').hide().getShadowElement().show();
 		} else {
-			$(elem).show().getShadowElement().hide();
+			$(elem).removeClass('swf-api-active nonnative-api-active').show().getShadowElement().hide();
 			shadowData.shadowElement = shadowData.shadowFocusElement = false;
 		}
-		
+		$(elem).trigger('mediaelementapichange');
 	};
 	
 	
@@ -724,22 +724,22 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			},
 			buffered: {
 				value: {
-				start: function(index){
-					if(index >= data.buffered.length){
-						webshims.error('buffered index size error');
-						return;
-					}
-					return 0;
-				},
-				end: function(index){
-					if(index >= data.buffered.length){
-						webshims.error('buffered index size error');
-						return;
-					}
-					return ( (data.duration - data._bufferedStart) * data._bufferedEnd / 100) + data._bufferedStart;
-				},
-				length: 0
-			}
+					start: function(index){
+						if(index >= data.buffered.length){
+							webshims.error('buffered index size error');
+							return;
+						}
+						return 0;
+					},
+					end: function(index){
+						if(index >= data.buffered.length){
+							webshims.error('buffered index size error');
+							return;
+						}
+						return ( (data.duration - data._bufferedStart) * data._bufferedEnd / 100) + data._bufferedStart;
+					},
+					length: 0
+				}
 			}
 		}));
 		
