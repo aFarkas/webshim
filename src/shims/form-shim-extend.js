@@ -225,17 +225,19 @@ var baseCheckValidity = function(elem){
 	$.removeData(elem, 'cachedValidity');
 	return v.valid;
 };
-
+var rsubmittable = /^(?:select|textarea|input)/i;
 webshims.defineNodeNameProperty('form', 'checkValidity', {
 	prop: {
 		value: function(){
 			
 			var ret = true,
-				elems = $('input,textarea,select', this).filter(function(){
+				elems = $($.prop(this, 'elements')).filter(function(){
+					if(!rsubmittable.test(this.nodeName)){return false;}
 					var shadowData = webshims.data(this, 'shadowData');
 					return !shadowData || !shadowData.nativeElement || shadowData.nativeElement === this;
 				})
 			;
+			
 			baseCheckValidity.unhandledInvalids = false;
 			for(var i = 0, len = elems.length; i < len; i++){
 				if( !baseCheckValidity(elems[i]) ){
@@ -810,6 +812,131 @@ webshims.addReady(function(context, contextElem){
 	catch (er) {}
 	
 });
+
+if(!Modernizr.formattribute){
+	(function(){
+		webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'button', 'fieldset'], 'form', {
+			prop: {
+				get: function(){
+					var form = webshims.contentAttr(this, 'form');
+					if(form){
+						form = document.getElementById(form);
+					} 
+					return form || this.form;
+				},
+				writeable: false
+			}
+		});
+		
+		var removeAddedElements = function(form){
+			var elements = $.data(form, 'webshimsAddedElements');
+			if(elements){
+				elements.remove();
+				$.removeData(form, 'webshimsAddedElements');
+			}
+		};
+		
+		webshims.defineNodeNamesProperty(['form'], 'elements', {
+			prop: {
+				get: function(){
+					var id = this.id;
+					var elements;
+					if(id){
+						removeAddedElements(this);
+						elements = $('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').add(this.elements).get();
+					}
+					return elements || this.elements;
+				},
+				writeable: false
+			}
+		});
+		
+		
+		
+		$(function(){
+			var stopPropagation = function(e){
+				e.stopPropagation();
+			};
+			$(window).delegate('form[id]', 'submit', function(e){
+				if(!e.isDefaultPrevented()){
+					var form = this;
+					var id = form.id;
+					var elements;
+					if(id){
+						removeAddedElements(form);
+						
+						elements = $('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"]')
+							.filter(function(){
+								return this.form != form;
+							})
+							.clone()
+						;
+						if(elements.length){
+							$.data(form, 'webshimsAddedElements', $('<div class="webshims-visual-hide" />').append(elements).appendTo(form));
+							setTimeout(function(){
+								removeAddedElements(form);
+							}, 9);
+						}
+						elements = null;
+					}
+				}
+			});
+			
+			$(window).delegate('input[type="submit"][form], button[form], input[type="button"][form], input[type="image"][form], input[type="reset"][form]', 'click', function(e){
+				if(!e.isDefaultPrevented()){
+					var trueForm = $.prop(this, 'form');
+					var formIn = this.form;
+					var clone;
+					if(trueForm && trueForm != formIn){
+						clone = $(this)
+							.clone()
+							.addClass('webshims-visual-hide')
+							.bind('click', stopPropagation)
+							.appendTo(trueForm)
+						;
+						if(formIn){
+							e.preventDefault();
+						}
+						clone.trigger('click');
+						setTimeout(function(){
+							clone.remove();
+							clone = null;
+						}, 9);
+					}
+				}
+			});
+		});
+		
+		
+		var rCRLF = /\r?\n/g,
+			rinput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i,
+			rselectTextarea = /^(?:select|textarea)/i;
+		
+		$.fn.serializeArray = function() {
+				return this.map(function(){
+					var elements = $.prop(this, 'elements');
+					return elements ? $.makeArray( elements ) : this;
+				})
+				.filter(function(){
+					return this.name && !this.disabled &&
+						( this.checked || rselectTextarea.test( this.nodeName ) ||
+							rinput.test( this.type ) );
+				})
+				.map(function( i, elem ){
+					var val = $( this ).val();
+		
+					return val == null ?
+						null :
+						$.isArray( val ) ?
+							$.map( val, function( val, i ){
+								return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+							}) :
+							{ name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+				}).get();
+			};
+		
+	})();
+}
 
 (function(){
 	Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
