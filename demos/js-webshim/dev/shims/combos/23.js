@@ -55,6 +55,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 	
 	
 	var hasSwf = swfobject.hasFlashPlayerVersion('9.0.115');
+	var hasYt = !hasSwf && ('postMessage' in window) && hasNative;
 	var loadSwf = function(){
 		webshims.ready('mediaelement-swf', function(){
 			if(!mediaelement.createSWF){
@@ -63,6 +64,27 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			}
 		});
 	};
+	var loadYt = (function(){
+		var loaded;
+		return function(){
+			if(loaded || !hasYt){return;}
+			loaded = true;
+			webshims.loader.loadScript("https://www.youtube.com/player_api");
+			webshims.polyfill("mediaelement-yt");
+		};
+	})();
+	var loadThird = function(){
+		if(hasSwf){
+			loadSwf();
+		} else {
+			loadYt();
+		}
+	};
+	
+	webshims.addPolyfill('mediaelement-yt', {
+		test: !hasYt,
+		d: ['dom-support']
+	});
 	
 	mediaelement.mimeTypes = {
 		audio: {
@@ -168,13 +190,14 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 	};
 	
 	mediaelement.swfMimeTypes = ['video/3gpp', 'video/x-msvideo', 'video/quicktime', 'video/x-m4v', 'video/mp4', 'video/m4p', 'video/x-flv', 'video/flv', 'audio/mpeg', 'audio/aac', 'audio/mp4', 'audio/x-m4a', 'audio/m4a', 'audio/mp3', 'audio/x-fla', 'audio/fla', 'youtube/flv', 'jwplayer/jwplayer', 'video/youtube'];
-	mediaelement.canSwfPlaySrces = function(mediaElem, srces){
+	
+	mediaelement.canThirdPlaySrces = function(mediaElem, srces){
 		var ret = '';
-		if(hasSwf){
+		if(hasSwf || hasYt){
 			mediaElem = $(mediaElem);
 			srces = srces || mediaelement.srces(mediaElem);
 			$.each(srces, function(i, src){
-				if(src.container && src.src && mediaelement.swfMimeTypes.indexOf(src.container) != -1){
+				if(src.container && src.src && ((hasSwf && mediaelement.swfMimeTypes.indexOf(src.container) != -1) || (hasYt && src.container == 'video/youtube'))){
 					ret = src;
 					return false;
 				}
@@ -218,26 +241,29 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		}, 1);
 	};
 	
-	var handleSWF = (function(){
+	var handleThird = (function(){
 		var requested;
 		return function( mediaElem, ret, data ){
-			webshims.ready('mediaelement-swf', function(){
+			webshims.ready(hasSwf ? 'mediaelement-swf' : 'mediaelement-yt', function(){
 				if(mediaelement.createSWF){
 					mediaelement.createSWF( mediaElem, ret, data );
 				} else if(!requested) {
 					requested = true;
-					loadSwf();
+					loadThird();
 					//readd to ready
-					handleSWF( mediaElem, ret, data );
+					handleThird( mediaElem, ret, data );
 				}
 			});
+			if(!requested && hasYt && !mediaelement.createSWF){
+				loadYt();
+			}
 		};
 	})();
 	
 	var stepSources = function(elem, data, useSwf, _srces, _noLoop){
 		var ret;
-		if(useSwf || (useSwf !== false && data && data.isActive == 'flash')){
-			ret = mediaelement.canSwfPlaySrces(elem, _srces);
+		if(useSwf || (useSwf !== false && data && data.isActive == 'third')){
+			ret = mediaelement.canThirdPlaySrces(elem, _srces);
 			if(!ret){
 				if(_noLoop){
 					mediaelement.setError(elem, false);
@@ -245,20 +271,20 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 					stepSources(elem, data, false, _srces, true);
 				}
 			} else {
-				handleSWF(elem, ret, data);
+				handleThird(elem, ret, data);
 			}
 		} else {
 			ret = mediaelement.canNativePlaySrces(elem, _srces);
 			if(!ret){
 				if(_noLoop){
 					mediaelement.setError(elem, false);
-					if(data && data.isActive == 'flash') {
+					if(data && data.isActive == 'third') {
 						mediaelement.setActive(elem, 'html5', data);
 					}
 				} else {
 					stepSources(elem, data, true, _srces, true);
 				}
-			} else if(data && data.isActive == 'flash') {
+			} else if(data && data.isActive == 'third') {
 				mediaelement.setActive(elem, 'html5', data);
 			}
 		}
@@ -396,9 +422,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 	if(hasNative){
 		webshims.isReady('mediaelement-core', true);
 		initMediaElements();
-		if(hasSwf){
-			webshims.ready('WINDOWLOAD mediaelement', loadSwf);
-		}
+		webshims.ready('WINDOWLOAD mediaelement', loadThird);
 	} else {
 		webshims.ready('mediaelement-swf', initMediaElements);
 	}
