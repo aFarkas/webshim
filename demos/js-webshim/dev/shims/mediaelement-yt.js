@@ -246,7 +246,7 @@ var addYtAPI = function(mediaElm, elemId, data, ytID){
 					data.buffered.length = 1;
 					$(mediaElm).trigger('progress');
 					
-					if(data.readyState < 4 && data.currentTime && (data._buffered - data.currentTime > 9 || bufFac > 0.99) ){
+					if(data.readyState < 4 && data.currentTime && (data._buffered - data.currentTime > 9 || bufFac > 0.9) ){
 						data.readyState = 4;
 						trigger(data._elem, 'canplaythrough');
 					}
@@ -317,7 +317,7 @@ var addYtAPI = function(mediaElm, elemId, data, ytID){
 				'onReady': function(e){
 					startAutoPlay(data);
 					setTimeout(getData, 9);
-					setInterval(getData, 999);
+					setInterval(getData, 5000);
 				},
 				
 				'onStateChange': function(e){
@@ -335,8 +335,6 @@ var addYtAPI = function(mediaElm, elemId, data, ytID){
 								data.networkState = 2;
 							}
 							callMeta = true;
-							
-							
 						}
 					}
 					
@@ -346,7 +344,7 @@ var addYtAPI = function(mediaElm, elemId, data, ytID){
 							.trigger('loadedmetadata')
 						;
 					}
-					
+					setTimeout(getData, 9);
 					if(e.data == 1){
 						handlePlayPauseState('playing', data);
 						getIntervalTime();
