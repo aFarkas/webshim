@@ -245,14 +245,13 @@ var addYtAPI = function(mediaElm, elemId, data, ytID){
 					data._buffered = buffered;
 					data.buffered.length = 1;
 					$(mediaElm).trigger('progress');
-					
-					if(data.readyState < 4 && data.currentTime && (data._buffered - data.currentTime > 9 || bufFac > 0.9) ){
-						data.readyState = 4;
-						trigger(data._elem, 'canplaythrough');
-					}
-					if(bufFac > 0.99){
-						data.networkState = 1;
-					}
+				}
+				if(bufFac > 0.99){
+					data.networkState = 1;
+				}
+				if(data.readyState < 4 && data.currentTime && (data._buffered - data.currentTime > 9 || bufFac > 0.9) ){
+					data.readyState = 4;
+					trigger(data._elem, 'canplaythrough');
 				}
 			}
 		};
@@ -263,9 +262,7 @@ var addYtAPI = function(mediaElm, elemId, data, ytID){
 					data.currentTime = currentTime;
 					$(mediaElm).trigger('timeupdate');
 				}
-				if(data._buffered < 0.95){
-					handleBuffered();
-				}
+				handleBuffered();
 			}
 		};
 		

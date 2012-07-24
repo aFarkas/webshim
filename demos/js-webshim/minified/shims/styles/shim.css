@@ -1,6 +1,6 @@
 article,aside,canvas,details,figcaption,figure,
 footer,header,hgroup,menu,nav,section,summary { 
-    display:block;
+	display:block;
 }
 audio {
 	display: none;
@@ -55,6 +55,19 @@ output {
 	position: relative;
 }
 
+.webshims-visual-hide {
+	position: absolute !important;
+	top: 0 !important;
+	left: 0 !important;
+	visibility: hidden !important;
+	width: 0 !important;
+	height: 0 !important;
+	overflow: hidden !important;
+}
+
+.webshims-visual-hide * {
+	visibility: hidden !important;
+}
 
 /* placeholder */
 .placeholder-box {
