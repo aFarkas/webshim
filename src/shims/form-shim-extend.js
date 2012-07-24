@@ -867,7 +867,7 @@ if(!Modernizr.formattribute){
 						
 						elements = $('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"]')
 							.filter(function(){
-								return this.form != form;
+								return !this.disabled && this.name && this.form != form;
 							})
 							.clone()
 						;

@@ -934,7 +934,7 @@
 		});
 		
 		if(Modernizr[formvalidation]){
-			webshims.bugs.bustedValidity = !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
+			webshims.bugs.bustedValidity = Modernizr.formattribute === false || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
 		}
 		
 		addTest('styleableinputrange', function(){
