@@ -26,6 +26,7 @@ asyncTest("widgets Modul", function(){
 	if(replaceUI || !Modernizr.inputtypes.date){
 		shadow =  $('#date').next('.input-date');
 		ok(!!shadow[0], "date has a shadow element");
+		ok(!!shadow[0].value, "date has an initial value");
 		$('#date').val('2010-10-10');
 		
 		var pickerObject = shadow.data('datepicker');

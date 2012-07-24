@@ -599,7 +599,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						e.stopImmediatePropagation();
 					}
 				})
-				.datepicker($.extend({
+				.datepicker($.extend(true, {
 					onClose: function(){
 						if(focusedOut && datePicker.not(':focus')){
 							resetFocusHandler();
@@ -969,7 +969,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			langObj: $.datepicker.regional, 
 			module: 'form-number-date-ui', 
 			callback: function(langObj){
-				$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', $.extend(defaultDatepicker, langObj, options.datepicker));
+				$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', $.extend(true, defaultDatepicker, langObj, options.datepicker));
 			}
 		});
 		$(document).unbind('jquery-uiReady.langchange input-widgetsReady.langchange');
@@ -1149,6 +1149,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	webshims.addReady(function(context, elem){
 		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(e){
 			if($.datepicker || $.fn.slider){
+				if($.datepicker && !defaultDatepicker.dateFormat){
+					defaultDatepicker.dateFormat = $.datepicker._defaults.dateFormat;
+				}
 				replaceInputUI(context, elem);
 			}
 			if($.datepicker && $.fn.slider){
