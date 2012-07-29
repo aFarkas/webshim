@@ -15,7 +15,7 @@ Implemented Features:
 
 * HTML5 shiv and innerShiv solution including basic CSS-support
 * canvas
-* HTML5 form features including: constraint validation and form widgets (input[range], input[date], input[time], input[datetime-local], output, input[list]/datalist)
+* HTML5 form features including: constraint validation and form widgets (input[type="range"], input[type="date"], input[type="number"], output, input[list]/datalist)
 * HTML5 audio/video implementation
 * interactive elements: summary/details
 * JSON (stringify and parse)

@@ -544,27 +544,6 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			currentValidationMessage = langObj;
 		}
 	});
-	//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
-	if(Modernizr.input.list && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
-		webshims.defineNodeNameProperty('datalist', 'options', {
-			prop: {
-				writeable: false,
-				get: function(){
-					var options = this.options || [];
-					if(!options.length){
-						var elem = this;
-						var select = $('select', elem);
-						if(select[0] && select[0].options && select[0].options.length){
-							options = select[0].options;
-						}
-					}
-					return options;
-				}
-			}
-		});
-	}
-	
-	
 	
 	implementProperties.forEach(function(messageProp){
 		webshims.defineNodeNamesProperty(['fieldset', 'output', 'button'], messageProp, {
@@ -1425,23 +1404,8 @@ webshims.addReady(function(context, contextElem){
 	
 });
 
-if(!Modernizr.formattribute){
+if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 	(function(){
-		webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'button', 'fieldset'], 'form', {
-			prop: {
-				get: function(){
-					var form = webshims.contentAttr(this, 'form');
-					if(form){
-						form = document.getElementById(form);
-						if(form && !$.nodeName(form, 'form')){
-							form = null;
-						}
-					} 
-					return form || this.form;
-				},
-				writeable: false
-			}
-		});
 		
 		var removeAddedElements = function(form){
 			var elements = $.data(form, 'webshimsAddedElements');
@@ -1450,82 +1414,112 @@ if(!Modernizr.formattribute){
 				$.removeData(form, 'webshimsAddedElements');
 			}
 		};
-		
-		webshims.defineNodeNamesProperty(['form'], 'elements', {
-			prop: {
-				get: function(){
-					var id = this.id;
-					var elements;
-					removeAddedElements(this);
-					if(id){
-						elements = $('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').add(this.elements).get();
-					}
-					return elements || this.elements;
-				},
-				writeable: false
-			}
-		});
-		
-		
-		
-		$(function(){
-			var stopPropagation = function(e){
-				e.stopPropagation();
-			};
-			$(window).delegate('form[id]', 'submit', function(e){
-				if(!e.isDefaultPrevented()){
-					var form = this;
-					var id = form.id;
-					var elements;
-					if(id){
-						removeAddedElements(form);
-						
-						elements = $('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"]')
-							.filter(function(){
-								return !this.disabled && this.name && this.form != form;
-							})
-							.clone()
-						;
-						if(elements.length){
-							$.data(form, 'webshimsAddedElements', $('<div class="webshims-visual-hide" />').append(elements).appendTo(form));
-							setTimeout(function(){
-								removeAddedElements(form);
-							}, 9);
-						}
-						elements = null;
-					}
-				}
-			});
-			
-			$(window).delegate('input[type="submit"][form], button[form], input[type="button"][form], input[type="image"][form], input[type="reset"][form]', 'click', function(e){
-				if(!e.isDefaultPrevented()){
-					var trueForm = $.prop(this, 'form');
-					var formIn = this.form;
-					var clone;
-					if(trueForm && trueForm != formIn){
-						clone = $(this)
-							.clone()
-							.addClass('webshims-visual-hide')
-							.bind('click', stopPropagation)
-							.appendTo(trueForm)
-						;
-						if(formIn){
-							e.preventDefault();
-						}
-						clone.trigger('click');
-						setTimeout(function(){
-							clone.remove();
-							clone = null;
-						}, 9);
-					}
-				}
-			});
-		});
-		
-		
 		var rCRLF = /\r?\n/g,
 			rinput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i,
 			rselectTextarea = /^(?:select|textarea)/i;
+		
+		if(!Modernizr.formattribute){
+			webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'button', 'fieldset'], 'form', {
+				prop: {
+					get: function(){
+						var form = webshims.contentAttr(this, 'form');
+						if(form){
+							form = document.getElementById(form);
+							if(form && !$.nodeName(form, 'form')){
+								form = null;
+							}
+						} 
+						return form || this.form;
+					},
+					writeable: false
+				}
+			});
+			
+			
+			webshims.defineNodeNamesProperty(['form'], 'elements', {
+				prop: {
+					get: function(){
+						var id = this.id;
+						var elements;
+						removeAddedElements(this);
+						if(id){
+							elements = $('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').add(this.elements).get();
+						}
+						return elements.length ? elements : this.elements || null;
+					},
+					writeable: false
+				}
+			});
+			
+			
+			
+			$(function(){
+				var stopPropagation = function(e){
+					e.stopPropagation();
+				};
+				$(window).delegate('form[id]', 'submit', function(e){
+					if(!e.isDefaultPrevented()){
+						var form = this;
+						var id = form.id;
+						var elements;
+						if(id){
+							removeAddedElements(form);
+							
+							elements = $('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"]')
+								.filter(function(){
+									return !this.disabled && this.name && this.form != form;
+								})
+								.clone()
+							;
+							if(elements.length){
+								$.data(form, 'webshimsAddedElements', $('<div class="webshims-visual-hide" />').append(elements).appendTo(form));
+								setTimeout(function(){
+									removeAddedElements(form);
+								}, 9);
+							}
+							elements = null;
+						}
+					}
+				});
+				
+				$(window).delegate('input[type="submit"][form], button[form], input[type="button"][form], input[type="image"][form], input[type="reset"][form]', 'click', function(e){
+					if(!e.isDefaultPrevented()){
+						var trueForm = $.prop(this, 'form');
+						var formIn = this.form;
+						var clone;
+						if(trueForm && trueForm != formIn){
+							clone = $(this)
+								.clone()
+								.addClass('webshims-visual-hide')
+								.bind('click', stopPropagation)
+								.appendTo(trueForm)
+							;
+							if(formIn){
+								e.preventDefault();
+							}
+							clone.trigger('click');
+							setTimeout(function(){
+								clone.remove();
+								clone = null;
+							}, 9);
+						}
+					}
+				});
+			});
+		}
+		
+		if(!Modernizr.fieldsetdisabled){
+			webshims.defineNodeNamesProperty(['fieldset'], 'elements', {
+				prop: {
+					get: function(){
+						//add listed elements without keygen, object, output
+						var elements = $('input, select, textarea, button, fieldset', this);
+						return elements.length ? elements : this.elements || null;
+					},
+					writeable: false
+				}
+			});
+		}
 		
 		$.fn.serializeArray = function() {
 				return this.map(function(){
@@ -1568,7 +1562,7 @@ if(!Modernizr.formattribute){
 		if(elem.setSelectionRange){
 			elem.setSelectionRange(0, 0);
 			return true;
-		} else if(elem){
+		} else if(elem.createTextRange){
 			var range = elem.createTextRange();
 			range.collapse(true);
 			range.moveEnd('character', 0);
@@ -1584,7 +1578,9 @@ if(!Modernizr.formattribute){
 			}
 			if(!isOver && elem.type != 'password'){
 				if(!value && _onFocus && setSelection(elem)){
-					var selectTimer;
+					var selectTimer  = setTimeout(function(){
+						setSelection(elem);
+					}, 9);
 					$(elem)
 						.unbind('.placeholderremove')
 						.bind('keydown.placeholderremove keypress.placeholderremove paste.placeholderremove input.placeholderremove', function(e){
@@ -1687,7 +1683,8 @@ if(!Modernizr.formattribute){
 					url: 1,
 					email: 1,
 					password: 1,
-					tel: 1
+					tel: 1,
+					date: 1
 				}
 			;
 			

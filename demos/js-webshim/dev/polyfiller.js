@@ -928,13 +928,18 @@
 	if(modernizrInputAttrs && modernizrInputTypes){
 		var formvalidation = 'formvalidation';
 		var formOptions;
+		var bugs = webshims.bugs;
 		var select = $('<select required="" name="a"><option disabled="" /></select>')[0];
 		addTest(formvalidation, function(){
 			return !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern);
 		});
+		addTest('fieldsetdisabled', function(){
+			var fieldset = $('<fieldset />')[0];
+			return 'elements' in fieldset && 'disabled' in fieldset;
+		});
 		
 		if(Modernizr[formvalidation]){
-			webshims.bugs.bustedValidity = Modernizr.formattribute === false || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
+			bugs.bustedValidity = !Modernizr.fieldsetdisabled || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
 		}
 		
 		addTest('styleableinputrange', function(){
@@ -976,7 +981,7 @@
 		
 		formOptions = webCFG.forms;
 				
-		if(Modernizr[formvalidation] && !webshims.bugs.bustedValidity){
+		if(Modernizr[formvalidation] && !bugs.bustedValidity){
 			addPolyfill('form-extend', {
 				f: 'forms',
 				src: 'form-native-extend',
@@ -1005,7 +1010,7 @@
 		addPolyfill('form-message', {
 			f: 'forms',
 			test: function(toLoad){
-				return !( formOptions.customMessages || !Modernizr[formvalidation] || !modules['form-extend'].test(toLoad) || webshims.bugs.validationMessage );
+				return !( formOptions.customMessages || !Modernizr[formvalidation] || !modules['form-extend'].test(toLoad) || bugs.validationMessage || bugs.bustedValidity );
 			},
 			d: [DOMSUPPORT],
 			c: [3, 2, 23, 21, 59, 17, 5, 4]
@@ -1044,17 +1049,12 @@
 				calculateWidth: true,
 				slider: {},
 				datepicker: {},
-				langSrc: uiLib+'i18n/jquery.ui.datepicker-',
-				recalcWidth: true
+				langSrc: uiLib+'i18n/jquery.ui.datepicker-'
 	//			,lazyDate: undefined // true for IE8- false for fast browser 
 	//			,replaceUI: false
 			},
 			c: [18, 7, 6]
 		});
-		
-//		if(!modernizrInputAttrs.list && browserVersion > 536.7 && $.browser.webkit && ('list') in $('<input />')[0]){
-//			modernizrInputAttrs.list = true;
-//		}
 		
 		addPolyfill('form-datalist', {
 			f: 'forms-ext',

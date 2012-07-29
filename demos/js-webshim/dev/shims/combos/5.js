@@ -253,25 +253,6 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 	});
 	
 	
-	//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
-	if(Modernizr.input.list && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
-		webshims.defineNodeNameProperty('datalist', 'options', {
-			prop: {
-				writeable: false,
-				get: function(){
-					var options = this.options || [];
-					if(!options.length){
-						var elem = this;
-						var select = $('select', elem);
-						if(select[0] && select[0].options && select[0].options.length){
-							options = select[0].options;
-						}
-					}
-					return options;
-				}
-			}
-		});
-	}
 });//additional tests for partial implementation of forms features
 (function($){
 	var Modernizr = window.Modernizr;
@@ -408,26 +389,6 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 							}
 						});
 					});
-					
-					//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
-					if(Modernizr.input.list && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
-						webshims.defineNodeNameProperty('datalist', 'options', {
-							prop: {
-								writeable: false,
-								get: function(){
-									var options = this.options || [];
-									if(!options.length){
-										var elem = this;
-										var select = $('select', elem);
-										if(select[0] && select[0].options && select[0].options.length){
-											options = select[0].options;
-										}
-									}
-									return options;
-								}
-							}
-						});
-					}
 					
 				});
 			}
@@ -1046,27 +1007,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			currentValidationMessage = langObj;
 		}
 	});
-	//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
-	if(Modernizr.input.list && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
-		webshims.defineNodeNameProperty('datalist', 'options', {
-			prop: {
-				writeable: false,
-				get: function(){
-					var options = this.options || [];
-					if(!options.length){
-						var elem = this;
-						var select = $('select', elem);
-						if(select[0] && select[0].options && select[0].options.length){
-							options = select[0].options;
-						}
-					}
-					return options;
-				}
-			}
-		});
-	}
-	
-	
 	
 	implementProperties.forEach(function(messageProp){
 		webshims.defineNodeNamesProperty(['fieldset', 'output', 'button'], messageProp, {

@@ -48,7 +48,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 							} else {
 								options = $('option', elem).get();
 								if(options.length){
-									webshims.warn('you should wrap you option-elements for a datalist in a select element to support IE and other old browsers.');
+									webshims.warn('you should wrap your option-elements for a datalist in a select element to support IE and other old browsers.');
 								}
 							}
 							return options;
@@ -89,32 +89,32 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				}
 			};
 			
-			if(formsCFG.customDatalist && (!listSupport || !('selectedOption') in $('<input />')[0])){
-				//currently not supported x-browser (FF4 has not implemented and is not polyfilled )
-				inputListProto.selectedOption = {
-					prop: {
-						writeable: false,
-						get: function(){
-							var elem = this;
-							var list = $.prop(elem, 'list');
-							var ret = null;
-							var value, options;
-							if(!list){return ret;}
-							value = $.prop(elem, 'value');
-							if(!value){return ret;}
-							options = $.prop(list, 'options');
-							if(!options.length){return ret;}
-							$.each(options, function(i, option){
-								if(value == $.prop(option, 'value')){
-									ret = option;
-									return false;
-								}
-							});
-							return ret;
-						}
-					}
-				};
-			}
+//			if(formsCFG.customDatalist && (!listSupport || !('selectedOption') in $('<input />')[0])){
+//				//currently not supported x-browser (FF4 has not implemented and is not polyfilled )
+//				inputListProto.selectedOption = {
+//					prop: {
+//						writeable: false,
+//						get: function(){
+//							var elem = this;
+//							var list = $.prop(elem, 'list');
+//							var ret = null;
+//							var value, options;
+//							if(!list){return ret;}
+//							value = $.prop(elem, 'value');
+//							if(!value){return ret;}
+//							options = $.prop(list, 'options');
+//							if(!options.length){return ret;}
+//							$.each(options, function(i, option){
+//								if(value == $.prop(option, 'value')){
+//									ret = option;
+//									return false;
+//								}
+//							});
+//							return ret;
+//						}
+//					}
+//				};
+//			}
 			
 			if(!listSupport){
 				inputListProto['list'] = {
@@ -135,6 +135,25 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					propNodeName: 'datalist'
 				};
 			} else {
+				//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
+				if(!($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
+					webshims.defineNodeNameProperty('datalist', 'options', {
+						prop: {
+							writeable: false,
+							get: function(){
+								var options = this.options || [];
+								if(!options.length){
+									var elem = this;
+									var select = $('select', elem);
+									if(select[0] && select[0].options && select[0].options.length){
+										options = select[0].options;
+									}
+								}
+								return options;
+							}
+						}
+					});
+				}
 				inputListProto['list'] = {
 					attr: {
 						get: function(){
@@ -915,25 +934,6 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 	});
 	
 	
-	//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
-	if(Modernizr.input.list && !($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
-		webshims.defineNodeNameProperty('datalist', 'options', {
-			prop: {
-				writeable: false,
-				get: function(){
-					var options = this.options || [];
-					if(!options.length){
-						var elem = this;
-						var select = $('select', elem);
-						if(select[0] && select[0].options && select[0].options.length){
-							options = select[0].options;
-						}
-					}
-					return options;
-				}
-			}
-		});
-	}
 });jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
 	"use strict";
 	
@@ -1554,7 +1554,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			if(_wrapper){
 				webshims.triggerDomUpdate(_wrapper[0]);	
 			}
-			['disabled', 'min', 'max', 'value', 'step'].forEach(function(name){
+			['disabled', 'min', 'max', 'value', 'step', 'placeholder'].forEach(function(name){
 				var val = elem.prop(name);
 				if(val !== "" && (name != 'disabled' || !val)){
 					elem.prop(name, val);
@@ -1774,6 +1774,14 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					$(shim).datepicker('option', 'maxDate', value);
 				}
 			},
+			placeholder: function(orig, shim, value){
+				var hintValue = (value || '').split('-');
+				var dateFormat;
+				if(hintValue.length == 3){
+					value = $(shim).datepicker('option','dateFormat').replace('yy', hintValue[0]).replace('mm', hintValue[1]).replace('dd', hintValue[2]);
+				} 
+				$.prop(shim, 'placeholder', value);
+			},
 			value: function(orig, shim, value){
 				if(!replaceInputUI.date.blockAttr){
 					try {
@@ -1885,7 +1893,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		webshims.onNodeNamesPropertyModify('input', 'valueAsDate', reflectFn);
 	}
 	
-	$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, attr){
+	$.each(['disabled', 'min', 'max', 'value', 'step', 'placeholder'], function(i, attr){
 		webshims.onNodeNamesPropertyModify('input', attr, function(val){
 				var shadowData = webshims.data(this, 'shadowData');
 				if(shadowData && shadowData.data && shadowData.data[attr] && shadowData.nativeElement === this){
@@ -1905,7 +1913,16 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			langObj: $.datepicker.regional, 
 			module: 'form-number-date-ui', 
 			callback: function(langObj){
-				$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', $.extend(true, defaultDatepicker, langObj, options.datepicker));
+				
+				$('input.hasDatepicker')
+					.filter('.input-date, .input-datetime-local-date')
+					.datepicker('option', $.extend(true, defaultDatepicker, langObj, options.datepicker))
+					.getNativeElement()
+					.filter('[placeholder]')
+					.prop('placeholder', function(i, val){
+						return val;
+					})
+				;
 			}
 		});
 		$(document).unbind('jquery-uiReady.langchange input-widgetsReady.langchange');
