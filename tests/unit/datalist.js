@@ -2,7 +2,7 @@
 
 module("datalist");
 asyncTest("datalist", function(){
-	var options = $('#dlist').prop('options');
+	var options = $('#dlist').prop('options') || $('#dlist datalist').prop('options');
 	var options2 = $('#dlist option');
 	
 	equals(options.length, options2.length, 'datalist options-attr has same length as option-element');

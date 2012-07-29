@@ -1,5 +1,5 @@
 /* Modernizr 2.6.1 (Custom Build) | MIT & BSD
- * Build: http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-domprefixes-load
+ * Build: http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-load
  */
 ;
 
@@ -23,7 +23,13 @@ window.Modernizr = (function( window, document, undefined ) {
 
     smile = ':)',
 
-    toString = {}.toString,    omPrefixes = 'Webkit Moz O ms',
+    toString = {}.toString,
+
+    prefixes = ' -webkit- -moz- -o- -ms- '.split(' '),
+
+
+
+    omPrefixes = 'Webkit Moz O ms',
 
     cssomPrefixes = omPrefixes.split(' '),
 
@@ -483,6 +489,7 @@ window.Modernizr = (function( window, document, undefined ) {
 
     Modernizr._version      = version;
 
+    Modernizr._prefixes     = prefixes;
     Modernizr._domPrefixes  = domPrefixes;
     Modernizr._cssomPrefixes  = cssomPrefixes;
 

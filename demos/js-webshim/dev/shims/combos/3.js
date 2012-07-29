@@ -1661,6 +1661,9 @@ if(!Modernizr.formattribute){
 					var form = webshims.contentAttr(this, 'form');
 					if(form){
 						form = document.getElementById(form);
+						if(form && !$.nodeName(form, 'form')){
+							form = null;
+						}
 					} 
 					return form || this.form;
 				},
@@ -1681,8 +1684,8 @@ if(!Modernizr.formattribute){
 				get: function(){
 					var id = this.id;
 					var elements;
+					removeAddedElements(this);
 					if(id){
-						removeAddedElements(this);
 						elements = $('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').add(this.elements).get();
 					}
 					return elements || this.elements;
@@ -2240,7 +2243,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 			get: function(){
 				var elem = descs.attr.get.call(this);
 				if(elem){
-					elem = $('#'+elem)[0];
+					elem = document.getElementById(elem);
 					if(elem && descs.propNodeName && !$.nodeName(elem, descs.propNodeName)){
 						elem = null;
 					}
@@ -2318,7 +2321,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				}
 			};
 			
-			if(!listSupport || !('selectedOption') in $('<input />')[0]){
+			if(formsCFG.customDatalist && (!listSupport || !('selectedOption') in $('<input />')[0])){
 				//currently not supported x-browser (FF4 has not implemented and is not polyfilled )
 				inputListProto.selectedOption = {
 					prop: {
@@ -2329,7 +2332,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 							var ret = null;
 							var value, options;
 							if(!list){return ret;}
-							value = $.attr(elem, 'value');
+							value = $.prop(elem, 'value');
 							if(!value){return ret;}
 							options = $.prop(list, 'options');
 							if(!options.length){return ret;}
@@ -2495,7 +2498,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				$.data(opts.input, 'datalistWidget', this);
 				this.shadowList = $('<div class="datalist-polyfill '+ (this.datalist.className || '') + ' '+ this.datalist.id +'-shadowdom' +'" />');
 				
-				if(formsCFG.positionDatalist){
+				if(formsCFG.positionDatalist || $(opts.input).hasClass('position-datalist')){
 					this.shadowList.insertAfter(opts.input);
 				} else {
 					this.shadowList.appendTo('body');
@@ -2512,7 +2515,9 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 						that.markItem(items.index(e.currentTarget), select, items);
 						if(e.type == 'click'){
 							that.hideList();
-							$(opts.input).trigger('datalistselect');
+							if(formsCFG.customDatalist){
+								$(opts.input).trigger('datalistselect');
+							}
 						}
 						return (e.type != 'mousedown');
 					})
@@ -2564,7 +2569,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 								that.changeValue( $('li.active-item:not(.hidden-item)', that.shadowList) );
 							}
 							that.hideList();
-							if(activeItem && activeItem[0]){
+							if(formsCFG.customDatalist && activeItem && activeItem[0]){
 								$(opts.input).trigger('datalistselect');
 							}
 							return false;
@@ -2593,7 +2598,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				
 				if(opts.input.form && (opts.input.name || opts.input.id)){
 					$(opts.input.form).bind('submit.datalistWidget'+opts.input.id, function(){
-						if(!$(opts.input).hasClass('no-datalist-cache')){
+						if(!$(opts.input).hasClass('no-datalist-cache') && that._autocomplete != 'off'){
 							var val = $.prop(opts.input, 'value');
 							var name = (opts.input.name || opts.input.id) + $.prop(opts.input, 'type');
 							if(!that.storedOptions){
@@ -2660,7 +2665,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 						fontFamily: $.css(this.input, 'fontFamily')
 					})
 				;
-				this.searchStart = $(this.input).hasClass('search-start');
+				this.searchStart = formsCFG.customDatalist && $(this.input).hasClass('search-start');
 				
 				var list = [];
 				
@@ -2686,7 +2691,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				}
 				
 				if(!this.storedOptions){
-					this.storedOptions = ($(this.input).hasClass('no-datalist-cache')) ? [] : getStoredOptions((this.input.name || this.input.id) + $.prop(this.input, 'type'));
+					this.storedOptions = ($(this.input).hasClass('no-datalist-cache') || this._autocomplete == 'off') ? [] : getStoredOptions((this.input.name || this.input.id) + $.prop(this.input, 'type'));
 				}
 				
 				this.storedOptions.forEach(function(val, i){
@@ -2727,7 +2732,7 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 						var search;
 						if(!('lowerText' in item)){
 							if(item.text != item.value){
-								item.lowerText = item.text.toLowerCase() +  item.value.toLowerCase();
+								item.lowerText = item.value.toLowerCase() + item.text.toLowerCase();
 							} else {
 								item.lowerText = item.text.toLowerCase();
 							}

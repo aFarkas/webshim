@@ -821,6 +821,9 @@ if(!Modernizr.formattribute){
 					var form = webshims.contentAttr(this, 'form');
 					if(form){
 						form = document.getElementById(form);
+						if(form && !$.nodeName(form, 'form')){
+							form = null;
+						}
 					} 
 					return form || this.form;
 				},
@@ -841,8 +844,8 @@ if(!Modernizr.formattribute){
 				get: function(){
 					var id = this.id;
 					var elements;
+					removeAddedElements(this);
 					if(id){
-						removeAddedElements(this);
 						elements = $('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').add(this.elements).get();
 					}
 					return elements || this.elements;
