@@ -235,7 +235,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			if(_wrapper){
 				webshims.triggerDomUpdate(_wrapper[0]);	
 			}
-			['disabled', 'min', 'max', 'value', 'step'].forEach(function(name){
+			['disabled', 'min', 'max', 'value', 'step', 'placeholder'].forEach(function(name){
 				var val = elem.prop(name);
 				if(val !== "" && (name != 'disabled' || !val)){
 					elem.prop(name, val);
@@ -455,6 +455,14 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					$(shim).datepicker('option', 'maxDate', value);
 				}
 			},
+			placeholder: function(orig, shim, value){
+				var hintValue = (value || '').split('-');
+				var dateFormat;
+				if(hintValue.length == 3){
+					value = $(shim).datepicker('option','dateFormat').replace('yy', hintValue[0]).replace('mm', hintValue[1]).replace('dd', hintValue[2]);
+				} 
+				$.prop(shim, 'placeholder', value);
+			},
 			value: function(orig, shim, value){
 				if(!replaceInputUI.date.blockAttr){
 					try {
@@ -566,7 +574,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		webshims.onNodeNamesPropertyModify('input', 'valueAsDate', reflectFn);
 	}
 	
-	$.each(['disabled', 'min', 'max', 'value', 'step'], function(i, attr){
+	$.each(['disabled', 'min', 'max', 'value', 'step', 'placeholder'], function(i, attr){
 		webshims.onNodeNamesPropertyModify('input', attr, function(val){
 				var shadowData = webshims.data(this, 'shadowData');
 				if(shadowData && shadowData.data && shadowData.data[attr] && shadowData.nativeElement === this){
@@ -586,7 +594,16 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			langObj: $.datepicker.regional, 
 			module: 'form-number-date-ui', 
 			callback: function(langObj){
-				$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', $.extend(true, defaultDatepicker, langObj, options.datepicker));
+				
+				$('input.hasDatepicker')
+					.filter('.input-date, .input-datetime-local-date')
+					.datepicker('option', $.extend(true, defaultDatepicker, langObj, options.datepicker))
+					.getNativeElement()
+					.filter('[placeholder]')
+					.prop('placeholder', function(i, val){
+						return val;
+					})
+				;
 			}
 		});
 		$(document).unbind('jquery-uiReady.langchange input-widgetsReady.langchange');
