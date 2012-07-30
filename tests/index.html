@@ -413,13 +413,19 @@
 	    </form>
 	</div><!-- end form --> 
 	
+	
+	
 	<form id="form-2" action="#" novalidate>
 		<div>
 			<input type="text" required="" name="test-2" />
 		</div>
 	</form> 
 	
-	
+	<input type="text" name="outside-1" form="form-buttons" />
+	<button type="submit" class="outside-button" formmethod="get" form="form-buttons">
+		<span>fdsf</span>
+	</button>
+	<input type="submit" name="outside-submit" value="outside-submitvalue" formmethod="get" form="form-buttons" />
 	<form id="form-buttons" action="test-ext/form-tester-1.html" target="originaltarget" method="post">
 		<input type="hidden" name="test" value="bla" />
 		<input type="image" class="target-image-test" formtarget="image-target" value="fds"/>
@@ -431,7 +437,7 @@
 		<button type="submit" class="method-test" formmethod="test-ext/form-tester-2.html">
 			<span>fdsf</span>
 		</button>
-		<input type="submit"  class="method-submit-test"  formmethod="Post" value="fds" />
+		<input type="submit"  class="method-submit-test" formmethod="Post" value="fds" />
 		
 		<button type="submit" class="enctype-test" formenctype="test-ext/form-tester-2.html">
 			<span>fdsf</span>

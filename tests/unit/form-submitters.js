@@ -131,4 +131,81 @@
 		});
 	}
 	
+	if (location.host.indexOf('github.com') == -1) {
+		
+		asyncTest("form-attribute1", function(){
+			var submits = 0;
+			var invalids = 0;
+			$('#form-buttons').bind('submit.testoutsidesubmit', function(){
+				submits++;
+				return false;
+			});
+			$('input[name="outside-1"]').bind('invalid.testoutsidesubmit', function(e){
+				invalids++;
+				return false;
+			});
+			ok( $( $('#form-buttons').prop('elements') ).filter('input[name="outside-1"]').length == 1, 'elements property finds associated element' );
+			ok($('#form-buttons').serialize().indexOf('outside-1=') != -1, "outside element is part of serialize");
+			
+			$.webshims.ready('DOM forms', start);
+		});
+		
+		asyncTest("form-attribute2", function(){
+			var submits = 0;
+			var invalids = 0;
+			$('#form-buttons').bind('submit.testoutsidesubmit', function(){
+				submits++;
+				return false;
+			});
+			$('input[name="outside-1"]').bind('invalid.testoutsidesubmit', function(e){
+				invalids++;
+				return false;
+			});
+			
+			$('button.outside-button span').click();
+			ok(submits == 1, "click on outsidebutton submits form");
+			ok(invalids === 0, "invalids are 0");
+			
+			setTimeout(function(){
+				$.webshims.ready('DOM forms', start);
+			}, 40);
+		});
+		asyncTest("form-attribute3", function(){
+			var submits = 0;
+			var invalids = 0;
+			$('#form-buttons').bind('submit.testoutsidesubmit', function(){
+				submits++;
+				return false;
+			});
+			$('input[name="outside-1"]').bind('invalid.testoutsidesubmit', function(e){
+				invalids++;
+				return false;
+			});
+			
+			
+			$('input[name="outside-1"]').prop('required', true);
+			ok(invalids === 0, "invalids are 0");
+			$('button.outside-button span').click();
+			equals(submits, 0, "click on outsidebutton of invalid form does not submit");
+			equals(invalids, 1, "click on outsidebutton validates associated fields");
+			setTimeout(function(){
+				$.webshims.ready('DOM forms', start);
+			}, 40);
+		});
+		asyncTest("button submits associated fields", function(){
+			var form = $('#form-buttons');
+			$('input[name="outside-submit"]').click();
+			stop();
+			addTest = function(){
+				equals(results.target, 'originaltarget');
+				ok(results.search.indexOf('outside-submit=outside-submitvalue') != -1, 'form submits associated submitter value');
+				ok(results.search.indexOf('outside-1=') != -1, 'form submits associated input');
+			};
+			
+			setTimeout(function(){
+				$.webshims.ready('DOM forms', start);
+			}, 40);
+		});
+	}
+	
 })(jQuery);

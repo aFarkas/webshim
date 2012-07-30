@@ -1559,17 +1559,19 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 	}
 	
 	var setSelection = function(elem){
-		if(elem.setSelectionRange){
-			elem.setSelectionRange(0, 0);
-			return true;
-		} else if(elem.createTextRange){
-			var range = elem.createTextRange();
-			range.collapse(true);
-			range.moveEnd('character', 0);
-			range.moveStart('character', 0);
-			range.select();
-			return true;
-		}
+		try {
+			if(elem.setSelectionRange){
+				elem.setSelectionRange(0, 0);
+				return true;
+			} else if(elem.createTextRange){
+				var range = elem.createTextRange();
+				range.collapse(true);
+				range.moveEnd('character', 0);
+				range.moveStart('character', 0);
+				range.select();
+				return true;
+			}
+		} catch(er){}
 	};
 	
 	var hidePlaceholder = function(elem, data, value, _onFocus){
