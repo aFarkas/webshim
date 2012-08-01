@@ -243,7 +243,19 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			});
 			return data;
 		};
-		
+
+		var setDatePlaceholder = function(shim, settings) {
+			var format;
+
+			if(settings.dateFormat){
+				format = settings.dateFormat
+					.replace(/y+/g, 		'Year')
+					.replace(/(d+|o+|D+)/g, 'Day')
+					.replace(/(m+|M+)/g, 	'Month');
+				shim.attr('placeholder', format);
+			}
+		};
+
 //		replaceInputUI['datetime-local'] = function(elem){
 //			if(!$.fn.datepicker){return;}
 //			
@@ -421,7 +433,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				data = configureDatePicker(elem, date, change)
 				
 			;
-						
+
+			setDatePlaceholder(date, data.settings);
 			if(attr.css){
 				date.css(attr.css);
 				if(attr.outerWidth){
