@@ -136,6 +136,7 @@
 		asyncTest("form-attribute1", function(){
 			var submits = 0;
 			var invalids = 0;
+			var outsideInput = $('input[name="outside-1"]');
 			$('#form-buttons').bind('submit.testoutsidesubmit', function(){
 				submits++;
 				return false;
@@ -146,6 +147,9 @@
 			});
 			ok( $( $('#form-buttons').prop('elements') ).filter('input[name="outside-1"]').length == 1, 'elements property finds associated element' );
 			ok($('#form-buttons').serialize().indexOf('outside-1=') != -1, "outside element is part of serialize");
+			equals(outsideInput[0], $('#form-buttons').prop('outside-1'), "outside input can be found by name");
+			equals($('#form-buttons').prop('multiple-outsides').length, 2, 'multiple associated field can be found by name');
+			equals($('#form-buttons').prop('outside-id'), $('#outside-id')[0], 'associated field can be found by id');
 			
 			$.webshims.ready('DOM forms', start);
 		});

@@ -138,7 +138,7 @@
 	<script>
 		jQuery.noConflict();
 		(function($){
-//			$.webshims.debug = "noCombo";
+			$.webshims.debug = "noCombo";
 			$(window).load(function(){
 				$.webshims.polyfill();
 			});
@@ -422,6 +422,8 @@
 	</form> 
 	
 	<input type="text" name="outside-1" form="form-buttons" />
+	<input type="hidden" name="multiple-outsides" form="form-buttons" />
+	<input type="hidden" name="multiple-outsides" id="outside-id" form="form-buttons" />
 	<button type="submit" class="outside-button" formmethod="get" form="form-buttons">
 		<span>fdsf</span>
 	</button>

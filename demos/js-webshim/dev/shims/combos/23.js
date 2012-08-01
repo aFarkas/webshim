@@ -1406,7 +1406,26 @@ webshims.addReady(function(context, contextElem){
 
 if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 	(function(){
-		
+		(function(prop, undefined){
+			$.prop = function(elem, name, value){
+				var ret;
+				if(elem && elem.nodeType == 1 && value === undefined && $.nodeName(elem, 'form') && elem.id){
+					ret = document.getElementsByName(name);
+					if(!ret || !ret.length){
+						ret = document.getElementById(name);
+					}
+					if(ret){
+						ret = $(ret).filter(function(){
+							return $.prop(this, 'form') == elem;
+						}).get();
+						if(ret.length){
+							return ret.length == 1 ? ret[0] : ret;
+						}
+					}
+				}
+				return prop.apply(this, arguments);
+			};
+		})($.prop, undefined);
 		var removeAddedElements = function(form){
 			var elements = $.data(form, 'webshimsAddedElements');
 			if(elements){

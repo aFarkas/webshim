@@ -1614,7 +1614,26 @@ webshims.addReady(function(context, contextElem){
 
 if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 	(function(){
-		
+		(function(prop, undefined){
+			$.prop = function(elem, name, value){
+				var ret;
+				if(elem && elem.nodeType == 1 && value === undefined && $.nodeName(elem, 'form') && elem.id){
+					ret = document.getElementsByName(name);
+					if(!ret || !ret.length){
+						ret = document.getElementById(name);
+					}
+					if(ret){
+						ret = $(ret).filter(function(){
+							return $.prop(this, 'form') == elem;
+						}).get();
+						if(ret.length){
+							return ret.length == 1 ? ret[0] : ret;
+						}
+					}
+				}
+				return prop.apply(this, arguments);
+			};
+		})($.prop, undefined);
 		var removeAddedElements = function(form){
 			var elements = $.data(form, 'webshimsAddedElements');
 			if(elements){
@@ -1767,17 +1786,19 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 	}
 	
 	var setSelection = function(elem){
-		if(elem.setSelectionRange){
-			elem.setSelectionRange(0, 0);
-			return true;
-		} else if(elem.createTextRange){
-			var range = elem.createTextRange();
-			range.collapse(true);
-			range.moveEnd('character', 0);
-			range.moveStart('character', 0);
-			range.select();
-			return true;
-		}
+		try {
+			if(elem.setSelectionRange){
+				elem.setSelectionRange(0, 0);
+				return true;
+			} else if(elem.createTextRange){
+				var range = elem.createTextRange();
+				range.collapse(true);
+				range.moveEnd('character', 0);
+				range.moveStart('character', 0);
+				range.select();
+				return true;
+			}
+		} catch(er){}
 	};
 	
 	var hidePlaceholder = function(elem, data, value, _onFocus){
