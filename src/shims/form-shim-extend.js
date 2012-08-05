@@ -910,7 +910,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 				var stopPropagation = function(e){
 					e.stopPropagation();
 				};
-				$(window).delegate('form[id]', 'submit', function(e){
+				$(document).delegate('form[id]', 'submit', function(e){
 					if(!e.isDefaultPrevented()){
 						var form = this;
 						var id = form.id;
@@ -935,7 +935,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					}
 				});
 				
-				$(window).delegate('input[type="submit"][form], button[form], input[type="button"][form], input[type="image"][form], input[type="reset"][form]', 'click', function(e){
+				$(document).delegate('input[type="submit"][form], button[form], input[type="button"][form], input[type="image"][form], input[type="reset"][form]', 'click', function(e){
 					if(!e.isDefaultPrevented()){
 						var trueForm = $.prop(this, 'form');
 						var formIn = this.form;
