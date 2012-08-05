@@ -1113,8 +1113,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					url: 1,
 					email: 1,
 					password: 1,
-					tel: 1,
-					date: 1
+					tel: 1
 				}
 			;
 			
@@ -1206,8 +1205,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					return data;
 				},
 				update: function(elem, val){
-					if(!allowedPlaceholder[$.prop(elem, 'type')] && !$.nodeName(elem, 'textarea')){
-						webshims.warn("placeholder not allowed on type: "+ $.prop(elem, 'type'));
+					if((!allowedPlaceholder[$.prop(elem, 'type')] || !allowedPlaceholder[$.attr(elem, 'type')]) && !$.nodeName(elem, 'textarea')){
 						return;
 					}
 					
