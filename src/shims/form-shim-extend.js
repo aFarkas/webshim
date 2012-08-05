@@ -140,7 +140,30 @@ $.event.special.invalid = {
 	}
 };
 
-$(document).bind('invalid', $.noop);
+
+if(!$.support.submitBubbles && $.event.special.submit){
+	$.event.special.submit.setup = function() {
+		// Only need this for delegated form submit events
+		if ( $.nodeName( this, "form" ) ) {
+			return false;
+		}
+
+		// Lazy-add a submit handler when a descendant form may potentially be submitted
+		$.event.add( this, "click._submit keypress._submit", function( e ) {
+			// Node name check avoids a VML-related crash in IE (#9807)
+			var elem = e.target,
+				form = $.nodeName( elem, 'input' ) || $.nodeName( elem, 'button' ) ? $.prop(elem, 'form') : undefined;
+			if ( typeof form == 'object' && !form._submit_attached ) {
+				$.event.add( form, 'submit._submit', function( event ) {
+					event._submit_bubble = true;
+				});
+				form._submit_attached = true;
+			}
+		});
+		// return undefined since we don't need an event listener
+	};
+}
+
 $.event.special.submit = $.event.special.submit || {setup: function(){return false;}};
 var submitSetup = $.event.special.submit.setup;
 $.extend($.event.special.submit, {
@@ -153,6 +176,8 @@ $.extend($.event.special.submit, {
 		return submitSetup.apply(this, arguments);
 	}
 });
+
+$(window).bind('invalid', $.noop);
 
 
 webshims.addInputType('email', {
