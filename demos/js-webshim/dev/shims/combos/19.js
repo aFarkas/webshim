@@ -427,14 +427,21 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if(shadowElem.jquery){
 				shadowElem = shadowElem[0];
 			}
-			if(!opts.shadowFocusElement){
-				opts.shadowFocusElement = shadowElem;
-			}
 			var nativeData = $.data(nativeElem, dataID) || $.data(nativeElem, dataID, {});
 			var shadowData = $.data(shadowElem, dataID) || $.data(shadowElem, dataID, {});
+			var shadowFocusElementData = {};
+			if(!opts.shadowFocusElement){
+				opts.shadowFocusElement = shadowElem;
+			} else if(opts.shadowFocusElement){
+				if(opts.shadowFocusElement.jquery){
+					opts.shadowFocusElement = opts.shadowFocusElement[0];
+				}
+				shadowFocusElementData = $.data(opts.shadowFocusElement, dataID) || $.data(opts.shadowFocusElement, dataID, shadowFocusElementData);
+			}
+			
 			nativeData.hasShadow = shadowElem;
-			shadowData.nativeElement = nativeElem;
-			shadowData.shadowData = nativeData.shadowData = {
+			shadowFocusElementData.nativeElement = shadowData.nativeElement = nativeElem;
+			shadowFocusElementData.shadowData = shadowData.shadowData = nativeData.shadowData = {
 				nativeElement: nativeElem,
 				shadowElement: shadowElem,
 				shadowFocusElement: opts.shadowFocusElement
@@ -446,8 +453,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			}
 			
 			if(opts.data){
-				nativeData.shadowData.data = opts.data;
-				shadowData.shadowData.data = opts.data;
+				shadowFocusElementData.shadowData.data = shadowData.shadowData.data = nativeData.shadowData.data = opts.data;
 			}
 			opts = null;
 		},
@@ -1866,15 +1872,17 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	};
 	
 	var switchValidityClass = function(e){
-		if(!e.target || e.target.type == 'submit' || !$.prop(e.target, 'willValidate')){return;}
-		var timer = $.data(e.target, 'webshimsswitchvalidityclass');
+		var elem, timer;
+		if(!e.target){return;}
+		elem = $(e.target).getNativeElement()[0];
+		if(elem.type == 'submit' || !$.prop(elem, 'willValidate')){return;}
+		timer = $.data(elem, 'webshimsswitchvalidityclass');
 		var switchClass = function(){
-			
-			var elem = $(e.target).getNativeElement().trigger('refreshCustomValidityRules')[0];
 			var validity = $.prop(elem, 'validity');
 			var shadowElem = $(elem).getShadowElement();
 			var addClass, removeClass, trigger, generaltrigger, validityCause;
 			
+			$(elem).trigger('refreshCustomValidityRules');
 			if(validity.valid){
 				if(!shadowElem.hasClass('form-ui-valid')){
 					addClass = 'form-ui-valid';
@@ -2106,6 +2114,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			if(e.wrongWebkitInvalid){return;}
 			var jElm = $(e.target);
 			var shadowElem = jElm.getShadowElement();
+			console.log(shadowElem)
 			if(!shadowElem.hasClass('form-ui-invalid')){
 				shadowElem.addClass('form-ui-invalid').removeClass('form-ui-valid');
 				setTimeout(function(){

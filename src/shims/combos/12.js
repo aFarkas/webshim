@@ -427,14 +427,21 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			if(shadowElem.jquery){
 				shadowElem = shadowElem[0];
 			}
-			if(!opts.shadowFocusElement){
-				opts.shadowFocusElement = shadowElem;
-			}
 			var nativeData = $.data(nativeElem, dataID) || $.data(nativeElem, dataID, {});
 			var shadowData = $.data(shadowElem, dataID) || $.data(shadowElem, dataID, {});
+			var shadowFocusElementData = {};
+			if(!opts.shadowFocusElement){
+				opts.shadowFocusElement = shadowElem;
+			} else if(opts.shadowFocusElement){
+				if(opts.shadowFocusElement.jquery){
+					opts.shadowFocusElement = opts.shadowFocusElement[0];
+				}
+				shadowFocusElementData = $.data(opts.shadowFocusElement, dataID) || $.data(opts.shadowFocusElement, dataID, shadowFocusElementData);
+			}
+			
 			nativeData.hasShadow = shadowElem;
-			shadowData.nativeElement = nativeElem;
-			shadowData.shadowData = nativeData.shadowData = {
+			shadowFocusElementData.nativeElement = shadowData.nativeElement = nativeElem;
+			shadowFocusElementData.shadowData = shadowData.shadowData = nativeData.shadowData = {
 				nativeElement: nativeElem,
 				shadowElement: shadowElem,
 				shadowFocusElement: opts.shadowFocusElement
@@ -446,8 +453,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			}
 			
 			if(opts.data){
-				nativeData.shadowData.data = opts.data;
-				shadowData.shadowData.data = opts.data;
+				shadowFocusElementData.shadowData.data = shadowData.shadowData.data = nativeData.shadowData.data = opts.data;
 			}
 			opts = null;
 		},
