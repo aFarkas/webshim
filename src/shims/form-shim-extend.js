@@ -140,7 +140,16 @@ $.event.special.invalid = {
 	}
 };
 
-
+var addSubmitBubbles = function(form){
+	if (!$.support.submitBubbles && typeof form == 'object' && !form._submit_attached ) {
+				
+		$.event.add( form, 'submit._submit', function( event ) {
+			event._submit_bubble = true;
+		});
+		
+		form._submit_attached = true;
+	}
+};
 if(!$.support.submitBubbles && $.event.special.submit){
 	$.event.special.submit.setup = function() {
 		// Only need this for delegated form submit events
@@ -153,12 +162,8 @@ if(!$.support.submitBubbles && $.event.special.submit){
 			// Node name check avoids a VML-related crash in IE (#9807)
 			var elem = e.target,
 				form = $.nodeName( elem, 'input' ) || $.nodeName( elem, 'button' ) ? $.prop(elem, 'form') : undefined;
-			if ( typeof form == 'object' && !form._submit_attached ) {
-				$.event.add( form, 'submit._submit', function( event ) {
-					event._submit_bubble = true;
-				});
-				form._submit_attached = true;
-			}
+			addSubmitBubbles(form);
+			
 		});
 		// return undefined since we don't need an event listener
 	};
@@ -448,7 +453,6 @@ if( !('maxLength' in document.createElement('textarea')) ){
 
 
 
-
 var submitterTypes = {submit: 1, button: 1, image: 1};
 var formSubmitterDescriptors = {};
 [
@@ -602,6 +606,7 @@ switch(desc.proptype) {
 });
 
 webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors);
+
 
 if(!$.support.getSetAttribute && $('<form novalidate></form>').attr('novalidate') == null){
 	webshims.defineNodeNameProperty('form', 'novalidate', {
@@ -894,9 +899,8 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					get: function(){
 						var id = this.id;
 						var elements;
-						removeAddedElements(this);
 						if(id){
-							elements = $('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').add(this.elements).get();
+							elements = $($.makeArray(this.elements)).add('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').not('.webshims-visual-hide > *').get();
 						}
 						return elements.length ? elements : this.elements || null;
 					},
@@ -910,11 +914,14 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 				var stopPropagation = function(e){
 					e.stopPropagation();
 				};
-				$(document).delegate('form[id]', 'submit', function(e){
+				$(document).bind('submit', function(e){
+					
 					if(!e.isDefaultPrevented()){
-						var form = this;
+						var form = e.target;
 						var id = form.id;
 						var elements;
+						
+						
 						if(id){
 							removeAddedElements(form);
 							
@@ -935,14 +942,15 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					}
 				});
 				
-				$(document).delegate('input[type="submit"][form], button[form], input[type="button"][form], input[type="image"][form], input[type="reset"][form]', 'click', function(e){
-					if(!e.isDefaultPrevented()){
-						var trueForm = $.prop(this, 'form');
-						var formIn = this.form;
+				$(document).bind('click', function(e){
+					if(!e.isDefaultPrevented() && $(e.target).is('input[type="submit"][form], button[form], input[type="button"][form], input[type="image"][form], input[type="reset"][form]')){
+						var trueForm = $.prop(e.target, 'form');
+						var formIn = e.target.form;
 						var clone;
 						if(trueForm && trueForm != formIn){
-							clone = $(this)
+							clone = $(e.target)
 								.clone()
+								.removeAttr('form')
 								.addClass('webshims-visual-hide')
 								.bind('click', stopPropagation)
 								.appendTo(trueForm)
@@ -950,6 +958,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 							if(formIn){
 								e.preventDefault();
 							}
+							addSubmitBubbles(trueForm);
 							clone.trigger('click');
 							setTimeout(function(){
 								clone.remove();
@@ -1230,9 +1239,10 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					return data;
 				},
 				update: function(elem, val){
-					if((!allowedPlaceholder[$.prop(elem, 'type')] || !allowedPlaceholder[$.attr(elem, 'type')]) && !$.nodeName(elem, 'textarea')){
+					if(($.attr(elem, 'type') || '').toLowerCase() == 'date' || (!allowedPlaceholder[$.prop(elem, 'type')] && !$.nodeName(elem, 'textarea'))){
 						return;
 					}
+					
 					
 					var data = pHolder.create(elem);
 					if(data.text){
