@@ -9,7 +9,8 @@
 		(function(){
 			var hash = location.hash.replace('#', '');
 			if(hash.indexOf('legacyjquery') != -1){
-				document.write('<script src="http:\/\/ajax.googleapis.com\/ajax\/libs\/jquery\/1.6.4\/jquery.js"><\/script>');
+				alert('no support for jQuery 1.6.x anymore');
+				//document.write('<script src="http:\/\/ajax.googleapis.com\/ajax\/libs\/jquery\/1.6.4\/jquery.js"><\/script>');
 			} else {
 				document.write('<script src="http:\/\/code.jquery.com\/jquery-1.7.2.js"><\/script>');
 			}
@@ -138,7 +139,7 @@
 	<script>
 		jQuery.noConflict();
 		(function($){
-			$.webshims.debug = "noCombo";
+//			$.webshims.debug = "noCombo";
 			$(window).load(function(){
 				$.webshims.polyfill();
 			});

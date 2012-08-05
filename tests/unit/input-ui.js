@@ -6,8 +6,9 @@
 module("input ui");
 
 asyncTest("widgets Modul", function(){
-	QUnit.reset();
 	$.webshims.setOptions('forms-ext', {lazyDate: false});
+	QUnit.reset();
+	
 	var replaceUI = $.webshims.cfg['forms-ext'].replaceUI;
 	var shadow;
 	ok($('#range').prop('value') !== "", "range has always a value");

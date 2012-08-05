@@ -627,7 +627,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	};
 	
 	if(options.replaceValidationUI){
-		webshims.ready('DOM', function(){
+		webshims.ready('DOM forms', function(){
 			$(document).bind('firstinvalid', function(e){
 				if(!e.isInvalidUIPrevented()){
 					e.preventDefault();
@@ -642,7 +642,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	
 	var implementProperties = (options.overrideMessages || options.customMessages) ? ['customValidationMessage'] : [];
 	
-	validityMessages['en'] = validityMessages['en'] || validityMessages['en-US'] || {
+	validityMessages['en'] = $.extend(true, {
 		typeMismatch: {
 			email: 'Please enter an email address.',
 			url: 'Please enter a URL.',
@@ -666,7 +666,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			defaultMessage: 'Please fill out this field.',
 			checkbox: 'Please check this box if you want to proceed.'
 		}
-	};
+	}, (validityMessages['en'] || validityMessages['en-US'] || {}));
 	
 	
 	['select', 'radio'].forEach(function(type){
@@ -683,7 +683,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	validityMessages['en-US'] = validityMessages['en-US'] || validityMessages['en'];
 	validityMessages[''] = validityMessages[''] || validityMessages['en-US'];
 	
-	validityMessages['de'] = validityMessages['de'] || {
+	validityMessages['de'] = $.extend(true, {
 		typeMismatch: {
 			email: '{%value} ist keine zulässige E-Mail-Adresse',
 			url: '{%value} ist keine zulässige Webadresse',
@@ -706,7 +706,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			defaultMessage: 'Bitte geben Sie einen Wert ein',
 			checkbox: 'Bitte aktivieren Sie das Kästchen'
 		}
-	};
+	}, (validityMessages['de'] || {}));
 	
 	['select', 'radio'].forEach(function(type){
 		validityMessages['de'].valueMissing[type] = 'Bitte wählen Sie eine Option aus';
@@ -939,7 +939,35 @@ $.event.special.invalid = {
 	}
 };
 
-$(document).bind('invalid', $.noop);
+var addSubmitBubbles = function(form){
+	if (!$.support.submitBubbles && form && typeof form == 'object' && !form._submit_attached ) {
+				
+		$.event.add( form, 'submit._submit', function( event ) {
+			event._submit_bubble = true;
+		});
+		
+		form._submit_attached = true;
+	}
+};
+if(!$.support.submitBubbles && $.event.special.submit){
+	$.event.special.submit.setup = function() {
+		// Only need this for delegated form submit events
+		if ( $.nodeName( this, "form" ) ) {
+			return false;
+		}
+
+		// Lazy-add a submit handler when a descendant form may potentially be submitted
+		$.event.add( this, "click._submit keypress._submit", function( e ) {
+			// Node name check avoids a VML-related crash in IE (#9807)
+			var elem = e.target,
+				form = $.nodeName( elem, 'input' ) || $.nodeName( elem, 'button' ) ? $.prop(elem, 'form') : undefined;
+			addSubmitBubbles(form);
+			
+		});
+		// return undefined since we don't need an event listener
+	};
+}
+
 $.event.special.submit = $.event.special.submit || {setup: function(){return false;}};
 var submitSetup = $.event.special.submit.setup;
 $.extend($.event.special.submit, {
@@ -952,6 +980,8 @@ $.extend($.event.special.submit, {
 		return submitSetup.apply(this, arguments);
 	}
 });
+
+$(window).bind('invalid', $.noop);
 
 
 webshims.addInputType('email', {
@@ -1222,7 +1252,6 @@ if( !('maxLength' in document.createElement('textarea')) ){
 
 
 
-
 var submitterTypes = {submit: 1, button: 1, image: 1};
 var formSubmitterDescriptors = {};
 [
@@ -1376,6 +1405,7 @@ switch(desc.proptype) {
 });
 
 webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors);
+
 
 if(!$.support.getSetAttribute && $('<form novalidate></form>').attr('novalidate') == null){
 	webshims.defineNodeNameProperty('form', 'novalidate', {
@@ -1668,9 +1698,8 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					get: function(){
 						var id = this.id;
 						var elements;
-						removeAddedElements(this);
 						if(id){
-							elements = $('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').add(this.elements).get();
+							elements = $($.makeArray(this.elements)).add('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').not('.webshims-visual-hide > *').get();
 						}
 						return elements.length ? elements : this.elements || null;
 					},
@@ -1684,11 +1713,14 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 				var stopPropagation = function(e){
 					e.stopPropagation();
 				};
-				$(window).delegate('form[id]', 'submit', function(e){
+				$(document).bind('submit', function(e){
+					
 					if(!e.isDefaultPrevented()){
-						var form = this;
+						var form = e.target;
 						var id = form.id;
 						var elements;
+						
+						
 						if(id){
 							removeAddedElements(form);
 							
@@ -1709,14 +1741,15 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					}
 				});
 				
-				$(window).delegate('input[type="submit"][form], button[form], input[type="button"][form], input[type="image"][form], input[type="reset"][form]', 'click', function(e){
-					if(!e.isDefaultPrevented()){
-						var trueForm = $.prop(this, 'form');
-						var formIn = this.form;
+				$(document).bind('click', function(e){
+					if(!e.isDefaultPrevented() && $(e.target).is('input[type="submit"][form], button[form], input[type="button"][form], input[type="image"][form], input[type="reset"][form]')){
+						var trueForm = $.prop(e.target, 'form');
+						var formIn = e.target.form;
 						var clone;
 						if(trueForm && trueForm != formIn){
-							clone = $(this)
+							clone = $(e.target)
 								.clone()
+								.removeAttr('form')
 								.addClass('webshims-visual-hide')
 								.bind('click', stopPropagation)
 								.appendTo(trueForm)
@@ -1724,6 +1757,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 							if(formIn){
 								e.preventDefault();
 							}
+							addSubmitBubbles(trueForm);
 							clone.trigger('click');
 							setTimeout(function(){
 								clone.remove();
@@ -1912,8 +1946,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					url: 1,
 					email: 1,
 					password: 1,
-					tel: 1,
-					date: 1
+					tel: 1
 				}
 			;
 			
@@ -2005,10 +2038,10 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					return data;
 				},
 				update: function(elem, val){
-					if(!allowedPlaceholder[$.prop(elem, 'type')] && !$.nodeName(elem, 'textarea')){
-						webshims.warn("placeholder not allowed on type: "+ $.prop(elem, 'type'));
+					if(($.attr(elem, 'type') || '').toLowerCase() == 'date' || (!allowedPlaceholder[$.prop(elem, 'type')] && !$.nodeName(elem, 'textarea'))){
 						return;
 					}
+					
 					
 					var data = pHolder.create(elem);
 					if(data.text){

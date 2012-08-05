@@ -78,11 +78,13 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 upcomming Release 1.9.0
 ----------
 
-- implemented youtube iframe support to video element
+- implemented youtube iframe support for video element
 - support for associating form field using the form attribute (input[form]/select[form] ...)
+- elements property for fieldset element
 - fixed regression for using an initial value with input[type="date"] (introduced in 1.8.11)
 - added opus -> mime-type detection for audio
 - allow placeholder on input[type="date"] (as a hint for the dateformat)
+- jQuery 1.6.x not tested anymore, use 1.7.2+
 
 
 Release 1.8.11/1.8.12

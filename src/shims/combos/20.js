@@ -90,6 +90,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		audio: {
 				//ogm shouldn´t be used!
 				'audio/ogg': ['ogg','oga', 'ogm'],
+				'audio/ogg;codecs="opus"': 'opus',
 				'audio/mpeg': ['mp2','mp3','mpga','mpega'],
 				'audio/mp4': ['mp4','mpg4', 'm4r', 'm4a', 'm4p', 'm4b', 'aac'],
 				'audio/wav': ['wav'],

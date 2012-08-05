@@ -627,7 +627,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	};
 	
 	if(options.replaceValidationUI){
-		webshims.ready('DOM', function(){
+		webshims.ready('DOM forms', function(){
 			$(document).bind('firstinvalid', function(e){
 				if(!e.isInvalidUIPrevented()){
 					e.preventDefault();
@@ -642,7 +642,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	
 	var implementProperties = (options.overrideMessages || options.customMessages) ? ['customValidationMessage'] : [];
 	
-	validityMessages['en'] = validityMessages['en'] || validityMessages['en-US'] || {
+	validityMessages['en'] = $.extend(true, {
 		typeMismatch: {
 			email: 'Please enter an email address.',
 			url: 'Please enter a URL.',
@@ -666,7 +666,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			defaultMessage: 'Please fill out this field.',
 			checkbox: 'Please check this box if you want to proceed.'
 		}
-	};
+	}, (validityMessages['en'] || validityMessages['en-US'] || {}));
 	
 	
 	['select', 'radio'].forEach(function(type){
@@ -683,7 +683,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	validityMessages['en-US'] = validityMessages['en-US'] || validityMessages['en'];
 	validityMessages[''] = validityMessages[''] || validityMessages['en-US'];
 	
-	validityMessages['de'] = validityMessages['de'] || {
+	validityMessages['de'] = $.extend(true, {
 		typeMismatch: {
 			email: '{%value} ist keine zulässige E-Mail-Adresse',
 			url: '{%value} ist keine zulässige Webadresse',
@@ -706,7 +706,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			defaultMessage: 'Bitte geben Sie einen Wert ein',
 			checkbox: 'Bitte aktivieren Sie das Kästchen'
 		}
-	};
+	}, (validityMessages['de'] || {}));
 	
 	['select', 'radio'].forEach(function(type){
 		validityMessages['de'].valueMissing[type] = 'Bitte wählen Sie eine Option aus';

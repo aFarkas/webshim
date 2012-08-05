@@ -141,7 +141,7 @@ $.event.special.invalid = {
 };
 
 var addSubmitBubbles = function(form){
-	if (!$.support.submitBubbles && typeof form == 'object' && !form._submit_attached ) {
+	if (!$.support.submitBubbles && form && typeof form == 'object' && !form._submit_attached ) {
 				
 		$.event.add( form, 'submit._submit', function( event ) {
 			event._submit_bubble = true;

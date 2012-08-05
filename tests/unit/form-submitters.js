@@ -157,18 +157,23 @@
 		asyncTest("form-attribute2", function(){
 			var submits = 0;
 			var invalids = 0;
-			$('#form-buttons').bind('submit.testoutsidesubmit', function(){
+			$('#form-buttons').bind('submit.testoutsidesubmit', function(e){
 				submits++;
-				return false;
+				e.preventDefault();
 			});
 			$('input[name="outside-1"]').bind('invalid.testoutsidesubmit', function(e){
 				invalids++;
-				return false;
+				e.preventDefault();
 			});
 			
-			$('button.outside-button span').click();
-			ok(submits == 1, "click on outsidebutton submits form");
-			ok(invalids === 0, "invalids are 0");
+			$('button.outside-button').click();
+			stop();
+			setTimeout(function(){
+				ok(submits == 1, "click on outsidebutton submits form");
+				ok(invalids === 0, "invalids are 0");
+				start();
+			}, 80);
+			
 			
 			setTimeout(function(){
 				$.webshims.ready('DOM forms', start);
@@ -189,7 +194,7 @@
 			
 			$('input[name="outside-1"]').prop('required', true);
 			ok(invalids === 0, "invalids are 0");
-			$('button.outside-button span').click();
+			$('button.outside-button').click();
 			equals(submits, 0, "click on outsidebutton of invalid form does not submit");
 			equals(invalids, 1, "click on outsidebutton validates associated fields");
 			setTimeout(function(){
@@ -197,8 +202,16 @@
 			}, 40);
 		});
 		asyncTest("button submits associated fields", function(){
+			
 			var form = $('#form-buttons');
+			
+			var submits = 0;
+			$('#form-buttons').bind('submit.testoutsidesubmit', function(){
+				submits++;
+			});
+			
 			$('input[name="outside-submit"]').click();
+			ok(submits == 1, "click on outsidebutton submits form");
 			stop();
 			addTest = function(){
 				equals(results.target, 'originaltarget');
@@ -208,7 +221,7 @@
 			
 			setTimeout(function(){
 				$.webshims.ready('DOM forms', start);
-			}, 40);
+			}, 80);
 		});
 	}
 	

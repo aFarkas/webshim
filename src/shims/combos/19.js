@@ -2151,7 +2151,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	};
 	
 	if(options.replaceValidationUI){
-		webshims.ready('DOM', function(){
+		webshims.ready('DOM forms', function(){
 			$(document).bind('firstinvalid', function(e){
 				if(!e.isInvalidUIPrevented()){
 					e.preventDefault();
