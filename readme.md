@@ -75,6 +75,16 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+upcomming Release 1.9.0
+----------
+
+- implemented youtube iframe support to video element
+- support for associating form field using the form attribute (input[form]/select[form] ...)
+- fixed regression for using an initial value with input[type="date"] (introduced in 1.8.11)
+- added opus -> mime-type detection for audio
+- allow placeholder on input[type="date"] (as a hint for the dateformat)
+
+
 Release 1.8.11/1.8.12
 ----------
 
