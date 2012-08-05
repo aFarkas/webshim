@@ -342,15 +342,17 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	};
 	
 	var switchValidityClass = function(e){
-		if(!e.target || e.target.type == 'submit' || !$.prop(e.target, 'willValidate')){return;}
-		var timer = $.data(e.target, 'webshimsswitchvalidityclass');
+		var elem, timer;
+		if(!e.target){return;}
+		elem = $(e.target).getNativeElement()[0];
+		if(elem.type == 'submit' || !$.prop(elem, 'willValidate')){return;}
+		timer = $.data(elem, 'webshimsswitchvalidityclass');
 		var switchClass = function(){
-			
-			var elem = $(e.target).getNativeElement().trigger('refreshCustomValidityRules')[0];
 			var validity = $.prop(elem, 'validity');
 			var shadowElem = $(elem).getShadowElement();
 			var addClass, removeClass, trigger, generaltrigger, validityCause;
 			
+			$(elem).trigger('refreshCustomValidityRules');
 			if(validity.valid){
 				if(!shadowElem.hasClass('form-ui-valid')){
 					addClass = 'form-ui-valid';
@@ -582,6 +584,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			if(e.wrongWebkitInvalid){return;}
 			var jElm = $(e.target);
 			var shadowElem = jElm.getShadowElement();
+			console.log(shadowElem)
 			if(!shadowElem.hasClass('form-ui-invalid')){
 				shadowElem.addClass('form-ui-invalid').removeClass('form-ui-valid');
 				setTimeout(function(){
