@@ -969,7 +969,14 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			langObj: $.datepicker.regional, 
 			module: 'form-number-date-ui', 
 			callback: function(langObj){
-				$('input.hasDatepicker').filter('.input-date, .input-datetime-local-date').datepicker('option', $.extend(defaultDatepicker, langObj, options.datepicker));
+				var datepickerCFG = $.extend({}, defaultDatepicker, langObj, options.datepicker);
+				$.datepicker.setDefaults(datepickerCFG);
+				if(datepickerCFG.dateFormat && options.datepicker.dateFormat != datepickerCFG.dateFormat ){
+					$('input.hasDatepicker')
+						.filter('.input-date, .input-datetime-local-date')
+						.datepicker('option', 'dateFormat', datepickerCFG.dateFormat)
+					;
+				}
 			}
 		});
 		$(document).unbind('jquery-uiReady.langchange input-widgetsReady.langchange');
@@ -1149,6 +1156,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	webshims.addReady(function(context, elem){
 		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(e){
 			if($.datepicker || $.fn.slider){
+				if($.datepicker && !defaultDatepicker.dateFormat){
+					defaultDatepicker.dateFormat = $.datepicker._defaults.dateFormat;
+				}
 				replaceInputUI(context, elem);
 			}
 			if($.datepicker && $.fn.slider){

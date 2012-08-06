@@ -51,14 +51,14 @@
 		});
 		$.webshims.setOptions({
 			//we do not use any DOM-/JS-APIs on DOM-ready, so we do not need to delay the ready event <- good against fouc
-			waitReady: false
+//			waitReady: false
 		});
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
 	</script>
 	<script>
-		$.webshims.ready('ready forms-ext', function(){
+		$.webshims.ready('DOM forms-ext', function(){
 			$('form').bind('firstinvalid', function(e){
 				//show the invalid alert for first invalid element
 				$.webshims.validityAlert.showFor( e.target );
@@ -68,8 +68,8 @@
 			
 			$('#range').each(function(){
 				var range = $(this);
-				var number = $('<input class="number" value="'+ range.attr('value') +'" min="0" max="100" type="number" />');
-				range.beforeWebshim(number);
+				var number = $('<input class="number" value="'+ range.prop('value') +'" min="0" max="100" type="number" />');
+				range.beforePolyfill(number);
 					
 				number.bind('input', function(){
 					range.attr('value', number.attr('value'));

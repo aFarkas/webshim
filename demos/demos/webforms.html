@@ -59,6 +59,7 @@
 			customMessages: true,
 			placeholderType: 'over' 
 		}); 
+		
 		$.webshims.setOptions({
 			//we do not use any DOM-/JS-APIs on DOM-ready, so we do not need to delay the ready event <- good against fouc
 			waitReady: false
@@ -204,7 +205,7 @@
 							<label for="date">
 								date: *
 							</label>
-						   	<input name="date" type="date" id="date" required />
+						   	<input name="date" type="date" id="date" value="2012-10-11" required />
 						</div>
 									
 						<div class="form-element">
