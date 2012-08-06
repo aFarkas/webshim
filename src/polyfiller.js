@@ -1129,6 +1129,10 @@
 		c: removeCombos
 	});
 	
+	if(!$.fn.on){
+		webshims.error("webshims 1.9.0 needs jQuery 1.7+. Please use a newer version of jQuery");
+	}
+	
 	jScripts
 		.filter('[data-polyfill-cfg]')
 		.each(function(){
