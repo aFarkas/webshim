@@ -228,6 +228,31 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		return ret;
 	};
 	
+	if(hasNative && hasSwf && !options.preferFlash){
+		var switchOptions = function(e){
+			var parent = e.target.parentNode;
+			if(!options.preferFlash && ($(e.target).is('audio, video') || (parent && $('source:last', parent)[0] == e.target)) ){
+				webshims.ready('mediaelement-swf', function(){
+					setTimeout(function(){
+						if(!$(e.target).closest('audio, video').is('.nonnative-api-active')){
+							options.preferFlash = true;
+							document.removeEventListener('error', switchOptions, true);
+							$('audio, video').mediaLoad();
+						}
+					}, 20);
+				});
+			}
+		};
+		document.addEventListener('error', switchOptions, true);
+		$.webshims.ready('DOM', function(){
+			$('audio, video').each(function(){
+				if(this.error){
+					switchOptions({target: this});
+				}
+			});
+		});
+	}
+	
 	mediaelement.setError = function(elem, message){
 		if(!message){
 			message = "can't play sources";
@@ -362,10 +387,10 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			}, 9);
 		}
 	});
-	
+		
 	var initMediaElements = function(){
 		webshims.addReady(function(context, insertedElement){
-			$('video, audio', context)
+			var medialements = $('video, audio', context)
 				.add(insertedElement.filter('video, audio'))
 				.each(function(){
 					if($.browser.msie && webshims.browserVersion > 8 && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay])')){
@@ -413,11 +438,31 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 							})
 						;
 					}
+					(function(){
+						var loadedTrack;
+						var loadTrackModule = function(){
+							if(!loadedTrack){
+								loadedTrack = true;
+								webshims.loader.loadList(['track-ui']);
+							}
+						};
+						webshims.ready('WINDOWLOAD', loadTrackModule);
+						if(!loadedTrack){
+							$('track', medialements).each(loadTrackModule)
+						}
+					})();
 				})
 			;
 		});
 	};
 	
+	if(Modernizr.track){
+		webshims.defineProperty(TextTrack.prototype, 'shimActiveCues', {
+			get: function(){
+				return this.activeCues;
+			}
+		});
+	}
 	
 	//set native implementation ready, before swf api is retested
 	if(hasNative){

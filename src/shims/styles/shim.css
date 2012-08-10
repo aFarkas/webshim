@@ -26,6 +26,27 @@ audio * {
 	min-height: 20px;
 	min-width: 20px;
 }
+.track-display {
+	position: absolute !important;
+	margin: 0;
+	padding: 0px !important;
+	max-width: 100% !important;
+	border: none !important;
+	background: none !important;
+	height: auto !important;
+	text-align: center;
+	visibility: hidden;
+}
+.track-display span {
+	display: inline-block;
+	padding: 5px 8px;
+	font-size: 120%;
+	font-weight: bold;
+	background: #000;
+	background: rgba(0,0,0,0.9);
+	color: #fff;
+	visibility: visible !important;
+}
 mark {
 	background-color: #ff9;
 	color: #000; 
