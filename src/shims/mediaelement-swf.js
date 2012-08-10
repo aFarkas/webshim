@@ -1018,31 +1018,12 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	}
 
 	if(!hasNative){
-		var anchor = document.createElement('a');
-		anchor.style.display = "none";
+		
 		['poster', 'src'].forEach(function(prop){
-			webshims.defineNodeNamesProperty(prop == 'src' ? ['audio', 'video', 'source'] : ['video'], prop, {
-				prop: {
-					get: function(){
-						var href = this.getAttribute(prop);
-						var ret;
-						if(href == null){return '';}
-						anchor.setAttribute('href', href+'' );
-						if(!$.support.hrefNormalized){
-							try {
-								$(anchor).appendTo(this);
-								ret = anchor.getAttribute('href', 4);
-							} catch(er){
-								ret = anchor.getAttribute('href', 4);
-							}
-							$(anchor).detach();
-						}
-						return ret || anchor.href;
-					},
-					set: function(src){
-						$.attr(this, prop, src);
-					}
-				}
+			webshims.defineNodeNameProperty(prop == 'src' ? ['audio', 'video', 'source'] : ['video'], prop, {
+				//attr: {},
+				reflect: true,
+				propType: 'src'
 			});
 		});
 		

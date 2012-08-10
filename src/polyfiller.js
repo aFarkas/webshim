@@ -1117,7 +1117,25 @@
 			},
 			c: [10, 9, 22, 20]
 		});
+
+		addTest('track', function(){
+			return Modernizr.audio && window.TextTrack && 'default' in document.createElement('track');
+		});
 		
+		addPolyfill('track', {
+			options: {
+				positionDisplay: true
+			},
+			test: Modernizr.track,
+			d: ['mediaelement', DOMSUPPORT],
+			methodNames: ['addTextTrack'],
+			c: []
+		});
+		
+		
+		webshims.loader.addModule('track-ui', {
+			d: ['track']
+		});
 	}
 	//>
 	
