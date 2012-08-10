@@ -1865,7 +1865,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			if(e.wrongWebkitInvalid){return;}
 			var jElm = $(e.target);
 			var shadowElem = jElm.getShadowElement();
-			console.log(shadowElem)
 			if(!shadowElem.hasClass('form-ui-invalid')){
 				shadowElem.addClass('form-ui-invalid').removeClass('form-ui-valid');
 				setTimeout(function(){
