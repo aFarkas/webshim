@@ -78,7 +78,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 upcomming Release 1.9.0
 ----------
 
-- basic but powerfull track-element including corresponding DOM- and JS-APIss
+- basic but powerfull track-element including corresponding DOM- and JS-API
 - input[form] support: for associating form field using the form attribute (input[form]/select[form] ...)
 - implemented youtube iframe support for video element
 - elements property for fieldset element

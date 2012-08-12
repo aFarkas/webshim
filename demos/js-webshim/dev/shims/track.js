@@ -47,7 +47,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		var baseData = webshims.data(this, 'mediaelementBase');
 		var oldTracks = trackList.splice(0);
 		var i, len;
-		$('> track', this).each(function(){
+		$('track', this).each(function(){
 			trackList.push($.prop(this, 'track'));
 		});
 		if(baseData.scriptedTextTracks){
@@ -437,7 +437,7 @@ modified for webshims
 		textTracks: {
 			prop: {
 				get: function(){
-					$('> track', this).each(function(){
+					$('track', this).each(function(){
 						refreshTrack(this);
 					});
 					return mediaelement.createTrackList(this);
