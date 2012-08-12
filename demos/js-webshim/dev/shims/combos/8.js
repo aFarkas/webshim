@@ -1,43 +1,3 @@
-//innerShiv for IE8-
-(function($){
-	if(Modernizr.genericDOM){return;}
-	var webshims = $.webshims;
-	var doc = document;
-	var b;
-	var d;
-	var rtagName = /<([\w:]+)/;
-	var wrapMap = {
-		option: 1,
-		optgroup: 1,
-		legend: 1,
-		thead: 1,
-		tr: 1,
-		td: 1,
-		col: 1,
-		area: 1
-	};
-	
-	
-	var htmlExp = /^(?:[^<]*(<[\w\W]+>)[^>]*$)/;
-	
-	webshims.fixHTML5 = function(h) {
-			if(typeof h != 'string' || wrapMap[ (rtagName.exec(h) || ["", ""])[1].toLowerCase() ]){return h;}
-			if (!d) {
-				b = doc.body;
-				if(!b){return h;}
-				d = doc.createElement('div');
-				d.style.display = 'none';
-			}
-			var e = d.cloneNode(false);
-			b.appendChild(e);
-			e.innerHTML = h;
-			b.removeChild(e);
-			return e.childNodes;
-		}
-	;
-
-})(jQuery);
-
 //DOM-Extension helper
 jQuery.webshims.register('dom-extend', function($, webshims, window, document, undefined){
 	"use strict";
@@ -370,6 +330,9 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				}
 			};
 		}
+		if(!descs.attr){
+			descs.attr = {};
+		}
 	};
 	
 	$.extend(webshims, {
@@ -487,9 +450,55 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						return descs.attr.get.call(this) != null;
 					}
 				};
-			}
+			},
+			"src": (function(){
+				var anchor = document.createElement('a');
+				anchor.style.display = "none";
+				return function(descs, name){
+					
+					createPropDefault(descs);
+					if(descs.prop){return;}
+					descs.prop = {
+						set: function(val){
+							descs.attr.set.call(this, val);
+						},
+						get: function(){
+							var href = this.getAttribute(name);
+							var ret;
+							if(href == null){return '';}
+							anchor.setAttribute('href', href+'' );
+							if(!$.support.hrefNormalized){
+								try {
+									$(anchor).insertAfterTo(this);
+									ret = anchor.getAttribute('href', 4);
+								} catch(er){
+									ret = anchor.getAttribute('href', 4);
+								}
+								$(anchor).detach();
+							}
+							return ret || anchor.href;
+						}
+					};
+				};
+			})(),
+			enumarated: function(descs, name){
+					
+					createPropDefault(descs);
+					if(descs.prop){return;}
+					descs.prop = {
+						set: function(val){
+							descs.attr.set.call(this, val);
+						},
+						get: function(){
+							var val = (descs.attr.get.call(this) || '').toLowerCase();
+							if(!val || descs.limitedTo.indexOf(val) == -1){
+								val = descs.defaultValue;
+							}
+							return val;
+						}
+					};
+				}
 			
-//			,enumarated: $.noop
 //			,unsignedLong: $.noop
 //			,"doubble": $.noop
 //			,"long": $.noop
@@ -517,7 +526,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			havePolyfill[prop] = true;
 						
 			if(descs.reflect){
-				webshims.propTypes[descs.propType || 'standard'](descs);
+				webshims.propTypes[descs.propType || 'standard'](descs, prop);
 			}
 			
 			['prop', 'attr', 'removeAttr'].forEach(function(type){
@@ -919,7 +928,9 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			if(loaded || !hasYt){return;}
 			loaded = true;
 			webshims.loader.loadScript("https://www.youtube.com/player_api");
-			webshims.polyfill("mediaelement-yt");
+			$(function(){
+				webshims.polyfill("mediaelement-yt");
+			});
 		};
 	})();
 	var loadThird = function(){
@@ -928,6 +939,9 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		} else {
 			loadYt();
 		}
+		$(function(){
+			webshims.loader.loadList(['track-ui']);
+		});
 	};
 	
 	webshims.addPolyfill('mediaelement-yt', {
@@ -1077,6 +1091,31 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		return ret;
 	};
 	
+	if(hasNative && hasSwf && !options.preferFlash){
+		var switchOptions = function(e){
+			var parent = e.target.parentNode;
+			if(!options.preferFlash && ($(e.target).is('audio, video') || (parent && $('source:last', parent)[0] == e.target)) ){
+				webshims.ready('mediaelement-swf', function(){
+					setTimeout(function(){
+						if(!$(e.target).closest('audio, video').is('.nonnative-api-active')){
+							options.preferFlash = true;
+							document.removeEventListener('error', switchOptions, true);
+							$('audio, video').mediaLoad();
+						}
+					}, 20);
+				});
+			}
+		};
+		document.addEventListener('error', switchOptions, true);
+		$.webshims.ready('DOM', function(){
+			$('audio, video').each(function(){
+				if(this.error){
+					switchOptions({target: this});
+				}
+			});
+		});
+	}
+	
 	mediaelement.setError = function(elem, message){
 		if(!message){
 			message = "can't play sources";
@@ -1211,8 +1250,9 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			}, 9);
 		}
 	});
-	
+		
 	var initMediaElements = function(){
+		
 		webshims.addReady(function(context, insertedElement){
 			$('video, audio', context)
 				.add(insertedElement.filter('video, audio'))
@@ -1262,12 +1302,23 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 							})
 						;
 					}
+					
 				})
 			;
 		});
 	};
 	
-	
+	if(Modernizr.track){
+		webshims.defineProperty(TextTrack.prototype, 'shimActiveCues', {
+			get: function(){
+				return this._shimActiveCues || this.activeCues;
+			}
+		});
+	} else {
+		$(function(){
+			webshims.loader.loadList(['track-ui']);
+		});
+	}
 	//set native implementation ready, before swf api is retested
 	if(hasNative){
 		webshims.isReady('mediaelement-core', true);

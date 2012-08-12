@@ -26,7 +26,7 @@
 		
 	
 	var webshims = {
-		version: '1.9.0pre',
+		version: '1.9.0beta1',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -249,9 +249,7 @@
 		 * basic DOM-/jQuery-Helpers
 		 */
 		
-		fixHTML5: function(h){
-			return h;
-		},
+		
 		capturingEvents: function(names, _maybePrevented){
 			if (!document.addEventListener) {
 				return;
@@ -514,7 +512,7 @@
 	$.webshims = webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var googleAPIs = protocol + 'ajax.googleapis.com/ajax/libs/';
-	var uiLib = googleAPIs + 'jqueryui/1.8.21/';
+	var uiLib = googleAPIs + 'jqueryui/1.8.22/';
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;
@@ -687,7 +685,7 @@
 		});
 		
 		$.fn.htmlPolyfill = function(a){
-			var ret = $.fn.html.call(this, (a) ? webshims.fixHTML5(a) : a);
+			var ret = $.fn.html.call(this,  a);
 			if(ret === this && $.isDOMReady){
 				this.each(function(){
 					if(this.nodeType == 1){
@@ -701,10 +699,10 @@
 		
 		$.each(['after', 'before', 'append', 'prepend', 'replaceWith'], function(i, name){
 			$.fn[name+'Polyfill'] = function(a){
-				var elems = $(webshims.fixHTML5(a));
-				$.fn[name].call(this, elems);
+				a = $(a);
+				$.fn[name].call(this, a);
 				if($.isDOMReady){
-					elems.each(function(){
+					a.each(function(){
 						if (this.nodeType == 1) {
 							webshims.triggerDomUpdate(this);
 						}
@@ -718,13 +716,17 @@
 		$.each(['insertAfter', 'insertBefore', 'appendTo', 'prependTo', 'replaceAll'], function(i, name){
 			$.fn[name.replace(/[A-Z]/, function(c){return "Polyfill"+c;})] = function(){
 				$.fn[name].apply(this, arguments);
-				webshims.triggerDomUpdate(this);
+				if($.isDOMReady){
+					webshims.triggerDomUpdate(this);
+				}
 				return this;
 			};
 		});
 		
 		$.fn.updatePolyfill = function(){
-			webshims.triggerDomUpdate(this);
+			if($.isDOMReady){
+				webshims.triggerDomUpdate(this);
+			}
 			return this;
 		};
 		
@@ -1117,7 +1119,25 @@
 			},
 			c: [10, 9, 22, 20]
 		});
+
+		addTest('track', function(){
+			return !!(Modernizr.audio && window.TextTrack && 'default' in document.createElement('track'));
+		});
 		
+		addPolyfill('track', {
+			options: {
+				positionDisplay: true
+			},
+			test: Modernizr.track,
+			d: ['mediaelement', DOMSUPPORT],
+			methodNames: ['addTextTrack'],
+			c: []
+		});
+		
+		
+		webshims.loader.addModule('track-ui', {
+			d: ['track']
+		});
 	}
 	//>
 	

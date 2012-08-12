@@ -70,7 +70,9 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			if(loaded || !hasYt){return;}
 			loaded = true;
 			webshims.loader.loadScript("https://www.youtube.com/player_api");
-			webshims.polyfill("mediaelement-yt");
+			$(function(){
+				webshims.polyfill("mediaelement-yt");
+			});
 		};
 	})();
 	var loadThird = function(){
@@ -79,6 +81,9 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		} else {
 			loadYt();
 		}
+		$(function(){
+			webshims.loader.loadList(['track-ui']);
+		});
 	};
 	
 	webshims.addPolyfill('mediaelement-yt', {
@@ -228,6 +233,31 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		return ret;
 	};
 	
+	if(hasNative && hasSwf && !options.preferFlash){
+		var switchOptions = function(e){
+			var parent = e.target.parentNode;
+			if(!options.preferFlash && ($(e.target).is('audio, video') || (parent && $('source:last', parent)[0] == e.target)) ){
+				webshims.ready('mediaelement-swf', function(){
+					setTimeout(function(){
+						if(!$(e.target).closest('audio, video').is('.nonnative-api-active')){
+							options.preferFlash = true;
+							document.removeEventListener('error', switchOptions, true);
+							$('audio, video').mediaLoad();
+						}
+					}, 20);
+				});
+			}
+		};
+		document.addEventListener('error', switchOptions, true);
+		$.webshims.ready('DOM', function(){
+			$('audio, video').each(function(){
+				if(this.error){
+					switchOptions({target: this});
+				}
+			});
+		});
+	}
+	
 	mediaelement.setError = function(elem, message){
 		if(!message){
 			message = "can't play sources";
@@ -362,8 +392,9 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			}, 9);
 		}
 	});
-	
+		
 	var initMediaElements = function(){
+		
 		webshims.addReady(function(context, insertedElement){
 			$('video, audio', context)
 				.add(insertedElement.filter('video, audio'))
@@ -413,12 +444,23 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 							})
 						;
 					}
+					
 				})
 			;
 		});
 	};
 	
-	
+	if(Modernizr.track){
+		webshims.defineProperty(TextTrack.prototype, 'shimActiveCues', {
+			get: function(){
+				return this._shimActiveCues || this.activeCues;
+			}
+		});
+	} else {
+		$(function(){
+			webshims.loader.loadList(['track-ui']);
+		});
+	}
 	//set native implementation ready, before swf api is retested
 	if(hasNative){
 		webshims.isReady('mediaelement-core', true);
@@ -1831,7 +1873,12 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					return data;
 				},
 				update: function(elem, val){
-					if(($.attr(elem, 'type') || '').toLowerCase() == 'date' || (!allowedPlaceholder[$.prop(elem, 'type')] && !$.nodeName(elem, 'textarea'))){
+					var type = ($.attr(elem, 'type') || $.prop(elem, 'type') || '').toLowerCase();
+					if(!allowedPlaceholder[type] && !$.nodeName(elem, 'textarea')){
+						webshims.error('placeholder not allowed on input[type="'+type+'"]');
+						if(type == 'date'){
+							webshims.error('but you can use data-placeholder for input[type="date"]');
+						}
 						return;
 					}
 					

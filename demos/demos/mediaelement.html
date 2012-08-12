@@ -20,8 +20,7 @@
 	
 	<script>
 		$.webshims.setOptions({
-			//we do not use any DOM-/JS-APIs on DOM-ready, so we do not need to delay the ready event <- good against fouc
-			waitReady: false
+			waitReady: true
 		});
 		$.webshims.polyfill();
 		
@@ -125,6 +124,10 @@
 				}).triggerHandler('updatemuted'); 
 				$('input.controls', player).bind('click updatecontrols', function(){
 					$('video, audio', player).prop('controls', $.prop(this, 'checked'));
+				}).prop('checked', true);
+				
+				$('input.texttrack', player).bind('click updatecontrols', function(){
+					$('track', player).prop('track').mode = $.prop(this, 'checked') ? 2 : 0;
 				}).prop('checked', true); 
 				
 				$('select.load-media', player).bind('change', function(){
@@ -233,10 +236,10 @@
 		<div class="main-box">
 		<section>
 			<hgroup>
-				<h2>HTML5 audio and video elements</h2>
+				<h2>HTML5 audio, video and track elements</h2>
 				<h3>Demo/About/Documentation audio and video elements</h3>
 			</hgroup>
-			<p>The <code>mediaelement</code> implements the audio, video and source elements including their API and enables playing mp4, mp3, flv, fla etc. media files and playing rtmp streams in incapable browsers using the <a href="http://www.longtailvideo.com/players/">famous JW Player</a>.</p>
+			<p>The <code>mediaelement</code> feature implements the audio, video and source elements including their API and enables playing mp4, mp3, flv, fla etc. media files and playing rtmp streams in incapable browsers using the <a href="http://www.longtailvideo.com/players/">famous JW Player</a>.</p>
 			<section>
 				<h3>Implemented/fixed elements, attributes, properties, methods, events</h3>
 				<ul>
@@ -266,6 +269,7 @@
 				<ul>
 					<li><strong>loadMediaSrc</strong> (source [, poster]) (jQuery plugin): Removes current audio/video sources adds new source[s] and calls the load method (mediaLoad).</li>
 				</ul>
+				
 <code class="block">
 //simple video
 $("video.my-video").loadMediaSrc("my-video.mp4");
@@ -279,16 +283,25 @@ $("video.my-video").loadMediaSrc(
 	], 
 	"my-poster.jpg"
 );
-</code>				
+</code>			<h2>Track Element support</h2>
+				<p>The <code>track</code> feature implements the track element including the corresponding DOM- and JS-APIs.</p>
+				<h3>Implemented/fixed elements, attributes, properties, methods, events</h3>
+				<ul>
+					<li><strong>elements:</strong> <a href="http://www.w3.org/TR/html5/the-track-element.html">track</a></li>
+					<li><strong>attributes and IDL/properties</strong>: <a href="http://www.w3.org/TR/html5/the-track-element.html#dom-track-kind">kind</a>, <a href="http://www.w3.org/TR/html5/the-track-element.html#attr-track-src">src</a>, <a href="http://www.w3.org/TR/html5/the-track-element.html#attr-track-srclang">srclang</a>, <a href="http://www.w3.org/TR/html5/the-track-element.html#attr-track-label">label</a>, <a href="http://www.w3.org/TR/html5/the-track-element.html#attr-track-default">default</a></li>
+					<li><strong>properties/IDLs</strong>: <a href="http://www.w3.org/TR/html5/the-track-element.html#dom-track-readystate">readystate</a>, <a href="http://www.w3.org/TR/html5/the-track-element.html#dom-track-track">track</a>, <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-texttracks">textTracks</a></li>
+					<li><strong>methods</strong>: <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-addtexttrack">addTextTrack</a></li>
+				</ul>
 			</section>
 			<section>
 				<h3>Simple Demo</h3>
 				<h4>Video example</h4>
 				<div class="player">
 					
-					<video controls preload="none" poster="http://protofunc.com/jme/media/bbb_watchtrailer.gif" style="width: 400px; height: 228px;">
-						<source src="http://protofunc.com/jme/media/bbb_trailer_mobile.m4v" type="video/mp4" />
-						<source src="http://protofunc.com/jme/media/bbb_trailer_400p.ogg" type="video/ogg" />
+					<video controls preload="none" style="width: 400px; height: 228px;">
+						<source src="http://cdn.yayquery.com/ep/23/yayquery_23.mp4" type="video/mp4" />
+						<source src="http://cdn.yayquery.com/ep/23/yayquery_23.ogv" type="video/ogg" />
+						<track src="subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
 					</video>
 					<table>
 						<thead>
@@ -360,11 +373,14 @@ $("video.my-video").loadMediaSrc(
 								<td><input class="volume-slider" type="range"  value="1" max="1" step="0.01" /></td>
 							</tr>
 							<tr>
+								<th>textTrack</th>
+								<td><input class="texttrack" type="checkbox" /></td>
+							</tr>
+							<tr>
 								<th>loadMediaSrc</th>
 								<td>
 									<select class="load-media">
 									
-										<option data-src='[{"src": "http://protofunc.com/jme/media/bbb_trailer_mobile.m4v", "type": "video/mp4"}, {"src": "http://protofunc.com/jme/media/bbb_trailer_400p.ogg", "type": "video/ogg"}]'>Big Buck Bunny</option>
 										<option data-src='[{"src": "http://cdn.yayquery.com/ep/23/yayquery_23.mp4", "type": "video/mp4"}, {"src": "http://cdn.yayquery.com/ep/23/yayquery_23.ogv", "type": "video/ogg"}]'>yayQuery - Episode 23 | When Things Are Things</option>
 										
 										

@@ -26,26 +26,56 @@ audio * {
 	min-height: 20px;
 	min-width: 20px;
 }
-.track-display {
+.cue-display {
 	position: absolute !important;
 	margin: 0;
 	padding: 0px !important;
 	max-width: 100% !important;
+	max-height: 100% !important;
 	border: none !important;
 	background: none !important;
-	height: auto !important;
 	text-align: center;
 	visibility: hidden;
+	font-family: sans-serif;
+	font-size: 10px;
+	overflow: hidden;
 }
-.track-display span {
-	display: inline-block;
-	padding: 5px 8px;
-	font-size: 120%;
-	font-weight: bold;
-	background: #000;
-	background: rgba(0,0,0,0.9);
+.cue-display span.cue-text {
+	position: absolute;
+	left: 0;
+	bottom: 40px;
+	right: 0;
+	display: block;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	font-size: 160%;
 	color: #fff;
 	visibility: visible !important;
+}
+.cue-display span.cue-text span {
+	display: inline-block;
+	padding: 5px 8px;
+	background: #000;
+	background: rgba(0,0,0,0.9);
+}
+.cue-display[data-displaysize="xs"] span.cue-text {
+	font-size: 120%;
+}
+.cue-display[data-displaysize="s"] span.cue-text {
+	font-size: 150%;
+}
+.cue-display[data-displaysize="m"] span.cue-text {
+	font-size: 170%;
+}
+.cue-display[data-displaysize="l"] span.cue-text {
+	font-size: 190%;
+}
+.cue-display[data-displaysize="xl"] span.cue-text {
+	font-size: 240%;
+}
+.cue-display[data-displaysize="xxl"] span.cue-text {
+	font-size: 300%;
 }
 mark {
 	background-color: #ff9;

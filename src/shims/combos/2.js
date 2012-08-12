@@ -2040,7 +2040,12 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					return data;
 				},
 				update: function(elem, val){
-					if(($.attr(elem, 'type') || '').toLowerCase() == 'date' || (!allowedPlaceholder[$.prop(elem, 'type')] && !$.nodeName(elem, 'textarea'))){
+					var type = ($.attr(elem, 'type') || $.prop(elem, 'type') || '').toLowerCase();
+					if(!allowedPlaceholder[type] && !$.nodeName(elem, 'textarea')){
+						webshims.error('placeholder not allowed on input[type="'+type+'"]');
+						if(type == 'date'){
+							webshims.error('but you can use data-placeholder for input[type="date"]');
+						}
 						return;
 					}
 					

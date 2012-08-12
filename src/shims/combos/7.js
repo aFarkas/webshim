@@ -873,7 +873,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			if(_wrapper){
 				webshims.triggerDomUpdate(_wrapper[0]);	
 			}
-			['disabled', 'min', 'max', 'value', 'step', 'placeholder'].forEach(function(name){
+			['disabled', 'min', 'max', 'value', 'step', 'data-placeholder'].forEach(function(name){
 				var val = elem.prop(name);
 				if(val !== "" && (name != 'disabled' || !val)){
 					elem.prop(name, val);
@@ -1093,7 +1093,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					$(shim).datepicker('option', 'maxDate', value);
 				}
 			},
-			placeholder: function(orig, shim, value){
+			'data-placeholder': function(orig, shim, value){
 				var hintValue = (value || '').split('-');
 				var dateFormat;
 				if(hintValue.length == 3){
@@ -1212,7 +1212,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		webshims.onNodeNamesPropertyModify('input', 'valueAsDate', reflectFn);
 	}
 	
-	$.each(['disabled', 'min', 'max', 'value', 'step', 'placeholder'], function(i, attr){
+	$.each(['disabled', 'min', 'max', 'value', 'step', 'data-placeholder'], function(i, attr){
 		webshims.onNodeNamesPropertyModify('input', attr, function(val){
 				var shadowData = webshims.data(this, 'shadowData');
 				if(shadowData && shadowData.data && shadowData.data[attr] && shadowData.nativeElement === this){
@@ -1240,8 +1240,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						.filter('.input-date, .input-datetime-local-date')
 						.datepicker('option', 'dateFormat', datepickerCFG.dateFormat)
 						.getNativeElement()
-						.filter('[placeholder]')
-						.prop('placeholder', function(i, val){
+						.filter('[data-placeholder]')
+						.attr('data-placeholder', function(i, val){
 							return val;
 						})
 					;

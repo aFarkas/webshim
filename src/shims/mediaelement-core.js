@@ -70,7 +70,9 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 			if(loaded || !hasYt){return;}
 			loaded = true;
 			webshims.loader.loadScript("https://www.youtube.com/player_api");
-			webshims.polyfill("mediaelement-yt");
+			$(function(){
+				webshims.polyfill("mediaelement-yt");
+			});
 		};
 	})();
 	var loadThird = function(){
@@ -79,6 +81,9 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		} else {
 			loadYt();
 		}
+		$(function(){
+			webshims.loader.loadList(['track-ui']);
+		});
 	};
 	
 	webshims.addPolyfill('mediaelement-yt', {
@@ -389,8 +394,9 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 	});
 		
 	var initMediaElements = function(){
+		
 		webshims.addReady(function(context, insertedElement){
-			var medialements = $('video, audio', context)
+			$('video, audio', context)
 				.add(insertedElement.filter('video, audio'))
 				.each(function(){
 					if($.browser.msie && webshims.browserVersion > 8 && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay])')){
@@ -438,19 +444,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 							})
 						;
 					}
-					(function(){
-						var loadedTrack;
-						var loadTrackModule = function(){
-							if(!loadedTrack){
-								loadedTrack = true;
-								webshims.loader.loadList(['track-ui']);
-							}
-						};
-						webshims.ready('WINDOWLOAD', loadTrackModule);
-						if(!loadedTrack){
-							$('track', medialements).each(loadTrackModule)
-						}
-					})();
+					
 				})
 			;
 		});
@@ -459,11 +453,14 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 	if(Modernizr.track){
 		webshims.defineProperty(TextTrack.prototype, 'shimActiveCues', {
 			get: function(){
-				return this.activeCues;
+				return this._shimActiveCues || this.activeCues;
 			}
 		});
+	} else {
+		$(function(){
+			webshims.loader.loadList(['track-ui']);
+		});
 	}
-	
 	//set native implementation ready, before swf api is retested
 	if(hasNative){
 		webshims.isReady('mediaelement-core', true);

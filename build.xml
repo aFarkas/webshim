@@ -17,10 +17,6 @@
 			<fileset file="${src}/shims/dom-extend.js" />
 		</concat>
 		
-		
-		
-		
-		
 		<concat destfile="${src}/shims/combos/2.js">
 			<fileset file="${src}/shims/form-core.js" />
 			<fileset file="${src}/shims/combos/21.js" />

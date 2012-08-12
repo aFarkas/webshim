@@ -1,0 +1,17 @@
+WEBVTT
+
+1
+00:00:01.000 --> 00:00:03.100
+This is an example for our track support
+
+2
+00:00:06.100 --> 00:00:10.100
+We have implemented the track element and the TextTrack API
+
+3
+00:00:11.100 --> 00:00:18.000
+Just play with it
+
+4
+00:00:19.100 --> 00:01:18.000
+This is the end of our subtitles

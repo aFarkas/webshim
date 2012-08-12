@@ -16,7 +16,7 @@ Implemented Features:
 * HTML5 shiv and innerShiv solution including basic CSS-support
 * canvas
 * HTML5 form features including: constraint validation and form widgets (input[type="range"], input[type="date"], input[type="number"], output, input[list]/datalist)
-* HTML5 audio/video implementation
+* HTML5 audio/video/track implementation
 * interactive elements: summary/details
 * JSON (stringify and parse)
 * localStorage/sessionStorage
@@ -78,13 +78,20 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 upcomming Release 1.9.0
 ----------
 
+- basic but powerfull track-element including corresponding DOM- and JS-APIss
+- input[form] support: for associating form field using the form attribute (input[form]/select[form] ...)
 - implemented youtube iframe support for video element
-- support for associating form field using the form attribute (input[form]/select[form] ...)
 - elements property for fieldset element
-- fixed regression for using an initial value with input[type="date"] (introduced in 1.8.11)
+- allow placeholder on input[type="date"] (as a hint for the dateformat, but use data-placeholder, instead of placeholder!)
 - added opus -> mime-type detection for audio
-- allow placeholder on input[type="date"] (as a hint for the dateformat)
-- jQuery 1.6.x not tested anymore, use 1.7.2+
+- fixed regression for using an initial value with input[type="date"] (introduced in 1.8.11)
+- jQuery 1.6.x not tested anymore, use 1.7.2+ (but we will have legacy support for webshims 1.8.x)
+
+
+Release 1.8.13
+----------
+
+- fixed regression for using an initial value with input[type="date"] (introduced in 1.8.11)
 
 
 Release 1.8.11/1.8.12
