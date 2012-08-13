@@ -5,16 +5,34 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 	var notImplemented = function(){
 		webshims.error('not implemented yet');
 	};
-	var eventTargetProto = {
-		addEventListener: notImplemented,
-		removeEventListener: notImplemented,
-		dispatchEvent: notImplemented
+	
+	var createEventTarget = function(obj){
+		var eventList = {};
+		obj.addEventListener = function(name, fn){
+			if(eventList[name]){
+				webshims.error('always use $.bind to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
+			}
+			eventList[name] = fn;
+			
+		};
+		obj.removeEventListener = function(name, fn){
+			if(eventList[name] && eventList[name] != fn){
+				webshims.error('always use $.bind to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
+			}
+			if(eventList[name]){
+				delete eventList[name];
+			}
+		};
+		return obj;
 	};
+	
+	
 	var cueListProto = {
 		getCueById: notImplemented
 	};
 	var textTrackProto = {
 		shimActiveCues: null,
+		activeCues: null,
 		cues: null,
 		kind: 'subtitles',
 		label: '',
@@ -97,6 +115,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		if(settings){
 			webshims.warn("webshims currently does not support any cue settings");
 		}
+		createEventTarget(this);
 	};
 	
 	window.TextTrackCue.prototype = {
@@ -119,6 +138,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		align: 'middle'
 	};
 	
+	
 	mediaelement.createCueList = function(){
 		return $.extend([], cueListProto);
 	};
@@ -134,7 +154,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 			}
 		}
 		if(!obj){
-			obj = webshims.objectCreate(textTrackProto);
+			obj = createEventTarget(webshims.objectCreate(textTrackProto));
 			copyProps.forEach(function(copyProp){
 				var prop = $.prop(track, copyProp);
 				if(prop){
@@ -169,7 +189,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 										mediaelement.parseCaptions(text, obj, function(cues){
 											if(cues && 'length' in cues){
 												obj.cues = cues;
-												obj.shimActiveCues = mediaelement.createCueList();
+												obj.activeCues = obj.shimActiveCues = mediaelement.createCueList();
 												trackData.readyState = 2;
 												$(track).triggerHandler('load');
 												$(mediaelem).triggerHandler('updatetrackdisplay');
@@ -197,7 +217,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 				}
 			} else {
 				obj.cues = mediaelement.createCueList();
-				obj.shimActiveCues = mediaelement.createCueList();
+				obj.activeCues = obj.shimActiveCues = mediaelement.createCueList();
 				obj.mode = 1;
 			}
 		}
@@ -401,9 +421,10 @@ modified for webshims
 		if(!baseData.textTracks){
 			baseData.textTracks = [];
 			webshims.defineProperties(baseData.textTracks, {
-				onaddtrack: {value: null},
-				onremovetrack: {value: null}
+				onaddtrack: {value: null}
+//				,onremovetrack: {value: null}
 			});
+			createEventTarget(baseData.textTracks);
 		}
 		return baseData.textTracks;
 	};
@@ -411,68 +432,77 @@ modified for webshims
 	
 	webshims.defineNodeNamesBooleanProperty(['track'], 'default');
 	webshims.reflectProperties(['track'], ['srclang', 'label']);
-	webshims.defineNodeNameProperty('track', 'src', {
-		//attr: {},
-		reflect: true,
-		propType: 'src'
-	});
 	
-	webshims.defineNodeNameProperty('track', 'kind', {
-		//attr: {},
-		reflect: true,
-		propType: 'enumarated',
-		defaultValue: 'subtitles',
-		limitedTo: ['subtitles', 'captions', 'descriptions', 'chapters', 'metadata']
-	});
-	
-	webshims.defineNodeNameProperty('track', 'readyState', {
-		prop: {
-			get: function(){
-				return (webshims.data(this, 'trackData') || {readyState: 0}).readyState;
-			}
+	webshims.defineNodeNameProperties('track', {
+		kind: {
+			//attr: {},
+			reflect: true,
+			propType: 'enumarated',
+			defaultValue: 'subtitles',
+			limitedTo: ['subtitles', 'captions', 'descriptions', 'chapters', 'metadata']
+		},
+		src: {
+			//attr: {},
+			reflect: true,
+			propType: 'src'
 		}
 	});
+	
+	webshims.defineNodeNamesProperties(['track'], {
+		ERROR: {
+			value: 3
+		},
+		LOADED: {
+			value: 2
+		},
+		LOADING: {
+			value: 1
+		},
+		NONE: {
+			value: 0
+		},
+		readyState: {
+			get: function(){
+				return (webshims.data(this, 'trackData') || {readyState: 0}).readyState;
+			},
+			writeable: false
+		},
+		track: {
+			get: function(){
+				return mediaelement.createTextTrack($(this).closest('audio, video')[0], this);
+			},
+			writeable: false
+		}
+	}, 'prop');
 	
 	webshims.defineNodeNamesProperties(['audio', 'video'], {
 		textTracks: {
-			prop: {
-				get: function(){
-					$('track', this).each(function(){
-						refreshTrack(this);
-					});
-					return mediaelement.createTrackList(this);
-				}
-			}
+			get: function(){
+				$('track', this).each(function(){
+					refreshTrack(this);
+				});
+				return mediaelement.createTrackList(this);
+			},
+			writeable: false
 		},
 		addTextTrack: {
-			prop: {
-				value: function(kind, label, lang){
-					var textTrack = mediaelement.createTextTrack(this, {
-						kind: kind || '',
-						label: label || '',
-						srclang: lang || ''
-					});
-					var baseData = webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
-					if (!baseData.scriptedTextTracks) {
-						baseData.scriptedTextTracks = [];
-					}
-					baseData.scriptedTextTracks.push(textTrack);
-					updateMediaTrackList.call(this);
-					return textTrack;
+			value: function(kind, label, lang){
+				var textTrack = mediaelement.createTextTrack(this, {
+					kind: kind || '',
+					label: label || '',
+					srclang: lang || ''
+				});
+				var baseData = webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
+				if (!baseData.scriptedTextTracks) {
+					baseData.scriptedTextTracks = [];
 				}
+				baseData.scriptedTextTracks.push(textTrack);
+				updateMediaTrackList.call(this);
+				return textTrack;
 			}
 		}
-	
-	});
-		
-	webshims.defineNodeNameProperty('track', 'track', {
-		prop: {
-			get: function(){
-				return mediaelement.createTextTrack($(this).closest('audio, video')[0], this);
-			}
-		}
-		
-	});
+	}, 'prop');
+
 	
 	$(document).bind('emptied', function(e){
 		if($(e.target).is('audio, video')){

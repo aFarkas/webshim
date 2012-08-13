@@ -109,10 +109,8 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 				if(cue.pauseOnExit){
 					$(media).pause();
 				}
-				if(cue.onexit){
-					exitE.target = cue;
-					cue.onexit(exitE);
-				}
+				$(track).triggerHandler('cuechange');
+				$(cue).triggerHandler('exit');
 			} else if(baseData.visibleCue != track.shimActiveCues[0] && track.mode > 1 && showTracks[track.kind]){
 				trackDisplay.show(track.shimActiveCues[0], baseData, media);
 			}
@@ -127,10 +125,8 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 					if(track.mode > 1 && showTracks[track.kind]){
 						trackDisplay.show(cue, baseData, media);
 					}
-					if(cue.onenter){
-						enterE.target = cue;
-						cue.onenter(enterE);
-					}
+					$(track).triggerHandler('cuechange');
+					$(cue).triggerHandler('enter');
 					
 					track._lastFoundCue.time = time;
 					track._lastFoundCue.index = i;

@@ -2636,6 +2636,9 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 				return this._shimActiveCues || this.activeCues;
 			}
 		});
+		$(function(){
+			webshims.polyfill('track');
+		});
 	} else {
 		$(function(){
 			webshims.loader.loadList(['track-ui']);
