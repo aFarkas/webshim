@@ -87,7 +87,6 @@ mark {
 /* reset */
 .input-range .ui-slider-range,
 .placeholder-box,
-.placeholder-box,
 .placeholder-text,
 .input-datetime-local,
 .step-controls,
@@ -129,7 +128,6 @@ output {
 .polyfill-important .placeholder-box {
 	position: relative !important;
 	display: inline-block !important;
-	overflow: hidden !important;
 	margin: 0 !important;
 	padding: 0 !important;
 	width: auto !important;
