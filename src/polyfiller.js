@@ -26,7 +26,7 @@
 		
 	
 	var webshims = {
-		version: '1.9.0beta1',
+		version: '1.9.0pre',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -55,11 +55,9 @@
 		setOptions: function(name, opts){
 			if (typeof name == 'string' && opts !== undefined) {
 				webCFG[name] = (!$.isPlainObject(opts)) ? opts : $.extend(true, webCFG[name] || {}, opts);
+			} else if (typeof name == 'object') {
+				$.extend(true, webCFG, name);
 			}
-			else 
-				if (typeof name == 'object') {
-					$.extend(true, webCFG, name);
-				}
 		},
 		addPolyfill: function(name, cfg){
 			cfg = cfg || {};
@@ -512,7 +510,7 @@
 	$.webshims = webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var googleAPIs = protocol + 'ajax.googleapis.com/ajax/libs/';
-	var uiLib = googleAPIs + 'jqueryui/1.8.22/';
+	var uiLib = googleAPIs + 'jqueryui/1.8.23/';
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;
