@@ -72,7 +72,6 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 						});
 						
 						baseData.trackDisplay.css('fontSize', Math.max(Math.round(uiHeight / 30), 7));
-						console.log(uiHeight / 30, Math.max(Math.round(uiHeight / 30), 8))
 						baseData.hasDirtyTrackDisplay = false;
 					} else {
 						baseData.hasDirtyTrackDisplay = true;
