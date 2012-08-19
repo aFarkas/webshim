@@ -3,6 +3,7 @@
 	var hasNative = Modernizr.audio && Modernizr.video;
 	var supportsLoop = false;
 	var options = webshims.cfg.mediaelement;
+	var bugs = webshims.bugs;
 	var hasSwf;
 	if(hasNative){
 		var videoElem = document.createElement('video');
@@ -48,36 +49,38 @@
 		});
 	}
 	
-	if(!Modernizr.track || typeof $('<track />')[0].readyState != 'number'){
-		webshims.ready('dom-support', function(){
-			webshims.defineNodeNamesProperties(['track'], {
-				readyState: {
-					get: function(){
-						return ($.prop(this, 'track') || {readyState: 0}).readyState;
-					},
-					writeable: false
-				}
-			}, 'prop');
-		});
-	}
+	bugs.track = false;
+	
 	
 	if(Modernizr.track){
 		(function(){
+			
+			bugs.track = typeof $('<track />')[0].readyState != 'number' || !$('<video />')[0].addTextTrack;
+			
 			var trackOptions = webshims.cfg.track;
 			var trackListener = function(e){
 				$(e.target).filter('track').each(changeApi);
 			};
 			var changeApi = function(){
-				if(!trackOptions.override && $.prop(this, 'readyState') == 3){
+				if(bugs.track || (!trackOptions.override && $.prop(this, 'readyState') == 3)){
 					trackOptions.override = true;
 					webshims.reTest('track');
 					document.removeEventListener('error', trackListener, true);
-					webshims.error("track support was overwritten. Please check your vtt mime-type");
+					if(this && $.nodeName(this, 'track')){
+						webshims.error("track support was overwritten. Please check your vtt mime-type");
+					} else {
+						webshims.info("track support was overwritten.");
+					}
 				}
 			};
 			var detectTrackError = function(){
 				document.addEventListener('error', trackListener, true);
-				$('track').each(changeApi);
+				
+				if(bugs.track){
+					changeApi();
+				} else {
+					$('track').each(changeApi);
+				}
 			};
 			if(!trackOptions.override){
 				if(webshims.isReady('track')){
@@ -496,7 +499,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		});
 	};
 	
-	if(Modernizr.track){
+	if(Modernizr.track && !bugs.track){
 		webshims.defineProperty(TextTrack.prototype, 'shimActiveCues', {
 			get: function(){
 				return this._shimActiveCues || this.activeCues;

@@ -759,7 +759,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						return false;
 					})
 				;
-				
+				if(type == 'number'){
+					jElm.bind('keypress', (function(){
+						var chars = '0123456789.';
+						return function(event){
+							var chr = String.fromCharCode(event.charCode == null ? event.keyCode : event.charCode);
+							return event.ctrlKey || event.metaKey || (chr < ' ' || chars.indexOf(chr) > -1);
+						};
+					})());
+				}
 				if($.fn.mwheelIntent){
 					jElm.add(controls).bind('mwheelIntent', mwheelUpDown);
 				} else {

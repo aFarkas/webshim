@@ -1128,7 +1128,7 @@
 				//,override
 			},
 			test: function(){
-				return Modernizr.track && !this.options.override;
+				return Modernizr.track && !this.options.override && !bugs.track;
 			},
 			d: ['mediaelement', DOMSUPPORT],
 			methodNames: ['addTextTrack'],
@@ -1136,7 +1136,7 @@
 		});
 		
 		
-		webshims.loader.addModule('track-ui', {
+		addModule('track-ui', {
 			d: ['track']
 		});
 	}

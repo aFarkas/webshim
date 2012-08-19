@@ -112,62 +112,106 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		}
 	};
 	
-	if(!window.TextTrackCue){
-		var emptyDiv = $('<div />')[0];
-		window.TextTrackCue = function(id, startTime, endTime, text, settings, pauseOnExit){
-			this.id = id;
-			this.startTime = startTime;
-			this.endTime = endTime;
-			this.text = text;
-			this.pauseOnExit = pauseOnExit;
+	var implementTextTrackCueConstructor = function(){
+		if(!window.TextTrackCue || webshims.bugs.track){
+			var emptyDiv = $('<div />')[0];
+			window.TextTrackCue = function(id, startTime, endTime, text, settings, pauseOnExit){
+				if(arguments.length < 4 || arguments.length > 6){
+					webshims.error("wrong arguments.length for TextTrackCue.constructor");
+				}
+				this.id = id;
+				this.startTime = startTime;
+				this.endTime = endTime;
+				this.text = text;
+				this.pauseOnExit = pauseOnExit || false;
+				
+				if(settings){
+					webshims.warn("webshims currently does not support any cue settings");
+				}
+				createEventTarget(this);
+			};
 			
-			if(settings){
-				webshims.warn("webshims currently does not support any cue settings");
-			}
-			createEventTarget(this);
+			window.TextTrackCue.prototype = {
+				
+				onenter: null,
+				onexit: null,
+				pauseOnExit: false,
+				getCueAsHTML: function(){
+					var lastText = "";
+					var parsedText = "";
+					var fragment = document.createDocumentFragment();
+					var fn;
+					if(!owns(this, 'getCueAsHTML')){
+						fn = this.getCueAsHTML = function(){
+							var i, len;
+							if(lastText != this.text){
+								lastText = this.text;
+								parsedText = mediaelement.parseCueTextToHTML(lastText);
+								emptyDiv.innerHTML = parsedText;
+								
+								for(i = 0, len = emptyDiv.childNodes.length; i < len; i++){
+									fragment.appendChild(emptyDiv.childNodes[i].cloneNode(true));
+								}
+							}
+							return fragment.cloneNode(true);
+						};
+						
+					}
+					return fn ? fn.apply(this, arguments) : fragment.cloneNode(true);
+				},
+				track: null,
+				
+				//todo-->
+				id: '',
+				snapToLines: true,
+				line: -1,
+				size: 100,
+				position: 50,
+				vertical: '',
+				align: 'middle'
+			};
+		}
+	};
+	
+	implementTextTrackCueConstructor();
+	
+	mediaelement.TextTrackCue = function(id, startTime, endTime, text, settings, pauseOnExit){
+		var ret;
+		if(!id){
+			id = '';
+		}
+		if(!startTime){
+			startTime = 0;
+		}
+		if(!endTime){
+			endTime = 0;
+		}
+		if(!text){
+			text = '';
+		}
+		
+		mediaelement.TextTrackCue = function(id, startTime, endTime, text, settings, pauseOnExit){
+			return new TextTrackCue(id, startTime, endTime, text, settings || '', pauseOnExit || false);
 		};
 		
-		window.TextTrackCue.prototype = {
-			
-			onenter: null,
-			onexit: null,
-			pauseOnExit: false,
-			getCueAsHTML: function(){
-				var lastText = "";
-				var parsedText = "";
-				var fragment = document.createDocumentFragment();
-				var fn;
-				if(!owns(this, 'getCueAsHTML')){
-					fn = this.getCueAsHTML = function(){
-						var i, len;
-						if(lastText != this.text){
-							lastText = this.text;
-							parsedText = mediaelement.parseCueTextToHTML(lastText);
-							emptyDiv.innerHTML = parsedText;
-							
-							for(i = 0, len = emptyDiv.childNodes.length; i < len; i++){
-								fragment.appendChild(emptyDiv.childNodes[i].cloneNode(true));
-							}
-						}
-						return fragment.cloneNode(true);
-					};
-					
-				}
-				return fn ? fn.apply(this, arguments) : fragment.cloneNode(true);
-			},
-			track: null,
-			
-			//todo-->
-			id: '',
-			snapToLines: true,
-			line: -1,
-			size: 100,
-			position: 50,
-			vertical: '',
-			align: 'middle'
-		};
-	}
-	
+		try {
+			ret = new TextTrackCue(id, startTime, endTime, text, settings || '', pauseOnExit || false);
+		} catch(e){}
+		if(!ret){
+			try {
+				ret = new TextTrackCue(id, startTime, endTime, text);
+			} catch(e){}
+		}
+		if (!ret) {
+			webshims.bugs.track = true;
+			implementTextTrackCueConstructor();
+		} else {
+			mediaelement.TextTrackCue = function(id, startTime, endTime, text){
+				return new TextTrackCue(id, startTime, endTime, text);
+			};
+		}
+		return ret;
+	};
 	
 	mediaelement.createCueList = function(){
 		return $.extend([], cueListProto);
@@ -312,7 +356,6 @@ modified for webshims
 		var WebVTTCOMMENTCueParser		= /^(COMMENT|COMMENTS)\s+\-\-\>\s+(.*)/g;
 		
 		return function(subtitleElement,objectCount){
-			var cueStyles = "";
 			var cueDefaults = [];
 		
 			var subtitleParts, timeIn, timeOut, html, timeData, subtitlePartIndex, cueSettings = "", id, specialCueData;
@@ -320,11 +363,10 @@ modified for webshims
 
 			// WebVTT Special Cue Logic
 			if ((specialCueData = WebVTTDEFAULTSCueParser.exec(subtitleElement))) {
-				cueDefaults = specialCueData.slice(2).join("");
-				cueDefaults = cueDefaults.split(/\s+/g).filter(function(def) { return def && !!def.length; });
+//				cueDefaults = specialCueData.slice(2).join("");
+//				cueDefaults = cueDefaults.split(/\s+/g).filter(function(def) { return def && !!def.length; });
 				return null;
 			} else if ((specialCueData = WebVTTSTYLECueParser.exec(subtitleElement))) {
-				cueStyles += specialCueData[specialCueData.length-1];
 				return null;
 			} else if ((specialCueData = WebVTTCOMMENTCueParser.exec(subtitleElement))) {
 				return null; // At this stage, we don't want to do anything with these.
@@ -410,8 +452,7 @@ modified for webshims
 */
 			// The remaining lines are the subtitle payload itself (after removing an ID if present, and the time);
 			html = subtitleParts.join("\n");
-			tmpCue = new TextTrackCue(id, timeIn, timeOut, html, cueSettings, false);
-			tmpCue.styleData = cueStyles;
+			tmpCue = mediaelement.TextTrackCue(id, timeIn, timeOut, html, cueSettings, false);
 			return tmpCue;
 		};
 	})();
@@ -472,12 +513,6 @@ modified for webshims
 					}, 9);
 				}, 9);
 				
-			
-				
-				
-				
-				
-				
 			} else {
 				throw new Error("Required parameter captionData not supplied.");
 			}
@@ -530,7 +565,12 @@ modified for webshims
 		NONE: {
 			value: 0
 		},
-		
+		readyState: {
+			get: function(){
+				return ($.prop(this, 'track') || {readyState: 0}).readyState;
+			},
+			writeable: false
+		},
 		track: {
 			get: function(){
 				return mediaelement.createTextTrack($(this).closest('audio, video')[0], this);
