@@ -2120,14 +2120,8 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 	
 })();
 
-}); //webshims.ready end
-}//end formvalidation
-jQuery.webshims.ready('dom-support', function($, webshims, window, document, undefined){
-	var doc = document;	
-	
-	
-	
 	(function(){
+		var doc = document;	
 		if( 'value' in document.createElement('output') ){return;}
 		
 		webshims.defineNodeNameProperty('output', 'value', {
@@ -2196,76 +2190,75 @@ jQuery.webshims.ready('dom-support', function($, webshims, window, document, und
 				outputCreate(this);
 			});
 		});
-	})();
-	
-	
-	
-	/*
-	 * Implements input event in all browsers
-	 */
-	(function(){
-		var noInputTriggerEvts = {updateInput: 1, input: 1},
-			noInputTypes = {
-				radio: 1,
-				checkbox: 1,
-				submit: 1,
-				button: 1,
-				image: 1,
-				reset: 1,
-				file: 1
-				
-				//pro forma
-				,color: 1
-				//,range: 1
-			},
-			observe = function(input){
-				var timer,
-					lastVal = input.prop('value'),
-					trigger = function(e){
-						//input === null
-						if(!input){return;}
-						var newVal = input.prop('value');
-						
-						if(newVal !== lastVal){
-							lastVal = newVal;
-							if(!e || !noInputTriggerEvts[e.type]){
-								webshims.triggerInlineForm && webshims.triggerInlineForm(input[0], 'input');
-							}
-						}
-					},
-					extraTimer,
-					extraTest = function(){
-						clearTimeout(extraTimer);
-						extraTimer = setTimeout(trigger, 9);
-					},
-					unbind = function(){
-						input.unbind('focusout', unbind).unbind('keyup keypress keydown paste cut', extraTest).unbind('input change updateInput', trigger);
-						clearInterval(timer);
-						setTimeout(function(){
-							trigger();
-							input = null;
-						}, 1);
-						
-					}
-				;
-				
-				clearInterval(timer);
-				timer = setInterval(trigger, 99);
-				extraTest();
-				input.bind('keyup keypress keydown paste cut', extraTest).bind('focusout', unbind).bind('input updateInput change', trigger);
-			}
-		;
-		if($.event.customEvent){
-			$.event.customEvent.updateInput = true;
-		} 
 		
-		$(doc)
-			.bind('focusin', function(e){
-				if( e.target && e.target.type && !e.target.readOnly && !e.target.disabled && (e.target.nodeName || '').toLowerCase() == 'input' && !noInputTypes[e.target.type] ){
-					observe($(e.target));
+		/*
+		 * Implements input event in all browsers
+		 */
+		(function(){
+			var noInputTriggerEvts = {updateInput: 1, input: 1},
+				noInputTypes = {
+					radio: 1,
+					checkbox: 1,
+					submit: 1,
+					button: 1,
+					image: 1,
+					reset: 1,
+					file: 1
+					
+					//pro forma
+					,color: 1
+					//,range: 1
+				},
+				observe = function(input){
+					var timer,
+						lastVal = input.prop('value'),
+						trigger = function(e){
+							//input === null
+							if(!input){return;}
+							var newVal = input.prop('value');
+							
+							if(newVal !== lastVal){
+								lastVal = newVal;
+								if(!e || !noInputTriggerEvts[e.type]){
+									webshims.triggerInlineForm && webshims.triggerInlineForm(input[0], 'input');
+								}
+							}
+						},
+						extraTimer,
+						extraTest = function(){
+							clearTimeout(extraTimer);
+							extraTimer = setTimeout(trigger, 9);
+						},
+						unbind = function(){
+							input.unbind('focusout', unbind).unbind('keyup keypress keydown paste cut', extraTest).unbind('input change updateInput', trigger);
+							clearInterval(timer);
+							setTimeout(function(){
+								trigger();
+								input = null;
+							}, 1);
+							
+						}
+					;
+					
+					clearInterval(timer);
+					timer = setInterval(trigger, 99);
+					extraTest();
+					input.bind('keyup keypress keydown paste cut', extraTest).bind('focusout', unbind).bind('input updateInput change', trigger);
 				}
-			})
-		;
+			;
+			if($.event.customEvent){
+				$.event.customEvent.updateInput = true;
+			} 
+			
+			$(doc)
+				.bind('focusin', function(e){
+					if( e.target && e.target.type && !e.target.readOnly && !e.target.disabled && (e.target.nodeName || '').toLowerCase() == 'input' && !noInputTypes[e.target.type] ){
+						observe($(e.target));
+					}
+				})
+			;
+		})();
 	})();
-	webshims.isReady('form-output', true);
-});
+
+}); //webshims.ready end
+}//end formvalidation

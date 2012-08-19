@@ -1470,7 +1470,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		orig
 			.after(shim)
-			.hide()
+			.css({display: 'none'})
 		;
 		
 		if(orig[0].form){
