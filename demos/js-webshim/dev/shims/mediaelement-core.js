@@ -67,7 +67,7 @@
 					webshims.reTest('track');
 					document.removeEventListener('error', trackListener, true);
 					if(this && $.nodeName(this, 'track')){
-						webshims.error("track support was overwritten. Please check your vtt mime-type");
+						webshims.error("track support was overwritten. Please check your vtt including your vtt mime-type");
 					} else {
 						webshims.info("track support was overwritten.");
 					}

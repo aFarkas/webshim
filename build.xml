@@ -126,7 +126,6 @@
 		<concat destfile="${src}/shims/combos/21.js">
 			<fileset file="${src}/shims/form-message.js" />
 			<fileset file="${src}/shims/form-shim-extend.js" />
-			<fileset file="${src}/shims/form-output.js" />
 		</concat>
 		
 		<concat destfile="${src}/shims/combos/22.js">

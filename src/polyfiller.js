@@ -939,7 +939,7 @@
 		});
 		
 		if(Modernizr[formvalidation]){
-			bugs.bustedValidity = Modernizr.formattribute === false || !Modernizr.fieldsetdisabled || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
+			bugs.bustedValidity = Modernizr.formattribute === false || !Modernizr.fieldsetdisabled || !('value' in document.createElement('output')) || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
 		}
 		
 		addTest('styleableinputrange', function(){
@@ -1015,14 +1015,6 @@
 			d: [DOMSUPPORT],
 			c: [3, 2, 23, 21, 59, 17, 5, 4]
 		});
-		
-		webshims.addPolyfill('form-output', {
-			f: 'forms',
-			test: ('value' in document.createElement('output')),
-			d: [DOMSUPPORT],
-			c: [3, 2, 23, 21]
-		});
-		
 		
 		addPolyfill('form-number-date-api', {
 			f: 'forms-ext',
@@ -1134,7 +1126,6 @@
 			methodNames: ['addTextTrack'],
 			c: []
 		});
-		
 		
 		addModule('track-ui', {
 			d: ['track']

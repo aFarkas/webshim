@@ -17,7 +17,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		};
 		obj.removeEventListener = function(name, fn){
 			if(eventList[name] && eventList[name] != fn){
-				webshims.error('always use $.bind to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
+				webshims.error('always use $.unbind to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
 			}
 			if(eventList[name]){
 				delete eventList[name];
@@ -642,16 +642,12 @@ modified for webshims
 									shimedTrack.mode = origTrack.mode;
 								}
 								origTrack.mode = 0;
-								if (!readyState && $.prop(this, 'default')) {
-									$(this).one('load', function(){
-										this.track.mode = 0;
-									});
-								}
 							}
 						})
 						.bind('load error', function(e){
 							if(e.originalEvent){
 								e.stopImmediatePropagation();
+								this.track.mode = 0;
 							}
 						})
 					;

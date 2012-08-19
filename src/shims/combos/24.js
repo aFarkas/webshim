@@ -671,8 +671,10 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		},
 		contentAttr: function(elem, name, val){
 			if(!elem.nodeName){return;}
+			var attr;
 			if(val === undefined){
-				val = (elem.attributes[name] || {}).value;
+				attr = (elem.attributes[name] || {});
+				val = attr.specified ? attr.value : null;
 				return (val == null) ? undefined : val;
 			}
 			
@@ -2247,7 +2249,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					webshims.reTest('track');
 					document.removeEventListener('error', trackListener, true);
 					if(this && $.nodeName(this, 'track')){
-						webshims.error("track support was overwritten. Please check your vtt mime-type");
+						webshims.error("track support was overwritten. Please check your vtt including your vtt mime-type");
 					} else {
 						webshims.info("track support was overwritten.");
 					}
