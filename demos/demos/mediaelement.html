@@ -254,7 +254,7 @@
 					<li><small>2.videoHeight/videoWidth not supported with youtube videos.</small></li>
 					<li><small>3. mediaLoad is the jQuery plugin method, which corresponds to the native load method (Webshims lib does not override jQuery's own load-method), ( $('video')[0].load() === $('video:first').mediaLoad() ).</small></li>
 					<li><small>4. canPlayType returns "maybe" if native player can't play, but Flash can and is installed. (i.e.: $('video').canPlayType('video/flv') might return "mabe")</small></li>
-				</pul>
+				</ul>
 				
 				<h3>Options for the <code>mediaelement</code> feature</h3>
 				
@@ -292,6 +292,17 @@ $("video.my-video").loadMediaSrc(
 					<li><strong>properties/IDLs</strong>: <a href="http://www.w3.org/TR/html5/the-track-element.html#dom-track-readystate">readystate</a>, <a href="http://www.w3.org/TR/html5/the-track-element.html#dom-track-track">track</a>, <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-texttracks">textTracks</a></li>
 					<li><strong>methods</strong>: <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-addtexttrack">addTextTrack</a></li>
 					<li><strong>events</strong>: <a href="http://www.w3.org/TR/html5/media-elements.html#handler-texttrack-oncuechange">cuechange</a>, <a href="http://www.w3.org/TR/html5/media-elements.html#handler-texttrackcue-onenter">enter</a>, <a href="http://www.w3.org/TR/html5/media-elements.html#handler-texttrackcue-onexit">exit</a></li>
+					<li><strong>corresponding interfaces</strong>: <a href="http://dev.w3.org/html5/spec/media-elements.html#texttracklist">TextTrackList</a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrack">TextTrack<sup>1</sup></a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrackcuelist">TextTrackCueList</a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrackcue">TextTrackCue</a> including the <a href="http://dev.w3.org/html5/spec/media-elements.html#dom-texttrackcue">TrextTrackCue constructor</a></li>
+				</ul>
+				<ul>
+					<li><small>1.Use shimActiveCues instead of activeCues property.</small></li>
+				</ul>
+				
+				<h3>Options for the <code>track</code> feature</h3>
+				
+				<ul>
+					<li><strong>override</strong> (false): Overrides native track implementation. In case you have to deal with some cross-browser issues with nativ3e implementation.</li>
+					<li><strong>positionDisplay</strong> (true): Positions the cue display via JavaScript.</li>
 				</ul>
 			</section>
 			<section>

@@ -3,31 +3,59 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 	var enterE = {type: 'enter'};
 	var exitE = {type: 'exit'};
 	var showTracks = {subtitles: 1, captions: 1};
+	var usesNativeTrack =  function(){
+		return !options.override && Modernizr.track;
+	};
 	
 	var trackDisplay = {
-		show: function(cue, baseData, media){
-			if(!baseData.trackDisplay){
-				baseData.trackDisplay = $('<div class="cue-display"></div>').insertAfter(media);
-				baseData.hasVisibleTrack = 0;
-				this.addEvents(baseData, media);
-			}
-			if(!baseData.currentTrack || cue.track == baseData.currentTrack){
-				baseData.hasVisibleTrack++;
-				baseData.currentTrack = cue.track;
-				baseData.visibleCue = cue;
-				if(baseData.hasDirtyTrackDisplay){
-					media.triggerHandler('forceupdatetrackdisplay');
-				}
-				baseData.trackDisplay.html('<span class="cue-text"><span>'+ cue.text +'</span></span>');
+		update: function(baseData, media){
+			if(!baseData.activeCues.length){
+				this.hide(baseData);
 			} else {
-				webshims.warn("we only handle one visible track");
+				if(!this.compareArray(baseData.displayedActiveCues, baseData.activeCues)){
+					baseData.displayedActiveCues = baseData.activeCues;
+					if(!baseData.trackDisplay){
+						baseData.trackDisplay = $('<div class="cue-display"></div>').insertAfter(media);
+						this.addEvents(baseData, media);
+					}
+					
+					if(baseData.hasDirtyTrackDisplay){
+						media.triggerHandler('forceupdatetrackdisplay');
+					}
+					this.showCues(baseData);
+				}
 			}
-		}, 
+		},
+		showCues: function(baseData){
+			var element = $('<span class="cue-wrapper" />');
+			$.each(baseData.displayedActiveCues, function(i, cue){
+				element.append(
+					$('<span class="cue" />').html(cue.getCueAsHTML())
+				);
+			});
+			baseData.trackDisplay.html(element);
+		},
+		compareArray: function(a1, a2){
+			var ret = true;
+			var i = 0;
+			var len = a1.length;
+			if(len != a2.length){
+				ret = false;
+			} else {
+				for(; i < len; i++){
+					if(a1[i] != a2[i]){
+						ret = false;
+						break;
+					}
+				}
+			}
+			return ret;
+		},
 		addEvents: function(baseData, media){
 			if(options.positionDisplay){
 				var timer;
 				var positionDisplay = function(_force){
-					if(baseData.hasVisibleTrack || _force === true){
+					if(baseData.displayedActiveCues.length || _force === true){
 						baseData.trackDisplay.css({display: 'none'});
 						var uiElement = media.getShadowElement();
 						var offsetElement = uiElement.offsetParent();
@@ -38,25 +66,13 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 						baseData.trackDisplay.css({
 							left: position.left,
 							width: uiWidth,
-							height: uiHeight - 5,
+							height: uiHeight - 45,
 							top: position.top,
 							display: 'block'
 						});
 						
-						if(displaySize < 80000){
-							displaySize = 'xs';
-						} else if(displaySize >= 80000 && displaySize < 100000) {
-							displaySize = 's';
-						} else if(displaySize >= 100000 && displaySize < 300000) {
-							displaySize = 'm';
-						} else if(displaySize >= 300000 && displaySize < 550000) {
-							displaySize = 'l';
-						} else if(displaySize >= 550000 && displaySize < 990000) {
-							displaySize = 'xl';
-						} else if(displaySize >= 990000) {
-							displaySize = 'xxl';
-						}
-						baseData.trackDisplay.attr('data-displaysize', displaySize);
+						baseData.trackDisplay.css('fontSize', Math.max(Math.round(uiHeight / 30), 7));
+						console.log(uiHeight / 30, Math.max(Math.round(uiHeight / 30), 8))
 						baseData.hasDirtyTrackDisplay = false;
 					} else {
 						baseData.hasDirtyTrackDisplay = true;
@@ -75,11 +91,9 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 				forceUpdate();
 			}
 		},
-		hide: function(track, baseData){
-			if(baseData.trackDisplay && track == baseData.currentTrack){
-				baseData.hasVisibleTrack--;
-				baseData.currentTrack = false;
-				baseData.visibleCue = false;
+		hide: function(baseData){
+			if(baseData.trackDisplay && baseData.displayedActiveCues.length){
+				baseData.displayedActiveCues = [];
 				baseData.trackDisplay.empty();
 			}
 		}
@@ -96,53 +110,52 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 			track._shimActiveCues = [];
 		}
 		
-		var len = track.cues.length;
-		var i = track._lastFoundCue.time < time ? track._lastFoundCue.index : 0;
+		var i = 0;
+		var len;
 		var cue;
 		
-		
-		if(track.shimActiveCues.length){
-			if(track.shimActiveCues[0].startTime > time || track.shimActiveCues[0].endTime < time){
-				cue = track.shimActiveCues[0];
-				track.shimActiveCues.pop();
-				trackDisplay.hide(track, baseData);
+		for(; i < track.shimActiveCues.length; i++){
+			cue = track.shimActiveCues[i];
+			if(cue.startTime > time || cue.endTime < time){
+				track.shimActiveCues.splice(i, 1);
+				i--;
 				if(cue.pauseOnExit){
 					$(media).pause();
 				}
 				$(track).triggerHandler('cuechange');
 				$(cue).triggerHandler('exit');
-			} else if(baseData.visibleCue != track.shimActiveCues[0] && track.mode > 1 && showTracks[track.kind]){
-				trackDisplay.show(track.shimActiveCues[0], baseData, media);
+			} else if(track.mode > 1 && showTracks[track.kind] && $.inArray(cue, baseData.activeCues) == -1){
+				baseData.activeCues.push(cue);
 			}
 		}
+		
 
-		if(!track.shimActiveCues.length){
-			for(; i < len; i++){
-				cue = track.cues[i];
+		len = track.cues.length;
+		i = track._lastFoundCue.time < time ? track._lastFoundCue.index : 0;
+		
+		for(; i < len; i++){
+			cue = track.cues[i];
+			
+			if(cue.startTime <= time && cue.endTime >= time && $.inArray(cue, track.shimActiveCues) == -1){
+				track.shimActiveCues.push(cue);
+				if(track.mode > 1 && showTracks[track.kind]){
+					baseData.activeCues.push(cue);
+				}
+				$(track).triggerHandler('cuechange');
+				$(cue).triggerHandler('enter');
 				
-				if(cue.startTime <= time && cue.endTime >= time){
-					track.shimActiveCues.push(cue);
-					if(track.mode > 1 && showTracks[track.kind]){
-						trackDisplay.show(cue, baseData, media);
-					}
-					$(track).triggerHandler('cuechange');
-					$(cue).triggerHandler('enter');
-					
-					track._lastFoundCue.time = time;
-					track._lastFoundCue.index = i;
-					
-					//found 1
-					break;
-					
-				}
-				if(cue.startTime > time){
-					break;
-				}
+				track._lastFoundCue.time = time;
+				track._lastFoundCue.index = i;
+				
+				
+			}
+			if(cue.startTime > time){
+				break;
 			}
 		}
 	};
 	
-	if(Modernizr.track){
+	if(usesNativeTrack()){
 		(function(){
 			var block;
 			var triggerDisplayUpdate = function(elem){
@@ -184,12 +197,11 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 				});
 			});
 		})();
-	
 	}
 	
 	webshims.addReady(function(context, insertedElement){
-		$('video, audio', context)
-			.add(insertedElement.filter('video, audio'))
+		$('video', context)
+			.add(insertedElement.filter('video'))
 			.each(function(){
 				var trackList;
 				var elem = $(this);
@@ -205,29 +217,36 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 							if(!trackList || !baseData){
 								trackList = elem.prop('textTracks');
 								baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
+								if(!baseData.displayedActiveCues){
+									baseData.displayedActiveCues = [];
+								}
 							}
 							
 							if (!trackList){return;}
 							time = elem.prop('currentTime');
 							
 							if(!time && time !== 0){return;}
+							baseData.activeCues = [];
 							for(var i = 0, len = trackList.length; i < len; i++){
 								track = trackList[i];
 								if(track.mode > 0 && track.cues && track.cues.length){
 									webshims.mediaelement.getActiveCue(track, elem, time, baseData);
 								} else {
-									trackDisplay.hide(track, baseData);
+									//remove form activeCues
 								}
 							}
+							trackDisplay.update(baseData, elem);
+							
 						})
 					;
 				};
-				if(!Modernizr.track || elem.is('.nonnative-api-active')){
+				if(!usesNativeTrack()){
 					addTrackView();
-				}
-				if(Modernizr.track){
-					elem.bind('mediaelementapichange', function(){
-						if(elem.is('.nonnative-api-active')){
+				} else {
+					elem.bind('mediaelementapichange trackapichange', function(){
+						trackList = false;
+						baseData = false;
+						if(!usesNativeTrack() || elem.is('.nonnative-api-active')){
 							addTrackView();
 						} else {
 							if(!trackList || !baseData){
@@ -246,7 +265,6 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 					});
 				}
 			})
-			
 		;
 	});
 });

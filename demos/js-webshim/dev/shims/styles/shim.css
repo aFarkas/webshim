@@ -37,13 +37,23 @@ audio * {
 	text-align: center;
 	visibility: hidden;
 	font-family: sans-serif;
-	font-size: 10px;
+	font-size: 12px;
+	white-space: pre-wrap;
 	overflow: hidden;
 }
-.cue-display span.cue-text {
+.cue-display b {
+	font-weight: bold;
+}
+.cue-display i {
+	font-style: italic;
+}
+.cue-display u {
+	text-decoration: underline;
+}
+.cue-display span.cue-wrapper {
 	position: absolute;
 	left: 0;
-	bottom: 40px;
+	bottom: 0;
 	right: 0;
 	display: block;
 	padding: 0;
@@ -53,30 +63,14 @@ audio * {
 	color: #fff;
 	visibility: visible !important;
 }
-.cue-display span.cue-text span {
+.cue-display span.cue {
 	display: inline-block;
-	padding: 5px 8px;
+	padding: 3px 5px;
 	background: #000;
-	background: rgba(0,0,0,0.9);
+	background: rgba(0,0,0,0.8);
+	color: #fff;
 }
-.cue-display[data-displaysize="xs"] span.cue-text {
-	font-size: 120%;
-}
-.cue-display[data-displaysize="s"] span.cue-text {
-	font-size: 150%;
-}
-.cue-display[data-displaysize="m"] span.cue-text {
-	font-size: 170%;
-}
-.cue-display[data-displaysize="l"] span.cue-text {
-	font-size: 190%;
-}
-.cue-display[data-displaysize="xl"] span.cue-text {
-	font-size: 240%;
-}
-.cue-display[data-displaysize="xxl"] span.cue-text {
-	font-size: 300%;
-}
+
 mark {
 	background-color: #ff9;
 	color: #000; 

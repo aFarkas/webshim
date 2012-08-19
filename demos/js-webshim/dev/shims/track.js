@@ -32,12 +32,14 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 	};
 	var textTrackProto = {
 		shimActiveCues: null,
+		_shimActiveCues: null,
 		activeCues: null,
 		cues: null,
 		kind: 'subtitles',
 		label: '',
 		language: '',
 		mode: 0,
+		readyState: 0,
 		oncuechange: null,
 		toString: function() {
 			return "[object TextTrack]";
@@ -56,9 +58,15 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		DISABLED: 0,
 		OFF: 0,
 		HIDDEN: 1,
-		SHOWING: 2
+		SHOWING: 2,
+		ERROR: 3,
+		LOADED: 2,
+		LOADING: 1,
+		NONE: 0
 	};
 	var copyProps = ['kind', 'label', 'srclang'];
+	
+	var owns = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
 	
 	var updateMediaTrackList = function(){
 		var trackList = $.prop(this, 'textTracks');
@@ -92,7 +100,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 			mode = (trackData.track || {}).mode; 
 			setTimeout(function(){
 				if(mode !== (trackData.track || {}).mode){
-					if(!trackData.readyState){
+					if(!(trackData.track || {}).readyState){
 						$(track).triggerHandler('checktrackmode');
 					} else {
 						$(track).parent().triggerHandler('updatetrackdisplay');
@@ -104,44 +112,103 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		}
 	};
 	
-	
-	window.TextTrackCue = function(id, startTime, endTime, text, settings, pauseOnExit){
-		this.id = id;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.text = text;
-		this.pauseOnExit = pauseOnExit;
-		
-		if(settings){
-			webshims.warn("webshims currently does not support any cue settings");
-		}
-		createEventTarget(this);
-	};
-	
-	window.TextTrackCue.prototype = {
-		
-		onenter: null,
-		onexit: null,
-		pauseOnExit: false,
-		getCueAsHTML: function(){
+	if(!window.TextTrackCue){
+		var emptyDiv = $('<div />')[0];
+		window.TextTrackCue = function(id, startTime, endTime, text, settings, pauseOnExit){
+			this.id = id;
+			this.startTime = startTime;
+			this.endTime = endTime;
+			this.text = text;
+			this.pauseOnExit = pauseOnExit;
 			
-		},
-		track: null,
+			if(settings){
+				webshims.warn("webshims currently does not support any cue settings");
+			}
+			createEventTarget(this);
+		};
 		
-		//todo-->
-		id: '',
-		snapToLines: true,
-		line: -1,
-		size: 100,
-		position: 50,
-		vertical: '',
-		align: 'middle'
-	};
+		window.TextTrackCue.prototype = {
+			
+			onenter: null,
+			onexit: null,
+			pauseOnExit: false,
+			getCueAsHTML: function(){
+				var lastText = "";
+				var parsedText = "";
+				var fragment = document.createDocumentFragment();
+				var fn;
+				if(!owns(this, 'getCueAsHTML')){
+					fn = this.getCueAsHTML = function(){
+						var i, len;
+						if(lastText != this.text){
+							lastText = this.text;
+							parsedText = mediaelement.parseCueTextToHTML(lastText);
+							emptyDiv.innerHTML = parsedText;
+							
+							for(i = 0, len = emptyDiv.childNodes.length; i < len; i++){
+								fragment.appendChild(emptyDiv.childNodes[i].cloneNode(true));
+							}
+						}
+						return fragment.cloneNode(true);
+					};
+					
+				}
+				return fn ? fn.apply(this, arguments) : fragment.cloneNode(true);
+			},
+			track: null,
+			
+			//todo-->
+			id: '',
+			snapToLines: true,
+			line: -1,
+			size: 100,
+			position: 50,
+			vertical: '',
+			align: 'middle'
+		};
+	}
 	
 	
 	mediaelement.createCueList = function(){
 		return $.extend([], cueListProto);
 	};
+	
+	mediaelement.parseCueTextToHTML = (function(){
+		var tagSplits = /(<\/?[^>]+>)/ig;
+		var allowedTags = /^(?:c|v|ruby|rt|b|i|u)/;
+		var regEnd = /\<\s*\//;
+		var addToTemplate = function(localName, attribute, tag, html){
+			var ret;
+			if(regEnd.test(html)){
+				ret = '</'+ localName +'>';
+			} else {
+				tag.splice(0, 1);
+				ret =  '<'+ localName +' '+ attribute +'="'+ (tag.join(' ').replace(/\"/g, '&quot;')) +'">';
+			}
+			return ret;
+		};
+		var replacer = function(html){
+			var tag = html.replace(/[<\/>]+/ig,"").split(/[\s\.]+/);
+			if(tag[0]){
+				tag[0] = tag[0].toLowerCase();
+				if(allowedTags.test(tag[0])){
+					if(tag[0] == 'c'){
+						tag.splice(0, 1);
+						html = addToTemplate('span', 'class', tag, html);
+					} else if(tag[0] == 'v'){
+						html = addToTemplate('q', 'title', tag, html);
+					}
+				} else {
+					html = "";
+				}
+			}
+			return html;
+		};
+		
+		return function(cueText){
+			return cueText.replace(tagSplits, replacer);
+		};
+	})();
 	
 	mediaelement.createTextTrack = function(mediaelem, track){
 		var obj, trackData, load, loadEvents;
@@ -172,12 +239,12 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 					if(obj.mode){
 						$(mediaelem).unbind(loadEvents, load);
 						$(track).unbind('checktrackmode', load);
-						if(!trackData.readyState){
+						if(!obj.readyState){
 							error = function(){
-								trackData.readyState = 3;
+								obj.readyState = 3;
 								$(track).triggerHandler('error');
 							};
-							trackData.readyState = 1;
+							obj.readyState = 1;
 							try {
 								ajax = $.ajax({
 									dataType: 'text',
@@ -189,8 +256,8 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 										mediaelement.parseCaptions(text, obj, function(cues){
 											if(cues && 'length' in cues){
 												obj.cues = cues;
-												obj.activeCues = obj.shimActiveCues = mediaelement.createCueList();
-												trackData.readyState = 2;
+												obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = mediaelement.createCueList();
+												obj.readyState = 2;
 												$(track).triggerHandler('load');
 												$(mediaelem).triggerHandler('updatetrackdisplay');
 											} else {
@@ -208,7 +275,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 						}
 					}
 				};
-				trackData = webshims.data(track, 'trackData', {track: obj, readyState: 0});
+				trackData = webshims.data(track, 'trackData', {track: obj});
 				$(mediaelem).bind(loadEvents, load);
 				$(track).bind('checktrackmode', load);
 				if($.prop(track, 'default')){
@@ -217,8 +284,9 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 				}
 			} else {
 				obj.cues = mediaelement.createCueList();
-				obj.activeCues = obj.shimActiveCues = mediaelement.createCueList();
+				obj.activeCues = obj._shimActiveCues = obj.shimActiveCues = mediaelement.createCueList();
 				obj.mode = 1;
+				obj.readyState = 2;
 			}
 		}
 		return obj;
@@ -236,7 +304,7 @@ https://github.com/cgiffard/Captionator
 modified for webshims
 */
 	mediaelement.parseCaptionChunk = (function(){
-		// Set up timestamp parsers - SRT does WebVTT timestamps as well.
+		// Set up timestamp parsers
 		var WebVTTTimestampParser			= /^(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s+\-\-\>\s+(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s*(.*)/;
 		var GoogleTimestampParser		= /^([\d\.]+)\s+\+([\d\.]+)\s*(.*)/;
 		var WebVTTDEFAULTSCueParser		= /^(DEFAULTS|DEFAULT)\s+\-\-\>\s+(.*)/g;
@@ -429,24 +497,25 @@ modified for webshims
 		return baseData.textTracks;
 	};
 	
-	
-	webshims.defineNodeNamesBooleanProperty(['track'], 'default');
-	webshims.reflectProperties(['track'], ['srclang', 'label']);
-	
-	webshims.defineNodeNameProperties('track', {
-		kind: {
-			//attr: {},
-			reflect: true,
-			propType: 'enumarated',
-			defaultValue: 'subtitles',
-			limitedTo: ['subtitles', 'captions', 'descriptions', 'chapters', 'metadata']
-		},
-		src: {
-			//attr: {},
-			reflect: true,
-			propType: 'src'
-		}
-	});
+	if(!Modernizr.track){
+		webshims.defineNodeNamesBooleanProperty(['track'], 'default');
+		webshims.reflectProperties(['track'], ['srclang', 'label']);
+		
+		webshims.defineNodeNameProperties('track', {
+			kind: {
+				//attr: {},
+				reflect: true,
+				propType: 'enumarated',
+				defaultValue: 'subtitles',
+				limitedTo: ['subtitles', 'captions', 'descriptions', 'chapters', 'metadata']
+			},
+			src: {
+				//attr: {},
+				reflect: true,
+				propType: 'src'
+			}
+		});
+	}
 	
 	webshims.defineNodeNamesProperties(['track'], {
 		ERROR: {
@@ -461,12 +530,7 @@ modified for webshims
 		NONE: {
 			value: 0
 		},
-		readyState: {
-			get: function(){
-				return (webshims.data(this, 'trackData') || {readyState: 0}).readyState;
-			},
-			writeable: false
-		},
+		
 		track: {
 			get: function(){
 				return mediaelement.createTextTrack($(this).closest('audio, video')[0], this);
@@ -512,9 +576,52 @@ modified for webshims
 		}
 	});
 	
+	var getNativeReadyState = function(trackElem, textTrack){
+		return textTrack.readyState || trackElem.readyState;
+	};
+	
 	webshims.addReady(function(context, insertedElement){
-		$('video, audio', context).add(insertedElement.filter('video, audio')).each(updateMediaTrackList);
-		insertedElement.filter('track').parent('audio, video').each(updateMediaTrackList);
+		$('video, audio', context)
+			.add(insertedElement.filter('video, audio, track').closest('audio, video'))
+			.each(updateMediaTrackList)
+			.each(function(){
+				if(Modernizr.track){
+					var shimedTextTracks = $.prop(this, 'textTracks');
+					var origTextTracks = this.textTracks;
+					if(shimedTextTracks.length != origTextTracks.length){
+						webshims.error("textTracks couldn't be copied");
+					}
+					$('track', this)
+						.each(function(){
+							var shimedTrack = $.prop(this, 'track');
+							var origTrack = this.track;
+							var readyState;
+							if(origTrack){
+								readyState = getNativeReadyState(this, origTrack);
+								if (origTrack.mode || readyState) {
+									shimedTrack.mode = origTrack.mode;
+								}
+								origTrack.mode = 0;
+								if (!readyState && $.prop(this, 'default')) {
+									$(this).one('load', function(){
+										this.track.mode = 0;
+									});
+								}
+							}
+						})
+						.bind('load error', function(e){
+							if(e.originalEvent){
+								e.stopImmediatePropagation();
+							}
+						})
+					;
+				}
+			})
+		;
 	});
+	
+	if(Modernizr.track){
+		$('video, audio').trigger('trackapichange');
+	}
 	
 });

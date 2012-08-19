@@ -939,7 +939,7 @@
 		});
 		
 		if(Modernizr[formvalidation]){
-			bugs.bustedValidity = !Modernizr.fieldsetdisabled || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
+			bugs.bustedValidity = Modernizr.formattribute === false || !Modernizr.fieldsetdisabled || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
 		}
 		
 		addTest('styleableinputrange', function(){
@@ -1125,8 +1125,11 @@
 		addPolyfill('track', {
 			options: {
 				positionDisplay: true
+				//,override
 			},
-			test: Modernizr.track,
+			test: function(){
+				return Modernizr.track && !this.options.override;
+			},
 			d: ['mediaelement', DOMSUPPORT],
 			methodNames: ['addTextTrack'],
 			c: []

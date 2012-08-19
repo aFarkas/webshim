@@ -2,7 +2,8 @@
 	"use strict";
 	var hasNative = Modernizr.audio && Modernizr.video;
 	var supportsLoop = false;
-	
+	var options = webshims.cfg.mediaelement;
+	var hasSwf;
 	if(hasNative){
 		var videoElem = document.createElement('video');
 		Modernizr.videoBuffered = ('buffered' in videoElem);
@@ -20,10 +21,80 @@
 			webshims.reTest('mediaelement-native-fix');
 		}
 	}
+	
+	if(hasNative && !options.preferFlash){
+		var switchOptions = function(e){
+			var parent = e.target.parentNode;
+			if(!options.preferFlash && ($(e.target).is('audio, video') || (parent && $('source:last', parent)[0] == e.target)) ){
+				webshims.ready('mediaelement-swf', function(){
+					setTimeout(function(){
+						if(hasSwf && !options.preferFlash && !$(e.target).closest('audio, video').is('.nonnative-api-active')){
+							options.preferFlash = true;
+							document.removeEventListener('error', switchOptions, true);
+							$('audio, video').mediaLoad();
+							webshims.info("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src);
+						} else if(!hasSwf){
+							document.removeEventListener('error', switchOptions, true);
+						}
+					}, 20);
+				});
+			}
+		};
+		document.addEventListener('error', switchOptions, true);
+		$('audio, video').each(function(){
+			if(this.error){
+				switchOptions({target: this});
+			}
+		});
+	}
+	
+	if(!Modernizr.track || typeof $('<track />')[0].readyState != 'number'){
+		webshims.ready('dom-support', function(){
+			webshims.defineNodeNamesProperties(['track'], {
+				readyState: {
+					get: function(){
+						return ($.prop(this, 'track') || {readyState: 0}).readyState;
+					},
+					writeable: false
+				}
+			}, 'prop');
+		});
+	}
+	
+	if(Modernizr.track){
+		(function(){
+			var trackOptions = webshims.cfg.track;
+			var trackListener = function(e){
+				$(e.target).filter('track').each(changeApi);
+			};
+			var changeApi = function(){
+				if(!trackOptions.override && $.prop(this, 'readyState') == 3){
+					trackOptions.override = true;
+					webshims.reTest('track');
+					document.removeEventListener('error', trackListener, true);
+					webshims.error("track support was overwritten. Please check your vtt mime-type");
+				}
+			};
+			var detectTrackError = function(){
+				document.addEventListener('error', trackListener, true);
+				$('track').each(changeApi);
+			};
+			if(!trackOptions.override){
+				if(webshims.isReady('track')){
+					detectTrackError();
+				} else {
+					$(detectTrackError);
+				}
+			}
+		})();
+		
+	}
 
-jQuery.webshims.register('mediaelement-core', function($, webshims, window, document, undefined){
+webshims.register('mediaelement-core', function($, webshims, window, document, undefined){
+	hasSwf = swfobject.hasFlashPlayerVersion('9.0.115');
+	
 	var mediaelement = webshims.mediaelement;
-	var options = webshims.cfg.mediaelement;
+	
 	var getSrcObj = function(elem, nodeName){
 		elem = $(elem);
 		var src = {src: elem.attr('src') || '', elem: elem, srcProp: elem.prop('src')};
@@ -54,7 +125,7 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 	};
 	
 	
-	var hasSwf = swfobject.hasFlashPlayerVersion('9.0.115');
+	
 	var hasYt = !hasSwf && ('postMessage' in window) && hasNative;
 	var loadSwf = function(){
 		webshims.ready('mediaelement-swf', function(){
@@ -232,31 +303,6 @@ jQuery.webshims.register('mediaelement-core', function($, webshims, window, docu
 		}
 		return ret;
 	};
-	
-	if(hasNative && hasSwf && !options.preferFlash){
-		var switchOptions = function(e){
-			var parent = e.target.parentNode;
-			if(!options.preferFlash && ($(e.target).is('audio, video') || (parent && $('source:last', parent)[0] == e.target)) ){
-				webshims.ready('mediaelement-swf', function(){
-					setTimeout(function(){
-						if(!$(e.target).closest('audio, video').is('.nonnative-api-active')){
-							options.preferFlash = true;
-							document.removeEventListener('error', switchOptions, true);
-							$('audio, video').mediaLoad();
-						}
-					}, 20);
-				});
-			}
-		};
-		document.addEventListener('error', switchOptions, true);
-		$.webshims.ready('DOM', function(){
-			$('audio, video').each(function(){
-				if(this.error){
-					switchOptions({target: this});
-				}
-			});
-		});
-	}
 	
 	mediaelement.setError = function(elem, message){
 		if(!message){
