@@ -112,106 +112,67 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		}
 	};
 	
-	var implementTextTrackCueConstructor = function(){
-		if(!window.TextTrackCue || webshims.bugs.track){
-			var emptyDiv = $('<div />')[0];
-			window.TextTrackCue = function(id, startTime, endTime, text, settings, pauseOnExit){
-				if(arguments.length < 4 || arguments.length > 6){
-					webshims.error("wrong arguments.length for TextTrackCue.constructor");
-				}
-				this.id = id;
-				this.startTime = startTime;
-				this.endTime = endTime;
-				this.text = text;
-				this.pauseOnExit = pauseOnExit || false;
-				
-				if(settings){
-					webshims.warn("webshims currently does not support any cue settings");
-				}
-				createEventTarget(this);
-			};
-			
-			window.TextTrackCue.prototype = {
-				
-				onenter: null,
-				onexit: null,
-				pauseOnExit: false,
-				getCueAsHTML: function(){
-					var lastText = "";
-					var parsedText = "";
-					var fragment = document.createDocumentFragment();
-					var fn;
-					if(!owns(this, 'getCueAsHTML')){
-						fn = this.getCueAsHTML = function(){
-							var i, len;
-							if(lastText != this.text){
-								lastText = this.text;
-								parsedText = mediaelement.parseCueTextToHTML(lastText);
-								emptyDiv.innerHTML = parsedText;
-								
-								for(i = 0, len = emptyDiv.childNodes.length; i < len; i++){
-									fragment.appendChild(emptyDiv.childNodes[i].cloneNode(true));
-								}
-							}
-							return fragment.cloneNode(true);
-						};
+	var emptyDiv = $('<div />')[0];
+	window.TextTrackCue = function(startTime, endTime, text){
+		if(arguments.length != 3){
+			webshims.error("wrong arguments.length for TextTrackCue.constructor");
+		}
+		
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.text = text;
+		
+		this.id = "";
+		this.pauseOnExit = false;
+		
+		createEventTarget(this);
+	};
+	
+	window.TextTrackCue.prototype = {
+		
+		onenter: null,
+		onexit: null,
+		pauseOnExit: false,
+		getCueAsHTML: function(){
+			var lastText = "";
+			var parsedText = "";
+			var fragment = document.createDocumentFragment();
+			var fn;
+			if(!owns(this, 'getCueAsHTML')){
+				fn = this.getCueAsHTML = function(){
+					var i, len;
+					if(lastText != this.text){
+						lastText = this.text;
+						parsedText = mediaelement.parseCueTextToHTML(lastText);
+						emptyDiv.innerHTML = parsedText;
 						
+						for(i = 0, len = emptyDiv.childNodes.length; i < len; i++){
+							fragment.appendChild(emptyDiv.childNodes[i].cloneNode(true));
+						}
 					}
-					return fn ? fn.apply(this, arguments) : fragment.cloneNode(true);
-				},
-				track: null,
+					return fragment.cloneNode(true);
+				};
 				
-				//todo-->
-				id: '',
-				snapToLines: true,
-				line: -1,
-				size: 100,
-				position: 50,
-				vertical: '',
-				align: 'middle'
-			};
-		}
+			}
+			return fn ? fn.apply(this, arguments) : fragment.cloneNode(true);
+		},
+		track: null,
+		
+		
+		id: ''
+		//todo-->
+//			,
+//			snapToLines: true,
+//			line: 'auto',
+//			size: 100,
+//			position: 50,
+//			vertical: '',
+//			align: 'middle'
 	};
 	
-	implementTextTrackCueConstructor();
 	
-	mediaelement.TextTrackCue = function(id, startTime, endTime, text, settings, pauseOnExit){
-		var ret;
-		if(!id){
-			id = '';
-		}
-		if(!startTime){
-			startTime = 0;
-		}
-		if(!endTime){
-			endTime = 0;
-		}
-		if(!text){
-			text = '';
-		}
-		
-		mediaelement.TextTrackCue = function(id, startTime, endTime, text, settings, pauseOnExit){
-			return new TextTrackCue(id, startTime, endTime, text, settings || '', pauseOnExit || false);
-		};
-		
-		try {
-			ret = new TextTrackCue(id, startTime, endTime, text, settings || '', pauseOnExit || false);
-		} catch(e){}
-		if(!ret){
-			try {
-				ret = new TextTrackCue(id, startTime, endTime, text);
-			} catch(e){}
-		}
-		if (!ret) {
-			webshims.bugs.track = true;
-			implementTextTrackCueConstructor();
-		} else {
-			mediaelement.TextTrackCue = function(id, startTime, endTime, text){
-				return new TextTrackCue(id, startTime, endTime, text);
-			};
-		}
-		return ret;
-	};
+	
+	
 	
 	mediaelement.createCueList = function(){
 		return $.extend([], cueListProto);
@@ -382,9 +343,6 @@ modified for webshims
 			if (subtitleParts[0].match(/^\s*[a-z0-9]+\s*$/ig)) {
 				// The identifier becomes the cue ID (when *we* load the cues from file. Programatically created cues can have an ID of whatever.)
 				id = String(subtitleParts.shift().replace(/\s*/ig,""));
-			} else {
-				// We're not parsing a format with an ID prior to each caption like SRT or WebVTT
-				id = objectCount;
 			}
 		
 			for (subtitlePartIndex = 0; subtitlePartIndex < subtitleParts.length; subtitlePartIndex ++) {
@@ -452,7 +410,10 @@ modified for webshims
 */
 			// The remaining lines are the subtitle payload itself (after removing an ID if present, and the time);
 			html = subtitleParts.join("\n");
-			tmpCue = mediaelement.TextTrackCue(id, timeIn, timeOut, html, cueSettings, false);
+			tmpCue = new TextTrackCue(timeIn, timeOut, html);
+			if(id){
+				tmpCue.id = id;
+			}
 			return tmpCue;
 		};
 	})();

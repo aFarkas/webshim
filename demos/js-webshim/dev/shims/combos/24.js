@@ -2233,11 +2233,26 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	
 	bugs.track = false;
 	
-	
 	if(Modernizr.track){
 		(function(){
 			
 			bugs.track = typeof $('<track />')[0].readyState != 'number' || !$('<video />')[0].addTextTrack;
+			
+			if(!bugs.track){
+				try {
+					new TextTrackCue(2, 3, '');
+				} catch(e){
+					try {
+						new TextTrackCue('', 2, 3, '', '', false);
+						var oldTextTrack = TextTrackCue;
+						window.TextTrackCue = function(startTime, endTime, text, a, b, c){
+							return (arguments.length > 4) ? new oldTextTrack(startTime, endTime, text, a, b || '', c || false) :  new oldTextTrack('', startTime, endTime, text, '', false);
+						};
+					} catch(e){
+						bugs.track = true;
+					}
+				}
+			}
 			
 			var trackOptions = webshims.cfg.track;
 			var trackListener = function(e){
