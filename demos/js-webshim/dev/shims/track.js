@@ -17,7 +17,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		};
 		obj.removeEventListener = function(name, fn){
 			if(eventList[name] && eventList[name] != fn){
-				webshims.error('always use $.unbind to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
+				webshims.error('always use $.bind/$.unbind to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
 			}
 			if(eventList[name]){
 				delete eventList[name];
@@ -81,25 +81,25 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 				trackList.push(baseData.scriptedTextTracks[i]);
 			}
 		}
-		if(mediaelement.trackDisplay && baseData.trackDisplay){
-			for(i = 0, len = oldTracks.length; i < len; i++){
-				if(trackList.indexOf(oldTracks[i]) == -1){
-					mediaelement.trackDisplay.hide(oldTracks[i], baseData);
-				}
+		for(i = 0, len = oldTracks.length; i < len; i++){
+			if(trackList.indexOf(oldTracks[i]) == -1){
+				oldTracks[i].mode = 0;
 			}
 		}
+		oldTracks = null;
 	};
 	
 	var refreshTrack = function(track, trackData){
-		var mode;
+		var mode, kind;
 		if(!trackData){
 			trackData = webshims.data(track, 'trackData');
 		}
 		if(trackData && !trackData.isTriggering){
 			trackData.isTriggering = true;
 			mode = (trackData.track || {}).mode; 
+			kind = (trackData.track || {}).kind; 
 			setTimeout(function(){
-				if(mode !== (trackData.track || {}).mode){
+				if(mode !== (trackData.track || {}).mode || kind != (trackData.track || {}).kind){
 					if(!(trackData.track || {}).readyState){
 						$(track).triggerHandler('checktrackmode');
 					} else {
@@ -215,8 +215,69 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		};
 	})();
 	
+	mediaelement.loadTextTrack = function(mediaelem, track, trackData, _default){
+		var loadEvents = 'play playing timeupdate updatetrackdisplay';
+		var obj = trackData.track;
+		var load = function(){
+			var src = $.prop(track, 'src');
+			var error;
+			var ajax;
+			if(obj.mode && src && $.attr(track, 'src')){
+				$(mediaelem).unbind(loadEvents, load);
+				$(track).unbind('checktrackmode', load);
+				if(!obj.readyState){
+					error = function(){
+						obj.readyState = 3;
+						$(track).triggerHandler('error');
+					};
+					obj.readyState = 1;
+					try {
+						ajax = $.ajax({
+							dataType: 'text',
+							url: src,
+							success: function(text){
+								if(ajax.getResponseHeader('content-type') != 'text/vtt'){
+									webshims.warn('set the mime-type of your WebVTT files to text/vtt. see: http://dev.w3.org/html5/webvtt/#text/vtt');
+								}
+								mediaelement.parseCaptions(text, obj, function(cues){
+									if(cues && 'length' in cues){
+										obj.cues = cues;
+										obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = mediaelement.createCueList();
+										obj.readyState = 2;
+										$(track).triggerHandler('load');
+										$(mediaelem).triggerHandler('updatetrackdisplay');
+									} else {
+										error();
+									}
+								});
+								
+							},
+							error: error
+						});
+					} catch(er){
+						error();
+						webshims.warn(er);
+					}
+				}
+			}
+		};
+		obj.readyState = 0;
+		obj.shimActiveCues = null;
+		obj._shimActiveCues = null;
+		obj.activeCues = null;
+		obj.cues = null;
+		$(mediaelem).unbind(loadEvents, load);
+		$(track).unbind('checktrackmode', load);
+		$(mediaelem).bind(loadEvents, load);
+		$(track).bind('checktrackmode', load);
+		if(_default){
+			obj.mode = showTracks[obj.kind] ? 2 : 1;
+			load();
+		}
+	};
+	
 	mediaelement.createTextTrack = function(mediaelem, track){
-		var obj, trackData, load, loadEvents;
+		var obj, trackData;
 		if(track.nodeName){
 			trackData = webshims.data(track, 'trackData');
 			
@@ -225,6 +286,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 				obj = trackData.track;
 			}
 		}
+		
 		if(!obj){
 			obj = createEventTarget(webshims.objectCreate(textTrackProto));
 			copyProps.forEach(function(copyProp){
@@ -236,57 +298,11 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 					obj[copyProp] = prop;
 				}
 			});
+			
+			
 			if(track.nodeName){
-				loadEvents = 'play playing timeupdate updatetrackdisplay';
-				load = function(){
-					var error;
-					var ajax;
-					if(obj.mode){
-						$(mediaelem).unbind(loadEvents, load);
-						$(track).unbind('checktrackmode', load);
-						if(!obj.readyState){
-							error = function(){
-								obj.readyState = 3;
-								$(track).triggerHandler('error');
-							};
-							obj.readyState = 1;
-							try {
-								ajax = $.ajax({
-									dataType: 'text',
-									url: $.prop(track, 'src'),
-									success: function(text){
-										if(ajax.getResponseHeader('content-type') != 'text/vtt'){
-											webshims.warn('set the mime-type of your WebVTT files to text/vtt. see: http://dev.w3.org/html5/webvtt/#text/vtt')
-										}
-										mediaelement.parseCaptions(text, obj, function(cues){
-											if(cues && 'length' in cues){
-												obj.cues = cues;
-												obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = mediaelement.createCueList();
-												obj.readyState = 2;
-												$(track).triggerHandler('load');
-												$(mediaelem).triggerHandler('updatetrackdisplay');
-											} else {
-												error();
-											}
-										});
-										
-									},
-									error: error
-								});
-							} catch(er){
-								error();
-								webshims.warn(er);
-							}
-						}
-					}
-				};
 				trackData = webshims.data(track, 'trackData', {track: obj});
-				$(mediaelem).bind(loadEvents, load);
-				$(track).bind('checktrackmode', load);
-				if($.prop(track, 'default')){
-					obj.mode = showTracks[obj.kind] ? 2 : 1;
-					load();
-				}
+				mediaelement.loadTextTrack(mediaelem, track, trackData, $.prop(track, 'default'));
 			} else {
 				obj.cues = mediaelement.createCueList();
 				obj.activeCues = obj._shimActiveCues = obj.shimActiveCues = mediaelement.createCueList();
@@ -498,13 +514,6 @@ modified for webshims
 		webshims.reflectProperties(['track'], ['srclang', 'label']);
 		
 		webshims.defineNodeNameProperties('track', {
-			kind: {
-				//attr: {},
-				reflect: true,
-				propType: 'enumarated',
-				defaultValue: 'subtitles',
-				limitedTo: ['subtitles', 'captions', 'descriptions', 'chapters', 'metadata']
-			},
 			src: {
 				//attr: {},
 				reflect: true,
@@ -512,6 +521,55 @@ modified for webshims
 			}
 		});
 	}
+	
+	webshims.defineNodeNameProperties('track', {
+		kind: {
+			attr: Modernizr.track ? {
+				set: function(value){
+					var trackData = webshims.data(this, 'trackData');
+					this.setAttribute('data-kind', value);
+					if(trackData){
+						trackData.attrKind = value;
+					}
+				},
+				get: function(){
+					var trackData = webshims.data(this, 'trackData');
+					if(trackData && ('attrKind' in trackData)){
+						return trackData.attrKind;
+					}
+					return this.getAttribute('kind');
+				}
+			} : {},
+			reflect: true,
+			propType: 'enumarated',
+			defaultValue: 'subtitles',
+			limitedTo: ['subtitles', 'captions', 'descriptions', 'chapters', 'metadata']
+		}
+	});
+	
+	webshims.onNodeNamesPropertyModify('track', 'kind', function(){
+		var trackData = webshims.data(this, 'trackData');
+		if(trackData){
+			trackData.track.kind = $.prop(this, 'kind');
+			refreshTrack(this, trackData);
+		}
+	});
+	
+	webshims.onNodeNamesPropertyModify('track', 'src', function(val){
+		if(val){
+			var data = webshims.data(this, 'trackData');
+			var media;
+			if(data){
+				media = $(this).closest('video, audio');
+				if(media[0]){
+					mediaelement.loadTextTrack(media, this, data);
+				}
+			}
+		}
+		
+	});
+	
+	//
 	
 	webshims.defineNodeNamesProperties(['track'], {
 		ERROR: {
@@ -581,6 +639,7 @@ modified for webshims
 		return textTrack.readyState || trackElem.readyState;
 	};
 	
+	var trackReplace = $('<span />');
 	webshims.addReady(function(context, insertedElement){
 		$('video, audio', context)
 			.add(insertedElement.filter('video, audio, track').closest('audio, video'))
@@ -596,19 +655,26 @@ modified for webshims
 						.each(function(){
 							var shimedTrack = $.prop(this, 'track');
 							var origTrack = this.track;
+							var kind;
 							var readyState;
 							if(origTrack){
+								kind = $.prop(this, 'kind');
 								readyState = getNativeReadyState(this, origTrack);
 								if (origTrack.mode || readyState) {
 									shimedTrack.mode = origTrack.mode;
 								}
-								origTrack.mode = 0;
+								//disable track from showing + remove UI
+								if(kind != 'descriptions'){
+									origTrack.mode = 0;
+									this.kind = 'metadata';
+									$(this).attr({kind: kind});
+								}
+								
 							}
 						})
 						.bind('load error', function(e){
 							if(e.originalEvent){
 								e.stopImmediatePropagation();
-								this.track.mode = 0;
 							}
 						})
 					;
