@@ -1572,6 +1572,25 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			.trigger('click')
 		;
 		
+		if($.browser.webkit && Modernizr.bugfreeformvalidation && !webshims.bugs.bustedValidity){
+			(function(){
+				var elems = /^(?:textarea|input)$/i;
+				var form = false;
+				document.addEventListener('mouseup', function(e){
+					if(e.which == 3 && elems.test( e.target.nodeName || '') && (form = e.target.form)){
+						setTimeout(function(){
+							form = false;
+						}, 1);
+					}
+				}, true);
+				$(window).bind('invalid', function(e){
+					if(e.originalEvent && form && form == e.target.form){
+						e.wrongWebkitInvalid = true;
+						e.stopImmediatePropagation();
+					}
+				});
+			})();
+		}
 	}
 	
 })(jQuery);
