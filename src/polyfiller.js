@@ -23,7 +23,10 @@
 	Modernizr.genericDOM = !!($('<video><div></div></video>')[0].innerHTML);
 	
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
-		
+	
+	if($.browser.chrome){
+		$.browser.webkit = true;
+	}	
 	
 	var webshims = {
 		version: '1.9.0pre',
