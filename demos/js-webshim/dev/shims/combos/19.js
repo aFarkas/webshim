@@ -1716,13 +1716,15 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 			(function(){
 				var elems = /^(?:textarea|input)$/i;
 				var form = false;
-				document.addEventListener('mouseup', function(e){
-					if(e.which == 3 && elems.test( e.target.nodeName || '') && (form = e.target.form)){
+
+				document.addEventListener('contextmenu', function(e){
+					if(elems.test( e.target.nodeName || '') && (form = e.target.form)){
 						setTimeout(function(){
 							form = false;
 						}, 1);
 					}
-				}, true);
+				}, false);
+				
 				$(window).bind('invalid', function(e){
 					if(e.originalEvent && form && form == e.target.form){
 						e.wrongWebkitInvalid = true;
