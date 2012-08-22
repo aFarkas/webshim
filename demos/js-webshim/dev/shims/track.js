@@ -46,7 +46,12 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		},
 		addCue: function(cue){
 			if(!this.cues){
-				this.cues =[];
+				this.cues =mediaelement.createCueList();
+			} else {
+				var lastCue = this.cues[this.cues.length-1];
+				if(lastCue && lastCue.startTime > cue.startTime){
+					webshims.error("cue startTime higher than previous cue's startTime");
+				}
 			}
 			if(cue.track){
 				webshims.error("cue already part of a track element");
@@ -232,6 +237,8 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 					};
 					obj.readyState = 1;
 					try {
+						obj.cues = mediaelement.createCueList();
+						obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = mediaelement.createCueList();
 						ajax = $.ajax({
 							dataType: 'text',
 							url: src,
@@ -241,8 +248,6 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 								}
 								mediaelement.parseCaptions(text, obj, function(cues){
 									if(cues && 'length' in cues){
-										obj.cues = cues;
-										obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = mediaelement.createCueList();
 										obj.readyState = 2;
 										$(track).triggerHandler('load');
 										$(mediaelem).triggerHandler('updatetrackdisplay');
@@ -457,8 +462,7 @@ modified for webshims
 							}
 							cue = mediaelement.parseCaptionChunk(cue, i);
 							if(cue){
-								cue.track = track;
-								subtitles.push(cue);
+								track.addCue(cue);
 							}
 						}
 						if(startDate < (new Date().getTime()) - 9){
@@ -475,7 +479,7 @@ modified for webshims
 						if(!isWEBVTT){
 							webshims.error('please use WebVTT format. This is the standard');
 						}
-						complete(subtitles);
+						complete(track.cues);
 					}
 				};
 				
