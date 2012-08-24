@@ -78,14 +78,15 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 upcomming Release 1.9.0
 ----------
 
-- basic but powerfull track-element including corresponding DOM- and JS-API
+- basic but powerfull track-element including corresponding (DOM- and JS-API)[http://jsfiddle.net/trixta/QZJTM/]
 - input[form] support: for associating form field using the form attribute (input[form]/select[form] ...)
 - implemented youtube iframe support for video element
+- better input widget calculation in responsive websites
 - elements property for fieldset element
-- allow placeholder on input[type="date"] (as a hint for the dateformat, but use data-placeholder, instead of placeholder!)
+- allow placeholder on input[type="date"]. (as a hint for the dateformat, but use data-placeholder, instead of placeholder!)
 - added opus -> mime-type detection for audio
-- fixed regression for using an initial value with input[type="date"] (introduced in 1.8.11)
-- jQuery 1.6.x not tested anymore, use 1.7.2+ (but we will have legacy support for webshims 1.8.x)
+- fixed regression for using an initial value with input[type="date"]. (introduced in 1.8.11)
+- jQuery 1.6.x not tested anymore, use 1.7.2+/1.8.x (but we will have legacy support for webshims 1.8.x)
 
 
 Release 1.8.13
