@@ -1720,11 +1720,11 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 				prop: {
 					get: function(){
 						var id = this.id;
-						var elements;
+						var elements = this.elements;
 						if(id){
-							elements = $($.makeArray(this.elements)).add('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').not('.webshims-visual-hide > *').get();
+							elements = $($.makeArray(elements)).add('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').not('.webshims-visual-hide > *').get();
 						}
-						return elements.length ? elements : this.elements || null;
+						return elements;
 					},
 					writeable: false
 				}

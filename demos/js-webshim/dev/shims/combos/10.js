@@ -1726,6 +1726,9 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						new TextTrackCue('', 2, 3, '', '', false);
 						var oldTextTrack = TextTrackCue;
 						window.TextTrackCue = function(startTime, endTime, text, a, b, c){
+							if(arguments.length != 3){
+								webshims.warn("TextTrackCue has 3 arguments: startTime, endTime and text. everything else is deprecated");
+							}
 							return (arguments.length > 4) ? new oldTextTrack(startTime, endTime, text, a, b || '', c || false) :  new oldTextTrack('', startTime, endTime, text, '', false);
 						};
 					} catch(e){
@@ -1746,7 +1749,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					if(this && $.nodeName(this, 'track')){
 						webshims.error("track support was overwritten. Please check your vtt including your vtt mime-type");
 					} else {
-						webshims.info("track support was overwritten.");
+						webshims.info("track support was overwritten. due to bad browser support");
 					}
 				}
 			};

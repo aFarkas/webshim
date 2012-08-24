@@ -64,6 +64,9 @@
 						new TextTrackCue('', 2, 3, '', '', false);
 						var oldTextTrack = TextTrackCue;
 						window.TextTrackCue = function(startTime, endTime, text, a, b, c){
+							if(arguments.length != 3){
+								webshims.warn("TextTrackCue has 3 arguments: startTime, endTime and text. everything else is deprecated");
+							}
 							return (arguments.length > 4) ? new oldTextTrack(startTime, endTime, text, a, b || '', c || false) :  new oldTextTrack('', startTime, endTime, text, '', false);
 						};
 					} catch(e){
@@ -84,7 +87,7 @@
 					if(this && $.nodeName(this, 'track')){
 						webshims.error("track support was overwritten. Please check your vtt including your vtt mime-type");
 					} else {
-						webshims.info("track support was overwritten.");
+						webshims.info("track support was overwritten. due to bad browser support");
 					}
 				}
 			};
@@ -1599,11 +1602,11 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 				prop: {
 					get: function(){
 						var id = this.id;
-						var elements;
+						var elements = this.elements;
 						if(id){
-							elements = $($.makeArray(this.elements)).add('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').not('.webshims-visual-hide > *').get();
+							elements = $($.makeArray(elements)).add('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').not('.webshims-visual-hide > *').get();
 						}
-						return elements.length ? elements : this.elements || null;
+						return elements;
 					},
 					writeable: false
 				}
@@ -1676,8 +1679,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 				prop: {
 					get: function(){
 						//add listed elements without keygen, object, output
-						var elements = $('input, select, textarea, button, fieldset', this);
-						return elements.length ? elements : this.elements || null;
+						return $('input, select, textarea, button, fieldset', this).get() || this.elements || [];
 					},
 					writeable: false
 				}
