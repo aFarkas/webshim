@@ -130,6 +130,7 @@
 	<script src="unit/boolean-attr.js"></script>
 	<script src="unit/interactive-validation.js"></script>
 	<script src="unit/form-submitters.js"></script>
+	<script src="unit/form-features.js"></script>
 	<script src="unit/loading.js"></script>
 	
 	<!-- last test: -->
@@ -191,57 +192,57 @@
 			<input type="radio" name="radio-outside" required />
 			<input type="checkbox" name="radio-outside" />
 		</div>
-	    <form id="form-1" action="" method="post">
-	        <!-- hidden fields should not be visible -->
+		<form id="form-1" action="" method="post">
+			<!-- hidden fields should not be visible -->
 			<div class="form-item-hidden">
-	            <input type="hidden" name="test1" />
-	            <input type="hidden" name="test2" />
-	            <input type="hidden" name="test3" />
-	            <input type="hidden" name="test4" />
+				<input type="hidden" name="test1" />
+				<input type="hidden" name="test2" />
+				<input type="hidden" name="test3" />
+				<input type="hidden" name="test4" />
 				<input type="hidden" />
 			</div>
-	        <fieldset class="check">
-	            <div>
-	                <label for="name">
-	                    Name: <dfn title="required">*</dfn>
-					</label>
-	                <input name="name" required="" type="text" id="name" />
-	            </div>
+			<fieldset class="check">
 				<div>
-	                <label for="number">
-	                    number: 
+					<label for="name">
+						Name: <dfn title="required">*</dfn>
 					</label>
-	                <input name="number" type="number" id="number" />
-	            </div>
+					<input name="name" required="" type="text" id="name" />
+				</div>
 				<div>
-	                <label for="date">
-	                    date: 
+					<label for="number">
+						number: 
 					</label>
-	                <input name="date" type="date" value="2011-11-11" id="date" />
-	            </div>
+					<input name="number" type="number" id="number" />
+				</div>
 				<div>
-	                <label for="datetime-local">
-	                    datetime-local: 
+					<label for="date">
+						date: 
 					</label>
-	                <input name="datetime-local" type="datetime-local" id="datetime-local" />
-	            </div>
+					<input name="date" type="date" value="2011-11-11" id="date" />
+				</div>
 				<div>
-	                <label for="time">
-	                    time: 
+					<label for="datetime-local">
+						datetime-local: 
 					</label>
-	                <input name="time" type="time" id="time" />
-	            </div>
+					<input name="datetime-local" type="datetime-local" id="datetime-local" />
+				</div>
 				<div>
-	                <label for="range">
-	                    range: 
+					<label for="time">
+						time: 
 					</label>
-	                <input name="range" type="range" id="range" />
-	            </div>
-	            <div>
-	                <label for="email">
-	                    E-Mail: <dfn title="required">*</dfn>
+					<input name="time" type="time" id="time" />
+				</div>
+				<div>
+					<label for="range">
+						range: 
 					</label>
-	               	<input list="dlist" name="email" required="required" class="email" type="email" id="email" />
+					<input name="range" type="range" id="range" />
+				</div>
+				<div>
+					<label for="email">
+						E-Mail: <dfn title="required">*</dfn>
+					</label>
+					<input list="dlist" name="email" required="required" class="email" type="email" id="email" />
 					<datalist id="dlist">
 						<select>
 							<option value="yes aßäöâ" />
@@ -254,163 +255,163 @@
 							<option value="secondlist" />
 						</select>
 					</datalist>
-	                <span>Lorem ipsum dolor sit amet adipiscing elit.</span>
-	            </div>
+					<span>Lorem ipsum dolor sit amet adipiscing elit.</span>
+				</div>
 				<div>
-	                <label for="maxlength">
-	                    textarea: <dfn title="required">*</dfn>
+					<label for="maxlength">
+						textarea: <dfn title="required">*</dfn>
 					</label>
-	                <textarea maxlength="100" id="maxlength" name="maxlength"></textarea>
-	            </div>
-	            <div>
-	                <label for="url">
-	                    E-Mail: <dfn title="required">*</dfn>
-					</label>
-	               	<input name="url" type="url" id="url" />
-	            </div>
+					<textarea maxlength="100" id="maxlength" name="maxlength"></textarea>
+				</div>
 				<div>
-	                
-	               	<output>jo</output>
+					<label for="url">
+						E-Mail: <dfn title="required">*</dfn>
+					</label>
+					<input name="url" type="url" id="url" />
+				</div>
+				<div>
+					
+					<output>jo</output>
 					<label for="labeled-output">output-label</label>
 					<output id="labeled-output" name="outputtest"></output>
-	            </div>
-	            <div>
+				</div>
+				<div>
 					<div class="form-item-l">
-	                	<label for="pattern">
-	                    	pattern:
+						<label for="pattern">
+							pattern:
 						</label>
-	                    <input type="text" PATTERN="[0-9][A-Z]{3}" name="pattern" id="pattern" />
+						<input type="text" PATTERN="[0-9][A-Z]{3}" name="pattern" id="pattern" />
 					</div>
-	            </div>
-				<div  class="multiple-labels">
-	                <fieldset>
-						<div class="form-item-m">
-	                        <label class="m" for="placeholder">
-	                            placeholder:
-							</label>
-	                        <input placeholder="hello" name="placeholder" type="password" id="placeholder" />
-						</div>
-						<div class="form-item-m">
-	                        <label class="m" for="placeholder-empty">
-	                            placeholder-empty:
-							</label>
-	                        <input class="oninput-test" name="placeholder-empty" type="password" id="placeholder-empty" />
-						</div>
-	               	</fieldset>
 				</div>
 				<div  class="multiple-labels">
-	                <fieldset>
+					<fieldset>
 						<div class="form-item-m">
-	                        <label class="m" for="placeholder-text">
-	                            placeholder-text:
+							<label class="m" for="placeholder">
+								placeholder:
 							</label>
-	                        <input placeholder="hello" name="placeholder-text" id="placeholder-text" />
+							<input placeholder="hello" name="placeholder" type="password" id="placeholder" />
 						</div>
 						<div class="form-item-m">
-	                        <label class="m" for="placeholder-empty-text">
-	                            placeholder-empty-text:
+							<label class="m" for="placeholder-empty">
+								placeholder-empty:
 							</label>
-	                        <input name="placeholder-empty-text" id="placeholder-empty-text" />
+							<input class="oninput-test" name="placeholder-empty" type="password" id="placeholder-empty" />
 						</div>
-	               	</fieldset>
+					</fieldset>
 				</div>
-	            <div>
-	            	<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
-	            	<fieldset class="mod">
-	            		<legend>Legend Short Labels  <dfn title="required">*</dfn></legend>
-	                    <div class="form-item">
-	                        <input required="required" type="radio" id="field6-1" name="radio-grp1-1" />
+				<div  class="multiple-labels">
+					<fieldset>
+						<div class="form-item-m">
+							<label class="m" for="placeholder-text">
+								placeholder-text:
+							</label>
+							<input placeholder="hello" name="placeholder-text" id="placeholder-text" />
+						</div>
+						<div class="form-item-m">
+							<label class="m" for="placeholder-empty-text">
+								placeholder-empty-text:
+							</label>
+							<input name="placeholder-empty-text" id="placeholder-empty-text" />
+						</div>
+				   	</fieldset>
+				</div>
+				<div>
+					<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
+					<fieldset class="mod">
+						<legend>Legend Short Labels  <dfn title="required">*</dfn></legend>
+						<div class="form-item">
+							<input required="required" type="radio" id="field6-1" name="radio-grp1-1" />
 							<label for="field6-1">
-	                            Radiooption 2
-	                        </label>
-						</div>
-						<div class="form-item">
-	                        <input required="" type="radio" id="field7-1" name="radio-grp1-1" />
-	                       	<label for="field7-1"> 
 								Radiooption 2
-	                    	</label>
+							</label>
 						</div>
 						<div class="form-item">
-	                        <input required type="radio" id="field8-1" name="radio-grp1-1" />
-							<label for="field8-1">
-	                        	Radiooption 3
-	                    	</label>
+							<input required="" type="radio" id="field7-1" name="radio-grp1-1" />
+						   	<label for="field7-1"> 
+								Radiooption 2
+							</label>
 						</div>
-	                </fieldset>
-	            </div>
-	            <div>
-	            	<label for="select">
-	                    Lorem ipsum
-					</label>
-	                <select name="select" id="select">
-	                	<option value="">Please Choose</option>
-	                	<optgroup label="group1">
-	                    	<option value="">Option 1</option>
-	                        <option>Option 2</option>
-	                        <option>Option 3</option>
-	                    </optgroup>
-	                    <optgroup label="group2">
-	                    	<option>Option 4</option>
-	                        <option>Option 5</option>
-	                        <option>Option 6</option>
-	                    </optgroup>
-	                </select>
-	            </div>
+						<div class="form-item">
+							<input required type="radio" id="field8-1" name="radio-grp1-1" />
+							<label for="field8-1">
+								Radiooption 3
+							</label>
+						</div>
+					</fieldset>
+				</div>
 				<div>
-	            	<label for="select2">
-	                    Lorem ipsum  <dfn title="required">*</dfn>
+					<label for="select">
+						Lorem ipsum
 					</label>
-	                <select name="select2" required="" id="select2">
-	                	<optgroup label="group1">
-	                    	<option value="">Option 1</option>
-	                        <option>Option 2</option>
-	                        <option>Option 3</option>
-	                    </optgroup>
-	                    <optgroup label="group2">
-	                    	<option>Option 4</option>
-	                        <option>Option 5</option>
-	                        <option>Option 6</option>
-	                    </optgroup>
-	                </select>
-	            </div>
+					<select name="select" id="select">
+						<option value="">Please Choose</option>
+						<optgroup label="group1">
+							<option value="">Option 1</option>
+							<option>Option 2</option>
+							<option>Option 3</option>
+						</optgroup>
+						<optgroup label="group2">
+							<option>Option 4</option>
+							<option>Option 5</option>
+							<option>Option 6</option>
+						</optgroup>
+					</select>
+				</div>
 				<div>
-	            	<label for="select3">
-	                    Lorem ipsum  <dfn title="required">*</dfn>
+					<label for="select2">
+						Lorem ipsum  <dfn title="required">*</dfn>
 					</label>
-	                <select name="select3" required="" id="select3" size="3">
-	                    	<option value="">Option 1</option>
-	                        <option>Option 2</option>
-	                        <option>Option 3</option>
-	                    	<option>Option 4</option>
-	                        <option>Option 5</option>
-	                        <option>Option 6</option>
-	                </select>
-	            </div>
+					<select name="select2" required="" id="select2">
+						<optgroup label="group1">
+							<option value="">Option 1</option>
+							<option>Option 2</option>
+							<option>Option 3</option>
+						</optgroup>
+						<optgroup label="group2">
+							<option>Option 4</option>
+							<option>Option 5</option>
+							<option>Option 6</option>
+						</optgroup>
+					</select>
+				</div>
 				<div>
-	            	<label for="select4">
-	                    Lorem ipsum  <dfn title="required">*</dfn>
+					<label for="select3">
+						Lorem ipsum  <dfn title="required">*</dfn>
 					</label>
-	                <select name="select4" required="" id="select4" multiple size="1">
-	                    	<option value="">Option 1</option>
-	                        <option>Option 2</option>
-	                        <option>Option 3</option>
-	                    	<option>Option 4</option>
-	                        <option>Option 5</option>
-	                        <option>Option 6</option>
-	                </select>
-	            </div>
+					<select name="select3" required="" id="select3" size="3">
+							<option value="">Option 1</option>
+							<option>Option 2</option>
+							<option>Option 3</option>
+							<option>Option 4</option>
+							<option>Option 5</option>
+							<option>Option 6</option>
+					</select>
+				</div>
 				<div>
-	            	<label for="rangeId">
-	                    Lorem ipsum  <dfn title="required">*</dfn>
+					<label for="select4">
+						Lorem ipsum  <dfn title="required">*</dfn>
 					</label>
-	                <input type="range" name="rangeName" id="rangeId" />
-	            </div>
-	            
-	            <div class="button-wrapper">
-	            	<input type="submit" value="Send" />
-	            </div>
-	        </fieldset>
-	    </form>
+					<select name="select4" required="" id="select4" multiple size="1">
+							<option value="">Option 1</option>
+							<option>Option 2</option>
+							<option>Option 3</option>
+							<option>Option 4</option>
+							<option>Option 5</option>
+							<option>Option 6</option>
+					</select>
+				</div>
+				<div>
+					<label for="rangeId">
+						Lorem ipsum  <dfn title="required">*</dfn>
+					</label>
+					<input type="range" name="rangeName" id="rangeId" />
+				</div>
+				
+				<div class="button-wrapper">
+					<input type="submit" value="Send" />
+				</div>
+			</fieldset>
+		</form>
 	</div><!-- end form --> 
 	
 	
@@ -456,6 +457,13 @@
 		<input type="text" name="texta" required />
 		<input type="text" name="textb" required />
 		<input type="date" name="datea" required />
+		<input type="submit" />
+	</form>
+	
+	<form action="#" class="no-id">
+		<input type="text" name="texta2" />
+		<input type="text" name="textb2" />
+		<input name="datea2" />
 		<input type="submit" />
 	</form>
 	<iframe name="originaltarget" id="originaltarget"></iframe>
