@@ -898,9 +898,9 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 				prop: {
 					get: function(){
 						var id = this.id;
-						var elements = this.elements;
+						var elements = $.makeArray(this.elements);
 						if(id){
-							elements = $($.makeArray(elements)).add('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').not('.webshims-visual-hide > *').get();
+							elements = $(elements).add('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').not('.webshims-visual-hide > *').get();
 						}
 						return elements;
 					},
@@ -975,7 +975,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 				prop: {
 					get: function(){
 						//add listed elements without keygen, object, output
-						return $('input, select, textarea, button, fieldset', this).get() || this.elements || [];
+						return $('input, select, textarea, button, fieldset', this).get() || [];
 					},
 					writeable: false
 				}

@@ -78,7 +78,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 upcomming Release 1.9.0
 ----------
 
-- basic but powerfull track-element including corresponding (DOM- and JS-API)[http://jsfiddle.net/trixta/QZJTM/]
+- basic but powerfull track-element including corresponding [DOM- and JS-API](http://jsfiddle.net/trixta/QZJTM/)
 - input[form] support: for associating form field using the form attribute (input[form]/select[form] ...)
 - implemented youtube iframe support for video element
 - better input widget calculation in responsive websites

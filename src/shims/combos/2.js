@@ -1797,8 +1797,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 				prop: {
 					get: function(){
 						//add listed elements without keygen, object, output
-						var elements = $('input, select, textarea, button, fieldset', this);
-						return elements.length ? elements : this.elements || null;
+						return $('input, select, textarea, button, fieldset', this).get() || this.elements || [];
 					},
 					writeable: false
 				}
