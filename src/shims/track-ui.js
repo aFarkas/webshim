@@ -79,13 +79,12 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 				};
 				var delayed = function(e){
 					clearTimeout(timer);
-					timer = setTimeout(positionDisplay, (e && e.type == 'resize') ? 99 : 9);
+					timer = setTimeout(positionDisplay, 0);
 				};
 				var forceUpdate = function(){
 					positionDisplay(true);
 				};
-				media.bind('playerdimensionchange mediaelementapichange updatetrackdisplay updatemediaelementdimensions swfstageresize', delayed);
-				$(window).bind('resize emchange', delayed);
+				media.bind('updateshadowom playerdimensionchange mediaelementapichange updatetrackdisplay updatemediaelementdimensions swfstageresize', delayed);
 				media.bind('forceupdatetrackdisplay', forceUpdate);
 				forceUpdate();
 			}
@@ -97,6 +96,11 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 			}
 		}
 	};
+	
+	$.extend($.event.customEvent, {
+		updatetrackdisplay: true,
+		forceupdatetrackdisplay: true
+	});
 	
 	webshims.mediaelement.trackDisplay = trackDisplay;
 	
@@ -230,8 +234,6 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 								track = trackList[i];
 								if(track.mode > 0 && track.cues && track.cues.length){
 									webshims.mediaelement.getActiveCue(track, elem, time, baseData);
-								} else {
-									//remove form activeCues
 								}
 							}
 							trackDisplay.update(baseData, elem);

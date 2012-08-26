@@ -382,44 +382,67 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				elem = null;
 			};
 		})(),
-		addShadowDom: function(nativeElem, shadowElem, opts){
-			opts = opts || {};
-			if(nativeElem.jquery){
-				nativeElem = nativeElem[0];
-			}
-			if(shadowElem.jquery){
-				shadowElem = shadowElem[0];
-			}
-			var nativeData = $.data(nativeElem, dataID) || $.data(nativeElem, dataID, {});
-			var shadowData = $.data(shadowElem, dataID) || $.data(shadowElem, dataID, {});
-			var shadowFocusElementData = {};
-			if(!opts.shadowFocusElement){
-				opts.shadowFocusElement = shadowElem;
-			} else if(opts.shadowFocusElement){
-				if(opts.shadowFocusElement.jquery){
-					opts.shadowFocusElement = opts.shadowFocusElement[0];
+		addShadowDom: (function(){
+			var resizeTimer;
+			var lastHeight;
+			var lastWidth;
+			$(window).bind('emchange resize', function(e){
+				clearTimeout(resizeTimer);
+				resizeTimer = setTimeout(function(){
+					if(e.type == 'resize'){
+						var width = $(window).width();
+						var height = $(window).width();
+						if(height == lastHeight && width == lastWidth){
+							return;
+						}
+						lastHeight = height;
+						lastWidth = width;
+					}
+					$.event.trigger('updateshadowdom');
+				}, 20);
+			});
+			
+			$.event.customEvent.updateshadowdom = true;
+			
+			return function(nativeElem, shadowElem, opts){
+				opts = opts || {};
+				if(nativeElem.jquery){
+					nativeElem = nativeElem[0];
 				}
-				shadowFocusElementData = $.data(opts.shadowFocusElement, dataID) || $.data(opts.shadowFocusElement, dataID, shadowFocusElementData);
+				if(shadowElem.jquery){
+					shadowElem = shadowElem[0];
+				}
+				var nativeData = $.data(nativeElem, dataID) || $.data(nativeElem, dataID, {});
+				var shadowData = $.data(shadowElem, dataID) || $.data(shadowElem, dataID, {});
+				var shadowFocusElementData = {};
+				if(!opts.shadowFocusElement){
+					opts.shadowFocusElement = shadowElem;
+				} else if(opts.shadowFocusElement){
+					if(opts.shadowFocusElement.jquery){
+						opts.shadowFocusElement = opts.shadowFocusElement[0];
+					}
+					shadowFocusElementData = $.data(opts.shadowFocusElement, dataID) || $.data(opts.shadowFocusElement, dataID, shadowFocusElementData);
+				}
+				
+				nativeData.hasShadow = shadowElem;
+				shadowFocusElementData.nativeElement = shadowData.nativeElement = nativeElem;
+				shadowFocusElementData.shadowData = shadowData.shadowData = nativeData.shadowData = {
+					nativeElement: nativeElem,
+					shadowElement: shadowElem,
+					shadowFocusElement: opts.shadowFocusElement
+				};
+				if(opts.shadowChilds){
+					opts.shadowChilds.each(function(){
+						elementData(this, 'shadowData', shadowData.shadowData);
+					});
+				}
+				
+				if(opts.data){
+					shadowFocusElementData.shadowData.data = shadowData.shadowData.data = nativeData.shadowData.data = opts.data;
+				}
+				opts = null;
 			}
-			
-			nativeData.hasShadow = shadowElem;
-			shadowFocusElementData.nativeElement = shadowData.nativeElement = nativeElem;
-			shadowFocusElementData.shadowData = shadowData.shadowData = nativeData.shadowData = {
-				nativeElement: nativeElem,
-				shadowElement: shadowElem,
-				shadowFocusElement: opts.shadowFocusElement
-			};
-			if(opts.shadowChilds){
-				opts.shadowChilds.each(function(){
-					elementData(this, 'shadowData', shadowData.shadowData);
-				});
-			}
-			
-			if(opts.data){
-				shadowFocusElementData.shadowData.data = shadowData.shadowData.data = nativeData.shadowData.data = opts.data;
-			}
-			opts = null;
-		},
+		})(),
 		propTypes: {
 			standard: function(descs, name){
 				createPropDefault(descs);
@@ -914,7 +937,9 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	if(Modernizr.track){
 		(function(){
 			
-			bugs.track = typeof $('<track />')[0].readyState != 'number' || !$('<video />')[0].addTextTrack;
+			if(!bugs.track){
+				bugs.track = typeof $('<track />')[0].readyState != 'number';
+			}
 			
 			if(!bugs.track){
 				try {
@@ -1033,9 +1058,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		} else {
 			loadYt();
 		}
-		$(function(){
-			webshims.loader.loadList(['track-ui']);
-		});
 	};
 	
 	webshims.addPolyfill('mediaelement-yt', {
@@ -1383,13 +1405,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				return this._shimActiveCues || this.activeCues;
 			}
 		});
-		$(function(){
-			webshims.polyfill('track');
-		});
-	} else {
-		$(function(){
-			webshims.loader.loadList(['track-ui']);
-		});
 	}
 	//set native implementation ready, before swf api is retested
 	if(hasNative){
@@ -1399,7 +1414,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	} else {
 		webshims.ready('mediaelement-swf', initMediaElements);
 	}
-	
+	$(function(){
+		webshims.loader.loadList(['track-ui']);
+	});
 	
 });
 })(jQuery, Modernizr, jQuery.webshims);/*
@@ -1547,6 +1564,13 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		}
 		data.readyState = readyState;
 	};
+	
+	$.extend($.event.customEvent, {
+		updatemediaelementdimensions: true,
+		flashblocker: true,
+		swfstageresize: true,
+		mediaelementapichange: true
+	});
 	
 	mediaelement.jwEvents = {
 		View: {
@@ -1871,6 +1895,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				})
 			;
 		};
+		
 		$(data._elem)
 			.bind('loadedmetadata', function(){
 				setSize($.prop(this, 'videoWidth'), $.prop(this, 'videoHeight'));
@@ -2106,7 +2131,6 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				overflow: 'hidden'
 			})
 		;
-		
 		data = webshims.data(elem, 'mediaelement', webshims.objectCreate(playerStateObj, {
 			actionQueue: {
 				value: []
@@ -2179,7 +2203,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		
 		options.changeJW(vars, elem, canPlaySrc, data, 'embed');
 		
-		$(elem).bind('updatemediaelementdimensions', function(){
+		$(elem).bind('updatemediaelementdimensions updateshadowdom', function(){
 			setElementDimension(data, $.prop(elem, 'controls'));
 		});
 		

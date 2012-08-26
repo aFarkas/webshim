@@ -54,7 +54,9 @@
 	if(Modernizr.track){
 		(function(){
 			
-			bugs.track = typeof $('<track />')[0].readyState != 'number' || !$('<video />')[0].addTextTrack;
+			if(!bugs.track){
+				bugs.track = typeof $('<track />')[0].readyState != 'number';
+			}
 			
 			if(!bugs.track){
 				try {
@@ -173,9 +175,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		} else {
 			loadYt();
 		}
-		$(function(){
-			webshims.loader.loadList(['track-ui']);
-		});
 	};
 	
 	webshims.addPolyfill('mediaelement-yt', {
@@ -523,13 +522,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				return this._shimActiveCues || this.activeCues;
 			}
 		});
-		$(function(){
-			webshims.polyfill('track');
-		});
-	} else {
-		$(function(){
-			webshims.loader.loadList(['track-ui']);
-		});
 	}
 	//set native implementation ready, before swf api is retested
 	if(hasNative){
@@ -539,7 +531,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	} else {
 		webshims.ready('mediaelement-swf', initMediaElements);
 	}
-	
+	$(function(){
+		webshims.loader.loadList(['track-ui']);
+	});
 	
 });
 })(jQuery, Modernizr, jQuery.webshims);/*
@@ -687,6 +681,13 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		}
 		data.readyState = readyState;
 	};
+	
+	$.extend($.event.customEvent, {
+		updatemediaelementdimensions: true,
+		flashblocker: true,
+		swfstageresize: true,
+		mediaelementapichange: true
+	});
 	
 	mediaelement.jwEvents = {
 		View: {
@@ -1011,6 +1012,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				})
 			;
 		};
+		
 		$(data._elem)
 			.bind('loadedmetadata', function(){
 				setSize($.prop(this, 'videoWidth'), $.prop(this, 'videoHeight'));
@@ -1246,7 +1248,6 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				overflow: 'hidden'
 			})
 		;
-		
 		data = webshims.data(elem, 'mediaelement', webshims.objectCreate(playerStateObj, {
 			actionQueue: {
 				value: []
@@ -1319,7 +1320,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		
 		options.changeJW(vars, elem, canPlaySrc, data, 'embed');
 		
-		$(elem).bind('updatemediaelementdimensions', function(){
+		$(elem).bind('updatemediaelementdimensions updateshadowdom', function(){
 			setElementDimension(data, $.prop(elem, 'controls'));
 		});
 		

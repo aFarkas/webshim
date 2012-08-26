@@ -144,6 +144,13 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		data.readyState = readyState;
 	};
 	
+	$.extend($.event.customEvent, {
+		updatemediaelementdimensions: true,
+		flashblocker: true,
+		swfstageresize: true,
+		mediaelementapichange: true
+	});
+	
 	mediaelement.jwEvents = {
 		View: {
 			
@@ -467,6 +474,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				})
 			;
 		};
+		
 		$(data._elem)
 			.bind('loadedmetadata', function(){
 				setSize($.prop(this, 'videoWidth'), $.prop(this, 'videoHeight'));
@@ -702,7 +710,6 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				overflow: 'hidden'
 			})
 		;
-		
 		data = webshims.data(elem, 'mediaelement', webshims.objectCreate(playerStateObj, {
 			actionQueue: {
 				value: []
@@ -775,7 +782,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		
 		options.changeJW(vars, elem, canPlaySrc, data, 'embed');
 		
-		$(elem).bind('updatemediaelementdimensions', function(){
+		$(elem).bind('updatemediaelementdimensions updateshadowdom', function(){
 			setElementDimension(data, $.prop(elem, 'controls'));
 		});
 		

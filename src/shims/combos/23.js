@@ -54,7 +54,9 @@
 	if(Modernizr.track){
 		(function(){
 			
-			bugs.track = typeof $('<track />')[0].readyState != 'number' || !$('<video />')[0].addTextTrack;
+			if(!bugs.track){
+				bugs.track = typeof $('<track />')[0].readyState != 'number';
+			}
 			
 			if(!bugs.track){
 				try {
@@ -173,9 +175,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		} else {
 			loadYt();
 		}
-		$(function(){
-			webshims.loader.loadList(['track-ui']);
-		});
 	};
 	
 	webshims.addPolyfill('mediaelement-yt', {
@@ -523,13 +522,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				return this._shimActiveCues || this.activeCues;
 			}
 		});
-		$(function(){
-			webshims.polyfill('track');
-		});
-	} else {
-		$(function(){
-			webshims.loader.loadList(['track-ui']);
-		});
 	}
 	//set native implementation ready, before swf api is retested
 	if(hasNative){
@@ -539,7 +531,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	} else {
 		webshims.ready('mediaelement-swf', initMediaElements);
 	}
-	
+	$(function(){
+		webshims.loader.loadList(['track-ui']);
+	});
 	
 });
 })(jQuery, Modernizr, jQuery.webshims);jQuery.webshims.register('form-message', function($, webshims, window, document, undefined, options){
@@ -1874,10 +1868,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					
 					if(elem.type == 'password' || isOver){
 						data.text = createPlaceholder(elem);
-						data.box = $(elem)
-							.wrap('<span class="placeholder-box placeholder-box-'+ (elem.nodeName || '').toLowerCase() +'" />')
-							.parent()
-						;
+						data.box = data.text;
 	
 						data.text
 							.insertAfter(elem)
@@ -1893,31 +1884,29 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 						;
 						
 						
-		
-						$.each(['Left', 'Top'], function(i, side){
-							var size = (parseInt($.css(elem, 'padding'+ side), 10) || 0) + Math.max((parseInt($.css(elem, 'margin'+ side), 10) || 0), 0) + (parseInt($.css(elem, 'border'+ side +'Width'), 10) || 0);
-							data.text.css('padding'+ side, size);
-						});
-						var lineHeight 	= $.css(elem, 'lineHeight'),
-							dims 		= {
-								width: $(elem).width(),
-								height: $(elem).height()
-							},
-							cssFloat 		= $.css(elem, 'float')
-						;
 						$.each(['lineHeight', 'fontSize', 'fontFamily', 'fontWeight'], function(i, style){
 							var prop = $.css(elem, style);
 							if(data.text.css(style) != prop){
 								data.text.css(style, prop);
 							}
 						});
+						$.each(['Left', 'Top'], function(i, side){
+							var size = (parseInt($.css(elem, 'padding'+ side), 10) || 0) + Math.max((parseInt($.css(elem, 'margin'+ side), 10) || 0), 0) + (parseInt($.css(elem, 'border'+ side +'Width'), 10) || 0);
+							data.text.css('padding'+ side, size);
+						});
+						$(elem)
+							.bind('updateshadowdom', function(){
+								data.text
+									.css({
+										width: $(elem).width(),
+										height: $(elem).height()
+									})
+									.css($(elem).position())
+								;
+							})
+							.triggerHandler('updateshadowdom')
+						;
 						
-						if(dims.width && dims.height){
-							data.text.css(dims);
-						}
-						if(cssFloat !== 'none'){
-							data.box.addClass('placeholder-box-'+cssFloat);
-						}
 					} else {
 						var reset = function(e){
 							if($(elem).hasClass('placeholder-visible')){

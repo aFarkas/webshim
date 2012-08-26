@@ -1112,15 +1112,19 @@
 			},
 			c: [10, 9, 22, 20]
 		});
-
-		addTest('track', function(){
-			return !!(Modernizr.audio && window.TextTrack && 'default' in document.createElement('track'));
+		
+		//This 
+		addTest({
+			texttrackapi: (typeof (document.createElement('video').addTextTrack) === 'function'),
+			track: ('kind' in document.createElement('track'))
 		});
+		
+		bugs.track = (Modernizr.track && !Modernizr.texttrackapi);
 		
 		addPolyfill('track', {
 			options: {
-				positionDisplay: true
-				//,override
+				positionDisplay: true,
+				override: bugs.track
 			},
 			test: function(){
 				return Modernizr.track && !this.options.override && !bugs.track;

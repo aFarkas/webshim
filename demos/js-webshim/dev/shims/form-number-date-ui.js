@@ -35,14 +35,14 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			}
 			//is inside
 			if( controlDim.mL <= (controlDim.w * -1) ){
-				button.css('marginRight',  Math.floor(Math.abs(controlDim.w + controlDim.mL) + inputDim.mR));
+				button.css('marginRight',  Math.floor(Math.abs(controlDim.w + controlDim.mL - 0.1) + inputDim.mR));
 				input.css('paddingRight', (parseInt(input.css('paddingRight'), 10) || 0) + Math.abs(controlDim.mL));
 				if(inputDim.add){
 					input.css('width', Math.floor(inputDim.w + controlDim.mL));
 				}
 			} else {
 				button.css('marginRight', inputDim.mR);
-				input.css('width',  Math.floor(inputDim.w - controlDim.mL - controlDim.w));
+				input.css('width',  Math.floor(inputDim.w - controlDim.mL - controlDim.w - 0.2));
 			}
 		};
 	})();
@@ -96,7 +96,19 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	
 	webshims.extendUNDEFProp(options.copyAttrs, copyAttrs);
 	
-	
+	var getDimensions = function(orig){
+		return (options.calculateWidth) ? 
+			{
+				css: {
+					marginRight: orig.css('marginRight'),
+					marginLeft: orig.css('marginLeft')
+				},
+				outerWidth: orig.outerWidth()
+				
+			} :
+			{}
+		;
+	};
 	var focusAttrs = copyAttrs;
 	
 	replaceInputUI.common = function(orig, shim, methods){
@@ -127,20 +139,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		}
 		
 		var id = orig.attr('id'),
-			attr = (options.calculateWidth) ? 
-				{
-					css: {
-						marginRight: orig.css('marginRight'),
-						marginLeft: orig.css('marginLeft')
-					},
-					outerWidth: orig.outerWidth()
-					
-				} :
-				{},
-			curLabelID
+			label =  (id) ? $('label[for="'+ id +'"]', orig[0].form) : emptyJ
 		;
-		attr.label =  (id) ? $('label[for="'+ id +'"]', orig[0].form) : emptyJ
-		curLabelID =  webshims.getID(attr.label);
+		
+		
 		
 		shim.addClass(orig[0].className);
 		webshims.addShadowDom(orig, shim, {
@@ -149,10 +151,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			shadowChilds: focusElement
 		});
 		
-		orig
-			.after(shim)
-			.css({display: 'none'})
-		;
+		orig.after(shim);
 		
 		if(orig[0].form){
 			$(orig[0].form).bind('reset', function(e){
@@ -161,14 +160,14 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 			});
 		}
-		if(shim.length == 1 && !$('*', shim)[0]){
-			shim.attr('aria-labelledby', curLabelID);
-			attr.label.bind('click', function(){
-				shim.focus();
+		
+		if(label[0]){
+			shim.getShadowFocusElement().attr('aria-labelledby', webshims.getID(label));
+			label.bind('click', function(){
+				orig.getShadowFocusElement().focus();
 				return false;
 			});
 		}
-		return attr;
 	};
 	
 	if(Modernizr.formvalidation){
@@ -187,7 +186,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	}
 	//date and datetime-local implement if we have to replace
 	if(!modernizrInputTypes['date'] /*||!modernizrInputTypes['datetime-local']*/ || options.replaceUI){
-		
 		
 		var datetimeFactor = {
 			trigger: [0.595,0.395],
@@ -394,7 +392,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			
 			if(!$.fn.datepicker){return;}
 			var date = $('<input class="input-date" type="text" />'),
-				attr  = this.common(elem, date, replaceInputUI.date.attrs),
+				
 				change = function(e){
 					
 					replaceInputUI.date.blockAttr = true;
@@ -421,15 +419,31 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				data = configureDatePicker(elem, date, change)
 				
 			;
-						
-			if(attr.css){
-				date.css(attr.css);
-				if(attr.outerWidth){
-					date.outerWidth(attr.outerWidth);
-				}
-				if(data.trigger[0]){
-					adjustInputWithBtn(date, data.trigger);
-				}
+			this.common(elem, date, replaceInputUI.date.attrs);
+			
+			$(elem)
+				.bind('updateshadowdom', function(){
+					if (data.trigger[0]) {
+						elem.css({display: ''});
+						var attr = getDimensions(elem);
+						if (attr.css) {
+							date.css(attr.css);
+							if (attr.outerWidth) {
+								date.outerWidth(attr.outerWidth);
+							}
+							adjustInputWithBtn(date, data.trigger);
+						}
+					}
+					elem.css({display: 'none'});
+				})
+				.triggerHandler('updateshadowdom')
+			;
+			if (data.trigger[0]) {
+				setTimeout(function(){
+					webshims.ready('WINDOWLOAD', function(){
+						$(elem).triggerHandler('updateshadowdom');
+					});
+				}, 9);
 			}
 			
 		};
@@ -482,7 +496,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		replaceInputUI.range = function(elem){
 			if(!$.fn.slider){return;}
 			var range = $('<span class="input-range"><span class="ui-slider-handle" role="slider" tabindex="0" /></span>'),
-				attr  = this.common(elem, range, replaceInputUI.range.attrs),
 				change = function(e, ui){
 					if(e.originalEvent){
 						replaceInputUI.range.blockAttr = true;
@@ -494,20 +507,25 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 			;
 			
-			$('span', range)
-				.attr('aria-labelledby', attr.label.attr('id'))
-			;
-			attr.label.bind('click', function(){
-				$('span', range).focus();
-				return false;
-			});
+			this.common(elem, range, replaceInputUI.range.attrs);
 			
-			if(attr.css){
-				range.css(attr.css);
-				if(attr.outerWidth){
-					range.outerWidth(attr.outerWidth);
-				}
-			}
+			
+			elem
+				.bind('updateshadowdom', function(){
+					elem.css({display: ''});
+					var attr = getDimensions(elem);
+					if(attr.css){
+						range.css(attr.css);
+						if(attr.outerWidth){
+							range.outerWidth(attr.outerWidth);
+						}
+					}
+					elem.css({display: 'none'});
+				})
+				.triggerHandler('updateshadowdom')
+			;
+			
+			
 			range.slider($.extend(true, {}, options.slider, elem.data('slider'))).bind('slide', change);
 			
 			['disabled', 'min', 'max', 'step', 'value'].forEach(function(name){

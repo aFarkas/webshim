@@ -1720,9 +1720,9 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 				prop: {
 					get: function(){
 						var id = this.id;
-						var elements = this.elements;
+						var elements = $.makeArray(this.elements);
 						if(id){
-							elements = $($.makeArray(elements)).add('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').not('.webshims-visual-hide > *').get();
+							elements = $(elements).add('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').not('.webshims-visual-hide > *').get();
 						}
 						return elements;
 					},
@@ -1797,7 +1797,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 				prop: {
 					get: function(){
 						//add listed elements without keygen, object, output
-						return $('input, select, textarea, button, fieldset', this).get() || this.elements || [];
+						return $('input, select, textarea, button, fieldset', this).get() || [];
 					},
 					writeable: false
 				}
@@ -1992,10 +1992,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					
 					if(elem.type == 'password' || isOver){
 						data.text = createPlaceholder(elem);
-						data.box = $(elem)
-							.wrap('<span class="placeholder-box placeholder-box-'+ (elem.nodeName || '').toLowerCase() +'" />')
-							.parent()
-						;
+						data.box = data.text;
 	
 						data.text
 							.insertAfter(elem)
@@ -2011,31 +2008,29 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 						;
 						
 						
-		
-						$.each(['Left', 'Top'], function(i, side){
-							var size = (parseInt($.css(elem, 'padding'+ side), 10) || 0) + Math.max((parseInt($.css(elem, 'margin'+ side), 10) || 0), 0) + (parseInt($.css(elem, 'border'+ side +'Width'), 10) || 0);
-							data.text.css('padding'+ side, size);
-						});
-						var lineHeight 	= $.css(elem, 'lineHeight'),
-							dims 		= {
-								width: $(elem).width(),
-								height: $(elem).height()
-							},
-							cssFloat 		= $.css(elem, 'float')
-						;
 						$.each(['lineHeight', 'fontSize', 'fontFamily', 'fontWeight'], function(i, style){
 							var prop = $.css(elem, style);
 							if(data.text.css(style) != prop){
 								data.text.css(style, prop);
 							}
 						});
+						$.each(['Left', 'Top'], function(i, side){
+							var size = (parseInt($.css(elem, 'padding'+ side), 10) || 0) + Math.max((parseInt($.css(elem, 'margin'+ side), 10) || 0), 0) + (parseInt($.css(elem, 'border'+ side +'Width'), 10) || 0);
+							data.text.css('padding'+ side, size);
+						});
+						$(elem)
+							.bind('updateshadowdom', function(){
+								data.text
+									.css({
+										width: $(elem).width(),
+										height: $(elem).height()
+									})
+									.css($(elem).position())
+								;
+							})
+							.triggerHandler('updateshadowdom')
+						;
 						
-						if(dims.width && dims.height){
-							data.text.css(dims);
-						}
-						if(cssFloat !== 'none'){
-							data.box.addClass('placeholder-box-'+cssFloat);
-						}
 					} else {
 						var reset = function(e){
 							if($(elem).hasClass('placeholder-visible')){

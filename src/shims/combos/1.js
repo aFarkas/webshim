@@ -1184,44 +1184,67 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				elem = null;
 			};
 		})(),
-		addShadowDom: function(nativeElem, shadowElem, opts){
-			opts = opts || {};
-			if(nativeElem.jquery){
-				nativeElem = nativeElem[0];
-			}
-			if(shadowElem.jquery){
-				shadowElem = shadowElem[0];
-			}
-			var nativeData = $.data(nativeElem, dataID) || $.data(nativeElem, dataID, {});
-			var shadowData = $.data(shadowElem, dataID) || $.data(shadowElem, dataID, {});
-			var shadowFocusElementData = {};
-			if(!opts.shadowFocusElement){
-				opts.shadowFocusElement = shadowElem;
-			} else if(opts.shadowFocusElement){
-				if(opts.shadowFocusElement.jquery){
-					opts.shadowFocusElement = opts.shadowFocusElement[0];
+		addShadowDom: (function(){
+			var resizeTimer;
+			var lastHeight;
+			var lastWidth;
+			$(window).bind('emchange resize', function(e){
+				clearTimeout(resizeTimer);
+				resizeTimer = setTimeout(function(){
+					if(e.type == 'resize'){
+						var width = $(window).width();
+						var height = $(window).width();
+						if(height == lastHeight && width == lastWidth){
+							return;
+						}
+						lastHeight = height;
+						lastWidth = width;
+					}
+					$.event.trigger('updateshadowdom');
+				}, 20);
+			});
+			
+			$.event.customEvent.updateshadowdom = true;
+			
+			return function(nativeElem, shadowElem, opts){
+				opts = opts || {};
+				if(nativeElem.jquery){
+					nativeElem = nativeElem[0];
 				}
-				shadowFocusElementData = $.data(opts.shadowFocusElement, dataID) || $.data(opts.shadowFocusElement, dataID, shadowFocusElementData);
+				if(shadowElem.jquery){
+					shadowElem = shadowElem[0];
+				}
+				var nativeData = $.data(nativeElem, dataID) || $.data(nativeElem, dataID, {});
+				var shadowData = $.data(shadowElem, dataID) || $.data(shadowElem, dataID, {});
+				var shadowFocusElementData = {};
+				if(!opts.shadowFocusElement){
+					opts.shadowFocusElement = shadowElem;
+				} else if(opts.shadowFocusElement){
+					if(opts.shadowFocusElement.jquery){
+						opts.shadowFocusElement = opts.shadowFocusElement[0];
+					}
+					shadowFocusElementData = $.data(opts.shadowFocusElement, dataID) || $.data(opts.shadowFocusElement, dataID, shadowFocusElementData);
+				}
+				
+				nativeData.hasShadow = shadowElem;
+				shadowFocusElementData.nativeElement = shadowData.nativeElement = nativeElem;
+				shadowFocusElementData.shadowData = shadowData.shadowData = nativeData.shadowData = {
+					nativeElement: nativeElem,
+					shadowElement: shadowElem,
+					shadowFocusElement: opts.shadowFocusElement
+				};
+				if(opts.shadowChilds){
+					opts.shadowChilds.each(function(){
+						elementData(this, 'shadowData', shadowData.shadowData);
+					});
+				}
+				
+				if(opts.data){
+					shadowFocusElementData.shadowData.data = shadowData.shadowData.data = nativeData.shadowData.data = opts.data;
+				}
+				opts = null;
 			}
-			
-			nativeData.hasShadow = shadowElem;
-			shadowFocusElementData.nativeElement = shadowData.nativeElement = nativeElem;
-			shadowFocusElementData.shadowData = shadowData.shadowData = nativeData.shadowData = {
-				nativeElement: nativeElem,
-				shadowElement: shadowElem,
-				shadowFocusElement: opts.shadowFocusElement
-			};
-			if(opts.shadowChilds){
-				opts.shadowChilds.each(function(){
-					elementData(this, 'shadowData', shadowData.shadowData);
-				});
-			}
-			
-			if(opts.data){
-				shadowFocusElementData.shadowData.data = shadowData.shadowData.data = nativeData.shadowData.data = opts.data;
-			}
-			opts = null;
-		},
+		})(),
 		propTypes: {
 			standard: function(descs, name){
 				createPropDefault(descs);
