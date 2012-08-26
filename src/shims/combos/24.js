@@ -1447,31 +1447,27 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				if(!this.hasViewableData){return false;}
 				this.isListVisible = true;
 				var that = this;
-				var resizeTimer;
 				
 				that.setPos();
 				that.shadowList.addClass('datalist-visible').find('li.active-item').removeClass('active-item');
 				
-				$(document).unbind('.datalist'+that.id).bind('mousedown.datalist'+that.id +' focusin.datalist'+that.id, function(e){
-					if(e.target === that.input ||  that.shadowList[0] === e.target || $.contains( that.shadowList[0], e.target )){
-						clearTimeout(that.hideTimer);
-						setTimeout(function(){
-							clearTimeout(that.hideTimer);
-						}, 9);
-					} else {
-						that.timedHide();
-					}
-				});
-				$(window)
+				$(window).unbind('.datalist'+that.id);
+				$(document)
 					.unbind('.datalist'+that.id)
-					.bind('resize.datalist'+that.id +' orientationchange.datalist '+that.id +' emchange.datalist'+that.id, function(){
-						clearTimeout(resizeTimer);
-						resizeTimer = setTimeout(function(){
-							that.setPos();
-						}, 9);
+					.bind('mousedown.datalist'+that.id +' focusin.datalist'+that.id, function(e){
+						if(e.target === that.input ||  that.shadowList[0] === e.target || $.contains( that.shadowList[0], e.target )){
+							clearTimeout(that.hideTimer);
+							setTimeout(function(){
+								clearTimeout(that.hideTimer);
+							}, 9);
+						} else {
+							that.timedHide();
+						}
+					})
+					.bind('updateshadowdom.datalist'+that.id, function(){
+						that.setPos();
 					})
 				;
-				clearTimeout(resizeTimer);
 				return true;
 			},
 			hideList: function(){
@@ -1500,9 +1496,8 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				$(document).unbind('.datalist'+that.id);
 				$(window)
 					.unbind('.datalist'+that.id)
-					.bind('resize.datalist'+that.id +' orientationchange.datalist '+that.id +' emchange.datalist'+that.id, function(){
+					.one('resize.datalist'+that.id, function(){
 						that.shadowList.css({top: 0, left: 0});
-						$(window).unbind('.datalist'+that.id);
 					})
 				;
 				return true;

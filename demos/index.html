@@ -364,6 +364,11 @@ $('datalist#list select').prependPolyfill('&lt;option value="new suggestion item
 //animate the width of all date - inputs to a width of 300
 $('input[type="date"]').getShadowElement().animate({width: 300});
 </code>
+							<p><strong>re-rendering shadowelements</strong>: On dynamic websites shadowelements dimensions and/or positions sometimes need to be updated, this can be achieved by triggering the <code>updateshadowdom</code>.</p>
+<code class="block">
+$.event.trigger('updateshadowdom');
+</code>
+							<p><small>Note: The <code>updateshadowdom</code> event is automatically (but 'lazily') triggered on window.resize/emchange events.</small></p>
 						</li>
 					</ul>
 					</div>
