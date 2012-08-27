@@ -1188,10 +1188,10 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			var resizeTimer;
 			var lastHeight;
 			var lastWidth;
-			$(window).bind('emchange resize', function(e){
+			var handler = function(e){
 				clearTimeout(resizeTimer);
 				resizeTimer = setTimeout(function(){
-					if(e.type == 'resize'){
+					if(e.type == 'resize' && e.target == window){
 						var width = $(window).width();
 						var height = $(window).width();
 						if(height == lastHeight && width == lastWidth){
@@ -1202,7 +1202,10 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					}
 					$.event.trigger('updateshadowdom');
 				}, 20);
-			});
+			};
+			// see also: http://www.tomdeater.com/jquery/onfontresize/ and http://benalman.com/projects/jquery-resize-plugin/
+			$(document).bind('emchange resize fontresize', handler);
+			$(window).bind('resize', handler);
 			
 			$.event.customEvent.updateshadowdom = true;
 			

@@ -1832,10 +1832,11 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 
 (function(){
 	Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
-	var bustedTextarea = $.browser.webkit && Modernizr.textareaPlaceholder;
+	var bustedTextarea = $.browser.webkit && Modernizr.textareaPlaceholder && webshims.browserVersion < 536;
 	if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder && !bustedTextarea){return;}
 	
 	var isOver = (webshims.cfg.forms.placeholderType == 'over');
+	var isResponsive = (webshims.cfg.forms.responsivePlaceholder);
 	var polyfillElements = ['textarea'];
 	if(!Modernizr.input.placeholder){
 		polyfillElements.push('input');
@@ -1975,6 +1976,8 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 			return {
 				create: function(elem){
 					var data = $.data(elem, 'placeHolder');
+					var form;
+					var responsiveElem;
 					if(data){return data;}
 					data = $.data(elem, 'placeHolder', {});
 					
@@ -1982,8 +1985,9 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 						changePlaceholderVisibility(this, false, false, data, e.type );
 						data.box[e.type == 'focus' ? 'addClass' : 'removeClass']('placeholder-focused');
 					});
-					if(elem.form){
-						$(elem.form).bind('reset.placeholder', function(e){
+					
+					if((form = $.prop(elem, 'form'))){
+						$(form).bind('reset.placeholder', function(e){
 							setTimeout(function(){
 								changePlaceholderVisibility(elem, false, false, data, e.type );
 							}, 0);
@@ -1992,8 +1996,16 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					
 					if(elem.type == 'password' || isOver){
 						data.text = createPlaceholder(elem);
-						data.box = data.text;
-	
+//						data.box = () ?  
+						if(isResponsive || $(elem).is('.responsive-width') || (elem.currentStyle || {width: ''}).width.indexOf('%') != -1){
+							responsiveElem = true;
+							data.box = data.text;
+						} else {
+							data.box = $(elem)
+								.wrap('<span class="placeholder-box placeholder-box-'+ (elem.nodeName || '').toLowerCase() +' placeholder-box-'+$.css(elem, 'float')+'" />')
+								.parent()
+							;
+						}
 						data.text
 							.insertAfter(elem)
 							.bind('mousedown.placeholder', function(){
@@ -2018,6 +2030,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 							var size = (parseInt($.css(elem, 'padding'+ side), 10) || 0) + Math.max((parseInt($.css(elem, 'margin'+ side), 10) || 0), 0) + (parseInt($.css(elem, 'border'+ side +'Width'), 10) || 0);
 							data.text.css('padding'+ side, size);
 						});
+						
 						$(elem)
 							.bind('updateshadowdom', function(){
 								data.text
@@ -2047,8 +2060,8 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 						
 						$(window).bind('beforeunload', reset);
 						data.box = $(elem);
-						if(elem.form){
-							$(elem.form).submit(reset);
+						if(form){
+							$(form).submit(reset);
 						}
 					}
 					
