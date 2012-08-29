@@ -193,7 +193,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 				ret = '</'+ localName +'>';
 			} else {
 				tag.splice(0, 1);
-				ret =  '<'+ localName +' '+ attribute +'="'+ (tag.join(' ').replace(/\"/g, '&quot;')) +'">';
+				ret =  '<'+ localName +' '+ attribute +'="'+ (tag.join(' ').replace(/\"/g, '&#34;')) +'">';
 			}
 			return ret;
 		};
@@ -233,6 +233,8 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 				if(!obj.readyState){
 					error = function(){
 						obj.readyState = 3;
+						obj.cues = null;
+						obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = null;
 						$(track).triggerHandler('error');
 					};
 					obj.readyState = 1;
@@ -631,7 +633,7 @@ modified for webshims
 	}, 'prop');
 
 	
-	$(document).bind('emptied', function(e){
+	$(document).bind('emptied ended', function(e){
 		if($(e.target).is('audio, video')){
 			setTimeout(function(){
 				updateMediaTrackList.call(e.target);
@@ -643,7 +645,6 @@ modified for webshims
 		return textTrack.readyState || trackElem.readyState;
 	};
 	
-	var trackReplace = $('<span />');
 	webshims.addReady(function(context, insertedElement){
 		$('video, audio', context)
 			.add(insertedElement.filter('video, audio, track').closest('audio, video'))
@@ -655,6 +656,7 @@ modified for webshims
 					if(shimedTextTracks.length != origTextTracks.length){
 						webshims.error("textTracks couldn't be copied");
 					}
+					
 					$('track', this)
 						.each(function(){
 							var shimedTrack = $.prop(this, 'track');
