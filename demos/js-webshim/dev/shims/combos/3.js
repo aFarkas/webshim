@@ -1832,7 +1832,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 
 (function(){
 	Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
-	var bustedTextarea = $.browser.webkit && Modernizr.textareaPlaceholder && webshims.browserVersion < 536;
+	var bustedTextarea = $.browser.webkit && Modernizr.textareaPlaceholder && webshims.browserVersion < 535;
 	if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder && !bustedTextarea){return;}
 	
 	var isOver = (webshims.cfg.forms.placeholderType == 'over');
@@ -1996,7 +1996,6 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					
 					if(elem.type == 'password' || isOver){
 						data.text = createPlaceholder(elem);
-//						data.box = () ?  
 						if(isResponsive || $(elem).is('.responsive-width') || (elem.currentStyle || {width: ''}).width.indexOf('%') != -1){
 							responsiveElem = true;
 							data.box = data.text;

@@ -1548,11 +1548,13 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				webshims.triggerDomUpdate(_wrapper[0]);	
 			}
 			['disabled', 'min', 'max', 'value', 'step', 'data-placeholder'].forEach(function(name){
-				var val = elem.prop(name);
-				if(val !== "" && (name != 'disabled' || !val)){
-					elem.prop(name, val);
+				var fn = 'data-placeholder' ? 'attr' : 'prop';
+				var val = elem[fn](name);
+				if(val){
+					elem[fn](name, val);
 				}
 			});
+			
 			return data;
 		};
 		
@@ -1730,10 +1732,13 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					triggerInlineForm(elem[0], 'input');
 					triggerInlineForm(elem[0], 'change');
 				},
-				data = configureDatePicker(elem, date, change)
+				data
 				
 			;
+			
 			this.common(elem, date, replaceInputUI.date.attrs);
+			
+			data = configureDatePicker(elem, date, change);
 			
 			$(elem)
 				.bind('updateshadowdom', function(){
@@ -1843,7 +1848,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			range.slider($.extend(true, {}, options.slider, elem.data('slider'))).bind('slide', change);
 			
 			['disabled', 'min', 'max', 'step', 'value'].forEach(function(name){
-				var val = elem.attr(name);
+				var val = elem.prop(name);
 				var shadow;
 				if(name == 'value' && !val){
 					
@@ -1853,7 +1858,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					}
 				}
 				if(val != null){
-					elem.attr(name, val);
+					elem.prop(name, val);
 				}
 			});
 		};
