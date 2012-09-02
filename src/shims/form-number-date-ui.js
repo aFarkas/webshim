@@ -430,13 +430,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				.bind('updateshadowdom', function(){
 					if (data.trigger[0]) {
 						elem.css({display: ''});
-						var attr = getDimensions(elem);
-						if (attr.css) {
-							date.css(attr.css);
-							if (attr.outerWidth) {
-								date.outerWidth(attr.outerWidth);
+						if(elem[0].offsetWidth || elem[0].offsetHeight){
+							var attr = getDimensions(elem);
+							if (attr.css) {
+								date.css(attr.css);
+								if (attr.outerWidth) {
+									date.outerWidth(attr.outerWidth);
+								}
+								adjustInputWithBtn(date, data.trigger);
 							}
-							adjustInputWithBtn(date, data.trigger);
 						}
 					}
 					elem.css({display: 'none'});
@@ -518,11 +520,13 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			elem
 				.bind('updateshadowdom', function(){
 					elem.css({display: ''});
-					var attr = getDimensions(elem);
-					if(attr.css){
-						range.css(attr.css);
-						if(attr.outerWidth){
-							range.outerWidth(attr.outerWidth);
+					if (elem[0].offsetWidth || elem[0].offsetHeight) {
+						var attr = getDimensions(elem);
+						if (attr.css) {
+							range.css(attr.css);
+							if (attr.outerWidth) {
+								range.outerWidth(attr.outerWidth);
+							}
 						}
 					}
 					elem.css({display: 'none'});
@@ -807,8 +811,17 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 				webshims.data(elem, 'step-controls', controls);
 				if(options.calculateWidth){
-					adjustInputWithBtn(jElm, controls);
-					controls.css('marginTop', (jElm.outerHeight() - controls.outerHeight())  / 2 );
+					var init;
+					jElm
+						.bind('updateshadowdom', function(){
+							if(!init && (elem.offsetWidth || elem.offsetHeight)){
+								init = true;
+								adjustInputWithBtn(jElm, controls);
+								controls.css('marginTop', (jElm.outerHeight() - controls.outerHeight()) / 2);
+							}
+						})
+						.triggerHandler('updateshadowdom')
+					;
 				}
 			});
 		}

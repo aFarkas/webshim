@@ -1210,13 +1210,16 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 						
 						$(elem)
 							.bind('updateshadowdom', function(){
-								data.text
-									.css({
-										width: $(elem).width(),
-										height: $(elem).height()
-									})
-									.css($(elem).position())
-								;
+								var height, width; 
+								if((width = elem.offsetWidth) || (height = elem.offsetHeight)){
+									data.text
+										.css({
+											width: width,
+											height: height
+										})
+										.css($(elem).position())
+									;
+								}
 							})
 							.triggerHandler('updateshadowdom')
 						;

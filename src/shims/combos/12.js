@@ -386,7 +386,29 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			var resizeTimer;
 			var lastHeight;
 			var lastWidth;
-			var handler = function(e){
+			var handler;
+			var docObserve = {
+				init: false,
+				start: function(){
+					if(!this.init){
+						this.init = true;
+						this.height = $(document).height();
+						this.width = $(document).width();
+						setInterval(function(){
+							var height = $(document).height();
+							var width = $(document).width();
+							if(height != docObserve.height || width != docObserve.width){
+								docObserve.height = height;
+								docObserve.width = width;
+								handler({type: 'docresize'});
+								console.log('docresize')
+							}
+						}, 400);
+					}
+				}
+			};
+			
+			handler = function(e){
 				clearTimeout(resizeTimer);
 				resizeTimer = setTimeout(function(){
 					if(e.type == 'resize' && e.target == window){
@@ -397,6 +419,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						}
 						lastHeight = height;
 						lastWidth = width;
+						docObserve.height = $(document).height();
+						docObserve.width = $(document).width();
 					}
 					$.event.trigger('updateshadowdom');
 				}, 20);
@@ -444,6 +468,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					shadowFocusElementData.shadowData.data = shadowData.shadowData.data = nativeData.shadowData.data = opts.data;
 				}
 				opts = null;
+				docObserve.start();
 			}
 		})(),
 		propTypes: {

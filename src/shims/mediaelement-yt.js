@@ -429,6 +429,9 @@ mediaelement.createSWF = function(mediaElem, src, data){
 			}
 		}
 	}));
+	
+	
+	
 	setElementDimension(data);
 	box.insertBefore(mediaElem);
 	
@@ -437,6 +440,9 @@ mediaelement.createSWF = function(mediaElem, src, data){
 	addMediaToStopEvents(mediaElem);
 	
 	addYtAPI(mediaElem, elemId, data, ytID);
+	$(mediaElem).bind('updatemediaelementdimensions updateshadowdom', function(){
+		setElementDimension(data);
+	});
 };
 
 (function(){
