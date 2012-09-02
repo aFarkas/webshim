@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 	<title>Webshims Lib Test Suite</title>
 	<script src="../src/extras/modernizr-custom.js"></script>
 	<link rel="stylesheet" href="qunit/qunit.css" media="screen">
@@ -11,7 +12,8 @@
 			if(hash.indexOf('legacyjquery') != -1){
 				document.write('<script src="http:\/\/ajax.googleapis.com\/ajax\/libs\/jquery\/1.7\/jquery.js"><\/script>');
 			} else {
-				document.write('<script src="http:\/\/ajax.googleapis.com\/ajax\/libs\/jquery\/1.8\/jquery.js"><\/script>');
+				
+				document.write('<script src="http:\/\/code.jquery.com\/jquery-1.8.1.js"><\/script>');
 			}
 		})();
 	</script>

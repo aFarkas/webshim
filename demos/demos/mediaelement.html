@@ -3,6 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 	<link href="../css/styles.css" rel="stylesheet" />
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
@@ -205,7 +206,7 @@
 		});
 	</script>
 	<script src="../demo-js/demo.js"></script>
-	<title>HTML5 mediaelements audio and video : webshims lib - the polyfilling capability based loading JS library</title>
+	<title>HTML5 mediaelements audio, video and track : webshims lib - the polyfilling capability based loading JS library</title>
 </head>
 
 <body>
@@ -284,7 +285,7 @@ $("video.my-video").loadMediaSrc(
 	"my-poster.jpg"
 );
 </code>			<h2>Track Element support</h2>
-				<p>The <code>track</code> feature implements the track element including the corresponding DOM- and JS-APIs.</p>
+				<p>The <code>track</code> feature implements the track element width a WebVTT parser and the including the corresponding DOM- and JS-APIs.</p>
 				<h3>Implemented/fixed elements, attributes, properties, methods, events</h3>
 				<ul>
 					<li><strong>elements:</strong> <a href="http://www.w3.org/TR/html5/the-track-element.html">track</a></li>
@@ -301,7 +302,7 @@ $("video.my-video").loadMediaSrc(
 				<h3>Options for the <code>track</code> feature</h3>
 				
 				<ul>
-					<li><strong>override</strong> (false): Overrides native track implementation. In case you have to deal with some cross-browser issues with nativ3e implementation.</li>
+					<li><strong>override</strong> (false): Overrides native track implementation. In case you have to deal with some cross-browser issues with native implementation.</li>
 					<li><strong>positionDisplay</strong> (true): Positions the cue display via JavaScript.</li>
 				</ul>
 			</section>

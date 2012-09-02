@@ -252,7 +252,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	 * Selectors for all browsers
 	 */
 	var rangeTypes = {number: 1, range: 1, date: 1/*, time: 1, 'datetime-local': 1, datetime: 1, month: 1, week: 1*/};
-	$.extend($.expr.filters, {
+	$.extend($.expr[":"], {
 		"valid-element": function(elem){
 			return !!($.prop(elem, 'willValidate') && ($.prop(elem, 'validity') || {valid: 1}).valid);
 		},
@@ -283,11 +283,11 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	});
 	
 	['valid', 'invalid', 'required', 'optional'].forEach(function(name){
-		$.expr.filters[name] = $.expr.filters[name+"-element"];
+		$.expr[":"][name] = $.expr.filters[name+"-element"];
 	});
 	
 	
-	$.expr.filters.focus = function( elem ) {
+	$.expr[":"].focus = function( elem ) {
 		try {
 			var doc = elem.ownerDocument;
 			return elem === doc.activeElement && (!doc.hasFocus || doc.hasFocus());
@@ -493,7 +493,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 						hideTimer = setTimeout(boundHide, this.hideDelay);
 					}
 					$(window)
-						.bind('resize.validityalert orientationchange.validityalert emchange.validityalert', function(){
+						.bind('resize.validityalert', function(){
 							clearTimeout(resizeTimer);
 							resizeTimer = setTimeout(function(){
 								api.position(visual);

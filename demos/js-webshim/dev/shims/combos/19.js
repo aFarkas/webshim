@@ -410,7 +410,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			handler = function(e){
 				clearTimeout(resizeTimer);
 				resizeTimer = setTimeout(function(){
-					if(e.type == 'resize' && e.target == window){
+					if(e.type == 'resize'){
 						var width = $(window).width();
 						var height = $(window).width();
 						if(height == lastHeight && width == lastWidth){
@@ -422,10 +422,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						docObserve.width = $(document).width();
 					}
 					$.event.trigger('updateshadowdom');
-				}, 20);
+				}, 40);
 			};
-			// see also: http://www.tomdeater.com/jquery/onfontresize/ and http://benalman.com/projects/jquery-resize-plugin/
-			$(document).bind('emchange resize fontresize', handler);
 			$(window).bind('resize', handler);
 			
 			$.event.customEvent.updateshadowdom = true;
@@ -1838,7 +1836,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	 * Selectors for all browsers
 	 */
 	var rangeTypes = {number: 1, range: 1, date: 1/*, time: 1, 'datetime-local': 1, datetime: 1, month: 1, week: 1*/};
-	$.extend($.expr.filters, {
+	$.extend($.expr[":"], {
 		"valid-element": function(elem){
 			return !!($.prop(elem, 'willValidate') && ($.prop(elem, 'validity') || {valid: 1}).valid);
 		},
@@ -1869,11 +1867,11 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	});
 	
 	['valid', 'invalid', 'required', 'optional'].forEach(function(name){
-		$.expr.filters[name] = $.expr.filters[name+"-element"];
+		$.expr[":"][name] = $.expr.filters[name+"-element"];
 	});
 	
 	
-	$.expr.filters.focus = function( elem ) {
+	$.expr[":"].focus = function( elem ) {
 		try {
 			var doc = elem.ownerDocument;
 			return elem === doc.activeElement && (!doc.hasFocus || doc.hasFocus());
@@ -2079,7 +2077,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 						hideTimer = setTimeout(boundHide, this.hideDelay);
 					}
 					$(window)
-						.bind('resize.validityalert orientationchange.validityalert emchange.validityalert', function(){
+						.bind('resize.validityalert', function(){
 							clearTimeout(resizeTimer);
 							resizeTimer = setTimeout(function(){
 								api.position(visual);
