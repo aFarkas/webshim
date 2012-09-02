@@ -2373,7 +2373,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	if(!hasNative){
 		
 		['poster', 'src'].forEach(function(prop){
-			webshims.defineNodeNameProperty(prop == 'src' ? ['audio', 'video', 'source'] : ['video'], prop, {
+			webshims.defineNodeNamesProperty(prop == 'src' ? ['audio', 'video', 'source'] : ['video'], prop, {
 				//attr: {},
 				reflect: true,
 				propType: 'src'

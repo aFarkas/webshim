@@ -73,8 +73,6 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	});
 	
 	
-	
-	
 	['removeAttr', 'prop', 'attr'].forEach(function(type){
 		olds[type] = $[type];
 		$[type] = function(elem, name, value, pass, _argless){
@@ -514,10 +512,12 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 							var href = this.getAttribute(name);
 							var ret;
 							if(href == null){return '';}
+							
 							anchor.setAttribute('href', href+'' );
+							
 							if(!$.support.hrefNormalized){
 								try {
-									$(anchor).insertAfterTo(this);
+									$(anchor).insertAfter(this);
 									ret = anchor.getAttribute('href', 4);
 								} catch(er){
 									ret = anchor.getAttribute('href', 4);
