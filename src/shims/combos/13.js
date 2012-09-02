@@ -401,7 +401,6 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 								docObserve.height = height;
 								docObserve.width = width;
 								handler({type: 'docresize'});
-								console.log('docresize')
 							}
 						}, 400);
 					}

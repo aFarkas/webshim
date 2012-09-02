@@ -109,7 +109,7 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 			track._lastFoundCue = {index: 0, time: 0};
 		}
 		
-		if(Modernizr.track && !track._shimActiveCues){
+		if(Modernizr.track && !options.override && !track._shimActiveCues){
 			track._shimActiveCues = [];
 		}
 		
@@ -127,7 +127,7 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 				}
 				$(track).triggerHandler('cuechange');
 				$(cue).triggerHandler('exit');
-			} else if(track.mode > 1 && showTracks[track.kind] && $.inArray(cue, baseData.activeCues) == -1){
+			} else if(track.mode == 'showing' && showTracks[track.kind] && $.inArray(cue, baseData.activeCues) == -1){
 				baseData.activeCues.push(cue);
 			}
 		}
@@ -141,7 +141,7 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 			
 			if(cue.startTime <= time && cue.endTime >= time && $.inArray(cue, track.shimActiveCues) == -1){
 				track.shimActiveCues.push(cue);
-				if(track.mode > 1 && showTracks[track.kind]){
+				if(track.mode == 'showing' && showTracks[track.kind]){
 					baseData.activeCues.push(cue);
 				}
 				$(track).triggerHandler('cuechange');
@@ -203,8 +203,8 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 	}
 	
 	webshims.addReady(function(context, insertedElement){
-		$('video', context)
-			.add(insertedElement.filter('video'))
+		$('video, audio', context)
+			.add(insertedElement.filter('video, audio'))
 			.each(function(){
 				var trackList;
 				var elem = $(this);
@@ -232,10 +232,12 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 							baseData.activeCues = [];
 							for(var i = 0, len = trackList.length; i < len; i++){
 								track = trackList[i];
-								if(track.mode > 0 && track.cues && track.cues.length){
+								if(track.mode != 'disabled' && track.cues && track.cues.length){
 									webshims.mediaelement.getActiveCue(track, elem, time, baseData);
+									
 								}
 							}
+							
 							trackDisplay.update(baseData, elem);
 							
 						})
@@ -245,22 +247,19 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 					addTrackView();
 				} else {
 					elem.bind('mediaelementapichange trackapichange', function(){
-						trackList = false;
-						baseData = false;
 						if(!usesNativeTrack() || elem.is('.nonnative-api-active')){
 							addTrackView();
 						} else {
-							if(!trackList || !baseData){
-								trackList = elem.prop('textTracks');
-								baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
-							}
+							trackList = elem.prop('textTracks');
+							baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
 							
 							$.each(trackList, function(i, track){
-								trackDisplay.hide(track, baseData);
+								
 								if(track._shimActiveCues){
 									delete track._shimActiveCues;
 								}
 							});
+							trackDisplay.hide(baseData);
 							elem.unbind('.trackview');
 						}
 					});

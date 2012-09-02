@@ -1081,6 +1081,7 @@
 	
 	//<mediaelement combos: 10, 9, 12, 17, 16, 8, 20, 22, 23, 24
 	if ('audio' in Modernizr && 'video' in Modernizr){
+		var trackElem = document.createElement('track');
 		webshims.mediaelement = {};
 		
 		addPolyfill('mediaelement-core', {
@@ -1113,13 +1114,12 @@
 			c: [10, 9, 22, 20]
 		});
 		
-		//This 
 		addTest({
 			texttrackapi: (typeof (document.createElement('video').addTextTrack) === 'function'),
-			track: ('kind' in document.createElement('track'))
+			track: ('kind' in trackElem)
 		});
 		
-		bugs.track = (Modernizr.track && !Modernizr.texttrackapi);
+		bugs.track = (Modernizr.track && (!Modernizr.texttrackapi || typeof (trackElem.track || {}).mode != 'string'));
 		
 		addPolyfill('track', {
 			options: {

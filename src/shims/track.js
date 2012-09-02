@@ -38,7 +38,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		kind: 'subtitles',
 		label: '',
 		language: '',
-		mode: 0,
+		mode: 'disabled',
 		readyState: 0,
 		oncuechange: null,
 		toString: function() {
@@ -88,7 +88,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		}
 		for(i = 0, len = oldTracks.length; i < len; i++){
 			if(trackList.indexOf(oldTracks[i]) == -1){
-				oldTracks[i].mode = 0;
+				oldTracks[i].mode = 'disabled';
 			}
 		}
 		oldTracks = null;
@@ -227,7 +227,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 			var src = $.prop(track, 'src');
 			var error;
 			var ajax;
-			if(obj.mode && src && $.attr(track, 'src')){
+			if(obj.mode != 'disabled' && src && $.attr(track, 'src')){
 				$(mediaelem).unbind(loadEvents, load);
 				$(track).unbind('checktrackmode', load);
 				if(!obj.readyState){
@@ -278,7 +278,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		$(mediaelem).bind(loadEvents, load);
 		$(track).bind('checktrackmode', load);
 		if(_default){
-			obj.mode = showTracks[obj.kind] ? 2 : 1;
+			obj.mode = showTracks[obj.kind] ? 'showing' : 'hidden';
 			load();
 		}
 	};
@@ -313,7 +313,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 			} else {
 				obj.cues = mediaelement.createCueList();
 				obj.activeCues = obj._shimActiveCues = obj.shimActiveCues = mediaelement.createCueList();
-				obj.mode = 1;
+				obj.mode = 'hidden';
 				obj.readyState = 2;
 			}
 		}
@@ -671,7 +671,7 @@ modified for webshims
 								}
 								//disable track from showing + remove UI
 								if(kind != 'descriptions'){
-									origTrack.mode = 0;
+									origTrack.mode = (typeof origTrack.mode == 'string') ? 'disabled' : 0;
 									this.kind = 'metadata';
 									$(this).attr({kind: kind});
 								}
