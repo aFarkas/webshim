@@ -1,6 +1,6 @@
 (function($){
 	var isMobile = /iphone|ipad|mobile/i.test(navigator.userAgent);
-	var setupClickTest = function(){
+	var setupClickTest = function(_removeId){
 		var counters = {};
 		counters.boundInvalids = 0;
 		counters.boundFormInvalids = 0;
@@ -82,6 +82,9 @@
 				counters.boundFirstInvalids++;
 			})
 		;
+		if(_removeId === true){
+			$('#click-test-form').removeAttr('id');
+		}
 		return counters;
 	};
 	var testClickTest = function(counters, expect){
@@ -111,6 +114,7 @@
 		}
 	};
 	module("submit test");
+	
 	test("click test all invalid 1", function(){
 		stop();
 		var counters = setupClickTest();
@@ -121,12 +125,21 @@
 				setTimeout(start, 50);
 			}, 40);
 		}, 0);
-		
-		
-		
-		
-		
 	});
+	
+	test("click test all invalid 1 removed id", function(){
+		stop();
+		var submitter = $('#click-test-form input[type="submit"]');
+		var counters = setupClickTest(true);
+		setTimeout(function(){
+			submitter.trigger('click');
+			setTimeout(function(){
+				testClickTest(counters, {firstinvalid: 1, invalid: 3, submit: 0, focus: $('#click-test-form input').eq(0).getShadowFocusElement()[0]});
+				setTimeout(start, 50);
+			}, 40);
+		}, 0);
+	});
+	
 	test("click test third invalid 2", function(){
 		stop();
 		var counters = setupClickTest();
@@ -152,6 +165,7 @@
 			}, 40);
 		}, 0);
 	});
+	
 	test("click test all invalid but invalid prevented", function(){
 		stop();
 		var counters = setupClickTest();

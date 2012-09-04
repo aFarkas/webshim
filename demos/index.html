@@ -161,7 +161,7 @@
 	});
 &lt;/script&gt;		
 </code>
-					<p><small>Note: Webshims do not need all Modernizr tests to work. Here you find <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-load">all Modernizr detections, which are used by webshims</a>.</small></p>
+					<p><small>Note: Webshims do not need all Modernizr tests to work. Here you find <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track-load">all Modernizr detections, which are used by webshims</a>.</small></p>
 				</div>
 	
 				<h3 id="embed-polyfill" class="button">Embedding and configuring the script</h3>
@@ -211,7 +211,7 @@ $.webshims.polyfill('json-storage geolocation');
 </code>			
 					<p>If you dont want any log messsages, simply set <code>$.webshims.debug</code> explicitly to <code>false</code>.</p>
 					<h3>Custom Modernizr build</h3>
-					<p>Webshims lib does not need every Modernizr test and supports creating a <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-load">custom Modernizr build</a>. (Webshims lib uses <a href="http://requirejs.org/">requireJS</a> as a script loader, if this is included, if not it uses Modernizr.load/yepnope.) </p>
+					<p>Webshims lib does not need every Modernizr test and supports creating a <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track-load">custom Modernizr build</a>. (Webshims lib uses <a href="http://requirejs.org/">requireJS</a> as a script loader, if this is included, if not it uses Modernizr.load/yepnope.) </p>
 					
 					<h3>changing Options path to shims folder</h3>
 					
@@ -402,20 +402,20 @@ $.webshims.polyfill(polyfillFeatures);
 					<h3>Customize Webshims lib's polyfiller.js</h3>
 					<p>While webshims lib comes with a lot of files, the polyfiller.js file is the only file, which has to be embeded directly in the page. The following tool allows you to customize and minimize the polyfiller.js file. (Simply overwrite the polyfiller.js with your customized version. All other files from the download package should stay.):</p>
 					<form action="http://marijnhaverbeke.nl/uglifyjs" method="post" data-polyfillpath="js-webshim/dev/polyfiller.js">
-			    		<fieldset class="config">
-			    			<label><input type="checkbox" checked disabled /> es5</label> 
+						<fieldset class="config">
+							<label><input type="checkbox" checked disabled /> es5</label> 
 							<label><input type="checkbox" checked id="canvas" /> canvas</label>
 							<label><input type="checkbox" checked id="forms" /> forms/forms-ext</label> 
 							<label><input type="checkbox" checked id="mediaelement" /> mediaelement</label> 
 							<label><input type="checkbox" checked id="localstorage" /> json-storage</label> 
 							<label><input type="checkbox" checked id="geolocation" data-dependent="localstorage" /> geolocation</label> 
 							<label><input type="checkbox" checked id="details" /> details</label> 
-			    		</fieldset>
-			    		
-			    		<textarea name="js_code" style="display: none;"></textarea>
+						</fieldset>
+						
+						<textarea name="js_code" style="display: none;"></textarea>
 						<input type="hidden" name="download" value="polyfiller.js" />
 						<input type="submit" value="download custom polyfiller" />	
-			    	</form>
+					</form>
 					<h3>Loading webshims async</h3>
 					<p>If webshims lib is loaded async, there are some configurations which have to be changed manually:</p>
 					<ul>

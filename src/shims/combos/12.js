@@ -983,18 +983,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				try {
 					new TextTrackCue(2, 3, '');
 				} catch(e){
-					try {
-						new TextTrackCue('', 2, 3, '', '', false);
-						var oldTextTrack = TextTrackCue;
-						window.TextTrackCue = function(startTime, endTime, text, a, b, c){
-							if(arguments.length != 3){
-								webshims.warn("TextTrackCue has 3 arguments: startTime, endTime and text. everything else is deprecated");
-							}
-							return (arguments.length > 4) ? new oldTextTrack(startTime, endTime, text, a, b || '', c || false) :  new oldTextTrack('', startTime, endTime, text, '', false);
-						};
-					} catch(e){
-						bugs.track = true;
-					}
+					bugs.track = true;
 				}
 			}
 			

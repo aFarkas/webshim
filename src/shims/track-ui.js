@@ -3,6 +3,7 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 	var enterE = {type: 'enter'};
 	var exitE = {type: 'exit'};
 	var showTracks = {subtitles: 1, captions: 1};
+	var mediaelement = webshims.mediaelement;
 	var usesNativeTrack =  function(){
 		return !options.override && Modernizr.track;
 	};
@@ -102,15 +103,35 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 		forceupdatetrackdisplay: true
 	});
 	
-	webshims.mediaelement.trackDisplay = trackDisplay;
+	mediaelement.trackDisplay = trackDisplay;
 	
-	webshims.mediaelement.getActiveCue = function(track, media, time, baseData){
+	if(!mediaelement.createCueList){
+		
+		var cueListProto = {
+			getCueById: function(id){
+				var cue = null;
+				for(var i = 0, len = this.length; i < len; i++){
+					if(this[i].id === id){
+						cue = this[i];
+						break;
+					}
+				}
+				return cue;
+			}
+		};
+		
+		mediaelement.createCueList = function(){
+			return $.extend([], cueListProto);
+		};
+	}
+	
+	mediaelement.getActiveCue = function(track, media, time, baseData){
 		if(!track._lastFoundCue){
 			track._lastFoundCue = {index: 0, time: 0};
 		}
 		
 		if(Modernizr.track && !options.override && !track._shimActiveCues){
-			track._shimActiveCues = [];
+			track._shimActiveCues = mediaelement.createCueList();
 		}
 		
 		var i = 0;
@@ -233,7 +254,7 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 							for(var i = 0, len = trackList.length; i < len; i++){
 								track = trackList[i];
 								if(track.mode != 'disabled' && track.cues && track.cues.length){
-									webshims.mediaelement.getActiveCue(track, elem, time, baseData);
+									mediaelement.getActiveCue(track, elem, time, baseData);
 									
 								}
 							}

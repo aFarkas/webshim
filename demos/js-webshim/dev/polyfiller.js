@@ -29,7 +29,7 @@
 	}	
 	
 	var webshims = {
-		version: '1.9.0RC3',
+		version: '1.9.0',
 		cfg: {
 			useImportantStyles: true,
 			//removeFOUC: false,
@@ -1150,6 +1150,8 @@
 	
 	if(!$.fn.on){
 		webshims.error("webshims 1.9.0 needs jQuery 1.7+. Please use a newer version of jQuery");
+	} else if($.fn.jquery == '1.8.0'){
+		webshims.error("webshims 1.9+ needs jQuery 1.7.1+ or 1.8.1+. We do not support jQ 1.8.0");
 	}
 	
 	jScripts

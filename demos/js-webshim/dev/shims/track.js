@@ -28,7 +28,16 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 	
 	
 	var cueListProto = {
-		getCueById: notImplemented
+		getCueById: function(id){
+			var cue = null;
+			for(var i = 0, len = this.length; i < len; i++){
+				if(this[i].id === id){
+					cue = this[i];
+					break;
+				}
+			}
+			return cue;
+		}
 	};
 	var textTrackProto = {
 		shimActiveCues: null,
@@ -46,7 +55,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		},
 		addCue: function(cue){
 			if(!this.cues){
-				this.cues =mediaelement.createCueList();
+				this.cues = mediaelement.createCueList();
 			} else {
 				var lastCue = this.cues[this.cues.length-1];
 				if(lastCue && lastCue.startTime > cue.startTime){
@@ -203,7 +212,6 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 				tag[0] = tag[0].toLowerCase();
 				if(allowedTags.test(tag[0])){
 					if(tag[0] == 'c'){
-						tag.splice(0, 1);
 						html = addToTemplate('span', 'class', tag, html);
 					} else if(tag[0] == 'v'){
 						html = addToTemplate('q', 'title', tag, html);

@@ -75,7 +75,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-upcomming Release 1.9.0
+Release 1.9.0
 ----------
 
 - basic but powerfull track-element including corresponding [DOM- and JS-API](http://jsfiddle.net/trixta/QZJTM/)
@@ -86,7 +86,10 @@ upcomming Release 1.9.0
 - allow placeholder on input[type="date"]. (as a hint for the dateformat, but use data-placeholder, instead of placeholder!)
 - added opus -> mime-type detection for audio
 - fixed regression for using an initial value with input[type="date"]. (introduced in 1.8.11)
-- jQuery 1.6.x not tested anymore, use 1.7.2+/1.8.x (but we will have legacy support for webshims 1.8.x)
+- update Modernizr to 2.6.2/jQuery UI to 1.8.23
+- jQuery 1.6.x not supported anymore, use 1.7.2+ or 1.8.1+ (but we will have legacy support for webshims 1.8.x)
+
+**We support jQuery 1.7.1+ and 1.8.1+, but not jQuery 1.8.0 or jQuery 1.7.0**
 
 
 Release 1.8.13

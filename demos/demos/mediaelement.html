@@ -19,6 +19,12 @@
 	
 	<script src="../js-webshim/minified/polyfiller.js"></script>
 	
+	<!--
+		<script src="../../src/polyfiller.js"></script> 
+		<script>
+			$.webshims.debug = 'noCombo';
+		</script>
+	-->
 	<script>
 		$.webshims.setOptions({
 			waitReady: true
@@ -285,7 +291,7 @@ $("video.my-video").loadMediaSrc(
 	"my-poster.jpg"
 );
 </code>			<h2>Track Element support</h2>
-				<p>The <code>track</code> feature implements the track element width a WebVTT parser and the including the corresponding DOM- and JS-APIs.</p>
+				<p>The <code>track</code> feature implements the track element width a WebVTT parser and the corresponding DOM- and JS-APIs.</p>
 				<h3>Implemented/fixed elements, attributes, properties, methods, events</h3>
 				<ul>
 					<li><strong>elements:</strong> <a href="http://www.w3.org/TR/html5/the-track-element.html">track</a></li>
@@ -296,7 +302,7 @@ $("video.my-video").loadMediaSrc(
 					<li><strong>corresponding interfaces</strong>: <a href="http://dev.w3.org/html5/spec/media-elements.html#texttracklist">TextTrackList</a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrack">TextTrack<sup>1</sup></a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrackcuelist">TextTrackCueList</a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrackcue">TextTrackCue</a> including the <a href="http://dev.w3.org/html5/spec/media-elements.html#dom-texttrackcue">TrextTrackCue constructor</a></li>
 				</ul>
 				<ul>
-					<li><small>1.Use shimActiveCues instead of activeCues property.</small></li>
+					<li><small>1.Use shimActiveCues instead of activeCues property. In case override is set to true or all track supporting browsers (currently only Chrome 23) won't load the flash- or the youtube iframe fallback  for video/audio playback, activeCues can be also used savely.</small></li>
 				</ul>
 				
 				<h3>Options for the <code>track</code> feature</h3>
