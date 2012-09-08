@@ -29,10 +29,9 @@
 	}	
 	
 	var webshims = {
-		version: '1.9.0',
+		version: '1.9.1pre',
 		cfg: {
 			useImportantStyles: true,
-			//removeFOUC: false,
 			//addCacheBuster: false,
 			waitReady: true,
 			extendNative: true,
@@ -826,14 +825,14 @@
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
 	addPolyfill('es5', {
 		test: !!(Modernizr.ES5 && Function.prototype.bind),
-		c: [10, 1, 22]
+		c: [27, 10, 1, 22]
 	});
 	
 	addPolyfill('dom-extend', {
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		d: ['es5'],
-		c: [10, 9, 12, 17, 16, 8, 1, 24, 19, 11, 13]
+		c: [27, 10, 9, 12, 17, 26, 16, 25, 8, 1, 24, 19, 11, 13]
 	});
 		
 	
@@ -924,7 +923,7 @@
 	//>
 	
 	
-	//<forms combos: 3, 2, 59, 17, 16, 5, 4, 24, 19, 18, 7, 59, 5, 21, 11, 23
+	//<forms combos: 3, 2, 59, 17, 16, 5, 4, 24, 19, 18, 7, 59, 5, 21, 11, 23, 26
 	var modernizrInputAttrs = Modernizr.input;
 	var modernizrInputTypes = Modernizr.inputtypes;
 	
@@ -972,14 +971,14 @@
 			options: {
 				placeholderType: 'value',
 				langSrc: 'i18n/errormessages-',
+				lightweightDatalist: true,
 				availabeLangs: ['ar', 'ch-ZN', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'nl', 'pt-PT', 'ru'] //en and de are directly implemented in core
 	//			,customMessages: false,
 	//			overrideMessages: false,
-	//			replaceValidationUI: false,
-	//			lightweightDatalist: false
+	//			replaceValidationUI: false
 			},
 			methodNames: ['setCustomValidity','checkValidity'],
-			c: [3, 2, 59, 17, 16, 5, 4, 24, 19]
+			c: [3, 2, 59, 17, 26, 16, 5, 4, 24, 19]
 		});
 		
 		formOptions = webCFG.forms;
@@ -1079,9 +1078,8 @@
 	});
 	//>
 	
-	//<mediaelement combos: 10, 9, 12, 17, 16, 8, 20, 22, 23, 24
-	if ('audio' in Modernizr && 'video' in Modernizr){
-		var trackElem = document.createElement('track');
+	//<mediaelement combos: 10, 9, 12, 17, 16, 8, 20, 22, 23, 24, 25, 26, 27
+	if ('audio' in Modernizr && 'video' in Modernizr && 'texttrackapi' in Modernizr){
 		webshims.mediaelement = {};
 		
 		addPolyfill('mediaelement-core', {
@@ -1089,7 +1087,7 @@
 			noAutoCallback: true,
 			
 			d: ['swfobject',DOMSUPPORT],
-			c: [10, 9, 12, 17, 16, 8, 22, 23, 24, 20]
+			c: [27, 10, 9, 12, 17, 26, 16, 25, 8, 22, 23, 24, 20]
 		});
 		addPolyfill('mediaelement-swf', {
 			f: 'mediaelement',
@@ -1111,15 +1109,10 @@
 				var hasToPlay = options.hasToPlay;
 				return !( (!window.swfobject || window.swfobject.hasFlashPlayerVersion('9.0.115')) && (options.preferFlash || (hasToPlay != 'any' && !Modernizr.video[hasToPlay] && !Modernizr.audio[hasToPlay])));
 			},
-			c: [10, 9, 22, 20]
+			c: [27, 10, 9, 22, 20]
 		});
 		
-		addTest({
-			texttrackapi: (typeof (document.createElement('video').addTextTrack) === 'function'),
-			track: ('kind' in trackElem)
-		});
-		
-		bugs.track = (Modernizr.track && (!Modernizr.texttrackapi || typeof (trackElem.track || {}).mode != 'string'));
+		bugs.track = (Modernizr.track && (!Modernizr.texttrackapi || typeof (document.createElement('track').track || {}).mode != 'string'));
 		
 		addPolyfill('track', {
 			options: {
@@ -1131,7 +1124,7 @@
 			},
 			d: ['mediaelement', DOMSUPPORT],
 			methodNames: ['addTextTrack'],
-			c: []
+			c: [27, 26, 25]
 		});
 		
 		addModule('track-ui', {
@@ -1148,11 +1141,6 @@
 		c: removeCombos
 	});
 	
-	if(!$.fn.on){
-		webshims.error("webshims 1.9.0 needs jQuery 1.7+. Please use a newer version of jQuery");
-	} else if($.fn.jquery == '1.8.0'){
-		webshims.error("webshims 1.9+ needs jQuery 1.7.1+ or 1.8.1+. We do not support jQ 1.8.0");
-	}
 	
 	jScripts
 		.filter('[data-polyfill-cfg]')

@@ -2195,6 +2195,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
 				if(message.indexOf('{%'+attr) === -1){return;}
 				var val = ((attr == 'label') ? $.trim($('label[for="'+ elem.id +'"]', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
+				if(name == 'patternMismatch' && attr == 'title' && !val){
+					webshims.error('no title for patternMismatch provided. Always add a title attribute.');
+				}
 				message = message.replace('{%'+ attr +'}', val);
 				if('value' == attr){
 					message = message.replace('{%valueLen}', val.length);

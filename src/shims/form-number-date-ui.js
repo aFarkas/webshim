@@ -8,6 +8,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	var adjustInputWithBtn = (function(){
 		var fns = {"padding-box": "innerWidth", "border-box": "outerWidth", "content-box": "width"};
 		var boxSizing = Modernizr.prefixed && Modernizr.prefixed("boxSizing");
+		if($.browser.msie && webshims.browserVersion < 8){
+			boxSizing = false;
+		}
 		var getWidth = function(input){
 			var widthFn = "width";
 			if(boxSizing){
@@ -766,7 +769,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					})
 				;
 				var mwheelUpDown = function(e, d){
-					if(elem.disabled || elem.readOnly){return;}
+					if(elem.disabled || elem.readOnly || !d){return;}
 					$.prop(elem, 'value',  typeModels[type].numberToString(getNextStep(elem, d, {type: type})));
 					triggerInlineForm(elem, 'input');
 					return false;
@@ -797,7 +800,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 				if($.fn.mwheelIntent){
 					jElm.add(controls).bind('mwheelIntent', mwheelUpDown);
-				} else {
+				} else if($.fn.mousewheel) {
 					jElm
 						.bind('focus', function(){
 							jElm.add(controls).unbind('.mwhellwebshims')

@@ -54,6 +54,8 @@
 		</concat>
 		
 		
+		
+		
 		<concat destfile="${src}/shims/combos/9.js">
 			<fileset file="${src}/shims/combos/8.js" />
 			<fileset file="${src}/shims/mediaelement-swf.js" />
@@ -142,6 +144,21 @@
 		<concat destfile="${src}/shims/combos/24.js">
 			<fileset file="${src}/shims/combos/19.js" />
 			<fileset file="${src}/shims/mediaelement-core.js" />
+		</concat>
+		
+		<concat destfile="${src}/shims/combos/25.js">
+			<fileset file="${src}/shims/combos/8.js" />
+			<fileset file="${src}/shims/track.js" />
+		</concat>
+		
+		<concat destfile="${src}/shims/combos/26.js">
+			<fileset file="${src}/shims/combos/16.js" />
+			<fileset file="${src}/shims/track.js" />
+		</concat>
+		
+		<concat destfile="${src}/shims/combos/27.js">
+			<fileset file="${src}/shims/combos/10.js" />
+			<fileset file="${src}/shims/track.js" />
 		</concat>
 		
 		<!-- remove if webkit supports datalist -->

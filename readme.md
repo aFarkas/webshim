@@ -89,8 +89,6 @@ Release 1.9.0
 - update Modernizr to 2.6.2/jQuery UI to 1.8.23
 - jQuery 1.6.x not supported anymore, use 1.7.2+ or 1.8.1+ (but we will have legacy support for webshims 1.8.x)
 
-**We support jQuery 1.7.1+ and 1.8.1+, but not jQuery 1.8.0 or jQuery 1.7.0**
-
 
 Release 1.8.13
 ----------

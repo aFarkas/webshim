@@ -254,7 +254,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 							url: src,
 							success: function(text){
 								if(ajax.getResponseHeader('content-type') != 'text/vtt'){
-									webshims.warn('set the mime-type of your WebVTT files to text/vtt. see: http://dev.w3.org/html5/webvtt/#text/vtt');
+									webshims.error('set the mime-type of your WebVTT files to text/vtt. see: http://dev.w3.org/html5/webvtt/#text/vtt');
 								}
 								mediaelement.parseCaptions(text, obj, function(cues){
 									if(cues && 'length' in cues){
@@ -505,7 +505,7 @@ modified for webshims
 				}, 9);
 				
 			} else {
-				throw new Error("Required parameter captionData not supplied.");
+				webshims.error("Required parameter captionData not supplied.");
 			}
 		};
 	

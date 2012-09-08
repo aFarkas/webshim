@@ -30,8 +30,9 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 		showCues: function(baseData){
 			var element = $('<span class="cue-wrapper" />');
 			$.each(baseData.displayedActiveCues, function(i, cue){
+				var id = (cue.id) ? 'id="cue-id-'+cue.id +'"' : '';
 				element.append(
-					$('<span class="cue" />').html(cue.getCueAsHTML())
+					$('<span '+ id+ ' class="cue" />').html(cue.getCueAsHTML())
 				);
 			});
 			baseData.trackDisplay.html(element);
