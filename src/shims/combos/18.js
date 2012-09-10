@@ -1394,11 +1394,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		}, 0));
 	};
 	
-	if(options.lazyDate === undefined){
-		try {
-			options.lazyDate = ($.browser.msie && webshims.browserVersion < 9) || ($(window).width() < 500 && $(window).height() < 500);
-		} catch(er){}
-	}
 	
 	var copyAttrs = {
 		tabindex: 1,

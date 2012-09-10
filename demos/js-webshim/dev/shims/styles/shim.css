@@ -557,6 +557,7 @@ datalist {
 	position: absolute !important;
 	overflow: hidden;
 	padding: 0 6px 6px 0;
+	font: 12px/140% sans-serif;
 	z-index: 1000000000;
 	
 }
@@ -568,9 +569,10 @@ datalist {
 	display: inline-block !important;
 	background: #fafafa;
 	color: #000;
-	border: 1px solid #000;
+	border: 1px solid #ccc;
 	padding: 5px;
-	border-radius: 2px;
+	border-radius: 5px;
+	box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 	zoom: 1 !important;
 	min-width: 60px;
 }
@@ -585,16 +587,18 @@ datalist {
 	border-left: 9px solid transparent;
 	border-right: 9px solid transparent;
 	
-	border-bottom: 7px solid #000;
+	border-bottom: 7px solid #ccc;
 	border-top: none;
 	zoom: 1;
 	font-size: 0;
 }
-html .validity-alert span.va-arrow {
+html .validity-alert span.va-arrow,
+html .validity-alert .va-arrow .va-arrow-box{
 	border-left-color: transparent;
 	border-right-color: transparent;
 }
-.polyfill-important .validity-alert span.va-arrow {
+.polyfill-important .validity-alert span.va-arrow,
+.polyfill-important .validity-alert .va-arrow .va-arrow-box {
 	border-left-color: transparent !important;
 	border-right-color: transparent !important;
 }

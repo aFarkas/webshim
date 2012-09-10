@@ -1950,7 +1950,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		var elem, timer;
 		if(!e.target){return;}
 		elem = $(e.target).getNativeElement()[0];
-		if(elem.type == 'submit' || !$.prop(elem, 'willValidate')){return;}
+		if(elem.type == 'submit' || !$.prop(elem, 'willValidate') || (e.type == 'focusout' && e.type == 'radio')){return;}
 		timer = $.data(elem, 'webshimsswitchvalidityclass');
 		var switchClass = function(){
 			var validity = $.prop(elem, 'validity');
@@ -2068,10 +2068,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				} else {
 					this.getMessage(elem, message);
 					this.position(visual, offset);
-					errorBubble.css({
-						fontSize: elem.css('fontSize'),
-						fontFamily: elem.css('fontFamily')
-					});
+					
 					this.show();
 					if(this.hideDelay){
 						hideTimer = setTimeout(boundHide, this.hideDelay);

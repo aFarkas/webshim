@@ -1043,8 +1043,8 @@
 				calculateWidth: true,
 				slider: {},
 				datepicker: {},
-				langSrc: uiLib+'i18n/jquery.ui.datepicker-'
-	//			,lazyDate: undefined // true for IE8- false for fast browser 
+				langSrc: uiLib+'i18n/jquery.ui.datepicker-',
+				lazyDate: true
 	//			,replaceUI: false
 			},
 			c: [18, 7, 6]
