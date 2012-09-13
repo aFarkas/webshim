@@ -2179,6 +2179,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		NONE: 0
 	};
 	var copyProps = ['kind', 'label', 'srclang'];
+	var copyName = {srclang: 'language'};
 	
 	var owns = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
 	
@@ -2445,10 +2446,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			copyProps.forEach(function(copyProp){
 				var prop = $.prop(track, copyProp);
 				if(prop){
-					if(copyProp == 'srclang'){
-						copyProp = 'language';
-					}
-					obj[copyProp] = prop;
+					obj[copyName[copyProp] || copyProp] = prop;
 				}
 			});
 			
@@ -2699,13 +2697,18 @@ modified for webshims
 		}
 	});
 	
-	webshims.onNodeNamesPropertyModify('track', 'kind', function(){
-		var trackData = webshims.data(this, 'trackData');
-		if(trackData){
-			trackData.track.kind = $.prop(this, 'kind');
-			refreshTrack(this, trackData);
-		}
+					
+	$.each(copyProps, function(i, copyProp){
+		var name = copyName[copyProp] || copyProp;
+		webshims.onNodeNamesPropertyModify('track', copyProp, function(){
+			var trackData = webshims.data(this, 'trackData');
+			if(trackData){
+				trackData.track[name] = $.prop(this, copyProp);
+				refreshTrack(this, trackData);
+			}
+		});
 	});
+	
 	
 	webshims.onNodeNamesPropertyModify('track', 'src', function(val){
 		if(val){

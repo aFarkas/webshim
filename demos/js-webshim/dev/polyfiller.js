@@ -19,6 +19,18 @@
 	var browserVersion = parseFloat($.browser.version, 10);
 	var Object = window.Object;
 	var html5 = window.html5 || {};
+	var needModernizr = function(tests, fn){
+		var run = true;
+		$.each(tests.split(' '), function(i, name){
+			if(!(name in Modernizr)){
+				webshims.warn('webshims needs Modernizr.'+name + ' to implement feature.');
+				run = false;
+			}
+		});
+		if(run && fn){
+			fn();
+		}
+	};
 	
 	Modernizr.genericDOM = !!($('<video><div></div></video>')[0].innerHTML);
 	
@@ -29,7 +41,7 @@
 	}	
 	
 	var webshims = {
-		version: '1.9.1',
+		version: '1.9.2pre',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -97,11 +109,13 @@
 					clearTimeout(timer);
 				};
 				
-				addClass.push('loading-polyfills');
 				$(window).bind('load.lP error.lP', removeLoader);
+				
+				addClass.push('loading-polyfills');
 				timer = setTimeout(function(){
 					$('html').addClass('long-loading-polyfills');
 				}, 600);
+				
 				if (webCFG.waitReady && $.isReady) {
 					webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
 				}
@@ -522,6 +536,7 @@
 	var loader = webshims.loader;
 	var loadList = loader.loadList;
 	var addModule = loader.addModule;
+	var bugs = webshims.bugs;
 	var removeCombos = [];
 	var importantLogs = {
 		warn: 1,
@@ -837,100 +852,94 @@
 		
 	
 	//<localstorage combos: 14
-	if('localstorage' in Modernizr) {
-		addPolyfill('json-storage', {
-			test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
-			loadInit: function(){
-				loadList(['swfobject']);
-			},
-			noAutoCallback: true,
-			c: [14]
-		});
-	}
+	needModernizr('localstorage');
+	addPolyfill('json-storage', {
+		test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
+		loadInit: function(){
+			loadList(['swfobject']);
+		},
+		noAutoCallback: true,
+		c: [14]
+	});
 	//>localstorage
 	
 	
 	//<geolocation combos: 14,15
-	if('geolocation' in Modernizr){
-		addPolyfill('geolocation', {
-			test: Modernizr.geolocation,
-			options: {
-				destroyWrite: true
-	//			,confirmText: ''
-			},
-			d: ['json-storage'],
-			c: [14, 15]
-		});
-	}
+	needModernizr('geolocation');
+	addPolyfill('geolocation', {
+		test: Modernizr.geolocation,
+		options: {
+			destroyWrite: true
+//			,confirmText: ''
+		},
+		d: ['json-storage'],
+		c: [14, 15]
+	});
 	//>
 	
 	//<canvas
-	(function(){
-		if('canvas' in Modernizr) {
-			var flashCanvas;
-			addPolyfill('canvas', {
-				src: 'excanvas',
-				test: Modernizr.canvas,
-				options: {type: 'flash'}, //excanvas | flash | flashpro
-				noAutoCallback: true,
-				loadInit: function(){
-					var type = this.options.type;
-					var src;
-					if(type && type.indexOf('flash') !== -1 && (!window.swfobject || swfobject.hasFlashPlayerVersion('9.0.0'))){
-						window.FlashCanvasOptions = window.FlashCanvasOptions || {};
-						flashCanvas = FlashCanvasOptions;
-						if(type == 'flash'){
-							$.extend(flashCanvas, {
-								swfPath: webCFG.basePath + 'FlashCanvas/'
-							});
-							this.src = 'FlashCanvas/flashcanvas';
-							src = flashCanvas.swfPath + 'flashcanvas.swf';
-						} else {
-							$.extend(flashCanvas, {swfPath: webCFG.basePath + 'FlashCanvasPro/'});
-							this.src = 'FlashCanvasPro/flashcanvas';
-							//assume, that the user has flash10+
-							src = flashCanvas.swfPath + 'flash10canvas.swf';
-						}
-						//todo: implement cachbuster for flashcanvas
-	//					if(webCFG.addCacheBuster){
-	//						src += webCFG.addCacheBuster;
-	//					}
-					}
-				},
-				afterLoad: function(){
-					webshims.addReady(function(context, elem){
-						if(context == document){
-							if(window.G_vmlCanvasManager && G_vmlCanvasManager.init_ ){
-								G_vmlCanvasManager.init_(document);
-							}
-						}
-						$('canvas', context).add(elem.filter('canvas')).each(function(){
-							var hasContext = this.getContext;
-							if(!hasContext && window.G_vmlCanvasManager){
-								G_vmlCanvasManager.initElement(this);
-							}
+	needModernizr('canvas', function(){
+		var flashCanvas;
+		addPolyfill('canvas', {
+			src: 'excanvas',
+			test: Modernizr.canvas,
+			options: {type: 'flash'}, //excanvas | flash | flashpro
+			noAutoCallback: true,
+			loadInit: function(){
+				var type = this.options.type;
+				var src;
+				if(type && type.indexOf('flash') !== -1 && (!window.swfobject || swfobject.hasFlashPlayerVersion('9.0.0'))){
+					window.FlashCanvasOptions = window.FlashCanvasOptions || {};
+					flashCanvas = FlashCanvasOptions;
+					if(type == 'flash'){
+						$.extend(flashCanvas, {
+							swfPath: webCFG.basePath + 'FlashCanvas/'
 						});
-						if(context == document){
-							isReady('canvas', true);
+						this.src = 'FlashCanvas/flashcanvas';
+						src = flashCanvas.swfPath + 'flashcanvas.swf';
+					} else {
+						$.extend(flashCanvas, {swfPath: webCFG.basePath + 'FlashCanvasPro/'});
+						this.src = 'FlashCanvasPro/flashcanvas';
+						//assume, that the user has flash10+
+						src = flashCanvas.swfPath + 'flash10canvas.swf';
+					}
+					//todo: implement cachbuster for flashcanvas
+//					if(webCFG.addCacheBuster){
+//						src += webCFG.addCacheBuster;
+//					}
+				}
+			},
+			afterLoad: function(){
+				webshims.addReady(function(context, elem){
+					if(context == document){
+						if(window.G_vmlCanvasManager && G_vmlCanvasManager.init_ ){
+							G_vmlCanvasManager.init_(document);
+						}
+					}
+					$('canvas', context).add(elem.filter('canvas')).each(function(){
+						var hasContext = this.getContext;
+						if(!hasContext && window.G_vmlCanvasManager){
+							G_vmlCanvasManager.initElement(this);
 						}
 					});
-				},
-				methodNames: ['getContext'],
-				d: [DOMSUPPORT]
-			});
-		}
-	})();
+					if(context == document){
+						isReady('canvas', true);
+					}
+				});
+			},
+			methodNames: ['getContext'],
+			d: [DOMSUPPORT]
+		});
+	});
 	//>
 	
 	
 	//<forms combos: 3, 2, 59, 17, 16, 5, 4, 24, 19, 18, 7, 59, 5, 21, 11, 23, 26
-	var modernizrInputAttrs = Modernizr.input;
-	var modernizrInputTypes = Modernizr.inputtypes;
-	
-	if(modernizrInputAttrs && modernizrInputTypes){
+	needModernizr('input inputtypes', function(){
+		var modernizrInputAttrs = Modernizr.input;
+		var modernizrInputTypes = Modernizr.inputtypes;
 		var formvalidation = 'formvalidation';
 		var formOptions;
-		var bugs = webshims.bugs;
 		var select = $('<select required="" name="a"><option disabled="" /></select>')[0];
 		addTest(formvalidation, function(){
 			return !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern);
@@ -1058,7 +1067,7 @@
 			d: ['form-core', DOMSUPPORT],
 			c: [3, 59, 18, 24, 19, 11]
 		});
-	}
+	});
 	//>
 	
 	//<details combos: 12,13,15
@@ -1079,58 +1088,57 @@
 	//>
 	
 	//<mediaelement combos: 10, 9, 12, 17, 16, 8, 20, 22, 23, 24, 25, 26, 27
-	if ('audio' in Modernizr && 'video' in Modernizr && 'texttrackapi' in Modernizr){
-		webshims.mediaelement = {};
+	needModernizr('audio video texttrackapi');
+	webshims.mediaelement = {};
+	
+	addPolyfill('mediaelement-core', {
+		f: 'mediaelement',
+		noAutoCallback: true,
 		
-		addPolyfill('mediaelement-core', {
-			f: 'mediaelement',
-			noAutoCallback: true,
-			
-			d: ['swfobject',DOMSUPPORT],
-			c: [27, 10, 9, 12, 17, 26, 16, 25, 8, 22, 23, 24, 20]
-		});
-		addPolyfill('mediaelement-swf', {
-			f: 'mediaelement',
-			options: {
-				hasToPlay: 'any',
-				preferFlash: false,
-				jwVars: {},
-				jwParams: {},
-				jwAttrs: {},
-				changeJW: $.noop
-			},
-			methodNames: ['play', 'pause', 'canPlayType', 'mediaLoad:load'],
-			d: ['swfobject', DOMSUPPORT],
-			test: function(){
-				if(!Modernizr.audio || !Modernizr.video){
-					return false;
-				}
-				var options = this.options;
-				var hasToPlay = options.hasToPlay;
-				return !( (!window.swfobject || window.swfobject.hasFlashPlayerVersion('9.0.115')) && (options.preferFlash || (hasToPlay != 'any' && !Modernizr.video[hasToPlay] && !Modernizr.audio[hasToPlay])));
-			},
-			c: [27, 10, 9, 22, 20]
-		});
-		
-		bugs.track = (Modernizr.track && (!Modernizr.texttrackapi || typeof (document.createElement('track').track || {}).mode != 'string'));
-		
-		addPolyfill('track', {
-			options: {
-				positionDisplay: true,
-				override: bugs.track
-			},
-			test: function(){
-				return Modernizr.track && !this.options.override && !bugs.track;
-			},
-			d: ['mediaelement', DOMSUPPORT],
-			methodNames: ['addTextTrack'],
-			c: [27, 26, 25]
-		});
-		
-		addModule('track-ui', {
-			d: ['track']
-		});
-	}
+		d: ['swfobject',DOMSUPPORT],
+		c: [27, 10, 9, 12, 17, 26, 16, 25, 8, 22, 23, 24, 20]
+	});
+	addPolyfill('mediaelement-swf', {
+		f: 'mediaelement',
+		options: {
+			hasToPlay: 'any',
+			preferFlash: false,
+			jwVars: {},
+			jwParams: {},
+			jwAttrs: {},
+			changeJW: $.noop
+		},
+		methodNames: ['play', 'pause', 'canPlayType', 'mediaLoad:load'],
+		d: ['swfobject', DOMSUPPORT],
+		test: function(){
+			if(!Modernizr.audio || !Modernizr.video){
+				return false;
+			}
+			var options = this.options;
+			var hasToPlay = options.hasToPlay;
+			return !( (!window.swfobject || window.swfobject.hasFlashPlayerVersion('9.0.115')) && (options.preferFlash || (hasToPlay != 'any' && !Modernizr.video[hasToPlay] && !Modernizr.audio[hasToPlay])));
+		},
+		c: [27, 10, 9, 22, 20]
+	});
+	
+	bugs.track = (Modernizr.track && (!Modernizr.texttrackapi || typeof (document.createElement('track').track || {}).mode != 'string'));
+	
+	addPolyfill('track', {
+		options: {
+			positionDisplay: true,
+			override: bugs.track
+		},
+		test: function(){
+			return Modernizr.track && !this.options.override && !bugs.track;
+		},
+		d: ['mediaelement', DOMSUPPORT],
+		methodNames: ['addTextTrack'],
+		c: [27, 26, 25]
+	});
+	
+	addModule('track-ui', {
+		d: ['track']
+	});
 	//>
 	
 	
