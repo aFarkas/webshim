@@ -75,6 +75,15 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.9.1
+----------
+
+- added onaddtrack/onremovetrack events to TextTrackList interface
+- datalist polyfill is now default for forms feature
+- added swedish locale (thx to @leon)
+- improved errorbubble style
+- updated JW player
+
 Release 1.9.0
 ----------
 

@@ -170,7 +170,7 @@
 				</ul>
 								
 			</section>
-			<section>
+			<section class="forms-demo">
 				<h3>Simple Demo</h3>
 				<fieldset>
 					<legend>outside of form but associated to the form using form-attribute</legend>
@@ -301,7 +301,7 @@
 								</div>
 								<div class="form-item">
 									<input type="radio" id="field7-1" name="radio-grp1-1" />
-								   	<label for="field7-1"> 
+									<label for="field7-1"> 
 										Radiooption 2
 									</label>
 								</div>
@@ -333,7 +333,7 @@
 						
 <code class="block run-once">
 /*bind to the first invalid element in a form*/
-$('form').bind('firstinvalid.example1', function(e){ 
+$('section.forms-demo').bind('firstinvalid.example1', function(e){ 
 	/*show the invalid alert for first invalid element*/
 	$.webshims.validityAlert.showFor( e.target ); 
 	/*prevent browser from showing native validation message */
@@ -341,7 +341,7 @@ $('form').bind('firstinvalid.example1', function(e){
 });
 
 /*unbind event binding from second/next example:*/
-$('form').unbind('firstinvalid.example2');
+$('section.forms-demo').unbind('firstinvalid.example2');
 </code>
 						<p>The validityAlert method will create the following custom styleable HTML:</p>
 <code class="block">
@@ -368,7 +368,7 @@ $.webshims.setOptions('forms', {
 /* wait for DOM-Ready */
 $(function(){
 	/*bind to the first invalid element in a form*/
-	$('form').bind('firstinvalid.example2', function(e){ 
+	$('section.forms-demo').bind('firstinvalid.example2', function(e){ 
 		/* show the invalid alert for first invalid element and pass the custom validation message */
 		$.webshims.validityAlert.showFor( e.target, $(e.target).prop('customValidationMessage') ); 
 		/* prevent browser from showing native validation message */
@@ -378,7 +378,7 @@ $(function(){
 
 
 /*unbind event binding from first example:*/
-$('form').unbind('firstinvalid.example1');
+$('section.forms-demo').unbind('firstinvalid.example1');
 </code>
 						<p>Instead of binding to the events your own, you can also simply set the configuration option <code>replaceValidationUI</code> to true:</p>
 <code class="block">
