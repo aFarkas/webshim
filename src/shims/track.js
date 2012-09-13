@@ -82,25 +82,63 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 	
 	var owns = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
 	
-	var updateMediaTrackList = function(){
-		var trackList = $.prop(this, 'textTracks');
-		var baseData = webshims.data(this, 'mediaelementBase');
-		var oldTracks = trackList.splice(0);
+	//ToDo: add/remove event
+	var updateMediaTrackList = function(baseData, trackList){
+		var removed = [];
+		var added = [];
+		var newTracks = [];
 		var i, len;
+		if(!baseData){
+			baseData =  webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
+		}
+		
+		if(!trackList){
+			baseData.blockTrackListUpdate = true;
+			trackList = $.prop(this, 'textTracks');
+			baseData.blockTrackListUpdate = false;
+		}
+		
+		clearTimeout(baseData.updateTrackListTimer);
+		
 		$('track', this).each(function(){
-			trackList.push($.prop(this, 'track'));
+			var track = $.prop(this, 'track');
+			newTracks.push(track);
+			if(trackList.indexOf(track) == -1){
+				added.push(track);
+			}
 		});
+		
 		if(baseData.scriptedTextTracks){
 			for(i = 0, len = baseData.scriptedTextTracks.length; i < len; i++){
-				trackList.push(baseData.scriptedTextTracks[i]);
+				newTracks.push(baseData.scriptedTextTracks[i]);
+				if(trackList.indexOf(baseData.scriptedTextTracks[i]) == -1){
+					added.push(baseData.scriptedTextTracks[i]);
+				}
 			}
 		}
-		for(i = 0, len = oldTracks.length; i < len; i++){
-			if(trackList.indexOf(oldTracks[i]) == -1){
-				oldTracks[i].mode = 'disabled';
+		
+		for(i = 0, len = trackList.length; i < len; i++){
+			if(newTracks.indexOf(trackList[i]) == -1){
+				removed.push(trackList[i]);
 			}
 		}
-		oldTracks = null;
+		
+		if(removed.length || added.length){
+			trackList.splice(0);
+			
+			for(i = 0, len = newTracks.length; i < len; i++){
+				trackList.push(newTracks[i]);
+			}
+			for(i = 0, len = removed.length; i < len; i++){
+				$([trackList]).triggerHandler($.Event({type: 'removetrack', track: trackList, track: removed[i]}));
+			}
+			for(i = 0, len = added.length; i < len; i++){
+				$([trackList]).triggerHandler($.Event({type: 'addtrack', track: trackList, track: added[i]}));
+			}
+			if(baseData.scriptedTextTracks || removed.length){
+				$(this).triggerHandler('updatetrackdisplay');
+			}
+		}
 	};
 	
 	var refreshTrack = function(track, trackData){
@@ -510,13 +548,13 @@ modified for webshims
 		};
 	
 	
-	mediaelement.createTrackList = function(mediaelem){
-		var baseData = webshims.data(mediaelem, 'mediaelementBase') || webshims.data(mediaelem, 'mediaelementBase', {});
+	mediaelement.createTrackList = function(mediaelem, baseData){
+		baseData = baseData || webshims.data(mediaelem, 'mediaelementBase') || webshims.data(mediaelem, 'mediaelementBase', {});
 		if(!baseData.textTracks){
 			baseData.textTracks = [];
 			webshims.defineProperties(baseData.textTracks, {
-				onaddtrack: {value: null}
-//				,onremovetrack: {value: null}
+				onaddtrack: {value: null},
+				onremovetrack: {value: null}
 			});
 			createEventTarget(baseData.textTracks);
 		}
@@ -615,10 +653,14 @@ modified for webshims
 	webshims.defineNodeNamesProperties(['audio', 'video'], {
 		textTracks: {
 			get: function(){
-				$('track', this).each(function(){
-					refreshTrack(this);
-				});
-				return mediaelement.createTrackList(this);
+				
+				var media = this;
+				var baseData = webshims.data(media, 'mediaelementBase') || webshims.data(media, 'mediaelementBase', {});
+				var tracks = mediaelement.createTrackList(media, baseData);
+				if(!baseData.blockTrackListUpdate){
+					updateMediaTrackList.call(media, baseData, tracks);
+				}
+				return tracks;
 			},
 			writeable: false
 		},
@@ -641,11 +683,15 @@ modified for webshims
 	}, 'prop');
 
 	
-	$(document).bind('emptied ended', function(e){
+	$(document).bind('emptied ended updatetracklist', function(e){
 		if($(e.target).is('audio, video')){
-			setTimeout(function(){
-				updateMediaTrackList.call(e.target);
-			}, 9);
+			var baseData = webshims.data(e.target, 'mediaelementBase');
+			if(baseData){
+				clearTimeout(baseData.updateTrackListTimer);
+				baseData.updateTrackListTimer = setTimeout(function(){
+					updateMediaTrackList.call(e.target, baseData);
+				}, 0);
+			}
 		}
 	});
 	
@@ -654,9 +700,12 @@ modified for webshims
 	};
 	
 	webshims.addReady(function(context, insertedElement){
+		var insertedMedia = insertedElement.filter('video, audio, track').closest('audio, video');
 		$('video, audio', context)
-			.add(insertedElement.filter('video, audio, track').closest('audio, video'))
-			.each(updateMediaTrackList)
+			.add(insertedMedia)
+			.each(function(){
+				updateMediaTrackList.call(this);
+			})
 			.each(function(){
 				if(Modernizr.track){
 					var shimedTextTracks = $.prop(this, 'textTracks');
@@ -695,6 +744,16 @@ modified for webshims
 				}
 			})
 		;
+		insertedMedia.each(function(){
+			var media = this;
+			var baseData = webshims.data(media, 'mediaelementBase');
+			if(baseData){
+				clearTimeout(baseData.updateTrackListTimer);
+				baseData.updateTrackListTimer = setTimeout(function(){
+					updateMediaTrackList.call(media, baseData);
+				}, 9);
+			}
+		});
 	});
 	
 	if(Modernizr.track){
