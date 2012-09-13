@@ -652,6 +652,7 @@
 			}, 9999);
 		});
 		$(window).load(function(){
+			$.isDOMReady = true;
 			isReady('DOM', true);
 			isReady('WINDOWLOAD', true);
 		});

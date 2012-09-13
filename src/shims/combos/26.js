@@ -2105,7 +2105,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	var notImplemented = function(){
 		webshims.error('not implemented yet');
 	};
-	
+	var supportTrackMod = Modernizr.ES5 && Modernizr.objectAccessor;
 	var createEventTarget = function(obj){
 		var eventList = {};
 		obj.addEventListener = function(name, fn){
@@ -2183,7 +2183,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	
 	var owns = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
 	
-	//ToDo: add/remove event
 	var updateMediaTrackList = function(baseData, trackList){
 		var removed = [];
 		var added = [];
@@ -2443,18 +2442,40 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		
 		if(!obj){
 			obj = createEventTarget(webshims.objectCreate(textTrackProto));
-			copyProps.forEach(function(copyProp){
-				var prop = $.prop(track, copyProp);
-				if(prop){
-					obj[copyName[copyProp] || copyProp] = prop;
-				}
-			});
+			
+			if(!supportTrackMod){
+				copyProps.forEach(function(copyProp){
+					var prop = $.prop(track, copyProp);
+					if(prop){
+						obj[copyName[copyProp] || copyProp] = prop;
+					}
+				});
+			}
 			
 			
 			if(track.nodeName){
+				
+				if(supportTrackMod){
+					copyProps.forEach(function(copyProp){
+						webshims.defineProperty(obj, copyName[copyProp] || copyProp, {
+							get: function(){
+								return $.prop(track, copyProp);
+							}
+						});
+					});
+				}
+				
 				trackData = webshims.data(track, 'trackData', {track: obj});
 				mediaelement.loadTextTrack(mediaelem, track, trackData, $.prop(track, 'default'));
 			} else {
+				if(supportTrackMod){
+					copyProps.forEach(function(copyProp){
+						webshims.defineProperty(obj, copyName[copyProp] || copyProp, {
+							value: track[copyProp],
+							writeable: false
+						});
+					});
+				}
 				obj.cues = mediaelement.createCueList();
 				obj.activeCues = obj._shimActiveCues = obj.shimActiveCues = mediaelement.createCueList();
 				obj.mode = 'hidden';
@@ -2697,17 +2718,18 @@ modified for webshims
 		}
 	});
 	
-					
-	$.each(copyProps, function(i, copyProp){
-		var name = copyName[copyProp] || copyProp;
-		webshims.onNodeNamesPropertyModify('track', copyProp, function(){
-			var trackData = webshims.data(this, 'trackData');
-			if(trackData){
-				trackData.track[name] = $.prop(this, copyProp);
-				refreshTrack(this, trackData);
-			}
+	if(!supportTrackMod){
+		$.each(copyProps, function(i, copyProp){
+			var name = copyName[copyProp] || copyProp;
+			webshims.onNodeNamesPropertyModify('track', copyProp, function(){
+				var trackData = webshims.data(this, 'trackData');
+				if(trackData){
+					trackData.track[name] = $.prop(this, copyProp);
+					refreshTrack(this, trackData);
+				}
+			});
 		});
-	});
+	}				
 	
 	
 	webshims.onNodeNamesPropertyModify('track', 'src', function(val){
