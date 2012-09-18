@@ -142,24 +142,18 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 	};
 	
 	var refreshTrack = function(track, trackData){
-		var mode, kind;
 		if(!trackData){
 			trackData = webshims.data(track, 'trackData');
 		}
 		if(trackData && !trackData.isTriggering){
 			trackData.isTriggering = true;
-			mode = (trackData.track || {}).mode; 
-			kind = (trackData.track || {}).kind; 
 			setTimeout(function(){
-				if(mode !== (trackData.track || {}).mode || kind != (trackData.track || {}).kind){
-					if(!(trackData.track || {}).readyState){
-						$(track).triggerHandler('checktrackmode');
-					} else {
-						$(track).parent().triggerHandler('updatetrackdisplay');
-					}
+				if(!(trackData.track || {}).readyState){
+					$(track).triggerHandler('checktrackmode');
+				} else {
+					$(track).parent().triggerHandler('updatetrackdisplay');
 				}
 				trackData.isTriggering = false;
-				
 			}, 9);
 		}
 	};
@@ -618,18 +612,25 @@ modified for webshims
 		}
 	});
 	
-	if(!supportTrackMod){
-		$.each(copyProps, function(i, copyProp){
-			var name = copyName[copyProp] || copyProp;
-			webshims.onNodeNamesPropertyModify('track', copyProp, function(){
-				var trackData = webshims.data(this, 'trackData');
-				if(trackData){
-					trackData.track[name] = $.prop(this, copyProp);
+	$.each(copyProps, function(i, copyProp){
+		var name = copyName[copyProp] || copyProp;
+		webshims.onNodeNamesPropertyModify('track', copyProp, function(){
+			var trackData = webshims.data(this, 'trackData');
+			var track = this;
+			if(trackData){
+				if(copyProp == 'kind'){
 					refreshTrack(this, trackData);
 				}
-			});
+				if(!supportTrackMod){
+					trackData.track[name] = $.prop(this, copyProp);
+				}
+				clearTimeout(trackData.changedTrackPropTimer);
+				trackData.changedTrackPropTimer = setTimeout(function(){
+					$(track).trigger('updatesubtitlestate');
+				}, 9); 
+			}
 		});
-	}				
+	});		
 	
 	
 	webshims.onNodeNamesPropertyModify('track', 'src', function(val){
