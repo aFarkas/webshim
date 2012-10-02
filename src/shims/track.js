@@ -39,6 +39,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 			return cue;
 		}
 	};
+	
 	var textTrackProto = {
 		shimActiveCues: null,
 		_shimActiveCues: null,
@@ -62,13 +63,33 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 					webshims.error("cue startTime higher than previous cue's startTime");
 				}
 			}
-			if(cue.track){
-				webshims.error("cue already part of a track element");
+			if(cue.track && cue.track.removeCue){
+				cue.track.removeCue(cue);
 			}
 			cue.track = this;
 			this.cues.push(cue);
 		},
-		removeCue: notImplemented,
+		//ToDo: make it more dynamic
+		removeCue: function(cue){
+			var cues = this.cues || [];
+			var i = 0;
+			var len = cues.length;
+			if(cue.track != this){
+				webshims.error("cue not part of track");
+				return;
+			}
+			for(; i < len; i++){
+				if(cues[i] === cue){
+					cues.splice(i, 1);
+					cue.track = null;
+					break;
+				}
+			}
+			if(cue.track){
+				webshims.error("cue not part of track");
+				return;
+			}
+		},
 		DISABLED: 'disabled',
 		OFF: 'disabled',
 		HIDDEN: 'hidden',
@@ -154,7 +175,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 					$(track).parent().triggerHandler('updatetrackdisplay');
 				}
 				trackData.isTriggering = false;
-			}, 9);
+			}, 1);
 		}
 	};
 	
@@ -526,7 +547,7 @@ modified for webshims
 								track.addCue(cue);
 							}
 						}
-						if(startDate < (new Date().getTime()) - 9){
+						if(startDate < (new Date().getTime()) - 30){
 							i++;
 							setTimeout(function(){
 								startDate = new Date().getTime();
@@ -627,7 +648,7 @@ modified for webshims
 				clearTimeout(trackData.changedTrackPropTimer);
 				trackData.changedTrackPropTimer = setTimeout(function(){
 					$(track).trigger('updatesubtitlestate');
-				}, 9); 
+				}, 1); 
 			}
 		});
 	});		
