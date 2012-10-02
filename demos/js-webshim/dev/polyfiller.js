@@ -23,7 +23,7 @@
 		var run = true;
 		$.each(tests.split(' '), function(i, name){
 			if(!(name in Modernizr)){
-				webshims.warn('webshims needs Modernizr.'+name + ' to implement feature.');
+				webshims.error('webshims needs Modernizr.'+name + ' to implement feature.');
 				run = false;
 			}
 		});
@@ -31,8 +31,6 @@
 			fn();
 		}
 	};
-	
-	Modernizr.genericDOM = !!($('<video><div></div></video>')[0].innerHTML);
 	
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
 	
@@ -99,7 +97,7 @@
 				var onReadyEvts = features;
 				var timer;
 				
-				if(webCFG.disableShivMethods && Modernizr.genericDOM && 'html5Clone' in $.support){
+				if(webCFG.disableShivMethods){
 					html5.shivMethods = false;
 				}
 				
@@ -159,7 +157,7 @@
 				
 				$.each(features, function(i, feature){
 					if(!webshimsFeatures[feature]){
-						webshims.warn("could not find webshims-feature (aborted): "+ feature);
+						webshims.error("could not find webshims-feature (aborted): "+ feature);
 						isReady(feature, true);
 						return;
 					}
