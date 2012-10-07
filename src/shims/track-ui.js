@@ -193,42 +193,31 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 		(function(){
 			var block;
 			var triggerDisplayUpdate = function(elem){
-				if(!block && usesNativeTrack()){
-					setTimeout(function(){
-						block = true;
-						$(elem).triggerHandler('updatetrackdisplay');
-						block = false;
-					}, 9);
-				}
+				setTimeout(function(){
+					block = true;
+					$(elem).triggerHandler('updatetrackdisplay');
+					block = false;
+				}, 9);
 			};
-			var trackDesc = webshims.defineNodeNameProperty('track', 'track', {
-				prop: {
-					get: function(){
-						triggerDisplayUpdate($(this).parent('audio, video'));
-						return trackDesc.prop._supget.apply(this, arguments);
+			
+			var createUpdateFn = function(nodeName, prop, type){
+				var superType = '_sup'+type;
+				var desc = {prop: {}};
+				var superDesc;
+				desc.prop[type] = function(){
+					if(!block && usesNativeTrack()){
+						triggerDisplayUpdate($(this).closest('audio, video'));
 					}
-				}
-				
-			});
+					return superDesc.prop[superType].apply(this, arguments);
+				};
+				superDesc = webshims.defineNodeNameProperty(nodeName, prop, desc);
+			};
+			
+			createUpdateFn('track', 'track', 'get');
+			
 			['audio', 'video'].forEach(function(nodeName){
-				var addTrack, textTracks;
-				textTracks = webshims.defineNodeNameProperty(nodeName, 'textTracks', {
-					prop: {
-						get: function(){
-							triggerDisplayUpdate(this);
-							return textTracks.prop._supget.apply(this, arguments);
-						}
-					}
-				});
-				
-				addTrack = webshims.defineNodeNameProperty(nodeName, 'addTextTrack', {
-					prop: {
-						value: function(){
-							triggerDisplayUpdate(this);
-							return addTrack.prop._supvalue.apply(this, arguments);
-						}
-					}
-				});
+				createUpdateFn(nodeName, 'textTracks', 'get');
+				createUpdateFn('nodeName', 'addTextTrack', 'value');
 			});
 		})();
 	}
