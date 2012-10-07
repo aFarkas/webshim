@@ -33,10 +33,7 @@
 	};
 	
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
-	
-	if($.browser.chrome){
-		$.browser.webkit = true;
-	}	
+
 	
 	var webshims = {
 		version: '1.9.2pre',
@@ -1094,7 +1091,7 @@
 		f: 'mediaelement',
 		noAutoCallback: true,
 		
-		d: ['swfobject',DOMSUPPORT],
+		d: ['swfobject', DOMSUPPORT],
 		c: [27, 10, 9, 12, 17, 26, 16, 25, 8, 22, 23, 24, 20]
 	});
 	addPolyfill('mediaelement-swf', {
