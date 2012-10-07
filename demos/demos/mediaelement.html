@@ -299,10 +299,11 @@ $("video.my-video").loadMediaSrc(
 					<li><strong>properties/IDLs</strong>: <a href="http://www.w3.org/TR/html5/the-track-element.html#dom-track-readystate">readystate</a>, <a href="http://www.w3.org/TR/html5/the-track-element.html#dom-track-track">track</a>, <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-texttracks">textTracks</a></li>
 					<li><strong>methods</strong>: <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-addtexttrack">addTextTrack</a></li>
 					<li><strong>events</strong>: <a href="http://www.w3.org/TR/html5/media-elements.html#handler-texttrack-oncuechange">cuechange</a>, <a href="http://www.w3.org/TR/html5/media-elements.html#handler-texttrackcue-onenter">enter</a>, <a href="http://www.w3.org/TR/html5/media-elements.html#handler-texttrackcue-onexit">exit</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#handler-texttracklist-onaddtrack">addtrack</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#handler-texttracklist-onremovetrack">removetrack</a></li>
-					<li><strong>corresponding interfaces</strong>: <a href="http://dev.w3.org/html5/spec/media-elements.html#texttracklist">TextTrackList</a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrack">TextTrack<sup>1</sup></a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrackcuelist">TextTrackCueList</a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrackcue">TextTrackCue</a> including the <a href="http://dev.w3.org/html5/spec/media-elements.html#dom-texttrackcue">TrextTrackCue constructor</a></li>
+					<li><strong>corresponding interfaces</strong>: <a href="http://dev.w3.org/html5/spec/media-elements.html#texttracklist">TextTrackList<sup>1</sup></a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrack">TextTrack<sup>2</sup></a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrackcuelist">TextTrackCueList</a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrackcue">TextTrackCue</a> including the <a href="http://dev.w3.org/html5/spec/media-elements.html#dom-texttrackcue">TrextTrackCue constructor</a></li>
 				</ul>
 				<ul>
-					<li><small>1.Use shimActiveCues instead of activeCues property. In case override is set to true or all track supporting browsers (currently only Chrome 23) won't load the flash- or the youtube iframe fallback  for video/audio playback, activeCues can be also used savely.</small></li>
+					<li><small>1. Use additional [] to bind events to Array-like objects (<code>$([ $('video').prop('textTracks') ]).on('addtrack', function(e){console.log('track was added');});</code>)</small></li>
+					<li><small>2. Use shimActiveCues instead of activeCues property. In case override is set to true or all track supporting browsers (currently only Chrome 23) won't load the flash- or the youtube iframe fallback  for video/audio playback, activeCues can be also used savely.</small></li>
 				</ul>
 				
 				<h3>Options for the <code>track</code> feature</h3>
@@ -317,9 +318,9 @@ $("video.my-video").loadMediaSrc(
 				<h4>Video example</h4>
 				<div class="player">
 					
-					<video controls preload="none" style="width: 630px; height: 356px;">
-						<source src="http://cdn.yayquery.com/ep/23/yayquery_23.mp4" type="video/mp4" />
-						<source src="http://cdn.yayquery.com/ep/23/yayquery_23.ogv" type="video/ogg" />
+					<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.png" style="width: 630px; height: 356px;">
+						<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
+						<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
 						<track src="subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
 					</video>
 					<table>
@@ -399,10 +400,9 @@ $("video.my-video").loadMediaSrc(
 								<th>loadMediaSrc</th>
 								<td>
 									<select class="load-media">
-									
+										<option data-src='[{"src": "http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v", "type": "video/mp4"}, {"src": "http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm", "type": "video/webm"}]'>Sintel Trailer</option>
+										<option data-src='[{"src": "http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.m4v", "type": "video/mp4"}, {"src": "http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.ogg", "type": "video/ogg"}]'>BigBugBunny</option>
 										<option data-src='[{"src": "http://cdn.yayquery.com/ep/23/yayquery_23.mp4", "type": "video/mp4"}, {"src": "http://cdn.yayquery.com/ep/23/yayquery_23.ogv", "type": "video/ogg"}]'>yayQuery - Episode 23 | When Things Are Things</option>
-										
-										
 										<option data-src="http://www.youtube.com/watch?v=siOHh0uzcuY">Youtube: Introduction to HTML 5</option>
 										
 									</select>
