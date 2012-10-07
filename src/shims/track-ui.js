@@ -2,7 +2,8 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 	var options = webshims.cfg.track;
 	var enterE = {type: 'enter'};
 	var exitE = {type: 'exit'};
-	var showTracks = {subtitles: 1, captions: 1};
+	//descriptions are not really shown, but they are inserted into the dom
+	var showTracks = {subtitles: 1, captions: 1, descriptions: 1};
 	var mediaelement = webshims.mediaelement;
 	var usesNativeTrack =  function(){
 		return !options.override && Modernizr.track;
@@ -13,10 +14,10 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 			if(!baseData.activeCues.length){
 				this.hide(baseData);
 			} else {
-				if(!this.compareArray(baseData.displayedActiveCues, baseData.activeCues)){
+				if(!compareArray(baseData.displayedActiveCues, baseData.activeCues)){
 					baseData.displayedActiveCues = baseData.activeCues;
 					if(!baseData.trackDisplay){
-						baseData.trackDisplay = $('<div class="cue-display"></div>').insertAfter(media);
+						baseData.trackDisplay = $('<div class="cue-display"><span class="description-cues" aria-live="assertive" /></div>').insertAfter(media);
 						this.addEvents(baseData, media);
 					}
 					
@@ -31,27 +32,17 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 			var element = $('<span class="cue-wrapper" />');
 			$.each(baseData.displayedActiveCues, function(i, cue){
 				var id = (cue.id) ? 'id="cue-id-'+cue.id +'"' : '';
-				element.append(
-					$('<span '+ id+ ' class="cue" />').html(cue.getCueAsHTML())
-				);
-			});
-			baseData.trackDisplay.html(element);
-		},
-		compareArray: function(a1, a2){
-			var ret = true;
-			var i = 0;
-			var len = a1.length;
-			if(len != a2.length){
-				ret = false;
-			} else {
-				for(; i < len; i++){
-					if(a1[i] != a2[i]){
-						ret = false;
-						break;
-					}
+				var cueHTML = $('<span '+ id+ ' class="cue" />').html(cue.getCueAsHTML());
+				if(cue.track.kind == 'descriptions'){
+					setTimeout(function(){
+						$('span.description-cues', baseData.trackDisplay).html(cueHTML);
+					}, 0);
+				} else {
+					element.append(cueHTML);
 				}
-			}
-			return ret;
+			});
+			$('span.cue-wrapper', baseData.trackDisplay).remove();
+			baseData.trackDisplay.append(element);
 		},
 		addEvents: function(baseData, media){
 			if(options.positionDisplay){
@@ -94,10 +85,28 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 		hide: function(baseData){
 			if(baseData.trackDisplay && baseData.displayedActiveCues.length){
 				baseData.displayedActiveCues = [];
-				baseData.trackDisplay.empty();
+				$('span.cue-wrapper', baseData.trackDisplay).remove();
+				$('span.description-cues', baseData.trackDisplay).empty();
 			}
 		}
 	};
+	
+	function compareArray(a1, a2){
+		var ret = true;
+		var i = 0;
+		var len = a1.length;
+		if(len != a2.length){
+			ret = false;
+		} else {
+			for(; i < len; i++){
+				if(a1[i] != a2[i]){
+					ret = false;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
 	
 	$.extend($.event.customEvent, {
 		updatetrackdisplay: true,

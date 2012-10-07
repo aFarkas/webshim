@@ -1,7 +1,8 @@
 jQuery.webshims.register('track', function($, webshims, window, document, undefined){
 	var mediaelement = webshims.mediaelement;
 	var id = new Date().getTime();
-	var showTracks = {subtitles: 1, captions: 1};
+	//descriptions are not really shown, but they are inserted into the dom
+	var showTracks = {subtitles: 1, captions: 1, descriptions: 1};
 	var notImplemented = function(){
 		webshims.error('not implemented yet');
 	};
@@ -172,7 +173,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 				if(!(trackData.track || {}).readyState){
 					$(track).triggerHandler('checktrackmode');
 				} else {
-					$(track).parent().triggerHandler('updatetrackdisplay');
+					$(track).closest('audio, video').triggerHandler('updatetrackdisplay');
 				}
 				trackData.isTriggering = false;
 			}, 1);
@@ -381,7 +382,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 				}
 				
 				trackData = webshims.data(track, 'trackData', {track: obj});
-				mediaelement.loadTextTrack(mediaelem, track, trackData, $.prop(track, 'default'));
+				mediaelement.loadTextTrack(mediaelem, track, trackData, ($.prop(track, 'default') && $(track).siblings('track[default]').andSelf()[0] == track));
 			} else {
 				if(supportTrackMod){
 					copyProps.forEach(function(copyProp){
@@ -522,64 +523,64 @@ modified for webshims
 	})();
 	
 	mediaelement.parseCaptions = function(captionData, track, complete) {
-			var subtitles = mediaelement.createCueList();
-			var cue, lazyProcess, regWevVTT;
-			var startDate;
-			var isWEBVTT;
-			if (captionData) {
+		var subtitles = mediaelement.createCueList();
+		var cue, lazyProcess, regWevVTT;
+		var startDate;
+		var isWEBVTT;
+		if (captionData) {
+			
+			regWevVTT = /^WEBVTT(\s*FILE)?/ig;
+			
+			lazyProcess = function(i, len){
 				
-				regWevVTT = /^WEBVTT(\s*FILE)?/ig;
-				
-				lazyProcess = function(i, len){
-					
-					for(; i < len; i++){
-						cue = captionData[i];
-						if(regWevVTT.test(cue)){
-							isWEBVTT = true;
-						} else if(cue.replace(/\s*/ig,"").length){
-							if(!isWEBVTT){
-								webshims.error('please use WebVTT format. This is the standard');
-								complete(null);
-								break;
-							}
-							cue = mediaelement.parseCaptionChunk(cue, i);
-							if(cue){
-								track.addCue(cue);
-							}
-						}
-						if(startDate < (new Date().getTime()) - 30){
-							i++;
-							setTimeout(function(){
-								startDate = new Date().getTime();
-								lazyProcess(i, len);
-							}, 90);
-							
-							break;
-						}
-					}
-					if(i >= len){
+				for(; i < len; i++){
+					cue = captionData[i];
+					if(regWevVTT.test(cue)){
+						isWEBVTT = true;
+					} else if(cue.replace(/\s*/ig,"").length){
 						if(!isWEBVTT){
 							webshims.error('please use WebVTT format. This is the standard');
+							complete(null);
+							break;
 						}
-						complete(track.cues);
+						cue = mediaelement.parseCaptionChunk(cue, i);
+						if(cue){
+							track.addCue(cue);
+						}
 					}
-				};
-				
-				captionData = captionData.replace(/\r\n/g,"\n");
-				
+					if(startDate < (new Date().getTime()) - 30){
+						i++;
+						setTimeout(function(){
+							startDate = new Date().getTime();
+							lazyProcess(i, len);
+						}, 90);
+						
+						break;
+					}
+				}
+				if(i >= len){
+					if(!isWEBVTT){
+						webshims.error('please use WebVTT format. This is the standard');
+					}
+					complete(track.cues);
+				}
+			};
+			
+			captionData = captionData.replace(/\r\n/g,"\n");
+			
+			setTimeout(function(){
+				captionData = captionData.replace(/\r/g,"\n");
 				setTimeout(function(){
-					captionData = captionData.replace(/\r/g,"\n");
-					setTimeout(function(){
-						startDate = new Date().getTime();
-						captionData = captionData.split(/\n\n+/g);
-						lazyProcess(0, captionData.length);
-					}, 9);
+					startDate = new Date().getTime();
+					captionData = captionData.split(/\n\n+/g);
+					lazyProcess(0, captionData.length);
 				}, 9);
-				
-			} else {
-				webshims.error("Required parameter captionData not supplied.");
-			}
-		};
+			}, 9);
+			
+		} else {
+			webshims.error("Required parameter captionData not supplied.");
+		}
+	};
 	
 	
 	mediaelement.createTrackList = function(mediaelem, baseData){
@@ -700,7 +701,6 @@ modified for webshims
 	webshims.defineNodeNamesProperties(['audio', 'video'], {
 		textTracks: {
 			get: function(){
-				
 				var media = this;
 				var baseData = webshims.data(media, 'mediaelementBase') || webshims.data(media, 'mediaelementBase', {});
 				var tracks = mediaelement.createTrackList(media, baseData);
