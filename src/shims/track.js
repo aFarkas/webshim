@@ -444,7 +444,7 @@ modified for webshims
 				subtitleParts.shift();
 			}
 		
-			if (subtitleParts[0].match(/^\s*[a-z0-9]+\s*$/ig)) {
+			if (subtitleParts[0].match(/^\s*[a-z0-9-\_]+\s*$/ig)) {
 				// The identifier becomes the cue ID (when *we* load the cues from file. Programatically created cues can have an ID of whatever.)
 				id = String(subtitleParts.shift().replace(/\s*/ig,""));
 			}
@@ -481,6 +481,7 @@ modified for webshims
 
 			if (!timeIn && !timeOut) {
 				// We didn't extract any time information. Assume the cue is invalid!
+				webshims.warn("couldn't extract time information: "+[timeIn, timeOut, subtitleParts.join("\n"), id].join(' ; '));
 				return null;
 			}
 /*

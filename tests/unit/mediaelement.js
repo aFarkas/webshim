@@ -1,9 +1,15 @@
 (function($){
-    module("mediaelement API test");
-    
-    var absoluteUrlTest = function(url){
-        ok(url.indexOf('://') != -1, 'url is absolute. url was: '+ url);
-    };
+	module("mediaelement API test");
+	
+	var SRCES = {
+		mp4: 'http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.m4v',
+		ogg: 'http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.ogg',
+		poster: 'http://corrupt-system.de/assets/media/sintel/sintel-trailer.png',
+		yt: 'http://www.youtube.com/watch?v=siOHh0uzcuY'
+	};
+	var absoluteUrlTest = function(url){
+		ok(url.indexOf('://') != -1, 'url is absolute. url was: '+ url);
+	};
 	
 	var generalMediaTest = function(media, options){
 		var events = {
@@ -79,12 +85,12 @@
 			}
 		};
 	};
-    
-    asyncTest("mediaelement properties", function(){
-        var video = $('video');
+	
+	asyncTest("mediaelement properties", function(){
+		var video = $('video');
 		var audio = $('audio');
-        
-        absoluteUrlTest(video.prop('poster'));
+		
+		absoluteUrlTest(video.prop('poster'));
 		absoluteUrlTest(video.prop('src'));
 		absoluteUrlTest($('source', video).prop('src'));
 		ok(video.data('mediaerror'), "video has mediaerror with unknown video sources");
@@ -129,27 +135,27 @@
 		webshimtest.reflectAttr(audio, 'loop', true, 'boolean');
 		
 		ok(!audio.prop('duration'), 'duration is NaN/0');
-        setTimeout(function(){
-	        $.webshims.ready('mediaelement swfobject', start);
+		setTimeout(function(){
+			$.webshims.ready('mediaelement swfobject', start);
 		}, 100);
-    });
+	});
 	
 	asyncTest("mediaelement all sources", function(){
-        var video = $('video');
-        var endTest = generalMediaTest(video, {
+		var video = $('video');
+		var endTest = generalMediaTest(video, {
 			duration: 32.5,
 			type: ['video/ogg', 'video/mp4'],
 			loadedmetadata: 1, 
 			durationchange: 1,
 			play: 1
 		});
-        video
+		video
 			.loadMediaSrc(
 				[
-					"http://protofunc.com/jme/media/bbb_trailer_mobile.m4v",
-					"http://protofunc.com/jme/media/bbb_trailer_400p.ogg"
+					SRCES.mp4,
+					SRCES.ogg
 				], 
-				"http://protofunc.com/jme/media/bbb_watchtrailer.gif")
+				SRCES.poster)
 			.play()
 		;
 		
@@ -169,9 +175,9 @@
 				video
 					.loadMediaSrc(
 						[
-							"http://www.youtube.com/watch?v=siOHh0uzcuY"
+							SRCES.yt
 						], 
-						"http://protofunc.com/jme/media/bbb_watchtrailer.gif")
+						SRCES.poster)
 					.bind('loadedmetadata.testevent mediaerror.testevent', function(){
 						setTimeout(function(){
 							endTest();
@@ -189,38 +195,6 @@
 				}
 			})
 		;
-    });
-	
-	
-	asyncTest("mediaelement embed test", function(){
-		var video = $(document.createElement('video'));
-		var endTest = generalMediaTest(video, {
-			duration: 2515,
-			type: ['video/youtube'],
-			loadedmetadata: 1, 
-			durationchange: 1,
-			emptied: 0
-		});
-        video.prop({
-			id: "doubble-check",
-			"src": "http://www.youtube.com/watch?v=siOHh0uzcuY"
-		});
-		
-		video
-			.bind('loadedmetadata.testevent mediaerror.testevent', function(e){
-				endTest();
-				if(e.type == 'loadedmetadata'){
-					equals($('div').filter('[id="wrapper-jwplayer-doubble-check"]').length, 1, "one video was generated");
-				}
-				setTimeout(start, 9);
-			})
-			.each(function(){
-				if(video.prop('readyState')){
-					video.trigger('loadedmetadata');
-				}
-			})
-		;
-		video.appendPolyfillTo('#qunit-fixture').play();
-    });
+	});
 	
 })(jQuery);

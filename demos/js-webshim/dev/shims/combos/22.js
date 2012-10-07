@@ -2146,7 +2146,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 						if(flash[0].offsetWidth > 1 && flash[0].offsetHeight > 1 && location.protocol.indexOf('file:') === 0){
 							webshims.error("Add your local development-directory to the local-trusted security sandbox:  http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html");
 						} else if(flash[0].offsetWidth < 2 || flash[0].offsetHeight < 2) {
-							webshims.info("JS-SWF connection can't be established on hidden or unconnected flash objects");
+							webshims.warn("JS-SWF connection can't be established on hidden or unconnected flash objects");
 						}
 						flash = null;
 					}, 8000);

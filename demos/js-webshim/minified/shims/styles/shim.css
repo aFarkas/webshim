@@ -70,6 +70,15 @@ audio * {
 	background: rgba(0,0,0,0.8);
 	color: #fff;
 }
+.cue-display .description-cues {
+	position: absolute;
+	top: -99px;
+	left: -99px;
+	display: block;
+	width: 5px;
+	height: 5px;
+	overflow: hidden;
+}
 mark {
 	background-color: #ff9;
 	color: #000; 

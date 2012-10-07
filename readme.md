@@ -75,6 +75,14 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+upcomming Release 1.9.2
+----------
+
+- allow dynamically changing label/kind/srclang of existing track elements
+- added removeCue to texttrack API
+- added screenreader-support for track[kind="descriptions"]
+- improved change events for input[type=range] and spinbutton controls (input[type=number])
+
 Release 1.9.1
 ----------
 
