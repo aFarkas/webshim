@@ -36,7 +36,7 @@
 
 	
 	var webshims = {
-		version: '1.9.2RC1',
+		version: '1.9.2',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -1025,7 +1025,7 @@
 		
 		addPolyfill('form-number-date-api', {
 			f: 'forms-ext',
-			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date /*&& modernizrInputTypes.time*/ && modernizrInputTypes.number);},
+			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && modernizrInputTypes.time && modernizrInputTypes.number);},
 			test: function(toLoad){
 				return (this.uiTest() && !webshims.bugs.valueAsNumberSet);
 			},

@@ -507,80 +507,80 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 			dateToString: function(date){
 				return (date && date.getFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
 			}
+		},
+		time: {
+			mismatch: function(val, _getParsed){
+				if(!val || !val.split || !(/\d$/.test(val))){return true;}
+				val = val.split(/\u003A/);
+				if(val.length < 2 || val.length > 3){return true;}
+				var ret = false,
+					sFraction;
+				if(val[2]){
+					val[2] = val[2].split(/\u002E/);
+					sFraction = parseInt(val[2][1], 10);
+					val[2] = val[2][0];
+				}
+				$.each(val, function(i, part){
+					if(!isDateTimePart(part) || part.length !== 2){
+						ret = true;
+						return false;
+					}
+				});
+				if(ret){return true;}
+				if(val[0] > 23 || val[0] < 0 || val[1] > 59 || val[1] < 0){
+					return true;
+				}
+				if(val[2] && (val[2] > 59 || val[2] < 0 )){
+					return true;
+				}
+				if(sFraction && isNaN(sFraction)){
+					return true;
+				}
+				if(sFraction){
+					if(sFraction < 100){
+						sFraction *= 100;
+					} else if(sFraction < 10){
+						sFraction *= 10;
+					}
+				}
+				return (_getParsed === true) ? [val, sFraction] : false;
+			},
+			step: 60,
+			stepBase: 0,
+			stepScaleFactor:  1000,
+			asDate: function(val){
+				val = new Date(this.asNumber(val));
+				return (isNaN(val)) ? null : val;
+			},
+			asNumber: function(val){
+				var ret = nan;
+				val = this.mismatch(val, true);
+				if(val !== true){
+					ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
+					if(val[1]){
+						ret += val[1];
+					}
+				}
+				return ret;
+			},
+			dateToString: function(date){
+				if(date && date.getUTCHours){
+					var str = addleadingZero(date.getUTCHours(), 2) +':'+ addleadingZero(date.getUTCMinutes(), 2),
+						tmp = date.getSeconds()
+					;
+					if(tmp != "0"){
+						str += ':'+ addleadingZero(tmp, 2);
+					}
+					tmp = date.getUTCMilliseconds();
+					if(tmp != "0"){
+						str += '.'+ addleadingZero(tmp, 3);
+					}
+					return str;
+				} else {
+					return false;
+				}
+			}
 		}
-//		,time: {
-//			mismatch: function(val, _getParsed){
-//				if(!val || !val.split || !(/\d$/.test(val))){return true;}
-//				val = val.split(/\u003A/);
-//				if(val.length < 2 || val.length > 3){return true;}
-//				var ret = false,
-//					sFraction;
-//				if(val[2]){
-//					val[2] = val[2].split(/\u002E/);
-//					sFraction = parseInt(val[2][1], 10);
-//					val[2] = val[2][0];
-//				}
-//				$.each(val, function(i, part){
-//					if(!isDateTimePart(part) || part.length !== 2){
-//						ret = true;
-//						return false;
-//					}
-//				});
-//				if(ret){return true;}
-//				if(val[0] > 23 || val[0] < 0 || val[1] > 59 || val[1] < 0){
-//					return true;
-//				}
-//				if(val[2] && (val[2] > 59 || val[2] < 0 )){
-//					return true;
-//				}
-//				if(sFraction && isNaN(sFraction)){
-//					return true;
-//				}
-//				if(sFraction){
-//					if(sFraction < 100){
-//						sFraction *= 100;
-//					} else if(sFraction < 10){
-//						sFraction *= 10;
-//					}
-//				}
-//				return (_getParsed === true) ? [val, sFraction] : false;
-//			},
-//			step: 60,
-//			stepBase: 0,
-//			stepScaleFactor:  1000,
-//			asDate: function(val){
-//				val = new Date(this.asNumber(val));
-//				return (isNaN(val)) ? null : val;
-//			},
-//			asNumber: function(val){
-//				var ret = nan;
-//				val = this.mismatch(val, true);
-//				if(val !== true){
-//					ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
-//					if(val[1]){
-//						ret += val[1];
-//					}
-//				}
-//				return ret;
-//			},
-//			dateToString: function(date){
-//				if(date && date.getUTCHours){
-//					var str = addleadingZero(date.getUTCHours(), 2) +':'+ addleadingZero(date.getUTCMinutes(), 2),
-//						tmp = date.getSeconds()
-//					;
-//					if(tmp != "0"){
-//						str += ':'+ addleadingZero(tmp, 2);
-//					}
-//					tmp = date.getUTCMilliseconds();
-//					if(tmp != "0"){
-//						str += '.'+ addleadingZero(tmp, 3);
-//					}
-//					return str;
-//				} else {
-//					return false;
-//				}
-//			}
-//		}
 //		,'datetime-local': {
 //			mismatch: function(val, _getParsed){
 //				if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
@@ -614,7 +614,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 	
 	if(typeBugs || !supportsType('range') || !supportsType('time')){
 		typeProtos.range = $.extend({}, typeProtos.number, typeProtos.range);
-//		typeProtos.time = $.extend({}, typeProtos.date, typeProtos.time);
+		typeProtos.time = $.extend({}, typeProtos.date, typeProtos.time);
 //		typeProtos['datetime-local'] = $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']);
 	}
 	
@@ -628,9 +628,9 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 	if(typeBugs || !supportsType('date')){
 		webshims.addInputType('date', typeProtos.date);
 	}
-//	if(typeBugs || !supportsType('time')){
-//		webshims.addInputType('time', typeProtos.time);
-//	}
+	if(typeBugs || !supportsType('time')){
+		webshims.addInputType('time', typeProtos.time);
+	}
 
 //	if(typeBugs || !supportsType('datetime-local')){
 //		webshims.addInputType('datetime-local', typeProtos['datetime-local']);
@@ -1295,10 +1295,14 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 	})();
 	
-	if(supportsType('number')/* && supportsType('time')*/){return;}
+	if(supportsType('number') && supportsType('time')){return;}
 	var doc = document;
 	var options = webshims.cfg["forms-ext"];
 	var typeModels = webshims.inputTypes;
+	var allowedChars = {
+		number: '0123456789.',
+		time: '0123456789:.'
+	};
 	
 	var getNextStep = function(input, upDown, cache){
 		
@@ -1375,17 +1379,17 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		}
 
 		function setFocus(){
-		  blockBlurChange = true;
-		  setTimeout(function(){
-			blockBlurChange = false;
-		  }, DELAY + 9);
-		  setTimeout(function(){
-			if(!$(elem).is(':focus')){
-				try{
-					elem.focus();
-				} catch(e){}
-			}
-		  }, 1);
+			blockBlurChange = true;
+			setTimeout(function(){
+				blockBlurChange = false;
+			}, DELAY + 9);
+			setTimeout(function(){
+				if(!$(elem).is(':focus')){
+					try{
+						elem.focus();
+					} catch(e){}
+				}
+			}, 1);
 		}
 
 		function triggerChange(){
@@ -1482,9 +1486,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					})
 				;
 				
-				if(type == 'number'){
+				if(allowedChars[type]){
 					jElm.bind('keypress', (function(){
-						var chars = '0123456789.';
+						var chars = allowedChars[type];
 						return function(event){
 							var chr = String.fromCharCode(event.charCode == null ? event.keyCode : event.charCode);
 							return event.ctrlKey || event.metaKey || (chr < ' ' || chars.indexOf(chr) > -1);

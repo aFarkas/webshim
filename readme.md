@@ -75,9 +75,10 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-upcomming Release 1.9.2
+Release 1.9.2
 ----------
 
+- implemented input[type="time"]
 - allow dynamically changing label/kind/srclang of existing track elements
 - added removeCue to texttrack API
 - added screenreader-support for track[kind="descriptions"]
@@ -105,43 +106,3 @@ Release 1.9.0
 - fixed regression for using an initial value with input[type="date"]. (introduced in 1.8.11)
 - update Modernizr to 2.6.2/jQuery UI to 1.8.23
 - jQuery 1.6.x not supported anymore, use 1.7.2+ or 1.8.1+ (but we will have legacy support for webshims 1.8.x)
-
-
-Release 1.8.13
-----------
-
-- fixed regression for using an initial value with input[type="date"] (introduced in 1.8.11)
-
-
-Release 1.8.11/1.8.12
-----------
-
-- updated to Modernizr 2.6.1/html5shiv 3.6.0
-- fixed Samsung's datepicker implementation 
-- updated jQuery UI
-- basic support for jQuery 1.8.0
-- improved implementation of excanvas
-- switch default canvas implementation from excanvas to flashcanvas (because it is so much better)
-- fixed :focus implementation in jQuery 1.6+
-
-Release 1.8.10
-----------
-
-- fixed validity issues with old webkits (Safari 5.0.0 - 5.0.2)
-- improved object/flash reframe handling for mediaelement
-- improved spinbutton usability
-- auto disable html5shiv's innerShiv, if jQuery 1.7+ is used
-- fixed input/change event for input widgets on iOS5
-- improved :required/:valid/:invalid pseudoselectos
-- added possibility for custom styleable datalists (in capable browsers)
-- added test for custom styleable input[type="range"]
-- temporarily removed support for time and datetime-local widgets
-
-Release 1.8.9
-----------
-
-- updated to Modernizr 2.5.3 (fixes crash bug in IE8)
-- improved field[placeholder] usability
-- fixed regression for iOS4 (old webkits)
-- updated email validation
-

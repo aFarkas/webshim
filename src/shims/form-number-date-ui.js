@@ -657,10 +657,14 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 	})();
 	
-	if(supportsType('number')/* && supportsType('time')*/){return;}
+	if(supportsType('number') && supportsType('time')){return;}
 	var doc = document;
 	var options = webshims.cfg["forms-ext"];
 	var typeModels = webshims.inputTypes;
+	var allowedChars = {
+		number: '0123456789.',
+		time: '0123456789:.'
+	};
 	
 	var getNextStep = function(input, upDown, cache){
 		
@@ -737,17 +741,17 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		}
 
 		function setFocus(){
-		  blockBlurChange = true;
-		  setTimeout(function(){
-			blockBlurChange = false;
-		  }, DELAY + 9);
-		  setTimeout(function(){
-			if(!$(elem).is(':focus')){
-				try{
-					elem.focus();
-				} catch(e){}
-			}
-		  }, 1);
+			blockBlurChange = true;
+			setTimeout(function(){
+				blockBlurChange = false;
+			}, DELAY + 9);
+			setTimeout(function(){
+				if(!$(elem).is(':focus')){
+					try{
+						elem.focus();
+					} catch(e){}
+				}
+			}, 1);
 		}
 
 		function triggerChange(){
@@ -844,9 +848,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					})
 				;
 				
-				if(type == 'number'){
+				if(allowedChars[type]){
 					jElm.bind('keypress', (function(){
-						var chars = '0123456789.';
+						var chars = allowedChars[type];
 						return function(event){
 							var chr = String.fromCharCode(event.charCode == null ? event.keyCode : event.charCode);
 							return event.ctrlKey || event.metaKey || (chr < ' ' || chars.indexOf(chr) > -1);
