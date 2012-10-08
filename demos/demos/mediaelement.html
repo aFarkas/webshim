@@ -144,7 +144,7 @@
 				}).prop('checked', true);
 				
 				$('input.texttrack', player).bind('click updatecontrols', function(){
-					$('track', player).prop('track').mode = $.prop(this, 'checked') ? 2 : 0;
+					$('track', player).prop('track').mode = $.prop(this, 'checked') ? 'showing' : 'disabled';
 				}).prop('checked', true); 
 				
 				$('select.load-media', player).bind('change', function(){
