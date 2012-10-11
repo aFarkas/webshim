@@ -63,6 +63,9 @@ audio * {
 	color: #fff;
 	visibility: visible !important;
 }
+.cue-display .cue-line {
+	display: block;
+}
 .cue-display span.cue {
 	display: inline-block;
 	padding: 3px 5px;

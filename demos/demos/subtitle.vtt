@@ -10,7 +10,7 @@ We have implemented the track element and the TextTrack API
 
 3
 00:00:10.100 --> 00:00:17.000
-You can use <b>bold</b>, <i>italic</i> and <c.customstyle>custom classes</c> to style
+You can use <b>bold</b>, <i>italic</i>, <u>underline</u> and <c.customstyle>custom classes</c> to style
 
 4
 00:00:17.100 --> 00:00:25.000

@@ -32,13 +32,13 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 			var element = $('<span class="cue-wrapper" />');
 			$.each(baseData.displayedActiveCues, function(i, cue){
 				var id = (cue.id) ? 'id="cue-id-'+cue.id +'"' : '';
-				var cueHTML = $('<span '+ id+ ' class="cue" />').html(cue.getCueAsHTML());
+				var cueHTML = $('<span class="cue-line"><span '+ id+ ' class="cue" /></span>').find('span').html(cue.getCueAsHTML()).end();
 				if(cue.track.kind == 'descriptions'){
 					setTimeout(function(){
 						$('span.description-cues', baseData.trackDisplay).html(cueHTML);
 					}, 0);
 				} else {
-					element.append(cueHTML);
+					element.prepend(cueHTML);
 				}
 			});
 			$('span.cue-wrapper', baseData.trackDisplay).remove();
