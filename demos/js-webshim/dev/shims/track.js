@@ -6,6 +6,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 	var notImplemented = function(){
 		webshims.error('not implemented yet');
 	};
+	var dummyTrack = $('<track />');
 	var supportTrackMod = Modernizr.ES5 && Modernizr.objectAccessor;
 	var createEventTarget = function(obj){
 		var eventList = {};
@@ -715,7 +716,7 @@ modified for webshims
 		addTextTrack: {
 			value: function(kind, label, lang){
 				var textTrack = mediaelement.createTextTrack(this, {
-					kind: kind || '',
+					kind: dummyTrack.prop('kind', kind || '').prop('kind'),
 					label: label || '',
 					srclang: lang || ''
 				});
