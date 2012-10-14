@@ -1866,15 +1866,28 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	 * Selectors for all browsers
 	 */
 	var rangeTypes = {number: 1, range: 1, date: 1/*, time: 1, 'datetime-local': 1, datetime: 1, month: 1, week: 1*/};
+	var hasInvalid = function(elem){
+		var ret = false;
+		$($.prop(elem, 'elements')).each(function(){
+			ret = $(this).is(':invalid');
+			if(ret){
+				return false;
+			}
+		});
+		return ret;
+	};
 	$.extend($.expr[":"], {
 		"valid-element": function(elem){
-			return !!($.prop(elem, 'willValidate') && ($.prop(elem, 'validity') || {valid: 1}).valid);
+			return $.nodeName(elem, 'form') ? !hasInvalid(elem) :!!($.prop(elem, 'willValidate') && isValid(elem));
 		},
 		"invalid-element": function(elem){
-			return !!($.prop(elem, 'willValidate') && !isValid(elem));
+			return $.nodeName(elem, 'form') ? hasInvalid(elem) : !!($.prop(elem, 'willValidate') && !isValid(elem));
 		},
 		"required-element": function(elem){
 			return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required'));
+		},
+		"user-error": function(elem){
+			return ($.prop(elem, 'willValidate') && $(elem).hasClass('user-error'));
 		},
 		"optional-element": function(elem){
 			return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required') === false);
@@ -1954,11 +1967,11 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	var changeVals = {selectedIndex: 1, value: 1, checked: 1, disabled: 1, readonly: 1};
 	$.prop = function(elem, name, val){
 		var ret = oldAttr.apply(this, arguments);
-		if(elem && 'form' in elem && changeVals[name] && val !== undefined && $(elem).hasClass('form-ui-invalid')){
+		if(elem && 'form' in elem && changeVals[name] && val !== undefined && $(elem).hasClass(invalidClass)){
 			if(isValid(elem)){
-				$(elem).getShadowElement().removeClass('form-ui-invalid');
+				$(elem).getShadowElement().removeClass(invalidClasses);
 				if(name == 'checked' && val) {
-					getGroupElements(elem).not(elem).removeClass('form-ui-invalid').removeAttr('aria-invalid');
+					getGroupElements(elem).not(elem).removeClass(invalidClasses).removeAttr('aria-invalid');
 				}
 			}
 		}
@@ -1976,11 +1989,23 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return ret;
 	};
 	
+	var isInGroup = function(name){
+		var ret;
+		try {
+			ret = document.activeElement.name === name;
+		} catch(e){}
+		return ret;
+	};
+	/* form-ui-invalid/form-ui-valid are deprecated. use user-error/user-succes instead */
+	var invalidClass = 'user-error';
+	var invalidClasses = 'user-error form-ui-invalid';
+	var validClass = 'user-success';
+	var validClasses = 'user-success form-ui-valid';
 	var switchValidityClass = function(e){
 		var elem, timer;
 		if(!e.target){return;}
 		elem = $(e.target).getNativeElement()[0];
-		if(elem.type == 'submit' || !$.prop(elem, 'willValidate') || (e.type == 'focusout' && e.type == 'radio')){return;}
+		if(elem.type == 'submit' || !$.prop(elem, 'willValidate') || (e.type == 'focusout' && elem.type == 'radio' && isInGroup(elem.name))){return;}
 		timer = $.data(elem, 'webshimsswitchvalidityclass');
 		var switchClass = function(){
 			var validity = $.prop(elem, 'validity');
@@ -1989,9 +2014,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			
 			$(elem).trigger('refreshCustomValidityRules');
 			if(validity.valid){
-				if(!shadowElem.hasClass('form-ui-valid')){
-					addClass = 'form-ui-valid';
-					removeClass = 'form-ui-invalid';
+				if(!shadowElem.hasClass(validClass)){
+					addClass = validClasses;
+					removeClass = invalidClasses;
 					generaltrigger = 'changedvaliditystate';
 					trigger = 'changedvalid';
 					if(checkTypes[elem.type] && elem.checked){
@@ -2005,9 +2030,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					$.data(elem, 'webshimsinvalidcause', validityCause);
 					generaltrigger = 'changedvaliditystate';
 				}
-				if(!shadowElem.hasClass('form-ui-invalid')){
-					addClass = 'form-ui-invalid';
-					removeClass = 'form-ui-valid';
+				if(!shadowElem.hasClass(invalidClass)){
+					addClass = invalidClasses;
+					removeClass = validClasses;
 					if (checkTypes[elem.type] && !elem.checked) {
 						getGroupElements(elem).not(elem).removeClass(removeClass).addClass(addClass);
 					}
@@ -2027,7 +2052,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				}, 0);
 			}
 			$.removeData(e.target, 'webshimsswitchvalidityclass');
-			
 		};
 		if(timer){
 			clearTimeout(timer);
@@ -2216,8 +2240,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			if(e.wrongWebkitInvalid){return;}
 			var jElm = $(e.target);
 			var shadowElem = jElm.getShadowElement();
-			if(!shadowElem.hasClass('form-ui-invalid')){
-				shadowElem.addClass('form-ui-invalid').removeClass('form-ui-valid');
+			if(!shadowElem.hasClass(invalidClass)){
+				shadowElem.addClass(invalidClasses).removeClass(validClasses);
 				setTimeout(function(){
 					$(e.target).trigger('changedinvalid').trigger('changedvaliditystate');
 				}, 0);

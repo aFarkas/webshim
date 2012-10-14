@@ -139,7 +139,7 @@
 				<h3>Options for the <code>forms</code> feature</h3>
 				<ul>
 					<li><strong>customMessages</strong> (boolean): <code>false</code> (default) || <code>true</code>. If <code>customMessages</code> is set to true. Webshims Lib will implement a DOM-Property called customValidationMessage, which can be changed through the $.webshims.validityMessages-Array.</li>
-					<li><strong>overrideMessages</strong> (boolean): <code>false</code> (default) || <code>true</code>. Overrides the native messages with the customMessages - using the <code>setCustomValidity</code>-method. This is useful, if you want to use customMessages with native validation UI. If you want to use custom messages with custom styleable UI. Use the <code>customMessages</code>-option instead.</li>
+					<li><strong>overrideMessages (deprecated)</strong> (boolean): <code>false</code> (default) || <code>true</code>. Overrides the native messages with the customMessages - using the <code>setCustomValidity</code>-method. This is useful, if you want to use customMessages with native validation UI. If you want to use custom messages with custom styleable UI. Use the <code>customMessages</code>-option instead.</li>
 					<li><strong>replaceValidationUI</strong> (boolean): <code>false</code> (default) || <code>true</code>. Replaces the browser validation UI with a custom styleable UI.</li>
 					<li><strong>placeholderType</strong> (string): <code>"value"</code> (default) || <code>"over"</code>. If placeholderType is set to "over", the polyfill uses the overLabel technique to create a placeholder and doesn't "pollute" the value property.</li>
 					<li><strong>lightweightDatalist</strong> (boolean): <code>true</code> (default) || <code>false</code>. If <code>lightweightDatalist</code> is set to true. Webshims Lib will switch the datalist element and list property implementation from the forms-ext to the forms feature.</li>
@@ -471,6 +471,7 @@ $.webshims.polyfill(features);
 			<aside>
 				<h3>Short forms examples with webshims lib</h3>
 				<ul>
+					<li><a href="http://jsfiddle.net/trixta/NnNKv/">Use of :user-error/.user-error to improve the usability of form validation</a></li>
 					<li><a href="http://jsfiddle.net/trixta/SWQme/">Combining two date fields (field limits dynamically min/max attribute of the other field)</a></li>
 					<li><a href="http://jsfiddle.net/trixta/werS3/">Combining input[type="range"] with an input[type="date"] using the new valueAsNumber property</a></li>
 					<li><a href="http://jsfiddle.net/trixta/DTqxA/">show validation message on focusout/blur</a></li>
