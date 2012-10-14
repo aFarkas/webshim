@@ -252,12 +252,22 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	 * Selectors for all browsers
 	 */
 	var rangeTypes = {number: 1, range: 1, date: 1/*, time: 1, 'datetime-local': 1, datetime: 1, month: 1, week: 1*/};
+	var hasInvalid = function(elem){
+		var ret = false;
+		$($.prop(elem, 'elements')).each(function(){
+			ret = $(this).is(':invalid');
+			if(ret){
+				return false;
+			}
+		});
+		return ret;
+	};
 	$.extend($.expr[":"], {
 		"valid-element": function(elem){
-			return !!($.prop(elem, 'willValidate') && ($.prop(elem, 'validity') || {valid: 1}).valid);
+			return $.nodeName(elem, 'form') ? !hasInvalid(elem) :!!($.prop(elem, 'willValidate') && isValid(elem));
 		},
 		"invalid-element": function(elem){
-			return !!($.prop(elem, 'willValidate') && !isValid(elem));
+			return $.nodeName(elem, 'form') ? hasInvalid(elem) : !!($.prop(elem, 'willValidate') && !isValid(elem));
 		},
 		"required-element": function(elem){
 			return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required'));
