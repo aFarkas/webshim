@@ -384,6 +384,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			var resizeTimer;
 			var lastHeight;
 			var lastWidth;
+			
 			var docObserve = {
 				init: false,
 				runs: 0,
@@ -419,7 +420,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 							
 						}
 						$.event.trigger('updateshadowdom');
-					}, 10);
+					}, (e.type == 'resize') ? 50 : 9);
 				},
 				_create: function(){
 					$.each({ Height: "getHeight", Width: "getWidth" }, function(name, type){
@@ -447,7 +448,21 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					}
 				}
 			};
-			
+			(function(){
+				var oldAnimate = $.fn.animate;
+				var body, animationTimer;
+				
+				$.fn.animate = function(){
+					if(body || (body = document.body)){
+						clearTimeout(animationTimer);
+						animationTimer = setTimeout(function(){
+							docObserve.test();
+							docObserve.handler({type: 'animationstart'});
+						}, 19);
+					}
+					return oldAnimate.apply(this, arguments);
+				};
+			})();
 			
 			$.event.customEvent.updateshadowdom = true;
 			
