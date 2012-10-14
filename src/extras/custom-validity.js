@@ -243,7 +243,7 @@
 			} else {
 				$(data.masterElement).bind('change', function(){
 					$.webshims.refreshCustomValidityRules(elem);
-					if($(elem).is('.form-ui-invalid, .form-ui-valid')){
+					if($(elem).is('.user-error, .user-success')){
 						$(elem).trigger('refreshvalidityui');
 					}
 				});
