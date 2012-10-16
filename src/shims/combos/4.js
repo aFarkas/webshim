@@ -391,9 +391,10 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		var elem, timer;
 		if(!e.target){return;}
 		elem = $(e.target).getNativeElement()[0];
-		if(elem.type == 'submit' || !$.prop(elem, 'willValidate') || (e.type == 'focusout' && elem.type == 'radio' && isInGroup(elem.name))){return;}
+		if(elem.type == 'submit' || !$.prop(elem, 'willValidate')){return;}
 		timer = $.data(elem, 'webshimsswitchvalidityclass');
 		var switchClass = function(){
+			if(e.type == 'focusout' && elem.type == 'radio' && isInGroup(elem.name)){return;}
 			var validity = $.prop(elem, 'validity');
 			var shadowElem = $(elem).getShadowElement();
 			var addClass, removeClass, trigger, generaltrigger, validityCause;
@@ -439,13 +440,14 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			}
 			$.removeData(e.target, 'webshimsswitchvalidityclass');
 		};
+		
 		if(timer){
 			clearTimeout(timer);
 		}
 		if(e.type == 'refreshvalidityui'){
 			switchClass();
 		} else {
-			$.data(e.target, 'webshimsswitchvalidityclass', setTimeout(switchClass, 9));
+			$.data(elem, 'webshimsswitchvalidityclass', setTimeout(switchClass, 9));
 		}
 	};
 	

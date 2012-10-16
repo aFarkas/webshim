@@ -1089,10 +1089,10 @@ if( !('maxLength' in document.createElement('textarea')) ){
 	
 	constrainMaxLength.update = function(element, maxLength){
 		if($(element).is(':focus')){
-			if(maxLength == null){
+			if(!maxLength){
 				maxLength = $.prop(element, 'maxlength');
 			}
-			constrainMaxLength(e.target, maxLength);
+			constrainMaxLength(element, maxLength);
 		}
 	};
 	

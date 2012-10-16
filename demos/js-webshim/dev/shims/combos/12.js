@@ -445,24 +445,24 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						$(this.test);
 						$(window).bind('load', this.test);
 						$(window).bind('resize', this.handler);
+						(function(){
+							var oldAnimate = $.fn.animate;
+							var animationTimer;
+							
+							$.fn.animate = function(){
+								clearTimeout(animationTimer);
+								animationTimer = setTimeout(function(){
+									docObserve.test();
+									docObserve.handler({type: 'animationstart'});
+								}, 19);
+								
+								return oldAnimate.apply(this, arguments);
+							};
+						})();
 					}
 				}
 			};
-			(function(){
-				var oldAnimate = $.fn.animate;
-				var body, animationTimer;
-				
-				$.fn.animate = function(){
-					if(body || (body = document.body)){
-						clearTimeout(animationTimer);
-						animationTimer = setTimeout(function(){
-							docObserve.test();
-							docObserve.handler({type: 'animationstart'});
-						}, 19);
-					}
-					return oldAnimate.apply(this, arguments);
-				};
-			})();
+			
 			
 			$.event.customEvent.updateshadowdom = true;
 			
