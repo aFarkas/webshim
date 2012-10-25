@@ -129,10 +129,10 @@ class NewControls extends MovieClip {
 		_controlsBar.addChild(_pauseControl);
 		
 		
-		
-		_fullscreenControl = new FullscreenIcon(0, 0, 0, 0, _controlColor, _hoverColor);
-		_controlsBar.addChild(_fullscreenControl);
-		
+		if(_player.getType() != InputType.AUDIO){
+			_fullscreenControl = new FullscreenIcon(0, 0, 0, 0, _controlColor, _hoverColor);
+			_controlsBar.addChild(_fullscreenControl);
+		}
 		_volumeIcon = new VolumeIcon(0, 0, 0, 0, _controlColor, _hoverColor);
 		_controlsBar.addChild(_volumeIcon);
 		
@@ -220,7 +220,10 @@ class NewControls extends MovieClip {
 		_track.addEventListener(MouseEvent.CLICK, onTrackClick);
 		_playControl.addEventListener(MouseEvent.CLICK, onPlayClick);
 		_pauseControl.addEventListener(MouseEvent.CLICK, onPauseClick);
-		_fullscreenControl.addEventListener(MouseEvent.CLICK, onFullscreenClick);
+		if(_player.getType() != InputType.AUDIO){
+			_fullscreenControl.addEventListener(MouseEvent.CLICK, onFullscreenClick);
+		}
+		
 		_volumeIcon.addEventListener(MouseEvent.CLICK, onVolumeIconClick);
 		_volumeTrack.addEventListener(MouseEvent.CLICK, onVolumeTrackClick);
 		
@@ -644,7 +647,7 @@ class NewControls extends MovieClip {
 		var barHeight = _controlSize;
 		var barCenter = barWidth / 2;
 		var buttonSize = Std.int(((80 / 100) * (barHeight - (barMargin*2))));
-		
+		var buttonCount = (_player.getType() != InputType.AUDIO) ? 2 : 1;
 		_controlsBar.x = 0;
 		_controlsBar.y = (_stage.stageHeight - barHeight);
 		
@@ -665,7 +668,7 @@ class NewControls extends MovieClip {
 		_controlsBar.graphics.endFill();
 		
 		//Draw seek bar
-		var _seekBarWidth = barWidth - (buttonSize+barMargin)*2 - (_playControl.x + _playControl.width + barMargin) - barMargin;
+		var _seekBarWidth = barWidth - (buttonSize+barMargin)*buttonCount - (_playControl.x + _playControl.width + barMargin) - barMargin;
 		var _seekBarHeight = barHeight;
 		_seekBar.x = _playControl.x + _playControl.width + barMargin;
 		_seekBar.y = 0;
@@ -736,13 +739,16 @@ class NewControls extends MovieClip {
 		
 				
 		//Draw fullscreen button
-		_fullscreenControl.setNormalColor(_controlColor);
-		_fullscreenControl.setHoverColor(_hoverColor);
-		_fullscreenControl.setPosition(_volumeIcon.x + _volumeIcon.width + barMargin, _playControl.y+1);
-		_fullscreenControl.setSize(buttonSize, buttonSize);
+		if(_player.getType() != InputType.AUDIO){
+			_fullscreenControl.setNormalColor(_controlColor);
+			_fullscreenControl.setHoverColor(_hoverColor);
+			_fullscreenControl.setPosition(_volumeIcon.x + _volumeIcon.width + barMargin, _playControl.y+1);
+			_fullscreenControl.setSize(buttonSize, buttonSize);
+		}
+		
 		
 		//Draw volume track
-		_volumeTrack.x = _controlsBar.width-(buttonSize+barMargin)*2;
+		_volumeTrack.x = _controlsBar.width-(buttonSize+barMargin)*buttonCount;
 		_volumeTrack.y = -_controlsBar.height-2;
 		_volumeTrack.graphics.lineStyle(1, _controlColor);
 		_volumeTrack.graphics.beginFill(0x000000, 0);
