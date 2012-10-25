@@ -910,7 +910,7 @@ var validityRules = {
 			}
 			return ret;
 		},
-		tooLong: function(input, val, cache){
+		tooLong: function(){
 			return false;
 		},
 		typeMismatch: function (input, val, cache){

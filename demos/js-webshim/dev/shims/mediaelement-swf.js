@@ -94,15 +94,15 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	var playerSwfPath = options.playerPath || webshims.cfg.basePath + "jwplayer/" + (options.playerName || "player.swf");
 	var jwplugin = options.pluginPath || webshims.cfg.basePath +'swf/jwwebshims.swf';
 	
-	webshims.extendUNDEFProp(options.jwParams, {
+	webshims.extendUNDEFProp(options.params, {
 		allowscriptaccess: 'always',
 		allowfullscreen: 'true',
 		wmode: 'transparent'
 	});
-	webshims.extendUNDEFProp(options.jwVars, {
+	webshims.extendUNDEFProp(options.vars, {
 		screencolor: 'ffffffff'
 	});
-	webshims.extendUNDEFProp(options.jwAttrs, {
+	webshims.extendUNDEFProp(options.attrs, {
 		bgcolor: '#000000'
 	});
 	
@@ -666,11 +666,11 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		} else {
 			loadedSwf++;
 		}
-		var vars = $.extend({}, options.jwVars, {
+		var vars = $.extend({}, options.vars, {
 				image: $.prop(elem, 'poster') || '',
 				file: canPlaySrc.srcProp
 		});
-		var elemVars = $(elem).data('jwvars') || {};
+		var elemVars = $(elem).data('vars') || {};
 		
 		if(!data){
 			data = webshims.data(elem, 'mediaelement');
@@ -681,7 +681,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			resetSwfProps(data);
 			data.currentSrc = canPlaySrc.srcProp;
 			$.extend(vars, elemVars);
-			options.changeJW(vars, elem, canPlaySrc, data, 'load');
+			options.changeSWF(vars, elem, canPlaySrc, data, 'load');
 			queueSwfMethod(elem, SENDEVENT, ['LOAD', vars]);
 			return;
 		}
@@ -691,18 +691,18 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		var elemId = 'jwplayer-'+ webshims.getID(elem);
 		var params = $.extend(
 			{},
-			options.jwParams,
-			$(elem).data('jwparams')
+			options.params,
+			$(elem).data('params')
 		);
 		var elemNodeName = elem.nodeName.toLowerCase();
 		var attrs = $.extend(
 			{},
-			options.jwAttrs,
+			options.attrs,
 			{
 				name: elemId,
 				id: elemId
 			},
-			$(elem).data('jwattrs')
+			$(elem).data('attrs')
 		);
 		var box = $('<div class="polyfill-'+ (elemNodeName) +' polyfill-mediaelement" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
 			.css({
@@ -761,7 +761,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		$.extend(vars, 
 			{
 				id: elemId,
-				controlbar: hasControls ? options.jwVars.controlbar || (elemNodeName == 'video' ? 'over' : 'bottom') : (elemNodeName == 'video') ? 'none' : 'bottom',
+				controlbar: hasControls ? options.vars.controlbar || (elemNodeName == 'video' ? 'over' : 'bottom') : (elemNodeName == 'video') ? 'none' : 'bottom',
 				icons: ''+ (hasControls && elemNodeName == 'video')
 			},
 			elemVars,
@@ -780,7 +780,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		
 		mediaelement.setActive(elem, 'third', data);
 		
-		options.changeJW(vars, elem, canPlaySrc, data, 'embed');
+		options.changeSWF(vars, elem, canPlaySrc, data, 'embed');
 		
 		$(elem).bind('updatemediaelementdimensions updateshadowdom', function(){
 			setElementDimension(data, $.prop(elem, 'controls'));
@@ -1070,5 +1070,4 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 					
 		}, 'prop');
 	}
-	
 });

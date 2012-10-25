@@ -2320,11 +2320,12 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	var supportsLoop = false;
 	var options = webshims.cfg.mediaelement;
 	var bugs = webshims.bugs;
+	var swfType = options.player == 'jwplayer' ? 'mediaelement-swf' : 'mediaelement-jaris'
 	var loadSwf = function(){
-		webshims.ready('mediaelement-swf', function(){
+		webshims.ready(swfType, function(){
 			if(!webshims.mediaelement.createSWF){
-				webshims.modules["mediaelement-swf"].test = $.noop;
-				webshims.reTest(["mediaelement-swf"], hasNative);
+				webshims.mediaelement.loadSwf = true;
+				webshims.reTest([swfType], hasNative);
 			}
 		});
 	};
@@ -2355,7 +2356,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					if(hasSwf){
 						loadSwf();
 					}
-					webshims.ready('WINDOWLOAD mediaelement-swf', function(){
+					webshims.ready('WINDOWLOAD '+swfType, function(){
 						setTimeout(function(){
 							if(hasSwf && !options.preferFlash && webshims.mediaelement.createSWF && !$(e.target).closest('audio, video').is('.nonnative-api-active')){
 								options.preferFlash = true;
@@ -2652,7 +2653,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	var handleThird = (function(){
 		var requested;
 		return function( mediaElem, ret, data ){
-			webshims.ready(hasSwf ? 'mediaelement-swf' : 'mediaelement-yt', function(){
+			webshims.ready(hasSwf ? swfType : 'mediaelement-yt', function(){
 				if(mediaelement.createSWF){
 					mediaelement.createSWF( mediaElem, ret, data );
 				} else if(!requested) {
@@ -2840,7 +2841,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		initMediaElements();
 		webshims.ready('WINDOWLOAD mediaelement', loadThird);
 	} else {
-		webshims.ready('mediaelement-swf', initMediaElements);
+		webshims.ready(swfType, initMediaElements);
 	}
 	$(function(){
 		webshims.loader.loadList(['track-ui']);

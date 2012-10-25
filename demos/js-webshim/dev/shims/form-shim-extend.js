@@ -429,7 +429,7 @@ if( !('maxLength' in document.createElement('textarea')) ){
 					constrainMaxLength.update(this, val);
 					return;
 				}
-				this.setAttribute('maxlength', ''+ 0);
+				this.setAttribute('maxlength', '0');
 				constrainMaxLength.update(this, 0);
 			},
 			get: function(){
