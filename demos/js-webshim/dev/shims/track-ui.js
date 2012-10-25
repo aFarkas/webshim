@@ -19,6 +19,7 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 					if(!baseData.trackDisplay){
 						baseData.trackDisplay = $('<div class="cue-display"><span class="description-cues" aria-live="assertive" /></div>').insertAfter(media);
 						this.addEvents(baseData, media);
+						webshims.docObserve();
 					}
 					
 					if(baseData.hasDirtyTrackDisplay){

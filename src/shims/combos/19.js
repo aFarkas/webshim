@@ -465,7 +465,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			
 			
 			$.event.customEvent.updateshadowdom = true;
-			
+			webshims.docObserve = function(){
+				webshims.ready('DOM', function(){
+					docObserve.start();
+				});
+			};
 			return function(nativeElem, shadowElem, opts){
 				opts = opts || {};
 				if(nativeElem.jquery){
@@ -503,9 +507,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					shadowFocusElementData.shadowData.data = shadowData.shadowData.data = nativeData.shadowData.data = opts.data;
 				}
 				opts = null;
-				webshims.ready('DOM', function(){
-					docObserve.start();
-				});
+				webshims.docObserve();
 			};
 		})(),
 		propTypes: {
