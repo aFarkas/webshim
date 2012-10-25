@@ -1,7 +1,6 @@
 jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, document, undefined, options){
 	"use strict";
 	
-	
 	var mediaelement = webshims.mediaelement;
 	var swfobject = window.swfobject;
 	var hasNative = Modernizr.audio && Modernizr.video;
@@ -85,7 +84,8 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 	webshims.extendUNDEFProp(options.params, {
 		allowscriptaccess: 'always',
 		allowfullscreen: 'true',
-		wmode: 'transparent'
+		wmode: 'transparent',
+		allowNetworking: 'all'
 	});
 	webshims.extendUNDEFProp(options.vars, {
 		controltype: '1',
@@ -150,12 +150,17 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 				}
 			}
 		},
+		onNotBuffering: function(jaris, data){
+			setReadyState(3, data);
+		},
 		onDataInitialized: function(jaris, data){
 			
 			var oldDur = data.duration;
 			
 			data.duration = jaris.duration;
 			if(oldDur === data.duration){return;}
+			data.videoHeight = jaris.height;
+			data.videoWidth = jaris.width;
 			if(!data.networkState){
 				data.networkState = 2;
 			}
@@ -264,7 +269,11 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			while(data.actionQueue.length && actionLen > i){
 				i++;
 				operation = data.actionQueue.shift();
-				data.api[operation.fn].apply(data.api, operation.args);
+				try{
+					data.api[operation.fn].apply(data.api, operation.args);
+				} catch(er){
+					webshims.warn(er);
+				}
 			}
 		}
 		if(data.actionQueue.length){
@@ -567,6 +576,8 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 				
 				if(canPlaySrc.type == 'audio/mpeg' || canPlaySrc.type == 'audio/mp3'){
 					vars.type = 'audio';
+					vars.streamtype = 'file';
+					//controls=false&jsapi=true&
 				} else if(canPlaySrc.type == 'video/youtube'){
 					vars.streamtype = 'youtube';
 				}
@@ -745,7 +756,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			$(this)[boolProp ? 'addClass' : 'removeClass']('webshims-controls');
 			
 			if(data){
-				webshims.warn("currently not fully supported");
+				webshims.warn("changing controls currently not fully supported with jaris player");
 				if(nodeName == 'audio'){
 					setElementDimension(data, boolProp);
 				}

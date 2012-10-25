@@ -32,6 +32,13 @@
 	<!--
 		<script src="../../src/polyfiller.js"></script> 
 		<script>
+			$.webshims.setOptions({
+				mediaelement: {
+					player: 'jaris',
+					preferFlash: true,
+					playerPath: '../../swfs/jaris/bin/JarisFLVPlayer.swf'
+				}
+			});
 			$.webshims.debug = 'noCombo';
 		</script>
 	-->
