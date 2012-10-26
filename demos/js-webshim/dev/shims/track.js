@@ -808,5 +808,7 @@ modified for webshims
 	if(Modernizr.track){
 		$('video, audio').trigger('trackapichange');
 	}
-	
+	$(function(){
+		webshims.loader.loadList(['track-ui']);
+	});
 });

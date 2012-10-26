@@ -82,6 +82,7 @@
 			if(dateElem){
 				try {
 					if(dateElem.prop({disabled: true, value: ''}).prop('disabled', false).is(':valid')){
+						bugs.disabledCached = true;
 						onDomextend(function(){
 							webshims.onNodeNamesPropertyModify(['input', 'textarea'], ['disabled', 'readonly'], {
 								set: function(val){

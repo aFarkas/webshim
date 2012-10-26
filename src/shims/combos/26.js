@@ -1576,6 +1576,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			if(dateElem){
 				try {
 					if(dateElem.prop({disabled: true, value: ''}).prop('disabled', false).is(':valid')){
+						bugs.disabledCached = true;
 						onDomextend(function(){
 							webshims.onNodeNamesPropertyModify(['input', 'textarea'], ['disabled', 'readonly'], {
 								set: function(val){
@@ -2987,5 +2988,7 @@ modified for webshims
 	if(Modernizr.track){
 		$('video, audio').trigger('trackapichange');
 	}
-	
+	$(function(){
+		webshims.loader.loadList(['track-ui']);
+	});
 });
