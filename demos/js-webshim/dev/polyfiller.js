@@ -1027,7 +1027,7 @@
 			f: 'forms-ext',
 			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && modernizrInputTypes.time && modernizrInputTypes.number);},
 			test: function(toLoad){
-				return (this.uiTest() && !webshims.bugs.valueAsNumberSet);
+				return this.uiTest();
 			},
 			d: ['forms', DOMSUPPORT],
 			c: [18, 7, 6]

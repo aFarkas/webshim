@@ -1494,10 +1494,11 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 });
 })(jQuery, Modernizr, jQuery.webshims);//additional tests for partial implementation of forms features
 (function($){
+	"use strict";
 	var Modernizr = window.Modernizr;
 	var webshims = $.webshims;
 	var bugs = webshims.bugs;
-	var form = $('<form action="#" style="width: 1px; height: 1px; overflow: hidden;"><select name="b" required="" /><input type="date" required="" name="a" /><input type="submit" /></form>');
+	var form = $('<form action="#" style="width: 1px; height: 1px; overflow: hidden;"><select name="b" required="" /><input required="" name="a" /></form>');
 	var testRequiredFind = function(){
 		if(form[0].querySelector){
 			try {
@@ -1507,9 +1508,14 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			}
 		}
 	};
+	var inputElem = $('input', form).eq(0);
+	var onDomextend = function(fn){
+		webshims.loader.loadList(['dom-extend']);
+		webshims.ready('dom-extend', fn);
+	};
+	
 	bugs.findRequired = false;
 	bugs.validationMessage = false;
-	bugs.valueAsNumberSet = false;
 	
 	webshims.capturingEventPrevented = function(e){
 		if(!e._isPolyfilled){
@@ -1538,157 +1544,71 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	webshims.capturingEvents(['input']);
 	webshims.capturingEvents(['invalid'], true);
 	
-	Modernizr.bugfreeformvalidation = true;
-	if(window.opera || $.browser.webkit || window.testGoodWithFix){
-		var dateElem = $('input', form).eq(0);
-		var timer;
-		var onDomextend = function(fn){
-			webshims.loader.loadList(['dom-extend']);
-			webshims.ready('dom-extend', fn);
-		};
-		var loadFormFixes = function(e){
-			var reTest = ['form-extend', 'form-message', 'form-native-fix'];
-			if(e){
-				e.preventDefault();
-				e.stopImmediatePropagation();
-			}
-			clearTimeout(timer);
-			setTimeout(function(){
-				if(!form){return;}
-				form.remove();
-				form = dateElem = null;
-			}, 9);
-			if(!Modernizr.bugfreeformvalidation){
-				webshims.addPolyfill('form-native-fix', {
-					f: 'forms',
-					d: ['form-extend']
-				});
-				//remove form-extend readyness
-				webshims.modules['form-extend'].test = $.noop;
-			} 
-			
-			if(webshims.isReady('form-number-date-api')){
-				reTest.push('form-number-date-api');
-			}
-			
-			webshims.reTest(reTest);
-			
-			if(dateElem){
-				try {
-					if(dateElem.prop({disabled: true, value: ''}).prop('disabled', false).is(':valid')){
-						bugs.disabledCached = true;
-						onDomextend(function(){
-							webshims.onNodeNamesPropertyModify(['input', 'textarea'], ['disabled', 'readonly'], {
-								set: function(val){
-									var elem = this;
-									if(!val && elem){
-										$.prop(elem, 'value', $.prop(elem, 'value'));
-									}
-								}
-							});
-							webshims.onNodeNamesPropertyModify(['select'], ['disabled', 'readonly'], {
-								set: function(val){
-									var elem = this;
-									if(!val && elem){
-										val = $(elem).val();
-										($('option:last-child', elem)[0] || {}).selected = true;
-										$(elem).val( val );
-									}
-								}
-							});
-						});
-					}
-				} catch(er){}
-			}
-			
-			if ($.browser.opera || window.testGoodWithFix) {
-				onDomextend(function(){
-					
-					//Opera shows native validation bubbles in case of input.checkValidity()
-					// Opera 11.6/12 hasn't fixed this issue right, it's buggy
-					var preventDefault = function(e){
-						e.preventDefault();
-					};
-					
-					['form', 'input', 'textarea', 'select'].forEach(function(name){
-						var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
-							prop: {
-								value: function(){
-									if (!webshims.fromSubmit) {
-										$(this).bind('invalid.checkvalidity', preventDefault);
-									}
-									
-									webshims.fromCheckValidity = true;
-									var ret = desc.prop._supvalue.apply(this, arguments);
-									if (!webshims.fromSubmit) {
-										$(this).unbind('invalid.checkvalidity', preventDefault);
-									}
-									webshims.fromCheckValidity = false;
-									return ret;
-								}
-							}
-						});
-					});
-					
-				});
-			}
-		};
+	if(window.opera || window.testGoodWithFix){
 		
 		form.appendTo('head');
-		if(window.opera || window.testGoodWithFix) {
-			testRequiredFind();
-			bugs.validationMessage = !(dateElem.prop('validationMessage'));
-			if((Modernizr.inputtypes || {}).date){
-				try {
-					dateElem.prop('valueAsNumber', 0);
-				} catch(er){}
-				bugs.valueAsNumberSet = (dateElem.prop('value') != '1970-01-01');
-			}
-			dateElem.prop('value', '');
-		}
 		
-		form.bind('submit', function(e){
-			Modernizr.bugfreeformvalidation = false;
-			loadFormFixes(e);
-		});
+		testRequiredFind();
+		bugs.validationMessage = !(inputElem.prop('validationMessage'));
 		
-		timer = setTimeout(function(){
-			if (form) {
-				form.triggerHandler('submit');
-			}
-		}, 9);
+		webshims.reTest(['form-extend', 'form-message']);
 		
-		$('input, select', form).bind('invalid', loadFormFixes)
-			.filter('[type="submit"]')
-			.bind('click', function(e){
-				e.stopImmediatePropagation();
-			})
-			.trigger('click')
-		;
-		
-		if($.browser.webkit && Modernizr.bugfreeformvalidation && !webshims.bugs.bustedValidity){
-			(function(){
-				var elems = /^(?:textarea|input)$/i;
-				var form = false;
-
-				document.addEventListener('contextmenu', function(e){
-					if(elems.test( e.target.nodeName || '') && (form = e.target.form)){
-						setTimeout(function(){
-							form = false;
-						}, 1);
-					}
-				}, false);
+		form.remove();
+			
+		$(function(){
+			onDomextend(function(){
 				
-				$(window).bind('invalid', function(e){
-					if(e.originalEvent && form && form == e.target.form){
-						e.wrongWebkitInvalid = true;
-						e.stopImmediatePropagation();
-					}
+				//Opera shows native validation bubbles in case of input.checkValidity()
+				// Opera 11.6/12 hasn't fixed this issue right, it's buggy
+				var preventDefault = function(e){
+					e.preventDefault();
+				};
+				
+				['form', 'input', 'textarea', 'select'].forEach(function(name){
+					var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
+						prop: {
+							value: function(){
+								if (!webshims.fromSubmit) {
+									$(this).bind('invalid.checkvalidity', preventDefault);
+								}
+								
+								webshims.fromCheckValidity = true;
+								var ret = desc.prop._supvalue.apply(this, arguments);
+								if (!webshims.fromSubmit) {
+									$(this).unbind('invalid.checkvalidity', preventDefault);
+								}
+								webshims.fromCheckValidity = false;
+								return ret;
+							}
+						}
+					});
 				});
-			})();
-		}
+				
+			});
+		});
 	}
 	
+	if($.browser.webkit && !webshims.bugs.bustedValidity){
+		(function(){
+			var elems = /^(?:textarea|input)$/i;
+			var form = false;
+
+			document.addEventListener('contextmenu', function(e){
+				if(elems.test( e.target.nodeName || '') && (form = e.target.form)){
+					setTimeout(function(){
+						form = false;
+					}, 1);
+				}
+			}, false);
+			
+			$(window).bind('invalid', function(e){
+				if(e.originalEvent && form && form == e.target.form){
+					e.wrongWebkitInvalid = true;
+					e.stopImmediatePropagation();
+				}
+			});
+		})();
+	}
 })(jQuery);
 
 jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
@@ -1808,7 +1728,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return ($.prop(elem, 'validity') || {valid: 1}).valid;
 	};
 	
-	if (bugs.bustedValidity || bugs.findRequired || !Modernizr.bugfreeformvalidation) {
+	if (bugs.bustedValidity || bugs.findRequired) {
 		(function(){
 			var find = $.find;
 			var matchesSelector = $.find.matchesSelector;

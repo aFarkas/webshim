@@ -307,7 +307,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 			return val;
 		},
 		EPS = 1e-7,
-		typeBugs = webshims.bugs.valueAsNumberSet || webshims.bugs.bustedValidity
+		typeBugs = webshims.bugs.bustedValidity
 	;
 	
 	webshims.addValidityRule('stepMismatch', function(input, val, cache, validityState){
@@ -1229,7 +1229,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 	}
 	
-	if(!webshims.bugs.valueAsNumberSet && (options.replaceUI || !Modernizr.inputtypes.date /*|| !Modernizr.inputtypes["datetime-local"]*/ || !Modernizr.inputtypes.range)){
+	if(options.replaceUI || !Modernizr.inputtypes.date /*|| !Modernizr.inputtypes["datetime-local"]*/ || !Modernizr.inputtypes.range){
 		var reflectFn = function(val){
 			if(webshims.data(this, 'hasShadow')){
 				$.prop(this, 'value', $.prop(this, 'value'));

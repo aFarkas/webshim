@@ -52,7 +52,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			return val;
 		},
 		EPS = 1e-7,
-		typeBugs = webshims.bugs.valueAsNumberSet || webshims.bugs.bustedValidity
+		typeBugs = webshims.bugs.bustedValidity
 	;
 	
 	webshims.addValidityRule('stepMismatch', function(input, val, cache, validityState){
