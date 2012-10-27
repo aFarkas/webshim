@@ -1,4 +1,5 @@
 jQuery.webshims.register('track', function($, webshims, window, document, undefined){
+	"use strict";
 	var mediaelement = webshims.mediaelement;
 	var id = new Date().getTime();
 	//descriptions are not really shown, but they are inserted into the dom
@@ -40,6 +41,11 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 			}
 			return cue;
 		}
+	};
+	var numericModes = {
+		0: 'disabled',
+		1: 'hidden',
+		2: 'showing'
 	};
 	
 	var textTrackProto = {
@@ -153,10 +159,10 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 				trackList.push(newTracks[i]);
 			}
 			for(i = 0, len = removed.length; i < len; i++){
-				$([trackList]).triggerHandler($.Event({type: 'removetrack', track: trackList, track: removed[i]}));
+				$([trackList]).triggerHandler($.Event({type: 'removetrack', track: removed[i]}));
 			}
 			for(i = 0, len = added.length; i < len; i++){
-				$([trackList]).triggerHandler($.Event({type: 'addtrack', track: trackList, track: added[i]}));
+				$([trackList]).triggerHandler($.Event({type: 'addtrack', track: added[i]}));
 			}
 			if(baseData.scriptedTextTracks || removed.length){
 				$(this).triggerHandler('updatetrackdisplay');
@@ -773,7 +779,7 @@ modified for webshims
 								kind = $.prop(this, 'kind');
 								readyState = getNativeReadyState(this, origTrack);
 								if (origTrack.mode || readyState) {
-									shimedTrack.mode = origTrack.mode;
+									shimedTrack.mode = numericModes[origTrack.mode] || origTrack.mode;
 								}
 								//disable track from showing + remove UI
 								if(kind != 'descriptions'){
@@ -808,7 +814,4 @@ modified for webshims
 	if(Modernizr.track){
 		$('video, audio').trigger('trackapichange');
 	}
-	$(function(){
-		webshims.loader.loadList(['track-ui']);
-	});
 });
