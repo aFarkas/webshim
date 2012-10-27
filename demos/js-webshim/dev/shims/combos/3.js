@@ -1777,6 +1777,74 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 	})();
 }
 
+try {
+	document.querySelector(':checked');
+} catch(er){
+	(function(){
+		var checkInputs = {
+			radio: 1,
+			checkbox: 1
+		};
+		var selectChange = function(){
+			var options = this.options || [];
+			var i, len, option;
+			for(i = 0, len = options.length; i < len; i++){
+				option = $(options[i]);
+				option[$.prop(options[i], 'selected') ? 'addClass' : 'removeClass']('prop-checked');
+			}
+		};
+		var checkChange = function(){
+			$(this)[$.prop(this, 'checked') ? 'addClass' : 'removeClass']('prop-checked');
+		};
+		
+		
+		webshims.onNodeNamesPropertyModify('select', 'value', selectChange);
+		webshims.onNodeNamesPropertyModify('select', 'selectedIndex', selectChange);
+		webshims.onNodeNamesPropertyModify('option', 'selected', function(){
+			$(this).closest('select').each(selectChange);
+		});
+		webshims.onNodeNamesPropertyModify('input', 'checked', function(value, boolVal){
+			var type = this.type;
+			if(type == 'radio' && boolVal){
+				webshims.modules["form-core"].getGroupElements(this).each(checkChange);
+			} else if(checkInputs[type]) {
+				$(this)[boolVal ? 'addClass' : 'removeClass']('prop-checked');
+			}
+		});
+		
+		$(document).on('change', function(e){
+			
+			if(checkInputs[e.target.type]){
+				if(e.target.type == 'radio'){
+					webshims.modules["form-core"].getGroupElements(e.target).each(checkChange);
+				} else {
+					$(e.target)[$.prop(e.target, 'checked') ? 'addClass' : 'removeClass']('prop-checked');
+				}
+			} else if(e.target.nodeName.toLowerCase() == 'select'){
+				$(e.target).each(selectChange);
+			}
+		});
+		
+		webshims.addReady(function(context, contextElem){
+			$('option, input', context)
+				.add(contextElem.filter('option, input'))
+				.each(function(){
+					var prop;
+					if(checkInputs[this.type]){
+						prop = 'checked';
+					} else if(this.nodeName.toLowerCase() == 'option'){
+						prop = 'selected';
+					}  
+					if(prop){
+						$(this)[$.prop(this, prop) ? 'addClass' : 'removeClass']('prop-checked');
+					}
+					
+				})
+			;
+		});
+	})();
+}
+
 (function(){
 	Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
 	var bustedTextarea = $.browser.webkit && Modernizr.textareaPlaceholder && webshims.browserVersion < 535;
