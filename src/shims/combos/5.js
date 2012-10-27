@@ -860,6 +860,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	}
 	
 });jQuery.webshims.register('form-message', function($, webshims, window, document, undefined, options){
+	"use strict";
 	var validityMessages = webshims.validityMessages;
 	
 	var implementProperties = (options.overrideMessages || options.customMessages) ? ['customValidationMessage'] : [];

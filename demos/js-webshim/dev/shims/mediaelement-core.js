@@ -171,9 +171,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		} else {
 			loadYt();
 		}
-		$(function(){
-			webshims.loader.loadList(['track-ui']);
-		});
 	};
 	
 	webshims.addPolyfill('mediaelement-yt', {
@@ -353,9 +350,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			if(!requested && hasYt && !mediaelement.createSWF){
 				loadYt();
 			}
-			$(function(){
-				webshims.loader.loadList(['track-ui']);
-			});
 		};
 	})();
 	
@@ -534,9 +528,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		webshims.ready(swfType, initMediaElements);
 	}
 	$(function(){
-		if(document.getElementsByTagName('track')[0]){
-			webshims.loader.loadList(['track-ui']);
-		}
+		webshims.loader.loadList(['track-ui']);
 	});
 	
 });

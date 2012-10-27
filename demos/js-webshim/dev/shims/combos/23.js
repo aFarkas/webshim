@@ -171,9 +171,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		} else {
 			loadYt();
 		}
-		$(function(){
-			webshims.loader.loadList(['track-ui']);
-		});
 	};
 	
 	webshims.addPolyfill('mediaelement-yt', {
@@ -353,9 +350,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			if(!requested && hasYt && !mediaelement.createSWF){
 				loadYt();
 			}
-			$(function(){
-				webshims.loader.loadList(['track-ui']);
-			});
 		};
 	})();
 	
@@ -534,13 +528,12 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		webshims.ready(swfType, initMediaElements);
 	}
 	$(function(){
-		if(document.getElementsByTagName('track')[0]){
-			webshims.loader.loadList(['track-ui']);
-		}
+		webshims.loader.loadList(['track-ui']);
 	});
 	
 });
 })(jQuery, Modernizr, jQuery.webshims);jQuery.webshims.register('form-message', function($, webshims, window, document, undefined, options){
+	"use strict";
 	var validityMessages = webshims.validityMessages;
 	
 	var implementProperties = (options.overrideMessages || options.customMessages) ? ['customValidationMessage'] : [];
@@ -705,6 +698,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	});
 });if(!Modernizr.formvalidation || jQuery.webshims.bugs.bustedValidity){
 jQuery.webshims.register('form-extend', function($, webshims, window, document){
+"use strict";
 webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
 var cfg = webshims.cfg.forms;

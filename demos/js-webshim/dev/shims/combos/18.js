@@ -1,4 +1,5 @@
 jQuery.webshims.register('form-datalist', function($, webshims, window, document, undefined){
+	"use strict";
 	var doc = document;	
 
 	/*

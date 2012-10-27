@@ -75,6 +75,15 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.9.3
+----------
+
+- add option to use alternative jarisplayer as mediaelement fallback
+- fixed track[default] in IE10 (initial copying of track.mode)
+- implement .prop-checked in browsers, which do not support the :checked selector
+- implement .user-error selector
+- limit track.kind property using addTextTrack to only known values
+
 Release 1.9.2
 ----------
 

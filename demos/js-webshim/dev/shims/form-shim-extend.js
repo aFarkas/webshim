@@ -1,5 +1,6 @@
 if(!Modernizr.formvalidation || jQuery.webshims.bugs.bustedValidity){
 jQuery.webshims.register('form-extend', function($, webshims, window, document){
+"use strict";
 webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
 var cfg = webshims.cfg.forms;

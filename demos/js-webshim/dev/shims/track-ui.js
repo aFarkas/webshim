@@ -1,4 +1,5 @@
 jQuery.webshims.register('track-ui', function($, webshims, window, document, undefined){
+	"use strict";
 	var options = webshims.cfg.track;
 	var enterE = {type: 'enter'};
 	var exitE = {type: 'exit'};
@@ -250,7 +251,6 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 						track = trackList[i];
 						if(track.mode != 'disabled' && track.cues && track.cues.length){
 							mediaelement.getActiveCue(track, elem, time, baseData);
-							
 						}
 					}
 					

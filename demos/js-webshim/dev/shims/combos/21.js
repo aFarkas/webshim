@@ -1,4 +1,5 @@
 jQuery.webshims.register('form-message', function($, webshims, window, document, undefined, options){
+	"use strict";
 	var validityMessages = webshims.validityMessages;
 	
 	var implementProperties = (options.overrideMessages || options.customMessages) ? ['customValidationMessage'] : [];
@@ -163,6 +164,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 	});
 });if(!Modernizr.formvalidation || jQuery.webshims.bugs.bustedValidity){
 jQuery.webshims.register('form-extend', function($, webshims, window, document){
+"use strict";
 webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
 var cfg = webshims.cfg.forms;
