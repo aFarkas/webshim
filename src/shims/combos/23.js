@@ -1736,7 +1736,17 @@ try {
 			}
 		};
 		var checkChange = function(){
-			$(this)[$.prop(this, 'checked') ? 'addClass' : 'removeClass']('prop-checked');
+			var fn = $.prop(this, 'checked')  ? 'addClass' : 'removeClass';
+			var className = this.className || '';
+			var parent;
+			
+			//IE8- has problems to update styles, we help
+			if( (className.indexOf('prop-checked') == -1) == (fn == 'addClass')){ 
+				$(this)[fn]('prop-checked');
+				if((parent = this.parentNode)){
+					parent.className = parent.className;
+				}
+			}
 		};
 		
 		
@@ -1750,7 +1760,7 @@ try {
 			if(type == 'radio' && boolVal){
 				webshims.modules["form-core"].getGroupElements(this).each(checkChange);
 			} else if(checkInputs[type]) {
-				$(this)[boolVal ? 'addClass' : 'removeClass']('prop-checked');
+				$(this).each(checkChange);
 			}
 		});
 		
