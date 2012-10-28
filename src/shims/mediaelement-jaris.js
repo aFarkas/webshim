@@ -50,7 +50,9 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		_bufferedEnd: 0,
 		_bufferedStart: 0,
 		currentTime: 0,
-		_ppFlag: undefined
+		_ppFlag: undefined,
+		_calledMeta: false,
+		lastDuration: 0
 	}, getProps, getSetProps);
 	
 	var idRep = /^jarisplayer-/;
@@ -156,9 +158,11 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		onDataInitialized: function(jaris, data){
 			
 			var oldDur = data.duration;
-			
 			data.duration = jaris.duration;
-			if(oldDur === data.duration){return;}
+			if(oldDur == data.duration || isNaN(data.duration)){return;}
+			if(data._calledMeta && Math.abs(data.lastDuration - data.duration) < 10){return;}
+			
+			data.lastDuration = data.duration;
 			data.videoHeight = jaris.height;
 			data.videoWidth = jaris.width;
 			if(!data.networkState){
@@ -171,8 +175,10 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			if(data.duration){
 				trigger(data._elem, 'durationchange');
 			}
-			
-			trigger(data._elem, 'loadedmetadata');
+			if(!data._calledMeta){
+				trigger(data._elem, 'loadedmetadata');
+			}
+			data._calledMeta = true;
 		},
 		onBuffering: function(jaris, data){
 			if(data.ended){
@@ -389,7 +395,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 	
 	
 	var resetSwfProps = (function(){
-		var resetProtoProps = ['_bufferedEnd', '_bufferedStart', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'videoHeight', 'videoWidth'];
+		var resetProtoProps = ['_calledMeta', 'lastDuration', '_bufferedEnd', '_bufferedStart', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'videoHeight', 'videoWidth'];
 		var len = resetProtoProps.length;
 		return function(data){
 			
@@ -397,7 +403,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			var lenI = len;
 			var networkState = data.networkState;
 			setReadyState(0, data);
-			while(--lenI){
+			while(--lenI > -1){
 				delete data[resetProtoProps[lenI]];
 			}
 			data.actionQueue = [];
@@ -548,7 +554,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 				} else {
 					data.currentTime = jaris.position;
 					
-					if(jaris.duration && data.duration != jaris.duration && isNaN(data.duration)){
+					if(!data._calledMeta && isNaN(jaris.duration) && data.duration != jaris.duration && isNaN(data.duration)){
 						onEvent.onDataInitialized(jaris, data);
 					}
 					
@@ -559,6 +565,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 					if(onEvent[jaris.type]){
 						onEvent[jaris.type](jaris, data);
 					}
+					data.duration = jaris.duration;
 				}
 				
 			};

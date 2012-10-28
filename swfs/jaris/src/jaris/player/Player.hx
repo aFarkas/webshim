@@ -56,6 +56,7 @@ import jaris.events.PlayerEvents;
 import jaris.utils.Utils;
 import jaris.player.AspectRatio;
 import jaris.player.UserSettings;
+import flash.errors.IOError;
 
 /**
  * Jaris main video player
@@ -565,6 +566,7 @@ class Player extends EventDispatcher
 	 */
 	private function onSoundProgress(event:ProgressEvent)
 	{
+		var oldDuration = _mediaDuration;
 		if (_sound.isBuffering)
 		{
 			callEvents(PlayerEvents.BUFFERING);
@@ -575,7 +577,9 @@ class Player extends EventDispatcher
 		}
 		
 		_mediaDuration = ((_sound.bytesTotal / _sound.bytesLoaded) * _sound.length) / 1000;
-		callEvents(PlayerEvents.MEDIA_INITIALIZED);
+		if (_mediaDuration != oldDuration) {
+			callEvents(PlayerEvents.MEDIA_INITIALIZED);
+		}
 	}
 	
 	/**
@@ -874,6 +878,14 @@ class Player extends EventDispatcher
 		else if(_type == InputType.AUDIO && _streamType == StreamType.FILE)
 		{
 			_sound.load(new URLRequest(source));
+			try {
+				_soundChannel = _sound.play();
+				_isPlaying = true;
+				
+				_firstLoad = false;
+				
+				_mediaLoaded = true;
+			} catch(error:IOError){}
 		}
 	}
 	
