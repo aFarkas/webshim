@@ -75,7 +75,7 @@
 						prop: {
 							value: function(){
 								if (!webshims.fromSubmit) {
-									$(this).bind('invalid.checkvalidity', preventDefault);
+									$(this).on('invalid.checkvalidity', preventDefault);
 								}
 								
 								webshims.fromCheckValidity = true;
@@ -107,7 +107,7 @@
 				}
 			}, false);
 			
-			$(window).bind('invalid', function(e){
+			$(window).on('invalid', function(e){
 				if(e.originalEvent && form && form == e.target.form){
 					e.wrongWebkitInvalid = true;
 					e.stopImmediatePropagation();
@@ -372,7 +372,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		}
 	};
 	
-	$(document).bind(options.validityUIEvents || 'focusout change refreshvalidityui', switchValidityClass);
+	$(document).on(options.validityUIEvents || 'focusout change refreshvalidityui', switchValidityClass);
 	customEvents.changedvaliditystate = true;
 	customEvents.refreshCustomValidityRules = true;
 	customEvents.changedvalid = true;
@@ -437,7 +437,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 						hideTimer = setTimeout(boundHide, this.hideDelay);
 					}
 					$(window)
-						.bind('resize.validityalert', function(){
+						.on('resize.validityalert', function(){
 							clearTimeout(resizeTimer);
 							resizeTimer = setTimeout(function(){
 								api.position(visual);
@@ -483,7 +483,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					}, 0);
 				}
 				setTimeout(function(){
-					$(document).bind('focusout.validityalert', boundHide);
+					$(document).on('focusout.validityalert', boundHide);
 				}, 10);
 			},
 			getMessage: function(elem, message){
@@ -545,7 +545,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			form
 		;
 		
-		$(document).bind('invalid', function(e){
+		$(document).on('invalid', function(e){
 			if(e.wrongWebkitInvalid){return;}
 			var jElm = $(e.target);
 			var shadowElem = jElm.getShadowElement();
@@ -595,7 +595,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	
 	if(options.replaceValidationUI){
 		webshims.ready('DOM forms', function(){
-			$(document).bind('firstinvalid', function(e){
+			$(document).on('firstinvalid', function(e){
 				if(!e.isInvalidUIPrevented()){
 					e.preventDefault();
 					$.webshims.validityAlert.showFor( e.target, $(e.target).prop('customValidationMessage') ); 

@@ -79,8 +79,8 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 				var forceUpdate = function(){
 					positionDisplay(true);
 				};
-				media.bind('updateshadowdom playerdimensionchange mediaelementapichange updatetrackdisplay updatemediaelementdimensions swfstageresize', delayed);
-				media.bind('forceupdatetrackdisplay', forceUpdate);
+				media.on('updateshadowdom playerdimensionchange mediaelementapichange updatetrackdisplay updatemediaelementdimensions swfstageresize', delayed);
+				media.on('forceupdatetrackdisplay', forceUpdate);
 				forceUpdate();
 			}
 		},
@@ -270,8 +270,8 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 				var addTrackView = function(){
 					
 					elem
-						.unbind('.trackview')
-						.bind('play.trackview timeupdate.trackview updatetrackdisplay.trackview', onUpdate)
+						.off('.trackview')
+						.on('play.trackview timeupdate.trackview updatetrackdisplay.trackview', onUpdate)
 					;
 				};
 				var baseData, trackList, updateTimer;
@@ -279,7 +279,7 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 				if(!usesNativeTrack()){
 					addTrackView();
 				} else {
-					elem.bind('mediaelementapichange trackapichange', function(){
+					elem.on('mediaelementapichange trackapichange', function(){
 						if(!usesNativeTrack() || elem.is('.nonnative-api-active')){
 							addTrackView();
 						} else {

@@ -1211,8 +1211,8 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 						data.shadowList.appendTo('body');
 					}
 					$(data.datalist)
-						.unbind('updateDatalist.datalistWidget')
-						.bind('updateDatalist.datalistWidget', $.proxy(data, '_resetListCached'))
+						.off('updateDatalist.datalistWidget')
+						.on('updateDatalist.datalistWidget', $.proxy(data, '_resetListCached'))
 					;
 					data._resetListCached();
 					return;
@@ -1261,7 +1261,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 						}
 						return (e.type != 'mousedown');
 					})
-					.bind('focusout', this.timedHide)
+					.on('focusout', this.timedHide)
 				;
 				
 				opts.input.setAttribute('autocomplete', 'off');
@@ -1271,73 +1271,74 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 						//role: 'combobox',
 						'aria-haspopup': 'true'
 					})
-					.bind('input.datalistWidget', function(){
-						if(!that.triggeredByDatalist){
-							that.changedValue = false;
-							that.showHideOptions();
-						}
-					})
-					
-					.bind('keydown.datalistWidget', function(e){
-						var keyCode = e.keyCode;
-						var activeItem;
-						var items;
-						if(keyCode == 40 && !that.showList()){
-							that.markItem(that.index + 1, true);
-							return false;
-						}
-						
-						if(!that.isListVisible){return;}
-						
-						 
-						if(keyCode == 38){
-							that.markItem(that.index - 1, true);
-							return false;
-						} 
-						if(!e.shiftKey && (keyCode == 33 || keyCode == 36)){
-							that.markItem(0, true);
-							return false;
-						} 
-						if(!e.shiftKey && (keyCode == 34 || keyCode == 35)){
-							items = $('li:not(.hidden-item)', that.shadowList);
-							that.markItem(items.length - 1, true, items);
-							return false;
-						} 
-						if(keyCode == 13 || keyCode == 27){
-							if (keyCode == 13){
-								activeItem = $('li.active-item:not(.hidden-item)', that.shadowList);
-								that.changeValue( $('li.active-item:not(.hidden-item)', that.shadowList) );
+					.on({
+						'input.datalistWidget': function(){
+							if(!that.triggeredByDatalist){
+								that.changedValue = false;
+								that.showHideOptions();
 							}
-							that.hideList();
-							if(formsCFG.customDatalist && activeItem && activeItem[0]){
-								$(opts.input).trigger('datalistselect');
+						},
+						'keydown.datalistWidget': function(e){
+							var keyCode = e.keyCode;
+							var activeItem;
+							var items;
+							if(keyCode == 40 && !that.showList()){
+								that.markItem(that.index + 1, true);
+								return false;
 							}
-							return false;
-						}
+							
+							if(!that.isListVisible){return;}
+							
+							 
+							if(keyCode == 38){
+								that.markItem(that.index - 1, true);
+								return false;
+							} 
+							if(!e.shiftKey && (keyCode == 33 || keyCode == 36)){
+								that.markItem(0, true);
+								return false;
+							} 
+							if(!e.shiftKey && (keyCode == 34 || keyCode == 35)){
+								items = $('li:not(.hidden-item)', that.shadowList);
+								that.markItem(items.length - 1, true, items);
+								return false;
+							} 
+							if(keyCode == 13 || keyCode == 27){
+								if (keyCode == 13){
+									activeItem = $('li.active-item:not(.hidden-item)', that.shadowList);
+									that.changeValue( $('li.active-item:not(.hidden-item)', that.shadowList) );
+								}
+								that.hideList();
+								if(formsCFG.customDatalist && activeItem && activeItem[0]){
+									$(opts.input).trigger('datalistselect');
+								}
+								return false;
+							}
+						},
+						'focus.datalistWidget': function(){
+							if($(this).hasClass('list-focus')){
+								that.showList();
+							}
+						},
+						'mousedown.datalistWidget': function(){
+							if($(this).is(':focus')){
+								that.showList();
+							}
+						},
+						'blur.datalistWidget': this.timedHide
 					})
-					.bind('focus.datalistWidget', function(){
-						if($(this).hasClass('list-focus')){
-							that.showList();
-						}
-					})
-					.bind('mousedown.datalistWidget', function(){
-						if($(this).is(':focus')){
-							that.showList();
-						}
-					})
-					.bind('blur.datalistWidget', this.timedHide)
 				;
 				
 				
 				$(this.datalist)
-					.unbind('updateDatalist.datalistWidget')
-					.bind('updateDatalist.datalistWidget', $.proxy(this, '_resetListCached'))
+					.off('updateDatalist.datalistWidget')
+					.on('updateDatalist.datalistWidget', $.proxy(this, '_resetListCached'))
 				;
 				
 				this._resetListCached();
 				
 				if(opts.input.form && (opts.input.name || opts.input.id)){
-					$(opts.input.form).bind('submit.datalistWidget'+opts.input.id, function(){
+					$(opts.input.form).on('submit.datalistWidget'+opts.input.id, function(){
 						if(!$(opts.input).hasClass('no-datalist-cache') && that._autocomplete != 'off'){
 							var val = $.prop(opts.input, 'value');
 							var name = (opts.input.name || opts.input.id) + $.prop(opts.input, 'type');
@@ -1351,21 +1352,21 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 						}
 					});
 				}
-				$(window).bind('unload.datalist'+this.id+' beforeunload.datalist'+this.id, function(){
+				$(window).on('unload.datalist'+this.id+' beforeunload.datalist'+this.id, function(){
 					that.destroy();
 				});
 			},
 			destroy: function(){
 				var autocomplete = $.attr(this.input, 'autocomplete');
 				$(this.input)
-					.unbind('.datalistWidget')
+					.off('.datalistWidget')
 					.removeData('datalistWidget')
 				;
 				this.shadowList.remove();
-				$(document).unbind('.datalist'+this.id);
-				$(window).unbind('.datalist'+this.id);
+				$(document).off('.datalist'+this.id);
+				$(window).off('.datalist'+this.id);
 				if(this.input.form && this.input.id){
-					$(this.input.form).unbind('submit.datalistWidget'+this.input.id);
+					$(this.input.form).off('submit.datalistWidget'+this.input.id);
 				}
 				this.input.removeAttribute('aria-haspopup');
 				if(autocomplete === undefined){
@@ -1526,8 +1527,8 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				
 				$(window).unbind('.datalist'+that.id);
 				$(document)
-					.unbind('.datalist'+that.id)
-					.bind('mousedown.datalist'+that.id +' focusin.datalist'+that.id, function(e){
+					.off('.datalist'+that.id)
+					.on('mousedown.datalist'+that.id +' focusin.datalist'+that.id, function(e){
 						if(e.target === that.input ||  that.shadowList[0] === e.target || $.contains( that.shadowList[0], e.target )){
 							clearTimeout(that.hideTimer);
 							setTimeout(function(){
@@ -1537,7 +1538,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 							that.timedHide();
 						}
 					})
-					.bind('updateshadowdom.datalist'+that.id, function(){
+					.on('updateshadowdom.datalist'+that.id, function(){
 						that.setPos();
 					})
 				;
@@ -1568,7 +1569,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				}
 				$(document).unbind('.datalist'+that.id);
 				$(window)
-					.unbind('.datalist'+that.id)
+					.off('.datalist'+that.id)
 					.one('resize.datalist'+that.id, function(){
 						that.shadowList.css({top: 0, left: 0});
 					})
@@ -1707,7 +1708,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 						prop: {
 							value: function(){
 								if (!webshims.fromSubmit) {
-									$(this).bind('invalid.checkvalidity', preventDefault);
+									$(this).on('invalid.checkvalidity', preventDefault);
 								}
 								
 								webshims.fromCheckValidity = true;
@@ -1739,7 +1740,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				}
 			}, false);
 			
-			$(window).bind('invalid', function(e){
+			$(window).on('invalid', function(e){
 				if(e.originalEvent && form && form == e.target.form){
 					e.wrongWebkitInvalid = true;
 					e.stopImmediatePropagation();
@@ -2004,7 +2005,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		}
 	};
 	
-	$(document).bind(options.validityUIEvents || 'focusout change refreshvalidityui', switchValidityClass);
+	$(document).on(options.validityUIEvents || 'focusout change refreshvalidityui', switchValidityClass);
 	customEvents.changedvaliditystate = true;
 	customEvents.refreshCustomValidityRules = true;
 	customEvents.changedvalid = true;
@@ -2069,7 +2070,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 						hideTimer = setTimeout(boundHide, this.hideDelay);
 					}
 					$(window)
-						.bind('resize.validityalert', function(){
+						.on('resize.validityalert', function(){
 							clearTimeout(resizeTimer);
 							resizeTimer = setTimeout(function(){
 								api.position(visual);
@@ -2115,7 +2116,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					}, 0);
 				}
 				setTimeout(function(){
-					$(document).bind('focusout.validityalert', boundHide);
+					$(document).on('focusout.validityalert', boundHide);
 				}, 10);
 			},
 			getMessage: function(elem, message){
@@ -2177,7 +2178,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			form
 		;
 		
-		$(document).bind('invalid', function(e){
+		$(document).on('invalid', function(e){
 			if(e.wrongWebkitInvalid){return;}
 			var jElm = $(e.target);
 			var shadowElem = jElm.getShadowElement();
@@ -2227,7 +2228,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	
 	if(options.replaceValidationUI){
 		webshims.ready('DOM forms', function(){
-			$(document).bind('firstinvalid', function(e){
+			$(document).on('firstinvalid', function(e){
 				if(!e.isInvalidUIPrevented()){
 					e.preventDefault();
 					$.webshims.validityAlert.showFor( e.target, $(e.target).prop('customValidationMessage') ); 
@@ -2635,7 +2636,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	};
 	
 	
-	$(document).bind('ended', function(e){
+	$(document).on('ended', function(e){
 		var data = webshims.data(e.target, 'mediaelement');
 		if( supportsLoop && (!data || data.isActive == 'html5') && !$.prop(e.target, 'loop')){return;}
 		setTimeout(function(){
@@ -2729,18 +2730,20 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 						};
 						
 						$(this)
-							.bind('play loadstart progress', function(e){
-								if(e.type == 'progress'){
-									lastBuffered = getBufferedString();
+							.on({
+								'play loadstart progress': function(e){
+									if(e.type == 'progress'){
+										lastBuffered = getBufferedString();
+									}
+									clearTimeout(bufferTimer);
+									bufferTimer = setTimeout(testBuffer, 999);
+								},
+								'emptied stalled mediaerror abort suspend': function(e){
+									if(e.type == 'emptied'){
+										lastBuffered = false;
+									}
+									clearTimeout(bufferTimer);
 								}
-								clearTimeout(bufferTimer);
-								bufferTimer = setTimeout(testBuffer, 999);
-							})
-							.bind('emptied stalled mediaerror abort suspend', function(e){
-								if(e.type == 'emptied'){
-									lastBuffered = false;
-								}
-								clearTimeout(bufferTimer);
 							})
 						;
 					}

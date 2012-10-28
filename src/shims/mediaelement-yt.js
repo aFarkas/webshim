@@ -173,8 +173,8 @@ var addMediaToStopEvents = $.noop;
 	
 	addMediaToStopEvents = function(elem){
 		$(elem)
-			.unbind(hidevents)
-			.bind(hidevents, hidePlayerEvents)
+			.off(hidevents)
+			.on(hidevents, hidePlayerEvents)
 		;
 		hideEvtArray.forEach(function(evt){
 			webshims.moveToFirstEvent(elem, evt);
@@ -183,7 +183,7 @@ var addMediaToStopEvents = $.noop;
 	addMediaToStopEvents(document);
 })();
 
-$(document).bind('emptied', function(e){
+$(document).on('emptied', function(e){
 	var data = getYtDataFromElem(e.target);
 	startAutoPlay(data);
 });
@@ -366,7 +366,7 @@ var addYtAPI = function(mediaElm, elemId, data, ytID){
 			}
 		});
 		
-		$(mediaElm).bind('updateytdata', getData);
+		$(mediaElm).on('updateytdata', getData);
 		
 	});
 };
@@ -440,7 +440,7 @@ mediaelement.createSWF = function(mediaElem, src, data){
 	addMediaToStopEvents(mediaElem);
 	
 	addYtAPI(mediaElem, elemId, data, ytID);
-	$(mediaElem).bind('updatemediaelementdimensions updateshadowdom', function(){
+	$(mediaElem).on('updatemediaelementdimensions updateshadowdom', function(){
 		setElementDimension(data);
 	});
 };

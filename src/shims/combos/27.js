@@ -2151,7 +2151,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	};
 	
 	
-	$(document).bind('ended', function(e){
+	$(document).on('ended', function(e){
 		var data = webshims.data(e.target, 'mediaelement');
 		if( supportsLoop && (!data || data.isActive == 'html5') && !$.prop(e.target, 'loop')){return;}
 		setTimeout(function(){
@@ -2245,18 +2245,20 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 						};
 						
 						$(this)
-							.bind('play loadstart progress', function(e){
-								if(e.type == 'progress'){
-									lastBuffered = getBufferedString();
+							.on({
+								'play loadstart progress': function(e){
+									if(e.type == 'progress'){
+										lastBuffered = getBufferedString();
+									}
+									clearTimeout(bufferTimer);
+									bufferTimer = setTimeout(testBuffer, 999);
+								},
+								'emptied stalled mediaerror abort suspend': function(e){
+									if(e.type == 'emptied'){
+										lastBuffered = false;
+									}
+									clearTimeout(bufferTimer);
 								}
-								clearTimeout(bufferTimer);
-								bufferTimer = setTimeout(testBuffer, 999);
-							})
-							.bind('emptied stalled mediaerror abort suspend', function(e){
-								if(e.type == 'emptied'){
-									lastBuffered = false;
-								}
-								clearTimeout(bufferTimer);
 							})
 						;
 					}
@@ -2669,120 +2671,6 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		}
 	};
 	
-	var startIntrinsicDimension = function(data){
-		if(!data || data._elemNodeName != 'video'){return;}
-		var img;
-		var widthAuto;
-		var heightAuto;
-		var lastIntrinsicSize = {};
-		var shadowElem;
-		var errorTimer;
-		var blockResize;
-		var lastSize;
-		var setSize = function(width, height){
-			if(!height || !width || height < 1 || width < 1 || data.isActive != 'third'){return;}
-			if(img){
-				img.remove();
-				img = false;
-			}
-			lastIntrinsicSize.width = width;
-			lastIntrinsicSize.height = height;
-			clearTimeout(errorTimer);
-			widthAuto = data._elem.style.width == 'auto';
-			heightAuto = data._elem.style.height == 'auto';
-			
-			if(!widthAuto && !heightAuto){return;}
-			var curSize;
-			shadowElem = shadowElem || $(data._elem).getShadowElement();
-			var cur;
-			if(widthAuto && !heightAuto){
-				cur = shadowElem.height();
-				width *=  cur / height;
-				height = cur;
-			} else if(!widthAuto && heightAuto){
-				cur = shadowElem.width();
-				height *=  cur / width;
-				width = cur;
-			}
-			blockResize = true;
-			setTimeout(function(){
-				blockResize = false;
-			}, 9);
-			
-			shadowElem.css({width: width, height: height});
-		};
-		var setPosterSrc = function(){
-			if(data.isActive != 'third' || ($.prop(data._elem, 'readyState') && $.prop(this, 'videoWidth'))){return;}
-			var posterSrc = $.prop(data._elem, 'poster');
-			if(!posterSrc){return;}
-			widthAuto = data._elem.style.width == 'auto';
-			heightAuto = data._elem.style.height == 'auto';
-			if(!widthAuto && !heightAuto){return;}
-			if(img){
-				img.remove();
-				img = false;
-			}
-			img = $('<img style="position: absolute; height: auto; width: auto; top: 0px; left: 0px; visibility: hidden;" />');
-			img
-				.bind('load error alreadycomplete', function(e){
-					clearTimeout(errorTimer);
-					
-					var elem = this;
-					var width = elem.naturalWidth || elem.width || elem.offsetWidth;
-					var height = elem.naturalHeight || elem.height || elem.offsetHeight;
-					
-					if(height && width){
-						setSize(width, height);
-						elem = null;
-					} else {
-						setTimeout(function(){
-							width = elem.naturalWidth || elem.width || elem.offsetWidth;
-							height = elem.naturalHeight || elem.height || elem.offsetHeight;
-							setSize(width, height);
-							if(img){
-								img.remove();
-								img = false;
-							}
-							elem = null;
-						}, 9);
-					}
-					$(this).unbind();
-				})
-				.prop('src', posterSrc)
-				.appendTo('body')
-				.each(function(){
-					if(this.complete || this.error){
-						$(this).triggerHandler('alreadycomplete');
-					} else {
-						clearTimeout(errorTimer);
-						errorTimer = setTimeout(function(){
-							$(data._elem).triggerHandler('error');
-						}, 9999);
-					}
-				})
-			;
-		};
-		
-		$(data._elem)
-			.bind('loadedmetadata', function(){
-				setSize($.prop(this, 'videoWidth'), $.prop(this, 'videoHeight'));
-			})
-			.bind('emptied', setPosterSrc)
-			.bind('swfstageresize updatemediaelementdimensions', function(){
-				if(blockResize){return;}
-				setSize(lastIntrinsicSize.width, lastIntrinsicSize.height);
-			})
-			.bind('emptied', function(){
-				lastIntrinsicSize = {};
-			})
-			.triggerHandler('swfstageresize')
-		;
-		
-		setPosterSrc();
-		if($.prop(data._elem, 'readyState')){
-			setSize($.prop(data._elem, 'videoWidth'), $.prop(data._elem, 'videoHeight'));
-		}
-	};
 	
 	mediaelement.playerResize = function(id){
 		if(!id){return;}
@@ -2795,7 +2683,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	};
 	
 	
-	$(document).bind('emptied', function(e){
+	$(document).on('emptied', function(e){
 		var data = getSwfDataFromElem(e.target);
 		startAutoPlay(data);
 	});
@@ -2872,8 +2760,8 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		
 		addMediaToStopEvents = function(elem){
 			$(elem)
-				.unbind(hidevents)
-				.bind(hidevents, hidePlayerEvents)
+				.off(hidevents)
+				.on(hidevents, hidePlayerEvents)
 			;
 			hideEvtArray.forEach(function(evt){
 				webshims.moveToFirstEvent(elem, evt);
@@ -3070,11 +2958,10 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		
 		options.changeSWF(vars, elem, canPlaySrc, data, 'embed');
 		
-		$(elem).bind('updatemediaelementdimensions updateshadowdom', function(){
+		$(elem).on('updatemediaelementdimensions updateshadowdom', function(){
 			setElementDimension(data, $.prop(elem, 'controls'));
 		});
 		
-		startIntrinsicDimension(data);
 		
 		swfobject.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.0", false, vars, params, attrs, function(swfData){
 			
@@ -3373,14 +3260,14 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		var eventList = {};
 		obj.addEventListener = function(name, fn){
 			if(eventList[name]){
-				webshims.error('always use $.bind to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
+				webshims.error('always use $.on to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
 			}
 			eventList[name] = fn;
 			
 		};
 		obj.removeEventListener = function(name, fn){
 			if(eventList[name] && eventList[name] != fn){
-				webshims.error('always use $.bind/$.unbind to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
+				webshims.error('always use $.on/$.off to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
 			}
 			if(eventList[name]){
 				delete eventList[name];
@@ -3704,8 +3591,8 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		obj.cues = null;
 		$(mediaelem).unbind(loadEvents, load);
 		$(track).unbind('checktrackmode', load);
-		$(mediaelem).bind(loadEvents, load);
-		$(track).bind('checktrackmode', load);
+		$(mediaelem).on(loadEvents, load);
+		$(track).on('checktrackmode', load);
 		if(_default){
 			obj.mode = showTracks[obj.kind] ? 'showing' : 'hidden';
 			load();
@@ -4098,7 +3985,7 @@ modified for webshims
 	}, 'prop');
 
 	
-	$(document).bind('emptied ended updatetracklist', function(e){
+	$(document).on('emptied ended updatetracklist', function(e){
 		if($(e.target).is('audio, video')){
 			var baseData = webshims.data(e.target, 'mediaelementBase');
 			if(baseData){
@@ -4150,7 +4037,7 @@ modified for webshims
 								
 							}
 						})
-						.bind('load error', function(e){
+						.on('load error', function(e){
 							if(e.originalEvent){
 								e.stopImmediatePropagation();
 							}

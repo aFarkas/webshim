@@ -1349,7 +1349,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	};
 	
 	
-	$(document).bind('ended', function(e){
+	$(document).on('ended', function(e){
 		var data = webshims.data(e.target, 'mediaelement');
 		if( supportsLoop && (!data || data.isActive == 'html5') && !$.prop(e.target, 'loop')){return;}
 		setTimeout(function(){
@@ -1443,18 +1443,20 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 						};
 						
 						$(this)
-							.bind('play loadstart progress', function(e){
-								if(e.type == 'progress'){
-									lastBuffered = getBufferedString();
+							.on({
+								'play loadstart progress': function(e){
+									if(e.type == 'progress'){
+										lastBuffered = getBufferedString();
+									}
+									clearTimeout(bufferTimer);
+									bufferTimer = setTimeout(testBuffer, 999);
+								},
+								'emptied stalled mediaerror abort suspend': function(e){
+									if(e.type == 'emptied'){
+										lastBuffered = false;
+									}
+									clearTimeout(bufferTimer);
 								}
-								clearTimeout(bufferTimer);
-								bufferTimer = setTimeout(testBuffer, 999);
-							})
-							.bind('emptied stalled mediaerror abort suspend', function(e){
-								if(e.type == 'emptied'){
-									lastBuffered = false;
-								}
-								clearTimeout(bufferTimer);
 							})
 						;
 					}
@@ -1499,14 +1501,14 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		var eventList = {};
 		obj.addEventListener = function(name, fn){
 			if(eventList[name]){
-				webshims.error('always use $.bind to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
+				webshims.error('always use $.on to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
 			}
 			eventList[name] = fn;
 			
 		};
 		obj.removeEventListener = function(name, fn){
 			if(eventList[name] && eventList[name] != fn){
-				webshims.error('always use $.bind/$.unbind to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
+				webshims.error('always use $.on/$.off to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
 			}
 			if(eventList[name]){
 				delete eventList[name];
@@ -1830,8 +1832,8 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		obj.cues = null;
 		$(mediaelem).unbind(loadEvents, load);
 		$(track).unbind('checktrackmode', load);
-		$(mediaelem).bind(loadEvents, load);
-		$(track).bind('checktrackmode', load);
+		$(mediaelem).on(loadEvents, load);
+		$(track).on('checktrackmode', load);
 		if(_default){
 			obj.mode = showTracks[obj.kind] ? 'showing' : 'hidden';
 			load();
@@ -2224,7 +2226,7 @@ modified for webshims
 	}, 'prop');
 
 	
-	$(document).bind('emptied ended updatetracklist', function(e){
+	$(document).on('emptied ended updatetracklist', function(e){
 		if($(e.target).is('audio, video')){
 			var baseData = webshims.data(e.target, 'mediaelementBase');
 			if(baseData){
@@ -2276,7 +2278,7 @@ modified for webshims
 								
 							}
 						})
-						.bind('load error', function(e){
+						.on('load error', function(e){
 							if(e.originalEvent){
 								e.stopImmediatePropagation();
 							}

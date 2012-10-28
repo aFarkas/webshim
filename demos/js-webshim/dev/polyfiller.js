@@ -104,7 +104,7 @@
 					clearTimeout(timer);
 				};
 				
-				$(window).bind('load.lP error.lP', removeLoader);
+				$(window).on('load.lP error.lP', removeLoader);
 				
 				addClass.push('loading-polyfills');
 				timer = setTimeout(function(){

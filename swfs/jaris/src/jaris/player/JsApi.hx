@@ -70,6 +70,7 @@ class JsApi extends MovieClip {
 	public function new(player:Player)
 	{
 		super();
+		var parameters:Dynamic<String> = flash.Lib.current.loaderInfo.parameters;
 		_externalListeners = new Hash<String>();
 
 		Security.allowDomain("*");
@@ -105,7 +106,10 @@ class JsApi extends MovieClip {
 		ExternalInterface.addCallback("api_seek", setSeek);
 		ExternalInterface.addCallback("api_volume", setVolume);
 	
-
+		
+		addJsListener('on*', 'jQuery.webshims.mediaelement.jarisEvent.' + parameters.evtId);
+		ExternalInterface.call('jQuery.webshims.mediaelement.jarisEvent.' + parameters.evtId, { type: 'ready', id: parameters.id } );
+		
 	}
 		
 	public function getAttribute(attribute:String):Float {

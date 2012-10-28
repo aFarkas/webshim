@@ -494,15 +494,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	
 	replaceInputUI.common = function(orig, shim, methods){
 		if(Modernizr.formvalidation){
-			orig.bind('firstinvalid', function(e){
+			orig.on('firstinvalid', function(e){
 				if(!webshims.fromSubmit && isCheckValidity){return;}
-				orig.unbind('invalid.replacedwidgetbubble').bind('invalid.replacedwidgetbubble', function(evt){
+				orig.off('invalid.replacedwidgetbubble').on('invalid.replacedwidgetbubble', function(evt){
 					if(!e.isInvalidUIPrevented() && !evt.isDefaultPrevented()){
 						webshims.validityAlert.showFor( e.target );
 						e.preventDefault();
 						evt.preventDefault();
 					}
-					orig.unbind('invalid.replacedwidgetbubble');
+					orig.off('invalid.replacedwidgetbubble');
 				});
 			});
 		}
@@ -535,7 +535,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		orig.after(shim);
 		
 		if(orig[0].form){
-			$(orig[0].form).bind('reset', function(e){
+			$(orig[0].form).on('reset', function(e){
 				if(e.originalEvent && !e.isDefaultPrevented()){
 					setTimeout(function(){orig.prop( 'value', orig.prop('value') );}, 0);
 				}
@@ -544,7 +544,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		if(label[0]){
 			shim.getShadowFocusElement().attr('aria-labelledby', webshims.getID(label));
-			label.bind('click', function(){
+			label.on('click', function(){
 				orig.getShadowFocusElement().focus();
 				return false;
 			});
@@ -583,16 +583,18 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				focusedOut = false;
 			};
 			var data = datePicker
-				.bind('focusin', function(){
-					resetFocusHandler();
-					data.dpDiv.unbind('mousedown.webshimsmousedownhandler').bind('mousedown.webshimsmousedownhandler', function(){
-						stopFocusout = true;
-					});
-				})
-				.bind('focusout blur', function(e){
-					if(stopFocusout){
-						focusedOut = true;
-						e.stopImmediatePropagation();
+				.on({
+					focusin: function(){
+						resetFocusHandler();
+						data.dpDiv.unbind('mousedown.webshimsmousedownhandler').bind('mousedown.webshimsmousedownhandler', function(){
+							stopFocusout = true;
+						});
+					},
+					'focusout blur': function(e){
+						if(stopFocusout){
+							focusedOut = true;
+							e.stopImmediatePropagation();
+						}
 					}
 				})
 				.datepicker($.extend({
@@ -606,7 +608,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						}
 					}
 				}, defaultDatepicker, options.datepicker, elem.data('datepicker')))
-				.bind('change', change)
+				.on('change', change)
 				.data('datepicker')
 			;
 			data.dpDiv.addClass('input-date-datepicker-control');
@@ -808,7 +810,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			data = configureDatePicker(elem, date, change);
 			
 			$(elem)
-				.bind('updateshadowdom', function(){
+				.on('updateshadowdom', function(){
 					if (data.trigger[0]) {
 						elem.css({display: ''});
 						if(elem[0].offsetWidth || elem[0].offsetHeight){
@@ -898,7 +900,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			
 			
 			elem
-				.bind('updateshadowdom', function(){
+				.on('updateshadowdom', function(){
 					elem.css({display: ''});
 					if (elem[0].offsetWidth || elem[0].offsetHeight) {
 						var attr = getDimensions(elem);
@@ -915,11 +917,16 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			;
 			
 			
-			range.slider($.extend(true, {}, options.slider, elem.data('slider'))).bind('slide', change).bind('slidechange', function(e){
-				if(e.originalEvent){
-					triggerInlineForm(elem[0], 'change');
-				}
-			});
+			range.slider($.extend(true, {}, options.slider, elem.data('slider')))
+				.on({
+					slide: change,
+					slidechange: function(e){
+						if(e.originalEvent){
+							triggerInlineForm(elem[0], 'change');
+						}
+					}
+				})
+			;
 			
 			['disabled', 'min', 'max', 'step', 'value'].forEach(function(name){
 				var val = elem.prop(name);
@@ -1025,7 +1032,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		$(document).unbind('jquery-uiReady.langchange input-widgetsReady.langchange');
 	};
 	
-	$(document).bind('jquery-uiReady.langchange input-widgetsReady.langchange', getDefaults);
+	$(document).on('jquery-uiReady.langchange input-widgetsReady.langchange', getDefaults);
 	getDefaults();
 	
 	//implement set/arrow controls
@@ -1147,7 +1154,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 
 		function init(){
 			blockChangeValue = $(elem)
-				.bind({
+				.on({
 					'change.stepcontrol focus.stepcontrol': function(e){
 						if(!blockBlurChange || e.type != 'focus'){
 							blockChangeValue = $.prop(elem, 'value');
@@ -1186,19 +1193,21 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				var uiEvents = changeInput(elem, type);
 				var controls = $('<span class="step-controls" unselectable="on"><span class="step-up" /><span class="step-down" /></span>')	
 					.insertAfter(elem)
-					.bind('selectstart dragstart', function(){return false;})
-					.bind('mousedown mousepress', function(e){
-						if(!$(e.target).hasClass('step-controls')){
-							uiEvents.step(($(e.target).hasClass('step-up')) ? 1 : -1);
+					.on({
+						'selectstart dragstart': function(){return false;},
+						'mousedown mousepress': function(e){
+							if(!$(e.target).hasClass('step-controls')){
+								uiEvents.step(($(e.target).hasClass('step-up')) ? 1 : -1);
+							}
+							uiEvents.setFocus();
+							return false;
+						},
+						'mousepressstart mousepressend': function(e){
+							if(e.type == 'mousepressend'){
+								uiEvents.triggerChange();
+							}
+							$(e.target)[e.type == 'mousepressstart' ? 'addClass' : 'removeClass']('mousepress-ui');
 						}
-						uiEvents.setFocus();
-						return false;
-					})
-					.bind('mousepressstart mousepressend', function(e){
-						if(e.type == 'mousepressend'){
-							uiEvents.triggerChange();
-						}
-						$(e.target)[e.type == 'mousepressstart' ? 'addClass' : 'removeClass']('mousepress-ui');
 					})
 				;
 				var mwheelUpDown = function(e, d){
@@ -1216,13 +1225,13 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						autocomplete: 'off',
 						role: 'spinbutton'
 					})
-					.bind('keyup', function(e){
+					.on('keyup', function(e){
 						var step = stepKeys[e.keyCode];
 						if(step){
 							uiEvents.triggerChange(step);
 						}
 					})
-					.bind(($.browser.msie) ? 'keydown' : 'keypress', function(e){
+					.on(($.browser.msie) ? 'keydown' : 'keypress', function(e){
 						var step = stepKeys[e.keyCode];
 						if(step){
 							uiEvents.step(step);
@@ -1232,7 +1241,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				;
 				
 				if(allowedChars[type]){
-					jElm.bind('keypress', (function(){
+					jElm.on('keypress', (function(){
 						var chars = allowedChars[type];
 						return function(event){
 							var chr = String.fromCharCode(event.charCode == null ? event.keyCode : event.charCode);
@@ -1242,13 +1251,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 				
 				jElm
-					.bind('focus', function(){
-						jElm.add(controls).unbind('.mwhellwebshims')
-							.bind('mousewheel.mwhellwebshims', mwheelUpDown)
-						;
-					})
-					.bind('blur', function(){
-						$(elem).add(controls).unbind('.mwhellwebshims');
+					.on({
+						focus: function(){
+							jElm.add(controls).off('.mwhellwebshims')
+								.on('mousewheel.mwhellwebshims', mwheelUpDown)
+							;
+						},
+						blur: function(){
+							$(elem).add(controls).off('.mwhellwebshims');
+						}
 					})
 				;
 				
@@ -1256,7 +1267,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				if(options.calculateWidth){
 					var init;
 					jElm
-						.bind('updateshadowdom', function(){
+						.on('updateshadowdom', function(){
 							if(!init && (elem.offsetWidth || elem.offsetHeight)){
 								init = true;
 								adjustInputWithBtn(jElm, controls);
@@ -1273,7 +1284,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 
 	
 	webshims.addReady(function(context, elem){
-		$(document).bind('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(e){
+		$(document).on('jquery-uiReady.initinputui input-widgetsReady.initinputui', function(e){
 			if($.datepicker || $.fn.slider){
 				if($.datepicker && !defaultDatepicker.dateFormat){
 					defaultDatepicker.dateFormat = $.datepicker._defaults.dateFormat;
