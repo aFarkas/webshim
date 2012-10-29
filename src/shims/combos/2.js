@@ -2010,7 +2010,8 @@ try {
 					url: 1,
 					email: 1,
 					password: 1,
-					tel: 1
+					tel: 1,
+					number: 1
 				}
 			;
 			
