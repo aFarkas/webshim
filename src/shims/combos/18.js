@@ -679,7 +679,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		initializeDatalist();
 	})();
 	
-});jQuery.webshims.register('form-extend', function($, webshims, window, doc, undefined, options){
+});jQuery.webshims.register('form-native-extend', function($, webshims, window, doc, undefined, options){
 	"use strict";
 	var Modernizr = window.Modernizr;
 	var modernizrInputTypes = Modernizr.inputtypes;

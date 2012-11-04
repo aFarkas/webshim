@@ -1687,7 +1687,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		testRequiredFind();
 		bugs.validationMessage = !(inputElem.prop('validationMessage'));
 		
-		webshims.reTest(['form-extend', 'form-message']);
+		webshims.reTest(['form-native-extend', 'form-message']);
 		
 		form.remove();
 			

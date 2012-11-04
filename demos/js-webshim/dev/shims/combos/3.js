@@ -57,7 +57,7 @@
 		testRequiredFind();
 		bugs.validationMessage = !(inputElem.prop('validationMessage'));
 		
-		webshims.reTest(['form-extend', 'form-message']);
+		webshims.reTest(['form-native-extend', 'form-message']);
 		
 		form.remove();
 			
@@ -769,7 +769,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		
 	});
 });if(!Modernizr.formvalidation || jQuery.webshims.bugs.bustedValidity){
-jQuery.webshims.register('form-extend', function($, webshims, window, document){
+jQuery.webshims.register('form-native-extend', function($, webshims, window, document){
 "use strict";
 webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions

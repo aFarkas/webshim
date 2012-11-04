@@ -1,4 +1,4 @@
-jQuery.webshims.register('form-extend', function($, webshims, window, doc, undefined, options){
+jQuery.webshims.register('form-native-extend', function($, webshims, window, doc, undefined, options){
 	"use strict";
 	var Modernizr = window.Modernizr;
 	var modernizrInputTypes = Modernizr.inputtypes;
@@ -312,7 +312,7 @@ jQuery.webshims.register('form-extend', function($, webshims, window, doc, undef
 		testRequiredFind();
 		bugs.validationMessage = !(inputElem.prop('validationMessage'));
 		
-		webshims.reTest(['form-extend', 'form-message']);
+		webshims.reTest(['form-native-extend', 'form-message']);
 		
 		form.remove();
 			

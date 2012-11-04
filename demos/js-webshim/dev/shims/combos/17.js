@@ -1552,7 +1552,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		testRequiredFind();
 		bugs.validationMessage = !(inputElem.prop('validationMessage'));
 		
-		webshims.reTest(['form-extend', 'form-message']);
+		webshims.reTest(['form-native-extend', 'form-message']);
 		
 		form.remove();
 			
