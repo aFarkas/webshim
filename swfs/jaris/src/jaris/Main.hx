@@ -163,5 +163,6 @@ class Main
 
 		var jsAPI:JsApi = new JsApi(player);
 		movieClip.addChild(jsAPI);
+		player.init();
 	}
 }

@@ -2299,9 +2299,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		});
 	}
 	
-	bugs.track = false;
 	
-	if(Modernizr.track){
+	if(Modernizr.track && !bugs.track){
 		(function(){
 			
 			if(!bugs.track){
@@ -2390,6 +2389,13 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	
 	var hasYt = !hasSwf && ('postMessage' in window) && hasNative;
 	
+	var loadTrackUi = function(){
+		if(loadTrackUi.loaded){return;}
+		loadTrackUi.loaded = true;
+		$(function(){
+			webshims.loader.loadList(['track-ui']);
+		});
+	};
 	var loadYt = (function(){
 		var loaded;
 		return function(){
@@ -2573,6 +2579,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	var handleThird = (function(){
 		var requested;
 		return function( mediaElem, ret, data ){
+			if(!requested){
+				loadTrackUi();
+			}
 			webshims.ready(hasSwf ? swfType : 'mediaelement-yt', function(){
 				if(mediaelement.createSWF){
 					mediaelement.createSWF( mediaElem, ret, data );
@@ -2694,7 +2703,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	var initMediaElements = function(){
 		
 		webshims.addReady(function(context, insertedElement){
-			$('video, audio', context)
+			var media = $('video, audio', context)
 				.add(insertedElement.filter('video, audio'))
 				.each(function(){
 					if($.browser.msie && webshims.browserVersion > 8 && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay])')){
@@ -2747,6 +2756,10 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 					
 				})
 			;
+			if(!loadTrackUi.loaded && $('track', media).length){
+				loadTrackUi();
+			}
+			media = null;
 		});
 	};
 	
@@ -2765,9 +2778,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	} else {
 		webshims.ready(swfType, initMediaElements);
 	}
-	$(function(){
-		webshims.loader.loadList(['track-ui']);
-	});
-	
+	webshims.ready('WINDOWLOAD mediaelement', loadTrackUi);
 });
 })(jQuery, Modernizr, jQuery.webshims);

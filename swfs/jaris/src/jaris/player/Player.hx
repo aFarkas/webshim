@@ -104,6 +104,9 @@ class Player extends EventDispatcher
 	private var _useHardWareScaling:Bool;
 	private var _youtubeLoader:Loader;
 	private var _userSettings:UserSettings;
+	private var _loadedYoutube:Bool;
+	private var _ytReady:Bool;
+	private var _ytCue:Bool;
 	//}
 	
 	
@@ -129,6 +132,9 @@ class Player extends EventDispatcher
 		_firstLoad = true;
 		_stopped = false;
 		_videoQualityHigh = false;
+		_loadedYoutube = false;
+		_ytReady = false;
+		_ytCue = false;
 		_isPlaying = false;
 		_streamType = StreamType.FILE;
 		_type = InputType.VIDEO;
@@ -178,9 +184,20 @@ class Player extends EventDispatcher
 		_connection.addEventListener(NetStatusEvent.NET_STATUS, onNetStatus);
 		_connection.addEventListener(AsyncErrorEvent.ASYNC_ERROR, onAsyncError);
 		//}
+		
+		
 	}
 	//}
 	
+	public function init():Void
+	{
+		var parameters:Dynamic<String> = flash.Lib.current.loaderInfo.parameters;
+		
+		if(parameters.poster == "" && _streamType == StreamType.YOUTUBE && _mediaSource != null){
+			_ytCue = true;
+			load(_mediaSource, _type, _streamType, _server);
+		}
+	}
 	
 	//{Timers
 	/**
@@ -602,9 +619,14 @@ class Player extends EventDispatcher
 	{
 		_movieClip.addChild(_youtubeLoader.content);
 		_movieClip.setChildIndex(_youtubeLoader.content, 0);
+		_ytReady = true;
 		Reflect.field(_youtubeLoader.content, "setSize")(_stage.stageWidth, _stage.stageHeight);
-		Reflect.field(_youtubeLoader.content, "loadVideoByUrl")(Utils.youtubeSourceParse(_mediaSource));
-		callEvents(PlayerEvents.BUFFERING);
+		if(_ytCue){
+			Reflect.field(_youtubeLoader.content, "cueVideoByUrl")(Utils.youtubeSourceParse(_mediaSource));
+		} else {
+			Reflect.field(_youtubeLoader.content, "loadVideoByUrl")(Utils.youtubeSourceParse(_mediaSource));
+			callEvents(PlayerEvents.BUFFERING);
+		}
 	}
 
 	/**
@@ -616,7 +638,8 @@ class Player extends EventDispatcher
 	private function onYoutubeStateChange(event:Event):Void
 	{
 		var status:UInt = Std.parseInt(Reflect.field(event, "data"));
-		
+		var oldPlaying:Bool = _isPlaying;
+		_mediaLoaded = true;
 		switch(status)
 		{
 			case -1:
@@ -628,16 +651,16 @@ class Player extends EventDispatcher
 				callEvents(PlayerEvents.PLAYBACK_FINISHED);
 				
 			case 1:
+				_isPlaying = true;
 				if (_firstLoad)
 				{
-					_isPlaying = true;
 					
 					_videoWidth = _stage.stageWidth;
 					_videoHeight = _stage.stageHeight;
 				
 					_firstLoad = false;
 					
-					_mediaLoaded = true;
+					
 					_mediaDuration = Reflect.field(_youtubeLoader.content, "getDuration")();
 					_aspectRatio = AspectRatio.getAspectRatio(_videoWidth, _videoHeight);
 					_originalAspectRatio = _aspectRatio;
@@ -651,9 +674,16 @@ class Player extends EventDispatcher
 					setVolume(_userSettings.getVolume());
 				}
 				callEvents(PlayerEvents.NOT_BUFFERING);
+				if(oldPlaying != _isPlaying){
+					callEvents(PlayerEvents.PLAY_PAUSE);
+				}
 				
 			case 2:
+				_isPlaying = false;
 				callEvents(PlayerEvents.NOT_BUFFERING);
+				if(oldPlaying != _isPlaying){
+					callEvents(PlayerEvents.PLAY_PAUSE);
+				}
 				
 			case 3:
 				callEvents(PlayerEvents.BUFFERING);
@@ -661,6 +691,7 @@ class Player extends EventDispatcher
 			case 5:
 				callEvents(PlayerEvents.NOT_BUFFERING);
 		}
+		
 	}
     
 	/**
@@ -830,62 +861,67 @@ class Player extends EventDispatcher
 	 */
 	public function load(source:String, type:String="video", streamType:String="file", server:String=""):Void
 	{
-		stopAndClose();
 		
-		_type = type;
-		_streamType = streamType;
-		_mediaSource = source;
-		_stopped = false;
-		_mediaLoaded = false;
-		_firstLoad = true;
-		_startTime = 0;
-		_downloadCompleted = false;
-		_seekPoints = new Array();
-		_server = server;
-		
-		callEvents(PlayerEvents.BUFFERING);
-		
-		if (_streamType == StreamType.YOUTUBE)
-		{
-			Security.allowDomain("*");
-			Security.allowDomain("www.youtube.com");  
-			Security.allowDomain("youtube.com");  
-			Security.allowDomain("s.ytimg.com");  
-			Security.allowDomain("i.ytimg.com"); 
-		
-			_youtubeLoader = new Loader();
-			_youtubeLoader.contentLoaderInfo.addEventListener(Event.INIT, onYouTubeLoaderInit);
-			_youtubeLoader.load(new URLRequest("http://www.youtube.com/apiplayer?version=3"));
-		}
-		else if (_type == InputType.VIDEO && (_streamType == StreamType.FILE || _streamType == StreamType.PSEUDOSTREAM))
-		{	
-			_connection.connect(null);
-			_stream = new NetStream(_connection);
-			_stream.addEventListener(NetStatusEvent.NET_STATUS, onNetStatus);
-			_stream.bufferTime = _bufferTime;
-			_stream.play(source);
-			_stream.client = this;
-			_video.attachNetStream(_stream);
-		}
-		else if (_type == InputType.VIDEO && _streamType == StreamType.RTMP)
-		{
-			_connection.connect(_server);
-		}
-		else if (_type == InputType.AUDIO && _streamType == StreamType.RTMP)
-		{
-			_connection.connect(_server);
-		}
-		else if(_type == InputType.AUDIO && _streamType == StreamType.FILE)
-		{
-			_sound.load(new URLRequest(source));
-			try {
-				_soundChannel = _sound.play();
-				_isPlaying = true;
-				
-				_firstLoad = false;
-				
-				_mediaLoaded = true;
-			} catch(error:IOError){}
+		if(_streamType != StreamType.YOUTUBE || !_loadedYoutube){
+			stopAndClose();
+			
+			_type = type;
+			_streamType = streamType;
+			_mediaSource = source;
+			_stopped = false;
+			_mediaLoaded = false;
+			_firstLoad = true;
+			_startTime = 0;
+			_downloadCompleted = false;
+			_seekPoints = new Array();
+			_server = server;
+			
+			callEvents(PlayerEvents.BUFFERING);
+			
+			if (_streamType == StreamType.YOUTUBE)
+			{
+				Security.allowDomain("*");
+				Security.allowDomain("www.youtube.com");  
+				Security.allowDomain("youtube.com");  
+				Security.allowDomain("i4.ytimg.com");
+				Security.allowDomain("s.ytimg.com");  
+				Security.allowDomain("i.ytimg.com"); 
+			
+				_youtubeLoader = new Loader();
+				_youtubeLoader.contentLoaderInfo.addEventListener(Event.INIT, onYouTubeLoaderInit);
+				_youtubeLoader.load(new URLRequest("http://www.youtube.com/apiplayer?version=3"));
+				_loadedYoutube = true;
+			}
+			else if (_type == InputType.VIDEO && (_streamType == StreamType.FILE || _streamType == StreamType.PSEUDOSTREAM))
+			{	
+				_connection.connect(null);
+				_stream = new NetStream(_connection);
+				_stream.addEventListener(NetStatusEvent.NET_STATUS, onNetStatus);
+				_stream.bufferTime = _bufferTime;
+				_stream.play(source);
+				_stream.client = this;
+				_video.attachNetStream(_stream);
+			}
+			else if (_type == InputType.VIDEO && _streamType == StreamType.RTMP)
+			{
+				_connection.connect(_server);
+			}
+			else if (_type == InputType.AUDIO && _streamType == StreamType.RTMP)
+			{
+				_connection.connect(_server);
+			}
+			else if(_type == InputType.AUDIO && _streamType == StreamType.FILE)
+			{
+				_sound.load(new URLRequest(source));
+				try {
+					_soundChannel = _sound.play();
+					_isPlaying = true;
+					
+					_firstLoad = false;
+					
+					_mediaLoaded = true;
+				} catch(error:IOError){}
+			}
 		}
 	}
 	
@@ -1120,8 +1156,11 @@ class Player extends EventDispatcher
 	 */
 	public function togglePlay():Bool
 	{
+		
+		var oldPlaying:Bool;
 		if (_mediaLoaded)
 		{
+			oldPlaying  = _isPlaying;
 			if (_mediaEndReached)
 			{
 				_mediaEndReached = false;
@@ -1143,7 +1182,7 @@ class Player extends EventDispatcher
 					setVolume(_userSettings.getVolume());
 				}
 			}
-			else if (_mediaLoaded)
+			else
 			{
 				if (_streamType == StreamType.YOUTUBE)
 				{
@@ -1182,13 +1221,11 @@ class Player extends EventDispatcher
 					}
 				}
 			}
-			else if (_stopped)
-			{
-				load(_mediaSource, _type, _streamType, _server);
-			}
 			
-			_isPlaying = !_isPlaying;
-			callEvents(PlayerEvents.PLAY_PAUSE);
+			if (oldPlaying == _isPlaying){
+				_isPlaying = !_isPlaying;
+				callEvents(PlayerEvents.PLAY_PAUSE);
+			}
 			return _isPlaying;
 		}
 		else if(_mediaSource != "")
@@ -1197,7 +1234,7 @@ class Player extends EventDispatcher
 			callEvents(PlayerEvents.BUFFERING);
 			return true;
 		}
-		callEvents(PlayerEvents.PLAY_PAUSE);
+		
 		return false;
 	}
 	
@@ -1765,7 +1802,7 @@ class Player extends EventDispatcher
 		var time:Float = 0;
 		if (_streamType == StreamType.YOUTUBE)
 		{
-			if(_youtubeLoader != null)
+			if(_youtubeLoader != null && _ytReady)
 			{
 				time = Reflect.field(_youtubeLoader.content, "getCurrentTime")();
 			}
