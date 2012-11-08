@@ -1,0 +1,29 @@
+{
+	"name": "webshims",
+	"description": "modular capability-based loading polyfill libary, which extends jQuery with HTML5 features in legacy browsers",
+	"version": "1.9.3",
+	"keywords": ["webshims", "polyfill", "HTML5"],
+	"main": "./master/demos/js-webshim/minified",
+	"homepage": "http://afarkas.github.com/webshim/demos/index.html",
+	"authors": [
+		"Alexander Farkas <info@corrupt-system.de>"
+	],
+	"repository": {
+		"type" : "git",
+		"url" : "https://github.com/aFarkas/webshim.git"
+	},
+	"licenses" : [
+		{
+			"type" : "MIT",
+			"url" : "https://raw.github.com/aFarkas/webshim/master/MIT-LICENSE.txt"
+		}
+	],
+	"dependencies" : {
+		"jquery" : ">=1.7.2",
+		"modernizr" : ">=2.6.2"
+	},
+	"devDependencies": {
+		"grunt-contrib-copy": ">=0.3.1",
+		"grunt": ">=0.3.1"
+	}
+}

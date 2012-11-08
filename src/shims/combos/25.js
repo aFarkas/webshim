@@ -947,6 +947,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		});
 	}
 })(jQuery, document);
+
 (function($, Modernizr, webshims){
 	"use strict";
 	var hasNative = Modernizr.audio && Modernizr.video;
@@ -1493,7 +1494,8 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	}
 	webshims.ready('WINDOWLOAD mediaelement', loadTrackUi);
 });
-})(jQuery, Modernizr, jQuery.webshims);jQuery.webshims.register('track', function($, webshims, window, document, undefined){
+})(jQuery, Modernizr, jQuery.webshims);
+jQuery.webshims.register('track', function($, webshims, window, document, undefined){
 	"use strict";
 	var mediaelement = webshims.mediaelement;
 	var id = new Date().getTime();

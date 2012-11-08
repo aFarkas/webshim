@@ -800,6 +800,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 })(jQuery, jQuery.webshims);
 
 
+
 (function($, Modernizr, webshims){
 	"use strict";
 	var hasNative = Modernizr.audio && Modernizr.video;
@@ -1346,7 +1347,8 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	}
 	webshims.ready('WINDOWLOAD mediaelement', loadTrackUi);
 });
-})(jQuery, Modernizr, jQuery.webshims);/*
+})(jQuery, Modernizr, jQuery.webshims);
+/*
  * todos: 
  * - decouple muted/volume (needs improvement)
  * - implement video <-> flashcanvas pro API

@@ -253,7 +253,8 @@ jQuery.webshims.register('form-native-extend', function($, webshims, window, doc
 	});
 	
 	
-});jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
+});
+jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
 	"use strict";
 	
 	//ToDo
@@ -636,7 +637,8 @@ jQuery.webshims.register('form-native-extend', function($, webshims, window, doc
 //		webshims.addInputType('datetime-local', typeProtos['datetime-local']);
 //	}
 		
-});/* number-date-ui */
+});
+/* number-date-ui */
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
 jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";

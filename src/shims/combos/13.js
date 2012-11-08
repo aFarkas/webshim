@@ -947,6 +947,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		});
 	}
 })(jQuery, document);
+
 jQuery.webshims.register('details', function($, webshims, window, doc, undefined, options){
 	var isInterActiveSummary = function(summary){
 		var details = $(summary).parent('details');

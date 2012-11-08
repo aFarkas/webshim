@@ -947,6 +947,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		});
 	}
 })(jQuery, document);
+
 (function($, Modernizr, webshims){
 	"use strict";
 	var hasNative = Modernizr.audio && Modernizr.video;

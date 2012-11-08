@@ -381,7 +381,8 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 //		webshims.addInputType('datetime-local', typeProtos['datetime-local']);
 //	}
 		
-});/* number-date-ui */
+});
+/* number-date-ui */
 /* https://github.com/aFarkas/webshim/issues#issue/23 */
 jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
