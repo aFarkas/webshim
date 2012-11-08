@@ -291,7 +291,7 @@
 		register: function(name, fn){
 			var module = modules[name];
 			if (!module) {
-				webshims.warn("can't find module: " + name);
+				webshims.error("can't find module: " + name);
 				return;
 			}
 			if (module.noAutoCallback) {
@@ -1081,7 +1081,7 @@
 	//>
 	
 	//<mediaelement combos: 10, 9, 12, 17, 16, 8, 20, 22, 23, 24, 25, 26, 27
-	needModernizr('audio video texttrackapi', function(){
+	needModernizr('audio video texttrackapi ds', function(){
 		webshims.mediaelement = {};
 		var swfTest = function(){
 			if(!Modernizr.audio || !Modernizr.video){

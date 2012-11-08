@@ -805,9 +805,8 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 	"use strict";
 	var hasNative = Modernizr.audio && Modernizr.video;
 	var supportsLoop = false;
-	var options = webshims.cfg.mediaelement;
 	var bugs = webshims.bugs;
-	var swfType = options.player == 'jwplayer' ? 'mediaelement-swf' : 'mediaelement-jaris'
+	
 	var loadSwf = function(){
 		webshims.ready(swfType, function(){
 			if(!webshims.mediaelement.createSWF){
@@ -816,7 +815,13 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 			}
 		});
 	};
+	var options = webshims.cfg.mediaelement;
+	var swfType = options && options.player == 'jwplayer' ? 'mediaelement-swf' : 'mediaelement-jaris';
 	var hasSwf;
+	if(!options){
+		webshims.error("mediaelement wasn't implemented but loaded");
+		return;
+	}
 	if(hasNative){
 		var videoElem = document.createElement('video');
 		Modernizr.videoBuffered = ('buffered' in videoElem);
