@@ -9,17 +9,12 @@ module.exports = function(grunt){
 			'<%= grunt.template.today("yyyy-mm-dd") %>\n' +
 			'<%= pkg.homepage ? "* " + pkg.homepage + "\n" : "" %> */'
 		},
+		//concat is changed through webshimscombos
 		concat: {},
-		copy: {
-			dist: {
-				files: {
-					"demos/js-webshim/dev/": "src/**",
-					"demos/js-webshim/minified/": "src/**"
-				}
-			}
-		},
-		min: getFiles('src', 'demos/js-webshim/minified', '**/*.js'),
-		
+		//copy and min are changed through cfgcopymin
+		copy: {},
+		min: {},
+		cssmin: getFiles('src', 'demos/js-webshim/minified', '**/*.css'),
 		uglify: {}
 	});
 	
@@ -41,7 +36,7 @@ module.exports = function(grunt){
 		}, 
 		function(err, result, code) {
 			if(!err && result.indexOf && result.indexOf('done') == -1){
-				grunt.log.write(result)
+				
 				try {
 					combos = JSON.parse(result);
 				} catch(er){
@@ -74,18 +69,51 @@ module.exports = function(grunt){
 		});		
 	
 	});
+	grunt.registerTask('cfgcopymin', 'config min and copy tasks.', function() {
+		var files = getFiles('src', false, '**', 'demos/js-webshim/dev', '*.js');
+		var path = require('path');
+		var copyTask = {};
+		var minTask = {};
+		var minPath, file, found;
+		
+		for(var i in files){
+			file = files[i];
+			if(grunt.file.isMatch('*.*', file)){
+				minPath = path.join('demos/js-webshim/minified', i);
+				if(grunt.file.isMatch('*.js', file)){
+					minTask[minPath] = file;
+					found = true;
+				}
+				copyTask[minPath] = file;
+				copyTask[path.join('demos/js-webshim/dev', i)] = file;
+			}
+		}
+		if(!found){
+			minTask[path.join('demos/js-webshim/minified', 'polyfiller.js')] = path.join('src', 'polyfiller.js');
+		}
+		grunt.config('min', minTask);
+		grunt.config('copy', copyTask);
+	});
 	
 	// Default task.
 	grunt.loadNpmTasks('grunt-contrib-copy');
-	grunt.registerTask('default', 'webshimscombos concat copy min');
+	grunt.loadNpmTasks('grunt-css');
+	grunt.registerTask('default', 'webshimscombos concat cfgcopymin copy cssmin min');
 
 
 
-	function getFiles(srcdir, destdir, wildcard) {
+	function getFiles(srcdir, destdir, wildcard, compareDir, compareMatch) {
 		var path = require('path');
+		var fs = require('fs');
+		// In Nodejs 0.8.0, existsSync moved from path -> fs.
+		var existsSync = fs.existsSync || path.existsSync;
 		var files = {};
 		grunt.file.expand({cwd: srcdir}, wildcard).forEach(function(relpath) {
-			files[path.join(destdir, relpath)] = path.join(srcdir, relpath);
+			var src = path.join(srcdir, relpath);
+			
+			if(!compareDir || !compareMatch || !grunt.file.isMatch(compareMatch, src) || (!existsSync(path.join(compareDir, relpath)) || grunt.file.read(src) != grunt.file.read(path.join(compareDir, relpath)))){
+				files[destdir === false ? relpath : path.join(destdir, relpath)] = src;
+			}
 		});
 		return files;
 	}

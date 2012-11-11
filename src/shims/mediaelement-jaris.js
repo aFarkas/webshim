@@ -158,25 +158,37 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		onDataInitialized: function(jaris, data){
 			
 			var oldDur = data.duration;
+			var durDelta;
 			data.duration = jaris.duration;
 			if(oldDur == data.duration || isNaN(data.duration)){return;}
-			if(data._calledMeta && Math.abs(data.lastDuration - data.duration) < 10){return;}
 			
-			data.lastDuration = data.duration;
+			if(data._calledMeta && ((durDelta = Math.abs(data.lastDuration - data.duration)) < 2)){return;}
+			
+			
+			
 			data.videoHeight = jaris.height;
 			data.videoWidth = jaris.width;
+			
 			if(!data.networkState){
 				data.networkState = 2;
 			}
 			if(data.readyState < 1){
 				setReadyState(1, data);
 			}
-			
-			if(data.duration){
-				trigger(data._elem, 'durationchange');
-			}
-			if(!data._calledMeta){
-				trigger(data._elem, 'loadedmetadata');
+			clearTimeout(data._durationChangeTimer);
+			if(data._calledMeta && data.duration){
+				data._durationChangeTimer = setTimeout(function(){
+					data.lastDuration = data.duration;
+					trigger(data._elem, 'durationchange');
+				}, durDelta > 50 ? 0 : durDelta > 9 ? 9 : 99);
+			} else {
+				data.lastDuration = data.duration;
+				if(data.duration){
+					trigger(data._elem, 'durationchange');
+				}
+				if(!data._calledMeta){
+					trigger(data._elem, 'loadedmetadata');
+				}
 			}
 			data._calledMeta = true;
 		},
@@ -403,6 +415,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			var lenI = len;
 			var networkState = data.networkState;
 			setReadyState(0, data);
+			clearTimeout(data._durationChangeTimer);
 			while(--lenI > -1){
 				delete data[resetProtoProps[lenI]];
 			}
