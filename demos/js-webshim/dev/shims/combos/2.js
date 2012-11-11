@@ -606,7 +606,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	
 });
 if(!Modernizr.formvalidation || jQuery.webshims.bugs.bustedValidity){
-jQuery.webshims.register('form-native-extend', function($, webshims, window, document){
+jQuery.webshims.register('form-shim-extend', function($, webshims, window, document){
 "use strict";
 webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
