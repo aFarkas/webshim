@@ -847,7 +847,7 @@
 	});
 		
 	
-	//<localstorage combos: 14
+	//<localstorage
 	needModernizr('localstorage');
 	addPolyfill('json-storage', {
 		test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
@@ -860,7 +860,7 @@
 	//>localstorage
 	
 	
-	//<geolocation combos: 14,15
+	//<geolocation
 	needModernizr('geolocation');
 	addPolyfill('geolocation', {
 		test: Modernizr.geolocation,
@@ -930,7 +930,7 @@
 	//>
 	
 	
-	//<forms combos: 3, 2, 59, 17, 16, 5, 4, 24, 19, 18, 7, 59, 5, 21, 11, 23, 26
+	//<forms
 	needModernizr('input inputtypes', function(){
 		var modernizrInputAttrs = Modernizr.input;
 		var modernizrInputTypes = Modernizr.inputtypes;
@@ -1063,7 +1063,7 @@
 	});
 	//>
 	
-	//<details combos: 12,13,15
+	//<details
 	if(!('details' in Modernizr)){
 		addTest('details', function(){
 			return ('open' in document.createElement('details'));
@@ -1080,7 +1080,7 @@
 	});
 	//>
 	
-	//<mediaelement combos: 10, 9, 12, 17, 16, 8, 20, 22, 23, 24, 25, 26, 27
+	//<mediaelement
 	needModernizr('audio video texttrackapi', function(){
 		webshims.mediaelement = {};
 		var swfTest = function(){
