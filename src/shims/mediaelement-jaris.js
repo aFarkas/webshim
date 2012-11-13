@@ -269,12 +269,13 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 						return;
 					}
 					i++;
+					
 					data.tryedReframeing++;
 					if(testAPI(data)){
 						data.wasSwfReady = true;
 						data.tryedReframeing = 0;
-						workActionQueue(data);
 						startAutoPlay(data);
+						workActionQueue(data);
 					} else if(data.tryedReframeing < 6) {
 						if(data.tryedReframeing < 3){
 							data.reframeTimer = setTimeout(doneFn, 9);
@@ -298,6 +299,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 				clearTimeout(localConnectionTimer);
 				clearTimeout(data.reframeTimer);
 				data.shadowElem.removeClass('flashblocker-assumed');
+				
 				if(!i){
 					doneFn();
 				} else {
@@ -315,6 +317,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		var actionLen = data.actionQueue.length;
 		var i = 0;
 		var operation;
+		
 		if(actionLen && data.isActive == 'third'){
 			while(data.actionQueue.length && actionLen > i){
 				i++;
@@ -342,6 +345,13 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 					} catch(er){}
 				}
 			}, 1);
+		}
+		
+		if(data.muted){
+			$.prop(data._elem, 'muted', true);
+		}
+		if(data.volume != 1){
+			$.prop(data._elem, 'volume', data.volume);
 		}
 	};
 	
@@ -549,7 +559,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			box.insertBefore(elem);
 			
 			if(hasNative){
-				$.extend(data, {volume: $.prop(elem, 'volume'), muted: $.prop(elem, 'muted')});
+				$.extend(data, {volume: $.prop(elem, 'volume'), muted: $.prop(elem, 'muted'), paused: $.prop(elem, 'paused')});
 			}
 			
 			webshims.addShadowDom(elem, box);
@@ -563,7 +573,13 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		if(!mediaelement.jarisEvent[data.id]){
 			mediaelement.jarisEvent[data.id] = function(jaris){
 				if(jaris.type == 'ready'){
-					onEvent[jaris.type](jaris, data);
+					if(data.api){
+						onEvent[jaris.type](jaris, data);
+					} else {
+						setTimeout(function(){
+							onEvent[jaris.type](jaris, data);
+						}, 9);
+					}
 				} else {
 					data.currentTime = jaris.position;
 					
@@ -592,7 +608,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 					{
 						id: elemId,
 						evtId: data.id,
-						controls: ''+hasControls,
+						controls: ''+$.prop(elem, 'controls'),
 						autostart: 'false'
 					},
 					elemVars
@@ -648,12 +664,14 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 	
 	var queueSwfMethod = function(elem, fn, args, data){
 		data = data || getSwfDataFromElem(elem);
+		
 		if(data){
 			if(data.api && data.api[fn]){
 				data.api[fn].apply(data.api, args || []);
 			} else {
 				//todo add to queue
 				data.actionQueue.push({fn: fn, args: args});
+				
 				if(data.actionQueue.length > 10){
 					setTimeout(function(){
 						if(data.actionQueue.length > 5){
@@ -755,6 +773,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 							clearTimeout(data.stopPlayPause);
 						}
 						queueSwfMethod(this, fn == 'play' ? 'api_play' : 'api_pause', [], data);
+						
 						data._ppFlag = true;
 						if(data.paused != (fn != 'play')){
 							data.paused = fn != 'play';

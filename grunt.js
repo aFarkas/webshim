@@ -15,7 +15,9 @@ module.exports = function(grunt){
 		copy: {},
 		min: {},
 		cssmin: getFiles('src', 'demos/js-webshim/minified', '**/*.css'),
-		uglify: {}
+		uglify: {
+			codegen: {ascii_only: true}
+		}
 	});
 	
 	grunt.registerTask('webshimscombos', 'create combos from polyfiller.js.', function() {
