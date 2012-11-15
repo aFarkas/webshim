@@ -925,7 +925,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 
 webshims.register('mediaelement-core', function($, webshims, window, document, undefined){
 	hasSwf = swfobject.hasFlashPlayerVersion('9.0.115');
-	
+	$('html').addClass(hasSwf ? 'swf' : 'no-swf');
 	var mediaelement = webshims.mediaelement;
 	
 	var getSrcObj = function(elem, nodeName){
