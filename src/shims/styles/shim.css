@@ -7,6 +7,10 @@ audio {
 	height: 0;
 	width: 0;
 }
+audio,
+video {
+	overflow: hidden;
+}
 audio.webshims-controls,
 video {
 	display: inline-block;
@@ -18,9 +22,13 @@ audio[controls] {
 	min-height: 45px;
 	min-width: 40px;
 }
-video *,
-audio * {
-	display: none !important;
+.js video > *,
+.js audio > * {
+	visibility: hidden;
+}
+.no-swf video > *,
+.no-swf audio > * {
+	visibility: inherit;
 }
 .flashblocker-assumed {
 	min-height: 20px;
