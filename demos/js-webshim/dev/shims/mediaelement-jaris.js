@@ -494,7 +494,6 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		var box;
 		
 		if(data && data.swfCreated){
-			clearInterval(data.readyInterval);
 			mediaelement.setActive(elem, 'third', data);
 			
 			data.currentSrc = canPlaySrc.srcProp;
@@ -600,63 +599,57 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			};
 		}
 		
-		$(function(){
-			clearInterval(data.readyInterval);
-			clearInterval(data.flashBlock);
-			data.readyInterval = setTimeout(function(){
-				$.extend(vars, 
-					{
-						id: elemId,
-						evtId: data.id,
-						controls: ''+$.prop(elem, 'controls'),
-						autostart: 'false'
-					},
-					elemVars
-				);
+		$.extend(vars, 
+			{
+				id: elemId,
+				evtId: data.id,
+				controls: ''+$.prop(elem, 'controls'),
+				autostart: 'false'
+			},
+			elemVars
+		);
+		
+		if(canPlaySrc.type == 'audio/mpeg' || canPlaySrc.type == 'audio/mp3'){
+			vars.type = 'audio';
+			vars.streamtype = 'file';
+			//controls=false&jsapi=true&
+		} else if(canPlaySrc.type == 'video/youtube'){
+			vars.streamtype = 'youtube';
+		}
+		options.changeSWF(vars, elem, canPlaySrc, data, 'embed');
+		clearInterval(data.flashBlock);
+		swfobject.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.0", false, vars, params, attrs, function(swfData){
+			
+			if(swfData.success){
 				
-				if(canPlaySrc.type == 'audio/mpeg' || canPlaySrc.type == 'audio/mp3'){
-					vars.type = 'audio';
-					vars.streamtype = 'file';
-					//controls=false&jsapi=true&
-				} else if(canPlaySrc.type == 'video/youtube'){
-					vars.streamtype = 'youtube';
+				data.api = swfData.ref;
+				
+				if(!hasControls){
+					$(swfData.ref).attr('tabindex', '-1').css('outline', 'none');
 				}
-				options.changeSWF(vars, elem, canPlaySrc, data, 'embed');
 				
-				swfobject.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.0", false, vars, params, attrs, function(swfData){
-					
-					if(swfData.success){
-						
-						data.api = swfData.ref;
-						
-						if(!hasControls){
-							$(swfData.ref).attr('tabindex', '-1').css('outline', 'none');
-						}
-						
-						data.flashBlock = setTimeout(function(){
-							if((!swfData.ref.parentNode && box[0].parentNode) || swfData.ref.style.display == "none"){
-								box.addClass('flashblocker-assumed');
-								$(elem).trigger('flashblocker');
-								webshims.warn("flashblocker assumed");
-							}
-							$(swfData.ref).css({'minHeight': '2px', 'minWidth': '2px', display: 'block'});
-						}, 9);
-						
-						if(!localConnectionTimer){
-							clearTimeout(localConnectionTimer);
-							localConnectionTimer = setTimeout(function(){
-								var flash = $(swfData.ref);
-								if(flash[0].offsetWidth > 1 && flash[0].offsetHeight > 1 && location.protocol.indexOf('file:') === 0){
-									webshims.error("Add your local development-directory to the local-trusted security sandbox:  http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html");
-								} else if(flash[0].offsetWidth < 2 || flash[0].offsetHeight < 2) {
-									webshims.warn("JS-SWF connection can't be established on hidden or unconnected flash objects");
-								}
-								flash = null;
-							}, 8000);
-						}
+				data.flashBlock = setTimeout(function(){
+					if((!swfData.ref.parentNode && box[0].parentNode) || swfData.ref.style.display == "none"){
+						box.addClass('flashblocker-assumed');
+						$(elem).trigger('flashblocker');
+						webshims.warn("flashblocker assumed");
 					}
-				});
-			}, 9);
+					$(swfData.ref).css({'minHeight': '2px', 'minWidth': '2px', display: 'block'});
+				}, 9);
+				
+				if(!localConnectionTimer){
+					clearTimeout(localConnectionTimer);
+					localConnectionTimer = setTimeout(function(){
+						var flash = $(swfData.ref);
+						if(flash[0].offsetWidth > 1 && flash[0].offsetHeight > 1 && location.protocol.indexOf('file:') === 0){
+							webshims.error("Add your local development-directory to the local-trusted security sandbox:  http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html");
+						} else if(flash[0].offsetWidth < 2 || flash[0].offsetHeight < 2) {
+							webshims.warn("JS-SWF connection can't be established on hidden or unconnected flash objects");
+						}
+						flash = null;
+					}, 8000);
+				}
+			}
 		});
 		
 	};
@@ -797,9 +790,8 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 				if(nodeName == 'audio'){
 					setElementDimension(data, boolProp);
 				}
-				if(data.api){
-					$(this).mediaLoad();
-				}
+				
+				queueSwfMethod(this, 'api_controls', [boolProp], data);
 			}
 		});
 		

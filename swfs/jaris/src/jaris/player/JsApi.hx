@@ -45,6 +45,7 @@ import jaris.animation.Animation;
 import jaris.display.Loader;
 import jaris.events.PlayerEvents;
 import jaris.player.Player;
+import jaris.player.newcontrols.NewControls;
 import flash.display.Sprite;
 import flash.display.Stage;
 import jaris.utils.Utils;
@@ -59,6 +60,7 @@ class JsApi extends MovieClip {
 	private var _stage:Stage;
 	private var _movieClip:MovieClip;
 	private var _player:Player;
+	private var _controls:NewControls;
 	private var _isBuffering:Bool;
 	private var _percentLoaded:Float;
 	private var _externalListeners:Hash<String>;
@@ -67,7 +69,7 @@ class JsApi extends MovieClip {
 	
 	
 	//{Constructor
-	public function new(player:Player)
+	public function new(player:Player, controls:NewControls)
 	{
 		super();
 		var parameters:Dynamic<String> = flash.Lib.current.loaderInfo.parameters;
@@ -79,6 +81,7 @@ class JsApi extends MovieClip {
 		// _stage = Lib.current.stage;
 		// _movieClip = Lib.current;
 		_player = player;
+		_controls = controls;
 				
 		_player.addEventListener(PlayerEvents.MOUSE_HIDE, onPlayerEvent);
 		_player.addEventListener(PlayerEvents.MOUSE_SHOW, onPlayerEvent);
@@ -105,6 +108,7 @@ class JsApi extends MovieClip {
 		ExternalInterface.addCallback("api_pause", setPause);
 		ExternalInterface.addCallback("api_seek", setSeek);
 		ExternalInterface.addCallback("api_volume", setVolume);
+		ExternalInterface.addCallback("api_controls", setControls);
 	
 		
 		addJsListener('on*', 'jQuery.webshims.mediaelement.jarisEvent.' + parameters.evtId);
@@ -192,7 +196,14 @@ class JsApi extends MovieClip {
 	private function setPause():Void
 	{
 		_player.pause();
-	}	
+	}
+	
+	private function setControls(forceControls):Void
+	{
+		_controls.forceControls(forceControls);
+	}
+
+	
 	
 	/**
 	 * Set Seek

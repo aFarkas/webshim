@@ -139,29 +139,26 @@ class Main
 		
 	
 		//Draw Controls
-		if (parameters.controls != "false")
-		{
-			var duration:String = parameters.duration != "" && parameters.duration != null? parameters.duration : "0";
-			var controlType:Int = parameters.controltype != "" && parameters.controltype != null? Std.parseInt(parameters.controltype) : 0;
-			var controlSize:Int = parameters.controlsize != "" && parameters.controlsize != null? Std.parseInt(parameters.controlsize) : 0;
-			
-			var controlColors:Array <String> = ["", "", "", "", ""];
-			controlColors[0] = parameters.darkcolor != null ? parameters.darkcolor : "";
-			controlColors[1] = parameters.brightcolor != null ? parameters.brightcolor : "";
-			controlColors[2] = parameters.controlcolor != null ? parameters.controlcolor : "";
-			controlColors[3] = parameters.hovercolor != null ? parameters.hovercolor : "";
-			controlColors[4] = parameters.seekcolor != null ? parameters.seekcolor : "";
-			
-			var controls:NewControls = new NewControls(player);
-			controls.setDurationLabel(duration);
-			controls.setControlColors(controlColors);
-			controls.setControlSize(controlSize);
-			movieClip.addChild(controls);
-		}
+		var duration:String = parameters.duration != "" && parameters.duration != null? parameters.duration : "0";
+		var controlType:Int = parameters.controltype != "" && parameters.controltype != null? Std.parseInt(parameters.controltype) : 0;
+		var controlSize:Int = parameters.controlsize != "" && parameters.controlsize != null? Std.parseInt(parameters.controlsize) : 0;
+		
+		var controlColors:Array <String> = ["", "", "", "", ""];
+		controlColors[0] = parameters.darkcolor != null ? parameters.darkcolor : "";
+		controlColors[1] = parameters.brightcolor != null ? parameters.brightcolor : "";
+		controlColors[2] = parameters.controlcolor != null ? parameters.controlcolor : "";
+		controlColors[3] = parameters.hovercolor != null ? parameters.hovercolor : "";
+		controlColors[4] = parameters.seekcolor != null ? parameters.seekcolor : "";
+		
+		var controls:NewControls = new NewControls(player, parameters.controls);
+		controls.setDurationLabel(duration);
+		controls.setControlColors(controlColors);
+		controls.setControlSize(controlSize);
+		movieClip.addChild(controls);
 		
 		
 
-		var jsAPI:JsApi = new JsApi(player);
+		var jsAPI:JsApi = new JsApi(player, controls);
 		movieClip.addChild(jsAPI);
 		player.init();
 	}

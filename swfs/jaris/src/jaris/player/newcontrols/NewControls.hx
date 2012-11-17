@@ -87,11 +87,13 @@ class NewControls extends MovieClip {
 	private var _aspectRatioLabelContainer:Sprite;
 	private var _aspectRatioLabel:TextField;
 	private var _textFormat:TextFormat;
+	private var _forceHideControls:Bool;
+	private var _shouldBeVisible:Bool;
 	//}
 	
 	
 	//{Constructor
-	public function new(player:Player)
+	public function new(player:Player, forceHideControls)
 	{
 		super();
 		
@@ -247,6 +249,12 @@ class NewControls extends MovieClip {
 		_hideAspectRatioLabelTimer.addEventListener(TimerEvent.TIMER, hideAspectRatioLabelTimer);
 		
 		_hideControlsTimer.start();
+		
+		_forceHideControls = forceHideControls == "false";
+		if (_forceHideControls) {
+			this.hideControls();
+		}
+		_shouldBeVisible = true;
 		//}
 	}
 	//}
@@ -328,15 +336,17 @@ class NewControls extends MovieClip {
 	 */
 	private function onMouseMove(event:MouseEvent):Void
 	{
-		if (_stage.mouseX >= _controlsBar.x)
-		{
-			if (!_hideControlsTimer.running)
+		if(!_forceHideControls){
+			if (_stage.mouseX >= _controlsBar.x)
 			{
-				_hideControlsTimer.start();
+				if (!_hideControlsTimer.running)
+				{
+					_hideControlsTimer.start();
+				}
+				
+				_controlsVisible = true;
+				showControls();
 			}
-			
-			_controlsVisible = true;
-			showControls();
 		}
 	}
 	
@@ -346,7 +356,9 @@ class NewControls extends MovieClip {
 	 */
 	private function onStageResize(event:Event):Void
 	{
-		redrawControls();
+		if(!_forceHideControls){
+			redrawControls();
+		}
 	}
 	
 	/**
@@ -463,6 +475,7 @@ class NewControls extends MovieClip {
 	{
 		_playControl.visible = !_player.isPlaying();
 		_pauseControl.visible = _player.isPlaying();
+		
 		showControls();
 	}
 	
@@ -515,15 +528,15 @@ class NewControls extends MovieClip {
 	 */
 	private function onPlayerMouseShow(event:PlayerEvents):Void
 	{
-		//Only use slidein effect on fullscreen since switching to windowed mode on
-		//hardware scaling causes a bug by a slow response on stage height changes
-		if (_player.isFullscreen() && !_controlsBar.visible)
+		
+		if (!_controlsBar.visible)
 		{
-			_controlsBar.visible = true;
-		}
-		else if (!_controlsBar.visible)
-		{
-			_controlsBar.visible = true;
+			if (!_forceHideControls) {
+				_controlsBar.visible = true;
+			} else {
+				_shouldBeVisible = true;
+			}
+			
 		}
 	}
 	
@@ -810,21 +823,40 @@ class NewControls extends MovieClip {
 	{
 		if(_controlsBar.visible)
 		{
-			drawControls();
-			Animation.slideOut(_controlsBar, "bottom", 800);
+			if (_forceHideControls) {
+				_controlsBar.visible = false;
+			} else {
+				drawControls();
+				Animation.slideOut(_controlsBar, "bottom", 800);
+			}
 		}
+		_shouldBeVisible = false;
 	}
 	
+	public function forceControls(controls:Bool):Void
+	{
+		if(controls){
+			_forceHideControls = false;
+			if(_shouldBeVisible){
+				showControls();
+			}
+		} else {
+			_forceHideControls = true;
+			_controlsBar.visible = false;
+		}
+	}
+		
 	/**
 	 * Shows play controls bar
 	 */
 	private function showControls():Void
 	{
-		if(!_controlsBar.visible)
+		if(!_forceHideControls && !_controlsBar.visible)
 		{
 			drawControls();
 			_controlsBar.visible = true;
 		}
+		_shouldBeVisible = true;
 	}
 	//}
 	
