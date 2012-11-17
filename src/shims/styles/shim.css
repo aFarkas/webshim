@@ -22,8 +22,8 @@ audio[controls] {
 	min-height: 45px;
 	min-width: 40px;
 }
-.js video > *,
-.js audio > * {
+video > *,
+audio > * {
 	visibility: hidden;
 }
 .no-swf video > *,
