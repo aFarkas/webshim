@@ -292,9 +292,9 @@ class Player extends EventDispatcher
 				}
 				
 			case "NetStream.Play.Start":
-				_isPlaying = true;
+				
 				_mediaEndReached = false;
-				if (_stream.bytesLoaded != _stream.bytesTotal || _streamType == StreamType.RTMP)
+				if (_isPlaying && (_stream.bytesLoaded != _stream.bytesTotal || _streamType == StreamType.RTMP))
 				{
 					callEvents(PlayerEvents.BUFFERING);
 				}
@@ -621,7 +621,7 @@ class Player extends EventDispatcher
 		_movieClip.setChildIndex(_youtubeLoader.content, 0);
 		_ytReady = true;
 		Reflect.field(_youtubeLoader.content, "setSize")(_stage.stageWidth, _stage.stageHeight);
-		if(_ytCue){
+		if(_ytCue || !_isPlaying){
 			Reflect.field(_youtubeLoader.content, "cueVideoByUrl")(Utils.youtubeSourceParse(_mediaSource));
 		} else {
 			Reflect.field(_youtubeLoader.content, "loadVideoByUrl")(Utils.youtubeSourceParse(_mediaSource));
@@ -1040,10 +1040,12 @@ class Player extends EventDispatcher
 		{
 			if (!canSeek(seekTime))
 			{
-				_startTime = seekTime;
-				Reflect.field(_youtubeLoader.content, "seekTo")(seekTime);
+				if(_ytReady){
+					_startTime = seekTime;
+					Reflect.field(_youtubeLoader.content, "seekTo")(seekTime);
+				}
 			}
-			else
+			else if(_ytReady)
 			{
 				Reflect.field(_youtubeLoader.content, "seekTo")(seekTime);
 			}
@@ -1158,6 +1160,59 @@ class Player extends EventDispatcher
 	{
 		
 		var oldPlaying:Bool;
+		if (_isPlaying) {
+			this.pause();
+		} else {
+			this.play();
+		}
+		return _isPlaying;
+	}
+	
+	/**
+	 * pause
+	 */
+	public function pause():Bool
+	{
+		
+		if (!_mediaEndReached)
+			
+		{
+			if (_streamType == StreamType.YOUTUBE)
+			{
+				if(_ytReady){
+					Reflect.field(_youtubeLoader.content, "pauseVideo")();
+				}
+			}
+			else if (_type == InputType.VIDEO || _streamType == StreamType.RTMP)
+			{
+				_stream.pause();
+			}
+			else if (_type == InputType.AUDIO)
+			{
+				_soundChannel.stop();
+			}
+		}
+		
+		if (_isPlaying){
+			_isPlaying = false;
+			
+			callEvents(PlayerEvents.PLAY_PAUSE);
+			if (!_mediaLoaded) {
+				callEvents(PlayerEvents.NOT_BUFFERING);
+			}
+			
+		}
+		return _isPlaying;
+	}
+	
+	/**
+	 * 
+	 */
+	public function play():Bool
+	{
+		
+		var oldPlaying:Bool;
+		trace('call play');
 		if (_mediaLoaded)
 		{
 			oldPlaying  = _isPlaying;
@@ -1169,11 +1224,12 @@ class Player extends EventDispatcher
 				{
 					Reflect.field(_youtubeLoader.content, "seekTo")(0);
 					Reflect.field(_youtubeLoader.content, "playVideo")();
+					
 				}
 				else if (_type == InputType.VIDEO || _streamType == StreamType.RTMP)
 				{
 					_stream.seek(0);
-					_stream.togglePause();
+					_stream.resume();
 				}
 				else if (_type == InputType.AUDIO)
 				{
@@ -1186,44 +1242,34 @@ class Player extends EventDispatcher
 			{
 				if (_streamType == StreamType.YOUTUBE)
 				{
-					if (_isPlaying)
-					{
-						Reflect.field(_youtubeLoader.content, "pauseVideo")();
-					}
-					else
-					{
+					if(_ytReady){
 						Reflect.field(_youtubeLoader.content, "playVideo")();
 					}
 				}
 				else if (_type == InputType.VIDEO || _streamType == StreamType.RTMP)
 				{
-					_stream.togglePause();
+					_stream.resume();
 				}
 				else if (_type == InputType.AUDIO)
 				{
-					if (_isPlaying)
+					
+					//If end of audio reached start from beggining
+					if (_soundChannel.position + 100 >= _sound.length)
 					{
-						_soundChannel.stop();
+						_soundChannel = _sound.play();
 					}
-					else
+					else 
 					{
-						//If end of audio reached start from beggining
-						if (_soundChannel.position + 100 >= _sound.length)
-						{
-							_soundChannel = _sound.play();
-						}
-						else 
-						{
-							_soundChannel = _sound.play(_soundChannel.position);
-						}
-						
-						setVolume(_userSettings.getVolume());
+						_soundChannel = _sound.play(_soundChannel.position);
 					}
+					
+					setVolume(_userSettings.getVolume());
+					
 				}
 			}
 			
-			if (oldPlaying == _isPlaying){
-				_isPlaying = !_isPlaying;
+			if (!_isPlaying){
+				_isPlaying = true;
 				callEvents(PlayerEvents.PLAY_PAUSE);
 			}
 			return _isPlaying;
@@ -1232,10 +1278,11 @@ class Player extends EventDispatcher
 		{
 			load(_mediaSource, _type, _streamType, _server);
 			callEvents(PlayerEvents.BUFFERING);
+			_isPlaying = true;
 			return true;
 		}
 		
-		return false;
+		return true;
 	}
 	
 	/**

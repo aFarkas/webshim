@@ -183,9 +183,7 @@ class JsApi extends MovieClip {
 	 */
 	private function setPlay():Void
 	{
-		if (_player.isPlaying()!=true) {
-			_player.togglePlay();
-		}
+		_player.play();
 	}	
 	
 	/**
@@ -193,9 +191,7 @@ class JsApi extends MovieClip {
 	 */
 	private function setPause():Void
 	{
-		if (_player.isPlaying()==true) {
-			_player.togglePlay();
-		}
+		_player.pause();
 	}	
 	
 	/**
