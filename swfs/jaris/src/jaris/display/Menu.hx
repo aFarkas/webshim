@@ -56,14 +56,14 @@ class Menu
 		_contextMenu.addEventListener(ContextMenuEvent.MENU_SELECT, onMenuOpen);
 		
 		//Initialize each menu item
-		_jarisVersionMenuItem = new ContextMenuItem("Jaris Player v" + Version.NUMBER + " " + Version.STATUS +" webshims edition", true, true, true);
+		_jarisVersionMenuItem = new ContextMenuItem("Jaris Player v" + Version.NUMBER + " webshims edition", true, true, true);
 		_jarisVersionMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, onJarisVersion);
 		
 		_playMenuItem = new ContextMenuItem("Play (SPACE)", true, true, true);
 		_playMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, onPlay);
 		
-		_fullscreenMenuItem = new ContextMenuItem("Fullscreen View (F)");
-		_fullscreenMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, onFullscreen);
+		//_fullscreenMenuItem = new ContextMenuItem("Fullscreen View (F)");
+		//_fullscreenMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, onFullscreen);
 		
 		
 		_muteMenuItem = new ContextMenuItem("Mute (M)");
@@ -74,7 +74,7 @@ class Menu
 		//add all context menu items to context menu object
 		_contextMenu.customItems.push(_jarisVersionMenuItem);
 		_contextMenu.customItems.push(_playMenuItem);
-		_contextMenu.customItems.push(_fullscreenMenuItem);
+		//_contextMenu.customItems.push(_fullscreenMenuItem);
 		_contextMenu.customItems.push(_muteMenuItem);
 		
 		
@@ -106,14 +106,7 @@ class Menu
 			_fullscreenMenuItem.caption = "Fullscreen View (F)";
 		}
 		
-		if (_player.getMute())
-		{
-			_muteMenuItem.caption = _player.isFullscreen()?"Unmute":"Unmute (M)";
-		}
-		else
-		{
-			_muteMenuItem.caption = _player.isFullscreen()?"Mute":"Mute (M)";
-		}
+		_muteMenuItem.caption = _player.isFullscreen()?"Mute/Unmute":"Mute/Unmute (M)";
 		
 	}
 	
@@ -123,7 +116,8 @@ class Menu
 	 */
 	private function onJarisVersion(event:ContextMenuEvent)
 	{
-		Lib.getURL(new URLRequest("http://jaris.sourceforge.net"), "_blank");
+		Lib.getURL(new URLRequest("http://afarkas.github.com/webshim/demos/index.html"), "_blank");
+		Lib.getURL(new URLRequest("http://jaris.sourceforge.net"), "_jaris");
 	}
 	
 	/**

@@ -732,7 +732,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			var data = getSwfDataFromElem(this);
 			if(data){
 				m = !!m;
-				queueSwfMethod(this, 'api_volume', [m ? 0 : data.volume || 1], data);
+				queueSwfMethod(this, 'api_muted', [m], data);
 				if(data.muted != m){
 					data.muted = m;
 					trigger(data._elem, 'volumechange');

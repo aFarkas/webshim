@@ -333,12 +333,9 @@ class Player extends EventDispatcher
 	{
 		var F_KEY:UInt = 70;
 		var M_KEY:UInt = 77;
-		var X_KEY:UInt = 88;
 		
 		switch(event.keyCode)
 		{
-			case Keyboard.TAB:
-				toggleAspectRatio();
 			
 			case F_KEY:
 				toggleFullscreen();
@@ -346,23 +343,9 @@ class Player extends EventDispatcher
 			case M_KEY:
 				toggleMute();
 				
-			case Keyboard.UP:
-				volumeUp();
-				
-			case Keyboard.DOWN:
-				volumeDown();
-				
-			case Keyboard.RIGHT:
-				forward();
-				
-			case Keyboard.LEFT:
-				rewind();
-				
+			
 			case Keyboard.SPACE:
 				togglePlay();
-				
-			case X_KEY:
-				stopAndClose();
 		}
 	}
 	
@@ -955,37 +938,6 @@ class Player extends EventDispatcher
 		callEvents(PlayerEvents.STOP_CLOSE);
 	}
 	
-	/**
-	 * Seeks 8 seconds forward from the current position.
-	 * @return current play time after forward
-	 */
-	public function forward():Float
-	{	
-		var seekTime = (getCurrentTime() + 8) + _startTime;
-		
-		if (getDuration() > seekTime)
-		{
-			seekTime = seek(seekTime);
-		}
-		
-		return seekTime;
-	}
-	
-	/**
-	 * Seeks 8 seconds back from the current position.
-	 * @return current play time after rewind
-	 */
-	public function rewind():Float
-	{
-		var seekTime = (getCurrentTime() - 8) + _startTime;
-		
-		if (seekTime >= _startTime)
-		{
-			seekTime = seek(seekTime);
-		}
-		
-		return seekTime;
-	}
 	
 	/**
 	 * Seeks video player to a given time in seconds
@@ -1087,71 +1039,6 @@ class Player extends EventDispatcher
 		return _isPlaying;
 	}
 	
-	/**
-	 * Cycle betewen aspect ratios
-	 * @return new aspect ratio in use
-	 */
-	public function toggleAspectRatio():Float
-	{
-		switch(_currentAspectRatio)
-		{
-			case "original":
-				_aspectRatio = AspectRatio._1_1;
-				_currentAspectRatio = "1:1";
-				
-			case "1:1":
-				_aspectRatio = AspectRatio._3_2;
-				_currentAspectRatio = "3:2";
-				
-			case "3:2":
-				_aspectRatio = AspectRatio._4_3;
-				_currentAspectRatio = "4:3";
-				
-			case "4:3":
-				_aspectRatio = AspectRatio._5_4;
-				_currentAspectRatio = "5:4";
-				
-			case "5:4":
-				_aspectRatio = AspectRatio._14_9;
-				_currentAspectRatio = "14:9";
-				
-			case "14:9":
-				_aspectRatio = AspectRatio._14_10;
-				_currentAspectRatio = "14:10";
-				
-			case "14:10":
-				_aspectRatio = AspectRatio._16_9;
-				_currentAspectRatio = "16:9";
-				
-			case "16:9":
-				_aspectRatio = AspectRatio._16_10;
-				_currentAspectRatio = "16:10";
-				
-			case "16:10":
-				_aspectRatio = _originalAspectRatio;
-				_currentAspectRatio = "original";
-			
-			default:
-				_aspectRatio = _originalAspectRatio;
-				_currentAspectRatio = "original";
-		}
-		
-		resizeAndCenterPlayer();
-		
-		callEvents(PlayerEvents.ASPECT_RATIO);
-		
-		//Store aspect ratio into user settings
-		if (_aspectRatio == _originalAspectRatio)
-		{
-			_userSettings.setAspectRatio(0.0);
-		}
-		else
-		{
-			_userSettings.setAspectRatio(_aspectRatio);
-		}
-		
-		return _aspectRatio;
-	}
 	
 	/**
 	 * Swithces between play and pause
@@ -1343,27 +1230,22 @@ class Player extends EventDispatcher
 	 * Mutes or unmutes the sound
 	 * @return true if muted false if unmuted
 	 */
-	public function toggleMute():Bool
+	public function toggleMute()
+	{
+		this.mute(!_soundMuted);
+	}
+	
+	public function mute(goMuted:Bool)
 	{
 		var soundTransform:SoundTransform = new SoundTransform();
-		var isMute:Bool;
+		
 		
 		//unmute sound
-		if (_soundMuted)
+		if (!goMuted)
 		{
 			_soundMuted = false;
 			
-			if (_volume > 0)
-			{
-				soundTransform.volume = _volume;
-			}
-			else
-			{
-				_volume = 1.0;
-				soundTransform.volume = _volume;
-			}
-			
-			isMute =  false;
+			soundTransform.volume = _volume;
 		}
 		
 		//mute sound
@@ -1373,13 +1255,14 @@ class Player extends EventDispatcher
 			_volume = _stream.soundTransform.volume;
 			soundTransform.volume = 0;
 			_stream.soundTransform = soundTransform;
-			
-			isMute = true;
+			_userSettings.setVolume(0);
 		}
 		
 		if (_streamType == StreamType.YOUTUBE)
 		{
-			Reflect.field(_youtubeLoader.content, "setVolume")(soundTransform.volume * 100);
+			if(this._ytReady){
+				Reflect.field(_youtubeLoader.content, "setVolume")(soundTransform.volume * 100);
+			}
 		}
 		else if (_type == InputType.VIDEO || _streamType == StreamType.RTMP)
 		{
@@ -1392,7 +1275,6 @@ class Player extends EventDispatcher
 		}
 		
 		callEvents(PlayerEvents.MUTE);
-		return isMute;
 	}
 	
 	/**
@@ -1403,99 +1285,6 @@ class Player extends EventDispatcher
 	{
 		return _stage.displayState == StageDisplayState.FULL_SCREEN;
 	}
-	
-	/**
-	 * Raises the volume
-	 * @return volume value after raising
-	 */
-	public function volumeUp():Float
-	{
-		var soundTransform:SoundTransform = new SoundTransform();
-		
-		if (_soundMuted)
-		{
-			_soundMuted = false;
-		}
-	
-		//raise volume if not already at max
-		if (_volume < 1)
-		{
-			if (_streamType == StreamType.YOUTUBE)
-			{
-				_volume = (Reflect.field(_youtubeLoader.content, "getVolume")() + 10) / 100;
-				Reflect.field(_youtubeLoader.content, "setVolume")(_volume * 100);
-			}
-			else if (_type == InputType.VIDEO || _streamType == StreamType.RTMP)
-			{
-				_volume = _stream.soundTransform.volume + (10/100);
-				soundTransform.volume = _volume;
-				_stream.soundTransform = soundTransform;
-			}
-			else if (_type == InputType.AUDIO)
-			{
-				_volume = _soundChannel.soundTransform.volume + (10/100);
-				soundTransform.volume = _volume;
-				_soundChannel.soundTransform = soundTransform;
-			}
-		}
-		
-		//reset volume to 1.0 if already reached max
-		if (_volume >= 1)
-		{
-			_volume = 1.0;
-		}
-		
-		//Store volume into user settings
-		_userSettings.setVolume(_volume);
-		
-		callEvents(PlayerEvents.VOLUME_UP);
-		return _volume;
-	}
-	
-	/**
-	 * Lower the volume
-	 * @return volume value after lowering
-	 */
-	public function volumeDown():Float
-	{
-		var soundTransform:SoundTransform = new SoundTransform();
-		
-		//lower sound
-		if(!_soundMuted)
-		{	
-			if (_streamType == StreamType.YOUTUBE)
-			{
-				_volume = (Reflect.field(_youtubeLoader.content, "getVolume")() - 10) / 100;
-				Reflect.field(_youtubeLoader.content, "setVolume")(_volume * 100);
-			}
-			else if (_type == InputType.VIDEO || _streamType == StreamType.RTMP)
-			{
-				_volume = _stream.soundTransform.volume - (10/100);
-				soundTransform.volume = _volume;
-				_stream.soundTransform = soundTransform;
-			}
-			else if (_type == InputType.AUDIO)
-			{
-				_volume = _soundChannel.soundTransform.volume - (10/100);
-				soundTransform.volume = _volume;
-				_soundChannel.soundTransform = soundTransform;
-			}
-			
-			//if volume reached min is muted
-			if (_volume <= 0)
-			{
-				_soundMuted = true;
-				_volume = 0;
-			}
-		}
-		
-		//Store volume into user settings
-		_userSettings.setVolume(_volume);
-		
-		callEvents(PlayerEvents.VOLUME_DOWN);
-		return _volume;
-	}
-	//}
 	
 	
 	//{Setters
@@ -1544,24 +1333,10 @@ class Player extends EventDispatcher
 	{
 		var soundTransform:SoundTransform = new SoundTransform();
 		
-		if (volume > _volume) {
-			callEvents(PlayerEvents.VOLUME_UP);
-		}
+		
 
-		if (volume < _volume) {
-			callEvents(PlayerEvents.VOLUME_DOWN);
-		}
-
-		if (volume > 0)
-		{
-			_soundMuted = false;
-			_volume = volume;
-		}
-		else
-		{
-			_soundMuted = true;
-			_volume = 1.0;
-		}
+		_volume = volume;
+		
 		
 		soundTransform.volume = volume;
 		

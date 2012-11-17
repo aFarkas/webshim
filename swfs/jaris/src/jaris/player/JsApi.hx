@@ -108,6 +108,7 @@ class JsApi extends MovieClip {
 		ExternalInterface.addCallback("api_pause", setPause);
 		ExternalInterface.addCallback("api_seek", setSeek);
 		ExternalInterface.addCallback("api_volume", setVolume);
+		ExternalInterface.addCallback("api_muted", setMuted);
 		ExternalInterface.addCallback("api_controls", setControls);
 	
 		
@@ -202,6 +203,12 @@ class JsApi extends MovieClip {
 	{
 		_controls.forceControls(forceControls);
 	}
+	
+	private function setMuted(mute):Void
+	{
+		_player.mute(mute);
+	}
+	
 
 	
 	
@@ -218,20 +225,6 @@ class JsApi extends MovieClip {
 	 */
 	private function setVolume(vol:Float):Void
 	{
-		if (vol <= 0 && _player.getMute()!=true) {
-			_player.toggleMute();
-			_player.setVolume(0);
-			return;
-		}
-		
-		if (_player.getMute() == true) {
-			_player.toggleMute();			
-		}
-		
-		if (vol >= 1) {
-			_player.setVolume(1);
-			return;
-		}
 		
 		_player.setVolume(vol);
 	}	

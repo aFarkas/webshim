@@ -140,7 +140,6 @@ class Main
 	
 		//Draw Controls
 		var duration:String = parameters.duration != "" && parameters.duration != null? parameters.duration : "0";
-		var controlType:Int = parameters.controltype != "" && parameters.controltype != null? Std.parseInt(parameters.controltype) : 0;
 		var controlSize:Int = parameters.controlsize != "" && parameters.controlsize != null? Std.parseInt(parameters.controlsize) : 0;
 		
 		var controlColors:Array <String> = ["", "", "", "", ""];
