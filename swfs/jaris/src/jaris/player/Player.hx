@@ -845,7 +845,7 @@ class Player extends EventDispatcher
 	public function load(source:String, type:String="video", streamType:String="file", server:String=""):Void
 	{
 		
-		if(_streamType != StreamType.YOUTUBE || !_loadedYoutube){
+		if(!_mediaLoaded && (_streamType != StreamType.YOUTUBE || !_loadedYoutube)){
 			stopAndClose();
 			
 			_type = type;
@@ -885,11 +885,7 @@ class Player extends EventDispatcher
 				_stream.client = this;
 				_video.attachNetStream(_stream);
 			}
-			else if (_type == InputType.VIDEO && _streamType == StreamType.RTMP)
-			{
-				_connection.connect(_server);
-			}
-			else if (_type == InputType.AUDIO && _streamType == StreamType.RTMP)
+			else if (_streamType == StreamType.RTMP)
 			{
 				_connection.connect(_server);
 			}
@@ -903,7 +899,7 @@ class Player extends EventDispatcher
 					_firstLoad = false;
 					
 					_mediaLoaded = true;
-				} catch(error:IOError){}
+				} catch (error:IOError) { }
 			}
 		}
 	}
@@ -1098,11 +1094,8 @@ class Player extends EventDispatcher
 	public function play():Bool
 	{
 		
-		var oldPlaying:Bool;
-		trace('call play');
 		if (_mediaLoaded)
 		{
-			oldPlaying  = _isPlaying;
 			if (_mediaEndReached)
 			{
 				_mediaEndReached = false;
@@ -1121,7 +1114,9 @@ class Player extends EventDispatcher
 				else if (_type == InputType.AUDIO)
 				{
 					_checkAudioTimer.start();
+					
 					_soundChannel = _sound.play();
+					
 					setVolume(_userSettings.getVolume());
 				}
 			}
@@ -1139,17 +1134,17 @@ class Player extends EventDispatcher
 				}
 				else if (_type == InputType.AUDIO)
 				{
-					
-					//If end of audio reached start from beggining
-					if (_soundChannel.position + 100 >= _sound.length)
-					{
-						_soundChannel = _sound.play();
+					if(!_isPlaying){
+						//If end of audio reached start from beggining
+						if (_soundChannel.position + 100 >= _sound.length)
+						{
+							_soundChannel = _sound.play();
+						}
+						else 
+						{
+							_soundChannel = _sound.play(_soundChannel.position);
+						}
 					}
-					else 
-					{
-						_soundChannel = _sound.play(_soundChannel.position);
-					}
-					
 					setVolume(_userSettings.getVolume());
 					
 				}

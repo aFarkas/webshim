@@ -464,9 +464,11 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		} else {
 			loadedSwf++;
 		}
+		var isRtmp = canPlaySrc.type == 'audio/rtmp' || canPlaySrc.type == 'video/rtmp';
 		var vars = $.extend({}, options.vars, {
 				poster: $.prop(elem, 'poster') || '',
-				source: canPlaySrc.srcProp
+				source: canPlaySrc.streamId || canPlaySrc.srcProp,
+				server: canPlaySrc.server || ''
 		});
 		var elemVars = $(elem).data('vars') || {};
 		
@@ -476,6 +478,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		
 		var hasControls = $.prop(elem, 'controls');
 		var elemId = 'jarisplayer-'+ webshims.getID(elem);
+		
 		var params = $.extend(
 			{},
 			options.params,
@@ -582,16 +585,18 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 				} else {
 					data.currentTime = jaris.position;
 					
-					if(!data._calledMeta && isNaN(jaris.duration) && data.duration != jaris.duration && isNaN(data.duration)){
-						onEvent.onDataInitialized(jaris, data);
-					}
-					
-					if(!data._ppFlag && jaris.type != 'onPlayPause'){
-						onEvent.onPlayPause(jaris, data);
-					}
-					
-					if(onEvent[jaris.type]){
-						onEvent[jaris.type](jaris, data);
+					if(data.api){
+						if(!data._calledMeta && isNaN(jaris.duration) && data.duration != jaris.duration && isNaN(data.duration)){
+							onEvent.onDataInitialized(jaris, data);
+						}
+						
+						if(!data._ppFlag && jaris.type != 'onPlayPause'){
+							onEvent.onPlayPause(jaris, data);
+						}
+						
+						if(onEvent[jaris.type]){
+							onEvent[jaris.type](jaris, data);
+						}
 					}
 					data.duration = jaris.duration;
 				}
@@ -603,21 +608,23 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			{
 				id: elemId,
 				evtId: data.id,
-				controls: ''+$.prop(elem, 'controls'),
-				autostart: 'false'
+				controls: ''+hasControls,
+				autostart: 'false',
+				nodename: elemNodeName
 			},
 			elemVars
 		);
 		
-		if(canPlaySrc.type == 'audio/mpeg' || canPlaySrc.type == 'audio/mp3'){
+		if(isRtmp){
+			vars.streamtype = 'rtmp';
+		} else if(canPlaySrc.type == 'audio/mpeg' || canPlaySrc.type == 'audio/mp3'){
 			vars.type = 'audio';
 			vars.streamtype = 'file';
-			//controls=false&jsapi=true&
 		} else if(canPlaySrc.type == 'video/youtube'){
 			vars.streamtype = 'youtube';
 		}
 		options.changeSWF(vars, elem, canPlaySrc, data, 'embed');
-		clearInterval(data.flashBlock);
+		clearTimeout(data.flashBlock);
 		swfobject.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.0", false, vars, params, attrs, function(swfData){
 			
 			if(swfData.success){

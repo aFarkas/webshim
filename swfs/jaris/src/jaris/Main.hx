@@ -149,7 +149,7 @@ class Main
 		controlColors[3] = parameters.hovercolor != null ? parameters.hovercolor : "";
 		controlColors[4] = parameters.seekcolor != null ? parameters.seekcolor : "";
 		
-		var controls:NewControls = new NewControls(player, parameters.controls);
+		var controls:NewControls = new NewControls(player, parameters.controls, parameters.nodename);
 		controls.setDurationLabel(duration);
 		controls.setControlColors(controlColors);
 		controls.setControlSize(controlSize);

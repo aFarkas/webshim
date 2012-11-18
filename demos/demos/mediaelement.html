@@ -506,6 +506,18 @@ $("video.my-video").loadMediaSrc(
 			
 			<section>
 				<h2>How to...</h2>
+				<h3>Playing <abbr title="HTTP Live Streams">HLS</abbr>/<abbr title="Real Time Messaging Protocol">RTMP</abbr> Streams</h3>
+<code class="block">
+&lt;video poster="poster.jpg"&gt;
+	&lt;!-- Mac OS / iOS HLS Streaming --&gt;
+	&lt;source src="http://server.com/path/file.m3u8" type="application/x-mpegURL" /&gt;
+	&lt;!-- rtmp streaming: using the data-server attribute --&gt;
+	&lt;source data-server="rtmp://server.com/path/" src="file.mp4" type="video/rtmp" /&gt;
+	&lt;!-- rtmp streaming: using an identifier (i.e.: mp4:) --&gt;
+	&lt;source src="rtmp://server.com/path/identifier:file.mp4" type="video/rtmp" /&gt;
+&lt;/video&gt;
+</code>
+
 				<h3>Styling the video/audio elements</h3>
 				<h4>Setting dimensions</h4>
 				<p>Webshims lib does not use the width/height content attributes to get the dimensions of your audio/video elements. Instead webshims lib mediaelement implementation only looks for the CSS styles.</p>
@@ -513,20 +525,7 @@ $("video.my-video").loadMediaSrc(
 				
 				<h4>Using additional styles (margin, background, float etc.)</h4>
 				<p>Additional styles like margin, float etc. are not transferred from the audio/video element to the flash-fallback. The best way to use margin, float and other styles is to use an additional wrapper for your mediaelement.</p>
-				<h4>Having controls at bottom and not over the video in JWPlayer</h4>
-				<p>The position of the controls can be configured, using either the general setOptions method or by using the data-vars attribute:</p>
-				
-<code class="block">
-$.webshims.setOptions('mediaelement', {
-	vars: {
-		controlbar: 'bottom'
-	}
-});
-</code>
 
-<code class="block">
-&lt;video data-vars='{"controlbar": "bottom"}' src="my-file.webm" controls&gt;&lt;/video&gt;
-</code>
 				<h4>Using custom styleable controls</h4>
 				<p>Webshims lib does not provide custom styleable controls out of the box. Instead webshims lib polyfills the HTML5 API, so that you can easily build your own controls. Simply have a look into the source code of this site, to see how we have build the controls in our demo. If you are interested in a ready-to-use solution for CSS styleable controls, try <a href="https://github.com/aFarkas/jMediaelement">JME2</a>. JME2 works in all HTML5 browsers without a polyfill and in all browsers including IE6 in conjunction with webshims lib.</p>
 				<h4>Updating JWPlayer/Using licensed JWPlayer</h4>

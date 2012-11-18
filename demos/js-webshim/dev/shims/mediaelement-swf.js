@@ -554,10 +554,13 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		}
 		var vars = $.extend({}, options.vars, {
 				image: $.prop(elem, 'poster') || '',
-				file: canPlaySrc.srcProp
+				file: canPlaySrc.streamId || canPlaySrc.srcProp
 		});
 		var elemVars = $(elem).data('vars') || {};
 		
+		if(canPlaySrc.server){
+			vars.streamer = canPlaySrc.server;
+		}
 		if(!data){
 			data = webshims.data(elem, 'mediaelement');
 		}

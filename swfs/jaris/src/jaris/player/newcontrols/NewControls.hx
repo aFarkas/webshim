@@ -89,15 +89,17 @@ class NewControls extends MovieClip {
 	private var _textFormat:TextFormat;
 	private var _forceHideControls:Bool;
 	private var _shouldBeVisible:Bool;
+	private var _nodeName:String;
 	//}
 	
 	
 	//{Constructor
-	public function new(player:Player, forceHideControls)
+	public function new(player:Player, forceHideControls, nodeName)
 	{
 		super();
 		
 		//{Main variables
+		_nodeName = nodeName;
 		_stage = Lib.current.stage;
 		_movieClip = Lib.current;
 		_player = player;
@@ -131,7 +133,7 @@ class NewControls extends MovieClip {
 		_controlsBar.addChild(_pauseControl);
 		
 		
-		if(_player.getType() != InputType.AUDIO){
+		if(_nodeName == 'video'){
 			_fullscreenControl = new FullscreenIcon(0, 0, 0, 0, _controlColor, _hoverColor);
 			_controlsBar.addChild(_fullscreenControl);
 		}
@@ -222,7 +224,7 @@ class NewControls extends MovieClip {
 		_track.addEventListener(MouseEvent.CLICK, onTrackClick);
 		_playControl.addEventListener(MouseEvent.CLICK, onPlayClick);
 		_pauseControl.addEventListener(MouseEvent.CLICK, onPauseClick);
-		if(_player.getType() != InputType.AUDIO){
+		if(_nodeName == 'video'){
 			_fullscreenControl.addEventListener(MouseEvent.CLICK, onFullscreenClick);
 		}
 		
@@ -660,7 +662,7 @@ class NewControls extends MovieClip {
 		var barHeight = _controlSize;
 		var barCenter = barWidth / 2;
 		var buttonSize = Std.int(((80 / 100) * (barHeight - (barMargin*2))));
-		var buttonCount = (_player.getType() != InputType.AUDIO) ? 2 : 1;
+		var buttonCount = (_nodeName == 'video') ? 2 : 1;
 		_controlsBar.x = 0;
 		_controlsBar.y = (_stage.stageHeight - barHeight);
 		
@@ -752,7 +754,7 @@ class NewControls extends MovieClip {
 		
 				
 		//Draw fullscreen button
-		if(_player.getType() != InputType.AUDIO){
+		if(_nodeName == 'video'){
 			_fullscreenControl.setNormalColor(_controlColor);
 			_fullscreenControl.setHoverColor(_hoverColor);
 			_fullscreenControl.setPosition(_volumeIcon.x + _volumeIcon.width + barMargin, _playControl.y+1);
@@ -825,7 +827,7 @@ class NewControls extends MovieClip {
 		{
 			if (_forceHideControls) {
 				_controlsBar.visible = false;
-			} else {
+			} else if(_nodeName == 'video') {
 				drawControls();
 				Animation.slideOut(_controlsBar, "bottom", 800);
 			}
