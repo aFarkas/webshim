@@ -11,7 +11,7 @@
 	<iframe src="index.html" style="width: 80%; height: 550px;"></iframe>
 	
 	
-	<iframe src="load-test.html?notrycatch=true" style="width: 80%; height: 150px;"></iframe>
+	
 	
 	<script>
 		if(location.href.indexOf('http://127.0.0.1:8000/webshim/') === 0){
@@ -21,8 +21,10 @@
 	
 	<script>
 		//performance
-		if(!$.browser.msie || $.browser.version > 8){
+		if(!$.browser.msie || parseInt($.browser.version, 10) > 8){
 			document.write('<iframe src="jquery\/index.html" style="width: 80%; height: 250px;"><\/iframe>');
+			document.write('<iframe src="load-test.html?notrycatch=true" style="width: 80%; height: 150px;"><\/iframe>');
+			
 		} else {
 			document.write('<p><a href="jquery\/index.html">jQuery tests<\/a><\/p>');
 		}

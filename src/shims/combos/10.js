@@ -1197,8 +1197,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						docObserve.width = width;
 						docObserve.handler({type: 'docresize'});
 						docObserve.runs++;
-						if(docObserve.runs < 30){
-							setTimeout(docObserve.test, 30);
+						if(docObserve.runs < 9){
+							setTimeout(docObserve.test, 90);
 						}
 					} else {
 						docObserve.runs = 0;
@@ -1242,7 +1242,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						this._create();
 						this.height = docObserve.getHeight();
 						this.width = docObserve.getWidth();
-						setInterval(this.test, 400);
+						setInterval(this.test, 600);
 						$(this.test);
 						webshims.ready('WINDOWLOAD', this.test);
 						$(window).bind('resize', this.handler);
@@ -1254,7 +1254,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 								clearTimeout(animationTimer);
 								animationTimer = setTimeout(function(){
 									docObserve.test();
-								}, 19);
+								}, 99);
 								
 								return oldAnimate.apply(this, arguments);
 							};
