@@ -1422,9 +1422,7 @@ if($.browser.webkit && Modernizr.inputtypes.date){
 			});
 			
 			$(document).on('change', function(e){
-				isChangeSubmit = true;
 				correctValue(e.target);
-				isChangeSubmit = false;
 			});
 			
 		})();
