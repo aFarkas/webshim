@@ -75,6 +75,17 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.9.4
+----------
+
+- improved rtmp handling for both Jaris and JW player
+- fixed bug on iOS in conjunction with input[type=date]
+- fixed creditcard validation
+- allow placeholder for type=number
+- show mediaelement fallback, if flash isn't installed and mediaelements aren't supported
+- a lot of improvements to the free and open source swf media player Jaris (we will switch to Jaris by default with next release)
+
+
 Release 1.9.3
 ----------
 
@@ -101,17 +112,3 @@ Release 1.9.1
 - added swedish locale (thx to @leon)
 - improved errorbubble style
 - updated JW player
-
-Release 1.9.0
-----------
-
-- basic but powerfull track-element including corresponding [DOM- and JS-API](http://jsfiddle.net/trixta/QZJTM/)
-- input[form] support: for associating form field using the form attribute (input[form]/select[form] ...)
-- implemented youtube iframe support for video element
-- better input widget calculation in responsive websites
-- elements property for fieldset element
-- allow placeholder on input[type="date"]. (as a hint for the dateformat, but use data-placeholder, instead of placeholder!)
-- added opus -> mime-type detection for audio
-- fixed regression for using an initial value with input[type="date"]. (introduced in 1.8.11)
-- update Modernizr to 2.6.2/jQuery UI to 1.8.23
-- jQuery 1.6.x not supported anymore, use 1.7.2+ or 1.8.1+ (but we will have legacy support for webshims 1.8.x)
