@@ -409,7 +409,7 @@ $.webshims.polyfill(polyfillFeatures);
 							<label><input type="checkbox" checked id="canvas" data-mod="canvas" /> canvas</label>
 							<label><input type="checkbox" checked id="forms" data-mod="input inputtypes" data-features='["forms", "forms-ext"]' /> forms/forms-ext</label> 
 							<label><input type="checkbox" checked id="mediaelement" data-mod="audio video elem_track" data-features='["mediaelement", "track"]' /> mediaelement/track</label> 
-							<label><input type="checkbox" checked id="localstorage" data-mod="localstorage sessionstorage" /> json-storage</label> 
+							<label><input type="checkbox" checked id="json-storage" data-mod="localstorage sessionstorage" /> json-storage</label> 
 							<label><input type="checkbox" checked id="geolocation" data-mod="geolocation" data-dependent="localstorage" /> geolocation</label> 
 							<label><input type="checkbox" checked id="details" /> details</label> 
 							<p>
@@ -418,8 +418,8 @@ $.webshims.polyfill(polyfillFeatures);
 						</fieldset>
 						<fieldset class="modernizr">
 							<legend>Modernizr build</legend>
-							<label><input type="checkbox" checked data-mod="shiv" /> HTML5shiv (you need HTML5shiv for sectioning elements in IE)</label>
-							<label><input type="checkbox" checked data-mod="load" /> Modernizr.load/yepnope (you need either yepnope or requirejs)</label> 
+							<div><label><input type="checkbox" checked data-mod="shiv" /> HTML5shiv (you need HTML5shiv for sectioning elements in IE)</label></div>
+							<div><label><input type="checkbox" checked data-mod="load" /> Modernizr.load/yepnope (you need either yepnope or requirejs)</label></div>
 							<p>
 								<a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track-load" data-base="http://modernizr.com/download/#-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes" class="modernizr-builder">Modernizr build link</a>
 								<br />

@@ -846,7 +846,7 @@
 	});
 		
 	
-	//<localstorage
+	//<json-storage
 	needModernizr('localstorage');
 	addPolyfill('json-storage', {
 		test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
@@ -856,7 +856,7 @@
 		noAutoCallback: true,
 		c: [14]
 	});
-	//>localstorage
+	//>json-storage
 	
 	
 	//<geolocation
