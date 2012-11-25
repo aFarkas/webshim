@@ -118,6 +118,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 //			}
 			
 			if(!listSupport){
+				
 				inputListProto['list'] = {
 					attr: {
 						get: function(){
@@ -128,6 +129,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 							var elem = this;
 							webshims.contentAttr(elem, 'list', value);
 							webshims.objectCreate(shadowListProto, undefined, {input: elem, id: value, datalist: $.prop(elem, 'list')});
+							$(elem).triggerHandler('listdatalistchange');
 						}
 					},
 					initAttr: true,
@@ -171,6 +173,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 							var elem = this;
 							$.data(elem, 'datalistListAttr', value);
 							webshims.objectCreate(shadowListProto, undefined, {input: elem, id: value, datalist: $.prop(elem, 'list')});
+							$(elem).triggerHandler('listdatalistchange');
 						}
 					},
 					initAttr: true,
@@ -183,16 +186,25 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				
 			webshims.defineNodeNameProperties('input', inputListProto);
 			
-			if($.event.customEvent){
-				$.event.customEvent.updateDatalist = true;
-				$.event.customEvent.updateInput = true;
-				$.event.customEvent.datalistselect = true;
-			} 
+			$.event.customEvent.updateDatalist = true;
+			$.event.customEvent.updateInput = true;
+			$.event.customEvent.datalistselect = true;
+			$.event.customEvent.listdatalistchange = true;
+			
 			webshims.addReady(function(context, contextElem){
 				contextElem
 					.filter('datalist > select, datalist, datalist > option, datalist > select > option')
 					.closest('datalist')
-					.triggerHandler('updateDatalist')
+					.each(function(){
+						var id = $.prop(this, 'id');
+						$(this).triggerHandler('updateDatalist');
+						if(id){
+							$('input[id="'+ id +'"]').each(function(){
+								$(this).triggerHandler('listdatalistchange');
+							});
+						}
+					})
+					
 				;
 				
 			});

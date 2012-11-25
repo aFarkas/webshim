@@ -299,10 +299,9 @@
 					fn($, webshims, window, document, undefined, module.options);
 					isReady(name, true);
 				};
-				if (module.d) {
+				if (module.d && module.d.length) {
 					onReady(module.d, ready);
-				}
-				else {
+				} else {
 					ready();
 				}
 			}
@@ -1026,6 +1025,7 @@
 			test: function(toLoad){
 				return this.uiTest();
 			},
+			methodNames: ['stepUp', 'stepDown'],
 			d: ['forms', DOMSUPPORT],
 			c: [18, 7, 6]
 		});
@@ -1043,6 +1043,7 @@
 			options: {
 				stepArrows: {number: 1, time: 1}, 
 				calculateWidth: true,
+				rangeOpts: {},
 				slider: {},
 				datepicker: {},
 				langSrc: uiLib+'i18n/jquery.ui.datepicker-',
