@@ -1867,7 +1867,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			webshims.error('Could not parse rtmp url');
 		}
 		data.streamId = data.streamId.join('/');
-		console.log(data)
 	};
 	var getSrcObj = function(elem, nodeName){
 		elem = $(elem);
