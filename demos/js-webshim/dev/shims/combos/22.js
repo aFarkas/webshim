@@ -948,7 +948,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			webshims.error('Could not parse rtmp url');
 		}
 		data.streamId = data.streamId.join('/');
-		console.log(data)
 	};
 	var getSrcObj = function(elem, nodeName){
 		elem = $(elem);
@@ -1954,7 +1953,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			loadedSwf++;
 		}
 		var vars = $.extend({}, options.vars, {
-				image: $.prop(elem, 'poster') || '',
+				image: $.attr(elem, 'poster') && $.prop(elem, 'poster') || '',
 				file: canPlaySrc.streamId || canPlaySrc.srcProp
 		});
 		var elemVars = $(elem).data('vars') || {};

@@ -466,7 +466,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		}
 		var isRtmp = canPlaySrc.type == 'audio/rtmp' || canPlaySrc.type == 'video/rtmp';
 		var vars = $.extend({}, options.vars, {
-				poster: $.prop(elem, 'poster') || '',
+				poster: $.attr(elem, 'poster') && $.prop(elem, 'poster') || '',
 				source: canPlaySrc.streamId || canPlaySrc.srcProp,
 				server: canPlaySrc.server || ''
 		});
