@@ -62,7 +62,9 @@ jQuery.webshims.register('form-base-ui', function($, webshims, window, document,
 		}
 		return options;
 	};
-	
+	var stopPropagation = function(e){
+		e.stopImmediatePropagation(e);
+	};
 	var implementType = function(){
 		var type = $.prop(this, 'type');
 		
@@ -75,16 +77,17 @@ jQuery.webshims.register('form-base-ui', function($, webshims, window, document,
 				orig: this,
 				options: getOptions(this, data),
 				slide: function(val){
-					stopCircular = true;
-					$.prop(opts.orig, 'value', val);
-					stopCircular = false;
+					opts._change(val);
 					$(opts.orig).trigger('input');
 				},
 				change: function(val){
+					opts._change(val);
+					$(opts.orig).trigger('change');
+				},
+				_change: function(val){
 					stopCircular = true;
 					$.prop(opts.orig, 'value', val);
 					stopCircular = false;
-					$(opts.orig).trigger('change');
 				}
 			});
 			
@@ -95,6 +98,17 @@ jQuery.webshims.register('form-base-ui', function($, webshims, window, document,
 			webshims.addShadowDom(this, data.shim.element, {
 				data: data.shim || {}
 			});
+			
+			data.shim.element.on('change input', stopPropagation);
+			data.shim.element.on('focusin focusout', function(e){
+				e.stopImmediatePropagation(e);
+				$(opts.orig).trigger(e);
+			});
+			data.shim.element.on('focus blur', function(e){
+				e.stopImmediatePropagation(e);
+				$(opts.orig).triggerHandler(e);
+			});
+			
 			
 			//options.calculateWidth
 		}

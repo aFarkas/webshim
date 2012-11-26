@@ -19,9 +19,8 @@
 			this.thumbStyle = this.thumb[0].style;
 			this.element.addClass('ws-range').attr({role: 'slider'}).html(this.thumb);
 			this.updateMetrics();
-			this.options.min = retDefault(this.options.min, 0);
-			this.options.max = retDefault(this.options.max, 100);
-			this.options.step = this.options.step == 'any' ? 'any' : retDefault(this.options.step, 1);
+			
+			this.orig = this.options.orig;
 			
 			for(i = 0; i < createOpts.length; i++){
 				this[createOpts[i]](this.options[createOpts[i]]);
@@ -38,7 +37,9 @@
 			var left;
 			var oVal = val;
 			if(!_noNormalize && parseFloat(val, 10) != val){
-				val = (this.options.max - this.options.min) / 2;
+				val = this.options.min + ((this.options.max - this.options.min) / 2);
+				
+				
 			}
 			
 			if(!_noNormalize){
@@ -46,20 +47,10 @@
 			}
 			left =  this.maxLeft * ((val - this.options.min) / (this.options.max - this.options.min));
 			
-			/*
-			max = 5;
-			min = 1;
-			
-			val = 1; //-> 0
-			val = 3 // 0.5
-			val = 8 // -> 1
-			*/
-			//this.options.min + this.options.max // 16
-			
 			this.options.value = val;
 			this.thumbStyle.left = left+'px';
-			if(this.orig && oVal != val){
-				this.orig.value = val;
+			if(this.orig && (oVal != val || (!this._init && this.orig.value != val)) ){
+				this.options._change(val);
 			}
 			this.element.attr({
 				'aria-valuenow': this.options.value,
@@ -176,9 +167,10 @@
 			return [val, pos];
 		},
 		addBindings: function(){
-			var x, l;
+			var x, l, hasFocus;
 			var that = this;
 			var o = this.options;
+			
 			var eventTimer = (function(){
 				var events = {};
 				return {
@@ -219,18 +211,20 @@
 				var nl = l + e.pageX - x;
 				setValueFromPos(nl, e.pageX);
 			};
-			var remove = function(){
+			var remove = function(e){
+				if(e && e.type == 'mouseup'){
+					eventTimer.call('input', o.value);
+					eventTimer.call('change', o.value);
+				}
 				that.element.removeClass('ws-active');
 				$(document).off('mousemove', move).off('mouseup', remove);
-				eventTimer.init('input', o.value);
-				eventTimer.call('change', o.value);
 			};
 			var add = function(e){
 				if(!o.readonly && !o.disabled){
 					x = e.pageX;
 					l = parseFloat(that.thumb.css('left'), 10);
 					remove();
-					that.element.focus().addClass('ws-active');
+					that.element.addClass('ws-active');
 					$(document).on({
 						mouseup: remove,
 						mousemove: move
@@ -246,34 +240,43 @@
 				mousedown: function(e){
 					if(!o.readonly && !o.disabled){
 						var eX = e.pageX;
-						var offset = that.element.addClass('ws-active').offset().left;
-						eventTimer.init('input', o.value);
-						eventTimer.init('change', o.value);
+						var offset = that.element.focus().addClass('ws-active').offset().left;
 						setValueFromPos(eX - offset - (that.thumbWidth / 2), eX);
 						add(e);
-						
 						return false;
 					}
 					e.preventDefault();
 				},
 				focus: function(e){
 					if(!o.disabled){
+						eventTimer.init('input', o.value);
 						eventTimer.init('change', o.value);
 						that.element.addClass('ws-focus');
 					}
+					hasFocus = true;
 				},
 				blur: function(e){
 					that.element.removeClass('ws-focus ws-active');
+					hasFocus = false;
+					eventTimer.init('input', o.value);
+					eventTimer.call('change', o.value);
 				},
 				keyup: function(){
 					that.element.removeClass('ws-active');
 					eventTimer.call('input', o.value);
 					eventTimer.call('change', o.value);
 				},
+				mousewheel: function(e, delta){
+					if(delta && hasFocus && !o.readonly && !o.disabled){
+						that.doStep(delta);
+						e.preventDefault();
+						eventTimer.call('input', o.value);
+					}
+				},
 				keypress: function(e){
 					var step = true;
 					var code = e.keyCode;
-					if (!o.readonly && !o.disabled) {
+					if(!o.readonly && !o.disabled){
 						if (code == 39 || code == 38) {
 							that.doStep(1);
 						}
@@ -299,7 +302,10 @@
 				}
 			});
 			this.thumb.on({
-				mousedown: add
+				mousedown: function(e){
+					that.element.focus();
+					add(e);
+				}
 			});
 		},
 		updateMetrics: function(){
@@ -319,7 +325,7 @@
 	};
 	
 	$.fn.rangeUI = function(opts){
-		opts = $.extend({readonly: false, disabled: false, tabindex: 0, min: 0, step: 1, max: 100, value: 50, input: $.noop, change: $.noop, showLabels: true}, opts);
+		opts = $.extend({readonly: false, disabled: false, tabindex: 0, min: 0, step: 1, max: 100, value: 50, input: $.noop, change: $.noop, _change: $.noop, showLabels: true}, opts);
 		return this.each(function(){
 			$.webshims.objectCreate(rangeProto, {
 				element: {
