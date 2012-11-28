@@ -15,9 +15,11 @@
 		_create: function(){
 			var i;
 			
-			this.thumb = $('<span class="ws-range-thumb" />');
+			
+			this.element.addClass('ws-range').attr({role: 'slider'}).html('<span class="ws-range-rail"><span class="ws-range-thumb" /></span>');
+			this.trail = $('.ws-range-rail', this.element);
+			this.thumb = $('.ws-range-thumb', this.trail);
 			this.thumbStyle = this.thumb[0].style;
-			this.element.addClass('ws-range').attr({role: 'slider'}).html(this.thumb);
 			this.updateMetrics();
 			
 			this.orig = this.options.orig;
@@ -33,22 +35,25 @@
 			this._init = true;
 		},
 		value: $.noop,
-		_value: function(val, _noNormalize){
+		_value: function(val, _noNormalize, animate){
 			var left;
 			var oVal = val;
 			if(!_noNormalize && parseFloat(val, 10) != val){
 				val = this.options.min + ((this.options.max - this.options.min) / 2);
-				
-				
 			}
 			
 			if(!_noNormalize){
 				val = this.normalizeVal(val);
 			}
-			left =  this.maxLeft * ((val - this.options.min) / (this.options.max - this.options.min));
+			left =  100 * ((val - this.options.min) / (this.options.max - this.options.min));
 			
 			this.options.value = val;
-			this.thumbStyle.left = left+'px';
+			if(!animate){
+				this.thumb.stop();
+				this.thumbStyle.left = left+'%';
+			} else {
+				this.thumb.stop(true).animate({left: left+'%'}, {animate: this.options.animate});
+			}
 			if(this.orig && (oVal != val || (!this._init && this.orig.value != val)) ){
 				this.options._change(val);
 			}
@@ -61,20 +66,18 @@
 			var o = this.options;
 			var min = o.min;
 			var max = o.max;
-			var maxLeft = this.maxLeft;
-			var correctLeft = (this.thumbWidth / 2);
-			var element = this.element;
+			var trail = this.trail;
 			o.options = opts || {};
 			
 			this.element.attr({'aria-valuetext': o.options[o.value] || o.value});
-			$('span.ws-range-ticks', this.element).remove();
+			$('.ws-range-ticks', trail).remove();
 			
 			
 			$.each(opts, function(val, label){
 				if(!isNumber(val) || val < min || val > max){return;}
-				var left =  (maxLeft * ((val - min) / (max - min))) + correctLeft;
+				var left = 100 * ((val - min) / (max - min));
 				var title = o.showLabels ? ' title="'+ label +'"' : '';
-				element.append('<span class="ws-range-ticks"'+ title +' style="left: '+left+'px;" />');
+				trail.append('<span class="ws-range-ticks"'+ title +' style="left: '+left+'%;" />');
 			});
 		},
 		readonly: function(val){
@@ -134,18 +137,23 @@
 			return val;
 		},
 		doStep: function(factor){
-			this.value( this.options.value + (retDefault(this.options.step, 1) * factor) );
+			var step = retDefault(this.options.step, 1);
+			if(this.options.step == 'any'){
+				step = Math.min(step, (this.options.max - this.options.min) / 10);
+			}
+			this.value( this.options.value + (step * factor) );
 			
 		},
 		 
 		getStepedValueFromPos: function(pos){
 			var val, valModStep, alignValue, step;
-			if(pos < 0){
+			
+			if(pos <= 0){
 				val = this.options.min;
-			} else if(pos > this.maxLeft) {
+			} else if(pos > 100) {
 				val = this.options.max;
 			} else {
-				val = ((this.options.max - this.options.min) * (pos / this.maxLeft)) + this.options.min;
+				val = ((this.options.max - this.options.min) * (pos / 100)) + this.options.min;
 				step = this.options.step;
 				if(step != 'any'){
 					valModStep = (val - this.options.min) % step;
@@ -159,15 +167,10 @@
 				}
 			}
 			
-			if (val == this.options.max) {
-				pos = this.maxLeft;
-			}else if (val == this.options.min){
-				pos = 0;
-			}
-			return [val, pos];
+			return val;
 		},
 		addBindings: function(){
-			var x, l, hasFocus;
+			var leftOffset, widgetUnits, hasFocus;
 			var that = this;
 			var o = this.options;
 			
@@ -198,55 +201,47 @@
 				};
 			})();
 			
-			var setValueFromPos = function(pos, pX){
-				var val = that.getStepedValueFromPos(pos);
-				if(val[0] != o.value){
-					x = pX;
-					l = val[1];
-					that.value(val[0]);
-					eventTimer.call('input', val[0]);
+			var setValueFromPos = function(e, animate){
+				var val = that.getStepedValueFromPos((e.pageX - leftOffset) * widgetUnits);
+				if(val != o.value){
+					
+					that.value(val, false, animate);
+					eventTimer.call('input', val);
 				}
 			};
-			var move = function(e){
-				var nl = l + e.pageX - x;
-				setValueFromPos(nl, e.pageX);
-			};
+			
 			var remove = function(e){
 				if(e && e.type == 'mouseup'){
 					eventTimer.call('input', o.value);
 					eventTimer.call('change', o.value);
 				}
 				that.element.removeClass('ws-active');
-				$(document).off('mousemove', move).off('mouseup', remove);
+				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
 			};
 			var add = function(e){
-				if(!o.readonly && !o.disabled){
-					x = e.pageX;
-					l = parseFloat(that.thumb.css('left'), 10);
-					remove();
-					that.element.addClass('ws-active');
-					$(document).on({
-						mouseup: remove,
-						mousemove: move
-					});
-				}
 				e.preventDefault();
+				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
+				if(!o.readonly && !o.disabled){
+					leftOffset = (that.element.focus().addClass('ws-active').offset() || {left: false}).left;
+					widgetUnits = that.element.width();
+					if(!widgetUnits || leftOffset === false){return;}
+					widgetUnits = 100 / (widgetUnits  - ((that.thumb.outerWidth() || 2) / 2));
+					setValueFromPos(e, that.options.animate);
+					$(document)
+						.on({
+							mouseup: remove,
+							mousemove: setValueFromPos
+						})
+					;
+					e.stopPropagation();
+				}
 			};
 			
 			eventTimer.init('input', o.value, this.options.slide);
 			eventTimer.init('change', o.value, this.options.change);
 			
 			this.element.on({
-				mousedown: function(e){
-					if(!o.readonly && !o.disabled){
-						var eX = e.pageX;
-						var offset = that.element.focus().addClass('ws-active').offset().left;
-						setValueFromPos(eX - offset - (that.thumbWidth / 2), eX);
-						add(e);
-						return false;
-					}
-					e.preventDefault();
-				},
+				mousedown: add,
 				focus: function(e){
 					if(!o.disabled){
 						eventTimer.init('input', o.value);
@@ -302,25 +297,11 @@
 				}
 			});
 			this.thumb.on({
-				mousedown: function(e){
-					that.element.focus();
-					add(e);
-				}
+				mousedown: add
 			});
 		},
 		updateMetrics: function(){
-			var rangeWidth, thumbWidth;
-			if(this._init){
-				rangeWidth = this.rangeWidth;
-				thumbWidth = this.thumbWidth;
-			}
-			this.rangeWidth = this.element.innerWidth();
-			this.thumbWidth = this.thumb.outerWidth();
-			this.maxLeft = this.rangeWidth - this.thumbWidth;
-			if(this._init && (rangeWidth != this.rangeWidth || thumbWidth != this.thumbWidth)){
-				this.value(this.options.value);
-				this.list(this.options.options);
-			}
+			
 		}
 	};
 	

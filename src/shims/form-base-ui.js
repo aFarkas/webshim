@@ -73,8 +73,9 @@ jQuery.webshims.register('form-base-ui', function($, webshims, window, document,
 			data = {};
 			optsName = type+'Opts';
 			//todo: do we need deep extend?
-			opts = $.extend({}, options[optsName], $(this).data(optsName) || {}, {
+			opts = $.extend({}, options[optsName], $(this).data(type) || {}, {
 				orig: this,
+				type: type,
 				options: getOptions(this, data),
 				slide: function(val){
 					opts._change(val);
@@ -95,6 +96,7 @@ jQuery.webshims.register('form-base-ui', function($, webshims, window, document,
 				opts[copyProps[i]] = $.prop(this, copyProps[i]);
 			}
 			data.shim = inputTypes[type]._create(opts);
+			
 			webshims.addShadowDom(this, data.shim.element, {
 				data: data.shim || {}
 			});
@@ -122,11 +124,11 @@ jQuery.webshims.register('form-base-ui', function($, webshims, window, document,
 		});
 	}
 	
-	if(false && !modernizrInputTypes.number || options.replaceUI){
+	if(!modernizrInputTypes.number || options.replaceUI){
 		extendType('number', {
 			_create: function(opts, set){
 				//
-				return $('<span />').insertAfter(opts.orig).spinbtnUI(opts).data('numberUi');
+				return $('<input type="text" style="border: 1px solid #f00;" />').insertAfter(opts.orig).spinbtnUI(opts).data('numberUi');
 			}
 		});
 	}

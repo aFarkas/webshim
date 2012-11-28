@@ -98,15 +98,13 @@ mark {
 }
 
 /* reset */
-.input-range .ui-slider-range,
+.ws-range,
+.ws-range *,
 .placeholder-box,
 .placeholder-text,
 .input-datetime-local,
 .step-controls,
 .step-controls span,
-.input-range,
-.input-range .ui-slider-handle,
-.input-range .ui-slider-range,
 .details-open-indicator {
 	margin: 0;
 	padding: 0;
@@ -301,79 +299,89 @@ img.ui-datepicker-trigger {
 }
 
 /* range */
-.input-range {
+.ws-range {
 	position: relative;
 	display: inline-block;
 	vertical-align: middle;
-	margin: 5px 0;
+	margin: 0;
 	zoom: 1;
 	border: none;
-	height: 9px;
+	height: 19px;
 	width: 155px;
 	border-radius: 1px;
-	background: url(forms.png) 0 -43px no-repeat;
+	background: url(forms.png) 0 -40px no-repeat;
 	cursor: pointer;
 	font-size: 0;
 	line-height: 0;
 }
-.polyfill-important .input-range {
+.ws-range-rail {
+	position: relative;
+	display: block;
+	height: 100%;
+	width: auto;
+	margin: 0 5px;
+}
+.polyfill-important .ws-range {
 	display: inline-block !important;
 	padding: 0 !important;
 	font-size: 0 !important;
 }
-.input-range .ui-slider-handle {
+.ws-range .ws-range-thumb {
 	top: 0;
 	position: absolute;
 	display: block;
 	z-index: 4;
 	overflow: hidden;
-	margin: -5px 0 0 -8px;
+	margin: -2px 0 0 -6px;
 	height: 22px;
-	width: 17px;
-	background: url(forms.png) 0 0 no-repeat;
+	width: 11px;
+	background: url(forms.png) -3px 0 no-repeat;
 	cursor: pointer;
 	outline: none;
 	font-size: 0;
 	line-height: 0;
 }
-.input-range .ui-slider-handle:hover,
-.input-range .ui-slider-handle:focus {
-	background-position: -17px 0;
+.ws-range .ws-range-thumb:hover,
+.ws-range:focus .ws-range-thumb {
+	background-position: -20px 0;
 }
-.input-range .ui-slider-handle.ui-state-active {
-	background-position: -34px 0;
+.ws-range.ws-active .ws-range-thumb {
+	background-position: -37px 0;
 }
-.input-range.ui-slider-disabled {
+.ws-range[aria-disabled="true"],
+.ws-range[aria-readonly="true"] {
 	cursor: default;
 	opacity: 0.95;
 }
-.input-range.ui-slider-disabled .ui-slider-handle {
+.ws-range[aria-disabled="true"] .ws-range-thumb {
 	cursor: default;
-	background-position: -51px 0;
+	background-position: -54px 0;
 }
-.input-range .ui-slider-range {
+.ws-range .ws-range-min {
 	position: absolute;
 	z-index: 1;
 	overflow: hidden;
 	display: block;
 	background: #b6e2fb;
 }
-.input-range .input-range .ui-slider-range,
-.polyfill-important .input-range .ui-slider-handle {
+.ws-range .ws-range-min {
 	position: absolute !important;
 	display: block !important;
 	padding: 0 !important;
-}
-.input-range.ui-slider-horizontal .ui-slider-range {
 	top: 4px;
 	height: 1px;
-}
-.input-range.ui-slider-horizontal .ui-slider-range-min {
 	left: 0;
 }
-.input-range.ui-slider-horizontal .ui-slider-range-max {
-	right: 0;
+.ws-range-ticks {
+	position: absolute;
+	bottom: 0px;
+	left: 0;
+	height: 4px;
+	width: 1px;
+	margin: 0 0 0 -1.5px;
+	background: #ccc;
 }
+
 .input-date-datepicker-control {
 	position: absolute;
 	zoom: 1;
