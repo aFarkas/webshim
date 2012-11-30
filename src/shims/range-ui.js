@@ -16,10 +16,10 @@
 			var i;
 			
 			
-			this.element.addClass('ws-range').attr({role: 'slider'}).html('<span class="ws-range-rail"><span class="ws-range-thumb" /></span>');
+			this.element.addClass('ws-range').attr({role: 'slider'}).html('<span class="ws-range-min" /><span class="ws-range-rail"><span class="ws-range-thumb" /></span>');
 			this.trail = $('.ws-range-rail', this.element);
+			this.range = $('.ws-range-min', this.element);
 			this.thumb = $('.ws-range-thumb', this.trail);
-			this.thumbStyle = this.thumb[0].style;
 			this.updateMetrics();
 			
 			this.orig = this.options.orig;
@@ -49,10 +49,11 @@
 			
 			this.options.value = val;
 			if(!animate){
-				this.thumb.stop();
-				this.thumbStyle.left = left+'%';
+				this.thumb.stop().css('left', left+'%');
+				this.range.stop().css('width', left+'%');
 			} else {
 				this.thumb.stop(true).animate({left: left+'%'}, {animate: this.options.animate});
+				this.range.stop(true).animate({width: left+'%'}, {animate: this.options.animate});
 			}
 			if(this.orig && (oVal != val || (!this._init && this.orig.value != val)) ){
 				this.options._change(val);
