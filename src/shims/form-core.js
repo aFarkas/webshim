@@ -303,7 +303,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		} catch(e){}
 		return ret;
 	};
-	/* form-ui-invalid/form-ui-valid are deprecated. use user-error/user-succes instead */
+	/* form-ui-invalid/form-ui-valid are deprecated. use user-error/user-success instead */
 	var invalidClass = 'user-error';
 	var invalidClasses = 'user-error form-ui-invalid';
 	var validClass = 'user-success';
@@ -424,11 +424,12 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				api._create();
 				elem = $(elem);
 				var visual = $(elem).getShadowElement();
-				var offset = api.getOffsetFromBody(visual);
+				var offset;
 				api.clear();
 				if(noBubble){
 					this.hide();
 				} else {
+					offset = api.getOffsetFromBody(visual);
 					this.getMessage(elem, message);
 					this.position(visual, offset);
 					
