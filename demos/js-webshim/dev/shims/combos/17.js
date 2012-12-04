@@ -1374,12 +1374,12 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				api._create();
 				elem = $(elem);
 				var visual = $(elem).getShadowElement();
-				var offset;
+				var offset = api.getOffsetFromBody(visual);
 				api.clear();
 				if(noBubble){
 					this.hide();
 				} else {
-					offset = api.getOffsetFromBody(visual);
+					
 					this.getMessage(elem, message);
 					this.position(visual, offset);
 					
@@ -1388,7 +1388,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 						hideTimer = setTimeout(boundHide, this.hideDelay);
 					}
 					$(window)
-						.on('resize.validityalert', function(){
+						.on('resize.validityalert reposoverlay.validityalert', function(){
 							clearTimeout(resizeTimer);
 							resizeTimer = setTimeout(function(){
 								api.position(visual);
@@ -1436,6 +1436,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				setTimeout(function(){
 					$(document).on('focusout.validityalert', boundHide);
 				}, 10);
+				$(window).triggerHandler('reposoverlay');
 			},
 			getMessage: function(elem, message){
 				if (!message) {
