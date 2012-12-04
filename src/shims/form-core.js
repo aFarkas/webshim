@@ -489,7 +489,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			},
 			getMessage: function(elem, message){
 				if (!message) {
-					message = getContentValidationMessage(elem[0]) || elem.prop('validationMessage');
+					message = getContentValidationMessage(elem[0]) || elem.prop('customValidationMessage') || elem.prop('validationMessage');
 				}
 				if (message) {
 					$('span.va-box', errorBubble).text(message);
@@ -599,7 +599,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			$(document).on('firstinvalid', function(e){
 				if(!e.isInvalidUIPrevented()){
 					e.preventDefault();
-					$.webshims.validityAlert.showFor( e.target, $(e.target).prop('customValidationMessage') ); 
+					$.webshims.validityAlert.showFor( e.target ); 
 				}
 			});
 		});
