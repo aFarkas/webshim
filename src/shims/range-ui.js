@@ -238,7 +238,7 @@
 				}
 			};
 			
-			eventTimer.init('input', o.value, this.options.slide);
+			eventTimer.init('input', o.value, this.options.input);
 			eventTimer.init('change', o.value, this.options.change);
 			
 			this.element.on({

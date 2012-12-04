@@ -206,14 +206,14 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 						val = $.prop(this, 'valueAsNumber');
 						
 						if(isNaN(val)){
-							webshims.error("valueAsNumber is NaN can't apply stepUp/stepDown ");
+							webshims.info("valueAsNumber is NaN can't apply stepUp/stepDown ");
 							throw('invalid state error');
 						}
 						
 						step = webshims.getStep(this, type);
 						
 						if(step == 'any'){
-							webshims.error("step is 'any' can't apply stepUp/stepDown");
+							webshims.info("step is 'any' can't apply stepUp/stepDown");
 							throw('invalid state error');
 						}
 						
@@ -222,22 +222,24 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 						
 						val = val + step;
 						valModStep = (val - (cache.minAsNumber || 0)) % step;
-						alignValue = val - valModStep;
 						
-						if ( Math.abs(valModStep) * 2 * factor >= step ) {
+						
+						if ( valModStep && (Math.abs(valModStep) > EPS) ) {
+							alignValue = val - valModStep;
 							alignValue += ( valModStep > 0 ) ? step : ( -step );
+							val = alignValue.toFixed(5) * 1;
 						}
-						val = alignValue.toFixed(5) * 1;
+						
 						webshims.addMinMaxNumberToCache('max', $(this), cache);
 						if( (!isNaN(cache.maxAsNumber) && val > cache.maxAsNumber) || (!isNaN(cache.minAsNumber) && val < cache.minAsNumber) ){
-							webshims.error("max/min overflow can't apply stepUp/stepDown");
+							webshims.info("max/min overflow can't apply stepUp/stepDown");
 							throw('invalid state error');
 						}
 						$.prop(this, 'valueAsNumber', val);
 					} else if(stepDescriptor.prop && stepDescriptor.prop.value){
 						return stepDescriptor.prop.value.apply(this, arguments);
 					} else {
-						webshims.error("no step method for type: "+ type);
+						webshims.info("no step method for type: "+ type);
 						throw('invalid state error');
 					}
 				}

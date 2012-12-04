@@ -77,7 +77,7 @@ jQuery.webshims.register('form-base-ui', function($, webshims, window, document,
 				orig: this,
 				type: type,
 				options: getOptions(this, data),
-				slide: function(val){
+				input: function(val){
 					opts._change(val);
 					$(opts.orig).trigger('input');
 				},

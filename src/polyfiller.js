@@ -962,7 +962,7 @@
 			return input.style.WebkitAppearance !== undefined;
 		});
 		
-		
+		webshims.formcfg = [];
 		webshims.validationMessages = webshims.validityMessages = [];
 		webshims.inputTypes = {};
 				
@@ -979,7 +979,7 @@
 			},
 			options: {
 				placeholderType: 'value',
-				langSrc: 'i18n/errormessages-',
+				langSrc: 'i18n/formcfg-',
 				lightweightDatalist: true,
 				availabeLangs: ['ar', 'ch-ZN', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'nl', 'pt-PT', 'ru', 'sv'] //en and de are directly implemented in core
 	//			,customMessages: false,
