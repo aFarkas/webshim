@@ -1253,7 +1253,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		} catch(e){}
 		return ret;
 	};
-	/* form-ui-invalid/form-ui-valid are deprecated. use user-error/user-succes instead */
+	/* form-ui-invalid/form-ui-valid are deprecated. use user-error/user-success instead */
 	var invalidClass = 'user-error';
 	var invalidClasses = 'user-error form-ui-invalid';
 	var validClass = 'user-success';
@@ -1379,6 +1379,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				if(noBubble){
 					this.hide();
 				} else {
+					
 					this.getMessage(elem, message);
 					this.position(visual, offset);
 					
@@ -1387,7 +1388,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 						hideTimer = setTimeout(boundHide, this.hideDelay);
 					}
 					$(window)
-						.on('resize.validityalert', function(){
+						.on('resize.validityalert reposoverlay.validityalert', function(){
 							clearTimeout(resizeTimer);
 							resizeTimer = setTimeout(function(){
 								api.position(visual);
@@ -1435,10 +1436,11 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				setTimeout(function(){
 					$(document).on('focusout.validityalert', boundHide);
 				}, 10);
+				$(window).triggerHandler('reposoverlay');
 			},
 			getMessage: function(elem, message){
 				if (!message) {
-					message = getContentValidationMessage(elem[0]) || elem.prop('validationMessage');
+					message = getContentValidationMessage(elem[0]) || elem.prop('customValidationMessage') || elem.prop('validationMessage');
 				}
 				if (message) {
 					$('span.va-box', errorBubble).text(message);
@@ -1548,7 +1550,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			$(document).on('firstinvalid', function(e){
 				if(!e.isInvalidUIPrevented()){
 					e.preventDefault();
-					$.webshims.validityAlert.showFor( e.target, $(e.target).prop('customValidationMessage') ); 
+					$.webshims.validityAlert.showFor( e.target ); 
 				}
 			});
 		});
