@@ -26,7 +26,7 @@ form textarea {
 	height: 140px;
 	font-family: arial, helvetica, sans-serif;
 }
-remove FOUC 
+/*remove FOUC */
 .loading-polyfills body {
 	visibility: hidden;
 }

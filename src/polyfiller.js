@@ -44,6 +44,7 @@
 			extendNative: true,
 			loadStyles: true,
 			disableShivMethods: true,
+			wspopover: {appendTo: 'body', hideOnBlur: true},
 			basePath: (function(){
 				var script = jScripts.filter('[src*="polyfiller.js"]');
 				var path;
@@ -969,18 +970,14 @@
 		addPolyfill('form-core', {
 			f: 'forms',
 			d: ['es5'],
-			test: function(toLoad){
-				if(formOptions.lightweightDatalist && !this.datalistLoaded){
-					this.datalistLoaded = true;
-					modules['form-datalist'].f = 'forms';
-					webshims.reTest(['form-datalist']);
-				}
-				return false;
-			},
+			
 			options: {
 				placeholderType: 'value',
 				langSrc: 'i18n/formcfg-',
-				lightweightDatalist: true,
+				messagePopover: {},
+				datalistPopover: {
+					constrainWidth: true
+				},
 				availabeLangs: ['ar', 'ch-ZN', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'nl', 'pt-PT', 'ru', 'sv'] //en and de are directly implemented in core
 	//			,customMessages: false,
 	//			overrideMessages: false,
@@ -1054,7 +1051,7 @@
 		});
 		
 		addPolyfill('form-datalist', {
-			f: 'forms-ext',
+			f: 'forms',
 			test: function(){
 				return modernizrInputAttrs.list && !formOptions.customDatalist;
 			},

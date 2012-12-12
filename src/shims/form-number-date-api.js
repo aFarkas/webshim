@@ -13,7 +13,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 				return step;
 			}
 			step = typeProtos.number.asNumber(step);
-			return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
+			return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * (typeModels[type].stepScaleFactor || 1);
 		};
 	}
 	if(!webshims.addMinMaxNumberToCache){
@@ -40,7 +40,8 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			return (elem.getAttribute('type') || '').toLowerCase();
 		},
 		isDateTimePart = function(string){
-			return (isNumber(string) || (string && string == '0' + (string * 1)));
+			var numStr = string * 1;
+			return (string && (numStr == string || string == '0' + numStr));
 		},
 		addMinMaxNumberToCache = webshims.addMinMaxNumberToCache,
 		addleadingZero = function(val, len){
@@ -60,12 +61,10 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		if(!('type' in cache)){
 			cache.type = getType(input[0]);
 		}
-		//stepmismatch with date is computable, but it would be a typeMismatch (performance)
-		if(cache.type == 'date'){
-			return false;
-		}
-		var ret = (validityState || {}).stepMismatch, base;
-		if(typeModels[cache.type] && typeModels[cache.type].step){
+		//stepmismatch with date is computable, but it would be a typeMismatch in most cases (performance)
+		//stepmismatch with month isn't part of this algorythim
+		var ret = (validityState || {}).stepMismatch || false, base;
+		if(typeModels[cache.type] && typeModels[cache.type].step && typeModels[cache.type].stepScaleFactor && cache.type != 'date'){
 			if( !('step' in cache) ){
 				cache.step = webshims.getStep(input[0], cache.type);
 			}
@@ -193,15 +192,15 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		var stepDescriptor = webshims.defineNodeNameProperty('input', name, {
 			prop: {
 				value: function(factor){
-					var step, val, valModStep, alignValue, cache;
+					var step, val, dateVal, valModStep, alignValue, cache;
 					var type = getType(this);
 					if(typeModels[type] && typeModels[type].asNumber){
 						cache = {type: type};
 						if(!factor){
 							factor = 1;
+							webshims.info("you should always use a factor for stepUp/stepDown");
 						}
 						factor *= stepFactor;
-						webshims.addMinMaxNumberToCache('min', $(this), cache);
 						
 						val = $.prop(this, 'valueAsNumber');
 						
@@ -217,25 +216,41 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 							throw('invalid state error');
 						}
 						
+						webshims.addMinMaxNumberToCache('min', $(this), cache);
+						webshims.addMinMaxNumberToCache('max', $(this), cache);
+						
 						step *= factor;
 						
-						
-						val = val + step;
-						valModStep = (val - (cache.minAsNumber || 0)) % step;
-						
-						
-						if ( valModStep && (Math.abs(valModStep) > EPS) ) {
-							alignValue = val - valModStep;
-							alignValue += ( valModStep > 0 ) ? step : ( -step );
-							val = alignValue.toFixed(5) * 1;
+						if(typeModels[type].stepScaleFactor){
+							val = val + step;
+							valModStep = (val - (cache.minAsNumber || 0)) % step;
+							
+							
+							if ( valModStep && (Math.abs(valModStep) > EPS) ) {
+								alignValue = val - valModStep;
+								alignValue += ( valModStep > 0 ) ? step : ( -step );
+								val = alignValue.toFixed(5) * 1;
+							}
+						//month has no stepScaleFactor and operates on the month, so it's a little bit special
+						} else if(cache.type == 'month') {
+							dateVal = $.prop(this, 'valueAsDate');
+							dateVal.setMonth(dateVal.getMonth()+step);
+							val = dateVal.getTime();
+						} else {
+							webshims.info("don't know what to do here :-) : "+ cache.type);
 						}
 						
-						webshims.addMinMaxNumberToCache('max', $(this), cache);
+						
+						
 						if( (!isNaN(cache.maxAsNumber) && val > cache.maxAsNumber) || (!isNaN(cache.minAsNumber) && val < cache.minAsNumber) ){
 							webshims.info("max/min overflow can't apply stepUp/stepDown");
 							throw('invalid state error');
 						}
-						$.prop(this, 'valueAsNumber', val);
+						if(dateVal){
+							$.prop(this, 'valueAsDate', dateVal);
+						} else {
+							$.prop(this, 'valueAsNumber', val);
+						}
 					} else if(stepDescriptor.prop && stepDescriptor.prop.value){
 						return stepDescriptor.prop.value.apply(this, arguments);
 					} else {
@@ -394,8 +409,8 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 				return typeProtos.date.mismatch(val+'-01');
 			},
 			step: 1,
+			stepScaleFactor:  false,
 			//stepBase: 0, 0 = default
-			stepScaleFactor:  86400000,
 			asDate: function(val){
 				val = new Date(this.asNumber(val));
 				return (isNaN(val)) ? null : val;

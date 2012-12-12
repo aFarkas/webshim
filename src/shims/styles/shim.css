@@ -515,6 +515,88 @@ img.ui-datepicker-trigger {
 	height: 200px; /*must have*/
 }
 
+/*
+ * popovers
+ */
+
+.ws-popover {
+	display: block;
+	visibility: hidden;
+	overflow: hidden;
+	position: absolute;
+	top: 0;
+	left: 0;
+	padding: 0 6px 0;
+	margin: 0 0 0 -6px;
+	z-index: 1000;
+	min-width: 90px;
+	transition: visibility 400ms ease-in-out;
+}
+
+.ws-popover.ws-po-visible {
+	visibility: visible;
+}
+
+.ws-po-outerbox {
+	position: relative;
+	opacity: 0;
+	padding: 11px 0 4px;
+	transform: translate(0, -100%);
+	transition: all 400ms ease-in-out;
+}
+
+
+.ws-popover.ws-po-visible .ws-po-outerbox  {
+	opacity: 1;
+	transform: translate(0, 0);
+}
+
+.ws-po-box {
+	border: 1px solid #ccc;
+	background: #fefefe;
+	padding: 4px;
+	box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.ws-po-arrow {
+	position: absolute;
+	top: 4px;
+	left: 20px;
+	display: block;
+	width: 0;
+	height: 0;
+	border-left: 9px solid transparent;
+	border-right: 9px solid transparent;
+	border-bottom: 7px solid #ccc;
+	border-top: none;
+	zoom: 1;
+	font-size: 0;
+}
+html .ws-po-arrow,
+html .ws-po-arrow .ws-po-arrowbox {
+	border-left-color: transparent;
+	border-right-color: transparent;
+}
+.polyfill-important .ws-po-arrow,
+.polyfill-important .ws-po-arrow .ws-po-arrowbox {
+	border-left-color: transparent !important;
+	border-right-color: transparent !important;
+}
+* html .ws-po-arrow {display: none;}
+.ws-po-arrow .ws-po-arrowbox {
+	position: relative;
+	top: 1px;
+	left: -9px;
+	display: block;
+	width: 0;
+	height: 0;
+	border-left: 9px solid transparent;
+	border-right: 9px solid transparent;
+	border-bottom: 7px solid #fefefe;
+	border-top: none;
+	z-index: 999999999;
+}
+
 datalist {
 	display: none;
 }
@@ -522,22 +604,11 @@ datalist {
 	position: absolute !important;
 	font-family: "Lucida Grande", "MS Shell Dlg", "Calibri", sans-serif;
 	font-size: 100%;
-	top: 0;
-	left: 0;
-	margin: 0;
-	padding: 0;
-	display: none;
-	z-index: 999999999;
+	
 }
-.datalist-polyfill.datalist-visible{
-	display: block;
-}
-.datalist-polyfill div {
-	margin: 0;
-	padding: 0;
-}
+
 .datalist-polyfill .datalist-box {
-	border: 1px solid #333;
+	position: relative;
 	max-height: 200px;
 	overflow: hidden;
 	overflow-x: hidden !important;
@@ -587,68 +658,13 @@ datalist {
 	cursor: default;
 }
 
-.validity-alert-wrapper {
-	position: absolute !important;
-	overflow: hidden;
-	padding: 0 6px 6px 0;
-	font: 12px/140% sans-serif;
-	z-index: 1000000000;
-	
-}
+
 .validity-alert {
 	display: inline-block;
-	padding: 8px 0 0;
-}
-.validity-alert .va-box {
-	display: inline-block !important;
-	background: #fafafa;
-	color: #000;
-	border: 1px solid #ccc;
-	padding: 5px;
-	border-radius: 5px;
-	box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-	zoom: 1 !important;
-	min-width: 60px;
+	font: 12px/140% sans-serif;
+	z-index: 1000000000;
 }
 
-.validity-alert .va-arrow {
-	position: absolute;
-	top: 1px;
-	left: 20px;
-	display: block;
-	width: 0;
-	height: 0;
-	border-left: 9px solid transparent;
-	border-right: 9px solid transparent;
-	
-	border-bottom: 7px solid #ccc;
-	border-top: none;
-	zoom: 1;
-	font-size: 0;
-}
-html .validity-alert span.va-arrow,
-html .validity-alert .va-arrow .va-arrow-box{
-	border-left-color: transparent;
-	border-right-color: transparent;
-}
-.polyfill-important .validity-alert span.va-arrow,
-.polyfill-important .validity-alert .va-arrow .va-arrow-box {
-	border-left-color: transparent !important;
-	border-right-color: transparent !important;
-}
-* html .validity-alert .va-arrow {display: none;}
-.validity-alert .va-arrow .va-arrow-box {
-	position: relative;
-	top: 1px;
-	left: -9px;
-	display: block;
-	width: 0;
-	height: 0;
-	border-left: 9px solid transparent;
-	border-right: 9px solid transparent;
-	border-bottom: 7px solid #fafafa;
-	border-top: none;
-}
 
 /* localStorage */
 #swflocalstorageshim-wrapper {

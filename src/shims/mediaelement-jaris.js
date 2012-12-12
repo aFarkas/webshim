@@ -793,7 +793,6 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			$(this)[boolProp ? 'addClass' : 'removeClass']('webshims-controls');
 			
 			if(data){
-				webshims.warn("changing controls currently not fully supported with jaris player");
 				if(nodeName == 'audio'){
 					setElementDimension(data, boolProp);
 				}

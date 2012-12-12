@@ -182,7 +182,7 @@
 						if(!events[name]){
 							events[name] = {fn: fn};
 							if(that.orig){
-								$(that.orig).bind(name, function(){
+								$(that.orig).on(name, function(){
 									events[name].val = $.prop(that.orig, 'value');
 								});
 							}
@@ -275,8 +275,7 @@
 					if(!o.readonly && !o.disabled){
 						if (code == 39 || code == 38) {
 							that.doStep(1);
-						}
-						else if (code == 37 || code == 40) {
+						} else if (code == 37 || code == 40) {
 							that.doStep(-1);
 						} else if (code == 33) {
 							that.doStep(10);

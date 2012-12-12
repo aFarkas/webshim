@@ -65,6 +65,7 @@ jQuery.webshims.register('form-base-ui', function($, webshims, window, document,
 	var stopPropagation = function(e){
 		e.stopImmediatePropagation(e);
 	};
+	
 	var implementType = function(){
 		var type = $.prop(this, 'type');
 		
@@ -78,16 +79,17 @@ jQuery.webshims.register('form-base-ui', function($, webshims, window, document,
 				type: type,
 				options: getOptions(this, data),
 				input: function(val){
-					opts._change(val);
-					$(opts.orig).trigger('input');
+					opts._change(val, 'input');
 				},
 				change: function(val){
-					opts._change(val);
-					$(opts.orig).trigger('change');
+					opts._change(val, 'change');
 				},
-				_change: function(val){
+				_change: function(val, trigger){
 					stopCircular = true;
 					$.prop(opts.orig, 'value', val);
+					if(trigger){
+						$(opts.orig).trigger(trigger);
+					}
 					stopCircular = false;
 				}
 			});
@@ -99,6 +101,12 @@ jQuery.webshims.register('form-base-ui', function($, webshims, window, document,
 			
 			webshims.addShadowDom(this, data.shim.element, {
 				data: data.shim || {}
+			});
+			
+			$(this).on('change', function(){
+				if(!stopCircular){
+					data.shim.value($.prop(this, 'value'));
+				}
 			});
 			
 			data.shim.element.on('change input', stopPropagation);
@@ -127,8 +135,31 @@ jQuery.webshims.register('form-base-ui', function($, webshims, window, document,
 	if(!modernizrInputTypes.number || options.replaceUI){
 		extendType('number', {
 			_create: function(opts, set){
-				//
-				return $('<input type="text" style="border: 1px solid #f00;" />').insertAfter(opts.orig).spinbtnUI(opts).data('numberUi');
+				return $('<input class="ws-'+opts.type+'" type="text" style="border: 1px solid #f00;" />').insertAfter(opts.orig).spinbtnUI(opts).data(opts.type+'Ui');
+			}
+		});
+	}
+	
+	if(!modernizrInputTypes.time || options.replaceUI){
+		extendType('time', {
+			_create: function(opts, set){
+				return $('<input class="ws-'+opts.type+'" type="text" style="border: 1px solid #f00;" />').insertAfter(opts.orig).spinbtnUI(opts).data(opts.type+'Ui');
+			}
+		});
+	}
+	
+	if(!modernizrInputTypes.month || options.replaceUI){
+		extendType('month', {
+			_create: function(opts, set){
+				return $('<input class="ws-'+opts.type+'" type="text" style="border: 1px solid #f00;" />').insertAfter(opts.orig).spinbtnUI(opts).data(opts.type+'Ui');
+			}
+		});
+	}
+	
+	if(!modernizrInputTypes.date || options.replaceUI){
+		extendType('date', {
+			_create: function(opts, set){
+				return $('<input class="ws-'+opts.type+'" type="text" style="border: 1px solid #f00;" />').insertAfter(opts.orig).spinbtnUI(opts).data(opts.type+'Ui');
 			}
 		});
 	}
