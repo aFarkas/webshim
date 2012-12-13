@@ -234,7 +234,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	if($.browser.webkit && !webshims.bugs.bustedValidity){
 		(function(){
 			var retriggerRadioValidity = function(){
-				if(!(this.validity || {}).customError){
+				var validity;
+				if((validity = this.validity) && !validity.customError){
 					this.setCustomValidity('');
 				}
 			};
