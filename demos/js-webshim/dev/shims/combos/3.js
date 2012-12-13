@@ -98,7 +98,7 @@
 		(function(){
 			var elems = /^(?:textarea|input)$/i;
 			var form = false;
-
+			
 			document.addEventListener('contextmenu', function(e){
 				if(elems.test( e.target.nodeName || '') && (form = e.target.form)){
 					setTimeout(function(){
@@ -113,6 +113,7 @@
 					e.stopImmediatePropagation();
 				}
 			});
+			
 		})();
 	}
 })(jQuery);
@@ -120,10 +121,11 @@
 jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 	
-	var groupTypes = {radio: 1};
+	
 	var checkTypes = {checkbox: 1, radio: 1};
 	var emptyJ = $([]);
 	var bugs = webshims.bugs;
+	var groupTypes = {radio: 1};
 	var getGroupElements = function(elem){
 		elem = $(elem);
 		var name;
@@ -228,6 +230,26 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		} catch(e){}
 		return false;
 	};
+	
+	if($.browser.webkit && !webshims.bugs.bustedValidity){
+		(function(){
+			var retriggerRadioValidity = function(){
+				var validity;
+				if((validity = this.validity) && !validity.customError){
+					this.setCustomValidity('');
+				}
+			};
+			
+			webshims.addReady(function(context, insertedElement){
+				if(context !== document){
+					$('input[type="radio"]:invalid', context)
+						.add(insertedElement.filter('input[type="radio"]:invalid'))
+						.each(retriggerRadioValidity)
+					;
+				}
+			});
+		})();
+	}
 	
 	var customEvents = $.event.customEvent || {};
 	var isValid = function(elem){
