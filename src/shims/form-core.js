@@ -231,10 +231,11 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return false;
 	};
 	
-	if($.browser.webkit && !webshims.bugs.bustedValidity){
+	if(Modernizr.formvalidation && $.browser.webkit && !webshims.bugs.bustedValidity){
 		(function(){
 			var retriggerRadioValidity = function(){
-				if(!(this.validity || {}).customError){
+				var validity;
+				if((validity = this.validity) && !validity.customError){
 					this.setCustomValidity('');
 				}
 			};
