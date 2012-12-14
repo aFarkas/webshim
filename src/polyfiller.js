@@ -1100,14 +1100,14 @@
 			options: {
 				hasToPlay: 'any',
 				preferFlash: false,
-				player: 'jwplayer',
+				player: 'jaris',
 				vars: {},
 				params: {},
 				attrs: {},
 				changeSWF: $.noop
 			},
 			methodNames: ['play', 'pause', 'canPlayType', 'mediaLoad:load'],
-			d: deps,
+			d: ['swfobject'],
 			c: [27, 10, 9, 12, 17, 26, 16, 25, 8, 22, 23, 24, 20]
 		});
 		addPolyfill('mediaelement-swf', {

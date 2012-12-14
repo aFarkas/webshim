@@ -412,7 +412,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			stepScaleFactor:  false,
 			//stepBase: 0, 0 = default
 			asDate: function(val){
-				val = new Date(this.asNumber(val));
+				val = new Date(typeProtos.date.asNumber(val+'-01'));
 				return (isNaN(val)) ? null : val;
 			},
 			asNumber: function(val){
