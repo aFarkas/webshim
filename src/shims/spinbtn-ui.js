@@ -116,6 +116,7 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 			return val;
 		},
 		month: function(val){
+//			val.split(/[\s-\/\\]+/);
 			return val;
 		},
 		date: function(val){
@@ -155,11 +156,12 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 			step: 60
 		},
 		month: {
-			step: 1
+			step: 1,
+			start: (new Date(new Date().getFullYear(), 0, 1))
 		},
 		date: {
 			step: 1,
-			start: (new Date(new Date().getFullYear(), '00', '01')).getTime()
+			start: (new Date(new Date().getFullYear(), 0, 1))
 		}
 	};
 	
@@ -170,7 +172,8 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 			if(!types[type]){
 				input = $('<input type="'+type+'" />');
 				types[type] = function(val){
-					return input.prop('value', val).prop('valueAsNumber');
+					var type = (typeof val == 'object') ? 'valueAsDate' : 'value';
+					return input.prop(type, val).prop('valueAsNumber');
 				};
 			}
 			return types[type];
@@ -187,13 +190,18 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 			this.orig = this.options.orig;
 			this.elemHelper = $('<input type="'+ this.type+'" />');
 			this.asNumber = createAsNumber(this.type);
-			this.buttonWrapper = $('<span class="input-buttons"><span unselectable="on" class="step-controls"><span class="step-up"></span><span class="step-down"></span></span></span>')
+			this.buttonWrapper = $('<span class="input-buttons '+this.type+'-input-buttons"><span unselectable="on" class="step-controls"><span class="step-up"></span><span class="step-down"></span></span></span>')
 				.insertAfter(this.element)
 			;
+			
+			if(typeof steps[this.type].start == 'object'){
+				steps[this.type].start = this.asNumber(steps[this.type].start);
+			}
+			
 			for(i = 0; i < createOpts.length; i++){
 				this[createOpts[i]](this.options[createOpts[i]]);
 			}
-			var elem = this.element.attr('autocomplete', 'off').data(this.type+'Ui', this);
+			var elem = this.element.attr('autocomplete', 'off').data('wsspinner', this);
 			this.addBindings();
 			if($.browser.mozilla){
 				$(window).on('unload', function(){
@@ -215,7 +223,8 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 			} else if(!isNaN(this.maxAsNumber) && start > this.maxAsNumber){
 				start = this.maxAsNumber;
 			}
-			this.elemHelper.prop('valueAsNumber', start);
+			this.elemHelper.prop('valueAsNumber', start).prop('value');
+			this.options.defValue = this.elemHelper.prop('value');
 		},
 		value: function(val){
 			this.valueAsNumber = this.asNumber(val);
@@ -225,6 +234,7 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 			} else {
 				this.elemHelper.prop('value', val);
 			}
+			
 			this.element.prop('value', formatVal[this.type](val));
 		},
 		

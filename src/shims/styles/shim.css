@@ -232,22 +232,29 @@ img.ui-datepicker-trigger {
 
 
 .input-buttons,
-.step-controls {
+.step-controls,
+.popover-opener {
 	position: absolute;
 	zoom: 1;
 	overflow: hidden;
 	display: inline-block;
 	font-size: 0;
-	vertical-align: middle;
 	vertical-align: top;
 	margin-left: -17px;
 }
-.step-controls {
+.input-button-size-2 {
+	margin-left: -32px;
+}
+.step-controls,
+.popover-opener {
 	position: relative;
+	float: left;
 	margin: 0;
 	height: 19px;
 	width: 15px;
-	margin-left: 0;
+}
+.popover-opener {
+	background: #000;
 }
 .polyfill-important .input-buttons,
 .polyfill-important .step-controls {

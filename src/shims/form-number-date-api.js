@@ -62,9 +62,8 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			cache.type = getType(input[0]);
 		}
 		//stepmismatch with date is computable, but it would be a typeMismatch in most cases (performance)
-		//stepmismatch with month isn't part of this algorythim
 		var ret = (validityState || {}).stepMismatch || false, base;
-		if(typeModels[cache.type] && typeModels[cache.type].step && typeModels[cache.type].stepScaleFactor && cache.type != 'date'){
+		if(typeModels[cache.type] && typeModels[cache.type].step && cache.type != 'date'){
 			if( !('step' in cache) ){
 				cache.step = webshims.getStep(input[0], cache.type);
 			}
@@ -221,26 +220,14 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 						
 						step *= factor;
 						
-						if(typeModels[type].stepScaleFactor){
-							val = val + step;
-							valModStep = (val - (cache.minAsNumber || 0)) % step;
-							
-							
-							if ( valModStep && (Math.abs(valModStep) > EPS) ) {
-								alignValue = val - valModStep;
-								alignValue += ( valModStep > 0 ) ? step : ( -step );
-								val = alignValue.toFixed(5) * 1;
-							}
-						//month has no stepScaleFactor and operates on the month, so it's a little bit special
-						} else if(cache.type == 'month') {
-							dateVal = $.prop(this, 'valueAsDate');
-							dateVal.setMonth(dateVal.getMonth()+step);
-							val = dateVal.getTime();
-						} else {
-							webshims.info("don't know what to do here :-) : "+ cache.type);
+						val = val + step;
+						valModStep = (val - (cache.minAsNumber || 0)) % step;
+						
+						if ( valModStep && (Math.abs(valModStep) > EPS) ) {
+							alignValue = val - valModStep;
+							alignValue += ( valModStep > 0 ) ? step : ( -step );
+							val = alignValue.toFixed(5) * 1;
 						}
-						
-						
 						
 						if( (!isNaN(cache.maxAsNumber) && val > cache.maxAsNumber) || (!isNaN(cache.minAsNumber) && val < cache.minAsNumber) ){
 							webshims.info("max/min overflow can't apply stepUp/stepDown");
@@ -412,11 +399,35 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			stepScaleFactor:  false,
 			//stepBase: 0, 0 = default
 			asDate: function(val){
-				val = new Date(typeProtos.date.asNumber(val+'-01'));
-				return (isNaN(val)) ? null : val;
+				return new Date(typeProtos.date.asNumber(val+'-01'));
 			},
 			asNumber: function(val){
-				return typeProtos.date.asNumber(val+'-01');
+				//1970-01
+				var ret = nan;
+				if(val && !this.mismatch(val)){
+					val = val.split(/\u002D/);
+					val[0] = (val[0] * 1) - 1970;
+					val[1] = (val[1] * 1) - 1;
+					ret = (val[0] * 12) + val[1];
+				}
+				return ret;
+			},
+			numberToString: function(num){
+				var mod;
+				var ret = false;
+				if(isNumber(num)){
+					mod = (num % 12);
+					num = ((num - mod) / 12) + 1970;
+					mod += 1;
+					if(mod < 1){
+						num -= 1;
+						mod += 12;
+					}
+					ret = addleadingZero(num, 4)+'-'+addleadingZero(mod, 2);
+					
+				}
+				
+				return ret;
 			},
 			dateToString: function(date){
 				if(date && date.getUTCHours){

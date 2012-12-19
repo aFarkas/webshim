@@ -439,7 +439,11 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			this.contentElement = $('.ws-po-box', this.element);
 			this.lastElement = $([]);
 			this.bindElement();
+			if(this.options.prepareFor){
+				this.prepareFor($(this.options.prepareFor).getNativeElement(), $(this.options.prepareFor).getShadowElement())
+			}
 			this.element.data('wspopover', this);
+			
 		},
 		options: {},
 		content: function(html){
@@ -469,7 +473,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			this.clear();
 			this.element.removeClass('ws-po-visible').css('display', 'none');
 			
-			this.prepareFor(element, visual);
+			if(this.options.prepareFor){
+				this.prepareFor(element, visual);
+			}
 			
 			this.position(visual);
 			that.timers.show = setTimeout(function(){
@@ -486,6 +492,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			});
 		},
 		prepareFor: function(element, visual){
+			var onBlur;
 			var opts = $.extend({}, this.options, $(element.prop('form') || []).data('wspopover') || {}, element.data('wspopover'));
 			var that = this;
 			this.lastElement = $(element).getShadowFocusElement();
@@ -503,19 +510,24 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			this.element.css({width: opts.constrainWidth ? visual.outerWidth() : ''});
 			
 			if(opts.hideOnBlur){
-				that.timers.bindBlur = setTimeout(function(){
-					that.lastElement.on('focusout'+that.eventns + ' blur'+that.eventns, function(e){
-						if(that.stopBlur){
-							e.preventDefault();
-							try {
-								that.lastElement.focus();
-							} catch(er){}
-							e.stopImmediatePropagation();
-						} else {
-							that.hide();
-						}
-					});
-				}, 10);
+				onBlur = function(e){
+					if(that.stopBlur){
+						e.preventDefault();
+						try {
+							that.lastElement.focus();
+						} catch(er){}
+						e.stopImmediatePropagation();
+					} else {
+						that.hide();
+					}
+				};
+				if(this.options.prepareFor){
+					that.lastElement.on('focusout'+that.eventns + ' blur'+that.eventns, onBlur);
+				} else {
+					that.timers.bindBlur = setTimeout(function(){
+						that.lastElement.on('focusout'+that.eventns + ' blur'+that.eventns, onBlur);
+					}, 10);
+				}
 				
 			}
 			if(!this.prepared && $.fn.bgIframe && $.browser.msie && parseInt($.browser.version, 10) < 7){
@@ -526,7 +538,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		clear: function(){
 			$(window).off(this.eventns);
 			$(document).off(this.eventns);
-			this.lastElement.off(this.eventns);
+			if(!this.options.prepareFor){
+				this.lastElement.off(this.eventns);
+			}
 			this.stopBlur = false;
 			$.each(this.timers, function(timerName, val){
 				clearTimeout(val);

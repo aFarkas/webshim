@@ -20,6 +20,10 @@
 			this.trail = $('.ws-range-rail', this.element);
 			this.range = $('.ws-range-min', this.element);
 			this.thumb = $('.ws-range-thumb', this.trail);
+			this.dirs = this.element.innerHeight() > this.element.innerWidth() ? 
+				{mouse: 'pageY', pos: 'top', range: 'height', outerWidth: 'outerHeight'} :
+				{mouse: 'pageX', pos: 'left', range: 'width', outerWidth: 'outerWidth'}
+			;
 			this.updateMetrics();
 			
 			this.orig = this.options.orig;
@@ -38,6 +42,8 @@
 		_value: function(val, _noNormalize, animate){
 			var left;
 			var oVal = val;
+			var thumbStyle = {};
+			var rangeStyle = {};
 			if(!_noNormalize && parseFloat(val, 10) != val){
 				val = this.options.min + ((this.options.max - this.options.min) / 2);
 			}
@@ -48,12 +54,16 @@
 			left =  100 * ((val - this.options.min) / (this.options.max - this.options.min));
 			
 			this.options.value = val;
+			this.thumb.stop();
+			this.range.stop();
+			thumbStyle[this.dirs.pos] = left+'%';
+			rangeStyle[this.dirs.range] = left+'%';
 			if(!animate){
-				this.thumb.stop().css('left', left+'%');
-				this.range.stop().css('width', left+'%');
+				this.thumb.css(thumbStyle);
+				this.range.css(rangeStyle);
 			} else {
-				this.thumb.stop(true).animate({left: left+'%'}, {animate: this.options.animate});
-				this.range.stop(true).animate({width: left+'%'}, {animate: this.options.animate});
+				this.thumb.animate(thumbStyle, {animate: this.options.animate});
+				this.range.animate(rangeStyle, {animate: this.options.animate});
 			}
 			if(this.orig && (oVal != val || (!this._init && this.orig.value != val)) ){
 				this.options._change(val);
@@ -78,7 +88,7 @@
 				if(!isNumber(val) || val < min || val > max){return;}
 				var left = 100 * ((val - min) / (max - min));
 				var title = o.showLabels ? ' title="'+ label +'"' : '';
-				trail.append('<span class="ws-range-ticks"'+ title +' style="left: '+left+'%;" />');
+				trail.append('<span class="ws-range-ticks"'+ title +' style="'+(this.dirs.pos)+': '+left+'%;" />');
 			});
 		},
 		readonly: function(val){
@@ -203,7 +213,7 @@
 			})();
 			
 			var setValueFromPos = function(e, animate){
-				var val = that.getStepedValueFromPos((e.pageX - leftOffset) * widgetUnits);
+				var val = that.getStepedValueFromPos((e[that.dirs.mouse] - leftOffset) * widgetUnits);
 				if(val != o.value){
 					
 					that.value(val, false, animate);
@@ -223,10 +233,11 @@
 				e.preventDefault();
 				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
 				if(!o.readonly && !o.disabled){
-					leftOffset = (that.element.focus().addClass('ws-active').offset() || {left: false}).left;
+					leftOffset = that.element.focus().addClass('ws-active').offset();
 					widgetUnits = that.element.width();
-					if(!widgetUnits || leftOffset === false){return;}
-					widgetUnits = 100 / (widgetUnits  - ((that.thumb.outerWidth() || 2) / 2));
+					if(!widgetUnits || !leftOffset){return;}
+					leftOffset = leftOffset[that.dirs.pos];
+					widgetUnits = 100 / (widgetUnits  - ((that.thumb[that.dirs.outerWidth]() || 2) / 2));
 					setValueFromPos(e, that.options.animate);
 					$(document)
 						.on({

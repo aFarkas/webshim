@@ -132,37 +132,22 @@ jQuery.webshims.register('form-base-ui', function($, webshims, window, document,
 		});
 	}
 	
-	if(!modernizrInputTypes.number || options.replaceUI){
-		extendType('number', {
-			_create: function(opts, set){
-				return $('<input class="ws-'+opts.type+'" type="text" style="border: 1px solid #f00;" />').insertAfter(opts.orig).spinbtnUI(opts).data(opts.type+'Ui');
-			}
-		});
-	}
 	
-	if(!modernizrInputTypes.time || options.replaceUI){
-		extendType('time', {
-			_create: function(opts, set){
-				return $('<input class="ws-'+opts.type+'" type="text" style="border: 1px solid #f00;" />').insertAfter(opts.orig).spinbtnUI(opts).data(opts.type+'Ui');
-			}
-		});
-	}
+	['number', 'time', 'month', 'date'].forEach(function(name){
+		if(!modernizrInputTypes[name] || options.replaceUI){
+			extendType(name, {
+				_create: function(opts, set){
+					var data = $('<input class="ws-'+name+'" type="text" style="border: 1px solid #f00;" />').insertAfter(opts.orig).spinbtnUI(opts).data('wsspinner');
+					if(webshims.picker && webshims.picker[name]){
+						webshims.picker[name](data);
+					}
+					data.buttonWrapper.addClass('input-button-size-'+(data.buttonWrapper.children().length));
+					return data;
+				}
+			});
+		}
+	});
 	
-	if(!modernizrInputTypes.month || options.replaceUI){
-		extendType('month', {
-			_create: function(opts, set){
-				return $('<input class="ws-'+opts.type+'" type="text" style="border: 1px solid #f00;" />').insertAfter(opts.orig).spinbtnUI(opts).data(opts.type+'Ui');
-			}
-		});
-	}
-	
-	if(!modernizrInputTypes.date || options.replaceUI){
-		extendType('date', {
-			_create: function(opts, set){
-				return $('<input class="ws-'+opts.type+'" type="text" style="border: 1px solid #f00;" />').insertAfter(opts.orig).spinbtnUI(opts).data(opts.type+'Ui');
-			}
-		});
-	}
 	
 	webshims.addReady(function(context, contextElem){
 		$('input', context)
