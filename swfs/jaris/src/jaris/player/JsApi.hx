@@ -82,7 +82,7 @@ class JsApi extends MovieClip {
 		// _movieClip = Lib.current;
 		_player = player;
 		_controls = controls;
-				
+			
 		_player.addEventListener(PlayerEvents.MOUSE_HIDE, onPlayerEvent);
 		_player.addEventListener(PlayerEvents.MOUSE_SHOW, onPlayerEvent);
 		_player.addEventListener(PlayerEvents.MEDIA_INITIALIZED, onPlayerEvent);
@@ -156,29 +156,31 @@ class JsApi extends MovieClip {
 	
 	public function onPlayerEvent(event:PlayerEvents):Void
 	{
-		var jsFunction = '';
-		var data = {
-				duration:		event.duration,
-				fullscreen:		event.fullscreen,
-				mute:			event.mute,
-				volume:			event.volume,
-				position:		event.time,
-				height:			event.height,
-				width:			event.width,
-				type:			event.name,
-				loaded:			_player.getBytesLoaded(),
-				total:			_player.getBytesTotal()
-		};
-		
-		if (_externalListeners.exists(event.name.toLowerCase()))
-		{		
-			ExternalInterface.call(_externalListeners.get(event.name.toLowerCase()), data);
-		} 
-		
-		if (_externalListeners.exists('on*'))
-		{		
-			ExternalInterface.call(_externalListeners.get('on*'), data);
-		} 
+		if(!_player.noAPITrigger){
+			var jsFunction = '';
+			var data = {
+					duration:		event.duration,
+					fullscreen:		event.fullscreen,
+					mute:			event.mute,
+					volume:			event.volume,
+					position:		event.time,
+					height:			event.height,
+					width:			event.width,
+					type:			event.name,
+					loaded:			_player.getBytesLoaded(),
+					total:			_player.getBytesTotal()
+			};
+			
+			if (_externalListeners.exists(event.name.toLowerCase()))
+			{		
+				ExternalInterface.call(_externalListeners.get(event.name.toLowerCase()), data);
+			} 
+			
+			if (_externalListeners.exists('on*'))
+			{		
+				ExternalInterface.call(_externalListeners.get('on*'), data);
+			} 
+		}
 	
 	}
 	

@@ -107,6 +107,7 @@ class Player extends EventDispatcher
 	private var _loadedYoutube:Bool;
 	private var _ytReady:Bool;
 	private var _ytCue:Bool;
+	public var noAPITrigger:Bool;
 	//}
 	
 	
@@ -144,6 +145,7 @@ class Player extends EventDispatcher
 		_lastTime = 0;
 		_lastProgress = 0;
 		_userSettings = new UserSettings();
+		noAPITrigger = false;
 		//}
 		
 		//{Initialize sound object
@@ -195,7 +197,9 @@ class Player extends EventDispatcher
 		
 		if(parameters.poster == "" && _streamType == StreamType.YOUTUBE && _mediaSource != null){
 			_ytCue = true;
+			noAPITrigger = true;
 			load(_mediaSource, _type, _streamType, _server);
+			noAPITrigger = false;
 		}
 	}
 	
