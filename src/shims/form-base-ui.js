@@ -72,7 +72,7 @@ jQuery.webshims.register('form-base-ui', function($, webshims, window, document,
 		var i, opts, data, optsName;
 		if(inputTypes[type]){
 			data = {};
-			optsName = type+'Opts';
+			optsName = type;
 			//todo: do we need deep extend?
 			opts = $.extend({}, options[optsName], $(this).data(type) || {}, {
 				orig: this,

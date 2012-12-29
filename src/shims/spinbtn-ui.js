@@ -2,88 +2,21 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 	"use strict";
 	var formcfg = $.webshims.formcfg;
 	var curCfg;
-	formcfg.de = {
-		numberFormat: {
-			",": ".",
-			".": ","
-		},
-		timeSigns: ":. ",
-		numberSigns: ',',
-		dateSigns: '.',
-		dFormat: ".",
-		patterns: {
-			d: "dd.mm.yy"
-		},
-		date: {
-			close: 'schließen',
-			prevText: 'zurück',
-			nextText: 'Vor;',
-			currentText: 'heute',
-			monthNames: ['Januar','Februar','März','April','Mai','Juni',
-			'Juli','August','September','Oktober','November','Dezember'],
-			monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun',
-			'Jul','Aug','Sep','Okt','Nov','Dez'],
-			dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
-			dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-			dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-			weekHeader: 'KW',
-			firstDay: 1,
-			isRTL: false,
-			showMonthAfterYear: false,
-			yearSuffix: ''
+	var createMonthKeys = function(langCfg){
+		if(!langCfg.date.monthkeys){
+			var create = function(i, name){
+				var strNum;
+				var num = i + 1;
+				strNum = (num < 10) ? '0'+num : ''+num;
+				
+				langCfg.date.monthkeys[num] = strNum;
+				langCfg.date.monthkeys[name] = strNum;
+			};
+			langCfg.date.monthkeys = {};
+			$.each(langCfg.date.monthNames, create);
+			$.each(langCfg.date.monthNamesShort, create);
 		}
 	};
-	
-	formcfg.en = {
-		numberFormat: {
-			".": ".",
-			",": ","
-		},
-		numberSigns: '.',
-		dateSigns: '/',
-		timeSigns: ":. ",
-		dFormat: "/",
-		patterns: {
-			d: "mm/dd/yy"
-		},
-		date: {
-			"closeText": "Done",
-			"prevText": "Prev",
-			"nextText": "Next",
-			"currentText": "Today",
-			"monthNames": ["January","February","March","April","May","June","July","August","September","October","November","December"],
-			"monthNamesShort": ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
-			"dayNames": ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
-			"dayNamesShort": ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
-			"dayNamesMin": ["Su","Mo","Tu","We","Th","Fr","Sa"],
-			"weekHeader": "Wk",
-			"firstDay": 0,
-			"isRTL": false,
-			"showMonthAfterYear": false,
-			"yearSuffix": ""
-		}
-	};
-	
-	formcfg['en-US'] = formcfg['en-US'] || formcfg['en'];
-	formcfg[''] = formcfg[''] || formcfg['en-US'];
-	
-	curCfg = formcfg[''];
-	
-	$.webshims.ready('dom-extend', function(){
-		$.webshims.activeLang({
-			register: 'form-core', 
-			callback: function(){
-				$.each(arguments, function(i, val){
-					if(formcfg[val]){
-						curCfg = formcfg[val];
-						$.event.trigger('wslocalechange');
-						return false;
-					}
-				});
-			}
-		});
-	});
-	
 	var mousePress = function(e){
 		$(this)[e.type == 'mousepressstart' ? 'addClass' : 'removeClass']('mousepress-ui');
 	};
@@ -115,8 +48,16 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 		time: function(val){
 			return val;
 		},
-		month: function(val){
-//			val.split(/[\s-\/\\]+/);
+		month: function(val, options){
+			var names;
+			var p = val.split('-');
+			if(p[0] && p[1]){
+				names = curCfg.date[options.monthNames] || curCfg.date.monthNames;
+				p[1] = names[(p[1] * 1) - 1];
+				if(p[1]){
+					val = curCfg.date.showMonthAfterYear ? p.join(' ') : p[1]+' '+p[0];
+				}
+			}
 			return val;
 		},
 		date: function(val){
@@ -138,6 +79,16 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 			return val;
 		},
 		month: function(val){
+			var p = val.trim().split(/[\s-\/\\]+/);
+			if(p.length == 2){
+				p[0] = curCfg.date.monthkeys[p[0]] || p[0];
+				p[1] = curCfg.date.monthkeys[p[1]] || p[1];
+				if(p[1].length == 2){
+					val = p[0]+'-'+p[1];
+				} else if(p[0].length == 2){
+					val = p[1]+'-'+p[0];
+				}
+			}
 			return val;
 		},
 		date: function(val){
@@ -214,7 +165,7 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 			return parseVal[this.type](val);
 		},
 		formatValue: function(val){
-			return formatVal[this.type](val);
+			return formatVal[this.type](val, this.options);
 		},
 		_setStartInRange: function(){
 			var start = steps[this.type].start || 0;
@@ -235,7 +186,7 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 				this.elemHelper.prop('value', val);
 			}
 			
-			this.element.prop('value', formatVal[this.type](val));
+			this.element.prop('value', formatVal[this.type](val, this.options));
 		},
 		
 		list: function(opts){
@@ -359,6 +310,12 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 			
 			this.buttonWrapper.on('mousedown', mouseDownInit);
 			
+			this.setChange = function(value){
+				that.value(value);
+				eventTimer.call('input', value);
+				eventTimer.call('change', value);
+			};
+			
 			this.element.on({
 				blur: function(e){
 					if(!preventBlur(e) && !o.disabled && !o.readonly){
@@ -395,7 +352,7 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 					} else if (code == 40) {
 						step.stepDown();
 					} else {
-						if(!e.ctrlKey && !e.metaKey){
+						if(!e.ctrlKey && !e.metaKey && curCfg[that.type+'Signs']){
 							chr = String.fromCharCode(e.charCode == null ? code : e.charCode);
 							stepped = !(chr < " " || (curCfg[that.type+'Signs']+'0123456789').indexOf(chr) > -1);
 						} else {
@@ -431,6 +388,89 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 		}
 	};
 	
+	
+	formcfg.de = {
+		numberFormat: {
+			",": ".",
+			".": ","
+		},
+		timeSigns: ":. ",
+		numberSigns: ',',
+		dateSigns: '.',
+		dFormat: ".",
+		patterns: {
+			d: "dd.mm.yy"
+		},
+		date: {
+			close: 'schließen',
+			prevText: 'zurück',
+			nextText: 'Vor;',
+			currentText: 'heute',
+			monthNames: ['Januar','Februar','März','April','Mai','Juni',
+			'Juli','August','September','Oktober','November','Dezember'],
+			monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun',
+			'Jul','Aug','Sep','Okt','Nov','Dez'],
+			dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
+			dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+			dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+			weekHeader: 'KW',
+			firstDay: 1,
+			isRTL: false,
+			showMonthAfterYear: false,
+			yearSuffix: ''
+		}
+	};
+	
+	formcfg.en = {
+		numberFormat: {
+			".": ".",
+			",": ","
+		},
+		numberSigns: '.',
+		dateSigns: '/',
+		timeSigns: ":. ",
+		dFormat: "/",
+		patterns: {
+			d: "mm/dd/yy"
+		},
+		date: {
+			"closeText": "Done",
+			"prevText": "Prev",
+			"nextText": "Next",
+			"currentText": "Today",
+			"monthNames": ["January","February","March","April","May","June","July","August","September","October","November","December"],
+			"monthNamesShort": ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+			"dayNames": ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+			"dayNamesShort": ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
+			"dayNamesMin": ["Su","Mo","Tu","We","Th","Fr","Sa"],
+			"weekHeader": "Wk",
+			"firstDay": 0,
+			"isRTL": false,
+			"showMonthAfterYear": false,
+			"yearSuffix": ""
+		}
+	};
+	
+	formcfg['en-US'] = formcfg['en-US'] || formcfg['en'];
+	formcfg[''] = formcfg[''] || formcfg['en-US'];
+	
+	curCfg = formcfg[''];
+	createMonthKeys(curCfg);
+	$.webshims.ready('dom-extend', function(){
+		$.webshims.activeLang({
+			register: 'form-core', 
+			callback: function(){
+				$.each(arguments, function(i, val){
+					if(formcfg[val]){
+						curCfg = formcfg[val];
+						createMonthKeys(curCfg);
+						$.event.trigger('wslocalechange');
+						return false;
+					}
+				});
+			}
+		});
+	});
 	
 	
 	$.fn.spinbtnUI = function(opts){
