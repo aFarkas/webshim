@@ -1,1 +1,477 @@
-(function(){if("JSON"in window&&JSON.stringify&&JSON.parse)return;this.JSON||(this.JSON={}),function(){function f(e){return e<10?"0"+e:e}function quote(e){return escapable.lastIndex=0,escapable.test(e)?'"'+e.replace(escapable,function(e){var t=meta[e];return typeof t=="string"?t:"\\u"+("0000"+e.charCodeAt(0).toString(16)).slice(-4)})+'"':'"'+e+'"'}function str(e,t){var n,r,i,s,o=gap,u,a=t[e];a&&typeof a=="object"&&typeof a.toJSON=="function"&&(a=a.toJSON(e)),typeof rep=="function"&&(a=rep.call(t,e,a));switch(typeof a){case"string":return quote(a);case"number":return isFinite(a)?String(a):"null";case"boolean":case"null":return String(a);case"object":if(!a)return"null";gap+=indent,u=[];if(Object.prototype.toString.apply(a)==="[object Array]"){s=a.length;for(n=0;n<s;n+=1)u[n]=str(n,a)||"null";return i=u.length===0?"[]":gap?"[\n"+gap+u.join(",\n"+gap)+"\n"+o+"]":"["+u.join(",")+"]",gap=o,i}if(rep&&typeof rep=="object"){s=rep.length;for(n=0;n<s;n+=1)r=rep[n],typeof r=="string"&&(i=str(r,a),i&&u.push(quote(r)+(gap?": ":":")+i))}else for(r in a)Object.hasOwnProperty.call(a,r)&&(i=str(r,a),i&&u.push(quote(r)+(gap?": ":":")+i));return i=u.length===0?"{}":gap?"{\n"+gap+u.join(",\n"+gap)+"\n"+o+"}":"{"+u.join(",")+"}",gap=o,i}}typeof Date.prototype.toJSON!="function"&&(Date.prototype.toJSON=function(e){return isFinite(this.valueOf())?this.getUTCFullYear()+"-"+f(this.getUTCMonth()+1)+"-"+f(this.getUTCDate())+"T"+f(this.getUTCHours())+":"+f(this.getUTCMinutes())+":"+f(this.getUTCSeconds())+"Z":null},String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(e){return this.valueOf()});var cx=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,gap,indent,meta={"\b":"\\b","	":"\\t","\n":"\\n","\f":"\\f","\r":"\\r",'"':'\\"',"\\":"\\\\"},rep;typeof JSON.stringify!="function"&&(JSON.stringify=function(e,t,n){var r;gap="",indent="";if(typeof n=="number")for(r=0;r<n;r+=1)indent+=" ";else typeof n=="string"&&(indent=n);rep=t;if(!t||typeof t=="function"||typeof t=="object"&&typeof t.length=="number")return str("",{"":e});throw new Error("JSON.stringify")}),typeof JSON.parse!="function"&&(JSON.parse=function(text,reviver){function walk(e,t){var n,r,i=e[t];if(i&&typeof i=="object")for(n in i)Object.hasOwnProperty.call(i,n)&&(r=walk(i,n),r!==undefined?i[n]=r:delete i[n]);return reviver.call(e,t,i)}var j;text=String(text),cx.lastIndex=0,cx.test(text)&&(text=text.replace(cx,function(e){return"\\u"+("0000"+e.charCodeAt(0).toString(16)).slice(-4)}));if(/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,"@").replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,"]").replace(/(?:^|:|,)(?:\s*\[)+/g,"")))return j=eval("("+text+")"),typeof reviver=="function"?walk({"":j},""):j;throw new SyntaxError("JSON.parse")})}()})(),function(){var e=jQuery;if("localStorage"in window&&"sessionStorage"in window){e.webshims.isReady("json-storage",!0);return}var t=function(t){t&&t.indexOf&&t.indexOf(";")!=-1&&setTimeout(function(){e.webshims.warn("Bad key for localStorage: ; in localStorage. name was: "+t)},0)},n,r=!1;e.each(["opener","top","parent"],function(e,t){try{n=window[t];if(n&&"name"in n){var r=n.name;return!1}n=!1}catch(i){n=!1}}),n||(n=window,r=!0);var i=function(e){if(!r)try{window.name=e}catch(t){}try{n.name=e}catch(t){n=window,r=!0}},s=function(){var e;if(!r)try{e=window.name}catch(t){}if(!e)try{e=n.name}catch(t){n=window,r=!0}return e},o=function(e){function n(e,t,n){var r,i;n?(r=new Date,r.setTime(r.getTime()+n*24*60*60*1e3),i="; expires="+r.toGMTString()):i="",document.cookie=e+"="+t+i+"; path=/"}function r(e){var t=e+"=",n=document.cookie.split(";"),r,i;for(r=0;r<n.length;r++){i=n[r];while(i.charAt(0)==" ")i=i.substring(1,i.length);if(i.indexOf(t)===0)return i.substring(t.length,i.length)}return null}function o(t){t=JSON.stringify(t),e=="session"?i(t):n("localStorage",t,365)}function u(){e=="session"?i(""):n("localStorage","",365)}function a(){var t;e=="session"?t=s():t=r("localStorage");if(t)try{t=JSON.parse(t)}catch(n){t={}}return t||{}}var f=a();return{clear:function(){f={},u()},getItem:function(e){return e in f?f[e]:null},key:function(e){var t=0;for(var n in f){if(t==e)return n;t++}return null},removeItem:function(e){delete f[e],o(f)},setItem:function(e,n){t(e),f[e]=n+"",o(f)}}};"sessionStorage"in window||(window.sessionStorage=new o("session")),function(){var n,r="(empty string)+1287520303738",i,s,u=function(i){clearTimeout(n);if(window.localStorage&&(i!="swf"||s&&s.key)){e.webshims.isReady("json-storage",!0);return}if(i==="swf"){s=document.getElementById("swflocalstorageshim");if(!s||typeof s.GetVariable=="undefined")s=document.swflocalstorageshim;if(!s||typeof s.GetVariable=="undefined")s=window.localstorageshim;s&&typeof s.GetVariable!="undefined"&&(window.localStorage={},window.localStorage.clear=function(){s.clear&&s.clear()},window.localStorage.key=function(e){s.key&&s.key(e)},window.localStorage.removeItem=function(e){s.removeItem&&s.removeItem(e)},window.localStorage.setItem=function(e,n){t(e),n+="",n||(n=r),s.setItem&&s.setItem(e,n)},window.localStorage.getItem=function(e){if(!s.getItem)return null;var t=s.getItem(e,t);return t==r&&(t=""),t},e.webshims.log("flash-localStorage was implemented"))}"localStorage"in window||(window.localStorage=new o("local"),e.webshims.warn("implement cookie-localStorage")),e.webshims.isReady("json-storage",!0)},a=e.webshims.cfg["json-storage"];e.webshims.swfLocalStorage={show:function(){a.exceededMessage&&e("#swflocalstorageshim-wrapper").prepend('<div class="polyfill-exceeded-message">'+a.exceededMessage+"</div>"),e("#swflocalstorageshim-wrapper").css({top:e(window).scrollTop()+20,left:e(window).width()/2-e("#swflocalstorageshim-wrapper").outerWidth()/2})},hide:function(t){e("#swflocalstorageshim-wrapper").css({top:"",left:""}).find("div.polyfill-exceeded-message").remove();if(!t){var n=new Error("DOMException: QUOTA_EXCEEDED_ERR");throw n.code=22,n.name="DOMException",n}},isReady:u},e.webshims.ready("DOM swfobject",function(){if(i||"localStorage"in window&&document.getElementById("swflocalstorageshim"))return;i=!0,window.swfobject&&swfobject.hasFlashPlayerVersion("8.0.0")?(e("body")[e.browser.mozilla?"after":"append"]('<div id="swflocalstorageshim-wrapper"><div id="swflocalstorageshim" /></div>'),swfobject.embedSWF(e.webshims.cfg.basePath+"swf/localStorage.swf"+(e.webshims.cfg.addCacheBuster||""),"swflocalstorageshim","295","198","8.0.0","",{allowscriptaccess:"always"},{name:"swflocalstorageshim"},function(e){!e.success&&!window.localStorage&&u()}),clearTimeout(n),n=setTimeout(function(){"localStorage"in window||e.webshims.warn("Add your development-directory to the local-trusted security sandbox: http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html"),u()},location.protocol.indexOf("file")===0?500:9999)):u()})}()}(),function(e){if(navigator.geolocation)return;var t=function(){setTimeout(function(){throw"document.write is overwritten by geolocation shim. This method is incompatible with this plugin"},1)},n=0,r=e.webshims.cfg.geolocation.options||{};navigator.geolocation=function(){var i,s={getCurrentPosition:function(n,s,o){var u=2,a,f,l,c=function(){if(l)return;if(i){l=!0,n(e.extend({timestamp:(new Date).getTime()},i)),p();if(window.JSON&&window.sessionStorage)try{sessionStorage.setItem("storedGeolocationData654321",JSON.stringify(i))}catch(t){}}else s&&!u&&(l=!0,p(),s({code:2,message:"POSITION_UNAVAILABLE"}))},h=function(){u--,d(),c()},p=function(){e(document).unbind("google-loader",p),clearTimeout(f),clearTimeout(a)},d=function(){if(i||!window.google||!google.loader||!google.loader.ClientLocation)return!1;var t=google.loader.ClientLocation;return i={coords:{latitude:t.latitude,longitude:t.longitude,altitude:null,accuracy:43e3,altitudeAccuracy:null,heading:parseInt("NaN",10),velocity:null},address:e.extend({streetNumber:"",street:"",premises:"",county:"",postalCode:""},t.address)},!0},v=function(){if(i)return;d();if(i||!window.JSON||!window.sessionStorage)return;try{i=sessionStorage.getItem("storedGeolocationData654321"),i=i?JSON.parse(i):!1,i.coords||(i=!1)}catch(e){i=!1}};v();if(!!i){setTimeout(c,1);return}if(r.confirmText&&!confirm(r.confirmText.replace("{location}",location.hostname))){s&&s({code:1,message:"PERMISSION_DENIED"});return}e.ajax({url:"http://freegeoip.net/json/",dataType:"jsonp",cache:!0,jsonp:"callback",success:function(e){u--;if(!e)return;i=i||{coords:{latitude:e.latitude,longitude:e.longitude,altitude:null,accuracy:43e3,altitudeAccuracy:null,heading:parseInt("NaN",10),velocity:null},address:{city:e.city,country:e.country_name,countryCode:e.country_code,county:"",postalCode:e.zipcode,premises:"",region:e.region_name,street:"",streetNumber:""}},c()},error:function(){u--,c()}}),clearTimeout(f),!window.google||!window.google.loader?f=setTimeout(function(){r.destroyWrite&&(document.write=t,document.writeln=t),e(document).one("google-loader",h),e.webshims.loader.loadScript("http://www.google.com/jsapi",!1,"google-loader")},800):u--,o&&o.timeout?a=setTimeout(function(){p(),s&&s({code:3,message:"TIMEOUT"})},o.timeout):a=setTimeout(function(){u=0,c()},1e4)},clearWatch:e.noop};return s.watchPosition=function(e,t,r){return s.getCurrentPosition(e,t,r),n++,n},s}(),e.webshims.isReady("geolocation",!0)}(jQuery);
+
+//JSON
+(function(){
+if('JSON'in window && JSON.stringify && JSON.parse){return;}
+
+if(!this.JSON){this.JSON={};}(function(){function f(n){return n<10?'0'+n:n;}if(typeof Date.prototype.toJSON!=='function'){Date.prototype.toJSON=function(key){return isFinite(this.valueOf())?this.getUTCFullYear()+'-'+f(this.getUTCMonth()+1)+'-'+f(this.getUTCDate())+'T'+f(this.getUTCHours())+':'+f(this.getUTCMinutes())+':'+f(this.getUTCSeconds())+'Z':null;};String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(key){return this.valueOf();};}var cx=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,gap,indent,meta={'\b':'\\b','\t':'\\t','\n':'\\n','\f':'\\f','\r':'\\r','"':'\\"','\\':'\\\\'},rep;function quote(string){escapable.lastIndex=0;return escapable.test(string)?'"'+string.replace(escapable,function(a){var c=meta[a];return typeof c==='string'?c:'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4);})+'"':'"'+string+'"';}function str(key,holder){var i,k,v,length,mind=gap,partial,value=holder[key];if(value&&typeof value==='object'&&typeof value.toJSON==='function'){value=value.toJSON(key);}if(typeof rep==='function'){value=rep.call(holder,key,value);}switch(typeof value){case'string':return quote(value);case'number':return isFinite(value)?String(value):'null';case'boolean':case'null':return String(value);case'object':if(!value){return'null';}gap+=indent;partial=[];if(Object.prototype.toString.apply(value)==='[object Array]'){length=value.length;for(i=0;i<length;i+=1){partial[i]=str(i,value)||'null';}v=partial.length===0?'[]':gap?'[\n'+gap+partial.join(',\n'+gap)+'\n'+mind+']':'['+partial.join(',')+']';gap=mind;return v;}if(rep&&typeof rep==='object'){length=rep.length;for(i=0;i<length;i+=1){k=rep[i];if(typeof k==='string'){v=str(k,value);if(v){partial.push(quote(k)+(gap?': ':':')+v);}}}}else{for(k in value){if(Object.hasOwnProperty.call(value,k)){v=str(k,value);if(v){partial.push(quote(k)+(gap?': ':':')+v);}}}}v=partial.length===0?'{}':gap?'{\n'+gap+partial.join(',\n'+gap)+'\n'+mind+'}':'{'+partial.join(',')+'}';gap=mind;return v;}}if(typeof JSON.stringify!=='function'){JSON.stringify=function(value,replacer,space){var i;gap='';indent='';if(typeof space==='number'){for(i=0;i<space;i+=1){indent+=' ';}}else if(typeof space==='string'){indent=space;}rep=replacer;if(replacer&&typeof replacer!=='function'&&(typeof replacer!=='object'||typeof replacer.length!=='number')){throw new Error('JSON.stringify');}return str('',{'':value});};}if(typeof JSON.parse!=='function'){JSON.parse=function(text,reviver){var j;function walk(holder,key){var k,v,value=holder[key];if(value&&typeof value==='object'){for(k in value){if(Object.hasOwnProperty.call(value,k)){v=walk(value,k);if(v!==undefined){value[k]=v;}else{delete value[k];}}}}return reviver.call(holder,key,value);}text=String(text);cx.lastIndex=0;if(cx.test(text)){text=text.replace(cx,function(a){return'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4);});}if(/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,'@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,']').replace(/(?:^|:|,)(?:\s*\[)+/g,''))){j=eval('('+text+')');return typeof reviver==='function'?walk({'':j},''):j;}throw new SyntaxError('JSON.parse');};}}());
+
+})();
+
+//modified version from http://gist.github.com/350433
+//using window.name for sessionStorage and cookies for localStorage
+
+(function () {
+var $ = jQuery;	
+if ('localStorage' in window && 'sessionStorage' in window) {
+	$.webshims.isReady('json-storage', true);
+	return;
+}
+
+
+var storageNameError = function(name){
+	if(name && name.indexOf && name.indexOf(';') != -1){
+		setTimeout(function(){
+			$.webshims.warn("Bad key for localStorage: ; in localStorage. name was: "+ name);
+		}, 0);
+	}
+};
+var winData;
+var selfWindow = false;
+$.each(['opener', 'top', 'parent'], function(i, name){
+	try {
+		winData = window[name];
+		if(winData && 'name' in winData){
+			var test = winData.name;
+			return false;
+		} else {
+			winData = false;
+		}
+	} catch(e){
+		winData = false;
+	}
+});
+if(!winData){
+	winData = window;
+	selfWindow = true;
+}
+var setWindowData = function(data){
+	if(!selfWindow){
+		try {
+			window.name = data;
+		} catch(e){}
+	}
+	try {
+		winData.name = data;
+	} catch(e){
+		winData = window;
+		selfWindow = true;
+	}
+};
+var getWindowData = function(){
+	var data;
+	if(!selfWindow){
+		try {
+			data = window.name;
+		} catch(e){}
+	}
+	if(!data){
+		try {
+			data = winData.name;
+		} catch(e){
+			winData = window;
+			selfWindow = true;
+		}
+	}
+	return data;
+};
+var Storage = function (type) {
+	function createCookie(name, value, days) {
+		var date, expires;
+		
+		if (days) {
+			date = new Date();
+			date.setTime(date.getTime()+(days*24*60*60*1000));
+			expires = "; expires="+date.toGMTString();
+		} else {
+			expires = "";
+		}
+		document.cookie = name+"="+value+expires+"; path=/";
+	}
+	
+	function readCookie(name) {
+		var nameEQ = name + "=",
+			ca = document.cookie.split(';'),
+			i, c;
+		
+		for (i=0; i < ca.length; i++) {
+			c = ca[i];
+			while (c.charAt(0)==' ') {
+				c = c.substring(1,c.length);
+			}
+			
+			if (c.indexOf(nameEQ) === 0) {
+				return c.substring(nameEQ.length,c.length);
+			}
+		}
+		return null;
+	}
+	
+	function setData(data) {
+		data = JSON.stringify(data);
+		if (type == 'session') {
+			setWindowData(data);
+		} else {
+			createCookie('localStorage', data, 365);
+		}
+	}
+	
+	function clearData() {
+		if (type == 'session') {
+			setWindowData('');
+		} else {
+			createCookie('localStorage', '', 365);
+		}
+	}
+	
+	function getData() {
+		var data;
+		if(type == 'session'){
+			data = getWindowData();
+		} else {
+			data = readCookie('localStorage');
+		}
+		if(data){
+			try {
+				data = JSON.parse(data);
+			} catch(e){
+				data = {};
+			}
+		}
+		return data || {};
+	}
+	
+	
+	// initialise if there's already data
+	var data = getData();
+	
+	return {
+		clear: function () {
+			data = {};
+			clearData();
+		},
+		getItem: function (key) {
+			return (key in data) ? data[key] : null;
+		},
+		key: function (i) {
+			// not perfect, but works
+			var ctr = 0;
+			for (var k in data) {
+				if (ctr == i) {
+					return k;
+				} else {
+					ctr++;
+				}
+			}
+			return null;
+		},
+		removeItem: function (key) {
+			delete data[key];
+			setData(data);
+		},
+		setItem: function (key, value) {
+			storageNameError(key);
+			data[key] = value+''; // forces the value to a string
+			setData(data);
+		}
+	};
+};
+
+
+
+if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session');}
+
+
+
+(function(){
+	var swfTimer;
+	var emptyString = '(empty string)+1287520303738';
+	var runStart;
+	var shim;
+	var localStorageSwfCallback = function(type){
+		clearTimeout(swfTimer);
+		
+		if(window.localStorage && (type != 'swf' || (shim && shim.key))){
+			$.webshims.isReady('json-storage', true);
+			return;
+		}
+
+		if(type === 'swf'){
+			shim = document.getElementById('swflocalstorageshim');
+			//brute force flash getter
+			if( !shim || typeof shim.GetVariable == 'undefined' ){
+				shim = document.swflocalstorageshim;
+			}
+			if( !shim || typeof shim.GetVariable == 'undefined'){
+				shim = window.localstorageshim;
+			}
+			
+			if(shim && typeof shim.GetVariable !== 'undefined'){
+				window.localStorage = {};
+				
+				window.localStorage.clear = function(){
+					if(shim.clear){shim.clear();}
+				};
+				window.localStorage.key = function(i){
+					if(shim.key){shim.key(i);}
+				};
+				window.localStorage.removeItem = function(name){
+					if(shim.removeItem){shim.removeItem(name);}
+				};
+				
+				window.localStorage.setItem = function(name, val){
+					storageNameError(name);
+					val += '';
+					if(!val){
+						val = emptyString;
+					}
+					if(shim.setItem){
+						shim.setItem(name, val);
+					}
+				};
+				window.localStorage.getItem = function(name){
+					if(!shim.getItem){
+						return null;
+					}
+					var val = shim.getItem(name, val);
+					if(val == emptyString){
+						val = '';
+					}
+					return val;
+				};
+				$.webshims.log('flash-localStorage was implemented');
+			}
+		}
+		if(!('localStorage' in window)){
+			window.localStorage = new Storage('local');
+			$.webshims.warn('implement cookie-localStorage');
+		}
+		
+		$.webshims.isReady('json-storage', true);
+	};
+	var storageCFG = $.webshims.cfg['json-storage'];
+	$.webshims.swfLocalStorage = {
+		show: function(){
+			if(storageCFG.exceededMessage){
+				$('#swflocalstorageshim-wrapper').prepend('<div class="polyfill-exceeded-message">'+ storageCFG.exceededMessage +'</div>');
+			}
+			$('#swflocalstorageshim-wrapper').css({
+				top: $(window).scrollTop() + 20,
+				left: ($(window).width() / 2) - ($('#swflocalstorageshim-wrapper').outerWidth(false) / 2)
+			});
+			
+		},
+		hide: function(success){
+			$('#swflocalstorageshim-wrapper')
+				.css({top: '', left: ''})
+				.find('div.polyfill-exceeded-message')
+				.remove()
+			;
+			if(!success){
+				var err = new Error('DOMException: QUOTA_EXCEEDED_ERR');
+				err.code = 22;
+				err.name = 'DOMException';
+				throw(err);
+			}
+		},
+		isReady: localStorageSwfCallback
+	};
+	
+//	$.webshims.swfLocalStorage.storageEvent = function(newVal, oldVal, url){
+//		
+//	};
+	
+	$.webshims.ready('DOM swfobject', function(){
+		if(runStart || (('localStorage' in window) && document.getElementById('swflocalstorageshim')) ){return;}
+		runStart = true;
+		if(window.swfobject && swfobject.hasFlashPlayerVersion('8.0.0')){
+			$('body')[$.browser.mozilla ? 'after' : 'append']('<div id="swflocalstorageshim-wrapper"><div id="swflocalstorageshim" /></div>');
+			swfobject.embedSWF($.webshims.cfg.basePath +'swf/localStorage.swf' +($.webshims.cfg.addCacheBuster || ''), 'swflocalstorageshim', '295', '198', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'swflocalstorageshim'}, function(e){
+				if(!e.success && !window.localStorage){
+					localStorageSwfCallback();
+				}
+			});
+			clearTimeout(swfTimer);
+			swfTimer = setTimeout(function(){
+				if(!('localStorage' in window)){
+					$.webshims.warn('Add your development-directory to the local-trusted security sandbox: http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html');
+				}
+				localStorageSwfCallback();
+			}, (location.protocol.indexOf('file') === 0) ? 500 : 9999);
+		} else {
+			localStorageSwfCallback();
+		}
+	});
+})();
+
+
+})();
+
+
+(function($){
+	if(navigator.geolocation){return;}
+	var domWrite = function(){
+			setTimeout(function(){
+				throw('document.write is overwritten by geolocation shim. This method is incompatible with this plugin');
+			}, 1);
+		},
+		id = 0
+	;
+	var geoOpts = $.webshims.cfg.geolocation.options || {};
+	navigator.geolocation = (function(){
+		var pos;
+		var api = {
+			getCurrentPosition: function(success, error, opts){
+				var locationAPIs = 2,
+					errorTimer,
+					googleTimer,
+					calledEnd,
+					endCallback = function(){
+						if(calledEnd){return;}
+						if(pos){
+							calledEnd = true;
+							success($.extend({timestamp: new Date().getTime()}, pos));
+							resetCallback();
+							if(window.JSON && window.sessionStorage){
+								try{
+									sessionStorage.setItem('storedGeolocationData654321', JSON.stringify(pos));
+								} catch(e){}
+							}
+						} else if(error && !locationAPIs) {
+							calledEnd = true;
+							resetCallback();
+							error({ code: 2, message: "POSITION_UNAVAILABLE"});
+						}
+					},
+					googleCallback = function(){
+						locationAPIs--;
+						getGoogleCoords();
+						endCallback();
+					},
+					resetCallback = function(){
+						$(document).unbind('google-loader', resetCallback);
+						clearTimeout(googleTimer);
+						clearTimeout(errorTimer);
+					},
+					getGoogleCoords = function(){
+						if(pos || !window.google || !google.loader || !google.loader.ClientLocation){return false;}
+						var cl = google.loader.ClientLocation;
+			            pos = {
+							coords: {
+								latitude: cl.latitude,
+				                longitude: cl.longitude,
+				                altitude: null,
+				                accuracy: 43000,
+				                altitudeAccuracy: null,
+				                heading: parseInt('NaN', 10),
+				                velocity: null
+							},
+			                //extension similiar to FF implementation
+							address: $.extend({streetNumber: '', street: '', premises: '', county: '', postalCode: ''}, cl.address)
+			            };
+						return true;
+					},
+					getInitCoords = function(){
+						if(pos){return;}
+						getGoogleCoords();
+						if(pos || !window.JSON || !window.sessionStorage){return;}
+						try{
+							pos = sessionStorage.getItem('storedGeolocationData654321');
+							pos = (pos) ? JSON.parse(pos) : false;
+							if(!pos.coords){pos = false;} 
+						} catch(e){
+							pos = false;
+						}
+					}
+				;
+				
+				getInitCoords();
+				
+				if(!pos){
+					if(geoOpts.confirmText && !confirm(geoOpts.confirmText.replace('{location}', location.hostname))){
+						if(error){
+							error({ code: 1, message: "PERMISSION_DENIED"});
+						}
+						return;
+					}
+					$.ajax({
+						url: 'http://freegeoip.net/json/',
+						dataType: 'jsonp',
+						cache: true,
+						jsonp: 'callback',
+						success: function(data){
+							locationAPIs--;
+							if(!data){return;}
+							pos = pos || {
+								coords: {
+									latitude: data.latitude,
+					                longitude: data.longitude,
+					                altitude: null,
+					                accuracy: 43000,
+					                altitudeAccuracy: null,
+					                heading: parseInt('NaN', 10),
+					                velocity: null
+								},
+				                //extension similiar to FF implementation
+								address: {
+									city: data.city,
+									country: data.country_name,
+									countryCode: data.country_code,
+									county: "",
+									postalCode: data.zipcode,
+									premises: "",
+									region: data.region_name,
+									street: "",
+									streetNumber: ""
+								}
+				            };
+							endCallback();
+						},
+						error: function(){
+							locationAPIs--;
+							endCallback();
+						}
+					});
+					clearTimeout(googleTimer);
+					if (!window.google || !window.google.loader) {
+						googleTimer = setTimeout(function(){
+							//destroys document.write!!!
+							if (geoOpts.destroyWrite) {
+								document.write = domWrite;
+								document.writeln = domWrite;
+							}
+							$(document).one('google-loader', googleCallback);
+							$.webshims.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
+						}, 800);
+					} else {
+						locationAPIs--;
+					}
+				} else {
+					setTimeout(endCallback, 1);
+					return;
+				}
+				if(opts && opts.timeout){
+					errorTimer = setTimeout(function(){
+						resetCallback();
+						if(error) {
+							error({ code: 3, message: "TIMEOUT"});
+						}
+					}, opts.timeout);
+				} else {
+					errorTimer = setTimeout(function(){
+						locationAPIs = 0;
+						endCallback();
+					}, 10000);
+				}
+			},
+			clearWatch: $.noop
+		};
+		api.watchPosition = function(a, b, c){
+			api.getCurrentPosition(a, b, c);
+			id++;
+			return id;
+		};
+		return api;
+	})();
+	
+	$.webshims.isReady('geolocation', true);
+})(jQuery);

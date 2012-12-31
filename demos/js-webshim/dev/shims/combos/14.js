@@ -256,7 +256,7 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 			}
 			$('#swflocalstorageshim-wrapper').css({
 				top: $(window).scrollTop() + 20,
-				left: ($(window).width() / 2) - ($('#swflocalstorageshim-wrapper').outerWidth() / 2)
+				left: ($(window).width() / 2) - ($('#swflocalstorageshim-wrapper').outerWidth(false) / 2)
 			});
 			
 		},

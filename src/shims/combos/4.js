@@ -523,7 +523,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			},
 			position: function(elem, offset){
 				offset = offset ? $.extend({}, offset) : api.getOffsetFromBody(elem);
-				offset.top += elem.outerHeight();
+				offset.top += elem.outerHeight(false);
 				errorBubble.css(offset);
 			},
 			show: function(){

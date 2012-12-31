@@ -238,8 +238,8 @@ $.widget( "ui.slider", $.ui.mouse, {
 		}
 
 		this.elementSize = {
-			width: this.element.outerWidth(),
-			height: this.element.outerHeight()
+			width: this.element.outerWidth(false),
+			height: this.element.outerHeight(false)
 		};
 		this.elementOffset = this.element.offset();
 
@@ -1352,7 +1352,7 @@ $.extend(Datepicker.prototype, {
 				if( !! cover.length ){
 					var borders = $.datepicker._getBorders(inst.dpDiv);
 					cover.css({left: -borders[0], top: -borders[1],
-						width: inst.dpDiv.outerWidth(), height: inst.dpDiv.outerHeight()});
+						width: inst.dpDiv.outerWidth(false), height: inst.dpDiv.outerHeight(false)});
 				}
 			};
 			inst.dpDiv.zIndex($(input).zIndex()+1);
@@ -1379,7 +1379,7 @@ $.extend(Datepicker.prototype, {
 		this._attachHandlers(inst);
 		var cover = inst.dpDiv.find('iframe.ui-datepicker-cover'); // IE6- only
 		if( !!cover.length ){ //avoid call to outerXXXX() when not in IE6
-			cover.css({left: -borders[0], top: -borders[1], width: inst.dpDiv.outerWidth(), height: inst.dpDiv.outerHeight()})
+			cover.css({left: -borders[0], top: -borders[1], width: inst.dpDiv.outerWidth(false), height: inst.dpDiv.outerHeight(false)})
 		}
 		inst.dpDiv.find('.' + this._dayOverClass + ' a').mouseover();
 		var numMonths = this._getNumberOfMonths(inst);
@@ -1423,10 +1423,10 @@ $.extend(Datepicker.prototype, {
 
 	/* Check positioning to remain on screen. */
 	_checkOffset: function(inst, offset, isFixed) {
-		var dpWidth = inst.dpDiv.outerWidth();
-		var dpHeight = inst.dpDiv.outerHeight();
-		var inputWidth = inst.input ? inst.input.outerWidth() : 0;
-		var inputHeight = inst.input ? inst.input.outerHeight() : 0;
+		var dpWidth = inst.dpDiv.outerWidth(false);
+		var dpHeight = inst.dpDiv.outerHeight(false);
+		var inputWidth = inst.input ? inst.input.outerWidth(false) : 0;
+		var inputHeight = inst.input ? inst.input.outerHeight(false) : 0;
 		var viewWidth = document.documentElement.clientWidth + (isFixed ? 0 : $(document).scrollLeft());
 		var viewHeight = document.documentElement.clientHeight + (isFixed ? 0 : $(document).scrollTop());
 

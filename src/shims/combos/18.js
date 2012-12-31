@@ -670,7 +670,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			if(!inputDim.w){return;}
 			var controlDim = {
 				mL: (parseInt(button.css('marginLeft'), 10) || 0),
-				w: button.outerWidth()
+				w: button.outerWidth(false)
 			};
 			inputDim.mR = (parseInt(input.css('marginRight'), 10) || 0);
 			if(inputDim.mR){
@@ -741,7 +741,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					marginRight: orig.css('marginRight'),
 					marginLeft: orig.css('marginLeft')
 				},
-				outerWidth: orig.outerWidth()
+				outerWidth: orig.outerWidth(false)
 				
 			} :
 			{}
@@ -1528,7 +1528,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 							if(!init && (elem.offsetWidth || elem.offsetHeight)){
 								init = true;
 								adjustInputWithBtn(jElm, controls);
-								controls.css('marginTop', (jElm.outerHeight() - controls.outerHeight()) / 2);
+								controls.css('marginTop', (jElm.outerHeight(false) - controls.outerHeight(false)) / 2);
 							}
 						})
 						.triggerHandler('updateshadowdom')
@@ -2116,8 +2116,8 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 			setPos: function(){
 				this.shadowList.css({marginTop: 0, marginLeft: 0, marginRight: 0, marginBottom: 0});
 				var css = (formsCFG.positionDatalist) ? $(this.input).position() : webshims.getRelOffset(this.shadowList, this.input);
-				css.top += $(this.input).outerHeight();
-				css.width = $(this.input).outerWidth() - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
+				css.top += $(this.input).outerHeight(false);
+				css.width = $(this.input).outerWidth(false) - (parseInt(this.shadowList.css('borderLeftWidth'), 10)  || 0) - (parseInt(this.shadowList.css('borderRightWidth'), 10)  || 0);
 				this.shadowList.css({marginTop: '', marginLeft: '', marginRight: '', marginBottom: ''}).css(css);
 				return css;
 			},
@@ -2195,7 +2195,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					div.scrollTop( div.scrollTop() + elemPos.top - 2);
 					return;
 				}
-				elemPos.top += elem.outerHeight();
+				elemPos.top += elem.outerHeight(false);
 				containerHeight = div.height();
 				if(elemPos.top > containerHeight){
 					div.scrollTop( div.scrollTop() + (elemPos.top - containerHeight) + 2);

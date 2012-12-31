@@ -670,7 +670,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			if(!inputDim.w){return;}
 			var controlDim = {
 				mL: (parseInt(button.css('marginLeft'), 10) || 0),
-				w: button.outerWidth()
+				w: button.outerWidth(false)
 			};
 			inputDim.mR = (parseInt(input.css('marginRight'), 10) || 0);
 			if(inputDim.mR){
@@ -741,7 +741,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					marginRight: orig.css('marginRight'),
 					marginLeft: orig.css('marginLeft')
 				},
-				outerWidth: orig.outerWidth()
+				outerWidth: orig.outerWidth(false)
 				
 			} :
 			{}
@@ -1528,7 +1528,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 							if(!init && (elem.offsetWidth || elem.offsetHeight)){
 								init = true;
 								adjustInputWithBtn(jElm, controls);
-								controls.css('marginTop', (jElm.outerHeight() - controls.outerHeight()) / 2);
+								controls.css('marginTop', (jElm.outerHeight(false) - controls.outerHeight(false)) / 2);
 							}
 						})
 						.triggerHandler('updateshadowdom')

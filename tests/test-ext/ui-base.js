@@ -655,8 +655,8 @@ $.fn.position = function( options ) {
 		targetWidth = targetHeight = 0;
 		basePosition = { top: options.of.pageY, left: options.of.pageX };
 	} else {
-		targetWidth = target.outerWidth();
-		targetHeight = target.outerHeight();
+		targetWidth = target.outerWidth(false);
+		targetHeight = target.outerHeight(false);
 		basePosition = target.offset();
 	}
 
@@ -705,8 +705,8 @@ $.fn.position = function( options ) {
 
 	return this.each(function() {
 		var elem = $( this ),
-			elemWidth = elem.outerWidth(),
-			elemHeight = elem.outerHeight(),
+			elemWidth = elem.outerWidth(false),
+			elemHeight = elem.outerHeight(false),
 			marginLeft = parseInt( $.curCSS( this, "marginLeft", true ) ) || 0,
 			marginTop = parseInt( $.curCSS( this, "marginTop", true ) ) || 0,
 			collisionWidth = elemWidth + marginLeft +
