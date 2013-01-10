@@ -280,12 +280,12 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 //		
 //	};
 	
-	$.webshims.ready('DOM swfobject', function(){
+	$.webshims.ready('DOM swfmini', function(){
 		if(runStart || (('localStorage' in window) && document.getElementById('swflocalstorageshim')) ){return;}
 		runStart = true;
-		if(window.swfobject && swfobject.hasFlashPlayerVersion('8.0.0')){
+		if(window.swfmini && swfmini.hasFlashPlayerVersion('8.0.0')){
 			$('body')[$.browser.mozilla ? 'after' : 'append']('<div id="swflocalstorageshim-wrapper"><div id="swflocalstorageshim" /></div>');
-			swfobject.embedSWF($.webshims.cfg.basePath +'swf/localStorage.swf' +($.webshims.cfg.addCacheBuster || ''), 'swflocalstorageshim', '295', '198', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'swflocalstorageshim'}, function(e){
+			swfmini.embedSWF($.webshims.cfg.basePath +'swf/localStorage.swf' +($.webshims.cfg.addCacheBuster || ''), 'swflocalstorageshim', '295', '198', '8.0.0', '', {allowscriptaccess: 'always'}, {name: 'swflocalstorageshim'}, function(e){
 				if(!e.success && !window.localStorage){
 					localStorageSwfCallback();
 				}

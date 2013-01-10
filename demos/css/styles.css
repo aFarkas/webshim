@@ -185,9 +185,7 @@ select {
 option {
 	padding-right: 3px;
 }
-.step-controls {
-	left: -2px;
-}
+
 .supported-browser-box:after,
 .home-box:after {
 	content: " ";

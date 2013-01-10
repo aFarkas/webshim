@@ -198,11 +198,6 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					.each(function(){
 						var id = $.prop(this, 'id');
 						$(this).triggerHandler('updateDatalist');
-						if(id){
-							$('input[id="'+ id +'"]').each(function(){
-								$(this).triggerHandler('listdatalistchange');
-							});
-						}
 					})
 					
 				;

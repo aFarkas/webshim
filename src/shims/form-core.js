@@ -435,12 +435,12 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			this.id = webshims.wsPopover.id++;
 			this.eventns = '.wsoverlay'+this.id;
 			this.timers = {};
-			this.element = $('<div class="ws-popover"><div class="ws-po-outerbox"><div class="ws-po-arrow"><div class="ws-po-arrowbox" /></div><div class="ws-po-box" /></div></div>');
+			this.element = $('<div class="ws-popover" tabindex="-1"><div class="ws-po-outerbox"><div class="ws-po-arrow"><div class="ws-po-arrowbox" /></div><div class="ws-po-box" /></div></div>');
 			this.contentElement = $('.ws-po-box', this.element);
 			this.lastElement = $([]);
 			this.bindElement();
 			if(this.options.prepareFor){
-				this.prepareFor($(this.options.prepareFor).getNativeElement(), $(this.options.prepareFor).getShadowElement())
+				this.prepareFor($(this.options.prepareFor).getNativeElement(), $(this.options.prepareFor).getShadowElement());
 			}
 			this.element.data('wspopover', this);
 			
@@ -458,7 +458,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				'mousedown': function(e){
 					that.stopBlur = true;
 					that.timers.stopBlur = setTimeout(stopBlur, 9);
-					return false;
 				}
 			});
 		},
@@ -484,11 +483,16 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 					that.element.addClass('ws-po-visible');
 				}, 9);
 			}, 9);
+			$(document).on('focusin'+this.eventns+' mousedown'+this.eventns, function(e){
+				if(that.options.hideOnBlur && !that.stopBlur && !$.contains(that.lastElement[0] || document.body, e.target) && !$.contains(that.element[0], e.target)){
+					that.hide();
+				}
+			});
 			$(window).on('resize'+this.eventns + ' pospopover'+this.eventns, function(){
 				clearTimeout(that.timers.repos);
 				that.timers.repos = setTimeout(function(){
-					that.position(element);
-				}, 9);
+					that.position(visual);
+				}, 900);
 			});
 		},
 		prepareFor: function(element, visual){
@@ -512,17 +516,13 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			if(opts.hideOnBlur){
 				onBlur = function(e){
 					if(that.stopBlur){
-						e.preventDefault();
-						try {
-							that.lastElement.focus();
-						} catch(er){}
 						e.stopImmediatePropagation();
 					} else {
 						that.hide();
 					}
 				};
 				if(this.options.prepareFor){
-					that.lastElement.on('focusout'+that.eventns + ' blur'+that.eventns, onBlur);
+					that.lastElement.on('focusout'+that.eventns + ' blur'+that.eventns, onBlur).data('preparedpopover', that);
 				} else {
 					that.timers.bindBlur = setTimeout(function(){
 						that.lastElement.on('focusout'+that.eventns + ' blur'+that.eventns, onBlur);

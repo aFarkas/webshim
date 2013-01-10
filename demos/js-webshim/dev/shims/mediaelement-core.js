@@ -121,7 +121,7 @@
 	}
 
 webshims.register('mediaelement-core', function($, webshims, window, document, undefined){
-	hasSwf = swfobject.hasFlashPlayerVersion('9.0.115');
+	hasSwf = swfmini.hasFlashPlayerVersion('9.0.115');
 	$('html').addClass(hasSwf ? 'swf' : 'no-swf');
 	var mediaelement = webshims.mediaelement;
 	mediaelement.parseRtmp = function(data){
@@ -363,11 +363,12 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		if(hasNative){
 			mediaElem = $(mediaElem);
 			var nodeName = (mediaElem[0].nodeName || '').toLowerCase();
-			if(!nativeCanPlayType[nodeName]){return ret;}
+			var nativeCanPlay = (nativeCanPlayType[nodeName] || {prop: {_supvalue: false}}).prop._supvalue || mediaElem[0].canPlayType;
+			if(!nativeCanPlay){return ret;}
 			srces = srces || mediaelement.srces(mediaElem);
 			
 			$.each(srces, function(i, src){
-				if(src.type && nativeCanPlayType[nodeName].prop._supvalue.call(mediaElem[0], src.type) ){
+				if(src.type && nativeCanPlay.call(mediaElem[0], src.type) ){
 					ret = src;
 					return false;
 				}
@@ -465,116 +466,140 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		}, 1);
 		
 	});
-	if(!supportsLoop){
-		webshims.defineNodeNamesBooleanProperty(['audio', 'video'], 'loop');
-	}
 	
-	['audio', 'video'].forEach(function(nodeName){
-		var supLoad = webshims.defineNodeNameProperty(nodeName, 'load',  {
-			prop: {
-				value: function(){
-					var data = webshims.data(this, 'mediaelement');
-					selectSource(this, data);
-					if(hasNative && (!data || data.isActive == 'html5') && supLoad.prop._supvalue){
-						supLoad.prop._supvalue.apply(this, arguments);
-					}
-				}
-			}
-		});
-		nativeCanPlayType[nodeName] = webshims.defineNodeNameProperty(nodeName, 'canPlayType',  {
-			prop: {
-				value: function(type){
-					var ret = '';
-					if(hasNative && nativeCanPlayType[nodeName].prop._supvalue){
-						ret = nativeCanPlayType[nodeName].prop._supvalue.call(this, type);
-						if(ret == 'no'){
-							ret = '';
-						}
-					}
-					if(!ret && hasSwf){
-						type = $.trim((type || '').split(';')[0]);
-						if(mediaelement.swfMimeTypes.indexOf(type) != -1){
-							ret = 'maybe';
-						}
-					}
-					return ret;
-				}
-			}
-		});
-	});
-	webshims.onNodeNamesPropertyModify(['audio', 'video'], ['src', 'poster'], {
-		set: function(){
-			var elem = this;
-			var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
-			clearTimeout(baseData.loadTimer);
-			baseData.loadTimer = setTimeout(function(){
-				selectSource(elem);
-				elem = null;
-			}, 9);
+	webshims.ready('dom-support', function(){
+		if(!supportsLoop){
+			webshims.defineNodeNamesBooleanProperty(['audio', 'video'], 'loop');
 		}
+		
+		['audio', 'video'].forEach(function(nodeName){
+			var supLoad = webshims.defineNodeNameProperty(nodeName, 'load',  {
+				prop: {
+					value: function(){
+						var data = webshims.data(this, 'mediaelement');
+						selectSource(this, data);
+						if(hasNative && (!data || data.isActive == 'html5') && supLoad.prop._supvalue){
+							supLoad.prop._supvalue.apply(this, arguments);
+						}
+					}
+				}
+			});
+			nativeCanPlayType[nodeName] = webshims.defineNodeNameProperty(nodeName, 'canPlayType',  {
+				prop: {
+					value: function(type){
+						var ret = '';
+						if(hasNative && nativeCanPlayType[nodeName].prop._supvalue){
+							ret = nativeCanPlayType[nodeName].prop._supvalue.call(this, type);
+							if(ret == 'no'){
+								ret = '';
+							}
+						}
+						if(!ret && hasSwf){
+							type = $.trim((type || '').split(';')[0]);
+							if(mediaelement.swfMimeTypes.indexOf(type) != -1){
+								ret = 'maybe';
+							}
+						}
+						return ret;
+					}
+				}
+			});
+		});
+		webshims.onNodeNamesPropertyModify(['audio', 'video'], ['src', 'poster'], {
+			set: function(){
+				var elem = this;
+				var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
+				clearTimeout(baseData.loadTimer);
+				baseData.loadTimer = setTimeout(function(){
+					selectSource(elem);
+					elem = null;
+				}, 9);
+			}
+		});
 	});
 		
 	var initMediaElements = function(){
-		
-		webshims.addReady(function(context, insertedElement){
-			var media = $('video, audio', context)
-				.add(insertedElement.filter('video, audio'))
-				.each(function(){
-					if($.browser.msie && webshims.browserVersion > 8 && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay])')){
-						$(this).prop('preload', 'metadata').mediaLoad();
-					} else {
-						selectSource(this);
-					}
-					
-					
-					
-					if(hasNative){
-						var bufferTimer;
-						var lastBuffered;
-						var elem = this;
-						var getBufferedString = function(){
-							var buffered = $.prop(elem, 'buffered');
-							if(!buffered){return;}
-							var bufferString = "";
-							for(var i = 0, len = buffered.length; i < len;i++){
-								bufferString += buffered.end(i);
-							}
-							return bufferString;
-						};
-						var testBuffer = function(){
-							var buffered = getBufferedString();
-							if(buffered != lastBuffered){
-								lastBuffered = buffered;
-								$(elem).triggerHandler('progress');
-							}
-						};
-						
-						$(this)
-							.on({
-								'play loadstart progress': function(e){
-									if(e.type == 'progress'){
-										lastBuffered = getBufferedString();
-									}
-									clearTimeout(bufferTimer);
-									bufferTimer = setTimeout(testBuffer, 999);
-								},
-								'emptied stalled mediaerror abort suspend': function(e){
-									if(e.type == 'emptied'){
-										lastBuffered = false;
-									}
-									clearTimeout(bufferTimer);
-								}
-							})
-						;
-					}
-					
-				})
-			;
-			if(!loadTrackUi.loaded && $('track', media).length){
-				loadTrackUi();
+		var testFixMedia = function(){
+			if($.browser.msie && webshims.browserVersion > 8 && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay])')){
+				$(this).prop('preload', 'metadata').mediaLoad();
+			} else {
+				selectSource(this);
 			}
-			media = null;
+			
+			if(hasNative){
+				var bufferTimer;
+				var lastBuffered;
+				var elem = this;
+				var getBufferedString = function(){
+					var buffered = $.prop(elem, 'buffered');
+					if(!buffered){return;}
+					var bufferString = "";
+					for(var i = 0, len = buffered.length; i < len;i++){
+						bufferString += buffered.end(i);
+					}
+					return bufferString;
+				};
+				var testBuffer = function(){
+					var buffered = getBufferedString();
+					if(buffered != lastBuffered){
+						lastBuffered = buffered;
+						$(elem).triggerHandler('progress');
+					}
+				};
+				
+				$(this)
+					.on({
+						'play loadstart progress': function(e){
+							if(e.type == 'progress'){
+								lastBuffered = getBufferedString();
+							}
+							clearTimeout(bufferTimer);
+							bufferTimer = setTimeout(testBuffer, 999);
+						},
+						'emptied stalled mediaerror abort suspend': function(e){
+							if(e.type == 'emptied'){
+								lastBuffered = false;
+							}
+							clearTimeout(bufferTimer);
+						}
+					})
+				;
+			}
+			
+		};
+		var handleMedia = false;
+		
+		
+		webshims.ready('dom-support', function(){
+			handleMedia = true;
+			webshims.addReady(function(context, insertedElement){
+				var media = $('video, audio', context)
+					.add(insertedElement.filter('video, audio'))
+					.each(testFixMedia)
+				;
+				if(!loadTrackUi.loaded && $('track', media).length){
+					loadTrackUi();
+				}
+				media = null;
+			});
 		});
+		
+		if(hasNative && !handleMedia){
+			webshims.addReady(function(context, insertedElement){
+				if(!handleMedia){
+					$('video, audio', context)
+						.add(insertedElement.filter('video, audio'))
+						.each(function(){
+							if(!mediaelement.canNativePlaySrces(this) || (!loadTrackUi.loaded && $('track', this).length)){
+								loadThird();
+								handleMedia = true;
+								return false;
+							}
+						})
+					;
+				}
+			});
+		}
 	};
 	
 	if(Modernizr.track && !bugs.track){

@@ -256,8 +256,7 @@ img.ui-datepicker-trigger {
 .popover-opener {
 	background: #000;
 }
-.polyfill-important .input-buttons,
-.polyfill-important .step-controls {
+.polyfill-important .input-buttons {
 	display: inline-block !important;
 	padding: 0 !important;
 	vertical-align: top !important;
@@ -538,6 +537,32 @@ img.ui-datepicker-trigger {
 	z-index: 1000;
 	min-width: 90px;
 	transition: visibility 400ms ease-in-out;
+}
+
+.ws-popover button::-moz-focus-inner {
+	border: 0;
+	padding: 0;
+}
+
+.ws-popover button {
+	display: inline-block;
+	overflow: visible;
+	position: relative;
+	margin: 0;
+	border: 0;
+	padding: 0;
+	-webkit-box-sizing: content-box;
+	-moz-box-sizing: content-box;
+	-webkit-appearance: none;
+	appearance: none;
+	box-sizing: content-box;
+	font-family: arial, sans-serif;
+	background: transparent;
+	cursor: pointer;
+}
+
+.ws-popover button[disabled] {
+	cursor: default;
 }
 
 .ws-popover.ws-po-visible {

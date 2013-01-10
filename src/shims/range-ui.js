@@ -58,6 +58,7 @@
 			this.range.stop();
 			thumbStyle[this.dirs.pos] = left+'%';
 			rangeStyle[this.dirs.range] = left+'%';
+			
 			if(!animate){
 				this.thumb.css(thumbStyle);
 				this.range.css(rangeStyle);
@@ -84,7 +85,7 @@
 			$('.ws-range-ticks', trail).remove();
 			
 			
-			$.each(opts, function(val, label){
+			$.each(o.options, function(val, label){
 				if(!isNumber(val) || val < min || val > max){return;}
 				var left = 100 * ((val - min) / (max - min));
 				var title = o.showLabels ? ' title="'+ label +'"' : '';

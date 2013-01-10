@@ -1,7 +1,7 @@
 jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
 	"use strict";
 	
-	//ToDo
+	
 	if(!webshims.getStep){
 		webshims.getStep = function(elem, type){
 			var step = $.attr(elem, 'step');
@@ -13,7 +13,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 				return step;
 			}
 			step = typeProtos.number.asNumber(step);
-			return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * typeModels[type].stepScaleFactor;
+			return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * (typeModels[type].stepScaleFactor || 1);
 		};
 	}
 	if(!webshims.addMinMaxNumberToCache){
@@ -40,7 +40,8 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			return (elem.getAttribute('type') || '').toLowerCase();
 		},
 		isDateTimePart = function(string){
-			return (isNumber(string) || (string && string == '0' + (string * 1)));
+			var numStr = string * 1;
+			return (string && (numStr == string || string == '0' + numStr));
 		},
 		addMinMaxNumberToCache = webshims.addMinMaxNumberToCache,
 		addleadingZero = function(val, len){
@@ -60,12 +61,9 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		if(!('type' in cache)){
 			cache.type = getType(input[0]);
 		}
-		//stepmismatch with date is computable, but it would be a typeMismatch (performance)
-		if(cache.type == 'date'){
-			return false;
-		}
-		var ret = (validityState || {}).stepMismatch, base;
-		if(typeModels[cache.type] && typeModels[cache.type].step){
+		//stepmismatch with date is computable, but it would be a typeMismatch in most cases (performance)
+		var ret = (validityState || {}).stepMismatch || false, base;
+		if(typeModels[cache.type] && typeModels[cache.type].step && cache.type != 'date'){
 			if( !('step' in cache) ){
 				cache.step = webshims.getStep(input[0], cache.type);
 			}
@@ -148,7 +146,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 					if(set !==  false){
 						$.prop(elem, 'value', set);
 					} else {
-						webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
+						webshims.error('INVALID_STATE_ERR: DOM Exception 11');
 					}
 				} else {
 					valueAsNumberDescriptor.prop._supset && valueAsNumberDescriptor.prop._supset.apply(elem, arguments);
@@ -180,7 +178,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 						$.prop(elem, 'value', set);
 						return set;
 					} else {
-						webshims.warn('INVALID_STATE_ERR: DOM Exception 11');
+						webshims.error('INVALID_STATE_ERR: DOM Exception 11');
 					}
 				} else {
 					return valueAsDateDescriptor.prop._supset && valueAsDateDescriptor.prop._supset.apply(elem, arguments) || null;
@@ -188,6 +186,69 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			}
 		}
 	});
+	
+	$.each({stepUp: 1, stepDown: -1}, function(name, stepFactor){
+		var stepDescriptor = webshims.defineNodeNameProperty('input', name, {
+			prop: {
+				value: function(factor){
+					var step, val, dateVal, valModStep, alignValue, cache;
+					var type = getType(this);
+					if(typeModels[type] && typeModels[type].asNumber){
+						cache = {type: type};
+						if(!factor){
+							factor = 1;
+							webshims.info("you should always use a factor for stepUp/stepDown");
+						}
+						factor *= stepFactor;
+						
+						val = $.prop(this, 'valueAsNumber');
+						
+						if(isNaN(val)){
+							webshims.info("valueAsNumber is NaN can't apply stepUp/stepDown ");
+							throw('invalid state error');
+						}
+						
+						step = webshims.getStep(this, type);
+						
+						if(step == 'any'){
+							webshims.info("step is 'any' can't apply stepUp/stepDown");
+							throw('invalid state error');
+						}
+						
+						webshims.addMinMaxNumberToCache('min', $(this), cache);
+						webshims.addMinMaxNumberToCache('max', $(this), cache);
+						
+						step *= factor;
+						
+						val = val + step;
+						valModStep = (val - (cache.minAsNumber || 0)) % step;
+						
+						if ( valModStep && (Math.abs(valModStep) > EPS) ) {
+							alignValue = val - valModStep;
+							alignValue += ( valModStep > 0 ) ? step : ( -step );
+							val = alignValue.toFixed(5) * 1;
+						}
+						
+						if( (!isNaN(cache.maxAsNumber) && val > cache.maxAsNumber) || (!isNaN(cache.minAsNumber) && val < cache.minAsNumber) ){
+							webshims.info("max/min overflow can't apply stepUp/stepDown");
+							throw('invalid state error');
+						}
+						if(dateVal){
+							$.prop(this, 'valueAsDate', dateVal);
+						} else {
+							$.prop(this, 'valueAsNumber', val);
+						}
+					} else if(stepDescriptor.prop && stepDescriptor.prop.value){
+						return stepDescriptor.prop.value.apply(this, arguments);
+					} else {
+						webshims.info("no step method for type: "+ type);
+						throw('invalid state error');
+					}
+				}
+			}
+		});
+	});
+	
 	
 	var typeProtos = {
 		
@@ -214,20 +275,24 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		date: {
 			mismatch: function(val){
 				if(!val || !val.split || !(/\d$/.test(val))){return true;}
+				var i;
 				var valA = val.split(/\u002D/);
 				if(valA.length !== 3){return true;}
 				var ret = false;
-				$.each(valA, function(i, part){
-					if(!isDateTimePart(part)){
-						ret = true;
-						return false;
-					}
-				});
-				if(ret){return ret;}
+				
+				
 				if(valA[0].length !== 4 || valA[1].length != 2 || valA[1] > 12 || valA[2].length != 2 || valA[2] > 33){
 					ret = true;
+				} else {
+					for(i = 0; i < 3; i++){
+						if(!isDateTimePart(valA[0])){
+							ret = true;
+							break;
+						}
+					}
 				}
-				return (val !== this.dateToString( this.asDate(val, true) ) );
+				
+				return ret || (val !== this.dateToString( this.asDate(val, true) ) );
 			},
 			step: 1,
 			//stepBase: 0, 0 = default
@@ -325,6 +390,53 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 					return false;
 				}
 			}
+		},
+		month: {
+			mismatch: function(val){
+				return typeProtos.date.mismatch(val+'-01');
+			},
+			step: 1,
+			stepScaleFactor:  false,
+			//stepBase: 0, 0 = default
+			asDate: function(val){
+				return new Date(typeProtos.date.asNumber(val+'-01'));
+			},
+			asNumber: function(val){
+				//1970-01
+				var ret = nan;
+				if(val && !this.mismatch(val)){
+					val = val.split(/\u002D/);
+					val[0] = (val[0] * 1) - 1970;
+					val[1] = (val[1] * 1) - 1;
+					ret = (val[0] * 12) + val[1];
+				}
+				return ret;
+			},
+			numberToString: function(num){
+				var mod;
+				var ret = false;
+				if(isNumber(num)){
+					mod = (num % 12);
+					num = ((num - mod) / 12) + 1970;
+					mod += 1;
+					if(mod < 1){
+						num -= 1;
+						mod += 12;
+					}
+					ret = addleadingZero(num, 4)+'-'+addleadingZero(mod, 2);
+					
+				}
+				
+				return ret;
+			},
+			dateToString: function(date){
+				if(date && date.getUTCHours){
+					var str = typeProtos.date.dateToString(date);
+					return (str.split && (str = str.split(/\u002D/))) ? str[0]+'-'+str[1] : false;
+				} else {
+					return false;
+				}
+			}
 		}
 //		,'datetime-local': {
 //			mismatch: function(val, _getParsed){
@@ -360,25 +472,17 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 	if(typeBugs || !supportsType('range') || !supportsType('time')){
 		typeProtos.range = $.extend({}, typeProtos.number, typeProtos.range);
 		typeProtos.time = $.extend({}, typeProtos.date, typeProtos.time);
+		typeProtos.month = $.extend({}, typeProtos.date, typeProtos.month);
 //		typeProtos['datetime-local'] = $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']);
 	}
 	
-	if(typeBugs || !supportsType('number')){
-		webshims.addInputType('number', typeProtos.number);
-	}
-	
-	if(typeBugs || !supportsType('range')){
-		webshims.addInputType('range', typeProtos.range);
-	}
-	if(typeBugs || !supportsType('date')){
-		webshims.addInputType('date', typeProtos.date);
-	}
-	if(typeBugs || !supportsType('time')){
-		webshims.addInputType('time', typeProtos.time);
-	}
+	//'datetime-local'
+	['number', 'month', 'range', 'date', 'time'].forEach(function(type){
+		if(typeBugs || !supportsType(type)){
+			webshims.addInputType(type, typeProtos[type]);
+		}
+	});
 
-//	if(typeBugs || !supportsType('datetime-local')){
-//		webshims.addInputType('datetime-local', typeProtos['datetime-local']);
-//	}
+
 		
 });
