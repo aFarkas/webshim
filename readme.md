@@ -75,6 +75,14 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.9.5
+----------
+
+- improve youtube playback with jarisplayer
+- fix position bug of error messages in nested overflow: scroll boxes
+- fix chrome issue with dynamically created required radio buttons
+- favorize custom validation message before vendor validation message
+
 Release 1.9.4
 ----------
 
