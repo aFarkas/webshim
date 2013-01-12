@@ -2232,14 +2232,20 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 	
 	
 	['select', 'radio'].forEach(function(type){
-		validityMessages['en'].valueMissing[type] = 'Please select an option.';
+		if(typeof validityMessages['en'].valueMissing == 'object'){
+			validityMessages['en'].valueMissing[type] = 'Please select an option.';
+		}
 	});
 	
 	['date', 'time', 'datetime-local'].forEach(function(type){
-		validityMessages.en.rangeUnderflow[type] = 'Value must be at or after {%min}.';
+		if(typeof validityMessages['en'].rangeUnderflow == 'object'){
+			validityMessages.en.rangeUnderflow[type] = 'Value must be at or after {%min}.';
+		}
 	});
 	['date', 'time', 'datetime-local'].forEach(function(type){
-		validityMessages.en.rangeOverflow[type] = 'Value must be at or before {%max}.';
+		if(typeof validityMessages['en'].rangeOverflow == 'object'){
+			validityMessages.en.rangeOverflow[type] = 'Value must be at or before {%max}.';
+		}
 	});
 	
 	validityMessages['en-US'] = validityMessages['en-US'] || validityMessages['en'];
@@ -2271,14 +2277,20 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 	}, (validityMessages['de'] || {}));
 	
 	['select', 'radio'].forEach(function(type){
-		validityMessages['de'].valueMissing[type] = 'Bitte wählen Sie eine Option aus';
+		if(typeof validityMessages['de'].valueMissing == 'object'){
+			validityMessages['de'].valueMissing[type] = 'Bitte wählen Sie eine Option aus';
+		}
 	});
 	
 	['date', 'time', 'datetime-local'].forEach(function(type){
-		validityMessages.de.rangeUnderflow[type] = '{%value} ist zu früh. {%min} ist die früheste Zeit, die Sie benutzen können.';
+		if(typeof validityMessages['de'].rangeUnderflow == 'object'){
+			validityMessages.de.rangeUnderflow[type] = '{%value} ist zu früh. {%min} ist die früheste Zeit, die Sie benutzen können.';
+		}
 	});
 	['date', 'time', 'datetime-local'].forEach(function(type){
-		validityMessages.de.rangeOverflow[type] = '{%value} ist zu spät. {%max} ist die späteste Zeit, die Sie benutzen können.';
+		if(typeof validityMessages['de'].rangeOverflow == 'object'){
+			validityMessages.de.rangeOverflow[type] = '{%value} ist zu spät. {%max} ist die späteste Zeit, die Sie benutzen können.';
+		}
 	});
 	
 	var currentValidationMessage =  validityMessages[''];
