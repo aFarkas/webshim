@@ -4,7 +4,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 	
 	var implementProperties = (options.overrideMessages || options.customMessages) ? ['customValidationMessage'] : [];
 	
-	validityMessages['en'] = $.extend(true, {
+	validityMessages.en = $.extend(true, {
 		typeMismatch: {
 			email: 'Please enter an email address.',
 			url: 'Please enter a URL.',
@@ -22,36 +22,35 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 		},
 		stepMismatch: 'Invalid input.',
 		tooLong: 'Please enter at most {%maxlength} character(s). You entered {%valueLen}.',
-		
 		patternMismatch: 'Invalid input. {%title}',
 		valueMissing: {
 			defaultMessage: 'Please fill out this field.',
 			checkbox: 'Please check this box if you want to proceed.'
 		}
-	}, (validityMessages['en'] || validityMessages['en-US'] || {}));
+	}, (validityMessages.en || validityMessages['en-US'] || {}));
 	
 	
 	['select', 'radio'].forEach(function(type){
 		if(typeof validityMessages['en'].valueMissing == 'object'){
-			validityMessages['en'].valueMissing[type] = 'Please select an option.';
+			validityMessages.en.valueMissing[type] = 'Please select an option.';
 		}
 	});
 	
-	['date', 'time', 'datetime-local'].forEach(function(type){
-		if(typeof validityMessages['en'].rangeUnderflow == 'object'){
+	['date', 'time', 'datetime-local', 'month'].forEach(function(type){
+		if(typeof validityMessages.en.rangeUnderflow == 'object'){
 			validityMessages.en.rangeUnderflow[type] = 'Value must be at or after {%min}.';
 		}
 	});
-	['date', 'time', 'datetime-local'].forEach(function(type){
-		if(typeof validityMessages['en'].rangeOverflow == 'object'){
+	['date', 'time', 'datetime-local', 'month'].forEach(function(type){
+		if(typeof validityMessages.en.rangeOverflow == 'object'){
 			validityMessages.en.rangeOverflow[type] = 'Value must be at or before {%max}.';
 		}
 	});
 	
-	validityMessages['en-US'] = validityMessages['en-US'] || validityMessages['en'];
+	validityMessages['en-US'] = validityMessages['en-US'] || validityMessages.en;
 	validityMessages[''] = validityMessages[''] || validityMessages['en-US'];
 	
-	validityMessages['de'] = $.extend(true, {
+	validityMessages.de = $.extend(true, {
 		typeMismatch: {
 			email: '{%value} ist keine zulässige E-Mail-Adresse',
 			url: '{%value} ist keine zulässige Webadresse',
@@ -74,21 +73,21 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 			defaultMessage: 'Bitte geben Sie einen Wert ein',
 			checkbox: 'Bitte aktivieren Sie das Kästchen'
 		}
-	}, (validityMessages['de'] || {}));
+	}, (validityMessages.de || {}));
 	
 	['select', 'radio'].forEach(function(type){
-		if(typeof validityMessages['de'].valueMissing == 'object'){
-			validityMessages['de'].valueMissing[type] = 'Bitte wählen Sie eine Option aus';
+		if(typeof validityMessages.de.valueMissing == 'object'){
+			validityMessages.de.valueMissing[type] = 'Bitte wählen Sie eine Option aus';
 		}
 	});
 	
-	['date', 'time', 'datetime-local'].forEach(function(type){
-		if(typeof validityMessages['de'].rangeUnderflow == 'object'){
+	['date', 'time', 'datetime-local', 'month'].forEach(function(type){
+		if(typeof validityMessages.de.rangeUnderflow == 'object'){
 			validityMessages.de.rangeUnderflow[type] = '{%value} ist zu früh. {%min} ist die früheste Zeit, die Sie benutzen können.';
 		}
 	});
-	['date', 'time', 'datetime-local'].forEach(function(type){
-		if(typeof validityMessages['de'].rangeOverflow == 'object'){
+	['date', 'time', 'datetime-local', 'month'].forEach(function(type){
+		if(typeof validityMessages.de.rangeOverflow == 'object'){
 			validityMessages.de.rangeOverflow[type] = '{%value} ist zu spät. {%max} ist die späteste Zeit, die Sie benutzen können.';
 		}
 	});
