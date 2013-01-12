@@ -10,9 +10,9 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 	"use strict";
 	var SENDEVENT = 'sendEvent';
 	var mediaelement = webshims.mediaelement;
-	var swfobject = window.swfobject;
+	var swfmini = window.swfmini;
 	var hasNative = Modernizr.audio && Modernizr.video;
-	var hasFlash = swfobject.hasFlashPlayerVersion('9.0.115');
+	var hasFlash = swfmini.hasFlashPlayerVersion('9.0.115');
 	var loadedSwf = 0;
 	var getProps = {
 		paused: true,
@@ -676,7 +676,7 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		});
 		
 		
-		swfobject.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.0", false, vars, params, attrs, function(swfData){
+		swfmini.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.0", false, vars, params, attrs, function(swfData){
 			
 			if(swfData.success){
 				data.jwapi = swfData.ref;

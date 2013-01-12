@@ -44,6 +44,7 @@
 			extendNative: true,
 			loadStyles: true,
 			disableShivMethods: true,
+			wspopover: {appendTo: 'body', hideOnBlur: true},
 			basePath: (function(){
 				var script = jScripts.filter('[src*="polyfiller.js"]');
 				var path;
@@ -299,10 +300,9 @@
 					fn($, webshims, window, document, undefined, module.options);
 					isReady(name, true);
 				};
-				if (module.d) {
+				if (module.d && module.d.length) {
 					onReady(module.d, ready);
-				}
-				else {
+				} else {
 					ready();
 				}
 			}
@@ -813,19 +813,31 @@
 	
 	addModule('jquery-ui', {
 		src: uiLib+'jquery-ui.min.js',
-		test: function(){return !!($.widget && $.Widget);}
+		test: function(){
+			webshims.warn('deprecated module: '+ this.name);
+			return !!($.widget && $.Widget);
+		}
 	});
 	
 	addModule('input-widgets', {
 		src: '',
 		test: function(){
+			webshims.warn('deprecated module: '+ this.name);
 			return !this.src || !($.widget && !($.fn.datepicker && $.fn.slider));
 		}
 	});
 	
-	addModule('swfobject', {
-		src: googleAPIs+'swfobject/2.2/swfobject.js',
-		test: function(){return ('swfobject' in window);}
+	if(window.swfobject){
+		window.swfmini = window.swfobject;
+	}
+	addModule('swfmini', {
+		test: function(){
+			if(window.swfobject){
+				window.swfmini = window.swfobject;
+			}
+			return ('swfmini' in window);
+		},
+		c: [2, 1]
 	});
 	
 		
@@ -836,14 +848,14 @@
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
 	addPolyfill('es5', {
 		test: !!(Modernizr.ES5 && Function.prototype.bind),
-		c: [27, 10, 1, 22]
+		c: []
 	});
 	
 	addPolyfill('dom-extend', {
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		d: ['es5'],
-		c: [27, 10, 9, 12, 17, 26, 16, 25, 8, 1, 24, 19, 11, 13]
+		c: [2, 3, 4]
 	});
 		
 	
@@ -851,11 +863,9 @@
 	needModernizr('localstorage');
 	addPolyfill('json-storage', {
 		test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
-		loadInit: function(){
-			loadList(['swfobject']);
-		},
+		d: ['swfmini'],
 		noAutoCallback: true,
-		c: [14]
+		c: []
 	});
 	//>json-storage
 	
@@ -869,7 +879,7 @@
 //			,confirmText: ''
 		},
 		d: ['json-storage'],
-		c: [14, 15]
+		c: []
 	});
 	//>
 	
@@ -884,7 +894,7 @@
 			loadInit: function(){
 				var type = this.options.type;
 				var src;
-				if(type && type.indexOf('flash') !== -1 && (!window.swfobject || swfobject.hasFlashPlayerVersion('9.0.0'))){
+				if(type && type.indexOf('flash') !== -1 && (!window.swfmini || swfmini.hasFlashPlayerVersion('9.0.0'))){
 					window.FlashCanvasOptions = window.FlashCanvasOptions || {};
 					flashCanvas = FlashCanvasOptions;
 					if(type == 'flash'){
@@ -963,32 +973,28 @@
 			return input.style.WebkitAppearance !== undefined;
 		});
 		
-		
+		webshims.formcfg = [];
 		webshims.validationMessages = webshims.validityMessages = [];
 		webshims.inputTypes = {};
 				
 		addPolyfill('form-core', {
 			f: 'forms',
 			d: ['es5'],
-			test: function(toLoad){
-				if(formOptions.lightweightDatalist && !this.datalistLoaded){
-					this.datalistLoaded = true;
-					modules['form-datalist'].f = 'forms';
-					webshims.reTest(['form-datalist']);
-				}
-				return false;
-			},
+			
 			options: {
 				placeholderType: 'value',
-				langSrc: 'i18n/errormessages-',
-				lightweightDatalist: true,
+				langSrc: 'i18n/formcfg-',
+				messagePopover: {},
+				datalistPopover: {
+					constrainWidth: true
+				},
 				availabeLangs: ['ar', 'ch-ZN', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'nl', 'pt-PT', 'ru', 'sv'] //en and de are directly implemented in core
 	//			,customMessages: false,
 	//			overrideMessages: false,
 	//			replaceValidationUI: false
 			},
 			methodNames: ['setCustomValidity','checkValidity'],
-			c: [3, 2, 59, 17, 26, 16, 5, 4, 24, 19]
+			c: [2, 1, 3]
 		});
 		
 		formOptions = webCFG.forms;
@@ -999,7 +1005,7 @@
 				return (!Modernizr[formvalidation] || bustedValidity) || ((modules['form-number-date-api'].test() || $.inArray('form-number-date-api', toLoad  || []) == -1) && !formOptions.overrideMessages );
 			},
 			d: ['form-core', DOMSUPPORT, 'form-message'],
-			c: [18, 7, 59, 5]
+			c: [6, 5]
 		});
 		
 		addPolyfill('form-shim-extend', {
@@ -1008,7 +1014,7 @@
 				return Modernizr[formvalidation] && !bustedValidity;
 			},
 			d: ['form-core', DOMSUPPORT],
-			c: [3, 2, 23, 21]
+			c: []
 		});
 		
 		addPolyfill('form-message', {
@@ -1017,48 +1023,62 @@
 				return !( formOptions.customMessages || !Modernizr[formvalidation] || bugs.validationMessage || bustedValidity || !modules[formExtend].test(toLoad) );
 			},
 			d: [DOMSUPPORT],
-			c: [3, 2, 23, 21, 59, 17, 5, 4]
+			c: [3, 4]
 		});
 		
 		addPolyfill('form-number-date-api', {
 			f: 'forms-ext',
-			uiTest: function(){return (modernizrInputTypes.range && modernizrInputTypes.date && modernizrInputTypes.time && modernizrInputTypes.number);},
-			test: function(toLoad){
-				return this.uiTest();
+			options: {
+				types: ['range', 'date', 'time', 'number', 'month']
 			},
+			test: function(toLoad){
+				var ret = true;
+				$.each(this.options.types, function(i, name){
+					if(!modernizrInputTypes[name]){
+						ret = false;
+						return false;
+					}
+				});
+				return ret;
+			},
+			methodNames: ['stepUp', 'stepDown'],
 			d: ['forms', DOMSUPPORT],
-			c: [18, 7, 6]
+			c: [6, 5]
+		});
+		
+		$.webshims.loader.addModule('range-ui', {
+			options: {},
+			noAutoCallback: true,
+			c: [6, 5]
 		});
 		
 		addPolyfill('form-number-date-ui', {
 			f: 'forms-ext',
-			test: function(){return modules['form-number-date-api'].test() && !this.options.replaceUI;},
-			d: ['forms', DOMSUPPORT, 'form-number-date-api'],
+			test: function(){
+				console.log(this.options.replaceUI)
+				return modules['form-number-date-api'].test() && !this.options.replaceUI;
+			},
+			d: ['forms', DOMSUPPORT, 'form-number-date-api', 'range-ui'],
 			loadInit: function(){
-				loadList(['jquery-ui']);
-				if(modules['input-widgets'].src){
-					loadList(['input-widgets']);
-				}
+//				loadList(['jquery-ui']);
+//				if(modules['input-widgets'].src){
+//					loadList(['input-widgets']);
+//				}
 			},
 			options: {
-				stepArrows: {number: 1, time: 1}, 
-				calculateWidth: true,
-				slider: {},
-				datepicker: {},
-				langSrc: uiLib+'i18n/jquery.ui.datepicker-',
-				lazyDate: true
+				calculateWidth: true
 	//			,replaceUI: false
 			},
-			c: [18, 7, 6]
+			c: [6, 5]
 		});
 		
 		addPolyfill('form-datalist', {
-			f: 'forms-ext',
+			f: 'forms',
 			test: function(){
 				return modernizrInputAttrs.list && !formOptions.customDatalist;
 			},
 			d: ['form-core', DOMSUPPORT],
-			c: [3, 59, 18, 24, 19, 11]
+			c: [6, 2]
 		});
 	});
 	//>
@@ -1076,7 +1096,7 @@
 //			animate: false,
 			text: 'Details'
 		},
-		c: [12, 13, 15]
+		c: []
 	});
 	//>
 	
@@ -1092,9 +1112,9 @@
 			}
 			var options = this.options;
 			var hasToPlay = options.hasToPlay;
-			return !( (!window.swfobject || window.swfobject.hasFlashPlayerVersion('9.0.115')) && (options.preferFlash || (hasToPlay != 'any' && !Modernizr.video[hasToPlay] && !Modernizr.audio[hasToPlay])));
+			return !( (!window.swfmini || window.swfmini.hasFlashPlayerVersion('9.0.115')) && (options.preferFlash || (hasToPlay != 'any' && !Modernizr.video[hasToPlay] && !Modernizr.audio[hasToPlay])));
 		};
-		var deps = ['swfobject', DOMSUPPORT];
+		var deps = ['swfmini', DOMSUPPORT];
 		
 		addPolyfill('mediaelement-core', {
 			f: 'mediaelement',
@@ -1102,23 +1122,22 @@
 			options: {
 				hasToPlay: 'any',
 				preferFlash: false,
-				player: 'jwplayer',
+				player: 'jaris',
 				vars: {},
 				params: {},
 				attrs: {},
 				changeSWF: $.noop
 			},
 			methodNames: ['play', 'pause', 'canPlayType', 'mediaLoad:load'],
-			d: deps,
-			c: [27, 10, 9, 12, 17, 26, 16, 25, 8, 22, 23, 24, 20]
+			d: ['swfmini'],
+			c: [2, 1]
 		});
 		addPolyfill('mediaelement-swf', {
 			f: 'mediaelement',
 			d: deps,
 			test: function(){
 				return this.options.player != 'jwplayer' ? true : swfTest.apply(this, arguments);
-			},
-			c: [27, 10, 9, 22, 20]
+			}
 		});
 		
 		addPolyfill('mediaelement-jaris', {
@@ -1126,7 +1145,8 @@
 			d: deps,
 			test: function(){
 				return this.options.player == 'jwplayer' ? true : swfTest.apply(this, arguments);
-			}
+			},
+			c: []
 		});
 		
 		bugs.track = (Modernizr.track && (!Modernizr.texttrackapi || typeof (document.createElement('track').track || {}).mode != 'string'));
@@ -1141,7 +1161,7 @@
 			},
 			d: ['mediaelement', DOMSUPPORT],
 			methodNames: ['addTextTrack'],
-			c: [27, 26, 25]
+			c: []
 		});
 		
 		addModule('track-ui', {

@@ -1,7 +1,7 @@
 * {}
 * {
-    margin: 0;
-    padding: 0;
+	margin: 0;
+	padding: 0;
 }
 section, article, footer, nav, header, footer, hgroup, aside {display: block;}
 li {
@@ -9,14 +9,14 @@ li {
 }
 
 fieldset {
-    border: 0 solid #fff;
+	border: 0 solid #fff;
 }
 del {
-    font-weight: normal;
+	font-weight: normal;
 }
 address {
-    font-size: 120%;
-    font-style: normal;
+	font-size: 120%;
+	font-style: normal;
 }
 img {
 	display: block;
@@ -26,7 +26,7 @@ form textarea {
 	height: 140px;
 	font-family: arial, helvetica, sans-serif;
 }
-remove FOUC 
+/*remove FOUC */
 .loading-polyfills body {
 	visibility: hidden;
 }
@@ -185,9 +185,7 @@ select {
 option {
 	padding-right: 3px;
 }
-.step-controls {
-	left: -2px;
-}
+
 .supported-browser-box:after,
 .home-box:after {
 	content: " ";

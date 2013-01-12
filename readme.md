@@ -75,6 +75,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+<<<<<<< HEAD
 Release 1.9.5
 ----------
 
@@ -82,6 +83,18 @@ Release 1.9.5
 - fix position bug of error messages in nested overflow: scroll boxes
 - fix chrome issue with dynamically created required radio buttons
 - favorize custom validation message before vendor validation message
+=======
+upcomming Release 1.10.0
+----------
+
+- new UI for all input widgets
+- <input type="month" />
+- list/datalist support for following types: range, month, date (datalist support for text/email/url/tel etc. was already there)
+- type="number" can be localized
+- type="number"/type="time" are custom styleable in supporting browsers
+
+
+>>>>>>> dev
 
 Release 1.9.4
 ----------
