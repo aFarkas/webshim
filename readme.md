@@ -32,7 +32,11 @@ How To Use
 
 ---------------
 	<script src="js/jquery.js"></script>
-	<script src="js/Modernizr-yepnope.js"></script> 
+	// Simple change
+	<script src="js-webshim/minified/extras/modernizr-custom.js"></script> 
+	// 'User your own' variant
+	<script src="js/Modernizr-custom.js"></script> 
+
 	<script src="js-webshim/minified/polyfiller.js"></script> 
 
 	<script> 
