@@ -79,15 +79,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-<<<<<<< HEAD
-Release 1.9.5
-----------
 
-- improve youtube playback with jarisplayer
-- fix position bug of error messages in nested overflow: scroll boxes
-- fix chrome issue with dynamically created required radio buttons
-- favorize custom validation message before vendor validation message
-=======
 upcomming Release 1.10.0
 ----------
 
@@ -97,8 +89,14 @@ upcomming Release 1.10.0
 - type="number" can be localized
 - type="number"/type="time" are custom styleable in supporting browsers
 
+Release 1.9.5
+----------
 
->>>>>>> dev
+- improve youtube playback with jarisplayer
+- fix position bug of error messages in nested overflow: scroll boxes
+- fix chrome issue with dynamically created required radio buttons
+- favorize custom validation message before vendor validation message
+
 
 Release 1.9.4
 ----------
