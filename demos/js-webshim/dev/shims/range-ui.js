@@ -58,6 +58,7 @@
 			this.range.stop();
 			thumbStyle[this.dirs.pos] = left+'%';
 			rangeStyle[this.dirs.range] = left+'%';
+			
 			if(!animate){
 				this.thumb.css(thumbStyle);
 				this.range.css(rangeStyle);

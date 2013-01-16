@@ -36,7 +36,7 @@
 
 	
 	var webshims = {
-		version: '1.9.5',
+		version: '1.10.0dev',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -1028,8 +1028,18 @@
 		
 		addPolyfill('form-number-date-api', {
 			f: 'forms-ext',
+			options: {
+				types: ['range', 'date', 'time', 'number', 'month']
+			},
 			test: function(toLoad){
-				return (modernizrInputTypes.range && modernizrInputTypes.date && modernizrInputTypes.time && modernizrInputTypes.number);
+				var ret = true;
+				$.each(this.options.types, function(i, name){
+					if(!modernizrInputTypes[name]){
+						ret = false;
+						return false;
+					}
+				});
+				return ret;
 			},
 			methodNames: ['stepUp', 'stepDown'],
 			d: ['forms', DOMSUPPORT],
@@ -1044,7 +1054,10 @@
 		
 		addPolyfill('form-number-date-ui', {
 			f: 'forms-ext',
-			test: function(){return modules['form-number-date-api'].test() && !this.options.replaceUI;},
+			test: function(){
+				console.log(this.options.replaceUI)
+				return modules['form-number-date-api'].test() && !this.options.replaceUI;
+			},
 			d: ['forms', DOMSUPPORT, 'form-number-date-api', 'range-ui'],
 			loadInit: function(){
 //				loadList(['jquery-ui']);

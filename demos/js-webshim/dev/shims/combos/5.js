@@ -1,3 +1,1078 @@
+jQuery.webshims.register('form-native-extend', function($, webshims, window, doc, undefined, options){
+	"use strict";
+	var Modernizr = window.Modernizr;
+	var modernizrInputTypes = Modernizr.inputtypes;
+	if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){return;}
+	var typeModels = webshims.inputTypes;
+	var validityRules = {};
+	
+	webshims.addInputType = function(type, obj){
+		typeModels[type] = obj;
+	};
+	
+	webshims.addValidityRule = function(type, fn){
+		validityRules[type] = fn;
+	};
+	
+	webshims.addValidityRule('typeMismatch',function (input, val, cache, validityState){
+		if(val === ''){return false;}
+		var ret = validityState.typeMismatch;
+		if(!('type' in cache)){
+			cache.type = (input[0].getAttribute('type') || '').toLowerCase();
+		}
+		
+		if(typeModels[cache.type] && typeModels[cache.type].mismatch){
+			ret = typeModels[cache.type].mismatch(val, input);
+		}
+		return ret;
+	});
+	
+	var overrideNativeMessages = options.overrideMessages;	
+	
+	var overrideValidity = (!modernizrInputTypes.number || !modernizrInputTypes.time || !modernizrInputTypes.range || overrideNativeMessages);
+	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
+	
+	var validityChanger = (overrideNativeMessages)? ['value', 'checked'] : ['value'];
+	var validityElements = [];
+	var testValidity = function(elem, init){
+		if(!elem){return;}
+		var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
+		
+		if(!overrideNativeMessages && !typeModels[type]){
+			return;
+		}
+		
+		if(overrideNativeMessages && !init && type == 'radio' && elem.name){
+			$(doc.getElementsByName( elem.name )).each(function(){
+				$.prop(this, 'validity');
+			});
+		} else {
+			$.prop(elem, 'validity');
+		}
+	};
+	
+	var oldSetCustomValidity = {};
+	['input', 'textarea', 'select'].forEach(function(name){
+		var desc = webshims.defineNodeNameProperty(name, 'setCustomValidity', {
+			prop: {
+				value: function(error){
+					error = error+'';
+					var elem = (name == 'input') ? $(this).getNativeElement()[0] : this;
+					desc.prop._supvalue.call(elem, error);
+					
+					if(webshims.bugs.validationMessage){
+						webshims.data(elem, 'customvalidationMessage', error);
+					}
+					if(overrideValidity){
+						webshims.data(elem, 'hasCustomError', !!(error));
+						testValidity(elem);
+					}
+				}
+			}
+		});
+		oldSetCustomValidity[name] = desc.prop._supvalue;
+	});
+		
+	
+	if(overrideValidity || overrideNativeMessages){
+		validityChanger.push('min');
+		validityChanger.push('max');
+		validityChanger.push('step');
+		validityElements.push('input');
+	}
+	if(overrideNativeMessages){
+		validityChanger.push('required');
+		validityChanger.push('pattern');
+		validityElements.push('select');
+		validityElements.push('textarea');
+	}
+	
+	if(overrideValidity){
+		var stopValidity;
+		validityElements.forEach(function(nodeName){
+			
+			var oldDesc = webshims.defineNodeNameProperty(nodeName, 'validity', {
+				prop: {
+					get: function(){
+						if(stopValidity){return;}
+						var elem = (nodeName == 'input') ? $(this).getNativeElement()[0] : this;
+						
+						var validity = oldDesc.prop._supget.call(elem);
+						
+						if(!validity){
+							return validity;
+						}
+						var validityState = {};
+						validityProps.forEach(function(prop){
+							validityState[prop] = validity[prop];
+						});
+						
+						if( !$.prop(elem, 'willValidate') ){
+							return validityState;
+						}
+						stopValidity = true;
+						var jElm 			= $(elem),
+							cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
+							val				= jElm.val(),
+							customError 	= !!(webshims.data(elem, 'hasCustomError')),
+							setCustomMessage
+						;
+						stopValidity = false;
+						validityState.customError = customError;
+						
+						if( validityState.valid && validityState.customError ){
+							validityState.valid = false;
+						} else if(!validityState.valid) {
+							var allFalse = true;
+							$.each(validityState, function(name, prop){
+								if(prop){
+									allFalse = false;
+									return false;
+								}
+							});
+							
+							if(allFalse){
+								validityState.valid = true;
+							}
+							
+						}
+						
+						$.each(validityRules, function(rule, fn){
+							validityState[rule] = fn(jElm, val, cache, validityState);
+							if( validityState[rule] && (validityState.valid || !setCustomMessage) && (overrideNativeMessages || (typeModels[cache.type] && typeModels[cache.type].mismatch)) ) {
+								oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, rule));
+								validityState.valid = false;
+								setCustomMessage = true;
+							}
+						});
+						if(validityState.valid){
+							oldSetCustomValidity[nodeName].call(elem, '');
+							webshims.data(elem, 'hasCustomError', false);
+						} else if(overrideNativeMessages && !setCustomMessage && !customError){
+							$.each(validityState, function(name, prop){
+								if(name !== 'valid' && prop){
+									oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, name));
+									return false;
+								}
+							});
+						}
+						return validityState;
+					},
+					writeable: false
+					
+				}
+			});
+		});
+
+		validityChanger.forEach(function(prop){
+			webshims.onNodeNamesPropertyModify(validityElements, prop, function(s){
+				testValidity(this);
+			});
+		});
+		
+		if(doc.addEventListener){
+			var inputThrottle;
+			var testPassValidity = function(e){
+				if(!('form' in e.target)){return;}
+				var form = e.target.form;
+				clearTimeout(inputThrottle);
+				testValidity(e.target);
+				if(form && overrideNativeMessages){
+					$('input', form).each(function(){
+						if(this.type == 'password'){
+							testValidity(this);
+						}
+					});
+				}
+			};
+			
+			doc.addEventListener('change', testPassValidity, true);
+			
+			if(overrideNativeMessages){
+				doc.addEventListener('blur', testPassValidity, true);
+				doc.addEventListener('keydown', function(e){
+					if(e.keyCode != 13){return;}
+					testPassValidity(e);
+				}, true);
+			}
+			
+			doc.addEventListener('input', function(e){
+				clearTimeout(inputThrottle);
+				inputThrottle = setTimeout(function(){
+					testValidity(e.target);
+				}, 290);
+			}, true);
+		}
+		
+		var validityElementsSel = validityElements.join(',');	
+		
+		webshims.addReady(function(context, elem){
+			$(validityElementsSel, context).add(elem.filter(validityElementsSel)).each(function(){
+				$.prop(this, 'validity');
+			});
+		});
+		
+		
+		if(overrideNativeMessages){
+			webshims.ready('DOM form-message', function(){
+				webshims.activeLang({
+					register: 'form-core',
+					callback: function(){
+						$('input, select, textarea')
+							.getNativeElement()
+							.each(function(){
+								if(webshims.data(this, 'hasCustomError')){return;}
+								var elem = this;
+								var validity = $.prop(elem, 'validity') || {valid: true};
+								var nodeName;
+								if(validity.valid){return;}
+								nodeName = (elem.nodeName || '').toLowerCase();
+								$.each(validity, function(name, prop){
+									if(name !== 'valid' && prop){
+										oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, name));
+										return false;
+									}
+								});
+							})
+						;
+					}
+				});
+			});
+		}
+		
+	} //end: overrideValidity
+	
+	webshims.defineNodeNameProperty('input', 'type', {
+		prop: {
+			get: function(){
+				var elem = this;
+				var type = (elem.getAttribute('type') || '').toLowerCase();
+				return (webshims.inputTypes[type]) ? type : elem.type;
+			}
+		}
+	});
+	
+	
+});
+jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
+	"use strict";
+	
+	
+	if(!webshims.getStep){
+		webshims.getStep = function(elem, type){
+			var step = $.attr(elem, 'step');
+			if(step === 'any'){
+				return step;
+			}
+			type = type || getType(elem);
+			if(!typeModels[type] || !typeModels[type].step){
+				return step;
+			}
+			step = typeProtos.number.asNumber(step);
+			return ((!isNaN(step) && step > 0) ? step : typeModels[type].step) * (typeModels[type].stepScaleFactor || 1);
+		};
+	}
+	if(!webshims.addMinMaxNumberToCache){
+		webshims.addMinMaxNumberToCache = function(attr, elem, cache){
+			if (!(attr+'AsNumber' in cache)) {
+				cache[attr+'AsNumber'] = typeModels[cache.type].asNumber(elem.attr(attr));
+				if(isNaN(cache[attr+'AsNumber']) && (attr+'Default' in typeModels[cache.type])){
+					cache[attr+'AsNumber'] = typeModels[cache.type][attr+'Default'];
+				}
+			}
+		};
+	}
+	
+	var nan = parseInt('NaN', 10),
+		doc = document,
+		typeModels = webshims.inputTypes,
+		isNumber = function(string){
+			return (typeof string == 'number' || (string && string == string * 1));
+		},
+		supportsType = function(type){
+			return ($('<input type="'+type+'" />').prop('type') === type);
+		},
+		getType = function(elem){
+			return (elem.getAttribute('type') || '').toLowerCase();
+		},
+		isDateTimePart = function(string){
+			var numStr = string * 1;
+			return (string && (numStr == string || string == '0' + numStr));
+		},
+		addMinMaxNumberToCache = webshims.addMinMaxNumberToCache,
+		addleadingZero = function(val, len){
+			val = ''+val;
+			len = len - val.length;
+			for(var i = 0; i < len; i++){
+				val = '0'+val;
+			}
+			return val;
+		},
+		EPS = 1e-7,
+		typeBugs = webshims.bugs.bustedValidity
+	;
+	
+	webshims.addValidityRule('stepMismatch', function(input, val, cache, validityState){
+		if(val === ''){return false;}
+		if(!('type' in cache)){
+			cache.type = getType(input[0]);
+		}
+		//stepmismatch with date is computable, but it would be a typeMismatch in most cases (performance)
+		var ret = (validityState || {}).stepMismatch || false, base;
+		if(typeModels[cache.type] && typeModels[cache.type].step && cache.type != 'date'){
+			if( !('step' in cache) ){
+				cache.step = webshims.getStep(input[0], cache.type);
+			}
+			
+			if(cache.step == 'any'){return false;}
+			
+			if(!('valueAsNumber' in cache)){
+				cache.valueAsNumber = typeModels[cache.type].asNumber( val );
+			}
+			if(isNaN(cache.valueAsNumber)){return false;}
+			
+			addMinMaxNumberToCache('min', input, cache);
+			base = cache.minAsNumber;
+			if(isNaN(base)){
+				base = typeModels[cache.type].stepBase || 0;
+			}
+			
+			ret =  Math.abs((cache.valueAsNumber - base) % cache.step);
+							
+			ret = !(  ret <= EPS || Math.abs(ret - cache.step) <= EPS  );
+		}
+		return ret;
+	});
+	
+	
+	
+	[{name: 'rangeOverflow', attr: 'max', factor: 1}, {name: 'rangeUnderflow', attr: 'min', factor: -1}].forEach(function(data, i){
+		webshims.addValidityRule(data.name, function(input, val, cache, validityState) {
+			var ret = (validityState || {})[data.name] || false;
+			if(val === ''){return ret;}
+			if (!('type' in cache)) {
+				cache.type = getType(input[0]);
+			}
+			if (typeModels[cache.type] && typeModels[cache.type].asNumber) {
+				if(!('valueAsNumber' in cache)){
+					cache.valueAsNumber = typeModels[cache.type].asNumber( val );
+				}
+				if(isNaN(cache.valueAsNumber)){
+					return false;
+				}
+				
+				addMinMaxNumberToCache(data.attr, input, cache);
+				
+				if(isNaN(cache[data.attr+'AsNumber'])){
+					return ret;
+				}
+				ret = ( cache[data.attr+'AsNumber'] * data.factor <  cache.valueAsNumber * data.factor - EPS );
+			}
+			return ret;
+		});
+	});
+	
+	webshims.reflectProperties(['input'], ['max', 'min', 'step']);
+	
+	
+	//IDLs and methods, that aren't part of constrain validation, but strongly tight to it
+	var valueAsNumberDescriptor = webshims.defineNodeNameProperty('input', 'valueAsNumber', {
+		prop: {
+			get: function(){
+				var elem = this;
+				var type = getType(elem);
+				var ret = (typeModels[type] && typeModels[type].asNumber) ? 
+					typeModels[type].asNumber($.prop(elem, 'value')) :
+					(valueAsNumberDescriptor.prop._supget && valueAsNumberDescriptor.prop._supget.apply(elem, arguments));
+				if(ret == null){
+					ret = nan;
+				}
+				return ret;
+			},
+			set: function(val){
+				var elem = this;
+				var type = getType(elem);
+				if(typeModels[type] && typeModels[type].numberToString){
+					//is NaN a number?
+					if(isNaN(val)){
+						$.prop(elem, 'value', '');
+						return;
+					}
+					var set = typeModels[type].numberToString(val);
+					if(set !==  false){
+						$.prop(elem, 'value', set);
+					} else {
+						webshims.error('INVALID_STATE_ERR: DOM Exception 11');
+					}
+				} else {
+					valueAsNumberDescriptor.prop._supset && valueAsNumberDescriptor.prop._supset.apply(elem, arguments);
+				}
+			}
+		}
+	});
+	
+	var valueAsDateDescriptor = webshims.defineNodeNameProperty('input', 'valueAsDate', {
+		prop: {
+			get: function(){
+				var elem = this;
+				var type = getType(elem);
+				return (typeModels[type] && typeModels[type].asDate && !typeModels[type].noAsDate) ? 
+					typeModels[type].asDate($.prop(elem, 'value')) :
+					valueAsDateDescriptor.prop._supget && valueAsDateDescriptor.prop._supget.call(elem) || null;
+			},
+			set: function(value){
+				var elem = this;
+				var type = getType(elem);
+				if(typeModels[type] && typeModels[type].dateToString && !typeModels[type].noAsDate){
+					
+					if(value === null){
+						$.prop(elem, 'value', '');
+						return '';
+					}
+					var set = typeModels[type].dateToString(value);
+					if(set !== false){
+						$.prop(elem, 'value', set);
+						return set;
+					} else {
+						webshims.error('INVALID_STATE_ERR: DOM Exception 11');
+					}
+				} else {
+					return valueAsDateDescriptor.prop._supset && valueAsDateDescriptor.prop._supset.apply(elem, arguments) || null;
+				}
+			}
+		}
+	});
+	
+	$.each({stepUp: 1, stepDown: -1}, function(name, stepFactor){
+		var stepDescriptor = webshims.defineNodeNameProperty('input', name, {
+			prop: {
+				value: function(factor){
+					var step, val, dateVal, valModStep, alignValue, cache;
+					var type = getType(this);
+					if(typeModels[type] && typeModels[type].asNumber){
+						cache = {type: type};
+						if(!factor){
+							factor = 1;
+							webshims.info("you should always use a factor for stepUp/stepDown");
+						}
+						factor *= stepFactor;
+						
+						val = $.prop(this, 'valueAsNumber');
+						
+						if(isNaN(val)){
+							webshims.info("valueAsNumber is NaN can't apply stepUp/stepDown ");
+							throw('invalid state error');
+						}
+						
+						step = webshims.getStep(this, type);
+						
+						if(step == 'any'){
+							webshims.info("step is 'any' can't apply stepUp/stepDown");
+							throw('invalid state error');
+						}
+						
+						webshims.addMinMaxNumberToCache('min', $(this), cache);
+						webshims.addMinMaxNumberToCache('max', $(this), cache);
+						
+						step *= factor;
+						
+						val = val + step;
+						valModStep = (val - (cache.minAsNumber || 0)) % step;
+						
+						if ( valModStep && (Math.abs(valModStep) > EPS) ) {
+							alignValue = val - valModStep;
+							alignValue += ( valModStep > 0 ) ? step : ( -step );
+							val = alignValue.toFixed(5) * 1;
+						}
+						
+						if( (!isNaN(cache.maxAsNumber) && val > cache.maxAsNumber) || (!isNaN(cache.minAsNumber) && val < cache.minAsNumber) ){
+							webshims.info("max/min overflow can't apply stepUp/stepDown");
+							throw('invalid state error');
+						}
+						if(dateVal){
+							$.prop(this, 'valueAsDate', dateVal);
+						} else {
+							$.prop(this, 'valueAsNumber', val);
+						}
+					} else if(stepDescriptor.prop && stepDescriptor.prop.value){
+						return stepDescriptor.prop.value.apply(this, arguments);
+					} else {
+						webshims.info("no step method for type: "+ type);
+						throw('invalid state error');
+					}
+				}
+			}
+		});
+	});
+	
+	
+	var typeProtos = {
+		
+		number: {
+			mismatch: function(val){
+				return !(isNumber(val));
+			},
+			step: 1,
+			//stepBase: 0, 0 = default
+			stepScaleFactor: 1,
+			asNumber: function(str){
+				return (isNumber(str)) ? str * 1 : nan;
+			},
+			numberToString: function(num){
+				return (isNumber(num)) ? num : false;
+			}
+		},
+		
+		range: {
+			minDefault: 0,
+			maxDefault: 100
+		},
+		
+		date: {
+			mismatch: function(val){
+				if(!val || !val.split || !(/\d$/.test(val))){return true;}
+				var i;
+				var valA = val.split(/\u002D/);
+				if(valA.length !== 3){return true;}
+				var ret = false;
+				
+				
+				if(valA[0].length !== 4 || valA[1].length != 2 || valA[1] > 12 || valA[2].length != 2 || valA[2] > 33){
+					ret = true;
+				} else {
+					for(i = 0; i < 3; i++){
+						if(!isDateTimePart(valA[0])){
+							ret = true;
+							break;
+						}
+					}
+				}
+				
+				return ret || (val !== this.dateToString( this.asDate(val, true) ) );
+			},
+			step: 1,
+			//stepBase: 0, 0 = default
+			stepScaleFactor:  86400000,
+			asDate: function(val, _noMismatch){
+				if(!_noMismatch && this.mismatch(val)){
+					return null;
+				}
+				return new Date(this.asNumber(val, true));
+			},
+			asNumber: function(str, _noMismatch){
+				var ret = nan;
+				if(_noMismatch || !this.mismatch(str)){
+					str = str.split(/\u002D/);
+					ret = Date.UTC(str[0], str[1] - 1, str[2]);
+				}
+				return ret;
+			},
+			numberToString: function(num){
+				return (isNumber(num)) ? this.dateToString(new Date( num * 1)) : false;
+			},
+			dateToString: function(date){
+				return (date && date.getFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
+			}
+		},
+		time: {
+			mismatch: function(val, _getParsed){
+				if(!val || !val.split || !(/\d$/.test(val))){return true;}
+				val = val.split(/\u003A/);
+				if(val.length < 2 || val.length > 3){return true;}
+				var ret = false,
+					sFraction;
+				if(val[2]){
+					val[2] = val[2].split(/\u002E/);
+					sFraction = parseInt(val[2][1], 10);
+					val[2] = val[2][0];
+				}
+				$.each(val, function(i, part){
+					if(!isDateTimePart(part) || part.length !== 2){
+						ret = true;
+						return false;
+					}
+				});
+				if(ret){return true;}
+				if(val[0] > 23 || val[0] < 0 || val[1] > 59 || val[1] < 0){
+					return true;
+				}
+				if(val[2] && (val[2] > 59 || val[2] < 0 )){
+					return true;
+				}
+				if(sFraction && isNaN(sFraction)){
+					return true;
+				}
+				if(sFraction){
+					if(sFraction < 100){
+						sFraction *= 100;
+					} else if(sFraction < 10){
+						sFraction *= 10;
+					}
+				}
+				return (_getParsed === true) ? [val, sFraction] : false;
+			},
+			step: 60,
+			stepBase: 0,
+			stepScaleFactor:  1000,
+			asDate: function(val){
+				val = new Date(this.asNumber(val));
+				return (isNaN(val)) ? null : val;
+			},
+			asNumber: function(val){
+				var ret = nan;
+				val = this.mismatch(val, true);
+				if(val !== true){
+					ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
+					if(val[1]){
+						ret += val[1];
+					}
+				}
+				return ret;
+			},
+			dateToString: function(date){
+				if(date && date.getUTCHours){
+					var str = addleadingZero(date.getUTCHours(), 2) +':'+ addleadingZero(date.getUTCMinutes(), 2),
+						tmp = date.getSeconds()
+					;
+					if(tmp != "0"){
+						str += ':'+ addleadingZero(tmp, 2);
+					}
+					tmp = date.getUTCMilliseconds();
+					if(tmp != "0"){
+						str += '.'+ addleadingZero(tmp, 3);
+					}
+					return str;
+				} else {
+					return false;
+				}
+			}
+		},
+		month: {
+			mismatch: function(val){
+				return typeProtos.date.mismatch(val+'-01');
+			},
+			step: 1,
+			stepScaleFactor:  false,
+			//stepBase: 0, 0 = default
+			asDate: function(val){
+				return new Date(typeProtos.date.asNumber(val+'-01'));
+			},
+			asNumber: function(val){
+				//1970-01
+				var ret = nan;
+				if(val && !this.mismatch(val)){
+					val = val.split(/\u002D/);
+					val[0] = (val[0] * 1) - 1970;
+					val[1] = (val[1] * 1) - 1;
+					ret = (val[0] * 12) + val[1];
+				}
+				return ret;
+			},
+			numberToString: function(num){
+				var mod;
+				var ret = false;
+				if(isNumber(num)){
+					mod = (num % 12);
+					num = ((num - mod) / 12) + 1970;
+					mod += 1;
+					if(mod < 1){
+						num -= 1;
+						mod += 12;
+					}
+					ret = addleadingZero(num, 4)+'-'+addleadingZero(mod, 2);
+					
+				}
+				
+				return ret;
+			},
+			dateToString: function(date){
+				if(date && date.getUTCHours){
+					var str = typeProtos.date.dateToString(date);
+					return (str.split && (str = str.split(/\u002D/))) ? str[0]+'-'+str[1] : false;
+				} else {
+					return false;
+				}
+			}
+		}
+//		,'datetime-local': {
+//			mismatch: function(val, _getParsed){
+//				if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
+//				val = val.split(/\u0054/);
+//				return ( typeProtos.date.mismatch(val[0]) || typeProtos.time.mismatch(val[1], _getParsed) );
+//			},
+//			noAsDate: true,
+//			asDate: function(val){
+//				val = new Date(this.asNumber(val));
+//				
+//				return (isNaN(val)) ? null : val;
+//			},
+//			asNumber: function(val){
+//				var ret = nan;
+//				var time = this.mismatch(val, true);
+//				if(time !== true){
+//					val = val.split(/\u0054/)[0].split(/\u002D/);
+//					
+//					ret = Date.UTC(val[0], val[1] - 1, val[2], time[0][0], time[0][1], time[0][2] || 0);
+//					if(time[1]){
+//						ret += time[1];
+//					}
+//				}
+//				return ret;
+//			},
+//			dateToString: function(date, _getParsed){
+//				return typeProtos.date.dateToString(date) +'T'+ typeProtos.time.dateToString(date, _getParsed);
+//			}
+//		}
+	};
+	
+	if(typeBugs || !supportsType('range') || !supportsType('time')){
+		typeProtos.range = $.extend({}, typeProtos.number, typeProtos.range);
+		typeProtos.time = $.extend({}, typeProtos.date, typeProtos.time);
+		typeProtos.month = $.extend({}, typeProtos.date, typeProtos.month);
+//		typeProtos['datetime-local'] = $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']);
+	}
+	
+	//'datetime-local'
+	['number', 'month', 'range', 'date', 'time'].forEach(function(type){
+		if(typeBugs || !supportsType(type)){
+			webshims.addInputType(type, typeProtos[type]);
+		}
+	});
+
+
+		
+});
+(function($){
+	
+	var id = 0;
+	var isNumber = function(string){
+		return (typeof string == 'number' || (string && string == string * 1));
+	};
+	var retDefault = function(val, def){
+		if(!(typeof val == 'number' || (val && val == val * 1))){
+			return def;
+		}
+		return val * 1;
+	};
+	var createOpts = ['step', 'min', 'max', 'readonly', 'title', 'disabled', 'tabindex'];
+	var rangeProto = {
+		_create: function(){
+			var i;
+			
+			
+			this.element.addClass('ws-range').attr({role: 'slider'}).html('<span class="ws-range-min" /><span class="ws-range-rail"><span class="ws-range-thumb" /></span>');
+			this.trail = $('.ws-range-rail', this.element);
+			this.range = $('.ws-range-min', this.element);
+			this.thumb = $('.ws-range-thumb', this.trail);
+			this.dirs = this.element.innerHeight() > this.element.innerWidth() ? 
+				{mouse: 'pageY', pos: 'top', range: 'height', outerWidth: 'outerHeight'} :
+				{mouse: 'pageX', pos: 'left', range: 'width', outerWidth: 'outerWidth'}
+			;
+			this.updateMetrics();
+			
+			this.orig = this.options.orig;
+			
+			for(i = 0; i < createOpts.length; i++){
+				this[createOpts[i]](this.options[createOpts[i]]);
+			}
+			this.value = this._value;
+			this.value(this.options.value);
+			this.list(this.options.options);
+			this.element.data('rangeUi', this);
+			this.addBindings();
+			this._init = true;
+		},
+		value: $.noop,
+		_value: function(val, _noNormalize, animate){
+			var left;
+			var oVal = val;
+			var thumbStyle = {};
+			var rangeStyle = {};
+			if(!_noNormalize && parseFloat(val, 10) != val){
+				val = this.options.min + ((this.options.max - this.options.min) / 2);
+			}
+			
+			if(!_noNormalize){
+				val = this.normalizeVal(val);
+			}
+			left =  100 * ((val - this.options.min) / (this.options.max - this.options.min));
+			
+			this.options.value = val;
+			this.thumb.stop();
+			this.range.stop();
+			thumbStyle[this.dirs.pos] = left+'%';
+			rangeStyle[this.dirs.range] = left+'%';
+			
+			if(!animate){
+				this.thumb.css(thumbStyle);
+				this.range.css(rangeStyle);
+			} else {
+				this.thumb.animate(thumbStyle, {animate: this.options.animate});
+				this.range.animate(rangeStyle, {animate: this.options.animate});
+			}
+			if(this.orig && (oVal != val || (!this._init && this.orig.value != val)) ){
+				this.options._change(val);
+			}
+			this.element.attr({
+				'aria-valuenow': this.options.value,
+				'aria-valuetext': this.options.options[this.options.value] || this.options.value
+			});
+		},
+		list: function(opts){
+			var o = this.options;
+			var min = o.min;
+			var max = o.max;
+			var trail = this.trail;
+			o.options = opts || {};
+			
+			this.element.attr({'aria-valuetext': o.options[o.value] || o.value});
+			$('.ws-range-ticks', trail).remove();
+			
+			
+			$.each(o.options, function(val, label){
+				if(!isNumber(val) || val < min || val > max){return;}
+				var left = 100 * ((val - min) / (max - min));
+				var title = o.showLabels ? ' title="'+ label +'"' : '';
+				trail.append('<span class="ws-range-ticks"'+ title +' style="'+(this.dirs.pos)+': '+left+'%;" />');
+			});
+		},
+		readonly: function(val){
+			val = !!val;
+			this.options.readonly = val;
+			this.element.attr('aria-readonly', ''+val);
+		},
+		disabled: function(val){
+			val = !!val;
+			this.options.disabled = val;
+			if(val){
+				this.element.attr({tabindex: -1, 'aria-disbaled': 'true'});
+			} else {
+				this.element.attr({tabindex: this.options.tabindex, 'aria-disbaled': 'false'});
+			}
+		},
+		tabindex: function(val){
+			this.options.tabindex = val;
+			if(!this.options.disabled){
+				this.element.attr({tabindex: val});
+			}
+		},
+		title: function(val){
+			this.element.prop('title', val);
+		},
+		min: function(val){
+			this.options.min = retDefault(val, 0);
+			this.value(this.options.value, true);
+		},
+		max: function(val){
+			this.options.max = retDefault(val, 100);
+			this.value(this.options.value, true);
+		},
+		step: function(val){
+			this.options.step = val == 'any' ? 'any' : retDefault(val, 1);
+			this.value(this.options.value);
+		},
+		
+		normalizeVal: function(val){
+			var valModStep, alignValue, step;
+			var o = this.options;
+			
+			if(val <= o.min){
+				val = o.min;
+			} else if(val >= o.max) {
+				val = o.max;
+			} else if(o.step != 'any'){
+				step = o.step;
+				valModStep = (val - o.min) % step;
+				alignValue = val - valModStep;
+				
+				if ( Math.abs(valModStep) * 2 >= step ) {
+					alignValue += ( valModStep > 0 ) ? step : ( -step );
+				}
+				val = alignValue.toFixed(5) * 1;
+			}
+			return val;
+		},
+		doStep: function(factor){
+			var step = retDefault(this.options.step, 1);
+			if(this.options.step == 'any'){
+				step = Math.min(step, (this.options.max - this.options.min) / 10);
+			}
+			this.value( this.options.value + (step * factor) );
+			
+		},
+		 
+		getStepedValueFromPos: function(pos){
+			var val, valModStep, alignValue, step;
+			
+			if(pos <= 0){
+				val = this.options.min;
+			} else if(pos > 100) {
+				val = this.options.max;
+			} else {
+				val = ((this.options.max - this.options.min) * (pos / 100)) + this.options.min;
+				step = this.options.step;
+				if(step != 'any'){
+					valModStep = (val - this.options.min) % step;
+					alignValue = val - valModStep;
+					
+					if ( Math.abs(valModStep) * 2 >= step ) {
+						alignValue += ( valModStep > 0 ) ? step : ( -step );
+					}
+					val = ((alignValue).toFixed(5)) * 1;
+					
+				}
+			}
+			
+			return val;
+		},
+		addBindings: function(){
+			var leftOffset, widgetUnits, hasFocus;
+			var that = this;
+			var o = this.options;
+			
+			var eventTimer = (function(){
+				var events = {};
+				return {
+					init: function(name, curVal, fn){
+						if(!events[name]){
+							events[name] = {fn: fn};
+							if(that.orig){
+								$(that.orig).on(name, function(){
+									events[name].val = $.prop(that.orig, 'value');
+								});
+							}
+							
+						}
+						events[name].val = curVal;
+					},
+					call: function(name, val){
+						if(events[name].val != val){
+							clearTimeout(events[name].timer);
+							events[name].val = val;
+							events[name].timer = setTimeout(function(){
+								events[name].fn(val, that);
+							}, 0);
+						}
+					}
+				};
+			})();
+			
+			var setValueFromPos = function(e, animate){
+				var val = that.getStepedValueFromPos((e[that.dirs.mouse] - leftOffset) * widgetUnits);
+				if(val != o.value){
+					
+					that.value(val, false, animate);
+					eventTimer.call('input', val);
+				}
+			};
+			
+			var remove = function(e){
+				if(e && e.type == 'mouseup'){
+					eventTimer.call('input', o.value);
+					eventTimer.call('change', o.value);
+				}
+				that.element.removeClass('ws-active');
+				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
+			};
+			var add = function(e){
+				e.preventDefault();
+				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
+				if(!o.readonly && !o.disabled){
+					leftOffset = that.element.focus().addClass('ws-active').offset();
+					widgetUnits = that.element.width();
+					if(!widgetUnits || !leftOffset){return;}
+					leftOffset = leftOffset[that.dirs.pos];
+					widgetUnits = 100 / (widgetUnits  - ((that.thumb[that.dirs.outerWidth]() || 2) / 2));
+					setValueFromPos(e, that.options.animate);
+					$(document)
+						.on({
+							mouseup: remove,
+							mousemove: setValueFromPos
+						})
+					;
+					e.stopPropagation();
+				}
+			};
+			
+			eventTimer.init('input', o.value, this.options.input);
+			eventTimer.init('change', o.value, this.options.change);
+			
+			this.element.on({
+				mousedown: add,
+				focus: function(e){
+					if(!o.disabled){
+						eventTimer.init('input', o.value);
+						eventTimer.init('change', o.value);
+						that.element.addClass('ws-focus');
+					}
+					hasFocus = true;
+				},
+				blur: function(e){
+					that.element.removeClass('ws-focus ws-active');
+					hasFocus = false;
+					eventTimer.init('input', o.value);
+					eventTimer.call('change', o.value);
+				},
+				keyup: function(){
+					that.element.removeClass('ws-active');
+					eventTimer.call('input', o.value);
+					eventTimer.call('change', o.value);
+				},
+				mousewheel: function(e, delta){
+					if(delta && hasFocus && !o.readonly && !o.disabled){
+						that.doStep(delta);
+						e.preventDefault();
+						eventTimer.call('input', o.value);
+					}
+				},
+				keypress: function(e){
+					var step = true;
+					var code = e.keyCode;
+					if(!o.readonly && !o.disabled){
+						if (code == 39 || code == 38) {
+							that.doStep(1);
+						} else if (code == 37 || code == 40) {
+							that.doStep(-1);
+						} else if (code == 33) {
+							that.doStep(10);
+						} else if (code == 34) {
+							that.doStep(-10);
+						} else if (code == 36) {
+							that.value(that.options.max);
+						} else if (code == 35) {
+							that.value(that.options.min);
+						} else {
+							step = false;
+						}
+						if (step) {
+							that.element.addClass('ws-active');
+							eventTimer.call('input', o.value);
+							e.preventDefault();
+						}
+					}
+				}
+			});
+			this.thumb.on({
+				mousedown: add
+			});
+		},
+		updateMetrics: function(){
+			
+		}
+	};
+	
+	$.fn.rangeUI = function(opts){
+		opts = $.extend({readonly: false, disabled: false, tabindex: 0, min: 0, step: 1, max: 100, value: 50, input: $.noop, change: $.noop, _change: $.noop, showLabels: true}, opts);
+		return this.each(function(){
+			$.webshims.objectCreate(rangeProto, {
+				element: {
+					value: $(this)
+				}
+			}, opts);
+		});
+	};
+	jQuery.webshims.isReady('range-ui', true);
+})(jQuery);
 
 jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
