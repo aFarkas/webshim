@@ -433,6 +433,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	/* some extra validation UI */
 	webshims.validityAlert = (function(){
 		var alertElem = (!$.browser.msie || parseInt($.browser.version, 10) > 7) ? 'span' : 'label';
+		var cfg = webshims.cfg.forms;
 		var errorBubble;
 		var hideTimer = false;
 		var focusTimer = false;
@@ -440,7 +441,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		var boundHide;
 		
 		var api = {
-			hideDelay: 5000,
+			hideDelay: cfg.validationDelay === -1 ? false : cfg.validationDelay || 5000,
 			
 			showFor: function(elem, message, noFocusElem, noBubble){
 				api._create();
