@@ -209,11 +209,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		
 	});
 	
-	//see also: https://github.com/lojjic/PIE/issues/40 | https://prototype.lighthouseapp.com/projects/8886/tickets/1107-ie8-fatal-crash-when-prototypejs-is-loaded-with-rounded-cornershtc
-	var isExtendNativeSave = (!$.browser.msie || parseInt($.browser.version, 10) > 8);
 	var extendNativeValue = (function(){
 		var UNKNOWN = webshims.getPrototypeOf(document.createElement('foobar'));
 		var has = Object.prototype.hasOwnProperty;
+		//see also: https://github.com/lojjic/PIE/issues/40 | https://prototype.lighthouseapp.com/projects/8886/tickets/1107-ie8-fatal-crash-when-prototypejs-is-loaded-with-rounded-cornershtc
+		var isExtendNativeSave = Modernizr.advancedObjectProperties && Modernizr.objectAccessor;
 		return function(nodeName, prop, desc){
 			var elem = document.createElement(nodeName);
 			var elemProto = webshims.getPrototypeOf(elem);
@@ -905,9 +905,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 });
 //html5a11y
 (function($, document){
-	var browserVersion = $.webshims.browserVersion;
-	if($.browser.mozilla && browserVersion > 5){return;}
-	if (!$.browser.msie || (browserVersion < 12 && browserVersion > 7)) {
+	if (Modernizr.localstorage && (!window.html5 || !window.html5.supportsUnknownElements)) {
 		var elemMappings = {
 			article: "article",
 			aside: "complementary",

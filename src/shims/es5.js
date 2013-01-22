@@ -683,7 +683,7 @@ var prepareString = "a"[0] != "a",
 		})();
 	}
 	
-	Modernizr.objectAccessor = !!((advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)) && (!$.browser.opera || shims.browserVersion >= 11));
+	Modernizr.objectAccessor = !!((advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)));
 	Modernizr.advancedObjectProperties = advancedObjectProperties;
 	
 if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor  || !Object.defineProperty)){

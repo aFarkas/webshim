@@ -155,11 +155,11 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 			}
 			var elem = this.element.attr('autocomplete', 'off').data('wsspinner', this);
 			this.addBindings();
-			if($.browser.mozilla){
-				$(window).on('unload', function(){
-					elem.remove();
-				});
-			}
+//			if($.browser.mozilla){
+//				$(window).on('unload', function(){
+//					elem.remove();
+//				});
+//			}
 			this._init = true;
 		},
 		parseValue: function(val){

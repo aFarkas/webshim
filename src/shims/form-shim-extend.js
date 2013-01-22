@@ -351,7 +351,7 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 	set: function(value){
 		$(this).getShadowFocusElement().attr('aria-required', !!(value)+'');
 	},
-	initAttr: (!$.browser.msie || webshims.browserVersion > 7)//only if we have aria-support
+	initAttr: true
 });
 
 webshims.reflectProperties(['input'], ['pattern']);
@@ -666,7 +666,7 @@ webshims.defineNodeNameProperty('form', 'noValidate', {
 	}
 });
 
-if($.browser.webkit && Modernizr.inputtypes.date){
+if(Modernizr.inputtypes.date){
 	(function(){
 		
 		var noInputTriggerEvts = {updateInput: 1, input: 1},
@@ -1097,8 +1097,7 @@ try {
 
 (function(){
 	Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
-	var bustedTextarea = $.browser.webkit && Modernizr.textareaPlaceholder && webshims.browserVersion < 535;
-	if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder && !bustedTextarea){return;}
+	if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder){return;}
 	
 	var isOver = (webshims.cfg.forms.placeholderType == 'over');
 	var isResponsive = (webshims.cfg.forms.responsivePlaceholder);
@@ -1369,17 +1368,11 @@ try {
 			attr: {
 				set: function(val){
 					var elem = this;
-					if(bustedTextarea){
-						webshims.data(elem, 'textareaPlaceholder', val);
-						elem.placeholder = '';
-					} else {
-						webshims.contentAttr(elem, 'placeholder', val);
-					}
+					webshims.contentAttr(elem, 'placeholder', val);
 					pHolder.update(elem, val);
 				},
 				get: function(){
-					var ret = (bustedTextarea) ? webshims.data(this, 'textareaPlaceholder') : '';
-					return ret || webshims.contentAttr(this, 'placeholder');
+					return webshims.contentAttr(this, 'placeholder');
 				}
 			},
 			reflect: true,
@@ -1396,9 +1389,7 @@ try {
 				set: function(val){
 					var elem = this;
 					var placeholder;
-					if(bustedTextarea){
-						placeholder = webshims.data(elem, 'textareaPlaceholder');
-					} 
+					
 					if(!placeholder){
 						placeholder = webshims.contentAttr(elem, 'placeholder');
 					}

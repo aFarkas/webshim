@@ -16,7 +16,6 @@
 	var Modernizr = window.Modernizr;
 	var asyncWebshims = window.asyncWebshims;
 	var addTest = Modernizr.addTest;
-	var browserVersion = parseFloat($.browser.version, 10);
 	var Object = window.Object;
 	var html5 = window.html5 || {};
 	var needModernizr = function(tests, fn){
@@ -33,7 +32,10 @@
 	};
 	
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
-
+	
+	if(!$.event.customEvent){
+		$.event.customEvent = {};
+	}
 	
 	var webshims = {
 		version: '1.10.0dev',
@@ -55,7 +57,7 @@
 			})()
 		},
 		bugs: {},
-		browserVersion: browserVersion,
+//		browserVersion: browserVersion,
 		/*
 		 * some data
 		 */
