@@ -666,7 +666,7 @@ webshims.defineNodeNameProperty('form', 'noValidate', {
 	}
 });
 
-if(Modernizr.inputtypes.date){
+if(Modernizr.inputtypes.date && /webkit/i.test(navigator.userAgent)){
 	(function(){
 		
 		var noInputTriggerEvts = {updateInput: 1, input: 1},

@@ -32,7 +32,10 @@
 	};
 	
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
-
+	
+	if(!$.event.customEvent){
+		$.event.customEvent = {};
+	}
 	
 	var webshims = {
 		version: '1.9.6pre',

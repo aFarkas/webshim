@@ -210,14 +210,14 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	});
 	
 	//see also: https://github.com/lojjic/PIE/issues/40 | https://prototype.lighthouseapp.com/projects/8886/tickets/1107-ie8-fatal-crash-when-prototypejs-is-loaded-with-rounded-cornershtc
-	var isExtendNativeSave = (!$.browser.msie || parseInt($.browser.version, 10) > 8);
+	var isExtendNativeSave = Modernizr.ES5;
 	var extendNativeValue = (function(){
 		var UNKNOWN = webshims.getPrototypeOf(document.createElement('foobar'));
 		var has = Object.prototype.hasOwnProperty;
 		return function(nodeName, prop, desc){
-			var elem = document.createElement(nodeName);
-			var elemProto = webshims.getPrototypeOf(elem);
-			if( isExtendNativeSave && elemProto && UNKNOWN !== elemProto && ( !elem[prop] || !has.call(elem, prop) ) ){
+			var elem;
+			var elemProto;
+			if( isExtendNativeSave && (elem = document.createElement(nodeName)) && (elemProto = webshims.getPrototypeOf(elem)) && UNKNOWN !== elemProto && ( !elem[prop] || !has.call(elem, prop) ) ){
 				var sup = elem[prop];
 				desc._supvalue = function(){
 					if(sup && sup.apply){
@@ -951,6 +951,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 //additional tests for partial implementation of forms features
 (function($){
 	"use strict";
+	var isWebkit = /webkit/i.test(navigator.userAgent);
 	var Modernizr = window.Modernizr;
 	var webshims = $.webshims;
 	var bugs = webshims.bugs;
@@ -1044,7 +1045,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		});
 	}
 	
-	if($.browser.webkit && !webshims.bugs.bustedValidity){
+	if(isWebkit && !webshims.bugs.bustedValidity){
 		(function(){
 			var elems = /^(?:textarea|input)$/i;
 			var form = false;
@@ -1066,7 +1067,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			
 		})();
 	}
-})(jQuery);
+
 
 jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
@@ -1181,7 +1182,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return false;
 	};
 	
-	if(Modernizr.formvalidation && $.browser.webkit && !webshims.bugs.bustedValidity){
+	if(Modernizr.formvalidation && isWebkit && !webshims.bugs.bustedValidity){
 		(function(){
 			var retriggerRadioValidity = function(){
 				var validity;
@@ -1360,7 +1361,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	
 	
 	var setRoot = function(){
-		webshims.scrollRoot = ($.browser.webkit || document.compatMode == 'BackCompat') ?
+		webshims.scrollRoot = (isWebkit || document.compatMode == 'BackCompat') ?
 			$(document.body) : 
 			$(document.documentElement)
 		;
@@ -1382,7 +1383,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	
 	/* some extra validation UI */
 	webshims.validityAlert = (function(){
-		var alertElem = (!$.browser.msie || parseInt($.browser.version, 10) > 7) ? 'span' : 'label';
+		var alertElem = 'span';
 		var errorBubble;
 		var hideTimer = false;
 		var focusTimer = false;
@@ -1497,7 +1498,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				errorBubble = api.errorBubble = $('<'+alertElem+' class="validity-alert-wrapper" role="alert"><span  class="validity-alert"><span class="va-arrow"><span class="va-arrow-box"></span></span><span class="va-box"></span></span></'+alertElem+'>').css({position: 'absolute', display: 'none'});
 				webshims.ready('DOM', function(){
 					errorBubble.appendTo('body');
-					if($.fn.bgIframe && $.browser.msie && parseInt($.browser.version, 10) < 7){
+					if($.fn.bgIframe){
 						errorBubble.bgIframe();
 					}
 				});
@@ -1577,8 +1578,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			});
 		});
 	}
-	
 });
+
+})(jQuery);
 jQuery.webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var validityMessages = webshims.validityMessages;

@@ -1485,7 +1485,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 							uiEvents.triggerChange(step);
 						}
 					})
-					.on(($.browser.msie) ? 'keydown' : 'keypress', function(e){
+					.on('keypress', function(e){
 						var step = stepKeys[e.keyCode];
 						if(step){
 							uiEvents.step(step);

@@ -1,6 +1,7 @@
 //additional tests for partial implementation of forms features
 (function($){
 	"use strict";
+	var isWebkit = /webkit/i.test(navigator.userAgent);
 	var Modernizr = window.Modernizr;
 	var webshims = $.webshims;
 	var bugs = webshims.bugs;
@@ -94,7 +95,7 @@
 		});
 	}
 	
-	if($.browser.webkit && !webshims.bugs.bustedValidity){
+	if(isWebkit && !webshims.bugs.bustedValidity){
 		(function(){
 			var elems = /^(?:textarea|input)$/i;
 			var form = false;
@@ -116,7 +117,7 @@
 			
 		})();
 	}
-})(jQuery);
+
 
 jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
@@ -231,7 +232,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return false;
 	};
 	
-	if(Modernizr.formvalidation && $.browser.webkit && !webshims.bugs.bustedValidity){
+	if(Modernizr.formvalidation && isWebkit && !webshims.bugs.bustedValidity){
 		(function(){
 			var retriggerRadioValidity = function(){
 				var validity;
@@ -410,7 +411,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	
 	
 	var setRoot = function(){
-		webshims.scrollRoot = ($.browser.webkit || document.compatMode == 'BackCompat') ?
+		webshims.scrollRoot = (isWebkit || document.compatMode == 'BackCompat') ?
 			$(document.body) : 
 			$(document.documentElement)
 		;
@@ -432,7 +433,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	
 	/* some extra validation UI */
 	webshims.validityAlert = (function(){
-		var alertElem = (!$.browser.msie || parseInt($.browser.version, 10) > 7) ? 'span' : 'label';
+		var alertElem = 'span';
 		var errorBubble;
 		var hideTimer = false;
 		var focusTimer = false;
@@ -547,7 +548,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				errorBubble = api.errorBubble = $('<'+alertElem+' class="validity-alert-wrapper" role="alert"><span  class="validity-alert"><span class="va-arrow"><span class="va-arrow-box"></span></span><span class="va-box"></span></span></'+alertElem+'>').css({position: 'absolute', display: 'none'});
 				webshims.ready('DOM', function(){
 					errorBubble.appendTo('body');
-					if($.fn.bgIframe && $.browser.msie && parseInt($.browser.version, 10) < 7){
+					if($.fn.bgIframe){
 						errorBubble.bgIframe();
 					}
 				});
@@ -627,8 +628,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			});
 		});
 	}
-	
 });
+
+})(jQuery);
 jQuery.webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var validityMessages = webshims.validityMessages;
