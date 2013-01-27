@@ -520,13 +520,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			var media = $('video, audio', context)
 				.add(insertedElement.filter('video, audio'))
 				.each(function(){
-					if($.browser.msie && webshims.browserVersion > 8 && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay])')){
-						$(this).prop('preload', 'metadata').mediaLoad();
-					} else {
-						selectSource(this);
-					}
-					
-					
+					selectSource(this);
 					
 					if(hasNative){
 						var bufferTimer;
@@ -1473,9 +1467,8 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		mediaSup = webshims.defineNodeNameProperties(nodeName, descs, 'prop');
 	});
 	
-	if(hasFlash){
+	if(hasFlash && $.cleanData){
 		var oldClean = $.cleanData;
-		var gcBrowser = $.browser.msie && webshims.browserVersion < 9;
 		var flashNames = {
 			object: 1,
 			OBJECT: 1
@@ -1492,15 +1485,13 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 								elems[i][SENDEVENT]('play', false);
 							} catch(er){}
 						}
-						if(gcBrowser){
-							try {
-								for (prop in elems[i]) {
-									if (typeof elems[i][prop] == "function") {
-										elems[i][prop] = null;
-									}
+						try {
+							for (prop in elems[i]) {
+								if (typeof elems[i][prop] == "function") {
+									elems[i][prop] = null;
 								}
-							} catch(er){}
-						}
+							}
+						} catch(er){}
 					}
 				}
 				

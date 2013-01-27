@@ -8,9 +8,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	var adjustInputWithBtn = (function(){
 		var fns = {"padding-box": "innerWidth", "border-box": "outerWidth", "content-box": "width"};
 		var boxSizing = Modernizr.prefixed && Modernizr.prefixed("boxSizing");
-		if($.browser.msie && webshims.browserVersion < 8){
-			boxSizing = false;
-		}
+		
 		var getWidth = function(input){
 			var widthFn = "width";
 			if(boxSizing){
@@ -189,7 +187,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			trigger: [0.595,0.395],
 			normal: [0.565,0.425]
 		};
-		var subPixelCorrect = (!$.browser.msie || webshims.browserVersion > 6) ? 0 : 0.45;
 		
 		var configureDatePicker = function(elem, datePicker, change, _wrapper){
 			var stopFocusout;

@@ -664,8 +664,7 @@ var prepareString = "a"[0] != "a",
 	var defineProperty = 'defineProperty';
 	var advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
 	//safari5 has defineProperty-interface, but it can't be used on dom-object
-	//only do this test in non-IE browsers, because this hurts dhtml-behavior in some IE8 versions
-	if (advancedObjectProperties && !$.browser.msie && Object[defineProperty] && Object.prototype.__defineGetter__) {
+	if (advancedObjectProperties && Object[defineProperty] && Object.prototype.__defineGetter__) {
 		(function(){
 			try {
 				var foo = document.createElement('foo');
@@ -683,7 +682,7 @@ var prepareString = "a"[0] != "a",
 		})();
 	}
 	
-	Modernizr.objectAccessor = !!((advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)) && (!$.browser.opera || shims.browserVersion >= 11));
+	Modernizr.objectAccessor = !!((advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)));
 	Modernizr.advancedObjectProperties = advancedObjectProperties;
 	
 if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor  || !Object.defineProperty)){
@@ -1708,45 +1707,45 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 });
 //html5a11y
 (function($, document){
-	var browserVersion = $.webshims.browserVersion;
-	if($.browser.mozilla && browserVersion > 5){return;}
-	if (!$.browser.msie || (browserVersion < 12 && browserVersion > 7)) {
-		var elemMappings = {
-			article: "article",
-			aside: "complementary",
-			section: "region",
-			nav: "navigation",
-			address: "contentinfo"
-		};
-		var addRole = function(elem, role){
-			var hasRole = elem.getAttribute('role');
-			if (!hasRole) {
-				elem.setAttribute('role', role);
-			}
-		};
-		
-		$.webshims.addReady(function(context, contextElem){
-			$.each(elemMappings, function(name, role){
-				var elems = $(name, context).add(contextElem.filter(name));
-				for (var i = 0, len = elems.length; i < len; i++) {
-					addRole(elems[i], role);
-				}
-			});
-			if (context === document) {
-				var header = document.getElementsByTagName('header')[0];
-				var footers = document.getElementsByTagName('footer');
-				var footerLen = footers.length;
-				if (header && !$(header).closest('section, article')[0]) {
-					addRole(header, 'banner');
-				}
-				if (!footerLen) {
-					return;
-				}
-				var footer = footers[footerLen - 1];
-				if (!$(footer).closest('section, article')[0]) {
-					addRole(footer, 'contentinfo');
-				}
+	//if we support basic styleing or do not support ARIA (assumed) abort
+	if(!Modernizr.localstorage || ('hidden' in document.createElement('a'))){return;}
+	
+	var elemMappings = {
+		article: "article",
+		aside: "complementary",
+		section: "region",
+		nav: "navigation",
+		address: "contentinfo"
+	};
+	var addRole = function(elem, role){
+		var hasRole = elem.getAttribute('role');
+		if (!hasRole) {
+			elem.setAttribute('role', role);
+		}
+	};
+	
+	$.webshims.addReady(function(context, contextElem){
+		$.each(elemMappings, function(name, role){
+			var elems = $(name, context).add(contextElem.filter(name));
+			for (var i = 0, len = elems.length; i < len; i++) {
+				addRole(elems[i], role);
 			}
 		});
-	}
+		if (context === document) {
+			var header = document.getElementsByTagName('header')[0];
+			var footers = document.getElementsByTagName('footer');
+			var footerLen = footers.length;
+			if (header && !$(header).closest('section, article')[0]) {
+				addRole(header, 'banner');
+			}
+			if (!footerLen) {
+				return;
+			}
+			var footer = footers[footerLen - 1];
+			if (!$(footer).closest('section, article')[0]) {
+				addRole(footer, 'contentinfo');
+			}
+		}
+	});
+	
 })(jQuery, document);

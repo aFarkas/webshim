@@ -216,7 +216,6 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 			range: 1,
 			date: 1
 		};
-		var lteie6 = ($.browser.msie && parseInt($.browser.version, 10) < 7);
 		var globStoredOptions = {};
 		var getStoredOptions = function(name){
 			if(!name){return [];}
@@ -500,7 +499,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				this.arrayOptions = allOptions;
 				this.shadowList.html('<div class="datalist-outer-box"><div class="datalist-box"><ul role="list">'+ list.join("\n") +'</ul></div></div>');
 				
-				if($.fn.bgIframe && lteie6){
+				if($.fn.bgIframe){
 					this.shadowList.bgIframe();
 				}
 				

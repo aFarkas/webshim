@@ -520,13 +520,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			var media = $('video, audio', context)
 				.add(insertedElement.filter('video, audio'))
 				.each(function(){
-					if($.browser.msie && webshims.browserVersion > 8 && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay])')){
-						$(this).prop('preload', 'metadata').mediaLoad();
-					} else {
-						selectSource(this);
-					}
-					
-					
+					selectSource(this);
 					
 					if(hasNative){
 						var bufferTimer;

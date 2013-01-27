@@ -16,7 +16,6 @@
 	var Modernizr = window.Modernizr;
 	var asyncWebshims = window.asyncWebshims;
 	var addTest = Modernizr.addTest;
-	var browserVersion = parseFloat($.browser.version, 10);
 	var Object = window.Object;
 	var html5 = window.html5 || {};
 	var needModernizr = function(tests, fn){
@@ -36,7 +35,7 @@
 
 	
 	var webshims = {
-		version: '1.9.5',
+		version: '1.9.6pre',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -54,7 +53,6 @@
 			})()
 		},
 		bugs: {},
-		browserVersion: browserVersion,
 		/*
 		 * some data
 		 */

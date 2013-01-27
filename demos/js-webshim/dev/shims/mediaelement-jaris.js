@@ -805,9 +805,8 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		mediaSup = webshims.defineNodeNameProperties(nodeName, descs, 'prop');
 	});
 	
-	if(hasFlash){
+	if(hasFlash && $.cleanData){
 		var oldClean = $.cleanData;
-		var gcBrowser = $.browser.msie && webshims.browserVersion < 9;
 		var flashNames = {
 			object: 1,
 			OBJECT: 1
@@ -824,15 +823,13 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 								elems[i].api_pause();
 							} catch(er){}
 						}
-						if(gcBrowser){
-							try {
-								for (prop in elems[i]) {
-									if (typeof elems[i][prop] == "function") {
-										elems[i][prop] = null;
-									}
+						try {
+							for (prop in elems[i]) {
+								if (typeof elems[i][prop] == "function") {
+									elems[i][prop] = null;
 								}
-							} catch(er){}
-						}
+							}
+						} catch(er){}
 					}
 				}
 				

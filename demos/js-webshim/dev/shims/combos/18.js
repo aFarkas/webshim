@@ -648,9 +648,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	var adjustInputWithBtn = (function(){
 		var fns = {"padding-box": "innerWidth", "border-box": "outerWidth", "content-box": "width"};
 		var boxSizing = Modernizr.prefixed && Modernizr.prefixed("boxSizing");
-		if($.browser.msie && webshims.browserVersion < 8){
-			boxSizing = false;
-		}
+		
 		var getWidth = function(input){
 			var widthFn = "width";
 			if(boxSizing){
@@ -829,7 +827,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			trigger: [0.595,0.395],
 			normal: [0.565,0.425]
 		};
-		var subPixelCorrect = (!$.browser.msie || webshims.browserVersion > 6) ? 0 : 0.45;
 		
 		var configureDatePicker = function(elem, datePicker, change, _wrapper){
 			var stopFocusout;
@@ -1777,7 +1774,6 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 			range: 1,
 			date: 1
 		};
-		var lteie6 = ($.browser.msie && parseInt($.browser.version, 10) < 7);
 		var globStoredOptions = {};
 		var getStoredOptions = function(name){
 			if(!name){return [];}
@@ -2061,7 +2057,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				this.arrayOptions = allOptions;
 				this.shadowList.html('<div class="datalist-outer-box"><div class="datalist-box"><ul role="list">'+ list.join("\n") +'</ul></div></div>');
 				
-				if($.fn.bgIframe && lteie6){
+				if($.fn.bgIframe){
 					this.shadowList.bgIframe();
 				}
 				

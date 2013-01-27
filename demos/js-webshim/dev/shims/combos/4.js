@@ -231,7 +231,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return false;
 	};
 	
-	if(Modernizr.formvalidation && $.browser.webkit && !webshims.bugs.bustedValidity && webshims.browserVersion < 27){
+	if(Modernizr.formvalidation && $.browser.webkit && !webshims.bugs.bustedValidity){
 		(function(){
 			var retriggerRadioValidity = function(){
 				var validity;
