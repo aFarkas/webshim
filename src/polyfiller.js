@@ -522,7 +522,7 @@
 	$.webshims = webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var googleAPIs = protocol + 'ajax.googleapis.com/ajax/libs/';
-	var uiLib = googleAPIs + 'jqueryui/1.8.24/';
+	var uiLib = googleAPIs + 'jqueryui/1.9.2/';
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;
