@@ -1422,7 +1422,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 			this.clear();
 			this.element.removeClass('ws-po-visible').css('display', 'none');
 			
-			if(this.options.prepareFor){
+			if(!this.options.prepareFor){
 				this.prepareFor(element, visual);
 			}
 			
@@ -1434,7 +1434,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 				}, 9);
 			}, 9);
 			$(document).on('focusin'+this.eventns+' mousedown'+this.eventns, function(e){
-				if(that.options.hideOnBlur && !that.stopBlur && !$.contains(that.lastElement[0] || document.body, e.target) && !$.contains(that.element[0], e.target)){
+				if(that.options.hideOnBlur && !that.stopBlur && !$.contains(that.lastElement.parent()[0] || document.body, e.target) && !$.contains(that.element.parent()[0], e.target)){
 					that.hide();
 				}
 			});

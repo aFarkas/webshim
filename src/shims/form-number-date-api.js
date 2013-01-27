@@ -61,9 +61,9 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		if(!('type' in cache)){
 			cache.type = getType(input[0]);
 		}
-		//stepmismatch with date is computable, but it would be a typeMismatch in most cases (performance)
+		
 		var ret = (validityState || {}).stepMismatch || false, base;
-		if(typeModels[cache.type] && typeModels[cache.type].step && cache.type != 'date'){
+		if(typeModels[cache.type] && typeModels[cache.type].step){
 			if( !('step' in cache) ){
 				cache.step = webshims.getStep(input[0], cache.type);
 			}
