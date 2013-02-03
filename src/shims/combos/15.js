@@ -7,7 +7,7 @@
 		},
 		id = 0
 	;
-	var geoOpts = $.webshims.cfg.geolocation.options || {};
+	var geoOpts = $.webshims.cfg.geolocation || {};
 	navigator.geolocation = (function(){
 		var pos;
 		var api = {
