@@ -38,7 +38,7 @@
 	}
 	
 	var webshims = {
-		version: '1.9.6pre',
+		version: '1.9.6RC1',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -160,7 +160,6 @@
 						return;
 					}
 					if (feature !== webshimsFeatures[feature][0]) {
-						
 						onReady(webshimsFeatures[feature], function(){
 							isReady(feature, true);
 						});
