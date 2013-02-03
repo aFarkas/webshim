@@ -160,6 +160,7 @@
 						return;
 					}
 					if (feature !== webshimsFeatures[feature][0]) {
+						
 						onReady(webshimsFeatures[feature], function(){
 							isReady(feature, true);
 						});
@@ -209,6 +210,7 @@
 			};
 		})(),
 		isReady: function(name, _set){
+			
 			if(webshimsFeatures[name] && webshimsFeatures[name].delayReady > 0){
 				if(_set){
 					webshimsFeatures[name].callReady = true;
@@ -269,11 +271,12 @@
 			}
 			$.each(names, function(i, name){
 				var handler = function(e){
+					
 					e = $.event.fix(e);
 					if (_maybePrevented && webshims.capturingEventPrevented) {
 						webshims.capturingEventPrevented(e);
 					}
-					return $.event.handle.call(this, e);
+					return ($.event.handle && !$.event.dispatch) ? $.event.handle.call(this, e) :  $.event.dispatch.call(this, e);
 				};
 				special[name] = special[name] || {};
 				if (special[name].setup || special[name].teardown) {

@@ -53,7 +53,7 @@
 			removeTimer($(this).unbind('.mousepressext'), true);
 		},
 		handler: function(elem, e){
-	         return $.event.handle.call(elem, {type: 'mousepress', target: e.target, pageX: e.pageX, pageY: e.pageY});
+			return (($.event.handle && !$.event.dispatch) ? $.event.handle : $.event.dispatch).call(elem, {type: 'mousepress', target: e.target, pageX: e.pageX, pageY: e.pageY});
 		}
 	};
 	
