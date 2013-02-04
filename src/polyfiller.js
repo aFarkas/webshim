@@ -38,7 +38,7 @@
 	}
 	
 	var webshims = {
-		version: '1.9.6pre',
+		version: '1.9.6RC2',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
