@@ -1806,7 +1806,9 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 							if(hasSwf && !options.preferFlash && webshims.mediaelement.createSWF && !$(e.target).closest('audio, video').is('.nonnative-api-active')){
 								options.preferFlash = true;
 								document.removeEventListener('error', switchOptions, true);
-								$('audio, video').mediaLoad();
+								$('audio, video').each(function(){
+									webshims.mediaelement.selectSource(this);
+								});
 								webshims.info("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src);
 							} else if(!hasSwf){
 								document.removeEventListener('error', switchOptions, true);
@@ -2210,7 +2212,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		data = data || webshims.data(elem, 'mediaelement');
 		stepSources(elem, data, options.preferFlash || undefined, _srces);
 	};
-	
+	mediaelement.selectSource = selectSource;
 	
 	$(document).on('ended', function(e){
 		var data = webshims.data(e.target, 'mediaelement');
@@ -2802,18 +2804,28 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		var hidevents = hideEvtArray.map(function(evt){
 			return evt +'.webshimspolyfill';
 		}).join(' ');
-		
+		var opposite = {
+			'html5': 'third',
+			'third': 'html5'
+		};
 		var hidePlayerEvents = function(event){
 			var data = webshims.data(event.target, 'mediaelement');
 			if(!data){return;}
 			var isNativeHTML5 = ( event.originalEvent && event.originalEvent.type === event.type );
 			if( isNativeHTML5 == (data.activating == 'third') ){
 				event.stopImmediatePropagation();
-				if(stopEvents[event.type] && data.isActive != data.activating){
-					$(event.target).pause();
+				if(stopEvents[event.type]){
+					if(data.isActive != data.activating){
+						$(event.target).pause();
+					} else {
+						data.isActive = opposite[data.isActive];
+						$(event.target).pause();
+						data.isActive = opposite[data.isActive];
+					}
 				}
 			}
 		};
+		
 		
 		addMediaToStopEvents = function(elem){
 			$(elem)

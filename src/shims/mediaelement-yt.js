@@ -158,6 +158,10 @@ var addMediaToStopEvents = $.noop;
 	var hidevents = hideEvtArray.map(function(evt){
 		return evt +'.webshimspolyfill';
 	}).join(' ');
+	var opposite = {
+		'html5': 'third',
+		'third': 'html5'
+	};
 	
 	var hidePlayerEvents = function(event){
 		var data = webshims.data(event.target, 'mediaelement');
@@ -165,8 +169,14 @@ var addMediaToStopEvents = $.noop;
 		var isNativeHTML5 = ( event.originalEvent && event.originalEvent.type === event.type );
 		if( isNativeHTML5 == (data.activating == 'third') ){
 			event.stopImmediatePropagation();
-			if(stopEvents[event.type] && data.isActive != data.activating){
-				$(event.target).pause();
+			if(stopEvents[event.type]){
+				if(data.isActive != data.activating){
+					$(event.target).pause();
+				} else {
+					data.isActive = opposite[data.isActive];
+					$(event.target).pause();
+					data.isActive = opposite[data.isActive];
+				}
 			}
 		}
 	};

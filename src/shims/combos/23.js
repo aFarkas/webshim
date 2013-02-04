@@ -1783,7 +1783,9 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 							if(hasSwf && !options.preferFlash && webshims.mediaelement.createSWF && !$(e.target).closest('audio, video').is('.nonnative-api-active')){
 								options.preferFlash = true;
 								document.removeEventListener('error', switchOptions, true);
-								$('audio, video').mediaLoad();
+								$('audio, video').each(function(){
+									webshims.mediaelement.selectSource(this);
+								});
 								webshims.info("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src);
 							} else if(!hasSwf){
 								document.removeEventListener('error', switchOptions, true);
@@ -2187,7 +2189,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		data = data || webshims.data(elem, 'mediaelement');
 		stepSources(elem, data, options.preferFlash || undefined, _srces);
 	};
-	
+	mediaelement.selectSource = selectSource;
 	
 	$(document).on('ended', function(e){
 		var data = webshims.data(e.target, 'mediaelement');
