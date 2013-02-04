@@ -818,6 +818,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	var singleVal = function(elem, name, val, pass, _argless){
 		return (_argless) ? oldVal.call($(elem)) : oldVal.call($(elem), val);
 	};
+	
+	$.fn.onTrigger = function(evt, fn){
+		return this.on(evt, fn).each(fn);
+	};
+	
 	$.fn.val = function(val){
 		var elem = this[0];
 		if(arguments.length && val == null){
@@ -1219,7 +1224,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 							docObserve.width = docObserve.getWidth();
 							
 						}
-						$.event.trigger('updateshadowdom');
+						$(document).triggerHandler('updateshadowdom');
 					}, (e.type == 'resize') ? 50 : 9);
 				},
 				_create: function(){
@@ -1263,7 +1268,6 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			};
 			
 			
-			$.event.customEvent.updateshadowdom = true;
 			webshims.docObserve = function(){
 				webshims.ready('DOM', function(){
 					docObserve.start();

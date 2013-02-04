@@ -16,6 +16,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	var singleVal = function(elem, name, val, pass, _argless){
 		return (_argless) ? oldVal.call($(elem)) : oldVal.call($(elem), val);
 	};
+	
+	$.fn.onTrigger = function(evt, fn){
+		return this.on(evt, fn).each(fn);
+	};
+	
 	$.fn.val = function(val){
 		var elem = this[0];
 		if(arguments.length && val == null){
@@ -417,7 +422,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 							docObserve.width = docObserve.getWidth();
 							
 						}
-						$.event.trigger('updateshadowdom');
+						$(document).triggerHandler('updateshadowdom');
 					}, (e.type == 'resize') ? 50 : 9);
 				},
 				_create: function(){
@@ -461,7 +466,6 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			};
 			
 			
-			$.event.customEvent.updateshadowdom = true;
 			webshims.docObserve = function(){
 				webshims.ready('DOM', function(){
 					docObserve.start();
@@ -2176,6 +2180,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 	"use strict";
 	var mediaelement = webshims.mediaelement;
 	var id = new Date().getTime();
+	var ADDBACK = $.fn.addBack ? 'addBack' : 'andSelf';
 	//descriptions are not really shown, but they are inserted into the dom
 	var showTracks = {subtitles: 1, captions: 1, descriptions: 1};
 	var notImplemented = function(){
@@ -2563,7 +2568,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 				}
 				
 				trackData = webshims.data(track, 'trackData', {track: obj});
-				mediaelement.loadTextTrack(mediaelem, track, trackData, ($.prop(track, 'default') && $(track).siblings('track[default]').andSelf()[0] == track));
+				mediaelement.loadTextTrack(mediaelem, track, trackData, ($.prop(track, 'default') && $(track).siblings('track[default]')[ADDBACK]()[0] == track));
 			} else {
 				if(supportTrackMod){
 					copyProps.forEach(function(copyProp){

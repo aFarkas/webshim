@@ -38,7 +38,7 @@
 	}
 	
 	var webshims = {
-		version: '1.9.6RC1',
+		version: '1.9.6pre',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -227,7 +227,7 @@
 						details.handler.call(this, name);
 					}
 				});
-				$.event.trigger(name);
+				$(document).triggerHandler(name);
 			}
 			return !!(special[name] && special[name].add) || false;
 		},
@@ -275,7 +275,7 @@
 					if (_maybePrevented && webshims.capturingEventPrevented) {
 						webshims.capturingEventPrevented(e);
 					}
-					return ($.event.handle && !$.event.dispatch) ? $.event.handle.call(this, e) :  $.event.dispatch.call(this, e);
+					return ($.event.dispatch || $.event.handle).call(this, e);
 				};
 				special[name] = special[name] || {};
 				if (special[name].setup || special[name].teardown) {

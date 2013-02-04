@@ -508,6 +508,10 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			box = data.shadowElem;
 			resetSwfProps(data);
 		} else {
+			var setDimensions = function(){
+				setElementDimension(data, $.prop(elem, 'controls'));
+			};
+			
 			box = $('<div class="polyfill-'+ (elemNodeName) +' polyfill-mediaelement" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
 				.css({
 					position: 'relative',
@@ -567,9 +571,8 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			webshims.addShadowDom(elem, box);
 			addMediaToStopEvents(elem);
 			mediaelement.setActive(elem, 'third', data);
-			$(elem).on('updatemediaelementdimensions updateshadowdom', function(){
-				setElementDimension(data, $.prop(elem, 'controls'));
-			});
+			$(document).on('updateshadowdom', setDimensions);
+			$(elem).on('updatemediaelementdimensions', setDimensions);
 		}
 		
 		if(!mediaelement.jarisEvent[data.id]){

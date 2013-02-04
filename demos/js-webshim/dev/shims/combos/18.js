@@ -1063,8 +1063,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			
 			data = configureDatePicker(elem, date, change);
 			
-			$(elem)
-				.on('updateshadowdom', function(){
+			$(document)
+				.onTrigger('updateshadowdom', function(){
 					if (data.trigger[0]) {
 						elem.css({display: ''});
 						if(elem[0].offsetWidth || elem[0].offsetHeight){
@@ -1080,16 +1080,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					}
 					elem.css({display: 'none'});
 				})
-				.triggerHandler('updateshadowdom')
 			;
-			if (data.trigger[0]) {
-				setTimeout(function(){
-					webshims.ready('WINDOWLOAD', function(){
-						$(elem).triggerHandler('updateshadowdom');
-					});
-				}, 9);
-			}
-			
 		};
 		
 		
@@ -1153,8 +1144,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			this.common(elem, range, replaceInputUI.range.attrs);
 			
 			
-			elem
-				.on('updateshadowdom', function(){
+			$(document)
+				.onTrigger('updateshadowdom', function(){
 					elem.css({display: ''});
 					if (elem[0].offsetWidth || elem[0].offsetHeight) {
 						var attr = getDimensions(elem);
@@ -1167,7 +1158,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					}
 					elem.css({display: 'none'});
 				})
-				.triggerHandler('updateshadowdom')
 			;
 			
 			
@@ -1520,15 +1510,14 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				webshims.data(elem, 'step-controls', controls);
 				if(options.calculateWidth){
 					var init;
-					jElm
-						.on('updateshadowdom', function(){
+					$(document)
+						.onTrigger('updateshadowdom', function(){
 							if(!init && (elem.offsetWidth || elem.offsetHeight)){
 								init = true;
 								adjustInputWithBtn(jElm, controls);
 								controls.css('marginTop', (jElm.outerHeight() - controls.outerHeight()) / 2);
 							}
 						})
-						.triggerHandler('updateshadowdom')
 					;
 				}
 			});

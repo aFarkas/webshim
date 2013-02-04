@@ -16,6 +16,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	var singleVal = function(elem, name, val, pass, _argless){
 		return (_argless) ? oldVal.call($(elem)) : oldVal.call($(elem), val);
 	};
+	
+	$.fn.onTrigger = function(evt, fn){
+		return this.on(evt, fn).each(fn);
+	};
+	
 	$.fn.val = function(val){
 		var elem = this[0];
 		if(arguments.length && val == null){
@@ -417,7 +422,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 							docObserve.width = docObserve.getWidth();
 							
 						}
-						$.event.trigger('updateshadowdom');
+						$(document).triggerHandler('updateshadowdom');
 					}, (e.type == 'resize') ? 50 : 9);
 				},
 				_create: function(){
@@ -461,7 +466,6 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			};
 			
 			
-			$.event.customEvent.updateshadowdom = true;
 			webshims.docObserve = function(){
 				webshims.ready('DOM', function(){
 					docObserve.start();
@@ -2140,6 +2144,10 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 				overflow: 'hidden'
 			})
 		;
+		var setDimensions = function(){
+			setElementDimension(data, $.prop(elem, 'controls'));
+		};
+			
 		data = webshims.data(elem, 'mediaelement', webshims.objectCreate(playerStateObj, {
 			actionQueue: {
 				value: []
@@ -2212,9 +2220,9 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		
 		options.changeSWF(vars, elem, canPlaySrc, data, 'embed');
 		
-		$(elem).on('updatemediaelementdimensions updateshadowdom', function(){
-			setElementDimension(data, $.prop(elem, 'controls'));
-		});
+		
+		$(document).on('updateshadowdom', setDimensions);
+		$(elem).on('updatemediaelementdimensions', setDimensions);
 		
 		
 		swfobject.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.0", false, vars, params, attrs, function(swfData){

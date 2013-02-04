@@ -396,7 +396,10 @@ mediaelement.createSWF = function(mediaElem, src, data){
 			overflow: 'hidden'
 		})
 	;
-	
+	var setDimensions = function(){
+		setElementDimension(data);
+	};
+			
 	
 	
 	data = webshims.data(mediaElem, 'mediaelement', webshims.objectCreate(playerStateObj, {
@@ -440,9 +443,8 @@ mediaelement.createSWF = function(mediaElem, src, data){
 	addMediaToStopEvents(mediaElem);
 	
 	addYtAPI(mediaElem, elemId, data, ytID);
-	$(mediaElem).on('updatemediaelementdimensions updateshadowdom', function(){
-		setElementDimension(data);
-	});
+	$(document).on('updateshadowdom', setDimensions);
+	$(mediaElem).on('updatemediaelementdimensions', setDimensions);
 };
 
 (function(){
