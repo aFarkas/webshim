@@ -2109,46 +2109,57 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			var media = $('video, audio', context)
 				.add(insertedElement.filter('video, audio'))
 				.each(function(){
-					selectSource(this);
+					var data = webshims.data(this, 'mediaelement');
+					
+					if(hasNative && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay])') && (!data || data.isActive == 'html5')){
+						//IE controls not visible bug
+						$(this).prop('preload', 'metadata').mediaLoad();
+					} else {
+						selectSource(this, data);
+					}
 					
 					if(hasNative){
-						var bufferTimer;
-						var lastBuffered;
-						var elem = this;
-						var getBufferedString = function(){
-							var buffered = $.prop(elem, 'buffered');
-							if(!buffered){return;}
-							var bufferString = "";
-							for(var i = 0, len = buffered.length; i < len;i++){
-								bufferString += buffered.end(i);
-							}
-							return bufferString;
-						};
-						var testBuffer = function(){
-							var buffered = getBufferedString();
-							if(buffered != lastBuffered){
-								lastBuffered = buffered;
-								$(elem).triggerHandler('progress');
-							}
-						};
 						
-						$(this)
-							.on({
-								'play loadstart progress': function(e){
-									if(e.type == 'progress'){
-										lastBuffered = getBufferedString();
-									}
-									clearTimeout(bufferTimer);
-									bufferTimer = setTimeout(testBuffer, 999);
-								},
-								'emptied stalled mediaerror abort suspend': function(e){
-									if(e.type == 'emptied'){
-										lastBuffered = false;
-									}
-									clearTimeout(bufferTimer);
+						//FF progress bug
+						(function(){
+							var bufferTimer;
+							var lastBuffered;
+							var elem = this;
+							var getBufferedString = function(){
+								var buffered = $.prop(elem, 'buffered');
+								if(!buffered){return;}
+								var bufferString = "";
+								for(var i = 0, len = buffered.length; i < len;i++){
+									bufferString += buffered.end(i);
 								}
-							})
-						;
+								return bufferString;
+							};
+							var testBuffer = function(){
+								var buffered = getBufferedString();
+								if(buffered != lastBuffered){
+									lastBuffered = buffered;
+									$(elem).triggerHandler('progress');
+								}
+							};
+							
+							$(this)
+								.on({
+									'play loadstart progress': function(e){
+										if(e.type == 'progress'){
+											lastBuffered = getBufferedString();
+										}
+										clearTimeout(bufferTimer);
+										bufferTimer = setTimeout(testBuffer, 999);
+									},
+									'emptied stalled mediaerror abort suspend': function(e){
+										if(e.type == 'emptied'){
+											lastBuffered = false;
+										}
+										clearTimeout(bufferTimer);
+									}
+								})
+							;
+						})();
 					}
 					
 				})
