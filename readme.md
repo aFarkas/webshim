@@ -79,6 +79,13 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+
+Release 1.9.6
+----------
+
+- jQuery 1.9.1 compatibility
+- improve flash fallback for mediaelements in case of an error event
+
 Release 1.9.5
 ----------
 
