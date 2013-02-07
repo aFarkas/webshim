@@ -9,3 +9,5 @@ node_modules/*
 /tests/form-implementation.html
 /build/yuicompressor.jar
 /tests/tmp_tests.html
+.DS_Store
+.sass-cache

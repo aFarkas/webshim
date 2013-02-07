@@ -102,6 +102,8 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-css');
 	grunt.registerTask('default', 'webshimscombos concat cfgcopymin copy cssmin min');
 
+	grunt.registerTask('css', 'cfgcopymin copy');
+
 
 
 	function getFiles(srcdir, destdir, wildcard, compareDir, compareMatch) {
