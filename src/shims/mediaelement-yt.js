@@ -396,6 +396,9 @@ mediaelement.createSWF = function(mediaElem, src, data){
 			overflow: 'hidden'
 		})
 	;
+	var setDimension = function(){
+		setElementDimension(data);
+	};
 	
 	
 	
@@ -440,9 +443,8 @@ mediaelement.createSWF = function(mediaElem, src, data){
 	addMediaToStopEvents(mediaElem);
 	
 	addYtAPI(mediaElem, elemId, data, ytID);
-	$(mediaElem).on('updatemediaelementdimensions updateshadowdom', function(){
-		setElementDimension(data);
-	});
+	$(mediaElem).on('updatemediaelementdimensions', setDimension);
+	$(document).on('updateshadowdom', setDimension);
 };
 
 (function(){

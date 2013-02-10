@@ -31,10 +31,10 @@ asyncTest("widgets Modul", function(){
 		$('#date').val('2010-10-10');
 		
 		var pickerObject = shadow.data('datepicker');
-		equals(pickerObject.currentYear +'-'+ (pickerObject.currentMonth + 1) +'-'+pickerObject.currentDay, $('#date').attr('value'), "date value is reflected");
+		equals(pickerObject.currentYear +'-'+ (pickerObject.currentMonth + 1) +'-'+pickerObject.currentDay, $('#date').prop('value'), "date value is reflected");
 		
 		$('#date').prop('valueAsNumber', 1293753600000);
-		equals(pickerObject.currentYear +'-'+ (pickerObject.currentMonth + 1) +'-'+pickerObject.currentDay, $('#date').attr('value'), "date valueAsNumber is reflected");
+		equals(pickerObject.currentYear +'-'+ (pickerObject.currentMonth + 1) +'-'+pickerObject.currentDay, $('#date').prop('value'), "date valueAsNumber is reflected");
 	}
 	
 	

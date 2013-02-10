@@ -155,11 +155,11 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 			}
 			var elem = this.element.attr('autocomplete', 'off').data('wsspinner', this);
 			this.addBindings();
-			if($.browser.mozilla){
-				$(window).on('unload', function(){
-					elem.remove();
-				});
-			}
+//			if($.browser.mozilla){
+//				$(window).on('unload', function(){
+//					elem.remove();
+//				});
+//			}
 			this._init = true;
 		},
 		parseValue: function(val){
@@ -370,10 +370,11 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 					if(stepped){
 						e.preventDefault();
 					}
-				},
-				wslocalechange: function(){
-					that.value(that.options.value);
 				}
+			});
+			
+			$(document).on('wslocalechange', function(){
+				that.value(that.options.value);
 			});
 			
 			$('.step-up', this.buttonWrapper)
@@ -472,7 +473,7 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 					if(formcfg[val]){
 						curCfg = formcfg[val];
 						createMonthKeys(curCfg);
-						$.event.trigger('wslocalechange');
+						$(document).triggerHandler('wslocalechange');
 						return false;
 					}
 				});

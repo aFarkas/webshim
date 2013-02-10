@@ -174,7 +174,7 @@ asyncTest('email, url, pattern, maxlength', function(){
 });
 
 asyncTest('validationMessage/setCustomValidity', function(){
-	var firstInvalid = $('#name').attr('value', '');
+	var firstInvalid = $('#name').prop('value', '');
 	var lang = $.webshims.activeLang()[0];
 	//select + customValidity
 	ok($('#select').is(':valid'), 'select is valid');
@@ -234,7 +234,7 @@ asyncTest('output test', function(){
 		
 	}
 	ok( !/&outputtest=somecontent&/.test($('form').serialize()) , 'does not find output serialized in shim');
-	$('#rangeId').attr('value', 30);
+	$('#rangeId').prop('value', 30);
 	
 	$($('#form-1')[0]['outputtest']).prop('value', 'value');
 	equals($('#labeled-output').prop('value'), 'value', 'value is set through form elements');

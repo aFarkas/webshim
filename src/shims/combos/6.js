@@ -317,9 +317,9 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		if(!('type' in cache)){
 			cache.type = getType(input[0]);
 		}
-		//stepmismatch with date is computable, but it would be a typeMismatch in most cases (performance)
+		
 		var ret = (validityState || {}).stepMismatch || false, base;
-		if(typeModels[cache.type] && typeModels[cache.type].step && cache.type != 'date'){
+		if(typeModels[cache.type] && typeModels[cache.type].step){
 			if( !('step' in cache) ){
 				cache.step = webshims.getStep(input[0], cache.type);
 			}
@@ -1182,7 +1182,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 							if(formcfg[val]){
 								curCfg = formcfg[val];
 								createMonthKeys(curCfg);
-								$.event.trigger('wslocalechange');
+								$(document).triggerHandler('wslocalechange');
 								return false;
 							}
 						});
@@ -1334,11 +1334,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 				var elem = this.element.attr('autocomplete', 'off').data('wsspinner', this);
 				this.addBindings();
-				if($.browser.mozilla){
-					$(window).on('unload', function(){
-						elem.remove();
-					});
-				}
+//				if($.browser.mozilla){
+//					$(window).on('unload', function(){
+//						elem.remove();
+//					});
+//				}
 				this._init = true;
 			},
 			parseValue: function(val){
@@ -1566,10 +1566,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						if(stepped){
 							e.preventDefault();
 						}
-					},
-					wslocalechange: function(){
-						that.value(that.options.value);
 					}
+				});
+				
+				$(document).on('wslocalechange',function(){
+					that.value(that.options.value);
 				});
 				
 				$('.step-up', this.buttonWrapper)
@@ -1991,14 +1992,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			popover.nextElement = $('button.ws-next', popover.contentElement);
 			popover.prevElement = $('button.ws-prev', popover.contentElement);
 			popover.bodyElement = $('div.ws-picker-body', popover.contentElement);
-			popover.contentElement
-				.on({
-					wslocalechange: function(){
-						popover.nextElement.text(curCfg.date.nextText);
-						popover.prevElement.text(curCfg.date.prevText);
-					}
+			$(document)
+				.onTrigger('wslocalechange',function(){
+					popover.nextElement.text(curCfg.date.nextText);
+					popover.prevElement.text(curCfg.date.prevText);
 				})
-				.triggerHandler('wslocalechange')
 			;
 			data.list(data.options.options);
 		};
@@ -2160,8 +2158,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				init = true;
 				$.style( data.orig, 'display', 'none' );
 			};
-			$(data.orig).on('updateshadowdom', updateStyles);
-			updateStyles();
+			$(document).onTrigger('updateshadowdom', updateStyles);
 		};
 		
 		

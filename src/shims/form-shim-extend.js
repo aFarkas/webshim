@@ -351,7 +351,7 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 	set: function(value){
 		$(this).getShadowFocusElement().attr('aria-required', !!(value)+'');
 	},
-	initAttr: true
+	initAttr: Modernizr.localstorage //only if we have aria-support
 });
 
 webshims.reflectProperties(['input'], ['pattern']);
@@ -666,7 +666,7 @@ webshims.defineNodeNameProperty('form', 'noValidate', {
 	}
 });
 
-if(Modernizr.inputtypes.date){
+if(Modernizr.inputtypes.date && /webkit/i.test(navigator.userAgent)){
 	(function(){
 		
 		var noInputTriggerEvts = {updateInput: 1, input: 1},
@@ -1299,8 +1299,8 @@ try {
 							data.text.css('padding'+ side, size);
 						});
 						
-						$(elem)
-							.on('updateshadowdom', function(){
+						$(document)
+							.onTrigger('updateshadowdom', function(){
 								var height, width; 
 								if((width = elem.offsetWidth) || (height = elem.offsetHeight)){
 									data.text
@@ -1312,7 +1312,6 @@ try {
 									;
 								}
 							})
-							.triggerHandler('updateshadowdom')
 						;
 						
 					} else {

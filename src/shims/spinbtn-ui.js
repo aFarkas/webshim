@@ -370,10 +370,11 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 					if(stepped){
 						e.preventDefault();
 					}
-				},
-				wslocalechange: function(){
-					that.value(that.options.value);
 				}
+			});
+			
+			$(document).on('wslocalechange', function(){
+				that.value(that.options.value);
 			});
 			
 			$('.step-up', this.buttonWrapper)
@@ -472,7 +473,7 @@ jQuery.webshims.register('spinbtn-ui', function($, webshims, window, document, u
 					if(formcfg[val]){
 						curCfg = formcfg[val];
 						createMonthKeys(curCfg);
-						$.event.trigger('wslocalechange');
+						$(document).triggerHandler('wslocalechange');
 						return false;
 					}
 				});

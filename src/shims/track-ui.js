@@ -79,7 +79,8 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 				var forceUpdate = function(){
 					positionDisplay(true);
 				};
-				media.on('updateshadowdom playerdimensionchange mediaelementapichange updatetrackdisplay updatemediaelementdimensions swfstageresize', delayed);
+				media.on('playerdimensionchange mediaelementapichange updatetrackdisplay updatemediaelementdimensions swfstageresize', delayed);
+				$(document).on('updateshadowdom', delayed);
 				media.on('forceupdatetrackdisplay', forceUpdate);
 				forceUpdate();
 			}

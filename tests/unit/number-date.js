@@ -681,7 +681,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			elem.prop('value', '');
 			elem.prop('valueAsNumber', data.value);
 			
-//			if (Modernizr.formvalidation === true && data.value != elem.attr('valueAsNumber')) {
+//			if (Modernizr.formvalidation === true && data.value != elem.prop('valueAsNumber')) {
 //				return;
 //			}
 			var val = elem.prop('value');
@@ -776,7 +776,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		
 		ok(elem.prop('value') === data.resultVal, 'expected val: ' + data.resultVal + ', element: ' + data.id + ', was: ' + elem.prop('value'));
 		if (data.resultNumber === undefined) {
-			ok(isNaN(elem.attr('valueAsNumber')), ' expected number: NaN, element: ' + data.id + ', was: ' + elem.prop('valueAsNumber'));
+			ok(isNaN(elem.prop('valueAsNumber')), ' expected number: NaN, element: ' + data.id + ', was: ' + elem.prop('valueAsNumber'));
 		}
 		else {
 			ok(elem.prop('valueAsNumber') === data.resultNumber, ' expected number: ' + data.resultNumber + ', element: ' + data.id + ', was: ' + elem.prop('valueAsNumber'));

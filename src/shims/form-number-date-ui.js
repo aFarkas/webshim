@@ -107,7 +107,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 							if(formcfg[val]){
 								curCfg = formcfg[val];
 								createMonthKeys(curCfg);
-								$.event.trigger('wslocalechange');
+								$(document).triggerHandler('wslocalechange');
 								return false;
 							}
 						});
@@ -491,10 +491,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						if(stepped){
 							e.preventDefault();
 						}
-					},
-					wslocalechange: function(){
-						that.value(that.options.value);
 					}
+				});
+				
+				$(document).on('wslocalechange',function(){
+					that.value(that.options.value);
 				});
 				
 				$('.step-up', this.buttonWrapper)
@@ -916,14 +917,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			popover.nextElement = $('button.ws-next', popover.contentElement);
 			popover.prevElement = $('button.ws-prev', popover.contentElement);
 			popover.bodyElement = $('div.ws-picker-body', popover.contentElement);
-			popover.contentElement
-				.on({
-					wslocalechange: function(){
-						popover.nextElement.text(curCfg.date.nextText);
-						popover.prevElement.text(curCfg.date.prevText);
-					}
+			$(document)
+				.onTrigger('wslocalechange',function(){
+					popover.nextElement.text(curCfg.date.nextText);
+					popover.prevElement.text(curCfg.date.prevText);
 				})
-				.triggerHandler('wslocalechange')
 			;
 			data.list(data.options.options);
 		};
@@ -1085,8 +1083,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				init = true;
 				$.style( data.orig, 'display', 'none' );
 			};
-			$(data.orig).on('updateshadowdom', updateStyles);
-			updateStyles();
+			$(document).onTrigger('updateshadowdom', updateStyles);
 		};
 		
 		

@@ -665,7 +665,7 @@ var prepareString = "a"[0] != "a",
 	var advancedObjectProperties = !!(Object.create && Object.defineProperties && Object.getOwnPropertyDescriptor);
 	//safari5 has defineProperty-interface, but it can't be used on dom-object
 	//only do this test in non-IE browsers, because this hurts dhtml-behavior in some IE8 versions
-	if (advancedObjectProperties && !$.browser.msie && Object[defineProperty] && Object.prototype.__defineGetter__) {
+	if (advancedObjectProperties && Object[defineProperty] && Object.prototype.__defineGetter__) {
 		(function(){
 			try {
 				var foo = document.createElement('foo');

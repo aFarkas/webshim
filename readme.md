@@ -34,7 +34,7 @@ How To Use
 	<script src="js/jquery.js"></script>
 	// Simple change
 	<script src="js-webshim/minified/extras/modernizr-custom.js"></script> 
-	// 'User your own' variant
+	// 'Use your own' variant
 	<script src="js/Modernizr-custom.js"></script> 
 
 	<script src="js-webshim/minified/polyfiller.js"></script> 

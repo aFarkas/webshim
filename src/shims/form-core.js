@@ -44,78 +44,77 @@
 	
 	if(!Modernizr.formvalidation || bugs.bustedValidity){
 		testRequiredFind();
-		return;
-	}
-	
-	//create delegatable events
-	webshims.capturingEvents(['input']);
-	webshims.capturingEvents(['invalid'], true);
-	
-	if(window.opera || window.testGoodWithFix){
+	} else {
+		//create delegatable events
+		webshims.capturingEvents(['input']);
+		webshims.capturingEvents(['invalid'], true);
 		
-		form.appendTo('head');
-		
-		testRequiredFind();
-		bugs.validationMessage = !(inputElem.prop('validationMessage'));
-		
-		webshims.reTest(['form-native-extend', 'form-message']);
-		
-		form.remove();
+		if(window.opera || window.testGoodWithFix){
 			
-		$(function(){
-			onDomextend(function(){
+			form.appendTo('head');
+			
+			testRequiredFind();
+			bugs.validationMessage = !(inputElem.prop('validationMessage'));
+			
+			webshims.reTest(['form-native-extend', 'form-message']);
+			
+			form.remove();
 				
-				//Opera shows native validation bubbles in case of input.checkValidity()
-				// Opera 11.6/12 hasn't fixed this issue right, it's buggy
-				var preventDefault = function(e){
-					e.preventDefault();
-				};
-				
-				['form', 'input', 'textarea', 'select'].forEach(function(name){
-					var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
-						prop: {
-							value: function(){
-								if (!webshims.fromSubmit) {
-									$(this).on('invalid.checkvalidity', preventDefault);
+			$(function(){
+				onDomextend(function(){
+					
+					//Opera shows native validation bubbles in case of input.checkValidity()
+					// Opera 11.6/12 hasn't fixed this issue right, it's buggy
+					var preventDefault = function(e){
+						e.preventDefault();
+					};
+					
+					['form', 'input', 'textarea', 'select'].forEach(function(name){
+						var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
+							prop: {
+								value: function(){
+									if (!webshims.fromSubmit) {
+										$(this).on('invalid.checkvalidity', preventDefault);
+									}
+									
+									webshims.fromCheckValidity = true;
+									var ret = desc.prop._supvalue.apply(this, arguments);
+									if (!webshims.fromSubmit) {
+										$(this).unbind('invalid.checkvalidity', preventDefault);
+									}
+									webshims.fromCheckValidity = false;
+									return ret;
 								}
-								
-								webshims.fromCheckValidity = true;
-								var ret = desc.prop._supvalue.apply(this, arguments);
-								if (!webshims.fromSubmit) {
-									$(this).unbind('invalid.checkvalidity', preventDefault);
-								}
-								webshims.fromCheckValidity = false;
-								return ret;
 							}
-						}
+						});
 					});
+					
+				});
+			});
+		}
+		
+		if(isWebkit && !webshims.bugs.bustedValidity){
+			(function(){
+				var elems = /^(?:textarea|input)$/i;
+				var form = false;
+				
+				document.addEventListener('contextmenu', function(e){
+					if(elems.test( e.target.nodeName || '') && (form = e.target.form)){
+						setTimeout(function(){
+							form = false;
+						}, 1);
+					}
+				}, false);
+				
+				$(window).on('invalid', function(e){
+					if(e.originalEvent && form && form == e.target.form){
+						e.wrongWebkitInvalid = true;
+						e.stopImmediatePropagation();
+					}
 				});
 				
-			});
-		});
-	}
-	
-	if(isWebkit && !webshims.bugs.bustedValidity){
-		(function(){
-			var elems = /^(?:textarea|input)$/i;
-			var form = false;
-			
-			document.addEventListener('contextmenu', function(e){
-				if(elems.test( e.target.nodeName || '') && (form = e.target.form)){
-					setTimeout(function(){
-						form = false;
-					}, 1);
-				}
-			}, false);
-			
-			$(window).on('invalid', function(e){
-				if(e.originalEvent && form && form == e.target.form){
-					e.wrongWebkitInvalid = true;
-					e.stopImmediatePropagation();
-				}
-			});
-			
-		})();
+			})();
+		}
 	}
 
 	$.webshims.register('form-core', function($, webshims, window, document, undefined, options){
@@ -229,25 +228,6 @@
 			return false;
 		};
 		
-		if(Modernizr.formvalidation && isWebkit && !webshims.bugs.bustedValidity){
-			(function(){
-				var retriggerRadioValidity = function(){
-					var validity;
-					if((validity = this.validity) && !validity.customError){
-						this.setCustomValidity('');
-					}
-				};
-				
-				webshims.addReady(function(context, insertedElement){
-					if(context !== document){
-						$('input[type="radio"]:invalid', context)
-							.add(insertedElement.filter('input[type="radio"]:invalid'))
-							.each(retriggerRadioValidity)
-						;
-					}
-				});
-			})();
-		}
 		
 		var customEvents = $.event.customEvent || {};
 		var isValid = function(elem){

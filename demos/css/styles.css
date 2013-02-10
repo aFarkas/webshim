@@ -30,10 +30,8 @@ form textarea {
 .loading-polyfills body {
 	visibility: hidden;
 }
-html.long-loading-polyfills {
-	background-image: url(polyfill-loader.gif);
-	background-position: center 240px;
-	background-repeat: no-repeat;
+html.long-loading-polyfills body {
+	visibility: visible;
 }
 
 

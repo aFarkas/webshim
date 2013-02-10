@@ -494,6 +494,9 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			},
 			$(elem).data('attrs')
 		);
+		var setDimension = function(){
+			setElementDimension(data, $.prop(elem, 'controls'));
+		};
 		var box;
 		
 		if(data && data.swfCreated){
@@ -567,9 +570,8 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			webshims.addShadowDom(elem, box);
 			addMediaToStopEvents(elem);
 			mediaelement.setActive(elem, 'third', data);
-			$(elem).on('updatemediaelementdimensions updateshadowdom', function(){
-				setElementDimension(data, $.prop(elem, 'controls'));
-			});
+			$(elem).on('updatemediaelementdimensions', setDimension);
+			$(document).on('updateshadowdom', setDimension);
 		}
 		
 		if(!mediaelement.jarisEvent[data.id]){
@@ -804,7 +806,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		mediaSup = webshims.defineNodeNameProperties(nodeName, descs, 'prop');
 	});
 	
-	if(hasFlash){
+	if(hasFlash && $.cleanData){
 		var oldClean = $.cleanData;
 		var flashNames = {
 			object: 1,
