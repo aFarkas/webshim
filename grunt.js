@@ -17,6 +17,10 @@ module.exports = function(grunt){
 		cssmin: getFiles('src', 'demos/js-webshim/minified', '**/*.css'),
 		uglify: {
 			codegen: {ascii_only: true}
+		},
+		watch: {
+			files: 'src/shims/styles/shim.css',
+			tasks: 'css'
 		}
 	});
 	
