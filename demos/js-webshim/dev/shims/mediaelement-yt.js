@@ -300,6 +300,8 @@ var addYtAPI = function(mediaElm, elemId, data, ytID){
 		data._ytAPI = new YT.Player(elemId, {
 			height: '100%',
 			width: '100%',
+			allowfullscreen: 'allowfullscreen',
+			webkitallowfullscreen: 'allowfullscreen',
 			playerVars: {
 				allowfullscreen: true,
 				fs: 1,

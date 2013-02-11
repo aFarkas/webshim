@@ -30,3 +30,34 @@ jQuery.webshims.validityMessages.he = {
     },
     "stepMismatch": "ערך לא חוקי."
 };
+jQuery.webshims.formcfg.he = {
+	numberFormat: {
+		".": ".",
+		",": ","
+	},
+	numberSigns: '.',
+	dateSigns: '/',
+	timeSigns: ":. ",
+	dFormat: "/",
+	patterns: {
+		d: 'dd/mm/yy'
+	},
+	date: {
+		closeText: 'סגור',
+		prevText: '&#x3C;הקודם',
+		nextText: 'הבא&#x3E;',
+		currentText: 'היום',
+		monthNames: ['ינואר','פברואר','מרץ','אפריל','מאי','יוני',
+		'יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'],
+		monthNamesShort: ['ינו','פבר','מרץ','אפר','מאי','יוני',
+		'יולי','אוג','ספט','אוק','נוב','דצמ'],
+		dayNames: ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'],
+		dayNamesShort: ['א\'','ב\'','ג\'','ד\'','ה\'','ו\'','שבת'],
+		dayNamesMin: ['א\'','ב\'','ג\'','ד\'','ה\'','ו\'','שבת'],
+		weekHeader: 'Wk',
+		firstDay: 0,
+		isRTL: true,
+		showMonthAfterYear: false,
+		yearSuffix: ''
+	}
+};

@@ -182,14 +182,8 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					propNodeName: 'datalist'
 				};
 			}
-				
-				
-			webshims.defineNodeNameProperties('input', inputListProto);
 			
-			$.event.customEvent.updateDatalist = true;
-			$.event.customEvent.updateInput = true;
-			$.event.customEvent.datalistselect = true;
-			$.event.customEvent.listdatalistchange = true;
+			webshims.defineNodeNameProperties('input', inputListProto);
 			
 			webshims.addReady(function(context, contextElem){
 				contextElem
@@ -219,9 +213,9 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 			reset: 1, 
 			hidden: 1,
 			
-			//ToDo
 			range: 1,
-			date: 1
+			date: 1,
+			month: 1
 		};
 
 		var globStoredOptions = {};
@@ -252,7 +246,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		var shadowListProto = {
 			_create: function(opts){
 				
-				if(noDatalistSupport[$.prop(opts.input, 'type')]){return;}
+				if(noDatalistSupport[$.prop(opts.input, 'type')] || noDatalistSupport[$.attr(opts.input, 'type')]){return;}
 				var datalist = opts.datalist;
 				var data = $.data(opts.input, 'datalistWidget');
 				if(datalist && data && data.datalist !== datalist){
@@ -264,6 +258,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 						.off('updateDatalist.datalistWidget')
 						.on('updateDatalist.datalistWidget', $.proxy(data, '_resetListCached'))
 					;
+					
 					data._resetListCached();
 					return;
 				} else if(!datalist){
