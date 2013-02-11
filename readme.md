@@ -89,6 +89,12 @@ upcomming Release 1.10.0
 - type="number" can be localized
 - type="number"/type="time" are custom styleable in supporting browsers
 
+Release 1.9.6
+----------
+
+- jQuery 1.9.1 compatibility
+- improve flash fallback for mediaelements in case of an error event
+
 Release 1.9.5
 ----------
 
