@@ -483,6 +483,28 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		}
 	});
 
-
+	if($('<input />').prop('labels') == null){
+		webshims.defineNodeNamesProperty('button, input, keygen, meter, output, progress, select, textarea', 'labels', {
+			prop: {
+				get: function(){
+					var parent;
+					var id = this.id;
+					var labels = $(this)
+						.closest('label')
+						.filter(function(){
+							var hFor = this.htmlFor;
+							return (!hFor || hFor == id);
+						})
+					;
+					
+					if(id) {
+						labels = labels.add('label[for="'+ id +'"]');
+					}
+					return labels.get();
+				},
+				writeable: false
+			}
+		});
+	}
 		
 });

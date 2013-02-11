@@ -1,4 +1,3 @@
-
 jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var curCfg;
@@ -10,111 +9,109 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		return val.length == 1 ? '0'+val : val;
 	};
 	
-	
 		
+	(function(){
 		
-		(function(){
-			
-			var formcfg = $.webshims.formcfg;
-			formcfg.de = {
-				numberFormat: {
-					",": ".",
-					".": ","
-				},
-				timeSigns: ":. ",
-				numberSigns: ',',
-				dateSigns: '.',
-				dFormat: ".",
-				patterns: {
-					d: "dd.mm.yy"
-				},
-				date: {
-					close: 'schließen',
-					prevText: 'zurück',
-					nextText: 'Vor',
-					currentText: 'heute',
-					monthNames: ['Januar','Februar','März','April','Mai','Juni',
-					'Juli','August','September','Oktober','November','Dezember'],
-					monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun',
-					'Jul','Aug','Sep','Okt','Nov','Dez'],
-					dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
-					dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-					dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-					weekHeader: 'KW',
-					firstDay: 1,
-					isRTL: false,
-					showMonthAfterYear: false,
-					yearSuffix: ''
+		var formcfg = $.webshims.formcfg;
+		formcfg.de = {
+			numberFormat: {
+				",": ".",
+				".": ","
+			},
+			timeSigns: ":. ",
+			numberSigns: ',',
+			dateSigns: '.',
+			dFormat: ".",
+			patterns: {
+				d: "dd.mm.yy"
+			},
+			date: {
+				close: 'schließen',
+				prevText: 'zurück',
+				nextText: 'Vor',
+				currentText: 'heute',
+				monthNames: ['Januar','Februar','März','April','Mai','Juni',
+				'Juli','August','September','Oktober','November','Dezember'],
+				monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun',
+				'Jul','Aug','Sep','Okt','Nov','Dez'],
+				dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
+				dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+				dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+				weekHeader: 'KW',
+				firstDay: 1,
+				isRTL: false,
+				showMonthAfterYear: false,
+				yearSuffix: ''
+			}
+		};
+		
+		formcfg.en = {
+			numberFormat: {
+				".": ".",
+				",": ","
+			},
+			numberSigns: '.',
+			dateSigns: '/',
+			timeSigns: ":. ",
+			dFormat: "/",
+			patterns: {
+				d: "mm/dd/yy"
+			},
+			date: {
+				"closeText": "Done",
+				"prevText": "Prev",
+				"nextText": "Next",
+				"currentText": "Today",
+				"monthNames": ["January","February","March","April","May","June","July","August","September","October","November","December"],
+				"monthNamesShort": ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+				"dayNames": ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+				"dayNamesShort": ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
+				"dayNamesMin": ["Su","Mo","Tu","We","Th","Fr","Sa"],
+				"weekHeader": "Wk",
+				"firstDay": 0,
+				"isRTL": false,
+				"showMonthAfterYear": false,
+				"yearSuffix": ""
+			}
+		};
+		
+		formcfg['en-US'] = formcfg['en-US'] || formcfg['en'];
+		formcfg[''] = formcfg[''] || formcfg['en-US'];
+		curCfg = formcfg[''];
+		
+		var createMonthKeys = function(langCfg){
+			if(!langCfg.date.monthkeys){
+				var create = function(i, name){
+					var strNum;
+					var num = i + 1;
+					strNum = (num < 10) ? '0'+num : ''+num;
+					
+					langCfg.date.monthkeys[num] = strNum;
+					langCfg.date.monthkeys[name] = strNum;
+				};
+				langCfg.date.monthkeys = {};
+				$.each(langCfg.date.monthNames, create);
+				$.each(langCfg.date.monthNamesShort, create);
+			}
+		};
+		
+		createMonthKeys(curCfg);
+		$.webshims.ready('dom-extend', function(){
+			$.webshims.activeLang({
+				register: 'form-core', 
+				callback: function(){
+					$.each(arguments, function(i, val){
+						if(formcfg[val]){
+							curCfg = formcfg[val];
+							createMonthKeys(curCfg);
+							$(document).triggerHandler('wslocalechange');
+							return false;
+						}
+					});
 				}
-			};
-			
-			formcfg.en = {
-				numberFormat: {
-					".": ".",
-					",": ","
-				},
-				numberSigns: '.',
-				dateSigns: '/',
-				timeSigns: ":. ",
-				dFormat: "/",
-				patterns: {
-					d: "mm/dd/yy"
-				},
-				date: {
-					"closeText": "Done",
-					"prevText": "Prev",
-					"nextText": "Next",
-					"currentText": "Today",
-					"monthNames": ["January","February","March","April","May","June","July","August","September","October","November","December"],
-					"monthNamesShort": ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
-					"dayNames": ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
-					"dayNamesShort": ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
-					"dayNamesMin": ["Su","Mo","Tu","We","Th","Fr","Sa"],
-					"weekHeader": "Wk",
-					"firstDay": 0,
-					"isRTL": false,
-					"showMonthAfterYear": false,
-					"yearSuffix": ""
-				}
-			};
-			
-			formcfg['en-US'] = formcfg['en-US'] || formcfg['en'];
-			formcfg[''] = formcfg[''] || formcfg['en-US'];
-			curCfg = formcfg[''];
-			
-			var createMonthKeys = function(langCfg){
-				if(!langCfg.date.monthkeys){
-					var create = function(i, name){
-						var strNum;
-						var num = i + 1;
-						strNum = (num < 10) ? '0'+num : ''+num;
-						
-						langCfg.date.monthkeys[num] = strNum;
-						langCfg.date.monthkeys[name] = strNum;
-					};
-					langCfg.date.monthkeys = {};
-					$.each(langCfg.date.monthNames, create);
-					$.each(langCfg.date.monthNamesShort, create);
-				}
-			};
-			
-			createMonthKeys(curCfg);
-			$.webshims.ready('dom-extend', function(){
-				$.webshims.activeLang({
-					register: 'form-core', 
-					callback: function(){
-						$.each(arguments, function(i, val){
-							if(formcfg[val]){
-								curCfg = formcfg[val];
-								createMonthKeys(curCfg);
-								$(document).triggerHandler('wslocalechange');
-								return false;
-							}
-						});
-					}
-				});
 			});
-		})();
+		});
+	})();
 		
 	
 	
