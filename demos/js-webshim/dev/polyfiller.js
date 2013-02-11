@@ -708,6 +708,9 @@
 			return ret;
 		};
 		
+		$.fn.jProp = function(){
+			return $($.fn.prop.apply(this, arguments) || []);
+		};
 		
 		$.each(['after', 'before', 'append', 'prepend', 'replaceWith'], function(i, name){
 			$.fn[name+'Polyfill'] = function(a){
