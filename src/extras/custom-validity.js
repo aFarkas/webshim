@@ -128,7 +128,7 @@
 		var name = elem.name;
 		if(!name || elem.type !== 'checkbox' || !$(elem).hasClass('group-required')){return;}
 		var checkboxes = $( (elem.form && elem.form[name]) || document.getElementsByName(name));
-		var isValid = checkboxes.filter(':checked');
+		var isValid = checkboxes.filter(':enabled:checked');
 		if(groupTimer[name]){
 			clearTimeout(groupTimer[name]);
 		}
