@@ -881,9 +881,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 				$.removeData(form, 'webshimsAddedElements');
 			}
 		};
-		var rCRLF = /\r?\n/g,
-			rinput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i,
-			rselectTextarea = /^(?:select|textarea)/i;
+		
 		
 		if(!Modernizr.formattribute){
 			webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'button', 'fieldset'], 'form', {
@@ -991,31 +989,160 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 			});
 		}
 		
-		$.fn.serializeArray = function() {
-				return this.map(function(){
-					var elements = $.prop(this, 'elements');
-					return elements ? $.makeArray( elements ) : this;
-				})
-				.filter(function(){
-					return this.name && !this.disabled &&
-						( this.checked || rselectTextarea.test( this.nodeName ) ||
-							rinput.test( this.type ) );
-				})
-				.map(function( i, elem ){
-					var val = $( this ).val();
-		
-					return val == null ?
-						null :
-						$.isArray( val ) ?
-							$.map( val, function( val, i ){
-								return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
-							}) :
-							{ name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
-				}).get();
-			};
+		if(!$.fn.finish && parseFloat($.fn.jquery, 10) < 1.9){
+			var rCRLF = /\r?\n/g,
+				rinput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i,
+				rselectTextarea = /^(?:select|textarea)/i;
+			$.fn.serializeArray = function() {
+					return this.map(function(){
+						var elements = $.prop(this, 'elements');
+						return elements ? $.makeArray( elements ) : this;
+					})
+					.filter(function(){
+						return this.name && !this.disabled &&
+							( this.checked || rselectTextarea.test( this.nodeName ) ||
+								rinput.test( this.type ) );
+					})
+					.map(function( i, elem ){
+						var val = $( this ).val();
+			
+						return val == null ?
+							null :
+							$.isArray( val ) ?
+								$.map( val, function( val, i ){
+									return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+								}) :
+								{ name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+					}).get();
+				};
+		}
 		
 	})();
 }
+
+	if($('<input />').prop('labels') == null){
+		webshims.defineNodeNamesProperty('button, input, keygen, meter, output, progress, select, textarea', 'labels', {
+			prop: {
+				get: function(){
+					if(this.type == 'hidden'){return null;}
+					var id = this.id;
+					var labels = $(this)
+						.closest('label')
+						.filter(function(){
+							var hFor = (this.attributes['for'] || {});
+							return (!hFor.specified || hFor.value == id);
+						})
+					;
+					
+					if(id) {
+						labels = labels.add('label[for="'+ id +'"]');
+					}
+					return labels.get();
+				},
+				writeable: false
+			}
+		});
+	}
+	
+	if(!('value' in document.createElement('progress'))){
+		(function(){
+			
+			var nan = parseInt('NaN', 10);
+			
+			var updateProgress = function(progress){
+				var position;
+				
+				
+				position = $.prop(progress, 'position');
+				
+				$.attr(progress, 'data-position', position);
+				$('> span', progress).css({width: (position < 0 ?  100 : position * 100) +'%'});
+			};
+			var desc = {
+				position: {
+					prop: {
+						get: function(){
+							var max;
+							var val = $.attr(this, 'value');
+							var ret = -1;
+							val = val ? (val * 1) : nan; 
+							if(!isNaN(val)){
+								max = $.prop(this, 'max');
+								ret = Math.max(Math.min(val / max, 1), 0);
+								if(updateProgress.isInChange){
+									$.attr(this, 'aria-valuenow', ret * 100);
+									if(updateProgress.isInChange == 'max'){
+										$.attr(this, 'aria-valuemax', max);
+									}
+								} else {
+									$(this).removeAttr('aria-valuenow');
+								}
+							}
+							return ret;
+						},
+						writeable: false
+					}
+				}
+			};
+			
+			$.each({value: 0, max: 1}, function(name, defValue){
+				desc[name] = {
+					attr: {
+						set: function(value){
+							var ret = desc[name].attr._supset.aplly(this, arguments);
+							updateProgress.isInChange = name;
+							updateProgress(this);
+							updateProgress.isInChange = false;
+							return ret;
+						}
+					},
+					prop: {
+						get: function(){
+							var max;
+							var ret = (desc[name].attr.get.apply(this) * 1);
+							if(ret < 0 || isNaN(ret)){
+								ret = defValue;
+							} else if(name == 'value'){
+								ret = Math.min(ret, $.prop(this, 'max'));
+							} else if(ret === 0){
+								ret = defValue;
+							}
+							return ret;
+						},
+						set: function(value){
+							return desc[name].attr._supset.call(this, value * 1);
+						}
+					}
+				};
+			});
+			
+			webshims.createElement(
+				'progress', 
+				function(){
+					var labels = $(this)
+						.attr({role: 'progressbar', 'aria-valuemin': '0'})
+						.html('<span class="progress-value" />')
+						.jProp('labels')
+						.map(function(){
+							return webshims.getID(this);
+						})
+						.get()
+					;
+					if(labels.length){
+						$.attr(this, 'aria-labelledby', labels.join(' '));
+					} else {
+						webshims.info("you should use label elements for your prgogress elements");
+					}
+					
+					updateProgress.isInChange = 'max';
+					updateProgress(this);
+					updateProgress.isInChange = false;
+				}, 
+				desc
+			);
+				
+		})();
+	}
 
 try {
 	document.querySelector(':checked');
@@ -1213,21 +1340,13 @@ try {
 				hidePlaceholder(elem, data, value);
 			}
 		},
+		hasLabel = function(elem){
+			elem = $(elem);
+			return !!(elem.prop('title') || elem.attr('aria-labelledby') || elem.attr('aria-label') || elem.jProp('labels').length);
+		},
 		createPlaceholder = function(elem){
 			elem = $(elem);
-			var id 			= elem.prop('id'),
-				hasLabel	= !!(elem.prop('title') || elem.attr('aria-labelledby'))
-			;
-			if(!hasLabel && id){
-				hasLabel = !!( $('label[for="'+ id +'"]', elem[0].form)[0] );
-			}
-			if(!hasLabel){
-				if(!id){
-					id = $.webshims.getID(elem);
-				}
-				hasLabel = !!($('label #'+ id)[0]);
-			}
-			return $( hasLabel ? '<span class="placeholder-text"></span>' : '<label for="'+ id +'" class="placeholder-text"></label>');
+			return $( hasLabel(elem) ? '<span class="placeholder-text"></span>' : '<label for="'+ elem.prop('id') +'" class="placeholder-text"></label>');
 		},
 		pHolder = (function(){
 			var delReg 	= /\n|\r|\f|\t/g,
@@ -1442,7 +1561,7 @@ try {
 			if(elem.getAttribute('aria-live')){return;}
 			elem = $(elem);
 			var value = (elem.text() || '').trim();
-			var	id 	= elem.attr('id');
+			var	id 	= elem.prop('id');
 			var	htmlFor = elem.attr('for');
 			var shim = $('<input class="output-shim" type="text" disabled name="'+ (elem.attr('name') || '')+'" value="'+value+'" style="display: none !important;" />').insertAfter(elem);
 			var form = shim[0].form || doc;
@@ -1459,7 +1578,9 @@ try {
 			elem.attr({'aria-live': 'polite'});
 			if(id){
 				shim.attr('id', id);
-				elem.attr('aria-labelledby', webshims.getID($('label[for="'+id+'"]', form)));
+				elem.attr('aria-labelledby', elem.jProp('labels').map(function(){
+					return webshims.getID(this);
+				}).join(' '));
 			}
 			if(htmlFor){
 				id = webshims.getID(elem);

@@ -831,19 +831,17 @@
 		}
 	});
 	
-	if(window.swfobject){
-		window.swfmini = window.swfobject;
-	}
+	
 	addModule('swfmini', {
 		test: function(){
-			if(window.swfobject){
+			if(window.swfobject && !window.swfmini){
 				window.swfmini = window.swfobject;
 			}
 			return ('swfmini' in window);
 		},
 		c: [2, 1]
 	});
-	
+	modules.swfmini.test();
 		
 	/* 
 	 * polyfill-Modules 
@@ -898,7 +896,7 @@
 			loadInit: function(){
 				var type = this.options.type;
 				var src;
-				if(type && type.indexOf('flash') !== -1 && (!window.swfmini || swfmini.hasFlashPlayerVersion('9.0.0'))){
+				if(type && type.indexOf('flash') !== -1 && (!modules.swfmini.test() || swfmini.hasFlashPlayerVersion('9.0.0'))){
 					window.FlashCanvasOptions = window.FlashCanvasOptions || {};
 					flashCanvas = FlashCanvasOptions;
 					if(type == 'flash'){
@@ -963,7 +961,7 @@
 		});
 		
 		if(Modernizr[formvalidation]){
-			bugs.bustedValidity = bustedValidity = Modernizr.formattribute === false || !Modernizr.fieldsetdisabled || !('value' in document.createElement('output')) || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
+			bugs.bustedValidity = bustedValidity = Modernizr.formattribute === false || !Modernizr.fieldsetdisabled || !('value' in document.createElement('progress')) || !('value' in document.createElement('output')) || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
 		}
 		
 		formExtend = Modernizr[formvalidation] && !bustedValidity ? 'form-native-extend' : 'form-shim-extend';
@@ -1036,15 +1034,13 @@
 				types: ['range', 'date', 'time', 'number', 'month']
 			},
 			test: function(toLoad){
-				var ret = ('value' in document.createElement('progress'));
-				if(ret){
-					$.each(this.options.types, function(i, name){
-						if(!modernizrInputTypes[name]){
-							ret = false;
-							return false;
-						}
-					});
-				}
+				var ret = true;
+				$.each(this.options.types, function(i, name){
+					if(!modernizrInputTypes[name]){
+						ret = false;
+						return false;
+					}
+				});
 				return ret;
 			},
 			methodNames: ['stepUp', 'stepDown'],
@@ -1110,8 +1106,10 @@
 				return false;
 			}
 			var options = this.options;
-			var hasToPlay = options.hasToPlay;
-			return !( (!window.swfmini || window.swfmini.hasFlashPlayerVersion('9.0.115')) && (options.preferFlash || (hasToPlay != 'any' && !Modernizr.video[hasToPlay] && !Modernizr.audio[hasToPlay])));
+			if(options.preferFlash && !modules.swfmini.test()){
+				options.preferFlash = false;
+			}
+			return !( options.preferFlash && window.swfmini.hasFlashPlayerVersion('9.0.115') );
 		};
 		var deps = ['swfmini', DOMSUPPORT];
 		
@@ -1119,7 +1117,6 @@
 			f: 'mediaelement',
 			noAutoCallback: true,
 			options: {
-				hasToPlay: 'any',
 				preferFlash: false,
 				player: 'jaris',
 				vars: {},

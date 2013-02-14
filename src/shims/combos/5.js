@@ -743,13 +743,13 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		webshims.defineNodeNamesProperty('button, input, keygen, meter, output, progress, select, textarea', 'labels', {
 			prop: {
 				get: function(){
-					var parent;
+					if(this.type == 'hidden'){return null;}
 					var id = this.id;
 					var labels = $(this)
 						.closest('label')
 						.filter(function(){
-							var hFor = this.htmlFor;
-							return (!hFor || hFor == id);
+							var hFor = (this.attributes['for'] || {});
+							return (!hFor.specified || hFor.value == id);
 						})
 					;
 					

@@ -38,31 +38,40 @@
 	}
 	
 	if(hasNative && !options.preferFlash){
+		var noSwitch = {
+			1: 1,
+			2: 1
+		};
 		var switchOptions = function(e){
+			var media;
 			var parent = e.target.parentNode;
-			if(!options.preferFlash && ($(e.target).is('audio, video') || (parent && $('source:last', parent)[0] == e.target)) ){
-				webshims.ready('DOM mediaelement', function(){
-					if(hasSwf){
+			if(!options.preferFlash && 
+				($(e.target).is('audio, video') || (parent && $('source:last', parent)[0] == e.target)) && 
+				(media = $(e.target).closest('audio, video')) && !noSwitch[media.prop('error')]
+				){
+				$(function(){
+					if(hasSwf && !options.preferFlash){
 						loadSwf();
+						webshims.ready('WINDOWLOAD '+swfType, function(){
+							setTimeout(function(){
+								if(!options.preferFlash && webshims.mediaelement.createSWF && !media.is('.nonnative-api-active')){
+									options.preferFlash = true;
+									document.removeEventListener('error', switchOptions, true);
+									$('audio, video').mediaLoad();
+									webshims.info("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error'));
+								}
+							}, 9);
+						});
+					} else{
+						document.removeEventListener('error', switchOptions, true);
 					}
-					webshims.ready('WINDOWLOAD '+swfType, function(){
-						setTimeout(function(){
-							if(hasSwf && !options.preferFlash && webshims.mediaelement.createSWF && !$(e.target).closest('audio, video').is('.nonnative-api-active')){
-								options.preferFlash = true;
-								document.removeEventListener('error', switchOptions, true);
-								$('audio, video').mediaLoad();
-								webshims.info("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src);
-							} else if(!hasSwf){
-								document.removeEventListener('error', switchOptions, true);
-							}
-						}, 20);
-					});
 				});
 			}
 		};
 		document.addEventListener('error', switchOptions, true);
 		$('audio, video').each(function(){
-			if(this.error){
+			var error = $.prop(this, 'error');
+			if(error && !noSwitch[error]){
 				switchOptions({target: this});
 			}
 		});

@@ -105,7 +105,8 @@ mark {
 .input-datetime-local,
 .input-buttons,
 .input-buttons *,
-.details-open-indicator {
+.details-open-indicator,
+progress span.progress-value {
 	margin: 0;
 	padding: 0;
 	border: none;
@@ -574,12 +575,14 @@ img.ui-datepicker-trigger {
 	opacity: 0;
 	padding: 11px 0 4px;
 	transform: translate(0, -100%);
+	-webkit-transform: translate(0, -100%);
 	transition: all 400ms ease-in-out;
 }
 
 
 .ws-popover.ws-po-visible .ws-po-outerbox  {
 	opacity: 1;
+	-webkit-transform: translate(0, 0);
 	transform: translate(0, 0);
 }
 
@@ -695,6 +698,30 @@ datalist {
 	display: inline-block;
 	font: 12px/140% sans-serif;
 	z-index: 1000000000;
+}
+
+progress {
+	position: relative;
+	display: inline-block;
+	width: 160px;
+	height: 16px;
+}
+progress[data-position] {
+	vertical-align: -0.2em;
+	border: 1px solid #ccc;
+	background: #e6e6e6;
+}
+progress * {
+	display: none !important;
+}
+progress span.progress-value {
+	position: absolute;
+	display: block !important;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	height: 100%;
+	background: #0063a6;
 }
 
 
