@@ -1089,7 +1089,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 				desc[name] = {
 					attr: {
 						set: function(value){
-							var ret = desc[name].attr._supset.aplly(this, arguments);
+							var ret = desc[name].attr._supset.call(this, value);
 							updateProgress.isInChange = name;
 							updateProgress(this);
 							updateProgress.isInChange = false;
@@ -1099,7 +1099,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					prop: {
 						get: function(){
 							var max;
-							var ret = (desc[name].attr.get.apply(this) * 1);
+							var ret = (desc[name].attr.get.call(this) * 1);
 							if(ret < 0 || isNaN(ret)){
 								ret = defValue;
 							} else if(name == 'value'){
@@ -1110,7 +1110,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 							return ret;
 						},
 						set: function(value){
-							return desc[name].attr._supset.call(this, value * 1);
+							return desc[name].attr.set.call(this, value * 1);
 						}
 					}
 				};
