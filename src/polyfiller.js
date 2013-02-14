@@ -1036,13 +1036,15 @@
 				types: ['range', 'date', 'time', 'number', 'month']
 			},
 			test: function(toLoad){
-				var ret = true;
-				$.each(this.options.types, function(i, name){
-					if(!modernizrInputTypes[name]){
-						ret = false;
-						return false;
-					}
-				});
+				var ret = ('value' in document.createElement('progress'));
+				if(ret){
+					$.each(this.options.types, function(i, name){
+						if(!modernizrInputTypes[name]){
+							ret = false;
+							return false;
+						}
+					});
+				}
 				return ret;
 			},
 			methodNames: ['stepUp', 'stepDown'],
@@ -1059,16 +1061,9 @@
 		addPolyfill('form-number-date-ui', {
 			f: 'forms-ext',
 			test: function(){
-				console.log(this.options.replaceUI)
-				return modules['form-number-date-api'].test() && !this.options.replaceUI;
+				return !this.options.replaceUI && modules['form-number-date-api'].test();
 			},
 			d: ['forms', DOMSUPPORT, 'form-number-date-api', 'range-ui'],
-			loadInit: function(){
-//				loadList(['jquery-ui']);
-//				if(modules['input-widgets'].src){
-//					loadList(['input-widgets']);
-//				}
-			},
 			options: {
 				calculateWidth: true
 	//			,replaceUI: false
