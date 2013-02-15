@@ -1,5 +1,5 @@
 article,aside,canvas,details,figcaption,figure,
-footer,header,hgroup,menu,nav,section,summary { 
+footer,header,hgroup,main,nav,section,summary { 
 	display:block;
 }
 audio {
@@ -241,10 +241,10 @@ img.ui-datepicker-trigger {
 	display: inline-block;
 	font-size: 0;
 	vertical-align: top;
-	margin-left: -17px;
+	margin-left: -20px;
 }
 .input-button-size-2 {
-	margin-left: -32px;
+	margin-left: -35px;
 }
 .step-controls,
 .popover-opener {
@@ -705,23 +705,30 @@ progress {
 	display: inline-block;
 	width: 160px;
 	height: 16px;
-}
-progress[data-position] {
-	vertical-align: -0.2em;
-	border: 1px solid #ccc;
-	background: #e6e6e6;
-}
-progress * {
-	display: none !important;
-}
-progress span.progress-value {
-	position: absolute;
-	display: block !important;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	height: 100%;
-	background: #0063a6;
+	
+	&[data-position] {
+		vertical-align: -0.2em;
+		border: 1px solid #ccc;
+		background: #e6e6e6;
+	}
+	
+	> * {
+		display: none !important;
+	}
+	
+	span.progress-value {
+		position: absolute;
+		display: block !important;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		height: 100%;
+		background: #a66300;
+	}
+	
+	&[aria-valuenow] span.progress-value {
+		background: #0063a6;
+	}
 }
 
 

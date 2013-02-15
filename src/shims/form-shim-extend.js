@@ -1063,8 +1063,10 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					prop: {
 						get: function(){
 							var max;
-							var val = $.attr(this, 'value');
+							//jQuery 1.8.x try's to normalize "0" to 0
+							var val = this.getAttribute('value');
 							var ret = -1;
+							
 							val = val ? (val * 1) : nan; 
 							if(!isNaN(val)){
 								max = $.prop(this, 'max');
@@ -1074,9 +1076,9 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 									if(updateProgress.isInChange == 'max'){
 										$.attr(this, 'aria-valuemax', max);
 									}
-								} else {
-									$(this).removeAttr('aria-valuenow');
 								}
+							} else if(updateProgress.isInChange) {
+								$(this).removeAttr('aria-valuenow');
 							}
 							return ret;
 						},
@@ -1096,6 +1098,15 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 							return ret;
 						}
 					},
+					removeAttr: {
+						value: function(){
+							this.removeAttribute(name);
+							updateProgress.isInChange = name;
+							updateProgress(this);
+							updateProgress.isInChange = false;
+							console.log('removeAttr', this, arguments)
+						}
+					},
 					prop: {
 						get: function(){
 							var max;
@@ -1110,6 +1121,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 							return ret;
 						},
 						set: function(value){
+							console.log('prop', value, arguments)
 							return desc[name].attr.set.call(this, value * 1);
 						}
 					}
@@ -1580,7 +1592,7 @@ try {
 				shim.attr('id', id);
 				elem.attr('aria-labelledby', elem.jProp('labels').map(function(){
 					return webshims.getID(this);
-				}).join(' '));
+				}).get().join(' '));
 			}
 			if(htmlFor){
 				id = webshims.getID(elem);

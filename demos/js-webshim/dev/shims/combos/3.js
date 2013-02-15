@@ -1400,9 +1400,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				this.contentElement = $('.ws-po-box', this.element);
 				this.lastElement = $([]);
 				this.bindElement();
-				if(this.options.prepareFor){
-					this.prepareFor($(this.options.prepareFor).getNativeElement(), $(this.options.prepareFor).getShadowElement());
-				}
+				
 				this.element.data('wspopover', this);
 				
 			},
@@ -1426,9 +1424,10 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				return container == contained || $.contains(container, contained);
 			},
 			show: function(element){
+				console.log(this, element)
 				if(this.isVisible){return;}
 				this.isVisible = true;
-				element = $(element).getNativeElement();
+				element = $(element || this.options.prepareFor).getNativeElement() ;
 				
 				var that = this;
 				var visual = $(element).getShadowElement();
@@ -1436,9 +1435,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				this.clear();
 				this.element.removeClass('ws-po-visible').css('display', 'none');
 				
-				if(!this.options.prepareFor){
-					this.prepareFor(element, visual);
-				}
+				this.prepareFor(element, visual);
 				
 				this.position(visual);
 				that.timers.show = setTimeout(function(){
@@ -1485,19 +1482,16 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 							that.hide();
 						}
 					};
-					if(this.options.prepareFor){
-						that.lastElement.on('focusout'+that.eventns + ' blur'+that.eventns, onBlur).data('preparedpopover', that);
-					} else {
-						that.timers.bindBlur = setTimeout(function(){
-							that.lastElement.on('focusout'+that.eventns + ' blur'+that.eventns, onBlur);
-						}, 10);
-					}
+					
+					that.timers.bindBlur = setTimeout(function(){
+						that.lastElement.on('focusout'+that.eventns + ' blur'+that.eventns, onBlur);
+					}, 10);
+					
 					
 				}
+				
 				if(!this.prepared){
-					if(this.options.prepareFor){
-						this.element.css('display', 'none');
-					}
+					
 					if($.fn.bgIframe){
 						this.element.bgIframe();
 					}
@@ -1507,16 +1501,14 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			clear: function(){
 				$(window).off(this.eventns);
 				$(document).off(this.eventns);
-				if(!this.options.prepareFor){
-					this.lastElement.off(this.eventns);
-				}
+				
 				this.stopBlur = false;
 				$.each(this.timers, function(timerName, val){
 					clearTimeout(val);
 				});
 			},
 			hide: function(){
-				if(!this.isVisible){return;}
+				if(true || !this.isVisible){return;}
 				this.isVisible = false;
 				var that = this;
 				var forceHide = function(){

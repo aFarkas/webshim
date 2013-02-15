@@ -213,6 +213,7 @@
 							required checkbox*
 						</label>
 					</div>
+					
 					<div class="button-wrapper">
 						<input type="submit" value="Send" form="form" />
 					</div>
@@ -293,7 +294,7 @@
 								<input type="date" id="dateControlledByRange" value="2011-01-01" min="2011-01-01" max="2011-12-31" />
 								<input type="range" id="rangeControlledByDate" value="1293840000000" min="1293840000000" max="1325289600000" step="86400000" style="margin-left: 5px; width: 400px;" />
 								
-								<script>
+							<script>
 								$('#dateControlledByRange').bind('input', function(){
 									$('#rangeControlledByDate').prop( 'valueAsNumber', $.prop(this, 'valueAsNumber') )
 								});
@@ -303,6 +304,30 @@
 								});
 							</script>
 							</fieldset>
+						</div>
+						
+						<div class="form-item">
+							<label for="progress">
+								progress
+							</label>
+							<progress id="progress" value="30" max="100">100%</progress>
+							<button type="button" data-increase="10">increase by 10</button>
+							<button type="button" data-increase="-10">increase by -10</button>
+							<button type="button" class="remove-value">remove value</button>
+							<script>
+								$('button[data-increase]').on('click', function(){
+									var val = $('#progress').prop( 'value' ) || 0;
+									var step = $(this).data('increase');
+									$('#progress').prop( 'value', val + step );
+									
+									return false;
+								});
+								$('button.remove-value').on('click', function(){
+									$('#progress').removeAttr( 'value' );
+									return false;
+								});
+								
+							</script>
 						</div>
 						
 						<div>
