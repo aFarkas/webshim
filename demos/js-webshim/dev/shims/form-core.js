@@ -524,7 +524,7 @@
 				});
 			},
 			hide: function(){
-				if(true || !this.isVisible){return;}
+				if(!this.isVisible){return;}
 				this.isVisible = false;
 				var that = this;
 				var forceHide = function(){

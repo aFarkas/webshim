@@ -2014,7 +2014,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				});
 			},
 			hide: function(){
-				if(true || !this.isVisible){return;}
+				if(!this.isVisible){return;}
 				this.isVisible = false;
 				var that = this;
 				var forceHide = function(){
