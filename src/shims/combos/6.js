@@ -2053,17 +2053,21 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					lis.push('<li><button value="'+ val +'" data-action="changeInput">'+ (label || data.formatValue(val)) +'</button></li>');
 				});
 				if(lis.length){
-					popover.contentElement.append('<div class="ws-options"><ul>'+ lis.join('') +'</ul></div>');
+					popover.bodyElement.after('<div class="ws-options"><ul>'+ lis.join('') +'</ul></div>');
 				}
 			};
-			popover.contentElement.html('<button class="ws-prev"></button><button class="ws-next"></button><div class="ws-picker-body"></div>');
+			popover.contentElement.html('<button class="ws-prev"></button><button class="ws-next"></button><div class="ws-picker-body"></div><div class="ws-button-row"><button type="button" class="ws-current" data-text="current"></button> <button type="button" data-text="empty" class="ws-empty"></button></div>');
 			popover.nextElement = $('button.ws-next', popover.contentElement);
 			popover.prevElement = $('button.ws-prev', popover.contentElement);
 			popover.bodyElement = $('div.ws-picker-body', popover.contentElement);
+			popover.buttonRow = $('div.ws-button-row', popover.contentElement)
 			$(document)
 				.onTrigger('wslocalechange',function(){
 					popover.nextElement.text(curCfg.date.nextText);
 					popover.prevElement.text(curCfg.date.prevText);
+					$('button', popover.buttonRow).each(function(){
+						$(this).text( $(this).data('text') );
+					});
 				})
 			;
 			data.list(data.options.options);

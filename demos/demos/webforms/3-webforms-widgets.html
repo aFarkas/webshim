@@ -48,6 +48,9 @@
 		.input-widget.no-spinbtn .step-controls {
 			display: none;
 		}
+		.input-widget.no-btn .input-buttons {
+			display: none !important;
+		}
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
@@ -316,6 +319,10 @@ $('form').bind('firstinvalid', function(e){
 						No spinbuttons: 
 						<input type="checkbox" name="no-spinbtn" />
 					</label>
+					<label>
+						No buttons: 
+						<input type="checkbox" name="no-btn" />
+					</label>
 				</fieldset>
 			</form>
 			
@@ -393,6 +400,11 @@ $('form').bind('firstinvalid', function(e){
 						No spinbuttons: 
 						<input type="checkbox" name="no-spinbtn" />
 					</label>
+					
+					<label>
+						No buttons: 
+						<input type="checkbox" name="no-btn" />
+					</label>
 				</fieldset>
 			</form>
 			
@@ -431,6 +443,17 @@ $('form').bind('firstinvalid', function(e){
 						</select>
 					</label>
 				</fieldset>
+				<fieldset data-style="">
+					<legend>Style</legend>
+					<label>
+						Buttons outside: 
+						<input type="checkbox" name="btn-outside" />
+					</label>
+					<label>
+						No buttons: 
+						<input type="checkbox" name="no-btn" />
+					</label>
+				</fieldset>
 			</form>
 			
 			<form class="input-widget" data-type="number">
@@ -466,6 +489,17 @@ $('form').bind('firstinvalid', function(e){
 							<option></option>
 							<option>numbers</option>
 						</select>
+					</label>
+				</fieldset>
+				<fieldset data-style="">
+					<legend>Style</legend>
+					<label>
+						Buttons outside: 
+						<input type="checkbox" name="btn-outside" />
+					</label>
+					<label>
+						No buttons: 
+						<input type="checkbox" name="no-btn" />
 					</label>
 				</fieldset>
 			</form>
