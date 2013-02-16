@@ -1184,6 +1184,11 @@ var swfmini = function() {
 		};
 		
 		if(options.replaceValidationUI){
+			if(options.overrideMessages && (options.customMessages || options.customMessages == null)){
+				options.customMessages = true;
+				options.overrideMessages = false;
+				webshims.info("set overrideMessages to false. Use customMessages instead");
+			}
 			webshims.ready('DOM forms', function(){
 				$(document).on('firstinvalid', function(e){
 					if(!e.isInvalidUIPrevented()){

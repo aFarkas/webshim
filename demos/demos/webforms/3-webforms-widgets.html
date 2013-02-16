@@ -70,7 +70,6 @@
 	-->
 	
 	<script class="example">
-//		$.webshims.debug = true;
 		
 		$.webshims.setOptions('forms', {
 			customDatalist: true
@@ -222,164 +221,254 @@ $('form').bind('firstinvalid', function(e){
 			<h3 id="configure-ui">Changing default-options for widgets</h3>
 			
 			<form class="input-widget" data-type="date">
+				<fieldset data-method="prop">
+					<legend>$.prop</legend>
+					
+					<label>
+						min: 
+						<select name="min">
+							<option></option>
+							<option>2008-01-01</option>
+						</select>
+					</label>
+					<label>
+						max: 
+						<select name="max">
+							<option></option>
+							<option>2014-12-31</option>
+						</select>
+					</label>
+					
+					<label>
+						disabled: 
+						<input type="checkbox" name="disabled" />	
+					</label>
+					<label>
+						readonly: 
+						<input type="checkbox" name="readonly" />	
+					</label>
+				</fieldset>
+				<fieldset data-method="attr">
+					<legend>$.attr</legend>
+					
+					<label>
+						data-placeholder: 
+						<select name="data-placeholder">
+							<option></option>
+							<option>yyyy-mm-dd</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="data" data-name="wspopover">
+					<legend>data-wspopover Properties</legend>
+					
+					<label>
+						appendTo: 
+						<select name="appendTo">
+							<option value="body">body (default || body-element)</option>
+							<option value="element">element (keyword for the input element itself)</option>
+						</select>
+					</label>
+					
+				</fieldset>
+				<fieldset data-method="data" data-name="date">
+					<legend>data-month Properties</legend>
+					<label>
+						size: 
+						<select name="size">
+							<option>1</option>
+							<option>3</option>
+						</select>
+					</label>
+					<label>
+						startAt: 
+						<select name="startAt">
+							<option>0</option>
+							<option>1</option>
+							<option>2</option>
+						</select>
+					</label>
+					<label>
+						selectNav: 
+						<input type="checkbox" name="selectNav" />
+					</label>
+					
+					<label>
+						monthNames: 
+						<select name="monthNames">
+							<option>monthNames</option>
+							<option>monthNamesShort</option>
+						</select>
+					</label>
+					
+					<label>
+						openOnFocus: 
+						<input type="checkbox" name="openOnFocus" />
+					</label>
+				</fieldset>
+				<fieldset data-style="">
+					<legend>Style</legend>
+					<label>
+						Buttons outside: 
+						<input type="checkbox" name="btn-outside" />
+					</label>
+					<label>
+						No spinbuttons: 
+						<input type="checkbox" name="no-spinbtn" />
+					</label>
+				</fieldset>
+			</form>
 			
+			<form class="input-widget" data-type="month">
+				<fieldset data-method="prop">
+					<legend>$.prop</legend>
+					
+					<label>
+						min: 
+						<select name="min">
+							<option></option>
+							<option>2008-01</option>
+						</select>
+					</label>
+					<label>
+						max: 
+						<select name="max">
+							<option></option>
+							<option>2014-12</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="attr">
+					<legend>$.attr</legend>
+					
+					<label>
+						data-placeholder: 
+						<select name="data-placeholder">
+							<option></option>
+							<option>yyyy-mm</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="data" data-name="month">
+					<legend>data-month Properties</legend>
+					<label>
+						size: 
+						<select name="size">
+							<option>1</option>
+							<option>3</option>
+						</select>
+					</label>
+					<label>
+						startAt: 
+						<select name="startAt">
+							<option>0</option>
+							<option>1</option>
+						</select>
+					</label>
+					<label>
+						selectNav: 
+						<input type="checkbox" name="selectNav" />	
+					</label>
+					
+					<label>
+						monthNames: 
+						<select name="monthNames">
+							<option>monthNames</option>
+							<option>monthNamesShort</option>
+						</select>
+					</label>
+					
+					<label>
+						openOnFocus: 
+						<input type="checkbox" name="openOnFocus" />	
+					</label>
+				</fieldset>
+				<fieldset data-style="">
+					<legend>Style</legend>
+					<label>
+						Buttons outside: 
+						<input type="checkbox" name="btn-outside" />
+					</label>
+					<label>
+						No spinbuttons: 
+						<input type="checkbox" name="no-spinbtn" />
+					</label>
+				</fieldset>
+			</form>
 			
-			<fieldset data-method="prop">
-				<legend>$.prop</legend>
-				
-				<label>
-					min: 
-					<select name="min">
-						<option></option>
-						<option>2008-01-01</option>
-					</select>
-				</label>
-				<label>
-					max: 
-					<select name="max">
-						<option></option>
-						<option>2014-12-31</option>
-					</select>
-				</label>
-				
-				<label>
-					disabled: 
-					<input type="checkbox" name="disabled" />	
-				</label>
-				<label>
-					readonly: 
-					<input type="checkbox" name="readonly" />	
-				</label>
-			</fieldset>
-			<fieldset data-method="attr">
-				<legend>$.attr</legend>
-				
-				<label>
-					data-placeholder: 
-					<select name="data-placeholder">
-						<option></option>
-						<option>yyyy-mm-dd</option>
-					</select>
-				</label>
-			</fieldset>
-			<fieldset data-method="data" data-name="wspopover">
-				<legend>data-wspopover Properties</legend>
-				
-				<label>
-					appendTo: 
-					<select name="appendTo">
-						<option value="body">body (default || body-element)</option>
-						<option value="element">element (keyword for the input element itself)</option>
-					</select>
-				</label>
-				
-			</fieldset>
-			<fieldset data-method="data" data-name="date">
-				<legend>data-month Properties</legend>
-				<label>
-					size: 
-					<select name="size">
-						<option>1</option>
-						<option>3</option>
-					</select>
-				</label>
-				<label>
-					startAt: 
-					<select name="startAt">
-						<option>0</option>
-						<option>1</option>
-						<option>2</option>
-					</select>
-				</label>
-				<label>
-					selectNav: 
-					<input type="checkbox" name="selectNav" />
-				</label>
-				
-				<label>
-					monthNames: 
-					<select name="monthNames">
-						<option>monthNames</option>
-						<option>monthNamesShort</option>
-					</select>
-				</label>
-				
-				<label>
-					openOnFocus: 
-					<input type="checkbox" name="openOnFocus" />
-				</label>
-			</fieldset>
-			<fieldset data-style="">
-				<legend>Style</legend>
-				<label>
-					Buttons outside: 
-					<input type="checkbox" name="btn-outside" />
-				</label>
-				<label>
-					No spinbuttons: 
-					<input type="checkbox" name="no-spinbtn" />
-				</label>
-			</fieldset>
-		</form>
-		
-		<form class="input-widget" data-type="month">
+			<form class="input-widget" data-type="time">
+				<fieldset data-method="prop">
+					<legend>$.prop</legend>
+					
+					<label>
+						min: 
+						<select name="min">
+							<option></option>
+							<option>14:00</option>
+						</select>
+					</label>
+					<label>
+						max: 
+						<select name="max">
+							<option></option>
+							<option>23:15</option>
+						</select>
+					</label>
+					<label>
+						step: 
+						<select name="step">
+							<option></option>
+							<option value="1">1 (seconds)</option>
+							<option>600</option>
+							<option>3600</option>
+						</select>
+					</label>
+					<label>
+						placeholder: 
+						<select name="placeholder">
+							<option></option>
+							<option>hh:mm</option>
+						</select>
+					</label>
+				</fieldset>
+			</form>
 			
-			<fieldset data-method="prop">
-				<legend>$.prop</legend>
-				
-				<label>
-					min: 
-					<select name="min">
-						<option></option>
-						<option>2008-01</option>
-					</select>
-				</label>
-				<label>
-					max: 
-					<select name="max">
-						<option></option>
-						<option>2014-12</option>
-					</select>
-				</label>
-			</fieldset>
-			
-			<fieldset data-method="data" data-name="month">
-				<legend>data-month Properties</legend>
-				<label>
-					size: 
-					<select name="size">
-						<option>1</option>
-						<option>3</option>
-					</select>
-				</label>
-				<label>
-					startAt: 
-					<select name="startAt">
-						<option>0</option>
-						<option>1</option>
-					</select>
-				</label>
-				<label>
-					selectNav: 
-					<input type="checkbox" name="selectNav" />	
-				</label>
-				
-				<label>
-					monthNames: 
-					<select name="monthNames">
-						<option>monthNames</option>
-						<option>monthNamesShort</option>
-					</select>
-				</label>
-				
-				<label>
-					openOnFocus: 
-					<input type="checkbox" name="openOnFocus" />	
-				</label>
-			</fieldset>
-			
-		</form>
-			
+			<form class="input-widget" data-type="number">
+				<fieldset data-method="prop">
+					<legend>$.prop</legend>
+					
+					<label>
+						min: 
+						<select name="min">
+							<option></option>
+							<option>-100</option>
+						</select>
+					</label>
+					<label>
+						max: 
+						<select name="max">
+							<option></option>
+							<option>2000</option>
+						</select>
+					</label>
+					<label>
+						step: 
+						<select name="step">
+							<option></option>
+							<option>0.1</option>
+							<option>0.5</option>
+							<option>10</option>
+						</select>
+					</label>
+					<label>
+						placeholder: 
+						<select name="placeholder">
+							<option></option>
+							<option>numbers</option>
+						</select>
+					</label>
+				</fieldset>
+			</form>
 			
 			<section>
 				<h3>Simple Demo</h3>

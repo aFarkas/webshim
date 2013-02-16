@@ -228,7 +228,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						getSup('set', desc, oldDesc) : 
 						(webshims.cfg.useStrict && prop == 'prop') ? 
 							function(){throw(prop +' is readonly on '+ nodeName);} : 
-							$.noop
+							function(){webhsims.info(prop +' is readonly on '+ nodeName);}
 					;
 				}
 				if(!desc.get){
@@ -1662,6 +1662,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		};
 		
 		if(options.replaceValidationUI){
+			if(options.overrideMessages && (options.customMessages || options.customMessages == null)){
+				options.customMessages = true;
+				options.overrideMessages = false;
+				webshims.info("set overrideMessages to false. Use customMessages instead");
+			}
 			webshims.ready('DOM forms', function(){
 				$(document).on('firstinvalid', function(e){
 					if(!e.isInvalidUIPrevented()){

@@ -228,7 +228,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						getSup('set', desc, oldDesc) : 
 						(webshims.cfg.useStrict && prop == 'prop') ? 
 							function(){throw(prop +' is readonly on '+ nodeName);} : 
-							$.noop
+							function(){webhsims.info(prop +' is readonly on '+ nodeName);}
 					;
 				}
 				if(!desc.get){

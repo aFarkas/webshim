@@ -1307,11 +1307,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			},
 			month: {
 				step: 1,
-				start: (new Date(new Date().getFullYear(), 0, 1))
+				start: new Date()
 			},
 			date: {
 				step: 1,
-				start: (new Date(new Date().getFullYear(), 0, 1))
+				start: new Date()
 			}
 		};
 		
@@ -1640,9 +1640,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		var getDateArray = function(date){
 			return [date.getFullYear(), addZero(date.getMonth() + 1), addZero(date.getDate())];
 		};
+		var today = getDateArray(new Date());
 		
 		picker.getYearList = function(value, data){
-			var j, i, val, disabled, lis, prevDisabled, nextDisabled, classStr;
+			var j, i, val, disabled, lis, prevDisabled, nextDisabled, classStr, classArray;
 			
 			value = value[0] * 1;
 			
@@ -1665,15 +1666,25 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				lis = [];
 				for(i = 0; i < 12; i++){
 					val = start + i ;
+					classArray = [];
 					if( !picker.isInRange([val], max, min) ){
 						disabled = ' disabled="disabled"';
 					} else {
 						disabled = '';
 						enabled++;
 					}
-					classStr = (currentValue[0] == val) ? 
-						' class="selected-value"' :
-						'';
+					
+					
+					if(val == today[0]){
+						classArray.push('this-year');
+					}
+					
+					if(currentValue[0] == val){
+						classArray.push('selected-value');
+					}
+					
+					classStr = classArray.length ? ' class="'+ (classArray.join(' ')) +'"' : '';
+					
 					
 					lis.push('<li><button type="button"'+ disabled + classStr +' data-action="setMonthList" value="'+val+'">'+val+'</button></li>');
 				}
@@ -1694,7 +1705,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		picker.getMonthList = function(value, data){
 			
-			var j, i, name, val, disabled, lis, fullyDisabled, prevDisabled, nextDisabled, classStr;
+			var j, i, name, val, disabled, lis, fullyDisabled, prevDisabled, nextDisabled, classStr, classArray;
 			var size = data.options.size || 1;
 			var max = data.options.max.split('-');
 			var min = data.options.min.split('-');
@@ -1734,20 +1745,29 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				for(i = 0; i < 12; i++){
 					val = curCfg.date.monthkeys[i+1];
 					name = curCfg.date.monthNames[i];
+					classArray = [];
 					if(fullyDisabled || !picker.isInRange([value, val], max, min) ){
 						disabled = ' disabled="disabled"';
 					} else {
 						disabled = '';
 						enabled++;
 					}
-					classStr = (currentValue[0] == value && currentValue[1] == val) ? 
-						' class="selected-value"' :
-						'';
+					
+					if(value == today[0] && today[1] == val){
+						classArray.push('this-month');
+					}
+					
+					if(currentValue[0] == value && currentValue[1] == val){
+						classArray.push('selected-value');
+					}
+					
+					classStr = (classArray.length) ? ' class="'+ (classArray.join(' ')) +'"' : '';
+					
 					
 					
 					lis.push('<li><button type="button"'+ disabled + classStr +' data-action="'+ (data.type == 'month' ? 'changeInput' : 'setDayList' ) +'" value="'+value+'-'+val+'">'+name+'</button></li>');
 				}
-				console.log(lis.join())
+				
 				str += '<ul>'+ (lis.join(''))+ '</ul></div>';
 			}
 			
@@ -1850,15 +1870,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						classArray.push('othermonth');
 					} 
 					
-					if(currentValue[0] == dateArray[0] && dateArray[1] == currentValue[1] && dateArray[2] == currentValue[2] ){
+					
+					
+					if(dateArray[0] == today[0] && today[1] == dateArray[1] && today[2] == dateArray[2]){
+						classArray.push('this-day');
+					}
+					
+					if(currentValue[0] == dateArray[0] && dateArray[1] == currentValue[1] && dateArray[2] == currentValue[2]){
 						classArray.push('selected-value');
 					}
-//					else if(dateArray[2] == value[2]){
-//						classArray.join('selected-date');
-//						
-//					}
-
-
 					
 					if(classArray.length){
 						buttonStr += ' class="'+ classArray.join(' ') +'"';
