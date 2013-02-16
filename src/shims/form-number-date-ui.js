@@ -1113,7 +1113,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						marginRight: $.css( data.orig, 'marginRight')
 					});
 					
-					if(data.buttonWrapper){
+					if(data.buttonWrapper && data.buttonWrapper.filter(isVisible).length){
 						data.element.css({paddingRight: ''});
 						
 						if((parseInt(data.buttonWrapper.css('marginLeft'), 10) || 0) < 0){
