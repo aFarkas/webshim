@@ -20,10 +20,7 @@
 			this.trail = $('.ws-range-rail', this.element);
 			this.range = $('.ws-range-min', this.element);
 			this.thumb = $('.ws-range-thumb', this.trail);
-			this.dirs = this.element.innerHeight() > this.element.innerWidth() ? 
-				{mouse: 'pageY', pos: 'top', range: 'height', outerWidth: 'outerHeight'} :
-				{mouse: 'pageX', pos: 'left', range: 'width', outerWidth: 'outerWidth'}
-			;
+			
 			this.updateMetrics();
 			
 			this.orig = this.options.orig;
@@ -41,30 +38,39 @@
 		value: $.noop,
 		_value: function(val, _noNormalize, animate){
 			var left;
+			var o = this.options;
 			var oVal = val;
 			var thumbStyle = {};
 			var rangeStyle = {};
 			if(!_noNormalize && parseFloat(val, 10) != val){
-				val = this.options.min + ((this.options.max - this.options.min) / 2);
+				val = o.min + ((o.max - o.min) / 2);
 			}
 			
 			if(!_noNormalize){
 				val = this.normalizeVal(val);
 			}
-			left =  100 * ((val - this.options.min) / (this.options.max - this.options.min));
+			left =  100 * ((val - o.min) / (o.max - o.min));
 			
 			this.options.value = val;
 			this.thumb.stop();
 			this.range.stop();
-			thumbStyle[this.dirs.pos] = left+'%';
-			rangeStyle[this.dirs.range] = left+'%';
+			
+			rangeStyle[this.dirs.width] = left+'%';
+			if(this.vertical){
+				left = Math.abs(left - 100);
+			}
+			thumbStyle[this.dirs.left] = left+'%';
+			
 			
 			if(!animate){
 				this.thumb.css(thumbStyle);
 				this.range.css(rangeStyle);
 			} else {
-				this.thumb.animate(thumbStyle, {animate: this.options.animate});
-				this.range.animate(rangeStyle, {animate: this.options.animate});
+				if(typeof o.animate != 'object'){
+					o.animate = {};
+				}
+				this.thumb.animate(thumbStyle, o.animate);
+				this.range.animate(rangeStyle, o.animate);
 			}
 			if(this.orig && (oVal != val || (!this._init && this.orig.value != val)) ){
 				this.options._change(val);
@@ -79,6 +85,7 @@
 			var min = o.min;
 			var max = o.max;
 			var trail = this.trail;
+			var that = this;
 			o.options = opts || {};
 			
 			this.element.attr({'aria-valuetext': o.options[o.value] || o.value});
@@ -89,7 +96,7 @@
 				if(!isNumber(val) || val < min || val > max){return;}
 				var left = 100 * ((val - min) / (max - min));
 				var title = o.showLabels ? ' title="'+ label +'"' : '';
-				trail.append('<span class="ws-range-ticks"'+ title +' style="'+(this.dirs.pos)+': '+left+'%;" />');
+				trail.append('<span class="ws-range-ticks"'+ title +' style="'+(that.dirs.pos)+': '+left+'%;" />');
 			});
 		},
 		readonly: function(val){
@@ -161,10 +168,13 @@
 			var val, valModStep, alignValue, step;
 			
 			if(pos <= 0){
-				val = this.options.min;
+				val = this.options[this.dirs.min];
 			} else if(pos > 100) {
-				val = this.options.max;
+				val = this.options[this.dirs.max];
 			} else {
+				if(this.vertical){
+					pos = Math.abs(pos - 100)
+				}
 				val = ((this.options.max - this.options.min) * (pos / 100)) + this.options.min;
 				step = this.options.step;
 				if(step != 'any'){
@@ -214,6 +224,9 @@
 			})();
 			
 			var setValueFromPos = function(e, animate){
+				if(this.vertical){
+					left = Math.abs(left - 100)
+				}
 				var val = that.getStepedValueFromPos((e[that.dirs.mouse] - leftOffset) * widgetUnits);
 				if(val != o.value){
 					
@@ -235,7 +248,7 @@
 				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
 				if(!o.readonly && !o.disabled){
 					leftOffset = that.element.focus().addClass('ws-active').offset();
-					widgetUnits = that.element.width();
+					widgetUnits = that.element[that.dirs.width]();
 					if(!widgetUnits || !leftOffset){return;}
 					leftOffset = leftOffset[that.dirs.pos];
 					widgetUnits = 100 / (widgetUnits  - ((that.thumb[that.dirs.outerWidth]() || 2) / 2));
@@ -313,7 +326,15 @@
 			});
 		},
 		updateMetrics: function(){
-			
+			this.vertical = (this.element.innerHeight() - this.element.innerWidth() > 10);
+			this.dirs = this.vertical ? 
+				{mouse: 'pageY', pos: 'top', min: 'max', max: 'min', left: 'top', width: 'height', outerWidth: 'outerHeight'} :
+				{mouse: 'pageX', pos: 'left', min: 'min', max: 'min', left: 'left', width: 'width', outerWidth: 'outerWidth'}
+			;
+			this.element
+				[this.vertical ? 'addClass' : 'removeClass']('vertical-range')
+				[this.vertical ? 'addClass' : 'removeClass']('horizontal-range')
+			;
 		}
 	};
 	

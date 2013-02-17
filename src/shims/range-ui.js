@@ -85,6 +85,7 @@
 			var min = o.min;
 			var max = o.max;
 			var trail = this.trail;
+			var that = this;
 			o.options = opts || {};
 			
 			this.element.attr({'aria-valuetext': o.options[o.value] || o.value});
@@ -95,7 +96,7 @@
 				if(!isNumber(val) || val < min || val > max){return;}
 				var left = 100 * ((val - min) / (max - min));
 				var title = o.showLabels ? ' title="'+ label +'"' : '';
-				trail.append('<span class="ws-range-ticks"'+ title +' style="'+(this.dirs.pos)+': '+left+'%;" />');
+				trail.append('<span class="ws-range-ticks"'+ title +' style="'+(that.dirs.pos)+': '+left+'%;" />');
 			});
 		},
 		readonly: function(val){
