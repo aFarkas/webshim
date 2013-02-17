@@ -1,5 +1,4 @@
-article, aside, canvas, details, figcaption, figure,
-footer, header, hgroup, main, nav, section, summary {
+article, aside, canvas, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
   display: block;
 }
 
@@ -7,21 +6,16 @@ audio {
   display: none;
   height: 0;
   width: 0;
+  overflow: hidden;
 }
 
-audio,
 video {
   overflow: hidden;
 }
 
-audio.webshims-controls,
-video {
-  display: inline-block;
-  min-height: 45px;
-  min-width: 40px;
-}
-
-audio[controls] {
+video,
+audio[controls],
+audio.webshims-controls {
   display: inline-block;
   min-height: 45px;
   min-width: 40px;
@@ -57,19 +51,15 @@ audio > * {
   white-space: pre-wrap;
   overflow: hidden;
 }
-
 .cue-display b {
   font-weight: bold;
 }
-
 .cue-display i {
   font-style: italic;
 }
-
 .cue-display u {
   text-decoration: underline;
 }
-
 .cue-display span.cue-wrapper {
   position: absolute;
   left: 0;
@@ -83,11 +73,9 @@ audio > * {
   color: #fff;
   visibility: visible !important;
 }
-
 .cue-display .cue-line {
   display: block;
 }
-
 .cue-display span.cue {
   display: inline-block;
   padding: 3px 5px;
@@ -95,7 +83,6 @@ audio > * {
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
 }
-
 .cue-display .description-cues {
   position: absolute;
   top: -99px;
@@ -154,7 +141,6 @@ output {
   display: inline-block;
   zoom: 1;
 }
-
 .polyfill-important .placeholder-box {
   position: relative !important;
   display: inline-block !important;
@@ -186,14 +172,15 @@ output {
   line-height: 1;
   cursor: text;
 }
-
 .polyfill-important .placeholder-text {
   margin: 0 !important;
   padding-right: 0 !important;
   padding-bottom: 0 !important;
   display: none !important;
 }
-
+.placeholder-visible .placeholder-text, .placeholder-text.placeholder-visible {
+  display: inline-block;
+}
 .placeholder-box-input .placeholder-text {
   white-space: nowrap;
 }
@@ -202,17 +189,11 @@ output {
   color: #999;
 }
 
-.placeholder-visible .placeholder-text,
-.placeholder-text.placeholder-visible {
-  display: inline-block;
-}
-
 .placeholder-focused.placeholder-visible {
   color: #ccc;
 }
 
-.polyfill-important .placeholder-visible .placeholder-text,
-.polyfill-important .placeholder-text.placeholder-visible {
+.polyfill-important .placeholder-visible .placeholder-text, .polyfill-important .placeholder-text.placeholder-visible {
   display: inline-block !important;
 }
 
@@ -222,7 +203,6 @@ output {
   zoom: 1;
   vertical-align: middle;
 }
-
 .polyfill-important .input-datetime-local {
   display: inline-block !important;
   height: auto !important;
@@ -230,7 +210,6 @@ output {
   margin: 0 !important;
   border: none !important;
 }
-
 .polyfill-important .input-datetime-local input {
   display: inline !important;
 }
@@ -238,7 +217,6 @@ output {
 .input-datetime-local-date {
   margin: 0 2px 0 0;
 }
-
 .polyfill-important .input-datetime-local-date {
   margin: 0 2px 0 0 !important;
 }
@@ -246,7 +224,6 @@ output {
 .input-datetime-local-time {
   margin: 0 0 0 2px;
 }
-
 .polyfill-important .input-datetime-local-time {
   margin: 0 0 0 2px !important;
 }
@@ -314,7 +291,6 @@ img.ui-datepicker-trigger {
   line-height: 0;
   background: url(forms.png) no-repeat 0 0;
 }
-
 .polyfill-important .step-controls span {
   display: inline-block !important;
   margin: 0 !important;
@@ -322,47 +298,49 @@ img.ui-datepicker-trigger {
   font-size: 0 !important;
 }
 
+.step-controls {
+  /* disabled or readonly */
+}
 .step-controls span.step-up {
   top: 0;
   background-position: -80px 0;
 }
-
 .step-controls span.step-up:hover {
   background-position: -105px 0;
 }
-
-.step-controls > span.mousepress-ui.step-up {
-  background-position: -105px -20px;
-}
-
 .step-controls span.step-down {
   bottom: 0;
   background-position: -155px 0;
 }
-
 .step-controls span.step-down:hover {
   background-position: -180px 0;
 }
-
+.step-controls > span.mousepress-ui.step-up {
+  background-position: -105px -20px;
+}
 .step-controls > span.mousepress-ui.step-down {
   background-position: -180px -20px;
 }
-
-/* disabled or readonly */
 .step-controls.disabled-step-control span {
   opacity: 0.95;
   cursor: default;
 }
-
 .step-controls.disabled-step-control span.step-up {
   background-position: -130px 0;
 }
-
 .step-controls.disabled-step-control span.step-down {
   background-position: -205px 0;
 }
 
 /* range */
+.ws-range-rail {
+  position: relative;
+  display: block;
+  height: 100%;
+  width: auto;
+  margin: 0 5px;
+}
+
 .ws-range {
   position: relative;
   display: inline-block;
@@ -378,21 +356,11 @@ img.ui-datepicker-trigger {
   font-size: 0;
   line-height: 0;
 }
-
-.ws-range-rail {
-  position: relative;
-  display: block;
-  height: 100%;
-  width: auto;
-  margin: 0 5px;
-}
-
 .polyfill-important .ws-range {
   display: inline-block !important;
   padding: 0 !important;
   font-size: 0 !important;
 }
-
 .ws-range .ws-range-thumb {
   top: 0;
   position: absolute;
@@ -408,27 +376,23 @@ img.ui-datepicker-trigger {
   font-size: 0;
   line-height: 0;
 }
-
-.ws-range .ws-range-thumb:hover,
+.ws-range .ws-range-thumb:hover {
+  background-position: -20px 0;
+}
 .ws-range:focus .ws-range-thumb {
   background-position: -20px 0;
 }
-
 .ws-range.ws-active .ws-range-thumb {
   background-position: -37px 0;
 }
-
-.ws-range[aria-disabled="true"],
-.ws-range[aria-readonly="true"] {
+.ws-range[aria-disabled="true"], .ws-range[aria-readonly="true"] {
   cursor: default;
   opacity: 0.95;
 }
-
 .ws-range[aria-disabled="true"] .ws-range-thumb {
   cursor: default;
   background-position: -54px 0;
 }
-
 .ws-range .ws-range-min {
   position: absolute !important;
   display: block !important;
@@ -473,16 +437,13 @@ img.ui-datepicker-trigger {
   margin: 0 0 3px;
   padding: 2px 0;
 }
-
 .input-date-datepicker-control .ui-datepicker-header select {
   border: 1px solid #333333;
   padding: 1px 2px 2px;
 }
-
 .input-date-datepicker-control .ui-datepicker-header option {
   padding-right: 8px;
 }
-
 .input-date-datepicker-control .ui-datepicker-header .ui-icon {
   position: absolute;
   display: block;
@@ -495,52 +456,43 @@ img.ui-datepicker-trigger {
   background: url(forms.png) no-repeat;
   cursor: pointer;
 }
-
 .input-date-datepicker-control .ui-datepicker-header .ui-state-disabled .ui-icon {
   cursor: default;
 }
-
 .input-date-datepicker-control .ui-datepicker-header .ui-icon-circle-triangle-w {
   left: 3px;
   background-position: -235px 3px;
 }
-
 .input-date-datepicker-control .ui-datepicker-header .ui-state-hover .ui-icon-circle-triangle-w {
   background-position: -235px -17px;
 }
-
 .input-date-datepicker-control .ui-datepicker-header .ui-icon-circle-triangle-e {
   right: 3px;
   background-position: -248px 3px;
 }
-
 .input-date-datepicker-control .ui-datepicker-header .ui-state-hover .ui-icon-circle-triangle-e {
   background-position: -248px -17px;
 }
-
 .input-date-datepicker-control table {
   font-size: 100%;
   border-spacing: 1px;
 }
-
 .input-date-datepicker-control .ui-datepicker-title {
   margin: 0 20px;
+  color: #069;
+  text-align: center;
+  font-weight: bold;
 }
-
-.input-date-datepicker-control .ui-datepicker-title,
 .input-date-datepicker-control th {
   color: #069;
   text-align: center;
   font-weight: bold;
 }
-
-.input-date-datepicker-control td,
-.input-date-datepicker-control th {
+.input-date-datepicker-control td, .input-date-datepicker-control th {
   padding: 0 2px;
   text-align: center;
   font-weight: normal;
 }
-
 .input-date-datepicker-control td {
   padding: 0 4px;
   cursor: pointer;
@@ -548,61 +500,44 @@ img.ui-datepicker-trigger {
   border: 1px solid white;
   border-radius: 2px;
 }
-
 .input-date-datepicker-control td.ui-datepicker-current-day {
   background-color: #adf;
   color: #000;
   border-color: #06c;
 }
-
 .input-date-datepicker-control td.ui-datepicker-today {
   border-color: #06c;
 }
-
 .input-date-datepicker-control td.ui-datepicker-current-day a {
   color: #000;
 }
-
 .input-date-datepicker-control td a {
   color: #000;
   text-decoration: none;
 }
-
 .input-date-datepicker-control td:hover {
   background-color: #bef;
   border-color: #06c;
 }
-
 .input-date-datepicker-control td.ui-state-disabled {
   cursor: default;
   border-color: #fff;
   color: #bbb;
   background-color: transparent;
 }
-
 .input-date-datepicker-control .ui-datepicker-buttonpane {
   margin: 4px 0 0;
 }
-
 .input-date-datepicker-control .ui-datepicker-cover {
   display: none;
-  /*sorry for IE5*/
   display/**/: block;
-  /*sorry for IE5*/
   position: absolute;
-  /*must have*/
   z-index: -1;
-  /*must have*/
   filter: mask();
-  /*must have*/
   top: -4px;
-  /*must have*/
   left: -4px;
-  /*must have*/
   width: 200px;
-  /*must have*/
   height: 200px;
-  /*must have*/
 }
 
 /*
@@ -621,12 +556,6 @@ img.ui-datepicker-trigger {
   min-width: 90px;
   transition: visibility 400ms ease-in-out;
 }
-
-.ws-popover button::-moz-focus-inner {
-  border: 0;
-  padding: 0;
-}
-
 .ws-popover button {
   display: inline-block;
   overflow: visible;
@@ -643,11 +572,13 @@ img.ui-datepicker-trigger {
   background: transparent;
   cursor: pointer;
 }
-
+.ws-popover button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
 .ws-popover button[disabled] {
   cursor: default;
 }
-
 .ws-popover.ws-po-visible {
   visibility: visible;
 }
@@ -660,7 +591,6 @@ img.ui-datepicker-trigger {
   -webkit-transform: translate(0, -100%);
   transition: all 400ms ease-in-out;
 }
-
 .ws-popover.ws-po-visible .ws-po-outerbox {
   opacity: 1;
   -webkit-transform: translate(0, 0);
@@ -688,23 +618,25 @@ img.ui-datepicker-trigger {
   zoom: 1;
   font-size: 0;
 }
-
-html .ws-po-arrow,
+html .ws-po-arrow {
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
 html .ws-po-arrow .ws-po-arrowbox {
   border-left-color: transparent;
   border-right-color: transparent;
 }
-
-.polyfill-important .ws-po-arrow,
+.polyfill-important .ws-po-arrow {
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+}
 .polyfill-important .ws-po-arrow .ws-po-arrowbox {
   border-left-color: transparent !important;
   border-right-color: transparent !important;
 }
-
 * html .ws-po-arrow {
   display: none;
 }
-
 .ws-po-arrow .ws-po-arrowbox {
   position: relative;
   top: 1px;
@@ -728,7 +660,6 @@ datalist {
   font-family: "Lucida Grande", "MS Shell Dlg", "Calibri", sans-serif;
   font-size: 100%;
 }
-
 .datalist-polyfill .datalist-box {
   position: relative;
   max-height: 200px;
@@ -736,13 +667,10 @@ datalist {
   overflow-x: hidden !important;
   overflow-y: auto;
 }
-
-.datalist-polyfill ul,
-.datalist-polyfill li {
+.datalist-polyfill ul, .datalist-polyfill li {
   font-size: 100%;
   list-style: none !important;
 }
-
 .datalist-polyfill ul {
   position: static !important;
   overflow: hidden;
@@ -752,7 +680,6 @@ datalist {
   background-color: #fff;
   color: #000;
 }
-
 .datalist-polyfill li {
   margin: 1px 1px 1px 0;
   padding: 2px 2px 2px 5px;
@@ -762,24 +689,20 @@ datalist {
   zoom: 1;
   overflow: hidden;
 }
-
 .datalist-polyfill .option-label {
   display: inline-block;
   float: left;
   max-width: 100%;
   text-overflow: ellipsis;
 }
-
 .datalist-polyfill .option-value {
   display: none;
   float: right;
   text-overflow: ellipsis;
 }
-
 .datalist-polyfill .hidden-item {
   display: none !important;
 }
-
 .datalist-polyfill .active-item {
   background-color: #39f;
   color: #fff;
@@ -829,7 +752,6 @@ progress[aria-valuenow] span.progress-value {
   min-width: 215px !important;
   z-index: 2147483647;
 }
-
 #swflocalstorageshim-wrapper .polyfill-exceeded-message {
   margin: 0 0 5px;
   padding: 5px;
@@ -837,7 +759,6 @@ progress[aria-valuenow] span.progress-value {
   color: #000;
   font-size: 13px;
 }
-
 #swflocalstorageshim-wrapper object {
   min-height: 138px !important;
   min-width: 215px !important;
@@ -863,11 +784,9 @@ summary {
   background: url(details-arrows.png) no-repeat 0 0;
   vertical-align: middle;
 }
-
 .closed-details-summary .details-open-indicator {
   background-position: 0 -20px;
 }
-
 .polyfill-important .details-open-indicator {
   margin: -1px 0 0 !important;
   padding: 0 !important;
@@ -878,7 +797,6 @@ summary {
   background: url(details-arrows.png) no-repeat 0 0 !important;
   vertical-align: middle !important;
 }
-
 .polyfill-important .closed-details-summary .details-open-indicator {
   background-position: 0 -20px !important;
 }
