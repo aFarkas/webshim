@@ -1,11 +1,11 @@
-.date-popover .ws-button-row, .year-list,
+.input-picker .ws-button-row, .year-list,
 .month-list,
 .day-list {
   zoom: 1;
 }
-.date-popover .ws-button-row:before, .year-list:before,
+.input-picker .ws-button-row:before, .year-list:before,
 .month-list:before,
-.day-list:before, .date-popover .ws-button-row:after, .year-list:after,
+.day-list:before, .input-picker .ws-button-row:after, .year-list:after,
 .month-list:after,
 .day-list:after {
   display: table;
@@ -503,57 +503,57 @@ html .ws-po-arrow .ws-po-arrowbox {
   z-index: 999999999;
 }
 
-.date-popover .ws-prev,
-.date-popover .ws-next, .date-popover .ws-button-row button {
+.input-picker .ws-prev,
+.input-picker .ws-next, .input-picker .ws-button-row button {
   border-radius: 4px;
   background: #ccc;
 }
 
-.date-popover {
+.input-picker {
   width: 300px;
   text-align: center;
   font-family: sans-serif;
 }
-.date-popover li,
-.date-popover button {
+.input-picker li,
+.input-picker button {
   font-size: 16px;
   line-height: 1.1em;
 }
-.date-popover .ws-po-box {
+.input-picker .ws-po-box {
   position: relative;
   padding: 10px;
   border-radius: 5px;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.6);
 }
-.date-popover .ws-prev,
-.date-popover .ws-next {
+.input-picker .ws-prev,
+.input-picker .ws-next {
   position: absolute;
   top: 10px;
   width: 40px;
   height: 40px;
   z-index: 1;
 }
-.date-popover .ws-picker-body {
+.input-picker .ws-picker-body {
   position: relative;
   padding: 50px 0 0;
 }
-.date-popover .ws-prev {
+.input-picker .ws-prev {
   left: 10px;
 }
-.date-popover .ws-next {
+.input-picker .ws-next {
   right: 10px;
 }
-.date-popover .ws-button-row {
+.input-picker .ws-button-row {
   position: relative;
   margin: 10px 0 0;
   text-align: left;
   z-index: 2;
 }
-.date-popover .ws-button-row button {
+.input-picker .ws-button-row button {
   padding: 5px 8px;
   display: inline-block;
 }
-.date-popover .ws-button-row button.ws-empty {
+.input-picker .ws-button-row button.ws-empty {
   float: right;
 }
 

@@ -1002,7 +1002,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 			};
 			
-			popover.element.addClass(data.type+'-popover');
+			popover.element.addClass(data.type+'-popover input-picker');
 			popover.contentElement
 				.on('click', 'button[data-action]', actionfn)
 				.on('change', 'select[data-action]', actionfn)
@@ -1197,6 +1197,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					e.stopImmediatePropagation(e);
 					$(opts.orig).triggerHandler(e);
 				});
+				
+				if(data.buttonWrapper && data.buttonWrapper.filter(isVisible).length){
+					data.shim.element.addClass('has-input-buttons');
+				}
 				
 				calcWidth = opts.calculateWidth != null ? opts.calculateWidth : options.calculateWidth;
 				
