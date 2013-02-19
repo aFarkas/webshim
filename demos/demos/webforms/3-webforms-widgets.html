@@ -63,13 +63,13 @@
 		}
 		window.html5.shivMethods = false;
 	</script>
-	<script src="../../js-webshim/minified/polyfiller.js"></script>
-	
-	<!--
-		<script src="../../../src/polyfiller.js"></script> 
+	<script src="../../../src/polyfiller.js"></script> 
 		<script>
 			$.webshims.debug = 'noCombo';
 		</script>
+	
+	<!--
+		
 	-->
 	
 	<script class="example">
@@ -143,6 +143,7 @@
 								$.prop(this, 'value')
 							;
 						});
+						
 						input[$(this).data('method')]($(this).data('name') || obj, obj);
 					});
 					$('fieldset[data-style] input[name]', form).each(function(){
@@ -224,6 +225,13 @@ $('form').bind('firstinvalid', function(e){
 			<h3 id="configure-ui">Changing default-options for widgets</h3>
 			
 			<form class="input-widget" data-type="date">
+				<datalist id="date-list">
+					<select>
+						<option value="2009-10-11" />
+						<option value="2012-11-11" />
+						<option value="2013-11-11" label="labeled Option (2012-11-11)" />
+					</select>
+				</datalist>
 				<fieldset data-method="prop">
 					<legend>$.prop</legend>
 					
@@ -250,10 +258,17 @@ $('form').bind('firstinvalid', function(e){
 						readonly: 
 						<input type="checkbox" name="readonly" />	
 					</label>
+					
 				</fieldset>
 				<fieldset data-method="attr">
 					<legend>$.attr</legend>
-					
+					<label>
+						list: 
+						<select name="list">
+							<option></option>
+							<option value="date-list">date-list (predefined datalist)</option>
+						</select>
+					</label>
 					<label>
 						data-placeholder: 
 						<select name="data-placeholder">
@@ -286,9 +301,9 @@ $('form').bind('firstinvalid', function(e){
 					<label>
 						startAt: 
 						<select name="startAt">
-							<option>0</option>
-							<option>1</option>
-							<option>2</option>
+							<option value="0">0 (= decade)</option>
+							<option value="1">1 (= year)</option>
+							<option value="2">2 (= month)</option>
 						</select>
 					</label>
 					<label>
@@ -368,8 +383,8 @@ $('form').bind('firstinvalid', function(e){
 					<label>
 						startAt: 
 						<select name="startAt">
-							<option>0</option>
-							<option>1</option>
+							<option value="0">0 (= decade)</option>
+							<option value="1">1 (= year)</option>
 						</select>
 					</label>
 					<label>

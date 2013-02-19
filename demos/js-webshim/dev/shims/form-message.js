@@ -6,6 +6,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 	
 	validityMessages.en = $.extend(true, {
 		typeMismatch: {
+			defaultMessage: 'Please enter a valid value.',
 			email: 'Please enter an email address.',
 			url: 'Please enter a URL.',
 			number: 'Please enter a number.',
@@ -29,36 +30,35 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 		}
 	}, (validityMessages.en || validityMessages['en-US'] || {}));
 	
-	
-	['select', 'radio'].forEach(function(type){
-		if(typeof validityMessages['en'].valueMissing == 'object'){
+	if(typeof validityMessages['en'].valueMissing == 'object'){
+		['select', 'radio'].forEach(function(type){
 			validityMessages.en.valueMissing[type] = 'Please select an option.';
-		}
-	});
-	
-	['date', 'time', 'datetime-local', 'month'].forEach(function(type){
-		if(typeof validityMessages.en.rangeUnderflow == 'object'){
+		});
+	}
+	if(typeof validityMessages.en.rangeUnderflow == 'object'){
+		['date', 'time', 'datetime-local', 'month'].forEach(function(type){
 			validityMessages.en.rangeUnderflow[type] = 'Value must be at or after {%min}.';
-		}
-	});
-	['date', 'time', 'datetime-local', 'month'].forEach(function(type){
-		if(typeof validityMessages.en.rangeOverflow == 'object'){
+		});
+	}
+	if(typeof validityMessages.en.rangeOverflow == 'object'){
+		['date', 'time', 'datetime-local', 'month'].forEach(function(type){
 			validityMessages.en.rangeOverflow[type] = 'Value must be at or before {%max}.';
-		}
-	});
+		});
+	}
 	
 	validityMessages['en-US'] = validityMessages['en-US'] || validityMessages.en;
 	validityMessages[''] = validityMessages[''] || validityMessages['en-US'];
 	
 	validityMessages.de = $.extend(true, {
 		typeMismatch: {
+			defaultMessage: '{%value} ist in diesem Feld nicht zulässig.',
 			email: '{%value} ist keine zulässige E-Mail-Adresse',
 			url: '{%value} ist keine zulässige Webadresse',
 			number: '{%value} ist keine Nummer!',
 			date: '{%value} ist kein Datum',
 			time: '{%value} ist keine Uhrzeit',
-			range: '{%value} ist keine Nummer!',
-			"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
+			range: '{%value} ist keine Nummer!'
+//			,"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
 		},
 		rangeUnderflow: {
 			defaultMessage: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.'
@@ -75,44 +75,66 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 		}
 	}, (validityMessages.de || {}));
 	
-	['select', 'radio'].forEach(function(type){
-		if(typeof validityMessages.de.valueMissing == 'object'){
+	if(typeof validityMessages.de.valueMissing == 'object'){
+		['select', 'radio'].forEach(function(type){
 			validityMessages.de.valueMissing[type] = 'Bitte wählen Sie eine Option aus';
-		}
-	});
-	
-	['date', 'time', 'datetime-local', 'month'].forEach(function(type){
-		if(typeof validityMessages.de.rangeUnderflow == 'object'){
+		});
+	}
+	if(typeof validityMessages.de.rangeUnderflow == 'object'){
+		['date', 'time', 'datetime-local', 'month'].forEach(function(type){
 			validityMessages.de.rangeUnderflow[type] = '{%value} ist zu früh. {%min} ist die früheste Zeit, die Sie benutzen können.';
-		}
-	});
-	['date', 'time', 'datetime-local', 'month'].forEach(function(type){
-		if(typeof validityMessages.de.rangeOverflow == 'object'){
+		});
+	}
+	if(typeof validityMessages.de.rangeOverflow == 'object'){
+		['date', 'time', 'datetime-local', 'month'].forEach(function(type){
 			validityMessages.de.rangeOverflow[type] = '{%value} ist zu spät. {%max} ist die späteste Zeit, die Sie benutzen können.';
-		}
-	});
+		});
+	}
 	
 	var currentValidationMessage =  validityMessages[''];
-	
-	
-	webshims.createValidationMessage = function(elem, name){
-		var message = currentValidationMessage[name];
+	var getMessageFromObj = function(message, elem){
 		if(message && typeof message !== 'string'){
 			message = message[ $.prop(elem, 'type') ] || message[ (elem.nodeName || '').toLowerCase() ] || message[ 'defaultMessage' ];
+		}
+		return message || '';
+	};
+	var valueVals = {
+		value: 1,
+		min: 1,
+		max: 1
+	};
+	
+	webshims.createValidationMessage = function(elem, name){
+		var spinner;
+		var message = getMessageFromObj(currentValidationMessage[name], elem);
+		
+		if(!message){
+			message = getMessageFromObj(validityMessages[''][name], elem) || 'invalid value';
+			webshims.info('could not find errormessage for: '+ name +' / '+ $.prop(elem, 'type') +'. in language: '+$.webshims.activeLang());
 		}
 		if(message){
 			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
 				if(message.indexOf('{%'+attr) === -1){return;}
-				var val = ((attr == 'label') ? $.trim($('label[for="'+ elem.id +'"]', elem.form).text()).replace(/\*$|:$/, '') : $.attr(elem, attr)) || '';
+				var val = ((attr == 'label') ? $.trim($('label[for="'+ elem.id +'"]', elem.form).text()).replace(/\*$|:$/, '') : $.prop(elem, attr)) || '';
 				if(name == 'patternMismatch' && attr == 'title' && !val){
 					webshims.error('no title for patternMismatch provided. Always add a title attribute.');
+				}
+				if(valueVals[attr]){
+					if(!spinner){
+						spinner = $(elem).getShadowElement().data('wsspinner');
+					}
+					if(spinner && spinner.formatValue){
+						val = spinner.formatValue(val);
+					}
 				}
 				message = message.replace('{%'+ attr +'}', val);
 				if('value' == attr){
 					message = message.replace('{%valueLen}', val.length);
 				}
+				
 			});
 		}
+		
 		return message || '';
 	};
 	
@@ -125,6 +147,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 		langObj: validityMessages, 
 		module: 'form-core', 
 		callback: function(langObj){
+			
 			currentValidationMessage = langObj;
 		}
 	});

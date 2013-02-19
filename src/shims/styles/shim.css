@@ -1,13 +1,13 @@
-.input-picker .ws-button-row, .year-list,
-.month-list,
-.day-list {
+.input-picker .ws-button-row, .input-picker .year-list,
+.input-picker .month-list,
+.input-picker .day-list {
   zoom: 1;
 }
-.input-picker .ws-button-row:before, .year-list:before,
-.month-list:before,
-.day-list:before, .input-picker .ws-button-row:after, .year-list:after,
-.month-list:after,
-.day-list:after {
+.input-picker .ws-button-row:before, .input-picker .year-list:before,
+.input-picker .month-list:before,
+.input-picker .day-list:before, .input-picker .ws-button-row:after, .input-picker .year-list:after,
+.input-picker .month-list:after,
+.input-picker .day-list:after {
   display: table;
   clear: both;
   content: ' ';
@@ -228,7 +228,7 @@ output {
   display: inline-block;
   font-size: 0;
   vertical-align: middle;
-  margin-top: -2px;
+  margin-top: -3px;
   margin-left: -20px;
 }
 
@@ -549,6 +549,9 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .ws-next, .input-picker .ws-button-row button {
   border-radius: 4px;
   background: #ccc;
+  padding: 5px 8px;
+  display: inline-block;
+  border: 1px solid transparent;
 }
 
 .input-picker {
@@ -571,8 +574,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .ws-next {
   position: absolute;
   top: 10px;
-  width: 40px;
-  height: 40px;
+  min-width: 30px;
   z-index: 1;
 }
 .input-picker .ws-picker-body {
@@ -591,24 +593,15 @@ html .ws-po-arrow .ws-po-arrowbox {
   text-align: left;
   z-index: 2;
 }
-.input-picker .ws-button-row button {
-  padding: 5px 8px;
-  display: inline-block;
-}
 .input-picker .ws-button-row button.ws-empty {
   float: right;
 }
-
-.ws-picker-body li {
+.input-picker .ws-picker-body li {
   display: block;
 }
-
-.year-list > h3,
-.year-list > button,
-.month-list > h3,
-.month-list > button,
-.day-list > h3,
-.day-list > button {
+.input-picker .year-list .ws-picker-header,
+.input-picker .month-list .ws-picker-header,
+.input-picker .day-list .ws-picker-header {
   position: absolute;
   top: 5px;
   right: 0;
@@ -622,15 +615,15 @@ html .ws-po-arrow .ws-po-arrowbox {
   border: 1px solid #dddddd;
   border-radius: 4px;
 }
-.year-list > button,
-.month-list > button,
-.day-list > button {
+.input-picker .year-list .ws-picker-header button,
+.input-picker .month-list .ws-picker-header button,
+.input-picker .day-list .ws-picker-header button {
   background: #f2f2f2;
   box-shadow: inset 0 -5px 12px -5px rgba(0, 0, 0, 0.4), 0 -4px 0 0 #dddddd;
 }
-.year-list > button:after,
-.month-list > button:after,
-.day-list > button:after {
+.input-picker .year-list .ws-picker-header button:after,
+.input-picker .month-list .ws-picker-header button:after,
+.input-picker .day-list .ws-picker-header button:after {
   content: ' ';
   position: absolute;
   top: -4px;
@@ -643,87 +636,118 @@ html .ws-po-arrow .ws-po-arrowbox {
   border-style: solid;
   border-width: 0 5px 5px 5px;
 }
-.year-list > button:focus, .year-list > button:hover,
-.month-list > button:focus,
-.month-list > button:hover,
-.day-list > button:focus,
-.day-list > button:hover {
+.input-picker .year-list .ws-picker-header button:focus, .input-picker .year-list .ws-picker-header button:hover,
+.input-picker .month-list .ws-picker-header button:focus,
+.input-picker .month-list .ws-picker-header button:hover,
+.input-picker .day-list .ws-picker-header button:focus,
+.input-picker .day-list .ws-picker-header button:hover {
   box-shadow: inset 0 -5px 12px -6px rgba(0, 0, 0, 0.6), 0 -4px 0 0 #dddddd;
 }
-.year-list > button:active,
-.month-list > button:active,
-.day-list > button:active {
+.input-picker .year-list .ws-picker-header button:active,
+.input-picker .month-list .ws-picker-header button:active,
+.input-picker .day-list .ws-picker-header button:active {
   box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.5), 0 -4px 0 0 #dddddd;
 }
-.year-list > button:active:after,
-.month-list > button:active:after,
-.day-list > button:active:after {
+.input-picker .year-list .ws-picker-header button:active:after,
+.input-picker .month-list .ws-picker-header button:active:after,
+.input-picker .day-list .ws-picker-header button:active:after {
   opacity: 0;
 }
-.year-list ul,
-.month-list ul,
-.day-list ul {
+.input-picker .year-list ul,
+.input-picker .month-list ul,
+.input-picker .day-list ul {
   margin: 0;
   padding: 0;
 }
-.year-list li,
-.month-list li,
-.day-list li {
+.input-picker .year-list li,
+.input-picker .month-list li,
+.input-picker .day-list li {
   float: left;
   margin: 0;
   padding: 0;
   border-top: 1px solid #dddddd;
 }
-.year-list li button,
-.year-list td button,
-.month-list li button,
-.month-list td button,
-.day-list li button,
-.day-list td button {
+.input-picker .year-list li button,
+.input-picker .year-list td button,
+.input-picker .month-list li button,
+.input-picker .month-list td button,
+.input-picker .day-list li button,
+.input-picker .day-list td button {
   display: block;
   padding: 10px 0;
   width: 100%;
+  border: 1px solid transparent;
   border-radius: 3px;
+  transition: all 400ms;
 }
-.year-list li button:hover, .year-list li button:focus,
-.year-list td button:hover,
-.year-list td button:focus,
-.month-list li button:hover,
-.month-list li button:focus,
-.month-list td button:hover,
-.month-list td button:focus,
-.day-list li button:hover,
-.day-list li button:focus,
-.day-list td button:hover,
-.day-list td button:focus {
+.input-picker .year-list li button:hover, .input-picker .year-list li button:focus,
+.input-picker .year-list td button:hover,
+.input-picker .year-list td button:focus,
+.input-picker .month-list li button:hover,
+.input-picker .month-list li button:focus,
+.input-picker .month-list td button:hover,
+.input-picker .month-list td button:focus,
+.input-picker .day-list li button:hover,
+.input-picker .day-list li button:focus,
+.input-picker .day-list td button:hover,
+.input-picker .day-list td button:focus {
   color: #fff;
   background: #39f;
 }
-
-.month-list li {
+.input-picker .year-list li button.selected-value,
+.input-picker .year-list td button.selected-value,
+.input-picker .month-list li button.selected-value,
+.input-picker .month-list td button.selected-value,
+.input-picker .day-list li button.selected-value,
+.input-picker .day-list td button.selected-value {
+  border-color: #39f;
+}
+.input-picker .year-list li button.this-year, .input-picker .year-list li button.this-month, .input-picker .year-list li button.this-day,
+.input-picker .year-list td button.this-year,
+.input-picker .year-list td button.this-month,
+.input-picker .year-list td button.this-day,
+.input-picker .month-list li button.this-year,
+.input-picker .month-list li button.this-month,
+.input-picker .month-list li button.this-day,
+.input-picker .month-list td button.this-year,
+.input-picker .month-list td button.this-month,
+.input-picker .month-list td button.this-day,
+.input-picker .day-list li button.this-year,
+.input-picker .day-list li button.this-month,
+.input-picker .day-list li button.this-day,
+.input-picker .day-list td button.this-year,
+.input-picker .day-list td button.this-month,
+.input-picker .day-list td button.this-day {
+  border-color: #f93;
+}
+.input-picker .month-list li {
   width: 50%;
 }
-
-.year-list li {
+.input-picker .year-list li {
   width: 33.33%;
 }
-
-.day-list table {
+.input-picker .day-list table {
   width: 100%;
   border: 0 none;
   border-collapse: collapse;
 }
-.day-list th {
+.input-picker .day-list th {
   font-size: 12px;
   line-height: 1.1em;
   padding: 3px 0 2px;
   text-transform: uppercase;
 }
-.day-list th, .day-list td {
+.input-picker .day-list th, .input-picker .day-list td {
   width: 14.2856%;
 }
-.day-list tr {
+.input-picker .day-list tr {
   border-top: 1px solid #dddddd;
+}
+.input-picker .ws-options {
+  margin: 10px 0 0;
+}
+.input-picker .ws-options button {
+  display: block;
 }
 
 datalist {

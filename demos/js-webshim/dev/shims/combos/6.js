@@ -1687,7 +1687,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					prevDisabled = picker.isInRange([start-1], max, min) ? {'data-action': 'setYearList','value': start-1} : false;
 				}
 				
-				str += '<div class="year-list"><h3>'+ start +' - '+(start + 11)+'</h3>';
+				str += '<div class="year-list"><div class="ws-picker-header"><h3>'+ start +' - '+(start + 11)+'</h3></div>';
 				lis = [];
 				for(i = 0; i < 12; i++){
 					val = start + i ;
@@ -1761,11 +1761,12 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					disabled = '';
 				}
 				
-				str += '<div class="month-list">';
+				str += '<div class="month-list"><div class="ws-picker-header">';
 				
 				str += data.options.selectNav ? 
 					'<select data-action="setMonthList">'+ picker.createYearSelect(value, max, min).join('') +'</select>' : 
 					'<button data-action="setYearList"'+disabled+' value="'+ value +'">'+ value +'</button>';
+				str += '</div>';
 				
 				for(i = 0; i < 12; i++){
 					val = curCfg.date.monthkeys[i+1];
@@ -1787,8 +1788,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					}
 					
 					classStr = (classArray.length) ? ' class="'+ (classArray.join(' ')) +'"' : '';
-					
-					
 					
 					lis.push('<li><button type="button"'+ disabled + classStr +' data-action="'+ (data.type == 'month' ? 'changeInput' : 'setDayList' ) +'" value="'+value+'-'+val+'">'+name+'</button></li>');
 				}
@@ -1824,7 +1823,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			for(j = 0;  j < size; j++){
 				lastMotnh = date.getMonth();
 				
-				
 				if(!j){
 					date2 = new Date(date.getTime());
 					date2.setDate(-1);
@@ -1834,8 +1832,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				dateArray = getDateArray(date);
 				
-				str.push('<div class="day-list">');
-				
+				str.push('<div class="day-list"><div class="ws-picker-header">');
 				if( data.options.selectNav ){
 					monthName = ['<select data-action="setDayList">'+ picker.createMonthSelect(dateArray, max, min, monthNames).join('') +'</select>', '<select data-action="setDayList">'+ picker.createYearSelect(dateArray[0], max, min, '-'+dateArray[1]).join('') +'</select>'];
 					if(curCfg.date.showMonthAfterYear){
@@ -1854,18 +1851,20 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 				
 				
-				str.push('<table><tr>');
+				str.push('</div><table><thead><tr>');
 				
-				for(k = 1; k < curCfg.date.dayNamesShort.length; k++){
+				for(k = curCfg.date.firstDay; k < curCfg.date.dayNamesShort.length; k++){
 					str.push('<th>'+ curCfg.date.dayNamesShort[k] +'</th>');
 				}
-				
-				str.push('<th>'+ curCfg.date.dayNamesShort[0] +'</th>');
-				str.push('</tr><tr>');
+				k = curCfg.date.firstDay;
+				while(k--){
+					str.push('<th>'+ curCfg.date.dayNamesShort[k] +'</th>');
+				}
+				str.push('</tr></thead><tbody><tr>');
 				
 					
 				
-				for (i = 0; i < 46; i++) {
+				for (i = 0; i < 99; i++) {
 					addTr = (i && !(i % 7));
 					curMonth = date.getMonth();
 					otherMonth = lastMotnh != curMonth;
@@ -1879,7 +1878,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						str.push('</tr><tr>');
 					}
 					if(!i){
-						day = date.getDay() - 1;
+						day = date.getDay() - curCfg.date.firstDay;
 						
 						if(day > -1 && day < 6){
 							date.setDate(date.getDate() - day);
@@ -1894,8 +1893,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					if(otherMonth){
 						classArray.push('othermonth');
 					} 
-					
-					
 					
 					if(dateArray[0] == today[0] && today[1] == dateArray[1] && today[2] == dateArray[2]){
 						classArray.push('this-day');
@@ -1917,7 +1914,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					
 					date.setDate(date.getDate() + 1);
 				}
-				str.push('</table></div>');
+				str.push('</tbody></table></div>');
 				if(j == size - 1){
 					dateArray = getDateArray(date);
 					dateArray[2] = 1;
@@ -2036,6 +2033,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 							var content = picker[item](values, data);
 							
 							if( values.length < 2 || content.enabled > 1 || stops[data.type] === names[i]){
+								popover.element.attr({'data-currentview': setName});
 								popover.bodyElement.html(content.main);
 								if(content.prev){
 									popover.prevElement
@@ -2068,28 +2066,44 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		})();
 		
 		picker.commonInit = function(data, popover){
+			var actionfn = function(){
+				var action = $(this).attr('data-action');
+				if(actions[action]){
+					actions[action]($(this).val(), popover, data);
+				} else {
+					webshims.warn('no action for '+ action);
+				}
+				return false;
+			};
+			
 			data.list = function(opts){
 				var o = this.options;
-				var lis = [];
+				var options = [];
 				
 				o.options = opts || {};
 				$('div.ws-options', popover.contentElement).remove();
 				$.each(o.options, function(val, label){
-					lis.push('<li><button value="'+ val +'" data-action="changeInput">'+ (label || data.formatValue(val)) +'</button></li>');
+					options.push('<button value="'+ val +'" data-action="changeInput">'+ (label || data.formatValue(val)) +'</button>');
 				});
-				if(lis.length){
-					popover.bodyElement.after('<div class="ws-options"><ul>'+ lis.join('') +'</ul></div>');
+				if(options.length){
+					popover.bodyElement.after('<div class="ws-options">'+ options.join('') +'</div>');
 				}
 			};
-			popover.contentElement.html('<button class="ws-prev"></button> <button class="ws-next"></button><div class="ws-picker-body"></div><div class="ws-button-row"><button type="button" class="ws-current" data-text="current"></button> <button type="button" data-text="empty" class="ws-empty"></button></div>');
+			popover.contentElement.html('<button class="ws-prev"><span></span></button> <button class="ws-next"><span></span></button><div class="ws-picker-body"></div><div class="ws-button-row"><button type="button" class="ws-current" data-text="current"></button> <button type="button" data-action="changeInput" value="" data-text="empty" class="ws-empty"></button></div>');
 			popover.nextElement = $('button.ws-next', popover.contentElement);
 			popover.prevElement = $('button.ws-prev', popover.contentElement);
 			popover.bodyElement = $('div.ws-picker-body', popover.contentElement);
-			popover.buttonRow = $('div.ws-button-row', popover.contentElement)
+			popover.buttonRow = $('div.ws-button-row', popover.contentElement);
+			
+			popover.contentElement
+				.on('click', 'button[data-action]', actionfn)
+				.on('change', 'select[data-action]', actionfn)
+			;
+			popover.bodyElement.on('click', 'button[data-action]', actionfn)
 			$(document)
 				.onTrigger('wslocalechange',function(){
-					popover.nextElement.text(curCfg.date.nextText);
-					popover.prevElement.text(curCfg.date.prevText);
+					$('> span', popover.nextElement).html(curCfg.date.nextText);
+					$('> span', popover.prevElement).html(curCfg.date.prevText);
 					$('button', popover.buttonRow).each(function(){
 						$(this).text( $(this).data('text') );
 					});
@@ -2103,32 +2117,23 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			var opener = $('<span class="popover-opener" />').appendTo(data.buttonWrapper);
 			var options = data.options;
 			var init = false;
-			var actionfn = function(){
-				var action = $(this).attr('data-action');
-				if(actions[action]){
-					actions[action]($(this).val(), popover, data);
-				} else {
-					webshims.warn('no action for '+ action);
-				}
-				return false;
-			};
+			
 			var show = function(){
 				if(!options.disabled && !options.readonly){
-					
 					if(!init){
 						picker.commonInit(data, popover);
 						actions.setYearList( options.value || options.defValue, popover, data, data.options.startAt);
+					} else {
+						actions[data.options.restartView ? 'setYearList' : popover.element.attr('data-currentview') || 'setYearList' ]( options.value || options.defValue, popover, data, 0);
 					}
+					
 					init = true;
 					popover.show(data.element);
 				}
 			};
 			
 			popover.element.addClass(data.type+'-popover input-picker');
-			popover.contentElement
-				.on('click', 'button[data-action]', actionfn)
-				.on('change', 'select[data-action]', actionfn)
-			;
+			
 			opener.on('mousedown', show);
 			
 			data.element.on({

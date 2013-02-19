@@ -407,7 +407,6 @@
 		
 		webshims.wsPopover = {
 			_create: function(){
-				
 				this.options =  $.extend({}, webshims.cfg.wspopover, this.options);
 				this.id = webshims.wsPopover.id++;
 				this.eventns = '.wsoverlay'+this.id;
@@ -440,8 +439,9 @@
 				return container == contained || $.contains(container, contained);
 			},
 			show: function(element){
-				console.log(this, element)
-				if(this.isVisible){return;}
+				var e = $.Event('wspopoverbeforeshow');
+				this.element.trigger(e);
+				if(e.isDefaultPrevented() || this.isVisible){return;}
 				this.isVisible = true;
 				element = $(element || this.options.prepareFor).getNativeElement() ;
 				
@@ -457,7 +457,7 @@
 				that.timers.show = setTimeout(function(){
 					that.element.css('display', '');
 					that.timers.show = setTimeout(function(){
-						that.element.addClass('ws-po-visible');
+						that.element.addClass('ws-po-visible').trigger('wspopovershow');
 					}, 9);
 				}, 9);
 				$(document).on('focusin'+this.eventns+' mousedown'+this.eventns, function(e){
@@ -524,7 +524,9 @@
 				});
 			},
 			hide: function(){
-				if(!this.isVisible){return;}
+				var e = $.Event('wspopoverbeforehide');
+				this.element.trigger(e);
+				if(e.isDefaultPrevented() || !this.isVisible){return;}
 				this.isVisible = false;
 				var that = this;
 				var forceHide = function(){
@@ -532,7 +534,7 @@
 					clearTimeout(that.timers.forcehide);
 				};
 				this.clear();
-				this.element.removeClass('ws-po-visible');
+				this.element.removeClass('ws-po-visible').trigger('wspopoverhide');
 				$(window).on('resize'+this.eventns, forceHide);
 				that.timers.forcehide = setTimeout(forceHide, 999);
 			},
