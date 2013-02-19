@@ -565,7 +565,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					prevDisabled = picker.isInRange([start-1], max, min) ? {'data-action': 'setYearList','value': start-1} : false;
 				}
 				
-				str += '<div class="year-list"><h3>'+ start +' - '+(start + 11)+'</h3>';
+				str += '<div class="year-list"><div class="ws-picker-header"><h3>'+ start +' - '+(start + 11)+'</h3></div>';
 				lis = [];
 				for(i = 0; i < 12; i++){
 					val = start + i ;
@@ -639,11 +639,12 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					disabled = '';
 				}
 				
-				str += '<div class="month-list">';
+				str += '<div class="month-list"><div class="ws-picker-header">';
 				
 				str += data.options.selectNav ? 
 					'<select data-action="setMonthList">'+ picker.createYearSelect(value, max, min).join('') +'</select>' : 
 					'<button data-action="setYearList"'+disabled+' value="'+ value +'">'+ value +'</button>';
+				str += '</div>';
 				
 				for(i = 0; i < 12; i++){
 					val = curCfg.date.monthkeys[i+1];
@@ -712,8 +713,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				dateArray = getDateArray(date);
 				
-				str.push('<div class="day-list">');
-				
+				str.push('<div class="day-list"><div class="ws-picker-header">');
 				if( data.options.selectNav ){
 					monthName = ['<select data-action="setDayList">'+ picker.createMonthSelect(dateArray, max, min, monthNames).join('') +'</select>', '<select data-action="setDayList">'+ picker.createYearSelect(dateArray[0], max, min, '-'+dateArray[1]).join('') +'</select>'];
 					if(curCfg.date.showMonthAfterYear){
@@ -732,14 +732,14 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 				
 				
-				str.push('<table><tr>');
+				str.push('</div><table><thead><tr>');
 				
 				for(k = 1; k < curCfg.date.dayNamesShort.length; k++){
 					str.push('<th>'+ curCfg.date.dayNamesShort[k] +'</th>');
 				}
 				
 				str.push('<th>'+ curCfg.date.dayNamesShort[0] +'</th>');
-				str.push('</tr><tr>');
+				str.push('</tr></thead><tbody><tr>');
 				
 					
 				
@@ -795,7 +795,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					
 					date.setDate(date.getDate() + 1);
 				}
-				str.push('</table></div>');
+				str.push('</tbody></table></div>');
 				if(j == size - 1){
 					dateArray = getDateArray(date);
 					dateArray[2] = 1;
