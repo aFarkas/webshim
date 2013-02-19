@@ -220,64 +220,24 @@ output {
 	}
 }
 
-/* datetime-local */
-.input-datetime-local {
-	display: inline-block;
-	zoom: 1;
-	vertical-align: middle;
-
-	.polyfill-important & {
-		display: inline-block !important;
-		height: auto !important;
-		padding: 0 !important;
-		margin: 0 !important;
-		border: none !important;
-
-		input {
-			display: inline !important;
-		}
-	}
-}
-
-.input-datetime-local-date {
-	margin: 0 2px 0 0;
-
-	.polyfill-important & {
-		margin: 0 2px 0 0 !important;
-	}
-}
-
-.input-datetime-local-time {
-	margin: 0 0 0 2px;
-
-	.polyfill-important & {
-		margin: 0 0 0 2px !important;
-	}
-}
-
-img.ui-datepicker-trigger {
-	display: inline;
-	display: inline-block;
-	width: 16px;
-}
 
 /* spinner control for time, number (usable for date, datetime-local) */
-.has-step-controls {
+.has-input-buttons {
 	display: inline;
 }
-.polyfill-important .has-step-controls {
+.polyfill-important .has-input-buttons {
 	display: inline !important;
 }
 
 .input-buttons,
 .step-controls,
 .popover-opener {
-	position: absolute;
 	zoom: 1;
 	overflow: hidden;
 	display: inline-block;
 	font-size: 0;
-	vertical-align: top;
+	vertical-align: middle;
+	margin-top: -2px;
 	margin-left: -20px;
 }
 .input-button-size-2 {
@@ -297,7 +257,7 @@ img.ui-datepicker-trigger {
 .polyfill-important .input-buttons {
 	display: inline-block !important;
 	padding: 0 !important;
-	vertical-align: top !important;
+	vertical-align: middle !important;
 }
 
 .step-controls span {
@@ -366,13 +326,6 @@ img.ui-datepicker-trigger {
 
 
 /* range */
-.ws-range-rail {
-	position: relative;
-	display: block;
-	height: 100%;
-	width: auto;
-	margin: 0 5px;
-}
 .ws-range {
 	position: relative;
 	display: inline-block;
@@ -414,19 +367,30 @@ img.ui-datepicker-trigger {
 		}
 	}
 
-	&:focus .ws-range-thumb {
+	&.ws-focus .ws-range-thumb {
 		background-position: -20px 0;
 	}
 	&.ws-active .ws-range-thumb {
 		background-position: -37px 0;
 	}
-	&[aria-disabled="true"], &[aria-readonly="true"] {
+	&[aria-disabled="true"], 
+	&[aria-readonly="true"] {
 		cursor: default;
 		opacity: 0.95;
 	}
 	&[aria-disabled="true"] .ws-range-thumb {
-		cursor: default;
 		background-position: -54px 0;
+	}
+	
+	.ws-range-rail {
+		position: absolute;
+		display: block;
+		top: 0;
+		left: 5px;
+		right: 5px;
+		bottom: 0;
+		margin: 0;
+		zoom: 1;
 	}
 
 	.ws-range-min {
@@ -440,167 +404,73 @@ img.ui-datepicker-trigger {
 		overflow: hidden;
 		background: #b6e2fb;
 	}
-}
-
-.ws-range-ticks {
-	position: absolute;
-	bottom: 0px;
-	left: 0;
-	height: 4px;
-	width: 1px;
-	margin: 0 0 0 -1.5px;
-	background: #ccc;
-}
-
-/* datepicker */
-.input-date-datepicker-control {
-	position: absolute;
-	zoom: 1;
-	display: none;
-	background-color: #fff;
-	z-index: 100;
-	overflow: visible;
-	padding: 5px;
-	font-family: "MS Shell Dlg", "Lucida Grande", "Calibri", sans-serif;
-	font-size: 14px;
-	border: 1px solid #333;
-
-	.polyfill-important & {
-		z-index: 999999999 !important;
-	}
-
-	.ui-datepicker-header {
-		position: relative;
-		margin: 0 0 3px;
-		padding: 2px 0;
-
-		select {
-			border: 1px solid #333;
-			padding: 1px 2px 2px;
-		}
-
-		option {
-			padding-right: 8px;
-		}
-
-		.ui-icon {
-			position: absolute;
-			display: block;
-			top: 0.2em;
-			width: 15px;
-			height: 18px;
-			text-indent: -9999em;
-			font-size: 10px;
-			line-height: 0;
-			background: url(forms.png) no-repeat;
-			cursor: pointer;
-		}
-
-		.ui-state-disabled .ui-icon {
-			cursor: default;
-		}
-
-		.ui-icon-circle-triangle-w {
-			left: 3px;
-			background-position: -235px 3px;
-		}
-
-		.ui-state-hover .ui-icon-circle-triangle-w {
-			background-position: -235px -17px;
-		}
-
-		.ui-icon-circle-triangle-e {
-			right: 3px;
-			background-position: -248px 3px;
-		}
-
-		.ui-state-hover .ui-icon-circle-triangle-e {
-			background-position: -248px -17px;
-		}
-	}
-
-	table {
-		font-size: 100%;
-		border-spacing: 1px;
-	}
-
-	.ui-datepicker-title {
-		margin: 0 20px;
-		color: #069;
-		text-align: center;
-		font-weight: bold;
-	}
-
-	th {
-		color: #069;
-		text-align: center;
-		font-weight: bold;
-	}
-
-	td, th {
-		padding: 0 2px;
-		text-align: center;
-		font-weight: normal;
-	}
-
-	td {
-		padding: 0 4px;
-		cursor: pointer;
-		text-align: right;
-		border: 1px solid #fff;
-		border-radius: 2px;
-
-		&.ui-datepicker-current-day {
-			background-color: #adf;
-			color: #000;
-			border-color: #06c;
-		}
-
-		&.ui-datepicker-today {
-			border-color: #06c;
-		}
-
-		&.ui-datepicker-current-day a {
-			color: #000;
-		}
-
-		a {
-			color: #000;
-			text-decoration: none;
-		}
-
-		&:hover {
-			background-color: #bef;
-			border-color: #06c;
-		}
-
-		&.ui-state-disabled {
-			cursor: default;
-			border-color: #fff;
-			color: #bbb;
-			background-color: transparent;
-		}
-	}
-
-	.ui-datepicker-buttonpane {
-		margin: 4px 0 0;
-	}
-
-	.ui-datepicker-cover {
-		//sorry for IE5
-		display: none;
-		display/**/: block;
-
-		//must haves
+	
+	.ws-range-ticks {
 		position: absolute;
-		z-index: -1;
-		filter: mask();
-		top: -4px;
-		left: -4px;
-		width: 200px;
-		height: 200px;
+		bottom: 0px;
+		left: 0;
+		height: 4px;
+		width: 1px;
+		margin: 0 0 0 -1.5px;
+		background: #ccc;
 	}
+	
+	&.vertical-range {
+		background: url(vertical-range.png) -30px bottom no-repeat;
+		width: 20px;
+		
+		.ws-range-thumb {
+			top: 0;
+			left: 3px;
+			bottom: auto;
+			background: url(vertical-range.png) 0 -51px no-repeat;
+			margin: -6px 0 0 0;
+			height: 11px;
+			width: 22px;
+			
+		}
+		.ws-range-thumb:hover,
+		&.ws-focus .ws-range-thumb {
+			background-position: 0 -34px;
+		}
+		&.ws-active .ws-range-thumb {
+			background-position: 0 -17px;
+		}
+		
+		&[aria-disabled="true"] .ws-range-thumb {
+			background-position: 0 0;
+		}
+		
+		.ws-range-min {
+			top: auto;
+			bottom: 1px;
+			left: 11px;
+			width: 1px;
+			height: 0;
+		}
+		
+		.ws-range-rail {
+			top: 5px;
+			left: 0;
+			right: 0;
+			bottom: 5px;
+		}
+		
+		.ws-range-ticks {
+			bottom: auto;
+			left: auto;
+			right: 0;
+			height: 1px;
+			width: 4px;
+		}
+	}
+	
 }
+
+
+
+
+
 
 /*
  * popovers
@@ -733,7 +603,7 @@ $border-light: 1px solid #ddd;
 	border-radius: 4px;
 	background: #ccc;
 }
-.date-popover {
+.input-picker{
 	width: 300px;
 	text-align: center;
 	font-family: sans-serif;

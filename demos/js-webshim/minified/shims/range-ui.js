@@ -1,1 +1,356 @@
-(function(e){var t=0,n=function(e){return typeof e=="number"||e&&e==e*1},r=function(e,t){return typeof e=="number"||e&&e==e*1?e*1:t},i=["step","min","max","readonly","title","disabled","tabindex"],s={_create:function(){var t;this.element.addClass("ws-range").attr({role:"slider"}).html('<span class="ws-range-min" /><span class="ws-range-rail"><span class="ws-range-thumb" /></span>'),this.trail=e(".ws-range-rail",this.element),this.range=e(".ws-range-min",this.element),this.thumb=e(".ws-range-thumb",this.trail),this.updateMetrics(),this.orig=this.options.orig;for(t=0;t<i.length;t++)this[i[t]](this.options[i[t]]);this.value=this._value,this.value(this.options.value),this.list(this.options.options),this.element.data("rangeUi",this),this.addBindings(),this._init=!0},value:e.noop,_value:function(e,t,n){var r,i=this.options,s=e,o={},u={};!t&&parseFloat(e,10)!=e&&(e=i.min+(i.max-i.min)/2),t||(e=this.normalizeVal(e)),r=100*((e-i.min)/(i.max-i.min)),this.options.value=e,this.thumb.stop(),this.range.stop(),u[this.dirs.width]=r+"%",this.vertical&&(r=Math.abs(r-100)),o[this.dirs.left]=r+"%",n?(typeof i.animate!="object"&&(i.animate={}),this.thumb.animate(o,i.animate),this.range.animate(u,i.animate)):(this.thumb.css(o),this.range.css(u)),this.orig&&(s!=e||!this._init&&this.orig.value!=e)&&this.options._change(e),this.element.attr({"aria-valuenow":this.options.value,"aria-valuetext":this.options.options[this.options.value]||this.options.value})},list:function(t){var r=this.options,i=r.min,s=r.max,o=this.trail,u=this;r.options=t||{},this.element.attr({"aria-valuetext":r.options[r.value]||r.value}),e(".ws-range-ticks",o).remove(),e.each(r.options,function(e,t){if(!n(e)||e<i||e>s)return;var a=100*((e-i)/(s-i)),f=r.showLabels?' title="'+t+'"':"";o.append('<span class="ws-range-ticks"'+f+' style="'+u.dirs.pos+": "+a+'%;" />')})},readonly:function(e){e=!!e,this.options.readonly=e,this.element.attr("aria-readonly",""+e)},disabled:function(e){e=!!e,this.options.disabled=e,e?this.element.attr({tabindex:-1,"aria-disbaled":"true"}):this.element.attr({tabindex:this.options.tabindex,"aria-disbaled":"false"})},tabindex:function(e){this.options.tabindex=e,this.options.disabled||this.element.attr({tabindex:e})},title:function(e){this.element.prop("title",e)},min:function(e){this.options.min=r(e,0),this.value(this.options.value,!0)},max:function(e){this.options.max=r(e,100),this.value(this.options.value,!0)},step:function(e){this.options.step=e=="any"?"any":r(e,1),this.value(this.options.value)},normalizeVal:function(e){var t,n,r,i=this.options;return e<=i.min?e=i.min:e>=i.max?e=i.max:i.step!="any"&&(r=i.step,t=(e-i.min)%r,n=e-t,Math.abs(t)*2>=r&&(n+=t>0?r:-r),e=n.toFixed(5)*1),e},doStep:function(e){var t=r(this.options.step,1);this.options.step=="any"&&(t=Math.min(t,(this.options.max-this.options.min)/10)),this.value(this.options.value+t*e)},getStepedValueFromPos:function(e){var t,n,r,i;return e<=0?t=this.options[this.dirs.min]:e>100?t=this.options[this.dirs.max]:(this.vertical&&(e=Math.abs(e-100)),t=(this.options.max-this.options.min)*(e/100)+this.options.min,i=this.options.step,i!="any"&&(n=(t-this.options.min)%i,r=t-n,Math.abs(n)*2>=i&&(r+=n>0?i:-i),t=r.toFixed(5)*1)),t},addBindings:function(){var t,n,r,i=this,s=this.options,o=function(){var t={};return{init:function(n,r,s){t[n]||(t[n]={fn:s},i.orig&&e(i.orig).on(n,function(){t[n].val=e.prop(i.orig,"value")})),t[n].val=r},call:function(e,n){t[e].val!=n&&(clearTimeout(t[e].timer),t[e].val=n,t[e].timer=setTimeout(function(){t[e].fn(n,i)},0))}}}(),u=function(e,r){this.vertical&&(left=Math.abs(left-100));var u=i.getStepedValueFromPos((e[i.dirs.mouse]-t)*n);u!=s.value&&(i.value(u,!1,r),o.call("input",u))},a=function(t){t&&t.type=="mouseup"&&(o.call("input",s.value),o.call("change",s.value)),i.element.removeClass("ws-active"),e(document).off("mousemove",u).off("mouseup",a)},f=function(r){r.preventDefault(),e(document).off("mousemove",u).off("mouseup",a);if(!s.readonly&&!s.disabled){t=i.element.focus().addClass("ws-active").offset(),n=i.element[i.dirs.width]();if(!n||!t)return;t=t[i.dirs.pos],n=100/(n-(i.thumb[i.dirs.outerWidth]()||2)/2),u(r,i.options.animate),e(document).on({mouseup:a,mousemove:u}),r.stopPropagation()}};o.init("input",s.value,this.options.input),o.init("change",s.value,this.options.change),this.element.on({mousedown:f,focus:function(e){s.disabled||(o.init("input",s.value),o.init("change",s.value),i.element.addClass("ws-focus")),r=!0},blur:function(e){i.element.removeClass("ws-focus ws-active"),r=!1,o.init("input",s.value),o.call("change",s.value)},keyup:function(){i.element.removeClass("ws-active"),o.call("input",s.value),o.call("change",s.value)},mousewheel:function(e,t){t&&r&&!s.readonly&&!s.disabled&&(i.doStep(t),e.preventDefault(),o.call("input",s.value))},keypress:function(e){var t=!0,n=e.keyCode;!s.readonly&&!s.disabled&&(n==39||n==38?i.doStep(1):n==37||n==40?i.doStep(-1):n==33?i.doStep(10):n==34?i.doStep(-10):n==36?i.value(i.options.max):n==35?i.value(i.options.min):t=!1,t&&(i.element.addClass("ws-active"),o.call("input",s.value),e.preventDefault()))}}),this.thumb.on({mousedown:f})},updateMetrics:function(){this.vertical=this.element.innerHeight()-this.element.innerWidth()>10,this.dirs=this.vertical?{mouse:"pageY",pos:"top",min:"max",max:"min",left:"top",width:"height",outerWidth:"outerHeight"}:{mouse:"pageX",pos:"left",min:"min",max:"min",left:"left",width:"width",outerWidth:"outerWidth"},this.element[this.vertical?"addClass":"removeClass"]("vertical-range")[this.vertical?"addClass":"removeClass"]("horizontal-range")}};e.fn.rangeUI=function(t){return t=e.extend({readonly:!1,disabled:!1,tabindex:0,min:0,step:1,max:100,value:50,input:e.noop,change:e.noop,_change:e.noop,showLabels:!0},t),this.each(function(){e.webshims.objectCreate(s,{element:{value:e(this)}},t)})},jQuery.webshims.isReady("range-ui",!0)})(jQuery);
+(function($){
+	
+	var id = 0;
+	var isNumber = function(string){
+		return (typeof string == 'number' || (string && string == string * 1));
+	};
+	var retDefault = function(val, def){
+		if(!(typeof val == 'number' || (val && val == val * 1))){
+			return def;
+		}
+		return val * 1;
+	};
+	var createOpts = ['step', 'min', 'max', 'readonly', 'title', 'disabled', 'tabindex'];
+	var rangeProto = {
+		_create: function(){
+			var i;
+			
+			
+			this.element.addClass('ws-range').attr({role: 'slider'}).html('<span class="ws-range-min" /><span class="ws-range-rail"><span class="ws-range-thumb" /></span>');
+			this.trail = $('.ws-range-rail', this.element);
+			this.range = $('.ws-range-min', this.element);
+			this.thumb = $('.ws-range-thumb', this.trail);
+			
+			this.updateMetrics();
+			
+			this.orig = this.options.orig;
+			
+			for(i = 0; i < createOpts.length; i++){
+				this[createOpts[i]](this.options[createOpts[i]]);
+			}
+			this.value = this._value;
+			this.value(this.options.value);
+			this.list(this.options.options);
+			this.element.data('rangeUi', this);
+			this.addBindings();
+			this._init = true;
+		},
+		value: $.noop,
+		_value: function(val, _noNormalize, animate){
+			var left;
+			var o = this.options;
+			var oVal = val;
+			var thumbStyle = {};
+			var rangeStyle = {};
+			if(!_noNormalize && parseFloat(val, 10) != val){
+				val = o.min + ((o.max - o.min) / 2);
+			}
+			
+			if(!_noNormalize){
+				val = this.normalizeVal(val);
+			}
+			left =  100 * ((val - o.min) / (o.max - o.min));
+			
+			this.options.value = val;
+			this.thumb.stop();
+			this.range.stop();
+			
+			rangeStyle[this.dirs.width] = left+'%';
+			if(this.vertical){
+				left = Math.abs(left - 100);
+			}
+			thumbStyle[this.dirs.left] = left+'%';
+			
+			
+			if(!animate){
+				this.thumb.css(thumbStyle);
+				this.range.css(rangeStyle);
+			} else {
+				if(typeof o.animate != 'object'){
+					o.animate = {};
+				}
+				this.thumb.animate(thumbStyle, o.animate);
+				this.range.animate(rangeStyle, o.animate);
+			}
+			if(this.orig && (oVal != val || (!this._init && this.orig.value != val)) ){
+				this.options._change(val);
+			}
+			this.element.attr({
+				'aria-valuenow': this.options.value,
+				'aria-valuetext': this.options.options[this.options.value] || this.options.value
+			});
+		},
+		list: function(opts){
+			var o = this.options;
+			var min = o.min;
+			var max = o.max;
+			var trail = this.trail;
+			var that = this;
+			o.options = opts || {};
+			
+			this.element.attr({'aria-valuetext': o.options[o.value] || o.value});
+			$('.ws-range-ticks', trail).remove();
+			
+			
+			$.each(o.options, function(val, label){
+				if(!isNumber(val) || val < min || val > max){return;}
+				var left = 100 * ((val - min) / (max - min));
+				var title = o.showLabels ? ' title="'+ label +'"' : '';
+				if(that.vertical){
+					left = Math.abs(left - 100);
+				}
+				trail.append('<span class="ws-range-ticks"'+ title +' style="'+(that.dirs.left)+': '+left+'%;" />');
+			});
+		},
+		readonly: function(val){
+			val = !!val;
+			this.options.readonly = val;
+			this.element.attr('aria-readonly', ''+val);
+		},
+		disabled: function(val){
+			val = !!val;
+			this.options.disabled = val;
+			if(val){
+				this.element.attr({tabindex: -1, 'aria-disabled': 'true'});
+			} else {
+				this.element.attr({tabindex: this.options.tabindex, 'aria-disabled': 'false'});
+			}
+		},
+		tabindex: function(val){
+			this.options.tabindex = val;
+			if(!this.options.disabled){
+				this.element.attr({tabindex: val});
+			}
+		},
+		title: function(val){
+			this.element.prop('title', val);
+		},
+		min: function(val){
+			this.options.min = retDefault(val, 0);
+			this.value(this.options.value, true);
+		},
+		max: function(val){
+			this.options.max = retDefault(val, 100);
+			this.value(this.options.value, true);
+		},
+		step: function(val){
+			this.options.step = val == 'any' ? 'any' : retDefault(val, 1);
+			this.value(this.options.value);
+		},
+		
+		normalizeVal: function(val){
+			var valModStep, alignValue, step;
+			var o = this.options;
+			
+			if(val <= o.min){
+				val = o.min;
+			} else if(val >= o.max) {
+				val = o.max;
+			} else if(o.step != 'any'){
+				step = o.step;
+				valModStep = (val - o.min) % step;
+				alignValue = val - valModStep;
+				
+				if ( Math.abs(valModStep) * 2 >= step ) {
+					alignValue += ( valModStep > 0 ) ? step : ( -step );
+				}
+				val = alignValue.toFixed(5) * 1;
+			}
+			return val;
+		},
+		doStep: function(factor){
+			var step = retDefault(this.options.step, 1);
+			if(this.options.step == 'any'){
+				step = Math.min(step, (this.options.max - this.options.min) / 10);
+			}
+			this.value( this.options.value + (step * factor) );
+			
+		},
+		 
+		getStepedValueFromPos: function(pos){
+			var val, valModStep, alignValue, step;
+			
+			if(pos <= 0){
+				val = this.options[this.dirs.min];
+			} else if(pos > 100) {
+				val = this.options[this.dirs.max];
+			} else {
+				if(this.vertical){
+					pos = Math.abs(pos - 100)
+				}
+				val = ((this.options.max - this.options.min) * (pos / 100)) + this.options.min;
+				step = this.options.step;
+				if(step != 'any'){
+					valModStep = (val - this.options.min) % step;
+					alignValue = val - valModStep;
+					
+					if ( Math.abs(valModStep) * 2 >= step ) {
+						alignValue += ( valModStep > 0 ) ? step : ( -step );
+					}
+					val = ((alignValue).toFixed(5)) * 1;
+					
+				}
+			}
+			
+			return val;
+		},
+		addBindings: function(){
+			var leftOffset, widgetUnits, hasFocus;
+			var that = this;
+			var o = this.options;
+			
+			var eventTimer = (function(){
+				var events = {};
+				return {
+					init: function(name, curVal, fn){
+						if(!events[name]){
+							events[name] = {fn: fn};
+							if(that.orig){
+								$(that.orig).on(name, function(){
+									events[name].val = $.prop(that.orig, 'value');
+								});
+							}
+							
+						}
+						events[name].val = curVal;
+					},
+					call: function(name, val){
+						if(events[name].val != val){
+							clearTimeout(events[name].timer);
+							events[name].val = val;
+							events[name].timer = setTimeout(function(){
+								events[name].fn(val, that);
+							}, 0);
+						}
+					}
+				};
+			})();
+			
+			var setValueFromPos = function(e, animate){
+				if(this.vertical){
+					left = Math.abs(left - 100)
+				}
+				var val = that.getStepedValueFromPos((e[that.dirs.mouse] - leftOffset) * widgetUnits);
+				if(val != o.value){
+					
+					that.value(val, false, animate);
+					eventTimer.call('input', val);
+				}
+			};
+			
+			var remove = function(e){
+				if(e && e.type == 'mouseup'){
+					eventTimer.call('input', o.value);
+					eventTimer.call('change', o.value);
+				}
+				that.element.removeClass('ws-active');
+				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
+			};
+			var add = function(e){
+				e.preventDefault();
+				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
+				if(!o.readonly && !o.disabled){
+					leftOffset = that.element.focus().addClass('ws-active').offset();
+					widgetUnits = that.element[that.dirs.width]();
+					if(!widgetUnits || !leftOffset){return;}
+					leftOffset = leftOffset[that.dirs.pos];
+					widgetUnits = 100 / (widgetUnits  - ((that.thumb[that.dirs.outerWidth]() || 2) / 2));
+					setValueFromPos(e, that.options.animate);
+					$(document)
+						.on({
+							mouseup: remove,
+							mousemove: setValueFromPos
+						})
+					;
+					e.stopPropagation();
+				}
+			};
+			
+			eventTimer.init('input', o.value, this.options.input);
+			eventTimer.init('change', o.value, this.options.change);
+			
+			this.element.on({
+				mousedown: add,
+				focus: function(e){
+					if(!o.disabled){
+						eventTimer.init('input', o.value);
+						eventTimer.init('change', o.value);
+						that.element.addClass('ws-focus');
+					}
+					hasFocus = true;
+				},
+				blur: function(e){
+					that.element.removeClass('ws-focus ws-active');
+					hasFocus = false;
+					eventTimer.init('input', o.value);
+					eventTimer.call('change', o.value);
+				},
+				keyup: function(){
+					that.element.removeClass('ws-active');
+					eventTimer.call('input', o.value);
+					eventTimer.call('change', o.value);
+				},
+				mousewheel: function(e, delta){
+					if(delta && hasFocus && !o.readonly && !o.disabled){
+						that.doStep(delta);
+						e.preventDefault();
+						eventTimer.call('input', o.value);
+					}
+				},
+				keypress: function(e){
+					var step = true;
+					var code = e.keyCode;
+					if(!o.readonly && !o.disabled){
+						if (code == 39 || code == 38) {
+							that.doStep(1);
+						} else if (code == 37 || code == 40) {
+							that.doStep(-1);
+						} else if (code == 33) {
+							that.doStep(10);
+						} else if (code == 34) {
+							that.doStep(-10);
+						} else if (code == 36) {
+							that.value(that.options.max);
+						} else if (code == 35) {
+							that.value(that.options.min);
+						} else {
+							step = false;
+						}
+						if (step) {
+							that.element.addClass('ws-active');
+							eventTimer.call('input', o.value);
+							e.preventDefault();
+						}
+					}
+				}
+			});
+			this.thumb.on({
+				mousedown: add
+			});
+		},
+		updateMetrics: function(){
+			this.vertical = (this.element.innerHeight() - this.element.innerWidth() > 10);
+			console.log('height: '+ this.element.innerHeight(), 'width: '+ this.element.innerWidth())
+			this.dirs = this.vertical ? 
+				{mouse: 'pageY', pos: 'top', min: 'max', max: 'min', left: 'top', width: 'height', outerWidth: 'outerHeight'} :
+				{mouse: 'pageX', pos: 'left', min: 'min', max: 'min', left: 'left', width: 'width', outerWidth: 'outerWidth'}
+			;
+			this.element
+				[this.vertical ? 'addClass' : 'removeClass']('vertical-range')
+				[this.vertical ? 'addClass' : 'removeClass']('horizontal-range')
+			;
+		}
+	};
+	
+	$.fn.rangeUI = function(opts){
+		opts = $.extend({readonly: false, disabled: false, tabindex: 0, min: 0, step: 1, max: 100, value: 50, input: $.noop, change: $.noop, _change: $.noop, showLabels: true}, opts);
+		return this.each(function(){
+			$.webshims.objectCreate(rangeProto, {
+				element: {
+					value: $(this)
+				}
+			}, opts);
+		});
+	};
+	jQuery.webshims.isReady('range-ui', true);
+})(jQuery);

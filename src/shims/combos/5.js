@@ -862,7 +862,10 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 				if(!isNumber(val) || val < min || val > max){return;}
 				var left = 100 * ((val - min) / (max - min));
 				var title = o.showLabels ? ' title="'+ label +'"' : '';
-				trail.append('<span class="ws-range-ticks"'+ title +' style="'+(that.dirs.pos)+': '+left+'%;" />');
+				if(that.vertical){
+					left = Math.abs(left - 100);
+				}
+				trail.append('<span class="ws-range-ticks"'+ title +' style="'+(that.dirs.left)+': '+left+'%;" />');
 			});
 		},
 		readonly: function(val){
@@ -874,9 +877,9 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			val = !!val;
 			this.options.disabled = val;
 			if(val){
-				this.element.attr({tabindex: -1, 'aria-disbaled': 'true'});
+				this.element.attr({tabindex: -1, 'aria-disabled': 'true'});
 			} else {
-				this.element.attr({tabindex: this.options.tabindex, 'aria-disbaled': 'false'});
+				this.element.attr({tabindex: this.options.tabindex, 'aria-disabled': 'false'});
 			}
 		},
 		tabindex: function(val){
@@ -1093,6 +1096,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		},
 		updateMetrics: function(){
 			this.vertical = (this.element.innerHeight() - this.element.innerWidth() > 10);
+			console.log('height: '+ this.element.innerHeight(), 'width: '+ this.element.innerWidth())
 			this.dirs = this.vertical ? 
 				{mouse: 'pageY', pos: 'top', min: 'max', max: 'min', left: 'top', width: 'height', outerWidth: 'outerHeight'} :
 				{mouse: 'pageX', pos: 'left', min: 'min', max: 'min', left: 'left', width: 'width', outerWidth: 'outerWidth'}
@@ -2120,7 +2124,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 			};
 			
-			popover.element.addClass(data.type+'-popover');
+			popover.element.addClass(data.type+'-popover input-picker');
 			popover.contentElement
 				.on('click', 'button[data-action]', actionfn)
 				.on('change', 'select[data-action]', actionfn)
@@ -2315,6 +2319,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					e.stopImmediatePropagation(e);
 					$(opts.orig).triggerHandler(e);
 				});
+				
+				if(data.shim.buttonWrapper && data.shim.buttonWrapper.filter(isVisible).length){
+					data.shim.element.addClass('has-input-buttons');
+				}
 				
 				calcWidth = opts.calculateWidth != null ? opts.calculateWidth : options.calculateWidth;
 				

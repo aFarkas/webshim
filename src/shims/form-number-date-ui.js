@@ -1198,7 +1198,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					$(opts.orig).triggerHandler(e);
 				});
 				
-				if(data.buttonWrapper && data.buttonWrapper.filter(isVisible).length){
+				if(data.shim.buttonWrapper && data.shim.buttonWrapper.filter(isVisible).length){
 					data.shim.element.addClass('has-input-buttons');
 				}
 				

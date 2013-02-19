@@ -1,11 +1,11 @@
-.date-popover .ws-button-row, .year-list,
+.input-picker .ws-button-row, .year-list,
 .month-list,
 .day-list {
   zoom: 1;
 }
-.date-popover .ws-button-row:before, .year-list:before,
+.input-picker .ws-button-row:before, .year-list:before,
 .month-list:before,
-.day-list:before, .date-popover .ws-button-row:after, .year-list:after,
+.day-list:before, .input-picker .ws-button-row:after, .year-list:after,
 .month-list:after,
 .day-list:after {
   display: table;
@@ -211,61 +211,24 @@ output {
   display: inline-block !important;
 }
 
-/* datetime-local */
-.input-datetime-local {
-  display: inline-block;
-  zoom: 1;
-  vertical-align: middle;
-}
-.polyfill-important .input-datetime-local {
-  display: inline-block !important;
-  height: auto !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: none !important;
-}
-.polyfill-important .input-datetime-local input {
-  display: inline !important;
-}
-
-.input-datetime-local-date {
-  margin: 0 2px 0 0;
-}
-.polyfill-important .input-datetime-local-date {
-  margin: 0 2px 0 0 !important;
-}
-
-.input-datetime-local-time {
-  margin: 0 0 0 2px;
-}
-.polyfill-important .input-datetime-local-time {
-  margin: 0 0 0 2px !important;
-}
-
-img.ui-datepicker-trigger {
-  display: inline;
-  display: inline-block;
-  width: 16px;
-}
-
 /* spinner control for time, number (usable for date, datetime-local) */
-.has-step-controls {
+.has-input-buttons {
   display: inline;
 }
 
-.polyfill-important .has-step-controls {
+.polyfill-important .has-input-buttons {
   display: inline !important;
 }
 
 .input-buttons,
 .step-controls,
 .popover-opener {
-  position: absolute;
   zoom: 1;
   overflow: hidden;
   display: inline-block;
   font-size: 0;
-  vertical-align: top;
+  vertical-align: middle;
+  margin-top: -2px;
   margin-left: -20px;
 }
 
@@ -289,7 +252,7 @@ img.ui-datepicker-trigger {
 .polyfill-important .input-buttons {
   display: inline-block !important;
   padding: 0 !important;
-  vertical-align: top !important;
+  vertical-align: middle !important;
 }
 
 .step-controls span {
@@ -347,14 +310,6 @@ img.ui-datepicker-trigger {
 }
 
 /* range */
-.ws-range-rail {
-  position: relative;
-  display: block;
-  height: 100%;
-  width: auto;
-  margin: 0 5px;
-}
-
 .ws-range {
   position: relative;
   display: inline-block;
@@ -393,7 +348,7 @@ img.ui-datepicker-trigger {
 .ws-range .ws-range-thumb:hover {
   background-position: -20px 0;
 }
-.ws-range:focus .ws-range-thumb {
+.ws-range.ws-focus .ws-range-thumb {
   background-position: -20px 0;
 }
 .ws-range.ws-active .ws-range-thumb {
@@ -404,8 +359,17 @@ img.ui-datepicker-trigger {
   opacity: 0.95;
 }
 .ws-range[aria-disabled="true"] .ws-range-thumb {
-  cursor: default;
   background-position: -54px 0;
+}
+.ws-range .ws-range-rail {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 5px;
+  right: 5px;
+  bottom: 0;
+  margin: 0;
+  zoom: 1;
 }
 .ws-range .ws-range-min {
   position: absolute !important;
@@ -418,8 +382,7 @@ img.ui-datepicker-trigger {
   overflow: hidden;
   background: #b6e2fb;
 }
-
-.ws-range-ticks {
+.ws-range .ws-range-ticks {
   position: absolute;
   bottom: 0px;
   left: 0;
@@ -428,129 +391,47 @@ img.ui-datepicker-trigger {
   margin: 0 0 0 -1.5px;
   background: #ccc;
 }
-
-/* datepicker */
-.input-date-datepicker-control {
-  position: absolute;
-  zoom: 1;
-  display: none;
-  background-color: #fff;
-  z-index: 100;
-  overflow: visible;
-  padding: 5px;
-  font-family: "MS Shell Dlg", "Lucida Grande", "Calibri", sans-serif;
-  font-size: 14px;
-  border: 1px solid #333333;
+.ws-range.vertical-range {
+  background: url(vertical-range.png) -30px bottom no-repeat;
+  width: 20px;
 }
-.polyfill-important .input-date-datepicker-control {
-  z-index: 999999999 !important;
-}
-.input-date-datepicker-control .ui-datepicker-header {
-  position: relative;
-  margin: 0 0 3px;
-  padding: 2px 0;
-}
-.input-date-datepicker-control .ui-datepicker-header select {
-  border: 1px solid #333333;
-  padding: 1px 2px 2px;
-}
-.input-date-datepicker-control .ui-datepicker-header option {
-  padding-right: 8px;
-}
-.input-date-datepicker-control .ui-datepicker-header .ui-icon {
-  position: absolute;
-  display: block;
-  top: 0.2em;
-  width: 15px;
-  height: 18px;
-  text-indent: -9999em;
-  font-size: 10px;
-  line-height: 0;
-  background: url(forms.png) no-repeat;
-  cursor: pointer;
-}
-.input-date-datepicker-control .ui-datepicker-header .ui-state-disabled .ui-icon {
-  cursor: default;
-}
-.input-date-datepicker-control .ui-datepicker-header .ui-icon-circle-triangle-w {
+.ws-range.vertical-range .ws-range-thumb {
+  top: 0;
   left: 3px;
-  background-position: -235px 3px;
+  bottom: auto;
+  background: url(vertical-range.png) 0 -51px no-repeat;
+  margin: -6px 0 0 0;
+  height: 11px;
+  width: 22px;
 }
-.input-date-datepicker-control .ui-datepicker-header .ui-state-hover .ui-icon-circle-triangle-w {
-  background-position: -235px -17px;
+.ws-range.vertical-range .ws-range-thumb:hover, .ws-range.vertical-range.ws-focus .ws-range-thumb {
+  background-position: 0 -34px;
 }
-.input-date-datepicker-control .ui-datepicker-header .ui-icon-circle-triangle-e {
-  right: 3px;
-  background-position: -248px 3px;
+.ws-range.vertical-range.ws-active .ws-range-thumb {
+  background-position: 0 -17px;
 }
-.input-date-datepicker-control .ui-datepicker-header .ui-state-hover .ui-icon-circle-triangle-e {
-  background-position: -248px -17px;
+.ws-range.vertical-range[aria-disabled="true"] .ws-range-thumb {
+  background-position: 0 0;
 }
-.input-date-datepicker-control table {
-  font-size: 100%;
-  border-spacing: 1px;
+.ws-range.vertical-range .ws-range-min {
+  top: auto;
+  bottom: 1px;
+  left: 11px;
+  width: 1px;
+  height: 0;
 }
-.input-date-datepicker-control .ui-datepicker-title {
-  margin: 0 20px;
-  color: #069;
-  text-align: center;
-  font-weight: bold;
+.ws-range.vertical-range .ws-range-rail {
+  top: 5px;
+  left: 0;
+  right: 0;
+  bottom: 5px;
 }
-.input-date-datepicker-control th {
-  color: #069;
-  text-align: center;
-  font-weight: bold;
-}
-.input-date-datepicker-control td, .input-date-datepicker-control th {
-  padding: 0 2px;
-  text-align: center;
-  font-weight: normal;
-}
-.input-date-datepicker-control td {
-  padding: 0 4px;
-  cursor: pointer;
-  text-align: right;
-  border: 1px solid white;
-  border-radius: 2px;
-}
-.input-date-datepicker-control td.ui-datepicker-current-day {
-  background-color: #adf;
-  color: #000;
-  border-color: #06c;
-}
-.input-date-datepicker-control td.ui-datepicker-today {
-  border-color: #06c;
-}
-.input-date-datepicker-control td.ui-datepicker-current-day a {
-  color: #000;
-}
-.input-date-datepicker-control td a {
-  color: #000;
-  text-decoration: none;
-}
-.input-date-datepicker-control td:hover {
-  background-color: #bef;
-  border-color: #06c;
-}
-.input-date-datepicker-control td.ui-state-disabled {
-  cursor: default;
-  border-color: #fff;
-  color: #bbb;
-  background-color: transparent;
-}
-.input-date-datepicker-control .ui-datepicker-buttonpane {
-  margin: 4px 0 0;
-}
-.input-date-datepicker-control .ui-datepicker-cover {
-  display: none;
-  display/**/: block;
-  position: absolute;
-  z-index: -1;
-  filter: mask();
-  top: -4px;
-  left: -4px;
-  width: 200px;
-  height: 200px;
+.ws-range.vertical-range .ws-range-ticks {
+  bottom: auto;
+  left: auto;
+  right: 0;
+  height: 1px;
+  width: 4px;
 }
 
 /*
@@ -664,57 +545,57 @@ html .ws-po-arrow .ws-po-arrowbox {
   z-index: 999999999;
 }
 
-.date-popover .ws-prev,
-.date-popover .ws-next, .date-popover .ws-button-row button {
+.input-picker .ws-prev,
+.input-picker .ws-next, .input-picker .ws-button-row button {
   border-radius: 4px;
   background: #ccc;
 }
 
-.date-popover {
+.input-picker {
   width: 300px;
   text-align: center;
   font-family: sans-serif;
 }
-.date-popover li,
-.date-popover button {
+.input-picker li,
+.input-picker button {
   font-size: 16px;
   line-height: 1.1em;
 }
-.date-popover .ws-po-box {
+.input-picker .ws-po-box {
   position: relative;
   padding: 10px;
   border-radius: 5px;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.6);
 }
-.date-popover .ws-prev,
-.date-popover .ws-next {
+.input-picker .ws-prev,
+.input-picker .ws-next {
   position: absolute;
   top: 10px;
   width: 40px;
   height: 40px;
   z-index: 1;
 }
-.date-popover .ws-picker-body {
+.input-picker .ws-picker-body {
   position: relative;
   padding: 50px 0 0;
 }
-.date-popover .ws-prev {
+.input-picker .ws-prev {
   left: 10px;
 }
-.date-popover .ws-next {
+.input-picker .ws-next {
   right: 10px;
 }
-.date-popover .ws-button-row {
+.input-picker .ws-button-row {
   position: relative;
   margin: 10px 0 0;
   text-align: left;
   z-index: 2;
 }
-.date-popover .ws-button-row button {
+.input-picker .ws-button-row button {
   padding: 5px 8px;
   display: inline-block;
 }
-.date-popover .ws-button-row button.ws-empty {
+.input-picker .ws-button-row button.ws-empty {
   float: right;
 }
 

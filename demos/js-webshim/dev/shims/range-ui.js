@@ -96,7 +96,10 @@
 				if(!isNumber(val) || val < min || val > max){return;}
 				var left = 100 * ((val - min) / (max - min));
 				var title = o.showLabels ? ' title="'+ label +'"' : '';
-				trail.append('<span class="ws-range-ticks"'+ title +' style="'+(that.dirs.pos)+': '+left+'%;" />');
+				if(that.vertical){
+					left = Math.abs(left - 100);
+				}
+				trail.append('<span class="ws-range-ticks"'+ title +' style="'+(that.dirs.left)+': '+left+'%;" />');
 			});
 		},
 		readonly: function(val){
@@ -108,9 +111,9 @@
 			val = !!val;
 			this.options.disabled = val;
 			if(val){
-				this.element.attr({tabindex: -1, 'aria-disbaled': 'true'});
+				this.element.attr({tabindex: -1, 'aria-disabled': 'true'});
 			} else {
-				this.element.attr({tabindex: this.options.tabindex, 'aria-disbaled': 'false'});
+				this.element.attr({tabindex: this.options.tabindex, 'aria-disabled': 'false'});
 			}
 		},
 		tabindex: function(val){
@@ -327,6 +330,7 @@
 		},
 		updateMetrics: function(){
 			this.vertical = (this.element.innerHeight() - this.element.innerWidth() > 10);
+			console.log('height: '+ this.element.innerHeight(), 'width: '+ this.element.innerWidth())
 			this.dirs = this.vertical ? 
 				{mouse: 'pageY', pos: 'top', min: 'max', max: 'min', left: 'top', width: 'height', outerWidth: 'outerHeight'} :
 				{mouse: 'pageX', pos: 'left', min: 'min', max: 'min', left: 'left', width: 'width', outerWidth: 'outerWidth'}
