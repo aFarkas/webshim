@@ -232,12 +232,12 @@ output {
 .input-buttons,
 .step-controls,
 .popover-opener {
-	position: absolute;
 	zoom: 1;
 	overflow: hidden;
 	display: inline-block;
 	font-size: 0;
-	vertical-align: top;
+	vertical-align: middle;
+	margin-top: -2px;
 	margin-left: -20px;
 }
 .input-button-size-2 {
@@ -257,7 +257,7 @@ output {
 .polyfill-important .input-buttons {
 	display: inline-block !important;
 	padding: 0 !important;
-	vertical-align: top !important;
+	vertical-align: middle !important;
 }
 
 .step-controls span {
@@ -326,13 +326,6 @@ output {
 
 
 /* range */
-.ws-range-rail {
-	position: relative;
-	display: block;
-	height: 100%;
-	width: auto;
-	margin: 0 5px;
-}
 .ws-range {
 	position: relative;
 	display: inline-block;
@@ -374,19 +367,30 @@ output {
 		}
 	}
 
-	&:focus .ws-range-thumb {
+	&.ws-focus .ws-range-thumb {
 		background-position: -20px 0;
 	}
 	&.ws-active .ws-range-thumb {
 		background-position: -37px 0;
 	}
-	&[aria-disabled="true"], &[aria-readonly="true"] {
+	&[aria-disabled="true"], 
+	&[aria-readonly="true"] {
 		cursor: default;
 		opacity: 0.95;
 	}
 	&[aria-disabled="true"] .ws-range-thumb {
-		cursor: default;
 		background-position: -54px 0;
+	}
+	
+	.ws-range-rail {
+		position: absolute;
+		display: block;
+		top: 0;
+		left: 5px;
+		right: 5px;
+		bottom: 0;
+		margin: 0;
+		zoom: 1;
 	}
 
 	.ws-range-min {
@@ -400,17 +404,73 @@ output {
 		overflow: hidden;
 		background: #b6e2fb;
 	}
+	
+	.ws-range-ticks {
+		position: absolute;
+		bottom: 0px;
+		left: 0;
+		height: 4px;
+		width: 1px;
+		margin: 0 0 0 -1.5px;
+		background: #ccc;
+	}
+	
+	&.vertical-range {
+		background: url(vertical-range.png) -30px bottom no-repeat;
+		width: 20px;
+		
+		.ws-range-thumb {
+			top: 0;
+			left: 3px;
+			bottom: auto;
+			background: url(vertical-range.png) 0 -51px no-repeat;
+			margin: -6px 0 0 0;
+			height: 11px;
+			width: 22px;
+			
+		}
+		.ws-range-thumb:hover,
+		&.ws-focus .ws-range-thumb {
+			background-position: 0 -34px;
+		}
+		&.ws-active .ws-range-thumb {
+			background-position: 0 -17px;
+		}
+		
+		&[aria-disabled="true"] .ws-range-thumb {
+			background-position: 0 0;
+		}
+		
+		.ws-range-min {
+			top: auto;
+			bottom: 1px;
+			left: 11px;
+			width: 1px;
+			height: 0;
+		}
+		
+		.ws-range-rail {
+			top: 5px;
+			left: 0;
+			right: 0;
+			bottom: 5px;
+		}
+		
+		.ws-range-ticks {
+			bottom: auto;
+			left: auto;
+			right: 0;
+			height: 1px;
+			width: 4px;
+		}
+	}
+	
 }
 
-.ws-range-ticks {
-	position: absolute;
-	bottom: 0px;
-	left: 0;
-	height: 4px;
-	width: 1px;
-	margin: 0 0 0 -1.5px;
-	background: #ccc;
-}
+
+
+
+
 
 /*
  * popovers
