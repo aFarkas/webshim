@@ -545,6 +545,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 		var today = getDateArray(new Date());
 		
+		picker.getWeek = function(date){
+			var onejan = new Date(date.getFullYear(),0,1);
+			return Math.ceil((((date - onejan) / 86400000) + onejan.getDay()+1)/7);
+		};
 		picker.getYearList = function(value, data){
 			var j, i, val, disabled, lis, prevDisabled, nextDisabled, classStr, classArray;
 			
@@ -684,7 +688,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		picker.getDayList = function(value, data){
 			
-			var j, i, k, day, name, val, disabled, lis,  prevDisabled, nextDisabled, addTr;
+			var j, i, k, day, name, val, disabled, lis,  prevDisabled, nextDisabled, addTr, week;
 			
 			var lastMotnh, curMonth, otherMonth, dateArray, monthName, buttonStr, date2, classArray;
 			var size = data.options.size || 1;
@@ -731,6 +735,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				str.push('</div><table><thead><tr>');
 				
+				if(data.options.showWeek){
+					str.push('<th>'+ curCfg.date.weekHeader +'</th>');
+				}
 				for(k = curCfg.date.firstDay; k < curCfg.date.dayNamesShort.length; k++){
 					str.push('<th>'+ curCfg.date.dayNamesShort[k] +'</th>');
 				}
@@ -740,7 +747,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 				str.push('</tr></thead><tbody><tr>');
 				
-					
+				if(data.options.showWeek) {
+					week = picker.getWeek(date);
+					str.push('<th>'+ week +'</th>');
+				}
 				
 				for (i = 0; i < 99; i++) {
 					addTr = (i && !(i % 7));
@@ -754,6 +764,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					}
 					if(addTr){
 						str.push('</tr><tr>');
+						if(data.options.showWeek) {
+							week++;
+							str.push('<th>'+ week +'</th>');
+						}
 					}
 					if(!i){
 						day = date.getDay() - curCfg.date.firstDay;
