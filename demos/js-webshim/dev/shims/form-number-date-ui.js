@@ -280,6 +280,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 				this.element.prop('placeholder', this.options.placeholder);
 			},
+			
 			addZero: addZero,
 			_setStartInRange: function(){
 				var start = steps[this.type].start || 0;
@@ -290,6 +291,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 				this.elemHelper.prop('valueAsNumber', start).prop('value');
 				this.options.defValue = this.elemHelper.prop('value');
+				
 			},
 			value: function(val){
 				this.valueAsNumber = this.asNumber(val);
@@ -298,18 +300,46 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					this._setStartInRange();
 				} else {
 					this.elemHelper.prop('value', val);
+					this.options.defValue = "";
 				}
 				
 				this.element.prop('value', formatVal[this.type](val, this.options));
+				this._propertyChange('value');
 			},
-			
-			list: function(opts, input){
-				this.options.options = opts || {};
+			initDataList: function(){
+				var listTimer;
+				var that = this;
+				var updateList = function(){
+					$(that.orig)
+						.jProp('list')
+						.off('updateDatalist', updateList)
+						.on('updateDatalist', updateList)
+					;
+					clearTimeout(listTimer);
+					listTimer = setTimeout(function(){
+						if(that.list){
+							that.list();
+						}
+					}, 9);
+					
+				};
+				
+				$(this.orig).onTrigger('listdatalistchange', updateList);
+			},
+			getOptions: function(){
+				var options = {};
+				$(this.orig).jProp('list').find('option').each(function(){
+					options[$.prop(this, 'value')] = $.prop(this, 'label');
+				});
+				return options;
+			},
+			list: function(){
 				if(this.type == 'number' || this.type == 'time'){
 					this.element.attr('list', $.attr(this.orig, 'list'));
 				}
+				this._propertyChange('list');
 			},
-			
+			_propertyChange: $.noop,
 			tabindex: function(val){
 				this.options.tabindex = val;
 				this.element.prop('tabindex', this.options.tabindex);
@@ -325,6 +355,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				if(this.valueAsNumber != null && isNaN(this.valueAsNumber)){
 					this._setStartInRange();
 				}
+				this._propertyChange('min');
 			},
 			max: function(val){
 				this.elemHelper.prop('max', val);
@@ -332,6 +363,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				if(this.valueAsNumber != null && isNaN(this.valueAsNumber)){
 					this._setStartInRange();
 				}
+				this._propertyChange('max');
 			},
 			step: function(val){
 				var defStep = steps[this.type];
@@ -775,15 +807,19 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 							str.push('<th class="week-cell">'+ week +'</th>');
 						}
 					}
+					
 					if(!i){
-						nDay = date.getDay() - curCfg.date.firstDay;
 						
-						if(nDay > -1 && nDay < 6){
+						if(day != curCfg.date.firstDay){
+							nDay = day - curCfg.date.firstDay;
+							if(nDay < 0){
+								nDay += 7;
+							}
 							date.setDate(date.getDate() - nDay);
+							day = date.getDay();
+							curMonth = date.getMonth();
+							otherMonth = lastMotnh != curMonth;
 						}
-						curMonth = date.getMonth();
-						otherMonth = lastMotnh != curMonth;
-						day = date.getDay();
 					}
 					
 					dateArray = getDateArray(date);
@@ -923,6 +959,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				var getNames = names.map(retNames);
 				actions[setName] = function(val, popover, data, startAt){
 					var values = val.split('-');
+					
 					if(!startAt){
 						startAt = 0;
 					}
@@ -988,12 +1025,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				return false;
 			};
-			
-			data.list = function(opts){
-				var o = this.options;
+			var generateList = function(o, max, min){
 				var options = [];
 				
-				o.options = opts || {};
+				o.options = data.getOptions() || {};
 				$('div.ws-options', popover.contentElement).remove();
 				$.each(o.options, function(val, label){
 					options.push('<button value="'+ val +'" data-action="changeInput" tabindex="-1">'+ (label || data.formatValue(val)) +'</button>');
@@ -1002,11 +1037,36 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					popover.bodyElement.after('<div class="ws-options">'+ options.join('') +'</div>');
 				}
 			};
+			var updateContent = function(){
+				if(popover.isDirty){
+					var o = data.options;
+					var max = o.max.split('-');
+					var min = o.min.split('-');
+					
+					$('button', popover.buttonRow).each(function(){
+						if($(this).is('.ws-empty')){
+							$.prop(this, 'disabled', $.prop(data.orig, 'required'));
+						} else if($(this).is('.ws-current')){
+							$.prop(this, 'disabled', !picker.isInRange(today[data.type].split('-'), max, min));
+						}
+						$(this).text($(this).data('text'));
+					});
+					$('> span', popover.nextElement).html(curCfg.date.nextText);
+					$('> span', popover.prevElement).html(curCfg.date.prevText);
+					
+					generateList(o, max, min);
+				}
+				popover.isDirty = false;
+			};
+			
+			
+			
 			popover.contentElement.html('<button class="ws-prev" tabindex="-1"><span></span></button> <button class="ws-next" tabindex="-1"><span></span></button><div class="ws-picker-body"></div><div class="ws-button-row"><button type="button" class="ws-current" data-action="changeInput" value="'+today[data.type]+'" data-text="current" tabindex="-1"></button> <button type="button" data-action="changeInput" value="" data-text="empty" class="ws-empty" tabindex="-1"></button></div>');
 			popover.nextElement = $('button.ws-next', popover.contentElement);
 			popover.prevElement = $('button.ws-prev', popover.contentElement);
 			popover.bodyElement = $('div.ws-picker-body', popover.contentElement);
 			popover.buttonRow = $('div.ws-button-row', popover.contentElement);
+			popover.isDirty = true;
 			
 			popover.contentElement
 				.on('click', 'button[data-action]', actionfn)
@@ -1019,24 +1079,26 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					actions[currentView]( data.options.value , popover, data, 0);
 				}
 			});
-			
-			popover.element.on('wspopoverbeforeshow', function(){
-				$('button', popover.buttonRow).each(function(){
-					if($(this).is('.ws-empty')){
-						$.prop(this, 'disabled', $.prop(data.orig, 'required'));
+			data._propertyChange = (function(){
+				var timer;
+				var update = function(){
+					if(popover.isVisible){
+						updateContent();
 					}
-					$(this).text($(this).data('text'));
-				});
-			});
+				};
+				return function(prop){
+					if(prop == 'value'){return;}
+					popover.isDirty = true;
+					if(popover.isVisible){
+						clearTimeout(timer);
+						timer = setTimeout(update, 9);
+					}
+				};
+			})();
 			
-			$(document)
-				.onTrigger('wslocalechange',function(){
-					$('> span', popover.nextElement).html(curCfg.date.nextText);
-					$('> span', popover.prevElement).html(curCfg.date.prevText);
-					
-					data.list(data.options.options);
-				})
-			;
+			popover.element.on('wspopoverbeforeshow', updateContent);
+			
+			$(document).onTrigger('wslocalechange', data._propertyChange);
 		};
 		
 		picker.month = function(data){
@@ -1046,15 +1108,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			var init = false;
 			
 			var show = function(){
-				if(!options.disabled && !options.readonly){
+				if(!options.disabled && !options.readonly && !popover.isVisible){
 					if(!init){
 						picker.commonInit(data, popover);
 					}
 					
 					if(!init || data.options.restartView) {
-						actions.setYearList( options.value || options.defValue, popover, data, data.options.startAt);
+						actions.setYearList( options.defValue || options.value, popover, data, data.options.startAt);
 					} else {
-						actions[popover.element.attr('data-currentview') || 'setYearList']( options.value || options.defValue, popover, data, 0)
+						actions[popover.element.attr('data-currentview') || 'setYearList']( options.defValue || options.value, popover, data, 0);
 					}
 					
 					init = true;
@@ -1128,38 +1190,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				data.props = $.merge([], copyProps, data.props);
 			};
 		})();
-		var initDataList = function(input, data){
-			var listTimer, updateList, list;
-			
-			if(data){
-				updateList = function(){
-					list = $(input)
-						.jProp('list')
-						.off('updateDatalist', updateList)
-						.on('updateDatalist', updateList)
-					;
-					clearTimeout(listTimer);
-					listTimer = setTimeout(function(){
-						if (data.shim && data.shim.list) {
-							data.shim.list(getOptions(input, list), input);
-						}
-					}, 9);
-						
-					
-					
-					
-				};
-				$(input).onTrigger('listdatalistchange', updateList);
-			}
-			return getOptions(input, list);
-		};
-		var getOptions = function(input, list){
-			var options = {};
-			(list || $(input).jProp('list')).find('option').each(function(){
-				options[$.prop(this, 'value')] = $.prop(this, 'label');
-			});
-			return options;
-		};
+		
 		var stopPropagation = function(e){
 			e.stopImmediatePropagation(e);
 		};
@@ -1213,7 +1244,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				opts = $.extend({}, options[type], $($.prop(this, 'form')).data(type) || {}, $(this).data(type) || {}, {
 					orig: this,
 					type: type,
-					options: initDataList(this, data),
+					options: {},
 					input: function(val){
 						opts._change(val, 'input');
 					},

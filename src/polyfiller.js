@@ -111,7 +111,8 @@
 				addClass.push('loading-polyfills');
 				timer = setTimeout(function(){
 					$('html').addClass('long-loading-polyfills');
-				}, 400);
+					timer = setTimeout(removeLoader, 150);
+				}, 350);
 				
 				if (webCFG.waitReady && $.isReady) {
 					webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
