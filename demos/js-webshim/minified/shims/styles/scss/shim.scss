@@ -240,9 +240,7 @@ output {
 	margin-top: -3px;
 	margin-left: -20px;
 }
-.input-button-size-2 {
-	margin-left: -35px;
-}
+
 .step-controls,
 .popover-opener {
 	position: relative;
@@ -254,41 +252,58 @@ output {
 .popover-opener {
 	background: #000;
 }
-.polyfill-important .input-buttons {
-	display: inline-block !important;
-	padding: 0 !important;
-	vertical-align: middle !important;
-}
-
-.step-controls span {
-	position: absolute;
-	display: inline-block;
-	overflow: hidden;
-	margin: 0 !important;
-	padding: 0 !important;
-	width: 15px;
-	height: 9px;
-	cursor: pointer;
-	font-size: 0;
-	line-height: 0;
-	background: url(forms.png) no-repeat 0 0;
-
+.input-buttons {
 	.polyfill-important & {
 		display: inline-block !important;
-		margin: 0 !important;
 		padding: 0 !important;
-		font-size: 0 !important;
+		vertical-align: middle !important;
 	}
+	&.input-button-size-2 {
+		margin-left: -35px;
+	}
+	&.ws-disabled {
+		opacity: 0.95;
+	}
+	&.ws-disabled,
+	&.ws-readonly * {
+		cursor: default;
+	}
+	
 }
 
 .step-controls {
 
 	span {
+		position: absolute;
+		display: inline-block;
+		overflow: hidden;
+		margin: 0 !important;
+		padding: 0 !important;
+		width: 15px;
+		height: 9px;
+		cursor: pointer;
+		font-size: 0;
+		line-height: 0;
+		background: url(forms.png) no-repeat 0 0;
+
+		.polyfill-important & {
+			display: inline-block !important;
+			margin: 0 !important;
+			padding: 0 !important;
+			font-size: 0 !important;
+		}
+		
 		&.step-up {
 			top: 0;
 			background-position: -80px 0;
 			&:hover {
 				background-position: -105px 0;
+			}
+			&.mousepress-ui {
+				background-position: -105px -20px;
+			}
+			.ws-disabled & {
+				background-position: -130px 0;
 			}
 		}
 		&.step-down {
@@ -297,29 +312,14 @@ output {
 			&:hover {
 				background-position: -180px 0;
 			}
+			&.mousepress-ui {
+				background-position: -180px -20px;
+			}
+			.ws-disabled & {
+				background-position: -205px 0;
+			}
 		}
-	}
-
-	> span.mousepress-ui.step-up {
-		background-position: -105px -20px;
-	}
-
-	> span.mousepress-ui.step-down {
-		background-position: -180px -20px;
-	}
-
-	/* disabled or readonly */
-	&.disabled-step-control span {
-		opacity: 0.95;
-		cursor: default;
-
-		&.step-up {
-			background-position: -130px 0;
-		}
-
-		&.step-down {
-			background-position: -205px 0;
-		}
+		
 	}
 }
 
@@ -636,6 +636,7 @@ $border-light: 1px solid #ddd;
 	.ws-picker-body {
 		position: relative;
 		padding: 50px 0 0;
+		zoom: 1px;
 	}
 
 	.ws-prev {

@@ -1373,6 +1373,10 @@ try {
 				}
 			;
 			
+			if(webshims.modules["form-number-date-ui"].loaded){
+				delete allowedPlaceholder.number;
+			}
+			
 			return {
 				create: function(elem){
 					var data = $.data(elem, 'placeHolder');

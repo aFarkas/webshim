@@ -464,6 +464,14 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		} else {
 			loadedSwf++;
 		}
+		if(!data){
+			data = webshims.data(elem, 'mediaelement');
+		}
+		
+		if($.attr(elem, 'height') || $.attr(elem, 'width')){
+			webshims.info("width or height content attributes used. Webshims only uses CSS to detect size of a video/audio");
+		}
+		
 		var isRtmp = canPlaySrc.type == 'audio/rtmp' || canPlaySrc.type == 'video/rtmp';
 		var vars = $.extend({}, options.vars, {
 				poster: $.attr(elem, 'poster') && $.prop(elem, 'poster') || '',
@@ -472,9 +480,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		});
 		var elemVars = $(elem).data('vars') || {};
 		
-		if(!data){
-			data = webshims.data(elem, 'mediaelement');
-		}
+		
 		
 		var hasControls = $.prop(elem, 'controls');
 		var elemId = 'jarisplayer-'+ webshims.getID(elem);

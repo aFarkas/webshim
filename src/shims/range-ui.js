@@ -228,7 +228,7 @@
 			
 			var setValueFromPos = function(e, animate){
 				if(this.vertical){
-					left = Math.abs(left - 100)
+					left = Math.abs(left - 100);
 				}
 				var val = that.getStepedValueFromPos((e[that.dirs.mouse] - leftOffset) * widgetUnits);
 				if(val != o.value){
@@ -265,11 +265,7 @@
 					e.stopPropagation();
 				}
 			};
-			
-			eventTimer.init('input', o.value, this.options.input);
-			eventTimer.init('change', o.value, this.options.change);
-			
-			this.element.on({
+			var elementEvts = {
 				mousedown: add,
 				focus: function(e){
 					if(!o.disabled){
@@ -290,13 +286,7 @@
 					eventTimer.call('input', o.value);
 					eventTimer.call('change', o.value);
 				},
-				mousewheel: function(e, delta){
-					if(delta && hasFocus && !o.readonly && !o.disabled){
-						that.doStep(delta);
-						e.preventDefault();
-						eventTimer.call('input', o.value);
-					}
-				},
+				
 				keypress: function(e){
 					var step = true;
 					var code = e.keyCode;
@@ -323,17 +313,30 @@
 						}
 					}
 				}
-			});
+			};
+			
+			eventTimer.init('input', o.value, this.options.input);
+			eventTimer.init('change', o.value, this.options.change);
+			
+			elementEvts[$.fn.mwheelIntent ? 'mwheelIntent' : 'mousewheel'] = function(e, delta){
+				if(delta && hasFocus && !o.readonly && !o.disabled){
+					that.doStep(delta);
+					e.preventDefault();
+					eventTimer.call('input', o.value);
+				}
+			};
+			this.element.on(elementEvts);
 			this.thumb.on({
 				mousedown: add
 			});
 		},
 		updateMetrics: function(){
-			this.vertical = (this.element.innerHeight() - this.element.innerWidth() > 10);
-			console.log('height: '+ this.element.innerHeight(), 'width: '+ this.element.innerWidth())
+			var width = this.element.innerWidth();
+			this.vertical = (width && this.element.innerHeight() - width  > 10);
+			
 			this.dirs = this.vertical ? 
 				{mouse: 'pageY', pos: 'top', min: 'max', max: 'min', left: 'top', width: 'height', outerWidth: 'outerHeight'} :
-				{mouse: 'pageX', pos: 'left', min: 'min', max: 'min', left: 'left', width: 'width', outerWidth: 'outerWidth'}
+				{mouse: 'pageX', pos: 'left', min: 'min', max: 'max', left: 'left', width: 'width', outerWidth: 'outerWidth'}
 			;
 			this.element
 				[this.vertical ? 'addClass' : 'removeClass']('vertical-range')

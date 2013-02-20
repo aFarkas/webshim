@@ -1696,6 +1696,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 			date: 'Please enter a date.',
 			time: 'Please enter a time.',
 			range: 'Invalid input.',
+			month: 'Please enter a valid value.',
 			"datetime-local": 'Please enter a datetime.'
 		},
 		rangeUnderflow: {
@@ -1740,8 +1741,9 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 			number: '{%value} ist keine Nummer!',
 			date: '{%value} ist kein Datum',
 			time: '{%value} ist keine Uhrzeit',
-			range: '{%value} ist keine Nummer!'
-//			,"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
+			month: '{%value} ist in diesem Feld nicht zulässig.',
+			range: '{%value} ist keine Nummer!',
+			"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
 		},
 		rangeUnderflow: {
 			defaultMessage: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.'
