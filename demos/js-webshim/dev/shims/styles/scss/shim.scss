@@ -268,7 +268,7 @@ output {
 	&.ws-readonly * {
 		cursor: default;
 	}
-	
+
 }
 
 .step-controls {
@@ -292,7 +292,7 @@ output {
 			padding: 0 !important;
 			font-size: 0 !important;
 		}
-		
+
 		&.step-up {
 			top: 0;
 			background-position: -80px 0;
@@ -319,7 +319,7 @@ output {
 				background-position: -205px 0;
 			}
 		}
-		
+
 	}
 }
 
@@ -373,7 +373,7 @@ output {
 	&.ws-active .ws-range-thumb {
 		background-position: -37px 0;
 	}
-	&[aria-disabled="true"], 
+	&[aria-disabled="true"],
 	&[aria-readonly="true"] {
 		cursor: default;
 		opacity: 0.95;
@@ -381,7 +381,7 @@ output {
 	&[aria-disabled="true"] .ws-range-thumb {
 		background-position: -54px 0;
 	}
-	
+
 	.ws-range-rail {
 		position: absolute;
 		display: block;
@@ -404,7 +404,7 @@ output {
 		overflow: hidden;
 		background: #b6e2fb;
 	}
-	
+
 	.ws-range-ticks {
 		position: absolute;
 		bottom: 0px;
@@ -414,11 +414,11 @@ output {
 		margin: 0 0 0 -1.5px;
 		background: #ccc;
 	}
-	
+
 	&.vertical-range {
 		background: url(vertical-range.png) -30px bottom no-repeat;
 		width: 20px;
-		
+
 		.ws-range-thumb {
 			top: 0;
 			left: 3px;
@@ -427,7 +427,7 @@ output {
 			margin: -6px 0 0 0;
 			height: 11px;
 			width: 22px;
-			
+
 		}
 		.ws-range-thumb:hover,
 		&.ws-focus .ws-range-thumb {
@@ -436,11 +436,11 @@ output {
 		&.ws-active .ws-range-thumb {
 			background-position: 0 -17px;
 		}
-		
+
 		&[aria-disabled="true"] .ws-range-thumb {
 			background-position: 0 0;
 		}
-		
+
 		.ws-range-min {
 			top: auto;
 			bottom: 1px;
@@ -448,14 +448,14 @@ output {
 			width: 1px;
 			height: 0;
 		}
-		
+
 		.ws-range-rail {
 			top: 5px;
 			left: 0;
 			right: 0;
 			bottom: 5px;
 		}
-		
+
 		.ws-range-ticks {
 			bottom: auto;
 			left: auto;
@@ -464,7 +464,7 @@ output {
 			width: 4px;
 		}
 	}
-	
+
 }
 
 
@@ -599,6 +599,7 @@ output {
 
 //date popover
 $border-light: 1px solid #ddd;
+$button-bgcolor: #f5f5f5;
 %ws-button {
 	border-radius: 4px;
 	background: #ccc;
@@ -619,7 +620,7 @@ $border-light: 1px solid #ddd;
 
 	.ws-po-box {
 		position: relative;
-		padding: 10px;
+		padding: 8px;
 		border-radius: 5px;
 		box-shadow: 0 3px 3px rgba(0, 0, 0, .6);
 	}
@@ -661,33 +662,30 @@ $border-light: 1px solid #ddd;
 			}
 		}
 	}
-	.ws-picker-body {
-		li {
-			display: block;
-		}
-	}
-	
-	.year-list,
-	.month-list,
-	.day-list {
-		@extend %clearfix;
 
-		.ws-picker-header {
-			position: absolute;
-			top: 5px;
-			right: 0;
-			left: 0;
+	.ws-picker-header {
+		position: absolute;
+		top: 5px;
+		right: 0;
+		left: 0;
+		margin: 0 60px;
+		border: $border-light;
+		border-radius: 4px;
+
+		h3,
+		button {
 			display: inline-block;
+			width: 100%;
+			margin: 0;
+			padding: 8px 0;
 			font-size: 16px;
 			line-height: 1.1em;
-			margin: 0 60px;
-			padding: 8px 0;
 			font-weight: normal;
-			border: $border-light;
-			border-radius: 4px;
 		}
-		.ws-picker-header button {
-			background: #f2f2f2;
+
+		button {
+			background: $button-bgcolor;
+			border-radius: inherit;
 			box-shadow: inset 0 -5px 12px -5px rgba(0,0,0,.4), 0 -4px 0 0 #ddd;
 
 			&:after {
@@ -699,7 +697,7 @@ $border-light: 1px solid #ddd;
 				width: 0;
 				height: 0;
 				margin: auto;
-				border-color: #fff transparent;
+				border-color: $button-bgcolor transparent;
 				border-style: solid;
 				border-width: 0 5px 5px 5px;
 			}
@@ -716,6 +714,20 @@ $border-light: 1px solid #ddd;
 				}
 			}
 		}
+	 }
+
+
+
+	.ws-picker-body {
+		li {
+			display: block;
+		}
+	}
+
+	.year-list,
+	.month-list,
+	.day-list {
+		@extend %clearfix;
 
 		ul {
 			margin: 0;
@@ -732,7 +744,7 @@ $border-light: 1px solid #ddd;
 		li button,
 		td button {
 			display: block;
-			padding: 10px 0;
+			padding: 8px 0;
 			width: 100%;
 			border: 1px solid transparent;
 			border-radius: 3px;
@@ -743,12 +755,11 @@ $border-light: 1px solid #ddd;
 				color: #fff;
 				background: #39f;
 			}
-			
-			
+
 			&.selected-value {
 				border-color: #39f;
 			}
-			
+
 			&.this-year,
 			&.this-month,
 			&.this-day {
@@ -789,7 +800,7 @@ $border-light: 1px solid #ddd;
 			border-top: $border-light;
 		}
 	}
-	
+
 	.ws-options {
 		margin: 10px 0 0;
 		button {
