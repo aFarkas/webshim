@@ -1664,7 +1664,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		['readonly', 'disabled'].forEach(function(name){
 			spinBtnProto[name] = function(val){
-				if(this.options[name] != val || this._init){
+				if(this.options[name] != val || !this._init){
 					this.options[name] = !!val;
 					this.element.prop(name, this.options[name]);
 					this.buttonWrapper[this.options[name] ? 'addClass' : 'removeClass']('ws-'+name);
