@@ -264,7 +264,7 @@ output {
 	&.ws-disabled {
 		opacity: 0.95;
 	}
-	&.ws-disabled,
+	&.ws-disabled *,
 	&.ws-readonly * {
 		cursor: default;
 	}
@@ -750,20 +750,22 @@ $button-bgcolor: #f5f5f5;
 			border-radius: 3px;
 			transition: all 400ms;
 
-			&:hover,
-			&:focus {
+			&:hover {
 				color: #fff;
 				background: #39f;
 			}
 
-			&.selected-value {
-				border-color: #39f;
-			}
-
-			&.this-year,
-			&.this-month,
-			&.this-day {
+			&.this-value {
 				border-color: #f93;
+			}
+			
+			&.selected-value,
+			&:focus {
+				outline: 1px dotted #39f;
+			}
+			
+			&.checked-value {
+				border-color: #39f;
 			}
 		}
 	}

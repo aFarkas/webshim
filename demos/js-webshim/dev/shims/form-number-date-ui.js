@@ -2,7 +2,18 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	"use strict";
 	var curCfg;
 	
-	
+	var labelWidth = (function(){
+		var getId = function(){
+			return webshims.getID(this);
+		};
+		return function(element, labels){
+			$(element).attr({'aria-labelledby': labels.map(getId).get().join(' ')});
+			labels.on('click', function(e){
+				element.focus();
+				e.preventDefault();
+			});
+		};
+	})();
 	var addZero = function(val){
 		if(!val){return "";}
 		val = val+'';
@@ -580,6 +591,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 		var today = getDateArray(new Date());
 		
+		webshims.ListBox = function (element){
+			//checked-value || this-value || selected-value
+			console.log(element)
+		};
 		
 		picker.getWeek = function(date){
 			var onejan = new Date(date.getFullYear(),0,1);
@@ -619,11 +634,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					
 					
 					if(val == today[0]){
-						classArray.push('this-year');
+						classArray.push('this-value');
 					}
 					
 					if(currentValue[0] == val){
-						classArray.push('selected-value');
+						classArray.push('checked-value');
 					}
 					
 					classStr = classArray.length ? ' class="'+ (classArray.join(' ')) +'"' : '';
@@ -641,7 +656,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				enabled: enabled,
 				main: str,
 				next: nextDisabled,
-				prev: prevDisabled
+				prev: prevDisabled,
+				type: 'ListBox'
 			};
 		};
 		
@@ -698,11 +714,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					}
 					
 					if(value == today[0] && today[1] == val){
-						classArray.push('this-month');
+						classArray.push('this-value');
 					}
 					
 					if(currentValue[0] == value && currentValue[1] == val){
-						classArray.push('selected-value');
+						classArray.push('checked-value');
 					}
 					
 					classStr = (classArray.length) ? ' class="'+ (classArray.join(' ')) +'"' : '';
@@ -830,11 +846,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					} 
 					
 					if(dateArray[0] == today[0] && today[1] == dateArray[1] && today[2] == dateArray[2]){
-						classArray.push('this-day');
+						classArray.push('this-value');
 					}
 					
 					if(currentValue[0] == dateArray[0] && dateArray[1] == currentValue[1] && dateArray[2] == currentValue[2]){
-						classArray.push('selected-value');
+						classArray.push('checked-value');
 					}
 					
 					if(classArray.length){
@@ -1003,6 +1019,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 										.prop({disabled: true})
 									;
 								}
+								if(webshims[content.type]){
+									webshims[content.type](popover.bodyElement.children());
+								}
 								popover.element.trigger('pickerchange');
 								return false;
 							}
@@ -1061,7 +1080,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			
 			
 			
-			popover.contentElement.html('<button class="ws-prev" tabindex="-1"><span></span></button> <button class="ws-next" tabindex="-1"><span></span></button><div class="ws-picker-body"></div><div class="ws-button-row"><button type="button" class="ws-current" data-action="changeInput" value="'+today[data.type]+'" data-text="current" tabindex="-1"></button> <button type="button" data-action="changeInput" value="" data-text="empty" class="ws-empty" tabindex="-1"></button></div>');
+			popover.contentElement.html('<button class="ws-prev" tabindex="0"><span></span></button> <button class="ws-next" tabindex="0"><span></span></button><div class="ws-picker-body"></div><div class="ws-button-row"><button type="button" class="ws-current" data-action="changeInput" value="'+today[data.type]+'" data-text="current" tabindex="0"></button> <button type="button" data-action="changeInput" value="" data-text="empty" class="ws-empty" tabindex="0"></button></div>');
 			popover.nextElement = $('button.ws-next', popover.contentElement);
 			popover.prevElement = $('button.ws-prev', popover.contentElement);
 			popover.bodyElement = $('div.ws-picker-body', popover.contentElement);
@@ -1103,7 +1122,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		picker.month = function(data){
 			var popover = webshims.objectCreate(webshims.wsPopover, {}, {prepareFor: data.element});
-			var opener = $('<span class="popover-opener" />').appendTo(data.buttonWrapper);
+			var opener = $('<button type="button" class="popover-opener" />').appendTo(data.buttonWrapper);
 			var options = data.options;
 			var init = false;
 			
@@ -1124,9 +1143,20 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 			};
 			
-			popover.element.addClass(data.type+'-popover input-picker');
-			
-			opener.on('mousedown', show);
+			popover.element
+				.addClass(data.type+'-popover input-picker')
+				.attr({role: 'application'})
+				
+			;
+			labelWidth(popover.element.children('div.ws-po-outerbox').attr({role: 'group'}), options.labels);
+			labelWidth(opener, options.labels);
+			opener
+				.attr({
+					'tabindex': options.labels.length ? '0' : '-1', 
+					'aria-haspopup': 'true'
+				})
+				.on('click', show)
+			;
 			
 			data.element.on({
 				focus: function(){
@@ -1236,14 +1266,18 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		var implementType = function(){
 			var type = $.prop(this, 'type');
 			
-			var i, opts, data, optsName, calcWidth;
+			var i, opts, data, optsName, calcWidth, labels;
 			if(inputTypes[type]){
 				data = {};
 				optsName = type;
 				//todo: do we need deep extend?
+				
+				labels = $(this).jProp('labels');
+				
 				opts = $.extend({}, options[type], $($.prop(this, 'form')).data(type) || {}, $(this).data(type) || {}, {
 					orig: this,
 					type: type,
+					labels: labels,
 					options: {},
 					input: function(val){
 						opts._change(val, 'input');
@@ -1277,6 +1311,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				webshims.addShadowDom(this, data.shim.element, {
 					data: data.shim || {}
 				});
+				
+				labelWidth($(this).getShadowFocusElement(), labels, true);
 				
 				$(this).on('change', function(e){
 					if(!stopCircular && e.originalEvent){

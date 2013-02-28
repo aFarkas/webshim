@@ -256,7 +256,7 @@ output {
 .input-buttons.ws-disabled {
   opacity: 0.95;
 }
-.input-buttons.ws-disabled, .input-buttons.ws-readonly * {
+.input-buttons.ws-disabled *, .input-buttons.ws-readonly * {
   cursor: default;
 }
 
@@ -670,45 +670,43 @@ html .ws-po-arrow .ws-po-arrowbox {
   border-radius: 3px;
   transition: all 400ms;
 }
-.input-picker .year-list li button:hover, .input-picker .year-list li button:focus,
+.input-picker .year-list li button:hover,
 .input-picker .year-list td button:hover,
-.input-picker .year-list td button:focus,
 .input-picker .month-list li button:hover,
-.input-picker .month-list li button:focus,
 .input-picker .month-list td button:hover,
-.input-picker .month-list td button:focus,
 .input-picker .day-list li button:hover,
-.input-picker .day-list li button:focus,
-.input-picker .day-list td button:hover,
-.input-picker .day-list td button:focus {
+.input-picker .day-list td button:hover {
   color: #fff;
   background: #39f;
 }
-.input-picker .year-list li button.selected-value,
-.input-picker .year-list td button.selected-value,
-.input-picker .month-list li button.selected-value,
-.input-picker .month-list td button.selected-value,
-.input-picker .day-list li button.selected-value,
-.input-picker .day-list td button.selected-value {
-  border-color: #39f;
-}
-.input-picker .year-list li button.this-year, .input-picker .year-list li button.this-month, .input-picker .year-list li button.this-day,
-.input-picker .year-list td button.this-year,
-.input-picker .year-list td button.this-month,
-.input-picker .year-list td button.this-day,
-.input-picker .month-list li button.this-year,
-.input-picker .month-list li button.this-month,
-.input-picker .month-list li button.this-day,
-.input-picker .month-list td button.this-year,
-.input-picker .month-list td button.this-month,
-.input-picker .month-list td button.this-day,
-.input-picker .day-list li button.this-year,
-.input-picker .day-list li button.this-month,
-.input-picker .day-list li button.this-day,
-.input-picker .day-list td button.this-year,
-.input-picker .day-list td button.this-month,
-.input-picker .day-list td button.this-day {
+.input-picker .year-list li button.this-value,
+.input-picker .year-list td button.this-value,
+.input-picker .month-list li button.this-value,
+.input-picker .month-list td button.this-value,
+.input-picker .day-list li button.this-value,
+.input-picker .day-list td button.this-value {
   border-color: #f93;
+}
+.input-picker .year-list li button.selected-value, .input-picker .year-list li button:focus,
+.input-picker .year-list td button.selected-value,
+.input-picker .year-list td button:focus,
+.input-picker .month-list li button.selected-value,
+.input-picker .month-list li button:focus,
+.input-picker .month-list td button.selected-value,
+.input-picker .month-list td button:focus,
+.input-picker .day-list li button.selected-value,
+.input-picker .day-list li button:focus,
+.input-picker .day-list td button.selected-value,
+.input-picker .day-list td button:focus {
+  outline: 1px dotted #3399ff;
+}
+.input-picker .year-list li button.checked-value,
+.input-picker .year-list td button.checked-value,
+.input-picker .month-list li button.checked-value,
+.input-picker .month-list td button.checked-value,
+.input-picker .day-list li button.checked-value,
+.input-picker .day-list td button.checked-value {
+  border-color: #39f;
 }
 .input-picker .month-list li {
   width: 50%;
