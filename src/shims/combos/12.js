@@ -1178,6 +1178,7 @@ jQuery.webshims.register('details', function($, webshims, window, doc, undefined
 			var error = $.prop(this, 'error');
 			if(error && !noSwitch[error]){
 				switchOptions({target: this});
+				return false;
 			}
 		});
 	}

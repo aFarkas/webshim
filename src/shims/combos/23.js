@@ -1811,6 +1811,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 			var error = $.prop(this, 'error');
 			if(error && !noSwitch[error]){
 				switchOptions({target: this});
+				return false;
 			}
 		});
 	}

@@ -75,6 +75,7 @@
 			var error = $.prop(this, 'error');
 			if(error && !noSwitch[error]){
 				switchOptions({target: this});
+				return false;
 			}
 		});
 	}

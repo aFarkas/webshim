@@ -1831,6 +1831,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			var error = $.prop(this, 'error');
 			if(error && !noSwitch[error]){
 				switchOptions({target: this});
+				return false;
 			}
 		});
 	}

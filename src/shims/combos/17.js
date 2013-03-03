@@ -1285,6 +1285,14 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	var invalidClasses = 'user-error form-ui-invalid';
 	var validClass = 'user-success';
 	var validClasses = 'user-success form-ui-valid';
+	var stopChangeTypes = {
+		time: 1,
+		date: 1,
+		month: 1,
+		datetime: 1,
+		week: 1,
+		'datetime-local': 1
+	};
 	var switchValidityClass = function(e){
 		var elem, timer;
 		if(!e.target){return;}
@@ -1293,10 +1301,11 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		timer = $.data(elem, 'webshimsswitchvalidityclass');
 		var switchClass = function(){
 			if(e.type == 'focusout' && elem.type == 'radio' && isInGroup(elem.name)){return;}
+			
 			var validity = $.prop(elem, 'validity');
 			var shadowElem = $(elem).getShadowElement();
 			var addClass, removeClass, trigger, generaltrigger, validityCause;
-			
+			if(isWebkit && e.type == 'change' && !bugs.bustedValidity && stopChangeTypes[shadowElem.prop('type')] && shadowElem.is(':focus')){return;}
 			$(elem).trigger('refreshCustomValidityRules');
 			if(validity.valid){
 				if(!shadowElem.hasClass(validClass)){
@@ -1839,6 +1848,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 			var error = $.prop(this, 'error');
 			if(error && !noSwitch[error]){
 				switchOptions({target: this});
+				return false;
 			}
 		});
 	}
