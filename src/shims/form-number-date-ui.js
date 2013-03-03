@@ -1038,6 +1038,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			
 		var actions = {
 			changeInput: function(val, popover, data){
+				data.element.focus();
 				popover.hide();
 				data.setChange(val);
 			}
@@ -1119,7 +1120,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				popover.actionFn({
 					'data-action': $.attr(this, 'data-action'),
 					value: $(this).val()
-				})
+				});
 				return false;
 			};
 			var generateList = function(o, max, min){
@@ -1128,10 +1129,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				o.options = data.getOptions() || {};
 				$('div.ws-options', popover.contentElement).remove();
 				$.each(o.options, function(val, label){
-					options.push('<button value="'+ val +'" data-action="changeInput" tabindex="-1">'+ (label || data.formatValue(val)) +'</button>');
+					options.push('<li role="presentation"><button value="'+ val +'" data-action="changeInput" tabindex="-1"  role="option">'+ (label || data.formatValue(val)) +'</button></li>');
 				});
 				if(options.length){
-					popover.bodyElement.after('<div class="ws-options">'+ options.join('') +'</div>');
+					new webshims.ListBox($('<div class="ws-options"><ul role="listbox">'+ options.join('') +'</div>').insertAfter(popover.bodyElement)[0], popover, {noFocus: true});
 				}
 			};
 			var updateContent = function(){
@@ -1175,6 +1176,27 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				.on('click', 'button[data-action]', actionfn)
 				.on('change', 'select[data-action]', actionfn)
 			;
+			
+			popover.contentElement.on({
+				keydown: function(e){
+					if(e.keyCode == 9){
+						var tabbable = $('[tabindex="0"]:not(:disabled)', this);
+						var index = tabbable.index(e.target);
+						if(e.shiftKey && index <= 0){
+							tabbable.last().focus();
+							return false;
+						}
+						if(!e.shiftKey && index >= tabbable.length - 1){
+							tabbable.first().focus();
+							return false;
+						}
+					} else if(e.keyCode == 27){
+						data.element.focus();
+						popover.hide();
+						return false;
+					}
+				}
+			});
 			
 			$(data.options.orig).on('input', function(){
 				var currentView;

@@ -318,6 +318,7 @@
 				var addClass, removeClass, trigger, generaltrigger, validityCause;
 				
 				$(elem).trigger('refreshCustomValidityRules');
+				
 				if(validity.valid){
 					if(!shadowElem.hasClass(validClass)){
 						addClass = validClass;
@@ -344,6 +345,7 @@
 						trigger = 'changedinvalid';
 					}
 				}
+				
 				if(addClass){
 					shadowElem.addClass(addClass).removeClass(removeClass);
 					//jQuery 1.6.1 IE9 bug (doubble trigger bug)
@@ -356,7 +358,8 @@
 						$(elem).trigger(generaltrigger);
 					}, 0);
 				}
-				$.removeData(e.target, 'webshimsswitchvalidityclass');
+				
+				$.removeData(elem, 'webshimsswitchvalidityclass');
 			};
 			
 			if(timer){
