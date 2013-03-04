@@ -305,6 +305,14 @@
 		/* form-ui-invalid/form-ui-valid are deprecated. use user-error/user-success instead */
 		var invalidClass = 'user-error';
 		var validClass = 'user-success';
+		var stopChangeTypes = {
+			time: 1,
+			date: 1,
+			month: 1,
+			datetime: 1,
+			week: 1,
+			'datetime-local': 1
+		};
 		var switchValidityClass = function(e){
 			var elem, timer;
 			if(!e.target){return;}
@@ -316,6 +324,8 @@
 				var validity = $.prop(elem, 'validity');
 				var shadowElem = $(elem).getShadowElement();
 				var addClass, removeClass, trigger, generaltrigger, validityCause;
+				
+				if(isWebkit && e.type == 'change' && !bugs.bustedValidity && stopChangeTypes[shadowElem.prop('type')] && shadowElem.is(':focus')){return;}
 				
 				$(elem).trigger('refreshCustomValidityRules');
 				

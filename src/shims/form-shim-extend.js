@@ -1330,15 +1330,18 @@ try {
 				if(!data){return;}
 			}
 			$(elem).unbind('.placeholderremove');
-			if(type == 'focus' || (!type && $(elem).is(':focus'))){
+			
+			if(value === false){
+				value = $.prop(elem, 'value');
+			}
+			
+			if(!value && (type == 'focus' || (!type && $(elem).is(':focus')))){
 				if(elem.type == 'password' || isOver || $(elem).hasClass('placeholder-visible')){
 					hidePlaceholder(elem, data, '', true);
 				}
 				return;
 			}
-			if(value === false){
-				value = $.prop(elem, 'value');
-			}
+			
 			if(value){
 				hidePlaceholder(elem, data, value);
 				return;

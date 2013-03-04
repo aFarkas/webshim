@@ -561,6 +561,9 @@ html .ws-po-arrow .ws-po-arrowbox {
   font-size: 16px;
   line-height: 1.1em;
 }
+.input-picker :focus {
+  outline: 1px dotted #3399ff;
+}
 .input-picker .ws-po-box {
   position: relative;
   padding: 8px;
@@ -687,17 +690,12 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .day-list td button.this-value {
   border-color: #f93;
 }
-.input-picker .year-list li button.selected-value, .input-picker .year-list li button:focus,
+.input-picker .year-list li button.selected-value,
 .input-picker .year-list td button.selected-value,
-.input-picker .year-list td button:focus,
 .input-picker .month-list li button.selected-value,
-.input-picker .month-list li button:focus,
 .input-picker .month-list td button.selected-value,
-.input-picker .month-list td button:focus,
 .input-picker .day-list li button.selected-value,
-.input-picker .day-list li button:focus,
-.input-picker .day-list td button.selected-value,
-.input-picker .day-list td button:focus {
+.input-picker .day-list td button.selected-value {
   outline: 1px dotted #3399ff;
 }
 .input-picker .year-list li button.checked-value,

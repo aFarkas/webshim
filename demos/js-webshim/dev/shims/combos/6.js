@@ -1126,8 +1126,21 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var curCfg;
-	
-	
+	var stopPropagation = function(e){
+		e.stopImmediatePropagation(e);
+	};
+	var labelWidth = (function(){
+		var getId = function(){
+			return webshims.getID(this);
+		};
+		return function(element, labels){
+			$(element).attr({'aria-labelledby': labels.map(getId).get().join(' ')});
+			labels.on('click', function(e){
+				element.focus();
+				e.preventDefault();
+			});
+		};
+	})();
 	var addZero = function(val){
 		if(!val){return "";}
 		val = val+'';
@@ -1705,6 +1718,89 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 		var today = getDateArray(new Date());
 		
+		webshims.ListBox = function (element, popover, opts){
+			this.element = $('ul', element);
+			this.popover = popover;
+			this.opts = opts || {};
+			this.buttons = $('button:not(:disabled)', this.element);
+			this.activeButton = this.buttons.filter('.checked-value');
+			if(!this.activeButton[0]){
+				this.activeButton = this.buttons.filter('.this-value');
+			}
+			if(!this.activeButton[0]){
+				this.activeButton = this.buttons.eq(0);
+			}
+			this.ons(this);
+			this.setFocus(this.activeButton, opts.noFocus);
+		};
+		
+		webshims.ListBox.prototype = {
+			setFocus: function(element, _noFocus){
+				element = $(element || this.activeButton);
+				this.activeButton.removeClass('selected-value').attr({tabindex: '-1'});
+				this.activeButton = element.addClass('selected-value').attr({tabindex: '0'});
+				this.index = this.buttons.index(this.activeButton[0]);
+				clearTimeout(this.timer);
+				if(!_noFocus){
+					this.timer = setTimeout(function(){
+						element[0].focus();
+					}, this.popover.isVisible ? 9 : 70);
+				}
+			},
+			prev: function(){
+				var index = this.index - 1;
+				if(index < 0){
+					if(this.opts.prev){
+						this.popover.actionFn(this.opts.prev);
+					}
+				} else {
+					this.setFocus(this.buttons.eq(index));
+				}
+			},
+			next: function(){
+				var index = this.index + 1;
+				if(index >= this.buttons.length){
+					if(this.opts.next){
+						this.popover.actionFn(this.opts.next);
+					}
+				} else {
+					this.setFocus(this.buttons.eq(index));
+				}
+			},
+			ons: function(that){
+				this.element
+//					.on('mouseenter', 'button:not(:disabled)', function(e){
+//						that.setFocus(e.currentTarget);
+//					})
+					.on({
+						'keydown': function(e){
+							var handled;
+							if(e.keyCode == 36 || e.keyCode == 33){
+								that.setFocus(that.buttons.eq(0));
+								handled = true;
+							} else if(e.keyCode == 34 || e.keyCode == 35){
+								that.setFocus(that.buttons.eq(that.buttons.length - 1));
+								handled = true;
+							} else if(e.keyCode == 38 || e.keyCode == 37){
+								that.prev();
+								handled = true;
+							} else if(e.keyCode == 40 || e.keyCode == 39){
+								that.next();
+								handled = true;
+							}
+							if(handled){
+								return false;
+							}
+							//38 39 40 37
+							//up: 38 && 37
+							//down: 40 39
+							//first: 36 33
+							//last: 34 35
+						}
+					})
+				;
+			}
+		};
 		
 		picker.getWeek = function(date){
 			var onejan = new Date(date.getFullYear(),0,1);
@@ -1744,29 +1840,30 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					
 					
 					if(val == today[0]){
-						classArray.push('this-year');
+						classArray.push('this-value');
 					}
 					
 					if(currentValue[0] == val){
-						classArray.push('selected-value');
+						classArray.push('checked-value');
 					}
 					
 					classStr = classArray.length ? ' class="'+ (classArray.join(' ')) +'"' : '';
 					
 					
-					lis.push('<li class="ws-item-'+ i +'"><button type="button"'+ disabled + classStr +' data-action="setMonthList" value="'+val+'" tabindex="-1">'+val+'</button></li>');
+					lis.push('<li class="ws-item-'+ i +'" role="presentation"><button type="button"'+ disabled + classStr +' data-action="setMonthList" value="'+val+'" tabindex="-1" role="option">'+val+'</button></li>');
 				}
 				if(j == size - 1){
 					nextDisabled = picker.isInRange([val+1], max, min) ? {'data-action': 'setYearList','value': val+1} : false;
 				}
-				str += '<ul class="year-list">'+ (lis.join(''))+ '</ul></div>';
+				str += '<ul class="year-list" role="listbox">'+ (lis.join(''))+ '</ul></div>';
 			}
 			
 			return {
 				enabled: enabled,
 				main: str,
 				next: nextDisabled,
-				prev: prevDisabled
+				prev: prevDisabled,
+				type: 'ListBox'
 			};
 		};
 		
@@ -1823,26 +1920,27 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					}
 					
 					if(value == today[0] && today[1] == val){
-						classArray.push('this-month');
+						classArray.push('this-value');
 					}
 					
 					if(currentValue[0] == value && currentValue[1] == val){
-						classArray.push('selected-value');
+						classArray.push('checked-value');
 					}
 					
 					classStr = (classArray.length) ? ' class="'+ (classArray.join(' ')) +'"' : '';
 					
-					lis.push('<li class="ws-item-'+ i +'"><button type="button"'+ disabled + classStr +' data-action="'+ (data.type == 'month' ? 'changeInput' : 'setDayList' ) +'" value="'+value+'-'+val+'" tabindex="-1">'+name+'</button></li>');
+					lis.push('<li class="ws-item-'+ i +'" role="presentation"><button type="button"'+ disabled + classStr +' data-action="'+ (data.type == 'month' ? 'changeInput' : 'setDayList' ) +'" value="'+value+'-'+val+'" tabindex="-1" role="option">'+name+'</button></li>');
 				}
 				
-				str += '<ul>'+ (lis.join(''))+ '</ul></div>';
+				str += '<ul role="listbox">'+ (lis.join(''))+ '</ul></div>';
 			}
 			
 			return {
 				enabled: enabled,
 				main: str,
 				prev: prevDisabled,
-				next: nextDisabled
+				next: nextDisabled,
+				type: 'ListBox'
 			};
 		};
 		
@@ -1955,11 +2053,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					} 
 					
 					if(dateArray[0] == today[0] && today[1] == dateArray[1] && today[2] == dateArray[2]){
-						classArray.push('this-day');
+						classArray.push('this-value');
 					}
 					
 					if(currentValue[0] == dateArray[0] && dateArray[1] == currentValue[1] && dateArray[2] == currentValue[2]){
-						classArray.push('selected-value');
+						classArray.push('checked-value');
 					}
 					
 					if(classArray.length){
@@ -2065,6 +2163,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			
 		var actions = {
 			changeInput: function(val, popover, data){
+				data.element.focus();
 				popover.hide();
 				data.setChange(val);
 			}
@@ -2083,6 +2182,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			$.each({'setYearList' : ['Year', 'Month', 'Day'], 'setMonthList': ['Month', 'Day'], 'setDayList': ['Day']}, function(setName, names){
 				var getNames = names.map(retNames);
 				actions[setName] = function(val, popover, data, startAt){
+					val = ''+val;
 					var values = val.split('-');
 					
 					if(!startAt){
@@ -2128,6 +2228,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 										.prop({disabled: true})
 									;
 								}
+								if(webshims[content.type]){
+									new webshims[content.type](popover.bodyElement.children(), popover, content);
+								}
 								popover.element.trigger('pickerchange');
 								return false;
 							}
@@ -2139,15 +2242,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		picker.commonInit = function(data, popover){
 			var actionfn = function(e){
-				
-				var action = $(this).attr('data-action');
-				var value = $(this).val();
-				if(actions[action]){
-					actions[action](value, popover, data, 0);
-				} else {
-					webshims.warn('no action for '+ action);
-				}
-				
+				popover.actionFn({
+					'data-action': $.attr(this, 'data-action'),
+					value: $(this).val()
+				});
 				return false;
 			};
 			var generateList = function(o, max, min){
@@ -2156,10 +2254,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				o.options = data.getOptions() || {};
 				$('div.ws-options', popover.contentElement).remove();
 				$.each(o.options, function(val, label){
-					options.push('<button value="'+ val +'" data-action="changeInput" tabindex="-1">'+ (label || data.formatValue(val)) +'</button>');
+					options.push('<li role="presentation"><button value="'+ val +'" data-action="changeInput" tabindex="-1"  role="option">'+ (label || data.formatValue(val)) +'</button></li>');
 				});
 				if(options.length){
-					popover.bodyElement.after('<div class="ws-options">'+ options.join('') +'</div>');
+					new webshims.ListBox($('<div class="ws-options"><ul role="listbox">'+ options.join('') +'</div>').insertAfter(popover.bodyElement)[0], popover, {noFocus: true});
 				}
 			};
 			var updateContent = function(){
@@ -2184,9 +2282,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				popover.isDirty = false;
 			};
 			
+			popover.actionFn = function(obj){
+				if(actions[obj['data-action']]){
+					actions[obj['data-action']](obj.value, popover, data, 0);
+				} else {
+					webshims.warn('no action for '+ obj['data-action']);
+				}
+			};
 			
-			
-			popover.contentElement.html('<button class="ws-prev" tabindex="-1"><span></span></button> <button class="ws-next" tabindex="-1"><span></span></button><div class="ws-picker-body"></div><div class="ws-button-row"><button type="button" class="ws-current" data-action="changeInput" value="'+today[data.type]+'" data-text="current" tabindex="-1"></button> <button type="button" data-action="changeInput" value="" data-text="empty" class="ws-empty" tabindex="-1"></button></div>');
+			popover.contentElement.html('<button class="ws-prev" tabindex="0"><span></span></button> <button class="ws-next" tabindex="0"><span></span></button><div class="ws-picker-body"></div><div class="ws-button-row"><button type="button" class="ws-current" data-action="changeInput" value="'+today[data.type]+'" data-text="current" tabindex="0"></button> <button type="button" data-action="changeInput" value="" data-text="empty" class="ws-empty" tabindex="0"></button></div>');
 			popover.nextElement = $('button.ws-next', popover.contentElement);
 			popover.prevElement = $('button.ws-prev', popover.contentElement);
 			popover.bodyElement = $('div.ws-picker-body', popover.contentElement);
@@ -2197,6 +2301,27 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				.on('click', 'button[data-action]', actionfn)
 				.on('change', 'select[data-action]', actionfn)
 			;
+			
+			popover.contentElement.on({
+				keydown: function(e){
+					if(e.keyCode == 9){
+						var tabbable = $('[tabindex="0"]:not(:disabled)', this);
+						var index = tabbable.index(e.target);
+						if(e.shiftKey && index <= 0){
+							tabbable.last().focus();
+							return false;
+						}
+						if(!e.shiftKey && index >= tabbable.length - 1){
+							tabbable.first().focus();
+							return false;
+						}
+					} else if(e.keyCode == 27){
+						data.element.focus();
+						popover.hide();
+						return false;
+					}
+				}
+			});
 			
 			$(data.options.orig).on('input', function(){
 				var currentView;
@@ -2228,7 +2353,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		picker.month = function(data){
 			var popover = webshims.objectCreate(webshims.wsPopover, {}, {prepareFor: data.element});
-			var opener = $('<span class="popover-opener" />').appendTo(data.buttonWrapper);
+			var opener = $('<button type="button" class="popover-opener" />').appendTo(data.buttonWrapper);
 			var options = data.options;
 			var init = false;
 			
@@ -2249,9 +2374,21 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 			};
 			
-			popover.element.addClass(data.type+'-popover input-picker');
-			
-			opener.on('mousedown', show);
+			popover.element
+				.addClass(data.type+'-popover input-picker')
+				.attr({role: 'application'})
+				
+			;
+			labelWidth(popover.element.children('div.ws-po-outerbox').attr({role: 'group'}), options.labels);
+			labelWidth(opener, options.labels);
+			opener
+				.attr({
+					'aria-haspopup': 'true',
+					'tabindex': options.labels.length ? 0 : '-1'
+				})
+				.on({mousedown: stopPropagation})
+				.on('click', show)
+			;
 			
 			data.element.on({
 				focus: function(){
@@ -2361,14 +2498,18 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		var implementType = function(){
 			var type = $.prop(this, 'type');
 			
-			var i, opts, data, optsName, calcWidth;
+			var i, opts, data, optsName, calcWidth, labels;
 			if(inputTypes[type]){
 				data = {};
 				optsName = type;
 				//todo: do we need deep extend?
+				
+				labels = $(this).jProp('labels');
+				
 				opts = $.extend({}, options[type], $($.prop(this, 'form')).data(type) || {}, $(this).data(type) || {}, {
 					orig: this,
 					type: type,
+					labels: labels,
 					options: {},
 					input: function(val){
 						opts._change(val, 'input');
@@ -2402,6 +2543,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				webshims.addShadowDom(this, data.shim.element, {
 					data: data.shim || {}
 				});
+				
+				labelWidth($(this).getShadowFocusElement(), labels, true);
 				
 				$(this).on('change', function(e){
 					if(!stopCircular && e.originalEvent){

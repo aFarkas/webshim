@@ -1289,6 +1289,14 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		/* form-ui-invalid/form-ui-valid are deprecated. use user-error/user-success instead */
 		var invalidClass = 'user-error';
 		var validClass = 'user-success';
+		var stopChangeTypes = {
+			time: 1,
+			date: 1,
+			month: 1,
+			datetime: 1,
+			week: 1,
+			'datetime-local': 1
+		};
 		var switchValidityClass = function(e){
 			var elem, timer;
 			if(!e.target){return;}
@@ -1301,7 +1309,10 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				var shadowElem = $(elem).getShadowElement();
 				var addClass, removeClass, trigger, generaltrigger, validityCause;
 				
+				if(isWebkit && e.type == 'change' && !bugs.bustedValidity && stopChangeTypes[shadowElem.prop('type')] && shadowElem.is(':focus')){return;}
+				
 				$(elem).trigger('refreshCustomValidityRules');
+				
 				if(validity.valid){
 					if(!shadowElem.hasClass(validClass)){
 						addClass = validClass;
@@ -1328,6 +1339,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						trigger = 'changedinvalid';
 					}
 				}
+				
 				if(addClass){
 					shadowElem.addClass(addClass).removeClass(removeClass);
 					//jQuery 1.6.1 IE9 bug (doubble trigger bug)
@@ -1340,7 +1352,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						$(elem).trigger(generaltrigger);
 					}, 0);
 				}
-				$.removeData(e.target, 'webshimsswitchvalidityclass');
+				
+				$.removeData(elem, 'webshimsswitchvalidityclass');
 			};
 			
 			if(timer){

@@ -1795,6 +1795,14 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		/* form-ui-invalid/form-ui-valid are deprecated. use user-error/user-success instead */
 		var invalidClass = 'user-error';
 		var validClass = 'user-success';
+		var stopChangeTypes = {
+			time: 1,
+			date: 1,
+			month: 1,
+			datetime: 1,
+			week: 1,
+			'datetime-local': 1
+		};
 		var switchValidityClass = function(e){
 			var elem, timer;
 			if(!e.target){return;}
@@ -1807,7 +1815,10 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				var shadowElem = $(elem).getShadowElement();
 				var addClass, removeClass, trigger, generaltrigger, validityCause;
 				
+				if(isWebkit && e.type == 'change' && !bugs.bustedValidity && stopChangeTypes[shadowElem.prop('type')] && shadowElem.is(':focus')){return;}
+				
 				$(elem).trigger('refreshCustomValidityRules');
+				
 				if(validity.valid){
 					if(!shadowElem.hasClass(validClass)){
 						addClass = validClass;
@@ -1834,6 +1845,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						trigger = 'changedinvalid';
 					}
 				}
+				
 				if(addClass){
 					shadowElem.addClass(addClass).removeClass(removeClass);
 					//jQuery 1.6.1 IE9 bug (doubble trigger bug)
@@ -1846,7 +1858,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 						$(elem).trigger(generaltrigger);
 					}, 0);
 				}
-				$.removeData(e.target, 'webshimsswitchvalidityclass');
+				
+				$.removeData(elem, 'webshimsswitchvalidityclass');
 			};
 			
 			if(timer){
@@ -2889,7 +2902,9 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 								if(!options.preferFlash && webshims.mediaelement.createSWF && !media.is('.nonnative-api-active')){
 									options.preferFlash = true;
 									document.removeEventListener('error', switchOptions, true);
-									$('audio, video').mediaLoad();
+									$('audio, video').each(function(){
+										webshims.mediaelement.selectSource(this);
+									});
 									webshims.info("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error'));
 								}
 							}, 9);
@@ -2905,6 +2920,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 			var error = $.prop(this, 'error');
 			if(error && !noSwitch[error]){
 				switchOptions({target: this});
+				return false;
 			}
 		});
 	}
@@ -3296,6 +3312,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		data = data || webshims.data(elem, 'mediaelement');
 		stepSources(elem, data, options.preferFlash || undefined, _srces);
 	};
+	mediaelement.selectSource = selectSource;
 	
 	
 	$(document).on('ended', function(e){

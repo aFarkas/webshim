@@ -57,7 +57,9 @@
 								if(!options.preferFlash && webshims.mediaelement.createSWF && !media.is('.nonnative-api-active')){
 									options.preferFlash = true;
 									document.removeEventListener('error', switchOptions, true);
-									$('audio, video').mediaLoad();
+									$('audio, video').each(function(){
+										webshims.mediaelement.selectSource(this);
+									});
 									webshims.info("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error'));
 								}
 							}, 9);
@@ -73,6 +75,7 @@
 			var error = $.prop(this, 'error');
 			if(error && !noSwitch[error]){
 				switchOptions({target: this});
+				return false;
 			}
 		});
 	}
@@ -464,6 +467,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		data = data || webshims.data(elem, 'mediaelement');
 		stepSources(elem, data, options.preferFlash || undefined, _srces);
 	};
+	mediaelement.selectSource = selectSource;
 	
 	
 	$(document).on('ended', function(e){
