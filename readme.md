@@ -27,7 +27,7 @@ Implemented Features:
 How To Use
 ------------------
 
-* Simply [download Webshims Lib](https://github.com/aFarkas/webshim/downloads) and put the js-webshim-folder in your project
+* Simply [download Webshims Lib](http://corrupt-system.de/webshims-stable.zip) and put the js-webshim-folder in your project
 * Include the JavaScript:
 
 ---------------
