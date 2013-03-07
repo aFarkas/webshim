@@ -1,6 +1,10 @@
 //DOM-Extension helper
 jQuery.webshims.register('dom-extend', function($, webshims, window, document, undefined){
 	"use strict";
+	
+	if($('<form />').attr('novalidate') === ""){
+		webshims.warn("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version");
+	}
 	//shortcus
 	var modules = webshims.modules;
 	var listReg = /\s*,\s*/;

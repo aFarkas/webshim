@@ -80,6 +80,13 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
 
+Release 1.9.7
+----------
+
+- fixed placeholder with datalist combination
+- fixed Chrome change bug with input type widgets
+- improved flashfallback for mediaelements 
+
 Release 1.9.6
 ----------
 
