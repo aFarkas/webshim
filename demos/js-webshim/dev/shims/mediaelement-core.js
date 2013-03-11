@@ -110,6 +110,7 @@
 					} else {
 						webshims.info("track support was overwritten. due to bad browser support");
 					}
+					return false;
 				}
 			};
 			var detectTrackError = function(){

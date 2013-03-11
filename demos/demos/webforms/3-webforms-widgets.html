@@ -26,11 +26,6 @@
 			width: 2.8em;
 		}
 		
-		.month-popover .ws-po-box {
-			min-width: 300px;
-			min-height: 300px;
-		}
-		
 		.input-widget {
 			margin: 20px auto;
 			max-width: 400px;
@@ -115,8 +110,9 @@
 	<script>
 			
 		$(function(){
-			
+			var id = 0;
 			$('form.input-widget').each(function(){
+				id++;
 				var form = $(this);
 				var type = form.data('type');
 				var createWidget = function(){
@@ -131,10 +127,16 @@
 					$('fieldset[data-method]', form).each(function(){
 						var obj = {};
 						$($.prop(this, 'elements')).filter('[name]').each(function(){
-							obj[$.prop(this, 'name')] = ($.prop(this, 'type') == 'checkbox') ?
-								$.prop(this, 'checked') :
-								$.prop(this, 'value')
-							;
+							var val;
+							if($.prop(this, 'type') == 'checkbox'){
+								val = $.prop(this, 'checked');
+							} else {
+								val = $.prop(this, 'value');
+								try {
+									val = JSON.parse(val);
+								} catch(e){}
+							}
+							obj[$.prop(this, 'name')] = val;
 						});
 						
 						input[$(this).data('method')]($(this).data('name') || obj, obj);
@@ -142,8 +144,12 @@
 					$('fieldset[data-style] input[name]', form).each(function(){
 						form[$.prop(this, 'checked') ? 'addClass' : 'removeClass']($.prop(this, 'name'));
 					});
-					input.prependPolyfillTo(form);
-					$('<span>'+ type +'</span>').prependTo(form);
+					$('<label for="'+ type+'-'+id +'">'+ type +' label</label>')
+						.prependTo(form)
+						.afterPolyfill(
+							input.prop('id', type+'-'+id)
+						)
+					;
 				};
 				$('select', this).prop('selectedIndex', 0);
 				$('> fieldset', form).on('change', createWidget);
@@ -292,8 +298,16 @@ $('form').bind('firstinvalid', function(e){
 						</select>
 					</label>
 					<label>
-						startAt: 
-						<select name="startAt">
+						startView: 
+						<select name="startView">
+							<option value="0">0 (= decade)</option>
+							<option value="1">1 (= year)</option>
+							<option value="2">2 (= month)</option>
+						</select>
+					</label>
+					<label>
+						minView: 
+						<select name="minView">
 							<option value="0">0 (= decade)</option>
 							<option value="1">1 (= year)</option>
 							<option value="2">2 (= month)</option>
@@ -323,10 +337,17 @@ $('form').bind('firstinvalid', function(e){
 							<option>monthNamesShort</option>
 						</select>
 					</label>
-					
 					<label>
 						openOnFocus: 
 						<input type="checkbox" name="openOnFocus" />
+					</label>
+					
+					<label>
+						disableDays: 
+						<select name="disableDays">
+							<option value="">empty/false</option>
+							<option value="[6, 0]">[6, 0] (= Saturday and Sunday)</option>
+						</select>
 					</label>
 				</fieldset>
 				<fieldset data-style="">
@@ -347,6 +368,13 @@ $('form').bind('firstinvalid', function(e){
 			</form>
 			
 			<form class="input-widget" data-type="month">
+				<datalist id="month-list">
+					<select>
+						<option value="2009-10" />
+						<option value="2012-11" />
+						<option value="2013-11" label="labeled Option (2012-11)" />
+					</select>
+				</datalist>
 				<fieldset data-method="prop">
 					<legend>$.prop</legend>
 					
@@ -364,10 +392,24 @@ $('form').bind('firstinvalid', function(e){
 							<option>2014-12</option>
 						</select>
 					</label>
+					<label>
+						disabled: 
+						<input type="checkbox" name="disabled" />	
+					</label>
+					<label>
+						readonly: 
+						<input type="checkbox" name="readonly" />	
+					</label>
 				</fieldset>
 				<fieldset data-method="attr">
 					<legend>$.attr</legend>
-					
+					<label>
+						list: 
+						<select name="list">
+							<option></option>
+							<option value="month-list">month-list (predefined datalist)</option>
+						</select>
+					</label>
 					<label>
 						data-placeholder: 
 						<select name="data-placeholder">
@@ -386,8 +428,15 @@ $('form').bind('firstinvalid', function(e){
 						</select>
 					</label>
 					<label>
-						startAt: 
-						<select name="startAt">
+						startView: 
+						<select name="startView">
+							<option value="0">0 (= decade)</option>
+							<option value="1">1 (= year)</option>
+						</select>
+					</label>
+					<label>
+						minView: 
+						<select name="minView">
 							<option value="0">0 (= decade)</option>
 							<option value="1">1 (= year)</option>
 						</select>
@@ -436,7 +485,67 @@ $('form').bind('firstinvalid', function(e){
 					</label>
 				</fieldset>
 			</form>
-			
+			<form class="input-widget" data-type="range">
+				<datalist id="range-list">
+					<select>
+						<option value="0" />
+						<option value="10" />
+						<option value="20" />
+						<option value="30" />
+						<option value="50" label="labeled Option (50)" />
+					</select>
+				</datalist>
+				<fieldset data-method="prop">
+					<legend>$.prop</legend>
+					
+					<label>
+						min: 
+						<select name="min">
+							<option></option>
+							<option>-100</option>
+						</select>
+					</label>
+					<label>
+						max: 
+						<select name="max">
+							<option></option>
+							<option>50</option>
+						</select>
+					</label>
+					<label>
+						step: 
+						<select name="step">
+							<option></option>
+							<option value="5">5</option>
+							<option value="10">10</option>
+						</select>
+					</label>
+					<label>
+						disabled: 
+						<input type="checkbox" name="disabled" />	
+					</label>
+					<label>
+						readonly: 
+						<input type="checkbox" name="readonly" />	
+					</label>
+				</fieldset>
+				<fieldset data-method="attr">
+					<legend>$.attr</legend>
+					<label>
+						list: 
+						<select name="list">
+							<option></option>
+							<option value="range-list">range-list (predefined datalist)</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="data" data-name="range">
+					<label>
+						animate: 
+						<input type="checkbox" name="animate" />
+					</label>
+				</fieldset>
+			</form>
 			<form class="input-widget" data-type="time">
 				<fieldset data-method="prop">
 					<legend>$.prop</legend>

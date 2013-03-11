@@ -1100,12 +1100,10 @@
 	needModernizr('audio video texttrackapi', function(){
 		webshims.mediaelement = {};
 		var swfTest = function(){
-			if(!Modernizr.audio || !Modernizr.video){
+			if(!Modernizr.audio || !Modernizr.video || webshims.mediaelement.loadSwf){
 				return false;
 			}
-			if(webshims.mediaelement.loadSwf){
-				return false;
-			}
+			
 			var options = this.options;
 			if(options.preferFlash && !modules.swfmini.test()){
 				options.preferFlash = false;

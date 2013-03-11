@@ -30,7 +30,7 @@
 			}
 			this.value = this._value;
 			this.value(this.options.value);
-			this.list(this.options.options);
+			this.initDataList();
 			this.element.data('rangeUi', this);
 			this.addBindings();
 			this._init = true;
@@ -77,8 +77,31 @@
 			}
 			this.element.attr({
 				'aria-valuenow': this.options.value,
-				'aria-valuetext': this.options.options[this.options.value] || this.options.value
+				'aria-valuetext': this.options.textValue ? this.options.textValue(this.options.value) : this.options.options[this.options.value] || this.options.value
 			});
+		},
+		initDataList: function(){
+			if(this.orig){
+				var listTimer;
+				var that = this;
+				var updateList = function(){
+					$(that.orig)
+						.jProp('list')
+						.off('updateDatalist', updateList)
+						.on('updateDatalist', updateList)
+					;
+					clearTimeout(listTimer);
+					listTimer = setTimeout(function(){
+						if(that.list){
+							that.list();
+						}
+					}, 9);
+					
+				};
+				
+				$(this.orig).on('listdatalistchange', updateList);
+				this.list();
+			}
 		},
 		list: function(opts){
 			var o = this.options;
@@ -86,11 +109,14 @@
 			var max = o.max;
 			var trail = this.trail;
 			var that = this;
-			o.options = opts || {};
 			
 			this.element.attr({'aria-valuetext': o.options[o.value] || o.value});
 			$('.ws-range-ticks', trail).remove();
 			
+			
+			$(this.orig).jProp('list').find('option').each(function(){
+				o.options[$.prop(this, 'value')] = $.prop(this, 'label');
+			});
 			
 			$.each(o.options, function(val, label){
 				if(!isNumber(val) || val < min || val > max){return;}
@@ -176,7 +202,7 @@
 				val = this.options[this.dirs.max];
 			} else {
 				if(this.vertical){
-					pos = Math.abs(pos - 100)
+					pos = Math.abs(pos - 100);
 				}
 				val = ((this.options.max - this.options.min) * (pos / 100)) + this.options.min;
 				step = this.options.step;
@@ -227,12 +253,9 @@
 			})();
 			
 			var setValueFromPos = function(e, animate){
-				if(this.vertical){
-					left = Math.abs(left - 100);
-				}
+				
 				var val = that.getStepedValueFromPos((e[that.dirs.mouse] - leftOffset) * widgetUnits);
 				if(val != o.value){
-					
 					that.value(val, false, animate);
 					eventTimer.call('input', val);
 				}
@@ -287,7 +310,7 @@
 					eventTimer.call('change', o.value);
 				},
 				
-				keypress: function(e){
+				keydown: function(e){
 					var step = true;
 					var code = e.keyCode;
 					if(!o.readonly && !o.disabled){

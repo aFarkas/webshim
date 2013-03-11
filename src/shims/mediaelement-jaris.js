@@ -469,7 +469,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		}
 		
 		if($.attr(elem, 'height') || $.attr(elem, 'width')){
-			webshims.info("width or height content attributes used. Webshims only uses CSS to detect size of a video/audio");
+			webshims.warn("width or height content attributes used. Webshims only uses CSS (computed styles or inline styles) to detect size of a video/audio");
 		}
 		
 		var isRtmp = canPlaySrc.type == 'audio/rtmp' || canPlaySrc.type == 'video/rtmp';

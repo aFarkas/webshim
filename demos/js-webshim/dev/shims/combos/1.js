@@ -947,13 +947,16 @@ var swfmini = function() {
 				var stopBlur = function(){
 					that.stopBlur = false;
 				};
+				this.preventBlur = function(e){
+					that.stopBlur = true;
+					clearTimeout(that.timers.stopBlur);
+					that.timers.stopBlur = setTimeout(stopBlur, 9);
+				};
 				this.element.on({
-					'mousedown': function(e){
-						that.stopBlur = true;
-						that.timers.stopBlur = setTimeout(stopBlur, 9);
-					}
+					'mousedown': this.preventBlur
 				});
 			},
+			
 			isInElement: function(container, contained){
 				return container == contained || $.contains(container, contained);
 			},
@@ -980,7 +983,7 @@ var swfmini = function() {
 					}, 9);
 				}, 9);
 				$(document).on('focusin'+this.eventns+' mousedown'+this.eventns, function(e){
-					if(that.options.hideOnBlur && !that.stopBlur && !that.isInElement(that.lastElement[0] || document.body, e.target) && !that.isInElement(that.element[0], e.target)){
+					if(that.options.hideOnBlur && !that.stopBlur && !that.isInElement(that.lastElement[0] || document.body, e.target) && !that.isInElement(element[0] || document.body, e.target) && !that.isInElement(that.element[0], e.target)){
 						that.hide();
 					}
 				});
@@ -1019,7 +1022,8 @@ var swfmini = function() {
 					};
 					
 					that.timers.bindBlur = setTimeout(function(){
-						that.lastElement.on('focusout'+that.eventns + ' blur'+that.eventns, onBlur);
+						that.lastElement.off(that.eventns).on('focusout'+that.eventns + ' blur'+that.eventns, onBlur);
+						that.lastElement.getNativeElement().off(that.eventns);
 					}, 10);
 					
 					
@@ -1328,6 +1332,7 @@ var swfmini = function() {
 					} else {
 						webshims.info("track support was overwritten. due to bad browser support");
 					}
+					return false;
 				}
 			};
 			var detectTrackError = function(){

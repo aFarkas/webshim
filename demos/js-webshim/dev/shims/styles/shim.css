@@ -1,13 +1,7 @@
-.input-picker .ws-button-row, .input-picker .year-list,
-.input-picker .month-list,
-.input-picker .day-list {
+.input-picker .ws-button-row, .input-picker .picker-list {
   zoom: 1;
 }
-.input-picker .ws-button-row:before, .input-picker .year-list:before,
-.input-picker .month-list:before,
-.input-picker .day-list:before, .input-picker .ws-button-row:after, .input-picker .year-list:after,
-.input-picker .month-list:after,
-.input-picker .day-list:after {
+.input-picker .ws-button-row:before, .input-picker .picker-list:before, .input-picker .ws-button-row:after, .input-picker .picker-list:after {
   display: table;
   clear: both;
   content: ' ';
@@ -561,6 +555,7 @@ html .ws-po-arrow .ws-po-arrowbox {
   font-size: 16px;
   line-height: 1.1em;
 }
+.input-picker .ws-focus,
 .input-picker :focus {
   outline: 1px dotted #3399ff;
 }
@@ -646,26 +641,18 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .ws-picker-body li {
   display: block;
 }
-.input-picker .year-list ul,
-.input-picker .month-list ul,
-.input-picker .day-list ul {
+.input-picker .picker-list ul {
   margin: 0;
   padding: 0;
 }
-.input-picker .year-list li,
-.input-picker .month-list li,
-.input-picker .day-list li {
+.input-picker .picker-list li {
   float: left;
   margin: 0;
   padding: 0;
   border-top: 1px solid #dddddd;
 }
-.input-picker .year-list li button,
-.input-picker .year-list td button,
-.input-picker .month-list li button,
-.input-picker .month-list td button,
-.input-picker .day-list li button,
-.input-picker .day-list td button {
+.input-picker .picker-list li button,
+.input-picker .picker-list td button {
   display: block;
   padding: 8px 0;
   width: 100%;
@@ -673,60 +660,37 @@ html .ws-po-arrow .ws-po-arrowbox {
   border-radius: 3px;
   transition: all 400ms;
 }
-.input-picker .year-list li button:hover,
-.input-picker .year-list td button:hover,
-.input-picker .month-list li button:hover,
-.input-picker .month-list td button:hover,
-.input-picker .day-list li button:hover,
-.input-picker .day-list td button:hover {
+.input-picker .picker-list li button:hover,
+.input-picker .picker-list td button:hover {
   color: #fff;
   background: #39f;
 }
-.input-picker .year-list li button.this-value,
-.input-picker .year-list td button.this-value,
-.input-picker .month-list li button.this-value,
-.input-picker .month-list td button.this-value,
-.input-picker .day-list li button.this-value,
-.input-picker .day-list td button.this-value {
+.input-picker .picker-list li button.this-value,
+.input-picker .picker-list td button.this-value {
   border-color: #f93;
 }
-.input-picker .year-list li button.selected-value,
-.input-picker .year-list td button.selected-value,
-.input-picker .month-list li button.selected-value,
-.input-picker .month-list td button.selected-value,
-.input-picker .day-list li button.selected-value,
-.input-picker .day-list td button.selected-value {
-  outline: 1px dotted #3399ff;
-}
-.input-picker .year-list li button.checked-value,
-.input-picker .year-list td button.checked-value,
-.input-picker .month-list li button.checked-value,
-.input-picker .month-list td button.checked-value,
-.input-picker .day-list li button.checked-value,
-.input-picker .day-list td button.checked-value {
+.input-picker .picker-list li button.checked-value,
+.input-picker .picker-list td button.checked-value {
   border-color: #39f;
 }
-.input-picker .month-list li {
-  width: 50%;
-}
-.input-picker .year-list li {
+.input-picker .picker-list li {
   width: 33.33%;
 }
-.input-picker .day-list table {
+.input-picker .picker-list table {
   width: 100%;
   border: 0 none;
   border-collapse: collapse;
 }
-.input-picker .day-list th {
+.input-picker .picker-list th {
   font-size: 12px;
   line-height: 1.1em;
   padding: 3px 0 2px;
   text-transform: uppercase;
 }
-.input-picker .day-list th, .input-picker .day-list td {
+.input-picker .picker-list th, .input-picker .picker-list td {
   width: 14.2856%;
 }
-.input-picker .day-list tr {
+.input-picker .picker-list tr {
   border-top: 1px solid #dddddd;
 }
 .input-picker .ws-options {

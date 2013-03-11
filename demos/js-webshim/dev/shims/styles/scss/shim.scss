@@ -618,9 +618,11 @@ $button-bgcolor: #f5f5f5;
 		line-height: 1.1em;
 	}
 	
+	.ws-focus,
 	:focus {
 		outline: 1px dotted #39f;
 	}
+	
 
 	.ws-po-box {
 		position: relative;
@@ -728,9 +730,7 @@ $button-bgcolor: #f5f5f5;
 		}
 	}
 
-	.year-list,
-	.month-list,
-	.day-list {
+	.picker-list {
 		@extend %clearfix;
 
 		ul {
@@ -765,27 +765,19 @@ $button-bgcolor: #f5f5f5;
 				border-color: #f93;
 			}
 			
-			&.selected-value {
-				outline: 1px dotted #39f;
-			}
 			
 			&.checked-value {
 				border-color: #39f;
 			}
 		}
 	}
-	.month-list {
-		li {
-			width: 50%;
-		}
-	}
-	.year-list {
+	
+	.picker-list {
 		li {
 			width: 33.33%;
 		}
-	}
-	.day-list {
-
+		
+		
 		table {
 			width: 100%;
 			border: 0 none;
@@ -807,6 +799,7 @@ $button-bgcolor: #f5f5f5;
 			border-top: $border-light;
 		}
 	}
+
 
 	.ws-options {
 		margin: 10px 0 0;

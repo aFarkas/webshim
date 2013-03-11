@@ -507,6 +507,11 @@ var swfmini = function() {
 //DOM-Extension helper
 jQuery.webshims.register('dom-extend', function($, webshims, window, document, undefined){
 	"use strict";
+	
+	if($('<form />').attr('novalidate') === ""){
+		webshims.warn("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
+	}
+
 	//shortcus
 	var modules = webshims.modules;
 	var listReg = /\s*,\s*/;
@@ -522,6 +527,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	var singleVal = function(elem, name, val, pass, _argless){
 		return (_argless) ? oldVal.call($(elem)) : oldVal.call($(elem), val);
 	};
+	
+
 	$.fn.val = function(val){
 		var elem = this[0];
 		if(arguments.length && val == null){
@@ -1931,13 +1938,16 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				var stopBlur = function(){
 					that.stopBlur = false;
 				};
+				this.preventBlur = function(e){
+					that.stopBlur = true;
+					clearTimeout(that.timers.stopBlur);
+					that.timers.stopBlur = setTimeout(stopBlur, 9);
+				};
 				this.element.on({
-					'mousedown': function(e){
-						that.stopBlur = true;
-						that.timers.stopBlur = setTimeout(stopBlur, 9);
-					}
+					'mousedown': this.preventBlur
 				});
 			},
+			
 			isInElement: function(container, contained){
 				return container == contained || $.contains(container, contained);
 			},
@@ -1964,7 +1974,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					}, 9);
 				}, 9);
 				$(document).on('focusin'+this.eventns+' mousedown'+this.eventns, function(e){
-					if(that.options.hideOnBlur && !that.stopBlur && !that.isInElement(that.lastElement[0] || document.body, e.target) && !that.isInElement(that.element[0], e.target)){
+					if(that.options.hideOnBlur && !that.stopBlur && !that.isInElement(that.lastElement[0] || document.body, e.target) && !that.isInElement(element[0] || document.body, e.target) && !that.isInElement(that.element[0], e.target)){
 						that.hide();
 					}
 				});
@@ -2003,7 +2013,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					};
 					
 					that.timers.bindBlur = setTimeout(function(){
-						that.lastElement.on('focusout'+that.eventns + ' blur'+that.eventns, onBlur);
+						that.lastElement.off(that.eventns).on('focusout'+that.eventns + ' blur'+that.eventns, onBlur);
+						that.lastElement.getNativeElement().off(that.eventns);
 					}, 10);
 					
 					
@@ -2955,6 +2966,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					} else {
 						webshims.info("track support was overwritten. due to bad browser support");
 					}
+					return false;
 				}
 			};
 			var detectTrackError = function(){
