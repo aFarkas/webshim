@@ -557,24 +557,15 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 			hideList: function(){
 				if(!this.popover.isVisible){return false;}
 				var that = this;
-				var triggerChange = function(e){
-					if(that.changedValue){
-						$(that.input).trigger('change');
-					}
-					that.changedValue = false;
-				};
+				
 				
 				this.popover.hide();
 				that.shadowList.removeClass('datalist-visible list-item-active');
 				that.index = -1;
 				if(that.changedValue){
 					that.triggeredByDatalist = true;
-					webshims.triggerInlineForm && webshims.triggerInlineForm(that.input, 'input');
-					if($(that.input).is(':focus')){
-						$(that.input).one('blur', triggerChange);
-					} else {
-						triggerChange();
-					}
+					$(that.input).trigger('input').trigger('change');
+					that.changedValue = false;
 					that.triggeredByDatalist = false;
 				}
 				

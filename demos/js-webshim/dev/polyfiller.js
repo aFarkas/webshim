@@ -1062,7 +1062,13 @@
 			},
 			d: ['forms', DOMSUPPORT, 'form-number-date-api', 'range-ui'],
 			options: {
-				calculateWidth: true
+				calculateWidth: true,
+				date: {
+					startView: 2
+				},
+				month: {
+					startView: 1
+				}
 	//			,replaceUI: false
 			},
 			c: [6, 5]

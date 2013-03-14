@@ -618,7 +618,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 		
 		var _initialFocus = function(){
-			var checkedButton = this.buttons.filter('.checked-value');
 			
 			if((!this.activeButton || !this.activeButton[0]) && this.buttons[this.popover.navedInitFocus]){
 				this.activeButton = this.buttons[this.popover.navedInitFocus]();
@@ -627,7 +626,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			}
 			
 			if(!this.activeButton || !this.activeButton[0]){
-				this.activeButton = checkedButton;
+				this.activeButton = this.buttons.filter('.checked-value');
 			}
 			
 			if(!this.activeButton[0]){
@@ -684,27 +683,24 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					.on({
 						'keydown': function(e){
 							var handled;
-							if(e.keyCode == 36 || e.keyCode == 33){
+							var key = e.keyCode;
+							if(e.ctrlKey){return;}
+							if(key == 36 || key == 33){
 								that.setFocus(that.buttons.eq(0));
 								handled = true;
-							} else if(e.keyCode == 34 || e.keyCode == 35){
+							} else if(key == 34 || key == 35){
 								that.setFocus(that.buttons.eq(that.buttons.length - 1));
 								handled = true;
-							} else if(e.keyCode == 38 || e.keyCode == 37){
+							} else if(key == 38 || key == 37){
 								that.prev();
 								handled = true;
-							} else if(e.keyCode == 40 || e.keyCode == 39){
+							} else if(key == 40 || key == 39){
 								that.next();
 								handled = true;
 							}
 							if(handled){
 								return false;
 							}
-							//38 39 40 37
-							//up: 38 && 37
-							//down: 40 39
-							//first: 36 33
-							//last: 34 35
 						}
 					})
 				;
@@ -731,13 +727,21 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			_initialFocus: _initialFocus,
 			ons: function(that){
 				this.element
-//					.on('mouseenter', 'button:not(:disabled)', function(e){
-//						that.setFocus(e.currentTarget);
-//					})
 					.on({
 						'keydown': function(e){
 							var handled;
-							if(e.keyCode == 36 || e.keyCode == 33){
+							var key = e.keyCode;
+							console.log(e)
+							console.log(that)
+							if(e.shiftKey){return;}
+							if(e.ctrlKey){
+								if(key == 34){
+									console.log(that)
+									//page down
+								} else if(key == 33){
+									//page up
+								}
+							} else if(e.keyCode == 36 || e.keyCode == 33){
 								that.setFocus(that.buttons.eq(0));
 								handled = true;
 							} else if(e.keyCode == 34 || e.keyCode == 35){
@@ -759,11 +763,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 							if(handled){
 								return false;
 							}
-							//38 39 40 37
-							//up: 38 && 37
-							//down: 40 39
-							//first: 36 33
-							//last: 34 35
 						}
 					})
 				;
@@ -772,21 +771,25 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		
 		$.each({
-			up: {traverse: 'prevAll', get: 'last', action: 'prev'}, 
+			up: {traverse: 'prevAll', get: 'last', action: 'prev', reverse: true}, 
 			down: {traverse: 'nextAll', get: 'first', action: 'next'}
 		}, function(name, val){
 			webshims.Grid.prototype[name] = function(){
 				var cellIndex = this.activeButton.closest('td').prop('cellIndex');
-				var sel = 'td:nth-child('+(cellIndex + 1)+') button:not(:disabled,.othermonth):'+val.get
-				var button = this.activeButton.closest('tr')[val.traverse]().find(sel);
+				var sel = 'td:nth-child('+(cellIndex + 1)+') button:not(:disabled,.othermonth)';
+				var button = this.activeButton.closest('tr')[val.traverse]();
 				
+				if(val.reverse){
+					button = $(button.get().reverse());
+				}
+				button = button.find(sel)[val.get]();
 				if(cellIndex == null){
 					webshims.warn("cellIndex not implemented. abort keynav");
 					return;
 				}
 				if(!button[0]){
 					if(this.opts[val.action]){
-						this.popover.navedInitFocus = sel;
+						this.popover.navedInitFocus = sel+':'+val.get;
 						this.popover.actionFn(this.opts[val.action]);
 						this.popover.navedInitFocus = false;
 					}
@@ -797,14 +800,22 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		});
 		
 		$.each({
-			prev: {traverse: 'prevAll',get: 'last'}, 
+			prev: {traverse: 'prevAll',get: 'last', reverse: true}, 
 			next: {traverse: 'nextAll', get: 'first'}
 		}, function(name, val){
 			webshims.Grid.prototype[name] = function(){
-				var sel = 'button:not(:disabled,.othermonth):'+val.get;
-				var button = this.activeButton.closest('td')[val.traverse]('td').find(sel);
+				var sel = 'button:not(:disabled,.othermonth)';
+				var button = this.activeButton.closest('td')[val.traverse]('td');
+				if(val.reverse){
+					button = $(button.get().reverse());
+				}
+				button = button.find(sel)[val.get]();
 				if(!button[0]){
-					button = this.activeButton.closest('tr')[val.traverse]('tr').find(sel);
+					button = this.activeButton.closest('tr')[val.traverse]('tr');
+					if(val.reverse){
+						button = $(button.get().reverse());
+					}
+					button = button.find(sel)[val.get]();
 				}
 				
 				if(!button[0]){
@@ -1331,7 +1342,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			popover.contentElement.on({
 				keydown: function(e){
 					if(e.keyCode == 9){
-						var tabbable = $('[tabindex="0"]:not(:disabled)', this);
+						var tabbable = $('[tabindex="0"]:not(:disabled)', this).filter(':visible');
 						var index = tabbable.index(e.target);
 						if(e.shiftKey && index <= 0){
 							tabbable.last().focus();
