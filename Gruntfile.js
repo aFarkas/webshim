@@ -11,9 +11,8 @@ module.exports = function(grunt){
 		},
 		//concat is changed through webshimscombos
 		concat: {},
-		//copy and min are changed through cfgcopymin
+		//copy and uglify are changed through cfgcopymin
 		copy: {},
-		min: {},
 		cssmin: getFiles('src', 'demos/js-webshim/minified', '**/*.css'),
 		uglify: {
 			codegen: {ascii_only: true}
@@ -21,22 +20,20 @@ module.exports = function(grunt){
 	});
 	
 	grunt.registerTask('webshimscombos', 'create combos from polyfiller.js.', function() {
+		var phantomjs = require('phantomjs');
 		var done = this.async();
 		var combos = {};
-		grunt.utils.spawn({
-			cmd: 'phantomjs',
+		grunt.util.spawn({
+			cmd: phantomjs.path,
 			args: [
-				// PhantomJS options.
-				'--config={}',
 				// The main script file.
 				'build/combobuild.js',
-				// The temporary file used for communications.
-				'',
 				// The QUnit helper file to be injected.
 				'build/build.html'
 			]
 		}, 
 		function(err, result, code) {
+			result = result.toString();
 			if(!err && result.indexOf && result.indexOf('done') == -1){
 				
 				try {
@@ -54,14 +51,6 @@ module.exports = function(grunt){
 			grunt.verbose.or.writeln();
 			grunt.log.write('Running PhantomJS...').error();
 			if (code === 127) {
-				grunt.log.errorlns(
-				  'In order for this task to work properly, PhantomJS must be ' +
-				  'installed and in the system PATH (if you can run "phantomjs" at' +
-				  ' the command line, this task should work). Unfortunately, ' +
-				  'PhantomJS cannot be installed automatically via npm or grunt. ' +
-				  'See the grunt FAQ for PhantomJS installation instructions: ' +
-				  'https://github.com/gruntjs/grunt/blob/master/docs/faq.md'
-				);
 				grunt.warn('PhantomJS not found.');
 			} else {
 				result.split('\n').forEach(grunt.log.error, grunt.log);
@@ -80,27 +69,33 @@ module.exports = function(grunt){
 		
 		for(var i in files){
 			file = files[i];
-			if(grunt.file.isMatch('*.*', file)){
+			if(grunt.file.isFile(file)){
 				minPath = path.join('demos/js-webshim/minified', i);
-				if(grunt.file.isMatch('*.js', file)){
-					minTask[minPath] = file;
+				if(/\.js$/.test(file)){
+					minTask[minPath] = [file];
 					found = true;
 				}
-				copyTask[minPath] = file;
-				copyTask[path.join('demos/js-webshim/dev', i)] = file;
+				copyTask[minPath] = [file];
+				copyTask[path.join('demos/js-webshim/dev', i)] = [file];
 			}
 		}
 		if(!found){
 			minTask[path.join('demos/js-webshim/minified', 'polyfiller.js')] = path.join('src', 'polyfiller.js');
 		}
-		grunt.config('min', minTask);
-		grunt.config('copy', copyTask);
+		var uglifyCfg = grunt.config('uglify');
+		var copyCfg = grunt.config('copy');
+		uglifyCfg.dist = { 'files': minTask };
+		copyCfg.dist = { 'files': copyTask };
+		grunt.config('uglify', uglifyCfg);
+		grunt.config('copy', copyCfg);
 	});
 	
 	// Default task.
+	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-css');
-	grunt.registerTask('default', 'webshimscombos concat cfgcopymin copy cssmin min');
+	grunt.registerTask('default', ['webshimscombos', 'concat', 'cfgcopymin', 'copy', 'cssmin', 'uglify']);
 
 
 
