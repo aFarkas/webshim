@@ -451,18 +451,18 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			min: function(orig, shim, value){
 				try {
 					value = $.datepicker.parseDate('yy-mm-dd', value);
-				} catch(e){value = false;}
-				if(value){
-					$(shim).datepicker('option', 'minDate', value);
+				} catch (e) {
+					value = null;
 				}
+				$(shim).datepicker('option', 'minDate', value);
 			},
 			max: function(orig, shim, value){
 				try {
 					value = $.datepicker.parseDate('yy-mm-dd', value);
-				} catch(e){value = false;}
-				if(value){
-					$(shim).datepicker('option', 'maxDate', value);
+				} catch (e) {
+					value = null;
 				}
+				$(shim).datepicker('option', 'maxDate', value);
 			},
 			'data-placeholder': function(orig, shim, value){
 				var hintValue = (value || '').split('-');
