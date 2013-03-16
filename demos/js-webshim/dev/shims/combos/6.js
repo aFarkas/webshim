@@ -1772,12 +1772,20 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 		
 		var _initialFocus = function(){
-			
-			if((!this.activeButton || !this.activeButton[0]) && this.buttons[this.popover.navedInitFocus]){
-				this.activeButton = this.buttons[this.popover.navedInitFocus]();
-			} else if(this.popover.navedInitFocus){
-				this.activeButton = $(this.popover.navedInitFocus, this.element);
+			var sel;
+			if(this.popover.navedInitFocus){
+				sel = this.popover.navedInitFocus.sel || this.popover.navedInitFocus;
+				if((!this.activeButton || !this.activeButton[0]) && this.buttons[sel]){
+					this.activeButton = this.buttons[sel]();
+				} else if(sel){
+					this.activeButton = $(sel, this.element);
+				}
+				
+				if(!this.activeButton[0] && this.popover.navedInitFocus.alt){
+					this.activeButton = this.buttons[this.popover.navedInitFocus.alt]();
+				}
 			}
+			
 			
 			if(!this.activeButton || !this.activeButton[0]){
 				this.activeButton = this.buttons.filter('.checked-value');
@@ -1862,7 +1870,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 		
 		webshims.Grid = function (element, popover, opts){
-			
 			this.element = $('tbody', element);
 			this.popover = popover;
 			this.opts = opts || {};
@@ -1878,42 +1885,41 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		webshims.Grid.prototype = {
 			setFocus: _setFocus,
 			_initialFocus: _initialFocus,
+			
+			first: function(){
+				this.setFocus(this.buttons.eq(0));
+			},
+			last: function(){
+				this.setFocus(this.buttons.eq(this.buttons.length - 1));
+			},
 			ons: function(that){
 				this.element
 					.on({
 						'keydown': function(e){
 							var handled;
 							var key = e.keyCode;
-							console.log(e)
-							console.log(that)
+							
 							if(e.shiftKey){return;}
-							if(e.ctrlKey){
-								if(key == 34){
-									console.log(that)
-									//page down
-								} else if(key == 33){
-									//page up
-								}
+							
+							if(key == 33 || (e.ctrlKey && key == 37)){
+								handled = 'prevPage';
+							} else if(key == 34 || (e.ctrlKey && key == 39)){
+								handled = 'nextPage';
 							} else if(e.keyCode == 36 || e.keyCode == 33){
-								that.setFocus(that.buttons.eq(0));
-								handled = true;
-							} else if(e.keyCode == 34 || e.keyCode == 35){
-								that.setFocus(that.buttons.eq(that.buttons.length - 1));
-								handled = true;
+								handled = 'first';
+							} else if(e.keyCode == 35){
+								handled = 'last';
 							} else if(e.keyCode == 38){
-								that.up();
-								handled = true;
+								handled = 'up';
 							} else if(e.keyCode == 37){
-								that.prev();
-								handled = true;
+								handled = 'prev';
 							} else if(e.keyCode == 40){
-								that.down();
-								handled = true;
+								handled = 'down';
 							} else if(e.keyCode == 39){
-								that.next();
-								handled = true;
+								handled = 'next';
 							}
 							if(handled){
+								that[handled]();
 								return false;
 							}
 						}
@@ -1921,7 +1927,21 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				;
 			}
 		};
-		
+		$.each({
+			prevPage: {get: 'last', action: 'prev'}, 
+			nextPage: {get: 'first', action: 'next'}
+		}, function(name, val){
+			webshims.Grid.prototype[name] = function(){
+				if(this.opts[val.action]){
+					this.popover.navedInitFocus = {
+						sel: 'button[data-id="'+ this.activeButton.attr('data-id') +'"]:not(:disabled,.othermonth)',
+						alt: val.get
+					};
+					this.popover.actionFn(this.opts[val.action]);
+					this.popover.navedInitFocus = false;
+				}
+			};
+		});
 		
 		$.each({
 			up: {traverse: 'prevAll', get: 'last', action: 'prev', reverse: true}, 
@@ -2036,7 +2056,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						rowNum++;
 						lis.push('</tr><tr class="ws-row-'+ rowNum +'">');
 					}
-					lis.push('<td class="ws-item-'+ i +'" role="presentation"><button type="button"'+ disabled + classStr +' data-action="setMonthList" value="'+val+'" tabindex="-1" role="gridcell">'+val+'</button></td>');
+					lis.push('<td class="ws-item-'+ i +'" role="presentation"><button  data-id="year-'+ i +'" type="button"'+ disabled + classStr +' data-action="setMonthList" value="'+val+'" tabindex="-1" role="gridcell">'+val+'</button></td>');
 				}
 				if(j == size - 1){
 					nextDisabled = picker.isInRange([val+1], max, min) ? {'data-action': 'setYearList','value': val+1} : false;
@@ -2124,7 +2144,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						rowNum++;
 						lis.push('</tr><tr class="ws-row-'+ rowNum +'">');
 					}
-					lis.push('<td data-id="month-'+ i +'" role="presentation"><button type="button"'+ disabled + classStr +' data-action="'+ (data.type == 'month' ? 'changeInput' : 'setDayList' ) +'" value="'+value+'-'+val+'" tabindex="-1" role="gridcell">'+name+'</button></td>');
+					lis.push('<td class="ws-item-'+ i +'" role="presentation"><button data-id="month-'+ i +'" type="button"'+ disabled + classStr +' data-action="'+ (data.type == 'month' ? 'changeInput' : 'setDayList' ) +'" value="'+value+'-'+val+'" tabindex="-1" role="gridcell">'+name+'</button></td>');
 					
 				}
 				
@@ -2245,7 +2265,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					}
 					
 					dateArray = getDateArray(date);
-					buttonStr = '<td data-id="day-'+ day +'" role="presentation"><button role="gridcell" data-action="changeInput" value="'+ (dateArray.join('-')) +'"';
+					buttonStr = '<td role="presentation" class="day-'+ day +'"><button data-id="day-'+ date.getDate() +'" role="gridcell" data-action="changeInput" value="'+ (dateArray.join('-')) +'"';
 					
 					if(otherMonth){
 						classArray.push('othermonth');
