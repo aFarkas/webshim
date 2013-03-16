@@ -69,14 +69,14 @@ module.exports = function(grunt){
 		
 		for(var i in files){
 			file = files[i];
-			if(grunt.file.isMatch('*.*', file)){
+			if(grunt.file.isFile(file)){
 				minPath = path.join('demos/js-webshim/minified', i);
-				if(grunt.file.isMatch('*.js', file)){
-					minTask[minPath] = file;
+				if(/\.js$/.test(file)){
+					minTask[minPath] = [file];
 					found = true;
 				}
-				copyTask[minPath] = file;
-				copyTask[path.join('demos/js-webshim/dev', i)] = file;
+				copyTask[minPath] = [file];
+				copyTask[path.join('demos/js-webshim/dev', i)] = [file];
 			}
 		}
 		if(!found){
