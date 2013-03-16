@@ -11,9 +11,8 @@ module.exports = function(grunt){
 		},
 		//concat is changed through webshimscombos
 		concat: {},
-		//copy and min are changed through cfgcopymin
+		//copy and uglify are changed through cfgcopymin
 		copy: {},
-		min: {},
 		cssmin: getFiles('src', 'demos/js-webshim/minified', '**/*.css'),
 		uglify: {
 			codegen: {ascii_only: true}
@@ -23,8 +22,8 @@ module.exports = function(grunt){
 	grunt.registerTask('webshimscombos', 'create combos from polyfiller.js.', function() {
 		var done = this.async();
 		var combos = {};
-		grunt.utils.spawn({
 			cmd: 'phantomjs',
+		grunt.util.spawn({
 			args: [
 				// PhantomJS options.
 				'--config={}',
@@ -37,6 +36,7 @@ module.exports = function(grunt){
 			]
 		}, 
 		function(err, result, code) {
+			result = result.toString();
 			if(!err && result.indexOf && result.indexOf('done') == -1){
 				
 				try {
@@ -93,14 +93,20 @@ module.exports = function(grunt){
 		if(!found){
 			minTask[path.join('demos/js-webshim/minified', 'polyfiller.js')] = path.join('src', 'polyfiller.js');
 		}
-		grunt.config('min', minTask);
-		grunt.config('copy', copyTask);
+		var uglifyCfg = grunt.config('uglify');
+		var copyCfg = grunt.config('copy');
+		uglifyCfg.dist = { 'files': minTask };
+		copyCfg.dist = { 'files': copyTask };
+		grunt.config('uglify', uglifyCfg);
+		grunt.config('copy', copyCfg);
 	});
 	
 	// Default task.
+	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-css');
-	grunt.registerTask('default', 'webshimscombos concat cfgcopymin copy cssmin min');
+	grunt.registerTask('default', ['webshimscombos', 'concat', 'cfgcopymin', 'copy', 'cssmin', 'uglify']);
 
 
 
