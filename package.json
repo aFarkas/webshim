@@ -31,6 +31,7 @@
 	},
 	"main": "./master/demos/js-webshim/minified/",
 	"devDependencies": {
+		"phantomjs": ">=1.8.2"
 		"grunt-css": ">=0.5.4",
 		"grunt-contrib-concat": ">=0.1.3",
 		"grunt-contrib-copy": ">=0.4.0",

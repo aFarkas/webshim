@@ -20,10 +20,11 @@ module.exports = function(grunt){
 	});
 	
 	grunt.registerTask('webshimscombos', 'create combos from polyfiller.js.', function() {
+		var phantomjs = require('phantomjs');
 		var done = this.async();
 		var combos = {};
-			cmd: 'phantomjs',
 		grunt.util.spawn({
+			cmd: phantomjs.path,
 			args: [
 				// PhantomJS options.
 				'--config={}',
@@ -54,14 +55,6 @@ module.exports = function(grunt){
 			grunt.verbose.or.writeln();
 			grunt.log.write('Running PhantomJS...').error();
 			if (code === 127) {
-				grunt.log.errorlns(
-				  'In order for this task to work properly, PhantomJS must be ' +
-				  'installed and in the system PATH (if you can run "phantomjs" at' +
-				  ' the command line, this task should work). Unfortunately, ' +
-				  'PhantomJS cannot be installed automatically via npm or grunt. ' +
-				  'See the grunt FAQ for PhantomJS installation instructions: ' +
-				  'https://github.com/gruntjs/grunt/blob/master/docs/faq.md'
-				);
 				grunt.warn('PhantomJS not found.');
 			} else {
 				result.split('\n').forEach(grunt.log.error, grunt.log);
