@@ -26,12 +26,8 @@ module.exports = function(grunt){
 		grunt.util.spawn({
 			cmd: phantomjs.path,
 			args: [
-				// PhantomJS options.
-				'--config={}',
 				// The main script file.
 				'build/combobuild.js',
-				// The temporary file used for communications.
-				'',
 				// The QUnit helper file to be injected.
 				'build/build.html'
 			]
