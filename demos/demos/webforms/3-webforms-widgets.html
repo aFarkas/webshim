@@ -48,7 +48,8 @@
 		}
 	</style>
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	
 	<script src="../../js-webshim/minified/extras/mousepress.js"></script>
 	<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
 	<script src="../../../src/polyfiller.js"></script> 
@@ -151,11 +152,15 @@
 						)
 					;
 				};
-				$('select', this).prop('selectedIndex', 0);
 				$('> fieldset', form).on('change', createWidget);
 				createWidget();
 			});
 		});
+	</script>
+	<script>
+		if(!jQuery.browser){
+			jQuery.browser = {};
+		}
 	</script>
 	<script src="../../demo-js/demo.js"></script>
 	<script>
@@ -302,7 +307,7 @@ $('form').bind('firstinvalid', function(e){
 						<select name="startView">
 							<option value="0">0 (= decade)</option>
 							<option value="1">1 (= year)</option>
-							<option value="2">2 (= month)</option>
+							<option value="2" selected="">2 (= month)</option>
 						</select>
 					</label>
 					<label>
@@ -337,6 +342,14 @@ $('form').bind('firstinvalid', function(e){
 							<option>monthNamesShort</option>
 						</select>
 					</label>
+					<label>
+						relDefaultValue: 
+						<select name="relDefaultValue">
+							<option value=""></option>
+							<option value="-660441600000">-660441600000 (=-21 years) (-> 364 * 24 * 60 * 60 * 1000 == year)</option>
+						</select>
+					</label>
+					
 					<label>
 						openOnFocus: 
 						<input type="checkbox" name="openOnFocus" />
@@ -431,7 +444,7 @@ $('form').bind('firstinvalid', function(e){
 						startView: 
 						<select name="startView">
 							<option value="0">0 (= decade)</option>
-							<option value="1">1 (= year)</option>
+							<option value="1" selected="">1 (= year)</option>
 						</select>
 					</label>
 					<label>
@@ -662,10 +675,10 @@ $('form').bind('firstinvalid', function(e){
 						</div>
 						
 						<div class="form-element">
-							<label for="range-max">
+							<label for="range-animate">
 								range (with data attribute):
 							</label>
-							<input data-slider='{"range": "max"}' name="range-max" type="range" id="range-max" />
+							<input data-range='{"animate": true}' name="range-animate" type="range" id="range-animate" />
 						</div>
 						
 						
@@ -683,7 +696,7 @@ $('form').bind('firstinvalid', function(e){
 								date (with data attribute): <dfn title="required">*</dfn>
 							</label>
 							
-							<input data-datepicker='{"showOn": "button", "buttonImage": "../../css/calendar.gif", "buttonImageOnly": true}' name="date-data" required="required" type="date" id="date-data" />
+							<input data-date='{"startView": 2, "minView": 1}' name="date-data" required="required" type="date" id="date-data" />
 						</div>
 						<div class="form-element">
 							<label for="email">
@@ -699,23 +712,7 @@ $('form').bind('firstinvalid', function(e){
 								</select>
 							</datalist>
 						</div>
-						<!--
-						<div class="form-element">
-							<label for="datetime-local">
-								datetime-local: 
-							</label>
-							<input value="2010-12-31T21:00" name="datetime-local" type="datetime-local" step="600" id="datetime-local" />
-							(step=600)
-						</div>
 						
-						<div class="form-element">
-							<label for="datetime-local-data">
-								datetime-local-data: 
-							</label>
-							<input data-datepicker='{"showOn": "both", "buttonImage": "../../css/calendar.gif", "buttonImageOnly": true}' name="datetime-local-data" type="datetime-local" step="900" id="datetime-local-data" />
-							(step=900)
-						</div>
-						-->			
 						<div class="form-element">
 							<label for="number">
 								number: <dfn title="required">*</dfn>
@@ -725,14 +722,13 @@ $('form').bind('firstinvalid', function(e){
 							(min="3")
 						</div>
 
-						<!--
+						
 						<div class="form-element">
 							<label for="time">
 								time: 
 							</label>
 							<input name="time" type="time" id="time" />
 						</div>
-						-->
 						<div class="button-wrapper">
 							<input type="submit" value="Send" />
 						</div>
