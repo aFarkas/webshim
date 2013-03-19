@@ -2,6 +2,7 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 	"use strict";
 	var mediaelement = webshims.mediaelement;
 	var id = new Date().getTime();
+	var ADDBACK = $.fn.addBack ? 'addBack' : 'andSelf';
 	//descriptions are not really shown, but they are inserted into the dom
 	var showTracks = {subtitles: 1, captions: 1, descriptions: 1};
 	var notImplemented = function(){
@@ -28,7 +29,6 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		};
 		return obj;
 	};
-	var ADDBACK = $.fn.addBack ? 'addBack' : 'andSelf';
 	
 	var cueListProto = {
 		getCueById: function(id){
