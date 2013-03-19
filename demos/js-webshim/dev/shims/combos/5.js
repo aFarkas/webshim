@@ -1820,7 +1820,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			if(!this.activeButton[0]){
 				this.activeButton = this.buttons.eq(0);
 			}
-			
+			if(this.popover.openedByFocus){
+				this.popover.activeElement = this.activeButton;
+			}
 			this.setFocus(this.activeButton, this.opts.noFocus);
 		};
 		
@@ -2415,7 +2417,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			
 		var actions = {
 			changeInput: function(val, popover, data){
+				popover.stopOpen = true;
 				data.element.focus();
+				setTimeout(function(){
+					popover.stopOpen = false;
+				}, 9);
 				popover.hide();
 				data.setChange(val);
 			}
@@ -2746,7 +2752,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				};
 				data.element.on({
 					focus: function(){
-						if(data.options.openOnFocus || (mouseFocus && options.openOnMouseFocus)){
+						if(!popover.stopOpen && (data.options.openOnFocus || (mouseFocus && options.openOnMouseFocus))){
 							popover.openedByFocus = !options.noInput;
 							show();
 						}
