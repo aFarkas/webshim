@@ -1088,6 +1088,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 			};
 			
 			$.each({value: 0, max: 1}, function(name, defValue){
+				var removeProp = (name == 'value' && !$.fn.finish);
 				desc[name] = {
 					attr: {
 						set: function(value){
@@ -1101,10 +1102,12 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 					removeAttr: {
 						value: function(){
 							this.removeAttribute(name);
+							if(removeProp){
+								delete this.value;
+							}
 							updateProgress.isInChange = name;
 							updateProgress(this);
 							updateProgress.isInChange = false;
-							console.log('removeAttr', this, arguments)
 						}
 					},
 					prop: {
@@ -1121,7 +1124,6 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 							return ret;
 						},
 						set: function(value){
-							console.log('prop', value, arguments)
 							return desc[name].attr.set.call(this, value * 1);
 						}
 					}

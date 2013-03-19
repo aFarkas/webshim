@@ -1044,13 +1044,13 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 	validityMessages.de = $.extend(true, {
 		typeMismatch: {
 			defaultMessage: '{%value} ist in diesem Feld nicht zulässig.',
-			email: '{%value} ist keine zulässige E-Mail-Adresse',
-			url: '{%value} ist keine zulässige Webadresse',
-			number: '{%value} ist keine Nummer!',
-			date: '{%value} ist kein Datum',
-			time: '{%value} ist keine Uhrzeit',
+			email: '{%value} ist keine gültige E-Mail-Adresse.',
+			url: '{%value} ist kein(e) gültige(r) Webadresse/Pfad.',
+			number: '{%value} ist keine Nummer.',
+			date: '{%value} ist kein Datum.',
+			time: '{%value} ist keine Uhrzeit.',
 			month: '{%value} ist in diesem Feld nicht zulässig.',
-			range: '{%value} ist keine Nummer!',
+			range: '{%value} ist keine Nummer.',
 			"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
 		},
 		rangeUnderflow: {
@@ -1061,16 +1061,16 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 		},
 		stepMismatch: 'Der Wert {%value} ist in diesem Feld nicht zulässig. Hier sind nur bestimmte Werte zulässig. {%title}',
 		tooLong: 'Der eingegebene Text ist zu lang! Sie haben {%valueLen} Zeichen eingegeben, dabei sind {%maxlength} das Maximum.',
-		patternMismatch: '{%value} hat für dieses Eingabefeld ein falsches Format! {%title}',
+		patternMismatch: '{%value} hat für dieses Eingabefeld ein falsches Format. {%title}',
 		valueMissing: {
-			defaultMessage: 'Bitte geben Sie einen Wert ein',
-			checkbox: 'Bitte aktivieren Sie das Kästchen'
+			defaultMessage: 'Bitte geben Sie einen Wert ein.',
+			checkbox: 'Bitte aktivieren Sie das Kästchen.'
 		}
 	}, (validityMessages.de || {}));
 	
 	if(typeof validityMessages.de.valueMissing == 'object'){
 		['select', 'radio'].forEach(function(type){
-			validityMessages.de.valueMissing[type] = 'Bitte wählen Sie eine Option aus';
+			validityMessages.de.valueMissing[type] = 'Bitte wählen Sie eine Option aus.';
 		});
 	}
 	if(typeof validityMessages.de.rangeUnderflow == 'object'){

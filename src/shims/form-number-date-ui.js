@@ -355,10 +355,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			},
 			getOptions: function(){
 				var options = {};
-				$(this.orig).jProp('list').find('option').each(function(){
+				var datalist = $(this.orig).jProp('list');
+				datalist.find('option').each(function(){
 					options[$.prop(this, 'value')] = $.prop(this, 'label');
 				});
-				return options;
+				return [options, datalist.data('label')];
 			},
 			list: function(val){
 				if(this.type == 'number' || this.type == 'time'){
@@ -581,7 +582,14 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			spinBtnProto[name] = function(val){
 				if(this.options[name] != val || !this._init){
 					this.options[name] = !!val;
-					this.element.prop(name, this.options[name]);
+					if(name == 'readonly' && this.options.noInput){
+						this.element
+							.prop(name, true)
+							.attr({'aria-readonly': this.options[name]})
+						;
+					} else {
+						this.element.prop(name, this.options[name]);
+					}
 					this.buttonWrapper[this.options[name] ? 'addClass' : 'removeClass']('ws-'+name);
 				}
 			};
@@ -624,15 +632,16 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			this.activeButton = element.attr({tabindex: '0', 'aria-selected': 'true'});
 			this.index = this.buttons.index(this.activeButton[0]);
 			
-			if(!_noFocus){
-				clearTimeout(this.timer);
+			
+			clearTimeout(this.timer);
+			
+			if(!this.popover.openedByFocus && !_noFocus){
 				this.popover.activateElement(element);
-				if(!this.popover.openedByFocus){
-					this.timer = setTimeout(function(){
-						element[0].focus();
-					}, this.popover.isVisible ? 20 : 99);
-				}
+				this.timer = setTimeout(function(){
+					element[0].focus();
+				}, this.popover.isVisible ? 20 : 99);
 			}
+			
 		};
 		
 		var _initialFocus = function(){
@@ -1342,20 +1351,27 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				});
 				return false;
 			};
+			var id = new Date().getTime();
 			var generateList = function(o, max, min){
 				var options = [];
-				
+				var label = '';
+				var labelId = '';
 				o.options = data.getOptions() || {};
 				$('div.ws-options', popover.contentElement).remove();
-				$.each(o.options, function(val, label){
+				$.each(o.options[0], function(val, label){
 					var disabled = picker.isInRange(val.split('-'), o.maxS, o.minS) ?
 						'' :
 						' disabled="" '
 					options.push('<li role="presentation"><button value="'+ val +'" '+disabled+' data-action="changeInput" tabindex="-1"  role="option">'+ (label || data.formatValue(val)) +'</button></li>');
 				});
 				if(options.length){
-					
-					new webshims.ListBox($('<div class="ws-options"><ul role="listbox">'+ options.join('') +'</div>').insertAfter(popover.bodyElement)[0], popover, {noFocus: true});
+					id++;
+					if(o.options[1]){
+						labelId = 'datalist-'+id;
+						label = '<h5 id="'+labelId+'">'+ o.options[1] +'</h5>';
+						labelId = ' aria-labelledbyid="'+ labelId +'" ';
+					}
+					new webshims.ListBox($('<div class="ws-options">'+label+'<ul role="listbox" '+ labelId +'>'+ options.join('') +'</div>').insertAfter(popover.bodyElement)[0], popover, {noFocus: true});
 				}
 			};
 			var updateContent = function(){
@@ -1573,20 +1589,28 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				})
 			;
 			
-			data.element.on({
-				focus: function(){
-					if(data.options.openOnFocus){
-						popover.openedByFocus = true;
-						show();
+			(function(){
+				var mouseFocus = false;
+				var resetMouseFocus = function(){
+					mouseFocus = false;
+				};
+				data.element.on({
+					focus: function(){
+						if(data.options.openOnFocus || (mouseFocus && options.openOnMouseFocus)){
+							popover.openedByFocus = !options.noInput;
+							show();
+						}
+					},
+					mousedown: function(){
+						mouseFocus = true;
+						setTimeout(resetMouseFocus, 9);
+						if(data.element.is(':focus')){
+							popover.openedByFocus = !options.noInput;
+							show();
+						}
 					}
-				},
-				mousedown: function(){
-					if(data.element.is(':focus')){
-						popover.openedByFocus = true;
-						show();
-					}
-				}
-			});
+				});
+			})();
 			data.popover = popover;
 		};
 		
@@ -1612,11 +1636,12 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			'max',
 			'step',
 			'title',
-			'placeholder'
+			'placeholder',
+			'tabindex'
 		];
 		
 		//
-		var copyAttrs = ['tabindex', 'data-placeholder'];
+		var copyAttrs = ['data-placeholder'];
 			
 		$.each(copyProps.concat(copyAttrs), function(i, name){
 			var fnName = name.replace(/^data\-/, '');

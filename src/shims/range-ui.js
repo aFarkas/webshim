@@ -37,7 +37,7 @@
 		},
 		value: $.noop,
 		_value: function(val, _noNormalize, animate){
-			var left;
+			var left, posDif;
 			var o = this.options;
 			var oVal = val;
 			var thumbStyle = {};
@@ -66,11 +66,13 @@
 				this.thumb.css(thumbStyle);
 				this.range.css(rangeStyle);
 			} else {
-				if(typeof o.animate != 'object'){
-					o.animate = {};
+				if(typeof animate != 'object'){
+					animate = {};
+					posDif = Math.abs(left - parseInt(this.thumb[0].style[this.dirs.left] || 50, 10));
+					animate.duration = Math.max(Math.min(999, posDif * 5), 99);
 				}
-				this.thumb.animate(thumbStyle, o.animate);
-				this.range.animate(rangeStyle, o.animate);
+				this.thumb.animate(thumbStyle, animate);
+				this.range.animate(rangeStyle, animate);
 			}
 			if(this.orig && (oVal != val || (!this._init && this.orig.value != val)) ){
 				this.options._change(val);
@@ -184,12 +186,12 @@
 			}
 			return val;
 		},
-		doStep: function(factor){
+		doStep: function(factor, animate){
 			var step = retDefault(this.options.step, 1);
 			if(this.options.step == 'any'){
 				step = Math.min(step, (this.options.max - this.options.min) / 10);
 			}
-			this.value( this.options.value + (step * factor) );
+			this.value( this.options.value + (step * factor), false, animate );
 			
 		},
 		 
@@ -278,7 +280,7 @@
 					if(!widgetUnits || !leftOffset){return;}
 					leftOffset = leftOffset[that.dirs.pos];
 					widgetUnits = 100 / (widgetUnits  - ((that.thumb[that.dirs.outerWidth]() || 2) / 2));
-					setValueFromPos(e, that.options.animate);
+					setValueFromPos(e, o.animate);
 					$(document)
 						.on({
 							mouseup: remove,
@@ -319,13 +321,13 @@
 						} else if (code == 37 || code == 40) {
 							that.doStep(-1);
 						} else if (code == 33) {
-							that.doStep(10);
+							that.doStep(10, o.animate);
 						} else if (code == 34) {
-							that.doStep(-10);
+							that.doStep(-10, o.animate);
 						} else if (code == 36) {
-							that.value(that.options.max);
+							that.value(that.options.max, false, o.animate);
 						} else if (code == 35) {
-							that.value(that.options.min);
+							that.value(that.options.min, false, o.animate);
 						} else {
 							step = false;
 						}

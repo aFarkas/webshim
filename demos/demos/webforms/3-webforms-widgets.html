@@ -153,6 +153,7 @@
 					;
 				};
 				$('> fieldset', form).on('change', createWidget);
+				form.on('submit', false);
 				createWidget();
 			});
 		});
