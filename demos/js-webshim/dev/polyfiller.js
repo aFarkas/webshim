@@ -844,7 +844,7 @@
 			}
 			return ('swfmini' in window);
 		},
-		c: [2, 1]
+		c: [16, 7, 2, 8, 1, 12, 19, 23]
 	});
 	modules.swfmini.test();
 		
@@ -855,14 +855,14 @@
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
 	addPolyfill('es5', {
 		test: !!(Modernizr.ES5 && Function.prototype.bind),
-		c: []
+		c: [14, 18, 19, 20]
 	});
 	
 	addPolyfill('dom-extend', {
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		d: ['es5'],
-		c: [2, 3, 4]
+		c: [16, 7, 2, 15, 3, 8, 4, 9, 10, 14, 19, 20]
 	});
 		
 	
@@ -872,7 +872,7 @@
 		test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
 		d: ['swfmini'],
 		noAutoCallback: true,
-		c: [],
+		c: [14],
 		nM: 'localstorage'
 	});
 	//>json-storage
@@ -887,7 +887,7 @@
 //			,confirmText: ''
 		},
 		d: ['json-storage'],
-		c: [],
+		c: [21],
 		nM: 'geolocation'
 	});
 	//>
@@ -1012,7 +1012,7 @@
 	//			replaceValidationUI: false
 			},
 			methodNames: ['setCustomValidity','checkValidity'],
-			c: [2, 1, 3],
+			c: [16, 7, 2, 8, 1, 15, 3],
 			nM: 'input'
 		});
 		
@@ -1033,7 +1033,7 @@
 				return Modernizr[formvalidation] && !bustedValidity;
 			},
 			d: ['form-core', DOMSUPPORT],
-			c: []
+			c: [16, 15]
 		});
 		
 		addPolyfill('form-message', {
@@ -1042,7 +1042,7 @@
 				return !( formOptions.customMessages || !Modernizr[formvalidation] || bugs.validationMessage || bustedValidity || !modules[formExtend].test(toLoad) );
 			},
 			d: [DOMSUPPORT],
-			c: [3, 4]
+			c: [16, 7, 15, 3, 8, 4]
 		});
 		
 		addPolyfill('form-number-date-api', {
@@ -1063,14 +1063,14 @@
 			},
 			methodNames: ['stepUp', 'stepDown'],
 			d: ['forms', DOMSUPPORT],
-			c: [6, 5],
+			c: [6, 5, 18, 17],
 			nM: 'input inputtypes'
 		});
 		
 		$.webshims.loader.addModule('range-ui', {
 			options: {},
 			noAutoCallback: true,
-			c: [6, 5]
+			c: [6, 5, 9, 10, 18, 17, 11]
 		});
 		
 		addPolyfill('form-number-date-ui', {
@@ -1089,7 +1089,7 @@
 				}
 	//			,replaceUI: false
 			},
-			c: [6, 5]
+			c: [6, 5, 9, 10, 18, 17, 11]
 		});
 		
 		addPolyfill('form-datalist', {
@@ -1098,7 +1098,7 @@
 				return modernizrInputAttrs.list && !formOptions.customDatalist;
 			},
 			d: ['form-core', DOMSUPPORT],
-			c: [6, 2]
+			c: [16, 7, 6, 2, 9, 15]
 		});
 	})();
 	//>
@@ -1116,7 +1116,7 @@
 //			animate: false,
 			text: 'Details'
 		},
-		c: []
+		c: [21, 22]
 	});
 	//>
 	
@@ -1149,7 +1149,7 @@
 			},
 			methodNames: ['play', 'pause', 'canPlayType', 'mediaLoad:load'],
 			d: ['swfmini'],
-			c: [2, 1],
+			c: [16, 7, 2, 8, 1, 12, 13, 19, 20, 23],
 			nM: 'audio video texttrackapi'
 		});
 		addPolyfill('mediaelement-swf', {
@@ -1166,7 +1166,7 @@
 			test: function(){
 				return this.options.player == 'jwplayer' ? true : swfTest.apply(this, arguments);
 			},
-			c: []
+			c: [21, 19, 20]
 		});
 		
 		bugs.track = (Modernizr.track && (!Modernizr.texttrackapi || typeof (document.createElement('track').track || {}).mode != 'string'));
@@ -1181,7 +1181,7 @@
 			},
 			d: ['mediaelement', DOMSUPPORT],
 			methodNames: ['addTextTrack'],
-			c: [],
+			c: [21, 12, 13, 22],
 			nM: 'texttrackapi'
 		});
 		

@@ -29,7 +29,6 @@ jQuery.webshims.register('track', function($, webshims, window, document, undefi
 		};
 		return obj;
 	};
-	var ADDBACK = $.fn.addBack ? 'addBack' : 'andSelf';
 	
 	var cueListProto = {
 		getCueById: function(id){

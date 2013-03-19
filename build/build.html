@@ -21,7 +21,7 @@
 		<script src="../src/polyfiller.js"></script>
 		<script>
 			
-			(function($){
+			(function($, r){
 				var combos = {};
 				var makeFile = function(file){
 					return 'src/shims/'+file+'.js';
@@ -29,13 +29,16 @@
 				$.each($.webshims.c, function(c, srces){
 					combos['src/shims/combos/'+c+'.js'] = $.map(srces, makeFile);
 				});
+				if(r.console){
+					r.console.log(combos);
+				}
 				combos = JSON.stringify(combos);
 				$('textarea').val(combos);
 				
 				setTimeout(function(){
 					alert(combos);
 				}, 0);
-			})(jQuery);
+			})(jQuery, this);
 			
 		</script>
 	</body>
