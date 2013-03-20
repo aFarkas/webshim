@@ -1,38 +1,49 @@
 {
-	"name": "webshims",
-	"version": "1.10.0pre",
-	"title": "Webshims - polyfills jQuery with many HTML5 features",
-	"licenses" : [
-		{
-			"type" : "MIT",
-			"url" : "https://raw.github.com/aFarkas/webshim/master/MIT-LICENSE.txt"
-		}
-	],
-	"author": {
-		"name": "Alexander Farkas",
-		"url": "https://github.com/aFarkas/"
-	},
-	
-	"keywords": ["webshims", "polyfill", "HTML5", "forms", "audio", "video", "validation", "canvas", "localstorage", "geolocation", "ui", "widgets"],
-	"homepage": "http://afarkas.github.com/webshim/demos/index.html",
-	"description": "modular capability-based polyfill loading libary, which extends jQuery with HTML5 features in legacy browsers",
-	"docs": "http://afarkas.github.com/webshim/demos/index.html",
-	"demo": "http://afarkas.github.com/webshim/demos/index.html",
-	"bugs": "https://github.com/aFarkas/webshim/issues",
-	"download": "http://corrupt-system.de/webshims-1.9.7.zip",
-	
-	"repository": {
-		"type" : "git",
-		"url" : "https://github.com/aFarkas/webshim.git"
-	},
-	"main": "./master/demos/js-webshim/minified/",
-	"devDependencies": {
-		"phantomjs": ">=1.8.2",
-		"grunt-css": ">=0.5.4",
-		"grunt-contrib-concat": ">=0.1.3",
-		"grunt-contrib-watch": ">=0.3.0",
-		"grunt-contrib-copy": ">=0.4.0",
-		"grunt-contrib-uglify": ">=0.1.1",
-		"grunt": ">=0.4.1"
-	}
+  "name": "webshims",
+  "version": "1.10.0pre",
+  "title": "Webshims - polyfills jQuery with many HTML5 features",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://raw.github.com/aFarkas/webshim/master/MIT-LICENSE.txt"
+    }
+  ],
+  "author": {
+    "name": "Alexander Farkas",
+    "url": "https://github.com/aFarkas/"
+  },
+  "keywords": [
+    "webshims",
+    "polyfill",
+    "HTML5",
+    "forms",
+    "audio",
+    "video",
+    "validation",
+    "canvas",
+    "localstorage",
+    "geolocation",
+    "ui",
+    "widgets"
+  ],
+  "homepage": "http://afarkas.github.com/webshim/demos/index.html",
+  "description": "modular capability-based polyfill loading libary, which extends jQuery with HTML5 features in legacy browsers",
+  "docs": "http://afarkas.github.com/webshim/demos/index.html",
+  "demo": "http://afarkas.github.com/webshim/demos/index.html",
+  "bugs": "https://github.com/aFarkas/webshim/issues",
+  "download": "http://corrupt-system.de/webshims-1.9.7.zip",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aFarkas/webshim.git"
+  },
+  "main": "./master/demos/js-webshim/minified/",
+  "devDependencies": {
+    "phantomjs": ">=1.8.2",
+    "grunt-css": ">=0.5.4",
+    "grunt-contrib-concat": ">=0.1.3",
+    "grunt-contrib-watch": ">=0.3.0",
+    "grunt-contrib-copy": ">=0.4.0",
+    "grunt-contrib-uglify": ">=0.1.1",
+    "grunt": "~0.4.1"
+  }
 }

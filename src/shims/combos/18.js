@@ -1702,6 +1702,16 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	var stopPropagation = function(e){
 		e.stopImmediatePropagation(e);
 	};
+	var splitInputs = {
+		date: {
+			_create: function(){
+				return [$('<input type="text" class="yyyy ws-0" />')[0], $('<input type="text" class="mm ws-1" />')[0], $('<input type="text" class="dd ws-2" />')[0]];
+			},
+			sort: function(){
+				
+			}
+		}
+	};
 	var labelWidth = (function(){
 		var getId = function(){
 			return webshims.getID(this);
@@ -1725,8 +1735,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	
 		
 	(function(){
-		
-		
+		var monthDigits = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 		formcfg.de = {
 			numberFormat: {
 				",": ".",
@@ -1807,17 +1816,19 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					var strNum;
 					var num = i + 1;
 					strNum = (num < 10) ? '0'+num : ''+num;
-					
 					langCfg.date.monthkeys[num] = strNum;
 					langCfg.date.monthkeys[name] = strNum;
+					langCfg.date.monthkeys[name.toLowerCase()] = strNum;
 				};
 				langCfg.date.monthkeys = {};
+				langCfg.date.monthDigits = monthDigits;
 				$.each(langCfg.date.monthNames, create);
 				$.each(langCfg.date.monthNamesShort, create);
 			}
 		};
 		
 		createMonthKeys(curCfg);
+		
 		$.webshims.ready('dom-extend', function(){
 			$.webshims.activeLang({
 				register: 'form-core', 
@@ -1874,7 +1885,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				var names;
 				var p = val.split('-');
 				if(p[0] && p[1]){
-					names = curCfg.date[options.monthNames] || curCfg.date.monthNames;
+					names = curCfg.date[options.formatMonthNames] || curCfg.date[options.monthNames] || curCfg.date.monthNames;
 					p[1] = names[(p[1] * 1) - 1];
 					if(p[1]){
 						val = curCfg.date.showMonthAfterYear ? p.join(' ') : p[1]+' '+p[0];
@@ -1902,7 +1913,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				return val;
 			},
 			month: function(val){
-				var p = val.trim().split(/[\s-\/\\]+/);
+				var p = val.trim().split(/[\.\s-\/\\]+/);
 				if(p.length == 2){
 					p[0] = curCfg.date.monthkeys[p[0]] || p[0];
 					p[1] = curCfg.date.monthkeys[p[1]] || p[1];
@@ -1940,6 +1951,19 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			}
 		};
 		
+		
+		var placeholderFormat = {
+			date: function(val){
+				var hintValue = (val || '').split('-');
+				if(hintValue.length == 3 && hintValue[0].length > 3 && hintValue[1].length == 2 && hintValue[2].length == 2){
+					hintValue = curCfg.patterns.d.replace('yy', hintValue[0]).replace('mm', hintValue[1]).replace('dd', hintValue[2]);
+				} else {
+					hintValue = val;
+				}
+				return hintValue;
+			}
+		};
+		
 		var createAsNumber = (function(){
 			var types = {};
 			return function(type){
@@ -1961,13 +1985,22 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		var spinBtnProto = {
 			_create: function(){
 				var i;
-				this.type = this.options.type;
-				this.orig = this.options.orig;
+				var o = this.options;
+				this.type = o.type;
+				this.orig = o.orig;
+				
 				this.elemHelper = $('<input type="'+ this.type+'" />');
 				this.asNumber = createAsNumber(this.type);
+				
 				this.buttonWrapper = $('<span class="input-buttons '+this.type+'-input-buttons"><span unselectable="on" class="step-controls"><span class="step-up"></span><span class="step-down"></span></span></span>')
 					.insertAfter(this.element)
 				;
+				
+				if(o.splitInput){
+					this._addSplitInputs();
+				} else {
+					this.inputElements = this.element;
+				}
 				
 				this.options.containerElements.push(this.buttonWrapper[0]);
 				
@@ -1975,14 +2008,24 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					steps[this.type].start = this.asNumber(steps[this.type].start);
 				}
 				
-				
-				
 				for(i = 0; i < createOpts.length; i++){
 					this[createOpts[i]](this.options[createOpts[i]]);
 				}
-				var elem = this.element.attr('autocomplete', 'off').data('wsspinner', this);
+				
+				this.inputElements.attr('autocomplete', 'off');
+				
+				this.element.data('wsspinner', this);
+				
 				this.addBindings();
 				this._init = true;
+			},
+			_addSplitInputs: function(){
+				if(!this.inputElements){
+					this.splits = splitInputs[this.type]._create();
+					this.inputElements = $(this.splits);
+					this.inputElements.prependTo(this.element);
+					console.log(this.inputElements)
+				}
 			},
 			parseValue: function(val){
 				return parseVal[this.type](val);
@@ -1991,14 +2034,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				return formatVal[this.type](val, this.options);
 			},
 			placeholder: function(val){
-				var hintValue;
 				this.options.placeholder = val;
-				if(this.type == 'date'){
-					hintValue = (val || '').split('-');
-					if(hintValue.length == 3){
-						this.options.placeholder = curCfg.patterns.d.replace('yy', hintValue[0]).replace('mm', hintValue[1]).replace('dd', hintValue[2]);
-					}
+				if(placeholderFormat[this.type]){
+					this.options.placeholder = placeholderFormat[this.type](val);
 				}
+				
 				this.element.prop('placeholder', this.options.placeholder);
 			},
 			
@@ -2072,7 +2112,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			},
 			title: function(val){
 				this.options.title = val;
-				this.element.prop('tabindex', this.options.title);
+				this.element.prop('title', this.options.title);
 			},
 			
 			min: function(val){
@@ -2723,7 +2763,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						rowNum++;
 						lis.push('</tr><tr class="ws-row-'+ rowNum +'">');
 					}
-					lis.push('<td class="ws-item-'+ i +'" role="presentation"><button data-id="month-'+ i +'" type="button"'+ disabled + classStr +' data-action="'+ (data.type == 'month' ? 'changeInput' : 'setDayList' ) +'" value="'+value+'-'+val+'" tabindex="-1" role="gridcell">'+name+'</button></td>');
+
+					lis.push('<td class="ws-item-'+ i +'" role="presentation"><button data-id="month-'+ i +'" type="button"'+ disabled + classStr +' data-action="'+ (data.type == 'month' ? 'changeInput' : 'setDayList' ) +'" value="'+value+'-'+val+'" tabindex="-1" role="gridcell" aria-label="'+ curCfg.date.monthNames[i] +'">'+name+'</button></td>');
 					
 				}
 				
@@ -3457,10 +3498,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				for(i = 0; i < copyProps.length; i++){
 					opts[copyProps[i]] = $.prop(this, copyProps[i]);
 				}
+				
 				for(i = 0; i < copyAttrs.length; i++){
 					optsName = copyAttrs[i].replace(/^data\-/, '');
-					if(!opts[optsName]){
-						opts[optsName] = $.attr(this, copyAttrs[i]);
+					if(optsName == 'placeholder' || !opts[optsName]){
+						opts[optsName] = $.attr(this, copyAttrs[i]) || opts[optsName];
 					}
 				}
 				
@@ -3567,7 +3609,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			if(!modernizrInputTypes[name] || options.replaceUI){
 				extendType(name, {
 					_create: function(opts, set){
-						var data = $('<input class="ws-'+name+'" type="text" />') //  role="spinbutton"???
+						var markup = splitInputs[name] && opts.splitInput ?
+								'<span class="ws-'+name+'" role="group"></span>' :
+								'<input class="ws-'+name+'" type="text" />';
+						var data = $(markup) //  role="spinbutton"???
 							.insertAfter(opts.orig)
 							.spinbtnUI(opts)
 							.data('wsspinner')
