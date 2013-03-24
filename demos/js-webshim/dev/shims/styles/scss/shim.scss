@@ -126,6 +126,7 @@ mark {
 .input-buttons,
 .input-buttons *,
 .details-open-indicator,
+.ws-input-seperator,
 progress span.progress-value {
 	margin: 0;
 	padding: 0;
@@ -223,10 +224,10 @@ output {
 
 /* spinner control for time, number (usable for date, datetime-local) */
 .has-input-buttons {
-	display: inline;
+	display: inline-block;
 }
 .polyfill-important .has-input-buttons {
-	display: inline !important;
+	display: inline-block !important;
 }
 
 .input-buttons,
@@ -268,7 +269,6 @@ output {
 	&.ws-readonly * {
 		cursor: default;
 	}
-
 }
 
 .step-controls {
@@ -324,6 +324,64 @@ output {
 }
 
 
+.ws-input {
+
+	letter-spacing: -0.31em;
+    word-spacing: -0.43em;
+	
+	> * {
+		text-align: center;
+		letter-spacing: normal;
+		word-spacing: normal;
+	}
+	.ws-input-seperator {
+		vertical-align: middle;
+		width: 2%;
+		overflow: hidden;
+	}
+	
+	& + .input-buttons {
+		margin-left: 2px;
+	}
+	
+	input,
+	.ws-input-seperator	{
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+		text-align: center;
+		display: inline-block;
+	}
+}
+
+.ws-date {
+
+	.mm,
+	.dd {
+		width: 22%;
+		
+		.no-boxsizing & {
+			width: 16%;
+		}
+	}
+	.yy {
+		width: 47%;
+		
+		.no-boxsizing & {
+			width: 40%;
+		}
+	}
+}
+
+.ws-month {
+	.mm,
+	.yy {
+		width: 47.9%;
+		
+		.no-boxsizing & {
+			width: 41%;
+		}
+	}
+}
 
 /* range */
 .ws-range {

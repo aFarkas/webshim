@@ -1117,7 +1117,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 						spinner = $(elem).getShadowElement().data('wsspinner');
 					}
 					if(spinner && spinner.formatValue){
-						val = spinner.formatValue(val);
+						val = spinner.formatValue(val, false);
 					}
 				}
 				message = message.replace('{%'+ attr +'}', val);

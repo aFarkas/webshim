@@ -389,13 +389,65 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	var stopPropagation = function(e){
 		e.stopImmediatePropagation(e);
 	};
+	var stopPropagation = function(e){
+		e.stopImmediatePropagation(e);
+	};
+	var createFormat = function(name){
+		if(!curCfg.patterns[name+'Obj']){
+			var obj = {};
+			$.each(curCfg.patterns[name].split(curCfg[name+'Format']), function(i, name){
+				obj[name] = i;
+			});
+			curCfg.patterns[name+'Obj'] = obj;
+		}
+	};
 	var splitInputs = {
 		date: {
 			_create: function(){
-				return [$('<input type="text" class="yyyy ws-0" />')[0], $('<input type="text" class="mm ws-1" />')[0], $('<input type="text" class="dd ws-2" />')[0]];
+				var obj = {
+					splits: [$('<input type="text" class="yy ws-0" size="4" />')[0], $('<input type="text" class="mm ws-1" maxlength="2" size="2" />')[0], $('<input type="text" class="dd ws-2" maxlength="2" size="2" />')[0]] 
+				};
+				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1], $('<span class="ws-input-seperator" />')[0], obj.splits[2]];
+				return obj;
 			},
-			sort: function(){
-				
+			sort: function(element){
+				createFormat('d');
+				var i = 0;
+				var seperators = $('.ws-input-seperator', element).html(curCfg.dFormat);
+				var inputs = $('input', element);
+				$.each(curCfg.patterns.dObj, function(name, value){
+					var input = inputs.filter('.'+ name);
+					if(input[0]){
+						
+						input.appendTo(element);
+						if(i < seperators.length){
+							seperators.eq(i).insertAfter(input);
+						}
+						i++;
+					}
+				});
+			}
+		},
+		month: {
+			_create: function(){
+				var obj = {
+					splits: [$('<input type="text" class="yy ws-0" size="4" />')[0], $('<input type="text" class="mm ws-1" maxlength="2" size="2" />')[0]] 
+				};
+				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1]];
+				return obj;
+			},
+			sort: function(element){
+				var seperator = $('.ws-input-seperator', element).html(curCfg.dFormat);
+				var mm = $('input.mm', element);
+				var action;
+				if(curCfg.date.showMonthAfterYear){
+					mm.appendTo(element);
+					action = 'insertBefore';
+				} else {
+					mm.prependTo(element);
+					action = 'insertAfter';
+				}
+				seperator[action](mm);
 			}
 		}
 	};
@@ -407,7 +459,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			$(element).attr({'aria-labelledby': labels.map(getId).get().join(' ')});
 			if(!noFocus){
 				labels.on('click', function(e){
-					element.focus();
+					element.getShadowFocusElement().focus();
 					e.preventDefault();
 					return false;
 				});
@@ -551,15 +603,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		var createOpts = ['step', 'min', 'max', 'readonly', 'title', 'disabled', 'tabindex', 'placeholder', 'value'];
 		
-		var createFormat = function(name){
-			if(!curCfg.patterns[name+'Obj']){
-				var obj = {};
-				$.each(curCfg.patterns[name].split(curCfg[name+'Format']), function(i, name){
-					obj[name] = i;
-				});
-				curCfg.patterns[name+'Obj'] = obj;
-			}
-		};
 		
 		var formatVal = {
 			number: function(val){
@@ -574,18 +617,26 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				if(p[0] && p[1]){
 					names = curCfg.date[options.formatMonthNames] || curCfg.date[options.monthNames] || curCfg.date.monthNames;
 					p[1] = names[(p[1] * 1) - 1];
-					if(p[1]){
+					if(options && options.splitInput){
+						val = [p[0] || '', p[1] || ''];
+					} else if(p[1]){
 						val = curCfg.date.showMonthAfterYear ? p.join(' ') : p[1]+' '+p[0];
 					}
 				}
 				return val;
 			},
-			date: function(val){
+			date: function(val, opts){
 				var p = (val+'').split('-');
 				if(p[2] && p[1] && p[0]){
-					val = curCfg.patterns.d.replace('yy', p[0] || '');
-					val = val.replace('mm', p[1] || '');
-					val = val.replace('dd', p[2] || '');
+					if(opts && opts.splitInput){
+						val = p;
+					} else {
+						val = curCfg.patterns.d.replace('yy', p[0] || '');
+						val = val.replace('mm', p[1] || '');
+						val = val.replace('dd', p[2] || '');
+					}
+				} else if(opts && opts.splitInputs){
+					val = [p[0] || '', p[1] || '', p[2] || ''];
 				}
 				
 				return val;
@@ -599,8 +650,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			time: function(val){
 				return val;
 			},
-			month: function(val){
-				var p = val.trim().split(/[\.\s-\/\\]+/);
+			month: function(val, opts){
+				var p = (!opts.splitInput) ? val.trim().split(/[\.\s-\/\\]+/) : val;
+				
 				if(p.length == 2){
 					p[0] = curCfg.date.monthkeys[p[0]] || p[0];
 					p[1] = curCfg.date.monthkeys[p[1]] || p[1];
@@ -612,12 +664,21 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 				return val;
 			},
-			date: function(val){
+			date: function(val, opts){
 				createFormat('d');
 				var i;
-				var obj = curCfg.patterns.dObj;
-				val = val.split(curCfg.dFormat);
-				return val.length == 3 ? ([addZero(val[obj.yy]), addZero(val[obj.mm]), addZero(val[obj.dd])]).join('-') : '';
+				var obj;
+				if(opts.splitInput){
+					obj = {yy: 0, mm: 1, dd: 2};
+				} else {
+					obj = curCfg.patterns.dObj;
+					val = val.split(curCfg.dFormat);
+				}
+				
+				return (val.length == 3 && val[0] && val[1] && val[2]) ? 
+					([addZero(val[obj.yy]), addZero(val[obj.mm]), addZero(val[obj.dd])]).join('-') : 
+					''
+				;
 			}
 		};
 		
@@ -640,12 +701,30 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		
 		var placeholderFormat = {
-			date: function(val){
+			date: function(val, opts){
 				var hintValue = (val || '').split('-');
-				if(hintValue.length == 3 && hintValue[0].length > 3 && hintValue[1].length == 2 && hintValue[2].length == 2){
-					hintValue = curCfg.patterns.d.replace('yy', hintValue[0]).replace('mm', hintValue[1]).replace('dd', hintValue[2]);
+				if(hintValue.length == 3){
+					hintValue = opts.splitInput ? 
+						hintValue : 
+						curCfg.patterns.d.replace('yy', hintValue[0]).replace('mm', hintValue[1]).replace('dd', hintValue[2]);
 				} else {
-					hintValue = val;
+					hintValue = opts.splitInput ?
+						[val, val, val] :
+						val;
+				}
+				return hintValue;
+			},
+			month: function(val, opts){
+				var hintValue = (val || '').split('-');
+				
+				if(hintValue.length == 2){
+					hintValue = opts.splitInput ? 
+						hintValue : 
+						curCfg.patterns.d.replace('yy', hintValue[0]).replace('mm', hintValue[1]);
+				} else {
+					hintValue = opts.splitInput ?
+						[val, val] :
+						val;
 				}
 				return hintValue;
 			}
@@ -708,25 +787,37 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			},
 			_addSplitInputs: function(){
 				if(!this.inputElements){
-					this.splits = splitInputs[this.type]._create();
-					this.inputElements = $(this.splits);
-					this.inputElements.prependTo(this.element);
-					console.log(this.inputElements)
+					var create = splitInputs[this.type]._create();
+					this.splits = create.splits;
+					this.inputElements = $(create.elements).prependTo(this.element).filter('input');
 				}
 			},
-			parseValue: function(val){
-				return parseVal[this.type](val);
+			parseValue: function(){
+				var value = this.inputElements.map(function(){
+					return $.prop(this, 'value');
+				}).get();
+				if(!this.options.splitInput){
+					value = value[0];
+				}
+				return parseVal[this.type](value, this.options);
 			},
-			formatValue: function(val){
-				return formatVal[this.type](val, this.options);
+			formatValue: function(val, noSplit){
+				return formatVal[this.type](val, noSplit === false ? false : this.options);
 			},
 			placeholder: function(val){
-				this.options.placeholder = val;
+				var options = this.options;
+				options.placeholder = val;
+				var placeholder = val;
 				if(placeholderFormat[this.type]){
-					this.options.placeholder = placeholderFormat[this.type](val);
+					placeholder = placeholderFormat[this.type](val, this.options);
 				}
-				
-				this.element.prop('placeholder', this.options.placeholder);
+				if(options.splitInput && typeof placeholder == 'object'){
+					$.each(this.splits, function(i, elem){
+						$.prop(elem, 'placeholder', placeholder[i]);
+					});
+				} else {
+					this.element.prop('placeholder', placeholder);
+				}
 			},
 			
 			addZero: addZero,
@@ -744,6 +835,18 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				this.options.defValue = this.elemHelper.prop('value');
 				
 			},
+			reorderInputs: function(){
+				if(splitInputs[this.type]){
+					var element = this.element;
+					splitInputs[this.type].sort(element);
+					setTimeout(function(){
+						var data = webshims.data(element);
+						if(data && data.shadowData){
+							data.shadowData.shadowFocusElement = element.find('input')[0] || element[0];
+						}
+					}, 9);
+				}
+			},
 			value: function(val){
 				this.valueAsNumber = this.asNumber(val);
 				this.options.value = val;
@@ -754,7 +857,16 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					this.options.defValue = "";
 				}
 				
-				this.element.prop('value', formatVal[this.type](val, this.options));
+				val = formatVal[this.type](val, this.options);
+				if(this.options.splitInput){
+					
+					$.each(this.splits, function(i, elem){
+						$.prop(elem, 'value', val[i]);
+					});
+				} else {
+					this.element.prop('value', val);
+				}
+				
 				this._propertyChange('value');
 			},
 			initDataList: function(){
@@ -795,7 +907,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			_propertyChange: $.noop,
 			tabindex: function(val){
 				this.options.tabindex = val;
-				this.element.prop('tabindex', this.options.tabindex);
+				this.inputElements.prop('tabindex', this.options.tabindex);
 			},
 			title: function(val){
 				this.options.title = val;
@@ -849,42 +961,77 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 								events[name].val = val;
 								events[name].timer = setTimeout(function(){
 									events[name].fn(val, that);
-								}, 0);
+								}, 9);
 							}
 						}
 					};
 				})();
+				var initChangeEvents = function(){
+					eventTimer.init('input', $.prop(that.orig, 'value'), that.options.input);
+					eventTimer.init('change', $.prop(that.orig, 'value'), that.options.change);
+				};
 				
 				var step = {};
 				
 				var preventBlur = function(e){
 					if(preventBlur.prevent){
 						e.preventDefault();
-						that.element.focus();
+						(isFocused || that.element.getShadowFocusElement()).focus();
 						e.stopImmediatePropagation();
 						return true;
 					}
 				};
+				var callSplitChange = (function(){
+					var timer;
+					var call = function(setVal){
+						var val;
+						if(!o.splitInput || !that.inputElements.filter(':focus').length){
+							if(setVal){
+								val = that.parseValue();
+								$.prop(that.orig, 'value', val);
+							} else {
+								val = $.prop(that.orig, 'value');
+							}
+							eventTimer.call('input', val);
+							eventTimer.call('change', val);
+						}
+					};
+					if(o.splitInput){
+						that.inputElements.on('focus', function(){
+							clearTimeout(timer);
+						});
+					}
+					return function(setVal){
+						if(o.splitInput){
+							if(!that.inputElements.filter(':focus').length){
+								timer = setTimeout(function(){
+									call(setVal);
+								}, 9);
+							}
+						} else {
+							call(setVal);
+						}
+					};
+				})();
 				var elementEvts = {
 					blur: function(e){
 						if(!preventBlur(e) && !o.disabled && !o.readonly){
-							eventTimer.call('input', $.prop(that.orig, 'value'));
-							eventTimer.call('change', $.prop(that.orig, 'value'));
+							callSplitChange();
 							if(!preventBlur.prevent){
 								isFocused = false;
 							}
 						}
+						stopPropagation(e);
 					},
-					focus: function(){
-						eventTimer.init('input', $.prop(that.orig, 'value'), that.options.input);
-						eventTimer.init('change', $.prop(that.orig, 'value'), that.options.change);
-						isFocused = true;
+					focus: function(e){
+						if(!isFocused){
+							initChangeEvents();
+							isFocused = this;
+						}
 					},
-					change: function(){
-						var val = parseVal[that.type]($.prop(this, 'value'));
-						$.prop(that.orig, 'value', val);
-						eventTimer.call('input', val);
-						eventTimer.call('change', val);
+					change: function(e){
+						callSplitChange(true);
+						stopPropagation(e);
 					},
 					keydown: function(e){
 						if(e.isDefaultPrevented()){return;}
@@ -919,7 +1066,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				};
 				var mouseDownInit = function(){
 					if(!o.disabled && !isFocused){
-						that.element[0].focus();
+						that.element.getShadowFocusElement().focus();
 					}
 					preventBlur.set();
 					
@@ -976,11 +1123,23 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						e.preventDefault();
 					}
 				};
-				this.element.on(elementEvts);
+				this.inputElements.on(elementEvts);
 				
-				$(document).on('wslocalechange',function(){
-					that.value(that.options.value);
-				});
+				if(!o.splitInput){
+					$(document).on('wslocalechange',function(){
+						if(o.value){
+							that.value(o.value);
+						}
+
+						if(placeholderFormat[that.type] && o.placeholder){
+							that.placeholder(o.placeholder);
+						}
+					});
+				} else {
+					$(document).onTrigger('wslocalechange',function(){
+						that.reorderInputs();
+					});
+				}
 				
 				$('.step-up', this.buttonWrapper)
 					.on({
@@ -998,7 +1157,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						}
 					})
 				;
-				
+				initChangeEvents();
 			}
 		};
 		
@@ -1056,7 +1215,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			this.activeButton = element.attr({tabindex: '0', 'aria-selected': 'true'});
 			this.index = this.buttons.index(this.activeButton[0]);
 			
-			
 			clearTimeout(this.timer);
 			
 			if(!this.popover.openedByFocus && !_noFocus){
@@ -1082,7 +1240,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					this.activeButton = this.buttons[this.popover.navedInitFocus.alt]();
 				}
 			}
-			
 			
 			if(!this.activeButton || !this.activeButton[0]){
 				this.activeButton = this.buttons.filter('.checked-value');
@@ -1693,7 +1850,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		var actions = {
 			changeInput: function(val, popover, data){
 				popover.stopOpen = true;
-				data.element.focus();
+				data.element.getShadowFocusElement().focus();
 				setTimeout(function(){
 					popover.stopOpen = false;
 				}, 9);
@@ -1793,7 +1950,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					var disabled = picker.isInRange(val.split('-'), o.maxS, o.minS) ?
 						'' :
 						' disabled="" '
-					options.push('<li role="presentation"><button value="'+ val +'" '+disabled+' data-action="changeInput" tabindex="-1"  role="option">'+ (label || data.formatValue(val)) +'</button></li>');
+					options.push('<li role="presentation"><button value="'+ val +'" '+disabled+' data-action="changeInput" tabindex="-1"  role="option">'+ (label || data.formatValue(val, false)) +'</button></li>');
 				});
 				if(options.length){
 					id++;
@@ -1930,8 +2087,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						popover.openedByFocus = false;
 					},
 					focusin: function(e){
-						popover.openedByFocus = false;
-						popover.activateElement(e.target);
+						if(popover.activateElement){
+							popover.openedByFocus = false;
+							popover.activateElement(e.target);
+						}
 					}
 				})
 			;
@@ -1964,17 +2123,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			};
 			
 			options.containerElements.push(popover.element[0]);
-			
-			popover.element
-				.on({
-					focusin: function(e){
-						if(popover.activateElement){
-							popover.openedByFocus = false;
-							popover.activateElement(e.target);
-						}
-					}
-				})
-			;
 			
 			if(!options.startView){
 				options.startView = 0;
@@ -2025,11 +2173,13 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				var resetMouseFocus = function(){
 					mouseFocus = false;
 				};
-				data.element.on({
+				data.inputElements.on({
 					focus: function(){
 						if(!popover.stopOpen && (data.options.openOnFocus || (mouseFocus && options.openOnMouseFocus))){
 							popover.openedByFocus = !options.noInput;
 							show();
+						} else {
+							popover.preventBlur();
 						}
 					},
 					mousedown: function(){
@@ -2039,6 +2189,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 							popover.openedByFocus = !options.noInput;
 							show();
 						}
+						popover.preventBlur();
 					}
 				});
 			})();
@@ -2067,12 +2218,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			'max',
 			'step',
 			'title',
-			'placeholder',
-			'tabindex'
+			'placeholder'
 		];
 		
 		//
-		var copyAttrs = ['data-placeholder'];
+		var copyAttrs = ['data-placeholder', 'tabindex'];
 			
 		$.each(copyProps.concat(copyAttrs), function(i, name){
 			var fnName = name.replace(/^data\-/, '');
@@ -2087,7 +2237,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			});
 		});
 		
-		if(options.replaceUI){
+		if(options.replaceUI && 'valueAsNumber' in document.createElement('input')){
 			var reflectFn = function(val){
 				if(webshims.data(this, 'hasShadow')){
 					$.prop(this, 'value', $.prop(this, 'value'));
@@ -2106,9 +2256,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			};
 		})();
 		
-		var stopPropagation = function(e){
-			e.stopImmediatePropagation(e);
-		};
 		var isVisible = function(){
 			return $.css(this, 'display') != 'none';
 		};
@@ -2204,7 +2351,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				labelWidth($(this).getShadowFocusElement(), labels);
 				
 				$(this).on('change', function(e){
-					if(!stopCircular && e.originalEvent){
+					if(!stopCircular){
 						data.shim.value($.prop(this, 'value'));
 					}
 				});
@@ -2296,8 +2443,13 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			if(!modernizrInputTypes[name] || options.replaceUI){
 				extendType(name, {
 					_create: function(opts, set){
-						var markup = splitInputs[name] && opts.splitInput ?
-								'<span class="ws-'+name+'" role="group"></span>' :
+						
+						if(opts.splitInput && !splitInputs[name]){
+							webshims.warn('splitInput not supported for '+ name);
+							opts.splitInput = false;
+						}
+						var markup = opts.splitInput ?
+								'<span class="ws-'+name+' ws-input" role="group"></span>' :
 								'<input class="ws-'+name+'" type="text" />';
 						var data = $(markup) //  role="spinbutton"???
 							.insertAfter(opts.orig)

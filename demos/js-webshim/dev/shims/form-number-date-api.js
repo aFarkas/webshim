@@ -40,8 +40,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			return (elem.getAttribute('type') || '').toLowerCase();
 		},
 		isDateTimePart = function(string){
-			var numStr = string * 1;
-			return (string && (numStr == string || string == '0' + numStr));
+			return (string && !(isNaN(string * 1)));
 		},
 		addMinMaxNumberToCache = webshims.addMinMaxNumberToCache,
 		addleadingZero = function(val, len){
@@ -281,11 +280,11 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 				var ret = false;
 				
 				
-				if(valA[0].length !== 4 || valA[1].length != 2 || valA[1] > 12 || valA[2].length != 2 || valA[2] > 33){
+				if(valA[0].length < 4 || valA[1].length != 2 || valA[1] > 12 || valA[2].length != 2 || valA[2] > 33){
 					ret = true;
 				} else {
 					for(i = 0; i < 3; i++){
-						if(!isDateTimePart(valA[0])){
+						if(!isDateTimePart(valA[i])){
 							ret = true;
 							break;
 						}
@@ -315,7 +314,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 				return (isNumber(num)) ? this.dateToString(new Date( num * 1)) : false;
 			},
 			dateToString: function(date){
-				return (date && date.getFullYear) ? date.getUTCFullYear() +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
+				return (date && date.getFullYear) ? addleadingZero(date.getUTCFullYear(), 4) +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
 			}
 		},
 		time: {
