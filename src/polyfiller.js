@@ -828,6 +828,14 @@
 		}
 	});
 	
+	addModule('swfobject', {
+		src: googleAPIs+'swfobject/2.2/swfobject.js',
+		test: function(){
+			webshims.warn('deprecated module: '+ this.name);
+			return ('swfobject' in window);
+		}
+	});
+	
 	addModule('input-widgets', {
 		src: '',
 		test: function(){
