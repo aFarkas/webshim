@@ -405,7 +405,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		date: {
 			_create: function(){
 				var obj = {
-					splits: [$('<input type="text" class="yy ws-0" size="4" />')[0], $('<input type="text" class="mm ws-1" maxlength="2" size="2" />')[0], $('<input type="text" class="dd ws-2" maxlength="2" size="2" />')[0]] 
+					splits: [$('<input type="text" class="yy" size="4" />')[0], $('<input type="text" class="mm" maxlength="2" size="2" />')[0], $('<input type="text" class="dd ws-spin" maxlength="2" size="2" />')[0]] 
 				};
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1], $('<span class="ws-input-seperator" />')[0], obj.splits[2]];
 				return obj;
@@ -431,7 +431,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		month: {
 			_create: function(){
 				var obj = {
-					splits: [$('<input type="text" class="yy ws-0" size="4" />')[0], $('<input type="text" class="mm ws-1" maxlength="2" size="2" />')[0]] 
+					splits: [$('<input type="text" class="yy" size="4" />')[0], $('<input type="text" class="mm ws-spin" maxlength="2" size="2" />')[0]] 
 				};
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1]];
 				return obj;
@@ -778,8 +778,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					this[createOpts[i]](this.options[createOpts[i]]);
 				}
 				
-				this.inputElements.attr('autocomplete', 'off');
-				
 				this.element.data('wsspinner', this);
 				
 				this.addBindings();
@@ -1013,6 +1011,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						}
 					};
 				})();
+				var spinEvents = {};
+				var spinElement = o.splitInput ? this.inputElements.filter('.ws-spin') : this.inputElements.eq(0);
 				var elementEvts = {
 					blur: function(e){
 						if(!preventBlur(e) && !o.disabled && !o.readonly){
@@ -1032,21 +1032,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					change: function(e){
 						callSplitChange(true);
 						stopPropagation(e);
-					},
-					keydown: function(e){
-						if(e.isDefaultPrevented()){return;}
-						var stepped = true;
-						var code = e.keyCode;
-						if (code == 38) {
-							step.stepUp();
-						} else if (code == 40) {
-							step.stepDown();
-						} else {
-							stepped = false;
-						}
-						if(stepped){
-							e.preventDefault();
-						}
 					},
 					keypress: function(e){
 						if(e.isDefaultPrevented()){return;}
@@ -1117,13 +1102,35 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					that.setInput(value);
 					eventTimer.call('change', value);
 				};
-				elementEvts[$.fn.mwheelIntent ? 'mwheelIntent' : 'mousewheel'] = function(e, delta){
-					if(delta && isFocused && !o.disabled){
-						step[delta > 0 ? 'stepUp' : 'stepDown']();
-						e.preventDefault();
-					}
-				};
+				
 				this.inputElements.on(elementEvts);
+				
+				if(!o.noSpinbtn){
+					spinEvents[$.fn.mwheelIntent ? 'mwheelIntent' : 'mousewheel'] = function(e, delta){
+						if(delta && isFocused && !o.disabled){
+							step[delta > 0 ? 'stepUp' : 'stepDown']();
+							e.preventDefault();
+						}
+					};
+					spinEvents.keydown = function(e){
+						if(o.list || e.isDefaultPrevented() || $.attr(this, 'list')){return;}
+						var stepped = true;
+						var code = e.keyCode;
+						if (code == 38) {
+							step.stepUp();
+						} else if (code == 40) {
+							step.stepDown();
+						} else {
+							stepped = false;
+						}
+						if(stepped){
+							e.preventDefault();
+						}
+					};
+					
+					spinElement.attr('autocomplete', 'off').on(spinEvents);
+				}
+				
 				
 				if(!o.splitInput){
 					$(document).on('wslocalechange',function(){
