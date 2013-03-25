@@ -47,7 +47,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		month: {
 			_create: function(){
 				var obj = {
-					splits: [$('<input type="text" class="yy" size="4" />')[0], $('<input type="text" class="mm ws-spin" maxlength="2" size="2" />')[0]] 
+					splits: [$('<input type="text" class="yy" size="4" />')[0], $('<input type="text" class="mm ws-spin" />')[0]] 
 				};
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1]];
 				return obj;
@@ -597,42 +597,53 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				};
 				var callSplitChange = (function(){
 					var timer;
-					var call = function(setVal){
+					
+					var call = function(){
 						var val;
-						if(!o.splitInput || !that.inputElements.filter(':focus').length){
-							if(setVal){
-								val = that.parseValue();
-								$.prop(that.orig, 'value', val);
-							} else {
-								val = $.prop(that.orig, 'value');
-							}
-							eventTimer.call('input', val);
-							eventTimer.call('change', val);
-						}
+						val = that.parseValue();
+						$.prop(that.orig, 'value', val);
+						eventTimer.call('input', val);
+						eventTimer.call('change', val);
 					};
-					if(o.splitInput){
-						that.inputElements.on('focus', function(){
-							clearTimeout(timer);
-						});
-					}
-					return function(setVal){
-						if(o.splitInput){
-							if(!that.inputElements.filter(':focus').length){
-								timer = setTimeout(function(){
-									call(setVal);
-								}, 9);
-							}
-						} else {
-							call(setVal);
-						}
+					
+					var onFocus = function(){
+						clearTimeout(timer);
 					};
+					var onBlur = function(e){
+						if(e.type == 'change'){
+							stopPropagation(e);
+						}
+						clearTimeout(timer);
+						timer = setTimeout(call, 0);
+					};
+					
+					that.inputElements
+						.add(that.buttonWrapper)
+						.add(that.element)
+						.on(
+							{
+								'focus focusin': onFocus,
+								'blur focusout change': onBlur
+							}
+						)
+					;
+					setTimeout(function(){
+						if(that.popover){
+							$('> *', that.popover.element)
+								.on({
+									'focusin': onFocus,
+									'focusout': onBlur
+								})
+							;
+						}
+					}, 0);
 				})();
+				
 				var spinEvents = {};
 				var spinElement = o.splitInput ? this.inputElements.filter('.ws-spin') : this.inputElements.eq(0);
 				var elementEvts = {
 					blur: function(e){
 						if(!preventBlur(e) && !o.disabled && !o.readonly){
-							callSplitChange();
 							if(!preventBlur.prevent){
 								isFocused = false;
 							}
@@ -644,10 +655,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 							initChangeEvents();
 							isFocused = this;
 						}
-					},
-					change: function(e){
-						callSplitChange(true);
-						stopPropagation(e);
 					},
 					keypress: function(e){
 						if(e.isDefaultPrevented()){return;}
@@ -706,6 +713,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						}
 					};
 				});
+				
 				
 				
 				this.buttonWrapper.on('mousedown', mouseDownInit);
@@ -1118,7 +1126,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					prevDisabled = picker.isInRange([start-1], max, min) ? {'data-action': 'setYearList','value': start-1} : false;
 				}
 				
-				str += '<div class="year-list picker-list ws-index-'+ j +'"><div class="ws-picker-header"><h3>'+ start +' - '+(start + 11)+'</h3></div>';
+				str += '<div class="year-list picker-list ws-index-'+ j +'"><div class="ws-picker-header"><button disabled="disabled">'+ start +' - '+(start + 11)+'</button></div>';
 				lis = [];
 				for(i = 0; i < 12; i++){
 					val = start + i ;
@@ -1659,7 +1667,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 							return false;
 						}
 					} else if(e.keyCode == 27){
-						data.element.focus();
+						data.element.getShadowFocusElement().focus();
 						popover.hide();
 						return false;
 					}

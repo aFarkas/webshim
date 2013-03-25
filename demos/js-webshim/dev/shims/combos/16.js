@@ -3375,6 +3375,7 @@ try {
 	document.querySelector(':checked');
 } catch(er){
 	(function(){
+		$('html').addClass('no-csschecked');
 		var checkInputs = {
 			radio: 1,
 			checkbox: 1
