@@ -4035,7 +4035,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				this.lastUnfoundValue = '';
 
 				if(!this.updateTimer){
-					if(window.QUnit || (forceShow = (e && document.activeElement == that.input))){
+					if(window.QUnit || (forceShow = ($(that.input).is(':focus') && ($(that.input).hasClass('list-focus') || $.prop(that.input, 'value'))) )){
 						that.updateListOptions(forceShow);
 					} else {
 						webshims.ready('WINDOWLOAD', function(){
