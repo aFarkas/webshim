@@ -1,7 +1,7 @@
-.input-picker .ws-picker-body, .input-picker .ws-button-row, .input-picker .picker-list {
+.input-picker .ws-picker-body, .input-picker .ws-button-row, .input-picker .picker-grid, .input-picker .picker-list {
   zoom: 1;
 }
-.input-picker .ws-picker-body:before, .input-picker .ws-button-row:before, .input-picker .picker-list:before, .input-picker .ws-picker-body:after, .input-picker .ws-button-row:after, .input-picker .picker-list:after {
+.input-picker .ws-picker-body:before, .input-picker .ws-button-row:before, .input-picker .picker-grid:before, .input-picker .picker-list:before, .input-picker .ws-picker-body:after, .input-picker .ws-button-row:after, .input-picker .picker-grid:after, .input-picker .picker-list:after {
   display: table;
   clear: both;
   content: ' ';
@@ -723,6 +723,11 @@ html .ws-po-arrow .ws-po-arrowbox {
 }
 .input-picker .ws-picker-header button[disabled]:hover {
   text-decoration: none;
+}
+.input-picker .picker-grid {
+  position: relative;
+  zoom: 1;
+  overflow: hidden;
 }
 .input-picker .picker-list {
   position: relative;

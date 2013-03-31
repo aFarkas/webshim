@@ -1170,7 +1170,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				if(j == size - 1){
 					nextDisabled = picker.isInRange([val+1], max, min) ? {'data-action': 'setYearList','value': val+1} : false;
 				}
-				str += '<table role="grid" aria-label="'+ start +' - '+(start + 11)+'"><tbody><tr class="ws-row-0">'+ (lis.join(''))+ '</tr></tbody></table></div>';
+				str += '<div class="picker-grid"><table role="grid" aria-label="'+ start +' - '+(start + 11)+'"><tbody><tr class="ws-row-0">'+ (lis.join(''))+ '</tr></tbody></table></div></div>';
 			}
 			
 			return {
@@ -1255,7 +1255,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					
 				}
 				
-				str += '<table role="grid" aria-label="'+value+'"><tbody><tr class="ws-row-0">'+ (lis.join(''))+ '</tr></tbody></table></div>';
+				str += '<div class="picker-grid"><table role="grid" aria-label="'+value+'"><tbody><tr class="ws-row-0">'+ (lis.join(''))+ '</tr></tbody></table></div></div>';
 			}
 			
 			return {
@@ -1320,7 +1320,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 				
 				
-				str.push('</div><table role="grid" aria-label="'+ fullMonthName.join(' ')  +'"><thead><tr>');
+				str.push('</div><div class="picker-grid"><table role="grid" aria-label="'+ fullMonthName.join(' ')  +'"><thead><tr>');
 				
 				if(data.options.showWeek){
 					str.push('<th class="week-header">'+ curCfg.date.weekHeader +'</th>');
@@ -1402,7 +1402,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					
 					date.setDate(date.getDate() + 1);
 				}
-				str.push('</tbody></table></div>');
+				str.push('</tbody></table></div></div>');
 				if(j == size - 1){
 					dateArray = getDateArray(date);
 					dateArray[2] = 1;

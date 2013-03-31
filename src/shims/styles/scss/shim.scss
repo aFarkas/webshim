@@ -822,7 +822,14 @@ $button-bgcolor: #f5f5f5;
 			}
 		}
 	 }
-
+	
+	.picker-grid {
+		@extend %clearfix;
+		position: relative;
+		zoom: 1;
+		overflow: hidden;
+	}
+	
 	.picker-list {
 		@extend %clearfix;
 		position: relative;
