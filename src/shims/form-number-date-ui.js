@@ -227,6 +227,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			time: function(val){
 				return val;
 			},
+			//todo empty val for month/split
 			month: function(val, options){
 				var names;
 				var p = val.split('-');
@@ -251,7 +252,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						val = val.replace('mm', p[1] || '');
 						val = val.replace('dd', p[2] || '');
 					}
-				} else if(opts && opts.splitInputs){
+				} else if(opts && opts.splitInput){
 					val = [p[0] || '', p[1] || '', p[2] || ''];
 				}
 				
@@ -598,12 +599,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				var callSplitChange = (function(){
 					var timer;
 					
-					var call = function(){
+					var call = function(e){
 						var val;
+						clearTimeout(timer);
 						val = that.parseValue();
 						$.prop(that.orig, 'value', val);
 						eventTimer.call('input', val);
-						eventTimer.call('change', val);
+						if(!e || e.type != 'wsupdatevalue'){
+							eventTimer.call('change', val);
+						}
 					};
 					
 					var onFocus = function(){
@@ -616,6 +620,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						clearTimeout(timer);
 						timer = setTimeout(call, 0);
 					};
+					
+					that.element.on('wsupdatevalue', call);
 					
 					that.inputElements
 						.add(that.buttonWrapper)
@@ -841,6 +847,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		var today = getDateArray(new Date());
 		
 		var _setFocus = function(element, _noFocus){
+			var setFocus, that;
 			element = $(element || this.activeButton);
 			this.activeButton.attr({tabindex: '-1', 'aria-selected': 'false'});
 			this.activeButton = element.attr({tabindex: '0', 'aria-selected': 'true'});
@@ -849,10 +856,18 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			clearTimeout(this.timer);
 			
 			if(!this.popover.openedByFocus && !_noFocus){
+				that = this;
+				setFocus = function(noTrigger){
+					clearTimeout(that.timer);
+					that.timer = setTimeout(function(){
+						element[0].focus();
+						if(noTrigger !== true && !element.is(':focus')){
+							setFocus(true);
+						}
+					}, that.popover.isVisible ? 20 : 99);
+				};
 				this.popover.activateElement(element);
-				this.timer = setTimeout(function(){
-					element[0].focus();
-				}, this.popover.isVisible ? 20 : 99);
+				setFocus();
 			}
 			
 		};
@@ -882,9 +897,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			if(!this.activeButton[0]){
 				this.activeButton = this.buttons.eq(0);
 			}
-			if(this.popover.openedByFocus){
-				this.popover.activeElement = this.activeButton;
-			}
+			
 			this.setFocus(this.activeButton, this.opts.noFocus);
 		};
 		
@@ -965,6 +978,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			this.ons(this);
 			
 			this._initialFocus();
+			if(this.popover.openedByFocus){
+				this.popover.activeElement = this.activeButton;
+			}
 		};
 		
 		
@@ -1053,10 +1069,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					button = $(button.get().reverse());
 				}
 				button = button.find(sel)[val.get]();
-				if(cellIndex == null){
-					webshims.warn("cellIndex not implemented. abort keynav");
-					return;
-				}
+				
 				if(!button[0]){
 					if(this.opts[val.action]){
 						this.popover.navedInitFocus = sel+':'+val.get;
@@ -1138,7 +1151,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						enabled++;
 					}
 					
-					
 					if(val == today[0]){
 						classArray.push('this-value');
 					}
@@ -1210,7 +1222,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				str += '<div class="month-list picker-list ws-index-'+ j +'"><div class="ws-picker-header">';
 				
 				str += o.selectNav ? 
-					'<select data-action="setMonthList">'+ picker.createYearSelect(value, max, min).join('') +'</select>' : 
+					'<select data-action="setMonthList" class="year-select">'+ picker.createYearSelect(value, max, min).join('') +'</select>' : 
 					'<button data-action="setYearList"'+disabled+' value="'+ value +'" tabindex="-1">'+ value +'</button>';
 				str += '</div>';
 				
@@ -1260,7 +1272,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			
 			var j, i, k, day, nDay, name, val, disabled, lis,  prevDisabled, nextDisabled, addTr, week, rowNum;
 			
-			var lastMotnh, curMonth, otherMonth, dateArray, monthName, buttonStr, date2, classArray;
+			var lastMotnh, curMonth, otherMonth, dateArray, monthName, fullMonthName, buttonStr, date2, classArray;
 			var o = data.options;
 			var size = o.size;
 			var max = o.max.split('-');
@@ -1287,16 +1299,18 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				str.push('<div class="day-list picker-list ws-index-'+ j +'"><div class="ws-picker-header">');
 				if( o.selectNav ){
-					monthName = ['<select data-action="setDayList" tabindex="0">'+ picker.createMonthSelect(dateArray, max, min, monthNames).join('') +'</select>', '<select data-action="setDayList" tabindex="0">'+ picker.createYearSelect(dateArray[0], max, min, '-'+dateArray[1]).join('') +'</select>'];
+					monthName = ['<select data-action="setDayList" class="month-select" tabindex="0">'+ picker.createMonthSelect(dateArray, max, min, monthNames).join('') +'</select>', '<select data-action="setDayList" class="year-select" tabindex="0">'+ picker.createYearSelect(dateArray[0], max, min, '-'+dateArray[1]).join('') +'</select>'];
 					if(curCfg.date.showMonthAfterYear){
 						monthName.reverse();
 					}
 					str.push( monthName.join(' ') );
 				} 
 				
+				fullMonthName = [curCfg.date.monthNames[(dateArray[1] * 1) - 1], dateArray[0]];
 				monthName = [monthNames[(dateArray[1] * 1) - 1], dateArray[0]];
 				if(curCfg.date.showMonthAfterYear){
 					monthName.reverse();
+					fullMonthName.reverse();
 				}
 				
 				if(!data.options.selectNav) {
@@ -1306,7 +1320,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 				
 				
-				str.push('</div><table role="grid" aria-label="'+ monthName.join(' ')  +'"><thead><tr>');
+				str.push('</div><table role="grid" aria-label="'+ fullMonthName.join(' ')  +'"><thead><tr>');
 				
 				if(data.options.showWeek){
 					str.push('<th class="week-header">'+ curCfg.date.weekHeader +'</th>');
@@ -1581,6 +1595,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					var disabled = picker.isInRange(val.split('-'), o.maxS, o.minS) ?
 						'' :
 						' disabled="" '
+					;
 					options.push('<li role="presentation"><button value="'+ val +'" '+disabled+' data-action="changeInput" tabindex="-1"  role="option">'+ (label || data.formatValue(val, false)) +'</button></li>');
 				});
 				if(options.length){
@@ -1627,6 +1642,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					$('> span', popover.prevElement).html(curCfg.date.prevText);
 					
 					generateList(o, o.maxS, o.minS);
+					
 				}
 				$('button.ws-empty', popover.buttonRow).prop('disabled', $.prop(data.orig, 'required'));
 				popover.isDirty = false;
@@ -1704,28 +1720,16 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				element = $(element);
 				if(element[0] != popover.activeElement[0]){
 					popover.activeElement.removeClass('ws-focus');
-					if(!popover.openedByFocus){
-						element.addClass('ws-focus');
-					}
+					element.addClass('ws-focus');
 				}
 				popover.activeElement = element;
 			};
-			
-			popover.element
-				.on({
-					wspopoverbeforeshow: updateContent,
-					wspopoverhide: function(){
-						popover.openedByFocus = false;
-					},
-					focusin: function(e){
-						if(popover.activateElement){
-							popover.openedByFocus = false;
-							popover.activateElement(e.target);
-						}
-					}
-				})
-			;
-			
+			popover.element.on({
+				wspopoverbeforeshow: function(){
+					data.element.triggerHandler('wsupdatevalue');
+					updateContent();
+				}
+			});
 			
 			$(document).onTrigger('wslocalechange', data._propertyChange);
 		};
@@ -1772,6 +1776,22 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			popover.element
 				.addClass(data.type+'-popover input-picker')
 				.attr({role: 'application'})
+				.on({
+					wspopoverhide: function(){
+						popover.openedByFocus = false;
+					},
+					focusin: function(e){
+						if(popover.activateElement){
+							popover.openedByFocus = false;
+							popover.activateElement(e.target);
+						}
+					},
+					focusout: function(){
+						if(popover.activeElement){
+							popover.activeElement.removeClass('ws-focus');
+						}
+					}
+				})
 			;
 			
 			labelWidth(popover.element.children('div.ws-po-outerbox').attr({role: 'group'}), options.labels, true);

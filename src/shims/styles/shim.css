@@ -237,7 +237,10 @@ output {
 }
 
 .popover-opener {
-  background: #000;
+  margin: 0 0 0 1px;
+  width: 14px;
+  border-radius: 3px;
+  background: #cccccc url(forms.png) no-repeat -321px 3px;
 }
 
 .polyfill-important .input-buttons {
@@ -335,7 +338,7 @@ output {
   width: 16%;
 }
 .ws-date .yy {
-  width: 47%;
+  width: 47.9%;
 }
 .no-boxsizing .ws-date .yy {
   width: 40%;
@@ -498,8 +501,8 @@ output {
   margin: 0;
   border: 0;
   padding: 0;
-  -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
+  box-sizing: content-box;
   -webkit-appearance: none;
   appearance: none;
   box-sizing: content-box;
@@ -513,6 +516,7 @@ output {
 }
 .ws-popover button[disabled] {
   cursor: default;
+  color: #888;
 }
 .ws-popover.ws-po-visible {
   visibility: visible;
@@ -522,8 +526,8 @@ output {
   position: relative;
   opacity: 0;
   padding: 11px 0 4px;
-  transform: translate(0, -100%);
   -webkit-transform: translate(0, -100%);
+  transform: translate(0, -100%);
   transition: all 400ms ease-in-out;
 }
 .ws-popover.ws-po-visible .ws-po-outerbox {
@@ -596,135 +600,144 @@ html .ws-po-arrow .ws-po-arrowbox {
 }
 
 .input-picker {
-  width: 300px;
+  outline: none;
   text-align: center;
   font-family: sans-serif;
+  width: 280px;
+}
+.input-picker abbr[title] {
+  cursor: help;
 }
 .input-picker li,
 .input-picker button {
-  font-size: 16px;
-  line-height: 1.1em;
+  font-size: 13px;
+  line-height: 16px;
+  color: #000;
+  transition: all 400ms;
 }
 .input-picker .ws-focus,
 .input-picker :focus {
-  outline: 1px dotted #3399ff;
+  outline: 1px dotted black;
 }
 .input-picker .ws-po-box {
   position: relative;
-  padding: 8px;
+  padding: 10px 20px 15px;
   border-radius: 5px;
-  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
 .input-picker .ws-prev,
 .input-picker .ws-next {
   position: absolute;
   top: 10px;
-  min-width: 30px;
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  background: #eeeeee url(forms.png) no-repeat 0 0;
   z-index: 1;
+}
+.input-picker .ws-prev span,
+.input-picker .ws-next span {
+  display: none;
 }
 .input-picker .ws-picker-body {
   position: relative;
-  padding: 50px 0 0;
+  padding: 46px 0 0;
   zoom: 1px;
 }
 .input-picker .ws-prev {
-  left: 10px;
+  left: 20px;
+  background-position: -243px 5px;
 }
 .input-picker .ws-next {
-  right: 10px;
+  right: 20px;
+  background-position: -275px 5px;
+}
+.input-picker .ws-prev:hover,
+.input-picker .ws-next:hover {
+  border-color: #666;
+}
+.input-picker .ws-prev[disabled],
+.input-picker .ws-next[disabled] {
+  opacity: 0.4;
+  border-color: #eee;
 }
 .input-picker .ws-button-row {
   position: relative;
   margin: 10px 0 0;
+  border-top: 1px solid #eeeeee;
+  padding: 10px 0 0;
   text-align: left;
   z-index: 2;
+}
+.input-picker .ws-button-row button {
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+  box-shadow: 1px 1px 0 white;
+  background-color: #ddd;
+  background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
+  background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
+  transition: border-color 200ms linear;
 }
 .input-picker .ws-button-row button.ws-empty {
   float: right;
 }
+.input-picker[data-currentview="setMonthList"] .ws-picker-header select {
+  max-width: 95%;
+}
+.input-picker[data-currentview="setDayList"] .ws-picker-header select {
+  max-width: 40%;
+}
+.input-picker[data-currentview="setDayList"] .ws-picker-header select.month-select {
+  max-width: 55%;
+}
 .input-picker .ws-picker-header {
   position: absolute;
-  top: 5px;
+  top: 2px;
   right: 0;
   left: 0;
-  margin: 0 60px;
-  border: 1px solid #dddddd;
-  border-radius: 4px;
+  margin: 0 40px;
 }
-.input-picker .ws-picker-header h3,
 .input-picker .ws-picker-header button {
   display: inline-block;
   width: 100%;
   margin: 0;
-  padding: 8px 0;
-  font-size: 16px;
-  line-height: 1.1em;
-  font-weight: normal;
+  padding: 4px 0;
+  font-weight: 700;
+  color: #000;
 }
-.input-picker .ws-picker-header button {
-  background: whitesmoke;
-  border-radius: inherit;
-  box-shadow: inset 0 -5px 12px -5px rgba(0, 0, 0, 0.4), 0 -4px 0 0 #dddddd;
+.input-picker .ws-picker-header button:hover {
+  text-decoration: underline;
 }
-.input-picker .ws-picker-header button:after {
-  content: ' ';
-  position: absolute;
-  top: -4px;
-  left: 0;
-  right: 0;
-  width: 0;
-  height: 0;
-  margin: auto;
-  border-color: whitesmoke transparent;
-  border-style: solid;
-  border-width: 0 5px 5px 5px;
+.input-picker .ws-picker-header button[disabled]:hover {
+  text-decoration: none;
 }
-.input-picker .ws-picker-header button:focus, .input-picker .ws-picker-header button:hover {
-  box-shadow: inset 0 -5px 12px -6px rgba(0, 0, 0, 0.6), 0 -4px 0 0 #dddddd;
+.input-picker .picker-list tr {
+  border: 0;
 }
-.input-picker .ws-picker-header button:active {
-  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.5), 0 -4px 0 0 #dddddd;
+.input-picker .picker-list th,
+.input-picker .picker-list td {
+  padding: 3px 5px;
 }
-.input-picker .ws-picker-header button:active:after {
-  opacity: 0;
+.input-picker .picker-list.day-list td {
+  padding: 2px 1px;
 }
-.input-picker .ws-picker-body li {
-  display: block;
-}
-.input-picker .picker-list ul {
-  margin: 0;
-  padding: 0;
-}
-.input-picker .picker-list li {
-  float: left;
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid #dddddd;
-}
-.input-picker .picker-list li button,
 .input-picker .picker-list td button {
   display: block;
-  padding: 8px 0;
+  padding: 4px 0;
   width: 100%;
-  border: 1px solid transparent;
-  border-radius: 3px;
-  transition: all 400ms;
+  border-radius: 5px;
+  color: #000;
+  background-color: #fff;
 }
-.input-picker .picker-list li button:hover,
-.input-picker .picker-list td button:hover {
+.input-picker .picker-list td button:hover, .input-picker .picker-list td button.checked-value {
   color: #fff;
-  background: #39f;
+  background: #000;
 }
-.input-picker .picker-list li button.this-value,
-.input-picker .picker-list td button.this-value {
-  border-color: #f93;
-}
-.input-picker .picker-list li button.checked-value,
-.input-picker .picker-list td button.checked-value {
-  border-color: #39f;
-}
-.input-picker .picker-list li {
-  width: 33.33%;
+.input-picker .picker-list td button[disabled], .input-picker .picker-list td button[disabled]:hover {
+  color: #888;
+  background-color: #fff;
 }
 .input-picker .picker-list table {
   width: 100%;
@@ -734,20 +747,42 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .picker-list th {
   font-size: 12px;
   line-height: 1.1em;
-  padding: 3px 0 2px;
+  padding-bottom: 3px;
   text-transform: uppercase;
 }
 .input-picker .picker-list th, .input-picker .picker-list td {
   width: 14.2856%;
 }
-.input-picker .picker-list tr {
-  border-top: 1px solid #dddddd;
-}
 .input-picker .ws-options {
   margin: 10px 0 0;
+  border-top: 1px solid #eeeeee;
+  padding: 10px 0 0;
+  text-align: left;
+}
+.input-picker .ws-options h5 {
+  margin: 0 0 5px;
+  padding: 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+.input-picker .ws-options ul,
+.input-picker .ws-options li {
+  padding: 0;
+  margin: 0;
+  list-style: none;
 }
 .input-picker .ws-options button {
   display: block;
+  padding: 2px 0;
+  width: 100%;
+  text-align: left;
+}
+.input-picker .ws-options button.ws-focus, .input-picker .ws-options button:focus, .input-picker .ws-options button:hover {
+  text-decoration: underline;
+}
+.input-picker .ws-options button[disabled], .input-picker .ws-options button[disabled].ws-focus, .input-picker .ws-options button[disabled]:focus, .input-picker .ws-options button[disabled]:hover {
+  color: #888;
+  text-decoration: none;
 }
 
 datalist {
