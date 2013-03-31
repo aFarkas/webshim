@@ -1,7 +1,7 @@
-.input-picker .ws-button-row, .input-picker .picker-list {
+.input-picker .ws-picker-body, .input-picker .ws-button-row, .input-picker .picker-list {
   zoom: 1;
 }
-.input-picker .ws-button-row:before, .input-picker .picker-list:before, .input-picker .ws-button-row:after, .input-picker .picker-list:after {
+.input-picker .ws-picker-body:before, .input-picker .ws-button-row:before, .input-picker .picker-list:before, .input-picker .ws-picker-body:after, .input-picker .ws-button-row:after, .input-picker .picker-list:after {
   display: table;
   clear: both;
   content: ' ';
@@ -605,6 +605,15 @@ html .ws-po-arrow .ws-po-arrowbox {
   font-family: sans-serif;
   width: 280px;
 }
+.input-picker.ws-size-2 {
+  width: 538px;
+}
+.input-picker.ws-size-3 {
+  width: 776px;
+}
+.boxsizing .input-picker {
+  width: auto;
+}
 .input-picker abbr[title] {
   cursor: help;
 }
@@ -645,6 +654,7 @@ html .ws-po-arrow .ws-po-arrowbox {
   position: relative;
   padding: 46px 0 0;
   zoom: 1px;
+  margin: 0 -10px;
 }
 .input-picker .ws-prev {
   left: 20px;
@@ -679,6 +689,7 @@ html .ws-po-arrow .ws-po-arrowbox {
   background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
   background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
   transition: border-color 200ms linear;
+  float: left;
 }
 .input-picker .ws-button-row button.ws-empty {
   float: right;
@@ -694,7 +705,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 }
 .input-picker .ws-picker-header {
   position: absolute;
-  top: 2px;
+  top: -44px;
   right: 0;
   left: 0;
   margin: 0 40px;
@@ -713,6 +724,17 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .ws-picker-header button[disabled]:hover {
   text-decoration: none;
 }
+.input-picker .picker-list {
+  position: relative;
+  zoom: 1;
+  width: 238px;
+  float: left;
+  margin: 0 10px;
+}
+.ws-size-1 .input-picker .picker-list {
+  width: auto;
+  float: none;
+}
 .input-picker .picker-list tr {
   border: 0;
 }
@@ -730,6 +752,9 @@ html .ws-po-arrow .ws-po-arrowbox {
   border-radius: 5px;
   color: #000;
   background-color: #fff;
+}
+.input-picker .picker-list td button.othermonth {
+  color: #888;
 }
 .input-picker .picker-list td button:hover, .input-picker .picker-list td button.checked-value {
   color: #fff;

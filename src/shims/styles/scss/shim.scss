@@ -675,6 +675,18 @@ $button-bgcolor: #f5f5f5;
 	font-family: sans-serif;
 	width: 280px;
 	
+	&.ws-size-2 {
+		width: 538px;
+	}
+	
+	&.ws-size-3 {
+		width: 776px;
+	}
+	
+	.boxsizing & {
+		width: auto;
+	}
+	
 	abbr[title] {
 		cursor: help;
 	}
@@ -719,9 +731,11 @@ $button-bgcolor: #f5f5f5;
 	}
 
 	.ws-picker-body {
+		@extend %clearfix;
 		position: relative;
 		padding: 46px 0 0;
 		zoom: 1px;
+		margin: 0 -10px;
 	}
 
 	.ws-prev {
@@ -763,6 +777,7 @@ $button-bgcolor: #f5f5f5;
 			background-image: -webkit-linear-gradient(top, #ececec 0%, #ddd 100%);
 			background-image: linear-gradient(to bottom, #ececec 0%, #ddd 100%);
 			transition: border-color 200ms linear;
+			float: left;
 
 			&.ws-empty {
 				float: right;
@@ -784,7 +799,7 @@ $button-bgcolor: #f5f5f5;
 
 	.ws-picker-header {
 		position: absolute;
-		top: 2px;
+		top: -44px;
 		right: 0;
 		left: 0;
 		margin: 0 40px;
@@ -810,6 +825,16 @@ $button-bgcolor: #f5f5f5;
 
 	.picker-list {
 		@extend %clearfix;
+		position: relative;
+		zoom: 1;
+		width: 238px;
+		float: left;
+		margin: 0 10px;
+		
+		.ws-size-1 & {
+			width: auto;
+			float: none;
+		}
 		
 		tr {
 			border: 0;
@@ -833,6 +858,10 @@ $button-bgcolor: #f5f5f5;
 			color: #000;
 			background-color: #fff;
 
+			&.othermonth {
+				color: #888;
+			}
+
 			&:hover,
 			&.checked-value {
 				color: #fff;
@@ -844,6 +873,7 @@ $button-bgcolor: #f5f5f5;
 				color: #888;
 				background-color: #fff;
 			}
+			
 			
 		}
 		

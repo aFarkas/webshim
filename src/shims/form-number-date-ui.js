@@ -758,7 +758,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						}
 					};
 					
-					spinElement.attr('autocomplete', 'off').on(spinEvents);
+					spinElement.attr({'autocomplete': 'off', role: 'spinbutton'}).on(spinEvents);
 				}
 				
 				
@@ -1957,7 +1957,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				labels = $(this).jProp('labels');
 				
-				opts = $.extend({}, options[type], $($.prop(this, 'form')).data(type) || {}, $(this).data(type) || {}, {
+				opts = $.extend({}, options.widgets, options[type], $($.prop(this, 'form')).data(type) || {}, $(this).data(type) || {}, {
 					orig: this,
 					type: type,
 					labels: labels,
@@ -2057,9 +2057,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					data.shim.element.addClass('has-input-buttons');
 				}
 				
-				calcWidth = opts.calculateWidth != null ? opts.calculateWidth : options.calculateWidth;
-				
-				if(calcWidth){
+				if(options.calculateWidth){
 					sizeInput(data.shim);
 				}
 				$(this).css({display: 'none'});
