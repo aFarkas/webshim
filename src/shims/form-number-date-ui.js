@@ -2059,7 +2059,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					data.shim.element.addClass('has-input-buttons');
 				}
 				
-				if(options.calculateWidth){
+				if(opts.calculateWidth){
 					sizeInput(data.shim);
 				}
 				$(this).css({display: 'none'});

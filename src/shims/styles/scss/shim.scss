@@ -704,10 +704,11 @@ $button-bgcolor: #f5f5f5;
 	}
 	
 	&.ws-size-3 {
-		width: 776px;
+		width: 796px;
 	}
 	
-	.boxsizing & {
+	.boxsizing &,
+	.display-table & {
 		width: auto;
 	}
 	
