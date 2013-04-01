@@ -52,7 +52,10 @@
 	
 	<script src="../../js-webshim/minified/extras/mousepress.js"></script>
 	<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
-	<script src="../../js-webshim/minified/polyfiller.js"></script> 
+	<script src="../../../src/polyfiller.js"></script> 
+	<script>
+		$.webshims.debug = 'noCombo';
+	</script>
 
 	
 	<script class="example">
@@ -61,7 +64,7 @@
 			customDatalist: true
 		});
 		$.webshims.setOptions('forms-ext', {
-			
+			replaceUI: true
 		});
 		
 		//load all polyfill features
@@ -302,7 +305,7 @@ $('form').bind('firstinvalid', function(e){
 						<select name="startView">
 							<option value="0">0 (= decade)</option>
 							<option value="1">1 (= year)</option>
-							<option value="2" selected="">2 (= month)</option>
+							<option value="2">2 (= month)</option>
 						</select>
 					</label>
 					<label>
@@ -353,6 +356,11 @@ $('form').bind('firstinvalid', function(e){
 						splitInput: 
 						<input type="checkbox" name="splitInput" />	
 					</label>
+					<label>
+						calculateWidth: 
+						<input type="checkbox" name="calculateWidth" checked="checked" />	
+					</label>
+					
 					<label>
 						disableDays: 
 						<select name="disableDays">
@@ -493,6 +501,10 @@ $('form').bind('firstinvalid', function(e){
 						splitInput: 
 						<input type="checkbox" name="splitInput" />	
 					</label>
+					<label>
+						calculateWidth: 
+						<input type="checkbox" name="calculateWidth" checked="checked" />	
+					</label>
 				</fieldset>
 				<fieldset data-style="">
 					<legend>Style</legend>
@@ -570,6 +582,10 @@ $('form').bind('firstinvalid', function(e){
 						animate: 
 						<input type="checkbox" name="animate" />
 					</label>
+					<label>
+						calculateWidth: 
+						<input type="checkbox" name="calculateWidth" checked="checked" />	
+					</label>
 				</fieldset>
 			</form>
 			<form class="input-widget" data-type="time">
@@ -612,6 +628,14 @@ $('form').bind('firstinvalid', function(e){
 						</select>
 					</label>
 				</fieldset>
+				<fieldset  data-method="data" data-name="time">
+					<legend>$.attr</legend>
+					<label>
+						calculateWidth: 
+						<input type="checkbox" name="calculateWidth" checked="checked" />	
+					</label>
+				</fieldset>
+				
 				<fieldset data-style="">
 					<legend>Style</legend>
 					<label>
@@ -658,6 +682,13 @@ $('form').bind('firstinvalid', function(e){
 							<option></option>
 							<option>numbers</option>
 						</select>
+					</label>
+				</fieldset>
+				<fieldset  data-method="data" data-name="number">
+					<legend>$.attr</legend>
+					<label>
+						calculateWidth: 
+						<input type="checkbox" name="calculateWidth" checked="checked" />	
 					</label>
 				</fieldset>
 				<fieldset data-style="">

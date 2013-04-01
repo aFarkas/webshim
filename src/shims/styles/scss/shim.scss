@@ -250,12 +250,28 @@ output {
 	height: 19px;
 	width: 15px;
 }
+
 .popover-opener {
-	margin: 0 0 0 1px;
-	width: 14px;
+	position: relative;
+	zoom: 1;
+	margin: 0 0 0 2px;
+	width: 19px;
 	border-radius: 3px;
-	background: #ccc url(forms.png) no-repeat -321px 3px;
+	cursor: pointer;
+	background: #ccc;
 }
+
+.popover-opener span {
+	display: block;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 13px;
+	height: 13px;
+	margin: -6.5px 0 0 -6.5px;
+	background: url(forms.png) no-repeat -322px -2px;
+}
+
 .input-buttons {
 	.polyfill-important & {
 		display: inline-block !important;
@@ -263,7 +279,7 @@ output {
 		vertical-align: middle !important;
 	}
 	&.input-button-size-2 {
-		margin-left: -35px;
+		margin-left: -39px;
 	}
 	&.ws-disabled {
 		opacity: 0.95;
@@ -431,14 +447,22 @@ output {
 	&.ws-focus .ws-range-thumb {
 		background-position: -20px 0;
 	}
+	
 	&.ws-active .ws-range-thumb {
 		background-position: -37px 0;
 	}
+	
 	&[aria-disabled="true"],
 	&[aria-readonly="true"] {
 		cursor: default;
 		opacity: 0.95;
 	}
+	
+	&[aria-disabled="true"]  .ws-range-thumb,
+	&[aria-readonly="true"]  .ws-range-thumb {
+		cursor: default;
+	}
+	
 	&[aria-disabled="true"] .ws-range-thumb {
 		background-position: -54px 0;
 	}
@@ -890,11 +914,13 @@ $button-bgcolor: #f5f5f5;
 			border-collapse: collapse;
 		}
 
-		th {
-			font-size: 12px;
+		th,
+		td.week-cell{
+			font-size: 13px;
 			line-height: 1.1em;
 			padding-bottom: 3px;
 			text-transform: uppercase;
+			font-weight: 700;
 		}
 
 		th, td {

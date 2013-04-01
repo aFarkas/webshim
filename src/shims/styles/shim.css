@@ -237,10 +237,24 @@ output {
 }
 
 .popover-opener {
-  margin: 0 0 0 1px;
-  width: 14px;
+  position: relative;
+  zoom: 1;
+  margin: 0 0 0 2px;
+  width: 19px;
   border-radius: 3px;
-  background: #cccccc url(forms.png) no-repeat -321px 3px;
+  cursor: pointer;
+  background: #ccc;
+}
+
+.popover-opener span {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 13px;
+  height: 13px;
+  margin: -6.5px 0 0 -6.5px;
+  background: url(forms.png) no-repeat -322px -2px;
 }
 
 .polyfill-important .input-buttons {
@@ -249,7 +263,7 @@ output {
   vertical-align: middle !important;
 }
 .input-buttons.input-button-size-2 {
-  margin-left: -35px;
+  margin-left: -39px;
 }
 .input-buttons.ws-disabled {
   opacity: 0.95;
@@ -401,6 +415,9 @@ output {
 .ws-range[aria-disabled="true"], .ws-range[aria-readonly="true"] {
   cursor: default;
   opacity: 0.95;
+}
+.ws-range[aria-disabled="true"] .ws-range-thumb, .ws-range[aria-readonly="true"] .ws-range-thumb {
+  cursor: default;
 }
 .ws-range[aria-disabled="true"] .ws-range-thumb {
   background-position: -54px 0;
@@ -774,11 +791,13 @@ html .ws-po-arrow .ws-po-arrowbox {
   border: 0 none;
   border-collapse: collapse;
 }
-.input-picker .picker-list th {
-  font-size: 12px;
+.input-picker .picker-list th,
+.input-picker .picker-list td.week-cell {
+  font-size: 13px;
   line-height: 1.1em;
   padding-bottom: 3px;
   text-transform: uppercase;
+  font-weight: 700;
 }
 .input-picker .picker-list th, .input-picker .picker-list td {
   width: 14.2856%;

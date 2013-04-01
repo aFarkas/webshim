@@ -5,7 +5,7 @@
 		if(!window.console){
 			window.console = {log: $.noop};
 		}
-		if(!$.browser.msie || parseInt($.browser.version, 10) > 7){
+		if(!window.ActiveXObject){
 			$('code.run-once').each(function(){
 				var elem = this;
 				$('<button>run example</button>').insertAfter(elem).click(function(){

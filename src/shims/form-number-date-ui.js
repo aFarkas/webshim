@@ -1578,10 +1578,12 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		picker.commonInit = function(data, popover){
 			var actionfn = function(e){
-				popover.actionFn({
-					'data-action': $.attr(this, 'data-action'),
-					value: $(this).val() || $.attr(this, 'value')
-				});
+				if(!$(this).is('.othermonth') || $(this).css('cursor') == 'pointer'){
+					popover.actionFn({
+						'data-action': $.attr(this, 'data-action'),
+						value: $(this).val() || $.attr(this, 'value')
+					});
+				}
 				return false;
 			};
 			var id = new Date().getTime();
@@ -1736,7 +1738,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		picker._common = function(data){
 			var popover = webshims.objectCreate(webshims.wsPopover, {}, {prepareFor: data.element});
-			var opener = $('<button type="button" class="popover-opener" />').appendTo(data.buttonWrapper);
+			var opener = $('<button type="button" class="popover-opener"><span /></button>').appendTo(data.buttonWrapper);
 			var options = data.options;
 			var init = false;
 			
@@ -2100,7 +2102,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						var markup = opts.splitInput ?
 								'<span class="ws-'+name+' ws-input" role="group"></span>' :
 								'<input class="ws-'+name+'" type="text" />';
-						var data = $(markup) //  role="spinbutton"???
+						var data = $(markup) //role="spinbutton"???
 							.insertAfter(opts.orig)
 							.spinbtnUI(opts)
 							.data('wsspinner')
