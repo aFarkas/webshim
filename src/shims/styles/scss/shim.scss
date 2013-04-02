@@ -697,7 +697,7 @@ $button-bgcolor: #f5f5f5;
 	outline: none;
 	text-align: center;
 	font-family: sans-serif;
-	width: 280px;
+	width: 300px;
 	
 	&.ws-size-2 {
 		width: 538px;
@@ -705,11 +705,6 @@ $button-bgcolor: #f5f5f5;
 	
 	&.ws-size-3 {
 		width: 796px;
-	}
-	
-	.boxsizing &,
-	.display-table & {
-		width: auto;
 	}
 	
 	abbr[title] {
@@ -855,6 +850,11 @@ $button-bgcolor: #f5f5f5;
 		overflow: hidden;
 	}
 	
+	&.ws-size-1 .picker-list  {
+		float: none;
+		width: auto;
+	}
+	
 	.picker-list {
 		@extend %clearfix;
 		position: relative;
@@ -863,10 +863,6 @@ $button-bgcolor: #f5f5f5;
 		float: left;
 		margin: 0 10px;
 		
-		.ws-size-1 & {
-			width: auto;
-			float: none;
-		}
 		
 		tr {
 			border: 0;

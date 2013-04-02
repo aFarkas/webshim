@@ -1120,6 +1120,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			time: function(val){
 				return val;
 			},
+			//todo empty val for month/split
 			month: function(val, options){
 				var names;
 				var p = val.split('-');
@@ -1144,7 +1145,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						val = val.replace('mm', p[1] || '');
 						val = val.replace('dd', p[2] || '');
 					}
-				} else if(opts && opts.splitInputs){
+				} else if(opts && opts.splitInput){
 					val = [p[0] || '', p[1] || '', p[2] || ''];
 				}
 				
@@ -1160,6 +1161,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				return val;
 			},
 			month: function(val, opts){
+				
 				var p = (!opts.splitInput) ? val.trim().split(/[\.\s-\/\\]+/) : val;
 				
 				if(p.length == 2){
@@ -1169,7 +1171,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						val = p[0]+'-'+p[1];
 					} else if(p[0].length == 2){
 						val = p[1]+'-'+p[0];
+					} else {
+						val = '';
 					}
+				} else if(opts.splitInput) {
+					val = '';
 				}
 				return val;
 			},
@@ -1491,12 +1497,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				var callSplitChange = (function(){
 					var timer;
 					
-					var call = function(){
+					var call = function(e){
 						var val;
+						clearTimeout(timer);
 						val = that.parseValue();
 						$.prop(that.orig, 'value', val);
 						eventTimer.call('input', val);
-						eventTimer.call('change', val);
+						if(!e || e.type != 'wsupdatevalue'){
+							eventTimer.call('change', val);
+						}
 					};
 					
 					var onFocus = function(){
@@ -1509,6 +1518,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						clearTimeout(timer);
 						timer = setTimeout(call, 0);
 					};
+					
+					that.element.on('wsupdatevalue', call);
 					
 					that.inputElements
 						.add(that.buttonWrapper)
@@ -1645,7 +1656,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						}
 					};
 					
-					spinElement.attr('autocomplete', 'off').on(spinEvents);
+					spinElement.attr({'autocomplete': 'off', role: 'spinbutton'}).on(spinEvents);
 				}
 				
 				
@@ -1734,6 +1745,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		var today = getDateArray(new Date());
 		
 		var _setFocus = function(element, _noFocus){
+			var setFocus, that;
 			element = $(element || this.activeButton);
 			this.activeButton.attr({tabindex: '-1', 'aria-selected': 'false'});
 			this.activeButton = element.attr({tabindex: '0', 'aria-selected': 'true'});
@@ -1742,10 +1754,18 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			clearTimeout(this.timer);
 			
 			if(!this.popover.openedByFocus && !_noFocus){
+				that = this;
+				setFocus = function(noTrigger){
+					clearTimeout(that.timer);
+					that.timer = setTimeout(function(){
+						element[0].focus();
+						if(noTrigger !== true && !element.is(':focus')){
+							setFocus(true);
+						}
+					}, that.popover.isVisible ? 20 : 99);
+				};
 				this.popover.activateElement(element);
-				this.timer = setTimeout(function(){
-					element[0].focus();
-				}, this.popover.isVisible ? 20 : 99);
+				setFocus();
 			}
 			
 		};
@@ -1775,9 +1795,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			if(!this.activeButton[0]){
 				this.activeButton = this.buttons.eq(0);
 			}
-			if(this.popover.openedByFocus){
-				this.popover.activeElement = this.activeButton;
-			}
+			
 			this.setFocus(this.activeButton, this.opts.noFocus);
 		};
 		
@@ -1858,6 +1876,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			this.ons(this);
 			
 			this._initialFocus();
+			if(this.popover.openedByFocus){
+				this.popover.activeElement = this.activeButton;
+			}
 		};
 		
 		
@@ -1946,10 +1967,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					button = $(button.get().reverse());
 				}
 				button = button.find(sel)[val.get]();
-				if(cellIndex == null){
-					webshims.warn("cellIndex not implemented. abort keynav");
-					return;
-				}
+				
 				if(!button[0]){
 					if(this.opts[val.action]){
 						this.popover.navedInitFocus = sel+':'+val.get;
@@ -2019,7 +2037,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					prevDisabled = picker.isInRange([start-1], max, min) ? {'data-action': 'setYearList','value': start-1} : false;
 				}
 				
-				str += '<div class="year-list picker-list ws-index-'+ j +'"><div class="ws-picker-header"><button disabled="disabled">'+ start +' - '+(start + 11)+'</button></div>';
+				str += '<div class="year-list picker-list ws-index-'+ j +'"><div class="ws-picker-header"><button disabled="disabled">'+ start +' – '+(start + 11)+'</button></div>';
 				lis = [];
 				for(i = 0; i < 12; i++){
 					val = start + i ;
@@ -2030,7 +2048,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						disabled = '';
 						enabled++;
 					}
-					
 					
 					if(val == today[0]){
 						classArray.push('this-value');
@@ -2051,7 +2068,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				if(j == size - 1){
 					nextDisabled = picker.isInRange([val+1], max, min) ? {'data-action': 'setYearList','value': val+1} : false;
 				}
-				str += '<table role="grid" aria-label="'+ start +' - '+(start + 11)+'"><tbody><tr class="ws-row-0">'+ (lis.join(''))+ '</tr></tbody></table></div>';
+				str += '<div class="picker-grid"><table role="grid" aria-label="'+ start +' – '+(start + 11)+'"><tbody><tr class="ws-row-0">'+ (lis.join(''))+ '</tr></tbody></table></div></div>';
 			}
 			
 			return {
@@ -2103,7 +2120,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				str += '<div class="month-list picker-list ws-index-'+ j +'"><div class="ws-picker-header">';
 				
 				str += o.selectNav ? 
-					'<select data-action="setMonthList">'+ picker.createYearSelect(value, max, min).join('') +'</select>' : 
+					'<select data-action="setMonthList" class="year-select">'+ picker.createYearSelect(value, max, min).join('') +'</select>' : 
 					'<button data-action="setYearList"'+disabled+' value="'+ value +'" tabindex="-1">'+ value +'</button>';
 				str += '</div>';
 				
@@ -2136,7 +2153,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					
 				}
 				
-				str += '<table role="grid" aria-label="'+value+'"><tbody><tr class="ws-row-0">'+ (lis.join(''))+ '</tr></tbody></table></div>';
+				str += '<div class="picker-grid"><table role="grid" aria-label="'+value+'"><tbody><tr class="ws-row-0">'+ (lis.join(''))+ '</tr></tbody></table></div></div>';
 			}
 			
 			return {
@@ -2153,7 +2170,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			
 			var j, i, k, day, nDay, name, val, disabled, lis,  prevDisabled, nextDisabled, addTr, week, rowNum;
 			
-			var lastMotnh, curMonth, otherMonth, dateArray, monthName, buttonStr, date2, classArray;
+			var lastMotnh, curMonth, otherMonth, dateArray, monthName, fullMonthName, buttonStr, date2, classArray;
 			var o = data.options;
 			var size = o.size;
 			var max = o.max.split('-');
@@ -2180,16 +2197,18 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				str.push('<div class="day-list picker-list ws-index-'+ j +'"><div class="ws-picker-header">');
 				if( o.selectNav ){
-					monthName = ['<select data-action="setDayList" tabindex="0">'+ picker.createMonthSelect(dateArray, max, min, monthNames).join('') +'</select>', '<select data-action="setDayList" tabindex="0">'+ picker.createYearSelect(dateArray[0], max, min, '-'+dateArray[1]).join('') +'</select>'];
+					monthName = ['<select data-action="setDayList" class="month-select" tabindex="0">'+ picker.createMonthSelect(dateArray, max, min, monthNames).join('') +'</select>', '<select data-action="setDayList" class="year-select" tabindex="0">'+ picker.createYearSelect(dateArray[0], max, min, '-'+dateArray[1]).join('') +'</select>'];
 					if(curCfg.date.showMonthAfterYear){
 						monthName.reverse();
 					}
 					str.push( monthName.join(' ') );
 				} 
 				
+				fullMonthName = [curCfg.date.monthNames[(dateArray[1] * 1) - 1], dateArray[0]];
 				monthName = [monthNames[(dateArray[1] * 1) - 1], dateArray[0]];
 				if(curCfg.date.showMonthAfterYear){
 					monthName.reverse();
+					fullMonthName.reverse();
 				}
 				
 				if(!data.options.selectNav) {
@@ -2199,7 +2218,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 				
 				
-				str.push('</div><table role="grid" aria-label="'+ monthName.join(' ')  +'"><thead><tr>');
+				str.push('</div><div class="picker-grid"><table role="grid" aria-label="'+ fullMonthName.join(' ')  +'"><thead><tr>');
 				
 				if(data.options.showWeek){
 					str.push('<th class="week-header">'+ curCfg.date.weekHeader +'</th>');
@@ -2281,7 +2300,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					
 					date.setDate(date.getDate() + 1);
 				}
-				str.push('</tbody></table></div>');
+				str.push('</tbody></table></div></div>');
 				if(j == size - 1){
 					dateArray = getDateArray(date);
 					dateArray[2] = 1;
@@ -2457,10 +2476,12 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		picker.commonInit = function(data, popover){
 			var actionfn = function(e){
-				popover.actionFn({
-					'data-action': $.attr(this, 'data-action'),
-					value: $(this).val() || $.attr(this, 'value')
-				});
+				if(!$(this).is('.othermonth') || $(this).css('cursor') == 'pointer'){
+					popover.actionFn({
+						'data-action': $.attr(this, 'data-action'),
+						value: $(this).val() || $.attr(this, 'value')
+					});
+				}
 				return false;
 			};
 			var id = new Date().getTime();
@@ -2474,6 +2495,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					var disabled = picker.isInRange(val.split('-'), o.maxS, o.minS) ?
 						'' :
 						' disabled="" '
+					;
 					options.push('<li role="presentation"><button value="'+ val +'" '+disabled+' data-action="changeInput" tabindex="-1"  role="option">'+ (label || data.formatValue(val, false)) +'</button></li>');
 				});
 				if(options.length){
@@ -2520,6 +2542,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					$('> span', popover.prevElement).html(curCfg.date.prevText);
 					
 					generateList(o, o.maxS, o.minS);
+					
 				}
 				$('button.ws-empty', popover.buttonRow).prop('disabled', $.prop(data.orig, 'required'));
 				popover.isDirty = false;
@@ -2597,35 +2620,23 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				element = $(element);
 				if(element[0] != popover.activeElement[0]){
 					popover.activeElement.removeClass('ws-focus');
-					if(!popover.openedByFocus){
-						element.addClass('ws-focus');
-					}
+					element.addClass('ws-focus');
 				}
 				popover.activeElement = element;
 			};
-			
-			popover.element
-				.on({
-					wspopoverbeforeshow: updateContent,
-					wspopoverhide: function(){
-						popover.openedByFocus = false;
-					},
-					focusin: function(e){
-						if(popover.activateElement){
-							popover.openedByFocus = false;
-							popover.activateElement(e.target);
-						}
-					}
-				})
-			;
-			
+			popover.element.on({
+				wspopoverbeforeshow: function(){
+					data.element.triggerHandler('wsupdatevalue');
+					updateContent();
+				}
+			});
 			
 			$(document).onTrigger('wslocalechange', data._propertyChange);
 		};
 		
 		picker._common = function(data){
 			var popover = webshims.objectCreate(webshims.wsPopover, {}, {prepareFor: data.element});
-			var opener = $('<button type="button" class="popover-opener" />').appendTo(data.buttonWrapper);
+			var opener = $('<button type="button" class="popover-opener"><span /></button>').appendTo(data.buttonWrapper);
 			var options = data.options;
 			var init = false;
 			
@@ -2665,6 +2676,22 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			popover.element
 				.addClass(data.type+'-popover input-picker')
 				.attr({role: 'application'})
+				.on({
+					wspopoverhide: function(){
+						popover.openedByFocus = false;
+					},
+					focusin: function(e){
+						if(popover.activateElement){
+							popover.openedByFocus = false;
+							popover.activateElement(e.target);
+						}
+					},
+					focusout: function(){
+						if(popover.activeElement){
+							popover.activeElement.removeClass('ws-focus');
+						}
+					}
+				})
 			;
 			
 			labelWidth(popover.element.children('div.ws-po-outerbox').attr({role: 'group'}), options.labels, true);
@@ -2830,7 +2857,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				labels = $(this).jProp('labels');
 				
-				opts = $.extend({}, options[type], $($.prop(this, 'form')).data(type) || {}, $(this).data(type) || {}, {
+				opts = $.extend({}, options.widgets, options[type], $($.prop(this, 'form')).data(type) || {}, $(this).data(type) || {}, {
 					orig: this,
 					type: type,
 					labels: labels,
@@ -2930,9 +2957,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					data.shim.element.addClass('has-input-buttons');
 				}
 				
-				calcWidth = opts.calculateWidth != null ? opts.calculateWidth : options.calculateWidth;
-				
-				if(calcWidth){
+				if(opts.calculateWidth){
 					sizeInput(data.shim);
 				}
 				$(this).css({display: 'none'});
@@ -2975,7 +3000,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						var markup = opts.splitInput ?
 								'<span class="ws-'+name+' ws-input" role="group"></span>' :
 								'<input class="ws-'+name+'" type="text" />';
-						var data = $(markup) //  role="spinbutton"???
+						var data = $(markup) //role="spinbutton"???
 							.insertAfter(opts.orig)
 							.spinbtnUI(opts)
 							.data('wsspinner')

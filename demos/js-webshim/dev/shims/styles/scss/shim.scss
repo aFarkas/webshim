@@ -250,9 +250,28 @@ output {
 	height: 19px;
 	width: 15px;
 }
+
 .popover-opener {
-	background: #000;
+	position: relative;
+	zoom: 1;
+	margin: 0 0 0 2px;
+	width: 19px;
+	border-radius: 3px;
+	cursor: pointer;
+	background: #ccc;
 }
+
+.popover-opener span {
+	display: block;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 13px;
+	height: 13px;
+	margin: -6.5px 0 0 -6.5px;
+	background: url(forms.png) no-repeat -322px -2px;
+}
+
 .input-buttons {
 	.polyfill-important & {
 		display: inline-block !important;
@@ -260,7 +279,7 @@ output {
 		vertical-align: middle !important;
 	}
 	&.input-button-size-2 {
-		margin-left: -35px;
+		margin-left: -39px;
 	}
 	&.ws-disabled {
 		opacity: 0.95;
@@ -364,7 +383,7 @@ output {
 		}
 	}
 	.yy {
-		width: 47%;
+		width: 47.9%;
 		
 		.no-boxsizing & {
 			width: 40%;
@@ -428,14 +447,22 @@ output {
 	&.ws-focus .ws-range-thumb {
 		background-position: -20px 0;
 	}
+	
 	&.ws-active .ws-range-thumb {
 		background-position: -37px 0;
 	}
+	
 	&[aria-disabled="true"],
 	&[aria-readonly="true"] {
 		cursor: default;
 		opacity: 0.95;
 	}
+	
+	&[aria-disabled="true"]  .ws-range-thumb,
+	&[aria-readonly="true"]  .ws-range-thumb {
+		cursor: default;
+	}
+	
 	&[aria-disabled="true"] .ws-range-thumb {
 		background-position: -54px 0;
 	}
@@ -553,8 +580,8 @@ output {
 		margin: 0;
 		border: 0;
 		padding: 0;
-		-webkit-box-sizing: content-box;
 		-moz-box-sizing: content-box;
+		box-sizing: content-box;
 		-webkit-appearance: none;
 		appearance: none;
 		box-sizing: content-box;
@@ -569,6 +596,7 @@ output {
 
 		&[disabled] {
 			cursor: default;
+			color: #888;
 		}
 	}
 
@@ -581,8 +609,8 @@ output {
 	position: relative;
 	opacity: 0;
 	padding: 11px 0 4px;
-	transform: translate(0, -100%);
 	-webkit-transform: translate(0, -100%);
+	transform: translate(0, -100%);
 	transition: all 400ms ease-in-out;
 
 	.ws-popover.ws-po-visible & {
@@ -666,27 +694,42 @@ $button-bgcolor: #f5f5f5;
 	border: 1px solid transparent;
 }
 .input-picker {
-	width: 300px;
+	outline: none;
 	text-align: center;
 	font-family: sans-serif;
-
+	width: 300px;
+	
+	&.ws-size-2 {
+		width: 538px;
+	}
+	
+	&.ws-size-3 {
+		width: 796px;
+	}
+	
+	abbr[title] {
+		cursor: help;
+	}
+	
 	li,
 	button {
-		font-size: 16px;
-		line-height: 1.1em;
+		font-size: 13px;
+		line-height: 16px;
+		color: #000;
+		transition: all 400ms;
 	}
 	
 	.ws-focus,
 	:focus {
-		outline: 1px dotted #39f;
+		outline: 1px dotted #000;
 	}
 	
 
 	.ws-po-box {
 		position: relative;
-		padding: 8px;
+		padding: 10px 20px 15px;
 		border-radius: 5px;
-		box-shadow: 0 3px 3px rgba(0, 0, 0, .6);
+		box-shadow: 0 0 2px rgba(0, 0, 0, .3);
 	}
 
 	.ws-prev,
@@ -694,127 +737,173 @@ $button-bgcolor: #f5f5f5;
 		@extend %ws-button;
 		position: absolute;
 		top: 10px;
-		min-width: 30px;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		padding: 0;
+		width: 24px;
+		height: 24px;
+		background: #eee url(forms.png) no-repeat 0 0;
 		z-index: 1;
+		
+		span {
+			display: none;
+		}
 	}
 
 	.ws-picker-body {
+		@extend %clearfix;
 		position: relative;
-		padding: 50px 0 0;
+		padding: 46px 0 0;
 		zoom: 1px;
+		margin: 0 -10px;
 	}
 
 	.ws-prev {
-		left: 10px;
+		left: 20px;
+		background-position: -243px 5px;
 	}
 	.ws-next {
-		right: 10px;
+		right: 20px;
+		background-position: -275px 5px;
+	}
+	
+	.ws-prev:hover,
+	.ws-next:hover {
+		border-color: #666;
+	}
+	
+	.ws-prev[disabled],
+	.ws-next[disabled] {
+		opacity: 0.4;
+		border-color: #eee;
 	}
 
 	.ws-button-row {
 		@extend %clearfix;
 		position: relative;
 		margin: 10px 0 0;
+		border-top: 1px solid #eee;
+		padding: 10px 0 0;
 		text-align: left;
 		z-index: 2;
 
 		button {
 			@extend %ws-button;
+			
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			box-shadow: 1px 1px 0 #fff;
+			background-color: #ddd;
+			background-image: -webkit-linear-gradient(top, #ececec 0%, #ddd 100%);
+			background-image: linear-gradient(to bottom, #ececec 0%, #ddd 100%);
+			transition: border-color 200ms linear;
+			float: left;
 
 			&.ws-empty {
 				float: right;
 			}
 		}
 	}
+	
+	&[data-currentview="setMonthList"] .ws-picker-header  select {
+		max-width: 95%;
+	}
+	
+	&[data-currentview="setDayList"] .ws-picker-header select {
+		max-width: 40%;
+	}
+	
+	&[data-currentview="setDayList"] .ws-picker-header select.month-select {
+		max-width: 55%;
+	}
 
 	.ws-picker-header {
 		position: absolute;
-		top: 5px;
+		top: -44px;
 		right: 0;
 		left: 0;
-		margin: 0 60px;
-		border: $border-light;
-		border-radius: 4px;
+		margin: 0 40px;
 
 		button {
 			display: inline-block;
 			width: 100%;
 			margin: 0;
-			padding: 8px 0;
-			font-size: 16px;
-			line-height: 1.1em;
-			font-weight: normal;
-		}
+			padding: 4px 0;
+			font-weight: 700;
+			color: #000;
+			
 
-		button {
-			background: $button-bgcolor;
-			border-radius: inherit;
-			box-shadow: inset 0 -5px 12px -5px rgba(0,0,0,.4), 0 -4px 0 0 #ddd;
-
-			&:after {
-				content: ' ';
-				position: absolute;
-				top: -4px;
-				left: 0;
-				right: 0;
-				width: 0;
-				height: 0;
-				margin: auto;
-				border-color: $button-bgcolor transparent;
-				border-style: solid;
-				border-width: 0 5px 5px 5px;
-			}
-
-			&:focus,
 			&:hover {
-				box-shadow: inset 0 -5px 12px -6px rgba(0,0,0,.6), 0 -4px 0 0 #ddd;
+				text-decoration: underline;
 			}
-			&:active {
-				box-shadow: inset 0 2px 3px rgba(0,0,0,.5), 0 -4px 0 0 #ddd;
-
-				&:after {
-					opacity: 0;
-				}
+			
+			&[disabled]:hover {
+				text-decoration: none;
 			}
 		}
 	 }
-
-
-
-	.ws-picker-body {
-		li {
-			display: block;
-		}
-	}
-
-	.picker-list {
+	
+	.picker-grid {
 		@extend %clearfix;
-
-		td button {
-			display: block;
-			padding: 8px 0;
-			width: 100%;
-			border: 1px solid transparent;
-			border-radius: 3px;
-			transition: all 400ms;
-
-			&:hover {
-				color: #fff;
-				background: #39f;
-			}
-
-			&.this-value {
-				border-color: #f93;
-			}
-			
-			
-			&.checked-value {
-				border-color: #39f;
-			}
-		}
+		position: relative;
+		zoom: 1;
+		overflow: hidden;
+	}
+	
+	&.ws-size-1 .picker-list  {
+		float: none;
+		width: auto;
 	}
 	
 	.picker-list {
+		@extend %clearfix;
+		position: relative;
+		zoom: 1;
+		width: 238px;
+		float: left;
+		margin: 0 10px;
+		
+		
+		tr {
+			border: 0;
+		}
+
+		th,
+		td {
+			padding: 3px 5px;
+		}
+		
+		&.day-list td {
+			padding: 2px 1px;
+		}
+
+
+		td button {
+			display: block;
+			padding: 4px 0;
+			width: 100%;
+			border-radius: 5px;
+			color: #000;
+			background-color: #fff;
+
+			&.othermonth {
+				color: #888;
+			}
+
+			&:hover,
+			&.checked-value {
+				color: #fff;
+				background: #000;
+			}
+
+			&[disabled],
+			&[disabled]:hover {
+				color: #888;
+				background-color: #fff;
+			}
+			
+			
+		}
 		
 		table {
 			width: 100%;
@@ -822,28 +911,63 @@ $button-bgcolor: #f5f5f5;
 			border-collapse: collapse;
 		}
 
-		th {
-			font-size: 12px;
+		th,
+		td.week-cell{
+			font-size: 13px;
 			line-height: 1.1em;
-			padding: 3px 0 2px;
+			padding-bottom: 3px;
 			text-transform: uppercase;
+			font-weight: 700;
 		}
 
 		th, td {
 			width: 14.2856%;
-		}
-
-		tr {
-			border-top: $border-light;
 		}
 	}
 
 
 	.ws-options {
 		margin: 10px 0 0;
+		border-top: 1px solid #eee;
+		padding: 10px 0 0;
+		text-align: left;
+		
+		h5 {
+			margin: 0 0 5px;
+			padding: 0;
+			font-size: 14px;
+			font-weight: bold;
+		}
+		
+		ul,
+		li {
+			padding: 0;
+			margin: 0;
+			list-style: none;
+		}
+		
 		button {
 			display: block;
+			padding: 2px 0;
+			width: 100%;
+			text-align: left;
+			
+			&.ws-focus,
+			&:focus,
+			&:hover {
+				text-decoration: underline;
+			}
+			
+			&[disabled],
+			&[disabled].ws-focus,
+			&[disabled]:focus,
+			&[disabled]:hover {
+				color: #888;
+				text-decoration: none;
+			}
 		}
+		
+		
 	}
 }
 

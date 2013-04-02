@@ -1088,12 +1088,10 @@
 			},
 			d: ['forms', DOMSUPPORT, 'form-number-date-api', 'range-ui'],
 			options: {
-				calculateWidth: true,
-				date: {
-					startView: 2
-				},
-				month: {
-					startView: 1
+				
+				widgets: {
+					calculateWidth: true,
+					monthNames: 'monthNamesShort'
 				}
 	//			,replaceUI: false
 			},

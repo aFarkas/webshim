@@ -268,6 +268,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				return val;
 			},
 			month: function(val, opts){
+				
 				var p = (!opts.splitInput) ? val.trim().split(/[\.\s-\/\\]+/) : val;
 				
 				if(p.length == 2){
@@ -277,7 +278,11 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						val = p[0]+'-'+p[1];
 					} else if(p[0].length == 2){
 						val = p[1]+'-'+p[0];
+					} else {
+						val = '';
 					}
+				} else if(opts.splitInput) {
+					val = '';
 				}
 				return val;
 			},
@@ -1139,7 +1144,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					prevDisabled = picker.isInRange([start-1], max, min) ? {'data-action': 'setYearList','value': start-1} : false;
 				}
 				
-				str += '<div class="year-list picker-list ws-index-'+ j +'"><div class="ws-picker-header"><button disabled="disabled">'+ start +' - '+(start + 11)+'</button></div>';
+				str += '<div class="year-list picker-list ws-index-'+ j +'"><div class="ws-picker-header"><button disabled="disabled">'+ start +' – '+(start + 11)+'</button></div>';
 				lis = [];
 				for(i = 0; i < 12; i++){
 					val = start + i ;
@@ -1170,7 +1175,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				if(j == size - 1){
 					nextDisabled = picker.isInRange([val+1], max, min) ? {'data-action': 'setYearList','value': val+1} : false;
 				}
-				str += '<div class="picker-grid"><table role="grid" aria-label="'+ start +' - '+(start + 11)+'"><tbody><tr class="ws-row-0">'+ (lis.join(''))+ '</tr></tbody></table></div></div>';
+				str += '<div class="picker-grid"><table role="grid" aria-label="'+ start +' – '+(start + 11)+'"><tbody><tr class="ws-row-0">'+ (lis.join(''))+ '</tr></tbody></table></div></div>';
 			}
 			
 			return {
