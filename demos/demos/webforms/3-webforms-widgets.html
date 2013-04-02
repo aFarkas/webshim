@@ -129,11 +129,12 @@
 							if($.prop(this, 'type') == 'checkbox'){
 								val = $.prop(this, 'checked');
 							} else {
-								val = $.prop(this, 'value');
+								val = $(this).val();
 								try {
-									val = JSON.parse(val);
+									val = JSON.parse(val) || val;
 								} catch(e){}
 							}
+							
 							obj[$.prop(this, 'name')] = val;
 						});
 						

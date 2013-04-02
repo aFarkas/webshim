@@ -254,6 +254,7 @@ output {
 .popover-opener {
 	position: relative;
 	zoom: 1;
+	overflow: visible;
 	margin: 0 0 0 2px;
 	width: 19px;
 	border-radius: 3px;
@@ -369,21 +370,27 @@ output {
 		box-sizing: border-box;
 		text-align: center;
 		display: inline-block;
+		
+		.polyfill-important & {
+			display: inline-block !important;
+		}
 	}
+	
+	
 }
 
 .ws-date {
 
 	.mm,
 	.dd {
-		width: 22%;
+		width: 23.5%;
 		
 		.no-boxsizing & {
 			width: 16%;
 		}
 	}
 	.yy {
-		width: 47.9%;
+		width: 48%;
 		
 		.no-boxsizing & {
 			width: 40%;

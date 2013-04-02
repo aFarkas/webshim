@@ -2486,7 +2486,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						this.popover.navedInitFocus = val.get;
 						this.popover.actionFn(this.opts[name]);
 						this.popover.navedInitFocus = false;
-						
 					}
 				} else {
 					this.setFocus(button.eq(0));
@@ -2666,6 +2665,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			date.setMonth(date.getMonth()  - Math.floor((size - 1) / 2));
 			
 			for(j = 0;  j < size; j++){
+				date.setDate(1);
 				lastMotnh = date.getMonth();
 				rowNum = 0;
 				if(!j){
