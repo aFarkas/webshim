@@ -50,8 +50,9 @@ class Poster extends Sprite
 	private var _loading:Bool;
 	private var _loaderStatus:jaris.display.Loader;
 	private var _player:Player;
+	private var _showLoader:Bool;
 	
-	public function new(source:String)
+	public function new(source:String, showLoader:Bool)
 	{
 		super();
 		
@@ -60,6 +61,7 @@ class Poster extends Sprite
 		_loader = new Loader();
 		_source = source;
 		_loading = true;
+		_showLoader = showLoader;
 		
 		//Reads flash vars
 		var parameters:Dynamic<String> = flash.Lib.current.loaderInfo.parameters;
@@ -70,9 +72,12 @@ class Poster extends Sprite
 		loaderColors[1] = parameters.controlcolor != null ? parameters.controlcolor : "";
 		
 		_loaderStatus = new jaris.display.Loader();
-		_loaderStatus.show();
-		_loaderStatus.setColors(loaderColors);
-		addChild(_loaderStatus);
+		
+		if ( _showLoader ) {
+			_loaderStatus.show();
+			_loaderStatus.setColors(loaderColors);
+			addChild(_loaderStatus);
+		}
 		
 		_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderComplete);
 		_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onNotLoaded);
@@ -85,8 +90,10 @@ class Poster extends Sprite
 	 */
 	private function onNotLoaded(event:IOErrorEvent):Void
 	{
-		_loaderStatus.hide();
-		removeChild(_loaderStatus);
+		if ( _showLoader ) {
+			_loaderStatus.hide();
+			removeChild(_loaderStatus);
+		}
 	}
 	
 	/**
@@ -95,8 +102,10 @@ class Poster extends Sprite
 	 */
 	private function onLoaderComplete(event:Event):Void
 	{
-		_loaderStatus.hide();
-		removeChild(_loaderStatus);
+		if ( _showLoader ) {
+			_loaderStatus.hide();
+			removeChild(_loaderStatus);
+		}
 		
 		addChild(_loader);
 		
@@ -122,7 +131,9 @@ class Poster extends Sprite
 	{
 		if (_player.getType() == InputType.VIDEO)
 		{
-			this.visible = false;
+			if ( !_player.getLoadType() ) {
+				this.visible = false;
+			}
 		}
 	}
 	

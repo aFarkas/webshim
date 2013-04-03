@@ -27,6 +27,8 @@ import flash.display.Sprite;
 import flash.display.Stage;
 import flash.events.Event;
 import flash.Lib;
+import flash.geom.Matrix;
+import jaris.utils.Utils;
 
 /**
  * Draws a loading bar
@@ -124,7 +126,7 @@ class Loader extends Sprite
 		_loaderThumb.graphics.clear();
 		
 		//Draw background
-		var backgroundWidth:Float = (65 / 100) * _stage.stageWidth;
+		var backgroundWidth:Float = (30 / 100) * _stage.stageWidth;
 		var backgroundHeight:Float = 30;
 		_background.x = (_stage.stageWidth / 2) - (backgroundWidth / 2);
 		_background.y = (_stage.stageHeight / 2) - (backgroundHeight / 2);
@@ -134,19 +136,27 @@ class Loader extends Sprite
 		_background.graphics.endFill();
 		
 		//Draw track
-		var trackWidth:Float = (50 / 100) * _stage.stageWidth;
+		var trackWidth:Float = (20 / 100) * _stage.stageWidth;
 		var trackHeight:Float = 15;
 		_loaderTrack.x = (_stage.stageWidth / 2) - (trackWidth / 2);
 		_loaderTrack.y = (_stage.stageHeight / 2) - (trackHeight / 2);
-		_loaderTrack.graphics.lineStyle(2, _controlColor);
-		_loaderTrack.graphics.drawRect(0, 0, trackWidth, trackHeight);
+		_loaderTrack.graphics.lineStyle();
+		_loaderTrack.graphics.beginFill(_controlColor, 0.3);
+		_loaderTrack.graphics.drawRoundRect(0, trackHeight/2/2, trackWidth, trackHeight/2, 5, 5);
 		
 		//Draw thumb
+		var matrix:Matrix = new Matrix(  );
+		matrix.createGradientBox(trackHeight*3, trackHeight, Utils.degreesToRadians(-90), trackHeight*3, 0);
+		var colors:Array<UInt> = [_controlColor, _controlColor];
+		var alphas:Array<Float> = [0.75, 1];
+		var ratios:Array<UInt> = [0, 255];
+		
 		_loaderThumb.x = _loaderTrack.x;
 		_loaderThumb.y = _loaderTrack.y;
 		_loaderThumb.graphics.lineStyle();
+		//_loaderThumb.graphics.beginGradientFill(GradientType.LINEAR, colors, alphas, ratios, matrix);
 		_loaderThumb.graphics.beginFill(_controlColor, 1);
-		_loaderThumb.graphics.drawRect(0, 0, trackHeight, trackHeight);
+		_loaderThumb.graphics.drawRoundRect(0, 0, trackHeight * 3, trackHeight, 10, 10);
 	}
 	
 	/**

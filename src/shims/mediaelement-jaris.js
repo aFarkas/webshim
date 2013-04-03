@@ -451,6 +451,20 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		}
 	};
 	
+	var bufferSrc = (function(){
+		var preloads = {
+				'': 1,
+				'auto': 1
+		};
+		return function(elem){
+			if($.attr(elem, 'preload') == null || $.prop(elem, 'autoplay')){
+				return false;
+			}
+			var preload =  $.prop(elem, 'preload');
+			return !!(preloads[preload] || (preload == 'metadata' && $(elem).hasClass('preload')));
+		}
+	})();
+	
 	mediaelement.createSWF = function( elem, canPlaySrc, data ){
 		if(!hasFlash){
 			setTimeout(function(){
@@ -503,6 +517,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		var setDimension = function(){
 			setElementDimension(data, $.prop(elem, 'controls'));
 		};
+		
 		var box;
 		
 		if(data && data.swfCreated){
@@ -583,12 +598,18 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		if(!mediaelement.jarisEvent[data.id]){
 			mediaelement.jarisEvent[data.id] = function(jaris){
 				if(jaris.type == 'ready'){
+					var onReady = function(){
+						if(data.api){
+							if(bufferSrc(elem)){
+								data.api.api_preload();
+							}
+							onEvent.ready(jaris, data);
+						}
+					};
 					if(data.api){
-						onEvent[jaris.type](jaris, data);
+						onReady();
 					} else {
-						setTimeout(function(){
-							onEvent[jaris.type](jaris, data);
-						}, 9);
+						setTimeout(onReady, 9);
 					}
 				} else {
 					data.currentTime = jaris.position;
@@ -804,8 +825,16 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 				if(nodeName == 'audio'){
 					setElementDimension(data, boolProp);
 				}
-				
 				queueSwfMethod(this, 'api_controls', [boolProp], data);
+			}
+		});
+		
+		webshims.onNodeNamesPropertyModify(nodeName, 'preload', function(val){
+			var data = getSwfDataFromElem(this);
+			
+			
+			if(data && bufferSrc(this)){
+				queueSwfMethod(this, 'api_preload', [], data);
 			}
 		});
 		
@@ -818,6 +847,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			object: 1,
 			OBJECT: 1
 		};
+		
 		$.cleanData = function(elems){
 			var i, len, prop;
 			if(elems && (len = elems.length) && loadedSwf){
@@ -853,6 +883,13 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 				reflect: true,
 				propType: 'src'
 			});
+		});
+		
+		webshims.defineNodeNamesProperty(['audio', 'video'], 'preload', {
+			reflect: true,
+			propType: 'enumarated',
+			defaultValue: '',
+			limitedTo: ['', 'auto', 'metadata', 'none']
 		});
 		
 		

@@ -108,6 +108,9 @@ class Player extends EventDispatcher
 	private var _ytReady:Bool;
 	private var _ytCue:Bool;
 	public var noAPITrigger:Bool;
+	public var _showLoader:Bool;
+	private var _preLoading:Bool;
+	private var _requestedPlay:Bool;
 	//}
 	
 	
@@ -146,6 +149,7 @@ class Player extends EventDispatcher
 		_lastProgress = 0;
 		_userSettings = new UserSettings();
 		noAPITrigger = false;
+		_showLoader = true;
 		//}
 		
 		//{Initialize sound object
@@ -186,8 +190,6 @@ class Player extends EventDispatcher
 		_connection.addEventListener(NetStatusEvent.NET_STATUS, onNetStatus);
 		_connection.addEventListener(AsyncErrorEvent.ASYNC_ERROR, onAsyncError);
 		//}
-		
-		
 	}
 	//}
 	
@@ -425,7 +427,7 @@ class Player extends EventDispatcher
 	{
 		if (_firstLoad)
 		{
-			_isPlaying = true;
+			_isPlaying = _preLoading ? false:true;
 			
 			_firstLoad = false;
 			if (data.width)
@@ -843,6 +845,55 @@ class Player extends EventDispatcher
 	
 	//{Public methods	
 	/**
+	 * Preload a video without playing
+	 */
+	public function preload():Void
+	{		
+		if (!_mediaLoaded && _mediaSource != "" && !_requestedPlay) {
+			var isVideo = (_type == InputType.VIDEO && (_streamType == StreamType.FILE || _streamType == StreamType.PSEUDOSTREAM));
+			var isAudio = (_type == InputType.AUDIO && _streamType == StreamType.FILE);
+			
+			if(isVideo || isAudio){
+				stopAndClose();
+				
+				_stopped = false;
+				_mediaLoaded = false;
+				_firstLoad = true;
+				_startTime = 0;
+				_downloadCompleted = false;			
+				_preLoading = true;
+			}
+			
+			if (isVideo)
+			{	
+				_connection.connect(null);
+				_stream = new NetStream(_connection);
+				_stream.addEventListener(NetStatusEvent.NET_STATUS, onNetStatus);
+				_stream.bufferTime = _bufferTime;
+				_stream.play(_mediaSource);
+				_stream.client = this;
+				pause();
+				
+			}else if(isAudio)
+			{
+				_sound.load(new URLRequest(_mediaSource));
+				
+				try {
+					_soundChannel = _sound.play();
+					_soundChannel.stop();
+					
+					_isPlaying = false;
+					_firstLoad = false;
+					_mediaLoaded = true;
+				
+				} catch (error:IOError) { }
+			}
+		}
+	}
+	
+	
+	//{Public methods	
+	/**
 	 * Loads a video and starts playing it
 	 * @param	video video url to load
 	 */
@@ -903,6 +954,7 @@ class Player extends EventDispatcher
 					_firstLoad = false;
 					
 					_mediaLoaded = true;
+				
 				} catch (error:IOError) { }
 			}
 		}
@@ -1045,8 +1097,6 @@ class Player extends EventDispatcher
 	 */
 	public function togglePlay():Bool
 	{
-		
-		var oldPlaying:Bool;
 		if (_isPlaying) {
 			this.pause();
 		} else {
@@ -1060,7 +1110,6 @@ class Player extends EventDispatcher
 	 */
 	public function pause():Bool
 	{
-		
 		if (!_mediaEndReached)
 			
 		{
@@ -1089,7 +1138,9 @@ class Player extends EventDispatcher
 			}
 			
 		}
+		
 		return _isPlaying;
+		
 	}
 	
 	/**
@@ -1097,6 +1148,9 @@ class Player extends EventDispatcher
 	 */
 	public function play():Bool
 	{
+		_video.attachNetStream(_stream);
+		_preLoading = false;
+		_requestedPlay = true;
 		
 		if (_mediaLoaded)
 		{
@@ -1332,10 +1386,7 @@ class Player extends EventDispatcher
 	{
 		var soundTransform:SoundTransform = new SoundTransform();
 		
-		
-
 		_volume = volume;
-		
 		
 		soundTransform.volume = volume;
 		
@@ -1371,6 +1422,15 @@ class Player extends EventDispatcher
 		{
 			_bufferTime = time;
 		}
+	}
+	
+	/**
+	 * Show/Hide the Loader
+	 * @param	true / false
+	 */
+	public function setLoader(val:Bool):Void
+	{
+		_showLoader = val;
 	}
 	
 	/**
@@ -1655,4 +1715,15 @@ class Player extends EventDispatcher
 		return time;
 	}
 	//}
+	
+	
+	/**
+	 * Return the load type
+	 * @return
+	 */
+	public function getLoadType():Bool
+	{
+		return _preLoading;
+	}
+	
 }

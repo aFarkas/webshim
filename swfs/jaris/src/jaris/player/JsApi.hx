@@ -42,7 +42,6 @@ import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
 import flash.utils.Timer;
 import jaris.animation.Animation;
-import jaris.display.Loader;
 import jaris.events.PlayerEvents;
 import jaris.player.Player;
 import jaris.player.newcontrols.NewControls;
@@ -110,6 +109,7 @@ class JsApi extends MovieClip {
 		ExternalInterface.addCallback("api_volume", setVolume);
 		ExternalInterface.addCallback("api_muted", setMuted);
 		ExternalInterface.addCallback("api_controls", setControls);
+		ExternalInterface.addCallback("api_preload", startLoading);
 	
 		
 		addJsListener('on*', 'jQuery.webshims.mediaelement.jarisEvent.' + parameters.evtId);
@@ -155,7 +155,7 @@ class JsApi extends MovieClip {
 	}	
 	
 	public function onPlayerEvent(event:PlayerEvents):Void
-	{
+	{	
 		if(!_player.noAPITrigger){
 			var jsFunction = '';
 			var data = {
@@ -181,7 +181,6 @@ class JsApi extends MovieClip {
 				ExternalInterface.call(_externalListeners.get('on*'), data);
 			} 
 		}
-	
 	}
 	
 	
@@ -201,18 +200,21 @@ class JsApi extends MovieClip {
 		_player.pause();
 	}
 	
+	/**
+	 * Set Controls
+	 */
 	private function setControls(forceControls):Void
 	{
 		_controls.forceControls(forceControls);
 	}
 	
+	/**
+	 * Set Mute
+	 */
 	private function setMuted(mute):Void
 	{
 		_player.mute(mute);
 	}
-	
-
-	
 	
 	/**
 	 * Set Seek
@@ -227,9 +229,15 @@ class JsApi extends MovieClip {
 	 */
 	private function setVolume(vol:Float):Void
 	{
-		
 		_player.setVolume(vol);
 	}	
-		
 	
+	/**
+	 * Start Loading
+	 */
+	private function startLoading():Void
+	{
+		_player.preload();
+	}	
+
 }

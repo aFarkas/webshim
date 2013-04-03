@@ -2,7 +2,10 @@
 How To!
 ==================
 
-The above example is one of the ways to embed the player to your html files. Just copy and paste. 
+
+The above example is one of the ways to embed the player to your html files. 
+Just copy and paste. 
+
 
 ---------------------------------------Code------------------------------------------
 <object
@@ -10,148 +13,233 @@ The above example is one of the ways to embed the player to your html files. Jus
   codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,45,2"
   width="640" height="360"
 >
-	<param name="allowFullscreen" value="true">
-	<param name="allowScriptAccess" value="always">
-	<param name="movie" value="JarisFLVPlayer.swf">
-	<param name="bgcolor" value="#000000">
-	<param name="quality" value="high">
-	<param name="scale" value="noscale">
-	<param name="wmode" value="opaque">
-	<param name="flashvars" value="source=jaris-intro.mp4&type=video&streamtype=file&poster=poster.png&autostart=false&logo=logo.png&logoposition=top left&logoalpha=30&logowidth=130&logolink=http://jaris.sourceforge.net&hardwarescaling=false&darkcolor=000000&brightcolor=4c4c4c&controlcolor=FFFFFF&hovercolor=67A8C1">
-	<param name="seamlesstabbing" value="false">
-	<embed
+	
+<param name="allowFullscreen" value="true">
+	
+<param name="allowScriptAccess" value="always">
+	
+<param name="movie" value="JarisFLVPlayer.swf">
+	
+<param name="bgcolor" value="#000000">
+	
+<param name="quality" value="high">
+	
+<param name="scale" value="noscale">
+	
+<param name="wmode" value="opaque">
+	
+<param name="flashvars" value="source=jaris-intro.mp4&type=video&streamtype=file&poster=poster.png&autostart=false&logo=logo.png&logoposition=top left&logoalpha=30&logowidth=130&logolink=http://jaris.sourceforge.net&hardwarescaling=false&darkcolor=000000&brightcolor=4c4c4c&controlcolor=FFFFFF&hovercolor=67A8C1">
+	
+<param name="seamlesstabbing" value="false">
+	
+
+<embed
 	  type="application/x-shockwave-flash"
-	  pluginspage="http://www.adobe.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"
-	  width="640" height="360"
-	  src="JarisFLVPlayer.swf"
-	  allowfullscreen="true" 
-	  allowscriptaccess="always"
-	  bgcolor="#000000"
-	  quality="high"
-	  scale="noscale"
-	  wmode="opaque"
-	  flashvars="source=jaris-intro.mp4&type=video&streamtype=file&poster=poster.png&autostart=false&logo=logo.png&logoposition=top left&logoalpha=30&logowidth=130&logolink=http://jaris.sourceforge.net&hardwarescaling=false&darkcolor=000000&brightcolor=4c4c4c&controlcolor=FFFFFF&hovercolor=67A8C1"
-	  seamlesstabbing="false"
+	  
+	pluginspage="http://www.adobe.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"
+	  
+	width="640" height="360"
+	  
+	src="JarisFLVPlayer.swf"
+	  
+	allowfullscreen="true" 
+	  
+	allowscriptaccess="always"
+	  
+	bgcolor="#000000"
+	  
+	quality="high"
+	  
+	scale="noscale"
+	  
+	wmode="opaque"
+	  
+	flashvars="source=jaris-intro.mp4&
+		type=video&
+		streamtype=file&
+		poster=poster.png&
+		autostart=false&
+		logo=logo.png&
+		logoposition=top left&
+		logoalpha=30&logowidth=130&
+		logolink=http://jaris.sourceforge.net&
+		hardwarescaling=false&
+		darkcolor=000000&
+		brightcolor=4c4c4c&
+		controlcolor=FFFFFF&
+		hovercolor=67A8C1"
+		seamlesstabbing="false"
 	>
-	  <noembed>
+	  
+<noembed>
 	  </noembed>
-	</embed>
+	
+</embed>
+
+
 </object>
+
+
 --------------------------------------End-Code---------------------------------------
+
+
 
 ==================
 Flash Variables
 ==================
 
+
+
 Here is the list of variables that you can pass to the player.
 
-    * source:
-      This is the actual path of the media that is going to be played.
+    
+* source:
+      		This is the actual path of the media that is going to be played.
 	  
-	* type:
-      The type of file to play, allowable values are: audio, video.
+	
+* type:
+      		The type of file to play, allowable values are: audio, video.
 	  
-    * streamtype:
-      The stream type of the file, allowable values are: file, http, rmtp, youtube.
+    
+* streamtype:
+     	The stream type of the file, allowable values are: file, http, rmtp, youtube.
 	  
-	* server:
-	  Used in coordination with rtmp stream servers
+	
+* server:
+	  	Used in coordination with rtmp stream servers
 	  
-	* duration:
-      Total times in seconds for input media or formatted string in the format hh:mm:ss
+	
+* duration:
+      	Total times in seconds for input media or formatted string in the format hh:mm:ss
     
-	* poster:
-      Screenshot of the video that is displayed before playing in png, jpg or gif format.
+	
+* poster:
+      	Screenshot of the video that is displayed before playing in png, jpg or gif format.
     
-	* autostart:
-      A true or false value that indicates to the player if it should auto play the video on load.
+	
+* autostart:
+      	A true or false value that indicates to the player if it should auto play the video on load.
     
-	* logo:
-      The path to the image of your logo.
+	
+* logo:
+      		The path to the image of your logo.
     
-	* logoposition:
-      The position of the logo in the player, permitted values are: top left, top right, bottom left and bottom right
+	
+* logoposition:
+      	The position of the logo in the player, permitted values are: top left, top right, bottom left and bottom right
     
-	* logoalpha:
-      The transparency percent. values permitted 0 to 100, while more higher the vale less transparency is applied.
+	
+* logoalpha:
+      	The transparency percent. values permitted 0 to 100, while more higher the vale less transparency is applied.
     
-	* logowidth:
-      The width in pixels of the logo.
+	
+* logowidth:
+      	The width in pixels of the logo.
     
-	* logolink:
-      A link to a webpage when the logo is clicked.
+	
+* logolink:
+      	A link to a webpage when the logo is clicked.
     
-	* hardwarescaling:
+	
+* hardwarescaling:
       Enable or disable hardware scaling on fullscreen mode, values: false or true
     
-	* logoalpha:
-      The transparency percent. values permitted 1 to 100
+	
+* logoalpha:
+      	The transparency percent. values permitted 1 to 100
 	  
-	* controls:
-	  To disable the displaying of controls, values: false to hide otherwise defaults to show
+	
+* controls:
+		To disable the displaying of controls, values: false to hide otherwise defaults to show
 	  
-	* controltype
-	  Choose which controls to displa. 0 = old controls, 1 = new controls
+	
+* controltype
+	  	Choose which controls to displa. 0 = old controls, 1 = new controls
 	  
-	* controlsize
-	  Changes the height of the new controllers, the default value is 40
+	
+* controlsize
+	  	Changes the height of the new controllers, the default value is 40
 	  
-	* seekcolor
-	  Change the seekbar color (new controls only)
+	
+* seekcolor
+	  	Change the seekbar color (new controls only)
     
-	* darkcolor:
-      The darker color of player controls in html hexadecimal format
+	
+* darkcolor:
+      	The darker color of player controls in html hexadecimal format
+   
+* brightcolor:
+   	The bright color of player controls in html hexadecimal format
     
-	* brightcolor:
-      The bright color of player controls in html hexadecimal format
+	
+* controlcolor:
+      	The face color of controls in html hexadecimal format
     
-	* controlcolor:
-      The face color of controls in html hexadecimal format
-    
-	* hovercolor:
-      On mouse hover color for controls in html hexadecimal format
+	
+* hovercolor:
+      	On mouse hover color for controls in html hexadecimal format
 	  
-	* aspectratio:
-      To override original aspect ratio on first time player load. Allowable values: 1:1, 3:2, 4:3, 5:4, 14:9, 14:10, 16:9, 16:10
+	
+* aspectratio:
+      	To override original aspect ratio on first time player load. Allowable values: 1:1, 3:2, 4:3, 5:4, 14:9, 14:10, 16:9, 16:10
 	  
-	* jsapi:
-	  Expose events to javascript functions and enable controlling the player from the outside. Set to any value to enable.
+	
+* jsapi:
+	  	Expose events to javascript functions and enable controlling the player from the outside. Set to any value to enable.
 	  
-	* loop:
-	  As the variable says this keeps looping the video. Set to any value to enable.
+	
+* loop:
+	  		As the variable says this keeps looping the video. Set to any value to enable.
 	  
-	* buffertime
-	  To change the default 10 seconds buffer time for local/pseudo streaming
+	
+* buffertime
+	  	To change the default 10 seconds buffer time for local/pseudo streaming
+
+
+
+
 
 ==================	  
 Keyboard Shortcuts
 ==================
 
+
 Here is the list of keyboard shortcuts to control Jaris Player.
 
-    * SPACE
-      Play or pause video.
+    
+* SPACE
+  	Play or pause video.
 	  
-    * TAB
-      Switch between different aspect ratios.
     
-	* UP
-      Raise volume
+* TAB
+      	Switch between different aspect ratios.
     
-	* DOWN
-      Lower volume
-    
-	* LEFT
-      Rewind
-    
-	* RIGHT
-      Forward
-    
-	* M
-      Mute or unmute volume.
-    
-	* F
-      Swtich to fullscreen mode.
 	
-	* X
-      Stops and close current stream
+* UP
+      	Raise volume
+    
+	
+* DOWN
+    	Lower volume
+    
+	
+* LEFT
+     	Rewind
+    
+	
+* RIGHT
+      	Forward
+    
+	
+* M
+      	Mute or unmute volume.
+    
+	
+* F
+      	Swtich to fullscreen mode.
+	
+	
+* X
+      	Stops and close current stream
+
+

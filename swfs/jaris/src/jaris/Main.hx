@@ -29,6 +29,9 @@ import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.Lib;
 import flash.system.Capabilities;
+import flash.text.TextField;
+import flash.text.TextFormat;
+import flash.external.ExternalInterface;
 
 import jaris.display.Menu;
 import jaris.display.Poster;
@@ -62,6 +65,9 @@ class Main
 		
 		//Reads flash vars
 		var parameters:Dynamic<String> = flash.Lib.current.loaderInfo.parameters;
+		
+		//show / hide Loader
+		var showLoader:Bool = ( parameters.noLoader == "" || parameters.noLoader != null ) && parameters.noLoader != "false" ? false : true;
 		
 		//Initialize and draw player object
 		var player:Player = new Player();
@@ -99,16 +105,16 @@ class Main
 			{
 				player.setAspectRatio(userSettings.getAspectRatio());
 			}
-			
+			player.setLoader(showLoader);
 			player.setType(type);
 			player.setStreamType(streamType);
 			player.setServer(server);
 			player.setVolume(userSettings.getVolume());
 			player.setBufferTime(bufferTime);
-			
 			player.setSource(parameters.source);
+			player.setHardwareScaling(parameters.hardwarescaling == "true"?true:false);
 			
-			player.setHardwareScaling(parameters.hardwarescaling=="true"?true:false);
+			//player.preload(parameters.source, type, streamType);
 		}
 		else
 		{
@@ -121,6 +127,7 @@ class Main
 			player.setVolume(userSettings.getVolume());
 			
 			player.load("http://jaris.sourceforge.net/files/jaris-intro.flv", InputType.VIDEO, StreamType.FILE);
+			//player.preload("http://jaris.sourceforge.net/files/jaris-intro.flv", InputType.VIDEO, StreamType.FILE);
 			//player.load("http://jaris.sourceforge.net/files/audio.mp3", InputType.AUDIO, StreamType.FILE);
 		}
 		
@@ -128,7 +135,7 @@ class Main
 		if (parameters.poster != null)
 		{
 			var poster:String = parameters.poster;
-			var posterImage = new Poster(poster);
+			var posterImage = new Poster(poster, showLoader);
 			posterImage.setPlayer(player);
 			movieClip.addChild(posterImage);
 		}
@@ -149,16 +156,20 @@ class Main
 		controlColors[3] = parameters.hovercolor != null ? parameters.hovercolor : "";
 		controlColors[4] = parameters.seekcolor != null ? parameters.seekcolor : "";
 		
-		var controls:NewControls = new NewControls(player, parameters.controls, parameters.nodename);
+		var controls:NewControls = new NewControls(player, parameters.controls, parameters.nodename, showLoader );
 		controls.setDurationLabel(duration);
 		controls.setControlColors(controlColors);
 		controls.setControlSize(controlSize);
 		movieClip.addChild(controls);
 		
 		
-
-		var jsAPI:JsApi = new JsApi(player, controls);
-		movieClip.addChild(jsAPI);
-		player.init();
+		if (ExternalInterface.available) {
+			
+			var jsAPI:JsApi = new JsApi(player, controls);
+			movieClip.addChild(jsAPI);
+			player.init();
+		}
+		
 	}
+	
 }

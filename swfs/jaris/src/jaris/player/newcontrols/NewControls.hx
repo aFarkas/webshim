@@ -90,11 +90,12 @@ class NewControls extends MovieClip {
 	private var _forceHideControls:Bool;
 	private var _shouldBeVisible:Bool;
 	private var _nodeName:String;
+	private var _showLoader:Bool;
 	//}
 	
 	
 	//{Constructor
-	public function new(player:Player, forceHideControls, nodeName)
+	public function new(player:Player, forceHideControls, nodeName, showLoader )
 	{
 		super();
 		
@@ -113,6 +114,7 @@ class NewControls extends MovieClip {
 		_hideControlsTimer = new Timer(500);
 		_hideAspectRatioLabelTimer = new Timer(500);
 		_controlsVisible = false;
+		_showLoader = showLoader;
 		
 		_textFormat = new TextFormat();
 		_textFormat.font = "arial";
@@ -201,18 +203,25 @@ class NewControls extends MovieClip {
 		
 		redrawControls();
 		
+		
+		_forceHideControls = forceHideControls == "false";		
+		
 		//{Loader bar
-		_loader = new Loader();
-		_loader.hide();
+		if ( _forceHideControls && _showLoader || !_forceHideControls ) {
+			
+			_loader = new Loader();
+			_loader.hide();
+			
+			var loaderColors:Array <String> = ["", "", "", ""];
+			loaderColors[0] = Std.string(_darkColor);
+			loaderColors[1] = Std.string(_controlColor);
+			loaderColors[2] = Std.string(_seekColor);
+			
+			_loader.setColors(loaderColors);
+			
+			addChild(_loader);
+		}
 		
-		var loaderColors:Array <String> = ["", "", "", ""];
-		loaderColors[0] = Std.string(_darkColor);
-		loaderColors[1] = Std.string(_controlColor);
-		loaderColors[2] = Std.string(_seekColor);
-		
-		_loader.setColors(loaderColors);
-		
-		addChild(_loader);
 		//}
 		
 		//{event Listeners
@@ -252,8 +261,9 @@ class NewControls extends MovieClip {
 		
 		_hideControlsTimer.start();
 		
-		_forceHideControls = forceHideControls == "false";
-		if (_forceHideControls) {
+		
+		if (_forceHideControls) 
+		{
 			this.hideControls();
 		}
 		_shouldBeVisible = true;
@@ -437,7 +447,7 @@ class NewControls extends MovieClip {
 	 */
 	private function onPlayerBuffering(event:PlayerEvents):Void
 	{
-		_loader.show();
+		if ( _forceHideControls && _showLoader || !_forceHideControls ) _loader.show();
 	}
 	
 	/**
@@ -446,7 +456,7 @@ class NewControls extends MovieClip {
 	 */
 	private function onPlayerNotBuffering(event:PlayerEvents):Void
 	{
-		_loader.hide();
+		if ( _forceHideControls && _showLoader || !_forceHideControls ) _loader.hide();
 	}
 	
 	/**
@@ -881,7 +891,7 @@ class NewControls extends MovieClip {
 		loaderColors[0] = colors[0];
 		loaderColors[1] = colors[2];
 		loaderColors[2] = colors[4];
-		_loader.setColors(loaderColors);
+		if ( _forceHideControls && _showLoader || !_forceHideControls ) _loader.setColors(loaderColors);
 		
 		redrawControls();
 	}

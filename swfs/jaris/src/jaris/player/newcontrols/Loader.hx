@@ -129,7 +129,7 @@ class Loader extends Sprite
 		_loaderThumb.graphics.clear();
 		
 		//Draw background
-		var backgroundWidth:Float = (65 / 100) * _stage.stageWidth;
+		var backgroundWidth:Float = (30 / 100) * _stage.stageWidth;
 		var backgroundHeight:Float = 30;
 		_background.x = (_stage.stageWidth / 2) - (backgroundWidth / 2);
 		_background.y = (_stage.stageHeight / 2) - (backgroundHeight / 2);
@@ -139,7 +139,7 @@ class Loader extends Sprite
 		_background.graphics.endFill();
 		
 		//Draw track
-		var trackWidth:Float = (50 / 100) * _stage.stageWidth;
+		var trackWidth:Float = (20 / 100) * _stage.stageWidth;
 		var trackHeight:Float = 11;
 		_loaderTrack.x = (_stage.stageWidth / 2) - (trackWidth / 2);
 		_loaderTrack.y = (_stage.stageHeight / 2) - (trackHeight / 2);
