@@ -26,7 +26,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.0dev',
+		version: '1.10.0',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -527,7 +527,7 @@
 	$.webshims = webshims;
 	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
 	var googleAPIs = protocol + 'ajax.googleapis.com/ajax/libs/';
-	var uiLib = googleAPIs + 'jqueryui/1.8.24/';
+	var uiLib = googleAPIs + 'jqueryui/1.10.2/';
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;

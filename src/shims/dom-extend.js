@@ -3,7 +3,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	"use strict";
 	
 	if($('<form />').attr('novalidate') === ""){
-		webshims.warn("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
+		webshims.error("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
+	}
+	
+	if(!$.parseHTML){
+		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
 
 	//shortcus

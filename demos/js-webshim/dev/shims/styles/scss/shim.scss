@@ -279,6 +279,12 @@ output {
 		padding: 0 !important;
 		vertical-align: middle !important;
 	}
+	&.input-button-size-1 {
+		&.month-input-buttons,
+		&.date-input-buttons {
+			margin-left: -24px;
+		}
+	}
 	&.input-button-size-2 {
 		margin-left: -39px;
 	}

@@ -3296,18 +3296,26 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			var init;
 			var updateStyles = function(){
 				$.style( data.orig, 'display', '' );
-				
+				var hasButtons, marginR, marginL;
 				var correctWidth = 0.6;
 				if(!init || data.orig.offsetWidth){
+					hasButtons = data.buttonWrapper && data.buttonWrapper.filter(isVisible).length;
+					marginR = $.css( data.orig, 'marginRight');
 					data.element.css({
 						marginLeft: $.css( data.orig, 'marginLeft'),
-						marginRight: $.css( data.orig, 'marginRight')
+						marginRight: hasButtons ? 0 : marginR
 					});
 					
-					if(data.buttonWrapper && data.buttonWrapper.filter(isVisible).length){
+					if(hasButtons){
+						marginL = (parseInt(data.buttonWrapper.css('marginLeft'), 10) || 0);
 						data.element.css({paddingRight: ''});
 						
-						if((parseInt(data.buttonWrapper.css('marginLeft'), 10) || 0) < 0){
+						
+						
+						if(marginL < 0){
+							
+							marginR = (parseInt(marginR, 10) || 0) + Math.abs(data.buttonWrapper.outerWidth() + marginL);
+							data.buttonWrapper.css('marginRight', marginR);
 							data.element
 								.css({paddingRight: ''})
 								.css({
@@ -3315,6 +3323,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 								})
 							;
 						} else {
+							data.buttonWrapper.css('marginRight', marginR);
 							correctWidth = data.buttonWrapper.outerWidth(true) + 0.6;
 						}
 					}

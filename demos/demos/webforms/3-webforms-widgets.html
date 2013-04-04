@@ -21,7 +21,7 @@
 		}
 		input.number {
 			display: inline-block;
-			margin-right: 5px;
+			margin-right: 8px;
 			text-align: center;
 			width: 2.8em;
 		}
@@ -52,10 +52,8 @@
 	
 	<script src="../../js-webshim/minified/extras/mousepress.js"></script>
 	<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
-	<script src="../../../src/polyfiller.js"></script> 
-	<script>
-		$.webshims.debug = 'noCombo';
-	</script>
+	<script src="../../js-webshim/minified/polyfiller.js"></script>
+	
 
 	
 	<script class="example">
@@ -227,7 +225,7 @@ $('form').bind('firstinvalid', function(e){
 </code>	
 			<h3 id="configure-ui">Changing default-options for widgets</h3>
 			
-			<form class="input-widget" data-type="date">
+			<form class="input-widget" data-type="date" id="date-cfg">
 				<datalist id="date-list">
 					<select>
 						<option value="2009-10-11" />
@@ -337,8 +335,8 @@ $('form').bind('firstinvalid', function(e){
 					<label>
 						monthNames: 
 						<select name="monthNames">
-							<option>monthNames</option>
 							<option>monthNamesShort</option>
+							<option>monthNames</option>
 						</select>
 					</label>
 					<label>
@@ -387,7 +385,7 @@ $('form').bind('firstinvalid', function(e){
 				</fieldset>
 			</form>
 			
-			<form class="input-widget" data-type="month">
+			<form class="input-widget" data-type="month" id="month-cfg">
 				<datalist id="month-list">
 					<select>
 						<option value="2009-10" />
@@ -478,8 +476,8 @@ $('form').bind('firstinvalid', function(e){
 					<label>
 						monthNames: 
 						<select name="monthNames">
-							<option>monthNames</option>
 							<option>monthNamesShort</option>
+							<option>monthNames</option>
 							<option>monthDigits</option>
 						</select>
 					</label>
@@ -524,7 +522,7 @@ $('form').bind('firstinvalid', function(e){
 					</label>
 				</fieldset>
 			</form>
-			<form class="input-widget" data-type="range">
+			<form class="input-widget" data-type="range" id="range-cfg">
 				<datalist id="range-list">
 					<select>
 						<option value="0" />
@@ -589,7 +587,7 @@ $('form').bind('firstinvalid', function(e){
 					</label>
 				</fieldset>
 			</form>
-			<form class="input-widget" data-type="time">
+			<form class="input-widget" data-type="time" id="time-cfg">
 				<fieldset data-method="prop">
 					<legend>$.prop</legend>
 					
@@ -650,7 +648,7 @@ $('form').bind('firstinvalid', function(e){
 				</fieldset>
 			</form>
 			
-			<form class="input-widget" data-type="number">
+			<form class="input-widget" data-type="number" id="number-cfg">
 				<fieldset data-method="prop">
 					<legend>$.prop</legend>
 					
