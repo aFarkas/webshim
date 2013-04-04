@@ -6,7 +6,9 @@
 module("input ui");
 
 var getRangeValueUI = function(range){
-	return parseInt( ($('.ws-range-thumb', range)[0] || {style: {left: -1}}).style.left, 10);
+	var leftStyle = parseInt( ($('.ws-range-thumb', range)[0] || {style: {left: -1}}).style.left, 10)
+	equals(range.data('rangeUi').options.value, leftStyle, "range's left style equals options.value");
+	return ''+leftStyle;
 };
 
 asyncTest("widgets Modul", function(){

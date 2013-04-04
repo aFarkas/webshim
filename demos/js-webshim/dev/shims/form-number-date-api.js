@@ -219,7 +219,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 						
 						step *= factor;
 						
-						val = val + step;
+						val = (val + step).toFixed(5) * 1;
 						valModStep = (val - (cache.minAsNumber || 0)) % step;
 						
 						if ( valModStep && (Math.abs(valModStep) > EPS) ) {

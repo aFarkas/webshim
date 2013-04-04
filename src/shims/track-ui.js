@@ -228,6 +228,9 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 	webshims.addReady(function(context, insertedElement){
 		$('video, audio', context)
 			.add(insertedElement.filter('video, audio'))
+			.filter(function(){
+				return webshims.implement(this, 'trackui');
+			})
 			.each(function(){
 				var elem = $(this);
 				

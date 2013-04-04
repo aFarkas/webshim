@@ -513,30 +513,6 @@ asyncTest('step number/date module specific validity', function(){
 //		], createTestMethodA('datetime-local'));
 //	}
 	
-	$.each([
-		{
-			attrs: {
-				
-			},
-			value: '4',
-			trueState: 'valid'
-		},
-		{
-			attrs: {
-				
-			},
-			value: '144',
-			trueState: 'rangeOverflow'
-		},
-		{
-			attrs: {
-				
-			},
-			value: '-10',
-			trueState: 'rangeUnderflow'
-		}
-	], 
-	createTestMethodA('range'));
 	
 	
 	$.webshims.ready('forms DOM', function(){

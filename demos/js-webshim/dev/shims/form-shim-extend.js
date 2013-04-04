@@ -1481,10 +1481,7 @@ try {
 				update: function(elem, val){
 					var type = ($.attr(elem, 'type') || $.prop(elem, 'type') || '').toLowerCase();
 					if(!allowedPlaceholder[type] && !$.nodeName(elem, 'textarea')){
-						webshims.error('placeholder not allowed on input[type="'+type+'"]');
-						if(type == 'date'){
-							webshims.error('but you can use data-placeholder for input[type="date"]');
-						}
+						webshims.warn('placeholder not allowed on input[type="'+type+'"], but it is a good fallback :-)');
 						return;
 					}
 					

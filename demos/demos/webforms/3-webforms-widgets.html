@@ -50,7 +50,6 @@
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	
-	<script src="../../js-webshim/minified/extras/mousepress.js"></script>
 	<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
 	
@@ -223,7 +222,29 @@ $('form').bind('firstinvalid', function(e){
 	return false;
 });
 </code>	
+
+			<h3 id="configure-ui">Changing locales for widgets</h3>
+<code class="block run-once">
+$.webshims.activeLang('en');
+</code>	
+<code class="block run-once">
+$.webshims.activeLang('de');
+</code>	
 			<h3 id="configure-ui">Changing default-options for widgets</h3>
+			<p>All widgets can be changed with the <code>forms-ext.widgets</code> or <code>forms-ext[type]</code> options.</p>
+<code class="block">
+	$.webshims.setOptions('forms-ext', {
+		widgets: {
+			calculateWidth: false
+		},
+		date: {
+			splitInput: true
+		},
+		month: {
+			calculateWidth: true
+		}
+	});
+</code>	
 			
 			<form class="input-widget" data-type="date" id="date-cfg">
 				<datalist id="date-list">
@@ -739,7 +760,7 @@ $('form').bind('firstinvalid', function(e){
 								date (with data attribute): <dfn title="required">*</dfn>
 							</label>
 							
-							<input data-date='{"startView": 2, "minView": 1}' name="date-data" required="required" type="date" id="date-data" />
+							<input data-date='{"startView": 2, "splitInput": true}' name="date-data" required="required" type="date" id="date-data" />
 						</div>
 						<div class="form-element">
 							<label for="email">

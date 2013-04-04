@@ -3,7 +3,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	"use strict";
 	
 	if($('<form />').attr('novalidate') === ""){
-		webshims.warn("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
+		webshims.error("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
+	}
+	
+	if(!$.parseHTML){
+		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
 
 	//shortcus
@@ -391,6 +395,15 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				return id;
 			};
 		})(),
+		implement: function(elem, type){
+			var data = elementData(elem, 'implemented') || elementData(elem, 'implemented', {});
+			if(data[type]){
+				webshims.info(type +' already implemented for element #'+elem.id);
+				return false;
+			}
+			data[type] = true;
+			return true;
+		},
 		extendUNDEFProp: function(obj, props){
 			$.each(props, function(name, prop){
 				if( !(name in obj) ){
@@ -3188,10 +3201,7 @@ try {
 				update: function(elem, val){
 					var type = ($.attr(elem, 'type') || $.prop(elem, 'type') || '').toLowerCase();
 					if(!allowedPlaceholder[type] && !$.nodeName(elem, 'textarea')){
-						webshims.error('placeholder not allowed on input[type="'+type+'"]');
-						if(type == 'date'){
-							webshims.error('but you can use data-placeholder for input[type="date"]');
-						}
+						webshims.warn('placeholder not allowed on input[type="'+type+'"], but it is a good fallback :-)');
 						return;
 					}
 					

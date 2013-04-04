@@ -5,6 +5,7 @@ todo.txt
 tests/performance.html
 dev-playground/*
 node_modules/*
+demos/demo-js/node_modules/*
 
 /tests/form-implementation.html
 /build/yuicompressor.jar

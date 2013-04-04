@@ -26,7 +26,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.0',
+		version: '1.10.0RC1',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -1029,6 +1029,7 @@
 		addPolyfill('form-native-extend', {
 			f: 'forms',
 			test: function(toLoad){
+				initialFormTest();
 				return (!Modernizr[formvalidation] || bustedValidity) || ((modules['form-number-date-api'].test() || $.inArray('form-number-date-api', toLoad  || []) == -1) && !formOptions.overrideMessages );
 			},
 			d: ['form-core', DOMSUPPORT, 'form-message'],
@@ -1038,6 +1039,7 @@
 		addPolyfill('form-shim-extend', {
 			f: 'forms',
 			test: function(){
+				initialFormTest();
 				return Modernizr[formvalidation] && !bustedValidity;
 			},
 			d: ['form-core', DOMSUPPORT],
@@ -1047,6 +1049,7 @@
 		addPolyfill('form-message', {
 			f: 'forms',
 			test: function(toLoad){
+				initialFormTest();
 				return !( formOptions.customMessages || !Modernizr[formvalidation] || bugs.validationMessage || bustedValidity || !modules[formExtend].test(toLoad) );
 			},
 			d: [DOMSUPPORT],
@@ -1084,6 +1087,7 @@
 		addPolyfill('form-number-date-ui', {
 			f: 'forms-ext',
 			test: function(){
+				initialFormTest();
 				return !this.options.replaceUI && modules['form-number-date-api'].test();
 			},
 			d: ['forms', DOMSUPPORT, 'form-number-date-api', 'range-ui'],
@@ -1101,6 +1105,7 @@
 		addPolyfill('form-datalist', {
 			f: 'forms',
 			test: function(){
+				initialFormTest();
 				return modernizrInputAttrs.list && !formOptions.customDatalist;
 			},
 			d: ['form-core', DOMSUPPORT],

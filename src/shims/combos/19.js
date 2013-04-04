@@ -1312,7 +1312,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	"use strict";
 	
 	if($('<form />').attr('novalidate') === ""){
-		webshims.warn("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
+		webshims.error("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
+	}
+	
+	if(!$.parseHTML){
+		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
 
 	//shortcus
@@ -1700,6 +1704,15 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				return id;
 			};
 		})(),
+		implement: function(elem, type){
+			var data = elementData(elem, 'implemented') || elementData(elem, 'implemented', {});
+			if(data[type]){
+				webshims.info(type +' already implemented for element #'+elem.id);
+				return false;
+			}
+			data[type] = true;
+			return true;
+		},
 		extendUNDEFProp: function(obj, props){
 			$.each(props, function(name, prop){
 				if( !(name in obj) ){
@@ -2834,46 +2847,48 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		
 	var initMediaElements = function(){
 		var testFixMedia = function(){
-			selectSource(this);
-			
-			if(hasNative){
-				var bufferTimer;
-				var lastBuffered;
-				var elem = this;
-				var getBufferedString = function(){
-					var buffered = $.prop(elem, 'buffered');
-					if(!buffered){return;}
-					var bufferString = "";
-					for(var i = 0, len = buffered.length; i < len;i++){
-						bufferString += buffered.end(i);
-					}
-					return bufferString;
-				};
-				var testBuffer = function(){
-					var buffered = getBufferedString();
-					if(buffered != lastBuffered){
-						lastBuffered = buffered;
-						$(elem).triggerHandler('progress');
-					}
-				};
+			if(webshims.implement(this, 'mediaelement')){
+				selectSource(this);
 				
-				$(this)
-					.on({
-						'play loadstart progress': function(e){
-							if(e.type == 'progress'){
-								lastBuffered = getBufferedString();
-							}
-							clearTimeout(bufferTimer);
-							bufferTimer = setTimeout(testBuffer, 999);
-						},
-						'emptied stalled mediaerror abort suspend': function(e){
-							if(e.type == 'emptied'){
-								lastBuffered = false;
-							}
-							clearTimeout(bufferTimer);
+				if(hasNative){
+					var bufferTimer;
+					var lastBuffered;
+					var elem = this;
+					var getBufferedString = function(){
+						var buffered = $.prop(elem, 'buffered');
+						if(!buffered){return;}
+						var bufferString = "";
+						for(var i = 0, len = buffered.length; i < len;i++){
+							bufferString += buffered.end(i);
 						}
-					})
-				;
+						return bufferString;
+					};
+					var testBuffer = function(){
+						var buffered = getBufferedString();
+						if(buffered != lastBuffered){
+							lastBuffered = buffered;
+							$(elem).triggerHandler('progress');
+						}
+					};
+					
+					$(this)
+						.on({
+							'play loadstart progress': function(e){
+								if(e.type == 'progress'){
+									lastBuffered = getBufferedString();
+								}
+								clearTimeout(bufferTimer);
+								bufferTimer = setTimeout(testBuffer, 999);
+							},
+							'emptied stalled mediaerror abort suspend': function(e){
+								if(e.type == 'emptied'){
+									lastBuffered = false;
+								}
+								clearTimeout(bufferTimer);
+							}
+						})
+					;
+				}
 			}
 			
 		};

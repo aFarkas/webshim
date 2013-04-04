@@ -534,46 +534,48 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		
 	var initMediaElements = function(){
 		var testFixMedia = function(){
-			selectSource(this);
-			
-			if(hasNative){
-				var bufferTimer;
-				var lastBuffered;
-				var elem = this;
-				var getBufferedString = function(){
-					var buffered = $.prop(elem, 'buffered');
-					if(!buffered){return;}
-					var bufferString = "";
-					for(var i = 0, len = buffered.length; i < len;i++){
-						bufferString += buffered.end(i);
-					}
-					return bufferString;
-				};
-				var testBuffer = function(){
-					var buffered = getBufferedString();
-					if(buffered != lastBuffered){
-						lastBuffered = buffered;
-						$(elem).triggerHandler('progress');
-					}
-				};
+			if(webshims.implement(this, 'mediaelement')){
+				selectSource(this);
 				
-				$(this)
-					.on({
-						'play loadstart progress': function(e){
-							if(e.type == 'progress'){
-								lastBuffered = getBufferedString();
-							}
-							clearTimeout(bufferTimer);
-							bufferTimer = setTimeout(testBuffer, 999);
-						},
-						'emptied stalled mediaerror abort suspend': function(e){
-							if(e.type == 'emptied'){
-								lastBuffered = false;
-							}
-							clearTimeout(bufferTimer);
+				if(hasNative){
+					var bufferTimer;
+					var lastBuffered;
+					var elem = this;
+					var getBufferedString = function(){
+						var buffered = $.prop(elem, 'buffered');
+						if(!buffered){return;}
+						var bufferString = "";
+						for(var i = 0, len = buffered.length; i < len;i++){
+							bufferString += buffered.end(i);
 						}
-					})
-				;
+						return bufferString;
+					};
+					var testBuffer = function(){
+						var buffered = getBufferedString();
+						if(buffered != lastBuffered){
+							lastBuffered = buffered;
+							$(elem).triggerHandler('progress');
+						}
+					};
+					
+					$(this)
+						.on({
+							'play loadstart progress': function(e){
+								if(e.type == 'progress'){
+									lastBuffered = getBufferedString();
+								}
+								clearTimeout(bufferTimer);
+								bufferTimer = setTimeout(testBuffer, 999);
+							},
+							'emptied stalled mediaerror abort suspend': function(e){
+								if(e.type == 'emptied'){
+									lastBuffered = false;
+								}
+								clearTimeout(bufferTimer);
+							}
+						})
+					;
+				}
 			}
 			
 		};
@@ -1385,7 +1387,34 @@ modified for webshims
 	var getNativeReadyState = function(trackElem, textTrack){
 		return textTrack.readyState || trackElem.readyState;
 	};
-	
+	var stopOriginalEvent = function(e){
+		if(e.originalEvent){
+			e.stopImmediatePropagation();
+		}
+	};
+	var startTrackImplementation = function(){
+		if(webshims.implement(this, 'track')){
+			var shimedTrack = $.prop(this, 'track');
+			var origTrack = this.track;
+			var kind;
+			var readyState;
+			if(origTrack){
+				kind = $.prop(this, 'kind');
+				readyState = getNativeReadyState(this, origTrack);
+				if (origTrack.mode || readyState) {
+					shimedTrack.mode = numericModes[origTrack.mode] || origTrack.mode;
+				}
+				//disable track from showing + remove UI
+				if(kind != 'descriptions'){
+					origTrack.mode = (typeof origTrack.mode == 'string') ? 'disabled' : 0;
+					this.kind = 'metadata';
+					$(this).attr({kind: kind});
+				}
+				
+			}
+			$(this).on('load error', stopOriginalEvent);
+		}
+	};
 	webshims.addReady(function(context, insertedElement){
 		var insertedMedia = insertedElement.filter('video, audio, track').closest('audio, video');
 		$('video, audio', context)
@@ -1401,33 +1430,7 @@ modified for webshims
 						webshims.error("textTracks couldn't be copied");
 					}
 					
-					$('track', this)
-						.each(function(){
-							var shimedTrack = $.prop(this, 'track');
-							var origTrack = this.track;
-							var kind;
-							var readyState;
-							if(origTrack){
-								kind = $.prop(this, 'kind');
-								readyState = getNativeReadyState(this, origTrack);
-								if (origTrack.mode || readyState) {
-									shimedTrack.mode = numericModes[origTrack.mode] || origTrack.mode;
-								}
-								//disable track from showing + remove UI
-								if(kind != 'descriptions'){
-									origTrack.mode = (typeof origTrack.mode == 'string') ? 'disabled' : 0;
-									this.kind = 'metadata';
-									$(this).attr({kind: kind});
-								}
-								
-							}
-						})
-						.on('load error', function(e){
-							if(e.originalEvent){
-								e.stopImmediatePropagation();
-							}
-						})
-					;
+					$('track', this).each(startTrackImplementation);
 				}
 			})
 		;

@@ -1003,11 +1003,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						clearTimeout(timer);
 					};
 					var onBlur = function(e){
-						if(e.type == 'change'){
-							stopPropagation(e);
-						}
 						clearTimeout(timer);
 						timer = setTimeout(call, 0);
+						
+						if(e.type == 'change'){
+							stopPropagation(e);
+							if(!o.splitInput){
+								call();
+							}
+						}
 					};
 					
 					that.element.on('wsupdatevalue', call);
@@ -2349,8 +2353,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		var implementType = function(){
 			var type = $.prop(this, 'type');
 			
-			var i, opts, data, optsName, calcWidth, labels;
-			if(inputTypes[type]){
+			var i, opts, data, optsName, labels;
+			if(inputTypes[type] && webshims.implement(this, 'inputwidgets')){
 				data = {};
 				optsName = type;
 				//todo: do we need deep extend?
@@ -2400,7 +2404,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				data.shim.options.containerElements.push(data.shim.element[0]);
 				
 				labelWidth($(this).getShadowFocusElement(), labels);
-				
+				$.attr(this, 'required', $.attr(this, 'required'));
 				$(this).on('change', function(e){
 					if(!stopCircular){
 						data.shim.value($.prop(this, 'value'));

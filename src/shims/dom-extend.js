@@ -395,6 +395,15 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				return id;
 			};
 		})(),
+		implement: function(elem, type){
+			var data = elementData(elem, 'implemented') || elementData(elem, 'implemented', {});
+			if(data[type]){
+				webshims.info(type +' already implemented for element #'+elem.id);
+				return false;
+			}
+			data[type] = true;
+			return true;
+		},
 		extendUNDEFProp: function(obj, props){
 			$.each(props, function(name, prop){
 				if( !(name in obj) ){

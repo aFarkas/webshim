@@ -3,7 +3,11 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	"use strict";
 	
 	if($('<form />').attr('novalidate') === ""){
-		webshims.warn("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
+		webshims.error("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
+	}
+	
+	if(!$.parseHTML){
+		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
 
 	//shortcus
@@ -391,6 +395,15 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				return id;
 			};
 		})(),
+		implement: function(elem, type){
+			var data = elementData(elem, 'implemented') || elementData(elem, 'implemented', {});
+			if(data[type]){
+				webshims.info(type +' already implemented for element #'+elem.id);
+				return false;
+			}
+			data[type] = true;
+			return true;
+		},
 		extendUNDEFProp: function(obj, props){
 			$.each(props, function(name, prop){
 				if( !(name in obj) ){
@@ -1994,11 +2007,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						clearTimeout(timer);
 					};
 					var onBlur = function(e){
-						if(e.type == 'change'){
-							stopPropagation(e);
-						}
 						clearTimeout(timer);
 						timer = setTimeout(call, 0);
+						
+						if(e.type == 'change'){
+							stopPropagation(e);
+							if(!o.splitInput){
+								call();
+							}
+						}
 					};
 					
 					that.element.on('wsupdatevalue', call);
@@ -3340,8 +3357,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		var implementType = function(){
 			var type = $.prop(this, 'type');
 			
-			var i, opts, data, optsName, calcWidth, labels;
-			if(inputTypes[type]){
+			var i, opts, data, optsName, labels;
+			if(inputTypes[type] && webshims.implement(this, 'inputwidgets')){
 				data = {};
 				optsName = type;
 				//todo: do we need deep extend?
@@ -3391,7 +3408,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				data.shim.options.containerElements.push(data.shim.element[0]);
 				
 				labelWidth($(this).getShadowFocusElement(), labels);
-				
+				$.attr(this, 'required', $.attr(this, 'required'));
 				$(this).on('change', function(e){
 					if(!stopCircular){
 						data.shim.value($.prop(this, 'value'));
