@@ -26,7 +26,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.0pre',
+		version: '1.10.0RC2',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -1081,6 +1081,10 @@
 		$.webshims.loader.addModule('range-ui', {
 			options: {},
 			noAutoCallback: true,
+			test: function(){
+				return !!$.fn.rangeUI;
+			},
+			d: ['es5'],
 			c: [6, 5, 9, 10, 18, 17, 11]
 		});
 		

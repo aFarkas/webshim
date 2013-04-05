@@ -16,7 +16,7 @@
 			var i;
 			
 			
-			this.element.addClass('ws-range').attr({role: 'slider'}).html('<span class="ws-range-min" /><span class="ws-range-rail"><span class="ws-range-thumb" /></span>');
+			this.element.addClass('ws-range').attr({role: 'slider'}).append('<span class="ws-range-min" /><span class="ws-range-rail"><span class="ws-range-thumb" /></span>');
 			this.trail = $('.ws-range-rail', this.element);
 			this.range = $('.ws-range-min', this.element);
 			this.thumb = $('.ws-range-thumb', this.trail);
@@ -371,7 +371,7 @@
 	};
 	
 	$.fn.rangeUI = function(opts){
-		opts = $.extend({readonly: false, disabled: false, tabindex: 0, min: 0, step: 1, max: 100, value: 50, input: $.noop, change: $.noop, _change: $.noop, showLabels: true}, opts);
+		opts = $.extend({readonly: false, disabled: false, tabindex: 0, min: 0, step: 1, max: 100, value: 50, input: $.noop, change: $.noop, _change: $.noop, showLabels: true, options: {}}, opts);
 		return this.each(function(){
 			$.webshims.objectCreate(rangeProto, {
 				element: {

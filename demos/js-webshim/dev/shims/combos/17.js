@@ -525,7 +525,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			var i;
 			
 			
-			this.element.addClass('ws-range').attr({role: 'slider'}).html('<span class="ws-range-min" /><span class="ws-range-rail"><span class="ws-range-thumb" /></span>');
+			this.element.addClass('ws-range').attr({role: 'slider'}).append('<span class="ws-range-min" /><span class="ws-range-rail"><span class="ws-range-thumb" /></span>');
 			this.trail = $('.ws-range-rail', this.element);
 			this.range = $('.ws-range-min', this.element);
 			this.thumb = $('.ws-range-thumb', this.trail);
@@ -880,7 +880,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 	};
 	
 	$.fn.rangeUI = function(opts){
-		opts = $.extend({readonly: false, disabled: false, tabindex: 0, min: 0, step: 1, max: 100, value: 50, input: $.noop, change: $.noop, _change: $.noop, showLabels: true}, opts);
+		opts = $.extend({readonly: false, disabled: false, tabindex: 0, min: 0, step: 1, max: 100, value: 50, input: $.noop, change: $.noop, _change: $.noop, showLabels: true, options: {}}, opts);
 		return this.each(function(){
 			$.webshims.objectCreate(rangeProto, {
 				element: {
@@ -2640,7 +2640,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 		picker._common = function(data){
 			var popover = webshims.objectCreate(webshims.wsPopover, {}, {prepareFor: data.element});
-			var opener = $('<button type="button" class="popover-opener"><span /></button>').appendTo(data.buttonWrapper);
+			var opener = $('<button type="button" class="ws-popover-opener"><span /></button>').appendTo(data.buttonWrapper);
 			var options = data.options;
 			var init = false;
 			
@@ -2832,11 +2832,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						marginL = (parseInt(data.buttonWrapper.css('marginLeft'), 10) || 0);
 						data.element.css({paddingRight: ''});
 						
-						
-						
 						if(marginL < 0){
-							
-							marginR = (parseInt(marginR, 10) || 0) + Math.abs(data.buttonWrapper.outerWidth() + marginL);
+							marginR = (parseInt(marginR, 10) || 0) + ((data.buttonWrapper.outerWidth() + marginL) * -1);
 							data.buttonWrapper.css('marginRight', marginR);
 							data.element
 								.css({paddingRight: ''})
