@@ -3494,6 +3494,7 @@ try {
 			if(value === false){
 				value = $.prop(elem, 'value');
 			}
+			
 			if(!isOver && elem.type != 'password'){
 				if(!value && _onFocus && setSelection(elem)){
 					var selectTimer  = setTimeout(function(){
@@ -3523,8 +3524,9 @@ try {
 						})
 					;
 					return;
+				} else if(!_onFocus && !value && elem.value){ //especially on submit
+					elem.value = value;
 				}
-				elem.value = value;
 			} else if(!value && _onFocus){
 				$(elem)
 					.off('.placeholderremove')
