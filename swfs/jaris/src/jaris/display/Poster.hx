@@ -174,7 +174,7 @@ class Poster extends Sprite
 	{
 		_player = player;
 		_player.addEventListener(PlayerEvents.MEDIA_INITIALIZED, onPlayerMediaInitialized);
-		_player.addEventListener(PlayerEvents.PLAYBACK_FINISHED, onPlayBackFinished);
+		//_player.addEventListener(PlayerEvents.PLAYBACK_FINISHED, onPlayBackFinished);
 		_player.addEventListener(PlayerEvents.PLAY_PAUSE, onPlayerPlay);
 	}
 	

@@ -533,7 +533,7 @@ class Player extends EventDispatcher
 	 * @param	event
 	 */
 	private function onSoundID3(event:Event)
-	{		
+	{
 		if (_firstLoad)
 		{
 			_soundChannel = _sound.play();
@@ -850,7 +850,7 @@ class Player extends EventDispatcher
 	 * Preload a video without playing
 	 */
 	public function preload():Void
-	{		
+	{
 		if (!_mediaLoaded && _mediaSource != "" && !_requestedPlay) {
 			var isVideo = (_type == InputType.VIDEO && (_streamType == StreamType.FILE || _streamType == StreamType.PSEUDOSTREAM));
 			var isAudio = (_type == InputType.AUDIO && _streamType == StreamType.FILE);
@@ -866,6 +866,7 @@ class Player extends EventDispatcher
 				_preLoading = true;
 			}
 			
+			
 			if (isVideo)
 			{	
 				_connection.connect(null);
@@ -875,7 +876,6 @@ class Player extends EventDispatcher
 				_stream.play(_mediaSource);
 				_stream.client = this;
 				pause();
-		
 				if (!_hasPoster) {
 					_video.attachNetStream(_stream);
 				}
