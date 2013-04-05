@@ -453,15 +453,16 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 	
 	var bufferSrc = (function(){
 		var preloads = {
-				'': 1,
-				'auto': 1
+			'': 1,
+			'auto': 1
 		};
 		return function(elem){
-			if($.attr(elem, 'preload') == null || $.prop(elem, 'autoplay')){
+			var preload = $.attr(elem, 'preload');
+			if(preload == null || preload == 'none' || $.prop(elem, 'autoplay')){
 				return false;
 			}
-			var preload =  $.prop(elem, 'preload');
-			return !!(preloads[preload] || (preload == 'metadata' && $(elem).hasClass('preload')));
+			preload =  $.prop(elem, 'preload');
+			return !!(preloads[preload] || (preload == 'metadata' && $(elem).is('.preload-in-doubt, video:not([poster])')));
 		}
 	})();
 	

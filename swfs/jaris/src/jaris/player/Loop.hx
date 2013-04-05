@@ -45,6 +45,8 @@ class Loop
 	 */
 	private function onPlayerStop(event:PlayerEvents):Void
 	{
+		_player.console.text += "\n loop";
+		_player.console.setTextFormat(_player.textFormat);
 		_player.togglePlay();
 	}
 }

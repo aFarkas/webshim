@@ -204,7 +204,8 @@ class NewControls extends MovieClip {
 		redrawControls();
 		
 		
-		_forceHideControls = forceHideControls == "false";		
+		_forceHideControls = forceHideControls == "false";
+		
 		
 		//{Loader bar
 		if ( _forceHideControls && _showLoader || !_forceHideControls ) {

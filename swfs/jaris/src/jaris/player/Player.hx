@@ -111,6 +111,7 @@ class Player extends EventDispatcher
 	public var _showLoader:Bool;
 	private var _preLoading:Bool;
 	private var _requestedPlay:Bool;
+	private var _hasPoster:Bool;
 	//}
 	
 	
@@ -149,6 +150,7 @@ class Player extends EventDispatcher
 		_lastProgress = 0;
 		_userSettings = new UserSettings();
 		noAPITrigger = false;
+		_hasPoster = false;
 		_showLoader = true;
 		//}
 		
@@ -519,7 +521,7 @@ class Player extends EventDispatcher
 	 * @param	event
 	 */
 	private function onSoundComplete(event:Event)
-	{
+	{		
 		_mediaDuration = _sound.length / 1000;
 		_downloadCompleted = true;
 		
@@ -531,7 +533,7 @@ class Player extends EventDispatcher
 	 * @param	event
 	 */
 	private function onSoundID3(event:Event)
-	{
+	{		
 		if (_firstLoad)
 		{
 			_soundChannel = _sound.play();
@@ -873,6 +875,10 @@ class Player extends EventDispatcher
 				_stream.play(_mediaSource);
 				_stream.client = this;
 				pause();
+		
+				if (!_hasPoster) {
+					_video.attachNetStream(_stream);
+				}
 				
 			}else if(isAudio)
 			{
@@ -954,7 +960,7 @@ class Player extends EventDispatcher
 					_firstLoad = false;
 					
 					_mediaLoaded = true;
-				
+					
 				} catch (error:IOError) { }
 			}
 		}
@@ -1138,7 +1144,6 @@ class Player extends EventDispatcher
 			}
 			
 		}
-		
 		return _isPlaying;
 		
 	}
@@ -1724,6 +1729,11 @@ class Player extends EventDispatcher
 	public function getLoadType():Bool
 	{
 		return _preLoading;
+	}
+	
+	public function hasPoster(val:Bool)
+	{
+		_hasPoster = val;
 	}
 	
 }

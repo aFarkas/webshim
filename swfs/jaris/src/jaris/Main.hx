@@ -105,6 +105,8 @@ class Main
 			{
 				player.setAspectRatio(userSettings.getAspectRatio());
 			}
+			
+			
 			player.setLoader(showLoader);
 			player.setType(type);
 			player.setStreamType(streamType);
@@ -112,6 +114,7 @@ class Main
 			player.setVolume(userSettings.getVolume());
 			player.setBufferTime(bufferTime);
 			player.setSource(parameters.source);
+			player.hasPoster((parameters.poster != null && parameters.poster != ''));
 			player.setHardwareScaling(parameters.hardwarescaling == "true"?true:false);
 			
 			//player.preload(parameters.source, type, streamType);
@@ -132,7 +135,7 @@ class Main
 		}
 		
 		//Draw preview image
-		if (parameters.poster != null)
+		if (parameters.poster != null && parameters.poster != '')
 		{
 			var poster:String = parameters.poster;
 			var posterImage = new Poster(poster, showLoader);

@@ -155,7 +155,10 @@ class JsApi extends MovieClip {
 	}	
 	
 	public function onPlayerEvent(event:PlayerEvents):Void
-	{	
+	{
+		//_player.console.text += "\n "+event.type;
+		//_player.console.setTextFormat(_player.textFormat);
+		
 		if(!_player.noAPITrigger){
 			var jsFunction = '';
 			var data = {
