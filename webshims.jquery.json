@@ -17,7 +17,7 @@
 		"url": "https://github.com/aFarkas/"
 	},
 	
-	"keywords": ["webshims", "polyfill", "HTML5", "forms", "form", "audio", "video", "validation", "canvas", "localstorage", "geolocation", "ui", "widgets"],
+	"keywords": ["webshims", "polyfill", "HTML5", "forms", "form", "audio", "video", "validation", "canvas", "localstorage", "geolocation", "ui", "widgets", "datepicker", "range"],
 	"homepage": "http://afarkas.github.com/webshim/demos/index.html",
 	"description": "modular capability-based polyfill loading libary, which extends jQuery with HTML5 features in legacy browsers",
 	"docs": "http://afarkas.github.com/webshim/demos/index.html",
