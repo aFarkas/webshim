@@ -31,19 +31,13 @@ asyncTest("progress", function(){
 		strictEqual(progress.attr('value'), "1", "progress attr value");
 	}
 	
-	progress.prop('value', 'dsadsa');
-	strictEqual(progress.prop('position'), -1, "progress position");
-	strictEqual(progress.prop('value'), 0, "progress prop value");
-	if($.fn.finish){
-		strictEqual(progress.attr('value'), "NaN", "progress attr value");
-	}
 	
-	progress.attr('value', 'dsadsa');
-	strictEqual(progress.prop('position'), -1, "progress position");
-	strictEqual(progress.prop('value'), 0, "progress prop value");
-	if($.fn.finish){
-		strictEqual(progress.attr('value'), "dsadsa", "progress attr value");
-	}
+//	progress.attr('value', 'dsadsa');
+//	strictEqual(progress.prop('position'), -1, "progress position");
+//	strictEqual(progress.prop('value'), 0, "progress prop value");
+//	if($.fn.finish){
+//		strictEqual(progress.attr('value'), "dsadsa", "progress attr value");
+//	}
 	
 	
 	$.webshims.ready('forms-ext DOM', start);

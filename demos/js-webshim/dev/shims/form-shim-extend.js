@@ -1124,7 +1124,11 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 							return ret;
 						},
 						set: function(value){
-							return desc[name].attr.set.call(this, value * 1);
+							value = value * 1;
+							if(isNaN(value)){
+								webshims.error('Floating-point value is not finite.');
+							}
+							return desc[name].attr.set.call(this, value);
 						}
 					}
 				};

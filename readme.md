@@ -89,6 +89,7 @@ upcomming Release 1.10.0
 - list/datalist support for following types: range, month, date (datalist support for text/email/url/tel etc. was already there)
 - type="number" can be localized
 - type="number"/type="time" are custom styleable in supporting browsers
+- video[preload]/audio[preload] (for "auto"/"" and "none")
 - labels property for labellable form elements
 - stepUp/stepDown methods for input elements
 

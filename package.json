@@ -1,6 +1,6 @@
 {
   "name": "webshims",
-  "version": "1.10.0pre",
+  "version": "1.10.0",
   "title": "Webshims - polyfills jQuery with many HTML5 features",
   "licenses": [
     {

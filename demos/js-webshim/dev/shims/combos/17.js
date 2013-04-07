@@ -1070,6 +1070,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				};
 				langCfg.date.monthkeys = {};
 				langCfg.date.monthDigits = monthDigits;
+				langCfg.numberSigns += '-';
 				$.each(langCfg.date.monthNames, create);
 				$.each(langCfg.date.monthNamesShort, create);
 			}
