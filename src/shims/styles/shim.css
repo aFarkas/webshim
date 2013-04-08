@@ -675,7 +675,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .ws-picker-body {
   position: relative;
   padding: 46px 0 0;
-  zoom: 1px;
+  zoom: 1;
   margin: 0 -10px;
 }
 .input-picker .ws-prev {

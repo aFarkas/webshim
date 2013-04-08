@@ -898,13 +898,6 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 								elems[i][SENDEVENT]('play', false);
 							} catch(er){}
 						}
-						try {
-							for (prop in elems[i]) {
-								if (typeof elems[i][prop] == "function") {
-									elems[i][prop] = null;
-								}
-							}
-						} catch(er){}
 					}
 				}
 				

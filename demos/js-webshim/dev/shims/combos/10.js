@@ -2,7 +2,9 @@
 jQuery.webshims.register('dom-extend', function($, webshims, window, document, undefined){
 	"use strict";
 	
-	if($('<form />').attr('novalidate') === ""){
+	webshims.assumeARIA = Modernizr.localstorage || Modernizr.video || Modernizr.boxsizing;
+	
+	if($('<form />').attr('novalidate') === "" || ('required' in $('<input />')[0].attributes)){
 		webshims.error("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
 	}
 	
@@ -960,7 +962,20 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 });
 //html5a11y
 (function($, document){
-	if(!Modernizr.localstorage || ('hidden' in document.createElement('a'))){return;}
+	if(!$.webshims.assumeARIA || ('content' in document.createElement('template'))){return;}
+	
+	$(function(){
+		var main = $('main').attr({role: 'main'});
+		if(main.length > 1){
+			webshims.error('only one main element allowed in document');
+		} else if(main.is('article *, section *')) {
+			webshims.error('main not allowed inside of article/section elements');
+		}
+	});
+	
+	if(('hidden' in document.createElement('a'))){
+		return;
+	}
 	
 	var elemMappings = {
 		article: "article",
@@ -976,6 +991,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		}
 	};
 	
+	
 	$.webshims.addReady(function(context, contextElem){
 		$.each(elemMappings, function(name, role){
 			var elems = $(name, context).add(contextElem.filter(name));
@@ -987,6 +1003,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			var header = document.getElementsByTagName('header')[0];
 			var footers = document.getElementsByTagName('footer');
 			var footerLen = footers.length;
+			
 			if (header && !$(header).closest('section, article')[0]) {
 				addRole(header, 'banner');
 			}
@@ -3011,7 +3028,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			var updateContent = function(){
 				if(popover.isDirty){
 					var o = data.options;
-					
 					o.maxS = o.max.split('-');
 					o.minS = o.min.split('-');
 					
@@ -3033,6 +3049,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						}
 						if(text){
 							$(this).text(text).attr({'aria-label': text});
+							if(webshims.assumeARIA){
+								$.attr(this, 'aria-label', text);
+							}
 						}
 						
 					});

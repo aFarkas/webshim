@@ -26,7 +26,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.0',
+		version: '1.10.1pre',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -1059,12 +1059,18 @@
 		addPolyfill('form-number-date-api', {
 			f: 'forms-ext',
 			options: {
-				types: ['range', 'date', 'time', 'number', 'month']
+				types: 'range date time number month'
 			},
 			test: function(toLoad){
 				var ret = true;
+				var types = this.options.types;
+				if(typeof types != 'string'){
+					webshims.warn("types should be a whitespace seperated string");
+				} else {
+					types = types.split(' ');
+				}
 				initialFormTest();
-				$.each(this.options.types, function(i, name){
+				$.each(types, function(i, name){
 					if(!modernizrInputTypes[name]){
 						ret = false;
 						return false;

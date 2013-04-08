@@ -1179,13 +1179,6 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 								elems[i].api_pause();
 							} catch(er){}
 						}
-						try {
-							for (prop in elems[i]) {
-								if (typeof elems[i][prop] == "function") {
-									elems[i][prop] = null;
-								}
-							}
-						} catch(er){}
 					}
 				}
 				

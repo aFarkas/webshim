@@ -2772,7 +2772,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			var updateContent = function(){
 				if(popover.isDirty){
 					var o = data.options;
-					
 					o.maxS = o.max.split('-');
 					o.minS = o.min.split('-');
 					
@@ -2794,6 +2793,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						}
 						if(text){
 							$(this).text(text).attr({'aria-label': text});
+							if(webshims.assumeARIA){
+								$.attr(this, 'aria-label', text);
+							}
 						}
 						
 					});
