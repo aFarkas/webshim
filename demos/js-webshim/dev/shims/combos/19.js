@@ -2557,7 +2557,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			loaded = true;
 			webshims.loader.loadScript("https://www.youtube.com/player_api");
 			$(function(){
-				webshims.polyfill("mediaelement-yt");
+				webshims._polyfill(["mediaelement-yt"]);
 			});
 		};
 	})();

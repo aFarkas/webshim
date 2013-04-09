@@ -26,7 +26,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.1pre',
+		version: '1.10.1',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -93,8 +93,26 @@
 				});
 			}
 		},
-		
 		polyfill: (function(){
+			var loaded = {};
+			return function(features){
+				if(!features){
+					features = webshims.featureList;
+				}
+					
+				if (typeof features == 'string') {
+					features = features.split(' ');
+				}
+				for(var i = 0; i < features.length; i++){
+					if(features[i] in loaded){
+						webshims.warn(features[i] +' already loaded, you might want to use updatePolyfill instead? see: bit.ly/12BtXX3');
+					}
+					loaded[features[i]] = true;
+				}
+				return webshims._polyfill(features);
+			};
+		})(),
+		_polyfill: (function(){
 			var firstPolyfillCall = function(features){
 				var addClass = [];
 				var onReadyEvts = features;
@@ -139,11 +157,6 @@
 				
 				var toLoadFeatures = [];
 				
-				features = features || webshims.featureList;
-				
-				if (typeof features == 'string') {
-					features = features.split(' ');
-				}
 				if(!loadedFormBase){
 					loadedFormBase = $.inArray('forms', features) !== -1;
 					if(!loadedFormBase && $.inArray('forms-ext', features) !== -1){
@@ -625,36 +638,30 @@
 	//Overwrite DOM-Ready and implement a new ready-method
 	(function(){
 		$.isDOMReady = $.isReady;
-		if(!$.isDOMReady){
-			var $Ready = $.ready;
-			$.ready = function(unwait){
-				if(unwait !== true && !$.isDOMReady){
-					if(document.body){
-						$.isDOMReady = true;
-						isReady('DOM', true);
-						$.ready = $Ready;
-					} else {
-						setTimeout(function(){
-							$.ready(unwait);
-						}, 13);
-					}
-				}
-				return $Ready.apply(this, arguments);
-			};
-			$.ready.promise = $Ready.promise;
-		} else {
-			isReady('DOM', true);
-		}
-		$(function(){
+		var onReady = function(){
 			$.isDOMReady = true;
 			isReady('DOM', true);
 			setTimeout(function(){
 				isReady('WINDOWLOAD', true);
 			}, 9999);
-		});
+		};
+		if(!$.isDOMReady){
+			var $Ready = $.ready;
+			$.ready = function(unwait){
+				if(unwait !== true && document.body){
+					onReady();
+					$.ready = $Ready;
+				}
+				return $Ready.apply(this, arguments);
+			};
+			$.ready.promise = $Ready.promise;
+		} else {
+			onReady();
+		}
+		$(onReady);
+		
 		$(window).load(function(){
-			$.isDOMReady = true;
-			isReady('DOM', true);
+			onReady();
 			isReady('WINDOWLOAD', true);
 		});
 	})();
