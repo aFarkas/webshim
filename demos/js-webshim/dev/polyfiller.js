@@ -128,13 +128,14 @@
 					clearTimeout(timer);
 				};
 				
-				$(window).on('load.lP error.lP', removeLoader);
+				
 				
 				addClass.push('loading-polyfills');
 				timer = setTimeout(function(){
 					$('html').addClass('long-loading-polyfills');
-					timer = setTimeout(removeLoader, 150);
-				}, 350);
+					timer = setTimeout(removeLoader, 300);
+				}, 300);
+				$(window).on('load.lP error.lP', removeLoader);
 				
 				if (webCFG.waitReady && $.isReady) {
 					webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
@@ -347,17 +348,20 @@
 			},
 			loadList: (function(){
 			
-				var loadedModules = [];
+//				var loadedModules = [];
 				var loadScript = function(src, names){
-					if (typeof names == 'string') {
-						names = [names];
-					}
-					$.merge(loadedModules, names);
+//					if (typeof names == 'string') {
+//						names = [names];
+//					}
+//					$.merge(loadedModules, names);
 					loader.loadScript(src, false, names);
 				};
 				
 				var noNeedToLoad = function(name, list){
-					if (isReady(name) || $.inArray(name, loadedModules) != -1) {
+//					if(modules[name].loaded == $.inArray(name, loadedModules) == -1){
+//						console.log(name)
+//					}
+					if (isReady(name) || modules[name].loaded) {
 						return true;
 					}
 					var module = modules[name];
@@ -409,7 +413,10 @@
 					var loadCombo = function(j, combo){
 						foundCombo = combo;
 						$.each(webshims.c[combo], function(i, moduleName){
-							if($.inArray(moduleName, loadCombos) == -1 || $.inArray(moduleName, loadedModules) != -1){
+//							if(modules[moduleName].loaded == $.inArray(moduleName, loadedModules) == -1){
+//								console.log(moduleName)
+//							}
+							if($.inArray(moduleName, loadCombos) == -1 || modules[moduleName].loaded){
 								foundCombo = false;
 								return false;
 							}
@@ -446,8 +453,10 @@
 						foundCombo = false;
 						
 						module = loadCombos[i];
-						
-						if($.inArray(module, loadedModules) == -1){
+//						if(modules[module].loaded == $.inArray(module, loadedModules) == -1){
+//							console.log(module)
+//						}
+						if(!modules[module].loaded){
 							if(webshims.debug != 'noCombo'){
 								$.each(modules[module].c, loadCombo);
 							}

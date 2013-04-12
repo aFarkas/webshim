@@ -95,6 +95,7 @@
 		},
 		polyfill: (function(){
 			var loaded = {};
+			var called;
 			return function(features){
 				if(!features){
 					features = webshims.featureList;
@@ -103,6 +104,10 @@
 				if (typeof features == 'string') {
 					features = features.split(' ');
 				}
+				if(called){
+					webshims.warn('polyfill already called, you might want to use updatePolyfill instead? see: bit.ly/12BtXX3. polyfill should be called only once.');
+				}
+				called = true;
 				for(var i = 0; i < features.length; i++){
 					if(features[i] in loaded){
 						webshims.warn(features[i] +' already loaded, you might want to use updatePolyfill instead? see: bit.ly/12BtXX3');
@@ -128,13 +133,14 @@
 					clearTimeout(timer);
 				};
 				
-				$(window).on('load.lP error.lP', removeLoader);
+				
 				
 				addClass.push('loading-polyfills');
 				timer = setTimeout(function(){
 					$('html').addClass('long-loading-polyfills');
-					timer = setTimeout(removeLoader, 150);
-				}, 350);
+					timer = setTimeout(removeLoader, 300);
+				}, 300);
+				$(window).on('load.lP error.lP', removeLoader);
 				
 				if (webCFG.waitReady && $.isReady) {
 					webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
