@@ -656,6 +656,7 @@
 					} catch(er){
 						webshims.error(er);
 					}
+					$.ready = $Ready;
 				}
 				if($.isReady && !isResolved){
 					webshims.error('was ready without resolving. reset to false');
