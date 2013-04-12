@@ -95,6 +95,7 @@
 		},
 		polyfill: (function(){
 			var loaded = {};
+			var called;
 			return function(features){
 				if(!features){
 					features = webshims.featureList;
@@ -103,6 +104,10 @@
 				if (typeof features == 'string') {
 					features = features.split(' ');
 				}
+				if(called){
+					webshims.warn('polyfill already called, you might want to use updatePolyfill instead? see: bit.ly/12BtXX3. polyfill should be called only once.');
+				}
+				called = true;
 				for(var i = 0; i < features.length; i++){
 					if(features[i] in loaded){
 						webshims.warn(features[i] +' already loaded, you might want to use updatePolyfill instead? see: bit.ly/12BtXX3');
@@ -348,20 +353,17 @@
 			},
 			loadList: (function(){
 			
-//				var loadedModules = [];
+				var loadedModules = [];
 				var loadScript = function(src, names){
-//					if (typeof names == 'string') {
-//						names = [names];
-//					}
-//					$.merge(loadedModules, names);
+					if (typeof names == 'string') {
+						names = [names];
+					}
+					$.merge(loadedModules, names);
 					loader.loadScript(src, false, names);
 				};
 				
 				var noNeedToLoad = function(name, list){
-//					if(modules[name].loaded == $.inArray(name, loadedModules) == -1){
-//						console.log(name)
-//					}
-					if (isReady(name) || modules[name].loaded) {
+					if (isReady(name) || $.inArray(name, loadedModules) != -1) {
 						return true;
 					}
 					var module = modules[name];
@@ -413,10 +415,7 @@
 					var loadCombo = function(j, combo){
 						foundCombo = combo;
 						$.each(webshims.c[combo], function(i, moduleName){
-//							if(modules[moduleName].loaded == $.inArray(moduleName, loadedModules) == -1){
-//								console.log(moduleName)
-//							}
-							if($.inArray(moduleName, loadCombos) == -1 || modules[moduleName].loaded){
+							if($.inArray(moduleName, loadCombos) == -1 || $.inArray(moduleName, loadedModules) != -1){
 								foundCombo = false;
 								return false;
 							}
@@ -453,10 +452,8 @@
 						foundCombo = false;
 						
 						module = loadCombos[i];
-//						if(modules[module].loaded == $.inArray(module, loadedModules) == -1){
-//							console.log(module)
-//						}
-						if(!modules[module].loaded){
+						
+						if($.inArray(module, loadedModules) == -1){
 							if(webshims.debug != 'noCombo'){
 								$.each(modules[module].c, loadCombo);
 							}
@@ -647,9 +644,7 @@
 	//Overwrite DOM-Ready and implement a new ready-method
 	(function(){
 		$.isDOMReady = $.isReady;
-		var isResolved = false;
 		var onReady = function(){
-			isResolved = true;
 			$.isDOMReady = true;
 			isReady('DOM', true);
 			setTimeout(function(){
@@ -660,16 +655,8 @@
 			var $Ready = $.ready;
 			$.ready = function(unwait){
 				if(unwait !== true && document.body){
-					try {
-						onReady();
-					} catch(er){
-						webshims.error(er);
-					}
+					onReady();
 					$.ready = $Ready;
-				}
-				if($.isReady && !isResolved){
-					webshims.error('was ready without resolving. reset to false');
-					$.isReady = false;
 				}
 				return $Ready.apply(this, arguments);
 			};

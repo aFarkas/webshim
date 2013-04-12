@@ -21,7 +21,7 @@
 					$("#main, #qunit-fixture").htmlPolyfill( QUnit.config.fixture );
 				};
 			});
-			$(window).bind('error', function(){
+			$(window).bind('error', function(e){
 				alert('error!!!');
 			});
 		})();

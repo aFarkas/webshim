@@ -2744,7 +2744,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 			},
 			showHideOptions: function(_fromShowList){
 				var value = $.prop(this.input, 'value').toLowerCase();
-				console.log(value)
+
 				//first check prevent infinite loop, second creates simple lazy optimization
 				if(value === this.lastUpdatedValue){
 					return;
