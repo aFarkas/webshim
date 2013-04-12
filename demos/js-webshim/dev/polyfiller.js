@@ -26,7 +26,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.1',
+		version: '1.10.2pre',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -638,7 +638,9 @@
 	//Overwrite DOM-Ready and implement a new ready-method
 	(function(){
 		$.isDOMReady = $.isReady;
+		var isResolved = false;
 		var onReady = function(){
+			isResolved = true;
 			$.isDOMReady = true;
 			isReady('DOM', true);
 			setTimeout(function(){
@@ -650,7 +652,10 @@
 			$.ready = function(unwait){
 				if(unwait !== true && document.body){
 					onReady();
-					$.ready = $Ready;
+				}
+				if($.isReady && !isResolved){
+					webshims.error('was ready without resolving. reset to false');
+					$.isReady = false;
 				}
 				return $Ready.apply(this, arguments);
 			};

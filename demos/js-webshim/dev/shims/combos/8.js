@@ -510,7 +510,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	
 	webshims.assumeARIA = Modernizr.localstorage || Modernizr.video || Modernizr.boxsizing;
 	
-	if($('<form />').attr('novalidate') === "" || ('required' in $('<input />')[0].attributes)){
+	if($('<input type="email" />').attr('type') == 'text' || $('<form />').attr('novalidate') === "" || ('required' in $('<input />')[0].attributes)){
 		webshims.error("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
 	}
 	
@@ -1930,6 +1930,10 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				$(document.documentElement)
 			;
 		};
+		var minWidth = (Modernizr.boxSizing || Modernizr['display-table'] || $.support.getSetAttribute) ?
+			'minWidth' :
+			'width'
+		;
 		setRoot();
 		webshims.ready('DOM', setRoot);
 		
@@ -2019,6 +2023,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				var onBlur;
 				var opts = $.extend({}, this.options, $(element.prop('form') || []).data('wspopover') || {}, element.data('wspopover'));
 				var that = this;
+				var css = {};
 				this.lastElement = $(element).getShadowFocusElement();
 				if(opts.appendTo == 'element'){
 					this.element.insertAfter(element);
@@ -2031,7 +2036,9 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					'data-id': element.prop('id')
 				});
 				
-				this.element.css({width: opts.constrainWidth ? visual.outerWidth() : ''});
+				css[minWidth] = opts.constrainWidth ? visual.outerWidth() : '';
+				
+				this.element.css(css);
 				
 				if(opts.hideOnBlur){
 					onBlur = function(e){

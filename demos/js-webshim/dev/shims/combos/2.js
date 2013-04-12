@@ -510,7 +510,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	
 	webshims.assumeARIA = Modernizr.localstorage || Modernizr.video || Modernizr.boxsizing;
 	
-	if($('<form />').attr('novalidate') === "" || ('required' in $('<input />')[0].attributes)){
+	if($('<input type="email" />').attr('type') == 'text' || $('<form />').attr('novalidate') === "" || ('required' in $('<input />')[0].attributes)){
 		webshims.error("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
 	}
 	
@@ -1930,6 +1930,10 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				$(document.documentElement)
 			;
 		};
+		var minWidth = (Modernizr.boxSizing || Modernizr['display-table'] || $.support.getSetAttribute) ?
+			'minWidth' :
+			'width'
+		;
 		setRoot();
 		webshims.ready('DOM', setRoot);
 		
@@ -2019,6 +2023,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				var onBlur;
 				var opts = $.extend({}, this.options, $(element.prop('form') || []).data('wspopover') || {}, element.data('wspopover'));
 				var that = this;
+				var css = {};
 				this.lastElement = $(element).getShadowFocusElement();
 				if(opts.appendTo == 'element'){
 					this.element.insertAfter(element);
@@ -2031,7 +2036,9 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					'data-id': element.prop('id')
 				});
 				
-				this.element.css({width: opts.constrainWidth ? visual.outerWidth() : ''});
+				css[minWidth] = opts.constrainWidth ? visual.outerWidth() : '';
+				
+				this.element.css(css);
 				
 				if(opts.hideOnBlur){
 					onBlur = function(e){
@@ -2702,13 +2709,11 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					rItem = {
 						value: $(rElem).val() || '',
 						text: $.trim($.attr(rElem, 'label') || getText(rElem)),
-						className: rElem.className || '',
-						style: $.attr(rElem, 'style') || ''
+						className: rElem.className || ''
 					};
-					if(!rItem.text){
-						rItem.text = rItem.value;
-					} else if(rItem.text != rItem.value){
-						rItem.className += ' different-label-value';
+					
+					if(rItem.text){
+						rItem.className += ' has-option-label';
 					}
 					values[rI] = rItem.value;
 					allOptions[rI] = rItem;
@@ -2726,12 +2731,11 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				
 				for(rI = 0, rLen = allOptions.length; rI < rLen; rI++){
 					item = allOptions[rI];
-					list[rI] = '<li class="'+ item.className +'" style="'+ item.style +'" tabindex="-1" role="listitem"><span class="option-label">'+ this.maskHTML(item.text, 'label', item) +'</span> <span class="option-value">'+ this.maskHTML(item.value, 'value', item) +'</span></li>';
+					list[rI] = '<li class="'+ item.className +'" tabindex="-1" role="listitem"><span class="option-value">'+ this.maskHTML(item.value, 'value', item) +'</span> <span class="option-label">'+ this.maskHTML(item.text, 'label', item) +'</span></li>';
 				}
 				
 				this.arrayOptions = allOptions;
 				this.popover.contentElement.html('<div class="datalist-box"><ul role="list">'+ list.join("\n") +'</ul></div>');
-				
 				
 				
 				if(_forceShow || this.popover.isVisible){
@@ -2740,10 +2744,16 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 			},
 			showHideOptions: function(_fromShowList){
 				var value = $.prop(this.input, 'value').toLowerCase();
+				console.log(value)
 				//first check prevent infinite loop, second creates simple lazy optimization
-				if(value === this.lastUpdatedValue || (this.lastUnfoundValue && value.indexOf(this.lastUnfoundValue) === 0)){
+				if(value === this.lastUpdatedValue){
+					return;
+				} 
+				if(this.lastUnfoundValue && value.indexOf(this.lastUnfoundValue) === 0){
+					this.hideList();
 					return;
 				}
+				
 				
 				this.lastUpdatedValue = value;
 				var found = false;
@@ -2753,14 +2763,16 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					this.arrayOptions.forEach(function(item, i){
 						var search;
 						if(!('lowerText' in item)){
-							if(item.text != item.value){
-								item.lowerText = item.value.toLowerCase() + item.text.toLowerCase();
+							if(item.text && item.text != item.value ){
+								item.lowerText = item.value.toLowerCase() +'A'+ item.text.toLowerCase();
 							} else {
-								item.lowerText = item.text.toLowerCase();
+								item.lowerText = item.value.toLowerCase();
 							}
 						}
-						search = item.lowerText.indexOf(value);
+						
+						search = (value == item.lowerText || item.value == value || item.text == value) ? -1 : item.lowerText.indexOf(value);
 						search = startSearch ? !search : search !== -1;
+						
 						if(search){
 							$(lis[i]).removeClass('hidden-item');
 							found = true;
@@ -2777,9 +2789,12 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				if(!_fromShowList && found){
 					this.showList();
 				}
+				
 				if(!found){
 					this.lastUnfoundValue = value;
 					this.hideList();
+				} else {
+					this.lastUnfoundValue = false;
 				}
 			},
 			showList: function(){

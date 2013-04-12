@@ -876,25 +876,42 @@ datalist {
   cursor: default;
   zoom: 1;
   overflow: hidden;
-}
-.datalist-polyfill .option-label {
-  display: inline-block;
-  float: left;
-  max-width: 100%;
   text-overflow: ellipsis;
 }
 .datalist-polyfill .option-value {
-  display: none;
-  float: right;
+  display: inline-block;
   text-overflow: ellipsis;
+  max-width: 100%;
+  color: #000;
+  float: left;
+}
+.datalist-polyfill .option-label {
+  display: none;
+  max-width: 100%;
+  float: right;
+  font-size: 90%;
+  color: #666;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  margin-top: 0.15em;
+  margin-left: 10px;
+  text-align: right;
+}
+.datalist-polyfill .has-option-label .option-label {
+  display: inline-block;
 }
 .datalist-polyfill .hidden-item {
   display: none !important;
 }
 .datalist-polyfill .active-item {
   background-color: #39f;
-  color: #fff;
   cursor: default;
+}
+.datalist-polyfill .active-item .option-value {
+  color: #fff;
+}
+.datalist-polyfill .active-item .option-label {
+  color: #eee;
 }
 
 .validity-alert {
