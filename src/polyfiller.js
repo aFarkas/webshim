@@ -651,7 +651,11 @@
 			var $Ready = $.ready;
 			$.ready = function(unwait){
 				if(unwait !== true && document.body){
-					onReady();
+					try {
+						onReady();
+					} catch(er){
+						webshims.error(er);
+					}
 				}
 				if($.isReady && !isResolved){
 					webshims.error('was ready without resolving. reset to false');
