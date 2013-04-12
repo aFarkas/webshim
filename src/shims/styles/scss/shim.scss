@@ -1026,20 +1026,36 @@ datalist {
 		cursor: default;
 		zoom: 1;
 		overflow: hidden;
-	}
-
-	.option-label {
-		display: inline-block;
-		float: left;
-		max-width: 100%;
 		text-overflow: ellipsis;
 	}
 
 	.option-value {
-		display: none;
-		float: right;
+		display: inline-block;
 		text-overflow: ellipsis;
+		max-width: 100%;
+		color: #000;
+		float: left;
 	}
+	
+	.option-label {
+		display: none;
+		max-width: 100%;
+		float: right;
+		font-size: 90%;
+		color: #666;
+		text-overflow: ellipsis;
+		vertical-align: bottom;
+		margin-top: 0.15em;
+		margin-left: 10px;
+		text-align: right;
+	}
+	
+	.has-option-label  {
+		.option-label {
+			display: inline-block;
+		}
+	}
+
 
 	.hidden-item {
 		display: none !important;
@@ -1047,7 +1063,12 @@ datalist {
 
 	.active-item {
 		background-color: #39f;
-		color: #fff;
+		.option-value {
+			color: #fff;
+		}
+		.option-label {
+			color: #eee;
+		}
 		cursor: default;
 	}
 }

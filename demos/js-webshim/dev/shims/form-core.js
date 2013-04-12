@@ -403,6 +403,10 @@
 				$(document.documentElement)
 			;
 		};
+		var minWidth = (Modernizr.boxSizing || Modernizr['display-table'] || $.support.getSetAttribute) ?
+			'minWidth' :
+			'width'
+		;
 		setRoot();
 		webshims.ready('DOM', setRoot);
 		
@@ -492,6 +496,7 @@
 				var onBlur;
 				var opts = $.extend({}, this.options, $(element.prop('form') || []).data('wspopover') || {}, element.data('wspopover'));
 				var that = this;
+				var css = {};
 				this.lastElement = $(element).getShadowFocusElement();
 				if(opts.appendTo == 'element'){
 					this.element.insertAfter(element);
@@ -504,7 +509,9 @@
 					'data-id': element.prop('id')
 				});
 				
-				this.element.css({width: opts.constrainWidth ? visual.outerWidth() : ''});
+				css[minWidth] = opts.constrainWidth ? visual.outerWidth() : '';
+				
+				this.element.css(css);
 				
 				if(opts.hideOnBlur){
 					onBlur = function(e){

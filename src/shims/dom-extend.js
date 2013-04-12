@@ -4,7 +4,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	
 	webshims.assumeARIA = Modernizr.localstorage || Modernizr.video || Modernizr.boxsizing;
 	
-	if($('<form />').attr('novalidate') === "" || ('required' in $('<input />')[0].attributes)){
+	if($('<input type="email" />').attr('type') == 'text' || $('<form />').attr('novalidate') === "" || ('required' in $('<input />')[0].attributes)){
 		webshims.error("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
 	}
 	
