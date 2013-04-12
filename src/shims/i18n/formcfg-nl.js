@@ -36,9 +36,9 @@ jQuery.webshims.formcfg.nl = {
 		",": ","
 	},
 	numberSigns: '.',
-	dateSigns: '0',
+	dateSigns: '-',
 	timeSigns: ":. ",
-	dFormat: "0",
+	dFormat: "-",
 	patterns: {
 		d: 'dd-mm-yy'
 	},
