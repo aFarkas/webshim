@@ -51,6 +51,7 @@
 				$.webshims.cfg.extendNative = false; 
 			}
 			if(hash.indexOf('useCustomUI') !== -1){
+				$.webshims.setOptions('forms', { customDatalist: true });
 				$.webshims.setOptions('forms-ext', { replaceUI: true });
 			}
 			
