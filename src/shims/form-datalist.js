@@ -247,6 +247,8 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		var getText = function(elem){
 			return (elem.textContent || elem.innerText || $.text([ elem ]) || '');
 		};
+		var lReg = /</g;
+		var gReg = />/g;
 		
 		var shadowListProto = {
 			_create: function(opts){
@@ -438,9 +440,6 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					}
 				}
 			},
-			maskHTML: function(str){
-				return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-			},
 			updateListOptions: function(_forceShow){
 				this.needsUpdate = false;
 				clearTimeout(this.updateTimer);
@@ -452,21 +451,22 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				
 				var values = [];
 				var allOptions = [];
-				var rElem, rItem, rOptions, rI, rLen, item;
+				var rElem, rItem, rOptions, rI, rLen, item, value;
 				for(rOptions = $.prop(this.datalist, 'options'), rI = 0, rLen = rOptions.length; rI < rLen; rI++){
 					rElem = rOptions[rI];
-					if(rElem.disabled){return;}
-					rItem = {
-						value: $(rElem).val() || '',
-						text: $.trim($.attr(rElem, 'label') || getText(rElem)),
-						className: rElem.className || ''
-					};
-					
-					if(rItem.text){
-						rItem.className += ' has-option-label';
+					if(!rElem.disabled && (value = $(rElem).val())){
+						rItem = {
+							value: value,
+							text: $.trim($.attr(rElem, 'label') || getText(rElem)),
+							className: rElem.className || ''
+						};
+						
+						if(rItem.text){
+							rItem.className += ' has-option-label';
+						}
+						values.push(rItem.value);
+						allOptions.push(rItem);
 					}
-					values[rI] = rItem.value;
-					allOptions[rI] = rItem;
 				}
 				
 				if(!this.storedOptions){
@@ -481,7 +481,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				
 				for(rI = 0, rLen = allOptions.length; rI < rLen; rI++){
 					item = allOptions[rI];
-					list[rI] = '<li class="'+ item.className +'" tabindex="-1" role="listitem"><span class="option-value">'+ this.maskHTML(item.value, 'value', item) +'</span> <span class="option-label">'+ this.maskHTML(item.text, 'label', item) +'</span></li>';
+					list[rI] = '<li class="'+ item.className +'" tabindex="-1" role="listitem">'+ this.getOptionContent(item) +'</li>';
 				}
 				
 				this.arrayOptions = allOptions;
@@ -491,6 +491,18 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				if(_forceShow || this.popover.isVisible){
 					this.showHideOptions();
 				}
+			},
+			getOptionContent: function(item){
+				var content = '';
+				if(options.getOptionContent){
+					content = options.apply(this, arguments) || '';
+				} else {
+					content = '<span class="option-value">'+ (item.value.replace(lReg, '&lt;').replace(gReg, '&gt;')) +'</span>';
+					if(item.text){
+						content += ' <span class="option-label">'+ (item.text.replace(lReg, '&lt;').replace(gReg, '&gt;')) +'</span>';
+					}
+				}
+				return content;
 			},
 			showHideOptions: function(_fromShowList){
 				var value = $.prop(this.input, 'value').toLowerCase();
@@ -510,18 +522,27 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				var startSearch = this.searchStart;
 				var lis = $('li', this.shadowList);
 				if(value){
+					
 					this.arrayOptions.forEach(function(item, i){
-						var search;
-						if(!('lowerText' in item)){
+						var search, searchIndex, foundName;
+						if(!('lowerValue' in item)){
+							item.lowerValue = item.value.toLowerCase();
 							if(item.text && item.text != item.value ){
-								item.lowerText = item.value.toLowerCase() +'A'+ item.text.toLowerCase();
-							} else {
-								item.lowerText = item.value.toLowerCase();
+								item.lowerText = item.text.toLowerCase();
 							}
 						}
 						
-						search = (value == item.lowerText || item.value == value || item.text == value) ? -1 : item.lowerText.indexOf(value);
-						search = startSearch ? !search : search !== -1;
+						if(value != item.lowerValue && item.lowerText != value){
+							searchIndex = item.lowerValue.indexOf(value);
+							search = startSearch ? !searchIndex : searchIndex !== -1;
+							if(search){
+								foundName = 'value';
+							} else if(item.lowerText){
+								searchIndex = item.lowerText.indexOf(value);
+								search = startSearch ? !searchIndex : searchIndex !== -1;
+								foundName = 'value';
+							}
+						}
 						
 						if(search){
 							$(lis[i]).removeClass('hidden-item');
