@@ -1897,7 +1897,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			value: function(val){
 				this.valueAsNumber = this.asNumber(val);
 				this.options.value = val;
-				if(isNaN(this.valueAsNumber)){
+				if(isNaN(this.valueAsNumber) || (!isNaN(this.minAsNumber) && this.valueAsNumber < this.minAsNumber) || (!isNaN(this.maxAsNumber) && this.valueAsNumber > this.maxAsNumber)){
 					this._setStartInRange();
 				} else {
 					this.elemHelper.prop('value', val);
@@ -2296,11 +2296,13 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				setFocus = function(noTrigger){
 					clearTimeout(that.timer);
 					that.timer = setTimeout(function(){
-						element[0].focus();
-						if(noTrigger !== true && !element.is(':focus')){
-							setFocus(true);
+						if(element[0]){
+							element[0].focus();
+							if(noTrigger !== true && !element.is(':focus')){
+								setFocus(true);
+							}
 						}
-					}, that.popover.isVisible ? 20 : 99);
+					}, that.popover.isVisible ? 99 : 360);
 				};
 				this.popover.activateElement(element);
 				setFocus();
@@ -2713,7 +2715,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			var max = o.max.split('-');
 			var min = o.min.split('-');
 			var currentValue = o.value.split('-');
-			var monthNames = curCfg.date[o.monthNames] || curCfg.date.monthNames; 
+			var monthNames = curCfg.date[o.monthNamesHead] || curCfg.date[o.monthNames] || curCfg.date.monthNames; 
 			var enabled = 0;
 			var str = [];
 			var date = new Date(value[0], value[1] - 1, 1);
@@ -4020,6 +4022,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				this.updateTimer = false;
 				
 				this.searchStart = formsCFG.customDatalist && $(this.input).hasClass('search-start');
+				this.addMarkElement = options.addMark || $(this.input).hasClass('mark-option-text');
 				
 				var list = [];
 				
@@ -4030,12 +4033,12 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					rElem = rOptions[rI];
 					if(!rElem.disabled && (value = $(rElem).val())){
 						rItem = {
-							value: value,
-							text: $.trim($.attr(rElem, 'label') || getText(rElem)),
+							value: value.replace(lReg, '&lt;').replace(gReg, '&gt;'),
+							label: $.trim($.attr(rElem, 'label') || getText(rElem)).replace(lReg, '&lt;').replace(gReg, '&gt;'),
 							className: rElem.className || ''
 						};
 						
-						if(rItem.text){
+						if(rItem.label){
 							rItem.className += ' has-option-label';
 						}
 						values.push(rItem.value);
@@ -4049,7 +4052,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				
 				this.storedOptions.forEach(function(val, i){
 					if(values.indexOf(val) == -1){
-						allOptions.push({value: val, text: val, className: 'stored-suggest', style: ''});
+						allOptions.push({value: val, label: '', className: 'stored-suggest', style: ''});
 					}
 				});
 				
@@ -4071,9 +4074,9 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				if(options.getOptionContent){
 					content = options.apply(this, arguments) || '';
 				} else {
-					content = '<span class="option-value">'+ (item.value.replace(lReg, '&lt;').replace(gReg, '&gt;')) +'</span>';
-					if(item.text){
-						content += ' <span class="option-label">'+ (item.text.replace(lReg, '&lt;').replace(gReg, '&gt;')) +'</span>';
+					content = '<span class="option-value">'+ item.value +'</span>';
+					if(item.label){
+						content += ' <span class="option-label">'+ item.label +'</span>';
 					}
 				}
 				return content;
@@ -4095,38 +4098,39 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				var found = false;
 				var startSearch = this.searchStart;
 				var lis = $('li', this.shadowList);
+				var that = this;
 				if(value){
 					
 					this.arrayOptions.forEach(function(item, i){
 						var search, searchIndex, foundName;
 						if(!('lowerValue' in item)){
 							item.lowerValue = item.value.toLowerCase();
-							if(item.text && item.text != item.value ){
-								item.lowerText = item.text.toLowerCase();
+							if(item.label && item.label != item.value ){
+								item.lowerLabel = item.label.toLowerCase();
 							}
 						}
 						
-						if(value != item.lowerValue && item.lowerText != value){
+						if(value != item.lowerValue && item.lowerLabel != value){
 							searchIndex = item.lowerValue.indexOf(value);
 							search = startSearch ? !searchIndex : searchIndex !== -1;
 							if(search){
 								foundName = 'value';
-							} else if(item.lowerText){
-								searchIndex = item.lowerText.indexOf(value);
+							} else if(item.lowerLabel){
+								searchIndex = item.lowerLabel.indexOf(value);
 								search = startSearch ? !searchIndex : searchIndex !== -1;
-								foundName = 'value';
+								foundName = 'label';
 							}
 						}
 						
 						if(search){
-							$(lis[i]).removeClass('hidden-item');
+							that.addMark($(lis[i]).removeClass('hidden-item'), item, foundName, searchIndex, value.length);
 							found = true;
 						} else {
 							$(lis[i]).addClass('hidden-item');
 						}
 					});
 				} else if(lis.length) {
-					lis.removeClass('hidden-item');
+					this.removeMark(lis.removeClass('hidden-item'));
 					found = true;
 				}
 				
@@ -4140,6 +4144,28 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					this.hideList();
 				} else {
 					this.lastUnfoundValue = false;
+				}
+			},
+			otherType: {
+				value: 'label',
+				label: 'value'
+			},
+			addMark: function(elem, item, prop, start, length){
+				if(this.addMarkElement){
+					var text = item[prop].substr(start, length);
+					text = item[prop].replace(text ,'<mark>'+ text +'</mark>');
+					$('.option-'+ this.otherType[prop] +' > mark', elem).each(this._replaceMark);
+					$('.option-'+prop, elem).html(text);
+					
+				}
+			},
+			_replaceMark: function(){
+				var content = $(this).html();
+				$(this).replaceWith(content);
+			},
+			removeMark: function(lis){
+				if(this.addMarkElement){
+					$('mark', lis).each(this._replaceMark);
 				}
 			},
 			showList: function(){

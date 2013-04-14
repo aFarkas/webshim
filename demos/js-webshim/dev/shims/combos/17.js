@@ -1368,7 +1368,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			value: function(val){
 				this.valueAsNumber = this.asNumber(val);
 				this.options.value = val;
-				if(isNaN(this.valueAsNumber)){
+				if(isNaN(this.valueAsNumber) || (!isNaN(this.minAsNumber) && this.valueAsNumber < this.minAsNumber) || (!isNaN(this.maxAsNumber) && this.valueAsNumber > this.maxAsNumber)){
 					this._setStartInRange();
 				} else {
 					this.elemHelper.prop('value', val);
@@ -1767,11 +1767,13 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				setFocus = function(noTrigger){
 					clearTimeout(that.timer);
 					that.timer = setTimeout(function(){
-						element[0].focus();
-						if(noTrigger !== true && !element.is(':focus')){
-							setFocus(true);
+						if(element[0]){
+							element[0].focus();
+							if(noTrigger !== true && !element.is(':focus')){
+								setFocus(true);
+							}
 						}
-					}, that.popover.isVisible ? 20 : 99);
+					}, that.popover.isVisible ? 99 : 360);
 				};
 				this.popover.activateElement(element);
 				setFocus();
@@ -2184,7 +2186,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			var max = o.max.split('-');
 			var min = o.min.split('-');
 			var currentValue = o.value.split('-');
-			var monthNames = curCfg.date[o.monthNames] || curCfg.date.monthNames; 
+			var monthNames = curCfg.date[o.monthNamesHead] || curCfg.date[o.monthNames] || curCfg.date.monthNames; 
 			var enabled = 0;
 			var str = [];
 			var date = new Date(value[0], value[1] - 1, 1);

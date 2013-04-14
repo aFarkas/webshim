@@ -44,6 +44,7 @@ audio > * {
 .flashblocker-assumed {
 	min-height: 20px;
 	min-width: 20px;
+	z-index: 2147483647;
 }
 
 .cue-display {
@@ -1027,6 +1028,11 @@ datalist {
 		zoom: 1;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	mark {
+		font-weight: normal;
+		font-style: normal;
 	}
 
 	.option-value {

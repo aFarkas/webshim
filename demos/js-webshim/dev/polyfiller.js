@@ -1118,7 +1118,8 @@
 				
 				widgets: {
 					calculateWidth: true,
-					monthNames: 'monthNamesShort'
+					monthNames: 'monthNamesShort',
+					monthNamesHead: 'monthNames'
 				}
 	//			,replaceUI: false
 			},

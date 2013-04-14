@@ -42,6 +42,7 @@ audio > * {
 .flashblocker-assumed {
   min-height: 20px;
   min-width: 20px;
+  z-index: 2147483647;
 }
 
 .cue-display {
@@ -562,7 +563,7 @@ output {
 }
 
 .ws-po-box {
-  border: 1px solid #ccc;
+  border: 1px solid #cccccc;
   background: #fefefe;
   padding: 5px;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -577,7 +578,7 @@ output {
   height: 0;
   border-left: 9px solid transparent;
   border-right: 9px solid transparent;
-  border-bottom: 7px solid #ccc;
+  border-bottom: 7px solid #cccccc;
   border-top: none;
   zoom: 1;
   font-size: 0;
@@ -648,7 +649,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 }
 .input-picker .ws-focus,
 .input-picker :focus {
-  outline: 1px dotted #000;
+  outline: 1px dotted black;
 }
 .input-picker .ws-po-box {
   position: relative;
@@ -660,7 +661,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .ws-next {
   position: absolute;
   top: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #cccccc;
   border-radius: 5px;
   padding: 0;
   width: 24px;
@@ -698,15 +699,15 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .ws-button-row {
   position: relative;
   margin: 10px 0 0;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #eeeeee;
   padding: 10px 0 0;
   text-align: left;
   z-index: 2;
 }
 .input-picker .ws-button-row button {
-  border: 1px solid #ccc;
+  border: 1px solid #cccccc;
   border-radius: 5px;
-  box-shadow: 1px 1px 0 #fff;
+  box-shadow: 1px 1px 0 white;
   background-color: #ddd;
   background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
   background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
@@ -809,7 +810,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 }
 .input-picker .ws-options {
   margin: 10px 0 0;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #eeeeee;
   padding: 10px 0 0;
   text-align: left;
 }
@@ -878,6 +879,10 @@ datalist {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.datalist-polyfill mark {
+  font-weight: normal;
+  font-style: normal;
+}
 .datalist-polyfill .option-value {
   display: inline-block;
   text-overflow: ellipsis;
@@ -928,7 +933,7 @@ progress {
 }
 progress[data-position] {
   vertical-align: -0.2em;
-  border: 1px solid #ccc;
+  border: 1px solid #cccccc;
   background: #e6e6e6;
 }
 progress > * {
@@ -1007,6 +1012,6 @@ summary {
 }
 
 summary.summary-has-focus {
-  outline: 1px dotted #aaa;
+  outline: 1px dotted #aaaaaa;
   outline-offset: -1px;
 }
