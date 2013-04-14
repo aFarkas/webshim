@@ -79,6 +79,14 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.10.0/1.10.1
+----------
+
+- improved list/datalist options [demo](http://jsfiddle.net/trixta/7DETa/)
+- small improvements to type="range" and type="date" [demo](http://jsfiddle.net/trixta/VNuct/)
+- fixed animate bug in jQuery 1.8.3
+- fixed dutch language
+
 
 Release 1.10.0/1.10.1
 ----------
