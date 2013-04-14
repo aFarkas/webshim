@@ -595,37 +595,54 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	});
 	
 	if($.Tween.propHooks._default){
-		$.extend($.Tween.propHooks._default, {
-			get: function( tween ) {
-				var result;
-				
-				if ( (tween.elem[ tween.prop ] != null || havePolyfill[ tween.prop ]) &&
-					(!tween.elem.style || tween.elem.style[ tween.prop ] == null) ) {
-					return havePolyfill[ tween.prop ] ? $.prop(tween.elem, tween.prop) : tween.elem[ tween.prop ];
-				}
-	
-				// passing an empty string as a 3rd parameter to .css will automatically
-				// attempt a parseFloat and fallback to a string if the parse fails
-				// so, simple values such as "10px" are parsed to Float.
-				// complex values such as "rotate(1rad)" are returned as is.
-				result = jQuery.css( tween.elem, tween.prop, "" );
-				// Empty strings, null, undefined and "auto" are converted to 0.
-				return !result || result === "auto" ? 0 : result;
-			},
-			set: function( tween ) {
-				// use step hook for back compat - use cssHook if its there - use .style if its
-				// available and use plain properties where available
-				if ( jQuery.fx.step[ tween.prop ] ) {
-					jQuery.fx.step[ tween.prop ]( tween );
-				} else if ( tween.elem.style && ( tween.elem.style[ jQuery.cssProps[ tween.prop ] ] != null || jQuery.cssHooks[ tween.prop ] ) ) {
-					jQuery.style( tween.elem, tween.prop, tween.now + tween.unit );
-				} else if( !havePolyfill[ tween.prop ] ) {
-					tween.elem[ tween.prop ] = tween.now;
-				} else {
-					$.prop(tween.elem, tween.prop, tween.now);
-				}
+		(function(){
+			var isjQ8 = false;
+			try {
+				isjQ8 = $.css($('<b style="width: 10px" />')[0], 'width', '') == '10px';
+			} catch(er){
+				webshims.error(er);
 			}
-		});
+			var css = isjQ8 ? 
+				function(elem, prop){
+					return $.css( elem, prop, false, "" );
+				} :
+				function(elem, prop){
+					return $.css( elem, prop, "" );
+				}
+			;
+				
+			$.extend($.Tween.propHooks._default, {
+				get: function( tween ) {
+					var result;
+					
+					if ( (tween.elem[ tween.prop ] != null || havePolyfill[ tween.prop ]) &&
+						(!tween.elem.style || tween.elem.style[ tween.prop ] == null) ) {
+						return havePolyfill[ tween.prop ] ? $.prop(tween.elem, tween.prop) : tween.elem[ tween.prop ];
+					}
+		
+					// passing an empty string as a 3rd parameter to .css will automatically
+					// attempt a parseFloat and fallback to a string if the parse fails
+					// so, simple values such as "10px" are parsed to Float.
+					// complex values such as "rotate(1rad)" are returned as is.
+					result = css( tween.elem, tween.prop );
+					// Empty strings, null, undefined and "auto" are converted to 0.
+					return !result || result === "auto" ? 0 : result;
+				},
+				set: function( tween ) {
+					// use step hook for back compat - use cssHook if its there - use .style if its
+					// available and use plain properties where available
+					if ( jQuery.fx.step[ tween.prop ] ) {
+						jQuery.fx.step[ tween.prop ]( tween );
+					} else if ( tween.elem.style && ( tween.elem.style[ jQuery.cssProps[ tween.prop ] ] != null || jQuery.cssHooks[ tween.prop ] ) ) {
+						jQuery.style( tween.elem, tween.prop, tween.now + tween.unit );
+					} else if( !havePolyfill[ tween.prop ] ) {
+						tween.elem[ tween.prop ] = tween.now;
+					} else {
+						$.prop(tween.elem, tween.prop, tween.now);
+					}
+				}
+			});
+		})();
 	}
 	
 	

@@ -595,37 +595,54 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	});
 	
 	if($.Tween.propHooks._default){
-		$.extend($.Tween.propHooks._default, {
-			get: function( tween ) {
-				var result;
-				
-				if ( (tween.elem[ tween.prop ] != null || havePolyfill[ tween.prop ]) &&
-					(!tween.elem.style || tween.elem.style[ tween.prop ] == null) ) {
-					return havePolyfill[ tween.prop ] ? $.prop(tween.elem, tween.prop) : tween.elem[ tween.prop ];
-				}
-	
-				// passing an empty string as a 3rd parameter to .css will automatically
-				// attempt a parseFloat and fallback to a string if the parse fails
-				// so, simple values such as "10px" are parsed to Float.
-				// complex values such as "rotate(1rad)" are returned as is.
-				result = jQuery.css( tween.elem, tween.prop, "" );
-				// Empty strings, null, undefined and "auto" are converted to 0.
-				return !result || result === "auto" ? 0 : result;
-			},
-			set: function( tween ) {
-				// use step hook for back compat - use cssHook if its there - use .style if its
-				// available and use plain properties where available
-				if ( jQuery.fx.step[ tween.prop ] ) {
-					jQuery.fx.step[ tween.prop ]( tween );
-				} else if ( tween.elem.style && ( tween.elem.style[ jQuery.cssProps[ tween.prop ] ] != null || jQuery.cssHooks[ tween.prop ] ) ) {
-					jQuery.style( tween.elem, tween.prop, tween.now + tween.unit );
-				} else if( !havePolyfill[ tween.prop ] ) {
-					tween.elem[ tween.prop ] = tween.now;
-				} else {
-					$.prop(tween.elem, tween.prop, tween.now);
-				}
+		(function(){
+			var isjQ8 = false;
+			try {
+				isjQ8 = $.css($('<b style="width: 10px" />')[0], 'width', '') == '10px';
+			} catch(er){
+				webshims.error(er);
 			}
-		});
+			var css = isjQ8 ? 
+				function(elem, prop){
+					return $.css( elem, prop, false, "" );
+				} :
+				function(elem, prop){
+					return $.css( elem, prop, "" );
+				}
+			;
+				
+			$.extend($.Tween.propHooks._default, {
+				get: function( tween ) {
+					var result;
+					
+					if ( (tween.elem[ tween.prop ] != null || havePolyfill[ tween.prop ]) &&
+						(!tween.elem.style || tween.elem.style[ tween.prop ] == null) ) {
+						return havePolyfill[ tween.prop ] ? $.prop(tween.elem, tween.prop) : tween.elem[ tween.prop ];
+					}
+		
+					// passing an empty string as a 3rd parameter to .css will automatically
+					// attempt a parseFloat and fallback to a string if the parse fails
+					// so, simple values such as "10px" are parsed to Float.
+					// complex values such as "rotate(1rad)" are returned as is.
+					result = css( tween.elem, tween.prop );
+					// Empty strings, null, undefined and "auto" are converted to 0.
+					return !result || result === "auto" ? 0 : result;
+				},
+				set: function( tween ) {
+					// use step hook for back compat - use cssHook if its there - use .style if its
+					// available and use plain properties where available
+					if ( jQuery.fx.step[ tween.prop ] ) {
+						jQuery.fx.step[ tween.prop ]( tween );
+					} else if ( tween.elem.style && ( tween.elem.style[ jQuery.cssProps[ tween.prop ] ] != null || jQuery.cssHooks[ tween.prop ] ) ) {
+						jQuery.style( tween.elem, tween.prop, tween.now + tween.unit );
+					} else if( !havePolyfill[ tween.prop ] ) {
+						tween.elem[ tween.prop ] = tween.now;
+					} else {
+						$.prop(tween.elem, tween.prop, tween.now);
+					}
+				}
+			});
+		})();
 	}
 	
 	
@@ -4403,6 +4420,8 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		var getText = function(elem){
 			return (elem.textContent || elem.innerText || $.text([ elem ]) || '');
 		};
+		var lReg = /</g;
+		var gReg = />/g;
 		
 		var shadowListProto = {
 			_create: function(opts){
@@ -4594,9 +4613,6 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					}
 				}
 			},
-			maskHTML: function(str){
-				return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-			},
 			updateListOptions: function(_forceShow){
 				this.needsUpdate = false;
 				clearTimeout(this.updateTimer);
@@ -4608,21 +4624,22 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				
 				var values = [];
 				var allOptions = [];
-				var rElem, rItem, rOptions, rI, rLen, item;
+				var rElem, rItem, rOptions, rI, rLen, item, value;
 				for(rOptions = $.prop(this.datalist, 'options'), rI = 0, rLen = rOptions.length; rI < rLen; rI++){
 					rElem = rOptions[rI];
-					if(rElem.disabled){return;}
-					rItem = {
-						value: $(rElem).val() || '',
-						text: $.trim($.attr(rElem, 'label') || getText(rElem)),
-						className: rElem.className || ''
-					};
-					
-					if(rItem.text){
-						rItem.className += ' has-option-label';
+					if(!rElem.disabled && (value = $(rElem).val())){
+						rItem = {
+							value: value,
+							text: $.trim($.attr(rElem, 'label') || getText(rElem)),
+							className: rElem.className || ''
+						};
+						
+						if(rItem.text){
+							rItem.className += ' has-option-label';
+						}
+						values.push(rItem.value);
+						allOptions.push(rItem);
 					}
-					values[rI] = rItem.value;
-					allOptions[rI] = rItem;
 				}
 				
 				if(!this.storedOptions){
@@ -4637,7 +4654,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				
 				for(rI = 0, rLen = allOptions.length; rI < rLen; rI++){
 					item = allOptions[rI];
-					list[rI] = '<li class="'+ item.className +'" tabindex="-1" role="listitem"><span class="option-value">'+ this.maskHTML(item.value, 'value', item) +'</span> <span class="option-label">'+ this.maskHTML(item.text, 'label', item) +'</span></li>';
+					list[rI] = '<li class="'+ item.className +'" tabindex="-1" role="listitem">'+ this.getOptionContent(item) +'</li>';
 				}
 				
 				this.arrayOptions = allOptions;
@@ -4647,6 +4664,18 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				if(_forceShow || this.popover.isVisible){
 					this.showHideOptions();
 				}
+			},
+			getOptionContent: function(item){
+				var content = '';
+				if(options.getOptionContent){
+					content = options.apply(this, arguments) || '';
+				} else {
+					content = '<span class="option-value">'+ (item.value.replace(lReg, '&lt;').replace(gReg, '&gt;')) +'</span>';
+					if(item.text){
+						content += ' <span class="option-label">'+ (item.text.replace(lReg, '&lt;').replace(gReg, '&gt;')) +'</span>';
+					}
+				}
+				return content;
 			},
 			showHideOptions: function(_fromShowList){
 				var value = $.prop(this.input, 'value').toLowerCase();
@@ -4666,18 +4695,27 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				var startSearch = this.searchStart;
 				var lis = $('li', this.shadowList);
 				if(value){
+					
 					this.arrayOptions.forEach(function(item, i){
-						var search;
-						if(!('lowerText' in item)){
+						var search, searchIndex, foundName;
+						if(!('lowerValue' in item)){
+							item.lowerValue = item.value.toLowerCase();
 							if(item.text && item.text != item.value ){
-								item.lowerText = item.value.toLowerCase() +'A'+ item.text.toLowerCase();
-							} else {
-								item.lowerText = item.value.toLowerCase();
+								item.lowerText = item.text.toLowerCase();
 							}
 						}
 						
-						search = (value == item.lowerText || item.value == value || item.text == value) ? -1 : item.lowerText.indexOf(value);
-						search = startSearch ? !search : search !== -1;
+						if(value != item.lowerValue && item.lowerText != value){
+							searchIndex = item.lowerValue.indexOf(value);
+							search = startSearch ? !searchIndex : searchIndex !== -1;
+							if(search){
+								foundName = 'value';
+							} else if(item.lowerText){
+								searchIndex = item.lowerText.indexOf(value);
+								search = startSearch ? !searchIndex : searchIndex !== -1;
+								foundName = 'value';
+							}
+						}
 						
 						if(search){
 							$(lis[i]).removeClass('hidden-item');
