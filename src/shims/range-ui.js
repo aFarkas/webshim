@@ -68,6 +68,10 @@
 			} else {
 				if(typeof animate != 'object'){
 					animate = {};
+				} else {
+					animate = $.extend({}, animate);
+				}
+				if(!animate.duration){
 					posDif = Math.abs(left - parseInt(this.thumb[0].style[this.dirs.left] || 50, 10));
 					animate.duration = Math.max(Math.min(999, posDif * 5), 99);
 				}
