@@ -505,5 +505,11 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			}
 		});
 	}
-		
+	
+	//update validity of all implemented input types
+	if(Modernizr.formvalidation && !webshims.bugs.bustedValidity){
+		$('input').each(function(){
+			$(this).prop('validity');
+		});
+	}
 });
