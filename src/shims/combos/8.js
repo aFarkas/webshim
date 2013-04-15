@@ -1590,7 +1590,6 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		testRequiredFind();
 	} else {
 		//create delegatable events
-		webshims.capturingEvents(['input']);
 		webshims.capturingEvents(['invalid'], true);
 		
 		if(window.opera || window.testGoodWithFix){

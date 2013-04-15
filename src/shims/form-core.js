@@ -46,7 +46,6 @@
 		testRequiredFind();
 	} else {
 		//create delegatable events
-		webshims.capturingEvents(['input']);
 		webshims.capturingEvents(['invalid'], true);
 		
 		if(window.opera || window.testGoodWithFix){

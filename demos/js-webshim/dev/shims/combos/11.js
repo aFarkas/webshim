@@ -390,9 +390,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	"use strict";
 	var curCfg;
 	var formcfg = $.webshims.formcfg;
-	var stopPropagation = function(e){
-		e.stopImmediatePropagation(e);
-	};
+	
 	var stopPropagation = function(e){
 		e.stopImmediatePropagation(e);
 	};
@@ -409,7 +407,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		date: {
 			_create: function(){
 				var obj = {
-					splits: [$('<input type="text" class="yy" size="4" />')[0], $('<input type="text" class="mm" maxlength="2" size="2" />')[0], $('<input type="text" class="dd ws-spin" maxlength="2" size="2" />')[0]] 
+					splits: [$('<input type="text" class="yy" size="4" maxlength />')[0], $('<input type="text" class="mm" maxlength="2" size="2" />')[0], $('<input type="text" class="dd ws-spin" maxlength="2" size="2" />')[0]] 
 				};
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1], $('<span class="ws-input-seperator" />')[0], obj.splits[2]];
 				return obj;
@@ -741,15 +739,21 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			}
 		};
 		
-		var createAsNumber = (function(){
+		var createHelper = (function(){
 			var types = {};
 			return function(type){
 				var input;
 				if(!types[type]){
 					input = $('<input type="'+type+'" />');
-					types[type] = function(val){
-						var type = (typeof val == 'object') ? 'valueAsDate' : 'value';
-						return input.prop(type, val).prop('valueAsNumber');
+					types[type] = {
+						asNumber: function(val){
+							var type = (typeof val == 'object') ? 'valueAsDate' : 'value';
+							return input.prop(type, val).prop('valueAsNumber');
+						},
+						asValue: function(val){
+							var type = (typeof val == 'object') ? 'valueAsDate' : 'valueAsNumber';
+							return input.prop(type, val).prop('value');
+						}
 					};
 				}
 				return types[type];
@@ -763,11 +767,13 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			_create: function(){
 				var i;
 				var o = this.options;
+				var helper = createHelper(o.type);
 				this.type = o.type;
 				this.orig = o.orig;
 				
 				this.elemHelper = $('<input type="'+ this.type+'" />');
-				this.asNumber = createAsNumber(this.type);
+				this.asNumber = helper.asNumber;
+				this.asValue = helper.asValue;
 				
 				this.buttonWrapper = $('<span class="input-buttons '+this.type+'-input-buttons"><span unselectable="on" class="step-controls"><span class="step-up"></span><span class="step-down"></span></span></span>')
 					.insertAfter(this.element)
@@ -785,13 +791,26 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					steps[this.type].start = this.asNumber(steps[this.type].start);
 				}
 				
+				
+				
 				for(i = 0; i < createOpts.length; i++){
-					this[createOpts[i]](this.options[createOpts[i]]);
+					this[createOpts[i]](o[createOpts[i]]);
 				}
 				
 				this.element.data('wsspinner', this);
 				
 				this.addBindings();
+				
+				if(!o.min && o.relMin != null){
+					o.min = this.asValue(this.getRelNumber(o.relMin));
+					$.prop(this.orig, 'min', o.min);
+				}
+				
+				if(!o.max && o.relMax != null){
+					o.max = this.asValue(this.getRelNumber(o.relMax));
+					$.prop(this.orig, 'max', o.max);
+				}
+				
 				this._init = true;
 			},
 			_addSplitInputs: function(){
@@ -828,19 +847,22 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					this.element.prop('placeholder', placeholder);
 				}
 			},
-			
+			getRelNumber: function(rel){
+				var start = steps[this.type].start || 0;
+				if(rel){
+					start += rel;
+				}
+				return start;
+			},
 			addZero: addZero,
 			_setStartInRange: function(){
-				var start = steps[this.type].start || 0;
-				if(this.options.relDefaultValue){
-					start += this.options.relDefaultValue;
-				}
+				var start = this.getRelNumber(this.options.relDefaultValue);
 				if(!isNaN(this.minAsNumber) && start < this.minAsNumber){
 					start = this.minAsNumber;
 				} else if(!isNaN(this.maxAsNumber) && start > this.maxAsNumber){
 					start = this.maxAsNumber;
 				}
-				this.elemHelper.prop('valueAsNumber', start).prop('value');
+				this.elemHelper.prop('valueAsNumber', start);
 				this.options.defValue = this.elemHelper.prop('value');
 				
 			},
@@ -1074,7 +1096,47 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						if(stepped){
 							e.preventDefault();
 						}
-					}
+					},
+					'input keydown keypress': (function(){
+						var timer;
+						var isStopped = false;
+						var releaseTab = function(){
+							if(isStopped === true){
+								isStopped = 'semi';
+								timer = setTimeout(releaseTab, 250);
+							} else {
+								isStopped = false;
+							}
+						};
+						var stopTab = function(){
+							isStopped = true;
+							clearTimeout(timer);
+							timer = setTimeout(releaseTab, 300);
+						};
+						var select = function(){
+							this.focus();
+							this.select();
+							stopTab();
+						};
+						
+						return function(e){
+							if(o.splitInput && o.jumpInputs){
+								if(e.type == 'input'){
+									if($.prop(this, 'value').length === $.prop(this, 'maxLength')){
+										try {
+											$(this)
+												.next()
+												.next('input')
+												.each(select)
+											;
+										} catch(er){}
+									}
+								} else if(!e.shiftKey && !e.crtlKey && e.keyCode == 9 && (isStopped === true || (isStopped && !$.prop(this, 'value')))){
+									e.preventDefault();
+								}
+							}
+						}
+					})()
 				};
 				var mouseDownInit = function(){
 					if(!o.disabled && !isFocused){
@@ -1130,6 +1192,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					that.setInput(value);
 					eventTimer.call('change', value);
 				};
+				
+				
 				
 				this.inputElements.on(elementEvts);
 				
@@ -1518,19 +1582,31 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			return Math.ceil((((date - onejan) / 86400000) + onejan.getDay()+1)/7);
 		};
 		picker.getYearList = function(value, data){
-			var j, i, val, disabled, lis, prevDisabled, nextDisabled, classStr, classArray;
+			var j, i, val, disabled, lis, prevDisabled, nextDisabled, classStr, classArray, start;
 			
-			value = value[0] * 1;
 			
 			var size = data.options.size;
-			var xth = value % (12 * size);
-			var start = value - xth;
 			var max = data.options.max.split('-');
 			var min = data.options.min.split('-');
 			var currentValue = data.options.value.split('-');
+			var xthCorrect = 0;
 			var enabled = 0;
 			var str = '';
 			var rowNum = 0;
+			
+			if(data.options.useMaxDecadeBase && max[0]){
+				xthCorrect = (max[0] % 12) + 11;
+			}
+			
+			if(data.options.useMinDecadeBase && min[0]){
+				xthCorrect = (min[0] % 12) + 11;
+			}
+			
+			value = value[0] * 1;
+			start = value - ((value + xthCorrect) % (12 * size));
+			
+			
+			
 			for(j = 0; j < size; j++){
 				if(j){
 					start += 12;
