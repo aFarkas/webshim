@@ -2109,12 +2109,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			var str = '';
 			var rowNum = 0;
 			
-			if(data.options.useMaxDecadeBase && max[0]){
-				xthCorrect = (max[0] % 12) + 11;
-			}
-			
-			if(data.options.useMinDecadeBase && min[0]){
-				xthCorrect = (min[0] % 12) + 11;
+			if(data.options.useDecadeBase == 'max' && max[0]){
+				xthCorrect = 11 - (max[0] % 12);
+			} else if(data.options.useDecadeBase == 'min' && min[0]){
+				xthCorrect = 11 - (min[0] % 12);
 			}
 			
 			value = value[0] * 1;
