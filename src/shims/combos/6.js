@@ -6,15 +6,32 @@ jQuery.webshims.register('form-native-extend', function($, webshims, window, doc
 	var typeModels = webshims.inputTypes;
 	var validityRules = {};
 	
+	var updateValidity = (function(){
+		var timer;
+		var getValidity = function(){
+			$(this).prop('validity');
+		};
+		var update = function(){
+			$('input').each(getValidity);
+		};
+		return function(fast){
+			clearTimeout(timer);
+			timer = setTimeout(update, 9);
+		};
+	})();
 	webshims.addInputType = function(type, obj){
 		typeModels[type] = obj;
+		//update validity of all implemented input types
+		if($.isDOMReady && Modernizr.formvalidation && !webshims.bugs.bustedValidity){
+			updateValidity();
+		}
 	};
 	
 	webshims.addValidityRule = function(type, fn){
 		validityRules[type] = fn;
 	};
 	
-	webshims.addValidityRule('typeMismatch',function (input, val, cache, validityState){
+	webshims.addValidityRule('typeMismatch', function (input, val, cache, validityState){
 		if(val === ''){return false;}
 		var ret = validityState.typeMismatch;
 		if(!('type' in cache)){
@@ -762,12 +779,6 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		});
 	}
 	
-	//update validity of all implemented input types
-	if(Modernizr.formvalidation && !webshims.bugs.bustedValidity){
-		$('input').each(function(){
-			$(this).prop('validity');
-		});
-	}
 });
 (function($){
 	
@@ -1572,12 +1583,12 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				this.addBindings();
 				
-				if(!o.min && o.relMin != null){
+				if(!o.min && typeof o.relMin == 'number'){
 					o.min = this.asValue(this.getRelNumber(o.relMin));
 					$.prop(this.orig, 'min', o.min);
 				}
 				
-				if(!o.max && o.relMax != null){
+				if(!o.max && typeof o.relMax == 'number'){
 					o.max = this.asValue(this.getRelNumber(o.relMax));
 					$.prop(this.orig, 'max', o.max);
 				}

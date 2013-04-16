@@ -128,7 +128,7 @@
 							} else {
 								val = $(this).val();
 								try {
-									val = JSON.parse(val) || val;
+									val = JSON.parse(val);
 								} catch(e){}
 							}
 							
@@ -233,6 +233,11 @@ $.webshims.activeLang('de');
 			<h3 id="configure-ui">Changing default-options for widgets</h3>
 			<p>All widgets can be changed with the <code>forms-ext.widgets</code> or <code>forms-ext[type]</code> options.</p>
 <code class="block">
+	$.webshims.setOptions({
+		wspopover: {
+			appendTo: 'element' //insert all popovers (datepicker, validationBubble, datalist after the associated element instead of the body)
+		}
+	});
 	$.webshims.setOptions('forms-ext', {
 		widgets: {
 			calculateWidth: false
@@ -374,6 +379,21 @@ $.webshims.activeLang('de');
 							<option value="-660441600000">-660441600000 (=-21 years) (-> 364 * 24 * 60 * 60 * 1000 == year)</option>
 						</select>
 					</label>
+					<label>
+						relMax: 
+						<select name="relMax">
+							<option value=""></option>
+							<option value="0">0 (= now) (only if max attribute is not set)</option>
+						</select>
+					</label>
+					
+					<label>
+						relMin: 
+						<select name="relMin">
+							<option value=""></option>
+							<option value="-660441600000">-660441600000 (=-21 years) (only if min attribute is not set)</option>
+						</select>
+					</label>
 					
 					<label>
 						openOnFocus: 
@@ -388,6 +408,14 @@ $.webshims.activeLang('de');
 						<input type="checkbox" name="calculateWidth" checked="checked" />	
 					</label>
 					
+					<label>
+						useDecadeBase: 
+						<select name="useDecadeBase">
+							<option value="">0 is used to compute the decade grid</option>
+							<option value="max">max value is used to compute the decade grid</option>
+							<option value="min">min value is used to compute the decade grid</option>
+						</select>
+					</label>
 					<label>
 						disableDays: 
 						<select name="disableDays">

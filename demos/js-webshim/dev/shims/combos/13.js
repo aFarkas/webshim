@@ -575,6 +575,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 							}
 						})
 					;
+					if('ActiveXObject' in window && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay],.nonnative-api-active)')){
+						$(this).prop('preload', 'metadata').mediaLoad(); 
+					}
 				}
 			}
 			

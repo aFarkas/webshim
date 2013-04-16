@@ -149,7 +149,6 @@
 					<li><strong>placeholderType</strong> (string): <code>"value"</code> (default) || <code>"over"</code>. If placeholderType is set to "over", the polyfill uses the overLabel technique to create a placeholder and doesn't "pollute" the value property.</li>
 					<li><strong>lightweightDatalist</strong> (boolean): <code>true</code> (default) || <code>false</code>. If <code>lightweightDatalist</code> is set to true. Webshims Lib will switch the datalist element and list property implementation from the forms-ext to the forms feature.</li>
 					<li><strong>customDatalist</strong> (boolean): <code>false</code> (default) || <code>true</code>. Allows to use custom styleable datalist elements in all browsers.</li>
-					<li><strong>positionDatalist</strong> (boolean): <code>false</code> (default) || <code>true</code>. If positionDatalist is true or the input element has the class 'position-datalist', the datalist shim element is added right after the input elementand not appended to the body (good for :hover menus).</li>
 				</ul>
 				
 				<h3>Options for the <code>forms-ext</code> feature</h3>
@@ -176,6 +175,7 @@
 					<li><strong>property: customValidationMessage</strong>: very similar to the standard validationMessage, but always uses built-in custom validation messages, which can be better controlled. <strong>Note: You have to either set <code>customMessages</code> to true or <code>overrideMessages</code> to true, before calling the <code>polyfill</code> method, to get this new property.</strong></li>
 					<li><strong>attribute: data-errormessage or -x-moz-errormessage</strong>: Attribute with text, which is used be custom validityAlert/customValidationMessage to show a custom error message for the field.</li>
 					<li><strong>attribute/class: search-start</strong>: If an input[list] has the class <code>search-start</code> the value of the datalist options have to match from start (only available, if customDatalist is set to true).</li>
+					<li><strong>attribute/class: mark-option-text</strong>: If an input[list] has the class <code>mark-option-text</code> the matched value/label string of the datalist options will be marked.</li>
 					<li><strong>helper method: $.webshims.validityAlert.showFor</strong>: takes a DOM-Object/Selector/jQuery-Object and shows the invalid message for this element. (simply look into the prototype i.e. <code>console.log($.webshims.validityAlert)</code> to make changes)</li>
 				</ul>
 								

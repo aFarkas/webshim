@@ -1309,12 +1309,6 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 		});
 	}
 	
-	//update validity of all implemented input types
-	if(Modernizr.formvalidation && !webshims.bugs.bustedValidity){
-		$('input').each(function(){
-			$(this).prop('validity');
-		});
-	}
 });
 (function($){
 	
@@ -2119,12 +2113,12 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				this.addBindings();
 				
-				if(!o.min && o.relMin != null){
+				if(!o.min && typeof o.relMin == 'number'){
 					o.min = this.asValue(this.getRelNumber(o.relMin));
 					$.prop(this.orig, 'min', o.min);
 				}
 				
-				if(!o.max && o.relMax != null){
+				if(!o.max && typeof o.relMax == 'number'){
 					o.max = this.asValue(this.getRelNumber(o.relMax));
 					$.prop(this.orig, 'max', o.max);
 				}

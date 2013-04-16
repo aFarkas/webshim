@@ -79,7 +79,7 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-Release 1.10.0/1.10.1
+Release 1.10.2
 ----------
 
 - improved list/datalist options [demo](http://jsfiddle.net/trixta/7DETa/)
