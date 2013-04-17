@@ -2743,7 +2743,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		}
 		
 		$(elem).pause().data('mediaerror', message);
-		webshims.warn('mediaelementError: '+ message);
+		webshims.error('mediaelementError: '+ message);
 		setTimeout(function(){
 			if($(elem).data('mediaerror')){
 				$(elem).trigger('mediaerror');
@@ -3473,9 +3473,9 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		
 		var isRtmp = canPlaySrc.type == 'audio/rtmp' || canPlaySrc.type == 'video/rtmp';
 		var vars = $.extend({}, options.vars, {
-				poster: $.attr(elem, 'poster') && $.prop(elem, 'poster') || '',
-				source: canPlaySrc.streamId || canPlaySrc.srcProp,
-				server: canPlaySrc.server || ''
+				poster: encodeURI($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
+				source: encodeURI(canPlaySrc.streamId || canPlaySrc.srcProp),
+				server: encodeURI(canPlaySrc.server || '')
 		});
 		var elemVars = $(elem).data('vars') || {};
 		
@@ -3639,7 +3639,8 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		}
 		options.changeSWF(vars, elem, canPlaySrc, data, 'embed');
 		clearTimeout(data.flashBlock);
-		swfmini.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.0", false, vars, params, attrs, function(swfData){
+		
+		swfmini.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.115", false, vars, params, attrs, function(swfData){
 			
 			if(swfData.success){
 				

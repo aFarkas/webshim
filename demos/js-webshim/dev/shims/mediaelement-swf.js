@@ -553,13 +553,13 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			loadedSwf++;
 		}
 		var vars = $.extend({}, options.vars, {
-				image: $.attr(elem, 'poster') && $.prop(elem, 'poster') || '',
-				file: canPlaySrc.streamId || canPlaySrc.srcProp
+				image: encodeURI($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
+				file: encodeURI(canPlaySrc.streamId || canPlaySrc.srcProp)
 		});
 		var elemVars = $(elem).data('vars') || {};
 		
 		if(canPlaySrc.server){
-			vars.streamer = canPlaySrc.server;
+			vars.streamer = encodeURI(canPlaySrc.server);
 		}
 		if(!data){
 			data = webshims.data(elem, 'mediaelement');
@@ -677,7 +677,6 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 		
 		$(elem).on('updatemediaelementdimensions', setDimension);
 		$(document).on('updateshadowdom', setDimension);
-		
 		
 		swfmini.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.0", false, vars, params, attrs, function(swfData){
 			

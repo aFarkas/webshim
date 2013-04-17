@@ -1624,7 +1624,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		}
 		
 		$(elem).pause().data('mediaerror', message);
-		webshims.warn('mediaelementError: '+ message);
+		webshims.error('mediaelementError: '+ message);
 		setTimeout(function(){
 			if($(elem).data('mediaerror')){
 				$(elem).trigger('mediaerror');
