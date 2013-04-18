@@ -544,9 +544,7 @@
 	 * shortcuts
 	 */
 	$.webshims = webshims;
-	var protocol = (location.protocol == 'https:') ? 'https://' : 'http://';
-	var googleAPIs = protocol + 'ajax.googleapis.com/ajax/libs/';
-	var uiLib = googleAPIs + 'jqueryui/1.10.2/';
+	
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
 	var isReady = webshims.isReady;
@@ -765,7 +763,7 @@
 		
 		$.each(['getNativeElement', 'getShadowElement', 'getShadowFocusElement'], function(i, name){
 			$.fn[name] = function(){
-				return this;
+				return this.pushStack(this);
 			};
 		});
 		
@@ -832,30 +830,6 @@
 	
 	/* general modules */
 	/* change path $.webshims.modules[moduleName].src */
-	
-	addModule('jquery-ui', {
-		src: uiLib+'jquery-ui.min.js',
-		test: function(){
-			webshims.warn('deprecated module: '+ this.name);
-			return !!($.widget && $.Widget);
-		}
-	});
-	
-	addModule('swfobject', {
-		src: googleAPIs+'swfobject/2.2/swfobject.js',
-		test: function(){
-			webshims.warn('deprecated module: '+ this.name);
-			return ('swfobject' in window);
-		}
-	});
-	
-	addModule('input-widgets', {
-		src: '',
-		test: function(){
-			webshims.warn('deprecated module: '+ this.name);
-			return !this.src || !($.widget && !($.fn.datepicker && $.fn.slider));
-		}
-	});
 	
 	
 	addModule('swfmini', {
@@ -997,14 +971,8 @@
 				
 				formExtend = Modernizr[formvalidation] && !bustedValidity ? 'form-native-extend' : 'form-shim-extend';
 				
-				//ToDo: MSIE10 is also styleable!!!
 				addTest('styleableinputrange', function(){
-					if(!modernizrInputTypes.range){
-						return false;
-					}
-					var input = document.createElement('input');
-					input.setAttribute('type', 'range');
-					return input.style.WebkitAppearance !== undefined;
+					return modernizrInputTypes.range && !window.opera;
 				});
 			}
 			initialFormTest.run = true;

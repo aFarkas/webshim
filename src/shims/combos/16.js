@@ -587,14 +587,19 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 
 	[{name: 'getNativeElement', prop: 'nativeElement'}, {name: 'getShadowElement', prop: 'shadowElement'}, {name: 'getShadowFocusElement', prop: 'shadowFocusElement'}].forEach(function(data){
 		$.fn[data.name] = function(){
-			return this.map(function(){
+			var elems = [];
+			this.each(function(){
 				var shadowData = elementData(this, 'shadowData');
-				return shadowData && shadowData[data.prop] || this;
+				var elem = shadowData && shadowData[data.prop] || this;
+				if($.inArray(elem, elems) == -1){
+					elems.push(elem);
+				}
 			});
+			return this.pushStack(elems);
 		};
 	});
 	
-	if($.Tween.propHooks._default){
+	if($.Tween.propHooks._default && $.css){
 		(function(){
 			var isjQ8 = false;
 			try {
