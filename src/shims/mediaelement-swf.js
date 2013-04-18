@@ -553,13 +553,13 @@ jQuery.webshims.register('mediaelement-swf', function($, webshims, window, docum
 			loadedSwf++;
 		}
 		var vars = $.extend({}, options.vars, {
-				image: encodeURI($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
-				file: encodeURI(canPlaySrc.streamId || canPlaySrc.srcProp)
+				image: encodeURIComponent($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
+				file: encodeURIComponent(canPlaySrc.streamId || canPlaySrc.srcProp)
 		});
 		var elemVars = $(elem).data('vars') || {};
 		
 		if(canPlaySrc.server){
-			vars.streamer = encodeURI(canPlaySrc.server);
+			vars.streamer = encodeURIComponent(canPlaySrc.server);
 		}
 		if(!data){
 			data = webshims.data(elem, 'mediaelement');

@@ -356,14 +356,6 @@ var swfmini = function() {
 		}
 	}
 
-	/* Filter to avoid XSS attacks
-	*/
-	function urlEncodeIfNecessary(s) {
-		var regex = /[\\\"<>\.;]/;
-		var hasBadChars = regex.exec(s) != null;
-		return hasBadChars && typeof encodeURIComponent != UNDEF ? encodeURIComponent(s) : s;
-	}
-	
 	/* Release memory to avoid memory leaks caused by closures, fix hanging audio/video threads and force open sockets/NetConnections to disconnect (Internet Explorer only)
 	*/
 	var cleanup = function() {
@@ -3473,9 +3465,9 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		
 		var isRtmp = canPlaySrc.type == 'audio/rtmp' || canPlaySrc.type == 'video/rtmp';
 		var vars = $.extend({}, options.vars, {
-				poster: encodeURI($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
-				source: encodeURI(canPlaySrc.streamId || canPlaySrc.srcProp),
-				server: encodeURI(canPlaySrc.server || '')
+				poster: encodeURIComponent($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
+				source: encodeURIComponent(canPlaySrc.streamId || canPlaySrc.srcProp),
+				server: encodeURIComponent(canPlaySrc.server || '')
 		});
 		var elemVars = $(elem).data('vars') || {};
 		

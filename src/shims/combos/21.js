@@ -807,9 +807,9 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		
 		var isRtmp = canPlaySrc.type == 'audio/rtmp' || canPlaySrc.type == 'video/rtmp';
 		var vars = $.extend({}, options.vars, {
-				poster: encodeURI($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
-				source: encodeURI(canPlaySrc.streamId || canPlaySrc.srcProp),
-				server: encodeURI(canPlaySrc.server || '')
+				poster: encodeURIComponent($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
+				source: encodeURIComponent(canPlaySrc.streamId || canPlaySrc.srcProp),
+				server: encodeURIComponent(canPlaySrc.server || '')
 		});
 		var elemVars = $(elem).data('vars') || {};
 		
