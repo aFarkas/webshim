@@ -26,7 +26,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.3RC2',
+		version: '1.10.3RC3',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -1126,18 +1126,6 @@
 	//<mediaelement
 	(function(){
 		webshims.mediaelement = {};
-		var swfTest = function(){
-			if(!Modernizr.audio || !Modernizr.video || webshims.mediaelement.loadSwf){
-				return false;
-			}
-			
-			var options = this.options;
-			if(options.preferFlash && !modules.swfmini.test()){
-				options.preferFlash = false;
-			}
-			return !( options.preferFlash && window.swfmini.hasFlashPlayerVersion('9.0.115') );
-		};
-		var deps = ['swfmini', DOMSUPPORT];
 		
 		addPolyfill('mediaelement-core', {
 			f: 'mediaelement',
@@ -1155,19 +1143,21 @@
 			c: [16, 7, 2, 8, 1, 12, 13, 19, 20, 23],
 			nM: 'audio video texttrackapi'
 		});
-		addPolyfill('mediaelement-swf', {
-			f: 'mediaelement',
-			d: deps,
-			test: function(){
-				return this.options.player != 'jwplayer' ? true : swfTest.apply(this, arguments);
-			}
-		});
+		
 		
 		addPolyfill('mediaelement-jaris', {
 			f: 'mediaelement',
-			d: deps,
+			d: ['swfmini', DOMSUPPORT],
 			test: function(){
-				return this.options.player == 'jwplayer' ? true : swfTest.apply(this, arguments);
+				if(!Modernizr.audio || !Modernizr.video || webshims.mediaelement.loadSwf){
+					return false;
+				}
+				
+				var options = this.options;
+				if(options.preferFlash && !modules.swfmini.test()){
+					options.preferFlash = false;
+				}
+				return !( options.preferFlash && window.swfmini.hasFlashPlayerVersion('9.0.115') );
 			},
 			c: [21, 19, 20]
 		});

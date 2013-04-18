@@ -356,14 +356,6 @@ var swfmini = function() {
 		}
 	}
 
-	/* Filter to avoid XSS attacks
-	*/
-	function urlEncodeIfNecessary(s) {
-		var regex = /[\\\"<>\.;]/;
-		var hasBadChars = regex.exec(s) != null;
-		return hasBadChars && typeof encodeURIComponent != UNDEF ? encodeURIComponent(s) : s;
-	}
-	
 	/* Release memory to avoid memory leaks caused by closures, fix hanging audio/video threads and force open sockets/NetConnections to disconnect (Internet Explorer only)
 	*/
 	var cleanup = function() {
@@ -3923,7 +3915,6 @@ try {
 							//input === null
 							if(!input){return;}
 							var newVal = input.prop('value');
-							
 							if(newVal !== lastVal){
 								lastVal = newVal;
 								if(!e || !noInputTriggerEvts[e.type]){
@@ -3948,7 +3939,7 @@ try {
 					;
 					
 					clearInterval(timer);
-					timer = setInterval(trigger, 99);
+					timer = setInterval(trigger, 200);
 					extraTest();
 					input.on({
 						'keyup keypress keydown paste cut': extraTest,
@@ -3963,7 +3954,7 @@ try {
 			
 			$(doc)
 				.on('focusin', function(e){
-					if( e.target && e.target.type && !e.target.readOnly && !e.target.disabled && (e.target.nodeName || '').toLowerCase() == 'input' && !noInputTypes[e.target.type] ){
+					if( e.target && !e.target.readOnly && !e.target.disabled && (e.target.nodeName || '').toLowerCase() == 'input' && !noInputTypes[e.target.type] && !(webshims.data(e.target, 'implemented') || {}).inputwidgets){
 						observe($(e.target));
 					}
 				})
@@ -4877,7 +4868,7 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		});
 	};
 	var options = webshims.cfg.mediaelement;
-	var swfType = options && options.player == 'jwplayer' ? 'mediaelement-swf' : 'mediaelement-jaris';
+	var swfType = 'mediaelement-jaris';
 	var hasSwf;
 	if(!options){
 		webshims.error("mediaelement wasn't implemented but loaded");
@@ -5215,7 +5206,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		});
 	};
 	
-	mediaelement.swfMimeTypes = ['video/3gpp', 'video/x-msvideo', 'video/quicktime', 'video/x-m4v', 'video/mp4', 'video/m4p', 'video/x-flv', 'video/flv', 'audio/mpeg', 'audio/aac', 'audio/mp4', 'audio/x-m4a', 'audio/m4a', 'audio/mp3', 'audio/x-fla', 'audio/fla', 'youtube/flv', 'jwplayer/jwplayer', 'video/youtube', 'video/rtmp', 'audio/rtmp'];
+	mediaelement.swfMimeTypes = ['video/3gpp', 'video/x-msvideo', 'video/quicktime', 'video/x-m4v', 'video/mp4', 'video/m4p', 'video/x-flv', 'video/flv', 'audio/mpeg', 'audio/aac', 'audio/mp4', 'audio/x-m4a', 'audio/m4a', 'audio/mp3', 'audio/x-fla', 'audio/fla', 'youtube/flv', 'video/jarisplayer', 'jarisplayer/jarisplayer', 'video/youtube', 'video/rtmp', 'audio/rtmp'];
 	
 	mediaelement.canThirdPlaySrces = function(mediaElem, srces){
 		var ret = '';

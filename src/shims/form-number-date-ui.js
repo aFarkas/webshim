@@ -1967,7 +1967,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			
 		$.each(copyProps.concat(copyAttrs), function(i, name){
 			var fnName = name.replace(/^data\-/, '');
-			
 			webshims.onNodeNamesPropertyModify('input', name, function(val){
 				if(!stopCircular){
 					var shadowData = webshims.data(this, 'shadowData');
@@ -2049,6 +2048,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			if(inputTypes[type] && webshims.implement(this, 'inputwidgets')){
 				data = {};
 				optsName = type;
+				
 				//todo: do we need deep extend?
 				
 				labels = $(this).jProp('labels');

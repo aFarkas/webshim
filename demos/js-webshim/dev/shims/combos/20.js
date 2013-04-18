@@ -1859,7 +1859,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		});
 	};
 	var options = webshims.cfg.mediaelement;
-	var swfType = options && options.player == 'jwplayer' ? 'mediaelement-swf' : 'mediaelement-jaris';
+	var swfType = 'mediaelement-jaris';
 	var hasSwf;
 	if(!options){
 		webshims.error("mediaelement wasn't implemented but loaded");
@@ -2197,7 +2197,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		});
 	};
 	
-	mediaelement.swfMimeTypes = ['video/3gpp', 'video/x-msvideo', 'video/quicktime', 'video/x-m4v', 'video/mp4', 'video/m4p', 'video/x-flv', 'video/flv', 'audio/mpeg', 'audio/aac', 'audio/mp4', 'audio/x-m4a', 'audio/m4a', 'audio/mp3', 'audio/x-fla', 'audio/fla', 'youtube/flv', 'jwplayer/jwplayer', 'video/youtube', 'video/rtmp', 'audio/rtmp'];
+	mediaelement.swfMimeTypes = ['video/3gpp', 'video/x-msvideo', 'video/quicktime', 'video/x-m4v', 'video/mp4', 'video/m4p', 'video/x-flv', 'video/flv', 'audio/mpeg', 'audio/aac', 'audio/mp4', 'audio/x-m4a', 'audio/m4a', 'audio/mp3', 'audio/x-fla', 'audio/fla', 'youtube/flv', 'video/jarisplayer', 'jarisplayer/jarisplayer', 'video/youtube', 'video/rtmp', 'audio/rtmp'];
 	
 	mediaelement.canThirdPlaySrces = function(mediaElem, srces){
 		var ret = '';
@@ -2946,8 +2946,18 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			}
 			preload =  $.prop(elem, 'preload');
 			return !!(preloads[preload] || (preload == 'metadata' && $(elem).is('.preload-in-doubt, video:not([poster])')));
-		}
+		};
 	})();
+	
+	var regs = {
+		A: /&amp;/g,
+		a: /&/g,
+		e: /\=/g,
+		q: /\?/g
+	},
+	replaceVar = function(val){
+		return (val.replace) ? val.replace(regs.A, '%26').replace(regs.a, '%26').replace(regs.e, '%3D').replace(regs.q, '%3F') : val;
+	};
 	
 	mediaelement.createSWF = function( elem, canPlaySrc, data ){
 		if(!hasFlash){
@@ -2972,9 +2982,9 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		
 		var isRtmp = canPlaySrc.type == 'audio/rtmp' || canPlaySrc.type == 'video/rtmp';
 		var vars = $.extend({}, options.vars, {
-				poster: encodeURI($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
-				source: encodeURI(canPlaySrc.streamId || canPlaySrc.srcProp),
-				server: encodeURI(canPlaySrc.server || '')
+				poster: replaceVar($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
+				source: replaceVar(canPlaySrc.streamId || canPlaySrc.srcProp),
+				server: replaceVar(canPlaySrc.server || '')
 		});
 		var elemVars = $(elem).data('vars') || {};
 		

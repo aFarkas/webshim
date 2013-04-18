@@ -356,14 +356,6 @@ var swfmini = function() {
 		}
 	}
 
-	/* Filter to avoid XSS attacks
-	*/
-	function urlEncodeIfNecessary(s) {
-		var regex = /[\\\"<>\.;]/;
-		var hasBadChars = regex.exec(s) != null;
-		return hasBadChars && typeof encodeURIComponent != UNDEF ? encodeURIComponent(s) : s;
-	}
-	
 	/* Release memory to avoid memory leaks caused by closures, fix hanging audio/video threads and force open sockets/NetConnections to disconnect (Internet Explorer only)
 	*/
 	var cleanup = function() {

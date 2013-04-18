@@ -781,8 +781,18 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			}
 			preload =  $.prop(elem, 'preload');
 			return !!(preloads[preload] || (preload == 'metadata' && $(elem).is('.preload-in-doubt, video:not([poster])')));
-		}
+		};
 	})();
+	
+	var regs = {
+		A: /&amp;/g,
+		a: /&/g,
+		e: /\=/g,
+		q: /\?/g
+	},
+	replaceVar = function(val){
+		return (val.replace) ? val.replace(regs.A, '%26').replace(regs.a, '%26').replace(regs.e, '%3D').replace(regs.q, '%3F') : val;
+	};
 	
 	mediaelement.createSWF = function( elem, canPlaySrc, data ){
 		if(!hasFlash){
@@ -807,9 +817,9 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 		
 		var isRtmp = canPlaySrc.type == 'audio/rtmp' || canPlaySrc.type == 'video/rtmp';
 		var vars = $.extend({}, options.vars, {
-				poster: encodeURI($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
-				source: encodeURI(canPlaySrc.streamId || canPlaySrc.srcProp),
-				server: encodeURI(canPlaySrc.server || '')
+				poster: replaceVar($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
+				source: replaceVar(canPlaySrc.streamId || canPlaySrc.srcProp),
+				server: replaceVar(canPlaySrc.server || '')
 		});
 		var elemVars = $(elem).data('vars') || {};
 		

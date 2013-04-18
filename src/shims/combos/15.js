@@ -3417,7 +3417,6 @@ try {
 							//input === null
 							if(!input){return;}
 							var newVal = input.prop('value');
-							
 							if(newVal !== lastVal){
 								lastVal = newVal;
 								if(!e || !noInputTriggerEvts[e.type]){
@@ -3442,7 +3441,7 @@ try {
 					;
 					
 					clearInterval(timer);
-					timer = setInterval(trigger, 99);
+					timer = setInterval(trigger, 200);
 					extraTest();
 					input.on({
 						'keyup keypress keydown paste cut': extraTest,
@@ -3457,7 +3456,7 @@ try {
 			
 			$(doc)
 				.on('focusin', function(e){
-					if( e.target && e.target.type && !e.target.readOnly && !e.target.disabled && (e.target.nodeName || '').toLowerCase() == 'input' && !noInputTypes[e.target.type] ){
+					if( e.target && !e.target.readOnly && !e.target.disabled && (e.target.nodeName || '').toLowerCase() == 'input' && !noInputTypes[e.target.type] && !(webshims.data(e.target, 'implemented') || {}).inputwidgets){
 						observe($(e.target));
 					}
 				})

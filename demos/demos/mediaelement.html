@@ -25,7 +25,17 @@
 		}
 		window.html5.shivMethods = false;
 	</script>
-	<script src="../js-webshim/minified/polyfiller.js"></script>
+	<script src="../../src/polyfiller.js"></script> 
+		<script>
+			$.webshims.setOptions({
+				mediaelement: {
+					player: 'jaris',
+					preferFlash: true,
+					playerPath: '../../swfs/jaris/bin/JarisFLVPlayer.swf'
+				}
+			});
+			$.webshims.debug = 'noCombo';
+		</script>
 	
 	
 	<!--
