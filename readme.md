@@ -79,6 +79,17 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.10.3
+----------
+
+- tested support for jQuery 2.0.0
+- fixed invisible native audio controls in IE9 in case of preload="none"
+- improved datepicker type="date"/type="number"
+- fixed flash encoding vars for special charakters in video path
+- check initially invalid inputs in Firefox
+- removed unused packages (jQuery UI, swfobject, jwplayer)
+
+
 Release 1.10.2
 ----------
 

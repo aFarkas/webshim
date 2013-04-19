@@ -3398,7 +3398,6 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			
 		$.each(copyProps.concat(copyAttrs), function(i, name){
 			var fnName = name.replace(/^data\-/, '');
-			
 			webshims.onNodeNamesPropertyModify('input', name, function(val){
 				if(!stopCircular){
 					var shadowData = webshims.data(this, 'shadowData');
