@@ -885,6 +885,8 @@ datalist {
   zoom: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  background-color: #fff;
+  transition: background-color 400ms;
 }
 .datalist-polyfill mark {
   font-weight: normal;
@@ -896,6 +898,7 @@ datalist {
   max-width: 100%;
   color: #000;
   float: left;
+  transition: color 400ms;
 }
 .datalist-polyfill .option-label {
   display: none;
@@ -908,6 +911,7 @@ datalist {
   margin-top: 0.15em;
   margin-left: 10px;
   text-align: right;
+  transition: color 400ms;
 }
 .datalist-polyfill .has-option-label .option-label {
   display: inline-block;

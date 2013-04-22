@@ -1035,6 +1035,8 @@ datalist {
 		zoom: 1;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		background-color: #fff;
+		transition: background-color 400ms;
 	}
 
 	mark {
@@ -1048,6 +1050,7 @@ datalist {
 		max-width: 100%;
 		color: #000;
 		float: left;
+		transition: color 400ms;
 	}
 	
 	.option-label {
@@ -1061,6 +1064,7 @@ datalist {
 		margin-top: 0.15em;
 		margin-left: 10px;
 		text-align: right;
+		transition: color 400ms;
 	}
 	
 	.has-option-label  {
