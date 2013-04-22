@@ -500,7 +500,7 @@ var swfmini = function() {
 jQuery.webshims.register('dom-extend', function($, webshims, window, document, undefined){
 	"use strict";
 	
-	webshims.assumeARIA = Modernizr.localstorage || Modernizr.video || Modernizr.boxsizing;
+	webshims.assumeARIA = $.support.getSetAttribute || Modernizr.canvas || Modernizr.video || Modernizr.boxsizing;
 	
 	if($('<input type="email" />').attr('type') == 'text' || $('<form />').attr('novalidate') === "" || ('required' in $('<input />')[0].attributes)){
 		webshims.error("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
@@ -509,6 +509,35 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	if(!$.parseHTML){
 		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
+	
+//	(function(){
+//		var hostNames = {
+//			'afarkas.github.io': 1,
+//			localhost: 1,
+//			'127.0.0.1': 1
+//		};
+//		
+//		if( webshims.debug && (hostNames[location.hostname] || location.protocol == 'file:') ){
+//			var list = $('<ul class="webshims-debug-list" />');
+//			webshims.errorLog.push = function(message){
+//				list.appendTo('body');
+//				$('<li style="display: none;">'+ message +'</li>')
+//					.appendTo(list)
+//					.slideDown()
+//					.delay(3000)
+//					.slideUp(function(){
+//						$(this).remove();
+//						if(!$('li', list).length){
+//							list.detach();
+//						}
+//					})
+//				;
+//			};
+//			$.each(webshims.errorLog, function(i, message){
+//				webshims.errorLog.push(message);
+//			});
+//		}
+//	})();
 
 	//shortcus
 	var modules = webshims.modules;
@@ -525,6 +554,24 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	var singleVal = function(elem, name, val, pass, _argless){
 		return (_argless) ? oldVal.call($(elem)) : oldVal.call($(elem), val);
 	};
+	
+	//jquery mobile and jquery ui
+	if(!$.widget){
+		(function(){
+			var _cleanData = $.cleanData;
+			$.cleanData = function( elems ) {
+				if(!$.widget){
+					for ( var i = 0, elem; (elem = elems[i]) != null; i++ ) {
+						try {
+							$( elem ).triggerHandler( "remove" );
+						// http://bugs.jquery.com/ticket/8235
+						} catch( e ) {}
+					}
+				}
+				_cleanData( elems );
+			};
+		})();
+	}
 	
 
 	$.fn.val = function(val){
@@ -557,6 +604,15 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	};
 	$.fn.onTrigger = function(evt, fn){
 		return this.on(evt, fn).each(fn);
+	};
+	
+	$.fn.onWSOff = function(evt, fn, trigger){
+		$(document)[trigger ? 'onTrigger' : 'on'](evt, fn);
+		this.on('remove', function(e){
+			if(!e.originalEvent){
+				$(document).off(evt, fn);
+			}
+		});
 	};
 	
 	var dataID = '_webshimsLib'+ (Math.round(Math.random() * 1000));
@@ -920,7 +976,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		implement: function(elem, type){
 			var data = elementData(elem, 'implemented') || elementData(elem, 'implemented', {});
 			if(data[type]){
-				webshims.info(type +' already implemented for element #'+elem.id);
+				webshims.warn(type +' already implemented for element #'+elem.id);
 				return false;
 			}
 			data[type] = true;
@@ -3709,8 +3765,8 @@ try {
 							data.text.css('padding'+ side, size);
 						});
 						
-						$(document)
-							.onTrigger('updateshadowdom', function(){
+						$(elem)
+							.onWSOff('updateshadowdom', function(){
 								var height, width; 
 								if((width = elem.offsetWidth) || (height = elem.offsetHeight)){
 									data.text
@@ -3721,7 +3777,7 @@ try {
 										.css($(elem).position())
 									;
 								}
-							})
+							}, true)
 						;
 						
 					} else {
@@ -4168,7 +4224,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 });
 jQuery.webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";
-	var doc = document;	
+	var doc = document;
 
 	/*
 	 * implement propType "element" currently only used for list-attribute (will be moved to dom-extend, if needed)
@@ -4361,12 +4417,8 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					.each(function(){
 						$(this).triggerHandler('updateDatalist');
 					})
-					
 				;
-				
 			});
-			
-			
 		};
 		
 		
@@ -4545,6 +4597,11 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				$(this.datalist)
 					.off('updateDatalist.datalistWidget')
 					.on('updateDatalist.datalistWidget', $.proxy(this, '_resetListCached'))
+					.on('remove', function(e){
+						if(!e.originalEvent){
+							that.detroy();
+						}
+					})
 				;
 				
 				this._resetListCached();

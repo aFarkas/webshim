@@ -2,7 +2,7 @@
 jQuery.webshims.register('dom-extend', function($, webshims, window, document, undefined){
 	"use strict";
 	
-	webshims.assumeARIA = Modernizr.localstorage || Modernizr.video || Modernizr.boxsizing;
+	webshims.assumeARIA = $.support.getSetAttribute || Modernizr.canvas || Modernizr.video || Modernizr.boxsizing;
 	
 	if($('<input type="email" />').attr('type') == 'text' || $('<form />').attr('novalidate') === "" || ('required' in $('<input />')[0].attributes)){
 		webshims.error("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
@@ -11,6 +11,35 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	if(!$.parseHTML){
 		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
+	
+//	(function(){
+//		var hostNames = {
+//			'afarkas.github.io': 1,
+//			localhost: 1,
+//			'127.0.0.1': 1
+//		};
+//		
+//		if( webshims.debug && (hostNames[location.hostname] || location.protocol == 'file:') ){
+//			var list = $('<ul class="webshims-debug-list" />');
+//			webshims.errorLog.push = function(message){
+//				list.appendTo('body');
+//				$('<li style="display: none;">'+ message +'</li>')
+//					.appendTo(list)
+//					.slideDown()
+//					.delay(3000)
+//					.slideUp(function(){
+//						$(this).remove();
+//						if(!$('li', list).length){
+//							list.detach();
+//						}
+//					})
+//				;
+//			};
+//			$.each(webshims.errorLog, function(i, message){
+//				webshims.errorLog.push(message);
+//			});
+//		}
+//	})();
 
 	//shortcus
 	var modules = webshims.modules;
@@ -27,6 +56,24 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	var singleVal = function(elem, name, val, pass, _argless){
 		return (_argless) ? oldVal.call($(elem)) : oldVal.call($(elem), val);
 	};
+	
+	//jquery mobile and jquery ui
+	if(!$.widget){
+		(function(){
+			var _cleanData = $.cleanData;
+			$.cleanData = function( elems ) {
+				if(!$.widget){
+					for ( var i = 0, elem; (elem = elems[i]) != null; i++ ) {
+						try {
+							$( elem ).triggerHandler( "remove" );
+						// http://bugs.jquery.com/ticket/8235
+						} catch( e ) {}
+					}
+				}
+				_cleanData( elems );
+			};
+		})();
+	}
 	
 
 	$.fn.val = function(val){
@@ -59,6 +106,15 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	};
 	$.fn.onTrigger = function(evt, fn){
 		return this.on(evt, fn).each(fn);
+	};
+	
+	$.fn.onWSOff = function(evt, fn, trigger){
+		$(document)[trigger ? 'onTrigger' : 'on'](evt, fn);
+		this.on('remove', function(e){
+			if(!e.originalEvent){
+				$(document).off(evt, fn);
+			}
+		});
 	};
 	
 	var dataID = '_webshimsLib'+ (Math.round(Math.random() * 1000));
@@ -422,7 +478,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 		implement: function(elem, type){
 			var data = elementData(elem, 'implemented') || elementData(elem, 'implemented', {});
 			if(data[type]){
-				webshims.info(type +' already implemented for element #'+elem.id);
+				webshims.warn(type +' already implemented for element #'+elem.id);
 				return false;
 			}
 			data[type] = true;
@@ -1408,7 +1464,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			});
 			$(function(){
 				setTimeout(function(){
-					$(document).on('updateshadowdom', function(){
+					that.element.onWSOff('updateshadowdom', function(){
 						that.updateMetrics();
 					});
 				}, 9);
@@ -1502,7 +1558,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		date: {
 			_create: function(){
 				var obj = {
-					splits: [$('<input type="text" class="yy" size="4" maxlength />')[0], $('<input type="text" class="mm" maxlength="2" size="2" />')[0], $('<input type="text" class="dd ws-spin" maxlength="2" size="2" />')[0]] 
+					splits: [$('<input type="text" class="yy" size="4" inputmode="numeric" />')[0], $('<input type="text" class="mm" inputmode="numeric" maxlength="2" size="2" />')[0], $('<input type="text" class="dd ws-spin" inputmode="numeric" maxlength="2" size="2" />')[0]] 
 				};
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1], $('<span class="ws-input-seperator" />')[0], obj.splits[2]];
 				return obj;
@@ -1878,6 +1934,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					this._addSplitInputs();
 				} else {
 					this.inputElements = this.element;
+				}
+				
+				if(this.type == 'number'){
+					this.inputElements.attr('inputmode', 'numeric');
 				}
 				
 				this.options.containerElements.push(this.buttonWrapper[0]);
@@ -2321,22 +2381,25 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					spinElement.attr({'autocomplete': 'off', role: 'spinbutton'}).on(spinEvents);
 				}
 				
-				
-				if(!o.splitInput){
-					$(document).on('wslocalechange',function(){
-						if(o.value){
-							that.value(o.value);
-						}
-
-						if(placeholderFormat[that.type] && o.placeholder){
-							that.placeholder(o.placeholder);
-						}
-					});
-				} else {
-					$(document).onTrigger('wslocalechange',function(){
-						that.reorderInputs();
-					});
-				}
+				(function(){
+					var localeChange ;
+					if(!o.splitInput){
+						localeChange = function(){
+							if(o.value){
+								that.value(o.value);
+							}
+	
+							if(placeholderFormat[that.type] && o.placeholder){
+								that.placeholder(o.placeholder);
+							}
+						};
+					} else {
+						localeChange = function(){
+							that.reorderInputs();
+						};
+					}
+					$(that.orig).onWSOff('wslocalechange', localeChange);
+				})();
 				
 				$('.step-up', this.buttonWrapper)
 					.on({
@@ -3305,6 +3368,12 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			});
 			
 			$(document).onTrigger('wslocalechange', data._propertyChange);
+			$(data.orig).on('remove', function(e){
+				if(!e.originalEvent){
+					$(document).off('wslocalechange', data._propertyChange);
+					popover.element.remove();
+				}
+			});
 		};
 		
 		picker._common = function(data){
@@ -3526,7 +3595,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				init = true;
 				$(data.orig).addClass('ws-important-hide');
 			};
-			$(document).onTrigger('updateshadowdom', updateStyles);
+			data.element.onWSOff('updateshadowdom', updateStyles);
 		};
 		
 		
@@ -3673,9 +3742,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			});
 		}
 		
-		
+		var isStupid = navigator.userAgent.indexOf('MSIE 10.0') != -1 && navigator.userAgent.indexOf('Touch') == -1;
 		['number', 'time', 'month', 'date'].forEach(function(name){
-			if(!modernizrInputTypes[name] || options.replaceUI){
+			if(!modernizrInputTypes[name] || options.replaceUI || (name == 'number' && isStupid)){
 				extendType(name, {
 					_create: function(opts, set){
 						

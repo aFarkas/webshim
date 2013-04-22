@@ -842,22 +842,25 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					spinElement.attr({'autocomplete': 'off', role: 'spinbutton'}).on(spinEvents);
 				}
 				
-				
-				if(!o.splitInput){
-					$(document).on('wslocalechange',function(){
-						if(o.value){
-							that.value(o.value);
-						}
-
-						if(placeholderFormat[that.type] && o.placeholder){
-							that.placeholder(o.placeholder);
-						}
-					});
-				} else {
-					$(document).onTrigger('wslocalechange',function(){
-						that.reorderInputs();
-					});
-				}
+				(function(){
+					var localeChange ;
+					if(!o.splitInput){
+						localeChange = function(){
+							if(o.value){
+								that.value(o.value);
+							}
+	
+							if(placeholderFormat[that.type] && o.placeholder){
+								that.placeholder(o.placeholder);
+							}
+						};
+					} else {
+						localeChange = function(){
+							that.reorderInputs();
+						};
+					}
+					$(that.orig).onWSOff('wslocalechange', localeChange);
+				})();
 				
 				$('.step-up', this.buttonWrapper)
 					.on({
@@ -1826,6 +1829,12 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			});
 			
 			$(document).onTrigger('wslocalechange', data._propertyChange);
+			$(data.orig).on('remove', function(e){
+				if(!e.originalEvent){
+					$(document).off('wslocalechange', data._propertyChange);
+					popover.element.remove();
+				}
+			});
 		};
 		
 		picker._common = function(data){
@@ -2047,7 +2056,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				init = true;
 				$(data.orig).addClass('ws-important-hide');
 			};
-			$(document).onTrigger('updateshadowdom', updateStyles);
+			data.element.onWSOff('updateshadowdom', updateStyles);
 		};
 		
 		

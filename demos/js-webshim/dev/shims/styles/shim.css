@@ -14,6 +14,28 @@
   top: -999999px;
 }
 
+.webshims-debug-list {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 5px;
+  padding: 5px;
+  list-style: none;
+  background: #fff;
+  color: #930;
+  font-size: 16px;
+  font-weight: bold;
+  max-height: 200px;
+  z-index: 99999;
+  overflow-y: auto;
+}
+.webshims-debug-list li {
+  border: 1px solid #cc6600;
+  margin: 2px 0;
+  padding: 5px;
+}
+
 article, aside, canvas, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
   display: block;
 }
@@ -885,6 +907,8 @@ datalist {
   zoom: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  background-color: #fff;
+  transition: background-color 400ms;
 }
 .datalist-polyfill mark {
   font-weight: normal;
@@ -896,6 +920,7 @@ datalist {
   max-width: 100%;
   color: #000;
   float: left;
+  transition: color 400ms;
 }
 .datalist-polyfill .option-label {
   display: none;
@@ -908,6 +933,7 @@ datalist {
   margin-top: 0.15em;
   margin-left: 10px;
   text-align: right;
+  transition: color 400ms;
 }
 .datalist-polyfill .has-option-label .option-label {
   display: inline-block;

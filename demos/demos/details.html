@@ -8,26 +8,14 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
 	<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
-	<script>
-		// set options for html5shiv
-		if(!window.html5){
-			window.html5 = {}; 
-		}
-		window.html5.shivMethods = false;
-	</script>
 	<script src="../js-webshim/minified/polyfiller.js"></script>
 	
-	<script class="example">
-		$.webshims.setOptions({
-			//we do not use any DOM-/JS-APIs on DOM-ready, so we do not need to delay the ready event <- good against fouc
-			waitReady: false
-		});
-    	
+	<script>
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
-        
-    </script>
+
+	</script>
 	<script src="../demo-js/demo.js"></script>
 	<title>HTML5 interactive elements: details &amp; summary : webshims lib - the polyfilling capability based loading JS library</title>
 	<style>

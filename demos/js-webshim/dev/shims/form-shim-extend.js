@@ -1446,8 +1446,8 @@ try {
 							data.text.css('padding'+ side, size);
 						});
 						
-						$(document)
-							.onTrigger('updateshadowdom', function(){
+						$(elem)
+							.onWSOff('updateshadowdom', function(){
 								var height, width; 
 								if((width = elem.offsetWidth) || (height = elem.offsetHeight)){
 									data.text
@@ -1458,7 +1458,7 @@ try {
 										.css($(elem).position())
 									;
 								}
-							})
+							}, true)
 						;
 						
 					} else {

@@ -95,7 +95,6 @@
 		},
 		polyfill: (function(){
 			var loaded = {};
-			var called;
 			return function(features){
 				if(!features){
 					features = webshims.featureList;
@@ -104,13 +103,10 @@
 				if (typeof features == 'string') {
 					features = features.split(' ');
 				}
-				if(called){
-					webshims.warn('polyfill already called, you might want to use updatePolyfill instead? see: bit.ly/12BtXX3. polyfill should be called only once.');
-				}
-				called = true;
+				
 				for(var i = 0; i < features.length; i++){
-					if(features[i] in loaded){
-						webshims.warn(features[i] +' already loaded, you might want to use updatePolyfill instead? see: bit.ly/12BtXX3');
+					if(loaded[features[i]]){
+						webshims.error(features[i] +' already loaded, you might want to use updatePolyfill instead? see: bit.ly/12BtXX3');
 					}
 					loaded[features[i]] = true;
 				}
@@ -630,10 +626,14 @@
 		};
 	})();
 	
+	webshims.errorLog = [];
 	$.each(['log', 'error', 'warn', 'info'], function(i, fn){
 		webshims[fn] = function(message){
-			if(( (importantLogs[fn] && webshims.debug !== false) || webshims.debug) && window.console && console.log){
-				return console[(console[fn]) ? fn : 'log'](message);
+			if( (importantLogs[fn] && webshims.debug !== false) || webshims.debug){
+				webshims.errorLog.push(message);
+				if(window.console && console.log){
+					console[(console[fn]) ? fn : 'log'](message);
+				}
 			}
 		};
 	});

@@ -1,6 +1,8 @@
 jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
 	"use strict";
-	
+	if(!webshims.addInputType){
+		webshims.error("you can not call forms-ext feature after calling forms feature. call both at once instead: $.webshims.polyfill('forms forms-ext')");
+	}
 	
 	if(!webshims.getStep){
 		webshims.getStep = function(elem, type){

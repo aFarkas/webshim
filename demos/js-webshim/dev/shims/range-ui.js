@@ -365,7 +365,7 @@
 			});
 			$(function(){
 				setTimeout(function(){
-					$(document).on('updateshadowdom', function(){
+					that.element.onWSOff('updateshadowdom', function(){
 						that.updateMetrics();
 					});
 				}, 9);

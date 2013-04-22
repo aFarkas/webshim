@@ -445,8 +445,10 @@ mediaelement.createSWF = function(mediaElem, src, data){
 	addMediaToStopEvents(mediaElem);
 	
 	addYtAPI(mediaElem, elemId, data, ytID);
-	$(mediaElem).on('updatemediaelementdimensions', setDimension);
-	$(document).on('updateshadowdom', setDimension);
+	$(mediaElem)
+		.on('updatemediaelementdimensions', setDimension)
+		.onWSOff('updateshadowdom', setDimension)
+	;
 };
 
 (function(){

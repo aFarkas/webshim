@@ -273,7 +273,9 @@ jQuery.webshims.register('form-native-extend', function($, webshims, window, doc
 });
 jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
 	"use strict";
-	
+	if(!webshims.addInputType){
+		webshims.error("you can not call forms-ext feature after calling forms feature. call both at once instead: $.webshims.polyfill('forms forms-ext')");
+	}
 	
 	if(!webshims.getStep){
 		webshims.getStep = function(elem, type){
@@ -1147,7 +1149,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			});
 			$(function(){
 				setTimeout(function(){
-					$(document).on('updateshadowdom', function(){
+					that.element.onWSOff('updateshadowdom', function(){
 						that.updateMetrics();
 					});
 				}, 9);
@@ -1241,7 +1243,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		date: {
 			_create: function(){
 				var obj = {
-					splits: [$('<input type="text" class="yy" size="4" maxlength />')[0], $('<input type="text" class="mm" maxlength="2" size="2" />')[0], $('<input type="text" class="dd ws-spin" maxlength="2" size="2" />')[0]] 
+					splits: [$('<input type="text" class="yy" size="4" inputmode="numeric" />')[0], $('<input type="text" class="mm" inputmode="numeric" maxlength="2" size="2" />')[0], $('<input type="text" class="dd ws-spin" inputmode="numeric" maxlength="2" size="2" />')[0]] 
 				};
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1], $('<span class="ws-input-seperator" />')[0], obj.splits[2]];
 				return obj;
@@ -1617,6 +1619,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					this._addSplitInputs();
 				} else {
 					this.inputElements = this.element;
+				}
+				
+				if(this.type == 'number'){
+					this.inputElements.attr('inputmode', 'numeric');
 				}
 				
 				this.options.containerElements.push(this.buttonWrapper[0]);
@@ -2060,22 +2066,25 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					spinElement.attr({'autocomplete': 'off', role: 'spinbutton'}).on(spinEvents);
 				}
 				
-				
-				if(!o.splitInput){
-					$(document).on('wslocalechange',function(){
-						if(o.value){
-							that.value(o.value);
-						}
-
-						if(placeholderFormat[that.type] && o.placeholder){
-							that.placeholder(o.placeholder);
-						}
-					});
-				} else {
-					$(document).onTrigger('wslocalechange',function(){
-						that.reorderInputs();
-					});
-				}
+				(function(){
+					var localeChange ;
+					if(!o.splitInput){
+						localeChange = function(){
+							if(o.value){
+								that.value(o.value);
+							}
+	
+							if(placeholderFormat[that.type] && o.placeholder){
+								that.placeholder(o.placeholder);
+							}
+						};
+					} else {
+						localeChange = function(){
+							that.reorderInputs();
+						};
+					}
+					$(that.orig).onWSOff('wslocalechange', localeChange);
+				})();
 				
 				$('.step-up', this.buttonWrapper)
 					.on({
@@ -3044,6 +3053,12 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			});
 			
 			$(document).onTrigger('wslocalechange', data._propertyChange);
+			$(data.orig).on('remove', function(e){
+				if(!e.originalEvent){
+					$(document).off('wslocalechange', data._propertyChange);
+					popover.element.remove();
+				}
+			});
 		};
 		
 		picker._common = function(data){
@@ -3265,7 +3280,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				init = true;
 				$(data.orig).addClass('ws-important-hide');
 			};
-			$(document).onTrigger('updateshadowdom', updateStyles);
+			data.element.onWSOff('updateshadowdom', updateStyles);
 		};
 		
 		
@@ -3412,9 +3427,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			});
 		}
 		
-		
+		var isStupid = navigator.userAgent.indexOf('MSIE 10.0') != -1 && navigator.userAgent.indexOf('Touch') == -1;
 		['number', 'time', 'month', 'date'].forEach(function(name){
-			if(!modernizrInputTypes[name] || options.replaceUI){
+			if(!modernizrInputTypes[name] || options.replaceUI || (name == 'number' && isStupid)){
 				extendType(name, {
 					_create: function(opts, set){
 						

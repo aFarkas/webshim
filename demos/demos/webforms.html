@@ -40,13 +40,6 @@
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
-	<script>
-		// set options for html5shiv
-		if(!window.html5){
-			window.html5 = {}; 
-		}
-		window.html5.shivMethods = false;
-	</script>
 	<script src="../js-webshim/minified/polyfiller.js"></script>
 	
 	
@@ -59,16 +52,12 @@
 			//$('html').on('wspopoverbeforehide', false);
 		</script>
 	-->
-	<script class="example">
+	<script>
 		$.webshims.setOptions('forms', { 
 			customMessages: true 
 		});
 
 		
-		$.webshims.setOptions({
-			//we do not use any DOM-/JS-APIs on DOM-ready, so we do not need to delay the ready event <- good against fouc
-			waitReady: false
-		});
 		//load all defined
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();

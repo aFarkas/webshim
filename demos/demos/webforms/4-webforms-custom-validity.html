@@ -33,12 +33,7 @@
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
 	<script src="../../js-webshim/minified/extras/custom-validity.js"></script>
 	
-	<script class="example">
-		$.webshims.setOptions({
-			//we do not use any DOM-/JS-APIs on DOM-ready, so we do not need to delay the ready event <- good against fouc
-			waitReady: false
-		});
-//		$.webshims.debug = true;
+	<script>
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();

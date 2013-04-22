@@ -602,8 +602,10 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			webshims.addShadowDom(elem, box);
 			addMediaToStopEvents(elem);
 			mediaelement.setActive(elem, 'third', data);
-			$(elem).on('updatemediaelementdimensions', setDimension);
-			$(document).on('updateshadowdom', setDimension);
+			$(elem)
+				.on({'updatemediaelementdimensions': setDimension})
+				.onWSOff('updateshadowdom', setDimension)
+			;
 		}
 		
 		if(!mediaelement.jarisEvent[data.id]){
@@ -865,13 +867,11 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 			if(elems && (len = elems.length) && loadedSwf){
 				
 				for(i = 0; i < len; i++){
-					if(flashNames[elems[i].nodeName]){
-						if('api_pause' in elems[i]){
-							loadedSwf--;
-							try {
-								elems[i].api_pause();
-							} catch(er){}
-						}
+					if(flashNames[elems[i].nodeName] && 'api_pause' in elems[i]){
+						loadedSwf--;
+						try {
+							elems[i].api_pause();
+						} catch(er){}
 					}
 				}
 				

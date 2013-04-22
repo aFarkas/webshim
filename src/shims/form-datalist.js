@@ -1,6 +1,6 @@
 jQuery.webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";
-	var doc = document;	
+	var doc = document;
 
 	/*
 	 * implement propType "element" currently only used for list-attribute (will be moved to dom-extend, if needed)
@@ -193,12 +193,8 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 					.each(function(){
 						$(this).triggerHandler('updateDatalist');
 					})
-					
 				;
-				
 			});
-			
-			
 		};
 		
 		
@@ -377,6 +373,11 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 				$(this.datalist)
 					.off('updateDatalist.datalistWidget')
 					.on('updateDatalist.datalistWidget', $.proxy(this, '_resetListCached'))
+					.on('remove', function(e){
+						if(!e.originalEvent){
+							that.detroy();
+						}
+					})
 				;
 				
 				this._resetListCached();

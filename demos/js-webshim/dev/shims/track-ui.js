@@ -80,8 +80,7 @@ jQuery.webshims.register('track-ui', function($, webshims, window, document, und
 					positionDisplay(true);
 				};
 				media.on('playerdimensionchange mediaelementapichange updatetrackdisplay updatemediaelementdimensions swfstageresize', delayed);
-				$(document).on('updateshadowdom', delayed);
-				media.on('forceupdatetrackdisplay', forceUpdate);
+				media.on('forceupdatetrackdisplay', forceUpdate).onWSOff('updateshadowdom', delayed);
 				forceUpdate();
 			}
 		},
