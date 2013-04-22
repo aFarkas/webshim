@@ -19,7 +19,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		date: {
 			_create: function(){
 				var obj = {
-					splits: [$('<input type="text" class="yy" size="4" maxlength />')[0], $('<input type="text" class="mm" maxlength="2" size="2" />')[0], $('<input type="text" class="dd ws-spin" maxlength="2" size="2" />')[0]] 
+					splits: [$('<input type="text" class="yy" size="4" inputmode="numeric" />')[0], $('<input type="text" class="mm" inputmode="numeric" maxlength="2" size="2" />')[0], $('<input type="text" class="dd ws-spin" inputmode="numeric" maxlength="2" size="2" />')[0]] 
 				};
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1], $('<span class="ws-input-seperator" />')[0], obj.splits[2]];
 				return obj;
@@ -395,6 +395,10 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					this._addSplitInputs();
 				} else {
 					this.inputElements = this.element;
+				}
+				
+				if(this.type == 'number'){
+					this.inputElements.attr('inputmode', 'numeric');
 				}
 				
 				this.options.containerElements.push(this.buttonWrapper[0]);
