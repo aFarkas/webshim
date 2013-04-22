@@ -2194,9 +2194,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			});
 		}
 		
-		
+		var isStupid = navigator.userAgent.indexOf('MSIE 10.0') != -1 && navigator.userAgent.indexOf('Touch') == -1;
 		['number', 'time', 'month', 'date'].forEach(function(name){
-			if(!modernizrInputTypes[name] || options.replaceUI){
+			if(!modernizrInputTypes[name] || options.replaceUI || (name == 'number' && isStupid)){
 				extendType(name, {
 					_create: function(opts, set){
 						
