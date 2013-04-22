@@ -120,18 +120,21 @@
 			$('.ws-range-ticks', trail).remove();
 			
 			
-			$(this.orig).jProp('list').find('option').each(function(){
+			$(this.orig).jProp('list').find('option:not([disabled])').each(function(){
 				o.options[$.prop(this, 'value')] = $.prop(this, 'label');
 			});
 			
 			$.each(o.options, function(val, label){
 				if(!isNumber(val) || val < min || val > max){return;}
 				var left = 100 * ((val - min) / (max - min));
-				var title = o.showLabels ? ' title="'+ label +'"' : '';
+				var title = o.showLabels && label ? ' title="'+ label +'"' : '';
 				if(that.vertical){
 					left = Math.abs(left - 100);
 				}
-				trail.append('<span class="ws-range-ticks"'+ title +' style="'+(that.dirs.left)+': '+left+'%;" />');
+				
+				that.posCenter(
+					$('<span class="ws-range-ticks"'+ title +' style="'+(that.dirs.left)+': '+left+'%;" />').appendTo(trail)
+				);
 			});
 		},
 		readonly: function(val){
@@ -276,14 +279,16 @@
 				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
 			};
 			var add = function(e){
+				var outerWidth;
 				e.preventDefault();
 				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
 				if(!o.readonly && !o.disabled){
 					leftOffset = that.element.focus().addClass('ws-active').offset();
-					widgetUnits = that.element[that.dirs.width]();
+					widgetUnits = that.element[that.dirs.innerWidth]();
 					if(!widgetUnits || !leftOffset){return;}
+					outerWidth = that.thumb[that.dirs.outerWidth]();
 					leftOffset = leftOffset[that.dirs.pos];
-					widgetUnits = 100 / (widgetUnits  - ((that.thumb[that.dirs.outerWidth]() || 2) / 2));
+					widgetUnits = 100 / (widgetUnits  - ((outerWidth || 2) / 2));
 					setValueFromPos(e, o.animate);
 					$(document)
 						.on({
@@ -358,24 +363,71 @@
 			this.thumb.on({
 				mousedown: add
 			});
+			$(function(){
+				setTimeout(function(){
+					$(document).on('updateshadowdom', function(){
+						that.updateMetrics();
+					});
+				}, 9);
+			});
+		},
+		posCenter: function(elem, outerWidth){
+			var temp;
+			if(this.options.calcCenter && (!this._init || this.element[0].offsetWidth)){
+				if(!elem){
+					elem = this.thumb;
+				}
+				if(!outerWidth){
+					outerWidth = elem[this.dirs.outerWidth]();
+				}
+				outerWidth = outerWidth / -2;
+				elem.css(this.dirs.marginLeft, outerWidth);
+				
+				if(this.options.calcTrail && elem[0] == this.thumb[0]){
+					temp = this.element[this.dirs.innerHeight]();
+					elem.css(this.dirs.marginTop, (elem[this.dirs.outerHeight]() - temp) / -2);
+					this.range.css(this.dirs.marginTop, (this.range[this.dirs.outerHeight]() - temp) / -2 );
+					outerWidth *= -1;
+					this.trail
+						.css(this.dirs.left, outerWidth)
+						.css(this.dirs.right, outerWidth)
+					;
+				}
+			}
 		},
 		updateMetrics: function(){
 			var width = this.element.innerWidth();
 			this.vertical = (width && this.element.innerHeight() - width  > 10);
 			
 			this.dirs = this.vertical ? 
-				{mouse: 'pageY', pos: 'top', min: 'max', max: 'min', left: 'top', width: 'height', outerWidth: 'outerHeight'} :
-				{mouse: 'pageX', pos: 'left', min: 'min', max: 'max', left: 'left', width: 'width', outerWidth: 'outerWidth'}
+				{mouse: 'pageY', pos: 'top', min: 'max', max: 'min', left: 'top', right: 'bottom', width: 'height', innerWidth: 'innerHeight', innerHeight: 'innerWidth', outerWidth: 'outerHeight', outerHeight: 'outerWidth', marginTop: 'marginLeft', marginLeft: 'marginTop'} :
+				{mouse: 'pageX', pos: 'left', min: 'min', max: 'max', left: 'left', right: 'right', width: 'width', innerWidth: 'innerWidth', innerHeight: 'innerHeight', outerWidth: 'outerWidth', outerHeight: 'outerHeight', marginTop: 'marginTop', marginLeft: 'marginLeft'}
 			;
 			this.element
 				[this.vertical ? 'addClass' : 'removeClass']('vertical-range')
 				[this.vertical ? 'addClass' : 'removeClass']('horizontal-range')
 			;
+			this.posCenter();
 		}
 	};
 	
 	$.fn.rangeUI = function(opts){
-		opts = $.extend({readonly: false, disabled: false, tabindex: 0, min: 0, step: 1, max: 100, value: 50, input: $.noop, change: $.noop, _change: $.noop, showLabels: true, options: {}}, opts);
+		opts = $.extend({
+			readonly: false, 
+			disabled: false, 
+			tabindex: 0, 
+			min: 0, 
+			step: 1, 
+			max: 100, 
+			value: 50, 
+			input: $.noop, 
+			change: $.noop, 
+			_change: $.noop, 
+			showLabels: true, 
+			options: {},
+			calcCenter: true,
+			calcTrail: true
+		}, opts);
 		return this.each(function(){
 			$.webshims.objectCreate(rangeProto, {
 				element: {

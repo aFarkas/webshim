@@ -1163,18 +1163,21 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			$('.ws-range-ticks', trail).remove();
 			
 			
-			$(this.orig).jProp('list').find('option').each(function(){
+			$(this.orig).jProp('list').find('option:not([disabled])').each(function(){
 				o.options[$.prop(this, 'value')] = $.prop(this, 'label');
 			});
 			
 			$.each(o.options, function(val, label){
 				if(!isNumber(val) || val < min || val > max){return;}
 				var left = 100 * ((val - min) / (max - min));
-				var title = o.showLabels ? ' title="'+ label +'"' : '';
+				var title = o.showLabels && label ? ' title="'+ label +'"' : '';
 				if(that.vertical){
 					left = Math.abs(left - 100);
 				}
-				trail.append('<span class="ws-range-ticks"'+ title +' style="'+(that.dirs.left)+': '+left+'%;" />');
+				
+				that.posCenter(
+					$('<span class="ws-range-ticks"'+ title +' style="'+(that.dirs.left)+': '+left+'%;" />').appendTo(trail)
+				);
 			});
 		},
 		readonly: function(val){
@@ -1319,14 +1322,16 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
 			};
 			var add = function(e){
+				var outerWidth;
 				e.preventDefault();
 				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
 				if(!o.readonly && !o.disabled){
 					leftOffset = that.element.focus().addClass('ws-active').offset();
-					widgetUnits = that.element[that.dirs.width]();
+					widgetUnits = that.element[that.dirs.innerWidth]();
 					if(!widgetUnits || !leftOffset){return;}
+					outerWidth = that.thumb[that.dirs.outerWidth]();
 					leftOffset = leftOffset[that.dirs.pos];
-					widgetUnits = 100 / (widgetUnits  - ((that.thumb[that.dirs.outerWidth]() || 2) / 2));
+					widgetUnits = 100 / (widgetUnits  - ((outerWidth || 2) / 2));
 					setValueFromPos(e, o.animate);
 					$(document)
 						.on({
@@ -1401,24 +1406,71 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			this.thumb.on({
 				mousedown: add
 			});
+			$(function(){
+				setTimeout(function(){
+					$(document).on('updateshadowdom', function(){
+						that.updateMetrics();
+					});
+				}, 9);
+			});
+		},
+		posCenter: function(elem, outerWidth){
+			var temp;
+			if(this.options.calcCenter && (!this._init || this.element[0].offsetWidth)){
+				if(!elem){
+					elem = this.thumb;
+				}
+				if(!outerWidth){
+					outerWidth = elem[this.dirs.outerWidth]();
+				}
+				outerWidth = outerWidth / -2;
+				elem.css(this.dirs.marginLeft, outerWidth);
+				
+				if(this.options.calcTrail && elem[0] == this.thumb[0]){
+					temp = this.element[this.dirs.innerHeight]();
+					elem.css(this.dirs.marginTop, (elem[this.dirs.outerHeight]() - temp) / -2);
+					this.range.css(this.dirs.marginTop, (this.range[this.dirs.outerHeight]() - temp) / -2 );
+					outerWidth *= -1;
+					this.trail
+						.css(this.dirs.left, outerWidth)
+						.css(this.dirs.right, outerWidth)
+					;
+				}
+			}
 		},
 		updateMetrics: function(){
 			var width = this.element.innerWidth();
 			this.vertical = (width && this.element.innerHeight() - width  > 10);
 			
 			this.dirs = this.vertical ? 
-				{mouse: 'pageY', pos: 'top', min: 'max', max: 'min', left: 'top', width: 'height', outerWidth: 'outerHeight'} :
-				{mouse: 'pageX', pos: 'left', min: 'min', max: 'max', left: 'left', width: 'width', outerWidth: 'outerWidth'}
+				{mouse: 'pageY', pos: 'top', min: 'max', max: 'min', left: 'top', right: 'bottom', width: 'height', innerWidth: 'innerHeight', innerHeight: 'innerWidth', outerWidth: 'outerHeight', outerHeight: 'outerWidth', marginTop: 'marginLeft', marginLeft: 'marginTop'} :
+				{mouse: 'pageX', pos: 'left', min: 'min', max: 'max', left: 'left', right: 'right', width: 'width', innerWidth: 'innerWidth', innerHeight: 'innerHeight', outerWidth: 'outerWidth', outerHeight: 'outerHeight', marginTop: 'marginTop', marginLeft: 'marginLeft'}
 			;
 			this.element
 				[this.vertical ? 'addClass' : 'removeClass']('vertical-range')
 				[this.vertical ? 'addClass' : 'removeClass']('horizontal-range')
 			;
+			this.posCenter();
 		}
 	};
 	
 	$.fn.rangeUI = function(opts){
-		opts = $.extend({readonly: false, disabled: false, tabindex: 0, min: 0, step: 1, max: 100, value: 50, input: $.noop, change: $.noop, _change: $.noop, showLabels: true, options: {}}, opts);
+		opts = $.extend({
+			readonly: false, 
+			disabled: false, 
+			tabindex: 0, 
+			min: 0, 
+			step: 1, 
+			max: 100, 
+			value: 50, 
+			input: $.noop, 
+			change: $.noop, 
+			_change: $.noop, 
+			showLabels: true, 
+			options: {},
+			calcCenter: true,
+			calcTrail: true
+		}, opts);
 		return this.each(function(){
 			$.webshims.objectCreate(rangeProto, {
 				element: {
@@ -1837,7 +1889,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				
 				for(i = 0; i < createOpts.length; i++){
-					this[createOpts[i]](o[createOpts[i]]);
+					if(o[createOpts[i]] != null){
+						this[createOpts[i]](o[createOpts[i]]);
+					}
 				}
 				
 				this.element.data('wsspinner', this);
@@ -1982,6 +2036,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			tabindex: function(val){
 				this.options.tabindex = val;
 				this.inputElements.prop('tabindex', this.options.tabindex);
+				$('button', this.buttonWrapper).prop('tabindex', this.options.tabindex);
 			},
 			title: function(val){
 				this.options.title = val;
@@ -2304,18 +2359,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 		
 		['readonly', 'disabled'].forEach(function(name){
+			var isDisabled = name == 'disabled';
 			spinBtnProto[name] = function(val){
 				if(this.options[name] != val || !this._init){
 					this.options[name] = !!val;
-					if(name == 'readonly' && this.options.noInput){
-						this.element
-							.prop(name, true)
-							.attr({'aria-readonly': this.options[name]})
-						;
-					} else {
-						this.element.prop(name, this.options[name]);
-					}
+					this.inputElements.prop(name, this.options[name]);
 					this.buttonWrapper[this.options[name] ? 'addClass' : 'removeClass']('ws-'+name);
+				}
+				if(isDisabled){
+					$('button', this.buttonWrapper).prop('disabled', this.options[name]);
 				}
 			};
 		});
@@ -3318,10 +3370,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			labelWidth(popover.element.children('div.ws-po-outerbox').attr({role: 'group'}), options.labels, true);
 			labelWidth(opener, options.labels, true);
 			
+			if(options.tabindex != null){
+				opener.attr({tabindex: options.tabindex});
+			}
+			
+			if(options.disabled){
+				opener.prop({disabled: true});
+			}
 			opener
-				.attr({
-					'tabindex': options.labels.length ? 0 : '-1'
-				})
+				
 				.on({
 					mousedown: function(){
 						stopPropagation.apply(this, arguments);
@@ -3433,6 +3490,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		var sizeInput = function(data){
 			var init;
 			var updateStyles = function(){
+				$(data.orig).removeClass('ws-important-hide');
 				$.style( data.orig, 'display', '' );
 				var hasButtons, marginR, marginL;
 				var correctWidth = 0.6;
@@ -3466,7 +3524,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					data.element.outerWidth( $(data.orig).outerWidth() - correctWidth );
 				}
 				init = true;
-				$.style( data.orig, 'display', 'none' );
+				$(data.orig).addClass('ws-important-hide');
 			};
 			$(document).onTrigger('updateshadowdom', updateStyles);
 		};
@@ -3586,8 +3644,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				if(opts.calculateWidth){
 					sizeInput(data.shim);
+				} else {
+					$(this).css({display: 'none'});
 				}
-				$(this).css({display: 'none'});
 			}
 		};
 		

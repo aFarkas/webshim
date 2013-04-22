@@ -9,6 +9,13 @@
 	}
 }
 
+.ws-important-hide {
+	display: none !important;
+	visibility: hidden !important;
+	position: absolute;
+	top: -999999px;
+}
+
 article, aside, canvas, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
 	display: block;
 }
@@ -427,7 +434,7 @@ output {
 	height: 19px;
 	width: 155px;
 	border-radius: 1px;
-	background: url(forms.png) 0 -40px no-repeat;
+	background: url(range-track.png) 0 center no-repeat;
 	cursor: pointer;
 	font-size: 0;
 	line-height: 0;
@@ -447,23 +454,23 @@ output {
 		margin: -2px 0 0 -6px;
 		height: 22px;
 		width: 11px;
-		background: url(forms.png) -3px 0 no-repeat;
+		background: url(forms.png) -3px 1px no-repeat;
 		cursor: pointer;
 		outline: none;
 		font-size: 0;
 		line-height: 0;
 
 		&:hover {
-			background-position: -20px 0;
+			background-position: -20px 1px;
 		}
 	}
 
 	&.ws-focus .ws-range-thumb {
-		background-position: -20px 0;
+		background-position: -20px 1px;
 	}
 	
 	&.ws-active .ws-range-thumb {
-		background-position: -37px 0;
+		background-position: -37px 1px;
 	}
 	
 	&[aria-disabled="true"],
@@ -478,7 +485,7 @@ output {
 	}
 	
 	&[aria-disabled="true"] .ws-range-thumb {
-		background-position: -54px 0;
+		background-position: -54px 1px;
 	}
 
 	.ws-range-rail {
@@ -494,9 +501,9 @@ output {
 
 	.ws-range-min {
 		position: absolute !important;
-		display: block !important;
+		display: block;
 		padding: 0 !important;
-		top: 7px;
+		top: 0;
 		height: 1px;
 		left: 0;
 		z-index: 1;

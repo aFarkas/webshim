@@ -406,7 +406,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				
 				for(i = 0; i < createOpts.length; i++){
-					this[createOpts[i]](o[createOpts[i]]);
+					if(o[createOpts[i]] != null){
+						this[createOpts[i]](o[createOpts[i]]);
+					}
 				}
 				
 				this.element.data('wsspinner', this);
@@ -551,6 +553,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			tabindex: function(val){
 				this.options.tabindex = val;
 				this.inputElements.prop('tabindex', this.options.tabindex);
+				$('button', this.buttonWrapper).prop('tabindex', this.options.tabindex);
 			},
 			title: function(val){
 				this.options.title = val;
@@ -873,18 +876,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		};
 		
 		['readonly', 'disabled'].forEach(function(name){
+			var isDisabled = name == 'disabled';
 			spinBtnProto[name] = function(val){
 				if(this.options[name] != val || !this._init){
 					this.options[name] = !!val;
-					if(name == 'readonly' && this.options.noInput){
-						this.element
-							.prop(name, true)
-							.attr({'aria-readonly': this.options[name]})
-						;
-					} else {
-						this.element.prop(name, this.options[name]);
-					}
+					this.inputElements.prop(name, this.options[name]);
 					this.buttonWrapper[this.options[name] ? 'addClass' : 'removeClass']('ws-'+name);
+				}
+				if(isDisabled){
+					$('button', this.buttonWrapper).prop('disabled', this.options[name]);
 				}
 			};
 		});
@@ -1887,10 +1887,15 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			labelWidth(popover.element.children('div.ws-po-outerbox').attr({role: 'group'}), options.labels, true);
 			labelWidth(opener, options.labels, true);
 			
+			if(options.tabindex != null){
+				opener.attr({tabindex: options.tabindex});
+			}
+			
+			if(options.disabled){
+				opener.prop({disabled: true});
+			}
 			opener
-				.attr({
-					'tabindex': options.labels.length ? 0 : '-1'
-				})
+				
 				.on({
 					mousedown: function(){
 						stopPropagation.apply(this, arguments);
@@ -2002,6 +2007,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		var sizeInput = function(data){
 			var init;
 			var updateStyles = function(){
+				$(data.orig).removeClass('ws-important-hide');
 				$.style( data.orig, 'display', '' );
 				var hasButtons, marginR, marginL;
 				var correctWidth = 0.6;
@@ -2035,7 +2041,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 					data.element.outerWidth( $(data.orig).outerWidth() - correctWidth );
 				}
 				init = true;
-				$.style( data.orig, 'display', 'none' );
+				$(data.orig).addClass('ws-important-hide');
 			};
 			$(document).onTrigger('updateshadowdom', updateStyles);
 		};
@@ -2155,8 +2161,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				
 				if(opts.calculateWidth){
 					sizeInput(data.shim);
+				} else {
+					$(this).css({display: 'none'});
 				}
-				$(this).css({display: 'none'});
 			}
 		};
 		

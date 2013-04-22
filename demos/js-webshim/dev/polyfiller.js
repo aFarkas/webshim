@@ -26,7 +26,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.3',
+		version: '1.10.4pre',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -971,15 +971,15 @@
 				
 				formExtend = Modernizr[formvalidation] && !bustedValidity ? 'form-native-extend' : 'form-shim-extend';
 				
-				addTest('styleableinputrange', function(){
-					return modernizrInputTypes.range && !window.opera;
-				});
 			}
 			initialFormTest.run = true;
 			return false;
 		};
 		
-		
+		addTest('styleableinputrange', function(){
+			return modernizrInputTypes.range && !window.opera;
+		});
+				
 		webshims.formcfg = [];
 		webshims.validationMessages = webshims.validityMessages = [];
 		webshims.inputTypes = {};

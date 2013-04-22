@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>range example</title>
+		
+		<script>
+			if(window.parent == window){
+				location = 'index.html';
+			}
+		</script>
+		
+		<style>
+			.example-area {
+				margin: 20px 0;
+				border: 1px solid #000;
+				padding: 20px 10px;
+			}
+			textarea {
+				width: 100%;
+				min-height: 400px;
+			}
+			/* todos */
+			::-moz-range-track {
+				border: none;
+				background: transparent;
+			}
+		</style>
+		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="../../../../src/extras/modernizr-custom.js"></script>
+		<script src="../../../../src/polyfiller.js"></script>
+		<script>
+			
+			(function($){
+				var writeCss = (function(){
+					var div = $('<div class="style" />');
+					var textarea = $('<textarea></textarea>');
+					$(function(){
+						div.prependTo('body');
+						textarea.appendTo('body');
+					});
+					return function(data){
+						var css = '';
+						$.each(data, function(sel, vals){
+							css += sel +' {';
+							$.each(vals, function(prop, val){
+								css += prop+': '+ val +';';
+							});
+							css += '}\n';
+						});
+						div.get(0).innerHTML = '&#173;<style>'+ css +'</style>';
+						textarea.val(css);
+						$(document).triggerHandler('updateshadowdom');
+					};
+					
+				})();
+				var css = '';
+				
+				var transformData = {
+					baseProps: {
+						'.ws-range, input[type="range"]': {'-webkit-appearance': 'none', cursor: 'pointer', outline: 'none'},
+						'input[type="range"]::-webkit-slider-thumb': {'-webkit-appearance': 'none'}
+					},
+					selector: {
+						'.ws-range, input[type="range"]': [],
+						'.ws-range .ws-range-thumb': ['input[type="range"]::-webkit-slider-thumb', 'input[type="range"]::-moz-range-thumb']
+					}
+				};
+				var transform = (function(){
+					var data;
+					var _extendProps = function(sel, val){
+						var props = transformData.baseProps[sel];
+						
+						if(props){
+							$.extend(val, props);
+						}
+					};
+					var extendProps = function(){
+						$.each(data, _extendProps);
+					};
+					var _extendSels = function(sel, val){
+						var sels = transformData.selector[sel];
+						
+						if(sels){
+							$.each(sels, function(i, extraSel){
+								data[extraSel] = $.extend({}, val);
+							});
+						}
+					};
+					var extendSels = function(){
+						$.each(data, _extendSels);
+					};
+					var start = function(dataSels){
+						data = dataSels;
+						extendSels();
+						extendProps();
+					};
+					return {
+						start: start
+					};
+				})();
+				
+				$(window).on('message', function(e){
+					e = e.originalEvent;
+					var data;
+					if(e.source == window.parent){
+						
+						try {
+							data = JSON.parse(e.data);
+						} catch(er){}
+						if(data.selector){
+							transform.start(data.selector);
+							writeCss(data.selector);
+						}
+					}
+				});
+				
+				$.webshims.ready('DOM range-ui', function(){
+					$('<span class="ws-range" />').appendTo('div.webshims-example').rangeUI();
+				});
+			})(jQuery);
+		</script>
+		
+		<script>
+			$.webshims.setOptions('forms-ext', {
+				replaceUI: !Modernizr.styleableinputrange,
+				types: 'range'
+			});
+			$.webshims.debug = 'noCombo';
+			$.webshims.polyfill('forms forms-ext');
+			$.webshims.loader.loadList(['range-ui']);
+		</script>
+		<script src="../../../demo-js/demo.js"></script>
+	</head>
+	<body>
+		<h2>webshims example</h2>
+		<div class="example-area webshims-example">
+			
+		</div>
+		<h2>native styleable example</h2>
+		<div class="example-area native-example">
+			<input type="range" />
+		</div>
+	</body>
+</html>
