@@ -271,7 +271,7 @@ jQuery.webshims.register('form-native-extend', function($, webshims, window, doc
 	
 	
 });
-jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined){
+jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(!webshims.addInputType){
 		webshims.error("you can not call forms-ext feature after calling forms feature. call both at once instead: $.webshims.polyfill('forms forms-ext')");
@@ -545,7 +545,12 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			minDefault: 0,
 			maxDefault: 100
 		},
-		
+		color: {
+			mismatch: function(val){
+				if(!val || val.length != 7 || !(/^\u0023/.test(val))){return true;}
+				return isNaN(parseInt( val.charAt(1) + val.charAt(2), 16)) || isNaN(parseInt( val.charAt(3) + val.charAt(4), 16)) || isNaN(parseInt( val.charAt(5) + val.charAt(6), 16));
+			}
+		},
 		date: {
 			mismatch: function(val){
 				if(!val || !val.split || !(/\d$/.test(val))){return true;}
@@ -743,12 +748,14 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 //		}
 	};
 	
-	if(typeBugs || !supportsType('range') || !supportsType('time')){
+	if(typeBugs || !supportsType('range') || !supportsType('time') || !supportsType('month')){
 		typeProtos.range = $.extend({}, typeProtos.number, typeProtos.range);
 		typeProtos.time = $.extend({}, typeProtos.date, typeProtos.time);
 		typeProtos.month = $.extend({}, typeProtos.date, typeProtos.month);
 //		typeProtos['datetime-local'] = $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']);
 	}
+	
+	
 	
 	//'datetime-local'
 	['number', 'month', 'range', 'date', 'time'].forEach(function(type){
@@ -756,6 +763,10 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			webshims.addInputType(type, typeProtos[type]);
 		}
 	});
+	
+	if(!supportsType('color') && options.types && options.types.indexOf && options.types.indexOf('color') != -1){
+		webshims.addInputType('color', typeProtos.color);
+	}
 
 	if($('<input />').prop('labels') == null){
 		webshims.defineNodeNamesProperty('button, input, keygen, meter, output, progress, select, textarea', 'labels', {

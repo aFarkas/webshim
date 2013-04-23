@@ -1264,9 +1264,9 @@ var swfmini = function() {
 		};
 		var switchOptions = function(e){
 			var media;
-			var parent = e.target.parentNode;
+			var parent;
 			if(!options.preferFlash && 
-				($(e.target).is('audio, video') || (parent && $('source:last', parent)[0] == e.target)) && 
+				($(e.target).is('audio, video') || ((parent = e.target.parentNode) && $('source:last', parent)[0] == e.target)) && 
 				(media = $(e.target).closest('audio, video')) && !noSwitch[media.prop('error')]
 				){
 				$(function(){
@@ -1280,7 +1280,7 @@ var swfmini = function() {
 									$('audio, video').each(function(){
 										webshims.mediaelement.selectSource(this);
 									});
-									webshims.info("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error'));
+									webshims.warn("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error'));
 								}
 							}, 9);
 						});
@@ -1609,19 +1609,34 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		}
 		return ret;
 	};
-	
+	var emptyType = (/^\s*application\/octet\-stream\s*$/i);
+	var getRemoveEmptyType = function(){
+		var ret = emptyType.test($.attr(this, 'type') || '');
+		if(ret){
+			$(this).removeAttr('type');
+		}
+		return ret;
+	};
 	mediaelement.setError = function(elem, message){
-		if(!message){
-			message = "can't play sources";
+		if($('source', elem).filter(getRemoveEmptyType).length){
+			webshims.error('"application/octet-stream" is a useless mimetype for audio/video. Please change this attribute.');
+			try {
+				$(elem).mediaLoad();
+			} catch(er){}
+		} else {
+			if(!message){
+				message = "can't play sources";
+			}
+			$(elem).pause().data('mediaerror', message);
+			webshims.error('mediaelementError: '+ message);
+			setTimeout(function(){
+				if($(elem).data('mediaerror')){
+					$(elem).trigger('mediaerror');
+				}
+			}, 1);
 		}
 		
-		$(elem).pause().data('mediaerror', message);
-		webshims.error('mediaelementError: '+ message);
-		setTimeout(function(){
-			if($(elem).data('mediaerror')){
-				$(elem).trigger('mediaerror');
-			}
-		}, 1);
+		
 	};
 	
 	var handleThird = (function(){
