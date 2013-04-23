@@ -643,7 +643,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			
 			
 			$(this.orig).jProp('list').find('option:not([disabled])').each(function(){
-				o.options[$.prop(this, 'value')] = $.prop(this, 'label');
+				o.options[$.prop(this, 'value')] = $.prop(this, 'label') || '';
 			});
 			
 			$.each(o.options, function(val, label){
@@ -655,7 +655,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 				}
 				
 				that.posCenter(
-					$('<span class="ws-range-ticks"'+ title +' style="'+(that.dirs.left)+': '+left+'%;" />').appendTo(trail)
+					$('<span class="ws-range-ticks"'+ title +' data-label="'+label+'" style="'+(that.dirs.left)+': '+left+'%;" />').appendTo(trail)
 				);
 			});
 		},
@@ -1820,6 +1820,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						localeChange = function(){
 							that.reorderInputs();
 						};
+						that.reorderInputs();
 					}
 					$(that.orig).onWSOff('wslocalechange', localeChange);
 				})();
@@ -3018,7 +3019,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				init = true;
 				$(data.orig).addClass('ws-important-hide');
 			};
-			data.element.onWSOff('updateshadowdom', updateStyles);
+			data.element.onWSOff('updateshadowdom', updateStyles, true);
 		};
 		
 		

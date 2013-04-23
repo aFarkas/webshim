@@ -858,6 +858,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						localeChange = function(){
 							that.reorderInputs();
 						};
+						that.reorderInputs();
 					}
 					$(that.orig).onWSOff('wslocalechange', localeChange);
 				})();
@@ -2056,7 +2057,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				init = true;
 				$(data.orig).addClass('ws-important-hide');
 			};
-			data.element.onWSOff('updateshadowdom', updateStyles);
+			data.element.onWSOff('updateshadowdom', updateStyles, true);
 		};
 		
 		

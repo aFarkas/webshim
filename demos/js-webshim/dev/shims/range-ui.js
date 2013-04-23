@@ -121,7 +121,7 @@
 			
 			
 			$(this.orig).jProp('list').find('option:not([disabled])').each(function(){
-				o.options[$.prop(this, 'value')] = $.prop(this, 'label');
+				o.options[$.prop(this, 'value')] = $.prop(this, 'label') || '';
 			});
 			
 			$.each(o.options, function(val, label){
@@ -133,7 +133,7 @@
 				}
 				
 				that.posCenter(
-					$('<span class="ws-range-ticks"'+ title +' style="'+(that.dirs.left)+': '+left+'%;" />').appendTo(trail)
+					$('<span class="ws-range-ticks"'+ title +' data-label="'+label+'" style="'+(that.dirs.left)+': '+left+'%;" />').appendTo(trail)
 				);
 			});
 		},

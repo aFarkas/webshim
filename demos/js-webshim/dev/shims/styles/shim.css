@@ -482,16 +482,20 @@ output {
   background: #b6e2fb;
 }
 .ws-range .ws-range-ticks {
+  overflow: hidden;
   position: absolute;
   bottom: 0px;
   left: 0;
   height: 4px;
   width: 1px;
   margin: 0 0 0 -1.5px;
+  font-size: 0;
+  line-height: 0;
+  text-indent: -999px;
   background: #ccc;
 }
 .ws-range.vertical-range {
-  background: url(vertical-range.png) -30px bottom no-repeat;
+  background: url(vertical-range.png) center bottom no-repeat;
   width: 20px;
 }
 .ws-range.vertical-range .ws-range-thumb {
@@ -515,7 +519,7 @@ output {
 .ws-range.vertical-range .ws-range-min {
   top: auto;
   bottom: 1px;
-  left: 11px;
+  left: 0;
   width: 1px;
   height: 0;
 }
