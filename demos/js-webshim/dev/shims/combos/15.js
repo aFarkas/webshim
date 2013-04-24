@@ -3651,7 +3651,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 		var message = getMessageFromObj(currentValidationMessage[name], elem);
 		
 		if(!message){
-			message = getMessageFromObj(validityMessages[''][name], elem) || 'invalid value';
+			message = getMessageFromObj(validityMessages[''][name], elem) || $.prop(elem, 'validationMessage');
 			webshims.info('could not find errormessage for: '+ name +' / '+ $.prop(elem, 'type') +'. in language: '+$.webshims.activeLang());
 		}
 		if(message){
