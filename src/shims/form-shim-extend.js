@@ -1,5 +1,5 @@
 if(!Modernizr.formvalidation || jQuery.webshims.bugs.bustedValidity){
-jQuery.webshims.register('form-shim-extend', function($, webshims, window, document){
+jQuery.webshims.register('form-shim-extend', function($, webshims, window, document, undefined, options){
 "use strict";
 webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
@@ -1242,13 +1242,17 @@ try {
 }
 
 (function(){
+	var bustedPlaceholder;
 	Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
-	if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder){return;}
+	if(Modernizr.input.placeholder && options.overridePlaceholder){
+		bustedPlaceholder = true;
+	}
+	if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder && !bustedPlaceholder){return;}
 	
 	var isOver = (webshims.cfg.forms.placeholderType == 'over');
 	var isResponsive = (webshims.cfg.forms.responsivePlaceholder);
 	var polyfillElements = ['textarea'];
-	if(!Modernizr.input.placeholder){
+	if(!Modernizr.input.placeholder || bustedPlaceholder){
 		polyfillElements.push('input');
 	}
 	
@@ -1511,11 +1515,20 @@ try {
 			attr: {
 				set: function(val){
 					var elem = this;
-					webshims.contentAttr(elem, 'placeholder', val);
+					if(bustedPlaceholder){
+						webshims.data(elem, 'bustedPlaceholder', val);
+						elem.placeholder = '';
+					} else {
+						webshims.contentAttr(elem, 'placeholder', val);
+					}
 					pHolder.update(elem, val);
 				},
 				get: function(){
-					return webshims.contentAttr(this, 'placeholder');
+					var placeholder;
+					if(bustedPlaceholder){
+						placeholder = webshims.data(this, 'bustedPlaceholder');
+					}
+					return  placeholder || webshims.contentAttr(this, 'placeholder');
 				}
 			},
 			reflect: true,
@@ -1532,7 +1545,9 @@ try {
 				set: function(val){
 					var elem = this;
 					var placeholder;
-					
+					if(bustedPlaceholder){
+						placeholder = webshims.data(elem, 'bustedPlaceholder');
+					}
 					if(!placeholder){
 						placeholder = webshims.contentAttr(elem, 'placeholder');
 					}

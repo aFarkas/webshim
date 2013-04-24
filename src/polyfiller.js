@@ -997,6 +997,7 @@
 				},
 				availabeLangs: ['ar', 'ch-ZN', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'nl', 'pt-PT', 'ru', 'sv'] //en and de are directly implemented in core
 	//			,customMessages: false,
+	//			overridePlaceholder: false, // might be good for IE10
 	//			overrideMessages: false,
 	//			replaceValidationUI: false
 			},
