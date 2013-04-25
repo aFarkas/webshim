@@ -15,7 +15,7 @@ Implemented Features:
 
 * HTML5 shiv and innerShiv solution including basic CSS-support
 * canvas
-* HTML5 form features including: constraint validation and form widgets (input[type="range"], input[type="date"], input[type="number"], output, input[list]/datalist)
+* HTML5 form features including: constraint validation and form widgets (input[type="range"], input[type="date"], input[type="number"], input[type="time"], input[type="month"], output, progress, input[list]/datalist)
 * HTML5 audio/video/track implementation
 * interactive elements: summary/details
 * JSON (stringify and parse)
@@ -78,6 +78,16 @@ If you have any questions, please feel free to ask them on the [Using jQuery Plu
 forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
+
+upcomming Release 1.10.4
+----------
+
+- override IE10's type="number" UI
+- improved styleability of input[type="range"]
+- improved loading of mediaelement/track support
+- improved performance for dynamic content (i.e.: updatePolyfill)
+- optional override of IE10's placeholder
+
 
 Release 1.10.3
 ----------
