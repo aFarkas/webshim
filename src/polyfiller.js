@@ -26,7 +26,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.4pre',
+		version: '1.10.4RC3',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -975,6 +975,8 @@
 			initialFormTest.run = true;
 			return false;
 		};
+		
+		document.createElement('datalist');
 		
 		addTest('styleableinputrange', function(){
 			return modernizrInputTypes.range && !window.opera;

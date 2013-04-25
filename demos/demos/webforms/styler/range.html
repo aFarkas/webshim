@@ -58,6 +58,7 @@
 				var css = '';
 				
 				var transformData = {
+					baseStyles: {'::-moz-range-track': {border: 'none', background: 'transparent'}},
 					baseProps: {
 						'.ws-range, input[type="range"]': {'-webkit-appearance': 'none', cursor: 'pointer', outline: 'none'},
 						'input[type="range"]::-webkit-slider-thumb': {'-webkit-appearance': 'none'}
@@ -93,6 +94,7 @@
 					};
 					var start = function(dataSels){
 						data = dataSels;
+						$.extend(data, transformData.baseStyles);
 						extendSels();
 						extendProps();
 					};
@@ -105,7 +107,6 @@
 					e = e.originalEvent;
 					var data;
 					if(e.source == window.parent){
-						
 						try {
 							data = JSON.parse(e.data);
 						} catch(er){}
@@ -128,7 +129,7 @@
 				types: 'range'
 			});
 			$.webshims.debug = 'noCombo';
-			$.webshims.polyfill('forms forms-ext dom-support');
+			$.webshims.polyfill('forms forms-ext');
 			$.webshims.loader.loadList(['range-ui']);
 		</script>
 		<script src="../../../demo-js/demo.js"></script>

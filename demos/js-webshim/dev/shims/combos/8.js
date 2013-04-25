@@ -2523,7 +2523,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 	var hasNative = Modernizr.audio && Modernizr.video;
 	var supportsLoop = false;
 	var bugs = webshims.bugs;
-	
+	var swfType = 'mediaelement-jaris';
 	var loadSwf = function(){
 		webshims.ready(swfType, function(){
 			if(!webshims.mediaelement.createSWF){
@@ -2533,7 +2533,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 		});
 	};
 	var options = webshims.cfg.mediaelement;
-	var swfType = 'mediaelement-jaris';
+	var hasFullTrackSupport;
 	var hasSwf;
 	if(!options){
 		webshims.error("mediaelement wasn't implemented but loaded");
@@ -2650,8 +2650,8 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 				}
 			}
 		})();
-		
 	}
+	hasFullTrackSupport = Modernizr.track && !bugs.track;
 
 webshims.register('mediaelement-core', function($, webshims, window, document, undefined){
 	hasSwf = swfmini.hasFlashPlayerVersion('9.0.115');
@@ -3140,7 +3140,10 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 					$('video, audio', context)
 						.add(insertedElement.filter('video, audio'))
 						.each(function(){
-							if(!mediaelement.canNativePlaySrces(this) || (!loadTrackUi.loaded && $('track', this).length)){
+							if((!hasFullTrackSupport || webshims.modules.track.options.override) && !loadTrackUi.loaded && $('track', this).length){
+								loadTrackUi();
+							}
+							if(!mediaelement.canNativePlaySrces(this)){
 								loadThird();
 								handleMedia = true;
 								return false;
@@ -3152,7 +3155,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		}
 	};
 	
-	if(Modernizr.track && !bugs.track){
+	if(hasFullTrackSupport){
 		webshims.defineProperty(TextTrack.prototype, 'shimActiveCues', {
 			get: function(){
 				return this._shimActiveCues || this.activeCues;

@@ -84,11 +84,14 @@
 							return data[type][value];
 						};
 						$('input, select', this).getNativeElement().each(function(){
+							var name = $.prop(this, 'name');
+							var value = $(this).val();
+							if(!name || $.prop(this, 'disabled') || value == 'disable'){return;}
 							if($(this).is(':invalid')){
 								isValid = false;
 								return false;
 							}
-							var name = $.prop(this, 'name');
+							
 							if(name){
 								var value = $(this).val();
 								$(this).closest('fieldset[data-type]').each(function(){

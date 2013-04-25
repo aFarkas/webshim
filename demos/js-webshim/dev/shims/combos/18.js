@@ -1593,6 +1593,9 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 					that.value(val, false, animate);
 					eventTimer.call('input', val);
 				}
+				if(e && e.type == 'mousemove'){
+					e.preventDefault();
+				}
 			};
 			
 			var remove = function(e){
@@ -1602,11 +1605,16 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 				}
 				that.element.removeClass('ws-active');
 				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
+				$(window).off('blur', removeWin);
+			};
+			var removeWin = function(e){
+				if(e.target == window){remove();}
 			};
 			var add = function(e){
 				var outerWidth;
 				e.preventDefault();
 				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
+				$(window).off('blur', removeWin);
 				if(!o.readonly && !o.disabled){
 					leftOffset = that.element.focus().addClass('ws-active').offset();
 					widgetUnits = that.element[that.dirs.innerWidth]();
@@ -1621,6 +1629,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 							mousemove: setValueFromPos
 						})
 					;
+					$(window).on('blur', removeWin);
 					e.stopPropagation();
 				}
 			};
@@ -1689,11 +1698,14 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 				mousedown: add
 			});
 			$(function(){
-				setTimeout(function(){
+				$.webshims.ready('dom-support', function(){
 					that.element.onWSOff('updateshadowdom', function(){
 						that.updateMetrics();
 					});
-				}, 9);
+				});
+				if(!$.fn.onWSOff){
+					$.webshims._polyfill(['dom-support']);
+				}
 			});
 		},
 		posCenter: function(elem, outerWidth){
