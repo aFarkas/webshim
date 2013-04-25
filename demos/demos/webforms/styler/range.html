@@ -20,11 +20,7 @@
 				width: 100%;
 				min-height: 400px;
 			}
-			/* todos */
-			::-moz-range-track {
-				border: none;
-				background: transparent;
-			}
+			
 		</style>
 		
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -58,14 +54,16 @@
 				var css = '';
 				
 				var transformData = {
-					baseStyles: {'::-moz-range-track': {border: 'none', background: 'transparent'}},
+					baseStyles: {'::-moz-range-track': {border: 'none', background: 'transparent'}, '::-ms-tooltip': {display: 'none'}, '::-ms-track': {color: 'transparent', background: 'transparent', border: 0}},
 					baseProps: {
-						'.ws-range, input[type="range"]': {'-webkit-appearance': 'none', cursor: 'pointer', outline: 'none'},
+						'.ws-range, input[type="range"]': {'-webkit-appearance': 'none', cursor: 'pointer', outline: 'none', padding: 0, margin: 0},
 						'input[type="range"]::-webkit-slider-thumb': {'-webkit-appearance': 'none'}
 					},
 					selector: {
 						'.ws-range, input[type="range"]': [],
-						'.ws-range .ws-range-thumb': ['input[type="range"]::-webkit-slider-thumb', 'input[type="range"]::-moz-range-thumb']
+						'.ws-range .ws-range-thumb': ['input[type="range"]::-webkit-slider-thumb', 'input[type="range"]::-moz-range-thumb', 'input[type="range"]::-ms-thumb'],
+						'.ws-range.ws-active .ws-range-thumb': ['input[type="range"]:active::-webkit-slider-thumb', 'input[type="range"]:active::-moz-range-thumb'],
+						'.ws-range .ws-range-min': ['::-moz-range-progress', '::-ms-fill-lower']
 					}
 				};
 				var transform = (function(){

@@ -1091,7 +1091,7 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 					if(!widgetUnits || !leftOffset){return;}
 					outerWidth = that.thumb[that.dirs.outerWidth]();
 					leftOffset = leftOffset[that.dirs.pos];
-					widgetUnits = 100 / (widgetUnits  - ((outerWidth || 2) / 2));
+					widgetUnits = 100 / widgetUnits;
 					setValueFromPos(e, o.animate);
 					$(document)
 						.on({

@@ -94,8 +94,14 @@
 							
 							if(name){
 								var value = $(this).val();
-								$(this).closest('fieldset[data-type]').each(function(){
+								if(value == '0'){
+									value = 0;
+								}
+								$(this).closest('[data-type]').each(function(){
 									var temp = buildData(this);
+									if(name in temp && !temp[name]){
+										return;
+									}
 									if(temp[name]){
 										buildData(this)[name] += value;
 									} else {
@@ -127,7 +133,7 @@
 				types: 'number range'
 			}
 		});
-		$.webshims.polyfill('forms forms-ext');
+		$.webshims.polyfill('forms forms-ext details');
 		</script>
 		<script src="../../../demo-js/demo.js" async=""></script>
 	</head>
@@ -136,62 +142,112 @@
 		<div class="styler">
 			<h2>Range styler</h2>
 			<div class="styler-controls">
-				<fieldset data-type="selector" data-value='.ws-range, input[type="range"]'>
+				<fieldset>
 					<legend>range</legend>
-					<div class="panel">
-						<label>width</label>
-						<span class="range-number">
-							<input type="number" />
-							<input type="range" min="100" max="400" value="300" required name="width" />
-						</span>
-						
-						<input type="hidden" name="width" value="px" />
-						
-						<label>height</label>
-						<span class="range-number">
-							<input type="number" />
-							<input type="range" min="1" max="30" value="10" required name="height" />
-						</span>
-						
-						<input type="hidden" name="height" value="px" />
-						<label>background</label>
-						<input type="color" value="#8a8a8a" name="background" />
-						
-					</div>
+					<details open="open" data-type="selector" data-value='.ws-range, input[type="range"]'>
+						<summary>default styles</summary>
+						<div class="panel">
+							<label>width</label>
+							<span class="range-number">
+								<input type="number" />
+								<input type="range" min="100" max="400" value="300" name="width" />
+							</span>
+							<input type="hidden" name="width" value="px" />
+							
+							<label>height</label>
+							<span class="range-number">
+								<input type="number" />
+								<input type="range" min="1" max="30" value="10" name="height" />
+							</span>
+							<input type="hidden" name="height" value="px" />
+							
+							
+							<label>border</label>
+							<span class="range-number">
+								<input type="number" />
+								<input type="range" min="0" max="10" value="0" name="border" />
+							</span>
+							<input type="hidden" name="border" value="px" />
+							<input type="hidden" name="border" value=" solid " />
+							<input type="color" value="#666666" name="border" />
+							
+							<label>border-radius</label>
+							<span class="range-number">
+								<input type="number" />
+								<input type="range" max="25" value="5" name="border-radius" />
+							</span>
+							<input type="hidden" name="border-radius" value="px" />
+							
+													
+							<label>background</label>
+							<input type="color" value="#8a8a8a" name="background" />
+							
+						</div>
+					</details>
 				</fieldset>
-				<fieldset data-type="selector" data-value=".ws-range .ws-range-thumb">
+				<fieldset>
 					<legend>range thumb</legend>
-					<div class="panel">
-						<label>width</label>
-						<span class="range-number">
-							<input type="number" />
-							<input type="range" min="1" max="40" value="20" required name="width" />
-						</span>
-						
-						<input type="hidden" name="width" value="px" />
-						
-						<label>height</label>
-						<span class="range-number">
-							<input type="number" />
-							<input type="range" min="1" max="40" value="20" required name="height" />
-						</span>
-						<input type="hidden" name="height" value="px" />
-						
-						<label>border-radius</label>
-						<span class="range-number">
-							<input type="number" />
-							<input type="range" max="50" value="50" required name="border-radius" />
-						</span>
-						<select name="border-radius">
-							<option>%</option>
-							<option>px</option>
-						</select>
-						<label>background</label>
-						<input type="color" value="#000000" required name="background" />
-					</div>
+					<details open="open" data-type="selector" data-value=".ws-range .ws-range-thumb">
+						<summary>default styles</summary>
+						<div class="panel">
+							<label>width</label>
+							<span class="range-number">
+								<input type="number" />
+								<input type="range" min="1" max="40" value="20" required name="width" />
+							</span>
+							
+							<input type="hidden" name="width" value="px" />
+							
+							<label>height</label>
+							<span class="range-number">
+								<input type="number" />
+								<input type="range" min="1" max="40" value="20" name="height" />
+							</span>
+							<input type="hidden" name="height" value="px" />
+							
+							<label>border</label>
+							<span class="range-number">
+								<input type="number" />
+								<input type="range" min="0" max="10" value="1" name="border" />
+							</span>
+							<input type="hidden" name="border" value="px" />
+							<input type="hidden" name="border" value=" solid " />
+							<input type="color" value="#666666" required name="border" />
+							
+							<label>border-radius</label>
+							<span class="range-number">
+								<input type="number" />
+								<input type="range" max="50" value="50" required name="border-radius" />
+							</span>
+							<select name="border-radius">
+								<option>%</option>
+								<option>px</option>
+							</select>
+							<label>background</label>
+							<input type="color" value="#efefef" required name="background" />
+						</div>
+					</details>
+					<details data-type="selector" data-value=".ws-range.ws-active .ws-range-thumb">
+						<summary>:active styles</summary>
+						<div class="panel">
+							<label>border</label>
+							<span class="disable-enable">
+								<input type="checkbox" checked="" />
+								<span class="range-number">
+									<input type="number" />
+									<input type="range" min="0" max="10" value="1" name="border" />
+								</span>
+								<input type="hidden" name="border" value="px" />
+								<input type="hidden" name="border" value=" solid " />
+								<input type="color" value="#333333" required name="border" />
+							</span>
+							<label>background</label>
+							<input type="color" value="#ffffff" required name="background" />
+						</div>
+					</details>
 				</fieldset>
 				<fieldset data-type="selector" data-value=".ws-range .ws-range-min">
-					<legend>range min (webshims only)</legend>
+					<legend>range min</legend>
 					<div class="panel">
 						<label>display</label>
 						<select name="display">
@@ -199,13 +255,9 @@
 							<option>block</option>
 						</select>
 						
-						<label>height</label>
-						<span class="range-number">
-							<input type="number" />
-							<input type="range" min="1" max="30" value="1" required name="height" />
-						</span>
 						
-						<input type="hidden" name="height" value="px" />
+						<input type="hidden" name="height" value="100%" />
+						
 						<label>background</label>
 						<input type="color" value="#333333" required name="background" />
 					</div>
