@@ -21,12 +21,16 @@
 	
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
 	
+	if(Modernizr.ES5 && !('toJSON' in Date.prototype)){
+		Modernizr.ES5 = false;
+	}
+	
 	if(!$.event.customEvent){
 		$.event.customEvent = {};
 	}
 	
 	var webshims = {
-		version: '1.10.4RC3',
+		version: '1.10.4RC4',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
