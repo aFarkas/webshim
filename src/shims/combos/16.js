@@ -3566,7 +3566,29 @@ try {
 	if(Modernizr.input.placeholder && options.overridePlaceholder){
 		bustedPlaceholder = true;
 	}
-	if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder && !bustedPlaceholder){return;}
+	if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder && !bustedPlaceholder){
+		(function(){
+			var ua = navigator.userAgent;
+			
+			if(ua.indexOf('Mobile') != -1 && ua.indexOf('Safari') != -1){
+				$(window).on('orientationchange', (function(){
+					var timer;
+					var retVal = function(i, value){
+						return value;
+					};
+					
+					var set = function(){
+						$('input[placeholder], textarea[placeholder]').attr('placeholder', retVal);
+					};
+					return function(e){
+						clearTimeout(timer);
+						timer = setTimeout(set, 9);
+					};
+				})());
+			}
+		})();
+		return;
+	}
 	
 	var isOver = (webshims.cfg.forms.placeholderType == 'over');
 	var isResponsive = (webshims.cfg.forms.responsivePlaceholder);

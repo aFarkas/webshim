@@ -87,6 +87,7 @@ upcomming Release 1.10.4
 - improved loading of mediaelement/track support
 - improved performance for dynamic content (i.e.: updatePolyfill)
 - optional override of IE10's placeholder
+- new fix for placeholder orientationchange bug on Safari iOS
 
 
 Release 1.10.3

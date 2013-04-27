@@ -30,7 +30,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.4RC4',
+		version: '1.10.4',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -969,6 +969,12 @@
 					return 'elements' in fieldset && 'disabled' in fieldset;
 				});
 				
+				if(modernizrInputTypes){
+					addTest('styleableinputrange', function(){
+						return modernizrInputTypes.range && !window.opera;
+					});
+				}
+				
 				if(Modernizr[formvalidation]){
 					bugs.bustedValidity = bustedValidity = Modernizr.formattribute === false || !Modernizr.fieldsetdisabled || !('value' in document.createElement('progress')) || !('value' in document.createElement('output')) || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
 				}
@@ -980,11 +986,10 @@
 			return false;
 		};
 		
+		if(modernizrInputAttrs && modernizrInputTypes){
+			initialFormTest();
+		}
 		document.createElement('datalist');
-		
-		addTest('styleableinputrange', function(){
-			return modernizrInputTypes.range && !window.opera;
-		});
 				
 		webshims.formcfg = [];
 		webshims.validationMessages = webshims.validityMessages = [];
@@ -1017,7 +1022,6 @@
 		addPolyfill('form-native-extend', {
 			f: 'forms',
 			test: function(toLoad){
-				initialFormTest();
 				return (!Modernizr[formvalidation] || bustedValidity) || ((modules['form-number-date-api'].test() || $.inArray('form-number-date-api', toLoad  || []) == -1) && !formOptions.overrideMessages );
 			},
 			d: ['form-core', DOMSUPPORT, 'form-message'],
@@ -1027,7 +1031,6 @@
 		addPolyfill('form-shim-extend', {
 			f: 'forms',
 			test: function(){
-				initialFormTest();
 				return Modernizr[formvalidation] && !bustedValidity;
 			},
 			d: ['form-core', DOMSUPPORT],
@@ -1037,7 +1040,6 @@
 		addPolyfill('form-message', {
 			f: 'forms',
 			test: function(toLoad){
-				initialFormTest();
 				return !( formOptions.customMessages || !Modernizr[formvalidation] || bugs.validationMessage || bustedValidity || !modules[formExtend].test(toLoad) );
 			},
 			d: [DOMSUPPORT],
