@@ -1437,7 +1437,10 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		if(loadTrackUi.loaded){return;}
 		loadTrackUi.loaded = true;
 		$(function(){
-			webshims.loader.loadList(['track-ui']);
+			webshims._polyfill(['track']);
+			webshims.ready('WINDOWLOAD', function(){
+				webshims.loader.loadList(['track-ui']);
+			});
 		});
 	};
 	var loadYt = (function(){
@@ -1870,6 +1873,5 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	} else {
 		webshims.ready(swfType, initMediaElements);
 	}
-	webshims.ready('WINDOWLOAD mediaelement', loadTrackUi);
 });
 })(jQuery, Modernizr, jQuery.webshims);

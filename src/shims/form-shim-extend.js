@@ -1230,7 +1230,7 @@ try {
 						prop = 'checked';
 					} else if(this.nodeName.toLowerCase() == 'option'){
 						prop = 'selected';
-					}  
+					}
 					if(prop){
 						$(this)[$.prop(this, prop) ? 'addClass' : 'removeClass']('prop-checked');
 					}
@@ -1268,6 +1268,8 @@ try {
 				})());
 			}
 		})();
+		
+		//abort
 		return;
 	}
 	

@@ -30,7 +30,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.4',
+		version: '1.10.5pre',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -670,7 +670,9 @@
 		
 		$(window).load(function(){
 			onReady();
-			isReady('WINDOWLOAD', true);
+			setTimeout(function(){
+				isReady('WINDOWLOAD', true);
+			}, 9);
 		});
 	})();
 	
