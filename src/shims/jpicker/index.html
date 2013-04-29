@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+		<meta charset="utf-8" />
+		<meta name="robots" content="noindex, nofollow" />
+		<link rel="Stylesheet" type="text/css" href="css/jPicker-1.1.6.css" />
+		<link rel="Stylesheet" type="text/css" href="jPicker.css" />
+		<title>color picker</title>
+		<script>
+			var jQuery;
+			try {
+				jQuery = window.parent.jQuery;
+			} catch(e){}
+			if(!jQuery){
+				document.write('<script src="jquery-1.4.4.min.js"><\/script>');
+			}
+		</script>
+		
+		<script src="jpicker-1.1.6.js"></script>
+	</head>
+	<body>
+		<div id="inline"></div>
+		<script>
+			jQuery.fn.jPicker.defaults.images.clientPath='images/';
+			jQuery('#inline').jPicker({window:{title:'Inline Example'}});
+		</script>
+	</body>
+</html>
