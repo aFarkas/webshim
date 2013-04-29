@@ -24,7 +24,7 @@
       function(bar, options)
       {
         var $this = this, // private properties, methods, and events - keep these variables and classes invisible to outside code
-          arrow = bar.find('img:first'), // the arrow image to drag
+          arrow = bar.find('img').eq(0), // the arrow image to drag
           minX = 0,
           maxX = 100,
           rangeX = 100,
@@ -91,6 +91,7 @@
               else if (locY > barH) locY = barH;
               val.call($this, 'xy', { x: ((locX / barW) * rangeX) + minX, y: ((locY / barH) * rangeY) + minY });
             },
+          drawTimeout,
           draw =
             function()
             {
@@ -100,7 +101,8 @@
                 barH = bar.h,
                 arrowW = arrow.w,
                 arrowH = arrow.h;
-              setTimeout(
+              clearTimeout(drawTimeout);
+              drawTimeout = setTimeout(
                 function()
                 {
                   if (rangeX > 0) // range is greater than zero
@@ -1511,7 +1513,7 @@
             radioClicked =
               function(e)
               {
-                $(this).parents('tbody:first').find('input:radio[value!="'+e.target.value+'"]').removeAttr('checked');
+                $(this).parents('tbody:first').find('input:radio[value!="'+e.target.value+'"]').prop('checked', false);
                 setColorMode.call($this, e.target.value);
               },
             currentClicked =
@@ -1765,7 +1767,7 @@
                     setImg.call($this, colorBarL4, images.clientPath + 'Bars.png');
                     setImg.call($this, colorBarL5, images.clientPath + 'bar-opacity.png');
                     setImg.call($this, colorBarL6, images.clientPath + 'AlphaBar.png');
-                    setImg.call($this, preview.find('div:first'), images.clientPath + 'preview-opacity.png');
+                    setImg.call($this, preview.find('div').eq(0), images.clientPath + 'preview-opacity.png');
                   }, 0);
                 tbody.find('td.Radio input').bind('click', radioClicked);
                 // initialize quick list
@@ -1983,7 +1985,7 @@
               new Color({ h: 330, s: 100, v: 100 }),
               new Color({ h: 330, s: 100, v: 75 }),
               new Color({ h: 330, s: 100, v: 50 }),
-              new Color()
+              new Color({ h: 180, s: 0, v: 0 })
             ]
         },
       images:
