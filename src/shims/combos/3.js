@@ -1596,10 +1596,12 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				var that = this;
 				var css = {};
 				this.lastElement = $(element).getShadowFocusElement();
-				if(opts.appendTo == 'element'){
-					this.element.insertAfter(element);
-				} else {
-					this.element.appendTo(opts.appendTo);
+				if(!this.prepared || !this.options.prepareFor){
+					if(opts.appendTo == 'element'){
+						this.element.insertAfter(element);
+					} else {
+						this.element.appendTo(opts.appendTo);
+					}
 				}
 				
 				this.element.attr({
@@ -1628,11 +1630,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					
 				}
 				
-				if(!this.prepared){
-					
-					if($.fn.bgIframe){
-						this.element.bgIframe();
-					}
+				if(!this.prepared && $.fn.bgIframe){
+					this.element.bgIframe();
 				}
 				this.prepared = true;
 			},

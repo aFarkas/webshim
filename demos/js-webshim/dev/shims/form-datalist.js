@@ -1,6 +1,23 @@
 jQuery.webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var doc = document;
+	
+	var noDatalistSupport = {
+		submit: 1,
+		button: 1,
+		reset: 1, 
+		hidden: 1,
+		
+		range: 1,
+		date: 1,
+		month: 1
+	};
+	if(webshims.modules["form-number-date-ui"].loaded){
+		$.extend(noDatalistSupport, {
+			number: 1,
+			time: 1
+		});
+	}
 
 	/*
 	 * implement propType "element" currently only used for list-attribute (will be moved to dom-extend, if needed)
@@ -202,22 +219,6 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		 * ShadowList
 		 */
 		var listidIndex = 0;
-		var noDatalistSupport = {
-			submit: 1,
-			button: 1,
-			reset: 1, 
-			hidden: 1,
-			
-			range: 1,
-			date: 1,
-			month: 1
-		};
-		if(webshims.modules["form-number-date-ui"].loaded){
-			$.extend(noDatalistSupport, {
-				number: 1,
-				time: 1
-			});
-		}
 
 		var globStoredOptions = {};
 		var getStoredOptions = function(name){

@@ -485,16 +485,12 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 	
 	
 	//'datetime-local'
-	['number', 'month', 'range', 'date', 'time'].forEach(function(type){
+	['number', 'month', 'range', 'date', 'time', 'color'].forEach(function(type){
 		if(typeBugs || !supportsType(type)){
 			webshims.addInputType(type, typeProtos[type]);
 		}
 	});
 	
-	if(!supportsType('color') && options.types && options.types.indexOf && options.types.indexOf('color') != -1){
-		webshims.addInputType('color', typeProtos.color);
-	}
-
 	if($('<input />').prop('labels') == null){
 		webshims.defineNodeNamesProperty('button, input, keygen, meter, output, progress, select, textarea', 'labels', {
 			prop: {

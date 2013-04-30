@@ -995,10 +995,12 @@ var swfmini = function() {
 				var that = this;
 				var css = {};
 				this.lastElement = $(element).getShadowFocusElement();
-				if(opts.appendTo == 'element'){
-					this.element.insertAfter(element);
-				} else {
-					this.element.appendTo(opts.appendTo);
+				if(!this.prepared || !this.options.prepareFor){
+					if(opts.appendTo == 'element'){
+						this.element.insertAfter(element);
+					} else {
+						this.element.appendTo(opts.appendTo);
+					}
 				}
 				
 				this.element.attr({
@@ -1027,11 +1029,8 @@ var swfmini = function() {
 					
 				}
 				
-				if(!this.prepared){
-					
-					if($.fn.bgIframe){
-						this.element.bgIframe();
-					}
+				if(!this.prepared && $.fn.bgIframe){
+					this.element.bgIframe();
 				}
 				this.prepared = true;
 			},

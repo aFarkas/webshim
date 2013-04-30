@@ -1596,10 +1596,12 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				var that = this;
 				var css = {};
 				this.lastElement = $(element).getShadowFocusElement();
-				if(opts.appendTo == 'element'){
-					this.element.insertAfter(element);
-				} else {
-					this.element.appendTo(opts.appendTo);
+				if(!this.prepared || !this.options.prepareFor){
+					if(opts.appendTo == 'element'){
+						this.element.insertAfter(element);
+					} else {
+						this.element.appendTo(opts.appendTo);
+					}
 				}
 				
 				this.element.attr({
@@ -1628,11 +1630,8 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					
 				}
 				
-				if(!this.prepared){
-					
-					if($.fn.bgIframe){
-						this.element.bgIframe();
-					}
+				if(!this.prepared && $.fn.bgIframe){
+					this.element.bgIframe();
 				}
 				this.prepared = true;
 			},
@@ -1867,7 +1866,8 @@ var isPlaceholderOptionSelected = function(select){
 	} 
 	return false;
 };
-
+var modules = webshims.modules;
+var getGroupElements = modules["form-core"].getGroupElements;
 var validityRules = {
 		valueMissing: function(input, val, cache){
 			if(!input.prop('required')){return false;}
@@ -1878,7 +1878,7 @@ var validityRules = {
 			if(cache.nodeName == 'select'){
 				ret = (!val && (input[0].selectedIndex < 0 || isPlaceholderOptionSelected(input[0]) ));
 			} else if(checkTypes[cache.type]){
-				ret = (cache.type == 'checkbox') ? !input.is(':checked') : !webshims.modules["form-core"].getGroupElements(input).filter(':checked')[0];
+				ret = (cache.type == 'checkbox') ? !input.is(':checked') : !getGroupElements(input).filter(':checked')[0];
 			} else {
 				ret = !(val);
 			}
@@ -3023,7 +3023,7 @@ try {
 		webshims.onNodeNamesPropertyModify('input', 'checked', function(value, boolVal){
 			var type = this.type;
 			if(type == 'radio' && boolVal){
-				webshims.modules["form-core"].getGroupElements(this).each(checkChange);
+				getGroupElements(this).each(checkChange);
 			} else if(checkInputs[type]) {
 				$(this).each(checkChange);
 			}
@@ -3033,7 +3033,7 @@ try {
 			
 			if(checkInputs[e.target.type]){
 				if(e.target.type == 'radio'){
-					webshims.modules["form-core"].getGroupElements(e.target).each(checkChange);
+					getGroupElements(e.target).each(checkChange);
 				} else {
 					$(e.target)[$.prop(e.target, 'checked') ? 'addClass' : 'removeClass']('prop-checked');
 				}
@@ -3051,7 +3051,7 @@ try {
 						prop = 'checked';
 					} else if(this.nodeName.toLowerCase() == 'option'){
 						prop = 'selected';
-					}  
+					}
 					if(prop){
 						$(this)[$.prop(this, prop) ? 'addClass' : 'removeClass']('prop-checked');
 					}
@@ -3089,6 +3089,8 @@ try {
 				})());
 			}
 		})();
+		
+		//abort
 		return;
 	}
 	
@@ -3232,7 +3234,7 @@ try {
 				}
 			;
 			
-			if(webshims.modules["form-number-date-ui"].loaded){
+			if(modules["form-number-date-ui"].loaded){
 				delete allowedPlaceholder.number;
 			}
 			
@@ -3764,6 +3766,23 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 jQuery.webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var doc = document;
+	
+	var noDatalistSupport = {
+		submit: 1,
+		button: 1,
+		reset: 1, 
+		hidden: 1,
+		
+		range: 1,
+		date: 1,
+		month: 1
+	};
+	if(webshims.modules["form-number-date-ui"].loaded){
+		$.extend(noDatalistSupport, {
+			number: 1,
+			time: 1
+		});
+	}
 
 	/*
 	 * implement propType "element" currently only used for list-attribute (will be moved to dom-extend, if needed)
@@ -3965,22 +3984,6 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 		 * ShadowList
 		 */
 		var listidIndex = 0;
-		var noDatalistSupport = {
-			submit: 1,
-			button: 1,
-			reset: 1, 
-			hidden: 1,
-			
-			range: 1,
-			date: 1,
-			month: 1
-		};
-		if(webshims.modules["form-number-date-ui"].loaded){
-			$.extend(noDatalistSupport, {
-				number: 1,
-				time: 1
-			});
-		}
 
 		var globStoredOptions = {};
 		var getStoredOptions = function(name){

@@ -153,7 +153,6 @@ mark {
 .ws-range *,
 .placeholder-box,
 .placeholder-text,
-.input-datetime-local,
 .input-buttons,
 .input-buttons *,
 .details-open-indicator,
@@ -304,11 +303,18 @@ output {
 	background: url(forms.png) no-repeat -322px -2px;
 }
 
+input[type="color"] {
+	width: 5.5em;
+}
+
 .input-buttons {
 	.polyfill-important & {
 		display: inline-block !important;
 		padding: 0 !important;
 		vertical-align: middle !important;
+	}
+	&.color-input-buttons {
+		margin-left: 2px;
 	}
 	&.input-button-size-1 {
 		&.month-input-buttons,
@@ -647,7 +653,7 @@ output {
 			color: #888;
 		}
 	}
-
+	
 	&.ws-po-visible {
 		visibility: visible;
 	}
@@ -753,6 +759,10 @@ $button-bgcolor: #f5f5f5;
 	
 	&.ws-size-3 {
 		width: 796px;
+	}
+	
+	&.color-popover {
+		width: 590px;
 	}
 	
 	abbr[title] {

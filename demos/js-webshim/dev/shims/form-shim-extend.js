@@ -46,7 +46,8 @@ var isPlaceholderOptionSelected = function(select){
 	} 
 	return false;
 };
-
+var modules = webshims.modules;
+var getGroupElements = modules["form-core"].getGroupElements;
 var validityRules = {
 		valueMissing: function(input, val, cache){
 			if(!input.prop('required')){return false;}
@@ -57,7 +58,7 @@ var validityRules = {
 			if(cache.nodeName == 'select'){
 				ret = (!val && (input[0].selectedIndex < 0 || isPlaceholderOptionSelected(input[0]) ));
 			} else if(checkTypes[cache.type]){
-				ret = (cache.type == 'checkbox') ? !input.is(':checked') : !webshims.modules["form-core"].getGroupElements(input).filter(':checked')[0];
+				ret = (cache.type == 'checkbox') ? !input.is(':checked') : !getGroupElements(input).filter(':checked')[0];
 			} else {
 				ret = !(val);
 			}
@@ -1202,7 +1203,7 @@ try {
 		webshims.onNodeNamesPropertyModify('input', 'checked', function(value, boolVal){
 			var type = this.type;
 			if(type == 'radio' && boolVal){
-				webshims.modules["form-core"].getGroupElements(this).each(checkChange);
+				getGroupElements(this).each(checkChange);
 			} else if(checkInputs[type]) {
 				$(this).each(checkChange);
 			}
@@ -1212,7 +1213,7 @@ try {
 			
 			if(checkInputs[e.target.type]){
 				if(e.target.type == 'radio'){
-					webshims.modules["form-core"].getGroupElements(e.target).each(checkChange);
+					getGroupElements(e.target).each(checkChange);
 				} else {
 					$(e.target)[$.prop(e.target, 'checked') ? 'addClass' : 'removeClass']('prop-checked');
 				}
@@ -1230,7 +1231,7 @@ try {
 						prop = 'checked';
 					} else if(this.nodeName.toLowerCase() == 'option'){
 						prop = 'selected';
-					}  
+					}
 					if(prop){
 						$(this)[$.prop(this, prop) ? 'addClass' : 'removeClass']('prop-checked');
 					}
@@ -1268,6 +1269,8 @@ try {
 				})());
 			}
 		})();
+		
+		//abort
 		return;
 	}
 	
@@ -1411,7 +1414,7 @@ try {
 				}
 			;
 			
-			if(webshims.modules["form-number-date-ui"].loaded){
+			if(modules["form-number-date-ui"].loaded){
 				delete allowedPlaceholder.number;
 			}
 			

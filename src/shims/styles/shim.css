@@ -143,7 +143,6 @@ mark {
 .ws-range *,
 .placeholder-box,
 .placeholder-text,
-.input-datetime-local,
 .input-buttons,
 .input-buttons *,
 .details-open-indicator,
@@ -288,10 +287,17 @@ output {
   background: url(forms.png) no-repeat -322px -2px;
 }
 
+input[type="color"] {
+  width: 5.5em;
+}
+
 .polyfill-important .input-buttons {
   display: inline-block !important;
   padding: 0 !important;
   vertical-align: middle !important;
+}
+.input-buttons.color-input-buttons {
+  margin-left: 2px;
 }
 .input-buttons.input-button-size-1.month-input-buttons, .input-buttons.input-button-size-1.date-input-buttons {
   margin-left: -24px;
@@ -669,6 +675,9 @@ html .ws-po-arrow .ws-po-arrowbox {
 }
 .input-picker.ws-size-3 {
   width: 796px;
+}
+.input-picker.color-popover {
+  width: 590px;
 }
 .input-picker abbr[title] {
   cursor: help;
