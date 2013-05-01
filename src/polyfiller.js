@@ -1117,6 +1117,11 @@
 	})();
 	//>
 	
+	addPolyfill('filereader', {
+		test: 'FileReader' in window,
+		d: ['swfmini', 'dom-support']
+	});
+	
 	//<details
 	if(!('details' in Modernizr)){
 		addTest('details', function(){
