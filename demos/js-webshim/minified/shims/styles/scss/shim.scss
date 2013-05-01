@@ -297,14 +297,25 @@ output {
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	width: 13px;
-	height: 13px;
-	margin: -6.5px 0 0 -6.5px;
-	background: url(forms.png) no-repeat -322px -2px;
+	width: 16px;
+	height: 16px;
+	margin: -8px 0 0 -8px;
+	background: url(forms.png) no-repeat -321px 0;
+	
+	.ws-color-indicator-bg {
+		background: url(../jpicker/images/preview-opacity.png) no-repeat 0;
+	}
+	.ws-color-indicator {
+		background: none;
+	}
+}
+
+.color-input-buttons .ws-popover-opener span {
+	background-position: -348px 0;
 }
 
 input[type="color"] {
-	width: 5.5em;
+	width: 6.5em;
 }
 
 .input-buttons {
@@ -626,6 +637,11 @@ input[type="color"] {
 	z-index: 1000;
 	min-width: 90px;
 	transition: visibility 400ms ease-in-out;
+	
+	.no-csstransitions &,
+	.no-opacity & {
+		display: none;
+	}
 
 	button {
 		display: inline-block;
@@ -656,6 +672,7 @@ input[type="color"] {
 	
 	&.ws-po-visible {
 		visibility: visible;
+		display: block;
 	}
 }
 

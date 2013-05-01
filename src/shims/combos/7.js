@@ -1120,6 +1120,12 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					shadowFocusElementData = $.data(opts.shadowFocusElement, dataID) || $.data(opts.shadowFocusElement, dataID, shadowFocusElementData);
 				}
 				
+				$(nativeElem).on('remove', function(e){
+					if (!e.originalEvent) {
+						$(shadowElem).remove();
+					}
+				});
+				
 				nativeData.hasShadow = shadowElem;
 				shadowFocusElementData.nativeElement = shadowData.nativeElement = nativeElem;
 				shadowFocusElementData.shadowData = shadowData.shadowData = nativeData.shadowData = {
@@ -2699,7 +2705,9 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 							var val = webshims.contentAttr(this, 'list');
 							if(val != null){
 								$.data(this, 'datalistListAttr', val);
-								this.removeAttribute('list');
+								if(!noDatalistSupport[$.prop(this, 'type')] && !noDatalistSupport[$.attr(this, 'type')]){
+									this.removeAttribute('list');
+								}
 							} else {
 								val = $.data(this, 'datalistListAttr');
 							}
@@ -2709,7 +2717,15 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 						set: function(value){
 							var elem = this;
 							$.data(elem, 'datalistListAttr', value);
-							webshims.objectCreate(shadowListProto, undefined, {input: elem, id: value, datalist: $.prop(elem, 'list')});
+							if (!noDatalistSupport[$.prop(this, 'type')] && !noDatalistSupport[$.attr(this, 'type')]) {
+								webshims.objectCreate(shadowListProto, undefined, {
+									input: elem,
+									id: value,
+									datalist: $.prop(elem, 'list')
+								});
+							} else {
+								elem.setAttribute('list', value);
+							}
 							$(elem).triggerHandler('listdatalistchange');
 						}
 					},

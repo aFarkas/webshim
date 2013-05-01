@@ -24,8 +24,8 @@
 		</style>
 		
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<script src="../../../../src/extras/modernizr-custom.js"></script>
-		<script src="../../../../src/polyfiller.js"></script>
+		<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
+		<script src="../../../js-webshim/minified/polyfiller.js"></script>
 		<script>
 			
 			(function($){
@@ -126,7 +126,6 @@
 				replaceUI: !Modernizr.styleableinputrange,
 				types: 'range'
 			});
-			$.webshims.debug = 'noCombo';
 			$.webshims.polyfill('forms forms-ext');
 			$.webshims.loader.loadList(['range-ui']);
 		</script>

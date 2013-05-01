@@ -622,6 +622,12 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					shadowFocusElementData = $.data(opts.shadowFocusElement, dataID) || $.data(opts.shadowFocusElement, dataID, shadowFocusElementData);
 				}
 				
+				$(nativeElem).on('remove', function(e){
+					if (!e.originalEvent) {
+						$(shadowElem).remove();
+					}
+				});
+				
 				nativeData.hasShadow = shadowElem;
 				shadowFocusElementData.nativeElement = shadowData.nativeElement = nativeElem;
 				shadowFocusElementData.shadowData = shadowData.shadowData = nativeData.shadowData = {
@@ -2615,8 +2621,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 			if(options.disabled){
 				opener.prop({disabled: true});
 			}
+			
 			opener
-				
 				.on({
 					mousedown: function(){
 						stopPropagation.apply(this, arguments);
@@ -2661,13 +2667,50 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				});
 			})();
 			data.popover = popover;
+			data.opener = opener;
+			$(data.orig).on('remove', function(e){
+				if(!e.originalEvent){
+					opener.remove();
+					popover.element.remove();
+				}
+			});
+			
 			loadPicker.WINDOWLOAD(data.type);
 		};
 		
 		picker.month = picker._common;
 		picker.date = picker._common;
-		picker.color = function(){
-			return picker._common.apply(this, arguments);
+		picker.color = function(data){
+			var ret = picker._common.apply(this, arguments);
+			var alpha = $(data.orig).data('alphacontrol');
+			var colorIndicator = data.opener
+				.prepend('<span class="ws-color-indicator-bg"><span class="ws-color-indicator" /></span>')
+				.find('.ws-color-indicator')
+			;
+			var showColor = function(){
+				colorIndicator.css({backgroundColor: $.prop(this, 'value') || '#000'})
+			};
+			var showOpacity = (function(){
+				var timer;
+				var show = function(){
+					try {
+						var value = data.alpha.prop('valueAsNumber') / (data.alpha.prop('max') || 1);
+						if(!isNaN(value)){
+							colorIndicator.css({opacity: value});
+						}
+					} catch(er){}
+					
+				};
+				return function(e){
+					clearTimeout(timer);
+					timer = setTimeout(show, !e || e.type == 'change' ? 4: 40);
+				};
+			})();
+			data.alpha = (alpha) ? $('#'+alpha) : $([]);
+			
+			$(data.orig).on('wsupdatevalue change', showColor).each(showColor);
+			data.alpha.on('wsupdatevalue change input', showOpacity).each(showOpacity);
+			return ret;
 		};
 		
 		webshims.picker = picker;
@@ -3140,7 +3183,9 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 							var val = webshims.contentAttr(this, 'list');
 							if(val != null){
 								$.data(this, 'datalistListAttr', val);
-								this.removeAttribute('list');
+								if(!noDatalistSupport[$.prop(this, 'type')] && !noDatalistSupport[$.attr(this, 'type')]){
+									this.removeAttribute('list');
+								}
 							} else {
 								val = $.data(this, 'datalistListAttr');
 							}
@@ -3150,7 +3195,15 @@ jQuery.webshims.register('form-datalist', function($, webshims, window, document
 						set: function(value){
 							var elem = this;
 							$.data(elem, 'datalistListAttr', value);
-							webshims.objectCreate(shadowListProto, undefined, {input: elem, id: value, datalist: $.prop(elem, 'list')});
+							if (!noDatalistSupport[$.prop(this, 'type')] && !noDatalistSupport[$.attr(this, 'type')]) {
+								webshims.objectCreate(shadowListProto, undefined, {
+									input: elem,
+									id: value,
+									datalist: $.prop(elem, 'list')
+								});
+							} else {
+								elem.setAttribute('list', value);
+							}
 							$(elem).triggerHandler('listdatalistchange');
 						}
 					},

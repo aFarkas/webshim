@@ -13,6 +13,9 @@
  * Color Picker page:   (http://johndyer.name/post/2007/09/PhotoShop-like-JavaScript-Color-Picker.aspx)
  *
  */ (function ($, version) {
+ 	if(!window.Modernizr || !('opacity' in Modernizr) || !('csstransitions' in Modernizr)){
+		$('html').addClass(('opacity' in document.documentElement.style) ? 'opacity' : 'no-opacity');
+	}
 	Math.precision = function (value, precision) {
 		if (precision === undefined) precision = 0;
 		return Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision);
@@ -22,7 +25,11 @@
 		if (elem.nodeType) {
 			ex = $.data(elem, 'wsjPicker') || $.data(elem, 'wsjPicker', {});
 		}
-		$.extend(true, ex, data);
+		if(deep){
+			$.extend(true, ex, data);
+		} else {
+			$.extend(ex, data);
+		}
 	};
 	var Slider = // encapsulate slider functionality for the ColorMap and ColorBar - could be useful to use a jQuery UI draggable for this with certain extensions
 
@@ -290,6 +297,7 @@
 				arrow = null;
 				changeEvents = null;
 			};
+		
 		$.extend(true, $this, // public properties, methods, and event bindings - these we need to access from other controls
 		{
 			val: val,
@@ -1028,9 +1036,6 @@
 				okButton = null,
 				cancelButton = null,
 				grid = null, // preset colors grid
-				iconColor = null, // iconColor for popup icon
-				iconAlpha = null, // iconAlpha for popup icon
-				iconImage = null, // iconImage popup icon
 				moveBar = null, // drag bar
 				setColorMode = // set color mode and update visuals for the new color mode
 
@@ -1576,7 +1581,7 @@
 					color.current.val('ahex', color.active.val('ahex'));
 				},
 				radioClicked = function (e) {
-					$(this).parents('tbody:first').find('input:radio[value!="' + e.target.value + '"]').prop('checked', false);
+					container.find('input[type="radio"][value!="' + e.target.value + '"]').prop('checked', false);
 					setColorMode.call($this, e.target.value);
 				},
 				currentClicked = function () {
@@ -1590,23 +1595,12 @@
 					commitColor.call($this);
 					$.isFunction(commitCallback) && commitCallback.call($this, color.active, okButton);
 				},
-				iconImageClicked = function () {
-					show.call($this);
-				},
 				currentColorChanged = function (ui, context) {
 					var hex = ui.val('hex');
 					currentPreview.css({
 						backgroundColor: hex && '#' + hex || 'transparent'
 					});
 					setAlpha.call($this, currentPreview, Math.precision(((ui.val('a') || 0) * 100) / 255, 4));
-				},
-				expandableColorChanged = function (ui, context) {
-					var hex = ui.val('hex');
-					var va = ui.val('va');
-					iconColor.css({
-						backgroundColor: hex && '#' + hex || 'transparent'
-					});
-					setAlpha.call($this, iconAlpha, Math.precision(((255 - (va && va.a || 0)) * 100) / 255, 4));
 				},
 				moveBarMouseDown = function (e) {
 					elementStartX = parseInt(container.css('left'), 10) || 0;
@@ -1623,19 +1617,16 @@
 						top: elementStartY - (pageStartY - e.pageY) + 'px'
 					});
 					
-					e.stopPropagation();
-					e.preventDefault();
+					
 					return false;
 				},
 				documentMouseUp = function (e) {
 					$(document).unbind('mousemove', documentMouseMove).unbind('mouseup', documentMouseUp);
-					e.stopPropagation();
-					e.preventDefault();
+					
 					return false;
 				},
 				quickPickClicked = function (e) {
-					e.preventDefault();
-					e.stopPropagation();
+					
 					color.active.val('ahex', $(this).attr('title') || null, e.target);
 					return false;
 				},
@@ -1812,12 +1803,16 @@
 					}),
 					quickList: settings.color.quickList
 				};
-			elemExtend(true, $this, // public properties, methods, and callbacks
+			elemExtend(false, $this, // public properties, methods, and callbacks
 			{
 				commitCallback: commitCallback, // commitCallback function can be overridden to return the selected color to a method you specify when the user clicks "OK"
 				liveCallback: liveCallback, // liveCallback function can be overridden to return the selected color to a method you specify in live mode (continuous update)
 				cancelCallback: cancelCallback, // cancelCallback function can be overridden to a method you specify when the user clicks "Cancel"
 				color: color,
+				setColorMode: function(val){
+					$('input[type="radio"][value="'+val+'"]', container).prop('checked', true).triggerHandler('click');
+				},
+				settings: settings,
 				show: show,
 				hide: hide,
 				destroy: destroy // destroys this control entirely, removing all events and objects, and removing itself from the List
@@ -1830,12 +1825,6 @@
 	};
 	$.fn.wsjPicker.defaults = /* jPicker defaults - you can change anything in this section (such as the clientPath to your images) without fear of breaking the program */ {
 		window: {
-			title: null,
-			/* any title for the jPicker window itself - displays "Drag Markers To Pick A Color" if left null */
-			
-			
-			expandable: false,
-			/* default to large static picker - set to true to make an expandable picker (small icon with popup) - set automatically when binded to input element */
 			liveUpdate: true,
 			/* set false if you want the user to have to click "OK" before the binded input box updates values (always "true" for expandable picker) */
 			alphaSupport: false,
@@ -1846,9 +1835,7 @@
 		color: {
 			mode: 'h',
 			/* acceptabled values "h" (hue), "s" (saturation), "v" (value), "r" (red), "g" (green), "b" (blue), "a" (alpha) */
-			active: new Color({
-				ahex: '#ffcc00ff'
-			}),
+			active: new Color({ahex: '#000000ff'}),
 			/* acceptable values are any declared $.jPicker.Color object or string HEX value (e.g. #ffc000) WITH OR WITHOUT the "#" prefix */
 			quickList: /* the quick pick color list */ [
 				new Color({
@@ -2235,12 +2222,6 @@
 					width: 20,
 					height: 7
 				}
-			},
-			picker: {
-				file: 'picker.gif',
-				/* Color Picker icon */
-				width: 25,
-				height: 24
 			}
 		},
 		localization: /* alter these to change the text presented by the picker (e.g. different language) */ {
@@ -3086,68 +3067,82 @@ jQuery.webshims.register('forms-picker', function($, webshims, window, document,
 	
 	picker.color.showPickerContent = (function(){
 		var _init, curData;
-		var jpicker = $('<div class="ws-jpicker" />'); 
+		var jpicker = $('<div class="ws-jpicker" />');
+		$.fn.wsjPicker.defaults.images.clientPath = webshims.cfg.basePath + 'jpicker/images/'; 
 		var jPickerApi;
+		
 		var fns = {
-			setPicker: function(type, data){
-				if(!type){
-					type = 'active';
+			setPicker: function(data){
+				
+				
+				var mode = $(data.orig).data('colormode') || 'h';
+				if(!data.alpha.length){
+					jpicker.addClass('no-alpha-picker');
+					if(mode == 'a'){
+						mode = 'h';
+					}
+				} else {
+					jpicker.removeClass('no-alpha-picker');
 				}
-				var value = data.parseValue().replace(/^#/, '');
 				
-				value += (data.alpha.length) ?
-					$.wsjPicker.ColorMethods.intToHex( (data.alpha.prop('value') || 1) * (255 / (data.alpha.prop('max') || 1)) ) :
-					'ff'
-				;
+				if(mode != jPickerApi.settings.color.mode){
+					jPickerApi.setColorMode(mode);
+				}
 				
-				jPickerApi.color[type].val('ahex', value);
 			},
-			setInputColor: function(color, data){
-				var colorData = color.val();
+			setInputColor: function(data){
+				var oldAlpha;
+				var colorData = jPickerApi.color.active.val();
 				var value = '#'+colorData.hex;
 				if(data.alpha.length){
+					oldAlpha = data.alpha.prop('value');
 					data.alpha.prop('value', colorData.a / (255 / (data.alpha.prop('max') || 1)));
 				}
+				$(data.orig).data('colormode', jPickerApi.settings.color.mode);
 				actions.changeInput(value, data.popover, data);
-				return color.val();
+				if(data.alpha.length && oldAlpha != data.alpha.prop('value')){
+					data.alpha.trigger('input').trigger('change');
+				}
+				return value;
 			}
 		};
-		var pickerSet = function(fn, value, data){
+		var pickerSet = function(fn, data, value){
 			if(data == curData && fns[fn]){
-				fns[fn](value, data);
+				fns[fn](data);
 			}
 		};
 		var createPicker =  function(data){
-			var popover = data.popover;
 			
+			jPickerApi = jpicker.data('wsjPicker');
+			
+			if(!jPickerApi){
+				jpicker.empty().wsjPicker(
+					{},
+					function(color){
+						if(curData){
+							pickerSet('setInputColor', curData);
+						}
+					},
+					false,
+					function(color){
+						if(curData){
+							actions.cancel('#' + color.val().hex, curData.popover, curData);
+						}
+					}
+				);
+				jPickerApi = jpicker.data('wsjPicker');
+			}
+		};
+		
+		var implementPickerFor = function(data){
+			createPicker();
 			if( data != curData){
 				if(curData){
 					curData.popover.hide();
 				}
 				curData = data;
 				data.popover.contentElement.html(jpicker);
-				if(_init){
-					pickerSet('setPicker', 'current', data);
-				}
-			}
-			if(!_init){
-				$.fn.wsjPicker.defaults.images.clientPath = webshims.cfg.basePath + 'jpicker/images/';
-				jpicker.wsjPicker(
-					{
-						window:{
-							title:''
-						}
-					},
-					function(color){
-						pickerSet('setInputColor', color, curData);
-					},
-					false,
-					function(color){
-						actions.cancel('#'+color.val().hex, curData.popover, curData);
-					}
-				);
-				jPickerApi = jpicker.data('wsjPicker');
-				_init = true;
+				pickerSet('setPicker', data);
 			}
 		};
 		
@@ -3157,23 +3152,21 @@ jQuery.webshims.register('forms-picker', function($, webshims, window, document,
 				picker.commonColorInit(data);
 			}
 			
-			var alpha = $(data.orig).data('alphacontrol');
-			data.alpha = (alpha) ? $('#'+alpha) : $([]);
-			createPicker(data);
-			if(!data.alpha.length){
-				$('input.alpha-radio:checked', jpicker).each(function(){
-					$('input.hue-radio', jpicker).trigger('click');
-				});
-				jpicker.addClass('no-alpha-picker');
-			} else {
-				jpicker.removeClass('no-alpha-picker');
-			}
-			pickerSet('setPicker', '', data);
+			var value = data.parseValue();
+			implementPickerFor(data);
+			
+			value += (data.alpha.length) ?
+				$.wsjPicker.ColorMethods.intToHex( (data.alpha.prop('value') || 1) * (255 / (data.alpha.prop('max') || 1)) ) :
+				'ff'
+			;
+			jPickerApi.color.active.val('ahex', value);
+			jPickerApi.color.current.val('ahex', value);
+			
 			data._popoverinit = true;
 		};
 	})();
 	
-	picker.commonDateInit = function(date, popover){
+	picker.commonDateInit = function(data, popover){
 		var actionfn = function(e){
 			if(!$(this).is('.othermonth') || $(this).css('cursor') == 'pointer'){
 				popover.actionFn({
@@ -3357,7 +3350,6 @@ jQuery.webshims.register('forms-picker', function($, webshims, window, document,
 		$(data.orig).on('remove', function(e){
 			if(!e.originalEvent){
 				$(document).off('wslocalechange', data._propertyChange);
-				popover.element.remove();
 			}
 		});
 	};

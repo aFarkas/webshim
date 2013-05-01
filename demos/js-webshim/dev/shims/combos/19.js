@@ -1923,6 +1923,12 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 					shadowFocusElementData = $.data(opts.shadowFocusElement, dataID) || $.data(opts.shadowFocusElement, dataID, shadowFocusElementData);
 				}
 				
+				$(nativeElem).on('remove', function(e){
+					if (!e.originalEvent) {
+						$(shadowElem).remove();
+					}
+				});
+				
 				nativeData.hasShadow = shadowElem;
 				shadowFocusElementData.nativeElement = shadowData.nativeElement = nativeElem;
 				shadowFocusElementData.shadowData = shadowData.shadowData = nativeData.shadowData = {
