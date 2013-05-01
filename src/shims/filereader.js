@@ -124,10 +124,12 @@ jQuery.webshims.register('filereader', function( $, webshims ){
 							outline: 0
 						})
 						.attr('tabindex', 0);
+						
+					self.ready = e.success && typeof e.ref.add === "function";
+					
 					if (self.ready) {
 						readyCallbacks.fire();
 					}
-					self.ready = e.success && typeof e.ref.add === "function";
 				});
 			}
 		},
