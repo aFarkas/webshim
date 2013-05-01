@@ -15,16 +15,18 @@ jQuery.webshims.register('filereader', function( $, webshims ){
 	* JQuery Plugin
 	*/
 	$.fn.fileReader = function( options ) {  
-		options = $.extend($.fn.fileReader.defaults, options);
-		
-		var self = this;
-		readyCallbacks.add(function() {
-			return main(self, options);
-		});
-		if ($.isFunction(options.callback)) readyCallbacks.add(options.callback);
-		
-		if (!FileAPIProxy.ready) {
-			FileAPIProxy.init(options);
+		if(this.length){
+			options = $.extend($.fn.fileReader.defaults, options);
+			
+			var self = this;
+			readyCallbacks.add(function() {
+				return main(self, options);
+			});
+			if ($.isFunction(options.callback)) readyCallbacks.add(options.callback);
+			
+			if (!FileAPIProxy.ready) {
+				FileAPIProxy.init(options);
+			}
 		}
 		return this;
 	};
@@ -90,40 +92,44 @@ jQuery.webshims.register('filereader', function( $, webshims ){
 	*/
 	window.FileAPIProxy = {
 		ready: false,
+		_inititalized: false,
 		init: function(o) {
 			var self = this;
 			this.debugMode = o.debugMode;
-			this.container = $('<div>').attr('id', o.id)
-				.wrap('<div>')
-				.parent()
-				.css({
-					position:'fixed',
-					// top:'0px',
-					width:'1px',
-					height:'1px',
-					display:'inline-block',
-					background:'transparent',
-					'z-index':99999
-				})
-				// Hands over mouse events to original input for css styles
-				.on('mouseover mouseout mousedown mouseup', function(evt) {
-					if(currentTarget) $('#' + currentTarget).trigger(evt.type);
-				})
-				.appendTo('body');
 			
-			swfobject.embedSWF(o.filereader, o.id, '100%', '100%', '10', o.expressInstall, {debugMode: o.debugMode ? true : ''}, {'wmode':'transparent','allowScriptAccess':'sameDomain'}, {}, function(e) {
-				self.swfObject = e.ref;
-				$(self.swfObject)
+			if(!this.container){
+				this.container = $('<div>').attr('id', o.id)
+					.wrap('<div>')
+					.parent()
 					.css({
-						display: 'block',
-						outline: 0
+						position:'fixed',
+						// top:'0px',
+						width:'1px',
+						height:'1px',
+						display:'inline-block',
+						background:'transparent',
+						'z-index':99999
 					})
-					.attr('tabindex', 0);
-				if (self.ready) {
-					readyCallbacks.fire();
-				}
-				self.ready = e.success && typeof e.ref.add === "function";
-			});
+					// Hands over mouse events to original input for css styles
+					.on('mouseover mouseout mousedown mouseup', function(evt) {
+						if(currentTarget) $('#' + currentTarget).trigger(evt.type);
+					})
+					.appendTo('body');
+				
+				swfobject.embedSWF(o.filereader, o.id, '100%', '100%', '10', o.expressInstall, {debugMode: o.debugMode ? true : ''}, {'wmode':'transparent','allowScriptAccess':'sameDomain'}, {}, function(e) {
+					self.swfObject = e.ref;
+					$(self.swfObject)
+						.css({
+							display: 'block',
+							outline: 0
+						})
+						.attr('tabindex', 0);
+					if (self.ready) {
+						readyCallbacks.fire();
+					}
+					self.ready = e.success && typeof e.ref.add === "function";
+				});
+			}
 		},
 		swfObject: null,
 		container: null,
