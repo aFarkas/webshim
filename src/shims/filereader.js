@@ -1,4 +1,5 @@
 jQuery.webshims.register('filereader', function( $, webshims ){
+	"use strict";
 	var swfobject = swfmini;
 
 	var readyCallbacks = $.Callbacks('once unique memory'),
@@ -112,7 +113,9 @@ jQuery.webshims.register('filereader', function( $, webshims ){
 					})
 					// Hands over mouse events to original input for css styles
 					.on('mouseover mouseout mousedown mouseup', function(evt) {
-						if(currentTarget) $('#' + currentTarget).trigger(evt.type);
+						if(currentTarget){
+							$('#' + currentTarget).trigger(evt.type);
+						}
 					})
 					.appendTo('body');
 				
@@ -294,11 +297,11 @@ jQuery.webshims.register('filereader', function( $, webshims ){
 	/**
 	* FileReader ProgressEvent implenting Event interface
 	*/
-	FileReaderEvent = function (e) {
+	window.FileReaderEvent = function (e) {
 		this.initEvent(e);
 	};
 
-	FileReaderEvent.prototype = {
+	window.FileReaderEvent.prototype = {
 		initEvent: function (event) {
 			$.extend(this, {
 				type: null,
@@ -327,7 +330,7 @@ jQuery.webshims.register('filereader', function( $, webshims ){
 	/**
 	* FileList interface (Object with item function)
 	*/
-	FileList = function(array) {
+	window.FileList = function(array) {
 		if (array) {
 			for (var i = 0; i < array.length; i++) {
 				this[i] = array[i];
@@ -338,10 +341,9 @@ jQuery.webshims.register('filereader', function( $, webshims ){
 		}
 	};
 	
-	FileList.prototype = {
+	window.FileList.prototype = {
 		item: function(index) {
-			if (index in this) return this[index];
-			return null;
+			return (index in this) ? this[index] : null;
 		}
 	};
 

@@ -1117,10 +1117,11 @@
 	})();
 	//>
 	
-	addPolyfill('filereader', {
-		test: 'FileReader' in window,
-		d: ['swfmini', 'dom-support']
-	});
+//	addPolyfill('filereader', {
+//		test: 'FileReader' in window,
+//		d: ['swfmini', 'dom-support']
+//		,nM: 'filereader'
+//	});
 	
 	//<details
 	if(!('details' in Modernizr)){
