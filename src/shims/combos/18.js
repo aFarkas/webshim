@@ -2749,27 +2749,145 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	
 	(function(){
 		var picker = {};
-		
-		var loadPicker = function(){
+
+		var loadPicker = function(type){
 			$(function(){
-				webshims.loader.loadList(['forms-picker']);
+				webshims.loader.loadList([type]);
 			});
 		};
 		
 		$.each(['DOM', 'WINDOWLOAD'], function(i, name){
 			loadPicker[name] = function(type){
-				
-				if(!loadPicker[name+'Loaded']){
-					loadPicker[name+'Loaded'] = true;
-					webshims.ready(name, loadPicker);
+				type = type == 'color' ? 'color-picker' : 'forms-picker';
+				if(!loadPicker[name+'Loaded'+type]){
+					loadPicker[name+'Loaded'+type] = true;
+					webshims.ready(name, function(){
+						loadPicker(type);
+					});
 				}
+				return type;
 			};
 		});
 		
-		loadPicker.toLoad = 'forms-picker';
-		webshims.loader.addModule('forms-picker', {noAutoCallback: true, options: {addZero: addZero}, css: 'jpicker/jpicker.css'});
+		webshims.loader.addModule('forms-picker', {
+			noAutoCallback: true,
+			options: {
+				addZero: addZero
+			}
+		});
+		webshims.loader.addModule('color-picker', {
+			noAutoCallback: true, 
+			css: 'jpicker/jpicker.css'
+		});
+		
+		picker._genericSetFocus = function(element, _noFocus){
+			element = $(element || this.activeButton);
+			if(!this.popover.openedByFocus && !_noFocus){
+				var that = this;
+				var setFocus = function(noTrigger){
+					clearTimeout(that.timer);
+					that.timer = setTimeout(function(){
+						if(element[0]){
+							element[0].focus();
+							if(noTrigger !== true && !element.is(':focus')){
+								setFocus(true);
+							}
+						}
+					}, that.popover.isVisible ? 99 : 360);
+				};
+				this.popover.activateElement(element);
+				setFocus();
+			}
+		};
+		
+		picker._actions = {
+			changeInput: function(val, popover, data){
+				picker._actions.cancel(val, popover, data);
+				data.setChange(val);
+			},
+			cancel: function(val, popover, data){
+				popover.stopOpen = true;
+				data.element.getShadowFocusElement().focus();
+				setTimeout(function(){
+					popover.stopOpen = false;
+				}, 9);
+				popover.hide();
+			}
+		};
 		
 		
+		picker.commonInit = function(data, popover){
+			var tabbable;
+			
+			popover.isDirty = true;
+			
+			popover.element.on('updatepickercontent pickerchange', function(){
+				tabbable = false;
+			});
+			popover.contentElement.on({
+				keydown: function(e){
+					if(e.keyCode == 9){
+						if(!tabbable){
+							tabbable = $('input:not(:disabled), [tabindex="0"]:not(:disabled)', this).filter(':visible');
+						}
+						var index = tabbable.index(e.target);
+						if(e.shiftKey && index <= 0){
+							tabbable.last().focus();
+							return false;
+						}
+						if(!e.shiftKey && index >= tabbable.length - 1){
+							tabbable.first().focus();
+							return false;
+						}
+					} else if(e.keyCode == 27){
+						data.element.getShadowFocusElement().focus();
+						popover.hide();
+						return false;
+					}
+				}
+			});
+			
+			data._propertyChange = (function(){
+				var timer;
+				var update = function(){
+					if(popover.isVisible){
+						popover.element.triggerHandler('updatepickercontent');
+					}
+				};
+				return function(prop){
+					if(prop == 'value'){return;}
+					popover.isDirty = true;
+					if(popover.isVisible){
+						clearTimeout(timer);
+						timer = setTimeout(update, 9);
+					}
+				};
+			})();
+			
+			popover.activeElement = $([]);
+			
+			popover.activateElement = function(element){
+				element = $(element);
+				if(element[0] != popover.activeElement[0]){
+					popover.activeElement.removeClass('ws-focus');
+					element.addClass('ws-focus');
+				}
+				popover.activeElement = element;
+			};
+			popover.element.on({
+				wspopoverbeforeshow: function(){
+					data.element.triggerHandler('wsupdatevalue');
+					popover.element.triggerHandler('updatepickercontent');
+				}
+			});
+			
+			
+			$(data.orig).on('remove', function(e){
+				if(!e.originalEvent){
+					$(document).off('wslocalechange', data._propertyChange);
+				}
+			});
+		};
 		
 		
 		picker._common = function(data){
@@ -2781,9 +2899,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				(picker[data.type].showPickerContent || picker.showPickerContent)(data, popover);
 			};
 			var show = function(){
-				loadPicker.DOM(data.type);
+				var type = loadPicker.DOM(data.type);
 				if(!options.disabled && !options.readonly && !popover.isVisible){
-					webshims.ready('forms-picker', showPickerContent);
+					webshims.ready(type, showPickerContent);
 					popover.show(data.element);
 				}
 			};

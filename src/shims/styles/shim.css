@@ -286,15 +286,14 @@ output {
   margin: -8px 0 0 -8px;
   background: url(forms.png) no-repeat -321px 0;
 }
-.ws-popover-opener span .ws-color-indicator-bg {
-  background: url(../jpicker/images/preview-opacity.png) no-repeat 0;
-}
-.ws-popover-opener span .ws-color-indicator {
-  background: none;
-}
-
 .color-input-buttons .ws-popover-opener span {
   background-position: -348px 0;
+}
+.ws-popover-opener span.ws-color-indicator-bg {
+  background: url(../jpicker/images/preview-opacity.png) no-repeat 0;
+}
+.ws-popover-opener span.ws-color-indicator {
+  background: none;
 }
 
 input[type="color"] {
