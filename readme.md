@@ -82,6 +82,15 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 upcomming Release 1.10.4
 ----------
 
+- input[type="color"]
+- Instant Form Validation helper (enhances the HTML5 UI for much better UX)
+- FileReader API
+- lazy load mostly everything (performance)
+
+
+Release 1.10.4
+----------
+
 - override IE10's type="number" UI
 - improved styleability of input[type="range"]
 - improved loading of mediaelement/track support

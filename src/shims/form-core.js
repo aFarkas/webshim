@@ -28,7 +28,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return ($.prop(elem, 'validity') || {valid: 1}).valid;
 	};
 	var lazyLoad = function(){
-		webshims.loader.loadList(['form-validation', 'form-validators']);
+		webshims.loader.loadList(options.addValidators ? ['form-validation', 'form-validators'] : ['form-validation']);
 		$(document).off('.lazyloadvalidation');
 	};
 	/*

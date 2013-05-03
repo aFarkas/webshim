@@ -558,7 +558,8 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 		
 	(function(){
 		var monthDigits = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-		formcfg.de = {
+		
+		formcfg.de = $.extend(true, {
 			numberFormat: {
 				",": ".",
 				".": ","
@@ -592,9 +593,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				showMonthAfterYear: false,
 				yearSuffix: ''
 			}
-		};
+		}, formcfg.de || {});
 		
-		formcfg.en = {
+		formcfg.en = $.extend(true, {
 			numberFormat: {
 				".": ".",
 				",": ","
@@ -626,7 +627,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				"showMonthAfterYear": false,
 				"yearSuffix": ""
 			}
-		};
+		}, formcfg['en'] || {});
 		if(!formcfg['en-US']){
 			formcfg['en-US'] = formcfg['en'];
 		}
@@ -847,7 +848,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 							return input.prop(type, val).prop('value');
 						},
 						isValid: function(val){
-							return input.prop(type, val).is(':valid');
+							return input.prop('value', val).is(':valid') && input.prop('value') == val;
 						}
 					};
 				}
@@ -942,6 +943,9 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 						var val;
 						clearTimeout(timer);
 						val = that.parseValue();
+						if(that.type == 'color'){
+							that.inputElements.val(val);
+						}
 						$.prop(that.orig, 'value', val);
 						eventTimer.call('input', val);
 						if(!e || e.type != 'wsupdatevalue'){

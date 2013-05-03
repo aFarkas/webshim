@@ -31,11 +31,17 @@
 		window.html5.shivMethods = false;
 	</script>
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
-	<script src="../../js-webshim/minified/extras/custom-validity.js"></script>
 	
 	<script>
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
+		$.webshims.setOptions('forms', { 
+			customMessages: true,
+			addValidators: true,
+			iVal: {
+				fieldWrapper: '.form-element'
+			}
+		});
 		$.webshims.polyfill();
 	</script>
 	
@@ -78,23 +84,32 @@
 				<li>setCustomValidity</li>
 			</ul>
 			<h3>Customvalidity Helper</h3>
-			<p>Webshim Lib comes with a simple custom validity helper located in the extras-folder (custom-validity.js). This script is an extension and it works with and without Webshim Lib.</p>
+			<p>Webshim Lib comes with a simple custom validity helper.</p>
+			<p>Simply set addValidators to true</p>
+<code class="block">
+$.webshims.setOptions('forms', { 
+	addValidators: true
+});
+</code>
 			<p>The custom-validity adds a new method called <code>$.webshims.addCustomValidityRule</code>.</p>
 <code class="block">
-//$.webshims.addCustomValidityRule(name of constraint, test-function, default error message); 
-$.webshims.addCustomValidityRule('testname', function(elem, value){
-	if(value && $(elem).hasClass('test-class') && value != 'foo bar baz'){
-		return true; //means yes, it's not valid
-	} else {
-		return false; //no, it is valid
-	}
-}, 'you have to enter foo bar baz');
-
-
-//changing default message
-$.webshims.customErrorMessages.testname[''] = "you really have to enter 'foo bar baz'";
-//adding new languages
-$.webshims.customErrorMessages.testname['de'] = 'Sie müßen "foo bar baz" eingeben';
+//wait until form-validators are implemented	
+$.webshims.ready('form-validators', function(){
+	//$.webshims.addCustomValidityRule(name of constraint, test-function, default error message); 
+	$.webshims.addCustomValidityRule('testname', function(elem, value){
+		if(value && $(elem).hasClass('test-class') && value != 'foo bar baz'){
+			return true; //means yes, it's not valid
+		} else {
+			return false; //no, it is valid
+		}
+	}, 'you have to enter foo bar baz');
+	
+	
+	//changing default message
+	$.webshims.customErrorMessages.testname[''] = "you really have to enter 'foo bar baz'";
+	//adding new languages
+	$.webshims.customErrorMessages.testname['de'] = 'Sie müßen "foo bar baz" eingeben';
+});
 </code>
 
 <code class="block">
@@ -156,7 +171,7 @@ $('input[data-minlength]').val('some value').trigger('refreshCustomValidityRules
 </code>
 			<section>
 				<h3>Simple Demo</h3>
-				<form action="#">
+				<form action="#" class="ws-instantvalidation">
 					<p class="required"><span>*</span> Required fields</p>
 					<fieldset>
 						

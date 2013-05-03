@@ -36,8 +36,12 @@
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
 	<script>
 		//configure
-		$.webshims.setOptions('forms', {
-			overrideMessages: true
+		$.webshims.setOptions('forms', { 
+			customMessages: true,
+			iVal: {
+				fieldWrapper: '.form-element',
+				handleBubble: 'hide'
+			}
 		});
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
@@ -96,6 +100,7 @@ $('form').bind('invalid', function(e){
 				<li>customValidationMessage (DOM-Property) (Note: to get this new property either <code>customMessages</code> or <code>overrideValidationMessage</code> has to be set to true before calling <code>$.webshims.polyfill();</code>)</li>
 				<li>$.webshims.validityAlert (Helper Object)</li>
 				<li>data-errormessage/-x-moz-errormessage content attributes (are automatically used by validityAlert)</li>
+				<li>.ws-instantvalidation for Live Inline Form Validation</li>
 			</ul>
 			<p>Preventing the default and replacing the invalid-bubble with your own message, could look like this:</p>
 <code class="block run-once">
@@ -123,7 +128,7 @@ $('form')
 			
 			<p>Firefox 4.0 also shows an invalid hint on mouseover, which can't be replaced by this technique. If you want to remove this you can use a title-attribute with an emtpy string or use the <a href="https://developer.mozilla.org/en/HTML/element/input#Error_messages">x-moz-errormessage</a> to control the error message.</p>
 			
-			<p>Using instead the <code>setCustomValidity</code> approach will fully replace the validation message, while the native validation UI stays. Changing the validation message with setCustomValidity, would look like this:</p>
+			<p>Using the <code>setCustomValidity</code> approach will fully replace the validation message, while the native validation UI stays. Changing the validation message with setCustomValidity, would look like this:</p>
 			
 <code class="block">
 $('input[required]').setCustomValidity('You have to enter something');
@@ -133,20 +138,20 @@ $('input[required]').setCustomValidity('You have to enter something');
 //remove customError flag:
 $('input[required]').setCustomValidity('');
 </code>
-			<p>Due to the fact, that Webshims Lib already had to implement the setCustomValidity approach to do a lot of bugfixing in capable browsers/implementing in uncapable/semi-capable browsers, webshims lib gives you a simple configuration property to dynamically overriding the validationMessage with the customValidationMessage. Simply set the <code>overrideMessages</code> to true, before calling <code>polyfill</code>.</p>
 			
+			<h3 id="instant-validation">Improving UX using the Instant Form Validation feature</h3>
+			
+			<p>Webshims can dramatically enhance the UX of the HTML5 form validation by adding the class 'ws-instantvalidation' to your form element.</p>
 <code class="block">
-//configure custom validation messages before you call polyfill
-$.webshims.setOptions('forms', {
-	overrideMessages: true
+$.webshims.setOptions('forms', { 
+	iVal: {
+		fieldWrapper: '.form-element', // default: ':not(span, em, strong, p)'
+		handleBubble: 'hide', // defaults: true. true|false|'hide'if set to the string 'hide'
+		fx: 'slide', //defaults 'slide' or 'fade'
+		sel: '.ws-instantvalidation' // simple selector for the form element, setting this to false, will remove this feature
+	}
 });
-
-$.webshims.polyfill();
-</code>
-			<p>Note: This site is loaded with <code>overrideMessages = true;</code>.</p>
-			
-			<p>Recommendation: Prefer <code>customMessages = true</code> to <code>overrideMessages = true</code> (less obtrusiv)</p>
-			<p>Or a simple rule: If you want to style the validation tooltip use <code>customMessages</code> and if you want to only change the validationMessage without changing the validation UI use <code>overrideMessages</code>.</p>
+</code>			
 			
 			<h3 id="change-validation-messages">Changing and Adding validation messages</h3>
 			<p>Webshims Lib validation messages are stored @ <code>$.webshims.validityMessages</code> as an object. The index is the specific language code. Currently there are only really bad validation messages for "en" and "de".</p>
@@ -262,8 +267,7 @@ $.webshims.activeLang("en");
 </code>
 			<section>
 				<h3>Simple Demo</h3>
-				<form action="#">
-				   
+				<form action="#" class="ws-instantvalidation">
 					<p class="required"><span>*</span> Required fields</p>
 					<fieldset>
 						<div class="form-element">
@@ -274,15 +278,15 @@ $.webshims.activeLang("en");
 						</div>
 						<div class="form-element">
 							<label for="email">
-								E-Mail:
+								E-Mail*:
 							</label>
-						   	<input name="email" type="email" id="email" />
+							<input name="email" type="email" id="email" required />
 						</div>
 						<div class="form-element">
 							<label for="range">
 								range:
 							</label>
-						   	<input name="range" type="range" id="range" />
+							<input name="range" type="range" id="range" />
 						</div>
 						
 						<div class="form-element">
@@ -290,7 +294,7 @@ $.webshims.activeLang("en");
 								date: <dfn title="required">*</dfn>
 							</label>
 							
-						   	<input min="2010-12-10" max="2016-01-01" name="date" required="required" type="date" id="date" />
+							<input min="2010-12-10" max="2016-01-01" name="date" required="required" type="date" id="date" />
 							(min="2010-12-10" max="2016-01-01")
 						</div>
 						<!--
@@ -306,27 +310,25 @@ $.webshims.activeLang("en");
 								number: <dfn title="required">*</dfn>
 							</label>
 							
-						   	<input min="3" name="number" required="required" type="number" id="number" />
+							<input min="3" name="number" required="required" type="number" id="number" />
 							(min="3")
 						</div>
-					   
-						<!--
 						<div class="form-element">
 							<label for="time">
 								time: 
 							</label>
-						   	<input name="time" type="time" id="time" />
+							<input name="time" type="time" id="time" />
 						</div>
-						-->
+						
 						
 						<div class="form-element">
 							<label for="password">
 								password: 
 							</label>
-						   	<input placeholder="password" name="password" type="password" id="password" />
+							<input placeholder="password" name="password" type="password" id="password" />
 						</div>
 						
-						<div>
+						<div class="form-element">
 							<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
 							<fieldset class="mod">
 								<legend>Legend Short Labels  <dfn title="required">*</dfn></legend>
@@ -338,7 +340,7 @@ $.webshims.activeLang("en");
 								</div>
 								<div class="form-item">
 									<input type="radio" id="field7-1" name="radio-grp1-1" />
-								   	<label for="field7-1"> 
+									<label for="field7-1"> 
 										Radiooption 2
 									</label>
 								</div>

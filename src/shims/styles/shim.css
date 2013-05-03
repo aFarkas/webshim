@@ -14,28 +14,29 @@
   top: -999999px;
 }
 
+/*
 .webshims-debug-list {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: 5px;
-  padding: 5px;
-  list-style: none;
-  background: #fff;
-  color: #930;
-  font-size: 16px;
-  font-weight: bold;
-  max-height: 200px;
-  z-index: 99999;
-  overflow-y: auto;
-}
-.webshims-debug-list li {
-  border: 1px solid #cc6600;
-  margin: 2px 0;
-  padding: 5px;
-}
-
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: 5px;
+	padding: 5px;
+	list-style: none;
+	background: #fff;
+	color: #930;
+	font-size: 16px;
+	font-weight: bold;
+	max-height: 200px;
+	z-index: 99999;
+	overflow-y: auto;
+	
+	li {
+		border: 1px solid #c60;
+		margin: 2px 0;
+		padding: 5px;
+	}
+}*/
 article, aside, canvas, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
   display: block;
 }
@@ -275,7 +276,6 @@ output {
   cursor: pointer;
   background: #ccc;
 }
-
 .ws-popover-opener span {
   display: block;
   position: absolute;
@@ -284,7 +284,7 @@ output {
   width: 16px;
   height: 16px;
   margin: -8px 0 0 -8px;
-  background: url(forms.png) no-repeat -321px 0;
+  background: url(forms.png) no-repeat -320px -1px;
 }
 .color-input-buttons .ws-popover-opener span {
   background-position: -348px 0;

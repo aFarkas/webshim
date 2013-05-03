@@ -16,6 +16,7 @@
 	top: -999999px;
 }
 
+/*
 .webshims-debug-list {
 	position: fixed;
 	bottom: 0;
@@ -37,7 +38,7 @@
 		margin: 2px 0;
 		padding: 5px;
 	}
-}
+}*/
 
 article, aside, canvas, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
 	display: block;
@@ -290,31 +291,30 @@ output {
 	border-radius: 3px;
 	cursor: pointer;
 	background: #ccc;
+	
+	span {
+		display: block;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 16px;
+		height: 16px;
+		margin: -8px 0 0 -8px;
+		background: url(forms.png) no-repeat -320px -1px;
+		
+		
+		.color-input-buttons & {
+			background-position: -348px 0;
+		}
+		
+		&.ws-color-indicator-bg {
+			background: url(../jpicker/images/preview-opacity.png) no-repeat 0;
+		}
+		&.ws-color-indicator {
+			background: none;
+		}
+	}
 }
-
-.ws-popover-opener span {
-	display: block;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	width: 16px;
-	height: 16px;
-	margin: -8px 0 0 -8px;
-	background: url(forms.png) no-repeat -321px 0;
-	
-	
-	.color-input-buttons & {
-		background-position: -348px 0;
-	}
-	
-	&.ws-color-indicator-bg {
-		background: url(../jpicker/images/preview-opacity.png) no-repeat 0;
-	}
-	&.ws-color-indicator {
-		background: none;
-	}
-}
-
 
 input[type="color"] {
 	width: 6.5em;

@@ -21,7 +21,7 @@ var isNumber = function(string){
 ;
 
 (function(){
-	if(!bugs.bustedValidity && 'querySelector' in document){
+	if('querySelector' in document){
 		try {
 			bugs.findRequired = !($('<form action="#" style="width: 1px; height: 1px; overflow: hidden;"><select name="b" required="" /></form>')[0].querySelector('select:required'));
 		} catch(er){
@@ -93,7 +93,28 @@ var isPlaceholderOptionSelected = function(select){
 	return false;
 };
 var modules = webshims.modules;
-var getGroupElements = modules["form-core"].getGroupElements;
+var emptyJ = $([]);
+var getGroupElements = function(elem){
+	elem = $(elem);
+	var name;
+	var form;
+	var ret = emptyJ;
+	if(elem[0].type == 'radio'){
+		form = elem.prop('form');
+		name = elem[0].name;
+		if(!name){
+			ret = elem;
+		} else if(form){
+			ret = $(form[name]);
+		} else {
+			ret = $(document.getElementsByName(name)).filter(function(){
+				return !$.prop(this, 'form');
+			});
+		}
+		ret = ret.filter('[type="radio"]');
+	}
+	return ret;
+};
 var validityRules = {
 		valueMissing: function(input, val, cache){
 			if(!input.prop('required')){return false;}

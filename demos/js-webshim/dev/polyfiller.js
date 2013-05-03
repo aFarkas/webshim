@@ -1009,7 +1009,8 @@
 					constrainWidth: true
 				},
 				iVal: {
-					replaceBubble: true
+					handleBubble: true,
+					sel: '.ws-instantvalidation'
 //					,hideBubble: undefined,
 //					,fieldWrapper: undefined
 //					,fx: 'slide'
@@ -1059,7 +1060,7 @@
 			options: modules['form-core'].options,
 			c: [24]
 		};
-		addModule('form-validation', formExtras);
+		addModule('form-validation', $.extend({}, formExtras));
 		
 		addModule('form-validators', formExtras);
 				
@@ -1090,7 +1091,7 @@
 			nM: 'input inputtypes'
 		});
 		
-		$.webshims.loader.addModule('range-ui', {
+		addModule('range-ui', {
 			options: {},
 			noAutoCallback: true,
 			test: function(){

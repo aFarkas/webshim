@@ -1009,7 +1009,8 @@
 					constrainWidth: true
 				},
 				iVal: {
-					replaceBubble: true
+					handleBubble: true,
+					sel: '.ws-instantvalidation'
 //					,hideBubble: undefined,
 //					,fieldWrapper: undefined
 //					,fx: 'slide'

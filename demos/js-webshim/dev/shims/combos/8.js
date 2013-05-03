@@ -1601,7 +1601,6 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	
 })(jQuery, document);
 
-
 jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
@@ -1632,7 +1631,7 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		return ($.prop(elem, 'validity') || {valid: 1}).valid;
 	};
 	var lazyLoad = function(){
-		webshims.loader.loadList(['form-validation', 'form-validators']);
+		webshims.loader.loadList(options.addValidators ? ['form-validation', 'form-validators'] : ['form-validation']);
 		$(document).off('.lazyloadvalidation');
 	};
 	/*
@@ -1890,17 +1889,17 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 	
 	if(typeof validityMessages['en'].valueMissing == 'object'){
 		['select', 'radio'].forEach(function(type){
-			validityMessages.en.valueMissing[type] = 'Please select an option.';
+			validityMessages.en.valueMissing[type] = validityMessages.en.valueMissing[type] || 'Please select an option.';
 		});
 	}
 	if(typeof validityMessages.en.rangeUnderflow == 'object'){
 		['date', 'time', 'datetime-local', 'month'].forEach(function(type){
-			validityMessages.en.rangeUnderflow[type] = 'Value must be at or after {%min}.';
+			validityMessages.en.rangeUnderflow[type] = validityMessages.en.rangeUnderflow[type] || 'Value must be at or after {%min}.';
 		});
 	}
 	if(typeof validityMessages.en.rangeOverflow == 'object'){
 		['date', 'time', 'datetime-local', 'month'].forEach(function(type){
-			validityMessages.en.rangeOverflow[type] = 'Value must be at or before {%max}.';
+			validityMessages.en.rangeOverflow[type] = validityMessages.en.rangeOverflow[type] || 'Value must be at or before {%max}.';
 		});
 	}
 	
@@ -1936,17 +1935,17 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 	
 	if(typeof validityMessages.de.valueMissing == 'object'){
 		['select', 'radio'].forEach(function(type){
-			validityMessages.de.valueMissing[type] = 'Bitte wählen Sie eine Option aus.';
+			validityMessages.de.valueMissing[type] = validityMessages.de.valueMissing[type] || 'Bitte wählen Sie eine Option aus.';
 		});
 	}
 	if(typeof validityMessages.de.rangeUnderflow == 'object'){
 		['date', 'time', 'datetime-local', 'month'].forEach(function(type){
-			validityMessages.de.rangeUnderflow[type] = '{%value} ist zu früh. {%min} ist die früheste Zeit, die Sie benutzen können.';
+			validityMessages.de.rangeUnderflow[type] = validityMessages.de.rangeUnderflow[type] || '{%value} ist zu früh. {%min} ist die früheste Zeit, die Sie benutzen können.';
 		});
 	}
 	if(typeof validityMessages.de.rangeOverflow == 'object'){
 		['date', 'time', 'datetime-local', 'month'].forEach(function(type){
-			validityMessages.de.rangeOverflow[type] = '{%value} ist zu spät. {%max} ist die späteste Zeit, die Sie benutzen können.';
+			validityMessages.de.rangeOverflow[type] = validityMessages.de.rangeOverflow[type] || '{%value} ist zu spät. {%max} ist die späteste Zeit, die Sie benutzen können.';
 		});
 	}
 	
@@ -1964,12 +1963,12 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 	};
 	
 	webshims.createValidationMessage = function(elem, name){
-		var spinner;
+		var widget;
 		var message = getMessageFromObj(currentValidationMessage[name], elem);
-		
+		var type = $.prop(elem, 'type');
 		if(!message){
 			message = getMessageFromObj(validityMessages[''][name], elem) || $.prop(elem, 'validationMessage');
-			webshims.info('could not find errormessage for: '+ name +' / '+ $.prop(elem, 'type') +'. in language: '+$.webshims.activeLang());
+			webshims.info('could not find errormessage for: '+ name +' / '+ type +'. in language: '+$.webshims.activeLang());
 		}
 		if(message){
 			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
@@ -1979,11 +1978,11 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 					webshims.error('no title for patternMismatch provided. Always add a title attribute.');
 				}
 				if(valueVals[attr]){
-					if(!spinner){
-						spinner = $(elem).getShadowElement().data('wsspinner');
+					if(!widget){
+						widget = $(elem).getShadowElement().data('wsWidget'+type);
 					}
-					if(spinner && spinner.formatValue){
-						val = spinner.formatValue(val, false);
+					if(widget && widget.formatValue){
+						val = widget.formatValue(val, false);
 					}
 				}
 				message = message.replace('{%'+ attr +'}', val);

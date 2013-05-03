@@ -135,12 +135,13 @@
 				<h3>Options for the <code>forms</code> feature</h3>
 				<ul>
 					<li><strong>customMessages</strong> (boolean): <code>false</code> (default) || <code>true</code>. If <code>customMessages</code> is set to true. Webshims Lib will implement a DOM-Property called customValidationMessage, which can be changed through the $.webshims.validityMessages-Array.</li>
-					<li><strong>overrideMessages (deprecated)</strong> (boolean): <code>false</code> (default) || <code>true</code>. Overrides the native messages with the customMessages - using the <code>setCustomValidity</code>-method. This is useful, if you want to use customMessages with native validation UI. If you want to use custom messages with custom styleable UI. Use the <code>customMessages</code>-option instead.</li>
 					<li><strong>replaceValidationUI</strong> (boolean): <code>false</code> (default) || <code>true</code>. Replaces the browser validation UI with a custom styleable UI.</li>
 					<li><strong>placeholderType</strong> (string): <code>"value"</code> (default) || <code>"over"</code>. If placeholderType is set to "over", the polyfill uses the overLabel technique to create a placeholder and doesn't "pollute" the value property.</li>
 					<li><strong>lightweightDatalist</strong> (boolean): <code>true</code> (default) || <code>false</code>. If <code>lightweightDatalist</code> is set to true. Webshims Lib will switch the datalist element and list property implementation from the forms-ext to the forms feature.</li>
 					<li><strong>customDatalist</strong> (boolean): <code>false</code> (default) || <code>true</code>. Allows to use custom styleable datalist elements in all browsers.</li>
 					<li><strong>overridePlaceholder</strong> (boolean)</li>
+					<li><strong>iVal</strong> (mixed options): options for the Instant/Live form validation feature (<a href="webforms/1-webforms-lang-custom-bubble.html#instant-validation">see</a>)</li>
+					<li><strong>addValidators</strong> (boolean): <code>false</code> (default) || <code>true</code>: Should Webshims implement some new custom validators. see: <a href="webforms/4-webforms-custom-validity.html">custom validity</a> </li>>
 				</ul>
 				
 				<h3>Options for the <code>forms-ext</code> feature</h3>
@@ -211,7 +212,7 @@
 				</fieldset>
 				<hr />
 				
-				<form action="#" id="form" class="ws-instantvalidation">
+				<form action="#" id="form">
 					<p class="required"><span>*</span> Required fields</p>
 					<fieldset>
 						<div class="form-element">
@@ -464,7 +465,36 @@ $('form').bind('invalid', function(e){
 	e.preventDefault();
 });
 </code>
-					
+						<h4>Instant / Live Inline form validation</h4>
+						<p>Webshims comes also with a simple Instant validation helper, simply add the class 'ws-instantvalidation' to your form element:</p>
+<code class="block">
+&lt;form class="ws-instantvalidation" action="#"&gt;
+	&lt;div class="form-element"&gt;
+		&lt;label&gt;email*:&lt;/label&gt;
+		&lt;input type="email" required /&gt;
+	&lt;/div&gt;
+	&lt;div class="form-element"&gt;
+		&lt;label&gt;password*:&lt;/label&gt;
+		&lt;input type="password" required /&gt;
+	&lt;/div&gt;
+	&lt;div&gt;
+		&lt;input type="submit" /&gt;
+	&lt;/div&gt;
+&lt;/form&gt;
+</code>
+						<form class="ws-instantvalidation" action="#">
+							<div class="form-element">
+								<label>email*:</label>
+								<input type="email" required />
+							</div>
+							<div class="form-element">
+								<label>password*:</label>
+								<input type="password" required />
+							</div>
+							<div>
+								<input type="submit" />
+							</div>
+						</form>
 						<p>More information about <a href="webforms/1-webforms-lang-custom-bubble.html">custom error messages/custom error bubbles</a> (also explains how to change the built-in text).</p>
 					</div>
 					<h3 id="custom-widget" class="button">... create/configure custom stylable slider/date widgets in all browser</h3>
