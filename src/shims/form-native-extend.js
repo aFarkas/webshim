@@ -77,9 +77,7 @@ jQuery.webshims.register('form-native-extend', function($, webshims, window, doc
 					var elem = (name == 'input') ? $(this).getNativeElement()[0] : this;
 					desc.prop._supvalue.call(elem, error);
 					
-					if(webshims.bugs.validationMessage){
-						webshims.data(elem, 'customvalidationMessage', error);
-					}
+					
 					if(overrideValidity){
 						webshims.data(elem, 'hasCustomError', !!(error));
 						testValidity(elem);

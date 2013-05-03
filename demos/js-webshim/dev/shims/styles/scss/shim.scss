@@ -1153,6 +1153,22 @@ datalist {
 	z-index: 1000000000;
 }
 
+.ws-errorbox {
+	display: none;
+	border: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	position: relative;
+	
+	p {
+		margin: 2px 0 3px;
+		padding: 0;
+		color: #933;
+		font: 90%/120% sans-serif;
+	}
+}
+
 progress {
 	position: relative;
 	display: inline-block;

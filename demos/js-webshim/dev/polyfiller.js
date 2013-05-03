@@ -954,12 +954,12 @@
 	
 	//<forms
 	(function(){
+		var formExtend, formOptions, formExtras;
 		var modernizrInputAttrs = Modernizr.input;
 		var modernizrInputTypes = Modernizr.inputtypes;
 		var formvalidation = 'formvalidation';
 		var select = $('<select required="" name="a"><option disabled="" /></select>')[0];
 		var bustedValidity = false;
-		var formExtend, formOptions;
 		
 		var initialFormTest = function(){
 			if(!initialFormTest.run){
@@ -978,7 +978,7 @@
 				}
 				
 				if(Modernizr[formvalidation]){
-					bugs.bustedValidity = bustedValidity = Modernizr.formattribute === false || !Modernizr.fieldsetdisabled || !('value' in document.createElement('progress')) || !('value' in document.createElement('output')) || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
+					bugs.bustedValidity = bustedValidity = window.opera || Modernizr.formattribute === false || !Modernizr.fieldsetdisabled || !('value' in document.createElement('progress')) || !('value' in document.createElement('output')) || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
 				}
 				
 				formExtend = Modernizr[formvalidation] && !bustedValidity ? 'form-native-extend' : 'form-shim-extend';
@@ -1007,6 +1007,12 @@
 				messagePopover: {},
 				datalistPopover: {
 					constrainWidth: true
+				},
+				iVal: {
+					replaceBubble: true
+//					,hideBubble: undefined,
+//					,fieldWrapper: undefined
+//					,fx: 'slide'
 				},
 				availabeLangs: ['ar', 'ch-ZN', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'nl', 'pt-PT', 'ru', 'sv'] //en and de are directly implemented in core
 	//			,customMessages: false,
@@ -1042,27 +1048,35 @@
 		addPolyfill('form-message', {
 			f: 'forms',
 			test: function(toLoad){
-				return !( formOptions.customMessages || !Modernizr[formvalidation] || bugs.validationMessage || bustedValidity || !modules[formExtend].test(toLoad) );
+				return !( formOptions.customMessages || !Modernizr[formvalidation] || bustedValidity || !modules[formExtend].test(toLoad) );
 			},
 			d: [DOMSUPPORT],
 			c: [16, 7, 15, 3, 8, 4]
 		});
 		
+		formExtras = {
+			noAutoCallback: true,
+			options: modules['form-core'].options,
+			c: [24]
+		};
+		addModule('form-validation', formExtras);
+		
+		addModule('form-validators', formExtras);
+				
 		addPolyfill('form-number-date-api', {
 			f: 'forms-ext',
 			options: {
 				types: 'range date time number month'
 			},
-			test: function(toLoad){
+			test: function(){
 				var ret = true;
-				var types = this.options.types;
-				if(typeof types != 'string'){
-					webshims.warn("types should be a whitespace seperated string");
-				} else {
-					types = types.split(' ');
+				var o = this.options;
+				if(!o._types){
+					o._types = o.types.split(' ');
 				}
+				
 				initialFormTest();
-				$.each(types, function(i, name){
+				$.each(o._types, function(i, name){
 					if(!modernizrInputTypes[name]){
 						ret = false;
 						return false;
@@ -1116,6 +1130,12 @@
 		});
 	})();
 	//>
+	
+//	addPolyfill('filereader', {
+//		test: 'FileReader' in window,
+//		d: ['swfmini', 'dom-support']
+//		,nM: 'filereader'
+//	});
 	
 	//<details
 	if(!('details' in Modernizr)){

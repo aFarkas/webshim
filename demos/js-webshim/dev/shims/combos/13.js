@@ -1470,9 +1470,7 @@ modified for webshims
 	if(Modernizr.track){
 		$('video, audio').trigger('trackapichange');
 	}
-	$(function(){
-		webshims.ready('WINDOWLOAD', function(){
-			webshims.loader.loadList(['track-ui']);
-		});
+	webshims.ready('WINDOWLOAD', function(){
+		webshims.loader.loadList(['track-ui']);
 	});
 });

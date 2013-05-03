@@ -40,7 +40,7 @@
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
-	<script src="../js-webshim/minified/polyfiller.js"></script>
+	<script src="../js-webshim/minified/polyfiller.js"></script> 
 	
 	
 	
@@ -54,10 +54,10 @@
 	-->
 	<script>
 		$.webshims.setOptions('forms', { 
-			customMessages: true 
+			customMessages: true,
+			iVal: {fieldWrapper: '.form-element'}
 		});
 
-		
 		//load all defined
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
@@ -198,7 +198,7 @@
 						<input name="date" data-placeholder="year-month-day" type="date" id="date" required form="form" />
 					</div>
 					
-					<div class="form-item">
+					<div class="form-element form-item">
 						<input type="checkbox" required id="checkbox" name="checkbox" form="form" />
 						<label for="checkbox">
 							required checkbox*
@@ -211,7 +211,7 @@
 				</fieldset>
 				<hr />
 				
-				<form action="#" id="form">
+				<form action="#" id="form" class="ws-instantvalidation">
 					<p class="required"><span>*</span> Required fields</p>
 					<fieldset>
 						<div class="form-element">
@@ -321,7 +321,7 @@
 							</fieldset>
 						</div>
 						
-						<div class="form-item">
+						<div class="form-element">
 							<label for="progress">
 								progress
 							</label>
@@ -345,7 +345,7 @@
 							</script>
 						</div>
 						
-						<div>
+						<div class="form-element">
 							<h4>Radio-Group Headline Short Labels  <dfn title="required">*</dfn></h4>
 							<fieldset class="mod">
 								<legend>Legend Short Labels  <dfn title="required">*</dfn></legend>

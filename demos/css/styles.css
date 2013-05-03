@@ -142,6 +142,10 @@ label {
 	display: block;
 	margin: 0 0 3px;
 }
+.form-item label {
+	display: inline-block;
+	margin: 0;
+}
 input {
 	box-shadow: none;
 }

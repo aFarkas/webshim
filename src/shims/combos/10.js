@@ -2534,24 +2534,18 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 	(function(){
 		var picker = {};
 
-		var loadPicker = function(type){
-			$(function(){
-				webshims.loader.loadList([type]);
-			});
-		};
-		
-		$.each(['DOM', 'WINDOWLOAD'], function(i, name){
-			loadPicker[name] = function(type){
-				type = type == 'color' ? 'color-picker' : 'forms-picker';
-				if(!loadPicker[name+'Loaded'+type]){
-					loadPicker[name+'Loaded'+type] = true;
-					webshims.ready(name, function(){
-						loadPicker(type);
+		var loadPicker = function(type, name){
+			type = type == 'color' ? 'color-picker' : 'forms-picker';
+			if(!loadPicker[name+'Loaded'+type]){
+				loadPicker[name+'Loaded'+type] = true;
+				webshims.ready(name, function(){
+					$(function(){
+						webshims.loader.loadList([type]);
 					});
-				}
-				return type;
-			};
-		});
+				});
+			}
+			return type;
+		};
 		
 		webshims.loader.addModule('forms-picker', {
 			noAutoCallback: true,
@@ -2683,7 +2677,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				(picker[data.type].showPickerContent || picker.showPickerContent)(data, popover);
 			};
 			var show = function(){
-				var type = loadPicker.DOM(data.type);
+				var type = loadPicker(data.type, 'DOM');
 				if(!options.disabled && !options.readonly && !popover.isVisible){
 					webshims.ready(type, showPickerContent);
 					popover.show(data.element);
@@ -2793,7 +2787,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 				}
 			});
 			
-			loadPicker.WINDOWLOAD(data.type);
+			loadPicker(data.type, 'WINDOWLOAD');
 		};
 		
 		picker.month = picker._common;

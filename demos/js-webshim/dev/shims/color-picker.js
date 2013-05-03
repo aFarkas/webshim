@@ -18,7 +18,7 @@
 	if(!window.Modernizr || !('opacity' in Modernizr) || !('csstransitions' in Modernizr)){
 		$('html').addClass(('opacity' in document.documentElement.style) ? 'opacity' : 'no-opacity');
 	}
-	Math.precision = function (value, precision) {
+	var mPrecision = function (value, precision) {
 		if (precision === undefined) precision = 0;
 		return Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision);
 	};
@@ -378,11 +378,11 @@
 						switch (e.keyCode) {
 						case 38:
 							alpha.val(setValueInRange.call($this, parseFloat(alpha.val()) + 1, 0, 100));
-							color.val('a', Math.precision((alpha.val() * 255) / 100, alphaPrecision), e.target);
+							color.val('a', mPrecision((alpha.val() * 255) / 100, alphaPrecision), e.target);
 							return false;
 						case 40:
 							alpha.val(setValueInRange.call($this, parseFloat(alpha.val()) - 1, 0, 100));
-							color.val('a', Math.precision((alpha.val() * 255) / 100, alphaPrecision), e.target);
+							color.val('a', mPrecision((alpha.val() * 255) / 100, alphaPrecision), e.target);
 							return false;
 						}
 						break;
@@ -444,7 +444,7 @@
 						break;
 					case alpha && alpha.get(0):
 						alpha.val(setValueInRange.call($this, alpha.val(), 0, 100));
-						color.val('a', Math.precision((alpha.val() * 255) / 100, alphaPrecision), e.target);
+						color.val('a', mPrecision((alpha.val() * 255) / 100, alphaPrecision), e.target);
 						break;
 					case hue.get(0):
 						hue.val(setValueInRange.call($this, hue.val(), 0, 360));
@@ -489,7 +489,7 @@
 							blue.val(color.val('b'));
 							break;
 						case alpha && alpha.get(0):
-							alpha.val(Math.precision((color.val('a') * 100) / 255, alphaPrecision));
+							alpha.val(mPrecision((color.val('a') * 100) / 255, alphaPrecision));
 							break;
 						case hue.get(0):
 							hue.val(color.val('h'));
@@ -540,7 +540,7 @@
 					if (context != red.get(0)) red.val(all != null ? all.r : '');
 					if (context != green.get(0)) green.val(all != null ? all.g : '');
 					if (context != blue.get(0)) blue.val(all != null ? all.b : '');
-					if (alpha && context != alpha.get(0)) alpha.val(all != null ? Math.precision((all.a * 100) / 255, alphaPrecision) : '');
+					if (alpha && context != alpha.get(0)) alpha.val(all != null ? mPrecision((all.a * 100) / 255, alphaPrecision) : '');
 					if (context != hue.get(0)) hue.val(all != null ? all.h : '');
 					if (context != saturation.get(0)) saturation.val(all != null ? all.s : '');
 					if (context != value.get(0)) value.val(all != null ? all.v : '');
@@ -1452,7 +1452,7 @@
 						activePreview.css({
 							backgroundColor: all && '#' + all.hex || 'transparent'
 						});
-						setAlpha.call($this, activePreview, all && Math.precision((all.a * 100) / 255, 4) || 0);
+						setAlpha.call($this, activePreview, all && mPrecision((all.a * 100) / 255, 4) || 0);
 					} catch (e) {}
 				},
 				updateMapVisuals = function (ui) {
@@ -1474,23 +1474,23 @@
 						setAlpha.call($this, colorMapL1, v != null ? v : 100);
 						break;
 					case 'r':
-						setAlpha.call($this, colorMapL2, Math.precision((ui.val('r') || 0) / 255 * 100, 4));
+						setAlpha.call($this, colorMapL2, mPrecision((ui.val('r') || 0) / 255 * 100, 4));
 						break;
 					case 'g':
-						setAlpha.call($this, colorMapL2, Math.precision((ui.val('g') || 0) / 255 * 100, 4));
+						setAlpha.call($this, colorMapL2, mPrecision((ui.val('g') || 0) / 255 * 100, 4));
 						break;
 					case 'b':
-						setAlpha.call($this, colorMapL2, Math.precision((ui.val('b') || 0) / 255 * 100));
+						setAlpha.call($this, colorMapL2, mPrecision((ui.val('b') || 0) / 255 * 100));
 						break;
 					}
 					var a = ui.val('a');
-					setAlpha.call($this, colorMapL3, Math.precision(((255 - (a || 0)) * 100) / 255, 4));
+					setAlpha.call($this, colorMapL3, mPrecision(((255 - (a || 0)) * 100) / 255, 4));
 				},
 				updateBarVisuals = function (ui) {
 					switch (settings.color.mode) {
 					case 'h':
 						var a = ui.val('a');
-						setAlpha.call($this, colorBarL5, Math.precision(((255 - (a || 0)) * 100) / 255, 4));
+						setAlpha.call($this, colorBarL5, mPrecision(((255 - (a || 0)) * 100) / 255, 4));
 						break;
 					case 's':
 						var hva = ui.val('hva'),
@@ -1501,7 +1501,7 @@
 							});
 						setBG.call($this, colorBarDiv, saturatedColor.val('hex'));
 						setAlpha.call($this, colorBarL2, 100 - (hva != null ? hva.v : 100));
-						setAlpha.call($this, colorBarL5, Math.precision(((255 - (hva && hva.a || 0)) * 100) / 255, 4));
+						setAlpha.call($this, colorBarL5, mPrecision(((255 - (hva && hva.a || 0)) * 100) / 255, 4));
 						break;
 					case 'v':
 						var hsa = ui.val('hsa'),
@@ -1511,7 +1511,7 @@
 								v: 100
 							});
 						setBG.call($this, colorBarDiv, valueColor.val('hex'));
-						setAlpha.call($this, colorBarL5, Math.precision(((255 - (hsa && hsa.a || 0)) * 100) / 255, 4));
+						setAlpha.call($this, colorBarL5, mPrecision(((255 - (hsa && hsa.a || 0)) * 100) / 255, 4));
 						break;
 					case 'r':
 					case 'g':
@@ -1530,10 +1530,10 @@
 							vValue = rgba && rgba.g || 0;
 						}
 						var middle = vValue > hValue ? hValue : vValue;
-						setAlpha.call($this, colorBarL2, hValue > vValue ? Math.precision(((hValue - vValue) / (255 - vValue)) * 100, 4) : 0);
-						setAlpha.call($this, colorBarL3, vValue > hValue ? Math.precision(((vValue - hValue) / (255 - hValue)) * 100, 4) : 0);
-						setAlpha.call($this, colorBarL4, Math.precision((middle / 255) * 100, 4));
-						setAlpha.call($this, colorBarL5, Math.precision(((255 - (rgba && rgba.a || 0)) * 100) / 255, 4));
+						setAlpha.call($this, colorBarL2, hValue > vValue ? mPrecision(((hValue - vValue) / (255 - vValue)) * 100, 4) : 0);
+						setAlpha.call($this, colorBarL3, vValue > hValue ? mPrecision(((vValue - hValue) / (255 - hValue)) * 100, 4) : 0);
+						setAlpha.call($this, colorBarL4, mPrecision((middle / 255) * 100, 4));
+						setAlpha.call($this, colorBarL5, mPrecision(((255 - (rgba && rgba.a || 0)) * 100) / 255, 4));
 						break;
 					case 'a':
 						var a = ui.val('a');
@@ -1564,7 +1564,7 @@
 					});
 					if (alpha > 0 && alpha < 100) {
 						obj.css({
-							opacity: Math.precision(alpha / 100, 4)
+							opacity: mPrecision(alpha / 100, 4)
 						});
 					} else if (alpha == 0 || alpha == 100) {
 						obj.css({
@@ -1602,7 +1602,7 @@
 					currentPreview.css({
 						backgroundColor: hex && '#' + hex || 'transparent'
 					});
-					setAlpha.call($this, currentPreview, Math.precision(((ui.val('a') || 0) * 100) / 255, 4));
+					setAlpha.call($this, currentPreview, mPrecision(((ui.val('a') || 0) * 100) / 255, 4));
 				},
 				moveBarMouseDown = function (e) {
 					elementStartX = parseInt(container.css('left'), 10) || 0;
@@ -1655,7 +1655,7 @@
 					var all = color.active.val('all');
 					if (win.alphaPrecision < 0) win.alphaPrecision = 0;
 					else if (win.alphaPrecision > 2) win.alphaPrecision = 2;
-					var controlHtml = '<table class="jPicker" cellpadding="0" cellspacing="0"><tbody><tr><td rowspan="9"><div class="Map"><span class="Map1">&nbsp;</span><span class="Map2">&nbsp;</span><span class="Map3">&nbsp;</span><img src="' + images.clientPath + images.colorMap.arrow.file + '" class="Arrow"/></div></td><td rowspan="9"><div class="Bar"><span class="Map1">&nbsp;</span><span class="Map2">&nbsp;</span><span class="Map3">&nbsp;</span><span class="Map4">&nbsp;</span><span class="Map5">&nbsp;</span><span class="Map6">&nbsp;</span><img src="' + images.clientPath + images.colorBar.arrow.file + '" class="Arrow"/></div></td><td colspan="2" class="Preview">' + localization.text.newColor + '<div><span class="Active" title="' + localization.tooltips.colors.newColor + '">&nbsp;</span><span class="Current" title="' + localization.tooltips.colors.currentColor + '">&nbsp;</span></div>' + localization.text.currentColor + '</td><td rowspan="9" class="Button"><input type="button" class="Ok" value="' + localization.text.ok + '" title="' + localization.tooltips.buttons.ok + '"/><input type="button" class="Cancel" value="' + localization.text.cancel + '" title="' + localization.tooltips.buttons.cancel + '"/><hr/><div class="Grid">&nbsp;</div></td></tr><tr class="Hue"><td class="Radio"><label><input type="radio" aria-label="' + localization.tooltips.hue.radio + '" class="hue-radio" value="h"' + (settings.color.mode == 'h' ? ' checked="checked"' : '') + '/>H:</label></td><td class="Text"><input type="text" maxlength="3" value="' + (all != null ? all.h : '') + '" title="' + localization.tooltips.hue.textbox + '"/>&nbsp;&deg;</td></tr><tr class="Saturation"><td class="Radio"><label><input type="radio" aria-label="' + localization.tooltips.saturation.radio + '" value="s"' + (settings.color.mode == 's' ? ' checked="checked"' : '') + '/>S:</label></td><td class="Text"><input type="text" maxlength="3" value="' + (all != null ? all.s : '') + '" title="' + localization.tooltips.saturation.textbox + '"/>&nbsp;%</td></tr><tr class="Value"><td class="Radio"><label><input type="radio" aria-label="' + localization.tooltips.value.radio + '" value="v"' + (settings.color.mode == 'v' ? ' checked="checked"' : '') + '/>V:</label><br/><br/></td><td class="Text"><input type="text" maxlength="3" value="' + (all != null ? all.v : '') + '" title="' + localization.tooltips.value.textbox + '"/>&nbsp;%<br/><br/></td></tr><tr class="Red"><td class="Radio"><label><input type="radio" aria-label="' + localization.tooltips.red.radio + '" value="r"' + (settings.color.mode == 'r' ? ' checked="checked"' : '') + '/>R:</label></td><td class="Text"><input type="text" maxlength="3" value="' + (all != null ? all.r : '') + '" title="' + localization.tooltips.red.textbox + '"/></td></tr><tr class="Green"><td class="Radio"><label><input type="radio" title="' + localization.tooltips.green.radio + '" value="g"' + (settings.color.mode == 'g' ? ' checked="checked"' : '') + '/>G:</label></td><td class="Text"><input type="text" maxlength="3" value="' + (all != null ? all.g : '') + '" title="' + localization.tooltips.green.textbox + '"/></td></tr><tr class="Blue"><td class="Radio"><label><input type="radio"  aria-label="' + localization.tooltips.blue.radio + '" value="b"' + (settings.color.mode == 'b' ? ' checked="checked"' : '') + '/>B:</label></td><td class="Text"><input type="text" maxlength="3" value="' + (all != null ? all.b : '') + '" title="' + localization.tooltips.blue.textbox + '"/></td></tr><tr class="Alpha"><td class="Radio"><label><input aria-label="' + localization.tooltips.alpha.radio + '" class="alpha-radio" type="radio" value="a"' + (settings.color.mode == 'a' ? ' checked="checked"' : '') + '/>A:</label></td><td class="Text"><input type="text" maxlength="' + (3 + win.alphaPrecision) + '" value="' + (all != null ? Math.precision((all.a * 100) / 255, win.alphaPrecision) : '') + '" title="' + localization.tooltips.alpha.textbox + '"/>&nbsp;%</td></tr><tr class="Hex"><td colspan="2" class="Text"><label>#:<input  aria-label="' + localization.tooltips.hex.textbox + '" type="text" maxlength="6" class="Hex" value="' + (all != null ? all.hex : '') + '"/></label><input type="text" maxlength="2" class="AHex" value="' + (all != null ? all.ahex.substring(6) : '') + '" title="' + localization.tooltips.hex.alpha + '"/></td></tr></tbody></table>';
+					var controlHtml = '<table class="jPicker" cellpadding="0" cellspacing="0"><tbody><tr><td rowspan="9"><div class="Map"><span class="Map1">&nbsp;</span><span class="Map2">&nbsp;</span><span class="Map3">&nbsp;</span><img src="' + images.clientPath + images.colorMap.arrow.file + '" class="Arrow"/></div></td><td rowspan="9"><div class="Bar"><span class="Map1">&nbsp;</span><span class="Map2">&nbsp;</span><span class="Map3">&nbsp;</span><span class="Map4">&nbsp;</span><span class="Map5">&nbsp;</span><span class="Map6">&nbsp;</span><img src="' + images.clientPath + images.colorBar.arrow.file + '" class="Arrow"/></div></td><td colspan="2" class="Preview">' + localization.text.newColor + '<div><span class="Active" title="' + localization.tooltips.colors.newColor + '">&nbsp;</span><span class="Current" title="' + localization.tooltips.colors.currentColor + '">&nbsp;</span></div>' + localization.text.currentColor + '</td><td rowspan="9" class="Button"><input type="button" class="Ok" value="' + localization.text.ok + '" title="' + localization.tooltips.buttons.ok + '"/><input type="button" class="Cancel" value="' + localization.text.cancel + '" title="' + localization.tooltips.buttons.cancel + '"/><hr/><div class="Grid">&nbsp;</div></td></tr><tr class="Hue"><td class="Radio"><label><input type="radio" aria-label="' + localization.tooltips.hue.radio + '" class="hue-radio" value="h"' + (settings.color.mode == 'h' ? ' checked="checked"' : '') + '/>H:</label></td><td class="Text"><input type="text" maxlength="3" value="' + (all != null ? all.h : '') + '" title="' + localization.tooltips.hue.textbox + '"/>&nbsp;&deg;</td></tr><tr class="Saturation"><td class="Radio"><label><input type="radio" aria-label="' + localization.tooltips.saturation.radio + '" value="s"' + (settings.color.mode == 's' ? ' checked="checked"' : '') + '/>S:</label></td><td class="Text"><input type="text" maxlength="3" value="' + (all != null ? all.s : '') + '" title="' + localization.tooltips.saturation.textbox + '"/>&nbsp;%</td></tr><tr class="Value"><td class="Radio"><label><input type="radio" aria-label="' + localization.tooltips.value.radio + '" value="v"' + (settings.color.mode == 'v' ? ' checked="checked"' : '') + '/>V:</label><br/><br/></td><td class="Text"><input type="text" maxlength="3" value="' + (all != null ? all.v : '') + '" title="' + localization.tooltips.value.textbox + '"/>&nbsp;%<br/><br/></td></tr><tr class="Red"><td class="Radio"><label><input type="radio" aria-label="' + localization.tooltips.red.radio + '" value="r"' + (settings.color.mode == 'r' ? ' checked="checked"' : '') + '/>R:</label></td><td class="Text"><input type="text" maxlength="3" value="' + (all != null ? all.r : '') + '" title="' + localization.tooltips.red.textbox + '"/></td></tr><tr class="Green"><td class="Radio"><label><input type="radio" title="' + localization.tooltips.green.radio + '" value="g"' + (settings.color.mode == 'g' ? ' checked="checked"' : '') + '/>G:</label></td><td class="Text"><input type="text" maxlength="3" value="' + (all != null ? all.g : '') + '" title="' + localization.tooltips.green.textbox + '"/></td></tr><tr class="Blue"><td class="Radio"><label><input type="radio"  aria-label="' + localization.tooltips.blue.radio + '" value="b"' + (settings.color.mode == 'b' ? ' checked="checked"' : '') + '/>B:</label></td><td class="Text"><input type="text" maxlength="3" value="' + (all != null ? all.b : '') + '" title="' + localization.tooltips.blue.textbox + '"/></td></tr><tr class="Alpha"><td class="Radio"><label><input aria-label="' + localization.tooltips.alpha.radio + '" class="alpha-radio" type="radio" value="a"' + (settings.color.mode == 'a' ? ' checked="checked"' : '') + '/>A:</label></td><td class="Text"><input type="text" maxlength="' + (3 + win.alphaPrecision) + '" value="' + (all != null ? mPrecision((all.a * 100) / 255, win.alphaPrecision) : '') + '" title="' + localization.tooltips.alpha.textbox + '"/>&nbsp;%</td></tr><tr class="Hex"><td colspan="2" class="Text"><label>#:<input  aria-label="' + localization.tooltips.hex.textbox + '" type="text" maxlength="6" class="Hex" value="' + (all != null ? all.hex : '') + '"/></label><input type="text" maxlength="2" class="AHex" value="' + (all != null ? all.ahex.substring(6) : '') + '" title="' + localization.tooltips.hex.alpha + '"/></td></tr></tbody></table>';
 					container = $($this);
 					container.html(controlHtml);
 					// initialize the objects to the source code just injected
@@ -1708,7 +1708,7 @@
 					currentPreview = preview.find('.Current:first').css({
 						backgroundColor: hex && '#' + hex || 'transparent'
 					}).bind('click', currentClicked);
-					setAlpha.call($this, currentPreview, Math.precision(color.current.val('a') * 100) / 255, 4);
+					setAlpha.call($this, currentPreview, mPrecision(color.current.val('a') * 100) / 255, 4);
 					okButton = button.find('.Ok:first').bind('click', okClicked);
 					cancelButton = button.find('.Cancel:first').bind('click', cancelClicked);
 					grid = button.find('.Grid:first');
@@ -1737,7 +1737,7 @@
 							var ahex = color.quickList[i].val('ahex');
 							if (!win.alphaSupport && ahex) ahex = ahex.substring(0, 6) + 'ff';
 							var quickHex = color.quickList[i].val('hex');
-							html += '<span class="QuickColor"' + (ahex && ' title="#' + ahex + '"' || '') + ' style="background-color:' + (quickHex && '#' + quickHex || '') + ';' + (quickHex ? '' : 'background-image:url(' + images.clientPath + 'NoColor.png)') + (win.alphaSupport && alpha && alpha < 255 ? ';opacity:' + Math.precision(alpha / 255, 4) + ';filter:Alpha(opacity=' + Math.precision(alpha / 2.55, 4) + ')' : '') + '">&nbsp;</span>';
+							html += '<span class="QuickColor"' + (ahex && ' title="#' + ahex + '"' || '') + ' style="background-color:' + (quickHex && '#' + quickHex || '') + ';' + (quickHex ? '' : 'background-image:url(' + images.clientPath + 'NoColor.png)') + (win.alphaSupport && alpha && alpha < 255 ? ';opacity:' + mPrecision(alpha / 255, 4) + ';filter:Alpha(opacity=' + mPrecision(alpha / 2.55, 4) + ')' : '') + '">&nbsp;</span>';
 						}
 						setImg.call($this, grid, images.clientPath + 'bar-opacity.png');
 						grid.html(html);

@@ -141,7 +141,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 	};
 	
 	
-	if(webshims.bugs.validationMessage || !Modernizr.formvalidation || webshims.bugs.bustedValidity){
+	if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){
 		implementProperties.push('validationMessage');
 	}
 	
