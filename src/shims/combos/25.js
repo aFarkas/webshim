@@ -2832,14 +2832,11 @@ webshims.register('filereader', function( $, webshims ){
 		
 		webshims.capturingEvents(['play', 'playing', 'waiting', 'paused', 'ended', 'durationchange', 'loadedmetadata', 'canplay', 'volumechange']);
 		
-		if(!Modernizr.videoBuffered){
+		if(!Modernizr.videoBuffered ){
 			webshims.addPolyfill('mediaelement-native-fix', {
-				f: 'mediaelement',
-				test: Modernizr.videoBuffered,
 				d: ['dom-support']
 			});
-			
-			webshims.reTest('mediaelement-native-fix');
+			webshims.loader.loadList(['mediaelement-native-fix']);
 		}
 	}
 	
@@ -2899,40 +2896,6 @@ webshims.register('filereader', function( $, webshims ){
 					new TextTrackCue(2, 3, '');
 				} catch(e){
 					bugs.track = true;
-				}
-			}
-			
-			var trackOptions = webshims.cfg.track;
-			var trackListener = function(e){
-				$(e.target).filter('track').each(changeApi);
-			};
-			var changeApi = function(){
-				if(bugs.track || (!trackOptions.override && $.prop(this, 'readyState') == 3)){
-					trackOptions.override = true;
-					webshims.reTest('track');
-					document.removeEventListener('error', trackListener, true);
-					if(this && $.nodeName(this, 'track')){
-						webshims.error("track support was overwritten. Please check your vtt including your vtt mime-type");
-					} else {
-						webshims.info("track support was overwritten. due to bad browser support");
-					}
-					return false;
-				}
-			};
-			var detectTrackError = function(){
-				document.addEventListener('error', trackListener, true);
-				
-				if(bugs.track){
-					changeApi();
-				} else {
-					$('track').each(changeApi);
-				}
-			};
-			if(!trackOptions.override){
-				if(webshims.isReady('track')){
-					detectTrackError();
-				} else {
-					$(detectTrackError);
 				}
 			}
 		})();
@@ -3022,11 +2985,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	var loadTrackUi = function(){
 		if(loadTrackUi.loaded){return;}
 		loadTrackUi.loaded = true;
-		$(function(){
-			webshims._polyfill(['track']);
-			webshims.ready('WINDOWLOAD', function(){
-				webshims.loader.loadList(['track-ui']);
-			});
+		webshims.ready('WINDOWLOAD', function(){
+			loadThird();
+			webshims.loader.loadList(['track-ui']);
 		});
 	};
 	var loadYt = (function(){
@@ -3376,6 +3337,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 						var buffered = getBufferedString();
 						if(buffered != lastBuffered){
 							lastBuffered = buffered;
+							webshims.info('needed to trigger progress manually');
 							$(elem).triggerHandler('progress');
 						}
 					};
@@ -3427,13 +3389,13 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 					$('video, audio', context)
 						.add(insertedElement.filter('video, audio'))
 						.each(function(){
-							if((!hasFullTrackSupport || webshims.modules.track.options.override) && !loadTrackUi.loaded && $('track', this).length){
-								loadTrackUi();
-							}
 							if(!mediaelement.canNativePlaySrces(this)){
 								loadThird();
 								handleMedia = true;
 								return false;
+							}
+							if((!hasFullTrackSupport || webshims.modules.track.options.override) && !loadTrackUi.loaded && $('track', this).length){
+								loadTrackUi();
 							}
 						})
 					;
@@ -3457,6 +3419,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	} else {
 		webshims.ready(swfType, initMediaElements);
 	}
+	webshims.ready('track', loadTrackUi);
 });
 })(jQuery, Modernizr, webshims);
 webshims.register('mediaelement-jaris', function($, webshims, window, document, undefined, options){
@@ -4394,6 +4357,5 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 					
 		}, 'prop');
 	}
-	
 	
 });

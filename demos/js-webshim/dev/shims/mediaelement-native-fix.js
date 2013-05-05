@@ -94,6 +94,7 @@ webshims.register('mediaelement-native-fix', function($, webshims, window, docum
 			.on('load progress', loadProgessListener)
 			.on('emptied', removeProgress)
 		;
+		
 	 });
 
 });

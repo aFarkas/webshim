@@ -1,3 +1,35 @@
+(function($){
+	var trackOptions = webshims.cfg.track;
+	var trackListener = function(e){
+		$(e.target).filter('track').each(changeApi);
+	};
+	var trackBugs = webshims.bugs.track;
+	var changeApi = function(){
+		if(trackBugs || (!trackOptions.override && $.prop(this, 'readyState') == 3)){
+			trackOptions.override = true;
+			webshims.reTest('track');
+			document.removeEventListener('error', trackListener, true);
+			if(this && $.nodeName(this, 'track')){
+				webshims.error("track support was overwritten. Please check your vtt including your vtt mime-type");
+			} else {
+				webshims.info("track support was overwritten. due to bad browser support");
+			}
+			return false;
+		}
+	};
+	var detectTrackError = function(){
+		document.addEventListener('error', trackListener, true);
+		
+		if(trackBugs){
+			changeApi();
+		} else {
+			$('track').each(changeApi);
+		}
+	};
+	if(!trackOptions.override){
+		detectTrackError();
+	}
+})(jQuery)
 webshims.register('track-ui', function($, webshims, window, document, undefined){
 	"use strict";
 	var options = webshims.cfg.track;

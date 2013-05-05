@@ -182,16 +182,8 @@ asyncTest('validationMessage/setCustomValidity', function(){
 	ok($('#select').is(':invalid'), 'select is set invalid');
 	ok($('#select').prop('validity').customError, 'select has customerror');
 	equals($('#select').prop('validationMessage'), 'has an error', 'custom error message set');
-	if($.webshims.cfg.forms.overrideMessages){
-		equals(firstInvalid.prop('validationMessage'), firstInvalid.prop('customValidationMessage'), 'custom message equals native message if messages are overridden');
-		$.webshims.activeLang('en');
-		equals(firstInvalid.prop('validationMessage'), firstInvalid.prop('customValidationMessage'), 'switched message to en');
-		$.webshims.activeLang('de');
-		equals(firstInvalid.prop('validationMessage'), firstInvalid.prop('customValidationMessage'), 'switched message to de');
-		$.webshims.activeLang(lang);
-		equals(firstInvalid.prop('validationMessage'), firstInvalid.prop('customValidationMessage'), 'switched message to '+ lang);
-	}
-	if($.webshims.cfg.forms.overrideMessages || $.webshims.cfg.forms.customMessages){
+	
+	if($.webshims.cfg.forms.customMessages){
 		$.webshims.activeLang('en');
 		var enMessage = firstInvalid.prop('customValidationMessage');
 		$.webshims.activeLang('de');

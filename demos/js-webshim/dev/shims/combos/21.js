@@ -1252,7 +1252,6 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		}, 'prop');
 	}
 	
-	
 });
 webshims.register('track', function($, webshims, window, document, undefined){
 	"use strict";
@@ -2071,7 +2070,4 @@ modified for webshims
 	if(Modernizr.track){
 		$('video, audio').trigger('trackapichange');
 	}
-	webshims.ready('WINDOWLOAD', function(){
-		webshims.loader.loadList(['track-ui']);
-	});
 });

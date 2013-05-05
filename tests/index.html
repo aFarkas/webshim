@@ -41,9 +41,6 @@
 			
 			var hash = location.hash.replace('#', '');
 			
-			if(hash.indexOf('overrideValidationMessages') !== -1){
-				$.webshims.cfg.forms.overrideMessages = true; 
-			}
 			if(hash.indexOf('customValidationMessage') !== -1){
 				$.webshims.cfg.forms.customMessages = true; 
 			}
@@ -58,7 +55,6 @@
 						
 			$(function(){
 				$('#customValidationMessage').prop('checked', !!$.webshims.cfg.forms.customMessages);
-				$('#overrideValidationMessages').prop('checked', !!$.webshims.cfg.forms.overrideMessages);
 				$('#noNativeMethods').prop('checked', !$.webshims.cfg.extendNative);
 				$('#useCustomUI').prop('checked', $.webshims.cfg['forms-ext'].replaceUI);
 				$('#legacyjquery').prop('checked', (hash.indexOf('legacyjquery') != -1));
@@ -167,7 +163,6 @@
 	<foobar></foobar>
 	<foobarbaz></foobarbaz>
 <div>
-	<input type="checkbox" id="overrideValidationMessages" value="overrideValidationMessages" class="webshim-config" /> <label for="overrideValidationMessages">overrideValidationMessages</label>
 	<input type="checkbox" id="customValidationMessage" value="customValidationMessage" class="webshim-config" /> <label for="customValidationMessage">customValidationMessage</label>
 	<input type="checkbox" id="noNativeMethods" value="noNativeMethods" class="webshim-config" /> <label for="noNativeMethods">noNativeMethods</label>
 	<input type="checkbox" id="useCustomUI" value="useCustomUI" class="webshim-config" /> <label for="useCustomUI">use custom input widgets</label>

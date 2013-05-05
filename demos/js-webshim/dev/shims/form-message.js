@@ -1,8 +1,12 @@
 webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
+	if(options.overrideMessages){
+		options.customMessages = true;
+		webshims.error('overrideMessages is deprecated. use customMessages instead.');
+	}
 	var validityMessages = webshims.validityMessages;
 	
-	var implementProperties = (options.overrideMessages || options.customMessages) ? ['customValidationMessage'] : [];
+	var implementProperties = options.customMessages ? ['customValidationMessage'] : [];
 	
 	validityMessages.en = $.extend(true, {
 		typeMismatch: {

@@ -692,6 +692,11 @@
 	
 	(function(){
 		var readyFns = [];
+		var eachTrigger = function(){
+			if(this.nodeType == 1){
+				webshims.triggerDomUpdate(this);
+			}
+		};
 		$.extend(webshims, {
 			addReady: function(fn){
 				var readyFn = function(context, elem){
@@ -721,11 +726,7 @@
 		$.fn.htmlPolyfill = function(a){
 			var ret = $.fn.html.call(this,  a);
 			if(ret === this && $.isDOMReady){
-				this.each(function(){
-					if(this.nodeType == 1){
-						webshims.triggerDomUpdate(this);
-					}
-				});
+				this.each(eachTrigger);
 			}
 			return ret;
 		};
@@ -739,11 +740,7 @@
 				a = $(a);
 				$.fn[name].call(this, a);
 				if($.isDOMReady){
-					a.each(function(){
-						if (this.nodeType == 1) {
-							webshims.triggerDomUpdate(this);
-						}
-					});
+					a.each(eachTrigger);
 				}
 				return this;
 			};
@@ -863,7 +860,7 @@
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		d: ['es5'],
-		c: [16, 7, 2, 15, 3, 8, 4, 9, 10, 14, 25, 19, 20, 26]
+		c: [16, 7, 2, 15, 3, 8, 4, 9, 10, 14, 25, 19, 20, 26, 28]
 	});
 		
 	
@@ -1193,7 +1190,7 @@
 				}
 				return !( options.preferFlash && window.swfmini.hasFlashPlayerVersion('9.0.115') );
 			},
-			c: [21, 19, 25, 20]
+			c: [21, 19, 25, 20, 28]
 		});
 		
 		bugs.track = (Modernizr.track && (!Modernizr.texttrackapi || typeof (document.createElement('track').track || {}).mode != 'string'));
@@ -1208,12 +1205,13 @@
 			},
 			d: ['mediaelement', DOMSUPPORT],
 			methodNames: ['addTextTrack'],
-			c: [21, 12, 13, 22],
+			c: [21, 12, 13, 22, 29],
 			nM: 'texttrackapi'
 		});
 		
 		addModule('track-ui', {
-			d: ['track']
+			d: ['track', DOMSUPPORT],
+			c: [29]
 		});
 	})();
 	//>

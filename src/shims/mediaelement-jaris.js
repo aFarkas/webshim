@@ -934,5 +934,4 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		}, 'prop');
 	}
 	
-	
 });

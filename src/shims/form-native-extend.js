@@ -44,28 +44,16 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		return ret;
 	});
 	
-	var overrideNativeMessages = options.overrideMessages;	
-	
-	var overrideValidity = (!modernizrInputTypes.number || !modernizrInputTypes.time || !modernizrInputTypes.range || overrideNativeMessages);
+	var overrideValidity = !webshims.modules['form-number-date-api'].test();
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	
-	var validityChanger = (overrideNativeMessages)? ['value', 'checked'] : ['value'];
+	var validityChanger = ['value'];
 	var validityElements = [];
 	var testValidity = function(elem, init){
 		if(!elem){return;}
 		var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
 		
-		if(!overrideNativeMessages && !typeModels[type]){
-			return;
-		}
-		
-		if(overrideNativeMessages && !init && type == 'radio' && elem.name){
-			$(doc.getElementsByName( elem.name )).each(function(){
-				$.prop(this, 'validity');
-			});
-		} else {
-			$.prop(elem, 'validity');
-		}
+		$.prop(elem, 'validity');
 	};
 	
 	var oldSetCustomValidity = {};
@@ -89,18 +77,13 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 	});
 		
 	
-	if(overrideValidity || overrideNativeMessages){
+	if(overrideValidity){
 		validityChanger.push('min');
 		validityChanger.push('max');
 		validityChanger.push('step');
 		validityElements.push('input');
 	}
-	if(overrideNativeMessages){
-		validityChanger.push('required');
-		validityChanger.push('pattern');
-		validityElements.push('select');
-		validityElements.push('textarea');
-	}
+	
 	
 	if(overrideValidity){
 		var stopValidity;
@@ -154,7 +137,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 						
 						$.each(validityRules, function(rule, fn){
 							validityState[rule] = fn(jElm, val, cache, validityState);
-							if( validityState[rule] && (validityState.valid || !setCustomMessage) && (overrideNativeMessages || (typeModels[cache.type] && typeModels[cache.type].mismatch)) ) {
+							if( validityState[rule] && (validityState.valid || !setCustomMessage) && ((typeModels[cache.type] && typeModels[cache.type].mismatch)) ) {
 								oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, rule));
 								validityState.valid = false;
 								setCustomMessage = true;
@@ -163,13 +146,6 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 						if(validityState.valid){
 							oldSetCustomValidity[nodeName].call(elem, '');
 							webshims.data(elem, 'hasCustomError', false);
-						} else if(overrideNativeMessages && !setCustomMessage && !customError){
-							$.each(validityState, function(name, prop){
-								if(name !== 'valid' && prop){
-									oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, name));
-									return false;
-								}
-							});
 						}
 						return validityState;
 					},
@@ -192,24 +168,10 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 				var form = e.target.form;
 				clearTimeout(inputThrottle);
 				testValidity(e.target);
-				if(form && overrideNativeMessages){
-					$('input', form).each(function(){
-						if(this.type == 'password'){
-							testValidity(this);
-						}
-					});
-				}
 			};
 			
 			doc.addEventListener('change', testPassValidity, true);
 			
-			if(overrideNativeMessages){
-				doc.addEventListener('blur', testPassValidity, true);
-				doc.addEventListener('keydown', function(e){
-					if(e.keyCode != 13){return;}
-					testPassValidity(e);
-				}, true);
-			}
 			
 			doc.addEventListener('input', function(e){
 				clearTimeout(inputThrottle);
@@ -227,33 +189,6 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 			});
 		});
 		
-		
-		if(overrideNativeMessages){
-			webshims.ready('DOM form-message', function(){
-				webshims.activeLang({
-					register: 'form-core',
-					callback: function(){
-						$('input, select, textarea')
-							.getNativeElement()
-							.each(function(){
-								if(webshims.data(this, 'hasCustomError')){return;}
-								var elem = this;
-								var validity = $.prop(elem, 'validity') || {valid: true};
-								var nodeName;
-								if(validity.valid){return;}
-								nodeName = (elem.nodeName || '').toLowerCase();
-								$.each(validity, function(name, prop){
-									if(name !== 'valid' && prop){
-										oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, name));
-										return false;
-									}
-								});
-							})
-						;
-					}
-				});
-			});
-		}
 		
 	} //end: overrideValidity
 	

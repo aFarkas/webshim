@@ -815,7 +815,4 @@ modified for webshims
 	if(Modernizr.track){
 		$('video, audio').trigger('trackapichange');
 	}
-	webshims.ready('WINDOWLOAD', function(){
-		webshims.loader.loadList(['track-ui']);
-	});
 });
