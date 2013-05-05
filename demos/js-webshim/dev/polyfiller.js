@@ -845,7 +845,7 @@
 			}
 			return ('swfmini' in window);
 		},
-		c: [16, 7, 2, 8, 1, 12, 19, 23]
+		c: [16, 7, 2, 8, 1, 12, 19, 25, 23, 27]
 	});
 	modules.swfmini.test();
 		
@@ -856,14 +856,14 @@
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
 	addPolyfill('es5', {
 		test: !!(Modernizr.ES5 && Function.prototype.bind),
-		c: [14, 18, 19, 20]
+		c: [14, 18, 19, 25, 20]
 	});
 	
 	addPolyfill('dom-extend', {
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		d: ['es5'],
-		c: [16, 7, 2, 15, 3, 8, 4, 9, 10, 14, 19, 20]
+		c: [16, 7, 2, 15, 3, 8, 4, 9, 10, 14, 25, 19, 20, 26]
 	});
 		
 	
@@ -1135,7 +1135,8 @@
 	
 	addPolyfill('filereader', {
 		test: 'FileReader' in window,
-		d: ['swfmini', 'dom-support']
+		d: ['swfmini', 'dom-support'],
+		c: [25, 26, 27]
 //		,nM: 'filereader'
 	});
 	
@@ -1173,7 +1174,7 @@
 			},
 			methodNames: ['play', 'pause', 'canPlayType', 'mediaLoad:load'],
 			d: ['swfmini'],
-			c: [16, 7, 2, 8, 1, 12, 13, 19, 20, 23],
+			c: [16, 7, 2, 8, 1, 12, 13, 19, 25, 20, 23],
 			nM: 'audio video texttrackapi'
 		});
 		
@@ -1192,7 +1193,7 @@
 				}
 				return !( options.preferFlash && window.swfmini.hasFlashPlayerVersion('9.0.115') );
 			},
-			c: [21, 19, 20]
+			c: [21, 19, 25, 20]
 		});
 		
 		bugs.track = (Modernizr.track && (!Modernizr.texttrackapi || typeof (document.createElement('track').track || {}).mode != 'string'));
