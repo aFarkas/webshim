@@ -1,4 +1,4 @@
-jQuery.webshims.register('forms-picker', function($, webshims, window, document, undefined, options){
+webshims.register('forms-picker', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var picker = webshims.picker;
 	var actions = picker._actions;

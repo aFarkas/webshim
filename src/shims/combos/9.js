@@ -1,5 +1,5 @@
 //DOM-Extension helper
-jQuery.webshims.register('dom-extend', function($, webshims, window, document, undefined){
+webshims.register('dom-extend', function($, webshims, window, document, undefined){
 	"use strict";
 	
 	webshims.assumeARIA = $.support.getSetAttribute || Modernizr.canvas || Modernizr.video || Modernizr.boxsizing;
@@ -11,7 +11,20 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	if(!$.parseHTML){
 		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
-	
+	if (!webshims.cfg.no$Switch) {
+		var switch$ = function(){
+			if (window.jQuery && (!window.$ || window.jQuery == window.$) && !window.jQuery.webshims) {
+				webshims.error("jQuery was included more than once. Make sure to include it only once! Webshims and other Plugins might not work properly.");
+				if (window.$) {
+					window.$ = webshims.$;
+				}
+				window.jQuery = webshims.$;
+			}
+		};
+		switch$();
+		setTimeout(switch$, 90);
+		$(switch$);
+	}
 //	(function(){
 //		var hostNames = {
 //			'afarkas.github.io': 1,
@@ -1478,13 +1491,13 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 				mousedown: add
 			});
 			$(function(){
-				$.webshims.ready('dom-support', function(){
+				webshims.ready('dom-support', function(){
 					that.element.onWSOff('updateshadowdom', function(){
 						that.updateMetrics();
 					});
 				});
 				if(!$.fn.onWSOff){
-					$.webshims._polyfill(['dom-support']);
+					webshims._polyfill(['dom-support']);
 				}
 			});
 		},
@@ -1546,16 +1559,16 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 			calcTrail: true
 		}, opts);
 		return this.each(function(){
-			$.webshims.objectCreate(rangeProto, {
+			webshims.objectCreate(rangeProto, {
 				element: {
 					value: $(this)
 				}
 			}, opts);
 		});
 	};
-	jQuery.webshims.isReady('range-ui', true);
+	webshims.isReady('range-ui', true);
 })(jQuery);
-jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
+webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var curCfg;
 	var formcfg = webshims.formcfg;
@@ -3117,7 +3130,7 @@ jQuery.webshims.register('form-number-date-ui', function($, webshims, window, do
 });
 
 
-jQuery.webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
+webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var doc = document;
 	var lazyLoad = function(name){

@@ -652,4 +652,4 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		webshims.ready(swfType, initMediaElements);
 	}
 });
-})(jQuery, Modernizr, jQuery.webshims);
+})(jQuery, Modernizr, webshims);

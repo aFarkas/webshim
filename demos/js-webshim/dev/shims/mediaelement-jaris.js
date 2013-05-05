@@ -1,4 +1,4 @@
-jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, document, undefined, options){
+webshims.register('mediaelement-jaris', function($, webshims, window, document, undefined, options){
 	"use strict";
 	
 	var mediaelement = webshims.mediaelement;

@@ -1,4 +1,4 @@
-jQuery.webshims.register('form-validators', function($, webshims, window, document, undefined, options){
+webshims.register('form-validators', function($, webshims, window, document, undefined, options){
 "use strict";
 (function(){
 	var webshims = $.webshims;
@@ -57,7 +57,7 @@ jQuery.webshims.register('form-validators', function($, webshims, window, docume
 	};
 	var testValidityRules = webshims.refreshCustomValidityRules;
 	
-	webshims.ready('forms', function(){
+	webshims.ready('forms form-validation', function(){
 		
 				
 		var oldCustomValidity = $.fn.setCustomValidity;
@@ -121,6 +121,7 @@ jQuery.webshims.register('form-validators', function($, webshims, window, docume
 		}
 		groupTimer[name] = setTimeout(function(){
 			checkboxes
+				.addClass('group-required')
 				.unbind('click.groupRequired')
 				.bind('click.groupRequired', function(){
 					checkboxes.filter('.group-required').each(function(){
@@ -163,7 +164,7 @@ jQuery.webshims.register('form-validators', function($, webshims, window, docume
 	var getGroupElements = function(elem) {
 		return $(elem.form[elem.name]).filter('[type="radio"]');
 	};
-	$.webshims.ready('form-core', function(){
+	$.webshims.ready('form-validation', function(){
 		if($.webshims.modules){
 			getGroupElements = $.webshims.modules["form-core"].getGroupElements || getGroupElements;
 		}
@@ -185,6 +186,9 @@ jQuery.webshims.register('form-validators', function($, webshims, window, docume
 				val = !val;
 			}
 			$.prop( elem, data.prop, val);
+			if(e && $(elem).is('.user-error, .user-success')){
+				$(elem).trigger('resetvalui');
+			}
 		};
 		
 		if(!data._init || !data.masterElement){

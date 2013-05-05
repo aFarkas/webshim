@@ -1,5 +1,5 @@
 //DOM-Extension helper
-jQuery.webshims.register('dom-extend', function($, webshims, window, document, undefined){
+webshims.register('dom-extend', function($, webshims, window, document, undefined){
 	"use strict";
 	
 	webshims.assumeARIA = $.support.getSetAttribute || Modernizr.canvas || Modernizr.video || Modernizr.boxsizing;
@@ -11,7 +11,20 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	if(!$.parseHTML){
 		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
-	
+	if (!webshims.cfg.no$Switch) {
+		var switch$ = function(){
+			if (window.jQuery && (!window.$ || window.jQuery == window.$) && !window.jQuery.webshims) {
+				webshims.error("jQuery was included more than once. Make sure to include it only once! Webshims and other Plugins might not work properly.");
+				if (window.$) {
+					window.$ = webshims.$;
+				}
+				window.jQuery = webshims.$;
+			}
+		};
+		switch$();
+		setTimeout(switch$, 90);
+		$(switch$);
+	}
 //	(function(){
 //		var hostNames = {
 //			'afarkas.github.io': 1,
@@ -1103,7 +1116,7 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	
 })(jQuery, document);
 
-jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
+webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -1328,7 +1341,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	};
 	
 	
-	
 	webshims.ready('forms', function(){
 		$(document).on('focusin.lazyloadvalidation', function(e){
 			if('form' in e.target && $(e.target).is(':invalid')){
@@ -1337,7 +1349,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		});
 	});
 	webshims.ready('WINDOWLOAD', lazyLoad);
-	
+	if(options.overrideMessages){
+		webshims.warn('overrideMessages is deprecated. use customMessages instead.');
+	}
 	if(options.replaceValidationUI){
 		if(options.overrideMessages && (options.customMessages || options.customMessages == null)){
 			options.customMessages = true;
@@ -1356,8 +1370,8 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 });
 
 
-if(!Modernizr.formvalidation || jQuery.webshims.bugs.bustedValidity){
-jQuery.webshims.register('form-shim-extend', function($, webshims, window, document, undefined, options){
+if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){
+webshims.register('form-shim-extend', function($, webshims, window, document, undefined, options){
 "use strict";
 webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
@@ -3167,7 +3181,7 @@ try {
 }); //webshims.ready end
 }//end formvalidation
 
-jQuery.webshims.register('form-message', function($, webshims, window, document, undefined, options){
+webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var validityMessages = webshims.validityMessages;
 	
@@ -3368,7 +3382,7 @@ jQuery.webshims.register('form-message', function($, webshims, window, document,
 		
 	});
 });
-jQuery.webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
+webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var doc = document;
 	var lazyLoad = function(name){

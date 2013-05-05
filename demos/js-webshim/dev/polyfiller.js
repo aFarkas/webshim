@@ -1010,7 +1010,8 @@
 				},
 				iVal: {
 					handleBubble: true,
-					sel: '.ws-instantvalidation'
+					sel: '.ws-instantvalidation',
+					recheckDelay: 400
 //					,hideBubble: undefined,
 //					,fieldWrapper: undefined
 //					,fx: 'slide'
@@ -1057,7 +1058,7 @@
 		
 		formExtras = {
 			noAutoCallback: true,
-			options: modules['form-core'].options,
+			options: formOptions,
 			c: [24]
 		};
 		addModule('form-validation', $.extend({}, formExtras));
@@ -1078,7 +1079,7 @@
 				
 				initialFormTest();
 				$.each(o._types, function(i, name){
-					if(!modernizrInputTypes[name]){
+					if((name in modernizrInputTypes) && !modernizrInputTypes[name]){
 						ret = false;
 						return false;
 					}
@@ -1132,11 +1133,11 @@
 	})();
 	//>
 	
-//	addPolyfill('filereader', {
-//		test: 'FileReader' in window,
-//		d: ['swfmini', 'dom-support']
+	addPolyfill('filereader', {
+		test: 'FileReader' in window,
+		d: ['swfmini', 'dom-support']
 //		,nM: 'filereader'
-//	});
+	});
 	
 	//<details
 	if(!('details' in Modernizr)){
@@ -1224,6 +1225,8 @@
 		c: removeCombos
 	});
 	
+	webshims.$ = $;
+	window.webshims = webshims;
 	
 	jScripts
 		.filter('[data-polyfill-cfg]')

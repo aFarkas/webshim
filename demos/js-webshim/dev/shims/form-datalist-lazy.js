@@ -1,4 +1,4 @@
-jQuery.webshims.register('form-datalist-lazy', function($, webshims, window, document, undefined, options){
+webshims.register('form-datalist-lazy', function($, webshims, window, document, undefined, options){
 	
 	var listidIndex = 0;
 	var formsCFG = $.webshims.cfg.forms;

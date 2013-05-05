@@ -8,7 +8,7 @@ var swfmini = function() {
 	
 	var UNDEF = "undefined",
 		OBJECT = "object",
-		webshims = jQuery.webshims,
+		webshims = jQuery.webshims || window.webshims,
 		SHOCKWAVE_FLASH = "Shockwave Flash",
 		SHOCKWAVE_FLASH_AX = "ShockwaveFlash.ShockwaveFlash",
 		FLASH_MIME_TYPE = "application/x-shockwave-flash",

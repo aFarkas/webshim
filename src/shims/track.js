@@ -1,4 +1,4 @@
-jQuery.webshims.register('track', function($, webshims, window, document, undefined){
+webshims.register('track', function($, webshims, window, document, undefined){
 	"use strict";
 	var mediaelement = webshims.mediaelement;
 	var id = new Date().getTime();

@@ -131,7 +131,7 @@
 								document.writeln = domWrite;
 							}
 							$(document).one('google-loader', googleCallback);
-							$.webshims.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
+							webshims.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
 						}, 800);
 					} else {
 						locationAPIs--;
@@ -164,5 +164,5 @@
 		return api;
 	})();
 	
-	$.webshims.isReady('geolocation', true);
+	webshims.isReady('geolocation', true);
 })(jQuery);

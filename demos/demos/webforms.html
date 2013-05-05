@@ -57,7 +57,11 @@
 			customMessages: true,
 			iVal: {fieldWrapper: '.form-element'}
 		});
-
+		
+		$.webshims.setOptions('forms-ext', { 
+			types: 'range date time number month color'
+		});
+		
 		//load all defined
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
@@ -147,7 +151,7 @@
 				<h3>Options for the <code>forms-ext</code> feature</h3>
 				<ul>
 					<li><strong>replaceUI</strong> (boolean): <code>false</code> (default) || <code>true</code>. If replaceUI is set to true the number, time, month, date <!--, datetime --> and range Widgets are replaced in all browsers (also in browser, which have implemented these types). This is useful, if you want to style the UI in all browsers.</li>
-					<li><strong>types</strong> (string): <code>'range date time number month'</code>. A white space seperated string. If one of the listed input types is not supported. Webshims will load the forms-ext API and UI package and implement all types.</li>
+					<li><strong>types</strong> (string): <code>'range date time number month'</code>. A white space seperated string. Possible values are: range date time number month color (Note: color is left out from the default string). If one of the listed input types is not supported. Webshims will load the forms-ext API and UI package and implement all types.</li>
 					<li><strong>widgets</strong> (options): widgets is a general options object for all input options. For more information see <a href="webforms/3-webforms-widgets.html#configure-ui">here</a> </li>
 					<li><strong>date</strong> (options): for more information see <a href="webforms/3-webforms-widgets.html#date-cfg">here</a></li>
 					<li><strong>month</strong> (options): for more information see <a href="webforms/3-webforms-widgets.html#month-cfg">here</a></li>

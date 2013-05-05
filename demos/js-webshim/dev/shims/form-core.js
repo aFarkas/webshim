@@ -1,4 +1,4 @@
-jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
+webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -223,7 +223,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	};
 	
 	
-	
 	webshims.ready('forms', function(){
 		$(document).on('focusin.lazyloadvalidation', function(e){
 			if('form' in e.target && $(e.target).is(':invalid')){
@@ -232,7 +231,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		});
 	});
 	webshims.ready('WINDOWLOAD', lazyLoad);
-	
+	if(options.overrideMessages){
+		webshims.warn('overrideMessages is deprecated. use customMessages instead.');
+	}
 	if(options.replaceValidationUI){
 		if(options.overrideMessages && (options.customMessages || options.customMessages == null)){
 			options.customMessages = true;

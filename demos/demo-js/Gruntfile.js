@@ -7,7 +7,7 @@ module.exports = function(grunt) {
 				separator: ';'
 			},
 			dist: {
-				src: ['src/mousepress.js', 'src/jquery.mousewheel.js', 'jquery.mwheelIntent.js', 'src/init.js'],
+				src: ['src/mousepress.js', 'src/jquery.mousewheel.js', 'src/jquery.mwheelIntent.js', 'src/init.js'],
 				dest: 'src/demo.js'
 			}
 		},

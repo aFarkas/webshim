@@ -2280,7 +2280,7 @@
 	};
 })(jQuery, '1.1.6wsmod');
 
-jQuery.webshims.register('color-picker', function($, webshims, window, document, undefined){
+webshims.register('color-picker', function($, webshims, window, document, undefined){
 	"use strict";
 	var picker = webshims.picker;
 	

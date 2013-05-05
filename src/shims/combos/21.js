@@ -131,7 +131,7 @@
 								document.writeln = domWrite;
 							}
 							$(document).one('google-loader', googleCallback);
-							$.webshims.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
+							webshims.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
 						}, 800);
 					} else {
 						locationAPIs--;
@@ -164,10 +164,10 @@
 		return api;
 	})();
 	
-	$.webshims.isReady('geolocation', true);
+	webshims.isReady('geolocation', true);
 })(jQuery);
 
-jQuery.webshims.register('details', function($, webshims, window, doc, undefined, options){
+webshims.register('details', function($, webshims, window, doc, undefined, options){
 	var isInterActiveSummary = function(summary){
 		var details = $(summary).parent('details');
 		if(details[0] && details.children(':first').get(0) === summary){
@@ -316,7 +316,7 @@ jQuery.webshims.register('details', function($, webshims, window, doc, undefined
 	});
 });
 
-jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, document, undefined, options){
+webshims.register('mediaelement-jaris', function($, webshims, window, document, undefined, options){
 	"use strict";
 	
 	var mediaelement = webshims.mediaelement;
@@ -1254,7 +1254,7 @@ jQuery.webshims.register('mediaelement-jaris', function($, webshims, window, doc
 	
 	
 });
-jQuery.webshims.register('track', function($, webshims, window, document, undefined){
+webshims.register('track', function($, webshims, window, document, undefined){
 	"use strict";
 	var mediaelement = webshims.mediaelement;
 	var id = new Date().getTime();

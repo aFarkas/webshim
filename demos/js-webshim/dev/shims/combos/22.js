@@ -1,4 +1,4 @@
-jQuery.webshims.register('details', function($, webshims, window, doc, undefined, options){
+webshims.register('details', function($, webshims, window, doc, undefined, options){
 	var isInterActiveSummary = function(summary){
 		var details = $(summary).parent('details');
 		if(details[0] && details.children(':first').get(0) === summary){
@@ -147,7 +147,7 @@ jQuery.webshims.register('details', function($, webshims, window, doc, undefined
 	});
 });
 
-jQuery.webshims.register('track', function($, webshims, window, document, undefined){
+webshims.register('track', function($, webshims, window, document, undefined){
 	"use strict";
 	var mediaelement = webshims.mediaelement;
 	var id = new Date().getTime();

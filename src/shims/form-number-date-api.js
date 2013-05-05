@@ -1,4 +1,4 @@
-jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
+webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(!webshims.addInputType){
 		webshims.error("you can not call forms-ext feature after calling forms feature. call both at once instead: $.webshims.polyfill('forms forms-ext')");
@@ -273,10 +273,12 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			maxDefault: 100
 		},
 		color: {
-			mismatch: function(val){
-				if(!val || val.length != 7 || !(/^\u0023/.test(val))){return true;}
-				return isNaN(parseInt( val.charAt(1) + val.charAt(2), 16)) || isNaN(parseInt( val.charAt(3) + val.charAt(4), 16)) || isNaN(parseInt( val.charAt(5) + val.charAt(6), 16));
-			}
+			mismatch: (function(){
+				var cReg = /^\u0023[a-f0-9]{6}$/;
+				return function(val){
+					return (!val || val.length != 7 || !(cReg.test(val)));
+				};
+			})()
 		},
 		date: {
 			mismatch: function(val){

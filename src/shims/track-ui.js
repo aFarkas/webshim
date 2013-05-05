@@ -1,4 +1,4 @@
-jQuery.webshims.register('track-ui', function($, webshims, window, document, undefined){
+webshims.register('track-ui', function($, webshims, window, document, undefined){
 	"use strict";
 	var options = webshims.cfg.track;
 	var enterE = {type: 'enter'};

@@ -21,13 +21,11 @@
 		}
 		
 		
-		.validity-alert .va-box,
-		.validity-alert .va-arrow {
-			border-color: #e66;
+		.ws-success {
+			border-color: #0a0;
 		}
-		.validity-alert .va-box {
-			font: 12px arial;
-			color: #600;
+		.ws-invalid {
+			border-color: #a00;
 		}
 	</style>
 	
@@ -322,10 +320,10 @@ $.webshims.activeLang("en");
 						
 						
 						<div class="form-element">
-							<label for="password">
-								password: 
+							<label for="no-constraints">
+								text (no constraints): 
 							</label>
-							<input placeholder="password" name="password" type="password" id="password" />
+							<input name="no-constraints" type="text" id="no-constraints" />
 						</div>
 						
 						<div class="form-element">

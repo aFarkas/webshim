@@ -801,7 +801,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 
 
 
-jQuery.webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
+webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(!webshims.addInputType){
 		webshims.error("you can not call forms-ext feature after calling forms feature. call both at once instead: $.webshims.polyfill('forms forms-ext')");
@@ -1076,10 +1076,12 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			maxDefault: 100
 		},
 		color: {
-			mismatch: function(val){
-				if(!val || val.length != 7 || !(/^\u0023/.test(val))){return true;}
-				return isNaN(parseInt( val.charAt(1) + val.charAt(2), 16)) || isNaN(parseInt( val.charAt(3) + val.charAt(4), 16)) || isNaN(parseInt( val.charAt(5) + val.charAt(6), 16));
-			}
+			mismatch: (function(){
+				var cReg = /^\u0023[a-f0-9]{6}$/;
+				return function(val){
+					return (!val || val.length != 7 || !(cReg.test(val)));
+				};
+			})()
 		},
 		date: {
 			mismatch: function(val){
@@ -1694,13 +1696,13 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 				mousedown: add
 			});
 			$(function(){
-				$.webshims.ready('dom-support', function(){
+				webshims.ready('dom-support', function(){
 					that.element.onWSOff('updateshadowdom', function(){
 						that.updateMetrics();
 					});
 				});
 				if(!$.fn.onWSOff){
-					$.webshims._polyfill(['dom-support']);
+					webshims._polyfill(['dom-support']);
 				}
 			});
 		},
@@ -1762,16 +1764,16 @@ jQuery.webshims.register('form-number-date-api', function($, webshims, window, d
 			calcTrail: true
 		}, opts);
 		return this.each(function(){
-			$.webshims.objectCreate(rangeProto, {
+			webshims.objectCreate(rangeProto, {
 				element: {
 					value: $(this)
 				}
 			}, opts);
 		});
 	};
-	jQuery.webshims.isReady('range-ui', true);
+	webshims.isReady('range-ui', true);
 })(jQuery);
-jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
+webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var curCfg;
 	var formcfg = webshims.formcfg;

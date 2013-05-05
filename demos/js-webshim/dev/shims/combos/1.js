@@ -8,7 +8,7 @@ var swfmini = function() {
 	
 	var UNDEF = "undefined",
 		OBJECT = "object",
-		webshims = jQuery.webshims,
+		webshims = jQuery.webshims || window.webshims,
 		SHOCKWAVE_FLASH = "Shockwave Flash",
 		SHOCKWAVE_FLASH_AX = "ShockwaveFlash.ShockwaveFlash",
 		FLASH_MIME_TYPE = "application/x-shockwave-flash",
@@ -496,7 +496,7 @@ var swfmini = function() {
 	};
 }();
 
-jQuery.webshims.register('form-core', function($, webshims, window, document, undefined, options){
+webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -721,7 +721,6 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 	};
 	
 	
-	
 	webshims.ready('forms', function(){
 		$(document).on('focusin.lazyloadvalidation', function(e){
 			if('form' in e.target && $(e.target).is(':invalid')){
@@ -730,7 +729,9 @@ jQuery.webshims.register('form-core', function($, webshims, window, document, un
 		});
 	});
 	webshims.ready('WINDOWLOAD', lazyLoad);
-	
+	if(options.overrideMessages){
+		webshims.warn('overrideMessages is deprecated. use customMessages instead.');
+	}
 	if(options.replaceValidationUI){
 		if(options.overrideMessages && (options.customMessages || options.customMessages == null)){
 			options.customMessages = true;
@@ -1403,4 +1404,4 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		webshims.ready(swfType, initMediaElements);
 	}
 });
-})(jQuery, Modernizr, jQuery.webshims);
+})(jQuery, Modernizr, webshims);

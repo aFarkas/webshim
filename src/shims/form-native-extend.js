@@ -1,4 +1,4 @@
-jQuery.webshims.register('form-native-extend', function($, webshims, window, doc, undefined, options){
+webshims.register('form-native-extend', function($, webshims, window, doc, undefined, options){
 	"use strict";
 	var Modernizr = window.Modernizr;
 	var modernizrInputTypes = Modernizr.inputtypes;

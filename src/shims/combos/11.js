@@ -373,13 +373,13 @@
 				mousedown: add
 			});
 			$(function(){
-				$.webshims.ready('dom-support', function(){
+				webshims.ready('dom-support', function(){
 					that.element.onWSOff('updateshadowdom', function(){
 						that.updateMetrics();
 					});
 				});
 				if(!$.fn.onWSOff){
-					$.webshims._polyfill(['dom-support']);
+					webshims._polyfill(['dom-support']);
 				}
 			});
 		},
@@ -441,16 +441,16 @@
 			calcTrail: true
 		}, opts);
 		return this.each(function(){
-			$.webshims.objectCreate(rangeProto, {
+			webshims.objectCreate(rangeProto, {
 				element: {
 					value: $(this)
 				}
 			}, opts);
 		});
 	};
-	jQuery.webshims.isReady('range-ui', true);
+	webshims.isReady('range-ui', true);
 })(jQuery);
-jQuery.webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
+webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var curCfg;
 	var formcfg = webshims.formcfg;

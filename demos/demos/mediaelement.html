@@ -269,10 +269,9 @@
 				<h3>Options for the <code>mediaelement</code> feature</h3>
 				
 				<ul>
-					<li><strong>player</strong> 'jwplayer' (default) || 'jaris': Use the free and open source <a href="http://jarisflvplayer.org/">Jarisplayer</a> or <a href="http://www.longtailvideo.com/players/">JW Player</a></li>
 					<li><strong>preferFlash</strong> (false): If preferFlash is set to true the mediaelements will be replaced by flash, if flash is available. Otherwise only, if mediaelements aren't supported or the current audio/video container/codec isn't supported by the browser.</li>
-					<li><strong>vars</strong> (Flahsvars Object): Object with default flashvars to configure<a href="http://jarisflvplayer.org/docs/">Jarisplayer</a> or  <a href="http://www.longtailvideo.com/support/jw-player/jw-player-for-flash-v5/12536/configuration-options">JWPlayer</a>. This general configuration can be changed by using a data-vars attribute, too.</li>
-					<li><strong>changeSWF</strong> (Manipulation function): Callback function to also modify the flashvars object for Jarisplayer/JWPlayer.</li>
+					<li><strong>vars</strong> (Flahsvars Object): Object with default flashvars to configure<a href="http://jarisflvplayer.org/docs/">Jarisplayer</a>. This general configuration can be changed by using a data-vars attribute, too.</li>
+					<li><strong>changeSWF</strong> (Manipulation function): Callback function to also modify the flashvars object for Jarisplayer.</li>
 					<!--<li><strong>hasToPlay</strong> (string default: "any" (or "ogg", "webm", "h264", "flv", "mp3", "wav", "m4a", "fla")): If a page is only using for example h.264 encoded videos, this can be set to <code>"h264"</code>. If a browser does not support h264, mp3 or flv/fla, but this property is set to "any", the video format will be still polyfilled.</li>-->
 				</ul>
 				
@@ -516,12 +515,7 @@ $("video.my-video").loadMediaSrc(
 
 				<h4>Using custom styleable controls</h4>
 				<p>Webshims lib does not provide custom styleable controls out of the box. Instead webshims lib polyfills the HTML5 API, so that you can easily build your own controls. Simply have a look into the source code of this site, to see how we have build the controls in our demo. If you are interested in a ready-to-use solution for CSS styleable controls, try <a href="https://github.com/aFarkas/jMediaelement">JME2</a>. JME2 works in all HTML5 browsers without a polyfill and in all browsers including IE6 in conjunction with webshims lib.</p>
-				<h4>Updating JWPlayer/Using licensed JWPlayer</h4>
-				<p>Simply place player.swf into your shims/jwplayer folder.</p>
-				<h4>Changing path to swfobject</h4>
-<code class="block">
-$.webshims.modules.swfobject.src = "/path/to/swfobject.js";
-</code>
+				
 				
 				<h2>Cookbook</h2>
 				

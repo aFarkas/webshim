@@ -253,7 +253,7 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 		$.webshims.isReady('json-storage', true);
 	};
 	var storageCFG = $.webshims.cfg['json-storage'];
-	$.webshims.swfLocalStorage = {
+	webshims.swfLocalStorage = {
 		show: function(){
 			if(storageCFG.exceededMessage){
 				$('#swflocalstorageshim-wrapper').prepend('<div class="polyfill-exceeded-message">'+ storageCFG.exceededMessage +'</div>');
@@ -284,14 +284,14 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 //		
 //	};
 	
-	$.webshims.ready('DOM swfmini', function(){
+	webshims.ready('DOM swfmini', function(){
 		
 		var swfmini = window.swfmini;
 		if(runStart || (('localStorage' in window) && document.getElementById('swflocalstorageshim')) ){return;}
 		runStart = true;
 		if(swfmini && swfmini.hasFlashPlayerVersion('8.0.0')){
 			$('body').append('<div id="swflocalstorageshim-wrapper"><div id="swflocalstorageshim" /></div>');
-			swfmini.embedSWF($.webshims.cfg.basePath +'swf/localStorage.swf' +($.webshims.cfg.addCacheBuster || ''), 'swflocalstorageshim', '295', '198', '8.0.0', null, {allowscriptaccess: 'always'}, {name: 'swflocalstorageshim'}, function(e){
+			swfmini.embedSWF(webshims.cfg.basePath +'swf/localStorage.swf' +(webshims.cfg.addCacheBuster || ''), 'swflocalstorageshim', '295', '198', '8.0.0', null, {allowscriptaccess: 'always'}, {name: 'swflocalstorageshim'}, function(e){
 				if(!e.success && !window.localStorage){
 					localStorageSwfCallback();
 				}
@@ -299,7 +299,7 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 			clearTimeout(swfTimer);
 			swfTimer = setTimeout(function(){
 				if(!('localStorage' in window)){
-					$.webshims.warn('Add your development-directory to the local-trusted security sandbox: http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html');
+					webshims.warn('Add your development-directory to the local-trusted security sandbox: http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html');
 				}
 				localStorageSwfCallback();
 			}, (location.protocol.indexOf('file') === 0) ? 500 : 9999);

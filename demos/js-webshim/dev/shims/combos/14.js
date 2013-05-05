@@ -802,7 +802,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 
 
 //DOM-Extension helper
-jQuery.webshims.register('dom-extend', function($, webshims, window, document, undefined){
+webshims.register('dom-extend', function($, webshims, window, document, undefined){
 	"use strict";
 	
 	webshims.assumeARIA = $.support.getSetAttribute || Modernizr.canvas || Modernizr.video || Modernizr.boxsizing;
@@ -814,7 +814,20 @@ jQuery.webshims.register('dom-extend', function($, webshims, window, document, u
 	if(!$.parseHTML){
 		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
-	
+	if (!webshims.cfg.no$Switch) {
+		var switch$ = function(){
+			if (window.jQuery && (!window.$ || window.jQuery == window.$) && !window.jQuery.webshims) {
+				webshims.error("jQuery was included more than once. Make sure to include it only once! Webshims and other Plugins might not work properly.");
+				if (window.$) {
+					window.$ = webshims.$;
+				}
+				window.jQuery = webshims.$;
+			}
+		};
+		switch$();
+		setTimeout(switch$, 90);
+		$(switch$);
+	}
 //	(function(){
 //		var hostNames = {
 //			'afarkas.github.io': 1,
@@ -2161,7 +2174,7 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 		$.webshims.isReady('json-storage', true);
 	};
 	var storageCFG = $.webshims.cfg['json-storage'];
-	$.webshims.swfLocalStorage = {
+	webshims.swfLocalStorage = {
 		show: function(){
 			if(storageCFG.exceededMessage){
 				$('#swflocalstorageshim-wrapper').prepend('<div class="polyfill-exceeded-message">'+ storageCFG.exceededMessage +'</div>');
@@ -2192,14 +2205,14 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 //		
 //	};
 	
-	$.webshims.ready('DOM swfmini', function(){
+	webshims.ready('DOM swfmini', function(){
 		
 		var swfmini = window.swfmini;
 		if(runStart || (('localStorage' in window) && document.getElementById('swflocalstorageshim')) ){return;}
 		runStart = true;
 		if(swfmini && swfmini.hasFlashPlayerVersion('8.0.0')){
 			$('body').append('<div id="swflocalstorageshim-wrapper"><div id="swflocalstorageshim" /></div>');
-			swfmini.embedSWF($.webshims.cfg.basePath +'swf/localStorage.swf' +($.webshims.cfg.addCacheBuster || ''), 'swflocalstorageshim', '295', '198', '8.0.0', null, {allowscriptaccess: 'always'}, {name: 'swflocalstorageshim'}, function(e){
+			swfmini.embedSWF(webshims.cfg.basePath +'swf/localStorage.swf' +(webshims.cfg.addCacheBuster || ''), 'swflocalstorageshim', '295', '198', '8.0.0', null, {allowscriptaccess: 'always'}, {name: 'swflocalstorageshim'}, function(e){
 				if(!e.success && !window.localStorage){
 					localStorageSwfCallback();
 				}
@@ -2207,7 +2220,7 @@ if (!('sessionStorage' in window)) {window.sessionStorage = new Storage('session
 			clearTimeout(swfTimer);
 			swfTimer = setTimeout(function(){
 				if(!('localStorage' in window)){
-					$.webshims.warn('Add your development-directory to the local-trusted security sandbox: http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html');
+					webshims.warn('Add your development-directory to the local-trusted security sandbox: http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html');
 				}
 				localStorageSwfCallback();
 			}, (location.protocol.indexOf('file') === 0) ? 500 : 9999);
