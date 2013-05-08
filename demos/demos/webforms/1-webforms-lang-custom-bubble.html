@@ -32,6 +32,15 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
+	
+	<!--
+		<script src="../../../src/polyfiller.js"></script> 
+		<script>
+			$.webshims.debug = 'noCombo';
+			//style calendar, datalist, validation bubble
+			//$('html').on('wspopoverbeforehide', false);
+		</script>
+	-->
 	<script>
 		//configure
 		$.webshims.setOptions('forms', { 
@@ -95,7 +104,7 @@ $('form').bind('invalid', function(e){
 			<p>Webshims lib gives you some extensions to make styling validation error message or changing the error-messages really simple.</p>
 			<ul>
 				<li>firstinvalid (event)</li>
-				<li>customValidationMessage (DOM-Property) (Note: to get this new property either <code>customMessages</code> or <code>overrideValidationMessage</code> has to be set to true before calling <code>$.webshims.polyfill();</code>)</li>
+				<li>customValidationMessage (webshims DOM-Property) (Note: to get this new property <code>customMessages</code> has to be set to true before calling <code>$.webshims.polyfill();</code>)</li>
 				<li>$.webshims.validityAlert (Helper Object)</li>
 				<li>data-errormessage/-x-moz-errormessage content attributes (are automatically used by validityAlert)</li>
 				<li>.ws-instantvalidation for Live Inline Form Validation</li>
@@ -124,7 +133,7 @@ $('form')
 &lt;/span&gt;
 </code>
 			
-			<p>Firefox 4.0 also shows an invalid hint on mouseover, which can't be replaced by this technique. If you want to remove this you can use a title-attribute with an emtpy string or use the <a href="https://developer.mozilla.org/en/HTML/element/input#Error_messages">x-moz-errormessage</a> to control the error message.</p>
+			<p>Firefox and some other browsers also show an invalid hint on mouseover, which can't be replaced by this technique. If you want to remove this you can use a title-attribute (with an emtpy string) or use the <a href="https://developer.mozilla.org/en/HTML/element/input#Error_messages">-x-moz-errormessage</a> to control the error message.</p>
 			
 			<p>Using the <code>setCustomValidity</code> approach will fully replace the validation message, while the native validation UI stays. Changing the validation message with setCustomValidity, would look like this:</p>
 			
@@ -144,7 +153,7 @@ $('input[required]').setCustomValidity('');
 $.webshims.setOptions('forms', { 
 	iVal: {
 		fieldWrapper: '.form-element', // default: ':not(span, em, strong, p)'
-		handleBubble: 'hide', // defaults: true. true|false|'hide'if set to the string 'hide'
+		handleBubble: 'hide', // defaults: true. true (bubble and focus first invalid element) | false (no focus and no bubble) | 'hide' (no bubble, but focus first invalid element)
 		fx: 'slide', //defaults 'slide' or 'fade'
 		sel: '.ws-instantvalidation' // simple selector for the form element, setting this to false, will remove this feature
 	}

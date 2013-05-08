@@ -4,8 +4,8 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 	var modernizrInputTypes = Modernizr.inputtypes;
 	if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){return;}
 	var typeModels = webshims.inputTypes;
+	var runTest = false;
 	var validityRules = {};
-	
 	var updateValidity = (function(){
 		var timer;
 		var getValidity = function(){
@@ -14,13 +14,14 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		var update = function(){
 			$('input').each(getValidity);
 		};
-		return function(fast){
+		return function(){
 			clearTimeout(timer);
 			timer = setTimeout(update, 9);
 		};
 	})();
 	webshims.addInputType = function(type, obj){
 		typeModels[type] = obj;
+		runTest = true;
 		//update validity of all implemented input types
 		if($.isDOMReady && Modernizr.formvalidation && !webshims.bugs.bustedValidity){
 			updateValidity();
@@ -44,16 +45,18 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		return ret;
 	});
 	
-	var overrideValidity = !webshims.modules['form-number-date-api'].test();
+	var formsExtModule = webshims.modules['form-number-date-api'];
+	var overrideValidity = formsExtModule.loaded && !formsExtModule.test();
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	
 	var validityChanger = ['value'];
 	var validityElements = [];
 	var testValidity = function(elem, init){
-		if(!elem){return;}
+		if(!elem && !runTest){return;}
 		var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
-		
-		$.prop(elem, 'validity');
+		if(typeModels[type]){
+			$.prop(elem, 'validity');
+		}
 	};
 	
 	var oldSetCustomValidity = {};
@@ -165,7 +168,6 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 			var inputThrottle;
 			var testPassValidity = function(e){
 				if(!('form' in e.target)){return;}
-				var form = e.target.form;
 				clearTimeout(inputThrottle);
 				testValidity(e.target);
 			};
@@ -184,9 +186,11 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		var validityElementsSel = validityElements.join(',');	
 		
 		webshims.addReady(function(context, elem){
-			$(validityElementsSel, context).add(elem.filter(validityElementsSel)).each(function(){
-				$.prop(this, 'validity');
-			});
+			if(runTest){
+				$(validityElementsSel, context).add(elem.filter(validityElementsSel)).each(function(){
+					testValidity(this);
+				});
+			}
 		});
 		
 		
@@ -196,7 +200,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		prop: {
 			get: function(){
 				var elem = this;
-				var type = (elem.getAttribute('type') || '').toLowerCase();
+				var type = (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase();
 				return (webshims.inputTypes[type]) ? type : elem.type;
 			}
 		}

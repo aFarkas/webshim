@@ -57,7 +57,7 @@
 									$('audio, video').each(function(){
 										webshims.mediaelement.selectSource(this);
 									});
-									webshims.warn("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error'));
+									webshims.error("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error'));
 								}
 							}, 9);
 						});

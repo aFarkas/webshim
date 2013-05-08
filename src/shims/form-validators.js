@@ -1,6 +1,9 @@
 webshims.register('form-validators', function($, webshims, window, document, undefined, options){
 "use strict";
 (function(){
+	if(webshims.refreshCustomValidityRules){
+		webshims.error("form-validators already included. please remove custom-validity.js");
+	}
 	var webshims = $.webshims;
 	var customValidityRules = {};
 	var formReady = false;

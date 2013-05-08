@@ -20,6 +20,15 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				}
 				window.jQuery = webshims.$;
 			}
+			if(webshims.M != Modernizr){
+				webshims.error("Modernizr was included more than once. Make sure to include it only once! Webshims and other scripts might not work properly.");
+				for(var i in Modernizr){
+					if(!(i in webshims.M)){
+						webshims.M[i] = Modernizr[i];
+					}
+				}
+				Modernizr = webshims.M;
+			}
 		};
 		switch$();
 		setTimeout(switch$, 90);
@@ -1259,6 +1268,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			val = !!val;
 			this.options.readonly = val;
 			this.element.attr('aria-readonly', ''+val);
+			if(this._init){
+				this.updateMetrics();
+			}
 		},
 		disabled: function(val){
 			val = !!val;
@@ -1267,6 +1279,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				this.element.attr({tabindex: -1, 'aria-disabled': 'true'});
 			} else {
 				this.element.attr({tabindex: this.options.tabindex, 'aria-disabled': 'false'});
+			}
+			if(this._init){
+				this.updateMetrics();
 			}
 		},
 		tabindex: function(val){
@@ -1347,6 +1362,24 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			
 			return val;
 		},
+		addRemoveClass: function(cName, add){
+			var isIn = this.element.prop('className').indexOf(cName) != -1;
+			var action;
+			if(!add && isIn){
+				action = 'removeClass';
+				this.element.removeClass(cName);
+				this.updateMetrics();
+			} else if(add && !isIn){
+				action = 'addClass';
+				
+			}
+			if(action){
+				this.element[action](cName);
+				if(this._init){
+					this.updateMetrics();
+				}
+			}
+		},
 		addBindings: function(){
 			var leftOffset, widgetUnits, hasFocus;
 			var that = this;
@@ -1390,13 +1423,12 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					e.preventDefault();
 				}
 			};
-			
 			var remove = function(e){
 				if(e && e.type == 'mouseup'){
 					eventTimer.call('input', o.value);
 					eventTimer.call('change', o.value);
 				}
-				that.element.removeClass('ws-active');
+				that.addRemoveClass('ws-active');
 				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
 				$(window).off('blur', removeWin);
 			};
@@ -1409,7 +1441,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
 				$(window).off('blur', removeWin);
 				if(!o.readonly && !o.disabled){
-					leftOffset = that.element.focus().addClass('ws-active').offset();
+					that.element.focus();
+					that.addRemoveClass('ws-active', true);
+					leftOffset = that.element.focus().offset();
 					widgetUnits = that.element[that.dirs.innerWidth]();
 					if(!widgetUnits || !leftOffset){return;}
 					outerWidth = that.thumb[that.dirs.outerWidth]();
@@ -1432,18 +1466,20 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					if(!o.disabled){
 						eventTimer.init('input', o.value);
 						eventTimer.init('change', o.value);
-						that.element.addClass('ws-focus');
+						that.addRemoveClass('ws-focus', true);
+						that.updateMetrics();
 					}
 					hasFocus = true;
 				},
 				blur: function(e){
 					that.element.removeClass('ws-focus ws-active');
+					that.updateMetrics();
 					hasFocus = false;
 					eventTimer.init('input', o.value);
 					eventTimer.call('change', o.value);
 				},
 				keyup: function(){
-					that.element.removeClass('ws-active');
+					that.addRemoveClass('ws-active');
 					eventTimer.call('input', o.value);
 					eventTimer.call('change', o.value);
 				},
@@ -1468,7 +1504,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 							step = false;
 						}
 						if (step) {
-							that.element.addClass('ws-active');
+							that.addRemoveClass('ws-active', true);
 							eventTimer.call('input', o.value);
 							e.preventDefault();
 						}

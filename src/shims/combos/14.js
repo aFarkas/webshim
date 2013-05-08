@@ -823,6 +823,15 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				}
 				window.jQuery = webshims.$;
 			}
+			if(webshims.M != Modernizr){
+				webshims.error("Modernizr was included more than once. Make sure to include it only once! Webshims and other scripts might not work properly.");
+				for(var i in Modernizr){
+					if(!(i in webshims.M)){
+						webshims.M[i] = Modernizr[i];
+					}
+				}
+				Modernizr = webshims.M;
+			}
 		};
 		switch$();
 		setTimeout(switch$, 90);

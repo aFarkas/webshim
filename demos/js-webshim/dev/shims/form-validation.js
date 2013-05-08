@@ -95,7 +95,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			
 			var addClass, removeClass, trigger, generaltrigger, validityCause;
 			
-			$(elem).trigger('refreshCustomValidityRules');
+			if(webshims.refreshCustomValidityRules){
+				webshims.refreshCustomValidityRules(elem);
+			}
 			
 			if(validity.valid){
 				if(!shadowElem.hasClass(validClass)){

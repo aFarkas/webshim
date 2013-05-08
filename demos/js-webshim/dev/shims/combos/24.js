@@ -95,7 +95,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			
 			var addClass, removeClass, trigger, generaltrigger, validityCause;
 			
-			$(elem).trigger('refreshCustomValidityRules');
+			if(webshims.refreshCustomValidityRules){
+				webshims.refreshCustomValidityRules(elem);
+			}
 			
 			if(validity.valid){
 				if(!shadowElem.hasClass(validClass)){
@@ -595,6 +597,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 webshims.register('form-validators', function($, webshims, window, document, undefined, options){
 "use strict";
 (function(){
+	if(webshims.refreshCustomValidityRules){
+		webshims.error("form-validators already included. please remove custom-validity.js");
+	}
 	var webshims = $.webshims;
 	var customValidityRules = {};
 	var formReady = false;

@@ -955,6 +955,7 @@
 		var modernizrInputAttrs = Modernizr.input;
 		var modernizrInputTypes = Modernizr.inputtypes;
 		var formvalidation = 'formvalidation';
+		var fNuAPI = 'form-number-date-api';
 		var select = $('<select required="" name="a"><option disabled="" /></select>')[0];
 		var bustedValidity = false;
 		
@@ -963,6 +964,7 @@
 				addTest(formvalidation, function(){
 					return !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern);
 				});
+				
 				addTest('fieldsetdisabled', function(){
 					var fieldset = $('<fieldset />')[0];
 					return 'elements' in fieldset && 'disabled' in fieldset;
@@ -1016,7 +1018,6 @@
 				availabeLangs: ['ar', 'ch-ZN', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'nl', 'pt-PT', 'ru', 'sv'] //en and de are directly implemented in core
 	//			,customMessages: false,
 	//			overridePlaceholder: false, // might be good for IE10
-	//			overrideMessages: false,
 	//			replaceValidationUI: false
 			},
 			methodNames: ['setCustomValidity','checkValidity'],
@@ -1029,7 +1030,7 @@
 		addPolyfill('form-native-extend', {
 			f: 'forms',
 			test: function(toLoad){
-				return (!Modernizr[formvalidation] || bustedValidity) || ((modules['form-number-date-api'].test() || $.inArray('form-number-date-api', toLoad  || []) == -1) && !formOptions.overrideMessages );
+				return !Modernizr[formvalidation] || bustedValidity  || $.inArray(fNuAPI, toLoad  || []) == -1 || modules[fNuAPI].test();
 			},
 			d: ['form-core', DOMSUPPORT, 'form-message'],
 			c: [6, 5]
@@ -1062,7 +1063,7 @@
 		
 		addModule('form-validators', formExtras);
 				
-		addPolyfill('form-number-date-api', {
+		addPolyfill(fNuAPI, {
 			f: 'forms-ext',
 			options: {
 				types: 'range date time number month'
@@ -1103,9 +1104,9 @@
 			f: 'forms-ext',
 			test: function(){
 				initialFormTest();
-				return !this.options.replaceUI && modules['form-number-date-api'].test();
+				return !this.options.replaceUI && modules[fNuAPI].test();
 			},
-			d: ['forms', DOMSUPPORT, 'form-number-date-api', 'range-ui'],
+			d: ['forms', DOMSUPPORT, fNuAPI, 'range-ui'],
 			options: {
 				
 				widgets: {
@@ -1225,6 +1226,7 @@
 	});
 	
 	webshims.$ = $;
+	webshims.M = Modernizr;
 	window.webshims = webshims;
 	
 	jScripts

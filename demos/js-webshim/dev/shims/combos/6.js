@@ -4,8 +4,8 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 	var modernizrInputTypes = Modernizr.inputtypes;
 	if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){return;}
 	var typeModels = webshims.inputTypes;
+	var runTest = false;
 	var validityRules = {};
-	
 	var updateValidity = (function(){
 		var timer;
 		var getValidity = function(){
@@ -14,13 +14,14 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		var update = function(){
 			$('input').each(getValidity);
 		};
-		return function(fast){
+		return function(){
 			clearTimeout(timer);
 			timer = setTimeout(update, 9);
 		};
 	})();
 	webshims.addInputType = function(type, obj){
 		typeModels[type] = obj;
+		runTest = true;
 		//update validity of all implemented input types
 		if($.isDOMReady && Modernizr.formvalidation && !webshims.bugs.bustedValidity){
 			updateValidity();
@@ -44,16 +45,18 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		return ret;
 	});
 	
-	var overrideValidity = !webshims.modules['form-number-date-api'].test();
+	var formsExtModule = webshims.modules['form-number-date-api'];
+	var overrideValidity = formsExtModule.loaded && !formsExtModule.test();
 	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	
 	var validityChanger = ['value'];
 	var validityElements = [];
 	var testValidity = function(elem, init){
-		if(!elem){return;}
+		if(!elem && !runTest){return;}
 		var type = (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase();
-		
-		$.prop(elem, 'validity');
+		if(typeModels[type]){
+			$.prop(elem, 'validity');
+		}
 	};
 	
 	var oldSetCustomValidity = {};
@@ -165,7 +168,6 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 			var inputThrottle;
 			var testPassValidity = function(e){
 				if(!('form' in e.target)){return;}
-				var form = e.target.form;
 				clearTimeout(inputThrottle);
 				testValidity(e.target);
 			};
@@ -184,9 +186,11 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		var validityElementsSel = validityElements.join(',');	
 		
 		webshims.addReady(function(context, elem){
-			$(validityElementsSel, context).add(elem.filter(validityElementsSel)).each(function(){
-				$.prop(this, 'validity');
-			});
+			if(runTest){
+				$(validityElementsSel, context).add(elem.filter(validityElementsSel)).each(function(){
+					testValidity(this);
+				});
+			}
 		});
 		
 		
@@ -196,7 +200,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		prop: {
 			get: function(){
 				var elem = this;
-				var type = (elem.getAttribute('type') || '').toLowerCase();
+				var type = (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase();
 				return (webshims.inputTypes[type]) ? type : elem.type;
 			}
 		}
@@ -867,6 +871,9 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			val = !!val;
 			this.options.readonly = val;
 			this.element.attr('aria-readonly', ''+val);
+			if(this._init){
+				this.updateMetrics();
+			}
 		},
 		disabled: function(val){
 			val = !!val;
@@ -875,6 +882,9 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 				this.element.attr({tabindex: -1, 'aria-disabled': 'true'});
 			} else {
 				this.element.attr({tabindex: this.options.tabindex, 'aria-disabled': 'false'});
+			}
+			if(this._init){
+				this.updateMetrics();
 			}
 		},
 		tabindex: function(val){
@@ -955,6 +965,24 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			
 			return val;
 		},
+		addRemoveClass: function(cName, add){
+			var isIn = this.element.prop('className').indexOf(cName) != -1;
+			var action;
+			if(!add && isIn){
+				action = 'removeClass';
+				this.element.removeClass(cName);
+				this.updateMetrics();
+			} else if(add && !isIn){
+				action = 'addClass';
+				
+			}
+			if(action){
+				this.element[action](cName);
+				if(this._init){
+					this.updateMetrics();
+				}
+			}
+		},
 		addBindings: function(){
 			var leftOffset, widgetUnits, hasFocus;
 			var that = this;
@@ -998,13 +1026,12 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 					e.preventDefault();
 				}
 			};
-			
 			var remove = function(e){
 				if(e && e.type == 'mouseup'){
 					eventTimer.call('input', o.value);
 					eventTimer.call('change', o.value);
 				}
-				that.element.removeClass('ws-active');
+				that.addRemoveClass('ws-active');
 				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
 				$(window).off('blur', removeWin);
 			};
@@ -1017,7 +1044,9 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
 				$(window).off('blur', removeWin);
 				if(!o.readonly && !o.disabled){
-					leftOffset = that.element.focus().addClass('ws-active').offset();
+					that.element.focus();
+					that.addRemoveClass('ws-active', true);
+					leftOffset = that.element.focus().offset();
 					widgetUnits = that.element[that.dirs.innerWidth]();
 					if(!widgetUnits || !leftOffset){return;}
 					outerWidth = that.thumb[that.dirs.outerWidth]();
@@ -1040,18 +1069,20 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 					if(!o.disabled){
 						eventTimer.init('input', o.value);
 						eventTimer.init('change', o.value);
-						that.element.addClass('ws-focus');
+						that.addRemoveClass('ws-focus', true);
+						that.updateMetrics();
 					}
 					hasFocus = true;
 				},
 				blur: function(e){
 					that.element.removeClass('ws-focus ws-active');
+					that.updateMetrics();
 					hasFocus = false;
 					eventTimer.init('input', o.value);
 					eventTimer.call('change', o.value);
 				},
 				keyup: function(){
-					that.element.removeClass('ws-active');
+					that.addRemoveClass('ws-active');
 					eventTimer.call('input', o.value);
 					eventTimer.call('change', o.value);
 				},
@@ -1076,7 +1107,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 							step = false;
 						}
 						if (step) {
-							that.element.addClass('ws-active');
+							that.addRemoveClass('ws-active', true);
 							eventTimer.call('input', o.value);
 							e.preventDefault();
 						}

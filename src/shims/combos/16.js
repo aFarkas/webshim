@@ -518,6 +518,15 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				}
 				window.jQuery = webshims.$;
 			}
+			if(webshims.M != Modernizr){
+				webshims.error("Modernizr was included more than once. Make sure to include it only once! Webshims and other scripts might not work properly.");
+				for(var i in Modernizr){
+					if(!(i in webshims.M)){
+						webshims.M[i] = Modernizr[i];
+					}
+				}
+				Modernizr = webshims.M;
+			}
 		};
 		switch$();
 		setTimeout(switch$, 90);
@@ -4264,7 +4273,7 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 									$('audio, video').each(function(){
 										webshims.mediaelement.selectSource(this);
 									});
-									webshims.warn("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error'));
+									webshims.error("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error'));
 								}
 							}, 9);
 						});
