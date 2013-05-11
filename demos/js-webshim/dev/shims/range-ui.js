@@ -42,6 +42,7 @@
 			var oVal = val;
 			var thumbStyle = {};
 			var rangeStyle = {};
+			
 			if(!_noNormalize && parseFloat(val, 10) != val){
 				val = o.min + ((o.max - o.min) / 2);
 			}
@@ -51,6 +52,7 @@
 			}
 			left =  100 * ((val - o.min) / (o.max - o.min));
 			
+			if(this._init && val == o.value && oVal == val){return;}
 			this.options.value = val;
 			this.thumb.stop();
 			this.range.stop();

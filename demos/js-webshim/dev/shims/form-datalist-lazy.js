@@ -107,7 +107,10 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 							if(formsCFG.customDatalist && activeItem && activeItem[0]){
 								$(opts.input).getNativeElement().trigger('datalistselect');
 							}
-							return false;
+							if(e.keyCode != 13 || (activeItem && activeItem[0])){
+								return false;
+							}
+							
 						}
 					},
 					'focus.datalistWidget': function(){

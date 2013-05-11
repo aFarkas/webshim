@@ -1365,6 +1365,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			var oVal = val;
 			var thumbStyle = {};
 			var rangeStyle = {};
+			
 			if(!_noNormalize && parseFloat(val, 10) != val){
 				val = o.min + ((o.max - o.min) / 2);
 			}
@@ -1374,6 +1375,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			}
 			left =  100 * ((val - o.min) / (o.max - o.min));
 			
+			if(this._init && val == o.value && oVal == val){return;}
 			this.options.value = val;
 			this.thumb.stop();
 			this.range.stop();
