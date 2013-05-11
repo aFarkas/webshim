@@ -2149,28 +2149,6 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 			var initializeDatalist =  function(){
 				
 				
-			if(!listSupport){
-				webshims.defineNodeNameProperty('datalist', 'options', {
-					prop: {
-						writeable: false,
-						get: function(){
-							var elem = this;
-							var select = $('select', elem);
-							var options;
-							if(select[0]){
-								options = select[0].options;
-							} else {
-								options = $('option', elem).get();
-								if(options.length){
-									webshims.warn('you should wrap your option-elements for a datalist in a select element to support IE and other old browsers.');
-								}
-							}
-							return options;
-						}
-					}
-				});
-			}
-				
 			var inputListProto = {
 				//override autocomplete
 				autocomplete: {
@@ -2230,27 +2208,8 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 				};
 			}
 			
-			if(!listSupport){
-				
-				inputListProto['list'] = {
-					attr: {
-						get: function(){
-							var val = webshims.contentAttr(this, 'list');
-							return (val == null) ? undefined : val;
-						},
-						set: function(value){
-							var elem = this;
-							webshims.contentAttr(elem, 'list', value);
-							webshims.objectCreate(shadowListProto, undefined, {input: elem, id: value, datalist: $.prop(elem, 'list')});
-							$(elem).triggerHandler('listdatalistchange');
-						}
-					},
-					initAttr: true,
-					reflect: true,
-					propType: 'element',
-					propNodeName: 'datalist'
-				};
-			} else {
+			
+			if(listSupport){
 				//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
 				if(!($('<datalist><select><option></option></select></datalist>').prop('options') || []).length ){
 					webshims.defineNodeNameProperty('datalist', 'options', {
@@ -2270,7 +2229,7 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 						}
 					});
 				}
-				inputListProto['list'] = {
+				inputListProto.list = {
 					attr: {
 						get: function(){
 							var val = webshims.contentAttr(this, 'list');
@@ -2305,9 +2264,9 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 					propType: 'element',
 					propNodeName: 'datalist'
 				};
+				
+				webshims.defineNodeNameProperties('input', inputListProto);
 			}
-			
-			webshims.defineNodeNameProperties('input', inputListProto);
 			
 			webshims.addReady(function(context, contextElem){
 				contextElem

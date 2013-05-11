@@ -151,7 +151,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 					}
 				});
 			}
-			$(window).on('unload.datalist'+this.id+' beforeunload.datalist'+this.id, function(){
+			$(window).on('unload.datalist'+this.id, function(){
 				that.destroy();
 			});
 		},
