@@ -79,12 +79,13 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
-upcomming Release 1.10.4
+Release 1.10.5
 ----------
 
 - input[type="color"]
 - Instant Form Validation helper (enhances the HTML5 UI for much better UX)
 - FileReader API
+- improved range UI styleability
 - lazy load mostly everything (performance)
 
 

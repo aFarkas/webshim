@@ -30,7 +30,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.5pre',
+		version: '1.10.5',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -860,7 +860,7 @@
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		d: ['es5'],
-		c: [16, 7, 2, 15, 3, 8, 4, 9, 10, 14, 25, 19, 20, 26, 28]
+		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 14, 25, 19, 20, 26, 28, 31]
 	});
 		
 	
@@ -1021,7 +1021,7 @@
 	//			replaceValidationUI: false
 			},
 			methodNames: ['setCustomValidity','checkValidity'],
-			c: [16, 7, 2, 8, 1, 15, 3],
+			c: [16, 7, 2, 8, 1, 15, 30, 3, 31],
 			nM: 'input'
 		});
 		
@@ -1051,7 +1051,7 @@
 				return !( formOptions.customMessages || !Modernizr[formvalidation] || bustedValidity || !modules[formExtend].test(toLoad) );
 			},
 			d: [DOMSUPPORT],
-			c: [16, 7, 15, 3, 8, 4]
+			c: [16, 7, 15, 30, 3, 8, 4]
 		});
 		
 		formExtras = {
@@ -1061,7 +1061,7 @@
 		};
 		addModule('form-validation', $.extend({}, formExtras));
 		
-		addModule('form-validators', formExtras);
+		addModule('form-validators', $.extend({}, formExtras));
 				
 		addPolyfill(fNuAPI, {
 			f: 'forms-ext',
@@ -1126,7 +1126,7 @@
 				return modernizrInputAttrs.list && !formOptions.customDatalist;
 			},
 			d: ['form-core', DOMSUPPORT],
-			c: [16, 7, 6, 2, 9, 15]
+			c: [16, 7, 6, 2, 9, 15, 30, 31]
 		});
 	})();
 	//>

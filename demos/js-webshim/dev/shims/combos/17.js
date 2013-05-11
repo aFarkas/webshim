@@ -1926,24 +1926,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					this._propertyChange('value');
 				}
 			},
-			min: function(val){
-				this.elemHelper.prop('min', val);
-				this.minAsNumber = this.asNumber(val);
-				if(this.valueAsNumber != null && isNaN(this.valueAsNumber)){
-					this._setStartInRange();
-				}
-				this.options.min = val;
-				this._propertyChange('min');
-			},
-			max: function(val){
-				this.elemHelper.prop('max', val);
-				this.maxAsNumber = this.asNumber(val);
-				if(this.valueAsNumber != null && isNaN(this.valueAsNumber)){
-					this._setStartInRange();
-				}
-				this.options.max = val;
-				this._propertyChange('max');
-			},
 			step: function(val){
 				var defStep = steps[this.type];
 				this.options.step = val;
@@ -1951,6 +1933,18 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			}
 		});
 		
+		$.each({min: 1, max: -1}, function(name, factor){
+			var numName = name +'AsNumber';
+			spinBtnProto[name] = function(val){
+				this.elemHelper.prop(name, val);
+				this[numName] = this.asNumber(val);
+				if(this.valueAsNumber != null && (isNaN(this.valueAsNumber) || (!isNaN(this[numName]) && (this.valueAsNumber * factor) < (this[numName] * factor)))){
+					this._setStartInRange();
+				}
+				this.options[name] = val;
+				this._propertyChange(name);
+			};
+		});
 		
 		$.fn.wsBaseWidget = function(opts){
 			opts = $.extend({}, opts);

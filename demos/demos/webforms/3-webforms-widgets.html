@@ -54,14 +54,22 @@
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
 	
 
-	
+	<!--
+		<script src="../../../src/polyfiller.js"></script> 
+		<script>
+			$.webshims.debug = 'noCombo';
+			//style calendar, datalist, validation bubble
+			//$('html').on('wspopoverbeforehide', false);
+		</script>
+	-->
 	<script>
 		
 		$.webshims.setOptions('forms', {
 			customDatalist: true
 		});
 		$.webshims.setOptions('forms-ext', {
-			replaceUI: true
+			replaceUI: true,
+			types: 'range date time number month color'
 		});
 		
 		//load all polyfill features
@@ -780,6 +788,66 @@ $.webshims.activeLang('de');
 							<input data-range='{"animate": true}' name="range-animate" type="range" id="range-animate" />
 						</div>
 						
+						<div class="form-element">
+							<label for="states">
+								US States: <dfn title="required">*</dfn>
+							</label>
+							<input list="state-list" class="mark-option-text" name="states" required="required" type="text" id="states" />
+							<datalist id="state-list">
+								<select>
+									<option value="Alabama" label="State of Alabama" />
+									<option value="Alaska" label="State of Alaska" />
+									<option value="Arizona" label="State of Arizona" />
+									<option value="Arkansas" label="State of Arkansas" />
+									<option value="California" label="State of California" />
+									<option value="Colorado" label="State of Colorado" />
+									<option value="Connecticut" label="State of Connecticut" />
+									<option value="Delaware" label="State of Delaware" />
+									<option value="Florida" label="State of Florida" />
+									<option value="Georgia" label="State of Georgia" />
+									<option value="Hawaiʻi" label="State of Hawaiʻi" />
+									<option value="Idaho" label="State of Idaho" />
+									<option value="Illinois" label="State of Illinois" />
+									<option value="Indiana" label="State of Indiana" />
+									<option value="Iowa" label="State of Iowa" />
+									<option value="Kansas" label="State of Kansas" />
+									<option value="Kentucky" label="Commonwealth of Kentucky" />
+									<option value="Louisiana" label="State of Louisiana" />
+									<option value="Maine" label="State of Maine" />
+									<option value="Maryland" label="State of Maryland" />
+									<option value="Massachusetts" label="Commonwealth of Massachusetts" />
+									<option value="Michigan" label="State of Michigan" />
+									<option value="Minnesota" label="State of Minnesota" />
+									<option value="Mississippi" label="State of Mississippi" />
+									<option value="Missouri" label="State of Missouri" />
+									<option value="Montana" label="State of Montana" />
+									<option value="Nebraska" label="State of Nebraska" />
+									<option value="Nevada" label="State of Nevada" />
+									<option value="New Hampshire" label="State of New Hampshire" />
+									<option value="New Jersey" label="State of New Jersey" />
+									<option value="New Mexico" label="State of New Mexico" />
+									<option value="New York" label="State of New York" />
+									<option value="North Carolina" label="State of North Carolina" />
+									<option value="North Dakota" label="State of North Dakota" />
+									<option value="Ohio" label="State of Ohio" />
+									<option value="Oklahoma" label="State of Oklahoma" />
+									<option value="Oregon" label="State of Oregon" />
+									<option value="Pennsylvania" label="Commonwealth of Pennsylvania" />
+									<option value="Rhode Island" label="State of Rhode Island and Providence Plantations" />
+									<option value="South Carolina" label="State of South Carolina" />
+									<option value="South Dakota" label="State of South Dakota" />
+									<option value="Tennessee" label="State of Tennessee" />
+									<option value="Texas" label="State of Texas" />
+									<option value="Utah" label="State of Utah" />
+									<option value="Vermont" label="State of Vermont" />
+									<option value="Virginia" label="Commonwealth of Virginia" />
+									<option value="Washington" label="State of Washington" />
+									<option value="West Virginia" label="State of West Virginia" />
+									<option value="Wisconsin" label="State of Wisconsin" />
+									<option value="Wyoming" label="State of Wyoming" />
+								</select>
+							</datalist>
+						</div>
 						
 						<div class="form-element">
 							<label for="date">
@@ -801,7 +869,7 @@ $.webshims.activeLang('de');
 							<label for="email">
 								E-Mail + datalist: <dfn title="required">*</dfn>
 							</label>
-							<input list="datalist" name="email" required="required" type="email" id="email" form="form" />
+							<input list="datalist" name="email" required="required" type="email" id="email" />
 							<datalist id="datalist">
 								<select>
 									<option value="yourmail@gmail.com"></option>
@@ -810,6 +878,23 @@ $.webshims.activeLang('de');
 									<option value="foo@bar.baz"></option>
 								</select>
 							</datalist>
+						</div>
+						
+						<div class="form-element">
+							<label for="acolorr">
+								alpha color with range: 
+							</label>
+							<input name="color" type="color" id="acolorr" data-alphacontrol="alpha-range" />
+							<input type="range" id="alpha-range" max="1" value="1" step="0.01" />
+						</div>
+						
+						
+						<div class="form-element">
+							<label for="acolorn">
+								alpha color with number: 
+							</label>
+							<input name="color" type="color" id="acolorn" data-alphacontrol="alpha-number" />
+							<input type="number" id="alpha-number" value="255" max="255" />
 						</div>
 						
 						<div class="form-element">

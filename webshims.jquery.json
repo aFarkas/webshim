@@ -1,6 +1,6 @@
 {
 	"name": "webshims",
-	"version": "1.10.4",
+	"version": "1.10.5",
 	"title": "Webshims - polyfills jQuery with many HTML5 features",
 	"licenses" : [
 		{
@@ -17,13 +17,13 @@
 		"url": "https://github.com/aFarkas/"
 	},
 	
-	"keywords": ["webshims", "polyfill", "HTML5", "forms", "form", "audio", "video", "validation", "canvas", "localstorage", "geolocation", "ui", "widgets", "datepicker", "range"],
+	"keywords": ["webshims", "polyfill", "HTML5", "forms", "form", "audio", "video", "validation", "formvalidation", "colorpicker", "slider", "canvas", "localstorage", "geolocation", "ui", "widgets", "datepicker", "range"],
 	"homepage": "http://afarkas.github.com/webshim/demos/index.html",
 	"description": "modular capability-based polyfill loading libary, which extends jQuery with HTML5 features in legacy browsers",
 	"docs": "http://afarkas.github.com/webshim/demos/index.html",
 	"demo": "http://afarkas.github.com/webshim/demos/index.html",
 	"bugs": "https://github.com/aFarkas/webshim/issues",
-	"download": "http://corrupt-system.de/webshims-1.10.4.zip",
+	"download": "http://corrupt-system.de/webshims-1.10.5.zip",
 	
 	"repository": {
 		"type" : "git",

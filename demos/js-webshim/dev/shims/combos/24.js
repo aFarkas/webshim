@@ -596,11 +596,12 @@ webshims.register('form-validation', function($, webshims, window, document, und
 
 webshims.register('form-validators', function($, webshims, window, document, undefined, options){
 "use strict";
+
 (function(){
 	if(webshims.refreshCustomValidityRules){
 		webshims.error("form-validators already included. please remove custom-validity.js");
 	}
-	var webshims = $.webshims;
+	
 	var customValidityRules = {};
 	var formReady = false;
 	var blockCustom;
@@ -785,8 +786,8 @@ webshims.register('form-validators', function($, webshims, window, document, und
 				val = !val;
 			}
 			$.prop( elem, data.prop, val);
-			if(e && $(elem).is('.user-error, .user-success')){
-				$(elem).trigger('resetvalui');
+			if(e){
+				$(elem).getShadowElement().filter('.user-error, .user-success').trigger('refreshvalidityui');
 			}
 		};
 		
@@ -825,9 +826,7 @@ webshims.register('form-validators', function($, webshims, window, document, und
 			} else {
 				$(data.masterElement).bind('change', function(){
 					$.webshims.refreshCustomValidityRules(elem);
-					if($(elem).is('.user-error, .user-success')){
-						$(elem).trigger('refreshvalidityui');
-					}
+					$(elem).getShadowElement().filter('.user-error, .user-success').trigger('refreshvalidityui');
 				});
 			}
 		}
