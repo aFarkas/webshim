@@ -1431,11 +1431,14 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		return this.on(evt, fn).each(fn);
 	};
 	
-	$.fn.onWSOff = function(evt, fn, trigger){
-		$(document)[trigger ? 'onTrigger' : 'on'](evt, fn);
+	$.fn.onWSOff = function(evt, fn, trigger, evtDel){
+		if(!evtDel){
+			evtDel = document;
+		}
+		$(evtDel)[trigger ? 'onTrigger' : 'on'](evt, fn);
 		this.on('remove', function(e){
 			if(!e.originalEvent){
-				$(document).off(evt, fn);
+				$(evtDel).off(evt, fn);
 			}
 		});
 	};

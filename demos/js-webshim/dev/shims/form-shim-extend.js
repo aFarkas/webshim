@@ -1499,11 +1499,11 @@ try {
 					});
 					
 					if((form = $.prop(elem, 'form'))){
-						$(form).on('reset.placeholder', function(e){
+						$(elem).onWSOff('reset.placeholder', function(e){
 							setTimeout(function(){
 								changePlaceholderVisibility(elem, false, false, data, e.type );
 							}, 0);
-						});
+						}, false, form);
 					}
 					
 					if(elem.type == 'password' || isOver){
@@ -1561,20 +1561,18 @@ try {
 						var reset = function(e){
 							if($(elem).hasClass('placeholder-visible')){
 								hidePlaceholder(elem, data, '');
-								if(e && e.type == 'submit'){
-									setTimeout(function(){
-										if(e.isDefaultPrevented()){
-											changePlaceholderVisibility(elem, false, false, data );
-										}
-									}, 9);
-								}
+								setTimeout(function(){
+									if(!e || e.type != 'submit' || e.isDefaultPrevented()){
+										changePlaceholderVisibility(elem, false, false, data );
+									}
+								}, 9);
 							}
 						};
 						
-						$(window).on('beforeunload', reset);
+						$(elem).onWSOff('beforeunload', reset, false, window);
 						data.box = $(elem);
 						if(form){
-							$(form).submit(reset);
+							$(elem).onWSOff('submit', reset, false, form);
 						}
 					}
 					
