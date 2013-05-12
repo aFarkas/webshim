@@ -8,9 +8,7 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 		if(!lazyLoad[name+'Loaded']){
 			lazyLoad[name+'Loaded'] = true;
 			webshims.ready(name, function(){
-				$(function(){
-					webshims.loader.loadList(['form-datalist-lazy']);
-				});
+				webshims.loader.loadList(['form-datalist-lazy']);
 			});
 		}
 	};
@@ -250,7 +248,8 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 					});
 				}
 			},
-			destroy: function(){
+			destroy: function(e){
+				var input;
 				var autocomplete = $.attr(this.input, 'autocomplete');
 				$(this.input)
 					.off('.datalistWidget')
@@ -267,6 +266,12 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 					this.input.removeAttribute('autocomplete');
 				} else {
 					$(this.input).attr('autocomplete', autocomplete);
+				}
+				if(e && e.type == 'beforeunload'){
+					input = this.input;
+					setTimeout(function(){
+						$.attr(input, 'list', $.attr(input, 'list'));
+					}, 9);
 				}
 				this._destroyed = true;
 			}

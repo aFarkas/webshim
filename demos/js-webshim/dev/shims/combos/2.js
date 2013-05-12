@@ -1656,16 +1656,23 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		return ($.prop(elem, 'validity') || {valid: 1}).valid;
 	};
 	var lazyLoad = function(){
-		webshims.loader.loadList(options.addValidators ? ['form-validation', 'form-validators'] : ['form-validation']);
+		var toLoad = ['form-validation'];
+		if(options.lazyCustomMessages){
+			options.customMessages = true;
+			toLoad.push('form-message');
+		}
+		if(options.addValidators){
+			toLoad.push('form-validators');
+		}
+		webshims.reTest(toLoad);
 		$(document).off('.lazyloadvalidation');
 	};
 	/*
 	 * Selectors for all browsers
 	 */
-	var rangeTypes = {number: 1, range: 1, date: 1, time: 1, month: 1/*, 'datetime-local': 1, datetime: 1, week: 1*/};
 	var hasInvalid = function(elem){
 		var ret = false;
-		$($.prop(elem, 'elements')).each(function(){
+		$(elem).jProp('elements').each(function(){
 			ret = $(this).is(':invalid');
 			if(ret){
 				return false;
@@ -1673,12 +1680,13 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		});
 		return ret;
 	};
+	var rElementsGroup = /^(?:form|fieldset)$/i;
 	$.extend($.expr[":"], {
 		"valid-element": function(elem){
-			return $.nodeName(elem, 'form') ? !hasInvalid(elem) :!!($.prop(elem, 'willValidate') && isValid(elem));
+			return rElementsGroup.test(elem.nodeName || '') ? !hasInvalid(elem) :!!($.prop(elem, 'willValidate') && isValid(elem));
 		},
 		"invalid-element": function(elem){
-			return $.nodeName(elem, 'form') ? hasInvalid(elem) : !!($.prop(elem, 'willValidate') && !isValid(elem));
+			return rElementsGroup.test(elem.nodeName || '') ? hasInvalid(elem) : !!($.prop(elem, 'willValidate') && !isValid(elem));
 		},
 		"required-element": function(elem){
 			return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required'));
@@ -1688,22 +1696,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		},
 		"optional-element": function(elem){
 			return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required') === false);
-		},
-		"in-range": function(elem){
-			if(!rangeTypes[$.prop(elem, 'type')] || !$.prop(elem, 'willValidate')){
-				return false;
-			}
-			var val = $.prop(elem, 'validity');
-			return !!(val && !val.rangeOverflow && !val.rangeUnderflow);
-		},
-		"out-of-range": function(elem){
-			if(!rangeTypes[$.prop(elem, 'type')] || !$.prop(elem, 'willValidate')){
-				return false;
-			}
-			var val = $.prop(elem, 'validity');
-			return !!(val && (val.rangeOverflow || val.rangeUnderflow));
 		}
-		
 	});
 	
 	['valid', 'invalid', 'required', 'optional'].forEach(function(name){
@@ -1861,6 +1854,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	webshims.ready('WINDOWLOAD', lazyLoad);
 	if(options.overrideMessages){
 		options.customMessages = true;
+		webshims.reTest('form-message');
 		webshims.error('overrideMessages is deprecated. use customMessages instead.');
 	}
 	if(options.replaceValidationUI){
@@ -1886,9 +1880,7 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 		if(!lazyLoad[name+'Loaded']){
 			lazyLoad[name+'Loaded'] = true;
 			webshims.ready(name, function(){
-				$(function(){
-					webshims.loader.loadList(['form-datalist-lazy']);
-				});
+				webshims.loader.loadList(['form-datalist-lazy']);
 			});
 		}
 	};
@@ -2128,7 +2120,8 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 					});
 				}
 			},
-			destroy: function(){
+			destroy: function(e){
+				var input;
 				var autocomplete = $.attr(this.input, 'autocomplete');
 				$(this.input)
 					.off('.datalistWidget')
@@ -2145,6 +2138,12 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 					this.input.removeAttribute('autocomplete');
 				} else {
 					$(this.input).attr('autocomplete', autocomplete);
+				}
+				if(e && e.type == 'beforeunload'){
+					input = this.input;
+					setTimeout(function(){
+						$.attr(input, 'list', $.attr(input, 'list'));
+					}, 9);
 				}
 				this._destroyed = true;
 			}

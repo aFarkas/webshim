@@ -1413,7 +1413,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				$.each(langCfg.date.monthNamesShort, create);
 			}
 			if(!langCfg.colorSigns){
-				langCfg = '#abcdef';
+				langCfg.colorSigns = '#abcdefABCDEF';
 			}
 		};
 		
@@ -2187,27 +2187,24 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		var picker = {};
 
 		var loadPicker = function(type, name){
-			type = type == 'color' ? 'color-picker' : 'forms-picker';
+			type = (type == 'color' ? 'color' : 'forms')+'-picker';
 			if(!loadPicker[name+'Loaded'+type]){
 				loadPicker[name+'Loaded'+type] = true;
 				webshims.ready(name, function(){
-					$(function(){
-						webshims.loader.loadList([type]);
-					});
+					webshims.loader.loadList([type]);
 				});
 			}
 			return type;
 		};
-		
+		options.addZero = addZero;
 		webshims.loader.addModule('forms-picker', {
 			noAutoCallback: true,
-			options: {
-				addZero: addZero
-			}
+			options: options
 		});
 		webshims.loader.addModule('color-picker', {
 			noAutoCallback: true, 
-			css: 'jpicker/jpicker.css'
+			css: 'jpicker/jpicker.css',
+			options: options
 		});
 		
 		picker._genericSetFocus = function(element, _noFocus){
@@ -2346,7 +2343,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					options.minView = 0;
 				}
 				if(options.startView < options.minView){
-					options.minView = options.startView;
+					options.startView = options.minView;
 					webshims.warn("wrong config for minView/startView.");
 				}
 				if(!options.size){
@@ -2775,9 +2772,7 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 		if(!lazyLoad[name+'Loaded']){
 			lazyLoad[name+'Loaded'] = true;
 			webshims.ready(name, function(){
-				$(function(){
-					webshims.loader.loadList(['form-datalist-lazy']);
-				});
+				webshims.loader.loadList(['form-datalist-lazy']);
 			});
 		}
 	};
@@ -3017,7 +3012,8 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 					});
 				}
 			},
-			destroy: function(){
+			destroy: function(e){
+				var input;
 				var autocomplete = $.attr(this.input, 'autocomplete');
 				$(this.input)
 					.off('.datalistWidget')
@@ -3034,6 +3030,12 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 					this.input.removeAttribute('autocomplete');
 				} else {
 					$(this.input).attr('autocomplete', autocomplete);
+				}
+				if(e && e.type == 'beforeunload'){
+					input = this.input;
+					setTimeout(function(){
+						$.attr(input, 'list', $.attr(input, 'list'));
+					}, 9);
 				}
 				this._destroyed = true;
 			}

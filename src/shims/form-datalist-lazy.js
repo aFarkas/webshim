@@ -23,9 +23,6 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 		} catch(e){}
 	};
 	
-	var getText = function(elem){
-		return (elem.textContent || elem.innerText || $.text([ elem ]) || '');
-	};
 	var lReg = /</g;
 	var gReg = />/g;
 	
@@ -154,8 +151,8 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 					}
 				});
 			}
-			$(window).on('unload.datalist'+this.id, function(){
-				that.destroy();
+			$(window).on('unload.datalist'+this.id +' beforeunload.datalist'+this.id, function(e){
+				that.destroy(e);
 			});
 		},
 		_resetListCached: function(e){
@@ -197,7 +194,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 				if(!rElem.disabled && (value = $(rElem).val())){
 					rItem = {
 						value: value.replace(lReg, '&lt;').replace(gReg, '&gt;'),
-						label: $.trim($.attr(rElem, 'label') || getText(rElem)).replace(lReg, '&lt;').replace(gReg, '&gt;'),
+						label: $.trim($.attr(rElem, 'label')) || '',
 						className: rElem.className || ''
 					};
 					

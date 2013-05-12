@@ -202,7 +202,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				$.each(langCfg.date.monthNamesShort, create);
 			}
 			if(!langCfg.colorSigns){
-				langCfg = '#abcdef';
+				langCfg.colorSigns = '#abcdefABCDEF';
 			}
 		};
 		
@@ -611,7 +611,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 									e.preventDefault();
 								}
 							}
-						}
+						};
 					})()
 				};
 				var mouseDownInit = function(){
@@ -976,27 +976,24 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		var picker = {};
 
 		var loadPicker = function(type, name){
-			type = type == 'color' ? 'color-picker' : 'forms-picker';
+			type = (type == 'color' ? 'color' : 'forms')+'-picker';
 			if(!loadPicker[name+'Loaded'+type]){
 				loadPicker[name+'Loaded'+type] = true;
 				webshims.ready(name, function(){
-					$(function(){
-						webshims.loader.loadList([type]);
-					});
+					webshims.loader.loadList([type]);
 				});
 			}
 			return type;
 		};
-		
+		options.addZero = addZero;
 		webshims.loader.addModule('forms-picker', {
 			noAutoCallback: true,
-			options: {
-				addZero: addZero
-			}
+			options: options
 		});
 		webshims.loader.addModule('color-picker', {
 			noAutoCallback: true, 
-			css: 'jpicker/jpicker.css'
+			css: 'jpicker/jpicker.css',
+			options: options
 		});
 		
 		picker._genericSetFocus = function(element, _noFocus){
@@ -1135,7 +1132,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					options.minView = 0;
 				}
 				if(options.startView < options.minView){
-					options.minView = options.startView;
+					options.startView = options.minView;
 					webshims.warn("wrong config for minView/startView.");
 				}
 				if(!options.size){

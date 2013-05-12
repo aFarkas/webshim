@@ -2280,7 +2280,7 @@
 	};
 })(jQuery, '1.1.6wsmod');
 
-webshims.register('color-picker', function($, webshims, window, document, undefined){
+webshims.register('color-picker', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var picker = webshims.picker;
 	
@@ -2409,4 +2409,7 @@ webshims.register('color-picker', function($, webshims, window, document, undefi
 			data._popoverinit = true;
 		};
 	})();
+	if(options && options._types && $.inArray('color', options._types) == -1){
+		webshims.error('[type="color"] used without adding it to the types config.');
+	}
 });

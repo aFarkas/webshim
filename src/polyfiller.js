@@ -30,7 +30,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.5',
+		version: '1.10.6pre',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -67,7 +67,6 @@
 			var feature = cfg.f || name;
 			if (!webshimsFeatures[feature]) {
 				webshimsFeatures[feature] = [];
-				webshimsFeatures[feature].delayReady = 0;
 				webshims.featureList.push(feature);
 				webCFG[feature] = {};
 			}
@@ -102,6 +101,7 @@
 			return function(features){
 				if(!features){
 					features = webshims.featureList;
+					webshims.info('loading all features without specifing might be bad for performance');
 				}
 					
 				if (typeof features == 'string') {
@@ -203,7 +203,6 @@
 		 */
 		reTest: (function(){
 			var resList;
-			var noDelayReady;
 			var reTest = function(i, name){
 				var module = modules[name];
 				var readyName = name+'Ready';
@@ -213,18 +212,11 @@
 						delete special[readyName];
 					}
 					feature = webshimsFeatures[module.f];
-					if(feature && !noDelayReady){
-						feature.delayReady++;
-						onReady(name, function(){
-							feature.delayReady--;
-							isReady(module.f, feature.callReady);
-						});
-					}
+					
 					resList.push(name);
 				}
 			};
-			return function(moduleNames, _noDelay){
-				noDelayReady = _noDelay;
+			return function(moduleNames){
 				if(typeof moduleNames == 'string'){
 					moduleNames = moduleNames.split(' ');
 				}
@@ -234,12 +226,7 @@
 			};
 		})(),
 		isReady: function(name, _set){
-			if(webshimsFeatures[name] && webshimsFeatures[name].delayReady > 0){
-				if(_set){
-					webshimsFeatures[name].callReady = true;
-				}
-				return false;
-			}
+			
 			name = name + 'Ready';
 			if (_set) {
 				if (special[name] && special[name].add) {
@@ -1059,7 +1046,7 @@
 			options: formOptions,
 			c: [24]
 		};
-		addModule('form-validation', $.extend({}, formExtras));
+		addModule('form-validation', $.extend({d: ['form-message']}, formExtras));
 		
 		addModule('form-validators', $.extend({}, formExtras));
 				
@@ -1133,7 +1120,7 @@
 	
 	addPolyfill('filereader', {
 		test: 'FileReader' in window,
-		d: ['swfmini', 'dom-support'],
+		d: ['swfmini', DOMSUPPORT],
 		c: [25, 26, 27]
 //		,nM: 'filereader'
 	});

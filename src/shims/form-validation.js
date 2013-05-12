@@ -11,6 +11,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		return ($.prop(elem, 'validity') || {valid: 1}).valid;
 	};
 	
+	var nonFormFilter = function(){
+		return !$.prop(this, 'form');
+	};
 	var getGroupElements = function(elem){
 		elem = $(elem);
 		var name;
@@ -24,9 +27,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			} else if(form){
 				ret = $(form).jProp(name);
 			} else {
-				ret = $(document.getElementsByName(name)).filter(function(){
-					return !$.prop(this, 'form');
-				});
+				ret = $(document.getElementsByName(name)).filter(nonFormFilter);
 			}
 			ret = ret.filter('[type="radio"]');
 		}
@@ -38,7 +39,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		var ret;
 		$.each(validity, function(name, value){
 			if(value){
-				ret = (name == 'customError') ? $.prop(elem, 'validationMessage') : name;
+				ret = name + $.prop(elem, 'validationMessage');
 				return false;
 			}
 		});

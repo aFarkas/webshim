@@ -45,7 +45,7 @@
 	<script>
 		//configure
 		$.webshims.setOptions('forms', { 
-			customMessages: true,
+			lazyCustomMessages: true,
 			iVal: {
 				fieldWrapper: '.form-element',
 				handleBubble: true // 'hide' || false
@@ -93,15 +93,24 @@
 				<li>Preventing the native invalid message to appear and replacing it with your own invalid UI (including own validation message or native validation message)</li>
 				<li>changing the messages through the setCustomValidity-method - without changing the native UI</li>
 			</ul>
-			<p>A starting point for Preventing the default invalid UI and then replacing it, could look like this:</p>
+			<p>A starting point for preventing the default invalid UI and then replacing it, could look like this:</p>
 <code class="block">
 $('form').bind('invalid', function(e){
 	//prevent browser from showing native validation message
 	e.preventDefault();
 	//implement custom UI and custom message according to the validityState $(e.target).attr('validity')
 });
-</code>		
+</code>
 			<p><small>Note: The HTML5 invalid event does not bubble. Webshims lib <a href="../../index.html#polyfill-abstractions">uses event capturing</a> for listening to the invalid event, so that it can be captured on the form/all ancestor elements</small><p>
+			<p>Another way to remove the native validation UI using HTML markup could look like this: </p>
+<code class="block">
+&lt;form novalidate="" action="#"&gt;
+	&lt;!-- ... --&gt;
+&lt;/form&gt;
+</code>
+<code class="block">
+$('form').attr('novalidate', 'novalidate');
+</code>
 			<p>Webshims lib gives you some extensions to make styling validation error message or changing the error-messages really simple.</p>
 			<ul>
 				<li>firstinvalid (event)</li>
@@ -125,13 +134,15 @@ $('form')
 			<p>Using <code>$.webshims.validityAlert.showFor</code> will generate the following styleable HTML structure:</p>
 			
 <code class="block">
-&lt;!-- note: span.validity-alert-wrapper is label.validity-alert in old browser, which do not support WAI-ARIA --&gt;
-&lt;span class="validity-alert-wrapper" role="alert"&gt;
-	&lt;span class="validity-alert"&gt;
-		&lt;span class="va-arrow"&gt;&lt;span class="va-arrow-box"&gt;&lt;/span&gt;&lt;/span&gt;
-		&lt;span class="va-box"&gt;Error message of the current field&lt;/span&gt;
-	&lt;/span&gt;
-&lt;/span&gt;
+&lt;!-- data-id and data-class attributes are filled with the corresponding id/class strings of the input element --&gt;
+&lt;div class="ws-popover validity-alert" role="alert" data-class="" data-id=""&gt;
+	&lt;div class="ws-po-outerbox"&gt;
+		&lt;div class="ws-po-arrow"&gt;
+			&lt;div class="ws-po-arrowbox"&gt;&lt;/div&gt;
+		&lt;/div&gt;
+		&lt;div class="ws-po-box"&gt;ERRORMESSAGE.&lt;/div&gt;
+	&lt;/div&gt;
+&lt;/div&gt;
 </code>
 			
 			<p>Firefox and some other browsers also show an invalid hint on mouseover, which can't be replaced by this technique. If you want to remove this you can use a title-attribute (with an emtpy string) or use the <a href="https://developer.mozilla.org/en/HTML/element/input#Error_messages">-x-moz-errormessage</a> to control the error message.</p>
@@ -149,7 +160,7 @@ $('input[required]').setCustomValidity('');
 			
 			<h3 id="instant-validation">Improving UX using the Instant Form Validation feature</h3>
 			
-			<p>Webshims can dramatically enhance the UX of the HTML5 form validation by adding the class 'ws-instantvalidation' to your form element.</p>
+			<p>Webshims can dramatically enhance the UX of the HTML5 form validation by adding the class 'ws-instantvalidation' to your form element. The instant validation feature can be configured by changing the iVal options:</p>
 <code class="block">
 $.webshims.setOptions('forms', { 
 	iVal: {
@@ -162,7 +173,7 @@ $.webshims.setOptions('forms', {
 </code>			
 			
 			<h3 id="change-validation-messages">Changing and Adding validation messages</h3>
-			<p>Webshims Lib validation messages are stored @ <code>$.webshims.validityMessages</code> as an object. The index is the specific language code. Currently there are only really bad validation messages for "en" and "de".</p>
+			<p>Webshims Lib validation messages are stored @ <code>$.webshims.validityMessages</code> as an object. The index is the specific language code.</p>
 			<p>Webshims Lib automatically shows the validation message in the detected language of the browser. If the script doesn't find the right language, it will show the default language which is stored under the key "" (defaults to "en").</p>
 			<p>You can easily add/change a language by specifying a certain language code.</p>
 <code class="block">
