@@ -889,7 +889,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		
 		var wsWidgetProto = {
 			_create: function(){
-				var i;
+				var i, that, timedMirror;
 				var o = this.options;
 				var createOpts = this.createOpts;
 				
@@ -898,6 +898,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				
 				this.buttonWrapper = $('<span class="input-buttons '+this.type+'-input-buttons"></span>').insertAfter(this.element);
 				this.options.containerElements.push(this.buttonWrapper[0]);
+				
+				o.mirrorValidity = o.mirrorValidity && this.orig && Modernizr.formvalidation && !webshims.bugs.bustedValidity;
 				
 				if(o.splitInput && this._addSplitInputs){
 					this._addSplitInputs();
@@ -911,7 +913,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				
 				for(i = 0; i < createOpts.length; i++){
 					if(o[createOpts[i]] != null){
-						this[createOpts[i]](o[createOpts[i]]);
+						this[createOpts[i]](o[createOpts[i]], o[createOpts[i]]);
 					}
 				}
 				if(this.type == 'color'){
@@ -919,7 +921,46 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				}
 				this.addBindings();
 				$(this.element).data('wsWidget'+o.type, this);
+				
 				this._init = true;
+				
+				if(o.mirrorValidity){
+					that = this;
+					timedMirror = function(){
+						clearTimeout(timedMirror._timerDealy);
+						timedMirror._timerDealy = setTimeout(timedMirror._wsexec, 9);
+					};
+					timedMirror._wsexec = function(){
+						clearTimeout(timedMirror._timerDealy);
+						that.mirrorValidity(true);
+					};
+					
+					timedMirror();
+					$(this.orig).on('change input', function(e){
+						if(e.type == 'input'){
+							timedMirror();
+						} else {
+							timedMirror._wsexec();
+						}
+					});
+				}
+			},
+			mirrorValidity: function(_noTest){
+				//
+				if(this._init && this.options.mirrorValidity){
+					if(!_noTest){
+						$.prop(this.orig, 'validity');
+					}
+					var message = $(this.orig).getErrorMessage();
+					if(message !== this.lastErrorMessage){
+						this.inputElements.prop('setCustomValidity', function(i, val){
+							if(val._supvalue){
+								val._supvalue.call(this, message);
+							}
+						});
+						this.lastErrorMessage = message;
+					}
+				}
 			},
 			addBindings: function(){
 				var isFocused;
@@ -1218,8 +1259,13 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					this.element.val(this.formatValue(val));
 					this.options.value = val;
 					this._propertyChange('value');
+					this.mirrorValidity();
 				}
 				
+			},
+			required: function(val, boolVal){
+				this.inputElements.attr({'aria-required': ''+boolVal});
+				this.mirrorValidity();
 			},
 			parseValue: function(){
 				var value = this.inputElements.map(function(){
@@ -1233,7 +1279,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			formatValue: function(val, noSplit){
 				return formatVal[this.type](val, noSplit === false ? false : this.options);
 			},
-			createOpts: ['readonly', 'title', 'disabled', 'tabindex', 'placeholder', 'value'],
+			createOpts: ['readonly', 'title', 'disabled', 'tabindex', 'placeholder', 'value', 'required'],
 			placeholder: function(val){
 				var options = this.options;
 				options.placeholder = val;
@@ -1291,22 +1337,29 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				$('button', this.buttonWrapper).prop('tabindex', this.options.tabindex);
 			},
 			title: function(val){
+				if(!val && this.orig && $.attr(this.orig, 'title') == null){
+					val = null;
+				}
 				this.options.title = val;
-				this.element.prop('title', this.options.title);
+				if(val == null){
+					this.inputElements.removeAttr('title');
+				} else {
+					this.inputElements.prop('title', this.options.title);
+				}
 			}
 		};
 		
 		
 		['readonly', 'disabled'].forEach(function(name){
 			var isDisabled = name == 'disabled';
-			wsWidgetProto[name] = function(val){
-				if(this.options[name] != val || !this._init){
-					this.options[name] = !!val;
+			wsWidgetProto[name] = function(val, boolVal){
+				if(this.options[name] != boolVal || !this._init){
+					this.options[name] = !!boolVal;
 					this.inputElements.prop(name, this.options[name]);
 					this.buttonWrapper[this.options[name] ? 'addClass' : 'removeClass']('ws-'+name);
-				}
-				if(isDisabled){
-					$('button', this.buttonWrapper).prop('disabled', this.options[name]);
+					if(isDisabled){
+						$('button', this.buttonWrapper).prop('disabled', this.options[name]);
+					}
 				}
 			};
 		});
@@ -1341,7 +1394,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				}
 				this._init = true;
 			},
-			createOpts: ['step', 'min', 'max', 'readonly', 'title', 'disabled', 'tabindex', 'placeholder', 'value'],
+			createOpts: ['step', 'min', 'max', 'readonly', 'title', 'disabled', 'tabindex', 'placeholder', 'value', 'required'],
 			_addSplitInputs: function(){
 				if(!this.inputElements){
 					var create = splitInputs[this.type]._create();
@@ -1402,14 +1455,15 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					} else {
 						this.element.prop('value', val);
 					}
-					
 					this._propertyChange('value');
+					this.mirrorValidity();
 				}
 			},
 			step: function(val){
 				var defStep = steps[this.type];
 				this.options.step = val;
 				this.elemHelper.prop('step', retDefault(val, defStep.step));
+				this.mirrorValidity();
 			}
 		});
 		
@@ -1423,6 +1477,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				}
 				this.options[name] = val;
 				this._propertyChange(name);
+				this.mirrorValidity();
 			};
 		});
 		
@@ -1763,6 +1818,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			'max',
 			'step',
 			'title',
+			'required',
 			'placeholder'
 		];
 		
@@ -1771,11 +1827,11 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			
 		$.each(copyProps.concat(copyAttrs), function(i, name){
 			var fnName = name.replace(/^data\-/, '');
-			webshims.onNodeNamesPropertyModify('input', name, function(val){
+			webshims.onNodeNamesPropertyModify('input', name, function(val, boolVal){
 				if(!stopCircular){
 					var shadowData = webshims.data(this, 'shadowData');
 					if(shadowData && shadowData.data && shadowData.nativeElement === this && shadowData.data[fnName]){
-						shadowData.data[fnName](val);
+						shadowData.data[fnName](val, boolVal);
 					}
 				}
 			});
@@ -1902,7 +1958,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				data.shim.options.containerElements.push(data.shim.element[0]);
 				
 				labelWidth($(this).getShadowFocusElement(), labels);
-				$.attr(this, 'required', $.attr(this, 'required'));
+				
 				$(this).on('change', function(e){
 					if(!stopCircular){
 						data.shim.value($.prop(this, 'value'));
