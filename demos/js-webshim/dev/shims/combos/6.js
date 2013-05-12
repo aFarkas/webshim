@@ -1822,7 +1822,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 									e.preventDefault();
 								}
 							}
-						}
+						};
 					})()
 				};
 				var mouseDownInit = function(){
@@ -2948,9 +2948,9 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 					propType: 'element',
 					propNodeName: 'datalist'
 				};
-				
-				webshims.defineNodeNameProperties('input', inputListProto);
 			}
+			
+			webshims.defineNodeNameProperties('input', inputListProto);
 			
 			webshims.addReady(function(context, contextElem){
 				contextElem

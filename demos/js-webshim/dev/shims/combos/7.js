@@ -2264,9 +2264,9 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 					propType: 'element',
 					propNodeName: 'datalist'
 				};
-				
-				webshims.defineNodeNameProperties('input', inputListProto);
 			}
+			
+			webshims.defineNodeNameProperties('input', inputListProto);
 			
 			webshims.addReady(function(context, contextElem){
 				contextElem

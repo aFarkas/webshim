@@ -1612,7 +1612,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 									e.preventDefault();
 								}
 							}
-						}
+						};
 					})()
 				};
 				var mouseDownInit = function(){
