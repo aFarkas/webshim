@@ -51,8 +51,12 @@ jQuery.webshims.formcfg.lt = {
 	patterns: {
 		d: "yy.mm.dd"
 	},
+	"month": {
+		"currentText": "šį mėnesį"
+	},
 	date: {
 		"closeText": "Uždaryti",
+		"clear": "Tuštinti",
 		"prevText": "Atgal",
 		"nextText": "Kitas",
 		"currentText": "Šiandien",
