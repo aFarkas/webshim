@@ -37,10 +37,7 @@ jQuery.webshims.validityMessages.lt = {
     }
 };
 //for IE
-$.webshims.validityMessages['lt-LT'] = $.webshims.validityMessages.lt;
-$.webshims.customErrorMessages['group-required']['lt'] = 'Prašom pažymėti bent vieną iš šių žymimųjų langelių.';
-//for IE
-$.webshims.customErrorMessages['group-required']['lt-LT'] = $.webshims.customErrorMessages['group-required']['lt'];
+jQuery.webshims.validityMessages['lt-LT'] = $.webshims.validityMessages.lt;
 
 jQuery.webshims.formcfg.lt = {
   numberFormat: {
