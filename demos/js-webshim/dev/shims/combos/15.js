@@ -1182,7 +1182,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		});
 		return ret;
 	};
-	var rElementsGroup = /^(?:form|fieldset)$/i;
+	var rElementsGroup = /^(?:form)$/i;///^(?:form|fieldset)$/i
 	$.extend($.expr[":"], {
 		"valid-element": function(elem){
 			return rElementsGroup.test(elem.nodeName || '') ? !hasInvalid(elem) :!!($.prop(elem, 'willValidate') && isValid(elem));

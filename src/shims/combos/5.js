@@ -1512,7 +1512,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				
 				var p = (!opts.splitInput) ? val.trim().split(/[\.\s-\/\\]+/) : val;
 				
-				if(p.length == 2){
+				if(p.length == 2 && p[0] && p[1]){
 					p[0] = curCfg.date.monthkeys[p[0]] || p[0];
 					p[1] = curCfg.date.monthkeys[p[1]] || p[1];
 					if(p[1].length == 2){
