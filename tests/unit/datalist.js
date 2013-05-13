@@ -21,10 +21,10 @@ asyncTest("datalist", function(){
 		$.each(['yes aßäöâ', 'yes "2"', "yes '3'"], function(i, val){
 			equals($('span.option-value', shadowListItems[i]).text(), val, 'shadow datalistitems value equals options value');
 		});
+		
+		
 		strictEqual($('#email').attr('aria-haspopup'), 'true', 'input[list] has aria');
 	}
-	
-	
 	
 	$('#email').attr('list', 'blasdsa');
 	strictEqual($('#email').prop('list'), null, 'list property is null, if id is not in document');
@@ -44,6 +44,10 @@ asyncTest("datalist", function(){
 		
 		$('#email').removeAttr('list');
 		ok(!$('#email').attr('aria-haspopup'), 'removed list attribute removes aria in shim');
+	}
+	
+	if($.webshims.cfg.forms.customDatalist){
+		strictEqual($('#email').prop('selectedOption'), null, 'selectedOption is implemented');
 	}
 	
 	$.webshims.ready('DOM forms forms-ext', function(){
