@@ -1849,7 +1849,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		month: {
 			_create: function(){
 				var obj = {
-					splits: [$('<input type="text" class="yy" size="4" />')[0], $('<input type="text" class="mm ws-spin" />')[0]] 
+					splits: [$('<input type="text" class="yy" inputmode="numeric" size="4" />')[0], $('<input type="text" class="mm ws-spin" />')[0]] 
 				};
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1]];
 				return obj;

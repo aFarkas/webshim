@@ -30,7 +30,7 @@
 	}
 	
 	var webshims = {
-		version: '1.10.6beta1',
+		version: '1.10.6',
 		cfg: {
 			useImportantStyles: true,
 			//addCacheBuster: false,
@@ -964,7 +964,7 @@
 				}
 				
 				if(Modernizr[formvalidation]){
-					bugs.bustedValidity = bustedValidity = window.opera || Modernizr.formattribute === false || !Modernizr.fieldsetdisabled || !('value' in document.createElement('progress')) || !('value' in document.createElement('output')) || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
+					bugs.bustedValidity = bustedValidity = !modernizrInputAttrs.list || window.opera || Modernizr.formattribute === false || !Modernizr.fieldsetdisabled || !('value' in document.createElement('progress')) || !('value' in document.createElement('output')) || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
 				}
 				
 				formExtend = Modernizr[formvalidation] && !bustedValidity ? 'form-native-extend' : 'form-shim-extend';

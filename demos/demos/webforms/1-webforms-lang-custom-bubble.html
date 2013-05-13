@@ -378,33 +378,6 @@ $.webshims.activeLang("en");
 					</fieldset>
 				</form>
 			</section>
-			
-			<h3>Now add some extras:</h3>
-			<p>Add valid/invalid Classes on focusout.</p>
-<code class="block">	
-//on focusout / blur
-$('form').bind('focusout invalid', function(e){
-	// get target element
-	var $elem = $(e.target);
-	//if the element is a candidate for constraint
-	if($elem.attr('willValidate') && $elem.attr('type') !== 'submit'){
-		//test wether it is valid and set/remove the classes
-		if(e.type !== 'invalid' && $elem.is(':valid-element')){
-			$elem
-				.closest('.form-element, fieldset')
-				.addClass('valid')
-				.removeClass('invalid')
-			;
-		} else {
-			$elem
-				.closest('.form-element, fieldset')
-				.addClass('invalid')
-				.removeClass('valid')
-			;
-		}	
-	}
-});
-</code>	
 	
 	</section>
 	</div>

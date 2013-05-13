@@ -79,11 +79,18 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.10.6
+----------
+
+- fixed regression from 1.10.5 (selectedOption not implemented in all browsers)
+- added Lithuanian (lt-LT) translations (thx @Gamesh)
+- small style tweaks for input[type="color"] [demo](http://jsfiddle.net/trixta/sYVEd/)
+
 Release 1.10.5
 ----------
 
 - input[type="color"]
-- Instant Form Validation helper (enhances the HTML5 UI for much better UX)
+- Instant Form Validation helper (enhances the HTML5 UI for much better UX) [demo](http://jsfiddle.net/trixta/XqPhQ/)
 - FileReader API
 - improved range UI styleability
 - lazy load mostly everything (performance)
@@ -118,17 +125,3 @@ Release 1.10.2
 - small improvements to type="range" and type="date" [demo](http://jsfiddle.net/trixta/VNuct/)
 - fixed animate bug in jQuery 1.8.3
 - fixed dutch language
-
-
-Release 1.10.0/1.10.1
-----------
-
-- new UI for all input widgets
-- input[type="month"]
-- progress element
-- list/datalist support for following types: range, month, date (datalist support for text/email/url/tel etc. was already there)
-- type="number" can be localized
-- type="number"/type="time" are custom styleable in supporting browsers
-- video[preload]/audio[preload] for "auto"/"" and "none" values
-- labels property for labellable form elements
-- stepUp/stepDown methods for input elements

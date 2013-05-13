@@ -3089,7 +3089,9 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
 						value: function(){
 							this.removeAttribute(name);
 							if(removeProp){
-								delete this.value;
+								try {
+									delete this.value;
+								} catch(er){}
 							}
 							updateProgress.isInChange = name;
 							updateProgress(this);

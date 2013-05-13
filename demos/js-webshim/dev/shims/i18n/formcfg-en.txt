@@ -51,6 +51,9 @@ jQuery.webshims.formcfg.en = {
 	"month": {
 		"currentText": "This month"
 	},
+	"week": {
+		"currentText": "This week"
+	},
 	"date": {
 		"closeText": "Done",
 		"clear": "Clear",

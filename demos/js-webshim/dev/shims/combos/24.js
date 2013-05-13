@@ -230,6 +230,11 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					that.element.addClass('ws-po-visible').trigger('wspopovershow');
 				}, 9);
 			}, 9);
+			this.element.on('remove', function(e){
+				if(!e.originalEvent){
+					that.destroy();
+				}
+			});
 			$(document).on('focusin'+this.eventns+' mousedown'+this.eventns, function(e){
 				if(that.options.hideOnBlur && !that.stopBlur && !that.isInElement(that.lastElement[0] || document.body, e.target) && !that.isInElement(element[0] || document.body, e.target) && !that.isInElement(that.element[0], e.target)){
 					that.hide();
@@ -361,29 +366,27 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				var focusElem = $(element).getShadowFocusElement();
 				var scrollTop = webshims.scrollRoot.scrollTop();
 				var elemTop = focusElem.offset().top - 30;
-				var smooth;
+				var focus = function(){
+					try {
+						focusElem[0].focus();
+					} catch(e){}
+					$(window).triggerHandler('pospopover'+this.eventns);
+				};
 				
 				if(scrollTop > elemTop){
 					webshims.scrollRoot.animate(
 						{scrollTop: elemTop - 5}, 
 						{
 							queue: false, 
-							duration: Math.max( Math.min( 600, (scrollTop - elemTop) * 1.5 ), 80 )
+							duration: Math.max( Math.min( 600, (scrollTop - elemTop) * 1.5 ), 80 ),
+							complete: focus
 						}
 					);
-					smooth = true;
-				}
-				try {
-					focusElem[0].focus();
-				} catch(e){}
-				if(smooth){
-					webshims.scrollRoot.scrollTop(scrollTop);
-					setTimeout(function(){
-						webshims.scrollRoot.scrollTop(scrollTop);
-					}, 0);
+					
+				} else {
+					focus();
 				}
 				
-				$(window).triggerHandler('pospopover'+this.eventns);
 			},
 			getMessage: function(elem, message){
 				if (!message) {

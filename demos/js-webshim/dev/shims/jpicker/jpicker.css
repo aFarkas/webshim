@@ -36,6 +36,9 @@ table.jPicker {
   width: 545px;
   z-index: 20;
 }
+.jPicker hr {
+	margin: 7px 0;
+}
 .jPicker .Move {
   background-color: #dddddd;
   border-color: #fff #666 #666 #fff;
@@ -201,10 +204,16 @@ table.jPicker {
   height: 15px;
 }
 .jPicker tr.Hex td.Text input.Hex {
+  width: 45px;
+  margin-left: 2px;
+  text-align: center;
+}
+.jPicker.no-alpha-picker tr.Hex td.Text input.Hex {
   width: 50px;
+  margin-left: 5px;
 }
 .jPicker tr.Hex td.Text input.AHex {
-  width: 20px;
+  width: 15px;
 }
 .jPicker.no-alpha-picker tr.Hex td.Text input.AHex {
 	display: none;
