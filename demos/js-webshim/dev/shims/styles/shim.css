@@ -41,6 +41,20 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, mai
   display: block;
 }
 
+dialog {
+  display: none;
+  postion: absolute;
+  left: 0;
+  right: 0;
+  border: solid;
+  background: #fff;
+  color: #000;
+  padding: 1em;
+}
+dialog[open] {
+  display: block;
+}
+
 audio {
   display: none;
   height: 0;
@@ -681,13 +695,13 @@ html .ws-po-arrow .ws-po-arrowbox {
   outline: none;
   text-align: center;
   font-family: sans-serif;
-  width: 300px;
+  width: 330px;
 }
 .input-picker.ws-size-2 {
-  width: 538px;
+  width: 645px;
 }
 .input-picker.ws-size-3 {
-  width: 796px;
+  width: 960px;
 }
 .input-picker.color-popover {
   width: 590px;
@@ -814,7 +828,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .picker-list {
   position: relative;
   zoom: 1;
-  width: 238px;
+  width: 290px;
   float: left;
   margin: 0 10px;
 }
