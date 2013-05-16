@@ -41,6 +41,20 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, mai
   display: block;
 }
 
+dialog {
+  display: none;
+  postion: absolute;
+  left: 0;
+  right: 0;
+  border: solid;
+  background: #fff;
+  color: #000;
+  padding: 1em;
+}
+dialog[open] {
+  display: block;
+}
+
 audio {
   display: none;
   height: 0;
