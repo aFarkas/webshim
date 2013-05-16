@@ -1754,8 +1754,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 						var localeChange ;
 						if(!o.splitInput){
 							localeChange = function(){
+								
 								if(o.value){
-									that.value(o.value);
+									that.value(o.value, true);
 								}
 		
 								if(placeholderFormat[that.type] && o.placeholder){
@@ -1774,8 +1775,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				
 				initChangeEvents();
 			},
-			value: function(val){
-				if(!this._init || val !== this.options.value){
+			value: function(val, force){
+				if(!this._init || force || val !== this.options.value){
 					this.element.val(this.formatValue(val));
 					this.options.value = val;
 					this._propertyChange('value');
@@ -1954,9 +1955,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					}, 9);
 				}
 			},
-			value: function(val){
+			value: function(val, force){
 				
-				if(!this._init || this.options.value !== val){
+				if(!this._init || force || this.options.value !== val){
 					this.valueAsNumber = this.asNumber(val);
 					this.options.value = val;
 					
