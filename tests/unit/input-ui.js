@@ -45,6 +45,20 @@ asyncTest("widgets Modul", function(){
 		
 		shadow.prop('value', '12.10.2000').trigger('change');
 		equals($('#date').prop('value'), '2000-10-12', "shadow dom input is reflected");
+		$.webshims.activeLang('en');
+		equals(shadow.prop('value'), '10/12/2000', "format is changed on localechange");
+		$.webshims.activeLang('de');
+	}
+	
+	if(replaceUI || !Modernizr.inputtypes.number){
+		$.webshims.activeLang('de');
+		shadow =  $('#number').next('.ws-number');
+		$('#number').prop('step', '0.1').val('0.1');
+		strictEqual($('#number').prop('valueAsNumber'), 0.1, 'valueAsNumber is 0.1');
+		strictEqual(shadow.prop('value'), '0,1', 'formatted value is 0,1 on nummber');
+		$.webshims.activeLang('en');
+		equals(shadow.prop('value'), '0.1', "format is changed on localechange");
+		$.webshims.activeLang('de');
 	}
 	
 	$.webshims.ready('forms-ext DOM', start);
