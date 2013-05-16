@@ -695,13 +695,13 @@ html .ws-po-arrow .ws-po-arrowbox {
   outline: none;
   text-align: center;
   font-family: sans-serif;
-  width: 300px;
+  width: 330px;
 }
 .input-picker.ws-size-2 {
-  width: 538px;
+  width: 645px;
 }
 .input-picker.ws-size-3 {
-  width: 796px;
+  width: 960px;
 }
 .input-picker.color-popover {
   width: 590px;
@@ -828,7 +828,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .picker-list {
   position: relative;
   zoom: 1;
-  width: 238px;
+  width: 290px;
   float: left;
   margin: 0 10px;
 }
