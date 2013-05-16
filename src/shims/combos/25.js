@@ -3442,6 +3442,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 	var hasNative = Modernizr.audio && Modernizr.video;
 	var hasFlash = swfmini.hasFlashPlayerVersion('9.0.115');
 	var loadedSwf = 0;
+	var needsLoadPreload = 'ActiveXObject' in window && hasNative;
 	var getProps = {
 		paused: true,
 		ended: false,
@@ -4279,12 +4280,20 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			}
 		});
 		
+		
 		webshims.onNodeNamesPropertyModify(nodeName, 'preload', function(val){
-			var data = getSwfDataFromElem(this);
+			var data;
 			
 			
-			if(data && bufferSrc(this)){
-				queueSwfMethod(this, 'api_preload', [], data);
+			if(bufferSrc(this)){
+				data = getSwfDataFromElem(this);
+				if(data){
+					queueSwfMethod(this, 'api_preload', [], data);
+				} else if(needsLoadPreload && this.paused && !this.readyState && !this.networkState && !this.autoplay && $(this).is(':not(.nonnative-api-active)')){
+					try {
+						this.load();
+					} catch(er){}
+				}
 			}
 		});
 		
