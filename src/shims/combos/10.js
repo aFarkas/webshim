@@ -956,7 +956,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 //				register: moduleName:string,
 //				callback: callback:function
 //			});
-//		get/set including removeLang
+//		get/set including remoteLang
 //			- webshims.activeLang({
 //				module: moduleName:string,
 //				callback: callback:function,
@@ -1823,20 +1823,33 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				langCfg.colorSigns = '#abcdefABCDEF';
 			}
 		};
+		var triggerLocaleChange = function(){
+			processLangCFG(curCfg);
+			$(document).triggerHandler('wslocalechange');
+		};
 		
-		processLangCFG(curCfg);
+		triggerLocaleChange();
 		
-		$.webshims.activeLang({
-			register: 'form-core', 
+		webshims.activeLang({
+			register: 'form-core',
 			callback: function(){
 				$.each(arguments, function(i, val){
 					if(formcfg[val]){
-						curCfg = formcfg[val];
-						processLangCFG(curCfg);
-						$(document).triggerHandler('wslocalechange');
+						if(formcfg[val] != curCfg){
+							curCfg = formcfg[val];
+							triggerLocaleChange();
+						}
 						return false;
 					}
 				});
+			}
+		});
+		webshims.activeLang({
+			langObj: formcfg, 
+			module: 'form-core',
+			callback: function(val){
+				curCfg = val;
+				triggerLocaleChange();
 			}
 		});
 	})();

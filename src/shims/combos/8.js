@@ -1454,7 +1454,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 //				register: moduleName:string,
 //				callback: callback:function
 //			});
-//		get/set including removeLang
+//		get/set including remoteLang
 //			- webshims.activeLang({
 //				module: moduleName:string,
 //				callback: callback:function,
@@ -2026,10 +2026,20 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 	
 	webshims.activeLang({
 		langObj: validityMessages, 
-		module: 'form-core', 
+		module: 'form-core',
 		callback: function(langObj){
-			
 			currentValidationMessage = langObj;
+		}
+	});
+	webshims.activeLang({
+		register: 'form-core',
+		callback: function(val){
+			$.each(validityMessages, function(i, val){
+				if(validityMessages[val]){
+					currentValidationMessage = validityMessages[val];
+					return false;
+				}
+			});
 		}
 	});
 	

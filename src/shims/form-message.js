@@ -151,10 +151,20 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 	
 	webshims.activeLang({
 		langObj: validityMessages, 
-		module: 'form-core', 
+		module: 'form-core',
 		callback: function(langObj){
-			
 			currentValidationMessage = langObj;
+		}
+	});
+	webshims.activeLang({
+		register: 'form-core',
+		callback: function(val){
+			$.each(validityMessages, function(i, val){
+				if(validityMessages[val]){
+					currentValidationMessage = validityMessages[val];
+					return false;
+				}
+			});
 		}
 	});
 	

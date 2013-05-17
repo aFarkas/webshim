@@ -1046,7 +1046,7 @@
 			options: formOptions,
 			c: [24]
 		};
-		addModule('form-validation', $.extend({d: ['form-message']}, formExtras));
+		addModule('form-validation', $.extend({d: ['form-message', 'form-core']}, formExtras));
 		
 		addModule('form-validators', $.extend({}, formExtras));
 				

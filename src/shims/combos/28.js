@@ -956,7 +956,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 //				register: moduleName:string,
 //				callback: callback:function
 //			});
-//		get/set including removeLang
+//		get/set including remoteLang
 //			- webshims.activeLang({
 //				module: moduleName:string,
 //				callback: callback:function,
