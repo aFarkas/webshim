@@ -46,10 +46,10 @@ jQuery.webshims.formcfg.fr = {
 		d: 'dd/mm/yy'
 	},
 	month: {
-		currentText: 'This month'
+		currentText: 'Ce mois-ci'
 	},
 	week: {
-		currentText: 'This week'
+		currentText: 'Cette semaine-ci'
 	},
 	date: {
 		closeText: 'Fermer',
