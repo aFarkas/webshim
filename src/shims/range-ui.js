@@ -456,6 +456,12 @@
 		}
 	};
 	
+	var oCreate = function (o) {
+		function F() {}
+		F.prototype = o;
+		return new F();
+	};
+	
 	$.fn.rangeUI = function(opts){
 		opts = $.extend({
 			readonly: false, 
@@ -474,12 +480,17 @@
 			calcTrail: true
 		}, opts);
 		return this.each(function(){
-			var obj = $.extend(Object.create(rangeProto), {element: $(this)});
+			var obj = $.extend(oCreate(rangeProto), {element: $(this)});
 			obj.options = opts;
 			obj._create.call(obj);
 		});
 	};
 	if(window.webshims && webshims.isReady){
-		webshims.isReady('range-ui', true);
+		webshims.ready('es5', function(){
+			webshims.isReady('range-ui', true);
+		});
+		if(webshims._polyfill){
+			 webshims._polyfill(['es5']);
+		}
 	}
 })(jQuery);
