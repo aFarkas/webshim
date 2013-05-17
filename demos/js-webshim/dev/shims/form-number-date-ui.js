@@ -175,9 +175,16 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				"showMonthAfterYear": false,
 				"yearSuffix": ""
 			}
-		}, formcfg['en'] || {});
+		}, formcfg.en || {});
+		
 		if(!formcfg['en-US']){
 			formcfg['en-US'] = formcfg['en'];
+		}
+		if(!formcfg['en-GB']){
+			formcfg['en-GB'] = $.extend(true, {}, formcfg.en, {
+				date: {firstDay: 1}, 
+				patterns: {d: "dd/mm/yy"}
+			});
 		}
 		if(!formcfg['']){
 			formcfg[''] = formcfg['en-US'];
@@ -230,8 +237,10 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			langObj: formcfg, 
 			module: 'form-core',
 			callback: function(val){
-				curCfg = val;
-				triggerLocaleChange();
+				if(curCfg != val){
+					curCfg = val;
+					triggerLocaleChange();
+				}
 			}
 		});
 	})();

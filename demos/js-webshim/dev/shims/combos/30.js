@@ -1427,8 +1427,12 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 			validityMessages.en.rangeOverflow[type] = validityMessages.en.rangeOverflow[type] || 'Value must be at or before {%max}.';
 		});
 	}
-	
-	validityMessages['en-US'] = validityMessages['en-US'] || validityMessages.en;
+	if(!validityMessages['en-US']){
+		validityMessages['en-US'] = $.extend({}, validityMessages.en);
+	}
+	if(!validityMessages['en-GB']){
+		validityMessages['en-GB'] = $.extend({}, validityMessages.en);
+	}
 	validityMessages[''] = validityMessages[''] || validityMessages['en-US'];
 	
 	validityMessages.de = $.extend(true, {

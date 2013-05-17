@@ -976,6 +976,12 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		}
 	};
 	
+	var oCreate = function (o) {
+		function F() {}
+		F.prototype = o;
+		return new F();
+	};
+	
 	$.fn.rangeUI = function(opts){
 		opts = $.extend({
 			readonly: false, 
@@ -994,13 +1000,18 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			calcTrail: true
 		}, opts);
 		return this.each(function(){
-			var obj = $.extend(Object.create(rangeProto), {element: $(this)});
+			var obj = $.extend(oCreate(rangeProto), {element: $(this)});
 			obj.options = opts;
 			obj._create.call(obj);
 		});
 	};
 	if(window.webshims && webshims.isReady){
-		webshims.isReady('range-ui', true);
+		webshims.ready('es5', function(){
+			webshims.isReady('range-ui', true);
+		});
+		if(webshims._polyfill){
+			 webshims._polyfill(['es5']);
+		}
 	}
 })(jQuery);
 webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
@@ -1180,9 +1191,16 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				"showMonthAfterYear": false,
 				"yearSuffix": ""
 			}
-		}, formcfg['en'] || {});
+		}, formcfg.en || {});
+		
 		if(!formcfg['en-US']){
 			formcfg['en-US'] = formcfg['en'];
+		}
+		if(!formcfg['en-GB']){
+			formcfg['en-GB'] = $.extend(true, {}, formcfg.en, {
+				date: {firstDay: 1}, 
+				patterns: {d: "dd/mm/yy"}
+			});
 		}
 		if(!formcfg['']){
 			formcfg[''] = formcfg['en-US'];
@@ -1235,8 +1253,10 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			langObj: formcfg, 
 			module: 'form-core',
 			callback: function(val){
-				curCfg = val;
-				triggerLocaleChange();
+				if(curCfg != val){
+					curCfg = val;
+					triggerLocaleChange();
+				}
 			}
 		});
 	})();

@@ -79,6 +79,12 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+Release 1.10.7
+----------
+
+- fixed several localization date formatting issues 
+- much improved french localization  (thx to @jls2933)
+
 Release 1.10.6
 ----------
 
