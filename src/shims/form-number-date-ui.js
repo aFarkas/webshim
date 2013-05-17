@@ -175,9 +175,16 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				"showMonthAfterYear": false,
 				"yearSuffix": ""
 			}
-		}, formcfg['en'] || {});
+		}, formcfg.en || {});
+		
 		if(!formcfg['en-US']){
 			formcfg['en-US'] = formcfg['en'];
+		}
+		if(!formcfg['en-GB']){
+			formcfg['en-GB'] = $.extend(true, formcfg.en, {
+				date: {firstDay: 1}, 
+				patterns: {d: "dd/mm/yy"}
+			});
 		}
 		if(!formcfg['']){
 			formcfg[''] = formcfg['en-US'];
@@ -207,6 +214,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		};
 		var triggerLocaleChange = function(){
 			processLangCFG(curCfg);
+			console.log(curCfg)
 			$(document).triggerHandler('wslocalechange');
 		};
 		
@@ -217,6 +225,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			callback: function(){
 				$.each(arguments, function(i, val){
 					if(formcfg[val]){
+						console.log(val, formcfg[val])
+						console.dir(formcfg)
 						if(formcfg[val] != curCfg){
 							curCfg = formcfg[val];
 							triggerLocaleChange();
@@ -230,8 +240,11 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			langObj: formcfg, 
 			module: 'form-core',
 			callback: function(val){
-				curCfg = val;
-				triggerLocaleChange();
+				if(curCfg != val){
+					curCfg = val;
+					console.log(val)
+					triggerLocaleChange();
+				}
 			}
 		});
 	})();
