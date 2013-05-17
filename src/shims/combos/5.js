@@ -1132,13 +1132,17 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 				mousedown: add
 			});
 			$(function(){
-				webshims.ready('dom-support', function(){
-					that.element.onWSOff('updateshadowdom', function(){
-						that.updateMetrics();
+				if(window.webshims){
+					webshims.ready('dom-support', function(){
+						if($.fn.onWSOff){
+							that.element.onWSOff('updateshadowdom', function(){
+								that.updateMetrics();
+							});
+						}
 					});
-				});
-				if(!$.fn.onWSOff){
-					webshims._polyfill(['dom-support']);
+					if(!$.fn.onWSOff && webshims._polyfill){
+						webshims._polyfill(['dom-support']);
+					}
 				}
 			});
 		},
@@ -1200,14 +1204,14 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			calcTrail: true
 		}, opts);
 		return this.each(function(){
-			webshims.objectCreate(rangeProto, {
-				element: {
-					value: $(this)
-				}
-			}, opts);
+			var obj = $.extend(Object.create(rangeProto), {element: $(this)});
+			obj.options = opts;
+			obj._create.call(obj);
 		});
 	};
-	webshims.isReady('range-ui', true);
+	if(window.webshims && webshims.isReady){
+		webshims.isReady('range-ui', true);
+	}
 })(jQuery);
 webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
