@@ -817,7 +817,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	if (!webshims.cfg.no$Switch) {
 		var switch$ = function(){
 			if (window.jQuery && (!window.$ || window.jQuery == window.$) && !window.jQuery.webshims) {
-				webshims.error("jQuery was included more than once. Make sure to include it only once! Webshims and other Plugins might not work properly.");
+				webshims.error("jQuery was included more than once. Make sure to include it only once or try the $.noConflict(extreme) feature! Webshims and other Plugins might not work properly..");
 				if (window.$) {
 					window.$ = webshims.$;
 				}
@@ -835,7 +835,10 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		};
 		switch$();
 		setTimeout(switch$, 90);
+		webshims.ready('DOM', switch$);
 		$(switch$);
+		webshims.ready('WINDOWLOAD', switch$);
+		
 	}
 //	(function(){
 //		var hostNames = {
@@ -3397,17 +3400,20 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		
 		
 		webshims.onNodeNamesPropertyModify(nodeName, 'preload', function(val){
-			var data;
+			var data, baseData, elem;
 			
 			
 			if(bufferSrc(this)){
 				data = getSwfDataFromElem(this);
 				if(data){
 					queueSwfMethod(this, 'api_preload', [], data);
-				} else if(needsLoadPreload && this.paused && !this.readyState && !this.networkState && !this.autoplay && $(this).is(':not(.nonnative-api-active)')){
-					try {
-						this.load();
-					} catch(er){}
+				} else if(needsLoadPreload && this.paused && !this.error && !$.data(this, 'mediaerror') && !this.readyState && !this.networkState && !this.autoplay && $(this).is(':not(.nonnative-api-active)')){
+					elem = this;
+					baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
+					clearTimeout(baseData.loadTimer);
+					baseData.loadTimer = setTimeout(function(){
+						$(elem).mediaLoad();
+					}, 9);
 				}
 			}
 		});
