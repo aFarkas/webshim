@@ -1,9 +1,12 @@
 jQuery.webshims.validityMessages.fr = {
     "typeMismatch": {
+        "defaultMessage": "Please enter a valid value.",
         "email": "Veuillez saisir une adresse courriel valide.",
         "url": "Veuillez saisir une URL.",
         "number": "Valeur incorrecte",
         "date": "Valeur incorrecte",
+        "month": "Please enter a valid month format.",
+        "week": "Please enter a valid week value.",
         "time": "Valeur incorrecte",
         "range": "Valeur incorrecte",
         "datetime-local": "Valeur incorrecte"
@@ -18,7 +21,7 @@ jQuery.webshims.validityMessages.fr = {
     },
     "rangeUnderflow": {
         "defaultMessage": "Cette valeur doit être supérieure ou égale à {%min}.",
-		"date": "Cette valeur doit être supérieure ou égale à {%min}.",
+        "date": "Cette valeur doit être supérieure ou égale à {%min}.",
         "time": "Cette valeur doit être supérieure ou égale à {%min}.",
         "datetime-local": "Cette valeur doit être supérieure ou égale à {%min}."
     },
@@ -42,8 +45,15 @@ jQuery.webshims.formcfg.fr = {
 	patterns: {
 		d: 'dd/mm/yy'
 	},
+	month: {
+		currentText: 'This month'
+	},
+	week: {
+		currentText: 'This week'
+	},
 	date: {
 		closeText: 'Fermer',
+		clear: 'Effacer',
 		prevText: 'Précédent',
 		nextText: 'Suivant',
 		currentText: 'Aujourd\'hui',

@@ -42,8 +42,15 @@ jQuery.webshims.formcfg.fr = {
 	patterns: {
 		d: 'dd/mm/yy'
 	},
+	month: {
+		currentText: 'This month'
+	},
+	week: {
+		currentText: 'This week'
+	},
 	date: {
 		closeText: 'Fermer',
+		clear: 'Effacer',
 		prevText: 'Précédent',
 		nextText: 'Suivant',
 		currentText: 'Aujourd\'hui',
