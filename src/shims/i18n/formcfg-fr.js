@@ -1,17 +1,17 @@
 jQuery.webshims.validityMessages.fr = {
     "typeMismatch": {
-        "defaultMessage": "Please enter a valid value.",
+        "defaultMessage": "Veuillez saisir une valeur valide.",
         "email": "Veuillez saisir une adresse courriel valide.",
         "url": "Veuillez saisir une URL.",
-        "number": "Valeur incorrecte",
-        "date": "Valeur incorrecte",
-        "month": "Please enter a valid month format.",
-        "week": "Please enter a valid week value.",
-        "time": "Valeur incorrecte",
-        "range": "Valeur incorrecte",
-        "datetime-local": "Valeur incorrecte"
+        "number": "Veuillez saisir un nombre valide.",
+        "date": "Veuillez saisir une date valide.",
+        "month": "Veuillez saisir un mois valide.",
+        "week": "Veuillez saisir un numéro de semaine valide.",
+        "time": "Veuillez saisir une heure valide.",
+        "range": "Veuillez saisir une borne valide.",
+        "datetime-local": "Veuillez saisir une date valide."
     },
-    "tooLong": "Valeur incorrecte",
+    "tooLong": "Contenu saisi trop long.",
     "patternMismatch": "Veuillez modifier la valeur du champ pour correspondre au format demandé : {%title}.",
     "valueMissing": {
         "defaultMessage": "Veuillez compléter ce champ.",
@@ -46,10 +46,10 @@ jQuery.webshims.formcfg.fr = {
 		d: 'dd/mm/yy'
 	},
 	month: {
-		currentText: 'This month'
+		currentText: 'Ce mois-ci'
 	},
 	week: {
-		currentText: 'This week'
+		currentText: 'Cette semaine-ci'
 	},
 	date: {
 		closeText: 'Fermer',
