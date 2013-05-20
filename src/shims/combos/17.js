@@ -1297,6 +1297,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					} else if(p[1]){
 						val = curCfg.date.showMonthAfterYear ? p.join(' ') : p[1]+' '+p[0];
 					}
+				} else if(options && options.splitInput){
+					val = [p[0] || '', p[1] || ''];
 				}
 				return val;
 			},
