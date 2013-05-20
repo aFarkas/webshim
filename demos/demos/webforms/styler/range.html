@@ -41,6 +41,10 @@
 						$.each(data, function(sel, vals){
 							css += sel +' {';
 							$.each(vals, function(prop, val){
+								if(prop == 'background' && vals.display == 'none'){
+									val = 'tranparent';
+								}
+								
 								css += prop+': '+ val +';';
 							});
 							css += '}\n';
@@ -54,7 +58,12 @@
 				var css = '';
 				
 				var transformData = {
-					baseStyles: {'::-moz-range-track': {border: 'none', background: 'transparent'}, '::-ms-tooltip': {display: 'none'}, '::-ms-track': {color: 'transparent', background: 'transparent', border: 0}},
+					baseStyles: {
+						'::-moz-range-track': {border: 'none', background: 'transparent'}, 
+						'::-ms-tooltip': {display: 'none'}, 
+						'::-ms-track': {color: 'transparent', background: 'transparent', border: 0}, 
+						'::-webkit-slider-thumb': {'box-sizing': 'content-box'}
+					},
 					baseProps: {
 						'.ws-range, input[type="range"]': {'-webkit-appearance': 'none', cursor: 'pointer', outline: 'none', padding: 0, margin: 0},
 						'input[type="range"]::-webkit-slider-thumb': {'-webkit-appearance': 'none'}
@@ -62,7 +71,7 @@
 					selector: {
 						'.ws-range, input[type="range"]': [],
 						'.ws-range .ws-range-thumb': ['input[type="range"]::-webkit-slider-thumb', 'input[type="range"]::-moz-range-thumb', 'input[type="range"]::-ms-thumb'],
-						'.ws-range.ws-active .ws-range-thumb': ['input[type="range"]:active::-webkit-slider-thumb', 'input[type="range"]:active::-moz-range-thumb'],
+						'.ws-range.ws-active .ws-range-thumb': ['input[type="range"]:active::-webkit-slider-thumb', 'input[type="range"]:active::-moz-range-thumb', 'input[type="range"]:active::-ms-thumb'],
 						'.ws-range .ws-range-min': ['::-moz-range-progress', '::-ms-fill-lower']
 					}
 				};
@@ -129,7 +138,6 @@
 			$.webshims.polyfill('forms forms-ext');
 			$.webshims.loader.loadList(['range-ui']);
 		</script>
-		<script src="../../../demo-js/demo.js"></script>
 	</head>
 	<body>
 		<h2>webshims example</h2>

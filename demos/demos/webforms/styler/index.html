@@ -32,101 +32,7 @@
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 		<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
 		<script src="../../../js-webshim/minified/polyfiller.js"></script>
-		<script>
-			jQuery(window).load(function(){
-				$('.range-number').each(function(){
-					//why not: $('input[type="range"]', this).prop(['min', 'max', 'value'])
-					var range = $('input[type="range"]', this);
-					var number = $('input[type="number"]', this);
-					number
-						.prop({
-							value: range.prop('value'),
-							min: range.prop('min'),
-							max: range.prop('max')
-						})
-						.on('input', function(){
-							if(number.is(':valid')){
-								range.val(number.val());
-							}
-						})
-					;
-					range.on('input', function(){
-						if(range.is(':valid')){
-							number.val(range.val());
-						}
-					});
-				});
-				
-				$('div.styler').each(function(){
-					var frame = $('iframe', this).get(0).contentWindow;
-					var throttle = function(fn, context, time){
-						var timer;
-						var fn2 = function(){
-							fn.apply(context);
-						};
-						return function(){
-							clearTimeout(timer);
-							timer = setTimeout(fn2, time);
-						};
-					};
-					var change = function(){
-						var isValid = true;
-						var data = {};
-						var buildData = function(elem){
-							var type = $(elem).data('type');
-							var value = $(elem).data('value');
-							if(!data[type]){
-								data[type] = {};
-							}
-							if(!data[type][value]){
-								data[type][value] = {};
-							}
-							return data[type][value];
-						};
-						$('input, select', this).getNativeElement().each(function(){
-							var name = $.prop(this, 'name');
-							var value = $(this).val();
-							if(!name || $.prop(this, 'disabled') || value == 'disable'){return;}
-							if($(this).is(':invalid')){
-								isValid = false;
-								return false;
-							}
-							
-							if(name){
-								var value = $(this).val();
-								if(value == '0'){
-									value = 0;
-								}
-								$(this).closest('[data-type]').each(function(){
-									var temp = buildData(this);
-									if(name in temp && !temp[name]){
-										return;
-									}
-									if(temp[name]){
-										buildData(this)[name] += value;
-									} else {
-										buildData(this)[name] = value;
-									}
-									
-								});
-							}
-						});
-						if(isValid){
-							frame.postMessage(JSON.stringify(data), '*');
-						}
-					};
-					
-					var throttledChange = throttle(change, this, 9);
-					
-					
-					$(this)
-						.on({'input change': throttledChange})
-						.each(throttledChange)
-					;
-				});
-			});
-			
-		</script>
+		
 		<script>
 		$.webshims.setOptions({
 			'forms-ext': {
@@ -135,7 +41,6 @@
 		});
 		$.webshims.polyfill('forms forms-ext details');
 		</script>
-		<script src="../../../demo-js/demo.js" async=""></script>
 	</head>
 	<body>
 		<h1>don't look, work in progress</h1>
@@ -214,6 +119,20 @@
 							<input type="hidden" name="border" value=" solid " />
 							<input type="color" value="#666666" required name="border" />
 							
+							<label>margin-top</label>
+							<span class="range-number">
+								<input type="number" />
+								<input type="range" min="0" max="20" value="0" name="margin-top" />
+							</span>
+							<input type="hidden" name="margin-top" value="px" />
+							
+							<label>margin-bottom</label>
+							<span class="range-number">
+								<input type="number" />
+								<input type="range" min="0" max="20" value="0" name="margin-top" />
+							</span>
+							<input type="hidden" name="margin-bottom" value="px" />
+							
 							<label>border-radius</label>
 							<span class="range-number">
 								<input type="number" />
@@ -230,24 +149,21 @@
 					<details data-type="selector" data-value=".ws-range.ws-active .ws-range-thumb">
 						<summary>:active styles</summary>
 						<div class="panel">
-							<label>border</label>
+							<label>border-color</label>
 							<span class="disable-enable">
 								<input type="checkbox" checked="" />
-								<span class="range-number">
-									<input type="number" />
-									<input type="range" min="0" max="10" value="1" name="border" />
-								</span>
-								<input type="hidden" name="border" value="px" />
-								<input type="hidden" name="border" value=" solid " />
-								<input type="color" value="#333333" required name="border" />
+								<input type="color" value="#333333" required name="border-color" />
 							</span>
 							<label>background</label>
-							<input type="color" value="#ffffff" required name="background" />
+							<span class="disable-enable">
+								<input type="checkbox" checked="" />
+								<input type="color" value="#ffffff" required name="background" />
+							</span>
 						</div>
 					</details>
 				</fieldset>
 				<fieldset data-type="selector" data-value=".ws-range .ws-range-min">
-					<legend>range min</legend>
+					<legend>range min/range-progress</legend>
 					<div class="panel">
 						<label>display</label>
 						<select name="display">
@@ -265,7 +181,7 @@
 			</div>
 			<iframe src="range.html" id="style-show"></iframe>
 		</div>
-		
+		<script src="styler.js"></script>
 		
 	</body>
 </html>
