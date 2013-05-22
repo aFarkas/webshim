@@ -1724,20 +1724,20 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			this.thumb.on({
 				mousedown: add
 			});
-			$(function(){
-				if(window.webshims){
+			if (window.webshims) {
+				webshims.ready('WINDOWLOAD', function(){
 					webshims.ready('dom-support', function(){
-						if($.fn.onWSOff){
+						if ($.fn.onWSOff) {
 							that.element.onWSOff('updateshadowdom', function(){
 								that.updateMetrics();
 							});
 						}
 					});
-					if(!$.fn.onWSOff && webshims._polyfill){
+					if (!$.fn.onWSOff && webshims._polyfill) {
 						webshims._polyfill(['dom-support']);
 					}
-				}
-			});
+				});
+			}
 		},
 		posCenter: function(elem, outerWidth){
 			var temp;
@@ -2474,8 +2474,12 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 							timer = setTimeout(releaseTab, 300);
 						};
 						var select = function(){
-							this.focus();
-							this.select();
+							var elem = this;
+							setTimeout(function(){
+								elem.focus();
+								elem.select();
+							}, 4);
+							
 							stopTab();
 						};
 						

@@ -655,8 +655,12 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 							timer = setTimeout(releaseTab, 300);
 						};
 						var select = function(){
-							this.focus();
-							this.select();
+							var elem = this;
+							setTimeout(function(){
+								elem.focus();
+								elem.select();
+							}, 4);
+							
 							stopTab();
 						};
 						
