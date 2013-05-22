@@ -401,20 +401,20 @@
 			this.thumb.on({
 				mousedown: add
 			});
-			$(function(){
-				if(window.webshims){
+			if (window.webshims) {
+				webshims.ready('WINDOWLOAD', function(){
 					webshims.ready('dom-support', function(){
-						if($.fn.onWSOff){
+						if ($.fn.onWSOff) {
 							that.element.onWSOff('updateshadowdom', function(){
 								that.updateMetrics();
 							});
 						}
 					});
-					if(!$.fn.onWSOff && webshims._polyfill){
+					if (!$.fn.onWSOff && webshims._polyfill) {
 						webshims._polyfill(['dom-support']);
 					}
-				}
-			});
+				});
+			}
 		},
 		posCenter: function(elem, outerWidth){
 			var temp;
