@@ -3337,7 +3337,8 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			if(webshims.implement(this, 'mediaelement')){
 				selectSource(this);
 				
-				if(hasNative){
+				//fixes for FF 12 and IE9/10 || does not hurt, if run in other browsers
+				if(hasNative && (!supportsLoop || ('ActiveXObject' in window))){
 					var bufferTimer;
 					var lastBuffered;
 					var elem = this;
@@ -4047,10 +4048,18 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			$(elem)
 				.on({'updatemediaelementdimensions': setDimension})
 				.onWSOff('updateshadowdom', setDimension)
+				.on('remove', function(e){
+					if(!e.originalEvent){
+						if(mediaelement.jarisEvent[data.id] && mediaelement.jarisEvent[data.id].elem == elem){
+							delete mediaelement.jarisEvent[data.id];
+						}
+						box.remove();
+					}
+				})
 			;
 		}
 		
-		if(!mediaelement.jarisEvent[data.id]){
+		if(!mediaelement.jarisEvent[data.id] || mediaelement.jarisEvent[data.id].elem != elem){
 			mediaelement.jarisEvent[data.id] = function(jaris){
 				if(jaris.type == 'ready'){
 					var onReady = function(){
@@ -4084,8 +4093,8 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 					}
 					data.duration = jaris.duration;
 				}
-				
 			};
+			mediaelement.jarisEvent[data.id].elem = elem;
 		}
 		
 		$.extend(vars, 

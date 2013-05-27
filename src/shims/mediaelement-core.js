@@ -514,7 +514,8 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			if(webshims.implement(this, 'mediaelement')){
 				selectSource(this);
 				
-				if(hasNative){
+				//fixes for FF 12 and IE9/10 || does not hurt, if run in other browsers
+				if(hasNative && (!supportsLoop || ('ActiveXObject' in window))){
 					var bufferTimer;
 					var lastBuffered;
 					var elem = this;
@@ -543,7 +544,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 									lastBuffered = getBufferedString();
 								}
 								clearTimeout(bufferTimer);
-								bufferTimer = setTimeout(testBuffer, 999);
+								bufferTimer = setTimeout(testBuffer, 400);
 							},
 							'emptied stalled mediaerror abort suspend': function(e){
 								if(e.type == 'emptied'){
