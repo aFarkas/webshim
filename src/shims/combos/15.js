@@ -143,6 +143,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				$(evtDel).off(evt, fn);
 			}
 		});
+		return this;
 	};
 	
 	var dataID = '_webshimsLib'+ (Math.round(Math.random() * 1000));
@@ -1230,7 +1231,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		});
 	};
 	
-	
+	var transClass = ('transitionDelay' in document.documentElement.style) ?  '' : ' no-transition';
 	webshims.wsPopover = {
 		id: 0,
 		_create: function(){
@@ -1238,7 +1239,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 			this.id = webshims.wsPopover.id++;
 			this.eventns = '.wsoverlay' + this.id;
 			this.timers = {};
-			this.element = $('<div class="ws-popover" tabindex="-1"><div class="ws-po-outerbox"><div class="ws-po-arrow"><div class="ws-po-arrowbox" /></div><div class="ws-po-box" /></div></div>');
+			this.element = $('<div class="ws-popover'+transClass+'" tabindex="-1"><div class="ws-po-outerbox"><div class="ws-po-arrow"><div class="ws-po-arrowbox" /></div><div class="ws-po-box" /></div></div>');
 			this.contentElement = $('.ws-po-box', this.element);
 			this.lastElement = $([]);
 			this.bindElement();

@@ -244,7 +244,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				clearTimeout(that.timers.repos);
 				that.timers.repos = setTimeout(function(){
 					that.position(visual);
-				}, 900);
+				}, 400);
 			});
 		},
 		prepareFor: function(element, visual){

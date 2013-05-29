@@ -1130,6 +1130,12 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				};
 				var baseData, trackList, updateTimer;
 				
+				elem.on('remove', function(e){
+					if(!e.originalEvent && baseData && baseData.trackDisplay){
+						baseData.trackDisplay.remove();
+					}
+				});
+				
 				if(!usesNativeTrack()){
 					addTrackView();
 				} else {

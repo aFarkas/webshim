@@ -2005,6 +2005,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				patterns: {d: "dd/mm/yy"}
 			});
 		}
+		if(!formcfg['en-AU']){
+			formcfg['en-AU'] = formcfg['en-GB'];
+		}
 		if(!formcfg['']){
 			formcfg[''] = formcfg['en-US'];
 		}

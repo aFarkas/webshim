@@ -143,6 +143,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				$(evtDel).off(evt, fn);
 			}
 		});
+		return this;
 	};
 	
 	var dataID = '_webshimsLib'+ (Math.round(Math.random() * 1000));
@@ -1816,6 +1817,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				date: {firstDay: 1}, 
 				patterns: {d: "dd/mm/yy"}
 			});
+		}
+		if(!formcfg['en-AU']){
+			formcfg['en-AU'] = formcfg['en-GB'];
 		}
 		if(!formcfg['']){
 			formcfg[''] = formcfg['en-US'];

@@ -143,6 +143,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				$(evtDel).off(evt, fn);
 			}
 		});
+		return this;
 	};
 	
 	var dataID = '_webshimsLib'+ (Math.round(Math.random() * 1000));

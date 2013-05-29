@@ -120,12 +120,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		data.readyState = readyState;
 	};
 	
-	$.extend($.event.customEvent, {
-		updatemediaelementdimensions: true,
-		flashblocker: true,
-		swfstageresize: true,
-		mediaelementapichange: true
-	});
+	
 	
 	mediaelement.jarisEvent = {};
 	var localConnectionTimer;
@@ -439,15 +434,18 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 	})();
 	
 	var setElementDimension = function(data, hasControls){
+		var cAttr;
 		var elem = data._elem;
 		var box = data.shadowElem;
+		
 		$(elem)[hasControls ? 'addClass' : 'removeClass']('webshims-controls');
 		if(data._elemNodeName == 'audio' && !hasControls){
 			box.css({width: 0, height: 0});
 		} else {
+			
 			box.css({
-				width: elem.style.width || $(elem).width(),
-				height: elem.style.height || $(elem).height()
+				width: elem.style.width || ((cAttr = $(elem).attr('width')) && cAttr+'px') || $(elem).width(),
+				height: elem.style.height|| ((cAttr = $(elem).attr('height')) && cAttr+'px') || $(elem).height()
 			});
 		}
 	};
@@ -495,7 +493,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		}
 		
 		if($.attr(elem, 'height') || $.attr(elem, 'width')){
-			webshims.warn("width or height content attributes used. Webshims only uses CSS (computed styles or inline styles) to detect size of a video/audio");
+			webshims.warn("width or height content attributes used. Webshims prefers the usage of CSS (computed styles or inline styles) to detect size of a video/audio. It's really more powerfull.");
 		}
 		
 		var isRtmp = canPlaySrc.type == 'audio/rtmp' || canPlaySrc.type == 'video/rtmp';
@@ -610,6 +608,8 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 					if(!e.originalEvent){
 						if(mediaelement.jarisEvent[data.id] && mediaelement.jarisEvent[data.id].elem == elem){
 							delete mediaelement.jarisEvent[data.id];
+							clearTimeout(localConnectionTimer);
+							clearTimeout(data.flashBlock);
 						}
 						box.remove();
 					}
@@ -680,25 +680,26 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		swfmini.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.115", false, vars, params, attrs, function(swfData){
 			
 			if(swfData.success){
-				
-				data.api = swfData.ref;
-				
-				if(!hasControls){
-					$(swfData.ref).attr('tabindex', '-1').css('outline', 'none');
-				}
-				
-				data.flashBlock = setTimeout(function(){
+				var fBlocker = function(){
 					if((!swfData.ref.parentNode && box[0].parentNode) || swfData.ref.style.display == "none"){
 						box.addClass('flashblocker-assumed');
 						$(elem).trigger('flashblocker');
 						webshims.warn("flashblocker assumed");
 					}
 					$(swfData.ref).css({'minHeight': '2px', 'minWidth': '2px', display: 'block'});
-				}, 9);
+				};
+				data.api = swfData.ref;
+				
+				if(!hasControls){
+					$(swfData.ref).attr('tabindex', '-1').css('outline', 'none');
+				}
+				
+				data.flashBlock = setTimeout(fBlocker, 99);
 				
 				if(!localConnectionTimer){
 					clearTimeout(localConnectionTimer);
 					localConnectionTimer = setTimeout(function(){
+						fBlocker();
 						var flash = $(swfData.ref);
 						if(flash[0].offsetWidth > 1 && flash[0].offsetHeight > 1 && location.protocol.indexOf('file:') === 0){
 							webshims.error("Add your local development-directory to the local-trusted security sandbox:  http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html");

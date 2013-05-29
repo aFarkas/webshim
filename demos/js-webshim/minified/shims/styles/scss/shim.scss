@@ -655,8 +655,7 @@ input[type="color"] {
 	min-width: 90px;
 	transition: visibility 400ms ease-in-out;
 	
-	.no-csstransitions &,
-	.no-opacity & {
+	&.no-transition	{
 		display: none;
 	}
 
@@ -954,7 +953,7 @@ $button-bgcolor: #f5f5f5;
 		width: 290px;
 		float: left;
 		margin: 0 10px;
-		
+		background: #fff;
 		
 		tr {
 			border: 0;

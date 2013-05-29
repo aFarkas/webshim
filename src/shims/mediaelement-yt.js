@@ -85,11 +85,13 @@ var resetSwfProps = (function(){
 })();
 
 var setElementDimension = function(data){
+	var cAttr;
 	var elem = data._elem;
 	var box = data.shadowElem;
+	
 	box.css({
-		width: elem.style.width || $(elem).width(),
-		height: elem.style.height || $(elem).height()
+		width: elem.style.width || ((cAttr = $(elem).attr('width')) && cAttr+'px') || $(elem).width(),
+		height: elem.style.height || ((cAttr = $(elem).attr('width')) && cAttr+'px') || $(elem).height()
 	});
 };
 
@@ -448,6 +450,11 @@ mediaelement.createSWF = function(mediaElem, src, data){
 	$(mediaElem)
 		.on('updatemediaelementdimensions', setDimension)
 		.onWSOff('updateshadowdom', setDimension)
+		.on('remove', function(e){
+			if(!e.originalEvent){
+				box.remove();
+			}
+		})
 	;
 };
 
