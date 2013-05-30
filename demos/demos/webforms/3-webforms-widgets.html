@@ -46,6 +46,11 @@
 		.input-widget.no-btn .input-buttons {
 			display: none !important;
 		}
+		
+		.input-widget fieldset {
+			border: 1px solid #ccc;
+			margin: 15px 0;
+		}
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -240,22 +245,22 @@ $.webshims.activeLang('de');
 			<h3 id="configure-ui">Changing default-options for widgets</h3>
 			<p>All widgets can be changed with the <code>forms-ext.widgets</code> or <code>forms-ext[type]</code> options.</p>
 <code class="block">
-	$.webshims.setOptions({
-		wspopover: {
-			appendTo: 'element' //insert all popovers (datepicker, validationBubble, datalist after the associated element instead of the body)
-		}
-	});
-	$.webshims.setOptions('forms-ext', {
-		widgets: {
-			calculateWidth: false
-		},
-		date: {
-			splitInput: true
-		},
-		month: {
-			calculateWidth: true
-		}
-	});
+$.webshims.setOptions({
+	wspopover: {
+		appendTo: 'element' //insert all popovers (datepicker, validationBubble, datalist after the associated element instead of the body)
+	}
+});
+$.webshims.setOptions('forms-ext', {
+	widgets: {
+		calculateWidth: false
+	},
+	date: {
+		splitInput: true
+	},
+	month: {
+		calculateWidth: true
+	}
+});
 </code>	
 			
 			<form class="input-widget" data-type="date" id="date-cfg">
@@ -695,7 +700,7 @@ $.webshims.activeLang('de');
 					</label>
 				</fieldset>
 				<fieldset  data-method="data" data-name="time">
-					<legend>$.attr</legend>
+					<legend>$.data</legend>
 					<label>
 						calculateWidth: 
 						<input type="checkbox" name="calculateWidth" checked="checked" />	
@@ -751,7 +756,7 @@ $.webshims.activeLang('de');
 					</label>
 				</fieldset>
 				<fieldset  data-method="data" data-name="number">
-					<legend>$.attr</legend>
+					<legend>$.data</legend>
 					<label>
 						calculateWidth: 
 						<input type="checkbox" name="calculateWidth" checked="checked" />	
