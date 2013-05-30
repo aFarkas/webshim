@@ -921,20 +921,20 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			this.thumb.on({
 				mousedown: add
 			});
-			if (window.webshims) {
-				webshims.ready('WINDOWLOAD', function(){
+			$(function(){
+				if(window.webshims){
 					webshims.ready('dom-support', function(){
-						if ($.fn.onWSOff) {
+						if($.fn.onWSOff){
 							that.element.onWSOff('updateshadowdom', function(){
 								that.updateMetrics();
 							});
 						}
 					});
-					if (!$.fn.onWSOff && webshims._polyfill) {
+					if(!$.fn.onWSOff && webshims._polyfill){
 						webshims._polyfill(['dom-support']);
 					}
-				});
-			}
+				}
+			});
 		},
 		posCenter: function(elem, outerWidth){
 			var temp;
@@ -1202,6 +1202,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				patterns: {d: "dd/mm/yy"}
 			});
 		}
+		if(!formcfg['en-AU']){
+			formcfg['en-AU'] = formcfg['en-GB'];
+		}
 		if(!formcfg['']){
 			formcfg[''] = formcfg['en-US'];
 		}
@@ -1297,8 +1300,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					} else if(p[1]){
 						val = curCfg.date.showMonthAfterYear ? p.join(' ') : p[1]+' '+p[0];
 					}
-				} else if(options && options.splitInput){
-					val = [p[0] || '', p[1] || ''];
 				}
 				return val;
 			},
@@ -1671,12 +1672,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 							timer = setTimeout(releaseTab, 300);
 						};
 						var select = function(){
-							var elem = this;
-							setTimeout(function(){
-								elem.focus();
-								elem.select();
-							}, 4);
-							
+							this.focus();
+							this.select();
 							stopTab();
 						};
 						

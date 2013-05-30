@@ -186,6 +186,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				patterns: {d: "dd/mm/yy"}
 			});
 		}
+		if(!formcfg['en-AU']){
+			formcfg['en-AU'] = formcfg['en-GB'];
+		}
 		if(!formcfg['']){
 			formcfg[''] = formcfg['en-US'];
 		}
@@ -281,8 +284,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					} else if(p[1]){
 						val = curCfg.date.showMonthAfterYear ? p.join(' ') : p[1]+' '+p[0];
 					}
-				} else if(options && options.splitInput){
-					val = [p[0] || '', p[1] || ''];
 				}
 				return val;
 			},
@@ -655,12 +656,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 							timer = setTimeout(releaseTab, 300);
 						};
 						var select = function(){
-							var elem = this;
-							setTimeout(function(){
-								elem.focus();
-								elem.select();
-							}, 4);
-							
+							this.focus();
+							this.select();
 							stopTab();
 						};
 						

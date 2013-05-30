@@ -20,8 +20,8 @@
 // -- lexer Alexey Zakharov XXX TODO License or CLA
 
 /*!
-    Copyright (c) 2009, 280 North Inc. http://280north.com/
-    MIT License. http://github.com/280north/narwhal/blob/master/README.md
+	Copyright (c) 2009, 280 North Inc. http://280north.com/
+	MIT License. http://github.com/280north/narwhal/blob/master/README.md
 */
 
 (function (undefined) {
@@ -64,106 +64,106 @@ var toString;
 // http://www.ecma-international.org/publications/files/drafts/tc39-2009-025.pdf
 
 if (!Function.prototype.bind) {
-    Function.prototype.bind = function (that) { // .length is 1
-        // 1. Let Target be the this value.
-        var target = this;
-        // 2. If IsCallable(Target) is false, throw a TypeError exception.
-        if (typeof target != "function")
-            throw new TypeError(); // TODO message
-        // 3. Let A be a new (possibly empty) internal list of all of the
-        //   argument values provided after thisArg (arg1, arg2 etc), in order.
-        // XXX slicedArgs will stand in for "A" if used
-        var args = slice.call(arguments, 1); // for normal call
-        // 4. Let F be a new native ECMAScript object.
-        // 9. Set the [[Prototype]] internal property of F to the standard
-        //   built-in Function prototype object as specified in 15.3.3.1.
-        // 10. Set the [[Call]] internal property of F as described in
-        //   15.3.4.5.1.
-        // 11. Set the [[Construct]] internal property of F as described in
-        //   15.3.4.5.2.
-        // 12. Set the [[HasInstance]] internal property of F as described in
-        //   15.3.4.5.3.
-        // 13. The [[Scope]] internal property of F is unused and need not
-        //   exist.
-        var bound = function () {
+	Function.prototype.bind = function (that) { // .length is 1
+		// 1. Let Target be the this value.
+		var target = this;
+		// 2. If IsCallable(Target) is false, throw a TypeError exception.
+		if (typeof target != "function")
+			throw new TypeError(); // TODO message
+		// 3. Let A be a new (possibly empty) internal list of all of the
+		//   argument values provided after thisArg (arg1, arg2 etc), in order.
+		// XXX slicedArgs will stand in for "A" if used
+		var args = slice.call(arguments, 1); // for normal call
+		// 4. Let F be a new native ECMAScript object.
+		// 9. Set the [[Prototype]] internal property of F to the standard
+		//   built-in Function prototype object as specified in 15.3.3.1.
+		// 10. Set the [[Call]] internal property of F as described in
+		//   15.3.4.5.1.
+		// 11. Set the [[Construct]] internal property of F as described in
+		//   15.3.4.5.2.
+		// 12. Set the [[HasInstance]] internal property of F as described in
+		//   15.3.4.5.3.
+		// 13. The [[Scope]] internal property of F is unused and need not
+		//   exist.
+		var bound = function () {
 
-            if (this instanceof bound) {
-                // 15.3.4.5.2 [[Construct]]
-                // When the [[Construct]] internal method of a function object,
-                // F that was created using the bind function is called with a
-                // list of arguments ExtraArgs the following steps are taken:
-                // 1. Let target be the value of F's [[TargetFunction]]
-                //   internal property.
-                // 2. If target has no [[Construct]] internal method, a
-                //   TypeError exception is thrown.
-                // 3. Let boundArgs be the value of F's [[BoundArgs]] internal
-                //   property.
-                // 4. Let args be a new list containing the same values as the
-                //   list boundArgs in the same order followed by the same
-                //   values as the list ExtraArgs in the same order.
+			if (this instanceof bound) {
+				// 15.3.4.5.2 [[Construct]]
+				// When the [[Construct]] internal method of a function object,
+				// F that was created using the bind function is called with a
+				// list of arguments ExtraArgs the following steps are taken:
+				// 1. Let target be the value of F's [[TargetFunction]]
+				//   internal property.
+				// 2. If target has no [[Construct]] internal method, a
+				//   TypeError exception is thrown.
+				// 3. Let boundArgs be the value of F's [[BoundArgs]] internal
+				//   property.
+				// 4. Let args be a new list containing the same values as the
+				//   list boundArgs in the same order followed by the same
+				//   values as the list ExtraArgs in the same order.
 
-                var F = function(){};
-                F.prototype = target.prototype;
-                var self = new F;
+				var F = function(){};
+				F.prototype = target.prototype;
+				var self = new F;
 
-                var result = target.apply(
-                    self,
-                    args.concat(slice.call(arguments))
-                );
-                if (result !== null && Object(result) === result)
-                    return result;
-                return self;
+				var result = target.apply(
+					self,
+					args.concat(slice.call(arguments))
+				);
+				if (result !== null && Object(result) === result)
+					return result;
+				return self;
 
-            } else {
-                // 15.3.4.5.1 [[Call]]
-                // When the [[Call]] internal method of a function object, F,
-                // which was created using the bind function is called with a
-                // this value and a list of arguments ExtraArgs the following
-                // steps are taken:
-                // 1. Let boundArgs be the value of F's [[BoundArgs]] internal
-                //   property.
-                // 2. Let boundThis be the value of F's [[BoundThis]] internal
-                //   property.
-                // 3. Let target be the value of F's [[TargetFunction]] internal
-                //   property.
-                // 4. Let args be a new list containing the same values as the list
-                //   boundArgs in the same order followed by the same values as
-                //   the list ExtraArgs in the same order. 5.  Return the
-                //   result of calling the [[Call]] internal method of target
-                //   providing boundThis as the this value and providing args
-                //   as the arguments.
+			} else {
+				// 15.3.4.5.1 [[Call]]
+				// When the [[Call]] internal method of a function object, F,
+				// which was created using the bind function is called with a
+				// this value and a list of arguments ExtraArgs the following
+				// steps are taken:
+				// 1. Let boundArgs be the value of F's [[BoundArgs]] internal
+				//   property.
+				// 2. Let boundThis be the value of F's [[BoundThis]] internal
+				//   property.
+				// 3. Let target be the value of F's [[TargetFunction]] internal
+				//   property.
+				// 4. Let args be a new list containing the same values as the list
+				//   boundArgs in the same order followed by the same values as
+				//   the list ExtraArgs in the same order. 5.  Return the
+				//   result of calling the [[Call]] internal method of target
+				//   providing boundThis as the this value and providing args
+				//   as the arguments.
 
-                // equiv: target.call(this, ...boundArgs, ...args)
-                return target.apply(
-                    that,
-                    args.concat(slice.call(arguments))
-                );
+				// equiv: target.call(this, ...boundArgs, ...args)
+				return target.apply(
+					that,
+					args.concat(slice.call(arguments))
+				);
 
-            }
+			}
 
-        };
-        // XXX bound.length is never writable, so don't even try
-        //
-        // 16. The length own property of F is given attributes as specified in
-        //   15.3.5.1.
-        // TODO
-        // 17. Set the [[Extensible]] internal property of F to true.
-        // TODO
-        // 18. Call the [[DefineOwnProperty]] internal method of F with
-        //   arguments "caller", PropertyDescriptor {[[Value]]: null,
-        //   [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]:
-        //   false}, and false.
-        // TODO
-        // 19. Call the [[DefineOwnProperty]] internal method of F with
-        //   arguments "arguments", PropertyDescriptor {[[Value]]: null,
-        //   [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]:
-        //   false}, and false.
-        // TODO
-        // NOTE Function objects created using Function.prototype.bind do not
-        // have a prototype property.
-        // XXX can't delete it in pure-js.
-        return bound;
-    };
+		};
+		// XXX bound.length is never writable, so don't even try
+		//
+		// 16. The length own property of F is given attributes as specified in
+		//   15.3.5.1.
+		// TODO
+		// 17. Set the [[Extensible]] internal property of F to true.
+		// TODO
+		// 18. Call the [[DefineOwnProperty]] internal method of F with
+		//   arguments "caller", PropertyDescriptor {[[Value]]: null,
+		//   [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]:
+		//   false}, and false.
+		// TODO
+		// 19. Call the [[DefineOwnProperty]] internal method of F with
+		//   arguments "arguments", PropertyDescriptor {[[Value]]: null,
+		//   [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]:
+		//   false}, and false.
+		// TODO
+		// NOTE Function objects created using Function.prototype.bind do not
+		// have a prototype property.
+		// XXX can't delete it in pure-js.
+		return bound;
+	};
 }
 
 toString = call.bind(prototypeOfObject.toString);
@@ -177,9 +177,9 @@ owns = call.bind(prototypeOfObject.hasOwnProperty);
 
 // ES5 15.4.3.2
 if (!Array.isArray) {
-    Array.isArray = function (obj) {
-        return toString(obj) == "[object Array]";
-    };
+	Array.isArray = function (obj) {
+		return toString(obj) == "[object Array]";
+	};
 }
 
 // The IsCallable() check in the Array functions
@@ -197,239 +197,239 @@ if (!Array.isArray) {
 // ES5 15.4.4.18
 // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/array/foreach
 if (!Array.prototype.forEach) {
-    Array.prototype.forEach = function (fun /*, thisp*/) {
-        var self = toObject(this),
-            thisp = arguments[1],
-            i = 0,
-            length = self.length >>> 0;
+	Array.prototype.forEach = function (fun /*, thisp*/) {
+		var self = toObject(this),
+			thisp = arguments[1],
+			i = 0,
+			length = self.length >>> 0;
 
-        // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
-            throw new TypeError(); // TODO message
-        }
+		// If no callback function or if callback is not a callable function
+		if (toString(fun) != "[object Function]") {
+			throw new TypeError(); // TODO message
+		}
 
-        while (i < length) {
-            if (i in self) {
-                // Invoke the callback function with call, passing arguments:
-                // context, property value, property key, thisArg object context
-                fun.call(thisp, self[i], i, self);
-            }
-            i++;
-        }
-    };
+		while (i < length) {
+			if (i in self) {
+				// Invoke the callback function with call, passing arguments:
+				// context, property value, property key, thisArg object context
+				fun.call(thisp, self[i], i, self);
+			}
+			i++;
+		}
+	};
 }
 
 // ES5 15.4.4.19
 // https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/map
 if (!Array.prototype.map) {
-    Array.prototype.map = function (fun /*, thisp*/) {
-        var self = toObject(this),
-            length = self.length >>> 0,
-            result = Array(length),
-            thisp = arguments[1];
+	Array.prototype.map = function (fun /*, thisp*/) {
+		var self = toObject(this),
+			length = self.length >>> 0,
+			result = Array(length),
+			thisp = arguments[1];
 
-        // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
-            throw new TypeError(); // TODO message
-        }
+		// If no callback function or if callback is not a callable function
+		if (toString(fun) != "[object Function]") {
+			throw new TypeError(); // TODO message
+		}
 
-        for (var i = 0; i < length; i++) {
-            if (i in self)
-                result[i] = fun.call(thisp, self[i], i, self);
-        }
-        return result;
-    };
+		for (var i = 0; i < length; i++) {
+			if (i in self)
+				result[i] = fun.call(thisp, self[i], i, self);
+		}
+		return result;
+	};
 }
 
 // ES5 15.4.4.20
 if (!Array.prototype.filter) {
-    Array.prototype.filter = function (fun /*, thisp */) {
-        var self = toObject(this),
-            length = self.length >>> 0,
-            result = [],
-            thisp = arguments[1];
+	Array.prototype.filter = function (fun /*, thisp */) {
+		var self = toObject(this),
+			length = self.length >>> 0,
+			result = [],
+			thisp = arguments[1];
 
-        // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
-            throw new TypeError(); // TODO message
-        }
+		// If no callback function or if callback is not a callable function
+		if (toString(fun) != "[object Function]") {
+			throw new TypeError(); // TODO message
+		}
 
-        for (var i = 0; i < length; i++) {
-            if (i in self && fun.call(thisp, self[i], i, self))
-                result.push(self[i]);
-        }
-        return result;
-    };
+		for (var i = 0; i < length; i++) {
+			if (i in self && fun.call(thisp, self[i], i, self))
+				result.push(self[i]);
+		}
+		return result;
+	};
 }
 
 // ES5 15.4.4.16
 if (!Array.prototype.every) {
-    Array.prototype.every = function (fun /*, thisp */) {
-        var self = toObject(this),
-            length = self.length >>> 0,
-            thisp = arguments[1];
+	Array.prototype.every = function (fun /*, thisp */) {
+		var self = toObject(this),
+			length = self.length >>> 0,
+			thisp = arguments[1];
 
-        // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
-            throw new TypeError(); // TODO message
-        }
+		// If no callback function or if callback is not a callable function
+		if (toString(fun) != "[object Function]") {
+			throw new TypeError(); // TODO message
+		}
 
-        for (var i = 0; i < length; i++) {
-            if (i in self && !fun.call(thisp, self[i], i, self))
-                return false;
-        }
-        return true;
-    };
+		for (var i = 0; i < length; i++) {
+			if (i in self && !fun.call(thisp, self[i], i, self))
+				return false;
+		}
+		return true;
+	};
 }
 
 // ES5 15.4.4.17
 // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/some
 if (!Array.prototype.some) {
-    Array.prototype.some = function (fun /*, thisp */) {
-        var self = toObject(this),
-            length = self.length >>> 0,
-            thisp = arguments[1];
+	Array.prototype.some = function (fun /*, thisp */) {
+		var self = toObject(this),
+			length = self.length >>> 0,
+			thisp = arguments[1];
 
-        // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
-            throw new TypeError(); // TODO message
-        }
+		// If no callback function or if callback is not a callable function
+		if (toString(fun) != "[object Function]") {
+			throw new TypeError(); // TODO message
+		}
 
-        for (var i = 0; i < length; i++) {
-            if (i in self && fun.call(thisp, self[i], i, self))
-                return true;
-        }
-        return false;
-    };
+		for (var i = 0; i < length; i++) {
+			if (i in self && fun.call(thisp, self[i], i, self))
+				return true;
+		}
+		return false;
+	};
 }
 
 // ES5 15.4.4.21
 // https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/reduce
 if (!Array.prototype.reduce) {
-    Array.prototype.reduce = function (fun /*, initial*/) {
-        var self = toObject(this),
-            length = self.length >>> 0;
+	Array.prototype.reduce = function (fun /*, initial*/) {
+		var self = toObject(this),
+			length = self.length >>> 0;
 
-        // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
-            throw new TypeError(); // TODO message
-        }
+		// If no callback function or if callback is not a callable function
+		if (toString(fun) != "[object Function]") {
+			throw new TypeError(); // TODO message
+		}
 
-        // no value to return if no initial value and an empty array
-        if (!length && arguments.length == 1)
-            throw new TypeError(); // TODO message
+		// no value to return if no initial value and an empty array
+		if (!length && arguments.length == 1)
+			throw new TypeError(); // TODO message
 
-        var i = 0;
-        var result;
-        if (arguments.length >= 2) {
-            result = arguments[1];
-        } else {
-            do {
-                if (i in self) {
-                    result = self[i++];
-                    break;
-                }
+		var i = 0;
+		var result;
+		if (arguments.length >= 2) {
+			result = arguments[1];
+		} else {
+			do {
+				if (i in self) {
+					result = self[i++];
+					break;
+				}
 
-                // if array contains no values, no initial value to return
-                if (++i >= length)
-                    throw new TypeError(); // TODO message
-            } while (true);
-        }
+				// if array contains no values, no initial value to return
+				if (++i >= length)
+					throw new TypeError(); // TODO message
+			} while (true);
+		}
 
-        for (; i < length; i++) {
-            if (i in self)
-                result = fun.call(void 0, result, self[i], i, self);
-        }
+		for (; i < length; i++) {
+			if (i in self)
+				result = fun.call(void 0, result, self[i], i, self);
+		}
 
-        return result;
-    };
+		return result;
+	};
 }
 
 // ES5 15.4.4.22
 // https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/reduceRight
 if (!Array.prototype.reduceRight) {
-    Array.prototype.reduceRight = function (fun /*, initial*/) {
-        var self = toObject(this),
-            length = self.length >>> 0;
+	Array.prototype.reduceRight = function (fun /*, initial*/) {
+		var self = toObject(this),
+			length = self.length >>> 0;
 
-        // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
-            throw new TypeError(); // TODO message
-        }
+		// If no callback function or if callback is not a callable function
+		if (toString(fun) != "[object Function]") {
+			throw new TypeError(); // TODO message
+		}
 
-        // no value to return if no initial value, empty array
-        if (!length && arguments.length == 1)
-            throw new TypeError(); // TODO message
+		// no value to return if no initial value, empty array
+		if (!length && arguments.length == 1)
+			throw new TypeError(); // TODO message
 
-        var result, i = length - 1;
-        if (arguments.length >= 2) {
-            result = arguments[1];
-        } else {
-            do {
-                if (i in self) {
-                    result = self[i--];
-                    break;
-                }
+		var result, i = length - 1;
+		if (arguments.length >= 2) {
+			result = arguments[1];
+		} else {
+			do {
+				if (i in self) {
+					result = self[i--];
+					break;
+				}
 
-                // if array contains no values, no initial value to return
-                if (--i < 0)
-                    throw new TypeError(); // TODO message
-            } while (true);
-        }
+				// if array contains no values, no initial value to return
+				if (--i < 0)
+					throw new TypeError(); // TODO message
+			} while (true);
+		}
 
-        do {
-            if (i in this)
-                result = fun.call(void 0, result, self[i], i, self);
-        } while (i--);
+		do {
+			if (i in this)
+				result = fun.call(void 0, result, self[i], i, self);
+		} while (i--);
 
-        return result;
-    };
+		return result;
+	};
 }
 
 // ES5 15.4.4.14
 // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/indexOf
 if (!Array.prototype.indexOf) {
-    Array.prototype.indexOf = function (sought /*, fromIndex */ ) {
-        var self = toObject(this),
-            length = self.length >>> 0;
+	Array.prototype.indexOf = function (sought /*, fromIndex */ ) {
+		var self = toObject(this),
+			length = self.length >>> 0;
 
-        if (!length)
-            return -1;
+		if (!length)
+			return -1;
 
-        var i = 0;
-        if (arguments.length > 1)
-            i = toInteger(arguments[1]);
+		var i = 0;
+		if (arguments.length > 1)
+			i = toInteger(arguments[1]);
 
-        // handle negative indices
-        i = i >= 0 ? i : length - Math.abs(i);
-        for (; i < length; i++) {
-            if (i in self && self[i] === sought) {
-                return i;
-            }
-        }
-        return -1;
-    };
+		// handle negative indices
+		i = i >= 0 ? i : length - Math.abs(i);
+		for (; i < length; i++) {
+			if (i in self && self[i] === sought) {
+				return i;
+			}
+		}
+		return -1;
+	};
 }
 
 // ES5 15.4.4.15
 if (!Array.prototype.lastIndexOf) {
-    Array.prototype.lastIndexOf = function (sought /*, fromIndex */) {
-        var self = toObject(this),
-            length = self.length >>> 0;
+	Array.prototype.lastIndexOf = function (sought /*, fromIndex */) {
+		var self = toObject(this),
+			length = self.length >>> 0;
 
-        if (!length)
-            return -1;
-        var i = length - 1;
-        if (arguments.length > 1)
-            i = toInteger(arguments[1]);
-        // handle negative indices
-        i = i >= 0 ? i : length - Math.abs(i);
-        for (; i >= 0; i--) {
-            if (i in self && sought === self[i])
-                return i;
-        }
-        return -1;
-    };
+		if (!length)
+			return -1;
+		var i = length - 1;
+		if (arguments.length > 1)
+			i = toInteger(arguments[1]);
+		// handle negative indices
+		i = i >= 0 ? i : length - Math.abs(i);
+		for (; i >= 0; i--) {
+			if (i in self && sought === self[i])
+				return i;
+		}
+		return -1;
+	};
 }
 
 //
@@ -443,16 +443,16 @@ if (!Array.prototype.lastIndexOf) {
 // [bugfix, ielt9, old browsers]
 // IE < 9 bug: [1,2].splice(0).join("") == "" but should be "12"
 if([1,2].splice(0).length != 2) {
-    var _origArraySplice = Array.prototype.splice;
+	var _origArraySplice = Array.prototype.splice;
 
-    Array.prototype.splice = function(start, deleteCount) {
-        if(!arguments.length)return [];
+	Array.prototype.splice = function(start, deleteCount) {
+		if(!arguments.length)return [];
 
-        return _origArraySplice.apply(this, [
-                start === void 0 ? 0 : start,
-                deleteCount === void 0 ? (this.length - start) : deleteCount
-            ].concat(slice.call(arguments, 2)))
-    };
+		return _origArraySplice.apply(this, [
+				start === void 0 ? 0 : start,
+				deleteCount === void 0 ? (this.length - start) : deleteCount
+			].concat(slice.call(arguments, 2)))
+	};
 }
 
 //
@@ -465,44 +465,44 @@ if([1,2].splice(0).length != 2) {
 // http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
 if (!Object.keys) {
 
-    var hasDontEnumBug = true,
-        dontEnums = [
-            "toString",
-            "toLocaleString",
-            "valueOf",
-            "hasOwnProperty",
-            "isPrototypeOf",
-            "propertyIsEnumerable",
-            "constructor"
-        ],
-        dontEnumsLength = dontEnums.length;
+	var hasDontEnumBug = true,
+		dontEnums = [
+			"toString",
+			"toLocaleString",
+			"valueOf",
+			"hasOwnProperty",
+			"isPrototypeOf",
+			"propertyIsEnumerable",
+			"constructor"
+		],
+		dontEnumsLength = dontEnums.length;
 
-    for (var key in {"toString": null})
-        hasDontEnumBug = false;
+	for (var key in {"toString": null})
+		hasDontEnumBug = false;
 
-    Object.keys = function keys(object) {
+	Object.keys = function keys(object) {
 
-        if ((typeof object != "object" && typeof object != "function") || object === null)
-            throw new TypeError("Object.keys called on a non-object");
+		if ((typeof object != "object" && typeof object != "function") || object === null)
+			throw new TypeError("Object.keys called on a non-object");
 
-        var keys = [];
-        for (var name in object) {
-            if (owns(object, name)) {
-                keys.push(name);
-            }
-        }
+		var keys = [];
+		for (var name in object) {
+			if (owns(object, name)) {
+				keys.push(name);
+			}
+		}
 
-        if (hasDontEnumBug) {
-            for (var i = 0, ii = dontEnumsLength; i < ii; i++) {
-                var dontEnum = dontEnums[i];
-                if (owns(object, dontEnum)) {
-                    keys.push(dontEnum);
-                }
-            }
-        }
+		if (hasDontEnumBug) {
+			for (var i = 0, ii = dontEnumsLength; i < ii; i++) {
+				var dontEnum = dontEnums[i];
+				if (owns(object, dontEnum)) {
+					keys.push(dontEnum);
+				}
+			}
+		}
 
-        return keys;
-    };
+		return keys;
+	};
 
 }
 
@@ -515,65 +515,65 @@ if (!Object.keys) {
 // Format a Date object as a string according to a simplified subset of the ISO 8601
 // standard as defined in 15.9.1.15.
 if (!Date.prototype.toISOString) {
-    Date.prototype.toISOString = function toISOString() {
-        var result, length, value;
-        if (!isFinite(this))
-            throw new RangeError;
+	Date.prototype.toISOString = function toISOString() {
+		var result, length, value;
+		if (!isFinite(this))
+			throw new RangeError;
 
-        // the date time string format is specified in 15.9.1.15.
-        result = [this.getUTCFullYear(), this.getUTCMonth() + 1, this.getUTCDate(),
-            this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()];
+		// the date time string format is specified in 15.9.1.15.
+		result = [this.getUTCFullYear(), this.getUTCMonth() + 1, this.getUTCDate(),
+			this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()];
 
-        length = result.length;
-        while (length--) {
-            value = result[length];
-            // pad months, days, hours, minutes, and seconds to have two digits.
-            if (value < 10)
-                result[length] = "0" + value;
-        }
-        // pad milliseconds to have three digits.
-        return result.slice(0, 3).join("-") + "T" + result.slice(3).join(":") + "." +
-            ("000" + this.getUTCMilliseconds()).slice(-3) + "Z";
-    }
+		length = result.length;
+		while (length--) {
+			value = result[length];
+			// pad months, days, hours, minutes, and seconds to have two digits.
+			if (value < 10)
+				result[length] = "0" + value;
+		}
+		// pad milliseconds to have three digits.
+		return result.slice(0, 3).join("-") + "T" + result.slice(3).join(":") + "." +
+			("000" + this.getUTCMilliseconds()).slice(-3) + "Z";
+	}
 }
 
 // ES5 15.9.4.4
 if (!Date.now) {
-    Date.now = function now() {
-        return new Date().getTime();
-    };
+	Date.now = function now() {
+		return new Date().getTime();
+	};
 }
 
 // ES5 15.9.5.44
 if (!Date.prototype.toJSON) {
-    Date.prototype.toJSON = function toJSON(key) {
-        // This function provides a String representation of a Date object for
-        // use by JSON.stringify (15.12.3). When the toJSON method is called
-        // with argument key, the following steps are taken:
+	Date.prototype.toJSON = function toJSON(key) {
+		// This function provides a String representation of a Date object for
+		// use by JSON.stringify (15.12.3). When the toJSON method is called
+		// with argument key, the following steps are taken:
 
-        // 1.  Let O be the result of calling ToObject, giving it the this
-        // value as its argument.
-        // 2. Let tv be ToPrimitive(O, hint Number).
-        // 3. If tv is a Number and is not finite, return null.
-        // XXX
-        // 4. Let toISO be the result of calling the [[Get]] internal method of
-        // O with argument "toISOString".
-        // 5. If IsCallable(toISO) is false, throw a TypeError exception.
-        if (typeof this.toISOString != "function")
-            throw new TypeError(); // TODO message
-        // 6. Return the result of calling the [[Call]] internal method of
-        // toISO with O as the this value and an empty argument list.
-        return this.toISOString();
+		// 1.  Let O be the result of calling ToObject, giving it the this
+		// value as its argument.
+		// 2. Let tv be ToPrimitive(O, hint Number).
+		// 3. If tv is a Number and is not finite, return null.
+		// XXX
+		// 4. Let toISO be the result of calling the [[Get]] internal method of
+		// O with argument "toISOString".
+		// 5. If IsCallable(toISO) is false, throw a TypeError exception.
+		if (typeof this.toISOString != "function")
+			throw new TypeError(); // TODO message
+		// 6. Return the result of calling the [[Call]] internal method of
+		// toISO with O as the this value and an empty argument list.
+		return this.toISOString();
 
-        // NOTE 1 The argument is ignored.
+		// NOTE 1 The argument is ignored.
 
-        // NOTE 2 The toJSON function is intentionally generic; it does not
-        // require that its this value be a Date object. Therefore, it can be
-        // transferred to other kinds of objects for use as a method. However,
-        // it does require that any such object have a toISOString method. An
-        // object is free to use the argument key to filter its
-        // stringification.
-    };
+		// NOTE 2 The toJSON function is intentionally generic; it does not
+		// require that its this value be a Date object. Therefore, it can be
+		// transferred to other kinds of objects for use as a method. However,
+		// it does require that any such object have a toISOString method. An
+		// object is free to use the argument key to filter its
+		// stringification.
+	};
 }
 
 
@@ -584,17 +584,17 @@ if (!Date.prototype.toJSON) {
 
 // ES5 15.5.4.20
 var ws = "\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003" +
-    "\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028" +
-    "\u2029\uFEFF";
+	"\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028" +
+	"\u2029\uFEFF";
 if (!String.prototype.trim || ws.trim()) {
-    // http://blog.stevenlevithan.com/archives/faster-trim-javascript
-    // http://perfectionkills.com/whitespace-deviations/
-    ws = "[" + ws + "]";
-    var trimBeginRegexp = new RegExp("^" + ws + ws + "*"),
-        trimEndRegexp = new RegExp(ws + ws + "*$");
-    String.prototype.trim = function trim() {
-        return String(this).replace(trimBeginRegexp, "").replace(trimEndRegexp, "");
-    };
+	// http://blog.stevenlevithan.com/archives/faster-trim-javascript
+	// http://perfectionkills.com/whitespace-deviations/
+	ws = "[" + ws + "]";
+	var trimBeginRegexp = new RegExp("^" + ws + ws + "*"),
+		trimEndRegexp = new RegExp(ws + ws + "*$");
+	String.prototype.trim = function trim() {
+		return String(this).replace(trimBeginRegexp, "").replace(trimEndRegexp, "");
+	};
 }
 
 // ES5 15.5.4.14
@@ -603,11 +603,11 @@ if (!String.prototype.trim || ws.trim()) {
 // If separator is undefined, then the result array contains just one String, which is the this value (converted to a String). If limit is not undefined, then the output array is truncated so that it contains no more than limit elements.
 // "0".split(undefined, 0) -> []
 if("0".split(void 0, 0).length) {
-    var oldSplit = String.prototype.split;
-    String.prototype.split = function(separator, limit) {
-        if(separator === void 0 && limit === 0)return [];
-        return oldSplit.apply(this, arguments);
-    }
+	var oldSplit = String.prototype.split;
+	String.prototype.split = function(separator, limit) {
+		if(separator === void 0 && limit === 0)return [];
+		return oldSplit.apply(this, arguments);
+	}
 }
 
 // ECMA-262, 3rd B.2.3
@@ -615,16 +615,16 @@ if("0".split(void 0, 0).length) {
 // and it should be normalized across all browsers
 // [bugfix, IE lt 9] IE < 9 substr() with negative value not working in IE
 if("".substr && "0b".substr(-1) !== "b") {
-    var oldSubstr = String.prototype.substr;
-    /**
+	var oldSubstr = String.prototype.substr;
+	/**
 * Get the substring of a string
 * @param {integer} start where to start the substring
 * @param {integer} length how many characters to return
 * @return {string}
 */
-    String.prototype.substr = function(start, length) {
-        return oldSubstr.call(this, start < 0 ? (start = this.length + start) < 0 ? 0 : start : start, length);
-    }
+	String.prototype.substr = function(start, length) {
+		return oldSubstr.call(this, start < 0 ? (start = this.length + start) < 0 ? 0 : start : start, length);
+	}
 }
 
 //
@@ -634,27 +634,27 @@ if("".substr && "0b".substr(-1) !== "b") {
 
 // http://jsperf.com/to-integer
 var toInteger = function (n) {
-    n = +n;
-    if (n !== n) // isNaN
-        n = -1;
-    else if (n !== 0 && n !== (1/0) && n !== -(1/0))
-        n = (n > 0 || -1) * Math.floor(Math.abs(n));
-    return n;
+	n = +n;
+	if (n !== n) // isNaN
+		n = -1;
+	else if (n !== 0 && n !== (1/0) && n !== -(1/0))
+		n = (n > 0 || -1) * Math.floor(Math.abs(n));
+	return n;
 };
 
 var prepareString = "a"[0] != "a",
-    // ES5 9.9
-    toObject = function (o) {
-        if (o == null) { // this matches both null and undefined
-            throw new TypeError(); // TODO message
-        }
-        // If the implementation doesn't support by-index access of
-        // string characters (ex. IE < 7), split the string
-        if (prepareString && typeof o == "string" && o) {
-            return o.split("");
-        }
-        return Object(o);
-    };
+	// ES5 9.9
+	toObject = function (o) {
+		if (o == null) { // this matches both null and undefined
+			throw new TypeError(); // TODO message
+		}
+		// If the implementation doesn't support by-index access of
+		// string characters (ex. IE < 7), split the string
+		if (prepareString && typeof o == "string" && o) {
+			return o.split("");
+		}
+		return Object(o);
+	};
 
 })();
 
@@ -736,24 +736,24 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 		}
 		
 		if(proto.__defineGetter__){
-            if (typeof descriptor.get == "function") {
+			if (typeof descriptor.get == "function") {
 				proto.__defineGetter__(property, descriptor.get);
 			}
-            if (typeof descriptor.set == "function"){
-                proto.__defineSetter__(property, descriptor.set);
+			if (typeof descriptor.set == "function"){
+				proto.__defineSetter__(property, descriptor.set);
 			}
-        }
+		}
 		return proto;
 	};
 	
 	shims.getPrototypeOf = function (object) {
-        return Object.getPrototypeOf && Object.getPrototypeOf(object) || object.__proto__ || object.constructor && object.constructor.prototype;
-    };
+		return Object.getPrototypeOf && Object.getPrototypeOf(object) || object.__proto__ || object.constructor && object.constructor.prototype;
+	};
 	
 	//based on http://www.refactory.org/s/object_getownpropertydescriptor/view/latest 
 	shims.getOwnPropertyDescriptor = function(obj, prop){
 		if (typeof obj !== "object" && typeof obj !== "function" || obj === null){
-            throw new TypeError("Object.getOwnPropertyDescriptor called on a non-object");
+			throw new TypeError("Object.getOwnPropertyDescriptor called on a non-object");
 		}
 		var descriptor;
 		if(Object.defineProperty && Object.getOwnPropertyDescriptor){
@@ -762,39 +762,39 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 				return descriptor;
 			} catch(e){}
 		}
-        descriptor = {
-            configurable: true,
-            enumerable: true,
-            writable: true,
-            value: undefined
-        };
+		descriptor = {
+			configurable: true,
+			enumerable: true,
+			writable: true,
+			value: undefined
+		};
 		var getter = obj.__lookupGetter__ && obj.__lookupGetter__(prop), 
 			setter = obj.__lookupSetter__ && obj.__lookupSetter__(prop)
 		;
-        
-        if (!getter && !setter) { // not an accessor so return prop
-        	if(!owns(obj, prop)){
+		
+		if (!getter && !setter) { // not an accessor so return prop
+			if(!owns(obj, prop)){
 				return;
 			}
-            descriptor.value = obj[prop];
-            return descriptor;
-        }
-        
-        // there is an accessor, remove descriptor.writable; populate descriptor.get and descriptor.set
-        delete descriptor.writable;
-        delete descriptor.value;
-        descriptor.get = descriptor.set = undefined;
-        
-        if(getter){
+			descriptor.value = obj[prop];
+			return descriptor;
+		}
+		
+		// there is an accessor, remove descriptor.writable; populate descriptor.get and descriptor.set
+		delete descriptor.writable;
+		delete descriptor.value;
+		descriptor.get = descriptor.set = undefined;
+		
+		if(getter){
 			descriptor.get = getter;
 		}
-        
-        if(setter){
-            descriptor.set = setter;
+		
+		if(setter){
+			descriptor.set = setter;
 		}
-        
-        return descriptor;
-    };
+		
+		return descriptor;
+	};
 
 }
 })(jQuery, jQuery.webshims);
@@ -1724,20 +1724,20 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			this.thumb.on({
 				mousedown: add
 			});
-			if (window.webshims) {
-				webshims.ready('WINDOWLOAD', function(){
+			$(function(){
+				if(window.webshims){
 					webshims.ready('dom-support', function(){
-						if ($.fn.onWSOff) {
+						if($.fn.onWSOff){
 							that.element.onWSOff('updateshadowdom', function(){
 								that.updateMetrics();
 							});
 						}
 					});
-					if (!$.fn.onWSOff && webshims._polyfill) {
+					if(!$.fn.onWSOff && webshims._polyfill){
 						webshims._polyfill(['dom-support']);
 					}
-				});
-			}
+				}
+			});
 		},
 		posCenter: function(elem, outerWidth){
 			var temp;
@@ -2005,6 +2005,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				patterns: {d: "dd/mm/yy"}
 			});
 		}
+		if(!formcfg['en-AU']){
+			formcfg['en-AU'] = formcfg['en-GB'];
+		}
 		if(!formcfg['']){
 			formcfg[''] = formcfg['en-US'];
 		}
@@ -2100,8 +2103,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					} else if(p[1]){
 						val = curCfg.date.showMonthAfterYear ? p.join(' ') : p[1]+' '+p[0];
 					}
-				} else if(options && options.splitInput){
-					val = [p[0] || '', p[1] || ''];
 				}
 				return val;
 			},
@@ -2474,12 +2475,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 							timer = setTimeout(releaseTab, 300);
 						};
 						var select = function(){
-							var elem = this;
-							setTimeout(function(){
-								elem.focus();
-								elem.select();
-							}, 4);
-							
+							this.focus();
+							this.select();
 							stopTab();
 						};
 						

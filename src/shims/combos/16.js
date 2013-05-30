@@ -1129,50 +1129,48 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				});
 			};
 			return function(nativeElem, shadowElem, opts){
-				if(nativeElem && shadowElem){
-					opts = opts || {};
-					if(nativeElem.jquery){
-						nativeElem = nativeElem[0];
-					}
-					if(shadowElem.jquery){
-						shadowElem = shadowElem[0];
-					}
-					var nativeData = $.data(nativeElem, dataID) || $.data(nativeElem, dataID, {});
-					var shadowData = $.data(shadowElem, dataID) || $.data(shadowElem, dataID, {});
-					var shadowFocusElementData = {};
-					if(!opts.shadowFocusElement){
-						opts.shadowFocusElement = shadowElem;
-					} else if(opts.shadowFocusElement){
-						if(opts.shadowFocusElement.jquery){
-							opts.shadowFocusElement = opts.shadowFocusElement[0];
-						}
-						shadowFocusElementData = $.data(opts.shadowFocusElement, dataID) || $.data(opts.shadowFocusElement, dataID, shadowFocusElementData);
-					}
-					
-					$(nativeElem).on('remove', function(e){
-						if (!e.originalEvent) {
-							$(shadowElem).remove();
-						}
-					});
-					
-					nativeData.hasShadow = shadowElem;
-					shadowFocusElementData.nativeElement = shadowData.nativeElement = nativeElem;
-					shadowFocusElementData.shadowData = shadowData.shadowData = nativeData.shadowData = {
-						nativeElement: nativeElem,
-						shadowElement: shadowElem,
-						shadowFocusElement: opts.shadowFocusElement
-					};
-					if(opts.shadowChilds){
-						opts.shadowChilds.each(function(){
-							elementData(this, 'shadowData', shadowData.shadowData);
-						});
-					}
-					
-					if(opts.data){
-						shadowFocusElementData.shadowData.data = shadowData.shadowData.data = nativeData.shadowData.data = opts.data;
-					}
-					opts = null;
+				opts = opts || {};
+				if(nativeElem.jquery){
+					nativeElem = nativeElem[0];
 				}
+				if(shadowElem.jquery){
+					shadowElem = shadowElem[0];
+				}
+				var nativeData = $.data(nativeElem, dataID) || $.data(nativeElem, dataID, {});
+				var shadowData = $.data(shadowElem, dataID) || $.data(shadowElem, dataID, {});
+				var shadowFocusElementData = {};
+				if(!opts.shadowFocusElement){
+					opts.shadowFocusElement = shadowElem;
+				} else if(opts.shadowFocusElement){
+					if(opts.shadowFocusElement.jquery){
+						opts.shadowFocusElement = opts.shadowFocusElement[0];
+					}
+					shadowFocusElementData = $.data(opts.shadowFocusElement, dataID) || $.data(opts.shadowFocusElement, dataID, shadowFocusElementData);
+				}
+				
+				$(nativeElem).on('remove', function(e){
+					if (!e.originalEvent) {
+						$(shadowElem).remove();
+					}
+				});
+				
+				nativeData.hasShadow = shadowElem;
+				shadowFocusElementData.nativeElement = shadowData.nativeElement = nativeElem;
+				shadowFocusElementData.shadowData = shadowData.shadowData = nativeData.shadowData = {
+					nativeElement: nativeElem,
+					shadowElement: shadowElem,
+					shadowFocusElement: opts.shadowFocusElement
+				};
+				if(opts.shadowChilds){
+					opts.shadowChilds.each(function(){
+						elementData(this, 'shadowData', shadowData.shadowData);
+					});
+				}
+				
+				if(opts.data){
+					shadowFocusElementData.shadowData.data = shadowData.shadowData.data = nativeData.shadowData.data = opts.data;
+				}
+				opts = null;
 				webshims.docObserve();
 			};
 		})(),
@@ -1728,7 +1726,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		});
 	};
 	
-	var transClass = ('transitionDelay' in document.documentElement.style) ?  '' : ' no-transition';
+	
 	webshims.wsPopover = {
 		id: 0,
 		_create: function(){
@@ -1736,7 +1734,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 			this.id = webshims.wsPopover.id++;
 			this.eventns = '.wsoverlay' + this.id;
 			this.timers = {};
-			this.element = $('<div class="ws-popover'+transClass+'" tabindex="-1"><div class="ws-po-outerbox"><div class="ws-po-arrow"><div class="ws-po-arrowbox" /></div><div class="ws-po-box" /></div></div>');
+			this.element = $('<div class="ws-popover" tabindex="-1"><div class="ws-po-outerbox"><div class="ws-po-arrow"><div class="ws-po-arrowbox" /></div><div class="ws-po-box" /></div></div>');
 			this.contentElement = $('.ws-po-box', this.element);
 			this.lastElement = $([]);
 			this.bindElement();
@@ -3789,6 +3787,9 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 	}
 	if(!validityMessages['en-GB']){
 		validityMessages['en-GB'] = $.extend({}, validityMessages.en);
+	}
+	if(!validityMessages['en-AU']){
+		validityMessages['en-AU'] = $.extend({}, validityMessages.en);
 	}
 	validityMessages[''] = validityMessages[''] || validityMessages['en-US'];
 	
