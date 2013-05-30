@@ -2231,7 +2231,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			return function(type){
 				var input;
 				if(!types[type]){
-					input = $('<input type="'+type+'" />');
+					input = $('<input type="'+type+'" step="any" />');
 					types[type] = {
 						asNumber: function(val){
 							var type = (typeof val == 'object') ? 'valueAsDate' : 'value';
@@ -2460,6 +2460,22 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 							e.preventDefault();
 						}
 					},
+					input: (this.type == 'color' && this.isValid) ? 
+						$.noop :
+						(function(){
+							var timer;
+							var check = function(){
+								var val = that.parseValue();
+								if(that.isValid(val)){
+									that.setInput(val);
+								}
+								
+							};
+							return function(){
+								clearTimeout(timer);
+								timer = setTimeout(check, 200);
+							};
+						})(),
 					'input keydown keypress': (function(){
 						var timer;
 						var isStopped = false;
@@ -2742,6 +2758,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				this.elemHelper = $('<input type="'+ o.type+'" />');
 				this.asNumber = helper.asNumber;
 				this.asValue = helper.asValue;
+				this.isValid = helper.isValid;
+				
 				
 				wsWidgetProto._create.apply(this, arguments);
 				this._init = false;
