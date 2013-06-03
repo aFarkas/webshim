@@ -1436,6 +1436,9 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 	if(!validityMessages['en-GB']){
 		validityMessages['en-GB'] = $.extend({}, validityMessages.en);
 	}
+	if(!validityMessages['en-AU']){
+		validityMessages['en-AU'] = $.extend({}, validityMessages.en);
+	}
 	validityMessages[''] = validityMessages[''] || validityMessages['en-US'];
 	
 	validityMessages.de = $.extend(true, {
