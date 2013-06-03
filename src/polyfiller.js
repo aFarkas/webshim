@@ -513,7 +513,7 @@
 					};
 					
 					loadedSrcs.push(src);
-					if(window.define && window.define.amd){
+					if(window.require && window.define && window.define.amd){
 						require([src], complete);
 					} else if (window.sssl) {
 						sssl(src, complete);

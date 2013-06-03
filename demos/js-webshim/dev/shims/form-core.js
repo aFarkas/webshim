@@ -142,6 +142,57 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	};
 	
 	
+	webshims.getContentValidationMessage = function(elem, validity, key){
+		var message = $(elem).data('errormessage') || elem.getAttribute('x-moz-errormessage') || '';
+		if(key && message[key]){
+			message = message[key];
+		}
+		if(typeof message == 'object'){
+			validity = validity || $.prop(elem, 'validity') || {valid: 1};
+			if(!validity.valid){
+				$.each(validity, function(name, prop){
+					if(prop && name != 'valid' && message[name]){
+						message = message[name];
+						return false;
+					}
+				});
+			}
+		}
+		
+		if(typeof message == 'object'){
+			message = message.defaultMessage;
+		}
+		return message || '';
+	};
+	
+	$.fn.getErrorMessage = function(key){
+		var message = '';
+		var elem = this[0];
+		if(elem){
+			message = webshims.getContentValidationMessage(elem, false, key) || $.prop(elem, 'customValidationMessage') || $.prop(elem, 'validationMessage');
+		}
+		return message;
+	};
+	
+	
+	$(document).on('focusin.lazyloadvalidation', function(e){
+		if('form' in e.target && $(e.target).is(':invalid')){
+			lazyLoad();
+		}
+	});
+	webshims.ready('WINDOWLOAD', lazyLoad);
+	
+	if(options.replaceValidationUI){
+		webshims.ready('DOM forms', function(){
+			$(document).on('firstinvalid', function(e){
+				if(!e.isInvalidUIPrevented()){
+					e.preventDefault();
+					webshims.validityAlert.showFor( e.target ); 
+				}
+			});
+		});
+	}
+	
 	/* extension, but also used to fix native implementation workaround/bugfixes */
 	(function(){
 		var firstEvent,
@@ -181,63 +232,4 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 			jElm = null;
 		});
 	})();
-	
-	
-	webshims.getContentValidationMessage = function(elem, validity, key){
-		var message = $(elem).data('errormessage') || elem.getAttribute('x-moz-errormessage') || '';
-		if(key && message[key]){
-			message = message[key];
-		}
-		if(typeof message == 'object'){
-			validity = validity || $.prop(elem, 'validity') || {valid: 1};
-			if(!validity.valid){
-				$.each(validity, function(name, prop){
-					if(prop && name != 'valid' && message[name]){
-						message = message[name];
-						return false;
-					}
-				});
-			}
-		}
-		
-		if(typeof message == 'object'){
-			message = message.defaultMessage;
-		}
-		return message || '';
-	};
-	
-	$.fn.getErrorMessage = function(key){
-		var message = '';
-		var elem = this[0];
-		if(elem){
-			message = webshims.getContentValidationMessage(elem, false, key) || $.prop(elem, 'customValidationMessage') || $.prop(elem, 'validationMessage');
-		}
-		return message;
-	};
-	
-	
-	webshims.ready('forms', function(){
-		$(document).on('focusin.lazyloadvalidation', function(e){
-			if('form' in e.target && $(e.target).is(':invalid')){
-				lazyLoad();
-			}
-		});
-	});
-	webshims.ready('WINDOWLOAD', lazyLoad);
-	if(options.overrideMessages){
-		options.customMessages = true;
-		webshims.reTest('form-message');
-		webshims.error('overrideMessages is deprecated. use customMessages instead.');
-	}
-	if(options.replaceValidationUI){
-		webshims.ready('DOM forms', function(){
-			$(document).on('firstinvalid', function(e){
-				if(!e.isInvalidUIPrevented()){
-					e.preventDefault();
-					webshims.validityAlert.showFor( e.target ); 
-				}
-			});
-		});
-	}
 });
-

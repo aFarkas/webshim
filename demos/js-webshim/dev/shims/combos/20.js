@@ -3035,7 +3035,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 	replaceVar = function(val){
 		return (val.replace) ? val.replace(regs.A, '%26').replace(regs.a, '%26').replace(regs.e, '%3D').replace(regs.q, '%3F') : val;
 	};
-	
+
 	mediaelement.createSWF = function( elem, canPlaySrc, data ){
 		if(!hasFlash){
 			setTimeout(function(){
@@ -3043,7 +3043,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			}, 1);
 			return;
 		}
-		
+
 		if(loadedSwf < 1){
 			loadedSwf = 1;
 		} else {
@@ -3151,6 +3151,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 					}
 				}
 			}));
+			
 			setElementDimension(data, hasControls);
 		
 			box.insertBefore(elem);
@@ -3160,26 +3161,31 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			}
 			
 			webshims.addShadowDom(elem, box);
+			if(!webshims.data(elem, 'mediaelement')){
+				webshims.data(elem, 'mediaelement', data);
+			}
 			addMediaToStopEvents(elem);
+			
 			mediaelement.setActive(elem, 'third', data);
+			
 			$(elem)
 				.on({'updatemediaelementdimensions': setDimension})
 				.onWSOff('updateshadowdom', setDimension)
 				.on('remove', function(e){
-					if(!e.originalEvent){
-						if(mediaelement.jarisEvent[data.id] && mediaelement.jarisEvent[data.id].elem == elem){
-							delete mediaelement.jarisEvent[data.id];
-							clearTimeout(localConnectionTimer);
-							clearTimeout(data.flashBlock);
-						}
-						box.remove();
+					if(!e.originalEvent && mediaelement.jarisEvent[data.id] && mediaelement.jarisEvent[data.id].elem == elem){
+						delete mediaelement.jarisEvent[data.id];
+						clearTimeout(localConnectionTimer);
+						clearTimeout(data.flashBlock);
 					}
+					box.remove();
 				})
 			;
 		}
 		
+		
 		if(!mediaelement.jarisEvent[data.id] || mediaelement.jarisEvent[data.id].elem != elem){
 			mediaelement.jarisEvent[data.id] = function(jaris){
+				
 				if(jaris.type == 'ready'){
 					var onReady = function(){
 						if(data.api){
@@ -3239,7 +3245,6 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		clearTimeout(data.flashBlock);
 		
 		swfmini.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.115", false, vars, params, attrs, function(swfData){
-			
 			if(swfData.success){
 				var fBlocker = function(){
 					if((!swfData.ref.parentNode && box[0].parentNode) || swfData.ref.style.display == "none"){

@@ -597,10 +597,10 @@ $.webshims.setOptions('forms-ext', {
 			<form class="input-widget" data-type="range" id="range-cfg">
 				<datalist id="range-list">
 					<select>
-						<option value="0" />
+						<option value="0" label="labeled Option (0)" />
 						<option value="10" />
-						<option value="20" />
-						<option value="30" />
+						<option value="20" label="labeled Option (20)" />
+						<option value="30" label="labeled Option (30)" />
 						<option value="50" label="labeled Option (50)" />
 					</select>
 				</datalist>
@@ -781,6 +781,22 @@ $.webshims.setOptions('forms-ext', {
 				
 					<p class="required"><span>*</span> Required fields</p>
 					<fieldset>
+						<div class="form-element">
+							<label for="acolorr">
+								alpha color with range: 
+							</label>
+							<input name="color" type="color" id="acolorr" data-alphacontrol="alpha-range" />
+							<input type="range" id="alpha-range" max="1" value="1" step="0.01" />
+						</div>
+						
+						
+						<div class="form-element">
+							<label for="acolorn">
+								alpha color with number: 
+							</label>
+							<input name="color" type="color" id="acolorn" data-alphacontrol="alpha-number" />
+							<input type="number" id="alpha-number" value="255" max="255" />
+						</div>
 						
 						<div class="form-element">
 							<label for="range">
@@ -888,22 +904,6 @@ $.webshims.setOptions('forms-ext', {
 							</datalist>
 						</div>
 						
-						<div class="form-element">
-							<label for="acolorr">
-								alpha color with range: 
-							</label>
-							<input name="color" type="color" id="acolorr" data-alphacontrol="alpha-range" />
-							<input type="range" id="alpha-range" max="1" value="1" step="0.01" />
-						</div>
-						
-						
-						<div class="form-element">
-							<label for="acolorn">
-								alpha color with number: 
-							</label>
-							<input name="color" type="color" id="acolorn" data-alphacontrol="alpha-number" />
-							<input type="number" id="alpha-number" value="255" max="255" />
-						</div>
 						
 						<div class="form-element">
 							<label for="number">

@@ -2412,4 +2412,5 @@ webshims.register('color-picker', function($, webshims, window, document, undefi
 	if(options && options._types && $.inArray('color', options._types) == -1){
 		webshims.error('[type="color"] used without adding it to the types config.');
 	}
+	document.createElement('img').src = webshims.cfg.basePath +'jpicker/images/Maps.png';
 });
