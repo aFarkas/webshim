@@ -566,6 +566,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		}
 	};
 	
+	var nowDate = new Date().getTime() - (new Date().getTimezoneOffset() * 60 * 1000 );
 	var steps = {
 		number: {
 			step: 1
@@ -575,11 +576,11 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		},
 		month: {
 			step: 1,
-			start: new Date()
+			start: nowDate
 		},
 		date: {
 			step: 1,
-			start: new Date()
+			start: nowDate
 		}
 	};
 	var labelWidth = (function(){
