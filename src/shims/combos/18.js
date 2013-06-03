@@ -2001,7 +2001,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		}, formcfg.en || {});
 		
 		if(!formcfg['en-US']){
-			formcfg['en-US'] = formcfg['en'];
+			formcfg['en-US'] = $.extend(true, {}, formcfg['en']);
 		}
 		if(!formcfg['en-GB']){
 			formcfg['en-GB'] = $.extend(true, {}, formcfg.en, {
@@ -2010,7 +2010,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			});
 		}
 		if(!formcfg['en-AU']){
-			formcfg['en-AU'] = formcfg['en-GB'];
+			formcfg['en-AU'] = $.extend(true, {}, formcfg['en-GB']);
 		}
 		if(!formcfg['']){
 			formcfg[''] = formcfg['en-US'];

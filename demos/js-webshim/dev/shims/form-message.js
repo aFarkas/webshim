@@ -51,10 +51,13 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 		});
 	}
 	if(!validityMessages['en-US']){
-		validityMessages['en-US'] = $.extend({}, validityMessages.en);
+		validityMessages['en-US'] = $.extend(true, {}, validityMessages.en);
 	}
 	if(!validityMessages['en-GB']){
-		validityMessages['en-GB'] = $.extend({}, validityMessages.en);
+		validityMessages['en-GB'] = $.extend(true, {}, validityMessages.en);
+	}
+	if(!validityMessages['en-AU']){
+		validityMessages['en-AU'] = $.extend(true, {}, validityMessages.en);
 	}
 	validityMessages[''] = validityMessages[''] || validityMessages['en-US'];
 	
