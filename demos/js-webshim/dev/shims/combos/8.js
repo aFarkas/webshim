@@ -1709,12 +1709,13 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		$.expr[":"][name] = $.expr.filters[name+"-element"];
 	});
 	
-	
-	$.expr[":"].focus = function( elem ) {
+	var pseudoFocus = $.expr[":"].focus;
+	$.expr[":"].focus = function(){
 		try {
-			var doc = elem.ownerDocument;
-			return elem === doc.activeElement && (!doc.hasFocus || doc.hasFocus());
-		} catch(e){}
+			return pseudoFocus.apply(this, arguments);
+		} catch(e){
+			webshims.error(e);
+		}
 		return false;
 	};
 	

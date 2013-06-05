@@ -79,6 +79,17 @@ forum](http://forum.jquery.com/using-jquery-plugins).
 
 **Please tag your questions with 'webshims' or 'polyfill'.**
 
+upcomming Release 1.10.8
+----------
+
+- improved input event for input widgets (date, time, number)
+- added en-AU locale (thx to @tomascassidy)
+- Browserify compatibility (thx to @joeybaker)
+- improved mediaelement error- and flashblock handling
+- added mediaelement width/height content attribute support (deprecated, but used too much in the wild)
+- use polyfilled input widgets in old Android stock browser (there are simply too much small bugs)
+- tested jQuery 1.10.1 and 2.0.2 compatibility
+
 Release 1.10.7
 ----------
 
