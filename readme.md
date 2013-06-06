@@ -74,12 +74,11 @@ The Webshims Lib core is licensed under the [MIT-License](http://aFarkas.github.
 Questions?
 ----------
 
-If you have any questions, please feel free to ask them on the [Using jQuery Plugins
-forum](http://forum.jquery.com/using-jquery-plugins).
+If you have any questions, please feel free to ask them on [stackoverflow.com/questions/tagged/webshim](http://stackoverflow.com/questions/tagged/webshim).
 
-**Please tag your questions with 'webshims' or 'polyfill'.**
+**Please tag your questions with 'webshims' or 'webshim'.**
 
-upcomming Release 1.10.8
+Release 1.10.8
 ----------
 
 - improved input event for input widgets (date, time, number)
