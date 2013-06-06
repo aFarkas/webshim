@@ -461,57 +461,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		
 	});
 	
-	webshims.ready('dom-support', function(){
-		if(!supportsLoop){
-			webshims.defineNodeNamesBooleanProperty(['audio', 'video'], 'loop');
-		}
-		
-		['audio', 'video'].forEach(function(nodeName){
-			var supLoad = webshims.defineNodeNameProperty(nodeName, 'load',  {
-				prop: {
-					value: function(){
-						var data = webshims.data(this, 'mediaelement');
-						selectSource(this, data);
-						if(hasNative && (!data || data.isActive == 'html5') && supLoad.prop._supvalue){
-							supLoad.prop._supvalue.apply(this, arguments);
-						}
-					}
-				}
-			});
-			nativeCanPlayType[nodeName] = webshims.defineNodeNameProperty(nodeName, 'canPlayType',  {
-				prop: {
-					value: function(type){
-						var ret = '';
-						if(hasNative && nativeCanPlayType[nodeName].prop._supvalue){
-							ret = nativeCanPlayType[nodeName].prop._supvalue.call(this, type);
-							if(ret == 'no'){
-								ret = '';
-							}
-						}
-						if(!ret && hasSwf){
-							type = $.trim((type || '').split(';')[0]);
-							if(mediaelement.swfMimeTypes.indexOf(type) != -1){
-								ret = 'maybe';
-							}
-						}
-						return ret;
-					}
-				}
-			});
-		});
-		webshims.onNodeNamesPropertyModify(['audio', 'video'], ['src', 'poster'], {
-			set: function(){
-				var elem = this;
-				var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
-				clearTimeout(baseData.loadTimer);
-				baseData.loadTimer = setTimeout(function(){
-					selectSource(elem);
-					elem = null;
-				}, 9);
-			}
-		});
-	});
-		
+	var handleMedia = false;	
 	var initMediaElements = function(){
 		var testFixMedia = function(){
 			if(webshims.implement(this, 'mediaelement')){
@@ -564,11 +514,62 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			}
 			
 		};
-		var handleMedia = false;
+		
 		
 		
 		webshims.ready('dom-support', function(){
 			handleMedia = true;
+			
+			if(!supportsLoop){
+				webshims.defineNodeNamesBooleanProperty(['audio', 'video'], 'loop');
+			}
+			
+			['audio', 'video'].forEach(function(nodeName){
+				var supLoad = webshims.defineNodeNameProperty(nodeName, 'load',  {
+					prop: {
+						value: function(){
+							var data = webshims.data(this, 'mediaelement');
+							selectSource(this, data);
+							if(hasNative && (!data || data.isActive == 'html5') && supLoad.prop._supvalue){
+								supLoad.prop._supvalue.apply(this, arguments);
+							}
+						}
+					}
+				});
+				nativeCanPlayType[nodeName] = webshims.defineNodeNameProperty(nodeName, 'canPlayType',  {
+					prop: {
+						value: function(type){
+							var ret = '';
+							if(hasNative && nativeCanPlayType[nodeName].prop._supvalue){
+								ret = nativeCanPlayType[nodeName].prop._supvalue.call(this, type);
+								if(ret == 'no'){
+									ret = '';
+								}
+							}
+							if(!ret && hasSwf){
+								type = $.trim((type || '').split(';')[0]);
+								if(mediaelement.swfMimeTypes.indexOf(type) != -1){
+									ret = 'maybe';
+								}
+							}
+							return ret;
+						}
+					}
+				});
+			});
+			webshims.onNodeNamesPropertyModify(['audio', 'video'], ['src', 'poster'], {
+				set: function(){
+					var elem = this;
+					var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
+					clearTimeout(baseData.loadTimer);
+					baseData.loadTimer = setTimeout(function(){
+						selectSource(elem);
+						elem = null;
+					}, 9);
+				}
+			});
+			
+			
 			webshims.addReady(function(context, insertedElement){
 				var media = $('video, audio', context)
 					.add(insertedElement.filter('video, audio'))

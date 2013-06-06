@@ -687,8 +687,13 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			var isNativeHTML5 = ( event.originalEvent && event.originalEvent.type === event.type );
 			if( isNativeHTML5 == (data.activating == 'third') ){
 				event.stopImmediatePropagation();
-				if(stopEvents[event.type] && data.isActive != data.activating){
-					$(event.target).pause();
+				
+				if(stopEvents[event.type]){
+					if(data.isActive != data.activating){
+						$(event.target).pause();
+					} else if(isNativeHTML5){
+						($.prop(event.target, 'pause')._supvalue || $.noop).apply(event.target);
+					}
 				}
 			}
 		};
