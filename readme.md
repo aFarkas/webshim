@@ -76,12 +76,12 @@ Questions?
 
 If you have any questions, please feel free to ask them on [stackoverflow.com/questions/tagged/webshim](http://stackoverflow.com/questions/tagged/webshim).
 
-**Please tag your questions with 'webshims' or 'webshim'.**
+**Please tag your questions with 'webshim'.**
 
 Release 1.10.9
 ----------
 
-- fixed regression introduced in 1.10.8 with input[type="month"] ([see Issue #258](https://github.com/aFarkas/webshim/issues/258))
+- fixed regression introduced in 1.10.8 with input[type="month"] [see Issue #258](https://github.com/aFarkas/webshim/issues/258)
 
 Release 1.10.8
 ----------
