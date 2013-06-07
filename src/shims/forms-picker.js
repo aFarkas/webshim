@@ -10,7 +10,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		ret.date = ret[0]+'-'+ret[1]+'-'+ret[2];
 		return ret;
 	};
-	var today = getDateArray(new Date());
+	var today = getDateArray(new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60 * 1000 )));
 	
 	
 	var _setFocus = function(element, _noFocus){
