@@ -80,11 +80,11 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		},
 		month: {
 			step: 1,
-			start: nowDate
+			start: new Date(nowDate)
 		},
 		date: {
 			step: 1,
-			start: nowDate
+			start: new Date(nowDate)
 		}
 	};
 	var labelWidth = (function(){
