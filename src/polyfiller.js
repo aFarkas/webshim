@@ -35,7 +35,7 @@
 			useImportantStyles: true,
 			//addCacheBuster: false,
 			waitReady: true,
-			extendNative: true,
+			extendNative: 1,
 			loadStyles: true,
 			disableShivMethods: true,
 			wspopover: {appendTo: 'body', hideOnBlur: true},
