@@ -90,8 +90,8 @@ var setElementDimension = function(data){
 	var box = data.shadowElem;
 	
 	box.css({
-		width: elem.style.width || ((cAttr = $(elem).attr('width')) && cAttr+'px') || $(elem).width(),
-		height: elem.style.height || ((cAttr = $(elem).attr('width')) && cAttr+'px') || $(elem).height()
+		width: elem.style.width || $(elem).attr('width') || $(elem).width(),
+		height: elem.style.height || $(elem).attr('height') || $(elem).height()
 	});
 };
 
@@ -374,6 +374,24 @@ var addYtAPI = function(mediaElm, elemId, data, ytID){
 		
 	});
 };
+
+
+if('matchMedia' in window){
+	var allowMediaSorting = false;
+	try {
+		allowMediaSorting = window.matchMedia('only all').matches;
+	} catch(er){}
+	if(allowMediaSorting){
+		mediaelement.sortMedia = function(src1, src2){
+			src1 = !src1.media || matchMedia( src1.media ).matches;
+			src2 = !src2.media || matchMedia( src2.media ).matches;
+			return src1 == src2 ? 
+				0 :
+				src1 ? -1
+				: 1;
+		};
+	}
+}
 
 mediaelement.createSWF = function(mediaElem, src, data){
 	if(!data){

@@ -944,6 +944,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		
 		if(!_srces.length || !parent || parent.nodeType != 1 || stopParent.test(parent.nodeName || '')){return;}
 		data = data || webshims.data(elem, 'mediaelement');
+		if(mediaelement.sortMedia){
+			_srces.sort(mediaelement.sortMedia);
+		}
 		stepSources(elem, data, options.preferFlash || undefined, _srces);
 	};
 	mediaelement.selectSource = selectSource;

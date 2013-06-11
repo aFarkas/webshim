@@ -27,9 +27,9 @@ package jaris;
  */
 class Version 
 {
-	public static var NUMBER:String = "2.0.16";
+	public static var NUMBER:String = "2.0.18";
 	public static var STATUS:String = "beta";
-	public static var DATE:String = "27";
-	public static var MONTH:String = "08";
-	public static var YEAR:String = "2011";
+	public static var DATE:String = "11";
+	public static var MONTH:String = "06";
+	public static var YEAR:String = "2013";
 }

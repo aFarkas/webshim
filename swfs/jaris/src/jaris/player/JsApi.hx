@@ -164,8 +164,8 @@ class JsApi extends MovieClip {
 					mute:			event.mute,
 					volume:			event.volume,
 					position:		event.time,
-					height:			event.height,
-					width:			event.width,
+					height:			_player._naturalHeight,
+					width:			_player._naturalWidth,
 					type:			event.name,
 					loaded:			_player.getBytesLoaded(),
 					total:			_player.getBytesTotal()

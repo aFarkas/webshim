@@ -1528,20 +1528,82 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		};
 	})();
 	
+	
+	var transformDimension = (function(){
+		var dimCache = {};
+		var getRealDims = function(data){
+			var ret, poster, img;
+			if(dimCache[data.currentSrc]){
+				ret = dimCache[data.currentSrc];
+			} else if(data.videoHeight && data.videoWidth){
+				dimCache[data.currentSrc] = {
+					width: data.videoWidth,
+					height: data.videoHeight
+				};
+				ret = dimCache[data.currentSrc];
+			} else if((poster = $.attr(data._elem, 'poster'))){
+				ret = dimCache[poster];
+				if(!ret){
+					img = document.createElement('img');
+					img.onload = function(){
+						dimCache[poster] = {
+							width: this.width,
+							height: this.height
+						};
+						
+						if(dimCache[poster].height && dimCache[poster].width){
+							setElementDimension(data, $.prop(data._elem, 'controls'));
+						} else {
+							delete dimCache[poster];
+						}
+					};
+					img.src = poster;
+					if(img.complete){
+						img.onload();
+					}
+				}
+			}
+			return ret || {width: 300, height: data._elemNodeName == 'video' ? 150 : 50};
+		};
+		return function(data){
+			var realDims, ratio;
+			var ret = data.elemDimensions;
+			
+			if(ret.width == 'auto' || ret.height == 'auto'){
+				ret = $.extend({}, data.elemDimensions);
+				realDims = getRealDims(data);
+				ratio = realDims.width / realDims.height;
+				
+				if(ret.width == 'auto' && ret.height == 'auto'){
+					ret = realDims;
+				} else if(ret.width == 'auto'){
+					data.shadowElem.css({height: ret.height});
+					ret.width = data.shadowElem.height() * ratio;
+				} else {
+					data.shadowElem.css({width: ret.width});
+					ret.height = data.shadowElem.width() / ratio;
+				}
+			}
+			return ret;
+		};
+	})();
 	var setElementDimension = function(data, hasControls){
-		var cAttr;
+		var dims;
 		var elem = data._elem;
 		var box = data.shadowElem;
-		
 		$(elem)[hasControls ? 'addClass' : 'removeClass']('webshims-controls');
-		if(data._elemNodeName == 'audio' && !hasControls){
-			box.css({width: 0, height: 0});
-		} else {
-			
-			box.css({
-				width: elem.style.width || ((cAttr = $(elem).attr('width')) && cAttr+'px') || $(elem).width(),
-				height: elem.style.height|| ((cAttr = $(elem).attr('height')) && cAttr+'px') || $(elem).height()
-			});
+
+		if(data.isActive == 'third'){
+			if(data._elemNodeName == 'audio' && !hasControls){
+				box.css({width: 0, height: 0});
+			} else {
+				data.elemDimensions = {
+					width: elem.style.width || $(elem).attr('width') || $(elem).width(),
+					height: elem.style.height || $(elem).attr('height') || $(elem).height()
+				};
+				dims = transformDimension(data);
+				box.css(dims);
+			}
 		}
 	};
 	
@@ -1569,6 +1631,23 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 	replaceVar = function(val){
 		return (val.replace) ? val.replace(regs.A, '%26').replace(regs.a, '%26').replace(regs.e, '%3D').replace(regs.q, '%3F') : val;
 	};
+	
+	if('matchMedia' in window){
+		var allowMediaSorting = false;
+		try {
+			allowMediaSorting = window.matchMedia('only all').matches;
+		} catch(er){}
+		if(allowMediaSorting){
+			mediaelement.sortMedia = function(src1, src2){
+				src1 = !src1.media || matchMedia( src1.media ).matches;
+				src2 = !src2.media || matchMedia( src2.media ).matches;
+				return src1 == src2 ? 
+					0 :
+					src1 ? -1
+					: 1;
+			};
+		}
+	}
 
 	mediaelement.createSWF = function( elem, canPlaySrc, data ){
 		if(!hasFlash){
@@ -1620,7 +1699,9 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			$(elem).data('attrs')
 		);
 		var setDimension = function(){
-			setElementDimension(data, $.prop(elem, 'controls'));
+			if(data.isActive == 'third'){
+				setElementDimension(data, $.prop(elem, 'controls'));
+			}
 		};
 		
 		var box;
@@ -1686,7 +1767,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 				}
 			}));
 			
-			setElementDimension(data, hasControls);
+			
 		
 			box.insertBefore(elem);
 			
@@ -1702,17 +1783,21 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			
 			mediaelement.setActive(elem, 'third', data);
 			
+			setElementDimension(data, hasControls);
+			
 			$(elem)
-				.on({'updatemediaelementdimensions': setDimension})
-				.onWSOff('updateshadowdom', setDimension)
-				.on('remove', function(e){
-					if(!e.originalEvent && mediaelement.jarisEvent[data.id] && mediaelement.jarisEvent[data.id].elem == elem){
-						delete mediaelement.jarisEvent[data.id];
-						clearTimeout(localConnectionTimer);
-						clearTimeout(data.flashBlock);
+				.on({
+					'updatemediaelementdimensions loadedmetadata emptied': setDimension,
+					'remove': function(e){
+						if(!e.originalEvent && mediaelement.jarisEvent[data.id] && mediaelement.jarisEvent[data.id].elem == elem){
+							delete mediaelement.jarisEvent[data.id];
+							clearTimeout(localConnectionTimer);
+							clearTimeout(data.flashBlock);
+						}
+						box.remove();
 					}
-					box.remove();
 				})
+				.onWSOff('updateshadowdom', setDimension)
 			;
 		}
 		

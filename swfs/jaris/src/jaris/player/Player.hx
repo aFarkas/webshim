@@ -86,6 +86,8 @@ class Player extends EventDispatcher
 	private var _video:Video;
 	private var _videoWidth:Float;
 	private var _videoHeight:Float;
+	public var _naturalWidth:Float;
+	public var _naturalHeight:Float;
 	private var _videoMask:Sprite;
 	private var _videoQualityHigh:Bool;
 	private var _mediaDuration:Float;
@@ -152,6 +154,9 @@ class Player extends EventDispatcher
 		noAPITrigger = false;
 		_hasPoster = false;
 		_showLoader = true;
+		
+		_naturalWidth =  0;
+		_naturalHeight = 0;
 		//}
 		
 		//{Initialize sound object
@@ -432,6 +437,9 @@ class Player extends EventDispatcher
 			_isPlaying = _preLoading ? false:true;
 			
 			_firstLoad = false;
+			
+			
+			
 			if (data.width)
 			{
 				_videoWidth = data.width;
@@ -441,6 +449,17 @@ class Player extends EventDispatcher
 			{
 				_videoWidth = _video.width;
 				_videoHeight = _video.height;
+			}
+			
+			_naturalWidth =  _video.videoWidth;
+			_naturalHeight = _video.videoHeight;
+			
+			if (_naturalWidth == 0) {
+				_naturalWidth = _videoWidth;
+			}
+			
+			if (_naturalHeight == 0) {
+				_naturalHeight = _videoHeight;
 			}
 			
 			//Store seekpoints times
@@ -648,6 +667,14 @@ class Player extends EventDispatcher
 					
 					_videoWidth = _stage.stageWidth;
 					_videoHeight = _stage.stageHeight;
+					
+					if (_naturalWidth == 0) {
+						_naturalWidth = _videoWidth;
+					}
+					
+					if (_naturalHeight == 0) {
+						_naturalHeight = _videoHeight;
+					}
 				
 					_firstLoad = false;
 					

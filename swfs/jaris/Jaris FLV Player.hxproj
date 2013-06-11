@@ -12,6 +12,7 @@
     <movie minorVersion="0" />
     <movie platform="Flash Player" />
     <movie background="#000000" />
+    <movie preferredSDK="Haxe 2.10;2.10;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
