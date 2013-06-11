@@ -44,7 +44,7 @@ jQuery.webshims.formcfg.pl = {
 	"timeSigns": ":. ",
 	"dFormat": "-",
 	"patterns": {
-		"d": "mm/dd/yyyy"
+		"d": "yy-mm-dd"
 	},
 	"month": {
 		"currentText": "Bieżący miesiąc"
@@ -100,7 +100,7 @@ jQuery.webshims.formcfg.pl = {
 		"weekHeader": "Tdz",
 		"firstDay": 1,
 		"isRTL": false,
-		"showMonthAfterYear": false,
+		"showMonthAfterYear": true,
 		"yearSuffix": ""
 	}
 };
