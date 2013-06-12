@@ -75,6 +75,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		$.expr[":"][name] = $.expr.filters[name+"-element"];
 	});
 	
+	//bug was partially fixed in 1.10.0 for IE9, but not IE8 (move to es5 as soon as 1.10.2 is used) 
 	var pseudoFocus = $.expr[":"].focus;
 	$.expr[":"].focus = function(){
 		try {

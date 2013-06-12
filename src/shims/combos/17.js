@@ -1489,6 +1489,10 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				this.addBindings();
 				$(this.element).data('wsWidget'+o.type, this);
 				
+				if(o.buttonOnly){
+					this.inputElements.prop({readOnly: true});
+				}
+				
 				this._init = true;
 				
 				if(o.mirrorValidity){
@@ -1941,12 +1945,18 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		['readonly', 'disabled'].forEach(function(name){
 			var isDisabled = name == 'disabled';
 			wsWidgetProto[name] = function(val, boolVal){
-				if(this.options[name] != boolVal || !this._init){
-					this.options[name] = !!boolVal;
-					this.inputElements.prop(name, this.options[name]);
-					this.buttonWrapper[this.options[name] ? 'addClass' : 'removeClass']('ws-'+name);
+				var options = this.options;
+				if(options[name] != boolVal || !this._init){
+					options[name] = !!boolVal;
+					
+					if(!isDisabled && options.buttonOnly){
+						this.inputElements.attr({'aria-readonly': options[name]});
+					} else {
+						this.inputElements.prop(name, options[name]);
+					}
+					this.buttonWrapper[options[name] ? 'addClass' : 'removeClass']('ws-'+name);
 					if(isDisabled){
-						$('button', this.buttonWrapper).prop('disabled', this.options[name]);
+						$('button', this.buttonWrapper).prop('disabled', options[name]);
 					}
 				}
 			};
@@ -2324,8 +2334,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				};
 				data.inputElements.on({
 					focus: function(){
-						if(!popover.stopOpen && (data.options.openOnFocus || (mouseFocus && options.openOnMouseFocus))){
-							popover.openedByFocus = !options.noInput;
+						if(!popover.stopOpen && (options.buttonOnly || options.openOnFocus || (mouseFocus && options.openOnMouseFocus))){
+							popover.openedByFocus = options.buttonOnly ? false : !options.noInput;
+							
 							show();
 						} else {
 							popover.preventBlur();

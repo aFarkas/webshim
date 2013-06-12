@@ -815,7 +815,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
 	
-	if(webshims.cfg.extendNative == 1){
+	if(webshims.cfg.extendNative === 1){
 		webshims.warn("extendNative configuration will be set to false by default with next release. In case you rely on it set it to 'true' otherwise to 'false'. See http://bit.ly/16OOTQO");
 	}
 	
@@ -1996,6 +1996,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	hasSwf = swfmini.hasFlashPlayerVersion('9.0.115');
 	$('html').addClass(hasSwf ? 'swf' : 'no-swf');
 	var mediaelement = webshims.mediaelement;
+	
 	mediaelement.parseRtmp = function(data){
 		var src = data.src.split('://');
 		var paths = src[1].split('/');
@@ -2165,7 +2166,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			var src = getSrcObj(mediaElem, nodeName);
 			
 			if(!src.src){
-				
 				$('source', mediaElem).each(function(){
 					src = getSrcObj(this, nodeName);
 					if(src.src){srces.push(src);}
@@ -2180,18 +2180,10 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				srces = [srces]; 
 			}
 			srces.forEach(function(src){
-				var source = document.createElement('source');
 				if(typeof src == 'string'){
 					src = {src: src};
 				} 
-				source.setAttribute('src', src.src);
-				if(src.type){
-					source.setAttribute('type', src.type);
-				}
-				if(src.media){
-					source.setAttribute('media', src.media);
-				}
-				mediaElem.append(source);
+				mediaElem.append($(document.createElement('source')).attr(src));
 			});
 			
 		}

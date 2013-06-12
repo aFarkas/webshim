@@ -12,7 +12,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
 	
-	if(webshims.cfg.extendNative == 1){
+	if(webshims.cfg.extendNative === 1){
 		webshims.warn("extendNative configuration will be set to false by default with next release. In case you rely on it set it to 'true' otherwise to 'false'. See http://bit.ly/16OOTQO");
 	}
 	
@@ -1165,6 +1165,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		$.expr[":"][name] = $.expr.filters[name+"-element"];
 	});
 	
+	//bug was partially fixed in 1.10.0 for IE9, but not IE8 (move to es5 as soon as 1.10.2 is used) 
 	var pseudoFocus = $.expr[":"].focus;
 	$.expr[":"].focus = function(){
 		try {
