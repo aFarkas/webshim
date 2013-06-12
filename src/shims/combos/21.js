@@ -1331,6 +1331,8 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			limitedTo: ['', 'auto', 'metadata', 'none']
 		});
 		
+		webshims.reflectProperties('source', ['type', 'media']);
+		
 		
 		['autoplay', 'controls'].forEach(function(name){
 			webshims.defineNodeNamesBooleanProperty(['audio', 'video'], name);
@@ -1366,6 +1368,8 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			}
 					
 		}, 'prop');
+	} else if(!('media' in document.createElement('source'))){
+		webshims.reflectProperties('source', ['media']);
 	}
 	
 });
