@@ -1054,7 +1054,7 @@
 		addPolyfill(fNuAPI, {
 			f: 'forms-ext',
 			options: {
-				types: 'range date time number month'
+				types: 'month week date time range number'
 			},
 			test: function(){
 				var ret = true;

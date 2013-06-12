@@ -62,7 +62,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		if(!('type' in cache)){
 			cache.type = getType(input[0]);
 		}
-		
+		if(cache.type == 'week'){return false;}
 		var ret = (validityState || {}).stepMismatch || false, base;
 		if(typeModels[cache.type] && typeModels[cache.type].step){
 			if( !('step' in cache) ){
@@ -250,6 +250,26 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		});
 	});
 	
+	var getWeek = function(date){
+		var time;
+		var checkDate = new Date(date.getTime());
+
+		checkDate.setDate(checkDate.getDate() + 4 - (checkDate.getDay() || 7));
+
+		time = checkDate.getTime();
+		checkDate.setMonth(0);
+		checkDate.setDate(1);
+		return Math.floor(Math.round((time - checkDate) / 86400000) / 7) + 1;
+	};
+	
+	var setWeek = function(year, week){
+		var date = new Date(year, 0, 1);
+		
+		week = (week - 1) * 86400000 * 7;
+		date = new Date(date.getTime() + week);
+		date.setDate(date.getDate() + 1 - (date.getDay() || 7));
+		return date;
+	};
 	
 	var typeProtos = {
 		
@@ -324,6 +344,53 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			},
 			dateToString: function(date){
 				return (date && date.getFullYear) ? addleadingZero(date.getUTCFullYear(), 4) +'-'+ addleadingZero(date.getUTCMonth()+1, 2) +'-'+ addleadingZero(date.getUTCDate(), 2) : false;
+			}
+		},
+		week: {
+			mismatch: function(val){
+				if(!val || !val.split){return true;}
+				var valA = val.split('-W');
+				var ret = true;
+				if(valA.length == 2 && valA[0].length > 3 && valA.length == 2){
+					ret = this.dateToString(setWeek(valA[0], valA[1])) != val;
+				}
+				return ret;
+			},
+			step: 1,
+			stepScaleFactor: 604800000,
+			stepBase: -259200000,
+			asDate: function(str, _noMismatch){
+				var ret = null;
+				if(_noMismatch || !this.mismatch(str)){
+					ret = str.split('-W');
+					ret = setWeek(ret[0], ret[1]);
+				}
+				return ret;
+			},
+			asNumber: function(str, _noMismatch){
+				var ret = nan;
+				var date = this.asDate(str, _noMismatch);
+				if(date && date.getUTCFullYear){
+					ret = date.getTime();
+				}
+				return ret;
+			},
+			dateToString: function(date){
+				var week, checkDate;
+				var ret = false;
+				if(date && date.getFullYear){
+					week = getWeek(date);
+					if(week == 1){
+						checkDate = new Date(date.getTime());
+						checkDate.setDate(checkDate.getDate() + 7);
+						date.setUTCFullYear(checkDate.getUTCFullYear());
+					}
+					ret = addleadingZero(date.getUTCFullYear(), 4) +'-W'+addleadingZero(week, 2);
+				}
+				return ret;
+			},
+			numberToString: function(num){
+				return (isNumber(num)) ? this.dateToString(new Date( num * 1)) : false;
 			}
 		},
 		time: {
@@ -484,10 +551,8 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 //		typeProtos['datetime-local'] = $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']);
 	}
 	
-	
-	
 	//'datetime-local'
-	['number', 'month', 'range', 'date', 'time', 'color'].forEach(function(type){
+	['number', 'month', 'range', 'date', 'time', 'color', 'week'].forEach(function(type){
 		if(typeBugs || !supportsType(type)){
 			webshims.addInputType(type, typeProtos[type]);
 		}
