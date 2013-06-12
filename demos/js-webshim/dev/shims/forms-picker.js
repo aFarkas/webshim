@@ -280,10 +280,19 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		};
 	});
 	
+	//taken from jquery ui
 	picker.getWeek = function(date){
-		var onejan = new Date(date.getFullYear(),0,1);
-		return Math.ceil((((date - onejan) / 86400000) + onejan.getDay()+1)/7);
+		var time;
+		var checkDate = new Date(date.getTime());
+
+		checkDate.setDate(checkDate.getDate() + 4 - (checkDate.getDay() || 7));
+
+		time = checkDate.getTime();
+		checkDate.setMonth(0);
+		checkDate.setDate(1);
+		return Math.floor(Math.round((time - checkDate) / 86400000) / 7) + 1;
 	};
+	
 	picker.getYearList = function(value, data){
 		var j, i, val, disabled, lis, prevDisabled, nextDisabled, classStr, classArray, start;
 		
@@ -532,6 +541,9 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					str.push('</tr><tr class="ws-row-'+ rowNum +'">');
 					if(data.options.showWeek) {
 						week++;
+						if(week > 52){
+							week =  picker.getWeek(date);
+						}
 						str.push('<td class="week-cell">'+ week +'</td>');
 					}
 				}
