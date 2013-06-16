@@ -58,6 +58,7 @@
 				$('#noNativeMethods').prop('checked', !$.webshims.cfg.extendNative);
 				$('#useCustomUI').prop('checked', $.webshims.cfg['forms-ext'].replaceUI);
 				$('#legacyjquery').prop('checked', (hash.indexOf('legacyjquery') != -1));
+				$('#noConflictExtreme').prop('checked', (hash.indexOf('noConflictExtreme') != -1));
 				$('input.webshim-config')
 					.bind('click', function(){
 						var addHash = '';
@@ -137,10 +138,15 @@
 	<script>
 		jQuery.noConflict();
 		(function($){
-//			$.webshims.debug = "noCombo";
+			var hash = location.hash.replace('#', '');
+			$.webshims.debug = "noCombo";
 			$(window).load(function(){
 				$.webshims.polyfill();
 			});
+			if(hash.indexOf('noConflictExtreme') != -1){
+				webshims.cfg.no$Switch = true;
+				jQuery.noConflict(true);
+			}
 		})(jQuery);
 	</script>
 	<style type="text/css">
@@ -167,6 +173,7 @@
 	<input type="checkbox" id="noNativeMethods" value="noNativeMethods" class="webshim-config" /> <label for="noNativeMethods">noNativeMethods</label>
 	<input type="checkbox" id="useCustomUI" value="useCustomUI" class="webshim-config" /> <label for="useCustomUI">use custom input widgets</label>
 	<input type="checkbox" id="legacyjquery" value="legacyjquery" class="webshim-config" /> <label for="legacyjquery">use legacy jquery</label>
+	<input type="checkbox" id="noConflictExtreme" value="noConflictExtreme" class="webshim-config" /> <label for="noConflictExtreme">jQuery.noConflict(true)</label>
 	
 </div>
 <small>Note: These tests are made to test webshims lib implementation. If there are some failing tests in native implementations, fill a browser bug. We currently only fix heavy/easy to fix errors in native implementations.</small>

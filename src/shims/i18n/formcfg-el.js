@@ -1,4 +1,4 @@
-jQuery.webshims.validityMessages.el = {
+webshims.validityMessages.el = {
     "typeMismatch": {
         "email": "Παρακαλώ εισάγετε μια διεύθυνση email.",
         "url": "Παρακαλώ εισάγετε ένα URL.",
@@ -30,7 +30,7 @@ jQuery.webshims.validityMessages.el = {
     },
     "stepMismatch": "Μη έγκυρη τιμή."
 };
-jQuery.webshims.formcfg.el = {
+webshims.formcfg.el = {
 	numberFormat: {
 		".": ".",
 		",": ","

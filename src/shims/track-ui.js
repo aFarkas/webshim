@@ -30,7 +30,7 @@
 			detectTrackError();
 		}
 	}
-})(jQuery)
+})(webshims.$)
 webshims.register('track-ui', function($, webshims, window, document, undefined){
 	"use strict";
 	var options = webshims.cfg.track;

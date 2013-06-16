@@ -1,4 +1,4 @@
-jQuery.webshims.validityMessages.hu = {
+webshims.validityMessages.hu = {
     "typeMismatch": {
         "email": "Írjon be egy e-mail címet.",
         "url": "Írjon be egy URL-t.",
@@ -30,7 +30,7 @@ jQuery.webshims.validityMessages.hu = {
     },
     "stepMismatch": "Érvénytelen érték."
 };
-jQuery.webshims.formcfg.hu = {
+webshims.formcfg.hu = {
 	numberFormat: {
 		".": ".",
 		",": ","

@@ -1,4 +1,4 @@
-jQuery.webshims.validityMessages.sv = {
+webshims.validityMessages.sv = {
     "typeMismatch": {
         "email": "Fyll i en e-postadress.",
         "url": "Fyll i en URL.",
@@ -30,7 +30,7 @@ jQuery.webshims.validityMessages.sv = {
     },
     "stepMismatch": "Felaktig inmatning."
 };
-jQuery.webshims.formcfg.sv = {
+webshims.formcfg.sv = {
 	numberFormat: {
 		".": ".",
 		",": ","

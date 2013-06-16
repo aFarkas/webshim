@@ -1,5 +1,5 @@
 //errormessages for de are already included in webshims core, this is only for information:
-jQuery.webshims.validityMessages.de = {
+webshims.validityMessages.de = {
 	"typeMismatch": {
 		"defaultMessage": "{%value} ist in diesem Feld nicht zulässig.",
 		"email": "{%value} ist keine zulässige E-Mail-Adresse",
@@ -35,7 +35,7 @@ jQuery.webshims.validityMessages.de = {
 		"radio": "Bitte wählen Sie eine Option aus"
 	}
 };
-jQuery.webshims.formcfg.de = {
+webshims.formcfg.de = {
 	numberFormat: {
 		",": ".",
 		".": ","

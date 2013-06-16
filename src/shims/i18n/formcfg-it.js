@@ -1,4 +1,4 @@
-jQuery.webshims.validityMessages.it = {
+webshims.validityMessages.it = {
     "typeMismatch": {
         "email": "Inserire un indirizzo e-mail",
         "url": "Inserire un URL",
@@ -30,7 +30,7 @@ jQuery.webshims.validityMessages.it = {
     },
     "stepMismatch": "Valore non valido."
 };
-jQuery.webshims.formcfg.it = {
+webshims.formcfg.it = {
 	numberFormat: {
 		".": ".",
 		",": ","

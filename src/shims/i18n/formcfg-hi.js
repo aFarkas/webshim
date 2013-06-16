@@ -1,4 +1,4 @@
-jQuery.webshims.validityMessages.hi = {
+webshims.validityMessages.hi = {
     "typeMismatch": {
         "email": "कृपया ई-मेल पता दर्ज करें.",
         "url": "कृपया URL लिखें.",
@@ -30,7 +30,7 @@ jQuery.webshims.validityMessages.hi = {
     },
     "stepMismatch": "अमान्य मान."
 };
-jQuery.webshims.formcfg.hi = {
+webshims.formcfg.hi = {
 	numberFormat: {
 		".": ".",
 		",": ","

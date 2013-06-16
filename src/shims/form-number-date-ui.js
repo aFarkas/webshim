@@ -1361,6 +1361,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		
 		picker.month = picker._common;
 		picker.date = picker._common;
+//		picker.week = picker._common;
 		picker.color = function(data){
 			var ret = picker._common.apply(this, arguments);
 			var alpha = $(data.orig).data('alphacontrol');

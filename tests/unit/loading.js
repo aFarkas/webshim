@@ -37,7 +37,7 @@
 		stop();
 		addTest = function(){
 			equals(results[0], '../../src/shims/');
-			strictEqual(results[1], true);
+			equals(results[1], true);
 		};
 		
 		setTimeout(function(){
@@ -66,7 +66,7 @@
 		stop();
 		addTest = function(){
 			equals(results[0], '../../src/shims/');
-			strictEqual(results[1], true);
+			equals(results[1], true);
 		};
 		
 		setTimeout(function(){

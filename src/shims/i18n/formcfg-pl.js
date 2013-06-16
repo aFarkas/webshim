@@ -1,4 +1,4 @@
-jQuery.webshims.validityMessages.pl = {
+webshims.validityMessages.pl = {
   "typeMismatch": {
 		"defaultMessage": "Wprowadź poprawną wartość.",
 		"email": "Wprowadź adres e-mail.",
@@ -34,7 +34,7 @@ jQuery.webshims.validityMessages.pl = {
 		"radio": "Zaznacz opcję."
 	}
 };
-jQuery.webshims.formcfg.pl = {
+webshims.formcfg.pl = {
 	"numberFormat": {
 		".": ".",
 		",": ","

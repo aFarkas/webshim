@@ -1,4 +1,4 @@
-jQuery.webshims.validityMessages['zh-CN'] = {
+webshims.validityMessages['zh-CN'] = {
     "typeMismatch": {
         "email": "请输入电子邮件地址。",
         "url": "请输入一个 URL。",
@@ -30,7 +30,7 @@ jQuery.webshims.validityMessages['zh-CN'] = {
     },
     "stepMismatch": "值无效。"
 };
-jQuery.webshims.formcfg['zh-CN'] = {
+webshims.formcfg['zh-CN'] = {
 	numberFormat: {
 		".": ".",
 		",": ","
