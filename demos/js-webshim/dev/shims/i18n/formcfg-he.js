@@ -1,4 +1,4 @@
-jQuery.webshims.validityMessages.he = {
+webshims.validityMessages.he = {
     "typeMismatch": {
         "email": "נא להזין כתובת דוא״ל.",
         "url": "נא להזין כתובת.",
@@ -30,7 +30,7 @@ jQuery.webshims.validityMessages.he = {
     },
     "stepMismatch": "ערך לא חוקי."
 };
-jQuery.webshims.formcfg.he = {
+webshims.formcfg.he = {
 	numberFormat: {
 		".": ".",
 		",": ","

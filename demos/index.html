@@ -260,15 +260,16 @@ $.webshims.ready('DOM canvas', function(){
 					<p><code>setOptions</code> should always be called before the <code>polyfill</code> method.</p>
 					<p>The available general options are the following:</p>
 					<ul>
-						<li><strong>extendNative</strong> (default: true): Webshims lib will automatically extend DOM-Objects with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNative is set to false, webshims lib won't touch any DOM-Objects and will only implement jQuery plugins. Setting this option to false, might be also good for DOM performance.</li>
+						<li><strong>extendNative</strong> (default: true) (will be set to false with next version): Webshims lib will automatically extend DOM-Objects with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNative is set to false, webshims lib won't touch any DOM-Objects and will only implement jQuery plugins. Setting this option to false, might be also good for DOM performance (<a href="index.html#polyfill-abstractions">see also</a>).</li>
 						<li><strong>basePath</strong> (default: "automatially computed path to the shims folder"): If polyfiller.js was renamed <strong>and</strong> is loaded dynamically, the basePath should be changed manually.</li>
 						<li><strong>waitReady</strong> (default: true): If this option is true, jQuery's ready-event will be delayed until all needed features are ready to use. This option should be set to false, if webshims lib polyfiller.js is loaded async (see also Loading webshims async in the <a href="#polyfill-foucs">loading documentation</a>) or from bottom of the body element. This option can also be set to false, if a website is using only HTML5 markup APIs (pure HTML or $.attr) and do not use any DOM-/JS-APIs on DOM-ready. If this feature is set to false, which might be good against FOUCs, scripted access to polyfilled APIs have to be added inside of a <a href="#polyfill-ready"><code>$.webshims.ready</code></a> callback.</li>
-						<li><strong>disableShivMethods</strong> (default: true): Automatically disables the <a href="https://github.com/aFarkas/html5shiv">shivMethods</a> option of html5shiv, if jQuery 1.7.x is used, which provides a suitable innerShiv method.</li>
+						<li><strong>useImportantStyles</strong> (default: false): If this option is true, Webshims basic stylesheet won't use any !important styles.</li>
+						<li><strong>disableShivMethods</strong> (default: true): Automatically disables the <a href="https://github.com/aFarkas/html5shiv">shivMethods</a> option of html5shiv.</li>
 					</ul>
 <code class="block">
 $.webshims.setOptions("extendNative", false);
 </code>	
-		<p><code>setOptions</code> can also take a single options parameter:</p>			
+		<p><code>setOptions</code> can also take a single options parameter:</p>
 <code class="block">
 $.webshims.setOptions({
 	extendNative: false
@@ -323,22 +324,25 @@ $('video').prop('currentTime', 200);
 </code>
 						</li>
 						<li>
-							<p><strong>calling a DOM method</strong>: While DOM properties have to be accessed through jQuery's <code>$.prop/$.attr</code> methods, DOM methods are added to DOM elements themselves, so you can call them directly:</p>
+							<p><strong>calling a DOM method</strong>: While DOM properties have to be accessed through jQuery's <code>$.prop/$.attr</code> methods, DOM methods have to be accesed using $.prop and executed in the context of the DOMK element.</p>
 <code class="block">
 // "this" refers to a DOM element, not a jQuery object
-this.checkValidity();
+var fn = $.prop(this, 'checkValidity');
+fn.apply(this);
 </code>
-							<p>Webshims lib also generates a jQuery plugin which wraps the feature, so you can use jQuery too:</p>
+							<p>To make this more easier Webshims lib also generates a jQuery plugin which wraps the featured method, so you can use jQuery too:</p>
 <code class="block">
 $(this).checkValidity();
+
+$(this).callProp('checkValidity'); // $(this).callProp('play');
 </code>
 							<p>If you pass a list of nodes and the method doesn't return anything, the method will be called on each element in this list, otherwise it will be called on the first element.</p>
-							<p>A lot of developers deprecate extending the DOM directly, in those cases the general option <code>extendNative</code> can be set to <code>false</code>.</p>
+							<p>In case a developer wants to make method calling "feel more native", ithe general option <code>extendNative</code> can be set to <code>true</code>.</p>
 <code class="block">
-$.webshims.setOptions("extendNative", false);
+$.webshims.setOptions("extendNative", true);
 $.webshims.polyfill('forms');
 //...
-//this.checkValidity() does not work cross-browser anymore use: $(this).checkValidity(); or $(this).callProp('checkValidity');
+this.checkValidity() //does now work cross-browser. $(this).checkValidity(); or $(this).callProp('checkValidity'); can still be used
 </code>	
 
 						</li>

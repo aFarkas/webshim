@@ -8,7 +8,7 @@ var swfmini = function() {
 	
 	var UNDEF = "undefined",
 		OBJECT = "object",
-		webshims = jQuery.webshims || window.webshims,
+		webshims = window.webshims,
 		SHOCKWAVE_FLASH = "Shockwave Flash",
 		SHOCKWAVE_FLASH_AX = "ShockwaveFlash.ShockwaveFlash",
 		FLASH_MIME_TYPE = "application/x-shockwave-flash",
@@ -1320,7 +1320,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	if (!webshims.cfg.no$Switch) {
 		var switch$ = function(){
 			if (window.jQuery && (!window.$ || window.jQuery == window.$) && !window.jQuery.webshims) {
-				webshims.error("jQuery was included more than once. Make sure to include it only once or try the $.noConflict(extreme) feature! Webshims and other Plugins might not work properly..");
+				webshims.error("jQuery was included more than once. Make sure to include it only once or try the $.noConflict(extreme) feature! Webshims and other Plugins might not work properly. Or set webshims.cfg.no$Switch to 'true'.");
 				if (window.$) {
 					window.$ = webshims.$;
 				}
@@ -2387,10 +2387,11 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 	});
 	
-})(jQuery, document);
+})(webshims.$, document);
 
-(function($, Modernizr, webshims){
+(function(Modernizr, webshims){
 	"use strict";
+	var $ = webshims.$;
 	var hasNative = Modernizr.audio && Modernizr.video;
 	var supportsLoop = false;
 	var bugs = webshims.bugs;
@@ -3006,7 +3007,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	}
 	webshims.ready('track', loadTrackUi);
 });
-})(jQuery, Modernizr, webshims);
+})(Modernizr, webshims);
 webshims.register('mediaelement-jaris', function($, webshims, window, document, undefined, options){
 	"use strict";
 	

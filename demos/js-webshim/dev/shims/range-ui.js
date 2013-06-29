@@ -493,4 +493,4 @@
 			 webshims._polyfill(['es5']);
 		}
 	}
-})(jQuery);
+})(window.webshims ? webshims.$ : jQuery);

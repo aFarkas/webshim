@@ -1,4 +1,4 @@
-jQuery.webshims.validityMessages.fr = {
+webshims.validityMessages.fr = {
     "typeMismatch": {
         "defaultMessage": "Veuillez saisir une valeur valide.",
         "email": "Veuillez saisir une adresse courriel valide.",
@@ -33,7 +33,7 @@ jQuery.webshims.validityMessages.fr = {
     },
     "stepMismatch": "Valeur incorrecte"
 };
-jQuery.webshims.formcfg.fr = {
+webshims.formcfg.fr = {
 	numberFormat: {
 		".": ".",
 		",": ","

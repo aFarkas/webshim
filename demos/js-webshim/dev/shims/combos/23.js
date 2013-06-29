@@ -8,7 +8,7 @@ var swfmini = function() {
 	
 	var UNDEF = "undefined",
 		OBJECT = "object",
-		webshims = jQuery.webshims || window.webshims,
+		webshims = window.webshims,
 		SHOCKWAVE_FLASH = "Shockwave Flash",
 		SHOCKWAVE_FLASH_AX = "ShockwaveFlash.ShockwaveFlash",
 		FLASH_MIME_TYPE = "application/x-shockwave-flash",
@@ -496,8 +496,9 @@ var swfmini = function() {
 	};
 }();
 
-(function($, Modernizr, webshims){
+(function(Modernizr, webshims){
 	"use strict";
+	var $ = webshims.$;
 	var hasNative = Modernizr.audio && Modernizr.video;
 	var supportsLoop = false;
 	var bugs = webshims.bugs;
@@ -1113,4 +1114,4 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	}
 	webshims.ready('track', loadTrackUi);
 });
-})(jQuery, Modernizr, webshims);
+})(Modernizr, webshims);

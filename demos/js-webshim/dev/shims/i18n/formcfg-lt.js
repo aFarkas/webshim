@@ -1,6 +1,6 @@
 //errormessages for en are already included in webshims core, this is only for information (by default en is equal to jQuery.webshims.validityMessages[""]):
 
-jQuery.webshims.validityMessages.lt = {
+webshims.validityMessages.lt = {
     "typeMismatch": {
         "defaultMessage": "Prašom įvesti teisingą reikšmę.",
         "email": "Prašom įvesti el. pašto adresą.",
@@ -36,10 +36,8 @@ jQuery.webshims.validityMessages.lt = {
         "radio": "Prašom pasirinkti vieną iš reikšmių."
     }
 };
-//for IE
-jQuery.webshims.validityMessages['lt-LT'] = jQuery.webshims.validityMessages.lt;
 
-jQuery.webshims.formcfg.lt = {
+webshims.formcfg.lt = {
   numberFormat: {
 		".": ".",
 		",": ","
@@ -72,3 +70,8 @@ jQuery.webshims.formcfg.lt = {
 		"yearSuffix": ""
 	}
 };
+
+
+//for IE
+webshims.validityMessages['lt-LT'] = webshims.validityMessages.lt;
+webshims.formcfg['lt-LT'] = webshims.formcfg.lt;

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	
+	<style>
+		.wrapper {
+			margin: auto;
+			min-width: 320px;
+			max-width: 980px;
+			width: 80%;
+		}
+		video {
+			display: inline-block;
+		}
+		.mediaplayer {
+			width: 100%;
+		}
+		
+		
+		.mediaplayer.ratio-16-9 {
+			position: relative;
+			height: 0;
+			width: 100%;
+			padding-bottom: 56.25%;
+		}
+		
+		
+		.mediaplayer.ratio-16-9 video,
+		.mediaplayer.ratio-16-9 .polyfill-video {
+			position: absolute !important;
+			top: 0;
+			left: 0;
+			width: 100% !important;
+			height: 100% !important;
+		}
+	</style>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
+	<script src="../../js-webshim/minified/polyfiller.js"></script>
+	
+	<script>
+		webshims.polyfill('mediaelement');
+	</script>
+	
+	<title>Responsive Video embedding with webshims and JME</title>
+	<script>
+		$(function(){
+			if(swfmini.hasFlashPlayerVersion('9.0.115')){
+				$('button.load-swf')
+					.prop('disabled', false)
+					.one('click', function(){
+						webshims.setOptions('mediaelement', {
+							preferFlash: true
+						});
+						$('video').mediaLoad();
+						$(this).prop('disabled', true);
+					})
+				;
+			} else {
+				$('button.load-swf').remove();
+			}
+			$('button.load-jme').prop('disabled', false).one('click', function(){
+				webshims.loader.loadCSS('http://afarkas.github.io/jMediaelement/demo/default-style/css/player-styles.css');
+				webshims.loader.loadList(['range-ui']);
+				webshims.loader.loadScript('http://afarkas.github.io/jMediaelement/demo/js/jme.full.js', function(){
+					$.jme.startJME();					
+					$('div.mediaplayer').jmeProp({"controlbar": true});
+				});
+				$(this).prop('disabled', true);
+			});
+		});
+	</script>
+</head>
+
+<body>
+<div class="wrapper">
+	<h1>Responsive Video embedding with webshims and JME</h1>
+	<div class="button-row">
+		<button class="load-swf" disabled="">test flash fallback</button>
+		
+		<button class="load-jme">test JME / customizable Controls</button>
+	</div>
+		
+	<h2>width: 100%; height: auto;</h2>
+	<p>Webshims supports setting width/height of a video in all units including the keyword auto (needs to be set inline to work with Flash Fallback).</p>
+	<div class="mediaplayer videoplayer">
+		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="width: 100%; height: auto;">
+			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
+			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
+			<track src="../subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
+			<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
+		</video>
+	</div>
+	
+	<hr />
+	
+	<h2>intrinsic ratio responsive/fluid video</h2>
+	<p>based on  http://www.alistapart.com/articles/creating-intrinsic-ratios-for-video/</p>
+	
+	<div class="mediaplayer videoplayer ratio-16-9">
+		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="width: 100%; height: 100%;">
+			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
+			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
+			<track src="../subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
+			<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
+		</video>
+	</div>
+</div>
+</body>
+</html>   

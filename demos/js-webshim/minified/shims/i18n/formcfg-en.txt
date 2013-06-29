@@ -1,6 +1,6 @@
 //errormessages for en are already included in webshims core, this is only for information (by default en is equal to jQuery.webshims.validityMessages[""]):
 
-jQuery.webshims.validityMessages.en = {
+webshims.validityMessages.en = {
 	"typeMismatch": {
 		"defaultMessage": "Please enter a valid value.",
 		"email": "Please enter an email address.",
@@ -36,7 +36,7 @@ jQuery.webshims.validityMessages.en = {
 		"radio": "Please select an option."
 	}
 };
-jQuery.webshims.formcfg.en = {
+webshims.formcfg.en = {
 	"numberFormat": {
 		".": ".",
 		",": ","

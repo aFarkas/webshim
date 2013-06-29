@@ -946,6 +946,7 @@
 		var fNuAPI = 'form-number-date-api';
 		var select = $('<select required="" name="a"><option disabled="" /></select>')[0];
 		var bustedValidity = false;
+		var bustedWidgetUi = false;
 		
 		var initialFormTest = function(){
 			if(!initialFormTest.run){
@@ -965,9 +966,10 @@
 				}
 				
 				if(Modernizr[formvalidation]){
-					bugs.bustedValidity = bustedValidity = !modernizrInputAttrs.list || window.opera || Modernizr.formattribute === false || !Modernizr.fieldsetdisabled || !('value' in document.createElement('progress')) || !('value' in document.createElement('output')) || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
+					bustedWidgetUi = window.opera || Modernizr.formattribute === false || !Modernizr.fieldsetdisabled || !('value' in document.createElement('progress')) || !('value' in document.createElement('output')) || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
+					bugs.bustedValidity = bustedValidity = bustedWidgetUi || !modernizrInputAttrs.list;
 				}
-				
+
 				formExtend = Modernizr[formvalidation] && !bustedValidity ? 'form-native-extend' : fShim;
 				
 			}
@@ -1003,7 +1005,7 @@
 //					,fieldWrapper: undefined
 //					,fx: 'slide'
 				},
-				availabeLangs: ['ar', 'ch-ZN', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'lt', 'nl', 'pt-PT', 'ru', 'sv'] //en and de are directly implemented in core
+				availabeLangs: ['ar', 'ch-ZN', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'lt', 'nl', 'pl', 'pt-PT', 'ru', 'sv'] //en and de are directly implemented in core
 	//			,customMessages: false,
 	//			overridePlaceholder: false, // might be good for IE10
 	//			replaceValidationUI: false
@@ -1054,7 +1056,7 @@
 		addPolyfill(fNuAPI, {
 			f: 'forms-ext',
 			options: {
-				types: 'month week date time range number'
+				types: 'month date time range number'
 			},
 			test: function(){
 				var ret = true;
@@ -1095,7 +1097,7 @@
 				var o = this.options;
 				initialFormTest();
 				//input widgets on old on old androids can't be trusted
-				if(fShim == formExtend && (/Android/i).test(navigator.userAgent)){
+				if(bustedWidgetUi && !o.replaceUI && (/Android/i).test(navigator.userAgent)){
 					o.replaceUI = true;
 				}
 				return !o.replaceUI && modules[fNuAPI].test();

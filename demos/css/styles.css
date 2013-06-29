@@ -221,7 +221,8 @@ body {
 }
 div.main {
 	position: relative;
-	width: 940px;
+	max-width: 940px;
+	min-width: 600px;
 	margin: 40px auto;
 	font-size: 16px;
 }

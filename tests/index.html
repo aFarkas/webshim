@@ -139,7 +139,8 @@
 		jQuery.noConflict();
 		(function($){
 			var hash = location.hash.replace('#', '');
-			$.webshims.debug = "noCombo";
+			
+//			$.webshims.debug = "noCombo";
 			$(window).load(function(){
 				$.webshims.polyfill();
 			});

@@ -1,5 +1,6 @@
-(function($, Modernizr, webshims){
+(function(Modernizr, webshims){
 	"use strict";
+	var $ = webshims.$;
 	var hasNative = Modernizr.audio && Modernizr.video;
 	var supportsLoop = false;
 	var bugs = webshims.bugs;
@@ -615,7 +616,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	}
 	webshims.ready('track', loadTrackUi);
 });
-})(jQuery, Modernizr, webshims);
+})(Modernizr, webshims);
 webshims.register('track', function($, webshims, window, document, undefined){
 	"use strict";
 	var mediaelement = webshims.mediaelement;

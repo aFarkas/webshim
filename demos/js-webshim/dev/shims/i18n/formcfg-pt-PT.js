@@ -1,4 +1,4 @@
-jQuery.webshims.validityMessages["pt-PT"] = {
+webshims.validityMessages["pt-PT"] = {
     "typeMismatch": {
         "email": "Por favor escreva um endereço de correio.",
         "url": "Por favor escreva o URL.",
@@ -30,7 +30,7 @@ jQuery.webshims.validityMessages["pt-PT"] = {
     },
     "stepMismatch": "Valor inválido."
 };
-jQuery.webshims.formcfg["pt-PT"] = {
+webshims.formcfg["pt-PT"] = {
 	numberFormat: {
 		".": ".",
 		",": ","

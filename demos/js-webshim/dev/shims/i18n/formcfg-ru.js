@@ -1,4 +1,4 @@
-jQuery.webshims.validityMessages.ru = {
+webshims.validityMessages.ru = {
 	"typeMismatch": {
 		"email": "Пожалуйста, введите адрес e-mail.",
 		"url": "Пожалуйста, введите адрес веб-страницы (URL).",
@@ -30,7 +30,7 @@ jQuery.webshims.validityMessages.ru = {
 	},
 	"stepMismatch": "Неправильное значение."
 };
-jQuery.webshims.formcfg.ru = {
+webshims.formcfg.ru = {
 	numberFormat: {
 		".": ".",
 		",": ","

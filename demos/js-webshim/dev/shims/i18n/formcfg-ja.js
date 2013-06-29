@@ -1,4 +1,4 @@
-jQuery.webshims.validityMessages.ja = {
+webshims.validityMessages.ja = {
     "typeMismatch": {
         "email": "メールアドレスが正しくありません。",
         "url": "URL が正しくありません。",
@@ -30,7 +30,7 @@ jQuery.webshims.validityMessages.ja = {
     },
     "stepMismatch": "値が無効です。"
 };
-jQuery.webshims.formcfg.ja = {
+webshims.formcfg.ja = {
 	numberFormat: {
 		".": ".",
 		",": ","

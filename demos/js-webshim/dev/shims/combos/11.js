@@ -493,7 +493,7 @@
 			 webshims._polyfill(['es5']);
 		}
 	}
-})(jQuery);
+})(window.webshims ? webshims.$ : jQuery);
 webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var curCfg;
@@ -571,10 +571,10 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		number: {
 			step: 1
 		},
-		week: {
-			step: 1,
-			start: new Date(nowDate)
-		},
+//		week: {
+//			step: 1,
+//			start: new Date(nowDate)
+//		},
 		time: {
 			step: 60
 		},
@@ -829,9 +829,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			number: function(val){
 				return (val+'').replace(curCfg.numberFormat[','], '').replace(curCfg.numberFormat['.'], '.');
 			},
-			week: function(val){
-				return val;
-			},
+//			week: function(val){
+//				return val;
+//			},
 			time: function(val){
 				return val;
 			},
@@ -1857,6 +1857,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		
 		picker.month = picker._common;
 		picker.date = picker._common;
+//		picker.week = picker._common;
 		picker.color = function(data){
 			var ret = picker._common.apply(this, arguments);
 			var alpha = $(data.orig).data('alphacontrol');
@@ -2143,8 +2144,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		}
 		
 		var isStupid = navigator.userAgent.indexOf('MSIE 10.0') != -1 && navigator.userAgent.indexOf('Touch') == -1;
-		['number', 'week', 'time', 'month', 'date', 'color'].forEach(function(name){
-			if(!modernizrInputTypes[name] || (options.replaceUI && name != 'week') || (name == 'number' && isStupid)){
+		['number', 'time', 'month', 'date', 'color'].forEach(function(name){
+			if(!modernizrInputTypes[name] || (name == 'number' && isStupid)){
 				extendType(name, {
 					_create: function(opts, set){
 						if(opts.splitInput && !splitInputs[name]){

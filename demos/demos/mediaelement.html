@@ -319,13 +319,14 @@ $("video.my-video").loadMediaSrc(
 				<h3>Simple Demo</h3>
 				<h4>Video example</h4>
 				<div class="player">
-					
-					<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="width: 630px; height: 356px;">
-						<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
-						<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
-						<track src="subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
-						<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
-					</video>
+					<div class="mediaplayer videoplayer">
+						<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="width: 630px; height: 356px;">
+							<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
+							<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
+							<track src="subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
+							<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
+						</video>
+					</div>
 					<table>
 						<thead>
 							<tr>
@@ -418,11 +419,12 @@ $("video.my-video").loadMediaSrc(
 				</div>
 				<h4>Audio example using mp3 only</h4>
 				<div class="player">
-					
-					<audio controls preload="none" style="width: 400px; height: 45px;">
-						<source src="http://media.libsyn.com/media/sitepoint/sitepointpodcast044.mp3" type="audio/mpeg" />
-						<p>You need a modern Browser or install the Flash Plugin</p>
-					</audio>
+					<div class="mediaplayer audioplayer">
+						<audio controls preload="none" style="width: 400px; height: 45px;">
+							<source src="http://media.libsyn.com/media/sitepoint/sitepointpodcast044.mp3" type="audio/mpeg" />
+							<p>You need a modern Browser or install the Flash Plugin</p>
+						</audio>
+					</div>
 					<table>
 						<thead>
 							<tr>
