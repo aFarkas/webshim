@@ -1686,10 +1686,18 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	};
 	
 	var transClass = ('transitionDelay' in document.documentElement.style) ?  '' : ' no-transition';
+	var poCFG = webshims.cfg.wspopover;
+	if(!poCFG.position && poCFG.position !== false){
+		poCFG.position = {
+			at: 'left bottom',
+			my: 'left top',
+			collision: 'fit flip'
+		};
+	}
 	webshims.wsPopover = {
 		id: 0,
 		_create: function(){
-			this.options = $.extend({}, webshims.cfg.wspopover, this.options);
+			this.options = $.extend({}, poCFG, this.options);
 			this.id = webshims.wsPopover.id++;
 			this.eventns = '.wsoverlay' + this.id;
 			this.timers = {};

@@ -187,18 +187,39 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		'width'
 	;
 	var hasTransition = ('transitionDelay' in document.documentElement.style);
+	var resetPos = {visibility: 'hidden', display: 'inline-block', left: 0, top: 0, marginTop: 0, marginLeft: 0, marginRight: 0, marginBottom: 0};
+	
 	setRoot();
 	webshims.ready('DOM', setRoot);
 	
-	webshims.getRelOffset = function(posElem, relElem){
+	
+	webshims.getRelOffset = function(posElem, relElem, opts){
 		posElem = $(posElem);
-		var offset = $(relElem).offset();
+		var offset;
 		var bodyOffset;
-		$.swap($(posElem)[0], {visibility: 'hidden', display: 'inline-block', left: 0, top: 0}, function(){
-			bodyOffset = posElem.offset();
+		$.swap($(posElem)[0], resetPos, function(){
+			if($.position && opts && $.position.getScrollInfo){
+				if(!opts.of){
+					opts.of = relElem;
+				}
+				opts.using = function(calced, data){
+					posElem.attr({'data-horizontal': data.horizontal, 'data-vertical': data.vertical});
+					offset = calced;
+				};
+				posElem.attr({'data-horizontal': '', 'data-vertical': ''});
+				posElem.position(opts);
+				
+			} else {
+				offset = $(relElem).offset();
+				bodyOffset = posElem.offset();
+				offset.top -= bodyOffset.top;
+				offset.left -= bodyOffset.left;
+				
+				offset.top += relElem.outerHeight();
+			}
+			
 		});
-		offset.top -= bodyOffset.top;
-		offset.left -= bodyOffset.left;
+		
 		return offset;
 	};
 	
@@ -324,9 +345,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			that.timers.forcehide = setTimeout(forceHide, hasTransition ? 600 : 40);
 		},
 		position: function(element){
-			var offset = webshims.getRelOffset(this.element.css({marginTop: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}).removeAttr('hidden'), element);
-			offset.top += element.outerHeight();
-			this.element.css({marginTop: '', marginLeft: '', marginRight: '', marginBottom: ''}).css(offset);
+			var offset = webshims.getRelOffset(this.element.removeAttr('hidden'), element, this.options.position);
+			
+			this.element.css(offset);
 		}
 	});
 	
