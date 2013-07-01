@@ -262,7 +262,7 @@ webshims.addInputType('email', {
 			// optional punycode support: https://github.com/bestiejs/punycode.js
 			if(window.punycode && punycode.toASCII){
 				try {
-					if(test.test(punycode.toASCII(val)){
+					if( test.test(punycode.toASCII(val)) ){
 						return false;
 					}
 				} catch(er){}

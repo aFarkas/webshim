@@ -257,8 +257,16 @@ $(window).on('invalid', $.noop);
 webshims.addInputType('email', {
 	mismatch: (function(){
 		//taken from http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#valid-e-mail-address
-		var test = cfg.emailReg || /^[a-zA-Z0-9.!#$%&'*+-\/=?\^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+		var test = cfg.emailReg || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 		return function(val){
+			// optional punycode support: https://github.com/bestiejs/punycode.js
+			if(window.punycode && punycode.toASCII){
+				try {
+					if( test.test(punycode.toASCII(val)) ){
+						return false;
+					}
+				} catch(er){}
+			}
 			return !test.test(val);
 		};
 	})()
