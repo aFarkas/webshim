@@ -2946,7 +2946,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		
 		var isStupid = navigator.userAgent.indexOf('MSIE 10.0') != -1 && navigator.userAgent.indexOf('Touch') == -1;
 		['number', 'time', 'month', 'date', 'color'].forEach(function(name){
-			if(!modernizrInputTypes[name] || (name == 'number' && isStupid)){
+			if(!modernizrInputTypes[name] || options.replaceUI || (name == 'number' && isStupid)){
 				extendType(name, {
 					_create: function(opts, set){
 						if(opts.splitInput && !splitInputs[name]){
