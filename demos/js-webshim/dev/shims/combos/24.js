@@ -355,6 +355,12 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	
 	/* some extra validation UI */
 	webshims.validityAlert = (function(){
+		
+		options.messagePopover.position = $.extend({}, {
+			at: 'left bottom',
+			my: 'left top',
+			collision: 'none'
+		}, options.messagePopover.position || {});
 			
 		var focusTimer = false;
 		

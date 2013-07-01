@@ -52,6 +52,10 @@
 				$.webshims.setOptions('forms-ext', { replaceUI: true });
 			}
 			
+			if(hash.indexOf('punycode') !== -1){
+				document.write('<script src="test-ext\/punycode.js"><\/script>');
+			}
+			
 						
 			$(function(){
 				$('#customValidationMessage').prop('checked', !!$.webshims.cfg.forms.customMessages);
@@ -59,6 +63,7 @@
 				$('#useCustomUI').prop('checked', $.webshims.cfg['forms-ext'].replaceUI);
 				$('#legacyjquery').prop('checked', (hash.indexOf('legacyjquery') != -1));
 				$('#noConflictExtreme').prop('checked', (hash.indexOf('noConflictExtreme') != -1));
+				$('#punycode').prop('checked', (hash.indexOf('punycode') !== -1));
 				$('input.webshim-config')
 					.bind('click', function(){
 						var addHash = '';
@@ -175,6 +180,8 @@
 	<input type="checkbox" id="useCustomUI" value="useCustomUI" class="webshim-config" /> <label for="useCustomUI">use custom input widgets</label>
 	<input type="checkbox" id="legacyjquery" value="legacyjquery" class="webshim-config" /> <label for="legacyjquery">use legacy jquery</label>
 	<input type="checkbox" id="noConflictExtreme" value="noConflictExtreme" class="webshim-config" /> <label for="noConflictExtreme">jQuery.noConflict(true)</label>
+	<input type="checkbox" id="punycode" value="punycode" class="webshim-config" /> <label for="punycode">punycode</label>
+	
 	
 </div>
 <small>Note: These tests are made to test webshims lib implementation. If there are some failing tests in native implementations, fill a browser bug. We currently only fix heavy/easy to fix errors in native implementations.</small>

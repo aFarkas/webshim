@@ -109,7 +109,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	webshims.wsPopover = {
 		id: 0,
 		_create: function(){
-			this.options = $.extend({}, poCFG, this.options);
+			this.options = $.extend(true, {}, poCFG, this.options);
 			this.id = webshims.wsPopover.id++;
 			this.eventns = '.wsoverlay' + this.id;
 			this.timers = {};
