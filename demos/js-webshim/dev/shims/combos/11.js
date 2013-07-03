@@ -2109,6 +2109,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					data.shim.element.addClass('has-input-buttons');
 				}
 				
+				data.shim.element.addClass($.prop(this, 'className'));
+				
 				if(opts.calculateWidth){
 					sizeInput(data.shim);
 				} else {
