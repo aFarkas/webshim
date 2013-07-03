@@ -1744,6 +1744,11 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		var message = $(elem).data('errormessage') || elem.getAttribute('x-moz-errormessage') || '';
 		if(key && message[key]){
 			message = message[key];
+		} else if(message) {
+			validity = validity || $.prop(elem, 'validity') || {valid: 1};
+			if(validity.valid){
+				message = '';
+			}
 		}
 		if(typeof message == 'object'){
 			validity = validity || $.prop(elem, 'validity') || {valid: 1};
@@ -3606,10 +3611,7 @@ try {
 					});
 				}
 			;
-			if($.event.customEvent){
-				$.event.customEvent.updateInput = true;
-			} 
-			
+						
 			$(doc)
 				.on('focusin', function(e){
 					if( e.target && !e.target.readOnly && !e.target.disabled && (e.target.nodeName || '').toLowerCase() == 'input' && !noInputTypes[e.target.type] && !(webshims.data(e.target, 'implemented') || {}).inputwidgets){

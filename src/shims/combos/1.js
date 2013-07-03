@@ -654,6 +654,11 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		var message = $(elem).data('errormessage') || elem.getAttribute('x-moz-errormessage') || '';
 		if(key && message[key]){
 			message = message[key];
+		} else if(message) {
+			validity = validity || $.prop(elem, 'validity') || {valid: 1};
+			if(validity.valid){
+				message = '';
+			}
 		}
 		if(typeof message == 'object'){
 			validity = validity || $.prop(elem, 'validity') || {valid: 1};

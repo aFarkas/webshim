@@ -150,15 +150,16 @@ var transformDimension = (function(){
 		var box = data.shadowElem;
 		
 		if(data.isActive == 'third'){
-			console.log(data)
 			if(data && data._ytAPI && data._ytAPI.getPlaybackQuality){
 				window.ytapi = data._ytAPI
 			}
 			data.elemDimensions = {
-				width: elem.style.width || $(elem).attr('width') || $(elem).width(),
-				height: elem.style.height || $(elem).attr('height') || $(elem).height()
+				width: elem.style.width || $.attr(elem, 'width') || $(elem).width(),
+				height: elem.style.height || $.attr(elem, 'height') || $(elem).height()
 			};
 			dims = transformDimension(data);
+			dims.minWidth = elem.style.minWidth;
+			dims.minHeight = elem.style.minHeight;
 			box.css(dims);
 		}
 	};

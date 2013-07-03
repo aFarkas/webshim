@@ -961,10 +961,6 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 		return ret;
 	}
 	
-	$.extend($.event.customEvent, {
-		updatetrackdisplay: true,
-		forceupdatetrackdisplay: true
-	});
 	
 	mediaelement.trackDisplay = trackDisplay;
 	

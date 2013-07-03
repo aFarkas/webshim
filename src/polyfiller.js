@@ -25,9 +25,6 @@
 		Modernizr.ES5 = false;
 	}
 	
-	if(!$.event.customEvent){
-		$.event.customEvent = {};
-	}
 	
 	var webshims = {
 		version: '1.10.10pre',

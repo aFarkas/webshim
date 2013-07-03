@@ -3905,10 +3905,12 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 				box.css({width: 0, height: 0});
 			} else {
 				data.elemDimensions = {
-					width: elem.style.width || $(elem).attr('width') || $(elem).width(),
-					height: elem.style.height || $(elem).attr('height') || $(elem).height()
+					width: elem.style.width || $.attr(elem, 'width') || $(elem).width(),
+					height: elem.style.height || $.attr(elem, 'height') || $(elem).height()
 				};
 				dims = transformDimension(data);
+				dims.minWidth = elem.style.minWidth;
+				dims.minHeight = elem.style.minHeight;
 				box.css(dims);
 			}
 		}

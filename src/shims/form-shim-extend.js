@@ -1772,10 +1772,7 @@ try {
 					});
 				}
 			;
-			if($.event.customEvent){
-				$.event.customEvent.updateInput = true;
-			} 
-			
+						
 			$(doc)
 				.on('focusin', function(e){
 					if( e.target && !e.target.readOnly && !e.target.disabled && (e.target.nodeName || '').toLowerCase() == 'input' && !noInputTypes[e.target.type] && !(webshims.data(e.target, 'implemented') || {}).inputwidgets){
