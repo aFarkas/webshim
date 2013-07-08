@@ -80,7 +80,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		if(!e.target){return;}
 		elem = $(e.target).getNativeElement()[0];
 		shadowElem = $(elem).getShadowElement();
-		if(elem.type == 'submit' || !$.prop(elem, 'willValidate') || (e.type == 'change' && !changeTypes[(shadowType = shadowElem.prop('type'))])){return;}
+		if(elem.type == 'submit' || !$.prop(elem, 'willValidate') || (e.type == 'change' && (shadowType = shadowElem.prop('type')) && !changeTypes[shadowType])){return;}
 		timer = $.data(elem, 'webshimsswitchvalidityclass');
 		var switchClass = function(){
 			if(!shadowType){
@@ -599,6 +599,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			},
 			submit: function(e){
 				if(options.iVal.sel && $(e.target).is(options.iVal.sel) && $.prop(e.target, 'noValidate') && !$(e.target).checkValidity()){
+					e.stopImmediatePropagation();
 					return false;
 				}
 			}

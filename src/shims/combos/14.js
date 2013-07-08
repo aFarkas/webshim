@@ -1364,6 +1364,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						setInterval(this.test, 600);
 						$(this.test);
 						webshims.ready('WINDOWLOAD', this.test);
+						$(document).on('updatelayout', this.handler);
 						$(window).bind('resize', this.handler);
 						(function(){
 							var oldAnimate = $.fn.animate;
@@ -1411,7 +1412,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					
 					$(nativeElem).on('remove', function(e){
 						if (!e.originalEvent) {
-							$(shadowElem).remove();
+							setTimeout(function(){
+								$(shadowElem).remove();
+							}, 4);
 						}
 					});
 					

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.js"></script>
+	
+	<script src="../../demo-js/src/modernizr-special.js"></script>
+	
+	
+	<script src="../../js-webshim/minified/polyfiller.js"></script>
+	
+	
+	<!--
+		<script src="../../../src/polyfiller.js"></script> 
+		<script>
+			$.webshims.debug = 'noCombo';
+			//style calendar, datalist, validation bubble
+			//$('html').on('wspopoverbeforehide', false);
+		</script>
+	-->
+
+	<style>
+		
+		input,
+		select,
+		textarea {
+			box-shadow: none;
+		}
+		
+		.ws-invalid .ui-input-text.ui-focus, .ui-input-search.ui-focus {
+			box-shadow: 0 0 12px #BE7B38;
+		}
+		
+		.ui-field-contain .ws-errorbox {
+			margin-left: 22%;
+		}
+		
+		.ws-invalid label {
+			color: #f00;
+		}
+		
+		
+		
+		/* some button style changes for webshims + jQ mobile */
+		.input-buttons .ui-btn {
+			display: inline-block;
+		}
+		
+		.ui-input-text .input-buttons.date-input-buttons,
+		.ui-input-text .input-buttons.month-input-buttons {
+			margin-left: -30px;
+		}
+		
+		.ui-input-text .date-input-buttons .step-controls,
+		.ui-input-text .month-input-buttons .step-controls {
+			display: none !important;
+		}
+		
+		.ui-input-text .input-buttons .step-controls {
+			margin-top: 2px;
+		}
+		
+		.ui-input-text .input-buttons .ui-btn-inner {
+			display: none;
+		}
+		
+		.ui-input-text .input-buttons .ws-popover-opener {
+			position: relative;
+			width: 22px;
+			height: 22px;
+		}
+		
+		
+		/* or simply hide buttons */
+		/*
+		.ui-input-text .date-input-buttons,
+		.ui-input-text .month-input-buttons {
+			display: none !important;
+		}
+		*/
+	</style>
+	<script src="../../demo-js/src/jqm-ws-compat.js"></script>
+	
+	<script src="../../demo-js/src/jquery.ui.position.js"></script>
+	<script>
+		
+		webshims.setOptions('forms', {
+			//configure instantvalidation for jQuery mobile
+			iVal: {
+				fieldWrapper: '[data-role="fieldcontain"]',
+				handleBubble: true // 'hide' || false || true
+			}
+		});
+		
+		webshims.setOptions('forms-ext', {
+			//only use custom widgets if we see some mobile aspects
+			replaceUI: !hasMobileAspect(),
+			types: 'range date time number month',
+			widgets: {
+				calculateWidth: false, //handle clalculations through CSS (good for responsive pferformance)
+				buttonOnly: true,
+				widgetPosition: {
+					my: 'center',
+					at: 'center'
+				}
+			}
+		});
+		
+		//update polyfills before jQ mobile kicks in, but only handle this after normal DOM ready
+		jQuery(function($){
+			$(document).on('pagebeforecreate', function(e){
+				$(e.target).updatePolyfill();
+			});
+		});
+		
+		//load all polyfill features
+		//or load only a specific feature with $.webshims.polyfill('feature-name');
+		webshims.polyfill('forms forms-ext');
+	</script>
+	
+	<title>Webshims and jQuery Mobile</title>
+
+</head>
+
+<body>
+	<div data-role="page" id="page1">
+		<div data-theme="a" data-role="header">
+			<h1>
+				jQuery mobile and Webshims
+			</h1>
+			
+		</div> 
+		<div data-role="content">
+			<p>Webshims and jQuery mobile do a lot of tricks with form elements, which often conflict with each other. This page including the <a href="../../demo-js/src/jqm-ws-compat.js" data-ajax="false">jqm-ws-compat.js script</a> document how to combine both scripts.</p>
+			<form action="jquery-mobile.html" class="ws-instantvalidation">
+				<div data-role="fieldcontain">
+					<label for="textinput1">
+						email*:
+					</label>
+					<input name="" id="textinput1" placeholder="email" value="" type="email" required="required">
+				</div>
+				<div data-role="fieldcontain">
+					<label for="textinput2">
+						date*:
+					</label>
+					<input name="" id="textinput2" placeholder="yyyy-mm-dd" value="" type="date" required="required">
+				</div>
+				<div data-role="fieldcontain">
+					<label for="textinput3">
+						time*:
+					</label>
+					<input name="" id="textinput3" value="" type="time" required="required">
+				</div>
+				<div data-role="fieldcontain">
+					<label for="textinput4">
+						month*:
+					</label>
+					<input name="" id="textinput4" value="" type="month" required="required">
+				</div>
+				<div data-role="fieldcontain">
+					<label for="slider1">
+						Value
+					</label>
+					<input id="slider1" name="slider" value="50" min="0" max="100" data-highlight="false"
+					type="range">
+				</div>
+				<div data-role="fieldcontain">
+					<label for="selectmenu1">
+						Choose*:
+					</label>
+					<select id="selectmenu1" name="" required="required">
+						<option value="">
+							Choose
+						</option>
+						<option value="option1">
+							Option 1
+						</option>
+						<option value="option2">
+							Option 2
+						</option>
+						<option value="option3">
+							Option 3
+						</option>
+						<option value="option4">
+							Option 4
+						</option>
+					</select>
+				</div>
+				<div data-role="fieldcontain">
+					<label for="selectmenu1">
+						Choose*:
+					</label>
+					<select id="selectmenu1" name="" data-native-menu="false" required="required">
+						<option value="">
+							Choose
+						</option>
+						<option value="option1">
+							Option 1
+						</option>
+						<option value="option2">
+							Option 2
+						</option>
+						<option value="option3">
+							Option 3
+						</option>
+						<option value="option4">
+							Option 4
+						</option>
+					</select>
+				</div>
+				<div data-role="fieldcontain">
+					<fieldset data-role="controlgroup" data-type="vertical">
+						<legend>
+							Choose*:
+						</legend>
+						<input id="radio1" name="radio-g-1" value="" data-theme="c" type="radio" required="required">
+						<label for="radio1">
+							Option
+						</label>
+						<input id="radio2" name="radio-g-1" value="radio2" data-theme="c" type="radio">
+						<label for="radio2">
+							Option
+						</label>
+						<input id="radio3" name="radio-g-1" value="radio3" data-theme="c" type="radio">
+						<label for="radio3">
+							Option
+						</label>
+					</fieldset>
+				</div>
+				<div id="checkboxes1" data-role="fieldcontain">
+					<fieldset data-role="controlgroup" data-type="vertical">
+						<legend>
+							Choose*:
+						</legend>
+						<input id="checkbox1" name="" data-theme="c" type="checkbox" required="required">
+						<label for="checkbox1">
+							Option
+						</label>
+					</fieldset>
+				</div>
+				<input value="Submit" type="submit">
+			</form>
+		</div>
+	</div>
+</body>
+</html>   

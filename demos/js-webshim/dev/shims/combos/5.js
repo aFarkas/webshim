@@ -1301,7 +1301,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 	var formcfg = webshims.formcfg;
 	
 	var stopPropagation = function(e){
-		e.stopImmediatePropagation(e);
+		e.stopImmediatePropagation();
 	};
 	var createFormat = function(name){
 		if(!curCfg.patterns[name+'Obj']){
@@ -1769,6 +1769,10 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					steps[this.type].start = this.asNumber(steps[this.type].start);
 				}
 				
+				if(!webshims.picker[this.type]){
+					o.buttonOnly = false;
+				}
+				
 				for(i = 0; i < createOpts.length; i++){
 					if(o[createOpts[i]] != null){
 						this[createOpts[i]](o[createOpts[i]], o[createOpts[i]]);
@@ -1779,6 +1783,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				}
 				this.addBindings();
 				$(this.element).data('wsWidget'+o.type, this);
+				
 				
 				if(o.buttonOnly){
 					this.inputElements.prop({readOnly: true});
@@ -1864,7 +1869,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					if(preventBlur.prevent){
 						e.preventDefault();
 						(isFocused || that.element.getShadowFocusElement()).focus();
-						e.stopImmediatePropagation();
+						stopPropagation(e);
 						return true;
 					}
 				};
@@ -2534,9 +2539,10 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		
 		
 		picker._common = function(data){
-			var popover = webshims.objectCreate(webshims.wsPopover, {}, {prepareFor: data.element});
-			var opener = $('<button type="button" class="ws-popover-opener"><span /></button>').appendTo(data.buttonWrapper);
 			var options = data.options;
+			var popover = webshims.objectCreate(webshims.wsPopover, {}, {prepareFor: data.element, position: options.widgetPosition});
+			var opener = $('<button type="button" class="ws-popover-opener"><span /></button>').appendTo(data.buttonWrapper);
+			
 			
 			var showPickerContent = function(){
 				(picker[data.type].showPickerContent || picker.showPickerContent)(data, popover);
@@ -2627,7 +2633,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					focus: function(){
 						if(!popover.stopOpen && (options.buttonOnly || options.openOnFocus || (mouseFocus && options.openOnMouseFocus))){
 							popover.openedByFocus = options.buttonOnly ? false : !options.noInput;
-							
 							show();
 						} else {
 							popover.preventBlur();
@@ -2636,8 +2641,15 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					mousedown: function(){
 						mouseFocus = true;
 						setTimeout(resetMouseFocus, 9);
+						if(options.buttonOnly && popover.isVisible && popover.activeElement){
+							popover.openedByFocus = false;
+							setTimeout(function(){
+								popover.openedByFocus = false;
+								popover.activeElement.focus();
+							}, 4);
+						}
 						if(data.element.is(':focus')){
-							popover.openedByFocus = !options.noInput;
+							popover.openedByFocus = options.buttonOnly ? false : !options.noInput;
 							show();
 						}
 						popover.preventBlur();
@@ -2648,8 +2660,10 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			data.opener = opener;
 			$(data.orig).on('remove', function(e){
 				if(!e.originalEvent){
-					opener.remove();
-					popover.element.remove();
+					setTimeout(function(){
+						opener.remove();
+						popover.element.remove();
+					}, 4);
 				}
 			});
 			
@@ -2915,7 +2929,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				if(opts.calculateWidth){
 					sizeInput(data.shim);
 				} else {
-					$(this).css({display: 'none'});
+					$(this).addClass('ws-important-hide');
 				}
 			}
 			

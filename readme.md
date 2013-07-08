@@ -81,8 +81,8 @@ If you have any questions, please feel free to ask them on [stackoverflow.com/qu
 upcomming Release 1.10.10
 ----------
 
-- improved positioning support of popover (datalist, datepicker etc.) (if of Query UI position utility is detected)
-- re-added width: auto/height: auto support for mediaelement flash fallback
+- improved positioning support of popover (datalist, datepicker etc.) (if jQuery UI position utility is detected)
+- re-added width: auto/height: auto support for mediaelement flash fallback [demo](http://afarkas.github.io/webshim/demos/demos/mediaelement/responsive-mediaelement.html)
 - added media attribute support for mediaelement flash fallback
 - updated regular expression for type="email"
 - optional IDN support for type="email" for polyfilled browsers ([punycode](https://github.com/bestiejs/punycode.js) has to be included) 

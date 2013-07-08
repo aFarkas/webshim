@@ -570,11 +570,6 @@ mediaelement.createSWF = function(mediaElem, src, data){
 	$(mediaElem)
 		.on('updatemediaelementdimensions loadedmetadata emptied', setDimension)
 		.onWSOff('updateshadowdom', setDimension)
-		.on('remove', function(e){
-			if(!e.originalEvent){
-				box.remove();
-			}
-		})
 	;
 };
 

@@ -561,6 +561,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						setInterval(this.test, 600);
 						$(this.test);
 						webshims.ready('WINDOWLOAD', this.test);
+						$(document).on('updatelayout', this.handler);
 						$(window).bind('resize', this.handler);
 						(function(){
 							var oldAnimate = $.fn.animate;
@@ -608,7 +609,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					
 					$(nativeElem).on('remove', function(e){
 						if (!e.originalEvent) {
-							$(shadowElem).remove();
+							setTimeout(function(){
+								$(shadowElem).remove();
+							}, 4);
 						}
 					});
 					
@@ -1641,8 +1644,12 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		} catch(er){}
 		if(allowMediaSorting){
 			mediaelement.sortMedia = function(src1, src2){
-				src1 = !src1.media || matchMedia( src1.media ).matches;
-				src2 = !src2.media || matchMedia( src2.media ).matches;
+				try {
+					src1 = !src1.media || matchMedia( src1.media ).matches;
+					src2 = !src2.media || matchMedia( src2.media ).matches;
+				} catch(er){
+					return 0;
+				}
 				return src1 == src2 ? 
 					0 :
 					src1 ? -1
@@ -1796,7 +1803,6 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 							clearTimeout(localConnectionTimer);
 							clearTimeout(data.flashBlock);
 						}
-						box.remove();
 					}
 				})
 				.onWSOff('updateshadowdom', setDimension)

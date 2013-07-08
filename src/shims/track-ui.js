@@ -310,7 +310,9 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				
 				elem.on('remove', function(e){
 					if(!e.originalEvent && baseData && baseData.trackDisplay){
-						baseData.trackDisplay.remove();
+						setTimeout(function(){
+							baseData.trackDisplay.remove();
+						}, 4);
 					}
 				});
 				

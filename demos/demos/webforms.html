@@ -502,27 +502,6 @@ $.webshims.setOptions('forms-ext', {
 	replaceUI: true
 });
 </code>
-					<p>Loading jQuery UI from another source:</p>
-<code class="block">
-/*load a customized jquery ui build from another source */
-$.webshims.modules["jquery-ui"].src = "../jquery-ui.custom.min.js";
-</code>
-					<p>Loading 'forms-ext' conditionally (for performance)</p>
-<code class="block">
-/*load a customized and more lightweight jquery ui build from another source */
-$.webshims.modules["jquery-ui"].src = "../jquery-ui.custom.min.js";
-
-/*add forms to the features list*/
-var features = ['forms'];
-
-/* only add forms-ext, if input[type="range"] is not supported */
-if( !Modernizr.inputtypes.range ){
-	features.push('forms-ext');
-}
-
-/* Load all features */
-$.webshims.polyfill(features);
-</code>
 					<p>More information about <a href="webforms/3-webforms-widgets.html">custom styleable input widgets</a>.</p>
 					</div>
 					<h3 id="custom-widget" class="button">... create custom validation rules</h3>

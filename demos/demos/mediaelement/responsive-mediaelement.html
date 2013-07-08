@@ -52,7 +52,7 @@
 		
 		.media-left {
 			max-width: 480px;
-			min-width: 240px;
+			min-width: 280px;
 			width: 50%;
 			float: left;
 			margin: 0 10px 5px 0;
@@ -69,7 +69,7 @@
 	<title>Responsive Video embedding with webshims and JME</title>
 	<script>
 		$(function(){
-			if(swfmini.hasFlashPlayerVersion('9.0.115')){
+			if(Modernizr.video && swfmini.hasFlashPlayerVersion('9.0.115')){
 				$('button.load-swf')
 					.prop('disabled', false)
 					.one('click', function(){

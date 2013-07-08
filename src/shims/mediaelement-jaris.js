@@ -551,8 +551,12 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		} catch(er){}
 		if(allowMediaSorting){
 			mediaelement.sortMedia = function(src1, src2){
-				src1 = !src1.media || matchMedia( src1.media ).matches;
-				src2 = !src2.media || matchMedia( src2.media ).matches;
+				try {
+					src1 = !src1.media || matchMedia( src1.media ).matches;
+					src2 = !src2.media || matchMedia( src2.media ).matches;
+				} catch(er){
+					return 0;
+				}
 				return src1 == src2 ? 
 					0 :
 					src1 ? -1
@@ -706,7 +710,6 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 							clearTimeout(localConnectionTimer);
 							clearTimeout(data.flashBlock);
 						}
-						box.remove();
 					}
 				})
 				.onWSOff('updateshadowdom', setDimension)

@@ -561,6 +561,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						setInterval(this.test, 600);
 						$(this.test);
 						webshims.ready('WINDOWLOAD', this.test);
+						$(document).on('updatelayout', this.handler);
 						$(window).bind('resize', this.handler);
 						(function(){
 							var oldAnimate = $.fn.animate;
@@ -608,7 +609,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					
 					$(nativeElem).on('remove', function(e){
 						if (!e.originalEvent) {
-							$(shadowElem).remove();
+							setTimeout(function(){
+								$(shadowElem).remove();
+							}, 4);
 						}
 					});
 					
@@ -3305,6 +3308,10 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 	});
 	
 	implementProperties.forEach(function(messageProp){
+		var skipNames = {
+			valid: 1,
+			badInput: 1
+		};
 		webshims.defineNodeNamesProperty(['fieldset', 'output', 'button'], messageProp, {
 			prop: {
 				value: '',
@@ -3333,13 +3340,16 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 							if(message){return message;}
 						}
 						$.each(validity, function(name, prop){
-							if(name == 'valid' || !prop){return;}
+							if(skipNames[name] || !prop){return;}
 							
 							message = webshims.createValidationMessage(elem, name);
 							if(message){
 								return false;
 							}
 						});
+						if(!message && validity.badInput){
+							message = webshims.createValidationMessage(elem, 'typeMismatch') || webshims.createValidationMessage(elem, 'valueMissing');
+						}
 						return message || '';
 					},
 					writeable: false
