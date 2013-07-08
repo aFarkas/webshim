@@ -78,7 +78,7 @@ If you have any questions, please feel free to ask them on [stackoverflow.com/qu
 
 **Please tag your questions with 'webshim'.**
 
-upcomming Release 1.10.10
+Release 1.10.10
 ----------
 
 - improved positioning support of popover (datalist, datepicker etc.) (if jQuery UI position utility is detected)
