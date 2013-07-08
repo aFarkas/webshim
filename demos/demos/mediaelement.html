@@ -31,7 +31,6 @@
 		</script>
 	-->
 	<script>
-		
 		$.webshims.polyfill();
 		
 		
@@ -124,10 +123,10 @@
 				$('input.volume-slider', player).bind('input', getSetVolume.set);
 				
 				$('input.play', player).bind('click', function(){
-					$('video, audio', player)[0].play();
+					$('video, audio', player).callProp('play');
 				});
 				$('input.pause', player).bind('click', function(){
-					$('video, audio', player)[0].pause();
+					$('video, audio', player).callProp('pause');
 				});
 				$('input.muted', player).bind('click updatemuted', function(){
 					$('video, audio', player).prop('muted', $.prop(this, 'checked'));
@@ -164,9 +163,9 @@
 									$(document.createElement('source')).attr(src).appendTo(mediaElement);
 								});
 							})
-							[0].load()
+							.callProp('load')
 						;
-						$('video, audio', player)[0].play();
+						$('video, audio', player).callProp('play');
 					}
 				}).prop('selectedIndex', 0);
 			});
@@ -196,7 +195,7 @@
 						}, 0);
 					}
 				};
-			};
+			}
 			
 			function getActiveTimeRange(range, time){
 				var len = range.length;
@@ -210,7 +209,22 @@
 					}
 				}
 				return [index, start, end];
-			};
+			}
+			
+			//implement callProp abstraction for webshims (extendNative = false)
+			if(!$.fn.callProp){
+				$.fn.callProp = function(prop, args){
+					var ret;
+					var fn = this.prop(prop);
+					if(!args){
+						args = []; 
+					}
+					if (fn && fn.apply) {
+						ret = fn.apply(this[0], args);
+					}
+					return (ret !== undefined) ? ret : this;
+				};
+			}
 			
 		});
 	</script>

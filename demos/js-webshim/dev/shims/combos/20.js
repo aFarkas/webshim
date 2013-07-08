@@ -707,11 +707,11 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 		}
 		
 		if(opts){
-			o.options = jQuery.extend(true, {}, o.options || {}, opts);
+			o.options = $.extend(true, {}, o.options || {}, opts);
 			opts = o.options;
 		}
 		
-		if(o._create && jQuery.isFunction(o._create)){
+		if(o._create && $.isFunction(o._create)){
 			o._create(opts);
 		}
 		return o;
@@ -797,7 +797,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
     };
 
 }
-})(jQuery, jQuery.webshims);
+})(webshims.$, webshims);
 
 
 

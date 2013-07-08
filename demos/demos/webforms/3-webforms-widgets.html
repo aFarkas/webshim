@@ -51,6 +51,10 @@
 			border: 1px solid #ccc;
 			margin: 15px 0;
 		}
+		
+		[data-at="right bottom"].input-picker {
+			margin-left: -47.5px;
+		}
 	</style>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -327,6 +331,14 @@ $.webshims.setOptions('forms-ext', {
 						</select>
 					</label>
 					
+					<label>
+						position (with jQuery UI position utitliy): 
+						<select name="position">
+							<option value='{}'>default ("my": "left top", "at": "left bottom")</option>
+							<option value='{"at": "right bottom"}'>"at": "right bottom"</option>
+							<option value='{"my": "center", "at": "center"}'>"my": "center", "at": "center"</option>
+						</select>
+					</label>
 				</fieldset>
 				<fieldset data-method="data" data-name="date">
 					<legend>data-month Properties</legend>
@@ -508,6 +520,26 @@ $.webshims.setOptions('forms-ext', {
 						<select name="data-placeholder">
 							<option></option>
 							<option>yyyy-mm</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="data" data-name="wspopover">
+					<legend>data-wspopover Properties</legend>
+					
+					<label>
+						appendTo: 
+						<select name="appendTo">
+							<option value="body">body (default || body-element)</option>
+							<option value="element">element (keyword for the input element itself)</option>
+						</select>
+					</label>
+					
+					<label>
+						position (with jQuery UI position utitliy): 
+						<select name="position">
+							<option value='{}'>default ("my": "left top", "at": "left bottom")</option>
+							<option value='{"at": "right bottom"}'>"at": "right bottom"</option>
+							<option value='{"my": "center", "at": "center"}'>"my": "center", "at": "center"</option>
 						</select>
 					</label>
 				</fieldset>
