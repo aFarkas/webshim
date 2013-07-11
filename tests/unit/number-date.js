@@ -32,7 +32,11 @@ var createTestMethodA = function(id){
 			return;
 		}
 		$.each(obj.trueState, function(i, trueState){
-			ok(validity[trueState], trueState+' is true for '+id+', '+ attrs);
+			if(trueState == 'typeMismatch' || trueState == 'badInput'){
+				ok(validity.typeMismatch || validity.badInput, 'typeMismatch/badInput is true for '+id+', '+ attrs);
+			} else {
+				ok(validity[trueState], trueState+' is true for '+id+', '+ attrs);
+			}
 			//these are conditional extra tests
 			if(trueState !== 'valid'){
 				if(validity.valid){

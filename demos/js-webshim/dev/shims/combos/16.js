@@ -1762,6 +1762,14 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 						return false;
 					}
 				});
+				if(typeof message == 'object'){
+					if(validity.typeMismatch && message.badInput){
+						message = message.badInput;
+					}
+					if(validity.badInput && message.typeMismatch){
+						message = message.typeMismatch;
+					}
+				}
 			}
 		}
 		
@@ -1917,6 +1925,7 @@ var validityPrototype = {
 	customError: false,
 
 	typeMismatch: false,
+	badInput: false,
 	rangeUnderflow: false,
 	rangeOverflow: false,
 	stepMismatch: false,
@@ -1976,20 +1985,6 @@ var validityRules = {
 		tooLong: function(){
 			return false;
 		},
-		typeMismatch: function (input, val, cache){
-			if(val === '' || cache.nodeName == 'select'){return false;}
-			var ret = false;
-			if(!('type' in cache)){
-				cache.type = getType(input[0]);
-			}
-			
-			if(typeModels[cache.type] && typeModels[cache.type].mismatch){
-				ret = typeModels[cache.type].mismatch(val, input);
-			} else if('validity' in input[0]){
-				ret = input[0].validity.typeMismatch;
-			}
-			return ret;
-		},
 		patternMismatch: function(input, val, cache) {
 			if(val === '' || cache.nodeName == 'select'){return false;}
 			var pattern = input.attr('pattern');
@@ -2005,6 +2000,23 @@ var validityRules = {
 		}
 	}
 ;
+
+$.each({typeMismatch: 'mismatch', badInput: 'bad'}, function(name, fn){
+	validityRules[name] = function (input, val, cache){
+		if(val === '' || cache.nodeName == 'select'){return false;}
+		var ret = false;
+		if(!('type' in cache)){
+			cache.type = getType(input[0]);
+		}
+		
+		if(typeModels[cache.type] && typeModels[cache.type][fn]){
+			ret = typeModels[cache.type][fn](val, input);
+		} else if('validity' in input[0]){
+			ret = input[0].validity[name] || input[0].validity.typeMismatch || false;
+		}
+		return ret;
+	};
+});
 
 webshims.addValidityRule = function(type, fn){
 	validityRules[type] = fn;
@@ -3642,7 +3654,10 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 		typeMismatch: {
 			defaultMessage: 'Please enter a valid value.',
 			email: 'Please enter an email address.',
-			url: 'Please enter a URL.',
+			url: 'Please enter a URL.'
+		},
+		badInput: {
+			defaultMessage: 'Please enter a valid value.',
 			number: 'Please enter a number.',
 			date: 'Please enter a date.',
 			time: 'Please enter a time.',
@@ -3695,13 +3710,16 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 		typeMismatch: {
 			defaultMessage: '{%value} ist in diesem Feld nicht zulässig.',
 			email: '{%value} ist keine gültige E-Mail-Adresse.',
-			url: '{%value} ist kein(e) gültige(r) Webadresse/Pfad.',
-			number: '{%value} ist keine Nummer.',
-			date: '{%value} ist kein Datum.',
-			time: '{%value} ist keine Uhrzeit.',
-			month: '{%value} ist in diesem Feld nicht zulässig.',
-			range: '{%value} ist keine Nummer.',
-			"datetime-local": '{%value} ist kein Datum-Uhrzeit Format.'
+			url: '{%value} ist kein(e) gültige(r) Webadresse/Pfad.'
+		},
+		badInput: {
+			defaultMessage: 'Geben Sie einen zulässigen Wert ein.',
+			number: 'Geben Sie eine Nummer ein.',
+			date: 'Geben Sie ein Datum ein.',
+			time: 'Geben Sie eine Uhrzeit ein.',
+			month: 'Geben Sie einen Monat mit Jahr ein.',
+			range: 'Geben Sie eine Nummer.',
+			"datetime-local": 'Geben Sie ein Datum mit Uhrzeit ein.'
 		},
 		rangeUnderflow: {
 			defaultMessage: '{%value} ist zu niedrig. {%min} ist der unterste Wert, den Sie benutzen können.'
@@ -3749,11 +3767,17 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 	
 	webshims.createValidationMessage = function(elem, name){
 		var widget;
-		var message = getMessageFromObj(currentValidationMessage[name], elem);
 		var type = $.prop(elem, 'type');
+		var message = getMessageFromObj(currentValidationMessage[name], elem);
+		if(!message && name == 'badInput'){
+			message = getMessageFromObj(currentValidationMessage.typeMismatch, elem);
+		}
+		if(!message && name == 'typeMismatch'){
+			message = getMessageFromObj(currentValidationMessage.badInput, elem);
+		}
 		if(!message){
 			message = getMessageFromObj(validityMessages[''][name], elem) || $.prop(elem, 'validationMessage');
-			webshims.info('could not find errormessage for: '+ name +' / '+ type +'. in language: '+$.webshims.activeLang());
+			webshims.info('could not find errormessage for: '+ name +' / '+ type +'. in language: '+webshims.activeLang());
 		}
 		if(message){
 			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
@@ -3796,20 +3820,14 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 	webshims.activeLang({
 		register: 'form-core',
 		callback: function(val){
-			$.each(validityMessages, function(i, val){
-				if(validityMessages[val]){
-					currentValidationMessage = validityMessages[val];
-					return false;
-				}
-			});
+			if(validityMessages[val]){
+				currentValidationMessage = validityMessages[val];
+			}
 		}
 	});
 	
 	implementProperties.forEach(function(messageProp){
-		var skipNames = {
-			valid: 1,
-			badInput: 1
-		};
+		
 		webshims.defineNodeNamesProperty(['fieldset', 'output', 'button'], messageProp, {
 			prop: {
 				value: '',
@@ -3838,16 +3856,14 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 							if(message){return message;}
 						}
 						$.each(validity, function(name, prop){
-							if(skipNames[name] || !prop){return;}
+							if(name == 'valid' || !prop){return;}
 							
 							message = webshims.createValidationMessage(elem, name);
 							if(message){
 								return false;
 							}
 						});
-						if(!message && validity.badInput){
-							message = webshims.createValidationMessage(elem, 'typeMismatch') || webshims.createValidationMessage(elem, 'valueMissing');
-						}
+						
 						return message || '';
 					},
 					writeable: false
@@ -4162,7 +4178,8 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 			}
 		});
 	};
-	var options = webshims.cfg.mediaelement;
+	var wsCfg = webshims.cfg;
+	var options = wsCfg.mediaelement;
 	var hasFullTrackSupport;
 	var hasSwf;
 	if(!options){
@@ -4338,6 +4355,14 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			webshims.loader.loadList(['track-ui']);
 		});
 	};
+//	var loadMediaGroup = function(){
+//		if(!loadMediaGroup.loaded){
+//			loadMediaGroup.loaded = true;
+//			webshims.ready(window.MediaController ? 'WINDOWLOAD' : 'DOM', function(){
+//				webshims.loader.loadList(['mediagroup']);
+//			});
+//		}
+//	};
 	var loadYt = (function(){
 		var loaded;
 		return function(){
@@ -4361,6 +4386,11 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		test: !hasYt,
 		d: ['dom-support']
 	});
+	
+	
+//	webshims.addModule('mediagroup', {
+//		d: ['mediaelement', 'dom-support']
+//	});
 	
 	mediaelement.mimeTypes = {
 		audio: {
@@ -4660,8 +4690,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			
 		};
 		
-		
-		
 		webshims.ready('dom-support', function(){
 			handleMedia = true;
 			
@@ -4670,7 +4698,8 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			}
 			
 			['audio', 'video'].forEach(function(nodeName){
-				var supLoad = webshims.defineNodeNameProperty(nodeName, 'load',  {
+				var supLoad, supController;
+				supLoad = webshims.defineNodeNameProperty(nodeName, 'load',  {
 					prop: {
 						value: function(){
 							var data = webshims.data(this, 'mediaelement');
@@ -4701,7 +4730,59 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 						}
 					}
 				});
+				
+//				supController = webshims.defineNodeNameProperty(nodeName, 'controller',  {
+//					prop: {
+//						get: function(type){
+//							if(!loadMediaGroup.loaded){
+//								loadMediaGroup();
+//							}
+//							if(mediaelement.controller){
+//								return mediaelement.controller[nodeName].get.apply(this, arguments);
+//							}
+//							return supController.prop._supget && supController.prop._supget.apply(this, arguments);
+//						},
+//						set: function(){
+//							var that = this;
+//							var args = arguments;
+//							if(!loadMediaGroup.loaded){
+//								loadMediaGroup();
+//							}
+//							if(mediaelement.controller){
+//								return mediaelement.controller[nodeName].set.apply(that, args);
+//							} else {
+//								webshims.ready('mediagroup', function(){
+//									mediaelement.controller[nodeName].set.apply(that, args);
+//								});
+//							}
+//							return supController.prop._supset && supController.prop._supset.apply(this, arguments);
+//						}
+//					}
+//				});
+				
+//				webshims.ready('mediagroup', function(){
+//					mediaelement.controller[nodeName].sup = supController;
+//				});
 			});
+			
+//			webshims.onNodeNamesPropertyModify(['audio', 'video'], ['mediaGroup'], {
+//				set: function(){
+//					var that = this;
+//					var args = arguments;
+//					if(!loadMediaGroup.loaded){
+//						loadMediaGroup();
+//					}
+//					if(mediaelement.mediagroup){
+//						mediaelement.mediagroup.set.apply(that, args);
+//					} else {
+//						webshims.ready('mediagroup', function(){
+//							mediaelement.mediagroup.set.apply(that, args);
+//						});
+//					}
+//				},
+//				initAttr: true
+//			});
+			
 			webshims.onNodeNamesPropertyModify(['audio', 'video'], ['src', 'poster'], {
 				set: function(){
 					var elem = this;
@@ -4738,9 +4819,12 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 								handleMedia = true;
 								return false;
 							}
-							if((!hasFullTrackSupport || webshims.modules.track.options.override) && !loadTrackUi.loaded && $('track', this).length){
+							if((!hasFullTrackSupport || wsCfg.track.override) && !loadTrackUi.loaded && $('track', this).length){
 								loadTrackUi();
 							}
+//							if(!loadMediaGroup.loaded && this.getAttribute('mediagroup')){
+//								loadMediaGroup();
+//							}
 						})
 					;
 				}

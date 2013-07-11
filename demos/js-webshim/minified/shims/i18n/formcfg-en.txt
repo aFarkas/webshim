@@ -4,7 +4,10 @@ webshims.validityMessages.en = {
 	"typeMismatch": {
 		"defaultMessage": "Please enter a valid value.",
 		"email": "Please enter an email address.",
-		"url": "Please enter a URL.",
+		"url": "Please enter a URL."
+	},
+	"badInput": {
+		"defaultMessage": "Please enter a valid value.",
 		"number": "Please enter a number.",
 		"date": "Please enter a date.",
 		"time": "Please enter a time.",

@@ -96,6 +96,7 @@ asyncTest("general validity Modul", function(){
 	if(navigator.userAgent.indexOf('Chrome') === -1){
 		same($('#email').prop('validity'), {
 			typeMismatch: false,
+			badInput: false,
 			rangeUnderflow: false,
 			rangeOverflow: false,
 			stepMismatch: false,
@@ -109,6 +110,7 @@ asyncTest("general validity Modul", function(){
 		$('#email').val('some input');
 		same($('#email').prop('validity'), {
 			typeMismatch: true,
+			badInput: false,
 			rangeUnderflow: false,
 			rangeOverflow: false,
 			stepMismatch: false,

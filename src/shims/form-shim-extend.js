@@ -75,6 +75,7 @@ var validityPrototype = {
 	customError: false,
 
 	typeMismatch: false,
+	badInput: false,
 	rangeUnderflow: false,
 	rangeOverflow: false,
 	stepMismatch: false,
@@ -134,20 +135,6 @@ var validityRules = {
 		tooLong: function(){
 			return false;
 		},
-		typeMismatch: function (input, val, cache){
-			if(val === '' || cache.nodeName == 'select'){return false;}
-			var ret = false;
-			if(!('type' in cache)){
-				cache.type = getType(input[0]);
-			}
-			
-			if(typeModels[cache.type] && typeModels[cache.type].mismatch){
-				ret = typeModels[cache.type].mismatch(val, input);
-			} else if('validity' in input[0]){
-				ret = input[0].validity.typeMismatch;
-			}
-			return ret;
-		},
 		patternMismatch: function(input, val, cache) {
 			if(val === '' || cache.nodeName == 'select'){return false;}
 			var pattern = input.attr('pattern');
@@ -163,6 +150,23 @@ var validityRules = {
 		}
 	}
 ;
+
+$.each({typeMismatch: 'mismatch', badInput: 'bad'}, function(name, fn){
+	validityRules[name] = function (input, val, cache){
+		if(val === '' || cache.nodeName == 'select'){return false;}
+		var ret = false;
+		if(!('type' in cache)){
+			cache.type = getType(input[0]);
+		}
+		
+		if(typeModels[cache.type] && typeModels[cache.type][fn]){
+			ret = typeModels[cache.type][fn](val, input);
+		} else if('validity' in input[0]){
+			ret = input[0].validity[name] || input[0].validity.typeMismatch || false;
+		}
+		return ret;
+	};
+});
 
 webshims.addValidityRule = function(type, fn){
 	validityRules[type] = fn;

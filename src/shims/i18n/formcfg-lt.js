@@ -1,40 +1,41 @@
-//errormessages for en are already included in webshims core, this is only for information (by default en is equal to jQuery.webshims.validityMessages[""]):
-
 webshims.validityMessages.lt = {
-    "typeMismatch": {
-        "defaultMessage": "Prašom įvesti teisingą reikšmę.",
-        "email": "Prašom įvesti el. pašto adresą.",
-        "url": "Prašom įvesti nuorodą (URL).",
-        "number": "Prašom įvesti skaičių.",
-        "date": "Prašom įvesti datą.",
-        "time": "Prašom įvesti laiką.",
-        "range": "Neteisingas skaičių rėžis.",
-        "month": "Prašom įvesti mėnesį.",
-        "datetime-local": "Prašom įvesti datą ir laiką."
-    },
-    "rangeUnderflow": {
-        "defaultMessage": "Reikšmė privalo būti didesnė arba lygi {%min}.",
-        "date": "Data turi būti ne ankstesnė negu {%min}.",
-        "time": "Laikas turi būti ne ankstesnis negu {%min}.",
-        "datetime-local": "Data ir laikas turi būti ne ankstesni negu {%min}.",
-        "month": "Mėnuo turi būti {%min} arba vėlesnis."
-    },
-    "rangeOverflow": {
-        "defaultMessage": "Reikšmė privalo būti mažesnė arba lygi {%max}.",
-        "date": "Data turi būti ne vėlesnė negu {%max}.",
-        "time": "Laikas turi būti ne vėlesnis negu {%max}.",
-        "datetime-local": "Data ir laikas turi būti ne vėlesni negu {%max}.",
-        "month": "Mėnuo turi būti {%max} arba ankstesnis."
-    },
-    "stepMismatch": "Neteisinga reikšmė.",
-    "tooLong": "Prašom įvesti ne daugiau negu {%maxlength} simbolių. Jūs įvedėte {%valueLen}.",
-    "patternMismatch": "Neteisinga lauko {%title} reikšmė.",
-    "valueMissing": {
-        "defaultMessage": "Šis laukas yra privalomas.",
-        "checkbox": "Prašome pažymėti šį žymimąjį laukelį, jis yra privalomas.",
-        "select": "Prašom pasirinkti reikšmę iš sąrašo.",
-        "radio": "Prašom pasirinkti vieną iš reikšmių."
-    }
+	"typeMismatch": {
+		"defaultMessage": "Prašom įvesti teisingą reikšmę.",
+		"email": "Prašom įvesti el. pašto adresą.",
+		"url": "Prašom įvesti nuorodą (URL)."
+	},
+	"badInput": {
+		"defaultMessage": "Prašom įvesti teisingą reikšmę.",
+		"number": "Prašom įvesti skaičių.",
+		"date": "Prašom įvesti datą.",
+		"time": "Prašom įvesti laiką.",
+		"range": "Neteisingas skaičių rėžis.",
+		"month": "Prašom įvesti mėnesį.",
+		"datetime-local": "Prašom įvesti datą ir laiką."
+	},
+	"rangeUnderflow": {
+		"defaultMessage": "Reikšmė privalo būti didesnė arba lygi {%min}.",
+		"date": "Data turi būti ne ankstesnė negu {%min}.",
+		"time": "Laikas turi būti ne ankstesnis negu {%min}.",
+		"datetime-local": "Data ir laikas turi būti ne ankstesni negu {%min}.",
+		"month": "Mėnuo turi būti {%min} arba vėlesnis."
+	},
+	"rangeOverflow": {
+		"defaultMessage": "Reikšmė privalo būti mažesnė arba lygi {%max}.",
+		"date": "Data turi būti ne vėlesnė negu {%max}.",
+		"time": "Laikas turi būti ne vėlesnis negu {%max}.",
+		"datetime-local": "Data ir laikas turi būti ne vėlesni negu {%max}.",
+		"month": "Mėnuo turi būti {%max} arba ankstesnis."
+	},
+	"stepMismatch": "Neteisinga reikšmė.",
+	"tooLong": "Prašom įvesti ne daugiau negu {%maxlength} simbolių. Jūs įvedėte {%valueLen}.",
+	"patternMismatch": "Neteisinga lauko {%title} reikšmė.",
+	"valueMissing": {
+		"defaultMessage": "Šis laukas yra privalomas.",
+		"checkbox": "Prašome pažymėti šį žymimąjį laukelį, jis yra privalomas.",
+		"select": "Prašom pasirinkti reikšmę iš sąrašo.",
+		"radio": "Prašom pasirinkti vieną iš reikšmių."
+	}
 };
 
 webshims.formcfg.lt = {

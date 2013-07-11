@@ -171,6 +171,14 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 						return false;
 					}
 				});
+				if(typeof message == 'object'){
+					if(validity.typeMismatch && message.badInput){
+						message = message.badInput;
+					}
+					if(validity.badInput && message.typeMismatch){
+						message = message.typeMismatch;
+					}
+				}
 			}
 		}
 		

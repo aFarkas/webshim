@@ -1762,6 +1762,14 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 						return false;
 					}
 				});
+				if(typeof message == 'object'){
+					if(validity.typeMismatch && message.badInput){
+						message = message.badInput;
+					}
+					if(validity.badInput && message.typeMismatch){
+						message = message.typeMismatch;
+					}
+				}
 			}
 		}
 		
@@ -2144,7 +2152,8 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 			}
 		});
 	};
-	var options = webshims.cfg.mediaelement;
+	var wsCfg = webshims.cfg;
+	var options = wsCfg.mediaelement;
 	var hasFullTrackSupport;
 	var hasSwf;
 	if(!options){
@@ -2320,6 +2329,14 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			webshims.loader.loadList(['track-ui']);
 		});
 	};
+//	var loadMediaGroup = function(){
+//		if(!loadMediaGroup.loaded){
+//			loadMediaGroup.loaded = true;
+//			webshims.ready(window.MediaController ? 'WINDOWLOAD' : 'DOM', function(){
+//				webshims.loader.loadList(['mediagroup']);
+//			});
+//		}
+//	};
 	var loadYt = (function(){
 		var loaded;
 		return function(){
@@ -2343,6 +2360,11 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		test: !hasYt,
 		d: ['dom-support']
 	});
+	
+	
+//	webshims.addModule('mediagroup', {
+//		d: ['mediaelement', 'dom-support']
+//	});
 	
 	mediaelement.mimeTypes = {
 		audio: {
@@ -2642,8 +2664,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			
 		};
 		
-		
-		
 		webshims.ready('dom-support', function(){
 			handleMedia = true;
 			
@@ -2652,7 +2672,8 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			}
 			
 			['audio', 'video'].forEach(function(nodeName){
-				var supLoad = webshims.defineNodeNameProperty(nodeName, 'load',  {
+				var supLoad, supController;
+				supLoad = webshims.defineNodeNameProperty(nodeName, 'load',  {
 					prop: {
 						value: function(){
 							var data = webshims.data(this, 'mediaelement');
@@ -2683,7 +2704,59 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 						}
 					}
 				});
+				
+//				supController = webshims.defineNodeNameProperty(nodeName, 'controller',  {
+//					prop: {
+//						get: function(type){
+//							if(!loadMediaGroup.loaded){
+//								loadMediaGroup();
+//							}
+//							if(mediaelement.controller){
+//								return mediaelement.controller[nodeName].get.apply(this, arguments);
+//							}
+//							return supController.prop._supget && supController.prop._supget.apply(this, arguments);
+//						},
+//						set: function(){
+//							var that = this;
+//							var args = arguments;
+//							if(!loadMediaGroup.loaded){
+//								loadMediaGroup();
+//							}
+//							if(mediaelement.controller){
+//								return mediaelement.controller[nodeName].set.apply(that, args);
+//							} else {
+//								webshims.ready('mediagroup', function(){
+//									mediaelement.controller[nodeName].set.apply(that, args);
+//								});
+//							}
+//							return supController.prop._supset && supController.prop._supset.apply(this, arguments);
+//						}
+//					}
+//				});
+				
+//				webshims.ready('mediagroup', function(){
+//					mediaelement.controller[nodeName].sup = supController;
+//				});
 			});
+			
+//			webshims.onNodeNamesPropertyModify(['audio', 'video'], ['mediaGroup'], {
+//				set: function(){
+//					var that = this;
+//					var args = arguments;
+//					if(!loadMediaGroup.loaded){
+//						loadMediaGroup();
+//					}
+//					if(mediaelement.mediagroup){
+//						mediaelement.mediagroup.set.apply(that, args);
+//					} else {
+//						webshims.ready('mediagroup', function(){
+//							mediaelement.mediagroup.set.apply(that, args);
+//						});
+//					}
+//				},
+//				initAttr: true
+//			});
+			
 			webshims.onNodeNamesPropertyModify(['audio', 'video'], ['src', 'poster'], {
 				set: function(){
 					var elem = this;
@@ -2720,9 +2793,12 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 								handleMedia = true;
 								return false;
 							}
-							if((!hasFullTrackSupport || webshims.modules.track.options.override) && !loadTrackUi.loaded && $('track', this).length){
+							if((!hasFullTrackSupport || wsCfg.track.override) && !loadTrackUi.loaded && $('track', this).length){
 								loadTrackUi();
 							}
+//							if(!loadMediaGroup.loaded && this.getAttribute('mediagroup')){
+//								loadMediaGroup();
+//							}
 						})
 					;
 				}

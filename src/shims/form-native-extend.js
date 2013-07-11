@@ -32,22 +32,24 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		validityRules[type] = fn;
 	};
 	
-	webshims.addValidityRule('typeMismatch', function (input, val, cache, validityState){
-		if(val === ''){return false;}
-		var ret = validityState.typeMismatch;
-		if(!('type' in cache)){
-			cache.type = (input[0].getAttribute('type') || '').toLowerCase();
-		}
-		
-		if(typeModels[cache.type] && typeModels[cache.type].mismatch){
-			ret = typeModels[cache.type].mismatch(val, input);
-		}
-		return ret;
+	$.each({typeMismatch: 'mismatch', badInput: 'bad'}, function(name, fn){
+		webshims.addValidityRule(name, function (input, val, cache, validityState){
+			if(val === ''){return false;}
+			var ret = validityState[name];
+			if(!('type' in cache)){
+				cache.type = (input[0].getAttribute('type') || '').toLowerCase();
+			}
+			
+			if(typeModels[cache.type] && typeModels[cache.type][fn]){
+				ret = typeModels[cache.type][fn](val, input);
+			}
+			return ret || false;
+		});
 	});
 	
 	var formsExtModule = webshims.modules['form-number-date-api'];
 	var overrideValidity = formsExtModule.loaded && !formsExtModule.test();
-	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
+	var validityProps = ['customError', 'badInput','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	
 	var validityChanger = ['value'];
 	var validityElements = [];
@@ -113,7 +115,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 						}
 						stopValidity = true;
 						var jElm 			= $(elem),
-							cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
+							cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
 							val				= jElm.val(),
 							customError 	= !!(webshims.data(elem, 'hasCustomError')),
 							setCustomMessage
@@ -140,7 +142,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 						
 						$.each(validityRules, function(rule, fn){
 							validityState[rule] = fn(jElm, val, cache, validityState);
-							if( validityState[rule] && (validityState.valid || !setCustomMessage) && ((typeModels[cache.type] && typeModels[cache.type].mismatch)) ) {
+							if( validityState[rule] && (validityState.valid || !setCustomMessage) && ((typeModels[cache.type])) ) {
 								oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, rule));
 								validityState.valid = false;
 								setCustomMessage = true;

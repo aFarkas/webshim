@@ -1,8 +1,11 @@
 webshims.validityMessages.pl = {
-  "typeMismatch": {
+	"typeMismatch": {
 		"defaultMessage": "Wprowadź poprawną wartość.",
 		"email": "Wprowadź adres e-mail.",
-		"url": "Wprowadź adres URL.",
+		"url": "Wprowadź adres URL."
+	},
+	"badInput": {
+		"defaultMessage": "Wprowadź poprawną wartość.",
 		"number": "Wprowadź numer.",
 		"date": "Wprowadź datę.",
 		"time": "Wprowadź czas.",

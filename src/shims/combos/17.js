@@ -277,7 +277,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 	var typeProtos = {
 		
 		number: {
-			mismatch: function(val){
+			bad: function(val){
 				return !(isNumber(val));
 			},
 			step: 1,
@@ -296,7 +296,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			maxDefault: 100
 		},
 		color: {
-			mismatch: (function(){
+			bad: (function(){
 				var cReg = /^\u0023[a-f0-9]{6}$/;
 				return function(val){
 					return (!val || val.length != 7 || !(cReg.test(val)));
@@ -304,7 +304,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			})()
 		},
 		date: {
-			mismatch: function(val){
+			bad: function(val){
 				if(!val || !val.split || !(/\d$/.test(val))){return true;}
 				var i;
 				var valA = val.split(/\u002D/);
@@ -329,14 +329,14 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			//stepBase: 0, 0 = default
 			stepScaleFactor:  86400000,
 			asDate: function(val, _noMismatch){
-				if(!_noMismatch && this.mismatch(val)){
+				if(!_noMismatch && this.bad(val)){
 					return null;
 				}
 				return new Date(this.asNumber(val, true));
 			},
 			asNumber: function(str, _noMismatch){
 				var ret = nan;
-				if(_noMismatch || !this.mismatch(str)){
+				if(_noMismatch || !this.bad(str)){
 					str = str.split(/\u002D/);
 					ret = Date.UTC(str[0], str[1] - 1, str[2]);
 				}
@@ -353,7 +353,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		 * ToDO: WEEK
 		 */
 //		week: {
-//			mismatch: function(val){
+//			bad: function(val){
 //				if(!val || !val.split){return true;}
 //				var valA = val.split('-W');
 //				var ret = true;
@@ -367,7 +367,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 //			stepBase: -259200000,
 //			asDate: function(str, _noMismatch){
 //				var ret = null;
-//				if(_noMismatch || !this.mismatch(str)){
+//				if(_noMismatch || !this.bad(str)){
 //					ret = str.split('-W');
 //					ret = setWeek(ret[0], ret[1]);
 //				}
@@ -400,7 +400,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 //			}
 //		},
 		time: {
-			mismatch: function(val, _getParsed){
+			bad: function(val, _getParsed){
 				if(!val || !val.split || !(/\d$/.test(val))){return true;}
 				val = val.split(/\u003A/);
 				if(val.length < 2 || val.length > 3){return true;}
@@ -445,7 +445,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			},
 			asNumber: function(val){
 				var ret = nan;
-				val = this.mismatch(val, true);
+				val = this.bad(val, true);
 				if(val !== true){
 					ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
 					if(val[1]){
@@ -473,8 +473,8 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			}
 		},
 		month: {
-			mismatch: function(val){
-				return typeProtos.date.mismatch(val+'-01');
+			bad: function(val){
+				return typeProtos.date.bad(val+'-01');
 			},
 			step: 1,
 			stepScaleFactor:  false,
@@ -485,7 +485,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			asNumber: function(val){
 				//1970-01
 				var ret = nan;
-				if(val && !this.mismatch(val)){
+				if(val && !this.bad(val)){
 					val = val.split(/\u002D/);
 					val[0] = (val[0] * 1) - 1970;
 					val[1] = (val[1] * 1) - 1;
@@ -520,10 +520,10 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			}
 		}
 //		,'datetime-local': {
-//			mismatch: function(val, _getParsed){
+//			bad: function(val, _getParsed){
 //				if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
 //				val = val.split(/\u0054/);
-//				return ( typeProtos.date.mismatch(val[0]) || typeProtos.time.mismatch(val[1], _getParsed) );
+//				return ( typeProtos.date.bad(val[0]) || typeProtos.time.bad(val[1], _getParsed) );
 //			},
 //			noAsDate: true,
 //			asDate: function(val){
@@ -533,7 +533,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 //			},
 //			asNumber: function(val){
 //				var ret = nan;
-//				var time = this.mismatch(val, true);
+//				var time = this.bad(val, true);
 //				if(time !== true){
 //					val = val.split(/\u0054/)[0].split(/\u002D/);
 //					

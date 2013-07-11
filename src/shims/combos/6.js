@@ -32,22 +32,24 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		validityRules[type] = fn;
 	};
 	
-	webshims.addValidityRule('typeMismatch', function (input, val, cache, validityState){
-		if(val === ''){return false;}
-		var ret = validityState.typeMismatch;
-		if(!('type' in cache)){
-			cache.type = (input[0].getAttribute('type') || '').toLowerCase();
-		}
-		
-		if(typeModels[cache.type] && typeModels[cache.type].mismatch){
-			ret = typeModels[cache.type].mismatch(val, input);
-		}
-		return ret;
+	$.each({typeMismatch: 'mismatch', badInput: 'bad'}, function(name, fn){
+		webshims.addValidityRule(name, function (input, val, cache, validityState){
+			if(val === ''){return false;}
+			var ret = validityState[name];
+			if(!('type' in cache)){
+				cache.type = (input[0].getAttribute('type') || '').toLowerCase();
+			}
+			
+			if(typeModels[cache.type] && typeModels[cache.type][fn]){
+				ret = typeModels[cache.type][fn](val, input);
+			}
+			return ret || false;
+		});
 	});
 	
 	var formsExtModule = webshims.modules['form-number-date-api'];
 	var overrideValidity = formsExtModule.loaded && !formsExtModule.test();
-	var validityProps = ['customError','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
+	var validityProps = ['customError', 'badInput','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
 	
 	var validityChanger = ['value'];
 	var validityElements = [];
@@ -113,7 +115,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 						}
 						stopValidity = true;
 						var jElm 			= $(elem),
-							cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
+							cache 			= {type: (elem.getAttribute && elem.getAttribute('type') || elem.type || '').toLowerCase(), nodeName: (elem.nodeName || '').toLowerCase()},
 							val				= jElm.val(),
 							customError 	= !!(webshims.data(elem, 'hasCustomError')),
 							setCustomMessage
@@ -140,7 +142,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 						
 						$.each(validityRules, function(rule, fn){
 							validityState[rule] = fn(jElm, val, cache, validityState);
-							if( validityState[rule] && (validityState.valid || !setCustomMessage) && ((typeModels[cache.type] && typeModels[cache.type].mismatch)) ) {
+							if( validityState[rule] && (validityState.valid || !setCustomMessage) && ((typeModels[cache.type])) ) {
 								oldSetCustomValidity[nodeName].call(elem, webshims.createValidationMessage(elem, rule));
 								validityState.valid = false;
 								setCustomMessage = true;
@@ -487,7 +489,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 	var typeProtos = {
 		
 		number: {
-			mismatch: function(val){
+			bad: function(val){
 				return !(isNumber(val));
 			},
 			step: 1,
@@ -506,7 +508,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			maxDefault: 100
 		},
 		color: {
-			mismatch: (function(){
+			bad: (function(){
 				var cReg = /^\u0023[a-f0-9]{6}$/;
 				return function(val){
 					return (!val || val.length != 7 || !(cReg.test(val)));
@@ -514,7 +516,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			})()
 		},
 		date: {
-			mismatch: function(val){
+			bad: function(val){
 				if(!val || !val.split || !(/\d$/.test(val))){return true;}
 				var i;
 				var valA = val.split(/\u002D/);
@@ -539,14 +541,14 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			//stepBase: 0, 0 = default
 			stepScaleFactor:  86400000,
 			asDate: function(val, _noMismatch){
-				if(!_noMismatch && this.mismatch(val)){
+				if(!_noMismatch && this.bad(val)){
 					return null;
 				}
 				return new Date(this.asNumber(val, true));
 			},
 			asNumber: function(str, _noMismatch){
 				var ret = nan;
-				if(_noMismatch || !this.mismatch(str)){
+				if(_noMismatch || !this.bad(str)){
 					str = str.split(/\u002D/);
 					ret = Date.UTC(str[0], str[1] - 1, str[2]);
 				}
@@ -563,7 +565,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		 * ToDO: WEEK
 		 */
 //		week: {
-//			mismatch: function(val){
+//			bad: function(val){
 //				if(!val || !val.split){return true;}
 //				var valA = val.split('-W');
 //				var ret = true;
@@ -577,7 +579,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 //			stepBase: -259200000,
 //			asDate: function(str, _noMismatch){
 //				var ret = null;
-//				if(_noMismatch || !this.mismatch(str)){
+//				if(_noMismatch || !this.bad(str)){
 //					ret = str.split('-W');
 //					ret = setWeek(ret[0], ret[1]);
 //				}
@@ -610,7 +612,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 //			}
 //		},
 		time: {
-			mismatch: function(val, _getParsed){
+			bad: function(val, _getParsed){
 				if(!val || !val.split || !(/\d$/.test(val))){return true;}
 				val = val.split(/\u003A/);
 				if(val.length < 2 || val.length > 3){return true;}
@@ -655,7 +657,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			},
 			asNumber: function(val){
 				var ret = nan;
-				val = this.mismatch(val, true);
+				val = this.bad(val, true);
 				if(val !== true){
 					ret = Date.UTC('1970', 0, 1, val[0][0], val[0][1], val[0][2] || 0);
 					if(val[1]){
@@ -683,8 +685,8 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			}
 		},
 		month: {
-			mismatch: function(val){
-				return typeProtos.date.mismatch(val+'-01');
+			bad: function(val){
+				return typeProtos.date.bad(val+'-01');
 			},
 			step: 1,
 			stepScaleFactor:  false,
@@ -695,7 +697,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			asNumber: function(val){
 				//1970-01
 				var ret = nan;
-				if(val && !this.mismatch(val)){
+				if(val && !this.bad(val)){
 					val = val.split(/\u002D/);
 					val[0] = (val[0] * 1) - 1970;
 					val[1] = (val[1] * 1) - 1;
@@ -730,10 +732,10 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			}
 		}
 //		,'datetime-local': {
-//			mismatch: function(val, _getParsed){
+//			bad: function(val, _getParsed){
 //				if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
 //				val = val.split(/\u0054/);
-//				return ( typeProtos.date.mismatch(val[0]) || typeProtos.time.mismatch(val[1], _getParsed) );
+//				return ( typeProtos.date.bad(val[0]) || typeProtos.time.bad(val[1], _getParsed) );
 //			},
 //			noAsDate: true,
 //			asDate: function(val){
@@ -743,7 +745,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 //			},
 //			asNumber: function(val){
 //				var ret = nan;
-//				var time = this.mismatch(val, true);
+//				var time = this.bad(val, true);
 //				if(time !== true){
 //					val = val.split(/\u0054/)[0].split(/\u002D/);
 //					
