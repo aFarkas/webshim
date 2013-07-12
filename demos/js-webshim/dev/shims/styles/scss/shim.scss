@@ -658,33 +658,6 @@ input[type="color"] {
 	&.no-transition	{
 		display: none;
 	}
-
-	button {
-		display: inline-block;
-		overflow: visible;
-		position: relative;
-		margin: 0;
-		border: 0;
-		padding: 0;
-		-moz-box-sizing: content-box;
-		box-sizing: content-box;
-		-webkit-appearance: none;
-		appearance: none;
-		box-sizing: content-box;
-		font-family: arial, sans-serif;
-		background: transparent;
-		cursor: pointer;
-
-		&::-moz-focus-inner {
-			border: 0;
-			padding: 0;
-		}
-
-		&[disabled] {
-			cursor: default;
-			color: #888;
-		}
-	}
 	
 	&.ws-po-visible {
 		visibility: visible;
@@ -724,6 +697,34 @@ input[type="color"] {
 	background: #fefefe;
 	padding: 5px;
 	box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+	
+	
+	button {
+		display: inline-block;
+		overflow: visible;
+		position: relative;
+		margin: 0;
+		border: 0;
+		padding: 0;
+		-moz-box-sizing: content-box;
+		box-sizing: content-box;
+		-webkit-appearance: none;
+		appearance: none;
+		box-sizing: content-box;
+		font-family: arial, sans-serif;
+		background: transparent;
+		cursor: pointer;
+
+		&::-moz-focus-inner {
+			border: 0;
+			padding: 0;
+		}
+
+		&[disabled] {
+			cursor: default;
+			color: #888;
+		}
+	}
 }
 
 .ws-po-arrow {

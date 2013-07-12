@@ -2720,8 +2720,20 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			options: options
 		});
 		
+		webshims.inlinePopover = {
+			_create: function(){
+				this.element = $('<div class="ws-inline-picker"><div class="ws-po-box" /></div>').data('wspopover', this);
+				this.contentElement = $('.ws-po-box', this.element);
+				this.element.insertAfter(this.options.prepareFor);
+			},
+			show: $.noop,
+			hide: $.noop,
+			isVisible: true
+		};
+		
 		picker._genericSetFocus = function(element, _noFocus){
 			element = $(element || this.activeButton);
+			
 			if(!this.popover.openedByFocus && !_noFocus){
 				var that = this;
 				var setFocus = function(noTrigger){
@@ -2746,12 +2758,14 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				data.setChange(val);
 			},
 			cancel: function(val, popover, data){
-				popover.stopOpen = true;
-				data.element.getShadowFocusElement().focus();
-				setTimeout(function(){
-					popover.stopOpen = false;
-				}, 9);
-				popover.hide();
+				if(!data.options.inlinePicker){
+					popover.stopOpen = true;
+					data.element.getShadowFocusElement().focus();
+					setTimeout(function(){
+						popover.stopOpen = false;
+					}, 9);
+					popover.hide();
+				}
 			}
 		};
 		
@@ -2764,28 +2778,31 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			popover.element.on('updatepickercontent pickerchange', function(){
 				tabbable = false;
 			});
-			popover.contentElement.on({
-				keydown: function(e){
-					if(e.keyCode == 9){
-						if(!tabbable){
-							tabbable = $('input:not(:disabled), [tabindex="0"]:not(:disabled)', this).filter(':visible');
-						}
-						var index = tabbable.index(e.target);
-						if(e.shiftKey && index <= 0){
-							tabbable.last().focus();
+			
+			if(!data.options.inlinePicker){
+				popover.contentElement.on({
+					keydown: function(e){
+						if(e.keyCode == 9){
+							if(!tabbable){
+								tabbable = $('input:not(:disabled), [tabindex="0"]:not(:disabled)', this).filter(':visible');
+							}
+							var index = tabbable.index(e.target);
+							if(e.shiftKey && index <= 0){
+								tabbable.last().focus();
+								return false;
+							}
+							if(!e.shiftKey && index >= tabbable.length - 1){
+								tabbable.first().focus();
+								return false;
+							}
+						} else if(e.keyCode == 27){
+							data.element.getShadowFocusElement().focus();
+							popover.hide();
 							return false;
 						}
-						if(!e.shiftKey && index >= tabbable.length - 1){
-							tabbable.first().focus();
-							return false;
-						}
-					} else if(e.keyCode == 27){
-						data.element.getShadowFocusElement().focus();
-						popover.hide();
-						return false;
 					}
-				}
-			});
+				});
+			}
 			
 			data._propertyChange = (function(){
 				var timer;
@@ -2832,7 +2849,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		
 		picker._common = function(data){
 			var options = data.options;
-			var popover = webshims.objectCreate(webshims.wsPopover, {}, {prepareFor: data.element, position: options.widgetPosition});
+			var popover = webshims.objectCreate(options.inlinePicker ? webshims.inlinePopover : webshims.wsPopover, {}, {prepareFor: options.inlinePicker ? data.buttonWrapper : data.element, position: options.widgetPosition});
 			var opener = $('<button type="button" class="ws-popover-opener"><span /></button>').appendTo(data.buttonWrapper);
 			
 			
@@ -2841,7 +2858,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			};
 			var show = function(){
 				var type = loadPicker(data.type, 'DOM');
-				if(!options.disabled && !options.readonly && !popover.isVisible){
+				if(!options.disabled && !options.readonly && (options.inlinePicker || !popover.isVisible)){
 					webshims.ready(type, showPickerContent);
 					popover.show(data.element);
 				}
@@ -2882,6 +2899,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 						if(popover.activeElement){
 							popover.activeElement.removeClass('ws-focus');
 						}
+						if(options.inlinePicker){
+							popover.openedByFocus = true;
+						}
 					}
 				})
 			;
@@ -2897,24 +2917,29 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				opener.prop({disabled: true});
 			}
 			
-			opener
-				.on({
-					mousedown: function(){
-						stopPropagation.apply(this, arguments);
-						popover.preventBlur();
-					},
-					click: function(){
-						if(popover.isVisible && popover.activeElement){
-							popover.openedByFocus = false;
-							popover.activeElement.focus();
+			if(options.inlinePicker){
+				popover.openedByFocus = true;
+			} else {
+				opener
+					.on({
+						mousedown: function(){
+							stopPropagation.apply(this, arguments);
+							popover.preventBlur();
+						},
+						click: function(){
+							if(popover.isVisible && popover.activeElement){
+								popover.openedByFocus = false;
+								popover.activeElement.focus();
+							}
+							show();
+						},
+						focus: function(){
+							popover.preventBlur();
 						}
-						show();
-					},
-					focus: function(){
-						popover.preventBlur();
-					}
-				})
-			;
+					})
+				;
+			}
+			
 			
 			(function(){
 				var mouseFocus = false;
@@ -2958,7 +2983,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					}, 4);
 				}
 			});
-			
+			if(options.inlinePicker){
+				show();
+			}
 			loadPicker(data.type, 'WINDOWLOAD');
 		};
 		
