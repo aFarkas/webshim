@@ -2,8 +2,8 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	var isWebkit = 'webkitURL' in window;
 	var chromeBugs = isWebkit && Modernizr.formvalidation && !webshims.bugs.bustedValidity;
 	var webkitVersion = chromeBugs && parseFloat((navigator.userAgent.match(/Safari\/([\d\.]+)/) || ['', '999999'])[1], 10);
-	var invalidClass = 'user-error';
-	var validClass = 'user-success';
+	var invalidClass = options.iVal.errorClass || 'user-error';
+	var validClass = options.iVal.successClass || 'user-success';
 	var checkTypes = {checkbox: 1, radio: 1};
 	
 	var emptyJ = $([]);
@@ -76,6 +76,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		'datetime-local': 1
 	};
 	var switchValidityClass = function(e){
+		if(!options.iVal.sel){return;}
 		var elem, timer, shadowElem, shadowType;
 		if(!e.target){return;}
 		elem = $(e.target).getNativeElement()[0];
@@ -476,7 +477,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				}
 			}
 			if(!fieldWrapper){
-				fieldWrapper = $(elem).parent().closest(':not(span, label, em, strong, b, mark, p)');
+				fieldWrapper = $(elem).parent().closest(':not(span, label, em, strong, b, i, mark, p)');
 			}
 			return fieldWrapper;
 		},
