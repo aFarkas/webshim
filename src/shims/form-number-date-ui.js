@@ -1139,6 +1139,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			},
 			show: $.noop,
 			hide: $.noop,
+			preventBlur: $.noop,
 			isVisible: true
 		};
 		
@@ -1223,7 +1224,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					}
 				};
 				return function(prop){
-					if(prop == 'value'){return;}
+					if(prop == 'value' && !data.options.inlinePicker){return;}
 					popover.isDirty = true;
 					if(popover.isVisible){
 						clearTimeout(timer);
@@ -1328,6 +1329,18 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				opener.prop({disabled: true});
 			}
 			
+			
+			opener
+				.on({
+					click: function(){
+						if((options.inlinePicker || popover.isVisible) && popover.activeElement){
+							popover.openedByFocus = false;
+							popover.activeElement.focus();
+						}
+						show();
+					}
+				})
+			;
 			if(options.inlinePicker){
 				popover.openedByFocus = true;
 			} else {
@@ -1337,53 +1350,46 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 							stopPropagation.apply(this, arguments);
 							popover.preventBlur();
 						},
-						click: function(){
-							if(popover.isVisible && popover.activeElement){
-								popover.openedByFocus = false;
-								popover.activeElement.focus();
-							}
-							show();
-						},
 						focus: function(){
 							popover.preventBlur();
 						}
 					})
 				;
-			}
-			
-			
-			(function(){
-				var mouseFocus = false;
-				var resetMouseFocus = function(){
-					mouseFocus = false;
-				};
-				data.inputElements.on({
-					focus: function(){
-						if(!popover.stopOpen && (options.buttonOnly || options.openOnFocus || (mouseFocus && options.openOnMouseFocus))){
-							popover.openedByFocus = options.buttonOnly ? false : !options.noInput;
-							show();
-						} else {
+				
+				(function(){
+					var mouseFocus = false;
+					var resetMouseFocus = function(){
+						mouseFocus = false;
+					};
+					data.inputElements.on({
+						focus: function(){
+							if(!popover.stopOpen && (options.buttonOnly || options.openOnFocus || (mouseFocus && options.openOnMouseFocus))){
+								popover.openedByFocus = options.buttonOnly ? false : !options.noInput;
+								show();
+							} else {
+								popover.preventBlur();
+							}
+						},
+						mousedown: function(){
+							mouseFocus = true;
+							setTimeout(resetMouseFocus, 9);
+							if(options.buttonOnly && popover.isVisible && popover.activeElement){
+								popover.openedByFocus = false;
+								setTimeout(function(){
+									popover.openedByFocus = false;
+									popover.activeElement.focus();
+								}, 4);
+							}
+							if(data.element.is(':focus')){
+								popover.openedByFocus = options.buttonOnly ? false : !options.noInput;
+								show();
+							}
 							popover.preventBlur();
 						}
-					},
-					mousedown: function(){
-						mouseFocus = true;
-						setTimeout(resetMouseFocus, 9);
-						if(options.buttonOnly && popover.isVisible && popover.activeElement){
-							popover.openedByFocus = false;
-							setTimeout(function(){
-								popover.openedByFocus = false;
-								popover.activeElement.focus();
-							}, 4);
-						}
-						if(data.element.is(':focus')){
-							popover.openedByFocus = options.buttonOnly ? false : !options.noInput;
-							show();
-						}
-						popover.preventBlur();
-					}
-				});
-			})();
+					});
+				})();
+			}
+			
 			data.popover = popover;
 			data.opener = opener;
 			$(data.orig).on('remove', function(e){

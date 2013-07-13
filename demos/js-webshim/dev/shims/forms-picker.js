@@ -840,6 +840,10 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				
 				generateList(o, o.maxS, o.minS);
 				
+				if(popover.isVisible){
+					picker.showPickerContent(data, popover);
+				}
+				
 			}
 			$('button.ws-empty', popover.buttonRow).prop('disabled', $.prop(data.orig, 'required'));
 			popover.isDirty = false;
@@ -864,6 +868,10 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			.on('click', 'button[data-action]', actionfn)
 			.on('change', 'select[data-action]', actionfn)
 		;
+		
+		if(!data.options.updateOnInput){
+			data.options.updateOnInput = !!data.options.inlinePicker;
+		}
 		
 		$(data.options.orig).on('input', function(){
 			var currentView;
