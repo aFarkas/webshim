@@ -467,6 +467,27 @@ input[type="color"] {
 			width: 40%;
 		}
 	}
+	&.ws-month-select {
+		
+		.dd {
+			width: 22%;
+			
+			.no-boxsizing & {
+				width: 13%;
+			}
+		}
+		.mm {
+			width: 36%;
+		}
+		
+		.yy {
+			width: 36%;
+			
+			.no-boxsizing & {
+				width: 30%;
+			}
+		}
+	}
 }
 
 .ws-month {

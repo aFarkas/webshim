@@ -2,10 +2,21 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 	"use strict";
 	var curCfg;
 	var formcfg = webshims.formcfg;
-	
+	var monthDigits = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 	var stopPropagation = function(e){
 		e.stopImmediatePropagation();
 	};
+	var getMonthOptions = (function(){
+		var str;
+		return function(){
+			if(!str){
+				str = ('<option></option>')+$.map(monthDigits, function(val){
+					return '<option>'+val+'</option>';
+				}).join('');
+			}
+			return str;
+		};
+	})();
 	var createFormat = function(name){
 		if(!curCfg.patterns[name+'Obj']){
 			var obj = {};
@@ -17,10 +28,18 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 	};
 	var splitInputs = {
 		date: {
-			_create: function(){
+			_create: function(opts){
 				var obj = {
-					splits: [$('<input type="text" class="yy" size="4" inputmode="numeric" />')[0], $('<input type="text" class="mm" inputmode="numeric" maxlength="2" size="2" />')[0], $('<input type="text" class="dd ws-spin" inputmode="numeric" maxlength="2" size="2" />')[0]] 
+					splits: [$('<input type="text" class="yy" size="4" inputmode="numeric" />')[0]] 
 				};
+				if(opts.monthSelect){
+					obj.splits.push($('<select class="mm">'+getMonthOptions()+'</select>')[0]);
+				} else {
+					obj.splits.push($('<input type="text" class="mm" inputmode="numeric" maxlength="2" size="2" />')[0]);
+				}
+				obj.splits.push($('<input type="text" class="dd ws-spin" inputmode="numeric" maxlength="2" size="2" />')[0]);
+				
+				
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1], $('<span class="ws-input-seperator" />')[0], obj.splits[2]];
 				return obj;
 			},
@@ -28,7 +47,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				createFormat('d');
 				var i = 0;
 				var seperators = $('.ws-input-seperator', element).html(curCfg.dFormat);
-				var inputs = $('input', element);
+				var inputs = $('input, select', element);
 				$.each(curCfg.patterns.dObj, function(name, value){
 					var input = inputs.filter('.'+ name);
 					if(input[0]){
@@ -46,17 +65,23 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			_create: function(opts){
 				
 				var obj = {
-					splits: [$('<input type="text" class="yy" inputmode="numeric" size="4" />')[0], $('<input type="text" class="mm ws-spin" />')[0]] 
+					splits: [$('<input type="text" class="yy" inputmode="numeric" size="4" />')[0]] 
 				};
-				if(opts.onlyMonthDigits){
-					$(obj.splits[1]).attr({inputmode: 'numeric', size: 2, maxlength: 2});
+				if(opts.monthSelect){
+					obj.splits.push($('<select class="mm ws-spin">'+getMonthOptions()+'</select>')[0]);
+				} else {
+					obj.splits.push($('<input type="text" class="mm ws-spin" />')[0]);
+					if(opts.onlyMonthDigits){
+						$(obj.splits[1]).attr({inputmode: 'numeric', size: 2, maxlength: 2});
+					}
 				}
+				
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1]];
 				return obj;
 			},
 			sort: function(element){
 				var seperator = $('.ws-input-seperator', element).html(curCfg.dFormat);
-				var mm = $('input.mm', element);
+				var mm = $('input.mm, select.mm', element);
 				var action;
 				if(curCfg.date.showMonthAfterYear){
 					mm.appendTo(element);
@@ -114,7 +139,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 	
 		
 	(function(){
-		var monthDigits = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 		
 		formcfg.de = $.extend(true, {
 			numberFormat: {
@@ -463,6 +487,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				o.mirrorValidity = o.mirrorValidity && this.orig && Modernizr.formvalidation && !webshims.bugs.bustedValidity;
 				
 				if(o.splitInput && this._addSplitInputs){
+					if(o.monthSelect){
+						this.element.addClass('ws-month-select');
+					}
 					this._addSplitInputs();
 				} else {
 					this.inputElements = this.element;
@@ -714,7 +741,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 										try {
 											$(this)
 												.next()
-												.next('input')
+												.next('input, select')
 												.each(select)
 											;
 										} catch(er){}
@@ -998,7 +1025,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				if(!this.inputElements){
 					var create = splitInputs[this.type]._create(this.options);
 					this.splits = create.splits;
-					this.inputElements = $(create.elements).prependTo(this.element).filter('input');
+					this.inputElements = $(create.elements).prependTo(this.element).filter('input, select');
 				}
 			},
 			
@@ -1024,11 +1051,11 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			reorderInputs: function(){
 				if(splitInputs[this.type]){
 					var element = this.element;
-					splitInputs[this.type].sort(element);
+					splitInputs[this.type].sort(element, this.options);
 					setTimeout(function(){
 						var data = webshims.data(element);
 						if(data && data.shadowData){
-							data.shadowData.shadowFocusElement = element.find('input')[0] || element[0];
+							data.shadowData.shadowFocusElement = element.find('input, select')[0] || element[0];
 						}
 					}, 9);
 				}
@@ -1591,6 +1618,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 						opts[optsName] = $.attr(this, copyAttrs[i]) || opts[optsName];
 					}
 				}
+				if(opts.monthSelect){
+					opts.onlyMonthDigits = true;
+				}
 				if(opts.onlyMonthDigits){
 					opts.formatMonthNames = 'monthDigits';
 				}
@@ -1701,6 +1731,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			if(!modernizrInputTypes[name] || options.replaceUI || (name == 'number' && isStupid)){
 				extendType(name, {
 					_create: function(opts, set){
+						if(opts.monthSelect){
+							opts.splitInput = true;
+						}
 						if(opts.splitInput && !splitInputs[name]){
 							webshims.warn('splitInput not supported for '+ name);
 							opts.splitInput = false;
