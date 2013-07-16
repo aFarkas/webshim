@@ -744,7 +744,10 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 							if(webshims[content.type]){
 								new webshims[content.type](popover.bodyElement.children(), popover, content);
 							}
-							popover.element.trigger('pickerchange');
+							popover.element.trigger('pickerchange')
+								.filter('[data-vertical="bottom"]')
+								.triggerHandler('pospopover')
+							;
 							return false;
 						}
 					}
