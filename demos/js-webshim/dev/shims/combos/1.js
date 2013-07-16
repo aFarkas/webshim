@@ -1396,6 +1396,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				if(!loadTrackUi.loaded && $('track', media).length){
 					loadTrackUi();
 				}
+//				if(!loadMediaGroup.loaded && this.getAttribute('mediagroup')){
+//					loadMediaGroup();
+//				}
 				media = null;
 			});
 		});
@@ -1411,12 +1414,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 								handleMedia = true;
 								return false;
 							}
-							if((!hasFullTrackSupport || wsCfg.track.override) && !loadTrackUi.loaded && $('track', this).length){
-								loadTrackUi();
-							}
-//							if(!loadMediaGroup.loaded && this.getAttribute('mediagroup')){
-//								loadMediaGroup();
-//							}
 						})
 					;
 				}

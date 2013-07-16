@@ -346,7 +346,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				
 				classStr = classArray.length ? ' class="'+ (classArray.join(' ')) +'"' : '';
 				
-				if(i && !(i % 3)){
+				if(i && !(i % 4)){
 					rowNum++;
 					lis.push('</tr><tr class="ws-row-'+ rowNum +'">');
 				}
@@ -431,7 +431,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				}
 				
 				classStr = (classArray.length) ? ' class="'+ (classArray.join(' ')) +'"' : '';
-				if(i && !(i % 3)){
+				if(i && !(i % 4)){
 					rowNum++;
 					lis.push('</tr><tr class="ws-row-'+ rowNum +'">');
 				}
@@ -744,7 +744,10 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 							if(webshims[content.type]){
 								new webshims[content.type](popover.bodyElement.children(), popover, content);
 							}
-							popover.element.trigger('pickerchange');
+							popover.element.trigger('pickerchange')
+								.filter('[data-vertical="bottom"]')
+								.triggerHandler('pospopover')
+							;
 							return false;
 						}
 					}

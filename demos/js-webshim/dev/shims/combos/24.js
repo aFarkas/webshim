@@ -236,14 +236,21 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			return container == contained || $.contains(container, contained);
 		},
 		show: function(element){
+			if(this.isVisible){return;}
 			var e = $.Event('wspopoverbeforeshow');
 			this.element.trigger(e);
-			if(e.isDefaultPrevented() || this.isVisible){return;}
+			if(e.isDefaultPrevented()){return;}
 			this.isVisible = true;
 			element = $(element || this.options.prepareFor).getNativeElement() ;
 			
 			var that = this;
 			var visual = $(element).getShadowElement();
+			var delayedRepos = function(e){
+				clearTimeout(that.timers.repos);
+				that.timers.repos = setTimeout(function(){
+					that.position(visual);
+				}, e && e.type == 'pospopover' ? 4 : 200);
+			};
 
 			this.clear();
 			this.element.removeClass('ws-po-visible').css('display', 'none');
@@ -257,22 +264,15 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					that.element.addClass('ws-po-visible').trigger('wspopovershow');
 				}, 9);
 			}, 9);
-			this.element.on('remove', function(e){
-				if(!e.originalEvent){
-					that.destroy();
-				}
-			});
+			
 			$(document).on('focusin'+this.eventns+' mousedown'+this.eventns, function(e){
 				if(that.options.hideOnBlur && !that.stopBlur && !that.isInElement(that.lastElement[0] || document.body, e.target) && !that.isInElement(element[0] || document.body, e.target) && !that.isInElement(that.element[0], e.target)){
 					that.hide();
 				}
 			});
-			$(window).on('resize'+this.eventns + ' pospopover'+this.eventns, function(){
-				clearTimeout(that.timers.repos);
-				that.timers.repos = setTimeout(function(){
-					that.position(visual);
-				}, 400);
-			});
+			
+			this.element.off('pospopover').on('pospopover', delayedRepos);
+			$(window).on('resize'+this.eventns + ' pospopover'+this.eventns, delayedRepos);
 		},
 		prepareFor: function(element, visual){
 			var onBlur;
