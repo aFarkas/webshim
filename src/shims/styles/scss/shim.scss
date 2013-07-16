@@ -1024,11 +1024,15 @@ $button-bgcolor: #f5f5f5;
 		&.day-list td {
 			padding: 2px 1px;
 		}
+		
+		&.day-list td button {
+			padding: 4px 0;
+		}
 
 
 		td button {
 			display: block;
-			padding: 4px 0;
+			padding: 9px 0;
 			width: 100%;
 			border-radius: 5px;
 			color: #000;
