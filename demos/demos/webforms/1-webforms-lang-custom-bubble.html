@@ -180,12 +180,14 @@ $.webshims.setOptions('forms', {
 $.webshims.validityMessages['en'] = {
 	typeMismatch: {
 		email: 'changed {%value} is not a legal email address',
-		url: 'changed {%value} is not a valid web address',
-		number: 'changed {%value} is not a number!',
-		date: 'changed {%value} is not a date',
-		time: 'changed {%value} is not a time',
-		range: 'changed {%value} is not a number!',
-		"datetime-local": 'changed {%value} is not a correct date-time format.'
+		url: 'changed {%value} is not a valid web address'
+	},
+	badInput: {
+		number: 'changed Enter a number!',
+		date: 'changed Enter a date',
+		time: 'changed Enter a time',
+		range: 'changed Enter a number!',
+		"datetime-local": 'changed Enter a correct date-time format.'
 	},
 	rangeUnderflow: 'changed {%value} is too low. The lowest value you can use is {%min}.',
 	rangeOverflow: 'changed {%value} is too high. The highest value you can use is {%max}.',

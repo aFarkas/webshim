@@ -398,13 +398,12 @@ $('section.forms-demo').unbind('firstinvalid.example2');
 </code>
 						<p>The validityAlert method will create the following custom styleable HTML:</p>
 <code class="block">
-&lt;!-- note: span.validity-alert-wrapper is label.validity-alert in old browser, which do not support WAI-ARIA --&gt;
-&lt;span class="validity-alert-wrapper" role="alert"&gt;
-	&lt;span class="validity-alert"&gt;
-		&lt;span class="va-arrow"&gt;&lt;span class="va-arrow-box"&gt;&lt;/span&gt;&lt;/span&gt;
-		&lt;span class="va-box"&gt;Error message of the current field&lt;/span&gt;
-	&lt;/span&gt;
-&lt;/span&gt;
+&lt;div class="ws-popover validity-alert" role="alert"&gt;
+	&lt;div class="ws-po-outerbox"&gt;
+		&lt;div class="ws-po-arrow"&gt;&lt;div class="ws-po-arrowbox"&gt;&lt;/div&gt;&lt;/div&gt;
+		&lt;div class="ws-po-box"&gt;ERRORMESSAGE&lt;/div&gt;
+	&lt;/div&gt;
+&lt;/div&gt;
 </code>
 						
 						<p>Using custom messages instead of native browser messages is also easy. Simply implement the customValidationMessage attribute and use it.</p>
