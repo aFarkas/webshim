@@ -86,7 +86,7 @@ audio > * {
 .flashblocker-assumed {
   min-height: 20px;
   min-width: 20px;
-  z-index: 2147483647;
+  z-index: 99999;
 }
 
 .cue-display {
@@ -593,7 +593,7 @@ input[type="color"] {
   left: 0;
   padding: 0 6px 0;
   margin: 0 0 0 -6px;
-  z-index: 1000;
+  z-index: 1100;
   min-width: 90px;
   transition: visibility 400ms ease-in-out;
 }
