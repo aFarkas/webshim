@@ -591,7 +591,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		}
 	};
 	
-	var nowDate = new Date().getTime() - (new Date().getTimezoneOffset() * 60 * 1000 );
+	var nowDate = new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60 * 1000 ));
+	nowDate = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), nowDate.getHours()).getTime()
 	var steps = {
 		number: {
 			step: 1
@@ -600,6 +601,10 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 //			step: 1,
 //			start: new Date(nowDate)
 //		},
+		'datetime-local': {
+			step: 60,
+			start: new Date(nowDate).getTime()
+		},
 		time: {
 			step: 60
 		},
@@ -684,6 +689,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			patterns: {
 				d: "mm/dd/yy"
 			},
+			meridian: ['AM', 'PM'],
 			month:  {
 				currentText: 'This month'
 			},
@@ -737,6 +743,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				langCfg.date.monthkeys = {};
 				langCfg.date.monthDigits = monthDigits;
 				langCfg.numberSigns += '-';
+				if(langCfg.meridian){
+					langCfg.timeSigns += langCfg.meridian[0] + langCfg.meridian[1];
+				}
 				$.each(langCfg.date.monthNames, create);
 				$.each(langCfg.date.monthNamesShort, create);
 			}
@@ -799,11 +808,27 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				return (val+'').replace(/\,/g, '').replace(/\./, curCfg.numberFormat['.']);
 			},
 			time: function(val){
+				var fVal;
+				if(val && curCfg.meridian){
+					val = val.split(':');
+					fVal = (val[0] * 1);
+					if(fVal && fVal >= 12){
+						val[0] = addZero(fVal - 12+'');
+						fVal = 1;
+						
+					} else {
+						fVal = 0;
+					}
+					val = $.trim(val.join(':')) + ' '+ curCfg.meridian[fVal];
+				}
 				return val;
 			},
-			week: function(val){
+			'datetime-local': function(val){
 				return val;
 			},
+//			week: function(val){
+//				return val;
+//			},
 			//todo empty val for month/split
 			month: function(val, options){
 				var names;
@@ -856,7 +881,22 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 //			week: function(val){
 //				return val;
 //			},
+			'datetime-local': function(val){
+				return val;
+			},
 			time: function(val){
+				var fVal;
+				if(val && curCfg.meridian){
+					if(val.indexOf(curCfg.meridian[1]) != -1){
+						val = val.split(':');
+						fVal = (val[0] * 1);
+						if(!isNaN(fVal)){
+							val[0] = fVal + 12;
+						}
+						val = val.join(':');
+					}
+					val = $.trim(val.replace(curCfg.meridian[0], '').replace(curCfg.meridian[1], ''));
+				}
 				return val;
 			},
 			month: function(val, opts, noCorrect){
@@ -957,8 +997,16 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 							var type = (typeof val == 'object') ? 'valueAsDate' : 'valueAsNumber';
 							return input.prop(type, val).prop('value');
 						},
-						isValid: function(val){
-							return input.prop('value', val).is(':valid') && input.prop('value') == val;
+						isValid: function(val, attrs){
+							if(attrs && (attrs.nodeName || attrs.jquery)){
+								attrs = {
+									min: $(attrs).prop('min') || '',
+									max: $(attrs).prop('max') || '',
+									step: $(attrs).prop('step') || 'any'
+								};
+							}
+							attrs = $.extend({step: 'any', min: '', max: ''}, attrs || {});
+							return input.attr(attrs).prop('value', val).is(':valid') && input.prop('value') == val;
 						}
 					};
 				}
@@ -1438,7 +1486,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				return [options, datalist.data('label')];
 			},
 			list: function(val){
-				if(this.type == 'number' || this.type == 'time'){
+				if(this.type == 'number'){
 					this.element.attr('list', $.attr(this.orig, 'list'));
 				}
 				this.options.list = val;
@@ -1805,6 +1853,10 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				if(!options.startView){
 					options.startView = 0;
 				}
+				if(data.type == 'time'){
+					options.minView = 3;
+					options.startView = 3;
+				}
 				if(!options.minView){
 					options.minView = 0;
 				}
@@ -1931,6 +1983,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		
 		picker.month = picker._common;
 		picker.date = picker._common;
+		picker.time = picker._common;
+		picker['datetime-local'] = picker._common;
 //		picker.week = picker._common;
 		picker.color = function(data){
 			var ret = picker._common.apply(this, arguments);
@@ -2222,8 +2276,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			});
 		}
 		
-		var isStupid = navigator.userAgent.indexOf('MSIE 10.0') != -1 && navigator.userAgent.indexOf('Touch') == -1;
-		['number', 'time', 'month', 'date', 'color'].forEach(function(name){
+		var isStupid = /MSIE 1[0|1]\.\d/.test(navigator.userAgent) && navigator.userAgent.indexOf('Touch') == -1;
+		['number', 'time', 'month', 'date', 'color', 'datetime-local'].forEach(function(name){
 			if(!modernizrInputTypes[name] || options.replaceUI || (name == 'number' && isStupid)){
 				extendType(name, {
 					_create: function(opts, set){

@@ -303,6 +303,9 @@ output {
 .color-input-buttons .ws-popover-opener span {
   background-position: -348px 0;
 }
+.time-input-buttons .ws-popover-opener span {
+  background-position: -377px 1px;
+}
 .ws-popover-opener span.ws-color-indicator-bg {
   background: url(../jpicker/images/preview-opacity.png) no-repeat 0;
 }
@@ -741,6 +744,13 @@ html .ws-po-arrow .ws-po-arrowbox {
   font-family: sans-serif;
   width: 330px;
 }
+.input-picker.time-popover, .input-picker.datetime-local-popover {
+  width: 415px;
+}
+.input-picker.time-popover .ws-prev,
+.input-picker.time-popover .ws-next {
+  display: none;
+}
 .input-picker.ws-size-2 {
   width: 645px;
 }
@@ -785,6 +795,9 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .ws-prev span,
 .input-picker .ws-next span {
   display: none;
+}
+.input-picker.time-popover .ws-picker-body {
+  padding-top: 36px;
 }
 .input-picker .ws-picker-body {
   position: relative;
@@ -838,6 +851,12 @@ html .ws-po-arrow .ws-po-arrowbox {
 }
 .input-picker[data-currentview="setDayList"] .ws-picker-header select.month-select {
   max-width: 55%;
+}
+.input-picker.time-popover .ws-picker-header {
+  top: -30px;
+}
+.input-picker.time-popover .ws-picker-header button {
+  font-size: 15px;
 }
 .input-picker .ws-picker-header {
   position: absolute;

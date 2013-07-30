@@ -322,6 +322,10 @@ output {
 			background-position: -348px 0;
 		}
 		
+		.time-input-buttons & {
+			background-position: -377px 1px;
+		}
+		
 		&.ws-color-indicator-bg {
 			background: url(../jpicker/images/preview-opacity.png) no-repeat 0;
 		}
@@ -843,6 +847,20 @@ $button-bgcolor: #f5f5f5;
 	font-family: sans-serif;
 	width: 330px;
 	
+	&.time-popover,
+	&.datetime-local-popover {
+		width: 415px;
+	}
+	
+	&.time-popover  {
+	
+		.ws-prev,
+		.ws-next {
+			display: none;
+		}
+	}
+
+	
 	&.ws-size-2 {
 		width: 645px;
 	}
@@ -896,6 +914,11 @@ $button-bgcolor: #f5f5f5;
 		span {
 			display: none;
 		}
+	}
+	
+	
+	&.time-popover .ws-picker-body {
+		padding-top: 36px;
 	}
 
 	.ws-picker-body {
@@ -963,6 +986,14 @@ $button-bgcolor: #f5f5f5;
 	
 	&[data-currentview="setDayList"] .ws-picker-header select.month-select {
 		max-width: 55%;
+	}
+	
+	&.time-popover .ws-picker-header {
+		top: -30px;
+		
+		button {
+			font-size: 15px;
+		}
 	}
 
 	.ws-picker-header {

@@ -149,8 +149,8 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 					} else {
 						webshims.error('INVALID_STATE_ERR: DOM Exception 11');
 					}
-				} else {
-					valueAsNumberDescriptor.prop._supset && valueAsNumberDescriptor.prop._supset.apply(elem, arguments);
+				} else if(valueAsNumberDescriptor.prop._supset) {
+					 valueAsNumberDescriptor.prop._supset.apply(elem, arguments);
 				}
 			}
 		}
@@ -519,46 +519,46 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 				}
 			}
 		}
-//		,'datetime-local': {
-//			bad: function(val, _getParsed){
-//				if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
-//				val = val.split(/\u0054/);
-//				return ( typeProtos.date.bad(val[0]) || typeProtos.time.bad(val[1], _getParsed) );
-//			},
-//			noAsDate: true,
-//			asDate: function(val){
-//				val = new Date(this.asNumber(val));
-//				
-//				return (isNaN(val)) ? null : val;
-//			},
-//			asNumber: function(val){
-//				var ret = nan;
-//				var time = this.bad(val, true);
-//				if(time !== true){
-//					val = val.split(/\u0054/)[0].split(/\u002D/);
-//					
-//					ret = Date.UTC(val[0], val[1] - 1, val[2], time[0][0], time[0][1], time[0][2] || 0);
-//					if(time[1]){
-//						ret += time[1];
-//					}
-//				}
-//				return ret;
-//			},
-//			dateToString: function(date, _getParsed){
-//				return typeProtos.date.dateToString(date) +'T'+ typeProtos.time.dateToString(date, _getParsed);
-//			}
-//		}
+		,'datetime-local': {
+			bad: function(val, _getParsed){
+				if(!val || !val.split || (val+'special').split(/\u0054/).length !== 2){return true;}
+				val = val.split(/\u0054/);
+				return ( typeProtos.date.bad(val[0]) || typeProtos.time.bad(val[1], _getParsed) );
+			},
+			noAsDate: true,
+			asDate: function(val){
+				val = new Date(this.asNumber(val));
+				
+				return (isNaN(val)) ? null : val;
+			},
+			asNumber: function(val){
+				var ret = nan;
+				var time = this.bad(val, true);
+				if(time !== true){
+					val = val.split(/\u0054/)[0].split(/\u002D/);
+					
+					ret = Date.UTC(val[0], val[1] - 1, val[2], time[0][0], time[0][1], time[0][2] || 0);
+					if(time[1]){
+						ret += time[1];
+					}
+				}
+				return ret;
+			},
+			dateToString: function(date, _getParsed){
+				return typeProtos.date.dateToString(date) +'T'+ typeProtos.time.dateToString(date, _getParsed);
+			}
+		}
 	};
 	
-	if(typeBugs || !supportsType('range') || !supportsType('time') || !supportsType('month')){
+	if(typeBugs || !supportsType('range') || !supportsType('time') || !supportsType('month') || !supportsType('datetime-local')){
 		typeProtos.range = $.extend({}, typeProtos.number, typeProtos.range);
 		typeProtos.time = $.extend({}, typeProtos.date, typeProtos.time);
 		typeProtos.month = $.extend({}, typeProtos.date, typeProtos.month);
-//		typeProtos['datetime-local'] = $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']);
+		typeProtos['datetime-local'] = $.extend({}, typeProtos.date, typeProtos.time, typeProtos['datetime-local']);
 	}
 	
-	//'datetime-local'
-	['number', 'month', 'range', 'date', 'time', 'color'].forEach(function(type){
+	//
+	['number', 'month', 'range', 'date', 'time', 'color', 'datetime-local'].forEach(function(type){
 		if(typeBugs || !supportsType(type)){
 			webshims.addInputType(type, typeProtos[type]);
 		}

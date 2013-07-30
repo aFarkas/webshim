@@ -8,9 +8,10 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		var ret = [date.getFullYear(), moduleOpts.addZero(date.getMonth() + 1), moduleOpts.addZero(date.getDate())];
 		ret.month = ret[0]+'-'+ret[1];
 		ret.date = ret[0]+'-'+ret[1]+'-'+ret[2];
+		ret.time = date.getHours() +':'+ date.getMinutes();
 		return ret;
 	};
-	var today = getDateArray(new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60 * 1000 )));
+	var today = getDateArray(new Date());
 	
 	
 	var _setFocus = function(element, _noFocus){
@@ -467,6 +468,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		var enabled = 0;
 		var str = [];
 		var date = new Date(value[0], value[1] - 1, 1);
+		var action = (data.type == 'datetime-local') ? 'setTimeList' : 'changeInput';
 		
 		date.setMonth(date.getMonth()  - Math.floor((size - 1) / 2));
 		
@@ -563,7 +565,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				}
 				
 				dateArray = getDateArray(date);
-				buttonStr = '<td role="presentation" class="day-'+ day +'"><button data-id="day-'+ date.getDate() +'" role="gridcell" data-action="changeInput" value="'+ (dateArray.join('-')) +'"';
+				buttonStr = '<td role="presentation" class="day-'+ day +'"><button data-id="day-'+ date.getDate() +'" role="gridcell" data-action="'+action+'" value="'+ (dateArray.join('-')) +'" type="button"';
 				
 				if(otherMonth){
 					classArray.push('othermonth');
@@ -605,6 +607,77 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			main: str.join(''),
 			prev: prevDisabled,
 			next: nextDisabled,
+			type: 'Grid'
+		};
+	};
+	
+//	var createDatimeValue = 
+	
+	
+	picker.getTimeList = function(value, data){
+		var label, tmpValue, iVal, hVal, valPrefix;
+		var str = '<div class="time-list picker-list ws-index-0">';
+		var i = 0;
+		var rowNum = 0;
+		var len = 24;
+		var attrs = {
+			min: $.prop(data.orig, 'min'),
+			max: $.prop(data.orig, 'max'),
+			step: $.prop(data.orig, 'step')
+		};
+		var o = data.options;
+		var monthNames = curCfg.date[o.monthNamesHead] || curCfg.date[o.monthNames] || curCfg.date.monthNames; 
+		var gridLabel = '';
+		
+		if(data.type == 'time'){
+			label = '<button type="button" disabled="">'+ $.trim($(data.orig).jProp('labels').text() || '').replace(/[\:\*]/g, '')+'</button>';
+		} else {
+			tmpValue = value[2].split('T');
+			value[2] = tmpValue[0];
+			if(tmpValue[1]){
+				value[3] = tmpValue[1];
+			}
+			label = value[2] +'. '+ (monthNames[(value[1] * 1) - 1]) +' '+ value[0];
+			gridLabel = ' aria-label="'+ label +'"';
+			label = '<button tabindex="-1" data-action="setDayList" value="'+value[0]+'-'+value[1]+'-'+value[2]+'" type="button">'+label+'</button>';
+			valPrefix = value[0] +'-'+value[1]+'-'+value[2]+'T';
+		}
+		
+		str += '<div class="ws-picker-header">'+label+'</div>';
+		
+		str += '<div class="picker-grid"><table role="grid"'+ gridLabel +'><tbody><tr>';
+		console.log(attrs)
+		for(; i <= len; i++){
+			iVal = moduleOpts.addZero(''+i) +':00';
+			hVal = valPrefix ? 
+				valPrefix+iVal :
+				iVal
+			;
+				
+			if(i && !(i % 5)){
+				rowNum++;
+				str += '</tr><tr class="ws-row-'+ rowNum +'">';
+			}
+			str += '<td role="presentation"><button role="gridcell" data-action="changeInput" value="'+ hVal +'" type="button" tabindex="-1"';
+			
+			if(!data.isValid(hVal, attrs)){
+				console.log(hVal, attrs)
+				str += ' disabled=""';
+			}
+			if(value == iVal){
+				str += ' class="checked-value"';
+			}
+			str += '>'+ data.formatValue(iVal) +'</button></td>';
+		}
+		
+		
+		str += '</tr></tbody></table></div></div>';
+		
+		return {
+			enabled: 9,
+			main: str,
+			prev: false,
+			next: false,
 			type: 'Grid'
 		};
 	};
@@ -691,10 +764,12 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		var stops = {
 			date: 'Day',
 			week: 'Day',
-			month: 'Month'
+			month: 'Month',
+			'datetime-local': 'Time',
+			time: 'Time'
 		};
 		
-		$.each({'setYearList' : ['Year', 'Month', 'Day'], 'setMonthList': ['Month', 'Day'], 'setDayList': ['Day']}, function(setName, names){
+		$.each({'setYearList' : ['Year', 'Month', 'Day', 'Time'], 'setMonthList': ['Month', 'Day', 'Time'], 'setDayList': ['Day', 'Time'], 'setTimeList': ['Time']}, function(setName, names){
 			var getNames = names.map(retNames);
 			var setNames = names.map(retSetNames);
 			actions[setName] = function(val, popover, data, startAt){
@@ -826,7 +901,9 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 							text = (formcfg[''][[data.type]] || {}).currentText || 'current';
 							webshims.warn("could not get currentText from form cfg");
 						}
-						$.prop(this, 'disabled', !picker.isInRange(today[data.type].split('-'), o.maxS, o.minS));
+						if(today[data.type] && data.type != 'time'){
+							$.prop(this, 'disabled', !picker.isInRange(today[data.type].split('-'), o.maxS, o.minS));
+						}
 					}
 					if(text){
 						$(this).text(text).attr({'aria-label': text});
@@ -872,8 +949,8 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			.on('change', 'select[data-action]', actionfn)
 		;
 		
-		if(!data.options.updateOnInput){
-			data.options.updateOnInput = !!data.options.inlinePicker;
+		if(data.options.inlinePicker){
+			data.options.updateOnInput = true;
 		}
 		
 		$(data.options.orig).on('input', function(){

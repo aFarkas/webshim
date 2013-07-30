@@ -2185,7 +2185,7 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 	}
 	hasFullTrackSupport = Modernizr.track && !bugs.track;
 
-webshims.register('mediaelement-core', function($, webshims, window, document, undefined){
+webshims.register('mediaelement-core', function($, webshims, window, document, undefined, options){
 	hasSwf = swfmini.hasFlashPlayerVersion('9.0.115');
 	$('html').addClass(hasSwf ? 'swf' : 'no-swf');
 	var mediaelement = webshims.mediaelement;
@@ -2269,10 +2269,12 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	var loadTrackUi = function(){
 		if(loadTrackUi.loaded){return;}
 		loadTrackUi.loaded = true;
-		webshims.ready('WINDOWLOAD', function(){
-			loadThird();
-			webshims.loader.loadList(['track-ui']);
-		});
+		if(!options.noAutoTrack){
+			webshims.ready('WINDOWLOAD', function(){
+				loadThird();
+				webshims.loader.loadList(['track-ui']);
+			});
+		}
 	};
 //	var loadMediaGroup = function(){
 //		if(!loadMediaGroup.loaded){

@@ -46,19 +46,19 @@
 					getGoogleCoords = function(){
 						if(pos || !window.google || !google.loader || !google.loader.ClientLocation){return false;}
 						var cl = google.loader.ClientLocation;
-			            pos = {
+						pos = {
 							coords: {
 								latitude: cl.latitude,
-				                longitude: cl.longitude,
-				                altitude: null,
-				                accuracy: 43000,
-				                altitudeAccuracy: null,
-				                heading: parseInt('NaN', 10),
-				                velocity: null
+							longitude: cl.longitude,
+								altitude: null,
+								accuracy: 43000,
+								altitudeAccuracy: null,
+								heading: parseInt('NaN', 10),
+								velocity: null
 							},
-			                //extension similiar to FF implementation
+							//extension similiar to FF implementation
 							address: $.extend({streetNumber: '', street: '', premises: '', county: '', postalCode: ''}, cl.address)
-			            };
+						};
 						return true;
 					},
 					getInitCoords = function(){
@@ -95,14 +95,14 @@
 							pos = pos || {
 								coords: {
 									latitude: data.latitude,
-					                longitude: data.longitude,
-					                altitude: null,
-					                accuracy: 43000,
-					                altitudeAccuracy: null,
-					                heading: parseInt('NaN', 10),
-					                velocity: null
+									longitude: data.longitude,
+									altitude: null,
+									accuracy: 43000,
+									altitudeAccuracy: null,
+									heading: parseInt('NaN', 10),
+									velocity: null
 								},
-				                //extension similiar to FF implementation
+								//extension similiar to FF implementation
 								address: {
 									city: data.city,
 									country: data.country_name,
@@ -114,7 +114,7 @@
 									street: "",
 									streetNumber: ""
 								}
-				            };
+							};
 							endCallback();
 						},
 						error: function(){
