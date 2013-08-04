@@ -9,6 +9,8 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		ret.month = ret[0]+'-'+ret[1];
 		ret.date = ret[0]+'-'+ret[1]+'-'+ret[2];
 		ret.time = date.getHours() +':'+ date.getMinutes();
+		
+		ret['datetime-local'] = ret.date +'T'+ ret.time;
 		return ret;
 	};
 	var today = getDateArray(new Date());
@@ -297,11 +299,12 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 	picker.getYearList = function(value, data){
 		var j, i, val, disabled, lis, prevDisabled, nextDisabled, classStr, classArray, start;
 		
-		
-		var size = data.options.size;
-		var max = data.options.max.split('-');
-		var min = data.options.min.split('-');
-		var currentValue = data.options.value.split('-');
+		var o = data.options;
+		var size = o.size;
+		var max = o.max.split('-');
+		var min = o.min.split('-');
+		var cols = o.cols || 4;
+		var currentValue = o.value.split('-');
 		var xthCorrect = 0;
 		var enabled = 0;
 		var str = '';
@@ -347,7 +350,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				
 				classStr = classArray.length ? ' class="'+ (classArray.join(' ')) +'"' : '';
 				
-				if(i && !(i % 4)){
+				if(i && !(i % cols)){
 					rowNum++;
 					lis.push('</tr><tr class="ws-row-'+ rowNum +'">');
 				}
@@ -376,6 +379,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		var size = o.size;
 		var max = o.max.split('-');
 		var min = o.min.split('-');
+		var cols = o.cols || 4;
 		var currentValue = o.value.split('-');
 		var enabled = 0;
 		var rowNum = 0;
@@ -432,7 +436,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				}
 				
 				classStr = (classArray.length) ? ' class="'+ (classArray.join(' ')) +'"' : '';
-				if(i && !(i % 4)){
+				if(i && !(i % cols)){
 					rowNum++;
 					lis.push('</tr><tr class="ws-row-'+ rowNum +'">');
 				}
@@ -646,7 +650,6 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		str += '<div class="ws-picker-header">'+label+'</div>';
 		
 		str += '<div class="picker-grid"><table role="grid"'+ gridLabel +'><tbody><tr>';
-		console.log(attrs)
 		for(; i <= len; i++){
 			iVal = moduleOpts.addZero(''+i) +':00';
 			hVal = valPrefix ? 
@@ -661,7 +664,6 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			str += '<td role="presentation"><button role="gridcell" data-action="changeInput" value="'+ hVal +'" type="button" tabindex="-1"';
 			
 			if(!data.isValid(hVal, attrs)){
-				console.log(hVal, attrs)
 				str += ' disabled=""';
 			}
 			if(value == iVal){
@@ -898,8 +900,8 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					} else if($(this).is('.ws-current')){
 						text = (curCfg[data.type] || {}).currentText;
 						if(!text){
-							text = (formcfg[''][[data.type]] || {}).currentText || 'current';
-							webshims.warn("could not get currentText from form cfg");
+							text = (formcfg[''][[data.type]] || {}).currentText || (curCfg.date || {}).currentText || 'current';
+							webshims.warn("could not get currentText from form cfg for "+data.type);
 						}
 						if(today[data.type] && data.type != 'time'){
 							$.prop(this, 'disabled', !picker.isInRange(today[data.type].split('-'), o.maxS, o.minS));

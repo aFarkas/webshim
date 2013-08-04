@@ -1093,9 +1093,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 
 webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
-	if(options.overrideMessages){
+	if(options.lazyCustomMessages){
 		options.customMessages = true;
-		webshims.error('overrideMessages is deprecated. use customMessages instead.');
 	}
 	var validityMessages = webshims.validityMessages;
 	

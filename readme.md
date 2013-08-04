@@ -84,7 +84,7 @@ upcomming Release 1.11.0
 - implemented input[type="datetime-local"]
 - implmented picker for input[type="time"]
 - implemented validityState.badInput
-- all input  widget popover can be displayed inline
+- all input widget popover can be displayed inline
 
 Release 1.10.10
 ----------

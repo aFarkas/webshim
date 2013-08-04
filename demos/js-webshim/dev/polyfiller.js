@@ -1116,7 +1116,7 @@
 			f: 'forms',
 			test: function(){
 				initialFormTest();
-				return modernizrInputAttrs.list && !formOptions.customDatalist;
+				return modernizrInputAttrs.list && !formOptions.fD;
 			},
 			d: ['form-core', DOMSUPPORT],
 			c: [16, 7, 6, 2, 9, 15, 30, 31]

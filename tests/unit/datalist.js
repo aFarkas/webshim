@@ -39,16 +39,13 @@ asyncTest("datalist", function(){
 	$('#email').attr('list', 'dlist2');
 	strictEqual($('#email').prop('list'), $('#dlist2')[0], 'list property changed through content attribute');
 	
-	if(!Modernizr.input.list || $.webshims.cfg.forms.customDatalist){
+	if(!Modernizr.input.list || webshims.cfg.forms.customDatalist){
 		strictEqual($('#email').attr('aria-haspopup'), 'true', 'input[list] has aria');
 		
 		$('#email').removeAttr('list');
 		ok(!$('#email').attr('aria-haspopup'), 'removed list attribute removes aria in shim');
 	}
 	
-	if($.webshims.cfg.forms.customDatalist){
-		strictEqual($('#email').prop('selectedOption'), null, 'selectedOption is implemented');
-	}
 	
 	$.webshims.ready('DOM forms forms-ext', function(){
 		start();

@@ -27,9 +27,7 @@ asyncTest("progress", function(){
 	progress.prop('value', '1');
 	strictEqual(progress.prop('position'), 1, "progress position");
 	strictEqual(progress.prop('value'), 0.5, "progress prop value");
-	if($.fn.finish){
-		strictEqual(progress.attr('value'), "1", "progress attr value");
-	}
+	
 	
 	
 //	progress.attr('value', 'dsadsa');

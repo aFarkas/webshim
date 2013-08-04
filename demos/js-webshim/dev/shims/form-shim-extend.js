@@ -161,8 +161,8 @@ $.each({typeMismatch: 'mismatch', badInput: 'bad'}, function(name, fn){
 		
 		if(typeModels[cache.type] && typeModels[cache.type][fn]){
 			ret = typeModels[cache.type][fn](val, input);
-		} else if('validity' in input[0]){
-			ret = input[0].validity[name] || input[0].validity.typeMismatch || false;
+		} else if('validity' in input[0] && ('name' in input[0].validity)){
+			ret = input[0].validity[name] || false;
 		}
 		return ret;
 	};

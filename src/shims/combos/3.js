@@ -1126,6 +1126,10 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 			options.customMessages = true;
 			toLoad.push('form-message');
 		}
+		if(options.customDatalist){
+			options.fD = true;
+			toLoad.push('form-datalist');
+		}
 		if(options.addValidators){
 			toLoad.push('form-validators');
 		}
@@ -1352,9 +1356,8 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 
 webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
-	if(options.overrideMessages){
+	if(options.lazyCustomMessages){
 		options.customMessages = true;
-		webshims.error('overrideMessages is deprecated. use customMessages instead.');
 	}
 	var validityMessages = webshims.validityMessages;
 	

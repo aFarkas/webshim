@@ -1845,6 +1845,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			if(!langCfg.colorSigns){
 				langCfg.colorSigns = '#abcdefABCDEF';
 			}
+			if(!langCfg['datetime-localSigns']){
+				langCfg['datetime-localSigns'] = langCfg.dateSigns+langCfg.timeSigns;
+			}
 		};
 		var triggerLocaleChange = function(){
 			processLangCFG(curCfg);
@@ -1916,7 +1919,11 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				}
 				return val;
 			},
-			'datetime-local': function(val){
+			'datetime-local': function(val, o){
+				var fVal = $.trim(val || '').split('T');
+				if(fVal.length == 2){
+					val = this.date(fVal[0], o) +' '+this.time(fVal[1], o);
+				}
 				return val;
 			},
 //			week: function(val){
@@ -1974,7 +1981,17 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 //			week: function(val){
 //				return val;
 //			},
-			'datetime-local': function(val){
+			'datetime-local': function(val, o){
+				var tmp;
+				var fVal = $.trim(val || '').split(/\s+/);
+				if(fVal.length == 2){
+					if(fVal[0].indexOf(':') != -1 && fVal[1].indexOf(':') == -1){
+						tmp = fVal[1];
+						fVal[1] = fVal[0];
+						fVal[0] = tmp;
+					}
+					val = this.date(fVal[0], o) +'T'+ this.time(fVal[1], o);
+				}
 				return val;
 			},
 			time: function(val){
@@ -3508,34 +3525,6 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 					}
 				}
 			};
-			
-			if(formsCFG.customDatalist && (!listSupport || !('selectedOption' in $('<input />')[0]))){
-				//currently not supported x-browser (FF4 has not implemented and is not polyfilled )
-				inputListProto.selectedOption = {
-					prop: {
-						writeable: false,
-						get: function(){
-							var elem = this;
-							var list = $.prop(elem, 'list');
-							var ret = null;
-							var value, options;
-							if(!list){return ret;}
-							value = $.prop(elem, 'value');
-							if(!value){return ret;}
-							options = $.prop(list, 'options');
-							if(!options.length){return ret;}
-							$.each(options, function(i, option){
-								if(value == $.prop(option, 'value')){
-									ret = option;
-									return false;
-								}
-							});
-							return ret;
-						}
-					}
-				};
-			}
-			
 			
 			if(listSupport){
 				//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible

@@ -748,7 +748,8 @@ html .ws-po-arrow .ws-po-arrowbox {
   width: 415px;
 }
 .input-picker.time-popover .ws-prev,
-.input-picker.time-popover .ws-next {
+.input-picker.time-popover .ws-next, .input-picker.datetime-local-popover .ws-prev,
+.input-picker.datetime-local-popover .ws-next {
   display: none;
 }
 .input-picker.ws-size-2 {

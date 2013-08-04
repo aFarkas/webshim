@@ -852,7 +852,8 @@ $button-bgcolor: #f5f5f5;
 		width: 415px;
 	}
 	
-	&.time-popover  {
+	&.time-popover,
+	&.datetime-local-popover	{
 	
 		.ws-prev,
 		.ws-next {

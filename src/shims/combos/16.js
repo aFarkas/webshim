@@ -165,52 +165,6 @@ var swfmini = function() {
 	}
 	
 	
-	/* Functions to abstract and display alternative content
-	*/
-	function displayAltContent(obj) {
-		if (ua.ie && ua.win && obj.readyState != 4) {
-			// IE only: when a SWF is loading (AND: not available in cache) wait for the readyState of the object element to become 4 before removing it,
-			// because you cannot properly cancel a loading SWF file without breaking browser load references, also obj.onreadystatechange doesn't work
-			var el = createElement("div");
-			obj.parentNode.insertBefore(el, obj); // insert placeholder div that will be replaced by the alternative content
-			el.parentNode.replaceChild(abstractAltContent(obj), el);
-			obj.style.display = "none";
-			(function(){
-				if (obj.readyState == 4) {
-					obj.parentNode.removeChild(obj);
-				}
-				else {
-					setTimeout(arguments.callee, 10);
-				}
-			})();
-		}
-		else {
-			obj.parentNode.replaceChild(abstractAltContent(obj), obj);
-		}
-	} 
-
-	function abstractAltContent(obj) {
-		var ac = createElement("div");
-		if (ua.win && ua.ie) {
-			ac.innerHTML = obj.innerHTML;
-		}
-		else {
-			var nestedObj = obj.getElementsByTagName(OBJECT)[0];
-			if (nestedObj) {
-				var c = nestedObj.childNodes;
-				if (c) {
-					var cl = c.length;
-					for (var i = 0; i < cl; i++) {
-						if (!(c[i].nodeType == 1 && c[i].nodeName == "PARAM") && !(c[i].nodeType == 8)) {
-							ac.appendChild(c[i].cloneNode(true));
-						}
-					}
-				}
-			}
-		}
-		return ac;
-	}
-	
 	/* Cross-browser dynamic SWF creation
 	*/
 	function createSWF(attObj, parObj, id) {
@@ -1624,6 +1578,10 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 			options.customMessages = true;
 			toLoad.push('form-message');
 		}
+		if(options.customDatalist){
+			options.fD = true;
+			toLoad.push('form-datalist');
+		}
 		if(options.addValidators){
 			toLoad.push('form-validators');
 		}
@@ -2011,8 +1969,8 @@ $.each({typeMismatch: 'mismatch', badInput: 'bad'}, function(name, fn){
 		
 		if(typeModels[cache.type] && typeModels[cache.type][fn]){
 			ret = typeModels[cache.type][fn](val, input);
-		} else if('validity' in input[0]){
-			ret = input[0].validity[name] || input[0].validity.typeMismatch || false;
+		} else if('validity' in input[0] && ('name' in input[0].validity)){
+			ret = input[0].validity[name] || false;
 		}
 		return ret;
 	};
@@ -3642,9 +3600,8 @@ try {
 
 webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
-	if(options.overrideMessages){
+	if(options.lazyCustomMessages){
 		options.customMessages = true;
-		webshims.error('overrideMessages is deprecated. use customMessages instead.');
 	}
 	var validityMessages = webshims.validityMessages;
 	
@@ -3971,34 +3928,6 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 					}
 				}
 			};
-			
-			if(formsCFG.customDatalist && (!listSupport || !('selectedOption' in $('<input />')[0]))){
-				//currently not supported x-browser (FF4 has not implemented and is not polyfilled )
-				inputListProto.selectedOption = {
-					prop: {
-						writeable: false,
-						get: function(){
-							var elem = this;
-							var list = $.prop(elem, 'list');
-							var ret = null;
-							var value, options;
-							if(!list){return ret;}
-							value = $.prop(elem, 'value');
-							if(!value){return ret;}
-							options = $.prop(list, 'options');
-							if(!options.length){return ret;}
-							$.each(options, function(i, option){
-								if(value == $.prop(option, 'value')){
-									ret = option;
-									return false;
-								}
-							});
-							return ret;
-						}
-					}
-				};
-			}
-			
 			
 			if(listSupport){
 				//options only return options, if option-elements are rooted: but this makes this part of HTML5 less backwards compatible
