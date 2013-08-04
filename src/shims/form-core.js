@@ -33,6 +33,10 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 			options.customMessages = true;
 			toLoad.push('form-message');
 		}
+		if(options.customDatalist){
+			options.fD = true;
+			toLoad.push('form-datalist');
+		}
 		if(options.addValidators){
 			toLoad.push('form-validators');
 		}
