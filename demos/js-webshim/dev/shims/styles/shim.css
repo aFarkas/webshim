@@ -633,7 +633,7 @@ input[type="color"] {
 }
 
 .ws-po-box {
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   background: #fefefe;
   padding: 5px;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -672,7 +672,7 @@ input[type="color"] {
   height: 0;
   border-left: 9px solid transparent;
   border-right: 9px solid transparent;
-  border-bottom: 7px solid #cccccc;
+  border-bottom: 7px solid #ccc;
   border-top: none;
   zoom: 1;
   font-size: 0;
@@ -689,7 +689,7 @@ input[type="color"] {
   top: auto;
   bottom: 4px;
   border-bottom: none;
-  border-top: 7px solid #cccccc;
+  border-top: 7px solid #ccc;
 }
 html .ws-po-arrow {
   border-left-color: transparent;
@@ -730,7 +730,9 @@ html .ws-po-arrow .ws-po-arrowbox {
 }
 
 .input-picker .ws-prev,
-.input-picker .ws-next, .input-picker .ws-button-row button {
+.input-picker .ws-next,
+.input-picker .ws-super-prev,
+.input-picker .ws-super-next, .input-picker .ws-button-row button {
   border-radius: 4px;
   background: #ccc;
   padding: 5px 8px;
@@ -748,8 +750,12 @@ html .ws-po-arrow .ws-po-arrowbox {
   width: 415px;
 }
 .input-picker.time-popover .ws-prev,
-.input-picker.time-popover .ws-next, .input-picker.datetime-local-popover .ws-prev,
-.input-picker.datetime-local-popover .ws-next {
+.input-picker.time-popover .ws-next,
+.input-picker.time-popover .ws-super-prev,
+.input-picker.time-popover .ws-super-next, .input-picker.datetime-local-popover .ws-prev,
+.input-picker.datetime-local-popover .ws-next,
+.input-picker.datetime-local-popover .ws-super-prev,
+.input-picker.datetime-local-popover .ws-super-next {
   display: none;
 }
 .input-picker.ws-size-2 {
@@ -773,7 +779,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 }
 .input-picker .ws-focus,
 .input-picker :focus {
-  outline: 1px dotted black;
+  outline: 1px dotted #000;
 }
 .input-picker .ws-po-box {
   position: relative;
@@ -782,10 +788,12 @@ html .ws-po-arrow .ws-po-arrowbox {
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
 .input-picker .ws-prev,
-.input-picker .ws-next {
+.input-picker .ws-next,
+.input-picker .ws-super-prev,
+.input-picker .ws-super-next {
   position: absolute;
   top: 10px;
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   border-radius: 5px;
   padding: 0;
   width: 24px;
@@ -794,7 +802,9 @@ html .ws-po-arrow .ws-po-arrowbox {
   z-index: 1;
 }
 .input-picker .ws-prev span,
-.input-picker .ws-next span {
+.input-picker .ws-next span,
+.input-picker .ws-super-prev span,
+.input-picker .ws-super-next span {
   display: none;
 }
 .input-picker.time-popover .ws-picker-body {
@@ -806,35 +816,47 @@ html .ws-po-arrow .ws-po-arrowbox {
   zoom: 1;
   margin: 0 -10px;
 }
-.input-picker .ws-prev {
+.input-picker .ws-prev,
+.input-picker .ws-super-prev {
   left: 20px;
   background-position: -243px 5px;
 }
-.input-picker .ws-next {
+.input-picker.ws-year-buttons .ws-prev {
+  left: 50px;
+}
+.input-picker .ws-next,
+.input-picker .ws-super-next {
   right: 20px;
   background-position: -275px 5px;
 }
+.input-picker.ws-year-buttons .ws-next {
+  right: 50px;
+}
 .input-picker .ws-prev:hover,
-.input-picker .ws-next:hover {
+.input-picker .ws-next:hover,
+.input-picker .ws-super-prev:hover,
+.input-picker .ws-super-next:hover {
   border-color: #666;
 }
 .input-picker .ws-prev[disabled],
-.input-picker .ws-next[disabled] {
+.input-picker .ws-next[disabled],
+.input-picker .ws-super-prev[disabled],
+.input-picker .ws-super-next[disabled] {
   opacity: 0.4;
   border-color: #eee;
 }
 .input-picker .ws-button-row {
   position: relative;
   margin: 10px 0 0;
-  border-top: 1px solid #eeeeee;
+  border-top: 1px solid #eee;
   padding: 10px 0 0;
   text-align: left;
   z-index: 2;
 }
 .input-picker .ws-button-row button {
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   border-radius: 5px;
-  box-shadow: 1px 1px 0 white;
+  box-shadow: 1px 1px 0 #fff;
   background-color: #ddd;
   background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
   background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
@@ -858,6 +880,9 @@ html .ws-po-arrow .ws-po-arrowbox {
 }
 .input-picker.time-popover .ws-picker-header button {
   font-size: 15px;
+}
+.input-picker.ws-year-buttons .ws-picker-header {
+  margin: 0 65px;
 }
 .input-picker .ws-picker-header {
   position: absolute;
@@ -947,7 +972,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 }
 .input-picker .ws-options {
   margin: 10px 0 0;
-  border-top: 1px solid #eeeeee;
+  border-top: 1px solid #eee;
   padding: 10px 0 0;
   text-align: left;
 }
@@ -1089,7 +1114,7 @@ progress {
 }
 progress[data-position] {
   vertical-align: -0.2em;
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   background: #e6e6e6;
 }
 progress > * {
@@ -1168,6 +1193,6 @@ summary {
 }
 
 summary.summary-has-focus {
-  outline: 1px dotted #aaaaaa;
+  outline: 1px dotted #aaa;
   outline-offset: -1px;
 }

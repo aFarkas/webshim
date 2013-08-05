@@ -856,7 +856,9 @@ $button-bgcolor: #f5f5f5;
 	&.datetime-local-popover	{
 	
 		.ws-prev,
-		.ws-next {
+		.ws-next,
+		.ws-super-prev,
+		.ws-super-next		{
 			display: none;
 		}
 	}
@@ -900,7 +902,9 @@ $button-bgcolor: #f5f5f5;
 	}
 
 	.ws-prev,
-	.ws-next {
+	.ws-next,
+	.ws-super-prev,
+	.ws-super-next	{
 		@extend %ws-button;
 		position: absolute;
 		top: 10px;
@@ -930,22 +934,37 @@ $button-bgcolor: #f5f5f5;
 		margin: 0 -10px;
 	}
 
-	.ws-prev {
+	.ws-prev,
+	.ws-super-prev	{
 		left: 20px;
 		background-position: -243px 5px;
 	}
-	.ws-next {
+	
+	&.ws-year-buttons .ws-prev {
+		left: 50px;
+	}
+	
+	.ws-next,
+	.ws-super-next{
 		right: 20px;
 		background-position: -275px 5px;
 	}
 	
+	&.ws-year-buttons .ws-next {
+		right: 50px;
+	}
+	
 	.ws-prev:hover,
-	.ws-next:hover {
+	.ws-next:hover,
+	.ws-super-prev:hover,
+	.ws-super-next:hover	{
 		border-color: #666;
 	}
 	
 	.ws-prev[disabled],
-	.ws-next[disabled] {
+	.ws-next[disabled],
+	.ws-super-prev[disabled],
+	.ws-super-next[disabled]{
 		opacity: 0.4;
 		border-color: #eee;
 	}
@@ -996,7 +1015,12 @@ $button-bgcolor: #f5f5f5;
 			font-size: 15px;
 		}
 	}
-
+	
+	&.ws-year-buttons .ws-picker-header {
+		margin: 0 65px;
+	}
+	
+	
 	.ws-picker-header {
 		position: absolute;
 		top: -44px;
