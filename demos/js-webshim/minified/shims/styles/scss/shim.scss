@@ -203,15 +203,6 @@ output {
 	position: relative;
 	display: inline-block;
 	zoom: 1;
-
-	.polyfill-important & {
-		position: relative !important;
-		display: inline-block !important;
-		margin: 0 !important;
-		padding: 0 !important;
-		width: auto !important;
-		height: auto !important;
-	}
 }
 
 .placeholder-box-input {
@@ -236,13 +227,6 @@ output {
 	line-height: 1;
 	cursor: text;
 
-	.polyfill-important & {
-		margin: 0 !important;
-		padding-right: 0 !important;
-		padding-bottom: 0 !important;
-		display: none !important;
-	}
-
 	.placeholder-visible &,
 	&.placeholder-visible {
 		display: inline-block;
@@ -261,19 +245,10 @@ output {
 	color: #ccc;
 }
 
-.polyfill-important {
-	.placeholder-visible .placeholder-text, .placeholder-text.placeholder-visible {
-		display: inline-block !important;
-	}
-}
-
 
 /* spinner control for time, number (usable for date, datetime-local) */
 .has-input-buttons {
 	display: inline-block;
-}
-.polyfill-important .has-input-buttons {
-	display: inline-block !important;
 }
 
 .input-buttons,
@@ -340,11 +315,7 @@ input[type="color"] {
 }
 
 .input-buttons {
-	.polyfill-important & {
-		display: inline-block !important;
-		padding: 0 !important;
-		vertical-align: middle !important;
-	}
+	
 	&.color-input-buttons {
 		margin-left: 2px;
 	}
@@ -380,13 +351,6 @@ input[type="color"] {
 		font-size: 0;
 		line-height: 0;
 		background: url(forms.png) no-repeat 0 0;
-
-		.polyfill-important & {
-			display: inline-block !important;
-			margin: 0 !important;
-			padding: 0 !important;
-			font-size: 0 !important;
-		}
 
 		&.step-up {
 			top: 0;
@@ -446,9 +410,6 @@ input[type="color"] {
 		text-align: center;
 		display: inline-block;
 		
-		.polyfill-important & {
-			display: inline-block !important;
-		}
 	}
 	
 	
@@ -520,12 +481,6 @@ input[type="color"] {
 	cursor: pointer;
 	font-size: 0;
 	line-height: 0;
-
-	.polyfill-important & {
-		display: inline-block !important;
-		padding: 0 !important;
-		font-size: 0 !important;
-	}
 
 	.ws-range-thumb {
 		top: 0;
@@ -793,15 +748,6 @@ input[type="color"] {
 		}
 	}
 
-	.polyfill-important & {
-		border-left-color: transparent !important;
-		border-right-color: transparent !important;
-
-		.ws-po-arrowbox {
-			border-left-color: transparent !important;
-			border-right-color: transparent !important;
-		}
-	}
 	[data-vertical="middle"] &,
 	* html & {
 		display: none;
@@ -852,8 +798,7 @@ $button-bgcolor: #f5f5f5;
 		width: 415px;
 	}
 	
-	&.time-popover,
-	&.datetime-local-popover	{
+	&.time-popover	{
 	
 		.ws-prev,
 		.ws-next,
@@ -1376,21 +1321,6 @@ summary {
 
 	.closed-details-summary & {
 		background-position: 0 -20px;
-	}
-
-	.polyfill-important & {
-		margin: -1px 0 0 !important;
-		padding: 0 !important;
-		border: 0 !important;
-		display: inline-block !important;
-		width: 16px !important;
-		height: 11px !important;
-		background: url(details-arrows.png) no-repeat 0 0 !important;
-		vertical-align: middle !important;
-	}
-
-	.polyfill-important .closed-details-summary & {
-		background-position: 0 -20px !important;
 	}
 }
 

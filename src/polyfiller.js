@@ -27,9 +27,9 @@
 	
 	
 	var webshims = {
-		version: '1.11.0Beta1',
+		version: '1.11.0Beta2',
 		cfg: {
-			useImportantStyles: true,
+			
 			//addCacheBuster: false,
 			waitReady: true,
 			extendNative: 1,
@@ -143,9 +143,6 @@
 					webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
 				}
 				onReady(features, removeLoader);
-				if (webCFG.useImportantStyles) {
-					addClass.push('polyfill-important');
-				}
 				if (addClass[0]) {
 					$('html').addClass(addClass.join(' '));
 				}

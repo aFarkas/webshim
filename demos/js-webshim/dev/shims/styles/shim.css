@@ -752,10 +752,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker.time-popover .ws-prev,
 .input-picker.time-popover .ws-next,
 .input-picker.time-popover .ws-super-prev,
-.input-picker.time-popover .ws-super-next, .input-picker.datetime-local-popover .ws-prev,
-.input-picker.datetime-local-popover .ws-next,
-.input-picker.datetime-local-popover .ws-super-prev,
-.input-picker.datetime-local-popover .ws-super-next {
+.input-picker.time-popover .ws-super-next {
   display: none;
 }
 .input-picker.ws-size-2 {

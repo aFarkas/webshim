@@ -637,7 +637,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		var str = '<div class="time-list picker-list ws-index-0">';
 		var i = 0;
 		var rowNum = 0;
-		var len = 24;
+		var len = 23;
 		var attrs = {
 			min: $.prop(data.orig, 'min'),
 			max: $.prop(data.orig, 'max'),
@@ -671,7 +671,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				iVal
 			;
 				
-			if(i && !(i % 5)){
+			if(i && !(i % 4)){
 				rowNum++;
 				str += '</tr><tr class="ws-row-'+ rowNum +'">';
 			}
