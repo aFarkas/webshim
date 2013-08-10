@@ -27,12 +27,12 @@
 	
 	
 	var webshims = {
-		version: '1.11.0Beta2',
+		version: '1.11.0RC1',
 		cfg: {
 			
 			//addCacheBuster: false,
 			waitReady: true,
-			extendNative: 1,
+//			extendNative: false,
 			loadStyles: true,
 			disableShivMethods: true,
 			wspopover: {appendTo: 'body', hideOnBlur: true},

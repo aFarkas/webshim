@@ -1267,8 +1267,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
 	
-	if(webshims.cfg.extendNative === 1){
-		webshims.warn("extendNative configuration will be set to false by default with next release. In case you rely on it set it to 'true' otherwise to 'false'. See http://bit.ly/16OOTQO");
+	if(webshims.cfg.extendNative === undefined){
+		webshims.warn("extendNative configuration was set to false by default with this release. In case you rely on it set it to 'true' otherwise to 'false'. See http://bit.ly/16OOTQO");
 	}
 	
 	if (!webshims.cfg.no$Switch) {

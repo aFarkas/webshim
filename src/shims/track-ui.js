@@ -40,7 +40,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 	var showTracks = {subtitles: 1, captions: 1, descriptions: 1};
 	var mediaelement = webshims.mediaelement;
 	var usesNativeTrack =  function(){
-		return !options.override && Modernizr.track;
+		return !options.override && Modernizr.texttrackapi;
 	};
 	
 	var trackDisplay = {
@@ -171,7 +171,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 			track._lastFoundCue = {index: 0, time: 0};
 		}
 		
-		if(Modernizr.track && !options.override && !track._shimActiveCues){
+		if(Modernizr.texttrackapi && !options.override && !track._shimActiveCues){
 			track._shimActiveCues = mediaelement.createCueList();
 		}
 		
@@ -251,6 +251,11 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				createUpdateFn('nodeName', 'addTextTrack', 'value');
 			});
 		})();
+		$.propHooks.activeCues = {
+			get: function(obj, value){
+				return obj._shimActiveCues || obj.activeCues;
+			}
+		};
 	}
 	
 	webshims.addReady(function(context, insertedElement){
@@ -260,8 +265,9 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				return webshims.implement(this, 'trackui');
 			})
 			.each(function(){
-				var elem = $(this);
+				var baseData, trackList, updateTimer, updateTimer2;
 				
+				var elem = $(this);
 				var getDisplayCues = function(e){
 					var track;
 					var time;
@@ -293,12 +299,11 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 					clearTimeout(updateTimer);
 					if(e && e.type == 'timeupdate'){
 						getDisplayCues();
-						setTimeout(onUpdate, 90);
+						updateTimer2 = setTimeout(onUpdate, 90);
 					} else {
 						updateTimer = setTimeout(getDisplayCues, 9);
 					}
 				};
-				
 				var addTrackView = function(){
 					
 					elem
@@ -306,7 +311,6 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 						.on('play.trackview timeupdate.trackview updatetrackdisplay.trackview', onUpdate)
 					;
 				};
-				var baseData, trackList, updateTimer;
 				
 				elem.on('remove', function(e){
 					if(!e.originalEvent && baseData && baseData.trackDisplay){
@@ -323,6 +327,9 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 						if(!usesNativeTrack() || elem.is('.nonnative-api-active')){
 							addTrackView();
 						} else {
+							clearTimeout(updateTimer);
+							clearTimeout(updateTimer2);
+							
 							trackList = elem.prop('textTracks');
 							baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
 							

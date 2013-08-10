@@ -41,20 +41,6 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, mai
   display: block;
 }
 
-dialog {
-  display: none;
-  postion: absolute;
-  left: 0;
-  right: 0;
-  border: solid;
-  background: #fff;
-  color: #000;
-  padding: 1em;
-}
-dialog[open] {
-  display: block;
-}
-
 audio {
   display: none;
   height: 0;
@@ -194,14 +180,6 @@ output {
   display: inline-block;
   zoom: 1;
 }
-.polyfill-important .placeholder-box {
-  position: relative !important;
-  display: inline-block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  width: auto !important;
-  height: auto !important;
-}
 
 .placeholder-box-input {
   vertical-align: bottom;
@@ -225,12 +203,6 @@ output {
   line-height: 1;
   cursor: text;
 }
-.polyfill-important .placeholder-text {
-  margin: 0 !important;
-  padding-right: 0 !important;
-  padding-bottom: 0 !important;
-  display: none !important;
-}
 .placeholder-visible .placeholder-text, .placeholder-text.placeholder-visible {
   display: inline-block;
 }
@@ -246,17 +218,9 @@ output {
   color: #ccc;
 }
 
-.polyfill-important .placeholder-visible .placeholder-text, .polyfill-important .placeholder-text.placeholder-visible {
-  display: inline-block !important;
-}
-
 /* spinner control for time, number (usable for date, datetime-local) */
 .has-input-buttons {
   display: inline-block;
-}
-
-.polyfill-important .has-input-buttons {
-  display: inline-block !important;
 }
 
 .input-buttons,
@@ -317,11 +281,6 @@ input[type="color"] {
   width: 6.5em;
 }
 
-.polyfill-important .input-buttons {
-  display: inline-block !important;
-  padding: 0 !important;
-  vertical-align: middle !important;
-}
 .input-buttons.color-input-buttons {
   margin-left: 2px;
 }
@@ -350,12 +309,6 @@ input[type="color"] {
   font-size: 0;
   line-height: 0;
   background: url(forms.png) no-repeat 0 0;
-}
-.polyfill-important .step-controls span {
-  display: inline-block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  font-size: 0 !important;
 }
 .step-controls span.step-up {
   top: 0;
@@ -407,10 +360,6 @@ input[type="color"] {
   box-sizing: border-box;
   text-align: center;
   display: inline-block;
-}
-.polyfill-important .ws-input input, .polyfill-important
-.ws-input .ws-input-seperator {
-  display: inline-block !important;
 }
 
 .ws-date .mm,
@@ -467,11 +416,6 @@ input[type="color"] {
   cursor: pointer;
   font-size: 0;
   line-height: 0;
-}
-.polyfill-important .ws-range {
-  display: inline-block !important;
-  padding: 0 !important;
-  font-size: 0 !important;
 }
 .ws-range .ws-range-thumb {
   top: 0;
@@ -633,7 +577,7 @@ input[type="color"] {
 }
 
 .ws-po-box {
-  border: 1px solid #ccc;
+  border: 1px solid #cccccc;
   background: #fefefe;
   padding: 5px;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -672,7 +616,7 @@ input[type="color"] {
   height: 0;
   border-left: 9px solid transparent;
   border-right: 9px solid transparent;
-  border-bottom: 7px solid #ccc;
+  border-bottom: 7px solid #cccccc;
   border-top: none;
   zoom: 1;
   font-size: 0;
@@ -689,7 +633,7 @@ input[type="color"] {
   top: auto;
   bottom: 4px;
   border-bottom: none;
-  border-top: 7px solid #ccc;
+  border-top: 7px solid #cccccc;
 }
 html .ws-po-arrow {
   border-left-color: transparent;
@@ -698,14 +642,6 @@ html .ws-po-arrow {
 html .ws-po-arrow .ws-po-arrowbox {
   border-left-color: transparent;
   border-right-color: transparent;
-}
-.polyfill-important .ws-po-arrow {
-  border-left-color: transparent !important;
-  border-right-color: transparent !important;
-}
-.polyfill-important .ws-po-arrow .ws-po-arrowbox {
-  border-left-color: transparent !important;
-  border-right-color: transparent !important;
 }
 [data-vertical="middle"] .ws-po-arrow, * html .ws-po-arrow {
   display: none;
@@ -776,7 +712,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 }
 .input-picker .ws-focus,
 .input-picker :focus {
-  outline: 1px dotted #000;
+  outline: 1px dotted black;
 }
 .input-picker .ws-po-box {
   position: relative;
@@ -790,7 +726,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .ws-super-next {
   position: absolute;
   top: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #cccccc;
   border-radius: 5px;
   padding: 0;
   width: 24px;
@@ -818,6 +754,9 @@ html .ws-po-arrow .ws-po-arrowbox {
   left: 20px;
   background-position: -243px 5px;
 }
+.input-picker .ws-super-prev {
+  background-position: -243px -12px;
+}
 .input-picker.ws-year-buttons .ws-prev {
   left: 50px;
 }
@@ -825,6 +764,9 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .ws-super-next {
   right: 20px;
   background-position: -275px 5px;
+}
+.input-picker .ws-super-next {
+  background-position: -275px -12px;
 }
 .input-picker.ws-year-buttons .ws-next {
   right: 50px;
@@ -845,15 +787,15 @@ html .ws-po-arrow .ws-po-arrowbox {
 .input-picker .ws-button-row {
   position: relative;
   margin: 10px 0 0;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #eeeeee;
   padding: 10px 0 0;
   text-align: left;
   z-index: 2;
 }
 .input-picker .ws-button-row button {
-  border: 1px solid #ccc;
+  border: 1px solid #cccccc;
   border-radius: 5px;
-  box-shadow: 1px 1px 0 #fff;
+  box-shadow: 1px 1px 0 white;
   background-color: #ddd;
   background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
   background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
@@ -969,7 +911,7 @@ html .ws-po-arrow .ws-po-arrowbox {
 }
 .input-picker .ws-options {
   margin: 10px 0 0;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #eeeeee;
   padding: 10px 0 0;
   text-align: left;
 }
@@ -1111,7 +1053,7 @@ progress {
 }
 progress[data-position] {
   vertical-align: -0.2em;
-  border: 1px solid #ccc;
+  border: 1px solid #cccccc;
   background: #e6e6e6;
 }
 progress > * {
@@ -1175,21 +1117,8 @@ summary {
 .closed-details-summary .details-open-indicator {
   background-position: 0 -20px;
 }
-.polyfill-important .details-open-indicator {
-  margin: -1px 0 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  display: inline-block !important;
-  width: 16px !important;
-  height: 11px !important;
-  background: url(details-arrows.png) no-repeat 0 0 !important;
-  vertical-align: middle !important;
-}
-.polyfill-important .closed-details-summary .details-open-indicator {
-  background-position: 0 -20px !important;
-}
 
 summary.summary-has-focus {
-  outline: 1px dotted #aaa;
+  outline: 1px dotted #aaaaaa;
   outline-offset: -1px;
 }

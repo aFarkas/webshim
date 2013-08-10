@@ -12,8 +12,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
 	
-	if(webshims.cfg.extendNative === 1){
-		webshims.warn("extendNative configuration will be set to false by default with next release. In case you rely on it set it to 'true' otherwise to 'false'. See http://bit.ly/16OOTQO");
+	if(webshims.cfg.extendNative === undefined){
+		webshims.warn("extendNative configuration was set to false by default with this release. In case you rely on it set it to 'true' otherwise to 'false'. See http://bit.ly/16OOTQO");
 	}
 	
 	if (!webshims.cfg.no$Switch) {
@@ -2473,7 +2473,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 							}
 						};
 						spinEvents.keydown = function(e){
-							if(o.list || e.isDefaultPrevented() || $.attr(this, 'list')){return;}
+							if(o.list || e.isDefaultPrevented() || (e.altKey && e.keyCode == 40) || $.attr(this, 'list')){return;}
 							var stepped = true;
 							var code = e.keyCode;
 							if (code == 38) {
@@ -2956,13 +2956,25 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					popover.show(data.element);
 				}
 			};
+			var open = function(){
+				if((options.inlinePicker || popover.isVisible) && popover.activeElement){
+					popover.openedByFocus = false;
+					popover.activeElement.focus();
+				}
+				show();
+			};
+			
 			
 			options.containerElements.push(popover.element[0]);
 			
 			if(data.type != 'color'){
+				if(options.yearButtons){
+					options.startView = 2;
+				} 
 				if(!options.startView){
 					options.startView = 0;
 				}
+				
 				if(data.type == 'time'){
 					options.minView = 3;
 					options.startView = 3;
@@ -3015,17 +3027,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			}
 			
 			
-			opener
-				.on({
-					click: function(){
-						if((options.inlinePicker || popover.isVisible) && popover.activeElement){
-							popover.openedByFocus = false;
-							popover.activeElement.focus();
-						}
-						show();
-					}
-				})
-			;
+			opener.on({click: open});
+			
 			if(options.inlinePicker){
 				popover.openedByFocus = true;
 			} else {
@@ -3047,6 +3050,11 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 						mouseFocus = false;
 					};
 					data.inputElements.on({
+						keydown: function(e){
+							if(e.keyCode == 40 && e.altKey){
+								open();
+							}
+						},
 						focus: function(){
 							if(!popover.stopOpen && (options.buttonOnly || options.openOnFocus || (mouseFocus && options.openOnMouseFocus))){
 								popover.openedByFocus = options.buttonOnly ? false : !options.noInput;
