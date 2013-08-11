@@ -183,7 +183,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			$(document.documentElement)
 		;
 	};
-	var minWidth = (Modernizr.boxSizing || Modernizr['display-table'] || $.support.getSetAttribute) ?
+	var minWidth = (Modernizr.boxSizing || Modernizr['display-table'] || $.support.getSetAttribute || $.support.boxSizing) ?
 		'minWidth' :
 		'width'
 	;

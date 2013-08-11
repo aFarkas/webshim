@@ -3695,7 +3695,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			});
 		}
 		
-		var isStupid = /MSIE 1[0|1]\.\d/.test(navigator.userAgent) && navigator.userAgent.indexOf('Touch') == -1;
+		var isStupid = modernizrInputTypes.number && navigator.userAgent.indexOf('Touch') == -1 && (/MSIE 1[0|1]\.\d/.test(navigator.userAgent) || /Trident\/7\.0/.test(navigator.userAgent));
 		['number', 'time', 'month', 'date', 'color', 'datetime-local'].forEach(function(name){
 			if(!modernizrInputTypes[name] || options.replaceUI || (name == 'number' && isStupid)){
 				extendType(name, {

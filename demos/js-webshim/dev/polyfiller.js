@@ -40,7 +40,7 @@
 				var script = jScripts.filter('[src*="polyfiller.js"]');
 				var path;
 				script = script[0] || script.end()[script.end().length - 1];
-				path = ( ($.support.hrefNormalized) ? script.src : script.getAttribute("src", 4) ).split('?')[0];
+				path = ( ( !('hrefNormalized' in $.support) || $.support.hrefNormalized  ) ? script.src : script.getAttribute("src", 4) ).split('?')[0];
 				path = path.slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 				return path;
 			})()
@@ -1050,7 +1050,7 @@
 		addPolyfill(fNuAPI, {
 			f: 'forms-ext',
 			options: {
-				types: 'month date time range number'
+				types: 'datetime-local month date time range number'
 			},
 			test: function(){
 				var ret = true;

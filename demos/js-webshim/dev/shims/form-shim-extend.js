@@ -213,8 +213,9 @@ $.event.special.invalid = {
 	}
 };
 
+var supportSubmitBubbles = !('submitBubbles' in $.support) || $.support.submitBubbles;
 var addSubmitBubbles = function(form){
-	if (!$.support.submitBubbles && form && typeof form == 'object' && !form._submit_attached ) {
+	if (!supportSubmitBubbles && form && typeof form == 'object' && !form._submit_attached ) {
 				
 		$.event.add( form, 'submit._submit', function( event ) {
 			event._submit_bubble = true;
@@ -223,7 +224,7 @@ var addSubmitBubbles = function(form){
 		form._submit_attached = true;
 	}
 };
-if(!$.support.submitBubbles && $.event.special.submit){
+if(!supportSubmitBubbles && $.event.special.submit){
 	$.event.special.submit.setup = function() {
 		// Only need this for delegated form submit events
 		if ( $.nodeName( this, "form" ) ) {

@@ -1,8 +1,9 @@
 //DOM-Extension helper
 webshims.register('dom-extend', function($, webshims, window, document, undefined){
 	"use strict";
-	
-	webshims.assumeARIA = $.support.getSetAttribute || Modernizr.canvas || Modernizr.video || Modernizr.boxsizing;
+	var supportHrefNormalized = !('hrefNormalized' in $.support) || $.support.hrefNormalized;
+	var supportGetSetAttribute = !('getSetAttribute' in $.support) || $.support.getSetAttribute;
+	webshims.assumeARIA = supportGetSetAttribute || Modernizr.canvas || Modernizr.video || Modernizr.boxsizing;
 	
 	if($('<input type="email" />').attr('type') == 'text' || $('<form />').attr('novalidate') === "" || ('required' in $('<input />')[0].attributes)){
 		webshims.error("IE browser modes are busted in IE10. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
@@ -685,7 +686,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 							
 							anchor.setAttribute('href', href+'' );
 							
-							if(!$.support.hrefNormalized){
+							if(!supportHrefNormalized){
 								try {
 									$(anchor).insertAfter(this);
 									ret = anchor.getAttribute('href', 4);
@@ -3394,7 +3395,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			});
 		}
 		
-		var isStupid = /MSIE 1[0|1]\.\d/.test(navigator.userAgent) && navigator.userAgent.indexOf('Touch') == -1;
+		var isStupid = modernizrInputTypes.number && navigator.userAgent.indexOf('Touch') == -1 && (/MSIE 1[0|1]\.\d/.test(navigator.userAgent) || /Trident\/7\.0/.test(navigator.userAgent));
 		['number', 'time', 'month', 'date', 'color', 'datetime-local'].forEach(function(name){
 			if(!modernizrInputTypes[name] || options.replaceUI || (name == 'number' && isStupid)){
 				extendType(name, {
