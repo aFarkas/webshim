@@ -85,7 +85,7 @@
 						return;
 					}
 					$.ajax({
-						url: 'http://freegeoip.net/json/',
+						url: '//freegeoip.net/json/',
 						dataType: 'jsonp',
 						cache: true,
 						jsonp: 'callback',
@@ -131,7 +131,7 @@
 								document.writeln = domWrite;
 							}
 							$(document).one('google-loader', googleCallback);
-							$.webshims.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
+							$.webshims.loader.loadScript('//www.google.com/jsapi', false, 'google-loader');
 						}, 800);
 					} else {
 						locationAPIs--;
