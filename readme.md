@@ -27,8 +27,8 @@ Implemented Features:
 How To Use
 ------------------
 
-1. Simply [download Webshims Lib](http://corrupt-system.de/webshims-stable.zip) and put the js-webshim-folder in your project
-2. Include the JavaScript:
+1 - Simply [download Webshims Lib](http://corrupt-system.de/webshims-stable.zip) and put the js-webshim-folder in your project
+2 - Include the JavaScript:
 
 ```html
 <script src="js/jquery.js"></script>
@@ -51,7 +51,7 @@ How To Use
 ```
 
 
-3. Wait till everything has been loaded and then use it:
+3 - Wait till everything has been loaded and then use it:
 
 ```html
 <script> 
