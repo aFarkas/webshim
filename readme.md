@@ -28,15 +28,16 @@ How To Use
 ------------------
 
 1 - Simply [download Webshims Lib](http://corrupt-system.de/webshims-stable.zip) and put the js-webshim-folder in your project
+
 2 - Include the JavaScript:
 
 ```html
 <script src="js/jquery.js"></script>
 
-// Simple change
+<!-- Simple change -->
 <script src="js-webshim/minified/extras/modernizr-custom.js"></script> 
 
-// 'Use your own' variant
+<!-- 'Use your own' variant -->
 <script src="js/Modernizr-custom.js"></script> 
 
 <script src="js-webshim/minified/polyfiller.js"></script> 
