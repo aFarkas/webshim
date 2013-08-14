@@ -24,10 +24,10 @@ Implemented Features:
 * ECMAScript 5 / JavaScript 1.8.5 features 
 
 
-How To Use
+Installation and Usage
 ------------------
 
-1 - Simply [download Webshims Lib](http://corrupt-system.de/webshims-stable.zip) and put the js-webshim-folder in your project
+1 - [Download the Webshims Lib](http://corrupt-system.de/webshims-stable.zip) and put the `js-webshim-folder` in your project.
 
 2 - Include the JavaScript:
 
@@ -43,10 +43,10 @@ How To Use
 <script src="js-webshim/minified/polyfiller.js"></script> 
 
 <script> 
-	//load and implement all unsupported features 
+	// load and implement all unsupported features 
 	$.webshims.polyfill();
 		
-	//or only load a specific feature
+	// or only load a specific feature
 	//$.webshims.polyfill('geolocation json-storage');
 </script>
 ```
@@ -57,22 +57,24 @@ How To Use
 ```html
 <script> 
 	$(function(){
-		//work with JSON and localStorage 
+		// work with JSON and localStorage 
 		var userData = JSON.parse(localStorage.getItem('userData')) || {visits: 0};
 		$('#visits').html(userData.visits);
-		//...
+		// ...
 	});
 </script>
 ```
 
 
-More information and demos [here](http://aFarkas.github.com/webshim/demos/index.html).
+ [More information and demos](http://aFarkas.github.com/webshim/demos/index.html).
 
 
 License
 ---------------------------------------
 
-The Webshims Lib core is licensed under the [MIT-License](http://aFarkas.github.com/webshim/MIT-LICENSE.txt). Note: Webshims Lib uses many great third party scripts.
+The Webshims Lib core is licensed under the [MIT-License](http://aFarkas.github.com/webshim/MIT-LICENSE.txt). 
+
+Webshims Lib uses many great third party scripts.
 
 
 
