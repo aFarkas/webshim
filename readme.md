@@ -4,18 +4,16 @@
 _The polyfilling, capability based loading JavaScript Library_
 
 
-Features
+General Principles
 ------------------
-
-General Principles:
-
 * HTML5 compliant: correctly and accurately implemented (HTML5) Markup-, JS- and DOM-APIs  
 * capability based loading: extremely lightweight in modern browsers
 * cross-browser support: All A-Graded browsers including latest version of Opera are tested
 * extendable: if we have not implemented a feature you want, you can easily implement it on your own
 
-Implemented Features:
 
+Features
+------------------
 * HTML5 shiv and innerShiv solution including basic CSS-support
 * canvas
 * HTML5 form features including: constraint validation and form widgets (input[type="range"], input[type="date"], input[type="number"], input[type="time"], input[type="month"], output, progress, input[list]/datalist)
