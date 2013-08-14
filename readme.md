@@ -27,43 +27,43 @@ Implemented Features:
 How To Use
 ------------------
 
-* Simply [download Webshims Lib](http://corrupt-system.de/webshims-stable.zip) and put the js-webshim-folder in your project
-* Include the JavaScript:
-
+1. Simply [download Webshims Lib](http://corrupt-system.de/webshims-stable.zip) and put the js-webshim-folder in your project
+2. Include the JavaScript:
 
 ```html
-	<script src="js/jquery.js"></script>
-	// Simple change
-	<script src="js-webshim/minified/extras/modernizr-custom.js"></script> 
-	// 'Use your own' variant
-	<script src="js/Modernizr-custom.js"></script> 
+<script src="js/jquery.js"></script>
 
-	<script src="js-webshim/minified/polyfiller.js"></script> 
+// Simple change
+<script src="js-webshim/minified/extras/modernizr-custom.js"></script> 
 
-	<script> 
-		//load and implement all unsupported features 
-		$.webshims.polyfill();
+// 'Use your own' variant
+<script src="js/Modernizr-custom.js"></script> 
+
+<script src="js-webshim/minified/polyfiller.js"></script> 
+
+<script> 
+	//load and implement all unsupported features 
+	$.webshims.polyfill();
 		
-		//or only load a specific feature
-		//$.webshims.polyfill('geolocation json-storage');
-	</script>
-	```
----------------
-
-* Wait till everything has been loaded and then use it:
-
-```html
-	<script> 
-		$(function(){
-			//work with JSON and localStorage 
-			var userData = JSON.parse(localStorage.getItem('userData')) || {visits: 0};
-			$('#visits').html(userData.visits);
-			//...
-		});
-	</script>
+	//or only load a specific feature
+	//$.webshims.polyfill('geolocation json-storage');
+</script>
 ```
 
---------------
+
+3. Wait till everything has been loaded and then use it:
+
+```html
+<script> 
+	$(function(){
+		//work with JSON and localStorage 
+		var userData = JSON.parse(localStorage.getItem('userData')) || {visits: 0};
+		$('#visits').html(userData.visits);
+		//...
+	});
+</script>
+```
+
 
 More information and demos [here](http://aFarkas.github.com/webshim/demos/index.html).
 
