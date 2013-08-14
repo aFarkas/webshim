@@ -1,5 +1,8 @@
-[Webshims Lib](http://aFarkas.github.com/webshim/demos/index.html) - The polyfilling, capability based loading JavaScript Library
+[Webshim](http://aFarkas.github.com/webshim/demos/index.html)
 ================================
+
+_The polyfilling, capability based loading JavaScript Library_
+
 
 Features
 ------------------
