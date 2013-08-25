@@ -2557,7 +2557,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		
 		picker._actions = {
 			changeInput: function(val, popover, data){
-				picker._actions.cancel(val, popover, data);
+				if(!data.options.noChangeDismiss){
+					picker._actions.cancel(val, popover, data);
+				}
 				data.setChange(val);
 			},
 			cancel: function(val, popover, data){

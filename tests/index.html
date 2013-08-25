@@ -9,10 +9,14 @@
 	<script>
 		(function(){
 			var hash = location.hash.replace('#', '');
+			
 			if(hash.indexOf('legacyjquery') != -1){
 				document.write('<script src="http:\/\/ajax.googleapis.com\/ajax\/libs\/jquery\/1.8\/jquery.js"><\/script>');
+			} else if(Object.defineProperties && hash.indexOf('modernjquery') != -1) {
+				document.write('<script src="http:\/\/code.jquery.com\/jquery-2.0.3.js"><\/script>');
 			} else {
-				document.write('<script src="http:\/\/code.jquery.com\/jquery-1.10.1.min.js"><\/script>');
+				//code.jquery.com/jquery-2.0.3.js
+				document.write('<script src="http:\/\/code.jquery.com\/jquery-1.10.2.min.js"><\/script>');
 			}
 		})();
 	</script>
@@ -62,6 +66,8 @@
 				$('#noNativeMethods').prop('checked', !$.webshims.cfg.extendNative);
 				$('#useCustomUI').prop('checked', $.webshims.cfg['forms-ext'].replaceUI);
 				$('#legacyjquery').prop('checked', (hash.indexOf('legacyjquery') != -1));
+				$('#modernjquery').prop('checked', (hash.indexOf('modernjquery') != -1));
+				
 				$('#noConflictExtreme').prop('checked', (hash.indexOf('noConflictExtreme') != -1));
 				$('#punycode').prop('checked', (hash.indexOf('punycode') !== -1));
 				$('input.webshim-config')
@@ -179,6 +185,7 @@
 	<input type="checkbox" id="noNativeMethods" value="noNativeMethods" class="webshim-config" /> <label for="noNativeMethods">noNativeMethods</label>
 	<input type="checkbox" id="useCustomUI" value="useCustomUI" class="webshim-config" /> <label for="useCustomUI">use custom input widgets</label>
 	<input type="checkbox" id="legacyjquery" value="legacyjquery" class="webshim-config" /> <label for="legacyjquery">use legacy jquery</label>
+	<input type="checkbox" id="modernjquery" value="modernjquery" class="webshim-config" /> <label for="modernjquery">use modern jquery</label>
 	<input type="checkbox" id="noConflictExtreme" value="noConflictExtreme" class="webshim-config" /> <label for="noConflictExtreme">jQuery.noConflict(true)</label>
 	<input type="checkbox" id="punycode" value="punycode" class="webshim-config" /> <label for="punycode">punycode</label>
 	

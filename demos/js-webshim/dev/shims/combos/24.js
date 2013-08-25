@@ -4,6 +4,10 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	var webkitVersion = chromeBugs && parseFloat((navigator.userAgent.match(/Safari\/([\d\.]+)/) || ['', '999999'])[1], 10);
 	var invalidClass = options.iVal.errorClass || 'user-error';
 	var validClass = options.iVal.successClass || 'user-success';
+	
+	var invalidWrapperClass = options.iVal.errorWrapperClass || 'ws-invalid';
+	var successWrapperClass = options.iVal.successWrapperClass || 'ws-success';
+	var errorBoxClass = options.iVal.errorBoxClass || 'ws-errorbox';
 	var checkTypes = {checkbox: 1, radio: 1};
 	
 	var emptyJ = $([]);
@@ -457,10 +461,10 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			if(!fieldWrapper){
 				fieldWrapper = this.getFieldWrapper(elem);
 			}
-			var errorBox = $('div.ws-errorbox', fieldWrapper);
+			var errorBox = $('div.'+errorBoxClass, fieldWrapper);
 			
 			if(!errorBox.length){
-				errorBox = $('<div class="ws-errorbox" hidden="hidden">');
+				errorBox = $('<div class="'+ errorBoxClass +'" hidden="hidden">');
 				fieldWrapper.append(errorBox);
 			}
 			
@@ -481,6 +485,46 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			}
 			return fieldWrapper;
 		},
+		_createContentMessage: (function(){
+			var fields = {};
+			var getErrorName = function(elem){
+				var ret = 'defaultMessage';
+				$.each(fields, function(errorName, cNames){
+					if($(elem).is(cNames)){
+						ret = errorName;
+						return false;
+					}
+				});
+				return ret;
+			};
+			$(function(){
+				$.each($('<input />').prop('validity'), function(name){
+					if(name != 'valid'){
+						var cName = name.replace(/[A-Z]/, function(c){
+							return '-'+(c).toLowerCase();
+						});
+						fields[name] = '.'+cName+', .'+name+', .'+(name).toLowerCase();
+					}
+				});
+			});
+			return function(elem, errorBox){
+				var extended = false;
+				var errorMessages = $(elem).data('errormessage') || {};
+				if(typeof errorMessages == 'string'){
+					errorMessages = {defaultMessage: errorMessages};
+				}
+				$('> *', errorBox).each(function(){
+					var name = getErrorName(this);
+					if(!errorMessages[name]){
+						extended = true;
+						errorMessages[name] = $(this).html();
+					}
+				});
+				if(extended){
+					$(elem).data('errormessage', errorMessages);
+				}
+			};
+		})(),
 		get: function(elem, fieldWrapper){
 			if(!fieldWrapper){
 				fieldWrapper = this.getFieldWrapper(elem);
@@ -488,9 +532,11 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			var errorBox = fieldWrapper.data('errorbox');
 			if(!errorBox){
 				errorBox = this.create(elem, fieldWrapper);
+				this._createContentMessage(elem, errorBox);
 			} else if(typeof errorBox == 'string'){
 				errorBox = $('#'+errorBox);
 				fieldWrapper.data('errorbox', errorBox);
+				this._createContentMessage(elem, errorBox);
 			}
 			return errorBox;
 		},
@@ -498,7 +544,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			var type = $.prop(elem, 'type');
 			var check = function(){
 				var hasVal = checkTypes[type] ? $.prop(elem, 'checked') : $(elem).val();
-				fieldWrapper[hasVal ? 'addClass' : 'removeClass']('ws-success');
+				fieldWrapper[hasVal ? 'addClass' : 'removeClass'](successWrapperClass);
 			};
 			var evt = changeTypes[type] ? 'change' : 'blur';
 			
@@ -507,10 +553,10 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		},
 		hideError: function(elem, reset){
 			var fieldWrapper = this.getFieldWrapper(elem);
-			var errorBox = fieldWrapper.data('errorbox');
+			var errorBox = fieldWrapper.hasClass(invalidWrapperClass) ? this.get(elem, fieldWrapper) : fieldWrapper.data('errorbox');
 			
 			if(errorBox && errorBox.jquery){
-				fieldWrapper.removeClass('ws-invalid');
+				fieldWrapper.removeClass(invalidWrapperClass);
 				errorBox.message = '';
 				$(elem).filter('input').off('.recheckinvalid');
 				errorBox.slideUp(function(){
@@ -534,15 +580,15 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				});
 			}
 		},
-		showError: function(elem, message){
+		showError: function(elem){
 			var fieldWrapper = this.getFieldWrapper(elem);
 			var box = this.get(elem, fieldWrapper);
-			
+			var message = $(elem).getErrorMessage();
 			if(box.message != message){
 				box.stop(true, true).html('<p>'+ message +'</p>');
 				box.message = message;
-				fieldWrapper.addClass('ws-invalid').removeClass('ws-success');
-				if(box.is('[hidden]')){
+				fieldWrapper.addClass(invalidWrapperClass).removeClass(successWrapperClass);
+				if(box.is('[hidden]') || box.css('display') == 'none'){
 					this.recheckInvalidInput(elem);
 					box
 						.css({display: 'none'})
@@ -551,20 +597,19 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					;
 				}
 			}
-			fieldWrapper.removeClass('ws-success');
+			fieldWrapper.removeClass(successWrapperClass);
 			$(elem).off('.recheckvalid');
 			
 			return fieldWrapper;
 		},
 		reset: function(elem){
-			this.hideError(elem, true).removeClass('ws-success');
+			this.hideError(elem, true).removeClass(successWrapperClass);
 		},
 		toggle: function(elem){
-			var message = $(elem).getErrorMessage();
-			if(message){
-				this.showError(elem, message);
+			if($(elem).is(':invalid')){
+				this.showError(elem);
 			} else {
-				this.hideError(elem, message);
+				this.hideError(elem);
 			}
 		}
 	};
@@ -608,6 +653,58 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	;
 	
 	webshims.modules["form-core"].getGroupElements = getGroupElements;
+	
+	
+	if(options.replaceValidationUI){
+		webshims.ready('DOM forms', function(){
+			$(document).on('firstinvalid', function(e){
+				if(!e.isInvalidUIPrevented()){
+					e.preventDefault();
+					webshims.validityAlert.showFor( e.target ); 
+				}
+			});
+		});
+	}
+	
+	/* extension, but also used to fix native implementation workaround/bugfixes */
+	(function(){
+		var firstEvent,
+			invalids = [],
+			stopSubmitTimer,
+			form
+		;
+		
+		$(document).on('invalid', function(e){
+			if(e.wrongWebkitInvalid){return;}
+			var jElm = $(e.target);
+			
+			
+			if(!firstEvent){
+				//trigger firstinvalid
+				firstEvent = $.Event('firstinvalid');
+				firstEvent.isInvalidUIPrevented = e.isDefaultPrevented;
+				var firstSystemInvalid = $.Event('firstinvalidsystem');
+				$(document).triggerHandler(firstSystemInvalid, {element: e.target, form: e.target.form, isInvalidUIPrevented: e.isDefaultPrevented});
+				jElm.trigger(firstEvent);
+			}
+
+			//if firstinvalid was prevented all invalids will be also prevented
+			if( firstEvent && firstEvent.isDefaultPrevented() ){
+				e.preventDefault();
+			}
+			invalids.push(e.target);
+			e.extraData = 'fix'; 
+			clearTimeout(stopSubmitTimer);
+			stopSubmitTimer = setTimeout(function(){
+				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
+				//reset firstinvalid
+				firstEvent = false;
+				invalids = [];
+				$(e.target).trigger(lastEvent, [lastEvent]);
+			}, 9);
+			jElm = null;
+		});
+	})();
 	
 	//see: https://bugs.webkit.org/show_bug.cgi?id=113377
 	if (chromeBugs && webkitVersion < 540) {
@@ -665,7 +762,7 @@ webshims.register('form-validators', function($, webshims, window, document, und
 		}
 	};
 	webshims.refreshCustomValidityRules = function(elem){
-		if(!elem.form || (!initTest && !$.prop(elem, 'willValidate')) ){return;}
+		if(!initTest && !$.prop(elem, 'willValidate')){return;}
 		blockCustom = true;
 		var customMismatchedRule = $.data(elem, 'customMismatchedRule');
 		var validity = $.prop(elem, 'validity') || {};

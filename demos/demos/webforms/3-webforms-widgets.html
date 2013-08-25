@@ -435,6 +435,11 @@ $.webshims.setOptions('forms-ext', {
 					</label>
 					
 					<label>
+						noChangeDismiss: 
+						<input type="checkbox" name="noChangeDismiss" />	
+					</label>
+					
+					<label>
 						openOnFocus: 
 						<input type="checkbox" name="openOnFocus" />
 					</label>
@@ -730,13 +735,28 @@ $.webshims.setOptions('forms-ext', {
 						animate: 
 						<input type="checkbox" name="animate" />
 					</label>
+					
 					<label>
 						calculateWidth: 
 						<input type="checkbox" name="calculateWidth" checked="checked" />	
 					</label>
+					
+					<label>
+						calcTrail: 
+						<input type="checkbox" name="calcTrail" checked="checked" />
+					</label>
 				</fieldset>
 			</form>
 			<form class="input-widget" data-type="time" id="time-cfg">
+				<datalist id="time-list">
+					<select>
+						<option value="12:15" />
+						<option value="14:30" />
+						<option value="16:15" />
+						<option value="18:00" label="labeled Option (18:00)" />
+						<option value="20:15" />
+					</select>
+				</datalist>
 				<fieldset data-method="prop">
 					<legend>$.prop</legend>
 					
@@ -767,7 +787,6 @@ $.webshims.setOptions('forms-ext', {
 				<fieldset data-method="attr">
 					<legend>$.attr</legend>
 					
-					
 					<label>
 						data-placeholder: 
 						<select name="data-placeholder">
@@ -775,6 +794,12 @@ $.webshims.setOptions('forms-ext', {
 							<option>hh:mm</option>
 						</select>
 					</label>
+					<label>
+						list: 
+						<select name="list">
+							<option></option>
+							<option value="time-list">time-list (predefined datalist)</option>
+						</select>
 				</fieldset>
 				<fieldset  data-method="data" data-name="time">
 					<legend>$.data</legend>

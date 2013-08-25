@@ -514,8 +514,8 @@ input[type="color"] {
 		position: absolute;
 		display: block;
 		top: 0;
-		left: 5px;
-		right: 5px;
+		left: 0;
+		right: 0;
 		bottom: 0;
 		margin: 0;
 		zoom: 1;
@@ -524,6 +524,7 @@ input[type="color"] {
 	.ws-range-min {
 		position: absolute !important;
 		display: block;
+		margin: 9px 0 0;
 		padding: 0 !important;
 		top: 0;
 		height: 1px;

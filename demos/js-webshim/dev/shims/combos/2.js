@@ -1749,62 +1749,12 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	
 	
 	$(document).on('focusin.lazyloadvalidation', function(e){
-		if('form' in e.target && $(e.target).is(':invalid')){
+		if('form' in e.target && (e.target.list || $(e.target).is(':invalid'))){
 			lazyLoad();
 		}
 	});
 	webshims.ready('WINDOWLOAD', lazyLoad);
 	
-	if(options.replaceValidationUI){
-		webshims.ready('DOM forms', function(){
-			$(document).on('firstinvalid', function(e){
-				if(!e.isInvalidUIPrevented()){
-					e.preventDefault();
-					webshims.validityAlert.showFor( e.target ); 
-				}
-			});
-		});
-	}
-	
-	/* extension, but also used to fix native implementation workaround/bugfixes */
-	(function(){
-		var firstEvent,
-			invalids = [],
-			stopSubmitTimer,
-			form
-		;
-		
-		$(document).on('invalid', function(e){
-			if(e.wrongWebkitInvalid){return;}
-			var jElm = $(e.target);
-			
-			
-			if(!firstEvent){
-				//trigger firstinvalid
-				firstEvent = $.Event('firstinvalid');
-				firstEvent.isInvalidUIPrevented = e.isDefaultPrevented;
-				var firstSystemInvalid = $.Event('firstinvalidsystem');
-				$(document).triggerHandler(firstSystemInvalid, {element: e.target, form: e.target.form, isInvalidUIPrevented: e.isDefaultPrevented});
-				jElm.trigger(firstEvent);
-			}
-
-			//if firstinvalid was prevented all invalids will be also prevented
-			if( firstEvent && firstEvent.isDefaultPrevented() ){
-				e.preventDefault();
-			}
-			invalids.push(e.target);
-			e.extraData = 'fix'; 
-			clearTimeout(stopSubmitTimer);
-			stopSubmitTimer = setTimeout(function(){
-				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
-				//reset firstinvalid
-				firstEvent = false;
-				invalids = [];
-				$(e.target).trigger(lastEvent, lastEvent);
-			}, 9);
-			jElm = null;
-		});
-	})();
 });
 
 webshims.register('form-datalist', function($, webshims, window, document, undefined, options){

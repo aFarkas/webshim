@@ -335,13 +335,22 @@ $(this).checkValidity();
 
 $(this).callProp('checkValidity'); // $(this).callProp('play');
 </code>
+							<p>The jQuerified method can also take some arguments, if specified by the spec.</p>
+							
+<code class="block">
+$('video').addTextTrack('subtitles', 'just a test', 'en');
+
+$('video').callProp('addTextTrack', ['subtitles', 'just a test', 'en']);	
+</code>							
 							<p>If you pass a list of nodes and the method doesn't return anything, the method will be called on each element in this list, otherwise it will be called on the first element.</p>
-							<p>In case a developer wants to make method calling "feel more native", ithe general option <code>extendNative</code> can be set to <code>true</code>.</p>
+							<p>In case a developer wants to make method calling "feel 100% native", he general option <code>extendNative</code> can be set to <code>true</code>.</p>
 <code class="block">
 $.webshims.setOptions("extendNative", true);
 $.webshims.polyfill('forms');
 //...
-this.checkValidity() //does now work cross-browser. $(this).checkValidity(); or $(this).callProp('checkValidity'); can still be used
+this.checkValidity() //$(this).checkValidity(); or $(this).callProp('checkValidity'); can still be used
+
+$('video').get(0).addTextTrack('subtitles', 'just a test', 'en');
 </code>	
 
 						</li>

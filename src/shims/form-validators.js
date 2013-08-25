@@ -29,7 +29,7 @@ webshims.register('form-validators', function($, webshims, window, document, und
 		}
 	};
 	webshims.refreshCustomValidityRules = function(elem){
-		if(!elem.form || (!initTest && !$.prop(elem, 'willValidate')) ){return;}
+		if(!initTest && !$.prop(elem, 'willValidate')){return;}
 		blockCustom = true;
 		var customMismatchedRule = $.data(elem, 'customMismatchedRule');
 		var validity = $.prop(elem, 'validity') || {};
