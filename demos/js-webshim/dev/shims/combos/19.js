@@ -2736,7 +2736,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			webshims.error('mediaelementError: '+ message);
 			setTimeout(function(){
 				if($(elem).data('mediaerror')){
-					$(elem).trigger('mediaerror');
+					$(elem).addClass('media-error').trigger('mediaerror');
 				}
 			}, 1);
 		}
@@ -2800,6 +2800,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		var parent = elem.parentNode;
 		
 		clearTimeout(baseData.loadTimer);
+		$(elem).removeClass('media-error');
 		$.data(elem, 'mediaerror', false);
 		
 		if(!_srces.length || !parent || parent.nodeType != 1 || stopParent.test(parent.nodeName || '')){return;}

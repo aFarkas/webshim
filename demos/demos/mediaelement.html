@@ -319,7 +319,7 @@ $("video.my-video").loadMediaSrc(
 				</ul>
 				<ul>
 					<li><small>1. Use additional [] to bind events to Array-like objects (<code>$([ $('video').prop('textTracks') ]).on('addtrack', function(e){console.log('track was added');});</code>)</small></li>
-					<li><small>2. Use shimActiveCues instead of activeCues property. In case override is set to true or all track supporting browsers (currently only Chrome 23) won't load the flash- or the youtube iframe fallback  for video/audio playback, activeCues can be also used savely.</small></li>
+					<li><small>2. Use $.prop to get activeCues property.  (i.e.: <code>$.prop(track, 'activeCues');</code> ).</small></li>
 				</ul>
 				
 				<h3>Options for the <code>track</code> feature</h3>

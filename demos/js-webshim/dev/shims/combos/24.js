@@ -746,7 +746,16 @@ webshims.register('form-validators', function($, webshims, window, document, und
 	var onEventTest = function(e){
 		webshims.refreshCustomValidityRules(e.target);
 	};
-	
+	var noValidate = function(){
+		return !noValidate.types[this.type];
+	};
+	noValidate.types = {
+		hidden: 1,
+		image: 1,
+		button: 1,
+		reset: 1,
+		submit: 1
+	};
 	
 	webshims.customErrorMessages = {};
 	webshims.addCustomValidityRule = function(name, test, defaultMessage){
@@ -756,13 +765,16 @@ webshims.register('form-validators', function($, webshims, window, document, und
 			webshims.customErrorMessages[name][''] = defaultMessage || name;
 		}
 		if($.isReady && formReady){
-			$('input, select, textarea').each(function(){
-				testValidityRules(this);
-			});
+			$('input, select, textarea')
+				.filter(noValidate)
+				.each(function(){
+					testValidityRules(this);
+				})
+			;
 		}
 	};
 	webshims.refreshCustomValidityRules = function(elem){
-		if(!initTest && !$.prop(elem, 'willValidate')){return;}
+		if(!initTest){return;}
 		blockCustom = true;
 		var customMismatchedRule = $.data(elem, 'customMismatchedRule');
 		var validity = $.prop(elem, 'validity') || {};
@@ -810,9 +822,12 @@ webshims.register('form-validators', function($, webshims, window, document, und
 		setTimeout(function(){
 			webshims.addReady(function(context, selfElement){
 				initTest = true;
-				$('input, select, textarea', context).add(selfElement.filter('input, select, textarea')).each(function(){
-					testValidityRules(this);
-				});
+				$('input, select, textarea', context).add(selfElement.filter('input, select, textarea'))
+					.filter(noValidate)
+					.each(function(){
+						testValidityRules(this);
+					})
+				;
 				initTest = false;
 				formReady = true;
 			});

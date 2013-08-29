@@ -2638,6 +2638,7 @@ try {
 	var isOver = (webshims.cfg.forms.placeholderType == 'over');
 	var isResponsive = (webshims.cfg.forms.responsivePlaceholder);
 	var polyfillElements = ['textarea'];
+	var debug = webshims.debug !== false;
 	if(!Modernizr.input.placeholder || bustedPlaceholder){
 		polyfillElements.push('input');
 	}
@@ -2728,6 +2729,16 @@ try {
 				data = $.data(elem, 'placeHolder');
 				if(!data){return;}
 			}
+			var isVisible = $(elem).hasClass('placeholder-visible');
+			if(placeholderTxt === false){
+				placeholderTxt = $.attr(elem, 'placeholder') || '';
+			}
+			if(debug && isVisible && !isOver && elem.type != 'password' && elem.value != placeholderTxt){
+				webshims.error('Placeholder does not match shown placeholder/value. Make sure to change value of elements always with $.prop/$.val.');
+				isVisible = false;
+				value = false;
+				$(elem).removeClass('placeholder-visible');
+			}
 			$(elem).unbind('.placeholderremove');
 			
 			if(value === false){
@@ -2735,7 +2746,7 @@ try {
 			}
 			
 			if(!value && (type == 'focus' || (!type && $(elem).is(':focus')))){
-				if(elem.type == 'password' || isOver || $(elem).hasClass('placeholder-visible')){
+				if(elem.type == 'password' || isOver || isVisible){
 					hidePlaceholder(elem, data, '', true);
 				}
 				return;
@@ -2745,9 +2756,7 @@ try {
 				hidePlaceholder(elem, data, value);
 				return;
 			}
-			if(placeholderTxt === false){
-				placeholderTxt = $.attr(elem, 'placeholder') || '';
-			}
+			
 			if(placeholderTxt && !value){
 				showPlaceholder(elem, data, placeholderTxt);
 			} else {
@@ -2855,6 +2864,7 @@ try {
 						var reset = function(e){
 							if($(elem).hasClass('placeholder-visible')){
 								hidePlaceholder(elem, data, '');
+								
 								setTimeout(function(){
 									if(!e || e.type != 'submit' || e.isDefaultPrevented()){
 										changePlaceholderVisibility(elem, false, false, data );

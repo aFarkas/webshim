@@ -1992,6 +1992,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 						fVal[0] = tmp;
 					}
 					val = this.date(fVal[0], o) +'T'+ this.time(fVal[1], o);
+				} else if (fVal.length == 3) {
+					val = this.date(fVal[0], o) +'T'+ this.time(fVal[1]+fVal[2], o);
 				}
 				return val;
 			},
