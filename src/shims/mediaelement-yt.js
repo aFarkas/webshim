@@ -497,21 +497,28 @@ mediaelement.createSWF = function(mediaElem, src, data){
 	if(!data){
 		data = webshims.data(mediaElem, 'mediaelement');
 	}
+	var elemId = 'yt-'+ webshims.getID(mediaElem);
 	var ytID = getYtId(src.src);
+	var hasControls = $.prop(mediaElem, 'controls');
 	if(data){
 		mediaelement.setActive(mediaElem, 'third', data);
 		resetSwfProps(data);
 		data.currentSrc = src.srcProp;
-		ytAPI.done(function(){
-			if(data._ytAPI.loadVideoById){
-				data._ytAPI.loadVideoById(ytID);
-			}
-		});
-		
+		if(hasControls != data._hasControls){
+			data.shadowElem.html('<div id="'+ elemId +'">');
+			addYtAPI(mediaElem, elemId, data, ytID);
+		} else {
+			ytAPI.done(function(){
+				if(data._ytAPI.cueVideoByUrl){
+					data._ytAPI.cueVideoByUrl(ytID);
+				}
+			});
+		}
+		data._hasControls = hasControls;
 		return;
 	}
-	var hasControls = $.prop(mediaElem, 'controls');
-	var elemId = 'yt-'+ webshims.getID(mediaElem);
+	
+	
 	var box = $('<div class="polyfill-video polyfill-mediaelement" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
 		.css({
 			position: 'relative',
@@ -530,6 +537,9 @@ mediaelement.createSWF = function(mediaElem, src, data){
 		},
 		_elem: {
 			value: mediaElem
+		},
+		_hasControls: {
+			value: hasControls
 		},
 		currentSrc: {
 			value: src.srcProp
@@ -664,6 +674,16 @@ mediaelement.createSWF = function(mediaElem, src, data){
 		
 	});
 	mediaSup = webshims.defineNodeNameProperties('video', descs, 'prop');
+	
+	webshims.onNodeNamesPropertyModify('video', 'controls', function(val, boolProp){
+		var data = getYtDataFromElem(this);
+		$(this)[boolProp ? 'addClass' : 'removeClass']('webshims-controls');
+		
+		if(data && data._ytAPI && !data.readyState){
+			$(this).mediaLoad();
+		}
+	});
+	
 })();
 
 
