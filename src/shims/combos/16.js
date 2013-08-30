@@ -3185,12 +3185,7 @@ try {
 			if(placeholderTxt === false){
 				placeholderTxt = $.attr(elem, 'placeholder') || '';
 			}
-			if(debug && isVisible && !isOver && elem.type != 'password' && elem.value != placeholderTxt){
-				webshims.error('Placeholder does not match shown placeholder/value. Make sure to change value of elements always with $.prop/$.val.');
-				isVisible = false;
-				value = false;
-				$(elem).removeClass('placeholder-visible');
-			}
+			
 			$(elem).unbind('.placeholderremove');
 			
 			if(value === false){
