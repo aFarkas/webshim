@@ -67,6 +67,7 @@ class PlayerEvents extends Event
 	public var sound:Sound;
 	public var time:Float;	
 	public var id3Info:ID3Info;
+	public var seekTime:Float;
 	
 	public function new(type:String, bubbles:Bool=false, cancelable:Bool=false) 
 	{
@@ -80,5 +81,6 @@ class PlayerEvents extends Event
 		height = 0;
 		time = 0;
 		name = type;
+		seekTime = 0;
 	}
 }

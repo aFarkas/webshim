@@ -114,6 +114,7 @@ class Player extends EventDispatcher
 	private var _preLoading:Bool;
 	private var _requestedPlay:Bool;
 	private var _hasPoster:Bool;
+	public var lastSeekTime:Float;
 	//}
 	
 	
@@ -154,6 +155,7 @@ class Player extends EventDispatcher
 		noAPITrigger = false;
 		_hasPoster = false;
 		_showLoader = true;
+		lastSeekTime = 0;
 		
 		_naturalWidth =  0;
 		_naturalHeight = 0;
@@ -764,6 +766,7 @@ class Player extends EventDispatcher
 		playerEvent.sound = getSound();
 		playerEvent.time = getCurrentTime();
 		playerEvent.id3Info = getId3Info();
+		playerEvent.seekTime = lastSeekTime;
 		
 		dispatchEvent(playerEvent);
 	}
@@ -1111,6 +1114,7 @@ class Player extends EventDispatcher
 				setVolume(_userSettings.getVolume());
 			}
 		}
+		lastSeekTime = seekTime;
 		callEvents(PlayerEvents.SEEK);
 		return seekTime;
 	}

@@ -168,7 +168,8 @@ class JsApi extends MovieClip {
 					width:			_player._naturalWidth,
 					type:			event.name,
 					loaded:			_player.getBytesLoaded(),
-					total:			_player.getBytesTotal()
+					total:			_player.getBytesTotal(),
+					seekTime: event.seekTime
 			};
 			
 			if (_externalListeners.exists(event.name.toLowerCase()))
