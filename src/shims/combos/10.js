@@ -13,10 +13,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
 	
-	if(webshims.cfg.extendNative === undefined){
-		webshims.warn("extendNative configuration was set to false by default with this release. In case you rely on it set it to 'true' otherwise to 'false'. See http://bit.ly/16OOTQO");
-	}
-	
 	if (!webshims.cfg.no$Switch) {
 		var switch$ = function(){
 			if (window.jQuery && (!window.$ || window.jQuery == window.$) && !window.jQuery.webshims) {
@@ -1271,7 +1267,17 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			this.value(this.options.value, true);
 		},
 		step: function(val){
-			this.options.step = val == 'any' ? 'any' : retDefault(val, 1);
+			var o = this.options;
+			var step = val == 'any' ? 'any' : retDefault(val, 1);
+			
+			if(o.stepping){
+				if(step != 'any' && o.stepping % step){
+					webshims.error('wrong stepping value for type range:'+ (o.stepping % step));
+				} else {
+					step = o.stepping;
+				}
+			}
+			o.step = step;
 			this.value(this.options.value);
 		},
 		

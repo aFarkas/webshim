@@ -334,6 +334,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		networkState: 0,
 		videoHeight: 0,
 		videoWidth: 0,
+		seeking: false,
 		error: null,
 		buffered: {
 			start: function(index){
@@ -437,7 +438,12 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		}
 		data.readyState = readyState;
 	};
-	
+	var callSeeked = function(data){
+		if(data.seeking && Math.abs(data.currentTime - data._lastSeektime) < 2){
+			data.seeking = false;
+			$(data._elem).triggerHandler('seeked');
+		}
+	};
 	
 	
 	mediaelement.jarisEvent = {};
@@ -465,6 +471,20 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 					trigger(data._elem, 'playing');
 				}
 			}
+		},
+		onSeek: function(jaris, data){
+			data._lastSeektime = jaris.seekTime;
+			
+			data.seeking = true;
+			$(data._elem).triggerHandler('seeking');
+			clearTimeout(data._seekedTimer);
+			data._seekedTimer = setTimeout(function(){
+				callSeeked(data);
+				data.seeking = false;
+			}, 300);
+		},
+		onConnectionFailed: function(){
+			webshims.error('media error');
 		},
 		onNotBuffering: function(jaris, data){
 			setReadyState(3, data);
@@ -521,7 +541,9 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 				setReadyState(3, data);
 				trigger(data._elem, 'playing');
 			}
-			
+			if(data.seeking){
+				callSeeked(data);
+			}
 			trigger(data._elem, 'timeupdate');
 		},
 		onProgress: function(jaris, data){
@@ -577,6 +599,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			
 			return function(jaris, data){
 				var i = 0;
+				
 				var doneFn = function(){
 					if(i > 9){
 						data.tryedReframeing = 0;
@@ -736,11 +759,12 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 	
 	
 	var resetSwfProps = (function(){
-		var resetProtoProps = ['_calledMeta', 'lastDuration', '_bufferedEnd', '_bufferedStart', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'videoHeight', 'videoWidth'];
+		var resetProtoProps = ['_calledMeta', 'lastDuration', '_bufferedEnd', '_bufferedStart', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'seeking', 'videoHeight', 'videoWidth'];
 		var len = resetProtoProps.length;
 		return function(data){
 			
 			if(!data){return;}
+			clearTimeout(data._seekedTimer);
 			var lenI = len;
 			var networkState = data.networkState;
 			setReadyState(0, data);
@@ -1181,6 +1205,8 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			delete descs[key].writeable;
 			descs[key].set = setFn;
 		};
+		
+		createGetSetProp('seeking');
 		
 		createGetSetProp('volume', function(v){
 			var data = getSwfDataFromElem(this);

@@ -177,7 +177,17 @@
 			this.value(this.options.value, true);
 		},
 		step: function(val){
-			this.options.step = val == 'any' ? 'any' : retDefault(val, 1);
+			var o = this.options;
+			var step = val == 'any' ? 'any' : retDefault(val, 1);
+			
+			if(o.stepping){
+				if(step != 'any' && o.stepping % step){
+					webshims.error('wrong stepping value for type range:'+ (o.stepping % step));
+				} else {
+					step = o.stepping;
+				}
+			}
+			o.step = step;
 			this.value(this.options.value);
 		},
 		

@@ -37,20 +37,15 @@
 		
 		if(!options.preferFlash){
 			var noSwitch = {
-				1: 1,
-				2: 1
+				1: 1
 			};
 			var switchOptions = function(e){
 				var media, error, parent;
 				if(!options.preferFlash && 
 				($(e.target).is('audio, video') || ((parent = e.target.parentNode) && $('source:last', parent)[0] == e.target)) && 
-				(media = $(e.target).closest('audio, video')) && !noSwitch[(error = media.prop('error'))]
+				(media = $(e.target).closest('audio, video')) && (error = media.prop('error')) && !noSwitch[error.code]
 				){
-					if(error == null){
-						webshims.warn("There was an unspecified error on a mediaelement");
-						return;
-						
-					}
+					
 					$(function(){
 						if(hasSwf && !options.preferFlash){
 							loadSwf();
@@ -62,7 +57,7 @@
 										$('audio, video').each(function(){
 											webshims.mediaelement.selectSource(this);
 										});
-										webshims.error("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error'));
+										webshims.error("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error')+ 'first error: '+ error);
 									}
 								}, 9);
 							});

@@ -465,10 +465,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
 	}
 	
-	if(webshims.cfg.extendNative === undefined){
-		webshims.warn("extendNative configuration was set to false by default with this release. In case you rely on it set it to 'true' otherwise to 'false'. See http://bit.ly/16OOTQO");
-	}
-	
 	if (!webshims.cfg.no$Switch) {
 		var switch$ = function(){
 			if (window.jQuery && (!window.$ || window.jQuery == window.$) && !window.jQuery.webshims) {
@@ -4088,20 +4084,15 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 		
 		if(!options.preferFlash){
 			var noSwitch = {
-				1: 1,
-				2: 1
+				1: 1
 			};
 			var switchOptions = function(e){
 				var media, error, parent;
 				if(!options.preferFlash && 
 				($(e.target).is('audio, video') || ((parent = e.target.parentNode) && $('source:last', parent)[0] == e.target)) && 
-				(media = $(e.target).closest('audio, video')) && !noSwitch[(error = media.prop('error'))]
+				(media = $(e.target).closest('audio, video')) && (error = media.prop('error')) && !noSwitch[error.code]
 				){
-					if(error == null){
-						webshims.warn("There was an unspecified error on a mediaelement");
-						return;
-						
-					}
+					
 					$(function(){
 						if(hasSwf && !options.preferFlash){
 							loadSwf();
@@ -4113,7 +4104,7 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 										$('audio, video').each(function(){
 											webshims.mediaelement.selectSource(this);
 										});
-										webshims.error("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error'));
+										webshims.error("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error')+ 'first error: '+ error);
 									}
 								}, 9);
 							});
