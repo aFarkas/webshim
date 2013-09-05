@@ -181,7 +181,8 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			clearTimeout(this.updateTimer);
 			this.updateTimer = false;
 			
-			this.searchStart = formsCFG.customDatalist && $(this.input).hasClass('search-start');
+			this.noSearch = $(this.input).hasClass('ws-nosearch');
+			this.searchStart = $(this.input).hasClass('search-start');
 			this.addMarkElement = options.addMark || $(this.input).hasClass('mark-option-text');
 			
 			var list = [];
@@ -232,7 +233,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 		getOptionContent: function(item){
 			var content = '';
 			if(options.getOptionContent){
-				content = options.apply(this, arguments) || '';
+				content = options.getOptionContent.apply(this, arguments) || '';
 			} else {
 				content = '<span class="option-value">'+ item.value +'</span>';
 				if(item.label){
@@ -259,7 +260,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			var startSearch = this.searchStart;
 			var lis = $('li', this.shadowList);
 			var that = this;
-			if(value){
+			if(value && !this.noSearch){
 				
 				this.arrayOptions.forEach(function(item, i){
 					var search, searchIndex, foundName;

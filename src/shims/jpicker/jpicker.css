@@ -175,11 +175,12 @@ table.jPicker {
 .jPicker td.Radio {
   margin: 0px;
   padding: 0px;
-  width: 31px;
+  width: 32px;
 }
 .jPicker td.Radio input {
   margin: 0px 5px 0px 0px;
   padding: 0px;
+  display: inline-block;
 }
 .jPicker td.Text {
   font-size: 12px !important;
@@ -205,6 +206,7 @@ table.jPicker {
 }
 .jPicker tr.Hex td.Text input.Hex {
   width: 45px;
+  display: inline-block;
   margin-left: 2px;
   text-align: center;
 }

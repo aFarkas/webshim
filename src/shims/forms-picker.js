@@ -886,7 +886,10 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					'' :
 					' disabled="" '
 				;
-				options.push('<li role="presentation"><button value="'+ val +'" '+disabled+' data-action="changeInput" tabindex="-1"  role="option">'+ (label || data.formatValue(val, false)) +'</button></li>');
+				if(label){
+					label = ' <span class="ws-label">'+ label +'</span>';
+				}
+				options.push('<li role="presentation"><button value="'+ val +'" '+disabled+' data-action="changeInput" tabindex="-1"  role="option"><span class="ws-value">'+ data.formatValue(val, false) +'</span>'+ label +'</button></li>');
 			});
 			if(options.length){
 				id++;

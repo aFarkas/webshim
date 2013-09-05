@@ -323,7 +323,7 @@ $('video').prop('currentTime', 200);
 </code>
 						</li>
 						<li>
-							<p><strong>calling a DOM method</strong>: While DOM properties have to be accessed through jQuery's <code>$.prop/$.attr</code> methods, DOM methods have to be accesed using $.prop and executed in the context of the DOMK element.</p>
+							<p><strong>calling a DOM method</strong>: While DOM properties have to be accessed through jQuery's <code>$.prop/$.attr</code> methods, DOM methods can be accesed using $.prop and executed in the context of the DOM element.</p>
 <code class="block">
 // "this" refers to a DOM element, not a jQuery object
 var fn = $.prop(this, 'checkValidity');
@@ -343,7 +343,7 @@ $('video').addTextTrack('subtitles', 'just a test', 'en');
 $('video').callProp('addTextTrack', ['subtitles', 'just a test', 'en']);	
 </code>							
 							<p>If you pass a list of nodes and the method doesn't return anything, the method will be called on each element in this list, otherwise it will be called on the first element.</p>
-							<p>In case a developer wants to make method calling "feel 100% native", he general option <code>extendNative</code> can be set to <code>true</code>.</p>
+							<p>In case a developer wants to make method calling "feel 100% native", the general option <code>extendNative</code> can be set to <code>true</code>.</p>
 <code class="block">
 $.webshims.setOptions("extendNative", true);
 $.webshims.polyfill('forms');
@@ -355,7 +355,7 @@ $('video').get(0).addTextTrack('subtitles', 'just a test', 'en');
 
 						</li>
 						<li>
-							<p><strong>binding to events</strong>: Always use jQuery's <code>bind</code> method to register your event handlers. <code>addEventListener</code> or inline event handler won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use event capturing in the native implementation and <code>$.fn.trigger</code> in the shim.</p>
+							<p><strong>binding to events</strong>: Always use jQuery's <code>on</code>, <code>bind</code> method to register your event handlers. <code>addEventListener</code> or inline event handler won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use event capturing in the native implementation and <code>$.fn.trigger</code> in the shim.</p>
 							<p>This means that some HTML5 events go down the DOM tree in capable browsers and go up the tree in polyfilled browsers. This can create differences if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default, don't use <code>return false;</code>, use <code>event.preventDefault();</code> instead.</p>
 						</li>
 						<li>
@@ -377,7 +377,7 @@ $('input[type="date"]').getShadowElement().animate({width: 300});
 </code>
 							<p><strong>re-rendering shadowelements</strong>: On dynamic websites shadowelements dimensions and/or positions sometimes need to be updated, this can be achieved by triggering the <code>updateshadowdom</code>.</p>
 <code class="block">
-$.event.trigger('updateshadowdom');
+$(document).trigger('updateshadowdom');
 </code>
 							<p><small>Note: The <code>updateshadowdom</code> event is automatically (but 'lazily') triggered on window.resize/emchange events.</small></p>
 						</li>
