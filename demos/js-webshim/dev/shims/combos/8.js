@@ -2251,7 +2251,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		if(src.indexOf('rtmp') === 0){
 			return nodeName+'/rtmp';
 		}
-		src = src.split('?')[0].split('.');
+		src = src.split('?')[0].split('#')[0].split('.');
 		src = src[src.length - 1];
 		var mt;
 		

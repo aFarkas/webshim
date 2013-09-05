@@ -454,13 +454,9 @@ webshims.polyfill('forms forms-ext');</pre>
 		
 		<!-- non required addons -->
 		<script>
-			$(function(){
-				
-				$.each(['jquery.ui.position.js', 'jquery.mousewheel.js', 'mousepress.js', 'jquery.mwheelIntent.js'], function(i, src){
-					webshims.loader.loadScript('../../../demo-js/src/'+src);
-				});
+			$.each(['jquery.ui.position.js', 'jquery.mousewheel.js', 'mousepress.js', 'jquery.mwheelIntent.js'], function(i, src){
+				webshims.loader.loadScript('../../../demo-js/src/'+src);
 			});
-			
 		</script>
 	</body>
 </html>
