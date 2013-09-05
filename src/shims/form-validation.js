@@ -97,13 +97,18 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				){
 					return;
 			}
+			if(webshims.refreshCustomValidityRules){
+				if(webshims.refreshCustomValidityRules(elem) == 'async'){
+					$(elem).one('refreshvalidityui', switchValidityClass);
+					return;
+				}
+			}
+			
 			var validity = $.prop(elem, 'validity');
 			
 			var addClass, removeClass, trigger, generaltrigger, validityCause;
 			
-			if(webshims.refreshCustomValidityRules){
-				webshims.refreshCustomValidityRules(elem);
-			}
+			
 			
 			if(validity.valid){
 				if(!shadowElem.hasClass(validClass)){
@@ -488,14 +493,16 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		_createContentMessage: (function(){
 			var fields = {};
 			var getErrorName = function(elem){
-				var ret = 'defaultMessage';
-				$.each(fields, function(errorName, cNames){
-					if($(elem).is(cNames)){
-						ret = errorName;
-						return false;
-					}
-				});
-				return ret;
+				var ret = $(elem).data('errortype');
+				if(!ret){
+					$.each(fields, function(errorName, cNames){
+						if($(elem).is(cNames)){
+							ret = errorName;
+							return false;
+						}
+					});
+				}
+				return ret || 'defaultMessage';
 			};
 			$(function(){
 				$.each($('<input />').prop('validity'), function(name){
@@ -503,7 +510,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 						var cName = name.replace(/[A-Z]/, function(c){
 							return '-'+(c).toLowerCase();
 						});
-						fields[name] = '.'+cName+', .'+name+', .'+(name).toLowerCase();
+						fields[name] = '.'+cName+', .'+name+', .'+(name).toLowerCase()+', [data-errortype="'+ name +'"]';
 					}
 				});
 			});
@@ -559,7 +566,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				fieldWrapper.removeClass(invalidWrapperClass);
 				errorBox.message = '';
 				$(elem).filter('input').off('.recheckinvalid');
-				errorBox.slideUp(function(){
+				errorBox[fx[options.iVal.fx].hide](function(){
 					$(this).attr({hidden: 'hidden'});
 				});
 			}
@@ -574,10 +581,17 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				var throttle = function(){
 					switchValidityClass({type: 'input', target: input});
 				};
-				$(input).filter('input:not([type="checkbox"], [type="radio"])').off('.recheckinvalid').on('input.recheckinvalid', function(){
-					clearTimeout(timer);
-					timer = setTimeout(throttle, options.iVal.recheckDelay); 
-				});
+				$(input)
+					.filter('input:not([type="checkbox"], [type="radio"])')
+					.off('.recheckinvalid')
+					.on('input.recheckinvalid', function(){
+						clearTimeout(timer);
+						timer = setTimeout(throttle, options.iVal.recheckDelay); 
+					})
+					.on('focusout.recheckinvalid', function(){
+						clearTimeout(timer);
+					})
+				;
 			}
 		},
 		showError: function(elem){
