@@ -89,6 +89,9 @@
 				webshims.loader.loadScript('http://afarkas.github.io/jMediaelement/demo/js/jme.full.js', function(){
 					$.jme.startJME();					
 					$('div.mediaplayer').jmeProp({"controlbar": true});
+					setTimeout(function(){
+						$(document).trigger('updateshadowdom');
+					}, 9);
 				});
 				$(this).prop('disabled', true);
 			});

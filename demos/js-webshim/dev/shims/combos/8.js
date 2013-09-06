@@ -2012,6 +2012,7 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 	if(hasNative){
 		var videoElem = document.createElement('video');
 		Modernizr.videoBuffered = ('buffered' in videoElem);
+		Modernizr.mediaDefaultMuted = ('defaultMuted' in videoElem);
 		supportsLoop = ('loop' in videoElem);
 		
 		webshims.capturingEvents(['play', 'playing', 'waiting', 'paused', 'ended', 'durationchange', 'loadedmetadata', 'canplay', 'volumechange']);
@@ -2462,7 +2463,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		var testFixMedia = function(){
 			if(webshims.implement(this, 'mediaelement')){
 				selectSource(this);
-				
+				if(!Modernizr.mediaDefaultMuted && $.attr(this, 'muted') != null){
+					$.prop(this, 'muted', true);
+				}
 				//fixes for FF 12 and IE9/10 || does not hurt, if run in other browsers
 				if(hasNative && (!supportsLoop || ('ActiveXObject' in window))){
 					var bufferTimer;

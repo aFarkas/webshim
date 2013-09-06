@@ -1000,7 +1000,25 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		});
 		
 		mediaSup = webshims.defineNodeNameProperties(nodeName, descs, 'prop');
+		
+		if(!Modernizr.mediaDefaultMuted){
+			webshims.defineNodeNameProperties(nodeName, {
+				defaultMuted: {
+					get: function(){
+						return $.attr(this, 'muted') != null;
+					},
+					set: function(val){
+						if(val){
+							$.attr(this, 'muted', '');
+						} else {
+							$(this).removeAttr('muted');
+						}
+					}
+				}
+			}, 'prop');
+		}
 	});
+	
 	
 	if(hasFlash && $.cleanData){
 		var oldClean = $.cleanData;

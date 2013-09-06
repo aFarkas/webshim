@@ -1,3 +1,13 @@
+upcomming Release 1.11.1
+----------
+
+- implemented seeking, seeked events, seeking property for mediaelements
+- implemented muted content attribute/defaultMuted property for mediaelements (muted porperty was supported from beginning of course)
+- improved form validators
+- implemented remote form validation
+- fixed meridian parsing for datetime-local
+- allow URI Fragments as source for mediaelements
+
 Release 1.11.0
 ----------
 
