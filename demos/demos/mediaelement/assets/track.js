@@ -101,7 +101,7 @@ var startTreeOfLife = function(video){
 				
 				$('#carousel [data-cueid="'+ cue.id +'"]').addClass('active-cueitem');
 			}
-		}
+		};
 		
 		$(textTrack)
 			.on('cuechange', highLightItem)
@@ -124,7 +124,7 @@ var startTreeOfLife = function(video){
 	
 	var onTrackLoad = function(){
 		var textTrack = $.prop(this, 'track'); // gotcha: "this" is track *element*
-		//track was loaded without errors	
+		//track was loaded without errors (0: nothing, 1: loading, 2: loaded, 3: error)
 		if ($.prop(this, 'readyState') == 2) {
 		
 			if (textTrack.kind === "metadata") {
@@ -145,14 +145,14 @@ var startTreeOfLife = function(video){
 	;
 	//activate all track
 	videoElement
-		//jProp is nice it returns a jQuery property
+		//jProp is nice it returns a jQuery-fied property
 		//good for properties, which return a DOM-Element, an event target or an array-like object
 		.jProp('textTracks')
 		.prop('mode', function(i, track){
 			//activate textTracks in case 'default' attribute didn't work (default should be only used on one track per mediaelement!)
 			return $.prop(this, 'kind') == 'subtitles' ? 
-				'showing' :
-				'hidden'
+				this.SHOWING :
+				this.HIDDEN
 			;
 		})
 	;

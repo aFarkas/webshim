@@ -104,6 +104,10 @@
 						if($.prop(this, 'readyState') > $.prop(this, 'HAVE_NOTHING')){
 							$(this).triggerHandler('updateMediaState');
 						}
+						//currently neither implemented in webshims nor in any browser!
+						$( [$(this).prop('textTracks')] ).on('change', function(){
+							$('input.texttrack', player).prop('checked', $('track', player).prop('track').mode == 'showing');
+						});
 					})
 				;
 				
@@ -576,6 +580,7 @@ $('video, audio')
 				<ul>
 					<li><a href="http://jsfiddle.net/trixta/VvmmC/">Player with some custom controls using input[type="range"]</a></li>
 					<li><a href="http://jsfiddle.net/trixta/QZJTM/">Working with the TextTrack API</a></li>
+					<li><a href="mediaelement/track-demo.html">Tree of Life demo (using video, textTrack, datalist/input[list], input[placeholder], input[autofocus] and JSON</a></li>
 				</ul>
 			</aside>
 				

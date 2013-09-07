@@ -19,7 +19,7 @@
 	webshims.setOptions('forms', {
 		customDatalist: true
 	});
-	webshims.polyfill('mediaelement track forms');
+	webshims.polyfill('mediaelement track forms json-storage');
 </script>
 
 <script>
@@ -73,7 +73,7 @@
 <p>This demo shows how the <a href="https://developer.mozilla.org/en/HTML/Element/track" title="MDN track element article" target="_blank">track element</a> can be used to build page content &ndash; and synchronise page changes with media playback. </p>
 <p>The video has a <a href="tracks/subtitle-en.vtt" title="WebVTT subtitle track" target="_blank">subtitle track</a>, and a <a href="tracks/metadata-en.vtt" title="WebVTT metadata track" target="_blank">metadata track</a> with cues in JSON format. The metadata cues are parsed to build the carousel, and as each metadata cue becomes active, the carousel and the content in the panel on the right are updated. The video can be navigated by clicking on thumbnails in the carousel; the content panel has links to full articles on Wikipedia.</p>
 <p>Content and layout are based on work done by BBC R&D Prototyping as part of the <a href="http://www.p2p-next.org" title="P2P-Next project">P2P-Next project</a>.</p>
-<p>The <a href="http://samdutton.net/track/">original demo (samdutton.net/track/)</a> was modified by using webshims to make it cross-browser so that it even works in IE7. This demo is using the following Technologies (video, track, datalist, input[autofocus], input[placeholder] and JSON.</p>
+<p>The <a href="http://samdutton.net/track/">original demo (samdutton.net/track/)</a> was modified by using webshims to make it cross-browser so that it even works in IE7/IE8 or Firefox 3.6. This demo is using the following Technologies (video, track, datalist, input[autofocus], input[placeholder] and JSON.</p>
 <div class="button-row">
 	
 	<button class="load-jme">test JME / customizable Controls</button>
@@ -84,17 +84,17 @@
 
 <div id="videoAndSearch">
 	<div class="mediaplayer videoplayer">
-		<video autoplay="" controls="">
+		<video controls="">
 			<source src="http://www.samdutton.net/track/video/treeOfLife-en.webm"  type='video/webm; codecs="vp8, vorbis"' />
 			<source src="http://www.youtube.com/watch?v=H6IrUUDboZo"  type='video/youtube' />
 			
 			<track label="English subtitles" kind="subtitles" srclang="en" src="assets/treeOfLife-subtitles-en.vtt" default />
-			<track label="Metadata" kind="metadata" srclang="en" src="assets/treeOfLife-metadata-en.vtt" />
+			<track kind="metadata" srclang="en" src="assets/treeOfLife-metadata-en.vtt" />
 		</video>
 	</div>	
 	<div id="searchContainer" class="trackSupported">
 		<label for="searchInput">Search subtitles: </label>
-		<input id="searchInput" autofocus placeholder="find subtitles, then select a result to move to that point in the video." />
+		<input id="searchInput" autofocus placeholder="find subtitles, then select a result to move to that point in the video." class="mark-option-text" />
 	</div>
 	
 	<div id="carouselContainer" class="trackSupported">
