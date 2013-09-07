@@ -28,7 +28,7 @@ var startTreeOfLife = function(video){
 	
 	var buildDatalistFromCues = function(textTrack){
 		var id = 'id-seachlist';
-		var datalist = $('<datalist id="'+ id +'">').insertAfter("#searchInput");
+		var datalist = $('<datalist id="'+ id +'" />').insertAfter("#searchInput");
 		//old option wrapper
 		var select = $('<select />');
 		var subtitles = $.map(textTrack.cues, function(cue){
