@@ -196,7 +196,8 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 					rItem = {
 						value: value.replace(lReg, '&lt;').replace(gReg, '&gt;'),
 						label: $.trim($.attr(rElem, 'label')) || '',
-						className: rElem.className || ''
+						className: rElem.className || '',
+						elem: options.getOptionContent ? rElem : null
 					};
 					
 					if(rItem.label){
@@ -231,16 +232,20 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			}
 		},
 		getOptionContent: function(item){
-			var content = '';
+			var content;
 			if(options.getOptionContent){
-				content = options.getOptionContent.apply(this, arguments) || '';
-			} else {
+				content = options.getOptionContent.apply(this, arguments);
+				if(content != null){
+					content += '<span class="option-value" style="display: none;">'+ item.value +'</span>'
+				}
+			} 
+			if(content == null){
 				content = '<span class="option-value">'+ item.value +'</span>';
 				if(item.label){
 					content += ' <span class="option-label">'+ item.label +'</span>';
 				}
 			}
-			return content;
+			return content || '';
 		},
 		showHideOptions: function(_fromShowList){
 			var value = $.prop(this.input, 'value').toLowerCase();
