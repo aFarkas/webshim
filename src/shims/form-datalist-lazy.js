@@ -226,6 +226,9 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			this.arrayOptions = allOptions;
 			this.popover.contentElement.html('<div class="datalist-box"><ul role="list">'+ list.join("\n") +'</ul></div>');
 			
+			if(options.datalistCreated){
+				options.datalistCreated.apply(this);
+			}
 			
 			if(_forceShow || this.popover.isVisible){
 				this.showHideOptions();

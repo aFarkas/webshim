@@ -125,15 +125,19 @@ webshims.polyfill('forms forms-ext');</pre>
 					</p>
 					<input type="text" value="" list="fruits" placeholder="Type your favorite fruit name" class="ws-nosearch" />
 					<datalist id="fruits">
-						<option value="Apple"></option>
-						<option value="Orange"></option>
-						<option value="Peach"></option>
+						<select>
+							<option value="Apple"></option>
+							<option value="Orange"></option>
+							<option value="Peach"></option>
+						</select>
 					</datalist>
 					<pre>&lt;input type="text" value="" list="fruits" /&gt;
 &lt;datalist id="fruits"&gt;
-  &lt;option value="Apple"&gt;&lt;/option&gt; 
-  &lt;option value="Orange"&gt;&lt;/option&gt; 
-  &lt;option value="Peach"&gt;&lt;/option&gt; 
+  &lt;select&gt;
+    &lt;option value="Apple"&gt;&lt;/option&gt; 
+    &lt;option value="Orange"&gt;&lt;/option&gt; 
+    &lt;option value="Peach"&gt;&lt;/option&gt;
+  &lt;/select&gt;
 &lt;/datalist&gt;</pre>
 				</div>
 				<div class="span4">
@@ -157,11 +161,13 @@ webshims.polyfill('forms forms-ext');</pre>
 						input[type=range] is not available on your browser
 					</div>
 					<datalist id="number">
-						<option>10</option>
-						<option>15</option>
-						<option>30</option>
-						<option>50</option>
-						<option>90</option>
+						<select>
+							<option>10</option>
+							<option>15</option>
+							<option>30</option>
+							<option>50</option>
+							<option>90</option>
+						</select>
 					</datalist>
 					<script>
 						$('#number_input').on('input', function(e){
@@ -170,11 +176,13 @@ webshims.polyfill('forms forms-ext');</pre>
 					</script>
 					<pre>&lt;input type="range" value="0" min="0" max="100" list="number" /&gt;
 &lt;datalist id=&quot;number&quot;&gt;
-  &lt;option&gt;10&lt;/option&gt; 
-  &lt;option&gt;15&lt;/option&gt; 
-  &lt;option&gt;30&lt;/option&gt; 
-  &lt;option&gt;50&lt;/option&gt; 
-  &lt;option&gt;90&lt;/option&gt; 
+  &lt;select&gt;
+    &lt;option&gt;10&lt;/option&gt; 
+    &lt;option&gt;15&lt;/option&gt; 
+    &lt;option&gt;30&lt;/option&gt; 
+    &lt;option&gt;50&lt;/option&gt; 
+    &lt;option&gt;90&lt;/option&gt; 
+  &lt;/select&gt;
 &lt;/datalist&gt;</pre>
 				</div>
 				<div class="span4">
@@ -195,22 +203,26 @@ webshims.polyfill('forms forms-ext');</pre>
 						input[type=color] is not available on your browser
 					</div>
 					<datalist id="colors">
-						<option>#ff0000</option>
-						<option>#0000ff</option>
-						<option>#00ff00</option>
-						<option>#ffff00</option>
-						<option>#00ffff</option>
-						<option>#f00</option>
-						<!--invalid--><option>red</option>
-						<!--invalid-->
+						<select>
+							<option>#ff0000</option>
+							<option>#0000ff</option>
+							<option>#00ff00</option>
+							<option>#ffff00</option>
+							<option>#00ffff</option>
+							<option>#f00</option>
+							<!--invalid--><option>red</option>
+							<!--invalid-->
+						</select>
 					</datalist>
 					<pre>&lt;input type="color" value="#000000" list="color" /&gt;
 &lt;datalist id=&quot;color&quot;&gt;
-  &lt;option&gt;#ff0000&lt;/option&gt; 
-  &lt;option&gt;#0000ff&lt;/option&gt; 
-  &lt;option&gt;#00ff00&lt;/option&gt; 
-  &lt;option&gt;#ffff00&lt;/option&gt; 
-  &lt;option&gt;#00ffff&lt;/option&gt; 
+  &lt;select&gt;
+    &lt;option&gt;#ff0000&lt;/option&gt; 
+    &lt;option&gt;#0000ff&lt;/option&gt; 
+    &lt;option&gt;#00ff00&lt;/option&gt; 
+    &lt;option&gt;#ffff00&lt;/option&gt; 
+    &lt;option&gt;#00ffff&lt;/option&gt; 
+  &lt;/select&gt;
 &lt;/datalist&gt;</pre>
 				</div>
 				<div class="span4">
@@ -239,15 +251,19 @@ webshims.polyfill('forms forms-ext');</pre>
 						input[type=date] is not available on your browser
 					</div>
 					<datalist id="days">
-						<option label="Independence Day">2013-07-04</option>
-						<option label="Labor Day">2013-09-02</option>
-						<option label="Columbus Day">2013-10-14</option>
+						<select>
+							<option label="Independence Day">2013-07-04</option>
+							<option label="Labor Day">2013-09-02</option>
+							<option label="Columbus Day">2013-10-14</option>
+						</select>
 					</datalist>
 					<pre>&lt;input type=&quot;date&quot; list=&quot;days&quot; /&gt;
 &lt;datalist id=&quot;days&quot;&gt;
-  &lt;option label=&quot;Independence Day&quot;&gt;2013-07-04&lt;/option&gt;
-  &lt;option label=&quot;Labor Day&quot;&gt;2013-09-02&lt;/option&gt;
-  &lt;option label=&quot;Columbus Day&quot;&gt;2013-10-14&lt;/option&gt;
+  &lt;select&gt;
+    &lt;option label=&quot;Independence Day&quot;&gt;2013-07-04&lt;/option&gt;
+    &lt;option label=&quot;Labor Day&quot;&gt;2013-09-02&lt;/option&gt;
+    &lt;option label=&quot;Columbus Day&quot;&gt;2013-10-14&lt;/option&gt;
+  &lt;/select&gt;
 &lt;/datalist&gt;</pre>
 				</div>
 				<div class="span4">
@@ -276,45 +292,24 @@ webshims.polyfill('forms forms-ext');</pre>
 						input[type=time] is not available on your browser
 					</div>
 					<datalist id="times">
-						<option label="Midnight">00:00</option>
-						<option>06:00</option>
-						<option label="Noon">12:00</option>
-						<option>18:00</option>
+						<select>
+							<option label="Midnight">00:00</option>
+							<option>06:00</option>
+							<option label="Noon">12:00</option>
+							<option>18:00</option>
+						</select>
 					</datalist>
 					<pre>&lt;input type=&quot;time&quot; list=&quot;times&quot; /&gt;
 &lt;datalist id=&quot;times&quot;&gt
-  &lt;option label=&quot;Midnight&quot;&gt;00:00&lt;/option&gt;
-  &lt;option&gt;06:00&lt;/option&gt;
-  &lt;option label=&quot;Noon&quot;&gt;12:00&lt;/option&gt;
-  &lt;option&gt;18:00&lt;/option&gt;
+  &lt;select&gt;
+    &lt;option label=&quot;Midnight&quot;&gt;00:00&lt;/option&gt;
+    &lt;option&gt;06:00&lt;/option&gt;
+    &lt;option label=&quot;Noon&quot;&gt;12:00&lt;/option&gt;
+    &lt;option&gt;18:00&lt;/option&gt;
+  &lt;/select&gt;
 &lt;/datalist&gt;</pre>
 				</div>
-				<!--           <div class="span4">
-				<h3>input[type=datetime] datalist</h3>
-				<p>For <code>datetime</code> type, <code>datalist</code> suggests a list of recommended datetimes. You can also specify labels for those datetimes by giving <code>label</code> attribute to <code>option</code> tags.</p>
-				<input type="datetime" id="datetime" list="datetimes" />
-				<div class="alert alert-error" style="display:none;">input[type=datetime] is not available on your browser</div>
-				<datalist id="datetimes">
-				<option label="Midnight">00:00</option>
-				<option>06:00</option>
-				<option label="Noon">12:00</option>
-				<option>18:00</option>
-				</datalist>
-				<script>
-				if (!Modernizr.inputtypes.datetime) {
-				document.querySelector('#datetime').style.display = 'none';
-				document.querySelector('#datetimes').previousElementSibling.style.display = 'block';
-				}
-				</script>
-				<pre>&lt;input type=&quot;datetime&quot; list=&quot;datetimes&quot; /&gt;
-				&lt;datalist id=&quot;datetimes&quot;&gt
-				&lt;option label=&quot;Midnight&quot;&gt;00:00&lt;/option&gt;
-				&lt;option&gt;06:00&lt;/option&gt;
-				&lt;option label=&quot;Noon&quot;&gt;12:00&lt;/option&gt;
-				&lt;option&gt;18:00&lt;/option&gt;
-				&lt;/datalist&gt;</pre>
-				</div>
-				-->
+				
 				<div class="span4">
 					<h3>input[type=datetime-local] datalist</h3>
 					<p>
@@ -341,17 +336,21 @@ webshims.polyfill('forms forms-ext');</pre>
 						input[type=datetime-local] is not available on your browser
 					</div>
 					<datalist id="datetime-locals">
-						<option label="Santa Visit">2012-12-24T23:59</option>
-						<option label="Chrismas party">2012-12-25T18:00</option>
-						<option>2012-12-30T00:00</option>
-						<option label="Happy New Year">2013-01-01T00:00</option>
+						<select>
+							<option label="Santa Visit">2012-12-24T23:59</option>
+							<option label="Chrismas party">2012-12-25T18:00</option>
+							<option>2012-12-30T00:00</option>
+							<option label="Happy New Year">2013-01-01T00:00</option>
+						</select>
 					</datalist>
 					<pre>&lt;input type=&quot;datetime-local&quot; list=&quot;datetime-locals&quot; /&gt;
 &lt;datalist id=&quot;datetime-locals&quot;&gt
-  &lt;option label=&quot;Santa Visit&quot;&gt;2012-12-24T23:59&lt;/option&gt;
-  &lt;option label=&quot;Chrismas party&quot;&gt;2012-12-25T18:00&lt;/option&gt;
-  &lt;option&gt;2012-12-30T00:00&lt;/option&gt;
-  &lt;option label=&quot;Happy New Year&quot;&gt;2013-01-01T00:00&lt;/option&gt;
+  &lt;select&gt;
+    &lt;option label=&quot;Santa Visit&quot;&gt;2012-12-24T23:59&lt;/option&gt;
+    &lt;option label=&quot;Chrismas party&quot;&gt;2012-12-25T18:00&lt;/option&gt;
+    &lt;option&gt;2012-12-30T00:00&lt;/option&gt;
+    &lt;option label=&quot;Happy New Year&quot;&gt;2013-01-01T00:00&lt;/option&gt;
+  &lt;/select&gt;
 &lt;/datalist&gt;</pre>
 				</div>
 				<div class="span4">
@@ -380,58 +379,24 @@ webshims.polyfill('forms forms-ext');</pre>
 						input[type=month] is not available on your browser
 					</div>
 					<datalist id="months">
-						<option label="Eiji's birthday">1976-02</option>
-						<option label="End of last century">2000-12</option>
-						<option>2010-01</option>
-						<option label="Now">2012-11</option>
+						<select>
+							<option label="Eiji's birthday">1976-02</option>
+							<option label="End of last century">2000-12</option>
+							<option>2010-01</option>
+							<option label="Now">2012-11</option>
+						</select>
 					</datalist>
 					<pre>&lt;input type=&quot;month&quot; list=&quot;months&quot; /&gt;
 &lt;datalist id=&quot;months&quot;&gt
-  &lt;option label=&quot;Eiji's birthday&quot;&gt;1976-02&lt;/option&gt;
-  &lt;option label=&quot;End of last century&quot;&gt;2000-12&lt;/option&gt;
-  &lt;option&gt;2010-01&lt;/option&gt;
-  &lt;option label=&quot;Now&quot;&gt;2012-11&lt;/option&gt;
+  &lt;select&gt;
+    &lt;option label=&quot;Eiji's birthday&quot;&gt;1976-02&lt;/option&gt;
+    &lt;option label=&quot;End of last century&quot;&gt;2000-12&lt;/option&gt;
+    &lt;option&gt;2010-01&lt;/option&gt;
+    &lt;option label=&quot;Now&quot;&gt;2012-11&lt;/option&gt;
+  &lt;/select&gt;
 &lt;/datalist&gt;</pre>
 				</div>
-				<div class="span4">
-					<h3>input[type=week] datalist</h3>
-					<p>
-						For 
-						<code>
-							week
-						</code>
-						type, 
-						<code>
-							datalist
-						</code>
-						suggests a list of recommended weeks. You can also specify labels for those weeks by giving 
-						<code>
-							label
-						</code>
-						attribute to 
-						<code>
-							option
-						</code>
-						tags.
-					</p>
-					<input type="week" id="week" list="weeks" />
-					<div class="alert alert-error" style="display:none;">
-						input[type=week] is not available on your browser
-					</div>
-					<datalist id="weeks">
-						<option label="First week of 2012">2012-W01</option>
-						<option label="Second week of 2012">2012-W02</option>
-						<option label="13th week of 2012">2012-W13</option>
-						<option label="The last week of 2012">2012-W52</option>
-					</datalist>
-					<pre>&lt;input type=&quot;week&quot; list=&quot;weeks&quot; /&gt;
-&lt;datalist id=&quot;weeks&quot;&gt
-  &lt;option label=&quot;First week of 2012&quot;&gt;2012-W01&lt;/option&gt;
-  &lt;option label=&quot;Second week of 2012&quot;&gt;2012-W02&lt;/option&gt;
-  &lt;option label=&quot;13th week of 2012&quot;&gt;2012-W13&lt;/option&gt;
-  &lt;option label=&quot;The last week of 2012&quot;&gt;2012-W52&lt;/option&gt;
-&lt;/datalist&gt;</pre>
-				</div>
+				
 			</div>
 			<br>
 			<h2>Compatibility</h2>
