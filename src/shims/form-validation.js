@@ -658,7 +658,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				}
 			},
 			submit: function(e){
-				if(options.iVal.sel && $(e.target).is(options.iVal.sel) && $.prop(e.target, 'noValidate') && !$(e.target).checkValidity()){
+				if(options.iVal.sel && !options.iVal.noSubmitCheck &&$(e.target).is(options.iVal.sel) && $.prop(e.target, 'noValidate') && !$(e.target).checkValidity()){
 					e.stopImmediatePropagation();
 					return false;
 				}

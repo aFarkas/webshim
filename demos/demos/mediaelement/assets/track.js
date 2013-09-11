@@ -162,6 +162,10 @@ $(function(){
 	startTreeOfLife('video');
 });
 
+$(window).on('load', function(){
+	$('video').eq(0).callProp('play');
+});
+
 
 
 })(jQuery);

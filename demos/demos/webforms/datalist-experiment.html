@@ -24,6 +24,15 @@
 			  .input-buttons {
 			  	margin-bottom: 5px;
 			  }
+			  
+			  .polyfill-all {
+			  	font-size: 200%;
+				font-weight: bold;
+			  }
+			  
+			  .custom-widgets .polyfill-all {
+			  	display: none;
+			  }
 		</style>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 		<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
@@ -39,18 +48,30 @@
 	-->
 		
 		<script>
-			webshims.setOptions('forms', {
-				//replace the default datalist feature with a custom styleable datalist
-				customDatalist: true
-			});
+			if((!Modernizr.input.list && !Modernizr.inputtypes.range) || location.search.indexOf('polyfillall') != -1){
+				$('html').addClass('custom-widgets');
+				webshims.setOptions('forms', {
+					//replace the default datalist feature with a custom styleable datalist
+					customDatalist: true
+				});
+				webshims.setOptions('forms-ext', {
+					//replace all input type widgets with a custom styleable feature
+					replaceUI: true
+				});
+			}
+			
 			webshims.setOptions('forms-ext', {
-				//replace all input type widgets with a custom styleable feature
-				replaceUI: true,
 				types: 'range date time month color'
 			});
 			
 			//load form polyfills
 			webshims.polyfill('forms forms-ext');
+		</script>
+		<!-- non required addons -->
+		<script>
+			$.each(['jquery.mousewheel.js', 'mousepress.js', 'jquery.mwheelIntent.js', 'jquery.ui.position.js'], function(i, src){
+				webshims.loader.loadScript('../../../demo-js/src/'+src);
+			});
 		</script>
 	</head>
 	<body>
@@ -94,19 +115,19 @@
 				<p>With only one line of code, a developer can polyfill all incapable browsers:</p>
 				<pre>webshims.polyfill('forms forms-ext');</pre>
 				
-				<p>And with some small configuration. All input widgets can be turned into highly customizable form widgets:</p>
+				<p>And with some small configuration. All input widgets can be turned into highly customizable form widgets in all browsers:</p>
 				<pre>webshims.setOptions('forms', {
 	//replace the default datalist feature with a custom styleable datalist
 	customDatalist: true
 });
 webshims.setOptions('forms-ext', {
 	//replace all input type widgets with a custom styleable feature
-	replaceUI: true,
-	types: 'range date time month color'
+	replaceUI: true
 });
 
 //load form polyfills
 webshims.polyfill('forms forms-ext');</pre>
+				<p class="polyfill-all"><a href="?polyfillall">Polyfill/Customize all browsers (including modern browsers like Chrome)</a></p>
 			</div>
 			<h2>Examples</h2>
 			<div class="row">
@@ -417,11 +438,5 @@ webshims.polyfill('forms forms-ext');</pre>
 		</div>
 		<!-- /container -->
 		
-		<!-- non required addons -->
-		<script>
-			$.each(['jquery.ui.position.js', 'jquery.mousewheel.js', 'mousepress.js', 'jquery.mwheelIntent.js'], function(i, src){
-				webshims.loader.loadScript('../../../demo-js/src/'+src);
-			});
-		</script>
 	</body>
 </html>

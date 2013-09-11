@@ -166,13 +166,11 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 				if(window.QUnit || (forceShow = ($(that.input).is(':focus') && ($(that.input).hasClass('list-focus') || $.prop(that.input, 'value'))) )){
 					that.updateListOptions(forceShow);
 				} else {
-					webshims.ready('WINDOWLOAD', function(){
-						that.updateTimer = setTimeout(function(){
-							that.updateListOptions();
-							that = null;
-							listidIndex = 1;
-						}, 200 + (100 * listidIndex));
-					});
+					that.updateTimer = setTimeout(function(){
+						that.updateListOptions();
+						that = null;
+						listidIndex = 1;
+					}, 200 + (100 * listidIndex));
 				}
 			}
 		},
@@ -181,9 +179,11 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			clearTimeout(this.updateTimer);
 			this.updateTimer = false;
 			
-			this.noSearch = $(this.input).hasClass('ws-nosearch');
-			this.searchStart = $(this.input).hasClass('search-start');
+			if($(this.input).hasClass('ws-nosearch') || $(this.input).hasClass('search-start')){
+				webshims.error('please use listFilter/data-list-filer configuration with values: "*", "^" or "!"');
+			}
 			this.addMarkElement = options.addMark || $(this.input).hasClass('mark-option-text');
+			this.listFilter = $(this.input).data('listFilter') || options.listFilter || '*';
 			
 			var list = [];
 			
@@ -265,10 +265,10 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			
 			this.lastUpdatedValue = value;
 			var found = false;
-			var startSearch = this.searchStart;
+			var startSearch = this.listFilter == '^';
 			var lis = $('li', this.shadowList);
 			var that = this;
-			if(value && !this.noSearch){
+			if(value && this.listFilter != '!'){
 				
 				this.arrayOptions.forEach(function(item, i){
 					var search, searchIndex, foundName;

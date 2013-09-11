@@ -500,6 +500,222 @@ $.webshims.setOptions('forms-ext', {
 				</fieldset>
 			</form>
 			
+			<form class="input-widget" data-type="datetime-local" id="datetime-local-cfg">
+				<datalist id="datetime-local-list">
+					<select>
+						<option value="2009-10-11T21:00" />
+						<option value="2012-11-11T20:00" />
+						<option value="2013-11-11T20:00" label="labeled Option (2013-11-11T20:00)" />
+					</select>
+				</datalist>
+				<fieldset data-method="prop">
+					<legend>$.prop</legend>
+					
+					<label>
+						min: 
+						<select name="min">
+							<option></option>
+							<option>2008-01-01T18:00</option>
+						</select>
+					</label>
+					<label>
+						max: 
+						<select name="max">
+							<option></option>
+							<option>2014-12-31T22:00</option>
+						</select>
+					</label>
+					
+					<label>
+						disabled: 
+						<input type="checkbox" name="disabled" />	
+					</label>
+					<label>
+						readonly: 
+						<input type="checkbox" name="readonly" />	
+					</label>
+					
+				</fieldset>
+				<fieldset data-method="attr">
+					<legend>$.attr</legend>
+					<label>
+						list: 
+						<select name="list">
+							<option></option>
+							<option value="datetime-local-list">datetime-local-list (predefined datalist)</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="data" data-name="wspopover">
+					<legend>data-wspopover Properties</legend>
+					
+					<label>
+						appendTo: 
+						<select name="appendTo">
+							<option value="body">body (default || body-element)</option>
+							<option value="element">element (keyword for the input element itself)</option>
+						</select>
+					</label>
+					
+					<label>
+						position (only with jQuery UI position utitliy): 
+						<select name="position">
+							<option value='{}'>default ("my": "left top", "at": "left bottom")</option>
+							<option value='{"at": "right bottom"}'>"at": "right bottom"</option>
+							<option value='{"my": "center", "at": "center"}'>"my": "center", "at": "center"</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="data" data-name="datetime-local">
+					<legend>data-month Properties</legend>
+					<label>
+						size: 
+						<select name="size">
+							<option>1</option>
+							<option>3</option>
+						</select>
+					</label>
+					<label>
+						startView: 
+						<select name="startView">
+							<option value="0">0 (= decade)</option>
+							<option value="1">1 (= year)</option>
+							<option value="2">2 (= month)</option>
+							<option value="3">3 (= day)</option>
+						</select>
+					</label>
+					<label>
+						minView: 
+						<select name="minView">
+							<option value="0">0 (= decade)</option>
+							<option value="1">1 (= year)</option>
+							<option value="2">2 (= month)</option>
+						</select>
+					</label>
+					<label>
+						restartView: 
+						<input type="checkbox" name="restartView" />
+					</label>
+					<label>
+						selectNav: 
+						<input type="checkbox" name="selectNav" />
+					</label>
+					<label>
+						showWeek: 
+						<input type="checkbox" name="showWeek" />
+					</label>
+					<label>
+						yearButtons: 
+						<input type="checkbox" name="yearButtons" />	
+					</label>
+					<label>
+						updateOnInput: 
+						<input type="checkbox" name="updateOnInput" />	
+					</label>
+					<label>
+						monthNames: 
+						<select name="monthNames">
+							<option>monthNamesShort</option>
+							<option>monthNames</option>
+						</select>
+					</label>
+					<label>
+						monthNamesHead: 
+						<select name="monthNamesHead">
+							<option>monthNames</option>
+							<option>monthNamesShort</option>
+						</select>
+					</label>
+					<label>
+						cols: 
+						<select name="cols">
+							<option value="4" select="">4</option>
+							<option value="3">3</option>
+						</select>
+					</label>
+					<label>
+						relDefaultValue: 
+						<select name="relDefaultValue">
+							<option value=""></option>
+							<option value="-660441600000">-660441600000 (=-21 years) (-> 364 * 24 * 60 * 60 * 1000 == year)</option>
+						</select>
+					</label>
+					<label>
+						relMax: 
+						<select name="relMax">
+							<option value=""></option>
+							<option value="0">0 (= now) (only if max attribute is not set)</option>
+						</select>
+					</label>
+					
+					<label>
+						relMin: 
+						<select name="relMin">
+							<option value=""></option>
+							<option value="-660441600000">-660441600000 (=-21 years) (only if min attribute is not set)</option>
+						</select>
+					</label>
+					
+					<label>
+						inlinePicker: 
+						<input type="checkbox" name="inlinePicker" />	
+					</label>
+					
+					<label>
+						noChangeDismiss: 
+						<input type="checkbox" name="noChangeDismiss" />	
+					</label>
+					
+					<label>
+						openOnFocus: 
+						<input type="checkbox" name="openOnFocus" />
+					</label>
+					
+					<label>
+						buttonOnly: 
+						<input type="checkbox" name="buttonOnly" />	
+					</label>
+					<label>
+						calculateWidth: 
+						<input type="checkbox" name="calculateWidth" checked="checked" />	
+					</label>
+					
+					
+					
+					
+					<label>
+						useDecadeBase: 
+						<select name="useDecadeBase">
+							<option value="">0 is used to compute the decade grid</option>
+							<option value="max">max value is used to compute the decade grid</option>
+							<option value="min">min value is used to compute the decade grid</option>
+						</select>
+					</label>
+					<label>
+						disableDays: 
+						<select name="disableDays">
+							<option value="">empty/false</option>
+							<option value="[6, 0]">[6, 0] (= Saturday and Sunday)</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-style="">
+					<legend>Style</legend>
+					<label>
+						Buttons outside: 
+						<input type="checkbox" name="btn-outside" />
+					</label>
+					<label>
+						No spinbuttons: 
+						<input type="checkbox" name="no-spinbtn" />
+					</label>
+					<label>
+						No buttons: 
+						<input type="checkbox" name="no-btn" />
+					</label>
+				</fieldset>
+			</form>
+			
 			<form class="input-widget" data-type="month" id="month-cfg">
 				<datalist id="month-list">
 					<select>

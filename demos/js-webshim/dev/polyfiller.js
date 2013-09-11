@@ -27,7 +27,7 @@
 	
 	
 	var webshims = {
-		version: '1.11.1RC3',
+		version: '1.11.1',
 		cfg: {
 			
 			//addCacheBuster: false,
@@ -1247,4 +1247,5 @@
 			webshims.polyfill(asyncWebshims.polyfill);
 		}
 	}
+	return webshims;
 }));
