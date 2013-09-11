@@ -1001,7 +1001,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 						cache = {type: type};
 						if(!factor){
 							factor = 1;
-							webshims.info("you should always use a factor for stepUp/stepDown");
+							webshims.warn("you should always use a factor for stepUp/stepDown");
 						}
 						factor *= stepFactor;
 						
@@ -1037,13 +1037,11 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 							webshims.info("max/min overflow can't apply stepUp/stepDown");
 							throw('invalid state error');
 						}
-						if(dateVal){
-							$.prop(this, 'valueAsDate', dateVal);
-						} else {
-							$.prop(this, 'valueAsNumber', val);
-						}
-					} else if(stepDescriptor.prop && stepDescriptor.prop.value){
-						return stepDescriptor.prop.value.apply(this, arguments);
+						
+						$.prop(this, 'valueAsNumber', val);
+						
+					} else if(stepDescriptor.prop && stepDescriptor.prop._supvalue){
+						return stepDescriptor.prop._supvalue.apply(this, arguments);
 					} else {
 						webshims.info("no step method for type: "+ type);
 						throw('invalid state error');
@@ -2770,10 +2768,18 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 								}
 								try {
 									that.elemHelper[name](factor);
+									
 									ret = that.elemHelper.prop('value');
+									
+								} catch (er) {
+									if(!o.value && that.maxAsNumber >= that.minAsNumber){
+										ret = o.defValue;
+									}
+								}
+								if(ret !== false && o.value != ret){
 									that.value(ret);
 									eventTimer.call('input', ret);
-								} catch (er) {}
+								}
 								return ret;
 							}
 						};

@@ -2466,10 +2466,18 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 								}
 								try {
 									that.elemHelper[name](factor);
+									
 									ret = that.elemHelper.prop('value');
+									
+								} catch (er) {
+									if(!o.value && that.maxAsNumber >= that.minAsNumber){
+										ret = o.defValue;
+									}
+								}
+								if(ret !== false && o.value != ret){
 									that.value(ret);
 									eventTimer.call('input', ret);
-								} catch (er) {}
+								}
 								return ret;
 							}
 						};
