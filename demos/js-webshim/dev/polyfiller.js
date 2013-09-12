@@ -1180,12 +1180,12 @@
 				if(options.preferFlash && !modules.swfmini.test()){
 					options.preferFlash = false;
 				}
-				return !( options.preferFlash && window.swfmini.hasFlashPlayerVersion('9.0.115') );
+				return !( options.preferFlash && swfmini.hasFlashPlayerVersion('9.0.115') );
 			},
 			c: [21, 19, 25, 20]
 		});
 		
-		bugs.track = (Modernizr.track && (!Modernizr.texttrackapi || typeof (document.createElement('track').track || {}).mode != 'string'));
+		bugs.track = !Modernizr.texttrackapi;
 		
 		addPolyfill('track', {
 			options: {

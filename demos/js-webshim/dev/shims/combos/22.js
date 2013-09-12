@@ -205,6 +205,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 		kind: 'subtitles',
 		label: '',
 		language: '',
+		id: '',
 		mode: 'disabled',
 		readyState: 0,
 		oncuechange: null,
@@ -323,14 +324,11 @@ webshims.register('track', function($, webshims, window, document, undefined){
 		if(!trackData){
 			trackData = webshims.data(track, 'trackData');
 		}
+		
 		if(trackData && !trackData.isTriggering){
 			trackData.isTriggering = true;
 			setTimeout(function(){
-				if(!(trackData.track || {}).readyState){
-					$(track).triggerHandler('checktrackmode');
-				} else {
-					$(track).closest('audio, video').triggerHandler('updatetrackdisplay');
-				}
+				$(track).closest('audio, video').triggerHandler('updatetrackdisplay');
 				trackData.isTriggering = false;
 			}, 1);
 		}
@@ -447,7 +445,6 @@ webshims.register('track', function($, webshims, window, document, undefined){
 			var ajax;
 			if(obj.mode != 'disabled' && src && $.attr(track, 'src')){
 				$(mediaelem).unbind(loadEvents, load);
-				$(track).unbind('checktrackmode', load);
 				if(!obj.readyState){
 					error = function(){
 						obj.readyState = 3;
@@ -492,9 +489,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 		obj.activeCues = null;
 		obj.cues = null;
 		$(mediaelem).unbind(loadEvents, load);
-		$(track).unbind('checktrackmode', load);
 		$(mediaelem).on(loadEvents, load);
-		$(track).on('checktrackmode', load);
 		if(_default){
 			obj.mode = showTracks[obj.kind] ? 'showing' : 'hidden';
 			load();
@@ -536,7 +531,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 						});
 					});
 				}
-				
+				obj.id = $(track).prop('id');
 				trackData = webshims.data(track, 'trackData', {track: obj});
 				mediaelement.loadTextTrack(mediaelem, track, trackData, ($.prop(track, 'default') && $(track).siblings('track[default]')[ADDBACK]()[0] == track));
 			} else {
@@ -553,6 +548,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 				obj.mode = 'hidden';
 				obj.readyState = 2;
 			}
+			obj.__wsmode = obj.mode;
 		}
 		return obj;
 	};
@@ -746,9 +742,24 @@ modified for webshims
 			baseData.textTracks = [];
 			webshims.defineProperties(baseData.textTracks, {
 				onaddtrack: {value: null},
-				onremovetrack: {value: null}
+				onremovetrack: {value: null},
+				onchange: {value: null},
+				getTrackById: function(id){
+					return $('track#'+id, mediaelem)[0] || null;
+				}
 			});
 			createEventTarget(baseData.textTracks);
+			$(mediaelem).on('updatetrackdisplay', function(){
+				var track;
+				for(var i = 0; i < baseData.textTracks.length; i++){
+					track = baseData.textTracks[i];
+					if(track.__wsmode != track.mode){
+						track.__wsmode = track.mode;
+						$([ baseData.textTracks ]).triggerHandler('change');
+					}
+				}
+			});
+			
 		}
 		return baseData.textTracks;
 	};
@@ -803,10 +814,6 @@ modified for webshims
 				if(!supportTrackMod){
 					trackData.track[name] = $.prop(this, copyProp);
 				}
-				clearTimeout(trackData.changedTrackPropTimer);
-				trackData.changedTrackPropTimer = setTimeout(function(){
-					$(track).trigger('updatesubtitlestate');
-				}, 1); 
 			}
 		});
 	});		

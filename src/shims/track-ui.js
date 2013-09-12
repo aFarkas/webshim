@@ -224,8 +224,8 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 		(function(){
 			var block;
 			var triggerDisplayUpdate = function(elem){
+				block = true;
 				setTimeout(function(){
-					block = true;
 					$(elem).triggerHandler('updatetrackdisplay');
 					block = false;
 				}, 9);
