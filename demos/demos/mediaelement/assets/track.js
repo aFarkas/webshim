@@ -103,11 +103,7 @@ var startTreeOfLife = function(video){
 			}
 		};
 		
-		$(textTrack)
-			.on('cuechange', highLightItem)
-			//run immediately in case there is already an active cue
-			.each(highLightItem)
-		;
+		
 		$('#carousel')
 			.jcarousel({
 				size: textTrack.cues.length,
@@ -119,6 +115,12 @@ var startTreeOfLife = function(video){
 				videoElement.prop('currentTime', $(this).data('startTime'));
 				videoElement.callProp('play');
 			})
+		;
+		
+		$(textTrack)
+			.on('cuechange', highLightItem)
+			//run immediately in case there is already an active cue
+			.each(highLightItem)
 		;
 	};
 	
@@ -151,8 +153,8 @@ var startTreeOfLife = function(video){
 		.prop('mode', function(i, track){
 			//activate textTracks in case 'default' attribute didn't work (default should be only used on one track per mediaelement!)
 			return $.prop(this, 'kind') == 'subtitles' ? 
-				this.SHOWING :
-				this.HIDDEN
+				'showing' :
+				'hidden'
 			;
 		})
 	;
