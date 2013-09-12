@@ -841,7 +841,7 @@
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		d: ['es5'],
-		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 14, 25, 19, 20, 26, 28, 31]
+		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 14, 25, 19, 20, 26, 31]
 	});
 		
 	
@@ -1097,6 +1097,7 @@
 				return !o.replaceUI && modules[fNuAPI].test();
 			},
 			d: ['forms', DOMSUPPORT, fNuAPI, 'range-ui'],
+			css: 'styles/forms-ext.css',
 			options: {
 				
 				widgets: {
@@ -1179,12 +1180,12 @@
 				if(options.preferFlash && !modules.swfmini.test()){
 					options.preferFlash = false;
 				}
-				return !( options.preferFlash && window.swfmini.hasFlashPlayerVersion('9.0.115') );
+				return !( options.preferFlash && swfmini.hasFlashPlayerVersion('9.0.115') );
 			},
-			c: [21, 19, 25, 20, 28]
+			c: [21, 19, 25, 20]
 		});
 		
-		bugs.track = (Modernizr.track && (!Modernizr.texttrackapi || typeof (document.createElement('track').track || {}).mode != 'string'));
+		bugs.track = !Modernizr.texttrackapi;
 		
 		addPolyfill('track', {
 			options: {
@@ -1196,14 +1197,13 @@
 			},
 			d: ['mediaelement', DOMSUPPORT],
 			methodNames: ['addTextTrack'],
-			c: [21, 12, 13, 22, 29],
+			c: [21, 12, 13, 22],
 			nM: 'texttrackapi'
 		});
 		
 		
 		addModule('track-ui', {
-			d: ['track', DOMSUPPORT],
-			c: [29]
+			d: ['track', DOMSUPPORT]
 		});
 		
 	})();
