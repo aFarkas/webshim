@@ -1504,7 +1504,7 @@ modified for webshims
 		});
 	});
 	
-	if(Modernizr.track){
+	if(Modernizr.texttrackapi){
 		$('video, audio').trigger('trackapichange');
 	}
 });

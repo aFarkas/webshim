@@ -1,5 +1,5 @@
 (function($){
-	if(Modernizr.track && Modernizr.texttrackapi && document.addEventListener){
+	if(Modernizr.texttrackapi && document.addEventListener){
 		var trackOptions = webshims.cfg.track;
 		var trackListener = function(e){
 			$(e.target).filter('track').each(changeApi);
@@ -224,8 +224,8 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 		(function(){
 			var block;
 			var triggerDisplayUpdate = function(elem){
+				block = true;
 				setTimeout(function(){
-					block = true;
 					$(elem).triggerHandler('updatetrackdisplay');
 					block = false;
 				}, 9);
@@ -323,25 +323,32 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				if(!usesNativeTrack()){
 					addTrackView();
 				} else {
-					elem.on('mediaelementapichange trackapichange', function(){
-						if(!usesNativeTrack() || elem.is('.nonnative-api-active')){
-							addTrackView();
-						} else {
-							clearTimeout(updateTimer);
-							clearTimeout(updateTimer2);
+					
+					if(elem.is('.nonnative-api-active')){
+						addTrackView();
+					}
+					elem
+						.on('mediaelementapichange trackapichange', function(){
 							
-							trackList = elem.prop('textTracks');
-							baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
-							
-							$.each(trackList, function(i, track){
-								if(track._shimActiveCues){
-									delete track._shimActiveCues;
-								}
-							});
-							trackDisplay.hide(baseData);
-							elem.unbind('.trackview');
-						}
-					});
+							if(!usesNativeTrack() || elem.is('.nonnative-api-active')){
+								addTrackView();
+							} else {
+								clearTimeout(updateTimer);
+								clearTimeout(updateTimer2);
+								
+								trackList = elem.prop('textTracks');
+								baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
+								
+								$.each(trackList, function(i, track){
+									if(track._shimActiveCues){
+										delete track._shimActiveCues;
+									}
+								});
+								trackDisplay.hide(baseData);
+								elem.unbind('.trackview');
+							}
+						})
+					;
 				}
 			})
 		;
