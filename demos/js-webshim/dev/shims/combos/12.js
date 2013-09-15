@@ -1195,7 +1195,6 @@ webshims.register('track', function($, webshims, window, document, undefined){
 		language: '',
 		id: '',
 		mode: 'disabled',
-		readyState: 0,
 		oncuechange: null,
 		toString: function() {
 			return "[object TextTrack]";
@@ -1235,7 +1234,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 				webshims.error("cue not part of track");
 				return;
 			}
-		},
+		}/*,
 		DISABLED: 'disabled',
 		OFF: 'disabled',
 		HIDDEN: 'hidden',
@@ -1243,7 +1242,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 		ERROR: 3,
 		LOADED: 2,
 		LOADING: 1,
-		NONE: 0
+		NONE: 0*/
 	};
 	var copyProps = ['kind', 'label', 'srclang'];
 	var copyName = {srclang: 'language'};
@@ -1321,7 +1320,36 @@ webshims.register('track', function($, webshims, window, document, undefined){
 			}, 1);
 		}
 	};
-	
+	var isDefaultTrack = (function(){
+		var defaultKinds = {
+			subtitles: {
+				subtitles: 1,
+				captions: 1
+			},
+			descriptions: {descriptions: 1},
+			chapters: {chapters: 1}
+		};
+		defaultKinds.captions = defaultKinds.subtitles;
+		
+		return function(track){
+			var kind, firstDefaultTrack;
+			var isDefault = $.prop(track, 'default');
+			if(isDefault && (kind = $.prop(track, 'kind')) != 'metadata'){
+				firstDefaultTrack = $(track)
+					.parent()
+					.find('track[default]')
+					.filter(function(){
+						return !!(defaultKinds[kind][$.prop(this, 'kind')]);
+					})[0]
+				;
+				if(firstDefaultTrack != track){
+					isDefault = false;
+					webshims.error('more than one default track of a specific kind detected. Fall back to default = false');
+				}
+			}
+			return isDefault;
+		};
+	})();
 	var emptyDiv = $('<div />')[0];
 	window.TextTrackCue = function(startTime, endTime, text){
 		if(arguments.length != 3){
@@ -1332,8 +1360,6 @@ webshims.register('track', function($, webshims, window, document, undefined){
 		this.endTime = endTime;
 		this.text = text;
 		
-		this.id = "";
-		this.pauseOnExit = false;
 		
 		createEventTarget(this);
 	};
@@ -1433,14 +1459,14 @@ webshims.register('track', function($, webshims, window, document, undefined){
 			var ajax;
 			if(obj.mode != 'disabled' && src && $.attr(track, 'src')){
 				$(mediaelem).unbind(loadEvents, load);
-				if(!obj.readyState){
+				if(!trackData.readyState){
 					error = function(){
-						obj.readyState = 3;
+						trackData.readyState = 3;
 						obj.cues = null;
 						obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = null;
 						$(track).triggerHandler('error');
 					};
-					obj.readyState = 1;
+					trackData.readyState = 1;
 					try {
 						obj.cues = mediaelement.createCueList();
 						obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = mediaelement.createCueList();
@@ -1453,7 +1479,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 								}
 								mediaelement.parseCaptions(text, obj, function(cues){
 									if(cues && 'length' in cues){
-										obj.readyState = 2;
+										trackData.readyState = 2;
 										$(track).triggerHandler('load');
 										$(mediaelem).triggerHandler('updatetrackdisplay');
 									} else {
@@ -1471,7 +1497,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 				}
 			}
 		};
-		obj.readyState = 0;
+		trackData.readyState = 0;
 		obj.shimActiveCues = null;
 		obj._shimActiveCues = null;
 		obj.activeCues = null;
@@ -1521,7 +1547,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 				}
 				obj.id = $(track).prop('id');
 				trackData = webshims.data(track, 'trackData', {track: obj});
-				mediaelement.loadTextTrack(mediaelem, track, trackData, ($.prop(track, 'default') && $(track).siblings('track[default]')[ADDBACK]()[0] == track));
+				mediaelement.loadTextTrack(mediaelem, track, trackData, isDefaultTrack(track));
 			} else {
 				if(supportTrackMod){
 					copyProps.forEach(function(copyProp){
@@ -1838,7 +1864,8 @@ modified for webshims
 		},
 		readyState: {
 			get: function(){
-				return ($.prop(this, 'track') || {readyState: 0}).readyState;
+				
+				return (webshims.data(this, 'trackData') || {readyState: 0}).readyState;
 			},
 			writeable: false
 		},

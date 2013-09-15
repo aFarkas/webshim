@@ -297,15 +297,21 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				};
 				var onUpdate = function(e){
 					clearTimeout(updateTimer);
-					if(e && e.type == 'timeupdate'){
-						getDisplayCues();
+					if(e){
+						if(e.type == 'timeupdate'){
+							getDisplayCues();
+						}
 						updateTimer2 = setTimeout(onUpdate, 90);
 					} else {
 						updateTimer = setTimeout(getDisplayCues, 9);
 					}
 				};
 				var addTrackView = function(){
-					
+					if(!trackList) {
+						trackList = elem.prop('textTracks');
+					}
+					//as soon as change on trackList is implemented in all browsers we do not need to have 'updatetrackdisplay' anymore
+					$( [trackList] ).on('change', onUpdate);
 					elem
 						.off('.trackview')
 						.on('play.trackview timeupdate.trackview updatetrackdisplay.trackview', onUpdate)

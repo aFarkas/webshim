@@ -145,19 +145,7 @@ var startTreeOfLife = function(video){
 		//run immediately in case track was already loaded
 		.each(onTrackLoad)
 	;
-	//activate all track
-	videoElement
-		//jProp is nice it returns a jQuery-fied property
-		//good for properties, which return a DOM-Element, an event target or an array-like object
-		.jProp('textTracks')
-		.prop('mode', function(i, track){
-			//activate textTracks in case 'default' attribute didn't work (default should be only used on one track per mediaelement!)
-			return $.prop(this, 'kind') == 'subtitles' ? 
-				'showing' :
-				'hidden'
-			;
-		})
-	;
+	
 };
 
 $(function(){
