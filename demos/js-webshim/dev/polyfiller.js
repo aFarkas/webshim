@@ -938,11 +938,12 @@
 		var modernizrInputTypes = Modernizr.inputtypes;
 		var formvalidation = 'formvalidation';
 		var fNuAPI = 'form-number-date-api';
-		var select = $('<select required="" name="a"><option disabled="" /></select>')[0];
+		var select = $('<select required=""><option disabled="" /></select>')[0];
 		var bustedValidity = false;
 		var bustedWidgetUi = false;
 		
 		var initialFormTest = function(){
+			var range, rangeCSS;
 			if(!initialFormTest.run){
 				addTest(formvalidation, function(){
 					return !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern);
@@ -953,9 +954,19 @@
 					return 'elements' in fieldset && 'disabled' in fieldset;
 				});
 				
-				if(modernizrInputTypes){
+				if(modernizrInputTypes && modernizrInputTypes.range && !window.opera){
+					range = $('<input type="range" style="-webkit-appearance: slider-horizontal; -moz-appearance: range;" />').appendTo('html');
+					rangeCSS = range.css('appearance');
+					range.remove();
+					
+					addTest('csstrackrange', function(){
+						return rangeCSS == null || rangeCSS == 'range';
+					});
+					addTest('cssrangeinput', function(){
+						return rangeCSS == 'slider-horizontal' || rangeCSS == 'range';
+					});
 					addTest('styleableinputrange', function(){
-						return modernizrInputTypes.range && !window.opera;
+						return Modernizr.csstrackrange || Modernizr.cssrangeinput;
 					});
 				}
 				

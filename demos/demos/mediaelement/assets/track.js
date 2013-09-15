@@ -6,15 +6,15 @@ var startTreeOfLife = function(video){
 	
 	var buildInfoPanel = function(textTrack){
 		var updatePanel = function(){
-			var cue = $.prop(this, 'activeCues')[0]; // there is only one active cue in this example
-			if (!cue) {
-				return;
+			var cue = $.prop(this, 'activeCues'); // there is only one active cue in this example
+			
+			if (cue && cue.length && (cue = cue[0])) {
+				// set text in #moreInformation panel
+				var obj = JSON.parse(cue.text);
+				$("#moreInformation h2").html(obj.title);
+				$("#moreInformation p").html(obj.description);
+				$("#originalArticle").attr("href", obj.href);
 			}
-			// set text in #moreInformation panel
-			var obj = JSON.parse(cue.text);
-			$("#moreInformation h2").html(obj.title);
-			$("#moreInformation p").html(obj.description);
-			$("#originalArticle").attr("href", obj.href);
 		};
 		
 		$(textTrack)
@@ -88,8 +88,8 @@ var startTreeOfLife = function(video){
 			}
 		};
 		var highLightItem = function(){
-			var cue = $.prop(textTrack, 'activeCues')[0];
-			if(cue){
+			var cue = $.prop(textTrack, 'activeCues');
+			if(cue && cue.length && (cue = cue[0])){
 				var carouselIndex = $.inArray(cue, textTrack.cues);
 				$('#carousel .active-cueitem').removeClass('active-cueitem');
 				
@@ -144,6 +144,11 @@ var startTreeOfLife = function(video){
 		.on("load", onTrackLoad)
 		//run immediately in case track was already loaded
 		.each(onTrackLoad)
+		.each(function(){
+			var track = $.prop(this, 'track');
+			//metadata is hidden
+			track.mode = (track.kind == 'metadata') ? 'hidden' : 'showing';
+		})
 	;
 	
 };
