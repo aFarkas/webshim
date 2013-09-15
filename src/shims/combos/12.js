@@ -1451,13 +1451,11 @@ webshims.register('track', function($, webshims, window, document, undefined){
 	})();
 	
 	mediaelement.loadTextTrack = function(mediaelem, track, trackData, _default){
-		var loadEvents = 'play playing timeupdate updatetrackdisplay';
+		var loadEvents = 'play playing updatetrackdisplay';
 		var obj = trackData.track;
 		var load = function(){
-			var src = $.prop(track, 'src');
-			var error;
-			var ajax;
-			if(obj.mode != 'disabled' && src && $.attr(track, 'src')){
+			var error, ajax, src;
+			if(obj.mode != 'disabled' && $.attr(track, 'src') && (src = $.prop(track, 'src'))){
 				$(mediaelem).unbind(loadEvents, load);
 				if(!trackData.readyState){
 					error = function(){
@@ -1492,7 +1490,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 						});
 					} catch(er){
 						error();
-						webshims.warn(er);
+						webshims.error(er);
 					}
 				}
 			}
@@ -1758,8 +1756,17 @@ modified for webshims
 				onaddtrack: {value: null},
 				onremovetrack: {value: null},
 				onchange: {value: null},
-				getTrackById: function(id){
-					return $('track#'+id, mediaelem)[0] || null;
+				getTrackById: {
+					value: function(id){
+						var track = null;
+						for(var i = 0; i < baseData.textTracks.length; i++){
+							if(id == baseData.textTracks[i].id){
+								track = baseData.textTracks[i];
+								break;
+							}
+						}
+						return track;
+					}
 				}
 			});
 			createEventTarget(baseData.textTracks);

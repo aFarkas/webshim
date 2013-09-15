@@ -2208,7 +2208,7 @@ if(!Modernizr.input.list){
 	
 }
 
-if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled){
+if(Modernizr.formattribute === false || !Modernizr.fieldsetdisabled){
 	(function(){
 		(function(prop, undefined){
 			$.prop = function(elem, name, value){

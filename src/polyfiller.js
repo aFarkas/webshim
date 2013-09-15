@@ -960,7 +960,7 @@
 				}
 				
 				if(Modernizr[formvalidation]){
-					bustedWidgetUi = window.opera || Modernizr.formattribute === false || !Modernizr.fieldsetdisabled || !('value' in document.createElement('progress')) || !('value' in document.createElement('output')) || !($('<input type="date" value="1488-12-11" />')[0].validity || {valid: true}).valid || !('required' in select) || (select.validity || {}).valid;
+					bustedWidgetUi = window.opera || !Modernizr.fieldsetdisabled || !('value' in document.createElement('progress')) || !('value' in document.createElement('output')) || !('required' in select) || (select.validity || {}).valid;
 					bugs.bustedValidity = bustedValidity = bustedWidgetUi || !modernizrInputAttrs.list;
 				}
 
@@ -1090,7 +1090,7 @@
 			test: function(){
 				var o = this.options;
 				initialFormTest();
-				//input widgets on old on old androids can't be trusted
+				//input widgets on old androids can't be trusted
 				if(bustedWidgetUi && !o.replaceUI && (/Android/i).test(navigator.userAgent)){
 					o.replaceUI = true;
 				}
@@ -1122,12 +1122,14 @@
 	})();
 	//>
 	
+	//<filereader
 	addPolyfill('filereader', {
 		test: 'FileReader' in window,
 		d: ['swfmini', DOMSUPPORT],
 		c: [25, 26, 27]
 //		,nM: 'filereader'
 	});
+	//>
 	
 	//<details
 	if(!('details' in Modernizr)){
@@ -1193,7 +1195,7 @@
 				override: bugs.track
 			},
 			test: function(){
-				return Modernizr.track && !this.options.override && !bugs.track;
+				return !this.options.override && !bugs.track;
 			},
 			d: ['mediaelement', DOMSUPPORT],
 			methodNames: ['addTextTrack'],
