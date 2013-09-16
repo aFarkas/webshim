@@ -67,15 +67,6 @@
 							<input type="hidden" name="height" value="px" />
 							
 							
-							<label>border</label>
-							<span class="range-number">
-								<input type="number" />
-								<input type="range" min="0" max="10" value="0" name="border" />
-							</span>
-							<input type="hidden" name="border" value="px" />
-							<input type="hidden" name="border" value=" solid " />
-							<input type="color" value="#666666" name="border" />
-							
 							<label>border-radius</label>
 							<span class="range-number">
 								<input type="number" />
@@ -133,13 +124,28 @@
 							<input type="color" value="#efefef" required name="background" />
 						</div>
 					</details>
+					<details data-type="selector" data-value=".ws-range.ws-focus .ws-range-thumb">
+						<summary>:focus styles</summary>
+						<div class="panel">
+							<label>border-color</label>
+							<span class="disable-enable">
+								<input type="checkbox" checked="" />
+								<input type="color" value="#333333" required name="border-color" />
+							</span>
+							<label>background</label>
+							<span class="disable-enable">
+								<input type="checkbox" checked="" />
+								<input type="color" value="#fafafa" required name="background" />
+							</span>
+						</div>
+					</details>
 					<details data-type="selector" data-value=".ws-range.ws-active .ws-range-thumb">
 						<summary>:active styles</summary>
 						<div class="panel">
 							<label>border-color</label>
 							<span class="disable-enable">
 								<input type="checkbox" checked="" />
-								<input type="color" value="#333333" required name="border-color" />
+								<input type="color" value="#000000" required name="border-color" />
 							</span>
 							<label>background</label>
 							<span class="disable-enable">

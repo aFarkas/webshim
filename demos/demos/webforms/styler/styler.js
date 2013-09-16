@@ -118,6 +118,7 @@
 			
 			$('iframe', this).on('load', throttledChange);
 			$(this).on({'input change': throttledChange});
+			throttledChange();
 		});
 	});
 	
