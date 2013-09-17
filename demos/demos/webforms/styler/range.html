@@ -12,15 +12,23 @@
 		
 		<style>
 			.example-area {
-				margin: 20px 0;
+				margin: 0 0 30px;
 				border: 1px solid #000;
 				padding: 20px 10px;
+			}
+			.example-area h2 {
+				font-size: 200%;
+				margin: 5px 0 20px;
+				padding: 0;
 			}
 			textarea {
 				width: 100%;
 				min-height: 400px;
 			}
-
+			
+			.no-styleableinputrange .native-example h2 {
+				text-decoration: line-through; 
+			}
 
 		</style>
 		
@@ -73,8 +81,8 @@
 						'input[type="range"]::-webkit-slider-thumb': {'box-sizing': 'content-box'}
 					},
 					baseProps: {
-						'input[type="range"]::-ms-track': {color: 'transparent'},
-						'.ws-range, input[type="range"]': {'-webkit-appearance': 'none', cursor: 'pointer', outline: 'none', padding: 0},
+						'input[type="range"]::-ms-track': {color: 'transparent', border: 0},
+						'.ws-range, input[type="range"]': {'-webkit-appearance': 'none', cursor: 'pointer', border: 0, outline: 'none', padding: 0},
 						'input[type="range"]::-webkit-slider-thumb': {'-webkit-appearance': 'none'}
 					},
 					selector: {
@@ -181,12 +189,14 @@
 		</script>
 	</head>
 	<body>
-		<h2>webshims example</h2>
+		
 		<div class="example-area webshims-example">
+			<h2>webshims example</h2>
 			
 		</div>
-		<h2>native styleable example</h2>
+		
 		<div class="example-area native-example">
+			<h2>native styleable example</h2>
 			<input type="range" />
 		</div>
 	</body>
