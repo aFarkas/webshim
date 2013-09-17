@@ -375,6 +375,27 @@ $('datalist#list select').prependPolyfill('&lt;option value="new suggestion item
 //animate the width of all date - inputs to a width of 300
 $('input[type="date"]').getShadowElement().animate({width: 300});
 </code>
+							<p>Some styles like float or display: none/block are not initially reflected by the shadowdom, it is a good approach to do this on a wrapper element:</p>
+<code class="block">&lt;!-- instead of --&gt;
+&lt;div class="form-field"&gt;
+  &lt;label for="date" style="display: none;"&gt;Birthdate&lt;/label&gt;
+  &lt;input type="date" id="date" style="display: none;" /&gt;
+&lt;/div&gt;
+&lt;!-- do this: --&gt;
+&lt;div class="form-field" style="display: none;"&gt;
+  &lt;label for="date"&gt;Birthdate&lt;/label&gt;
+  &lt;input type="date" id="date" /&gt;
+&lt;/div&gt;
+
+&lt;!-- or instead of: --&gt;
+&lt;div class="mediaplayer"&gt;
+  &lt;video src="file.mp4" controls style="margin: 0 10px 5px 0; float: left;"&gt;&lt;/video&gt;
+&lt;/div&gt;
+&lt;!-- do this: --&gt;
+&lt;div class="mediaplayer" style="margin: 0 10px 5px 0; float: left;"&gt;
+  &lt;video src="file.mp4" controls&gt;&lt;/video&gt;
+&lt;/div&gt;
+</code>
 							<p><strong>re-rendering shadowelements</strong>: On dynamic websites shadowelements dimensions and/or positions sometimes need to be updated, this can be achieved by triggering the <code>updateshadowdom</code>.</p>
 <code class="block">
 $(document).trigger('updateshadowdom');
