@@ -3564,7 +3564,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				$(data.orig).removeClass('ws-important-hide');
 				$.style( data.orig, 'display', '' );
 				var hasButtons, marginR, marginL;
-				var correctWidth = 0.6;
+				var correctWidth = 0.8;
 				if(!init || data.orig.offsetWidth){
 					hasButtons = data.buttonWrapper && data.buttonWrapper.filter(isVisible).length;
 					marginR = $.css( data.orig, 'marginRight');
@@ -3588,7 +3588,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 							;
 						} else {
 							data.buttonWrapper.css('marginRight', marginR);
-							correctWidth = data.buttonWrapper.outerWidth(true) + 0.6;
+							correctWidth = data.buttonWrapper.outerWidth(true) + correctWidth;
 						}
 					}
 					
