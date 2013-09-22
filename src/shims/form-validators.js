@@ -119,7 +119,7 @@ webshims.register('form-validators', function($, webshims, window, document, und
  *  	- <input type="checkbox" id="check" /> <input data-dependent-validation='checkbox' />
  */
 (function(){
-	
+	var formCFG = webshims.cfg.forms;
 	var addCustomValidityRule = webshims.addCustomValidityRule;
 	var getId = function(name){
 		return document.getElementById(name);
@@ -297,7 +297,7 @@ webshims.register('form-validators', function($, webshims, window, document, und
 										url: opts.url,
 										dataType: 'json',
 										depData: remoteData,
-										data: opts.fullForm ? 
+										data: formCFG.fullRemoteForm || opts.fullForm ? 
 											$(elem).jProp('form').serializeArray() : 
 											remoteData,
 										success: this.getResponse,

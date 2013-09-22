@@ -1051,8 +1051,7 @@
 		
 		formExtras = {
 			noAutoCallback: true,
-			options: formOptions,
-			c: [24]
+			options: formOptions
 		};
 		addModule('form-validation', $.extend({d: ['form-message', 'form-core']}, formExtras));
 		
