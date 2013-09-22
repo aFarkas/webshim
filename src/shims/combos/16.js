@@ -2682,6 +2682,7 @@ if(Modernizr.formattribute === false || !Modernizr.fieldsetdisabled){
 				return prop.apply(this, arguments);
 			};
 		})($.prop, undefined);
+		
 		var removeAddedElements = function(form){
 			var elements = $.data(form, 'webshimsAddedElements');
 			if(elements){
@@ -2729,6 +2730,10 @@ if(Modernizr.formattribute === false || !Modernizr.fieldsetdisabled){
 				var stopPropagation = function(e){
 					e.stopPropagation();
 				};
+				var submitters = {
+					image: 1,
+					submit: 1
+				};
 				$(document).on('submit', function(e){
 					
 					if(!e.isDefaultPrevented()){
@@ -2757,8 +2762,9 @@ if(Modernizr.formattribute === false || !Modernizr.fieldsetdisabled){
 					}
 				});
 				
+				
 				$(document).on('click', function(e){
-					if(!e.isDefaultPrevented() && $(e.target).is('input[type="submit"][form], button[form], input[type="button"][form], input[type="image"][form], input[type="reset"][form]')){
+					if(submitters[e.target.type] && !e.isDefaultPrevented() && $(e.target).is('input[form], button[form]')){
 						var trueForm = $.prop(e.target, 'form');
 						var formIn = e.target.form;
 						var clone;
