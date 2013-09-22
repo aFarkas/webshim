@@ -1318,7 +1318,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		return function(){
 			if(!str){
 				str = ('<option></option>')+$.map(monthDigits, function(val){
-					return '<option>'+val+'</option>';
+					return '<option value="'+val+'"]>'+val+'</option>';
 				}).join('');
 			}
 			return str;
@@ -2254,15 +2254,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				
 				initChangeEvents();
 			},
-			value: function(val, force){
-				if(!this._init || force || val !== this.options.value){
-					this.element.val(this.formatValue(val));
-					this.options.value = val;
-					this._propertyChange('value');
-					this.mirrorValidity();
-				}
-				
-			},
 			required: function(val, boolVal){
 				this.inputElements.attr({'aria-required': ''+boolVal});
 				this.mirrorValidity();
@@ -2279,7 +2270,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			formatValue: function(val, noSplit){
 				return formatVal[this.type](val, noSplit === false ? false : this.options);
 			},
-			createOpts: ['readonly', 'title', 'disabled', 'tabindex', 'placeholder', 'value', 'required'],
+			createOpts: ['readonly', 'title', 'disabled', 'tabindex', 'placeholder', 'defaultValue', 'value', 'required'],
 			placeholder: function(val){
 				var options = this.options;
 				options.placeholder = val;
@@ -2349,6 +2340,16 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			}
 		};
 		
+		['defaultValue', 'value'].forEach(function(name){
+			wsWidgetProto[name] = function(val, force){
+				if(!this._init || force || val !== this.options[name]){
+					this.element.prop(name, this.formatValue(val));
+					this.options[name] = val;
+					this._propertyChange(name);
+					this.mirrorValidity();
+				}
+			};
+		});
 		
 		['readonly', 'disabled'].forEach(function(name){
 			var isDisabled = name == 'disabled';
@@ -2402,7 +2403,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				}
 				this._init = true;
 			},
-			createOpts: ['step', 'min', 'max', 'readonly', 'title', 'disabled', 'tabindex', 'placeholder', 'value', 'required'],
+			createOpts: ['step', 'min', 'max', 'readonly', 'title', 'disabled', 'tabindex', 'placeholder', 'defaultValue', 'value', 'required'],
 			_addSplitInputs: function(){
 				if(!this.inputElements){
 					var create = splitInputs[this.type]._create(this.options);
@@ -2472,7 +2473,45 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				this.options.step = val;
 				this.elemHelper.prop('step', retDefault(val, defStep.step));
 				this.mirrorValidity();
+			},
+			_beforeValue: function(val){
+				this.valueAsNumber = this.asNumber(val);
+				this.options.value = val;
+				
+				if(isNaN(this.valueAsNumber) || (!isNaN(this.minAsNumber) && this.valueAsNumber < this.minAsNumber) || (!isNaN(this.maxAsNumber) && this.valueAsNumber > this.maxAsNumber)){
+					this._setStartInRange();
+				} else {
+					this.elemHelper.prop('value', val);
+					this.options.defValue = "";
+				}
 			}
+		});
+		
+		['defaultValue', 'value'].forEach(function(name){
+			var isValue = name == 'value';
+			spinBtnProto[name] = function(val, force){
+				if(!this._init || force || this.options[name] !== val){
+					if(isValue){
+						this._beforeValue(val);
+					}
+					
+					val = formatVal[this.type](val, this.options);
+					if(this.options.splitInput){
+						$.each(this.splits, function(i, elem){
+							var setOption;
+							if(!(name in elem) && !isValue && $.nodeName(elem, 'select')){
+								$('option[value="'+ val[i] +'"]', elem).prop('defaultSelected', true);
+							} else {
+								$.prop(elem, name, val[i]);
+							}
+						});
+					} else {
+						this.element.prop(name, val);
+					}
+					this._propertyChange(name);
+					this.mirrorValidity();
+				}
+			};
 		});
 		
 		$.each({min: 1, max: -1}, function(name, factor){
@@ -2882,6 +2921,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			'disabled',
 			'readonly',
 			'value',
+			'defaultValue',
 			'min',
 			'max',
 			'step',
