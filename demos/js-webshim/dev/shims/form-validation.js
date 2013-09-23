@@ -169,8 +169,8 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		.on(options.validityUIEvents || 'focusout change refreshvalidityui invalid', switchValidityClass)
 		.on('reset resetvalui', function(e){
 			var elems = $(e.target);
-			if(e.type == 'reset'){
-				elems = elems.filter('form').jProp('elements');
+			if(elems.is('form, fieldset')){
+				elems = elems.jProp('elements');
 			}
 			elems
 				.filter('.user-error, .user-success')
