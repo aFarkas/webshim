@@ -1379,7 +1379,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			var notLocal = /:\/\/|^\.*\//;
 			var loadRemoteLang = function(data, lang, options){
 				var langSrc;
-				if(lang && options && $.inArray(lang, options.availabeLangs || []) !== -1){
+				if(lang && options && $.inArray(lang, options.availableLangs || options.availabeLangs || []) !== -1){
 					data.loading = true;
 					langSrc = options.langSrc;
 					if(!notLocal.test(langSrc)){

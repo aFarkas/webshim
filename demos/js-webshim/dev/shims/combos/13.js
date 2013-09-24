@@ -1108,8 +1108,12 @@ webshims.register('track', function($, webshims, window, document, undefined){
 				obj.mode = 'hidden';
 				obj.readyState = 2;
 			}
+			if(obj.kind == 'subtitles' && !obj.language){
+				webshims.error('you must provide a language for track in subtitles state');
+			}
 			obj.__wsmode = obj.mode;
 		}
+		
 		return obj;
 	};
 	
