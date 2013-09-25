@@ -879,30 +879,6 @@ if(!Modernizr.input.list){
 			}
 		}
 	});
-	
-	webshims.ready('form-datalist', function(){
-		webshims.defineNodeNameProperties('input', {
-			list: {
-				attr: {
-					get: function(){
-						var val = webshims.contentAttr(this, 'list');
-						return (val == null) ? undefined : val;
-					},
-					set: function(value){
-						var elem = this;
-						webshims.contentAttr(elem, 'list', value);
-						webshims.objectCreate(options.shadowListProto, undefined, {input: elem, id: value, datalist: $.prop(elem, 'list')});
-						$(elem).triggerHandler('listdatalistchange');
-					}
-				},
-				initAttr: true,
-				reflect: true,
-				propType: 'element',
-				propNodeName: 'datalist'
-			}
-		});
-	});
-	
 }
 
 if(Modernizr.formattribute === false || !Modernizr.fieldsetdisabled){

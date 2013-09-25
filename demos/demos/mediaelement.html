@@ -20,13 +20,16 @@
 	<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
 	<script src="../js-webshim/minified/polyfiller.js"></script>
 	
+	
 	<!--
 		<script src="../../src/polyfiller.js"></script> 
-		<script>
-			$.webshims.debug = 'noCombo';
-			//style calendar, datalist, validation bubble
-			//$('html').on('wspopoverbeforehide', false);
-		</script>
+	<script>
+		$.webshims.debug = 'noCombo';
+		webshims.cfg.mediaelement.playerPath = '../../swfs/jaris/bin/JarisFLVPlayer.swf'
+		
+		//style calendar, datalist, validation bubble
+		//$('html').on('wspopoverbeforehide', false);
+	</script>
 	-->
 	<script>
 		$.webshims.polyfill();

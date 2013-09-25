@@ -48,9 +48,7 @@ class Poster extends Sprite
 	private var _width:Float;
 	private var _height:Float;
 	private var _loading:Bool;
-	private var _loaderStatus:jaris.display.Loader;
 	private var _player:Player;
-	private var _showLoader:Bool;
 	
 	public function new(source:String, showLoader:Bool)
 	{
@@ -61,40 +59,16 @@ class Poster extends Sprite
 		_loader = new Loader();
 		_source = source;
 		_loading = true;
-		_showLoader = showLoader;
 		
 		//Reads flash vars
 		var parameters:Dynamic<String> = flash.Lib.current.loaderInfo.parameters;
 		
-		//Draw Loader status
-		var loaderColors:Array <String> = ["", "", "", ""];
-		loaderColors[0] = parameters.brightcolor != null ? parameters.brightcolor : "";
-		loaderColors[1] = parameters.controlcolor != null ? parameters.controlcolor : "";
-		
-		_loaderStatus = new jaris.display.Loader();
-		
-		if ( _showLoader ) {
-			_loaderStatus.show();
-			_loaderStatus.setColors(loaderColors);
-			addChild(_loaderStatus);
-		}
 		
 		_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderComplete);
-		_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onNotLoaded);
         _loader.load(new URLRequest(source));
 	}
 	
-	/**
-	 * Triggers when the poster image could not be loaded
-	 * @param	event
-	 */
-	private function onNotLoaded(event:IOErrorEvent):Void
-	{
-		if ( _showLoader ) {
-			_loaderStatus.hide();
-			removeChild(_loaderStatus);
-		}
-	}
+	
 	
 	/**
 	 * Triggers when the poster image finalized loading
@@ -102,10 +76,7 @@ class Poster extends Sprite
 	 */
 	private function onLoaderComplete(event:Event):Void
 	{
-		if ( _showLoader ) {
-			_loaderStatus.hide();
-			removeChild(_loaderStatus);
-		}
+		
 		
 		addChild(_loader);
 		

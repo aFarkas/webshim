@@ -448,7 +448,7 @@ class NewControls extends MovieClip {
 	 */
 	private function onPlayerBuffering(event:PlayerEvents):Void
 	{
-		if ( _forceHideControls && _showLoader || !_forceHideControls ) _loader.show();
+		if ( !_forceHideControls ) _loader.show();
 	}
 	
 	/**
@@ -457,7 +457,7 @@ class NewControls extends MovieClip {
 	 */
 	private function onPlayerNotBuffering(event:PlayerEvents):Void
 	{
-		if ( _forceHideControls && _showLoader || !_forceHideControls ) _loader.hide();
+		_loader.hide();
 	}
 	
 	/**
@@ -856,6 +856,7 @@ class NewControls extends MovieClip {
 		} else {
 			_forceHideControls = true;
 			_controlsBar.visible = false;
+			_loader.hide();
 		}
 	}
 		

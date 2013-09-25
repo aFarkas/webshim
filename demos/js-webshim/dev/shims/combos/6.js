@@ -3241,12 +3241,12 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 	/*
 	 * implement propType "element" currently only used for list-attribute (will be moved to dom-extend, if needed)
 	 */
-	webshims.propTypes.element = function(descs){
+	webshims.propTypes.element = function(descs, name){
 		webshims.createPropDefault(descs, 'attr');
 		if(descs.prop){return;}
 		descs.prop = {
 			get: function(){
-				var elem = $.attr(this, 'list');
+				var elem = $.attr(this, name);
 				if(elem){
 					elem = document.getElementById(elem);
 					if(elem && descs.propNodeName && !$.nodeName(elem, descs.propNodeName)){
@@ -3270,7 +3270,15 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 		if(listSupport && !formsCFG.customDatalist){return;}
 		
 			var initializeDatalist =  function(){
-				
+			
+			var updateDatlistAndOptions = function(){
+				var id;
+				if(!$.data(this, 'datalistWidgetData') && (id = $.prop(this, 'id'))){
+					$('input[list="'+ id +'"], input[data-wslist="'+ id +'"]').eq(0).attr('list', id);
+				} else {
+					$(this).triggerHandler('updateDatalist');
+				}
+			};
 				
 			var inputListProto = {
 				//override autocomplete
@@ -3348,6 +3356,7 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 									id: value,
 									datalist: $.prop(elem, 'list')
 								});
+								elem.setAttribute('data-wslist', value);
 							} else {
 								elem.setAttribute('list', value);
 							}
@@ -3359,6 +3368,27 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 					propType: 'element',
 					propNodeName: 'datalist'
 				};
+			} else {
+				webshims.defineNodeNameProperties('input', {
+					list: {
+						attr: {
+							get: function(){
+								var val = webshims.contentAttr(this, 'list');
+								return (val == null) ? undefined : val;
+							},
+							set: function(value){
+								var elem = this;
+								webshims.contentAttr(elem, 'list', value);
+								webshims.objectCreate(options.shadowListProto, undefined, {input: elem, id: value, datalist: $.prop(elem, 'list')});
+								$(elem).triggerHandler('listdatalistchange');
+							}
+						},
+						initAttr: true,
+						reflect: true,
+						propType: 'element',
+						propNodeName: 'datalist'
+					}
+				});
 			}
 			
 			webshims.defineNodeNameProperties('input', inputListProto);
@@ -3367,9 +3397,7 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 				contextElem
 					.filter('datalist > select, datalist, datalist > option, datalist > select > option')
 					.closest('datalist')
-					.each(function(){
-						$(this).triggerHandler('updateDatalist');
-					})
+					.each(updateDatlistAndOptions)
 				;
 			});
 		};
@@ -3414,6 +3442,7 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 				this.hasViewableData = true;
 				this._autocomplete = $.attr(opts.input, 'autocomplete');
 				$.data(opts.input, 'datalistWidget', this);
+				$.data(datalist, 'datalistWidgetData', this);
 				
 				lazyLoad('WINDOWLOAD');
 				
