@@ -213,6 +213,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				"isRTL": false,
 				"showMonthAfterYear": false,
 				"yearSuffix": ""
+			},
+			time: {
+				"currentText": "Now"
 			}
 		}, formcfg.en || {});
 		
