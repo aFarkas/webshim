@@ -213,6 +213,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				"isRTL": false,
 				"showMonthAfterYear": false,
 				"yearSuffix": ""
+			},
+			time: {
+				"currentText": "Now"
 			}
 		}, formcfg.en || {});
 		
@@ -326,6 +329,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					} else {
 						fVal = 0;
 					}
+					if(val[0] === '00') val[0] = '12';
 					val = $.trim(val.join(':')) + ' '+ curCfg.meridian[fVal];
 				}
 				return val;
@@ -410,6 +414,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			time: function(val){
 				var fVal;
 				if(val && curCfg.meridian){
+					if(val.substr(0,2) === "12") val = "00" + val.substr(2);
 					if(val.indexOf(curCfg.meridian[1]) != -1){
 						val = val.split(':');
 						fVal = (val[0] * 1);
