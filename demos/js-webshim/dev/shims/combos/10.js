@@ -1760,6 +1760,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			month:  {
 				currentText: 'Aktueller Monat'
 			},
+			time:  {
+				currentText: 'Jetzt'
+			},
 			date: {
 				close: 'schließen',
 				clear: 'Löschen',
@@ -1796,6 +1799,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			meridian: ['AM', 'PM'],
 			month:  {
 				currentText: 'This month'
+			},
+			time: {
+				"currentText": "Now"
 			},
 			date: {
 				"closeText": "Done",
@@ -1858,6 +1864,12 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			}
 			if(!langCfg['datetime-localSigns']){
 				langCfg['datetime-localSigns'] = langCfg.dateSigns+langCfg.timeSigns;
+			}
+			if(!langCfg['datetime-local']){
+				langCfg['datetime-local'] = {};
+			}
+			if(!langCfg['datetime-local'].currentText && langCfg.time.currentText){
+				langCfg['datetime-local'].currentText = langCfg.time.currentText;
 			}
 		};
 		var triggerLocaleChange = function(){
@@ -1925,6 +1937,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 						
 					} else {
 						fVal = 0;
+					}
+					if(val[0] === '00'){ 
+						val[0] = '12';
 					}
 					val = $.trim(val.join(':')) + ' '+ curCfg.meridian[fVal];
 				}
@@ -2010,6 +2025,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			time: function(val){
 				var fVal;
 				if(val && curCfg.meridian){
+					if(val.substr(0,2) === "12"){ 
+						val = "00" + val.substr(2);
+					}
 					if(val.indexOf(curCfg.meridian[1]) != -1){
 						val = val.split(':');
 						fVal = (val[0] * 1);

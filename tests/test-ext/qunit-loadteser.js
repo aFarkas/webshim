@@ -1,12 +1,5 @@
 (function($){
-	var browserName;
-	var browserVersion = parseInt($.browser.version, 10);
-	$.each($.browser, function(name, value){
-		if(value === true){
-			browserName = (name == 'safari') ? 'webkit' : name;
-			return;
-		}
-	});
+	
 	var implementTests = {};
 	var profiles = [
 		{

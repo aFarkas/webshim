@@ -57,6 +57,9 @@ webshims.formcfg.en = {
 	"week": {
 		"currentText": "This week"
 	},
+	"time": {
+		"currentText": "Now"
+	},
 	"date": {
 		"closeText": "Done",
 		"clear": "Clear",
@@ -107,4 +110,5 @@ webshims.formcfg.en = {
 		"isRTL": false,
 		"showMonthAfterYear": false,
 		"yearSuffix": ""
+	}
 };

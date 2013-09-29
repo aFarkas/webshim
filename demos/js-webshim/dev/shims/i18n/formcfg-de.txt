@@ -54,6 +54,9 @@ webshims.formcfg.de = {
 	month:  {
 		currentText: 'Aktueller Monat'
 	},
+	time:  {
+		currentText: 'Jetzt'
+	},
 	"week": {
 		"currentText": "Aktuelle Woche"
 	},
