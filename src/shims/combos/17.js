@@ -1105,7 +1105,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		var str;
 		return function(){
 			if(!str){
-				str = ('<option></option>')+$.map(monthDigits, function(val){
+				str = ('<option value=""></option>')+$.map(monthDigits, function(val){
 					return '<option value="'+val+'"]>'+val+'</option>';
 				}).join('');
 			}
@@ -1128,7 +1128,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					splits: [$('<input type="text" class="yy" size="4" inputmode="numeric" />')[0]] 
 				};
 				if(opts.monthSelect){
-					obj.splits.push($('<select class="mm">'+getMonthOptions()+'</select>')[0]);
+					obj.splits.push($('<select class="mm">'+getMonthOptions(opts)+'</select>')[0]);
 				} else {
 					obj.splits.push($('<input type="text" class="mm" inputmode="numeric" maxlength="2" size="2" />')[0]);
 				}
@@ -1163,7 +1163,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					splits: [$('<input type="text" class="yy" inputmode="numeric" size="4" />')[0]] 
 				};
 				if(opts.monthSelect){
-					obj.splits.push($('<select class="mm ws-spin">'+getMonthOptions()+'</select>')[0]);
+					obj.splits.push($('<select class="mm ws-spin">'+getMonthOptions(opts)+'</select>')[0]);
 				} else {
 					obj.splits.push($('<input type="text" class="mm ws-spin" />')[0]);
 					if(opts.onlyMonthDigits){
@@ -1608,7 +1608,10 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				if(hintValue.length == 2){
 					hintValue = opts.splitInput ? 
 						hintValue : 
-						curCfg.patterns.d.replace('yy', hintValue[0]).replace('mm', hintValue[1]);
+						curCfg.date.showMonthAfterYear ?
+							hintValue[0] +' '+hintValue[1] :
+							
+							hintValue[1] +' '+ hintValue[0];
 				} else {
 					hintValue = opts.splitInput ?
 						[val, val] :
