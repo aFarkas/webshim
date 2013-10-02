@@ -1,8 +1,7 @@
-webshims.register('form-shim-extend', function($, webshims, window, document, undefined, options){
+webshims.register('form-shim-extend2', function($, webshims, window, document, undefined, options){
 "use strict";
 
 //submitbubbles for IE6-IE8
-(function(){
 var supportSubmitBubbles = !('submitBubbles' in $.support) || $.support.submitBubbles;
 var addSubmitBubbles = function(form){
 	if (!supportSubmitBubbles && form && typeof form == 'object' && !form._submit_attached ) {
@@ -32,7 +31,6 @@ if(!supportSubmitBubbles && $.event.special.submit){
 		// return undefined since we don't need an event listener
 	};
 }
-})();
 
 
 
