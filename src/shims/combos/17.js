@@ -2755,7 +2755,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		});
 		
 		if(options.replaceUI && 'valueAsNumber' in document.createElement('input')){
-			var reflectFn = function(val){
+			var reflectFn = function(){
 				if(webshims.data(this, 'hasShadow')){
 					$.prop(this, 'value', $.prop(this, 'value'));
 				}
@@ -2763,6 +2763,20 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			
 			webshims.onNodeNamesPropertyModify('input', 'valueAsNumber', reflectFn);
 			webshims.onNodeNamesPropertyModify('input', 'valueAsDate', reflectFn);
+			$.each({stepUp: 1, stepDown: -1}, function(name, stepFactor){
+				var stepDescriptor = webshims.defineNodeNameProperty('input', name, {
+					prop: {
+						value: function(){
+							var ret;
+							if(stepDescriptor.prop && stepDescriptor.prop._supvalue){
+								ret = stepDescriptor.prop._supvalue.apply(this, arguments);
+								reflectFn.apply(this, arguments);
+							}
+							return ret;
+						}
+					}
+				});
+			});
 		}
 		
 		var extendType = (function(){
