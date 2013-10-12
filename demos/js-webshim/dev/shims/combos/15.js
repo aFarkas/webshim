@@ -1399,7 +1399,7 @@ var isPlaceholderOptionSelected = function(select){
 	} 
 	return false;
 };
-var modules = webshims.modules;
+
 var emptyJ = $([]);
 var getGroupElements = function(elem){
 	elem = $(elem);
@@ -1531,8 +1531,9 @@ $.extend($.event.special.submit, {
 		return submitSetup.apply(this, arguments);
 	}
 });
-
-$(window).on('invalid', $.noop);
+webshims.ready('form-shim-extend2 WINDOWLOAD', function(){
+	$(window).on('invalid', $.noop);
+});
 
 
 webshims.addInputType('email', {

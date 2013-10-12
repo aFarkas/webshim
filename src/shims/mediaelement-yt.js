@@ -1,7 +1,7 @@
 webshims.register('mediaelement-yt', function($, webshims, window, document, undefined, options){
 "use strict";
 var mediaelement = webshims.mediaelement;
-var ytAPI = jQuery.Deferred();
+var ytAPI = $.Deferred();
 window.onYouTubePlayerAPIReady = function() {
 	ytAPI.resolve();
 };

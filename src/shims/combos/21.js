@@ -1638,7 +1638,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 		};
 	})();
 	var emptyDiv = $('<div />')[0];
-	window.TextTrackCue = function(startTime, endTime, text){
+	var TextTrackCue = function(startTime, endTime, text){
 		if(arguments.length != 3){
 			webshims.error("wrong arguments.length for TextTrackCue.constructor");
 		}
@@ -1651,7 +1651,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 		createEventTarget(this);
 	};
 	
-	window.TextTrackCue.prototype = {
+	TextTrackCue.prototype = {
 		
 		onenter: null,
 		onexit: null,
@@ -1693,6 +1693,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 //			align: 'middle'
 	};
 	
+	window.TextTrackCue = TextTrackCue;
 	
 	
 	

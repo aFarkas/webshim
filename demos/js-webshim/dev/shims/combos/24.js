@@ -92,7 +92,7 @@ var isPlaceholderOptionSelected = function(select){
 	} 
 	return false;
 };
-var modules = webshims.modules;
+
 var emptyJ = $([]);
 var getGroupElements = function(elem){
 	elem = $(elem);
@@ -224,8 +224,9 @@ $.extend($.event.special.submit, {
 		return submitSetup.apply(this, arguments);
 	}
 });
-
-$(window).on('invalid', $.noop);
+webshims.ready('form-shim-extend2 WINDOWLOAD', function(){
+	$(window).on('invalid', $.noop);
+});
 
 
 webshims.addInputType('email', {
@@ -583,7 +584,28 @@ if(!Modernizr.input.list){
 }); //webshims.ready end
 webshims.register('form-shim-extend2', function($, webshims, window, document, undefined, options){
 "use strict";
-
+var emptyJ = $([]);
+var getGroupElements = function(elem){
+	elem = $(elem);
+	var name;
+	var form;
+	var ret = emptyJ;
+	if(elem[0].type == 'radio'){
+		form = elem.prop('form');
+		name = elem[0].name;
+		if(!name){
+			ret = elem;
+		} else if(form){
+			ret = $(form[name]);
+		} else {
+			ret = $(document.getElementsByName(name)).filter(function(){
+				return !$.prop(this, 'form');
+			});
+		}
+		ret = ret.filter('[type="radio"]');
+	}
+	return ret;
+};
 //submitbubbles for IE6-IE8
 var supportSubmitBubbles = !('submitBubbles' in $.support) || $.support.submitBubbles;
 var addSubmitBubbles = function(form){
@@ -597,6 +619,7 @@ var addSubmitBubbles = function(form){
 	}
 };
 if(!supportSubmitBubbles && $.event.special.submit){
+	
 	$.event.special.submit.setup = function() {
 		// Only need this for delegated form submit events
 		if ( $.nodeName( this, "form" ) ) {
@@ -898,6 +921,7 @@ if(!$.support.getSetAttribute && $('<form novalidate></form>').attr('novalidate'
 
 if(Modernizr.formattribute === false || !Modernizr.fieldsetdisabled){
 	(function(){
+
 		(function(prop, undefined){
 			$.prop = function(elem, name, value){
 				var ret;
@@ -1468,8 +1492,7 @@ try {
 					number: 1
 				}
 			;
-			
-			if(modules["form-number-date-ui"].loaded){
+			if(webshims.modules["form-number-date-ui"].loaded){
 				delete allowedPlaceholder.number;
 			}
 			
