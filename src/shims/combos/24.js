@@ -581,6 +581,162 @@ if(!Modernizr.input.list){
 	});
 }
 
+
+
+var submitterTypes = {submit: 1, button: 1, image: 1};
+var formSubmitterDescriptors = {};
+[
+	{
+		name: "enctype",
+		limitedTo: {
+			"application/x-www-form-urlencoded": 1,
+			"multipart/form-data": 1,
+			"text/plain": 1
+		},
+		defaultProp: "application/x-www-form-urlencoded",
+		proptype: "enum"
+	},
+	{
+		name: "method",
+		limitedTo: {
+			"get": 1,
+			"post": 1
+		},
+		defaultProp: "get",
+		proptype: "enum"
+	},
+	{
+		name: "action",
+		proptype: "url"
+	},
+	{
+		name: "target"
+	},
+	{
+		name: "novalidate",
+		propName: "noValidate",
+		proptype: "boolean"
+	}
+].forEach(function(desc){
+	var propName = 'form'+ (desc.propName || desc.name).replace(/^[a-z]/, function(f){
+		return f.toUpperCase();
+	});
+	var attrName = 'form'+ desc.name;
+	var formName = desc.name;
+	var eventName = 'click.webshimssubmittermutate'+formName;
+	
+	var changeSubmitter = function(){
+		var elem = this;
+		if( !('form' in elem) || !submitterTypes[elem.type] ){return;}
+		var form = $.prop(elem, 'form');
+		if(!form){return;}
+		var attr = $.attr(elem, attrName);
+		if(attr != null && ( !desc.limitedTo || attr.toLowerCase() === $.prop(elem, propName))){
+			
+			var oldAttr = $.attr(form, formName);
+			
+			$.attr(form, formName, attr);
+			setTimeout(function(){
+				if(oldAttr != null){
+					$.attr(form, formName, oldAttr);
+				} else {
+					try {
+						$(form).removeAttr(formName);
+					} catch(er){
+						form.removeAttribute(formName);
+					}
+				}
+			}, 9);
+		}
+	};
+	
+	
+
+switch(desc.proptype) {
+		case "url":
+			var urlForm = document.createElement('form');
+			formSubmitterDescriptors[propName] = {
+				prop: {
+					set: function(value){
+						$.attr(this, attrName, value);
+					},
+					get: function(){
+						var value = $.attr(this, attrName);
+						if(value == null){return '';}
+						urlForm.setAttribute('action', value);
+						return urlForm.action;
+					}
+				}
+			};
+			break;
+		case "boolean":
+			formSubmitterDescriptors[propName] = {
+				prop: {
+					set: function(val){
+						val = !!val;
+						if(val){
+							$.attr(this, 'formnovalidate', 'formnovalidate');
+						} else {
+							$(this).removeAttr('formnovalidate');
+						}
+					},
+					get: function(){
+						return $.attr(this, 'formnovalidate') != null;
+					}
+				}
+			};
+			break;
+		case "enum":
+			formSubmitterDescriptors[propName] = {
+				prop: {
+					set: function(value){
+						$.attr(this, attrName, value);
+					},
+					get: function(){
+						var value = $.attr(this, attrName);
+						return (!value || ( (value = value.toLowerCase()) && !desc.limitedTo[value] )) ? desc.defaultProp : value;
+					}
+				}
+		};
+		break;
+		default:
+			formSubmitterDescriptors[propName] = {
+				prop: {
+					set: function(value){
+						$.attr(this, attrName, value);
+					},
+					get: function(){
+						var value = $.attr(this, attrName);
+						return (value != null) ? value : "";
+					}
+				}
+			};
+	}
+
+
+	if(!formSubmitterDescriptors[attrName]){
+		formSubmitterDescriptors[attrName] = {};
+	}
+	formSubmitterDescriptors[attrName].attr = {
+		set: function(value){
+			formSubmitterDescriptors[attrName].attr._supset.call(this, value);
+			$(this).unbind(eventName).on(eventName, changeSubmitter);
+		},
+		get: function(){
+			return formSubmitterDescriptors[attrName].attr._supget.call(this);
+		}
+	};
+	formSubmitterDescriptors[attrName].initAttr = true;
+	formSubmitterDescriptors[attrName].removeAttr = {
+		value: function(){
+			$(this).unbind(eventName);
+			formSubmitterDescriptors[attrName].removeAttr._supvalue.call(this);
+		}
+	};
+});
+
+webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors);
+
 }); //webshims.ready end
 webshims.register('form-shim-extend2', function($, webshims, window, document, undefined, options){
 "use strict";
@@ -746,163 +902,6 @@ if( !('maxLength' in document.createElement('textarea')) ){
 		}
 	});
 } 
-
-
-
-var submitterTypes = {submit: 1, button: 1, image: 1};
-var formSubmitterDescriptors = {};
-[
-	{
-		name: "enctype",
-		limitedTo: {
-			"application/x-www-form-urlencoded": 1,
-			"multipart/form-data": 1,
-			"text/plain": 1
-		},
-		defaultProp: "application/x-www-form-urlencoded",
-		proptype: "enum"
-	},
-	{
-		name: "method",
-		limitedTo: {
-			"get": 1,
-			"post": 1
-		},
-		defaultProp: "get",
-		proptype: "enum"
-	},
-	{
-		name: "action",
-		proptype: "url"
-	},
-	{
-		name: "target"
-	},
-	{
-		name: "novalidate",
-		propName: "noValidate",
-		proptype: "boolean"
-	}
-].forEach(function(desc){
-	var propName = 'form'+ (desc.propName || desc.name).replace(/^[a-z]/, function(f){
-		return f.toUpperCase();
-	});
-	var attrName = 'form'+ desc.name;
-	var formName = desc.name;
-	var eventName = 'click.webshimssubmittermutate'+formName;
-	
-	var changeSubmitter = function(){
-		var elem = this;
-		if( !('form' in elem) || !submitterTypes[elem.type] ){return;}
-		var form = $.prop(elem, 'form');
-		if(!form){return;}
-		var attr = $.attr(elem, attrName);
-		if(attr != null && ( !desc.limitedTo || attr.toLowerCase() === $.prop(elem, propName))){
-			
-			var oldAttr = $.attr(form, formName);
-			
-			$.attr(form, formName, attr);
-			setTimeout(function(){
-				if(oldAttr != null){
-					$.attr(form, formName, oldAttr);
-				} else {
-					try {
-						$(form).removeAttr(formName);
-					} catch(er){
-						form.removeAttribute(formName);
-					}
-				}
-			}, 9);
-		}
-	};
-	
-	
-
-switch(desc.proptype) {
-		case "url":
-			var urlForm = document.createElement('form');
-			formSubmitterDescriptors[propName] = {
-				prop: {
-					set: function(value){
-						$.attr(this, attrName, value);
-					},
-					get: function(){
-						var value = $.attr(this, attrName);
-						if(value == null){return '';}
-						urlForm.setAttribute('action', value);
-						return urlForm.action;
-					}
-				}
-			};
-			break;
-		case "boolean":
-			formSubmitterDescriptors[propName] = {
-				prop: {
-					set: function(val){
-						val = !!val;
-						if(val){
-							$.attr(this, 'formnovalidate', 'formnovalidate');
-						} else {
-							$(this).removeAttr('formnovalidate');
-						}
-					},
-					get: function(){
-						return $.attr(this, 'formnovalidate') != null;
-					}
-				}
-			};
-			break;
-		case "enum":
-			formSubmitterDescriptors[propName] = {
-				prop: {
-					set: function(value){
-						$.attr(this, attrName, value);
-					},
-					get: function(){
-						var value = $.attr(this, attrName);
-						return (!value || ( (value = value.toLowerCase()) && !desc.limitedTo[value] )) ? desc.defaultProp : value;
-					}
-				}
-		};
-		break;
-		default:
-			formSubmitterDescriptors[propName] = {
-				prop: {
-					set: function(value){
-						$.attr(this, attrName, value);
-					},
-					get: function(){
-						var value = $.attr(this, attrName);
-						return (value != null) ? value : "";
-					}
-				}
-			};
-	}
-
-
-	if(!formSubmitterDescriptors[attrName]){
-		formSubmitterDescriptors[attrName] = {};
-	}
-	formSubmitterDescriptors[attrName].attr = {
-		set: function(value){
-			formSubmitterDescriptors[attrName].attr._supset.call(this, value);
-			$(this).unbind(eventName).on(eventName, changeSubmitter);
-		},
-		get: function(){
-			return formSubmitterDescriptors[attrName].attr._supget.call(this);
-		}
-	};
-	formSubmitterDescriptors[attrName].initAttr = true;
-	formSubmitterDescriptors[attrName].removeAttr = {
-		value: function(){
-			$(this).unbind(eventName);
-			formSubmitterDescriptors[attrName].removeAttr._supvalue.call(this);
-		}
-	};
-});
-
-webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors);
-
 
 if(!$.support.getSetAttribute && $('<form novalidate></form>').attr('novalidate') == null){
 	webshims.defineNodeNameProperty('form', 'novalidate', {
