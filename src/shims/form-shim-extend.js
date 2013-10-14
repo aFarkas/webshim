@@ -568,7 +568,7 @@ if(!Modernizr.input.list){
 				var select = $('select', elem);
 				var options;
 				if(select[0]){
-					options = select[0].options;
+					options = $.makeArray(select[0].options || []);
 				} else {
 					options = $('option', elem).get();
 					if(options.length){
