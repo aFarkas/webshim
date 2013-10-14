@@ -9,6 +9,8 @@ asyncTest("datalist", function(){
 	}
 	equals(options.length, options2.length, 'datalist options-attr has same length as option-element');
 	
+	equals($('#dlist').prop('options').length, $('#dlist').jProp('options').length, 'prop("options").length equals jProp length');
+	
 	strictEqual(options[0], options2[0], 'datalist first options-attr equals first option-element');
 	
 	//todo: test prop list| test attr set/get list || removeAttr list

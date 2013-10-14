@@ -1875,7 +1875,7 @@ if(!Modernizr.input.list){
 				var select = $('select', elem);
 				var options;
 				if(select[0]){
-					options = select[0].options;
+					options = $.makeArray(select[0].options || []);
 				} else {
 					options = $('option', elem).get();
 					if(options.length){
@@ -2045,6 +2045,7 @@ switch(desc.proptype) {
 webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors);
 
 }); //webshims.ready end
+
 webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(options.lazyCustomMessages){
