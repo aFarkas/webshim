@@ -21,7 +21,7 @@
 
 	</script>
 	<script src="../demo-js/demo.js"></script>
-	<title>HTML5 canvas : webshims lib - the polyfilling capability based loading JS library</title>
+	<title>HTML5 FileReader : webshims lib - the polyfilling capability based loading JS library</title>
 	    
 </head>
 
@@ -43,54 +43,65 @@
 				<li><a href="shiv.html">HTML5 shiv and innerShiv</a></li>
 				<li><a href="es5.html">ES5/JavaScript 1.8.5</a></li>
 				<li><a href="webforms.html">constraint validation and input widgets</a></li>
-				<li><strong>canvas</strong></li>
+				<li><a href="canvas.html">canvas</a></li>
 				<li><a href="mediaelement.html">mediaelement</a></li>
 				<li><a href="json-storage.html">storage and JSON</a></li>
 				<li><a href="geolocation.html">geolocation API</a></li>
 				<li><a href="details.html">details &amp; summary</a></li>
-				<li><a href="filereader.html">FileReader</a></li>
+				<li><strong>FileReader</strong></li>
 			</ul>
 		</nav>
 		<div class="main-box">
 		<section>
 			
-			<h2>Demo/About/Documentation HTML5 canvas</h2>
-			<p>Webshim Lib for the feature <code>canvas</code> implements one simple jQuery-method <code>.getContext()</code>.</p>
+			<h2>FileReader Documentation</h2>
+			<p>An example of how to read a file as a base64 string from a form control:</p>
 			
-			
-			<canvas id="my-canvas" width="80" height="80"></canvas>
-<code class="block run-once">
-var ctx = $('#my-canvas').getContext('2d');
-ctx.fillStyle = "rgb(200,0,0)";  
-ctx.fillRect (10, 10, 55, 50);  
- 
-ctx.fillStyle = "rgba(0, 0, 200, 0.5)";  
-ctx.fillRect (30, 30, 55, 50);
-</code>
-			<p>Webshim Lib can implement <a href="http://code.google.com/p/explorercanvas/">excanvas</a> or <a href="http://flashcanvas.net/">FlashCanvas (default)/FlashCanvas Pro</a>:</p>
 <code class="block">
-//always run configuration before calling $.webshims.polyfill();
-window.FlashCanvasOptions = {
-	disableContextMenu: true
-};
-$.webshims.setOptions('canvas', {
-	type: 'flashpro' //excanvas | flash | flashpro
-});
+$.webshims.polyfill('filereader');
+
+// shim the fileReader if not supported
+if(!window.FileReader) {
+  $('#fileInput').fileReader();
+  $('#fileInput').on('change', function (evt) {
+	var reader, file;
+	reader = new FileReader();
+    reader.onload = function (evt) {
+      var fileData = evt.target.result;
+      // fileData is the base64 encoded image
+    }
+
+    file = document.getElementById('user-photo').files[0];
+    reader.readAsDataURL(file);
+  });
+}
 </code>
-			<h3>Options for the <code>canvas</code> feature</h3>
+			<h3>Options for the <code>FileReader</code> feature</h3>
 			<ul>
-				<li><strong>type</strong>: <code>"flash"</code> | <code>"flashpro"</code> | <code>"excanvas"</code></li>
+				<li><strong>debugMode</strong>: Boolean - Turn on/off console logging</li>
+				<li><strong>callback</strong>: Function - Callback function triggered when Filereader is ready</li>
+			</ul>
+
+			<h3>Element specific options</h3>
+			<ul>
+				<li><strong>multiple</strong>: Boolean - Mutliple file select. Default: input file multiple property or false</li>
+<li><strong>accept</strong>: String - Mime type file restriction. Default: input file accept attribute or false</li>
+<li><strong>label</strong>: String - Label for the file type in file dialog if using extensions: example “Images (.jpg)”</li>
+<li><strong>extensions</strong>: String - File extensions in Flash format: "*.jpg;*.png;*.pdf", requires label option</li>
 			</ul>
 			
 			<aside>
-				<h3>Links about canvas</h3>
+				<h3>Related Links</h3>
 				<ul>
-					<li><a href="http://dev.w3.org/html5/canvas-api/canvas-2d-api.html">Canvas 2D API (W3C)</a></li>
-					<li><a href="https://developer.mozilla.org/en/Canvas_tutorial">Canvas tutorial (MDC)</a></li>
-					<li><a href="http://www.peterkroener.de/eine-kleine-canvas-einfuehrung/">Eine kleine Canvas-Einführung by Peter Kröner (german)</a></li>
+					<li><a href="http://www.w3.org/TR/FileAPI/#FileReader-interface">FileReader API (W3C)</a></li>
+					<li><a href="http://www.html5rocks.com/en/tutorials/file/dndfiles/">HTML5 Rocks tutorial on File APIs</a></li>
 				</ul>
 			</aside>
 		</section>
+		<p><em>
+			This feature is based on code from <a href="https://github.com/Jahdrien/FileReader" target="_external">https://github.com/Jahdrien/FileReader</a>.
+		</em>
+		</p>
 		</div>
 		</div>
 	<footer>	
