@@ -559,18 +559,24 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			check();
 		},
 		hideError: function(elem, reset){
+			var invalid;
 			var fieldWrapper = this.getFieldWrapper(elem);
-			var errorBox = fieldWrapper.hasClass(invalidWrapperClass) ? this.get(elem, fieldWrapper) : fieldWrapper.data('errorbox');
+			var errorBox = this.get(elem, fieldWrapper);
 			
 			if(errorBox && errorBox.jquery){
-				fieldWrapper.removeClass(invalidWrapperClass);
-				errorBox.message = '';
 				$(elem).filter('input').off('.recheckinvalid');
-				errorBox[fx[options.iVal.fx].hide](function(){
-					$(this).attr({hidden: 'hidden'});
-				});
+				if(!reset && (invalid = $('input:invalid, select:invalid, textarea:invalid', fieldWrapper)[0])){
+					$(invalid).trigger('refreshvalidityui');
+				} else {
+					fieldWrapper.removeClass(invalidWrapperClass);
+					errorBox.message = '';
+					errorBox[fx[options.iVal.fx].hide](function(){
+						$(this).attr({hidden: 'hidden'});
+					});
+				}
+				
 			}
-			if(!reset){
+			if(!reset && !invalid){
 				this.addSuccess(elem, fieldWrapper);
 			}
 			return fieldWrapper;
@@ -598,12 +604,13 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			var fieldWrapper = this.getFieldWrapper(elem);
 			var box = this.get(elem, fieldWrapper);
 			var message = $(elem).getErrorMessage();
+
 			if(box.message != message){
 				box.stop(true, true).html('<p>'+ message +'</p>');
 				box.message = message;
 				fieldWrapper.addClass(invalidWrapperClass).removeClass(successWrapperClass);
+				this.recheckInvalidInput(elem);
 				if(box.is('[hidden]') || box.css('display') == 'none'){
-					this.recheckInvalidInput(elem);
 					box
 						.css({display: 'none'})
 						.removeAttr('hidden')
