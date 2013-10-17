@@ -56,25 +56,30 @@
 			
 			<h2>FileReader Documentation</h2>
 			<p>An example of how to read a file as a base64 string from a form control:</p>
-			
+<code class="block">
+&lt;!-- add ws-filereader class to all shimable type="file" inputs --&gt;
+&lt;input type="file" class="ws-filereader" id="user-photo" /&gt;
+</code>
 <code class="block">
 $.webshims.polyfill('filereader');
 
-// shim the fileReader if not supported
-if(!window.FileReader) {
-  $('#fileInput').fileReader();
-  $('#fileInput').on('change', function (evt) {
-	var reader, file;
-	reader = new FileReader();
+//on DOM ready filereader is shimmed
+$(function(){
+
+  $('#user-photo').on('change', function (evt) {
+    var reader, file;
+    reader = new FileReader();
     reader.onload = function (evt) {
       var fileData = evt.target.result;
       // fileData is the base64 encoded image
-    }
+    };
 
-    file = document.getElementById('user-photo').files[0];
+    //use $.prop to access files property
+    file = $(this).prop('files')[0];
     reader.readAsDataURL(file);
   });
-}
+
+});
 </code>
 			<h3>Options for the <code>FileReader</code> feature</h3>
 			<ul>
