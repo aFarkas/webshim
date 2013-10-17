@@ -855,7 +855,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			}
 		},
 		addBindings: function(){
-			var leftOffset, widgetUnits, hasFocus;
+			var leftOffset, widgetUnits, hasFocus, isActive;
 			var that = this;
 			var o = this.options;
 			
@@ -885,8 +885,28 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 					}
 				};
 			})();
-			
+			var normalizeTouch = (function(){
+				var types = {
+					touchstart: 1,
+					touchend: 1,
+					touchmove: 1
+				};
+				var normalize = ['pageX', 'pageY'];
+				return function(e){
+					if(types[e.type] && e.originalEvent && e.originalEvent.touches && e.originalEvent.touches.length){
+						for(var i = 0; i < normalize.length; i++){
+							e[normalize[i]] = e.originalEvent.touches[0][normalize[i]];
+						}
+						
+					}
+					return e;
+				};
+			})();
 			var setValueFromPos = function(e, animate){
+				if(e.type == 'touchmove'){
+					e.preventDefault();
+					normalizeTouch(e);
+				}
 				
 				var val = that.getStepedValueFromPos((e[that.dirs.mouse] - leftOffset) * widgetUnits);
 				if(val != o.value){
@@ -903,18 +923,25 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 					eventTimer.call('change', o.value);
 				}
 				that.addRemoveClass('ws-active');
-				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
+				$(document).off('mousemove touchmove', setValueFromPos).off('mouseup touchend', remove);
 				$(window).off('blur', removeWin);
+				isActive = false;
 			};
 			var removeWin = function(e){
 				if(e.target == window){remove();}
 			};
 			var add = function(e){
 				var outerWidth;
+				
+				if(isActive || (e.type == 'touchstart' && (!e.originalEvent || !e.originalEvent.touches || e.originalEvent.touches.length != 1))){
+					return;
+				}
 				e.preventDefault();
-				$(document).off('mousemove', setValueFromPos).off('mouseup', remove);
+				
+				$(document).off('mousemove touchmove', setValueFromPos).off('mouseup touchend', remove);
 				$(window).off('blur', removeWin);
 				if(!o.readonly && !o.disabled){
+					normalizeTouch(e);
 					that.element.focus();
 					that.addRemoveClass('ws-active', true);
 					leftOffset = that.element.focus().offset();
@@ -924,18 +951,25 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 					leftOffset = leftOffset[that.dirs.pos];
 					widgetUnits = 100 / widgetUnits;
 					setValueFromPos(e, o.animate);
+					isActive = true;
 					$(document)
-						.on({
-							mouseup: remove,
-							mousemove: setValueFromPos
-						})
+						.on(e.type == 'touchstart' ?
+							{
+								touchend: remove,
+								touchmove: setValueFromPos
+							} :
+							{
+								mouseup: remove,
+								mousemove: setValueFromPos
+							}
+						)
 					;
 					$(window).on('blur', removeWin);
 					e.stopPropagation();
 				}
 			};
 			var elementEvts = {
-				mousedown: add,
+				'touchstart mousedown': add,
 				focus: function(e){
 					if(!o.disabled){
 						eventTimer.init('input', o.value);

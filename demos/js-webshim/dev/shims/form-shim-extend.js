@@ -233,16 +233,18 @@ webshims.addInputType('email', {
 	mismatch: (function(){
 		//taken from http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#valid-e-mail-address
 		var test = cfg.emailReg || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-		return function(val){
-			// optional punycode support: https://github.com/bestiejs/punycode.js
-			if(window.punycode && punycode.toASCII){
-				try {
-					if( test.test(punycode.toASCII(val)) ){
-						return false;
-					}
-				} catch(er){}
+		var splitReg = /\s*,\s*/g;
+		return function(val, input){
+			var ret = false;
+			val = $(input).prop('multiple') ? val.split(splitReg) : [val];
+			
+			for(var i = 0; i < val.length; i++){
+				if(!test.test(val[i])){
+					ret = true;
+					break;
+				}
 			}
-			return !test.test(val);
+			return ret;
 		};
 	})()
 });
@@ -404,6 +406,8 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 	},
 	initAttr: Modernizr.localstorage //only if we have aria-support
 });
+webshims.defineNodeNamesBooleanProperty(['input'], 'multiple');
+
 if(webshims.bugs.bustedValidity){
 	
 	webshims.defineNodeNameProperty('form', 'novalidate', {

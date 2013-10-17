@@ -144,7 +144,7 @@ webshims.polyfill('forms forms-ext');</pre>
 						</code>
 						simply suggests list of words.
 					</p>
-					<input type="text" value="" list="fruits" placeholder="Type your favorite fruit name" class="ws-nosearch" />
+					<input type="text" value="" list="fruits" placeholder="Type your favorite fruit name" />
 					<datalist id="fruits">
 						<select>
 							<option value="Apple"></option>
@@ -158,6 +158,42 @@ webshims.polyfill('forms forms-ext');</pre>
     &lt;option value="Apple"&gt;&lt;/option&gt; 
     &lt;option value="Orange"&gt;&lt;/option&gt; 
     &lt;option value="Peach"&gt;&lt;/option&gt;
+  &lt;/select&gt;
+&lt;/datalist&gt;</pre>
+				</div>
+				<div class="span4">
+					<h3>input[type=email][multiple] datalist</h3>
+					<p>
+						For 
+						<code>
+							email
+						</code>
+						type and multiple attribute
+						<code>
+							datalist
+						</code>
+						simply suggests list of words.
+					</p>
+					<input type="email" value="" list="contacts" multiple placeholder="Type your mail contacts" data-list-filter="^" />
+					<datalist id="contacts">
+						<select>
+							<option value="art@example.net" label="Arthur Dent" />
+							<option value="adamjosh@example.net" label="Adam Josh" />
+							<option value="hedral@damowmow.com" />
+							<option value="pillar@example.com" />
+							<option value="astrophy@cute.example" />
+							<option value="astronomy@science.example.org" />
+						</select>
+					</datalist>
+					<pre>&lt;input type="email" list="contacts" multiple data-list-filter="^" placeholder="Type your mail contacts" /&gt;
+&lt;datalist id="contacts"&gt;
+  &lt;select&gt;
+    &lt;option value="art@example.net" label="Arthur Dent" /&gt;
+    &lt;option value="adamjosh@example.net" label="Adam Josh" /&gt;
+    &lt;option value="hedral@damowmow.com" /&gt;
+    &lt;option value="pillar@example.com" /&gt;
+    &lt;option value="astrophy@cute.example" /&gt;
+    &lt;option value="astronomy@science.example.org" /&gt;
   &lt;/select&gt;
 &lt;/datalist&gt;</pre>
 				</div>

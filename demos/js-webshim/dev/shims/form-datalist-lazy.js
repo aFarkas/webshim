@@ -25,6 +25,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 	
 	var lReg = /</g;
 	var gReg = />/g;
+	var splitReg = /\s*,\s*/g;
 	
 	$.extend(options.shadowListProto, {
 		_lazyCreate: function(opts){
@@ -184,7 +185,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			}
 			this.addMarkElement = options.addMark || $(this.input).hasClass('mark-option-text');
 			this.listFilter = $(this.input).data('listFilter') || options.listFilter || '*';
-			
+			this.multiple = $(this.input).prop('multiple') && $(this.input).prop('type') == 'email';
 			var list = [];
 			
 			var values = [];
@@ -256,7 +257,13 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			//first check prevent infinite loop, second creates simple lazy optimization
 			if(value === this.lastUpdatedValue){
 				return;
-			} 
+			}
+			
+			if(this.multiple){
+				value = value.split(splitReg);
+				value = value[value.length - 1];
+			}
+			
 			if(this.lastUnfoundValue && value.indexOf(this.lastUnfoundValue) === 0){
 				this.hideList();
 				return;
@@ -268,7 +275,10 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			var startSearch = this.listFilter == '^';
 			var lis = $('li', this.shadowList);
 			var that = this;
+			
+			
 			if(value && this.listFilter != '!'){
+				
 				
 				this.arrayOptions.forEach(function(item, i){
 					var search, searchIndex, foundName;
@@ -390,9 +400,17 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 		},
 		changeValue: function(activeItem){
 			if(!activeItem[0]){return;}
-			var spinner;
+			var spinner, tmpValue;
 			var newValue = $('span.option-value', activeItem).text();
 			var oldValue = $.prop(this.input, 'value');
+			
+			if(this.multiple){
+				tmpValue = oldValue.split(splitReg);
+				tmpValue[tmpValue.length - 1] = newValue;
+				
+				newValue = tmpValue.join(', ');
+			}
+			
 			if(newValue != oldValue){
 				
 				$(this.input)
