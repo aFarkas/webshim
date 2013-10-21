@@ -1,4 +1,4 @@
-upcoming Release 1.11.1
+Release 1.11.1
 ----------
 
 - implemented seeking, seeked events, seeking property for mediaelements

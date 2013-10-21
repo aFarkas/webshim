@@ -283,18 +283,41 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			this.element.off('pospopover').on('pospopover', delayedRepos);
 			$(window).on('resize'+this.eventns + ' pospopover'+this.eventns, delayedRepos);
 		},
+		_getAutoAppendElement: (function(){
+			var invalidParent = /^(?:span|i|label|b|p|tr|thead|tbody|table|strong|em|ul|ol|dl|html)$/i;
+			return function(element){
+			
+				var appendElement;
+				var parent = element[0];
+				var body = document.body;
+				while((parent = parent[appendElement ? 'offsetParent' : 'parentNode']) && parent.nodeType == 1  && parent != body){
+					if(!appendElement && !invalidParent.test(parent.nodeName)){
+						appendElement = parent;
+					} 
+					if(appendElement && $.style(parent, 'overflow') == 'hidden' && $.style(parent, 'position') != 'static'){
+						appendElement = false;
+					}
+				}
+				return $(appendElement || body);
+			};
+		})(),
 		prepareFor: function(element, visual){
-			var onBlur;
+			var onBlur, parentElem;
 			var that = this;
 			var css = {};
-			var opts = $.extend(true, {}, this.options, $(element.prop('form') || []).data('wspopover') || {}, element.data('wspopover'));
+			var opts = $.extend(true, {}, this.options, element.jProp('form').data('wspopover') || {}, element.data('wspopover'));
 			this.lastOpts = opts;
 			this.lastElement = $(element).getShadowFocusElement();
 			if(!this.prepared || !this.options.prepareFor){
 				if(opts.appendTo == 'element'){
-					this.element.insertAfter(element);
+					parentElem = element.parent();
+				} else if(opts.appendTo == 'auto'){
+					parentElem = this._getAutoAppendElement(element);
 				} else {
-					this.element.appendTo(opts.appendTo);
+					parentElem = $(opts.appendTo);
+				}
+				if(!this.prepared || parentElem[0] != this.element[0].parentNode){
+					this.element.appendTo(parentElem);
 				}
 			}
 			
@@ -324,9 +347,6 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				
 			}
 			
-			if(!this.prepared && $.fn.bgIframe){
-				this.element.bgIframe();
-			}
 			this.prepared = true;
 		},
 		clear: function(){

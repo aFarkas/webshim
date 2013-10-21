@@ -185,7 +185,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			}
 			this.addMarkElement = options.addMark || $(this.input).hasClass('mark-option-text');
 			this.listFilter = $(this.input).data('listFilter') || options.listFilter || '*';
-			this.multiple = $(this.input).prop('multiple') && $(this.input).prop('type') == 'email';
+			this.multiple = $(this.input).hasClass('list-multiple') || ($(this.input).prop('multiple') && $(this.input).prop('type') == 'email');
 			var list = [];
 			
 			var values = [];
@@ -261,7 +261,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			
 			if(this.multiple){
 				value = value.split(splitReg);
-				value = value[value.length - 1];
+				value = value[value.length - 1] || '';
 			}
 			
 			if(this.lastUnfoundValue && value.indexOf(this.lastUnfoundValue) === 0){

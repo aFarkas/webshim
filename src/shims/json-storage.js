@@ -11,7 +11,7 @@ if(!this.JSON){this.JSON={};}(function(){function f(n){return n<10?'0'+n:n;}if(t
 //using window.name for sessionStorage and cookies for localStorage
 
 (function () {
-var $ = jQuery;	
+var $ = webshims.$ || jQuery;	
 if ('localStorage' in window && 'sessionStorage' in window) {
 	$.webshims.isReady('json-storage', true);
 	return;

@@ -27,7 +27,7 @@
 	
 	
 	var webshims = {
-		version: '1.11.2RC5',
+		version: '1.11.2RC6',
 		cfg: {
 			
 			//addCacheBuster: false,
@@ -35,7 +35,7 @@
 //			extendNative: false,
 			loadStyles: true,
 			disableShivMethods: true,
-			wspopover: {appendTo: 'body', hideOnBlur: true},
+			wspopover: {appendTo: 'auto', hideOnBlur: true},
 			basePath: (function(){
 				var script = jScripts.filter('[src*="polyfiller.js"]');
 				var path;
