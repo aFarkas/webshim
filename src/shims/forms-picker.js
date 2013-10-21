@@ -8,7 +8,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		var ret = [date.getFullYear(), moduleOpts.addZero(date.getMonth() + 1), moduleOpts.addZero(date.getDate())];
 		ret.month = ret[0]+'-'+ret[1];
 		ret.date = ret[0]+'-'+ret[1]+'-'+ret[2];
-		ret.time = date.getHours() +':'+ date.getMinutes();
+		ret.time = moduleOpts.addZero(date.getHours()) +':'+ moduleOpts.addZero(date.getMinutes());
 		
 		ret['datetime-local'] = ret.date +'T'+ ret.time;
 		return ret;
