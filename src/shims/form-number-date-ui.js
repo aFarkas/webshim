@@ -1883,7 +1883,26 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			});
 		}
 		
-		if(!modernizrInputTypes.range || options.replaceUI){
+		var replace = {};
+		var isStupid = modernizrInputTypes.number && navigator.userAgent.indexOf('Touch') == -1 && ((/MSIE 1[0|1]\.\d/.test(navigator.userAgent)) || (/Trident\/7\.0/.test(navigator.userAgent)));
+		
+		if(options.replaceUI){
+			if( $.isPlainObject(options.replaceUI) ){
+				$.extend(replace, options.replaceUI);
+			} else {
+				$.extend(replace, {
+					'range': 1,
+					'number': 1,
+					'time': 1, 
+					'month': 1, 
+					'date': 1, 
+					'color': 1, 
+					'datetime-local': 1
+				});
+			}
+		}
+		replace.number = !(isStupid);
+		if(!modernizrInputTypes.range || replace.range){
 			extendType('range', {
 				_create: function(opts, set){
 					var data = $('<span />').insertAfter(opts.orig).rangeUI(opts).data('rangeUi');
@@ -1892,9 +1911,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			});
 		}
 		
-		var isStupid = modernizrInputTypes.number && navigator.userAgent.indexOf('Touch') == -1 && ((/MSIE 1[0|1]\.\d/.test(navigator.userAgent)) || (/Trident\/7\.0/.test(navigator.userAgent)));
+		
 		['number', 'time', 'month', 'date', 'color', 'datetime-local'].forEach(function(name){
-			if(!modernizrInputTypes[name] || options.replaceUI || (name == 'number' && isStupid)){
+			if(!modernizrInputTypes[name] || replace[name]){
 				extendType(name, {
 					_create: function(opts, set){
 						if(opts.monthSelect){
