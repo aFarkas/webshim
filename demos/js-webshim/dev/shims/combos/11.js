@@ -382,7 +382,7 @@
 			var elementEvts = {
 				'touchstart mousedown': add,
 				focus: function(e){
-					if(!o.disabled){
+					if(!o.disabled && !hasFocus){
 						eventTimer.init('input', o.value);
 						eventTimer.init('change', o.value);
 						that.addRemoveClass('ws-focus', true);
