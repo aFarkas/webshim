@@ -559,7 +559,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						$(this.test);
 						webshims.ready('WINDOWLOAD', this.test);
 						$(document).on('updatelayout', this.handler);
-						$(window).bind('resize', this.handler);
+						$(window).on('resize', this.handler);
 						(function(){
 							var oldAnimate = $.fn.animate;
 							var animationTimer;
@@ -581,6 +581,13 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			webshims.docObserve = function(){
 				webshims.ready('DOM', function(){
 					docObserve.start();
+					if($.support.boxSizing == null){
+						$(function(){
+							if($.support.boxSizing){
+								docObserve.handler({type: 'boxsizing'});
+							}
+						});
+					}
 				});
 			};
 			return function(nativeElem, shadowElem, opts){

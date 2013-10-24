@@ -1631,6 +1631,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		var inputTypes = {
 			
 		};
+		var boolAttrs = {disabled: 1, required: 1, readonly: 1};
 		var copyProps = [
 			'disabled',
 			'readonly',
@@ -1653,7 +1654,11 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				if(!stopCircular){
 					var shadowData = webshims.data(this, 'shadowData');
 					if(shadowData && shadowData.data && shadowData.nativeElement === this && shadowData.data[fnName]){
-						shadowData.data[fnName](val, boolVal);
+						if(boolAttrs[fnName]){
+							shadowData.data[fnName](val, boolVal);
+						} else {
+							shadowData.data[fnName](val);
+						}
 					}
 				}
 			});
@@ -1884,7 +1889,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		}
 		
 		var replace = {};
-		var isStupid = modernizrInputTypes.number && navigator.userAgent.indexOf('Touch') == -1 && ((/MSIE 1[0|1]\.\d/.test(navigator.userAgent)) || (/Trident\/7\.0/.test(navigator.userAgent)));
+		
 		
 		if(options.replaceUI){
 			if( $.isPlainObject(options.replaceUI) ){
@@ -1901,7 +1906,10 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				});
 			}
 		}
-		replace.number = !(isStupid);
+		if(modernizrInputTypes.number && navigator.userAgent.indexOf('Touch') == -1 && ((/MSIE 1[0|1]\.\d/.test(navigator.userAgent)) || (/Trident\/7\.0/.test(navigator.userAgent)))){
+			replace.number = 1;
+		}
+		
 		if(!modernizrInputTypes.range || replace.range){
 			extendType('range', {
 				_create: function(opts, set){

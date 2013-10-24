@@ -559,7 +559,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						$(this.test);
 						webshims.ready('WINDOWLOAD', this.test);
 						$(document).on('updatelayout', this.handler);
-						$(window).bind('resize', this.handler);
+						$(window).on('resize', this.handler);
 						(function(){
 							var oldAnimate = $.fn.animate;
 							var animationTimer;
@@ -581,6 +581,13 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			webshims.docObserve = function(){
 				webshims.ready('DOM', function(){
 					docObserve.start();
+					if($.support.boxSizing == null){
+						$(function(){
+							if($.support.boxSizing){
+								docObserve.handler({type: 'boxsizing'});
+							}
+						});
+					}
 				});
 			};
 			return function(nativeElem, shadowElem, opts){
@@ -1122,6 +1129,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			for(i = 0; i < createOpts.length; i++){
 				this[createOpts[i]](this.options[createOpts[i]]);
 			}
+			
 			this.value = this._value;
 			this.value(this.options.value);
 			this.initDataList();
@@ -1539,6 +1547,20 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			this.thumb.on({
 				mousedown: add
 			});
+			
+			if(this.orig){
+				$(this.orig).jProp('form').on('reset', function(){
+					var val = $.prop(that.orig, 'value');
+					that.value(val);
+					setTimeout(function(){
+						var val2 = $.prop(that.orig, 'value');
+						if(val != val2){
+							that.value(val2);
+						}
+					}, 4);
+				});
+			}
+			
 			if (window.webshims) {
 				webshims.ready('WINDOWLOAD', function(){
 					webshims.ready('dom-support', function(){
@@ -3265,6 +3287,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		var inputTypes = {
 			
 		};
+		var boolAttrs = {disabled: 1, required: 1, readonly: 1};
 		var copyProps = [
 			'disabled',
 			'readonly',
@@ -3287,7 +3310,11 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				if(!stopCircular){
 					var shadowData = webshims.data(this, 'shadowData');
 					if(shadowData && shadowData.data && shadowData.nativeElement === this && shadowData.data[fnName]){
-						shadowData.data[fnName](val, boolVal);
+						if(boolAttrs[fnName]){
+							shadowData.data[fnName](val, boolVal);
+						} else {
+							shadowData.data[fnName](val);
+						}
 					}
 				}
 			});
@@ -3517,7 +3544,29 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			});
 		}
 		
-		if(!modernizrInputTypes.range || options.replaceUI){
+		var replace = {};
+		
+		
+		if(options.replaceUI){
+			if( $.isPlainObject(options.replaceUI) ){
+				$.extend(replace, options.replaceUI);
+			} else {
+				$.extend(replace, {
+					'range': 1,
+					'number': 1,
+					'time': 1, 
+					'month': 1, 
+					'date': 1, 
+					'color': 1, 
+					'datetime-local': 1
+				});
+			}
+		}
+		if(modernizrInputTypes.number && navigator.userAgent.indexOf('Touch') == -1 && ((/MSIE 1[0|1]\.\d/.test(navigator.userAgent)) || (/Trident\/7\.0/.test(navigator.userAgent)))){
+			replace.number = 1;
+		}
+		
+		if(!modernizrInputTypes.range || replace.range){
 			extendType('range', {
 				_create: function(opts, set){
 					var data = $('<span />').insertAfter(opts.orig).rangeUI(opts).data('rangeUi');
@@ -3526,9 +3575,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			});
 		}
 		
-		var isStupid = modernizrInputTypes.number && navigator.userAgent.indexOf('Touch') == -1 && ((/MSIE 1[0|1]\.\d/.test(navigator.userAgent)) || (/Trident\/7\.0/.test(navigator.userAgent)));
+		
 		['number', 'time', 'month', 'date', 'color', 'datetime-local'].forEach(function(name){
-			if(!modernizrInputTypes[name] || options.replaceUI || (name == 'number' && isStupid)){
+			if(!modernizrInputTypes[name] || replace[name]){
 				extendType(name, {
 					_create: function(opts, set){
 						if(opts.monthSelect){

@@ -28,6 +28,7 @@
 			for(i = 0; i < createOpts.length; i++){
 				this[createOpts[i]](this.options[createOpts[i]]);
 			}
+			
 			this.value = this._value;
 			this.value(this.options.value);
 			this.initDataList();
@@ -445,6 +446,20 @@
 			this.thumb.on({
 				mousedown: add
 			});
+			
+			if(this.orig){
+				$(this.orig).jProp('form').on('reset', function(){
+					var val = $.prop(that.orig, 'value');
+					that.value(val);
+					setTimeout(function(){
+						var val2 = $.prop(that.orig, 'value');
+						if(val != val2){
+							that.value(val2);
+						}
+					}, 4);
+				});
+			}
+			
 			if (window.webshims) {
 				webshims.ready('WINDOWLOAD', function(){
 					webshims.ready('dom-support', function(){
