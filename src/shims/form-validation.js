@@ -428,8 +428,8 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			},
 			setFocus: function(element){
 				var focusElem = $(element).getShadowFocusElement();
-				var scrollTop = webshims.scrollRoot.scrollTop();
-				var elemTop = focusElem.offset().top - 30;
+				var scrollTop = webshims.scrollRoot.scrollTop() + (options.viewportOffset || 0);
+				var elemTop = focusElem.offset().top - (options.scrollOffset || 30);
 				var focus = function(){
 					try {
 						focusElem[0].focus();
@@ -439,7 +439,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				
 				if(scrollTop > elemTop){
 					webshims.scrollRoot.animate(
-						{scrollTop: elemTop - 5}, 
+						{scrollTop: elemTop - 5 - (options.viewportOffset || 0)}, 
 						{
 							queue: false, 
 							duration: Math.max( Math.min( 600, (scrollTop - elemTop) * 1.5 ), 80 ),
