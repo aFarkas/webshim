@@ -2,7 +2,9 @@
 
 
 /* spinner control for time, number (usable for date, datetime-local) */
-.has-input-buttons {
+.has-input-buttons,
+input.has-input-buttons,
+span.has-input-buttons {
 	display: inline-block;
 }
 
@@ -70,6 +72,7 @@ input[type="color"] {
 }
 
 .input-buttons {
+	text-align: left;
 	
 	&.color-input-buttons {
 		margin-left: 2px;
