@@ -221,7 +221,44 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				"yearSuffix": ""
 			}
 		}, formcfg.en || {});
-		
+
+		formcfg.pt = $.extend(true, {
+			numberFormat: {
+				".": ",",
+				",": "."
+			},
+			numberSigns: '.',
+			dateSigns: '/',
+			timeSigns: ":. ",
+			dFormat: "/",
+			patterns: {
+				d: "dd/mm/yy"
+			},
+			month:  {
+				currentText: 'Este mês'
+			},
+			time: {
+				currentText: "Agora"
+			},
+			date: {
+				closeText: "Feito",
+				clear: 'Limpa',
+				prevText: "Próximo",
+				nextText: "Anterior",
+				currentText: "Hoje",
+				monthNames: ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],
+				monthNamesShort: ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],
+				dayNames: ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"],
+				dayNamesShort: ["Dom","Seg","Ter","Qua","Qui","Sex","Sab"],
+				dayNamesMin: ["Do","Se","Te","Qa","Qi","Se","Sa"],
+				weekHeader: "Sem",
+				firstDay: 0,
+				isRTL: false,
+				showMonthAfterYear: false,
+				yearSuffix: ""
+			}
+		}, formcfg.pt || {});
+
 		if(!formcfg['en-US']){
 			formcfg['en-US'] = $.extend(true, {}, formcfg['en']);
 		}
@@ -233,6 +270,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		}
 		if(!formcfg['en-AU']){
 			formcfg['en-AU'] = $.extend(true, {}, formcfg['en-GB']);
+		}
+		if(!formcfg['pt-BR']){
+			formcfg['pt-BR'] = $.extend(true, {}, formcfg['pt']);
 		}
 		if(!formcfg['']){
 			formcfg[''] = formcfg['en-US'];
