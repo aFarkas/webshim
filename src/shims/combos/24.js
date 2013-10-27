@@ -1802,7 +1802,7 @@ try {
 					input.on({
 						'keyup keypress keydown paste cut': extraTest,
 						focusout: unbind,
-						'input updateInput change': trigger
+						'input updateInput change triggerinput': trigger
 					});
 				}
 			;

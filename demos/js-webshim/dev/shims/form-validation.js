@@ -770,4 +770,72 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			
 		})();
 	}
+	
+	if(!$.event.special.change && Modernizr.inputtypes && options.fixRangeChange){
+		var rangeChange = {
+			
+			trigger: function(){
+				if(rangeChange.blockElement){
+					$(rangeChange.blockElement).off('blur', rangeChange.trigger);
+					rangeChange.blockElement = false;
+					setTimeout(function(){
+						if(rangeChange.requestedChange && rangeChange.value != rangeChange.requestedChange.value){
+							$(rangeChange.requestedChange).trigger('change');
+						}
+						rangeChange.value = false;
+					}, 9);
+				}
+				
+			}
+		};
+		
+		$.each([{name: 'key', evt: 'keyup'}, {name: 'mouse', evt: 'mouseup'}, {name: 'touch', evt: 'touchend'}], function(i, obj){
+			var setup = obj.name + 'Setup';
+			var commit = obj.name + 'Commit';
+			rangeChange[obj.name+'Block'] = function(e){
+				
+				if(!rangeChange.blockElement && e.target.type == 'range'){
+					
+					rangeChange.blockElement = e.target;
+					rangeChange.value = e.target.value;
+					$(rangeChange.blockElement)
+						.off('blur', rangeChange.trigger)
+						.on('blur', rangeChange.trigger)
+					;
+					
+					$(document.body)
+						.off(obj.evt, rangeChange[commit])
+						.on(obj.evt, rangeChange[commit])
+					;
+				}
+			};
+			
+			rangeChange[commit] = function(e){
+				$(document.body).off(obj.evt, rangeChange[commit]);
+				rangeChange.trigger();
+			};
+			
+		});
+		
+		$(document.body || 'html').on({
+			mousedown: rangeChange.mouseBlock,
+			'keydown kepress': rangeChange.keyBlock,
+			'touchstart': rangeChange.touchBlock
+		});
+		
+		$.event.special.change = {
+			
+			handle: function(e){
+				
+				if(!e.isTrigger && rangeChange.blockElement == e.target){
+					rangeChange.requestedChange = e.target;
+					$(e.target).triggerHandler('triggerinput');
+					return false;
+				} else if(rangeChange.requestedChange == e.target){
+					rangeChange.requestedChange = false;
+				}
+				e.handleObj.handler.apply(this, arguments);
+			}
+		};
+	}
 });
