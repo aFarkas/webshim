@@ -1786,7 +1786,7 @@ try {
 							extraTimer = setTimeout(trigger, 9);
 						},
 						unbind = function(){
-							input.unbind('focusout', unbind).unbind('keyup keypress keydown paste cut', extraTest).unbind('input change updateInput', trigger);
+							input.unbind('focusout', unbind).unbind('keyup keypress keydown paste cut', extraTest).unbind('input change updateInput triggerinput', trigger);
 							clearInterval(timer);
 							setTimeout(function(){
 								trigger();
