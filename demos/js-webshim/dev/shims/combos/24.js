@@ -1764,7 +1764,6 @@ try {
 					
 					//pro forma
 					,color: 1
-					//,range: 1
 				},
 				observe = function(input){
 					var timer,

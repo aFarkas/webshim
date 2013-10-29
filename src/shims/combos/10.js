@@ -1924,6 +1924,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			if(!langCfg['datetime-local']){
 				langCfg['datetime-local'] = {};
 			}
+			if(!langCfg.time){
+				langCfg.time = {};
+			}
 			if(!langCfg['datetime-local'].currentText && langCfg.time.currentText){
 				langCfg['datetime-local'].currentText = langCfg.time.currentText;
 			}
