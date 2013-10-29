@@ -150,10 +150,15 @@
 	<script>
 		jQuery.noConflict();
 		(function($){
+			var getRandom = function( max ) {
+				return parseInt( Math.random() * ( max + 1 ), 10 );
+			};
 			var hash = location.hash.replace('#', '');
+			var langs = webshims.cfg.forms.availableLangs;
 			
 //			$.webshims.debug = "noCombo";
 			$(window).load(function(){
+				webshims.activeLang(langs[ getRandom(langs.length) ]);
 				$.webshims.polyfill();
 			});
 			if(hash.indexOf('noConflictExtreme') != -1){
