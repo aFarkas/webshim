@@ -786,8 +786,36 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					}, 9);
 				}
 				
+			},
+			lastValue: false,
+			updateInputValue: function(e){
+				rangeChange.lastValue = e.target.value;
+			},
+			triggerInput: function(e){
+				if(rangeChange.lastValue !== false && rangeChange.lastValue != e.target.value){
+					$(e.target).trigger('input');
+				}
+			},
+			inputTeardown: function(e){
+				$(e.target)
+					.off('input', rangeChange.updateInputValue)
+					.off('blur', rangeChange.inputTeardown)
+				;
+				rangeChange.lastValue = false;
+			},
+			inputSetup: function(e){
+				
+				if(e.target.type == 'range'){
+					rangeChange.inputTeardown(e);
+					rangeChange.lastValue = e.target.value;
+					$(e.target)
+						.on('input', rangeChange.updateInputValue)
+						.on('blur', rangeChange.inputTeardown)
+					;
+				}
 			}
 		};
+		
 		
 		$.each([{name: 'key', evt: 'keyup'}, {name: 'mouse', evt: 'mouseup'}, {name: 'touch', evt: 'touchend'}], function(i, obj){
 			var setup = obj.name + 'Setup';
@@ -820,7 +848,8 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		$(document.body || 'html').on({
 			mousedown: rangeChange.mouseBlock,
 			'keydown kepress': rangeChange.keyBlock,
-			'touchstart': rangeChange.touchBlock
+			'touchstart': rangeChange.touchBlock,
+			focusin: rangeChange.inputSetup
 		});
 		
 		$.event.special.change = {
@@ -829,7 +858,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				
 				if(!e.isTrigger && rangeChange.blockElement == e.target){
 					rangeChange.requestedChange = e.target;
-					$(e.target).triggerHandler('triggerinput');
+					rangeChange.triggerInput(e);
 					return false;
 				} else if(rangeChange.requestedChange == e.target){
 					rangeChange.requestedChange = false;
