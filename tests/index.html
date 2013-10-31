@@ -47,6 +47,11 @@
 			
 			if(hash.indexOf('customValidationMessage') !== -1){
 				$.webshims.cfg.forms.customMessages = true; 
+				webshims.setOptions({
+					forms: {
+						fixRangeChange: true
+					}
+				});
 			}
 			if(hash.indexOf('noNativeMethods') !== -1){
 				$.webshims.cfg.extendNative = false; 
