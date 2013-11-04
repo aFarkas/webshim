@@ -1437,34 +1437,34 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	});
 	
 	//add support for $('video').trigger('play') in case extendNative is set to false
-//	if(!webshims.cfg.extendNative && !webshims.cfg.noTriggerOverride){
-//		(function(oldTrigger){
-//			$.event.trigger = function(event, data, elem, onlyHandlers){
-//				
-//				if(!havePolyfill[event] || onlyHandlers || !elem || elem.nodeType !== 1){
-//					return oldTrigger.apply(this, arguments);
-//				}
-//				var ret, isOrig;
-//				var origFn = elem[event];
-//				var polyfilledFn = $.prop(elem, event);
-//				var changeFn = polyfilledFn && origFn != polyfilledFn;
-//				if(changeFn){
-//					isOrig = (event in elem) && has.call(elem, event);
-//					elem[event] = polyfilledFn;
-//				}
-//				ret = oldTrigger.apply(this, arguments);
-//				if (changeFn) {
-//					if(isOrig){
-//						elem[event] = origFn;
-//					} else {
-//						delete elem[event];
-//					}
-//				}
-//				
-//				return ret;
-//			};
-//		})($.event.trigger);
-//	}
+	if(!webshims.cfg.extendNative && !webshims.cfg.noTriggerOverride){
+		(function(oldTrigger){
+			$.event.trigger = function(event, data, elem, onlyHandlers){
+				
+				if(!havePolyfill[event] || onlyHandlers || !elem || elem.nodeType !== 1){
+					return oldTrigger.apply(this, arguments);
+				}
+				var ret, isOrig;
+				var origFn = elem[event];
+				var polyfilledFn = $.prop(elem, event);
+				var changeFn = polyfilledFn && origFn != polyfilledFn;
+				if(changeFn){
+					isOrig = (event in elem) && has.call(elem, event);
+					elem[event] = polyfilledFn;
+				}
+				ret = oldTrigger.apply(this, arguments);
+				if (changeFn) {
+					if(isOrig){
+						elem[event] = origFn;
+					} else {
+						delete elem[event];
+					}
+				}
+				
+				return ret;
+			};
+		})($.event.trigger);
+	}
 	
 	['removeAttr', 'prop', 'attr'].forEach(function(type){
 		olds[type] = $[type];

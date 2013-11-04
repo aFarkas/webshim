@@ -182,34 +182,34 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	});
 	
 	//add support for $('video').trigger('play') in case extendNative is set to false
-//	if(!webshims.cfg.extendNative && !webshims.cfg.noTriggerOverride){
-//		(function(oldTrigger){
-//			$.event.trigger = function(event, data, elem, onlyHandlers){
-//				
-//				if(!havePolyfill[event] || onlyHandlers || !elem || elem.nodeType !== 1){
-//					return oldTrigger.apply(this, arguments);
-//				}
-//				var ret, isOrig;
-//				var origFn = elem[event];
-//				var polyfilledFn = $.prop(elem, event);
-//				var changeFn = polyfilledFn && origFn != polyfilledFn;
-//				if(changeFn){
-//					isOrig = (event in elem) && has.call(elem, event);
-//					elem[event] = polyfilledFn;
-//				}
-//				ret = oldTrigger.apply(this, arguments);
-//				if (changeFn) {
-//					if(isOrig){
-//						elem[event] = origFn;
-//					} else {
-//						delete elem[event];
-//					}
-//				}
-//				
-//				return ret;
-//			};
-//		})($.event.trigger);
-//	}
+	if(!webshims.cfg.extendNative && !webshims.cfg.noTriggerOverride){
+		(function(oldTrigger){
+			$.event.trigger = function(event, data, elem, onlyHandlers){
+				
+				if(!havePolyfill[event] || onlyHandlers || !elem || elem.nodeType !== 1){
+					return oldTrigger.apply(this, arguments);
+				}
+				var ret, isOrig;
+				var origFn = elem[event];
+				var polyfilledFn = $.prop(elem, event);
+				var changeFn = polyfilledFn && origFn != polyfilledFn;
+				if(changeFn){
+					isOrig = (event in elem) && has.call(elem, event);
+					elem[event] = polyfilledFn;
+				}
+				ret = oldTrigger.apply(this, arguments);
+				if (changeFn) {
+					if(isOrig){
+						elem[event] = origFn;
+					} else {
+						delete elem[event];
+					}
+				}
+				
+				return ret;
+			};
+		})($.event.trigger);
+	}
 	
 	['removeAttr', 'prop', 'attr'].forEach(function(type){
 		olds[type] = $[type];
@@ -1177,17 +1177,21 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	/*
 	 * Selectors for all browsers
 	 */
+	var rElementsGroup = /^(?:form|fieldset)$/i;
 	var hasInvalid = function(elem){
 		var ret = false;
 		$(elem).jProp('elements').each(function(){
-			ret = $(this).is(':invalid');
-			if(ret){
-				return false;
+			if(!rElementsGroup.test(elem.nodeName || '')){
+				ret = $(this).is(':invalid');
+				if(ret){
+					return false;
+				}
 			}
+			
 		});
 		return ret;
 	};
-	var rElementsGroup = /^(?:form)$/i;///^(?:form|fieldset)$/i
+	
 	$.extend($.expr[":"], {
 		"valid-element": function(elem){
 			return rElementsGroup.test(elem.nodeName || '') ? !hasInvalid(elem) :!!($.prop(elem, 'willValidate') && isValid(elem));
