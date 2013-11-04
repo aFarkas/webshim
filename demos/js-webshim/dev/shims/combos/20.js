@@ -992,14 +992,17 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				if(!havePolyfill[event] || onlyHandlers || !elem || elem.nodeType !== 1){
 					return oldTrigger.apply(this, arguments);
 				}
-				var ret, isOrig;
+				var ret, isOrig, origName;
 				var origFn = elem[event];
 				var polyfilledFn = $.prop(elem, event);
 				var changeFn = polyfilledFn && origFn != polyfilledFn;
 				if(changeFn){
+					origName = '__ws'+event;
 					isOrig = (event in elem) && has.call(elem, event);
 					elem[event] = polyfilledFn;
+					elem[origName] = origFn;
 				}
+				
 				ret = oldTrigger.apply(this, arguments);
 				if (changeFn) {
 					if(isOrig){
@@ -1007,6 +1010,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					} else {
 						delete elem[event];
 					}
+					delete elem[origName];
 				}
 				
 				return ret;
@@ -1097,6 +1101,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			}
 			var oldDesc = extendedProps[nodeName][prop][type];
 			var getSup = function(propType, descriptor, oDesc){
+				var origProp;
 				if(descriptor && descriptor[propType]){
 					return descriptor[propType];
 				}
@@ -1113,8 +1118,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					};
 				}
 				if(type == 'prop' && propType == 'value' && desc.value.apply){
+					origProp = '__ws'+prop;
 					return  function(value){
-						var sup = olds[type](this, prop);
+						var sup = this[origProp] || olds[type](this, prop);
 						if(sup && sup.apply){
 							sup = sup.apply(this, arguments);
 						} 
@@ -2327,15 +2333,18 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	
 	var handleThird = (function(){
 		var requested;
+		var readyType = hasSwf ? swfType : 'mediaelement-yt';
 		return function( mediaElem, ret, data ){
+			//readd to ready
 			
-			webshims.ready(hasSwf ? swfType : 'mediaelement-yt', function(){
-				if(mediaelement.createSWF){
+			
+			webshims.ready(readyType, function(){
+				if(mediaelement.createSWF && $(mediaElem).parent()[0]){
 					mediaelement.createSWF( mediaElem, ret, data );
 				} else if(!requested) {
 					requested = true;
 					loadThird();
-					//readd to ready
+					
 					handleThird( mediaElem, ret, data );
 				}
 			});
@@ -2675,15 +2684,6 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		_calledMeta: false,
 		lastDuration: 0
 	}, getProps, getSetProps);
-	
-	var idRep = /^jarisplayer-/;
-	var getSwfDataFromID = function(id){
-		
-		var elem = document.getElementById(id.replace(idRep, ''));
-		if(!elem){return;}
-		var data = webshims.data(elem, 'mediaelement');
-		return data.isActive == 'third' ? data : null;
-	};
 	
 	
 	var getSwfDataFromElem = function(elem){
@@ -3277,6 +3277,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			box = data.shadowElem;
 			resetSwfProps(data);
 		} else {
+			$(document.getElementById('wrapper-'+ elemId )).remove();
 			box = $('<div class="polyfill-'+ (elemNodeName) +' polyfill-mediaelement" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
 				.css({
 					position: 'relative',
@@ -3359,8 +3360,11 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			;
 		}
 		
-		
-		if(!mediaelement.jarisEvent[data.id] || mediaelement.jarisEvent[data.id].elem != elem){
+		if(mediaelement.jarisEvent[data.id] && mediaelement.jarisEvent[data.id].elem != elem){
+			webshims.error('something went wrong');
+			return;
+		} else if(!mediaelement.jarisEvent[data.id]){
+			
 			mediaelement.jarisEvent[data.id] = function(jaris){
 				
 				if(jaris.type == 'ready'){
@@ -3566,6 +3570,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			descs[fn] = {
 				value: function(){
 					var data = getSwfDataFromElem(this);
+					
 					if(data){
 						if(data.stopPlayPause){
 							clearTimeout(data.stopPlayPause);
@@ -3588,6 +3593,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		
 		webshims.onNodeNamesPropertyModify(nodeName, 'controls', function(val, boolProp){
 			var data = getSwfDataFromElem(this);
+			
 			$(this)[boolProp ? 'addClass' : 'removeClass']('webshims-controls');
 			
 			if(data){

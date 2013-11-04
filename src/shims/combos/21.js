@@ -375,15 +375,6 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		lastDuration: 0
 	}, getProps, getSetProps);
 	
-	var idRep = /^jarisplayer-/;
-	var getSwfDataFromID = function(id){
-		
-		var elem = document.getElementById(id.replace(idRep, ''));
-		if(!elem){return;}
-		var data = webshims.data(elem, 'mediaelement');
-		return data.isActive == 'third' ? data : null;
-	};
-	
 	
 	var getSwfDataFromElem = function(elem){
 		try {
@@ -976,6 +967,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			box = data.shadowElem;
 			resetSwfProps(data);
 		} else {
+			$(document.getElementById('wrapper-'+ elemId )).remove();
 			box = $('<div class="polyfill-'+ (elemNodeName) +' polyfill-mediaelement" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
 				.css({
 					position: 'relative',
@@ -1058,8 +1050,11 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			;
 		}
 		
-		
-		if(!mediaelement.jarisEvent[data.id] || mediaelement.jarisEvent[data.id].elem != elem){
+		if(mediaelement.jarisEvent[data.id] && mediaelement.jarisEvent[data.id].elem != elem){
+			webshims.error('something went wrong');
+			return;
+		} else if(!mediaelement.jarisEvent[data.id]){
+			
 			mediaelement.jarisEvent[data.id] = function(jaris){
 				
 				if(jaris.type == 'ready'){
@@ -1265,6 +1260,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			descs[fn] = {
 				value: function(){
 					var data = getSwfDataFromElem(this);
+					
 					if(data){
 						if(data.stopPlayPause){
 							clearTimeout(data.stopPlayPause);
@@ -1287,6 +1283,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		
 		webshims.onNodeNamesPropertyModify(nodeName, 'controls', function(val, boolProp){
 			var data = getSwfDataFromElem(this);
+			
 			$(this)[boolProp ? 'addClass' : 'removeClass']('webshims-controls');
 			
 			if(data){

@@ -641,14 +641,17 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				if(!havePolyfill[event] || onlyHandlers || !elem || elem.nodeType !== 1){
 					return oldTrigger.apply(this, arguments);
 				}
-				var ret, isOrig;
+				var ret, isOrig, origName;
 				var origFn = elem[event];
 				var polyfilledFn = $.prop(elem, event);
 				var changeFn = polyfilledFn && origFn != polyfilledFn;
 				if(changeFn){
+					origName = '__ws'+event;
 					isOrig = (event in elem) && has.call(elem, event);
 					elem[event] = polyfilledFn;
+					elem[origName] = origFn;
 				}
+				
 				ret = oldTrigger.apply(this, arguments);
 				if (changeFn) {
 					if(isOrig){
@@ -656,6 +659,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					} else {
 						delete elem[event];
 					}
+					delete elem[origName];
 				}
 				
 				return ret;
@@ -746,6 +750,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			}
 			var oldDesc = extendedProps[nodeName][prop][type];
 			var getSup = function(propType, descriptor, oDesc){
+				var origProp;
 				if(descriptor && descriptor[propType]){
 					return descriptor[propType];
 				}
@@ -762,8 +767,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					};
 				}
 				if(type == 'prop' && propType == 'value' && desc.value.apply){
+					origProp = '__ws'+prop;
 					return  function(value){
-						var sup = olds[type](this, prop);
+						var sup = this[origProp] || olds[type](this, prop);
 						if(sup && sup.apply){
 							sup = sup.apply(this, arguments);
 						} 
@@ -2483,15 +2489,18 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	
 	var handleThird = (function(){
 		var requested;
+		var readyType = hasSwf ? swfType : 'mediaelement-yt';
 		return function( mediaElem, ret, data ){
+			//readd to ready
 			
-			webshims.ready(hasSwf ? swfType : 'mediaelement-yt', function(){
-				if(mediaelement.createSWF){
+			
+			webshims.ready(readyType, function(){
+				if(mediaelement.createSWF && $(mediaElem).parent()[0]){
 					mediaelement.createSWF( mediaElem, ret, data );
 				} else if(!requested) {
 					requested = true;
 					loadThird();
-					//readd to ready
+					
 					handleThird( mediaElem, ret, data );
 				}
 			});

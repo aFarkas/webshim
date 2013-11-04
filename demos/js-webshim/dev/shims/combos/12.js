@@ -845,15 +845,18 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	
 	var handleThird = (function(){
 		var requested;
+		var readyType = hasSwf ? swfType : 'mediaelement-yt';
 		return function( mediaElem, ret, data ){
+			//readd to ready
 			
-			webshims.ready(hasSwf ? swfType : 'mediaelement-yt', function(){
-				if(mediaelement.createSWF){
+			
+			webshims.ready(readyType, function(){
+				if(mediaelement.createSWF && $(mediaElem).parent()[0]){
 					mediaelement.createSWF( mediaElem, ret, data );
 				} else if(!requested) {
 					requested = true;
 					loadThird();
-					//readd to ready
+					
 					handleThird( mediaElem, ret, data );
 				}
 			});
