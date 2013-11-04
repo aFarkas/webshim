@@ -49,7 +49,7 @@ asyncTest("general validity Modul", function(){
 	var invalid = $('input, textarea, select', form1).filter(':invalid');
 	equals( invalid.length, 7, 'total invalid using filter' );
 	
-	equals( $(':invalid', form1).length, 7, 'total invalid' );
+	equals( $(':invalid:not(fieldset)', form1).length, 7, 'total invalid' );
 	
 	equals( invalid.filter('[type=radio]').length, 3, 'radio invalid' );
 	invalid.filter('[type=radio]:last').prop('checked', true);
