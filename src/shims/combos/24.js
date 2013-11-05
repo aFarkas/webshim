@@ -1504,7 +1504,6 @@ try {
 				create: function(elem){
 					var data = $.data(elem, 'placeHolder');
 					var form;
-					var responsiveElem;
 					if(data){return data;}
 					data = $.data(elem, 'placeHolder', {});
 					
@@ -1524,7 +1523,6 @@ try {
 					if(elem.type == 'password' || isOver){
 						data.text = createPlaceholder(elem);
 						if(isResponsive || $(elem).is('.responsive-width') || (elem.currentStyle || {width: ''}).width.indexOf('%') != -1){
-							responsiveElem = true;
 							data.box = data.text;
 						} else {
 							data.box = $(elem)

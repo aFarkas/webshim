@@ -1331,6 +1331,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	//proxying attribute
 	var olds = {};
 	var havePolyfill = {};
+	var hasPolyfillMethod = {};
 	var extendedProps = {};
 	var extendQ = {};
 	var modifyProps = {};
@@ -1441,7 +1442,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		(function(oldTrigger){
 			$.event.trigger = function(event, data, elem, onlyHandlers){
 				
-				if(!havePolyfill[event] || onlyHandlers || !elem || elem.nodeType !== 1){
+				if(!hasPolyfillMethod[event] || onlyHandlers || !elem || elem.nodeType !== 1){
 					return oldTrigger.apply(this, arguments);
 				}
 				var ret, isOrig, origName;
@@ -1571,6 +1572,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				}
 				if(type == 'prop' && propType == 'value' && desc.value.apply){
 					origProp = '__ws'+prop;
+					hasPolyfillMethod[prop] = true;
 					return  function(value){
 						var sup = this[origProp] || olds[type](this, prop);
 						if(sup && sup.apply){
@@ -2918,7 +2920,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			src.server = tmp;
 		}
 		
-		tmp = elem.attr('type');
+		tmp = elem.attr('type') || elem.attr('data-type');
 		if(tmp){
 			src.type = tmp;
 			src.container = $.trim(tmp.split(';')[0]);
@@ -2942,6 +2944,12 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				}
 			}
 		}
+		
+		console.log(src)
+		if(!src.container){
+			$(elem).attr('data-wsrecheckmimetype', '');
+		}
+		
 		tmp = elem.attr('media');
 		if(tmp){
 			src.media = tmp;
@@ -4570,4 +4578,52 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		webshims.reflectProperties('source', ['media']);
 	}
 	
+//	var ADDBACK = $.fn.addBack ? 'addBack' : 'andSelf';
+//	var getMimeType = function(){
+//		var done;
+//		var unknown = 'media/unknown please provide mime type';
+//		var media = $(this);
+//		var xhrs = [];
+//		media
+//			.not('.ws-after-check')
+//			.find('source')
+//			[ADDBACK]()
+//			.filter('[data-wsrecheckmimetype]')
+//			.each(function(){
+//				var source = $(this).removeAttr('data-wsrecheckmimetype');
+//				var error = function(){
+//					source.attr('type', unknown);
+//				};
+//				try {
+//					xhrs.push(
+//						$.ajax({
+//							type: 'head',
+//							url: $.attr(this, 'src'),
+//							success: function(content, status, xhr){
+//								done = true;
+//								source.attr('type', xhr.getResponseHeader('Content-Type') || unknown);
+//							},
+//							error: error
+//						})
+//					)
+//					;
+//				} catch(er){
+//					error();
+//				}
+//			})
+//		;
+//		if(xhrs.length){
+//			media.addClass('ws-after-check');
+//			$.when.apply($, xhrs).always(function(){
+//				media.mediaLoad();
+//				setTimeout(function(){
+//					media.removeClass('ws-after-check')
+//				}, 9);
+//			});
+//		}
+//	};
+//	$('audio.media-error, video.media-error').each(getMimeType);
+//	$(document).on('mediaerror', function(e){
+//		getMimeType.call(e.target);
+//	});
 });

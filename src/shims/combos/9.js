@@ -76,6 +76,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	//proxying attribute
 	var olds = {};
 	var havePolyfill = {};
+	var hasPolyfillMethod = {};
 	var extendedProps = {};
 	var extendQ = {};
 	var modifyProps = {};
@@ -186,7 +187,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		(function(oldTrigger){
 			$.event.trigger = function(event, data, elem, onlyHandlers){
 				
-				if(!havePolyfill[event] || onlyHandlers || !elem || elem.nodeType !== 1){
+				if(!hasPolyfillMethod[event] || onlyHandlers || !elem || elem.nodeType !== 1){
 					return oldTrigger.apply(this, arguments);
 				}
 				var ret, isOrig, origName;
@@ -316,6 +317,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				}
 				if(type == 'prop' && propType == 'value' && desc.value.apply){
 					origProp = '__ws'+prop;
+					hasPolyfillMethod[prop] = true;
 					return  function(value){
 						var sup = this[origProp] || olds[type](this, prop);
 						if(sup && sup.apply){

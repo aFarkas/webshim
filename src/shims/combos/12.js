@@ -588,7 +588,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			src.server = tmp;
 		}
 		
-		tmp = elem.attr('type');
+		tmp = elem.attr('type') || elem.attr('data-type');
 		if(tmp){
 			src.type = tmp;
 			src.container = $.trim(tmp.split(';')[0]);
@@ -612,6 +612,12 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				}
 			}
 		}
+		
+		console.log(src)
+		if(!src.container){
+			$(elem).attr('data-wsrecheckmimetype', '');
+		}
+		
 		tmp = elem.attr('media');
 		if(tmp){
 			src.media = tmp;
