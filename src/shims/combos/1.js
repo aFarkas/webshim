@@ -830,7 +830,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			}
 		}
 		
-		console.log(src)
 		if(!src.container){
 			$(elem).attr('data-wsrecheckmimetype', '');
 		}
