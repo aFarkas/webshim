@@ -577,6 +577,7 @@ try {
 }
 
 (function(){
+	if(options.noPlaceholderPolyfill){return;}
 	var bustedPlaceholder;
 	Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
 	if(Modernizr.input.placeholder && options.overridePlaceholder){
