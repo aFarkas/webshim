@@ -435,7 +435,7 @@
 						module = loadCombos[i];
 						
 						if($.inArray(module, loadedModules) == -1){
-							if(webshims.debug != 'noCombo'){
+							if(webCFG.debug != 'noCombo'){
 								$.each(modules[module].c, loadCombo);
 							}
 							if(!foundCombo){
@@ -614,7 +614,7 @@
 	webshims.errorLog = [];
 	$.each(['log', 'error', 'warn', 'info'], function(i, fn){
 		webshims[fn] = function(message){
-			if( (importantLogs[fn] && webshims.debug !== false) || webshims.debug){
+			if( (importantLogs[fn] && webCFG.debug !== false) || webCFG.debug){
 				webshims.errorLog.push(message);
 				if(window.console && console.log){
 					console[(console[fn]) ? fn : 'log'](message);

@@ -161,7 +161,7 @@
 			var hash = location.hash.replace('#', '');
 			var langs = webshims.cfg.forms.availableLangs;
 			
-//			$.webshims.debug = "noCombo";
+//			webshims.cfg.debug = "noCombo";
 			$(window).load(function(){
 				webshims.activeLang(langs[ getRandom(langs.length) ]);
 				$.webshims.polyfill();

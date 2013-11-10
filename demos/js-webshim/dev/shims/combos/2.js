@@ -499,7 +499,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 //			'127.0.0.1': 1
 //		};
 //		
-//		if( webshims.debug && (hostNames[location.hostname] || location.protocol == 'file:') ){
+//		if( webshims.cfg.debug && (hostNames[location.hostname] || location.protocol == 'file:') ){
 //			var list = $('<ul class="webshims-debug-list" />');
 //			webshims.errorLog.push = function(message){
 //				list.appendTo('body');

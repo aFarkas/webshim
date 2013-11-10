@@ -81,7 +81,6 @@ Webshims Lib uses many great third party scripts:
 |:--------------- |:-------------------------------------------- |:----------------------------------------------------------------------------- |
 | flashcanvas     | MIT                                          | http://code.google.com/p/flashcanvas                                          |
 | flashcanvaspro  | closed                                       | http://flashcanvas.net                                                        |
-| jwplayer        | CC Attribution-NonCommercial-ShareAlike 3.0  | http://www.longtailvideo.com                                                  |
 | Jaris FLV       | GPL 3.0                                      | http://jarisflvplayer.org                                                     |
 | excanvas        | Apache License 2.0                           | http://excanvas.sourceforge.net                                               |
 | filereader      | MIT                                          | https://github.com/Jahdrien/FileReader                                        |
@@ -89,7 +88,6 @@ Webshims Lib uses many great third party scripts:
 | json-storage    | MIT                                          | https://gist.github.com/remy/350433                                           |
 | swfmini         | MIT                                          | https://code.google.com/p/swfobject                                           |
 | track           | BSD 2 clause                                 | https://github.com/cgiffard/Captionator                                       |
-| forms-picker    | MIT                                          | http://jqueryui.com                                                           |
 | form-validators | ???                                          | https://sites.google.com/site/abapexamples/javascript/luhn-validation         |
 | color-picker    | MIT                                          | http://johndyer.name/post/2007/09/PhotoShop-like-JavaScript-Color-Picker.aspx |
 

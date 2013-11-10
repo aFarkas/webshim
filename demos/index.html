@@ -204,14 +204,14 @@ $.webshims.polyfill('json-storage geolocation');
 							<li><code>details</code></li>
 						</ul>
 						
-						<p>If you have any trouble setting up Webshims lib, set <code>$.webshims.debug</code> to true and open your console:</p>
+						<p>If you have any trouble setting up Webshims lib, set <code>debug</code> to true and open your console:</p>
 <code class="block">							
 &lt;script&gt;
-	$.webshims.debug = true;
-	$.webshims.polyfill();
+	webshims.setOptions('debug', true);
+	webshims.polyfill();
 &lt;/script&gt;	
 </code>			
-					<p>If you dont want any log messsages, simply set <code>$.webshims.debug</code> explicitly to <code>false</code>.</p>
+					<p>If you dont want any log messsages, simply set <code>debug</code> explicitly to <code>false</code>.</p>
 					<h3>Custom Modernizr build</h3>
 					<p>Webshims lib does not need every Modernizr test and supports creating a <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track-load">custom Modernizr build</a>. (Webshims lib uses <a href="http://requirejs.org/">requireJS</a> or <a href="https://gist.github.com/aFarkas/936413">sssl</a> as a script loader, if this is included, if not it uses Modernizr.load/yepnope.) </p>
 					
