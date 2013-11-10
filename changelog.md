@@ -1,3 +1,24 @@
+Release 1.11.3
+----------
+
+- fixed regression error for time picker (i.e: t.time is undefined)
+- added full support for form reset
+- allow partial UI replacement (replaceUI can take an object instead of a boolean)
+- fix change/input event in capable browsers on type="range" (fixRangeChange option)
+- added czech and br language
+- added support for fieldset:invalid (but not polyfilled in capable browsers without support i.e.: Chrome)
+
+
+Release 1.11.2
+----------
+
+- split form-shims into two files (improves network performance for iOS/Safari7)
+- added getTrackById and onchange event to TrackList Object
+- improved stepUp/stepDown method
+- added touch support to input[type="range"]
+- fixed time picker
+- added support for defaultValue to all input widgets 
+
 Release 1.11.1
 ----------
 
