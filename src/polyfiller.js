@@ -27,7 +27,7 @@
 	
 	
 	var webshims = {
-		version: 'pre1.11.3',
+		version: '1.11.3',
 		cfg: {
 			
 			//addCacheBuster: false,
@@ -1176,7 +1176,6 @@
 			noAutoCallback: true,
 			options: {
 				preferFlash: false,
-				player: 'jaris',
 				vars: {},
 				params: {},
 				attrs: {},
@@ -1191,7 +1190,7 @@
 		
 		addPolyfill('mediaelement-jaris', {
 			f: 'mediaelement',
-			d: ['swfmini', DOMSUPPORT],
+			d: ['mediaelement-core', 'swfmini', DOMSUPPORT],
 			test: function(){
 				if(!Modernizr.audio || !Modernizr.video || webshims.mediaelement.loadSwf){
 					return false;

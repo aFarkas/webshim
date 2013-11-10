@@ -771,12 +771,11 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		})();
 	}
 	
-	if(!$.event.special.change && Modernizr.inputtypes && options.fixRangeChange){
+	if(!$.event.special.change && !$.event.special.input && Modernizr.inputtypes && options.fixRangeChange){
 		var rangeChange = {
 			
-			trigger: function(){
+			trigger: function(e){
 				if(rangeChange.blockElement){
-					$(rangeChange.blockElement).off('blur', rangeChange.trigger);
 					rangeChange.blockElement = false;
 					setTimeout(function(){
 						if(rangeChange.requestedChange && rangeChange.value != rangeChange.requestedChange.value){
@@ -847,24 +846,65 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		
 		$(document.body || 'html').on({
 			mousedown: rangeChange.mouseBlock,
-			'keydown kepress': rangeChange.keyBlock,
+			'keydown kepress': function(e){
+				if(e.keyCode < 45 && e.keyCode > 30){
+					rangeChange.keyBlock(e);
+				}
+			},
 			'touchstart': rangeChange.touchBlock,
 			focusin: rangeChange.inputSetup
 		});
 		
-		$.event.special.change = {
-			
-			handle: function(e){
-				
-				if(!e.isTrigger && rangeChange.blockElement == e.target){
-					rangeChange.requestedChange = e.target;
-					rangeChange.triggerInput(e);
-					return false;
-				} else if(rangeChange.requestedChange == e.target){
-					rangeChange.requestedChange = false;
+		$.extend(true, $.event.special, {
+			change: {
+				handle: function(e){
+					
+					if(!e.isTrigger && rangeChange.blockElement == e.target){
+						rangeChange.requestedChange = e.target;
+						rangeChange.triggerInput(e);
+						return false;
+					} else if(rangeChange.requestedChange == e.target){
+						rangeChange.requestedChange = false;
+					}
+					e.handleObj.handler.apply(this, arguments);
 				}
-				e.handleObj.handler.apply(this, arguments);
+			},
+			input: {
+				handle: (function(){
+					var lastValue, lastElement;
+					
+					var remove = function(){
+						if(lastElement){
+							$(lastElement).off('change', remove);
+						}
+						lastValue = false;
+						lastElement = false;
+					};
+					
+					var setup = function(e){
+						remove(e);
+						lastElement = e.target;
+						lastValue = e.target.value;
+						$(e.target).on('change', remove);
+					};
+					
+					return function(e){
+						var value;
+						if(!e.isTrigger && e.target.type == 'range'){
+							
+							if(lastElement != e.target){
+								setup(e);
+							} else if(lastElement == e.target){
+								if(lastValue == (value = e.target.value)){
+									return false;
+								}
+								lastValue = e.target.value;
+							}
+						}
+						e.handleObj.handler.apply(this, arguments);
+					};
+				})()
 			}
-		};
+		});
 	}
 });

@@ -375,15 +375,6 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		lastDuration: 0
 	}, getProps, getSetProps);
 	
-	var idRep = /^jarisplayer-/;
-	var getSwfDataFromID = function(id){
-		
-		var elem = document.getElementById(id.replace(idRep, ''));
-		if(!elem){return;}
-		var data = webshims.data(elem, 'mediaelement');
-		return data.isActive == 'third' ? data : null;
-	};
-	
 	
 	var getSwfDataFromElem = function(elem){
 		try {
@@ -976,6 +967,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			box = data.shadowElem;
 			resetSwfProps(data);
 		} else {
+			$(document.getElementById('wrapper-'+ elemId )).remove();
 			box = $('<div class="polyfill-'+ (elemNodeName) +' polyfill-mediaelement" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
 				.css({
 					position: 'relative',
@@ -1058,8 +1050,11 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			;
 		}
 		
-		
-		if(!mediaelement.jarisEvent[data.id] || mediaelement.jarisEvent[data.id].elem != elem){
+		if(mediaelement.jarisEvent[data.id] && mediaelement.jarisEvent[data.id].elem != elem){
+			webshims.error('something went wrong');
+			return;
+		} else if(!mediaelement.jarisEvent[data.id]){
+			
 			mediaelement.jarisEvent[data.id] = function(jaris){
 				
 				if(jaris.type == 'ready'){
@@ -1265,6 +1260,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			descs[fn] = {
 				value: function(){
 					var data = getSwfDataFromElem(this);
+					
 					if(data){
 						if(data.stopPlayPause){
 							clearTimeout(data.stopPlayPause);
@@ -1287,6 +1283,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		
 		webshims.onNodeNamesPropertyModify(nodeName, 'controls', function(val, boolProp){
 			var data = getSwfDataFromElem(this);
+			
 			$(this)[boolProp ? 'addClass' : 'removeClass']('webshims-controls');
 			
 			if(data){
@@ -1419,6 +1416,61 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		}, 'prop');
 	} else if(!('media' in document.createElement('source'))){
 		webshims.reflectProperties('source', ['media']);
+	}
+	if(options.experimentallyMimetypeCheck){
+		(function(){
+			var ADDBACK = $.fn.addBack ? 'addBack' : 'andSelf';
+			var getMimeType = function(){
+				var done;
+				var unknown = 'media/unknown please provide mime type';
+				var media = $(this);
+				var xhrs = [];
+				media
+					.not('.ws-after-check')
+					.find('source')
+					[ADDBACK]()
+					.filter('[data-wsrecheckmimetype]:not([type])')
+					.each(function(){
+						var source = $(this).removeAttr('data-wsrecheckmimetype');
+						var error = function(){
+							source.attr('data-type', unknown);
+						};
+						try {
+							xhrs.push(
+								$.ajax({
+									type: 'head',
+									url: $.attr(this, 'src'),
+									success: function(content, status, xhr){
+										var mime = xhr.getResponseHeader('Content-Type');
+										if(mime){
+											done = true;
+										}
+										source.attr('data-type', mime || unknown);
+									},
+									error: error
+								})
+							)
+							;
+						} catch(er){
+							error();
+						}
+					})
+				;
+				if(xhrs.length){
+					media.addClass('ws-after-check');
+					$.when.apply($, xhrs).always(function(){
+						media.mediaLoad();
+						setTimeout(function(){
+							media.removeClass('ws-after-check');
+						}, 9);
+					});
+				}
+			};
+			$('audio.media-error, video.media-error').each(getMimeType);
+			$(document).on('mediaerror', function(e){
+				getMimeType.call(e.target);
+			});
+		})();
 	}
 	
 });

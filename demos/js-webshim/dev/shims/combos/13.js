@@ -136,7 +136,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			src.server = tmp;
 		}
 		
-		tmp = elem.attr('type');
+		tmp = elem.attr('type') || elem.attr('data-type');
 		if(tmp){
 			src.type = tmp;
 			src.container = $.trim(tmp.split(';')[0]);
@@ -160,6 +160,11 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				}
 			}
 		}
+		
+		if(!src.container){
+			$(elem).attr('data-wsrecheckmimetype', '');
+		}
+		
 		tmp = elem.attr('media');
 		if(tmp){
 			src.media = tmp;
@@ -393,15 +398,18 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	
 	var handleThird = (function(){
 		var requested;
+		var readyType = hasSwf ? swfType : 'mediaelement-yt';
 		return function( mediaElem, ret, data ){
+			//readd to ready
 			
-			webshims.ready(hasSwf ? swfType : 'mediaelement-yt', function(){
-				if(mediaelement.createSWF){
+			
+			webshims.ready(readyType, function(){
+				if(mediaelement.createSWF && $(mediaElem).parent()[0]){
 					mediaelement.createSWF( mediaElem, ret, data );
 				} else if(!requested) {
 					requested = true;
 					loadThird();
-					//readd to ready
+					
 					handleThird( mediaElem, ret, data );
 				}
 			});

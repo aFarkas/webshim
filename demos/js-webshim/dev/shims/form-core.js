@@ -46,17 +46,21 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	/*
 	 * Selectors for all browsers
 	 */
+	var rElementsGroup = /^(?:form|fieldset)$/i;
 	var hasInvalid = function(elem){
 		var ret = false;
 		$(elem).jProp('elements').each(function(){
-			ret = $(this).is(':invalid');
-			if(ret){
-				return false;
+			if(!rElementsGroup.test(elem.nodeName || '')){
+				ret = $(this).is(':invalid');
+				if(ret){
+					return false;
+				}
 			}
+			
 		});
 		return ret;
 	};
-	var rElementsGroup = /^(?:form)$/i;///^(?:form|fieldset)$/i
+	
 	$.extend($.expr[":"], {
 		"valid-element": function(elem){
 			return rElementsGroup.test(elem.nodeName || '') ? !hasInvalid(elem) :!!($.prop(elem, 'willValidate') && isValid(elem));

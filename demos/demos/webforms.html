@@ -147,6 +147,7 @@
 					<li><strong>iVal</strong> (mixed options): options for the Instant/Live form validation feature (<a href="webforms/1-webforms-lang-custom-bubble.html#instant-validation">see</a>)</li>
 					<li><strong>addValidators</strong> (boolean): <code>false</code> (default) || <code>true</code>: Should Webshims implement some new custom validators. see: <a href="webforms/4-webforms-custom-validity.html">custom validity</a> </li>
 					<li><strong>listFilter</strong> (string): <code>*</code> (default) || <code>^</code> || <code>!</code>: How to search/filter insdie of a datalist. * (wildcard search), ^ (matches the beginning) or ! (no search at all). This option can be changed on the input[list] element itself, by using data-list-filter="^".</li>
+					<li><strong>fixRangeChange</strong> (boolean): <code>false</code> (default) || <code>true</code>: Wether or not to fix the change event on input[type="range"] especially in Chrome/Safari (input event fix for IE10/11 is always done).</li>
 				</ul>
 				
 				<h3>Options for the <code>forms-ext</code> feature</h3>
