@@ -58,6 +58,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			;
 			
 			opts.input.setAttribute('autocomplete', 'off');
+			this.lastCompletedValue = "";
 			
 			$(opts.input)
 				.attr({
@@ -112,6 +113,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 						}
 					},
 					'focus.datalistWidget': function(){
+						that.lastCompletedValue = "";
 						if($(this).hasClass('list-focus')){
 							that.showList();
 						}
@@ -123,7 +125,6 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 					}
 				})
 			;
-			
 			
 			$(this.datalist)
 				.off('updateDatalist.datalistWidget')
@@ -186,6 +187,9 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			this.addMarkElement = options.addMark || $(this.input).hasClass('mark-option-text');
 			this.listFilter = $(this.input).data('listFilter') || options.listFilter || '*';
 			this.multiple = $(this.input).hasClass('list-multiple') || ($(this.input).prop('multiple') && $(this.input).prop('type') == 'email');
+			this.valueCompletion = this.listFilter == '^' && !this.multiple && $(this.input).hasClass('value-completion');
+			this.lastCompletedValue = "";
+			
 			var list = [];
 			
 			var values = [];
@@ -251,9 +255,45 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			}
 			return content || '';
 		},
+		setCompletedValue: function(value, foundItem){
+			console.log(value)
+			if(!this.valueCompletion || !foundItem || this.lastCompletedValue.length >= value.length ){
+				this.lastCompletedValue = value;
+				return;
+			}
+			
+			var newValue;
+			var input = this.input;
+			var end = $.prop(input, 'selectionEnd');
+			
+			this.lastCompletedValue = value;
+			
+			if(value.length == end){
+				
+				newValue = value + foundItem.value.substr(value.length);
+				
+				$(input).triggerHandler('triggerinput');
+				$.prop(input, 'value', newValue);
+				$(input).triggerHandler('updateInput');
+				$(input).callProp('setSelectionRange', [value.length, newValue.length]);
+				
+				//safari workaround || needs more investigation
+				setTimeout(function(){
+					if(newValue == $.prop(input, 'value') && $.prop(input, 'selectionEnd') != newValue.length){
+						$.prop(input, 'selectionEnd', newValue.length);
+					}
+				}, 0);
+				
+			}
+		},
 		showHideOptions: function(_fromShowList){
-			var value = $.prop(this.input, 'value').toLowerCase();
-
+			var lis, firstFoundValue;
+			var inputValue = $.prop(this.input, 'value');
+			var value = inputValue.toLowerCase();
+			var found = false;
+			var startSearch = this.listFilter == '^';
+			var that = this;
+			console.log(value)
 			//first check prevent infinite loop, second creates simple lazy optimization
 			if(value === this.lastUpdatedValue){
 				return;
@@ -271,10 +311,8 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			
 			
 			this.lastUpdatedValue = value;
-			var found = false;
-			var startSearch = this.listFilter == '^';
-			var lis = $('li', this.shadowList);
-			var that = this;
+			lis = $('li', this.shadowList);
+			
 			
 			
 			if(value && this.listFilter != '!'){
@@ -294,6 +332,9 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 						search = startSearch ? !searchIndex : searchIndex !== -1;
 						if(search){
 							foundName = 'value';
+							if(!firstFoundValue){
+								firstFoundValue = item;
+							}
 						} else if(item.lowerLabel){
 							searchIndex = item.lowerLabel.indexOf(value);
 							search = startSearch ? !searchIndex : searchIndex !== -1;
@@ -325,6 +366,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 				this.lastUnfoundValue = value;
 				this.hideList();
 			} else {
+				this.setCompletedValue(inputValue, firstFoundValue);
 				this.lastUnfoundValue = false;
 			}
 		},

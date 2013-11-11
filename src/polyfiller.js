@@ -1015,7 +1015,7 @@
 	//			overridePlaceholder: false, // might be good for IE10
 	//			replaceValidationUI: false
 			},
-			methodNames: ['setCustomValidity','checkValidity'],
+			methodNames: ['setCustomValidity','checkValidity', 'setSelectionRange'],
 			c: [16, 7, 2, 8, 1, 15, 30, 3, 31],
 			nM: 'input'
 		});
