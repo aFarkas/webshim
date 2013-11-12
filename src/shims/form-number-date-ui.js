@@ -254,7 +254,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				langCfg.date.monthDigits = monthDigits;
 				langCfg.numberSigns += '-';
 				if(langCfg.meridian){
-					langCfg.timeSigns += langCfg.meridian[0] + langCfg.meridian[1];
+					langCfg.timeSigns += langCfg.meridian[0] + langCfg.meridian[1] + langCfg.meridian[0].toLowerCase() + langCfg.meridian[1].toLowerCase();
 				}
 				$.each(langCfg.date.monthNames, create);
 				$.each(langCfg.date.monthNamesShort, create);
@@ -428,6 +428,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			time: function(val){
 				var fVal;
 				if(val && curCfg.meridian){
+					val = val.toUpperCase();
 					if(val.substr(0,2) === "12"){ 
 						val = "00" + val.substr(2);
 					}
