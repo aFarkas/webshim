@@ -1321,6 +1321,91 @@ try {
 	})();
 }
 
+if(!('setSelectionRange' in document.createElement('input'))){
+	(function(){
+		var getSelection = function(elem){
+		var range, value, normalizedValue, textInputRange, len, endRange;
+		var start = 0
+		var end = 0;
+		if (document.selection && (range = document.selection.createRange()) && range.parentElement() == elem) {
+			value = $.prop(elem, 'value');
+			len =value.length;
+			normalizedValue = value.replace(/\r\n/g, "\n");
+
+			textInputRange = elem.createTextRange();
+			textInputRange.moveToBookmark(range.getBookmark());
+
+			
+			endRange = elem.createTextRange();
+			endRange.collapse(false);
+
+			if (textInputRange.compareEndPoints("StartToEnd", endRange) > -1) {
+				start = end = len;
+			} else {
+				start = -textInputRange.moveStart("character", -len);
+				start += normalizedValue.slice(0, start).split("\n").length - 1;
+
+				if (textInputRange.compareEndPoints("EndToEnd", endRange) > -1) {
+					end = len;
+				} else {
+					end = -textInputRange.moveEnd("character", -len);
+					end += normalizedValue.slice(0, end).split("\n").length - 1;
+				}
+			}
+		}
+		return {
+			start: start,
+			end: end
+		};
+	};
+	
+	webshims.defineNodeNamesProperties(['input', 'textarea'], {
+		selectionStart: {
+			get: function(){
+				return getSelection(this).start;
+			},
+			set: function(v){
+				if(this.createTextRange){
+					var range = this.createTextRange();
+					range.collapse(true);
+					range.moveStart('character', v);
+					range.moveEnd('character', $.prop(this, 'selectionEnd'));
+					range.select();
+				}
+			}
+		},
+		selectionEnd: {
+			get: function(){
+				
+				return getSelection(this).end;
+			},
+			set: function(v){
+				if(this.createTextRange){
+					var range = this.createTextRange();
+					var start;
+					range.collapse(true);
+					start = $.prop(this, 'selectionStart');
+					range.moveStart('character', start);
+					range.moveEnd('character', v - start);
+					range.select();
+				}
+			}
+		},
+		setSelectionRange: {
+			value: function(start, end, dir){
+				if(this.createTextRange){
+					var range = this.createTextRange();
+					range.collapse(true);
+					range.moveStart('character', start);
+					range.moveEnd('character', end - start);
+					range.select();
+				}
+			}
+		}
+	}, 'prop');
+	})();
+}
+
 (function(){
 	if(options.noPlaceholderPolyfill){return;}
 	var bustedPlaceholder;
@@ -1363,17 +1448,8 @@ try {
 	
 	var setSelection = function(elem){
 		try {
-			if(elem.setSelectionRange){
-				elem.setSelectionRange(0, 0);
-				return true;
-			} else if(elem.createTextRange){
-				var range = elem.createTextRange();
-				range.collapse(true);
-				range.moveEnd('character', 0);
-				range.moveStart('character', 0);
-				range.select();
-				return true;
-			}
+			$(elem).setSelectionRange(0,0);
+			return true;
 		} catch(er){}
 	};
 	

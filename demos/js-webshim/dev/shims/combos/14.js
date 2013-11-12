@@ -813,8 +813,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		webshims.error("IE browser modes are busted in IE10+. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
 	}
 	
-	if(!$.parseHTML){
-		webshims.error("Webshims needs jQuery 1.8+ to work properly. Please update your jQuery version or downgrade webshims.");
+	if('debug' in webshims){
+		webshims.error('Use webshims.setOptions("debug", true||false||"noCombo"); to debug flag');
 	}
 	
 	if (!webshims.cfg.no$Switch) {

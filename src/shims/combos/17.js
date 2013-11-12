@@ -1398,7 +1398,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				langCfg.date.monthDigits = monthDigits;
 				langCfg.numberSigns += '-';
 				if(langCfg.meridian){
-					langCfg.timeSigns += langCfg.meridian[0] + langCfg.meridian[1];
+					langCfg.timeSigns += langCfg.meridian[0] + langCfg.meridian[1] + langCfg.meridian[0].toLowerCase() + langCfg.meridian[1].toLowerCase();
 				}
 				$.each(langCfg.date.monthNames, create);
 				$.each(langCfg.date.monthNamesShort, create);
@@ -1572,6 +1572,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			time: function(val){
 				var fVal;
 				if(val && curCfg.meridian){
+					val = val.toUpperCase();
 					if(val.substr(0,2) === "12"){ 
 						val = "00" + val.substr(2);
 					}
@@ -2304,31 +2305,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					}, 9);
 				}
 			},
-			value: function(val, force){
-				
-				if(!this._init || force || this.options.value !== val){
-					this.valueAsNumber = this.asNumber(val);
-					this.options.value = val;
-					
-					if(isNaN(this.valueAsNumber) || (!isNaN(this.minAsNumber) && this.valueAsNumber < this.minAsNumber) || (!isNaN(this.maxAsNumber) && this.valueAsNumber > this.maxAsNumber)){
-						this._setStartInRange();
-					} else {
-						this.elemHelper.prop('value', val);
-						this.options.defValue = "";
-					}
-					
-					val = formatVal[this.type](val, this.options);
-					if(this.options.splitInput){
-						$.each(this.splits, function(i, elem){
-							$.prop(elem, 'value', val[i]);
-						});
-					} else {
-						this.element.prop('value', val);
-					}
-					this._propertyChange('value');
-					this.mirrorValidity();
-				}
-			},
 			step: function(val){
 				var defStep = steps[this.type];
 				this.options.step = val;
@@ -2400,6 +2376,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			});
 		};
 		
+		$.fn.wsBaseWidget.wsProto = wsWidgetProto;
+		
 		$.fn.spinbtnUI = function(opts){
 			opts = $.extend({
 				monthNames: 'monthNames',
@@ -2414,6 +2392,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				}, opts);
 			});
 		};
+		
+		$.fn.spinbtnUI.wsProto = spinBtnProto;
+		
 	})();
 	
 	(function(){
