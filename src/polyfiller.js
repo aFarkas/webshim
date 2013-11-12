@@ -98,7 +98,7 @@
 			return function(features){
 				if(!features){
 					features = webshims.featureList;
-					webshims.info('loading all features without specifing might be bad for performance');
+					webshims.warn('loading all features without specifing might be bad for performance');
 				}
 					
 				if (typeof features == 'string') {
