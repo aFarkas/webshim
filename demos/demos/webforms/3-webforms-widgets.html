@@ -1016,6 +1016,7 @@ $.webshims.setOptions('forms-ext', {
 							<option></option>
 							<option value="time-list">time-list (predefined datalist)</option>
 						</select>
+					</label>
 				</fieldset>
 				<fieldset  data-method="data" data-name="time">
 					<legend>$.data</legend>
@@ -1134,9 +1135,10 @@ $.webshims.setOptions('forms-ext', {
 							<label for="states">
 								US States: <dfn title="required">*</dfn>
 							</label>
-							<input list="state-list" class="mark-option-text" name="states" required="required" type="text" id="states" />
+							<input list="state-list" class="mark-option-text value-completion" name="states" required="required" type="text" id="states" />
 							<datalist id="state-list">
 								<select>
+									
 									<option value="Alabama" label="State of Alabama" />
 									<option value="Alaska" label="State of Alaska" />
 									<option value="Arizona" label="State of Arizona" />
@@ -1209,9 +1211,9 @@ $.webshims.setOptions('forms-ext', {
 						</div>
 						<div class="form-element">
 							<label for="email">
-								E-Mail + datalist: <dfn title="required">*</dfn>
+								E-Mail + datalist + multiple: <dfn title="required">*</dfn>
 							</label>
-							<input list="datalist" name="email" required="required" type="email" id="email" />
+							<input list="datalist" name="email" multiple="" required="required" type="email" id="email" />
 							<datalist id="datalist">
 								<select>
 									<option value="yourmail@gmail.com"></option>

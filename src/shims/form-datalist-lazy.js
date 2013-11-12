@@ -187,7 +187,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			this.addMarkElement = options.addMark || $(this.input).hasClass('mark-option-text');
 			this.listFilter = $(this.input).data('listFilter') || options.listFilter || '*';
 			this.multiple = $(this.input).hasClass('list-multiple') || ($(this.input).prop('multiple') && $(this.input).prop('type') == 'email');
-			this.valueCompletion = this.listFilter == '^' && !this.multiple && $(this.input).hasClass('value-completion');
+			this.valueCompletion = !this.multiple && $(this.input).hasClass('value-completion');
 			this.lastCompletedValue = "";
 			
 			var list = [];
@@ -256,7 +256,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			return content || '';
 		},
 		setCompletedValue: function(value, foundItem){
-			console.log(value)
+			
 			if(!this.valueCompletion || !foundItem || this.lastCompletedValue.length >= value.length ){
 				this.lastCompletedValue = value;
 				return;
@@ -293,7 +293,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			var found = false;
 			var startSearch = this.listFilter == '^';
 			var that = this;
-			console.log(value)
+			
 			//first check prevent infinite loop, second creates simple lazy optimization
 			if(value === this.lastUpdatedValue){
 				return;
@@ -332,7 +332,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 						search = startSearch ? !searchIndex : searchIndex !== -1;
 						if(search){
 							foundName = 'value';
-							if(!firstFoundValue){
+							if(!firstFoundValue && !searchIndex){
 								firstFoundValue = item;
 							}
 						} else if(item.lowerLabel){
