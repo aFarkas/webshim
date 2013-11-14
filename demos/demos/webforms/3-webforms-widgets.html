@@ -239,7 +239,7 @@ $('form').bind('firstinvalid', function(e){
 });
 </code>	
 
-			<h3 id="configure-ui">Changing locales for widgets</h3>
+			<h3 id="configure-locale">Changing locales for widgets</h3>
 <code class="block run-once">
 $.webshims.activeLang('en');
 </code>	
@@ -247,25 +247,34 @@ $.webshims.activeLang('en');
 $.webshims.activeLang('de');
 </code>	
 			<h3 id="configure-ui">Changing default-options for widgets</h3>
-			<p>All widgets can be changed with the <code>forms-ext.widgets</code> or <code>forms-ext[type]</code> options.</p>
+			<p>All widgets can be configured with the <code>forms-ext.widgets</code> or <code>forms-ext[type]</code> options.</p>
 <code class="block">
-$.webshims.setOptions({
-	wspopover: {
-		appendTo: 'element' //insert all popovers (datepicker, validationBubble, datalist after the associated element instead of the body)
-	}
-});
 $.webshims.setOptions('forms-ext', {
+	//general widgets options
 	widgets: {
 		calculateWidth: false
 	},
-	date: {
-		splitInput: true
-	},
+	//override for type month
 	month: {
+		startView: 1,
 		calculateWidth: true
+	},
+	date: {
+		startView: 2,
+		splitInput: true,
+		//open all date widget right to the input (needs jQuery UI position)
+		widgetPosition: {
+			my: 'left center',
+			at: "right center",
+			collision: "fit"
+		}
 	}
 });
-</code>	
+</code>
+			<p>inputs can be also configured using markup data-[type] attribute (Use JSON):</p>
+<code class="block">
+&lt;input type="date" data-date='{"showWeek": true}' /&gt;
+</code>
 			
 			<form class="input-widget" data-type="date" id="date-cfg">
 				<datalist id="date-list">
