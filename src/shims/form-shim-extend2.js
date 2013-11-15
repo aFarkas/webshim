@@ -578,86 +578,113 @@ try {
 
 if(!('setSelectionRange' in document.createElement('input'))){
 	(function(){
-		var getSelection = function(elem){
-		var range, value, normalizedValue, textInputRange, len, endRange;
-		var start = 0
-		var end = 0;
-		if (document.selection && (range = document.selection.createRange()) && range.parentElement() == elem) {
-			value = $.prop(elem, 'value');
-			len =value.length;
-			normalizedValue = value.replace(/\r\n/g, "\n");
-
-			textInputRange = elem.createTextRange();
-			textInputRange.moveToBookmark(range.getBookmark());
-
-			
-			endRange = elem.createTextRange();
-			endRange.collapse(false);
-
-			if (textInputRange.compareEndPoints("StartToEnd", endRange) > -1) {
-				start = end = len;
-			} else {
-				start = -textInputRange.moveStart("character", -len);
-				start += normalizedValue.slice(0, start).split("\n").length - 1;
-
-				if (textInputRange.compareEndPoints("EndToEnd", endRange) > -1) {
-					end = len;
-				} else {
-					end = -textInputRange.moveEnd("character", -len);
-					end += normalizedValue.slice(0, end).split("\n").length - 1;
-				}
-			}
-		}
-		return {
-			start: start,
-			end: end
-		};
-	};
+		var getSelection = function(elem, getStart){
+			var range, value, normalizedValue, textInputRange, len, endRange;
+			var start = 0;
+			var end = 0;
+			if (document.selection && (range = document.selection.createRange()) && range.parentElement() == elem) {
+				value = $.prop(elem, 'value');
+				len = value.length;
+				normalizedValue = value.replace(/\r\n/g, "\n");
 	
-	webshims.defineNodeNamesProperties(['input', 'textarea'], {
-		selectionStart: {
-			get: function(){
-				return getSelection(this).start;
-			},
-			set: function(v){
-				if(this.createTextRange){
-					var range = this.createTextRange();
-					range.collapse(true);
-					range.moveStart('character', v);
-					range.moveEnd('character', $.prop(this, 'selectionEnd'));
-					range.select();
-				}
-			}
-		},
-		selectionEnd: {
-			get: function(){
+				textInputRange = elem.createTextRange();
+				textInputRange.moveToBookmark(range.getBookmark());
+	
 				
-				return getSelection(this).end;
-			},
-			set: function(v){
-				if(this.createTextRange){
-					var range = this.createTextRange();
-					var start;
-					range.collapse(true);
-					start = $.prop(this, 'selectionStart');
-					range.moveStart('character', start);
-					range.moveEnd('character', v - start);
-					range.select();
+				endRange = elem.createTextRange();
+				endRange.collapse(false);
+	
+				if (textInputRange.compareEndPoints("StartToEnd", endRange) > -1) {
+					start = end = len;
+				} else {
+					if(getStart){
+						start = -textInputRange.moveStart("character", -len);
+						start += normalizedValue.slice(0, start).split("\n").length - 1;
+					} else {
+						if (textInputRange.compareEndPoints("EndToEnd", endRange) > -1) {
+							end = len;
+						} else {
+							end = -textInputRange.moveEnd("character", -len);
+							end += normalizedValue.slice(0, end).split("\n").length - 1;
+						}
+					}
+	
 				}
 			}
-		},
-		setSelectionRange: {
-			value: function(start, end, dir){
-				if(this.createTextRange){
-					var range = this.createTextRange();
-					range.collapse(true);
-					range.moveStart('character', start);
-					range.moveEnd('character', end - start);
-					range.select();
+			return {
+				start: start,
+				end: end
+			};
+		};
+		
+		['input', 'textarea'].forEach(function(name){
+			var isTextarea = name == 'textarea';
+			//email?
+			var allowedTypes = {text: 1, search: 1, url: 1, tel: 1, password: 1, email: 1};
+			var error = 'InvalidStateError: An attempt was made to use an object that is not, or is no longer, usable. selection not allowed on this type';
+			webshims.defineNodeNameProperties(name, {
+				selectionStart: {
+					get: function(){
+						if(isTextarea || allowedTypes[$.prop(this, 'type')]){
+							return getSelection(this, true).start;
+						}
+						webshims.error(error);
+					},
+					set: function(v){
+						if(this.createTextRange && (isTextarea || allowedTypes[$.prop(this, 'type')])){
+							var range = this.createTextRange();
+							range.collapse(true);
+							range.moveStart('character', v);
+							range.moveEnd('character', $.prop(this, 'selectionEnd'));
+							if($(this).is(':focus')){
+								range.select();
+							}
+						} else {
+							webshims.error(error);
+						}
+					}
+				},
+				selectionEnd: {
+					get: function(){
+						if(isTextarea || allowedTypes[$.prop(this, 'type')]){
+							return getSelection(this).end;
+						}
+						webshims.error(error);
+					},
+					set: function(v){
+						if(this.createTextRange && (isTextarea || allowedTypes[$.prop(this, 'type')])){
+							var range = this.createTextRange();
+							var start;
+							range.collapse(true);
+							start = getSelection(this, true).start;
+							range.moveStart('character', start);
+							range.moveEnd('character', v - start);
+							if($(this).is(':focus')){
+								range.select();
+							}
+						} else {
+							webshims.error(error);
+						}
+					}
+				},
+				setSelectionRange: {
+					value: function(start, end, dir){
+						if(this.createTextRange && (isTextarea || allowedTypes[$.prop(this, 'type')])){
+							var range = this.createTextRange();
+							range.collapse(true);
+							range.moveStart('character', start);
+							range.moveEnd('character', end - start);
+							if($(this).is(':focus')){
+								range.select();
+							}
+						} else {
+							webshims.error(error);
+						}
+					}
 				}
-			}
-		}
-	}, 'prop');
+			}, 'prop');
+		});
+		
 	})();
 }
 
