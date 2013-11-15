@@ -83,16 +83,18 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		$.expr[":"][name] = $.expr.filters[name+"-element"];
 	});
 	
-	//bug was partially fixed in 1.10.0 for IE9, but not IE8 (move to es5 as soon as 1.10.2 is used) 
-	var pseudoFocus = $.expr[":"].focus;
-	$.expr[":"].focus = function(){
-		try {
-			return pseudoFocus.apply(this, arguments);
-		} catch(e){
-			webshims.error(e);
-		}
-		return false;
-	};
+	//bug was partially fixed in 1.10.0 for IE9, but not IE8 (move to es5 as soon as 1.10.2 is used)
+	if(typeof document.activeElement == 'unknown'){
+		var pseudoFocus = $.expr[":"].focus;
+		$.expr[":"].focus = function(){
+			try {
+				return pseudoFocus.apply(this, arguments);
+			} catch(e){
+				webshims.error(e);
+			}
+			return false;
+		};
+	}
 	
 	webshims.triggerInlineForm = function(elem, event){
 		$(elem).trigger(event);
