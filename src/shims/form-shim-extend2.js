@@ -1,6 +1,9 @@
 webshims.register('form-shim-extend2', function($, webshims, window, document, undefined, options){
 "use strict";
 var emptyJ = $([]);
+var isNumber = function(string){
+    return (typeof string == 'number' || (string && string == string * 1));
+};
 var getGroupElements = function(elem){
 	elem = $(elem);
 	var name;
