@@ -2437,7 +2437,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			var switchOptions = function(e){
 				var media, error, parent;
 				if(!options.preferFlash && 
-				($(e.target).is('audio, video') || ((parent = e.target.parentNode) && $('source:last', parent)[0] == e.target)) && 
+				($(e.target).is('audio, video') || ((parent = e.target.parentNode) && $('source', parent).last()[0] == e.target)) && 
 				(media = $(e.target).closest('audio, video')) && (error = media.prop('error')) && !noSwitch[error.code]
 				){
 					

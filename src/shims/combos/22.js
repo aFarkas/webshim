@@ -17,7 +17,7 @@ webshims.register('details', function($, webshims, window, doc, undefined, optio
 					oldSummary.remove();
 				} else {
 					oldSummary
-						.unbind('.summaryPolyfill')
+						.off('.summaryPolyfill')
 						.removeData('detailsElement')
 						.removeAttr('role')
 						.removeAttr('tabindex')
@@ -35,7 +35,7 @@ webshims.register('details', function($, webshims, window, doc, undefined, optio
 	var getSummary = function(details){
 		var summary = $.data(details, 'summaryElement');
 		if(!summary){
-			summary = $('> summary:first-child', details);
+			summary = $(details).children('summary:first-child');
 			if(!summary[0]){
 				$(details).prependPolyfill('<summary class="fallback-summary">'+ options.text +'</summary>');
 				summary = $.data(details, 'summaryElement');
@@ -467,9 +467,9 @@ webshims.register('track', function($, webshims, window, document, undefined){
 		var loadEvents = 'play playing updatetrackdisplay';
 		var obj = trackData.track;
 		var load = function(){
-			var error, ajax, src;
+			var error, ajax, src, createAjax;
 			if(obj.mode != 'disabled' && $.attr(track, 'src') && (src = $.prop(track, 'src'))){
-				$(mediaelem).unbind(loadEvents, load);
+				$(mediaelem).off(loadEvents, load);
 				if(!trackData.readyState){
 					error = function(){
 						trackData.readyState = 3;
@@ -481,26 +481,34 @@ webshims.register('track', function($, webshims, window, document, undefined){
 					try {
 						obj.cues = mediaelement.createCueList();
 						obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = mediaelement.createCueList();
-						ajax = $.ajax({
-							dataType: 'text',
-							url: src,
-							success: function(text){
-								if(ajax.getResponseHeader('content-type') != 'text/vtt'){
-									webshims.error('set the mime-type of your WebVTT files to text/vtt. see: http://dev.w3.org/html5/webvtt/#text/vtt');
-								}
-								mediaelement.parseCaptions(text, obj, function(cues){
-									if(cues && 'length' in cues){
-										trackData.readyState = 2;
-										$(track).triggerHandler('load');
-										$(mediaelem).triggerHandler('updatetrackdisplay');
-									} else {
-										error();
+						createAjax = function(){
+							ajax = $.ajax({
+								dataType: 'text',
+								url: src,
+								success: function(text){
+									if(ajax.getResponseHeader('content-type') != 'text/vtt'){
+										webshims.error('set the mime-type of your WebVTT files to text/vtt. see: http://dev.w3.org/html5/webvtt/#text/vtt');
 									}
-								});
-								
-							},
-							error: error
-						});
+									mediaelement.parseCaptions(text, obj, function(cues){
+										if(cues && 'length' in cues){
+											trackData.readyState = 2;
+											$(track).triggerHandler('load');
+											$(mediaelem).triggerHandler('updatetrackdisplay');
+										} else {
+											error();
+										}
+									});
+									
+								},
+								error: error
+							});
+						};
+						if($.ajax){
+							createAjax();
+						} else {
+							webshims.ready('$ajax', createAjax);
+							webshims.loader.loadList(['$ajax']);
+						}
 					} catch(er){
 						error();
 						webshims.error(er);
@@ -513,7 +521,7 @@ webshims.register('track', function($, webshims, window, document, undefined){
 		obj._shimActiveCues = null;
 		obj.activeCues = null;
 		obj.cues = null;
-		$(mediaelem).unbind(loadEvents, load);
+		$(mediaelem).off(loadEvents, load);
 		$(mediaelem).on(loadEvents, load);
 		if(_default){
 			obj.mode = showTracks[obj.kind] ? 'showing' : 'hidden';

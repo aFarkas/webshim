@@ -84,7 +84,7 @@
 			mouseUp = // unbind the document events - they aren't needed when not dragging
 
 			function (e) {
-				$(document).unbind('mouseup', mouseUp).unbind('mousemove', mouseMove);
+				$(document).off('mouseup', mouseUp).off('mousemove', mouseMove);
 				e.stopPropagation();
 				e.preventDefault();
 				return false;
@@ -293,8 +293,8 @@
 			},
 			destroy = function () {
 				// unbind all possible events and null objects
-				$(document).unbind('mouseup', mouseUp).unbind('mousemove', mouseMove);
-				bar.unbind('mousedown', mouseDown);
+				$(document).off('mouseup', mouseUp).off('mousemove', mouseMove);
+				bar.off('mousedown', mouseDown);
 				bar = null;
 				arrow = null;
 				changeEvents = null;
@@ -550,9 +550,9 @@
 				},
 				destroy = function () {
 					// unbind all events and null objects
-					red.add(green).add(blue).add(alpha).add(hue).add(saturation).add(value).add(hex).add(bindedHex).add(ahex).unbind('keyup', keyUp).unbind('blur', blur);
-					red.add(green).add(blue).add(alpha).add(hue).add(saturation).add(value).unbind('keydown', keyDown);
-					color.unbind(colorChanged);
+					red.add(green).add(blue).add(alpha).add(hue).add(saturation).add(value).add(hex).add(bindedHex).add(ahex).off('keyup', keyUp).off('blur', blur);
+					red.add(green).add(blue).add(alpha).add(hue).add(saturation).add(value).off('keydown', keyDown);
+					color.off(colorChanged);
 					red = null;
 					green = null;
 					blue = null;
@@ -1623,7 +1623,7 @@
 					return false;
 				},
 				documentMouseUp = function (e) {
-					$(document).unbind('mousemove', documentMouseMove).unbind('mouseup', documentMouseUp);
+					$(document).off('mousemove', documentMouseMove).off('mouseup', documentMouseUp);
 					
 					return false;
 				},
@@ -1751,11 +1751,11 @@
 				},
 				destroy = function () {
 					var elemData = $.data($this, 'wsjPicker') || $this;
-					container.find('td.Radio input').unbind('click', radioClicked);
-					currentPreview.unbind('click', currentClicked);
-					cancelButton.unbind('click', cancelClicked);
-					okButton.unbind('click', okClicked);
-					container.find('.QuickColor').unbind('click', quickPickClicked);
+					container.find('td.Radio input').off('click', radioClicked);
+					currentPreview.off('click', currentClicked);
+					cancelButton.off('click', cancelClicked);
+					okButton.off('click', okClicked);
+					container.find('.QuickColor').off('click', quickPickClicked);
 					colorMapDiv = null;
 					colorBarDiv = null;
 					colorMapL1 = null;

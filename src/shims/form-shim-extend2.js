@@ -83,7 +83,7 @@ if( !('maxLength' in document.createElement('textarea')) ){
 		};
 		var remove = function(){
 			clearTimeout(timer);
-			lastElement.unbind('.maxlengthconstraint');
+			lastElement.off('.maxlengthconstraint');
 		};
 		return function(element, maxLength){
 			remove();
@@ -163,7 +163,7 @@ if( !('maxLength' in document.createElement('textarea')) ){
 	});
 } 
 
-if(!$.support.getSetAttribute && $('<form novalidate></form>').attr('novalidate') == null){
+if(('getSetAttribute' in  $.support) && !$.support.getSetAttribute && $('<form novalidate></form>').attr('novalidate') == null){
 	webshims.defineNodeNameProperty('form', 'novalidate', {
 		attr: {
 			set: function(val){
@@ -753,7 +753,7 @@ if(!('setSelectionRange' in document.createElement('input'))){
 								elem.value = $.prop(elem, 'value');
 								data.box.removeClass('placeholder-visible');
 								clearTimeout(selectTimer);
-								$(elem).unbind('.placeholderremove');
+								$(elem).off('.placeholderremove');
 							},
 							'mousedown.placeholderremove drag.placeholderremove select.placeholderremove': function(e){
 								setSelection(elem);
@@ -764,7 +764,7 @@ if(!('setSelectionRange' in document.createElement('input'))){
 							},
 							'blur.placeholderremove': function(){
 								clearTimeout(selectTimer);
-								$(elem).unbind('.placeholderremove');
+								$(elem).off('.placeholderremove');
 							}
 						})
 					;
@@ -779,10 +779,10 @@ if(!('setSelectionRange' in document.createElement('input'))){
 						'keydown.placeholderremove keypress.placeholderremove paste.placeholderremove input.placeholderremove': function(e){
 							if(e && (e.keyCode == 17 || e.keyCode == 16)){return;}
 							data.box.removeClass('placeholder-visible');
-							$(elem).unbind('.placeholderremove');
+							$(elem).off('.placeholderremove');
 						},
 						'blur.placeholderremove': function(){
-							$(elem).unbind('.placeholderremove');
+							$(elem).off('.placeholderremove');
 						}
 					})
 				;
@@ -810,7 +810,7 @@ if(!('setSelectionRange' in document.createElement('input'))){
 				placeholderTxt = $.attr(elem, 'placeholder') || '';
 			}
 			
-			$(elem).unbind('.placeholderremove');
+			$(elem).off('.placeholderremove');
 			
 			if(value === false){
 				value = $.prop(elem, 'value');
@@ -883,10 +883,10 @@ if(!('setSelectionRange' in document.createElement('input'))){
 						if(isResponsive || $(elem).is('.responsive-width') || (elem.currentStyle || {width: ''}).width.indexOf('%') != -1){
 							data.box = data.text;
 						} else {
-							data.box = $(elem)
-								.wrap('<span class="placeholder-box placeholder-box-'+ (elem.nodeName || '').toLowerCase() +' placeholder-box-'+$.css(elem, 'float')+'" />')
-								.parent()
+							data.box = $('<span class="placeholder-box placeholder-box-'+ (elem.nodeName || '').toLowerCase() +' placeholder-box-'+$.css(elem, 'float')+'" />')
+								.insertAfter(elem)
 							;
+							data.box.append(elem);
 						}
 						data.text
 							.insertAfter(elem)
@@ -1141,7 +1141,7 @@ if(!('setSelectionRange' in document.createElement('input'))){
 							extraTimer = setTimeout(trigger, 9);
 						},
 						unbind = function(){
-							input.unbind('focusout', unbind).unbind('keyup keypress keydown paste cut', extraTest).unbind('input change updateInput triggerinput', trigger);
+							input.off('focusout', unbind).off('keyup keypress keydown paste cut', extraTest).off('input change updateInput triggerinput', trigger);
 							clearInterval(timer);
 							setTimeout(function(){
 								trigger();

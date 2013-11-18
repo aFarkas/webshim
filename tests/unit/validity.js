@@ -1,7 +1,7 @@
 (function($){
 
-$.expr.filters.willValidate = function(elem){
-	return $.prop(elem, 'willValidate');
+var willValidateFilter = function(){
+	return $.prop(this, 'willValidate');
 };
 
 module("validity");
@@ -28,18 +28,18 @@ asyncTest("general validity Modul", function(){
 	webshimtest.reflectAttr(form1.find('#name'), 'required', true, 'boolean');
 	
 	//willValidate
-	var willValidate = $('#form-1 input:willValidate'),
+	var willValidate = $('#form-1 input').filter(willValidateFilter),
 		total = willValidate.length
 	;
 	
-	willValidate.filter(':eq(0)').prop('disabled', true);
-	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate disabled' );
-	willValidate.filter(':eq(0)').prop('disabled', false);
-	equals( $('#form-1 input:willValidate').length, total, 'willValidate enabled' );
+	willValidate.first().prop('disabled', true);
+	equals( $('#form-1 input').filter(willValidateFilter).length, total - 1, 'willValidate disabled' );
+	willValidate.first().prop('disabled', false);
+	equals( $('#form-1 input').filter(willValidateFilter).length, total, 'willValidate enabled' );
 
 	
 	form1.find('#name').prop('readOnly', true);
-	equals( $('#form-1 input:willValidate').length, total - 1, 'willValidate: false with readonly' );
+	equals( $('#form-1 input').filter(willValidateFilter).length, total - 1, 'willValidate: false with readonly' );
 	form1.find('#name').prop('readOnly', false);
 	
 	//invalid
@@ -52,9 +52,9 @@ asyncTest("general validity Modul", function(){
 	equals( $(':invalid:not(fieldset)', form1).length, 7, 'total invalid' );
 	
 	equals( invalid.filter('[type=radio]').length, 3, 'radio invalid' );
-	invalid.filter('[type=radio]:last').prop('checked', true);
+	invalid.filter('[type=radio]').last().prop('checked', true);
 	equals( invalid.filter('[type=radio]:invalid').length, 0, 'radio changed valid' );
-	invalid.filter('[type=radio]:last').prop('checked', false);
+	invalid.filter('[type=radio]').last().prop('checked', false);
 	
 	equals(form1.find('#name').is(':invalid'), true, 'name is invalid');
 	form1.find('#name').prop('required', false);
@@ -216,14 +216,14 @@ asyncTest('output test', function(){
 	equals($('foobarbaz').prop('value'), undefined, "unknown extension don't pollute other unknowns");
 	
 	equals($('output').prop('value'), 'jo', 'first output has initial value');
-	$('output:first').prop('value', 'hello');
+	$('output').first().prop('value', 'hello');
 	equals($('output').prop('value'), 'hello', 'first output has changed value');
 	
 	
 	
 	$('#labeled-output').prop('value', 'somecontent');
 	if( !omitTests.output ){
-		equals($('output:first').text(), 'hello', 'shim shows value');
+		equals($('output').first().text(), 'hello', 'shim shows value');
 		equals($('#labeled-output').text(), 'somecontent', 'shim shows value');
 		
 	}
@@ -241,7 +241,7 @@ asyncTest('output test', function(){
 asyncTest('checkValidity/invalid event I', function(){
 	QUnit.reset();
 	var invalids = 0;
-	$('#form-1').bind('invalid', function(){
+	$('#form-1').on('invalid', function(){
 		invalids++;
 	});
 
@@ -269,7 +269,7 @@ asyncTest('checkValidity/invalid event I', function(){
 asyncTest('checkValidity/invalid event III', function(){
 	QUnit.reset();
 	var invalids = 0;
-	$('#form-1').bind('invalid', function(){
+	$('#form-1').on('invalid', function(){
 		invalids++;
 	});
 	
@@ -286,7 +286,7 @@ if($.webshims.cfg.extendNative){
 	asyncTest('native checkValidity/invalid event III', function(){
 		QUnit.reset();
 		var invalids = 0;
-		$('#form-1').bind('invalid', function(){
+		$('#form-1').on('invalid', function(){
 			invalids++;
 		});
 		ok(!$('#name')[0].checkValidity(), 'validity is false for #name (element)');
@@ -302,7 +302,7 @@ if($.webshims.cfg.extendNative){
 asyncTest('checkValidity/invalid event IV', function(){
 	QUnit.reset();
 	var invalids = 0;
-	$('#form-1').bind('invalid', function(e){
+	$('#form-1').on('invalid', function(e){
 		invalids++;
 	});
 	

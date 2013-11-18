@@ -14,6 +14,12 @@
 				document.write('<script src="http:\/\/ajax.googleapis.com\/ajax\/libs\/jquery\/1.8\/jquery.js"><\/script>');
 			} else if(Object.defineProperties && hash.indexOf('modernjquery') != -1) {
 				document.write('<script src="http:\/\/code.jquery.com\/jquery-2.0.3.js"><\/script>');
+			} else if(hash.indexOf('customjquery') != -1) {
+				if(Object.defineProperties){
+					document.write('<script src="test-ext\/jquery-2-custom.js"><\/script>');
+				} else {
+					document.write('<script src="test-ext\/jquery-1-custom.js"><\/script>');
+				}
 			} else {
 				//code.jquery.com/jquery-2.0.3.js
 				document.write('<script src="http:\/\/code.jquery.com\/jquery-1.10.2.min.js"><\/script>');
@@ -23,8 +29,8 @@
 	
 	<script>
 	(function(){
-		var oldbind = jQuery.fn.bind;
-		jQuery.fn.bind = function(type){
+		var oldbind = jQuery.fn.on;
+		jQuery.fn.on = function(type){
 			if(typeof type == 'string' && /\s{2,9}/.test(type)){
 				alert(type);
 			}
@@ -46,41 +52,43 @@
 			var hash = location.hash.replace('#', '');
 			
 			if(hash.indexOf('customValidationMessage') !== -1){
-				$.webshims.cfg.forms.customMessages = true; 
+				webshims.cfg.forms.customMessages = true; 
 				webshims.setOptions({
 					forms: {
 						fixRangeChange: true
 					}
 				});
 			}
-			if(hash.indexOf('noNativeMethods') !== -1){
-				$.webshims.cfg.extendNative = false; 
+			if(hash.indexOf('nativeMethods') !== -1){
+				webshims.cfg.extendNative = true; 
 			}
 			if(hash.indexOf('useCustomUI') !== -1){
-				$.webshims.setOptions('forms', { customDatalist: true });
-				$.webshims.setOptions('forms-ext', { replaceUI: true });
-				$.webshims.setOptions('forms', { addValidators: true });
+				webshims.setOptions('forms', { customDatalist: true });
+				webshims.setOptions('forms-ext', { replaceUI: true });
+				webshims.setOptions('forms', { addValidators: true });
 			}
 			
-			if(hash.indexOf('punycode') !== -1){
-				document.write('<script src="test-ext\/punycode.js"><\/script>');
-			}
 			
 						
 			$(function(){
 				$('#customValidationMessage').prop('checked', !!$.webshims.cfg.forms.customMessages);
-				$('#noNativeMethods').prop('checked', !$.webshims.cfg.extendNative);
+				$('#nativeMethods').prop('checked', $.webshims.cfg.extendNative);
 				$('#useCustomUI').prop('checked', $.webshims.cfg['forms-ext'].replaceUI);
 				$('#legacyjquery').prop('checked', (hash.indexOf('legacyjquery') != -1));
-				$('#modernjquery').prop('checked', (hash.indexOf('modernjquery') != -1));
+				$('#jq-version option').each(function(){
+					var val = $.prop(this, 'value');
+					if(val && hash.indexOf(val) != -1){
+						$.prop(this, 'selected', true);
+						return false;
+					}
+				});
 				
 				$('#noConflictExtreme').prop('checked', (hash.indexOf('noConflictExtreme') != -1));
-				$('#punycode').prop('checked', (hash.indexOf('punycode') !== -1));
-				$('input.webshim-config')
-					.bind('click', function(){
+				$('#ws-config')
+					.on('change', '.webshim-config', function(){
 						var addHash = '';
-						$('input.webshim-config').each(function(){
-							if(this.checked){
+						$('#ws-config .webshim-config').each(function(){
+							if($(this).is('select') || this.checked){
 								addHash += $.prop(this, 'value');
 							}
 						});
@@ -133,7 +141,6 @@
 	<script src="test-ext/test-helper.js"></script>
 	
 	<script src="unit/updatepolyfill.js"></script>
-	
 	<script src="unit/placeholder.js"></script>
 	<script src="unit/validity.js"></script>
 	<script src="unit/canvas.js"></script>
@@ -149,7 +156,6 @@
 	<script src="unit/form-features.js"></script>
 	<script src="unit/loading.js"></script>
 	<script src="unit/form-submitters.js"></script>
-	
 	<script src="unit/datalist.js"></script>
 	
 	<script>
@@ -162,7 +168,7 @@
 			var langs = webshims.cfg.forms.availableLangs;
 			
 //			webshims.cfg.debug = "noCombo";
-			$(window).load(function(){
+			$(window).on('load', function(){
 				webshims.activeLang(langs[ getRandom(langs.length) ]);
 				$.webshims.polyfill();
 			});
@@ -191,15 +197,17 @@
 <body class="flora">
 	<foobar></foobar>
 	<foobarbaz></foobarbaz>
-<div>
+<div id="ws-config">
 	<input type="checkbox" id="customValidationMessage" value="customValidationMessage" class="webshim-config" /> <label for="customValidationMessage">customValidationMessage</label>
-	<input type="checkbox" id="noNativeMethods" value="noNativeMethods" class="webshim-config" /> <label for="noNativeMethods">noNativeMethods</label>
+	<input type="checkbox" id="nativeMethods" value="nativeMethods" class="webshim-config" /> <label for="nativeMethods">nativeMethods</label>
 	<input type="checkbox" id="useCustomUI" value="useCustomUI" class="webshim-config" /> <label for="useCustomUI">use custom input widgets</label>
-	<input type="checkbox" id="legacyjquery" value="legacyjquery" class="webshim-config" /> <label for="legacyjquery">use legacy jquery</label>
-	<input type="checkbox" id="modernjquery" value="modernjquery" class="webshim-config" /> <label for="modernjquery">use modern jquery</label>
 	<input type="checkbox" id="noConflictExtreme" value="noConflictExtreme" class="webshim-config" /> <label for="noConflictExtreme">jQuery.noConflict(true)</label>
-	<input type="checkbox" id="punycode" value="punycode" class="webshim-config" /> <label for="punycode">punycode</label>
-	
+	<select class="webshim-config" id="jq-version">
+		<option value="">jQuery 1.10.2</option>
+		<option value="legacyjquery">jQuery 1.8.3</option>
+		<option value="modernjquery">jQuery 2.x</option>
+		<option value="customjquery">custom builds of jQuery 2.x/1.x</option>
+	</select>
 	
 </div>
 <small>Note: These tests are made to test webshims lib implementation. If there are some failing tests in native implementations, fill a browser bug. We currently only fix heavy/easy to fix errors in native implementations.</small>

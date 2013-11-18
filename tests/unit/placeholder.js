@@ -14,7 +14,7 @@ var placeholder = {
 		if(Modernizr.input.placeholder) {return;}
 		var parent = $(elem).parent();
 		equals(parent.hasClass('placeholder-visible'), state, 'placeholder visible class');
-		equals(parent.find('.placeholder-text').is(':visible'), state, 'placeholder-text is applied');
+		equals(parent.find('.placeholder-text').css('display'), state ? 'inline-block' : 'none', 'placeholder-text is applied');
 	},
 	hasText: function(elem, text){
 		if(Modernizr.input.placeholder) {return;}

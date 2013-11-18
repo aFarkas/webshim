@@ -16,6 +16,7 @@
 					errorTimer,
 					googleTimer,
 					calledEnd,
+					createAjax,
 					endCallback = function(){
 						if(calledEnd){return;}
 						if(pos){
@@ -39,7 +40,7 @@
 						endCallback();
 					},
 					resetCallback = function(){
-						$(document).unbind('google-loader', resetCallback);
+						$(document).off('google-loader', resetCallback);
 						clearTimeout(googleTimer);
 						clearTimeout(errorTimer);
 					},
@@ -84,44 +85,52 @@
 						}
 						return;
 					}
-					$.ajax({
-						url: 'http://freegeoip.net/json/',
-						dataType: 'jsonp',
-						cache: true,
-						jsonp: 'callback',
-						success: function(data){
-							locationAPIs--;
-							if(!data){return;}
-							pos = pos || {
-								coords: {
-									latitude: data.latitude,
-									longitude: data.longitude,
-									altitude: null,
-									accuracy: 43000,
-									altitudeAccuracy: null,
-									heading: parseInt('NaN', 10),
-									velocity: null
-								},
-								//extension similiar to FF implementation
-								address: {
-									city: data.city,
-									country: data.country_name,
-									countryCode: data.country_code,
-									county: "",
-									postalCode: data.zipcode,
-									premises: "",
-									region: data.region_name,
-									street: "",
-									streetNumber: ""
-								}
-							};
-							endCallback();
-						},
-						error: function(){
-							locationAPIs--;
-							endCallback();
-						}
-					});
+					createAjax = function(){
+						$.ajax({
+							url: 'http://freegeoip.net/json/',
+							dataType: 'jsonp',
+							cache: true,
+							jsonp: 'callback',
+							success: function(data){
+								locationAPIs--;
+								if(!data){return;}
+								pos = pos || {
+									coords: {
+										latitude: data.latitude,
+										longitude: data.longitude,
+										altitude: null,
+										accuracy: 43000,
+										altitudeAccuracy: null,
+										heading: parseInt('NaN', 10),
+										velocity: null
+									},
+									//extension similiar to FF implementation
+									address: {
+										city: data.city,
+										country: data.country_name,
+										countryCode: data.country_code,
+										county: "",
+										postalCode: data.zipcode,
+										premises: "",
+										region: data.region_name,
+										street: "",
+										streetNumber: ""
+									}
+								};
+								endCallback();
+							},
+							error: function(){
+								locationAPIs--;
+								endCallback();
+							}
+						});
+					};
+					if($.ajax){
+						createAjax();
+					} else {
+						webshims.ready('$ajax', createAjax);
+						webshims.loader.loadList(['$ajax']);
+					}
 					clearTimeout(googleTimer);
 					if (!window.google || !window.google.loader) {
 						googleTimer = setTimeout(function(){
@@ -164,5 +173,8 @@
 		return api;
 	})();
 	
+	webshims.ready('WINDOWLOAD', function(){
+		webshims.loader.loadList(['$ajax']);
+	});
 	webshims.isReady('geolocation', true);
 })(webshims.$);

@@ -148,8 +148,8 @@ webshims.register('form-validators', function($, webshims, window, document, und
 		groupTimer[name] = setTimeout(function(){
 			checkboxes
 				.addClass('group-required')
-				.unbind('click.groupRequired')
-				.bind('click.groupRequired', function(){
+				.off('click.groupRequired')
+				.on('click.groupRequired', function(){
 					checkboxes.filter('.group-required').each(function(){
 						webshims.refreshCustomValidityRules(this);
 					});
@@ -314,7 +314,6 @@ webshims.register('form-validators', function($, webshims, window, document, und
 						remoteValidate.restartAjax = false;
 					},
 					getResponse: function(data){
-						var old = webshims.refreshCustomValidityRules;
 						if(!data){
 							data = {message: '', valid: true};
 						} else if(typeof data == 'string'){

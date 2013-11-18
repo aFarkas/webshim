@@ -742,7 +742,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					setTimeout(function(){
 						if(that.popover){
 							that.popover.element.on('wspopoverhide', onBlur);
-							$('> *', that.popover.element)
+							that.popover.element
+								.children()
 								.on({
 									'focusin': onFocus,
 									'focusout': onBlur
@@ -847,7 +848,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				};
 				var mouseDownInit = function(){
 					if(!o.disabled && !isFocused){
-						that.element.getShadowFocusElement().focus();
+						that.element.getShadowFocusElement().trigger('focus');
 					}
 					preventBlur.set();
 					
@@ -1320,7 +1321,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			cancel: function(val, popover, data){
 				if(!data.options.inlinePicker){
 					popover.stopOpen = true;
-					data.element.getShadowFocusElement().focus();
+					data.element.getShadowFocusElement().trigger('focus');
 					setTimeout(function(){
 						popover.stopOpen = false;
 					}, 9);

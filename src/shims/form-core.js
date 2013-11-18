@@ -61,40 +61,49 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		return ret;
 	};
 	
-	$.extend($.expr[":"], {
-		"valid-element": function(elem){
-			return rElementsGroup.test(elem.nodeName || '') ? !hasInvalid(elem) :!!($.prop(elem, 'willValidate') && isValid(elem));
-		},
-		"invalid-element": function(elem){
-			return rElementsGroup.test(elem.nodeName || '') ? hasInvalid(elem) : !!($.prop(elem, 'willValidate') && !isValid(elem));
-		},
-		"required-element": function(elem){
-			return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required'));
-		},
-		"user-error": function(elem){
-			return ($.prop(elem, 'willValidate') && $(elem).hasClass('user-error'));
-		},
-		"optional-element": function(elem){
-			return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required') === false);
-		}
-	});
-	
-	['valid', 'invalid', 'required', 'optional'].forEach(function(name){
-		$.expr[":"][name] = $.expr.filters[name+"-element"];
-	});
-	
-	//bug was partially fixed in 1.10.0 for IE9, but not IE8 (move to es5 as soon as 1.10.2 is used)
-	if(typeof document.activeElement == 'unknown'){
-		var pseudoFocus = $.expr[":"].focus;
-		$.expr[":"].focus = function(){
-			try {
-				return pseudoFocus.apply(this, arguments);
-			} catch(e){
-				webshims.error(e);
+	var extendSels = function(){
+		$.extend($.expr[":"], {
+			"valid-element": function(elem){
+				return rElementsGroup.test(elem.nodeName || '') ? !hasInvalid(elem) :!!($.prop(elem, 'willValidate') && isValid(elem));
+			},
+			"invalid-element": function(elem){
+				return rElementsGroup.test(elem.nodeName || '') ? hasInvalid(elem) : !!($.prop(elem, 'willValidate') && !isValid(elem));
+			},
+			"required-element": function(elem){
+				return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required'));
+			},
+			"user-error": function(elem){
+				return ($.prop(elem, 'willValidate') && $(elem).hasClass('user-error'));
+			},
+			"optional-element": function(elem){
+				return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required') === false);
 			}
-			return false;
-		};
+		});
+		
+		['valid', 'invalid', 'required', 'optional'].forEach(function(name){
+			$.expr[":"][name] = $.expr[":"][name+"-element"];
+		});
+		
+		//bug was partially fixed in 1.10.0 for IE9, but not IE8 (move to es5 as soon as 1.10.2 is used)
+		if(typeof document.activeElement == 'unknown'){
+			var pseudoFocus = $.expr[":"].focus;
+			$.expr[":"].focus = function(){
+				try {
+					return pseudoFocus.apply(this, arguments);
+				} catch(e){
+					webshims.error(e);
+				}
+				return false;
+			};
+		}
+	};
+	
+	if($.expr.filters){
+		extendSels();
+	} else {
+		webshims.ready('sizzle', extendSels);
 	}
+	
 	
 	webshims.triggerInlineForm = function(elem, event){
 		$(elem).trigger(event);

@@ -476,10 +476,17 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		fade: {
 			show: 'fadeIn',
 			hide: 'fadeOut'
+		},
+		show: {
+			show: 'show',
+			hide: 'hide'
 		}
 	};
 	if(!fx[options.iVal.fx]){
 		options.iVal.fx = 'slide';
+	}
+	if(!$.fn[fx[options.iVal.fx]]){
+		options.iVal.fx = 'show';
 	}
 	webshims.errorbox = {
 		create: function(elem, fieldWrapper){
@@ -506,7 +513,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				}
 			}
 			if(!fieldWrapper){
-				fieldWrapper = $(elem).parent().closest(':not(span, label, em, strong, b, i, mark, p)');
+				fieldWrapper = $(elem).parent().closest(':not(span), :not(label), :not(em), :not(strong), :not(p)');
 			}
 			return fieldWrapper;
 		},
@@ -540,7 +547,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				if(typeof errorMessages == 'string'){
 					errorMessages = {defaultMessage: errorMessages};
 				}
-				$('> *', errorBox).each(function(){
+				$(errorBox).children().each(function(){
 					var name = getErrorName(this);
 					if(!errorMessages[name]){
 						extended = true;
@@ -608,7 +615,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					switchValidityClass({type: 'input', target: input});
 				};
 				$(input)
-					.filter('input:not([type="checkbox"], [type="radio"])')
+					.filter('input:not([type="checkbox"]):not([type="radio"])')
 					.off('.recheckinvalid')
 					.on('input.recheckinvalid', function(){
 						clearTimeout(timer);
@@ -626,7 +633,10 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			var message = $(elem).getErrorMessage();
 
 			if(box.message != message){
-				box.stop(true, true).html('<p>'+ message +'</p>');
+				if(box.stop){
+					box.stop(true, true);
+				}
+				box.html('<p>'+ message +'</p>');
 				box.message = message;
 				fieldWrapper.addClass(invalidWrapperClass).removeClass(successWrapperClass);
 				this.recheckInvalidInput(elem);

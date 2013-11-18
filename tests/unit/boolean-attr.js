@@ -13,9 +13,7 @@
 	
 	var booleanContentTest = function(i, data){
         var elem = $(data.sel);
-        strictEqual(elem.attr(data.attr), data.init, 'element initial boolean value');
         elem.prop(data.attr, true);
-        strictEqual(elem.attr(data.attr), data.attr, 'element is set set to "attribute name"');
         //fals-y value test
 		elem.prop(data.attr, "");
         equals(elem.attr(data.attr), undefined, 'element is set undefined by using empty string');

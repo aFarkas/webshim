@@ -17,7 +17,7 @@ webshims.register('details', function($, webshims, window, doc, undefined, optio
 					oldSummary.remove();
 				} else {
 					oldSummary
-						.unbind('.summaryPolyfill')
+						.off('.summaryPolyfill')
 						.removeData('detailsElement')
 						.removeAttr('role')
 						.removeAttr('tabindex')
@@ -35,7 +35,7 @@ webshims.register('details', function($, webshims, window, doc, undefined, optio
 	var getSummary = function(details){
 		var summary = $.data(details, 'summaryElement');
 		if(!summary){
-			summary = $('> summary:first-child', details);
+			summary = $(details).children('summary:first-child');
 			if(!summary[0]){
 				$(details).prependPolyfill('<summary class="fallback-summary">'+ options.text +'</summary>');
 				summary = $.data(details, 'summaryElement');

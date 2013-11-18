@@ -27,7 +27,7 @@
 	
 	
 	var webshims = {
-		version: '1.11.3',
+		version: '1.11.4-pre',
 		cfg: {
 			
 			//addCacheBuster: false,
@@ -126,7 +126,7 @@
 				
 				var removeLoader = function(){
 					$('html').removeClass('loading-polyfills long-loading-polyfills');
-					$(window).unbind('.lP');
+					$(window).off('.lP');
 					clearTimeout(timer);
 				};
 				
@@ -649,7 +649,7 @@
 		}
 		$(onReady);
 		
-		$(window).load(function(){
+		$(window).on('load', function(){
 			onReady();
 			setTimeout(function(){
 				isReady('WINDOWLOAD', true);
@@ -826,7 +826,9 @@
 		c: [16, 7, 2, 8, 1, 12, 19, 25, 23, 27]
 	});
 	modules.swfmini.test();
-		
+	
+	addModule('sizzle', {test: $.expr.filters});
+	addModule('$ajax', {test: $.ajax});
 	/* 
 	 * polyfill-Modules 
 	 */
@@ -1036,7 +1038,7 @@
 			test: function(){
 				return Modernizr[formvalidation] && !bustedValidity;
 			},
-			d: ['form-core', DOMSUPPORT],
+			d: ['form-core', DOMSUPPORT, 'sizzle'],
 			c: [16, 15, 24]
 		});
 		

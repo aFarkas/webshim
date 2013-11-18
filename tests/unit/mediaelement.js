@@ -72,7 +72,7 @@
 		
 		
 		return function(){
-			media.unbind('.testevent');
+			media.off('.testevent');
 			if(media.canPlayType( options.type[0] ) || (options.type[1] && media.canPlayType( options.type[1] )) ){
 				ok(!media.prop('mediaerror'), "media has no error");
 				$.each(events, function(eventName){
@@ -178,7 +178,7 @@
 							SRCES.yt
 						], 
 						SRCES.poster)
-					.bind('loadedmetadata.testevent mediaerror.testevent', function(){
+						.on('loadedmetadata.testevent mediaerror.testevent', function(){
 						setTimeout(function(){
 							endTest();
 							setTimeout(start, 9);

@@ -2,7 +2,7 @@
  * simple helper for a mousepress event
  * used by webshims improving spinbutton controls for input[type=time], input[type=number]...
  * 
- * $(element).bind('mousepress', function(){
+ * $(element).on('mousepress', function(){
  * 	//repeatedly called after mousedown, till mouseleave/mouseup
  * });
  */
@@ -13,14 +13,14 @@
 			clearTimeout(timer);
 		}
 		if(full){
-			elem.unbind('mouseup.mousepressext mouseleave.mousepressext');
+			elem.off('mouseup.mousepressext mouseleave.mousepressext');
 		}
 		elem = null;
 	};
 	$.event.special.mousepress = {
 		setup: function(){
 			var timer;
-			$(this).bind('mousedown.mousepressext', function(e){
+			$(this).on('mousedown.mousepressext', function(e){
 				var elem = $(this);
 				
 				var startIntervall = function(delay){
@@ -41,7 +41,7 @@
 					startIntervall(180);
 				}, 200));
 				
-				elem.bind('mouseup.mousepressext mouseleave.mousepressext', function(e){
+				elem.on('mouseup.mousepressext mouseleave.mousepressext', function(e){
 					removeTimer(elem, true);
 					target.trigger('mousepressend', [e]);
 					elem = null;
@@ -50,7 +50,7 @@
 			});
 		},
 		teardown: function(){
-			removeTimer($(this).unbind('.mousepressext'), true);
+			removeTimer($(this).off('.mousepressext'), true);
 		},
 		handler: function(elem, e){
 			return $.event.dispatch.call(elem, {type: 'mousepress', target: e.target, pageX: e.pageX, pageY: e.pageY});

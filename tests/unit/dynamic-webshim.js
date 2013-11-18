@@ -2,7 +2,7 @@
 var id = 'addready-test'+ (new Date().getTime());
 $.webshims.addReady(function(context, contextElem){
 	contextElem.filter('#webshim-structure').addClass(id);
-	$('> #webshim-structure', context).filter('#webshim-structure').addClass(id);
+	$(context).children('#webshim-structure').filter('#webshim-structure').addClass(id);
 });
 module("dynamic webshim / css load");
 asyncTest("dynamic webshim Modul", function(){

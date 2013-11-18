@@ -43,7 +43,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			this.arrayOptions = [];
 			
 			this.shadowList
-				.delegate('li', 'mouseenter.datalistWidget mousedown.datalistWidget click.datalistWidget', function(e){
+				.on('mouseenter.datalistWidget mousedown.datalistWidget click.datalistWidget', 'li', function(e){
 					var items = $('li:not(.hidden-item)', that.shadowList);
 					var select = (e.type == 'mousedown' || e.type == 'click');
 					that.markItem(items.index(e.currentTarget), select, items);

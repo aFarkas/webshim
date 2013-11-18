@@ -143,7 +143,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		this.element = $('tbody', element);
 		this.popover = popover;
 		this.opts = opts || {};
-		this.buttons = $('button:not(:disabled,.othermonth)', this.element);
+		this.buttons = $('button:not(:disabled):not(.othermonth)', this.element);
 		
 		this.ons(this);
 		

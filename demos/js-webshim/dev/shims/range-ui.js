@@ -55,8 +55,11 @@
 			
 			if(this._init && val == o.value && oVal == val){return;}
 			this.options.value = val;
-			this.thumb.stop();
-			this.range.stop();
+			
+			if($.fn.stop){
+				this.thumb.stop();
+				this.range.stop();
+			}
 			
 			rangeStyle[this.dirs.width] = left+'%';
 			if(this.vertical){
@@ -65,7 +68,7 @@
 			thumbStyle[this.dirs.left] = left+'%';
 			
 			
-			if(!animate){
+			if(!animate || !$.fn.animate){
 				this.thumb.css(thumbStyle);
 				this.range.css(rangeStyle);
 			} else {
@@ -354,9 +357,9 @@
 				$(window).off('blur', removeWin);
 				if(!o.readonly && !o.disabled){
 					normalizeTouch(e);
-					that.element.focus();
+					that.element.trigger('focus');
 					that.addRemoveClass('ws-active', true);
-					leftOffset = that.element.focus().offset();
+					leftOffset = that.element.offset();
 					widgetUnits = that.element[that.dirs.innerWidth]();
 					if(!widgetUnits || !leftOffset){return;}
 					outerWidth = that.thumb[that.dirs.outerWidth]();

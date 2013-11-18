@@ -505,7 +505,7 @@ if(Modernizr.inputtypes.date && /webkit/i.test(navigator.userAgent)){
 								focusedin = false;
 							}
 							if(input){
-								input.unbind('focusout blur', unbind).unbind('input change updateInput', trigger);
+								input.off('focusout blur', unbind).off('input change updateInput', trigger);
 								trigger();
 							}
 							input = null;
@@ -548,7 +548,7 @@ webshims.addReady(function(context, contextElem){
 	var focusElem;
 	$('form', context)
 		.add(contextElem.filter('form'))
-		.bind('invalid', $.noop)
+		.on('invalid', $.noop)
 	;
 	
 	try {
@@ -724,7 +724,7 @@ switch(desc.proptype) {
 	formSubmitterDescriptors[attrName].attr = {
 		set: function(value){
 			formSubmitterDescriptors[attrName].attr._supset.call(this, value);
-			$(this).unbind(eventName).on(eventName, changeSubmitter);
+			$(this).off(eventName).on(eventName, changeSubmitter);
 		},
 		get: function(){
 			return formSubmitterDescriptors[attrName].attr._supget.call(this);
@@ -733,7 +733,7 @@ switch(desc.proptype) {
 	formSubmitterDescriptors[attrName].initAttr = true;
 	formSubmitterDescriptors[attrName].removeAttr = {
 		value: function(){
-			$(this).unbind(eventName);
+			$(this).off(eventName);
 			formSubmitterDescriptors[attrName].removeAttr._supvalue.call(this);
 		}
 	};

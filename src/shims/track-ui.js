@@ -351,7 +351,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 									}
 								});
 								trackDisplay.hide(baseData);
-								elem.unbind('.trackview');
+								elem.off('.trackview');
 							}
 						})
 					;

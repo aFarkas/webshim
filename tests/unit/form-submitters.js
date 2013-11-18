@@ -62,7 +62,7 @@
 	if (location.host.indexOf('github.com') == -1) {
 		asyncTest("mixed-test", function(){
 			var form = $('#form-buttons');
-			$('input.enctype-submit-test', form).click();
+			$('input.enctype-submit-test', form).trigger('click');
 			stop();
 			addTest = function(){
 				equals(results.target, 'originaltarget');
@@ -82,7 +82,7 @@
 	
 	asyncTest("target-dynamic-change-test", function(){
 		var form = $('#form-buttons');
-		$('input.target-image-test', form).removeAttr('formtarget').attr('formmethod', 'get').click();
+		$('input.target-image-test', form).removeAttr('formtarget').attr('formmethod', 'get').trigger('click');
 		stop();
 		addTest = function(){
 			equals(results.target, 'originaltarget');
@@ -100,7 +100,7 @@
 	if (location.host.indexOf('github.com') == -1) {
 		asyncTest("target-test", function(){
 			var form = $('#form-buttons');
-			$('input.target-image-test', form).click();
+			$('input.target-image-test', form).trigger('click');
 			stop();
 			addTest = function(){
 				equals(results.target, 'image-target');
@@ -119,7 +119,7 @@
 		
 		asyncTest("empty-test", function(){
 			var form = $('#form-buttons');
-			$('button.empty-test', form).click();
+			$('button.empty-test', form).trigger('click');
 			stop();
 			addTest = function(){
 				equals(results.target, 'originaltarget');
@@ -141,11 +141,11 @@
 			var submits = 0;
 			var invalids = 0;
 			var outsideInput = $('input[name="outside-1"]');
-			$('#form-buttons').bind('submit.testoutsidesubmit', function(){
+			$('#form-buttons').on('submit.testoutsidesubmit', function(){
 				submits++;
 				return false;
 			});
-			$('input[name="outside-1"]').bind('invalid.testoutsidesubmit', function(e){
+			$('input[name="outside-1"]').on('invalid.testoutsidesubmit', function(e){
 				invalids++;
 				return false;
 			});
@@ -161,16 +161,16 @@
 		asyncTest("form-attribute2", function(){
 			var submits = 0;
 			var invalids = 0;
-			$('#form-buttons').bind('submit.testoutsidesubmit', function(e){
+			$('#form-buttons').on('submit.testoutsidesubmit', function(e){
 				submits++;
 				e.preventDefault();
 			});
-			$('input[name="outside-1"]').bind('invalid.testoutsidesubmit', function(e){
+			$('input[name="outside-1"]').on('invalid.testoutsidesubmit', function(e){
 				invalids++;
 				e.preventDefault();
 			});
 			
-			$('button.outside-button').click();
+			$('button.outside-button').trigger('click');
 			stop();
 			setTimeout(function(){
 				ok(submits == 1, "click on outsidebutton submits form");
@@ -186,11 +186,11 @@
 		asyncTest("form-attribute3", function(){
 			var submits = 0;
 			var invalids = 0;
-			$('#form-buttons').bind('submit.testoutsidesubmit', function(){
+			$('#form-buttons').on('submit.testoutsidesubmit', function(){
 				submits++;
 				return false;
 			});
-			$('input[name="outside-1"]').bind('invalid.testoutsidesubmit', function(e){
+			$('input[name="outside-1"]').on('invalid.testoutsidesubmit', function(e){
 				invalids++;
 				return false;
 			});
@@ -198,7 +198,7 @@
 			
 			$('input[name="outside-1"]').prop('required', true);
 			ok(invalids === 0, "invalids are 0");
-			$('button.outside-button').click();
+			$('button.outside-button').trigger('click');
 			equals(submits, 0, "click on outsidebutton of invalid form does not submit");
 			equals(invalids, 1, "click on outsidebutton validates associated fields");
 			setTimeout(function(){
@@ -210,11 +210,11 @@
 			var form = $('#form-buttons');
 			
 			var submits = 0;
-			$('#form-buttons').bind('submit.testoutsidesubmit', function(){
+			$('#form-buttons').on('submit.testoutsidesubmit', function(){
 				submits++;
 			});
 			
-			$('input[name="outside-submit"]').click();
+			$('input[name="outside-submit"]').trigger('click');
 			ok(submits == 1, "click on outsidebutton submits form");
 			stop();
 			addTest = function(){

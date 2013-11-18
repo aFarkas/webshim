@@ -856,8 +856,11 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			
 			if(this._init && val == o.value && oVal == val){return;}
 			this.options.value = val;
-			this.thumb.stop();
-			this.range.stop();
+			
+			if($.fn.stop){
+				this.thumb.stop();
+				this.range.stop();
+			}
 			
 			rangeStyle[this.dirs.width] = left+'%';
 			if(this.vertical){
@@ -866,7 +869,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			thumbStyle[this.dirs.left] = left+'%';
 			
 			
-			if(!animate){
+			if(!animate || !$.fn.animate){
 				this.thumb.css(thumbStyle);
 				this.range.css(rangeStyle);
 			} else {
@@ -1155,9 +1158,9 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 				$(window).off('blur', removeWin);
 				if(!o.readonly && !o.disabled){
 					normalizeTouch(e);
-					that.element.focus();
+					that.element.trigger('focus');
 					that.addRemoveClass('ws-active', true);
-					leftOffset = that.element.focus().offset();
+					leftOffset = that.element.offset();
 					widgetUnits = that.element[that.dirs.innerWidth]();
 					if(!widgetUnits || !leftOffset){return;}
 					outerWidth = that.thumb[that.dirs.outerWidth]();
@@ -2098,7 +2101,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					setTimeout(function(){
 						if(that.popover){
 							that.popover.element.on('wspopoverhide', onBlur);
-							$('> *', that.popover.element)
+							that.popover.element
+								.children()
 								.on({
 									'focusin': onFocus,
 									'focusout': onBlur
@@ -2203,7 +2207,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				};
 				var mouseDownInit = function(){
 					if(!o.disabled && !isFocused){
-						that.element.getShadowFocusElement().focus();
+						that.element.getShadowFocusElement().trigger('focus');
 					}
 					preventBlur.set();
 					
@@ -2676,7 +2680,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			cancel: function(val, popover, data){
 				if(!data.options.inlinePicker){
 					popover.stopOpen = true;
-					data.element.getShadowFocusElement().focus();
+					data.element.getShadowFocusElement().trigger('focus');
 					setTimeout(function(){
 						popover.stopOpen = false;
 					}, 9);

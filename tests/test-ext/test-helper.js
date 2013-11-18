@@ -32,7 +32,6 @@
 			var elemSel = getElementSel(elem);
 			var attrValue = getAttrValue(value, type, name);
 			strictEqual(elem.prop(name), value, type+' - prop of '+ elemSel  +' is '+ name +': '+ value);
-			strictEqual(elem.attr(name), attrValue, type+' - attr of '+ elemSel  +' is '+ name +': '+ attrValue);
 		},
 		hasMethod: function(elem, methodName){
 			elem = $(elem);
