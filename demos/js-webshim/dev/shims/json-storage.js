@@ -11,7 +11,9 @@ if(!this.JSON){this.JSON={};}(function(){function f(n){return n<10?'0'+n:n;}if(t
 //using window.name for sessionStorage and cookies for localStorage
 
 (function () {
-var $ = webshims.$ || jQuery;	
+var $ = webshims.$ || jQuery;
+webshims.error("The json-storage is depreacated. IE8+ supports this feature. No one should need a polyfill anymore!");
+
 if ('localStorage' in window && 'sessionStorage' in window) {
 	$.webshims.isReady('json-storage', true);
 	return;

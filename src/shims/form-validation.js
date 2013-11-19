@@ -274,7 +274,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				}, 9);
 			}, 9);
 			
-			$(document).on('focusin'+this.eventns+' mousedown'+this.eventns, function(e){
+			$(document.body || document).on('focusin'+this.eventns+' mousedown'+this.eventns, function(e){
 				if(that.options.hideOnBlur && !that.stopBlur && !that.isInElement(that.lastElement[0] || document.body, e.target) && !that.isInElement(element[0] || document.body, e.target) && !that.isInElement(that.element[0], e.target)){
 					that.hide();
 				}
@@ -352,6 +352,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		clear: function(){
 			$(window).off(this.eventns);
 			$(document).off(this.eventns);
+			$(document.body).off(this.eventns);
 			this.element.off('transitionend'+this.eventns);
 			this.stopBlur = false;
 			this.lastOpts = false;
