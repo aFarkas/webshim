@@ -31,6 +31,7 @@ webshims.validityMessages.en = {
 	},
 	"stepMismatch": "Invalid input.",
 	"tooLong": "Please enter at most {%maxlength} character(s). You entered {%valueLen}.",
+	"tooShort": "Please enter at least {%minlength} character(s). You entered {%valueLen}.",
 	"patternMismatch": "Invalid input. {%title}",
 	"valueMissing": {
 		"defaultMessage": "Please fill out this field.",
@@ -44,18 +45,19 @@ webshims.formcfg.en = {
 		".": ".",
 		",": ","
 	},
-	"numberSigns": ".-",
+	"numberSigns": ".",
 	"dateSigns": "/",
 	"timeSigns": ":. ",
 	"dFormat": "/",
 	"patterns": {
 		"d": "mm/dd/yy"
 	},
+	"meridian": [
+		"AM",
+		"PM"
+	],
 	"month": {
 		"currentText": "This month"
-	},
-	"week": {
-		"currentText": "This week"
 	},
 	"time": {
 		"currentText": "Now"
@@ -103,8 +105,24 @@ webshims.formcfg.en = {
 			"Friday",
 			"Saturday"
 		],
-		"dayNamesShort": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-		"dayNamesMin": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+		"dayNamesShort": [
+			"Sun",
+			"Mon",
+			"Tue",
+			"Wed",
+			"Thu",
+			"Fri",
+			"Sat"
+		],
+		"dayNamesMin": [
+			"Su",
+			"Mo",
+			"Tu",
+			"We",
+			"Th",
+			"Fr",
+			"Sa"
+		],
 		"weekHeader": "Wk",
 		"firstDay": 0,
 		"isRTL": false,

@@ -165,10 +165,12 @@
 				return parseInt( Math.random() * ( max + 1 ), 10 );
 			};
 			var hash = location.hash.replace('#', '');
-			var langs = webshims.cfg.forms.availableLangs;
+			var langs = webshims.validationMessages.availableLangs;
 			
 //			webshims.cfg.debug = "noCombo";
 			$(window).on('load', function(){
+				webshims.activeLang('de');
+				webshims.activeLang(webshims.validationMessages);
 				webshims.activeLang(langs[ getRandom(langs.length) ]);
 				$.webshims.polyfill();
 			});

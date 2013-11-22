@@ -576,18 +576,7 @@
 		return (ret !== undefined) ? ret : this;
 	};
 	
-	//activeLang will be overridden
-
 	
-	//	set current Lang:
-	//		- webshims.activeLang(lang:string);
-	//	get current lang
-	//		- webshims.activeLang();
-	//		- webshims.activeLang({
-	//			module: moduleName:string,
-	//			callback: callback:function,
-	//			langObj: languageObj:array/object
-	//		});
 
 	webshims.activeLang = (function(){
 		var curLang = navigator.browserLanguage || navigator.language || '';
@@ -940,7 +929,6 @@
 		var modernizrInputTypes = Modernizr.inputtypes;
 		var formvalidation = 'formvalidation';
 		var fNuAPI = 'form-number-date-api';
-		var select = $('<select required=""><option disabled="" /></select>')[0];
 		var bustedValidity = false;
 		var bustedWidgetUi = false;
 		
@@ -973,7 +961,7 @@
 				}
 				
 				if(Modernizr[formvalidation]){
-					bustedWidgetUi = !Modernizr.fieldsetdisabled || !('value' in document.createElement('progress')) || !('value' in document.createElement('output')) || !('required' in select) || (select.validity || {}).valid;
+					bustedWidgetUi = !Modernizr.fieldsetdisabled || !('value' in document.createElement('progress')) || !('value' in document.createElement('output'));
 					bugs.bustedValidity = bustedValidity = window.opera || bustedWidgetUi || !modernizrInputAttrs.list;
 				}
 
@@ -989,8 +977,13 @@
 		}
 		document.createElement('datalist');
 				
-		webshims.formcfg = [];
-		webshims.validationMessages = webshims.validityMessages = [];
+		
+		webshims.validationMessages = webshims.validityMessages = {
+			langSrc: 'i18n/formcfg-', 
+			availableLangs: ['ar', 'ch-ZN', 'cs', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'lt', 'nl', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ru', 'sv']
+		};
+		webshims.formcfg = $.extend({}, webshims.validationMessages);
+		
 		webshims.inputTypes = {};
 				
 		addPolyfill('form-core', {
@@ -999,7 +992,6 @@
 			test: initialFormTest,
 			options: {
 				placeholderType: 'value',
-				langSrc: 'i18n/formcfg-',
 				messagePopover: {},
 				datalistPopover: {
 					constrainWidth: true
@@ -1011,8 +1003,7 @@
 //					,hideBubble: undefined,
 //					,fieldWrapper: undefined
 //					,fx: 'slide'
-				},
-				availableLangs: ['ar', 'ch-ZN', 'cs', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'lt', 'nl', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ru', 'sv'] //en and de are directly implemented in core
+				}
 	//			,customMessages: false,
 	//			overridePlaceholder: false, // might be good for IE10
 	//			replaceValidationUI: false
