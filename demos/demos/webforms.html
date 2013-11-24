@@ -133,7 +133,7 @@
 					<li><strong>Selectors</strong>: <a href="http://www.w3.org/TR/css3-ui/#pseudo-invalid">:invalid</a>, <a href="http://www.w3.org/TR/css3-ui/#pseudo-valid">:valid</a>, <a href="http://www.w3.org/TR/css3-ui/#pseudo-required">:required</a>, <a href="http://www.w3.org/TR/selectors4/#user-pseudos">:user-error</a> <!--, <a href="http://www.w3.org/TR/css3-ui/#pseudo-optional">:optional</a><span class="forms-ext-feature"><a href="http://www.w3.org/TR/css3-ui/#pseudo-in-range">, :in-range</a>, <a href="http://www.w3.org/TR/css3-ui/#pseudo-out-of-range">:out-of-range</a></span> -->(Not for CSS, only for JS, for CSS use selectors .user-sccuess, .user-error or [required] please look into the abstractions section)</li>
 				</ul>
 				<ul>
-					<li><small>1. You need to wrap the datalist options in a select element (datalist > select > option)! / datalist can be also switched to the <code>forms-ext</code> feature using the lightweightDatalist option.</small></li>
+					<li><small>1. You need to wrap the datalist options in a select element (datalist > select > option)!</li>
 				</ul>
 				
 				<h3>Options for the <code>forms</code> feature</h3>
@@ -146,7 +146,7 @@
 					<li><strong>overridePlaceholder</strong> (boolean): </li>
 					<li><strong>iVal</strong> (mixed options): options for the Instant/Live form validation feature (<a href="webforms/1-webforms-lang-custom-bubble.html#instant-validation">see</a>)</li>
 					<li><strong>addValidators</strong> (boolean): <code>false</code> (default) || <code>true</code>: Should Webshims implement some new custom validators. see: <a href="webforms/4-webforms-custom-validity.html">custom validity</a> </li>
-					<li><strong>listFilter</strong> (string): <code>*</code> (default) || <code>^</code> || <code>!</code>: How to search/filter insdie of a datalist. * (wildcard search), ^ (matches the beginning) or ! (no search at all). This option can be changed on the input[list] element itself, by using data-list-filter="^".</li>
+					<li><strong>list</strong> (options): <code>{}</code> (default): {filter: '*'|'^'|'!', highlight: false|true, focus: false|true, valueCompletion: false|true, multiple: false|true, position: {}}.</li>
 					<li><strong>fixRangeChange</strong> (boolean): <code>false</code> (default) || <code>true</code>: Wether or not to fix the change event on input[type="range"] especially in Chrome/Safari (input event fix for IE10/11 is always done).</li>
 				</ul>
 				
@@ -176,7 +176,6 @@
 					<li><strong>selectors for CSS: .prop-checked</strong>: which work equal to <a href="http://www.w3.org/TR/selectors4/#checked">:checked</a> pseudoclass. This class is only added, if the browser does not support the <code>:checked</code> pseudoclass (i.e. IE8-).</li>
 					<li><strong>property: customValidationMessage</strong>: very similar to the standard validationMessage, but always uses built-in custom validation messages, which can be better controlled. <strong>Note: You have to set <code>customMessages</code> to true before calling the <code>polyfill</code> method, to get this new property.</strong></li>
 					<li><strong>attribute: data-errormessage or -x-moz-errormessage</strong>: Attribute with text, which is used be custom validityAlert/customValidationMessage to show a custom error message for the field.</li>
-					<li><strong>attribute/class: mark-option-text</strong>: If an input[list] has the class <code>mark-option-text</code> the matched value/label string of the datalist options will be marked.</li>
 					<li><strong>helper method: $.webshims.validityAlert.showFor</strong>: takes a DOM-Object/Selector/jQuery-Object and shows the invalid message for this element. (simply look into the prototype i.e. <code>console.log($.webshims.validityAlert)</code> to make changes)</li>
 				</ul>
 								

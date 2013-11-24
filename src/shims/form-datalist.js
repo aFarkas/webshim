@@ -282,7 +282,9 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 			noAutoCallback: true,
 			options: $.extend(options, {shadowListProto: shadowListProto})
 		});
-		
+		if(!options.list){
+			options.list = {};
+		}
 		//init datalist update
 		initializeDatalist();
 	})();
