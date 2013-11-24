@@ -147,8 +147,8 @@
 				}
 				
 				$.each(features, function(i, feature){
-					if(DEBUG && !webshimsFeatures[feature]){
-						webshims.error("could not find webshims-feature (aborted): "+ feature);
+					if(!webshimsFeatures[feature]){
+						DEBUG && webshims.error("could not find webshims-feature (aborted): "+ feature);
 						isReady(feature, true);
 						return;
 					}
@@ -386,7 +386,7 @@
 					for (i = 0; i < list.length; i++) {
 						module = modules[list[i]];
 						if (!module || noNeedToLoad(module.name, list)) {
-							if (!module) {
+							if (DEBUG && !module) {
 								webshims.warn('could not find: ' + list[i]);
 							}
 							continue;
