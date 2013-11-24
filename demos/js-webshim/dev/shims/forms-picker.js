@@ -58,17 +58,352 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		this.setFocus(this.activeButton, this.opts.noFocus);
 	};
 	var formcfg = webshims.formcfg;
-	var curCfg = formcfg[$.webshims.activeLang()] || formcfg[''];
-	$.webshims.activeLang({
-		register: 'form-core', 
-		callback: function(){
-			$.each(arguments, function(i, val){
-				if(formcfg[val]){
-					curCfg = formcfg[val];
-					return false;
+	var curCfg = formcfg.__active || formcfg[''];
+	var stopPropagation = function(e){
+		e.stopImmediatePropagation();
+	};
+	var steps = options.steps;
+	
+	var mousePress = function(e){
+		$(this)[e.type == 'mousepressstart' ? 'addClass' : 'removeClass']('mousepress-ui');
+	};
+	
+	
+	var widgetProtos = {
+		_addBindings: function(){
+			var isFocused;
+			
+			var that = this;
+			var o = this.options;
+			
+			var eventTimer = (function(){
+				var events = {};
+				return {
+					init: function(name, curVal, fn){
+						if (!events[name]) {
+							events[name] = {
+								fn: fn
+							};
+							$(that.orig).on(name, function(){
+								events[name].val = $.prop(that.orig, 'value');
+							});
+						}
+						events[name].val = curVal;
+					},
+					call: function(name, val){
+						if (events[name] && events[name].val != val) {
+							clearTimeout(events[name].timer);
+							events[name].val = val;
+							events[name].timer = setTimeout(function(){
+								events[name].fn(val, that);
+							}, 9);
+						}
+					}
+				};
+			})();
+			var initChangeEvents = function(){
+				eventTimer.init('input', $.prop(that.orig, 'value'), that.options.input);
+				eventTimer.init('change', $.prop(that.orig, 'value'), that.options.change);
+			};
+			
+			var step = {};
+			
+			var preventBlur = function(e){
+				if (preventBlur.prevent) {
+					e.preventDefault();
+					(isFocused || that.element.getShadowFocusElement()).focus();
+					stopPropagation(e);
+					return true;
 				}
+			};
+			var callSplitChange = (function(){
+				var timer;
+				
+				var call = function(e){
+					var val;
+					clearTimeout(timer);
+					val = that.parseValue();
+					if (that.type == 'color') {
+						that.inputElements.val(val);
+					}
+					$.prop(that.orig, 'value', val);
+					eventTimer.call('input', val);
+					if (!e || e.type != 'wsupdatevalue') {
+						eventTimer.call('change', val);
+					}
+				};
+				
+				var onFocus = function(){
+					clearTimeout(timer);
+				};
+				var onBlur = function(e){
+					clearTimeout(timer);
+					timer = setTimeout(call, 0);
+					
+					if (e.type == 'ws__change') {
+						stopPropagation(e);
+						if (!o.splitInput) {
+							call();
+						}
+					}
+				};
+				
+				that.element.on('wsupdatevalue', call);
+				
+				that.inputElements.add(that.buttonWrapper).add(that.element).on({
+					'ws__focusin': onFocus,
+					'ws__blur ws__focusout ws__change': onBlur
+				});
+				setTimeout(function(){
+					if (that.popover) {
+						that.popover.element.on('wspopoverhide', onBlur);
+						that.popover.element.children().on({
+							'focusin': onFocus,
+							'focusout': onBlur
+						});
+					}
+				}, 0);
+			})();
+			
+			var spinEvents = {};
+			var spinElement = o.splitInput ? this.inputElements.filter('.ws-spin') : this.inputElements.eq(0);
+			var elementEvts = {
+				ws__blur: function(e){
+					if (!preventBlur(e) && !o.disabled && !o.readonly) {
+						if (!preventBlur.prevent) {
+							isFocused = false;
+						}
+					}
+					stopPropagation(e);
+				},
+				ws__focus: function(e){
+					if (!isFocused) {
+						initChangeEvents();
+						isFocused = this;
+					}
+				},
+				keypress: function(e){
+					if (e.isDefaultPrevented()) {
+						return;
+					}
+					var chr;
+					var stepped = true;
+					var code = e.keyCode;
+					if (!e.ctrlKey && !e.metaKey && curCfg[that.type + 'Signs']) {
+						chr = String.fromCharCode(e.charCode == null ? code : e.charCode);
+						stepped = !(chr < " " || (curCfg[that.type + 'Signs'] + '0123456789').indexOf(chr) > -1);
+					}
+					else {
+						stepped = false;
+					}
+					if (stepped) {
+						e.preventDefault();
+					}
+				},
+				ws__input: (this.type == 'color' && this.isValid) ? $.noop : (function(){
+					var timer;
+					var check = function(){
+						var val = that.parseValue(true);
+						if (val && that.isValid(val)) {
+							that.setInput(val);
+						}
+						
+					};
+					return function(){
+						clearTimeout(timer);
+						timer = setTimeout(check, 200);
+					};
+				})(),
+				'ws__input keydown keypress': (function(){
+					var timer;
+					var isStopped = false;
+					var releaseTab = function(){
+						if (isStopped === true) {
+							isStopped = 'semi';
+							timer = setTimeout(releaseTab, 250);
+						}
+						else {
+							isStopped = false;
+						}
+					};
+					var stopTab = function(){
+						isStopped = true;
+						clearTimeout(timer);
+						timer = setTimeout(releaseTab, 300);
+					};
+					var select = function(){
+						var elem = this;
+						setTimeout(function(){
+							elem.focus();
+							elem.select();
+						}, 4);
+						
+						stopTab();
+					};
+					
+					return function(e){
+						if (o.splitInput && o.jumpInputs) {
+							if (e.type == 'ws__input') {
+								if ($.prop(this, 'value').length === $.prop(this, 'maxLength')) {
+									try {
+										$(this).next().next('input, select').each(select);
+									} 
+									catch (er) {
+									}
+								}
+							}
+							else 
+								if (!e.shiftKey && !e.crtlKey && e.keyCode == 9 && (isStopped === true || (isStopped && !$.prop(this, 'value')))) {
+									e.preventDefault();
+								}
+						}
+					};
+				})()
+			};
+			var mouseDownInit = function(){
+				if (!o.disabled && !isFocused) {
+					that.element.getShadowFocusElement().trigger('focus');
+				}
+				preventBlur.set();
+				
+				return false;
+			};
+			
+			preventBlur.set = (function(){
+				var timer;
+				var reset = function(){
+					preventBlur.prevent = false;
+				};
+				return function(){
+					clearTimeout(timer);
+					preventBlur.prevent = true;
+					setTimeout(reset, 9);
+				};
+			})();
+			
+			
+			this.buttonWrapper.on('mousedown', mouseDownInit);
+			
+			this.setInput = function(value){
+				that.value(value);
+				eventTimer.call('input', value);
+			};
+			this.setChange = function(value){
+				that.setInput(value);
+				eventTimer.call('change', value);
+			};
+			
+			
+			
+			this.inputElements.on(elementEvts);
+			
+			if (steps[this.type]) {
+				['stepUp', 'stepDown'].forEach(function(name){
+					step[name] = function(factor){
+						if (!o.disabled && !o.readonly) {
+							if (!isFocused) {
+								mouseDownInit();
+							}
+							var ret = false;
+							if (!factor) {
+								factor = 1;
+							}
+							try {
+								that.elemHelper[name](factor);
+								
+								ret = that.elemHelper.prop('value');
+								
+							} 
+							catch (er) {
+								if (!o.value && that.maxAsNumber >= that.minAsNumber) {
+									ret = o.defValue;
+								}
+							}
+							if (ret !== false && o.value != ret) {
+								that.value(ret);
+								eventTimer.call('input', ret);
+							}
+							return ret;
+						}
+					};
+				});
+				if (!o.noSpinbtn) {
+					spinEvents[$.fn.mwheelIntent ? 'mwheelIntent' : 'mousewheel'] = function(e, delta){
+						if (delta && isFocused && !o.disabled) {
+							step[delta > 0 ? 'stepUp' : 'stepDown']();
+							e.preventDefault();
+						}
+					};
+					spinEvents.keydown = function(e){
+						if (o.list || e.isDefaultPrevented() || (e.altKey && e.keyCode == 40) || $.attr(this, 'list')) {
+							return;
+						}
+						var stepped = true;
+						var code = e.keyCode;
+						if (code == 38) {
+							step.stepUp();
+						}
+						else 
+							if (code == 40) {
+								step.stepDown();
+							}
+							else {
+								stepped = false;
+							}
+						if (stepped) {
+							e.preventDefault();
+						}
+					};
+					
+					spinElement.attr({
+						'autocomplete': 'off',
+						role: 'spinbutton'
+					}).on(spinEvents);
+				}
+				$(this.buttonWrapper).on('mousepressstart mousepressend', '.step-up, .step-down', mousePress).on('mousedown mousepress', '.step-up', function(e){
+					step.stepUp();
+				}).on('mousedown mousepress', '.step-down', function(e){
+					step.stepDown();
+				});
+				initChangeEvents();
+			}
+		},
+		initDataList: function(){
+			var listTimer;
+			var that = this;
+			var updateList = function(){
+				$(that.orig)
+					.jProp('list')
+					.off('updateDatalist', updateList)
+					.on('updateDatalist', updateList)
+				;
+				clearTimeout(listTimer);
+				listTimer = setTimeout(function(){
+					if(that.list){
+						that.list();
+					}
+				}, 9);
+				
+			};
+			
+			$(this.orig).onTrigger('listdatalistchange', updateList);
+		},
+		getOptions: function(){
+			var options = {};
+			var datalist = $(this.orig).jProp('list');
+			datalist.find('option').each(function(){
+				options[$.prop(this, 'value')] = $.prop(this, 'label');
 			});
+			return [options, datalist.data('label')];
 		}
+	};
+	
+	$.extend($.fn.wsBaseWidget.wsProto, widgetProtos);
+	$.extend($.fn.spinbtnUI.wsProto, widgetProtos);
+	
+	
+	$(formcfg).on('change', function(e, data){
+		curCfg = formcfg.__active;
 	});
 	
 	

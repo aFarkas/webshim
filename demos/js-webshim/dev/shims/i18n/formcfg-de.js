@@ -1,4 +1,3 @@
-//errormessages for de are already included in webshims core, this is only for information:
 webshims.validityMessages.de = {
 	"typeMismatch": {
 		"defaultMessage": "{%value} ist in diesem Feld nicht zulässig.",
@@ -30,6 +29,7 @@ webshims.validityMessages.de = {
 	},
 	"stepMismatch": "Der Wert {%value} ist in diesem Feld nicht zulässig. Hier sind nur bestimmte Werte zulässig. {%title}",
 	"tooLong": "Der eingegebene Text ist zu lang! Sie haben {%valueLen} Zeichen eingegeben, dabei sind {%maxlength} das Maximum.",
+	"tooShort": "Der eingegebene Text ist zu kurz! Sie haben {%valueLen} Zeichen eingegeben, dabei sind {%minlength} das Minimum.",
 	"patternMismatch": "{%value} hat für dieses Eingabefeld ein falsches Format. {%title}",
 	"valueMissing": {
 		"defaultMessage": "Bitte geben Sie einen Wert ein.",
@@ -40,43 +40,88 @@ webshims.validityMessages.de = {
 };
 
 webshims.formcfg.de = {
-	numberFormat: {
+	"numberFormat": {
 		",": ".",
 		".": ","
 	},
-	timeSigns: ":. ",
-	numberSigns: ',',
-	dateSigns: '.',
-	dFormat: ".",
-	patterns: {
-		d: "dd.mm.yy"
+	"timeSigns": ":. ",
+	"numberSigns": ",",
+	"dateSigns": ".",
+	"dFormat": ".",
+	"patterns": {
+		"d": "dd.mm.yy"
 	},
-	month:  {
-		currentText: 'Aktueller Monat'
+	"month": {
+		"currentText": "Aktueller Monat"
 	},
-	time:  {
-		currentText: 'Jetzt'
+	"time": {
+		"currentText": "Jetzt"
 	},
-	"week": {
-		"currentText": "Aktuelle Woche"
-	},
-	date: {
-		close: 'schließen',
-		clear: 'Löschen',
-		prevText: 'zurück',
-		nextText: 'Vor',
-		currentText: 'heute',
-		monthNames: ['Januar','Februar','März','April','Mai','Juni',
-		'Juli','August','September','Oktober','November','Dezember'],
-		monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun',
-		'Jul','Aug','Sep','Okt','Nov','Dez'],
-		dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
-		dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-		dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-		weekHeader: 'KW',
-		firstDay: 1,
-		isRTL: false,
-		showMonthAfterYear: false,
-		yearSuffix: ''
+	"date": {
+		"close": "schließen",
+		"clear": "Löschen",
+		"prevText": "Zurück",
+		"nextText": "Vor",
+		"currentText": "Heute",
+		"monthNames": [
+			"Januar",
+			"Februar",
+			"März",
+			"April",
+			"Mai",
+			"Juni",
+			"Juli",
+			"August",
+			"September",
+			"Oktober",
+			"November",
+			"Dezember"
+		],
+		"monthNamesShort": [
+			"Jan",
+			"Feb",
+			"Mär",
+			"Apr",
+			"Mai",
+			"Jun",
+			"Jul",
+			"Aug",
+			"Sep",
+			"Okt",
+			"Nov",
+			"Dez"
+		],
+		"dayNames": [
+			"Sonntag",
+			"Montag",
+			"Dienstag",
+			"Mittwoch",
+			"Donnerstag",
+			"Freitag",
+			"Samstag"
+		],
+		"dayNamesShort": [
+			"So",
+			"Mo",
+			"Di",
+			"Mi",
+			"Do",
+			"Fr",
+			"Sa"
+		],
+		"dayNamesMin": [
+			"So",
+			"Mo",
+			"Di",
+			"Mi",
+			"Do",
+			"Fr",
+			"Sa"
+		],
+		"weekHeader": "KW",
+		"firstDay": 1,
+		"isRTL": false,
+		"showMonthAfterYear": false,
+		"yearSuffix": ""
 	}
 };

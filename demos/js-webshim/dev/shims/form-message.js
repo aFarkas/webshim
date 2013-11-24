@@ -30,6 +30,7 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 		},
 		stepMismatch: 'Invalid input.',
 		tooLong: 'Please enter at most {%maxlength} character(s). You entered {%valueLen}.',
+		tooShort: 'Please enter at least {%minlength} character(s). You entered {%valueLen}.',
 		patternMismatch: 'Invalid input. {%title}',
 		valueMissing: {
 			defaultMessage: 'Please fill out this field.',
@@ -86,6 +87,7 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 		},
 		stepMismatch: 'Der Wert {%value} ist in diesem Feld nicht zulässig. Hier sind nur bestimmte Werte zulässig. {%title}',
 		tooLong: 'Der eingegebene Text ist zu lang! Sie haben {%valueLen} Zeichen eingegeben, dabei sind {%maxlength} das Maximum.',
+		tooShort: 'Der eingegebene Text ist zu kurz! Sie haben {%valueLen} Zeichen eingegeben, dabei sind {%minlength} das Minimum.',
 		patternMismatch: '{%value} hat für dieses Eingabefeld ein falsches Format. {%title}',
 		valueMissing: {
 			defaultMessage: 'Bitte geben Sie einen Wert ein.',
@@ -137,7 +139,7 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 			webshims.info('could not find errormessage for: '+ name +' / '+ type +'. in language: '+webshims.activeLang());
 		}
 		if(message){
-			['value', 'min', 'max', 'title', 'maxlength', 'label'].forEach(function(attr){
+			['value', 'min', 'max', 'title', 'maxlength', 'minlength', 'label'].forEach(function(attr){
 				if(message.indexOf('{%'+attr) === -1){return;}
 				var val = ((attr == 'label') ? $.trim($('label[for="'+ elem.id +'"]', elem.form).text()).replace(/\*$|:$/, '') : $.prop(elem, attr)) || '';
 				if(name == 'patternMismatch' && attr == 'title' && !val){
@@ -167,20 +169,10 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 		implementProperties.push('validationMessage');
 	}
 	
-	webshims.activeLang({
-		langObj: validityMessages, 
-		module: 'form-core',
-		callback: function(langObj){
-			currentValidationMessage = langObj;
-		}
-	});
-	webshims.activeLang({
-		register: 'form-core',
-		callback: function(val){
-			if(validityMessages[val]){
-				currentValidationMessage = validityMessages[val];
-			}
-		}
+	currentValidationMessage = webshims.activeLang(validityMessages);
+		
+	$(validityMessages).on('change', function(e, data){
+		currentValidationMessage = validityMessages.__active;
 	});
 	
 	implementProperties.forEach(function(messageProp){

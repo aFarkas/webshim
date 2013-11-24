@@ -931,7 +931,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	};
 	
 	$.extend(webshims, {
-
 		getID: (function(){
 			var ID = new Date().getTime();
 			return function(elem){
@@ -1406,109 +1405,67 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			}
 		},
 		
-//		set current Lang:
-//			- webshims.activeLang(lang:string);
-//		get current lang
-//			- webshims.activeLang();
-//		get current lang
-//			webshims.activeLang({
-//				register: moduleName:string,
-//				callback: callback:function
-//			});
-//		get/set including remoteLang
-//			- webshims.activeLang({
-//				module: moduleName:string,
-//				callback: callback:function,
-//				langObj: languageObj:array/object
-//			});
 		activeLang: (function(){
-			var callbacks = [];
-			var registeredCallbacks = {};
-			var currentLang;
-			var shortLang;
-			var notLocal = /:\/\/|^\.*\//;
-			var loadRemoteLang = function(data, lang, options){
-				var langSrc;
-				if(lang && options && $.inArray(lang, options.availableLangs || options.availabeLangs || []) !== -1){
-					data.loading = true;
-					langSrc = options.langSrc;
-					if(!notLocal.test(langSrc)){
-						langSrc = webshims.cfg.basePath+langSrc;
-					}
-					webshims.loader.loadScript(langSrc+lang+'.js', function(){
-						if(data.langObj[lang]){
-							data.loading = false;
-							callLang(data, true);
-						} else {
-							$(function(){
-								if(data.langObj[lang]){
-									callLang(data, true);
-								}
-								data.loading = false;
+			var curLang = [];
+			var langDatas = [];
+			var loading = {};
+			var load = function(src, obj, loadingLang){
+				obj._isLoading = true;
+				if(loading[src]){
+					loading[src].push(obj);
+				} else {
+					loading[src] = [obj];
+					webshims.loader.loadScript(src, function(){
+						if(loadingLang == curLang.join()){
+							$.each(loading[src], function(i, obj){
+								select(obj);
 							});
 						}
-					});
-					return true;
-				}
-				return false;
-			};
-			var callRegister = function(module){
-				if(registeredCallbacks[module]){
-					registeredCallbacks[module].forEach(function(data){
-						data.callback(currentLang, shortLang, '');
+						delete loading[src];
 					});
 				}
 			};
-			var callLang = function(data, _noLoop){
-				if(data.activeLang != currentLang && data.activeLang !== shortLang){
-					var options = modules[data.module].options;
-					if( data.langObj[currentLang] || (shortLang && data.langObj[shortLang]) ){
-						data.activeLang = currentLang;
-						data.callback(data.langObj[currentLang] || data.langObj[shortLang], currentLang);
-						callRegister(data.module);
-					} else if( !_noLoop &&
-						!loadRemoteLang(data, currentLang, options) && 
-						!loadRemoteLang(data, shortLang, options) && 
-						data.langObj[''] && data.activeLang !== '' ) {
-						data.activeLang = '';
-						data.callback(data.langObj[''], currentLang);
-						callRegister(data.module);
+			var select = function(obj){
+				var oldLang = obj.__active;
+				var selectLang = function(i, lang){
+					obj._isLoading = false;
+					if(obj[lang] || obj.availableLangs.indexOf(lang) != -1){
+						if(obj[lang]){
+							obj.__active = obj[lang];
+						} else {
+							load(obj.langSrc+lang, obj, curLang.join());
+						}
+						return false;
 					}
+				};
+				$.each(curLang, selectLang);
+				if(!obj.__active){
+					obj.__active = obj[''];
+				}
+				if(oldLang != obj.__active){
+					$(obj).trigger('change');
 				}
 			};
-			
-			
-			var activeLang = function(lang){
-				
-				if(typeof lang == 'string' && lang !== currentLang){
-					currentLang = lang;
-					shortLang = currentLang.split('-')[0];
-					if(currentLang == shortLang){
-						shortLang = false;
+			return function(lang){
+				var shortLang;
+				if(typeof lang == 'string'){
+					if(curLang[0] != lang){
+						curLang = [lang];
+						shortLang = curLang[0].split('-')[0];
+						if(shortLang && shortLang != lang){
+							curLang.push(shortLang);
+						}
+						langDatas.forEach(select);
 					}
-					$.each(callbacks, function(i, data){
-						callLang(data);
-					});
 				} else if(typeof lang == 'object'){
-					
-					if(lang.register){
-						if(!registeredCallbacks[lang.register]){
-							registeredCallbacks[lang.register] = [];
-						}
-						registeredCallbacks[lang.register].push(lang);
-						lang.callback(currentLang, shortLang, '');
-					} else {
-						if(!lang.activeLang){
-							lang.activeLang = '';
-						}
-						callbacks.push(lang);
-						callLang(lang);
+					if(!lang.__active){
+						langDatas.push(lang);
+						select(lang);
 					}
+					return lang.__active;
 				}
-				return currentLang;
+				return curLang[0];
 			};
-			
-			return activeLang;
 		})()
 	});
 	
@@ -2101,7 +2058,9 @@ webshims.register('form-datalist', function($, webshims, window, document, undef
 			noAutoCallback: true,
 			options: $.extend(options, {shadowListProto: shadowListProto})
 		});
-		
+		if(!options.list){
+			options.list = {};
+		}
 		//init datalist update
 		initializeDatalist();
 	})();

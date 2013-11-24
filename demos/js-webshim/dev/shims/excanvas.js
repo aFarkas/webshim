@@ -920,5 +920,20 @@ if (!document.createElement('canvas').getContext) {
   CanvasPattern = CanvasPattern_;
 
 })();
-
+(function(document){
+webshims.addReady(function(context, elem){
+	if(context == document){
+		if(window.G_vmlCanvasManager && G_vmlCanvasManager.init_ ){
+			G_vmlCanvasManager.init_(document);
+		}
+	}
+	$('canvas', context).add(elem.filter('canvas')).each(function(){
+		var hasContext = this.getContext;
+		if(!hasContext && window.G_vmlCanvasManager){
+			G_vmlCanvasManager.initElement(this);
+		}
+	});
+});
+webshims.isReady('canvas', true);
+})(document);
 } // if

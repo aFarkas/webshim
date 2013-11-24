@@ -4,7 +4,6 @@ webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
 var cfg = webshims.cfg.forms;
 var bugs = webshims.bugs;
-var isSubmit;
 
 var isNumber = function(string){
 		return (typeof string == 'number' || (string && string == string * 1));
@@ -79,6 +78,7 @@ var validityPrototype = {
 	rangeOverflow: false,
 	stepMismatch: false,
 	tooLong: false,
+	tooShort: false,
 	patternMismatch: false,
 	valueMissing: false,
 	
@@ -115,6 +115,9 @@ var getGroupElements = function(elem){
 	}
 	return ret;
 };
+var patternTypes = {url: 1, email: 1, text: 1, search: 1, tel: 1, password: 1};
+var lengthTypes = $.extend({textarea: 1}, patternTypes);
+
 var validityRules = {
 		valueMissing: function(input, val, cache){
 			if(!input.prop('required')){return false;}
@@ -131,11 +134,12 @@ var validityRules = {
 			}
 			return ret;
 		},
-		tooLong: function(){
-			return false;
-		},
 		patternMismatch: function(input, val, cache) {
 			if(val === '' || cache.nodeName == 'select'){return false;}
+			if(!('type' in cache)){
+				cache.type = getType(input[0]);
+			}
+			if(!patternTypes[cache.type]){return false;}
 			var pattern = input.attr('pattern');
 			if(!pattern){return false;}
 			try {
@@ -149,6 +153,20 @@ var validityRules = {
 		}
 	}
 ;
+
+$.each({tooShort: ['minLength', -1], tooLong: ['maxLength', 1]}, function(name, props){
+	validityRules[name] = function(input, val, cache){
+		//defaultValue is not the same as dirty flag, but very similiar
+		if(cache.nodeName == 'select' || input.prop('defaultValue') == val){return false;}
+		if(!('type' in cache)){
+			cache.type = getType(input[0]);
+		}
+		if(!lengthTypes[cache.type]){return false;}
+		var prop = input.prop(props[0]);
+		
+		return ( prop > 0 && prop * props[1] < val.length * props[1] );
+	}
+})
 
 $.each({typeMismatch: 'mismatch', badInput: 'bad'}, function(name, fn){
 	validityRules[name] = function (input, val, cache){
@@ -200,15 +218,12 @@ $.event.special.invalid = {
 		
 		if( e.type != 'submit' || e.testedValidity || !e.originalEvent || !$.nodeName(e.target, 'form') || $.prop(e.target, 'noValidate') ){return;}
 		
-		isSubmit = true;
 		e.testedValidity = true;
-		var notValid = !($(e.target).checkValidity());
+		var notValid = !($(e.target).callProp('reportValidity'));
 		if(notValid){
 			e.stopImmediatePropagation();
-			isSubmit = false;
 			return false;
 		}
-		isSubmit = false;
 	}
 };
 
@@ -275,6 +290,9 @@ webshims.defineNodeNamesProperties(['button', 'fieldset', 'output'], {
 	checkValidity: {
 		value: function(){return true;}
 	},
+	reportValidity: {
+		value: function(){return true;}
+	},
 	willValidate: {
 		value: false
 	},
@@ -289,7 +307,7 @@ webshims.defineNodeNamesProperties(['button', 'fieldset', 'output'], {
 	}
 }, 'prop');
 
-var baseCheckValidity = function(elem){
+var baseCheckValidity = function(elem, type){
 	var e,
 		v = $.prop(elem, 'validity')
 	;
@@ -301,7 +319,7 @@ var baseCheckValidity = function(elem){
 	if( !v.valid ){
 		e = $.Event('invalid');
 		var jElm = $(elem).trigger(e);
-		if(isSubmit && !baseCheckValidity.unhandledInvalids && !e.isDefaultPrevented()){
+		if(type == 'reportValidity' && !baseCheckValidity.unhandledInvalids && !e.isDefaultPrevented()){
 			webshims.validityAlert.showFor(jElm);
 			baseCheckValidity.unhandledInvalids = true;
 		}
@@ -310,36 +328,33 @@ var baseCheckValidity = function(elem){
 	return v.valid;
 };
 var rsubmittable = /^(?:select|textarea|input)/i;
-webshims.defineNodeNameProperty('form', 'checkValidity', {
-	prop: {
-		value: function(){
-			
-			var ret = true,
-				elems = $($.prop(this, 'elements')).filter(function(){
-					if(!rsubmittable.test(this.nodeName)){return false;}
-					var shadowData = webshims.data(this, 'shadowData');
-					return !shadowData || !shadowData.nativeElement || shadowData.nativeElement === this;
-				})
-			;
-			
-			baseCheckValidity.unhandledInvalids = false;
-			for(var i = 0, len = elems.length; i < len; i++){
-				if( !baseCheckValidity(elems[i]) ){
-					ret = false;
+
+['checkValidity', 'reportValidity'].forEach(function(name){
+	webshims.defineNodeNameProperty('form', name, {
+		prop: {
+			value: function(){
+				
+				var ret = true,
+					elems = $($.prop(this, 'elements')).filter(function(){
+						if(!rsubmittable.test(this.nodeName)){return false;}
+						var shadowData = webshims.data(this, 'shadowData');
+						return !shadowData || !shadowData.nativeElement || shadowData.nativeElement === this;
+					})
+				;
+				
+				baseCheckValidity.unhandledInvalids = false;
+				for(var i = 0, len = elems.length; i < len; i++){
+					if( !baseCheckValidity(elems[i], name) ){
+						ret = false;
+					}
 				}
+				return ret;
 			}
-			return ret;
 		}
-	}
+	});
 });
 
-webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
-	checkValidity: {
-		value: function(){
-			baseCheckValidity.unhandledInvalids = false;
-			return baseCheckValidity($(this).getNativeElement()[0]);
-		}
-	},
+var inputValidationAPI = {
 	setCustomValidity: {
 		value: function(error){
 			$.removeData(this, 'cachedValidity');
@@ -358,7 +373,6 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 			;
 			return function(){
 				var elem = $(this).getNativeElement()[0];
-				//elem.name && <- we don't use to make it easier for developers
 				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] );
 			};
 		})()
@@ -398,7 +412,19 @@ webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
 			return validityState;
 		}
 	}
-}, 'prop');
+};
+
+['checkValidity', 'reportValidity'].forEach(function(name){
+	inputValidationAPI[name] = {
+		value: function(){
+			baseCheckValidity.unhandledInvalids = false;
+			return baseCheckValidity($(this).getNativeElement()[0], name);
+		}
+	}
+});
+
+
+webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], inputValidationAPI, 'prop');
 
 webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
 	set: function(value){
@@ -450,6 +476,22 @@ webshims.defineNodeNameProperty('form', 'noValidate', {
 		}
 	}
 });
+
+webshims.defineNodeNamesProperty(['input', 'textarea'], 'minLength', {
+		prop: {
+			set: function(val){
+				val *= 1;
+				if(val < 0){
+					throw('INDEX_SIZE_ERR');
+				}
+				this.setAttribute('minlength', val || 0);
+			},
+			get: function(){
+				var val = this.getAttribute('minlength');
+				return val == null ? -1 : (val * 1) || 0;
+			}
+		}
+})
 
 if(Modernizr.inputtypes.date && /webkit/i.test(navigator.userAgent)){
 	(function(){
