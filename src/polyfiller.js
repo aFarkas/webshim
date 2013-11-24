@@ -9,6 +9,9 @@
 	}
 }(function($){
 	"use strict";
+	if (typeof DEBUG === 'undefined') {
+		window.DEBUG = true;
+	}
 	var DOMSUPPORT = 'dom-support';
 	var jScripts = $(document.scripts || 'script');
 	var special = $.event.special;
@@ -36,6 +39,7 @@
 			loadStyles: true,
 			disableShivMethods: true,
 			wspopover: {appendTo: 'auto', hideOnBlur: true},
+			ajax: {cache: true, crossDomain: true},
 			basePath: (function(){
 				var script = jScripts.filter('[src*="polyfiller.js"]');
 				var path;
@@ -78,10 +82,10 @@
 			}
 			
 			if(webshimsFeatures[feature].failedM){
-				cfg.test = function(){
+				cfg.test = DEBUG ? function(){
 					webshims.error('webshims needs Modernizr.'+webshimsFeatures[feature].failedM + ' to implement feature: '+ feature);
 					return true;
-				};
+				} : true;
 			}
 			webshimsFeatures[feature].push(name);
 			cfg.options = $.extend(webCFG[feature], cfg.options);
@@ -98,71 +102,41 @@
 			return function(features){
 				if(!features){
 					features = webshims.featureList;
-					webshims.warn('loading all features without specifing might be bad for performance');
+					DEBUG && webshims.warn('loading all features without specifing might be bad for performance');
 				}
 					
 				if (typeof features == 'string') {
 					features = features.split(' ');
 				}
 				
-				for(var i = 0; i < features.length; i++){
-					if(loaded[features[i]]){
-						webshims.error(features[i] +' already loaded, you might want to use updatePolyfill instead? see: bit.ly/12BtXX3');
+				if(DEBUG){
+					for(var i = 0; i < features.length; i++){
+						if(loaded[features[i]]){
+							webshims.error(features[i] +' already loaded, you might want to use updatePolyfill instead? see: bit.ly/12BtXX3');
+						}
+						loaded[features[i]] = true;
 					}
-					loaded[features[i]] = true;
 				}
 				return webshims._polyfill(features);
 			};
 		})(),
 		_polyfill: (function(){
-			var firstPolyfillCall = function(features){
-				var addClass = [];
-				var onReadyEvts = features;
-				var timer;
-				
-				if(webCFG.disableShivMethods){
-					html5.shivMethods = false;
-				}
-				
-				var removeLoader = function(){
-					$('html').removeClass('loading-polyfills long-loading-polyfills');
-					$(window).off('.lP');
-					clearTimeout(timer);
-				};
-				
-				
-				
-				addClass.push('loading-polyfills');
-				timer = setTimeout(function(){
-					$('html').addClass('long-loading-polyfills');
-					timer = setTimeout(removeLoader, 300);
-				}, 300);
-				$(window).on('load.lP error.lP', removeLoader);
-				
-				if (webCFG.waitReady && $.isReady) {
-					webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
-				}
-				onReady(features, removeLoader);
-				if (addClass[0]) {
-					$('html').addClass(addClass.join(' '));
-				}
-				if(webCFG.loadStyles){
-					loader.loadCSS('styles/shim.css');
-				}
-				//remove function
-				firstPolyfillCall = $.noop;
-			};
+			
 			var loadedFormBase;
 			return function(features){
 				
 				var toLoadFeatures = [];
 				
-				if(!loadedFormBase){
+				if(DEBUG && !loadedFormBase){
 					loadedFormBase = $.inArray('forms', features) !== -1;
 					if(!loadedFormBase && $.inArray('forms-ext', features) !== -1){
-						features.push('forms');
+						webshims.error('need to load forms feature to use forms-ext feature.');
 						loadedFormBase = true;
 					}
+				}
+				
+				if (DEBUG && webCFG.waitReady && $.isReady) {
+					webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
 				}
 				
 				if (webCFG.waitReady) {
@@ -173,7 +147,7 @@
 				}
 				
 				$.each(features, function(i, feature){
-					if(!webshimsFeatures[feature]){
+					if(DEBUG && !webshimsFeatures[feature]){
 						webshims.error("could not find webshims-feature (aborted): "+ feature);
 						isReady(feature, true);
 						return;
@@ -185,8 +159,9 @@
 					}
 					toLoadFeatures = toLoadFeatures.concat(webshimsFeatures[feature]);
 				});
-				
-				firstPolyfillCall(features);
+				if(webCFG.loadStyles){
+					loader.loadCSS('styles/shim.css');
+				}
 				loadList(toLoadFeatures);
 				
 			};
@@ -416,7 +391,7 @@
 							}
 							continue;
 						}
-						if (module.css) {
+						if (module.css && webCFG.loadStyles) {
 							loader.loadCSS(module.css);
 						}
 						
@@ -461,14 +436,14 @@
 			},
 			
 			loadCSS: (function(){
-				var parent, loadedSrcs = [];
+				var parent, loadedSrcs = {};
 				return function(src){
 					src = this.makePath(src);
-					if ($.inArray(src, loadedSrcs) != -1) {
+					if (loadedSrcs[src]) {
 						return;
 					}
 					parent = parent || $('link, style')[0] || $('script')[0];
-					loadedSrcs.push(src);
+					loadedSrcs[src] = 1;
 					$('<link rel="stylesheet" />').insertBefore(parent).attr({
 						href: src
 					});
@@ -476,15 +451,14 @@
 			})(),
 			
 			loadScript: (function(){
-				var loadedSrcs = [];
+				var loadedSrcs = {};
 				var scriptLoader;
 				return function(src, callback, name){
 				
 					src = loader.makePath(src);
-					if ($.inArray(src, loadedSrcs) != -1) {return;}
+					if (loadedSrcs[src]) {return;}
 					var complete = function(){
 						
-						complete = null;
 						if (callback) {
 							callback();
 						}
@@ -506,16 +480,17 @@
 						}
 					};
 					
-					loadedSrcs.push(src);
+					loadedSrcs[src] = 1;
+					
 					if(window.require && window.define && window.define.amd){
 						require([src], complete);
 					} else if (window.sssl) {
 						sssl(src, complete);
 					} else if (window.yepnope) {
 						yepnope.injectJs(src, complete);
-					} else if (window.steal) {
-						steal(src).then(complete);
-					} 
+					} else {
+						$.ajax($.extend({}, webCFG.ajax, {url: src, success: complete, dataType: 'script'}));
+					}
 				};
 			})()
 		}
@@ -541,6 +516,10 @@
 		warn: 1,
 		error: 1
 	};
+	
+	if(DEBUG){
+		webCFG.debug = true;
+	}
 	
 	webshims.addMethodName = function(name){
 		name = name.split(':');
@@ -611,10 +590,24 @@
 			}
 		};
 	});
-		
 	
-	//Overwrite DOM-Ready and implement a new ready-method
+	/*
+	 * jQuery-plugins for triggering dom updates can be also very usefull in conjunction with non-HTML5 DOM-Changes (AJAX)
+	 * Example:
+	 * $.webshims.addReady(function(context, insertedElement){
+	 * 		$('div.tabs', context).add(insertedElement.filter('div.tabs')).tabs();
+	 * });
+	 * 
+	 * $.ajax({
+	 * 		success: function(html){
+	 * 			$('#main').htmlPolyfill(html);
+	 * 		}
+	 * });
+	 */
+	
 	(function(){
+		
+		//Overwrite DOM-Ready and implement a new ready-method
 		$.isDOMReady = $.isReady;
 		var onReady = function(){
 			$.isDOMReady = true;
@@ -644,23 +637,7 @@
 				isReady('WINDOWLOAD', true);
 			}, 9);
 		});
-	})();
-	
-	/*
-	 * jQuery-plugins for triggering dom updates can be also very usefull in conjunction with non-HTML5 DOM-Changes (AJAX)
-	 * Example:
-	 * $.webshims.addReady(function(context, insertedElement){
-	 * 		$('div.tabs', context).add(insertedElement.filter('div.tabs')).tabs();
-	 * });
-	 * 
-	 * $.ajax({
-	 * 		success: function(html){
-	 * 			$('#main').htmlPolyfill(html);
-	 * 		}
-	 * });
-	 */
-	
-	(function(){
+		
 		var readyFns = [];
 		var eachTrigger = function(){
 			if(this.nodeType == 1){
@@ -702,7 +679,7 @@
 		};
 		
 		$.fn.jProp = function(){
-			return $($.fn.prop.apply(this, arguments) || []);
+			return this.pushStack($($.fn.prop.apply(this, arguments) || []));
 		};
 		
 		$.each(['after', 'before', 'append', 'prepend', 'replaceWith'], function(i, name){
@@ -864,7 +841,6 @@
 	
 	//<canvas
 	(function(){
-		var flashCanvas;
 		addPolyfill('canvas', {
 			src: 'excanvas',
 			test: Modernizr.canvas,
@@ -873,45 +849,9 @@
 			
 			loadInit: function(){
 				var type = this.options.type;
-				var src;
 				if(type && type.indexOf('flash') !== -1 && (!modules.swfmini.test() || swfmini.hasFlashPlayerVersion('9.0.0'))){
-					window.FlashCanvasOptions = window.FlashCanvasOptions || {};
-					flashCanvas = FlashCanvasOptions;
-					if(type == 'flash'){
-						$.extend(flashCanvas, {
-							swfPath: webCFG.basePath + 'FlashCanvas/'
-						});
-						this.src = 'FlashCanvas/flashcanvas';
-						src = flashCanvas.swfPath + 'flashcanvas.swf';
-					} else {
-						$.extend(flashCanvas, {swfPath: webCFG.basePath + 'FlashCanvasPro/'});
-						this.src = 'FlashCanvasPro/flashcanvas';
-						//assume, that the user has flash10+
-						src = flashCanvas.swfPath + 'flash10canvas.swf';
-					}
-					//todo: implement cachbuster for flashcanvas
-//					if(webCFG.addCacheBuster){
-//						src += webCFG.addCacheBuster;
-//					}
+					this.src = type == 'flash' ? 'FlashCanvas/flashcanvas' : 'FlashCanvasPro/flashcanvas';
 				}
-			},
-			afterLoad: function(){
-				webshims.addReady(function(context, elem){
-					if(context == document){
-						if(window.G_vmlCanvasManager && G_vmlCanvasManager.init_ ){
-							G_vmlCanvasManager.init_(document);
-						}
-					}
-					$('canvas', context).add(elem.filter('canvas')).each(function(){
-						var hasContext = this.getContext;
-						if(!hasContext && window.G_vmlCanvasManager){
-							G_vmlCanvasManager.initElement(this);
-						}
-					});
-					if(context == document){
-						isReady('canvas', true);
-					}
-				});
 			},
 			methodNames: ['getContext'],
 			d: [DOMSUPPORT],
@@ -993,8 +933,10 @@
 			options: {
 				placeholderType: 'value',
 				messagePopover: {},
-				datalistPopover: {
-					constrainWidth: true
+				list: {
+					popover: {
+						constrainWidth: true
+					}
 				},
 				iVal: {
 					handleBubble: true,
@@ -1260,5 +1202,6 @@
 			webshims.polyfill(asyncWebshims.polyfill);
 		}
 	}
+	
 	return webshims;
 }));
