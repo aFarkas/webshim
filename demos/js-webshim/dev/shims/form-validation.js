@@ -1,4 +1,5 @@
 webshims.register('form-validation', function($, webshims, window, document, undefined, options){
+	
 	var isWebkit = 'webkitURL' in window;
 	var chromeBugs = isWebkit && Modernizr.formvalidation && !webshims.bugs.bustedValidity;
 	var webkitVersion = chromeBugs && parseFloat((navigator.userAgent.match(/Safari\/([\d\.]+)/) || ['', '999999'])[1], 10);

@@ -1941,8 +1941,8 @@ $.each({tooShort: ['minLength', -1], tooLong: ['maxLength', 1]}, function(name, 
 		var prop = input.prop(props[0]);
 		
 		return ( prop > 0 && prop * props[1] < val.length * props[1] );
-	}
-})
+	};
+});
 
 $.each({typeMismatch: 'mismatch', badInput: 'bad'}, function(name, fn){
 	validityRules[name] = function (input, val, cache){
@@ -2130,77 +2130,84 @@ var rsubmittable = /^(?:select|textarea|input)/i;
 	});
 });
 
-var inputValidationAPI = {
-	setCustomValidity: {
-		value: function(error){
-			$.removeData(this, 'cachedValidity');
-			webshims.data(this, 'customvalidationMessage', ''+error);
-		}
-	},
-	willValidate: {
-		writeable: false,
-		get: (function(){
-			var types = {
-					button: 1,
-					reset: 1,
-					hidden: 1,
-					image: 1
+
+
+
+['input', 'textarea', 'select'].forEach(function(nodeName){
+	var inputValidationAPI = {
+		setCustomValidity: {
+			value: function(error){
+				$.removeData(this, 'cachedValidity');
+				webshims.data(this, 'customvalidationMessage', ''+error);
+				if(bugs.bustedValidity && inputValidationAPI.setCustomValidity.prop._supvalue){
+					inputValidationAPI.setCustomValidity.prop._supvalue.apply(this, arguments);
 				}
-			;
-			return function(){
-				var elem = $(this).getNativeElement()[0];
-				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] );
-			};
-		})()
-	},
-	validity: {
-		writeable: false,
-		get: function(){
-			var jElm = $(this).getNativeElement();
-			var elem = jElm[0];
-			var validityState = $.data(elem, 'cachedValidity');
-			if(validityState){
-				return validityState;
 			}
-			validityState 	= $.extend({}, validityPrototype);
-			
-			if( !$.prop(elem, 'willValidate') || elem.type == 'submit' ){
-				return validityState;
-			}
-			var val 	= jElm.val(),
-				cache 	= {nodeName: elem.nodeName.toLowerCase()}
-			;
-			
-			validityState.customError = !!(webshims.data(elem, 'customvalidationMessage'));
-			if( validityState.customError ){
-				validityState.valid = false;
-			}
-							
-			$.each(validityRules, function(rule, fn){
-				if (fn(jElm, val, cache)) {
-					validityState[rule] = true;
+		},
+		willValidate: {
+			writeable: false,
+			get: (function(){
+				var types = {
+						button: 1,
+						reset: 1,
+						hidden: 1,
+						image: 1
+					}
+				;
+				return function(){
+					var elem = $(this).getNativeElement()[0];
+					return !!(!elem.disabled && !elem.readOnly && !types[elem.type] );
+				};
+			})()
+		},
+		validity: {
+			writeable: false,
+			get: function(){
+				var jElm = $(this).getNativeElement();
+				var elem = jElm[0];
+				var validityState = $.data(elem, 'cachedValidity');
+				if(validityState){
+					return validityState;
+				}
+				validityState 	= $.extend({}, validityPrototype);
+				
+				if( !$.prop(elem, 'willValidate') || elem.type == 'submit' ){
+					return validityState;
+				}
+				var val 	= jElm.val(),
+					cache 	= {nodeName: elem.nodeName.toLowerCase()}
+				;
+				
+				validityState.customError = !!(webshims.data(elem, 'customvalidationMessage'));
+				if( validityState.customError ){
 					validityState.valid = false;
 				}
-			});
-			$(this).getShadowFocusElement().attr('aria-invalid',  validityState.valid ? 'false' : 'true');
-			jElm = null;
-			elem = null;
-			return validityState;
+								
+				$.each(validityRules, function(rule, fn){
+					if (fn(jElm, val, cache)) {
+						validityState[rule] = true;
+						validityState.valid = false;
+					}
+				});
+				$(this).getShadowFocusElement().attr('aria-invalid',  validityState.valid ? 'false' : 'true');
+				jElm = null;
+				elem = null;
+				return validityState;
+			}
 		}
-	}
-};
-
-['checkValidity', 'reportValidity'].forEach(function(name){
-	inputValidationAPI[name] = {
-		value: function(){
-			baseCheckValidity.unhandledInvalids = false;
-			return baseCheckValidity($(this).getNativeElement()[0], name);
+	};
+	
+	['checkValidity', 'reportValidity'].forEach(function(name){
+		inputValidationAPI[name] = {
+			value: function(){
+				baseCheckValidity.unhandledInvalids = false;
+				return baseCheckValidity($(this).getNativeElement()[0], name);
+			}
 		}
-	}
+	});
+	webshims.defineNodeNameProperties(nodeName, inputValidationAPI, 'prop');
 });
 
-
-webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], inputValidationAPI, 'prop');
 
 webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
 	set: function(value){
@@ -2210,7 +2217,7 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 });
 webshims.defineNodeNamesBooleanProperty(['input'], 'multiple');
 
-if(webshims.bugs.bustedValidity){
+if(bugs.bustedValidity){
 	
 	webshims.defineNodeNameProperty('form', 'novalidate', {
 		attr: {
