@@ -49,7 +49,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 	
 	var formsExtModule = webshims.modules['form-number-date-api'];
 	var overrideValidity = formsExtModule.loaded && !formsExtModule.test();
-	var validityProps = ['customError', 'badInput','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong','patternMismatch','valueMissing','valid'];
+	var validityProps = ['customError', 'badInput','typeMismatch','rangeUnderflow','rangeOverflow','stepMismatch','tooLong', 'tooShort','patternMismatch','valueMissing','valid'];
 	
 	var validityChanger = ['value'];
 	var validityElements = [];
@@ -107,7 +107,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 						}
 						var validityState = {};
 						validityProps.forEach(function(prop){
-							validityState[prop] = validity[prop];
+							validityState[prop] = validity[prop] || false;
 						});
 						
 						if( !$.prop(elem, 'willValidate') ){
