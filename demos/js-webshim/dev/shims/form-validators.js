@@ -49,19 +49,28 @@ webshims.register('form-validators', function($, webshims, window, document, und
 		var message = '';
 		var setMessage = function(message, errorType){
 			blockCustom = true;
-			data.customMismatchedRule = message ?  errorType : '';
 			
-			if(typeof message != 'string'){
-				message = $(elem).data('errormessage') || elem.getAttribute('x-moz-errormessage'); 
+			
+			if(message){
+				data.customMismatchedRule = errorType;
+				
+				if(typeof message != 'string'){
+					message = webshims.getContentValidationMessage(elem, false, errorType); 
+					
+					if(message && typeof message == 'object'){
+						message = message[errorType];
+					}
+					
+					if(!message || typeof message != 'string'){
+						message = webshims.customErrorMessages[errorType][webshims.activeLang()] || webshims.customErrorMessages[errorType]['']  || message.customError || message.defaultMessage || '';
+					}
+				}
+			} else {
+				message = '';
+				data.customMismatchedRule = '';
 			}
 			
-			if(message && typeof message == 'object'){
-				message = message[errorType];
-			}
 			
-			if(typeof message != 'string'){
-				message = webshims.customErrorMessages[errorType][webshims.activeLang()] || webshims.customErrorMessages[errorType]['']  || message.customError || message.defaultMessage || '';
-			}
 			
 			$(elem).setCustomValidity(message);
 			blockCustom = false;
@@ -75,7 +84,7 @@ webshims.register('form-validators', function($, webshims, window, document, und
 					return false;
 				}
 			});
-			if(message != 'async'){
+			if(message != 'async' && (message || !validity.valid)){
 				setMessage(message, customMismatchedRule);
 			}
 		}

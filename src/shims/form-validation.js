@@ -561,6 +561,12 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				}
 			};
 		})(),
+		initIvalContentMessage: function(elem){
+			var form = $(elem).jProp('form');
+			if(form.is(options.iVal.sel)){
+				this.get(elem);
+			}
+		},
 		get: function(elem, fieldWrapper){
 			if(!fieldWrapper){
 				fieldWrapper = this.getFieldWrapper(elem);

@@ -624,6 +624,9 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	
 	
 	webshims.getContentValidationMessage = function(elem, validity, key){
+		if(webshims.errorbox && webshims.errorbox.initIvalContentMessage){
+			webshims.errorbox.initIvalContentMessage(elem);
+		}
 		var message = $(elem).data('errormessage') || elem.getAttribute('x-moz-errormessage') || '';
 		if(key && message[key]){
 			message = message[key];
