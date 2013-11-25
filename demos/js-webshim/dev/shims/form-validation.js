@@ -295,7 +295,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					if(!appendElement && !invalidParent.test(parent.nodeName)){
 						appendElement = parent;
 					} 
-					if(appendElement && $.style(parent, 'overflow') == 'hidden' && $.style(parent, 'position') != 'static'){
+					if(appendElement && $.css(parent, 'overflow') == 'hidden' && $.css(parent, 'position') != 'static'){
 						appendElement = false;
 					}
 				}

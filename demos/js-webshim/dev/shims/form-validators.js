@@ -52,12 +52,17 @@ webshims.register('form-validators', function($, webshims, window, document, und
 			data.customMismatchedRule = message ?  errorType : '';
 			
 			if(typeof message != 'string'){
-				message = $(elem).data('errormessage') || elem.getAttribute('x-moz-errormessage') || webshims.customErrorMessages[errorType][webshims.activeLang()] || webshims.customErrorMessages[errorType]['']; 
+				message = $(elem).data('errormessage') || elem.getAttribute('x-moz-errormessage'); 
 			}
 			
-			if(typeof message == 'object'){
-				message = message[errorType] || message.customError || message.defaultMessage;
+			if(message && typeof message == 'object'){
+				message = message[errorType];
 			}
+			
+			if(typeof message != 'string'){
+				message = webshims.customErrorMessages[errorType][webshims.activeLang()] || webshims.customErrorMessages[errorType]['']  || message.customError || message.defaultMessage || '';
+			}
+			
 			$(elem).setCustomValidity(message);
 			blockCustom = false;
 		};
