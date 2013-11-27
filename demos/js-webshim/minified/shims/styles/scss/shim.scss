@@ -253,21 +253,25 @@ output {
 	position: relative;
 	opacity: 0;
 	padding: 11px 0 4px;
+	-webkit-transform: translate(0, -100%);
 	transform: translate(0, -100%);
 	transition: all 400ms ease-in-out;
 	
 	[data-vertical="bottom"] & {
+	  -webkit-transform: translate(0, 100%);
 		transform: translate(0, 100%);
 		padding: 4px 0 11px;
 	}
 	
 	[data-vertical="middle"] & {
-		transform: translate(0, 0) scale(0);
+	  -webkit-transform: translate(0, 0) scale(0.3);
+		transform: translate(0, 0) scale(0.3);
 		padding: 4px 0;
 	}
 
 	.ws-popover.ws-po-visible & {
 		opacity: 1;
+		-webkit-transform: translate(0, 0) scale(1);
 		transform: translate(0, 0) scale(1);
 	}
 }

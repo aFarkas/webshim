@@ -206,20 +206,24 @@ output {
   position: relative;
   opacity: 0;
   padding: 11px 0 4px;
+  -webkit-transform: translate(0, -100%);
   transform: translate(0, -100%);
   transition: all 400ms ease-in-out; }
   [data-vertical="bottom"] .ws-po-outerbox {
+    -webkit-transform: translate(0, 100%);
     transform: translate(0, 100%);
     padding: 4px 0 11px; }
   [data-vertical="middle"] .ws-po-outerbox {
-    transform: translate(0, 0) scale(0);
+    -webkit-transform: translate(0, 0) scale(0.3);
+    transform: translate(0, 0) scale(0.3);
     padding: 4px 0; }
   .ws-popover.ws-po-visible .ws-po-outerbox {
     opacity: 1;
+    -webkit-transform: translate(0, 0) scale(1);
     transform: translate(0, 0) scale(1); }
 
 .ws-po-box {
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   background: #fefefe;
   padding: 5px;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); }
@@ -254,7 +258,7 @@ output {
   height: 0;
   border-left: 9px solid transparent;
   border-right: 9px solid transparent;
-  border-bottom: 7px solid #cccccc;
+  border-bottom: 7px solid #ccc;
   border-top: none;
   zoom: 1;
   font-size: 0; }
@@ -268,7 +272,7 @@ output {
     top: auto;
     bottom: 4px;
     border-bottom: none;
-    border-top: 7px solid #cccccc; }
+    border-top: 7px solid #ccc; }
   html .ws-po-arrow {
     border-left-color: transparent;
     border-right-color: transparent; }
@@ -389,7 +393,7 @@ progress {
   height: 16px; }
   progress[data-position] {
     vertical-align: -0.2em;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     background: #e6e6e6; }
   progress > * {
     display: none !important; }
@@ -443,5 +447,5 @@ summary {
     background-position: 0 -20px; }
 
 summary.summary-has-focus {
-  outline: 1px dotted #aaaaaa;
+  outline: 1px dotted #aaa;
   outline-offset: -1px; }
