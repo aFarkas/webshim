@@ -111,7 +111,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			var preventBlur = function(e){
 				if (preventBlur.prevent) {
 					e.preventDefault();
-					(isFocused || that.element.getShadowFocusElement()).focus();
+					(isFocused || that.element.getShadowFocusElement()).trigger('focus');
 					stopPropagation(e);
 					return true;
 				}

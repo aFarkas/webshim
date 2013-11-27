@@ -2333,7 +2333,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					})
 					.on({
 						'change input focus focusin blur focusout': function(e){
-							stopPropagation(e);
 							$(e.target).trigger('ws__'+e.type);
 						}
 					})
@@ -2752,9 +2751,12 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		
 		picker._common = function(data){
 			var options = data.options;
-			var popover = webshims.objectCreate(options.inlinePicker ? webshims.inlinePopover : webshims.wsPopover, {}, {prepareFor: options.inlinePicker ? data.buttonWrapper : data.element, position: options.widgetPosition});
+			var popover = webshims.objectCreate(options.inlinePicker ? webshims.inlinePopover : webshims.wsPopover, {}, $.extend(options.popover || {}, {prepareFor: options.inlinePicker ? data.buttonWrapper : data.element}));
 			var opener = $('<button type="button" class="ws-popover-opener"><span /></button>').appendTo(data.buttonWrapper);
 			
+			if(options.widgetPosition){
+				webshims.error('options.widgetPosition was removed use options.popover.position instead');
+			}
 			
 			var showPickerContent = function(){
 				(picker[data.type].showPickerContent || picker.showPickerContent)(data, popover);
@@ -3258,8 +3260,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 							opts.splitInput = false;
 						}
 						var markup = opts.splitInput ?
-								'<span class="ws-'+name+' ws-input" role="group"></span>' :
-								'<input class="ws-'+name+'" type="text" />';
+								'<span class="ws-'+name+' ws-input ws-inputreplace" role="group"></span>' :
+								'<input class="ws-'+name+' ws-inputreplace" type="text" />';
 						var data = $(markup).insertAfter(opts.orig);
 						if(steps[name]){
 							data = data.spinbtnUI(opts).data('wsWidget'+name);

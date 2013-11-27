@@ -4,118 +4,128 @@
 <head>
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />
-	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-	<script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.js"></script>
+	
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0-rc.1/jquery.mobile-1.4.0-rc.1.min.css">
+	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+	
+	<!-- jQM: add jQM before webshim's polyfiller.js -->
+	<script src="http://code.jquery.com/mobile/1.4.0-rc.1/jquery.mobile-1.4.0-rc.1.js"></script>
 	
 	<script src="../../demo-js/src/modernizr-special.js"></script>
 	
 	
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
 	
-	
-	<!--
-		<script src="../../../src/polyfiller.js"></script> 
-		<script>
-			webshims.setOptions('debug', 'noCombo');
-			//style calendar, datalist, validation bubble
-			//$('html').on('wspopoverbeforehide', false);
-		</script>
-	-->
-
+	<!-- jQM: make some small style adjustments -->
 	<style>
-		
-		input,
-		select,
-		textarea {
-			box-shadow: none;
-		}
-		
-		.ws-invalid .ui-input-text.ui-focus, .ui-input-search.ui-focus {
-			box-shadow: 0 0 12px #BE7B38;
-		}
-		
 		.ui-field-contain .ws-errorbox {
 			margin-left: 22%;
 		}
-		
-		.ws-invalid label {
-			color: #f00;
+		.ui-slider-input + input + .input-buttons {
+			float: left;
+			margin-top: 6px;
+		}
+		.ui-slider-input + input:focus {
+			box-shadow: 0 0 12px #3388CC;
 		}
 		
-		
-		
-		/* some button style changes for webshims + jQ mobile */
-		.input-buttons .ui-btn {
-			display: inline-block;
+		.ws-invalid .ui-shadow-inset {
+			box-shadow: 0 1px 3px rgba(255, 0, 0, 0.2) inset;
 		}
 		
-		.ui-input-text .input-buttons.date-input-buttons,
-		.ui-input-text .input-buttons.month-input-buttons {
-			margin-left: -30px;
+		.ws-invalid .ui-shadow {
+			box-shadow: 0 1px 3px rgba(255, 0, 0, 0.15);
 		}
 		
-		.ui-input-text .date-input-buttons .step-controls,
-		.ui-input-text .month-input-buttons .step-controls {
-			display: none !important;
+		.ws-invalid .ui-btn {
+			border-color: #fdd;
 		}
 		
-		.ui-input-text .input-buttons .step-controls {
-			margin-top: 2px;
-		}
-		
-		.ui-input-text .input-buttons .ui-btn-inner {
-			display: none;
-		}
-		
-		.ui-input-text .input-buttons .ws-popover-opener {
-			position: relative;
-			width: 22px;
-			height: 22px;
-		}
-		
-		
-		/* or simply hide buttons */
-		/*
-		.ui-input-text .date-input-buttons,
-		.ui-input-text .month-input-buttons {
-			display: none !important;
-		}
-		*/
 	</style>
-	<script src="../../demo-js/src/jqm-ws-compat.js"></script>
-	
-	<script src="../../demo-js/src/jquery.ui.position.js"></script>
+	 	
+	<script src="../../demo-js/src/jquery.ui.position.js" async></script>
 	<script>
+		(function(){
+			var assumeMobile = Modernizr.mq('(max-device-width: 768px)') || (Modernizr.touch && Modernizr.mq('(max-device-width: 124px)'));
+			
+			//jQM: set waitReady to false
+			webshims.setOptions('waitReady', false);
+			
+			webshims.setOptions('forms', {
+				//configure instantvalidation for jQuery mobile
+				iVal: {
+					fieldWrapper: '[data-role="fieldcontain"]',
+					handleBubble: true // 'hide' || false || true
+				}
+			});
+			
+			webshims.setOptions('forms-ext', {
+				//only use custom widgets if we do not see some mobile aspects
+				replaceUI: !assumeMobile,
+				types: 'range date time number month',
+				widgets: {
+					//buttonOnly: true,
+					openOnFocus: true,
+					popover: {
+						position: {
+							my: 'center',
+							at: 'center'
+						}
+					}
+				}
+			});
+		})();
 		
-		webshims.setOptions('forms', {
-			//configure instantvalidation for jQuery mobile
-			iVal: {
-				fieldWrapper: '[data-role="fieldcontain"]',
-				handleBubble: true // 'hide' || false || true
-			}
-		});
-		
-		webshims.setOptions('forms-ext', {
-			//only use custom widgets if we see some mobile aspects
-			replaceUI: !hasMobileAspect(),
-			types: 'range date time number month',
-			widgets: {
-				calculateWidth: false, //handle clalculations through CSS (good for responsive pferformance)
-				buttonOnly: true,
-				widgetPosition: {
-					my: 'center',
-					at: 'center'
+		//jQM: helper methods to register mobile widgets (especially select|[type="radio"][type="checkbox"]) to webshims
+		var webshimsJQM = {
+			select: function(context){
+				$('select:not(.ui-select-nativeonly)', context).each(function(){
+					var data = $(this).data('mobileSelectmenu');
+					if(data && data.button){
+						var focusElement = data.options.nativeMenu ? this : data.button;
+						webshimsJQM.loadAdd(this, data.button, {shadowFocusElement: focusElement});
+					}
+				});
+			},
+			checkboxRadio: function(context){
+				$('input[type="radio"], input[type="checkbox"]', context).each(function(){
+					var data = $(this).data('mobileCheckboxradio');
+					if(data && data.label){
+						webshimsJQM.loadAdd(this, data.label, {shadowFocusElement: this});
+					}
+				});
+			},
+			update: function(context){
+				webshimsJQM.select(context);
+				webshimsJQM.checkboxRadio(context);
+			},
+			loadAdd: function(){
+				var args;
+				if(!webshims.isReady('dom-support')){
+					args = arguments;
+					webshims.polyfill('dom-support');
+					webshims.ready('dom-support', function(){
+						webshims.addShadowDom.apply(webshims, args);
+					});
+				} else {
+					webshims.addShadowDom.apply(webshims, arguments);
 				}
 			}
+		};
+		
+		
+		//jQM: update polyfills on pageinit
+		$(document).on('pageinit', function(e){
+			$(e.target).updatePolyfill();
+			
+			//jQM: register jQM widgets to webshims
+			webshimsJQM.update(e.target);
 		});
 		
-		//update polyfills before jQ mobile kicks in, but only handle this after normal DOM ready
-		jQuery(function($){
-			$(document).on('pagebeforecreate', function(e){
-				$(e.target).updatePolyfill();
-			});
-		});
+		
+		
+		
+		
 		
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
@@ -135,7 +145,7 @@
 			
 		</div> 
 		<div data-role="content">
-			<p>Webshims and jQuery mobile do a lot of tricks with form elements, which often conflict with each other. This page including the <a href="../../demo-js/src/jqm-ws-compat.js" data-ajax="false">jqm-ws-compat.js script</a> document how to combine both scripts.</p>
+			<p>Webshims and jQuery mobile do a lot of tricks with form elements, which often conflict with each other. This page demonstrates how both libaries can be combined. Please read the source code and watch out for comments marked with <code>JQM:</code>.</p>
 			<form action="jquery-mobile.html" class="ws-instantvalidation">
 				<div data-role="fieldcontain">
 					<label for="textinput1">
@@ -162,11 +172,16 @@
 					<input name="" id="textinput4" value="" type="month" required="required">
 				</div>
 				<div data-role="fieldcontain">
+					<label for="number">
+						number
+					</label>
+					<input id="number" name="number" value="50" min="0" max="100" type="number">
+				</div>
+				<div data-role="fieldcontain">
 					<label for="slider1">
 						Value
 					</label>
-					<input id="slider1" name="slider" value="50" min="0" max="100" data-highlight="false"
-					type="range">
+					<input id="slider1" name="slider" value="50" min="0" max="100" data-highlight="false" type="range">
 				</div>
 				<div data-role="fieldcontain">
 					<label for="selectmenu1">

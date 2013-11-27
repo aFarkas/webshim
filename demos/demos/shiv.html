@@ -74,14 +74,14 @@ $('#my-dynamic-container').load('ajax/test.html', function(){
 			<h4>jQuery mobile example</h4>
 			
 <code class="block">
+//jQuery mobile before webshims polyfiller.js! and set waitReady to false
+$.webshims.setOptions('waitReady', false);
 //call webshims.polyfill() before domready
 $.webshims.polyfill();
-$(function(){
-	//bind to the pageinit event after domready...
-	$(document).on('pagebeforecreate', function(e){
-		//...and call updatePolyfill on the changed element container
-		$(e.target).updatePolyfill();
-	});
+//bind to the pageinit event after domready...
+$(document).on('pageinit', function(e){
+	//...and call updatePolyfill on the changed element container
+	$(e.target).updatePolyfill();
 });
 </code>	
 			<p>For jQuery Mobile see also <a href="webforms/jquery-mobile.html">webshims and jQ mobile</a></p>
