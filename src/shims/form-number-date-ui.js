@@ -679,7 +679,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					})
 					.on({
 						'change input focus focusin blur focusout': function(e){
-							stopPropagation(e);
 							$(e.target).trigger('ws__'+e.type);
 						}
 					})
@@ -1604,8 +1603,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 							opts.splitInput = false;
 						}
 						var markup = opts.splitInput ?
-								'<span class="ws-'+name+' ws-input" role="group"></span>' :
-								'<input class="ws-'+name+'" type="text" />';
+								'<span class="ws-'+name+' ws-input ws-inputreplace" role="group"></span>' :
+								'<input class="ws-'+name+' ws-inputreplace" type="text" />';
 						var data = $(markup).insertAfter(opts.orig);
 						if(steps[name]){
 							data = data.spinbtnUI(opts).data('wsWidget'+name);
