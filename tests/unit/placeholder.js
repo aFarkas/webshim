@@ -2,6 +2,7 @@
 	
 //Todo test textarea + \n
 module("placeholder");
+var visibleStyle = $('<div style="display: inline-block" />').css('display');
 var placeholder = {
 	isApplied: function(elem, state){
 		if(Modernizr.input.placeholder) {return;}
@@ -14,7 +15,7 @@ var placeholder = {
 		if(Modernizr.input.placeholder) {return;}
 		var parent = $(elem).parent();
 		equals(parent.hasClass('placeholder-visible'), state, 'placeholder visible class');
-		equals(parent.find('.placeholder-text').css('display'), state ? 'inline-block' : 'none', 'placeholder-text is applied');
+		equals(parent.find('.placeholder-text').css('display'), state ? visibleStyle : 'none', 'placeholder-text is applied');
 	},
 	hasText: function(elem, text){
 		if(Modernizr.input.placeholder) {return;}

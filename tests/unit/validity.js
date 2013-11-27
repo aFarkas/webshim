@@ -92,35 +92,7 @@ asyncTest("general validity Modul", function(){
 	}
 		
 	//validityState
-	//what is the problem here?
-	if(navigator.userAgent.indexOf('Chrome') === -1){
-		same($('#email').prop('validity'), {
-			typeMismatch: false,
-			badInput: false,
-			rangeUnderflow: false,
-			rangeOverflow: false,
-			stepMismatch: false,
-			tooLong: false,
-			patternMismatch: false,
-			valueMissing: true,
-			customError: false,
-			valid: false
-		}, 'email required');
-		
-		$('#email').val('some input');
-		same($('#email').prop('validity'), {
-			typeMismatch: true,
-			badInput: false,
-			rangeUnderflow: false,
-			rangeOverflow: false,
-			stepMismatch: false,
-			tooLong: false,
-			patternMismatch: false,
-			valueMissing: false,
-			customError: false,
-			valid: false
-		}, 'email required');
-	}
+	
 	$('#email').val('some input');
 	ok($('#email').prop('validity').typeMismatch, 'typeMismatch is true for email and value: some input');
 	

@@ -927,7 +927,7 @@ webshims.addReady(function(context, elem){
 			G_vmlCanvasManager.init_(document);
 		}
 	}
-	$('canvas', context).add(elem.filter('canvas')).each(function(){
+	webshims.$('canvas', context).add(elem.filter('canvas')).each(function(){
 		var hasContext = this.getContext;
 		if(!hasContext && window.G_vmlCanvasManager){
 			G_vmlCanvasManager.initElement(this);
