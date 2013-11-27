@@ -14,6 +14,19 @@ module.exports = function(grunt){
 		//copy and uglify are changed through cfgcopymin
 		copy: {},
 		cssmin: getFiles('src', 'demos/js-webshim/minified', '**/*.css'),
+
+		sass: { 
+			dist: { 
+				files:[{
+					expand : true,
+					cwd : 'src/shims/styles/scss',
+					src : ['*.scss'],
+					dest : 'src/shims/styles/',
+					ext : '.css'
+				}]
+			}
+		},
+
 		uglify: {
 			options: {
 				beautify: {
@@ -21,15 +34,25 @@ module.exports = function(grunt){
 				},
 				compress: {
 				global_defs: {
-					"DEBUG": false
+					"WSDEBUG": false
 				},
 					dead_code: true
 				}
 			}			  
 		},
 		watch: {
-			files: 'src/shims/styles/shim.css',
-			tasks: 'css'
+			sass: {
+		      files: ['src/shims/styles/scss/*.scss'],
+		      tasks: ['sass']
+		   },
+		   css: {
+		      files: ['src/shims/**/*.css'],
+		      tasks: ['cfgcopymin', 'copy']
+		   },
+		   js: {
+		      files: ['src/**/*.js'],
+		      tasks: ['webshimscombos', 'concat', 'cfgcopymin', 'copy']
+		   }
 		}
 	});
 	
@@ -110,10 +133,11 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-css');
-	grunt.registerTask('default', ['webshimscombos', 'concat', 'cfgcopymin', 'copy', 'cssmin', 'uglify']);
+	grunt.loadNpmTasks('grunt-contrib-sass');
+	
+	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy', 'cssmin', 'uglify']);
 
-	grunt.registerTask('css', ['cfgcopymin', 'copy']);
-
+	grunt.registerTask('dev', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy', 'watch']);
 
 
 	function getFiles(srcdir, destdir, wildcard, compareDir, compareMatch) {

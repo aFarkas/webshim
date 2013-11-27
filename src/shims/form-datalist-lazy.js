@@ -34,7 +34,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			
 			this._updateOptions();
 			
-			this.popover = webshims.objectCreate(webshims.wsPopover, {}, options.popover);
+			this.popover = webshims.objectCreate(webshims.wsPopover, {}, this.options.popover);
 			this.shadowList = this.popover.element.addClass('datalist-polyfill');
 			
 			
@@ -179,14 +179,24 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 		_updateOptions: function(){
 			this.options = $.extend(true, {}, options.list, $(this.input).data('list') || {});
 			
+			
 			if($(this.input).prop('multiple') && $(this.input).prop('type') == 'email'){
 				this.options.multiple = true;
+			}
+			
+			if( this.options.getOptionContent && !$.isFunction(this.options.getOptionContent) ){
+				this.options.getOptionContent = false;	
+			}
+			
+			//depreacated option settings:
+			if(options.getOptionContent){
+				webshims.error('getOptionContent is depreacated use $(input).on("getoptioncontent")');
 			}
 			
 			if($(this.input).hasClass('list-focus')){
 				webshims.error(".list-focus is depreacated. Use focus option.");
 			}
-			//depreacated option settings:
+			
 			if(options.datalistPopover && !this.options.popover){
 				this.options.popover = options.datalistPopover;
 				webshims.error("datalistPopover is depreacated. Use popover option.");
@@ -234,7 +244,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 				rElem = rOptions[rI];
 				if(!rElem.disabled && (value = $(rElem).val())){
 					rItem = {
-						value: value.replace(lReg, '&lt;').replace(gReg, '&gt;'),
+						value: this.options.noHtmlEscape ? value : value.replace(lReg, '&lt;').replace(gReg, '&gt;'),
 						label: $.trim($.attr(rElem, 'label')) || '',
 						className: rElem.className || '',
 						elem: options.getOptionContent ? rElem : null
@@ -276,11 +286,9 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 		},
 		getOptionContent: function(item){
 			var content;
-			if(options.getOptionContent){
-				content = options.getOptionContent.apply(this, arguments);
-				if(content != null){
-					content += '<span class="option-value" style="display: none;">'+ item.value +'</span>'
-				}
+			var args = [{instance: this, item: item}];
+			if( ( content = $(this.input).triggerHandler('getoptioncontent', args) || (this.options.getOptionContent && this.options.getOptionContent.apply(this.input, args)) ) && content.indexOf && content.indexOf('option-value') == -1 ){
+				content += '<span class="option-value" style="display: none;">'+ item.value +'</span>';
 			} 
 			if(content == null){
 				content = '<span class="option-value">'+ item.value +'</span>';

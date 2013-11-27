@@ -9,8 +9,8 @@
 	}
 }(function($){
 	"use strict";
-	if (typeof DEBUG === 'undefined') {
-		window.DEBUG = true;
+	if (typeof WSDEBUG === 'undefined') {
+		window.WSDEBUG = true;
 	}
 	var DOMSUPPORT = 'dom-support';
 	var jScripts = $(document.scripts || 'script');
@@ -82,7 +82,7 @@
 			}
 			
 			if(webshimsFeatures[feature].failedM){
-				cfg.test = DEBUG ? function(){
+				cfg.test = WSDEBUG ? function(){
 					webshims.error('webshims needs Modernizr.'+webshimsFeatures[feature].failedM + ' to implement feature: '+ feature);
 					return true;
 				} : true;
@@ -102,14 +102,14 @@
 			return function(features){
 				if(!features){
 					features = webshims.featureList;
-					DEBUG && webshims.warn('loading all features without specifing might be bad for performance');
+					WSDEBUG && webshims.warn('loading all features without specifing might be bad for performance');
 				}
 					
 				if (typeof features == 'string') {
 					features = features.split(' ');
 				}
 				
-				if(DEBUG){
+				if(WSDEBUG){
 					for(var i = 0; i < features.length; i++){
 						if(loaded[features[i]]){
 							webshims.error(features[i] +' already loaded, you might want to use updatePolyfill instead? see: bit.ly/12BtXX3');
@@ -127,7 +127,7 @@
 				
 				var toLoadFeatures = [];
 				
-				if(DEBUG && !loadedFormBase){
+				if(WSDEBUG && !loadedFormBase){
 					loadedFormBase = $.inArray('forms', features) !== -1;
 					if(!loadedFormBase && $.inArray('forms-ext', features) !== -1){
 						webshims.error('need to load forms feature to use forms-ext feature.');
@@ -135,7 +135,7 @@
 					}
 				}
 				
-				if (DEBUG && webCFG.waitReady && $.isReady) {
+				if (WSDEBUG && webCFG.waitReady && $.isReady) {
 					webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
 				}
 				
@@ -148,7 +148,7 @@
 				
 				$.each(features, function(i, feature){
 					if(!webshimsFeatures[feature]){
-						DEBUG && webshims.error("could not find webshims-feature (aborted): "+ feature);
+						WSDEBUG && webshims.error("could not find webshims-feature (aborted): "+ feature);
 						isReady(feature, true);
 						return;
 					}
@@ -386,7 +386,7 @@
 					for (i = 0; i < list.length; i++) {
 						module = modules[list[i]];
 						if (!module || noNeedToLoad(module.name, list)) {
-							if (DEBUG && !module) {
+							if (WSDEBUG && !module) {
 								webshims.warn('could not find: ' + list[i]);
 							}
 							continue;
@@ -517,9 +517,6 @@
 		error: 1
 	};
 	
-	if(DEBUG){
-		webCFG.debug = true;
-	}
 	
 	webshims.addMethodName = function(name){
 		name = name.split(':');
@@ -719,6 +716,12 @@
 		
 	})();
 	
+	
+	if(WSDEBUG){
+		webCFG.debug = true;
+		webshims.warn('use this version of webshims for debugging/troubleshooting');
+	}
+	
 	//this might be extended by ES5 shim feature
 	(function(){
 		var defineProperty = 'defineProperty';
@@ -875,9 +878,7 @@
 		var initialFormTest = function(){
 			var range, rangeCSS;
 			if(!initialFormTest.run){
-				addTest(formvalidation, function(){
-					return !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern);
-				});
+				addTest(formvalidation, !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern));
 				
 				addTest('fieldsetdisabled', function(){
 					var fieldset = $('<fieldset />')[0];
@@ -889,15 +890,11 @@
 					rangeCSS = range.css('appearance');
 					range.remove();
 					
-					addTest('csstrackrange', function(){
-						return rangeCSS == null || rangeCSS == 'range';
-					});
-					addTest('cssrangeinput', function(){
-						return rangeCSS == 'slider-horizontal' || rangeCSS == 'range';
-					});
-					addTest('styleableinputrange', function(){
-						return Modernizr.csstrackrange || Modernizr.cssrangeinput;
-					});
+					addTest('csstrackrange', rangeCSS == null || rangeCSS == 'range');
+					
+					addTest('cssrangeinput', rangeCSS == 'slider-horizontal' || rangeCSS == 'range');
+					
+					addTest('styleableinputrange', Modernizr.csstrackrange || Modernizr.cssrangeinput);
 				}
 				
 				if(Modernizr[formvalidation]){

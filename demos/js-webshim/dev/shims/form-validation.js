@@ -479,17 +479,19 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			show: 'fadeIn',
 			hide: 'fadeOut'
 		},
-		show: {
+		no: {
 			show: 'show',
 			hide: 'hide'
 		}
 	};
-	if(!fx[options.iVal.fx]){
+	if(!options.iVal.fx || !fx[options.iVal.fx]){
 		options.iVal.fx = 'slide';
 	}
-	if(!$.fn[fx[options.iVal.fx]]){
-		options.iVal.fx = 'show';
+	
+	if(!$.fn[fx[options.iVal.fx].show]){
+		options.iVal.fx = 'no';
 	}
+	
 	webshims.errorbox = {
 		create: function(elem, fieldWrapper){
 			if(!fieldWrapper){

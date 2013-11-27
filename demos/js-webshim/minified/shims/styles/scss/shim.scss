@@ -236,6 +236,8 @@ output {
 	z-index: 1100;
 	min-width: 90px;
 	transition: visibility 400ms ease-in-out;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
 	
 	&.no-transition	{
 		display: none;
@@ -251,25 +253,21 @@ output {
 	position: relative;
 	opacity: 0;
 	padding: 11px 0 4px;
-	-webkit-transform: translate(0, -100%);
 	transform: translate(0, -100%);
 	transition: all 400ms ease-in-out;
 	
 	[data-vertical="bottom"] & {
-		-webkit-transform: translate(0, 100%);
 		transform: translate(0, 100%);
 		padding: 4px 0 11px;
 	}
 	
 	[data-vertical="middle"] & {
-		-webkit-transform: translate(0, 0) scale(0);
 		transform: translate(0, 0) scale(0);
 		padding: 4px 0;
 	}
 
 	.ws-popover.ws-po-visible & {
 		opacity: 1;
-		-webkit-transform: translate(0, 0) scale(1);
 		transform: translate(0, 0) scale(1);
 	}
 }
@@ -278,7 +276,7 @@ output {
 	border: 1px solid #ccc;
 	background: #fefefe;
 	padding: 5px;
-	box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+	box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 	
 	
 	button {
@@ -385,7 +383,7 @@ datalist {
 .datalist-polyfill {
 	position: absolute !important;
 	font-family: "Lucida Grande", "MS Shell Dlg", "Calibri", sans-serif;
-	font-size: 100%;
+	font-size: 13px;
 
 	.datalist-box {
 		position: relative;
@@ -393,85 +391,86 @@ datalist {
 		overflow: hidden;
 		overflow-x: hidden !important;
 		overflow-y: auto;
-	}
 
-	ul, li {
-		font-size: 100%;
-		list-style: none !important;
-	}
-
-	ul {
-		position: static !important;
-		overflow: hidden;
-		margin: 0;
-		padding: 2px 0;
-		height: auto !important;
-		background-color: #fff;
-		color: #000;
-	}
-
-	li {
-		margin: 1px 1px 1px 0;
-		padding: 2px 2px 2px 5px;
-		overflow: hidden;
-		white-space: nowrap;
-		cursor: default;
-		zoom: 1;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		background-color: #fff;
-		transition: background-color 400ms;
-	}
-
-	mark {
-		font-weight: normal;
-		font-style: normal;
-	}
-
-	.option-value {
-		display: inline-block;
-		text-overflow: ellipsis;
-		max-width: 100%;
-		color: #000;
-		float: left;
-		transition: color 400ms;
-	}
+  	ul, li {
+  		font-size: 100%;
+  		list-style: none !important;
+  	}
+  
+  	ul {
+  		position: static !important;
+  		overflow: hidden;
+  		margin: 0;
+  		padding: 2px 0;
+  		height: auto !important;
+  		background-color: #fff;
+  		color: #000;
+  	}
+  
+  	li {
+  		margin: 1px 1px 1px 0;
+  		padding: 2px 2px 2px 5px;
+  		overflow: hidden;
+  		white-space: nowrap;
+  		cursor: default;
+  		zoom: 1;
+  		overflow: hidden;
+  		text-overflow: ellipsis;
+  		background-color: #fff;
+  		transition: background-color 400ms;
+  	}
+  
+  	mark {
+  		font-weight: normal;
+  		font-style: normal;
+  	}
+  
+  	.option-value {
+  		display: inline-block;
+  		text-overflow: ellipsis;
+  		max-width: 100%;
+  		color: #000;
+  		float: left;
+  		transition: color 400ms;
+  	}
+  	
+  	.option-label {
+  		display: none;
+  		max-width: 100%;
+  		float: right;
+  		font-size: 90%;
+  		color: #666;
+  		text-overflow: ellipsis;
+  		vertical-align: bottom;
+  		margin-top: 0.15em;
+  		margin-left: 10px;
+  		text-align: right;
+  		transition: color 400ms;
+  	}
+  	
+  	.has-option-label  {
+  		.option-label {
+  			display: inline-block;
+  		}
+  	}
+  
+  
+  	.hidden-item {
+  		display: none !important;
+  	}
+  
+  	.active-item {
+  		background-color: #39f;
+  		.option-value {
+  			color: #fff;
+  		}
+  		.option-label {
+  			color: #eee;
+  		}
+  		cursor: default;
+  	}
 	
-	.option-label {
-		display: none;
-		max-width: 100%;
-		float: right;
-		font-size: 90%;
-		color: #666;
-		text-overflow: ellipsis;
-		vertical-align: bottom;
-		margin-top: 0.15em;
-		margin-left: 10px;
-		text-align: right;
-		transition: color 400ms;
-	}
-	
-	.has-option-label  {
-		.option-label {
-			display: inline-block;
-		}
-	}
-
-
-	.hidden-item {
-		display: none !important;
-	}
-
-	.active-item {
-		background-color: #39f;
-		.option-value {
-			color: #fff;
-		}
-		.option-label {
-			color: #eee;
-		}
-		cursor: default;
-	}
+  }
 }
 
 
