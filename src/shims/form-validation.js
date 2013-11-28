@@ -927,4 +927,10 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			}
 		});
 	}
+	
+	webshims.loader.addModule('form-combat', {
+		d: ['dom-support'],
+		test: ! (($.mobile && ($.mobile.selectmenu || $.mobile.checkboxradio)) || $.fn.select2)
+	});
+	webshims.loader.loadList(['form-combat']);
 });

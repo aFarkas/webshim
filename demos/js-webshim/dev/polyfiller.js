@@ -21,6 +21,7 @@
 	var addTest = Modernizr.addTest;
 	var Object = window.Object;
 	var html5 = window.html5 || {};
+	var firstRun;
 	
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
 	
@@ -30,7 +31,7 @@
 	
 	
 	var webshims = {
-		version: '1.11.4-RC1',
+		version: '1.11.5',
 		cfg: {
 			
 			//addCacheBuster: false,
@@ -120,52 +121,48 @@
 				return webshims._polyfill(features);
 			};
 		})(),
-		_polyfill: (function(){
+		_polyfill: function(features){
+			var toLoadFeatures = [];
 			
-			var loadedFormBase;
-			return function(features){
-				
-				var toLoadFeatures = [];
-				
-				if(WSDEBUG && !loadedFormBase){
-					loadedFormBase = $.inArray('forms', features) !== -1;
-					if(!loadedFormBase && $.inArray('forms-ext', features) !== -1){
-						webshims.error('need to load forms feature to use forms-ext feature.');
-						loadedFormBase = true;
-					}
+			firstRun();
+			
+			if($.inArray('forms', features) == -1 && $.inArray('forms-ext', features) !== -1){
+				features.push('forms');
+				if(WSDEBUG){
+					webshims.error('need to load forms feature to use forms-ext feature.');
 				}
-				
-				if (WSDEBUG && webCFG.waitReady && $.isReady) {
-					webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
+			}
+			
+			if (WSDEBUG && webCFG.waitReady && $.isReady) {
+				webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
+			}
+			
+			if (webCFG.waitReady) {
+				$.readyWait++;
+				onReady(features, function(){
+					$.ready(true);
+				});
+			}
+			
+			$.each(features, function(i, feature){
+				if(!webshimsFeatures[feature]){
+					WSDEBUG && webshims.error("could not find webshims-feature (aborted): "+ feature);
+					isReady(feature, true);
+					return;
 				}
-				
-				if (webCFG.waitReady) {
-					$.readyWait++;
-					onReady(features, function(){
-						$.ready(true);
+				if (feature !== webshimsFeatures[feature][0]) {
+					onReady(webshimsFeatures[feature], function(){
+						isReady(feature, true);
 					});
 				}
-				
-				$.each(features, function(i, feature){
-					if(!webshimsFeatures[feature]){
-						WSDEBUG && webshims.error("could not find webshims-feature (aborted): "+ feature);
-						isReady(feature, true);
-						return;
-					}
-					if (feature !== webshimsFeatures[feature][0]) {
-						onReady(webshimsFeatures[feature], function(){
-							isReady(feature, true);
-						});
-					}
-					toLoadFeatures = toLoadFeatures.concat(webshimsFeatures[feature]);
-				});
-				if(webCFG.loadStyles){
-					loader.loadCSS('styles/shim.css');
-				}
-				loadList(toLoadFeatures);
-				
-			};
-		})(),
+				toLoadFeatures = toLoadFeatures.concat(webshimsFeatures[feature]);
+			});
+			if(webCFG.loadStyles){
+				loader.loadCSS('styles/shim.css');
+			}
+			loadList(toLoadFeatures);
+			
+		},
 		
 		/*
 		 * handle ready modules
@@ -613,21 +610,37 @@
 				isReady('WINDOWLOAD', true);
 			}, 9999);
 		};
-		if(!$.isDOMReady){
-			var $Ready = $.ready;
-			$.ready = function(unwait){
-				if(unwait !== true && document.body){
-					onReady();
-					$.ready = $Ready;
-				}
-				return $Ready.apply(this, arguments);
-			};
-			$.ready.promise = $Ready.promise;
-		} else {
-			onReady();
-		}
-		$(onReady);
 		
+		firstRun = function(){
+			if(!firstRun.run){
+				if(!$.mobile || (!$.mobile.textinput && !$.mobile.rangeslider && !$.mobile.button)){
+					if(!$.isDOMReady && webCFG.waitReady){
+						var $Ready = $.ready;
+						$.ready = function(unwait){
+							if(unwait !== true && document.body){
+								onReady();
+								$.ready = $Ready;
+							}
+							return $Ready.apply(this, arguments);
+						};
+						$.ready.promise = $Ready.promise;
+					}
+					$(onReady);
+				} else {
+					webCFG.waitReady = false;
+					$(document).one('pageinit', onReady);
+					
+					if(WSDEBUG){
+						webshims.warn('jQM textinput/rangeslider/button detected waitReady was set to false. Use webshims.ready("featurename") to script against polyfilled methods/properties');
+					}
+				}
+			}
+			firstRun.run = true;
+		};
+		
+		setTimeout(function(){
+			$(onReady);
+		}, 4);
 		$(window).on('load', function(){
 			onReady();
 			setTimeout(function(){
@@ -719,7 +732,6 @@
 	
 	if(WSDEBUG){
 		webCFG.debug = true;
-		webshims.warn('use this version of webshims for debugging/troubleshooting');
 	}
 	
 	//this might be extended by ES5 shim feature

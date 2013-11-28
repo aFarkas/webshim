@@ -42,8 +42,10 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			this.input = opts.input;
 			this.arrayOptions = [];
 			
+			
 			this.shadowList
 				.on('mouseenter.datalistWidget mousedown.datalistWidget click.datalistWidget', 'li', function(e){
+					if(that._stopMouseOver && e && e.type == 'mouseenter'){return;}
 					var items = $('li:not(.hidden-item)', that.shadowList);
 					var select = (e.type == 'mousedown' || e.type == 'click');
 					that.markItem(items.index(e.currentTarget), select, items);
@@ -400,7 +402,11 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			this.hasViewableData = found;
 			if(!_fromShowList && found){
 				if(this.popover.isVisible && this.popover.element.attr('data-vertical') == 'bottom'){
+					that._stopMouseOver = true;
 					this.popover.element.triggerHandler('pospopover');
+					setTimeout(function(){
+						that._stopMouseOver = false;
+					}, 9);
 				}
 				this.showList();
 			}

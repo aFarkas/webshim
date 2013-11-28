@@ -1769,7 +1769,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	
 	
 	$(document).on('focusin.lazyloadvalidation', function(e){
-		if('form' in e.target && (e.target.list || $(e.target).is(':invalid'))){
+		if('form' in e.target){
 			lazyLoad();
 		}
 	});

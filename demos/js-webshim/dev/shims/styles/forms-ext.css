@@ -299,7 +299,7 @@ input[type="color"] {
     transition: all 400ms; }
   .input-picker .ws-focus,
   .input-picker :focus {
-    outline: 1px dotted #000; }
+    outline: 1px dotted black; }
   .input-picker .ws-po-box {
     position: relative;
     padding: 10px 20px 15px;
@@ -311,7 +311,7 @@ input[type="color"] {
   .input-picker .ws-super-next {
     position: absolute;
     top: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #cccccc;
     border-radius: 5px;
     padding: 0;
     width: 24px;
@@ -360,14 +360,14 @@ input[type="color"] {
   .input-picker .ws-button-row {
     position: relative;
     margin: 10px 0 0;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #eeeeee;
     padding: 10px 0 0;
     text-align: left;
     z-index: 2; }
     .input-picker .ws-button-row button {
-      border: 1px solid #ccc;
+      border: 1px solid #cccccc;
       border-radius: 5px;
-      box-shadow: 1px 1px 0 #fff;
+      box-shadow: 1px 1px 0 white;
       background-color: #ddd;
       background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
       background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
@@ -457,7 +457,7 @@ input[type="color"] {
       width: 14.2856%; }
   .input-picker .ws-options {
     margin: 10px 0 0;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #eeeeee;
     padding: 10px 0 0;
     text-align: left; }
     .input-picker .ws-options h5 {

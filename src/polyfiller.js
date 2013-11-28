@@ -31,7 +31,7 @@
 	
 	
 	var webshims = {
-		version: '1.11.5pre',
+		version: '1.11.5',
 		cfg: {
 			
 			//addCacheBuster: false,

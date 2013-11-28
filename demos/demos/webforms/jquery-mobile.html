@@ -8,10 +8,11 @@
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0-rc.1/jquery.mobile-1.4.0-rc.1.min.css">
 	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 	
-	<!-- jQM: add jQM before webshim's polyfiller.js -->
+	<!-- jQM: add jQM *before* webshim's polyfiller.js -->
 	<script src="http://code.jquery.com/mobile/1.4.0-rc.1/jquery.mobile-1.4.0-rc.1.js"></script>
 	
 	<script src="../../demo-js/src/modernizr-special.js"></script>
+	
 	
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
 	
@@ -70,6 +71,7 @@
 					//buttonOnly: true,
 					openOnFocus: true,
 					popover: {
+						appendTo: 'body',
 						position: {
 							my: 'center',
 							at: 'center'

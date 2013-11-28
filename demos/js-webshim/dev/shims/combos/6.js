@@ -2463,6 +2463,10 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				webshims.error('options.widgetPosition was removed use options.popover.position instead');
 			}
 			
+			if(options.openOnFocus && popover.options && (popover.options.appendTo == 'auto' || popover.options.appendTo == 'element')){
+				webshims.error('openOnFocus and popover.appendTo "auto/element" can prduce a11y problems try to change appendTo to body or similiar or use openOnMouseFocus instead');
+			}
+			
 			var showPickerContent = function(){
 				(picker[data.type].showPickerContent || picker.showPickerContent)(data, popover);
 			};

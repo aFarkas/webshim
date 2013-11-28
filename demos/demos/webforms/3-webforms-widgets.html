@@ -262,11 +262,13 @@ $.webshims.setOptions('forms-ext', {
 	date: {
 		startView: 2,
 		splitInput: true,
-		//open all date widget right to the input (needs jQuery UI position)
-		widgetPosition: {
-			my: 'left center',
-			at: "right center",
-			collision: "fit"
+		popover: {
+			//open all date widget right to the input (needs jQuery UI position)
+			position: {
+				my: 'left center',
+				at: "right center",
+				collision: "fit"
+			}
 		}
 	}
 });
@@ -350,7 +352,7 @@ $.webshims.setOptions('forms-ext', {
 					</label>
 				</fieldset>
 				<fieldset data-method="data" data-name="date">
-					<legend>data-month Properties</legend>
+					<legend>data-date Properties</legend>
 					<label>
 						size: 
 						<select name="size">
@@ -1144,7 +1146,7 @@ $.webshims.setOptions('forms-ext', {
 							<label for="states">
 								US States: <dfn title="required">*</dfn>
 							</label>
-							<input list="state-list" class="mark-option-text value-completion" name="states" required="required" type="text" id="states" />
+							<input list="state-list" data-list='{"highlight": true}' name="states" required="required" type="text" id="states" />
 							<datalist id="state-list">
 								<select>
 									

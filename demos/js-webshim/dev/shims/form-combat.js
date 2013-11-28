@@ -47,10 +47,7 @@ webshims.register('form-combat', function($,webshims){
 			return data.options.nativeMenu ? data.element : data.button;
 		}
 	});
-	
-	
-	
-	
+
 	function find(context){
 		$('select:not(.ui-select-nativeonly), input[type="radio"], input[type="checkbox"]', context).each(find.detectReplacement);
 	}
