@@ -13,7 +13,6 @@
 	
 	<script src="../../demo-js/src/modernizr-special.js"></script>
 	
-	
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
 	
 	<!-- jQM: make some small style adjustments -->
@@ -50,7 +49,7 @@
 	<script src="../../demo-js/src/jquery.ui.position.js" async></script>
 	<script>
 		(function(){
-			var assumeMobile = Modernizr.mq('(max-device-width: 768px)') || (Modernizr.touch && Modernizr.mq('(max-device-width: 124px)'));
+			var assumeMobile = Modernizr.mq && (Modernizr.mq('(max-device-width: 768px)') || (Modernizr.touch && Modernizr.mq('(max-device-width: 124px)')));
 			
 			//jQM: set waitReady to false
 			webshims.setOptions('waitReady', false);
@@ -80,56 +79,13 @@
 			});
 		})();
 		
-		//jQM: helper methods to register mobile widgets (especially select|[type="radio"][type="checkbox"]) to webshims
-		var webshimsJQM = {
-			select: function(context){
-				$('select:not(.ui-select-nativeonly)', context).each(function(){
-					var data = $(this).data('mobileSelectmenu');
-					if(data && data.button){
-						var focusElement = data.options.nativeMenu ? this : data.button;
-						webshimsJQM.loadAdd(this, data.button, {shadowFocusElement: focusElement});
-					}
-				});
-			},
-			checkboxRadio: function(context){
-				$('input[type="radio"], input[type="checkbox"]', context).each(function(){
-					var data = $(this).data('mobileCheckboxradio');
-					if(data && data.label){
-						webshimsJQM.loadAdd(this, data.label, {shadowFocusElement: this});
-					}
-				});
-			},
-			update: function(context){
-				webshimsJQM.select(context);
-				webshimsJQM.checkboxRadio(context);
-			},
-			loadAdd: function(){
-				var args;
-				if(!webshims.isReady('dom-support')){
-					args = arguments;
-					webshims.polyfill('dom-support');
-					webshims.ready('dom-support', function(){
-						webshims.addShadowDom.apply(webshims, args);
-					});
-				} else {
-					webshims.addShadowDom.apply(webshims, arguments);
-				}
-			}
-		};
+		
 		
 		
 		//jQM: update polyfills on pageinit
 		$(document).on('pageinit', function(e){
 			$(e.target).updatePolyfill();
-			
-			//jQM: register jQM widgets to webshims
-			webshimsJQM.update(e.target);
 		});
-		
-		
-		
-		
-		
 		
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
