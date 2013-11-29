@@ -5,20 +5,23 @@
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 	
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0-rc.1/jquery.mobile-1.4.0-rc.1.min.css">
-	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	
 	<!-- jQM: add jQM *before* webshim's polyfiller.js -->
-	<script src="http://code.jquery.com/mobile/1.4.0-rc.1/jquery.mobile-1.4.0-rc.1.js"></script>
+	<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
 	
 	<script src="../../demo-js/src/modernizr-special.js"></script>
-	
 	
 	<script src="../../js-webshim/minified/polyfiller.js"></script>
 	
 	<!-- jQM: make some small style adjustments -->
 	<style>
-		
+		input,
+		select,
+		textarea {
+			box-shadow: none;
+		}
 		.ui-slider-input + input + .input-buttons {
 			float: left;
 			margin-top: 6px;
@@ -59,7 +62,7 @@
 				//configure instantvalidation for jQuery mobile
 				iVal: {
 					fieldWrapper: '[data-role="fieldcontain"]',
-					handleBubble: true // 'hide' || false || true
+					handleBubble: 'hide' // 'hide' || false || true
 				}
 			});
 			
@@ -107,7 +110,7 @@
 			
 		</div> 
 		<div data-role="content">
-			<p>Webshims and jQuery mobile do a lot of tricks with form elements, which often conflict with each other. This page demonstrates how both libaries can be combined. Please read the source code and watch out for comments marked with <code>JQM:</code>.</p>
+			<p>Webshims and jQuery mobile do a lot of tricks with form elements, which can conflict with each other. This page demonstrates how both libaries can be combined. Please read the source code and watch out for comments marked with <code>JQM:</code>.</p>
 			<form action="jquery-mobile.html" class="ws-instantvalidation">
 				<div data-role="fieldcontain">
 					<label for="textinput1">
@@ -168,10 +171,10 @@
 					</select>
 				</div>
 				<div data-role="fieldcontain">
-					<label for="selectmenu1">
+					<label for="selectmenu2">
 						Choose*:
 					</label>
-					<select id="selectmenu1" name="" data-native-menu="false" required="required">
+					<select id="selectmenu2" name="" data-native-menu="false" required="required">
 						<option value="">
 							Choose
 						</option>
