@@ -1,321 +1,312 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
+<html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<meta charset="utf-8"/>
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=IE7" />
-	<link href="css/styles.css" rel="stylesheet" />
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-	<script>
-		// set options for html5shiv
-		if(!window.html5){
-			window.html5 = {}; 
-		}
-		window.html5.shivMethods = false;
-	</script>
-	<script src="js-webshim/minified/extras/modernizr-custom.js"></script>
-	
-	<script src="js-webshim/minified/polyfiller.js"></script>
-	<script src="demo-js/demo.js"></script>
-	<script>
-		//load all polyfill features
-		$.webshims.polyfill();
-		
-	</script>
-	
-	<title>Webshims lib - The capability-based polyfill-loading JS library</title>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="viewport" content="width=device-width">
+    <title>Webshim</title>
+    <link href="css/styles.css" rel="stylesheet" />
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="js-webshim/minified/extras/modernizr-custom.js"></script>
+
+    <script src="js-webshim/minified/polyfiller.js"></script>
+    <script src="demo-js/demo.js"></script>
+    <script>
+        webshims.polyfill(); // load all available polyfills
+    </script>
 
 </head>
 
-<body class="home">
-		<header>
-			<hgroup>
-				<h1>Webshims Lib.</h1>
-				<h2>Polyfill only the incapable browsers</h2>
-			</hgroup>
-			<nav></nav>
-		</header>
-		<div class="main">
-			<section>
-				<div class="home-box about-box">
-					<p>Webshims Lib is a modular capability-based <a href="http://remysharp.com/2010/10/08/what-is-a-polyfill/">polyfill</a>-loading library, which focuses on accurate implementations of stable HTML5 features, so that developers can write modern, interoperable and robust code in all browsers. It is built on top of <a href="http://jquery.com/">jQuery</a> and <a href="http://www.modernizr.com/">Modernizr</a>.</p>
-				</div>
-				<div class="home-box download-box">
-					<p>
-						<a href="http://corrupt-system.de/webshims-stable.zip" class="download-button">
-							<strong>Download Webshims Lib</strong>
-						</a>
-					</p>
-				</div>
-				<div class="home-box concept-box">
-				<h3>Main concepts</h3>
-					<ul>
-						<li><strong>Capability based loading:</strong> the more features a browser supports natively, the more lightweight webshims will be</li>
-						<li><strong>Modular feature implementation:</strong> Only load features that you need for your application.</li>
-						<li><strong>Future-proof feature detection:</strong> We try to feature detect everything instead of browser sniffing to be more future proof</li>
-						<li><strong>Almost pure native and accurate APIs</strong> Helps you to learn HTML5 (Markup-/DOM/JS-APIs) and to build useful abstractions and extensions on top of the standard. Documentation is the specification (e.g. <a href="http://dev.w3.org/html5/html-author/">HTML5 W3C Specification</a>)</li>
-						<li><strong>stable and reliable polyfills for current and future x-browser landscape:</strong> webshims lib's polyfills are cross-browser tested and work with incapable, buggy, partial and of course full capable HTML5 implementations.</li>
-					</ul>
-				</div>
-				<div class="feature-example home-box">
-					<h3>What makes webshims lib different?</h3>
-					<div class="inner-box">
-						<p>Did you ever try to dynamically set or get the placeholder or the value attribute of a text input with one of the other placeholder shims? With many of them it doesn't properly work. Webshims strives to provide a uniform and standards-compliant API in every environment.</p>
-						<p>The following text input uses the html5 placeholder attribute:</p>
-						<form action="#">
-							<input class="text" name="placeholder" id="placeholder" placeholder="change me" />
-						</form>
-						<p>If you're viewing this page in a browser that doesn't support placeholder, Webshims has added this functionality via Javascript, and in a way that preserves your ability to work with the element's properties dynamically:</p>
-						<code>$("#placeholder").attr("placeholder", "<input value="test text" class="text" id="placeholder-text" />");</code> <button>run code</button>
-						<div class="hidden-explanation">
-							<p>Being able to change the placeholder of an input element dynamically isn't  a huge deal, but it shows how webshims lib works. With few exceptions, you won't be able to tell the difference between a shim and a native implementation. In some cases, the shim will even be more standards compliant than some browsers' native implementations.</p>
-							<p>The placeholder polyfill also works with getting and setting the value property (many other placeholder polyfills don't support this properly):</p>
-							<ul>
-								<li><code>$("#placeholder").prop('value')</code></li>
-								<li><code>$("#placeholder").val()</code></li>
-								<li><code>$("#placeholder").prop('value', 'new value')</code></li>
-								<li><code>$("#placeholder").val('new value')</code></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-				<div class="home-box supported-browser-box">
-					<h3 title="Webshims should work in a lot more browsers/browser versions">tested Browser Support</h3>
-					<ul>
-						<li>IE8+</li>
-						<li>Firefox 3.6+</li>
-						<li>Safari 5.1+</li>
-						<li>Safari for iOS 5+</li>
-						<li>Chrome 24.0+</li>
-						<li>Opera 12.1+</li>
-					</ul>
-					
-				</div>
-				
-			</section>
-			<section class="feature-overview">
-				<hgroup>
-					<h2>Features / Demos</h2>
-				</hgroup>
-				<div>
-					<article>
-						<h3><a href="demos/shiv.html">Semantic Structure: Shiv solution / dynamic HTML5</a></h3>
-					</article>
-					
-					<article>
-						<h3><a href="demos/canvas.html">Canvas</a></h3>
-					</article>
-					
-					<article>
-						<h3><a href="demos/webforms.html">HTML5 forms / Webforms 2</a></h3>
-					</article>
-					
-					<article>
-						<h3><a href="demos/mediaelement.html">HTML5 mediaelements: audio/video/track</a></h3>
-					</article>
-										
-					<article>
-						<h3><a href="demos/json-storage.html">JSON.parse / JSON.stringify &amp; localStorage / sessionStorage</a></h3>
-					</article>
-					
-					<article>
-						<h3><a href="demos/geolocation.html">Geolocation</a></h3>
-					</article>
-					
-					<article>
-						<h3><a href="demos/es5.html">ES5/JavaScript 1.8.5</a></h3>
-					</article>
-					
-					<article>
-						<h3><a href="demos/details.html">interactive elements: details &amp; summary</a></h3>
-					</article>
+<body>
 
-					<article>
-						<h3><a href="demos/filereader.html">FileReader</a></h3>
-					</article>
-				</div>	
-			</section>
-			<section>
-				<hgroup>
-					<h2>How to</h2>
-				</hgroup>
-				<div class="accordion">
-				<h3 id="quick-install" class="button">Easy &amp; simple Quick install</h3>
-				<div class="panel">
-<code class="block">
-&lt;!-- dependencies: jQuery + Modernizr with yepnope --&gt;
+    <div id="sidebar" class="interface">
+
+        <a class="toc_title" href="#">
+            Webshim <span class="version">(1.11.1)</span>
+        </a>
+        <ul class="toc_section">
+            <li>&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a></li>
+        </ul>
+
+        <a class="toc_title" href="#introduction"> Introduction </a>
+
+         <a class="toc_title" href="#Guide-installation"> Guide </a>
+        <ul class="toc_section">
+            <li>– <a href="#Guide-installation">Installation</a> </li>
+            <li>– <a href="#Guide-configuration">Configuration</a> </li>
+            <li>- <a href="#Guide-fire-when-ready">Fire When Ready</a> </li>
+            <li>- <a href="#Guide-dom-abstractions">DOM Abstractions</a> </li>
+        </ul>
+
+        <a class="toc_title" href="#Shiv"> HTML5 shiv and innerShiv </a>
+        <ul class="toc_section">
+          <li>– <a href="#Shiv-dynamic-html5">Dynamically adding HTML5 Markup</a></li>
+          <li>– <a href="#Shiv-updatePolyfill">updatePolyfill</a></li>
+          <li>– <a href="#Shiv-shivMethods">shivMethods Configuration</a></li>
+        </ul>
+
+        <a class="toc_title" href="#ES5"> ES5 </a>
+
+        <a class="toc_title" href="#Forms"> Forms </a>
+        <ul class="toc_section">
+            <li>– <a href="#Forms-forms">forms</a> </li>
+            <li>– <a href="#Forms-forms-ext">forms-ext</a> </li>
+            <li>– <a href="#Forms-extensions">Extensions</a> </li>
+        </ul>
+
+        <a class="toc_title" href="#Canvas"> Canvas </a>
+
+        <a class="toc_title" href="#Media"> Media </a>
+        <ul class="toc_section">
+            <li>- <a href="#Media-extensions">Extensions</a></li>
+            <li>- <a href="#Media-track">Track Element</a></li>
+        </ul>
+
+        <a class="toc_title" href="#Geolocation"> Geolocation </a>
+
+        <a class="toc_title" href="#DetailsSummary"> Details &amp; Summary </a>
+
+        <a class="toc_title" href="#FileReader"> FileReader </a>
+
+        <a class="toc_title" href="#Customizing"> Customizing </a>
+        <ul class="toc_section">
+            <li>- <a href="#Customizing-modernizr">Modernizr</a> </li>
+            <li>- <a href="#Customizing-extending">Writing a New Polyfill</a> </li>
+        </ul>
+<!--
+    <a class="toc_title" href="#Events">
+      &lt;audio&gt;, &lt;video&gt;, and &lt;track&gt;
+    </a>
+
+    <a class="toc_title" href="#Events">
+      JSON, localStorage, and sessionStorage
+    </a>
+
+    <a class="toc_title" href="#Events">
+      geolocation
+    </a>
+   
+    <a class="toc_title" href="#Events">
+      &lt;details&gt; and &lt;summary&gt;
+    </a>
+    
+    <a class="toc_title" href="#Events">
+      FileReader
+    </a> 
+-->
+
+    </div>
+
+    <div class="container">
+
+        <p>
+            <img id="logo" src="images/webshim2.png" alt="webshim" />
+        </p>
+
+        <p>
+            Webshim is a <a href="http://remysharp.com/2010/10/08/what-is-a-polyfill/">polyfill</a> library that enables you to reliably use HTML5 features across browsers, even if native support is lacking.
+        </p>
+
+        <p>
+            The project is <a href="https://github.com/aFarkas/webshim/">hosted on GitHub</a>, and is available for use under the <a href="http://github.com/aFarkas/webshim/blob/master/MIT-LICENSE.txt">MIT software license</a>.
+        </p>
+
+        <p>
+            You can report bugs and discuss features on the <a href="https://github.com/aFarkas/webshim/issues">GitHub issues page</a>.
+        </p>
+
+        <b class="header" id="downloads">Downloads &amp; Dependencies</b>
+      <span style="padding-left: 7px; font-size:11px; font-weight: normal;" class="interface">(Right-click, and use "Save As")</span>
+    
+        <table>
+            <tr>
+                <td>
+                    <a href="http://corrupt-system.de/webshims-stable.zip" class="download-button">
+                        <strong><i>Version 1.11.1</i></strong>
+                    </a>
+                </td>
+                <td class="text"></td>
+            </tr>
+        </table>
+
+        <p>
+            Webshim depends on <a href="http://jquery.com/">jQuery</a> and <a href="http://www.modernizr.com/">Modernizr</a>.
+        </p>
+
+        <h2 id="introduction" class="header">Introduction</h2>
+
+        <p>
+            There are many appealing HTML5 features such as form validation, geolocation, and FileReader which ease the burden of writing rich web applications.
+        </p>
+
+        <p>
+            Using these features responsibly requires supporting the browsers and versions that the audience is likely to use, without breaking usability. There are two common ways to support these new features. Abstractions declare a library or piece of code that
+            invents a new API which you can use to access the feature. jQuery is a good example; It defines an API that provides access to features that are buggy or incomplete, by coming up with it's own format. $.ajax is an abstraction over xmlhttprequest
+            which is a standard that has varying support. The other solution is called polyfilling, which fills in the gaps in a lacking browser rather than than designing a new API.
+        </p>
+
+        <p>
+            <strong>Webshim is a polyfill solution.</strong> It adds these features in a way that is transparent to the end user and developer. It enables coding against the browser standards rather than learning and maintaining abstractions. It results
+            in less code that is simpler and easier to maintain.
+        </p>
+
+        <p>
+            Many of the examples that follow are runnable. Click the <i>play</i> button to execute them.
+        </p>
+
+
+        <p id="Guide-installation" class="header">
+            <b class="header">Installation</b>
+            <br>Take the 'js-webshim' folder and add it to your project. (You will find a minified and a dev folder there.) Here is an example showing how to include dependencies and load webshims:
+            <pre>
 &lt;script src="js/jquery-1.9.1.js"&gt;&lt;/script&gt;
-&lt;script src="js/modernizr-yepnope-custom.js"&gt;&lt;/script&gt;
-	
-&lt;!-- reference the base script --&gt;
+&lt;script src="js/modernizr-custom.js"&gt;&lt;/script&gt;
 &lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
-	
+  
 &lt;script&gt;
-	//implement all unsupported features || call polyfill before DOM-Ready to implement everything as soon and as fast as possible
-	$.webshims.polyfill();
-	//or load only specific features you need
-	//$.webshims.polyfill('forms json-storage');
-	
-	$(function(){
-	//use all implemented API-features on DOM-ready
-	});
-&lt;/script&gt;		
-</code>
-					<p><small>Note: Webshims do not need all Modernizr tests to work. Here you find <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track-load">all Modernizr detections, which are used by webshims</a>.</small></p>
-				</div>
-	
-				<h3 id="embed-polyfill" class="button">Embedding and configuring the script</h3>
-				<div class="panel">
-					<ul>
-						<li>Take the 'js-webshim' folder and add it to your project. (You will find a minified and a dev folder there.)</li>
-						<li>Include the polyfiller.js into your HTML page. You can concatenate this file with your other js and rename. Don't forget to also include <a href="http://jquery.com">jQuery</a>, <a href="http://www.modernizr.com/">Modernizr (including Modernizr.load)</a>.</li>
-						<li>call the polyfill method</li>
-					</ul>
-				
-<code class="block">
-&lt;script src="js/jquery-1.9.1.js"&gt;&lt;/script&gt;
-&lt;script src="js/modernizr-yepnope-custom.js"&gt;&lt;/script&gt;
-&lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
+  webshims.polyfill();
+  
+  $(function(){
+    // use all implemented API-features on DOM-ready
+  });
+&lt;/script&gt;   
+</pre>
+        </p>
 
 
-&lt;script&gt;
-	//load and implement all unsupported features || call polyfill before DOM-Ready to implement everything as soon and as fast as possible
-	$.webshims.polyfill();
-&lt;/script&gt;	
-</code>
-				
-						<p>The polyfill method can also take a whitespace-separated list of several features and should be called as soon as possible (before DOM ready).</p>
-<code class="block">
-//load and implement json-storage and geolocation features, if they aren't supported
-$.webshims.polyfill('json-storage geolocation');
-</code>					
-						<h3>List of features</h3>
-						
-						<ul>
-							<li><code>json-storage</code></li>
-							<li><code>es5</code></li>
-							<li><code>geolocation</code></li>
-							<li><code>canvas</code></li>
-							<li><code>forms</code></li>
-							<li><code>forms-ext</code></li>
-							<li><code>mediaelement</code></li>
-							<li><code>track</code></li>
-							<li><code>filereader</code></li>
-							<li><code>details</code></li>
-						</ul>
-						
-						<p>If you have any trouble setting up Webshims lib, set <code>debug</code> to true and open your console:</p>
-<code class="block">							
-&lt;script&gt;
-	webshims.setOptions('debug', true);
-	webshims.polyfill();
-&lt;/script&gt;	
-</code>			
-					<p>If you dont want any log messsages, simply set <code>debug</code> explicitly to <code>false</code>.</p>
-					<h3>Custom Modernizr build</h3>
-					<p>Webshims lib does not need every Modernizr test and supports creating a <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track-load">custom Modernizr build</a>. (Webshims lib uses <a href="http://requirejs.org/">requireJS</a> or <a href="https://gist.github.com/aFarkas/936413">sssl</a> as a script loader, if this is included, if not it uses Modernizr.load/yepnope.) </p>
-					
-					<h3>changing Options path to shims folder</h3>
-					
-					<p>Shims folder is computed automatically. If the name of polyfiller.js is changed <strong>and</strong> the polyfill-script is loaded async, this computation can be wrong and you have to set the folder manually. This generated path can be changed by changing the <code>basePath</code> configuration with the <code><a href="#polyfill-options" class="tab-opener">setOptions</a></code> method.</p>
-<code class="block">
-$.webshims.setOptions("basePath", "/yourFolderTo/shims/");
-//or:
-$.webshims.setOptions({
-	basePath: "/yourFolderTo/shims/"
-});
-</code>					
-					
-					
+        <p id="Guide-configuration" class="header">
+            <b class="header">Configuration</b> 
+            <br>The polyfill method accepts an optional whitespace-separated feature list. Call it as soon as possible (before DOM ready.)
+            <pre> webshims.polyfill('canvas geolocation'); </pre> 
+            <strong>Available Features</strong>
 
-					
-										
-				</div>
-				<h3 id="polyfill-ready" class="button">Fire when ready</h3>
-				<div class="panel">
-				<p>Not every feature is ready immediately in all browsers; some shims might take time to load before you can use them. You can use one of jQuery's <code>ready</code> methods to delay working with elements until the DOM and any necessary shims are ready.</p>
-<code class="block">
-$(function(){
-	//work with DOM + all implemented features
-});
+            <ul style="margin: 0">
+                <li style="margin-bottom: 0">es5</li>
+                <li style="margin-bottom: 0">geolocation</li>
+                <li style="margin-bottom: 0">canvas</li>
+                <li style="margin-bottom: 0">forms</li>
+                <li style="margin-bottom: 0">forms-ext</li>
+                <li style="margin-bottom: 0">mediaelement</li>
+                <li style="margin-bottom: 0">track</li>
+                <li style="margin-bottom: 0">filereader</li>
+                <li style="margin-bottom: 0">details</li>
+            </ul>
 
-$(document).ready(function(){
-	//work with DOM + all features
+            <p>
+                <tt>setOptions</tt> should always be called before the <tt>polyfill</tt> method.
+            </p>
+
+            <p>The available options for <tt>webshims.setOptions</tt>:</p>
+            <ul>
+                <li><strong>extendNative</strong>  Webshims lib will automatically extend DOM-Objects with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNative is set to false, webshims lib
+                    won't touch any DOM-Objects and will only implement jQuery plugins. Setting this option to false might improve DOM performance. <br>
+                    <em>default: false</em>
+                </li>
+                <li><strong>basePath</strong> The shims folder is computed automatically. If the name of polyfiller.js is changed <strong>and</strong> the polyfill-script is loaded async, this computation can be wrong and you have to set the folder manually. Example:<br>
+                    <tt> webshims.setOptions('basePath', '/yourFolderTo/shims/'); </tt> <br>
+                    <em>default: computed path to shims folder</em>
+                </li>
+                <li><strong>waitReady</strong> Setting this to true delays jQuery's ready-event until all polyfilled features are ready. This option should be set to false, if webshims lib polyfiller.js is loaded asynchronously. This option can also be set to false, if a website is using only HTML5 markup APIs (pure HTML or $.attr) and
+                    doesn't use any DOM-/JS-APIs on DOM-ready. If this feature is set to false, scripted access to polyfilled APIs have to be added inside of a <tt>webshims.ready</tt> callback. <br>
+                    <em>default: true</em>
+                </li>
+                <li><strong>disableShivMethods</strong> Automatically disables the <a href="https://github.com/aFarkas/html5shiv">shivMethods</a> option of html5shiv. <br>
+                <em> default: true</em>
+                </li>
+                <li>
+                    <strong>debug</strong> Setting to true enables debug info to be printed in the developer console. Note the polyfiller.js in the dev folder will have more debug information and pretty printed code.<br>
+                    <em>default: false</em>
+                </li>
+            </ul>
+            <pre>
+webshims.setOptions('extendNative', false);
+</pre> 
+            <p>
+                <tt>setOptions</tt> can also take a single options parameter:
+            </p>
+            <pre>
+webshims.setOptions({
+  extendNative: false
 });
-</code>		
-	
-			
-					<p>If you want to use a feature as soon as possible or you have set the <code>waitReady</code> option to <code>false</code>, you can use <code>$.webshims.ready</code> and pass the feature name(s) and a callback function:</p>
-<code class="block">
-$.webshims.ready('geolocation json-storage', function(){
-	//work with geolocation, JSON and localStorage
+</pre> 
+            <p>
+                Feature specific options are nested options with the feature name as their key.
+            </p>
+            <pre>
+webshims.setOptions({
+  // configure generally option
+  extendNative: false,
+
+  // configure canvas-shim
+  canvas: {
+    type: 'flash' // use flashcanvas instead of excanvas as polyfill
+  },
+
+  // configure forms-shim
+  forms: { 
+    customMessages: true // implement customValidationMessages
+  }
 });
-</code>	
-					<p>Note that this callback function may be called before the DOM is ready. If you want to use a feature after DOM-Ready, simply pass the string 'DOM':</p>
-<code class="block">
-$.webshims.ready('DOM canvas', function(){
-	//work with canvas in the document
-});
-</code>	
-				</div>
-				<h3 id="polyfill-options" class="button">Setting options</h3>
-				<div class="panel">
-					<p>Webshims has some general and some feature specific options which can be configured with the <code>$.webshims.setOptions</code> method.</p>
-					<p><code>setOptions</code> should always be called before the <code>polyfill</code> method.</p>
-					<p>The available general options are the following:</p>
-					<ul>
-						<li><strong>extendNative</strong> (default: false): Webshims lib will automatically extend DOM-Objects with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNative is set to false, webshims lib won't touch any DOM-Objects and will only implement jQuery plugins. Setting this option to false, might be also good for DOM performance (<a href="index.html#polyfill-abstractions">see also</a>).</li>
-						<li><strong>basePath</strong> (default: "automatially computed path to the shims folder"): If polyfiller.js was renamed <strong>and</strong> is loaded dynamically, the basePath should be changed manually.</li>
-						<li><strong>waitReady</strong> (default: true): If this option is true, jQuery's ready-event will be delayed until all needed features are ready to use. This option should be set to false, if webshims lib polyfiller.js is loaded async (see also Loading webshims async in the <a href="#polyfill-foucs">loading documentation</a>) or from bottom of the body element. This option can also be set to false, if a website is using only HTML5 markup APIs (pure HTML or $.attr) and do not use any DOM-/JS-APIs on DOM-ready. If this feature is set to false, which might be good against FOUCs, scripted access to polyfilled APIs have to be added inside of a <a href="#polyfill-ready"><code>$.webshims.ready</code></a> callback.</li>
-						<li><strong>disableShivMethods</strong> (default: true): Automatically disables the <a href="https://github.com/aFarkas/html5shiv">shivMethods</a> option of html5shiv.</li>
-					</ul>
-<code class="block">
-$.webshims.setOptions("extendNative", false);
-</code>	
-		<p><code>setOptions</code> can also take a single options parameter:</p>
-<code class="block">
-$.webshims.setOptions({
-	extendNative: false
-});
-</code>		
-					<p>Feature specific options are nested options with the featurename as their key.</p>
-<code class="block">
-$.webshims.setOptions({
-	//configure generally option
-	extendNative: false,
-	
-	//configure canvas-shim
-	canvas: {
-		type: "flash" // use flashcanvas instead of excanvas as polyfill
-	},
-	
-	//configure forms-shim
-	forms: {
-		customMessages: true // implement customValidationMessages
-	}
-});
-</code>	
-					<p>The polyfill-options can also be changed by using declarative markup, using a data-polyfill-cfg attribute with a valid JSON string on a script-element:</p>
-<code class="block">
+</pre> 
+            <p>The polyfill-options can also be changed by using declarative markup, using a data-polyfill-cfg attribute with a valid JSON string on a script-element:</p>
+            <pre>
 &lt;script src="some.js" data-polyfill='{
-	"basePath": "pathToYour/shims-folder/",
-	"canvas": {
-		"type": "flash"
-	}
+"basePath": "pathToYour/shims-folder/",
+"canvas": {
+  "type": "flash"
+}
 }'&gt;
 
 &lt;/script&gt;
-</code>	
-					
-				</div>
-				<h3 id="polyfill-abstractions" class="button">Minor Abstractions to DOM attributes, DOM methods and DOM events</h3>
-				<div class="panel">
-					<p>Due to the fact that we cannot extend accessors of elements in all browsers, we always use jQuery as an extension-wrapper.</p>
-					<ul>
-						<li>
-							<p><strong>Accessing DOM properties/attribute IDLs</strong>: if the feature allows accessing a specific attribute or property, always use jQuery's built-in <code>$.prop</code> (in case of IDL attributes/properties) or <code>$.attr</code>/<code>$.removeAttr</code> (in case of content attributes) method:</p>
-<code class="block">
-// instead of accessing a property directly (e.g. this.validity), use $.fn.prop 
+</pre>
+        </p>
+
+
+        <p id="Guide-fire-when-ready" class="header">
+            <b class="header">Fire When Ready</b> 
+            <br>
+
+            <p>Not every feature is ready immediately in all browsers; some shims might take time to load before you can use them. You can use one of jQuery's <tt>ready</tt> methods to delay working with elements until the DOM and any necessary shims are
+                ready.</p>
+            <pre>
+$(function(){
+  // work with DOM + all implemented features
+});
+
+$(document).ready(function(){
+  // work with DOM + all features
+});
+</pre> 
+
+
+            <p>If you want to use a feature as soon as possible or you have set the <tt>waitReady</tt> option to <tt>false</tt>, you can use <tt>webshims.ready</tt> and pass the feature name(s) and a callback function:</p>
+            <pre>
+webshims.ready('geolocation canvas', function(){
+  // work with geolocation and canvas
+});
+</pre> 
+            <p>Note that this callback function may be called before the DOM is ready. If you want to use a feature after DOM-Ready, simply pass the string 'DOM':</p>
+            <pre>
+webshims.ready('DOM canvas', function(){
+  // work with canvas in the document
+});
+</pre> 
+
+        </p>
+
+        <p id="Guide-dom-abstractions" class="header">
+            <b class="header">DOM Abstractions</b> 
+            <br>
+            
+            <p>Due to the fact that we cannot extend accessors of elements in all browsers, we always use jQuery as an extension-wrapper.</p>
+                    <ul>
+                        <li>
+                            <p><strong>Accessing DOM properties/attribute IDLs</strong>: if the feature allows accessing a specific attribute or property, always use jQuery's built-in <tt>$.prop</tt> (in case of IDL attributes/properties) or <tt>$.attr</tt>/<tt>$.removeAttr</tt> (in case of content attributes) method:</p>
+<pre>
+// instead of accessing a property directly (e.g. this.validity), 
+// use $.fn.prop 
 $(this).prop('validity');
 // or:
 //$.prop(this, 'validity');
@@ -324,63 +315,63 @@ $(this).prop('validity');
 $('video').prop('currentTime', 200);
 // or:
 //$.prop(videoElement, 'currentTime', 200);
-</code>
-						</li>
-						<li>
-							<p><strong>calling a DOM method</strong>: While DOM properties have to be accessed through jQuery's <code>$.prop/$.attr</code> methods, DOM methods can be accesed using $.prop and executed in the context of the DOM element.</p>
-<code class="block">
+</pre>
+                        </li>
+                        <li>
+                            <p><strong>calling a DOM method</strong>: While DOM properties have to be accessed through jQuery's <tt>$.prop/$.attr</tt> methods, DOM methods can be accesed using $.prop and executed in the context of the DOM element.</p>
+<pre>
 // "this" refers to a DOM element, not a jQuery object
 var fn = $.prop(this, 'checkValidity');
 fn.apply(this);
-</code>
-							<p>To make this more easier Webshims lib also generates a jQuery plugin which wraps the featured method, so you can use jQuery too:</p>
-<code class="block">
+</pre>
+                            <p>To make this more easier Webshims lib also generates a jQuery plugin which wraps the featured method, so you can use jQuery too:</p>
+<pre>
 $(this).checkValidity();
 
 $(this).callProp('checkValidity'); // $(this).callProp('play');
-</code>
-							<p>The jQuerified method can also take some arguments, if specified by the spec.</p>
-							
-<code class="block">
+</pre>
+                            <p>The jQuerified method can also take some arguments, if specified by the spec.</p>
+                            
+<pre>
 $('video').addTextTrack('subtitles', 'just a test', 'en');
 
-$('video').callProp('addTextTrack', ['subtitles', 'just a test', 'en']);	
-</code>							
-							<p>If you pass a list of nodes and the method doesn't return anything, the method will be called on each element in this list, otherwise it will be called on the first element.</p>
-							<p>In case a developer wants to make method calling "feel 100% native", the general option <code>extendNative</code> can be set to <code>true</code>.</p>
-<code class="block">
-$.webshims.setOptions("extendNative", true);
-$.webshims.polyfill('forms');
-//...
-this.checkValidity() //$(this).checkValidity(); or $(this).callProp('checkValidity'); can still be used
+$('video').callProp('addTextTrack', ['subtitles', 'just a test', 'en']);    
+</pre>                         
+                            <p>If you pass a list of nodes and the method doesn't return anything, the method will be called on each element in this list, otherwise it will be called on the first element.</p>
+                            <p>In case a developer wants to make method calling "feel 100% native", the general option <tt>extendNative</tt> can be set to <tt>true</tt>.</p>
+<pre>
+webshims.setOptions('extendNative', true);
+webshims.polyfill('forms');
+// ...
+this.checkValidity()  // or use $(this).callProp('checkValidity')
 
 $('video').get(0).addTextTrack('subtitles', 'just a test', 'en');
-</code>	
+</pre> 
 
-						</li>
-						<li>
-							<p><strong>binding to events</strong>: Always use jQuery's <code>on</code>, <code>bind</code> method to register your event handlers. <code>addEventListener</code> or inline event handler won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use event capturing in the native implementation and <code>$.fn.trigger</code> in the shim.</p>
-							<p>This means that some HTML5 events go down the DOM tree in capable browsers and go up the tree in polyfilled browsers. This can create differences if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default, don't use <code>return false;</code>, use <code>event.preventDefault();</code> instead.</p>
-						</li>
-						<li>
-							<p><strong>manipulation methods/dynamically adding HTML5 content</strong>: To insert new HTML5 content dynamically, use <code>.htmlPolyfill()</code>, <code>.appendPolyfill()</code>, <code>.prependPolyfill()</code>, <code>.afterPolyfill()</code>, <code>.beforePolyfill()</code> and <code>.replaceWithPolyfill()</code>:</p>
-<code class="block">
-//three different examples
+                        </li>
+                        <li>
+                            <p><strong>binding to events</strong>: Always use jQuery's <tt>on</tt>, <tt>bind</tt> method to register your event handlers. <tt>addEventListener</tt> or inline event handler won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use event capturing in the native implementation and <tt>$.fn.trigger</tt> in the shim.</p>
+                            <p>This means that some HTML5 events go down the DOM tree in capable browsers and go up the tree in polyfilled browsers. This can create differences if you are calling <tt>event.stopPropagation();</tt> or <tt>return false;</tt> in your event handler. If you only want to prevent the default, don't use <tt>return false;</tt>, use <tt>event.preventDefault();</tt> instead.</p>
+                        </li>
+                        <li>
+                            <p><strong>manipulation methods/dynamically adding HTML5 content</strong>: To insert new HTML5 content dynamically, use <tt>.htmlPolyfill()</tt>, <tt>.appendPolyfill()</tt>, <tt>.prependPolyfill()</tt>, <tt>.afterPolyfill()</tt>, <tt>.beforePolyfill()</tt> and <tt>.replaceWithPolyfill()</tt>:</p>
+<pre>
+// three different examples
 $('form').appendPolyfill('&lt;fieldset&gt;&lt;input type="date" /&gt;&lt;/fieldset&gt;');
 $('#canvas-box').htmlPolyfill('&lt;canvas&gt;&lt;/canvas&gt;');
 $('datalist#list select').prependPolyfill('&lt;option value="new suggestion item" /&gt;');
-</code>
-							<p><small>See also <a href="demos/shiv.html#dynamic">dynamic HTML5 description</a>.</small></p>
-						</li>
-						<li>
-							<p><strong>no shadowdom</strong>: Webshims lib sometimes has to add additional DOM elements to mimic the UI of HTML5 elements. This can sometimes create differences, between polyfilled and non polyfilled browsers. Webshims lib gives you a method called 'getShadowElement' to access the shadowelement from the native element and a method called 'getNativeElement' to access the native element from the shadowelement. If the element has no shadowelement the element itself is returned.</p>
-							
-<code class="block">
-//animate the width of all date - inputs to a width of 300
+</pre>
+                            <p><small>See also <a href="demos/shiv.html#dynamic">dynamic HTML5 description</a>.</small></p>
+                        </li>
+                        <li>
+                            <p><strong>no shadowdom</strong>: Webshims lib sometimes has to add additional DOM elements to mimic the UI of HTML5 elements. This can sometimes create differences, between polyfilled and non polyfilled browsers. Webshims lib gives you a method called 'getShadowElement' to access the shadowelement from the native element and a method called 'getNativeElement' to access the native element from the shadowelement. If the element has no shadowelement the element itself is returned.</p>
+                            
+<pre>
+// animate the width of all date - inputs to a width of 300
 $('input[type="date"]').getShadowElement().animate({width: 300});
-</code>
-							<p>Some styles like float or display: none/block are not initially reflected by the shadowdom, it is a good approach to do this on a wrapper element:</p>
-<code class="block">&lt;!-- instead of --&gt;
+</pre>
+                            <p>Some styles like float or display: none/block are not initially reflected by the shadowdom, it is a good approach to do this on a wrapper element:</p>
+<pre>&lt;!-- instead of --&gt;
 &lt;div class="form-field"&gt;
   &lt;label for="date" style="display: none;"&gt;Birthdate&lt;/label&gt;
   &lt;input type="date" id="date" style="display: none;" /&gt;
@@ -393,242 +384,580 @@ $('input[type="date"]').getShadowElement().animate({width: 300});
 
 &lt;!-- or instead of: --&gt;
 &lt;div class="mediaplayer"&gt;
-  &lt;video src="file.mp4" controls style="margin: 0 10px 5px 0; float: left;"&gt;&lt;/video&gt;
+  &lt;video src="file.mp4" controls style="margin: 0 10px 5px 0; float: left"&gt;
+  &lt;/video&gt;
 &lt;/div&gt;
 &lt;!-- do this: --&gt;
-&lt;div class="mediaplayer" style="margin: 0 10px 5px 0; float: left;"&gt;
+&lt;div class="mediaplayer" style="margin: 0 10px 5px 0; float: left"&gt;
   &lt;video src="file.mp4" controls&gt;&lt;/video&gt;
 &lt;/div&gt;
-</code>
-							<p><strong>re-rendering shadowelements</strong>: On dynamic websites shadowelements dimensions and/or positions sometimes need to be updated, this can be achieved by triggering the <code>updateshadowdom</code>.</p>
-<code class="block">
+</pre>
+                            <p><strong>re-rendering shadowelements</strong>: On dynamic websites shadowelements dimensions and/or positions sometimes need to be updated, this can be achieved by triggering the <tt>updateshadowdom</tt>.</p>
+<pre>
 $(document).trigger('updateshadowdom');
-</code>
-							<p><small>Note: The <code>updateshadowdom</code> event is automatically (but 'lazily') triggered on window.resize/emchange events.</small></p>
-						</li>
-					</ul>
-					</div>
-					<h3 id="polyfill-foucs" class="button">Loading, Performance, FOUCs</h3>
-					<div class="panel">
-						<h3>Making webshims lib more lightweight (call polyfill conditionally)</h3>
-						<p>Webshims lib can be considered as very lightweight polyfill libary. Feature implementations are only loaded in browsers, which do not support those features without any blocking behavior.</p>
-						<p>The grouping of features in webshims lib however is a balancing act. For grouping features, we take the following aspects into account: filesize vs. HTTP-request (minimize requests vs. parallelise requests), relation between features (JSON has nothing to do with input[placeholder], but with localStorage) and the current featureset of modern browsers (current modern browsers shouldn't load too much).</p>
-						<p>In some cases those grouping decisions - made by webshims lib - do not really fit the needs of a project. An example: If a project only need the input[placeholder] and input[autofocus] features, the <code>forms</code> feature has to be used. But <code>forms</code> does not only implement those needed features, but also constraint validation and some other features like formtarget.</p>
-						<p>This would not hurt a browser, which hasn't implemented anything of this (Due to our minimize requests and non blocking approach, the additional filesize isn't really significant). But it hurts browsers, which have implemented those features, but haven't implemented the other features (For example: Safari 5 has no validation UI. Opera 11.5 has a buggy validation API).</p>
-						<p>To make webshims lib really lightweight in those cases, the <code>polyfill</code> method should be called conditionally:</p>
-<code class="block">
-//only polyfill forms, if placeholder or autofocus are not supported
-if(!Modernizr.input.placeholder || !Modernizr.input.autofocus){
-	$.webshims.polyfill('forms');
-}
-</code>				
-						<p>And in case of adding multiple conditionally features:</p>
-<code class="block">
-//always polyfill mediaelement -> mp4, flv, youtube in all browsers
-var polyfillFeatures = ['mediaelement'];
+</pre>
+                            <p><small>The <tt>updateshadowdom</tt> event is automatically and lazily triggered on window.resize/emchange events.</small></p>
+                        </li>
+                    </ul>
+            
+        </p>
 
-//only polyfill forms, if placeholder or autofocus are not supported
-if(!Modernizr.input.placeholder || !Modernizr.input.autofocus){
-	polyfillFeatures.push('forms');
-}
-//Start polyfilling
-$.webshims.polyfill(polyfillFeatures);
-</code>	
-					<h3>Customize Webshims lib's polyfiller.js</h3>
-					<p>While webshims lib comes with a lot of files, the polyfiller.js file is the only file, which has to be embeded directly in the page. The following tool allows you to customize and minimize the polyfiller.js file. (Simply overwrite the polyfiller.js with your customized version. All other files from the download package should stay.):</p>
-					<form action="http://marijnhaverbeke.nl/uglifyjs" method="post" data-polyfillpath="js-webshim/dev/polyfiller.js">
-						<fieldset class="config">
-							<legend>webshims config</legend>
-							<label><input type="checkbox" checked disabled /> es5</label> 
-							<label><input type="checkbox" checked id="canvas" data-mod="canvas" /> canvas</label>
-							<label><input type="checkbox" checked id="forms" data-mod="input inputtypes" data-features='["forms", "forms-ext"]' /> forms/forms-ext</label> 
-							<label><input type="checkbox" checked id="mediaelement" data-mod="audio video elem_track" data-features='["mediaelement", "track"]' /> mediaelement/track</label> 
-							<label><input type="checkbox" checked id="json-storage" data-mod="localstorage sessionstorage" /> json-storage</label> 
-							<label><input type="checkbox" checked id="geolocation" data-mod="geolocation" data-dependent="localstorage" /> geolocation</label> 
-							<label><input type="checkbox" checked id="details" /> details</label> 
-							<p>
-								<input type="submit" value="download custom polyfiller" />
-							</p>	
-						</fieldset>
-						<fieldset class="modernizr">
-							<legend>Modernizr build</legend>
-							<div><label><input type="checkbox" checked data-mod="shiv" /> HTML5shiv (you need HTML5shiv for sectioning elements in IE)</label></div>
-							<div><label><input type="checkbox" checked data-mod="load" /> Modernizr.load/yepnope (you need either yepnope or requirejs)</label></div>
-							<p>
-								<a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track-load" data-base="http://modernizr.com/download/#-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes" class="modernizr-builder">Modernizr build link</a>
-								<br />
-								<code class="modernizr-output"></code>
-							</p>
-						</fieldset>
-						<textarea name="js_code" style="display: none;"></textarea>
-						<input type="hidden" name="download" value="polyfiller.js" />
-					</form>	
-					<h3>Loading webshims async</h3>
-					<p>If webshims lib is loaded async, there are some configurations which have to be changed manually:</p>
-					<ul>
-						<li>waitReady: should be changed to false. Note: you can not rely on jQuery's DOM-Ready event anymore.</li>
-						<li>basePath: should be set manually</li>
-					</ul>
-					<p>A typical configuration and usage for webshims lib loading async (using yepnope) would look like this:</p>
-<code class="block">&lt;script src="modernizr-yepnope.js"&gt;&lt;/script&gt;
-&lt;script&gt;
-	Modernizr.load([
-		{
-			load: '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js',
-			complete: function () {
-				if ( !window.jQuery ) {
-					Modernizr.load('/js/libs/jquery-1.9.1.min.js');
-				}
-			}
-		},
-		{
-			// This will wait for the fallback to load and execute
-			load: '/js/libs/combined-package-with-polyfiller.js',
-			complete: function () {
-				
-				//The following code can be also inside of your combined-package-with-polyfiller.js file package
-				if ( jQuery.webshims ) {
-				
-					//change webshims options
-					jQuery.webshims.setOptions({
-						waitReady: false,
-						basePath: "/js/libs/shims/"
-					});
-					
-					//start polyfilling
-					jQuery.webshims.polyfill('forms canvas');
-					
-					//wait for the normal ready event and...
-					jQuery(function($){
-						//wait until all requested features are implemented
-						$.wehshims.ready('canvas forms', function(){
-							//use polyfilled features
-							var context = $('#myCanvas').getContext("2d");
-						});
-					});
-				}
-				
-			}
-		}
-	]);
-&lt;/script&gt;
-&lt;/head&gt;
-</code>
 
-						<p>Webshims polyfiller main file also registers as a "polyfiller" named AMD module. A typical configuration for loading webshims and jQuery async, using requireJS, would look like this:</p>
-						
-<code class="block">&lt;script src="require.js"&gt;&lt;/script&gt;
-&lt;script src="modernizr.custom.js"&gt;&lt;/script&gt;
-&lt;script&gt;
-	//requireJS config
-	//...
-require( ["jquery", "polyfiller"], function(e){
-	//change webshims options
-	jQuery.webshims.setOptions({
-		waitReady: false,
-		basePath: "/js/libs/shims/"
-	});
-	
-	//start polyfilling
-	jQuery.webshims.polyfill('forms canvas');
-	
-	//wait for the normal ready event and...
-	jQuery(function($){
-		//wait until all requested features are implemented
-		$.wehshims.ready('canvas forms', function(){
-			//use polyfilled features
-			var context = $('#myCanvas').getContext("2d");
-		});
-	});
+
+        <h2 id="Shiv">HTML5 shiv and innershiv</h2>
+        <p>
+            IE8- isn't capable of rendering HTML5 elements. Webshims lib in combination with Modernizr automatically fixes this issue and adds WAI-ARIA landmarks to enable accessibility of HTML5.
+        </p>
+
+        <p id="Shiv-dynamic-html5" class="header">
+            <b class="header">Dynamically adding HTML5 markup</b><br>
+            Additionally it implements the following manipulation methods to allow dynamic creation of HTML5 elements: <tt>.updatePolyfill()</tt>, <tt>.htmlPolyfill()</tt>, <tt>.appendPolyfill()</tt>, <tt>.prependPolyfill()</tt>, <tt>.afterPolyfill()</tt>, <tt>.beforePolyfill()</tt> <tt>.replaceWithPolyfill()</tt>, <tt>.appendPolyfillTo()</tt>, <tt>.prependPolyfillTo()</tt>, <tt>.insertPolyfillAfter()</tt>, <tt>.insertPolyfillBefore()</tt>, <tt>.replacePolyfillAll()</tt>
+<pre class="runnable">
+var html = '&lt;section&gt;&lt;form action="#"&gt;' +
+           '&lt;input type="text" placeholder="name" name="test" required/&gt;' +
+           '&lt;input type="date" required="required" name="test2" /&gt;' +
+           '&lt;input type="submit" /&gt;' +
+           '&lt;/form&gt;&lt;/section&gt;';
+$('#Shiv-dynamic-html5-test').htmlPolyfill(html);
+</pre>
+<div id="Shiv-dynamic-html5-test"> &nbsp; </div>
+        </p>
+            
+        <p id="Shiv-updatePolyfill" class="header">
+            
+            <b class="header">Using webshims' <tt>updatePolyfill</tt> method with Backbone/jQMobile/Knockout</b> <br>
+            If a plugin, script or framework is used, which uses a "normal" JS/jQuery manipulation method instead of the corresponding webshims enhanced manipulation method to generate new HTML5 content  (i.e.: <tt>.html()</tt> instead of <tt>.htmlPolyfill()</tt>), the method <tt>.updatePolyfill()</tt> can be used to polyfill the dynamic content:
+<pre>
+$('#my-dynamic-container').load('ajax/test.html', function(){
+    $(this).updatePolyfill();
 });
+</pre>     
+            <h4>jQuery mobile example</h4>
+            
+<pre>
+// call webshims.polyfill() before domready
+webshims.polyfill();
+$(function(){
+    // bind to the pageinit event after domready...
+    $(document).on('pagebeforecreate', function(e){
+        // ...and call updatePolyfill on the changed element container
+        $(e.target).updatePolyfill();
+    });
+});
+</pre> 
+            <p>For jQuery Mobile see also <a href="webforms/jquery-mobile.html">webshims and jQ mobile</a></p>
 
-&lt;/script&gt;
-&lt;/head&gt;
-</code>	
-						
+        <h2 id="ES5">ES5</h2>
+        <p>The <tt>es5</tt> feature uses the <a href="http://github.com/kriskowal/es5-shim/">ES5 shim</a> by <a href="http://askawizard.blogspot.com/">Kris Kowal</a> (all object methods, which can't be used cross-browser are removed.).</p>
+            <p>The script implements the following methods:</p>
+            <ul>
+                <li><strong>Object</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/keys">keys</a></li>
+                <li><strong>Array</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/isArray">isArray</a></li>
+                <li><strong>Array.prototype</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/forEach">forEach</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/map">map</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/filter">filter</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/every">every</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/some">some</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/Reduce">reduce</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/ReduceRight">reduceRight</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/indexOf">indexOf</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/lastIndexOf">lastIndexOf</a></li>
+                <li><strong>Date</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/now">now</a> <!--, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/parse">parse</a> --></li>
+                <li><strong>Date.prototype</strong>: <a href="http://msdn.microsoft.com/en-us/library/ff925953%28v=vs.94%29.aspx#Y72">toISOString</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/toJSON">toJSON</a></li>
+                <li><strong>Function.prototype</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind">bind</a></li>
+                <li><strong>String.prototype</strong>: <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String/Trim">trim</a></li>
+            </ul>
+            
+            
+            <p>Note: All methods added to the prototype object are visible inside of a for in loop, while native implementations aren't enumerable. (use hasOwnProperty)</p>
+<pre>
+webshims.ready('es5', function(){
+    [1, 2, 3].forEach(function(){
+        // do stuff
+    });
+});
+</pre>
+            <h3>Abstractions</h3>
+            <p>Webshims Lib adds the following methods: <tt>webshims.objectCreate</tt>, <tt>webshims.defineProperty</tt>, <tt>webshims.defineProperties</tt>, <tt>webshims.getOwnPropertyDescriptor</tt> and corresponding support flags: <tt>Modernizr.objectAccessor</tt> (true in all modern Browsers including IE9, getters and setters can be used on all objects) and <tt>Modernizr.advancedObjectProperties</tt> (true in FF4, IE9, Chrome 10..., the full ES5 specification of defineProperty is implemented (including writeable, enumerable and configurable).</p>
+            <h4>webshims.objectCreate(proto [, propertiesObject, options ])</h4>
+            <p><tt>webshims.objectCreate</tt> works very similar to <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/create">Object.create</a></p>
+            <p>If <tt>propertiesObject</tt> is defined, the method goes through this object and sets writeable, enumerable and configurable to true, if the corresponding property is undefined.</p>
+            <p>After this, it will pass <tt>proto</tt> and <tt>propertiesObject</tt> to Object.create (if defined) or will use Crockfords <tt>begetObject</tt>-Method on the <tt>proto</tt>-object and then calls <tt>webshims.defineProperties</tt> with the returned object and the <tt>propertiesObject</tt>.</p>
+            <p>If you pass the options parameter and the Object already has a Options-property. The options-property on the object will be deeply extended otherwise an new options-property will be created.</p>
+            <p>If the object has a method called <tt>_create</tt>, it will call this method with options as first argument.</p>
+            <p>After this, the created object will be returned.</p>
+<pre>
+var carProto = {
+    options: {
+        foo: 'bar',
+        baz: 'boom'
+    },
+    wheels: 4, 
+    drive: function(){
+        this.isDriving = true;
+    }
+};
 
-						<h3>Dealing with FOUCs</h3>
-						<p>Webshims lib uses a script loader and loading scripts dynamically always have the potential to create so called Flash of unstyled contents or Flash of unbehaviored contents.</p>
-						<p>There are a lot ways to deal with FOUCs/FOUBCs. The most easiest way to remove FOUCs caused by webshims lib is:</p>
-						<ol>
-							<li>Put your JS into your head and call $.webshims.polyfill() immediately (before DOM-Ready)</li>
-							<li>Put the following CSS in your Stylesheet:
-<code class="block">
-/* 
-The class loading-polyfills is set after you have called polyfill
-and will be removed as soon as all polyfills are loaded and implemented
-*/
-html.loading-polyfills body {
-	visibility: hidden;
+var myCar = Object.create(carProto, {
+    _create: {
+        value: function(){
+            this.drive();
+        }
+    },
+    jumps: {
+        value: function(){
+            //implements jumping
+        }
+    },
+    {baz: 'jo'}
+);
+
+// myCar will look like this:
+
+{
+    // own property:
+    options: { 
+        foo: 'bar',
+        baz: 'jo'
+    },
+    
+    // prototype:
+    wheels: 4, 
+    
+    // prototype
+    drive: function(){
+        this.isDriving = true;
+    },
+    
+    // own property:
+    _create: function(){
+        this.drive();
+    },
+    
+    // own property:
+    jumps: function(){
+        //implements jumping
+    },
+    
+    // own property:
+    isDriving: true
 }
-/*
-If polyfilling takes longer as 600ms, an additional class called 'long-loading-polyfill' will be set
-It's good practice to show the user that something is going on in this case
-*/
-html.long-loading-polyfills {
-	background-image: url(polyfill-loader.gif);
-	background-position: center 240px;
-	background-repeat: no-repeat;
-}
-</code>
-							</li>
-						</ol>
-						
-						<h4>Why you should put your webshims inside of your documents head</h4>
-						<p>There is a lot of misunderstanding about the yslow rule "Put your JavaScript at the bottom". Put your JavaScript at the bottom does not decrease total page load time. The effect is psychologic. The user sooner sees how the page is loading, because JS blocks the UI rendering.</p>
-						<p>This also means that a FOUC is not a side effect of "Put your JavaScript at the bottom". It is the intended effect of this technique.</p>
-						<p>Using a script loader (and webshims lib uses a script loader) has a very similiar effect, because dynamically added scripts won't block the UI anymore. Combining both techniques will increase FOUCs.</p>
-						<p>If you use a script loader and put your JS at top you have done everything right about performance. Some versions of yslow recognize that you have used this technique and won't subtract points for this rule ("Put your JavaScript at the bottom"). The nice thing about script loaders is, that loading JS-files dynamically will additionally decrease page load time, because all browsers can parallelize script loading.</p>
-					</div>
-					<h3 id="implement-polyfill" class="button">How to write a new feature implementation?</h3>
-					<div class="panel">
-						<p>A Pollyfill is always split into at least two parts. First the test and loader definition, and then the implementation.</p>
-		
-		<p>Assume there is a new method <code>magicMethod</code> on the window object that we want to polyfill if the browser doesn't provide it. An implementation would look like this:</p>
-<code class="block">
-$.webshims.addPolyfill('magicMethod', {
-	test: function(){
-		return ('magicMethod' in window);	
-	}
+</pre>
+        <h4>webshims.defineProperties (object, props)</h4>
+        <p><tt>webshims.defineProperties</tt> works similar to <a href="https://developer.mozilla.org/en/JavaScript/Reference/global_objects/object/defineproperties">Object.defineProperties</a></p>
+        <p>It will go through the props properties and will set writeable, enumerable and configurable to true, if they are undefined.</p>
+        <p>After this either Object.defineProperties will be invoked or legacy code is used.</p>
+        
+
+        <h2 id="Forms">Forms</h2>
+        <p>
+            The <tt>forms</tt> (constraint validation without number, date etc.) and <tt>forms-ext</tt> (number, date, range etc.) features of the webshim lib are implementing support for the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#the-constraint-validation-api">constraint validation API</a>, some input widgets and the placeholder-attribute.</p>
+            <p>The <tt>forms</tt> feature also implements an easy and cross browser way to control the validation UI (error message and styling the validation bubble).
+        </p>
+
+        <h3>Implemented/fixed in <tt>form</tt>:</h3>
+        <ul>
+            <li>
+                <strong>elements:</strong> <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-button-element.html#the-output-element">output</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-button-element.html#the-datalist-element">datalist<sup>1</sup></a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-button-element.html#the-progress-element">progress</a></li>
+            <li>
+                <strong>types</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-(type=email)">email</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#url-state-(type=url)">url</a>
+            </li>
+            <li>
+                <strong>content attributes and properties (IDL attributes)</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#attr-input-placeholder">placeholder</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#attr-input-list">list</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#attr-fe-autofocus">autofocus</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#attr-fs-novalidate">novalidate (noValidate)</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#attr-input-required">required</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#attr-input-pattern">pattern</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-button-element.html#attr-textarea-maxlength">maxlength</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#attr-fs-formnovalidate">formnovalidate (formNoValidate)</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#attr-fs-formaction">formaction (formAction)</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#attr-fs-formenctype">formenctype (formEnctype)</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#attr-fs-formmethod">formmethod (formMethod)</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#attr-fs-formtarget">formtarget (formTarget)</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#association-of-controls-and-forms">form attribute</a> </li>
+            <li>
+                <strong>properties/IDLs</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-button-element.html#dom-datalist-options">options<sup>2</sup></a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-button-element.html#dom-progress-position">position</a>,
+                <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#dom-cva-willvalidate">willValidate</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#dom-cva-validity">validity</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#dom-cva-validationmessage">validationMessage</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-button-element.html#dom-progress-position">position</a></li>
+            <li>
+                <strong>methods</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#dom-cva-setcustomvalidity">setCustomValidity</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/forms.html#dom-form-checkvalidity">checkValidity</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#dom-input-stepdown">stepUp/stepDown</a></li>
+            <li>
+                <strong>events</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#constraint-validation">invalid</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#event-input-input">input</a></li>
+            <li>
+                <strong>Selectors</strong>: <a href="http://www.w3.org/TR/css3-ui/#pseudo-invalid">:invalid</a>, <a href="http://www.w3.org/TR/css3-ui/#pseudo-valid">:valid</a>, <a href="http://www.w3.org/TR/css3-ui/#pseudo-required">:required</a>, <a href="http://www.w3.org/TR/selectors4/#user-pseudos">:user-error</a> <!--, <a href="http://www.w3.org/TR/css3-ui/#pseudo-optional">:optional</a><span class="forms-ext-feature"><a href="http://www.w3.org/TR/css3-ui/#pseudo-in-range">, :in-range</a>, <a href="http://www.w3.org/TR/css3-ui/#pseudo-out-of-range">:out-of-range</a></span> -->(Not for CSS, only for JS, for CSS use selectors .user-sccuess, .user-error or [required] please look into the abstractions section)</li>
+        </ul>
+        <ul>
+            <li><small>1. You need to wrap the datalist options in a select element (datalist > select > option)!</li>
+        </ul>
+
+
+        <h3>Implemented/fixed in <tt>form-ext</tt>:</h3>
+        <ul>
+            <li>
+                <strong>types</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#local-date-and-time-state">datetime-local</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#time-state-(type=time)">time</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#date-state-(type=date)">date</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/number-state.html#number-state-(type=number)">number</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#month-state-%28type=month%29">month</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/number-state.html#range-state-(type=range)">range</a>
+            </li>
+            <li>
+                <strong>content attributes and properties (IDL attributes)</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#attr-input-step">step</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#attr-input-max">max</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#attr-input-min">min</a>
+            </li>
+            <li>
+                <strong>properties/IDLs</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#dom-input-valueasnumber">valueAsNumber</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#dom-input-valueasdate">valueAsDate</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/forms.html#dom-lfe-labels">labels</a>
+            </li>
+        </ul>
+
+
+
+        
+        <p id="Forms-forms" class="header">
+            <b class="header"><tt>forms</tt> Options</b>
+        </p>
+        <ul>
+            <li>
+                <strong>customMessages</strong> <em>boolean</em> If set to true, Webshims will implement a DOM-Property called customValidationMessage, which can be changed through the webshims.validityMessages-Array.<br>
+                <em>default: false</em>
+            </li>
+            <li>
+                <strong>lazyCustomMessages</strong> <em>boolean</em> Similiar to <tt>customMessages</tt>, but the data is lazily loaded after window.onload or as soon as the user starts to interact with a form for better performance. The customValidationMessage property is therefore not available on DOM-Ready.<br>
+                <em>default: false</em>
+            </li>
+            <li>
+                <strong>replaceValidationUI</strong> <em>boolean</em> Replaces the browser validation UI with a custom styleable UI. <br>
+                <em>default: false</em>
+            </li>
+            <li>
+                <strong>placeholderType</strong> <em>string</em> Enumeration with value <tt>value</tt> or <tt>over</tt>. If set to "over", the polyfill uses the overLabel technique to create a placeholder and doesn't "pollute" the value property. <br>
+                <em>default: value</em>
+            </li>
+            <li>
+                <strong>customDatalist</strong> <em>boolean</em> Allows to use custom styleable datalist elements in all browsers. <br>
+                <em>default: false</em>
+            </li>
+            <li>
+                <strong>overridePlaceholder</strong> <em>boolean</em>
+            </li>
+            <li>
+                <strong>iVal</strong> <em>mixed object</em> <a href="webforms/1-webforms-lang-custom-bubble.html#instant-validation"> live form validation example</a>
+            </li>
+            <li>
+                <strong>addValidators</strong> <em>boolean</em> Should Webshim implement some new custom validators. <a href="webforms/4-webforms-custom-validity.html">custom validity example</a> <br>
+                <em>default: false</em>
+            </li>
+            <li>
+                <strong>list</strong> <em>mixed object</em>  Options for the datalist/[list] feature. <br>
+                <em>default: {popover: {constrainWidth: true}}</em>
+            </li>
+        </ul>
+        
+        <p id="Forms-forms-ext" class="header">
+            <b class="header"><tt>forms-ext</tt> Options</b>
+        </p>
+        <ul>
+            <li>
+                <strong>replaceUI</strong> <em>boolean</em> If set to true the number, time, month, date <!--, datetime --> and range Widgets are replaced in all browsers (also in browser, which have implemented these types). This is useful, if you want to style the UI in all browsers. <br>
+                <em>default: false</em>
+            </li>
+            <li>
+                <strong>types</strong> <em>string</em> A white space seperated string. Possible values are <tt>'datetime-local range date time number month color'</tt>. If one of the listed input types is not supported, Webshim will load the forms-ext API and UI package and implement all types.<br>
+                <em>default: datetime-local month date time range number</em>
+            </li>
+            <li>
+                <strong>widgets</strong> <em>object</em> widgets is a general options object for all input options. <a href="webforms/3-webforms-widgets.html#configure-ui">more information</a>
+            </li>
+            <li>
+                <strong>date</strong> <em>object</em> <a href="webforms/3-webforms-widgets.html#date-cfg"> example </a>
+            </li>
+            <!--<li><strong>datetime-local</strong> (options): for more information see <a href="webforms/3-webforms-widgets.html#datetime-local-cfg">here</a></li>-->
+            <li>
+                <strong>month</strong> <em>object</em> <a href="webforms/3-webforms-widgets.html#month-cfg">example</a>
+            </li>
+            <li>
+                <strong>number</strong> <em>object</em> <a href="webforms/3-webforms-widgets.html#number-cfg">example</a>
+            </li>
+            <li>
+                <strong>time</strong> <em>object</em> <a href="webforms/3-webforms-widgets.html#time-cfg">example</a>
+            </li>
+            <li>
+                <strong>range</strong> <em>object</em> <a href="webforms/3-webforms-widgets.html#range-cfg">example</a>
+            </li>
+            <li>
+                <strong>color</strong> <em>object</em>
+            </li>
+        </ul>
+        
+        <p id="Forms-extensions" class="header">
+            <b class="header">Extensions</b>
+        </p>
+        <ul>
+            <li><strong>event: firstinvalid</strong>: <tt>firstinvalid</tt> is a simple, bubbling event, which is triggered on the first invalid form element. Preventing the default of firstinvalid will automatically prevent the default behavior of all current invalid elements.</li>
+            <li><strong>event: lastinvalid</strong>: <tt>lastinvalid</tt> is an extended, bubbling, (but) uncancelable event, which is triggered on the last invalid form element. The property <tt>invalidlist</tt> is a jQuery-collection of all current invalid elements.</li>
+            <li><strong>event: changedvalid/changedinvalid</strong>: Event is triggered, if the value of the element was changed and is marked as valid/invalid (see also: .form-ui-valid/.form-ui-invalid).</li>
+            <li><strong>event: datalistselect</strong>:  Event is triggered on the input element, if the user selects a value from an option inside of the associated datalist (only available, if customDatalist is set to true)</li>
+            <li><strong>selectors for CSS/JS: .ws-instantvalidation (.ws-invalid/.ws-success)</strong>: The class 'ws-instantvalidation' on a form element will implement UX improved Instant Validation for this form. The classes .ws-invalid (similiar to <a href="http://www.w3.org/TR/selectors4/#user-pseudos">:user-error</a>) and .ws-success will mark either "touched" invalid element wrappers or valid and "filled" element wrappers. <a href="webforms/1-webforms-lang-custom-bubble.html#instant-validation">example</a></li>
+            <li><strong>selectors for CSS/JS: .user-success/.user-error</strong>: which work similar to <a href="https://developer.mozilla.org/en/CSS/%3A-moz-ui-valid">:-moz-ui-valid</a>/<a href="https://developer.mozilla.org/en/CSS/%3A-moz-ui-invalid">:-moz-ui-invalid</a> or <a href="http://www.w3.org/TR/selectors4/#user-pseudos">:user-error</a></li>
+            <li><strong>selectors for CSS/JS: .placeholder-visible</strong>: which work similar to <a href="https://developer.mozilla.org/en/CSS/%3A-moz-placeholder">:-moz-placeholder</a>, <a href="http://msdn.microsoft.com/en-us/ie/hh272905#_HTML5FormsVal">:-ms-input-placeholder</a> and <a href="http://css-tricks.com/snippets/css/style-placeholder-text/">::-webkit-input-placeholder</a></li>
+            <li><strong>selectors for CSS: .prop-checked</strong>: which work equal to <a href="http://www.w3.org/TR/selectors4/#checked">:checked</a> pseudoclass. This class is only added, if the browser does not support the <tt>:checked</tt> pseudoclass (i.e. IE8-).</li>
+            <li><strong>property: customValidationMessage</strong>: very similar to the standard validationMessage, but always uses built-in custom validation messages, which can be better controlled. <strong>Note: You have to set <tt>customMessages</tt> or <tt>lazyCustomMessages</tt> to true before calling the <tt>polyfill</tt> method, to get this new property.</strong></li>
+            <li><strong>attribute: data-errormessage or -x-moz-errormessage</strong>: Attribute with text, which is used be custom validityAlert/customValidationMessage to show a custom error message for the field.</li>
+            <li><strong>helper method: webshims.validityAlert.showFor</strong>: takes a DOM-Object/Selector/jQuery-Object and shows the invalid message for this element. (simply look into the prototype i.e. <tt>console.log(webshims.validityAlert)</tt> to make changes)</li>
+        </ul>
+
+
+        <h2 id="Canvas">Canvas</h2>
+        <p>the canvas feature implements one jQuery method <tt>.getContext()</tt>.</p>
+            
+            
+            <canvas id="my-canvas" width="80" height="80"></canvas>
+<pre class="runnable">
+var ctx = $('#my-canvas').getContext('2d');
+ctx.clearRect(10, 10, 100, 100);
+ctx.fillStyle = "rgb(200,0,0)";  
+ctx.fillRect(10, 10, 55, 50);  
+ 
+ctx.fillStyle = "rgba(0, 0, 200, 0.5)";  
+ctx.fillRect(30, 30, 55, 50);
+</pre>
+            <p>Webshim Lib can implement <a href="http://code.google.com/p/explorercanvas/">excanvas</a> or <a href="http://flashcanvas.net/">FlashCanvas (default)/FlashCanvas Pro</a>:</p>
+<pre>
+// always run configuration before calling webshims.polyfill();
+window.FlashCanvasOptions = {
+    disableContextMenu: true
+};
+webshims.setOptions('canvas', {
+    type: 'flashpro' // excanvas | flash | flashpro
+});
+</pre>
+            <h3>Options for the <tt>canvas</tt> feature</h3>
+            <ul>
+                <li>
+                    <strong>type</strong> <em>string</em> Enumeration with value <tt>flash</tt> or <tt>flashpro</tt> or <tt>excanvas</tt>
+                </li>
+            </ul>
+
+
+
+        <h2 id="Media">Media</h2>
+        <p>The <tt>mediaelement</tt> feature implements the audio, video and source elements including their API and enables playing mp4, mp3, flv, fla etc. media files and playing rtmp streams in incapable browsers.
+        </p>
+        
+        <h3>Implemented/fixed elements, attributes, properties, methods, events</h3>
+        <ul>
+            <li><strong>elements:</strong> <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#video">video</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#audio">audio</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#the-source-element">source</a></li>
+            <li><strong>attributes and IDL/properties</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#attr-media-controls">controls</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#attr-media-loop">loop</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#attr-media-autoplay">autoplay</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#attr-source-src">src</a>, <a href="http://www.w3.org/TR/html5/embedded-content-0.html#dom-source-media">media</a>, <a href="http://www.w3.org/TR/html5/embedded-content-0.html#dom-source-media">type</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#attr-media-muted">muted</a></li>
+            <li><strong>properties/IDLs</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-paused">paused</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-ended">ended</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-muted">muted</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-volume">volume</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-currenttime">currentTime</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-duration">duration</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-buffered">buffered</a><sup>1</sup>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-currentsrc">currentSrc</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-readystate">readyState</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-networkstate">networkState</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-video-videoheight">videoHeight</a><sup>2</sup>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-video-videowidth">videoWidth</a><sup>2</sup>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-seeking">seeking</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-defaultmuted">defaultMuted</a></li>
+            <li><strong>methods</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-play">play</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-pause">pause</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-media-load">load</a> (mediaLoad<sup>3</sup>), <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#dom-navigator-canplaytype">canPlayType</a> <sup>4</sup> </li>
+            <li><strong>events</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-loadedmetadata">loadedmetadata</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-play">play</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-pause">pause</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-playing">playing</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-canplay">canplay</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-ended">ended</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-waiting">waiting</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-timeupdate">timeupdate</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-progress">progress</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-emptied">emptied</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-volumechange">volumechange</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-durationchange">durationchange</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-seeking">seeking</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-seeked">seeked</a></li>
+        </ul>
+        <ul>
+            <li><small>1.buffered is a little bit buggy with youtube videos.</small></li>
+            <li><small>2.videoHeight/videoWidth not supported with youtube videos.</small></li>
+            <li><small>3. mediaLoad is the jQuery plugin method, which corresponds to the native load method (Webshims lib does not override jQuery's own load-method), ( $('video')[0].load() === $('video:first').mediaLoad() ).</small></li>
+            <li><small>4. canPlayType returns "maybe" if native player can't play, but Flash can and is installed. (i.e.: $('video').canPlayType('video/flv') might return "mabe")</small></li>
+        </ul>
+        
+        <h3>Options for the <tt>mediaelement</tt> feature</h3>
+        
+        <ul>
+            <li>
+                <strong>preferFlash</strong> <em>boolean</em> If set to true the mediaelements will be replaced by flash, if flash is available. Otherwise, only if mediaelements aren't supported or the current audio/video container/codec isn't supported by the browser. <br>
+                <em>default: false</em>
+            </li>
+            <li><strong>vars</strong> <em>Flashvars Object</em> configuration for <a href="http://jarisflvplayer.org/docs/">Jarisplayer</a>. This general configuration can be changed via a data-vars attribute too.</li>
+            <li><strong>changeSWF</strong> <em>function</em> Callback function to modify the flashvars object for Jarisplayer.</li>
+        </ul>
+
+        <p id="Media-track" class="header">
+            <b class="header">Track Element Support</b> <br>
+            The <tt>track</tt> feature implements the track element width a WebVTT parser and the corresponding DOM- and JS-APIs.
+        </p>
+        <h3>Implemented/fixed elements, attributes, properties, methods, events</h3>
+        <ul>
+            <li><strong>elements:</strong> <a href="http://www.w3.org/TR/html5/the-track-element.html">track</a></li>
+            <li><strong>attributes and IDL/properties</strong>: <a href="http://www.w3.org/TR/html5/the-track-element.html#dom-track-kind">kind</a>, <a href="http://www.w3.org/TR/html5/the-track-element.html#attr-track-src">src</a>, <a href="http://www.w3.org/TR/html5/the-track-element.html#attr-track-srclang">srclang</a>, <a href="http://www.w3.org/TR/html5/the-track-element.html#attr-track-label">label</a>, <a href="http://www.w3.org/TR/html5/the-track-element.html#attr-track-default">default</a></li>
+            <li><strong>properties/IDLs</strong>: <a href="http://www.w3.org/TR/html5/the-track-element.html#dom-track-readystate">readystate</a>, <a href="http://www.w3.org/TR/html5/the-track-element.html#dom-track-track">track</a>, <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-texttracks">textTracks</a></li>
+            <li><strong>methods</strong>: <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-addtexttrack">addTextTrack</a></li>
+            <li><strong>events</strong>: <a href="http://www.w3.org/TR/html5/media-elements.html#handler-texttrack-oncuechange">cuechange</a>, <a href="http://www.w3.org/TR/html5/media-elements.html#handler-texttrackcue-onenter">enter</a>, <a href="http://www.w3.org/TR/html5/media-elements.html#handler-texttrackcue-onexit">exit</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#handler-texttracklist-onaddtrack">addtrack</a>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#handler-texttracklist-onremovetrack">removetrack</a></li>
+            <li><strong>corresponding interfaces</strong>: <a href="http://dev.w3.org/html5/spec/media-elements.html#texttracklist">TextTrackList<sup>1</sup></a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrack">TextTrack<sup>2</sup></a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrackcuelist">TextTrackCueList</a>, <a href="http://dev.w3.org/html5/spec/media-elements.html#texttrackcue">TextTrackCue</a> including the <a href="http://dev.w3.org/html5/spec/media-elements.html#dom-texttrackcue">TrextTrackCue constructor</a></li>
+        </ul>
+        <ul>
+            <li><small>1. Use additional [] to bind events to Array-like objects (<tt>$([ $('video').prop('textTracks') ]).on('addtrack', function(e){console.log('track was added');});</tt>)</small></li>
+            <li><small>2. Use $.prop to get activeCues property.  (i.e.: <tt>$.prop(track, 'activeCues');</tt> ).</small></li>
+        </ul>
+        
+        <h3>Options for the <tt>track</tt> feature</h3>
+        
+        <ul>
+            <li><strong>override</strong> (false): Overrides native track implementation. In case you have to deal with some cross-browser issues with native implementation.</li>
+            <li><strong>positionDisplay</strong> (true): Positions the cue display via JavaScript.</li>
+        </ul>
+
+
+        <h2 id="Geolocation">Geolocation</h2>
+        <p>
+            The <tt>geolocation</tt>-feature implements the navigator.geolocation API. The following methods are available:
+        </p>
+            
+        <ul>
+            <li>navigator.getCurrentPosition: successCallback, errorCallback and options ({timeout: number}) are supported</li>
+            <li>navigator.watchPosition: in shim identical to getCurrentPosition, except it returns an useless ID</li>
+            <li>navigator.clearWatch: is noop in shim</li>
+        </ul>
+        
+        <p>The shim uses the geolocation information provided by <a href="http://freegeoip.net">http://freegeoip.net</a> and/or <a href="http://code.google.com/intl/de-DE/apis/ajax/documentation/#ClientLocation">googles API-Loader</a></p>
+        
+        <h3>Options for geolocation</h3>
+        <ul>
+            <li><strong>confirmText</strong> <em>string</em> confirm text for requesting access to geo data.</li>
+        </ul>
+<pre>
+webshims.setOptions('geolocation', {
+    confirmText: '{location} wants to know your position. It is Ok to press Ok.'
+});
+</pre>         
+<pre class="runnable">
+navigator.geolocation.getCurrentPosition(function(pos){
+    alert("Thx, you are @ latitude: "+ pos.coords.latitude +"/longitude: " + pos.coords.longitude);
+});
+</pre>
+
+
+        <h2 id="DetailsSummary">Details &amp; Summary</h2>
+
+        <p>The HTML5 details element is an interactive element. If the open attribute is set the details are shown, if not the details are hidden.</p>
+        <details>
+            <summary>click to toggle visibility</summary>
+            <p>Here are the <strong>details</strong> of this element:</p>
+            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore mag</p>
+        </details>
+        
+        <p>Dynamically creating a details element (always use htmlPolyfill, afterPolyfill, beforePolyfill etc.):</p>
+<pre class="runnable">
+$('details:first').afterPolyfill('&lt;details open="open"&gt;&lt;p&gt;Here is some text&lt;/p&gt;&lt;/details&gt;');
+</pre>
+        <p>The openness of a details element can be also scripted. Simply change the open IDL-attribute:</p>
+<pre class="runnable">
+// set the open attribute of the first details element ...
+// ... to its opposite value
+$('details:first').prop('open', !$('details').prop('open') );
+</pre>
+        
+
+        <h3>Options for the <tt>details</tt> feature</h3>
+        <ul>
+            <li>
+                <strong>text</strong> <em>string</em> The summary text which is generated if no summary element is found as first child of the details element. <br>
+                <em>default: Details</em>
+            </li>
+            <li>
+                <strong>animate</strong> <em>boolean</em> If set to true, the visibility toggle of details will be animated. <br>
+                <em>default: false</em>
+            </li>
+        </ul>
+        
+<pre class="runnable">
+webshims.setOptions('details', {animate: true});
+</pre>
+
+        <b class="header">Constraints of the details polyfill</b><br>
+        <ul>
+            <li>The polyfill currently only allows other elements as direct children of the details. Simple text is not allowed as direct child of details.</li>
+            <li>The details and summary element can be <strong>considered as experimental</strong>. It is not clear wether and if yes, how a developer can style the summary element. Safari nightly (6) and Chrome 12 are currently the only browsers supporting this element. Note: Please read <a href="http://my.opera.com/ODIN/blog/implementing-html5-details">Bruce Lawson's blog post</a>.</a></li>
+            <li>We currently haven't coded unit tests for this feature</li>
+        </ul>
+
+
+        <h2 id="FileReader"> FileReader</h2>
+        <p>An example of how to read a file as a base64 string from a form control:</p>
+<pre>
+&lt;!-- add ws-filereader class to all shimable type="file" inputs --&gt;
+&lt;input type="file" class="ws-filereader" id="user-photo" /&gt;
+</pre>
+<pre>
+webshims.polyfill('filereader');
+
+//on DOM ready filereader is shimmed
+$(function(){
+
+  $('#user-photo').on('change', function (evt) {
+    var reader, file;
+    reader = new FileReader();
+    reader.onload = function (evt) {
+      var fileData = evt.target.result;
+      // fileData is the base64 encoded image
+    };
+
+    //use $.prop to access files property
+    file = $(this).prop('files')[0];
+    reader.readAsDataURL(file);
+  });
+
+});
+</pre>
+        <h3>Options for the <code>FileReader</code> feature</h3>
+        <ul>
+            <li><strong>debugMode</strong> <em>boolean</em> Turn on/off console logging</li>
+            <li><strong>callback</strong> <em>function</em> Callback function triggered when Filereader is ready</li>
+        </ul>
+
+        <h3>Element specific options</h3>
+        <ul>
+            <li><strong>multiple</strong> <em>boolean</em> Mutliple file select. Default: input file multiple property or false</li>
+<li><strong>accept</strong> <em>string</em> Mime type file restriction. Default: input file accept attribute or false</li>
+<li><strong>label</strong> <em>string</em> Label for the file type in file dialog if using extensions: example “Images (.jpg)”</li>
+<li><strong>extensions</strong> <em>string</em> File extensions in Flash format: "*.jpg;*.png;*.pdf", requires label option</li>
+        </ul>
+
+        <p>
+            <em>This feature is based on code from <a href="https://github.com/Jahdrien/FileReader" target="_external">https://github.com/Jahdrien/FileReader</a>.
+            </em>
+        </p>
+
+
+
+        <h2 id="Customizing"> Customizing Webshim</h2> 
+
+        <p id="Customizing-modernizr" class="header">
+            <b class="header">Modernizr</b> 
+            <br>
+            Webshims lib does not need every Modernizr test and supports creating a <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track">custom Modernizr build</a>.
+            <!-- (Webshims lib uses <a href="http://requirejs.org/">requireJS</a> or <a href="https://gist.github.com/aFarkas/936413">sssl</a> as a script loader, if this is included, if not it uses Modernizr.load/yepnope.)-->
+        </p>
+
+        <p>
+            <small> <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track"> Modernizr detections used by webshim</a> </small>
+        </p>
+
+
+
+        <p id="Customizing-extending" class="header">
+            <b class="header">Writing a New Polyfill</b> 
+            <br>
+
+            <p>A Pollyfill is always split into at least two parts. First the test and loader definition, and then the implementation.</p>
+
+            <p>Assume there is a new method <tt>magicMethod</tt> on the window object that we want to polyfill if the browser doesn't provide it. An implementation would look like this:</p>
+            <pre>
+webshims.addPolyfill('magicMethod', {
+  test: function(){
+    return ('magicMethod' in window); 
+  }
 });
 // loads magicMethod.js from shim-folder if test returns false
-</code>		
-		<p>Create a file called magicMethod with your polyfill code and place it in the shim folder:</p>	
-<code class="block">
+</pre> 
+            <p>Create a file called magicMethod with your polyfill code and place it in the shim folder:</p>
+            <pre>
 window.magicMethod = function(){
-	//your polyfill implementation
+  // your polyfill implementation
 };
-</code>		
+</pre> 
 
-		<p>If your implementation has dependencies on other polyfills/modules, you can add a dependencies property to make sure they're loaded too:</p>
-		
-<code class="block">
-$.webshims.addPolyfill('magicMethod', {
-	test: function(){
-		return ('magicMethod' in window);	
-	},
-	d: ['es5', 'json-storage'] // d = dependencies
+            <p>If your implementation has dependencies on other polyfills/modules, you can add a dependencies property to make sure they're loaded too:</p>
+
+            <pre>
+webshims.addPolyfill('magicMethod', {
+  test: function(){
+    return ('magicMethod' in window); 
+  },
+  d: ['es5'] // d = dependencies
 });
 // load magicMethod.js and its dependencies if test returns false
-</code>		
-		<p>If your shim has dependencies, you have to register your implementation code with <code>$.webshims.register</code>:</p>	
-<code class="block">
-jQuery.webshims.register('magicMethod', function($, webshims, window, document, undefined, options){
-	//now you can use es5-feature and json-storage feature	
-	window.magicMethod = function(){
-		//your polyfill implementation
-	};
+</pre> 
+            <p>If your shim has dependencies, you have to register your implementation code with <tt>webshims.register</tt>:</p>
+            <pre>
+webshims.register('magicMethod', function($, webshims, window, document, undefined, options){
+  // now you can use es5-feature feature  
+  window.magicMethod = function(){
+    // your polyfill implementation
+  };
 });
-</code>	
+</pre> 
 
-		<p>In case of a DOM extension, webshims lib comes with some useful extension-methods.</p>
-<code class="block">
-$.webshims.addPolyfill('mediaelement', {
-	test: function(){
-		return ('canPlayType' in document.createElement('video'));	
-	},
-	d: ['dom-support'],
-	methodNames: ['play'] //pause, load
+            <p>In case of a DOM extension, webshims lib comes with some useful extension-methods.</p>
+            <pre>
+webshims.addPolyfill('mediaelement', {
+  test: function(){
+    return ('canPlayType' in document.createElement('video'));  
+  },
+  d: ['dom-support'],
+  methodNames: ['play'] // pause, load
 });
 // load mediaelement.js and DOM extension features from shim folder
 // if test returns false and always create a jQuery plugin called play,
@@ -636,118 +965,124 @@ $.webshims.addPolyfill('mediaelement', {
 
 // listen to 'play' events in the capturing phase
 // can use event delegation with jQuery's bind method
-$.webshims.capturingEvents(['play']);
-</code>
+webshims.capturingEvents(['play']);
+</pre>
 
-		<p>Now put a mediaelement.js inside of your shim folder and start implementing some features. The <code>dom-support</code> feature of Webshims lib comes with some very useful implementation helpers. Here are two of them:</p>
-		<ul>
-			<li><code>$.webshims.defineNodeNamesProperty</code> (nodeNames, property, descriptor)</li>
-			<li><code>$.webshims.defineNodeNamesBooleanProperty</code> (nodeNames, property, descriptor)</li>
-		</ul>
-<code class="block">
-//wait till the DOM-Extension feature is loaded
-jQuery.webshims.register('mediaelement', function($, webshims, window, document, undefined, options){
-	//note: webshims refers to jQuery.webshims in this function
-	
-	//Implements a new IDL property on audio, video called currentTime
-	webshims.defineNodeNamesProperty('audio, video', 'currentTime', {
-		prop: {
-			get: function(){
-				//your getter implementation ("this" refers to the element)
-			},
-			set: function(value){
-				//your setter implementation ("this" refers to the element)
-			}
-		}
-	});
-	
-	//Implements a new constant property called HAVE_CURRENT_DATA on audio, video
-	webshims.defineNodenamesProperty('audio, video', 'HAVE_CURRENT_DATA', {
-		prop: {
-			value: 2
-		}
-	});
-	
-	//Implements a new method called play on audio, video
-	webshims.defineNodeNamesProperty('audio, video', 'play', {
-		prop: {
-			value: function(){
-				//your play method implementation
-				//this refers to the element
-			}
-		}
-	});
-	
-	
-	
-	//Implements a new boolean IDL property called controls on audio, video
-	//which is reflected by a content attribute
-	webshims.defineNodeNamesBooleanProperty('audio, video', 'controls', {
-		//set works more like an onSet:
-		//you don't have to set the value anymore on the DOM node, only handle true/false values
-		set: function(value){
-			if(value){
-				//show controls for elem
-			} else {
-				//hide controls for elem
-			}
-		},
-		initAttr: true
-	});
-});	
-</code>
-		
-					</div>
-					
-					
-					
-					<h3 id="polyfill-philosophy" class="button">Webshims polyfilling philosophy</h3>
-					<div class="panel">
-						<h4>Abstractions vs. Polyfills</h4>
-						<p>A polyfill is a shim that mimics/replicates a future/standarized API using legacy techniques to older browsers. A "shim-abstraction" is a code that uses modern and legacy techniques to create a new unstandardized API.</p>
-						<p>An abstraction can have several advantages over a pure polyfill. One of those advantages is a more clean and more easy-to-use API. Webshims Lib has decided to create/use polyfills (with some extensions on top of the standard, not instead!). This decision has several reasons.</p>
-						<p><strong>Make learning new web technologies easy</strong>: It's an easy question: Do you want to learn proprietary or standardized code.</p>
-						<p><strong>Make interoperability easy</strong>: Although Webshims Lib technique to create DOM-Setters and DOM-Getters is an abstraction (always use $.prop/$.attr to get/set DOM-Attributes). This abstraction is compatible to HTML5-browsers and makes writing interoperable code easy. Which means, you can use and mix different code of different developers.</p>
-						<p><strong>Make extensions easy</strong>: If you want to create an extension on top of a feature, you always have one code path, because everything (including the low-level API) should be polyfilled. If you want to extend an abstraction, it might be possible, that you have to extend several code paths (modern and legacy code).</p>
-						<p><strong>Let the user/developer choose</strong>: Webshims lib's polyfills are loaded modular by demand, which means you can mix several polyfills. Consider the following:</p>
-						<p>A plugin-author needs a storage API and he chooses abstraction code A, because it is good, has an awsome API and is only 5kb. Another plugin author also needs an storage API and uses abstraction code B, it's also nice and also just 5kb. And now you need to use both scripts and you are adding 10kb of useless code, because 80% of all browser already support localStorage and JSON (I would say this is a big fail).</p>
-						
-						<h4>Create stable, reliable polyfills</h4>
-						<p>One big problem in the "polyfilling" world are reliable and production ready polyfills. Webshims Lib takes cross-browser testing and studying the specifications very serious.</p>
-						<h4>Improve the standard</h4>
-						<p>While Webshims lib's polyfills only want to polyfill the gaps and in some cases do some extension work. Every developer is invited to abstract ugly APIs, to re-style ugly polyfilled UI components or/and to write extensions on top of the standard. If you are doing so, please be so kind and share your code with others.</p>
-						
-					</div>
-				</div>
-			</section>
-			
-				
-			<section>
-				<hgroup>
-					<h2>Further Development</h2>
-					<h3>Feel free to <a href="https://github.com/aFarkas/webshim#fork_box">fork</a>, <a href="https://github.com/aFarkas/webshim/issues">report issues</a>, develop implementations/features, develop extensions on top of implemented features or simply use :-).</h3>
-				</hgroup>
-				
-				<ul>
-					<li>improve current implementations</li>
-					<li>improve current documentation</li>
-					<li>history (pushState etc.)/hashchange (maybe <a href="https://github.com/balupton/history.js">history.js</a> (coming in 1.9))</li>
-					<li>make everything more native (this will be more awesome!!! coming in 2.0)</li>
-				</ul>
-				
-			</section>
-		</div>
-		<footer>
-			<small>
-				<strong>Note</strong>: every polyfill is a hack! innovative frontend development is hacky and always will be hacky!
-			</small>
-		</footer>
-<!--[if lte IE 7]>
-	<div class="browser-support"> 			
-		<div class="browser-support-box"> 				
-			Webshims Lib really cares about cross browser support and supports all A-Graded Browsers including IE6 and newest Opera. But I don't care about Styling/Layout issues in IE7- on this demo page.
-		</div> 		
-	</div>
-<![endif]-->
+            <p>Now put a mediaelement.js inside of your shim folder and start implementing some features. The <tt>dom-support</tt> feature of Webshims lib comes with some very useful implementation helpers. Here are two of them:</p>
+            <ul>
+                <li><tt>webshims.defineNodeNamesProperty</tt> (nodeNames, property, descriptor)</li>
+                <li><tt>webshims.defineNodeNamesBooleanProperty</tt> (nodeNames, property, descriptor)</li>
+            </ul>
+            <pre>
+// wait till the DOM-Extension feature is loaded
+webshims.register('mediaelement', function($, webshims, window, document, undefined, options){
+  // webshims refers to jQuery.webshims in this function
+  
+  // Implements a new IDL property on audio, video called currentTime
+  webshims.defineNodeNamesProperty('audio, video', 'currentTime', {
+    prop: {
+      get: function(){
+        // your getter implementation ("this" refers to the element)
+      },
+      set: function(value){
+        // your setter implementation ("this" refers to the element)
+      }
+    }
+  });
+  
+  // Implements a new constant property called HAVE_CURRENT_DATA on audio, video
+  webshims.defineNodenamesProperty('audio video', 'HAVE_CURRENT_DATA', {
+    prop: {
+      value: 2
+    }
+  });
+  
+  // Implements a new method called play on audio, video
+  webshims.defineNodeNamesProperty('audio video', 'play', {
+    prop: {
+      value: function(){
+        // your play method implementation
+        // this refers to the element
+      }
+    }
+  });
+  
+  // Implements a new boolean IDL property called controls on audio, video
+  // which is reflected by a content attribute
+  webshims.defineNodeNamesBooleanProperty('audio video', 'controls', {
+    // set works more like an onSet:
+    // you don't have to set the value anymore on the DOM node, only handle true/false values
+    set: function(value){
+      if(value){
+        // show controls for elem
+      } else {
+        // hide controls for elem
+      }
+    },
+    initAttr: true
+  });
+}); 
+</pre>
+        </p>
+    </div>
+
+    <script>
+        // Set up the 'play' buttons for each runnable code example.
+        $(function () {
+            $('.runnable').each(function () {
+                var code = this;
+                var button = '<div class="run" title="Run"></div>';
+                $(button).insertBefore(code).bind('click', function () {
+                    eval($(code).text());
+                });
+            });
+
+            //$('[data-original]').lazyload();
+        });
+
+
+        // highlight the active menu. Modified from http://expressjs.com/app.js
+        $(function(){
+          var prev;
+          var n = 0;
+
+          var headings = $('h2,p.header').map(function(i, el){
+            return {
+              top: $(el).offset().top,
+              id: el.id
+            }
+          });
+
+          function closest() {
+            var h;
+            var top = $(window).scrollTop();
+            var i = headings.length;
+            while (i--) {
+              h = headings[i];
+              if (top >= h.top) return h;
+            }
+          }
+
+          $(document).scroll(function(){
+            var h = closest();
+            console.log ('closest', h);
+            if (!h) return;
+
+            if (prev) {
+              prev.css('color', '#000');
+              //prev.removeClass('active');
+              //prev.parent().parent().removeClass('active');
+            }
+
+            var a = $('a[href="#' + h.id + '"]');
+            a.css('color', '#18b6e5');
+            //a.addClass('active');
+            //a.parent().parent().addClass('active');
+
+            prev = a;
+          });
+        });
+
+    </script>
 </body>
-</html>   
+</html>
