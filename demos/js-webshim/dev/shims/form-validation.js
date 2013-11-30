@@ -1,15 +1,21 @@
 webshims.register('form-validation', function($, webshims, window, document, undefined, options){
+	"use strict";
 	
 	var isWebkit = 'webkitURL' in window;
 	var chromeBugs = isWebkit && Modernizr.formvalidation && !webshims.bugs.bustedValidity;
 	var webkitVersion = chromeBugs && parseFloat((navigator.userAgent.match(/Safari\/([\d\.]+)/) || ['', '999999'])[1], 10);
+	
 	var invalidClass = options.iVal.errorClass || 'user-error';
 	var validClass = options.iVal.successClass || 'user-success';
 	
 	var invalidWrapperClass = options.iVal.errorWrapperClass || 'ws-invalid';
 	var successWrapperClass = options.iVal.successWrapperClass || 'ws-success';
 	var errorBoxClass = options.iVal.errorBoxClass || 'ws-errorbox';
+	var errorMessageClass = options.iVal.errorMessageClass || 'ws-errormessage';
 	var checkTypes = {checkbox: 1, radio: 1};
+	
+	var loader = webshims.loader;
+	var addModule = loader.addModule;
 	
 	var emptyJ = $([]);
 	var isValid = function(elem){
@@ -500,7 +506,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			var errorBox = $('div.'+errorBoxClass, fieldWrapper);
 			
 			if(!errorBox.length){
-				errorBox = $('<div class="'+ errorBoxClass +'" hidden="hidden">');
+				errorBox = $('<div class="'+ errorBoxClass +'" hidden="hidden" style="display: none;">');
 				fieldWrapper.append(errorBox);
 			}
 			
@@ -646,7 +652,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				if(box.stop){
 					box.stop(true, true);
 				}
-				box.html('<p>'+ message +'</p>');
+				box.html('<p class="'+ errorMessageClass +'"">'+ message +'</p>');
 				box.message = message;
 				fieldWrapper.addClass(invalidWrapperClass).removeClass(successWrapperClass);
 				this.recheckInvalidInput(elem);
@@ -767,29 +773,6 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		});
 	})();
 	
-	//see: https://bugs.webkit.org/show_bug.cgi?id=113377
-	if (chromeBugs && webkitVersion < 540) {
-		(function(){
-			var elems = /^(?:textarea|input)$/i;
-			var form = false;
-			
-			document.addEventListener('contextmenu', function(e){
-				if (elems.test(e.target.nodeName || '') && (form = e.target.form)) {
-					setTimeout(function(){
-						form = false;
-					}, 1);
-				}
-			}, false);
-			
-			$(window).on('invalid', function(e){
-				if (e.originalEvent && form && form == e.target.form) {
-					e.wrongWebkitInvalid = true;
-					e.stopImmediatePropagation();
-				}
-			});
-			
-		})();
-	}
 	
 	if(!$.event.special.change && !$.event.special.input && Modernizr.inputtypes && options.fixRangeChange){
 		var rangeChange = {
@@ -928,9 +911,15 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		});
 	}
 	
-	webshims.loader.addModule('form-combat', {
+	addModule('form-combat', {
 		d: ['dom-support'],
-		test: ! (($.mobile && ($.mobile.selectmenu || $.mobile.checkboxradio)) || $.fn.select2)
+		test: ! (($.mobile && ($.mobile.selectmenu || $.mobile.checkboxradio)) || $.fn.select2 || $.fn.chosen || $.fn.selectpicker || $.fn.selectBoxIt)
 	});
-	webshims.loader.loadList(['form-combat']);
+	
+	addModule('position', {
+		src: 'plugins/jquery.ui.position.js',
+		test: $.position && $.position.getScrollInfo
+	});
+	
+	loader.loadList(['form-combat', 'position']);
 });

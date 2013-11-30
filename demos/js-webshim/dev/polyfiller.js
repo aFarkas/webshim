@@ -888,14 +888,13 @@
 		var bustedWidgetUi = false;
 		
 		var initialFormTest = function(){
-			var range, rangeCSS;
+			var range, rangeCSS, fieldset;
 			if(!initialFormTest.run){
+				fieldset = $('<fieldset />')[0];
 				addTest(formvalidation, !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern));
 				
-				addTest('fieldsetdisabled', function(){
-					var fieldset = $('<fieldset />')[0];
-					return 'elements' in fieldset && 'disabled' in fieldset;
-				});
+				addTest('fieldsetdisabled', 'disabled' in fieldset);
+				addTest('fieldsetelements', 'elements' in fieldset);
 				
 				if(modernizrInputTypes && modernizrInputTypes.range && !window.opera){
 					range = $('<input type="range" style="-webkit-appearance: slider-horizontal; -moz-appearance: range;" />').appendTo('html');
@@ -910,7 +909,7 @@
 				}
 				
 				if(Modernizr[formvalidation]){
-					bustedWidgetUi = !Modernizr.fieldsetdisabled || !('value' in document.createElement('progress')) || !('value' in document.createElement('output'));
+					bustedWidgetUi = !Modernizr.fieldsetdisabled ||!Modernizr.fieldsetelements || !('value' in document.createElement('progress')) || !('value' in document.createElement('output'));
 					bugs.bustedValidity = bustedValidity = window.opera || bustedWidgetUi || !modernizrInputAttrs.list;
 				}
 

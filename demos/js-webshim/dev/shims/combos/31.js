@@ -1182,7 +1182,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		});
 		
 		// sizzle/jQuery has a bug with :disabled/:enabled selectors
-		if(Modernizr.fieldsetdisabled && !$('<fieldset disabled=""><input /><fieldset>').find('input'.is(':disabled'))){
+		if(Modernizr.fieldsetdisabled && !$('<fieldset disabled=""><input /><fieldset>').find('input').is(':disabled')){
 			$.extend(exp, {
 				"enabled": function( elem ) {
 					return elem.disabled === false && !$(elem).is('fieldset[disabled] *');
