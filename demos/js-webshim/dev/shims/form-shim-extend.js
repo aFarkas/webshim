@@ -380,7 +380,7 @@ var rsubmittable = /^(?:select|textarea|input)/i;
 				;
 				return function(){
 					var elem = $(this).getNativeElement()[0];
-					return !!(!elem.disabled && !elem.readOnly && !types[elem.type] );
+					return !!(!elem.readOnly && !types[elem.type] && !$(elem).is(':disabled') );
 				};
 			})()
 		},
@@ -429,6 +429,7 @@ var rsubmittable = /^(?:select|textarea|input)/i;
 			}
 		}
 	});
+	
 	webshims.defineNodeNameProperties(nodeName, inputValidationAPI, 'prop');
 });
 

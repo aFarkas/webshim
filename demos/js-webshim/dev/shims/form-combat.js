@@ -52,14 +52,20 @@ webshims.register('form-combat', function($,webshims){
 		$('select:not(.ui-select-nativeonly), input[type="radio"], input[type="checkbox"]', context).each(find.detectReplacement);
 	}
 	
-	find.register = function(elem, data, pluginDescriptor){
+	find.register = function(elem, data, pluginDescriptor, plugin){
 		var shadow = typeof pluginDescriptor.shadow == 'string' ? data[pluginDescriptor.shadow] : pluginDescriptor.shadow(data, elem);
 		var shadowFocus = typeof pluginDescriptor.shadowFocus == 'string' ? data[pluginDescriptor.shadowFocus] : pluginDescriptor.shadowFocus(data, elem);
 		if(!shadowFocus){
 			shadowFocus = shadow;
 		}
-		if(shadow){
+		if(shadow && (replacementDatas.success || ($(shadowFocus).attr('tabindex') || $(shadowFocus).prop('tabIndex') > -1))){
 			webshims.addShadowDom(elem, shadow, {shadowFocusElement: shadowFocus});
+			replacementDatas.success = true;
+		} else {
+			webshims.error("webshim could not add support for "+plugin);
+			if(plugin in replacementDatas){
+				delete replacementDatas[plugin];
+			}
 		}
 	};
 	
@@ -69,7 +75,7 @@ webshims.register('form-combat', function($,webshims){
 		if(data && !(webshims.data(this) || {}).hasShadow){
 			for(plugin in replacementDatas){
 				if(data[plugin]){
-					find.register(this, data[plugin], replacementDatas[plugin]);
+					find.register(this, data[plugin], replacementDatas[plugin], plugin);
 					break;
 				}
 			}
