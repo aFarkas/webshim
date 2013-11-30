@@ -62,7 +62,8 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	};
 	
 	var extendSels = function(){
-		$.extend($.expr[":"], {
+		var exp = $.expr[":"];
+		$.extend(exp, {
 			"valid-element": function(elem){
 				return rElementsGroup.test(elem.nodeName || '') ? !hasInvalid(elem) :!!($.prop(elem, 'willValidate') && isValid(elem));
 			},
@@ -81,8 +82,22 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		});
 		
 		['valid', 'invalid', 'required', 'optional'].forEach(function(name){
-			$.expr[":"][name] = $.expr[":"][name+"-element"];
+			exp[name] = $.expr[":"][name+"-element"];
 		});
+		
+		// sizzle/jQuery has a bug with :disabled/:enabled selectors
+		if(Modernizr.fieldsetdisabled && !$('<fieldset disabled=""><input /><fieldset>').find('input'.is(':disabled'))){
+			$.extend(exp, {
+				"enabled": function( elem ) {
+					return elem.disabled === false && !$(elem).is('fieldset[disabled] *');
+				},
+		
+				"disabled": function( elem ) {
+					return elem.disabled === true || ('disabled' in elem && $(elem).is('fieldset[disabled] *'));
+				}
+			});
+		}
+		
 		
 		//bug was partially fixed in 1.10.0 for IE9, but not IE8 (move to es5 as soon as 1.10.2 is used)
 		if(typeof document.activeElement == 'unknown'){
