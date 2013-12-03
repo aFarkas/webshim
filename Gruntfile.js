@@ -3,7 +3,9 @@ module.exports = function(grunt){
 
 	// Project configuration.
 	grunt.initConfig({
-		pkg: '<json:package.json>',
+		pkg: grunt.file.readJSON('package.json'),
+		bower: grunt.file.readJSON('bower.json'),
+		jq: grunt.file.readJSON('webshims.jquery.json'),
 		meta: {
 			banner: '/*! v<%= pkg.version %> - ' +
 			'<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -38,21 +40,21 @@ module.exports = function(grunt){
 				},
 					dead_code: true
 				}
-			}			  
+			}
 		},
 		watch: {
 			sass: {
-		      files: ['src/shims/styles/scss/*.scss'],
-		      tasks: ['sass']
-		   },
-		   css: {
-		      files: ['src/shims/**/*.css'],
-		      tasks: ['cfgcopymin', 'copy']
-		   },
-		   js: {
-		      files: ['src/**/*.js'],
-		      tasks: ['webshimscombos', 'concat', 'cfgcopymin', 'copy']
-		   }
+				files: ['src/shims/styles/scss/*.scss'],
+				tasks: ['sass']
+			},
+			css: {
+				files: ['src/shims/**/*.css'],
+				tasks: ['cfgcopymin', 'copy']
+			},
+			js: {
+				files: ['src/**/*.js'],
+				tasks: ['webshimscombos', 'concat', 'cfgcopymin', 'copy']
+			}
 		}
 	});
 	
