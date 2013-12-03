@@ -490,45 +490,86 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			}
 			return ret || {width: 300, height: data._elemNodeName == 'video' ? 150 : 50};
 		};
-		return function(data){
-			var realDims, ratio;
-			var ret = data.elemDimensions;
+		var addMinMax = function(ret, c, autos, ratio){
+			var changed;
+			if(c.maxH && ret.height > c.maxH){
+				ret.height = c.maxH;
+				changed = true;
+			}
 			
+			if(c.minH && ret.height < c.minH){
+				ret.height = c.minH;
+				changed = true;
+			}
+			
+			if(changed && autos.width == 'auto'){
+				ret.width = ret.height * ratio;
+			}
+			
+			changed = false;
+			
+			if(c.maxW && ret.width > c.maxW){
+				ret.width = c.maxW;
+				changed = true;
+			}
+			
+			if(c.minW && ret.width < c.minW){
+				ret.width = c.minW;
+				changed = true;
+			}
+			
+			if(changed && autos.height == 'auto'){
+				ret.height = ret.width / ratio;
+			}
+			
+		};
+		return function(data){
+			data._elem.style.display = '';
+			var numDims, ratio;
+			var elem = data._elem;
+			var ret  = {
+				width: elem.style.width == 'auto' ? 'auto' : $(elem).width(),
+				height: elem.style.height == 'auto' ? 'auto' : $(elem).height()
+			};
+			var c = {
+				maxW: parseInt($.css(elem, 'maxWidth'), 10) || '',
+				minW: parseInt($.css(elem, 'minWidth'), 10) || '',
+				maxH: parseInt($.css(elem, 'maxHeight'), 10) || '',
+				minH: parseInt($.css(elem, 'minHeight'), 10) || ''
+			};
 			if(ret.width == 'auto' || ret.height == 'auto'){
-				ret = $.extend({}, data.elemDimensions);
-				realDims = getRealDims(data);
-				ratio = realDims.width / realDims.height;
+				numDims = getRealDims(data);
+				ratio = numDims.width / numDims.height;
 				
 				if(ret.width == 'auto' && ret.height == 'auto'){
-					ret = realDims;
+				
 				} else if(ret.width == 'auto'){
-					data.shadowElem.css({height: ret.height});
-					ret.width = data.shadowElem.height() * ratio;
-				} else {
-					data.shadowElem.css({width: ret.width});
-					ret.height = data.shadowElem.width() / ratio;
+					numDims.width = ret.height * ratio;
+					numDims.height = ret.height;
+				} else if(ret.height == 'auto'){
+					numDims.height = ret.width / ratio;
+					numDims.width = ret.width;
 				}
+				
+			} else {
+				numDims = ret;
 			}
-			return ret;
+			data._elem.style.display = 'none';
+			addMinMax(numDims, c, ret, ratio);
+			return numDims;
 		};
 	})();
 	var setElementDimension = function(data, hasControls){
 		var dims;
-		var elem = data._elem;
+		
 		var box = data.shadowElem;
-		$(elem)[hasControls ? 'addClass' : 'removeClass']('webshims-controls');
+		$(data._elem)[hasControls ? 'addClass' : 'removeClass']('webshims-controls');
 
 		if(data.isActive == 'third'){
 			if(data._elemNodeName == 'audio' && !hasControls){
 				box.css({width: 0, height: 0});
 			} else {
-				data.elemDimensions = {
-					width: elem.style.width || $.attr(elem, 'width') || $(elem).width(),
-					height: elem.style.height || $.attr(elem, 'height') || $(elem).height()
-				};
 				dims = transformDimension(data);
-				dims.minWidth = elem.style.minWidth;
-				dims.minHeight = elem.style.minHeight;
 				box.css(dims);
 			}
 		}
@@ -587,6 +628,8 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			}, 1);
 			return;
 		}
+		
+		var attrStyle = {};
 
 		if(loadedSwf < 1){
 			loadedSwf = 1;
@@ -597,7 +640,8 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			data = webshims.data(elem, 'mediaelement');
 		}
 		
-		if($.attr(elem, 'height') || $.attr(elem, 'width')){
+		if((attrStyle.height = $.attr(elem, 'height') || '') || (attrStyle.width = $.attr(elem, 'width') || '')){
+			$(elem).css(attrStyle);
 			webshims.warn("width or height content attributes used. Webshims prefers the usage of CSS (computed styles or inline styles) to detect size of a video/audio. It's really more powerfull.");
 		}
 		
@@ -704,7 +748,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			box.insertBefore(elem);
 			
 			if(hasNative){
-				$.extend(data, {volume: $.prop(elem, 'volume'), muted: $.prop(elem, 'muted'), paused: $.prop(elem, 'paused')});
+				$.extend(data, {volume: $.prop(elem, 'volume'), muted: $.prop(elem, 'muted')});
 			}
 			
 			webshims.addShadowDom(elem, box);
