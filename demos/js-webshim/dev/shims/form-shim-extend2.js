@@ -187,11 +187,11 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled || !Modernizr.fieldse
 			var isFieldsetGroup = /^(?:fieldset)$/i;
 			$.extend($.expr[":"], {
 				"enabled": function( elem ) {
-					return elem.disabled === false || (isFieldsetGroup.test(elem.nodeName) && elem.getAttribute('disabled') == null) ;
+					return elem.disabled === false || (isFieldsetGroup.test(elem.nodeName) && elem.getAttribute('disabled') == null && !$(elem).is('fieldset[disabled] *')) ;
 				},
 		
 				"disabled": function( elem ) {
-					return elem.disabled === true ||  (isFieldsetGroup.test(elem.nodeName) && elem.getAttribute('disabled') != null);
+					return elem.disabled === true || (isFieldsetGroup.test(elem.nodeName) && (elem.getAttribute('disabled') != null || $(elem).is('fieldset[disabled] *')));
 				}
 			});
 			
@@ -234,8 +234,8 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled || !Modernizr.fieldse
 				},
 				initAttr: true
 			});
+			
 			['input', 'textarea', 'select', 'button'].forEach(function(nodeName){
-				
 				var desc = webshims.defineNodeNameProperty(nodeName, 'disabled', {
 					prop: {
 						set: function(value){
@@ -263,8 +263,8 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled || !Modernizr.fieldse
 				});
 			});
 			
-			webshims.addReady(function(context, insertedElement){
-				$(context).closest('fieldset[disabled]').prop('disabled', true);
+			webshims.addReady(function(context){
+				$(context).filter('fieldset[disabled], fieldset[disabled] *').each(groupControl.disable);
 			});
 		}
 		

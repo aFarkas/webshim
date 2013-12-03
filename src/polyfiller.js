@@ -133,10 +133,6 @@
 				}
 			}
 			
-			if (WSDEBUG && webCFG.waitReady && $.isReady) {
-				webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
-			}
-			
 			if (webCFG.waitReady) {
 				$.readyWait++;
 				onReady(features, function(){
@@ -621,6 +617,10 @@
 						webCFG.readyEvt = 'pageinit';
 					}
 					webCFG.waitReady = false;
+				}
+				
+				if (WSDEBUG && webCFG.waitReady && $.isReady) {
+					webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
 				}
 				
 				if(!$.isDOMReady && webCFG.waitReady){

@@ -6,14 +6,64 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 	
 	<style>
+		html,
+		body {
+			background: #000;
+		}
 		.wrapper {
-			margin: auto;
+			position: relative;
+			margin: 15px auto;
 			min-width: 320px;
 			max-width: 980px;
 			width: 80%;
+			background: rgba(255, 255, 255, 0.6);
+			padding: 25px;
+			border-radius: 15px;
+			z-index: 9;
 		}
+		
+		.video-bg {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+		}
+		
+		.video-bg video {
+			display: block;
+			min-width: 100%;
+			min-height: 100%;
+			/* set inline !!!
+			width: auto;
+			height: auto; */
+		}
+		
+		.video-bg .video-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+		}
+		
+		.video-box {
+			position: relative;
+			width: 100%;
+			height: 100%;
+		}
+		
+		.play-toggle {
+			position: absolute;
+			top: 20px;
+			left: 10px;
+			font-size: 16px;
+			padding: 5px;
+		}
+		
 		video {
 			display: inline-block;
+			width: 100%;
 		}
 		.mediaplayer {
 			width: 100%;
@@ -61,7 +111,39 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
 	<script src="../../js-webshim/minified/polyfiller.js"></script> 
-	
+	<script>
+		$(function(){
+			$('.video-bg').each(function(){
+				var timer;
+				var module = $(this);
+				var posBox = $('.video-box', module);
+				var video = $('video', module);
+				var pos = function(){
+					var css = {
+						top: (module.height() - video.getShadowElement().height()) / 2,
+						left: (module.width() - video.getShadowElement().width()) / 2
+					};
+					posBox.css(css);
+				};
+				var throttle = function(e){
+					clearTimeout(timer);
+					timer = setTimeout(pos, e.type == 'resize' ? 30 : 4);
+				};
+				
+				$('button.play-toggle', module).on('click', function(){
+					if(video.prop('paused') || video.prop('ended')){
+						video.callProp('play');
+					} else {
+						video.callProp('pause');
+					}
+				});
+				
+				pos();
+				$(document).on('updateshadowdom', throttle);
+				$(window).on('resize load', throttle);
+			});
+		});
+	</script>
 	<script>
 		webshims.polyfill('mediaelement');
 	</script>
@@ -110,9 +192,9 @@
 	</div>
 		
 	<h2>width: 100%; height: auto;</h2>
-	<p>Webshims supports setting width/height of a video in all units including the keyword auto (needs to be set inline to work with Flash Fallback).</p>
+	<p>Webshims supports setting width/height of a video in all units including the keyword auto (The auto keyword needs to be set inline to work with Flash Fallback).</p>
 	<div class="mediaplayer videoplayer">
-		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="width: 100%; height: auto;">
+		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="height: auto;">
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
 			<track src="../subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
@@ -126,7 +208,7 @@
 	<p>based on  http://www.alistapart.com/articles/creating-intrinsic-ratios-for-video/</p>
 	
 	<div class="mediaplayer videoplayer ratio-16-9">
-		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="width: 100%; height: 100%;">
+		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="height: 100%;">
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
 			<track src="../subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
@@ -140,7 +222,7 @@
 	<h2>floating content with margin</h2>
 	<div class="bfc">
 		<div class="mediaplayer videoplayer media-left">
-			<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="width: 100%; height: auto;">
+			<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="height: auto;">
 				<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
 				<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
 				<track src="../subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
@@ -153,5 +235,17 @@
 		<p> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
 	</div>
 </div>
+
+	<div class="video-bg">
+		<div class="video-box">
+			<video muted="" loop="loop" style="width: auto; height: auto;">
+					<source src="http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.m4v" type="video/mp4" />
+					<source src="http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.ogg" />
+			</video>
+		</div>
+		<div class="video-overlay"></div>
+		<button type="button" class="play-toggle">play/pause bg video</button>
+	</div>
+
 </body>
 </html>   

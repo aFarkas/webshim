@@ -553,8 +553,8 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		
 		//bug was partially fixed in 1.10.0 for IE9, but not IE8 (move to es5 as soon as 1.10.2 is used)
 		if(typeof document.activeElement == 'unknown'){
-			var pseudoFocus = $.expr[":"].focus;
-			$.expr[":"].focus = function(){
+			var pseudoFocus = exp.focus;
+			exp.focus = function(){
 				try {
 					return pseudoFocus.apply(this, arguments);
 				} catch(e){
@@ -642,7 +642,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		if(webshims.errorbox && webshims.errorbox.initIvalContentMessage){
 			webshims.errorbox.initIvalContentMessage(elem);
 		}
-		var message = $(elem).data('errormessage') || elem.getAttribute('x-moz-errormessage') || '';
+		var message = (webshims.getOptions && webshims.errorbox ? webshims.getOptions(elem, 'errormessage') : $(elem).data('errormessage')) || elem.getAttribute('x-moz-errormessage') || '';
 		if(key && message[key]){
 			message = message[key];
 		} else if(message) {

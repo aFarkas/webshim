@@ -508,6 +508,51 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				}
 			});
 		},
+		getOptions: (function(){
+			var regs = {};
+			var regFn = function(f, upper){
+				return upper.toLowerCase();
+			};
+			return function(elem, name, bases){
+				var data = elementData(elem, 'cfg'+name);
+				var dataName;
+				var cfg = {};
+				
+				if(data){
+					return data;
+				}
+				data = $(elem).data();
+				
+				if(!bases){
+					bases = [true, {}];
+				} else if(!Array.isArray(bases)){
+					bases = [true, {}, bases];
+				} else {
+					bases.unshift(true, {});
+				}
+				
+				if(data && data[name]){
+					if(typeof data[name] == 'object'){
+						bases.push(data[name]);
+					} else {
+						webshims.error('data-'+ name +' attribute has to be a valid JSON, was: '+ data[name]);
+					}
+				}
+				
+				if(!regs[name]){
+					regs[name] = new RegExp('^'+ name +'([A-Z])');
+				}
+				
+				for(dataName in data){
+					if(regs[name].test(dataName)){
+						cfg[dataName.replace(regs[name], regFn)] = data[dataName];
+					}
+				}
+				bases.push(cfg);
+				
+				return elementData(elem, 'cfg'+name, $.extend.apply($, bases));
+			};
+		})(),
 		//http://www.w3.org/TR/html5/common-dom-interfaces.html#reflect
 		createPropDefault: createPropDefault,
 		data: elementData,
@@ -1197,8 +1242,8 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		
 		//bug was partially fixed in 1.10.0 for IE9, but not IE8 (move to es5 as soon as 1.10.2 is used)
 		if(typeof document.activeElement == 'unknown'){
-			var pseudoFocus = $.expr[":"].focus;
-			$.expr[":"].focus = function(){
+			var pseudoFocus = exp.focus;
+			exp.focus = function(){
 				try {
 					return pseudoFocus.apply(this, arguments);
 				} catch(e){
@@ -1286,7 +1331,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		if(webshims.errorbox && webshims.errorbox.initIvalContentMessage){
 			webshims.errorbox.initIvalContentMessage(elem);
 		}
-		var message = $(elem).data('errormessage') || elem.getAttribute('x-moz-errormessage') || '';
+		var message = (webshims.getOptions && webshims.errorbox ? webshims.getOptions(elem, 'errormessage') : $(elem).data('errormessage')) || elem.getAttribute('x-moz-errormessage') || '';
 		if(key && message[key]){
 			message = message[key];
 		} else if(message) {

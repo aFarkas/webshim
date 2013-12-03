@@ -2577,11 +2577,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				data = {};
 				optsName = type;
 				
-				//todo: do we need deep extend?
-				
 				labels = $(this).jProp('labels');
-				
-				opts = $.extend({}, options.widgets, options[type], $($.prop(this, 'form')).data(type) || {}, $(this).data(type) || {}, {
+				opts = $.extend(webshims.getOptions(this, type, [options.widgets, options[type], $($.prop(this, 'form')).data(type)]), {
 					orig: this,
 					type: type,
 					labels: labels,
@@ -2602,7 +2599,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					},
 					containerElements: []
 				});
-				
 				
 				for(i = 0; i < copyProps.length; i++){
 					opts[copyProps[i]] = $.prop(this, copyProps[i]);

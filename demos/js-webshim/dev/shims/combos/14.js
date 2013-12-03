@@ -1311,6 +1311,51 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				}
 			});
 		},
+		getOptions: (function(){
+			var regs = {};
+			var regFn = function(f, upper){
+				return upper.toLowerCase();
+			};
+			return function(elem, name, bases){
+				var data = elementData(elem, 'cfg'+name);
+				var dataName;
+				var cfg = {};
+				
+				if(data){
+					return data;
+				}
+				data = $(elem).data();
+				
+				if(!bases){
+					bases = [true, {}];
+				} else if(!Array.isArray(bases)){
+					bases = [true, {}, bases];
+				} else {
+					bases.unshift(true, {});
+				}
+				
+				if(data && data[name]){
+					if(typeof data[name] == 'object'){
+						bases.push(data[name]);
+					} else {
+						webshims.error('data-'+ name +' attribute has to be a valid JSON, was: '+ data[name]);
+					}
+				}
+				
+				if(!regs[name]){
+					regs[name] = new RegExp('^'+ name +'([A-Z])');
+				}
+				
+				for(dataName in data){
+					if(regs[name].test(dataName)){
+						cfg[dataName.replace(regs[name], regFn)] = data[dataName];
+					}
+				}
+				bases.push(cfg);
+				
+				return elementData(elem, 'cfg'+name, $.extend.apply($, bases));
+			};
+		})(),
 		//http://www.w3.org/TR/html5/common-dom-interfaces.html#reflect
 		createPropDefault: createPropDefault,
 		data: elementData,

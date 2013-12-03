@@ -508,6 +508,51 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				}
 			});
 		},
+		getOptions: (function(){
+			var regs = {};
+			var regFn = function(f, upper){
+				return upper.toLowerCase();
+			};
+			return function(elem, name, bases){
+				var data = elementData(elem, 'cfg'+name);
+				var dataName;
+				var cfg = {};
+				
+				if(data){
+					return data;
+				}
+				data = $(elem).data();
+				
+				if(!bases){
+					bases = [true, {}];
+				} else if(!Array.isArray(bases)){
+					bases = [true, {}, bases];
+				} else {
+					bases.unshift(true, {});
+				}
+				
+				if(data && data[name]){
+					if(typeof data[name] == 'object'){
+						bases.push(data[name]);
+					} else {
+						webshims.error('data-'+ name +' attribute has to be a valid JSON, was: '+ data[name]);
+					}
+				}
+				
+				if(!regs[name]){
+					regs[name] = new RegExp('^'+ name +'([A-Z])');
+				}
+				
+				for(dataName in data){
+					if(regs[name].test(dataName)){
+						cfg[dataName.replace(regs[name], regFn)] = data[dataName];
+					}
+				}
+				bases.push(cfg);
+				
+				return elementData(elem, 'cfg'+name, $.extend.apply($, bases));
+			};
+		})(),
 		//http://www.w3.org/TR/html5/common-dom-interfaces.html#reflect
 		createPropDefault: createPropDefault,
 		data: elementData,
@@ -3084,11 +3129,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				data = {};
 				optsName = type;
 				
-				//todo: do we need deep extend?
-				
 				labels = $(this).jProp('labels');
-				
-				opts = $.extend({}, options.widgets, options[type], $($.prop(this, 'form')).data(type) || {}, $(this).data(type) || {}, {
+				opts = $.extend(webshims.getOptions(this, type, [options.widgets, options[type], $($.prop(this, 'form')).data(type)]), {
 					orig: this,
 					type: type,
 					labels: labels,
@@ -3109,7 +3151,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					},
 					containerElements: []
 				});
-				
 				
 				for(i = 0; i < copyProps.length; i++){
 					opts[copyProps[i]] = $.prop(this, copyProps[i]);

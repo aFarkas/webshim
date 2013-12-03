@@ -179,8 +179,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			}
 		},
 		_updateOptions: function(){
-			this.options = $.extend(true, {}, options.list, $(this.input).data('list') || {});
-			
+			this.options = webshims.getOptions(this.input, 'list', options.list);
 			
 			if($(this.input).prop('multiple') && $(this.input).prop('type') == 'email'){
 				this.options.multiple = true;
@@ -207,11 +206,6 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			if($(this.input).hasClass('mark-option-text')){
 				this.options.highlight = true;
 				webshims.error(".mark-option-text is depreacated. Use highlight option.");
-			}
-			
-			if($(this.input).data('listFilter')){
-				this.listFilter = $(this.input).data('listFilter');
-				webshims.error("[data-list-filter] is depreacated. Use filter option.");
 			}
 			
 			if($(this.input).hasClass('list-multiple')){

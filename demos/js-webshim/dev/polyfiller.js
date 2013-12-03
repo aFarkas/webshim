@@ -133,10 +133,6 @@
 				}
 			}
 			
-			if (WSDEBUG && webCFG.waitReady && $.isReady) {
-				webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
-			}
-			
 			if (webCFG.waitReady) {
 				$.readyWait++;
 				onReady(features, function(){
@@ -613,26 +609,35 @@
 		
 		firstRun = function(){
 			if(!firstRun.run){
-				if(!$.mobile || (!$.mobile.textinput && !$.mobile.rangeslider && !$.mobile.button)){
-					if(!$.isDOMReady && webCFG.waitReady){
-						var $Ready = $.ready;
-						$.ready = function(unwait){
-							if(unwait !== true && document.body){
-								onReady();
-								$.ready = $Ready;
-							}
-							return $Ready.apply(this, arguments);
-						};
-						$.ready.promise = $Ready.promise;
-					}
-					$(onReady);
-				} else {
-					webCFG.waitReady = false;
-					$(document).one('pageinit', onReady);
-					
+				if($.mobile && ($.mobile.textinput || $.mobile.rangeslider || $.mobile.button)){
 					if(WSDEBUG){
 						webshims.warn('jQM textinput/rangeslider/button detected waitReady was set to false. Use webshims.ready("featurename") to script against polyfilled methods/properties');
 					}
+					if(!webCFG.readyEvt){
+						webCFG.readyEvt = 'pageinit';
+					}
+					webCFG.waitReady = false;
+				}
+				
+				if (WSDEBUG && webCFG.waitReady && $.isReady) {
+					webshims.warn('Call webshims.polyfill before DOM-Ready or set waitReady to false.');
+				}
+				
+				if(!$.isDOMReady && webCFG.waitReady){
+					var $Ready = $.ready;
+					$.ready = function(unwait){
+						if(unwait !== true && document.body){
+							onReady();
+							$.ready = $Ready;
+						}
+						return $Ready.apply(this, arguments);
+					};
+					$.ready.promise = $Ready.promise;
+				}
+				if(webCFG.readyEvt){
+					$(document).one(webCFG.readyEvt, onReady);
+				} else {
+					$(onReady);
 				}
 			}
 			firstRun.run = true;
