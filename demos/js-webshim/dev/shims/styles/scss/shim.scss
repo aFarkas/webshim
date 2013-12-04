@@ -63,6 +63,14 @@ audio > * {
 	}
 }
 
+.polyfill-mediaelement > iframe {
+	border: 0;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+}
+
 .flashblocker-assumed {
 	min-height: 20px;
 	min-width: 20px;

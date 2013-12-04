@@ -225,8 +225,6 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			clearTimeout(this.updateTimer);
 			this.updateTimer = false;
 			
-			this._updateOptions();
-			
 			this.lastCompletedValue = "";
 			
 			var list = [];
