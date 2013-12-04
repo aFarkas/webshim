@@ -443,7 +443,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					try {
 						focusElem[0].focus();
 					} catch(e){}
-					$(window).triggerHandler('pospopover'+this.eventns);
+					api.element.triggerHandler('pospopover');
 				};
 				
 				if(scrollTop > elemTop){

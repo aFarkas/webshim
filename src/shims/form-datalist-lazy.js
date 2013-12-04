@@ -32,16 +32,14 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			var that = this;
 			this.hideList = $.proxy(that, 'hideList');
 			
-			this._updateOptions();
-			
-			this.popover = webshims.objectCreate(webshims.wsPopover, {}, this.options.popover);
-			this.shadowList = this.popover.element.addClass('datalist-polyfill');
-			
-			
 			this.index = -1;
 			this.input = opts.input;
 			this.arrayOptions = [];
 			
+			this._updateOptions();
+			
+			this.popover = webshims.objectCreate(webshims.wsPopover, {}, this.options.popover);
+			this.shadowList = this.popover.element.addClass('datalist-polyfill');
 			
 			this.shadowList
 				.on('mouseenter.datalistWidget mousedown.datalistWidget click.datalistWidget', 'li', function(e){
@@ -133,7 +131,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 				.on('updateDatalist.datalistWidget', $.proxy(this, '_resetListCached'))
 				.on('remove', function(e){
 					if(!e.originalEvent){
-						that.detroy();
+						that.destroy();
 					}
 				})
 			;
