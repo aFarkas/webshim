@@ -158,4 +158,13 @@ class Utils
 	{
 		return source.split("watch?v=").join("v/");
 	}
+	
+	/**
+	 * 
+	 */
+	public static function youtubeQualitySourceParse(source:String):String
+	{
+		var reg = ~/vq=(small|medium|large|hd720|hd1080|highres)/i;
+		return reg.match(source) ? reg.matched(1) : 'default';
+	}
 }

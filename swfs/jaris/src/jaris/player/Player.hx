@@ -634,9 +634,9 @@ class Player extends EventDispatcher
 		_ytReady = true;
 		Reflect.field(_youtubeLoader.content, "setSize")(_stage.stageWidth, _stage.stageHeight);
 		if(_ytCue || !_isPlaying){
-			Reflect.field(_youtubeLoader.content, "cueVideoByUrl")(Utils.youtubeSourceParse(_mediaSource));
+			Reflect.field(_youtubeLoader.content, "cueVideoByUrl")(Utils.youtubeSourceParse(_mediaSource), 0, Utils.youtubeQualitySourceParse(_mediaSource));
 		} else {
-			Reflect.field(_youtubeLoader.content, "loadVideoByUrl")(Utils.youtubeSourceParse(_mediaSource));
+			Reflect.field(_youtubeLoader.content, "loadVideoByUrl")(Utils.youtubeSourceParse(_mediaSource), 0, Utils.youtubeQualitySourceParse(_mediaSource));
 			callEvents(PlayerEvents.BUFFERING);
 		}
 	}
@@ -651,6 +651,8 @@ class Player extends EventDispatcher
 	{
 		var status:UInt = Std.parseInt(Reflect.field(event, "data"));
 		var oldPlaying:Bool = _isPlaying;
+		var quality;
+		
 		_mediaLoaded = true;
 		switch(status)
 		{
@@ -669,6 +671,35 @@ class Player extends EventDispatcher
 					
 					_videoWidth = _stage.stageWidth;
 					_videoHeight = _stage.stageHeight;
+					quality =  Reflect.field(_youtubeLoader.content, "getPlaybackQuality")();
+					
+					switch(quality)
+						{
+							case 'small':
+								_naturalHeight = 240;
+								_naturalWidth =  320;
+								
+							case 'medium':
+								_naturalHeight = 360;
+								_naturalWidth =  640;
+								
+							case 'large':
+								_naturalHeight = 480;
+								_naturalWidth =  853;
+								
+							case 'hd720':
+								_naturalHeight = 720;
+								_naturalWidth =  1280;
+								
+							case 'hd1080':
+								_naturalHeight = 1080;
+								_naturalWidth =  1920;
+								
+							case 'highres':
+								_naturalHeight = 1080;
+								_naturalWidth =  1920;
+						}
+					
 					
 					if (_naturalWidth == 0) {
 						_naturalWidth = _videoWidth;
