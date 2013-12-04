@@ -185,6 +185,7 @@ var transformDimension = (function(){
 		} else {
 			numDims = ret;
 		}
+		
 		data._elem.style.display = 'none';
 		addMinMax(numDims, c, ret, ratio);
 		return numDims;
@@ -195,10 +196,9 @@ var transformDimension = (function(){
 		var dims;
 		var elem = data._elem;
 		var box = data.shadowElem;
-		
 		if(data.isActive == 'third'){
 			if(data && data._ytAPI && data._ytAPI.getPlaybackQuality){
-				window.ytapi = data._ytAPI
+				window.ytapi = data._ytAPI;
 			}
 			
 			dims = transformDimension(data);
@@ -615,15 +615,13 @@ mediaelement.createSWF = function(mediaElem, src, data){
 	}));
 	
 	
-	
-	setElementDimension(data);
-	
-	
 	webshims.addShadowDom(mediaElem, box);
 	mediaelement.setActive(mediaElem, 'third', data);
 	addMediaToStopEvents(mediaElem);
 	
 	box.insertBefore(mediaElem);
+	
+	setElementDimension(data);
 	
 	addYtAPI(mediaElem, elemId, data, ytID);
 	$(mediaElem)
