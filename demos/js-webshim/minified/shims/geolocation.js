@@ -1,1 +1,180 @@
-!function(a){if(!navigator.geolocation){var b=function(){setTimeout(function(){throw"document.write is overwritten by geolocation shim. This method is incompatible with this plugin"},1)},c=0,d=webshims.cfg.geolocation||{};navigator.geolocation=function(){var e,f={getCurrentPosition:function(c,f,g){var h,i,j,k,l=2,m=function(){if(!j)if(e){if(j=!0,c(a.extend({timestamp:(new Date).getTime()},e)),o(),window.JSON&&window.sessionStorage)try{sessionStorage.setItem("storedGeolocationData654321",JSON.stringify(e))}catch(b){}}else f&&!l&&(j=!0,o(),f({code:2,message:"POSITION_UNAVAILABLE"}))},n=function(){l--,p(),m()},o=function(){a(document).off("google-loader",o),clearTimeout(i),clearTimeout(h)},p=function(){if(e||!window.google||!google.loader||!google.loader.ClientLocation)return!1;var b=google.loader.ClientLocation;return e={coords:{latitude:b.latitude,longitude:b.longitude,altitude:null,accuracy:43e3,altitudeAccuracy:null,heading:parseInt("NaN",10),velocity:null},address:a.extend({streetNumber:"",street:"",premises:"",county:"",postalCode:""},b.address)},!0},q=function(){if(!e&&(p(),!e&&window.JSON&&window.sessionStorage))try{e=sessionStorage.getItem("storedGeolocationData654321"),e=e?JSON.parse(e):!1,e.coords||(e=!1)}catch(a){e=!1}};return q(),e?(setTimeout(m,1),void 0):d.confirmText&&!confirm(d.confirmText.replace("{location}",location.hostname))?(f&&f({code:1,message:"PERMISSION_DENIED"}),void 0):(k=function(){a.ajax({url:"http://freegeoip.net/json/",dataType:"jsonp",cache:!0,jsonp:"callback",success:function(a){l--,a&&(e=e||{coords:{latitude:a.latitude,longitude:a.longitude,altitude:null,accuracy:43e3,altitudeAccuracy:null,heading:parseInt("NaN",10),velocity:null},address:{city:a.city,country:a.country_name,countryCode:a.country_code,county:"",postalCode:a.zipcode,premises:"",region:a.region_name,street:"",streetNumber:""}},m())},error:function(){l--,m()}})},a.ajax?k():(webshims.ready("$ajax",k),webshims.loader.loadList(["$ajax"])),clearTimeout(i),window.google&&window.google.loader?l--:i=setTimeout(function(){d.destroyWrite&&(document.write=b,document.writeln=b),a(document).one("google-loader",n),webshims.loader.loadScript("http://www.google.com/jsapi",!1,"google-loader")},800),h=g&&g.timeout?setTimeout(function(){o(),f&&f({code:3,message:"TIMEOUT"})},g.timeout):setTimeout(function(){l=0,m()},1e4),void 0)},clearWatch:a.noop};return f.watchPosition=function(a,b,d){return f.getCurrentPosition(a,b,d),c++,c},f}(),webshims.ready("WINDOWLOAD",function(){webshims.loader.loadList(["$ajax"])}),webshims.isReady("geolocation",!0)}}(webshims.$);
+(function($){
+	if(navigator.geolocation){return;}
+	var domWrite = function(){
+			setTimeout(function(){
+				throw('document.write is overwritten by geolocation shim. This method is incompatible with this plugin');
+			}, 1);
+		},
+		id = 0
+	;
+	var geoOpts = webshims.cfg.geolocation || {};
+	navigator.geolocation = (function(){
+		var pos;
+		var api = {
+			getCurrentPosition: function(success, error, opts){
+				var locationAPIs = 2,
+					errorTimer,
+					googleTimer,
+					calledEnd,
+					createAjax,
+					endCallback = function(){
+						if(calledEnd){return;}
+						if(pos){
+							calledEnd = true;
+							success($.extend({timestamp: new Date().getTime()}, pos));
+							resetCallback();
+							if(window.JSON && window.sessionStorage){
+								try{
+									sessionStorage.setItem('storedGeolocationData654321', JSON.stringify(pos));
+								} catch(e){}
+							}
+						} else if(error && !locationAPIs) {
+							calledEnd = true;
+							resetCallback();
+							error({ code: 2, message: "POSITION_UNAVAILABLE"});
+						}
+					},
+					googleCallback = function(){
+						locationAPIs--;
+						getGoogleCoords();
+						endCallback();
+					},
+					resetCallback = function(){
+						$(document).off('google-loader', resetCallback);
+						clearTimeout(googleTimer);
+						clearTimeout(errorTimer);
+					},
+					getGoogleCoords = function(){
+						if(pos || !window.google || !google.loader || !google.loader.ClientLocation){return false;}
+						var cl = google.loader.ClientLocation;
+						pos = {
+							coords: {
+								latitude: cl.latitude,
+							longitude: cl.longitude,
+								altitude: null,
+								accuracy: 43000,
+								altitudeAccuracy: null,
+								heading: parseInt('NaN', 10),
+								velocity: null
+							},
+							//extension similiar to FF implementation
+							address: $.extend({streetNumber: '', street: '', premises: '', county: '', postalCode: ''}, cl.address)
+						};
+						return true;
+					},
+					getInitCoords = function(){
+						if(pos){return;}
+						getGoogleCoords();
+						if(pos || !window.JSON || !window.sessionStorage){return;}
+						try{
+							pos = sessionStorage.getItem('storedGeolocationData654321');
+							pos = (pos) ? JSON.parse(pos) : false;
+							if(!pos.coords){pos = false;} 
+						} catch(e){
+							pos = false;
+						}
+					}
+				;
+				
+				getInitCoords();
+				
+				if(!pos){
+					if(geoOpts.confirmText && !confirm(geoOpts.confirmText.replace('{location}', location.hostname))){
+						if(error){
+							error({ code: 1, message: "PERMISSION_DENIED"});
+						}
+						return;
+					}
+					createAjax = function(){
+						$.ajax({
+							url: 'http://freegeoip.net/json/',
+							dataType: 'jsonp',
+							cache: true,
+							jsonp: 'callback',
+							success: function(data){
+								locationAPIs--;
+								if(!data){return;}
+								pos = pos || {
+									coords: {
+										latitude: data.latitude,
+										longitude: data.longitude,
+										altitude: null,
+										accuracy: 43000,
+										altitudeAccuracy: null,
+										heading: parseInt('NaN', 10),
+										velocity: null
+									},
+									//extension similiar to FF implementation
+									address: {
+										city: data.city,
+										country: data.country_name,
+										countryCode: data.country_code,
+										county: "",
+										postalCode: data.zipcode,
+										premises: "",
+										region: data.region_name,
+										street: "",
+										streetNumber: ""
+									}
+								};
+								endCallback();
+							},
+							error: function(){
+								locationAPIs--;
+								endCallback();
+							}
+						});
+					};
+					if($.ajax){
+						createAjax();
+					} else {
+						webshims.ready('$ajax', createAjax);
+						webshims.loader.loadList(['$ajax']);
+					}
+					clearTimeout(googleTimer);
+					if (!window.google || !window.google.loader) {
+						googleTimer = setTimeout(function(){
+							//destroys document.write!!!
+							if (geoOpts.destroyWrite) {
+								document.write = domWrite;
+								document.writeln = domWrite;
+							}
+							$(document).one('google-loader', googleCallback);
+							webshims.loader.loadScript('http://www.google.com/jsapi', false, 'google-loader');
+						}, 800);
+					} else {
+						locationAPIs--;
+					}
+				} else {
+					setTimeout(endCallback, 1);
+					return;
+				}
+				if(opts && opts.timeout){
+					errorTimer = setTimeout(function(){
+						resetCallback();
+						if(error) {
+							error({ code: 3, message: "TIMEOUT"});
+						}
+					}, opts.timeout);
+				} else {
+					errorTimer = setTimeout(function(){
+						locationAPIs = 0;
+						endCallback();
+					}, 10000);
+				}
+			},
+			clearWatch: $.noop
+		};
+		api.watchPosition = function(a, b, c){
+			api.getCurrentPosition(a, b, c);
+			id++;
+			return id;
+		};
+		return api;
+	})();
+	
+	webshims.ready('WINDOWLOAD', function(){
+		webshims.loader.loadList(['$ajax']);
+	});
+	webshims.isReady('geolocation', true);
+})(webshims.$);
