@@ -1,97 +1,55 @@
+// Copyright 2009-2012 by contributors, MIT License
 // vim: ts=4 sts=4 sw=4 expandtab
-// -- kriskowal Kris Kowal Copyright (C) 2009-2011 MIT License
-// -- tlrobinson Tom Robinson Copyright (C) 2009-2010 MIT License (Narwhal Project)
-// -- dantman Daniel Friesen Copyright (C) 2010 XXX TODO License or CLA
-// -- fschaefer Florian Schäfer Copyright (C) 2010 MIT License
-// -- Gozala Irakli Gozalishvili Copyright (C) 2010 MIT License
-// -- kitcambridge Kit Cambridge Copyright (C) 2011 MIT License
-// -- kossnocorp Sasha Koss XXX TODO License or CLA
-// -- bryanforbes Bryan Forbes XXX TODO License or CLA
-// -- killdream Quildreen Motta Copyright (C) 2011 MIT Licence
-// -- michaelficarra Michael Ficarra Copyright (C) 2011 3-clause BSD License
-// -- sharkbrainguy Gerard Paapu Copyright (C) 2011 MIT License
-// -- bbqsrc Brendan Molloy XXX TODO License or CLA
-// -- iwyg XXX TODO License or CLA
-// -- DomenicDenicola Domenic Denicola XXX TODO License or CLA
-// -- xavierm02 Montillet Xavier XXX TODO License or CLA
-// -- Raynos Raynos XXX TODO License or CLA
-// -- samsonjs Sami Samhuri XXX TODO License or CLA
-// -- rwldrn Rick Waldron Copyright (C) 2011 MIT License
-// -- lexer Alexey Zakharov XXX TODO License or CLA
 
-/*!
-    Copyright (c) 2009, 280 North Inc. http://280north.com/
-    MIT License. http://github.com/280north/narwhal/blob/master/README.md
-*/
-
-(function (undefined) {
+(function () {
 
 /**
  * Brings an environment as close to ECMAScript 5 compliance
  * as is possible with the facilities of erstwhile engines.
  *
- * ES5 Draft
- * http://www.ecma-international.org/publications/files/drafts/tc39-2009-050.pdf
- *
- * NOTE: this is a draft, and as such, the URL is subject to change.  If the
- * link is broken, check in the parent directory for the latest TC39 PDF.
- * http://www.ecma-international.org/publications/files/drafts/
- *
- * Previous ES5 Draft
- * http://www.ecma-international.org/publications/files/drafts/tc39-2009-025.pdf
- * This is a broken link to the previous draft of ES5 on which most of the
- * numbered specification references and quotes herein were taken.  Updating
- * these references and quotes to reflect the new document would be a welcome
- * volunteer project.
- *
- * @module
+ * Annotated ES5: http://es5.github.com/ (specific links below)
+ * ES5 Spec: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
+ * Required reading: http://javascriptweblog.wordpress.com/2011/12/05/extending-javascript-natives/
  */
 
-/*whatsupdoc*/
-
-// Shortcut to an often accessed properties, in order to avoid multiple
-// dereference that costs universally.
-// _Please note: Shortcuts are defined after `Function.prototype.bind` as we
-// us it in defining shortcuts.
-var call = Function.prototype.call;
-var prototypeOfArray = Array.prototype;
-var prototypeOfObject = Object.prototype;
-var slice = prototypeOfArray.slice;
-var owns;
-var toString;
+//
+// Function
+// ========
+//
 
 // ES-5 15.3.4.5
-// http://www.ecma-international.org/publications/files/drafts/tc39-2009-025.pdf
+// http://es5.github.com/#x15.3.4.5
+
+function Empty() {}
 
 if (!Function.prototype.bind) {
-    Function.prototype.bind = function (that) { // .length is 1
+    Function.prototype.bind = function bind(that) { // .length is 1
         // 1. Let Target be the this value.
         var target = this;
         // 2. If IsCallable(Target) is false, throw a TypeError exception.
-        if (typeof target != "function")
-            throw new TypeError(); // TODO message
+        if (typeof target != "function") {
+            throw new TypeError("Function.prototype.bind called on incompatible " + target);
+        }
         // 3. Let A be a new (possibly empty) internal list of all of the
         //   argument values provided after thisArg (arg1, arg2 etc), in order.
         // XXX slicedArgs will stand in for "A" if used
-        var args = slice.call(arguments, 1); // for normal call
+        var args = _Array_slice_.call(arguments, 1); // for normal call
         // 4. Let F be a new native ECMAScript object.
-        // 9. Set the [[Prototype]] internal property of F to the standard
+        // 11. Set the [[Prototype]] internal property of F to the standard
         //   built-in Function prototype object as specified in 15.3.3.1.
-        // 10. Set the [[Call]] internal property of F as described in
+        // 12. Set the [[Call]] internal property of F as described in
         //   15.3.4.5.1.
-        // 11. Set the [[Construct]] internal property of F as described in
+        // 13. Set the [[Construct]] internal property of F as described in
         //   15.3.4.5.2.
-        // 12. Set the [[HasInstance]] internal property of F as described in
+        // 14. Set the [[HasInstance]] internal property of F as described in
         //   15.3.4.5.3.
-        // 13. The [[Scope]] internal property of F is unused and need not
-        //   exist.
         var bound = function () {
 
             if (this instanceof bound) {
                 // 15.3.4.5.2 [[Construct]]
                 // When the [[Construct]] internal method of a function object,
                 // F that was created using the bind function is called with a
-                // list of arguments ExtraArgs the following steps are taken:
+                // list of arguments ExtraArgs, the following steps are taken:
                 // 1. Let target be the value of F's [[TargetFunction]]
                 //   internal property.
                 // 2. If target has no [[Construct]] internal method, a
@@ -101,24 +59,23 @@ if (!Function.prototype.bind) {
                 // 4. Let args be a new list containing the same values as the
                 //   list boundArgs in the same order followed by the same
                 //   values as the list ExtraArgs in the same order.
-
-                var F = function(){};
-                F.prototype = target.prototype;
-                var self = new F;
+                // 5. Return the result of calling the [[Construct]] internal
+                //   method of target providing args as the arguments.
 
                 var result = target.apply(
-                    self,
-                    args.concat(slice.call(arguments))
+                    this,
+                    args.concat(_Array_slice_.call(arguments))
                 );
-                if (result !== null && Object(result) === result)
+                if (Object(result) === result) {
                     return result;
-                return self;
+                }
+                return this;
 
             } else {
                 // 15.3.4.5.1 [[Call]]
                 // When the [[Call]] internal method of a function object, F,
                 // which was created using the bind function is called with a
-                // this value and a list of arguments ExtraArgs the following
+                // this value and a list of arguments ExtraArgs, the following
                 // steps are taken:
                 // 1. Let boundArgs be the value of F's [[BoundArgs]] internal
                 //   property.
@@ -126,59 +83,207 @@ if (!Function.prototype.bind) {
                 //   property.
                 // 3. Let target be the value of F's [[TargetFunction]] internal
                 //   property.
-                // 4. Let args be a new list containing the same values as the list
-                //   boundArgs in the same order followed by the same values as
-                //   the list ExtraArgs in the same order. 5.  Return the
-                //   result of calling the [[Call]] internal method of target
-                //   providing boundThis as the this value and providing args
-                //   as the arguments.
+                // 4. Let args be a new list containing the same values as the
+                //   list boundArgs in the same order followed by the same
+                //   values as the list ExtraArgs in the same order.
+                // 5. Return the result of calling the [[Call]] internal method
+                //   of target providing boundThis as the this value and
+                //   providing args as the arguments.
 
                 // equiv: target.call(this, ...boundArgs, ...args)
                 return target.apply(
                     that,
-                    args.concat(slice.call(arguments))
+                    args.concat(_Array_slice_.call(arguments))
                 );
 
             }
 
         };
+        if(target.prototype) {
+            Empty.prototype = target.prototype;
+            bound.prototype = new Empty();
+            // Clean up dangling references.
+            Empty.prototype = null;
+        }
         // XXX bound.length is never writable, so don't even try
         //
-        // 16. The length own property of F is given attributes as specified in
-        //   15.3.5.1.
+        // 15. If the [[Class]] internal property of Target is "Function", then
+        //     a. Let L be the length property of Target minus the length of A.
+        //     b. Set the length own property of F to either 0 or L, whichever is
+        //       larger.
+        // 16. Else set the length own property of F to 0.
+        // 17. Set the attributes of the length own property of F to the values
+        //   specified in 15.3.5.1.
+
         // TODO
-        // 17. Set the [[Extensible]] internal property of F to true.
+        // 18. Set the [[Extensible]] internal property of F to true.
+
         // TODO
-        // 18. Call the [[DefineOwnProperty]] internal method of F with
-        //   arguments "caller", PropertyDescriptor {[[Value]]: null,
-        //   [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]:
-        //   false}, and false.
-        // TODO
-        // 19. Call the [[DefineOwnProperty]] internal method of F with
-        //   arguments "arguments", PropertyDescriptor {[[Value]]: null,
-        //   [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]:
-        //   false}, and false.
+        // 19. Let thrower be the [[ThrowTypeError]] function Object (13.2.3).
+        // 20. Call the [[DefineOwnProperty]] internal method of F with
+        //   arguments "caller", PropertyDescriptor {[[Get]]: thrower, [[Set]]:
+        //   thrower, [[Enumerable]]: false, [[Configurable]]: false}, and
+        //   false.
+        // 21. Call the [[DefineOwnProperty]] internal method of F with
+        //   arguments "arguments", PropertyDescriptor {[[Get]]: thrower,
+        //   [[Set]]: thrower, [[Enumerable]]: false, [[Configurable]]: false},
+        //   and false.
+
         // TODO
         // NOTE Function objects created using Function.prototype.bind do not
-        // have a prototype property.
-        // XXX can't delete it in pure-js.
+        // have a prototype property or the [[Code]], [[FormalParameters]], and
+        // [[Scope]] internal properties.
+        // XXX can't delete prototype in pure-js.
+
+        // 22. Return F.
         return bound;
     };
 }
 
-toString = call.bind(prototypeOfObject.toString);
-owns = call.bind(prototypeOfObject.hasOwnProperty);
+// Shortcut to an often accessed properties, in order to avoid multiple
+// dereference that costs universally.
+// _Please note: Shortcuts are defined after `Function.prototype.bind` as we
+// us it in defining shortcuts.
+var call = Function.prototype.call;
+var prototypeOfArray = Array.prototype;
+var prototypeOfObject = Object.prototype;
+var _Array_slice_ = prototypeOfArray.slice;
+// Having a toString local variable name breaks in Opera so use _toString.
+var _toString = call.bind(prototypeOfObject.toString);
+var owns = call.bind(prototypeOfObject.hasOwnProperty);
 
+// If JS engine supports accessors creating shortcuts.
+var defineGetter;
+var defineSetter;
+var lookupGetter;
+var lookupSetter;
+var supportsAccessors;
+if ((supportsAccessors = owns(prototypeOfObject, "__defineGetter__"))) {
+    defineGetter = call.bind(prototypeOfObject.__defineGetter__);
+    defineSetter = call.bind(prototypeOfObject.__defineSetter__);
+    lookupGetter = call.bind(prototypeOfObject.__lookupGetter__);
+    lookupSetter = call.bind(prototypeOfObject.__lookupSetter__);
+}
 
 //
 // Array
 // =====
 //
 
+// ES5 15.4.4.12
+// http://es5.github.com/#x15.4.4.12
+// Default value for second param
+// [bugfix, ielt9, old browsers]
+// IE < 9 bug: [1,2].splice(0).join("") == "" but should be "12"
+if ([1,2].splice(0).length != 2) {
+    var array_splice = Array.prototype.splice;
+
+    if(function() { // test IE < 9 to splice bug - see issue #138
+        function makeArray(l) {
+            var a = [];
+            while (l--) {
+                a.unshift(l)
+            }
+            return a
+        }
+
+        var array = []
+            , lengthBefore
+        ;
+
+        array.splice.bind(array, 0, 0).apply(null, makeArray(20));
+        array.splice.bind(array, 0, 0).apply(null, makeArray(26));
+
+        lengthBefore = array.length; //20
+        array.splice(5, 0, "XXX"); // add one element
+
+        if(lengthBefore + 1 == array.length) {
+            return true;// has right splice implementation without bugs
+        }
+        // else {
+        //    IE8 bug
+        // }
+    }()) {//IE 6/7
+        Array.prototype.splice = function(start, deleteCount) {
+            if (!arguments.length) {
+                return [];
+            } else {
+                return array_splice.apply(this, [
+                    start === void 0 ? 0 : start,
+                    deleteCount === void 0 ? (this.length - start) : deleteCount
+                ].concat(_Array_slice_.call(arguments, 2)))
+            }
+        };
+    }
+    else {//IE8
+        Array.prototype.splice = function(start, deleteCount) {
+            var result
+                , args = _Array_slice_.call(arguments, 2)
+                , addElementsCount = args.length
+            ;
+
+            if(!arguments.length) {
+                return [];
+            }
+
+            if(start === void 0) { // default
+                start = 0;
+            }
+            if(deleteCount === void 0) { // default
+                deleteCount = this.length - start;
+            }
+
+            if(addElementsCount > 0) {
+                if(deleteCount <= 0) {
+                    if(start == this.length) { // tiny optimisation #1
+                        this.push.apply(this, args);
+                        return [];
+                    }
+
+                    if(start == 0) { // tiny optimisation #2
+                        this.unshift.apply(this, args);
+                        return [];
+                    }
+                }
+
+                // Array.prototype.splice implementation
+                result = _Array_slice_.call(this, start, start + deleteCount);// delete part
+                args.push.apply(args, _Array_slice_.call(this, start + deleteCount, this.length));// right part
+                args.unshift.apply(args, _Array_slice_.call(this, 0, start));// left part
+
+                // delete all items from this array and replace it to 'left part' + _Array_slice_.call(arguments, 2) + 'right part'
+                args.unshift(0, this.length);
+
+                array_splice.apply(this, args);
+
+                return result;
+            }
+
+            return array_splice.call(this, start, deleteCount);
+        }
+
+    }
+}
+
+// ES5 15.4.4.12
+// http://es5.github.com/#x15.4.4.13
+// Return len+argCount.
+// [bugfix, ielt8]
+// IE < 8 bug: [].unshift(0) == undefined but should be "1"
+if ([].unshift(0) != 1) {
+    var array_unshift = Array.prototype.unshift;
+    Array.prototype.unshift = function() {
+        array_unshift.apply(this, arguments);
+        return this.length;
+    };
+}
+
 // ES5 15.4.3.2
+// http://es5.github.com/#x15.4.3.2
+// https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/isArray
 if (!Array.isArray) {
-    Array.isArray = function (obj) {
-        return toString(obj) == "[object Array]";
+    Array.isArray = function isArray(obj) {
+        return _toString(obj) == "[object Array]";
     };
 }
 
@@ -195,129 +300,169 @@ if (!Array.isArray) {
 // expressions.
 
 // ES5 15.4.4.18
-// https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/array/foreach
+// http://es5.github.com/#x15.4.4.18
+// https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/array/forEach
+
+// Check failure of by-index access of string characters (IE < 9)
+// and failure of `0 in boxedString` (Rhino)
+var boxedString = Object("a"),
+    splitString = boxedString[0] != "a" || !(0 in boxedString);
+
 if (!Array.prototype.forEach) {
-    Array.prototype.forEach = function (fun /*, thisp*/) {
-        var self = toObject(this),
+    Array.prototype.forEach = function forEach(fun /*, thisp*/) {
+        var object = toObject(this),
+            self = splitString && _toString(this) == "[object String]" ?
+                this.split("") :
+                object,
             thisp = arguments[1],
-            i = 0,
+            i = -1,
             length = self.length >>> 0;
 
         // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
+        if (_toString(fun) != "[object Function]") {
             throw new TypeError(); // TODO message
         }
 
-        while (i < length) {
+        while (++i < length) {
             if (i in self) {
                 // Invoke the callback function with call, passing arguments:
-                // context, property value, property key, thisArg object context
-                fun.call(thisp, self[i], i, self);
+                // context, property value, property key, thisArg object
+                // context
+                fun.call(thisp, self[i], i, object);
             }
-            i++;
         }
     };
 }
 
 // ES5 15.4.4.19
+// http://es5.github.com/#x15.4.4.19
 // https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/map
 if (!Array.prototype.map) {
-    Array.prototype.map = function (fun /*, thisp*/) {
-        var self = toObject(this),
+    Array.prototype.map = function map(fun /*, thisp*/) {
+        var object = toObject(this),
+            self = splitString && _toString(this) == "[object String]" ?
+                this.split("") :
+                object,
             length = self.length >>> 0,
             result = Array(length),
             thisp = arguments[1];
 
         // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
-            throw new TypeError(); // TODO message
+        if (_toString(fun) != "[object Function]") {
+            throw new TypeError(fun + " is not a function");
         }
 
         for (var i = 0; i < length; i++) {
             if (i in self)
-                result[i] = fun.call(thisp, self[i], i, self);
+                result[i] = fun.call(thisp, self[i], i, object);
         }
         return result;
     };
 }
 
 // ES5 15.4.4.20
+// http://es5.github.com/#x15.4.4.20
+// https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/filter
 if (!Array.prototype.filter) {
-    Array.prototype.filter = function (fun /*, thisp */) {
-        var self = toObject(this),
+    Array.prototype.filter = function filter(fun /*, thisp */) {
+        var object = toObject(this),
+            self = splitString && _toString(this) == "[object String]" ?
+                this.split("") :
+                    object,
             length = self.length >>> 0,
             result = [],
+            value,
             thisp = arguments[1];
 
         // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
-            throw new TypeError(); // TODO message
+        if (_toString(fun) != "[object Function]") {
+            throw new TypeError(fun + " is not a function");
         }
 
         for (var i = 0; i < length; i++) {
-            if (i in self && fun.call(thisp, self[i], i, self))
-                result.push(self[i]);
+            if (i in self) {
+                value = self[i];
+                if (fun.call(thisp, value, i, object)) {
+                    result.push(value);
+                }
+            }
         }
         return result;
     };
 }
 
 // ES5 15.4.4.16
+// http://es5.github.com/#x15.4.4.16
+// https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/every
 if (!Array.prototype.every) {
-    Array.prototype.every = function (fun /*, thisp */) {
-        var self = toObject(this),
+    Array.prototype.every = function every(fun /*, thisp */) {
+        var object = toObject(this),
+            self = splitString && _toString(this) == "[object String]" ?
+                this.split("") :
+                object,
             length = self.length >>> 0,
             thisp = arguments[1];
 
         // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
-            throw new TypeError(); // TODO message
+        if (_toString(fun) != "[object Function]") {
+            throw new TypeError(fun + " is not a function");
         }
 
         for (var i = 0; i < length; i++) {
-            if (i in self && !fun.call(thisp, self[i], i, self))
+            if (i in self && !fun.call(thisp, self[i], i, object)) {
                 return false;
+            }
         }
         return true;
     };
 }
 
 // ES5 15.4.4.17
+// http://es5.github.com/#x15.4.4.17
 // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/some
 if (!Array.prototype.some) {
-    Array.prototype.some = function (fun /*, thisp */) {
-        var self = toObject(this),
+    Array.prototype.some = function some(fun /*, thisp */) {
+        var object = toObject(this),
+            self = splitString && _toString(this) == "[object String]" ?
+                this.split("") :
+                object,
             length = self.length >>> 0,
             thisp = arguments[1];
 
         // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
-            throw new TypeError(); // TODO message
+        if (_toString(fun) != "[object Function]") {
+            throw new TypeError(fun + " is not a function");
         }
 
         for (var i = 0; i < length; i++) {
-            if (i in self && fun.call(thisp, self[i], i, self))
+            if (i in self && fun.call(thisp, self[i], i, object)) {
                 return true;
+            }
         }
         return false;
     };
 }
 
 // ES5 15.4.4.21
+// http://es5.github.com/#x15.4.4.21
 // https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/reduce
 if (!Array.prototype.reduce) {
-    Array.prototype.reduce = function (fun /*, initial*/) {
-        var self = toObject(this),
+    Array.prototype.reduce = function reduce(fun /*, initial*/) {
+        var object = toObject(this),
+            self = splitString && _toString(this) == "[object String]" ?
+                this.split("") :
+                object,
             length = self.length >>> 0;
 
         // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
-            throw new TypeError(); // TODO message
+        if (_toString(fun) != "[object Function]") {
+            throw new TypeError(fun + " is not a function");
         }
 
         // no value to return if no initial value and an empty array
-        if (!length && arguments.length == 1)
-            throw new TypeError(); // TODO message
+        if (!length && arguments.length == 1) {
+            throw new TypeError("reduce of empty array with no initial value");
+        }
 
         var i = 0;
         var result;
@@ -331,14 +476,16 @@ if (!Array.prototype.reduce) {
                 }
 
                 // if array contains no values, no initial value to return
-                if (++i >= length)
-                    throw new TypeError(); // TODO message
+                if (++i >= length) {
+                    throw new TypeError("reduce of empty array with no initial value");
+                }
             } while (true);
         }
 
         for (; i < length; i++) {
-            if (i in self)
-                result = fun.call(void 0, result, self[i], i, self);
+            if (i in self) {
+                result = fun.call(void 0, result, self[i], i, object);
+            }
         }
 
         return result;
@@ -346,20 +493,25 @@ if (!Array.prototype.reduce) {
 }
 
 // ES5 15.4.4.22
+// http://es5.github.com/#x15.4.4.22
 // https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/reduceRight
 if (!Array.prototype.reduceRight) {
-    Array.prototype.reduceRight = function (fun /*, initial*/) {
-        var self = toObject(this),
+    Array.prototype.reduceRight = function reduceRight(fun /*, initial*/) {
+        var object = toObject(this),
+            self = splitString && _toString(this) == "[object String]" ?
+                this.split("") :
+                object,
             length = self.length >>> 0;
 
         // If no callback function or if callback is not a callable function
-        if (toString(fun) != "[object Function]") {
-            throw new TypeError(); // TODO message
+        if (_toString(fun) != "[object Function]") {
+            throw new TypeError(fun + " is not a function");
         }
 
         // no value to return if no initial value, empty array
-        if (!length && arguments.length == 1)
-            throw new TypeError(); // TODO message
+        if (!length && arguments.length == 1) {
+            throw new TypeError("reduceRight of empty array with no initial value");
+        }
 
         var result, i = length - 1;
         if (arguments.length >= 2) {
@@ -372,14 +524,20 @@ if (!Array.prototype.reduceRight) {
                 }
 
                 // if array contains no values, no initial value to return
-                if (--i < 0)
-                    throw new TypeError(); // TODO message
+                if (--i < 0) {
+                    throw new TypeError("reduceRight of empty array with no initial value");
+                }
             } while (true);
         }
 
+        if (i < 0) {
+            return result;
+        }
+
         do {
-            if (i in this)
-                result = fun.call(void 0, result, self[i], i, self);
+            if (i in this) {
+                result = fun.call(void 0, result, self[i], i, object);
+            }
         } while (i--);
 
         return result;
@@ -387,21 +545,26 @@ if (!Array.prototype.reduceRight) {
 }
 
 // ES5 15.4.4.14
+// http://es5.github.com/#x15.4.4.14
 // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/indexOf
-if (!Array.prototype.indexOf) {
-    Array.prototype.indexOf = function (sought /*, fromIndex */ ) {
-        var self = toObject(this),
+if (!Array.prototype.indexOf || ([0, 1].indexOf(1, 2) != -1)) {
+    Array.prototype.indexOf = function indexOf(sought /*, fromIndex */ ) {
+        var self = splitString && _toString(this) == "[object String]" ?
+                this.split("") :
+                toObject(this),
             length = self.length >>> 0;
 
-        if (!length)
+        if (!length) {
             return -1;
+        }
 
         var i = 0;
-        if (arguments.length > 1)
+        if (arguments.length > 1) {
             i = toInteger(arguments[1]);
+        }
 
         // handle negative indices
-        i = i >= 0 ? i : length - Math.abs(i);
+        i = i >= 0 ? i : Math.max(0, length + i);
         for (; i < length; i++) {
             if (i in self && self[i] === sought) {
                 return i;
@@ -412,46 +575,30 @@ if (!Array.prototype.indexOf) {
 }
 
 // ES5 15.4.4.15
-if (!Array.prototype.lastIndexOf) {
-    Array.prototype.lastIndexOf = function (sought /*, fromIndex */) {
-        var self = toObject(this),
+// http://es5.github.com/#x15.4.4.15
+// https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/lastIndexOf
+if (!Array.prototype.lastIndexOf || ([0, 1].lastIndexOf(0, -3) != -1)) {
+    Array.prototype.lastIndexOf = function lastIndexOf(sought /*, fromIndex */) {
+        var self = splitString && _toString(this) == "[object String]" ?
+                this.split("") :
+                toObject(this),
             length = self.length >>> 0;
 
-        if (!length)
+        if (!length) {
             return -1;
+        }
         var i = length - 1;
-        if (arguments.length > 1)
-            i = toInteger(arguments[1]);
+        if (arguments.length > 1) {
+            i = Math.min(i, toInteger(arguments[1]));
+        }
         // handle negative indices
         i = i >= 0 ? i : length - Math.abs(i);
         for (; i >= 0; i--) {
-            if (i in self && sought === self[i])
+            if (i in self && sought === self[i]) {
                 return i;
+            }
         }
         return -1;
-    };
-}
-
-//
-// Array
-// =====
-//
-
-// ES5 15.4.4.12
-// http://es5.github.com/#x15.4.4.12
-// Default value for second param
-// [bugfix, ielt9, old browsers]
-// IE < 9 bug: [1,2].splice(0).join("") == "" but should be "12"
-if([1,2].splice(0).length != 2) {
-    var _origArraySplice = Array.prototype.splice;
-
-    Array.prototype.splice = function(start, deleteCount) {
-        if(!arguments.length)return [];
-
-        return _origArraySplice.apply(this, [
-                start === void 0 ? 0 : start,
-                deleteCount === void 0 ? (this.length - start) : deleteCount
-            ].concat(slice.call(arguments, 2)))
     };
 }
 
@@ -460,11 +607,10 @@ if([1,2].splice(0).length != 2) {
 // ======
 //
 
-
 // ES5 15.2.3.14
-// http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
+// http://es5.github.com/#x15.2.3.14
 if (!Object.keys) {
-
+    // http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
     var hasDontEnumBug = true,
         dontEnums = [
             "toString",
@@ -477,13 +623,18 @@ if (!Object.keys) {
         ],
         dontEnumsLength = dontEnums.length;
 
-    for (var key in {"toString": null})
+    for (var key in {"toString": null}) {
         hasDontEnumBug = false;
+    }
 
     Object.keys = function keys(object) {
 
-        if ((typeof object != "object" && typeof object != "function") || object === null)
+        if (
+            (typeof object != "object" && typeof object != "function") ||
+            object === null
+        ) {
             throw new TypeError("Object.keys called on a non-object");
+        }
 
         var keys = [];
         for (var name in object) {
@@ -500,7 +651,6 @@ if (!Object.keys) {
                 }
             }
         }
-
         return keys;
     };
 
@@ -512,58 +662,102 @@ if (!Object.keys) {
 //
 
 // ES5 15.9.5.43
-// Format a Date object as a string according to a simplified subset of the ISO 8601
-// standard as defined in 15.9.1.15.
-if (!Date.prototype.toISOString) {
+// http://es5.github.com/#x15.9.5.43
+// This function returns a String value represent the instance in time
+// represented by this Date object. The format of the String is the Date Time
+// string format defined in 15.9.1.15. All fields are present in the String.
+// The time zone is always UTC, denoted by the suffix Z. If the time value of
+// this object is not a finite Number a RangeError exception is thrown.
+var negativeDate = -62198755200000,
+    negativeYearString = "-000001";
+if (
+    !Date.prototype.toISOString ||
+    (new Date(negativeDate).toISOString().indexOf(negativeYearString) === -1)
+) {
     Date.prototype.toISOString = function toISOString() {
-        var result, length, value;
-        if (!isFinite(this))
-            throw new RangeError;
+        var result, length, value, year, month;
+        if (!isFinite(this)) {
+            throw new RangeError("Date.prototype.toISOString called on non-finite value.");
+        }
+
+        year = this.getUTCFullYear();
+
+        month = this.getUTCMonth();
+        // see https://github.com/kriskowal/es5-shim/issues/111
+        year += Math.floor(month / 12);
+        month = (month % 12 + 12) % 12;
 
         // the date time string format is specified in 15.9.1.15.
-        result = [this.getUTCFullYear(), this.getUTCMonth() + 1, this.getUTCDate(),
+        result = [month + 1, this.getUTCDate(),
             this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()];
+        year = (
+            (year < 0 ? "-" : (year > 9999 ? "+" : "")) +
+            ("00000" + Math.abs(year))
+            .slice(0 <= year && year <= 9999 ? -4 : -6)
+        );
 
         length = result.length;
         while (length--) {
             value = result[length];
-            // pad months, days, hours, minutes, and seconds to have two digits.
-            if (value < 10)
+            // pad months, days, hours, minutes, and seconds to have two
+            // digits.
+            if (value < 10) {
                 result[length] = "0" + value;
+            }
         }
         // pad milliseconds to have three digits.
-        return result.slice(0, 3).join("-") + "T" + result.slice(3).join(":") + "." +
-            ("000" + this.getUTCMilliseconds()).slice(-3) + "Z";
-    }
-}
-
-// ES5 15.9.4.4
-if (!Date.now) {
-    Date.now = function now() {
-        return new Date().getTime();
+        return (
+            year + "-" + result.slice(0, 2).join("-") +
+            "T" + result.slice(2).join(":") + "." +
+            ("000" + this.getUTCMilliseconds()).slice(-3) + "Z"
+        );
     };
 }
 
+
 // ES5 15.9.5.44
-if (!Date.prototype.toJSON) {
+// http://es5.github.com/#x15.9.5.44
+// This function provides a String representation of a Date object for use by
+// JSON.stringify (15.12.3).
+var dateToJSONIsSupported = false;
+try {
+    dateToJSONIsSupported = (
+        Date.prototype.toJSON &&
+        new Date(NaN).toJSON() === null &&
+        new Date(negativeDate).toJSON().indexOf(negativeYearString) !== -1 &&
+        Date.prototype.toJSON.call({ // generic
+            toISOString: function () {
+                return true;
+            }
+        })
+    );
+} catch (e) {
+}
+if (!dateToJSONIsSupported) {
     Date.prototype.toJSON = function toJSON(key) {
-        // This function provides a String representation of a Date object for
-        // use by JSON.stringify (15.12.3). When the toJSON method is called
-        // with argument key, the following steps are taken:
+        // When the toJSON method is called with argument key, the following
+        // steps are taken:
 
         // 1.  Let O be the result of calling ToObject, giving it the this
         // value as its argument.
-        // 2. Let tv be ToPrimitive(O, hint Number).
+        // 2. Let tv be toPrimitive(O, hint Number).
+        var o = Object(this),
+            tv = toPrimitive(o),
+            toISO;
         // 3. If tv is a Number and is not finite, return null.
-        // XXX
+        if (typeof tv === "number" && !isFinite(tv)) {
+            return null;
+        }
         // 4. Let toISO be the result of calling the [[Get]] internal method of
         // O with argument "toISOString".
+        toISO = o.toISOString;
         // 5. If IsCallable(toISO) is false, throw a TypeError exception.
-        if (typeof this.toISOString != "function")
-            throw new TypeError(); // TODO message
+        if (typeof toISO != "function") {
+            throw new TypeError("toISOString property is not callable");
+        }
         // 6. Return the result of calling the [[Call]] internal method of
-        // toISO with O as the this value and an empty argument list.
-        return this.toISOString();
+        //  toISO with O as the this value and an empty argument list.
+        return toISO.call(o);
 
         // NOTE 1 The argument is ignored.
 
@@ -576,13 +770,455 @@ if (!Date.prototype.toJSON) {
     };
 }
 
+// ES5 15.9.4.2
+// http://es5.github.com/#x15.9.4.2
+// based on work shared by Daniel Friesen (dantman)
+// http://gist.github.com/303249
+if (!Date.parse || "Date.parse is buggy") {
+    // XXX global assignment won't work in embeddings that use
+    // an alternate object for the context.
+    Date = (function(NativeDate) {
+
+        // Date.length === 7
+        function Date(Y, M, D, h, m, s, ms) {
+            var length = arguments.length;
+            if (this instanceof NativeDate) {
+                var date = length == 1 && String(Y) === Y ? // isString(Y)
+                    // We explicitly pass it through parse:
+                    new NativeDate(Date.parse(Y)) :
+                    // We have to manually make calls depending on argument
+                    // length here
+                    length >= 7 ? new NativeDate(Y, M, D, h, m, s, ms) :
+                    length >= 6 ? new NativeDate(Y, M, D, h, m, s) :
+                    length >= 5 ? new NativeDate(Y, M, D, h, m) :
+                    length >= 4 ? new NativeDate(Y, M, D, h) :
+                    length >= 3 ? new NativeDate(Y, M, D) :
+                    length >= 2 ? new NativeDate(Y, M) :
+                    length >= 1 ? new NativeDate(Y) :
+                                  new NativeDate();
+                // Prevent mixups with unfixed Date object
+                date.constructor = Date;
+                return date;
+            }
+            return NativeDate.apply(this, arguments);
+        };
+
+        // 15.9.1.15 Date Time String Format.
+        var isoDateExpression = new RegExp("^" +
+            "(\\d{4}|[\+\-]\\d{6})" + // four-digit year capture or sign +
+                                      // 6-digit extended year
+            "(?:-(\\d{2})" + // optional month capture
+            "(?:-(\\d{2})" + // optional day capture
+            "(?:" + // capture hours:minutes:seconds.milliseconds
+                "T(\\d{2})" + // hours capture
+                ":(\\d{2})" + // minutes capture
+                "(?:" + // optional :seconds.milliseconds
+                    ":(\\d{2})" + // seconds capture
+                    "(?:(\\.\\d{1,}))?" + // milliseconds capture
+                ")?" +
+            "(" + // capture UTC offset component
+                "Z|" + // UTC capture
+                "(?:" + // offset specifier +/-hours:minutes
+                    "([-+])" + // sign capture
+                    "(\\d{2})" + // hours offset capture
+                    ":(\\d{2})" + // minutes offset capture
+                ")" +
+            ")?)?)?)?" +
+        "$");
+
+        var months = [
+            0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365
+        ];
+
+        function dayFromMonth(year, month) {
+            var t = month > 1 ? 1 : 0;
+            return (
+                months[month] +
+                Math.floor((year - 1969 + t) / 4) -
+                Math.floor((year - 1901 + t) / 100) +
+                Math.floor((year - 1601 + t) / 400) +
+                365 * (year - 1970)
+            );
+        }
+
+        // Copy any custom methods a 3rd party library may have added
+        for (var key in NativeDate) {
+            Date[key] = NativeDate[key];
+        }
+
+        // Copy "native" methods explicitly; they may be non-enumerable
+        Date.now = NativeDate.now;
+        Date.UTC = NativeDate.UTC;
+        Date.prototype = NativeDate.prototype;
+        Date.prototype.constructor = Date;
+
+        // Upgrade Date.parse to handle simplified ISO 8601 strings
+        Date.parse = function parse(string) {
+            var match = isoDateExpression.exec(string);
+            if (match) {
+                // parse months, days, hours, minutes, seconds, and milliseconds
+                // provide default values if necessary
+                // parse the UTC offset component
+                var year = Number(match[1]),
+                    month = Number(match[2] || 1) - 1,
+                    day = Number(match[3] || 1) - 1,
+                    hour = Number(match[4] || 0),
+                    minute = Number(match[5] || 0),
+                    second = Number(match[6] || 0),
+                    millisecond = Math.floor(Number(match[7] || 0) * 1000),
+                    // When time zone is missed, local offset should be used
+                    // (ES 5.1 bug)
+                    // see https://bugs.ecmascript.org/show_bug.cgi?id=112
+                    offset = !match[4] || match[8] ?
+                        0 : Number(new NativeDate(1970, 0)),
+                    signOffset = match[9] === "-" ? 1 : -1,
+                    hourOffset = Number(match[10] || 0),
+                    minuteOffset = Number(match[11] || 0),
+                    result;
+                if (
+                    hour < (
+                        minute > 0 || second > 0 || millisecond > 0 ?
+                        24 : 25
+                    ) &&
+                    minute < 60 && second < 60 && millisecond < 1000 &&
+                    month > -1 && month < 12 && hourOffset < 24 &&
+                    minuteOffset < 60 && // detect invalid offsets
+                    day > -1 &&
+                    day < (
+                        dayFromMonth(year, month + 1) -
+                        dayFromMonth(year, month)
+                    )
+                ) {
+                    result = (
+                        (dayFromMonth(year, month) + day) * 24 +
+                        hour +
+                        hourOffset * signOffset
+                    ) * 60;
+                    result = (
+                        (result + minute + minuteOffset * signOffset) * 60 +
+                        second
+                    ) * 1000 + millisecond + offset;
+                    if (-8.64e15 <= result && result <= 8.64e15) {
+                        return result;
+                    }
+                }
+                return NaN;
+            }
+            return NativeDate.parse.apply(this, arguments);
+        };
+
+        return Date;
+    })(Date);
+}
+
+// ES5 15.9.4.4
+// http://es5.github.com/#x15.9.4.4
+if (!Date.now) {
+    Date.now = function now() {
+        return new Date().getTime();
+    };
+}
+
+
+//
+// Number
+// ======
+//
+
+// ES5.1 15.7.4.5
+// http://es5.github.com/#x15.7.4.5
+if (!Number.prototype.toFixed || (0.00008).toFixed(3) !== '0.000' || (0.9).toFixed(0) === '0' || (1.255).toFixed(2) !== '1.25' || (1000000000000000128).toFixed(0) !== "1000000000000000128") {
+    // Hide these variables and functions
+    (function () {
+        var base, size, data, i;
+
+        base = 1e7;
+        size = 6;
+        data = [0, 0, 0, 0, 0, 0];
+
+        function multiply(n, c) {
+            var i = -1;
+            while (++i < size) {
+                c += n * data[i];
+                data[i] = c % base;
+                c = Math.floor(c / base);
+            }
+        }
+
+        function divide(n) {
+            var i = size, c = 0;
+            while (--i >= 0) {
+                c += data[i];
+                data[i] = Math.floor(c / n);
+                c = (c % n) * base;
+            }
+        }
+
+        function toString() {
+            var i = size;
+            var s = '';
+            while (--i >= 0) {
+                if (s !== '' || i === 0 || data[i] !== 0) {
+                    var t = String(data[i]);
+                    if (s === '') {
+                        s = t;
+                    } else {
+                        s += '0000000'.slice(0, 7 - t.length) + t;
+                    }
+                }
+            }
+            return s;
+        }
+
+        function pow(x, n, acc) {
+            return (n === 0 ? acc : (n % 2 === 1 ? pow(x, n - 1, acc * x) : pow(x * x, n / 2, acc)));
+        }
+
+        function log(x) {
+            var n = 0;
+            while (x >= 4096) {
+                n += 12;
+                x /= 4096;
+            }
+            while (x >= 2) {
+                n += 1;
+                x /= 2;
+            }
+            return n;
+        }
+
+        Number.prototype.toFixed = function (fractionDigits) {
+            var f, x, s, m, e, z, j, k;
+
+            // Test for NaN and round fractionDigits down
+            f = Number(fractionDigits);
+            f = f !== f ? 0 : Math.floor(f);
+
+            if (f < 0 || f > 20) {
+                throw new RangeError("Number.toFixed called with invalid number of decimals");
+            }
+
+            x = Number(this);
+
+            // Test for NaN
+            if (x !== x) {
+                return "NaN";
+            }
+
+            // If it is too big or small, return the string value of the number
+            if (x <= -1e21 || x >= 1e21) {
+                return String(x);
+            }
+
+            s = "";
+
+            if (x < 0) {
+                s = "-";
+                x = -x;
+            }
+
+            m = "0";
+
+            if (x > 1e-21) {
+                // 1e-21 < x < 1e21
+                // -70 < log2(x) < 70
+                e = log(x * pow(2, 69, 1)) - 69;
+                z = (e < 0 ? x * pow(2, -e, 1) : x / pow(2, e, 1));
+                z *= 0x10000000000000; // Math.pow(2, 52);
+                e = 52 - e;
+
+                // -18 < e < 122
+                // x = z / 2 ^ e
+                if (e > 0) {
+                    multiply(0, z);
+                    j = f;
+
+                    while (j >= 7) {
+                        multiply(1e7, 0);
+                        j -= 7;
+                    }
+
+                    multiply(pow(10, j, 1), 0);
+                    j = e - 1;
+
+                    while (j >= 23) {
+                        divide(1 << 23);
+                        j -= 23;
+                    }
+
+                    divide(1 << j);
+                    multiply(1, 1);
+                    divide(2);
+                    m = toString();
+                } else {
+                    multiply(0, z);
+                    multiply(1 << (-e), 0);
+                    m = toString() + '0.00000000000000000000'.slice(2, 2 + f);
+                }
+            }
+
+            if (f > 0) {
+                k = m.length;
+
+                if (k <= f) {
+                    m = s + '0.0000000000000000000'.slice(0, f - k + 2) + m;
+                } else {
+                    m = s + m.slice(0, k - f) + '.' + m.slice(k - f);
+                }
+            } else {
+                m = s + m;
+            }
+
+            return m;
+        }
+    }());
+}
+
 
 //
 // String
 // ======
 //
 
+
+// ES5 15.5.4.14
+// http://es5.github.com/#x15.5.4.14
+
+// [bugfix, IE lt 9, firefox 4, Konqueror, Opera, obscure browsers]
+// Many browsers do not split properly with regular expressions or they
+// do not perform the split correctly under obscure conditions.
+// See http://blog.stevenlevithan.com/archives/cross-browser-split
+// I've tested in many browsers and this seems to cover the deviant ones:
+//    'ab'.split(/(?:ab)*/) should be ["", ""], not [""]
+//    '.'.split(/(.?)(.?)/) should be ["", ".", "", ""], not ["", ""]
+//    'tesst'.split(/(s)*/) should be ["t", undefined, "e", "s", "t"], not
+//       [undefined, "t", undefined, "e", ...]
+//    ''.split(/.?/) should be [], not [""]
+//    '.'.split(/()()/) should be ["."], not ["", "", "."]
+
+var string_split = String.prototype.split;
+if (
+    'ab'.split(/(?:ab)*/).length !== 2 ||
+    '.'.split(/(.?)(.?)/).length !== 4 ||
+    'tesst'.split(/(s)*/)[1] === "t" ||
+    ''.split(/.?/).length === 0 ||
+    '.'.split(/()()/).length > 1
+) {
+    (function () {
+        var compliantExecNpcg = /()??/.exec("")[1] === void 0; // NPCG: nonparticipating capturing group
+
+        String.prototype.split = function (separator, limit) {
+            var string = this;
+            if (separator === void 0 && limit === 0)
+                return [];
+
+            // If `separator` is not a regex, use native split
+            if (Object.prototype.toString.call(separator) !== "[object RegExp]") {
+                return string_split.apply(this, arguments);
+            }
+
+            var output = [],
+                flags = (separator.ignoreCase ? "i" : "") +
+                        (separator.multiline  ? "m" : "") +
+                        (separator.extended   ? "x" : "") + // Proposed for ES6
+                        (separator.sticky     ? "y" : ""), // Firefox 3+
+                lastLastIndex = 0,
+                // Make `global` and avoid `lastIndex` issues by working with a copy
+                separator = new RegExp(separator.source, flags + "g"),
+                separator2, match, lastIndex, lastLength;
+            string += ""; // Type-convert
+            if (!compliantExecNpcg) {
+                // Doesn't need flags gy, but they don't hurt
+                separator2 = new RegExp("^" + separator.source + "$(?!\\s)", flags);
+            }
+            /* Values for `limit`, per the spec:
+             * If undefined: 4294967295 // Math.pow(2, 32) - 1
+             * If 0, Infinity, or NaN: 0
+             * If positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
+             * If negative number: 4294967296 - Math.floor(Math.abs(limit))
+             * If other: Type-convert, then use the above rules
+             */
+            limit = limit === void 0 ?
+                -1 >>> 0 : // Math.pow(2, 32) - 1
+                limit >>> 0; // ToUint32(limit)
+            while (match = separator.exec(string)) {
+                // `separator.lastIndex` is not reliable cross-browser
+                lastIndex = match.index + match[0].length;
+                if (lastIndex > lastLastIndex) {
+                    output.push(string.slice(lastLastIndex, match.index));
+                    // Fix browsers whose `exec` methods don't consistently return `undefined` for
+                    // nonparticipating capturing groups
+                    if (!compliantExecNpcg && match.length > 1) {
+                        match[0].replace(separator2, function () {
+                            for (var i = 1; i < arguments.length - 2; i++) {
+                                if (arguments[i] === void 0) {
+                                    match[i] = void 0;
+                                }
+                            }
+                        });
+                    }
+                    if (match.length > 1 && match.index < string.length) {
+                        Array.prototype.push.apply(output, match.slice(1));
+                    }
+                    lastLength = match[0].length;
+                    lastLastIndex = lastIndex;
+                    if (output.length >= limit) {
+                        break;
+                    }
+                }
+                if (separator.lastIndex === match.index) {
+                    separator.lastIndex++; // Avoid an infinite loop
+                }
+            }
+            if (lastLastIndex === string.length) {
+                if (lastLength || !separator.test("")) {
+                    output.push("");
+                }
+            } else {
+                output.push(string.slice(lastLastIndex));
+            }
+            return output.length > limit ? output.slice(0, limit) : output;
+        };
+    }());
+
+// [bugfix, chrome]
+// If separator is undefined, then the result array contains just one String,
+// which is the this value (converted to a String). If limit is not undefined,
+// then the output array is truncated so that it contains no more than limit
+// elements.
+// "0".split(undefined, 0) -> []
+} else if ("0".split(void 0, 0).length) {
+    String.prototype.split = function(separator, limit) {
+        if (separator === void 0 && limit === 0) return [];
+        return string_split.apply(this, arguments);
+    }
+}
+
+
+// ECMA-262, 3rd B.2.3
+// Note an ECMAScript standart, although ECMAScript 3rd Edition has a
+// non-normative section suggesting uniform semantics and it should be
+// normalized across all browsers
+// [bugfix, IE lt 9] IE < 9 substr() with negative value not working in IE
+if("".substr && "0b".substr(-1) !== "b") {
+    var string_substr = String.prototype.substr;
+    /**
+     *  Get the substring of a string
+     *  @param  {integer}  start   where to start the substring
+     *  @param  {integer}  length  how many characters to return
+     *  @return {string}
+     */
+    String.prototype.substr = function(start, length) {
+        return string_substr.call(
+            this,
+            start < 0 ? ((start = this.length + start) < 0 ? 0 : start) : start,
+            length
+        );
+    }
+}
+
 // ES5 15.5.4.20
+// http://es5.github.com/#x15.5.4.20
 var ws = "\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003" +
     "\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028" +
     "\u2029\uFEFF";
@@ -593,38 +1229,13 @@ if (!String.prototype.trim || ws.trim()) {
     var trimBeginRegexp = new RegExp("^" + ws + ws + "*"),
         trimEndRegexp = new RegExp(ws + ws + "*$");
     String.prototype.trim = function trim() {
-        return String(this).replace(trimBeginRegexp, "").replace(trimEndRegexp, "");
+        if (this === void 0 || this === null) {
+            throw new TypeError("can't convert "+this+" to object");
+        }
+        return String(this)
+            .replace(trimBeginRegexp, "")
+            .replace(trimEndRegexp, "");
     };
-}
-
-// ES5 15.5.4.14
-// http://es5.github.com/#x15.5.4.14
-// [bugfix, chrome]
-// If separator is undefined, then the result array contains just one String, which is the this value (converted to a String). If limit is not undefined, then the output array is truncated so that it contains no more than limit elements.
-// "0".split(undefined, 0) -> []
-if("0".split(void 0, 0).length) {
-    var oldSplit = String.prototype.split;
-    String.prototype.split = function(separator, limit) {
-        if(separator === void 0 && limit === 0)return [];
-        return oldSplit.apply(this, arguments);
-    }
-}
-
-// ECMA-262, 3rd B.2.3
-// Note an ECMAScript standart, although ECMAScript 3rd Edition has a non-normative section suggesting uniform semantics
-// and it should be normalized across all browsers
-// [bugfix, IE lt 9] IE < 9 substr() with negative value not working in IE
-if("".substr && "0b".substr(-1) !== "b") {
-    var oldSubstr = String.prototype.substr;
-    /**
-* Get the substring of a string
-* @param {integer} start where to start the substring
-* @param {integer} length how many characters to return
-* @return {string}
-*/
-    String.prototype.substr = function(start, length) {
-        return oldSubstr.call(this, start < 0 ? (start = this.length + start) < 0 ? 0 : start : start, length);
-    }
 }
 
 //
@@ -632,31 +1243,64 @@ if("".substr && "0b".substr(-1) !== "b") {
 // ======
 //
 
+// ES5 9.4
+// http://es5.github.com/#x9.4
 // http://jsperf.com/to-integer
-var toInteger = function (n) {
+
+function toInteger(n) {
     n = +n;
-    if (n !== n) // isNaN
-        n = -1;
-    else if (n !== 0 && n !== (1/0) && n !== -(1/0))
+    if (n !== n) { // isNaN
+        n = 0;
+    } else if (n !== 0 && n !== (1/0) && n !== -(1/0)) {
         n = (n > 0 || -1) * Math.floor(Math.abs(n));
+    }
     return n;
+}
+
+function isPrimitive(input) {
+    var type = typeof input;
+    return (
+        input === null ||
+        type === "undefined" ||
+        type === "boolean" ||
+        type === "number" ||
+        type === "string"
+    );
+}
+
+function toPrimitive(input) {
+    var val, valueOf, toString;
+    if (isPrimitive(input)) {
+        return input;
+    }
+    valueOf = input.valueOf;
+    if (typeof valueOf === "function") {
+        val = valueOf.call(input);
+        if (isPrimitive(val)) {
+            return val;
+        }
+    }
+    toString = input.toString;
+    if (typeof toString === "function") {
+        val = toString.call(input);
+        if (isPrimitive(val)) {
+            return val;
+        }
+    }
+    throw new TypeError();
+}
+
+// ES5 9.9
+// http://es5.github.com/#x9.9
+var toObject = function (o) {
+    if (o == null) { // this matches both null and undefined
+        throw new TypeError("can't convert "+o+" to object");
+    }
+    return Object(o);
 };
 
-var prepareString = "a"[0] != "a",
-    // ES5 9.9
-    toObject = function (o) {
-        if (o == null) { // this matches both null and undefined
-            throw new TypeError(); // TODO message
-        }
-        // If the implementation doesn't support by-index access of
-        // string characters (ex. IE < 7), split the string
-        if (prepareString && typeof o == "string" && o) {
-            return o.split("");
-        }
-        return Object(o);
-    };
-
 })();
+
 
 
 
@@ -2495,6 +3139,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 							if(hasNative && (!data || data.isActive == 'html5') && supLoad.prop._supvalue){
 								supLoad.prop._supvalue.apply(this, arguments);
 							}
+							$(this).triggerHandler('wsmediareload');
 						}
 					}
 				});
@@ -3091,9 +3736,9 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 	})();
 	
 	
-	var transformDimension = (function(){
+	var getComputedDimension = (function(){
 		var dimCache = {};
-		var getRealDims = function(data){
+		var getVideoDims = function(data){
 			var ret, poster, img;
 			if(dimCache[data.currentSrc]){
 				ret = dimCache[data.currentSrc];
@@ -3118,95 +3763,102 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 						} else {
 							delete dimCache[poster];
 						}
+						img.onload = null;
 					};
 					img.src = poster;
-					if(img.complete){
+					if(img.complete && img.onload){
 						img.onload();
 					}
 				}
 			}
 			return ret || {width: 300, height: data._elemNodeName == 'video' ? 150 : 50};
 		};
-		var addMinMax = function(ret, c, autos, ratio){
-			var changed;
-			if(c.maxH && ret.height > c.maxH){
-				ret.height = c.maxH;
-				changed = true;
-			}
-			
-			if(c.minH && ret.height < c.minH){
-				ret.height = c.minH;
-				changed = true;
-			}
-			
-			if(changed && autos.width == 'auto'){
-				ret.width = ret.height * ratio;
-			}
-			
-			changed = false;
-			
-			if(c.maxW && ret.width > c.maxW){
-				ret.width = c.maxW;
-				changed = true;
-			}
-			
-			if(c.minW && ret.width < c.minW){
-				ret.width = c.minW;
-				changed = true;
-			}
-			
-			if(changed && autos.height == 'auto'){
-				ret.height = ret.width / ratio;
-			}
-			
+		
+		var getCssStyle = function(elem, style){
+			return elem.style[style] || (elem.currentStyle && elem.currentStyle[style]) || (window.getComputedStyle && (window.getComputedStyle( elem, null ) || {} )[style]) || '';
 		};
-		return function(data){
-			data._elem.style.display = '';
-			var numDims, ratio;
+		var minMaxProps = ['minWidth', 'maxWidth', 'minHeight', 'maxHeight'];
+		
+		var addMinMax = function(elem, ret){
+			var i, prop;
+			var hasMinMax = false;
+			for (i = 0; i < 4; i++) {
+				prop = getCssStyle(elem, minMaxProps[i]);
+				if(parseFloat(prop, 10)){
+					hasMinMax = true;
+					ret[minMaxProps[i]] = prop;
+				}
+			}
+			return hasMinMax;
+		};
+		var retFn = function(data){
+			var videoDims, ratio, hasMinMax;
 			var elem = data._elem;
+			var autos = {
+				width: getCssStyle(elem, 'width') == 'auto',
+				height: getCssStyle(elem, 'height') == 'auto'
+			};
 			var ret  = {
-				width: elem.style.width == 'auto' ? 'auto' : $(elem).width(),
-				height: elem.style.height == 'auto' ? 'auto' : $(elem).height()
+				width: !autos.width && $(elem).width(),
+				height: !autos.height && $(elem).height()
 			};
-			var c = {
-				maxW: parseInt($.css(elem, 'maxWidth'), 10) || '',
-				minW: parseInt($.css(elem, 'minWidth'), 10) || '',
-				maxH: parseInt($.css(elem, 'maxHeight'), 10) || '',
-				minH: parseInt($.css(elem, 'minHeight'), 10) || ''
-			};
-			if(ret.width == 'auto' || ret.height == 'auto'){
-				numDims = getRealDims(data);
-				ratio = numDims.width / numDims.height;
+			
+			if(autos.width || autos.height){
+				videoDims = getVideoDims(data);
+				ratio = videoDims.width / videoDims.height;
 				
-				if(ret.width == 'auto' && ret.height == 'auto'){
-				
-				} else if(ret.width == 'auto'){
-					numDims.width = ret.height * ratio;
-					numDims.height = ret.height;
-				} else if(ret.height == 'auto'){
-					numDims.height = ret.width / ratio;
-					numDims.width = ret.width;
+				if(autos.width && autos.height){
+					ret.width = videoDims.width;
+					ret.height = videoDims.height;
+				} else if(autos.width){
+					ret.width = ret.height * ratio;
+				} else if(autos.height){
+					ret.height = ret.width / ratio;
 				}
 				
-			} else {
-				numDims = ret;
+				if(addMinMax(elem, ret)){
+					data.shadowElem.css(ret);
+					if(autos.width){
+						ret.width = data.shadowElem.height() * ratio;
+					} 
+					if(autos.height){
+						ret.height = ((autos.width) ? ret.width :  data.shadowElem.width()) / ratio;
+					}
+					if(autos.width && autos.height){
+						data.shadowElem.css(ret);
+						ret.height = data.shadowElem.width() / ratio;
+						ret.width = ret.height * ratio;
+						
+						data.shadowElem.css(ret);
+						ret.width = data.shadowElem.height() * ratio;
+						ret.height = ret.width / ratio;
+						
+					}
+					if(!Modernizr.video){
+						ret.width = data.shadowElem.width();
+						ret.height = data.shadowElem.height();
+					}
+				}
 			}
-			data._elem.style.display = 'none';
-			addMinMax(numDims, c, ret, ratio);
-			return numDims;
+			return ret;
 		};
+		
+		return retFn;
 	})();
+	
 	var setElementDimension = function(data, hasControls){
 		var dims;
 		
 		var box = data.shadowElem;
 		$(data._elem)[hasControls ? 'addClass' : 'removeClass']('webshims-controls');
 
-		if(data.isActive == 'third'){
+		if(data.isActive == 'third' || data.activating == 'third'){
 			if(data._elemNodeName == 'audio' && !hasControls){
 				box.css({width: 0, height: 0});
 			} else {
-				dims = transformDimension(data);
+				data._elem.style.display = '';
+				dims = getComputedDimension(data);
+				data._elem.style.display = 'none';
 				box.css(dims);
 			}
 		}

@@ -7,13 +7,7 @@
 	<link href="../css/styles.css" rel="stylesheet" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
-	<script>
-		// set options for html5shiv
-		if(!window.html5){
-			window.html5 = {}; 
-		}
-		window.html5.shivMethods = false;
-	</script>
+	
 	<script src="../js-webshim/minified/polyfiller.js"></script>
 	
 	<script class="example">
@@ -74,7 +68,7 @@ $('#my-dynamic-container').load('ajax/test.html', function(){
 			<h4>jQuery mobile example</h4>
 			
 <code class="block">
-//jQuery mobile before webshims polyfiller.js! and set waitReady to false
+//add jQuery mobile before webshims polyfiller.js! and set waitReady to false
 $.webshims.setOptions('waitReady', false);
 //call webshims.polyfill() before domready
 $.webshims.polyfill();
@@ -85,36 +79,7 @@ $(document).on('pageinit', function(e){
 });
 </code>	
 			<p>For jQuery Mobile see also <a href="webforms/jquery-mobile.html">webshims and jQ mobile</a></p>
-			<h3 id="#shivMethods">html5.shivMethods config</h3>
-			<p>The <a href="https://github.com/aFarkas/html5shiv">html5shiv</a> also fixes dynamically creating HTML5 elements in IE6/7/8. In case you do not create HTML5 elements dynamically using JavaScript or you are using jQuery 1.7+ manipulation methods for creating HTML5 elements, you should set html5.shivMethods to false:</p>
-
-<code class="block">
-&lt;script&gt;
-	// set options for html5shiv *before* embeding html5shiv
-	window.html5 = {
-		shivMethods: false
-	};
-&lt;/script&gt;
-&lt;script src="modernizr-with-shiv.js"&gt;&lt;/script&gt;
-</code>	
-
-<code class="block">
-&lt;script src="modernizr-with-shiv.js"&gt;&lt;/script&gt;
-&lt;script&gt;
-	// set options for html5shiv *after* embeding html5shiv
-	window.html5.shivMethods = false;
-&lt;/script&gt;
-</code>	
-
-<code class="block">
-&lt;script&gt;
-	// set options for html5shiv
-	if(!window.html5){
-		window.html5 = {}; 
-	}
-	window.html5.shivMethods = false;
-&lt;/script&gt;
-</code>	
+			
 
 			<aside>
 				<h3>Links about shiv</h3>

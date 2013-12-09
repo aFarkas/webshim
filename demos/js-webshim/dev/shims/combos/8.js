@@ -2615,6 +2615,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 							if(hasNative && (!data || data.isActive == 'html5') && supLoad.prop._supvalue){
 								supLoad.prop._supvalue.apply(this, arguments);
 							}
+							$(this).triggerHandler('wsmediareload');
 						}
 					}
 				});

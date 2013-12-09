@@ -16,8 +16,10 @@
 			min-width: 320px;
 			max-width: 980px;
 			width: 80%;
+			background: url(assets/trans.png);
 			background: rgba(255, 255, 255, 0.6);
 			padding: 25px;
+			border: 2px solid #666;
 			border-radius: 15px;
 			z-index: 9;
 		}
@@ -34,9 +36,9 @@
 			display: block;
 			min-width: 100%;
 			min-height: 100%;
-			/* set inline !!!
+			/* set inline !!! */
 			width: auto;
-			height: auto; */
+			height: auto;
 		}
 		
 		.video-bg .video-overlay {
@@ -108,10 +110,21 @@
 			margin: 0 10px 5px 0;
 		}
 	</style>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="http://code.jquery.com/jquery-1.8.3.js"></script>
 	<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
-	<script src="../../js-webshim/minified/polyfiller.js"></script> 
+	<script src="../../js-webshim/minified/polyfiller.js"></script>
+	
+	<!--
+	<script src="../../../src/polyfiller.js"></script> 
 	<script>
+		webshims.setOptions('debug', 'noCombo');
+	</script>
+	
+	
+	<script src="../../js-webshim/minified/polyfiller.js"></script>
+	-->
+	<script>
+		
 		$(function(){
 			$('.video-bg').each(function(){
 				var timer;
@@ -127,7 +140,7 @@
 				};
 				var throttle = function(e){
 					clearTimeout(timer);
-					timer = setTimeout(pos, e.type == 'resize' ? 30 : 4);
+					timer = setTimeout(pos, e && e.type == 'resize' ? 40 : 4);
 				};
 				
 				$('button.play-toggle', module).on('click', function(){
@@ -139,6 +152,7 @@
 				});
 				
 				pos();
+				video.on('loadedmetadata', throttle);
 				$(document).on('updateshadowdom', throttle);
 				$(window).on('resize load', throttle);
 			});
@@ -152,6 +166,7 @@
 	<script>
 		
 		$(function(){
+						
 			if(Modernizr.video && swfmini.hasFlashPlayerVersion('9.0.115')){
 				$('button.load-swf')
 					.prop('disabled', false)
@@ -174,7 +189,7 @@
 					$('div.mediaplayer').jmeProp({"controlbar": true});
 					setTimeout(function(){
 						$(document).trigger('updateshadowdom');
-					}, 9);
+					}, 99);
 				});
 				$(this).prop('disabled', true);
 			});
@@ -208,7 +223,7 @@
 	<p>based on  http://www.alistapart.com/articles/creating-intrinsic-ratios-for-video/</p>
 	
 	<div class="mediaplayer videoplayer ratio-16-9">
-		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="height: 100%;">
+		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg">
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
 			<track src="../subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
@@ -238,12 +253,12 @@
 
 	<div class="video-bg">
 		<div class="video-box">
-			<video muted="" loop="loop" style="width: auto; height: auto;">
-					<source src="http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.m4v" type="video/mp4" />
-					<source src="http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.ogg" />
+			<video preload="" muted="" loop="loop" style="width: auto; height: auto;">
+				<source src="http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.m4v" type="video/mp4" />
+				<source src="http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.ogg" />
 			</video>
 		</div>
-		<div class="video-overlay"></div>
+		
 		<button type="button" class="play-toggle">play/pause bg video</button>
 	</div>
 

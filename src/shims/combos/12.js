@@ -1003,6 +1003,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 							if(hasNative && (!data || data.isActive == 'html5') && supLoad.prop._supvalue){
 								supLoad.prop._supvalue.apply(this, arguments);
 							}
+							$(this).triggerHandler('wsmediareload');
 						}
 					}
 				});
@@ -1936,8 +1937,8 @@ modified for webshims
 		}
 	}, 'prop');
 
-	
-	$(document).on('emptied ended updatetracklist', function(e){
+	//wsmediareload
+	var thUpdateList = function(e){
 		if($(e.target).is('audio, video')){
 			var baseData = webshims.data(e.target, 'mediaelementBase');
 			if(baseData){
@@ -1947,7 +1948,7 @@ modified for webshims
 				}, 0);
 			}
 		}
-	});
+	};
 	
 	var getNativeReadyState = function(trackElem, textTrack){
 		return textTrack.readyState || trackElem.readyState;
@@ -1987,6 +1988,7 @@ modified for webshims
 			.each(function(){
 				updateMediaTrackList.call(this);
 			})
+			.on('emptied updatetracklist wsmediareload', thUpdateList)
 			.each(function(){
 				if(Modernizr.track){
 					var shimedTextTracks = $.prop(this, 'textTracks');

@@ -18,7 +18,25 @@ webshims.register('form-combat', function($,webshims){
 	
 	addReplacement('select2', {
 		shadow: 'container',
-		shadowFocus: 'selection'
+		shadowFocus: 'focusser',
+		_create: function(elem, shadow, shadowFocus, widgetData){
+			
+			if(('container' in widgetData) && $.isFunction(widgetData.opened)){
+				var onValidate = function(e){
+					if (!webshims.wsPopover.isInElement([elem, shadow, shadowFocus, $(widgetData.container)], e.target)) {
+						$(elem).trigger('refreshvalidityui');
+					}
+				};
+				
+				$(shadow).on('wsallowinstantvalidation', function(e, data){
+					$(document).off('focusin', onValidate);
+					if(data.type == 'focusout' && data.target != elem && widgetData.opened()){
+						$(document).on('focusin', onValidate);
+						return false;
+					}
+				});
+			}
+		}
 	});
 	
 	addReplacement('chosen', {
@@ -28,7 +46,24 @@ webshims.register('form-combat', function($,webshims){
 	
 	addReplacement('selectpicker', {
 		shadow: '$newElement',
-		shadowFocus: '$button'
+		shadowFocus: '$button',
+		_create: function(elem, shadow, shadowFocus, widgetData){
+			if(('$menu' in widgetData)){
+				var onValidate = function(e){
+					if (!webshims.wsPopover.isInElement([elem, shadow, shadowFocus, $(widgetData.$menu)], e.target)) {
+						$(elem).trigger('refreshvalidityui');
+					}
+				};
+				
+				$(shadow).on('wsallowinstantvalidation', function(e, data){
+					$(document).off('focusin', onValidate);
+					if(data.type == 'focusout' && data.target != elem){
+						$(document).on('focusin', onValidate);
+						return false;
+					}
+				});
+			}
+		}
 	});
 	
 	addReplacement('selectBoxIt', {
@@ -45,6 +80,24 @@ webshims.register('form-combat', function($,webshims){
 		shadow: 'button',
 		shadowFocus: function(data, elem){
 			return data.options.nativeMenu ? data.element : data.button;
+		},
+		_create: function(elem, shadow, shadowFocus, widgetData){
+			if(('listbox' in widgetData)){
+				var onValidate = function(e){
+					if (!webshims.wsPopover.isInElement([elem, shadow, shadowFocus, $(widgetData.listbox).parent()], e.target)) {
+						$(elem).trigger('refreshvalidityui');
+					}
+				};
+				
+				$(shadow).on('wsallowinstantvalidation', function(e, data){
+					if(data.type == 'focusout' && data.target != elem && widgetData.isOpen){
+						setTimeout(function(){
+							$(document).off('focusin', onValidate).on('focusin', onValidate);
+						}, 1);
+						return false;
+					}
+				});
+			}
 		}
 	});
 
@@ -60,6 +113,9 @@ webshims.register('form-combat', function($,webshims){
 		}
 		if(shadow && (replacementDatas.success || ($(shadowFocus).attr('tabindex') || $(shadowFocus).prop('tabIndex') > -1))){
 			webshims.addShadowDom(elem, shadow, {shadowFocusElement: shadowFocus});
+			if(pluginDescriptor._create){
+				pluginDescriptor._create(elem, shadow, shadowFocus, data);
+			}
 			replacementDatas.success = true;
 		} else {
 			webshims.error("webshim could not add support for "+plugin);

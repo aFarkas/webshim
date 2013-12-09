@@ -162,14 +162,15 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			
 			$.removeData(elem, 'webshimsswitchvalidityclass');
 		};
-		
-		if(timer){
-			clearTimeout(timer);
-		}
-		if(e.type == 'refreshvalidityui'){
-			switchClass();
-		} else {
-			$.data(elem, 'webshimsswitchvalidityclass', setTimeout(switchClass, 9));
+		if(shadowElem.triggerHandler('wsallowinstantvalidation', [e]) !== false){
+			if(timer){
+				clearTimeout(timer);
+			}
+			if(e.type == 'refreshvalidityui'){
+				switchClass();
+			} else {
+				$.data(elem, 'webshimsswitchvalidityclass', setTimeout(switchClass, 9));
+			}
 		}
 	};
 	
@@ -249,8 +250,23 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	$.extend(webshims.wsPopover, {
 		
 		
-		isInElement: function(container, contained){
-			return container == contained || $.contains(container, contained);
+		isInElement: function(containers, contained){
+			if(!$.isArray(containers)){
+				containers = [containers];
+			}
+			var i, len, container;
+			var ret = false;
+			for(i = 0, len = containers.length; i < len; i++){
+				container = containers[i];
+				if(container && container.jquery){
+					container = container[0];
+				}
+				if(container && (container == contained || $.contains(container, contained))){
+					ret = true;
+					break;
+				}
+			}
+			return ret;
 		},
 		show: function(element){
 			if(this.isVisible){return;}
@@ -283,7 +299,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			}, 9);
 			
 			$(document.body || document).on('focusin'+this.eventns+' mousedown'+this.eventns, function(e){
-				if(that.options.hideOnBlur && !that.stopBlur && !that.isInElement(that.lastElement[0] || document.body, e.target) && !that.isInElement(element[0] || document.body, e.target) && !that.isInElement(that.element[0], e.target)){
+				if(that.options.hideOnBlur && !that.stopBlur && !that.isInElement([that.lastElement[0], element[0], that.element[0]], e.target)){
 					that.hide();
 				}
 			});
@@ -730,7 +746,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		$(document).on('firstinvalid', function(e){
 			if(!e.isInvalidUIPrevented()){
 				e.preventDefault();
-				webshims.validityAlert.showFor( e.target ); 
+				setTimeout(function(){
+					webshims.validityAlert.showFor( e.target ); 
+				}, 4);
 			}
 		});
 	}

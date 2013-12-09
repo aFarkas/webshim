@@ -454,9 +454,9 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 	})();
 	
 	
-	var transformDimension = (function(){
+	var getComputedDimension = (function(){
 		var dimCache = {};
-		var getRealDims = function(data){
+		var getVideoDims = function(data){
 			var ret, poster, img;
 			if(dimCache[data.currentSrc]){
 				ret = dimCache[data.currentSrc];
@@ -481,95 +481,102 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 						} else {
 							delete dimCache[poster];
 						}
+						img.onload = null;
 					};
 					img.src = poster;
-					if(img.complete){
+					if(img.complete && img.onload){
 						img.onload();
 					}
 				}
 			}
 			return ret || {width: 300, height: data._elemNodeName == 'video' ? 150 : 50};
 		};
-		var addMinMax = function(ret, c, autos, ratio){
-			var changed;
-			if(c.maxH && ret.height > c.maxH){
-				ret.height = c.maxH;
-				changed = true;
-			}
-			
-			if(c.minH && ret.height < c.minH){
-				ret.height = c.minH;
-				changed = true;
-			}
-			
-			if(changed && autos.width == 'auto'){
-				ret.width = ret.height * ratio;
-			}
-			
-			changed = false;
-			
-			if(c.maxW && ret.width > c.maxW){
-				ret.width = c.maxW;
-				changed = true;
-			}
-			
-			if(c.minW && ret.width < c.minW){
-				ret.width = c.minW;
-				changed = true;
-			}
-			
-			if(changed && autos.height == 'auto'){
-				ret.height = ret.width / ratio;
-			}
-			
+		
+		var getCssStyle = function(elem, style){
+			return elem.style[style] || (elem.currentStyle && elem.currentStyle[style]) || (window.getComputedStyle && (window.getComputedStyle( elem, null ) || {} )[style]) || '';
 		};
-		return function(data){
-			data._elem.style.display = '';
-			var numDims, ratio;
+		var minMaxProps = ['minWidth', 'maxWidth', 'minHeight', 'maxHeight'];
+		
+		var addMinMax = function(elem, ret){
+			var i, prop;
+			var hasMinMax = false;
+			for (i = 0; i < 4; i++) {
+				prop = getCssStyle(elem, minMaxProps[i]);
+				if(parseFloat(prop, 10)){
+					hasMinMax = true;
+					ret[minMaxProps[i]] = prop;
+				}
+			}
+			return hasMinMax;
+		};
+		var retFn = function(data){
+			var videoDims, ratio, hasMinMax;
 			var elem = data._elem;
+			var autos = {
+				width: getCssStyle(elem, 'width') == 'auto',
+				height: getCssStyle(elem, 'height') == 'auto'
+			};
 			var ret  = {
-				width: elem.style.width == 'auto' ? 'auto' : $(elem).width(),
-				height: elem.style.height == 'auto' ? 'auto' : $(elem).height()
+				width: !autos.width && $(elem).width(),
+				height: !autos.height && $(elem).height()
 			};
-			var c = {
-				maxW: parseInt($.css(elem, 'maxWidth'), 10) || '',
-				minW: parseInt($.css(elem, 'minWidth'), 10) || '',
-				maxH: parseInt($.css(elem, 'maxHeight'), 10) || '',
-				minH: parseInt($.css(elem, 'minHeight'), 10) || ''
-			};
-			if(ret.width == 'auto' || ret.height == 'auto'){
-				numDims = getRealDims(data);
-				ratio = numDims.width / numDims.height;
+			
+			if(autos.width || autos.height){
+				videoDims = getVideoDims(data);
+				ratio = videoDims.width / videoDims.height;
 				
-				if(ret.width == 'auto' && ret.height == 'auto'){
-				
-				} else if(ret.width == 'auto'){
-					numDims.width = ret.height * ratio;
-					numDims.height = ret.height;
-				} else if(ret.height == 'auto'){
-					numDims.height = ret.width / ratio;
-					numDims.width = ret.width;
+				if(autos.width && autos.height){
+					ret.width = videoDims.width;
+					ret.height = videoDims.height;
+				} else if(autos.width){
+					ret.width = ret.height * ratio;
+				} else if(autos.height){
+					ret.height = ret.width / ratio;
 				}
 				
-			} else {
-				numDims = ret;
+				if(addMinMax(elem, ret)){
+					data.shadowElem.css(ret);
+					if(autos.width){
+						ret.width = data.shadowElem.height() * ratio;
+					} 
+					if(autos.height){
+						ret.height = ((autos.width) ? ret.width :  data.shadowElem.width()) / ratio;
+					}
+					if(autos.width && autos.height){
+						data.shadowElem.css(ret);
+						ret.height = data.shadowElem.width() / ratio;
+						ret.width = ret.height * ratio;
+						
+						data.shadowElem.css(ret);
+						ret.width = data.shadowElem.height() * ratio;
+						ret.height = ret.width / ratio;
+						
+					}
+					if(!Modernizr.video){
+						ret.width = data.shadowElem.width();
+						ret.height = data.shadowElem.height();
+					}
+				}
 			}
-			data._elem.style.display = 'none';
-			addMinMax(numDims, c, ret, ratio);
-			return numDims;
+			return ret;
 		};
+		
+		return retFn;
 	})();
+	
 	var setElementDimension = function(data, hasControls){
 		var dims;
 		
 		var box = data.shadowElem;
 		$(data._elem)[hasControls ? 'addClass' : 'removeClass']('webshims-controls');
 
-		if(data.isActive == 'third'){
+		if(data.isActive == 'third' || data.activating == 'third'){
 			if(data._elemNodeName == 'audio' && !hasControls){
 				box.css({width: 0, height: 0});
 			} else {
-				dims = transformDimension(data);
+				data._elem.style.display = '';
+				dims = getComputedDimension(data);
+				data._elem.style.display = 'none';
 				box.css(dims);
 			}
 		}
