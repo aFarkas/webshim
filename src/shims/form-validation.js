@@ -669,7 +669,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				if(box.stop){
 					box.stop(true, true);
 				}
-				box.html('<p class="'+ errorMessageClass +'"">'+ message +'</p>');
+				box.html('<p class="'+ errorMessageClass +'">'+ message +'</p>');
 				box.message = message;
 				fieldWrapper.addClass(invalidWrapperClass).removeClass(successWrapperClass);
 				this.recheckInvalidInput(elem);
