@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	<link href="../../css/styles.css" rel="stylesheet" />
+	
+	<style>
+		
+		fieldset div.form-element {
+			zoom: 1;
+			padding: 5px;
+			border: 1px solid #000;
+			margin: 5px 0;
+		}
+		fieldset div.form-element:after {
+			content: " ";
+			display: block;
+			clear: both;
+		}
+		input.number {
+			display: inline-block;
+			margin-right: 8px;
+			text-align: center;
+			width: 2.8em;
+		}
+		
+		.input-widget {
+			margin: 20px auto;
+			max-width: 400px;
+			padding: 20px;
+			border: 1px solid #000;
+		}
+		.input-widget label {
+			display: block;
+			margin: 2px 0;
+		}
+		
+		.input-widget.btn-outside .input-buttons {
+			margin-left: 2px;
+		}
+		.input-widget.no-spinbtn .step-controls {
+			display: none;
+		}
+		.input-widget.no-btn .input-buttons {
+			display: none !important;
+		}
+		
+		.input-widget fieldset {
+			border: 1px solid #ccc;
+			margin: 15px 0;
+		}
+		
+		[data-at="right bottom"].input-picker {
+			margin-left: -47.5px;
+		}
+	</style>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	
+	<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
+	<script src="../../js-webshim/minified/polyfiller.js"></script>
+
+	<!--
+		<script src="../../../src/polyfiller.js"></script> 
+		<script>
+			webshims.setOptions('debug', 'noCombo');
+			//style calendar, datalist, validation bubble
+			//$('html').on('wspopoverbeforehide', false);
+		</script>
+	-->
+	<script>
+		
+		$.webshims.setOptions('forms', {
+			customDatalist: true
+		});
+		$.webshims.setOptions('forms-ext', {
+			replaceUI: true,
+			types: 'range date time number month color'
+		});
+		
+		//load all polyfill features
+		//or load only a specific feature with $.webshims.polyfill('feature-name');
+		$.webshims.polyfill();
+	</script>
+	<script>
+		$(function(){
+			$('form').bind('firstinvalid', function(e){
+				//show the invalid alert for first invalid element
+				$.webshims.validityAlert.showFor( e.target );
+				//prevent browser from showing his native validation message
+				return false;
+			});
+			
+			$('#range').each(function(){
+				var range = $(this);
+				var number = $('<input class="number" min="0" max="100" type="number" />');
+				var updateNumber = function(){
+					number.prop('value', $(this).prop('value'));
+				};
+				var updateRange = function(){
+					range.prop('value', number.prop('value'));
+				};
+				
+				range.beforePolyfill(number);
+					
+				number.bind('input', updateRange);
+				range
+					.bind('input', updateNumber)
+					.each(updateNumber)
+				;
+			});
+			$('#email').bind('datalistselect', function(){
+				if(window.console){
+					console.log('selected form datalist: '+ $.prop(this, 'value'));
+				}
+			});
+		});
+	</script>
+	<script>
+			
+		$(function(){
+			var id = 0;
+			$('form.input-widget').each(function(){
+				id++;
+				var form = $(this);
+				var type = form.data('type');
+				var createWidget = function(){
+					$('> *:not(fieldset, datalist)', form).each(function(){
+						var popover = $(this).data('preparedpopover');
+						if(popover){
+							popover.clear();
+							popover.element.remove();
+						}
+					}).remove();
+					var input = $('<input type="'+ type +'" />');
+					$('fieldset[data-method]', form).each(function(){
+						var obj = {};
+						$($.prop(this, 'elements')).filter('[name]').each(function(){
+							var val;
+							if($.prop(this, 'type') == 'checkbox'){
+								val = $.prop(this, 'checked');
+							} else {
+								val = $(this).val();
+								try {
+									val = JSON.parse(val);
+								} catch(e){}
+							}
+							
+							obj[$.prop(this, 'name')] = val;
+						});
+						
+						input[$(this).data('method')]($(this).data('name') || obj, obj);
+					});
+					$('fieldset[data-style] input[name]', form).each(function(){
+						form[$.prop(this, 'checked') ? 'addClass' : 'removeClass']($.prop(this, 'name'));
+					});
+					$('<label for="'+ type+'-'+id +'">'+ type +' label</label>')
+						.prependTo(form)
+						.afterPolyfill(
+							input.prop('id', type+'-'+id)
+						)
+					;
+				};
+				$('> fieldset', form).on('change', createWidget);
+				form.on('submit', false);
+				createWidget();
+			});
+		});
+	</script>
+	<script>
+		if(!jQuery.browser){
+			jQuery.browser = {};
+		}
+	</script>
+	<script src="../../demo-js/demo.js"></script>
+	<script>
+		if(!('cubicbezierrange' in Modernizr) && Modernizr._prefixes){
+			Modernizr.addTest('cubicbezierrange', function() {
+				var el = document.createElement('div');
+				el.style.cssText = Modernizr._prefixes.join('transition-timing-function' + ':cubic-bezier(1,0,0,1.1); ');
+				return !!el.style.length;
+			});
+		}
+	</script>
+	<title>configuring HTML5 forms/Web Forms 2.0 widgets: webshims lib - the polyfilling capability based loading JS library</title>
+
+</head>
+
+<body>
+	
+	<header>
+		<hgroup>
+			<h1>Webshims Lib</h1>
+			<h2>Polyfill only the incapable browsers</h2>
+		</hgroup>
+		<nav>
+			<ul>
+				<li><a href="../../index.html">home</a></li>
+			</ul>
+		</nav>
+	</header>
+	<div class="main">
+		<nav>
+			<ul>
+				<li><a href="../shiv.html">HTML5 shiv and innerShiv</a></li>
+				<li><a href="../es5.html">ES5/JavaScript 1.8.5</a></li>
+				<li><a href="../webforms.html" class="active">constraint validation and input widgets</a></li>
+				<li><a href="../canvas.html">canvas</a></li>
+				<li><a href="../mediaelement.html">mediaelement</a></li>
+				<li><a href="../json-storage.html">storage and JSON</a></li>
+				<li><a href="../geolocation.html">geolocation API</a></li>
+				<li><a href="../details.html">details &amp; summary</a></li>
+			</ul>
+		</nav>
+		<div class="main-box">
+		<section>
+			<h2>Configuring of HTML5 input-widgets (input[type="range"], input[type="date"], input[type="number"] polyfills)</h2>
+			<h3 id="replace-ui">Using custom widgets in all browsers</h3>
+<code class="block">
+//implement custom datalist in all browsers
+$.webshims.setOptions('forms', {
+	customDatalist: true
+});
+//implement custom [type="date"]/[type="range"] widgets in all browsers
+$.webshims.setOptions('forms-ext', {
+	replaceUI: true
+});
+</code>
+			<p>Note: If you also replace the native input widgets, you should also customize the error-bubble. The fastest way of doing this would look like this:</p>
+			
+<code class="block">
+$('form').bind('firstinvalid', function(e){
+	//show the invalid alert for first invalid element
+	$.webshims.validityAlert.showFor( e.target );
+	//prevent browser from showing his native validation message
+	return false;
+});
+</code>	
+
+			<h3 id="configure-locale">Changing locales for widgets</h3>
+<code class="block run-once">
+$.webshims.activeLang('en');
+</code>	
+<code class="block run-once">
+$.webshims.activeLang('de');
+</code>	
+			<h3 id="configure-ui">Changing default-options for widgets</h3>
+			<p>All widgets can be configured with the <code>forms-ext.widgets</code> or <code>forms-ext[type]</code> options.</p>
+<code class="block">
+$.webshims.setOptions('forms-ext', {
+	//general widgets options
+	widgets: {
+		calculateWidth: false
+	},
+	//override for type month
+	month: {
+		startView: 1,
+		calculateWidth: true
+	},
+	date: {
+		startView: 2,
+		splitInput: true,
+		popover: {
+			//open all date widget right to the input (needs jQuery UI position)
+			position: {
+				my: 'left center',
+				at: "right center",
+				collision: "fit"
+			}
+		}
+	}
+});
+</code>
+			<p>inputs can be also configured using markup data-[type] attribute (Use JSON):</p>
+<code class="block">
+&lt;input type="date" data-date='{"showWeek": true}' /&gt;
+</code>
+			
+			<form class="input-widget" data-type="date" id="date-cfg">
+				<datalist id="date-list">
+					<select>
+						<option value="2009-10-11" />
+						<option value="2012-11-11" />
+						<option value="2013-11-11" label="labeled Option (2013-11-11)" />
+					</select>
+				</datalist>
+				<fieldset data-method="prop">
+					<legend>$.prop</legend>
+					
+					<label>
+						min: 
+						<select name="min">
+							<option></option>
+							<option>2008-01-01</option>
+						</select>
+					</label>
+					<label>
+						max: 
+						<select name="max">
+							<option></option>
+							<option>2014-12-31</option>
+						</select>
+					</label>
+					
+					<label>
+						disabled: 
+						<input type="checkbox" name="disabled" />	
+					</label>
+					<label>
+						readonly: 
+						<input type="checkbox" name="readonly" />	
+					</label>
+					
+				</fieldset>
+				<fieldset data-method="attr">
+					<legend>$.attr</legend>
+					<label>
+						list: 
+						<select name="list">
+							<option></option>
+							<option value="date-list">date-list (predefined datalist)</option>
+						</select>
+					</label>
+					<label>
+						data-placeholder: 
+						<select name="data-placeholder">
+							<option></option>
+							<option>yyyy-mm-dd</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="data" data-name="wspopover">
+					<legend>data-wspopover Properties</legend>
+					
+					<label>
+						appendTo: 
+						<select name="appendTo">
+							<option value="body">body (default || body-element)</option>
+							<option value="element">element (keyword for the input element itself)</option>
+						</select>
+					</label>
+					
+					<label>
+						position (only with jQuery UI position utitliy): 
+						<select name="position">
+							<option value='{}'>default ("my": "left top", "at": "left bottom")</option>
+							<option value='{"at": "right bottom"}'>"at": "right bottom"</option>
+							<option value='{"my": "center", "at": "center"}'>"my": "center", "at": "center"</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="data" data-name="date">
+					<legend>data-date Properties</legend>
+					<label>
+						size: 
+						<select name="size">
+							<option>1</option>
+							<option>3</option>
+						</select>
+					</label>
+					<label>
+						startView: 
+						<select name="startView">
+							<option value="0">0 (= decade)</option>
+							<option value="1">1 (= year)</option>
+							<option value="2">2 (= month)</option>
+						</select>
+					</label>
+					<label>
+						minView: 
+						<select name="minView">
+							<option value="0">0 (= decade)</option>
+							<option value="1">1 (= year)</option>
+							<option value="2">2 (= month)</option>
+						</select>
+					</label>
+					<label>
+						restartView: 
+						<input type="checkbox" name="restartView" />
+					</label>
+					<label>
+						selectNav: 
+						<input type="checkbox" name="selectNav" />
+					</label>
+					<label>
+						showWeek: 
+						<input type="checkbox" name="showWeek" />
+					</label>
+					<label>
+						yearButtons: 
+						<input type="checkbox" name="yearButtons" />	
+					</label>
+					<label>
+						updateOnInput: 
+						<input type="checkbox" name="updateOnInput" />	
+					</label>
+					<label>
+						monthNames: 
+						<select name="monthNames">
+							<option>monthNamesShort</option>
+							<option>monthNames</option>
+						</select>
+					</label>
+					<label>
+						monthNamesHead: 
+						<select name="monthNamesHead">
+							<option>monthNames</option>
+							<option>monthNamesShort</option>
+						</select>
+					</label>
+					<label>
+						cols: 
+						<select name="cols">
+							<option value="4" select="">4</option>
+							<option value="3">3</option>
+						</select>
+					</label>
+					<label>
+						relDefaultValue: 
+						<select name="relDefaultValue">
+							<option value=""></option>
+							<option value="-660441600000">-660441600000 (=-21 years) (-> 364 * 24 * 60 * 60 * 1000 == year)</option>
+						</select>
+					</label>
+					<label>
+						relMax: 
+						<select name="relMax">
+							<option value=""></option>
+							<option value="0">0 (= now) (only if max attribute is not set)</option>
+						</select>
+					</label>
+					
+					<label>
+						relMin: 
+						<select name="relMin">
+							<option value=""></option>
+							<option value="-660441600000">-660441600000 (=-21 years) (only if min attribute is not set)</option>
+						</select>
+					</label>
+					
+					<label>
+						inlinePicker: 
+						<input type="checkbox" name="inlinePicker" />	
+					</label>
+					
+					<label>
+						noChangeDismiss: 
+						<input type="checkbox" name="noChangeDismiss" />	
+					</label>
+					
+					<label>
+						openOnFocus: 
+						<input type="checkbox" name="openOnFocus" />
+					</label>
+					<label>
+						splitInput: 
+						<input type="checkbox" name="splitInput" />	
+					</label>
+					<label>
+						monthSelect: 
+						<input type="checkbox" name="monthSelect" />	
+					</label>
+					<label>
+						jumpInputs (only with splitInput): 
+						<input type="checkbox" name="jumpInputs" />	
+					</label>
+					<label>
+						buttonOnly: 
+						<input type="checkbox" name="buttonOnly" />	
+					</label>
+					<label>
+						calculateWidth: 
+						<input type="checkbox" name="calculateWidth" checked="checked" />	
+					</label>
+					
+					
+					
+					
+					<label>
+						useDecadeBase: 
+						<select name="useDecadeBase">
+							<option value="">0 is used to compute the decade grid</option>
+							<option value="max">max value is used to compute the decade grid</option>
+							<option value="min">min value is used to compute the decade grid</option>
+						</select>
+					</label>
+					<label>
+						disableDays: 
+						<select name="disableDays">
+							<option value="">empty/false</option>
+							<option value="[6, 0]">[6, 0] (= Saturday and Sunday)</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-style="">
+					<legend>Style</legend>
+					<label>
+						Buttons outside: 
+						<input type="checkbox" name="btn-outside" />
+					</label>
+					<label>
+						No spinbuttons: 
+						<input type="checkbox" name="no-spinbtn" />
+					</label>
+					<label>
+						No buttons: 
+						<input type="checkbox" name="no-btn" />
+					</label>
+				</fieldset>
+			</form>
+			
+			<form class="input-widget" data-type="datetime-local" id="datetime-local-cfg">
+				<datalist id="datetime-local-list">
+					<select>
+						<option value="2009-10-11T21:00" />
+						<option value="2012-11-11T20:00" />
+						<option value="2013-11-11T20:00" label="labeled Option (2013-11-11T20:00)" />
+					</select>
+				</datalist>
+				<fieldset data-method="prop">
+					<legend>$.prop</legend>
+					
+					<label>
+						min: 
+						<select name="min">
+							<option></option>
+							<option>2008-01-01T18:00</option>
+						</select>
+					</label>
+					<label>
+						max: 
+						<select name="max">
+							<option></option>
+							<option>2014-12-31T22:00</option>
+						</select>
+					</label>
+					
+					<label>
+						disabled: 
+						<input type="checkbox" name="disabled" />	
+					</label>
+					<label>
+						readonly: 
+						<input type="checkbox" name="readonly" />	
+					</label>
+					
+				</fieldset>
+				<fieldset data-method="attr">
+					<legend>$.attr</legend>
+					<label>
+						list: 
+						<select name="list">
+							<option></option>
+							<option value="datetime-local-list">datetime-local-list (predefined datalist)</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="data" data-name="wspopover">
+					<legend>data-wspopover Properties</legend>
+					
+					<label>
+						appendTo: 
+						<select name="appendTo">
+							<option value="body">body (default || body-element)</option>
+							<option value="element">element (keyword for the input element itself)</option>
+						</select>
+					</label>
+					
+					<label>
+						position (only with jQuery UI position utitliy): 
+						<select name="position">
+							<option value='{}'>default ("my": "left top", "at": "left bottom")</option>
+							<option value='{"at": "right bottom"}'>"at": "right bottom"</option>
+							<option value='{"my": "center", "at": "center"}'>"my": "center", "at": "center"</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="data" data-name="datetime-local">
+					<legend>data-month Properties</legend>
+					<label>
+						size: 
+						<select name="size">
+							<option>1</option>
+							<option>3</option>
+						</select>
+					</label>
+					<label>
+						startView: 
+						<select name="startView">
+							<option value="0">0 (= decade)</option>
+							<option value="1">1 (= year)</option>
+							<option value="2">2 (= month)</option>
+							<option value="3">3 (= day)</option>
+						</select>
+					</label>
+					<label>
+						minView: 
+						<select name="minView">
+							<option value="0">0 (= decade)</option>
+							<option value="1">1 (= year)</option>
+							<option value="2">2 (= month)</option>
+						</select>
+					</label>
+					<label>
+						restartView: 
+						<input type="checkbox" name="restartView" />
+					</label>
+					<label>
+						selectNav: 
+						<input type="checkbox" name="selectNav" />
+					</label>
+					<label>
+						showWeek: 
+						<input type="checkbox" name="showWeek" />
+					</label>
+					<label>
+						yearButtons: 
+						<input type="checkbox" name="yearButtons" />	
+					</label>
+					<label>
+						updateOnInput: 
+						<input type="checkbox" name="updateOnInput" />	
+					</label>
+					<label>
+						monthNames: 
+						<select name="monthNames">
+							<option>monthNamesShort</option>
+							<option>monthNames</option>
+						</select>
+					</label>
+					<label>
+						monthNamesHead: 
+						<select name="monthNamesHead">
+							<option>monthNames</option>
+							<option>monthNamesShort</option>
+						</select>
+					</label>
+					<label>
+						cols: 
+						<select name="cols">
+							<option value="4" select="">4</option>
+							<option value="3">3</option>
+						</select>
+					</label>
+					<label>
+						relDefaultValue: 
+						<select name="relDefaultValue">
+							<option value=""></option>
+							<option value="-660441600000">-660441600000 (=-21 years) (-> 364 * 24 * 60 * 60 * 1000 == year)</option>
+						</select>
+					</label>
+					<label>
+						relMax: 
+						<select name="relMax">
+							<option value=""></option>
+							<option value="0">0 (= now) (only if max attribute is not set)</option>
+						</select>
+					</label>
+					
+					<label>
+						relMin: 
+						<select name="relMin">
+							<option value=""></option>
+							<option value="-660441600000">-660441600000 (=-21 years) (only if min attribute is not set)</option>
+						</select>
+					</label>
+					
+					<label>
+						inlinePicker: 
+						<input type="checkbox" name="inlinePicker" />	
+					</label>
+					
+					<label>
+						noChangeDismiss: 
+						<input type="checkbox" name="noChangeDismiss" />	
+					</label>
+					
+					<label>
+						openOnFocus: 
+						<input type="checkbox" name="openOnFocus" />
+					</label>
+					
+					<label>
+						buttonOnly: 
+						<input type="checkbox" name="buttonOnly" />	
+					</label>
+					<label>
+						calculateWidth: 
+						<input type="checkbox" name="calculateWidth" checked="checked" />	
+					</label>
+					
+					
+					
+					
+					<label>
+						useDecadeBase: 
+						<select name="useDecadeBase">
+							<option value="">0 is used to compute the decade grid</option>
+							<option value="max">max value is used to compute the decade grid</option>
+							<option value="min">min value is used to compute the decade grid</option>
+						</select>
+					</label>
+					<label>
+						disableDays: 
+						<select name="disableDays">
+							<option value="">empty/false</option>
+							<option value="[6, 0]">[6, 0] (= Saturday and Sunday)</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-style="">
+					<legend>Style</legend>
+					<label>
+						Buttons outside: 
+						<input type="checkbox" name="btn-outside" />
+					</label>
+					<label>
+						No spinbuttons: 
+						<input type="checkbox" name="no-spinbtn" />
+					</label>
+					<label>
+						No buttons: 
+						<input type="checkbox" name="no-btn" />
+					</label>
+				</fieldset>
+			</form>
+			
+			<form class="input-widget" data-type="month" id="month-cfg">
+				<datalist id="month-list">
+					<select>
+						<option value="2009-10" />
+						<option value="2012-11" />
+						<option value="2013-11" label="labeled Option (2013-11)" />
+					</select>
+				</datalist>
+				<fieldset data-method="prop">
+					<legend>$.prop</legend>
+					
+					<label>
+						min: 
+						<select name="min">
+							<option></option>
+							<option>2008-01</option>
+						</select>
+					</label>
+					<label>
+						max: 
+						<select name="max">
+							<option></option>
+							<option>2014-12</option>
+						</select>
+					</label>
+					<label>
+						disabled: 
+						<input type="checkbox" name="disabled" />	
+					</label>
+					<label>
+						readonly: 
+						<input type="checkbox" name="readonly" />	
+					</label>
+				</fieldset>
+				<fieldset data-method="attr">
+					<legend>$.attr</legend>
+					<label>
+						list: 
+						<select name="list">
+							<option></option>
+							<option value="month-list">month-list (predefined datalist)</option>
+						</select>
+					</label>
+					<label>
+						data-placeholder: 
+						<select name="data-placeholder">
+							<option></option>
+							<option>yyyy-mm</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="data" data-name="wspopover">
+					<legend>data-wspopover Properties</legend>
+					
+					<label>
+						appendTo: 
+						<select name="appendTo">
+							<option value="body">body (default || body-element)</option>
+							<option value="element">element (keyword for the input element itself)</option>
+						</select>
+					</label>
+					
+					<label>
+						position (with jQuery UI position utitliy): 
+						<select name="position">
+							<option value='{}'>default ("my": "left top", "at": "left bottom")</option>
+							<option value='{"at": "right bottom"}'>"at": "right bottom"</option>
+							<option value='{"my": "center", "at": "center"}'>"my": "center", "at": "center"</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="data" data-name="month">
+					<legend>data-month Properties</legend>
+					<label>
+						size: 
+						<select name="size">
+							<option>1</option>
+							<option>3</option>
+						</select>
+					</label>
+					<label>
+						startView: 
+						<select name="startView">
+							<option value="0">0 (= decade)</option>
+							<option value="1" selected="">1 (= year)</option>
+						</select>
+					</label>
+					<label>
+						minView: 
+						<select name="minView">
+							<option value="0">0 (= decade)</option>
+							<option value="1">1 (= year)</option>
+						</select>
+					</label>
+					<label>
+						restartView: 
+						<input type="checkbox" name="restartView" />
+					</label>
+					<label>
+						selectNav: 
+						<input type="checkbox" name="selectNav" />	
+					</label>
+					<label>
+						cols: 
+						<select name="cols">
+							<option value="4" select="">4</option>
+							<option value="3">3</option>
+						</select>
+					</label>
+					<label>
+						inlinePicker: 
+						<input type="checkbox" name="inlinePicker" />	
+					</label>
+					
+					<label>
+						updateOnInput: 
+						<input type="checkbox" name="updateOnInput" />	
+					</label>
+					
+					<label>
+						monthNames: 
+						<select name="monthNames">
+							<option>monthNamesShort</option>
+							<option>monthNames</option>
+							<option>monthDigits</option>
+						</select>
+					</label>
+					
+					
+					<label>
+						formatMonthNames: 
+						<select name="formatMonthNames">
+							<option>monthNames</option>
+							<option>monthDigits</option>
+							<option>monthNamesShort</option>
+						</select>
+					</label>
+					
+					<label>
+						openOnFocus: 
+						<input type="checkbox" name="openOnFocus" />	
+					</label>
+					<label>
+						splitInput: 
+						<input type="checkbox" name="splitInput" />	
+					</label>
+					<label>
+						monthSelect: 
+						<input type="checkbox" name="monthSelect" />	
+					</label>
+					<label>
+						buttonOnly: 
+						<input type="checkbox" name="buttonOnly" />	
+					</label>
+					<label>
+						calculateWidth: 
+						<input type="checkbox" name="calculateWidth" checked="checked" />	
+					</label>
+				</fieldset>
+				<fieldset data-style="">
+					<legend>Style</legend>
+					<label>
+						Buttons outside: 
+						<input type="checkbox" name="btn-outside" />
+					</label>
+					<label>
+						No spinbuttons: 
+						<input type="checkbox" name="no-spinbtn" />
+					</label>
+					
+					<label>
+						No buttons: 
+						<input type="checkbox" name="no-btn" />
+					</label>
+				</fieldset>
+			</form>
+			<form class="input-widget" data-type="range" id="range-cfg">
+				<datalist id="range-list">
+					<select>
+						<option value="0" label="labeled Option (0)" />
+						<option value="10" />
+						<option value="20" label="labeled Option (20)" />
+						<option value="30" label="labeled Option (30)" />
+						<option value="50" label="labeled Option (50)" />
+					</select>
+				</datalist>
+				<fieldset data-method="prop">
+					<legend>$.prop</legend>
+					
+					<label>
+						min: 
+						<select name="min">
+							<option></option>
+							<option>-100</option>
+						</select>
+					</label>
+					<label>
+						max: 
+						<select name="max">
+							<option></option>
+							<option>50</option>
+						</select>
+					</label>
+					<label>
+						step: 
+						<select name="step">
+							<option></option>
+							<option value="5">5</option>
+							<option value="10">10</option>
+						</select>
+					</label>
+					<label>
+						disabled: 
+						<input type="checkbox" name="disabled" />	
+					</label>
+					<label>
+						readonly: 
+						<input type="checkbox" name="readonly" />	
+					</label>
+				</fieldset>
+				<fieldset data-method="attr">
+					<legend>$.attr</legend>
+					<label>
+						list: 
+						<select name="list">
+							<option></option>
+							<option value="range-list">range-list (predefined datalist)</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="data" data-name="range">
+					<label>
+						animate: 
+						<input type="checkbox" name="animate" />
+					</label>
+					
+					<label>
+						calculateWidth: 
+						<input type="checkbox" name="calculateWidth" checked="checked" />	
+					</label>
+					
+					<label>
+						calcTrail: 
+						<input type="checkbox" name="calcTrail" checked="checked" />
+					</label>
+				</fieldset>
+			</form>
+			<form class="input-widget" data-type="time" id="time-cfg">
+				<datalist id="time-list">
+					<select>
+						<option value="12:15" />
+						<option value="14:30" />
+						<option value="16:15" />
+						<option value="18:00" label="labeled Option (18:00)" />
+						<option value="20:15" />
+					</select>
+				</datalist>
+				<fieldset data-method="prop">
+					<legend>$.prop</legend>
+					
+					<label>
+						min: 
+						<select name="min">
+							<option></option>
+							<option>14:00</option>
+						</select>
+					</label>
+					<label>
+						max: 
+						<select name="max">
+							<option></option>
+							<option>23:15</option>
+						</select>
+					</label>
+					<label>
+						step: 
+						<select name="step">
+							<option></option>
+							<option value="1">1 (seconds)</option>
+							<option>600</option>
+							<option>3600</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset data-method="attr">
+					<legend>$.attr</legend>
+					
+					<label>
+						data-placeholder: 
+						<select name="data-placeholder">
+							<option></option>
+							<option>hh:mm</option>
+						</select>
+					</label>
+					<label>
+						list: 
+						<select name="list">
+							<option></option>
+							<option value="time-list">time-list (predefined datalist)</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset  data-method="data" data-name="time">
+					<legend>$.data</legend>
+					<label>
+						calculateWidth: 
+						<input type="checkbox" name="calculateWidth" checked="checked" />	
+					</label>
+				</fieldset>
+				
+				<fieldset data-style="">
+					<legend>Style</legend>
+					<label>
+						Buttons outside: 
+						<input type="checkbox" name="btn-outside" />
+					</label>
+					<label>
+						No buttons: 
+						<input type="checkbox" name="no-btn" />
+					</label>
+				</fieldset>
+			</form>
+			
+			<form class="input-widget" data-type="number" id="number-cfg">
+				<fieldset data-method="prop">
+					<legend>$.prop</legend>
+					
+					<label>
+						min: 
+						<select name="min">
+							<option></option>
+							<option>-100</option>
+						</select>
+					</label>
+					<label>
+						max: 
+						<select name="max">
+							<option></option>
+							<option>2000</option>
+						</select>
+					</label>
+					<label>
+						step: 
+						<select name="step">
+							<option></option>
+							<option>0.1</option>
+							<option>0.5</option>
+							<option>10</option>
+						</select>
+					</label>
+					<label>
+						placeholder: 
+						<select name="placeholder">
+							<option></option>
+							<option>numbers</option>
+						</select>
+					</label>
+				</fieldset>
+				<fieldset  data-method="data" data-name="number">
+					<legend>$.data</legend>
+					<label>
+						calculateWidth: 
+						<input type="checkbox" name="calculateWidth" checked="checked" />	
+					</label>
+				</fieldset>
+				<fieldset data-style="">
+					<legend>Style</legend>
+					<label>
+						Buttons outside: 
+						<input type="checkbox" name="btn-outside" />
+					</label>
+					<label>
+						No buttons: 
+						<input type="checkbox" name="no-btn" />
+					</label>
+				</fieldset>
+			</form>
+			
+			<section>
+				<h3>Simple Demo</h3>
+				<form action="#">
+				
+					<p class="required"><span>*</span> Required fields</p>
+					<fieldset>
+						<div class="form-element">
+							<label for="acolorr">
+								alpha color with range: 
+							</label>
+							<input name="color" type="color" id="acolorr" data-alphacontrol="alpha-range" />
+							<input type="range" id="alpha-range" max="1" value="1" step="0.01" />
+						</div>
+						
+						
+						<div class="form-element">
+							<label for="acolorn">
+								alpha color with number: 
+							</label>
+							<input name="color" type="color" id="acolorn" data-alphacontrol="alpha-number" />
+							<input type="number" id="alpha-number" value="255" max="255" />
+						</div>
+						
+						<div class="form-element">
+							<label for="range">
+								range:
+							</label>
+							<input name="range" type="range" id="range" />
+						</div>
+						
+						<div class="form-element">
+							<label for="range-animate">
+								range (with data attribute):
+							</label>
+							<input data-range='{"animate": true}' name="range-animate" type="range" id="range-animate" />
+						</div>
+						
+						<div class="form-element">
+							<label for="states">
+								US States: <dfn title="required">*</dfn>
+							</label>
+							<input list="state-list" data-list='{"highlight": true}' name="states" required="required" type="text" id="states" />
+							<datalist id="state-list">
+								<select>
+									
+									<option value="Alabama" label="State of Alabama" />
+									<option value="Alaska" label="State of Alaska" />
+									<option value="Arizona" label="State of Arizona" />
+									<option value="Arkansas" label="State of Arkansas" />
+									<option value="California" label="State of California" />
+									<option value="Colorado" label="State of Colorado" />
+									<option value="Connecticut" label="State of Connecticut" />
+									<option value="Delaware" label="State of Delaware" />
+									<option value="Florida" label="State of Florida" />
+									<option value="Georgia" label="State of Georgia" />
+									<option value="Hawaiʻi" label="State of Hawaiʻi" />
+									<option value="Idaho" label="State of Idaho" />
+									<option value="Illinois" label="State of Illinois" />
+									<option value="Indiana" label="State of Indiana" />
+									<option value="Iowa" label="State of Iowa" />
+									<option value="Kansas" label="State of Kansas" />
+									<option value="Kentucky" label="Commonwealth of Kentucky" />
+									<option value="Louisiana" label="State of Louisiana" />
+									<option value="Maine" label="State of Maine" />
+									<option value="Maryland" label="State of Maryland" />
+									<option value="Massachusetts" label="Commonwealth of Massachusetts" />
+									<option value="Michigan" label="State of Michigan" />
+									<option value="Minnesota" label="State of Minnesota" />
+									<option value="Mississippi" label="State of Mississippi" />
+									<option value="Missouri" label="State of Missouri" />
+									<option value="Montana" label="State of Montana" />
+									<option value="Nebraska" label="State of Nebraska" />
+									<option value="Nevada" label="State of Nevada" />
+									<option value="New Hampshire" label="State of New Hampshire" />
+									<option value="New Jersey" label="State of New Jersey" />
+									<option value="New Mexico" label="State of New Mexico" />
+									<option value="New York" label="State of New York" />
+									<option value="North Carolina" label="State of North Carolina" />
+									<option value="North Dakota" label="State of North Dakota" />
+									<option value="Ohio" label="State of Ohio" />
+									<option value="Oklahoma" label="State of Oklahoma" />
+									<option value="Oregon" label="State of Oregon" />
+									<option value="Pennsylvania" label="Commonwealth of Pennsylvania" />
+									<option value="Rhode Island" label="State of Rhode Island and Providence Plantations" />
+									<option value="South Carolina" label="State of South Carolina" />
+									<option value="South Dakota" label="State of South Dakota" />
+									<option value="Tennessee" label="State of Tennessee" />
+									<option value="Texas" label="State of Texas" />
+									<option value="Utah" label="State of Utah" />
+									<option value="Vermont" label="State of Vermont" />
+									<option value="Virginia" label="Commonwealth of Virginia" />
+									<option value="Washington" label="State of Washington" />
+									<option value="West Virginia" label="State of West Virginia" />
+									<option value="Wisconsin" label="State of Wisconsin" />
+									<option value="Wyoming" label="State of Wyoming" />
+								</select>
+							</datalist>
+						</div>
+						
+						<div class="form-element">
+							<label for="date">
+								date: <dfn title="required">*</dfn>
+							</label>
+							
+							<input min="2010-12-10" max="2016-01-01" name="date" required="required" type="date" id="date" />
+							(min="2010-12-10" max="2016-01-01")
+						</div>
+						
+						<div class="form-element">
+							<label for="date-data">
+								date (with data attribute): <dfn title="required">*</dfn>
+							</label>
+							
+							<input data-date='{"startView": 2, "splitInput": true}' name="date-data" required="required" type="date" id="date-data" />
+						</div>
+						<div class="form-element">
+							<label for="email">
+								E-Mail + datalist + multiple: <dfn title="required">*</dfn>
+							</label>
+							<input list="datalist" name="email" multiple="" required="required" type="email" id="email" />
+							<datalist id="datalist">
+								<select>
+									<option value="yourmail@gmail.com"></option>
+									<option value="yourmail@yahoo.com"></option>
+									<option value="mail@some-example-domain.com"></option>
+									<option value="foo@bar.baz"></option>
+								</select>
+							</datalist>
+						</div>
+						
+						
+						<div class="form-element">
+							<label for="number">
+								number: <dfn title="required">*</dfn>
+							</label>
+							
+							<input min="3" name="number" required="required" type="number" id="number" />
+							(min="3")
+						</div>
+
+						
+						<div class="form-element">
+							<label for="time">
+								time: 
+							</label>
+							<input name="time" type="time" id="time" />
+						</div>
+						<div class="button-wrapper">
+							<input type="submit" value="Send" />
+						</div>
+					</fieldset>
+				</form>
+			</section>
+	</section>
+	</div>
+</div>
+	<footer>			
+		<small>
+			<strong>Note</strong>: every polyfill is a hack! innovative frontend development is hacky and always will be hacky!
+		</small>
+	</footer>
+<!--[if lte IE 7]>
+	<div class="browser-support"> 			
+		<div class="browser-support-box"> 				
+			Webshims Lib really cares about cross browser support and supports all A-Graded Browsers including IE6 and newest Opera. But I don't care about Styling/Layout issues in IE7- on this demo page.
+		</div> 		
+	</div>
+<![endif]-->
+</body>
+</html>   

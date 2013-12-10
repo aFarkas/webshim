@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="keywords" content="track element, html5, video, audio, accessibility, Sam Dutton" /> 
+<meta name="Description" content="The HTML5 track element provides a simple, standardised way to add subtitles, captions, screen reader descriptions, chapters and timed metadata to video and audio." /> 
+
+<title>Track element demo</title>
+
+<!-- jQuery UI files for autocomplete input#searchInput was removed we use HTML5 datalist, yeah-->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
+<script src="../../js-webshim/minified/polyfiller.js"></script>
+
+<script>
+	webshims.setOptions('forms', {
+		customDatalist: true
+	});
+	webshims.polyfill('mediaelement track forms json-storage');
+</script>
+
+<script>
+	$(function(){
+		
+		$('button.load-jme').prop('disabled', false).one('click', function(){
+			webshims.loader.loadCSS('http://afarkas.github.io/jMediaelement/demo/default-style/css/player-styles.css');
+			webshims.loader.loadList(['range-ui']);
+			webshims.loader.loadScript('http://afarkas.github.io/jMediaelement/demo/js/jme.full.js', function(){
+				$.jme.startJME();					
+				$('div.mediaplayer').jmeProp({"controlbar": true});
+				setTimeout(function(){
+					$(document).trigger('updateshadowdom');
+				}, 30);
+			});
+			$(this).prop('disabled', true);
+		});
+	});
+</script>
+<style>
+	.mediaplayer {
+		width: 100%;
+	}
+	
+	.button-row button {
+		font-size: 140%;
+	}
+</style>
+
+<!-- jCarousel files -->
+<link rel="stylesheet" type="text/css" href="assets/skin.css" />
+<script src="assets/jquery.jcarousel.min.js"></script>
+
+<!-- Colorbox (for 'Read original article' link) -->
+<link rel="stylesheet" type="text/css" href="assets/colorbox.css" />
+<script src="assets/jquery.colorbox.js"></script>
+
+<link type="text/css" href="assets/track.css" rel="stylesheet" />
+<script src="assets/track.js"></script>
+
+
+</head>
+
+<body>
+
+<div id="container">
+
+<h1>Using JSON with the HTML5 video track element</h1>
+
+<div id="blurb">
+<p>This demo shows how the <a href="https://developer.mozilla.org/en/HTML/Element/track" title="MDN track element article" target="_blank">track element</a> can be used to build page content &ndash; and synchronise page changes with media playback. </p>
+<p>The video has a <a href="assets/subtitle-en.vtt" title="WebVTT subtitle track" target="_blank">subtitle track</a>, and a <a href="assets/metadata-en.vtt" title="WebVTT metadata track" target="_blank">metadata track</a> with cues in JSON format. The metadata cues are parsed to build the carousel, and as each metadata cue becomes active, the carousel and the content in the panel on the right are updated. The video can be navigated by clicking on thumbnails in the carousel; the content panel has links to full articles on Wikipedia.</p>
+<p>Content and layout are based on work done by BBC R&D Prototyping as part of the <a href="http://www.p2p-next.org" title="P2P-Next project">P2P-Next project</a>.</p>
+<p>The <a href="http://samdutton.net/track/">original demo (samdutton.net/track/)</a> was modified by using webshims to make it cross-browser so that it even works in IE7/IE8 or Firefox 3.6. This demo is using the following Technologies (video, track, datalist, input[autofocus], input[placeholder] and JSON.</p>
+<div class="button-row">
+	<button class="load-jme">test JME / customizable Controls</button>
+</div>
+
+</div>
+
+
+<div id="videoAndSearch">
+	<div class="mediaplayer videoplayer">
+		<video controls="">
+			<source src="http://www.samdutton.net/track/video/treeOfLife-en.webm"  type='video/webm; codecs="vp8, vorbis"' />
+			<source src="http://www.youtube.com/watch?v=H6IrUUDboZo"  type='video/youtube' />
+			
+			<track label="English subtitles" kind="subtitles" srclang="en" src="assets/treeOfLife-subtitles-en.vtt" default />
+			<track kind="metadata" srclang="en" src="assets/treeOfLife-metadata-en.vtt" default />
+		</video>
+	</div>	
+	<div id="searchContainer" class="trackSupported">
+		<label for="searchInput">Search subtitles: </label>
+		<input id="searchInput" placeholder="find subtitles, then select a result to move to that point in the video." class="mark-option-text" />
+	</div>
+	
+	<div id="carouselContainer" class="trackSupported">
+		<ul id="carousel" class="jcarousel-skin-tango">
+			<!-- Content loaded dynamically -->
+		</ul>
+	</div>
+
+</div> <!-- videoAndSearch -->
+
+<div id="moreInformation" class="trackSupported">
+
+	<h2>Multi-celled organisms</h2>
+
+	<p>Multi-celled organisms have different types of cells that perform specialised functions. Most life that can be seen with the naked eye is multi-cellular. These organisms are though to have evolved around 1 billion years ago with plants, animals and fungi having independent evolutionary paths.</p>
+
+	<a id="originalArticle" href="http://en.wikipedia.org/wiki/Multicellular">Read original article</a>
+
+</div>
+
+<div id="copyright">&copy; 2009 BBC. <a href="http://www.wellcometreeoflife.org/">Wellcome Tree of Life</a> animation and related content is used under <a href="http://creativecommons.org/licenses/by-nc-nd/2.0/uk/">Creative Commons licence</a>. Further information is available in <a href="http://samdutton.net/track/licence.txt" title="licensing information">licence.txt</a>.</div>
+
+</div> <!-- container -->
+
+</body>
+
+</html>

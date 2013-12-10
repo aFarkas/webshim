@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	
+	<style>
+		html,
+		body {
+			background: #000;
+		}
+		.wrapper {
+			position: relative;
+			margin: 15px auto;
+			min-width: 320px;
+			max-width: 980px;
+			width: 80%;
+			background: rgba(255, 255, 255, 0.6);
+			padding: 25px;
+			border-radius: 15px;
+			z-index: 9;
+		}
+		
+		.video-bg {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+		}
+		
+		.video-bg video {
+			display: block;
+			min-width: 100%;
+			min-height: 100%;
+			/* set inline !!!
+			width: auto;
+			height: auto; */
+		}
+		
+		.video-bg .video-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+		}
+		
+		.video-box {
+			position: relative;
+			width: 100%;
+			height: 100%;
+		}
+		
+		.play-toggle {
+			position: absolute;
+			top: 20px;
+			left: 10px;
+			font-size: 16px;
+			padding: 5px;
+		}
+		
+		video {
+			display: inline-block;
+			width: 100%;
+		}
+		.mediaplayer {
+			width: 100%;
+		}
+		
+		.button-row button {
+			font-size: 140%;
+		}
+		
+		.mediaplayer.ratio-16-9 {
+			position: relative;
+			height: 0;
+			width: 100%;
+			padding-bottom: 56.25%;
+		}
+		
+		
+		.mediaplayer.ratio-16-9 video,
+		.mediaplayer.ratio-16-9 .polyfill-video {
+			position: absolute !important;
+			top: 0;
+			left: 0;
+			width: 100% !important;
+			height: 100% !important;
+		}
+		
+		.bfc {
+			overflow: hidden;
+			zoom: 1;
+		}
+		
+		.bfc p {
+			margin: 0 0 1em;
+			padding: 0;
+		}
+		
+		.media-left {
+			max-width: 480px;
+			min-width: 280px;
+			width: 50%;
+			float: left;
+			margin: 0 10px 5px 0;
+		}
+	</style>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
+	<script src="../../js-webshim/minified/polyfiller.js"></script> 
+	<script>
+		$(function(){
+			$('.video-bg').each(function(){
+				var timer;
+				var module = $(this);
+				var posBox = $('.video-box', module);
+				var video = $('video', module);
+				var pos = function(){
+					var css = {
+						top: (module.height() - video.getShadowElement().height()) / 2,
+						left: (module.width() - video.getShadowElement().width()) / 2
+					};
+					posBox.css(css);
+				};
+				var throttle = function(e){
+					clearTimeout(timer);
+					timer = setTimeout(pos, e.type == 'resize' ? 30 : 4);
+				};
+				
+				$('button.play-toggle', module).on('click', function(){
+					if(video.prop('paused') || video.prop('ended')){
+						video.callProp('play');
+					} else {
+						video.callProp('pause');
+					}
+				});
+				
+				pos();
+				$(document).on('updateshadowdom', throttle);
+				$(window).on('resize load', throttle);
+			});
+		});
+	</script>
+	<script>
+		webshims.polyfill('mediaelement');
+	</script>
+	
+	<title>Responsive Video embedding with webshims and JME</title>
+	<script>
+		
+		$(function(){
+			if(Modernizr.video && swfmini.hasFlashPlayerVersion('9.0.115')){
+				$('button.load-swf')
+					.prop('disabled', false)
+					.one('click', function(){
+						webshims.setOptions('mediaelement', {
+							preferFlash: true
+						});
+						$('video').mediaLoad();
+						$(this).prop('disabled', true);
+					})
+				;
+			} else {
+				$('button.load-swf').remove();
+			}
+			$('button.load-jme').prop('disabled', false).one('click', function(){
+				webshims.loader.loadCSS('http://afarkas.github.io/jMediaelement/demo/default-style/css/player-styles.css');
+				webshims.loader.loadList(['range-ui']);
+				webshims.loader.loadScript('http://afarkas.github.io/jMediaelement/demo/js/jme.full.js', function(){
+					$.jme.startJME();					
+					$('div.mediaplayer').jmeProp({"controlbar": true});
+					setTimeout(function(){
+						$(document).trigger('updateshadowdom');
+					}, 9);
+				});
+				$(this).prop('disabled', true);
+			});
+		});
+	</script>
+</head>
+
+<body>
+<div class="wrapper">
+	<h1>Responsive Video embedding with webshims and JME</h1>
+	<div class="button-row">
+		<button class="load-swf" disabled="">test flash fallback</button>
+		
+		<button class="load-jme">test JME / customizable Controls</button>
+	</div>
+		
+	<h2>width: 100%; height: auto;</h2>
+	<p>Webshims supports setting width/height of a video in all units including the keyword auto (The auto keyword needs to be set inline to work with Flash Fallback).</p>
+	<div class="mediaplayer videoplayer">
+		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="height: auto;">
+			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
+			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
+			<track src="../subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
+			<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
+		</video>
+	</div>
+	<p><small>In case you are using a poster you need to ensure, that the poster has the same aspect ration than the video.</small></p>
+	<hr />
+	
+	<h2>intrinsic ratio responsive/fluid video</h2>
+	<p>based on  http://www.alistapart.com/articles/creating-intrinsic-ratios-for-video/</p>
+	
+	<div class="mediaplayer videoplayer ratio-16-9">
+		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="height: 100%;">
+			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
+			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
+			<track src="../subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
+			<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
+		</video>
+	</div>
+	
+	
+	<hr />
+	
+	<h2>floating content with margin</h2>
+	<div class="bfc">
+		<div class="mediaplayer videoplayer media-left">
+			<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="height: auto;">
+				<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
+				<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
+				<track src="../subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
+				<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
+			</video>
+		</div>
+		<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+		<p> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+		<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+		<p> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+	</div>
+</div>
+
+	<div class="video-bg">
+		<div class="video-box">
+			<video muted="" loop="loop" style="width: auto; height: auto;">
+					<source src="http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.m4v" type="video/mp4" />
+					<source src="http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.ogg" />
+			</video>
+		</div>
+		<div class="video-overlay"></div>
+		<button type="button" class="play-toggle">play/pause bg video</button>
+	</div>
+
+</body>
+</html>   
