@@ -277,7 +277,8 @@ output {
 		padding: 4px 0;
 	}
 
-	.ws-popover.ws-po-visible & {
+	.ws-popover.ws-po-visible &,
+	div.ws-popover[data-vertical][data-horizontal].ws-po-visible & {
 		opacity: 1;
 		-webkit-transform: translate(0, 0) scale(1);
 		transform: translate(0, 0) scale(1);

@@ -1705,17 +1705,16 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 	var stopPropagation = function(e){
 		e.stopImmediatePropagation();
 	};
-	var getMonthOptions = (function(){
-		var str;
-		return function(){
-			if(!str){
-				str = ('<option value=""></option>')+$.map(monthDigits, function(val){
-					return '<option value="'+val+'"]>'+val+'</option>';
-				}).join('');
-			}
-			return str;
-		};
-	})();
+	var getMonthOptions = function(opts){
+		var selectName = 'monthSelect'+opts.formatMonthNames;
+		if(!curCfg[selectName]){
+			var labels = curCfg.date[opts.formatMonthNames] || monthDigits;
+			curCfg[selectName] = ('<option value=""></option>')+$.map(monthDigits, function(val, i){
+				return '<option value="'+val+'"]>'+labels[i]+'</option>';
+			}).join('');
+		}
+		return curCfg[selectName];
+	};
 	var createFormat = function(name){
 		if(!curCfg.patterns[name+'Obj']){
 			var obj = {};
@@ -2434,7 +2433,11 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				}
 				if(options.splitInput && typeof placeholder == 'object'){
 					$.each(this.splits, function(i, elem){
-						$.prop(elem, 'placeholder', placeholder[i]);
+						if($.nodeName(elem, 'select')){
+							$(elem).children('option:first-child').text(placeholder[i]);
+						} else {
+							$.prop(elem, 'placeholder', placeholder[i]);
+						}
 					});
 				} else {
 					this.element.prop('placeholder', placeholder);
@@ -2644,9 +2647,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		
 		$.fn.spinbtnUI = function(opts){
 			opts = $.extend({
-				monthNames: 'monthNames',
-				size: 1,
-				startView: 0
+				monthNames: 'monthNames'
 			}, opts);
 			return this.each(function(){
 				$.webshims.objectCreate(spinBtnProto, {
@@ -2827,30 +2828,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			
 			
 			options.containerElements.push(popover.element[0]);
-			
-			if(data.type != 'color'){
-				if(options.yearButtons){
-					options.startView = 2;
-				} 
-				if(!options.startView){
-					options.startView = 0;
-				}
-				
-				if(data.type == 'time'){
-					options.minView = 3;
-					options.startView = 3;
-				}
-				if(!options.minView){
-					options.minView = 0;
-				}
-				if(options.startView < options.minView){
-					options.startView = options.minView;
-					webshims.warn("wrong config for minView/startView.");
-				}
-				if(!options.size){
-					options.size = 1;
-				}
-			}
 			
 			popover.element
 				.addClass(data.type+'-popover input-picker')
@@ -3162,10 +3139,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 						opts[optsName] = $.attr(this, copyAttrs[i]) || opts[optsName];
 					}
 				}
-				if(opts.monthSelect){
-					opts.onlyMonthDigits = true;
-				}
-				if(opts.onlyMonthDigits){
+				
+				if(opts.onlyMonthDigits || (!opts.formatMonthNames && opts.monthSelect)){
 					opts.formatMonthNames = 'monthDigits';
 				}
 				data.shim = inputTypes[type]._create(opts);

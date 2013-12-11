@@ -299,7 +299,7 @@ input[type="color"] {
     transition: all 400ms; }
   .input-picker .ws-focus,
   .input-picker :focus {
-    outline: 1px dotted black; }
+    outline: 1px dotted #000; }
   .input-picker .ws-po-box {
     position: relative;
     padding: 10px 20px 15px;
@@ -311,7 +311,7 @@ input[type="color"] {
   .input-picker .ws-super-next {
     position: absolute;
     top: 10px;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     border-radius: 5px;
     padding: 0;
     width: 24px;
@@ -327,7 +327,7 @@ input[type="color"] {
     padding-top: 36px; }
   .input-picker .ws-picker-body {
     position: relative;
-    padding: 46px 0 0;
+    padding: 40px 0 0;
     zoom: 1;
     margin: 0 -10px; }
   .input-picker .ws-prev,
@@ -360,14 +360,14 @@ input[type="color"] {
   .input-picker .ws-button-row {
     position: relative;
     margin: 10px 0 0;
-    border-top: 1px solid #eeeeee;
+    border-top: 1px solid #eee;
     padding: 10px 0 0;
     text-align: left;
     z-index: 2; }
     .input-picker .ws-button-row button {
-      border: 1px solid #cccccc;
+      border: 1px solid #ccc;
       border-radius: 5px;
-      box-shadow: 1px 1px 0 white;
+      box-shadow: 1px 1px 0 #fff;
       background-color: #ddd;
       background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
       background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
@@ -389,7 +389,7 @@ input[type="color"] {
     margin: 0 65px; }
   .input-picker .ws-picker-header {
     position: absolute;
-    top: -44px;
+    top: -40px;
     right: 0;
     left: 0;
     margin: 0 40px; }
@@ -444,6 +444,7 @@ input[type="color"] {
         background-color: #fff; }
     .input-picker .picker-list table {
       width: 100%;
+      margin: 0;
       border: 0 none;
       border-collapse: collapse; }
     .input-picker .picker-list th,
@@ -457,7 +458,7 @@ input[type="color"] {
       width: 14.2856%; }
   .input-picker .ws-options {
     margin: 10px 0 0;
-    border-top: 1px solid #eeeeee;
+    border-top: 1px solid #eee;
     padding: 10px 0 0;
     text-align: left; }
     .input-picker .ws-options h5 {

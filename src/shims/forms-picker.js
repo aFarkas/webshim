@@ -542,6 +542,9 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				};
 			})();
 			
+			if(o.splitInput && o.jumpInputs == null){
+				o.jumpInputs = true;
+			}
 			
 			this.buttonWrapper.on('mousedown', mouseDownInit);
 			
@@ -1348,7 +1351,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		if(!valueAdd){
 			valueAdd = '';
 		}
-		while(i < 8 && (goUp || goDown)){
+		while(i < 18 && (goUp || goDown)){
 			i++;
 			temp = value-i;
 			if(goUp && picker.isInRange([temp], max, min)){
@@ -1460,6 +1463,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 	
 	
 	picker.commonDateInit = function(data, popover){
+		var o = data.options;
 		var actionfn = function(e){
 			if(!$(this).is('.othermonth') || $(this).css('cursor') == 'pointer'){
 				popover.actionFn({
@@ -1499,7 +1503,6 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		};
 		var updateContent = function(){
 			if(popover.isDirty){
-				var o = data.options;
 				o.maxS = o.max.split('-');
 				o.minS = o.min.split('-');
 				
@@ -1564,6 +1567,27 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			popover.isDirty = false;
 		};
 		
+		
+		
+		if(!o.startView){
+			o.startView = o.yearButtons ? 2 : 0;
+		}
+		
+		if(data.type == 'time'){
+			o.minView = 3;
+			o.startView = 3;
+		}
+		if(!o.minView){
+			o.minView = 0;
+		}
+		if(o.startView < o.minView){
+			o.startView = o.minView;
+			webshims.warn("wrong config for minView/startView.");
+		}
+		if(!o.size){
+			o.size = 1;
+		}
+		
 		popover.actionFn = function(obj){
 			if(actions[obj['data-action']]){
 				actions[obj['data-action']](obj.value, popover, data, 0);
@@ -1592,13 +1616,13 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			.on('change', 'select[data-action]', actionfn)
 		;
 		
-		if(data.options.inlinePicker){
-			data.options.updateOnInput = true;
+		if(o.inlinePicker){
+			o.updateOnInput = true;
 		}
 		
-		$(data.options.orig).on('input', function(){
+		$(o.orig).on('input', function(){
 			var currentView;
-			if(data.options.updateOnInput && popover.isVisible && data.options.value && (currentView = popover.element.attr('data-currentview'))){
+			if(o.updateOnInput && popover.isVisible && o.value && (currentView = popover.element.attr('data-currentview'))){
 				actions[currentView]( data.options.value , popover, data, 0);
 			}
 		});

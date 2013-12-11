@@ -63,7 +63,8 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			$(opts.input)
 				.attr({
 					//role: 'combobox',
-					'aria-haspopup': 'true'
+					'aria-haspopup': 'true',
+					'aria-autocomplete': 'both' //support only list?
 				})
 				.on({
 					'input.datalistWidget': function(){
@@ -496,6 +497,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 				
 				$(this.input)
 					.prop('value', newValue)
+					.trigger('select')
 					.triggerHandler('updateInput')
 				;
 				this.changedValue = true;
