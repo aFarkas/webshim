@@ -43,6 +43,9 @@
 		}
 		
 		@media (min-width: 28em) {
+			.touch .input-picker {
+				font-size: 16px;
+			}
 			.ui-field-contain .ws-errorbox {
 				margin-left: 22%;
 			}
@@ -77,7 +80,8 @@
 						appendTo: 'body',
 						position: {
 							my: 'center',
-							at: 'center'
+							at: 'center',
+							collision: 'fit'
 						}
 					}
 				}

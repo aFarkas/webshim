@@ -607,7 +607,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			
 			this.element.addClass('ws-range').attr({role: 'slider'}).append('<span class="ws-range-min ws-range-progress" /><span class="ws-range-rail ws-range-track"><span class="ws-range-thumb" /></span>');
 			this.trail = $('.ws-range-track', this.element);
-			this.range = $('.ws-range-progress ', this.element);
+			this.range = $('.ws-range-progress', this.element);
 			this.thumb = $('.ws-range-thumb', this.trail);
 			
 			this.updateMetrics();
@@ -627,7 +627,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		},
 		value: $.noop,
 		_value: function(val, _noNormalize, animate){
-			var left, posDif;
+			var left, posDif, textValue;
 			var o = this.options;
 			var oVal = val;
 			var thumbStyle = {};
@@ -676,9 +676,15 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			if(this.orig && (oVal != val || (!this._init && this.orig.value != val)) ){
 				this.options._change(val);
 			}
+			
+			textValue = this.options.textValue ? this.options.textValue(this.options.value) : this.options.options[this.options.value] || this.options.value;
 			this.element.attr({
 				'aria-valuenow': this.options.value,
-				'aria-valuetext': this.options.textValue ? this.options.textValue(this.options.value) : this.options.options[this.options.value] || this.options.value
+				'aria-valuetext': textValue
+			});
+			this.thumb.attr({
+				'data-value': this.options.value,
+				'data-valuetext': textValue
 			});
 		},
 		initDataList: function(){
@@ -722,13 +728,19 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			$.each(o.options, function(val, label){
 				if(!isNumber(val) || val < min || val > max){return;}
 				var left = 100 * ((val - min) / (max - min));
-				var title = o.showLabels && label ? ' title="'+ label +'"' : '';
+				var attr = '';
+				if(label){
+					attr += 'data-label="'+label+'"';
+					if(o.showLabels){
+						attr += ' title="'+label+'"';
+					}
+				}
 				if(that.vertical){
 					left = Math.abs(left - 100);
 				}
 				
 				that.posCenter(
-					$('<span class="ws-range-ticks"'+ title +' data-label="'+label+'" style="'+(that.dirs.left)+': '+left+'%;" />').appendTo(trail)
+					$('<span class="ws-range-ticks"'+ attr +' style="'+(that.dirs.left)+': '+left+'%;" />').appendTo(trail)
 				);
 			});
 		},
@@ -1833,7 +1845,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				
 				if(this.type != 'color'){
 					(function(){
-						var localeChange ;
+						var localeChange, select, selectVal;
 						if(!o.splitInput){
 							localeChange = function(){
 								
@@ -1848,6 +1860,12 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 						} else {
 							localeChange = function(){
 								that.reorderInputs();
+								if(o.monthSelect){
+									select = that.inputElements.filter('select.mm');
+									selectVal = select.prop('value');
+									select.html(getMonthOptions(o));
+									select.prop('value', selectVal);
+								}
 							};
 							that.reorderInputs();
 						}

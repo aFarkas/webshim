@@ -137,7 +137,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		poCFG.position = {
 			at: 'left bottom',
 			my: 'left top',
-			collision: 'fit flip'
+			collision: 'fit'
 		};
 	}
 	webshims.wsPopover = {

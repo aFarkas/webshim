@@ -686,7 +686,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				
 				if(this.type != 'color'){
 					(function(){
-						var localeChange ;
+						var localeChange, select, selectVal;
 						if(!o.splitInput){
 							localeChange = function(){
 								
@@ -701,6 +701,12 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 						} else {
 							localeChange = function(){
 								that.reorderInputs();
+								if(o.monthSelect){
+									select = that.inputElements.filter('select.mm');
+									selectVal = select.prop('value');
+									select.html(getMonthOptions(o));
+									select.prop('value', selectVal);
+								}
 							};
 							that.reorderInputs();
 						}

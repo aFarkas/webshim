@@ -509,11 +509,22 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			});
 		},
 		getOptions: (function(){
+			var normalName = /\-([a-z])/g;
 			var regs = {};
+			var nameRegs = {};
 			var regFn = function(f, upper){
 				return upper.toLowerCase();
 			};
+			var nameFn = function(f, dashed){
+				return dashed.toUpperCase();
+			};
 			return function(elem, name, bases){
+				if(nameRegs[name]){
+					name = nameRegs[name];
+				} else {
+					nameRegs[name] = name.replace(normalName, nameFn);
+					name = nameRegs[name];
+				}
 				var data = elementData(elem, 'cfg'+name);
 				var dataName;
 				var cfg = {};
@@ -549,7 +560,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					}
 				}
 				bases.push(cfg);
-				
+				console.log(bases)
 				return elementData(elem, 'cfg'+name, $.extend.apply($, bases));
 			};
 		})(),
@@ -1278,7 +1289,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		poCFG.position = {
 			at: 'left bottom',
 			my: 'left top',
-			collision: 'fit flip'
+			collision: 'fit'
 		};
 	}
 	webshims.wsPopover = {
