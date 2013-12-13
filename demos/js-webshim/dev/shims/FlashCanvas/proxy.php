@@ -5,7 +5,7 @@
  *
  * PHP versions 4 and 5
  *
- * Copyright (c) 2010-2011 Shinya Muramatsu
+ * Copyright (c) 2010-2013 Shinya Muramatsu
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -26,21 +26,40 @@
  * DEALINGS IN THE SOFTWARE.
  *
  * @author     Shinya Muramatsu <revulon@gmail.com>
- * @copyright  2010-2011 Shinya Muramatsu
+ * @copyright  2010-2013 Shinya Muramatsu
  * @license    http://www.opensource.org/licenses/mit-license.php  MIT License
  * @link       http://flashcanvas.net/
  * @link       http://code.google.com/p/flashcanvas/
  */
 
+function getHostName() {
+    if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+        return $_SERVER['HTTP_X_FORWARDED_HOST'];
+    } else if (isset($_SERVER['HTTP_HOST'])) {
+        return $_SERVER['HTTP_HOST'];
+    } else {
+        return $_SERVER['SERVER_NAME'];
+    }
+}
+
 // Whether we check referrer or not
 define('CHECK_REFERRER', true);
 
-// Check that the request is from FlashCanvas
+// If necessary, specify the host where the SWF file is located
+define('SWF_HOST_NAME', '');
+
+// Check that the request comes from the same host
 if (CHECK_REFERRER) {
     if (empty($_SERVER['HTTP_REFERER'])) {
         exit;
     }
-    if (!preg_match('#/flash\d*canvas\.swf$#', $_SERVER['HTTP_REFERER'])) {
+    if (SWF_HOST_NAME) {
+        $host = SWF_HOST_NAME;
+    } else {
+        $host = getHostName();
+    }
+    $pattern = '#^https?://' . str_replace('.', '\.', $host) . '(:\d*)?/#';
+    if (!preg_match($pattern, $_SERVER['HTTP_REFERER'])) {
         exit;
     }
 }
@@ -65,6 +84,8 @@ header('Content-Encoding: none');
 if (extension_loaded('curl')) {
     // Use cURL extension
     $ch = curl_init($url);
+//  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+//  curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
     curl_exec($ch);
     curl_close($ch);
 } else {

@@ -5,7 +5,7 @@
  *
  * PHP versions 4 and 5
  *
- * Copyright (c) 2010-2011 Shinya Muramatsu
+ * Copyright (c) 2010-2013 Shinya Muramatsu
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -26,16 +26,22 @@
  * DEALINGS IN THE SOFTWARE.
  *
  * @author     Shinya Muramatsu <revulon@gmail.com>
- * @copyright  2010-2011 Shinya Muramatsu
+ * @copyright  2010-2013 Shinya Muramatsu
  * @license    http://www.opensource.org/licenses/mit-license.php  MIT License
  * @link       http://flashcanvas.net/
  * @link       http://code.google.com/p/flashcanvas/
  */
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_GET['filename'])) {
+        $filename = $_GET['filename'];
+    } else {
+        $filename = 'canvas.png';
+    }
+
     // Force download
     header('Content-Type: application/octet-stream');
-    header('Content-Disposition: attachment; filename="canvas.png"');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
 
     if (isset($_POST['dataurl'])) {
         // Decode the base64-encoded data
