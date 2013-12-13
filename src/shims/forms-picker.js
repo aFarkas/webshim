@@ -1137,13 +1137,14 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				day = date.getDay();
 				classArray = [];
 				
-				if(addTr && otherMonth ){
+				if(addTr && otherMonth && rowNum >= 5){
+					
 					str.push('</tr>');
 					break;
 				}
 				if(addTr){
 					rowNum++;
-					str.push('</tr><tr class="ws-row-'+ rowNum +'">');
+					str.push('</tr><tr class="ws-row-'+ rowNum + ((otherMonth) ? ' other-month-row' : '')+'">');
 					week++;
 					if(week > 52){
 						week =  picker.getWeek(date);

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>widgets</title>
+		<meta charset="utf-8">
+		<style>
+			html, body {min-height: 100%; min-width: 99%;}
+			body > div.form-row {
+				margin: 10px auto;
+				padding: 5px 10px;
+				max-width: 600px;
+				min-width: 300px;
+				width: 100%;
+			}
+			label {
+				display: block;
+				margin: 3px 0;
+			}
+			.form-row input {
+				min-width: 220px;
+				width: 100%;
+				max-width: 360px;
+				padding: 3px 1px;
+			}
+		</style>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="../src/extras/modernizr-custom.js"></script>
+		
+		<script src="../src/polyfiller.js"></script>
+		
+		<script>
+	
+//	 Issue #307 
+	webshims.setOptions('debug', 'noCombo');
+	
+	webshims.setOptions('forms', {replaceValidationUI: true, fixRangeChange: true,customDatalist: true,  addValidators: true});
+	webshims.setOptions('forms-ext', {
+		replaceUI: true
+		//time: {widgetPosition: {"my": "center", "at": "center"}}
+	});
+	webshims.polyfill('forms forms-ext');
+
+	
+	</script>
+		
+	
+		<style>
+			
+
+
+		</style>
+		
+		
+	</head>
+	
+	<body>
+		<div class="form-row">
+			<label for="range">range with: {"animate": true}, step="10" and datalist</label>
+			<input type="range" data-range='{"animate": true}' step="10" list="rangelist-1" />
+			<datalist id="rangelist-1">
+				<select>
+					<option value="0" label="0" />
+					<option value="10" />
+					<option value="20" />
+					<option value="30" />
+					<option value="40" />
+					<option value="50" label="50" />
+					<option value="60" />
+					<option value="70" />
+					<option value="80" />
+					<option value="90" />
+					<option value="100" label="100" />
+				</select>
+			</datalist>
+		</div>
+		
+		<div class="form-row range-ticks-ballon">
+			<style scoped>
+				.range-ticks-ballon .ws-range {
+					font-size: 16px;
+				}
+				.range-ticks-ballon .ws-range-ticks[data-label]:after {
+					visibility: visible;
+				}
+				
+				.range-ticks-ballon .ws-range-thumb:before {
+					opacity: 0;
+				}
+				
+				.range-ticks-ballon .ws-active .ws-range-thumb:before {
+					visibility: visible;
+					opacity: 1;
+				}
+			</style>
+			<label for="range">range with: {"animate": true}, step="10" and datalist (but CSS)</label>
+			<input type="range" data-range='{"animate": true}' step="10" list="rangelist-2" />
+			
+			<datalist id="rangelist-2">
+				<select>
+					<option value="0" label="0" />
+					<option value="10" />
+					<option value="20" />
+					<option value="30" />
+					<option value="40" />
+					<option value="50" label="50" />
+					<option value="60" />
+					<option value="70" />
+					<option value="80" />
+					<option value="90" />
+					<option value="100" label="100" />
+				</select>
+			</datalist>
+		</div>
+		
+		<div class="form-row">
+			
+			<label>date</label>
+			<input type="date" value="2014-01-01" data-date-start-view="2" />
+			
+			
+		</div>
+		<div class="form-row date-css-config">
+			<style scoped>
+				.date-css-config .input-picker {
+					font-size: 16px;
+				}
+				.date-css-config .ws-picker-header button {
+					display: none;
+				}
+				
+				.date-css-config .ws-picker-header select,
+				.date-css-config .ws-super-prev,
+				.date-css-config .ws-super-next {
+					display: inline-block;
+				}
+				
+				.date-css-config .week-header,
+				.date-css-config .week-cell {
+					display: table-cell;
+				}
+				
+				.date-css-config .othermonth {
+					cursor: default;
+				}
+				
+				.date-css-config .other-month-row {
+					display: table-row;
+				}
+			</style>
+			<label>date</label>
+			<input type="date" value="2014-01-01" data-date-start-view="2" />
+			
+			
+		</div>
+		
+	</body>
+</html>

@@ -1012,7 +1012,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					}
 				}
 				bases.push(cfg);
-				console.log(bases)
 				return elementData(elem, 'cfg'+name, $.extend.apply($, bases));
 			};
 		})(),
@@ -1741,7 +1740,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		poCFG.position = {
 			at: 'left bottom',
 			my: 'left top',
-			collision: 'fit'
+			collision: 'fit flip'
 		};
 	}
 	webshims.wsPopover = {

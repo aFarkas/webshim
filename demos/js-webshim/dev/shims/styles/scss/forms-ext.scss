@@ -420,6 +420,7 @@ $button-bgcolor: #f5f5f5;
 	border: em(1) solid transparent;
 }
 .input-picker {
+	overflow: visible;
 	font-size: 13px;
 	outline: none;
 	text-align: center;
@@ -427,6 +428,16 @@ $button-bgcolor: #f5f5f5;
 	width: em(330);
 	max-width: 100%;
 	min-width: em(300);
+	
+	.ws-po-outerbox {
+		-webkit-transform: translate(0, 30%);
+		transform: translate(0, 30%);
+		
+		[data-vertical="bottom"] & {
+		  -webkit-transform: translate(0, -3%);
+			transform: translate(0, -30%);
+		}
+	}
 	
 	&.time-popover,
 	&.datetime-local-popover {
@@ -676,6 +687,10 @@ $button-bgcolor: #f5f5f5;
 		
 		tr {
 			border: 0;
+		}
+		
+		.other-month-row {
+			display: none;
 		}
 
 		th,

@@ -293,6 +293,7 @@ input[type="color"] {
   border: 0.07692em solid transparent; }
 
 .input-picker {
+  overflow: visible;
   font-size: 13px;
   outline: none;
   text-align: center;
@@ -300,6 +301,12 @@ input[type="color"] {
   width: 25.38462em;
   max-width: 100%;
   min-width: 23.07692em; }
+  .input-picker .ws-po-outerbox {
+    -webkit-transform: translate(0, 30%);
+    transform: translate(0, 30%); }
+    [data-vertical="bottom"] .input-picker .ws-po-outerbox {
+      -webkit-transform: translate(0, -3%);
+      transform: translate(0, -30%); }
   .input-picker.time-popover, .input-picker.datetime-local-popover {
     width: 31.92308em; }
   .input-picker.time-popover .ws-prev,
@@ -453,6 +460,8 @@ input[type="color"] {
     background: #fff; }
     .input-picker .picker-list tr {
       border: 0; }
+    .input-picker .picker-list .other-month-row {
+      display: none; }
     .input-picker .picker-list th,
     .input-picker .picker-list td {
       padding: 0.23077em 0.38462em;

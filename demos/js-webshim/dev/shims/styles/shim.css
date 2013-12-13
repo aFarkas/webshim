@@ -200,6 +200,12 @@ output {
   margin: 0 0 0 -6px;
   z-index: 1100;
   min-width: 90px;
+  -webkit-transform: translate3d(0px, 0px, 0px);
+  -webkit-backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d;
+  transform: translate3d(0px, 0px, 0px);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
   transition: visibility 400ms ease-in-out;
   -moz-box-sizing: content-box;
   box-sizing: content-box; }

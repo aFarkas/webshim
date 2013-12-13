@@ -2459,7 +2459,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					}
 				}
 				bases.push(cfg);
-				console.log(bases)
 				return elementData(elem, 'cfg'+name, $.extend.apply($, bases));
 			};
 		})(),

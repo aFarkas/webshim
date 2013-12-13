@@ -822,27 +822,15 @@
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
 	addPolyfill('es5', {
 		test: !!(Modernizr.ES5 && Function.prototype.bind),
-		c: [14, 18, 19, 25, 20]
+		c: [18, 19, 25, 20]
 	});
 	
 	addPolyfill('dom-extend', {
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		d: ['es5'],
-		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 14, 25, 19, 20, 26, 31]
+		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 25, 19, 20, 26, 31]
 	});
-		
-	
-	//<json-storage
-	
-	addPolyfill('json-storage', {
-		test: Modernizr.localstorage && 'sessionStorage' in window && 'JSON' in window,
-		d: ['swfmini'],
-		noAutoCallback: true,
-		c: [14],
-		nM: 'localstorage'
-	});
-	//>json-storage
 	
 	
 	//<geolocation

@@ -295,8 +295,8 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				that.element.css('display', '');
 				that.timers.show = setTimeout(function(){
 					that.element.addClass('ws-po-visible').trigger('wspopovershow');
-				}, 9);
-			}, 9);
+				}, 14);
+			}, 4);
 			
 			$(document.body || document).on('focusin'+this.eventns+' mousedown'+this.eventns, function(e){
 				if(that.options.hideOnBlur && !that.stopBlur && !that.isInElement([that.lastElement[0], element[0], that.element[0]], e.target)){
