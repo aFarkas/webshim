@@ -182,37 +182,26 @@ input[type="color"] {
 	.mm,
 	.dd {
 		width: 23.5%;
-		
-		.no-boxsizing & {
-			width: 16%;
-		}
+		min-width: 12%;
 	}
 	.yy {
 		width: 48%;
-		
-		.no-boxsizing & {
-			width: 40%;
-		}
+		min-width: 24%;
 	}
 	&.ws-month-select {
 		
 		.dd {
 			width: 22%;
-			
-			.no-boxsizing & {
-				width: 13%;
-			}
+			min-width: 11%;
 		}
 		.mm {
 			width: 38%;
+			min-width: 19%;
 		}
 		
 		.yy {
 			width: 36%;
-			
-			.no-boxsizing & {
-				width: 30%;
-			}
+			min-width: 18%;
 		}
 	}
 }
@@ -221,10 +210,7 @@ input[type="color"] {
 	.mm,
 	.yy {
 		width: 47.9%;
-		
-		.no-boxsizing & {
-			width: 41%;
-		}
+		min-width: 24%;
 	}
 }
 

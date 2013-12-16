@@ -12,7 +12,15 @@ module.exports = function(grunt){
 			'<%= pkg.homepage ? "* " + pkg.homepage + "\n" : "" %> */'
 		},
 		//concat is changed through webshimscombos
-		concat: {},
+		concat: {
+			options: {
+				separator: ';'
+			},
+			demo: {
+				src: ['demos/demo-js/src/prism.js', 'demos/demo-js/src/behavior.js'],
+				dest: 'demos/demo-js/demo.js'
+			}
+		},
 		//copy and uglify are changed through cfgcopymin
 		copy: {},
 		cssmin: getFiles('src', 'demos/js-webshim/minified', '**/*.css'),
@@ -40,6 +48,10 @@ module.exports = function(grunt){
 				},
 					dead_code: true
 				}
+			},
+			demo: {
+				src: 'demos/demo-js/demo.js',
+				dest: 'demos/demo-js/demo.js'
 			}
 		},
 		watch: {
@@ -54,6 +66,10 @@ module.exports = function(grunt){
 			js: {
 				files: ['src/**/*.js'],
 				tasks: ['webshimscombos', 'concat', 'cfgcopymin', 'copy']
+			},
+			js: {
+				files: ['demos/demo-js/src/**/*.js'],
+				tasks: ['concat']
 			}
 		}
 	});
@@ -72,6 +88,7 @@ module.exports = function(grunt){
 			]
 		}, 
 		function(err, result, code) {
+			var concatCfg;
 			result = result.toString();
 			if(!err && result.indexOf && result.indexOf('done') == -1){
 				
@@ -80,7 +97,15 @@ module.exports = function(grunt){
 				} catch(er){
 					grunt.warn('parse error');
 				}
-				grunt.config('concat', combos);
+				
+				concatCfg = grunt.config('concat');
+				if(concatCfg){
+					concatCfg.combos = combos;
+				} else {
+					concatCfg = combos;
+				}
+				
+				grunt.config('concat', concatCfg);
 				
 				done(code);
 				return;

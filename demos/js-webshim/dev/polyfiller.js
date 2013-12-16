@@ -10,6 +10,20 @@
 			}
 		}
 	};
+	var start = function(){
+		if(window.jQuery){
+			factory(jQuery);
+			factory = jQuery.noop;
+			clearInterval(timer);
+		}
+		if (typeof define === 'function' && define.amd && define.amd.jQuery) {
+			define('polyfiller', ['jquery'], factory);
+			clearInterval(timer);
+		}
+		
+	};
+	var timer = setInterval(start, 1);
+	
 	window.webshims = {
 		setOptions: function(){
 			addAsync();
@@ -28,19 +42,8 @@
 			window.asyncWebshims.polyfill = features;
 		}
 	};
-	var start = function(){
-		if(window.jQuery){
-			factory(jQuery);
-			factory = jQuery.noop;
-			clearInterval(timer);
-		}
-		if (typeof define === 'function' && define.amd && define.amd.jQuery) {
-			define('polyfiller', ['jquery'], factory);
-			clearInterval(timer);
-		}
-		
-	};
-	var timer = setInterval(start, 1);
+	window.webshim = window.webshims;
+	
 	start();
 }(function($){
 	"use strict";

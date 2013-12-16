@@ -114,7 +114,7 @@
 		<div class="form-row">
 			
 			<label>date</label>
-			<input type="date" value="2014-01-01" data-date-start-view="2" />
+			<input type="date" placeholder="year-month-day" data-date-split-input="true" data-date-split-inputs="true" data-date-start-view="2" />
 			
 			
 		</div>
@@ -123,7 +123,17 @@
 				.date-css-config .input-picker {
 					font-size: 16px;
 				}
+								
+				/* remove step-controls */
+				.date-css-config .step-controls {
+					display: none;
+				}
 				
+				/* ... and put button after input || not needed for {"splitInput": true}
+				.date-css-config .input-buttons.input-button-size-1.date-input-buttons {
+					margin-left: 3px;
+				}
+				*/
 				/* show up arrow */
 				.date-css-config .ws-picker-header button:after {
 					display: inline-block;
@@ -169,9 +179,14 @@
 				.date-css-config  .picker-grid button .month-digit {
 					display: inline-block;
 				}
+				
+				/* hide button-row */
+				.date-css-config  .ws-button-row {
+					display: none;
+				}
 			</style>
 			<label>date</label>
-			<input type="date" value="2014-01-01" data-date-start-view="2" />
+			<input type="date" placeholder="year-month-day" data-date-split-input="true" data-date-start-view="2" />
 			
 			
 		</div>

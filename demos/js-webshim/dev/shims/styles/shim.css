@@ -4,29 +4,6 @@
   position: absolute;
   top: -999999px; }
 
-/*
-.webshims-debug-list {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	margin: 5px;
-	padding: 5px;
-	list-style: none;
-	background: #fff;
-	color: #930;
-	font-size: 16px;
-	font-weight: bold;
-	max-height: 200px;
-	z-index: 99999;
-	overflow-y: auto;
-	
-	li {
-		border: 1px solid #c60;
-		margin: 2px 0;
-		padding: 5px;
-	}
-}*/
 article, aside, canvas, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
   display: block; }
 
