@@ -324,7 +324,7 @@ input[type="color"] {
     transition: all 400ms; }
   .input-picker .ws-focus,
   .input-picker :focus {
-    outline: 1px dotted black; }
+    outline: 1px dotted #000; }
   .input-picker .ws-po-box {
     position: relative;
     padding: 0.76923em 1.53846em 1.15385em;
@@ -370,7 +370,7 @@ input[type="color"] {
     .input-picker .prev-controls .ws-super-prev:before,
     .input-picker .prev-controls .ws-prev:before {
       border-width: 0.35em 0.6em 0.35em 0;
-      border-color: transparent #333333 transparent transparent;
+      border-color: transparent #333 transparent transparent;
       margin-left: -0.1em; }
     .input-picker .prev-controls .ws-super-prev {
       margin-right: 0.23077em;
@@ -385,7 +385,7 @@ input[type="color"] {
     .input-picker .next-controls .ws-super-next:after,
     .input-picker .next-controls .ws-next:before {
       border-width: 0.35em 0 0.35em 0.6em;
-      border-color: transparent transparent transparent #333333;
+      border-color: transparent transparent transparent #333;
       margin-right: -0.1em; }
     .input-picker .next-controls .ws-super-next {
       margin-left: 0.23077em;
@@ -409,7 +409,7 @@ input[type="color"] {
     .input-picker .ws-button-row button {
       border: 0.07692em solid #cccccc;
       border-radius: 5px;
-      box-shadow: 1px 1px 0 white;
+      box-shadow: 1px 1px 0 #fff;
       background-color: #ddd;
       background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
       background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
@@ -453,7 +453,7 @@ input[type="color"] {
         height: 0px;
         border-style: solid;
         border-width: 0 0.3em 0.6em 0.3em;
-        border-color: transparent transparent #333333 transparent;
+        border-color: transparent transparent #333 transparent;
         vertical-align: middle; }
       .input-picker .ws-picker-header button:hover {
         text-decoration: underline; }

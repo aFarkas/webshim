@@ -240,7 +240,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 						value: this.options.noHtmlEscape ? value : value.replace(lReg, '&lt;').replace(gReg, '&gt;'),
 						label: $.trim($.attr(rElem, 'label')) || '',
 						className: rElem.className || '',
-						elem: options.getOptionContent ? rElem : null
+						elem: rElem
 					};
 					
 					if(rItem.label){
@@ -280,7 +280,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 		getOptionContent: function(item){
 			var content;
 			var args = [{instance: this, item: item}];
-			if( ( content = $(this.input).triggerHandler('getoptioncontent', args) || (this.options.getOptionContent && this.options.getOptionContent.apply(this.input, args)) ) && content.indexOf && content.indexOf('option-value') == -1 ){
+			if( ( content = $(this.input).triggerHandler('getoptioncontent', args) ) && content.indexOf && content.indexOf('option-value') == -1 ){
 				content += '<span class="option-value" style="display: none;">'+ item.value +'</span>';
 			} 
 			if(content == null){

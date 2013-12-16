@@ -6,13 +6,17 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	var webkitVersion = chromeBugs && parseFloat((navigator.userAgent.match(/Safari\/([\d\.]+)/) || ['', '999999'])[1], 10);
 	
 	var iVal = options.iVal;
-	var invalidClass = iVal.errorClass || 'user-error';
+	if(!iVal.fieldWrapper){
+		iVal.fieldWrapper = ':not(span), :not(label), :not(em), :not(strong), :not(p)'; 
+	}
+	var invalidClass = iVal.errorClass || (iVal.errorClass = 'user-error');
 	var validClass = iVal.successClass || 'user-success';
 	
-	var invalidWrapperClass = iVal.errorWrapperClass || 'ws-invalid';
-	var successWrapperClass = iVal.successWrapperClass || 'ws-success';
-	var errorBoxClass = iVal.errorBoxClass || 'ws-errorbox';
-	var errorMessageClass = iVal.errorMessageClass || 'ws-errormessage';
+	var invalidWrapperClass = iVal.errorWrapperClass || (iVal.errorWrapperClass = 'ws-invalid');
+	var successWrapperClass = iVal.successWrapperClass || (iVal.successWrapperClass = 'ws-success');
+	var errorBoxClass = iVal.errorBoxClass || (iVal.errorBoxClass = 'ws-errorbox');
+	var errorMessageClass = iVal.errorMessageClass || (iVal.errorMessageClass = 'ws-errormessage');
+	
 	var checkTypes = {checkbox: 1, radio: 1};
 	
 	var loader = webshims.loader;
@@ -532,15 +536,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		},
 		getFieldWrapper: function(elem){
 			var fieldWrapper;
-			if(iVal.fieldWrapper){
-				fieldWrapper = (typeof iVal.fieldWrapper == "function") ? iVal.fieldWrapper.apply(this, arguments) : $(elem).parent().closest(iVal.fieldWrapper);
-				if(!fieldWrapper.length){
-					fieldWrapper = false;
-					webshims.error("could not find fieldwrapper: "+ iVal.fieldWrapper);
-				}
-			}
-			if(!fieldWrapper){
-				fieldWrapper = $(elem).parent().closest(':not(span), :not(label), :not(em), :not(strong), :not(p)');
+			fieldWrapper = (typeof iVal.fieldWrapper == "function") ? iVal.fieldWrapper.apply(this, arguments) : $(elem).parent().closest(iVal.fieldWrapper);
+			if(!fieldWrapper.length){
+				webshims.error("could not find fieldwrapper: "+ iVal.fieldWrapper);
 			}
 			return fieldWrapper;
 		},
@@ -930,7 +928,13 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			}
 		});
 	}
-	
+	if(webshims.cfg.debug !== false){
+		$(function(){
+			if($('form.ws-instantvalidation').length){
+				webshims.error('.ws-instantvalidation was renamed to .ws-validate');
+			}
+		});
+	}
 	addModule('form-combat', {
 		d: ['dom-support'],
 		test: ! (($.mobile && ($.mobile.selectmenu || $.mobile.checkboxradio)) || $.fn.select2 || $.fn.chosen || $.fn.selectpicker || $.fn.selectBoxIt)

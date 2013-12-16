@@ -18,7 +18,7 @@
 		var prev;
 		var n = 0;
 		
-		var headings = $('h2,p.header').map(function(i, el){
+		var headings = $('h2[id],h3[id]').map(function(i, el){
 			return {
 				top: $(el).offset().top,
 				id: el.id
@@ -45,12 +45,10 @@
 				}
 				
 				if (prev) {
-					//prev.removeClass('color', '#000');
 					prev.removeClass('active');
 				}
 				
 				var a = $('a[href="#' + h.id + '"]');
-				a.css('color', '#18b6e5');
 				a.addClass('active');
 				
 				prev = a;

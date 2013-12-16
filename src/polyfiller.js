@@ -979,11 +979,9 @@
 					}
 				},
 				iVal: {
-					handleBubble: true,
-					sel: '.ws-instantvalidation',
+					sel: '.ws-validate',
+					handleBubble: 'hide',
 					recheckDelay: 400
-//					,hideBubble: undefined,
-//					,fieldWrapper: undefined
 //					,fx: 'slide'
 				}
 	//			,customMessages: false,

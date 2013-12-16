@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html>
+
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+		<meta name="viewport" content="width=device-width">
+		<title>Webshim - foms polyfill</title>
+		<link href="../css/styles.css" rel="stylesheet" />
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
+
+		<script src="../js-webshim/minified/polyfiller.js"></script>
+
+		<script>
+			webshims.setOptions('forms', {
+				lazyCustomMessages: true,
+				replaceValidationUI: true,
+				customDatalist: true
+			});
+			webshims.polyfill('forms');
+			// load all available polyfills
+		</script>
+
+	</head>
+
+	<body>
+
+		<div id="sidebar" class="interface">
+
+			<a class="toc_title" href="../index.html"> Webshim <span class="version">({{version}})</span> </a>
+			<ul class="toc_section">
+				<li>
+					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
+				</li>
+			</ul>
+
+			<a class="toc_title" href="#introduction"> Forms Introduction </a>
+
+			<a class="toc_title" href="#Locale-Settings"> Locale /errormessage Settings </a>
+			<ul class="toc_section">
+				
+				<li>
+					– <a href="#Locale-activeLang">Changing locale <code class="i">.activeLang</code></a>
+				</li>
+				<li>
+					– <a href="#Locale-validityMessages">Add new  or change locale <code class="i">.validityMessages</code></a>
+				</li>
+				<li>
+					- <a href="#Guide-fire-when-ready">Fire When Ready</a>
+				</li>
+				<li>
+					- <a href="#Guide-dom-abstractions">DOM Abstractions</a>
+				</li>
+			</ul>
+
+
+			
+
+		</div>
+
+		<div class="container">
+
+			<p>
+				<img id="logo" src="images/webshim2.png" alt="webshim" />
+			</p>
+
+			
+
+			<h2 id="introduction" class="header">Introduction</h2>
+
+			<p>
+				Webshim's <code class="i">forms</code> feautre implements the hole constraint validation API and some other realy nice form features (form-attribute, fieldset[disabled] [list]/datalist, setSelectionRange etc.) in incapable browsers. 
+			</p>
+			<p>The hole specified API can be used to extend and modify those features. This sections only describes some of the build-in extensions to the HTML5 standard.</p>
+			
+			<h2 id="Locale-Settings" class="header">Locale Settings</h2>
+			
+			<p>Changes to the locale settings normally only affect polyfilled browsers. To get those changes visible in capable browsers either the <code class="i">replaceValidationUI</code> or the <code class="i">iVal</code> (instant/live validation) feature should be used.</p>
+			
+			Locale-activeLang
+		</div>
+
+		<script src="demo-js/demo.js"></script>
+	</body>
+</html>
