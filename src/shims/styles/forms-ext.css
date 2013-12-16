@@ -126,31 +126,25 @@ input[type="color"] {
 
 .ws-date .mm,
 .ws-date .dd {
-  width: 23.5%; }
-  .no-boxsizing .ws-date .mm, .no-boxsizing
-  .ws-date .dd {
-    width: 16%; }
+  width: 23.5%;
+  min-width: 12%; }
 .ws-date .yy {
-  width: 48%; }
-  .no-boxsizing .ws-date .yy {
-    width: 40%; }
+  width: 48%;
+  min-width: 24%; }
 .ws-date.ws-month-select .dd {
-  width: 22%; }
-  .no-boxsizing .ws-date.ws-month-select .dd {
-    width: 13%; }
+  width: 22%;
+  min-width: 11%; }
 .ws-date.ws-month-select .mm {
-  width: 38%; }
+  width: 38%;
+  min-width: 19%; }
 .ws-date.ws-month-select .yy {
-  width: 36%; }
-  .no-boxsizing .ws-date.ws-month-select .yy {
-    width: 30%; }
+  width: 36%;
+  min-width: 18%; }
 
 .ws-month .mm,
 .ws-month .yy {
-  width: 47.9%; }
-  .no-boxsizing .ws-month .mm, .no-boxsizing
-  .ws-month .yy {
-    width: 41%; }
+  width: 47.9%;
+  min-width: 24%; }
 
 /* range */
 .ws-range {
@@ -350,10 +344,14 @@ input[type="color"] {
       background: #eee;
       z-index: 1;
       color: #333; }
-      .input-picker .prev-controls button:before,
+      .input-picker .prev-controls button[class*="ws-super-"]:after, .input-picker .prev-controls button:before,
+      .input-picker .next-controls button[class*="ws-super-"]:after,
       .input-picker .next-controls button:before {
         display: inline-block;
-        font-size: 0.84615em; }
+        content: " ";
+        width: 0px;
+        height: 0px;
+        border-style: solid; }
       .input-picker .prev-controls button span,
       .input-picker .next-controls button span {
         display: none; }
@@ -368,26 +366,32 @@ input[type="color"] {
         color: #ddd; }
   .input-picker .prev-controls {
     left: 1.53846em; }
-    .input-picker .prev-controls button:before {
-      margin-left: -0.11538em; }
+    .input-picker .prev-controls .ws-super-prev:after,
+    .input-picker .prev-controls .ws-super-prev:before,
     .input-picker .prev-controls .ws-prev:before {
-      content: "\25C0"; }
+      border-width: 0.35em 0.6em 0.35em 0;
+      border-color: transparent #333333 transparent transparent;
+      margin-left: -0.1em; }
     .input-picker .prev-controls .ws-super-prev {
       margin-right: 0.23077em;
       display: none; }
-      .input-picker .prev-controls .ws-super-prev:before {
-        content: "\23EA"; }
+      .input-picker .prev-controls .ws-super-prev[disabled], .input-picker .prev-controls .ws-super-prev:disabled {
+        display: none; }
   .input-picker .next-controls {
     right: 1.53846em; }
     .input-picker .next-controls button:before {
       margin-left: 0.11538em; }
+    .input-picker .next-controls .ws-super-next:before,
+    .input-picker .next-controls .ws-super-next:after,
     .input-picker .next-controls .ws-next:before {
-      content: "\25B6"; }
+      border-width: 0.35em 0 0.35em 0.6em;
+      border-color: transparent transparent transparent #333333;
+      margin-right: -0.1em; }
     .input-picker .next-controls .ws-super-next {
       margin-left: 0.23077em;
       display: none; }
-      .input-picker .next-controls .ws-super-next:before {
-        content: " \23E9"; }
+      .input-picker .next-controls .ws-super-next[disabled], .input-picker .next-controls .ws-super-next:disabled {
+        display: none; }
   .input-picker.time-popover .ws-picker-body {
     padding-top: 2.76923em; }
   .input-picker .ws-picker-body {
@@ -415,8 +419,8 @@ input[type="color"] {
         float: right; }
   .input-picker .ws-picker-header select {
     display: none; }
-  .input-picker[data-currentview="setMonthList"] .ws-picker-header select {
-    max-width: 95%; }
+  .input-picker[data-currentview="setMonthList"] .ws-picker-header select, .input-picker[data-currentview="setYearList"] .ws-picker-header select {
+    max-width: 90%; }
   .input-picker[data-currentview="setDayList"] .ws-picker-header select {
     max-width: 40%; }
   .input-picker[data-currentview="setDayList"] .ws-picker-header select.month-select {
@@ -425,8 +429,6 @@ input[type="color"] {
     top: -2.30769em; }
     .input-picker.time-popover .ws-picker-header button {
       font-size: 1.15385em; }
-  .input-picker.ws-year-buttons .ws-picker-header {
-    margin: 0 5em; }
   .input-picker .ws-picker-header {
     position: absolute;
     top: -3.07692em;
@@ -440,14 +442,32 @@ input[type="color"] {
       padding: 0.30769em 0;
       font-weight: 700;
       color: #000; }
+      .input-picker .ws-picker-header button .month-digit,
+      .input-picker .ws-picker-header button .monthname-short {
+        display: none; }
+      .input-picker .ws-picker-header button:after {
+        display: none;
+        content: " ";
+        margin: -0.1em 0.5em 0;
+        width: 0px;
+        height: 0px;
+        border-style: solid;
+        border-width: 0 0.3em 0.6em 0.3em;
+        border-color: transparent transparent #333333 transparent;
+        vertical-align: middle; }
       .input-picker .ws-picker-header button:hover {
         text-decoration: underline; }
+      .input-picker .ws-picker-header button[disabled]:after {
+        display: none !important; }
       .input-picker .ws-picker-header button[disabled]:hover {
         text-decoration: none; }
   .input-picker .picker-grid {
     position: relative;
     zoom: 1;
     overflow: hidden; }
+    .input-picker .picker-grid .montname,
+    .input-picker .picker-grid .month-digit {
+      display: none; }
   .input-picker.ws-size-1 .picker-list {
     float: none;
     width: auto; }
@@ -460,8 +480,6 @@ input[type="color"] {
     background: #fff; }
     .input-picker .picker-list tr {
       border: 0; }
-    .input-picker .picker-list .other-month-row {
-      display: none; }
     .input-picker .picker-list th,
     .input-picker .picker-list td {
       padding: 0.23077em 0.38462em;
@@ -498,10 +516,12 @@ input[type="color"] {
       text-transform: uppercase;
       font-weight: 700; }
     .input-picker .picker-list .week-header,
-    .input-picker .picker-list td.week-cell {
+    .input-picker .picker-list .week-cell {
       display: none; }
     .input-picker .picker-list th, .input-picker .picker-list td {
       width: 14.2856%; }
+  .input-picker .other-month-row {
+    display: none; }
   .input-picker .ws-options {
     margin: 0.76923em 0 0;
     border-top: 0.07692em solid #eeeeee;

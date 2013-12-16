@@ -50,6 +50,9 @@ div#sidebar {
         text-decoration: none;
         color: black;
       }
+        .toc_section li a.active {
+          color: #18b6e5;
+        } 
         .toc_section li a:hover {
           text-decoration: underline;
         }

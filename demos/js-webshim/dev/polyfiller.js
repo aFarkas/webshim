@@ -1,12 +1,50 @@
 (function (factory) {
+	var timer;
+	var addAsync = function(){
+		if(!window.asyncWebshims){
+			if(!window.asyncWebshims){
+				window.asyncWebshims = {
+					cfg: [],
+					ready: []
+				};
+			}
+		}
+	};
+	var start = function(){
+		if(window.jQuery){
+			factory(jQuery);
+			factory = jQuery.noop;
+			clearInterval(timer);
+		}
+		if (typeof define === 'function' && define.amd && define.amd.jQuery) {
+			define('polyfiller', ['jquery'], factory);
+			clearInterval(timer);
+		}
+		
+	};
+	var timer = setInterval(start, 1);
 	
-	if(window.jQuery){
-		factory(jQuery);
-		factory = jQuery.noop;
-	}
-	if (typeof define === 'function' && define.amd && define.amd.jQuery) {
-		define('polyfiller', ['jquery'], factory);
-	}
+	window.webshims = {
+		setOptions: function(){
+			addAsync();
+			window.asyncWebshims.cfg.push(arguments);
+		},
+		ready: function(){
+			addAsync();
+			window.asyncWebshims.ready.push(arguments);
+		},
+		activeLang: function(lang){
+			addAsync();
+			window.asyncWebshims.lang = lang;
+		},
+		polyfill: function(features){
+			addAsync();
+			window.asyncWebshims.polyfill = features;
+		}
+	};
+	window.webshim = window.webshims;
+	
+	start();
 }(function($){
 	"use strict";
 	if (typeof WSDEBUG === 'undefined') {
@@ -22,6 +60,7 @@
 	var Object = window.Object;
 	var html5 = window.html5 || {};
 	var firstRun;
+	var webshims = window.webshims;
 	
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
 	
@@ -30,8 +69,8 @@
 	}
 	
 	
-	var webshims = {
-		version: '1.11.6',
+	$.extend(webshims, {
+		version: '1.12.0-pre',
 		cfg: {
 			
 			//addCacheBuster: false,
@@ -487,7 +526,7 @@
 				};
 			})()
 		}
-	};
+	});
 	
 	/*
 	 * shortcuts
@@ -1005,7 +1044,7 @@
 		addPolyfill(fNuAPI, {
 			f: 'forms-ext',
 			options: {
-				types: 'datetime-local month date time range number'
+				types: 'date time range number'
 			},
 			test: function(){
 				var ret = true;
@@ -1054,11 +1093,9 @@
 			d: ['forms', DOMSUPPORT, fNuAPI, 'range-ui'],
 			css: 'styles/forms-ext.css',
 			options: {
-				
 				widgets: {
 					calculateWidth: true,
-					monthNames: 'monthNamesShort',
-					monthNamesHead: 'monthNames'
+					anmiate: true
 				}
 	//			,replaceUI: false
 			},
@@ -1194,7 +1231,17 @@
 	;
 	if(asyncWebshims){
 		if(asyncWebshims.cfg){
-			webshims.setOptions(asyncWebshims.cfg);
+			if(!asyncWebshims.cfg.length){
+				asyncWebshims.cfg = [asyncWebshims.cfg];
+			}
+			$.each(asyncWebshims.cfg, function(i, cfg){
+				webshims.setOptions.apply(webshims, cfg);
+			});
+		}
+		if(asyncWebshims.ready){
+			$.each(asyncWebshims.ready, function(i, ready){
+				webshims.ready.apply(webshims, ready);
+			});
 		}
 		if(asyncWebshims.lang){
 			webshims.activeLang(asyncWebshims.lang);
@@ -1203,6 +1250,6 @@
 			webshims.polyfill(asyncWebshims.polyfill);
 		}
 	}
-	
+	webshims.isReady('jquery', true);
 	return webshims;
 }));

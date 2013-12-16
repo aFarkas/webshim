@@ -182,37 +182,26 @@ input[type="color"] {
 	.mm,
 	.dd {
 		width: 23.5%;
-		
-		.no-boxsizing & {
-			width: 16%;
-		}
+		min-width: 12%;
 	}
 	.yy {
 		width: 48%;
-		
-		.no-boxsizing & {
-			width: 40%;
-		}
+		min-width: 24%;
 	}
 	&.ws-month-select {
 		
 		.dd {
 			width: 22%;
-			
-			.no-boxsizing & {
-				width: 13%;
-			}
+			min-width: 11%;
 		}
 		.mm {
 			width: 38%;
+			min-width: 19%;
 		}
 		
 		.yy {
 			width: 36%;
-			
-			.no-boxsizing & {
-				width: 30%;
-			}
+			min-width: 18%;
 		}
 	}
 }
@@ -221,10 +210,7 @@ input[type="color"] {
 	.mm,
 	.yy {
 		width: 47.9%;
-		
-		.no-boxsizing & {
-			width: 41%;
-		}
+		min-width: 24%;
 	}
 }
 
@@ -449,7 +435,7 @@ $button-bgcolor: #f5f5f5;
 		.ws-prev,
 		.ws-next,
 		.ws-super-prev,
-		.ws-super-next		{
+		.ws-super-next	{
 			display: none;
 		}
 	}
@@ -507,9 +493,13 @@ $button-bgcolor: #f5f5f5;
 			z-index: 1;
 			color: #333;
 			
+			&[class*="ws-super-"]:after,
 			&:before {
 				display: inline-block;
-				font-size: em(11);
+				content: " ";
+				width: 0px;
+				height: 0px;
+				border-style: solid;
 			}
 			
 			span {
@@ -531,18 +521,19 @@ $button-bgcolor: #f5f5f5;
 	.prev-controls {
 		left: em(20);
 		
-		button:before {
-			margin-left: em(-1.5);
-		}
-
+		.ws-super-prev:after,
+		.ws-super-prev:before,
 		.ws-prev:before {
-			content: "\25C0";
+			border-width: 0.35em 0.6em 0.35em 0;
+			border-color: transparent #333 transparent transparent;
+			margin-left: -0.1em;
 		}
 		.ws-super-prev {
 			margin-right: em(3);
 			display: none;
-			&:before {
-				content: "\23EA";
+			&[disabled],
+			&:disabled {
+				display: none;
 			}
 		}
 		
@@ -555,16 +546,20 @@ $button-bgcolor: #f5f5f5;
 			margin-left: em(1.5);
 		}
 		
+		.ws-super-next:before,
+		.ws-super-next:after,
 		.ws-next:before {
-			content: "\25B6";
+			border-width: 0.35em 0 0.35em 0.6em;
+			border-color: transparent transparent transparent #333;
+			margin-right: -0.1em;
 		}
 		
 		.ws-super-next {
 			margin-left: em(3);
 			display: none;
-			
-			&:before {
-				content: " \23E9";
+			&[disabled],
+			&:disabled	{
+				display: none;
 			}
 		}
 	}
@@ -613,8 +608,9 @@ $button-bgcolor: #f5f5f5;
 		display: none;
 	}
 	
-	&[data-currentview="setMonthList"] .ws-picker-header  select {
-		max-width: 95%;
+	&[data-currentview="setMonthList"] .ws-picker-header  select,
+	&[data-currentview="setYearList"] .ws-picker-header  select{
+		max-width: 90%;
 	}
 	
 	&[data-currentview="setDayList"] .ws-picker-header select {
@@ -633,10 +629,6 @@ $button-bgcolor: #f5f5f5;
 		}
 	}
 	
-	&.ws-year-buttons .ws-picker-header {
-		margin: 0 em(65);
-	}
-	
 	
 	.ws-picker-header {
 		position: absolute;
@@ -653,9 +645,30 @@ $button-bgcolor: #f5f5f5;
 			font-weight: 700;
 			color: #000;
 			
+			.month-digit,
+			.monthname-short {
+				display: none;
+			}
+			
+			&:after {
+				display: none;
+				content: " ";
+				margin: -0.1em 0.5em 0;
+				width: 0px;
+				height: 0px;
+				border-style: solid;
+				border-width: 0 0.3em 0.6em 0.3em;
+				border-color: transparent transparent #333 transparent;
+				vertical-align: middle;
+				
+			}
 
 			&:hover {
 				text-decoration: underline;
+			}
+			
+			&[disabled]:after {
+				display: none !important;
 			}
 			
 			&[disabled]:hover {
@@ -669,6 +682,11 @@ $button-bgcolor: #f5f5f5;
 		position: relative;
 		zoom: 1;
 		overflow: hidden;
+		
+		.montname,
+		.month-digit {
+			display: none;
+		}
 	}
 	
 	&.ws-size-1 .picker-list  {
@@ -687,10 +705,6 @@ $button-bgcolor: #f5f5f5;
 		
 		tr {
 			border: 0;
-		}
-		
-		.other-month-row {
-			display: none;
 		}
 
 		th,
@@ -731,8 +745,6 @@ $button-bgcolor: #f5f5f5;
 				color: #888;
 				background-color: #fff;
 			}
-			
-			
 		}
 		
 		table {
@@ -752,7 +764,7 @@ $button-bgcolor: #f5f5f5;
 		}
 		
 		.week-header,
-		td.week-cell {
+		.week-cell {
 			display: none;
 		}
 
@@ -761,7 +773,10 @@ $button-bgcolor: #f5f5f5;
 		}
 	}
 
-
+	.other-month-row {
+		display: none;
+	}
+	
 	.ws-options {
 		margin: em(10) 0 0;
 		border-top: em(1) solid #eee;

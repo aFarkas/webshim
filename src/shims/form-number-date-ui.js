@@ -828,14 +828,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				}
 				
 				
-				if(!o.min && typeof o.relMin == 'number'){
-					o.min = this.asValue(this.getRelNumber(o.relMin));
-					$.prop(this.orig, 'min', o.min);
-				}
 				
-				if(!o.max && typeof o.relMax == 'number'){
-					o.max = this.asValue(this.getRelNumber(o.relMax));
-					$.prop(this.orig, 'max', o.max);
+				if((!o.max && typeof o.relMax == 'number') || (!o.min && typeof o.relMin == 'number')){
+					webshims.error('relMax/relMin are not supported anymore')
 				}
 				this._init = true;
 			},

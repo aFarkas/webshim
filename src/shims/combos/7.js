@@ -492,34 +492,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		webshims.ready('WINDOWLOAD', switch$);
 		
 	}
-//	(function(){
-//		var hostNames = {
-//			'afarkas.github.io': 1,
-//			localhost: 1,
-//			'127.0.0.1': 1
-//		};
-//		
-//		if( webshims.cfg.debug && (hostNames[location.hostname] || location.protocol == 'file:') ){
-//			var list = $('<ul class="webshims-debug-list" />');
-//			webshims.errorLog.push = function(message){
-//				list.appendTo('body');
-//				$('<li style="display: none;">'+ message +'</li>')
-//					.appendTo(list)
-//					.slideDown()
-//					.delay(3000)
-//					.slideUp(function(){
-//						$(this).remove();
-//						if(!$('li', list).length){
-//							list.detach();
-//						}
-//					})
-//				;
-//			};
-//			$.each(webshims.errorLog, function(i, message){
-//				webshims.errorLog.push(message);
-//			});
-//		}
-//	})();
 
 	//shortcus
 	var modules = webshims.modules;

@@ -14,7 +14,6 @@
     <script src="js-webshim/minified/polyfiller.js"></script>
     
     <script>
-    	webshims.setOptions('waitReady', false);
         webshims.polyfill(); // load all available polyfills
     </script>
 
@@ -1027,64 +1026,6 @@ webshims.register('mediaelement', function($, webshims, window, document, undefi
 </code></pre>
     </div>
 
-    <script>
-        // Set up the 'play' buttons for each runnable code example.
-        $(function () {
-        	return;
-            $('.runnable').each(function () {
-                var code = this;
-                var button = '<div class="run" title="Run"></div>';
-                $(button).insertBefore(code).bind('click', function () {
-                    eval($(code).text());
-                });
-            });
-
-        });
-
-
-        // highlight the active menu. Modified from http://expressjs.com/app.js
-        $(function(){
-          var prev;
-          var n = 0;
-
-          var headings = $('h2,p.header').map(function(i, el){
-            return {
-              top: $(el).offset().top,
-              id: el.id
-            }
-          });
-
-          function closest() {
-            var h;
-            var top = $(window).scrollTop();
-            var i = headings.length;
-            while (i--) {
-              h = headings[i];
-              if (top >= h.top) return h;
-            }
-          }
-
-          $(document).scroll(function(){
-            var h = closest();
-            console.log ('closest', h);
-            if (!h) return;
-
-            if (prev) {
-              prev.css('color', '#000');
-              //prev.removeClass('active');
-              //prev.parent().parent().removeClass('active');
-            }
-
-            var a = $('a[href="#' + h.id + '"]');
-            a.css('color', '#18b6e5');
-            //a.addClass('active');
-            //a.parent().parent().addClass('active');
-
-            prev = a;
-          });
-        });
-
-    </script>
-    <script src="demo-js/src/prism.js"></script>
+    <script src="demo-js/demo.js" async="" defer=""></script>
 </body>
 </html>
