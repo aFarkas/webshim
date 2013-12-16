@@ -449,8 +449,7 @@ var swfmini = function() {
 		}
 	};
 }();
-
-webshims.register('filereader', function( $, webshims ){
+;webshims.register('filereader', function( $, webshims ){
 	"use strict";
 	/**
 	 * Code is based on https://github.com/Jahdrien/FileReader

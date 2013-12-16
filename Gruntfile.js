@@ -67,7 +67,7 @@ module.exports = function(grunt){
 				files: ['src/**/*.js'],
 				tasks: ['webshimscombos', 'concat', 'cfgcopymin', 'copy']
 			},
-			js: {
+			demos: {
 				files: ['demos/demo-js/src/**/*.js'],
 				tasks: ['concat']
 			}
@@ -100,11 +100,11 @@ module.exports = function(grunt){
 				
 				concatCfg = grunt.config('concat');
 				if(concatCfg){
-					concatCfg.combos = combos;
+					concatCfg.combos = {files: combos};
 				} else {
 					concatCfg = combos;
 				}
-				
+				//grunt.warn(JSON.stringify(concatCfg))
 				grunt.config('concat', concatCfg);
 				
 				done(code);

@@ -1000,6 +1000,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					});
 				}
 			};
+			
 			var select = function(obj){
 				var oldLang = obj.__active;
 				var selectLang = function(i, lang){
@@ -1007,6 +1008,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					if(obj[lang] || obj.availableLangs.indexOf(lang) != -1){
 						if(obj[lang]){
 							obj.__active = obj[lang];
+							obj.__activeName = lang;
 						} else {
 							load(obj.langSrc+lang, obj, curLang.join());
 						}
@@ -1016,6 +1018,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				$.each(curLang, selectLang);
 				if(!obj.__active){
 					obj.__active = obj[''];
+					obj.__activeName = '';
 				}
 				if(oldLang != obj.__active){
 					$(obj).trigger('change');

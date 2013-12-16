@@ -449,8 +449,7 @@ var swfmini = function() {
 		}
 	};
 }();
-
-(function(Modernizr, webshims){
+;(function(Modernizr, webshims){
 	"use strict";
 	var $ = webshims.$;
 	var hasNative = Modernizr.audio && Modernizr.video;
@@ -1143,8 +1142,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	}
 	webshims.ready('track', loadTrackUi);
 });
-})(Modernizr, webshims);
-webshims.register('track', function($, webshims, window, document, undefined){
+})(Modernizr, webshims);;webshims.register('track', function($, webshims, window, document, undefined){
 	"use strict";
 	var mediaelement = webshims.mediaelement;
 	var id = new Date().getTime();

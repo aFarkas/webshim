@@ -1,4 +1,4 @@
-(function($){
+webshims.ready('jquery', function($){
 	// Set up the 'play' buttons for each runnable code example.
 	//todo need to write a prism plugin
 	/*
@@ -62,5 +62,34 @@
 		$(document).on('scroll', _onScroll);
 		_onScroll();
 	});
-})(jQuery);
+	
+	
+	$(function(){
+		var langs = webshims.validityMessages.availableLangs.concat(['de', 'en', 'en-AU', 'en-GB', 'en-US']).sort();
+		
+		langs.unshift('');
+		$('select.active-lang').each(function(){
+			var select = $(this);
+			var options = langs.map(function(lang){
+				return '<option>'+ lang +'</option>';
+			});
+			var onLangChange = function(){
+				select.val(this.__activeName);
+			};
+			select
+				.html(options)
+				.on('change', function(){
+					var value = select.val();
+					if(value){
+						webshims.activeLang(value);
+					}
+				})
+			;
+			$(webshims.validityMessages)
+				.on('change', onLangChange)
+				.each(onLangChange)
+			;
+		});
+	});
+});
 	

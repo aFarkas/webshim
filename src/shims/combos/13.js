@@ -691,8 +691,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	}
 	webshims.ready('track', loadTrackUi);
 });
-})(Modernizr, webshims);
-webshims.register('track', function($, webshims, window, document, undefined){
+})(Modernizr, webshims);;webshims.register('track', function($, webshims, window, document, undefined){
 	"use strict";
 	var mediaelement = webshims.mediaelement;
 	var id = new Date().getTime();

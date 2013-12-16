@@ -6,9 +6,19 @@
 		<meta http-equiv="X-UA-Compatible" content="chrome=1" />
 		<meta name="viewport" content="width=device-width">
 		<title>Webshim - foms polyfill</title>
+		
+		<script>
+			(function(){
+				var src = (Object.defineProperty && window.addEventListener) ?
+					'http://code.jquery.com/jquery-2.0.3.min.js' :
+					'http://code.jquery.com/jquery-1.10.1.min.js'
+				;
+				
+				document.write('<script src="'+ src +'" async=""><\/script>');
+			})();
+		</script>
 		<link href="../css/styles.css" rel="stylesheet" />
 
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 		<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
 
 		<script src="../js-webshim/minified/polyfiller.js"></script>
@@ -38,7 +48,7 @@
 
 			<a class="toc_title" href="#introduction"> Forms Introduction </a>
 
-			<a class="toc_title" href="#Locale-Settings"> Locale /errormessage Settings </a>
+			<a class="toc_title" href="#Locale-Settings"> Locale / errormessage Settings </a>
 			<ul class="toc_section">
 				
 				<li>
@@ -48,7 +58,7 @@
 					– <a href="#Locale-validityMessages">Add new  or change locale <code class="i">.validityMessages</code></a>
 				</li>
 				<li>
-					- <a href="#Guide-fire-when-ready">Fire When Ready</a>
+					- <a href="#Locale-customMessages"><code class="i">customMessages</code> / <code class="i">lazyCustomMessages</code></a>
 				</li>
 				<li>
 					- <a href="#Guide-dom-abstractions">DOM Abstractions</a>
@@ -63,25 +73,49 @@
 		<div class="container">
 
 			<p>
-				<img id="logo" src="images/webshim2.png" alt="webshim" />
+				<img id="logo" src="../images/webshim2.png" alt="webshim" />
 			</p>
-
-			
 
 			<h2 id="introduction" class="header">Introduction</h2>
 
 			<p>
-				Webshim's <code class="i">forms</code> feautre implements the hole constraint validation API and some other realy nice form features (form-attribute, fieldset[disabled] [list]/datalist, setSelectionRange etc.) in incapable browsers. 
+				Webshim's <code class="i">forms</code> feautre implements the hole constraint validation API (validity, checkValidity, setCustomValidity, required, pattern ...) and some other really nice form features (output element, form-attribute, fieldset[disabled] [list]/datalist, setSelectionRange etc.) in incapable browsers. 
 			</p>
-			<p>The hole specified API can be used to extend and modify those features. This sections only describes some of the build-in extensions to the HTML5 standard.</p>
+			<p>The hole specified API can be used to extend and modify those features. This sections only describes some of the build-in extensions to the HTML5 standard. By combining those with webshim's extension you will get a powerfull toolset.</p>
 			
 			<h2 id="Locale-Settings" class="header">Locale Settings</h2>
 			
 			<p>Changes to the locale settings normally only affect polyfilled browsers. To get those changes visible in capable browsers either the <code class="i">replaceValidationUI</code> or the <code class="i">iVal</code> (instant/live validation) feature should be used.</p>
 			
-			Locale-activeLang
+			<h3 id="Locale-activeLang">Changing locale <code class="i">webshims.activeLang</code></h3>
+			
+			<p>The used locale settings can be read or changed using the <code class="i">webshims.activeLang</code> method.</p>
+<pre><code class="language-javascript">
+webshims.activeLang(); //returns current set language
+
+webshims.activeLang('en'); //set locale to en
+</code></pre>
+			<p>Webshim supports the following locales out of the box: <select class="active-lang"></select>.</p>
+			
+			<h3 id="Locale-validityMessages">Adding new / changing existing  locale settings and errormessages.</h3>
+			<p>Existing locale setting fiels can be found in the <a href="../js-webshim/dev/shims/i18n/">shims/i18n directory</a>. Simply take one of those files (save as new), embed it after the polyfiller.js and adjust it to your needs.</p>
+<pre data-src="../js-webshim/dev/shims/i18n/formcfg-en.js"><code class="language-javascript">
+</code></pre>
+			<p>Note: <code class="i">webshims.activeLang</code> with the corresponding language code has to called to activate your locale</p>
+<pre><code class="language-javascript">
+//locale definition with the locale code 'cd'
+webshims.validityMessages.cd = {
+	//your errormessages
+};
+webshims.formcfg.cd = {
+	//locale settings
+};
+
+//activate locale 'cd'
+webshims.activeLang('cd'); 
+</code></pre>
 		</div>
 
-		<script src="demo-js/demo.js"></script>
+		<script src="../demo-js/demo.js"></script>
 	</body>
 </html>

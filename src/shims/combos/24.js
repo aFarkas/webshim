@@ -792,8 +792,7 @@ switch(desc.proptype) {
 webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors);
 
 }); //webshims.ready end
-
-webshims.register('form-shim-extend2', function($, webshims, window, document, undefined, options){
+;webshims.register('form-shim-extend2', function($, webshims, window, document, undefined, options){
 "use strict";
 var emptyJ = $([]);
 var isNumber = function(string){

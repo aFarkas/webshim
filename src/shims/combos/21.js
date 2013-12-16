@@ -178,8 +178,7 @@
 	});
 	webshims.isReady('geolocation', true);
 })(webshims.$);
-
-webshims.register('details', function($, webshims, window, doc, undefined, options){
+;webshims.register('details', function($, webshims, window, doc, undefined, options){
 	var isInterActiveSummary = function(summary){
 		var details = $(summary).parent('details');
 		if(details[0] && details.children(':first').get(0) === summary){
@@ -327,8 +326,7 @@ webshims.register('details', function($, webshims, window, doc, undefined, optio
 		initDetails = false;
 	});
 });
-
-webshims.register('mediaelement-jaris', function($, webshims, window, document, undefined, options){
+;webshims.register('mediaelement-jaris', function($, webshims, window, document, undefined, options){
 	"use strict";
 	
 	var mediaelement = webshims.mediaelement;
@@ -1536,8 +1534,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		})();
 	}
 	
-});
-webshims.register('track', function($, webshims, window, document, undefined){
+});;webshims.register('track', function($, webshims, window, document, undefined){
 	"use strict";
 	var mediaelement = webshims.mediaelement;
 	var id = new Date().getTime();

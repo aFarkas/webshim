@@ -1444,8 +1444,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 })(webshims.$, webshims);
 
 
-
-webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
+;webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(!webshims.addInputType){
 		webshims.error("you can not call forms-ext feature after calling forms feature. call both at once instead: $.webshims.polyfill('forms forms-ext')");
@@ -2033,8 +2032,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		});
 	}
 	
-});
-(function($){
+});;(function($){
 	
 	var id = 0;
 	var isNumber = function(string){
@@ -2603,8 +2601,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			 webshims._polyfill(['es5']);
 		}
 	}
-})(window.webshims ? webshims.$ : jQuery);
-webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
+})(window.webshims ? webshims.$ : jQuery);;webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var curCfg;
 	var formcfg = webshims.formcfg;
