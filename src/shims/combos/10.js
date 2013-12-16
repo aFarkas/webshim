@@ -40,34 +40,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		webshims.ready('WINDOWLOAD', switch$);
 		
 	}
-//	(function(){
-//		var hostNames = {
-//			'afarkas.github.io': 1,
-//			localhost: 1,
-//			'127.0.0.1': 1
-//		};
-//		
-//		if( webshims.cfg.debug && (hostNames[location.hostname] || location.protocol == 'file:') ){
-//			var list = $('<ul class="webshims-debug-list" />');
-//			webshims.errorLog.push = function(message){
-//				list.appendTo('body');
-//				$('<li style="display: none;">'+ message +'</li>')
-//					.appendTo(list)
-//					.slideDown()
-//					.delay(3000)
-//					.slideUp(function(){
-//						$(this).remove();
-//						if(!$('li', list).length){
-//							list.detach();
-//						}
-//					})
-//				;
-//			};
-//			$.each(webshims.errorLog, function(i, message){
-//				webshims.errorLog.push(message);
-//			});
-//		}
-//	})();
 
 	//shortcus
 	var modules = webshims.modules;
@@ -2549,14 +2521,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				}
 				
 				
-				if(!o.min && typeof o.relMin == 'number'){
-					o.min = this.asValue(this.getRelNumber(o.relMin));
-					$.prop(this.orig, 'min', o.min);
-				}
 				
-				if(!o.max && typeof o.relMax == 'number'){
-					o.max = this.asValue(this.getRelNumber(o.relMax));
-					$.prop(this.orig, 'max', o.max);
+				if((!o.max && typeof o.relMax == 'number') || (!o.min && typeof o.relMin == 'number')){
+					webshims.error('relMax/relMin are not supported anymore')
 				}
 				this._init = true;
 			},

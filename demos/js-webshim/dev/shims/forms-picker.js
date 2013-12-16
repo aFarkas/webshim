@@ -328,7 +328,24 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 	var mousePress = function(e){
 		$(this)[e.type == 'mousepressstart' ? 'addClass' : 'removeClass']('mousepress-ui');
 	};
-	
+	var getMonthNameHTML = function(index, year, prefix){
+		var dateCfg = curCfg.date;
+		var str = [];
+		if(!prefix){
+			prefix = '';
+		}
+		$.each({monthNames: 'montname', monthDigits: 'month-digit', monthNamesShort: 'monthname-short'}, function(prop, cName){
+			var name = [prefix + dateCfg[prop][index]];
+			if(year){
+				name.push(year);
+				if(dateCfg.showMonthAfterYear){
+					name.reverse();
+				}
+			}
+			str.push('<span class="'+ cName +'">'+ name.join(' ') +'</span>');
+		});
+		return str.join('');
+	};
 	
 	var widgetProtos = {
 		_addBindings: function(){
@@ -927,7 +944,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				prevDisabled = picker.isInRange([start-1], max, min) ? {'data-action': 'setYearList','value': start-1} : false;
 			}
 			
-			str += '<div class="year-list picker-list ws-index-'+ j +'"><div class="ws-picker-header"><button disabled="disabled">'+ start +' – '+(start + 11)+'</button></div>';
+			str += '<div class="year-list picker-list ws-index-'+ j +'"><div class="ws-picker-header"><select data-action="setYearList" class="decade-select">'+ picker.createYearSelect(value, max, min, '', {start: start, step: 12 * size, label: start+' – '+(start + 11)}).join('') +'</select><button disabled="disabled"><span>'+ start +' – '+(start + 11)+'</span></button></div>';
 			lis = [];
 			for(i = 0; i < 12; i++){
 				val = start + i ;
@@ -1011,12 +1028,12 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			
 			str += '<div class="month-list picker-list ws-index-'+ j +'"><div class="ws-picker-header">';
 			
-			str += '<select data-action="setMonthList" class="year-select">'+ picker.createYearSelect(value, max, min).join('') +'</select> <button data-action="setYearList"'+disabled+' value="'+ value +'" tabindex="-1">'+ value +'</button>';
+			str += '<select data-action="setMonthList" class="year-select">'+ picker.createYearSelect(value, max, min).join('') +'</select> <button data-action="setYearList"'+disabled+' value="'+ value +'" tabindex="-1"><span>'+ value +'</span></button>';
 			str += '</div>';
 			
 			for(i = 0; i < 12; i++){
 				val = curCfg.date.monthkeys[i+1];
-				name = (curCfg.date[o.monthNames] || curCfg.date.monthNames)[i];
+				name = getMonthNameHTML(i);
 				classArray = [];
 				if(fullyDisabled || !picker.isInRange([value, val], max, min) ){
 					disabled = ' disabled=""';
@@ -1056,17 +1073,18 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 	};
 	
 	
+	
 	picker.getDayList = function(value, data){
 		
 		var j, i, k, day, nDay, name, val, disabled, lis,  prevDisabled, nextDisabled, yearNext, yearPrev, addTr, week, rowNum;
 		
-		var lastMotnh, curMonth, otherMonth, dateArray, monthName, fullMonthName, buttonStr, date2, classArray;
+		var lastMonth, curMonth, otherMonth, dateArray, monthName, fullMonthName, monthDigit, buttonStr, date2, classArray;
 		var o = data.options;
 		var size = o.size;
 		var max = o.max.split('-');
 		var min = o.min.split('-');
 		var currentValue = o.value.split('-');
-		var monthNames = curCfg.date[o.monthNamesHead] || curCfg.date[o.monthNames] || curCfg.date.monthNames; 
+		var dateCfg = curCfg.date;
 		var enabled = 0;
 		var str = [];
 		var date = new Date(value[0], value[1] - 1, 1);
@@ -1082,7 +1100,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		
 		for(j = 0;  j < size; j++){
 			date.setDate(1);
-			lastMotnh = date.getMonth();
+			lastMonth = date.getMonth();
 			rowNum = 0;
 			if(!j){
 				date2 = new Date(date.getTime());
@@ -1096,34 +1114,33 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			
 			
 			str.push('<div class="day-list picker-list ws-index-'+ j +'"><div class="ws-picker-header">');
-			monthName = ['<select data-action="setDayList" class="month-select" tabindex="0">'+ picker.createMonthSelect(dateArray, max, min, monthNames).join('') +'</select>', '<select data-action="setDayList" class="year-select" tabindex="0">'+ picker.createYearSelect(dateArray[0], max, min, '-'+dateArray[1]).join('') +'</select>'];
+			monthName = ['<select data-action="setDayList" class="month-select" tabindex="0">'+ picker.createMonthSelect(dateArray, max, min).join('') +'</select>', '<select data-action="setDayList" class="year-select" tabindex="0">'+ picker.createYearSelect(dateArray[0], max, min, '-'+dateArray[1]).join('') +'</select>'];
 			if(curCfg.date.showMonthAfterYear){
 				monthName.reverse();
 			}
 			str.push( monthName.join(' ') );
 			
-			fullMonthName = [curCfg.date.monthNames[(dateArray[1] * 1) - 1], dateArray[0]];
-			monthName = [monthNames[(dateArray[1] * 1) - 1], dateArray[0]];
-			if(curCfg.date.showMonthAfterYear){
-				monthName.reverse();
+			fullMonthName = [dateCfg.monthNames[(dateArray[1] * 1) - 1], dateArray[0]];
+			
+			if(dateCfg.showMonthAfterYear){
 				fullMonthName.reverse();
 			}
 			
 			str.push(  
-				'<button data-action="setMonthList"'+ (o.minView >= 2 ? ' disabled="" ' : '') +' value="'+ dateArray.date +'" tabindex="-1">'+ monthName.join(' ') +'</button>'
+				'<button data-action="setMonthList"'+ (o.minView >= 2 ? ' disabled="" ' : '') +' value="'+ dateArray.date +'" tabindex="-1">'+ getMonthNameHTML((dateArray[1] * 1) - 1, dateArray[0]) +'</button>'
 			);
 			
 			
 			str.push('</div><div class="picker-grid"><table role="grid" aria-label="'+ fullMonthName.join(' ')  +'"><thead><tr>');
 			
-			str.push('<th class="week-header">'+ curCfg.date.weekHeader +'</th>');
+			str.push('<th class="week-header">'+ dateCfg.weekHeader +'</th>');
 			
-			for(k = curCfg.date.firstDay; k < curCfg.date.dayNamesShort.length; k++){
-				str.push('<th class="day-'+ k +'"><abbr title="'+ curCfg.date.dayNames[k] +'">'+ curCfg.date.dayNamesShort[k] +'</abbr></th>');
+			for(k = dateCfg.firstDay; k < dateCfg.dayNamesShort.length; k++){
+				str.push('<th class="day-'+ k +'"><abbr title="'+ dateCfg.dayNames[k] +'">'+ dateCfg.dayNamesShort[k] +'</abbr></th>');
 			}
-			k = curCfg.date.firstDay;
+			k = dateCfg.firstDay;
 			while(k--){
-				str.push('<th class="day-'+ k +'"><abbr title="'+ curCfg.date.dayNames[k] +'">'+ curCfg.date.dayNamesShort[k] +'</abbr></th>');
+				str.push('<th class="day-'+ k +'"><abbr title="'+ dateCfg.dayNames[k] +'">'+ dateCfg.dayNamesShort[k] +'</abbr></th>');
 			}
 			str.push('</tr></thead><tbody><tr class="ws-row-0">');
 			
@@ -1133,7 +1150,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			for (i = 0; i < 99; i++) {
 				addTr = (i && !(i % 7));
 				curMonth = date.getMonth();
-				otherMonth = lastMotnh != curMonth;
+				otherMonth = lastMonth != curMonth;
 				day = date.getDay();
 				classArray = [];
 				
@@ -1162,7 +1179,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 						date.setDate(date.getDate() - nDay);
 						day = date.getDay();
 						curMonth = date.getMonth();
-						otherMonth = lastMotnh != curMonth;
+						otherMonth = lastMonth != curMonth;
 					}
 				}
 				
@@ -1230,7 +1247,6 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			step: $.prop(data.orig, 'step')
 		};
 		var o = data.options;
-		var monthNames = curCfg.date[o.monthNamesHead] || curCfg.date[o.monthNames] || curCfg.date.monthNames; 
 		var gridLabel = '';
 		
 		if(data.type == 'time'){
@@ -1241,8 +1257,8 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			if(tmpValue[1]){
 				value[3] = tmpValue[1];
 			}
-			label = value[2] +'. '+ (monthNames[(value[1] * 1) - 1]) +' '+ value[0];
-			gridLabel = ' aria-label="'+ label +'"';
+			gridLabel = ' aria-label="'+ value[2] +'. '+ (curCfg.date.monthNames[(value[1] * 1) - 1]) +' '+ value[0] +'"';
+			label = getMonthNameHTML((value[1] * 1) - 1, value[0], value[2] +'. ');
 			label = '<button tabindex="-1" data-action="setDayList" value="'+value[0]+'-'+value[1]+'-'+value[2]+'" type="button">'+label+'</button>';
 			valPrefix = value[0] +'-'+value[1]+'-'+value[2]+'T';
 		}
@@ -1328,30 +1344,43 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		return options;
 	};
 	
-	picker.createYearSelect = function(value, max, min, valueAdd){
-		
+	picker.createYearSelect = function(value, max, min, valueAdd, stepper){
+		if(!stepper){
+			stepper = {start: value, step: 1, label: value};
+		}
 		var temp;
 		var goUp = true;
 		var goDown = true;
-		var options = ['<option selected="">'+ value + '</option>'];
+		var options = ['<option selected="">'+ stepper.label + '</option>'];
 		var i = 0;
+		var createOption = function(value, add){
+			var value2, label;
+			if(stepper.step > 1){
+				value2 = value + stepper.step - 1;
+				label = value+' – '+value2;
+			} else {
+				label = value;
+			}
+			
+			if(picker.isInRange([value], max, min) || (value2 && picker.isInRange([value2], max, min))){
+				options[add]('<option value="'+ (value+valueAdd) +'">'+ label +'</option>');
+				return true;
+			}
+		};
 		if(!valueAdd){
 			valueAdd = '';
 		}
 		while(i < 18 && (goUp || goDown)){
 			i++;
-			temp = value-i;
-			if(goUp && picker.isInRange([temp], max, min)){
-				options.unshift('<option value="'+ (temp+valueAdd) +'">'+ temp +'</option>');
-			} else {
-				goUp = false;
+			if(goUp){
+				temp = stepper.start - (i * stepper.step);
+				goUp = createOption(temp, 'unshift');
 			}
-			temp = value + i;
-			if(goDown && picker.isInRange([temp], max, min)){
-				options.push('<option value="'+ (temp+valueAdd) +'">'+ temp +'</option>');
-			} else {
-				goDown = false;
+			if(goDown){
+				temp = stepper.start + (i * stepper.step);
+				goDown = createOption(temp, 'push');
 			}
+			
 		}
 		return options;
 	};
@@ -1519,23 +1548,15 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				});
 				popover.nextElement
 					.attr({'aria-label': curCfg.date.nextText})
-					.find('span')
-					.html(curCfg.date.nextText)
 				;
 				popover.prevElement
 					.attr({'aria-label': curCfg.date.prevText})
-					.find('span')
-					.html(curCfg.date.prevText)
 				;
 				popover.yearNextElement
 					.attr({'aria-label': curCfg.date.nextText})
-					.find('span')
-					.html(curCfg.date.nextText)
 				;
 				popover.yearPrevElement
 					.attr({'aria-label': curCfg.date.prevText})
-					.find('span')
-					.html(curCfg.date.prevText)
 				;
 				
 				
@@ -1566,6 +1587,10 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			o.size = 1;
 		}
 		
+		if(o.inlinePicker){
+			o.updateOnInput = true;
+		}
+		
 		popover.actionFn = function(obj){
 			if(actions[obj['data-action']]){
 				actions[obj['data-action']](obj.value, popover, data, 0);
@@ -1576,7 +1601,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		
 		
 		
-		popover.contentElement.html('<div class="prev-controls"><button class="ws-super-prev" tabindex="0"><span></span></button><button class="ws-prev" tabindex="0"><span></span></button></div> <div class="next-controls"><button class="ws-next" tabindex="0"><span></span></button><button class="ws-super-next" tabindex="0"><span></span></button></div><div class="ws-picker-body"></div><div class="ws-button-row"><button type="button" class="ws-current" data-action="changeInput" value="'+today[data.type]+'" tabindex="0"></button> <button type="button" data-action="changeInput" value="" class="ws-empty" tabindex="0"></button></div>');
+		popover.contentElement.html('<div class="prev-controls"><button class="ws-super-prev" tabindex="0"></button><button class="ws-prev" tabindex="0"></button></div> <div class="next-controls"><button class="ws-next" tabindex="0"></button><button class="ws-super-next" tabindex="0"></button></div><div class="ws-picker-body"></div><div class="ws-button-row"><button type="button" class="ws-current" data-action="changeInput" value="'+today[data.type]+'" tabindex="0"></button> <button type="button" data-action="changeInput" value="" class="ws-empty" tabindex="0"></button></div>');
 		popover.nextElement = $('button.ws-next', popover.contentElement);
 		popover.prevElement = $('button.ws-prev', popover.contentElement);
 		popover.yearNextElement = $('button.ws-super-next', popover.contentElement);
@@ -1590,9 +1615,6 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			.on('change', 'select[data-action]', actionfn)
 		;
 		
-		if(o.inlinePicker){
-			o.updateOnInput = true;
-		}
 		
 		$(o.orig).on('input', function(){
 			var currentView;

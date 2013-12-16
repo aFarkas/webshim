@@ -30,10 +30,9 @@
 		
 		<script>
 	
-//	 Issue #307 
 	webshims.setOptions('debug', 'noCombo');
 	
-	webshims.setOptions('forms', {replaceValidationUI: true, fixRangeChange: true,customDatalist: true,  addValidators: true});
+	//webshims.setOptions('forms', {replaceValidationUI: true, fixRangeChange: true,customDatalist: true,  addValidators: true});
 	webshims.setOptions('forms-ext', {
 		replaceUI: true
 		//time: {widgetPosition: {"my": "center", "at": "center"}}
@@ -55,8 +54,8 @@
 	
 	<body>
 		<div class="form-row">
-			<label for="range">range with: {"animate": true}, step="10" and datalist</label>
-			<input type="range" data-range='{"animate": true}' step="10" list="rangelist-1" />
+			<label for="range">range with: step="10" and datalist</label>
+			<input type="range" step="10" list="rangelist-1" />
 			<datalist id="rangelist-1">
 				<select>
 					<option value="0" label="0" />
@@ -75,7 +74,7 @@
 		</div>
 		
 		<div class="form-row range-ticks-ballon">
-			<style scoped>
+			<style>
 				.range-ticks-ballon .ws-range {
 					font-size: 16px;
 				}
@@ -92,8 +91,8 @@
 					opacity: 1;
 				}
 			</style>
-			<label for="range">range with: {"animate": true}, step="10" and datalist (but CSS)</label>
-			<input type="range" data-range='{"animate": true}' step="10" list="rangelist-2" />
+			<label for="range">range with: step="10" and datalist (but CSS)</label>
+			<input type="range" step="10" list="rangelist-2" />
 			
 			<datalist id="rangelist-2">
 				<select>
@@ -120,31 +119,55 @@
 			
 		</div>
 		<div class="form-row date-css-config">
-			<style scoped>
+			<style>
 				.date-css-config .input-picker {
 					font-size: 16px;
 				}
+				
+				/* show up arrow */
+				.date-css-config .ws-picker-header button:after {
+					display: inline-block;
+				}
+				/* place up arrow after nav selects */
 				.date-css-config .ws-picker-header button {
+					width: auto;
+					max-width: 10%;
+				}
+				/* hide "up" text */
+				.date-css-config .ws-picker-header button > span {
 					display: none;
 				}
 				
+				/* show nav select and year buttons */
 				.date-css-config .ws-picker-header select,
-				.date-css-config .ws-super-prev,
-				.date-css-config .ws-super-next {
+				.date-css-config .input-picker .ws-super-prev,
+				.date-css-config .input-picker .ws-super-next {
 					display: inline-block;
 				}
 				
-				.date-css-config .week-header,
-				.date-css-config .week-cell {
+				/* show week numbers */
+				.date-css-config .input-picker .week-header,
+				.date-css-config .input-picker .week-cell {
 					display: table-cell;
 				}
 				
+				/* make othermonth unclickable */
 				.date-css-config .othermonth {
 					cursor: default;
 				}
 				
+				/* always show 6 rows (same height) */
 				.date-css-config .other-month-row {
 					display: table-row;
+				}
+				
+				/* hide short monthname and... */
+				.date-css-config  .picker-grid button .monthname-short {
+					display: none;
+				}
+				/* ... use month digits instead */
+				.date-css-config  .picker-grid button .month-digit {
+					display: inline-block;
 				}
 			</style>
 			<label>date</label>
