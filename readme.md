@@ -90,6 +90,7 @@ Webshims Lib uses many great third party scripts:
 | track           | BSD 2 clause                                 | https://github.com/cgiffard/Captionator                                       |
 | form-validators | ???                                          | https://sites.google.com/site/abapexamples/javascript/luhn-validation         |
 | color-picker    | MIT                                          | http://johndyer.name/post/2007/09/PhotoShop-like-JavaScript-Color-Picker.aspx |
+| forms-picker    | MIT                                          | https://github.com/brandonaaron/jquery-mousewheel                             |
 
 
 
