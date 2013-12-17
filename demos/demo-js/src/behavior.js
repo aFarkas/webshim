@@ -74,8 +74,9 @@ webshims.ready('jquery', function($){
 				return '<option>'+ lang +'</option>';
 			});
 			var onLangChange = function(){
-				select.val(this.__activeName);
+				select.val(this.__activeName ||  webshims.activeLang());
 			};
+			
 			select
 				.html(options)
 				.on('change', function(){

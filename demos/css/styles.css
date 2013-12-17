@@ -311,6 +311,7 @@ code[class*="language"] {
 	max-height:29em;
 	display:block;
 	overflow:scroll;
+	padding: 0;
 }
 
 /* Margin bottom to accomodate shadow */

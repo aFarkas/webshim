@@ -30,7 +30,7 @@
 				customDatalist: true
 			});
 			webshims.polyfill('forms');
-			// load all available polyfills
+			// load the forms polyfill
 		</script>
 
 	</head>
@@ -48,20 +48,34 @@
 
 			<a class="toc_title" href="#introduction"> Forms Introduction </a>
 
-			<a class="toc_title" href="#Locale-Settings"> Locale / errormessage Settings </a>
+			<a class="toc_title" href="#Locale-Settings"> Controlling Locale / errormessage Settings </a>
 			<ul class="toc_section">
 				
 				<li>
-					– <a href="#Locale-activeLang">Changing locale <code class="i">.activeLang</code></a>
+					– <a href="#Locale-activeLang">Changing locale <code>.activeLang</code></a>
 				</li>
 				<li>
-					– <a href="#Locale-validityMessages">Add new  or change locale <code class="i">.validityMessages</code></a>
+					– <a href="#Locale-validityMessages">Add new or change locale <code>.validityMessages</code></a>
 				</li>
 				<li>
-					- <a href="#Locale-customMessages"><code class="i">customMessages</code> / <code class="i">lazyCustomMessages</code></a>
+					- <a href="#Locale-customMessages"><code>customMessages</code> / <code>lazyCustomMessages</code></a>
 				</li>
 				<li>
-					- <a href="#Guide-dom-abstractions">DOM Abstractions</a>
+					- <a href="#Locale-markupMessages"><code>data-errormessage</code> attribute</a>
+				</li>
+				<li>
+					- <a href="#Locale-getErrorMessage"><code>.getErrorMessage</code> method</a>
+				</li>
+			</ul>
+
+			<a class="toc_title" href="#UI-Settings">Customizing UI/UX of form validation</a>
+			<ul class="toc_section">
+				
+				<li>
+					– <a href="#UI-replaceValidationUI"><code>replaceValidationUI</code> and <code>.user-error</code>/<code>.user-success</code></a>
+				</li>
+				<li>
+					– <a href="#UI-ival">Live validation with <code>iVal</code> option</a>
 				</li>
 			</ul>
 
@@ -75,13 +89,14 @@
 			<p>
 				<img id="logo" src="../images/webshim2.png" alt="webshim" />
 			</p>
+			
 
 			<h2 id="introduction" class="header">Introduction</h2>
 
 			<p>
-				Webshim's <code class="i">forms</code> feautre implements the hole constraint validation API (validity, checkValidity, setCustomValidity, required, pattern ...) and some other really nice form features (output element, form-attribute, fieldset[disabled] [list]/datalist, setSelectionRange etc.) in incapable browsers. 
+				Webshim's <code class="i">forms</code> feautre implements the hole constraint validation API (validity, checkValidity, setCustomValidity, required, pattern, novalidate ...) and some other really nice form features (output element, form-attribute, fieldset[disabled] [list]/datalist, setSelectionRange etc.) in incapable browsers. 
 			</p>
-			<p>The hole specified API can be used to extend and modify those features. This sections only describes some of the build-in extensions to the HTML5 standard. By combining those with webshim's extension you will get a powerfull toolset.</p>
+			<p>This document does not describe how to use those native/polyfilled features. It only describes the extensions build on top of it.</p>
 			
 			<h2 id="Locale-Settings" class="header">Locale Settings</h2>
 			
@@ -96,6 +111,7 @@ webshims.activeLang(); //returns current set language
 webshims.activeLang('en'); //set locale to en
 </code></pre>
 			<p>Webshim supports the following locales out of the box: <select class="active-lang"></select>.</p>
+		
 			
 			<h3 id="Locale-validityMessages">Adding new / changing existing  locale settings and errormessages.</h3>
 			<p>Existing locale setting fiels can be found in the <a href="../js-webshim/dev/shims/i18n/">shims/i18n directory</a>. Simply take one of those files (save as new), embed it after the polyfiller.js and adjust it to your needs.</p>
@@ -114,7 +130,43 @@ webshims.formcfg.cd = {
 //activate locale 'cd'
 webshims.activeLang('cd'); 
 </code></pre>
-		</div>
+			<h3 id="Locale-customMessages"><code class="i">customMessages</code>/<code class="i">lazyCustomMessages</code></h3>
+			<p>Normally the validationMessages are only loaded by incapable browsers with the options <code class="i">customMessages</code> or <code class="i">lazyCustomMessages</code> those can be loaded and used in all browsers.</p>
+			<p><code class="i">lazyCustomMessages</code> loads the messages only after window onload and therefore has no negative impact on the network performance.</p>
+<pre><code class="language-javascript">
+webshims.setOptions('forms', {
+	//set lazyCustomMessages to true
+	lazyCustomMessages: true,
+	//show custom styleable validation bubble
+	replaceValidationUI: true
+});
+
+//start polyfilling
+webshims.polyfill('forms');
+</code></pre>
+			<h3 id="Locale-markupMessages"><code class="i">data-errormessage</code> attribute</h3>
+			<p>The used validation message can also be controlled by markup using the <code class="i">data-errormessage</code> attribute.</p>
+			<p>The value of the data-errormessage attribute is either a simple string containing the errormessage or a valid JSON with different keys representing the different HTML5 validity constraints (<code>["valueMissing", "typeMismatch", "patternMismatch", "customError", "tooLong",  "badInput", "rangeUnderflow", "rangeOverflow","stepMismatch"]</code>)</p>
+			<iframe class="fiddle-example" width="100%" height="270" src="http://jsfiddle.net/trixta/YPCQP/embedded/html,result,js" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<p>In case <code class="i">customMessages</code> or <code class="i">lazyCustomMessages</code> are set to true the data-errormessage as a JSON can be also written as flattened data-errormessage-[dashed-key] attribute.</p>
+			<iframe class="fiddle-example" width="100%" height="200" src="http://jsfiddle.net/trixta/YT7m5/embedded/html,result,js" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			
+			<h3 id="Locale-getErrorMessage"><code class="i">$.getErrorMessage</code> method</h3>
+			<p><code class="i">.getErrorMessage</code> returns the validationMessage of an invalid form field. As an enhancement to the native <code>validationMessage</code> property the return value can be simpler controlled by the developer. It uses the first possible found message set by a) data-errormessage attribute, b) <code class="i">validityMessages</code> object or last c) native/polyfilled <code>validationMessage</code> property.</p>
+			<p><code class="language-javascript">$('input').getErrorMessage();</code></p>
+			<iframe class="fiddle-example" width="100%" height="350" src="http://jsfiddle.net/trixta/6ELuD/embedded/result,js,html" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			
+			<h2 id="UI-Settings">Customizing UI/UX of form validation</h2>
+			<p>HTML5 constraint form validation gives a very simple UI for form validation. In most cases developers want to enhance this UI. Webshim implementation allows this by using all native form features, but also gives some pre-build configuration options to implement clientside form validation with a very good user experience and great control over style and behavior.</p>
+			
+			<h3 id="UI-replaceValidationUI"><code class="i">replaceValidationUI</code> and <code class="i">.user-error</code>/<code class="i">.user-success</code></h3>
+			<p></p>
+			
+			<h3 id="UI-ival">Live form validation <code class="i">iVal</code></h3>
+			<p></p>
+			
+</div>
+			
 
 		<script src="../demo-js/demo.js"></script>
 	</body>
