@@ -960,7 +960,7 @@
 		
 		webshims.validationMessages = webshims.validityMessages = {
 			langSrc: 'i18n/formcfg-', 
-			availableLangs: ['ar', 'ch-ZN', 'cs', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'lt', 'nl', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ru', 'sv']
+			availableLangs: ['ar', 'ch-CN', 'cs', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'lt', 'nl', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ru', 'sv']
 		};
 		webshims.formcfg = $.extend({}, webshims.validationMessages);
 		

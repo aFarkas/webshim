@@ -1,5 +1,3 @@
-//errormessages for en are already included in webshims core, this is only for information (by default en is equal to jQuery.webshims.validityMessages[""]):
-
 webshims.validityMessages.en = {
 	"typeMismatch": {
 		"defaultMessage": "Please enter a valid value.",

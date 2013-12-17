@@ -559,7 +559,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				}
 				return ret || 'defaultMessage';
 			};
-			$.each(["customError","badInput","typeMismatch","rangeUnderflow","rangeOverflow","stepMismatch","tooLong","tooShort","patternMismatch","valueMissing","tooShort"], function(i, name){
+			$.each(["customError","badInput","typeMismatch","rangeUnderflow","rangeOverflow","stepMismatch","tooLong","tooShort","patternMismatch","valueMissing"], function(i, name){
 				var cName = name.replace(/[A-Z]/, deCamelCase);
 				fields[name] = '.'+cName+', .'+name+', .'+(name).toLowerCase()+', [data-errortype="'+ name +'"]';
 			});
@@ -742,8 +742,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	
 	if(options.replaceValidationUI){
 		$(document).on('firstinvalid', function(e){
-			if(!e.isInvalidUIPrevented()){
+			if(!e.isDefaultPrevented()){
 				e.preventDefault();
+				
 				setTimeout(function(){
 					webshims.validityAlert.showFor( e.target ); 
 				}, 4);
@@ -767,9 +768,6 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			if(!firstEvent){
 				//trigger firstinvalid
 				firstEvent = $.Event('firstinvalid');
-				firstEvent.isInvalidUIPrevented = e.isDefaultPrevented;
-				var firstSystemInvalid = $.Event('firstinvalidsystem');
-				$(document).triggerHandler(firstSystemInvalid, {element: e.target, form: e.target.form, isInvalidUIPrevented: e.isDefaultPrevented});
 				jElm.trigger(firstEvent);
 			}
 
