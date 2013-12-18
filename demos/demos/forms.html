@@ -7,6 +7,9 @@
 		<meta name="viewport" content="width=device-width">
 		<title>Webshim - foms polyfill</title>
 		
+		
+		<link href="../css/styles.css" rel="stylesheet" />
+		
 		<script>
 			(function(){
 				var src = (Object.defineProperty && window.addEventListener) ?
@@ -14,14 +17,12 @@
 					'http://code.jquery.com/jquery-1.10.1.min.js'
 				;
 				
-				document.write('<script src="'+ src +'" async=""><\/script>');
+				document.write('<script src="'+ src +'"><\/script>');
 			})();
 		</script>
-		<link href="../css/styles.css" rel="stylesheet" />
+		<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
 
-		<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
-
-		<script src="../js-webshim/minified/polyfiller.js"></script>
+		<script src="../../js-webshim/minified/polyfiller.js"></script>
 
 		<script>
 			webshims.setOptions('forms', {
@@ -89,7 +90,16 @@
 			<p>
 				<img id="logo" src="../images/webshim2.png" alt="webshim" />
 			</p>
-			
+			<form action="">
+			<input list="d" required />
+			<datalist id="d">
+				<option value="dfd" />
+				<option value="dfd" />
+				<option value="dfd" />
+				<option value="dfd" />
+			</datalist>
+			<input type="submit" />
+			</form>
 
 			<h2 id="introduction" class="header">Introduction</h2>
 

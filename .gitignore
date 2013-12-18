@@ -2,6 +2,7 @@
 *.un~
 *.tmp_*~
 todo.txt
+_extends.css
 tests/performance.html
 dev-playground/*
 node_modules/*

@@ -1,6 +1,9 @@
 /*global module:false*/
 module.exports = function(grunt){
-
+	var DISTPATH = "js-webshim";
+	var MINPATH = DISTPATH+"/minified";
+	var DEVPATH = DISTPATH+"/dev";
+	
 	// Project configuration.
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
@@ -23,7 +26,7 @@ module.exports = function(grunt){
 		},
 		//copy and uglify are changed through cfgcopymin
 		copy: {},
-		cssmin: getFiles('src', 'demos/js-webshim/minified', '**/*.css'),
+		cssmin: getFiles('src', MINPATH, '**/*.css'),
 
 		sass: { 
 			dist: { 
@@ -125,7 +128,7 @@ module.exports = function(grunt){
 	
 	});
 	grunt.registerTask('cfgcopymin', 'config min and copy tasks.', function() {
-		var files = getFiles('src', false, '**', 'demos/js-webshim/dev', '*.js');
+		var files = getFiles('src', false, '**', DEVPATH, '*.js');
 		var path = require('path');
 		var copyTask = {};
 		var minTask = {};
@@ -134,17 +137,17 @@ module.exports = function(grunt){
 		for(var i in files){
 			file = files[i];
 			if(grunt.file.isFile(file)){
-				minPath = path.join('demos/js-webshim/minified', i);
+				minPath = path.join(MINPATH, i);
 				if(/\.js$/.test(file)){
 					minTask[minPath] = [file];
 					found = true;
 				}
 				copyTask[minPath] = [file];
-				copyTask[path.join('demos/js-webshim/dev', i)] = [file];
+				copyTask[path.join(DEVPATH, i)] = [file];
 			}
 		}
 		if(!found){
-			minTask[path.join('demos/js-webshim/minified', 'polyfiller.js')] = path.join('src', 'polyfiller.js');
+			minTask[path.join(MINPATH, 'polyfiller.js')] = path.join('src', 'polyfiller.js');
 		}
 		var uglifyCfg = grunt.config('uglify');
 		var copyCfg = grunt.config('copy');

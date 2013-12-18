@@ -42,7 +42,7 @@
 	
 	<script src="qunit/qunit.js"></script>
 	
-	<script src="../demos/js-webshim/minified/polyfiller.js"></script>
+	<script src="../js-webshim/minified/polyfiller.js"></script>
 	<script>
 		(function($){
 			
@@ -111,7 +111,7 @@
 			
 			module("init");
 			asyncTest("init", function(){
-				$.webshims.ready('DOM forms-ext forms canvas json-storage', start);
+				$.webshims.ready('DOM forms-ext forms canvas', start);
 			});
 			$.webshims.ready('forms-ext', function(){
 				omitTests.validity = Modernizr.formvalidation;
@@ -150,7 +150,6 @@
 	<script src="unit/stepup-down.js"></script>
 	<script src="unit/progress.js"></script>
 	<script src="unit/input-ui.js"></script>
-	<script src="unit/storage.js"></script>
 	<script src="unit/es5.js"></script>
 	<script src="unit/boolean-attr.js"></script>
 	<script src="unit/interactive-validation.js"></script>

@@ -6,7 +6,7 @@
     "aFarkas <info@corrupt-system.de>"
   ],
   "description": "Webshims Lib is a modular capability-based polyfill-loading library",
-  "main": "demos/js-webshim",
+  "main": ["js-webshim/dev/polyfiller.js", "js-webshim/minified/polyfiller.js"],
   "keywords": [
     "polyfill",
     "shim",
@@ -32,6 +32,15 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
-  ]
+    "tests",
+    "swfs",
+    "build",
+    "src",
+    "demos",
+    "Gruntfile.js",
+    "webshims.jquery.json"
+  ],
+  "dependencies": {
+    "jquery": ">= 1.8.2"
+  }
 }
