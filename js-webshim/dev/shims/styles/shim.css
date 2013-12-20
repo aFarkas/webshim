@@ -214,7 +214,7 @@ output {
     transform: translate(0, 0) scale(1); }
 
 .ws-po-box {
-  border: 1px solid #ccc;
+  border: 1px solid #cccccc;
   background: #fff;
   padding: 5px 5px 3px;
   border-radius: 3px;
@@ -250,7 +250,7 @@ output {
   height: 0;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-bottom: 8px solid #ccc;
+  border-bottom: 8px solid #cccccc;
   border-top: none;
   zoom: 1;
   font-size: 0; }
@@ -264,7 +264,7 @@ output {
     top: auto;
     bottom: 4px;
     border-bottom: none;
-    border-top: 8px solid #ccc; }
+    border-top: 8px solid #cccccc; }
   html .ws-po-arrow {
     border-left-color: transparent;
     border-right-color: transparent; }
@@ -317,7 +317,7 @@ datalist {
       color: #000; }
     .datalist-polyfill .datalist-box li {
       margin: 1px 0;
-      padding: 2px 2px 2px 5px;
+      padding: 2px 5px 2px 9px;
       overflow: hidden;
       white-space: nowrap;
       cursor: default;
@@ -386,7 +386,7 @@ progress {
   height: 16px; }
   progress[data-position] {
     vertical-align: -0.2em;
-    border: 1px solid #ccc;
+    border: 1px solid #cccccc;
     background: #e6e6e6; }
   progress > * {
     display: none !important; }
@@ -440,5 +440,5 @@ summary {
     background-position: 0 -20px; }
 
 summary.summary-has-focus {
-  outline: 1px dotted #aaa;
+  outline: 1px dotted #aaaaaa;
   outline-offset: -1px; }

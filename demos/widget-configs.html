@@ -4,192 +4,259 @@
 		<title>widgets</title>
 		<meta charset="utf-8">
 		<style>
-			html, body {min-height: 100%; min-width: 99%;}
-			body > div.form-row {
+			html, body {
+				position: relative;
+			    min-height: 100%;
+			    min-width: 99%;
+			}
+			.wrapper {
+				position: relative;
 				margin: 10px auto;
-				padding: 5px 10px;
-				max-width: 600px;
-				min-width: 300px;
-				width: 100%;
+			    max-width: 600px;
+			    min-width: 300px;
+				min-height: 800px;
 			}
+			div.form-row {
+			    
+			    padding: 5px 10px;
+			    width: 100%;
+			}
+			
 			label {
-				display: block;
-				margin: 3px 0;
+			    display: block;
+			    margin: 3px 0;
 			}
+			
 			.form-row input {
-				min-width: 220px;
-				width: 100%;
-				max-width: 360px;
-				padding: 3px 1px;
+			    min-width: 220px;
+			    width: 100%;
+			    max-width: 360px;
+			    padding: 3px 1px;
 			}
 		</style>
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<script src="../src/extras/modernizr-custom.js"></script>
-		
-		<script src="../src/polyfiller.js"></script>
-		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
+		</script>
+		<script src="../js-webshim/dev/extras/modernizr-custom.js">
+		</script>
+		<script src="../js-webshim/dev/polyfiller.js">
+		</script>
 		<script>
-	
-	webshims.setOptions('debug', 'noCombo');
-	
-	//webshims.setOptions('forms', {replaceValidationUI: true, fixRangeChange: true,customDatalist: true,  addValidators: true});
-	webshims.setOptions('forms-ext', {
-		replaceUI: true
-		//time: {widgetPosition: {"my": "center", "at": "center"}}
-	});
-	webshims.polyfill('forms forms-ext');
-
-	
-	</script>
-		
-	
+			
+			webshims.setOptions('debug', 'noCombo');
+			
+			//webshims.setOptions('forms', {replaceValidationUI: true, fixRangeChange: true,customDatalist: true,  addValidators: true});
+			webshims.setOptions('forms-ext', {
+				replaceUI: true
+			});
+			webshims.setOptions('forms', {
+				lazyCustomMessages: true,
+				replaceValidationUI: true,
+				customDatalist: true
+			});
+			webshims.polyfill('forms forms-ext');
+			
+			
+		</script>
 		<style>
-			
-
-
 		</style>
-		
-		
 	</head>
-	
 	<body>
-		<div class="form-row">
-			<label for="range">range with: step="10" and datalist</label>
-			<input type="range" step="10" list="rangelist-1" />
-			<datalist id="rangelist-1">
-				<select>
-					<option value="0" label="0" />
-					<option value="10" />
-					<option value="20" />
-					<option value="30" />
-					<option value="40" />
-					<option value="50" label="50" />
-					<option value="60" />
-					<option value="70" />
-					<option value="80" />
-					<option value="90" />
-					<option value="100" label="100" />
-				</select>
-			</datalist>
+		<div class="wrapper">
+			<div class="form-row">
+				<label for="range">
+					range with: step="10" and datalist
+				</label>
+				<input type="range" step="10" list="rangelist-1" />
+				<datalist id="rangelist-1">
+					<select>
+						<option value="0" label="0" /><option value="10" /><option value="20" /><option value="30" /><option value="40" /><option value="50" label="50" /><option value="60" /><option value="70" /><option value="80" /><option value="90" /><option value="100" label="100" />
+					</select>
+				</datalist>
+			</div>
+			<div class="form-row range-ticks-ballon">
+				<style>
+					.range-ticks-ballon .ws-range {
+					    font-size: 16px;
+					}
+					
+					.range-ticks-ballon .ws-range-ticks[data-label]:after {
+					    visibility: visible;
+					}
+					
+					.range-ticks-ballon .ws-range-thumb:before {
+					    opacity: 0;
+					}
+					
+					.range-ticks-ballon .ws-active .ws-range-thumb:before {
+					    visibility: visible;
+					    opacity: 1;
+					}
+				</style>
+				<label for="range">
+					range with: step="10" and datalist (but CSS)
+				</label>
+				<input type="range" step="10" list="rangelist-2" />
+				<datalist id="rangelist-2">
+					<select>
+						<option value="0" label="0" /><option value="10" /><option value="20" /><option value="30" /><option value="40" /><option value="50" label="50" /><option value="60" /><option value="70" /><option value="80" /><option value="90" /><option value="100" label="100" />
+					</select>
+				</datalist>
+			</div>
+			<div class="form-row">
+				<label>
+					date
+				</label>
+				<input type="date" placeholder="year-month-day" data-date-split-input="true" data-date-split-inputs="true" data-date-start-view="2" />
+			</div>
+			<div class="form-row date-css-config">
+				<style>
+					.date-css-config .input-picker {
+					    font-size: 16px;
+					}
+					
+					/* remove step-controls */
+					.date-css-config .step-controls {
+					    display: none;
+					}
+					
+					/* ... and put button after input || not needed for {"splitInput": true}
+					 .date-css-config .input-buttons.input-button-size-1.date-input-buttons {
+					 margin-left: 3px;
+					 }
+					 */
+					/* show up arrow */
+					.date-css-config .ws-picker-header button:after {
+					    display: inline-block;
+					}
+					
+					/* place up arrow after nav selects */
+					.date-css-config .ws-picker-header button {
+					    width: auto;
+					    max-width: 10%;
+					}
+					
+					/* hide "up" text */
+					.date-css-config .ws-picker-header button > span {
+					    display: none;
+					}
+					
+					/* show nav select and year buttons */
+					.date-css-config .ws-picker-header select, .date-css-config .input-picker .ws-super-prev, .date-css-config .input-picker .ws-super-next {
+					    display: inline-block;
+					}
+					
+					/* show week numbers */
+					.date-css-config .input-picker .week-header, .date-css-config .input-picker .week-cell {
+					    display: table-cell;
+					}
+					
+					/* make othermonth unclickable */
+					.date-css-config .othermonth {
+					    cursor: default;
+					}
+					
+					/* always show 6 rows (same height) */
+					.date-css-config .other-month-row {
+					    display: table-row;
+					}
+					
+					/* hide short monthname and... */
+					.date-css-config .picker-grid button .monthname-short {
+					    display: none;
+					}
+					
+					/* ... use month digits instead */
+					.date-css-config .picker-grid button .month-digit {
+					    display: inline-block;
+					}
+					
+					/* hide button-row */
+					.date-css-config .ws-button-row {
+					    display: none;
+					}
+				</style>
+				<label>
+					date
+				</label>
+				<input type="date" placeholder="year-month-day" data-date-split-input="true" data-date-start-view="2" />
+			</div>
+			<div class="form-row">
+				<label for="datalist">datalist</label>
+				<input list="state-list" data-list='{"highlight": true}' name="states" required="required" type="text" id="datalist" />
+				<datalist id="state-list">
+					<select>
+						
+						<option value="Alabama" label="State of Alabama" />
+						<option value="Alaska" label="State of Alaska" />
+						<option value="Arizona" label="State of Arizona" />
+						<option value="Arkansas" label="State of Arkansas" />
+						<option value="California" label="State of California" />
+						<option value="Colorado" label="State of Colorado" />
+						<option value="Connecticut" label="State of Connecticut" />
+						<option value="Delaware" label="State of Delaware" />
+						<option value="Florida" label="State of Florida" />
+						<option value="Georgia" label="State of Georgia" />
+						<option value="Hawaiʻi" label="State of Hawaiʻi" />
+						<option value="Idaho" label="State of Idaho" />
+						<option value="Illinois" label="State of Illinois" />
+						<option value="Indiana" label="State of Indiana" />
+						<option value="Iowa" label="State of Iowa" />
+						<option value="Kansas" label="State of Kansas" />
+						<option value="Kentucky" label="Commonwealth of Kentucky" />
+						<option value="Louisiana" label="State of Louisiana" />
+						<option value="Maine" label="State of Maine" />
+						<option value="Maryland" label="State of Maryland" />
+						<option value="Massachusetts" label="Commonwealth of Massachusetts" />
+						<option value="Michigan" label="State of Michigan" />
+						<option value="Minnesota" label="State of Minnesota" />
+						<option value="Mississippi" label="State of Mississippi" />
+						<option value="Missouri" label="State of Missouri" />
+						<option value="Montana" label="State of Montana" />
+						<option value="Nebraska" label="State of Nebraska" />
+						<option value="Nevada" label="State of Nevada" />
+						<option value="New Hampshire" label="State of New Hampshire" />
+						<option value="New Jersey" label="State of New Jersey" />
+						<option value="New Mexico" label="State of New Mexico" />
+						<option value="New York" label="State of New York" />
+						<option value="North Carolina" label="State of North Carolina" />
+						<option value="North Dakota" label="State of North Dakota" />
+						<option value="Ohio" label="State of Ohio" />
+						<option value="Oklahoma" label="State of Oklahoma" />
+						<option value="Oregon" label="State of Oregon" />
+						<option value="Pennsylvania" label="Commonwealth of Pennsylvania" />
+						<option value="Rhode Island" label="State of Rhode Island and Providence Plantations" />
+						<option value="South Carolina" label="State of South Carolina" />
+						<option value="South Dakota" label="State of South Dakota" />
+						<option value="Tennessee" label="State of Tennessee" />
+						<option value="Texas" label="State of Texas" />
+						<option value="Utah" label="State of Utah" />
+						<option value="Vermont" label="State of Vermont" />
+						<option value="Virginia" label="Commonwealth of Virginia" />
+						<option value="Washington" label="State of Washington" />
+						<option value="West Virginia" label="State of West Virginia" />
+						<option value="Wisconsin" label="State of Wisconsin" />
+						<option value="Wyoming" label="State of Wyoming" />
+					</select>
+				</datalist>
+			</div>
+			<form action="#">
+				<div class="form-row">
+					<label for="mail">required email</label>
+					<input id="mail" type="email" required />
+				</div>
+				<div class="form-row">
+					<input type="submit" />
+				</div>
+			</form>
+			<form action="#" class="ws-validate">
+				<div class="form-row">
+					<label for="mail2">required email</label>
+					<input id="mail2" type="email" required />
+				</div>
+				<div class="form-row">
+					<input type="submit" />
+				</div>
+			</form>
 		</div>
-		
-		<div class="form-row range-ticks-ballon">
-			<style>
-				.range-ticks-ballon .ws-range {
-					font-size: 16px;
-				}
-				.range-ticks-ballon .ws-range-ticks[data-label]:after {
-					visibility: visible;
-				}
-				
-				.range-ticks-ballon .ws-range-thumb:before {
-					opacity: 0;
-				}
-				
-				.range-ticks-ballon .ws-active .ws-range-thumb:before {
-					visibility: visible;
-					opacity: 1;
-				}
-			</style>
-			<label for="range">range with: step="10" and datalist (but CSS)</label>
-			<input type="range" step="10" list="rangelist-2" />
-			
-			<datalist id="rangelist-2">
-				<select>
-					<option value="0" label="0" />
-					<option value="10" />
-					<option value="20" />
-					<option value="30" />
-					<option value="40" />
-					<option value="50" label="50" />
-					<option value="60" />
-					<option value="70" />
-					<option value="80" />
-					<option value="90" />
-					<option value="100" label="100" />
-				</select>
-			</datalist>
-		</div>
-		
-		<div class="form-row">
-			
-			<label>date</label>
-			<input type="date" placeholder="year-month-day" data-date-split-input="true" data-date-split-inputs="true" data-date-start-view="2" />
-			
-			
-		</div>
-		<div class="form-row date-css-config">
-			<style>
-				.date-css-config .input-picker {
-					font-size: 16px;
-				}
-								
-				/* remove step-controls */
-				.date-css-config .step-controls {
-					display: none;
-				}
-				
-				/* ... and put button after input || not needed for {"splitInput": true}
-				.date-css-config .input-buttons.input-button-size-1.date-input-buttons {
-					margin-left: 3px;
-				}
-				*/
-				/* show up arrow */
-				.date-css-config .ws-picker-header button:after {
-					display: inline-block;
-				}
-				/* place up arrow after nav selects */
-				.date-css-config .ws-picker-header button {
-					width: auto;
-					max-width: 10%;
-				}
-				/* hide "up" text */
-				.date-css-config .ws-picker-header button > span {
-					display: none;
-				}
-				
-				/* show nav select and year buttons */
-				.date-css-config .ws-picker-header select,
-				.date-css-config .input-picker .ws-super-prev,
-				.date-css-config .input-picker .ws-super-next {
-					display: inline-block;
-				}
-				
-				/* show week numbers */
-				.date-css-config .input-picker .week-header,
-				.date-css-config .input-picker .week-cell {
-					display: table-cell;
-				}
-				
-				/* make othermonth unclickable */
-				.date-css-config .othermonth {
-					cursor: default;
-				}
-				
-				/* always show 6 rows (same height) */
-				.date-css-config .other-month-row {
-					display: table-row;
-				}
-				
-				/* hide short monthname and... */
-				.date-css-config  .picker-grid button .monthname-short {
-					display: none;
-				}
-				/* ... use month digits instead */
-				.date-css-config  .picker-grid button .month-digit {
-					display: inline-block;
-				}
-				
-				/* hide button-row */
-				.date-css-config  .ws-button-row {
-					display: none;
-				}
-			</style>
-			<label>date</label>
-			<input type="date" placeholder="year-month-day" data-date-split-input="true" data-date-start-view="2" />
-			
-			
-		</div>
-		
 	</body>
 </html>

@@ -25,7 +25,10 @@ module.exports = function(grunt){
 			}
 		},
 		//copy and uglify are changed through cfgcopymin
-		copy: {},
+		copy: {
+			main: {},
+			legacy: {expand: true, src: [DISTPATH+'/**'], dest: 'demos'}
+		},
 		cssmin: getFiles('src', MINPATH, '**/*.css'),
 
 		sass: { 
@@ -151,8 +154,9 @@ module.exports = function(grunt){
 		}
 		var uglifyCfg = grunt.config('uglify');
 		var copyCfg = grunt.config('copy');
+		
 		uglifyCfg.dist = { 'files': minTask };
-		copyCfg.dist = { 'files': copyTask };
+		copyCfg.main = { 'files': copyTask };
 		grunt.config('uglify', uglifyCfg);
 		grunt.config('copy', copyCfg);
 	});
@@ -165,9 +169,9 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-css');
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	
-	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy', 'cssmin', 'uglify']);
+	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'copy:legacy']);
 
-	grunt.registerTask('dev', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy', 'watch']);
+	grunt.registerTask('dev', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'watch']);
 
 
 	function getFiles(srcdir, destdir, wildcard, compareDir, compareMatch) {
