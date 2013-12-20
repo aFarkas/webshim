@@ -1463,12 +1463,18 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 	
 	picker.showPickerContent = function(data, popover){
 		var options = data.options;
-		if(!data._popoverinit){
+		var init = data._popoverinit;
+		
+		data._popoverinit = true;
+		
+		if(!init){
 			picker.commonInit(data, popover);
 			picker.commonDateInit(data, popover);
 		}
+
 		popover.element.triggerHandler('updatepickercontent');
-		if(!data._popoverinit || options.restartView) {
+
+		if(!init || options.restartView) {
 			actions.setYearList( options.defValue || options.value, popover, data, options.startView);
 		} else {
 			actions[popover.element.attr('data-currentview') || 'setYearList']( options.defValue || options.value, popover, data, 0);
@@ -1478,6 +1484,8 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 	
 	
 	picker.commonDateInit = function(data, popover){
+		if(data._commonDateInit){return;}
+		data._commonDateInit = true;
 		var o = data.options;
 		var actionfn = function(e){
 			if(!$(this).is('.othermonth') || $(this).css('cursor') == 'pointer'){
@@ -1518,8 +1526,9 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		};
 		var updateContent = function(){
 			var tmpMinMax;
-			
+
 			if(popover.isDirty){
+				popover.isDirty = false;
 				tmpMinMax = o.max.split('T');
 				o.maxS = tmpMinMax[0].split('-');
 				if(tmpMinMax[1]){
@@ -1599,9 +1608,6 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			o.size = 1;
 		}
 		
-		if(o.inlinePicker){
-			o.updateOnInput = true;
-		}
 		
 		popover.actionFn = function(obj){
 			if(actions[obj['data-action']]){
@@ -1635,6 +1641,10 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			}
 		});
 		$(document).onTrigger('wslocalechange', data._propertyChange);
+		
+		if(o.inlinePicker){
+			o.updateOnInput = true;
+		}
 	};
 		
 });
