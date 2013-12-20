@@ -604,7 +604,7 @@ $button-bgcolor: #f5f5f5;
 		}
 	}
 	
-	.ws-picker-header  select {
+	.ws-picker-header select {
 		display: none;
 	}
 	
@@ -724,7 +724,7 @@ $button-bgcolor: #f5f5f5;
 
 		td button {
 			display: block;
-			padding: em(9) 0;
+			padding: em(20.66) 0;
 			width: 100%;
 			border-radius: em(5);
 			color: #000;
@@ -771,10 +771,6 @@ $button-bgcolor: #f5f5f5;
 		th, td {
 			width: 14.2856%;
 		}
-	}
-
-	.other-month-row {
-		display: none;
 	}
 	
 	.ws-options {

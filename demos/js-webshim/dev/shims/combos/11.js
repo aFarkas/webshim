@@ -1590,10 +1590,12 @@
 		
 		
 		picker.commonInit = function(data, popover){
+			if(data._commonInit){return;}
+			data._commonInit = true;
 			var tabbable;
 			
 			popover.isDirty = true;
-			
+
 			popover.element.on('updatepickercontent pickerchange', function(){
 				tabbable = false;
 			});
@@ -1633,6 +1635,7 @@
 				return function(prop){
 					if(prop == 'value' && !data.options.inlinePicker){return;}
 					popover.isDirty = true;
+					
 					if(popover.isVisible){
 						clearTimeout(timer);
 						timer = setTimeout(update, 9);
