@@ -139,7 +139,6 @@ webshims.register('form-combat', function($,webshims){
 	};
 	
 	webshims.addReady(function(context){
-		
 		setTimeout(function(){
 			find(context);
 		}, 4);

@@ -2605,6 +2605,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 	"use strict";
 	var curCfg;
 	var formcfg = webshims.formcfg;
+	var hasFormValidation = Modernizr.formvalidation && !webshims.bugs.bustedValidity;
 	var monthDigits = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 	var stopPropagation = function(e){
 		e.stopImmediatePropagation();
@@ -3185,7 +3186,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 				this.buttonWrapper = $('<span class="input-buttons '+this.type+'-input-buttons"></span>').insertAfter(this.element);
 				this.options.containerElements.push(this.buttonWrapper[0]);
 				
-				o.mirrorValidity = o.mirrorValidity && this.orig && Modernizr.formvalidation && !webshims.bugs.bustedValidity;
+				o.mirrorValidity = o.mirrorValidity && this.orig && hasFormValidation;
 				
 				if(o.splitInput && this._addSplitInputs){
 					if(o.monthSelect){
@@ -4098,11 +4099,11 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 				
 				data.shim.element.on('change input', stopPropagation);
 				
-				if(Modernizr.formvalidation){
+				if(hasFormValidation){
 					$(opts.orig).on('firstinvalid', function(e){
 						if(!webshims.fromSubmit && isCheckValidity){return;}
 						$(opts.orig).off('invalid.replacedwidgetbubble').on('invalid.replacedwidgetbubble', function(evt){
-							if(!e.isInvalidUIPrevented() && !evt.isDefaultPrevented()){
+							if(!evt.isDefaultPrevented()){
 								webshims.validityAlert.showFor( e.target );
 								e.preventDefault();
 								evt.preventDefault();
@@ -4129,7 +4130,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 		};
 		
 		
-		if(Modernizr.formvalidation){
+		if(hasFormValidation){
 			['input', 'form'].forEach(function(name){
 				var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
 					prop: {

@@ -920,22 +920,22 @@
 		var bustedWidgetUi = false;
 		
 		var initialFormTest = function(){
-			var range, rangeCSS, fieldset;
+			var range, tmp, fieldset;
 			if(!initialFormTest.run){
 				fieldset = $('<fieldset />')[0];
 				addTest(formvalidation, !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern));
 				
-				addTest('fieldsetdisabled', 'disabled' in fieldset);
-				addTest('fieldsetelements', 'elements' in fieldset);
+				addTest('fieldsetelements', (tmp = 'elements' in fieldset));
+				addTest('fieldsetdisabled', (!tmp && /MSIE [6-9]\./.test(navigator.userAgent)) ? false : ('disabled' in fieldset));
 				
 				if(modernizrInputTypes && modernizrInputTypes.range && !window.opera){
 					range = $('<input type="range" style="-webkit-appearance: slider-horizontal; -moz-appearance: range;" />').appendTo('html');
-					rangeCSS = range.css('appearance');
+					tmp = range.css('appearance');
 					range.remove();
 					
-					addTest('csstrackrange', rangeCSS == null || rangeCSS == 'range');
+					addTest('csstrackrange', tmp == null || tmp == 'range');
 					
-					addTest('cssrangeinput', rangeCSS == 'slider-horizontal' || rangeCSS == 'range');
+					addTest('cssrangeinput', tmp == 'slider-horizontal' || tmp == 'range');
 					
 					addTest('styleableinputrange', Modernizr.csstrackrange || Modernizr.cssrangeinput);
 				}
@@ -1233,7 +1233,7 @@
 				asyncWebshims.cfg = [asyncWebshims.cfg];
 			}
 			$.each(asyncWebshims.cfg, function(i, cfg){
-				webshims.setOptions.apply(webshims, cfg);
+				webshims.setOptions.call(webshims, cfg);
 			});
 		}
 		if(asyncWebshims.ready){

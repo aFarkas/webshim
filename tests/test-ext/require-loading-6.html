@@ -15,7 +15,7 @@
 						customMessages: true
 					}
 				},
-				polyfill: "forms-ext json-storage geolocation"
+				polyfill: "forms forms-ext geolocation"
 			};
 		</script>
 		<script src="../../src/polyfiller.js"></script>
@@ -26,7 +26,7 @@
 			(function(){
 				var webshimsReady = false;
 				webshimsReady = !!($.webshims);
-				$.webshims.ready('forms-ext json-storage geolocation', function(){
+				$.webshims.ready('forms-ext geolocation', function(){
 					setTimeout(function(){
 						(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, $.webshims.cfg.extendNative);
 					}, 1);

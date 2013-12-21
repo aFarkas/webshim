@@ -197,7 +197,7 @@ $.fn.extend({
 $(function(){
 	body = doc.body;
 	//assume that document is always scrollable, doesn't hurt if not
-	$(doc).bind('mwheelIntent.mwheelIntentDefault', $.noop);
+	$(doc).on('mwheelIntent.mwheelIntentDefault', $.noop);
 });
 })();
 

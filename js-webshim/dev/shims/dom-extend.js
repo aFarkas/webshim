@@ -937,13 +937,17 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			webshims.defineNodeNamesProperty(elementNames, prop, {
 				attr: {
 					set: function(val){
-						this.setAttribute(prop, val);
+						if(descs.useContentAttribute){
+							webshims.contentAttr(this, prop, val);
+						} else {
+							this.setAttribute(prop, val);
+						}
 						if(descs.set){
 							descs.set.call(this, true);
 						}
 					},
 					get: function(){
-						var ret = this.getAttribute(prop);
+						var ret = (descs.useContentAttribute) ? webshims.contentAttr(this, prop) : this.getAttribute(prop);
 						return (ret == null) ? undefined : prop;
 					}
 				},

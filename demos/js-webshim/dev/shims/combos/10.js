@@ -937,13 +937,17 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			webshims.defineNodeNamesProperty(elementNames, prop, {
 				attr: {
 					set: function(val){
-						this.setAttribute(prop, val);
+						if(descs.useContentAttribute){
+							webshims.contentAttr(this, prop, val);
+						} else {
+							this.setAttribute(prop, val);
+						}
 						if(descs.set){
 							descs.set.call(this, true);
 						}
 					},
 					get: function(){
-						var ret = this.getAttribute(prop);
+						var ret = (descs.useContentAttribute) ? webshims.contentAttr(this, prop) : this.getAttribute(prop);
 						return (ret == null) ? undefined : prop;
 					}
 				},
@@ -1696,6 +1700,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	"use strict";
 	var curCfg;
 	var formcfg = webshims.formcfg;
+	var hasFormValidation = Modernizr.formvalidation && !webshims.bugs.bustedValidity;
 	var monthDigits = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 	var stopPropagation = function(e){
 		e.stopImmediatePropagation();
@@ -2276,7 +2281,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				this.buttonWrapper = $('<span class="input-buttons '+this.type+'-input-buttons"></span>').insertAfter(this.element);
 				this.options.containerElements.push(this.buttonWrapper[0]);
 				
-				o.mirrorValidity = o.mirrorValidity && this.orig && Modernizr.formvalidation && !webshims.bugs.bustedValidity;
+				o.mirrorValidity = o.mirrorValidity && this.orig && hasFormValidation;
 				
 				if(o.splitInput && this._addSplitInputs){
 					if(o.monthSelect){
@@ -3189,11 +3194,11 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				
 				data.shim.element.on('change input', stopPropagation);
 				
-				if(Modernizr.formvalidation){
+				if(hasFormValidation){
 					$(opts.orig).on('firstinvalid', function(e){
 						if(!webshims.fromSubmit && isCheckValidity){return;}
 						$(opts.orig).off('invalid.replacedwidgetbubble').on('invalid.replacedwidgetbubble', function(evt){
-							if(!e.isInvalidUIPrevented() && !evt.isDefaultPrevented()){
+							if(!evt.isDefaultPrevented()){
 								webshims.validityAlert.showFor( e.target );
 								e.preventDefault();
 								evt.preventDefault();
@@ -3220,7 +3225,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		};
 		
 		
-		if(Modernizr.formvalidation){
+		if(hasFormValidation){
 			['input', 'form'].forEach(function(name){
 				var desc = webshims.defineNodeNameProperty(name, 'checkValidity', {
 					prop: {

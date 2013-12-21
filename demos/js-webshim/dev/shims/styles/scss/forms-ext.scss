@@ -223,8 +223,7 @@ input[type="color"] {
 	margin: 0;
 	zoom: 1;
 	border: none;
-	height: em(9);
-	border: em(1) solid #fff;
+	height: em(8);
 	width: 155px;
 	border-radius: em(5);
 	background: #ccc;
@@ -232,6 +231,7 @@ input[type="color"] {
 	font-size: 13px;
 	outline: none;
 	transition: background-color 400ms, border-color 400ms;
+	background-color: #aaa;
 
 	.ws-range-thumb {
 		top: 0;
@@ -242,7 +242,7 @@ input[type="color"] {
 		height: em(18);
 		width: em(18);
 		border-radius: 50%;
-		background: #aaa;
+		background: #ccc;
 		border: em(1) solid #666;
 		cursor: pointer;
 		transition: background-color 400ms, border-color 400ms;
@@ -272,12 +272,12 @@ input[type="color"] {
 	}
 
 	&.ws-focus .ws-range-thumb {
-		background: #888;
+		background: #ddd;
 		border-color: #000;
 	}
 	
 	&.ws-active .ws-range-thumb {
-		background: #666;
+		background: #eee;
 	}
 	
 	&[aria-disabled="true"],

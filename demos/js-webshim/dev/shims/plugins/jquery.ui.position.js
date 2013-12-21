@@ -494,4 +494,4 @@ $.ui.position = {
 	testElementParent.removeChild( testElement );
 })();
 
-}( jQuery ) );
+}( window.webshims && window.webshims.$ || jQuery ) );

@@ -1388,13 +1388,17 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			webshims.defineNodeNamesProperty(elementNames, prop, {
 				attr: {
 					set: function(val){
-						this.setAttribute(prop, val);
+						if(descs.useContentAttribute){
+							webshims.contentAttr(this, prop, val);
+						} else {
+							this.setAttribute(prop, val);
+						}
 						if(descs.set){
 							descs.set.call(this, true);
 						}
 					},
 					get: function(){
-						var ret = this.getAttribute(prop);
+						var ret = (descs.useContentAttribute) ? webshims.contentAttr(this, prop) : this.getAttribute(prop);
 						return (ret == null) ? undefined : prop;
 					}
 				},
@@ -1638,6 +1642,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	};
 	
 	var extendSels = function(){
+		var matches, matchesOverride;
 		var exp = $.expr[":"];
 		$.extend(exp, {
 			"valid-element": function(elem){
@@ -1662,7 +1667,15 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		});
 		
 		// sizzle/jQuery has a bug with :disabled/:enabled selectors
-		if(Modernizr.fieldsetdisabled && !$('<fieldset disabled=""><input /><fieldset>').find('input').is(':disabled')){
+		if(Modernizr.fieldsetdisabled && !$('<fieldset disabled=""><input /><input /></fieldset>').find(':disabled').filter(':disabled').is(':disabled')){
+			matches = $.find.matches;
+			matchesOverride = {':disabled': 1, ':enabled': 1};
+			$.find.matches = function(expr, elements){
+				if(matchesOverride[expr]){
+					return matches.call(this, '*'+expr, elements);
+				}
+				return matches.apply(this, arguments);
+			};
 			$.extend(exp, {
 				"enabled": function( elem ) {
 					return elem.disabled === false && !$(elem).is('fieldset[disabled] *');

@@ -513,6 +513,7 @@ var swfmini = function() {
 	};
 	
 	var extendSels = function(){
+		var matches, matchesOverride;
 		var exp = $.expr[":"];
 		$.extend(exp, {
 			"valid-element": function(elem){
@@ -537,7 +538,15 @@ var swfmini = function() {
 		});
 		
 		// sizzle/jQuery has a bug with :disabled/:enabled selectors
-		if(Modernizr.fieldsetdisabled && !$('<fieldset disabled=""><input /><fieldset>').find('input').is(':disabled')){
+		if(Modernizr.fieldsetdisabled && !$('<fieldset disabled=""><input /><input /></fieldset>').find(':disabled').filter(':disabled').is(':disabled')){
+			matches = $.find.matches;
+			matchesOverride = {':disabled': 1, ':enabled': 1};
+			$.find.matches = function(expr, elements){
+				if(matchesOverride[expr]){
+					return matches.call(this, '*'+expr, elements);
+				}
+				return matches.apply(this, arguments);
+			};
 			$.extend(exp, {
 				"enabled": function( elem ) {
 					return elem.disabled === false && !$(elem).is('fieldset[disabled] *');
