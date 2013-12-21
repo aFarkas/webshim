@@ -935,12 +935,12 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	}
 	addModule('form-combat', {
 		d: ['dom-support'],
-		test: ! (($.mobile && ($.mobile.selectmenu || $.mobile.checkboxradio)) || $.fn.select2 || $.fn.chosen || $.fn.selectpicker || $.fn.selectBoxIt)
+		test: !(($.mobile && ($.mobile.selectmenu || $.mobile.checkboxradio)) || $.fn.select2 || $.fn.chosen || $.fn.selectpicker || $.fn.selectBoxIt)
 	});
 	
 	addModule('position', {
 		src: 'plugins/jquery.ui.position.js',
-		test:!! ($.position && $.position.getScrollInfo)
+		test: !!($.position && $.position.getScrollInfo)
 	});
 	
 	loader.loadList(['form-combat', 'position']);
