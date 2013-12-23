@@ -1127,7 +1127,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 	});
 	
-})(webshims.$, document);;webshims.register('form-core', function($, webshims, window, document, undefined, options){
+})(webshims.$, document);;
+webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -1379,7 +1380,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 	});
 	webshims.ready('WINDOWLOAD', lazyLoad);
-	
 });
 ;webshims.register('form-shim-extend', function($, webshims, window, document, undefined, options){
 "use strict";
@@ -2691,3 +2691,4 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 	})();
 	
 });
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/combos/15.js

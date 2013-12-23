@@ -146,3 +146,5 @@ webshims.register('details', function($, webshims, window, doc, undefined, optio
 		initDetails = false;
 	});
 });
+
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/details.js

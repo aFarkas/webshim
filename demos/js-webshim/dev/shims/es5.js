@@ -1444,3 +1444,5 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 })(webshims.$, webshims);
 
 
+
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/es5.js

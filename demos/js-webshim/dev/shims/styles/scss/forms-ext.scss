@@ -478,12 +478,11 @@ $button-bgcolor: #f5f5f5;
 		box-shadow: 0 0 2px rgba(0, 0, 0, .3);
 	}
 	
-	.prev-controls,
-	.next-controls {
+	.ws-picker-controls {
 		position: absolute;
 		top: em(10);
-		button{
-			@extend %ws-button;
+		
+		> button{
 			border: em(1) solid #ccc;
 			border-radius: em(5);
 			padding: 0;
@@ -493,7 +492,7 @@ $button-bgcolor: #f5f5f5;
 			z-index: 1;
 			color: #333;
 			
-			&[class*="ws-super-"]:after,
+			&.ws-year-btn:after,
 			&:before {
 				display: inline-block;
 				content: " ";
@@ -518,6 +517,7 @@ $button-bgcolor: #f5f5f5;
 			}
 		}
 	}
+	
 	.prev-controls {
 		left: em(20);
 		
@@ -530,7 +530,7 @@ $button-bgcolor: #f5f5f5;
 		}
 		.ws-super-prev {
 			margin-right: em(3);
-			display: none;
+
 			&[disabled],
 			&:disabled {
 				display: none;
@@ -556,7 +556,7 @@ $button-bgcolor: #f5f5f5;
 		
 		.ws-super-next {
 			margin-left: em(3);
-			display: none;
+
 			&[disabled],
 			&:disabled	{
 				display: none;
@@ -604,21 +604,18 @@ $button-bgcolor: #f5f5f5;
 		}
 	}
 	
-	.ws-picker-header select {
-		display: none;
-	}
 	
-	&[data-currentview="setMonthList"] .ws-picker-header  select,
-	&[data-currentview="setYearList"] .ws-picker-header  select{
+	&[data-currentview="setMonthList"] .ws-picker-header > select,
+	&[data-currentview="setYearList"] .ws-picker-header > select{
 		max-width: 90%;
 	}
 	
-	&[data-currentview="setDayList"] .ws-picker-header select {
+	&[data-currentview="setDayList"] .ws-picker-header > select {
 		max-width: 40%;
 	}
 	
-	&[data-currentview="setDayList"] .ws-picker-header select.month-select {
-		max-width: 55%;
+	&[data-currentview="setDayList"] .ws-picker-header > .month-select {
+		max-width: 50%;
 	}
 	
 	&.time-popover .ws-picker-header {
@@ -635,9 +632,9 @@ $button-bgcolor: #f5f5f5;
 		top: em(-40);
 		right: 0;
 		left: 0;
-		margin: 0 em(40);
+		margin: 0 em(55);
 
-		button {
+		> button {
 			display: inline-block;
 			width: 100%;
 			margin: 0;
@@ -651,7 +648,6 @@ $button-bgcolor: #f5f5f5;
 			}
 			
 			&:after {
-				display: none;
 				content: " ";
 				margin: -0.1em 0.5em 0;
 				width: 0px;
@@ -717,14 +713,14 @@ $button-bgcolor: #f5f5f5;
 			padding: em(2) em(1);
 		}
 		
-		&.day-list td button {
+		&.day-list td > button {
 			padding: em(4) 0;
 		}
 
 
-		td button {
+		td > button {
 			display: block;
-			padding: em(20.66) 0;
+			padding: em(20.669) 0;
 			width: 100%;
 			border-radius: em(5);
 			color: #000;
@@ -761,11 +757,6 @@ $button-bgcolor: #f5f5f5;
 			padding-bottom: em(3);
 			text-transform: uppercase;
 			font-weight: 700;
-		}
-		
-		.week-header,
-		.week-cell {
-			display: none;
 		}
 
 		th, td {
@@ -825,7 +816,22 @@ $button-bgcolor: #f5f5f5;
 				font-size: 96%;
 			}
 		}
-		
-		
 	}
+	/* Selector API: */
+	.ws-week,
+	.ws-year-btn {
+    display: none;
+  }
 }
+.ws-picker-controls > button {
+  display: inline-block;
+}
+.ws-picker-header > button:after {
+  display: none;
+}
+
+.ws-picker-header select {
+  display: none;
+}
+
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/styles/scss/forms-ext.scss

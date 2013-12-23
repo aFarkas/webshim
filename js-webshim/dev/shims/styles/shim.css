@@ -215,7 +215,7 @@ output {
     transform: translate(0, 0) scale(1); }
 
 .ws-po-box {
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   background: #fff;
   padding: 5px 5px 3px;
   border-radius: 3px;
@@ -251,7 +251,7 @@ output {
   height: 0;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-bottom: 8px solid #cccccc;
+  border-bottom: 8px solid #ccc;
   border-top: none;
   zoom: 1;
   font-size: 0; }
@@ -265,7 +265,7 @@ output {
     top: auto;
     bottom: 4px;
     border-bottom: none;
-    border-top: 8px solid #cccccc; }
+    border-top: 8px solid #ccc; }
   html .ws-po-arrow {
     border-left-color: transparent;
     border-right-color: transparent; }
@@ -387,7 +387,7 @@ progress {
   height: 16px; }
   progress[data-position] {
     vertical-align: -0.2em;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     background: #e6e6e6; }
   progress > * {
     display: none !important; }
@@ -441,5 +441,7 @@ summary {
     background-position: 0 -20px; }
 
 summary.summary-has-focus {
-  outline: 1px dotted #aaaaaa;
+  outline: 1px dotted #aaa;
   outline-offset: -1px; }
+
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/styles/shim.css

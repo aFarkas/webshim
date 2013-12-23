@@ -387,3 +387,5 @@ webshims.register('filereader', function( $, webshims ){
 		});
 	});
 });
+
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/filereader.js

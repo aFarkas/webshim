@@ -45,3 +45,5 @@ window.canvas2png = function(canvas, filename) {
 }
 
 })(document);
+
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/FlashCanvas/canvas2png.js

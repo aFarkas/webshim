@@ -449,7 +449,8 @@ var swfmini = function() {
 		}
 	};
 }();
-;webshims.register('form-core', function($, webshims, window, document, undefined, options){
+;
+webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -701,7 +702,6 @@ var swfmini = function() {
 		}
 	});
 	webshims.ready('WINDOWLOAD', lazyLoad);
-	
 });
 ;(function(Modernizr, webshims){
 	"use strict";
@@ -1397,3 +1397,4 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	webshims.ready('track', loadTrackUi);
 });
 })(Modernizr, webshims);
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/combos/1.js

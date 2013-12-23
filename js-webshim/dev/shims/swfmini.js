@@ -449,3 +449,5 @@ var swfmini = function() {
 		}
 	};
 }();
+
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/swfmini.js

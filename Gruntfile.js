@@ -48,6 +48,7 @@ module.exports = function(grunt){
 				beautify: {
 					ascii_only : true
 				},
+				preserveComments: 'some',
 				compress: {
 				global_defs: {
 					"WSDEBUG": false
@@ -130,8 +131,21 @@ module.exports = function(grunt){
 		});		
 	
 	});
+	
+	grunt.registerTask('sourceurl', 'Add sourceURL to file.', function() {
+		var files = getFiles(DISTPATH, false, '**', false, '*.js');
+		var file, content;
+		for(var i in files){
+			file = files[i];
+			if(grunt.file.isFile(file)){
+					content = grunt.file.read(file);
+					grunt.file.write(file, content +"\n//@ sourceURL=EVALPATH/"+ file );
+			}
+		}
+	});
+	
 	grunt.registerTask('cfgcopymin', 'config min and copy tasks.', function() {
-		var files = getFiles('src', false, '**', DEVPATH, '*.js');
+		var files = getFiles('src', false, '**');
 		var path = require('path');
 		var copyTask = {};
 		var minTask = {};
@@ -169,9 +183,9 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-css');
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	
-	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'copy:legacy']);
+	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'sourceurl', 'copy:legacy']);
 
-	grunt.registerTask('dev', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'watch']);
+	grunt.registerTask('dev', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'sourceurl', 'watch']);
 
 
 	function getFiles(srcdir, destdir, wildcard, compareDir, compareMatch) {

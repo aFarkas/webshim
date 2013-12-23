@@ -1578,7 +1578,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 	});
 	
-})(webshims.$, document);;webshims.register('form-core', function($, webshims, window, document, undefined, options){
+})(webshims.$, document);;
+webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -1830,7 +1831,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 	});
 	webshims.ready('WINDOWLOAD', lazyLoad);
-	
 });
 ;webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";
@@ -2817,3 +2817,4 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	webshims.ready('track', loadTrackUi);
 });
 })(Modernizr, webshims);
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/combos/2.js

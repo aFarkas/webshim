@@ -10,3 +10,4 @@ javascripts_dir = "/"
 output_style = :expanded
 relative_assets = true
 line_comments = false
+//@ sourceURL=EVALPATH/js-webshim/minified/shims/styles/config.rb

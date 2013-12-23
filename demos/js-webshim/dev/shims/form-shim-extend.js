@@ -792,3 +792,5 @@ switch(desc.proptype) {
 webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors);
 
 }); //webshims.ready end
+
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/form-shim-extend.js
