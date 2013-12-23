@@ -1,4 +1,4 @@
-jPicker 1.1.6
+﻿jPicker 1.1.6
 
 jQuery Plugin for Photoshop style color picker
 
@@ -45,4 +45,3 @@ ______________
   Add activateCallback option for calling a callback function when the jPicker is activated or its binding is switched to a different picker element.
   
   Add multiple window modes for picker operation, include modal, popup, windowed, and exclusive.
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/jpicker/ReadMe.txt

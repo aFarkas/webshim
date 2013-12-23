@@ -1,4 +1,4 @@
-Change Log
+﻿Change Log
 ______________
 1.1.6
   Corrected bug preventing selections inside input values in some browsers - the onselectstart function no longer captures on input boxes.
@@ -119,4 +119,3 @@ ______________
 
 1.0.0
   First Release.
-//@ sourceURL=EVALPATH/js-webshim/minified/shims/jpicker/ChangeLog.txt

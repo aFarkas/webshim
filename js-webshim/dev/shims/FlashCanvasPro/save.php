@@ -53,5 +53,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         readfile('php://input');
     }
 }
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/FlashCanvasPro/save.php

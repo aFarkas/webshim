@@ -92,5 +92,3 @@ if (extension_loaded('curl')) {
     // Use the http:// wrapper
     readfile($url);
 }
-
-//@ sourceURL=EVALPATH/js-webshim/minified/shims/FlashCanvasPro/proxy.php

@@ -133,11 +133,11 @@ module.exports = function(grunt){
 	});
 	
 	grunt.registerTask('sourceurl', 'Add sourceURL to file.', function() {
-		var files = getFiles(DISTPATH, false, '**', false, '*.js');
+		var files = getFiles(DISTPATH, false, '**');
 		var file, content;
 		for(var i in files){
 			file = files[i];
-			if(grunt.file.isFile(file)){
+			if(grunt.file.isFile(file) && /\.js$/.test(file)){
 					content = grunt.file.read(file);
 					grunt.file.write(file, content +"\n//@ sourceURL=EVALPATH/"+ file );
 			}
