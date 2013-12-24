@@ -2414,3 +2414,5 @@ webshims.register('color-picker', function($, webshims, window, document, undefi
 	}
 	document.createElement('img').src = webshims.cfg.basePath +'jpicker/images/Maps.png';
 });
+
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/color-picker.js

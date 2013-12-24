@@ -124,10 +124,10 @@ webshims.activeLang('en'); //set locale to en
 		
 			
 			<h3 id="Locale-validityMessages">Adding new / changing existing  locale settings and errormessages.</h3>
-			<p>Existing locale setting fiels can be found in the <a href="../js-webshim/dev/shims/i18n/">shims/i18n directory</a>. Simply take one of those files (save as new), embed it after the polyfiller.js and adjust it to your needs.</p>
+			<p>Existing locale setting files can be found in the <a href="../js-webshim/dev/shims/i18n/">shims/i18n directory</a>. Simply take one of those files (save as new), embed it after the polyfiller.js and adjust it to your needs.</p>
 <pre data-src="../js-webshim/dev/shims/i18n/formcfg-en.js"><code class="language-javascript">
 </code></pre>
-			<p>Note: <code class="i">webshims.activeLang</code> with the corresponding language code has to called to activate your locale</p>
+			<p>Note: <code class="i">webshims.activeLang</code> with the corresponding language code has to be called to activate the locale</p>
 <pre><code class="language-javascript">
 //locale definition with the locale code 'cd'
 webshims.validityMessages.cd = {
@@ -167,14 +167,46 @@ webshims.polyfill('forms');
 			<iframe class="fiddle-example" width="100%" height="350" src="http://jsfiddle.net/trixta/6ELuD/embedded/result,js,html" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 			
 			<h2 id="UI-Settings">Customizing UI/UX of form validation</h2>
-			<p>HTML5 constraint form validation gives a very simple UI for form validation. In most cases developers want to enhance this UI. Webshim implementation allows this by using all native form features, but also gives some pre-build configuration options to implement clientside form validation with a very good user experience and great control over style and behavior.</p>
+			<p>HTML5 constraint form validation implements a very simple UI for form validation. In most cases developers want to enhance this UI. Webshim implementation allows this by using all native form features, but also gives some pre-build configuration options to implement clientside form validation with a very good user experience and great control over style and behavior.</p>
 			
 			<h3 id="UI-replaceValidationUI"><code class="i">replaceValidationUI</code> and <code class="i">.user-error</code>/<code class="i">.user-success</code></h3>
-			<p></p>
+			<p>With <code class="i">replaceValidationUI</code> set to true the validation bubble of the browser will be replaced with a webshims popover with the additional class <code>validity-alert</code>. Additionally all form fields can be styled using the classes <code>.user-error</code> and <code>.user-success</code></p>
+			<iframe class="fiddle-example" width="100%" height="200" src="http://jsfiddle.net/trixta/Xp3Vb/embedded/js,css,result,html" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			
 			
 			<h3 id="UI-ival">Live form validation <code class="i">iVal</code></h3>
-			<p></p>
-			
+			<p>The instant form validation feature of webshims is a simple to use but powerfull and UX enhanced feature. Simply put a <code class="i">ws-validate</code> class to your form element:</p>
+			<iframe class="fiddle-example" width="100%" height="200" src="http://jsfiddle.net/trixta/Xp3Vb/embedded/html,js,css,result,html" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<p>The instant validation feature can be controlled through the <code class="i">iVal</code> option object. The <code class="i">iVal</code> option has the following defaults.</p>
+<pre><code class="language-javascript">
+webshims.setOptions('forms', {
+	//instant validation options
+	iVal: {
+		//a simple selector of your form element
+		"sel": ".ws-validate", 
+		//wether webshim should show a bubble on invalid event: "hide" | true | false
+		"handleBubble": "hide", 
+		
+		//selector or function to find the wrapper of the form field[s] (if there are more than one form field in the wrapper they will be handled as a group with one combined errormessage)
+		"fieldWrapper": ":not(span), :not(label), :not(em), :not(strong), :not(p)",
+		
+		//wether an invalid input should be re-checked while user types
+		"recheckDelay": 400,
+		
+		//the class of the errorbox, which is normally appended to the fieldWrapper
+		"errorBoxClass": "ws-errorbox", 
+		
+		//classes to adjust to your CSS/CSS-framework
+		"errorMessageClass": "ws-errormessage",
+		"errorWrapperClass": "ws-invalid", 
+		"successWrapperClass": "ws-success", 
+		
+		"fx": "slide" 
+	}
+});			
+//start polyfilling
+webshims.polyfill('forms');
+</code></pre>			
 </div>
 			
 

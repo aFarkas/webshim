@@ -79,7 +79,7 @@
 			loadStyles: true,
 			disableShivMethods: true,
 			wspopover: {appendTo: 'auto', hideOnBlur: true},
-			ajax: {cache: true, crossDomain: true},
+			ajax: {cache: true},
 			basePath: (function(){
 				var script = jScripts.filter('[src*="polyfiller.js"]');
 				var path;
@@ -549,6 +549,9 @@
 		error: 1
 	};
 	
+	if(!('crossDomain' in webCFG.ajax) && location.protocol.indexOf('http')){
+		webCFG.ajax.crossDomain = true;
+	}
 	
 	webshims.addMethodName = function(name){
 		name = name.split(':');

@@ -63,3 +63,4 @@ webshims.formcfg.ru = {
 		yearSuffix: ''
 	}
 };
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/i18n/formcfg-ru.js

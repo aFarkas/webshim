@@ -74,3 +74,5 @@ webshims.formcfg.fr = {
 		yearSuffix: ''
 	}
 };
+
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/i18n/formcfg-fr.js

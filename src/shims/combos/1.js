@@ -449,7 +449,8 @@ var swfmini = function() {
 		}
 	};
 }();
-;webshims.register('form-core', function($, webshims, window, document, undefined, options){
+;
+webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -701,7 +702,6 @@ var swfmini = function() {
 		}
 	});
 	webshims.ready('WINDOWLOAD', lazyLoad);
-	
 });
 ;(function(Modernizr, webshims){
 	"use strict";

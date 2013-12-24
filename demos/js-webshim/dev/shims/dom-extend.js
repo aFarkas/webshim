@@ -1128,3 +1128,4 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	});
 	
 })(webshims.$, document);
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/dom-extend.js

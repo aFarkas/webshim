@@ -30,25 +30,27 @@
 			.form-row input {
 			    min-width: 220px;
 			    width: 100%;
-			    max-width: 360px;
+			    max-width: 300px;
 			    padding: 3px 1px;
 			}
-			.ws-important-hide {
-				display: block !important;
-				visibility: visible !important;
-				position: static !important;
-				
-			}
 		</style>
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
+		<script>
+			(function(){
+				var src = (Object.defineProperty && window.addEventListener) ?
+					'http://code.jquery.com/jquery-2.0.3.min.js' :
+					'http://code.jquery.com/jquery-1.10.1.min.js'
+				;
+				
+				document.write('<script src="'+ src +'"><\/script>');
+			})();
 		</script>
-		<script src="../js-webshim/dev/extras/modernizr-custom.js">
+		<script src="../js-webshim/minified/extras/modernizr-custom.js">
 		</script>
-		<script src="../src/polyfiller.js">
+		<script src="../js-webshim/minified/polyfiller.js">
 		</script>
 		<script>
 			
-			webshims.setOptions('debug', 'noCombo');
+			//webshims.setOptions('debug', 'noCombo');
 			
 			//webshims.setOptions('forms', {replaceValidationUI: true, fixRangeChange: true,customDatalist: true,  addValidators: true});
 			webshims.setOptions('forms-ext', {
@@ -64,7 +66,7 @@
 			$(function(){
 				//console.log()
 				
-			})
+			});
 		</script>
 		<style>
 		</style>
@@ -115,12 +117,12 @@
 				<label>
 					date
 				</label>
-				<input type="date" placeholder="year-month-day" data-date-inline-picker="true" data-date-split-inputs="true" data-date-start-view="2" />
+				<input type="date" placeholder="year-month-day" data-date-split-input="true" data-date-start-view="2" />
 			</div>
 			<div class="form-row date-css-config">
 				<style>
 					.date-css-config .input-picker {
-					    font-size: 16px;
+					   /* font-size: 16px;*/
 					}
 					
 					/* remove step-controls */
@@ -150,12 +152,13 @@
 					}
 					
 					/* show nav select and year buttons */
-					.date-css-config .ws-picker-header select, .date-css-config .input-picker .ws-super-prev, .date-css-config .input-picker .ws-super-next {
+					.date-css-config .ws-picker-header select, 
+					.date-css-config .ws-year-btn {
 					    display: inline-block;
 					}
 					
 					/* show week numbers */
-					.date-css-config .input-picker .week-header, .date-css-config .input-picker .week-cell {
+					.date-css-config .ws-week {
 					    display: table-cell;
 					}
 					
@@ -187,7 +190,7 @@
 				<label>
 					date
 				</label>
-				<input type="date" placeholder="year-month-day" data-date-inline-picker="true" data-date-inline-picker="" data-date-split-input="true" data-date-start-view="0" min="1900-01-01" max="2013-12-31" />
+				<input type="date" placeholder="year-month-day" data-date-split-input="true" data-date-start-view="2" />
 			</div>
 			<div class="form-row">
 				<label for="datalist">datalist</label>

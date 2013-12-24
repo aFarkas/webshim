@@ -1,3 +1,4 @@
+
 webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
@@ -250,5 +251,6 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		}
 	});
 	webshims.ready('WINDOWLOAD', lazyLoad);
-	
 });
+
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/form-core.js

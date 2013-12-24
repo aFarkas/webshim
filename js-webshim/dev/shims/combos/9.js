@@ -1715,6 +1715,15 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 		return curCfg[selectName];
 	};
+	var daySelect = '<select class="dd"><option value=""></option>'+ (function(){
+		var i = 1;
+		var opts = [];
+		while(i < 32){
+			opts.push('<option>'+ ((i < 10) ? '0'+ i : i) +'</option>' );
+			i++;
+		}
+		return opts.join('');
+	})() +'</select>';
 	var createFormat = function(name){
 		if(!curCfg.patterns[name+'Obj']){
 			var obj = {};
@@ -1728,15 +1737,19 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		date: {
 			_create: function(opts){
 				var obj = {
-					splits: [$('<input type="text" class="yy" size="4" inputmode="numeric" />')[0]] 
+					splits: [$('<input type="text" class="yy" size="4" inputmode="numeric" maxlength="4" />')[0]] 
 				};
+				
 				if(opts.monthSelect){
 					obj.splits.push($('<select class="mm">'+getMonthOptions(opts)+'</select>')[0]);
 				} else {
 					obj.splits.push($('<input type="text" class="mm" inputmode="numeric" maxlength="2" size="2" />')[0]);
 				}
-				obj.splits.push($('<input type="text" class="dd ws-spin" inputmode="numeric" maxlength="2" size="2" />')[0]);
-				
+				if(opts.daySelect){
+					obj.splits.push($(daySelect)[0]);
+				} else {
+					obj.splits.push($('<input type="text" class="dd ws-spin" inputmode="numeric" maxlength="2" size="2" />')[0]);
+				}
 				
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1], $('<span class="ws-input-seperator" />')[0], obj.splits[2]];
 				return obj;
@@ -1766,7 +1779,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					splits: [$('<input type="text" class="yy" inputmode="numeric" size="4" />')[0]] 
 				};
 				if(opts.monthSelect){
-					obj.splits.push($('<select class="mm ws-spin">'+getMonthOptions(opts)+'</select>')[0]);
+					obj.splits.push($('<select class="mm">'+getMonthOptions(opts)+'</select>')[0]);
 				} else {
 					obj.splits.push($('<input type="text" class="mm ws-spin" />')[0]);
 					if(opts.onlyMonthDigits){
@@ -2893,12 +2906,12 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					};
 					data.inputElements.on({
 						keydown: function(e){
-							if(e.keyCode == 40 && e.altKey){
+							if(e.keyCode == 40 && e.altKey && !$.nodeName(e.target, 'select')){
 								open();
 							}
 						},
-						focus: function(){
-							if(!popover.stopOpen && (options.buttonOnly || options.openOnFocus || (mouseFocus && options.openOnMouseFocus))){
+						focus: function(e){
+							if(!popover.stopOpen && (options.buttonOnly || options.openOnFocus || (mouseFocus && options.openOnMouseFocus)) && !$.nodeName(e.target, 'select')){
 								popover.openedByFocus = options.buttonOnly ? false : !options.noInput;
 								show();
 							} else {
@@ -2915,7 +2928,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 									popover.activeElement.focus();
 								}, 4);
 							}
-							if(data.element.is(':focus')){
+							if(data.element.is(':focus')  && !$.nodeName(e.target, 'select')){
 								popover.openedByFocus = options.buttonOnly ? false : !options.noInput;
 								show();
 							}
@@ -3276,7 +3289,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			if(!modernizrInputTypes[name] || replace[name]){
 				extendType(name, {
 					_create: function(opts, set){
-						if(opts.monthSelect){
+						if(opts.monthSelect || opts.daySelect){
 							opts.splitInput = true;
 						}
 						if(opts.splitInput && !splitInputs[name]){
@@ -3611,3 +3624,4 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	})();
 	
 });
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/combos/9.js

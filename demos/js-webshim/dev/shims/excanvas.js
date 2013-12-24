@@ -937,3 +937,5 @@ webshims.addReady(function(context, elem){
 webshims.isReady('canvas', true);
 })(document);
 } // if
+
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/excanvas.js

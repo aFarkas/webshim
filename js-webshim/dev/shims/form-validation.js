@@ -945,3 +945,5 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	
 	loader.loadList(['form-combat', 'position']);
 });
+
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/form-validation.js

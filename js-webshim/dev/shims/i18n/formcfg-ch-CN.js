@@ -63,3 +63,4 @@ webshims.formcfg['zh-CN'] = {
 		yearSuffix: '年'
 	}
 };
+//@ sourceURL=EVALPATH/js-webshim/dev/shims/i18n/formcfg-ch-CN.js

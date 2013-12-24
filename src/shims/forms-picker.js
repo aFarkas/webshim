@@ -1134,7 +1134,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			
 			str.push('</div><div class="picker-grid"><table role="grid" aria-label="'+ fullMonthName.join(' ')  +'"><thead><tr>');
 			
-			str.push('<th class="week-header">'+ dateCfg.weekHeader +'</th>');
+			str.push('<th class="week-header ws-week">'+ dateCfg.weekHeader +'</th>');
 			
 			for(k = dateCfg.firstDay; k < dateCfg.dayNamesShort.length; k++){
 				str.push('<th class="day-'+ k +'"><abbr title="'+ dateCfg.dayNames[k] +'">'+ dateCfg.dayNamesShort[k] +'</abbr></th>');
@@ -1146,7 +1146,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			str.push('</tr></thead><tbody><tr class="ws-row-0">');
 			
 			week = picker.getWeek(date);
-			str.push('<td class="week-cell">'+ week +'</td>');
+			str.push('<td class="week-cell ws-week">'+ week +'</td>');
 			
 			for (i = 0; i < 99; i++) {
 				addTr = (i && !(i % 7));
@@ -1167,7 +1167,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					if(week > 52){
 						week =  picker.getWeek(date);
 					}
-					str.push('<td class="week-cell">'+ week +'</td>');
+					str.push('<td class="week-cell ws-week">'+ week +'</td>');
 				}
 				
 				if(!i){
@@ -1619,7 +1619,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		
 		
 		
-		popover.contentElement.html('<div class="prev-controls"><button class="ws-super-prev" tabindex="0"></button><button class="ws-prev" tabindex="0"></button></div> <div class="next-controls"><button class="ws-next" tabindex="0"></button><button class="ws-super-next" tabindex="0"></button></div><div class="ws-picker-body"></div><div class="ws-button-row"><button type="button" class="ws-current" data-action="changeInput" value="'+today[data.type]+'" tabindex="0"></button> <button type="button" data-action="changeInput" value="" class="ws-empty" tabindex="0"></button></div>');
+		popover.contentElement.html('<div class="prev-controls ws-picker-controls"><button class="ws-super-prev ws-year-btn" tabindex="0"></button><button class="ws-prev" tabindex="0"></button></div> <div class="next-controls ws-picker-controls"><button class="ws-next" tabindex="0"></button><button class="ws-super-next ws-year-btn" tabindex="0"></button></div><div class="ws-picker-body"></div><div class="ws-button-row"><button type="button" class="ws-current" data-action="changeInput" value="'+today[data.type]+'" tabindex="0"></button> <button type="button" data-action="changeInput" value="" class="ws-empty" tabindex="0"></button></div>');
 		popover.nextElement = $('button.ws-next', popover.contentElement);
 		popover.prevElement = $('button.ws-prev', popover.contentElement);
 		popover.yearNextElement = $('button.ws-super-next', popover.contentElement);
