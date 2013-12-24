@@ -1146,7 +1146,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			str.push('</tr></thead><tbody><tr class="ws-row-0">');
 			
 			week = picker.getWeek(date);
-			str.push('<td class="week-cell ws-week">'+ week +'</td>');
+			str.push('<td class="week-cell ws-week" role="gridcell" aria-disabled="true">'+ week +'</td>');
 			
 			for (i = 0; i < 99; i++) {
 				addTr = (i && !(i % 7));
@@ -1167,7 +1167,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					if(week > 52){
 						week =  picker.getWeek(date);
 					}
-					str.push('<td class="week-cell ws-week">'+ week +'</td>');
+					str.push('<td class="week-cell ws-week" role="gridcell" aria-disabled="true">'+ week +'</td>');
 				}
 				
 				if(!i){
