@@ -710,11 +710,20 @@ $button-bgcolor: #f5f5f5;
 		}
 		
 		&.day-list td {
-			padding: em(2) em(1);
+			padding: em(0.5) em(2);
+			
+			> button {
+        padding: em(5.5) 0;
+      }
 		}
 		
-		&.day-list td > button {
-			padding: em(4) 0;
+		
+		&.time-list td {
+		  padding: em(1) em(5);
+		  
+		  > button {
+        padding: em(6.85) 0;
+      }
 		}
 
 

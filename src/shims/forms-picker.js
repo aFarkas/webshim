@@ -791,18 +791,17 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			this.element
 				.on({
 					'keydown': function(e){
-						var handled;
+						var handled, sKey;
 						var key = e.keyCode;
-						
 						if(e.shiftKey){return;}
-						
-						if((e.ctrlKey && key == 40)){
+						sKey = e.ctrlKey || e.altKey; //|| e.metaKey
+						if((sKey && key == 40)){
 							handled = 'downPage';
-						} else if((e.ctrlKey && key == 38)){
+						} else if((sKey && key == 38)){
 							handled = 'upPage';
-						} else if(key == 33 || (e.ctrlKey && key == 37)){
+						} else if(key == 33 || (sKey && key == 37)){
 							handled = 'prevPage';
-						} else if(key == 34 || (e.ctrlKey && key == 39)){
+						} else if(key == 34 || (sKey && key == 39)){
 							handled = 'nextPage';
 						} else if(e.keyCode == 36 || e.keyCode == 33){
 							handled = 'first';
