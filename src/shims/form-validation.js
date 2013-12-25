@@ -518,7 +518,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	if(!$.fn[fx[iVal.fx].show]){
 		iVal.fx = 'no';
 	}
-	
+	var errorBoxId = 0;
 	webshims.errorbox = {
 		create: function(elem, fieldWrapper){
 			if(!fieldWrapper){
@@ -530,7 +530,10 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				errorBox = $('<div class="'+ errorBoxClass +'" hidden="hidden" style="display: none;">');
 				fieldWrapper.append(errorBox);
 			}
-			
+			if(!errorBox.prop('id')){
+				errorBoxId++;
+				errorBox.prop('id', 'errorbox-'+errorBoxId);
+			}
 			fieldWrapper.data('errorbox', errorBox);
 			return errorBox;
 		},
@@ -629,6 +632,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					fieldWrapper.removeClass(invalidWrapperClass);
 					errorBox.message = '';
 					errorBox[fx[iVal.fx].hide](function(){
+						if(this.id == elem.getAttribute('aria-describedby')){
+							elem.removeAttribute('aria-describedby');
+						}
 						$(this).attr({hidden: 'hidden'});
 					});
 				}
@@ -672,11 +678,15 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				fieldWrapper.addClass(invalidWrapperClass).removeClass(successWrapperClass);
 				this.recheckInvalidInput(elem);
 				if(box.is('[hidden]') || box.css('display') == 'none'){
+					if(!elem.getAttribute('aria-describedby')){
+						elem.setAttribute('aria-describedby', box.prop('id'));
+					}
 					box
 						.css({display: 'none'})
 						.removeAttr('hidden')
 						[fx[iVal.fx].show]()
 					;
+					
 				}
 			}
 			fieldWrapper.removeClass(successWrapperClass);

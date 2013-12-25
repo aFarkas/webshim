@@ -153,6 +153,20 @@
 		}, 0);
 	});
 	
+	test("fieldset[disabled] test 1 invalid", function(){
+		stop();
+		var counters = setupClickTest();
+		setTimeout(function(){
+			$('#click-test-form fieldset').prop('disabled', true);
+			$('#click-test-form input[type="submit"]').trigger('click');
+			setTimeout(function(){
+				testClickTest(counters, {firstinvalid: 1, invalid: 1, submit: 0, focus: $('#click-test-form input').eq(2).getShadowFocusElement()[0]});
+				setTimeout(start, 50);
+			}, 40);
+		}, 0);
+	});
+	
+	
 	test("click test all valid", function(){
 		stop();
 		var counters = setupClickTest();
