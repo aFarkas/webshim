@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html>
+
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+		<meta name="viewport" content="width=device-width">
+		<title>Webshim - foms polyfill</title>
+		
+		
+		<link href="css/styles.css" rel="stylesheet" />
+		
+		<script>
+			(function(){
+				var src = (Object.defineProperty && window.addEventListener) ?
+					'http://code.jquery.com/jquery-2.0.3.min.js' :
+					'http://code.jquery.com/jquery-1.10.1.min.js'
+				;
+				
+				document.write('<script src="'+ src +'"><\/script>');
+			})();
+		</script>
+		<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
+
+		<script src="../js-webshim/minified/polyfiller.js"></script>
+		<style>
+			textarea {
+				display: block;
+				width: 80%;
+				height: 300px;
+			}
+		</style>
+		<script>
+			
+			
+		</script>
+
+	</head>
+
+	<body>
+
+		<form action="http://marijnhaverbeke.nl/uglifyjs" method="post" data-polyfillpath="../js-webshim/dev/">
+			<div>
+				<label><input type="checkbox" class="include-initial" checked="" /> include initial fiels</label> 
+			</div>
+<textarea class="config">
+//webshims.setOptions
+//for forms.customMessages and form-ext.replaceUI detection
+webshims.setOptions('waitReady', false);
+webshims.setOptions('forms', {
+	lazyCustomMessages: true
+});
+
+webshims.setOptions('forms-ext', {
+	replaceUI: true
+});
+
+//webshims.activeLang
+webshims.activeLang('ar');
+
+webshims.polyfill('forms forms-ext mediaelement');
+</textarea>
+			<button type="button" class="generate">generate</button>
+			<textarea class="output" name="js_code" readonly="">
+				
+			</textarea>
+			<input type="hidden" name="download" value="polyfiller-custom.js" />
+			<input type="submit" value="compress and download" />
+		</form>
+		<script>
+			
+		</script>
+		<script src="demo-js/src/builder.js"></script>
+	</body>
+</html>

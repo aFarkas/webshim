@@ -42,7 +42,27 @@ module.exports = function(grunt){
 				}]
 			}
 		},
+		/*not used for build might be really helpfull for production*/
+		optimizePolyfiller: {
+			options: {
+				src: 'js-webshim/dev/', //required
+				features: 'forms forms-ext ',
 
+				dest: 'polyfiller-custom.js',
+				
+				inlineInitFiles: true,
+				
+				//only in case inlineInitFiles is true
+				
+				lang: 'fr it',
+				
+				//customMessages: true,
+				replaceUI: true,
+				includeSwfmini: true,
+				
+				uglify: true
+			}
+		},
 		uglify: {
 			options: {
 				beautify: {
@@ -107,13 +127,13 @@ module.exports = function(grunt){
 				
 				concatCfg = grunt.config('concat');
 				if(concatCfg){
-					concatCfg.combos = {files: combos};
+					concatCfg.combos = {files: combos.files};
 				} else {
-					concatCfg = combos;
+					concatCfg = combos.files;
 				}
 				//grunt.warn(JSON.stringify(concatCfg))
 				grunt.config('concat', concatCfg);
-				
+				grunt.file.write(DEVPATH+'/shims/combos/comboinfo.json', result);
 				done(code);
 				return;
 			}
@@ -127,9 +147,9 @@ module.exports = function(grunt){
 				result.split('\n').forEach(grunt.log.error, grunt.log);
 				grunt.warn('PhantomJS exited unexpectedly with exit code ' + code + '.');
 			}
+			
 			done(code);
-		});		
-	
+		});
 	});
 	
 	grunt.registerTask('sourceurl', 'Add sourceURL to file.', function() {
@@ -176,6 +196,8 @@ module.exports = function(grunt){
 	});
 	
 	// Default task.
+	grunt.loadTasks('grunt-tasks/');
+	
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
