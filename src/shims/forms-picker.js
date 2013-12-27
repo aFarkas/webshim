@@ -1205,7 +1205,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					buttonStr += ' class="'+ classArray.join(' ') +'"';
 				}
 				
-				if(!picker.isInRange(dateArray, max, min) || (data.options.disableDays && $.inArray(day, data.options.disableDays) != -1)){
+				if(!picker.isInRange(dateArray, max, min)){
 					buttonStr += ' disabled=""';
 				}
 				
@@ -1445,11 +1445,13 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 							
 							setDirButtons(content, popover, 'yearPrev');
 							setDirButtons(content, popover, 'yearNext');
+							$(o.orig).trigger('pickerchange');
 							
 							if(webshims[content.type]){
 								new webshims[content.type](popover.bodyElement.children(), popover, content);
 							}
-							popover.element.trigger('pickerchange')
+							
+							popover.element
 								.filter('[data-vertical="bottom"]')
 								.triggerHandler('pospopover')
 							;
@@ -1645,6 +1647,8 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		if(o.inlinePicker){
 			o.updateOnInput = true;
 		}
+		
+		$(o.orig).trigger('pickercreated');
 	};
 		
 });
