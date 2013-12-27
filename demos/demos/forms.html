@@ -90,16 +90,7 @@
 			<p>
 				<img id="logo" src="../images/webshim2.png" alt="webshim" />
 			</p>
-			<form action="">
-			<input list="d" required />
-			<datalist id="d">
-				<option value="dfd" />
-				<option value="dfd" />
-				<option value="dfd" />
-				<option value="dfd" />
-			</datalist>
-			<input type="submit" />
-			</form>
+			
 
 			<h2 id="introduction" class="header">Introduction</h2>
 
@@ -122,7 +113,11 @@ webshims.activeLang('en'); //set locale to en
 </code></pre>
 			<p>Webshim supports the following locales out of the box: <select class="active-lang"></select>.</p>
 		
+			<form action="#">
+				<input type="email" required />
 			
+				<input type="submit" />
+			</form>
 			<h3 id="Locale-validityMessages">Adding new / changing existing  locale settings and errormessages.</h3>
 			<p>Existing locale setting files can be found in the <a href="../js-webshim/dev/shims/i18n/">shims/i18n directory</a>. Simply take one of those files (save as new), embed it after the polyfiller.js and adjust it to your needs.</p>
 <pre data-src="../js-webshim/dev/shims/i18n/formcfg-en.js"><code class="language-javascript">

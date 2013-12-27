@@ -308,17 +308,17 @@
 				webshims.error("can't find module: " + name);
 				return;
 			}
-			if (module.noAutoCallback) {
-				var ready = function(){
-					fn($, webshims, window, document, undefined, module.options);
-					isReady(name, true);
-				};
-				if (module.d && module.d.length) {
-					onReady(module.d, ready);
-				} else {
-					ready();
-				}
+			module.loaded = true;
+			var ready = function(){
+				fn($, webshims, window, document, undefined, module.options);
+				isReady(name, true);
+			};
+			if (module.d && module.d.length) {
+				onReady(module.d, ready);
+			} else {
+				ready();
 			}
+			
 		},
 		c: {},
 		/*
@@ -378,7 +378,9 @@
 						};
 						$.each(module.d, function(i, dependency){
 							if (modules[dependency]) {
-								addDependency(i, dependency);
+								if(!modules[dependency].loaded){
+									addDependency(i, dependency);
+								}
 							}
 							else 
 								if (webshimsFeatures[dependency]) {
@@ -431,9 +433,12 @@
 							module.loadInit();
 						}
 						
-						module.loaded = true;
+						
 						setDependencies(module, list);
-						loadCombos.push(module.name);
+						if(!module.loaded){
+							loadCombos.push(module.name);
+						}
+						module.loaded = true;
 					}
 					
 					for(i = 0, len = loadCombos.length; i < len; i++){
@@ -1004,7 +1009,7 @@
 				return !Modernizr[formvalidation] || bustedValidity  || $.inArray(fNuAPI, toLoad  || []) == -1 || modules[fNuAPI].test();
 			},
 			d: ['form-core', DOMSUPPORT, 'form-message'],
-			c: [6, 5]
+			c: [6, 5, 14]
 		});
 		
 		addPolyfill(fShim, {
@@ -1013,7 +1018,7 @@
 				return Modernizr[formvalidation] && !bustedValidity;
 			},
 			d: ['form-core', DOMSUPPORT, 'sizzle'],
-			c: [16, 15, 24]
+			c: [16, 15, 24, 28]
 		});
 		
 		addPolyfill(fShim+'2', {
@@ -1031,7 +1036,7 @@
 				return !( formOptions.customMessages || !Modernizr[formvalidation] || bustedValidity || !modules[formExtend].test(toLoad) );
 			},
 			d: [DOMSUPPORT],
-			c: [16, 7, 15, 30, 3, 8, 4]
+			c: [16, 7, 15, 30, 3, 8, 4, 14, 28]
 		});
 		
 		formExtras = {
@@ -1066,7 +1071,7 @@
 			},
 			methodNames: ['stepUp', 'stepDown'],
 			d: ['forms', DOMSUPPORT],
-			c: [6, 5, 18, 17],
+			c: [6, 5, 18, 17, 14, 28],
 			nM: 'input inputtypes'
 		});
 		
@@ -1110,7 +1115,7 @@
 				return modernizrInputAttrs.list && !formOptions.fD;
 			},
 			d: ['form-core', DOMSUPPORT],
-			c: [16, 7, 6, 2, 9, 15, 30, 31]
+			c: [16, 7, 6, 2, 9, 15, 30, 31, 28]
 		});
 	})();
 	//>

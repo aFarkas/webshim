@@ -561,7 +561,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			var resizeTimer;
 			var lastHeight;
 			var lastWidth;
-			
+			var $window = $(window);
 			var docObserve = {
 				init: false,
 				runs: 0,
@@ -581,25 +581,36 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						docObserve.runs = 0;
 					}
 				},
-				handler: function(e){
-					clearTimeout(resizeTimer);
-					resizeTimer = setTimeout(function(){
-						if(e.type == 'resize'){
-							var width = $(window).width();
-							var height = $(window).width();
-							if(height == lastHeight && width == lastWidth){
-								return;
-							}
-							lastHeight = height;
-							lastWidth = width;
-							
-							docObserve.height = docObserve.getHeight();
-							docObserve.width = docObserve.getWidth();
-							
-						}
+				handler: (function(){
+					var trigger = function(){
 						$(document).triggerHandler('updateshadowdom');
-					}, (e.type == 'resize') ? 50 : 9);
-				},
+					};
+					return function(e){
+						clearTimeout(resizeTimer);
+						resizeTimer = setTimeout(function(){
+							if(e.type == 'resize'){
+								var width = $window.width();
+								var height = $window.width();
+
+								if(height == lastHeight && width == lastWidth){
+									return;
+								}
+								lastHeight = height;
+								lastWidth = width;
+								
+								docObserve.height = docObserve.getHeight();
+								docObserve.width = docObserve.getWidth();
+							}
+
+							if(window.requestAnimationFrame){
+								requestAnimationFrame(trigger);
+							} else {
+								setTimeout(trigger, 0);
+							}
+							
+						}, (e.type == 'resize' && !window.requestAnimationFrame) ? 50 : 0);
+					};
+				})(),
 				_create: function(){
 					$.each({ Height: "getHeight", Width: "getWidth" }, function(name, type){
 						var body = document.body;

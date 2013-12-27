@@ -560,11 +560,6 @@
 		});
 	};
 	if(window.webshims && webshims.isReady){
-		webshims.ready('es5', function(){
-			webshims.isReady('range-ui', true);
-		});
-		if(webshims._polyfill){
-			 webshims._polyfill(['es5']);
-		}
+		webshims.isReady('range-ui', true);
 	}
 })(window.webshims ? webshims.$ : jQuery);

@@ -22,12 +22,23 @@
 		<script>
 			
 			(function($, r){
-				var combos = {};
+				var combos = {features: {}, files: {}};
 				var makeFile = function(file){
 					return 'src/shims/'+file+'.js';
 				};
-				$.each($.webshims.c, function(c, srces){
-					combos['src/shims/combos/'+c+'.js'] = $.map(srces, makeFile);
+				$.each(webshims.c, function(c, srces){
+					
+					combos.files['src/shims/combos/'+c+'.js'] = $.map(srces, makeFile);
+					c *= 1;
+					$.each(srces, function(i, moduleName){
+						var feature = webshims.modules[moduleName].f || moduleName;
+						if(!combos.features[feature]){
+							combos.features[feature] = [];
+						}
+						if(combos.features[feature].indexOf(c) == -1){
+							combos.features[feature].push(c);
+						}
+					});
 				});
 				if(r.console){
 					r.console.log(combos);
