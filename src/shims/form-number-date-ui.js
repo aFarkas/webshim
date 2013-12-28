@@ -485,18 +485,30 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			},
 			date: function(val, opts, noCorrect){
 				createFormat('d');
-				var i;
-				var obj;
+				var tmp, obj;
+				var ret = '';
 				if(opts.splitInput){
 					obj = {yy: 0, mm: 1, dd: 2};
 				} else {
 					obj = curCfg.patterns.dObj;
 					val = val.split(curCfg.dFormat);
 				}
-				
-				return (val.length == 3 && val[0] && val[1] && val[2] && (!noCorrect || (val[obj.yy].length > 3 && val[obj.mm].length == 2 && val[obj.dd].length == 2))) ? 
-					([addZero(val[obj.yy]), addZero(val[obj.mm]), addZero(val[obj.dd])]).join('-') : 
-					''
+				if(val.length == 3 && val[0] && val[1] && val[2] && (!noCorrect || (val[obj.yy].length > 3 && val[obj.mm].length == 2 && val[obj.dd].length == 2))){
+					if(val[obj.mm] > 12 && val[obj.dd] < 13){
+						tmp = val[obj.dd];
+						val[obj.dd] = val[obj.mm];
+						val[obj.mm] = tmp;
+					}
+					if(val[obj.yy].length < 4){
+						tmp = ((new Date()).getFullYear() +'').substr(0, 4 - val[obj.yy].length);
+						if(val[obj.yy] > 50){
+							tmp--;
+						}
+						val[obj.yy] = tmp + val[obj.yy];
+					}
+					ret = ([addZero(val[obj.yy]), addZero(val[obj.mm]), addZero(val[obj.dd])]).join('-');
+				}
+				return ret
 				;
 			},
 			color: function(val, opts){
