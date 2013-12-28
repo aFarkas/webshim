@@ -925,6 +925,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				if(!this._init || force || this.options[name] !== val){
 					if(isValue){
 						this._beforeValue(val);
+					} else {
+						this.elemHelper.prop(name, val);
 					}
 					
 					val = formatVal[this.type](val, this.options);

@@ -63,7 +63,8 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			cache.type = getType(input[0]);
 		}
 		if(cache.type == 'week'){return false;}
-		var ret = (validityState || {}).stepMismatch || false, base;
+		var base, attrVal;
+		var ret = (validityState || {}).stepMismatch || false;
 		if(typeModels[cache.type] && typeModels[cache.type].step){
 			if( !('step' in cache) ){
 				cache.step = webshims.getStep(input[0], cache.type);
@@ -78,6 +79,11 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			
 			addMinMaxNumberToCache('min', input, cache);
 			base = cache.minAsNumber;
+			
+			if(isNaN(base) && (attrVal = input.prop('defaultValue'))){
+				base = typeModels[cache.type].asNumber( attrVal );
+			}
+			
 			if(isNaN(base)){
 				base = typeModels[cache.type].stepBase || 0;
 			}
@@ -192,7 +198,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		var stepDescriptor = webshims.defineNodeNameProperty('input', name, {
 			prop: {
 				value: function(factor){
-					var step, val, dateVal, valModStep, alignValue, cache;
+					var step, val, dateVal, valModStep, alignValue, cache, base, attrVal;
 					var type = getType(this);
 					if(typeModels[type] && typeModels[type].asNumber){
 						cache = {type: type};
@@ -219,10 +225,21 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 						webshims.addMinMaxNumberToCache('min', $(this), cache);
 						webshims.addMinMaxNumberToCache('max', $(this), cache);
 						
+						base = cache.minAsNumber;
+						
+						if(isNaN(base) && (attrVal = $.prop(this, 'defaultValue'))){
+							base = typeModels[type].asNumber( attrVal );
+						}
+						
+						if(!base){
+							base = 0;
+						}
+						
 						step *= factor;
 						
 						val = (val + step).toFixed(5) * 1;
-						valModStep = (val - (cache.minAsNumber || 0)) % step;
+						
+						valModStep = (val - base) % step;
 						
 						if ( valModStep && (Math.abs(valModStep) > EPS) ) {
 							alignValue = val - valModStep;
