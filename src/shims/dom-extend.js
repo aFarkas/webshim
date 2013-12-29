@@ -490,7 +490,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			var nameFn = function(f, dashed){
 				return dashed.toUpperCase();
 			};
-			return function(elem, name, bases){
+			return function(elem, name, bases, stringAllowed){
 				if(nameRegs[name]){
 					name = nameRegs[name];
 				} else {
@@ -505,7 +505,12 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					return data;
 				}
 				data = $(elem).data();
-				
+				if(data && typeof data[name] == 'string'){
+					if(stringAllowed){
+						return elementData(elem, 'cfg'+name, data[name]);
+					}
+					webshims.error('data-'+ name +' attribute has to be a valid JSON, was: '+ data[name]);
+				}
 				if(!bases){
 					bases = [true, {}];
 				} else if(!Array.isArray(bases)){
@@ -514,12 +519,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					bases.unshift(true, {});
 				}
 				
-				if(data && data[name]){
-					if(typeof data[name] == 'object'){
-						bases.push(data[name]);
-					} else {
-						webshims.error('data-'+ name +' attribute has to be a valid JSON, was: '+ data[name]);
-					}
+				if(data && typeof data[name] == 'object'){
+					bases.push(data[name]);
 				}
 				
 				if(!regs[name]){
