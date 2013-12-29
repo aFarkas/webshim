@@ -941,7 +941,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			var nameFn = function(f, dashed){
 				return dashed.toUpperCase();
 			};
-			return function(elem, name, bases){
+			return function(elem, name, bases, stringAllowed){
 				if(nameRegs[name]){
 					name = nameRegs[name];
 				} else {
@@ -956,7 +956,12 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					return data;
 				}
 				data = $(elem).data();
-				
+				if(data && typeof data[name] == 'string'){
+					if(stringAllowed){
+						return elementData(elem, 'cfg'+name, data[name]);
+					}
+					webshims.error('data-'+ name +' attribute has to be a valid JSON, was: '+ data[name]);
+				}
 				if(!bases){
 					bases = [true, {}];
 				} else if(!Array.isArray(bases)){
@@ -965,12 +970,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					bases.unshift(true, {});
 				}
 				
-				if(data && data[name]){
-					if(typeof data[name] == 'object'){
-						bases.push(data[name]);
-					} else {
-						webshims.error('data-'+ name +' attribute has to be a valid JSON, was: '+ data[name]);
-					}
+				if(data && typeof data[name] == 'object'){
+					bases.push(data[name]);
 				}
 				
 				if(!regs[name]){
@@ -1012,7 +1013,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			var resizeTimer;
 			var lastHeight;
 			var lastWidth;
-			
+			var $window = $(window);
 			var docObserve = {
 				init: false,
 				runs: 0,
@@ -1032,25 +1033,36 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						docObserve.runs = 0;
 					}
 				},
-				handler: function(e){
-					clearTimeout(resizeTimer);
-					resizeTimer = setTimeout(function(){
-						if(e.type == 'resize'){
-							var width = $(window).width();
-							var height = $(window).width();
-							if(height == lastHeight && width == lastWidth){
-								return;
-							}
-							lastHeight = height;
-							lastWidth = width;
-							
-							docObserve.height = docObserve.getHeight();
-							docObserve.width = docObserve.getWidth();
-							
-						}
+				handler: (function(){
+					var trigger = function(){
 						$(document).triggerHandler('updateshadowdom');
-					}, (e.type == 'resize') ? 50 : 9);
-				},
+					};
+					return function(e){
+						clearTimeout(resizeTimer);
+						resizeTimer = setTimeout(function(){
+							if(e.type == 'resize'){
+								var width = $window.width();
+								var height = $window.width();
+
+								if(height == lastHeight && width == lastWidth){
+									return;
+								}
+								lastHeight = height;
+								lastWidth = width;
+								
+								docObserve.height = docObserve.getHeight();
+								docObserve.width = docObserve.getWidth();
+							}
+
+							if(window.requestAnimationFrame){
+								requestAnimationFrame(trigger);
+							} else {
+								setTimeout(trigger, 0);
+							}
+							
+						}, (e.type == 'resize' && !window.requestAnimationFrame) ? 50 : 0);
+					};
+				})(),
 				_create: function(){
 					$.each({ Height: "getHeight", Width: "getWidth" }, function(name, type){
 						var body = document.body;
@@ -1780,7 +1792,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		if(webshims.errorbox && webshims.errorbox.initIvalContentMessage){
 			webshims.errorbox.initIvalContentMessage(elem);
 		}
-		var message = (webshims.getOptions && webshims.errorbox ? webshims.getOptions(elem, 'errormessage') : $(elem).data('errormessage')) || elem.getAttribute('x-moz-errormessage') || '';
+		var message = (webshims.getOptions && webshims.errorbox ? webshims.getOptions(elem, 'errormessage', false, true) : $(elem).data('errormessage')) || elem.getAttribute('x-moz-errormessage') || '';
 		if(key && message[key]){
 			message = message[key];
 		} else if(message) {
@@ -2817,4 +2829,3 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	webshims.ready('track', loadTrackUi);
 });
 })(Modernizr, webshims);
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/combos/2.js

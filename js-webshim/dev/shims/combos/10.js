@@ -490,7 +490,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			var nameFn = function(f, dashed){
 				return dashed.toUpperCase();
 			};
-			return function(elem, name, bases){
+			return function(elem, name, bases, stringAllowed){
 				if(nameRegs[name]){
 					name = nameRegs[name];
 				} else {
@@ -505,7 +505,12 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					return data;
 				}
 				data = $(elem).data();
-				
+				if(data && typeof data[name] == 'string'){
+					if(stringAllowed){
+						return elementData(elem, 'cfg'+name, data[name]);
+					}
+					webshims.error('data-'+ name +' attribute has to be a valid JSON, was: '+ data[name]);
+				}
 				if(!bases){
 					bases = [true, {}];
 				} else if(!Array.isArray(bases)){
@@ -514,12 +519,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					bases.unshift(true, {});
 				}
 				
-				if(data && data[name]){
-					if(typeof data[name] == 'object'){
-						bases.push(data[name]);
-					} else {
-						webshims.error('data-'+ name +' attribute has to be a valid JSON, was: '+ data[name]);
-					}
+				if(data && typeof data[name] == 'object'){
+					bases.push(data[name]);
 				}
 				
 				if(!regs[name]){
@@ -561,7 +562,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			var resizeTimer;
 			var lastHeight;
 			var lastWidth;
-			
+			var $window = $(window);
 			var docObserve = {
 				init: false,
 				runs: 0,
@@ -581,25 +582,36 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						docObserve.runs = 0;
 					}
 				},
-				handler: function(e){
-					clearTimeout(resizeTimer);
-					resizeTimer = setTimeout(function(){
-						if(e.type == 'resize'){
-							var width = $(window).width();
-							var height = $(window).width();
-							if(height == lastHeight && width == lastWidth){
-								return;
-							}
-							lastHeight = height;
-							lastWidth = width;
-							
-							docObserve.height = docObserve.getHeight();
-							docObserve.width = docObserve.getWidth();
-							
-						}
+				handler: (function(){
+					var trigger = function(){
 						$(document).triggerHandler('updateshadowdom');
-					}, (e.type == 'resize') ? 50 : 9);
-				},
+					};
+					return function(e){
+						clearTimeout(resizeTimer);
+						resizeTimer = setTimeout(function(){
+							if(e.type == 'resize'){
+								var width = $window.width();
+								var height = $window.width();
+
+								if(height == lastHeight && width == lastWidth){
+									return;
+								}
+								lastHeight = height;
+								lastWidth = width;
+								
+								docObserve.height = docObserve.getHeight();
+								docObserve.width = docObserve.getWidth();
+							}
+
+							if(window.requestAnimationFrame){
+								requestAnimationFrame(trigger);
+							} else {
+								setTimeout(trigger, 0);
+							}
+							
+						}, (e.type == 'resize' && !window.requestAnimationFrame) ? 50 : 0);
+					};
+				})(),
 				_create: function(){
 					$.each({ Height: "getHeight", Width: "getWidth" }, function(name, type){
 						var body = document.body;
@@ -1689,12 +1701,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		});
 	};
 	if(window.webshims && webshims.isReady){
-		webshims.ready('es5', function(){
-			webshims.isReady('range-ui', true);
-		});
-		if(webshims._polyfill){
-			 webshims._polyfill(['es5']);
-		}
+		webshims.isReady('range-ui', true);
 	}
 })(window.webshims ? webshims.$ : jQuery);;webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
@@ -2183,18 +2190,30 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			},
 			date: function(val, opts, noCorrect){
 				createFormat('d');
-				var i;
-				var obj;
+				var tmp, obj;
+				var ret = '';
 				if(opts.splitInput){
 					obj = {yy: 0, mm: 1, dd: 2};
 				} else {
 					obj = curCfg.patterns.dObj;
 					val = val.split(curCfg.dFormat);
 				}
-				
-				return (val.length == 3 && val[0] && val[1] && val[2] && (!noCorrect || (val[obj.yy].length > 3 && val[obj.mm].length == 2 && val[obj.dd].length == 2))) ? 
-					([addZero(val[obj.yy]), addZero(val[obj.mm]), addZero(val[obj.dd])]).join('-') : 
-					''
+				if(val.length == 3 && val[0] && val[1] && val[2] && (!noCorrect || (val[obj.yy].length > 3 && val[obj.mm].length == 2 && val[obj.dd].length == 2))){
+					if(val[obj.mm] > 12 && val[obj.dd] < 13){
+						tmp = val[obj.dd];
+						val[obj.dd] = val[obj.mm];
+						val[obj.mm] = tmp;
+					}
+					if(val[obj.yy].length < 4){
+						tmp = ((new Date()).getFullYear() +'').substr(0, 4 - val[obj.yy].length);
+						if(val[obj.yy] > 50){
+							tmp--;
+						}
+						val[obj.yy] = tmp + val[obj.yy];
+					}
+					ret = ([addZero(val[obj.yy]), addZero(val[obj.mm]), addZero(val[obj.dd])]).join('-');
+				}
+				return ret
 				;
 			},
 			color: function(val, opts){
@@ -2611,6 +2630,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				if(!this._init || force || this.options[name] !== val){
 					if(isValue){
 						this._beforeValue(val);
+					} else {
+						this.elemHelper.prop(name, val);
 					}
 					
 					val = formatVal[this.type](val, this.options);
@@ -3332,5 +3353,3 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	})();
 });
 
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/combos/10.js

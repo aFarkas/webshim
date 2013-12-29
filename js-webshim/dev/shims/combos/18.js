@@ -1509,7 +1509,8 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 			cache.type = getType(input[0]);
 		}
 		if(cache.type == 'week'){return false;}
-		var ret = (validityState || {}).stepMismatch || false, base;
+		var base, attrVal;
+		var ret = (validityState || {}).stepMismatch || false;
 		if(typeModels[cache.type] && typeModels[cache.type].step){
 			if( !('step' in cache) ){
 				cache.step = webshims.getStep(input[0], cache.type);
@@ -1524,6 +1525,11 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 			
 			addMinMaxNumberToCache('min', input, cache);
 			base = cache.minAsNumber;
+			
+			if(isNaN(base) && (attrVal = input.prop('defaultValue'))){
+				base = typeModels[cache.type].asNumber( attrVal );
+			}
+			
 			if(isNaN(base)){
 				base = typeModels[cache.type].stepBase || 0;
 			}
@@ -1638,7 +1644,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 		var stepDescriptor = webshims.defineNodeNameProperty('input', name, {
 			prop: {
 				value: function(factor){
-					var step, val, dateVal, valModStep, alignValue, cache;
+					var step, val, dateVal, valModStep, alignValue, cache, base, attrVal;
 					var type = getType(this);
 					if(typeModels[type] && typeModels[type].asNumber){
 						cache = {type: type};
@@ -1665,10 +1671,21 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 						webshims.addMinMaxNumberToCache('min', $(this), cache);
 						webshims.addMinMaxNumberToCache('max', $(this), cache);
 						
+						base = cache.minAsNumber;
+						
+						if(isNaN(base) && (attrVal = $.prop(this, 'defaultValue'))){
+							base = typeModels[type].asNumber( attrVal );
+						}
+						
+						if(!base){
+							base = 0;
+						}
+						
 						step *= factor;
 						
 						val = (val + step).toFixed(5) * 1;
-						valModStep = (val - (cache.minAsNumber || 0)) % step;
+						
+						valModStep = (val - base) % step;
 						
 						if ( valModStep && (Math.abs(valModStep) > EPS) ) {
 							alignValue = val - valModStep;
@@ -2594,12 +2611,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 		});
 	};
 	if(window.webshims && webshims.isReady){
-		webshims.ready('es5', function(){
-			webshims.isReady('range-ui', true);
-		});
-		if(webshims._polyfill){
-			 webshims._polyfill(['es5']);
-		}
+		webshims.isReady('range-ui', true);
 	}
 })(window.webshims ? webshims.$ : jQuery);;webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
@@ -3088,18 +3100,30 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 			},
 			date: function(val, opts, noCorrect){
 				createFormat('d');
-				var i;
-				var obj;
+				var tmp, obj;
+				var ret = '';
 				if(opts.splitInput){
 					obj = {yy: 0, mm: 1, dd: 2};
 				} else {
 					obj = curCfg.patterns.dObj;
 					val = val.split(curCfg.dFormat);
 				}
-				
-				return (val.length == 3 && val[0] && val[1] && val[2] && (!noCorrect || (val[obj.yy].length > 3 && val[obj.mm].length == 2 && val[obj.dd].length == 2))) ? 
-					([addZero(val[obj.yy]), addZero(val[obj.mm]), addZero(val[obj.dd])]).join('-') : 
-					''
+				if(val.length == 3 && val[0] && val[1] && val[2] && (!noCorrect || (val[obj.yy].length > 3 && val[obj.mm].length == 2 && val[obj.dd].length == 2))){
+					if(val[obj.mm] > 12 && val[obj.dd] < 13){
+						tmp = val[obj.dd];
+						val[obj.dd] = val[obj.mm];
+						val[obj.mm] = tmp;
+					}
+					if(val[obj.yy].length < 4){
+						tmp = ((new Date()).getFullYear() +'').substr(0, 4 - val[obj.yy].length);
+						if(val[obj.yy] > 50){
+							tmp--;
+						}
+						val[obj.yy] = tmp + val[obj.yy];
+					}
+					ret = ([addZero(val[obj.yy]), addZero(val[obj.mm]), addZero(val[obj.dd])]).join('-');
+				}
+				return ret
 				;
 			},
 			color: function(val, opts){
@@ -3516,6 +3540,8 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 				if(!this._init || force || this.options[name] !== val){
 					if(isValue){
 						this._beforeValue(val);
+					} else {
+						this.elemHelper.prop(name, val);
 					}
 					
 					val = formatVal[this.type](val, this.options);
@@ -4237,5 +4263,3 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 	})();
 });
 
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/combos/18.js

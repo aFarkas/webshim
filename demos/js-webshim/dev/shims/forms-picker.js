@@ -791,18 +791,17 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			this.element
 				.on({
 					'keydown': function(e){
-						var handled;
+						var handled, sKey;
 						var key = e.keyCode;
-						
 						if(e.shiftKey){return;}
-						
-						if((e.ctrlKey && key == 40)){
+						sKey = e.ctrlKey || e.altKey; //|| e.metaKey
+						if((sKey && key == 40)){
 							handled = 'downPage';
-						} else if((e.ctrlKey && key == 38)){
+						} else if((sKey && key == 38)){
 							handled = 'upPage';
-						} else if(key == 33 || (e.ctrlKey && key == 37)){
+						} else if(key == 33 || (sKey && key == 37)){
 							handled = 'prevPage';
-						} else if(key == 34 || (e.ctrlKey && key == 39)){
+						} else if(key == 34 || (sKey && key == 39)){
 							handled = 'nextPage';
 						} else if(e.keyCode == 36 || e.keyCode == 33){
 							handled = 'first';
@@ -1146,7 +1145,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			str.push('</tr></thead><tbody><tr class="ws-row-0">');
 			
 			week = picker.getWeek(date);
-			str.push('<td class="week-cell ws-week">'+ week +'</td>');
+			str.push('<td class="week-cell ws-week" role="gridcell" aria-disabled="true">'+ week +'</td>');
 			
 			for (i = 0; i < 99; i++) {
 				addTr = (i && !(i % 7));
@@ -1167,7 +1166,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					if(week > 52){
 						week =  picker.getWeek(date);
 					}
-					str.push('<td class="week-cell ws-week">'+ week +'</td>');
+					str.push('<td class="week-cell ws-week" role="gridcell" aria-disabled="true">'+ week +'</td>');
 				}
 				
 				if(!i){
@@ -1205,7 +1204,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					buttonStr += ' class="'+ classArray.join(' ') +'"';
 				}
 				
-				if(!picker.isInRange(dateArray, max, min) || (data.options.disableDays && $.inArray(day, data.options.disableDays) != -1)){
+				if(!picker.isInRange(dateArray, max, min)){
 					buttonStr += ' disabled=""';
 				}
 				
@@ -1445,11 +1444,13 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 							
 							setDirButtons(content, popover, 'yearPrev');
 							setDirButtons(content, popover, 'yearNext');
+							$(o.orig).trigger('pickerchange');
 							
 							if(webshims[content.type]){
 								new webshims[content.type](popover.bodyElement.children(), popover, content);
 							}
-							popover.element.trigger('pickerchange')
+							
+							popover.element
 								.filter('[data-vertical="bottom"]')
 								.triggerHandler('pospopover')
 							;
@@ -1645,8 +1646,8 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		if(o.inlinePicker){
 			o.updateOnInput = true;
 		}
+		
+		$(o.orig).trigger('pickercreated');
 	};
 		
 });
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/forms-picker.js

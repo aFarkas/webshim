@@ -42,25 +42,30 @@ module.exports = function(grunt){
 				}]
 			}
 		},
-		/*not used for build might be really helpfull for production*/
+		/*not used for build but might be really helpfull for production*/
+		/* should we create a npm grunt task???*/
 		optimizePolyfiller: {
 			options: {
 				src: 'js-webshim/dev/', //required
-				features: 'forms forms-ext ',
+				features: 'forms mediaelement',
 
 				dest: 'polyfiller-custom.js',
+				//should existing uglify be extended to uglify custom polyfiller? default: false
+				uglify: true,
 				
+				//should initially loaded files inlined into polyfiller? default: false
 				inlineInitFiles: true,
-				
+				/*
 				//only in case inlineInitFiles is true
-				
+				*/
+				//which lang or langs are used on page?
 				lang: 'fr it',
-				
-				//customMessages: true,
-				replaceUI: true,
-				includeSwfmini: true,
-				
-				uglify: true
+				//forms feature option default: false
+				customMessages: false,
+				//forms-ext feature option default: false
+				replaceUI: false,
+				//is swfobject not used on site default: true
+				includeSwfmini: true
 			}
 		},
 		uglify: {
@@ -152,18 +157,6 @@ module.exports = function(grunt){
 		});
 	});
 	
-	grunt.registerTask('sourceurl', 'Add sourceURL to file.', function() {
-		var files = getFiles(DISTPATH, false, '**');
-		var file, content;
-		for(var i in files){
-			file = files[i];
-			if(grunt.file.isFile(file) && /\.js$/.test(file)){
-					content = grunt.file.read(file);
-					grunt.file.write(file, content +"\n//@ sourceURL=EVALPATH/"+ file );
-			}
-		}
-	});
-	
 	grunt.registerTask('cfgcopymin', 'config min and copy tasks.', function() {
 		var files = getFiles('src', false, '**');
 		var path = require('path');
@@ -205,9 +198,9 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-css');
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	
-	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'sourceurl', 'copy:legacy']);
+	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'copy:legacy']);
 
-	grunt.registerTask('dev', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'sourceurl', 'watch']);
+	grunt.registerTask('dev', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'watch']);
 
 
 	function getFiles(srcdir, destdir, wildcard, compareDir, compareMatch) {

@@ -178,5 +178,3 @@
 	});
 	webshims.isReady('geolocation', true);
 })(webshims.$);
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/geolocation.js

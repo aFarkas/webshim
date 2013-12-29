@@ -222,5 +222,3 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 		
 	});
 });
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/form-message.js

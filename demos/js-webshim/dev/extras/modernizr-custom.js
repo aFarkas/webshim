@@ -543,4 +543,3 @@ Modernizr.addTest({
 	track: ('kind' in document.createElement('track'))
 });
 ;
-//@ sourceURL=EVALPATH/js-webshim/dev/extras/modernizr-custom.js

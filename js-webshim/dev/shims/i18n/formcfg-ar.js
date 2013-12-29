@@ -62,5 +62,3 @@ webshims.formcfg.ar = {
 		yearSuffix: ''
 	}
 };
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/i18n/formcfg-ar.js

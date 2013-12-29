@@ -495,5 +495,3 @@ $.ui.position = {
 })();
 
 }( window.webshims && window.webshims.$ || jQuery ) );
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/plugins/jquery.ui.position.js

@@ -55,5 +55,3 @@ webshims.addReady(function(context, elem){
 });
 webshims.isReady('canvas', true);
 })(document);
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/FlashCanvasPro/flashcanvas.js

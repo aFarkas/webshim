@@ -838,5 +838,3 @@ var swfmini = function() {
 		});
 	});
 });
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/combos/27.js

@@ -393,5 +393,3 @@ webshims.register('form-validators', function($, webshims, window, document, und
 })();
 
 });
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/form-validators.js

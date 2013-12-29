@@ -61,7 +61,9 @@
 	var html5 = window.html5 || {};
 	var firstRun;
 	var webshims = window.webshims;
-	
+	var addSource = function(text){
+		return text +"\n//# sourceURL="+this.url;
+	};
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
 	
 	if(Modernizr.ES5 && !('toJSON' in Date.prototype)){
@@ -79,7 +81,11 @@
 			loadStyles: true,
 			disableShivMethods: true,
 			wspopover: {appendTo: 'auto', hideOnBlur: true},
-			ajax: {cache: true},
+			ajax: {},
+			loadScript: function(src, success, fail){
+				$.ajax($.extend({}, webCFG.ajax, {url: src, success: success, dataType: 'script', cache: true, global: false, dataFilter: addSource}));
+			},
+			
 			basePath: (function(){
 				var script = jScripts.filter('[src*="polyfiller.js"]');
 				var path;
@@ -518,16 +524,7 @@
 					};
 					
 					loadedSrcs[src] = 1;
-					
-					if(window.require && window.define && window.define.amd){
-						require([src], complete);
-					} else if (window.sssl) {
-						sssl(src, complete);
-					} else if (window.yepnope) {
-						yepnope.injectJs(src, complete);
-					} else {
-						$.ajax($.extend({}, webCFG.ajax, {url: src, success: complete, dataType: 'script'}));
-					}
+					webCFG.loadScript(src, complete, $.noop);
 				};
 			})()
 		}
@@ -554,7 +551,7 @@
 		error: 1
 	};
 	
-	if(!('crossDomain' in webCFG.ajax) && location.protocol.indexOf('http')){
+	if(webCFG.debug || (!('crossDomain' in webCFG.ajax) && location.protocol.indexOf('http'))){
 		webCFG.ajax.crossDomain = true;
 	}
 	
@@ -869,7 +866,7 @@
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
 	addPolyfill('es5', {
 		test: !!(Modernizr.ES5 && Function.prototype.bind),
-		c: [18, 19, 25, 20]
+		c: [18, 19, 25, 20, 32]
 	});
 	
 	addPolyfill('dom-extend', {
@@ -1009,7 +1006,7 @@
 				return !Modernizr[formvalidation] || bustedValidity  || $.inArray(fNuAPI, toLoad  || []) == -1 || modules[fNuAPI].test();
 			},
 			d: ['form-core', DOMSUPPORT, 'form-message'],
-			c: [6, 5, 14]
+			c: [6, 5, 14, 29]
 		});
 		
 		addPolyfill(fShim, {
@@ -1071,7 +1068,7 @@
 			},
 			methodNames: ['stepUp', 'stepDown'],
 			d: ['forms', DOMSUPPORT],
-			c: [6, 5, 18, 17, 14, 28],
+			c: [6, 5, 18, 17, 14, 28, 29, 32, 33],
 			nM: 'input inputtypes'
 		});
 		
@@ -1115,7 +1112,7 @@
 				return modernizrInputAttrs.list && !formOptions.fD;
 			},
 			d: ['form-core', DOMSUPPORT],
-			c: [16, 7, 6, 2, 9, 15, 30, 31, 28]
+			c: [16, 7, 6, 2, 9, 15, 30, 31, 28, 32, 33]
 		});
 	})();
 	//>

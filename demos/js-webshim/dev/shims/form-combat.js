@@ -144,5 +144,3 @@ webshims.register('form-combat', function($,webshims){
 		}, 4);
 	});
 });
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/form-combat.js

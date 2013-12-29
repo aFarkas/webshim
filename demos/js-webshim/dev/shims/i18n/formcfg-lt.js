@@ -76,5 +76,3 @@ webshims.formcfg.lt = {
 //for IE
 webshims.validityMessages['lt-LT'] = webshims.validityMessages.lt;
 webshims.formcfg['lt-LT'] = webshims.formcfg.lt;
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/i18n/formcfg-lt.js

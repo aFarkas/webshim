@@ -2024,5 +2024,3 @@ if ( typeof define === "function" && define.amd ) {
 })(window.webshims && window.webshims.$ || window.jQuery, window.Sizzle);
 })( window );
 
-
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/sizzle.js

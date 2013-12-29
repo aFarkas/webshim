@@ -1207,4 +1207,3 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 	}
 	
 });
-//@ sourceURL=EVALPATH/js-webshim/dev/shims/mediaelement-jaris.js
