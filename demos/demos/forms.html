@@ -71,7 +71,6 @@
 
 			<a class="toc_title" href="#UI-Settings">Customizing UI/UX of form validation</a>
 			<ul class="toc_section">
-				
 				<li>
 					– <a href="#UI-replaceValidationUI"><code>replaceValidationUI</code> and <code>.user-error</code>/<code>.user-success</code></a>
 				</li>
@@ -79,9 +78,17 @@
 					– <a href="#UI-ival">Live validation with <code>iVal</code> option</a>
 				</li>
 			</ul>
-
-
 			
+			<a class="toc_title" href="#Custom-validity">Custom errors</a>
+			<ul class="toc_section">
+				<li>
+					– <a href="#Custom-addValidators"><code>addValidators</code> option</a>
+				</li>
+			</ul>
+			
+			<a class="toc_title" href="#Datalist"><code>datalist</code> element</a>
+
+			<a class="toc_title" href="#WSpopover">webshims popover options</a>
 
 		</div>
 
@@ -114,7 +121,7 @@ webshims.activeLang('en'); //set locale to en
 			<p>Webshim supports the following locales out of the box: <select class="active-lang"></select>.</p>
 		
 			<form action="#">
-				<input type="email" required />
+				<input placeholder="required email" type="email" required />
 			
 				<input type="submit" />
 			</form>
@@ -162,7 +169,7 @@ webshims.polyfill('forms');
 			<iframe class="fiddle-example" width="100%" height="350" src="http://jsfiddle.net/trixta/6ELuD/embedded/result,js,html" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 			
 			<h2 id="UI-Settings">Customizing UI/UX of form validation</h2>
-			<p>HTML5 constraint form validation implements a very simple UI for form validation. In most cases developers want to enhance this UI. Webshim implementation allows this by using all native form features, but also gives some pre-build configuration options to implement clientside form validation with a very good user experience and great control over style and behavior.</p>
+			<p>HTML5 constraint form validation implements a very simple UI for form validation. In most cases developers want to enhance this UI. Webshim implementation allows this by using all native form features (<code>noValidate</code> or preventing default behavior of the <code>invalid</code> event), but also gives some pre-build configuration options to implement clientside form validation with a very good user experience and great control over style and behavior.</p>
 			
 			<h3 id="UI-replaceValidationUI"><code class="i">replaceValidationUI</code> and <code class="i">.user-error</code>/<code class="i">.user-success</code></h3>
 			<p>With <code class="i">replaceValidationUI</code> set to true the validation bubble of the browser will be replaced with a webshims popover with the additional class <code>validity-alert</code>. Additionally all form fields can be styled using the classes <code>.user-error</code> and <code>.user-success</code></p>
@@ -171,7 +178,7 @@ webshims.polyfill('forms');
 			
 			<h3 id="UI-ival">Live form validation <code class="i">iVal</code></h3>
 			<p>The instant form validation feature of webshims is a simple to use but powerfull and UX enhanced feature. Simply put a <code class="i">ws-validate</code> class to your form element:</p>
-			<iframe class="fiddle-example" width="100%" height="200" src="http://jsfiddle.net/trixta/Xp3Vb/embedded/html,js,css,result,html" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<iframe class="fiddle-example" width="100%" height="200" src="http://jsfiddle.net/trixta/9859C/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 			<p>The instant validation feature can be controlled through the <code class="i">iVal</code> option object. The <code class="i">iVal</code> option has the following defaults.</p>
 <pre><code class="language-javascript">
 webshims.setOptions('forms', {
@@ -201,7 +208,9 @@ webshims.setOptions('forms', {
 });			
 //start polyfilling
 webshims.polyfill('forms');
-</code></pre>			
+</code></pre>
+			<p>The iVal feature integrates well into different CSS-frameworks like bootstrap or jQuery mobile:</p>
+			<iframe  class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/T29Kx/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 </div>
 			
 

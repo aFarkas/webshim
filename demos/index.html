@@ -170,13 +170,17 @@
 			</p>
 
 			<h3 id="Guide-installation">Installation</h3>
-				<p>
-				Take the 'js-webshim' folder and add it to your project. (You will find a minified and a dev folder there.) Here is an example showing how to include dependencies and load webshims: 				<pre><code class="language-markup">
+			<p>
+				Take the 'js-webshim' folder and add it to your project. (You will find a minified and a dev folder there.) Here is an example showing how to include dependencies and load webshims:
+			</p>
+<pre><code class="language-markup">
 &lt;script src="js/jquery-1.9.1.js"&gt;&lt;/script&gt;
 &lt;script src="js/modernizr-custom.js"&gt;&lt;/script&gt;
 &lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
   
 &lt;script&gt;
+  //webshims.setOptions('basePath', 'js-webshim/minified/shims/');
+  
   webshims.polyfill();
   
   $(function(){
@@ -184,14 +188,14 @@
   });
 &lt;/script&gt;
 </code></pre>
-			</p>
 
 			<h3 id="Guide-configuration">Configuration</h3>
-				<br>
+			<p>
 				The polyfill method accepts an optional whitespace-separated feature list. Call it as soon as possible (before DOM ready.)
 				<code class="i">
 					webshims.polyfill( "canvas geolocation" );
 				</code>
+			</p>
 				<strong>Available Features</strong>
 
 				<ul class="list">
@@ -351,8 +355,8 @@ $(document).ready(function(){
 				and pass the feature name(s) and a callback function:
 			</p>
 			<pre><code class="language-javascript">
-webshims.ready('geolocation canvas', function(){
-  // work with geolocation and canvas
+webshims.ready('geolocation es5', function(){
+  // work with geolocation and es5
 });
 </code></pre>
 			<p>
@@ -449,8 +453,6 @@ $('video').get(0).addTextTrack('subtitles', 'just a test', 'en');
 					<p>
 						<strong>binding to events</strong>: Always use jQuery's <code class="i">
 							on</code>
-						, <code class="i">
-							bind</code>
 						method to register your event handlers. <code class="i">
 							addEventListener</code>
 						or inline event handler won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use event capturing in the native implementation and <code class="i">
@@ -621,7 +623,7 @@ $(document).on('pageinit', function(e){
 </code></pre>
 
 			<p>
-				For jQuery Mobile see also <a href="webforms/jquery-mobile.html">webshims and jQ mobile</a>
+				For jQuery Mobile see also <a href="demos/webforms/jquery-mobile.html">webshims and jQ mobile</a>
 			</p>
 
 			<h2 id="ES5">ES5</h2>
@@ -835,7 +837,7 @@ var myCar = Object.create(carProto, {
 			</ul>
 			<ul class="list">
 				<li>
-					<small>1. You need to wrap the datalist options in a select element (datalist > select > option)!
+					<small>1. You need to wrap the datalist options in a select element (datalist > select > option)!</small>
 				</li>
 			</ul>
 
@@ -858,56 +860,53 @@ var myCar = Object.create(carProto, {
 
 			<h3 id="Forms-forms"><code class="i">
 					forms</code> Options</h3>
+			<p>A typical configuration would look like this:</p>
+<pre><code class="language-javascript">
+webshims.setOptions("forms", {
+	lazyCustomMessages: true,
+	replaceValidationUI: true,
+	customDatalist: true,
+	list: {
+		"filter": "^"
+	}
+});</code></pre>
 			<ul>
 				<li>
-					<strong>customMessages</strong> <em>boolean</em> If set to true, Webshims will implement a DOM-Property called customValidationMessage, which can be changed through the webshims.validityMessages-Array.
+					<strong><a href="demos/forms.html#Locale-customMessages">customMessages</a></strong> <em>boolean</em> If set to true, Webshims will implement a DOM-Property called customValidationMessage, which can be changed through the webshims.validityMessages-Array.
 					<br>
 					<em>default: false</em>
 				</li>
 				<li>
-					<strong>lazyCustomMessages</strong> <em>boolean</em> Similiar to <code class="i">
+					<strong><a href="demos/forms.html#Locale-customMessages">lazyCustomMessages</a></strong> <em>boolean</em> Similiar to <code class="i">
 						customMessages</code>
 					, but the data is lazily loaded after window.onload or as soon as the user starts to interact with a form for better performance. The customValidationMessage property is therefore not available on DOM-Ready.
 					<br>
 					<em>default: false</em>
 				</li>
 				<li>
-					<strong>replaceValidationUI</strong> <em>boolean</em> Replaces the browser validation UI with a custom styleable UI.
+					<strong><a href="demos/forms.html#UI-replaceValidationUI">replaceValidationUI</a></strong> <em>boolean</em> Replaces the browser validation UI with a custom styleable UI.
 					<br>
 					<em>default: false</em>
 				</li>
 				<li>
-					<strong>placeholderType</strong> <em>string</em> Enumeration with value <code class="i">
-						value</code>
-					or <code class="i">
-						over</code>
-					. If set to "over", the polyfill uses the overLabel technique to create a placeholder and doesn't "pollute" the value property.
+					<strong>iVal</strong> <em>mixed object</em> Adds and configures a user friendly clientside form validation UI.
 					<br>
-					<em>default: value</em>
-				</li>
-				<li>
-					<strong>customDatalist</strong> <em>boolean</em> Allows to use custom styleable datalist elements in all browsers.
-					<br>
-					<em>default: false</em>
-				</li>
-				<li>
-					<strong>overridePlaceholder</strong> <em>boolean</em>
-				</li>
-				<li>
-					<strong>iVal</strong> <em>mixed object</em>
-					<br>
-					<em>default: <code class="i">{
-	"sel": ".ws-validate",
-	"handleBubble": "hide",
-	"recheckDelay": 400,
-	"fieldWrapper": ":not(span), :not(label), :not(em), :not(strong), :not(p)",
-	"errorClass": "user-error",
-	"errorWrapperClass": "ws-invalid",
-	"successWrapperClass": "ws-success",
-	"errorBoxClass": "ws-errorbox",
-	"errorMessageClass": "ws-errormessage",
-	"fx": "slide"
-}}</code></em>
+					<em>default: </em>
+<pre><code class="language-javascript">
+webshims.setOptions("forms", {
+	iVal: {
+		"sel": ".ws-validate",
+		"handleBubble": "hide",
+		"recheckDelay": 400,
+		"fieldWrapper": ":not(span), :not(label), :not(em), :not(strong), :not(p)",
+		"errorClass": "user-error",
+		"errorWrapperClass": "ws-invalid",
+		"successWrapperClass": "ws-success",
+		"errorBoxClass": "ws-errorbox",
+		"errorMessageClass": "ws-errormessage",
+		"fx": "slide"
+	}
+});</code></pre>
 				</li>
 				<li>
 					<strong>addValidators</strong> <em>boolean</em> Should Webshim implement some new custom validators. <a href="webforms/4-webforms-custom-validity.html">custom validity example</a>
@@ -915,20 +914,38 @@ var myCar = Object.create(carProto, {
 					<em>default: false</em>
 				</li>
 				<li>
-					<strong>list</strong> <em>mixed object</em> Options for the datalist/[list] feature.
+					<strong>customDatalist</strong> <em>boolean</em> Allows to use custom styleable datalist elements in all browsers.
 					<br>
-					<em>default: <code class="i">{
-	"filter": "*",
-	"multiple": false,
-	"focus": false,
-	"highlight": false,
-	"valueCompletion": false,
-	"noHtmlEscape": false,
-	"datalistCreated": false,
-	"popover": {
-		"constrainWidth": true
+					<em>default: false</em>
+				</li>
+				<li>
+					<strong>list</strong> <em>mixed object</em> Options object for the datalist/[list] feature (can be also controlled using data-list markup).
+					<br>
+					<em>default:</em>
+<pre><code class="language-javascript">
+webshims.setOptions("forms", {
+	list: {
+		"filter": "*",
+		"multiple": false,
+		"focus": false,
+		"highlight": false,
+		"valueCompletion": false,
+		"noHtmlEscape": false,
+		"datalistCreated": false,
+		"popover": {
+			"constrainWidth": true
+		}
 	}
-}</code></em>
+});</code>
+</pre>
+
+<p>The list option can be also controlled by markup using either data-list attribute with a JSON string or dashed data-list-property-name attributes.
+<pre><code class="language-markup">
+&lt;input data-list='{"multiple": true, "valueCompletion": true}' list="datalist" /&gt;
+&lt;!-- or --/&gt;
+&lt;input data-list-multiple="true" datalist-value-completion='{"multiple": true, "valueCompletion": true}' list="datalist" /&gt;
+</code>
+</pre>
 				</li>
 			</ul>
 
@@ -946,29 +963,49 @@ var myCar = Object.create(carProto, {
 						'datetime-local range date time number month color'</code>
 					. If one of the listed input types is not supported, Webshim will load the forms-ext API and UI package and implement all types.
 					<br>
-					<em>default: datetime-local month date time range number</em>
+					<em>default: date time range number</em>
 				</li>
 				<li>
-					<strong>widgets</strong> <em>object</em> widgets is a general options object for all input options. <a href="webforms/3-webforms-widgets.html#configure-ui">more information</a>
+					<strong>widgets</strong> <em>object</em> widgets is a general options object for all input widgets. <a href="webforms/3-webforms-widgets.html#configure-ui">more information</a>
+<pre><code class="language-javascript">
+webshims.setOptions("forms-ext", {
+	"widgets": {
+		"filter": "*",
+		"noChangeDismiss": false,
+		"openOnFocus": false,
+		"startView": false,
+		"minView": false,
+		"inlinePicker": false,
+		"size": 1,
+		"splitInput": false,
+		"monthSelect": false,
+		"daySelect": false,
+		"popover": {
+			//popover options
+		},
+		"calculateWidth": true,
+		"animate": true
+	}
+});</code>
+</pre>
 				</li>
 				<li>
-					<strong>date</strong> <em>object</em><a href="webforms/3-webforms-widgets.html#date-cfg"> example </a>
-				</li>
-				<!--<li><strong>datetime-local</strong> (options): for more information see <a href="webforms/3-webforms-widgets.html#datetime-local-cfg">here</a></li>-->
-				<li>
-					<strong>month</strong> <em>object</em><a href="webforms/3-webforms-widgets.html#month-cfg">example</a>
+					<strong>date</strong> <em>object</em> Overrides widgets option object, can be also configured through data-date attribute 
 				</li>
 				<li>
-					<strong>number</strong> <em>object</em><a href="webforms/3-webforms-widgets.html#number-cfg">example</a>
+					<strong>month</strong> <em>object</em> Overrides widgets option object, can be also configured through data-month attribute
 				</li>
 				<li>
-					<strong>time</strong> <em>object</em><a href="webforms/3-webforms-widgets.html#time-cfg">example</a>
+					<strong>number</strong> <em>object</em> Overrides widgets option object, can be also configured through data-number attribute
 				</li>
 				<li>
-					<strong>range</strong> <em>object</em><a href="webforms/3-webforms-widgets.html#range-cfg">example</a>
+					<strong>time</strong> <em>object</em> Overrides widgets option object, can be also configured through data-time attribute
 				</li>
 				<li>
-					<strong>color</strong> <em>object</em>
+					<strong>range</strong> <em>object</em> Overrides widgets option object, can be also configured through data-range attribute
+				</li>
+				<li>
+					<strong>color</strong> <em>object</em> Overrides widgets option object, can be also configured through data-color attribute
 				</li>
 			</ul>
 
@@ -990,8 +1027,12 @@ var myCar = Object.create(carProto, {
 					<strong>event: changedvalid/changedinvalid</strong>: Event is triggered, if the value of the element was changed and is marked as valid/invalid (see also: .form-ui-valid/.form-ui-invalid).
 				</li>
 				<li>
-					<strong>event: datalistselect</strong>:  Event is triggered on the input element, if the user selects a value from an option inside of the associated datalist (only available, if customDatalist is set to true)
+					<strong>event: datalistselect</strong>:  Event is triggered on each input[list] for each option, in case the callback returns a string this is used to construct the datalist polyfill
 				</li>
+				<li>
+					<strong>event: getoptioncontent</strong>:  Event is triggered on the input element, if the user selects a value from an option inside of the associated datalist (only available, if customDatalist is set to true)
+				</li>
+				
 				<li>
 					<strong>selectors for CSS/JS: .ws-validate (.ws-invalid/.ws-success)</strong>: The class 'ws-validate' on a form element will implement UX improved Instant Validation for this form. The classes .ws-invalid (similiar to <a href="http://www.w3.org/TR/selectors4/#user-pseudos">:user-error</a>) and .ws-success will mark either "touched" invalid element wrappers or valid and "filled" element wrappers. <a href="webforms/1-webforms-lang-custom-bubble.html#instant-validation">example</a>
 				</li>
@@ -1007,10 +1048,7 @@ var myCar = Object.create(carProto, {
 					pseudoclass (i.e. IE8-).
 				</li>
 				<li>
-					<strong>property: customValidationMessage</strong>: very similar to the standard validationMessage, but always uses built-in custom validation messages, which can be better controlled. <strong>Note: You have to set <code class="i">
-						customMessages</code> or <code class="i">
-						lazyCustomMessages</code> to true before calling the <code class="i">
-						polyfill</code> method, to get this new property.</strong>
+					<strong>$().getErrorMessage</strong>: very similar to the standard validationMessage, but gives more control over the validationMessage.
 				</li>
 				<li>
 					<strong>attribute: data-errormessage or -x-moz-errormessage</strong>: Attribute with text, which is used be custom validityAlert/customValidationMessage to show a custom error message for the field.
@@ -1045,10 +1083,10 @@ ctx.fillRect(30, 30, 55, 50);
 			<pre><code class="language-javascript">
 // always run configuration before calling webshims.polyfill();
 window.FlashCanvasOptions = {
-    disableContextMenu: true
+	disableContextMenu: true
 };
 webshims.setOptions('canvas', {
-    type: 'flashpro' // excanvas | flash | flashpro
+	type: 'flashpro' // excanvas | flash | flashpro
 });
 </code></pre>
 			<h3>Options for the <code class="i">
