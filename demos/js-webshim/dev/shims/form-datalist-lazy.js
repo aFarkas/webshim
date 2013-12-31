@@ -497,7 +497,6 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 				
 				$(this.input)
 					.prop('value', newValue)
-					.trigger('select')
 					.triggerHandler('updateInput')
 				;
 				this.changedValue = true;

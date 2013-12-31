@@ -210,6 +210,7 @@ output {
  * popovers
  */
 .ws-popover {
+	font-size: 13px;
 	display: block;
 	visibility: hidden;
 	overflow: hidden;
@@ -217,10 +218,10 @@ output {
 	top: 0;
 	left: 0;
 	outline: none;
-	padding: 0 12px 0;
-	margin: 0 0 0 -12px;
+	padding: 0 em(12) 0;
+	margin: 0 0 0 em(-12);
 	z-index: 1100;
-	min-width: 90px;
+	min-width: em(50);
 	-webkit-transform: translate3d(0px, 0px, 0px);
 	-webkit-backface-visibility: hidden;
 	-webkit-transform-style: preserve-3d;
@@ -245,7 +246,7 @@ output {
 .ws-po-outerbox {
 	position: relative;
 	opacity: 0;
-	padding: 11px 0 9px;
+	padding: em(11) 0 em(9);
 	-webkit-transform: translate(0, -100%);
 	transform: translate(0, -100%);
 	transition: all 400ms ease-in-out;
@@ -253,13 +254,13 @@ output {
 	[data-vertical="bottom"] & {
 	  -webkit-transform: translate(0, 100%);
 		transform: translate(0, 100%);
-		padding: 4px 0 11px;
+		padding: em(4) 0 em(11);
 	}
 	
 	[data-vertical="middle"] & {
 		-webkit-transform: translate(0, 0) scale(0.3);
 		transform: translate(0, 0) scale(0.3);
-		padding: 4px 0;
+		padding: em(4) 0;
 	}
 
 	.ws-popover.ws-po-visible &,
@@ -271,11 +272,11 @@ output {
 }
 
 .ws-po-box {
-	border: 1px solid #ccc;
+	border: em(1) solid #ccc;
 	background: #fff;
-	padding: 5px 5px 3px;
+	padding: em(5) em(5) em(3);
 	border-radius: 3px;
-	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+	box-shadow: 0 em(1) em(5) rgba(0, 0, 0, 0.25);
 	
 	
 	button {
@@ -290,7 +291,7 @@ output {
 		-webkit-appearance: none;
 		appearance: none;
 		box-sizing: content-box;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-family: inherit;
 		background: transparent;
 		cursor: pointer;
 
@@ -308,33 +309,32 @@ output {
 
 .ws-po-arrow {
 	position: absolute;
-	top: 4px;
-	left: 20px;
+	top: em(4);
+	left: em(20);
 	display: block;
 	width: 0;
 	height: 0;
-	border-left: 8px solid transparent;
-	border-right: 8px solid transparent;
-	border-bottom: 8px solid #ccc;
+	border-left: em(8) solid transparent;
+	border-right: em(8) solid transparent;
+	border-bottom: em(8) solid #ccc;
 	border-top: none;
 	zoom: 1;
-	font-size: 0;
 	
 	[data-horizontal="center"] & {
 		left: 50%;
-		margin-left: -4px;
+		margin-left: em(-4);
 	}
 	
 	[data-horizontal="right"] & {
 		left: auto;
-		right: 20px;
+		right: em(20);
 	}
 	
 	[data-vertical="bottom"] & {
 		top: auto;
-		bottom: 4px;
+		bottom: em(4);
 		border-bottom: none;
-		border-top: 8px solid #ccc;
+		border-top: em(8) solid #ccc;
 	}
 
 	html & {
@@ -354,21 +354,21 @@ output {
 
 	.ws-po-arrowbox {
 		position: relative;
-		top: 1px;
-		left: -7px;
+		top: em(1);
+		left: em(-6.7);
 		display: block;
 		width: 0;
 		height: 0;
-		border-left: 7px solid transparent;
-		border-right: 7px solid transparent;
-		border-bottom: 7px solid #fefefe;
+		border-left: em(7) solid transparent;
+		border-right: em(7) solid transparent;
+		border-bottom: em(7) solid #fefefe;
 		border-top: none;
 		z-index: 999999999;
 		
 		[data-vertical="bottom"] & {
-			top: -8px;
+			top: em(-8);
 			border-bottom: none;
-			border-top: 7px solid #fefefe;
+			border-top: em(7) solid #fefefe;
 		}
 	}
 }
@@ -381,15 +381,14 @@ datalist {
 
 .datalist-polyfill {
 	position: absolute !important;
-	font-size: 13px;
 	
 	.ws-po-box {
-		padding: 5px 0;
+		padding: em(5) 0;
 	}
 
 	.datalist-box {
 		position: relative;
-		max-height: 200px;
+		max-height: em(200);
 		overflow: hidden;
 		overflow-x: hidden !important;
 		overflow-y: auto;
@@ -403,15 +402,15 @@ datalist {
   		position: static !important;
   		overflow: hidden;
   		margin: 0;
-  		padding: 2px 0;
+  		padding: em(1) 0;
   		height: auto !important;
   		background-color: #fff;
   		color: #000;
   	}
   
   	li {
-  		margin: 1px 0;
-  		padding: 2px 10px;
+  		margin: em(1) 0;
+  		padding: em(2) em(10);
   		overflow: hidden;
   		white-space: nowrap;
   		cursor: default;
@@ -445,7 +444,7 @@ datalist {
   		text-overflow: ellipsis;
   		vertical-align: bottom;
   		margin-top: 0.15em;
-  		margin-left: 10px;
+  		margin-left: em(10);
   		text-align: right;
   		transition: color 400ms;
   	}
@@ -478,7 +477,6 @@ datalist {
 
 .validity-alert {
 	display: inline-block;
-	font: 12px/140% sans-serif;
 	z-index: 1000000000;
 }
 
@@ -499,16 +497,35 @@ datalist {
 	}
 }
 
+@mixin progressbar {
+	border: 1px solid #ddd;
+	background: #f0f0f0;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+	border-radius: 4px;
+}
+
+@mixin progressvalue {
+	position: absolute;
+	display: block !important;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	height: 100%;
+	box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
+	background: #0063a6 url(progress.gif);
+	border: 0;
+}
+
 progress {
 	position: relative;
 	display: inline-block;
 	width: 160px;
 	height: 16px;
-
+	overflow: hidden;
+	
 	&[data-position] {
+		@include progressbar;
 		vertical-align: -0.2em;
-		border: 1px solid #ccc;
-		background: #e6e6e6;
 	}
 
 	> * {
@@ -516,44 +533,52 @@ progress {
 	}
 
 	span.progress-value {
-		position: absolute;
-		display: block !important;
-		top: 0;
-		left: 0;
-		bottom: 0;
-		height: 100%;
-		background: #a66300;
+		@include progressvalue;
 	}
-
+	
 	&[aria-valuenow] span.progress-value {
-		background: #0063a6;
+		background-image: url(progress.png);
+	}
+	
+	.ws-replaceui & {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+		
+		@include progressbar;
+		
+		&::-webkit-progress-bar { 
+			@include progressbar;
+			border: 0 none;
+		}
+		&::-webkit-progress-value { 
+			@include progressvalue;
+			background-image: url(progress.png);
+		}
+		&:indeterminate::-webkit-progress-bar { 
+			background-image: url(progress.gif);
+		}
+		
+		&::-moz-progress-bar { 
+			@include progressvalue;
+			background-image: url(progress.png);
+		}
+		&:indeterminate::-moz-progress-bar {
+			background-image: url(progress.gif);
+		}
+		/*ms styles*/
+		&:indeterminate {
+			background-image: url(progress.gif);
+		}
+		&::-ms-fill {
+			@include progressvalue;
+			background-image: url(progress.png);
+			animation-name: none;
+		}
 	}
 }
 
 
-/* localStorage */
-#swflocalstorageshim-wrapper {
-	position: absolute;
-	top: -999px;
-	left: -9999px;
-	overflow: hidden;
-	width: 215px;
-	min-width: 215px !important;
-	z-index: 2147483647;
-
-	.polyfill-exceeded-message {
-		margin: 0 0 5px;
-		padding: 5px;
-		background: #ffd;
-		color: #000;
-		font-size: 13px;
-	}
-
-	object {
-		min-height: 138px !important;
-		min-width: 215px !important;
-	}
-}
 
 details {
 	overflow: hidden;

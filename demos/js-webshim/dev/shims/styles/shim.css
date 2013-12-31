@@ -167,6 +167,7 @@ output {
  * popovers
  */
 .ws-popover {
+  font-size: 13px;
   display: block;
   visibility: hidden;
   overflow: hidden;
@@ -174,10 +175,10 @@ output {
   top: 0;
   left: 0;
   outline: none;
-  padding: 0 12px 0;
-  margin: 0 0 0 -12px;
+  padding: 0 0.92308em 0;
+  margin: 0 0 0 -0.92308em;
   z-index: 1100;
-  min-width: 90px;
+  min-width: 3.84615em;
   -webkit-transform: translate3d(0px, 0px, 0px);
   -webkit-backface-visibility: hidden;
   -webkit-transform-style: preserve-3d;
@@ -197,29 +198,29 @@ output {
 .ws-po-outerbox {
   position: relative;
   opacity: 0;
-  padding: 11px 0 9px;
+  padding: 0.84615em 0 0.69231em;
   -webkit-transform: translate(0, -100%);
   transform: translate(0, -100%);
   transition: all 400ms ease-in-out; }
   [data-vertical="bottom"] .ws-po-outerbox {
     -webkit-transform: translate(0, 100%);
     transform: translate(0, 100%);
-    padding: 4px 0 11px; }
+    padding: 0.30769em 0 0.84615em; }
   [data-vertical="middle"] .ws-po-outerbox {
     -webkit-transform: translate(0, 0) scale(0.3);
     transform: translate(0, 0) scale(0.3);
-    padding: 4px 0; }
+    padding: 0.30769em 0; }
   .ws-popover.ws-po-visible .ws-po-outerbox, div.ws-popover[data-vertical][data-horizontal].ws-po-visible .ws-po-outerbox {
     opacity: 1;
     -webkit-transform: translate(0, 0) scale(1);
     transform: translate(0, 0) scale(1); }
 
 .ws-po-box {
-  border: 1px solid #cccccc;
+  border: 0.07692em solid #cccccc;
   background: #fff;
-  padding: 5px 5px 3px;
+  padding: 0.38462em 0.38462em 0.23077em;
   border-radius: 3px;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25); }
+  box-shadow: 0 0.07692em 0.38462em rgba(0, 0, 0, 0.25); }
   .ws-po-box button {
     display: inline-block;
     overflow: visible;
@@ -232,7 +233,7 @@ output {
     -webkit-appearance: none;
     appearance: none;
     box-sizing: content-box;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: inherit;
     background: transparent;
     cursor: pointer; }
     .ws-po-box button::-moz-focus-inner {
@@ -244,28 +245,27 @@ output {
 
 .ws-po-arrow {
   position: absolute;
-  top: 4px;
-  left: 20px;
+  top: 0.30769em;
+  left: 1.53846em;
   display: block;
   width: 0;
   height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-bottom: 8px solid #cccccc;
+  border-left: 0.61538em solid transparent;
+  border-right: 0.61538em solid transparent;
+  border-bottom: 0.61538em solid #cccccc;
   border-top: none;
-  zoom: 1;
-  font-size: 0; }
+  zoom: 1; }
   [data-horizontal="center"] .ws-po-arrow {
     left: 50%;
-    margin-left: -4px; }
+    margin-left: -0.30769em; }
   [data-horizontal="right"] .ws-po-arrow {
     left: auto;
-    right: 20px; }
+    right: 1.53846em; }
   [data-vertical="bottom"] .ws-po-arrow {
     top: auto;
-    bottom: 4px;
+    bottom: 0.30769em;
     border-bottom: none;
-    border-top: 8px solid #cccccc; }
+    border-top: 0.61538em solid #cccccc; }
   html .ws-po-arrow {
     border-left-color: transparent;
     border-right-color: transparent; }
@@ -276,32 +276,31 @@ output {
     display: none; }
   .ws-po-arrow .ws-po-arrowbox {
     position: relative;
-    top: 1px;
-    left: -7px;
+    top: 0.07692em;
+    left: -0.51538em;
     display: block;
     width: 0;
     height: 0;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-bottom: 7px solid #fefefe;
+    border-left: 0.53846em solid transparent;
+    border-right: 0.53846em solid transparent;
+    border-bottom: 0.53846em solid #fefefe;
     border-top: none;
     z-index: 999999999; }
     [data-vertical="bottom"] .ws-po-arrow .ws-po-arrowbox {
-      top: -8px;
+      top: -0.61538em;
       border-bottom: none;
-      border-top: 7px solid #fefefe; }
+      border-top: 0.53846em solid #fefefe; }
 
 datalist {
   display: none; }
 
 .datalist-polyfill {
-  position: absolute !important;
-  font-size: 13px; }
+  position: absolute !important; }
   .datalist-polyfill .ws-po-box {
-    padding: 5px 0; }
+    padding: 0.38462em 0; }
   .datalist-polyfill .datalist-box {
     position: relative;
-    max-height: 200px;
+    max-height: 15.38462em;
     overflow: hidden;
     overflow-x: hidden !important;
     overflow-y: auto; }
@@ -312,13 +311,13 @@ datalist {
       position: static !important;
       overflow: hidden;
       margin: 0;
-      padding: 2px 0;
+      padding: 0.07692em 0;
       height: auto !important;
       background-color: #fff;
       color: #000; }
     .datalist-polyfill .datalist-box li {
-      margin: 1px 0;
-      padding: 2px 10px;
+      margin: 0.07692em 0;
+      padding: 0.15385em 0.76923em;
       overflow: hidden;
       white-space: nowrap;
       cursor: default;
@@ -346,7 +345,7 @@ datalist {
       text-overflow: ellipsis;
       vertical-align: bottom;
       margin-top: 0.15em;
-      margin-left: 10px;
+      margin-left: 0.76923em;
       text-align: right;
       transition: color 400ms; }
     .datalist-polyfill .datalist-box .has-option-label .option-label {
@@ -363,7 +362,6 @@ datalist {
 
 .validity-alert {
   display: inline-block;
-  font: 12px/140% sans-serif;
   z-index: 1000000000; }
 
 .ws-errorbox {
@@ -384,11 +382,14 @@ progress {
   position: relative;
   display: inline-block;
   width: 160px;
-  height: 16px; }
+  height: 16px;
+  overflow: hidden; }
   progress[data-position] {
-    vertical-align: -0.2em;
-    border: 1px solid #cccccc;
-    background: #e6e6e6; }
+    border: 1px solid #dddddd;
+    background: #f0f0f0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+    border-radius: 4px;
+    vertical-align: -0.2em; }
   progress > * {
     display: none !important; }
   progress span.progress-value {
@@ -398,28 +399,66 @@ progress {
     left: 0;
     bottom: 0;
     height: 100%;
-    background: #a66300; }
+    box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
+    background: #0063a6 url(progress.gif);
+    border: 0; }
   progress[aria-valuenow] span.progress-value {
-    background: #0063a6; }
-
-/* localStorage */
-#swflocalstorageshim-wrapper {
-  position: absolute;
-  top: -999px;
-  left: -9999px;
-  overflow: hidden;
-  width: 215px;
-  min-width: 215px !important;
-  z-index: 2147483647; }
-  #swflocalstorageshim-wrapper .polyfill-exceeded-message {
-    margin: 0 0 5px;
-    padding: 5px;
-    background: #ffd;
-    color: #000;
-    font-size: 13px; }
-  #swflocalstorageshim-wrapper object {
-    min-height: 138px !important;
-    min-width: 215px !important; }
+    background-image: url(progress.png); }
+  .ws-replaceui progress {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 1px solid #dddddd;
+    background: #f0f0f0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+    border-radius: 4px;
+    /*ms styles*/ }
+    .ws-replaceui progress::-webkit-progress-bar {
+      border: 1px solid #dddddd;
+      background: #f0f0f0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+      border-radius: 4px;
+      border: 0 none; }
+    .ws-replaceui progress::-webkit-progress-value {
+      position: absolute;
+      display: block !important;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      height: 100%;
+      box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
+      background: #0063a6 url(progress.gif);
+      border: 0;
+      background-image: url(progress.png); }
+    .ws-replaceui progress:indeterminate::-webkit-progress-bar {
+      background-image: url(progress.gif); }
+    .ws-replaceui progress::-moz-progress-bar {
+      position: absolute;
+      display: block !important;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      height: 100%;
+      box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
+      background: #0063a6 url(progress.gif);
+      border: 0;
+      background-image: url(progress.png); }
+    .ws-replaceui progress:indeterminate::-moz-progress-bar {
+      background-image: url(progress.gif); }
+    .ws-replaceui progress:indeterminate {
+      background-image: url(progress.gif); }
+    .ws-replaceui progress::-ms-fill {
+      position: absolute;
+      display: block !important;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      height: 100%;
+      box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
+      background: #0063a6 url(progress.gif);
+      border: 0;
+      background-image: url(progress.png);
+      animation-name: none; }
 
 details {
   overflow: hidden; }
