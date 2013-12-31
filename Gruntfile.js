@@ -158,7 +158,7 @@ module.exports = function(grunt){
 	});
 	
 	grunt.registerTask('cfgcopymin', 'config min and copy tasks.', function() {
-		var files = getFiles('src', false, '**');
+		var files = getFiles('src', false, '**', 'demos/js-webshim/dev', '*.js');
 		var path = require('path');
 		var copyTask = {};
 		var minTask = {};

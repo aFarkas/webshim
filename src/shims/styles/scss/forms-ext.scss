@@ -1,9 +1,4 @@
 @import "_extends.scss";
-$browser-context: 13; // Default
-
-@function em($pixels, $context: $browser-context) {
-  @return #{$pixels/$context}em
-}
 
 /* spinner control for time, number (usable for date, datetime-local) */
 .has-input-buttons,
@@ -148,7 +143,7 @@ input[type="color"] {
 .ws-input {
 
 	letter-spacing: -0.31em;
-    word-spacing: -0.43em;
+	word-spacing: -0.43em;
 	
 	> * {
 		text-align: center;
@@ -171,7 +166,6 @@ input[type="color"] {
 		box-sizing: border-box;
 		text-align: center;
 		display: inline-block;
-		
 	}
 	
 	
@@ -220,30 +214,32 @@ input[type="color"] {
 	position: relative;
 	display: inline-block;
 	vertical-align: middle;
-	margin: 0;
+	margin: 5px 0 10px;
 	zoom: 1;
 	border: none;
 	height: em(8);
 	width: 155px;
 	border-radius: em(5);
-	background: #ccc;
+	background: #ddd;
 	cursor: pointer;
 	font-size: 13px;
 	outline: none;
 	transition: background-color 400ms, border-color 400ms;
-	background-color: #aaa;
+	background-color: #ddd;
+	box-shadow: 0 em(-1) em(1.5) rgba(0, 0, 0, 0.2) inset;
 
 	.ws-range-thumb {
+		$dim: 16;
 		top: 0;
 		position: absolute;
 		display: block;
 		z-index: 4;
-		margin: em(-9) 0 0 em(-9);
-		height: em(18);
-		width: em(18);
+		margin: em($dim / -2) 0 0 em($dim / -2);
+		height: em($dim);
+		width: em($dim);
 		border-radius: 50%;
 		background: #ccc;
-		border: em(1) solid #666;
+		border: em(1) solid #aaa;
 		cursor: pointer;
 		transition: background-color 400ms, border-color 400ms;
 		
@@ -272,12 +268,12 @@ input[type="color"] {
 	}
 
 	&.ws-focus .ws-range-thumb {
-		background: #ddd;
-		border-color: #000;
+		background: #eee;
+		border-color: #999;
 	}
 	
 	&.ws-active .ws-range-thumb {
-		background: #eee;
+		box-shadow: 0 0 em(9) rgba(0, 75, 100, 0.2);
 	}
 	
 	&[aria-disabled="true"],
@@ -292,8 +288,8 @@ input[type="color"] {
 	}
 	
 	&[aria-disabled="true"] .ws-range-thumb {
-		background: #ccc;
-		border-color: #999;
+		background: #ddd;
+		border-color: #ddd;
 	}
 
 	.ws-range-rail {
@@ -318,14 +314,15 @@ input[type="color"] {
 		left: 0;
 		z-index: 1;
 		overflow: hidden;
-		background: #b6e2fb;
+		background: #09c;
+		box-shadow: 0 em(1.5) em(3.5) rgba(255, 255, 255, 0.2) inset;
 	}
 
 	.ws-range-ticks {
 		position: absolute;
-		bottom: em(-6.5);
+		bottom: em(-7.5);
 		left: 0;
-		height: em(5.5);
+		height: em(6.8);
 		width: em(1.5);
 		margin: 0 0 0 em(-2);
 		background: #ccc;
@@ -338,7 +335,7 @@ input[type="color"] {
 		font-size: em(9);
 		min-width: 2em;
 		text-align: center;
-		margin: em(6) 0 0 -1em;
+		margin: em(7) 0 0 -1em;
 	}
 
 	&.vertical-range {
@@ -420,7 +417,7 @@ $button-bgcolor: #f5f5f5;
 		transform: translate(0, 30%);
 		
 		[data-vertical="bottom"] & {
-		  -webkit-transform: translate(0, -3%);
+			-webkit-transform: translate(0, -3%);
 			transform: translate(0, -30%);
 		}
 	}
@@ -431,7 +428,6 @@ $button-bgcolor: #f5f5f5;
 	}
 	
 	&.time-popover	{
-	
 		.ws-prev,
 		.ws-next,
 		.ws-super-prev,
@@ -531,8 +527,7 @@ $button-bgcolor: #f5f5f5;
 		.ws-super-prev {
 			margin-right: em(3);
 
-			&[disabled],
-			&:disabled {
+			&[disabled] {
 				display: none;
 			}
 		}
@@ -557,8 +552,7 @@ $button-bgcolor: #f5f5f5;
 		.ws-super-next {
 			margin-left: em(3);
 
-			&[disabled],
-			&:disabled	{
+			&[disabled]	{
 				display: none;
 			}
 		}
@@ -642,8 +636,8 @@ $button-bgcolor: #f5f5f5;
 			font-weight: 700;
 			color: #000;
 			
-			.month-digit,
-			.monthname-short {
+			> .month-digit,
+			> .monthname-short {
 				display: none;
 			}
 			
@@ -679,7 +673,7 @@ $button-bgcolor: #f5f5f5;
 		zoom: 1;
 		overflow: hidden;
 		
-		.montname,
+		.monthname,
 		.month-digit {
 			display: none;
 		}
@@ -713,17 +707,22 @@ $button-bgcolor: #f5f5f5;
 			padding: em(0.5) em(2);
 			
 			> button {
-        padding: em(5.5) 0;
-      }
+				padding: em(5.5) 0;
+			}
 		}
 		
-		
-		&.time-list td {
-		  padding: em(1) em(5);
-		  
-		  > button {
-        padding: em(6.85) 0;
-      }
+		&.time-list {
+			> .ws-picker-header > button > .monthname {
+				display: inline;
+			}
+			
+			td {
+				padding: em(1) em(5);
+				
+				> button {
+					padding: em(6.85) 0;
+				}
+			}
 		}
 
 
@@ -766,10 +765,6 @@ $button-bgcolor: #f5f5f5;
 			padding-bottom: em(3);
 			text-transform: uppercase;
 			font-weight: 700;
-		}
-
-		th, td {
-			width: 14.2856%;
 		}
 	}
 	

@@ -1,3 +1,31 @@
+/**
+Task to optimize polyfiller.js
+optimizePolyfiller: {
+	options: {
+		src: 'js-webshim/dev/', //required
+		features: 'forms mediaelement', //which features are used?
+
+		dest: 'polyfiller-custom.js',
+		//should existing uglify be extended to uglify custom polyfiller? default: false (grunt-contrib-uglify has to be installed)
+		uglify: true,
+		
+		//should initially loaded files inlined into polyfiller? default: false (
+		//depends on your pferformance strategy. in case you include polyfiller.js at bottom, this should be set true)
+		inlineInitFiles: true,
+		
+		//only in case inlineInitFiles is true
+		//which lang or langs are used on page?
+		lang: 'fr it',
+		//forms feature option default: false
+		customMessages: false,
+		//forms-ext feature option default: false
+		replaceUI: false,
+		//is swfobject not used on site default: true (used only with mediaelement)
+		includeSwfmini: true
+	}
+}
+*/
+
 module.exports = function( grunt ) {
 	grunt.registerTask('optimizePolyfiller', 'optimizes polyfiller file.', function() {
 		var code, polyfillerPath, dirPath, uglifyCfg;

@@ -334,7 +334,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		if(!prefix){
 			prefix = '';
 		}
-		$.each({monthNames: 'montname', monthDigits: 'month-digit', monthNamesShort: 'monthname-short'}, function(prop, cName){
+		$.each({monthNames: 'monthname', monthDigits: 'month-digit', monthNamesShort: 'monthname-short'}, function(prop, cName){
 			var name = [prefix + dateCfg[prop][index]];
 			if(year){
 				name.push(year);

@@ -72,7 +72,7 @@
 	
 	
 	$.extend(webshims, {
-		version: '1.12.0-pre',
+		version: '1.12.0',
 		cfg: {
 			
 			//addCacheBuster: false,
@@ -90,6 +90,9 @@
 				var script = jScripts.filter('[src*="polyfiller.js"]');
 				var path;
 				script = script[0] || script.end()[script.end().length - 1];
+				if(WSDEBUG && document.currentScript && script !=  document.currentScript && document.currentScript.src){
+					webshims.warn("It seems you need to set webshims.setOptions('basePath', 'pathTo/shims/'); manually.");
+				}
 				path = ( ( !('hrefNormalized' in $.support) || $.support.hrefNormalized  ) ? script.src : script.getAttribute("src", 4) ).split('?')[0];
 				path = path.slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 				return path;
@@ -927,12 +930,22 @@
 		var initialFormTest = function(){
 			var range, tmp, fieldset;
 			if(!initialFormTest.run){
-				fieldset = $('<fieldset />')[0];
+				fieldset = $('<fieldset><textarea required="" /></fieldset>')[0];
 				addTest(formvalidation, !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern));
 				
 				addTest('fieldsetelements', (tmp = 'elements' in fieldset));
-				addTest('fieldsetdisabled', (!tmp && /MSIE [6-9]\./.test(navigator.userAgent)) ? false : ('disabled' in fieldset));
 				
+				if(('disabled' in fieldset)){
+					if(!tmp) {
+						try {
+							if($('textarea', fieldset).is(':invalid')){
+								fieldset.disabled = true;
+								tmp = $('textarea', fieldset).is(':valid');
+							}
+						} catch(er){}
+					}
+					addTest('fieldsetdisabled', tmp);
+				}
 				if(modernizrInputTypes && modernizrInputTypes.range && !window.opera){
 					range = $('<input type="range" style="-webkit-appearance: slider-horizontal; -moz-appearance: range;" />').appendTo('html');
 					tmp = range.css('appearance');
@@ -965,7 +978,7 @@
 		
 		webshims.validationMessages = webshims.validityMessages = {
 			langSrc: 'i18n/formcfg-', 
-			availableLangs: ['ar', 'ch-CN', 'cs', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'lt', 'nl', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ru', 'sv']
+			availableLangs: ['ar', 'cs', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'lt', 'nl', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ru', 'sv', 'zh-CN']
 		};
 		webshims.formcfg = $.extend({}, webshims.validationMessages);
 		
@@ -1087,6 +1100,9 @@
 			test: function(){
 				var o = this.options;
 				initialFormTest();
+				if(o.replaceUI){
+					$('html').addClass('ws-replaceui');
+				}
 				//input widgets on old androids can't be trusted
 				if(bustedWidgetUi && !o.replaceUI && (/Android/i).test(navigator.userAgent)){
 					o.replaceUI = true;
@@ -1098,7 +1114,7 @@
 			options: {
 				widgets: {
 					calculateWidth: true,
-					anmiate: true
+					animate: true
 				}
 	//			,replaceUI: false
 			},
