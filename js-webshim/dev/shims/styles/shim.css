@@ -91,6 +91,18 @@ audio > * {
     height: 5px;
     overflow: hidden; }
 
+summary::-webkit-details-marker {
+  display: none; }
+summary > .details-open-indicator {
+  display: none; }
+summary:before {
+  display: inline-block;
+  content: ">";
+  content: ">";
+  border: 0;
+  background: #000;
+  color: #fff; }
+
 mark {
   background-color: #ff9;
   color: #000;
@@ -277,7 +289,7 @@ output {
   .ws-po-arrow .ws-po-arrowbox {
     position: relative;
     top: 0.07692em;
-    left: -0.51538em;
+    left: -0.53846em;
     display: block;
     width: 0;
     height: 0;
@@ -381,84 +393,90 @@ datalist {
 progress {
   position: relative;
   display: inline-block;
-  width: 160px;
-  height: 16px;
-  overflow: hidden; }
-  progress[data-position] {
-    border: 1px solid #dddddd;
-    background: #f0f0f0;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
-    border-radius: 4px;
-    vertical-align: -0.2em; }
+  width: 164px;
+  height: 20px;
+  overflow: hidden;
+  vertical-align: -0.1em; }
   progress > * {
     display: none !important; }
-  progress span.progress-value {
-    position: absolute;
-    display: block !important;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    height: 100%;
-    box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
-    background: #0063a6 url(progress.gif);
-    border: 0; }
-  progress[aria-valuenow] span.progress-value {
-    background-image: url(progress.png); }
-  .ws-replaceui progress {
+  progress[data-position], .ws-replaceui progress {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+    border: 0;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     border: 1px solid #dddddd;
     background: #f0f0f0;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
-    border-radius: 4px;
-    /*ms styles*/ }
-    .ws-replaceui progress::-webkit-progress-bar {
+    border-radius: 4px; }
+    progress[data-position]::-webkit-progress-bar, .ws-replaceui progress::-webkit-progress-bar {
       border: 1px solid #dddddd;
       background: #f0f0f0;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
       border-radius: 4px;
       border: 0 none; }
-    .ws-replaceui progress::-webkit-progress-value {
+    progress[data-position]::-moz-progress-bar, .ws-replaceui progress::-moz-progress-bar {
+      border: 1px solid #dddddd;
+      background: #f0f0f0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+      border-radius: 4px; }
+    progress[data-position]::-ms-fill, .ws-replaceui progress::-ms-fill {
+      animation-name: none;
+      border: 1px solid #dddddd;
+      background: #f0f0f0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+      border-radius: 4px; }
+    progress[data-position]::-webkit-progress-value, .ws-replaceui progress::-webkit-progress-value {
       position: absolute;
-      display: block !important;
       top: 0;
       left: 0;
       bottom: 0;
       height: 100%;
       box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
-      background: #0063a6 url(progress.gif);
-      border: 0;
-      background-image: url(progress.png); }
-    .ws-replaceui progress:indeterminate::-webkit-progress-bar {
-      background-image: url(progress.gif); }
-    .ws-replaceui progress::-moz-progress-bar {
+      background: #0063a6 url(progress.png);
+      border: 0; }
+    progress[data-position]::-moz-progress-bar, .ws-replaceui progress::-moz-progress-bar {
       position: absolute;
-      display: block !important;
       top: 0;
       left: 0;
       bottom: 0;
       height: 100%;
       box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
-      background: #0063a6 url(progress.gif);
-      border: 0;
-      background-image: url(progress.png); }
-    .ws-replaceui progress:indeterminate::-moz-progress-bar {
-      background-image: url(progress.gif); }
-    .ws-replaceui progress:indeterminate {
-      background-image: url(progress.gif); }
-    .ws-replaceui progress::-ms-fill {
+      background: #0063a6 url(progress.png);
+      border: 0; }
+    progress[data-position]::-ms-fill, .ws-replaceui progress::-ms-fill {
+      animation-name: none;
       position: absolute;
-      display: block !important;
       top: 0;
       left: 0;
       bottom: 0;
       height: 100%;
       box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
-      background: #0063a6 url(progress.gif);
-      border: 0;
-      background-image: url(progress.png);
-      animation-name: none; }
+      background: #0063a6 url(progress.png);
+      border: 0; }
+    progress[data-position] > span.progress-value, .ws-replaceui progress > span.progress-value {
+      display: block !important;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      height: 100%;
+      box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
+      background: #0063a6 url(progress.png);
+      border: 0; }
+    progress[data-position]:indeterminate::-webkit-progress-bar, .ws-replaceui progress:indeterminate::-webkit-progress-bar {
+      background-image: url(progress.gif); }
+    progress[data-position]:indeterminate::-moz-progress-bar, .ws-replaceui progress:indeterminate::-moz-progress-bar {
+      background-image: url(progress.gif); }
+    progress[data-position]:indeterminate, .ws-replaceui progress:indeterminate {
+      animation-name: none;
+      background-image: url(progress.gif); }
+    progress[data-position].ws-indeterminate > span.progress-value, .ws-replaceui progress.ws-indeterminate > span.progress-value {
+      display: block !important;
+      width: 100%;
+      right: 0;
+      background-image: url(progress.gif); }
 
 details {
   overflow: hidden; }
@@ -472,8 +490,11 @@ summary {
 .details-open-indicator {
   margin: -1px 0 0;
   display: inline-block;
-  width: 16px;
-  height: 11px;
+  width: 0.66em;
+  height: 0.66em;
+  margin-right: 0.4em;
+  min-width: 11px;
+  min-height: 11px;
   background: url(details-arrows.png) no-repeat 0 0;
   vertical-align: middle; }
   .closed-details-summary .details-open-indicator {

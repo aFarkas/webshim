@@ -46,11 +46,11 @@
 		</script>
 		<script src="../js-webshim/minified/extras/modernizr-custom.js">
 		</script>
-		<script src="../js-webshim/minified/polyfiller.js">
+		<script src="../src/polyfiller.js">
 		</script>
 		<script>
 			
-			//webshims.setOptions('debug', 'noCombo');
+			webshims.setOptions('debug', 'noCombo');
 			
 			//webshims.setOptions('forms', {replaceValidationUI: true, fixRangeChange: true,customDatalist: true,  addValidators: true});
 			webshims.setOptions('forms-ext', {
@@ -87,11 +87,11 @@
 			<div class="form-row range-ticks-ballon">
 				<style>
 					.range-ticks-ballon .ws-range {
-					    font-size: 16px;
+						font-size: 16px;
 					}
 					
 					.range-ticks-ballon .ws-range-ticks[data-label]:after {
-					    visibility: visible;
+						visibility: visible;
 					}
 					
 					.range-ticks-ballon .ws-range-thumb:before {
@@ -117,7 +117,7 @@
 				<label>
 					date
 				</label>
-				<input type="date" placeholder="year-month-day" data-date-split-input="true" data-date-start-view="2" />
+				<input type="date" class="show-week" data-date-inline-picker="true" placeholder="year-month-day" data-date-start-view="2" />
 			</div>
 			<div class="form-row date-css-config">
 				<style>

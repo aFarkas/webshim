@@ -1,4 +1,5 @@
 @import "_extends.scss";
+@import "_api-shim.scss";
 
 .ws-important-hide {
 	display: none !important;
@@ -355,7 +356,7 @@ output {
 	.ws-po-arrowbox {
 		position: relative;
 		top: em(1);
-		left: em(-6.7);
+		left: em(-7);
 		display: block;
 		width: 0;
 		height: 0;
@@ -497,7 +498,7 @@ datalist {
 	}
 }
 
-@mixin progressbar {
+@mixin progressbarStyle {
 	border: 1px solid #ddd;
 	background: #f0f0f0;
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
@@ -506,78 +507,53 @@ datalist {
 
 @mixin progressvalue {
 	position: absolute;
-	display: block !important;
 	top: 0;
 	left: 0;
 	bottom: 0;
 	height: 100%;
 	box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
-	background: #0063a6 url(progress.gif);
+	background: #0063a6 url(progress.png);
 	border: 0;
 }
 
 progress {
 	position: relative;
 	display: inline-block;
-	width: 160px;
-	height: 16px;
+	width: 164px;
+	height: 20px;
 	overflow: hidden;
+	vertical-align: -0.1em;
 	
-	&[data-position] {
-		@include progressbar;
-		vertical-align: -0.2em;
-	}
-
 	> * {
 		display: none !important;
 	}
-
-	span.progress-value {
-		@include progressvalue;
-	}
 	
-	&[aria-valuenow] span.progress-value {
-		background-image: url(progress.png);
-	}
-	
+	&[data-position],
 	.ws-replaceui & {
-		-webkit-appearance: none;
-		-moz-appearance: none;
-		appearance: none;
-		
-		@include progressbar;
-		
-		&::-webkit-progress-bar { 
-			@include progressbar;
-			border: 0 none;
-		}
-		&::-webkit-progress-value { 
-			@include progressvalue;
-			background-image: url(progress.png);
-		}
-		&:indeterminate::-webkit-progress-bar { 
-			background-image: url(progress.gif);
+	
+		@include progress {
+			border: 1px solid #ddd;
+			background: #f0f0f0;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+			border-radius: 4px;
 		}
 		
-		&::-moz-progress-bar { 
-			@include progressvalue;
-			background-image: url(progress.png);
+		@include progressbar {
+			position: absolute;
+			top: 0;
+			left: 0;
+			bottom: 0;
+			height: 100%;
+			box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
+			background: #0063a6 url(progress.png);
+			border: 0;
 		}
-		&:indeterminate::-moz-progress-bar {
+		
+		@include indeterminate-progressbar {
 			background-image: url(progress.gif);
-		}
-		/*ms styles*/
-		&:indeterminate {
-			background-image: url(progress.gif);
-		}
-		&::-ms-fill {
-			@include progressvalue;
-			background-image: url(progress.png);
-			animation-name: none;
 		}
 	}
 }
-
 
 
 details {
@@ -593,13 +569,20 @@ summary {
 .details-open-indicator {
 	margin: -1px 0 0;
 	display: inline-block;
-	width: 16px;
-	height: 11px;
-	background: url(details-arrows.png) no-repeat 0 0;
+	
+	margin-right: 0.4em;
+	width: 0px;
+	height: 0px;
+	border-style: solid;
+	border-width: em(10) em(5) 0 em(5);
+	border-color: #000 transparent transparent transparent;
+	
+	
 	vertical-align: middle;
 
 	.closed-details-summary & {
-		background-position: 0 -20px;
+		border-width: em(5) 0 em(5) em(10);
+		border-color: transparent transparent transparent #000;
 	}
 }
 

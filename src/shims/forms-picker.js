@@ -1593,7 +1593,6 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			popover.isDirty = false;
 		};
 		
-		
 		if(data.type == 'time'){
 			o.minView = 3;
 			o.startView = 3;
@@ -1645,6 +1644,8 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		
 		if(o.inlinePicker){
 			o.updateOnInput = true;
+			popover.element.attr('data-class', $.prop(data.orig, 'className'));
+			popover.element.attr('data-ud', $.prop(data.orig, 'id'));
 		}
 		
 		$(o.orig).trigger('pickercreated');

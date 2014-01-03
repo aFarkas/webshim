@@ -4,7 +4,7 @@ Release 1.12.0
 - new dir structure for bower (:root/js-webshim is the new folder for build js. :root/demos/js-webshim will be removed with next realease)
 - all locale js files are fetched using XHR (use setOptions('ajax', {crossDomain: true}) to disable)
 - transfer JS options for many pickers to CSS (i.e.: showWeek: true -> .input-picker .ws-week {display: table-cell})
-- fixed fieldset:disabled implementation (wow, each version of IE behaves different + IE11 is worse than IE10!)
+- fixed fieldset:disabled implementation [demo](http://jsfiddle.net/trixta/K8EPm/)
 - improved styles for type=range, datalist and progress element
 - most widgets are em scalable (base font is 13px)
 - fixed data-errormessage attribute

@@ -1302,8 +1302,9 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled || !Modernizr.fieldse
 										$.attr(this, 'aria-valuemax', max);
 									}
 								}
+								$(this).removeClass('ws-indeterminate');
 							} else if(updateProgress.isInChange) {
-								$(this).removeAttr('aria-valuenow');
+								$(this).removeAttr('aria-valuenow').addClass('ws-indeterminate');
 							}
 							return ret;
 						},

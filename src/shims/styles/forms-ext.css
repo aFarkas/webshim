@@ -5,6 +5,73 @@
     clear: both;
     content: ' '; }
 
+/* style picker api */
+.input-picker[data-class~="show-week"] .ws-week,
+.show-week .input-picker .ws-week {
+  display: table-cell; }
+
+.input-picker[data-class~="show-yearbtns"] .ws-picker-header,
+.show-yearbtns .input-picker .ws-picker-header {
+  margin: 0 4.23077em; }
+.input-picker[data-class~="show-yearbtns"] button.ws-year-btn,
+.show-yearbtns .input-picker button.ws-year-btn {
+  display: inline-block; }
+
+.input-picker[data-class~="hide-btnrow"] .ws-button-row,
+.hide-btnrow .input-picker .ws-button-row {
+  display: none; }
+
+.input-picker[data-class~="show-selectnav"] .ws-picker-header > button:after,
+.show-selectnav .input-picker .ws-picker-header > button:after, .input-picker[data-class~="show-uparrow"] .ws-picker-header > button:after,
+.show-uparrow .input-picker .ws-picker-header > button:after {
+  display: inline-block; }
+
+.input-picker[data-class~="show-selectnav"] .ws-picker-header > select,
+.show-selectnav .input-picker .ws-picker-header > select {
+  display: inline-block; }
+.input-picker[data-class~="show-selectnav"] .ws-picker-header > button,
+.show-selectnav .input-picker .ws-picker-header > button {
+  width: auto; }
+  .input-picker[data-class~="show-selectnav"] .ws-picker-header > button > span,
+  .show-selectnav .input-picker .ws-picker-header > button > span {
+    display: none; }
+
+/* btn api */
+.hide-spinbtns + .input-buttons > .step-controls,
+.hide-spinbtns .input-buttons > .step-controls {
+  display: none; }
+
+.hide-dropdownbtn + .input-buttons > .ws-popover-opener,
+.hide-dropdownbtn .input-buttons > .ws-popover-opener {
+  display: none; }
+
+.hide-inputbtns + .input-buttons,
+.hide-inputbtns .input-buttons {
+  display: none; }
+
+.a11yhide-inputbtns + .input-buttons,
+.a11yhide-inputbtns .input-buttons {
+  width: 0;
+  margin: 0;
+  overflow: visible; }
+  .a11yhide-inputbtns + .input-buttons > .step-controls,
+  .a11yhide-inputbtns .input-buttons > .step-controls {
+    display: none; }
+  .a11yhide-inputbtns + .input-buttons > .ws-popover-opener,
+  .a11yhide-inputbtns .input-buttons > .ws-popover-opener {
+    height: 0;
+    width: 0;
+    overflow: hidden; }
+    .a11yhide-inputbtns + .input-buttons > .ws-popover-opener:focus, .a11yhide-inputbtns + .input-buttons > .ws-popover-opener:active,
+    .a11yhide-inputbtns .input-buttons > .ws-popover-opener:focus,
+    .a11yhide-inputbtns .input-buttons > .ws-popover-opener:active {
+      height: 19px;
+      width: 19px; }
+
+.inputbtns-outside + span.input-buttons,
+.inputbtns-outside span.input.input-buttons {
+  margin-left: 2px; }
+
 /* spinner control for time, number (usable for date, datetime-local) */
 .has-input-buttons,
 html > body input.ws-inputreplace.has-input-buttons,
@@ -64,14 +131,16 @@ input[type="color"] {
   text-align: left; }
   .input-buttons.color-input-buttons {
     margin-left: 2px; }
-  .input-buttons.input-button-size-1.month-input-buttons, .input-buttons.input-button-size-1.date-input-buttons {
-    margin-left: -24px; }
-  .input-buttons.input-button-size-2 {
-    margin-left: -39px; }
   .input-buttons.ws-disabled {
     opacity: 0.95; }
   .input-buttons.ws-disabled *, .input-buttons.ws-readonly * {
     cursor: default; }
+
+.input-button-size-1.month-input-buttons, .input-button-size-1.date-input-buttons, .input-button-size-1.datetime-local-input-buttons {
+  margin-left: -24px; }
+
+.input-button-size-2 {
+  margin-left: -39px; }
 
 .step-controls span {
   position: absolute;
@@ -104,6 +173,7 @@ input[type="color"] {
     .ws-disabled .step-controls span.step-down {
       background-position: -205px 0; }
 
+/* helper classes to hide show/hide specific btn features features */
 .ws-input {
   letter-spacing: -0.31em;
   word-spacing: -0.43em; }
@@ -294,7 +364,6 @@ input[type="color"] {
   text-align: center;
   font-family: sans-serif;
   width: 25.38462em;
-  max-width: 100%;
   min-width: 23.07692em;
   /* Selector API: */ }
   .input-picker .ws-po-outerbox {
@@ -310,6 +379,8 @@ input[type="color"] {
   .input-picker.time-popover .ws-super-prev,
   .input-picker.time-popover .ws-super-next {
     display: none; }
+  .input-picker.ws-size-1 {
+    max-width: 100%; }
   .input-picker.ws-size-2 {
     width: 49.61538em; }
   .input-picker.ws-size-3 {
@@ -329,12 +400,12 @@ input[type="color"] {
     outline: 1px dotted black; }
   .input-picker .ws-po-box {
     position: relative;
-    padding: 0.76923em 1.53846em 1.15385em;
+    padding: 1.15385em 1.53846em;
     border-radius: 5px;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); }
   .input-picker .ws-picker-controls {
     position: absolute;
-    top: 0.76923em; }
+    top: 1.15385em; }
     .input-picker .ws-picker-controls > button {
       border: 0.07692em solid #cccccc;
       border-radius: 0.38462em;
@@ -425,7 +496,7 @@ input[type="color"] {
     top: -3.07692em;
     right: 0;
     left: 0;
-    margin: 0 4.23077em; }
+    margin: 0 2.69231em; }
     .input-picker .ws-picker-header > button {
       display: inline-block;
       width: 100%;
@@ -503,7 +574,8 @@ input[type="color"] {
       width: 100%;
       margin: 0;
       border: 0 none;
-      border-collapse: collapse; }
+      border-collapse: collapse;
+      table-layout: fixed; }
     .input-picker .picker-list th,
     .input-picker .picker-list td.week-cell {
       font-size: 1em;
@@ -556,3 +628,5 @@ input[type="color"] {
 
 .ws-picker-header select {
   display: none; }
+
+/* helper classes to hide show/hide specific picker features */

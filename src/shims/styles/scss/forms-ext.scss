@@ -1,4 +1,5 @@
 @import "_extends.scss";
+@import "_api-forms-ext.scss";
 
 /* spinner control for time, number (usable for date, datetime-local) */
 .has-input-buttons,
@@ -76,15 +77,7 @@ input[type="color"] {
 	&.color-input-buttons {
 		margin-left: 2px;
 	}
-	&.input-button-size-1 {
-		&.month-input-buttons,
-		&.date-input-buttons {
-			margin-left: -24px;
-		}
-	}
-	&.input-button-size-2 {
-		margin-left: -39px;
-	}
+	
 	&.ws-disabled {
 		opacity: 0.95;
 	}
@@ -92,6 +85,17 @@ input[type="color"] {
 	&.ws-readonly * {
 		cursor: default;
 	}
+}
+
+.input-button-size-1 {
+	&.month-input-buttons,
+	&.date-input-buttons,
+	&.datetime-local-input-buttons {
+		margin-left: -24px;
+	}
+}
+.input-button-size-2 {
+	margin-left: -39px;
 }
 
 .step-controls {
@@ -139,9 +143,14 @@ input[type="color"] {
 	}
 }
 
+/* helper classes to hide show/hide specific btn features features */
+@each $class in $btnapis {
+	.#{$class} {
+		@extend %#{$class};
+	}
+}
 
 .ws-input {
-
 	letter-spacing: -0.31em;
 	word-spacing: -0.43em;
 	
@@ -409,7 +418,6 @@ $button-bgcolor: #f5f5f5;
 	text-align: center;
 	font-family: sans-serif;
 	width: em(330);
-	max-width: 100%;
 	min-width: em(300);
 	
 	.ws-po-outerbox {
@@ -436,6 +444,9 @@ $button-bgcolor: #f5f5f5;
 		}
 	}
 
+	&.ws-size-1 {
+		max-width: 100%;
+	}
 	
 	&.ws-size-2 {
 		width: em(645);
@@ -469,14 +480,14 @@ $button-bgcolor: #f5f5f5;
 
 	.ws-po-box {
 		position: relative;
-		padding: em(10) em(20) em(15);
+		padding: em(15) em(20);
 		border-radius: 5px;
 		box-shadow: 0 0 2px rgba(0, 0, 0, .3);
 	}
 	
 	.ws-picker-controls {
 		position: absolute;
-		top: em(10);
+		top: em(15);
 		
 		> button{
 			border: em(1) solid #ccc;
@@ -626,7 +637,7 @@ $button-bgcolor: #f5f5f5;
 		top: em(-40);
 		right: 0;
 		left: 0;
-		margin: 0 em(55);
+		margin: 0 em(35);
 
 		> button {
 			display: inline-block;
@@ -756,6 +767,7 @@ $button-bgcolor: #f5f5f5;
 			margin: 0;
 			border: 0 none;
 			border-collapse: collapse;
+			table-layout: fixed;
 		}
 
 		th,
@@ -824,16 +836,23 @@ $button-bgcolor: #f5f5f5;
 	/* Selector API: */
 	.ws-week,
 	.ws-year-btn {
-    display: none;
-  }
+		display: none;
+	}
 }
 .ws-picker-controls > button {
-  display: inline-block;
+	display: inline-block;
 }
 .ws-picker-header > button:after {
   display: none;
 }
 
 .ws-picker-header select {
-  display: none;
+	display: none;
+}
+/* helper classes to hide show/hide specific picker features */
+@each $class in $pickerapis {
+	.input-picker[data-class~="#{$class}"],
+	.#{$class} .input-picker {
+		@extend %#{$class};
+	}
 }

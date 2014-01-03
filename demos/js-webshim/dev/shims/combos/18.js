@@ -3849,7 +3849,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 								popover.preventBlur();
 							}
 						},
-						mousedown: function(){
+						mousedown: function(e){
 							mouseFocus = true;
 							setTimeout(resetMouseFocus, 9);
 							if(options.buttonOnly && popover.isVisible && popover.activeElement){
@@ -4099,6 +4099,12 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 				
 				data.shim.options.containerElements.push(data.shim.element[0]);
 				
+				data.shim.element.on('change input', stopPropagation).addClass($.prop(this, 'className'));
+				
+				if(data.shim.buttonWrapper){
+					data.shim.buttonWrapper.addClass('input-button-size-'+(data.shim.buttonWrapper.children().filter(isVisible).length));
+				}
+				
 				labelWidth($(this).getShadowFocusElement(), labels);
 				
 				$(this).on('change', function(e){
@@ -4136,7 +4142,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 				})();
 								
 				
-				data.shim.element.on('change input', stopPropagation);
+				
 				
 				if(hasFormValidation){
 					$(opts.orig).on('firstinvalid', function(e){
@@ -4157,7 +4163,6 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 					data.shim.element.addClass('has-input-buttons');
 				}
 				
-				data.shim.element.addClass($.prop(this, 'className'));
 				
 				if(opts.calculateWidth){
 					sizeInput(data.shim);
@@ -4239,7 +4244,6 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 						if(webshims.picker && webshims.picker[name]){
 							webshims.picker[name](data);
 						}
-						data.buttonWrapper.addClass('input-button-size-'+(data.buttonWrapper.children().filter(isVisible).length));
 						return data;
 					}
 				});

@@ -554,10 +554,6 @@
 		error: 1
 	};
 	
-	if(webCFG.debug || (!('crossDomain' in webCFG.ajax) && location.protocol.indexOf('http'))){
-		webCFG.ajax.crossDomain = true;
-	}
-	
 	webshims.addMethodName = function(name){
 		name = name.split(':');
 		var prop = name[1];
@@ -656,6 +652,11 @@
 		
 		firstRun = function(){
 			if(!firstRun.run){
+				
+				if(webCFG.debug || (!('crossDomain' in webCFG.ajax) && location.protocol.indexOf('http'))){
+					webCFG.ajax.crossDomain = true;
+				}
+
 				if($.mobile && ($.mobile.textinput || $.mobile.rangeslider || $.mobile.button)){
 					if(WSDEBUG){
 						webshims.warn('jQM textinput/rangeslider/button detected waitReady was set to false. Use webshims.ready("featurename") to script against polyfilled methods/properties');
