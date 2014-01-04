@@ -123,3 +123,25 @@ $btnapis: hide-spinbtns hide-dropdownbtn hide-inputbtns inputbtns-outside a11yhi
 		margin-left: 2px;
 	}
 }
+
+$rangeapis: show-ticklabels hide-ticks show-valuetooltip;
+
+%show-ticklabels {
+	.ws-range-ticks[data-label]:after {
+		visibility: visible;
+	}
+}
+
+%hide-ticks {
+	.ws-range-ticks {
+		display: none;
+	}
+}
+%show-valuetooltip {
+	&.ws-active .ws-range-thumb:before,
+	.ws-range.ws-active .ws-range-thumb:before {
+		opacity: 1;
+		visibility: visible;
+	}
+}
+

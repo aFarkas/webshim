@@ -256,11 +256,12 @@ input[type="color"] {
 		&:before	{
 			position: absolute;
 			top: em(-28);
-			left: -.3em;
+			left: -.5em;
 			display: inline-block;
 			content: attr(data-value);
 			padding: em(3) em(1);
 			min-width: 2em;
+			opacity: 0;
 			visibility: hidden;
 			text-align: center;
 			background: #fff;
@@ -336,16 +337,6 @@ input[type="color"] {
 		margin: 0 0 0 em(-2);
 		background: #ccc;
 	}
-	
-	.ws-range-ticks[data-label]:after {
-		visibility: hidden;
-		content: attr(data-label);
-		display: inline-block;
-		font-size: em(9);
-		min-width: 2em;
-		text-align: center;
-		margin: em(7) 0 0 -1em;
-	}
 
 	&.vertical-range {
 		background: url(vertical-range.png) center bottom no-repeat;
@@ -399,6 +390,23 @@ input[type="color"] {
 }
 
 
+.ws-range-ticks[data-label]:after {
+	visibility: hidden;
+	content: attr(data-label);
+	display: inline-block;
+	font-size: em(10);
+	min-width: 2em;
+	text-align: center;
+	margin: em(9) 0 0 -0.95em;
+}
+
+
+/* helper classes to hide show/hide specific range features features */
+@each $class in $rangeapis {
+	.#{$class} {
+		@extend %#{$class};
+	}
+}
 
 
 //date popover

@@ -72,6 +72,17 @@
 .inputbtns-outside span.input.input-buttons {
   margin-left: 2px; }
 
+.show-ticklabels .ws-range-ticks[data-label]:after {
+  visibility: visible; }
+
+.hide-ticks .ws-range-ticks {
+  display: none; }
+
+.ws-active.show-valuetooltip .ws-range-thumb:before,
+.show-valuetooltip .ws-range.ws-active .ws-range-thumb:before {
+  opacity: 1;
+  visibility: visible; }
+
 /* spinner control for time, number (usable for date, datetime-local) */
 .has-input-buttons,
 html > body input.ws-inputreplace.has-input-buttons,
@@ -250,11 +261,12 @@ input[type="color"] {
     .ws-range .ws-range-thumb:after, .ws-range .ws-range-thumb:before {
       position: absolute;
       top: -2.15385em;
-      left: -.3em;
+      left: -.5em;
       display: inline-block;
       content: attr(data-value);
       padding: 0.23077em 0.07692em;
       min-width: 2em;
+      opacity: 0;
       visibility: hidden;
       text-align: center;
       background: #fff;
@@ -307,14 +319,6 @@ input[type="color"] {
     width: 0.11538em;
     margin: 0 0 0 -0.15385em;
     background: #ccc; }
-  .ws-range .ws-range-ticks[data-label]:after {
-    visibility: hidden;
-    content: attr(data-label);
-    display: inline-block;
-    font-size: 0.69231em;
-    min-width: 2em;
-    text-align: center;
-    margin: 0.53846em 0 0 -1em; }
   .ws-range.vertical-range {
     background: url(vertical-range.png) center bottom no-repeat;
     width: 20px; }
@@ -350,6 +354,16 @@ input[type="color"] {
       height: 1px;
       width: 4px; }
 
+.ws-range-ticks[data-label]:after {
+  visibility: hidden;
+  content: attr(data-label);
+  display: inline-block;
+  font-size: 0.76923em;
+  min-width: 2em;
+  text-align: center;
+  margin: 0.69231em 0 0 -0.95em; }
+
+/* helper classes to hide show/hide specific range features features */
 .input-picker .ws-button-row button {
   border-radius: 0.30769em;
   background: #ccc;
@@ -397,7 +411,7 @@ input[type="color"] {
     transition: all 400ms; }
   .input-picker .ws-focus,
   .input-picker :focus {
-    outline: 1px dotted black; }
+    outline: 1px dotted #000; }
   .input-picker .ws-po-box {
     position: relative;
     padding: 1.15385em 1.53846em;
@@ -436,7 +450,7 @@ input[type="color"] {
     .input-picker .prev-controls .ws-super-prev:before,
     .input-picker .prev-controls .ws-prev:before {
       border-width: 0.35em 0.6em 0.35em 0;
-      border-color: transparent #333333 transparent transparent;
+      border-color: transparent #333 transparent transparent;
       margin-left: -0.1em; }
     .input-picker .prev-controls .ws-super-prev {
       margin-right: 0.23077em; }
@@ -450,7 +464,7 @@ input[type="color"] {
     .input-picker .next-controls .ws-super-next:after,
     .input-picker .next-controls .ws-next:before {
       border-width: 0.35em 0 0.35em 0.6em;
-      border-color: transparent transparent transparent #333333;
+      border-color: transparent transparent transparent #333;
       margin-right: -0.1em; }
     .input-picker .next-controls .ws-super-next {
       margin-left: 0.23077em; }
@@ -473,7 +487,7 @@ input[type="color"] {
     .input-picker .ws-button-row button {
       border: 0.07692em solid #cccccc;
       border-radius: 5px;
-      box-shadow: 1px 1px 0 white;
+      box-shadow: 1px 1px 0 #fff;
       background-color: #ddd;
       background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
       background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
@@ -514,7 +528,7 @@ input[type="color"] {
         height: 0px;
         border-style: solid;
         border-width: 0 0.3em 0.6em 0.3em;
-        border-color: transparent transparent #333333 transparent;
+        border-color: transparent transparent #333 transparent;
         vertical-align: middle; }
       .input-picker .ws-picker-header > button:hover {
         text-decoration: underline; }

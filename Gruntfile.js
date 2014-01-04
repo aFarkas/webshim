@@ -47,7 +47,7 @@ module.exports = function(grunt){
 		optimizePolyfiller: {
 			options: {
 				src: 'js-webshim/dev/', //required
-				features: 'forms mediaelement',
+				features: 'forms',
 
 				dest: 'polyfiller-custom.js',
 				//should existing uglify be extended to uglify custom polyfiller? default: false
@@ -163,6 +163,7 @@ module.exports = function(grunt){
 		var copyTask = {};
 		var minTask = {};
 		var minPath, file, found;
+		var exclude = ['*.scss', 'config.rb', '*.txt'];
 		
 		for(var i in files){
 			file = files[i];
@@ -172,7 +173,9 @@ module.exports = function(grunt){
 					minTask[minPath] = [file];
 					found = true;
 				}
-				copyTask[minPath] = [file];
+				if(!grunt.file.match(exclude, file)){
+					copyTask[minPath] = [file];
+				}
 				copyTask[path.join(DEVPATH, i)] = [file];
 			}
 		}

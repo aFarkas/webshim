@@ -183,7 +183,7 @@ module.exports = function( grunt ) {
 					} else if( !line || !(foundFeature = regStart.exec(line)) || features.indexOf(foundFeature[1]) !== -1 ){
 						if(combos.length && (/\/\/>removeCombos</).test(line)){
 							line = line.replace(/\/\/>removeCombos</, "removeCombos = removeCombos.concat(["+ combos.join(",") +"]);" );
-							grunt.log.writeln('Removed following combos: '+ combos.join(","));
+							grunt.log.writeln('Following combos are unsued: '+ combos.join(","));
 						}
 						result.push(line);
 					} else if(foundFeature){
