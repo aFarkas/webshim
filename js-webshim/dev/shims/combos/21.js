@@ -185,7 +185,7 @@
 			return details;
 		}
 	};
-	
+
 	var bindDetailsSummary = function(summary, details){
 		summary = $(summary);
 		details = $(details);

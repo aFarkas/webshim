@@ -244,7 +244,58 @@ input[type="color"] {
   outline: none;
   transition: background-color 400ms, border-color 400ms;
   background-color: #ddd;
-  box-shadow: 0 -0.07692em 0.11538em rgba(0, 0, 0, 0.2) inset; }
+  box-shadow: 0 -0.07692em 0.11538em rgba(0, 0, 0, 0.2) inset;
+  /*
+  	&.vertical-range {
+  		background: url(vertical-range.png) center bottom no-repeat;
+  		width: 20px;
+  
+  		.ws-range-thumb {
+  			top: 0;
+  			left: 3px;
+  			bottom: auto;
+  			background: url(vertical-range.png) 0 -51px no-repeat;
+  			margin: -6px 0 0 0;
+  			height: 11px;
+  			width: 22px;
+  
+  		}
+  		.ws-range-thumb:hover,
+  		&.ws-focus .ws-range-thumb {
+  			background-position: 0 -34px;
+  		}
+  		&.ws-active .ws-range-thumb {
+  			background-position: 0 -17px;
+  		}
+  
+  		&[aria-disabled="true"] .ws-range-thumb {
+  			background-position: 0 0;
+  		}
+  
+  		.ws-range-progress {
+  			top: auto;
+  			bottom: 1px;
+  			left: 0;
+  			width: 1px;
+  			height: 0;
+  		}
+  
+  		.ws-range-rail {
+  			top: 5px;
+  			left: 0;
+  			right: 0;
+  			bottom: 5px;
+  		}
+  
+  		.ws-range-ticks {
+  			bottom: auto;
+  			left: auto;
+  			right: 0;
+  			height: 1px;
+  			width: 4px;
+  		}
+  	}
+  	*/ }
   .ws-range .ws-range-thumb {
     top: 0;
     position: absolute;
@@ -319,40 +370,6 @@ input[type="color"] {
     width: 0.11538em;
     margin: 0 0 0 -0.15385em;
     background: #ccc; }
-  .ws-range.vertical-range {
-    background: url(vertical-range.png) center bottom no-repeat;
-    width: 20px; }
-    .ws-range.vertical-range .ws-range-thumb {
-      top: 0;
-      left: 3px;
-      bottom: auto;
-      background: url(vertical-range.png) 0 -51px no-repeat;
-      margin: -6px 0 0 0;
-      height: 11px;
-      width: 22px; }
-    .ws-range.vertical-range .ws-range-thumb:hover, .ws-range.vertical-range.ws-focus .ws-range-thumb {
-      background-position: 0 -34px; }
-    .ws-range.vertical-range.ws-active .ws-range-thumb {
-      background-position: 0 -17px; }
-    .ws-range.vertical-range[aria-disabled="true"] .ws-range-thumb {
-      background-position: 0 0; }
-    .ws-range.vertical-range .ws-range-progress {
-      top: auto;
-      bottom: 1px;
-      left: 0;
-      width: 1px;
-      height: 0; }
-    .ws-range.vertical-range .ws-range-rail {
-      top: 5px;
-      left: 0;
-      right: 0;
-      bottom: 5px; }
-    .ws-range.vertical-range .ws-range-ticks {
-      bottom: auto;
-      left: auto;
-      right: 0;
-      height: 1px;
-      width: 4px; }
 
 .ws-range-ticks[data-label]:after {
   visibility: hidden;
@@ -411,7 +428,7 @@ input[type="color"] {
     transition: all 400ms; }
   .input-picker .ws-focus,
   .input-picker :focus {
-    outline: 1px dotted #000; }
+    outline: 1px dotted black; }
   .input-picker .ws-po-box {
     position: relative;
     padding: 1.15385em 1.53846em;
@@ -450,7 +467,7 @@ input[type="color"] {
     .input-picker .prev-controls .ws-super-prev:before,
     .input-picker .prev-controls .ws-prev:before {
       border-width: 0.35em 0.6em 0.35em 0;
-      border-color: transparent #333 transparent transparent;
+      border-color: transparent #333333 transparent transparent;
       margin-left: -0.1em; }
     .input-picker .prev-controls .ws-super-prev {
       margin-right: 0.23077em; }
@@ -464,7 +481,7 @@ input[type="color"] {
     .input-picker .next-controls .ws-super-next:after,
     .input-picker .next-controls .ws-next:before {
       border-width: 0.35em 0 0.35em 0.6em;
-      border-color: transparent transparent transparent #333;
+      border-color: transparent transparent transparent #333333;
       margin-right: -0.1em; }
     .input-picker .next-controls .ws-super-next {
       margin-left: 0.23077em; }
@@ -487,7 +504,7 @@ input[type="color"] {
     .input-picker .ws-button-row button {
       border: 0.07692em solid #cccccc;
       border-radius: 5px;
-      box-shadow: 1px 1px 0 #fff;
+      box-shadow: 1px 1px 0 white;
       background-color: #ddd;
       background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
       background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
@@ -528,7 +545,7 @@ input[type="color"] {
         height: 0px;
         border-style: solid;
         border-width: 0 0.3em 0.6em 0.3em;
-        border-color: transparent transparent #333 transparent;
+        border-color: transparent transparent #333333 transparent;
         vertical-align: middle; }
       .input-picker .ws-picker-header > button:hover {
         text-decoration: underline; }

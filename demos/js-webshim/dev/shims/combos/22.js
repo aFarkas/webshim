@@ -5,7 +5,7 @@ webshims.register('details', function($, webshims, window, doc, undefined, optio
 			return details;
 		}
 	};
-	
+
 	var bindDetailsSummary = function(summary, details){
 		summary = $(summary);
 		details = $(details);

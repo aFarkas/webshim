@@ -91,18 +91,6 @@ audio > * {
     height: 5px;
     overflow: hidden; }
 
-summary::-webkit-details-marker {
-  display: none; }
-summary > .details-open-indicator {
-  display: none; }
-summary:before {
-  display: inline-block;
-  content: ">";
-  content: ">";
-  border: 0;
-  background: #000;
-  color: #fff; }
-
 mark {
   background-color: #ff9;
   color: #000;
@@ -365,8 +353,8 @@ datalist {
     .datalist-polyfill .datalist-box .hidden-item {
       display: none !important; }
     .datalist-polyfill .datalist-box .active-item {
-      background-color: #39f;
-      cursor: default; }
+      cursor: default;
+      background-color: #39f; }
       .datalist-polyfill .datalist-box .active-item .option-value {
         color: #fff; }
       .datalist-polyfill .datalist-box .active-item .option-label {
@@ -490,15 +478,16 @@ summary {
 .details-open-indicator {
   margin: -1px 0 0;
   display: inline-block;
-  width: 0.66em;
-  height: 0.66em;
   margin-right: 0.4em;
-  min-width: 11px;
-  min-height: 11px;
-  background: url(details-arrows.png) no-repeat 0 0;
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 0.76923em 0.38462em 0 0.38462em;
+  border-color: black transparent transparent transparent;
   vertical-align: middle; }
   .closed-details-summary .details-open-indicator {
-    background-position: 0 -20px; }
+    border-width: 0.38462em 0 0.38462em 0.76923em;
+    border-color: transparent transparent transparent black; }
 
 summary.summary-has-focus {
   outline: 1px dotted #aaaaaa;

@@ -163,7 +163,7 @@ module.exports = function(grunt){
 		var copyTask = {};
 		var minTask = {};
 		var minPath, file, found;
-		var exclude = ['*.scss', 'config.rb', '*.txt'];
+		var exclude = /(\.scss|config\.rb|\.txt|\.php)$/;
 		
 		for(var i in files){
 			file = files[i];
@@ -173,7 +173,7 @@ module.exports = function(grunt){
 					minTask[minPath] = [file];
 					found = true;
 				}
-				if(!grunt.file.match(exclude, file)){
+				if(! exclude.test(file) ){
 					copyTask[minPath] = [file];
 				}
 				copyTask[path.join(DEVPATH, i)] = [file];

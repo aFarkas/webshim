@@ -463,6 +463,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					try {
 						focusElem[0].focus();
 					} catch(e){}
+					if(!focusElem[0].offsetWidth && !focusElem[0].offsetHeight){
+						webshims.warn('invalid element seems to be hidden. Make element either visible or use disabled/readonly to bar elements from validation. With fieldset[disabled] a group of elements can be ignored.');
+					}
 					api.element.triggerHandler('pospopover');
 				};
 				

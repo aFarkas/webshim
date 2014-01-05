@@ -256,11 +256,12 @@ input[type="color"] {
 		&:before	{
 			position: absolute;
 			top: em(-28);
-			left: -.3em;
+			left: -.5em;
 			display: inline-block;
 			content: attr(data-value);
 			padding: em(3) em(1);
 			min-width: 2em;
+			opacity: 0;
 			visibility: hidden;
 			text-align: center;
 			background: #fff;
@@ -336,17 +337,7 @@ input[type="color"] {
 		margin: 0 0 0 em(-2);
 		background: #ccc;
 	}
-	
-	.ws-range-ticks[data-label]:after {
-		visibility: hidden;
-		content: attr(data-label);
-		display: inline-block;
-		font-size: em(9);
-		min-width: 2em;
-		text-align: center;
-		margin: em(7) 0 0 -1em;
-	}
-
+/*
 	&.vertical-range {
 		background: url(vertical-range.png) center bottom no-repeat;
 		width: 20px;
@@ -396,9 +387,27 @@ input[type="color"] {
 			width: 4px;
 		}
 	}
+	*/
 }
 
 
+.ws-range-ticks[data-label]:after {
+	visibility: hidden;
+	content: attr(data-label);
+	display: inline-block;
+	font-size: em(10);
+	min-width: 2em;
+	text-align: center;
+	margin: em(9) 0 0 -0.95em;
+}
+
+
+/* helper classes to hide show/hide specific range features features */
+@each $class in $rangeapis {
+	.#{$class} {
+		@extend %#{$class};
+	}
+}
 
 
 //date popover
@@ -480,14 +489,14 @@ $button-bgcolor: #f5f5f5;
 
 	.ws-po-box {
 		position: relative;
-		padding: em(10) em(20) em(15);
+		padding: em(15) em(20);
 		border-radius: 5px;
 		box-shadow: 0 0 2px rgba(0, 0, 0, .3);
 	}
 	
 	.ws-picker-controls {
 		position: absolute;
-		top: em(10);
+		top: em(15);
 		
 		> button{
 			border: em(1) solid #ccc;

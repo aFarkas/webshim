@@ -72,6 +72,17 @@
 .inputbtns-outside span.input.input-buttons {
   margin-left: 2px; }
 
+.show-ticklabels .ws-range-ticks[data-label]:after {
+  visibility: visible; }
+
+.hide-ticks .ws-range-ticks {
+  display: none; }
+
+.ws-active.show-valuetooltip .ws-range-thumb:before,
+.show-valuetooltip .ws-range.ws-active .ws-range-thumb:before {
+  opacity: 1;
+  visibility: visible; }
+
 /* spinner control for time, number (usable for date, datetime-local) */
 .has-input-buttons,
 html > body input.ws-inputreplace.has-input-buttons,
@@ -233,7 +244,58 @@ input[type="color"] {
   outline: none;
   transition: background-color 400ms, border-color 400ms;
   background-color: #ddd;
-  box-shadow: 0 -0.07692em 0.11538em rgba(0, 0, 0, 0.2) inset; }
+  box-shadow: 0 -0.07692em 0.11538em rgba(0, 0, 0, 0.2) inset;
+  /*
+  	&.vertical-range {
+  		background: url(vertical-range.png) center bottom no-repeat;
+  		width: 20px;
+  
+  		.ws-range-thumb {
+  			top: 0;
+  			left: 3px;
+  			bottom: auto;
+  			background: url(vertical-range.png) 0 -51px no-repeat;
+  			margin: -6px 0 0 0;
+  			height: 11px;
+  			width: 22px;
+  
+  		}
+  		.ws-range-thumb:hover,
+  		&.ws-focus .ws-range-thumb {
+  			background-position: 0 -34px;
+  		}
+  		&.ws-active .ws-range-thumb {
+  			background-position: 0 -17px;
+  		}
+  
+  		&[aria-disabled="true"] .ws-range-thumb {
+  			background-position: 0 0;
+  		}
+  
+  		.ws-range-progress {
+  			top: auto;
+  			bottom: 1px;
+  			left: 0;
+  			width: 1px;
+  			height: 0;
+  		}
+  
+  		.ws-range-rail {
+  			top: 5px;
+  			left: 0;
+  			right: 0;
+  			bottom: 5px;
+  		}
+  
+  		.ws-range-ticks {
+  			bottom: auto;
+  			left: auto;
+  			right: 0;
+  			height: 1px;
+  			width: 4px;
+  		}
+  	}
+  	*/ }
   .ws-range .ws-range-thumb {
     top: 0;
     position: absolute;
@@ -250,11 +312,12 @@ input[type="color"] {
     .ws-range .ws-range-thumb:after, .ws-range .ws-range-thumb:before {
       position: absolute;
       top: -2.15385em;
-      left: -.3em;
+      left: -.5em;
       display: inline-block;
       content: attr(data-value);
       padding: 0.23077em 0.07692em;
       min-width: 2em;
+      opacity: 0;
       visibility: hidden;
       text-align: center;
       background: #fff;
@@ -307,49 +370,17 @@ input[type="color"] {
     width: 0.11538em;
     margin: 0 0 0 -0.15385em;
     background: #ccc; }
-  .ws-range .ws-range-ticks[data-label]:after {
-    visibility: hidden;
-    content: attr(data-label);
-    display: inline-block;
-    font-size: 0.69231em;
-    min-width: 2em;
-    text-align: center;
-    margin: 0.53846em 0 0 -1em; }
-  .ws-range.vertical-range {
-    background: url(vertical-range.png) center bottom no-repeat;
-    width: 20px; }
-    .ws-range.vertical-range .ws-range-thumb {
-      top: 0;
-      left: 3px;
-      bottom: auto;
-      background: url(vertical-range.png) 0 -51px no-repeat;
-      margin: -6px 0 0 0;
-      height: 11px;
-      width: 22px; }
-    .ws-range.vertical-range .ws-range-thumb:hover, .ws-range.vertical-range.ws-focus .ws-range-thumb {
-      background-position: 0 -34px; }
-    .ws-range.vertical-range.ws-active .ws-range-thumb {
-      background-position: 0 -17px; }
-    .ws-range.vertical-range[aria-disabled="true"] .ws-range-thumb {
-      background-position: 0 0; }
-    .ws-range.vertical-range .ws-range-progress {
-      top: auto;
-      bottom: 1px;
-      left: 0;
-      width: 1px;
-      height: 0; }
-    .ws-range.vertical-range .ws-range-rail {
-      top: 5px;
-      left: 0;
-      right: 0;
-      bottom: 5px; }
-    .ws-range.vertical-range .ws-range-ticks {
-      bottom: auto;
-      left: auto;
-      right: 0;
-      height: 1px;
-      width: 4px; }
 
+.ws-range-ticks[data-label]:after {
+  visibility: hidden;
+  content: attr(data-label);
+  display: inline-block;
+  font-size: 0.76923em;
+  min-width: 2em;
+  text-align: center;
+  margin: 0.69231em 0 0 -0.95em; }
+
+/* helper classes to hide show/hide specific range features features */
 .input-picker .ws-button-row button {
   border-radius: 0.30769em;
   background: #ccc;
@@ -400,12 +431,12 @@ input[type="color"] {
     outline: 1px dotted black; }
   .input-picker .ws-po-box {
     position: relative;
-    padding: 0.76923em 1.53846em 1.15385em;
+    padding: 1.15385em 1.53846em;
     border-radius: 5px;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); }
   .input-picker .ws-picker-controls {
     position: absolute;
-    top: 0.76923em; }
+    top: 1.15385em; }
     .input-picker .ws-picker-controls > button {
       border: 0.07692em solid #cccccc;
       border-radius: 0.38462em;
