@@ -71,6 +71,10 @@
 .inputbtns-outside + span.input-buttons,
 .inputbtns-outside span.input.input-buttons {
   margin-left: 2px; }
+  .inputbtns-outside + span.input-buttons.ws-is-rtl,
+  .inputbtns-outside span.input.input-buttons.ws-is-rtl {
+    margin-left: 0;
+    margin-right: 2px; }
 
 .show-ticklabels .ws-range-ticks[data-label]:after {
   visibility: visible; }
@@ -107,6 +111,9 @@ span.has-input-buttons {
   margin: 0;
   height: 19px;
   width: 15px; }
+  .ws-is-rtl .step-controls, .ws-is-rtl
+  .ws-popover-opener {
+    float: right; }
 
 .ws-popover-opener {
   position: relative;
@@ -117,6 +124,8 @@ span.has-input-buttons {
   border-radius: 3px;
   cursor: pointer;
   background: #ccc; }
+  .ws-is-rtl .ws-popover-opener {
+    margin: 0 2px 0 0; }
   .ws-popover-opener span {
     display: block;
     position: absolute;
@@ -149,12 +158,19 @@ input[type="color"] {
 
 .input-button-size-1.month-input-buttons, .input-button-size-1.date-input-buttons, .input-button-size-1.datetime-local-input-buttons {
   margin-left: -24px; }
+  .input-button-size-1.month-input-buttons.ws-is-rtl, .input-button-size-1.date-input-buttons.ws-is-rtl, .input-button-size-1.datetime-local-input-buttons.ws-is-rtl {
+    margin-left: 0;
+    margin-right: -24px; }
 
 .input-button-size-2 {
   margin-left: -39px; }
+  .input-button-size-2.ws-is-rtl {
+    margin-left: 0;
+    margin-right: -39px; }
 
 .step-controls span {
   position: absolute;
+  left: 0;
   display: inline-block;
   overflow: hidden;
   margin: 0 !important;
@@ -244,58 +260,7 @@ input[type="color"] {
   outline: none;
   transition: background-color 400ms, border-color 400ms;
   background-color: #ddd;
-  box-shadow: 0 -0.07692em 0.11538em rgba(0, 0, 0, 0.2) inset;
-  /*
-  	&.vertical-range {
-  		background: url(vertical-range.png) center bottom no-repeat;
-  		width: 20px;
-  
-  		.ws-range-thumb {
-  			top: 0;
-  			left: 3px;
-  			bottom: auto;
-  			background: url(vertical-range.png) 0 -51px no-repeat;
-  			margin: -6px 0 0 0;
-  			height: 11px;
-  			width: 22px;
-  
-  		}
-  		.ws-range-thumb:hover,
-  		&.ws-focus .ws-range-thumb {
-  			background-position: 0 -34px;
-  		}
-  		&.ws-active .ws-range-thumb {
-  			background-position: 0 -17px;
-  		}
-  
-  		&[aria-disabled="true"] .ws-range-thumb {
-  			background-position: 0 0;
-  		}
-  
-  		.ws-range-progress {
-  			top: auto;
-  			bottom: 1px;
-  			left: 0;
-  			width: 1px;
-  			height: 0;
-  		}
-  
-  		.ws-range-rail {
-  			top: 5px;
-  			left: 0;
-  			right: 0;
-  			bottom: 5px;
-  		}
-  
-  		.ws-range-ticks {
-  			bottom: auto;
-  			left: auto;
-  			right: 0;
-  			height: 1px;
-  			width: 4px;
-  		}
-  	}
-  	*/ }
+  box-shadow: 0 -0.07692em 0.11538em rgba(0, 0, 0, 0.2) inset; }
   .ws-range .ws-range-thumb {
     top: 0;
     position: absolute;
@@ -370,6 +335,22 @@ input[type="color"] {
     width: 0.11538em;
     margin: 0 0 0 -0.15385em;
     background: #ccc; }
+  .ws-range.vertical-range {
+    width: 0.61538em;
+    margin: 0 10px 0 5px; }
+    .ws-range.vertical-range .ws-range-ticks {
+      bottom: auto;
+      left: auto;
+      margin: -0.05769em 0 0 0;
+      right: -0.57692em;
+      height: 0.11538em;
+      width: 0.52308em; }
+    .ws-range.vertical-range .ws-range-progress {
+      top: auto;
+      bottom: 1px;
+      left: 0;
+      width: 100%;
+      height: 0; }
 
 .ws-range-ticks[data-label]:after {
   visibility: hidden;
@@ -379,6 +360,13 @@ input[type="color"] {
   min-width: 2em;
   text-align: center;
   margin: 0.69231em 0 0 -0.95em; }
+
+.vertical-range .ws-range-ticks[data-label]:after {
+  margin: 0 0 0 5px;
+  position: relative;
+  top: -0.7em;
+  left: 0.53846em;
+  min-width: 0; }
 
 /* helper classes to hide show/hide specific range features features */
 .input-picker .ws-button-row button {
@@ -428,12 +416,13 @@ input[type="color"] {
     transition: all 400ms; }
   .input-picker .ws-focus,
   .input-picker :focus {
-    outline: 1px dotted black; }
+    outline: 1px dotted #000; }
   .input-picker .ws-po-box {
     position: relative;
     padding: 1.15385em 1.53846em;
     border-radius: 5px;
-    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); }
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+    direction: ltr; }
   .input-picker .ws-picker-controls {
     position: absolute;
     top: 1.15385em; }
@@ -461,32 +450,47 @@ input[type="color"] {
         opacity: 0.4;
         border-color: #eee;
         color: #ddd; }
-  .input-picker .prev-controls {
-    left: 1.53846em; }
-    .input-picker .prev-controls .ws-super-prev:after,
-    .input-picker .prev-controls .ws-super-prev:before,
-    .input-picker .prev-controls .ws-prev:before {
+  .input-picker .prev-controls,
+  .input-picker .ws-po-box[dir="rtl"] .next-controls {
+    left: 1.53846em;
+    right: auto; }
+    .input-picker .prev-controls [class*="ws-super-"]:after,
+    .input-picker .prev-controls button:before,
+    .input-picker .ws-po-box[dir="rtl"] .next-controls [class*="ws-super-"]:after,
+    .input-picker .ws-po-box[dir="rtl"] .next-controls button:before {
       border-width: 0.35em 0.6em 0.35em 0;
-      border-color: transparent #333333 transparent transparent;
+      border-color: transparent #333 transparent transparent;
       margin-left: -0.1em; }
-    .input-picker .prev-controls .ws-super-prev {
-      margin-right: 0.23077em; }
-      .input-picker .prev-controls .ws-super-prev[disabled] {
+    .input-picker .prev-controls .ws-super-prev,
+    .input-picker .ws-po-box[dir="rtl"] .next-controls .ws-super-prev {
+      margin-right: 0.23077em;
+      margin-left: 0; }
+      .input-picker .prev-controls .ws-super-prev[disabled],
+      .input-picker .ws-po-box[dir="rtl"] .next-controls .ws-super-prev[disabled] {
         display: none; }
-  .input-picker .next-controls {
-    right: 1.53846em; }
-    .input-picker .next-controls button:before {
+  .input-picker .next-controls,
+  .input-picker .ws-po-box[dir="rtl"] .prev-controls {
+    right: 1.53846em;
+    left: auto; }
+    .input-picker .next-controls button:before,
+    .input-picker .ws-po-box[dir="rtl"] .prev-controls button:before {
       margin-left: 0.11538em; }
-    .input-picker .next-controls .ws-super-next:before,
-    .input-picker .next-controls .ws-super-next:after,
-    .input-picker .next-controls .ws-next:before {
+    .input-picker .next-controls [class*="ws-super-"]:after,
+    .input-picker .next-controls button:before,
+    .input-picker .ws-po-box[dir="rtl"] .prev-controls [class*="ws-super-"]:after,
+    .input-picker .ws-po-box[dir="rtl"] .prev-controls button:before {
       border-width: 0.35em 0 0.35em 0.6em;
-      border-color: transparent transparent transparent #333333;
+      border-color: transparent transparent transparent #333;
       margin-right: -0.1em; }
-    .input-picker .next-controls .ws-super-next {
-      margin-left: 0.23077em; }
-      .input-picker .next-controls .ws-super-next[disabled] {
+    .input-picker .next-controls [class*="ws-super-"],
+    .input-picker .ws-po-box[dir="rtl"] .prev-controls [class*="ws-super-"] {
+      margin-left: 0.23077em;
+      margin-right: 0; }
+      .input-picker .next-controls [class*="ws-super-"][disabled],
+      .input-picker .ws-po-box[dir="rtl"] .prev-controls [class*="ws-super-"][disabled] {
         display: none; }
+  .input-picker .ws-po-box[dir="rtl"] {
+    direction: rtl; }
   .input-picker.time-popover .ws-picker-body {
     padding-top: 2.76923em; }
   .input-picker .ws-picker-body {
@@ -504,7 +508,7 @@ input[type="color"] {
     .input-picker .ws-button-row button {
       border: 0.07692em solid #cccccc;
       border-radius: 5px;
-      box-shadow: 1px 1px 0 white;
+      box-shadow: 1px 1px 0 #fff;
       background-color: #ddd;
       background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
       background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
@@ -512,6 +516,10 @@ input[type="color"] {
       float: left; }
       .input-picker .ws-button-row button.ws-empty {
         float: right; }
+  .input-picker .ws-po-box[dir="rtl"] .ws-button-row button {
+    float: right; }
+    .input-picker .ws-po-box[dir="rtl"] .ws-button-row button.ws-empty {
+      float: left; }
   .input-picker[data-currentview="setMonthList"] .ws-picker-header > select, .input-picker[data-currentview="setYearList"] .ws-picker-header > select {
     max-width: 90%; }
   .input-picker[data-currentview="setDayList"] .ws-picker-header > select {
@@ -545,7 +553,7 @@ input[type="color"] {
         height: 0px;
         border-style: solid;
         border-width: 0 0.3em 0.6em 0.3em;
-        border-color: transparent transparent #333333 transparent;
+        border-color: transparent transparent #333 transparent;
         vertical-align: middle; }
       .input-picker .ws-picker-header > button:hover {
         text-decoration: underline; }

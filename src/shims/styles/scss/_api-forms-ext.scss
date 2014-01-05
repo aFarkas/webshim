@@ -121,6 +121,11 @@ $btnapis: hide-spinbtns hide-dropdownbtn hide-inputbtns inputbtns-outside a11yhi
 	+ span.input-buttons,
 	span.input.input-buttons {
 		margin-left: 2px;
+		
+		&.ws-is-rtl {
+			margin-left: 0;
+			margin-right: 2px;
+		}
 	}
 }
 

@@ -215,25 +215,40 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	setRoot();
 	webshims.ready('DOM', setRoot);
 	
-	
+	var rtlReg = /right|left/g;
+	var rtlReplace = function(ret){
+		return ret == 'left' ? 'right' : 'left';
+	};
 	webshims.getRelOffset = function(posElem, relElem, opts){
 		var offset, bodyOffset, dirs;
 		posElem = $(posElem);
-		$.swap($(posElem)[0], resetPos, function(){
+		$.swap(posElem[0], resetPos, function(){
+			var isRtl;
 			if($.position && opts && $.position.getScrollInfo){
 				if(!opts.of){
 					opts.of = relElem;
 				}
 				
+				isRtl = $(opts.of).css('direction') == 'rtl';
+				
+				if(opts.isRtl != isRtl){
+					opts.my = (opts.my || 'center').replace(rtlReg, rtlReplace);
+					opts.at = (opts.at || 'center').replace(rtlReg, rtlReplace);
+					opts.isRtl = isRtl;
+				}
+				
+				posElem[opts.isRtl ? 'addClass' : 'removeClass']('ws-is-rtl');
+				
 				opts.using = function(calced, data){
 					posElem.attr({'data-horizontal': data.horizontal, 'data-vertical': data.vertical});
 					offset = calced;
 				};
+				
 				posElem.attr({
 					'data-horizontal': '', 
 					'data-vertical': '',
-					'data-my': opts.my || 'center',
-					'data-at': opts.at || 'center'
+					'data-my': opts.my,
+					'data-at': opts.at
 				});
 				posElem.position(opts);
 				

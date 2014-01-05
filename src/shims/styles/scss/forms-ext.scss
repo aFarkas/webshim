@@ -27,6 +27,10 @@ span.has-input-buttons {
 	margin: 0;
 	height: 19px;
 	width: 15px;
+	
+	.ws-is-rtl & {
+		float: right;
+	}
 }
 
 .ws-popover-opener {
@@ -38,6 +42,11 @@ span.has-input-buttons {
 	border-radius: 3px;
 	cursor: pointer;
 	background: #ccc;
+	
+	
+	.ws-is-rtl & {
+		margin: 0 2px 0 0;
+	}
 	
 	span {
 		display: block;
@@ -92,16 +101,28 @@ input[type="color"] {
 	&.date-input-buttons,
 	&.datetime-local-input-buttons {
 		margin-left: -24px;
+		
+		
+		&.ws-is-rtl {
+			margin-left: 0;
+			margin-right: -24px;
+		}
 	}
 }
 .input-button-size-2 {
 	margin-left: -39px;
+	
+	&.ws-is-rtl {
+		margin-left: 0;
+		margin-right: -39px;
+	}
 }
 
 .step-controls {
 
 	span {
 		position: absolute;
+		left: 0;
 		display: inline-block;
 		overflow: hidden;
 		margin: 0 !important;
@@ -337,57 +358,29 @@ input[type="color"] {
 		margin: 0 0 0 em(-2);
 		background: #ccc;
 	}
-/*
+	
 	&.vertical-range {
-		background: url(vertical-range.png) center bottom no-repeat;
-		width: 20px;
-
-		.ws-range-thumb {
-			top: 0;
-			left: 3px;
+		width: em(8);
+		margin: 0 10px 0 5px;
+		
+		.ws-range-ticks {
 			bottom: auto;
-			background: url(vertical-range.png) 0 -51px no-repeat;
-			margin: -6px 0 0 0;
-			height: 11px;
-			width: 22px;
-
+			left: auto;
+			margin:  em(-0.75) 0 0 0;
+			right: em(-7.5);
+			height: em(1.5);
+			width: em(6.8);
 		}
-		.ws-range-thumb:hover,
-		&.ws-focus .ws-range-thumb {
-			background-position: 0 -34px;
-		}
-		&.ws-active .ws-range-thumb {
-			background-position: 0 -17px;
-		}
-
-		&[aria-disabled="true"] .ws-range-thumb {
-			background-position: 0 0;
-		}
-
+		
 		.ws-range-progress {
 			top: auto;
 			bottom: 1px;
 			left: 0;
-			width: 1px;
+			width: 100%;
 			height: 0;
 		}
-
-		.ws-range-rail {
-			top: 5px;
-			left: 0;
-			right: 0;
-			bottom: 5px;
-		}
-
-		.ws-range-ticks {
-			bottom: auto;
-			left: auto;
-			right: 0;
-			height: 1px;
-			width: 4px;
-		}
+		
 	}
-	*/
 }
 
 
@@ -399,6 +392,14 @@ input[type="color"] {
 	min-width: 2em;
 	text-align: center;
 	margin: em(9) 0 0 -0.95em;
+}
+
+.vertical-range .ws-range-ticks[data-label]:after {
+	margin: 0 0 0 5px;
+	position: relative;
+	top: -0.7em;
+	left: em(7);
+	min-width: 0;
 }
 
 
@@ -492,6 +493,7 @@ $button-bgcolor: #f5f5f5;
 		padding: em(15) em(20);
 		border-radius: 5px;
 		box-shadow: 0 0 2px rgba(0, 0, 0, .3);
+		direction: ltr;
 	}
 	
 	.ws-picker-controls {
@@ -534,18 +536,20 @@ $button-bgcolor: #f5f5f5;
 		}
 	}
 	
-	.prev-controls {
+	.prev-controls,
+	.ws-po-box[dir="rtl"] .next-controls {
 		left: em(20);
+		right: auto;
 		
-		.ws-super-prev:after,
-		.ws-super-prev:before,
-		.ws-prev:before {
+		[class*="ws-super-"]:after,
+		button:before {
 			border-width: 0.35em 0.6em 0.35em 0;
 			border-color: transparent #333 transparent transparent;
 			margin-left: -0.1em;
 		}
 		.ws-super-prev {
 			margin-right: em(3);
+			margin-left: 0;
 
 			&[disabled] {
 				display: none;
@@ -554,28 +558,36 @@ $button-bgcolor: #f5f5f5;
 		
 	}
 	
-	.next-controls {
+	.next-controls,
+	.ws-po-box[dir="rtl"] .prev-controls {
 		right: em(20);
+		left: auto;
 		
 		button:before {
 			margin-left: em(1.5);
 		}
 		
-		.ws-super-next:before,
-		.ws-super-next:after,
-		.ws-next:before {
+		
+		[class*="ws-super-"]:after,
+		button:before {
 			border-width: 0.35em 0 0.35em 0.6em;
 			border-color: transparent transparent transparent #333;
 			margin-right: -0.1em;
 		}
 		
-		.ws-super-next {
+		[class*="ws-super-"] {
 			margin-left: em(3);
+			margin-right: 0;
 
 			&[disabled]	{
 				display: none;
 			}
 		}
+	}
+	
+	.ws-po-box[dir="rtl"] {
+		direction: rtl;
+		
 	}
 
 	&.time-popover .ws-picker-body {
@@ -615,6 +627,14 @@ $button-bgcolor: #f5f5f5;
 			&.ws-empty {
 				float: right;
 			}
+		}
+	}
+	
+	.ws-po-box[dir="rtl"] .ws-button-row button {
+		float: right;
+		
+		&.ws-empty {
+			float: left;
 		}
 	}
 	
