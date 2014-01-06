@@ -359,6 +359,17 @@ input[type="color"] {
 		background: #ccc;
 	}
 	
+	&.ws-is-rtl {
+		.ws-range-progress {
+			left: auto;
+			right: 0;
+		}
+		.ws-range-ticks {
+			left: auto;
+			right: 0;
+		}
+	}
+	
 	&.vertical-range {
 		width: em(8);
 		margin: 0 10px 0 5px;
@@ -392,15 +403,20 @@ input[type="color"] {
 	min-width: 2em;
 	text-align: center;
 	margin: em(9) 0 0 -0.95em;
+	
+	.ws-is-rtl & {
+		margin: em(9) -0.95em 0 0;
+	}
+	
+	.vertical-range & {
+		margin: 0 0 0 5px;
+		position: relative;
+		top: -0.7em;
+		left: em(7);
+		min-width: 0;
+	}
 }
 
-.vertical-range .ws-range-ticks[data-label]:after {
-	margin: 0 0 0 5px;
-	position: relative;
-	top: -0.7em;
-	left: em(7);
-	min-width: 0;
-}
 
 
 /* helper classes to hide show/hide specific range features features */
