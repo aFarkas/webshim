@@ -534,7 +534,9 @@ progress {
 	width: 164px;
 	height: 20px;
 	overflow: hidden;
-	vertical-align: -0.1em;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	vertical-align: -0.2em;
 	
 	> * {
 		display: none !important;
@@ -550,10 +552,18 @@ progress {
 			border-radius: 4px;
 		}
 		
+		> span.progress-value {
+			left: 0;
+		}
+		
+		&.ws-is-rtl > span.progress-value {
+			left: auto;
+			right: 0;
+		}
+		
 		@include progressbar {
 			position: absolute;
 			top: 0;
-			left: 0;
 			bottom: 0;
 			height: 100%;
 			box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
