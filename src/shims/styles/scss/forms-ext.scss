@@ -563,7 +563,8 @@ $button-bgcolor: #f5f5f5;
 			border-color: transparent #333 transparent transparent;
 			margin-left: -0.1em;
 		}
-		.ws-super-prev {
+		
+		[class*="ws-super-"] {
 			margin-right: em(3);
 			margin-left: 0;
 

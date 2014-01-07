@@ -15,7 +15,6 @@
 		_create: function(){
 			var i;
 			
-			
 			this.element.addClass('ws-range').attr({role: 'slider'}).append('<span class="ws-range-min ws-range-progress" /><span class="ws-range-rail ws-range-track"><span class="ws-range-thumb" data-value="" data-valuetext="" /></span>');
 			this.trail = $('.ws-range-track', this.element);
 			this.range = $('.ws-range-progress', this.element);
@@ -540,6 +539,7 @@
 				[this.vertical ? 'addClass' : 'removeClass']('vertical-range')
 				[this.isRtl ? 'addClass' : 'removeClass']('ws-is-rtl')
 			;
+			this.updateMetrics = this.posCenter;
 			this.posCenter();
 		}
 	};
