@@ -2,6 +2,10 @@
 	var isMobile = /iphone|ipad|mobile/i.test(navigator.userAgent);
 	var setupClickTest = function(_removeId){
 		var counters = {};
+		var addToCount = function(e, type){
+			if(e.type == 'invalid' && $.nodeName(e.target, 'form')){return;}
+			counters[type]++;
+		};
 		counters.boundInvalids = 0;
 		counters.boundFormInvalids = 0;
 		counters.delegatedFormInvalids = 0;
@@ -26,45 +30,44 @@
 		counters.focused = [];
 		
 		$(document)
-			.on('invalid.clicktest', function(){
-				counters.boundDocumentInvalids++;
+			.on('invalid.clicktest', function(e){
+				addToCount(e, 'boundDocumentInvalids');
 			})
-			.on('firstinvalid.clicktest', function(){
-				counters.boundDocumentFirstInvalids++;
+			.on('firstinvalid.clicktest', function(e){
+				addToCount(e, 'boundDocumentFirstInvalids');
 			})
-			.on('submit.clicktest', function(){
-				counters.boundDocumentSubmit++;
-				
+			.on('submit.clicktest', function(e){
+				addToCount(e, 'boundDocumentSubmit');
 			})
 		;
 		
 		$(document)
-			.on('invalid.clicktest', 'input', function(){
-				counters.delegatedDocumentInvalids++;
+			.on('invalid.clicktest', 'input', function(e){
+				addToCount(e, 'delegatedDocumentInvalids');
 			})
-			.on('firstinvalid.clicktest', 'input', function(){
-				counters.delegatedDocumentFirstInvalids++;
+			.on('firstinvalid.clicktest', 'input', function(e){
+				addToCount(e, 'delegatedDocumentFirstInvalids');
 			})
-			.on('submit.clicktest', 'form', function(){
-				counters.delegatedDocumentSubmit++;
+			.on('submit.clicktest', 'form', function(e){
+				addToCount(e, 'delegatedDocumentSubmit');
 			})
 		;
 		$('#click-test-form')
-			.on('invalid.clicktest', function(){
-				counters.boundFormInvalids++;
+			.on('invalid.clicktest', function(e){
+				addToCount(e, 'boundFormInvalids');
 			})
-			.on('firstinvalid.clicktest', function(){
-				counters.boundFormFirstInvalids++;
+			.on('firstinvalid.clicktest', function(e){
+				addToCount(e, 'boundFormFirstInvalids');
 			})
 			.on('submit.clicktest', function(e){
-				counters.boundFormSubmit++;
+				addToCount(e, 'boundFormSubmit');
 				e.preventDefault();
 			})
-			.on('invalid.clicktest', function(){
-				counters.delegatedFormInvalids++;
+			.on('invalid.clicktest', function(e){
+				addToCount(e, 'delegatedFormInvalids');
 			})
-			.on('firstinvalid.clicktest', function(){
-				counters.delegatedFormFirstInvalids++;
+			.on('firstinvalid.clicktest', function(e){
+				addToCount(e, 'delegatedFormFirstInvalids');
 				setTimeout(function(){
 					counters.focused.push(document.activeElement);
 				}, 20);

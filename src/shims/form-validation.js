@@ -2,7 +2,8 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	"use strict";
 	
 	var isWebkit = 'webkitURL' in window;
-	var chromeBugs = isWebkit && Modernizr.formvalidation && !webshims.bugs.bustedValidity;
+	var hasNative = Modernizr.formvalidation && !webshims.bugs.bustedValidity;
+	var chromeBugs = isWebkit && hasNative;
 	var webkitVersion = chromeBugs && parseFloat((navigator.userAgent.match(/Safari\/([\d\.]+)/) || ['', '999999'])[1], 10);
 	
 	var iVal = options.iVal;
@@ -230,7 +231,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				}
 				
 				isRtl = $(opts.of).css('direction') == 'rtl';
-				
+				if(!opts.isRtl){
+					opts.isRtl = false;
+				}
 				if(opts.isRtl != isRtl){
 					opts.my = (opts.my || 'center').replace(rtlReg, rtlReplace);
 					opts.at = (opts.at || 'center').replace(rtlReg, rtlReplace);
@@ -744,7 +747,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			},
 			firstinvalid: function(e){
 				if(iVal.sel && iVal.handleBubble){
-				var form = $(e.target).jProp('form');
+					var form = $(e.target).jProp('form');
 					if(form.is(iVal.sel)){
 						e.preventDefault();
 						if(iVal.handleBubble != 'none'){
@@ -785,11 +788,11 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		var firstEvent,
 			invalids = [],
 			stopSubmitTimer,
-			form
+			stop
 		;
 		
 		$(document).on('invalid', function(e){
-			if(e.wrongWebkitInvalid){return;}
+			if(e.wrongWebkitInvalid || stop){return;}
 			var jElm = $(e.target);
 			
 			
@@ -811,7 +814,14 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				//reset firstinvalid
 				firstEvent = false;
 				invalids = [];
+				stop = true;
 				$(e.target).trigger(lastEvent, [lastEvent]);
+				/*
+				if(hasNative && !$.nodeName(e.target, 'form')){
+					$(e.target).jProp('form').triggerHandler('invalid');
+				}
+				*/
+				stop = false;
 			}, 9);
 			jElm = null;
 		});

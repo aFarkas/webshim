@@ -222,6 +222,9 @@ $.event.special.invalid = {
 		var notValid = !($(e.target).callProp('reportValidity'));
 		if(notValid){
 			e.stopImmediatePropagation();
+			if(!options.noFormInvalid){
+				$(e.target).trigger('invalid');
+			}
 			return false;
 		}
 	}
