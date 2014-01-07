@@ -4,6 +4,9 @@
   position: absolute;
   top: -999999px; }
 
+[hidden] {
+  display: none; }
+
 article, aside, canvas, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
   display: block; }
 
@@ -401,7 +404,9 @@ progress {
   width: 164px;
   height: 20px;
   overflow: hidden;
-  vertical-align: -0.1em; }
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  vertical-align: -0.2em; }
   progress > * {
     display: none !important; }
   progress[data-position], .ws-replaceui progress {
@@ -409,8 +414,6 @@ progress {
     -moz-appearance: none;
     appearance: none;
     border: 0;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
     border: 1px solid #ddd;
     background: #f0f0f0;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
@@ -432,10 +435,14 @@ progress {
       background: #f0f0f0;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
       border-radius: 4px; }
+    progress[data-position] > span.progress-value, .ws-replaceui progress > span.progress-value {
+      left: 0; }
+    progress[data-position].ws-is-rtl > span.progress-value, .ws-replaceui progress.ws-is-rtl > span.progress-value {
+      left: auto;
+      right: 0; }
     progress[data-position]::-webkit-progress-value, .ws-replaceui progress::-webkit-progress-value {
       position: absolute;
       top: 0;
-      left: 0;
       bottom: 0;
       height: 100%;
       box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
@@ -444,7 +451,6 @@ progress {
     progress[data-position]::-moz-progress-bar, .ws-replaceui progress::-moz-progress-bar {
       position: absolute;
       top: 0;
-      left: 0;
       bottom: 0;
       height: 100%;
       box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
@@ -454,7 +460,6 @@ progress {
       animation-name: none;
       position: absolute;
       top: 0;
-      left: 0;
       bottom: 0;
       height: 100%;
       box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
@@ -464,7 +469,6 @@ progress {
       display: block !important;
       position: absolute;
       top: 0;
-      left: 0;
       bottom: 0;
       height: 100%;
       box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;

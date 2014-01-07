@@ -2066,7 +2066,6 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 		_create: function(){
 			var i;
 			
-			
 			this.element.addClass('ws-range').attr({role: 'slider'}).append('<span class="ws-range-min ws-range-progress" /><span class="ws-range-rail ws-range-track"><span class="ws-range-thumb" data-value="" data-valuetext="" /></span>');
 			this.trail = $('.ws-range-track', this.element);
 			this.range = $('.ws-range-progress', this.element);
@@ -2113,6 +2112,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 			}
 			
 			rangeStyle[this.dirs.width] = left+'%';
+			
 			if(this.vertical){
 				left = Math.abs(left - 100);
 			}
@@ -2291,11 +2291,11 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 			var val, valModStep, alignValue, step;
 			
 			if(pos <= 0){
-				val = this.options[this.dirs.min];
+				val = this.options[this.dirs[this.isRtl ? 'max' : 'min']];
 			} else if(pos > 100) {
-				val = this.options[this.dirs.max];
+				val = this.options[this.dirs[this.isRtl ? 'min' : 'max']];
 			} else {
-				if(this.vertical){
+				if(this.vertical || this.isRtl){
 					pos = Math.abs(pos - 100);
 				}
 				val = ((this.options.max - this.options.min) * (pos / 100)) + this.options.min;
@@ -2474,6 +2474,13 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 					var step = true;
 					var code = e.keyCode;
 					if(!o.readonly && !o.disabled){
+						if(that.isRtl){
+							if(code == 39){
+								code = 37;
+							} else if(code == 37){
+								code = 39;
+							}
+						}
 						if (code == 39 || code == 38) {
 							that.doStep(1);
 						} else if (code == 37 || code == 40) {
@@ -2573,10 +2580,17 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 				{mouse: 'pageY', pos: 'top', min: 'max', max: 'min', left: 'top', right: 'bottom', width: 'height', innerWidth: 'innerHeight', innerHeight: 'innerWidth', outerWidth: 'outerHeight', outerHeight: 'outerWidth', marginTop: 'marginLeft', marginLeft: 'marginTop'} :
 				{mouse: 'pageX', pos: 'left', min: 'min', max: 'max', left: 'left', right: 'right', width: 'width', innerWidth: 'innerWidth', innerHeight: 'innerHeight', outerWidth: 'outerWidth', outerHeight: 'outerHeight', marginTop: 'marginTop', marginLeft: 'marginLeft'}
 			;
+			if(!this.vertical && this.element.css('direction') == 'rtl'){
+				this.isRtl = true;
+				this.dirs.left = 'right';
+				this.dirs.right = 'left';
+				this.dirs.marginLeft = 'marginRight';
+			}
 			this.element
 				[this.vertical ? 'addClass' : 'removeClass']('vertical-range')
-				[this.vertical ? 'addClass' : 'removeClass']('horizontal-range')
+				[this.isRtl ? 'addClass' : 'removeClass']('ws-is-rtl')
 			;
+			this.updateMetrics = this.posCenter;
 			this.posCenter();
 		}
 	};
@@ -2933,9 +2947,6 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 			processLangCFG(curCfg);
 			$(document).triggerHandler('wslocalechange');
 		};
-		
-		
-		
 		
 		curCfg = webshims.activeLang(formcfg);
 		
@@ -4007,31 +4018,41 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 			var updateStyles = function(){
 				$(data.orig).removeClass('ws-important-hide');
 				$.style( data.orig, 'display', '' );
-				var hasButtons, marginR, marginL;
+				var hasButtons, marginR, marginL, left, right, isRtl;
 				var correctWidth = 0.8;
 				if(!init || data.orig.offsetWidth){
 					hasButtons = data.buttonWrapper && data.buttonWrapper.filter(isVisible).length;
-					marginR = $.css( data.orig, 'marginRight');
-					data.element.css({
-						marginLeft: $.css( data.orig, 'marginLeft'),
-						marginRight: hasButtons ? 0 : marginR
-					});
+					
+					isRtl = hasButtons && data.buttonWrapper.css('direction') == 'rtl';
+					if(isRtl){
+						left = 'Right';
+						right = 'Left';
+					} else {
+						left = 'Left';
+						right = 'Right';
+					}
+					
+					marginR = $.css( data.orig, 'margin'+right);
+					
+					data.element
+						.css('margin'+left, $.css( data.orig, 'margin'+left))
+						.css('margin'+right, hasButtons ? 0 : marginR)
+					;
 					
 					if(hasButtons){
-						marginL = (parseInt(data.buttonWrapper.css('marginLeft'), 10) || 0);
-						data.element.css({paddingRight: ''});
+						data.buttonWrapper[isRtl ? 'addClass' : 'removeClass']('ws-is-rtl');
+						marginL = (parseInt(data.buttonWrapper.css('margin'+left), 10) || 0);
+						data.element.css('padding'+right, '');
 						
 						if(marginL < 0){
 							marginR = (parseInt(marginR, 10) || 0) + ((data.buttonWrapper.outerWidth() + marginL) * -1);
-							data.buttonWrapper.css('marginRight', marginR);
+							data.buttonWrapper.css('margin'+right, marginR);
 							data.element
-								.css({paddingRight: ''})
-								.css({
-									paddingRight: (parseInt( data.element.css('paddingRight'), 10) || 0) + data.buttonWrapper.outerWidth()
-								})
+								.css('padding'+right, '')
+								.css('padding'+right, (parseInt( data.element.css('padding'+right), 10) || 0) + data.buttonWrapper.outerWidth())
 							;
 						} else {
-							data.buttonWrapper.css('marginRight', marginR);
+							data.buttonWrapper.css('margin'+right, marginR);
 							correctWidth = data.buttonWrapper.outerWidth(true) + correctWidth;
 						}
 					}

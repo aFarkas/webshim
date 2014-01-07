@@ -1580,8 +1580,11 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				popover.yearPrevElement
 					.attr({'aria-label': curCfg.date.prevText})
 				;
-				
-				
+				popover.contentElement.attr({
+					dir: curCfg.date.isRTL ? 'rtl' : 'ltr',
+					lang: webshims.formcfg.__activeName
+				});
+
 				generateList(o, o.maxS, o.minS);
 				
 				if(popover.isVisible){
@@ -1645,7 +1648,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		if(o.inlinePicker){
 			o.updateOnInput = true;
 			popover.element.attr('data-class', $.prop(data.orig, 'className'));
-			popover.element.attr('data-ud', $.prop(data.orig, 'id'));
+			popover.element.attr('data-id', $.prop(data.orig, 'id'));
 		}
 		
 		$(o.orig).trigger('pickercreated');

@@ -15,7 +15,6 @@
 		_create: function(){
 			var i;
 			
-			
 			this.element.addClass('ws-range').attr({role: 'slider'}).append('<span class="ws-range-min ws-range-progress" /><span class="ws-range-rail ws-range-track"><span class="ws-range-thumb" data-value="" data-valuetext="" /></span>');
 			this.trail = $('.ws-range-track', this.element);
 			this.range = $('.ws-range-progress', this.element);
@@ -62,6 +61,7 @@
 			}
 			
 			rangeStyle[this.dirs.width] = left+'%';
+			
 			if(this.vertical){
 				left = Math.abs(left - 100);
 			}
@@ -240,11 +240,11 @@
 			var val, valModStep, alignValue, step;
 			
 			if(pos <= 0){
-				val = this.options[this.dirs.min];
+				val = this.options[this.dirs[this.isRtl ? 'max' : 'min']];
 			} else if(pos > 100) {
-				val = this.options[this.dirs.max];
+				val = this.options[this.dirs[this.isRtl ? 'min' : 'max']];
 			} else {
-				if(this.vertical){
+				if(this.vertical || this.isRtl){
 					pos = Math.abs(pos - 100);
 				}
 				val = ((this.options.max - this.options.min) * (pos / 100)) + this.options.min;
@@ -423,6 +423,13 @@
 					var step = true;
 					var code = e.keyCode;
 					if(!o.readonly && !o.disabled){
+						if(that.isRtl){
+							if(code == 39){
+								code = 37;
+							} else if(code == 37){
+								code = 39;
+							}
+						}
 						if (code == 39 || code == 38) {
 							that.doStep(1);
 						} else if (code == 37 || code == 40) {
@@ -522,10 +529,17 @@
 				{mouse: 'pageY', pos: 'top', min: 'max', max: 'min', left: 'top', right: 'bottom', width: 'height', innerWidth: 'innerHeight', innerHeight: 'innerWidth', outerWidth: 'outerHeight', outerHeight: 'outerWidth', marginTop: 'marginLeft', marginLeft: 'marginTop'} :
 				{mouse: 'pageX', pos: 'left', min: 'min', max: 'max', left: 'left', right: 'right', width: 'width', innerWidth: 'innerWidth', innerHeight: 'innerHeight', outerWidth: 'outerWidth', outerHeight: 'outerHeight', marginTop: 'marginTop', marginLeft: 'marginLeft'}
 			;
+			if(!this.vertical && this.element.css('direction') == 'rtl'){
+				this.isRtl = true;
+				this.dirs.left = 'right';
+				this.dirs.right = 'left';
+				this.dirs.marginLeft = 'marginRight';
+			}
 			this.element
 				[this.vertical ? 'addClass' : 'removeClass']('vertical-range')
-				[this.vertical ? 'addClass' : 'removeClass']('horizontal-range')
+				[this.isRtl ? 'addClass' : 'removeClass']('ws-is-rtl')
 			;
+			this.updateMetrics = this.posCenter;
 			this.posCenter();
 		}
 	};

@@ -2527,10 +2527,10 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	});
 	
 	webshims.isReady('webshimLocalization', true);
-});
-//html5a11y
-(function($, document){
-	if(!$.webshims.assumeARIA || ('content' in document.createElement('template'))){return;}
+
+//html5a11y + hidden attribute
+(function(){
+	if(('content' in document.createElement('template'))){return;}
 	
 	$(function(){
 		var main = $('main').attr({role: 'main'});
@@ -2544,6 +2544,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	if(('hidden' in document.createElement('a'))){
 		return;
 	}
+	
+	webshims.defineNodeNamesBooleanProperty(['*'], 'hidden');
 	
 	var elemMappings = {
 		article: "article",
@@ -2585,7 +2587,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 	});
 	
-})(webshims.$, document);;(function(Modernizr, webshims){
+})();
+});;(function(Modernizr, webshims){
 	"use strict";
 	var $ = webshims.$;
 	var hasNative = Modernizr.audio && Modernizr.video;

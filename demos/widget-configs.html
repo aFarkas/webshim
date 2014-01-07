@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html dir="rtl">
 	<head>
 		<title>widgets</title>
 		<meta charset="utf-8">
@@ -62,16 +62,21 @@
 				customDatalist: true
 			});
 			webshims.polyfill('forms forms-ext');
-			
+			//webshims.activeLang('ar')
 			$(function(){
 				//console.log()
-				
+				$('form').on('invalid', function(e){
+				    //console.log(e.target, e)
+				})
 			});
 		</script>
 		<style>
 		</style>
 	</head>
 	<body>
+		<meter max="500" value="350">350 degrees</meter>
+		<meter low="69" high="80" max="100" value="84">B</meter>
+		<progress value="0.3"></progress>
 		<div class="wrapper">
 			<div class="form-row">
 				<label for="range">
@@ -117,7 +122,7 @@
 				<label>
 					date
 				</label>
-				<input type="date" class="show-week" data-date-inline-picker="true" placeholder="year-month-day" data-date-start-view="2" />
+				<input type="date" class="show-week inputbtns-outside" data-date-inline-picker="true" placeholder="year-month-day" data-date-start-view="2" />
 			</div>
 			<div class="form-row date-css-config">
 				<style>
@@ -198,7 +203,7 @@
 				<datalist id="state-list">
 					<select>
 						
-						<option value="Alabama" label="State of Alabama" />
+						<option value="Alabama" />
 						<option value="Alaska" label="State of Alaska" />
 						<option value="Arizona" label="State of Arizona" />
 						<option value="Arkansas" label="State of Arkansas" />

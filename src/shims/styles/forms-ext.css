@@ -468,12 +468,12 @@ input[type="color"] {
       border-width: 0.35em 0.6em 0.35em 0;
       border-color: transparent #333 transparent transparent;
       margin-left: -0.1em; }
-    .input-picker .prev-controls .ws-super-prev,
-    .input-picker .ws-po-box[dir="rtl"] .next-controls .ws-super-prev {
+    .input-picker .prev-controls [class*="ws-super-"],
+    .input-picker .ws-po-box[dir="rtl"] .next-controls [class*="ws-super-"] {
       margin-right: 0.23077em;
       margin-left: 0; }
-      .input-picker .prev-controls .ws-super-prev[disabled],
-      .input-picker .ws-po-box[dir="rtl"] .next-controls .ws-super-prev[disabled] {
+      .input-picker .prev-controls [class*="ws-super-"][disabled],
+      .input-picker .ws-po-box[dir="rtl"] .next-controls [class*="ws-super-"][disabled] {
         display: none; }
   .input-picker .next-controls,
   .input-picker .ws-po-box[dir="rtl"] .prev-controls {

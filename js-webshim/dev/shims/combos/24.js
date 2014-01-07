@@ -222,6 +222,9 @@ $.event.special.invalid = {
 		var notValid = !($(e.target).callProp('reportValidity'));
 		if(notValid){
 			e.stopImmediatePropagation();
+			if(!options.noFormInvalid){
+				$(e.target).trigger('invalid');
+			}
 			return false;
 		}
 	}
@@ -1275,10 +1278,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled || !Modernizr.fieldse
 			var nan = parseInt('NaN', 10);
 			
 			var updateProgress = function(progress){
-				var position;
-				
-				
-				position = $.prop(progress, 'position');
+				var position = $.prop(progress, 'position');
 				
 				$.attr(progress, 'data-position', position);
 				$('> span', progress).css({width: (position < 0 ?  100 : position * 100) +'%'});
@@ -1379,7 +1379,9 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled || !Modernizr.fieldse
 					} else {
 						webshims.info("you should use label elements for your prgogress elements");
 					}
-					
+					if($(this).css('direction') == 'rtl'){
+						$(this).addClass('ws-is-rtl');
+					}
 					updateProgress.isInChange = 'max';
 					updateProgress(this);
 					updateProgress.isInChange = false;

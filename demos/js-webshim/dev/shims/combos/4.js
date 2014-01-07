@@ -1081,10 +1081,10 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	});
 	
 	webshims.isReady('webshimLocalization', true);
-});
-//html5a11y
-(function($, document){
-	if(!$.webshims.assumeARIA || ('content' in document.createElement('template'))){return;}
+
+//html5a11y + hidden attribute
+(function(){
+	if(('content' in document.createElement('template'))){return;}
 	
 	$(function(){
 		var main = $('main').attr({role: 'main'});
@@ -1098,6 +1098,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	if(('hidden' in document.createElement('a'))){
 		return;
 	}
+	
+	webshims.defineNodeNamesBooleanProperty(['*'], 'hidden');
 	
 	var elemMappings = {
 		article: "article",
@@ -1139,7 +1141,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 	});
 	
-})(webshims.$, document);;webshims.register('form-message', function($, webshims, window, document, undefined, options){
+})();
+});;webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(options.lazyCustomMessages){
 		options.customMessages = true;
