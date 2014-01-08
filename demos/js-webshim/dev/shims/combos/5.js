@@ -2835,7 +2835,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 			
 			var type = $.prop(this, 'type');
 			
-			var i, opts, data, optsName, labels;
+			var i, opts, data, optsName, labels, cNames;
 			if(inputTypes[type] && webshims.implement(this, 'inputwidgets')){
 				data = {};
 				optsName = type;
@@ -2884,11 +2884,24 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 				});
 				
 				data.shim.options.containerElements.push(data.shim.element[0]);
+				cNames = $.prop(this, 'className');
+				if(opts.classes){
+					cNames += ' '+opts.classes;
+				}
 				
-				data.shim.element.on('change input', stopPropagation).addClass($.prop(this, 'className'));
+				if(opts.splitInput || type == 'range'){
+					cNames = cNames.replace('form-control', '');
+				}
+				
+				data.shim.element.on('change input', stopPropagation).addClass(cNames);
 				
 				if(data.shim.buttonWrapper){
+					
 					data.shim.buttonWrapper.addClass('input-button-size-'+(data.shim.buttonWrapper.children().filter(isVisible).length));
+					
+					if(data.shim.buttonWrapper.filter(isVisible).length){
+						data.shim.element.addClass('has-input-buttons');
+					}
 				}
 				
 				labelWidth($(this).getShadowFocusElement(), labels);
@@ -2926,7 +2939,6 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 						})
 					;
 				})();
-								
 				
 				
 				
@@ -2943,12 +2955,6 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 						});
 					});
 				}
-				
-				
-				if(data.shim.buttonWrapper && data.shim.buttonWrapper.filter(isVisible).length){
-					data.shim.element.addClass('has-input-buttons');
-				}
-				
 				
 				if(opts.calculateWidth){
 					sizeInput(data.shim);

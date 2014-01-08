@@ -1427,7 +1427,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					if(i >= startAt){
 						var content = picker[item](values, data);
 						
-						if( values.length < 2 || content.enabled > 1 || stops[data.type] === names[i]){
+						if( values.length < 2 || content.enabled > 0 || stops[data.type] === names[i]){
 							popover.element
 								.attr({'data-currentview': setNames[i]})
 								.addClass('ws-size-'+o.size)
@@ -1644,9 +1644,10 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			}
 		});
 		$(document).onTrigger('wslocalechange', data._propertyChange);
-		
-		if(o.inlinePicker){
+		if(o.updateOnInput == null && (o.inlinePicker || o.noChangeDismiss)){
 			o.updateOnInput = true;
+		}
+		if(o.inlinePicker){
 			popover.element.attr('data-class', $.prop(data.orig, 'className'));
 			popover.element.attr('data-id', $.prop(data.orig, 'id'));
 		}

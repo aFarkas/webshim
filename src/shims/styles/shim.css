@@ -1,3 +1,12 @@
+.ws-popover {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box; }
+  .ws-popover *, .ws-popover:before, .ws-popover:after,
+  .ws-popover :after,
+  .ws-popover :before {
+    -moz-box-sizing: content-box;
+    box-sizing: content-box; }
+
 .ws-important-hide {
   display: none !important;
   visibility: hidden !important;
@@ -182,15 +191,13 @@ output {
   margin: 0 0 0 -0.92308em;
   z-index: 1100;
   min-width: 3.84615em;
-  -webkit-transform: translate3d(0px, 0px, 0px);
-  -webkit-backface-visibility: hidden;
   -webkit-transform-style: preserve-3d;
-  transform: translate3d(0px, 0px, 0px);
   transform-style: preserve-3d;
+  -webkit-transform: translate3d(0px, 0px, 0px);
+  transform: translate3d(0px, 0px, 0px);
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transition: visibility 400ms ease-in-out;
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   direction: ltr; }
   .ws-popover.ws-is-rtl {
@@ -235,11 +242,8 @@ output {
     margin: 0;
     border: 0;
     padding: 0;
-    -moz-box-sizing: content-box;
-    box-sizing: content-box;
     -webkit-appearance: none;
     appearance: none;
-    box-sizing: content-box;
     font-family: inherit;
     background: transparent;
     cursor: pointer; }

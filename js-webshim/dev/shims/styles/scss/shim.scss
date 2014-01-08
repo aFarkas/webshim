@@ -211,6 +211,8 @@ output {
  * popovers
  */
 .ws-popover {
+	@extend %contentbox;
+	
 	font-size: 13px;
 	display: block;
 	visibility: hidden;
@@ -223,15 +225,13 @@ output {
 	margin: 0 0 0 em(-12);
 	z-index: 1100;
 	min-width: em(50);
-	-webkit-transform: translate3d(0px, 0px, 0px);
-	-webkit-backface-visibility: hidden;
 	-webkit-transform-style: preserve-3d;
-	transform: translate3d(0px, 0px, 0px);
 	transform-style: preserve-3d;
+	-webkit-transform: translate3d(0px, 0px, 0px);
+	transform: translate3d(0px, 0px, 0px);
+	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
 	transition: visibility 400ms ease-in-out;
-	-moz-box-sizing: content-box;
-	box-sizing: content-box;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	direction: ltr;
 	
@@ -257,6 +257,7 @@ output {
 	-webkit-transform: translate(0, -100%);
 	transform: translate(0, -100%);
 	transition: all 400ms ease-in-out;
+	
 	
 	[data-vertical="bottom"] & {
 		-webkit-transform: translate(0, 100%);
@@ -293,11 +294,8 @@ output {
 		margin: 0;
 		border: 0;
 		padding: 0;
-		-moz-box-sizing: content-box;
-		box-sizing: content-box;
 		-webkit-appearance: none;
 		appearance: none;
-		box-sizing: content-box;
 		font-family: inherit;
 		background: transparent;
 		cursor: pointer;
@@ -332,6 +330,7 @@ output {
 		right: em(20);
 	}
 	
+	
 	[data-horizontal="center"] & {
 		left: 50%;
 		margin-left: em(-4);
@@ -358,6 +357,8 @@ output {
 			border-right-color: transparent;
 		}
 	}
+	
+	
 
 	[data-vertical="middle"] & {
 		display: none;

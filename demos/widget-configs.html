@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html dir="rtl">
+<html dir="ltr">
 	<head>
 		<title>widgets</title>
 		<meta charset="utf-8">
@@ -78,52 +78,7 @@
 		<meter low="69" high="80" max="100" value="84">B</meter>
 		<progress value="0.3"></progress>
 		<div class="wrapper">
-			<div class="form-row">
-				<label for="range">
-					range with: step="10" and datalist
-				</label>
-				<input type="range" step="10" list="rangelist-1" />
-				<datalist id="rangelist-1">
-					<select>
-						<option value="0" label="0" /><option value="10" /><option value="20" /><option value="30" /><option value="40" /><option value="50" label="50" /><option value="60" /><option value="70" /><option value="80" /><option value="90" /><option value="100" label="100" />
-					</select>
-				</datalist>
-			</div>
-			<div class="form-row range-ticks-ballon">
-				<style>
-					.range-ticks-ballon .ws-range {
-						font-size: 16px;
-					}
-					
-					.range-ticks-ballon .ws-range-ticks[data-label]:after {
-						visibility: visible;
-					}
-					
-					.range-ticks-ballon .ws-range-thumb:before {
-					    opacity: 0;
-					}
-					
-					.range-ticks-ballon .ws-active .ws-range-thumb:before {
-					    visibility: visible;
-					    opacity: 1;
-					}
-				</style>
-				<label for="range">
-					range with: step="10" and datalist (but CSS)
-				</label>
-				<input type="range" step="10" list="rangelist-2" />
-				<datalist id="rangelist-2">
-					<select>
-						<option value="0" label="0" /><option value="10" /><option value="20" /><option value="30" /><option value="40" /><option value="50" label="50" /><option value="60" /><option value="70" /><option value="80" /><option value="90" /><option value="100" label="100" />
-					</select>
-				</datalist>
-			</div>
-			<div class="form-row">
-				<label>
-					date
-				</label>
-				<input type="date" class="show-week inputbtns-outside" data-date-inline-picker="true" placeholder="year-month-day" data-date-start-view="2" />
-			</div>
+			
 			<div class="form-row date-css-config">
 				<style>
 					.date-css-config .input-picker {
@@ -189,7 +144,7 @@
 					
 					/* hide button-row */
 					.date-css-config .ws-button-row {
-					    display: none;
+						display: none;
 					}
 				</style>
 				<label>

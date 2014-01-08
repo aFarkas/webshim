@@ -6,6 +6,7 @@
 html > body input.ws-inputreplace.has-input-buttons,
 span.has-input-buttons {
 	display: inline-block;
+	vertical-align: middle;
 }
 
 .input-buttons,
@@ -14,9 +15,7 @@ span.has-input-buttons {
 	zoom: 1;
 	overflow: hidden;
 	display: inline-block;
-	font-size: 0;
 	vertical-align: middle;
-	margin-top: -3px;
 	margin-left: -20px;
 }
 
@@ -443,17 +442,18 @@ $button-bgcolor: #f5f5f5;
 	outline: none;
 	text-align: center;
 	font-family: sans-serif;
-	width: em(330);
+	width: em(360);
 	min-width: em(300);
 	
 	.ws-po-outerbox {
 		-webkit-transform: translate(0, 30%);
 		transform: translate(0, 30%);
 		
-		[data-vertical="bottom"] & {
-			-webkit-transform: translate(0, -3%);
-			transform: translate(0, -30%);
-		}
+		
+	}
+	&[data-vertical="bottom"] .ws-po-outerbox {
+		-webkit-transform: translate(0, -30%);
+		transform: translate(0, -30%);
 	}
 	
 	&.time-popover,
@@ -516,7 +516,7 @@ $button-bgcolor: #f5f5f5;
 		position: absolute;
 		top: em(15);
 		
-		> button{
+		> button {
 			border: em(1) solid #ccc;
 			border-radius: em(5);
 			padding: 0;
@@ -533,6 +533,7 @@ $button-bgcolor: #f5f5f5;
 				width: 0px;
 				height: 0px;
 				border-style: solid;
+				margin-top: em(3.8);
 			}
 			
 			span {

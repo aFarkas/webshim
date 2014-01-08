@@ -91,7 +91,8 @@
 .has-input-buttons,
 html > body input.ws-inputreplace.has-input-buttons,
 span.has-input-buttons {
-  display: inline-block; }
+  display: inline-block;
+  vertical-align: middle; }
 
 .input-buttons,
 .step-controls,
@@ -99,9 +100,7 @@ span.has-input-buttons {
   zoom: 1;
   overflow: hidden;
   display: inline-block;
-  font-size: 0;
   vertical-align: middle;
-  margin-top: -3px;
   margin-left: -20px; }
 
 .step-controls,
@@ -389,15 +388,15 @@ input[type="color"] {
   outline: none;
   text-align: center;
   font-family: sans-serif;
-  width: 25.38462em;
+  width: 27.69231em;
   min-width: 23.07692em;
   /* Selector API: */ }
   .input-picker .ws-po-outerbox {
     -webkit-transform: translate(0, 30%);
     transform: translate(0, 30%); }
-    [data-vertical="bottom"] .input-picker .ws-po-outerbox {
-      -webkit-transform: translate(0, -3%);
-      transform: translate(0, -30%); }
+  .input-picker[data-vertical="bottom"] .ws-po-outerbox {
+    -webkit-transform: translate(0, -30%);
+    transform: translate(0, -30%); }
   .input-picker.time-popover, .input-picker.datetime-local-popover {
     width: 31.92308em; }
   .input-picker.time-popover .ws-prev,
@@ -447,7 +446,8 @@ input[type="color"] {
         content: " ";
         width: 0px;
         height: 0px;
-        border-style: solid; }
+        border-style: solid;
+        margin-top: 0.29231em; }
       .input-picker .ws-picker-controls > button span {
         display: none; }
       .input-picker .ws-picker-controls > button:hover {
