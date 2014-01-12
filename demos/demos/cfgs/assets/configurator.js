@@ -3,6 +3,7 @@ $(function($){
 	$('#code').each(function(){
 		var lastData, configType, markupFormat;
 		var output = $(this);
+		var cfgFeature = $('#cfg-feature').val() || 'forms-cfg';
 		var getOptions = function(){
 			configType = ($('#config-type').val() || $('#config-type option').eq(0).val()).split('-');
 			markupFormat = $('#markup-format').val();
@@ -39,10 +40,10 @@ $(function($){
 					data.data.classes = data.classes.join(' ');
 				}
 				if(!$.isEmptyObject(data.data)){
-					obj[configType[1]] = data.data;
+					obj[configType[1] == 'type' ? data.attr.type : 'widgets'] = data.data;
 					code += '<script>\n';
 					code += '//configure before calling webshims.polyfill\n';
-					code += 'webshims.setOptions("forms-ext", ';
+					code += 'webshims.setOptions("'+cfgFeature+'", ';
 					code += JSON.stringify(obj, null, '\t') +');';
 					code += '\n\n//webshims.polyfill("forms forms-ext");';
 					code += '\n<\/script>\n';
@@ -104,13 +105,27 @@ $(function($){
 		$(this).on('change', onChange).each(onChange);
 	});
 	
+	$('#widget-scale').each(function(){
+		var div = $('<div hidden="" />').appendTo('body').get(0);
+		var fsScale = function(){
+			var fs = $.prop(this, 'value');
+			var style = 'x<style>#output .ws-popover, #output .input-picker, #output .ws-range, body >  .ws-popover { font-size:'+ fs +'px;}</style>';
+			div.innerHTML = style;
+			$(document).trigger('updatelayout');
+		};
+		$(this).on('input', fsScale).each(fsScale);
+		
+	});
 	
 	$('form.input-widget').each(function(){
 		var form = $(this);
 		var type = form.data('type');
 		var createWidget = function(){
 			var output = {};
-			var input = $('<input type="'+ type +'" />');
+			var input = $('<input />');
+			if(type){
+				input.attr('type', type);
+			}
 			$('fieldset[data-method]', form).each(function(){
 				var obj = {};
 				var method = $(this).data('method');
@@ -125,7 +140,7 @@ $(function($){
 						}
 					} else {
 						val = $(this).val();
-						if(val === $.prop(this, 'defaultValue') || $(this).prop('selectedIndex') <= 0){
+						if(val === $.prop(this, 'defaultValue') || !val){
 							return;
 						}
 						
@@ -141,6 +156,10 @@ $(function($){
 				});
 				
 				input[method]($(this).data('name') || obj, obj);
+				
+				if(method == 'data' && !type){
+					type = $(this).data('name');
+				}
 				
 				if(method == 'prop'){
 					method = 'attr';
@@ -166,6 +185,9 @@ $(function($){
 			;
 			output.attr.type = type;
 			$('#code').trigger('render', [output]);
+			if(location.replace){
+				location.replace('#'+ form.serialize());
+			}
 		};
 		$('> fieldset', form).on('change input', (function(){
 			var timer;
@@ -175,7 +197,62 @@ $(function($){
 			};
 		})());
 		form.on('submit', false);
+		if(form.deserialize){
+			form.deserialize(location.hash.substr(1));
+		}
 		createWidget();
 	});
+	
+	(function(){
+		var getFormElements = function(names, form){
+			return names.split(' ').map(function(name){
+				return form.prop(name);
+			});
+		};
+		var isChecked = function(elem){
+			return $.prop(elem, 'checked');
+		};
+		$('[data-needs]').each(function(){
+			var module = $(this);
+			var form = module.jProp('form');
+			var needs = getFormElements(module.data('needs'), module.jProp('form'));
+			var enable = function(){
+				module.prop('disabled', !needs.some(isChecked));
+			};
+			module.each(enable);
+			$(needs).on('change', enable);
+		});
+		$('[data-excludes]').each(function(){
+			var module = $(this);
+			var excludes = getFormElements(module.data('excludes'), module.jProp('form'));
+			
+			var enable = function(){
+				module.prop('disabled', excludes.some(isChecked));
+			};
+			var addFlag = function(excludes){
+				var excludeFlags = $.data(this, 'excludeFlags') || $.data(this, 'excludeFlags', {});
+				excludeFlags[module.prop('name')] = true;
+			};
+			var enableExclude = function(){
+				var excludeFlags = $.data(this, 'excludeFlags');
+				if(excludeFlags){
+					delete excludeFlags[module.prop('name')]; 
+				}
+				if(!excludeFlags || $.isEmptyObject(excludeFlags)){
+					$.prop(this, 'disabled', false);
+				}
+			};
+			module.each(enable).on('change', function(){
+				if($(this).prop('checked')){
+					$(excludes).prop('disabled', true);
+					$(excludes).each(addFlag);
+				} else {
+					$(excludes).each(enableExclude);
+				}
+			});
+			$(excludes).on('change', enable);
+			enable();
+		});
+	})();
 });
 });

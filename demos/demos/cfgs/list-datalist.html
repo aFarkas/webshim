@@ -1,0 +1,307 @@
+<!DOCTYPE HTML>
+<html>
+
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+		<meta name="viewport" content="width=device-width">
+		<title>Webshim - foms polyfill</title>
+		<link rel="stylesheet" href="assets/config.css">
+		
+		
+		<link rel="stylesheet" href="../../css/prism.css" /> 
+		<script>
+			(function(){
+				var src = (Object.defineProperty && window.addEventListener) ?
+					'http://code.jquery.com/jquery-2.0.3.min.js' :
+					'http://code.jquery.com/jquery-1.10.1.min.js'
+				;
+				
+				document.write('<script src="'+ src +'"><\/script>');
+			})();
+		</script>
+		<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
+
+		<script src="../../../js-webshim/minified/polyfiller.js"></script>
+
+		<script>
+			webshims.setOptions('forms', {
+				lazyCustomMessages: true,
+				replaceValidationUI: true,
+				addValidators: true,
+				customDatalist: true
+			});
+			
+			webshims.setOptions('forms-ext', {
+				replaceUI: true
+			});
+			
+			// load the forms polyfill
+			webshims.polyfill('forms forms-ext');
+			
+		</script>
+
+	</head>
+
+	<body>
+		<div class="page-wrap container">
+			<div class="row">
+				<div class="panel panel-default">
+					<div class="panel-heading">Configurator</div>
+					<div class="panel-body">
+						<div class="col-md-12">
+							<p>Configure your input widget to your needs.</p>
+						</div>
+						<div class="col-md-6">
+							<div class="panel panel-primary">
+								<div class="panel-heading">Rendered output</div>
+								<div class="panel-body" id="output"></div>
+							</div>
+							<div class="panel panel-default">
+								<div class="panel-heading">Code input</div>
+								<div class="panel-body" id="code">
+									<label for="config-type" class="control-label">Config type</label>
+									<input type="hidden" id="cfg-feature" value="forms" />
+									<select size="6" class="form-control" id="config-type">
+										<optgroup label="general JS config">
+											<option value="js-type" selected="">list general JS config</option>
+										</optgroup>
+										<optgroup label="descriptive markup">
+											<option value="markup-flat">dashed/expanded</option>
+											<option value="markup-json">JSON/compressed</option>
+										</optgroup>
+									</select>
+									<label for="markup-format" class="control-label">Markup format</label>
+									<select size="2" class="form-control" id="markup-format">
+										<option value="verbose" selected="">verbose</option>
+										<option value="compact">one line</option>
+									</select>
+<pre><code class="language-markup"></code></pre>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="panel panel-default">
+								<div class="panel-heading">live configuration options</div>
+								<div class="panel-body">
+									<form class="input-widget form-inline ws-validate">
+								
+										<fieldset data-method="attr">
+											<legend>$.prop/$.attr</legend>
+											<div class="form-group">
+												<div class="col-sm-6">
+													<label for="type" class="form-label">
+														type
+													</label>
+													<select name="type" id="type" class="form-control">
+														<option>text</option>
+														<option>search</option>
+														<option>email</option>
+													</select>
+												</div>
+												<div class="col-sm-6">
+													<label class="form-label" for="list">
+														list
+													</label> 
+													<select name="list" id="list" class="form-control">
+														<option value="contacts">email contacts (predefined datalist)</option>
+														<option value="state-list">state-list (predefined datalist)</option>
+													</select>
+<datalist id="contacts">
+	<select>
+		<option value="art@example.net" label="Arthur Dent"></option>
+		<option value="adamjosh@example.net" label="Adam Josh"></option>
+		<option value="hedral@damowmow.com"></option>
+		<option value="pillar@example.com"></option>
+		<option value="astrophy@cute.example"></option>
+		<option value="astronomy@science.example.org"></option>
+	</select>
+</datalist>
+<datalist id="state-list">
+	<select>
+		<option value="Alabama" label="State of Alabama"></option>
+		<option value="Alaska" label="State of Alaska"></option>
+		<option value="Arizona" label="State of Arizona"></option>
+		<option value="Arkansas" label="State of Arkansas"></option>
+		<option value="California" label="State of California"></option>
+		<option value="Colorado" label="State of Colorado"></option>
+		<option value="Connecticut" label="State of Connecticut"></option>
+		<option value="Delaware" label="State of Delaware"></option>
+		<option value="Florida" label="State of Florida"></option>
+		<option value="Georgia" label="State of Georgia"></option>
+		<option value="Hawaiʻi" label="State of Hawaiʻi"></option>
+		<option value="Idaho" label="State of Idaho"></option>
+		<option value="Illinois" label="State of Illinois"></option>
+		<option value="Indiana" label="State of Indiana"></option>
+		<option value="Iowa" label="State of Iowa"></option>
+		<option value="Kansas" label="State of Kansas"></option>
+		<option value="Kentucky" label="Commonwealth of Kentucky"></option>
+		<option value="Louisiana" label="State of Louisiana"></option>
+		<option value="Maine" label="State of Maine"></option>
+		<option value="Maryland" label="State of Maryland"></option>
+		<option value="Massachusetts" label="Commonwealth of Massachusetts"></option>
+		<option value="Michigan" label="State of Michigan"></option>
+		<option value="Minnesota" label="State of Minnesota"></option>
+		<option value="Mississippi" label="State of Mississippi"></option>
+		<option value="Missouri" label="State of Missouri"></option>
+		<option value="Montana" label="State of Montana"></option>
+		<option value="Nebraska" label="State of Nebraska"></option>
+		<option value="Nevada" label="State of Nevada"></option>
+		<option value="New Hampshire" label="State of New Hampshire"></option>
+		<option value="New Jersey" label="State of New Jersey"></option>
+		<option value="New Mexico" label="State of New Mexico"></option>
+		<option value="New York" label="State of New York"></option>
+		<option value="North Carolina" label="State of North Carolina"></option>
+		<option value="North Dakota" label="State of North Dakota"></option>
+		<option value="Ohio" label="State of Ohio"></option>
+		<option value="Oklahoma" label="State of Oklahoma"></option>
+		<option value="Oregon" label="State of Oregon"></option>
+		<option value="Pennsylvania" label="Commonwealth of Pennsylvania"></option>
+		<option value="Rhode Island" label="State of Rhode Island and Providence Plantations"></option>
+		<option value="South Carolina" label="State of South Carolina"></option>
+		<option value="South Dakota" label="State of South Dakota" ></option>
+		<option value="Tennessee" label="State of Tennessee"></option>
+		<option value="Texas" label="State of Texas"></option>
+		<option value="Utah" label="State of Utah"></option>
+		<option value="Vermont" label="State of Vermont"></option>
+		<option value="Virginia" label="Commonwealth of Virginia"></option>
+		<option value="Washington" label="State of Washington"></option>
+		<option value="West Virginia" label="State of West Virginia"></option>
+		<option value="Wisconsin" label="State of Wisconsin"></option>
+		<option value="Wyoming" label="State of Wyoming"></option>
+	</select>
+</datalist>
+												</div>
+											</div>
+											<div class="form-group col-sm-12">
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="multiple" />
+														multiple (only with email)
+													</label>
+												</div>
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="disabled" />
+														disabled
+													</label>
+												</div>
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="readonly" />
+														readonly
+													</label>
+												</div>
+											</div>
+										</fieldset>
+											
+										<fieldset data-method="data" data-name="list">
+											<legend>Config properties / data-date attribute</legend>
+											<div class="form-group">
+												<div class="col-sm-12">
+													<label for="filter" class="control-label">filter</label>
+													<select name="filter" id="filter" class="form-control">
+														<option value="">* (wildcard)</option>
+														<option value="^">^ (beginning)</option>
+														<option value="!">! (no filter)</option>
+													</select>
+												</div>
+											</div>
+											<div class="form-group col-sm-12">
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="valueCompletion" />
+														valueCompletion
+													</label>
+												</div>
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="highlight" />
+														highlight
+													</label>
+												</div>
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="multiple" />
+														multiple (similiar to multiple attribute, but also for other other types...)
+													</label>
+												</div>
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="focus" />
+														focus
+													</label>
+												</div>
+											</div>
+											<fieldset>
+												<legend>popover</legend>
+												<div class="form-group">
+													<div class="col-sm-6">
+														<label for="position" class="form-label">popover.position</label>
+														<select name="popover" id="position" class="form-control">
+															<option value=''>"my": "left top", "at": "left bottom"</option>
+															<option value='{"position": {"at": "right bottom"}}'>"at": "right bottom"</option>
+															<option value='{"position": {"my": "left middle", "at": "right middle"}}'>"my": "left middle", "at": "right middle"</option>
+														</select>
+													</div>
+													<div class="col-sm-6">
+														<label for="appendTo" class="form-label">popover.appendTo</label>
+														<select name="popover" id="appendTo" class="form-control">
+															<option value=''>auto (mostly = element)</option>
+															<option value='{"appendTo": "element"}'>element</option>
+															<option value='{"appendTo": "body"}'>body</option>
+														</select>
+													</div>
+												</div>
+												
+											</fieldset>
+										</fieldset>
+										
+									</form>
+							
+								</div>
+							</div>
+							<div class="panel panel-default">
+								<div class="panel-heading">general document/browser enviroment</div>
+								<div class="panel-body">
+									<div class="row form-group">
+										<div class="col-md-12">
+											
+											<label class="form-label" for="dir">
+												direction of the document
+											</label>
+											<select class="form-control" id="dir">
+												<option>ltr</option>
+												<option>rtl</option>
+											</select>
+										</div>
+									</div>
+									<div class="row form-group">
+										<div class="col-md-12 show-activevaluetooltip show-tickvalues">
+											
+											<label class="form-label" for="widget-scale">
+												widget scale
+											</label>
+											<input type="range" class="form-control" min="13" value="13" max="19" id="widget-scale" list="save-scales" />
+											<datalist id="save-scales">
+												<select>
+													<option>13</option>
+													<option>19</option>
+												</select>
+											</datalist>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	<script src="assets/jquery.deserialize.js" async=""></script>
+	<script>
+		webshims.loader.loadScript("../../demo-js/demo.js", false, false, true);
+		webshims.loader.loadScript("assets/configurator.js", false, false, true);
+	</script>
+	</body>
+</html>

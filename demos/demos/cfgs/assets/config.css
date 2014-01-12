@@ -39,3 +39,6 @@ legend {
 .ws-popover[data-horizontal="left"][data-at="right bottom"][data-my="left top"] {
 	margin-left: -4.07692em;
 }
+#output label {
+	display: block;
+}

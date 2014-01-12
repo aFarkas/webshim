@@ -513,7 +513,9 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 						var elem = this;
 						setTimeout(function(){
 							elem.focus();
-							elem.select();
+							if(elem.select){
+								elem.select();
+							}
 						}, 4);
 						
 						stopTab();
@@ -526,8 +528,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 									try {
 										$(this).next().next('input, select').each(select);
 									} 
-									catch (er) {
-									}
+									catch (er) {}
 								}
 							}
 							else 
@@ -989,11 +990,11 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 	
 	picker.getMonthList = function(value, data){
 		
-		var j, i, name, val, disabled, lis, fullyDisabled, prevDisabled, nextDisabled, classStr, classArray;
+		var j, i, name, val, disabled, lis, prevDisabled, nextDisabled, classStr, classArray;
 		var o = data.options;
 		var size = o.size;
-		var max = o.max.split('-');
-		var min = o.min.split('-');
+		var max = o.maxS;
+		var min = o.minS;
 		var cols = o.cols || 4;
 		var currentValue = o.value.split('-');
 		var enabled = 0;
@@ -1015,9 +1016,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			
 			if( !picker.isInRange([value, '01'], max, min) && !picker.isInRange([value, '12'], max, min)){
 				disabled = ' disabled=""';
-				fullyDisabled = true;
 			} else {
-				fullyDisabled = false;
 				disabled = '';
 			}
 			
@@ -1034,7 +1033,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				val = curCfg.date.monthkeys[i+1];
 				name = getMonthNameHTML(i);
 				classArray = [];
-				if(fullyDisabled || !picker.isInRange([value, val], max, min) ){
+				if(!picker.isInRange([value, val], max, min) ){
 					disabled = ' disabled=""';
 				} else {
 					disabled = '';
@@ -1343,47 +1342,6 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		}
 		return options;
 	};
-	
-	picker.createYearSelect = function(value, max, min, valueAdd, stepper){
-		if(!stepper){
-			stepper = {start: value, step: 1, label: value};
-		}
-		var temp;
-		var goUp = true;
-		var goDown = true;
-		var options = ['<option selected="">'+ stepper.label + '</option>'];
-		var i = 0;
-		var createOption = function(value, add){
-			var value2, label;
-			if(stepper.step > 1){
-				value2 = value + stepper.step - 1;
-				label = value+' – '+value2;
-			} else {
-				label = value;
-			}
-			
-			if(picker.isInRange([value], max, min) || (value2 && picker.isInRange([value2], max, min))){
-				options[add]('<option value="'+ (value+valueAdd) +'">'+ label +'</option>');
-				return true;
-			}
-		};
-		if(!valueAdd){
-			valueAdd = '';
-		}
-		while(i < 18 && (goUp || goDown)){
-			i++;
-			if(goUp){
-				temp = stepper.start - (i * stepper.step);
-				goUp = createOption(temp, 'unshift');
-			}
-			if(goDown){
-				temp = stepper.start + (i * stepper.step);
-				goDown = createOption(temp, 'push');
-			}
-			
-		}
-		return options;
-	};
 		
 	(function(){
 		var retNames = function(name){
@@ -1427,7 +1385,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					if(i >= startAt){
 						var content = picker[item](values, data);
 						
-						if( values.length < 2 || content.enabled > 0 || stops[data.type] === names[i]){
+						if( values.length < 2 || content.enabled > 1 || content.prev || content.next || stops[data.type] === names[i]){
 							popover.element
 								.attr({'data-currentview': setNames[i]})
 								.addClass('ws-size-'+o.size)

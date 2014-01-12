@@ -5,10 +5,10 @@
 		<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="chrome=1" />
 		<meta name="viewport" content="width=device-width">
-		<title>Webshim - foms polyfill</title>
+		<title>Webshim - builder alpha</title>
 		
 		
-		<link href="css/styles.css" rel="stylesheet" />
+		<link href="../../css/styles.css" rel="stylesheet" />
 		
 		<script>
 			(function(){
@@ -20,9 +20,9 @@
 				document.write('<script src="'+ src +'"><\/script>');
 			})();
 		</script>
-		<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
+		<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
 
-		<script src="../js-webshim/minified/polyfiller.js"></script>
+		<script src="../../../js-webshim/minified/polyfiller.js"></script>
 		<style>
 			textarea {
 				display: block;
@@ -30,16 +30,12 @@
 				height: 300px;
 			}
 		</style>
-		<script>
-			
-			
-		</script>
 
 	</head>
 
 	<body>
 
-		<form action="http://marijnhaverbeke.nl/uglifyjs" method="post" data-polyfillpath="../js-webshim/dev/">
+		<form action="http://marijnhaverbeke.nl/uglifyjs" method="post" data-polyfillpath="../../../js-webshim/dev/">
 			<div>
 				<label><input type="checkbox" class="include-initial" checked="" /> include initial fiels</label> 
 			</div>
@@ -67,9 +63,7 @@ webshims.polyfill('forms forms-ext mediaelement');
 			<input type="hidden" name="download" value="polyfiller-custom.js" />
 			<input type="submit" value="compress and download" />
 		</form>
-		<script>
-			
-		</script>
-		<script src="demo-js/src/builder.js"></script>
+		<p><a href="../../../grunt-tasks/optimize-polyfiller.js">better you use the grunt task!</a></p>
+		<script src="../../demo-js/src/builder.js"></script>
 	</body>
 </html>

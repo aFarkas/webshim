@@ -129,11 +129,17 @@ $btnapis: hide-spinbtns hide-dropdownbtn hide-inputbtns inputbtns-outside a11yhi
 	}
 }
 
-$rangeapis: show-ticklabels hide-ticks show-valuetooltip;
+$rangeapis: show-ticklabels show-tickvalues hide-ticks show-valuetooltip show-labeltooltip show-activevaluetooltip show-activelabeltooltip;
 
 %show-ticklabels {
 	.ws-range-ticks[data-label]:after {
-		visibility: visible;
+		display: inline-block;
+	}
+}
+
+%show-tickvalues {
+	.ws-range-ticks:before {
+		display: inline-block;
 	}
 }
 
@@ -142,11 +148,42 @@ $rangeapis: show-ticklabels hide-ticks show-valuetooltip;
 		display: none;
 	}
 }
+
 %show-valuetooltip {
-	&.ws-active .ws-range-thumb:before,
-	.ws-range.ws-active .ws-range-thumb:before {
-		opacity: 1;
-		visibility: visible;
+	span.ws-range-thumb > span {
+		&,
+		&:after {
+			display: inline-block;
+		}
+	}
+}
+
+%show-activevaluetooltip {
+	
+	&.ws-active span.ws-range-thumb > span,
+	.ws-range.ws-active span.ws-range-thumb > span {
+		&,
+		&:after {
+			display: inline-block;
+		}
+	}
+}
+%show-labeltooltip {
+	span.ws-range-thumb > span {
+		&,
+		&:after {
+			display: inline-block;
+		}
+	}
+}
+%show-activelabeltooltip {
+	
+	&.ws-active span.ws-range-thumb > span,
+	.ws-range.ws-active span.ws-range-thumb > span {
+		&,
+		&:after {
+			display: inline-block;
+		}
 	}
 }
 

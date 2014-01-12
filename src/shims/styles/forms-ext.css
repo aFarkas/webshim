@@ -5,6 +5,15 @@
     clear: both;
     content: ' '; }
 
+.ws-range .ws-range-thumb {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box; }
+  .ws-range .ws-range-thumb *, .ws-range .ws-range-thumb:before, .ws-range .ws-range-thumb:after,
+  .ws-range .ws-range-thumb :after,
+  .ws-range .ws-range-thumb :before {
+    -moz-box-sizing: content-box;
+    box-sizing: content-box; }
+
 /* style picker api */
 .input-picker[data-class~="show-week"] .ws-week,
 .show-week .input-picker .ws-week {
@@ -77,15 +86,29 @@
     margin-right: 2px; }
 
 .show-ticklabels .ws-range-ticks[data-label]:after {
-  visibility: visible; }
+  display: inline-block; }
+
+.show-tickvalues .ws-range-ticks:before {
+  display: inline-block; }
 
 .hide-ticks .ws-range-ticks {
   display: none; }
 
-.ws-active.show-valuetooltip .ws-range-thumb:before,
-.show-valuetooltip .ws-range.ws-active .ws-range-thumb:before {
-  opacity: 1;
-  visibility: visible; }
+.show-valuetooltip span.ws-range-thumb > span, .show-valuetooltip span.ws-range-thumb > span:after {
+  display: inline-block; }
+
+.ws-active.show-activevaluetooltip span.ws-range-thumb > span, .ws-active.show-activevaluetooltip span.ws-range-thumb > span:after,
+.show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span,
+.show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span:after {
+  display: inline-block; }
+
+.show-labeltooltip span.ws-range-thumb > span, .show-labeltooltip span.ws-range-thumb > span:after {
+  display: inline-block; }
+
+.ws-active.show-activelabeltooltip span.ws-range-thumb > span, .ws-active.show-activelabeltooltip span.ws-range-thumb > span:after,
+.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span,
+.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span:after {
+  display: inline-block; }
 
 /* spinner control for time, number (usable for date, datetime-local) */
 .has-input-buttons,
@@ -247,7 +270,7 @@ input[type="color"] {
   position: relative;
   display: inline-block;
   vertical-align: middle;
-  margin: 5px 0 10px;
+  margin: 0.57692em 0;
   zoom: 1;
   border: none;
   height: 0.61538em;
@@ -260,37 +283,44 @@ input[type="color"] {
   transition: background-color 400ms, border-color 400ms;
   background-color: #ddd;
   box-shadow: 0 -0.07692em 0.11538em rgba(0, 0, 0, 0.2) inset; }
+  [list] + .ws-range {
+    margin: 0.19231em 0 0.96154em; }
   .ws-range .ws-range-thumb {
     top: 0;
     position: absolute;
     display: block;
     z-index: 4;
-    margin: -0.61538em 0 0 -0.61538em;
-    height: 1.23077em;
-    width: 1.23077em;
+    margin: -0.46154em 0 0 -0.76923em;
+    height: 1.53846em;
+    width: 1.53846em;
     border-radius: 50%;
     background: #ccc;
     border: 0.07692em solid #aaaaaa;
     cursor: pointer;
     transition: background-color 400ms, border-color 400ms; }
-    .ws-range .ws-range-thumb:after, .ws-range .ws-range-thumb:before {
+    .ws-range .ws-range-thumb > span {
       position: absolute;
-      top: -2.15385em;
-      left: -.5em;
-      display: inline-block;
-      content: attr(data-value);
-      padding: 0.23077em 0.07692em;
-      min-width: 2em;
-      opacity: 0;
+      margin: 0 0 3px -90px;
+      padding: 0;
+      border: 0;
+      left: 50%;
+      bottom: 1.61538em;
       visibility: hidden;
+      width: 180px;
       text-align: center;
-      background: #fff;
-      border: 0.07692em solid #cccccc;
-      transition: all 400ms; }
-    .ws-range .ws-range-thumb:after {
-      content: attr(data-value); }
-    .ws-range .ws-range-thumb:before {
-      content: attr(data-valuetext); }
+      background: none; }
+      .ws-range .ws-range-thumb > span:after, .ws-range .ws-range-thumb > span:before {
+        content: attr(data-value);
+        padding: 0.07692em 0.26923em;
+        text-align: center;
+        background: #fff;
+        border: 0.07692em solid #cccccc;
+        border-radius: 0.30769em;
+        visibility: visible; }
+      .ws-range .ws-range-thumb > span:after {
+        content: attr(data-value); }
+      .ws-range .ws-range-thumb > span:before {
+        content: attr(data-valuetext); }
   .ws-range.ws-focus .ws-range-thumb {
     background: #eee;
     border-color: #999; }
@@ -328,12 +358,16 @@ input[type="color"] {
     box-shadow: 0 0.11538em 0.26923em rgba(255, 255, 255, 0.2) inset; }
   .ws-range .ws-range-ticks {
     position: absolute;
-    bottom: -0.57692em;
+    bottom: -0.76923em;
     left: 0;
-    height: 0.52308em;
-    width: 0.11538em;
-    margin: 0 0 0 -0.15385em;
-    background: #ccc; }
+    height: 0.61538em;
+    width: 0.07692em;
+    margin: 0 0 0 -0.07692em;
+    background: #ccc;
+    transition: background-color 400ms, color 400ms; }
+    .ws-range .ws-range-ticks.ws-selected-option {
+      background: #09c;
+      color: #09c; }
   .ws-range.ws-is-rtl .ws-range-progress {
     left: auto;
     right: 0; }
@@ -357,22 +391,30 @@ input[type="color"] {
       width: 100%;
       height: 0; }
 
-.ws-range-ticks[data-label]:after {
-  visibility: hidden;
+.ws-range-ticks[data-label]:after,
+.ws-range-ticks:before {
+  display: none;
   content: attr(data-label);
-  display: inline-block;
   font-size: 0.76923em;
   min-width: 2em;
   text-align: center;
   margin: 0.69231em 0 0 -0.95em; }
-  .ws-is-rtl .ws-range-ticks[data-label]:after {
+  .ws-is-rtl .ws-range-ticks[data-label]:after, .ws-is-rtl
+  .ws-range-ticks:before {
     margin: 0.69231em -0.95em 0 0; }
-  .vertical-range .ws-range-ticks[data-label]:after {
+  .vertical-range .ws-range-ticks[data-label]:after, .vertical-range
+  .ws-range-ticks:before {
     margin: 0 0 0 5px;
     position: relative;
     top: -0.7em;
     left: 0.53846em;
     min-width: 0; }
+
+.ws-range-ticks:before {
+  content: attr(data-value); }
+
+.ws-range-thumb > span, .ws-range-thumb > span:after, .ws-range-thumb > span:before {
+  display: none; }
 
 /* helper classes to hide show/hide specific range features features */
 .input-picker .ws-button-row button {

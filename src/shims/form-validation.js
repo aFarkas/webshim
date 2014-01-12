@@ -243,7 +243,6 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				posElem[opts.isRtl ? 'addClass' : 'removeClass']('ws-is-rtl');
 				
 				opts.using = function(calced, data){
-					console.log(calced, data, opts)
 					posElem.attr({'data-horizontal': data.horizontal, 'data-vertical': data.vertical});
 					offset = calced;
 				};

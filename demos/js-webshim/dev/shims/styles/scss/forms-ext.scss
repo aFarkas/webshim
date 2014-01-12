@@ -239,11 +239,10 @@ input[type="color"] {
 
 /* range */
 .ws-range {
-
 	position: relative;
 	display: inline-block;
 	vertical-align: middle;
-	margin: 5px 0 10px;
+	margin: em(7.5) 0;
 	zoom: 1;
 	border: none;
 	height: em(8);
@@ -256,14 +255,19 @@ input[type="color"] {
 	transition: background-color 400ms, border-color 400ms;
 	background-color: #ddd;
 	box-shadow: 0 em(-1) em(1.5) rgba(0, 0, 0, 0.2) inset;
-
+	
+	[list] + & {
+		margin: em(2.5) 0 em(12.5);
+	}
+	
 	.ws-range-thumb {
-		$dim: 16;
+		@extend %contentbox;
+		$dim: 20;
 		top: 0;
 		position: absolute;
 		display: block;
 		z-index: 4;
-		margin: em($dim / -2) 0 0 em($dim / -2);
+		margin: em(($dim - 8) / -2) 0 0 em($dim / -2);
 		height: em($dim);
 		width: em($dim);
 		border-radius: 50%;
@@ -272,29 +276,37 @@ input[type="color"] {
 		cursor: pointer;
 		transition: background-color 400ms, border-color 400ms;
 		
-		&:after,
-		&:before	{
+		> span {
 			position: absolute;
-			top: em(-28);
-			left: -.5em;
-			display: inline-block;
-			content: attr(data-value);
-			padding: em(3) em(1);
-			min-width: 2em;
-			opacity: 0;
+			margin: 0 0 3px -90px;
+			padding: 0;
+			border: 0;
+			left: 50%;
+			bottom: em($dim + 1);
 			visibility: hidden;
+			width: 180px;
 			text-align: center;
-			background: #fff;
-			border: em(1) solid #ccc;
-			transition: all 400ms;
+			background: none;
+			
+			&:after,
+			&:before {
+				content: attr(data-value);
+				padding: em(1) em(3.5);
+				text-align: center;
+				background: #fff;
+				border: em(1) solid #ccc;
+				border-radius: em(4);
+				visibility: visible;
+			}
+			
+			&:after {
+				content: attr(data-value);
+			}
+			&:before {
+				content: attr(data-valuetext);
+			}
 		}
 		
-		&:after {
-			content: attr(data-value);
-		}
-		&:before {
-			content: attr(data-valuetext);
-		}
 	}
 
 	&.ws-focus .ws-range-thumb {
@@ -350,12 +362,18 @@ input[type="color"] {
 
 	.ws-range-ticks {
 		position: absolute;
-		bottom: em(-7.5);
+		bottom: em(-10);
 		left: 0;
-		height: em(6.8);
-		width: em(1.5);
-		margin: 0 0 0 em(-2);
+		height: em(8);
+		width: em(1);
+		margin: 0 0 0 em(-1);
 		background: #ccc;
+		transition: background-color 400ms, color 400ms;
+		
+		&.ws-selected-option {
+			background: #09c;
+			color: #09c;
+		}
 	}
 	
 	&.ws-is-rtl {
@@ -394,10 +412,10 @@ input[type="color"] {
 }
 
 
-.ws-range-ticks[data-label]:after {
-	visibility: hidden;
+.ws-range-ticks[data-label]:after,
+.ws-range-ticks:before {
+	display: none;
 	content: attr(data-label);
-	display: inline-block;
 	font-size: em(10);
 	min-width: 2em;
 	text-align: center;
@@ -416,6 +434,19 @@ input[type="color"] {
 	}
 }
 
+.ws-range-ticks:before {
+	content: attr(data-value);
+}
+
+.ws-range-thumb {
+	> span {
+		&,
+		&:after,
+		&:before {
+			display: none;
+		}
+	}
+}
 
 
 /* helper classes to hide show/hide specific range features features */

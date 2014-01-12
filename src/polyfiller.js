@@ -499,9 +499,10 @@
 			loadScript: (function(){
 				var loadedSrcs = {};
 				var scriptLoader;
-				return function(src, callback, name){
-				
-					src = loader.makePath(src);
+				return function(src, callback, name, noShimPath){
+					if(!noShimPath){
+						src = loader.makePath(src);
+					}
 					if (loadedSrcs[src]) {return;}
 					var complete = function(){
 						

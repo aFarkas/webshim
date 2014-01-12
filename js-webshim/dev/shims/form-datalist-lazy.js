@@ -100,6 +100,9 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 						} 
 						if(keyCode == 13 || keyCode == 27){
 							if (keyCode == 13){
+								if(that.isCompleted){
+									$.prop(opts.input, 'selectionStart', $.prop(opts.input, 'value').length);
+								}
 								activeItem = $('li.active-item:not(.hidden-item)', that.shadowList);
 								that.changeValue( $('li.active-item:not(.hidden-item)', that.shadowList) );
 							}
@@ -180,7 +183,10 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 		_updateOptions: function(){
 			this.options = webshims.getOptions(this.input, 'list', options.list);
 			
-			if($(this.input).prop('multiple') && $(this.input).prop('type') == 'email'){
+			if($(this.input).prop('multiple')){
+				if(!$(this.input).prop('type') == 'email'){
+					webshims.warn('multiple only used on email and file type');
+				}
 				this.options.multiple = true;
 			}
 			
@@ -188,38 +194,6 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 				this.options.getOptionContent = false;	
 			}
 			
-			//depreacated option settings:
-			if(options.getOptionContent){
-				webshims.error('getOptionContent is depreacated use $(input).on("getoptioncontent")');
-			}
-			
-			if($(this.input).hasClass('list-focus')){
-				webshims.error(".list-focus is depreacated. Use focus option.");
-			}
-			
-			if(options.datalistPopover && !this.options.popover){
-				this.options.popover = options.datalistPopover;
-				webshims.error("datalistPopover is depreacated. Use popover option.");
-			}
-			
-			if($(this.input).hasClass('mark-option-text')){
-				this.options.highlight = true;
-				webshims.error(".mark-option-text is depreacated. Use highlight option.");
-			}
-			
-			if($(this.input).hasClass('list-multiple')){
-				this.options.multiple = true;
-				webshims.error(".list-multiple is depreacated. Use multiple option.");
-			}
-			
-			if($(this.input).hasClass('value-completion')){
-				this.options.valueCompletion = true;
-				webshims.error(".value-completion is depreacated. Use valueCompletion option.");
-			}
-			
-			if(this.options.valueCompletion && this.options.multiple){
-				webshims.warn("valueCompletion and multiple shouldn't be set together");
-			}
 		},
 		updateListOptions: function(_forceShow){
 			this.needsUpdate = false;
@@ -291,7 +265,8 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			}
 			return content || '';
 		},
-		setCompletedValue: function(value, foundItem){
+		setCompletedValue: function(value, foundItem, length){
+			this.isCompleted = false;
 			
 			if(!this.options.valueCompletion || !foundItem || this.lastCompletedValue.length >= value.length ){
 				this.lastCompletedValue = value;
@@ -306,7 +281,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			
 			if(value.length == end){
 				
-				newValue = value + foundItem.value.substr(value.length);
+				newValue = value + foundItem.value.substr(length.length);
 				
 				$(input).triggerHandler('triggerinput');
 				$.prop(input, 'value', newValue);
@@ -319,7 +294,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 						$.prop(input, 'selectionEnd', newValue.length);
 					}
 				}, 0);
-				
+				this.isCompleted = true;
 			}
 		},
 		showHideOptions: function(_fromShowList){
@@ -406,7 +381,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 				this.lastUnfoundValue = value;
 				this.hideList();
 			} else {
-				this.setCompletedValue(inputValue, firstFoundValue);
+				this.setCompletedValue(inputValue, firstFoundValue, value);
 				this.lastUnfoundValue = false;
 			}
 		},

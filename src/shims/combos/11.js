@@ -15,7 +15,7 @@
 		_create: function(){
 			var i;
 			
-			this.element.addClass('ws-range').attr({role: 'slider'}).append('<span class="ws-range-min ws-range-progress" /><span class="ws-range-rail ws-range-track"><span class="ws-range-thumb" data-value="" data-valuetext="" /></span>');
+			this.element.addClass('ws-range').attr({role: 'slider'}).append('<span class="ws-range-min ws-range-progress" /><span class="ws-range-rail ws-range-track"><span class="ws-range-thumb"><span data-value="" data-valuetext="" /></span></span>');
 			this.trail = $('.ws-range-track', this.element);
 			this.range = $('.ws-range-progress', this.element);
 			this.thumb = $('.ws-range-thumb', this.trail);
@@ -37,7 +37,7 @@
 		},
 		value: $.noop,
 		_value: function(val, _noNormalize, animate){
-			var left, posDif, textValue;
+			var left, posDif;
 			var o = this.options;
 			var oVal = val;
 			var thumbStyle = {};
@@ -53,7 +53,7 @@
 			left =  100 * ((val - o.min) / (o.max - o.min));
 			
 			if(this._init && val == o.value && oVal == val){return;}
-			this.options.value = val;
+			o.value = val;
 			
 			if($.fn.stop){
 				this.thumb.stop();
@@ -88,15 +88,26 @@
 				this.options._change(val);
 			}
 			
-			textValue = this.options.textValue ? this.options.textValue(this.options.value) : this.options.options[this.options.value] || this.options.value;
+			this._setValueMarkup();
+		},
+		_setValueMarkup: function(){
+			var o = this.options;
+			var textValue = o.textValue ? o.textValue(this.options.value) : o.options[o.value] || o.value;
 			this.element.attr({
 				'aria-valuenow': this.options.value,
 				'aria-valuetext': textValue
 			});
-			this.thumb.attr({
+			$('span', this.thumb).attr({
 				'data-value': this.options.value,
 				'data-valuetext': textValue
 			});
+			if(o.selectedOption){
+				$(o.selectedOption).removeClass('ws-selected-option');
+				o.selectedOption = null;
+			}
+			if(o.value in o.options){
+				o.selectedOption = $('[data-value="'+o.value+'"].ws-range-ticks').addClass('ws-selected-option');
+			}
 		},
 		initDataList: function(){
 			if(this.orig){
@@ -139,9 +150,9 @@
 			$.each(o.options, function(val, label){
 				if(!isNumber(val) || val < min || val > max){return;}
 				var left = 100 * ((val - min) / (max - min));
-				var attr = '';
+				var attr = 'data-value="'+val+'"';
 				if(label){
-					attr += 'data-label="'+label+'"';
+					attr += ' data-label="'+label+'"';
 					if(o.showLabels){
 						attr += ' title="'+label+'"';
 					}
@@ -154,6 +165,9 @@
 					$('<span class="ws-range-ticks"'+ attr +' style="'+(that.dirs.left)+': '+left+'%;" />').appendTo(trail)
 				);
 			});
+			if(o.value in o.options){
+				this._setValueMarkup();
+			}
 		},
 		readonly: function(val){
 			val = !!val;
@@ -329,17 +343,20 @@
 					return e;
 				};
 			})();
+			var updateValue = function(val, animate){
+				if(val != o.value){
+					that.value(val, false, animate);
+					eventTimer.call('input', val);
+				}
+			};
 			var setValueFromPos = function(e, animate){
 				if(e.type == 'touchmove'){
 					e.preventDefault();
 					normalizeTouch(e);
 				}
 				
-				var val = that.getStepedValueFromPos((e[that.dirs.mouse] - leftOffset) * widgetUnits);
-				if(val != o.value){
-					that.value(val, false, animate);
-					eventTimer.call('input', val);
-				}
+				updateValue(that.getStepedValueFromPos((e[that.dirs.mouse] - leftOffset) * widgetUnits), animate);
+				
 				if(e && e.type == 'mousemove'){
 					e.preventDefault();
 				}
@@ -377,7 +394,12 @@
 					outerWidth = that.thumb[that.dirs.outerWidth]();
 					leftOffset = leftOffset[that.dirs.pos];
 					widgetUnits = 100 / widgetUnits;
-					setValueFromPos(e, o.animate);
+
+					if(e.target.className == 'ws-range-ticks'){
+						updateValue(e.target.getAttribute('data-value'), o.animate);
+					} else {
+						setValueFromPos(e, o.animate);
+					}
 					isActive = true;
 					$(document)
 						.on(e.type == 'touchstart' ?
@@ -586,9 +608,9 @@
 		e.stopImmediatePropagation();
 	};
 	var getMonthOptions = function(opts){
-		var selectName = 'monthSelect'+opts.formatMonthNames;
+		var selectName = 'monthSelect'+opts.monthNames;
 		if(!curCfg[selectName]){
-			var labels = curCfg.date[opts.formatMonthNames] || monthDigits;
+			var labels = curCfg.date[opts.monthNames] || monthDigits;
 			curCfg[selectName] = ('<option value=""></option>')+$.map(monthDigits, function(val, i){
 				return '<option value="'+val+'"]>'+labels[i]+'</option>';
 			}).join('');
@@ -613,12 +635,38 @@
 			curCfg.patterns[name+'Obj'] = obj;
 		}
 	};
+	var createYearSelect = function(obj, opts){
+		var options, nowY, max, min;
+		if(opts.yearSelect){
+			nowY = parseInt(opts.value.split('-')[0], 10);
+			max = opts.max.split('-');
+			min = opts.min.split('-');
+			options = webshims.picker.createYearSelect(nowY || parseInt(min[0], 10) || parseInt(max[0], 10) || nowYear, max, min);
+			options.unshift('<option />');
+			$(obj.elements)
+				.filter('select.yy')
+				.html(options.join(''))
+				.each(function(){
+					if(!nowY){
+						$('option[selected]', this).removeAttr('selected');
+						$(this).val();
+					}
+				})
+			;
+		}
+	};
 	var splitInputs = {
 		date: {
 			_create: function(opts){
 				var obj = {
-					splits: [$('<input type="text" class="yy" size="4" inputmode="numeric" maxlength="4" />')[0]] 
+					splits: [] 
 				};
+				
+				if(opts.yearSelect){
+					obj.splits.push($('<select class="yy"></select>')[0]);
+				} else {
+					obj.splits.push($('<input type="text" class="yy" size="4" inputmode="numeric" maxlength="4" />')[0]);
+				}
 				
 				if(opts.monthSelect){
 					obj.splits.push($('<select class="mm">'+getMonthOptions(opts)+'</select>')[0]);
@@ -632,6 +680,7 @@
 				}
 				
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1], $('<span class="ws-input-seperator" />')[0], obj.splits[2]];
+				createYearSelect(obj, opts);
 				return obj;
 			},
 			sort: function(element){
@@ -656,8 +705,15 @@
 			_create: function(opts){
 				
 				var obj = {
-					splits: [$('<input type="text" class="yy" inputmode="numeric" size="4" />')[0]] 
+					splits: [] 
 				};
+				
+				if(opts.yearSelect){
+					obj.splits.push($('<select class="yy"></select>')[0]);
+				} else {
+					obj.splits.push($('<input type="text" class="yy" size="4" inputmode="numeric" maxlength="4" />')[0]);
+				}
+				
 				if(opts.monthSelect){
 					obj.splits.push($('<select class="mm">'+getMonthOptions(opts)+'</select>')[0]);
 				} else {
@@ -668,6 +724,7 @@
 				}
 				
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1]];
+				createYearSelect(obj, opts);
 				return obj;
 			},
 			sort: function(element){
@@ -687,7 +744,8 @@
 	};
 	
 	var nowDate = new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60 * 1000 ));
-	nowDate = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), nowDate.getHours()).getTime()
+	var nowYear = nowDate.getFullYear();
+	nowDate = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), nowDate.getHours()).getTime();
 	var steps = {
 		number: {
 			step: 1
@@ -958,7 +1016,7 @@
 				var names;
 				var p = val.split('-');
 				if(p[0] && p[1]){
-					names = curCfg.date[options.formatMonthNames] || curCfg.date[options.monthNames] || curCfg.date.monthNames;
+					names = curCfg.date[options.monthNames] || curCfg.date.monthNames;
 					p[1] = names[(p[1] * 1) - 1];
 					if(options && options.splitInput){
 						val = [p[0] || '', p[1] || ''];
@@ -1465,7 +1523,7 @@
 			},
 			reorderInputs: function(){
 				if(splitInputs[this.type]){
-					var element = this.element;
+					var element = this.element.attr('dir', curCfg.date.isRTL ? 'rtl' : 'ltr');
 					splitInputs[this.type].sort(element, this.options);
 					setTimeout(function(){
 						var data = webshims.data(element);
@@ -1532,6 +1590,9 @@
 					this._setStartInRange();
 				}
 				this.options[name] = val;
+				if(this._init){
+					createYearSelect({elements: this.inputElements}, this.options);
+				}
 				this._propertyChange(name);
 				this.mirrorValidity();
 			};
@@ -1552,7 +1613,7 @@
 		
 		$.fn.spinbtnUI = function(opts){
 			opts = $.extend({
-				monthNames: 'monthNames'
+				monthNames: 'monthNamesShort'
 			}, opts);
 			return this.each(function(){
 				$.webshims.objectCreate(spinBtnProto, {
@@ -1580,6 +1641,52 @@
 			hide: $.noop,
 			preventBlur: $.noop,
 			isVisible: true
+		};
+		
+		picker.isInRange = function(value, max, min){
+			return !((min[0] && min[0] > value[0]) || (max[0] && max[0] < value[0]));
+		};
+		
+		
+		picker.createYearSelect = function(value, max, min, valueAdd, stepper){
+			if(!stepper){
+				stepper = {start: value, step: 1, label: value};
+			}
+			var temp;
+			var goUp = true;
+			var goDown = true;
+			var options = ['<option selected="">'+ stepper.label + '</option>'];
+			var i = 0;
+			var createOption = function(value, add){
+				var value2, label;
+				if(stepper.step > 1){
+					value2 = value + stepper.step - 1;
+					label = value+' – '+value2;
+				} else {
+					label = value;
+				}
+				
+				if(picker.isInRange([value], max, min) || (value2 && picker.isInRange([value2], max, min))){
+					options[add]('<option value="'+ (value+valueAdd) +'">'+ label +'</option>');
+					return true;
+				}
+			};
+			if(!valueAdd){
+				valueAdd = '';
+			}
+			while(i < 18 && (goUp || goDown)){
+				i++;
+				if(goUp){
+					temp = stepper.start - (i * stepper.step);
+					goUp = createOption(temp, 'unshift');
+				}
+				if(goDown){
+					temp = stepper.start + (i * stepper.step);
+					goDown = createOption(temp, 'push');
+				}
+				
+			}
+			return options;
 		};
 		
 		picker._genericSetFocus = function(element, _noFocus){
@@ -2057,9 +2164,11 @@
 						opts[optsName] = $.attr(this, copyAttrs[i]) || opts[optsName];
 					}
 				}
-				
-				if(opts.onlyMonthDigits || (!opts.formatMonthNames && opts.monthSelect)){
-					opts.formatMonthNames = 'monthDigits';
+				if(opts.formatMonthNames){
+					webshims.error('formatMonthNames was renamded to monthNames');
+				}
+				if(opts.onlyMonthDigits){
+					opts.monthNames = 'monthDigits';
 				}
 				data.shim = inputTypes[type]._create(opts);
 				
@@ -2201,7 +2310,7 @@
 			if(!modernizrInputTypes[name] || replace[name]){
 				extendType(name, {
 					_create: function(opts, set){
-						if(opts.monthSelect || opts.daySelect){
+						if(opts.monthSelect || opts.daySelect || opts.yearSelect){
 							opts.splitInput = true;
 						}
 						if(opts.splitInput && !splitInputs[name]){

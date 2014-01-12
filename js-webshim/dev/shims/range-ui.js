@@ -15,7 +15,7 @@
 		_create: function(){
 			var i;
 			
-			this.element.addClass('ws-range').attr({role: 'slider'}).append('<span class="ws-range-min ws-range-progress" /><span class="ws-range-rail ws-range-track"><span class="ws-range-thumb" data-value="" data-valuetext="" /></span>');
+			this.element.addClass('ws-range').attr({role: 'slider'}).append('<span class="ws-range-min ws-range-progress" /><span class="ws-range-rail ws-range-track"><span class="ws-range-thumb"><span data-value="" data-valuetext="" /></span></span>');
 			this.trail = $('.ws-range-track', this.element);
 			this.range = $('.ws-range-progress', this.element);
 			this.thumb = $('.ws-range-thumb', this.trail);
@@ -37,7 +37,7 @@
 		},
 		value: $.noop,
 		_value: function(val, _noNormalize, animate){
-			var left, posDif, textValue;
+			var left, posDif;
 			var o = this.options;
 			var oVal = val;
 			var thumbStyle = {};
@@ -53,7 +53,7 @@
 			left =  100 * ((val - o.min) / (o.max - o.min));
 			
 			if(this._init && val == o.value && oVal == val){return;}
-			this.options.value = val;
+			o.value = val;
 			
 			if($.fn.stop){
 				this.thumb.stop();
@@ -88,15 +88,26 @@
 				this.options._change(val);
 			}
 			
-			textValue = this.options.textValue ? this.options.textValue(this.options.value) : this.options.options[this.options.value] || this.options.value;
+			this._setValueMarkup();
+		},
+		_setValueMarkup: function(){
+			var o = this.options;
+			var textValue = o.textValue ? o.textValue(this.options.value) : o.options[o.value] || o.value;
 			this.element.attr({
 				'aria-valuenow': this.options.value,
 				'aria-valuetext': textValue
 			});
-			this.thumb.attr({
+			$('span', this.thumb).attr({
 				'data-value': this.options.value,
 				'data-valuetext': textValue
 			});
+			if(o.selectedOption){
+				$(o.selectedOption).removeClass('ws-selected-option');
+				o.selectedOption = null;
+			}
+			if(o.value in o.options){
+				o.selectedOption = $('[data-value="'+o.value+'"].ws-range-ticks').addClass('ws-selected-option');
+			}
 		},
 		initDataList: function(){
 			if(this.orig){
@@ -139,9 +150,9 @@
 			$.each(o.options, function(val, label){
 				if(!isNumber(val) || val < min || val > max){return;}
 				var left = 100 * ((val - min) / (max - min));
-				var attr = '';
+				var attr = 'data-value="'+val+'"';
 				if(label){
-					attr += 'data-label="'+label+'"';
+					attr += ' data-label="'+label+'"';
 					if(o.showLabels){
 						attr += ' title="'+label+'"';
 					}
@@ -154,6 +165,9 @@
 					$('<span class="ws-range-ticks"'+ attr +' style="'+(that.dirs.left)+': '+left+'%;" />').appendTo(trail)
 				);
 			});
+			if(o.value in o.options){
+				this._setValueMarkup();
+			}
 		},
 		readonly: function(val){
 			val = !!val;
@@ -329,17 +343,20 @@
 					return e;
 				};
 			})();
+			var updateValue = function(val, animate){
+				if(val != o.value){
+					that.value(val, false, animate);
+					eventTimer.call('input', val);
+				}
+			};
 			var setValueFromPos = function(e, animate){
 				if(e.type == 'touchmove'){
 					e.preventDefault();
 					normalizeTouch(e);
 				}
 				
-				var val = that.getStepedValueFromPos((e[that.dirs.mouse] - leftOffset) * widgetUnits);
-				if(val != o.value){
-					that.value(val, false, animate);
-					eventTimer.call('input', val);
-				}
+				updateValue(that.getStepedValueFromPos((e[that.dirs.mouse] - leftOffset) * widgetUnits), animate);
+				
 				if(e && e.type == 'mousemove'){
 					e.preventDefault();
 				}
@@ -377,7 +394,12 @@
 					outerWidth = that.thumb[that.dirs.outerWidth]();
 					leftOffset = leftOffset[that.dirs.pos];
 					widgetUnits = 100 / widgetUnits;
-					setValueFromPos(e, o.animate);
+
+					if(e.target.className == 'ws-range-ticks'){
+						updateValue(e.target.getAttribute('data-value'), o.animate);
+					} else {
+						setValueFromPos(e, o.animate);
+					}
 					isActive = true;
 					$(document)
 						.on(e.type == 'touchstart' ?
