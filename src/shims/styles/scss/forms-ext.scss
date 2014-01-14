@@ -538,7 +538,7 @@ $button-bgcolor: #f5f5f5;
 	.ws-po-box {
 		position: relative;
 		padding: em(15) em(20);
-		border-radius: 5px;
+		border-radius: em(5);
 		box-shadow: 0 0 2px rgba(0, 0, 0, .3);
 		direction: ltr;
 	}
