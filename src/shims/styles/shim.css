@@ -233,7 +233,7 @@ output {
   border: 0.07692em solid #cccccc;
   background: #fff;
   padding: 0.38462em 0.38462em 0.23077em;
-  border-radius: 3px;
+  border-radius: 0.23077em;
   box-shadow: 0 0.07692em 0.38462em rgba(0, 0, 0, 0.25); }
   .ws-po-box button {
     display: inline-block;

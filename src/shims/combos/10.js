@@ -2830,6 +2830,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				}
 				
 			}
+			
 			return options;
 		};
 		
@@ -2842,12 +2843,12 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					clearTimeout(that.timer);
 					that.timer = setTimeout(function(){
 						if(element[0]){
-							element[0].focus();
+							element.trigger('focus');
 							if(noTrigger !== true && !element.is(':focus')){
 								setFocus(true);
 							}
 						}
-					}, that.popover.isVisible ? 99 : 360);
+					}, that.popover.isVisible ? 0 : 360);
 				};
 				this.popover.activateElement(element);
 				setFocus();
@@ -3371,7 +3372,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 										$(opts.orig).trigger(hasFocus ? 'focusin' : 'focusout');
 									}
 									hasFocusTriggered = hasFocus;
-								}, 0);
+								}, 9);
 							}
 						})
 					;

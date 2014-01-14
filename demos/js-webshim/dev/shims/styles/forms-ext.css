@@ -468,7 +468,7 @@ input[type="color"] {
   .input-picker .ws-po-box {
     position: relative;
     padding: 1.15385em 1.53846em;
-    border-radius: 5px;
+    border-radius: 0.38462em;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
     direction: ltr; }
   .input-picker .ws-picker-controls {
