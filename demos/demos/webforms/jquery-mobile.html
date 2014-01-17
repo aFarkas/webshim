@@ -5,11 +5,11 @@
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 	
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	
 	<!-- jQM: add jQM *before* webshim's polyfiller.js -->
-	<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
 	
 	<script src="../../demo-js/src/modernizr-special.js"></script>
 	
@@ -53,7 +53,6 @@
 		
 	</style>
 	 	
-	<script src="../../demo-js/src/jquery.ui.position.js" async></script>
 	<script>
 		(function(){
 			var assumeMobile = Modernizr.mq && (Modernizr.mq('(max-device-width: 768px)') || (Modernizr.touch && Modernizr.mq('(max-device-width: 124px)')));
@@ -115,7 +114,7 @@
 		</div> 
 		<div data-role="content">
 			<p>Webshims and jQuery mobile do a lot of tricks with form elements, which can conflict with each other. This page demonstrates how both libaries can be combined. Please read the source code and watch out for comments marked with <code>JQM:</code>.</p>
-			<form action="jquery-mobile.html" class="ws-instantvalidation">
+			<form action="jquery-mobile.html" class="ws-validate">
 				<div data-role="fieldcontain">
 					<label for="textinput1">
 						email*:

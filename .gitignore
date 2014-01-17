@@ -13,3 +13,4 @@ demos/demo-js/node_modules/*
 /tests/tmp_tests.html
 .DS_Store
 .sass-cache
+.idea
