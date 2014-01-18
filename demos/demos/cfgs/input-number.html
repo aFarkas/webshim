@@ -64,7 +64,7 @@
 									<select size="6" class="form-control" id="config-type">
 										<optgroup label="general JS config">
 											<option value="js-widgets" selected="">all input types</option>
-											<option value="js-type">only date</option>
+											<option value="js-type">only number</option>
 										</optgroup>
 										<optgroup label="descriptive markup">
 											<option value="markup-flat">dashed/expanded</option>
@@ -84,49 +84,38 @@
 							<div class="panel panel-default">
 								<div class="panel-heading">live configuration options</div>
 								<div class="panel-body">
-									<form class="input-widget form-inline ws-validate" data-type="date" id="date-cfg">
+									<form class="input-widget form-inline ws-validate" data-type="number">
 								
 										<fieldset data-method="attr">
 											<legend>$.prop/$.attr</legend>
-											<div class="form-group">
-												<div class="col-sm-12">
-													<label for="defaultValue" class="control-label">defaultValue</label>
-													<input type="date" class="form-control" name="value" id="defaultValue" />
-												</div>
-											</div>
+
 											<div class="form-group">
 												<div class="col-sm-6">
 													<label for="min" class="control-label">min</label>
-													<input type="date" class="form-control" name="min" id="min" data-dependent-validation='{"from": "max", "prop": "max"}' />
+													<input type="number" class="form-control" name="min" id="min" data-dependent-validation='{"from": "max", "prop": "max"}' />
 												</div>
 												<div class="col-sm-6">
 													<label for="max" class="control-label">max</label>
-													<input type="date" class="form-control" name="max" id="max" data-dependent-validation='{"from": "min", "prop": "min"}' />
+													<input type="number" class="form-control" name="max" id="max" data-dependent-validation='{"from": "min", "prop": "min"}' />
 												</div>
 											</div>
-											
 											<div class="form-group">
-												<div class="col-sm-6">
-													<label class="form-label" for="list">
-														list
-													</label> 
-													<select name="list" id="list" class="form-control">
-														<option></option>
-														<option value="date-list">date-list (predefined datalist)</option>
-													</select>
-													
+												<div class="col-sm-12">
+													<label for="step" class="control-label">step</label>
+													<input type="number" step="any" min="0" class="form-control" name="step" id="step" />
 												</div>
+												<div class="col-sm-12">
+													<label for="defaultValue" class="control-label">defaultValue</label>
+													<input type="number" class="form-control" name="value" id="defaultValue" />
+												</div>
+											</div>
+											<div class="form-group">
+
 												<div class="col-sm-6">
 													<label class="form-label" for="placeholder">
 														placeholder
 													</label> 
-													<input class="form-control" name="placeholder" id="placeholder" list="placeholder-list" data-list-filter="!" data-list-focus="true" />
-													<datalist id="placeholder-list">
-														<select>
-															<option value="yyyy-mm-dd" />
-															<option value="year-month-day" />
-														</select>
-													</datalist>
+													<input class="form-control" name="placeholder" id="placeholder" />
 												</div>
 											</div>
 											
@@ -152,71 +141,24 @@
 										</div>
 										</fieldset>
 											
-										<fieldset data-method="data" data-name="date">
-											<legend>Config properties / data-date attribute</legend>
+										<fieldset data-method="data" data-name="number">
+											<legend>Config properties / data-number attribute</legend>
 											
 											<div class="form-group">
 												<div class="col-sm-4">
-													<label for="startView" class="form-label">startView</label>
-													<input type="number" min="0" max="2" value="0" id="startView" name="startView" class="form-control" />
+													<label for="toFixed" class="form-label">toFixed</label>
+													<input type="number" min="0" max="20" id="toFixed" name="toFixed" class="form-control" />
 												</div>
 												<div class="col-sm-4">
-													<label for="minView" class="form-label">minView</label>
-													<input type="number" min="0" max="2" value="0" id="minView" name="minView" class="form-control" />
-												</div>
-												<div class="col-sm-4">
-													<label for="size" class="form-label">size</label>
-													<input type="number" min="1" max="3" value="1" id="size" name="size" class="form-control" />
+
 												</div>
 											</div>
 												
 											<div class="form-group col-sm-12">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="inlinePicker" />
-														inlinePicker
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="noChangeDismiss" />
-														noChangeDismiss
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="openOnFocus" />
-														openOnFocus
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="splitInput" />
-														splitInput
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="yearSelect" />
-														yearSelect
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="monthSelect" />
-														monthSelect
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="daySelect" />
-														daySelect
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="buttonOnly" />
-														buttonOnly
+														<input type="checkbox" name="fixOnlyFloat" />
+														fixOnlyFloat
 													</label>
 												</div>
 												<div class="checkbox">
@@ -226,86 +168,22 @@
 													</label>
 												</div>
 											</div>
-											<div class="form-group">
-												<div class="col-sm-12">
-													<label for="monthNames" class="form-label">monthNames (only with monthSelect checked)</label>
-													<select data-needs="monthSelect" name="monthNames" id="monthNames" class="form-control">
-														<option>monthNamesShort</option>
-														<option>monthDigits</option>
-														<option>monthNames</option>
-													</select>
-												</div>
-											</div>
-											<fieldset>
-												<legend>popover</legend>
-												<div class="form-group">
-													<div class="col-sm-6">
-														<label for="position" class="form-label">popover.position</label>
-														<select name="popover" id="position" class="form-control">
-															<option value=''>"my": "left top", "at": "left bottom"</option>
-															<option value='{"position": {"at": "right bottom"}}'>"at": "right bottom"</option>
-															<option value='{"position": {"my": "left middle", "at": "right middle"}}'>"my": "left middle", "at": "right middle"</option>
-														</select>
-													</div>
-													<div class="col-sm-6">
-														<label for="appendTo" class="form-label">popover.appendTo</label>
-														<select name="popover" id="appendTo" class="form-control">
-															<option value=''>auto (mostly = element)</option>
-															<option value='{"appendTo": "element"}'>element</option>
-															<option value='{"appendTo": "body"}'>body</option>
-														</select>
-													</div>
-												</div>
-											</fieldset>
+
 										</fieldset>
 										<fieldset data-classes="">
 											<legend>Classes/SASS extends</legend>
 											<div class="form-group">
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="show-week" />
-														show-week
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="show-yearbtns" />
-														show-yearbtns
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="hide-btnrow" />
-														hide-btnrow
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="show-uparrow" />
-														show-uparrow
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="show-selectnav" />
-														show-selectnav
-													</label>
-												</div>
+
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="hide-spinbtns" />
 														hide-spinbtns
 													</label>
 												</div>
+
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="hide-dropdownbtn" />
-														hide-dropdownbtn
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input data-excludes="inputbtns-outside a11yhide-inputbtns hide-dropdownbtn hide-spinbtns" type="checkbox" name="hide-inputbtns" />
+														<input data-excludes="inputbtns-outside a11yhide-inputbtns hide-spinbtns" type="checkbox" name="hide-inputbtns" />
 														hide-inputbtns
 													</label>
 												</div>
@@ -313,12 +191,6 @@
 													<label>
 														<input type="checkbox" name="inputbtns-outside" />
 														inputbtns-outside
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input data-excludes="inputbtns-outside hide-inputbtns hide-dropdownbtn hide-spinbtns" type="checkbox" name="a11yhide-inputbtns" />
-														a11yhide-inputbtns
 													</label>
 												</div>
 													
@@ -349,21 +221,7 @@
 											<select class="active-lang form-control" id="lang"></select>
 										</div>
 									</div>
-									<div class="row form-group">
-										<div class="col-md-12 show-activevaluetooltip show-tickvalues">
-											
-											<label class="form-label" for="widget-scale">
-												widget scale
-											</label>
-											<input type="range" class="form-control" min="13" value="13" max="19" id="widget-scale" list="save-scales" />
-											<datalist id="save-scales">
-												<select>
-													<option>13</option>
-													<option>19</option>
-												</select>
-											</datalist>
-										</div>
-									</div>
+
 								</div>
 							</div>
 						</div>
@@ -371,13 +229,7 @@
 				</div>
 			</div>
 		</div>
-<datalist id="date-list">
-	<select>
-		<option value="2009-10-11"></option>
-		<option value="2012-11-11"></option>
-		<option value="2013-11-11" label="labeled Option (2013-11-11)"></option>
-	</select>
-</datalist>
+
 	<script src="assets/jquery.deserialize.js" async=""></script>
 	<script>
 		webshims.loader.loadScript("../../demo-js/demo.js", false, false, true);

@@ -131,7 +131,7 @@ $(function($){
 				var method = $(this).data('method');
 				$($.prop(this, 'elements')).filter('[name]').each(function(){
 					var val, name;
-					if($(this).is(':invalid')){return;}
+					if($(this).is(':invalid') || $(this).is(':disabled')){return;}
 					name = $.prop(this, 'name');
 					if($.prop(this, 'type') == 'checkbox'){
 						val =  $.prop(this, 'checked') ;
@@ -140,7 +140,7 @@ $(function($){
 						}
 					} else {
 						val = $(this).val();
-						if(val === $.prop(this, 'defaultValue') || !val){
+						if( !val || (!$(this).is('.init-value') && (val === $.prop(this, 'defaultValue') || $('option:checked', this).prop('defaultSelected'))) ){
 							return;
 						}
 						
