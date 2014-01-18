@@ -1795,7 +1795,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		
 		
 		var formatVal = {
-			number: function(val){
+			number: function(val, o){
 				return (val+'').replace(/\,/g, '').replace(/\./, curCfg.numberFormat['.']);
 			},
 			time: function(val){
@@ -2153,7 +2153,15 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 					})
 					.on({
 						'change input focus focusin blur focusout': function(e){
+                            var oVal, nVal;
 							$(e.target).trigger('ws__'+e.type);
+                            if(o.toFixed && o.type == 'number' && e.type == 'change'){
+                                oVal = that.element.prop('value');
+                                nVal = that.toFixed(oVal, true);
+                                if(oVal != nVal){
+                                    that.element.prop('value', nVal);
+                                }
+                            }
 						}
 					})
 					
@@ -2365,7 +2373,14 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 					this.elemHelper.prop('value', val);
 					this.options.defValue = "";
 				}
-			}
+			},
+            toFixed: function(val, force){
+                var o = this.options;
+                if(o.toFixed && o.type == 'number' && val && this.valueAsNumber && (!this.element.is(':focus')) && (!o.fixOnlyFloat || (this.valueAsNumber % 1)) && !$(this.orig).is(':invalid')){
+                    val = formatVal[this.type](this.valueAsNumber.toFixed(o.toFixed), this.options);
+                }
+                return val;
+            }
 		});
 		
 		['defaultValue', 'value'].forEach(function(name){
@@ -2377,7 +2392,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 					} else {
 						this.elemHelper.prop(name, val);
 					}
-					
+
 					val = formatVal[this.type](val, this.options);
 					if(this.options.splitInput){
 						$.each(this.splits, function(i, elem){
@@ -2389,7 +2404,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 							}
 						});
 					} else {
-						this.element.prop(name, val);
+                        this.element.prop(name, this.toFixed(val));
 					}
 					this._propertyChange(name);
 					this.mirrorValidity();
