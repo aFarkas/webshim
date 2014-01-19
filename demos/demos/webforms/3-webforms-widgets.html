@@ -77,12 +77,32 @@
 		});
 		$.webshims.setOptions('forms-ext', {
 			replaceUI: true,
-			types: 'range date time number month color'
+			types: 'range date time number month color',
+			widgets: {
+				calculateWidth: false
+			}
 		});
 		
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
 		$.webshims.polyfill();
+		
+		$(window).on('load', function(){
+			setTimeout(function(){
+				console.time('updatelayout')
+				$(document).trigger('updateshadowdom');
+				console.timeEnd('updatelayout');
+			}, 900);;
+		})
+		
+		$(function(){
+			$(document).on('updatelayout', function(e){
+				console.log(e.type, 'without namespace')
+			})
+			$(document).on('updatelayout.webshim', function(e){
+				console.log(e.type, 'with namespace')
+			})
+		});
 	</script>
 	<script>
 		$(function(){

@@ -278,7 +278,7 @@
 				</li>
 			</ul>
 			<pre><code class="language-javascript">
-webshims.setOptions('extendNative', false);
+webshims.setOptions('extendNative', true);
 </code></pre>
 			<p>
 				<code class="i">
@@ -905,7 +905,8 @@ webshims.setOptions("forms", {
 		"successWrapperClass": "ws-success",
 		"errorBoxClass": "ws-errorbox",
 		"errorMessageClass": "ws-errormessage",
-		"fx": "slide"
+		"fx": "slide",
+		"submitCheck": false
 	}
 });</code></pre>
 				</li>
@@ -932,7 +933,6 @@ webshims.setOptions("forms", {
 		"highlight": false,
 		"valueCompletion": false,
 		"noHtmlEscape": false,
-		"datalistCreated": false,
 		"popover": {
 			"constrainWidth": true
 		}
@@ -971,42 +971,49 @@ webshims.setOptions("forms", {
 <pre><code class="language-javascript">
 webshims.setOptions("forms-ext", {
 	"widgets": {
-		"filter": "*",
-		"noChangeDismiss": false,
-		"openOnFocus": false,
-		"startView": false,
-		"minView": false,
+		"startView": 0,
+		"minView": 0,
 		"inlinePicker": false,
 		"size": 1,
 		"splitInput": false,
+		"yearSelect": false,
 		"monthSelect": false,
 		"daySelect": false,
+		"noChangeDismiss": false,
+		"openOnFocus": false,
+		"buttonOnly": false,
+		"classes": "",
 		"popover": {
 			//popover options
 		},
 		"calculateWidth": true,
-		"animate": true
+		"animate": true,
+		"toFixed": 0,
+		"onlyFixFloat": false
 	}
 });</code>
 </pre>
 				</li>
 				<li>
-					<strong>date</strong> <em>object</em> Overrides widgets option object, can be also configured through data-date attribute 
+					<strong>date</strong> <em>object</em> Overrides widgets option object, can be also configured through data-date attribute (<a href="demos/cfgs/input-date.html">Configurator</a>)
 				</li>
 				<li>
-					<strong>month</strong> <em>object</em> Overrides widgets option object, can be also configured through data-month attribute
+					<strong>month</strong> <em>object</em> Overrides widgets option object, can be also configured through data-month attribute (<a href="demos/cfgs/input-month.html">Configurator</a>)
 				</li>
 				<li>
-					<strong>number</strong> <em>object</em> Overrides widgets option object, can be also configured through data-number attribute
+					<strong>number</strong> <em>object</em> Overrides widgets option object, can be also configured through data-number attribute (<a href="demos/cfgs/input-number.html">Configurator</a>)
 				</li>
 				<li>
-					<strong>time</strong> <em>object</em> Overrides widgets option object, can be also configured through data-time attribute
+					<strong>time</strong> <em>object</em> Overrides widgets option object, can be also configured through data-time attribute (<a href="demos/cfgs/input-time.html">Configurator</a>)
 				</li>
 				<li>
-					<strong>range</strong> <em>object</em> Overrides widgets option object, can be also configured through data-range attribute
+					<strong>range</strong> <em>object</em> Overrides widgets option object, can be also configured through data-range attribute (<a href="demos/cfgs/input-range.html">Configurator</a>)
 				</li>
 				<li>
-					<strong>color</strong> <em>object</em> Overrides widgets option object, can be also configured through data-color attribute
+					<strong>color</strong> <em>object</em> Overrides widgets option object, can be also configured through data-color attribute (<a href="demos/cfgs/input-color.html">Configurator</a>)
+				</li>
+				<li>
+					<strong>datetime-local</strong> <em>object</em> Overrides widgets option object, can be also configured through data-color attribute (<a href="demos/cfgs/input-datetime-local.html">Configurator</a>)
 				</li>
 			</ul>
 
@@ -1031,7 +1038,10 @@ webshims.setOptions("forms-ext", {
 					<strong>event: datalistselect</strong>:  Event is triggered on each input[list] for each option, in case the callback returns a string this is used to construct the datalist polyfill
 				</li>
 				<li>
-					<strong>event: getoptioncontent</strong>:  Event is triggered on the input element, if the user selects a value from an option inside of the associated datalist (only available, if customDatalist is set to true)
+					<strong>event: getoptioncontent</strong>:  Event is triggered on the input element, for each option of a datalist. The return value (must be a string) is used to build each list item. Good to enhance list items (For example to add images or more complex HTML)
+				</li>
+				<li>
+					<strong>event: datalistcreated</strong>:  Event is triggered on the input element, after the list was created. 
 				</li>
 				
 				<li>

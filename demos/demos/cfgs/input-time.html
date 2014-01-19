@@ -33,8 +33,7 @@
 			});
 			
 			webshims.setOptions('forms-ext', {
-				replaceUI: true,
-				"types": "month number"
+				replaceUI: true
 			});
 			
 			// load the forms polyfill
@@ -65,7 +64,7 @@
 									<select size="6" class="form-control" id="config-type">
 										<optgroup label="general JS config">
 											<option value="js-widgets" selected="">all input types</option>
-											<option value="js-type">only month</option>
+											<option value="js-type">only time</option>
 										</optgroup>
 										<optgroup label="descriptive markup">
 											<option value="markup-flat">dashed/expanded</option>
@@ -85,24 +84,24 @@
 							<div class="panel panel-default">
 								<div class="panel-heading">live configuration options</div>
 								<div class="panel-body">
-									<form class="input-widget form-inline ws-validate" data-type="month">
+									<form class="input-widget form-inline ws-validate" data-type="time">
 								
 										<fieldset data-method="attr">
 											<legend>$.prop/$.attr</legend>
 											<div class="form-group">
-												<div class="col-sm-12">
-													<label for="defaultValue" class="control-label">defaultValue</label>
-													<input type="month" class="form-control" name="value" id="defaultValue" />
-												</div>
-											</div>
-											<div class="form-group">
 												<div class="col-sm-6">
 													<label for="min" class="control-label">min</label>
-													<input type="month" class="form-control" name="min" id="min" data-dependent-validation='{"from": "max", "prop": "max"}' />
+													<input type="time" class="form-control" name="min" id="min" data-dependent-validation='{"from": "max", "prop": "max"}' />
 												</div>
 												<div class="col-sm-6">
 													<label for="max" class="control-label">max</label>
-													<input type="month" class="form-control" name="max" id="max" data-dependent-validation='{"from": "min", "prop": "min"}' />
+													<input type="time" class="form-control" name="max" id="max" data-dependent-validation='{"from": "min", "prop": "min"}' />
+												</div>
+												<div class="form-group">
+													<div class="col-sm-12">
+														<label for="defaultValue" class="control-label">defaultValue</label>
+														<input type="time" class="form-control" name="value" id="defaultValue" />
+													</div>
 												</div>
 											</div>
 											
@@ -113,7 +112,7 @@
 													</label> 
 													<select name="list" id="list" class="form-control">
 														<option></option>
-														<option value="month-list">month-list (predefined datalist)</option>
+														<option value="time-list">time-list (predefined datalist)</option>
 													</select>
 													
 												</div>
@@ -124,8 +123,7 @@
 													<input class="form-control" name="placeholder" id="placeholder" list="placeholder-list" data-list-filter="!" data-list-focus="true" />
 													<datalist id="placeholder-list">
 														<select>
-															<option value="yyyy-mm" />
-															<option value="year-month" />
+															<option value="hh:mm" />
 														</select>
 													</datalist>
 												</div>
@@ -153,24 +151,9 @@
 										</div>
 										</fieldset>
 											
-										<fieldset data-method="data" data-name="month">
-											<legend>Config properties / data-month attribute</legend>
+										<fieldset data-method="data" data-name="time">
+											<legend>Config properties / data-time attribute</legend>
 											
-											<div class="form-group">
-												<div class="col-sm-4">
-													<label for="startView" class="form-label">startView</label>
-													<input type="number" min="0" max="1" value="0" id="startView" name="startView" class="form-control" />
-												</div>
-												<div class="col-sm-4">
-													<label for="minView" class="form-label">minView</label>
-													<input type="number" min="0" max="1" value="0" id="minView" name="minView" class="form-control" />
-												</div>
-												<div class="col-sm-4">
-													<label for="size" class="form-label">size</label>
-													<input type="number" min="1" max="3" value="1" id="size" name="size" class="form-control" />
-												</div>
-											</div>
-												
 											<div class="form-group col-sm-12">
 												<div class="checkbox">
 													<label>
@@ -190,30 +173,7 @@
 														openOnFocus
 													</label>
 												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="splitInput" />
-														splitInput
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="yearSelect" />
-														yearSelect
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="monthSelect" />
-														monthSelect
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="onlyMonthDigits" />
-														onlyMonthDigits
-													</label>
-												</div>
+												
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="buttonOnly" />
@@ -227,16 +187,7 @@
 													</label>
 												</div>
 											</div>
-											<div class="form-group">
-												<div class="col-sm-12">
-													<label for="monthNames" class="form-label">monthNames</label>
-													<select name="monthNames" id="monthNames" class="form-control">
-														<option>monthNamesShort</option>
-														<option>monthDigits</option>
-														<option>monthNames</option>
-													</select>
-												</div>
-											</div>
+											
 											<fieldset>
 												<legend>popover</legend>
 												<div class="form-group">
@@ -262,23 +213,10 @@
 										<fieldset data-classes="">
 											<legend>Classes/SASS extends</legend>
 											<div class="form-group">
-												
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="hide-btnrow" />
 														hide-btnrow
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="show-uparrow" />
-														show-uparrow
-													</label>
-												</div>
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="show-selectnav" />
-														show-selectnav
 													</label>
 												</div>
 												<div class="checkbox">
@@ -361,11 +299,11 @@
 				</div>
 			</div>
 		</div>
-<datalist id="month-list">
+<datalist id="time-list">
 	<select>
-		<option value="2009-10"></option>
-		<option value="2012-11"></option>
-		<option value="2013-11" label="labeled Option (2013-11)"></option>
+		<option value="20:15"></option>
+		<option value="09:30"></option>
+		<option value="10:00" label="labeled Option (10:00)"></option>
 	</select>
 </datalist>
 	<script src="assets/jquery.deserialize.js" async=""></script>
