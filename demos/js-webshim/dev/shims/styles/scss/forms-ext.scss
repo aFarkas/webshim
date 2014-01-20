@@ -9,6 +9,14 @@ span.has-input-buttons {
 	vertical-align: middle;
 }
 
+.ws-inputreplace[readonly][aria-readonly="false"] {
+	cursor: pointer;
+	&[disabled] {
+		cursor: default;
+		cursor: not-allowed;
+	}
+}
+
 .input-buttons,
 .step-controls,
 .ws-popover-opener {
@@ -76,7 +84,7 @@ span.has-input-buttons {
 }
 
 input[type="color"] {
-	width: 6.5em;
+	width: 7.5em;
 }
 
 .input-buttons {
@@ -178,6 +186,10 @@ input[type="color"] {
 		text-align: center;
 		letter-spacing: normal;
 		word-spacing: normal;
+		
+		> option {
+			text-align: left;
+		}
 	}
 	.ws-input-seperator {
 		vertical-align: middle;
@@ -466,6 +478,11 @@ $button-bgcolor: #f5f5f5;
 	padding: em(5) em(8);
 	display: inline-block;
 	border: em(1) solid transparent;
+}
+.ws-inline-picker {
+	@extend %contentbox;
+	position: relative;
+	z-index: 99;
 }
 .input-picker {
 	overflow: visible;

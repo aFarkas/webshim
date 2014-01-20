@@ -5,12 +5,14 @@
     clear: both;
     content: ' '; }
 
-.ws-range .ws-range-thumb {
+.ws-range .ws-range-thumb, .ws-inline-picker {
   -moz-box-sizing: content-box;
   box-sizing: content-box; }
-  .ws-range .ws-range-thumb *, .ws-range .ws-range-thumb:before, .ws-range .ws-range-thumb:after,
+  .ws-range .ws-range-thumb *, .ws-inline-picker *, .ws-range .ws-range-thumb:before, .ws-inline-picker:before, .ws-range .ws-range-thumb:after, .ws-inline-picker:after,
   .ws-range .ws-range-thumb :after,
-  .ws-range .ws-range-thumb :before {
+  .ws-inline-picker :after,
+  .ws-range .ws-range-thumb :before,
+  .ws-inline-picker :before {
     -moz-box-sizing: content-box;
     box-sizing: content-box; }
 
@@ -102,12 +104,12 @@
 .show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span:after {
   display: inline-block; }
 
-.show-labeltooltip span.ws-range-thumb > span, .show-labeltooltip span.ws-range-thumb > span:after {
+.show-labeltooltip span.ws-range-thumb > span, .show-labeltooltip span.ws-range-thumb > span:before {
   display: inline-block; }
 
-.ws-active.show-activelabeltooltip span.ws-range-thumb > span, .ws-active.show-activelabeltooltip span.ws-range-thumb > span:after,
+.ws-active.show-activelabeltooltip span.ws-range-thumb > span, .ws-active.show-activelabeltooltip span.ws-range-thumb > span:before,
 .show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span,
-.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span:after {
+.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span:before {
   display: inline-block; }
 
 /* spinner control for time, number (usable for date, datetime-local) */
@@ -116,6 +118,12 @@ html > body input.ws-inputreplace.has-input-buttons,
 span.has-input-buttons {
   display: inline-block;
   vertical-align: middle; }
+
+.ws-inputreplace[readonly][aria-readonly="false"] {
+  cursor: pointer; }
+  .ws-inputreplace[readonly][aria-readonly="false"][disabled] {
+    cursor: default;
+    cursor: not-allowed; }
 
 .input-buttons,
 .step-controls,
@@ -167,7 +175,7 @@ span.has-input-buttons {
       background: none; }
 
 input[type="color"] {
-  width: 6.5em; }
+  width: 7.5em; }
 
 .input-buttons {
   text-align: left; }
@@ -230,6 +238,8 @@ input[type="color"] {
     text-align: center;
     letter-spacing: normal;
     word-spacing: normal; }
+    .ws-input > * > option {
+      text-align: left; }
   .ws-input .ws-input-seperator {
     vertical-align: middle;
     width: 2%;
@@ -423,6 +433,10 @@ input[type="color"] {
   padding: 0.38462em 0.61538em;
   display: inline-block;
   border: 0.07692em solid transparent; }
+
+.ws-inline-picker {
+  position: relative;
+  z-index: 99; }
 
 .input-picker {
   overflow: visible;

@@ -171,7 +171,7 @@ $rangeapis: show-ticklabels show-tickvalues hide-ticks show-valuetooltip show-la
 %show-labeltooltip {
 	span.ws-range-thumb > span {
 		&,
-		&:after {
+		&:before {
 			display: inline-block;
 		}
 	}
@@ -181,7 +181,7 @@ $rangeapis: show-ticklabels show-tickvalues hide-ticks show-valuetooltip show-la
 	&.ws-active span.ws-range-thumb > span,
 	.ws-range.ws-active span.ws-range-thumb > span {
 		&,
-		&:after {
+		&:before {
 			display: inline-block;
 		}
 	}

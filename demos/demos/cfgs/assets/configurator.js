@@ -45,7 +45,11 @@ $(function($){
 					code += '//configure before calling webshims.polyfill\n';
 					code += 'webshims.setOptions("'+cfgFeature+'", ';
 					code += JSON.stringify(obj, null, '\t') +');';
-					code += '\n\n//webshims.polyfill("forms forms-ext");';
+					if(cfgFeature == 'forms-ext'){
+						code += '\n\n//webshims.polyfill("forms forms-ext");';
+					} else {
+						code += '\n\n//webshims.polyfill("'+ cfgFeature +'");';
+					}
 					code += '\n<\/script>\n';
 				}
 			}
