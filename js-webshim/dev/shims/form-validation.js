@@ -567,6 +567,16 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			return fieldWrapper;
 		},
 		_createContentMessage: (function(){
+			var noValidate = function(){
+				return !noValidate.types[this.type];
+			};
+			noValidate.types = {
+				hidden: 1,
+				image: 1,
+				button: 1,
+				reset: 1,
+				submit: 1
+			};
 			var fields = {};
 			var deCamelCase = function(c){
 				return '-'+(c).toLowerCase();
@@ -587,26 +597,36 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				var cName = name.replace(/[A-Z]/, deCamelCase);
 				fields[name] = '.'+cName+', .'+name+', .'+(name).toLowerCase()+', [data-errortype="'+ name +'"]';
 			});
-			return function(elem, errorBox){
+			return function(elem, errorBox, fieldWrapper){
 				var extended = false;
-				var errorMessages = $(elem).data('errormessage') || {};
-				if(typeof errorMessages == 'string'){
-					errorMessages = {defaultMessage: errorMessages};
-				}
+				var descriptiveMessages = {};
+
 				$(errorBox).children().each(function(){
 					var name = getErrorName(this);
-					if(!errorMessages[name]){
-						extended = true;
-						errorMessages[name] = $(this).html();
+					descriptiveMessages[name] = $(this).html();
+				});
+
+				$('input, select, textarea', fieldWrapper).filter(noValidate).each(function(i, elem){
+					var errorMessages = $(elem).data('errormessage') || {};
+					if(typeof errorMessages == 'string'){
+						errorMessages = {defaultMessage: errorMessages};
+					}
+
+					$.each(descriptiveMessages, function(name, val){
+						if(!errorMessages[name]){
+							extended = true;
+							errorMessages[name] = val;
+						}
+					});
+
+					if(extended){
+						$(elem).data('errormessage', errorMessages);
+					}
+					if(webshims.getOptions){
+						webshims.getOptions(elem, 'errormessage');
 					}
 				});
-				
-				if(extended){
-					$(elem).data('errormessage', errorMessages);
-				}
-				if(webshims.getOptions){
-					webshims.getOptions(elem, 'errormessage');
-				}
+
 			};
 		})(),
 		initIvalContentMessage: function(elem){
@@ -621,10 +641,10 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			var errorBox = fieldWrapper.data('errorbox');
 			if(!errorBox){
 				errorBox = this.create(elem, fieldWrapper);
-				this._createContentMessage(elem, errorBox);
+				this._createContentMessage(elem, errorBox, fieldWrapper);
 			} else if(typeof errorBox == 'string'){
 				errorBox = $('#'+errorBox);
-				fieldWrapper.data('errorbox', errorBox);
+				fieldWrapper.data('errorbox', errorBox, fieldWrapper);
 				this._createContentMessage(elem, errorBox);
 			}
 			return errorBox;
@@ -964,7 +984,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			}
 		});
 	}
-	if(webshims.cfg.debug !== false){
+	if(webshims.cfg.debug !== false && iVal.sel != '.ws-instantvalidation'){
 		$(function(){
 			if($('form.ws-instantvalidation').length){
 				webshims.error('.ws-instantvalidation was renamed to .ws-validate');

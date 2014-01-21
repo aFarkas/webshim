@@ -1253,10 +1253,10 @@
 	if(asyncWebshims){
 		if(asyncWebshims.cfg){
 			if(!asyncWebshims.cfg.length){
-				asyncWebshims.cfg = [asyncWebshims.cfg];
+				asyncWebshims.cfg = [[asyncWebshims.cfg]];
 			}
 			$.each(asyncWebshims.cfg, function(i, cfg){
-				webshims.setOptions.call(webshims, cfg);
+				webshims.setOptions.apply(webshims, cfg);
 			});
 		}
 		if(asyncWebshims.ready){

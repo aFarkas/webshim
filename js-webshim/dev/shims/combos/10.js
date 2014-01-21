@@ -634,7 +634,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						setInterval(this.test, 600);
 						$(this.test);
 						webshims.ready('WINDOWLOAD', this.test);
-						$(document).on('updatelayout pageinit popupafteropen panelbeforeopen tabsactivate collapsibleexpand shown.bs.modal shown.bs.collapse slid.bs.carousel', this.handler);
+						$(document).on('updatelayout.webshim pageinit popupafteropen panelbeforeopen tabsactivate collapsibleexpand shown.bs.modal shown.bs.collapse slid.bs.carousel', this.handler);
 						$(window).on('resize', this.handler);
 						(function(){
 							var oldAnimate = $.fn.animate;
@@ -2481,15 +2481,15 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					})
 					.on({
 						'change input focus focusin blur focusout': function(e){
-                            var oVal, nVal;
+							var oVal, nVal;
 							$(e.target).trigger('ws__'+e.type);
-                            if(o.toFixed && o.type == 'number' && e.type == 'change'){
-                                oVal = that.element.prop('value');
-                                nVal = that.toFixed(oVal, true);
-                                if(oVal != nVal){
-                                    that.element.prop('value', nVal);
-                                }
-                            }
+							if(o.toFixed && o.type == 'number' && e.type == 'change'){
+								oVal = that.element.prop('value');
+								nVal = that.toFixed(oVal, true);
+								if(oVal != nVal){
+									that.element.prop('value', nVal);
+								}
+							}
 						}
 					})
 					
@@ -2702,13 +2702,13 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					this.options.defValue = "";
 				}
 			},
-            toFixed: function(val, force){
-                var o = this.options;
-                if(o.toFixed && o.type == 'number' && val && this.valueAsNumber && (!this.element.is(':focus')) && (!o.fixOnlyFloat || (this.valueAsNumber % 1)) && !$(this.orig).is(':invalid')){
-                    val = formatVal[this.type](this.valueAsNumber.toFixed(o.toFixed), this.options);
-                }
-                return val;
-            }
+			toFixed: function(val, force){
+				var o = this.options;
+				if(o.toFixed && o.type == 'number' && val && this.valueAsNumber && (!this.element.is(':focus')) && (!o.fixOnlyFloat || (this.valueAsNumber % 1)) && !$(this.orig).is(':invalid')){
+					val = formatVal[this.type](this.valueAsNumber.toFixed(o.toFixed), this.options);
+				}
+				return val;
+			}
 		});
 		
 		['defaultValue', 'value'].forEach(function(name){
@@ -2732,7 +2732,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 							}
 						});
 					} else {
-                        this.element.prop(name, this.toFixed(val));
+						this.element.prop(name, this.toFixed(val));
 					}
 					this._propertyChange(name);
 					this.mirrorValidity();
@@ -3331,7 +3331,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					opts.monthNames = 'monthDigits';
 				}
 				data.shim = inputTypes[type]._create(opts);
-				
+
 				webshims.addShadowDom(this, data.shim.element, {
 					data: data.shim || {}
 				});

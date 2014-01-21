@@ -1,16 +1,16 @@
 webshims.validityMessages.pl = {
 	"typeMismatch": {
 		"defaultMessage": "Wprowadź poprawną wartość.",
-		"email": "Wprowadź adres e-mail.",
-		"url": "Wprowadź adres URL."
+		"email": "Wprowadź poprawny adres e-mail.",
+		"url": "Wprowadź poprawny adres URL."
 	},
 	"badInput": {
 		"defaultMessage": "Wprowadź poprawną wartość.",
 		"number": "Wprowadź numer.",
 		"date": "Wprowadź datę.",
 		"time": "Wprowadź czas.",
-		"range": "Invalid input.",
-		"month": "Wprowadź prawidłową wartość.",
+		"range": "Niepoprawny zakres.",
+		"month": "Wprowadź poprawny miesiąc.",
 		"datetime-local": "Wprowadź datę i czas."
 	},
 	"rangeUnderflow": {

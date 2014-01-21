@@ -1587,7 +1587,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					opts.monthNames = 'monthDigits';
 				}
 				data.shim = inputTypes[type]._create(opts);
-				
+
 				webshims.addShadowDom(this, data.shim.element, {
 					data: data.shim || {}
 				});
