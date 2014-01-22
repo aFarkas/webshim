@@ -260,8 +260,8 @@
 				</li>
 				<li>
 					<strong>waitReady</strong> Setting this to true delays jQuery's ready-event until all polyfilled features are ready. This option should be set to false, if webshims lib polyfiller.js is loaded asynchronously. This option can also be set to false, if a website is using only HTML5 markup APIs (pure HTML or $.attr) and
-					doesn't use any DOM-/JS-APIs on DOM-ready. If this feature is set to false, scripted access to polyfilled APIs have to be added inside of a <code class="i">
-						webshims.ready</code>
+					doesn't use any DOM-/JS-APIs on DOM-ready. If this feature is set to false, scripted access to polyfilled APIs have to be added inside of a <code class="i"><a href="#Guide-fire-when-ready">
+						webshims.ready</a></code>
 					callback.
 					<br>
 					<em>default: true</em>
@@ -285,9 +285,9 @@ webshims.setOptions('extendNative', true);
 					setOptions</code>
 				can also take a single options parameter:
 			</p>
-			<pre>
+			<pre><code class="language-javascript">
 webshims.setOptions({
-  extendNative: false
+  extendNative: true
 });
 </code></pre>
 			<p>
@@ -296,7 +296,7 @@ webshims.setOptions({
 			<pre><code class="language-javascript">
 webshims.setOptions({
   // configure generally option
-  extendNative: false,
+  extendNative: true,
 
   // configure canvas-shim
   canvas: {
@@ -305,7 +305,7 @@ webshims.setOptions({
 
   // configure forms-shim
   forms: { 
-    customMessages: true // implement customValidationMessages
+    lazyCustomMessages: true // implement customValidationMessages
   }
 });
 </code></pre>
@@ -386,7 +386,7 @@ webshims.ready('DOM canvas', function(){
 							$.attr</code>
 						/<code class="i">
 							$.removeAttr</code>
-						(in case of content attributes) method:
+						(in case of content attributes) methods:
 					</p>
 					<pre><code class="language-javascript">
 // instead of accessing a property directly (e.g. this.validity), 
@@ -454,7 +454,7 @@ $('video').get(0).addTextTrack('subtitles', 'just a test', 'en');
 					<p>
 						<strong>binding to events</strong>: Always use jQuery's <code class="i">
 							on</code>
-						method to register your event handlers. <code class="i">
+						method to register your event listeners. <code class="i">
 							addEventListener</code>
 						or inline event handler won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use event capturing in the native implementation and <code class="i">
 							$.fn.trigger</code>
@@ -804,7 +804,7 @@ var myCar = Object.create(carProto, {
 			<p>
 				The <code class="i">
 					forms</code>
-				feature also implements an easy and cross browser way to control the validation UI (error message and styling the validation bubble).
+				feature also implements an easy and cross browser way to control the <a href="forms.html#UI-Settings">validation UI</a> (error message and styling the validation bubble).
 			</p>
 
 			<h3>Implemented/fixed in <code class="i">
@@ -890,7 +890,7 @@ webshims.setOptions("forms", {
 					<em>default: false</em>
 				</li>
 				<li>
-					<strong>iVal</strong> <em>mixed object</em> Adds and configures a user friendly clientside form validation UI.
+					<strong><a href="demos/forms.html#UI-ival">iVal</a></strong> <em>mixed object</em> Adds and configures a user friendly clientside form validation UI.
 					<br>
 					<em>default: </em>
 <pre><code class="language-javascript">
@@ -911,17 +911,17 @@ webshims.setOptions("forms", {
 });</code></pre>
 				</li>
 				<li>
-					<strong>addValidators</strong> <em>boolean</em> Should Webshim implement some new custom validators. <a href="webforms/4-webforms-custom-validity.html">custom validity example</a>
+					<strong><a href="forms.html#Custom-validity">addValidators</a></strong> <em>boolean</em> Should Webshims implement some new custom validators. <a href="forms.html#Custom-validity">custom validity example</a>
 					<br>
 					<em>default: false</em>
 				</li>
 				<li>
-					<strong>customDatalist</strong> <em>boolean</em> Allows to use custom styleable datalist elements in all browsers.
+					<strong><a href="forms.html#Datalist">customDatalist</a></strong> <em>boolean</em> Allows to use custom styleable datalist elements in all browsers.
 					<br>
 					<em>default: false</em>
 				</li>
 				<li>
-					<strong>list</strong> <em>mixed object</em> Options object for the datalist/[list] feature (can be also controlled using data-list markup).
+					<strong><a href="forms.html#Datalist">list</a></strong> <em>mixed object</em> Options object for the datalist/[list] feature (can be also controlled using data-list markup).
 					<br>
 					<em>default:</em>
 <pre><code class="language-javascript">
@@ -954,8 +954,7 @@ webshims.setOptions("forms", {
 					forms-ext</code> Options</h3>
 			<ul>
 				<li>
-					<strong>replaceUI</strong> <em>boolean</em> If set to true the number, time, month, date <!--, datetime -->
-					and range Widgets are replaced in all browsers (also in browser, which have implemented these types). This is useful, if you want to style the UI in all browsers.
+					<strong>replaceUI</strong> <em>boolean</em>|<em>mixed object</em> If set to true the UI of all input widgets (number, time, month, date, range) are replaced in all browsers (also in browser, which have implemented these types). This is useful, if you want to style the UI in all browsers.
 					<br>
 					<em>default: false</em>
 				</li>

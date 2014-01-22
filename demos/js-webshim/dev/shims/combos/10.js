@@ -2487,7 +2487,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 								oVal = that.element.prop('value');
 								nVal = that.toFixed(oVal, true);
 								if(oVal != nVal){
-									that.element.prop('value', nVal);
+									that.element[0].value = nVal;
 								}
 							}
 						}

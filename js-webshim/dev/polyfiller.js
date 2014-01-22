@@ -1,34 +1,26 @@
 (function (factory) {
-	var timer;
 	var addAsync = function(){
 		if(!window.asyncWebshims){
-			if(!window.asyncWebshims){
-				window.asyncWebshims = {
-					cfg: [],
-					ready: []
-				};
-			}
+			window.asyncWebshims = {
+				cfg: [],
+				ready: []
+			};
 		}
 	};
 	var start = function(){
 		if(window.jQuery){
 			factory(jQuery);
-			factory = jQuery.noop;
-			clearInterval(timer);
+			factory = function(){return window.webshims;};
 		}
-		if (typeof define === 'function' && define.amd && define.amd.jQuery) {
-			define('polyfiller', ['jquery'], factory);
-			clearInterval(timer);
-		}
-		
 	};
-	var timer = setInterval(start, 1);
+	var path = (document.currentScript || {}).src;
 	
 	window.webshims = {
 		setOptions: function(){
 			addAsync();
 			window.asyncWebshims.cfg.push(arguments);
 		},
+
 		ready: function(){
 			addAsync();
 			window.asyncWebshims.ready.push(arguments);
@@ -43,15 +35,30 @@
 		}
 	};
 	window.webshim = window.webshims;
-	
+	window.webshims.timer = setInterval(start, 0);
+
+	if(!path){
+		try {
+			path();
+		} catch(e) {
+			path = e.stack.replace(/^[\@\sat]+/, '');
+		}
+	}
+	window.webshims.path = path.slice(0, path.lastIndexOf("/") + 1) + 'shims/';
+
 	start();
+
+	if (typeof define === 'function' && define.amd && define.amd.jQuery) {
+		define('polyfiller', ['jquery'], factory);
+	}
 }(function($){
 	"use strict";
 	if (typeof WSDEBUG === 'undefined') {
 		window.WSDEBUG = true;
 	}
+	var firstRun;
+	var webshims = window.webshims;
 	var DOMSUPPORT = 'dom-support';
-	var jScripts = $(document.scripts || 'script');
 	var special = $.event.special;
 	var emptyJ = $([]);
 	var Modernizr = window.Modernizr;
@@ -59,8 +66,6 @@
 	var addTest = Modernizr.addTest;
 	var Object = window.Object;
 	var html5 = window.html5 || {};
-	var firstRun;
-	var webshims = window.webshims;
 	var addSource = function(text){
 		return text +"\n//# sourceURL="+this.url;
 	};
@@ -70,9 +75,10 @@
 		Modernizr.ES5 = false;
 	}
 	
-	
+	clearInterval(webshims.timer);
+
 	$.extend(webshims, {
-		version: '1.12.0',
+		version: '1.12.1-pre',
 		cfg: {
 			
 			//addCacheBuster: false,
@@ -86,17 +92,7 @@
 				$.ajax($.extend({}, webCFG.ajax, {url: src, success: success, dataType: 'script', cache: true, global: false, dataFilter: addSource}));
 			},
 			
-			basePath: (function(){
-				var script = jScripts.filter('[src*="polyfiller.js"]');
-				var path;
-				script = script[0] || script.end()[script.end().length - 1];
-				if(WSDEBUG && document.currentScript && script !=  document.currentScript && document.currentScript.src){
-					webshims.warn("It seems you need to set webshims.setOptions('basePath', 'pathTo/shims/'); manually.");
-				}
-				path = ( ( !('hrefNormalized' in $.support) || $.support.hrefNormalized  ) ? script.src : script.getAttribute("src", 4) ).split('?')[0];
-				path = path.slice(0, path.lastIndexOf("/") + 1) + 'shims/';
-				return path;
-			})()
+			basePath: webshims.path
 		},
 		bugs: {},
 		/*
@@ -1102,9 +1098,6 @@
 			test: function(){
 				var o = this.options;
 				initialFormTest();
-				if(o.replaceUI){
-					$('html').addClass('ws-replaceui');
-				}
 				//input widgets on old androids can't be trusted
 				if(bustedWidgetUi && !o.replaceUI && (/Android/i).test(navigator.userAgent)){
 					o.replaceUI = true;
@@ -1234,43 +1227,48 @@
 	webshims.$ = $;
 	webshims.M = Modernizr;
 	window.webshims = webshims;
-	
-	jScripts
-		.filter('[data-polyfill-cfg]')
-		.each(function(){
-			try {
-				webshims.setOptions( $(this).data('polyfillCfg') );
-			} catch(e){
-				webshims.warn('error parsing polyfill cfg: '+e);
+
+	webshims.callAsync = function(){
+		webshims.callAsync = $.noop;
+		$(document.scripts || 'script')
+			.filter('[data-polyfill-cfg]')
+			.each(function(){
+				try {
+					webshims.setOptions( $(this).data('polyfillCfg') );
+				} catch(e){
+					webshims.warn('error parsing polyfill cfg: '+e);
+				}
+			})
+			.end()
+			.filter('[data-polyfill]')
+			.each(function(){
+				webshims.polyfill( $.trim( $(this).data('polyfill') || '' ) );
+			})
+		;
+		if(asyncWebshims){
+			if(asyncWebshims.cfg){
+				if(!asyncWebshims.cfg.length){
+					asyncWebshims.cfg = [[asyncWebshims.cfg]];
+				}
+				$.each(asyncWebshims.cfg, function(i, cfg){
+					webshims.setOptions.apply(webshims, cfg);
+				});
 			}
-		})
-		.end()
-		.filter('[data-polyfill]')
-		.each(function(){
-			webshims.polyfill( $.trim( $(this).data('polyfill') || '' ) );
-		})
-	;
-	if(asyncWebshims){
-		if(asyncWebshims.cfg){
-			if(!asyncWebshims.cfg.length){
-				asyncWebshims.cfg = [[asyncWebshims.cfg]];
+			if(asyncWebshims.ready){
+				$.each(asyncWebshims.ready, function(i, ready){
+					webshims.ready.apply(webshims, ready);
+				});
 			}
-			$.each(asyncWebshims.cfg, function(i, cfg){
-				webshims.setOptions.apply(webshims, cfg);
-			});
+			if(asyncWebshims.lang){
+				webshims.activeLang(asyncWebshims.lang);
+			}
+			if('polyfill' in asyncWebshims){
+				webshims.polyfill(asyncWebshims.polyfill);
+			}
 		}
-		if(asyncWebshims.ready){
-			$.each(asyncWebshims.ready, function(i, ready){
-				webshims.ready.apply(webshims, ready);
-			});
-		}
-		if(asyncWebshims.lang){
-			webshims.activeLang(asyncWebshims.lang);
-		}
-		if('polyfill' in asyncWebshims){
-			webshims.polyfill(asyncWebshims.polyfill);
-		}
-	}
-	webshims.isReady('jquery', true);
+		webshims.isReady('jquery', true);
+	};
+
+	webshims.callAsync();
 	return webshims;
 }));

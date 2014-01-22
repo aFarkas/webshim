@@ -55,6 +55,7 @@
 	 	
 	<script>
 		(function(){
+			//Modernizr.mq is not part of webshims' Modernizr build!
 			var assumeMobile = Modernizr.mq && (Modernizr.mq('(max-device-width: 768px)') || (Modernizr.touch && Modernizr.mq('(max-device-width: 124px)')));
 			
 			//jQM: set waitReady to false
