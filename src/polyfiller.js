@@ -1,4 +1,5 @@
 (function (factory) {
+	var scripts;
 	var addAsync = function(){
 		if(!window.asyncWebshims){
 			window.asyncWebshims = {
@@ -41,10 +42,19 @@
 		try {
 			path();
 		} catch(e) {
-			path = e.stack.replace(/^[\@\sat]+/, '');
+			path = (e.stack || '').replace(/^[\@\sat]+/, '');
 		}
 	}
-	window.webshims.path = path.slice(0, path.lastIndexOf("/") + 1) + 'shims/';
+	if(!path){
+		scripts = document.scripts || document.getElementsByTagName('script');
+		for(var i = 0; i < scripts.length; i++){
+			if(scripts[i].readyState == 'interactive'){
+				path = scripts[i];
+				break;
+			}
+		}
+	}
+	window.webshims.path = path || '';
 
 	start();
 
@@ -76,6 +86,11 @@
 	}
 	
 	clearInterval(webshims.timer);
+
+	if(typeof webshims.path == 'object'){
+		webshims.path = ($.support.hrefNormalized === false) ? webshims.path.getAttribute("src", 4) : webshims.path.src;
+	}
+	webshims.path = webshims.path.split('?')[0].slice(0, webshims.path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
 		version: '1.12.1-pre',
@@ -636,10 +651,13 @@
 	 */
 	
 	(function(){
-		
+		var doc = document;
 		//Overwrite DOM-Ready and implement a new ready-method
 		$.isDOMReady = $.isReady;
-		var onReady = function(){
+		var onReady = function(e){
+			if(webCFG.readyEvt && e && e.type === webCFG.readyEvt){
+				doc = e.target || document;
+			}
 			$.isDOMReady = true;
 			isReady('DOM', true);
 			setTimeout(function(){
@@ -687,10 +705,7 @@
 			}
 			firstRun.run = true;
 		};
-		
-		setTimeout(function(){
-			$(onReady);
-		}, 4);
+
 		$(window).on('load', function(){
 			onReady();
 			setTimeout(function(){
@@ -710,7 +725,7 @@
 					webshims.ready('DOM', function(){fn(context, elem);});
 				};
 				readyFns.push(readyFn);
-				readyFn(document, emptyJ);
+				readyFn(doc, emptyJ);
 			},
 			triggerDomUpdate: function(context){
 				if(!context || !context.nodeType){

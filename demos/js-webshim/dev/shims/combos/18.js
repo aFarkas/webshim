@@ -3611,7 +3611,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 			},
 			toFixed: function(val, force){
 				var o = this.options;
-				if(o.toFixed && o.type == 'number' && val && this.valueAsNumber && (!this.element.is(':focus')) && (!o.fixOnlyFloat || (this.valueAsNumber % 1)) && !$(this.orig).is(':invalid')){
+				if(o.toFixed && o.type == 'number' && val && this.valueAsNumber && (force || !this.element.is(':focus')) && (!o.fixOnlyFloat || (this.valueAsNumber % 1)) && !$(this.orig).is(':invalid')){
 					val = formatVal[this.type](this.valueAsNumber.toFixed(o.toFixed), this.options);
 				}
 				return val;

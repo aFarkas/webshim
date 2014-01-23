@@ -604,7 +604,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 							if (ret !== false && o.value != ret) {
 								that.value(ret);
 								if(o.toFixed && o.type == 'number'){
-									that.element[0].value = that.toFixed(ret, true);
+									that.element[0].value = that.toFixed(that.element[0].value, true);
 								}
 								eventTimer.call('input', ret);
 							}
