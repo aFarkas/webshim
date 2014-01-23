@@ -101,6 +101,7 @@
 //			extendNative: false,
 			loadStyles: true,
 			disableShivMethods: true,
+			wsdoc: document,
 			wspopover: {appendTo: 'auto', hideOnBlur: true},
 			ajax: {},
 			loadScript: function(src, success, fail){
@@ -651,13 +652,10 @@
 	 */
 	
 	(function(){
-		var doc = document;
 		//Overwrite DOM-Ready and implement a new ready-method
 		$.isDOMReady = $.isReady;
 		var onReady = function(e){
-			if(webCFG.readyEvt && e && e.type === webCFG.readyEvt){
-				doc = e.target || document;
-			}
+
 			$.isDOMReady = true;
 			isReady('DOM', true);
 			setTimeout(function(){
@@ -725,7 +723,10 @@
 					webshims.ready('DOM', function(){fn(context, elem);});
 				};
 				readyFns.push(readyFn);
-				readyFn(doc, emptyJ);
+
+				if(webCFG.wsdoc){
+					readyFn(webCFG.wsdoc, emptyJ);
+				}
 			},
 			triggerDomUpdate: function(context){
 				if(!context || !context.nodeType){

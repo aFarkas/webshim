@@ -13,7 +13,7 @@
 	
 	<script src="../../demo-js/src/modernizr-special.js"></script>
 	
-	<script src="../../js-webshim/minified/polyfiller.js"></script>
+	<script src="../../../js-webshim/minified/polyfiller.js"></script>
 	
 	<!-- jQM: make some small style adjustments -->
 	<style>
@@ -88,11 +88,12 @@
 			});
 		})();
 		
+		//jQM: set wsdoc to active page or false
+		webshims.setOptions('wsdoc', $('.ui-page-active').updatePolyfill().get(0) || false);
 		
-		
-		
-		//jQM: update polyfills on pageinit
+		//jQM: update polyfills on pageinit and change active page
 		$(document).on('pageinit', function(e){
+			webshims.setOptions('wsdoc', e.target);
 			$(e.target).updatePolyfill();
 		});
 		

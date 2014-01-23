@@ -101,6 +101,7 @@
 //			extendNative: false,
 			loadStyles: true,
 			disableShivMethods: true,
+			wsdoc: document,
 			wspopover: {appendTo: 'auto', hideOnBlur: true},
 			ajax: {},
 			loadScript: function(src, success, fail){
@@ -117,7 +118,7 @@
 		features: {},
 		featureList: [],
 		setOptions: function(name, opts){
-			if (typeof name == 'string' && opts !== undefined) {
+			if (typeof name == 'string' && arguments.length > 1) {
 				webCFG[name] = (!$.isPlainObject(opts)) ? opts : $.extend(true, webCFG[name] || {}, opts);
 			} else if (typeof name == 'object') {
 				$.extend(true, webCFG, name);
@@ -723,8 +724,8 @@
 				};
 				readyFns.push(readyFn);
 
-				if(!webCFG.noDocumentInit){
-					readyFn(document, emptyJ);
+				if(webCFG.wsdoc){
+					readyFn(webCFG.wsdoc, emptyJ);
 				}
 			},
 			triggerDomUpdate: function(context){
