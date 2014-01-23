@@ -9,7 +9,7 @@
 		<script>
 			window.asyncWebshims = {
 				cfg: {
-					basePath: "../../src/shims/",
+					testData: 'test6',
 					waitReady: false,
 					forms: {
 						customMessages: true
@@ -26,9 +26,9 @@
 			(function(){
 				var webshimsReady = false;
 				webshimsReady = !!($.webshims);
-				$.webshims.ready('forms-ext geolocation', function(){
+				webshims.ready('forms-ext geolocation', function(){
 					setTimeout(function(){
-						(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, $.webshims.cfg.extendNative);
+						(window.opener || window.parent).loadingTest($.webshims.cfg.testData, $.webshims.cfg.extendNative);
 					}, 1);
 				});
 			})();

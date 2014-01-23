@@ -9,7 +9,7 @@
 		<script>
 			window.asyncWebshims = {
 				cfg: {
-					basePath: "../../src/shims/",
+					testData: 'test5',
 					extendNative: false,
 					waitReady: false,
 					forms: {
@@ -30,7 +30,7 @@
 					
 					$.webshims.ready('forms-ext geolocation', function(){
 						setTimeout(function(){
-							(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, webshimsReady);
+							(window.opener || window.parent).loadingTest($.webshims.cfg.testData, webshimsReady);
 						}, 1);
 					});
 				});

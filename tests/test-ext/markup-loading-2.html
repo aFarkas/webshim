@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>Webshims Lib Test Suite</title>
-		<script data-polyfill-cfg='{"extendNative": false, "basePath": "../../src/shims/"}' src="../../src/extras/modernizr-custom.js"></script>
+		<script data-polyfill-cfg='{"extendNative": false, "testData": "markup2"}' src="../../src/extras/modernizr-custom.js"></script>
 		<script src="yepnope.js"></script>
 		<script data-polyfill="canvas details forms">
 			yepnope([ { 
@@ -12,7 +12,7 @@
 				complete: function(){
 					$.webshims.ready('forms', function(){
 						setTimeout(function(){
-							(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, $.webshims.cfg.extendNative);
+							(window.opener || window.parent).loadingTest($.webshims.cfg.testData, $.webshims.cfg.extendNative);
 						}, 400);
 					});
 					$.webshims.ready('mediaelement', function(){

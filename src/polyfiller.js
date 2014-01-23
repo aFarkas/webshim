@@ -1,5 +1,7 @@
 (function (factory) {
-	var scripts;
+	if (typeof WSDEBUG === 'undefined') {
+		window.WSDEBUG = true;
+	}
 	var addAsync = function(){
 		if(!window.asyncWebshims){
 			window.asyncWebshims = {
@@ -14,7 +16,7 @@
 			factory = function(){return window.webshims;};
 		}
 	};
-	var path = (document.currentScript || {}).src;
+	
 	
 	window.webshims = {
 		setOptions: function(){
@@ -38,23 +40,34 @@
 	window.webshim = window.webshims;
 	window.webshims.timer = setInterval(start, 0);
 
-	if(!path){
-		try {
-			path();
-		} catch(e) {
-			path = (e.stack || '').replace(/^[\@\sat]+/, '');
+	
+	(function(){
+		var scripts, i;
+		var path = document.currentScript;
+		if(WSDEBUG){
+			path = '';
 		}
-	}
-	if(!path){
-		scripts = document.scripts || document.getElementsByTagName('script');
-		for(var i = 0; i < scripts.length; i++){
-			if(scripts[i].readyState == 'interactive'){
-				path = scripts[i];
-				break;
+		if(!path){
+			try {
+				throw(new Error(''));
+			} catch(e) {
+				path = (e.stack || e.sourceURL || '').split('\n');
+				path = (path[path.length - 1] || path[path.length - 2] || '').replace(/^[\@\sat]+/, '');
 			}
 		}
-	}
-	window.webshims.path = path || '';
+		
+		if(!path){
+			scripts = document.scripts || document.getElementsByTagName('script');
+			for(i = 0; i < scripts.length; i++){
+				if(scripts[i].readyState == 'interactive'){
+					path = scripts[i];
+					break;
+				}
+			}
+		}
+		window.webshims.path = path || '';
+	})();
+	
 
 	start();
 
@@ -63,9 +76,6 @@
 	}
 }(function($){
 	"use strict";
-	if (typeof WSDEBUG === 'undefined') {
-		window.WSDEBUG = true;
-	}
 	var firstRun;
 	var webshims = window.webshims;
 	var DOMSUPPORT = 'dom-support';

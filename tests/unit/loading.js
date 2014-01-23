@@ -21,7 +21,6 @@
 		$('#image-target').attr('src', 'test-ext/require-loading-3.html');
 		stop();
 		addTest = function(){
-			equals(results[0], '../../src/shims/');
 			strictEqual(results[1], false);
 		};
 		
@@ -36,7 +35,7 @@
 		$('#image-target').attr('src', 'test-ext/require-loading-4.html');
 		stop();
 		addTest = function(){
-			equals(results[0], '../../src/shims/');
+			equals(results[0], 'test4');
 		};
 		
 		setTimeout(function(){
@@ -49,7 +48,7 @@
 		$('#image-target').attr('src', 'test-ext/require-loading-5.html');
 		stop();
 		addTest = function(){
-			equals(results[0], '../../src/shims/');
+			equals(results[0], 'test5');
 		};
 		
 		setTimeout(function(){
@@ -63,7 +62,7 @@
 		$('#image-target').attr('src', 'test-ext/require-loading-6.html');
 		stop();
 		addTest = function(){
-			equals(results[0], '../../src/shims/');
+			equals(results[0], 'test6');
 //			equals(results[1], true);
 		};
 		
@@ -76,7 +75,7 @@
 		$('#image-target').attr('src', 'test-ext/markup-loading-1.html');
 		stop();
 		addTest = function(){
-			equals(results[0], '../../src/shims/', 'shims folder set correctly');
+			equals(results[0], 'markup1', 'shims folder set correctly');
 			strictEqual(results[1], false, 'cfg is set correctly');
 		};
 		
@@ -89,7 +88,7 @@
 		$('#image-target').attr('src', 'test-ext/markup-loading-2.html');
 		stop();
 		addTest = function(){
-			equals(results[0], '../../src/shims/');
+			equals(results[0], 'markup2');
 			strictEqual(results[1], false);
 		};
 		

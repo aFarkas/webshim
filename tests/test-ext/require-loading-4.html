@@ -12,7 +12,7 @@
 			});
 			window.asyncWebshims = {
 				cfg: {
-					basePath: "../../src/shims/",
+					testData: 'test4',
 					waitReady: false,
 					forms: {
 						customMessages: true
@@ -24,8 +24,8 @@
 				var requireCallback = false;
 				require( ["polyfiller"], function(e){
 					requireCallback = true;
-					$.webshims.ready('forms-ext', function(){
-						(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, $.webshims.cfg.extendNative);
+					webshims.ready('forms-ext', function(){
+						(window.opener || window.parent).loadingTest($.webshims.cfg.testData);
 					});
 				});
 				
