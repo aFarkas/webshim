@@ -548,7 +548,7 @@ progress {
 	}
 	
 	&[data-position],
-	.ws-replaceui & {
+	&.ws-style {
 	
 		@include progress {
 			border: 1px solid #ddd;

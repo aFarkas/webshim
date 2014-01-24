@@ -14,7 +14,7 @@
 			(function(){
 				var src = (Object.defineProperty && window.addEventListener) ?
 					'http://code.jquery.com/jquery-2.0.3.min.js' :
-					'http://code.jquery.com/jquery-1.10.1.min.js'
+					'http://code.jquery.com/jquery-1.10.2.min.js'
 				;
 				
 				document.write('<script src="'+ src +'"><\/script>');
@@ -50,7 +50,7 @@
 					<div class="panel-heading">Configurator</div>
 					<div class="panel-body">
 						<div class="col-md-12">
-							<p>Configure your input widget to your needs. Tip set check inlinePicker option and watch changes.</p>
+							<p>Configure your input widget to your needs.</p>
 						</div>
 						<div class="col-md-6">
 							<div class="panel panel-primary">
@@ -150,7 +150,8 @@
 													<input type="number" min="0" max="20" id="toFixed" name="toFixed" class="form-control" />
 												</div>
 												<div class="col-sm-4">
-
+													<label for="stepfactor" class="form-label">stepfactor</label>
+													<input type="number" min="1" id="stepfactor" name="stepfactor" class="form-control" />
 												</div>
 											</div>
 												

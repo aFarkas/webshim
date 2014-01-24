@@ -211,12 +211,13 @@
 			var step = val == 'any' ? 'any' : retDefault(val, 1);
 			
 			if(o.stepping){
-				if(step != 'any' && o.stepping % step){
-					webshims.error('wrong stepping value for type range:'+ (o.stepping % step));
-				} else {
-					step = o.stepping;
-				}
+				webshims.error('stepping was removed. Use stepfactor instead.');
 			}
+
+			if(o.stepfactor && step != 'any'){
+				step *= o.stepfactor;
+			}
+
 			o.step = step;
 			this.value(this.options.value);
 		},
@@ -598,7 +599,8 @@
 	if(window.webshims && webshims.isReady){
 		webshims.isReady('range-ui', true);
 	}
-})(window.webshims ? webshims.$ : jQuery);;webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
+})(window.webshims ? webshims.$ : jQuery);
+;webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var curCfg;
 	var formcfg = webshims.formcfg;

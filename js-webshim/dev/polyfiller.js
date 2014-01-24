@@ -38,23 +38,37 @@
 		},
 		_curScript: (function(){
 			var scripts, i, scriptUrl;
+			//modern browsers: Chrome 29+, Firefox 4+
 			var currentScript = document.currentScript;
+
+			//in debug mode remove result to fully test fallback in all browsers
 			if(WSDEBUG){
-				currentScript = '';
+				currentScript = false;
 			}
 			if (!currentScript) {
+				//error trick: works in Safari, Chrome, Firefox, IE 10+
+				//idea found here: https://github.com/samyk/jiagra/
 				try {
 					throw(new Error(''));
 				} catch (e) {
+					//Safari has sourceURL
 					scriptUrl = (e.sourceURL || e.stack || '').split('\n');
-					scriptUrl = ((scriptUrl[scriptUrl.length - 1] || scriptUrl[scriptUrl.length - 2] || '').match(/(?:file|http|https)(.)+/i) || [''])[0].replace(/[\:\s]+[\d\:]+$/, '');
+					//extract scriptUrl from stack: this is dangerous! All browsers have different string patterns (pattern can even vary between different browser versions). Help to make it bulletproof!!!
+					scriptUrl = ((scriptUrl[scriptUrl.length - 1] || scriptUrl[scriptUrl.length - 2] || '').match(/(?:fil|htt|wid|abo|app|res)(.)+/i) || [''])[0].replace(/[\:\s\(]+[\d\:\)\(\s]+$/, '');
 				}
+
+
 				scripts = document.scripts || document.getElementsByTagName('script');
 
+				//get script by URL or by readyState == 'interactive' (readySate is supported in IE10-)
+				//if this fails the last found script is set to the currentScript, which is
 				for (i = 0; i < scripts.length; i++) {
 					if(scripts[i].getAttribute('src')){
 						currentScript = scripts[i];
 						if (scripts[i].readyState == 'interactive' || scriptUrl == scripts[i].src) {
+							if(WSDEBUG){
+								currentScript.wsFoundCurrent = true;
+							}
 							break;
 						}
 					}
@@ -643,6 +657,12 @@
 			}
 		};
 	});
+
+	if(WSDEBUG){
+		if(!webshims._curScript.wsFoundCurrent){
+			webshims.error('Could not detect currentScript! Use basePath to set script path.');
+		}
+	}
 	
 	/*
 	 * jQuery-plugins for triggering dom updates can be also very usefull in conjunction with non-HTML5 DOM-Changes (AJAX)

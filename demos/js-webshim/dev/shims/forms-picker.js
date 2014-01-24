@@ -587,8 +587,12 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 								mouseDownInit();
 							}
 							var ret = false;
+
 							if (!factor) {
 								factor = 1;
+							}
+							if(o.stepfactor){
+								factor *= o.stepfactor;
 							}
 							try {
 								that.elemHelper[name](factor);

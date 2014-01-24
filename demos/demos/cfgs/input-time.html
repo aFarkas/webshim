@@ -98,7 +98,11 @@
 													<input type="time" class="form-control" name="max" id="max" data-dependent-validation='{"from": "min", "prop": "min"}' />
 												</div>
 												<div class="form-group">
-													<div class="col-sm-12">
+													<div class="col-sm-6">
+														<label for="step" class="control-label">step</label>
+														<input type="number" min="0" class="form-control" name="step" id="step" />
+													</div>
+													<div class="col-sm-6">
 														<label for="defaultValue" class="control-label">defaultValue</label>
 														<input type="time" class="form-control" name="value" id="defaultValue" />
 													</div>
@@ -153,7 +157,13 @@
 											
 										<fieldset data-method="data" data-name="time">
 											<legend>Config properties / data-time attribute</legend>
-											
+
+											<div class="form-group">
+												<div class="col-sm-4">
+													<label for="stepfactor" class="form-label">stepfactor</label>
+													<input type="number" min="1" id="stepfactor" name="stepfactor" class="form-control" />
+												</div>
+											</div>
 											<div class="form-group col-sm-12">
 												<div class="checkbox">
 													<label>

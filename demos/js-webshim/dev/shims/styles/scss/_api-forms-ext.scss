@@ -76,6 +76,11 @@ $btnapis: hide-spinbtns hide-dropdownbtn hide-inputbtns inputbtns-outside a11yhi
 	.input-buttons > .step-controls {
 		display: none;
 	}
+
+    &::-webkit-inner-spin-button,
+    ::-webkit-inner-spin-button {
+      display: none;
+    }
 }
 
 %hide-dropdownbtn {
@@ -90,6 +95,11 @@ $btnapis: hide-spinbtns hide-dropdownbtn hide-inputbtns inputbtns-outside a11yhi
 	.input-buttons {
 		display: none;
 	}
+
+    &::-webkit-inner-spin-button,
+    ::-webkit-inner-spin-button {
+      display: none;
+    }
 }
 
 %a11yhide-inputbtns {
