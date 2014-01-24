@@ -5,6 +5,7 @@
 		<title>Webshims Lib Test Suite</title>
 		<script src="require.js"></script>
 		<script src="../../src/extras/modernizr-custom.js"></script>
+		<script src="empty-2.js" async=""></script>
 		<script>
 			require.config({
 				baseUrl: "../../src/",
@@ -29,7 +30,7 @@
 				var requireCallback = false;
 				require( ["jquery", "polyfiller"], function(e){
 					requireCallback = true;
-					$.webshims.ready('forms mediaelement', function(){
+					webshims.ready('forms mediaelement', function(){
 						(window.opener || window.parent).loadingTest($.webshims.cfg.basePath, $.webshims.cfg.extendNative);
 					});
 				});

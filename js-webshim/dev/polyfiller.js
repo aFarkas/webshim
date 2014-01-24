@@ -113,7 +113,7 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.12.1-pre',
+		version: '1.12.1-RC1',
 		cfg: {
 			
 			//addCacheBuster: false,

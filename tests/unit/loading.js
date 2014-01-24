@@ -21,6 +21,8 @@
 		$('#image-target').attr('src', 'test-ext/require-loading-3.html');
 		stop();
 		addTest = function(){
+			
+			strictEqual(results[0], "../../src/shims/");
 			strictEqual(results[1], false);
 		};
 		
