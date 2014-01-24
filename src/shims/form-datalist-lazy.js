@@ -1,6 +1,6 @@
 webshims.register('form-datalist-lazy', function($, webshims, window, document, undefined, options){
 	
-	var listidIndex = 0;
+	var optionID = 0;
 	var formsCFG = $.webshims.cfg.forms;
 	var globStoredOptions = {};
 	var getStoredOptions = function(name){
@@ -46,6 +46,9 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 					if(that._stopMouseOver && e && e.type == 'mouseenter'){return;}
 					var items = $('li:not(.hidden-item)', that.shadowList);
 					var select = (e.type == 'mousedown' || e.type == 'click');
+					if(select && $(opts.input).getNativeElement().triggerHandler('beforeselect', [$(e.currentTarget).find('.option-value').text()]) === false){
+						return (e.type != 'mousedown');
+					}
 					that.markItem(items.index(e.currentTarget), select, items);
 					if(e.type == 'click'){
 						that.hideList();
@@ -77,8 +80,10 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 						var keyCode = e.keyCode;
 						var activeItem;
 						var items;
+						var doValue = that.options.noInlineValue ? 'onlyScroll' : true;
+
 						if(keyCode == 40 && !that.showList()){
-							that.markItem(that.index + 1, true);
+							that.markItem(that.index + 1, doValue);
 							return false;
 						}
 						
@@ -86,11 +91,11 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 						
 						 
 						if(keyCode == 38){
-							that.markItem(that.index - 1, true);
+							that.markItem(that.index - 1, doValue);
 							return false;
 						} 
 						if(!e.shiftKey && (keyCode == 33 || keyCode == 36)){
-							that.markItem(0, true);
+							that.markItem(0, doValue);
 							return false;
 						} 
 						if(!e.shiftKey && (keyCode == 34 || keyCode == 35)){
@@ -104,7 +109,10 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 									$.prop(opts.input, 'selectionStart', $.prop(opts.input, 'value').length);
 								}
 								activeItem = $('li.active-item:not(.hidden-item)', that.shadowList);
-								that.changeValue( $('li.active-item:not(.hidden-item)', that.shadowList) );
+								if($(opts.input).getNativeElement().triggerHandler('beforeselect', [activeItem.find('.option-value').text()]) === false){
+									return;
+								}
+								that.changeValue( activeItem );
 							}
 							that.hideList();
 							if(formsCFG.customDatalist && activeItem && activeItem[0]){
@@ -169,14 +177,13 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			this.lastUnfoundValue = '';
 
 			if(!this.updateTimer){
-				if(window.QUnit || (forceShow = ($(that.input).is(':focus') && ($(that.input).hasClass('list-focus') || $.prop(that.input, 'value'))) )){
+				if(window.QUnit || (forceShow = ($(that.input).is(':focus') && (that.options.focus || $.prop(that.input, 'value'))) )){
 					that.updateListOptions(forceShow);
 				} else {
 					that.updateTimer = setTimeout(function(){
 						that.updateListOptions();
 						that = null;
-						listidIndex = 1;
-					}, 200 + (100 * listidIndex));
+					}, 200);
 				}
 			}
 		},
@@ -184,11 +191,18 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			this.options = webshims.getOptions(this.input, 'list', options.list);
 			
 			if($(this.input).prop('multiple')){
-				if(!$(this.input).prop('type') == 'email'){
-					webshims.warn('multiple only used on email and file type');
+				if($(this.input).prop('type') != 'email'){
+					webshims.warn('multiple only used on email and file type. Use data-list-multiple instead.');
+				} else {
+					this.options.multiple = true;
 				}
-				this.options.multiple = true;
 			}
+
+			if(this.options.noInlineValue && !this.options.valueCompletion){
+				$.attr(this.input, 'aria-autocomplete', 'list');
+				$.attr(this.input, 'aria-expanded', 'false');
+			}
+
 			
 			if( this.options.getOptionContent && !$.isFunction(this.options.getOptionContent) ){
 				this.options.getOptionContent = false;	
@@ -237,13 +251,13 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			
 			for(rI = 0, rLen = allOptions.length; rI < rLen; rI++){
 				item = allOptions[rI];
-				list[rI] = '<li class="'+ item.className +'" tabindex="-1" role="listitem">'+ this.getOptionContent(item) +'</li>';
+				list[rI] = '<li class="'+ item.className +'" tabindex="-1" role="listitem" id="wsoption-'+ (optionID++) +'">'+ this.getOptionContent(item) +'</li>';
 			}
 			
 			this.arrayOptions = allOptions;
-			this.popover.contentElement.html('<div class="datalist-box"><ul role="list">'+ list.join("\n") +'</ul></div>');
+			this.popover.contentElement.html('<div class="datalist-box"><ul role="listbox">'+ list.join("\n") +'</ul></div>');
 			
-			$(this.input).triggerHandler('datalistcreated', [{instance: this}]);
+			$(this.input).removeAttr('aria-activedescendant').triggerHandler('datalistcreated', [{instance: this}]);
 			
 			if(_forceShow || this.popover.isVisible){
 				this.showHideOptions();
@@ -379,6 +393,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 				this.lastUnfoundValue = value;
 				this.hideList();
 			} else {
+				$(this.input).removeAttr('aria-activedescendant');
 				this.setCompletedValue(inputValue, firstFoundValue, value);
 				this.lastUnfoundValue = false;
 			}
@@ -416,14 +431,19 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			
 			that.shadowList.find('li.active-item').removeClass('active-item');
 			that.popover.show(this.input);
-			
+			$(this.input)
+				.attr({'aria-expanded': 'true'})
+			;
 			
 			return true;
 		},
 		hideList: function(){
 			if(!this.popover.isVisible){return false;}
 			var that = this;
-			
+			$(this.input)
+				.attr({'aria-expanded': 'false'})
+				.removeAttr('aria-activedescendant')
+			;
 			
 			this.popover.hide();
 			that.shadowList.removeClass('datalist-visible list-item-active');
@@ -492,9 +512,13 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			items.removeClass('active-item');
 			this.shadowList.addClass('list-item-active');
 			activeItem = items.filter(':eq('+ index +')').addClass('active-item');
-			
+
 			if(doValue){
-				this.changeValue(activeItem);
+				if(doValue != 'onlyScroll'){
+					this.changeValue(activeItem);
+				} else {
+					$(this.input).attr('aria-activedescendant', activeItem.prop('id'));
+				}
 				this.scrollIntoView(activeItem);
 			}
 			this.index = index;
