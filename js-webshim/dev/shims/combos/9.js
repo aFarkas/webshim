@@ -3753,9 +3753,13 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				lazyLoad('WINDOWLOAD');
 				
 				if(webshims.isReady('form-datalist-lazy')){
-					setTimeout(function(){
+					if(window.QUnit){
 						that._lazyCreate(opts);
-					}, 9);
+					} else {
+						setTimeout(function(){
+							that._lazyCreate(opts);
+						}, 9);
+					}
 				} else {
 					$(opts.input).one('focus', lazyLoad);
 					webshims.ready('form-datalist-lazy', function(){

@@ -47,7 +47,7 @@
 					throw(new Error(''));
 				} catch (e) {
 					scriptUrl = (e.sourceURL || e.stack || '').split('\n');
-					scriptUrl = ((scriptUrl[scriptUrl.length - 1] || scriptUrl[scriptUrl.length - 2] || '').match(/(?:file|http|https)(.)+/i) || [])[0].replace(/[\:\s]+[\d\:]+$/, '');
+					scriptUrl = ((scriptUrl[scriptUrl.length - 1] || scriptUrl[scriptUrl.length - 2] || '').match(/(?:file|http|https)(.)+/i) || [''])[0].replace(/[\:\s]+[\d\:]+$/, '');
 				}
 				scripts = document.scripts || document.getElementsByTagName('script');
 

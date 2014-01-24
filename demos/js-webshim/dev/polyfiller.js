@@ -35,40 +35,39 @@
 		polyfill: function(features){
 			addAsync();
 			window.asyncWebshims.polyfill = features;
-		}
-	};
-	window.webshim = window.webshims;
-	window.webshims.timer = setInterval(start, 0);
-
-	
-	(function(){
-		var scripts, i;
-		var path = document.currentScript;
-		if(WSDEBUG){
-			path = '';
-		}
-		if(!path){
-			try {
-				throw(new Error(''));
-			} catch(e) {
-				path = (e.stack || e.sourceURL || '').split('\n');
-				path = (path[path.length - 1] || path[path.length - 2] || '').replace(/^[\@\sat]+/, '');
+		},
+		_curScript: (function(){
+			var scripts, i, scriptUrl;
+			var currentScript = document.currentScript;
+			if(WSDEBUG){
+				currentScript = '';
 			}
-		}
-		
-		if(!path){
-			scripts = document.scripts || document.getElementsByTagName('script');
-			for(i = 0; i < scripts.length; i++){
-				if(scripts[i].readyState == 'interactive'){
-					path = scripts[i];
-					break;
+			if (!currentScript) {
+				try {
+					throw(new Error(''));
+				} catch (e) {
+					scriptUrl = (e.sourceURL || e.stack || '').split('\n');
+					scriptUrl = ((scriptUrl[scriptUrl.length - 1] || scriptUrl[scriptUrl.length - 2] || '').match(/(?:file|http|https)(.)+/i) || [''])[0].replace(/[\:\s]+[\d\:]+$/, '');
+				}
+				scripts = document.scripts || document.getElementsByTagName('script');
+
+				for (i = 0; i < scripts.length; i++) {
+					if(scripts[i].getAttribute('src')){
+						currentScript = scripts[i];
+						if (scripts[i].readyState == 'interactive' || scriptUrl == scripts[i].src) {
+							break;
+						}
+					}
 				}
 			}
-		}
-		window.webshims.path = path || '';
-	})();
-	
 
+			return currentScript;
+		})()
+	};
+	window.webshim = window.webshims;
+
+
+	window.webshims.timer = setInterval(start, 0);
 	start();
 
 	if (typeof define === 'function' && define.amd && define.amd.jQuery) {
@@ -76,7 +75,7 @@
 	}
 }(function($){
 	"use strict";
-	var firstRun;
+	var firstRun, path;
 	var webshims = window.webshims;
 	var DOMSUPPORT = 'dom-support';
 	var special = $.event.special;
@@ -97,10 +96,8 @@
 	
 	clearInterval(webshims.timer);
 
-	if(typeof webshims.path == 'object'){
-		webshims.path = ($.support.hrefNormalized === false) ? webshims.path.getAttribute("src", 4) : webshims.path.src;
-	}
-	webshims.path = webshims.path.split('?')[0].slice(0, webshims.path.lastIndexOf("/") + 1) + 'shims/';
+	path = ($.support.hrefNormalized === false) ? webshims._curScript.getAttribute("src", 4) : webshims._curScript.src;
+	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
 		version: '1.12.1-pre',
@@ -118,7 +115,7 @@
 				$.ajax($.extend({}, webCFG.ajax, {url: src, success: success, dataType: 'script', cache: true, global: false, dataFilter: addSource}));
 			},
 			
-			basePath: webshims.path
+			basePath: path
 		},
 		bugs: {},
 		/*
