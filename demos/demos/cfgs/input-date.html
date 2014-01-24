@@ -88,12 +88,7 @@
 								
 										<fieldset data-method="attr">
 											<legend>$.prop/$.attr</legend>
-											<div class="form-group">
-												<div class="col-sm-12">
-													<label for="defaultValue" class="control-label">defaultValue</label>
-													<input type="date" class="form-control" name="value" id="defaultValue" />
-												</div>
-											</div>
+
 											<div class="form-group">
 												<div class="col-sm-6">
 													<label for="min" class="control-label">min</label>
@@ -104,7 +99,12 @@
 													<input type="date" class="form-control" name="max" id="max" data-dependent-validation='{"from": "min", "prop": "min"}' />
 												</div>
 											</div>
-											
+											<div class="form-group">
+												<div class="col-sm-12">
+													<label for="defaultValue" class="control-label">defaultValue</label>
+													<input type="date" class="form-control" name="value" id="defaultValue" />
+												</div>
+											</div>
 											<div class="form-group">
 												<div class="col-sm-6">
 													<label class="form-label" for="list">
@@ -156,19 +156,36 @@
 											<legend>Config properties / data-date attribute</legend>
 											
 											<div class="form-group">
-												<div class="col-sm-4">
+												<div class="col-sm-6">
 													<label for="startView" class="form-label">startView</label>
 													<input type="number" min="0" max="2" value="0" id="startView" name="startView" class="form-control" />
 												</div>
-												<div class="col-sm-4">
+												<div class="col-sm-6">
 													<label for="minView" class="form-label">minView</label>
 													<input type="number" min="0" max="2" value="0" id="minView" name="minView" class="form-control" />
 												</div>
+											</div>
+											<div class="form-group">
 												<div class="col-sm-4">
 													<label for="size" class="form-label">size</label>
 													<input type="number" min="1" max="3" value="1" id="size" name="size" class="form-control" />
 												</div>
+												<div class="col-sm-8">
+													<label for="startValue" class="form-label">startValue (only used if value is empty)</label>
+													<input type="date" id="startValue" name="startValue" class="form-control" />
+												</div>
 											</div>
+											<div class="form-group">
+												<div class="col-sm-4">
+													<label for="useDecadeBase" class="form-label">useDecadeBase</label>
+													<select class="form-control" id="useDecadeBase" name="useDecadeBase">
+														<option value="0" selected="">0</option>
+														<option value="max">max (only with max option)</option>
+														<option value="min">min (only with min option)</option>
+													</select>
+												</div>
+											</div>
+
 												
 											<div class="form-group col-sm-12">
 												<div class="checkbox">
@@ -230,7 +247,7 @@
 												<div class="col-sm-12">
 													<label for="monthNames" class="form-label">monthNames (only with monthSelect checked)</label>
 													<select data-needs="monthSelect" name="monthNames" id="monthNames" class="form-control">
-														<option>monthNamesShort</option>
+														<option selected="">monthNamesShort</option>
 														<option>monthDigits</option>
 														<option>monthNames</option>
 													</select>

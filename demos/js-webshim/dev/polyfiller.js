@@ -57,7 +57,6 @@
 					scriptUrl = ((scriptUrl[scriptUrl.length - 1] || scriptUrl[scriptUrl.length - 2] || '').match(/(?:fil|htt|wid|abo|app|res)(.)+/i) || [''])[0].replace(/[\:\s\(]+[\d\:\)\(\s]+$/, '');
 				}
 
-
 				scripts = document.scripts || document.getElementsByTagName('script');
 
 				//get script by URL or by readyState == 'interactive' (readySate is supported in IE10-)

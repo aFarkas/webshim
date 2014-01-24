@@ -151,6 +151,10 @@ webshims.register('form-validators', function($, webshims, window, document, und
 	
 	addCustomValidityRule('tooShort', function(elem, val, data){
 		if(!val || !data.minlength){return;}
+
+		if($.nodeName(elem, 'input')){
+			webshims.warn('depreacated data-minlength usage: Use pattern=".{'+ data.minlength +'3,}" instead.');
+		}
 		return data.minlength > val.length;
 	}, 'Entered value is too short.');
 	

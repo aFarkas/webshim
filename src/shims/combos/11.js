@@ -1496,11 +1496,14 @@
 					this.inputElements.attr('inputmode', 'numeric');
 				}
 				
-				
-				
 				if((!o.max && typeof o.relMax == 'number') || (!o.min && typeof o.relMin == 'number')){
-					webshims.error('relMax/relMin are not supported anymore')
+					webshims.error('relMax/relMin are not supported anymore calculate at set it your own.');
 				}
+
+				if(this.options.relDefaultValue){
+					webshims.warn('relDefaultValue was removed use startValue instead!');
+				}
+
 				this._init = true;
 			},
 			createOpts: ['step', 'min', 'max', 'readonly', 'title', 'disabled', 'tabindex', 'placeholder', 'defaultValue', 'value', 'required'],
@@ -1511,17 +1514,9 @@
 					this.inputElements = $(create.elements).prependTo(this.element).filter('input, select');
 				}
 			},
-			
-			getRelNumber: function(rel){
-				var start = steps[this.type].start || 0;
-				if(rel){
-					start += rel;
-				}
-				return start;
-			},
 			addZero: addZero,
 			_setStartInRange: function(){
-				var start = this.getRelNumber(this.options.relDefaultValue);
+				var start = this.options.startValue && this.asNumber( this.options.startValue ) || steps[this.type].start || 0;
 				if(!isNaN(this.minAsNumber) && start < this.minAsNumber){
 					start = this.minAsNumber;
 				} else if(!isNaN(this.maxAsNumber) && start > this.maxAsNumber){

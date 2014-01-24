@@ -466,8 +466,6 @@ input[type="color"] {
   .input-picker.time-popover .ws-super-prev,
   .input-picker.time-popover .ws-super-next {
     display: none; }
-  .input-picker.ws-size-1 {
-    max-width: 100%; }
   .input-picker.ws-size-2 {
     width: 49.61538em; }
   .input-picker.ws-size-3 {

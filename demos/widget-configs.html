@@ -81,13 +81,47 @@
 					}
 				}
 			});
-			webshims.polyfill('forms');
+			webshims.polyfill('forms forms-ext');
 
 		</script>
 		<style>
 		</style>
 	</head>
 	<body>
+	<div class="row example-2">
+		<h2>2. use internals</h2>
+
+		<div class="calendar">
+			<label for="calendar2">calendar</label>
+			<input id="calendar2" class="inline-calendar show-selectnav" type="date" data-date-inline-picker="true" />
+		</div>
+		<hr />
+		<div class="picker">
+			<label for="picker2">datepicker</label>
+			<input type="date" id="picker2" data-date-restart-view="true" data-date-start-view="2" />
+		</div>
+	</div>
+	<script>
+		$('.example-2').each(function () {
+			var module = $(this);
+			var onChange = function () {
+				var value = $(this).prop('value');
+				var widget = $('.picker input[type="date"]', module).getShadowElement().data('wsWidgetdate');
+				if (value && widget) {
+					widget.options.startValue = value;
+					widget._beforeValue(widget.options.value);
+				}
+			};
+			$('.calendar input[type="date"]', module)
+				.on('change', onChange)
+				.each(onChange)
+			;
+		});
+	</script>
+	<br><br><br><br><br><br>
+	<hr><br><br><br><br><br><br>
+	<hr><br><br><br><br><br><br>
+	<hr>
 	<form class="example ws-instantvalidation">
 		<fieldset>
 			<div class="form-row">

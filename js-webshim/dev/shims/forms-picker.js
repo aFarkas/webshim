@@ -936,7 +936,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		if(data.options.useDecadeBase == 'max' && max[0]){
 			xthCorrect = 11 - (max[0] % 12);
 		} else if(data.options.useDecadeBase == 'min' && min[0]){
-			xthCorrect = 11 - (min[0] % 12);
+			xthCorrect = 0 - (min[0] % 12);
 		}
 		
 		value = value[0] * 1;
