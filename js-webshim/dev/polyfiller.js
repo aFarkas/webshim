@@ -60,7 +60,7 @@
 				scripts = document.scripts || document.getElementsByTagName('script');
 
 				//get script by URL or by readyState == 'interactive' (readySate is supported in IE10-)
-				//if this fails the last found script is set to the currentScript, which is
+				//if this fails the last found script is set to the currentScript
 				for (i = 0; i < scripts.length; i++) {
 					if(scripts[i].getAttribute('src')){
 						currentScript = scripts[i];
@@ -113,7 +113,7 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.12.1-RC1',
+		version: '1.12.1',
 		cfg: {
 			
 			//addCacheBuster: false,

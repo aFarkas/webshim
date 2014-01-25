@@ -102,7 +102,7 @@
 			<h2 id="introduction" class="header">Introduction</h2>
 
 			<p>
-				Webshim's <code class="i">forms</code> feautre implements the hole constraint validation API (validity, checkValidity, setCustomValidity, required, pattern, novalidate ...) and some other really nice form features (output element, form-attribute, fieldset[disabled] [list]/datalist, setSelectionRange etc.) in incapable browsers. 
+				Webshim's <code class="i">forms</code> feature implements the hole constraint validation API (validity, checkValidity, setCustomValidity, required, pattern, novalidate ...) and some other really nice form features (output element, form-attribute, fieldset[disabled] [list]/datalist, setSelectionRange etc.) in incapable browsers.
 			</p>
 			<p>This document does not describe how to use those native/polyfilled features. It only describes the extensions build on top of it.</p>
 			
@@ -169,7 +169,7 @@ webshims.polyfill('forms');
 			<iframe class="fiddle-example" width="100%" height="350" src="http://jsfiddle.net/trixta/6ELuD/embedded/result,js,html" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 			
 			<h2 id="UI-Settings">Customizing UI/UX of form validation</h2>
-			<p>HTML5 constraint form validation implements a very simple UI for form validation. In most cases developers want to enhance this UI. Webshim implementation allows this by using all native form features (<code>noValidate</code> or preventing default behavior of the <code>invalid</code> event), but also gives some pre-build configuration options to implement clientside form validation with a very good user experience and great control over style and behavior.</p>
+			<p>HTML5 constraint form validation implements a very simple UI for form validation. In most cases developers want to enhance this UI. Webshim implementation allows this by using all native form features (<code>noValidate</code> or preventing default behavior of the <code>invalid</code> event), but also gives some pre-build configuration options to implement form validation with a very good user experience and great control over style and behavior.</p>
 			
 			<h3 id="UI-replaceValidationUI"><code class="i">replaceValidationUI</code> and <code class="i">.user-error</code>/<code class="i">.user-success</code></h3>
 			<p>With <code class="i">replaceValidationUI</code> set to true the validation bubble of the browser will be replaced with a webshims popover with the additional class <code>validity-alert</code>. Additionally all form fields can be styled using the classes <code>.user-error</code> and <code>.user-success</code></p>

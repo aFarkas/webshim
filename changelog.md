@@ -1,3 +1,17 @@
+Release 1.12.1
+----------
+
+- improved intelligent calculation of basePath (now works with async loaded and renamed polyfiller, too)
+- fixed regression in IE8 on input type date prev/next buttons (https://github.com/aFarkas/webshim/issues/340)
+- added tooFixed option for input type=number (a good base for a currency input [demo](http://afarkas.github.io/webshim/demos/demos/cfgs/input-number.html#min=0&step=0.01&stepfactor=1000&toFixed=2))
+- added predefined styling configurations for mutliple widgets ([range](http://afarkas.github.io/webshim/demos/demos/cfgs/input-range.html#&max=50&list=range-list&show-activelabeltooltip=on&show-tickvalues=on), [date](http://afarkas.github.io/webshim/demos/demos/cfgs/input-date.html#startView=2&splitInput=on&calculateWidth=on&show-week=on&hide-btnrow=on&hide-spinbtns=on&inputbtns-outside=on))
+- added yearSelect/monthSelect [and daySelect] option to type=month/date pickers ([month](http://afarkas.github.io/webshim/demos/demos/cfgs/input-month.html#yearSelect=on&monthSelect=on&placeholder=yyyy-mm&min=2014-02&max=2020-01&monthNames=monthNamesShort))
+- added noInlineValue to list/datalist ([demo](http://afarkas.github.io/webshim/demos/demos/cfgs/list-datalist.html#list=state-list&filter=^&highlight=on&noInlineValue=on))
+- improved descriptive errormessage markup
+- trigger invalid event on form element itself (only in polyfilled browsers)
+- new stepbase calculation using defaultValue if min isn't applied (only in polyfilled browsers)
+
+
 Release 1.12.0
 ----------
 

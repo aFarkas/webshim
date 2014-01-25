@@ -7,8 +7,7 @@
 	
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-	
-	<!-- jQM: add jQM *before* webshim's polyfiller.js -->
+
 	<script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
 	
 	<script src="../../demo-js/src/modernizr-special.js"></script>
@@ -58,9 +57,6 @@
 			//Modernizr.mq is not part of webshims' Modernizr build!
 			var assumeMobile = Modernizr.mq && (Modernizr.mq('(max-device-width: 768px)') || (Modernizr.touch && Modernizr.mq('(max-device-width: 124px)')));
 			
-			//jQM: set waitReady to false
-			webshims.setOptions('waitReady', false);
-			
 			webshims.setOptions('forms', {
 				//configure instantvalidation for jQuery mobile
 				iVal: {
@@ -87,6 +83,10 @@
 				}
 			});
 		})();
+
+
+		//jQM: set waitReady to false
+		webshims.setOptions('waitReady', false);
 		
 		//jQM: set wsdoc to active page or false
 		webshims.setOptions('wsdoc', $('.ui-page-active').updatePolyfill().get(0) || false);
@@ -98,8 +98,20 @@
 		});
 		
 		//load all polyfill features
-		//or load only a specific feature with $.webshims.polyfill('feature-name');
+		//or load only a specific feature with webshims.polyfill('feature-name');
 		webshims.polyfill('forms forms-ext');
+
+
+		/**
+		 * jQM and webshims explanation
+		 *
+		 * 1. The easiest way to get both libraries work friendly side by side is to make sure, that jQM enhances all form elements before webshims does.
+		 * 	  This is done by setting webshims.setOptions('waitReady', false); and calling webshims.polyfill after jQM was.
+		 * 2. JQM has the concept of pages while webshims normally works on the hole document. To make sure webshims is updating only the active page, the wsdoc option has to set
+		 * 3. JQM dynamically loads new content and creates new pages, the wsdoc has to changed on pageinit and updatePolyfill has to be called on this new page
+		 */
+
+
 	</script>
 	
 	<title>Webshims and jQuery Mobile</title>
@@ -115,7 +127,7 @@
 			
 		</div> 
 		<div data-role="content">
-			<p>Webshims and jQuery mobile do a lot of tricks with form elements, which can conflict with each other. This page demonstrates how both libaries can be combined. Please read the source code and watch out for comments marked with <code>JQM:</code>.</p>
+			<p>Webshims and jQuery mobile do a lot of tricks with form elements, which can conflict with each other. This page demonstrates how both libraries can be combined. Please read the source code and watch out for comments marked with <code>JQM:</code>.</p>
 			<form action="jquery-mobile.html" class="ws-validate">
 				<div data-role="fieldcontain">
 					<label for="textinput1">

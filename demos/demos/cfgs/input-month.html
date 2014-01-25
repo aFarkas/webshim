@@ -6,20 +6,13 @@
 		<meta http-equiv="X-UA-Compatible" content="chrome=1" />
 		<meta name="viewport" content="width=device-width">
 		<title>Webshim - foms widget configurator</title>
+
+		<script src="http://code.jquery.com/jquery-1.11.0.min.js" async=""></script>
+
 		<link rel="stylesheet" href="assets/config.css">
-		
-		
-		<link rel="stylesheet" href="../../css/prism.css" /> 
-		<script>
-			(function(){
-				var src = (Object.defineProperty && window.addEventListener) ?
-					'http://code.jquery.com/jquery-2.0.3.min.js' :
-					'http://code.jquery.com/jquery-1.10.1.min.js'
-				;
-				
-				document.write('<script src="'+ src +'"><\/script>');
-			})();
-		</script>
+
+		<link rel="stylesheet" href="../../css/prism.css" />
+
 		<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
 
 		<script src="../../../js-webshim/minified/polyfiller.js"></script>
@@ -382,10 +375,12 @@
 		<option value="2013-11" label="labeled Option (2013-11)"></option>
 	</select>
 </datalist>
-	<script src="assets/jquery.deserialize.js" async=""></script>
-	<script>
-		webshims.loader.loadScript("../../demo-js/demo.js", false, false, true);
-		webshims.loader.loadScript("assets/configurator.js", false, false, true);
-	</script>
+
+		<script>
+			webshims.ready('jquery', function(){
+				webshims.loader.loadScript("../../demo-js/demo.js", false, false, true);
+				webshims.loader.loadScript("assets/cfg.js", false, false, true);
+			});
+		</script>
 	</body>
 </html>

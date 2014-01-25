@@ -85,10 +85,8 @@ Webshims Lib uses many great third party scripts:
 | excanvas        | Apache License 2.0                           | http://excanvas.sourceforge.net                                               |
 | filereader      | MIT                                          | https://github.com/Jahdrien/FileReader                                        |
 | es5             | MIT                                          | https://github.com/280north/narwhal                                           |
-| json-storage    | MIT                                          | https://gist.github.com/remy/350433                                           |
 | swfmini         | MIT                                          | https://code.google.com/p/swfobject                                           |
 | track           | BSD 2 clause                                 | https://github.com/cgiffard/Captionator                                       |
-| form-validators | ???                                          | https://sites.google.com/site/abapexamples/javascript/luhn-validation         |
 | color-picker    | MIT                                          | http://johndyer.name/post/2007/09/PhotoShop-like-JavaScript-Color-Picker.aspx |
 | forms-picker    | MIT                                          | https://github.com/brandonaaron/jquery-mousewheel                             |
 

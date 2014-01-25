@@ -22,6 +22,10 @@ module.exports = function(grunt){
 			demo: {
 				src: ['demos/demo-js/src/prism.js', 'demos/demo-js/src/behavior.js'],
 				dest: 'demos/demo-js/demo.js'
+			},
+			cfgs: {
+				src: ['demos/demos/cfgs/assets/jquery.deserialize.js', 'demos/demos/cfgs/assets/configurator.js'],
+				dest: 'demos/demos/cfgs/assets/cfg.js'
 			}
 		},
 		//copy and uglify are changed through cfgcopymin
@@ -84,6 +88,11 @@ module.exports = function(grunt){
 			demo: {
 				src: 'demos/demo-js/demo.js',
 				dest: 'demos/demo-js/demo.js'
+			},
+
+			cfgs: {
+				src: 'demos/demos/cfgs/assets/cfg.js',
+				dest: 'demos/demos/cfgs/assets/cfg.js'
 			}
 		},
 		watch: {
@@ -101,7 +110,11 @@ module.exports = function(grunt){
 			},
 			demos: {
 				files: ['demos/demo-js/src/**/*.js'],
-				tasks: ['concat']
+				tasks: ['concat:demo']
+			},
+			cfgs: {
+				files: ['demos/demos/cfgs/assets/**/*.js'],
+				tasks: ['concat:cfgs']
 			}
 		}
 	});
