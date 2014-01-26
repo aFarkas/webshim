@@ -19,8 +19,7 @@ Features
 * HTML5 form features including: constraint validation and form widgets (input[type="range"], input[type="date"], input[type="number"], input[type="time"], input[type="month"], output, progress, input[list]/datalist)
 * HTML5 audio/video/track implementation
 * interactive elements: summary/details
-* JSON (stringify and parse)
-* localStorage/sessionStorage
+* filereader
 * geolocation
 * ECMAScript 5 / JavaScript 1.8.5 features 
 
@@ -35,9 +34,6 @@ Installation and Usage
 ```html
 <script src="js/jquery.js"></script>
 
-<!-- Simple change -->
-<script src="js-webshim/minified/extras/modernizr-custom.js"></script> 
-
 <!-- 'Use your own' variant -->
 <script src="js/Modernizr-custom.js"></script> 
 
@@ -45,10 +41,10 @@ Installation and Usage
 
 <script> 
 	// load and implement all unsupported features 
-	$.webshims.polyfill();
+	webshims.polyfill();
 		
 	// or only load a specific feature
-	//$.webshims.polyfill('geolocation json-storage');
+	//webshims.polyfill('forms es5');
 </script>
 ```
 
@@ -58,9 +54,10 @@ Installation and Usage
 ```html
 <script> 
 	$(function(){
-		// work with JSON and localStorage 
-		var userData = JSON.parse(localStorage.getItem('userData')) || {visits: 0};
-		$('#visits').html(userData.visits);
+		// work with the HTML5 API
+		$('input:invalid').each(function(){
+		    $(this).after( $.prop(this, 'validationMessage');
+		});
 		// ...
 	});
 </script>

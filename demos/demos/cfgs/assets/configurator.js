@@ -122,11 +122,17 @@ $(function($){
 	});
 	
 	$('form.input-widget').each(function(){
+		var lastState;
 		var form = $(this);
 		var type = form.data('type');
 		var createWidget = function(){
+			var curState = form.serialize();
 			var output = {};
 			var input = $('<input />');
+			if(curState === lastState){
+				return;
+			}
+			lastState = curState;
 			if(type){
 				input.attr('type', type);
 			}
@@ -190,7 +196,7 @@ $(function($){
 			output.attr.type = type;
 			$('#code').trigger('render', [output]);
 			if(location.replace){
-				location.replace('#'+ form.serialize());
+				location.replace('#'+ curState);
 			}
 		};
 		$('> fieldset', form).on('change input', (function(){

@@ -1,1 +1,100 @@
-webshims.register("mediaelement-native-fix",function(a,b,c,d){if(!Modernizr.videoBuffered){var e=function(a){var c=b.data(a,"mediaelementBuffered");return c||(c={buffered:{start:function(a){return a>=c.buffered.length?(b.error("buffered index size error"),void 0):0},end:function(a){return a>=c.buffered.length?(b.error("buffered index size error"),void 0):c.loaded},length:0},loaded:0},b.data(a,"mediaelementBuffered",c)),c},f=function(c){if(c=c.originalEvent,c&&"lengthComputable"in c){var d=b.data(c.target,"mediaelement");if((!d||"html5"==d.isActive)&&c.lengthComputable&&"loaded"in c){var f=c.target.duration,g=e(c.target);g.loaded=f?c.loaded/c.total*f:0,g.loaded&&(g.buffered.length=1),"load"==c.type&&a(c.target).triggerHandler("progress")}}},g=function(a){var b=e(a.target);b.buffered.length=0,b.loaded=0};["audio","video"].forEach(function(a){var c=b.defineNodeNameProperty(a,"buffered",{prop:{get:function(){var a=b.data(this,"mediaelement");return a&&"flash"==a.isActive&&c.prop._supget?(c.prop._supget.apply(this),void 0):e(this).buffered}}})}),function(){var a=d.createElement("video");if(!("preload"in a)&&"autobuffer"in a){var c={metadata:1,none:1};b.onNodeNamesPropertyModify(["audio","video"],["preload"],{set:function(a,d,e){c[a]||"removeAttr"==e?this.autobuffer=!1:"html5"==!(b.data(this,"mediaelement")||{}).isActive&&(this.autobuffer=!0)},initAttr:!0})}}(),b.addReady(function(b,c){a("video, audio",b).add(c.filter("video, audio")).on("load progress",f).on("emptied",g)})}});
+webshims.register('mediaelement-native-fix', function($, webshims, window, document, undefined){
+	if(Modernizr.videoBuffered){return;}
+	
+	var getBufferedData = function(elem){
+		var data = webshims.data(elem, 'mediaelementBuffered');
+		if(!data){
+			data = {
+				buffered: {
+					start: function(index){
+						if(index >= data.buffered.length){
+							webshims.error('buffered index size error');
+							return;
+						}
+						return 0;
+					},
+					end: function(index){
+						if(index >= data.buffered.length){
+							webshims.error('buffered index size error');
+							return;
+						}
+						return data.loaded;
+					},
+					length: 0
+				},
+				loaded: 0
+			};
+			webshims.data(elem, 'mediaelementBuffered', data);
+		}
+		return data;
+	};
+	
+	var loadProgessListener = function(e){
+		e = e.originalEvent;
+		if(!e || !('lengthComputable' in e)){return;}
+		var data = webshims.data(e.target, 'mediaelement');
+		if(data && data.isActive != 'html5'){return;}
+		if(e.lengthComputable && 'loaded' in e){
+			var duration = e.target.duration;
+			var bufferedData = getBufferedData(e.target);
+			bufferedData.loaded = (duration) ? e.loaded / e.total * duration : 0;
+			if(bufferedData.loaded){
+				bufferedData.buffered.length = 1;
+			}
+			if(e.type == 'load'){
+				$(e.target).triggerHandler('progress');
+			}
+		}
+	};
+	var removeProgress = function(e){
+		var data = getBufferedData(e.target);
+		data.buffered.length = 0;
+		data.loaded = 0;
+	};
+	
+	['audio', 'video'].forEach(function(nodeName){
+		var sup = webshims.defineNodeNameProperty(nodeName, 'buffered',  {
+			prop: {
+				get: function(){
+					var data = webshims.data(this, 'mediaelement');
+					
+					if(data && data.isActive == 'flash' && sup.prop._supget){
+						sup.prop._supget.apply(this);
+					} else {
+						return getBufferedData(this).buffered;
+					}
+				}
+			}
+		});
+	});
+	
+	(function(){
+		var videoElem = document.createElement('video');
+		if( !('preload' in videoElem) && ('autobuffer' in videoElem)){
+			var noBufferProps = {
+				metadata: 1,
+				none: 1
+			};
+			webshims.onNodeNamesPropertyModify(['audio', 'video'], ['preload'], {
+				set: function(value, boolValue, curType){
+					if(noBufferProps[value] || curType == 'removeAttr'){
+						this.autobuffer = false;
+					} else if( !(webshims.data(this, 'mediaelement') || {}).isActive == 'html5') {
+						this.autobuffer = true;
+					}
+				},
+				initAttr: true
+			});
+		}
+	})();
+	
+	webshims.addReady(function(context, insertedElement){
+		$('video, audio', context)
+			.add(insertedElement.filter('video, audio'))
+			.on('load progress', loadProgessListener)
+			.on('emptied', removeProgress)
+		;
+		
+	 });
+
+});

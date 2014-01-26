@@ -627,7 +627,6 @@
 		var curLang = navigator.browserLanguage || navigator.language || '';
 		onReady('webshimLocalization', function(){
 			webshims.activeLang(curLang);
-			
 		});
 		return function(lang){
 			if(lang){

@@ -624,10 +624,9 @@
 	
 
 	webshims.activeLang = (function(){
-		var curLang = navigator.browserLanguage || navigator.language || '';
+		var curLang = $('html').attr('lang') || navigator.browserLanguage || navigator.language || '';
 		onReady('webshimLocalization', function(){
 			webshims.activeLang(curLang);
-			
 		});
 		return function(lang){
 			if(lang){
