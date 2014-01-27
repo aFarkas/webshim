@@ -101,9 +101,7 @@
 
 			<h2 id="introduction" class="header">Introduction</h2>
 
-			<p>
-				Webshim's <code class="i">forms</code> feature implements the hole constraint validation API (validity, checkValidity, setCustomValidity, required, pattern, novalidate ...) and some other really nice form features (output element, form-attribute, fieldset[disabled] [list]/datalist, setSelectionRange etc.) in incapable browsers.
-			</p>
+			<p>Webshim's <code class="i">forms</code> feature implements the hole constraint validation API (validity, checkValidity, setCustomValidity, required, pattern, novalidate ...) and some other really nice form features (output and progress element, form-attribute, fieldset[disabled] [list]/datalist, setSelectionRange etc.) in incapable browsers.</p>
 			<p>This document does not describe how to use those native/polyfilled features. It only describes the extensions build on top of it.</p>
 			
 			<h2 id="Locale-Settings" class="header">Locale Settings</h2>
@@ -177,14 +175,14 @@ webshims.polyfill('forms');
 			
 			
 			<h3 id="UI-ival">Live form validation <code class="i">iVal</code></h3>
-			<p>The instant form validation feature of webshims is a simple to use but powerfull and UX enhanced feature. Simply put a <code class="i">ws-validate</code> class to your form element:</p>
+			<p>The instant form validation (<code class="i">iVal</code> = instant validation) feature of webshims is a simple to use but powerfull and UX enhanced feature. Simply put a <code class="i">ws-validate</code> class to your form element:</p>
 			<iframe class="fiddle-example" width="100%" height="200" src="http://jsfiddle.net/trixta/9859C/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 			<p>The instant validation feature can be controlled through the <code class="i">iVal</code> option object. The <code class="i">iVal</code> option has the following defaults.</p>
 <pre><code class="language-javascript">
 webshims.setOptions('forms', {
 	//instant validation options
 	iVal: {
-		//a simple selector of your form element
+		//a simple selector of your form element[s]
 		"sel": ".ws-validate", 
 		//wether webshim should show a bubble on invalid event: "hide" | true | false
 		"handleBubble": "hide", 
@@ -194,6 +192,9 @@ webshims.setOptions('forms', {
 		
 		//wether an invalid input should be re-checked while user types
 		"recheckDelay": 400,
+
+		//in case a developer has set novalidate attribute to a form element and wants the form validated on submit, this should be set to true
+		"submitCheck": false,
 		
 		//the class of the errorbox, which is normally appended to the fieldWrapper
 		"errorBoxClass": "ws-errorbox", 
@@ -202,7 +203,8 @@ webshims.setOptions('forms', {
 		"errorMessageClass": "ws-errormessage",
 		"errorWrapperClass": "ws-invalid", 
 		"successWrapperClass": "ws-success", 
-		
+
+		//show/hide effect: 'no' | 'slide' | 'fade'
 		"fx": "slide" 
 	}
 });			
@@ -211,8 +213,22 @@ webshims.polyfill('forms');
 </code></pre>
 			<p>The iVal feature integrates well into different CSS-frameworks like bootstrap or jQuery mobile:</p>
 			<iframe  class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/T29Kx/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+			<h3 id="UI-ivalfieldWrapper">The <code class="i">iVal.fieldWrapper</code> option</h3>
+			<p><code class="i">iVal.fieldWrapper</code> defines a selector, which matches the closest ancestor element to a form field and gets the classes <code>ws-invalid</code> (<code>iVal.errorWrapperClass</code>) or <code>ws-success</code> (<code>iVal.successWrapperClass</code>).</p>
+			<p><code class="i">iVal.fieldWrapper</code> can be used to group multiple form fields to one "validation group" with one errormessage (i.e.: radio buttons or separated telephone fields) or to control the placement of errormessages.</p>
+			<p><strong>Grouping multiple form fields to one validation group</strong> can be achieved with the following code:</p>
+			<iframe  class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/uMA9d/embedded/js,html,result,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<p><code class="i">iVal.fieldWrapper</code> in conjunction with <code class="i">iVal.errorBoxClass</code> (<code>ws-errorbox</code>) can be also used <strong>to place the errormessages</strong>.</p>
+			<p>Normally the <code>ws-errorbox</code> is automatically created and appended to the <code>fieldWrapper</code>. If a <code>ws-errorbox</code> already exists inside of <code>fieldWrapper</code> or is associated with a <code>fieldWrapper</code> using the <code>data-errorbox</code> attribute this <code>ws-errorbox</code> is used.</p>
+			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/SzbJV/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+			<p>Among other ways to <a href="#Locale-validityMessages">control errormessages</a>. Forms with the <code>iVal.sel</code> can have a more descriptive to define errormessages. Simply by adding one or more child elements to <code>ws-errorbox</code>. The <code>data-errortype</code> can be used to switch between the different error types. The value of the <code>data-errortype</code> attribute is case-sensitive. All standard <code>validity</code> properties als can be written as dashed classes (i.e.: .value-missing is treated as [data-errortype="valueMissing"]).</p>
+			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/82xUV/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
 </div>
-			
+
+
 
 		<script src="../demo-js/demo.js"></script>
 	</body>

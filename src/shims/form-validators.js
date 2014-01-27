@@ -75,7 +75,7 @@ webshims.register('form-validators', function($, webshims, window, document, und
 			$(elem).setCustomValidity(message);
 			blockCustom = false;
 		};
-		if(customMismatchedRule || validity.valid || (data.dependentValidation && !data.dependentValidation._init)){
+		if(customMismatchedRule || validity.valid){
 			val = $(elem).val();
 			$.each(customValidityRules, function(name, test){
 				message = test(elem, val, data, setMessage) || '';

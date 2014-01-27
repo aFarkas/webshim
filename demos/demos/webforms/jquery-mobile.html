@@ -54,12 +54,13 @@
 	 	
 	<script>
 		(function(){
-			//Modernizr.mq is not part of webshims' Modernizr build!
+			//jQM: Modernizr.mq is not part of webshims' Modernizr build!
 			var assumeMobile = Modernizr.mq && (Modernizr.mq('(max-device-width: 768px)') || (Modernizr.touch && Modernizr.mq('(max-device-width: 124px)')));
 			
 			webshims.setOptions('forms', {
 				//configure instantvalidation for jQuery mobile
 				iVal: {
+					// jQM; change iVal option for jQuery mobile
 					fieldWrapper: '[data-role="fieldcontain"]',
 					handleBubble: 'hide' // 'hide' || false || true
 				}
