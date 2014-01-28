@@ -1,11 +1,13 @@
 /**
 Task to optimize polyfiller.js
+//grunt.loadTasks('_js/bower_components/webshim/grunt-tasks/');
+//...
 optimizePolyfiller: {
 	options: {
 		src: 'js-webshim/dev/', //required
 		features: 'forms mediaelement', //which features are used?
 
-		dest: 'polyfiller-custom.js',
+		dest: 'js-webshims/minified/polyfiller-custom.js',
 		//should existing uglify be extended to uglify custom polyfiller? default: false (grunt-contrib-uglify has to be installed)
 		uglify: true,
 		
@@ -65,7 +67,7 @@ module.exports = function( grunt ) {
 		code = removeFeatures(code, options.features, dirPath);
 		code = inlineInitial(code, options, dirPath);
 		
-		grunt.file.write(dirPath+options.dest, code);
+		grunt.file.write(options.dest, code);
 		
 		if(options.uglify){
 			uglifyCfg = grunt.config('uglify') || {};
