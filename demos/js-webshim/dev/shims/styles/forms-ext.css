@@ -23,7 +23,7 @@
 
 .input-picker[data-class~="show-yearbtns"] .ws-picker-header,
 .show-yearbtns .input-picker .ws-picker-header {
-  margin: 0 wsem(55); }
+  margin: 0 4.23077em; }
 .input-picker[data-class~="show-yearbtns"] button.ws-year-btn,
 .show-yearbtns .input-picker button.ws-year-btn {
   display: inline-block; }
@@ -485,7 +485,7 @@ span.ws-input {
     transition: all 400ms; }
   .input-picker .ws-focus,
   .input-picker :focus {
-    outline: 1px dotted #000; }
+    outline: 1px dotted black; }
   .input-picker .ws-po-box {
     position: relative;
     padding: 1.15385em 1.53846em;
@@ -529,7 +529,7 @@ span.ws-input {
     .input-picker .ws-po-box[dir="rtl"] .next-controls [class*="ws-super-"]:after,
     .input-picker .ws-po-box[dir="rtl"] .next-controls button:before {
       border-width: 0.35em 0.6em 0.35em 0;
-      border-color: transparent #333 transparent transparent;
+      border-color: transparent #333333 transparent transparent;
       margin-left: -0.1em; }
     .input-picker .prev-controls [class*="ws-super-"],
     .input-picker .ws-po-box[dir="rtl"] .next-controls [class*="ws-super-"] {
@@ -550,7 +550,7 @@ span.ws-input {
     .input-picker .ws-po-box[dir="rtl"] .prev-controls [class*="ws-super-"]:after,
     .input-picker .ws-po-box[dir="rtl"] .prev-controls button:before {
       border-width: 0.35em 0 0.35em 0.6em;
-      border-color: transparent transparent transparent #333;
+      border-color: transparent transparent transparent #333333;
       margin-right: -0.1em; }
     .input-picker .next-controls [class*="ws-super-"],
     .input-picker .ws-po-box[dir="rtl"] .prev-controls [class*="ws-super-"] {
@@ -578,7 +578,7 @@ span.ws-input {
     .input-picker .ws-button-row button {
       border: 0.07692em solid #cccccc;
       border-radius: 5px;
-      box-shadow: 1px 1px 0 #fff;
+      box-shadow: 1px 1px 0 white;
       background-color: #ddd;
       background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
       background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
@@ -623,7 +623,7 @@ span.ws-input {
         height: 0px;
         border-style: solid;
         border-width: 0 0.3em 0.6em 0.3em;
-        border-color: transparent transparent #333 transparent;
+        border-color: transparent transparent #333333 transparent;
         vertical-align: middle; }
       .input-picker .ws-picker-header > button:hover {
         text-decoration: underline; }

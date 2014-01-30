@@ -18,6 +18,11 @@ SASS:
 *
 */
 
+
+@function wsem($pixels, $context: 13) {
+	@return #{$pixels/$context}em
+}
+
 $pickerapis: show-week show-yearbtns hide-btnrow show-uparrow show-selectnav;
 
 %show-week {
@@ -77,10 +82,10 @@ $btnapis: hide-spinbtns hide-dropdownbtn hide-inputbtns inputbtns-outside a11yhi
 		display: none;
 	}
 
-    &::-webkit-inner-spin-button,
-    ::-webkit-inner-spin-button {
-      display: none;
-    }
+	&::-webkit-inner-spin-button,
+	::-webkit-inner-spin-button {
+		display: none;
+	}
 }
 
 %hide-dropdownbtn {
@@ -96,10 +101,10 @@ $btnapis: hide-spinbtns hide-dropdownbtn hide-inputbtns inputbtns-outside a11yhi
 		display: none;
 	}
 
-    &::-webkit-inner-spin-button,
-    ::-webkit-inner-spin-button {
-      display: none;
-    }
+	&::-webkit-inner-spin-button,
+	::-webkit-inner-spin-button {
+		display: none;
+	}
 }
 
 %a11yhide-inputbtns {
@@ -196,8 +201,3 @@ $rangeapis: show-ticklabels show-tickvalues hide-ticks show-valuetooltip show-la
 		}
 	}
 }
-
-@function wsem($pixels, $context: 13) {
-	@return #{$pixels/$context}em
-}
-
