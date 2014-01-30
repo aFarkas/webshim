@@ -113,7 +113,7 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.12.1',
+		version: '1.12.2-pre',
 		cfg: {
 			
 			//addCacheBuster: false,
@@ -624,7 +624,7 @@
 	
 
 	webshims.activeLang = (function(){
-		var curLang = navigator.browserLanguage || navigator.language || '';
+		var curLang = $('html').attr('lang') || navigator.browserLanguage || navigator.language || '';
 		onReady('webshimLocalization', function(){
 			webshims.activeLang(curLang);
 		});

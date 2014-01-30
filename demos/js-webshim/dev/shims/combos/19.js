@@ -3039,7 +3039,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	});
 	
 })();
-});;(function(Modernizr, webshims){
+});
+;(function(Modernizr, webshims){
 	"use strict";
 	var $ = webshims.$;
 	var hasNative = Modernizr.audio && Modernizr.video;

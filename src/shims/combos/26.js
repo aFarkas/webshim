@@ -1142,7 +1142,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	});
 	
 })();
-});;webshims.register('filereader', function( $, webshims ){
+});
+;webshims.register('filereader', function( $, webshims ){
 	"use strict";
 	/**
 	 * Code is based on https://github.com/Jahdrien/FileReader

@@ -28,7 +28,7 @@ $pickerapis: show-week show-yearbtns hide-btnrow show-uparrow show-selectnav;
 
 %show-yearbtns {
 	.ws-picker-header {
-		margin: 0 em(55);
+		margin: 0 wsem(55);
 	}
 	
 	button.ws-year-btn {
@@ -195,5 +195,9 @@ $rangeapis: show-ticklabels show-tickvalues hide-ticks show-valuetooltip show-la
 			display: inline-block;
 		}
 	}
+}
+
+@function wsem($pixels, $context: 13) {
+	@return #{$pixels/$context}em
 }
 

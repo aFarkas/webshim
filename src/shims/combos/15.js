@@ -1142,7 +1142,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	});
 	
 })();
-});;
+});
+;
 webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 

@@ -1142,7 +1142,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	});
 	
 })();
-});;(function($){
+});
+;(function($){
 	
 	var id = 0;
 	var isNumber = function(string){

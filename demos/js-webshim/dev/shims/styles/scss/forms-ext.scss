@@ -181,7 +181,9 @@ input[type="color"] {
 .ws-input {
 	letter-spacing: -0.31em;
 	word-spacing: -0.43em;
-	
+
+
+
 	> * {
 		text-align: center;
 		letter-spacing: normal;
@@ -208,8 +210,10 @@ input[type="color"] {
 		text-align: center;
 		display: inline-block;
 	}
-	
-	
+}
+
+span.ws-input {
+	display: inline-block;
 }
 
 .ws-date {

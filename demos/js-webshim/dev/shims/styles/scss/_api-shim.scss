@@ -14,6 +14,16 @@
 	}
 }
 
+@mixin checked {
+  &:checked {
+    @content;
+  }
+
+  &.prop-checked {
+    @content;
+  }
+}
+
 @mixin progress {
 	-webkit-appearance: none;
 	-moz-appearance: none;

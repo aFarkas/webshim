@@ -23,7 +23,7 @@
 
 .input-picker[data-class~="show-yearbtns"] .ws-picker-header,
 .show-yearbtns .input-picker .ws-picker-header {
-  margin: 0 4.23077em; }
+  margin: 0 wsem(55); }
 .input-picker[data-class~="show-yearbtns"] button.ws-year-btn,
 .show-yearbtns .input-picker button.ws-year-btn {
   display: inline-block; }
@@ -258,6 +258,9 @@ input[type="color"] {
     box-sizing: border-box;
     text-align: center;
     display: inline-block; }
+
+span.ws-input {
+  display: inline-block; }
 
 .ws-date .mm,
 .ws-date .dd {

@@ -663,8 +663,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		hideError: function(elem, reset){
 			var invalid;
 			var fieldWrapper = this.getFieldWrapper(elem);
-			var errorBox = this.get(elem, fieldWrapper);
-			
+			//only if an errorbox was already created! don't use this.get here!
+			var errorBox = fieldWrapper.data('errorbox');
+
 			if(errorBox && errorBox.jquery){
 				$(elem).filter('input').off('.recheckinvalid');
 				if(!reset && (invalid = $('input:invalid, select:invalid, textarea:invalid', fieldWrapper)[0])){
