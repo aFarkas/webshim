@@ -507,7 +507,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					message = elem.getErrorMessage();
 				}
 				if (message) {
-					api.contentElement.text(message);
+					api.contentElement.html(message);
 				} else {
 					this.hide();
 				}
