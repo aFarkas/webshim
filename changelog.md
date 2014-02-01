@@ -1,3 +1,8 @@
+Release 1.12.2
+----------
+
+- fixed grouped instant validation
+
 Release 1.12.1
 ----------
 
