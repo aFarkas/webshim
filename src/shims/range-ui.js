@@ -15,7 +15,7 @@
 		_create: function(){
 			var i;
 			
-			this.element.addClass('ws-range').attr({role: 'slider'}).append('<span class="ws-range-min ws-range-progress" /><span class="ws-range-rail ws-range-track"><span class="ws-range-thumb"><span data-value="" data-valuetext="" /></span></span>');
+			this.element.addClass('ws-range').attr({role: 'slider'}).append('<span class="ws-range-min ws-range-progress" /><span class="ws-range-rail ws-range-track"><span class="ws-range-thumb"><span><span data-value="" data-valuetext="" /></span></span></span>');
 			this.trail = $('.ws-range-track', this.element);
 			this.range = $('.ws-range-progress', this.element);
 			this.thumb = $('.ws-range-thumb', this.trail);
@@ -97,7 +97,7 @@
 				'aria-valuenow': this.options.value,
 				'aria-valuetext': textValue
 			});
-			$('span', this.thumb).attr({
+			$('span[data-value]', this.thumb).attr({
 				'data-value': this.options.value,
 				'data-valuetext': textValue
 			});

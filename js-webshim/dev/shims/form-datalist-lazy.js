@@ -376,7 +376,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 				this.removeMark(lis.removeClass('hidden-item'));
 				found = true;
 			}
-			
+
 			this.hasViewableData = found;
 			if(!_fromShowList && found){
 				if(this.popover.isVisible && this.popover.element.attr('data-vertical') == 'bottom'){

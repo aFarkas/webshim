@@ -2314,6 +2314,8 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 		}
 		return message || '';
 	};
+	var lReg = /</g;
+	var gReg = />/g;
 	var valueVals = {
 		value: 1,
 		min: 1,
@@ -2349,7 +2351,7 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 						val = widget.formatValue(val, false);
 					}
 				}
-				message = message.replace('{%'+ attr +'}', val);
+				message = message.replace('{%'+ attr +'}', val.replace(lReg, '&lt;').replace(gReg, '&gt;'));
 				if('value' == attr){
 					message = message.replace('{%valueLen}', val.length);
 				}

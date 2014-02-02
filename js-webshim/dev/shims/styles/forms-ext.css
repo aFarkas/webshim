@@ -102,21 +102,39 @@
 .hide-ticks .ws-range-ticks {
   display: none; }
 
-.show-valuetooltip span.ws-range-thumb > span, .show-valuetooltip span.ws-range-thumb > span:after {
+.show-valuetooltip span.ws-range-thumb > span,
+.show-valuetooltip span.ws-range-thumb > span span:after {
   display: inline-block; }
+.show-valuetooltip span.ws-range-thumb > span span:after {
+  content: attr(data-value) !important;
+  visibility: visible !important; }
 
-.ws-active.show-activevaluetooltip span.ws-range-thumb > span, .ws-active.show-activevaluetooltip span.ws-range-thumb > span:after,
+.ws-active.show-activevaluetooltip span.ws-range-thumb > span,
+.ws-active.show-activevaluetooltip span.ws-range-thumb > span span:after,
 .show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span,
-.show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span:after {
+.show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span span:after {
   display: inline-block; }
+.ws-active.show-activevaluetooltip span.ws-range-thumb > span span:after,
+.show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span span:after {
+  content: attr(data-value) !important;
+  visibility: visible !important; }
 
-.show-labeltooltip span.ws-range-thumb > span, .show-labeltooltip span.ws-range-thumb > span:before {
+.show-labeltooltip span.ws-range-thumb > span,
+.show-labeltooltip span.ws-range-thumb > span span:before {
   display: inline-block; }
+.show-labeltooltip span.ws-range-thumb > span span:before {
+  content: attr(data-valuetext) !important;
+  visibility: visible !important; }
 
-.ws-active.show-activelabeltooltip span.ws-range-thumb > span, .ws-active.show-activelabeltooltip span.ws-range-thumb > span:before,
+.ws-active.show-activelabeltooltip span.ws-range-thumb > span,
+.ws-active.show-activelabeltooltip span.ws-range-thumb > span span:before,
 .show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span,
-.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span:before {
+.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span span:before {
   display: inline-block; }
+.ws-active.show-activelabeltooltip span.ws-range-thumb > span span:before,
+.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span span:before {
+  content: attr(data-valuetext) !important;
+  visibility: visible !important; }
 
 /* spinner control for time, number (usable for date, datetime-local) */
 .has-input-buttons,
@@ -265,24 +283,24 @@ span.ws-input {
 .ws-date .mm,
 .ws-date .dd {
   width: 23.5%;
-  min-width: 12%; }
+  min-width: 10%; }
 .ws-date .yy {
   width: 48%;
-  min-width: 24%; }
+  min-width: 20%; }
 .ws-date.ws-month-select .dd {
   width: 22%;
-  min-width: 11%; }
+  min-width: 10%; }
 .ws-date.ws-month-select .mm {
   width: 38%;
-  min-width: 19%; }
+  min-width: 17%; }
 .ws-date.ws-month-select .yy {
   width: 36%;
-  min-width: 18%; }
+  min-width: 16%; }
 
 .ws-month .mm,
 .ws-month .yy {
   width: 47.9%;
-  min-width: 24%; }
+  min-width: 20%; }
 
 /* range */
 .ws-range {
@@ -328,18 +346,16 @@ span.ws-input {
       width: 180px;
       text-align: center;
       background: none; }
-      .ws-range .ws-range-thumb > span:after, .ws-range .ws-range-thumb > span:before {
-        content: attr(data-value);
-        padding: 0.07692em 0.26923em;
-        text-align: center;
-        background: #fff;
-        border: 0.07692em solid #cccccc;
-        border-radius: 0.30769em;
+      .ws-range .ws-range-thumb > span span {
         visibility: visible; }
-      .ws-range .ws-range-thumb > span:after {
-        content: attr(data-value); }
-      .ws-range .ws-range-thumb > span:before {
-        content: attr(data-valuetext); }
+        .ws-range .ws-range-thumb > span span:after, .ws-range .ws-range-thumb > span span:before {
+          content: "";
+          padding: 0.07692em 0.26923em;
+          text-align: center;
+          background: #fff;
+          border: 0.07692em solid #cccccc;
+          border-radius: 0.30769em;
+          visibility: visible; }
   .ws-range.ws-focus .ws-range-thumb {
     background: #eee;
     border-color: #999; }
@@ -432,7 +448,9 @@ span.ws-input {
 .ws-range-ticks:before {
   content: attr(data-value); }
 
-.ws-range-thumb > span, .ws-range-thumb > span:after, .ws-range-thumb > span:before {
+.ws-range-thumb > span,
+.ws-range-thumb > span span:after,
+.ws-range-thumb > span span:before {
   display: none; }
 
 /* helper classes to hide show/hide specific range features features */
@@ -485,7 +503,7 @@ span.ws-input {
     transition: all 400ms; }
   .input-picker .ws-focus,
   .input-picker :focus {
-    outline: 1px dotted black; }
+    outline: 1px dotted #000; }
   .input-picker .ws-po-box {
     position: relative;
     padding: 1.15385em 1.53846em;
@@ -506,7 +524,7 @@ span.ws-input {
       color: #333; }
       .input-picker .ws-picker-controls > button.ws-year-btn:after, .input-picker .ws-picker-controls > button:before {
         display: inline-block;
-        content: " ";
+        content: "";
         width: 0px;
         height: 0px;
         border-style: solid;
@@ -529,7 +547,7 @@ span.ws-input {
     .input-picker .ws-po-box[dir="rtl"] .next-controls [class*="ws-super-"]:after,
     .input-picker .ws-po-box[dir="rtl"] .next-controls button:before {
       border-width: 0.35em 0.6em 0.35em 0;
-      border-color: transparent #333333 transparent transparent;
+      border-color: transparent #333 transparent transparent;
       margin-left: -0.1em; }
     .input-picker .prev-controls [class*="ws-super-"],
     .input-picker .ws-po-box[dir="rtl"] .next-controls [class*="ws-super-"] {
@@ -550,7 +568,7 @@ span.ws-input {
     .input-picker .ws-po-box[dir="rtl"] .prev-controls [class*="ws-super-"]:after,
     .input-picker .ws-po-box[dir="rtl"] .prev-controls button:before {
       border-width: 0.35em 0 0.35em 0.6em;
-      border-color: transparent transparent transparent #333333;
+      border-color: transparent transparent transparent #333;
       margin-right: -0.1em; }
     .input-picker .next-controls [class*="ws-super-"],
     .input-picker .ws-po-box[dir="rtl"] .prev-controls [class*="ws-super-"] {
@@ -559,6 +577,8 @@ span.ws-input {
       .input-picker .next-controls [class*="ws-super-"][disabled],
       .input-picker .ws-po-box[dir="rtl"] .prev-controls [class*="ws-super-"][disabled] {
         display: none; }
+  .input-picker.ws-po-visible .ws-picker-controls button:after, .input-picker.ws-po-visible .ws-picker-controls button:before {
+    content: " "; }
   .input-picker .ws-po-box[dir="rtl"] {
     direction: rtl; }
   .input-picker.time-popover .ws-picker-body {
@@ -578,7 +598,7 @@ span.ws-input {
     .input-picker .ws-button-row button {
       border: 0.07692em solid #cccccc;
       border-radius: 5px;
-      box-shadow: 1px 1px 0 white;
+      box-shadow: 1px 1px 0 #fff;
       background-color: #ddd;
       background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
       background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
@@ -623,7 +643,7 @@ span.ws-input {
         height: 0px;
         border-style: solid;
         border-width: 0 0.3em 0.6em 0.3em;
-        border-color: transparent transparent #333333 transparent;
+        border-color: transparent transparent #333 transparent;
         vertical-align: middle; }
       .input-picker .ws-picker-header > button:hover {
         text-decoration: underline; }

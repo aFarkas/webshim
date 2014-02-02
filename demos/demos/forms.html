@@ -25,6 +25,8 @@
 			// load the forms polyfill
 		</script>
 
+
+        <script src="../demo-js/demo.js" async=""></script>
 	</head>
 
 	<body>
@@ -214,13 +216,21 @@ webshims.polyfill('forms');
 			<p>Normally the <code>ws-errorbox</code> is automatically created and appended to the <code>fieldWrapper</code>. If a <code>ws-errorbox</code> already exists inside of <code>fieldWrapper</code> or is associated with a <code>fieldWrapper</code> using the <code>data-errorbox</code> attribute this <code>ws-errorbox</code> is used.</p>
 			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/SzbJV/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
-			<p>Among other ways to <a href="#Locale-validityMessages">control errormessages</a>. Forms with the <code>iVal.sel</code> can have a more descriptive to define errormessages. Simply by adding one or more child elements to <code>ws-errorbox</code>. The <code>data-errortype</code> can be used to switch between the different error types. The value of the <code>data-errortype</code> attribute is case-sensitive. All standard <code>validity</code> properties als can be written as dashed classes (i.e.: .value-missing is treated as [data-errortype="valueMissing"]).</p>
+			<p>Among other ways to <a href="#Locale-validityMessages">control errormessages</a>. Forms matching the <code>iVal.sel</code> can have a more descriptive to define errormessages. Simply by adding one or more child elements to <code>ws-errorbox</code>. The <code>data-errortype</code> can be used to switch between the different error types. The value of the <code>data-errortype</code> attribute is case-sensitive. All standard <code>validity</code> properties als can be written as dashed classes (i.e.: .value-missing is treated as [data-errortype="valueMissing"]).</p>
 			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/82xUV/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
+			<h3 id="Custom-validity">Custom-validity</h3>
+			<p>There are 3 ways to add/use custom validation constraints with HTML5.</p>
+			<ul>
+				<li>pattern attribute (see also <a href="http://html5pattern.com">html5pattern.com</a>)</li>
+				<li>dynamically changing constraints depending on a value/checkedness of another form-control</li>
+				<li>setCustomValidity method</li>
+			</ul>
+			<h3 id="Custom-addValidators"><code>addValidators</code></h3>
+			<p>Webshim Lib comes with a simple custom validity helper. With some predefined typical validation constraints and a custom validation helper method. To turn this feature on, simply set <code>addValidators</code> to true:</p>
+<pre><code class="language-javascript">webshims.setOptions('forms', { addValidators: true });
+</code></pre>
 </div>
 
-
-
-		<script src="../demo-js/demo.js" async=""></script>
 	</body>
 </html>

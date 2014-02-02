@@ -167,8 +167,12 @@ $rangeapis: show-ticklabels show-tickvalues hide-ticks show-valuetooltip show-la
 %show-valuetooltip {
 	span.ws-range-thumb > span {
 		&,
-		&:after {
+		span:after {
 			display: inline-block;
+		}
+		span:after {
+			content: attr(data-value) !important;
+			visibility: visible !important;
 		}
 	}
 }
@@ -178,16 +182,24 @@ $rangeapis: show-ticklabels show-tickvalues hide-ticks show-valuetooltip show-la
 	&.ws-active span.ws-range-thumb > span,
 	.ws-range.ws-active span.ws-range-thumb > span {
 		&,
-		&:after {
+		span:after {
 			display: inline-block;
+		}
+		span:after {
+			content: attr(data-value) !important;
+			visibility: visible !important;
 		}
 	}
 }
 %show-labeltooltip {
 	span.ws-range-thumb > span {
 		&,
-		&:before {
+		span:before {
 			display: inline-block;
+		}
+		span:before {
+			content: attr(data-valuetext) !important;
+			visibility: visible !important;
 		}
 	}
 }
@@ -196,8 +208,12 @@ $rangeapis: show-ticklabels show-tickvalues hide-ticks show-valuetooltip show-la
 	&.ws-active span.ws-range-thumb > span,
 	.ws-range.ws-active span.ws-range-thumb > span {
 		&,
-		&:before {
+		span:before {
 			display: inline-block;
+		}
+		span:before {
+			content: attr(data-valuetext) !important;
+			visibility: visible !important;
 		}
 	}
 }

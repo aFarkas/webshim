@@ -1968,6 +1968,8 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		}
 		return message || '';
 	};
+	var lReg = /</g;
+	var gReg = />/g;
 	var valueVals = {
 		value: 1,
 		min: 1,
@@ -2003,7 +2005,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 						val = widget.formatValue(val, false);
 					}
 				}
-				message = message.replace('{%'+ attr +'}', val);
+				message = message.replace('{%'+ attr +'}', val.replace(lReg, '&lt;').replace(gReg, '&gt;'));
 				if('value' == attr){
 					message = message.replace('{%valueLen}', val.length);
 				}

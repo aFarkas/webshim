@@ -221,26 +221,26 @@ span.ws-input {
 	.mm,
 	.dd {
 		width: 23.5%;
-		min-width: 12%;
+		min-width: 10%;
 	}
 	.yy {
 		width: 48%;
-		min-width: 24%;
+		min-width: 20%;
 	}
 	&.ws-month-select {
 		
 		.dd {
 			width: 22%;
-			min-width: 11%;
+			min-width: 10%;
 		}
 		.mm {
 			width: 38%;
-			min-width: 19%;
+			min-width: 17%;
 		}
 		
 		.yy {
 			width: 36%;
-			min-width: 18%;
+			min-width: 16%;
 		}
 	}
 }
@@ -249,7 +249,7 @@ span.ws-input {
 	.mm,
 	.yy {
 		width: 47.9%;
-		min-width: 24%;
+		min-width: 20%;
 	}
 }
 
@@ -303,23 +303,19 @@ span.ws-input {
 			width: 180px;
 			text-align: center;
 			background: none;
-			
-			&:after,
-			&:before {
-				content: attr(data-value);
-				padding: em(1) em(3.5);
-				text-align: center;
-				background: #fff;
-				border: em(1) solid #ccc;
-				border-radius: em(4);
+
+			span {
 				visibility: visible;
-			}
-			
-			&:after {
-				content: attr(data-value);
-			}
-			&:before {
-				content: attr(data-valuetext);
+				&:after,
+				&:before {
+					content: "";
+					padding: em(1) em(3.5);
+					text-align: center;
+					background: #fff;
+					border: em(1) solid #ccc;
+					border-radius: em(4);
+					visibility: visible;
+				}
 			}
 		}
 		
@@ -457,8 +453,8 @@ span.ws-input {
 .ws-range-thumb {
 	> span {
 		&,
-		&:after,
-		&:before {
+		span:after,
+		span:before {
 			display: none;
 		}
 	}
@@ -496,7 +492,7 @@ $button-bgcolor: #f5f5f5;
 	font-family: sans-serif;
 	width: em(360);
 	min-width: em(300);
-	
+
 	.ws-po-outerbox {
 		-webkit-transform: translate(0, 30%);
 		transform: translate(0, 30%);
@@ -577,7 +573,7 @@ $button-bgcolor: #f5f5f5;
 			&.ws-year-btn:after,
 			&:before {
 				display: inline-block;
-				content: " ";
+				content: "";
 				width: 0px;
 				height: 0px;
 				border-style: solid;
@@ -648,6 +644,13 @@ $button-bgcolor: #f5f5f5;
 			&[disabled]	{
 				display: none;
 			}
+		}
+	}
+
+	&.ws-po-visible .ws-picker-controls button {
+		&:after,
+		&:before {
+			content: " ";
 		}
 	}
 	

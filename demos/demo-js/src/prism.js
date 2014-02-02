@@ -340,7 +340,7 @@ if (!self.document) {
 var script = document.currentScript;
 
 if(!script){
-	document.getElementsByTagName('script')
+	script = document.getElementsByTagName('script');
 	script = script[script.length - 1];
 }
 
@@ -348,8 +348,8 @@ if (script) {
 	_.filename = script.src;
 	
 	if (!script.hasAttribute('data-manual')) {
-		if(document.readyState == 'complete'){
-			_.highlightAll();
+		if(document.readyState == 'interactive' || document.readyState == "complete"){
+			setTimeout(_.highlightAll);
 		} else if(document.addEventListener) {
 			document.addEventListener('DOMContentLoaded', _.highlightAll);
 		}
@@ -557,4 +557,4 @@ Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(f
 	xhr.send(null);
 });
 
-})();;
+})();

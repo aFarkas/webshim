@@ -32,7 +32,12 @@
 			webshims.polyfill('forms forms-ext');
 			
 		</script>
-
+		<script>
+			webshims.ready('jquery', function(){
+				webshims.loader.loadScript("../../demo-js/demo.js", false, false, true);
+				webshims.loader.loadScript("assets/cfg.js", false, false, true);
+			});
+		</script>
 	</head>
 
 	<body>
@@ -362,11 +367,5 @@
 	</select>
 </datalist>
 
-		<script>
-			webshims.ready('jquery', function(){
-				webshims.loader.loadScript("../../demo-js/demo.js", false, false, true);
-				webshims.loader.loadScript("assets/cfg.js", false, false, true);
-			});
-		</script>
 	</body>
 </html>
