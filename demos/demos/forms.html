@@ -90,7 +90,7 @@
 			<p>
 				<img id="logo" src="../images/webshim2.png" alt="webshim" />
 			</p>
-			
+
 
 			<h2 id="introduction" class="header">Introduction</h2>
 
@@ -215,11 +215,11 @@ webshims.polyfill('forms');
 			<p><code class="i">iVal.fieldWrapper</code> in conjunction with <code class="i">iVal.errorBoxClass</code> (<code>ws-errorbox</code>) can be also used <strong>to place the errormessages</strong>.</p>
 			<p>Normally the <code>ws-errorbox</code> is automatically created and appended to the <code>fieldWrapper</code>. If a <code>ws-errorbox</code> already exists inside of <code>fieldWrapper</code> or is associated with a <code>fieldWrapper</code> using the <code>data-errorbox</code> attribute this <code>ws-errorbox</code> is used.</p>
 			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/SzbJV/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
-
-			<p>Among other ways to <a href="#Locale-validityMessages">control errormessages</a>. Forms matching the <code>iVal.sel</code> can have a more descriptive to define errormessages. Simply by adding one or more child elements to <code>ws-errorbox</code>. The <code>data-errortype</code> can be used to switch between the different error types. The value of the <code>data-errortype</code> attribute is case-sensitive. All standard <code>validity</code> properties als can be written as dashed classes (i.e.: .value-missing is treated as [data-errortype="valueMissing"]).</p>
+<a name="ival-messages" id="ival-messages"></a>
+			<p>Among other ways to <a href="#Locale-validityMessages">control errormessages</a>. Forms matching the <code>iVal.sel</code> can have a more descriptive way to define errormessages. Simply by adding one or more child elements to <code>ws-errorbox</code>. The <code>data-errortype</code> can be used to switch between the different error types. The value of the <code>data-errortype</code> attribute is case-sensitive. All standard <code>validity</code> properties als can be written as dashed classes (i.e.: .value-missing is treated as [data-errortype="valueMissing"]).</p>
 			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/82xUV/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
-			<h3 id="Custom-validity">Custom-validity</h3>
+			<h2 id="Custom-validity">Custom-validity</h2>
 			<p>There are 3 ways to add/use custom validation constraints with HTML5.</p>
 			<ul>
 				<li>pattern attribute (see also <a href="http://html5pattern.com">html5pattern.com</a>)</li>
@@ -227,9 +227,120 @@ webshims.polyfill('forms');
 				<li>setCustomValidity method</li>
 			</ul>
 			<h3 id="Custom-addValidators"><code>addValidators</code></h3>
-			<p>Webshim Lib comes with a simple custom validity helper. With some predefined typical validation constraints and a custom validation helper method. To turn this feature on, simply set <code>addValidators</code> to true:</p>
-<pre><code class="language-javascript">webshims.setOptions('forms', { addValidators: true });
+			<p>Webshim Lib comes with a simple custom validity helper and some predefined typical validation constraints. To turn this feature on, simply set <code>addValidators</code> to true:</p>
+<pre><code class="language-javascript">
+webshims.setOptions('forms', { addValidators: true });
 </code></pre>
+			<h4><code>creditcard</code></h4>
+			<p>All elements with a <code class="i">data-creditcard</code> should have a valid credit card number following the Luhn algorithm.</p>
+<pre><code class="language-markup">
+&lt;input data-creditcard="" /&gt;
+</code></pre>
+			<h4><code>grouprequired</code></h4>
+			<p>If a checkbox has an attribute <code class="i">data-grouprequired</code> at least one of the checkboxes with the same name inside the form has to be checked.</p>
+<pre><code class="language-markup">
+&lt;input data-grouprequired="" name="a" type="checkbox" /&gt;
+&lt;input name="a" type="checkbox" /&gt;
+</code></pre>
+			<h4><code>dependent</code></h4>
+			<p>Dependent validation dynamically changes the validation constraints depending on another elements value or other property.</p>
+			<p>The attribute <code>data-dependent-validation</code> either takes an IDREF or a JSON-String with the dependency options.</p>
+			<p>The options are as follows:</p>
+			<ul>
+				<li>from (required): IDREF (ID or name of the element)</li>
+				<li>prop (optional): property, which should be changed | default: value/disabled (depends on type of from-element disabled, if from-element is a checkbox/radiobutton, value otherwise)</li>
+				<li>from-prop (optional): default value/checked (depends on type)</li>
+				<li>toggle (optional): reverts the prop-state (only if from-prop equals checked)</li>
+			</ul>
+			<p>Examples:</p>
+			<iframe class="fiddle-example"  width="100%" height="300" src="http://jsfiddle.net/trixta/Ev5G4/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<h4><code>ajaxvalidate</code></h4>
+			<p>An input with the attribute <code class="i">data-ajaxvalidate</code> referencing a validation service will start an AJAX validation.</p>
+<pre><code class="language-markup">
+&lt;input data-ajaxvalidate="path-to-validation-service.js" /&gt;
+</code></pre>
+			<p>The response has to be a valid JSON or JSON-P either with the key <code>valid</code> or the key <code>message</code></p>
+			<p>Valid response:</p>
+<pre><code class="language-javascript">
+{"valid": true}
+</code></pre>
+			<p>Invalid response:</p>
+<pre><code class="language-javascript">
+{"valid": false}
+</code></pre>
+			<p>Valid response providing the message:</p>
+<pre><code class="language-javascript">
+{"message": ""}
+</code></pre>
+			<p>Invalid response:</p>
+<pre><code class="language-javascript">
+{"message": "Something wrong"}
+</code></pre>
+
+			<p>In a lot of cases the validity of one input's value, depends on other entered values. In those cases the <code>data-ajaxvalidate</code> attribute can take a valid JSON string with the keys <code>url</code> and <code>depends</code>. The <code>depends</code> value is either an array or a whitespace separated list of ids or names of the related form fields.</p>
+<pre><code class="language-markup">
+&lt;input data-ajaxvalidate='{
+	"url": "path-to-validation-service.js",
+	"depends": "field-a field-b"
+}' /&gt;
+</code></pre>
+
+			<h4>Controlling the errormessages of custom errors</h4>
+			<p>The customError helper hook into the descriptive ways to define errormessage in webshims. Therefore the <code>data-errormessage</code> attribute and in case of the iVal feature the <code>data-errortype</code> can be used to define errormessages for the field.</p>
+			<iframe class="fiddle-example"  width="100%" height="300" src="http://jsfiddle.net/trixta/3A2DF/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<p>For a more general way the JS API can be used to change the errormessage for the given type:</p>
+			<iframe class="fiddle-example"  width="100%" height="260" src="http://jsfiddle.net/trixta/2CyEr/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<h2 id="Datalist">Datalist</h2>
+			<p>The datalist element can be used to create autocomplete/combobox widgets. With the <code class="i">customDatalist</code> option the UI can be even replaced in supporting browsers to have more control over this widget.</p>
+<pre><code class="language-javascript">
+webshims.setOptions('forms', {
+	customDatalist: true
+});
+</code></pre>
+			<h3>Creating new customErrors</h3>
+			<p>While webshim allows the developer to use the native or polyfilled <code>setCustomValidity</code> method to add custom errors, webshims also exposes the custom error helper to generate new custom constraints:</p>
+			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/KdFB2/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<h3 id="Datalist-options">Datalist-options</h3>
+
+<pre><code class="language-javascript">
+webshims.setOptions("forms", {
+	list: {
+		// how should the options be filtered * = wildcard | ^ = beginning | ! = no filter
+		"filter": "*",
+		// whether multiple values can be entered separated with a ","
+		"multiple": false,
+		// opens the datalist on focus
+		"focus": false,
+		// highlights matching parts in the datalist
+		"highlight": false,
+		// inline first found value with a selection range while user types
+		"valueCompletion": false,
+		// inline value while user navigates inside the datalist using cursor up/cursor down
+		"inlineValue": false,
+		// normally HTML will be escaped
+		"noHtmlEscape": false,
+		// popover options
+		"popover": {
+			"constrainWidth": true
+		}
+	}
+});</code>
+</pre>
+
+			<p>The list option can be also controlled by markup using either data-list attribute with a JSON string or dashed data-list-property-name attributes.
+<pre><code class="language-markup">
+&lt;input data-list='{"multiple": true, "valueCompletion": true}' list="datalist" /&gt;
+&lt;!-- or --/&gt;
+&lt;input data-list-multiple="true" datalist-value-completion='{"multiple": true, "valueCompletion": true}' list="datalist" /&gt;
+</code>
+</pre>
+			<p>See also the <a href="cfgs/list-datalist.html">datalist configurator</a> to play with the widget.</p>
+
+			<h4 id="Datalist-events">Datalist-options</h4>
+			<p>All datalist events are triggered on the input element not the datalist itself.</p>
+			<p><code class="i">getoptioncontent</code> </p>
+
+
 </div>
 
 	</body>

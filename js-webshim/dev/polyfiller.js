@@ -967,7 +967,7 @@
 		var bustedWidgetUi = false;
 		
 		var initialFormTest = function(){
-			var range, tmp, fieldset;
+			var tmp, fieldset;
 			if(!initialFormTest.run){
 				fieldset = $('<fieldset><textarea required="" /></fieldset>')[0];
 				addTest(formvalidation, !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern));
@@ -984,17 +984,6 @@
 						} catch(er){}
 					}
 					addTest('fieldsetdisabled', tmp);
-				}
-				if(modernizrInputTypes && modernizrInputTypes.range && !window.opera){
-					range = $('<input type="range" style="-webkit-appearance: slider-horizontal; -moz-appearance: range;" />').appendTo('html');
-					tmp = range.css('appearance');
-					range.remove();
-					
-					addTest('csstrackrange', tmp == null || tmp == 'range');
-					
-					addTest('cssrangeinput', tmp == 'slider-horizontal' || tmp == 'range');
-					
-					addTest('styleableinputrange', Modernizr.csstrackrange || Modernizr.cssrangeinput);
 				}
 				
 				if(Modernizr[formvalidation]){
@@ -1198,7 +1187,11 @@
 	//<mediaelement
 	(function(){
 		webshims.mediaelement = {};
-		
+		addTest({
+			texttrackapi: ('addTextTrack' in document.createElement('video')),
+			// a more strict test for track including UI support: document.createElement('track').kind === 'subtitles'
+			track: ('kind' in document.createElement('track'))
+		});
 		addPolyfill('mediaelement-core', {
 			f: 'mediaelement',
 			noAutoCallback: true,
@@ -1212,7 +1205,7 @@
 			methodNames: ['play', 'pause', 'canPlayType', 'mediaLoad:load'],
 			d: ['swfmini'],
 			c: [16, 7, 2, 8, 1, 12, 13, 19, 25, 20, 23],
-			nM: 'audio video texttrackapi'
+			nM: 'audio video'
 		});
 		
 		
@@ -1228,7 +1221,7 @@
 				if(options.preferFlash && !modules.swfmini.test()){
 					options.preferFlash = false;
 				}
-				return !( options.preferFlash && swfmini.hasFlashPlayerVersion('9.0.115') );
+				return !( options.preferFlash && swfmini.hasFlashPlayerVersion('10.0.3') );
 			},
 			c: [21, 19, 25, 20]
 		});
@@ -1245,8 +1238,7 @@
 			},
 			d: ['mediaelement', DOMSUPPORT],
 			methodNames: ['addTextTrack'],
-			c: [21, 12, 13, 22],
-			nM: 'texttrackapi'
+			c: [21, 12, 13, 22]
 		});
 		
 		

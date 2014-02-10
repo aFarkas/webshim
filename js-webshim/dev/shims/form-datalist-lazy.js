@@ -80,7 +80,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 						var keyCode = e.keyCode;
 						var activeItem;
 						var items;
-						var doValue = that.options.noInlineValue ? 'onlyScroll' : true;
+						var doValue = !!that.options.inlineValue || 'onlyScroll';
 
 						if(keyCode == 40 && !that.showList()){
 							that.markItem(that.index + 1, doValue);
@@ -198,7 +198,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 				}
 			}
 
-			if(this.options.noInlineValue && !this.options.valueCompletion){
+			if(!this.options.inlineValue && !this.options.valueCompletion){
 				$.attr(this.input, 'aria-autocomplete', 'list');
 				$.attr(this.input, 'aria-expanded', 'false');
 			}

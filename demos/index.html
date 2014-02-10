@@ -797,7 +797,7 @@ var myCar = Object.create(carProto, {
 			<p>
 				The <code class="i">
 					forms</code>
-				feature also implements an easy and cross browser way to control the <a href="forms.html#UI-Settings">validation UI</a> (error message and styling the validation bubble).
+				feature also implements an easy and cross browser way to control the <a href="demos/forms.html#UI-Settings">validation UI</a> (error message and styling the validation bubble).
 			</p>
 
 			<h3>Implemented/fixed in <code class="i">
@@ -904,17 +904,17 @@ webshims.setOptions("forms", {
 });</code></pre>
 				</li>
 				<li>
-					<strong><a href="forms.html#Custom-validity">addValidators</a></strong> <em>boolean</em> Should Webshims implement some new custom validators. <a href="forms.html#Custom-validity">custom validity example</a>
+					<strong><a href="demos/forms.html#Custom-validity">addValidators</a></strong> <em>boolean</em> Should Webshims implement some new custom validators. <a href="demos/forms.html#Custom-validity">custom validity example</a>
 					<br>
 					<em>default: false</em>
 				</li>
 				<li>
-					<strong><a href="forms.html#Datalist">customDatalist</a></strong> <em>boolean</em> Allows to use custom styleable datalist elements in all browsers.
+					<strong><a href="demos/forms.html#Datalist">customDatalist</a></strong> <em>boolean</em> Allows to use custom styleable datalist elements in all browsers.
 					<br>
 					<em>default: false</em>
 				</li>
 				<li>
-					<strong><a href="forms.html#Datalist">list</a></strong> <em>mixed object</em> Options object for the datalist/[list] feature (can be also controlled using data-list markup).
+					<strong><a href="demos/forms.html#Datalist">list</a></strong> <em>mixed object</em> Options object for the datalist/[list] feature (can be also controlled using data-list markup).
 					<br>
 					<em>default:</em>
 <pre><code class="language-javascript">
@@ -925,6 +925,7 @@ webshims.setOptions("forms", {
 		"focus": false,
 		"highlight": false,
 		"valueCompletion": false,
+		"inlineValue": false,
 		"noHtmlEscape": false,
 		"popover": {
 			"constrainWidth": true
@@ -933,13 +934,6 @@ webshims.setOptions("forms", {
 });</code>
 </pre>
 
-<p>The list option can be also controlled by markup using either data-list attribute with a JSON string or dashed data-list-property-name attributes.
-<pre><code class="language-markup">
-&lt;input data-list='{"multiple": true, "valueCompletion": true}' list="datalist" /&gt;
-&lt;!-- or --/&gt;
-&lt;input data-list-multiple="true" datalist-value-completion='{"multiple": true, "valueCompletion": true}' list="datalist" /&gt;
-</code>
-</pre>
 				</li>
 			</ul>
 
@@ -1381,11 +1375,11 @@ $(function(){
 
 			<h3 id="Customizing-modernizr">Modernizr</h3>
 			<p>
-				Webshims lib does not need every Modernizr test and supports creating a <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track">custom Modernizr build</a>. <!-- (Webshims lib uses <a href="http://requirejs.org/">requireJS</a> or <a href="https://gist.github.com/aFarkas/936413">sssl</a> as a script loader, if this is included, if not it uses Modernizr.load/yepnope.)-->
+				Webshims lib does not need every Modernizr test and supports creating a <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes">custom Modernizr build</a>. <!-- (Webshims lib uses <a href="http://requirejs.org/">requireJS</a> or <a href="https://gist.github.com/aFarkas/936413">sssl</a> as a script loader, if this is included, if not it uses Modernizr.load/yepnope.)-->
 			</p>
 
 			<p>
-				<small> <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track"> Modernizr detections used by webshim</a> </small>
+				<small> <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes"> Modernizr detections used by webshim</a> </small>
 			</p>
 
 			<h3 id="Customizing-extending">Writing a New Polyfill</h3>

@@ -1,5 +1,5 @@
 /* Modernizr 2.7.1 (Custom Build) | MIT & BSD
- * Build: http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track
+ * Build: http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-geolocation-shiv-addtest-prefixed-testprop-testallprops-prefixes-domprefixes
  */
 ;
 
@@ -11,7 +11,6 @@ window.Modernizr = (function( window, document, undefined ) {
 
 		Modernizr = {},
 
-		enableClasses = true,
 
 		docElement = document.documentElement,
 
@@ -207,30 +206,7 @@ window.Modernizr = (function( window, document, undefined ) {
 		} catch(e) { }
 
 		return bool;
-	};
-
-
-	tests['localstorage'] = function() {
-		try {
-			localStorage.setItem(mod, mod);
-			localStorage.removeItem(mod);
-			return true;
-		} catch(e) {
-			return false;
-		}
-	};
-
-	tests['sessionstorage'] = function() {
-		try {
-			sessionStorage.setItem(mod, mod);
-			sessionStorage.removeItem(mod);
-			return true;
-		} catch(e) {
-			return false;
-		}
-	};
-
-	function webforms() {
+	};    function webforms() {
 		Modernizr['input'] = (function( props ) {
 			for ( var i = 0, len = props.length; i < len; i++ ) {
 				attrs[ props[i] ] = !!(props[i] in inputElem);
@@ -524,22 +500,8 @@ window.Modernizr = (function( window, document, undefined ) {
 	};
 
 
-	docElement.className = docElement.className.replace(/(^|\s)no-js(\s|$)/, '$1$2') +
-
-		(enableClasses ? ' js ' + classes.join(' ') : '');
 
 	return Modernizr;
 
 })(this, this.document);
-// Track element + Timed Text Track API
-// http://www.w3.org/TR/html5/video.html#the-track-element
-// http://www.w3.org/TR/html5/media-elements.html#text-track-api
-//
-// While IE10 has implemented the track element, IE10 does not expose the underlying APIs to create timed text tracks by JS (really sad)
-// By Addy Osmani
-Modernizr.addTest({
-	texttrackapi: (typeof (document.createElement('video').addTextTrack) === 'function'),
-	// a more strict test for track including UI support: document.createElement('track').kind === 'subtitles'
-	track: ('kind' in document.createElement('track'))
-});
 ;

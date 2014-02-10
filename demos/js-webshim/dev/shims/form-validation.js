@@ -666,7 +666,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			//only if an errorbox was already created! don't use this.get here!
 			var errorBox = fieldWrapper.data('errorbox');
 
-			if(errorBox && errorBox.jquery){
+			if(errorBox && errorBox.jquery && fieldWrapper.hasClass(invalidWrapperClass)){
 				$(elem).filter('input').off('.recheckinvalid');
 				if(!reset && (invalid = $('input:invalid, select:invalid, textarea:invalid', fieldWrapper)[0])){
 					$(invalid).trigger('refreshvalidityui');
