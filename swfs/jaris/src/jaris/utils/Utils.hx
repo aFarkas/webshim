@@ -22,6 +22,9 @@
 
 package jaris.utils;
 
+import StringTools;
+using StringTools;
+
 /**
  * Some utility functions
  */
@@ -156,6 +159,8 @@ class Utils
 	 */
 	public static function youtubeSourceParse(source:String):String
 	{
+		var reg = ~/&vq=(small|medium|large|hd720|hd1080|highres)/i;
+		source = reg.replace(source, "");
 		return source.split("watch?v=").join("v/");
 	}
 	

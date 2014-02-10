@@ -8,8 +8,8 @@
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />
-    <movie version="9" />
-    <movie minorVersion="0" />
+    <movie version="10" />
+    <movie minorVersion="3" />
     <movie platform="Flash Player" />
     <movie background="#000000" />
     <movie preferredSDK="Haxe 2.10;2.10;" />
