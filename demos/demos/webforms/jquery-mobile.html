@@ -6,7 +6,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 	
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
-	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 
 	<script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
 	
@@ -107,9 +107,9 @@
 		 * jQM and webshims explanation
 		 *
 		 * 1. The easiest way to get both libraries work friendly side by side is to make sure, that jQM enhances all form elements before webshims does.
-		 * 	  This is done by setting webshims.setOptions('waitReady', false); and calling webshims.polyfill after jQM was.
-		 * 2. JQM has the concept of pages while webshims normally works on the hole document. To make sure webshims is updating only the active page, the wsdoc option has to set
-		 * 3. JQM dynamically loads new content and creates new pages, the wsdoc has to changed on pageinit and updatePolyfill has to be called on this new page
+		 * 	  This is done by setting webshims.setOptions('waitReady', false); and calling webshims.polyfill after jQM was included.
+		 * 2. JQM has the concept of pages while webshims normally works on the hole document. To make sure webshims is updating only the active page (only needed in case of multiple pages inside a document), the wsdoc option should be set to the active page
+		 * 3. JQM dynamically loads new content and creates new pages, the wsdoc has to change on pageinit and updatePolyfill has to be called on this [new] page element
 		 */
 
 

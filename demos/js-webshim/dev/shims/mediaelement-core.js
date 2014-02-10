@@ -98,7 +98,7 @@
 	hasFullTrackSupport = Modernizr.track && !bugs.track;
 
 webshims.register('mediaelement-core', function($, webshims, window, document, undefined, options){
-	hasSwf = swfmini.hasFlashPlayerVersion('9.0.115');
+	hasSwf = swfmini.hasFlashPlayerVersion('10.0.3');
 	$('html').addClass(hasSwf ? 'swf' : 'no-swf');
 	var mediaelement = webshims.mediaelement;
 	
