@@ -683,6 +683,9 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		if(typeof message == 'object'){
 			message = message.defaultMessage;
 		}
+		if(webshims.replaceValidationplaceholder){
+			message = webshims.replaceValidationplaceholder(elem, message);
+		}
 		return message || '';
 	};
 	

@@ -623,7 +623,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 						$(elem).data('errormessage', errorMessages);
 					}
 					if(webshims.getOptions){
-						webshims.getOptions(elem, 'errormessage');
+						webshims.getOptions(elem, 'errormessage', false, true);
 					}
 				});
 
