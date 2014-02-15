@@ -645,7 +645,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			} else if(typeof errorBox == 'string'){
 				errorBox = $('#'+errorBox);
 				fieldWrapper.data('errorbox', errorBox, fieldWrapper);
-				this._createContentMessage(elem, errorBox);
+				this._createContentMessage(elem, errorBox, fieldWrapper);
 			}
 			return errorBox;
 		},
