@@ -234,6 +234,7 @@ output {
 	transition: visibility 400ms ease-in-out;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	direction: ltr;
+	-webkit-tap-highlight-color: transparent;
 	
 	&.ws-is-rtl {
 		direction: rtl;
@@ -299,6 +300,7 @@ output {
 		font-family: inherit;
 		background: transparent;
 		cursor: pointer;
+		touch-action: none;
 
 		&::-moz-focus-inner {
 			border: 0;
@@ -441,6 +443,7 @@ input[data-wslist]::-webkit-calendar-picker-indicator {
 			text-overflow: ellipsis;
 			background-color: #fff;
 			transition: background-color 400ms;
+			touch-action: none;
 		}
 		
 		mark {

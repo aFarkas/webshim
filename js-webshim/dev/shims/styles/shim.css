@@ -199,7 +199,8 @@ output {
   backface-visibility: hidden;
   transition: visibility 400ms ease-in-out;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  direction: ltr; }
+  direction: ltr;
+  -webkit-tap-highlight-color: transparent; }
   .ws-popover.ws-is-rtl {
     direction: rtl;
     margin: 0 0 0 0.92308em; }
@@ -246,7 +247,8 @@ output {
     appearance: none;
     font-family: inherit;
     background: transparent;
-    cursor: pointer; }
+    cursor: pointer;
+    touch-action: none; }
     .ws-po-box button::-moz-focus-inner {
       border: 0;
       padding: 0; }
@@ -345,7 +347,8 @@ input[data-wslist]::-webkit-calendar-picker-indicator {
       overflow: hidden;
       text-overflow: ellipsis;
       background-color: #fff;
-      transition: background-color 400ms; }
+      transition: background-color 400ms;
+      touch-action: none; }
     .datalist-polyfill .datalist-box mark {
       font-weight: normal;
       font-style: normal; }
