@@ -1,3 +1,11 @@
+Release 1.12.3
+----------
+
+- fixed removeAttr 'disabled' for fieldset[disabled] elements (fix by @outdooricon)
+- Enable attribute placeholders for custom error elements in Instant Form Validation
+- fix CSS bugs for IE8 in datepicker and range
+- compile Jarisplayer as Flash 10.x (fixe youtube advertisement bug https://code.google.com/p/gdata-issues/issues/detail?id=5911)
+
 Release 1.12.2
 ----------
 
