@@ -263,7 +263,7 @@ if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled || !Modernizr.fieldse
 					},
 					removeAttr: {
 						value: function(){
-							desc.set.call(this, false);
+							desc.prop.set.call(this, false);
 						}
 					} 
 				});
