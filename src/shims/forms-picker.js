@@ -1095,6 +1095,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		var str = [];
 		var date = new Date(value[0], value[1] - 1, 1);
 		var action = (data.type == 'datetime-local') ? 'setTimeList' : 'changeInput';
+		var triggerValueValidation = (data.orig && ('valuevalidation' in $.data(data.orig)));
 		
 		date.setMonth(date.getMonth()  - Math.floor((size - 1) / 2));
 		
@@ -1210,7 +1211,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					buttonStr += ' class="'+ classArray.join(' ') +'"';
 				}
 				
-				if(!picker.isInRange(dateArray, max, min)){
+				if(!picker.isInRange(dateArray, max, min) || (triggerValueValidation && $(data.orig).triggerHandler('valuevalidation', [{value: dateArray.join('-'), valueAsDate: date}]))){
 					buttonStr += ' disabled=""';
 				}
 				

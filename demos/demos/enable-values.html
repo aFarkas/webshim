@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+		<meta name="viewport" content="width=device-width" />
+		<title>Webshim - foms polyfill</title>
+		
+
+        <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
+		<script src="../../js-webshim/minified/polyfiller.js"></script>
+
+		<script>
+			webshims.setOptions('debug', 'noCombo');
+
+			webshims.setOptions('forms', {
+				lazyCustomMessages: true,
+				replaceValidationUI: true,
+				customDatalist: true,
+				addValidators: true
+			});
+			webshims.setOptions('forms-ext', {
+				replaceUI: true
+			});
+			webshims.polyfill('forms forms-ext');
+			// load the forms polyfill
+		</script>
+
+	</head>
+
+	<body>
+	<form action="#" class="ws-validate">
+		<div>
+			<p>var allowedDays = {"2014-10-10": 1, "2014-10-12": 1};</p>
+			<input type="date" required="" class="test-1" data-valuevalidation='' data-errormessage-valuevalidation='Nutzen sie bitte ausschließlich {"2014-10-10": 1, "2014-10-12": 1}' data-date-start-view="2" data-date='{"inlinePicker": true}' />
+		</div>
+		<div>
+			<p>allowed values not day == 0 or day == 6</p>
+			<input type="date" class="test-2" data-valuevalidation='' data-date-start-view="2" data-date='{"inlinePicker": true}' />
+		</div>
+		<input type="submit" />
+	</form>
+<script>
+	$(function(){
+		var allowedDays = {"2014-10-10": 1, "2014-10-12": 1};
+		$('input.test-1').on('valuevalidation', function(e, data){
+			return !(data.value in allowedDays);
+		});
+
+
+		$('input.test-2').on('valuevalidation', function(e, data){
+			var day = data.valueAsDate.getDay();
+			return !day || day == 6 ?
+				"Nutzen Sie bitte ausschließlich Werktage" :
+				false
+			;
+		});
+	});
+</script>
+
+	</body>
+</html>

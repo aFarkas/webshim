@@ -284,8 +284,14 @@ webshims.register('form-validators', function($, webshims, window, document, und
 		}
 		
 	}, 'The value of this field does not repeat the value of the other field');
-	
-	
+
+	addCustomValidityRule('valuevalidation', function(elem, val, data){
+		if(val && ('valuevalidation' in data)){
+			//Todo allow markup params + mark popover as dirty!
+			return $(elem).triggerHandler('valuevalidation', [{value: val, valueAsDate: $.prop(elem, 'valueAsDate')}]) || '';
+		}
+	}, 'This value is not allowed here');
+
 	if(window.JSON){
 		addCustomValidityRule('ajaxvalidate', function(elem, val, data){
 			if(!val || !data.ajaxvalidate){return;}
