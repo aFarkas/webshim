@@ -932,6 +932,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		var enabled = 0;
 		var str = '';
 		var rowNum = 0;
+		var triggerValueValidation = (data.orig && ('valuevalidation' in $.data(data.orig)));
 		
 		if(data.options.useDecadeBase == 'max' && max[0]){
 			xthCorrect = 11 - (max[0] % 12);
@@ -956,7 +957,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			for(i = 0; i < 12; i++){
 				val = start + i ;
 				classArray = [];
-				if( !picker.isInRange([val], max, min) ){
+				if( !picker.isInRange([val], max, min) || (triggerValueValidation && $(data.orig).triggerHandler('valuevalidation', [{value: val, valueAsDate: null, isPartial: [val]}]))){
 					disabled = ' disabled=""';
 				} else {
 					disabled = '';
@@ -1007,6 +1008,9 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		var enabled = 0;
 		var rowNum = 0;
 		var str = '';
+		var action = data.type == 'month' ? 'changeInput' : 'setDayList' ;
+		var triggerValueValidation = (data.orig && ('valuevalidation' in $.data(data.orig)));
+		var isPartial = action != 'changeInput';
 		
 		value = value[0] - Math.floor((size - 1) / 2);
 		for(j = 0; j < size; j++){
@@ -1040,7 +1044,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				val = curCfg.date.monthkeys[i+1];
 				name = getMonthNameHTML(i);
 				classArray = [];
-				if(!picker.isInRange([value, val], max, min) ){
+				if(!picker.isInRange([value, val], max, min) || (triggerValueValidation  && $(data.orig).triggerHandler('valuevalidation', [{value: value+'-'+val, valueAsDate: data.asDate(value+'-'+val), isPartial: isPartial && [value, val]}]))){
 					disabled = ' disabled=""';
 				} else {
 					disabled = '';
@@ -1061,7 +1065,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					lis.push('</tr><tr class="ws-row-'+ rowNum +'">');
 				}
 
-				lis.push('<td class="ws-item-'+ i +'" role="presentation"><button data-id="month-'+ i +'" type="button"'+ disabled + classStr +' data-action="'+ (data.type == 'month' ? 'changeInput' : 'setDayList' ) +'" value="'+value+'-'+val+'" tabindex="-1" role="gridcell" aria-label="'+ curCfg.date.monthNames[i] +'">'+name+'</button></td>');
+				lis.push('<td class="ws-item-'+ i +'" role="presentation"><button data-id="month-'+ i +'" type="button"'+ disabled + classStr +' data-action="'+ action +'" value="'+value+'-'+val+'" tabindex="-1" role="gridcell" aria-label="'+ curCfg.date.monthNames[i] +'">'+name+'</button></td>');
 				
 			}
 			
@@ -1081,9 +1085,9 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 	
 	picker.getDayList = function(value, data){
 		
-		var j, i, k, day, nDay, name, val, disabled, lis,  prevDisabled, nextDisabled, yearNext, yearPrev, addTr, week, rowNum;
+		var j, i, k, day, nDay, disabled, prevDisabled, nextDisabled, yearNext, yearPrev, addTr, week, rowNum;
 		
-		var lastMonth, curMonth, otherMonth, dateArray, monthName, fullMonthName, monthDigit, buttonStr, date2, classArray;
+		var lastMonth, curMonth, otherMonth, dateArray, monthName, fullMonthName, buttonStr, date2, classArray;
 		
 		var o = data.options;
 		var size = o.size;
@@ -1091,11 +1095,11 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		var min = o.minS;
 		var currentValue = o.value.split('T')[0].split('-');
 		var dateCfg = curCfg.date;
-		var enabled = 0;
 		var str = [];
 		var date = new Date(value[0], value[1] - 1, 1);
 		var action = (data.type == 'datetime-local') ? 'setTimeList' : 'changeInput';
 		var triggerValueValidation = (data.orig && ('valuevalidation' in $.data(data.orig)));
+		var isPartial = action != 'changeInput';
 		
 		date.setMonth(date.getMonth()  - Math.floor((size - 1) / 2));
 		
@@ -1211,7 +1215,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					buttonStr += ' class="'+ classArray.join(' ') +'"';
 				}
 				
-				if(!picker.isInRange(dateArray, max, min) || (triggerValueValidation && $(data.orig).triggerHandler('valuevalidation', [{value: dateArray.join('-'), valueAsDate: date}]))){
+				if(!picker.isInRange(dateArray, max, min) || (triggerValueValidation && $(data.orig).triggerHandler('valuevalidation', [{value: dateArray.join('-'), valueAsDate: date, isPartial: isPartial && dateArray}]))){
 					buttonStr += ' disabled=""';
 				}
 				
@@ -1253,7 +1257,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			max: $.prop(data.orig, 'max'),
 			step: $.prop(data.orig, 'step')
 		};
-		var o = data.options;
+		var triggerValueValidation = (data.orig && ('valuevalidation' in $.data(data.orig)));
 		var gridLabel = '';
 		
 		if(data.type == 'time'){
@@ -1286,7 +1290,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			}
 			str += '<td role="presentation"><button role="gridcell" data-action="changeInput" value="'+ hVal +'" type="button" tabindex="-1"';
 			
-			if(!data.isValid(hVal, attrs)){
+			if(!data.isValid(hVal, attrs) || (triggerValueValidation && $(data.orig).triggerHandler('valuevalidation', [{value: hVal, valueAsDate: data.asDate(hVal), partial: false}]))){
 				str += ' disabled=""';
 			}
 			if(value == iVal){
@@ -1524,15 +1528,13 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 							text = (formcfg[''][[data.type]] || {}).currentText || (curCfg.date || {}).currentText || 'current';
 							webshims.warn("could not get currentText from form cfg for "+data.type);
 						}
+
 						if(today[data.type] && data.type != 'time'){
-							$.prop(this, 'disabled', !picker.isInRange(today[data.type].split('-'), o.maxS, o.minS));
+							$.prop(this, 'disabled', (!picker.isInRange(today[data.type].split('-'), o.maxS, o.minS) || !!$(data.orig).triggerHandler('valuevalidation', [{value: today[data.type], valueAsDate: new Date(), isPartial: false}])));
 						}
 					}
 					if(text){
 						$(this).text(text).attr({'aria-label': text});
-						if(webshims.assumeARIA){
-							$.attr(this, 'aria-label', text);
-						}
 					}
 					
 				});

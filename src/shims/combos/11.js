@@ -1212,6 +1212,10 @@
 							var type = (typeof val == 'object') ? 'valueAsDate' : 'valueAsNumber';
 							return input.prop(type, val).prop('value');
 						},
+						asDate: function(val){
+							var type = (typeof val == 'number') ? 'valueAsNumber' : 'value';
+							return input.prop(type, val).prop('valueAsDate');
+						},
 						isValid: function(val, attrs){
 							if(attrs && (attrs.nodeName || attrs.jquery)){
 								attrs = {
@@ -1485,6 +1489,7 @@
 				this.asNumber = helper.asNumber;
 				this.asValue = helper.asValue;
 				this.isValid = helper.isValid;
+				this.asDate = helper.asDate;
 				
 				
 				wsWidgetProto._create.apply(this, arguments);

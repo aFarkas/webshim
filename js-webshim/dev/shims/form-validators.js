@@ -287,8 +287,8 @@ webshims.register('form-validators', function($, webshims, window, document, und
 
 	addCustomValidityRule('valuevalidation', function(elem, val, data){
 		if(val && ('valuevalidation' in data)){
-			//Todo allow markup params + mark popover as dirty!
-			return $(elem).triggerHandler('valuevalidation', [{value: val, valueAsDate: $.prop(elem, 'valueAsDate')}]) || '';
+			//Todo allow markup params
+			return $(elem).triggerHandler('valuevalidation', [{value: val, valueAsDate: $.prop(elem, 'valueAsDate'), isPartial: false}]) || '';
 		}
 	}, 'This value is not allowed here');
 

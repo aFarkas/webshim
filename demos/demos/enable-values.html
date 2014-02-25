@@ -34,7 +34,7 @@
 	<form action="#" class="ws-validate">
 		<div>
 			<p>var allowedDays = {"2014-10-10": 1, "2014-10-12": 1};</p>
-			<input type="date" required="" class="test-1" data-valuevalidation='' data-errormessage-valuevalidation='Nutzen sie bitte ausschließlich {"2014-10-10": 1, "2014-10-12": 1}' data-date-start-view="2" data-date='{"inlinePicker": true}' />
+			<input type="datetime-local" required="" class="test-1" data-valuevalidation='' data-errormessage-valuevalidation='Nutzen sie bitte ausschließlich {"2014-10-10": 1, "2014-10-12": 1}' data-date-start-view="2" data-date='{"inlinePicker": true}' />
 		</div>
 		<div>
 			<p>allowed values not day == 0 or day == 6</p>
@@ -46,16 +46,31 @@
 	$(function(){
 		var allowedDays = {"2014-10-10": 1, "2014-10-12": 1};
 		$('input.test-1').on('valuevalidation', function(e, data){
+			var ret = true;
+			var val;
+
+			if(data.isPartial){
+				for(val in allowedDays){
+					if(val.indexOf(data.value) === 0){
+						ret = false;
+						break;
+					}
+				}
+				return ret;
+			}
+
 			return !(data.value in allowedDays);
 		});
 
 
 		$('input.test-2').on('valuevalidation', function(e, data){
-			var day = data.valueAsDate.getDay();
-			return !day || day == 6 ?
-				"Nutzen Sie bitte ausschließlich Werktage" :
-				false
-			;
+			if(data.valueAsDate){
+				var day = data.valueAsDate.getDay();
+				return !day || day == 6 ?
+					"Nutzen Sie bitte ausschließlich Werktage" :
+					false
+				;
+			}
 		});
 	});
 </script>
