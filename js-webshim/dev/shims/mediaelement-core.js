@@ -87,8 +87,15 @@
 			}
 			
 			if(!bugs.track){
+
+				if(window.VTTCue && !window.TextTrackCue){
+					window.TextTrackCue = window.VTTCue;
+				} else if(!window.VTTCue){
+					window.VTTCue = window.TextTrackCue;
+				}
+
 				try {
-					new TextTrackCue(2, 3, '');
+					new VTTCue(2, 3, '');
 				} catch(e){
 					bugs.track = true;
 				}

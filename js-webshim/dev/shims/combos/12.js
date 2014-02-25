@@ -538,8 +538,15 @@ var swfmini = function() {
 			}
 			
 			if(!bugs.track){
+
+				if(window.VTTCue && !window.TextTrackCue){
+					window.TextTrackCue = window.VTTCue;
+				} else if(!window.VTTCue){
+					window.VTTCue = window.TextTrackCue;
+				}
+
 				try {
-					new TextTrackCue(2, 3, '');
+					new VTTCue(2, 3, '');
 				} catch(e){
 					bugs.track = true;
 				}
@@ -1415,6 +1422,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	};
 	
 	window.TextTrackCue = TextTrackCue;
+	window.VTTCue = TextTrackCue;
 	
 	
 	
@@ -1600,19 +1608,17 @@ modified for webshims
 	mediaelement.parseCaptionChunk = (function(){
 		// Set up timestamp parsers
 		var WebVTTTimestampParser			= /^(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s+\-\-\>\s+(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s*(.*)/;
-		var GoogleTimestampParser		= /^([\d\.]+)\s+\+([\d\.]+)\s*(.*)/;
 		var WebVTTDEFAULTSCueParser		= /^(DEFAULTS|DEFAULT)\s+\-\-\>\s+(.*)/g;
 		var WebVTTSTYLECueParser		= /^(STYLE|STYLES)\s+\-\-\>\s*\n([\s\S]*)/g;
 		var WebVTTCOMMENTCueParser		= /^(COMMENT|COMMENTS)\s+\-\-\>\s+(.*)/g;
 		
 		return function(subtitleElement,objectCount){
-			var cueDefaults = [];
-		
-			var subtitleParts, timeIn, timeOut, html, timeData, subtitlePartIndex, cueSettings = "", id, specialCueData;
+
+			var subtitleParts, timeIn, timeOut, html, timeData, subtitlePartIndex, id, specialCueData;
 			var timestampMatch, tmpCue;
 
 			// WebVTT Special Cue Logic
-			if ((specialCueData = WebVTTDEFAULTSCueParser.exec(subtitleElement))) {
+			if (WebVTTDEFAULTSCueParser.exec(subtitleElement)) {
 //				cueDefaults = specialCueData.slice(2).join("");
 //				cueDefaults = cueDefaults.split(/\s+/g).filter(function(def) { return def && !!def.length; });
 				return null;
@@ -1709,10 +1715,10 @@ modified for webshims
 	})();
 	
 	mediaelement.parseCaptions = function(captionData, track, complete) {
-		var subtitles = mediaelement.createCueList();
-		var cue, lazyProcess, regWevVTT;
-		var startDate;
-		var isWEBVTT;
+
+		var cue, lazyProcess, regWevVTT, startDate, isWEBVTT;
+
+		mediaelement.createCueList();
 		if (captionData) {
 			
 			regWevVTT = /^WEBVTT(\s*FILE)?/ig;
