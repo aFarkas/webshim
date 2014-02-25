@@ -915,9 +915,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		};
 	})();
 	var emptyDiv = $('<div />')[0];
-	var TextTrackCue = function(startTime, endTime, text){
+	function VTTCue(startTime, endTime, text){
 		if(arguments.length != 3){
-			webshims.error("wrong arguments.length for TextTrackCue.constructor");
+			webshims.error("wrong arguments.length for VTTCue.constructor");
 		}
 		
 		this.startTime = startTime;
@@ -926,9 +926,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		
 		
 		createEventTarget(this);
-	};
+	}
 	
-	TextTrackCue.prototype = {
+	VTTCue.prototype = {
 		
 		onenter: null,
 		onexit: null,
@@ -970,9 +970,14 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 //			align: 'middle'
 	};
 	
-	window.TextTrackCue = TextTrackCue;
-	window.VTTCue = TextTrackCue;
-	
+	window.VTTCue = VTTCue;
+	window.TextTrackCue = function(){
+		webshims.error("Use VTTCue constructor instead of abstract TextTrackCue constructor.");
+		VTTCue.apply(this, arguments);
+	};
+
+	window.TextTrackCue.prototype = VTTCue.prototype;
+
 	
 	
 	
@@ -1244,7 +1249,7 @@ modified for webshims
 						return previous;
 					},compositeCueSettings);
 			
-			// Turn back into string like the TextTrackCue constructor expects
+			// Turn back into string like the VTTCue constructor expects
 			cueSettings = "";
 			for (var key in compositeCueSettings) {
 				if (compositeCueSettings.hasOwnProperty(key)) {
@@ -1255,7 +1260,7 @@ modified for webshims
 */
 			// The remaining lines are the subtitle payload itself (after removing an ID if present, and the time);
 			html = subtitleParts.join("\n");
-			tmpCue = new TextTrackCue(timeIn, timeOut, html);
+			tmpCue = new VTTCue(timeIn, timeOut, html);
 			if(id){
 				tmpCue.id = id;
 			}
