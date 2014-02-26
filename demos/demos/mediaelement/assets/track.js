@@ -128,14 +128,14 @@ var startTreeOfLife = function(video){
 		var textTrack = $.prop(this, 'track'); // gotcha: "this" is track *element*
 		//track was loaded without errors (0: nothing, 1: loading, 2: loaded, 3: error)
 		if ($.prop(this, 'readyState') == 2) {
-		
+
 			if (textTrack.kind === "metadata") {
 				buildCarouselFromCues(textTrack);
 				buildInfoPanel(textTrack);
 			} else if (textTrack.kind === "subtitles") {
 				buildDatalistFromCues(textTrack);
 			}
-		}	
+		}
 	
 	};
 	
@@ -144,6 +144,7 @@ var startTreeOfLife = function(video){
 		.on("load", onTrackLoad)
 		//run immediately in case track was already loaded
 		.each(onTrackLoad)
+		//IE10/11 only allows one default track element, so we activate all tracks here:
 		.each(function(){
 			var track = $.prop(this, 'track');
 			//metadata is hidden
@@ -156,6 +157,10 @@ var startTreeOfLife = function(video){
 $(function(){
 	startTreeOfLife('video');
 });
+
+if(!$.fn.callProp){
+	$.fn.callProp = $.fn.trigger;
+}
 
 $(window).on('load', function(){
 	$('video').eq(0).callProp('play');

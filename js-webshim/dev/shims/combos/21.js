@@ -1813,9 +1813,6 @@
 
 	window.TextTrackCue.prototype = VTTCue.prototype;
 
-	
-	
-	
 	mediaelement.createCueList = function(){
 		return $.extend([], cueListProto);
 	};

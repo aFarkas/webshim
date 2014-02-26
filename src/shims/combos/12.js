@@ -1429,9 +1429,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 
 	window.TextTrackCue.prototype = VTTCue.prototype;
 
-	
-	
-	
 	mediaelement.createCueList = function(){
 		return $.extend([], cueListProto);
 	};
