@@ -1306,3 +1306,5 @@
 	webshims.callAsync();
 	return webshims;
 }));
+webshims.error('"js-webshim" folder was moved from http://afarkas.github.io/webshim/demos/js-webshim/ to http://afarkas.github.io/webshim/js-webshim/. Please update your path');
+webshims.setOptions('basePath', webshims.cfg.basePath +'../../../../js-webshim/dev/shims/');

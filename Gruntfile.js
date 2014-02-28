@@ -30,11 +30,10 @@ module.exports = function(grunt){
 		},
 		//copy and uglify are changed through cfgcopymin
 		copy: {
-			main: {},
-			legacy: {expand: true, src: [DISTPATH+'/**'], dest: 'demos'}
+			main: {}
 		},
 		cssmin: getFiles('src', MINPATH, '**/*.css'),
-
+		legacypolyfiller: {},
 		sass: { 
 			dist: { 
 				files:[{
@@ -118,7 +117,20 @@ module.exports = function(grunt){
 			}
 		}
 	});
-	
+
+	grunt.registerTask('legacypolyfiller', 'copy polyfiller code to legacy folder.', function() {
+
+		var code = grunt.file.read(DEVPATH+'/polyfiller.js');
+		var code2 = grunt.file.read(DEVPATH+'/extras/modernizr-custom.js');
+
+		code += "webshims.error('\"js-webshim\" folder was moved from http://afarkas.github.io/webshim/demos/js-webshim/ to http://afarkas.github.io/webshim/js-webshim/. Please update your path');\n";
+		code += "webshims.setOptions('basePath', webshims.cfg.basePath +'../../../../js-webshim/dev/shims/');";
+		grunt.file.write('demos/js-webshim/minified/polyfiller.js', code);
+		grunt.file.write('demos/js-webshim/dev/polyfiller.js', code);
+		grunt.file.write('demos/js-webshim/minified/extras/modernizr-custom.js', code2);
+		grunt.file.write('demos/js-webshim/dev/extras/modernizr-custom.js', code2);
+	});
+
 	grunt.registerTask('webshimscombos', 'create combos from polyfiller.js.', function() {
 		var phantomjs = require('phantomjs');
 		var done = this.async();
@@ -214,7 +226,7 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-css');
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	
-	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'copy:legacy']);
+	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'legacypolyfiller']);
 
 	grunt.registerTask('dev', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'watch']);
 

@@ -88,6 +88,7 @@
 	}
 }(function($){
 	"use strict";
+	clearInterval(webshims.timer);
 	var firstRun, path;
 	var webshims = window.webshims;
 	var DOMSUPPORT = 'dom-support';
@@ -106,8 +107,8 @@
 	if(Modernizr.ES5 && !('toJSON' in Date.prototype)){
 		Modernizr.ES5 = false;
 	}
-	
-	clearInterval(webshims.timer);
+
+
 
 	path = ($.support.hrefNormalized === false) ? webshims._curScript.getAttribute("src", 4) : webshims._curScript.src;
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
