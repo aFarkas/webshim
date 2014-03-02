@@ -3,7 +3,7 @@ $(function($){
 	$('#code').each(function(){
 		var lastData, configType, markupFormat;
 		var output = $(this);
-		var cfgFeature = $('#cfg-feature').val() || 'forms-cfg';
+		var cfgFeature = $('#cfg-feature').val() || 'forms-ext';
 		var getOptions = function(){
 			configType = ($('#config-type').val() || $('#config-type option').eq(0).val()).split('-');
 			markupFormat = $('#markup-format').val();

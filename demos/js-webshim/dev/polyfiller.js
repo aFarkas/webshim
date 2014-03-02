@@ -97,7 +97,6 @@
 	var asyncWebshims = window.asyncWebshims;
 	var addTest = Modernizr.addTest;
 	var Object = window.Object;
-	var html5 = window.html5 || {};
 	var addSource = function(text){
 		return text +"\n//# sourceURL="+this.url;
 	};
@@ -106,7 +105,7 @@
 	if(Modernizr.ES5 && !('toJSON' in Date.prototype)){
 		Modernizr.ES5 = false;
 	}
-	
+
 	clearInterval(webshims.timer);
 
 	path = ($.support.hrefNormalized === false) ? webshims._curScript.getAttribute("src", 4) : webshims._curScript.src;
@@ -120,7 +119,6 @@
 			waitReady: true,
 //			extendNative: false,
 			loadStyles: true,
-			disableShivMethods: true,
 			wsdoc: document,
 			wspopover: {appendTo: 'auto', hideOnBlur: true},
 			ajax: {},

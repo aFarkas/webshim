@@ -18,10 +18,11 @@
 			        padding: 20px;
 			      }
 			    }
-			  
-			  .input-buttons {
-			  	margin-bottom: 5px;
-			  }
+
+
+			.input-buttons {
+				margin-bottom: 9px;
+			}
 			  
 			  .polyfill-all {
 			  	font-size: 200%;
@@ -32,9 +33,9 @@
 			  	display: none;
 			  }
 		</style>
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
-		<script src="../../js-webshim/minified/polyfiller.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
+		<script src="../../../js-webshim/minified/polyfiller.js"></script>
 
 	<!--
 		<script src="../../../src/polyfiller.js"></script> 
@@ -65,12 +66,7 @@
 			//load form polyfills
 			webshims.polyfill('forms forms-ext');
 		</script>
-		<!-- non required addons -->
-		<script>
-			$.each(['jquery.mousewheel.js', 'mousepress.js', 'jquery.mwheelIntent.js', 'jquery.ui.position.js'], function(i, src){
-				webshims.loader.loadScript('../../../demo-js/src/'+src);
-			});
-		</script>
+
 	</head>
 	<body>
 		<!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
