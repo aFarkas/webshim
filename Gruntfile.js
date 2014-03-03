@@ -215,6 +215,17 @@ module.exports = function(grunt){
 		grunt.config('uglify', uglifyCfg);
 		grunt.config('copy', copyCfg);
 	});
+
+	grunt.registerTask('versionreplace', 'replace version', function() {
+		var reg = /<span class=\"ws-version\">[\d\.\-a-z]+<\/span>/g;
+		var replace = '<span class="ws-version">'+ grunt.config('pkg').version +'</span>';
+		grunt.file.expand({cwd: 'demos/', matchBase: true}, '*.html').forEach(function(path) {
+			var code = grunt.file.read('demos/'+path);
+			code = code.replace(reg, replace);
+			grunt.file.write('demos/'+path, code);
+
+		});
+	});
 	
 	// Default task.
 	grunt.loadTasks('grunt-tasks/');
@@ -226,7 +237,7 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-css');
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	
-	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'legacypolyfiller']);
+	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'versionreplace', 'legacypolyfiller']);
 
 	grunt.registerTask('dev', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'watch']);
 
