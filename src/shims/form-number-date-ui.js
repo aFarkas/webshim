@@ -12,7 +12,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		if(!curCfg[selectName]){
 			var labels = curCfg.date[opts.monthNames] || monthDigits;
 			curCfg[selectName] = ('<option value=""></option>')+$.map(monthDigits, function(val, i){
-				return '<option value="'+val+'"]>'+labels[i]+'</option>';
+				return '<option value="'+val+'">'+labels[i]+'</option>';
 			}).join('');
 		}
 		return curCfg[selectName];
@@ -416,8 +416,12 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				var names;
 				var p = val.split('-');
 				if(p[0] && p[1]){
-					names = curCfg.date[options.monthNames] || curCfg.date.monthNames;
-					p[1] = names[(p[1] * 1) - 1];
+
+					if(!options || !options.monthSelect){
+						names = curCfg.date[options.monthNames] || curCfg.date.monthNames;
+						p[1] = names[(p[1] * 1) - 1];
+					}
+
 					if(options && options.splitInput){
 						val = [p[0] || '', p[1] || ''];
 					} else if(p[1]){

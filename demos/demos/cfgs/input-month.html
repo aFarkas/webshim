@@ -15,7 +15,7 @@
 
 		<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
 
-		<script src="../../../js-webshim/minified/polyfiller.js"></script>
+		<script src="../../../src/polyfiller.js"></script>
 
 		<script>
 			webshims.setOptions('forms', {
@@ -29,6 +29,8 @@
 				replaceUI: true,
 				"types": "month number"
 			});
+
+			webshims.setOptions('debug', 'noCombo');
 			
 			// load the forms polyfill
 			webshims.polyfill('forms forms-ext');
