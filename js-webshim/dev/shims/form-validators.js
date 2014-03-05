@@ -264,12 +264,10 @@ webshims.register('form-validators', function($, webshims, window, document, und
 				$(data.masterElement.type === 'radio' && getGroupElements(data.masterElement) || data.masterElement).on('change', depFn);
 			} else {
 				$(data.masterElement).on('change', function(){
+					webshims.refreshCustomValidityRules(elem);
 					$(elem)
 						.getShadowElement()
 						.filter('.user-error, .user-success')
-						.each(function(){
-							webshims.refreshCustomValidityRules(elem);
-						})
 						.trigger('refreshvalidityui')
 					;
 				});
