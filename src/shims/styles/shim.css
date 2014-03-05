@@ -67,7 +67,11 @@ audio > * {
   font-family: sans-serif;
   font-size: 12px;
   white-space: pre-wrap;
-  overflow: hidden; }
+  overflow: hidden;
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none; }
   .cue-display b {
     font-weight: bold; }
   .cue-display i {

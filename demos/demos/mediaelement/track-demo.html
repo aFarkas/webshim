@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 
-<html dir="ltr">
+<html lang="en" dir="ltr">
 
 <head>
 
 <meta charset="utf-8" />
-<meta name="keywords" content="track element, html5, video, audio, accessibility, Sam Dutton" /> 
-<meta name="Description" content="The HTML5 track element provides a simple, standardised way to add subtitles, captions, screen reader descriptions, chapters and timed metadata to video and audio." /> 
+<meta name="keywords" content="track element, html5, video, audio, accessibility, Sam Dutton" />
+<meta name="Description" content="The HTML5 track element provides a simple, standardised way to add subtitles, captions, screen reader descriptions, chapters and timed metadata to video and audio." />
 
 <title>Track element demo</title>
 
 <!-- jQuery UI files for autocomplete input#searchInput was removed we use HTML5 datalist, yeah-->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
-<script src="../../../js-webshim/minified/polyfiller.js"></script>
+<script src="../../js-webshim/minified/extras/modernizr-custom.js"></script>
+<script src="../../js-webshim/minified/polyfiller.js"></script>
 
 <script>
 	webshims.setOptions('forms', {
 		customDatalist: true
 	});
-	webshims.polyfill('mediaelement track forms');
+	webshims.polyfill('mediaelement track forms json-storage');
 </script>
 
 <script>
 	$(function(){
-		
+
 		$('button.load-jme').prop('disabled', false).one('click', function(){
 			webshims.loader.loadCSS('http://afarkas.github.io/jMediaelement/demo/default-style/css/player-styles.css');
 			webshims.loader.loadList(['range-ui']);
 			webshims.loader.loadScript('http://afarkas.github.io/jMediaelement/demo/js/jme.full.js', function(){
-				$.jme.startJME();					
+				$.jme.startJME();
 				$('div.mediaplayer').jmeProp({"controlbar": true});
 				setTimeout(function(){
 					$(document).trigger('updateshadowdom');
@@ -43,7 +43,7 @@
 	.mediaplayer {
 		width: 100%;
 	}
-	
+
 	.button-row button {
 		font-size: 140%;
 	}
@@ -86,16 +86,16 @@
 		<video controls="">
 			<source src="http://www.samdutton.net/track/video/treeOfLife-en.webm"  type='video/webm; codecs="vp8, vorbis"' />
 			<source src="http://www.youtube.com/watch?v=H6IrUUDboZo"  type='video/youtube' />
-			
+
 			<track label="English subtitles" kind="subtitles" srclang="en" src="assets/treeOfLife-subtitles-en.vtt" default />
 			<track kind="metadata" srclang="en" src="assets/treeOfLife-metadata-en.vtt" default />
 		</video>
-	</div>	
+	</div>
 	<div id="searchContainer" class="trackSupported">
 		<label for="searchInput">Search subtitles: </label>
 		<input id="searchInput" placeholder="find subtitles, then select a result to move to that point in the video." class="mark-option-text" />
 	</div>
-	
+
 	<div id="carouselContainer" class="trackSupported">
 		<ul id="carousel" class="jcarousel-skin-tango">
 			<!-- Content loaded dynamically -->

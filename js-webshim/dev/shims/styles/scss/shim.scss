@@ -69,6 +69,10 @@ audio > * {
 	font-size: 12px;
 	white-space: pre-wrap;
 	overflow: hidden;
+	cursor: default;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
 
 	b {
 		font-weight: bold;
