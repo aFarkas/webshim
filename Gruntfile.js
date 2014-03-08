@@ -119,11 +119,13 @@ module.exports = function(grunt){
 	});
 
 	grunt.registerTask('legacypolyfiller', 'copy polyfiller code to legacy folder.', function() {
-
+		var error = '"js-webshim" folder was moved from http://afarkas.github.io/webshim/demos/js-webshim/ to http://afarkas.github.io/webshim/js-webshim/. Please update your path';
 		var code = grunt.file.read(DEVPATH+'/polyfiller.js');
 		var code2 = grunt.file.read(DEVPATH+'/extras/modernizr-custom.js');
 
-		code += "webshims.error('\"js-webshim\" folder was moved from http://afarkas.github.io/webshim/demos/js-webshim/ to http://afarkas.github.io/webshim/js-webshim/. Please update your path');\n";
+		code2 += "\nif(window.console){console.log('"+ error +"');}";
+
+		code += "webshims.error('"+ error +"');\n";
 		code += "webshims.setOptions('basePath', webshims.cfg.basePath +'../../../../js-webshim/dev/shims/');";
 		grunt.file.write('demos/js-webshim/minified/polyfiller.js', code);
 		grunt.file.write('demos/js-webshim/dev/polyfiller.js', code);

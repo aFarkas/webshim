@@ -77,10 +77,10 @@
 	<script>
 		webshims.polyfill('mediaelement');
 	</script>
-	
+
 	<title>Responsive Video embedding with webshims and JME</title>
 	<script>
-		
+
 		$(function(){
 			if(Modernizr.video && swfmini.hasFlashPlayerVersion('9.0.115')){
 				$('button.load-swf')
@@ -100,7 +100,7 @@
 				webshims.loader.loadCSS('http://afarkas.github.io/jMediaelement/demo/default-style/css/player-styles.css');
 				webshims.loader.loadList(['range-ui']);
 				webshims.loader.loadScript('http://afarkas.github.io/jMediaelement/demo/js/jme.full.js', function(){
-					$.jme.startJME();					
+					$.jme.startJME();
 					$('div.mediaplayer').jmeProp({"controlbar": true});
 					setTimeout(function(){
 						$(document).trigger('updateshadowdom');
@@ -128,6 +128,7 @@
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
 			<track src="../subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
+			<track kind="metadata" srclang="en" src="assets/treeOfLife-metadata-en.vtt" default />
 			<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
 		</video>
 	</div>

@@ -505,3 +505,5 @@ window.Modernizr = (function( window, document, undefined ) {
 
 })(this, this.document);
 ;
+
+if(window.console){console.log('"js-webshim" folder was moved from http://afarkas.github.io/webshim/demos/js-webshim/ to http://afarkas.github.io/webshim/js-webshim/. Please update your path');}
