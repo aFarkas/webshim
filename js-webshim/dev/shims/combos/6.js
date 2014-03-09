@@ -3018,6 +3018,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 				cNames = $.prop(this, 'className');
 				if(opts.classes){
 					cNames += ' '+opts.classes;
+					$(this).addClass(opts.classes);
 				}
 				
 				if(opts.splitInput || type == 'range'){

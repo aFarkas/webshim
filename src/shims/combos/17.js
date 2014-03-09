@@ -2807,6 +2807,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 				cNames = $.prop(this, 'className');
 				if(opts.classes){
 					cNames += ' '+opts.classes;
+					$(this).addClass(opts.classes);
 				}
 				
 				if(opts.splitInput || type == 'range'){
