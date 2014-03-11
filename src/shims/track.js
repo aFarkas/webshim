@@ -749,7 +749,6 @@ modified for webshims
 		},
 		readyState: {
 			get: function(){
-				
 				return (webshims.data(this, 'trackData') || {readyState: 0}).readyState;
 			},
 			writeable: false

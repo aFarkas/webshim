@@ -1226,7 +1226,7 @@
 
 
 		bugs.track = !window.TextTrackCue || !Modernizr.texttrackapi;
-		
+
 		addPolyfill('track', {
 			options: {
 				positionDisplay: true,
