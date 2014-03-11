@@ -65,7 +65,7 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 	set: function(value){
 		$(this).getShadowFocusElement().attr('aria-required', !!(value)+'');
 	},
-	initAttr: Modernizr.localstorage //only if we have aria-support
+	initAttr: true
 });
 
 webshims.reflectProperties(['input'], ['pattern']);
