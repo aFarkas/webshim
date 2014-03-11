@@ -110,11 +110,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				){
 					return;
 			}
-			if(webshims.refreshCustomValidityRules){
-				if(webshims.refreshCustomValidityRules(elem) == 'async'){
-					$(elem).one('refreshvalidityui', switchValidityClass);
-					return;
-				}
+			if(webshims.refreshCustomValidityRules && webshims.refreshCustomValidityRules(elem) == 'async'){
+				$(elem).one('refreshvalidityui', switchValidityClass);
+				return;
 			}
 			
 			var validity = $.prop(elem, 'validity');
@@ -779,7 +777,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				}
 			},
 			submit: function(e){
-				if(iVal.sel && iVal.submitCheck &&$(e.target).is(iVal.sel) && $.prop(e.target, 'noValidate') && !$(e.target).checkValidity()){
+				if(iVal.sel && iVal.submitCheck && $(e.target).is(iVal.sel) && $.prop(e.target, 'noValidate') && !$(e.target).checkValidity()){
 					e.stopImmediatePropagation();
 					return false;
 				}

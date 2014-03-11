@@ -96,22 +96,18 @@ var isPlaceholderOptionSelected = function(select){
 var emptyJ = $([]);
 var getGroupElements = function(elem){
 	elem = $(elem);
-	var name;
-	var form;
+	var name, form;
 	var ret = emptyJ;
 	if(elem[0].type == 'radio'){
-		form = elem.prop('form');
 		name = elem[0].name;
 		if(!name){
 			ret = elem;
-		} else if(form){
-			ret = $(form[name]);
 		} else {
+			form = elem.prop('form');
 			ret = $(document.getElementsByName(name)).filter(function(){
-				return !$.prop(this, 'form');
+				return this.type == 'radio' && this.name == name && $.prop(this, 'form') == form;
 			});
 		}
-		ret = ret.filter('[type="radio"]');
 	}
 	return ret;
 };
@@ -862,7 +858,7 @@ webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'requir
 	set: function(value){
 		$(this).getShadowFocusElement().attr('aria-required', !!(value)+'');
 	},
-	initAttr: Modernizr.localstorage //only if we have aria-support
+	initAttr: true
 });
 
 webshims.reflectProperties(['input'], ['pattern']);
