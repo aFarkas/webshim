@@ -93,6 +93,18 @@ webshims.register('form-validators', function($, webshims, window, document, und
 		return message;
 	};
 	var testValidityRules = webshims.refreshCustomValidityRules;
+
+	if(typeof document.activeElement != 'unknown'){
+		$('body').on('click', function(e){
+			if(e.target.type == 'submit'){
+				var activeElement = document.activeElement;
+
+				if(activeElement != e.target && $.data(activeElement, 'webshimsswitchvalidityclass')){
+					$(activeElement).trigger('refreshvalidityui');
+				}
+			}
+		});
+	}
 	
 	webshims.ready('forms form-validation', function(){
 		
