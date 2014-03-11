@@ -98,6 +98,7 @@ audio > * {
 		font-size: 160%;
 		color: #fff;
 		visibility: visible !important;
+		pointer-events: none;
 	}
 
 	.cue-line {

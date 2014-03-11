@@ -1022,8 +1022,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		var loadEvents = 'play playing updatetrackdisplay';
 		var obj = trackData.track;
 		var load = function(){
-			var error, ajax, src, createAjax;
-			if(obj.mode != 'disabled' && $.attr(track, 'src') && (src = $.prop(track, 'src'))){
+			var error, ajax, createAjax;
+			var src = $.data(track, 'wsFFTrackSrc') || ($.attr(track, 'src') && $.prop(track, 'src'));
+			if(obj.mode != 'disabled' && src){
 				$(mediaelem).off(loadEvents, load);
 				if(!trackData.readyState){
 					error = function(){
@@ -1516,22 +1517,27 @@ modified for webshims
 	};
 	var startTrackImplementation = function(){
 		if(webshims.implement(this, 'track')){
-			var shimedTrack = $.prop(this, 'track');
+			var kind, parent;
 			var origTrack = this.track;
-			var kind;
-			var readyState;
 			if(origTrack){
-				kind = $.prop(this, 'kind');
-				readyState = getNativeReadyState(this, origTrack);
-				if (origTrack.mode || readyState) {
-					shimedTrack.mode = numericModes[origTrack.mode] || origTrack.mode;
+
+				if (!webshims.bugs.track && (origTrack.mode || getNativeReadyState(this, origTrack))) {
+					$.prop(this, 'track').mode = numericModes[origTrack.mode] || origTrack.mode;
 				}
 				//disable track from showing + remove UI
-				if(kind != 'descriptions'){
-					origTrack.mode = (typeof origTrack.mode == 'string') ? 'disabled' : 0;
-					this.kind = 'metadata';
-					$(this).attr({kind: kind});
-				}
+				kind = $.prop(this, 'kind');
+				//ToDo: remove as soon as FF becomes less stupid
+				parent = this.parentNode;
+				$(this).data('wsFFTrackSrc', $.attr(this, 'src') && $.prop(this, 'src'));
+				this.removeAttribute('src');
+				$(this).detach();
+				//End: FF workaround
+
+				origTrack.mode = (typeof origTrack.mode == 'string') ? 'disabled' : 0;
+				this.kind = 'metadata';
+
+				//ToDo: remove .appendTo(parent)
+				$(this).attr({kind: kind}).appendTo(parent);
 				
 			}
 			$(this).on('load error', stopOriginalEvent);

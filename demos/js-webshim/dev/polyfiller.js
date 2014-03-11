@@ -1225,7 +1225,7 @@
 		});
 
 
-		bugs.track = !Modernizr.texttrackapi;
+		bugs.track = !window.TextTrackCue || !Modernizr.texttrackapi;
 		
 		addPolyfill('track', {
 			options: {

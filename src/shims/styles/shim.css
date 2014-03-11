@@ -89,7 +89,8 @@ audio > * {
     width: 100%;
     font-size: 160%;
     color: #fff;
-    visibility: visible !important; }
+    visibility: visible !important;
+    pointer-events: none; }
   .cue-display .cue-line {
     display: block; }
   .cue-display span.cue {
