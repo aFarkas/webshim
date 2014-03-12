@@ -1513,8 +1513,8 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 						if($.ajax){
 							createAjax();
 						} else {
-							webshims.ready('$ajax', createAjax);
-							webshims.loader.loadList(['$ajax']);
+							webshims.ready('jajax', createAjax);
+							webshims.loader.loadList(['jajax']);
 						}
 					} catch(er){
 						error();

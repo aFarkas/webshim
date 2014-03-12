@@ -361,8 +361,8 @@ webshims.register('track', function($, webshims, window, document, undefined){
 						if($.ajax){
 							createAjax();
 						} else {
-							webshims.ready('$ajax', createAjax);
-							webshims.loader.loadList(['$ajax']);
+							webshims.ready('jajax', createAjax);
+							webshims.loader.loadList(['jajax']);
 						}
 					} catch(er){
 						error();

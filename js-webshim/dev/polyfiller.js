@@ -898,7 +898,7 @@
 	modules.swfmini.test();
 	
 	addModule('sizzle', {test: $.expr.filters});
-	addModule('$ajax', {test: $.ajax});
+	addModule('jajax', {test: $.ajax});
 	/* 
 	 * polyfill-Modules 
 	 */
