@@ -56,7 +56,7 @@ Installation and Usage
 	$(function(){
 		// work with the HTML5 API
 		$('input:invalid').each(function(){
-		    $(this).after( $.prop(this, 'validationMessage');
+		    $(this).after( $.prop(this, 'validationMessage') );
 		});
 		// ...
 	});
