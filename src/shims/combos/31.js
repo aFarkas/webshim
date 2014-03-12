@@ -1196,7 +1196,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	var hasInvalid = function(elem){
 		var ret = false;
 		$(elem).jProp('elements').each(function(){
-			if(!rElementsGroup.test(elem.nodeName || '')){
+			if(!rElementsGroup.test(this.nodeName || '')){
 				ret = $(this).is(':invalid');
 				if(ret){
 					return false;
