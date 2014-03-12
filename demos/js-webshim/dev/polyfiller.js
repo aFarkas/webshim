@@ -986,7 +986,7 @@
 				
 				if(Modernizr[formvalidation]){
 					bustedWidgetUi = !Modernizr.fieldsetdisabled ||!Modernizr.fieldsetelements || !('value' in document.createElement('progress')) || !('value' in document.createElement('output'));
-					bugs.bustedValidity = bustedValidity = window.opera || bustedWidgetUi || !modernizrInputAttrs.list;
+					bugs.bustedValidity = bustedValidity = window.opera || bugs.bustedValidity || bustedWidgetUi || !modernizrInputAttrs.list;
 				}
 
 				formExtend = Modernizr[formvalidation] && !bustedValidity ? 'form-native-extend' : fShim;
@@ -995,10 +995,7 @@
 			initialFormTest.run = true;
 			return false;
 		};
-		
-		if(modernizrInputAttrs && modernizrInputTypes){
-			initialFormTest();
-		}
+
 		document.createElement('datalist');
 				
 		
@@ -1226,7 +1223,7 @@
 
 
 		bugs.track = !window.TextTrackCue || !Modernizr.texttrackapi;
-		
+
 		addPolyfill('track', {
 			options: {
 				positionDisplay: true,
