@@ -76,6 +76,9 @@
 				webshims.setOptions('forms-ext', { replaceUI: true });
 				webshims.setOptions('forms', { addValidators: true });
 			}
+			if(hash.indexOf('bustedValidity') !== -1){
+				webshims.bugs.bustedValidity = true;
+			}
 			
 			
 						
@@ -84,6 +87,7 @@
 				$('#nativeMethods').prop('checked', $.webshims.cfg.extendNative);
 				$('#useCustomUI').prop('checked', $.webshims.cfg['forms-ext'].replaceUI);
 				$('#legacyjquery').prop('checked', (hash.indexOf('legacyjquery') != -1));
+				$('#bustedValidity').prop('checked', webshims.bugs.bustedValidity);
 				$('#jq-version option').each(function(){
 					var val = $.prop(this, 'value');
 					if(val && hash.indexOf(val) != -1){
@@ -212,6 +216,7 @@
 	<input type="checkbox" id="nativeMethods" value="nativeMethods" class="webshim-config" /> <label for="nativeMethods">nativeMethods</label>
 	<input type="checkbox" id="useCustomUI" value="useCustomUI" class="webshim-config" /> <label for="useCustomUI">use custom input widgets</label>
 	<input type="checkbox" id="noConflictExtreme" value="noConflictExtreme" class="webshim-config" /> <label for="noConflictExtreme">jQuery.noConflict(true)</label>
+	<input type="checkbox" id="bustedValidity" value="bustedValidity" class="webshim-config" /> <label for="bustedValidity">bustedValidity</label>
 	<select class="webshim-config" id="jq-version">
 		<option value="">jQuery 1.11.0</option>
 		<option value="legacyjquery">jQuery 1.8.3</option>
