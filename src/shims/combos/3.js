@@ -1534,9 +1534,11 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 			['value', 'min', 'max', 'title', 'maxlength', 'minlength', 'label'].forEach(function(attr){
 				if(message.indexOf('{%'+attr) === -1){return;}
 				var val = ((attr == 'label') ? $.trim($('label[for="'+ elem.id +'"]', elem.form).text()).replace(/\*$|:$/, '') : $.prop(elem, attr)) || '';
+				val = ''+val;
 				if(name == 'patternMismatch' && attr == 'title' && !val){
 					webshims.error('no title for patternMismatch provided. Always add a title attribute.');
 				}
+
 				if(valueVals[attr]){
 					if(!widget){
 						widget = $(elem).getShadowElement().data('wsWidget'+ (type = $.prop(elem, 'type')));
