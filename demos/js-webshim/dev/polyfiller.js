@@ -987,6 +987,8 @@
 				if(Modernizr[formvalidation]){
 					bustedWidgetUi = !Modernizr.fieldsetdisabled ||!Modernizr.fieldsetelements || !('value' in document.createElement('progress')) || !('value' in document.createElement('output'));
 					bugs.bustedValidity = bustedValidity = window.opera || bugs.bustedValidity || bustedWidgetUi || !modernizrInputAttrs.list;
+				} else {
+					bugs.bustedValidity = false;
 				}
 
 				formExtend = Modernizr[formvalidation] && !bustedValidity ? 'form-native-extend' : fShim;
