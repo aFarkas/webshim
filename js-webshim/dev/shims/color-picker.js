@@ -67,7 +67,7 @@
 					setValuesFromMousePosition.call($this, e);
 				}, 0);
 				// Bind mousemove and mouseup event to the document so it responds when dragged of of the bar - we will unbind these when on mouseup to save processing
-				$(document).bind('mousemove', mouseMove).bind('mouseup', mouseUp);
+				$(document).on('mousemove', mouseMove).on('mouseup', mouseUp);
 				e.preventDefault(); // don't try to select anything or drag the image to the desktop
 			},
 			mouseMove = // set the values as the mouse moves
@@ -315,7 +315,7 @@
 		bar.w = options.map && options.map.width || bar.width();
 		bar.h = options.map && options.map.height || bar.height();
 		// bind mousedown event
-		bar.bind('mousedown', mouseDown);
+		bar.on('mousedown', mouseDown);
 		bind.call($this, draw);
 	},
 		ColorValuePicker = // controls for all the input elements for the typing in color values
@@ -567,8 +567,8 @@
 			{
 				destroy: destroy
 			});
-			red.add(green).add(blue).add(alpha).add(hue).add(saturation).add(value).add(hex).add(bindedHex).add(ahex).bind('keyup', keyUp).bind('blur', blur);
-			red.add(green).add(blue).add(alpha).add(hue).add(saturation).add(value).bind('keydown', keyDown);
+			red.add(green).add(blue).add(alpha).add(hue).add(saturation).add(value).add(hex).add(bindedHex).add(ahex).on('keyup', keyUp).on('blur', blur);
+			red.add(green).add(blue).add(alpha).add(hue).add(saturation).add(value).on('keydown', keyDown);
 			color.bind(colorChanged);
 		};
 	$.wsjPicker = {
@@ -1583,7 +1583,7 @@
 					color.current.val('ahex', color.active.val('ahex'));
 				},
 				radioClicked = function (e) {
-					container.find('input[type="radio"][value!="' + e.target.value + '"]').prop('checked', false);
+					container.find('input[type="radio"]:not([value="' + e.target.value + '"])').prop('checked', false);
 					setColorMode.call($this, e.target.value);
 				},
 				currentClicked = function () {
@@ -1610,7 +1610,7 @@
 					pageStartX = e.pageX;
 					pageStartY = e.pageY;
 					// bind events to document to move window - we will unbind these on mouseup
-					$(document).bind('mousemove', documentMouseMove).bind('mouseup', documentMouseUp);
+					$(document).on('mousemove', documentMouseMove).on('mouseup', documentMouseUp);
 					e.preventDefault(); // prevent attempted dragging of the column
 				},
 				documentMouseMove = function (e) {
@@ -1702,16 +1702,16 @@
 					var hex = all != null ? all.hex : null,
 						preview = tbody.find('.Preview'),
 						button = tbody.find('.Button');
-					activePreview = preview.find('.Active:first').css({
+					activePreview = preview.find('.Active').eq(0).css({
 						backgroundColor: hex && '#' + hex || 'transparent'
 					});
-					currentPreview = preview.find('.Current:first').css({
+					currentPreview = preview.find('.Current').eq(0).css({
 						backgroundColor: hex && '#' + hex || 'transparent'
-					}).bind('click', currentClicked);
+					}).on('click', currentClicked);
 					setAlpha.call($this, currentPreview, mPrecision(color.current.val('a') * 100) / 255, 4);
-					okButton = button.find('.Ok:first').bind('click', okClicked);
-					cancelButton = button.find('.Cancel:first').bind('click', cancelClicked);
-					grid = button.find('.Grid:first');
+					okButton = button.find('.Ok').eq(0).on('click', okClicked);
+					cancelButton = button.find('.Cancel').eq(0).on('click', cancelClicked);
+					grid = button.find('.Grid').eq(0);
 					setTimeout(function () {
 						setImg.call($this, colorMapL1, images.clientPath + 'Maps.png');
 						setImg.call($this, colorMapL2, images.clientPath + 'Maps.png');
@@ -1724,7 +1724,7 @@
 						setImg.call($this, colorBarL6, images.clientPath + 'AlphaBar.png');
 						setImg.call($this, preview.find('div').eq(0), images.clientPath + 'preview-opacity.png');
 					}, 0);
-					tbody.find('td.Radio input').bind('click', radioClicked);
+					tbody.find('td.Radio input').on('click', radioClicked);
 					// initialize quick list
 					if (color.quickList && color.quickList.length > 0) {
 						var html = '', i;
@@ -1741,7 +1741,7 @@
 						}
 						setImg.call($this, grid, images.clientPath + 'bar-opacity.png');
 						grid.html(html);
-						grid.find('.QuickColor').click(quickPickClicked);
+						grid.find('.QuickColor').on('click', quickPickClicked);
 					}
 					setColorMode.call($this, settings.color.mode);
 					color.active.bind(activeColorChanged);

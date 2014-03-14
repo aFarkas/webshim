@@ -34,7 +34,7 @@
 
 		<div id="sidebar" class="interface">
 
-			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.12.3</span>)</span></a>
+			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.12.4</span>)</span></a>
 			<ul class="toc_section">
 				<li>
 					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
@@ -118,8 +118,8 @@ webshims.activeLang('en'); //set locale to en
 				<input type="submit" />
 			</form>
 			<h3 id="Locale-validityMessages">Adding new / changing existing  locale settings and errormessages.</h3>
-			<p>Existing locale setting files can be found in the <a href="../js-webshim/dev/shims/i18n/">shims/i18n directory</a>. Simply take one of those files (save as new), embed it after the polyfiller.js and adjust it to your needs.</p>
-<pre data-src="../js-webshim/dev/shims/i18n/formcfg-en.js"><code class="language-javascript">
+			<p>Existing locale setting files can be found in the <a href="../../js-webshim/dev/shims/i18n/">shims/i18n directory</a>. Simply take one of those files (save as new), embed it after the polyfiller.js and adjust it to your needs.</p>
+<pre data-src="../../js-webshim/dev/shims/i18n/formcfg-en.js"><code class="language-javascript">
 </code></pre>
 			<p>Note: <code class="i">webshims.activeLang</code> with the corresponding language code has to be called to activate the locale</p>
 <pre><code class="language-javascript">
@@ -291,6 +291,11 @@ webshims.setOptions('forms', { addValidators: true });
 			<iframe class="fiddle-example"  width="100%" height="300" src="http://jsfiddle.net/trixta/3A2DF/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 			<p>For a more general way the JS API can be used to change the errormessage for the given type:</p>
 			<iframe class="fiddle-example"  width="100%" height="260" src="http://jsfiddle.net/trixta/2CyEr/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+			<h3>Creating new customErrors</h3>
+			<p>While webshim allows the developer to use the native or polyfilled <code>setCustomValidity</code> method to add custom errors, webshims also exposes the custom error helper to generate new custom constraints:</p>
+			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/KdFB2/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
 			<h2 id="Datalist">Datalist</h2>
 			<p>The datalist element can be used to create autocomplete/combobox widgets. With the <code class="i">customDatalist</code> option the UI can be even replaced in supporting browsers to have more control over this widget.</p>
 <pre><code class="language-javascript">
@@ -298,9 +303,6 @@ webshims.setOptions('forms', {
 	customDatalist: true
 });
 </code></pre>
-			<h3>Creating new customErrors</h3>
-			<p>While webshim allows the developer to use the native or polyfilled <code>setCustomValidity</code> method to add custom errors, webshims also exposes the custom error helper to generate new custom constraints:</p>
-			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/KdFB2/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 			<h3 id="Datalist-options">Datalist-options</h3>
 
 <pre><code class="language-javascript">
@@ -337,7 +339,7 @@ webshims.setOptions("forms", {
 </pre>
 			<p>See also the <a href="cfgs/list-datalist.html">datalist configurator</a> to play with the widget.</p>
 
-			<h4 id="Datalist-events">Datalist-options</h4>
+			<h3 id="Datalist-events">Datalist-options</h3>
 			<p>All datalist events are triggered on the input element not the datalist itself.</p>
 			<p><code class="i">getoptioncontent</code> </p>
 

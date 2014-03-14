@@ -1391,13 +1391,22 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		}
 		return message;
 	};
-	
+
+	$.event.special.valuevalidation = {
+		setup: function(){
+			var data = $(this).data() || $.data(this, {});
+			if(!('valuevalidation' in data)){
+				data.valuevalidation = true;
+			}
+		}
+	};
 	
 	$(document).on('focusin.lazyloadvalidation', function(e){
 		if('form' in e.target){
 			lazyLoad();
 		}
 	});
+
 	webshims.ready('WINDOWLOAD', lazyLoad);
 });
 ;webshims.register('form-shim-extend', function($, webshims, window, document, undefined, options){

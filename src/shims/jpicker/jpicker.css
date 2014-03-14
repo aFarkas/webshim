@@ -1,4 +1,11 @@
-﻿.jPicker .Icon {
+﻿.jPicker,
+.jPicker *  {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.jPicker .Icon {
   display: inline-block;
   height: 24px; /* change this value if using a different sized color picker icon */
   position: relative; /* make this element an absolute positioning container */
@@ -64,10 +71,7 @@ table.jPicker {
   position: relative; /* make this element an absolute positioning container */
   width: 260px; /* IE 6 incorrectly draws border inside the width and height instead of outside - We will fix this to 256px later */
 }
-.jPicker div[class="Map"] {
-  height: 256px; /* correct to 256px for browsers that support the "[class="xxx"]" selector (IE7+,Firefox,Safari,Chrome,Opera,etc.) */
-  width: 256px; /* correct to 256px for browsers that support the "[class="xxx"]" selector (IE7+,Firefox,Safari,Chrome,Opera,etc.) */
-}
+
 .jPicker div.Bar {
   border-bottom: 2px solid #fff;
   border-left: 2px solid #9a9a9a;
@@ -81,10 +85,7 @@ table.jPicker {
   position: relative;
   width: 24px; /* IE 6 incorrectly draws border inside the width and height instead of outside - We will fix this to 20px later */
 }
-.jPicker div[class="Bar"] {
-  height: 256px; /* correct to 256px for browsers that support the "[class="xxx"]" selector (IE7+,Firefox,Safari,Chrome,Opera,etc.) */
-  width: 20px; /* correct to 20px for browsers that support the "[class="xxx"]" selector (IE7+,Firefox,Safari,Chrome,Opera,etc.) */
-}
+
 .jPicker .Map .Map1, .jPicker .Map .Map2, .jPicker .Map .Map3, .jPicker .Bar .Map1, .jPicker .Bar .Map2, .jPicker .Bar .Map3, .jPicker .Bar .Map4, .jPicker .Bar .Map5, .jPicker .Bar .Map6 {
   background-color: transparent;
   background-image: none;
@@ -201,9 +202,7 @@ table.jPicker {
   text-align: left;
   width: 30px;
 }
-.jPicker td[class="Text"] input {
-  height: 15px;
-}
+
 .jPicker tr.Hex td.Text input.Hex {
   width: 45px;
   display: inline-block;
@@ -225,21 +224,20 @@ table.jPicker {
 }
 .jPicker .Grid {
   text-align: center;
-  width: 114px;
+  width: 102px;
+  overflow: hidden;
 }
 .jPicker .Grid span.QuickColor {
   border: 1px inset #aaa;
   cursor: pointer;
   display: inline-block;
   height: 15px;
-  line-height: 15px;
   margin: 0px;
   padding: 0px;
-  width: 19px;
-}
-.jPicker .Grid span[class="QuickColor"] {
   width: 17px;
+  float: left;
 }
+
 @media all 
 {
 	#jPicker { margin: 0px 8px; text-align: left; }
