@@ -1210,11 +1210,12 @@
 			f: 'mediaelement',
 			d: ['mediaelement-core', 'swfmini', DOMSUPPORT],
 			test: function(){
+				var options = this.options;
+
 				if(!Modernizr.audio || !Modernizr.video || webshims.mediaelement.loadSwf){
 					return false;
 				}
-				
-				var options = this.options;
+
 				if(options.preferFlash && !modules.swfmini.test()){
 					options.preferFlash = false;
 				}

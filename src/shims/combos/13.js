@@ -1023,8 +1023,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		var obj = trackData.track;
 		var load = function(){
 			var error, ajax, createAjax;
-			var src = $.data(track, 'wsFFTrackSrc') || ($.attr(track, 'src') && $.prop(track, 'src'));
-			if(obj.mode != 'disabled' && src){
+
+			var src = obj.mode != 'disabled' && ($.attr(track, 'src') && $.prop(track, 'src'));
+			if(src){
 				$(mediaelem).off(loadEvents, load);
 				if(!trackData.readyState){
 					error = function(){
@@ -1514,9 +1515,9 @@ modified for webshims
 			e.stopImmediatePropagation();
 		}
 	};
-	var startTrackImplementation = function(){
+	var hideNativeTracks = function(){
 		if(webshims.implement(this, 'track')){
-			var kind, parent;
+			var kind;
 			var origTrack = this.track;
 			if(origTrack){
 
@@ -1525,23 +1526,16 @@ modified for webshims
 				}
 				//disable track from showing + remove UI
 				kind = $.prop(this, 'kind');
-				//ToDo: remove as soon as FF becomes less stupid
-				parent = this.parentNode;
-				$(this).data('wsFFTrackSrc', $.attr(this, 'src') && $.prop(this, 'src'));
-				this.removeAttribute('src');
-				$(this).detach();
-				//End: FF workaround
-
 				origTrack.mode = (typeof origTrack.mode == 'string') ? 'disabled' : 0;
 				this.kind = 'metadata';
 
-				//ToDo: remove .appendTo(parent)
-				$(this).attr({kind: kind}).appendTo(parent);
+				$(this).attr({kind: kind});
 				
 			}
 			$(this).on('load error', stopOriginalEvent);
 		}
 	};
+
 	webshims.addReady(function(context, insertedElement){
 		var insertedMedia = insertedElement.filter('video, audio, track').closest('audio, video');
 		$('video, audio', context)
@@ -1558,10 +1552,11 @@ modified for webshims
 						webshims.error("textTracks couldn't be copied");
 					}
 					
-					$('track', this).each(startTrackImplementation);
+					$('track', this).each(hideNativeTracks);
 				}
 			})
 		;
+
 		insertedMedia.each(function(){
 			var media = this;
 			var baseData = webshims.data(media, 'mediaelementBase');
