@@ -43,6 +43,15 @@ module.exports = function(grunt){
 					dest : 'src/shims/styles/',
 					ext : '.css'
 				}]
+			},
+			jme: {
+				files:[{
+					expand : true,
+					cwd : 'src/shims/jme',
+					src : ['*.scss'],
+					dest : 'src/shims/jme',
+					ext : '.css'
+				}]
 			}
 		},
 		/*not used for build but might be really helpfull for production*/
@@ -96,7 +105,7 @@ module.exports = function(grunt){
 		},
 		watch: {
 			sass: {
-				files: ['src/shims/styles/scss/*.scss'],
+				files: ['src/shims/**/*.scss'],
 				tasks: ['sass']
 			},
 			css: {

@@ -1239,7 +1239,18 @@
 			methodNames: ['addTextTrack'],
 			c: [21, 12, 13, 22]
 		});
-		
+
+
+		addModule('jme', {
+			src: 'jme/b',
+			options: {}
+		});
+
+		addModule('mediacontrols', {
+			src: 'jme/c',
+			css: 'jme/controls.css',
+			d: ['jme']
+		});
 		
 		addModule('track-ui', {
 			d: ['track', DOMSUPPORT]
