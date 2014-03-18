@@ -435,7 +435,7 @@
 					}
 				};
 				
-				return function(list, combo){
+				return function(list){
 					var module;
 					var loadCombos = [];
 					var i;
@@ -528,7 +528,6 @@
 			
 			loadScript: (function(){
 				var loadedSrcs = {};
-				var scriptLoader;
 				return function(src, callback, name, noShimPath){
 					if(!noShimPath){
 						src = loader.makePath(src);
@@ -599,6 +598,7 @@
 			return this.callProp(prop, arguments);
 		};
 	};
+
 	$.fn.callProp = function(prop, args){
 		var ret;
 		if(!args){
@@ -1240,18 +1240,23 @@
 			c: [21, 12, 13, 22]
 		});
 
+		//if(WSDEBUG){
+			addModule('jme', {
+				src: 'jme/b',
+				options: {
+					selector: '.mediaplayer'
+				},
+				c: [99]
+			});
 
-		addModule('jme', {
-			src: 'jme/b',
-			options: {}
-		});
+			addModule('mediacontrols', {
+				src: 'jme/c',
+				css: 'jme/controls.css',
+				d: ['jme'],
+				c: [99]
+			});
+		//}
 
-		addModule('mediacontrols', {
-			src: 'jme/c',
-			css: 'jme/controls.css',
-			d: ['jme']
-		});
-		
 		addModule('track-ui', {
 			d: ['track', DOMSUPPORT]
 		});

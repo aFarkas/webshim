@@ -1621,6 +1621,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		webshims.capturingEvents(['invalid'], true);
 	}
 
+	var modules = webshims.modules;
 	var isValid = function(elem){
 		return ($.prop(elem, 'validity') || {valid: 1}).valid;
 	};
@@ -1859,6 +1860,10 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	});
 
 	webshims.ready('WINDOWLOAD', lazyLoad);
+
+	if(modules['form-number-date-ui'].loaded && modules['form-number-date-api'].test()){
+		webshims.isReady('form-number-date-ui', true);
+	}
 });
 ;webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";

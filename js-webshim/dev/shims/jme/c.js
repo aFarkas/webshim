@@ -1086,6 +1086,10 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 			});
 		}
 	});
-	//make this clean
-	$.jme.startJME();
+
+	$('.mediaplayer').each(function(){
+		if(($.data(this, 'jme')|| {}).controlbar){
+			$(this).jmeProp('controlbar', true);
+		}
+	});
 });

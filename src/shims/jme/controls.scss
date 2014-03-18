@@ -381,6 +381,7 @@ $browser-context: 16; // Default
 	.currenttime-display,
 	.duration-display {
 		font-size: 81.3%;
+		font-family: sans-serif;
 		width: 2.5em;
 		text-align: center;
 		margin-top: 0.03em;
@@ -589,7 +590,7 @@ $browser-context: 16; // Default
 		width: 60px;
 	}
 
-	.state-unmute + .volume-slider {
+	&.state-muted .volume-slider {
 		.ws-range-progress {
 			width: 0 !important;
 		}

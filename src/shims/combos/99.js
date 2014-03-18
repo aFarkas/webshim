@@ -1,8 +1,7 @@
-(function($){
+webshims.register('jme', function($, webshims, window, doc, undefined, options){
 	"use strict";
-	var webshims = $.webshims;
 
-	if(!window.Modernizr || !('opacity' in Modernizr)){
+	if(!('opacity' in Modernizr)){
 		$('html').addClass(('opacity' in document.documentElement.style) ? 'opacity' : 'no-opacity');
 	}
 
@@ -124,32 +123,17 @@
 	$.jme.createSelectors = function(){
 		if(baseSelector){return;}
 		ns = $.jme.classNS;
-		baseSelector = 'div.'+ns+ 'mediaplayer';
+		baseSelector = '.'+ns+ 'mediaplayer';
 		$.each($.jme.plugins, function(name, plugin){
 			plugin.className = ns + plugin.className;
-			plugin.selector = plugin.nodeName +'.'+plugin.className;
+
 			pluginSelectors.push(plugin.selector);
-			if(ns && plugin.pseudoClasses){
-				$.each(plugin.pseudoClasses, function(stateName, stateValue){
-					plugin.pseudoClasses[stateName] = ns+stateValue;
-				});
-			}
 
 		});
 		pluginSelectors = pluginSelectors.join(',');
 	};
-	$.jme.initJME = function(context, insertedElement){
-		$('video, audio', context)
-			.add(insertedElement.filter('video, audio'))
-			.filter('[data-volume]')
-			.each(function(){
-				var defaultVolume = $(this).data('volume');
-				if(defaultVolume <= 1 && defaultVolume >= 0){
-					$.prop(this, 'volume', defaultVolume);
-				}
-			})
-		;
 
+	$.jme.initJME = function(context, insertedElement){
 		$(baseSelector, context).add(insertedElement.filter(baseSelector)).jmePlayer();
 	};
 
@@ -258,7 +242,7 @@
 			});
 			isCheckbox = true;
 		} else if(button.is('a')){
-			button.bind('click', function(e){
+			button.on('click', function(e){
 				e.preventDefault();
 			});
 		}
@@ -267,15 +251,13 @@
 	};
 
 	$.fn.jmePlayer = function(opts){
-		var removeClasses = ['idle', 'playing', 'ended', 'waiting', 'mediaerror'].map(function(state){
-			return ns+'state-'+state;
-		}).join(' ');
+
 		return this.each(function(){
 			if(opts){
 				$.jme.data(this, $.extend(true, {}, opts));
 			}
 
-			var mediaUpdateFn, init, focusenterTimer, foverTimer, canPlay, removeCanPlay, canplayTimer, needPreload;
+			var mediaUpdateFn, init, canPlay, removeCanPlay, canplayTimer, needPreload;
 			var media = $('audio, video', this).filter(':first');
 			var base = $(this);
 			var insideControls = $(pluginSelectors, base);
@@ -293,12 +275,12 @@
 				needPreload = !media.prop('autoplay');
 
 				removeCanPlay = function(){
-					media.unbind('canplay', canPlay);
+					media.off('canplay', canPlay);
 					clearTimeout(canplayTimer);
 				};
 				canPlay = function(){
 					var state = ($.prop(this, 'paused')) ? 'idle' : 'playing';
-					base.removeClass(removeClasses).addClass(ns +'state-'+ state);
+					base.attr('data-state', state);
 				};
 				mediaUpdateFn = function(e){
 					var state = e.type;
@@ -318,7 +300,7 @@
 									canPlay();
 								}
 							}, 9);
-							media.bind('canPlay', canPlay);
+							media.on('canPlay', canPlay);
 						}
 
 					} else if(idlStates[state]){
@@ -336,85 +318,55 @@
 					}
 
 					if(state){
-						base.removeClass(removeClasses).addClass(ns +'state-'+ state);
+						base.attr('data-state', state);
 					}
 				};
 				jmeData.media = media;
 				jmeData.player = base;
 				media
-					.bind('ended', function(){
+					.on('ended', function(){
 						removeCanPlay();
 						media.jmeFn('pause');
 						if(!media.prop('autoplay') && !media.prop('loop') && !media.hasClass('no-reload')){
 							media.jmeFn('load');
 						}
 					})
-					.bind('emptied waiting canplay canplaythrough playing ended pause mediaerror', mediaUpdateFn)
-					.bind('volumechange updateJMEState', function(){
+					.on('emptied waiting canplay canplaythrough playing ended pause mediaerror', mediaUpdateFn)
+					.on('volumechange updateJMEState', function(){
 						var volume = $.prop(this, 'volume');
 						base[!volume || $.prop(this, 'muted') ? 'addClass' : 'removeClass'](ns +'state-muted');
-						if(volume < 0.34){
+
+						if(volume < 0.01){
+							volume = 'no';
+						} else if(volume < 0.36){
 							volume = 'low';
-						} else if(volume < 0.67){
+						} else if(volume < 0.7){
 							volume = 'medium';
 						} else {
 							volume = 'high';
 						}
 						base.attr('data-volume', volume);
 					})
-					.bind('emptied updateJMEState play playing waiting', function(e){
-						var action;
-						if(e.type == 'emptied' || (e.type == 'updateJMEState' && $.prop(this, 'paused'))){
-							if(e.type == 'emptied'){
-								needPreload = !media.prop('autoplay');
-							}
-							action = 'addClass';
-						} else if(e.type == 'play' || e.type == 'waiting' || e.type == 'playing'){
-							action = 'removeClass';
-						}
-						if(action){
-							base[action](ns + 'state-initial');
+					.on('emptied', function(e){
+						if(e.type == 'emptied'){
+							needPreload = !media.prop('autoplay');
 						}
 					})
 				;
 
 				base
-					//assume inactive
-					.addClass(ns+'userinactive')
 					.on({
 						useractive: function(){
-							base.addClass(ns+'useractive').removeClass(ns+'userinactive');
-						},
-						focusin: function(){
-							clearTimeout(focusenterTimer);
-							base.addClass(ns+'focusenter');
-						},
-						'focusout': function(){
-							clearTimeout(focusenterTimer);
-							focusenterTimer = setTimeout(function(){
-								base.removeClass(ns+'focusenter');
-							}, 1);
-						},
-						'mouseenter focusin': function(){
-							clearTimeout(foverTimer);
-							base.addClass(ns+'fover');
-							if(needPreload && allowPreload){
-								media.prop('preload', 'auto');
-								needPreload = false;
-							}
-						},
-						'mouseleave focusout': function(){
-							clearTimeout(foverTimer);
-							foverTimer = setTimeout(function(){
-								base.removeClass(ns+'fover');
-							}, 1);
+							base.attr('data-useractivity', 'true');
 						}
 					})
 					.on('userinactive', {idletime: 3500}, function(){
-						base.removeClass(ns+'useractive').addClass(ns+'userinactive');
+						base.attr('data-useractivity', 'false');
 					})
+					.triggerHandler('userinactive')
 				;
 			}
+
 			base.jmeFn('addControls', controls);
 			if(init){
 				if(!('controlbar' in jmeData)){
@@ -449,9 +401,9 @@
 
 	$.jme.defineProp('srces', {
 		get: function(elem){
+			var srces;
 			var data = $.jme.data(elem);
 			var src = data.media.prop('src');
-			var srces = [];
 			if(src){
 				return [{src: src}];
 			}
@@ -479,7 +431,6 @@
 					src = {src: src};
 				}
 				$(document.createElement('source')).attr(src).appendTo(data.media);
-
 			};
 			data.media.removeAttr('src').find('source').remove();
 			if($.isArray(srces)){
@@ -496,45 +447,6 @@
 		$(this).jmeFn( ( props.isPlaying.get(this) ) ? 'pause' : 'play' );
 	});
 
-
-	$.jme.defineProp('controlbar', {
-		set: function(elem, value){
-			value = !!value;
-			var data = $.jme.data(elem);
-			var controlBar = $('div.jme-default-media-overlay, div.jme-default-control-bar', data.player);
-			var mediaControls = $.jme.plugins["media-controls"] ;
-			var structure = '';
-			var controls;
-			if(value && !controlBar[0]){
-				if(data._controlbar){
-					data._controlbar.appendTo(data.player);
-				} else {
-					data.media.prop('controls', false);
-					$.each(mediaControls.pluginOrder, function(i, name){
-						var plugin = $.jme.plugins[name];
-						if(plugin && plugin.structure){
-							structure += plugin.structure.replace('{%class%}', ns+name).replace('{%text%}', plugin.text || '');
-						} else if(name){
-							structure += name;
-						}
-					});
-					data._controlbar = $( mediaControls.barStructure );
-					controlBar = data._controlbar.find('div.jme-cb-box').addClass(ns+'media-controls');
-					controls = data._controlbar.filter('.jme-default-media-overlay').addClass(ns+'play-pause');
-					controls =  controls.add( controlBar );
-					controls = controls.add( $(structure).appendTo(controlBar) );
-					data._controlbar.appendTo(data.player);
-					data.player.jmeFn('addControls', controls);
-				}
-
-			} else if(!value) {
-				controlBar.detach();
-			}
-			controlBar = null;
-			controls = null;
-			return value;
-		}
-	});
 
 	$.jme.defineMethod('addControls', function(controls){
 		var data = $.jme.data(this) || {};
@@ -572,54 +484,6 @@
 	});
 
 
-
-	$.jme.defineMethod('updateControlbar', function(){
-		var timeSlider = $('.'+ $.jme.classNS +'time-slider', this);
-		if(timeSlider[0] && timeSlider.css('position') !== 'absolute'){
-			var width;
-			var elemWidths = 0;
-			var oldCss = {
-				position: timeSlider[0].style.position,
-				display: timeSlider[0].style.display
-			};
-
-			timeSlider.css({display: 'none', position: 'absolute'});
-
-			width = Math.floor(timeSlider.parent().width()) - 0.2;
-			timeSlider
-				.siblings()
-				.each(function(){
-					if(this !== timeSlider[0] && $.css(this, 'position') !== 'absolute' && $.css(this, 'display') !== 'none'){
-						elemWidths += Math.ceil($(this).outerWidth(true)) + 0.1;
-					}
-				})
-				.end()
-				.css(oldCss)
-			;
-			timeSlider.width(Math.floor(width - elemWidths - Math.ceil(timeSlider.outerWidth(true) - timeSlider.width()) - 0.3));
-		}
-	});
-
-	$.jme.registerPlugin('media-controls', {
-		pluginOrder: ['play-pause', '<div class="media-bar">', 'currenttime-display', 'time-slider', 'duration-display', '<div class="volume-controls">', 'mute-unmute', 'volume-slider', '</div>', '<div class="subtitle-controls">', 'captions', '</div>', 'fullscreen', '</div>'],
-		barStructure: '<div class="jme-default-media-overlay"></div><div class="jme-default-control-bar" tabindex="-1"><div class="jme-cb-box"></div></div>',
-		_create: function(control, media, base, options){
-			var timer;
-			var update = function(){
-				clearTimeout(timer);
-				control.jmeFn('updateControlbar');
-				timer = setTimeout(function(){
-					control.jmeFn('updateControlbar');
-				}, 9);
-			};
-			setTimeout(function(){
-				media.on('loadedmetadata volumechange play pause ended emptied', update);
-				base.on('updatetimeformat controlsadded controlschanged playerdimensionchange', update);
-				$(window).on('resize emchange', update);
-			}, 1);
-			update();
-		}
-	});
 
 
 	(function(){
@@ -692,16 +556,49 @@
 			};
 		});
 	})();
-})(jQuery);
-	
-(function($){
+
+
+	(function(){
+		var started;
+
+		$.jme.startJME = function(){
+			if(started){return;}
+			setTimeout(function(){
+				webshims.loader.loadList(['range-ui']);
+			}, 0);
+			webshims.ready('mediaelement', function(){
+				$(function(){
+					$.jme.createSelectors();
+					$.jme.initJME(document, $([]));
+				});
+
+				webshims.addReady(function(context, insertedElement){
+					if(context !== document){
+						$.jme.initJME(context, insertedElement);
+					}
+				});
+			});
+			started = true;
+		};
+
+
+		//make this clean
+		$.jme.startJME();
+	})();
+});
+
+
+
+;webshims.register('mediacontrols', function($, webshims, window, doc, undefined, options){
+	"use strict";
+
 	var pseudoClasses = 'pseudoClasses';
 
 	var playStates = {
 		play: 1,
 		playing: 1
 	};
-	
+
 	var pauseStates = {
 		pause: 1,
 		ended: 1
@@ -714,11 +611,98 @@
 		loadRange();
 		webshims.ready('range-ui', fn);
 	};
-	
-	var btnStructure = '<button class="{%class%}"><span class="jme-icon"></span><span class="jme-text">{%text%}</span></button>';
+
+	var btnStructure = '<button class="{%class%}" type="button" aria-label="{%text%}"></button>';
 	var defaultStructure = '<div  class="{%class%}"></div>';
 	var slideStructure = '<div class="{%class%}"></div>';
-	
+	var ns = $.jme.classNS;
+
+
+
+	$.jme.defineProp('controlbar', {
+		set: function(elem, value){
+			value = !!value;
+			var data = $.jme.data(elem);
+			var controlBar = $('div.jme-mediaoverlay, div.jme-controlbar', data.player);
+			var mediaControls = $.jme.plugins["media-controls"] ;
+			var structure = '';
+			var controls;
+			if(value && !controlBar[0]){
+				if(data._controlbar){
+					data._controlbar.appendTo(data.player);
+				} else {
+					data.media.prop('controls', false);
+					$.each(mediaControls.pluginOrder, function(i, name){
+						var plugin = $.jme.plugins[name];
+						if(plugin && plugin.structure){
+							structure += plugin.structure.replace('{%class%}', ns+name).replace('{%text%}', plugin.text || '');
+						} else if(name){
+							structure += name;
+						}
+					});
+					data._controlbar = $( mediaControls.barStructure );
+					controlBar = data._controlbar.find('div.jme-cb-box').addClass(ns+'media-controls');
+					controls = data._controlbar.filter('.jme-media-overlay').addClass(ns+'play-pause');
+					controls =  controls.add( controlBar );
+					controls = controls.add( $(structure).appendTo(controlBar) );
+					data._controlbar.appendTo(data.player);
+					data.player.jmeFn('addControls', controls);
+				}
+
+			} else if(!value) {
+				controlBar.detach();
+			}
+			controlBar = null;
+			controls = null;
+			return value;
+		}
+	});
+
+	$.jme.defineMethod('updateControlbar', function(){
+		var timeSlider = $('.'+ $.jme.classNS +'time-slider', this);
+		if(timeSlider[0] && timeSlider.css('position') !== 'absolute'){
+			var width;
+			var elemWidths = 0;
+
+			width = Math.floor(timeSlider.parent().width()) - 0.2;
+			timeSlider
+				.siblings()
+				.each(function(){
+					if(this !== timeSlider[0] && $.css(this, 'position') !== 'absolute' && $.css(this, 'display') !== 'none'){
+						elemWidths += Math.ceil($(this).outerWidth(true)) + 0.1;
+					}
+				})
+			;
+			timeSlider.width(Math.floor(width - elemWidths - Math.ceil(timeSlider.outerWidth(true) - timeSlider.width()) - 0.3));
+		}
+	});
+
+	$.jme.registerPlugin('media-controls', {
+		options: {
+			calculateTimerange: false
+		},
+		pluginOrder: ['<div class="play-pause-container">', 'play-pause', '</div>', '<div class="currenttime-container">', 'currenttime-display', '</div>', '<div class="progress-container">', 'time-slider', '</div>', '<div class="duration-container">', 'duration-display', '</div>', '<div class="mute-container">', 'mute-unmute', '</div>', '<div class="volume-container">', 'volume-slider', '</div>', '<div class="subtitle-container">', '<div class="subtitle-controls">', 'captions', '</div>', '</div>', '<div class="fullscreen-container">', 'fullscreen', '</div>'],
+		barStructure: '<div class="jme-media-overlay"></div><div class="jme-controlbar" tabindex="-1"><div class="jme-cb-box"></div></div>',
+		_create: function(control, media, base, options){
+			var timer;
+			var update = function(){
+				clearTimeout(timer);
+				control.jmeFn('updateControlbar');
+				timer = setTimeout(function(){
+					control.jmeFn('updateControlbar');
+				}, 9);
+			};
+			if(options.calculateTimerange){
+				setTimeout(function(){
+					media.on('loadedmetadata volumechange play pause ended emptied', update);
+					base.on('updatetimeformat controlsadded controlschanged playerdimensionchange', update);
+					$(window).on('resize emchange', update);
+				}, 1);
+				update();
+			}
+		}
+	});
+
 	$.jme.registerPlugin('play-pause', {
 		pseudoClasses: {
 			play: 'state-paused',
@@ -728,7 +712,7 @@
 		text: 'play / pause',
 		_create: function(control, media, base){
 			var textFn = $.jme.getButtonText(control, [this[pseudoClasses].play, this[pseudoClasses].pause]);
-			
+
 			media
 				.on('play playing ended pause updateJMEState', function(e){
 					var state = e.type;
@@ -747,7 +731,7 @@
 				media.jmeFn('togglePlay');
 				e.stopPropagation();
 			});
-			
+
 		}
 	});
 
@@ -766,12 +750,12 @@
 				})
 				.triggerHandler('updateJMEState')
 			;
-			
+
 			control.on((control.is('select')) ? 'change' : 'click', function(e){
 				media.prop('muted', !media.prop('muted'));
 				e.stopPropagation();
 			});
-			
+
 		}
 	});
 
@@ -800,16 +784,16 @@
 			}
 		};
 	}
-	
+
 	$.jme.registerPlugin('volume-slider', {
 		structure: slideStructure,
-		
+
 		_create: function(control, media, base){
 			loadRange();
-			
+
 			var createFn = function(){
 				var api, volume;
-				
+
 				volume = createGetSetHandler(
 					function(){
 						var volume = media.prop('volume');
@@ -824,7 +808,7 @@
 						});
 					}
 				);
-				
+
 				api = control
 					.rangeUI({
 						min: 0,
@@ -833,7 +817,8 @@
 						step: 'any',
 						input: function(){
 							volume.set();
-						} 
+						},
+						baseClass: 'media-range'
 					})
 					.data('rangeUi')
 				;
@@ -854,14 +839,14 @@
 		},
 		_create: function(control, media, base){
 			loadRange();
-			
+
 			var module = this;
-			
+
 			var createFn = function(){
 				var time, durationChange, api, timeShow;
 				var hasDuration = $.jme.classNS+'has-duration';
 				var duration = media.prop('duration');
-				
+
 				time = createGetSetHandler(
 					function(){
 						var time = media.prop('currentTime');
@@ -870,7 +855,7 @@
 								api.value(time);
 							} catch(er){}
 						}
-						
+
 					},
 					function(){
 						try {
@@ -878,14 +863,14 @@
 						} catch(er){}
 					}
 				);
-				
+
 				durationChange = function(){
 					duration = media.prop('duration');
 					hasDuration = duration && isFinite(duration) && !isNaN(duration);
 					if(hasDuration){
 						api.disabled(false);
 						api.max(duration);
-						
+
 						base.removeClass(module[pseudoClasses].no);
 					} else {
 						api.disabled(true);
@@ -893,7 +878,7 @@
 						base.addClass(module[pseudoClasses].no);
 					}
 				};
-				
+
 				api = control
 					.rangeUI({
 						min: 0,
@@ -905,13 +890,14 @@
 						},
 						textValue: function(val){
 							return media.jmeFn('formatTime', val);
-						}
+						},
+						baseClass: 'media-range'
 					})
 					.data('rangeUi')
 				;
-				
+
 				timeShow = $('<span class="'+ $.jme.classNS +'time-select" />').appendTo(control);
-				
+
 				control
 					.on({
 						'mouseenter': function(e){
@@ -925,7 +911,7 @@
 										.css({left: perc+'%'})
 									;
 								};
-								
+
 								posLeft(e.pageX);
 								timeShow.addClass($.jme.classNS +'show-time-select');
 								control
@@ -942,8 +928,8 @@
 						}
 					})
 				;
-				
-				
+
+
 				media.on({
 					timeupdate: time.get,
 					emptied: function(){
@@ -952,14 +938,11 @@
 					},
 					durationchange: durationChange
 				});
-				
-				
-				
-				
+
 				base.jmeFn('addControls', $('<div class="'+ $.jme.classNS +'buffer-progress" />').prependTo(control) );
 				durationChange();
 			};
-			
+
 			onSliderReady(createFn);
 		}
 	});
@@ -981,7 +964,6 @@
 			ret.start = type.start(i);
 			ret.end = type.end(i);
 			if(ret.start <= time && ret.end >= time){
-
 				break;
 			}
 		}
@@ -1051,7 +1033,7 @@
 			} else {
 				frac = parseInt(sec / times[format[i]], 10);
 				sec = sec % times[format[i]];
-			} 
+			}
 			if(frac < 10){
 				frac = '0'+frac;
 			}
@@ -1142,7 +1124,7 @@
 	 * Added Poster Plugin
 	 * @author mderting
 	 */
-	
+
 	/*
 	 * the old technique wasn't fully bullet proof
 	 * beside this, jme2 adovactes to use the new improved state-classes to handle visual effect on specific state (see CSS change)
@@ -1152,7 +1134,7 @@
 		options: {
 		},
 		_create: function(control, media, base, options){
-			
+
 			/* Empty span element used for vertical centering in IE7 - thanks to Bruno Fassino.
 			 * @see http://www.brunildo.org/test/img_center.html
 			 */
@@ -1168,53 +1150,13 @@
 			updatePoster();
 		}
 	});
-})(jQuery);
 
-(function($){
-	var started;
-	
-	$.jme.startJME = function(){
-		if(started){return;}
-		setTimeout(function(){
-			webshims.loader.loadList(['range-ui']);
-		}, 0);
-		webshims.ready('mediaelement', function(){
-			$(function(){
-				$.jme.createSelectors();
-				$.jme.initJME(document, $([]));
-			});
-
-			webshims.addReady(function(context, insertedElement){
-				if(context !== document){
-					$.jme.initJME(context, insertedElement);
-				}
-			});
-		});
-		started = true;
-	};
-
-	setTimeout($.jme.startJME, 0);
-	$(window).trigger('jmepluginready');
-})(window.webshims && webshims.$ || jQuery);;(function (factory) {
-	var $ = window.webshims && webshims.$ || jQuery;
-	if($.jme){
-		factory($);
-	} else {
-		$(window).on('jmepluginready', function(){
-			factory($);
-		});
-	}
-	
-}(function($){
-	var btnStructure = '<button class="{%class%}"><span class="jme-icon"></span><span class="jme-text">{%text%}</span></button>';
-	var pseudoClasses = 'pseudoClasses';
-	
 	//taken from http://johndyer.name/native-fullscreen-javascript-api-plus-jquery-plugin/
 	$.jme.fullscreen = (function() {
 		var parentData;
 		var frameData;
 		var doc = document.documentElement;
-		
+
 		var fullScreenApi = {
 			supportsFullScreen: Modernizr.prefixed('fullscreenEnabled', document, false) || Modernizr.prefixed('fullScreenEnabled', document, false),
 			isFullScreen: function() { return false; },
@@ -1260,7 +1202,7 @@
 				} catch(er){
 					frameData = false;
 				}
-				
+
 				tmpData = null;
 			},
 			cancelFullScreen: function(){
@@ -1292,7 +1234,7 @@
 			elementName: 'fullscreenElement',
 			enabledName: ''
 		};
-		
+
 		fullScreenApi.cancelFullWindow = fullScreenApi.cancelFullScreen;
 		fullScreenApi.requestFullWindow = fullScreenApi.requestFullScreen;
 
@@ -1312,7 +1254,7 @@
 					}
 				});
 			}
-			
+
 			fullScreenApi.isFullScreen = function() {
 				return document[fullScreenApi.elementName];
 			};
@@ -1323,16 +1265,15 @@
 				return document[fullScreenApi.exitName]();
 			};
 		}
-		
+
 		if(!window.Modernizr || !('fullscreen' in Modernizr)){
 			$('html').addClass(fullScreenApi.supportsFullScreen ? 'fullscreen' : 'no-fullscreen');
 		}
-		
+
 		if(window.parent != window){
 			(function(){
 				try{
 					var frame = window.frameElement;
-					var fStyle = frame.style;
 					if (fullScreenApi.supportsFullScreen) {
 						if('allowfullscreen' in frame && !frame.allowfullscreen) {
 							frame.allowfullscreen = true;
@@ -1351,17 +1292,17 @@
 					}
 				}
 			})();
-			
+
 		}
-		
+
 
 		return fullScreenApi;
 	})();
-	
+
 	$.jme.defineProp('fullscreen', {
 		set: function(elem, value){
 			var data = $.jme.data(elem);
-			
+
 			if((!data || !data.player) && !$(elem).hasClass($.jme.classNS+'player-fullscreen')){return 'noDataSet';}
 			if(value){
 				if(data.player.hasClass($.jme.classNS+'player-fullscreen')){return 'noDataSet';}
@@ -1372,7 +1313,7 @@
 				};
 
 				$(document)
-					.unbind('.jmefullscreen')
+					.off('.jmefullscreen')
 					.on('keydown.jmefullscreen', function(e){
 						if(e.keyCode == 27){
 							data.player.jmeProp('fullscreen', false);
@@ -1384,8 +1325,8 @@
 						}
 					})
 				;
-				
-				
+
+
 				if(value == 'fullwindow'){
 					$.jme.fullscreen.requestFullWindow(data.player[0]);
 				} else {
@@ -1394,14 +1335,14 @@
 					} catch(er){}
 				}
 
-				
+
 				$('html').addClass($.jme.classNS+'has-media-fullscreen');
 
 				data.player.addClass($.jme.classNS+'player-fullscreen');
 
 				data.media.addClass($.jme.classNS+'media-fullscreen');
-				
-				$('.jme-default-control-bar', data.player).focus();
+
+				$('button.play-pause', data.player).focus();
 
 				if($.jme.fullscreen.supportsFullScreen){
 					$(document)
@@ -1417,10 +1358,10 @@
 
 				}
 				data.player.triggerHandler('playerdimensionchange', ['fullwindow']);
-				
+
 			} else {
 				if(data.player && !data.player.hasClass($.jme.classNS+'player-fullscreen')){return 'noDataSet';}
-				$(document).unbind('.jmefullscreen');
+				$(document).off('.jmefullscreen');
 				$('html').removeClass($.jme.classNS+'has-media-fullscreen');
 				if(data.player && data.media){
 					data.player.removeClass($.jme.classNS+'player-fullscreen');
@@ -1453,7 +1394,7 @@
 			return $.jme.fullscreen.isFullScreen() || 'fullwindow';
 		}
 	});
-	
+
 	$.jme.defineProp('autoplayfs');
 
 	$.jme.registerPlugin('fullscreen', {
@@ -1475,18 +1416,18 @@
 			var options = this.options;
 			var addDoubbleClick = function(){
 				$(base.data('jme').controlElements)
-					.filter('.jme-default-media-overlay')
+					.filter('.jme-media-overlay')
 					.off('.dblfullscreen')
 					.on('dblclick.dblfullscreen', function(e){
 						base.jmeProp('fullscreen', !base.jmeProp('fullscreen'));
 					})
 				;
 			};
-			
+
 			base.on('controlsadded', addDoubbleClick);
-			
+
 			base.on('playerdimensionchange', updateControl);
-			
+
 			control.on((control.is('select')) ? 'change' : 'click', function(){
 				var value = base.hasClass($.jme.classNS+'player-fullscreen') ? false : options.fullscreen;
 				base.jmeProp('fullscreen', value);
@@ -1498,42 +1439,25 @@
 			updateControl();
 		}
 	});
-}));
-;(function (factory) {
-	var $ = window.webshims && webshims.$ || jQuery;
-	if($.jme){
-		factory($);
-	} else {
-		$(window).on('jmepluginready', function(){
-			factory($);
-		});
-	}
-	
-}(function($){
-	var btnStructure = '<button class="{%class%}" type="button"><span class="jme-icon"></span><span class="jme-text">{%text%}</span></button>';
-	var pseudoClasses = 'pseudoClasses';
-	/**
-	 * Added captions Plugin
-	 * @author mderting
-	 */
-	
+
+
 	$.jme.ButtonMenu = function(button, menu, clickHandler){
-		
+
 		this.button = $(button).attr({'aria-haspopup': 'true'});
-		
+
 		this.clickHandler = clickHandler;
-		
+
 		this.toggle = $.proxy(this, 'toggle');
 		this.keyIndex = $.proxy(this, 'keyIndex');
 		this._buttonClick = $.proxy(this, '_buttonClick');
-		
-		
+
+
 		this.addMenu(menu);
 		this._closeFocusOut();
 		this.button.on('click', this.toggle);
-		
+
 	};
-	
+
 	$.jme.ButtonMenu.prototype = {
 		addMenu: function(menu){
 			if(this.menu){
@@ -1551,11 +1475,11 @@
 			var that  = this;
 			var timer;
 			var stopFocusOut = function(){
+				clearTimeout(timer);
+				setTimeout(function(){
 					clearTimeout(timer);
-					setTimeout(function(){
-						clearTimeout(timer);
-					}, 9);
-				};
+				}, 9);
+			};
 			this.menu
 				.parent()
 				.on('focusin', stopFocusOut)
@@ -1576,7 +1500,7 @@
 			if(dir){
 				var buttons = this.buttons.not(':disabled');
 				var activeButton = buttons.filter(':focus');
-				
+
 				activeButton = buttons[buttons.index(activeButton) + dir] || buttons.filter(dir > 0 ? ':first' : ':last');
 				activeButton.focus();
 				e.preventDefault();
@@ -1592,7 +1516,7 @@
 			} catch(er){
 				this.activeElement = this.button[0];
 			}
-			
+
 			setTimeout(function(){
 				$(buttons.filter('[aria-checked="true"]')[0] || buttons[0]).focus();
 			}, 60);
@@ -1612,7 +1536,7 @@
 			this.activeElement = false;
 		}
 	};
-	
+
 	var showKinds = {subtitles: 1, caption: 1};
 	var getTrackMenu = function(tracks){
 		var items = $.map(tracks, function(track){
@@ -1621,44 +1545,26 @@
 				lang = (lang) ? ' <span class="track-lang">'+ lang +'</span>' : '';
 				return '<li class="'+ className +'" role="presentation"><button role="menuitemcheckbox">'+ track.label + lang +'</button></li>';
 			})
-		;
+			;
 		return '<div><ul>' + items.join('') +'</ul></div>';
 	};
-	
-	
+
+
 	$.jme.registerPlugin('captions', {
 		pseudoClasses: {
-			enabled: 'state-captionsenabled',
-			disabled: 'state-captionsdisabled',
-			noTrack: 'no-track',
-			hasTrack: 'has-track',
+
 			menu: 'subtitle-menu'
 		},
 		structure: btnStructure,
-		text: 'subtitles menu',
+		text: 'subtitles',
 		_create: function(control, media, base, options){
 			var that = this;
-			
+
 			var trackElems = media.find('track');
 			var checkbox = $(control).clone().attr({role: 'checkbox'}).insertBefore(control);
 
-			var btnTextElem = $('span.jme-text, +label span.jme-text', control);
+			base.attr('data-tracks', trackElems.length > 1 ? 'many' : trackElems.length);
 
-			if(!btnTextElem[0]){
-				btnTextElem = control;
-			}
-
-			btnTextElem.html(that.text);
-
-			if(!trackElems.length){
-				control.prop('disabled', true);
-				base.addClass(that[pseudoClasses].noTrack);
-			} else {
-				base.addClass(that[pseudoClasses].hasTrack);
-			}
-
-			base.attr('data-tracks', trackElems.length);
-			
 			webshims.ready('track', function(){
 				var menuObj, throttledUpdateMode;
 				var tracks = [];
@@ -1703,10 +1609,10 @@
 					} else {
 						menuObj.addMenu(menu);
 					}
-					
+
 					updateMode();
 				}
-				
+
 				function updateMode(){
 					$('button', menuObj.menu).each(function(i){
 						var checked = (tracks[i].mode == 'showing') ? 'true' : 'false';
@@ -1716,7 +1622,7 @@
 						$.attr(this, 'aria-checked', checked);
 					});
 				}
-				
+
 				function updateTrackMenu(){
 					tracks = [];
 					$.each(textTracks, function(i, track){
@@ -1725,7 +1631,7 @@
 						}
 					});
 
-					base.attr('data-tracks', tracks.length);
+					base.attr('data-tracks', tracks.length > 1 ? 'many' : tracks.length);
 
 					if(tracks.length){
 						createSubtitleMenu('<div class="'+that[pseudoClasses].menu +'" >'+ (getTrackMenu(tracks)) +'</div>');
@@ -1734,18 +1640,12 @@
 
 						if(!base.hasClass(that[pseudoClasses].hasTrack) || base.hasClass(that[pseudoClasses].noTrack)){
 							control.prop('disabled', false);
-							base
-								.addClass(that[pseudoClasses].hasTrack)
-								.removeClass(that[pseudoClasses].noTrack)
-								.triggerHandler('controlschanged')
-							;
+							base.triggerHandler('controlschanged');
 						}
 
 					} else if(!base.hasClass(that[pseudoClasses].noTrack) || base.hasClass(that[pseudoClasses].hasTrack)){
 						control.prop('disabled', true);
 						base
-							.addClass(that[pseudoClasses].noTrack)
-							.removeClass(that[pseudoClasses].hasTrack)
 							.triggerHandler('controlschanged')
 						;
 					}
@@ -1773,10 +1673,14 @@
 					base.on('updatesubtitlestate', throttledUpdate);
 					media.on('updatetrackdisplay', throttledUpdateMode);
 				}
-				
+
 			});
-			
 		}
-		
 	});
-}));
+
+	$('.mediaplayer').each(function(){
+		if(($.data(this, 'jme')|| {}).controlbar){
+			$(this).jmeProp('controlbar', true);
+		}
+	});
+});

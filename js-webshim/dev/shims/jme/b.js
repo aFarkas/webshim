@@ -123,16 +123,11 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 	$.jme.createSelectors = function(){
 		if(baseSelector){return;}
 		ns = $.jme.classNS;
-		baseSelector = 'div.'+ns+ 'mediaplayer';
+		baseSelector = '.'+ns+ 'mediaplayer';
 		$.each($.jme.plugins, function(name, plugin){
 			plugin.className = ns + plugin.className;
-			plugin.selector = plugin.nodeName +'.'+plugin.className;
+
 			pluginSelectors.push(plugin.selector);
-			if(ns && plugin.pseudoClasses){
-				$.each(plugin.pseudoClasses, function(stateName, stateValue){
-					plugin.pseudoClasses[stateName] = ns+stateValue;
-				});
-			}
 
 		});
 		pluginSelectors = pluginSelectors.join(',');
@@ -587,6 +582,8 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 		};
 
 
+		//make this clean
+		$.jme.startJME();
 	})();
 });
 

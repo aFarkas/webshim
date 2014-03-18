@@ -178,6 +178,7 @@
 .mediaplayer .currenttime-display,
 .mediaplayer .duration-display {
   font-size: 81.3%;
+  font-family: sans-serif;
   width: 2.5em;
   text-align: center;
   margin-top: 0.03em; }
@@ -290,9 +291,9 @@
   border-radius: 0.1875em; }
 .mediaplayer .volume-slider {
   width: 60px; }
-.mediaplayer .state-unmute + .volume-slider .ws-range-progress {
+.mediaplayer.state-muted .volume-slider .ws-range-progress {
   width: 0 !important; }
-.mediaplayer .state-unmute + .volume-slider .ws-range-thumb {
+.mediaplayer.state-muted .volume-slider .ws-range-thumb {
   left: 0 !important; }
 
 html.has-media-fullscreen,

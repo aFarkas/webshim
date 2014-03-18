@@ -26,22 +26,14 @@
 	$(function(){
 
 		$('button.load-jme').prop('disabled', false).one('click', function(){
-			webshims.loader.loadCSS('http://afarkas.github.io/jMediaelement/demo/default-style/css/player-styles.css');
-			webshims.loader.loadList(['range-ui']);
-			webshims.loader.loadScript('http://afarkas.github.io/jMediaelement/demo/js/jme.full.js', function(){
-				$.jme.startJME();
-				$('div.mediaplayer').jmeProp({"controlbar": true});
-				setTimeout(function(){
-					$(document).trigger('updateshadowdom');
-				}, 30);
-			});
+			webshims.loader.loadList(['mediacontrols']);
 			$(this).prop('disabled', true);
 		});
 	});
 </script>
 <style>
 	.mediaplayer {
-		width: 100%;
+		width: 640px;
 	}
 
 	.button-row button {
