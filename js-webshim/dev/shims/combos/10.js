@@ -1144,8 +1144,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 })();
 });
 ;(function($){
-	
-	var id = 0;
+	"use strict";
 	var isNumber = function(string){
 		return (typeof string == 'number' || (string && string == string * 1));
 	};
@@ -3237,24 +3236,32 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			return $.css(this, 'display') != 'none';
 		};
 		var sizeInput = function(data){
-			var init;
+			var init, lastWidth, left, right, isRtl, hasButtons;
+			var styleO = data.orig.style;
 			var updateStyles = function(){
-				$(data.orig).removeClass('ws-important-hide');
-				$.style( data.orig, 'display', '' );
-				var hasButtons, marginR, marginL, left, right, isRtl;
+				styleO.display = '';
+				var marginR, marginL;
 				var correctWidth = 0.8;
-				if(!init || data.orig.offsetWidth){
-					hasButtons = data.buttonWrapper && data.buttonWrapper.filter(isVisible).length;
-					
-					isRtl = hasButtons && data.buttonWrapper.css('direction') == 'rtl';
-					if(isRtl){
-						left = 'Right';
-						right = 'Left';
-					} else {
-						left = 'Left';
-						right = 'Right';
+				var curWidth = data.orig.offsetWidth;
+				if(!init || (curWidth && curWidth != lastWidth)){
+					lastWidth = curWidth;
+
+
+					if(!init){
+						hasButtons = data.buttonWrapper && data.buttonWrapper.filter(isVisible).length;
+						isRtl = hasButtons && data.buttonWrapper.css('direction') == 'rtl';
+						if(isRtl){
+							left = 'Right';
+							right = 'Left';
+						} else {
+							left = 'Left';
+							right = 'Right';
+						}
+						if(hasButtons){
+							data.buttonWrapper[isRtl ? 'addClass' : 'removeClass']('ws-is-rtl');
+						}
 					}
-					
+
 					marginR = $.css( data.orig, 'margin'+right);
 					
 					data.element
@@ -3263,7 +3270,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					;
 					
 					if(hasButtons){
-						data.buttonWrapper[isRtl ? 'addClass' : 'removeClass']('ws-is-rtl');
+
 						marginL = (parseInt(data.buttonWrapper.css('margin'+left), 10) || 0);
 						data.element.css('padding'+right, '');
 						
@@ -3283,7 +3290,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					data.element.outerWidth( $(data.orig).outerWidth() - correctWidth );
 				}
 				init = true;
-				$(data.orig).addClass('ws-important-hide');
+				styleO.display = 'none';
+
 			};
 			data.element.onWSOff('updateshadowdom', updateStyles, true);
 		};
@@ -3420,7 +3428,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				if(opts.calculateWidth){
 					sizeInput(data.shim);
 				} else {
-					$(this).addClass('ws-important-hide');
+					$(this).css('display', 'none');
 				}
 			}
 			

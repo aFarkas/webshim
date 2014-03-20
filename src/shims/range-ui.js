@@ -1,6 +1,5 @@
 (function($){
-	
-	var id = 0;
+	"use strict";
 	var isNumber = function(string){
 		return (typeof string == 'number' || (string && string == string * 1));
 	};
