@@ -3237,15 +3237,22 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		};
 		var sizeInput = function(data){
 			var init, lastWidth, left, right, isRtl, hasButtons;
-			var styleO = data.orig.style;
+			var oriStyleO = data.orig.style;
+			var styleO = data.element[0].style;
+			var parent = data.orig.parentNode;
+
 			var updateStyles = function(){
-				styleO.display = '';
-				var marginR, marginL;
+				var curWidth, marginR, marginL, assignWidth;
 				var correctWidth = 0.8;
-				var curWidth = data.orig.offsetWidth;
+
+				if(parent){
+					curWidth = parent.offsetWidth;
+				}
+
 				if(!init || (curWidth && curWidth != lastWidth)){
 					lastWidth = curWidth;
-
+					oriStyleO.display = '';
+					styleO.display = 'none';
 
 					if(!init){
 						hasButtons = data.buttonWrapper && data.buttonWrapper.filter(isVisible).length;
@@ -3286,11 +3293,14 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 							correctWidth = data.buttonWrapper.outerWidth(true) + correctWidth;
 						}
 					}
-					
-					data.element.outerWidth( $(data.orig).outerWidth() - correctWidth );
+
+					assignWidth = $(data.orig).outerWidth() - correctWidth;
+
+					styleO.display = '';
+					data.element.outerWidth(assignWidth);
+					oriStyleO.display = 'none';
+					init = true;
 				}
-				init = true;
-				styleO.display = 'none';
 
 			};
 			data.element.onWSOff('updateshadowdom', updateStyles, true);

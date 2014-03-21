@@ -92,7 +92,9 @@ $(function($){
 				.each(prism)
 			;
 		};
+
 		getOptions();
+
 		$(this).on('change', function(){
 			getOptions();
 			render();
@@ -101,10 +103,11 @@ $(function($){
 			render(data);
 		});
 	});
+
 	$('#dir').each(function(){
 		var onChange = function(){
 			$('#output').attr('dir', $(this).val());
-			$('form.input-widget fieldset').eq(0).trigger('change');
+			$('form.input-widget fieldset').eq(0).trigger('forcechange');
 		};
 		$(this).on('change', onChange).each(onChange);
 	});
@@ -202,10 +205,13 @@ $(function($){
 				location.replace('#'+ curState);
 			}
 		};
-		$('> fieldset', form).on('change input', (function(){
+		$('> fieldset', form).on('change input forcechange', (function(){
 			var timer;
 			return function(e){
 				clearTimeout(timer);
+				if(e.type == 'forcechange'){
+					lastState = null;
+				}
 				timer = setTimeout(createWidget, e.type == 'input' ? 200 : 9);
 			};
 		})());
