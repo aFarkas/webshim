@@ -19,13 +19,16 @@
 	webshims.setOptions('forms', {
 		customDatalist: true
 	});
-	webshims.polyfill('mediaelement track forms');
+	if(location.search.indexOf('nopolyfill') == -1){
+		webshims.polyfill('mediaelement track forms');
+	}
 </script>
 
 <script>
 	$(function(){
 
 		$('button.load-jme').prop('disabled', false).one('click', function(){
+			webshims.polyfill('mediaelement track forms');
 			webshims.loader.loadList(['mediacontrols']);
 			$(this).prop('disabled', true);
 		});
