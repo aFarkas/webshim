@@ -1501,7 +1501,6 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 
 	$.jme.registerPlugin('captions', {
 		pseudoClasses: {
-
 			menu: 'subtitle-menu'
 		},
 		structure: btnStructure,
@@ -1513,6 +1512,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 			var checkbox = $(control).clone().attr({role: 'checkbox'}).insertBefore(control);
 
 			base.attr('data-tracks', trackElems.length > 1 ? 'many' : trackElems.length);
+			control.attr('aria-haspopup', 'true');
 
 			webshims.ready('track', function(){
 				var menuObj, throttledUpdateMode;

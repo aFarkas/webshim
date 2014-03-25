@@ -346,6 +346,7 @@ $browser-context: 16; // Default
 		cursor: default;
 		outline: none;
 		background: #333;
+		background: rgba(0, 0, 0, 0.3);
 		color: #e1e1e1;
 		transition: all 300ms;
 
@@ -379,7 +380,8 @@ $browser-context: 16; // Default
 
 
 	.currenttime-display,
-	.duration-display {
+	.duration-display,
+	.time-select {
 		font-size: 81.3%;
 		font-family: sans-serif;
 		width: 2.5em;
@@ -555,7 +557,22 @@ $browser-context: 16; // Default
 	}
 
 	.time-select {
+		display: inline-block;
+		margin: 0 0 2px -1.75em;
+		padding: em(3) 0 em(1);
+		min-width: 3.5em;
+		bottom: em(20);
 		visibility: hidden;
+		opacity: 0;
+		transition: 400ms opacity, 400ms visibility;
+		background: #333;
+		background: rgba(0, 0, 0, 0.3);
+		color: #eee;
+
+		&.show-time-select {
+			opacity: 1;
+			visibility: visible;
+		}
 	}
 
 	.ws-range-progress {

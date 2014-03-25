@@ -156,6 +156,7 @@
   cursor: default;
   outline: none;
   background: #333;
+  background: rgba(0, 0, 0, 0.3);
   color: #e1e1e1;
   transition: all 300ms; }
   .mediaplayer > .jme-controlbar button {
@@ -176,7 +177,8 @@
       cursor: default;
       cursor: not-allowed; }
 .mediaplayer .currenttime-display,
-.mediaplayer .duration-display {
+.mediaplayer .duration-display,
+.mediaplayer .time-select {
   font-size: 81.3%;
   font-family: sans-serif;
   width: 2.5em;
@@ -270,7 +272,20 @@
   position: absolute;
   display: block; }
 .mediaplayer .time-select {
-  visibility: hidden; }
+  display: inline-block;
+  margin: 0 0 2px -1.75em;
+  padding: 0.1875em 0 0.0625em;
+  min-width: 3.5em;
+  bottom: 1.25em;
+  visibility: hidden;
+  opacity: 0;
+  transition: 400ms opacity, 400ms visibility;
+  background: #333;
+  background: rgba(0, 0, 0, 0.3);
+  color: #eee; }
+  .mediaplayer .time-select.show-time-select {
+    opacity: 1;
+    visibility: visible; }
 .mediaplayer .ws-range-progress {
   cursor: pointer;
   background: #e1e1e1;

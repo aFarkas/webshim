@@ -904,7 +904,7 @@ webshims.setOptions("forms", {
 					<em>default: false</em>
 				</li>
 				<li>
-					<strong><a href="demos/forms.html#Datalist">customDatalist</a></strong> <em>boolean</em> Allows to use custom styleable datalist elements in all browsers.
+					<strong><a href="demos/forms.html#Datalist">customDatalist</a></strong> <em>boolean</em>|<em>String 'auto'</em> Allows to use custom styleable datalist elements in all browsers. If the string 'auto' is used, input widgets are only replaced in desktop browser or incapable browsers.
 					<br>
 					<em>default: false</em>
 				</li>
@@ -936,7 +936,7 @@ webshims.setOptions("forms", {
 					forms-ext</code> Options</h3>
 			<ul>
 				<li>
-					<strong>replaceUI</strong> <em>boolean</em>|<em>mixed object</em> If set to true the UI of all input widgets (number, time, month, date, range) are replaced in all browsers (also in browser, which have implemented these types). This is useful, if you want to style the UI in all browsers.
+					<strong>replaceUI</strong> <em>boolean</em>|<em>mixed object</em>|<em>String 'auto'</em> If set to true the UI of all input widgets (number, time, month, date, range) are replaced in all browsers (also in browser, which have implemented these types). This is useful, if you want to style the UI in all browsers. If the string 'auto' is used, input widgets are only replaced in desktop browser or incapable browsers.
 					<br>
 					<em>default: false</em>
 				</li>
@@ -948,7 +948,7 @@ webshims.setOptions("forms", {
 					<em>default: date time range number</em>
 				</li>
 				<li>
-					<strong>widgets</strong> <em>object</em> widgets is a general options object for all input widgets. <a href="webforms/3-webforms-widgets.html#configure-ui">more information</a>
+					<strong>widgets</strong> <em>object</em> widgets is a general options object for all input widgets. <a href="http://jsfiddle.net/trixta/VNuct/">example with different form widgets</a>
 <pre><code class="language-javascript">
 webshims.setOptions("forms-ext", {
 	"widgets": {
@@ -1026,7 +1026,7 @@ webshims.setOptions("forms-ext", {
 				</li>
 				
 				<li>
-					<strong>selectors for CSS/JS: .ws-validate (.ws-invalid/.ws-success)</strong>: The class 'ws-validate' on a form element will implement UX improved Instant Validation for this form. The classes .ws-invalid (similiar to <a href="http://www.w3.org/TR/selectors4/#user-pseudos">:user-error</a>) and .ws-success will mark either "touched" invalid element wrappers or valid and "filled" element wrappers. <a href="webforms/1-webforms-lang-custom-bubble.html#instant-validation">example</a>
+					<strong>selectors for CSS/JS: .ws-validate (.ws-invalid/.ws-success)</strong>: The class 'ws-validate' on a form element will implement UX improved Instant Validation for this form. The classes .ws-invalid (similiar to <a href="http://www.w3.org/TR/selectors4/#user-pseudos">:user-error</a>) and .ws-success will mark either "touched" invalid element wrappers or valid and "filled" element wrappers. <a href="demos/forms.html#UI-ival">example</a>
 				</li>
 				<li>
 					<strong>selectors for CSS/JS: .user-success/.user-error</strong>: which work similar to <a href="https://developer.mozilla.org/en/CSS/%3A-moz-ui-valid">:-moz-ui-valid</a>/<a href="https://developer.mozilla.org/en/CSS/%3A-moz-ui-invalid">:-moz-ui-invalid</a> or <a href="http://www.w3.org/TR/selectors4/#user-pseudos">:user-error</a>
@@ -1141,6 +1141,9 @@ webshims.setOptions('canvas', {
 
 			<ul>
 				<li>
+					<strong>replaceUI</strong> <em>boolean</em>|<em>string</em> If set to true, all audio and video elements inside a container with the class <code class="i">mediaplayer</code> get custom styleable controls. If set to the string 'auto', only desktop browser will get those extra styleable controls.
+				</li>
+				<li>
 					<strong>preferFlash</strong> <em>boolean</em> If set to true the mediaelements will be replaced by flash, if flash is available. Otherwise, only if mediaelements aren't supported or the current audio/video container/codec isn't supported by the browser.
 					<br>
 					<em>default: false</em>
@@ -1156,7 +1159,7 @@ webshims.setOptions('canvas', {
 			<h4>Playing <abbr title="HTTP Live Streams">HLS</abbr>/<abbr title="Real Time Messaging Protocol">RTMP</abbr> Streams</h4>
 
 <pre><code class="language-markup">
-&lt;video poster="poster.jpg"&gt;
+&lt;video poster="poster.jpg" controls=""&gt;
 	&lt;!-- Mac OS / iOS HLS Streaming --&gt;
 	&lt;source src="http://server.com/path/file.m3u8" type="application/x-mpegURL" /&gt;
 	&lt;!-- rtmp streaming: using the data-server attribute --&gt;
@@ -1168,8 +1171,41 @@ webshims.setOptions('canvas', {
 			<h4>Loading youtube videos with different Qualities</h4>
 			<p>Video quality can be suggested by using the <code>vq</code> parameter. Possible values are: small, medium, large, hd720, hd1080, highres</p>
 <pre><code class="language-markup">
-&lt;video poster="poster.jpg" src="http://www.youtube.com/watch?v=siOHh0uzcuY&vq=large"&gt;
+&lt;video poster="poster.jpg" controls="" src="http://www.youtube.com/watch?v=siOHh0uzcuY&vq=large"&gt;
 &lt;/video&gt;
+</code></pre>
+			<h4>Using customstyleable controls</h4>
+<pre><code class="language-markup">
+&lt;style&gt;
+	/* add basic styles */
+	.mediaplayer {
+		position: relative;
+		height: 0;
+		width: 100%;
+		max-width: 980px;
+		min-width: 310px;
+		padding-bottom: 56.25%; /* 16/9 */
+	}
+
+	.mediaplayer video,
+	.mediaplayer .polyfill-video {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+	}
+&lt;/style&gt;
+
+&lt;script&gt;
+	webshims.setOptions('mediaelement', {replaceUI: 'auto'});
+	webshims.polyfill('mediaelement');
+&lt;/script&gt;
+
+&lt;div class="mediaplayer"&gt;
+	&lt;video poster="poster.jpg" src="http://www.youtube.com/watch?v=siOHh0uzcuY&vq=large"&gt;
+	&lt;/video&gt;
+&lt;/div&gt;
 </code></pre>
 			<h4>Examples/Demos</h4>
 			<ul>
