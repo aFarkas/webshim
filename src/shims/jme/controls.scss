@@ -338,6 +338,15 @@ $browser-context: 16; // Default
 		visibility: hidden;
 	}
 
+	.cue-display span.cue-wrapper {
+		transition: bottom 300ms;
+		bottom: -5px;
+	}
+
+	&[data-state="playing"][data-useractivity="false"] .cue-display span.cue-wrapper {
+		bottom: -35px;
+	}
+
 	> .jme-controlbar {
 		position: absolute;
 		left: 0;

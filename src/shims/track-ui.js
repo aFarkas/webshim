@@ -86,11 +86,9 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 					if(baseData.displayedActiveCues.length || _force === true){
 						baseData.trackDisplay.css({display: 'none'});
 						var uiElement = media.getShadowElement();
-						var offsetElement = uiElement.offsetParent();
 						var uiHeight = uiElement.innerHeight();
 						var uiWidth = uiElement.innerWidth();
 						var position = uiElement.position();
-						var displaySize = uiHeight * uiWidth;
 						baseData.trackDisplay.css({
 							left: position.left,
 							width: uiWidth,

@@ -148,6 +148,11 @@
 .mediaplayer[data-state="playing"][data-useractivity="false"] .jme-controlbar {
   opacity: 0;
   visibility: hidden; }
+.mediaplayer .cue-display span.cue-wrapper {
+  transition: bottom 300ms;
+  bottom: -5px; }
+.mediaplayer[data-state="playing"][data-useractivity="false"] .cue-display span.cue-wrapper {
+  bottom: -35px; }
 .mediaplayer > .jme-controlbar {
   position: absolute;
   left: 0;

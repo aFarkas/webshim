@@ -100,6 +100,9 @@
 	var addSource = function(text){
 		return text +"\n//# sourceURL="+this.url;
 	};
+	var getAutoMobile = function(prop){
+		return webshims.assumeMobile && prop == 'auto' ? false : prop;
+	};
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
 	
 	if(Modernizr.ES5 && !('toJSON' in Date.prototype)){
@@ -1132,9 +1135,8 @@
 				var o = this.options;
 				initialFormTest();
 
-				if(o.replaceUI == 'auto' && webshims.assumeMobile){
-					o.replaceUI = false;
-				}
+				o.replaceUI = getAutoMobile(o.replaceUI);
+
 				//input widgets on old androids can't be trusted
 				if(bustedWidgetUi && !o.replaceUI && (/Android/i).test(navigator.userAgent)){
 					o.replaceUI = true;
@@ -1205,9 +1207,8 @@
 			loadInit: function(){
 				//
 				var o = this.options;
-				if(o.replaceUI == 'auto' && webshims.assumeMobile){
-					o.replaceUI = false;
-				}
+				o.replaceUI = getAutoMobile(o.replaceUI);
+
 				if(o.replaceUI){
 					o.plugins.unshift('mediacontrols');
 				}
@@ -1258,7 +1259,9 @@
 				override: bugs.track
 			},
 			test: function(){
-				return !this.options.override && !bugs.track;
+				var o = this.options;
+				o.override = getAutoMobile(o.override);
+				return !o.override && !bugs.track;
 			},
 			d: ['mediaelement', DOMSUPPORT],
 			methodNames: ['addTextTrack'],
