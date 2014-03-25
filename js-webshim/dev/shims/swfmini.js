@@ -449,3 +449,5 @@ var swfmini = function() {
 		}
 	};
 }();
+
+webshims.isReady('swfmini', true);

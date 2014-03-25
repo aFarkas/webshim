@@ -449,8 +449,9 @@ var swfmini = function() {
 		}
 	};
 }();
-;
-webshims.register('form-core', function($, webshims, window, document, undefined, options){
+
+webshims.isReady('swfmini', true);
+;webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -485,6 +486,9 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		if(options.lazyCustomMessages){
 			options.customMessages = true;
 			toLoad.push('form-message');
+		}
+		if(options.customDatalist == 'auto' && webshims.assumeMobile){
+			options.customDatalist = false;
 		}
 		if(options.customDatalist){
 			options.fD = true;

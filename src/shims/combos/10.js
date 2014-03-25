@@ -3236,11 +3236,16 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			return $.css(this, 'display') != 'none';
 		};
 		var sizeInput = function(data){
-			var init, lastWidth, left, right, isRtl, hasButtons;
+			var init, parent, lastWidth, left, right, isRtl, hasButtons;
 			var oriStyleO = data.orig.style;
 			var styleO = data.element[0].style;
-			var parent = data.orig.parentNode;
-
+			if($.support.boxSizing == null && !$.isReady){
+				$(function(){
+					parent = data.orig.parentNode;
+				});
+			} else {
+				parent = data.orig.parentNode;
+			}
 			var updateStyles = function(){
 				var curWidth, marginR, marginL, assignWidth;
 				var correctWidth = 0.8;

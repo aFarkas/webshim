@@ -449,6 +449,8 @@ var swfmini = function() {
 		}
 	};
 }();
+
+webshims.isReady('swfmini', true);
 ;webshims.register('filereader', function( $, webshims ){
 	"use strict";
 	/**

@@ -76,10 +76,8 @@
 
 	<script>
 		//webshims.setOptions('track', {override: true});
+		webshims.setOptions('mediaelement', {replaceUI: 'auto'});
 		webshims.polyfill('mediaelement');
-		if(!window.matchMedia || !matchMedia('(max-device-width: 640px)').matches){
-			webshims.loader.loadList(['mediacontrols']);
-		}
 	</script>
 
 	<title>Responsive Video embedding with webshims and JME</title>

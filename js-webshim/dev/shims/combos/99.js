@@ -1,10 +1,5 @@
 webshims.register('jme', function($, webshims, window, doc, undefined, options){
 	"use strict";
-
-	if(!('opacity' in Modernizr)){
-		$('html').addClass(('opacity' in document.documentElement.style) ? 'opacity' : 'no-opacity');
-	}
-
 	var props = {};
 
 	var fns = {};
@@ -116,22 +111,12 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 	};
 
 
-
-	var baseSelector;
+	options = $.extend({selector: '.mediaplayer'}, webshims.cfg.mediaelement.jme);
+	webshims.cfg.mediaelement.jme = options;
+	var baseSelector = options.selector;
 	var pluginSelectors = [];
 	var ns = '';
-	$.jme.createSelectors = function(){
-		if(baseSelector){return;}
-		ns = $.jme.classNS;
-		baseSelector = '.'+ns+ 'mediaplayer';
-		$.each($.jme.plugins, function(name, plugin){
-			plugin.className = ns + plugin.className;
 
-			pluginSelectors.push(plugin.selector);
-
-		});
-		pluginSelectors = pluginSelectors.join(',');
-	};
 
 	$.jme.initJME = function(context, insertedElement){
 		$(baseSelector, context).add(insertedElement.filter(baseSelector)).jmePlayer();
@@ -260,9 +245,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 			var mediaUpdateFn, init, canPlay, removeCanPlay, canplayTimer, needPreload;
 			var media = $('audio, video', this).filter(':first');
 			var base = $(this);
-			var insideControls = $(pluginSelectors, base);
-			var externalControls = $.jme.getDOMList( $.jme.data(this, 'controls') );
-			var controls = insideControls.add($(externalControls));
+
 			var jmeData = $.jme.data(this);
 			var mediaData = $.jme.data(media[0]);
 
@@ -365,20 +348,10 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 					})
 					.triggerHandler('userinactive')
 				;
-			}
 
-			base.jmeFn('addControls', controls);
-			if(init){
-				if(!('controlbar' in jmeData)){
-					jmeData.controlbar = true;
-				}
-				if(jmeData.controlbar){
-					base.jmeProp('controlbar', true);
-				}
 				if(mediaUpdateFn){
 					media.on('updateJMEState', mediaUpdateFn).triggerHandler('updateJMEState');
 				}
-
 			}
 		});
 	};
@@ -558,41 +531,17 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 	})();
 
 
-	(function(){
-		var started;
-
-		$.jme.startJME = function(){
-			if(started){return;}
-			setTimeout(function(){
-				webshims.loader.loadList(['range-ui']);
-			}, 0);
-			webshims.ready('mediaelement', function(){
-				$(function(){
-					$.jme.createSelectors();
-					$.jme.initJME(document, $([]));
-				});
-
-				webshims.addReady(function(context, insertedElement){
-					if(context !== document){
-						$.jme.initJME(context, insertedElement);
-					}
-				});
-			});
-			started = true;
-		};
-
-
-		//make this clean
-		$.jme.startJME();
-	})();
+	webshims.ready('mediaelement', function(){
+		webshims.addReady($.jme.initJME);
+	});
 });
 
 
 
 ;webshims.register('mediacontrols', function($, webshims, window, doc, undefined, options){
 	"use strict";
-
 	var pseudoClasses = 'pseudoClasses';
+	var baseSelector = webshims.cfg.mediaelement.jme.selector;
 
 	var playStates = {
 		play: 1,
@@ -1682,5 +1631,11 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 		if(($.data(this, 'jme')|| {}).controlbar){
 			$(this).jmeProp('controlbar', true);
 		}
+	});
+
+	webshims.ready('mediaelement', function(){
+		webshims.addReady(function(context, insertedElement){
+			$(baseSelector, context).add(insertedElement.filter(baseSelector)).jmeProp('controlbar', true);
+		});
 	});
 });

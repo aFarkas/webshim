@@ -1,7 +1,7 @@
 webshims.register('mediacontrols', function($, webshims, window, doc, undefined, options){
 	"use strict";
-
 	var pseudoClasses = 'pseudoClasses';
+	var baseSelector = webshims.cfg.mediaelement.jme.selector;
 
 	var playStates = {
 		play: 1,
@@ -1091,5 +1091,11 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 		if(($.data(this, 'jme')|| {}).controlbar){
 			$(this).jmeProp('controlbar', true);
 		}
+	});
+
+	webshims.ready('mediaelement', function(){
+		webshims.addReady(function(context, insertedElement){
+			$(baseSelector, context).add(insertedElement.filter(baseSelector)).jmeProp('controlbar', true);
+		});
 	});
 });

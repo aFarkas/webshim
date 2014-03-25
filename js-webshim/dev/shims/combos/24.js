@@ -1736,8 +1736,7 @@ if(!('setSelectionRange' in document.createElement('input'))){
 			return $( hasLabel(elem) ? '<span class="placeholder-text"></span>' : '<label for="'+ elem.prop('id') +'" class="placeholder-text"></label>');
 		},
 		pHolder = (function(){
-			var delReg 	= /\n|\r|\f|\t/g,
-				allowedPlaceholder = {
+			var allowedPlaceholder = {
 					text: 1,
 					search: 1,
 					url: 1,
@@ -1805,20 +1804,42 @@ if(!('setSelectionRange' in document.createElement('input'))){
 							var size = (parseInt($.css(elem, 'padding'+ side), 10) || 0) + Math.max((parseInt($.css(elem, 'margin'+ side), 10) || 0), 0) + (parseInt($.css(elem, 'border'+ side +'Width'), 10) || 0);
 							data.text.css('padding'+ side, size);
 						});
-						
+
 						$(elem)
-							.onWSOff('updateshadowdom', function(){
-								var height, width; 
-								if((width = elem.offsetWidth) || (height = elem.offsetHeight)){
-									data.text
-										.css({
-											width: width,
-											height: height
-										})
-										.css($(elem).position())
-									;
-								}
-							}, true)
+							.onWSOff('updateshadowdom', (function(){
+								var lastWidth, init, timer;
+								var jelm = $(elem);
+								var lastPos = {};
+								return function(){
+									var width, fn;
+
+									if((width = elem.offsetWidth)){
+
+										fn = function(){
+											var pos = jelm.position();
+											if(width !== lastWidth){
+												lastWidth = width;
+												data.text
+													.css({
+														width: width
+													})
+												;
+											}
+											if(pos.top !== lastPos.top || pos.left !== lastPos.left){
+												lastPos = pos;
+												data.text.css(pos);
+											}
+										};
+										if(!init){
+											fn();
+											init = true;
+										} else {
+											clearTimeout(timer);
+											timer = setTimeout(fn, 99);
+										}
+									}
+								};
+							})(), true)
 						;
 						
 					} else {

@@ -112,9 +112,9 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.12.4',
+		version: '1.12.5-pre',
 		cfg: {
-			
+			assumeMobile: window.matchMedia && matchMedia('(max-device-width: 640px)').matches,
 			//addCacheBuster: false,
 			waitReady: true,
 //			extendNative: false,
@@ -123,7 +123,13 @@
 			wspopover: {appendTo: 'auto', hideOnBlur: true},
 			ajax: {},
 			loadScript: function(src, success, fail){
-				$.ajax($.extend({}, webCFG.ajax, {url: src, success: success, dataType: 'script', cache: true, global: false, dataFilter: addSource}));
+				if(!$.ajax && !$.isDOMReady){
+					loadList(['jajax']);
+					document.write('<script src="'+ src +'"><\/script>');
+					setTimeout(success, 999);
+				} else {
+					$.ajax($.extend({}, webCFG.ajax, {url: src, success: success, dataType: 'script', cache: true, global: false, dataFilter: addSource}));
+				}
 			},
 			
 			basePath: path
@@ -1125,6 +1131,10 @@
 			test: function(){
 				var o = this.options;
 				initialFormTest();
+
+				if(o.replaceUI == 'auto' && webshims.assumeMobile){
+					o.replaceUI = false;
+				}
 				//input widgets on old androids can't be trusted
 				if(bustedWidgetUi && !o.replaceUI && (/Android/i).test(navigator.userAgent)){
 					o.replaceUI = true;
@@ -1192,8 +1202,23 @@
 		addPolyfill('mediaelement-core', {
 			f: 'mediaelement',
 			noAutoCallback: true,
+			loadInit: function(){
+				//
+				var o = this.options;
+				if(o.replaceUI == 'auto' && webshims.assumeMobile){
+					o.replaceUI = false;
+				}
+				if(o.replaceUI){
+					o.plugins.unshift('mediacontrols');
+				}
+				setTimeout(function(){
+					loadList(o.plugins);
+				});
+			},
 			options: {
-				preferFlash: false,
+				//replaceUI: false,
+				jme: {},
+				plugins: [],
 				vars: {},
 				params: {},
 				attrs: {},
@@ -1243,9 +1268,6 @@
 		//if(WSDEBUG){
 			addModule('jme', {
 				src: 'jme/b',
-				options: {
-					selector: '.mediaplayer'
-				},
 				c: [99]
 			});
 
