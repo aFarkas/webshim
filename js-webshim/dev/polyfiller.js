@@ -11,7 +11,7 @@
 		}
 	};
 	var start = function(){
-		if(window.jQuery){
+		if(window.jQuery && window.Modernizr){
 			factory(jQuery);
 			factory = function(){return window.webshims;};
 		}
@@ -83,12 +83,12 @@
 	window.webshims.timer = setInterval(start, 0);
 	start();
 
-	if (typeof define === 'function' && define.amd && define.amd.jQuery) {
+	if (typeof define === 'function' && define.amd) {
 		define('polyfiller', ['jquery'], factory);
 	}
 }(function($){
 	"use strict";
-	var firstRun, path;
+	var firstRun, path, docWriteLoaded;
 	var webshims = window.webshims;
 	var DOMSUPPORT = 'dom-support';
 	var special = $.event.special;
@@ -103,19 +103,19 @@
 	var getAutoMobile = function(prop){
 		return webshims.assumeMobile && prop == 'auto' ? false : prop;
 	};
+	clearInterval(webshims.timer);
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
-	
+
 	if(Modernizr.ES5 && !('toJSON' in Date.prototype)){
 		Modernizr.ES5 = false;
 	}
 
-	clearInterval(webshims.timer);
 
 	path = ($.support.hrefNormalized === false) ? webshims._curScript.getAttribute("src", 4) : webshims._curScript.src;
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.12.5-RC1',
+		version: '1.12.5-RC2',
 		cfg: {
 			assumeMobile: window.matchMedia && matchMedia('(max-device-width: 640px)').matches,
 			//addCacheBuster: false,
@@ -125,11 +125,9 @@
 			wsdoc: document,
 			wspopover: {appendTo: 'auto', hideOnBlur: true},
 			ajax: {},
-			loadScript: function(src, success, fail){
-				if(!$.ajax && !$.isDOMReady){
-					loadList(['jajax']);
-					document.write('<script src="'+ src +'"><\/script>');
-					setTimeout(success, 999);
+			loadScript: function(src, success){
+				if(!$.ajax && window.require){
+					require([src], success);
 				} else {
 					$.ajax($.extend({}, webCFG.ajax, {url: src, success: success, dataType: 'script', cache: true, global: false, dataFilter: addSource}));
 				}
@@ -686,7 +684,7 @@
 	(function(){
 		//Overwrite DOM-Ready and implement a new ready-method
 		$.isDOMReady = $.isReady;
-		var onReady = function(e){
+		var onReady = function(){
 
 			$.isDOMReady = true;
 			isReady('DOM', true);

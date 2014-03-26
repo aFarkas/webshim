@@ -29,7 +29,7 @@
 
 		<div id="sidebar" class="interface">
 
-			<a class="toc_title" href="#"> Webshim <span class="version">(<span class="ws-version">1.12.5-RC1</span>)</span></a>
+			<a class="toc_title"> Webshim <span class="version">(<span class="ws-version">1.12.5-RC1</span>)</span></a>
 			<ul class="toc_section">
 				<li>
 					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
@@ -96,6 +96,8 @@
 			<a class="toc_title" href="#DetailsSummary"> Details &amp; Summary </a>
 
 			<a class="toc_title" href="#FileReader"> FileReader </a>
+
+			<a class="toc_title" href="#Requirejs-setup">Setup with r.js or other JS optimization tasks</a>
 
 			<a class="toc_title" href="#Customizing"> Customizing </a>
 			<ul class="toc_section">
@@ -165,15 +167,15 @@
 -->
 			<h3 id="Guide-installation">Installation</h3>
 			<p>
-				Take the 'js-webshim' folder and add it to your project. (You will find a minified and a dev folder there.) Here is an example showing how to include dependencies and load webshims:
+				Take the 'js-webshim' folder and add it to your project. (You will find a minified and a dev folder there. Put the hole folder, not only the polyfiller.js file into your project!) Here is an example showing how to include dependencies and load webshims:
 			</p>
 <pre><code class="language-markup">
-&lt;script src="js/jquery-1.9.1.js"&gt;&lt;/script&gt;
+&lt;script src="js/jquery.js"&gt;&lt;/script&gt;
 &lt;script src="js/modernizr-custom.js"&gt;&lt;/script&gt;
 &lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
   
 &lt;script&gt;
-  //webshims.setOptions('basePath', 'js-webshim/minified/shims/');
+  //webshims.setOptions('basePath', '/js-webshim/minified/shims/');
   
   webshims.polyfill();
   
@@ -1434,6 +1436,53 @@ $(function(){
 			<p>
 				<em>This feature is based on code from <a href="https://github.com/Jahdrien/FileReader" target="_external">https://github.com/Jahdrien/FileReader</a>. </em>
 			</p>
+
+			<h2 id="Requirejs-setup">Typical project setup and JS optimizations (requirejs, concatination of JS files)</h2>
+
+			<p>While most scripts only use one JS file to include the hole behavior, Webshims is using the polyfiller.js file, a <code>polyfiller</code> named AMD module, as an entry point and loads conditionally other resources. This means webshims needs to know, where those resources are.</p>
+			<p>The code inside of the polyfiller.js automatically detects the path to the script it is run from and assumes, that the <code class="i">shims</code> folder is in the same directory. This means, you have to make sure, that either the shims folder is placed parallel to the code of the polyfiller.js or to configure the path using the <code class="i">basePath</code> option.</p>
+
+			<h3>Optimizing into the same folder</h3>
+
+			<p>The following example, shows a very simple setup where the shims folder is parallel to the normal polyfiller.js file and the optimized js file (i.e.: app.min.js):</p>
+
+<pre><code class="language-dir">
++-- projectfolder
+	|-- index.html
+	+-- scripts
+		+-- vendor
+			|-- jquery.js
+			|-- modernizr.custom.js
+		+-- shims
+		|-- main.js
+		|-- require.js
+		|-- app.min.js (optimized code, which also includes the polyfiller.js code)
+		|-- polyfiller.js
+</code></pre>
+
+			<h3>Optimizing into a different folder</h3>
+			<p>A better way is to output the concatenated and compressed code into a different directory for deployment. For a webshims project this means beside an optimization task (concat and minify) often another simple task to copy the shims folder parallel to the optimized script package:</p>
+
+<pre><code class="language-dir">
+|-- projectfolder
+	|-- index.html
+	+-- bower-components
+		|-- jquery
+		+-- js-webshim
+			+-- dev
+				|-- polyfiller.js
+				|-- shims
+			|-- minified
+	+-- scripts
+		+-- vendor
+			|-- modernizr.custom.js
+	|-- main.js (requires polyfiller.js from the **dev** folder)
+	|-- require.js
+	+-- optimized-scripts (folder with optimized scripts)
+		|-- app.min.js (optimized code, which also includes the polyfiller.js code)
+		|-- shims (copied shims folder from the **minified** folder)
+</code></pre>
+
 
 			<h2 id="Customizing"> Customizing Webshim</h2>
 

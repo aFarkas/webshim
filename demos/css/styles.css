@@ -43,7 +43,6 @@ div#sidebar {
 		font-family: Lucida Grande;
 	}
 		.toc_section li {
-			cursor: pointer;
 			margin: 0 0 3px 0;
 		}
 			.toc_section li a {
@@ -262,6 +261,12 @@ code, pre{
 	pre {
 		overflow: scroll;
 	}
+}
+
+pre code.language-dir {
+    -moz-tab-size: 3;
+    -webkit-tab-size: 3;
+    tab-size: 3;
 }
 
 
