@@ -115,7 +115,7 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.12.5-RC3',
+		version: '1.12.5-RC4',
 		cfg: {
 			assumeMobile: window.matchMedia && matchMedia('(max-device-width: 640px)').matches,
 			//addCacheBuster: false,

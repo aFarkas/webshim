@@ -110,13 +110,19 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 						} 
 						if(keyCode == 13 || keyCode == 27){
 							if (keyCode == 13){
+								activeItem = $('li.active-item:not(.hidden-item)', that.shadowList);
 								if(that.isCompleted){
 									$.prop(opts.input, 'selectionStart', $.prop(opts.input, 'value').length);
+									if(that.lastCompletedValue && !activeItem[0]){
+										that.lastCompletedValue = "";
+										that.isCompleted = false;
+									}
 								}
-								activeItem = $('li.active-item:not(.hidden-item)', that.shadowList);
+
 								if($(opts.input).getNativeElement().triggerHandler('beforeselect', [activeItem.find('.option-value').text()]) === false){
 									return;
 								}
+
 								that.changeValue( activeItem );
 							}
 							that.hideList();
@@ -508,7 +514,12 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 				
 				newValue = tmpValue.join(', ');
 			}
-			
+
+			if(this.options.valueCompletion && this.lastCompletedValue && !oldValue.indexOf(this.lastCompletedValue)){
+				oldValue = this.lastCompletedValue;
+				this.lastCompletedValue = "";
+			}
+
 			if(newValue != oldValue){
 				
 				$(this.input)

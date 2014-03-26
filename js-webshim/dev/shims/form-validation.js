@@ -661,7 +661,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			check();
 		},
 		hideError: function(elem, reset){
-			var invalid, errorBox;
+			var invalid, errorBox, afterHide;
 			var fieldWrapper = this.getFieldWrapper(elem);
 
 			if(fieldWrapper.hasClass(invalidWrapperClass)){
@@ -672,12 +672,17 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					errorBox = this.get(elem, fieldWrapper);
 					fieldWrapper.removeClass(invalidWrapperClass);
 					errorBox.message = '';
-					errorBox[fx[iVal.fx].hide](function(){
+					afterHide = function(){
 						if(this.id == elem.getAttribute('aria-describedby')){
 							elem.removeAttribute('aria-describedby');
 						}
 						$(this).attr({hidden: 'hidden'});
-					});
+					};
+					if(iVal.fx != 'no'){
+						errorBox[fx[iVal.fx].hide](afterHide);
+					} else {
+						errorBox[fx[iVal.fx].hide]().each(afterHide);
+					}
 				}
 				
 			}
