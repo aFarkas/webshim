@@ -5,7 +5,7 @@
 */
 
 var swfmini = function() {
-	
+	var wasRemoved = function(){webshims.error('This method was removed from swfmini');};
 	var UNDEF = "undefined",
 		OBJECT = "object",
 		webshims = window.webshims,
@@ -19,15 +19,8 @@ var swfmini = function() {
 		
 		plugin = false,
 		domLoadFnArr = [main],
-		objIdArr = [],
-		listenersArr = [],
-		storedAltContent,
-		storedAltContentId,
-		storedCallbackFn,
-		storedCallbackObj,
+
 		isDomLoaded = false,
-		dynamicStylesheet,
-		dynamicStylesheetMedia,
 		autoHideShow = true,
 	
 	/* Centralized function for browser feature detection
@@ -75,11 +68,6 @@ var swfmini = function() {
 	
 	function callDomLoadFunctions() {
 		if (isDomLoaded) { return; }
-		try { // test if we can really add/remove elements to/from the DOM; we don't want to fire it too early
-			var t = doc.getElementsByTagName("body")[0].appendChild(createElement("span"));
-			t.parentNode.removeChild(t);
-		}
-		catch (e) { return; }
 		isDomLoaded = true;
 		var dl = domLoadFnArr.length;
 		for (var i = 0; i < dl; i++) {
@@ -95,14 +83,7 @@ var swfmini = function() {
 			domLoadFnArr[domLoadFnArr.length] = fn; // Array.push() is only available in IE5.5+
 		}
 	}
-	
-	/* Cross-browser onload
-		- Based on James Edwards' solution: http://brothercake.com/site/resources/scripts/onload/
-		- Will fire an event as soon as a web page including all of its assets are loaded 
-	 */
-	function addLoadEvent(fn) {
-		
-	}
+
 	
 	/* Main function
 		- Will preferably execute onDomLoad, otherwise onload (as a fallback)
@@ -145,150 +126,13 @@ var swfmini = function() {
 			})();
 		}
 	}
-	
-	
-	function getObjectById(objectIdStr) {
-		var r = null;
-		var o = getElementById(objectIdStr);
-		if (o && o.nodeName == "OBJECT") {
-			if (typeof o.SetVariable != UNDEF) {
-				r = o;
-			}
-			else {
-				var n = o.getElementsByTagName(OBJECT)[0];
-				if (n) {
-					r = n;
-				}
-			}
-		}
-		return r;
-	}
-	
-	
-	/* Cross-browser dynamic SWF creation
-	*/
-	function createSWF(attObj, parObj, id) {
-		var r, el = getElementById(id);
-		if (ua.wk && ua.wk < 312) { return r; }
-		if (el) {
-			if (typeof attObj.id == UNDEF) { // if no 'id' is defined for the object element, it will inherit the 'id' from the alternative content
-				attObj.id = id;
-			}
-			if (ua.ie && ua.win) { // Internet Explorer + the HTML object element + W3C DOM methods do not combine: fall back to outerHTML
-				var att = "";
-				for (var i in attObj) {
-					if (attObj[i] != Object.prototype[i]) { // filter out prototype additions from other potential libraries
-						if (i.toLowerCase() == "data") {
-							parObj.movie = attObj[i];
-						}
-						else if (i.toLowerCase() == "styleclass") { // 'class' is an ECMA4 reserved keyword
-							att += ' class="' + attObj[i] + '"';
-						}
-						else if (i.toLowerCase() != "classid") {
-							att += ' ' + i + '="' + attObj[i] + '"';
-						}
-					}
-				}
-				var par = "";
-				for (var j in parObj) {
-					if (parObj[j] != Object.prototype[j]) { // filter out prototype additions from other potential libraries
-						par += '<param name="' + j + '" value="' + parObj[j] + '" />';
-					}
-				}
-				el.outerHTML = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"' + att + '>' + par + '</object>';
-				objIdArr[objIdArr.length] = attObj.id; // stored to fix object 'leaks' on unload (dynamic publishing only)
-				r = getElementById(attObj.id);	
-			}
-			else { // well-behaving browsers
-				var o = createElement(OBJECT);
-				o.setAttribute("type", FLASH_MIME_TYPE);
-				for (var m in attObj) {
-					if (attObj[m] != Object.prototype[m]) { // filter out prototype additions from other potential libraries
-						if (m.toLowerCase() == "styleclass") { // 'class' is an ECMA4 reserved keyword
-							o.setAttribute("class", attObj[m]);
-						}
-						else if (m.toLowerCase() != "classid") { // filter out IE specific attribute
-							o.setAttribute(m, attObj[m]);
-						}
-					}
-				}
-				for (var n in parObj) {
-					if (parObj[n] != Object.prototype[n] && n.toLowerCase() != "movie") { // filter out prototype additions from other potential libraries and IE specific param element
-						createObjParam(o, n, parObj[n]);
-					}
-				}
-				el.parentNode.replaceChild(o, el);
-				r = o;
-			}
-		}
-		return r;
-	}
-	
-	function createObjParam(el, pName, pValue) {
-		var p = createElement("param");
-		p.setAttribute("name", pName);	
-		p.setAttribute("value", pValue);
-		el.appendChild(p);
-	}
-	
-	/* Cross-browser SWF removal
-		- Especially needed to safely and completely remove a SWF in Internet Explorer
-	*/
-	function removeSWF(id) {
-		var obj = getElementById(id);
-		if (obj && obj.nodeName == "OBJECT") {
-			if (ua.ie && ua.win) {
-				obj.style.display = "none";
-				(function(){
-					if (obj.readyState == 4) {
-						removeObjectInIE(id);
-					}
-					else {
-						setTimeout(arguments.callee, 10);
-					}
-				})();
-			}
-			else {
-				obj.parentNode.removeChild(obj);
-			}
-		}
-	}
-	
-	function removeObjectInIE(id) {
-		var obj = getElementById(id);
-		if (obj) {
-			for (var i in obj) {
-				if (typeof obj[i] == "function") {
-					obj[i] = null;
-				}
-			}
-			obj.parentNode.removeChild(obj);
-		}
-	}
-	
-	/* Functions to optimize JavaScript compression
-	*/
-	function getElementById(id) {
-		var el = null;
-		try {
-			el = doc.getElementById(id);
-		}
-		catch (e) {}
-		return el;
-	}
+
 	
 	function createElement(el) {
 		return doc.createElement(el);
 	}
 	
-	/* Updated attachEvent function for Internet Explorer
-		- Stores attachEvent information in an Array, so on unload the detachEvent functions can be called to avoid memory leaks
-	*/	
-	function addListener(target, eventType, fn) {
-		target.attachEvent(eventType, fn);
-		listenersArr[listenersArr.length] = [target, eventType, fn];
-	}
-	
+
 	/* Flash Player and SWF content version matching
 	*/
 	function hasPlayerVersion(rv) {
@@ -300,107 +144,43 @@ var swfmini = function() {
 	}
 	
 	
-	
-	function setVisibility(id, isVisible) {
-		if (!autoHideShow) { return; }
-		var elem;
-		var v = isVisible ? "visible" : "hidden";
-		if (isDomLoaded && (elem && getElementById(id))) {
-			getElementById(id).style.visibility = v;
-		}
+
+
+
+	webshims.ready('DOM', callDomLoadFunctions);
+
+	webshims.loader.addModule('swfmini-embed', {d: ['swfmini']});
+	var loadEmbed = hasPlayerVersion('9.0.0') ?
+		function(){
+			webshims.loader.loadList(['swfmini-embed']);
+			return true;
+		} :
+		webshims.$.noop
+	;
+
+	if(!Modernizr.video){
+		loadEmbed();
+	} else {
+		webshims.ready('WINDOWLOAD', loadEmbed);
 	}
 
-	/* Release memory to avoid memory leaks caused by closures, fix hanging audio/video threads and force open sockets/NetConnections to disconnect (Internet Explorer only)
-	*/
-	var cleanup = function() {
-		if (ua.ie && ua.win && window.attachEvent) {
-			window.attachEvent("onunload", function() {
-				// remove listeners to avoid memory leaks
-				var ll = listenersArr.length;
-				for (var i = 0; i < ll; i++) {
-					listenersArr[i][0].detachEvent(listenersArr[i][1], listenersArr[i][2]);
-				}
-				// cleanup dynamically embedded objects to fix audio/video threads and force open sockets and NetConnections to disconnect
-				var il = objIdArr.length;
-				for (var j = 0; j < il; j++) {
-					removeSWF(objIdArr[j]);
-				}
-				// cleanup library's main closures to avoid memory leaks
-				for (var k in ua) {
-					ua[k] = null;
-				}
-				ua = null;
-				for (var l in swfmini) {
-					swfmini[l] = null;
-				}
-				swfmini = null;
-			});
-		}
-	}();
-	
-	webshims.ready('DOM', callDomLoadFunctions);
-	
 	return {
 		/* Public API
 			- Reference: http://code.google.com/p/swfobject/wiki/documentation
 		*/ 
-		registerObject: function() {
-			
-		},
+		registerObject: wasRemoved,
 		
-		getObjectById: function(objectIdStr) {
-			if (ua.w3) {
-				return getObjectById(objectIdStr);
-			}
-		},
+		getObjectById: wasRemoved,
 		
 		embedSWF: function(swfUrlStr, replaceElemIdStr, widthStr, heightStr, swfVersionStr, xiSwfUrlStr, flashvarsObj, parObj, attObj, callbackFn) {
-			var callbackObj = {success:false, id:replaceElemIdStr};
-			if (ua.w3 && !(ua.wk && ua.wk < 312) && swfUrlStr && replaceElemIdStr && widthStr && heightStr && swfVersionStr) {
-				setVisibility(replaceElemIdStr, false);
-				addDomLoadEvent(function() {
-					widthStr += ""; // auto-convert to string
-					heightStr += "";
-					var att = {};
-					if (attObj && typeof attObj === OBJECT) {
-						for (var i in attObj) { // copy object to avoid the use of references, because web authors often reuse attObj for multiple SWFs
-							att[i] = attObj[i];
-						}
-					}
-					att.data = swfUrlStr;
-					att.width = widthStr;
-					att.height = heightStr;
-					var par = {}; 
-					if (parObj && typeof parObj === OBJECT) {
-						for (var j in parObj) { // copy object to avoid the use of references, because web authors often reuse parObj for multiple SWFs
-							par[j] = parObj[j];
-						}
-					}
-					if (flashvarsObj && typeof flashvarsObj === OBJECT) {
-						for (var k in flashvarsObj) { // copy object to avoid the use of references, because web authors often reuse flashvarsObj for multiple SWFs
-							if (typeof par.flashvars != UNDEF) {
-								par.flashvars += "&" + k + "=" + flashvarsObj[k];
-							}
-							else {
-								par.flashvars = k + "=" + flashvarsObj[k];
-							}
-						}
-					}
-					if (hasPlayerVersion(swfVersionStr)) { // create SWF
-						var obj = createSWF(att, par, replaceElemIdStr);
-						if (att.id == replaceElemIdStr) {
-							setVisibility(replaceElemIdStr, true);
-						}
-						callbackObj.success = true;
-						callbackObj.ref = obj;
-					}
-					else { // show alternative content
-						setVisibility(replaceElemIdStr, true);
-					}
-					if (callbackFn) { callbackFn(callbackObj); }
+			var args = arguments;
+			if(loadEmbed()){
+				webshims.ready('swfmini-embed', function(){
+					swfmini.embedSWF.apply(swfmini, args);
 				});
+			} else if(callbackFn) {
+				callbackFn({success:false, id:replaceElemIdStr});
 			}
-			else if (callbackFn) { callbackFn(callbackObj);	}
 		},
 		
 		switchOffAutoHideShow: function() {
@@ -424,29 +204,19 @@ var swfmini = function() {
 			}
 		},
 		
-		showExpressInstall: function() {
-			
-		},
+		showExpressInstall: wasRemoved,
 		
-		removeSWF: function(objElemIdStr) {
-			if (ua.w3) {
-				removeSWF(objElemIdStr);
-			}
-		},
+		removeSWF: wasRemoved,
 		
-		createCSS: function() {
-			
-		},
+		createCSS: wasRemoved,
 		
 		addDomLoadEvent: addDomLoadEvent,
 		
-		addLoadEvent: addLoadEvent,
+		addLoadEvent: wasRemoved,
 		
 		
 		// For internal usage only
-		expressInstallCallback: function() {
-			
-		}
+		expressInstallCallback: wasRemoved
 	};
 }();
 

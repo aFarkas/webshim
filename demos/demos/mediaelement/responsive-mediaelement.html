@@ -10,6 +10,7 @@
 		body {
 			background: #000;
 		}
+
 		.wrapper {
 			position: relative;
 			margin: 15px auto;
@@ -22,7 +23,6 @@
 			z-index: 9;
 		}
 
-		
 		video {
 			display: inline-block;
 			width: 100%;
@@ -30,11 +30,11 @@
 		.mediaplayer {
 			width: 100%;
 		}
-		
+
 		.button-row button {
 			font-size: 140%;
 		}
-		
+
 		.mediaplayer.ratio-16-9 {
 			position: relative;
 			height: 0;
@@ -80,7 +80,7 @@
 		webshims.polyfill('mediaelement');
 	</script>
 
-	<title>Responsive Video embedding with webshims and JME</title>
+	<title>Responsive Video with custom styleable controls with webshims</title>
 	<script>
 
 		$(function(){
@@ -112,48 +112,48 @@
 
 <body>
 <div class="wrapper">
-	<h1>Responsive Video embedding with webshims and JME</h1>
+	<h1>Responsive Video embedding with webshims</h1>
 	<div class="button-row">
 		<button class="load-swf" disabled="">test flash fallback</button>
-		
+
 		<button class="load-jme">test JME / customizable Controls</button>
 	</div>
-		
+
 	<h2>width: 100%; height: auto;</h2>
 	<p>Webshims supports setting width/height of a video in all units including the keyword auto (The auto keyword needs to be set inline to work with Flash Fallback).</p>
 	<div class="mediaplayer videoplayer">
 		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="height: auto;">
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
-			<track src="../subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
+			<track src="subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
 			<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
 		</video>
 	</div>
 	<p><small>In case you are using a poster you need to ensure, that the poster has the same aspect ration than the video.</small></p>
 	<hr />
-	
+
 	<h2>intrinsic ratio responsive/fluid video</h2>
 	<p>based on  http://www.alistapart.com/articles/creating-intrinsic-ratios-for-video/</p>
-	
+
 	<div class="mediaplayer videoplayer ratio-16-9">
 		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="height: 100%;">
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
-			<track src="../subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
+			<track src="subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
 			<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
 		</video>
 	</div>
-	
-	
+
+
 	<hr />
-	
+
 	<h2>floating content with margin</h2>
 	<div class="bfc">
 		<div class="mediaplayer videoplayer media-left">
 			<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="height: auto;">
 				<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
 				<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
-				<track src="../subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
+				<track src="subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
 				<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
 			</video>
 		</div>

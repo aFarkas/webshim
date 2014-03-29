@@ -2051,6 +2051,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 	
 });;(function($){
 	"use strict";
+	var posI = 0;
 	var isNumber = function(string){
 		return (typeof string == 'number' || (string && string == string * 1));
 	};
@@ -2559,8 +2560,13 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 				webshims.ready('WINDOWLOAD', function(){
 					webshims.ready('dom-support', function(){
 						if ($.fn.onWSOff) {
-							that.element.onWSOff('updateshadowdom', function(){
+							var timer;
+							var update = function(){
 								that.updateMetrics();
+							};
+							that.element.onWSOff('updateshadowdom', function(){
+								clearTimeout(timer);
+								timer = setTimeout(update, 100);
 							});
 						}
 					});
@@ -2571,26 +2577,26 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 			}
 		},
 		posCenter: function(elem, outerWidth){
-			var temp;
+			var temp, eS;
+
 			if(this.options.calcCenter && (!this._init || this.element[0].offsetWidth)){
 				if(!elem){
 					elem = this.thumb;
 				}
+				eS = elem[0].style;
 				if(!outerWidth){
 					outerWidth = elem[this.dirs.outerWidth]();
 				}
 				outerWidth = outerWidth / -2;
-				elem.css(this.dirs.marginLeft, outerWidth);
-				
+				eS[this.dirs.marginLeft] = outerWidth +'px';
+
 				if(this.options.calcTrail && elem[0] == this.thumb[0]){
 					temp = this.element[this.dirs.innerHeight]();
-					elem.css(this.dirs.marginTop, (elem[this.dirs.outerHeight]() - temp) / -2);
-					this.range.css(this.dirs.marginTop, (this.range[this.dirs.outerHeight]() - temp) / -2 );
+					eS[this.dirs.marginTop] = ((elem[this.dirs.outerHeight]() - temp) / -2) + 'px';
+					this.range[0].style[this.dirs.marginTop] = ((this.range[this.dirs.outerHeight]() - temp) / -2 ) +'px';
 					outerWidth *= -1;
-					this.trail
-						.css(this.dirs.left, outerWidth)
-						.css(this.dirs.right, outerWidth)
-					;
+					this.trail[0].style[this.dirs.left] = outerWidth +'px';
+					this.trail[0].style[this.dirs.right] = outerWidth +'px';
 				}
 			}
 		},
@@ -4181,26 +4187,24 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 					}
 
 					marginR = $.css( data.orig, 'margin'+right);
-					
-					data.element
-						.css('margin'+left, $.css( data.orig, 'margin'+left))
-						.css('margin'+right, hasButtons ? 0 : marginR)
-					;
+
+					styleO['margin'+left] = $.css( data.orig, 'margin'+left);
+					styleO['margin'+right] = hasButtons ? '0px' : marginR;
+
 					
 					if(hasButtons){
 
 						marginL = (parseInt(data.buttonWrapper.css('margin'+left), 10) || 0);
-						data.element.css('padding'+right, '');
-						
+						styleO['padding'+right] = '';
+
 						if(marginL < 0){
 							marginR = (parseInt(marginR, 10) || 0) + ((data.buttonWrapper.outerWidth() + marginL) * -1);
-							data.buttonWrapper.css('margin'+right, marginR);
-							data.element
-								.css('padding'+right, '')
-								.css('padding'+right, (parseInt( data.element.css('padding'+right), 10) || 0) + data.buttonWrapper.outerWidth())
-							;
+							data.buttonWrapper[0].style['margin'+right] = marginR+'px';
+
+							styleO['padding'+right] = ((parseInt( data.element.css('padding'+right), 10) || 0) + data.buttonWrapper.outerWidth()) +'px';
+
 						} else {
-							data.buttonWrapper.css('margin'+right, marginR);
+							data.buttonWrapper[0].style['margin'+right] = marginR;
 							correctWidth = data.buttonWrapper.outerWidth(true) + correctWidth;
 						}
 					}

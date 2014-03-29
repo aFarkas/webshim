@@ -198,7 +198,6 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 		structure: slideStructure,
 
 		_create: function(control, media, base){
-			loadRange();
 
 			var createFn = function(){
 				var api, volume;
@@ -247,7 +246,6 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 			format: ['mm', 'ss']
 		},
 		_create: function(control, media, base){
-			loadRange();
 
 			var module = this;
 
@@ -1098,4 +1096,5 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 			$(baseSelector, context).add(insertedElement.filter(baseSelector)).jmeProp('controlbar', true);
 		});
 	});
+	webshims.ready('WINDOWLOAD', loadRange);
 });

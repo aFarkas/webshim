@@ -1819,15 +1819,12 @@ if(!('setSelectionRange' in document.createElement('input'))){
 											var pos = jelm.position();
 											if(width !== lastWidth){
 												lastWidth = width;
-												data.text
-													.css({
-														width: width
-													})
-												;
+												data.text[0].style.width = width +'px';
 											}
 											if(pos.top !== lastPos.top || pos.left !== lastPos.left){
 												lastPos = pos;
-												data.text.css(pos);
+												data.text[0].style.top = pos.top +'px';
+												data.text[0].style.left = pos.left +'px';
 											}
 										};
 										if(!init){

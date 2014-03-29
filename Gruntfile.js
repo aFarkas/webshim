@@ -228,7 +228,7 @@ module.exports = function(grunt){
 	});
 
 	grunt.registerTask('versionreplace', 'replace version', function() {
-		var reg = /<span class=\"ws-version\">[\d\.\-a-z]+<\/span>/g;
+		var reg = /<span class=\"ws-version\">[\d\.\-a-zA-Z]+<\/span>/g;
 		var replace = '<span class="ws-version">'+ grunt.config('pkg').version +'</span>';
 		grunt.file.expand({cwd: 'demos/', matchBase: true}, '*.html').forEach(function(path) {
 			var code = grunt.file.read('demos/'+path);

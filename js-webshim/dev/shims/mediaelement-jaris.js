@@ -1084,6 +1084,13 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 						loadedSwf--;
 						try {
 							elems[i].api_pause();
+							if(elems[i].readyState == 4){
+								for (prop in elems[i]) {
+									if (typeof elems[i][prop] == "function") {
+										elems[i][prop] = null;
+									}
+								}
+							}
 						} catch(er){}
 					}
 				}
@@ -1147,6 +1154,17 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			}
 					
 		}, 'prop');
+
+
+		if(hasFlash){
+			webshims.ready('WINDOWLOAD', function(){
+				setTimeout(function(){
+					if(!loadedSwf){
+						document.createElement('img').src = playerSwfPath;
+					}
+				}, 9);
+			});
+		}
 	} else if(!('media' in document.createElement('source'))){
 		webshims.reflectProperties('source', ['media']);
 	}
@@ -1205,5 +1223,43 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			});
 		})();
 	}
-	
+
+
+	if(hasNative && hasFlash && !options.preferFlash){
+		var noSwitch = {
+			1: 1
+		};
+		var switchOptions = function(e){
+			var media, error, parent;
+			if(!options.preferFlash &&
+				($(e.target).is('audio, video') || ((parent = e.target.parentNode) && $('source', parent).last()[0] == e.target)) &&
+				(media = $(e.target).closest('audio, video')) && (error = media.prop('error')) && !noSwitch[error.code]
+				){
+
+				if(!options.preferFlash){
+					if(!media.is('.nonnative-api-active')){
+						options.preferFlash = true;
+						document.removeEventListener('error', switchOptions, true);
+						$('audio, video').each(function(){
+							webshims.mediaelement.selectSource(this);
+						});
+						webshims.error("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error')+ 'first error: '+ error);
+					}
+				} else{
+					document.removeEventListener('error', switchOptions, true);
+				}
+			}
+		};
+		setTimeout(function(){
+			document.addEventListener('error', switchOptions, true);
+			$('audio, video').each(function(){
+				var error = $.prop(this, 'error');
+				if(error && !noSwitch[error]){
+					switchOptions({target: this});
+					return false;
+				}
+			});
+		}, 9);
+	}
+
 });

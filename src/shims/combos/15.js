@@ -616,7 +616,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					$.each({ Height: "getHeight", Width: "getWidth" }, function(name, type){
 						var body = document.body;
 						var doc = document.documentElement;
-						docObserve[type] = function(){
+						docObserve[type] = function (){
 							return Math.max(
 								body[ "scroll" + name ], doc[ "scroll" + name ],
 								body[ "offset" + name ], doc[ "offset" + name ],
@@ -631,24 +631,11 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						this._create();
 						this.height = docObserve.getHeight();
 						this.width = docObserve.getWidth();
-						setInterval(this.test, 600);
+						setInterval(this.test, 999);
 						$(this.test);
 						webshims.ready('WINDOWLOAD', this.test);
 						$(document).on('updatelayout.webshim pageinit popupafteropen panelbeforeopen tabsactivate collapsibleexpand shown.bs.modal shown.bs.collapse slid.bs.carousel', this.handler);
 						$(window).on('resize', this.handler);
-						(function(){
-							var oldAnimate = $.fn.animate;
-							var animationTimer;
-							
-							$.fn.animate = function(){
-								clearTimeout(animationTimer);
-								animationTimer = setTimeout(function(){
-									docObserve.test();
-								}, 99);
-								
-								return oldAnimate.apply(this, arguments);
-							};
-						})();
 					}
 				}
 			};

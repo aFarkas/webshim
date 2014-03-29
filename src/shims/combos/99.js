@@ -738,7 +738,6 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 		structure: slideStructure,
 
 		_create: function(control, media, base){
-			loadRange();
 
 			var createFn = function(){
 				var api, volume;
@@ -787,7 +786,6 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 			format: ['mm', 'ss']
 		},
 		_create: function(control, media, base){
-			loadRange();
 
 			var module = this;
 
@@ -1638,4 +1636,5 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 			$(baseSelector, context).add(insertedElement.filter(baseSelector)).jmeProp('controlbar', true);
 		});
 	});
+	webshims.ready('WINDOWLOAD', loadRange);
 });
