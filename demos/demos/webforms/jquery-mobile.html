@@ -54,9 +54,7 @@
 	 	
 	<script>
 		(function(){
-			//jQM: Modernizr.mq is not part of webshims' Modernizr build!
-			var assumeMobile = Modernizr.mq && (Modernizr.mq('(max-device-width: 768px)') || (Modernizr.touch && Modernizr.mq('(max-device-width: 124px)')));
-			
+
 			webshims.setOptions('forms', {
 				//configure instantvalidation for jQuery mobile
 				iVal: {
@@ -68,7 +66,7 @@
 			
 			webshims.setOptions('forms-ext', {
 				//only use custom widgets if we do not see some mobile aspects
-				replaceUI: !assumeMobile,
+				replaceUI: 'auto',
 				types: 'range date time number month',
 				widgets: {
 					//buttonOnly: true,

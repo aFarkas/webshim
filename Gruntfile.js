@@ -105,11 +105,11 @@ module.exports = function(grunt){
 		},
 		watch: {
 			sass: {
-				files: ['src/shims/**/*.scss'],
+				files: ['src/**/*.scss'],
 				tasks: ['sass']
 			},
 			css: {
-				files: ['src/shims/**/*.css'],
+				files: ['src/**/*.css'],
 				tasks: ['cfgcopymin', 'copy']
 			},
 			js: {

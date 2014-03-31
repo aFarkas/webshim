@@ -9,7 +9,7 @@
   font-weight: normal;
   font-style: normal; }
 
-.mediaplayer[data-state="waiting"] > .jme-media-overlay, .mediaplayer .fullscreen, .mediaplayer .fullscreen.state-exitfullscreen, .mediaplayer[data-state="idle"] > .jme-media-overlay, .mediaplayer button.play-pause, .mediaplayer button.play-pause.state-playing, .mediaplayer .mute-unmute, .mediaplayer[data-volume="medium"] .mute-unmute, .mediaplayer[data-volume="low"] .mute-unmute, .mediaplayer[data-volume="no"] .mute-unmute, .mediaplayer .state-unmute.mute-unmute, .mediaplayer .captions, .mediaplayer .subtitle-menu button[aria-checked="true"], .mediaplayer .subtitle-menu button {
+.mediaplayer[data-state="waiting"] > .jme-media-overlay, .mediaplayer .fullscreen, .mediaplayer .fullscreen.state-exitfullscreen, .mediaplayer[data-state="idle"] > .jme-media-overlay, .mediaplayer button.play-pause, .mediaplayer button.play-pause.state-playing, .mediaplayer .mute-unmute, .mediaplayer[data-volume="medium"] .mute-unmute, .mediaplayer[data-volume="low"] .mute-unmute, .mediaplayer[data-volume="no"] .mute-unmute, .mediaplayer .state-unmute.mute-unmute, .mediaplayer .captions, .mediaplayer .subtitle-menu button[aria-checked="true"], .mediaplayer .subtitle-menu button, .mediaplayer[data-state="ended"] > .jme-media-overlay {
   font-family: 'jme';
   speak: none;
   font-style: normal;
@@ -63,6 +63,9 @@
 .mediaplayer .subtitle-menu button:before {
   content: "\e617"; }
 
+.mediaplayer[data-state="ended"] > .jme-media-overlay:before {
+  content: "\e601"; }
+
 @keyframes jmespin {
   0% {
     -webkit-transform: rotate(0deg);
@@ -94,6 +97,20 @@
     padding-right: 0.0625em; }
   .jme-cb-box .volume-container {
     padding-left: 0.0625em; }
+
+[data-playersize="x-small"] > .jme-controlbar {
+  padding-top: 0.25em; }
+  [data-playersize="x-small"] > .jme-controlbar .time-slider {
+    position: absolute;
+    top: -0.125em;
+    left: 0;
+    right: 0; }
+  [data-playersize="x-small"] > .jme-controlbar .progress-container {
+    width: auto; }
+    [data-playersize="x-small"] > .jme-controlbar .progress-container:before {
+      content: "/"; }
+  [data-playersize="x-small"] > .jme-controlbar .duration-container {
+    width: 100%; }
 
 .mediaplayer {
   position: relative;
@@ -127,7 +144,7 @@
   right: 0;
   bottom: 0;
   font-size: 400%;
-  color: #fff;
+  color: #f6f6f6;
   text-align: center; }
   .mediaplayer > .jme-media-overlay:before {
     position: absolute;
@@ -139,6 +156,8 @@
     margin: -0.5em 0 0 -0.5em;
     text-shadow: 0 0 0.4em rgba(0, 0, 0, 0.6); }
 .mediaplayer[data-state="idle"] {
+  cursor: pointer; }
+.mediaplayer[data-state="ended"] {
   cursor: pointer; }
 .mediaplayer[data-state="waiting"] > .jme-media-overlay {
   animation-name: jmespin;
@@ -161,14 +180,14 @@
   cursor: default;
   outline: none;
   background: #333;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.6);
   color: #e1e1e1;
   transition: all 300ms; }
   .mediaplayer > .jme-controlbar button {
     display: inline-block;
     color: inherit;
-    width: 1.375em;
-    height: 1.375em;
+    width: 1.5em;
+    height: 1.5em;
     cursor: pointer;
     text-align: center;
     transition: color 400ms;
@@ -189,6 +208,12 @@
   width: 2.5em;
   text-align: center;
   margin-top: 0.03em; }
+.mediaplayer .no-volume-api .volume-container,
+.mediaplayer .no-volume-api .mute-container {
+  padding: 0; }
+.mediaplayer .no-volume-api .mute-unmute,
+.mediaplayer .no-volume-api .volume-slider {
+  display: none; }
 .mediaplayer .captions[role="checkbox"] {
   color: #999; }
   .mediaplayer .captions[role="checkbox"][aria-checked="true"] {
@@ -266,7 +291,7 @@
 .mediaplayer .media-range {
   position: relative;
   zoom: 1;
-  height: 0.3125em;
+  height: 0.4375em;
   border: 1px solid #999;
   outline: none;
   border-radius: 0.1875em; }
@@ -286,7 +311,7 @@
   opacity: 0;
   transition: 400ms opacity, 400ms visibility;
   background: #333;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.6);
   color: #eee; }
   .mediaplayer .time-select.show-time-select {
     opacity: 1;
@@ -301,16 +326,18 @@
   background: #f1f1f1;
   cursor: pointer;
   border-radius: 50%;
-  width: 0.5625em;
-  height: 0.5625em; }
+  width: 0.6875em;
+  height: 0.6875em; }
 .mediaplayer .ws-focus .ws-range-thumb {
   background: #fff; }
 .mediaplayer .time-slider .ws-range-thumb {
-  width: 0.875em;
-  height: 0.5625em;
+  width: 1em;
+  height: 0.6875em;
   border-radius: 0.1875em; }
 .mediaplayer .volume-slider {
   width: 60px; }
+.mediaplayer[data-playersize="large"] .volume-slider {
+  width: 90px; }
 .mediaplayer.state-muted .volume-slider .ws-range-progress {
   width: 0 !important; }
 .mediaplayer.state-muted .volume-slider .ws-range-thumb {

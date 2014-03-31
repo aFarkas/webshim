@@ -88,7 +88,7 @@
 	}
 }(function($){
 	"use strict";
-	var firstRun, path, docWriteLoaded;
+	var firstRun, path;
 	var webshims = window.webshims;
 	var DOMSUPPORT = 'dom-support';
 	var special = $.event.special;
@@ -100,9 +100,10 @@
 	var addSource = function(text){
 		return text +"\n//# sourceURL="+this.url;
 	};
-	var getAutoMobile = function(prop){
-		return webshims.assumeMobile && prop == 'auto' ? false : prop;
+	var getAutoEnhance = function(prop){
+		return !webCFG.enhanceAuto && prop == 'auto' ? false : prop;
 	};
+
 	clearInterval(webshims.timer);
 	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
 
@@ -115,9 +116,9 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.12.5-RC5',
+		version: '1.12.5-RC6',
 		cfg: {
-			assumeMobile: window.matchMedia && matchMedia('(max-device-width: 640px)').matches,
+			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 719px)').matches),
 			//addCacheBuster: false,
 			waitReady: true,
 //			extendNative: false,
@@ -135,6 +136,7 @@
 			
 			basePath: path
 		},
+
 		bugs: {},
 		/*
 		 * some data
@@ -149,6 +151,7 @@
 				$.extend(true, webCFG, name);
 			}
 		},
+		_getAutoEnhance: getAutoEnhance,
 		addPolyfill: function(name, cfg){
 			cfg = cfg || {};
 			var feature = cfg.f || name;
@@ -1133,7 +1136,7 @@
 				var o = this.options;
 				initialFormTest();
 
-				o.replaceUI = getAutoMobile(o.replaceUI);
+				o.replaceUI = getAutoEnhance(o.replaceUI);
 
 				//input widgets on old androids can't be trusted
 				if(bustedWidgetUi && !o.replaceUI && (/Android/i).test(navigator.userAgent)){
@@ -1205,7 +1208,7 @@
 			loadInit: function(){
 				//
 				var o = this.options;
-				o.replaceUI = getAutoMobile(o.replaceUI);
+				o.replaceUI = getAutoEnhance(o.replaceUI);
 
 				if(o.replaceUI){
 					o.plugins.unshift('mediacontrols');
@@ -1258,7 +1261,7 @@
 			},
 			test: function(){
 				var o = this.options;
-				o.override = getAutoMobile(o.override);
+				o.override = getAutoEnhance(o.override);
 				return !o.override && !bugs.track;
 			},
 			d: ['mediaelement', DOMSUPPORT],

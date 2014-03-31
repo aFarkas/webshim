@@ -1166,13 +1166,12 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			options.customMessages = true;
 			toLoad.push('form-message');
 		}
-		if(options.customDatalist == 'auto' && webshims.assumeMobile){
-			options.customDatalist = false;
-		}
-		if(options.customDatalist){
+
+		if(webshims._getAutoEnhance(options.customDatalist)){
 			options.fD = true;
 			toLoad.push('form-datalist');
 		}
+
 		if(options.addValidators){
 			toLoad.push('form-validators');
 		}

@@ -242,7 +242,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 				$.jme.data(this, $.extend(true, {}, opts));
 			}
 
-			var mediaUpdateFn, init, canPlay, removeCanPlay, canplayTimer, needPreload;
+			var mediaUpdateFn, init, canPlay, removeCanPlay, canplayTimer, needPreload, playerSize;
 			var media = $('audio, video', this).filter(':first');
 			var base = $(this);
 
@@ -269,6 +269,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 					var state = e.type;
 					var readyState;
 					var paused;
+
 					removeCanPlay();
 
 					if(state == 'ended' || $.prop(this, 'ended')){
@@ -300,10 +301,40 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 						}
 					}
 
+					if(state == 'idle' && base._seekpause){
+						state = false;
+					}
 					if(state){
 						base.attr('data-state', state);
 					}
 				};
+
+				playerSize = (function(){
+					var lastSize;
+					var sizes = [
+						{size: 380, name: 'x-small'},
+						{size: 490, name: 'small'},
+						{size: 756, name: 'medium'},
+						{size: 1024, name: 'large'}
+					];
+
+					var len = sizes.length;
+					return function(){
+						var size = 'x-large';
+						var i = 0;
+						var width = base.outerWidth();
+						for(; i < len; i++){
+							if(sizes[i].size >= width){
+								size = sizes[i].name;
+								break;
+							}
+						}
+						if(lastSize != size){
+							lastSize = size;
+							base.attr('data-playersize', size);
+						}
+					};
+				})();
 				jmeData.media = media;
 				jmeData.player = base;
 				media
@@ -349,6 +380,11 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 					.triggerHandler('userinactive')
 				;
 
+				playerSize();
+				webshims.ready('dom-support', function(){
+					base.onWSOff('updateshadowdom', playerSize);
+					webshims.addShadowDom();
+				});
 				if(mediaUpdateFn){
 					media.on('updateJMEState', mediaUpdateFn).triggerHandler('updateJMEState');
 				}

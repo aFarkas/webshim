@@ -258,6 +258,28 @@ $browser-context: 16; // Default
 	}
 }
 
+[data-playersize="x-small"] > .jme-controlbar {
+	padding-top: em(4);
+
+	.time-slider {
+		position: absolute;
+		top: em(-2);
+		left: 0;
+		right: 0;
+	}
+	.progress-container {
+		width: auto;
+
+		&:before {
+			content: "/";
+		}
+	}
+
+	.duration-container {
+		width: 100%;
+	}
+}
+
 .mediaplayer {
 	position: relative;
 	display: block;
@@ -301,7 +323,7 @@ $browser-context: 16; // Default
 		right: 0;
 		bottom: 0;
 		font-size: 400%;
-		color: #fff;
+		color: #f6f6f6;
 		text-align: center;
 
 		&:before {
@@ -320,6 +342,14 @@ $browser-context: 16; // Default
 		cursor: pointer;
 		> .jme-media-overlay {
 			@extend %icon-play-circle;
+		}
+	}
+
+
+	&[data-state="ended"] {
+		cursor: pointer;
+		> .jme-media-overlay {
+			@extend %icon-loop;
 		}
 	}
 
@@ -355,15 +385,15 @@ $browser-context: 16; // Default
 		cursor: default;
 		outline: none;
 		background: #333;
-		background: rgba(0, 0, 0, 0.3);
+		background: rgba(0, 0, 0, 0.6);
 		color: #e1e1e1;
 		transition: all 300ms;
 
 		button {
 			display: inline-block;
 			color: inherit;
-			width: em(22);
-			height: em(22);
+			width: em(24);
+			height: em(24);
 			cursor: pointer;
 			text-align: center;
 			transition: color 400ms;
@@ -423,6 +453,18 @@ $browser-context: 16; // Default
 
 	.state-unmute.mute-unmute  {
 		@extend %icon-volume-mute2;
+	}
+
+	.no-volume-api {
+		.volume-container,
+		.mute-container {
+			padding: 0;
+		}
+
+		.mute-unmute,
+		.volume-slider {
+			display: none;
+		}
 	}
 
 	.captions {
@@ -551,7 +593,7 @@ $browser-context: 16; // Default
 	.media-range {
 		position: relative;
 		zoom: 1;
-		height: em(5);
+		height: em(7);
 		border: 1px solid #999;
 		outline: none;
 		border-radius: em(3);
@@ -575,7 +617,7 @@ $browser-context: 16; // Default
 		opacity: 0;
 		transition: 400ms opacity, 400ms visibility;
 		background: #333;
-		background: rgba(0, 0, 0, 0.3);
+		background: rgba(0, 0, 0, 0.6);
 		color: #eee;
 
 		&.show-time-select {
@@ -596,8 +638,8 @@ $browser-context: 16; // Default
 		background: #f1f1f1;
 		cursor: pointer;
 		border-radius: 50%;
-		width: em(9);
-		height: em(9);
+		width: em(11);
+		height: em(11);
 	}
 
 	.ws-focus .ws-range-thumb {
@@ -607,13 +649,17 @@ $browser-context: 16; // Default
 	.time-slider {
 
 		.ws-range-thumb {
-			width: em(14);
-			height: em(9);
+			width: em(16);
+			height: em(11);
 			border-radius: em(3);
 		}
 	}
 	.volume-slider {
 		width: 60px;
+	}
+
+	&[data-playersize="large"] .volume-slider {
+		width: 90px;
 	}
 
 	&.state-muted .volume-slider {

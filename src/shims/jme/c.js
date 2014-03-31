@@ -25,6 +25,17 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 	var defaultStructure = '<div  class="{%class%}"></div>';
 	var slideStructure = '<div class="{%class%}"></div>';
 	var ns = $.jme.classNS;
+	var noVolumeClass = (function(){
+		var audio;
+		var ret = '';
+		if(typeof window.Audio == 'function'){
+			audio = new Audio();
+			audio.volume = 0.55;
+			ret = audio.volume = 0.55 ? '' : ' no-volume-api';
+		}
+		return ret;
+	})();
+
 
 
 
@@ -91,7 +102,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 			calculateTimerange: false
 		},
 		pluginOrder: ['<div class="play-pause-container">', 'play-pause', '</div>', '<div class="currenttime-container">', 'currenttime-display', '</div>', '<div class="progress-container">', 'time-slider', '</div>', '<div class="duration-container">', 'duration-display', '</div>', '<div class="mute-container">', 'mute-unmute', '</div>', '<div class="volume-container">', 'volume-slider', '</div>', '<div class="subtitle-container">', '<div class="subtitle-controls">', 'captions', '</div>', '</div>', '<div class="fullscreen-container">', 'fullscreen', '</div>'],
-		barStructure: '<div class="jme-media-overlay"></div><div class="jme-controlbar" tabindex="-1"><div class="jme-cb-box"></div></div>',
+		barStructure: '<div class="jme-media-overlay"></div><div class="jme-controlbar'+ noVolumeClass +'" tabindex="-1"><div class="jme-cb-box"></div></div>',
 		_create: function(control, media, base, options){
 			var timer;
 			var update = function(){
@@ -119,7 +130,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 		},
 		structure: btnStructure,
 		text: 'play / pause',
-		_create: function(control, media, base){
+		_create: function(control, media){
 			var textFn = $.jme.getButtonText(control, [this[pseudoClasses].play, this[pseudoClasses].pause]);
 
 			media
@@ -168,30 +179,48 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 		}
 	});
 
-	function createGetSetHandler(get, set){
+	function createGetSetHandler(fns){
 		var throttleTimer;
-		var blockedTimer;
 		var blocked;
-		return {
+
+		if(fns.release === true){
+			fns.release = fns.set;
+		}
+		var getSetHelper = {
+			start: function(){
+				if(!blocked){
+					blocked = true;
+					if(fns.start){
+						fns.start();
+					}
+				}
+			},
+			release: function(){
+				if(blocked){
+					blocked = false;
+
+					if(fns.release){
+						fns.release();
+					}
+				}
+			},
 			get: function(){
 				if(blocked){return;}
-				return get.apply(this, arguments);
+				return fns.get.apply(this, arguments);
 			},
 			set: function(){
-				clearTimeout(throttleTimer);
-				clearTimeout(blockedTimer);
 
 				var that = this;
 				var args = arguments;
-				blocked = true;
+				getSetHelper.start();
+				clearTimeout(throttleTimer);
 				throttleTimer = setTimeout(function(){
-					set.apply(that, args);
-					blockedTimer = setTimeout(function(){
-						blocked = false;
-					}, 30);
-				}, 0);
+					fns.set.apply(that, args);
+				}, 33);
 			}
 		};
+		getSetHelper.fns = fns;
+		return getSetHelper;
 	}
 
 	$.jme.registerPlugin('volume-slider', {
@@ -202,20 +231,21 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 			var createFn = function(){
 				var api, volume;
 
-				volume = createGetSetHandler(
-					function(){
+				volume = createGetSetHandler({
+					get: function(){
 						var volume = media.prop('volume');
 						if(volume !== undefined){
 							api.value(volume);
 						}
 					},
-					function(value){
+					set: function(){
 						media.prop({
 							muted: false,
 							volume: api.options.value
 						});
-					}
-				);
+					},
+					release: true
+				});
 
 				api = control
 					.rangeUI({
@@ -223,9 +253,8 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 						max: 1,
 						//animate: true,
 						step: 'any',
-						input: function(){
-							volume.set();
-						},
+						input: volume.set,
+						change: volume.release,
 						baseClass: 'media-range'
 					})
 					.data('rangeUi')
@@ -250,12 +279,12 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 			var module = this;
 
 			var createFn = function(){
-				var time, durationChange, api, timeShow;
+				var time, durationChange, api, timeShow, wasPaused;
 				var hasDuration = $.jme.classNS+'has-duration';
 				var duration = media.prop('duration');
 
-				time = createGetSetHandler(
-					function(){
+				time = createGetSetHandler({
+					get: function(){
 						var time = media.prop('currentTime');
 						if(!isNaN(time)){
 							try {
@@ -264,12 +293,33 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 						}
 
 					},
-					function(){
+					set: function(){
 						try {
 							media.prop('currentTime', api.options.value).triggerHandler('timechanged', [api.options.value]);
 						} catch(er){}
+					},
+					start: function(){
+						if(wasPaused == null){
+							wasPaused = media.prop('paused');
+							if(!wasPaused){
+								base._seekpause = true;
+								media.pause();
+							} else {
+								base._seekpause = false;
+							}
+						}
+					},
+					release: function(){
+						time.fns.set();
+						if(wasPaused === false){
+							media.play();
+						}
+						if('_seekpause' in base){
+							delete base._seekpause;
+						}
+						wasPaused = null;
 					}
-				);
+				});
 
 				durationChange = function(){
 					duration = media.prop('duration');
@@ -290,11 +340,9 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 					.rangeUI({
 						min: 0,
 						value: media.prop('currentTime') || 0,
-						//animate: true,
 						step: 'any',
-						input: function(){
-							time.set();
-						},
+						input: time.set,
+						change: time.release,
 						textValue: function(val){
 							return media.jmeFn('formatTime', val);
 						},
