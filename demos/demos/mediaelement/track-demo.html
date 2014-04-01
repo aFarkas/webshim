@@ -15,32 +15,54 @@
 <script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
 <script src="../../../js-webshim/minified/polyfiller.js"></script>
 
-<script>
-	webshims.setOptions('forms', {
-		customDatalist: true
-	});
-	if(location.search.indexOf('nopolyfill') == -1){
-		webshims.polyfill('mediaelement track forms');
-	}
-</script>
+<!-- lightweight autosuggest plugin based on HTML5 datalist element -->
+<script src="http://afarkas.github.io/remote-list/dist/remote-list.min.js"></script>
 
 <script>
-	$(function(){
-
-		$('button.load-jme').prop('disabled', false).one('click', function(){
-			webshims.polyfill('mediaelement track forms');
-			webshims.loader.loadList(['mediacontrols']);
-			$(this).prop('disabled', true);
+	(function () {
+		var stateMatches = {
+			'true': true,
+			'false': false,
+			'auto': 'auto'
+		};
+		var enhanceState = (location.search.match(/enhancelist\=([true|auto|false|nopolyfill]+)/) || ['', 'auto'])[1];
+		$(function () {
+			$('.polyfill-type select')
+				.val(enhanceState)
+				.on('change', function () {
+					location.search = 'enhancelist=' + $(this).val();
+				})
+			;
 		});
-	});
+
+		webshims.setOptions('forms', {
+			customDatalist: stateMatches[enhanceState]
+		});
+
+		webshims.setOptions('mediaelement', {
+			replaceUI: stateMatches[enhanceState]
+		});
+		if(enhanceState != 'nopolyfill'){
+			webshims.polyfill('mediaelement track forms');
+		}
+	})();
+
+
 </script>
+
 <style>
 	.mediaplayer {
 		width: 640px;
 	}
 
-	.button-row button {
-		font-size: 140%;
+	.polyfill-type {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		background: #666;
+		color: #f1f1f1;
+		display: inline-block;
+		padding: 5px;
 	}
 </style>
 
@@ -69,9 +91,7 @@
 <p>The video has a <a href="assets/subtitle-en.vtt" title="WebVTT subtitle track" target="_blank">subtitle track</a>, and a <a href="assets/metadata-en.vtt" title="WebVTT metadata track" target="_blank">metadata track</a> with cues in JSON format. The metadata cues are parsed to build the carousel, and as each metadata cue becomes active, the carousel and the content in the panel on the right are updated. The video can be navigated by clicking on thumbnails in the carousel; the content panel has links to full articles on Wikipedia.</p>
 <p>Content and layout are based on work done by BBC R&D Prototyping as part of the <a href="http://www.p2p-next.org" title="P2P-Next project">P2P-Next project</a>.</p>
 <p>The <a href="http://samdutton.net/track/">original demo (samdutton.net/track/)</a> was modified by using webshims to make it cross-browser so that it even works in IE7/IE8 or Firefox 3.6. This demo is using the following Technologies (video, track, datalist, input[autofocus], input[placeholder] and JSON.</p>
-<div class="button-row">
-	<button class="load-jme">test JME / customizable Controls</button>
-</div>
+
 
 </div>
 
@@ -88,7 +108,7 @@
 	</div>
 	<div id="searchContainer" class="trackSupported">
 		<label for="searchInput">Search subtitles: </label>
-		<input id="searchInput" placeholder="find subtitles, then select a result to move to that point in the video." class="mark-option-text" />
+		<input id="searchInput" placeholder="find subtitles, then select a result to move to that point in the video." data-list-highlight="true" />
 	</div>
 
 	<div id="carouselContainer" class="trackSupported">
@@ -112,7 +132,15 @@
 <div id="copyright">&copy; 2009 BBC. <a href="http://www.wellcometreeoflife.org/">Wellcome Tree of Life</a> animation and related content is used under <a href="http://creativecommons.org/licenses/by-nc-nd/2.0/uk/">Creative Commons licence</a>. Further information is available in <a href="http://samdutton.net/track/licence.txt" title="licensing information">licence.txt</a>.</div>
 
 </div> <!-- container -->
-
+<label class="polyfill-type">
+	Polyfill/enhance strategy
+	<select>
+		<option value="auto" selected="">"auto" enhance non-mobile</option>
+		<option value="false">false: only polyfill</option>
+		<option value="true">true: enhance all</option>
+		<option value="nopolyfill">nopolyfill: (without webshims)</option>
+	</select>
+</label>
 </body>
 
 </html>

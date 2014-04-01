@@ -27,37 +27,28 @@ var startTreeOfLife = function(video){
 	
 	
 	var buildDatalistFromCues = function(textTrack){
-		var id = 'id-seachlist';
-		var datalist = $('<datalist id="'+ id +'" />').insertAfter("#searchInput");
-		//old option wrapper
-		var select = $('<select />');
+
 		var subtitles = $.map(textTrack.cues, function(cue){
-			return $(document.createElement('option')).attr({
-				'data-start-time': cue.startTime,
-				value: cue.text
-			})[0];
+			return {
+				value: cue.text,
+				cue: cue
+			};
 		});
-		var onSelect = function(){
-			var val = $.prop(this, 'value');
-			var startTime = $(subtitles)
-				.filter(function(){
-					return val == $.prop(this, 'value');
-				})
-				.data('startTime')
-			;
-			
-			if(startTime){
-				videoElement.prop('currentTime', startTime);
-				videoElement.callProp('play');
+		
+		$("#searchInput").remoteList({
+			minLength: 0,
+			maxLength: 0,
+			source: function(val, response){
+				response(subtitles);
+			},
+			select: function(){
+				var data = $(this).remoteList('selectedData');
+				if(data && data.cue && data.cue.startTime){
+					videoElement.prop('currentTime', data.cue.startTime);
+					videoElement.callProp('play');
+				}
 			}
-			
-		};
-		
-		select.html(subtitles);
-		
-		$("#searchInput").attr('list', id).on('change', onSelect);
-		//use htmlPolyfill instead of html for dynamic content!
-		datalist.htmlPolyfill(select);
+		});
 	};
 	
 	var buildCarouselFromCues = function(textTrack){

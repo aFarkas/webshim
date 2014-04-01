@@ -605,7 +605,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 	
 });;(function($){
 	"use strict";
-	var posI = 0;
+
 	var isNumber = function(string){
 		return (typeof string == 'number' || (string && string == string * 1));
 	};
@@ -805,10 +805,12 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		},
 		min: function(val){
 			this.options.min = retDefault(val, 0);
+			this.element.attr('aria-valuemin', this.options.min);
 			this.value(this.options.value, true);
 		},
 		max: function(val){
 			this.options.max = retDefault(val, 100);
+			this.element.attr('aria-valuemax', this.options.max);
 			this.value(this.options.value, true);
 		},
 		step: function(val){
@@ -981,8 +983,6 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 				if(e.target == window){remove();}
 			};
 			var add = function(e){
-				var outerWidth;
-				
 				if(isActive || (e.type == 'touchstart' && (!e.originalEvent || !e.originalEvent.touches || e.originalEvent.touches.length != 1))){
 					return;
 				}
@@ -997,7 +997,6 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 					leftOffset = that.element.offset();
 					widgetUnits = that.element[that.dirs.innerWidth]();
 					if(!widgetUnits || !leftOffset){return;}
-					outerWidth = that.thumb[that.dirs.outerWidth]();
 					leftOffset = leftOffset[that.dirs.pos];
 					widgetUnits = 100 / widgetUnits;
 
