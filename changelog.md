@@ -1,3 +1,18 @@
+Release 1.12.5
+----------
+- added custom styleable controls to mediaelement feature `webshims.setOptions('mediaelement', {replaceUI: true});`
+- runtime performance improvements for several input widgets
+- added enhancement/mobile strategy flag
+- improved datalist/list widget
+
+
+Release 1.12.4
+----------
+- new documentation (thx to @mreinstein)
+- several small bugfixes
+- improve track stlyes
+
+
 Release 1.12.3
 ----------
 
