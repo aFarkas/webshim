@@ -116,7 +116,7 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.12.5-RC6',
+		version: '1.12.5',
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 719px)').matches),
 			//addCacheBuster: false,
@@ -127,13 +127,16 @@
 			wspopover: {appendTo: 'auto', hideOnBlur: true},
 			ajax: {},
 			loadScript: function(src, success){
-				if(!$.ajax && window.require){
-					require([src], success);
+				if(!$.ajax){
+					if(window.yepnope){
+						yepnope.injectJs(src, success);
+					} else if(window.require){
+						require([src], success);
+					}
 				} else {
 					$.ajax($.extend({}, webCFG.ajax, {url: src, success: success, dataType: 'script', cache: true, global: false, dataFilter: addSource}));
 				}
 			},
-			
 			basePath: path
 		},
 
@@ -908,7 +911,7 @@
 	modules.swfmini.test();
 	
 	addModule('sizzle', {test: $.expr.filters});
-	addModule('jajax', {test: $.ajax});
+	addModule('jajax', {test: $.ajax && $.ajaxSettings.xhr});
 	/* 
 	 * polyfill-Modules 
 	 */

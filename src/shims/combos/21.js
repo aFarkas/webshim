@@ -128,8 +128,8 @@
 					if($.ajax){
 						createAjax();
 					} else {
-						webshims.ready('$ajax', createAjax);
-						webshims.loader.loadList(['$ajax']);
+						webshims.ready('jajax', createAjax);
+						webshims.loader.loadList(['jajax']);
 					}
 					clearTimeout(googleTimer);
 					if (!window.google || !window.google.loader) {
@@ -174,7 +174,7 @@
 	})();
 	
 	webshims.ready('WINDOWLOAD', function(){
-		webshims.loader.loadList(['$ajax']);
+		webshims.loader.loadList(['jajax']);
 	});
 	webshims.isReady('geolocation', true);
 })(webshims.$);

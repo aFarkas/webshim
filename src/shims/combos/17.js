@@ -1193,7 +1193,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			value: 50, 
 			input: $.noop, 
 			change: $.noop, 
-			_change: $.noop, 
+			_change: $.noop,
 			showLabels: true, 
 			options: {},
 			calcCenter: true,

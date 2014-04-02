@@ -1404,7 +1404,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 			value: 50, 
 			input: $.noop, 
 			change: $.noop, 
-			_change: $.noop, 
+			_change: $.noop,
 			showLabels: true, 
 			options: {},
 			calcCenter: true,

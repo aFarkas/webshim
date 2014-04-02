@@ -2639,7 +2639,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 			value: 50, 
 			input: $.noop, 
 			change: $.noop, 
-			_change: $.noop, 
+			_change: $.noop,
 			showLabels: true, 
 			options: {},
 			calcCenter: true,
