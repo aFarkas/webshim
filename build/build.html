@@ -22,7 +22,7 @@
 		<script>
 			
 			(function($, r){
-				var combos = {features: {}, files: {}};
+				var combos = {version: webshims.version, features: {}, files: {}};
 				var makeFile = function(file){
 					file = (webshims.modules[file] && webshims.modules[file].src) || file;
 					return 'src/shims/'+file+'.js';

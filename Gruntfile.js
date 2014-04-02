@@ -7,13 +7,6 @@ module.exports = function(grunt){
 	// Project configuration.
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		bower: grunt.file.readJSON('bower.json'),
-		jq: grunt.file.readJSON('webshims.jquery.json'),
-		meta: {
-			banner: '/*! v<%= pkg.version %> - ' +
-			'<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-			'<%= pkg.homepage ? "* " + pkg.homepage + "\n" : "" %> */'
-		},
 		//concat is changed through webshimscombos
 		concat: {
 			options: {
@@ -30,7 +23,31 @@ module.exports = function(grunt){
 		},
 		//copy and uglify are changed through cfgcopymin
 		copy: {
-			main: {}
+			main: {},
+			archive: {
+				files: [{src: 'webshims-stable.zip', dest: 'webshims-<%= pkg.version %>.zip'}]
+			}
+		},
+		compress: {
+			main: {
+				options: {
+					archive: 'webshims-stable.zip'
+				},
+				files: [
+					{expand: true, cwd: 'demos/', src: ['**'], dest: 'demos/', filter: function(filepath){
+						if(filepath.indexOf('demos/js-webshim') == 0 || filepath.indexOf('.tmp') != -1){
+							return false;
+						}
+						return true;
+					}},
+					{expand: true, cwd: 'js-webshim/', src: ['**'], dest: 'js-webshim/'}
+				]
+			}
+		},
+		clean: {
+			build: {
+				src: ['js-webshim/', 'src/shims/combos', 'webshims-*.zip']
+			}
 		},
 		cssmin: getFiles('src', MINPATH, '**/*.css'),
 		sass: {
@@ -122,6 +139,22 @@ module.exports = function(grunt){
 			cfgs: {
 				files: ['demos/demos/cfgs/assets/**/*.js'],
 				tasks: ['concat:cfgs']
+			}
+		}
+	});
+
+	grunt.registerTask('versiontest', 'test the current version of build', function(){
+		var version = grunt.file.readJSON(DEVPATH+'/shims/combos/comboinfo.json').version;
+		var packageinfos = ['package.json', 'bower.json', 'webshims.jquery.json'];
+		if(!/^\d+\.\d+\.\d+$/.test(version)){
+			grunt.warn('version "'+ version +'" is not valid');
+		}
+		if(grunt.file.readJSON('webshims.jquery.json').download.indexOf('webshims-'+version+'.zip') == -1){
+			grunt.warn('download in webshims manifest is not valid version');
+		}
+		for(var i = 0; i < packageinfos.length; i++){
+			if(grunt.file.readJSON(packageinfos[i]).version != version){
+				grunt.warn('version in"'+ packageinfos[i] +'" does not match file-version');
 			}
 		}
 	});
@@ -221,7 +254,7 @@ module.exports = function(grunt){
 
 		});
 	});
-	
+
 	// Default task.
 	grunt.loadTasks('grunt-tasks/');
 	
@@ -231,10 +264,14 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-css');
 	grunt.loadNpmTasks('grunt-contrib-sass');
+	grunt.loadNpmTasks('grunt-contrib-compress');
+	grunt.loadNpmTasks('grunt-contrib-clean');
 	
 	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'versionreplace']);
 
 	grunt.registerTask('dev', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'watch']);
+
+	grunt.registerTask('release', ['clean', 'default', 'versiontest', 'compress', 'copy:archive']);
 
 
 	function getFiles(srcdir, destdir, wildcard, compareDir, compareMatch) {

@@ -116,7 +116,7 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.12.5',
+		version: '1.12.6-pre',
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 719px)').matches),
 			//addCacheBuster: false,
@@ -259,12 +259,11 @@
 			var reTest = function(i, name){
 				var module = modules[name];
 				var readyName = name+'Ready';
-				var feature;
 				if(module && !module.loaded && !( (module.test && $.isFunction(module.test) ) ? module.test([]) : module.test )){
 					if(special[readyName]){
 						delete special[readyName];
 					}
-					feature = webshimsFeatures[module.f];
+					webshimsFeatures[module.f];
 					
 					resList.push(name);
 				}
