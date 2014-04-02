@@ -1380,7 +1380,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 						.on($.jme.fullscreen.eventName+'.jmefullscreen', function(e){
 							var fullScreenElem = $.jme.fullscreen.isFullScreen();
 							if(fullScreenElem && elem == fullScreenElem){
-								$(elem).triggerHandler('playerdimensionchange', ['fullscreen']);
+								data.media.trigger('playerdimensionchange', ['fullscreen']);
 							} else {
 								data.player.jmeProp('fullscreen', false);
 							}
@@ -1388,7 +1388,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 					;
 
 				}
-				data.player.triggerHandler('playerdimensionchange', ['fullwindow']);
+				data.media.trigger('playerdimensionchange', ['fullwindow']);
 
 			} else {
 				if(data.player && !data.player.hasClass($.jme.classNS+'player-fullscreen')){return 'noDataSet';}
@@ -1405,14 +1405,14 @@ webshims.register('jme', function($, webshims, window, doc, undefined, options){
 				} else {
 					$.jme.fullscreen.cancelFullWindow();
 				}
-
-				if(data.player){
-					data.player.triggerHandler('playerdimensionchange');
-				}
+				
 				if(data.scrollPos){
 					$(window).scrollTop(data.scrollPos.top);
 					$(window).scrollLeft(data.scrollPos.left);
 					delete data.scrollPos;
+				}
+				if(data.media){
+					data.media.trigger('playerdimensionchange');
 				}
 			}
 			return 'noDataSet';
