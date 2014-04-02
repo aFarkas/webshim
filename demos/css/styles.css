@@ -87,15 +87,6 @@ a.download-button {
 }
 
 
-div.run {
-	position: absolute;
-	right: 15px;
-	width: 26px; height: 18px;
-	background: url('../images/arrows.png') no-repeat -26px 0;
-}
-	div.run:active {
-		background-position: -51px 0;
-	}
 div.container p, div.container ul {
 	margin: 20px 0;
 }
