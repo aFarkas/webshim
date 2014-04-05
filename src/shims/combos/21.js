@@ -1911,14 +1911,15 @@
 	})();
 	
 	mediaelement.loadTextTrack = function(mediaelem, track, trackData, _default){
-		var loadEvents = 'play playing updatetrackdisplay';
+		var loadEvents = 'play playing';
 		var obj = trackData.track;
 		var load = function(){
 			var error, ajax, createAjax;
-
 			var src = obj.mode != 'disabled' && ($.attr(track, 'src') && $.prop(track, 'src'));
+
 			if(src){
-				$(mediaelem).off(loadEvents, load);
+				$(mediaelem).off(loadEvents, load).off('updatetrackdisplay', load);
+
 				if(!trackData.readyState){
 					error = function(){
 						trackData.readyState = 3;
@@ -1952,7 +1953,7 @@
 								error: error
 							});
 						};
-						if($.ajax){
+						if($.ajax && $.ajaxSettings.xhr){
 							createAjax();
 						} else {
 							webshims.ready('jajax', createAjax);
@@ -1970,11 +1971,15 @@
 		obj._shimActiveCues = null;
 		obj.activeCues = null;
 		obj.cues = null;
-		$(mediaelem).off(loadEvents, load);
+
 		$(mediaelem).on(loadEvents, load);
 		if(_default){
 			obj.mode = showTracks[obj.kind] ? 'showing' : 'hidden';
-			load();
+			webshims.ready('WINDOWLOAD', load);
+		} else {
+			webshims.ready('WINDOWLOAD', function(){
+				$(mediaelem).on('updatetrackdisplay', load);
+			});
 		}
 	};
 	
@@ -2003,7 +2008,6 @@
 			
 			
 			if(track.nodeName){
-				
 				if(supportTrackMod){
 					copyProps.forEach(function(copyProp){
 						webshims.defineProperty(obj, copyName[copyProp] || copyProp, {

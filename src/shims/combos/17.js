@@ -624,6 +624,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			this.trail = $('.ws-range-track', this.element);
 			this.range = $('.ws-range-progress', this.element);
 			this.thumb = $('.ws-range-thumb', this.trail);
+			this.thumbValue = $('span[data-value]', this.thumb);
 			
 			this.updateMetrics();
 			
@@ -674,8 +675,8 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			
 			
 			if(!animate || !$.fn.animate){
-				this.thumb.css(thumbStyle);
-				this.range.css(rangeStyle);
+				this.thumb[0].style[this.dirs.left] = thumbStyle[this.dirs.left];
+				this.range[0].style[this.dirs.width] = rangeStyle[this.dirs.width];
 			} else {
 				if(typeof animate != 'object'){
 					animate = {};
@@ -698,20 +699,19 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		_setValueMarkup: function(){
 			var o = this.options;
 			var textValue = o.textValue ? o.textValue(this.options.value) : o.options[o.value] || o.value;
-			this.element.attr({
-				'aria-valuenow': this.options.value,
-				'aria-valuetext': textValue
-			});
-			$('span[data-value]', this.thumb).attr({
-				'data-value': this.options.value,
-				'data-valuetext': textValue
-			});
+
+			this.element[0].setAttribute('aria-valuenow', this.options.value);
+			this.element[0].setAttribute('aria-valuetext', textValue);
+
+			this.thumbValue[0].setAttribute('data-value', this.options.value);
+			this.thumbValue[0].setAttribute('data-valuetext', textValue);
+
 			if(o.selectedOption){
 				$(o.selectedOption).removeClass('ws-selected-option');
 				o.selectedOption = null;
 			}
 			if(o.value in o.options){
-				o.selectedOption = $('[data-value="'+o.value+'"].ws-range-ticks').addClass('ws-selected-option');
+				o.selectedOption = $('[data-value="'+o.value+'"].ws-range-ticks', this.trail).addClass('ws-selected-option');
 			}
 		},
 		initDataList: function(){

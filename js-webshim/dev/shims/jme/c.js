@@ -1,12 +1,12 @@
-webshims.register('mediacontrols', function($, webshims, window, doc, undefined, options){
+webshims.register('mediacontrols', function($, webshims, window, doc, undefined){
 	"use strict";
 	var pseudoClasses = 'pseudoClasses';
-	var baseSelector = webshims.cfg.mediaelement.jme.selector;
-
 	var playStates = {
 		play: 1,
 		playing: 1
 	};
+	var options = webshims.cfg.mediaelement.jme;
+	var baseSelector = options.selector;
 
 	var pauseStates = {
 		pause: 1,
@@ -24,7 +24,6 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 	var btnStructure = '<button class="{%class%}" type="button" aria-label="{%text%}"></button>';
 	var defaultStructure = '<div  class="{%class%}"></div>';
 	var slideStructure = '<div class="{%class%}"></div>';
-	var ns = $.jme.classNS;
 	var noVolumeClass = (function(){
 		var audio;
 		var ret = '';
@@ -36,6 +35,34 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 		return ret;
 	})();
 
+	var getBarHtml = (function(){
+		var cache = {};
+		var regTemplate = /{{(\S+)}}/igm;
+
+		return function(template, invalidCache){
+			if(!template){
+				template = options.barTemplate;
+			}
+			if(!cache[template] || invalidCache){
+				cache[template] = template.replace(regTemplate, function(match, matchName){
+					var plugin = $.jme.plugins[matchName];
+					if(plugin && plugin.structure){
+						return plugin.structure.replace('{%class%}', matchName).replace('{%text%}', plugin.text || '');
+					}
+					return match;
+				});
+			}
+
+			return cache[template] || '';
+		};
+	})();
+
+	if(!options.barTemplate){
+		options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="subtitle-container"><div class="subtitle-controls">{{captions}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
+	}
+	if(!options.barStructure){
+		options.barStructure = '<div class="jme-media-overlay"></div><div class="jme-controlbar'+ noVolumeClass +'" tabindex="-1"><div class="jme-cb-box"></div></div>';
+	}
 
 
 
@@ -44,7 +71,6 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 			value = !!value;
 			var data = $.jme.data(elem);
 			var controlBar = $('div.jme-mediaoverlay, div.jme-controlbar', data.player);
-			var mediaControls = $.jme.plugins["media-controls"] ;
 			var structure = '';
 			var controls;
 			if(value && !controlBar[0]){
@@ -52,19 +78,13 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 					data._controlbar.appendTo(data.player);
 				} else {
 					data.media.prop('controls', false);
-					$.each(mediaControls.pluginOrder, function(i, name){
-						var plugin = $.jme.plugins[name];
-						if(plugin && plugin.structure){
-							structure += plugin.structure.replace('{%class%}', ns+name).replace('{%text%}', plugin.text || '');
-						} else if(name){
-							structure += name;
-						}
-					});
-					data._controlbar = $( mediaControls.barStructure );
-					controlBar = data._controlbar.find('div.jme-cb-box').addClass(ns+'media-controls');
-					controls = data._controlbar.filter('.jme-media-overlay').addClass(ns+'play-pause');
+
+					structure = getBarHtml();
+					data._controlbar = $( options.barStructure );
+					controlBar = data._controlbar.find('div.jme-cb-box').addClass('media-controls');
+					controls = data._controlbar.filter('.jme-media-overlay').addClass('play-pause');
 					controls =  controls.add( controlBar );
-					controls = controls.add( $(structure).appendTo(controlBar) );
+					$(structure).appendTo(controlBar);
 					data._controlbar.appendTo(data.player);
 					data.player.jmeFn('addControls', controls);
 				}
@@ -75,51 +95,6 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 			controlBar = null;
 			controls = null;
 			return value;
-		}
-	});
-
-	$.jme.defineMethod('updateControlbar', function(){
-		var timeSlider = $('.'+ $.jme.classNS +'time-slider', this);
-		if(timeSlider[0] && timeSlider.css('position') !== 'absolute'){
-			var width;
-			var elemWidths = 0;
-
-			width = Math.floor(timeSlider.parent().width()) - 0.2;
-			timeSlider
-				.siblings()
-				.each(function(){
-					if(this !== timeSlider[0] && $.css(this, 'position') !== 'absolute' && $.css(this, 'display') !== 'none'){
-						elemWidths += Math.ceil($(this).outerWidth(true)) + 0.1;
-					}
-				})
-			;
-			timeSlider.width(Math.floor(width - elemWidths - Math.ceil(timeSlider.outerWidth(true) - timeSlider.width()) - 0.3));
-		}
-	});
-
-	$.jme.registerPlugin('media-controls', {
-		options: {
-			calculateTimerange: false
-		},
-		pluginOrder: ['<div class="play-pause-container">', 'play-pause', '</div>', '<div class="currenttime-container">', 'currenttime-display', '</div>', '<div class="progress-container">', 'time-slider', '</div>', '<div class="duration-container">', 'duration-display', '</div>', '<div class="mute-container">', 'mute-unmute', '</div>', '<div class="volume-container">', 'volume-slider', '</div>', '<div class="subtitle-container">', '<div class="subtitle-controls">', 'captions', '</div>', '</div>', '<div class="fullscreen-container">', 'fullscreen', '</div>'],
-		barStructure: '<div class="jme-media-overlay"></div><div class="jme-controlbar'+ noVolumeClass +'" tabindex="-1"><div class="jme-cb-box"></div></div>',
-		_create: function(control, media, base, options){
-			var timer;
-			var update = function(){
-				clearTimeout(timer);
-				control.jmeFn('updateControlbar');
-				timer = setTimeout(function(){
-					control.jmeFn('updateControlbar');
-				}, 9);
-			};
-			if(options.calculateTimerange){
-				setTimeout(function(){
-					media.on('loadedmetadata volumechange play pause ended emptied', update);
-					base.on('updatetimeformat controlsadded controlschanged playerdimensionchange', update);
-					$(window).on('resize emchange', update);
-				}, 1);
-				update();
-			}
 		}
 	});
 
@@ -280,7 +255,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 
 			var createFn = function(){
 				var time, durationChange, api, timeShow, wasPaused;
-				var hasDuration = $.jme.classNS+'has-duration';
+				var hasDuration = 'has-duration';
 				var duration = media.prop('duration');
 
 				time = createGetSetHandler({
@@ -351,7 +326,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 					.data('rangeUi')
 				;
 
-				timeShow = $('<span class="'+ $.jme.classNS +'time-select" />').appendTo(control);
+				timeShow = $('<span class="time-select" />').appendTo(control);
 
 				control
 					.on({
@@ -367,8 +342,10 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 									;
 								};
 
-								posLeft(e.pageX);
-								timeShow.addClass($.jme.classNS +'show-time-select');
+								setTimeout(function(){
+									posLeft(e.pageX);
+									timeShow.addClass('show-time-select');
+								});
 								control
 									.off('.jmetimeselect')
 									.on('mousemove.jmetimeselect', function(e){
@@ -378,8 +355,10 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 							}
 						},
 						mouseleave: function(){
-							timeShow.removeClass($.jme.classNS +'show-time-select');
-							control.off('.jmetimeselect');
+							setTimeout(function(){
+								timeShow.removeClass('show-time-select');
+								control.off('.jmetimeselect');
+							});
 						}
 					})
 				;
@@ -394,7 +373,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 					durationchange: durationChange
 				});
 
-				base.jmeFn('addControls', $('<div class="'+ $.jme.classNS +'buffer-progress" />').prependTo(control) );
+				base.jmeFn('addControls', $('<div class="buffer-progress" />').prependTo(control) );
 				durationChange();
 			};
 
@@ -440,7 +419,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 
 	$.jme.registerPlugin('buffer-progress', {
 		_create: function(control, media, base, options){
-			var indicator = $('<div class="'+ $.jme.classNS +'buffer-progress-indicator" />').appendTo(control);
+			var indicator = $('<div class="buffer-progress-indicator" />').appendTo(control);
 			var drawBufferProgress = function(){
 				var progress = media.jmeProp('progress');
 
@@ -596,7 +575,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 			var updatePoster = function(){
 				var poster = media.prop('poster');
 				if(poster){
-					control.html('<span></span><img src="'+ poster +'" class="'+ $.jme.classNS +'poster-image" />');
+					control.html('<span></span><img src="'+ poster +'" class="poster-image" />');
 				} else {
 					control.empty();
 				}
@@ -758,9 +737,9 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 		set: function(elem, value){
 			var data = $.jme.data(elem);
 
-			if((!data || !data.player) && !$(elem).hasClass($.jme.classNS+'player-fullscreen')){return 'noDataSet';}
+			if((!data || !data.player) && !$(elem).hasClass('player-fullscreen')){return 'noDataSet';}
 			if(value){
-				if(data.player.hasClass($.jme.classNS+'player-fullscreen')){return 'noDataSet';}
+				if(data.player.hasClass('player-fullscreen')){return 'noDataSet';}
 
 				data.scrollPos = {
 					top: $(window).scrollTop(),
@@ -791,13 +770,13 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 				}
 
 
-				$('html').addClass($.jme.classNS+'has-media-fullscreen');
+				$('html').addClass('has-media-fullscreen');
 
-				data.player.addClass($.jme.classNS+'player-fullscreen');
+				data.player.addClass('player-fullscreen');
 
-				data.media.addClass($.jme.classNS+'media-fullscreen');
+				data.media.addClass('media-fullscreen');
 
-				$('button.play-pause', data.player).focus();
+				$('button.play-pause', data.player).trigger('focus');
 
 				if($.jme.fullscreen.supportsFullScreen){
 					$(document)
@@ -815,12 +794,12 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 				data.media.trigger('playerdimensionchange', ['fullwindow']);
 
 			} else {
-				if(data.player && !data.player.hasClass($.jme.classNS+'player-fullscreen')){return 'noDataSet';}
+				if(data.player && !data.player.hasClass('player-fullscreen')){return 'noDataSet';}
 				$(document).off('.jmefullscreen');
-				$('html').removeClass($.jme.classNS+'has-media-fullscreen');
+				$('html').removeClass('has-media-fullscreen');
 				if(data.player && data.media){
-					data.player.removeClass($.jme.classNS+'player-fullscreen');
-					data.media.removeClass($.jme.classNS+'media-fullscreen');
+					data.player.removeClass('player-fullscreen');
+					data.media.removeClass('media-fullscreen');
 				}
 				if($.jme.fullscreen.isFullScreen()){
 					try {
@@ -844,7 +823,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 		get: function(elem){
 			var data = $.jme.data(elem);
 			if(!data || !data.player){return;}
-			var fs = data.player.hasClass($.jme.classNS+'player-fullscreen');
+			var fs = data.player.hasClass('player-fullscreen');
 			if(!fs){return false;}
 			return $.jme.fullscreen.isFullScreen() || 'fullwindow';
 		}
@@ -866,7 +845,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 		_create: function(control, media, base){
 			var textFn = $.jme.getButtonText(control, [this[pseudoClasses].enter, this[pseudoClasses].exit]);
 			var updateControl = function(){
-				textFn(base.hasClass($.jme.classNS+'player-fullscreen') ? 1 : 0);
+				textFn(base.hasClass('player-fullscreen') ? 1 : 0);
 			};
 			var options = this.options;
 			var addDoubbleClick = function(){
@@ -884,7 +863,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 			base.on('playerdimensionchange', updateControl);
 
 			control.on((control.is('select')) ? 'change' : 'click', function(){
-				var value = base.hasClass($.jme.classNS+'player-fullscreen') ? false : options.fullscreen;
+				var value = base.hasClass('player-fullscreen') ? false : options.fullscreen;
 				base.jmeProp('fullscreen', value);
 				if(value && options.autoplayfs){
 					media.jmeFn('play');
@@ -1091,7 +1070,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 					if(tracks.length){
 						createSubtitleMenu('<div class="'+that[pseudoClasses].menu +'" >'+ (getTrackMenu(tracks)) +'</div>');
 
-						$('span.jme-text, +label span.jme-text', checkbox).text((tracks[0].label || ' ') + (tracks[0].lang || ''));
+						$('span.jme-text, label span.jme-text', checkbox).text((tracks[0].label || ' ') + (tracks[0].lang || ''));
 
 						if(!base.hasClass(that[pseudoClasses].hasTrack) || base.hasClass(that[pseudoClasses].noTrack)){
 							control.prop('disabled', false);
@@ -1130,12 +1109,6 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined,
 				}
 
 			});
-		}
-	});
-
-	$('.mediaplayer').each(function(){
-		if(($.data(this, 'jme')|| {}).controlbar){
-			$(this).jmeProp('controlbar', true);
 		}
 	});
 

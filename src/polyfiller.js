@@ -925,7 +925,7 @@
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		d: ['es5'],
-		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 25, 19, 20, 26, 31]
+		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 25, 19, 20, 26, 31, 34]
 	});
 	
 	
@@ -1268,7 +1268,7 @@
 			},
 			d: ['mediaelement', DOMSUPPORT],
 			methodNames: ['addTextTrack'],
-			c: [21, 12, 13, 22]
+			c: [21, 12, 13, 22, 34]
 		});
 
 		//if(WSDEBUG){

@@ -463,6 +463,7 @@ span.ws-input {
 
 .ws-inline-picker {
   position: relative;
+  max-width: 100%;
   z-index: 99; }
 
 .input-picker {
@@ -473,6 +474,7 @@ span.ws-input {
   font-family: sans-serif;
   width: 27.69231em;
   min-width: 23.07692em;
+  max-width: 100vw;
   /* Selector API: */ }
   .input-picker .ws-po-outerbox {
     -webkit-transform: translate(0, 30%);
