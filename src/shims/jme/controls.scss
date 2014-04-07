@@ -338,6 +338,21 @@ $browser-context: 16; // Default
 		}
 	}
 
+	&[data-playersize="large"] > .jme-media-overlay {
+		font-size: 450%;
+	}
+
+	&[data-playersize="small"] > .jme-media-overlay {
+		font-size: 350%;
+	}
+
+
+	&[data-playersize="x-small"] > .jme-media-overlay {
+		font-size: 300%;
+	}
+
+
+
 	&[data-state="idle"] {
 		cursor: pointer;
 		> .jme-media-overlay {
@@ -382,6 +397,7 @@ $browser-context: 16; // Default
 		left: 0;
 		right: 0;
 		bottom: 0;
+		width: auto;
 		cursor: default;
 		outline: none;
 		background: #333;
@@ -423,7 +439,6 @@ $browser-context: 16; // Default
 	.time-select {
 		font-size: 81.3%;
 		font-family: sans-serif;
-		text-align: center;
 		margin-top: 0.03em;
 	}
 
@@ -609,8 +624,9 @@ $browser-context: 16; // Default
 	.time-select {
 		display: inline-block;
 		margin: 0 0 2px -1.75em;
-		padding: em(3) 0 em(1);
-		min-width: 3.5em;
+		padding: em(4) em(2) em(2);
+		min-width: 2.8em;
+		text-align: center;
 		bottom: em(20);
 		visibility: hidden;
 		opacity: 0;

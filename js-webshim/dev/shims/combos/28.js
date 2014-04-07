@@ -920,9 +920,61 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 		min: 1,
 		max: 1
 	};
+	var toLocale = (function(){
+		var monthFormatter;
+		var transforms = {
+			date: function(val){
+				var date = new Date(val);
+				if(date && date.toLocaleDateString){
+					val = date.toLocaleDateString() || val;
+				}
+				return val;
+			},
+			time: function(val){
+				var date = new Date(val);
+				if(date && date.toLocaleTimeString){
+					val = date.toLocaleTimeString() || val;
+				}
+				return val;
+			},
+			number: function(val){
+				var num = val * 1;
+				if(num.toLocaleString && !isNaN(num)){
+					val = num.toLocaleString() || val;
+				}
+				return val;
+			}
+		};
+
+		if(window.Intl && Intl.DateTimeFormat){
+			monthFormatter = new Intl.DateTimeFormat(navigator.browserLanguage || navigator.language, {year: "numeric", month: "2-digit"}).format(new Date());
+			if(monthFormatter && monthFormatter.format){
+				transforms.month = function(val){
+					var date = new Date(val);
+					if(date){
+						val = monthFormatter.format(date) || val;
+					}
+					return val;
+				};
+			}
+		}
+		return function(val, elem, attr){
+			var type, widget;
+			if(valueVals[attr]){
+				type = $.prop(elem, 'type');
+				widget = $(elem).getShadowElement().data('wsWidget'+ type );
+				if(widget && widget.formatValue){
+					val = widget.formatValue(val, false);
+				} else if(transforms[type]){
+					val = transforms[type](val);
+				}
+			}
+			return val;
+		};
+	})();
 
 	webshims.replaceValidationplaceholder = function(elem, message, name){
-		var type, widget;
+
 		if(message && message.indexOf('{%') != -1){
 			['value', 'min', 'max', 'title', 'maxlength', 'minlength', 'label'].forEach(function(attr){
 				if(message.indexOf('{%'+attr) === -1){return;}
@@ -932,14 +984,8 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 					webshims.error('no title for patternMismatch provided. Always add a title attribute.');
 				}
 
-				if(valueVals[attr]){
-					if(!widget){
-						widget = $(elem).getShadowElement().data('wsWidget'+ (type = $.prop(elem, 'type')));
-					}
-					if(widget && widget.formatValue){
-						val = widget.formatValue(val, false);
-					}
-				}
+				val = toLocale(val, elem, attr);
+
 				message = message.replace('{%'+ attr +'}', val.replace(lReg, '&lt;').replace(gReg, '&gt;'));
 				if('value' == attr){
 					message = message.replace('{%valueLen}', val.length);

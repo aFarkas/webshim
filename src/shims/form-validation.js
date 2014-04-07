@@ -24,9 +24,6 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	var addModule = loader.addModule;
 	
 	var emptyJ = $([]);
-	var isValid = function(elem){
-		return ($.prop(elem, 'validity') || {valid: 1}).valid;
-	};
 	
 	var nonFormFilter = function(){
 		return !$.prop(this, 'form');

@@ -1953,7 +1953,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 					val = val.split(curCfg.dFormat);
 				}
 				if(val.length == 3 && val[0] && val[1] && val[2] && (!noCorrect || (val[obj.yy].length > 3 && val[obj.mm].length == 2 && val[obj.dd].length == 2))){
-					if(val[obj.mm] > 12 && val[obj.dd] < 13){
+					if(!opts.noDayMonthSwitch && val[obj.mm] > 12 && val[obj.dd] < 13){
 						tmp = val[obj.dd];
 						val[obj.dd] = val[obj.mm];
 						val[obj.mm] = tmp;
