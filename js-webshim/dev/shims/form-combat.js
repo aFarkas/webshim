@@ -24,7 +24,7 @@ webshims.register('form-combat', function($,webshims){
 			if(('container' in widgetData) && $.isFunction(widgetData.opened)){
 				var onValidate = function(e){
 					if (!webshims.wsPopover.isInElement([elem, shadow, shadowFocus, $(widgetData.container)], e.target)) {
-						$(elem).trigger('refreshvalidityui');
+						$(elem).trigger('updatevalidation.webshims');
 					}
 				};
 				
@@ -51,7 +51,7 @@ webshims.register('form-combat', function($,webshims){
 			if(('$menu' in widgetData)){
 				var onValidate = function(e){
 					if (!webshims.wsPopover.isInElement([elem, shadow, shadowFocus, $(widgetData.$menu)], e.target)) {
-						$(elem).trigger('refreshvalidityui');
+						$(elem).trigger('updatevalidation.webshims');
 					}
 				};
 				
@@ -85,7 +85,7 @@ webshims.register('form-combat', function($,webshims){
 			if(('listbox' in widgetData)){
 				var onValidate = function(e){
 					if (!webshims.wsPopover.isInElement([elem, shadow, shadowFocus, $(widgetData.listbox).parent()], e.target)) {
-						$(elem).trigger('refreshvalidityui');
+						$(elem).trigger('updatevalidation.webshims');
 					}
 				};
 				

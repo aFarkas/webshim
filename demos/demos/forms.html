@@ -172,6 +172,7 @@ webshims.polyfill('forms');
 			<h3 id="UI-ival">Live form validation <code class="i">iVal</code></h3>
 			<p>The instant form validation (<code class="i">iVal</code> = instant validation) feature of webshims is a simple to use but powerfull and UX enhanced feature. Simply put a <code class="i">ws-validate</code> class to your form element:</p>
 			<iframe class="fiddle-example" width="100%" height="200" src="http://jsfiddle.net/trixta/9859C/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
 			<p>The instant validation feature can be controlled through the <code class="i">iVal</code> option object. The <code class="i">iVal</code> option has the following defaults.</p>
 <pre><code class="language-javascript">
 webshims.setOptions('forms', {
@@ -190,6 +191,9 @@ webshims.setOptions('forms', {
 
 		//in case a developer has set novalidate attribute to a form element and wants the form validated on submit, this should be set to true
 		"submitCheck": false,
+
+		//Events to check for validity/update validation UI
+		"events": "focusout change", //Note: The 'invalid' and 'updatevalidation' events will be always used
 		
 		//the class of the errorbox, which is normally appended to the fieldWrapper
 		"errorBoxClass": "ws-errorbox", 
@@ -220,7 +224,12 @@ webshims.polyfill('forms');
 <a name="ival-messages" id="ival-messages"></a>
 			<p>Among other ways to <a href="#Locale-validityMessages">control errormessages</a>. Forms matching the <code>iVal.sel</code> can have a more descriptive way to define errormessages. Simply by adding one or more child elements to <code>ws-errorbox</code>. The <code>data-errortype</code> can be used to switch between the different error types. The value of the <code>data-errortype</code> attribute is case-sensitive. All standard <code>validity</code> properties als can be written as dashed classes (i.e.: .value-missing is treated as [data-errortype="valueMissing"]).</p>
 			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/82xUV/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
-
+			<h3>Programatically updating or resetting the validation UI</h3>
+			<p>In case a value was changed, through script the validation UI can be updated by triggering the <code>updatevalidation</code> on the given element:</p>
+<pre><code class="language-javascript">
+$('input.foo').val('bar').trigger('updatevalidation');
+</code></pre>
+			<p>Or reseted by triggering the <code>resetvalidation</code> event on the input or the form element.</p>
 			<h2 id="Custom-validity">Custom-validity</h2>
 			<p>There are 3 ways to add/use custom validation constraints with HTML5.</p>
 			<ul>

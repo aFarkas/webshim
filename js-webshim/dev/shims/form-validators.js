@@ -1,15 +1,16 @@
 webshims.register('form-validators', function($, webshims, window, document, undefined, options){
 "use strict";
-
+var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 (function(){
 	if(webshims.refreshCustomValidityRules){
 		webshims.error("form-validators already included. please remove custom-validity.js");
 	}
-	
+
 	var customValidityRules = {};
 	var formReady = false;
 	var blockCustom;
 	var initTest;
+
 	var onEventTest = function(e){
 		webshims.refreshCustomValidityRules(e.target);
 	};
@@ -100,7 +101,7 @@ webshims.register('form-validators', function($, webshims, window, document, und
 				var activeElement = document.activeElement;
 
 				if(activeElement != e.target && $.data(activeElement, 'webshimsswitchvalidityclass')){
-					$(activeElement).trigger('refreshvalidityui');
+					$(activeElement).trigger('updatevalidation.webshims');
 				}
 			}
 		});
@@ -238,7 +239,7 @@ webshims.register('form-validators', function($, webshims, window, document, und
 			}
 			$.prop( elem, data.prop, val);
 			if(e){
-				$(elem).getShadowElement().filter('.user-error, .user-success').trigger('refreshvalidityui');
+				$(elem).getShadowElement().filter(iValClasses).trigger('updatevalidation.webshims');
 			}
 		};
 		
@@ -279,8 +280,8 @@ webshims.register('form-validators', function($, webshims, window, document, und
 					webshims.refreshCustomValidityRules(elem);
 					$(elem)
 						.getShadowElement()
-						.filter('.user-error, .user-success')
-						.trigger('refreshvalidityui')
+						.filter(iValClasses)
+						.trigger('updatevalidation.webshims')
 					;
 				});
 			}
@@ -364,7 +365,7 @@ webshims.register('form-validators', function($, webshims, window, document, und
 						remoteValidate.message = ('message' in data) ? data.message : !data.valid;
 						remoteValidate.lastMessage = remoteValidate.message;
 						remoteValidate.blockUpdate = true;
-						$(elem).triggerHandler('refreshvalidityui');
+						$(elem).triggerHandler('updatevalidation.webshims');
 						remoteValidate.message = 'async';
 						remoteValidate.blockUpdate = false;
 					},

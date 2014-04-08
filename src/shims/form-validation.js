@@ -1,17 +1,18 @@
 webshims.register('form-validation', function($, webshims, window, document, undefined, options){
 	"use strict";
-	
+
 	var isWebkit = 'webkitURL' in window;
 	var hasNative = Modernizr.formvalidation && !webshims.bugs.bustedValidity;
 	var chromeBugs = isWebkit && hasNative;
 	var webkitVersion = chromeBugs && parseFloat((navigator.userAgent.match(/Safari\/([\d\.]+)/) || ['', '999999'])[1], 10);
 	
 	var iVal = options.iVal;
+
 	if(!iVal.fieldWrapper){
 		iVal.fieldWrapper = ':not(span), :not(label), :not(em), :not(strong), :not(p)'; 
 	}
 	var invalidClass = iVal.errorClass || (iVal.errorClass = 'user-error');
-	var validClass = iVal.successClass || 'user-success';
+	var validClass = iVal.successClass || (iVal.successClass = 'user-success');
 	
 	var invalidWrapperClass = iVal.errorWrapperClass || (iVal.errorWrapperClass = 'ws-invalid');
 	var successWrapperClass = iVal.successWrapperClass || (iVal.successWrapperClass = 'ws-success');
@@ -89,6 +90,11 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		week: 1,
 		'datetime-local': 1
 	};
+	var updateValidationEvents = {
+		refreshvalidityui: 1,
+		updatevalidation: 1
+	};
+	var iValClasses = '.'+ iVal.errorClass +', .'+iVal.successClass;
 	var switchValidityClass = function(e){
 		if(!iVal.sel){return;}
 		var elem, timer, shadowElem, shadowType;
@@ -108,7 +114,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					return;
 			}
 			if(webshims.refreshCustomValidityRules && webshims.refreshCustomValidityRules(elem) == 'async'){
-				$(elem).one('refreshvalidityui', switchValidityClass);
+				$(elem).one('updatevalidation', switchValidityClass);
 				return;
 			}
 			
@@ -166,32 +172,64 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			if(timer){
 				clearTimeout(timer);
 			}
-			if(e.type == 'refreshvalidityui'){
+			if(updateValidationEvents[e.type]){
+				if(e.type == 'refreshvalidityui'){
+					webshims.warn('refreshvalidityui was renamed to updatevalidation');
+				}
 				switchClass();
 			} else {
 				$.data(elem, 'webshimsswitchvalidityclass', setTimeout(switchClass, 9));
 			}
 		}
 	};
-	
+	var eachReset = function(){
+		webshims.errorbox.reset(this);
+	};
+	if('validityUIEvents' in options){
+		webshims.warn('validityUIEvents was renamed to iVal.events');
+		iVal.events = options.validityUIEvents;
+	}
+	if('events' in iVal){
+		iVal.events = iVal.events || '';
+	} else {
+		iVal.events = 'focusout change';
+	}
+
+	if(iVal.events){
+		iVal.events += ' ';
+	}
+
 	$(document.body || 'html')
-		.on(options.validityUIEvents || 'focusout change refreshvalidityui invalid', switchValidityClass)
-		.on('reset resetvalui', function(e){
+		.on(iVal.events+'refreshvalidityui updatevalidation.webshims invalid', switchValidityClass)
+		.on('reset resetvalidation.webshims resetvalui', function(e){
+			var noIValTrigger;
 			var elems = $(e.target);
+			if(e.type == 'resetvalui'){
+				webshims.warn('resetvalui was renamed to resetvalidation');
+			}
 			if(elems.is('form, fieldset')){
+				if(elems[0].nodeName.toLowerCase() == 'form'){
+					noIValTrigger = !elems.is(iVal.sel);
+				}
 				elems = elems.jProp('elements');
 			}
-			elems
-				.filter('.user-error, .user-success')
+			elems = elems
+				.filter(iValClasses)
 				.removeAttr('aria-invalid')
-				.removeClass('user-error')
-				.removeClass('user-success')
+				.removeClass(iVal.errorClass +' '+ iVal.successClass)
 				.getNativeElement()
 				.each(function(){
 					$.removeData(this, 'webshimsinvalidcause');
 				})
-				.trigger('resetvalidityui')
 			;
+
+			if(!noIValTrigger){
+				if(noIValTrigger === false){
+					elems.each(eachReset);
+				} else {
+					elems.trigger('resetvalidityui.webshims');
+				}
+			}
 		})
 	;
 	
@@ -664,7 +702,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			if(fieldWrapper.hasClass(invalidWrapperClass)){
 				$(elem).filter('input').off('.recheckinvalid');
 				if(!reset && (invalid = $('input:invalid, select:invalid, textarea:invalid', fieldWrapper)[0])){
-					$(invalid).trigger('refreshvalidityui');
+					$(invalid).trigger('updatevalidation.webshims');
 				} else {
 					errorBox = this.get(elem, fieldWrapper);
 					fieldWrapper.removeClass(invalidWrapperClass);
@@ -759,7 +797,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					}
 				}
 			},
-			resetvalidityui: function(e){
+			'resetvalidityui.webshims': function(e){
 				if (iVal.sel) {
 					var form = $(e.target).jProp('form');
 					if (form.is(iVal.sel)) {
@@ -986,13 +1024,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			}
 		});
 	}
-	if(webshims.cfg.debug !== false && iVal.sel != '.ws-instantvalidation'){
-		$(function(){
-			if($('form.ws-instantvalidation').length){
-				webshims.error('.ws-instantvalidation was renamed to .ws-validate');
-			}
-		});
-	}
+
 	addModule('form-combat', {
 		d: ['dom-support'],
 		test: !(($.mobile && ($.mobile.selectmenu || $.mobile.checkboxradio)) || $.fn.select2 || $.fn.chosen || $.fn.selectpicker || $.fn.selectBoxIt)
