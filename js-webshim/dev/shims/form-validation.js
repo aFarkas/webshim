@@ -479,8 +479,6 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			collision: 'none'
 		}, options.messagePopover.position || {});
 			
-		var focusTimer = false;
-		
 		var api = webshims.objectCreate(webshims.wsPopover, {}, options.messagePopover);
 		var boundHide = api.hide.bind(api);
 		
@@ -886,144 +884,10 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			jElm = null;
 		});
 	})();
-	
-	
-	if(!$.event.special.change && !$.event.special.input && Modernizr.inputtypes && options.fixRangeChange){
-		var rangeChange = {
-			
-			trigger: function(e){
-				if(rangeChange.blockElement){
-					rangeChange.blockElement = false;
-					setTimeout(function(){
-						if(rangeChange.requestedChange && rangeChange.value != rangeChange.requestedChange.value){
-							$(rangeChange.requestedChange).trigger('change');
-						}
-						rangeChange.value = false;
-					}, 9);
-				}
-				
-			},
-			lastValue: false,
-			updateInputValue: function(e){
-				rangeChange.lastValue = e.target.value;
-			},
-			triggerInput: function(e){
-				if(rangeChange.lastValue !== false && rangeChange.lastValue != e.target.value){
-					$(e.target).trigger('input');
-				}
-			},
-			inputTeardown: function(e){
-				$(e.target)
-					.off('input', rangeChange.updateInputValue)
-					.off('blur', rangeChange.inputTeardown)
-				;
-				rangeChange.lastValue = false;
-			},
-			inputSetup: function(e){
-				
-				if(e.target.type == 'range'){
-					rangeChange.inputTeardown(e);
-					rangeChange.lastValue = e.target.value;
-					$(e.target)
-						.on('input', rangeChange.updateInputValue)
-						.on('blur', rangeChange.inputTeardown)
-					;
-				}
-			}
-		};
-		
-		
-		$.each([{name: 'key', evt: 'keyup'}, {name: 'mouse', evt: 'mouseup'}, {name: 'touch', evt: 'touchend'}], function(i, obj){
-			var setup = obj.name + 'Setup';
-			var commit = obj.name + 'Commit';
-			rangeChange[obj.name+'Block'] = function(e){
-				
-				if(!rangeChange.blockElement && e.target.type == 'range'){
-					
-					rangeChange.blockElement = e.target;
-					rangeChange.value = e.target.value;
-					$(rangeChange.blockElement)
-						.off('blur', rangeChange.trigger)
-						.on('blur', rangeChange.trigger)
-					;
-					
-					$(document.body)
-						.off(obj.evt, rangeChange[commit])
-						.on(obj.evt, rangeChange[commit])
-					;
-				}
-			};
-			
-			rangeChange[commit] = function(e){
-				$(document.body).off(obj.evt, rangeChange[commit]);
-				rangeChange.trigger();
-			};
-			
-		});
-		
-		$(document.body || 'html').on({
-			mousedown: rangeChange.mouseBlock,
-			'keydown kepress': function(e){
-				if(e.keyCode < 45 && e.keyCode > 30){
-					rangeChange.keyBlock(e);
-				}
-			},
-			'touchstart': rangeChange.touchBlock,
-			focusin: rangeChange.inputSetup
-		});
-		
-		$.extend(true, $.event.special, {
-			change: {
-				handle: function(e){
-					
-					if(!e.isTrigger && rangeChange.blockElement == e.target){
-						rangeChange.requestedChange = e.target;
-						rangeChange.triggerInput(e);
-						return false;
-					} else if(rangeChange.requestedChange == e.target){
-						rangeChange.requestedChange = false;
-					}
-					e.handleObj.handler.apply(this, arguments);
-				}
-			},
-			input: {
-				handle: (function(){
-					var lastValue, lastElement;
-					
-					var remove = function(){
-						if(lastElement){
-							$(lastElement).off('change', remove);
-						}
-						lastValue = false;
-						lastElement = false;
-					};
-					
-					var setup = function(e){
-						remove(e);
-						lastElement = e.target;
-						lastValue = e.target.value;
-						$(e.target).on('change', remove);
-					};
-					
-					return function(e){
-						var value;
-						if(!e.isTrigger && e.target.type == 'range'){
-							
-							if(lastElement != e.target){
-								setup(e);
-							} else if(lastElement == e.target){
-								if(lastValue == (value = e.target.value)){
-									return false;
-								}
-								lastValue = e.target.value;
-							}
-						}
-						e.handleObj.handler.apply(this, arguments);
-					};
-				})()
-			}
-		});
-	}
+
+	addModule('form-fixrangechange', {
+		test: !(!$.event.special.change && !$.event.special.input && Modernizr.inputtypes && Modernizr.inputtypes.range && options.fixRangeChange)
+	});
 
 	addModule('form-combat', {
 		d: ['dom-support'],
@@ -1035,5 +899,5 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		test: !!($.position && $.position.getScrollInfo)
 	});
 	
-	loader.loadList(['form-combat', 'position']);
+	loader.loadList(['form-combat', 'position', 'form-fixrangechange']);
 });

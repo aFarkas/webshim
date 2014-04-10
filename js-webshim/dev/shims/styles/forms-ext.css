@@ -473,8 +473,8 @@ span.ws-input {
   text-align: center;
   font-family: sans-serif;
   width: 27.69231em;
-  min-width: 23.07692em;
-  max-width: 100vw;
+  min-width: 20.76923em;
+  max-width: 96vw;
   /* Selector API: */ }
   .input-picker .ws-po-outerbox {
     -webkit-transform: translate(0, 30%);

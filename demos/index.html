@@ -498,12 +498,22 @@ $('datalist#list select').prependPolyfill('&lt;option value="new suggestion item
 						<strong>no shadowdom</strong>: Webshims lib sometimes has to add additional DOM elements to mimic the UI of HTML5 elements. This can sometimes create differences, between polyfilled and non polyfilled browsers. Webshims lib gives you a method called 'getShadowElement' to access the shadowelement from the native element and a method called 'getNativeElement' to access the native element from the shadowelement. If the element has no shadowelement the element itself is returned.
 					</p>
 					<pre><code class="language-javascript">
-// animate the width of all date - inputs to a width of 300
-$('input[type="date"]').getShadowElement().animate({width: 300});
+// get the UI component element of input[type="date"]
+$('input[type="date"]').getShadowElement();
 </code></pre>
+					<p>Another problem can be, that some styles of your website may conflict with webshims styles. This normally happens if a tagname selector without a specific class or attribute is used as last selector part:</p>
+<pre><code class="  language-css">/* do not use */
+fieldset > div {
+	/* some styles */
+}
 
+/* instead write something like this: */
+.form-row {
+	/* some styles */
+}
+</code></pre>
 					<p>
-						Some styles like float or display: none/block are not initially reflected by the shadowdom, it is a good approach to do this on a wrapper element:
+						Some styles like float or display: none/block are not reflected by the shadowdom, it is a good approach to do this on a wrapper element or to also add those styles to the generated UI components yourself:
 					</p>
 					<pre><code class="language-markup">&lt;!-- instead of --&gt;
 &lt;div class="form-field"&gt;
@@ -525,6 +535,26 @@ $('input[type="date"]').getShadowElement().animate({width: 300});
 &lt;div class="mediaplayer" style="margin: 0 10px 5px 0; float: left"&gt;
   &lt;video src="file.mp4" controls&gt;&lt;/video&gt;
 &lt;/div&gt;
+</code></pre>
+					<p>This could be also fixed by adding those styles to the polyfilled component:</p>
+<pre><code class="  language-css">/* do not use */
+video {
+	margin: 0 10px 5px 0;
+	float: left;
+}
+
+/* do something like this: */
+video,
+.polyfill-video {
+	margin: 0 10px 5px 0;
+	float: left;
+}
+
+/* or better */
+.video-wrapper {
+	margin: 0 10px 5px 0;
+	float: left;
+}
 </code></pre>
 					<p>
 						<strong>re-rendering shadowelements</strong>: On dynamic websites shadowelements dimensions and/or positions sometimes need to be updated, this can be achieved by triggering the <code class="i">

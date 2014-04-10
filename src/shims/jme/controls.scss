@@ -385,7 +385,7 @@ $browser-context: 16; // Default
 
 	.cue-display span.cue-wrapper {
 		transition: bottom 300ms;
-		bottom: -5px;
+		bottom: 0;
 	}
 
 	&[data-state="playing"][data-useractivity="false"] .cue-display span.cue-wrapper {
@@ -623,11 +623,11 @@ $browser-context: 16; // Default
 
 	.time-select {
 		display: inline-block;
-		margin: 0 0 2px -1.75em;
+		margin: 0 0 4px -1.55em;
 		padding: em(4) em(2) em(2);
 		min-width: 2.8em;
 		text-align: center;
-		bottom: em(20);
+		bottom: em(9);
 		visibility: hidden;
 		opacity: 0;
 		transition: 400ms opacity, 400ms visibility;

@@ -132,14 +132,19 @@
 	<p><small>In case you are using a poster you need to ensure, that the poster has the same aspect ration than the video.</small></p>
 	<hr />
 
-	<h2>intrinsic ratio responsive/fluid video</h2>
+	<h2>intrinsic ratio responsive/fluid video + multiple subtitles</h2>
 	<p>based on  http://www.alistapart.com/articles/creating-intrinsic-ratios-for-video/</p>
 
 	<div class="mediaplayer videoplayer ratio-16-9">
 		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="height: 100%;">
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
 			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
-			<track src="subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
+
+			<track kind="subtitles" src="sintel-trailer_en.vtt" srclang="en" label="English subtitles" />
+
+			<track kind="subtitles" src="sintel-trailer_de.vtt" srclang="de" label="German subtitles" />
+			<track kind="subtitles" src="sintel-trailer_es.vtt" srclang="es" label="Spanish subtitles" />
+			<track kind="subtitles" src="sintel-trailer_fr.vtt" srclang="fr" label="French subtitles" />
 			<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
 		</video>
 	</div>

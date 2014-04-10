@@ -175,7 +175,7 @@
   visibility: hidden; }
 .mediaplayer .cue-display span.cue-wrapper {
   transition: bottom 300ms;
-  bottom: -5px; }
+  bottom: 0; }
 .mediaplayer[data-state="playing"][data-useractivity="false"] .cue-display span.cue-wrapper {
   bottom: -35px; }
 .mediaplayer > .jme-controlbar {
@@ -308,11 +308,11 @@
   display: block; }
 .mediaplayer .time-select {
   display: inline-block;
-  margin: 0 0 2px -1.75em;
+  margin: 0 0 4px -1.55em;
   padding: 0.25em 0.125em 0.125em;
   min-width: 2.8em;
   text-align: center;
-  bottom: 1.25em;
+  bottom: 0.5625em;
   visibility: hidden;
   opacity: 0;
   transition: 400ms opacity, 400ms visibility;
