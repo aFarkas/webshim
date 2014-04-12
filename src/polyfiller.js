@@ -248,7 +248,17 @@
 				loader.loadCSS('styles/shim.css');
 			}
 			loadList(toLoadFeatures);
-			
+
+
+			$.each(features, function(i, feature){
+				var o = webCFG[feature];
+				if(feature == 'mediaelement' && (o.replaceUI = getAutoEnhance(o.replaceUI))){
+					o.plugins.unshift('mediacontrols');
+				}
+				if(o.plugins && o.plugins.length){
+					loadList(webCFG[feature].plugins);
+				}
+			});
 		},
 		
 		/*
@@ -1210,14 +1220,7 @@
 			loadInit: function(){
 				//
 				var o = this.options;
-				o.replaceUI = getAutoEnhance(o.replaceUI);
 
-				if(o.replaceUI){
-					o.plugins.unshift('mediacontrols');
-				}
-				setTimeout(function(){
-					loadList(o.plugins);
-				});
 			},
 			options: {
 				//replaceUI: false,
@@ -1271,19 +1274,23 @@
 			c: [21, 12, 13, 22, 34]
 		});
 
-		//if(WSDEBUG){
-			addModule('jme', {
-				src: 'jme/b',
-				c: [99]
-			});
+		addModule('jme', {
+			src: 'jme/b',
+			c: [98, 99]
+		});
 
-			addModule('mediacontrols', {
-				src: 'jme/c',
-				css: 'jme/controls.css',
-				d: ['jme'],
-				c: [99]
-			});
-		//}
+		addModule('mediacontrols', {
+			src: 'jme/c',
+			css: 'jme/controls.css',
+			d: ['jme'],
+			c: [98, 99]
+		});
+
+		addModule('playlist', {
+			src: 'jme/p',
+			d: ['jme'],
+			c: [98]
+		});
 
 		addModule('track-ui', {
 			d: ['track', DOMSUPPORT]

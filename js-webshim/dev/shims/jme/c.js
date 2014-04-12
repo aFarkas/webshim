@@ -37,7 +37,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined)
 
 	var getBarHtml = (function(){
 		var cache = {};
-		var regTemplate = /{{(\S+)}}/igm;
+		var regTemplate = /\{\{(.+?)\}\}/igm;
 
 		return function(template, invalidCache){
 			if(!template){
@@ -58,7 +58,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined)
 	})();
 
 	if(!options.barTemplate){
-		options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="subtitle-container"><div class="subtitle-controls">{{captions}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
+		options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box">{{playlist-prev}}{{playlist-next}}</div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="subtitle-container"><div class="subtitle-controls">{{captions}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
 	}
 	if(!options.barStructure){
 		options.barStructure = '<div class="jme-media-overlay"></div><div class="jme-controlbar'+ noVolumeClass +'" tabindex="-1"><div class="jme-cb-box"></div></div>';
@@ -1112,7 +1112,7 @@ webshims.register('mediacontrols', function($, webshims, window, doc, undefined)
 		}
 	});
 
-	webshims.ready('mediaelement', function(){
+	webshims.ready(webshims.cfg.mediaelement.plugins, function(){
 		webshims.addReady(function(context, insertedElement){
 			$(baseSelector, context).add(insertedElement.filter(baseSelector)).jmeProp('controlbar', true);
 		});

@@ -489,7 +489,7 @@ webshims.isReady('swfmini', true);
 
 	webshims.ready('WINDOWLOAD', lazyLoad);
 
-	if(modules['form-number-date-ui'].loaded && modules['form-number-date-api'].test()){
+	if(modules['form-number-date-ui'].loaded && (modules['form-number-date-api'].test() || (Modernizr.inputtypes.range && Modernizr.inputtypes.color))){
 		webshims.isReady('form-number-date-ui', true);
 	}
 });

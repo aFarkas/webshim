@@ -469,6 +469,26 @@ $browser-context: 16; // Default
 		@extend %icon-volume-mute2;
 	}
 
+	.playlist-container {
+		display: none;
+	}
+
+	&.has-playlist .playlist-container {
+		display: table-cell;
+	}
+
+	.playlist-box {
+		width: 3.09em;
+	}
+
+	.playlist-prev {
+		@extend %icon-previous;
+	}
+
+	.playlist-next {
+		@extend %icon-next;
+	}
+
 	.no-volume-api {
 		.volume-container,
 		.mute-container {

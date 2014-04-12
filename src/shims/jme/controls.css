@@ -9,7 +9,7 @@
   font-weight: normal;
   font-style: normal; }
 
-.mediaplayer[data-state="waiting"] > .jme-media-overlay, .mediaplayer .fullscreen, .mediaplayer .fullscreen.state-exitfullscreen, .mediaplayer[data-state="idle"] > .jme-media-overlay, .mediaplayer button.play-pause, .mediaplayer button.play-pause.state-playing, .mediaplayer .mute-unmute, .mediaplayer[data-volume="medium"] .mute-unmute, .mediaplayer[data-volume="low"] .mute-unmute, .mediaplayer[data-volume="no"] .mute-unmute, .mediaplayer .state-unmute.mute-unmute, .mediaplayer .captions, .mediaplayer .subtitle-menu button[aria-checked="true"], .mediaplayer .subtitle-menu button, .mediaplayer[data-state="ended"] > .jme-media-overlay {
+.mediaplayer[data-state="waiting"] > .jme-media-overlay, .mediaplayer .fullscreen, .mediaplayer .fullscreen.state-exitfullscreen, .mediaplayer[data-state="idle"] > .jme-media-overlay, .mediaplayer button.play-pause, .mediaplayer button.play-pause.state-playing, .mediaplayer .mute-unmute, .mediaplayer[data-volume="medium"] .mute-unmute, .mediaplayer[data-volume="low"] .mute-unmute, .mediaplayer[data-volume="no"] .mute-unmute, .mediaplayer .state-unmute.mute-unmute, .mediaplayer .captions, .mediaplayer .subtitle-menu button[aria-checked="true"], .mediaplayer .subtitle-menu button, .mediaplayer .playlist-next, .mediaplayer .playlist-prev, .mediaplayer[data-state="ended"] > .jme-media-overlay {
   font-family: 'jme';
   speak: none;
   font-style: normal;
@@ -62,6 +62,12 @@
 
 .mediaplayer .subtitle-menu button:before {
   content: "\e617"; }
+
+.mediaplayer .playlist-next:before {
+  content: "\e602"; }
+
+.mediaplayer .playlist-prev:before {
+  content: "\e603"; }
 
 .mediaplayer[data-state="ended"] > .jme-media-overlay:before {
   content: "\e601"; }
@@ -213,6 +219,12 @@
   font-size: 81.3%;
   font-family: sans-serif;
   margin-top: 0.03em; }
+.mediaplayer .playlist-container {
+  display: none; }
+.mediaplayer.has-playlist .playlist-container {
+  display: table-cell; }
+.mediaplayer .playlist-box {
+  width: 3.09em; }
 .mediaplayer .no-volume-api .volume-container,
 .mediaplayer .no-volume-api .mute-container {
   padding: 0; }
