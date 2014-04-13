@@ -171,11 +171,13 @@
   cursor: pointer; }
 .mediaplayer[data-state="ended"] {
   cursor: pointer; }
-.mediaplayer[data-state="waiting"] > .jme-media-overlay {
-  animation-name: jmespin;
-  animation-iteration-count: infinite;
-  animation-duration: 1100ms;
-  animation-timing-function: linear; }
+.mediaplayer[data-state="waiting"] {
+  cursor: default; }
+  .mediaplayer[data-state="waiting"] > .jme-media-overlay {
+    animation-name: jmespin;
+    animation-iteration-count: infinite;
+    animation-duration: 1100ms;
+    animation-timing-function: linear; }
 .mediaplayer[data-state="playing"][data-useractivity="false"] .jme-controlbar {
   opacity: 0;
   visibility: hidden; }
@@ -334,7 +336,13 @@
   .mediaplayer .time-select.show-time-select {
     opacity: 1;
     visibility: visible; }
+.mediaplayer .ws-range-track {
+  top: 0;
+  left: 0;
+  bottom: 0; }
 .mediaplayer .ws-range-progress {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
   cursor: pointer;
   background: #e1e1e1;
   left: 0;

@@ -1605,7 +1605,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		}
 	});
 
-	webshims.ready(webshims.cfg.mediaelement.plugins, function(){
+	webshims.ready(webshims.cfg.mediaelement.plugins.concat(['mediaelement']), function(){
 		webshims.addReady(function(context, insertedElement){
 			$(baseSelector, context).add(insertedElement.filter(baseSelector)).jmeProp('controlbar', true);
 		});
@@ -1723,19 +1723,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		return $elem.attr('content') || ($elem.text() || '').trim();
 	};
 	Playlist.getUrl = function($elem){
-		return $elem.attr('content') || $elem.attr('url') || $elem.attr('href') || $elem.attr('src') ||  ($elem.text() || '').trim();
-	};
-	Playlist.tryGetElements = function(selectors, element){
-		var elem, i;
-		var len = selectors.length;
-
-		for(i = 0; i < len; i++){
-			elem = $(selectors[i], element);
-			if(elem[i]){
-				break;
-			}
-		}
-		return elem;
+		return $elem.attr('content') || $elem.attr('url') || $elem.attr('href') || $elem.attr('src') || ($elem.text() || '').trim();
 	};
 
 	Playlist.defaults = {
@@ -1755,8 +1743,8 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		mapDom: function(element){
 
 			return {
-				title: Playlist.getText(Playlist.tryGetElements(['[itemprop="name"]', 'h1, h2, h3, h4, h5, h6', 'a'], element)),
-				srces: Playlist.tryGetElements(['[itemprop="contentUrl"]', 'a'], element).map(function(){
+				title: Playlist.getText($('[itemprop="name"], h1, h2, h3, h4, h5, h6, a', element)),
+				srces: $('[itemprop="contentUrl"], a[type^="video"], a[type^="audio"]', element).map(function(){
 					var tmp;
 					var src =  {src: Playlist.getUrl($(this))};
 					if(this.nodeName.toLowerCase() == 'a'){
@@ -1773,8 +1761,9 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					}
 					return src;
 				}).get(),
-				poster: Playlist.getUrl(Playlist.tryGetElements(['[itemprop="thumbnailUrl"]', 'img'], element)) || null,
-				description:  Playlist.getText(Playlist.tryGetElements(['[itemprop="description"]', '.item-description', 'p'], element)) || null
+				tracks: $('a[type="text/vtt"]').map(mapTrackUrl).get(),
+				poster: Playlist.getUrl($('[itemprop="thumbnailUrl"], a[type^="image"], img', element)) || null,
+				description:  Playlist.getText($('[itemprop="description"], .item-description, p', element)) || null
 			};
 		},
 		mapUrl: function(url, callback){
@@ -1801,7 +1790,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 									poster: Playlist.getUrl($('itunes\\:image, media\\:thumbnail, enclosure[type^="image"], media\\:content[type^="image"]', this)) || null,
 									author: $('itunes\\:author', this).html() || null,
 									duration: $('itunes\\:duration', this).html() || null,
-									tracks: $('media\\:subTitle', this).map(mapUrl).get() || null
+									tracks: $('media\\:subTitle', this).map(mapTrackUrl).get() || null
 								});
 							}
 						});
@@ -1812,6 +1801,14 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			});
 		}
 	};
+
+	function mapTrackUrl(){
+		return {
+			src: $.attr(this, 'href'),
+			srclang: $.attr(this, 'lang'),
+			label: $.attr(this, 'data-label')
+		};
+	}
 
 	function mapUrl(){
 		return {
@@ -1839,7 +1836,6 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		},
 		_createListFromUrl: function(){
 			var that = this;
-
 
 			this.options.mapUrl(this.list, function(list){
 				that.list = list;
@@ -1983,8 +1979,16 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		},
 		*/
 		_loadItem: function(item){
-			this.media.attr('poster', item.poster || '');
-			this.media.jmeProp('srces', item.srces);
+			var media = this.media;
+			media.attr('poster', item.poster || '');
+
+			$('track', media).remove();
+
+			$.each(item.tracks || [], function(i, track){
+				$('<track />').attr(track).appendTo(media);
+			});
+
+			media.jmeProp('srces', item.srces);
 		},
 		_getItem: function(item){
 			if(item && (item.nodeName || item.jquery || typeof item == 'string')){

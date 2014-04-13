@@ -361,7 +361,7 @@ span.ws-input {
 		position: absolute !important;
 		display: block;
 		margin: 0;
-		padding: 0 !important;
+		padding: 0;
 		top: 0;
 		border-radius: em(5);
 		height: 100%;
@@ -370,6 +370,8 @@ span.ws-input {
 		overflow: hidden;
 		background: #09c;
 		box-shadow: 0 em(1.5) em(3.5) rgba(255, 255, 255, 0.2) inset;
+		-moz-box-sizing: content-box;
+		box-sizing: content-box;
 	}
 
 	.ws-range-ticks {

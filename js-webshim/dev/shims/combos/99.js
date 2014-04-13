@@ -1605,7 +1605,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		}
 	});
 
-	webshims.ready(webshims.cfg.mediaelement.plugins, function(){
+	webshims.ready(webshims.cfg.mediaelement.plugins.concat(['mediaelement']), function(){
 		webshims.addReady(function(context, insertedElement){
 			$(baseSelector, context).add(insertedElement.filter(baseSelector)).jmeProp('controlbar', true);
 		});

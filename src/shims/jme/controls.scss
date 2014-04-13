@@ -369,6 +369,7 @@ $browser-context: 16; // Default
 	}
 
 	&[data-state="waiting"] {
+		cursor: default;
 		> .jme-media-overlay {
 			@extend %icon-spinner;
 			animation-name: jmespin;
@@ -661,7 +662,15 @@ $browser-context: 16; // Default
 		}
 	}
 
+	.ws-range-track {
+		top: 0;
+		left: 0;
+		bottom: 0;
+	}
+
 	.ws-range-progress {
+		-moz-box-sizing: content-box;
+		box-sizing: content-box;
 		cursor: pointer;
 		background: #e1e1e1;
 		left: 0;

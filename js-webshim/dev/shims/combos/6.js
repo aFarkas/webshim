@@ -831,7 +831,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		_create: function(){
 			var i;
 			
-			this.element.addClass(this.options.baseClass || 'ws-range').attr({role: 'slider'}).append('<span class="ws-range-min ws-range-progress" /><span class="ws-range-rail ws-range-track"><span class="ws-range-thumb"><span><span data-value="" data-valuetext="" /></span></span></span>');
+			this.element.addClass(this.options.baseClass || 'ws-range').attr({role: 'slider'}).append('<span class="ws-range-rail ws-range-track"><span class="ws-range-min ws-range-progress" /><span class="ws-range-thumb"><span><span data-value="" data-valuetext="" /></span></span></span>');
 			this.trail = $('.ws-range-track', this.element);
 			this.range = $('.ws-range-progress', this.element);
 			this.thumb = $('.ws-range-thumb', this.trail);
@@ -1358,9 +1358,16 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 					temp = this.element[this.dirs.innerHeight]();
 					eS[this.dirs.marginTop] = ((elem[this.dirs.outerHeight]() - temp) / -2) + 'px';
 					this.range[0].style[this.dirs.marginTop] = ((this.range[this.dirs.outerHeight]() - temp) / -2 ) +'px';
+
+					this.range[0].style[this.dirs.posLeft] = outerWidth +'px';
+
 					outerWidth *= -1;
+
+					this.range[0].style[this.dirs.paddingRight] = outerWidth +'px';
 					this.trail[0].style[this.dirs.left] = outerWidth +'px';
 					this.trail[0].style[this.dirs.right] = outerWidth +'px';
+
+
 				}
 			}
 		},
@@ -1369,8 +1376,8 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 			this.vertical = (width && this.element.innerHeight() - width  > 10);
 			
 			this.dirs = this.vertical ? 
-				{mouse: 'pageY', pos: 'top', min: 'max', max: 'min', left: 'top', right: 'bottom', width: 'height', innerWidth: 'innerHeight', innerHeight: 'innerWidth', outerWidth: 'outerHeight', outerHeight: 'outerWidth', marginTop: 'marginLeft', marginLeft: 'marginTop'} :
-				{mouse: 'pageX', pos: 'left', min: 'min', max: 'max', left: 'left', right: 'right', width: 'width', innerWidth: 'innerWidth', innerHeight: 'innerHeight', outerWidth: 'outerWidth', outerHeight: 'outerHeight', marginTop: 'marginTop', marginLeft: 'marginLeft'}
+				{mouse: 'pageY', pos: 'top', posLeft: 'bottom', paddingRight: 'paddingTop', min: 'max', max: 'min', left: 'top', right: 'bottom', width: 'height', innerWidth: 'innerHeight', innerHeight: 'innerWidth', outerWidth: 'outerHeight', outerHeight: 'outerWidth', marginTop: 'marginLeft', marginLeft: 'marginTop'} :
+				{mouse: 'pageX', pos: 'left', posLeft: 'left', paddingRight: 'paddingRight', min: 'min', max: 'max', left: 'left', right: 'right', width: 'width', innerWidth: 'innerWidth', innerHeight: 'innerHeight', outerWidth: 'outerWidth', outerHeight: 'outerHeight', marginTop: 'marginTop', marginLeft: 'marginLeft'}
 			;
 			if(!this.vertical && this.element.css('direction') == 'rtl'){
 				this.isRtl = true;
