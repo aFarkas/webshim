@@ -179,15 +179,28 @@ webshims.register('form-message', function($, webshims, window, document, undefi
 	})();
 
 	webshims.replaceValidationplaceholder = function(elem, message, name){
+		var val = $.prop(elem, 'title');
+		if(message){
+			if(name == 'patternMismatch' && !val){
+				webshims.error('no title for patternMismatch provided. Always add a title attribute.');
+			}
+			if(val){
+				val = '<span class="ws-titlevalue">'+ val.replace(lReg, '&lt;').replace(gReg, '&gt;') +'</span>';
+			}
+
+			if(message.indexOf('{%title}') != -1){
+				message = message.replace('{%title}', val);
+			} else if(val) {
+				message = message+' '+val;
+			}
+		}
 
 		if(message && message.indexOf('{%') != -1){
-			['value', 'min', 'max', 'title', 'maxlength', 'minlength', 'label'].forEach(function(attr){
+			['value', 'min', 'max', 'maxlength', 'minlength', 'label'].forEach(function(attr){
 				if(message.indexOf('{%'+attr) === -1){return;}
 				var val = ((attr == 'label') ? $.trim($('label[for="'+ elem.id +'"]', elem.form).text()).replace(/\*$|:$/, '') : $.prop(elem, attr)) || '';
 				val = ''+val;
-				if(name == 'patternMismatch' && attr == 'title' && !val){
-					webshims.error('no title for patternMismatch provided. Always add a title attribute.');
-				}
+
 
 				val = toLocale(val, elem, attr);
 

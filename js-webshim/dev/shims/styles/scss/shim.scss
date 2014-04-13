@@ -520,6 +520,10 @@ input[data-wslist]::-webkit-calendar-picker-indicator {
 .validity-alert {
 	display: inline-block;
 	z-index: 1000000000;
+
+	.ws-titlevalue {
+		display: block;
+	}
 }
 
 .ws-errorbox {
