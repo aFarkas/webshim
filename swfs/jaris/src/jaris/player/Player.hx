@@ -633,7 +633,7 @@ class Player extends EventDispatcher
 		_movieClip.setChildIndex(_youtubeLoader.content, 0);
 		_ytReady = true;
 		Reflect.field(_youtubeLoader.content, "setSize")(_stage.stageWidth, _stage.stageHeight);
-		if(_ytCue || !_isPlaying){
+		if(_ytCue && !_isPlaying && !_requestedPlay){
 			Reflect.field(_youtubeLoader.content, "cueVideoByUrl")(Utils.youtubeSourceParse(_mediaSource), 0, Utils.youtubeQualitySourceParse(_mediaSource));
 		} else {
 			Reflect.field(_youtubeLoader.content, "loadVideoByUrl")(Utils.youtubeSourceParse(_mediaSource), 0, Utils.youtubeQualitySourceParse(_mediaSource));
@@ -652,7 +652,9 @@ class Player extends EventDispatcher
 		var status:UInt = Std.parseInt(Reflect.field(event, "data"));
 		var oldPlaying:Bool = _isPlaying;
 		var quality;
-		
+		if (!_mediaLoaded && _ytCue && !_isPlaying && _requestedPlay) {
+			play();
+		}
 		_mediaLoaded = true;
 		switch(status)
 		{
@@ -1178,6 +1180,7 @@ class Player extends EventDispatcher
 	 */
 	public function pause():Bool
 	{
+		_requestedPlay = false;
 		if (!_mediaEndReached)
 			
 		{
