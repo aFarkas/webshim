@@ -1276,6 +1276,7 @@
 
 		addModule('jme', {
 			src: 'jme/b',
+			d: ['mediaelement'],
 			c: [98, 99]
 		});
 

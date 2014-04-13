@@ -91,7 +91,13 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		});
 		return (ret !== undefined) ? ret : this;
 	};
-
+	var idlStates = {
+		emptied: 1,
+		pause: 1
+	};
+	var unwaitingEvents = {
+		canplay: 1, canplaythrough: 1
+	};
 
 
 	var baseSelector = options.selector;
@@ -100,10 +106,6 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		$(baseSelector, context).add(insertedElement.filter(baseSelector)).jmePlayer();
 	};
 
-	var idlStates = {
-		emptied: 1,
-		pause: 1
-	};
 
 	$.jme.getDOMList = function(attr){
 		var list = [];
@@ -165,7 +167,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				$.jme.data(this, $.extend(true, {}, opts));
 			}
 
-			var mediaUpdateFn, canPlay, removeCanPlay, canplayTimer, playerSize;
+			var mediaUpdateFn, canPlay, removeCanPlay, canplayTimer, playerSize, lastState;
 			var media = $('audio, video', this).eq(0);
 			var base = $(this);
 
@@ -191,6 +193,10 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					var readyState;
 					var paused;
 					removeCanPlay();
+
+					if(unwaitingEvents[state] && lastState != 'waiting'){
+						return;
+					}
 
 					if(state == 'ended' || $.prop(this, 'ended')){
 						state = 'ended';
@@ -224,7 +230,9 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					if(state == 'idle' && base._seekpause){
 						state = false;
 					}
+
 					if(state){
+						lastState = state;
 						base.attr('data-state', state);
 					}
 				};
@@ -258,13 +266,23 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				jmeData.media = media;
 				jmeData.player = base;
 				media
-					.on('ended', function(){
-						removeCanPlay();
-						media.jmeFn('pause');
-						if(!options.noReload && !media.prop('autoplay') && !media.prop('loop') && !media.hasClass('no-reload')){
-							media.jmeFn('load');
-						}
-					})
+					.on('ended emptied play', (function(){
+						var timer;
+						var ended = function(){
+							removeCanPlay();
+							media.jmeFn('pause');
+							if(!options.noReload && media.prop('ended') && media.prop('paused') && !media.prop('autoplay') && !media.prop('loop') && !media.hasClass('no-reload')){
+								media.jmeFn('load');
+								base.attr('data-state', 'ended');
+							}
+						};
+						return function(e){
+							clearTimeout(timer);
+							if(e.type == 'ended' && !options.noReload && !media.prop('autoplay') && !media.prop('loop') && !media.hasClass('no-reload')){
+								timer = setTimeout(ended);
+							}
+						};
+					})())
 					.on('emptied waiting canplay canplaythrough playing ended pause mediaerror', mediaUpdateFn)
 					.on('volumechange updateJMEState', function(){
 						var volume = $.prop(this, 'volume');
