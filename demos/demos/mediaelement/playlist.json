@@ -1,0 +1,30 @@
+[
+	{
+		"title": "Big Bug Bunny",
+		"srces": [
+			{"src": "http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.m4v", "type": "video/mp4"},
+			"http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.ogg"
+		],
+		"poster": ""
+	},
+	{
+		"title": "Sintel",
+		"srces": [
+			{"src": "http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v", "type": "video/mp4"},
+			{"src": "http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm", "type": "video/webm"}
+		],
+		"poster": "http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg"
+	},
+	{
+		"title": "yayQuery - Episode 23 | When Things Are Things",
+		"srces": [
+			{"src": "http://cdn.yayquery.com/ep/23/yayquery_23.mp4", "type": "video/mp4"},
+			{"src": "http://cdn.yayquery.com/ep/23/yayquery_23.ogv", "type": "video/ogg"}
+		],
+		"poster": "http://cdn.yayquery.com/ep/23/yayquery_23.jpg"
+	},
+	{
+		"title": "Youtube: Introduction to HTML 5",
+		"srces": {"src": "http://www.youtube.com/watch?v=siOHh0uzcuY", "type": "video/youtube"}
+	}
+]

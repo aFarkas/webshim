@@ -1277,7 +1277,7 @@
 		addModule('jme', {
 			src: 'jme/b',
 			d: ['mediaelement'],
-			c: [98, 99]
+			c: [98, 99, 97]
 		});
 
 		addModule('mediacontrols', {
@@ -1290,7 +1290,7 @@
 		addModule('playlist', {
 			src: 'jme/p',
 			d: ['jme'],
-			c: [98]
+			c: [98, 97]
 		});
 
 		addModule('track-ui', {

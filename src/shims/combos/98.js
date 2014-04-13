@@ -1637,35 +1637,14 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	var btnStructure = '<button class="{%class%}" type="button" aria-label="{%text%}"></button>';
 
 	function PlaylistList(data){
-		this.data = data;
+		this._data = data;
 		this._autoplay = null;
 		this.lists = {};
 
-
-		this.onaddlist = null;
-		this.onremovelist = null;
-
-		this.onitemchange = null;
-		this.onloopchange = null;
-		this.onautoplaychange = null;
+		this.on('showcontrolschange', this._updateControlsClass);
 	}
 
 	$.extend(PlaylistList.prototype, {
-		add: function(list, opts){
-
-			list = new Playlist(list, this, opts);
-			if(!list.id){
-				listId++;
-				list.id = 'list-'+listId;
-			}
-			this.lists[list.id] = list;
-
-			if(list.options.showControls){
-				this.data.player.addClass('has-playlist');
-			}
-
-			return list;
-		},
 		on: function(){
 			$.fn.on.apply($(this), arguments);
 		},
@@ -1681,30 +1660,48 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			}
 			return id;
 		},
+		_updateControlsClass: function(){
+			this._data.player[this.getShowcontrolsList() ? 'addClass' : 'removeClass']('has-playlist');
+		},
+		add: function(list, opts){
+
+			list = new Playlist(list, this, opts);
+			if(!list.id){
+				listId++;
+				list.id = 'list-'+listId;
+			}
+			this.lists[list.id] = list;
+
+			if(list.options.showcontrols){
+				this._data.player.addClass('has-playlist');
+			}
+
+			return list;
+		},
 		remove: function(list){
 			var id = this._getListId(list);
 			if(this.lists[id]){
-				this.lists[id].remove();
+				this.lists[id]._remove();
+				delete this.lists[id];
+			}
+			if(!this.getShowcontrolsList()){
+				this._data.player.removeClass('has-playlist');
 			}
 		},
-		autoplay: function(list, value){
-			var id = this._getListId(list);
-			if(arguments.length > 1){
-				if(value && this._autoplay && this._autoplay != this.lists[id]){
-					this.active(this._autoplay, false);
-				}
-				this.lists[id].autoplay(value);
-			} else {
-				return this.lists[id] == this._autoplay;
-			}
-		},
-		getAutoplay: function(){
-			return this._autoplay;
-		},
-		getControlsList: function(){
+		getAutoplayList: function(){
 			var clist = null;
 			$.each(this.lists, function(id, list){
-				if(list.options.showControls){
+				if(list.options.autoplay){
+					clist = list;
+					return false;
+				}
+			});
+			return clist;
+		},
+		getShowcontrolsList: function(){
+			var clist = null;
+			$.each(this.lists, function(id, list){
+				if(list.options.showcontrols){
 					clist = list;
 					return false;
 				}
@@ -1717,15 +1714,15 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	function Playlist(list, parent, opts){
 		this.list = list || [];
 		this.playlists = parent;
-		this.media = parent.data.media;
-		this.player = parent.data.player;
+		this.media = parent._data.media;
+		this.player = parent._data.player;
 		this.options = $.extend(true, {}, Playlist.defaults, opts);
 		this.options.itemTmpl  = this.options.itemTmpl.trim();
 
 		this.deferred = $.Deferred();
 		this._selectedIndex = -1;
 		this._selectedItem = null;
-		this._$rendered = null;
+		this.$rendered = null;
 
 		this._detectListType();
 
@@ -1755,7 +1752,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		autoplay: false,
 		defaultSelected: 'auto',
 		addItemEvents: true,
-		showControls: true,
+		showcontrols: true,
 		ajax: {},
 		itemTmpl: '<li class="list-item">' +
 			'<% if(typeof poster == "string" && poster) {%><img src="<%=poster%>" /><% }%>' +
@@ -1896,12 +1893,12 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		_createListFromDom: function(){
 			var that = this;
 
-			this._$rendered = $(this.list).eq(0);
+			this.$rendered = $(this.list).eq(0);
 			this.list = [];
 
-			if(this._$rendered){
+			if(this.$rendered){
 				this._addDomList();
-				this.list = this._$rendered.children().map(function(){
+				this.list = this.$rendered.children().map(function(){
 					return that._createItemFromDom(this);
 				}).get();
 			}
@@ -1915,12 +1912,12 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			var evt = $.Event(evt);
 			$(this).triggerHandler(evt, extra);
 			$(this.playlists).triggerHandler(evt, $.merge([{list: this}], extra || []));
-			if(this._$rendered){
-				this._$rendered.triggerHandler(evt, extra);
+			if(this.$rendered){
+				this.$rendered.triggerHandler(evt, extra);
 			}
 		},
 		_addDomList: function(){
-			this._$rendered
+			this.$rendered
 				.attr({
 					'data-autoplay': this.options.autoplay,
 					'data-loop': this.options.loop
@@ -1931,11 +1928,13 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		},
 		_addItemData: function(item, dom){
 			var that = this;
-			item._$elem = $(dom).data('itemData', item);
+			item.$item = $(dom).data('itemData', item);
 			if(this.options.addItemEvents){
-				item._$elem.on('click.playlist', function(e){
-					that.playItem(item, e);
-					return false;
+				item.$item.on('click.playlist', function(e){
+					if(that.options.addItemEvents){
+						that.playItem(item, e);
+						return false;
+					}
 				});
 			}
 		},
@@ -1946,33 +1945,30 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					that.playNext(e);
 				}
 			};
-			this.playlists.data.media.on('ended', onEnded);
-			this.remove = function(){
-				that.playlists.data.media.on('ended', onEnded);
-
+			this.media.on('ended', onEnded);
+			this._remove = function(){
+				that.media.off('ended', onEnded);
 				that.autoplay(false);
-				if(that.playlists.lists[that.id]){
-					delete that.playlists.lists[that.id];
+
+				if(that.$rendered){
+					that.$rendered.remove();
 				}
-				if(that._$rendered){
-					that._$rendered.remove();
-				}
-				if(!that.playlists.getControlsList()){
-					that.player.removeClass('has-playlist');
-				}
+
 				that._fire('removelist');
 			};
 		},
-		remove: $.noop,
+		_remove: function(){
+			this._fire('removelist');
+		},
 		render: function(callback){
-			if(this._$rendered){
-				callback(this._$rendered, this.player, this);
+			if(this.$rendered){
+				callback(this.$rendered, this.player, this);
 			} else {
 				this.deferred.done(function(){
 					var nodeName;
 					var that = this;
 					var items = [];
-					if(!this._$rendered){
+					if(!this.$rendered){
 						$.each(this.list, function(i, item){
 							var domItem = $($.parseHTML(that.options.renderer(item, that.options.itemTmpl))).filter(filterNode)[0];
 							that._addItemData(item, domItem);
@@ -1982,49 +1978,24 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 
 						switch (nodeName){
 							case 'li':
-								this._$rendered = $.parseHTML('<ul />');
+								this.$rendered = $.parseHTML('<ul />');
 								break;
 							case 'option':
-								this._$rendered = $.parseHTML('<select />');
+								this.$rendered = $.parseHTML('<select />');
 								break;
 							default:
-								this._$rendered = $.parseHTML('<div />');
+								this.$rendered = $.parseHTML('<div />');
 								break;
 						}
-						this._$rendered = $(this._$rendered).html(items);
+						this.$rendered = $(this.$rendered).html(items);
 						this._addDomList();
 					}
-					callback(this._$rendered, this.player, this);
+					callback(this.$rendered, this.player, this);
 				});
 			}
 		},
-
-		autoplay: function(value){
-			if(arguments.length){
-
-				if(value){
-					if(this.playlists._autoplay && this.playlists._autoplay != this){
-						this.playlists.autoplay(this.lists._autoplay, false);
-					}
-					this.playlists._autoplay = this;
-				}
-
-				if(this.options.autoplay != value){
-					this.options.autoplay = !!value;
-					if(this._$rendered){
-						this._$rendered.attr('data-autoplay', this.options.autoplay);
-					}
-					this._fire('autoplaychange');
-				}
-			} else {
-				return this.options.autoplay;
-			}
-
-		},
 		/*
-		loop: function(loop){
 
-		},
 		addItem: function(item, pos){
 
 		},
@@ -2053,7 +2024,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		playItem: function(item, e){
 			this.selectedItem(item, e);
 			if(item){
-				this.playlists.data.media.play();
+				this.media.play();
 			}
 		},
 		selectedIndex: function(index, e){
@@ -2085,13 +2056,13 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 
 				if(found != this._selectedIndex){
 					oldItem = this._selectedItem || null;
-					if(oldItem && oldItem._$elem){
-						oldItem._$elem.removeClass('selected-item');
+					if(oldItem && oldItem.$item){
+						oldItem.$item.removeClass('selected-item');
 					}
 					this._selectedItem = this.list[found] || null;
 					this._selectedIndex = found;
-					if(this._selectedItem && this._selectedItem._$elem){
-						this._selectedItem._$elem.addClass('selected-item');
+					if(this._selectedItem && this._selectedItem.$item){
+						this._selectedItem.$item.addClass('selected-item');
 					}
 					if(oldItem !== this._selectedItem){
 						this._fire('itemchange', [{oldItem: oldItem, from: e || null}]);
@@ -2121,6 +2092,32 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		getPrev: function(){
 			var index = this._selectedIndex - 1;
 			return this.list[index] || (this.options.loop ? this.list[this.list.length - 1] : null);
+		}
+	});
+
+	[{name: 'autoplay', fn: 'getAutoplayList'}, {name: 'showcontrols', fn: 'getShowcontrolsList'}, {name: 'loop'}].forEach(function(desc){
+		Playlist.prototype[desc.name] = function(value){
+			var curList;
+			if(arguments.length){
+				value = !!value;
+
+				if(value && desc.fn){
+					curList = this.playlists[desc.fn]();
+					if(curList && curList != this){
+						curList[desc.name](false);
+					}
+				}
+
+				if(this.options[desc.name] != value){
+					this.options[desc.name] = value;
+					if(this.$rendered){
+						this.$rendered.attr('data-'+desc.name, value);
+					}
+					this._fire(desc.name+'change');
+				}
+			} else {
+				return this.options[desc.name];
+			}
 		}
 	});
 
@@ -2167,7 +2164,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					}
 
 					function listchange(){
-						var newClist = playlists.getControlsList();
+						var newClist = playlists.getShowcontrolsList();
 						if(newClist != cList){
 							if(cList){
 								cList.off('itemchange', itemChange);
@@ -2187,7 +2184,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					});
 
 					playlists.on({
-						'addlist removelist':listchange
+						'addlist removelist showcontrolschange':listchange
 					});
 					listchange();
 				}
