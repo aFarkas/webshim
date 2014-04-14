@@ -96,6 +96,13 @@ module.exports = function(grunt){
 				includeSwfmini: true
 			}
 		},
+		bytesize: {
+			all: {
+				src: [
+					MINPATH+'/polyfiller.js'
+				]
+			}
+		},
 		uglify: {
 			options: {
 				beautify: {
@@ -266,12 +273,13 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-contrib-compress');
 	grunt.loadNpmTasks('grunt-contrib-clean');
+	grunt.loadNpmTasks('grunt-bytesize');
 	
-	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'versionreplace']);
+	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'versionreplace', 'bytesize']);
 
 	grunt.registerTask('dev', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'watch']);
 
-	grunt.registerTask('release', ['clean', 'default', 'versiontest', 'compress', 'copy:archive']);
+	grunt.registerTask('release', ['clean', 'default', 'versiontest', 'compress', 'copy:archive', 'bytesize']);
 
 
 	function getFiles(srcdir, destdir, wildcard, compareDir, compareMatch) {
