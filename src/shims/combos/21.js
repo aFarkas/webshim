@@ -1083,7 +1083,7 @@
 			box.insertBefore(elem);
 			
 			if(hasNative){
-				$.extend(data, {volume: $.prop(elem, 'volume'), muted: $.prop(elem, 'muted')});
+				$.extend(data, {volume: $.prop(elem, 'volume'), muted: $.prop(elem, 'muted'), paused: $.prop(elem, 'paused')});
 			}
 			
 			webshims.addShadowDom(elem, box);
@@ -1121,6 +1121,9 @@
 				if(jaris.type == 'ready'){
 					var onReady = function(){
 						if(data.api){
+							if(!data.paused){
+								data.api.api_play();
+							}
 							if(bufferSrc(elem)){
 								data.api.api_preload();
 							}
