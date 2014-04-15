@@ -4,7 +4,9 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-
+.jPicker label {
+    display: inline;
+}
 .jPicker .Icon {
   display: inline-block;
   height: 24px; /* change this value if using a different sized color picker icon */
@@ -214,7 +216,8 @@ table.jPicker {
   margin-left: 5px;
 }
 .jPicker tr.Hex td.Text input.AHex {
-  width: 15px;
+  width: 16px;
+  text-align: center;
 }
 .jPicker.no-alpha-picker tr.Hex td.Text input.AHex {
 	display: none;

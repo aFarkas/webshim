@@ -1178,8 +1178,13 @@ webshims.setOptions('canvas', {
 
 			<ul>
 				<li>
-					<strong>replaceUI</strong> <em>boolean</em>|<em>string</em> If set to true, all audio and video elements inside a container with the class <code class="i">mediaplayer</code> get custom styleable controls. If set to the string 'auto', only desktop browsers (except IE8) will get those extra styleable controls.
+					<strong><a href="demos/mediaelement.html#Custom-ui-controls">replaceUI</a></strong> <em>boolean</em>|<em>string</em> If set to true, all audio and video elements inside a container with the class <code class="i">mediaplayer</code> get custom styleable controls. If set to the string 'auto', only desktop browsers (except IE8) will get those extra styleable controls.
 				</li>
+				<!--
+				<li>
+					<
+				</li>
+				-->
 				<li>
 					<strong>preferFlash</strong> <em>boolean</em> If set to true the mediaelements will be replaced by flash, if flash is available. Otherwise, only if mediaelements aren't supported or the current audio/video container/codec isn't supported by the browser.
 					<br>
@@ -1219,8 +1224,6 @@ webshims.setOptions('canvas', {
 		position: relative;
 		height: 0;
 		width: 100%;
-		max-width: 980px;
-		min-width: 310px;
 		padding-bottom: 56.25%; /* 16/9 */
 	}
 

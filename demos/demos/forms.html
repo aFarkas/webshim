@@ -327,7 +327,7 @@ $('.only-foo').on('valuevalidation', function(e, extra){
 			<p>The datalist element can be used to create autocomplete/combobox widgets. With the <code class="i">customDatalist</code> option the UI can be even replaced in supporting browsers to have more control over this widget.</p>
 <pre><code class="language-javascript">
 webshims.setOptions('forms', {
-	customDatalist: true
+	customDatalist: true // default: false || set to 'auto' to only replace in non-mobile browsers.
 });
 </code></pre>
 			<h3 id="Datalist-options">Datalist-options</h3>

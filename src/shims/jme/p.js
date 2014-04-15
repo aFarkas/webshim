@@ -1,12 +1,13 @@
-webshims.register('playlist', function($, webshims){
+webshims.ready('jme DOM', function(){
 	"use strict";
+	var webshims = window.webshims;
+	var $ = webshims.$;
 	var jme = $.jme;
 	var listId = 0;
 	var btnStructure = '<button class="{%class%}" type="button" aria-label="{%text%}"></button>';
 
 	function PlaylistList(data){
 		this._data = data;
-		this._autoplay = null;
 		this.lists = {};
 
 		this.on('showcontrolschange', this._updateControlsClass);
@@ -297,6 +298,10 @@ webshims.register('playlist', function($, webshims){
 		_addItemData: function(item, dom){
 			var that = this;
 			item.$item = $(dom).data('itemData', item);
+
+			if(item == this._selectedItem){
+				item.$item.addClass('selected-item');
+			}
 			if(this.options.addItemEvents){
 				item.$item.on('click.playlist', function(e){
 					if(that.options.addItemEvents){
@@ -589,6 +594,6 @@ webshims.register('playlist', function($, webshims){
 			return data ? cache[str](data) : cache[str];
 		};
 	})();
-
 	$.jme.Playlist = Playlist;
+	webshims.isReady('playlist', true);
 });

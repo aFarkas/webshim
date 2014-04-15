@@ -492,11 +492,14 @@ span.ws-input {
   .input-picker.time-popover .ws-super-next {
     display: none; }
   .input-picker.ws-size-2 {
-    width: 49.61538em; }
+    width: 49.61538em;
+    min-width: 49.46154em; }
   .input-picker.ws-size-3 {
-    width: 73.84615em; }
+    width: 73.84615em;
+    min-width: 73.53846em; }
   .input-picker.color-popover {
-    width: 590px; }
+    width: 590px;
+    min-width: 575px; }
   .input-picker abbr[title] {
     cursor: help; }
   .input-picker li,

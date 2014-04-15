@@ -933,6 +933,14 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		var str = '';
 		var rowNum = 0;
 		var triggerValueValidation = (data.orig && ('valuevalidation' in $.data(data.orig)));
+
+		if(!data.options.useDecadeBase){
+			if(!max[0] && min[0]){
+				data.options.useDecadeBase = 'min';
+			} else if(max[0] && !min[0]){
+				data.options.useDecadeBase = 'max';
+			}
+		}
 		
 		if(data.options.useDecadeBase == 'max' && max[0]){
 			xthCorrect = 11 - (max[0] % 12);

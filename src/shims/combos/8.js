@@ -1755,20 +1755,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	var toLocale = (function(){
 		var monthFormatter;
 		var transforms = {
-			date: function(val){
-				var date = new Date(val);
-				if(date && date.toLocaleDateString){
-					val = date.toLocaleDateString() || val;
-				}
-				return val;
-			},
-			time: function(val){
-				var date = new Date(val);
-				if(date && date.toLocaleTimeString){
-					val = date.toLocaleTimeString() || val;
-				}
-				return val;
-			},
 			number: function(val){
 				var num = val * 1;
 				if(num.toLocaleString && !isNaN(num)){
@@ -1777,6 +1763,16 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				return val;
 			}
 		};
+
+		[{n: 'date', f: 'toLocaleDateString'}, {n: 'time', f: 'toLocaleTimeString'}, {n: 'datetime-local', f: 'toLocaleString'}].forEach(function(desc){
+			transforms[desc.n] = function(val){
+				var date = new Date(val);
+				if(date && date[desc.f]){
+					val = date[desc.f]() || val;
+				}
+				return val;
+			};
+		});
 
 		if(window.Intl && Intl.DateTimeFormat){
 			monthFormatter = new Intl.DateTimeFormat(navigator.browserLanguage || navigator.language, {year: "numeric", month: "2-digit"}).format(new Date());
@@ -1790,6 +1786,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				};
 			}
 		}
+
 		return function(val, elem, attr){
 			var type, widget;
 			if(valueVals[attr]){

@@ -167,7 +167,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				$.jme.data(this, $.extend(true, {}, opts));
 			}
 
-			var mediaUpdateFn, canPlay, removeCanPlay, canplayTimer, playerSize, lastState;
+			var mediaUpdateFn, canPlay, removeCanPlay, canplayTimer, lastState;
 			var media = $('audio, video', this).eq(0);
 			var base = $(this);
 
@@ -237,32 +237,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					}
 				};
 
-				playerSize = (function(){
-					var lastSize;
-					var sizes = [
-						{size: 380, name: 'x-small'},
-						{size: 490, name: 'small'},
-						{size: 756, name: 'medium'},
-						{size: 1024, name: 'large'}
-					];
 
-					var len = sizes.length;
-					return function(){
-						var size = 'x-large';
-						var i = 0;
-						var width = base.outerWidth();
-						for(; i < len; i++){
-							if(sizes[i].size >= width){
-								size = sizes[i].name;
-								break;
-							}
-						}
-						if(lastSize != size){
-							lastSize = size;
-							base.attr('data-playersize', size);
-						}
-					};
-				})();
 				jmeData.media = media;
 				jmeData.player = base;
 				media
@@ -301,23 +276,6 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					})
 				;
 
-				base
-					.on({
-						useractive: function(){
-							base.attr('data-useractivity', 'true');
-						}
-					})
-					.on('userinactive', {idletime: 3500}, function(){
-						base.attr('data-useractivity', 'false');
-					})
-					.triggerHandler('userinactive')
-				;
-
-				playerSize();
-				webshims.ready('dom-support', function(){
-					base.onWSOff('updateshadowdom', playerSize);
-					webshims.addShadowDom();
-				});
 				if(mediaUpdateFn){
 					media.on('updateJMEState', mediaUpdateFn).triggerHandler('updateJMEState');
 				}
@@ -427,85 +385,6 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	});
 
 
-
-
-	(function(){
-		var activity = {
-			add: function(elem, cfg, name){
-				var data 		= $.data(elem, 'jmeuseractivity') || $.data(elem, 'jmeuseractivity', {idletime: 2500, idle: true, trigger: {}}),
-					jElm 		= $(elem),
-					setInactive = function(){
-						if(!data.idle){
-							data.idle = true;
-							if ( data.trigger.userinactive ) {
-								jElm.trigger('userinactive');
-							}
-						}
-					},
-					x, y,
-					setActive 	= function(e){
-						if(!e || (e.type === 'mousemove' && e.pageX === x && e.pageY === y)){return;}
-						if(e.type === 'mousemove'){
-							 x = e.pageX;
-							 y = e.pageY;
-						}
-						if(data.idleTimer){
-							clearTimeout(data.idleTimer);
-						}
-						data.idleTimer = setTimeout(setInactive, data.idletime);
-						if(data.idle){
-							data.idle = false;
-							if( data.trigger.useractive ){
-								jElm.trigger('useractive');
-							}
-						}
-					}
-				;
-
-				data.idletime = (cfg || {}).idletime || data.idletime;
-				if(cfg && 'idle' in cfg){
-					data.idle = cfg.idle;
-				}
-				data.trigger[name] = true;
-
-				if(!data.bound){
-					jElm
-						.on('mouseleave.jmeuseractivity', setInactive)
-						.on('mousemove.jmeuseractivity focusin.jmeuseractivity mouseenter.jmeuseractivity keydown.jmeuseractivity keyup.jmeuseractivity mousedown.jmeuseractivity', setActive)
-					;
-					data.bound = true;
-				}
-				if(!data.idle){
-					setActive({type: 'initunidled'});
-				}
-			},
-			remove: function(elem, name){
-				var data = $.data(elem, 'jmeuseractivity') || $.data(elem, 'jmeuseractivity', {idletime: 2500, idle: true, trigger: {}});
-				data.trigger[name] = false;
-				if(!data.trigger.useractive && !data.trigger.userinactive){
-					$(elem).off('.jmeuseractivity');
-					data.bound = false;
-				}
-			}
-		};
-		$.each(['useractive', 'userinactive'], function(i, name){
-			$.event.special[name] = {
-				setup: function(cfg){
-					activity.add(this, cfg, name);
-				},
-				teardown: function(){
-					activity.remove(this, name);
-				}
-			};
-		});
-	})();
-
-
-	webshims.ready('mediaelement', function(){
-		webshims.addReady($.jme.initJME);
-	});
+	webshims.addReady($.jme.initJME);
 	webshims._polyfill(['mediaelement']);
 });
-
-
-
