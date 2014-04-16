@@ -15,10 +15,9 @@
 
 		<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
 
-		<script src="../../../js-webshim/dev/polyfiller.js"></script>
+		<script src="../../../js-webshim/minified/polyfiller.js"></script>
 
 		<script>
-
 			webshims.setOptions('forms', {
 				lazyCustomMessages: true,
 				replaceValidationUI: true,
@@ -31,7 +30,7 @@
 			});
 			
 			// load the forms polyfill
-			webshims.polyfill('forms forms-ext');
+			webshims.polyfill('forms');
 			
 		</script>
 		<script>

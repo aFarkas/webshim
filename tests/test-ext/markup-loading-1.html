@@ -3,7 +3,14 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>Webshims Lib Test Suite</title>
-		<script src="../../src/extras/modernizr-custom.js" data-polyfill-cfg='{"extendNative": false, "testData": "markup1"}' data-polyfill></script>
+		<script src="../../src/extras/modernizr-custom.js"></script>
+		<script>
+			window.asyncWebshims = window.asyncWebshims || {};
+			window.asyncWebshims.cfg = window.asyncWebshims.cfg || [];
+
+			window.asyncWebshims.cfg.push({"extendNative": false, "testData": "markup1"});
+			window.asyncWebshims.polyfill = null;
+		</script>
 		<script src="yepnope.js"></script>
 		<script src="empty-1.js" async=""></script>
 		<script>

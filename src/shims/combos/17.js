@@ -2238,7 +2238,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		$.fn.wsBaseWidget = function(opts){
 			opts = $.extend({}, opts);
 			return this.each(function(){
-				$.webshims.objectCreate(wsWidgetProto, {
+				webshims.objectCreate(wsWidgetProto, {
 					element: {
 						value: $(this)
 					}
@@ -2253,7 +2253,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 				monthNames: 'monthNamesShort'
 			}, opts);
 			return this.each(function(){
-				$.webshims.objectCreate(spinBtnProto, {
+				webshims.objectCreate(spinBtnProto, {
 					element: {
 						value: $(this)
 					}

@@ -479,7 +479,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			collision: 'none'
 		}, options.messagePopover.position || {});
 			
-		var api = webshims.objectCreate(webshims.wsPopover, {}, options.messagePopover);
+		var api = webshims.objectCreate(webshims.wsPopover, undefined, options.messagePopover);
 		var boundHide = api.hide.bind(api);
 		
 		api.element.addClass('validity-alert').attr({role: 'alert'});

@@ -715,14 +715,16 @@
 					webCFG.ajax.crossDomain = true;
 				}
 
-				if($.mobile && ($.mobile.textinput || $.mobile.rangeslider || $.mobile.button)){
-					if(WSDEBUG){
-						webshims.warn('jQM textinput/rangeslider/button detected waitReady was set to false. Use webshims.ready("featurename") to script against polyfilled methods/properties');
-					}
+				if(WSDEBUG && $.mobile && ($.mobile.textinput || $.mobile.rangeslider || $.mobile.button)){
+					webshims.info('jQM textinput/rangeslider/button detected waitReady was set to false. Use webshims.ready("featurename") to script against polyfilled methods/properties');
+
 					if(!webCFG.readyEvt){
-						webCFG.readyEvt = 'pageinit';
+						webshims.error('in a jQuery mobile enviroment: you should change the readyEvt to "pageinit".');
 					}
-					webCFG.waitReady = false;
+
+					if(webCFG.waitReady){
+						webshims.error('in a jQuery mobile enviroment: you should change the waitReady to false.')
+					}
 				}
 				
 				if (WSDEBUG && webCFG.waitReady && $.isReady) {
@@ -844,58 +846,23 @@
 	if(WSDEBUG){
 		webCFG.debug = true;
 	}
-	
-	//this might be extended by ES5 shim feature
-	(function(){
-		var defineProperty = 'defineProperty';
-		var has = Object.prototype.hasOwnProperty;
-		var descProps = ['configurable', 'enumerable', 'writable'];
-		var extendUndefined = function(prop){
-			for(var i = 0; i < 3; i++){
-				if(prop[descProps[i]] === undefined && (descProps[i] !== 'writable' || prop.value !== undefined)){
-					prop[descProps[i]] = true;
-				}
+
+	if(Object.create){
+		webshims.objectCreate = function(proto, props, opts){
+			if(WSDEBUG && props){
+				webshims.error('second argument for webshims.objectCreate is only available with DOM support');
 			}
-		};
-		var extendProps = function(props){
-			if(props){
-				for(var i in props){
-					if(has.call(props, i)){
-						extendUndefined(props[i]);
-					}
-				}
+			var o = Object.create(proto);
+			if(opts){
+				o.options = $.extend(true, {}, o.options  || {}, opts);
+				opts = o.options;
 			}
+			if(o._create && $.isFunction(o._create)){
+				o._create(opts);
+			}
+			return o;
 		};
-		if(Object.create){
-			webshims.objectCreate = function(proto, props, opts){
-				extendProps(props);
-				var o = Object.create(proto, props);
-				if(opts){
-					o.options = $.extend(true, {}, o.options  || {}, opts);
-					opts = o.options;
-				}
-				if(o._create && $.isFunction(o._create)){
-					o._create(opts);
-				}
-				return o;
-			};
-		}
-		if(Object[defineProperty]){
-			webshims[defineProperty] = function(obj, prop, desc){
-				extendUndefined(desc);
-				return Object[defineProperty](obj, prop, desc);
-			};
-		}
-		if(Object.defineProperties){
-			webshims.defineProperties = function(obj, props){
-				extendProps(props);
-				return Object.defineProperties(obj, props);
-			};
-		}
-		webshims.getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-		
-		webshims.getPrototypeOf = Object.getPrototypeOf;
-	})();
+	}
 	
 	
 
@@ -1314,21 +1281,19 @@
 
 	webshims.callAsync = function(){
 		webshims.callAsync = $.noop;
-		$(document.scripts || 'script')
-			.filter('[data-polyfill-cfg]')
-			.each(function(){
-				try {
-					webshims.setOptions( $(this).data('polyfillCfg') );
-				} catch(e){
-					webshims.warn('error parsing polyfill cfg: '+e);
-				}
-			})
-			.end()
-			.filter('[data-polyfill]')
-			.each(function(){
-				webshims.polyfill( $.trim( $(this).data('polyfill') || '' ) );
-			})
-		;
+		if(WSDEBUG){
+			$(document.scripts || 'script')
+				.filter('[data-polyfill-cfg]')
+				.each(function(){
+					webshims.error('script[data-polyfill-cfg] feature was removed')
+				})
+				.end()
+				.filter('[data-polyfill]')
+				.each(function(){
+					webshims.error('script[data-polyfill] feature was removed')
+				})
+			;
+		}
 		if(asyncWebshims){
 			if(asyncWebshims.cfg){
 				if(!asyncWebshims.cfg.length){

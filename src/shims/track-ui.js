@@ -25,6 +25,13 @@
 			} else {
 				$('track').each(changeApi);
 			}
+			if(!trackBugs && !trackOptions.override){
+				webshims.defineProperty(TextTrack.prototype, 'shimActiveCues', {
+					get: function(){
+						return this._shimActiveCues || this.activeCues;
+					}
+				});
+			}
 		};
 		if(!trackOptions.override){
 			$(detectTrackError);
@@ -250,7 +257,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 			});
 		})();
 		$.propHooks.activeCues = {
-			get: function(obj, value){
+			get: function(obj){
 				return obj._shimActiveCues || obj.activeCues;
 			}
 		};

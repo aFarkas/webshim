@@ -4,6 +4,7 @@
 <head>
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	<meta name="viewport" content="width=device-width" />
 	
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.1/jquery.mobile-1.4.1.min.css" />
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
@@ -89,6 +90,9 @@
 		
 		//jQM: set wsdoc to active page or false
 		webshims.setOptions('wsdoc', $('.ui-page-active').updatePolyfill().get(0) || false);
+
+		//JQM: set ready event to pageinit
+		webshims.setOptions('readyEvt', 'pageinit');
 		
 		//jQM: update polyfills on pageinit and change active page
 		$(document).on('pageinit', function(e){

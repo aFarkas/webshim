@@ -1689,7 +1689,6 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 	
 });;webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";
-	var doc = document;
 	var lazyLoad = function(name){
 		if(!name || typeof name != 'string'){
 			name = 'DOM';
