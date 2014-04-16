@@ -118,7 +118,7 @@
 	$.extend(webshims, {
 		version: '1.12.6-pre',
 		cfg: {
-			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 719px)').matches),
+			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
 			//addCacheBuster: false,
 			waitReady: true,
 //			extendNative: false,

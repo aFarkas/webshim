@@ -1,5 +1,9 @@
 (function($){
-	if(navigator.geolocation){return;}
+	var webshims = window.webshims;
+
+	setTimeout(function(){
+		webshims.isReady('geolocation', true);
+	});
 	var domWrite = function(){
 			setTimeout(function(){
 				throw('document.write is overwritten by geolocation shim. This method is incompatible with this plugin');
@@ -8,7 +12,10 @@
 		id = 0
 	;
 	var geoOpts = webshims.cfg.geolocation || {};
-	navigator.geolocation = (function(){
+	if(!navigator.geolocation){
+		navigator.geolocation = {};
+	}
+	$.extend(navigator.geolocation, (function(){
 		var pos;
 		var api = {
 			getCurrentPosition: function(success, error, opts){
@@ -171,7 +178,7 @@
 			return id;
 		};
 		return api;
-	})();
+	})());
 	
 	webshims.ready('WINDOWLOAD', function(){
 		webshims.loader.loadList(['jajax']);
