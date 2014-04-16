@@ -1446,7 +1446,9 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 
 ;
 //this might was already extended by ES5 shim feature
-(function(){
+(function($){
+	"use strict";
+	var webshims = window.webshims;
 	if(webshims.defineProperties){return;}
 	var defineProperty = 'defineProperty';
 	var has = Object.prototype.hasOwnProperty;
@@ -1499,7 +1501,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 	webshims.getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
 	webshims.getPrototypeOf = Object.getPrototypeOf;
-})();
+})(window.webshims.$);
 //DOM-Extension helper
 webshims.register('dom-extend', function($, webshims, window, document, undefined){
 	"use strict";

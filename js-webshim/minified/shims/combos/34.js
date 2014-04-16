@@ -1,1 +1,2069 @@
-!function(){if(!webshims.defineProperties){var a="defineProperty",b=Object.prototype.hasOwnProperty,c=["configurable","enumerable","writable"],d=function(a){for(var b=0;3>b;b++)void 0!==a[c[b]]||"writable"===c[b]&&void 0===a.value||(a[c[b]]=!0)},e=function(a){if(a)for(var c in a)b.call(a,c)&&d(a[c])};Object.create&&(webshims.objectCreate=function(a,b,c){e(b);var d=Object.create(a,b);return c&&(d.options=$.extend(!0,{},d.options||{},c),c=d.options),d._create&&$.isFunction(d._create)&&d._create(c),d}),Object[a]&&(webshims[a]=function(b,c,e){return d(e),Object[a](b,c,e)}),Object.defineProperties&&(webshims.defineProperties=function(a,b){return e(b),Object.defineProperties(a,b)}),webshims.getOwnPropertyDescriptor=Object.getOwnPropertyDescriptor,webshims.getPrototypeOf=Object.getPrototypeOf}}(),webshims.register("dom-extend",function(a,b,c,d,e){"use strict";var f=!("hrefNormalized"in a.support)||a.support.hrefNormalized,g=!("getSetAttribute"in a.support)||a.support.getSetAttribute,h=Object.prototype.hasOwnProperty;if(b.assumeARIA=g||Modernizr.canvas||Modernizr.video||Modernizr.boxsizing,("text"==a('<input type="email" />').attr("type")||""===a("<form />").attr("novalidate")||"required"in a("<input />")[0].attributes)&&b.error("IE browser modes are busted in IE10+. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools"),"debug"in b&&b.error('Use webshims.setOptions("debug", true||false||"noCombo"); to debug flag'),!b.cfg.no$Switch){var i=function(){if(!c.jQuery||c.$&&c.jQuery!=c.$||c.jQuery.webshims||(b.error("jQuery was included more than once. Make sure to include it only once or try the $.noConflict(extreme) feature! Webshims and other Plugins might not work properly. Or set webshims.cfg.no$Switch to 'true'."),c.$&&(c.$=b.$),c.jQuery=b.$),b.M!=Modernizr){b.error("Modernizr was included more than once. Make sure to include it only once! Webshims and other scripts might not work properly.");for(var a in Modernizr)a in b.M||(b.M[a]=Modernizr[a]);Modernizr=b.M}};i(),setTimeout(i,90),b.ready("DOM",i),a(i),b.ready("WINDOWLOAD",i)}var j=(b.modules,/\s*,\s*/),k={},l={},m={},n={},o={},p={},q=a.fn.val,r=function(b,c,d,e,f){return f?q.call(a(b)):q.call(a(b),d)};a.widget||!function(){var b=a.cleanData;a.cleanData=function(c){if(!a.widget)for(var d,e=0;null!=(d=c[e]);e++)try{a(d).triggerHandler("remove")}catch(f){}b(c)}}(),a.fn.val=function(b){var c=this[0];if(arguments.length&&null==b&&(b=""),!arguments.length)return c&&1===c.nodeType?a.prop(c,"value",b,"val",!0):q.call(this);if(a.isArray(b))return q.apply(this,arguments);var d=a.isFunction(b);return this.each(function(f){if(c=this,1===c.nodeType)if(d){var g=b.call(c,f,a.prop(c,"value",e,"val",!0));null==g&&(g=""),a.prop(c,"value",g,"val")}else a.prop(c,"value",b,"val")})},a.fn.onTrigger=function(a,b){return this.on(a,b).each(b)},a.fn.onWSOff=function(b,c,e,f){return f||(f=d),a(f)[e?"onTrigger":"on"](b,c),this.on("remove",function(d){d.originalEvent||a(f).off(b,c)}),this};var s="_webshimsLib"+Math.round(1e3*Math.random()),t=function(b,c,d){if(b=b.jquery?b[0]:b,!b)return d||{};var f=a.data(b,s);return d!==e&&(f||(f=a.data(b,s,{})),c&&(f[c]=d)),c?f&&f[c]:f};[{name:"getNativeElement",prop:"nativeElement"},{name:"getShadowElement",prop:"shadowElement"},{name:"getShadowFocusElement",prop:"shadowFocusElement"}].forEach(function(b){a.fn[b.name]=function(){var c=[];return this.each(function(){var d=t(this,"shadowData"),e=d&&d[b.prop]||this;-1==a.inArray(e,c)&&c.push(e)}),this.pushStack(c)}}),b.cfg.extendNative||b.cfg.noTriggerOverride||!function(b){a.event.trigger=function(c,d,e,f){if(!m[c]||f||!e||1!==e.nodeType)return b.apply(this,arguments);var g,i,j,k=e[c],l=a.prop(e,c),n=l&&k!=l;return n&&(j="__ws"+c,i=c in e&&h.call(e,c),e[c]=l,e[j]=k),g=b.apply(this,arguments),n&&(i?e[c]=k:delete e[c],delete e[j]),g}}(a.event.trigger),["removeAttr","prop","attr"].forEach(function(c){k[c]=a[c],a[c]=function(b,d,f,g,h){var i="val"==g,j=i?r:k[c];if(!b||!l[d]||1!==b.nodeType||!i&&g&&"attr"==c&&a.attrFn[d])return j(b,d,f,g,h);var m,o,q,s=(b.nodeName||"").toLowerCase(),t=n[s],u="attr"!=c||f!==!1&&null!==f?c:"removeAttr";if(t||(t=n["*"]),t&&(t=t[d]),t&&(m=t[u]),m){if("value"==d&&(o=m.isVal,m.isVal=i),"removeAttr"===u)return m.value.call(b);if(f===e)return m.get?m.get.call(b):m.value;m.set&&("attr"==c&&f===!0&&(f=d),q=m.set.call(b,f)),"value"==d&&(m.isVal=o)}else q=j(b,d,f,g,h);if((f!==e||"removeAttr"===u)&&p[s]&&p[s][d]){var v;v="removeAttr"==u?!1:"prop"==u?!!f:!0,p[s][d].forEach(function(a){(!a.only||(a.only="prop"&&"prop"==c)||"attr"==a.only&&"prop"!=c)&&a.call(b,f,v,i?"val":u,c)})}return q},o[c]=function(a,d,f){n[a]||(n[a]={}),n[a][d]||(n[a][d]={});var g=n[a][d][c],h=function(a,b,e){var g;return b&&b[a]?b[a]:e&&e[a]?e[a]:"prop"==c&&"value"==d?function(a){var b=this;return f.isVal?r(b,d,a,!1,0===arguments.length):k[c](b,d,a)}:"prop"==c&&"value"==a&&f.value.apply?(g="__ws"+d,m[d]=!0,function(){var a=this[g]||k[c](this,d);return a&&a.apply&&(a=a.apply(this,arguments)),a}):function(a){return k[c](this,d,a)}};n[a][d][c]=f,f.value===e&&(f.set||(f.set=f.writeable?h("set",f,g):b.cfg.useStrict&&"prop"==d?function(){throw d+" is readonly on "+a}:function(){b.info(d+" is readonly on "+a)}),f.get||(f.get=h("get",f,g))),["value","get","set"].forEach(function(a){f[a]&&(f["_sup"+a]=h(a,g))})}});var u=function(){var a=b.getPrototypeOf(d.createElement("foobar")),c=Modernizr.advancedObjectProperties&&Modernizr.objectAccessor;return function(e,f,g){var i,j;if(!(c&&(i=d.createElement(e))&&(j=b.getPrototypeOf(i))&&a!==j)||i[f]&&h.call(i,f))g._supvalue=function(){var a=t(this,"propValue");return a&&a[f]&&a[f].apply?a[f].apply(this,arguments):a&&a[f]},v.extendValue(e,f,g.value);else{var k=i[f];g._supvalue=function(){return k&&k.apply?k.apply(this,arguments):k},j[f]=g.value}g.value._supvalue=g._supvalue}}(),v=function(){var c={};b.addReady(function(d,e){var f={},g=function(b){f[b]||(f[b]=a(d.getElementsByTagName(b)),e[0]&&a.nodeName(e[0],b)&&(f[b]=f[b].add(e)))};a.each(c,function(a,c){return g(a),c&&c.forEach?(c.forEach(function(b){f[a].each(b)}),void 0):(b.warn("Error: with "+a+"-property. methods: "+c),void 0)}),f=null});var e,f=a([]),g=function(b,f){c[b]?c[b].push(f):c[b]=[f],a.isDOMReady&&(e||a(d.getElementsByTagName(b))).each(f)};return{createTmpCache:function(b){return a.isDOMReady&&(e=e||a(d.getElementsByTagName(b))),e||f},flushTmpCache:function(){e=null},content:function(b,c){g(b,function(){var b=a.attr(this,c);null!=b&&a.attr(this,c,b)})},createElement:function(a,b){g(a,b)},extendValue:function(b,c,d){g(b,function(){a(this).each(function(){var a=t(this,"propValue",{});a[c]=this[c],this[c]=d})})}}}(),w=function(a,b){a.defaultValue===e&&(a.defaultValue=""),a.removeAttr||(a.removeAttr={value:function(){a[b||"prop"].set.call(this,a.defaultValue),a.removeAttr._supvalue.call(this)}}),a.attr||(a.attr={})};a.extend(b,{getID:function(){var b=(new Date).getTime();return function(c){c=a(c);var d=c.prop("id");return d||(b++,d="ID-"+b,c.eq(0).prop("id",d)),d}}(),implement:function(a,c){var d=t(a,"implemented")||t(a,"implemented",{});return d[c]?(b.warn(c+" already implemented for element #"+a.id),!1):(d[c]=!0,!0)},extendUNDEFProp:function(b,c){a.each(c,function(a,c){a in b||(b[a]=c)})},getOptions:function(){var c=/\-([a-z])/g,d={},e={},f=function(a,b){return b.toLowerCase()},g=function(a,b){return b.toUpperCase()};return function(h,i,j,k){e[i]?i=e[i]:(e[i]=i.replace(c,g),i=e[i]);var l,m=t(h,"cfg"+i),n={};if(m)return m;if(m=a(h).data(),m&&"string"==typeof m[i]){if(k)return t(h,"cfg"+i,m[i]);b.error("data-"+i+" attribute has to be a valid JSON, was: "+m[i])}j?Array.isArray(j)?j.unshift(!0,{}):j=[!0,{},j]:j=[!0,{}],m&&"object"==typeof m[i]&&j.push(m[i]),d[i]||(d[i]=new RegExp("^"+i+"([A-Z])"));for(l in m)d[i].test(l)&&(n[l.replace(d[i],f)]=m[l]);return j.push(n),t(h,"cfg"+i,a.extend.apply(a,j))}}(),createPropDefault:w,data:t,moveToFirstEvent:function(b,c,d){var e,f=(a._data(b,"events")||{})[c];f&&f.length>1&&(e=f.pop(),d||(d="bind"),"bind"==d&&f.delegateCount?f.splice(f.delegateCount,0,e):f.unshift(e)),b=null},addShadowDom:function(){var e,f,g,h=a(c),i={init:!1,runs:0,test:function(){var a=i.getHeight(),b=i.getWidth();a!=i.height||b!=i.width?(i.height=a,i.width=b,i.handler({type:"docresize"}),i.runs++,i.runs<9&&setTimeout(i.test,90)):i.runs=0},handler:function(){var b=function(){a(d).triggerHandler("updateshadowdom")};return function(a){clearTimeout(e),e=setTimeout(function(){if("resize"==a.type){var d=h.width(),e=h.width();if(e==f&&d==g)return;f=e,g=d,i.height=i.getHeight(),i.width=i.getWidth()}c.requestAnimationFrame?requestAnimationFrame(b):setTimeout(b,0)},"resize"!=a.type||c.requestAnimationFrame?9:50)}}(),_create:function(){a.each({Height:"getHeight",Width:"getWidth"},function(a,b){var c=d.body,e=d.documentElement;i[b]=function(){return Math.max(c["scroll"+a],e["scroll"+a],c["offset"+a],e["offset"+a],e["client"+a])}})},start:function(){!this.init&&d.body&&(this.init=!0,this._create(),this.height=i.getHeight(),this.width=i.getWidth(),setInterval(this.test,999),a(this.test),b.ready("WINDOWLOAD",this.test),a(d).on("updatelayout.webshim pageinit popupafteropen panelbeforeopen tabsactivate collapsibleexpand shown.bs.modal shown.bs.collapse slid.bs.carousel",this.handler),a(c).on("resize",this.handler))}};return b.docObserve=function(){b.ready("DOM",function(){i.start(),null==a.support.boxSizing&&a(function(){a.support.boxSizing&&i.handler({type:"boxsizing"})})})},function(c,d,e){if(c&&d){e=e||{},c.jquery&&(c=c[0]),d.jquery&&(d=d[0]);var f=a.data(c,s)||a.data(c,s,{}),g=a.data(d,s)||a.data(d,s,{}),h={};e.shadowFocusElement?e.shadowFocusElement&&(e.shadowFocusElement.jquery&&(e.shadowFocusElement=e.shadowFocusElement[0]),h=a.data(e.shadowFocusElement,s)||a.data(e.shadowFocusElement,s,h)):e.shadowFocusElement=d,a(c).on("remove",function(b){b.originalEvent||setTimeout(function(){a(d).remove()},4)}),f.hasShadow=d,h.nativeElement=g.nativeElement=c,h.shadowData=g.shadowData=f.shadowData={nativeElement:c,shadowElement:d,shadowFocusElement:e.shadowFocusElement},e.shadowChilds&&e.shadowChilds.each(function(){t(this,"shadowData",g.shadowData)}),e.data&&(h.shadowData.data=g.shadowData.data=f.shadowData.data=e.data),e=null}b.docObserve()}}(),propTypes:{standard:function(a){w(a),a.prop||(a.prop={set:function(b){a.attr.set.call(this,""+b)},get:function(){return a.attr.get.call(this)||a.defaultValue}})},"boolean":function(a){w(a),a.prop||(a.prop={set:function(b){b?a.attr.set.call(this,""):a.removeAttr.value.call(this)},get:function(){return null!=a.attr.get.call(this)}})},src:function(){var b=d.createElement("a");return b.style.display="none",function(c,d){w(c),c.prop||(c.prop={set:function(a){c.attr.set.call(this,a)},get:function(){var c,e=this.getAttribute(d);if(null==e)return"";if(b.setAttribute("href",e+""),!f){try{a(b).insertAfter(this),c=b.getAttribute("href",4)}catch(g){c=b.getAttribute("href",4)}a(b).detach()}return c||b.href}})}}(),enumarated:function(a){w(a),a.prop||(a.prop={set:function(b){a.attr.set.call(this,b)},get:function(){var b=(a.attr.get.call(this)||"").toLowerCase();return b&&-1!=a.limitedTo.indexOf(b)||(b=a.defaultValue),b}})}},reflectProperties:function(c,d){"string"==typeof d&&(d=d.split(j)),d.forEach(function(d){b.defineNodeNamesProperty(c,d,{prop:{set:function(b){a.attr(this,d,b)},get:function(){return a.attr(this,d)||""}}})})},defineNodeNameProperty:function(c,d,e){return l[d]=!0,e.reflect&&(e.propType&&!b.propTypes[e.propType]?b.error("could not finde propType "+e.propType):b.propTypes[e.propType||"standard"](e,d)),["prop","attr","removeAttr"].forEach(function(f){var g=e[f];g&&(g="prop"===f?a.extend({writeable:!0},g):a.extend({},g,{writeable:!0}),o[f](c,d,g),"*"!=c&&b.cfg.extendNative&&"prop"==f&&g.value&&a.isFunction(g.value)&&u(c,d,g),e[f]=g)}),e.initAttr&&v.content(c,d),e},defineNodeNameProperties:function(a,c,d,e){for(var f in c)!e&&c[f].initAttr&&v.createTmpCache(a),d&&(c[f][d]||(c[f][d]={},["value","set","get"].forEach(function(a){a in c[f]&&(c[f][d][a]=c[f][a],delete c[f][a])}))),c[f]=b.defineNodeNameProperty(a,f,c[f]);return e||v.flushTmpCache(),c},createElement:function(c,d,e){var f;return a.isFunction(d)&&(d={after:d}),v.createTmpCache(c),d.before&&v.createElement(c,d.before),e&&(f=b.defineNodeNameProperties(c,e,!1,!0)),d.after&&v.createElement(c,d.after),v.flushTmpCache(),f},onNodeNamesPropertyModify:function(b,c,d,e){"string"==typeof b&&(b=b.split(j)),a.isFunction(d)&&(d={set:d}),b.forEach(function(a){p[a]||(p[a]={}),"string"==typeof c&&(c=c.split(j)),d.initAttr&&v.createTmpCache(a),c.forEach(function(b){p[a][b]||(p[a][b]=[],l[b]=!0),d.set&&(e&&(d.set.only=e),p[a][b].push(d.set)),d.initAttr&&v.content(a,b)}),v.flushTmpCache()})},defineNodeNamesBooleanProperty:function(c,d,f){f||(f={}),a.isFunction(f)&&(f.set=f),b.defineNodeNamesProperty(c,d,{attr:{set:function(a){f.useContentAttribute?b.contentAttr(this,d,a):this.setAttribute(d,a),f.set&&f.set.call(this,!0)},get:function(){var a=f.useContentAttribute?b.contentAttr(this,d):this.getAttribute(d);return null==a?e:d}},removeAttr:{value:function(){this.removeAttribute(d),f.set&&f.set.call(this,!1)}},reflect:!0,propType:"boolean",initAttr:f.initAttr||!1})},contentAttr:function(a,b,c){if(a.nodeName){var d;return c===e?(d=a.attributes[b]||{},c=d.specified?d.value:null,null==c?e:c):("boolean"==typeof c?c?a.setAttribute(b,b):a.removeAttribute(b):a.setAttribute(b,c),void 0)}},activeLang:function(){var c=[],d=[],e={},f=function(d,f,h){f._isLoading=!0,e[d]?e[d].push(f):(e[d]=[f],b.loader.loadScript(d,function(){h==c.join()&&a.each(e[d],function(a,b){g(b)}),delete e[d]}))},g=function(b){var d=b.__active,e=function(a,d){return b._isLoading=!1,b[d]||-1!=b.availableLangs.indexOf(d)?(b[d]?(b.__active=b[d],b.__activeName=d):f(b.langSrc+d,b,c.join()),!1):void 0};a.each(c,e),b.__active||(b.__active=b[""],b.__activeName=""),d!=b.__active&&a(b).trigger("change")};return function(a){var b;if("string"==typeof a)c[0]!=a&&(c=[a],b=c[0].split("-")[0],b&&b!=a&&c.push(b),d.forEach(g));else if("object"==typeof a)return a.__active||(d.push(a),g(a)),a.__active;return c[0]}}()}),a.each({defineNodeNamesProperty:"defineNodeNameProperty",defineNodeNamesProperties:"defineNodeNameProperties",createElements:"createElement"},function(a,c){b[a]=function(a,d,e,f){"string"==typeof a&&(a=a.split(j));var g={};return a.forEach(function(a){g[a]=b[c](a,d,e,f)}),g}}),b.isReady("webshimLocalization",!0),function(){if(!("content"in d.createElement("template")||(a(function(){var c=a("main").attr({role:"main"});c.length>1?b.error("only one main element allowed in document"):c.is("article *, section *")&&b.error("main not allowed inside of article/section elements")}),"hidden"in d.createElement("a")))){b.defineNodeNamesBooleanProperty(["*"],"hidden");var c={article:"article",aside:"complementary",section:"region",nav:"navigation",address:"contentinfo"},e=function(a,b){var c=a.getAttribute("role");c||a.setAttribute("role",b)};a.webshims.addReady(function(b,f){if(a.each(c,function(c,d){for(var g=a(c,b).add(f.filter(c)),h=0,i=g.length;i>h;h++)e(g[h],d)}),b===d){var g=d.getElementsByTagName("header")[0],h=d.getElementsByTagName("footer"),i=h.length;if(g&&!a(g).closest("section, article")[0]&&e(g,"banner"),!i)return;var j=h[i-1];a(j).closest("section, article")[0]||e(j,"contentinfo")}})}}()}),webshims.register("track",function(a,b,c,d){"use strict";function e(a,c,d){3!=arguments.length&&b.error("wrong arguments.length for VTTCue.constructor"),this.startTime=a,this.endTime=c,this.text=d,j(this)}var f=b.mediaelement,g=((new Date).getTime(),a.fn.addBack?"addBack":"andSelf",{subtitles:1,captions:1,descriptions:1}),h=a("<track />"),i=Modernizr.ES5&&Modernizr.objectAccessor,j=function(a){var c={};return a.addEventListener=function(a,d){c[a]&&b.error("always use $.on to the shimed event: "+a+" already bound fn was: "+c[a]+" your fn was: "+d),c[a]=d},a.removeEventListener=function(a,d){c[a]&&c[a]!=d&&b.error("always use $.on/$.off to the shimed event: "+a+" already bound fn was: "+c[a]+" your fn was: "+d),c[a]&&delete c[a]},a},k={getCueById:function(a){for(var b=null,c=0,d=this.length;d>c;c++)if(this[c].id===a){b=this[c];break}return b}},l={0:"disabled",1:"hidden",2:"showing"},m={shimActiveCues:null,_shimActiveCues:null,activeCues:null,cues:null,kind:"subtitles",label:"",language:"",id:"",mode:"disabled",oncuechange:null,toString:function(){return"[object TextTrack]"},addCue:function(a){if(this.cues){var c=this.cues[this.cues.length-1];c&&c.startTime>a.startTime&&b.error("cue startTime higher than previous cue's startTime")}else this.cues=f.createCueList();a.track&&a.track.removeCue&&a.track.removeCue(a),a.track=this,this.cues.push(a)},removeCue:function(a){var c=this.cues||[],d=0,e=c.length;if(a.track!=this)return b.error("cue not part of track"),void 0;for(;e>d;d++)if(c[d]===a){c.splice(d,1),a.track=null;break}return a.track?(b.error("cue not part of track"),void 0):void 0}},n=["kind","label","srclang"],o={srclang:"language"},p=Function.prototype.call.bind(Object.prototype.hasOwnProperty),q=function(c,d){var e,f,g=[],h=[],i=[];if(c||(c=b.data(this,"mediaelementBase")||b.data(this,"mediaelementBase",{})),d||(c.blockTrackListUpdate=!0,d=a.prop(this,"textTracks"),c.blockTrackListUpdate=!1),clearTimeout(c.updateTrackListTimer),a("track",this).each(function(){var b=a.prop(this,"track");i.push(b),-1==d.indexOf(b)&&h.push(b)}),c.scriptedTextTracks)for(e=0,f=c.scriptedTextTracks.length;f>e;e++)i.push(c.scriptedTextTracks[e]),-1==d.indexOf(c.scriptedTextTracks[e])&&h.push(c.scriptedTextTracks[e]);for(e=0,f=d.length;f>e;e++)-1==i.indexOf(d[e])&&g.push(d[e]);if(g.length||h.length){for(d.splice(0),e=0,f=i.length;f>e;e++)d.push(i[e]);for(e=0,f=g.length;f>e;e++)a([d]).triggerHandler(a.Event({type:"removetrack",track:g[e]}));for(e=0,f=h.length;f>e;e++)a([d]).triggerHandler(a.Event({type:"addtrack",track:h[e]}));(c.scriptedTextTracks||g.length)&&a(this).triggerHandler("updatetrackdisplay")}},r=function(c,d){d||(d=b.data(c,"trackData")),d&&!d.isTriggering&&(d.isTriggering=!0,setTimeout(function(){a(c).closest("audio, video").triggerHandler("updatetrackdisplay"),d.isTriggering=!1},1))},s=function(){var c={subtitles:{subtitles:1,captions:1},descriptions:{descriptions:1},chapters:{chapters:1}};return c.captions=c.subtitles,function(d){var e,f,g=a.prop(d,"default");return g&&"metadata"!=(e=a.prop(d,"kind"))&&(f=a(d).parent().find("track[default]").filter(function(){return!!c[e][a.prop(this,"kind")]})[0],f!=d&&(g=!1,b.error("more than one default track of a specific kind detected. Fall back to default = false"))),g}}(),t=a("<div />")[0];e.prototype={onenter:null,onexit:null,pauseOnExit:!1,getCueAsHTML:function(){var a,b="",c="",e=d.createDocumentFragment();return p(this,"getCueAsHTML")||(a=this.getCueAsHTML=function(){var a,d;if(b!=this.text)for(b=this.text,c=f.parseCueTextToHTML(b),t.innerHTML=c,a=0,d=t.childNodes.length;d>a;a++)e.appendChild(t.childNodes[a].cloneNode(!0));return e.cloneNode(!0)}),a?a.apply(this,arguments):e.cloneNode(!0)},track:null,id:""},c.VTTCue=e,c.TextTrackCue=function(){b.error("Use VTTCue constructor instead of abstract TextTrackCue constructor."),e.apply(this,arguments)},c.TextTrackCue.prototype=e.prototype,f.createCueList=function(){return a.extend([],k)},f.parseCueTextToHTML=function(){var a=/(<\/?[^>]+>)/gi,b=/^(?:c|v|ruby|rt|b|i|u)/,c=/\<\s*\//,d=function(a,b,d,e){var f;return c.test(e)?f="</"+a+">":(d.splice(0,1),f="<"+a+" "+b+'="'+d.join(" ").replace(/\"/g,"&#34;")+'">'),f},e=function(a){var c=a.replace(/[<\/>]+/gi,"").split(/[\s\.]+/);return c[0]&&(c[0]=c[0].toLowerCase(),b.test(c[0])?"c"==c[0]?a=d("span","class",c,a):"v"==c[0]&&(a=d("q","title",c,a)):a=""),a};return function(b){return b.replace(a,e)}}(),f.loadTextTrack=function(c,d,e,h){var i="play playing",j=e.track,k=function(){var g,h,l,m="disabled"!=j.mode&&a.attr(d,"src")&&a.prop(d,"src");if(m&&(a(c).off(i,k).off("updatetrackdisplay",k),!e.readyState)){g=function(){e.readyState=3,j.cues=null,j.activeCues=j.shimActiveCues=j._shimActiveCues=null,a(d).triggerHandler("error")},e.readyState=1;try{j.cues=f.createCueList(),j.activeCues=j.shimActiveCues=j._shimActiveCues=f.createCueList(),l=function(){h=a.ajax({dataType:"text",url:m,success:function(i){"text/vtt"!=h.getResponseHeader("content-type")&&b.error("set the mime-type of your WebVTT files to text/vtt. see: http://dev.w3.org/html5/webvtt/#text/vtt"),f.parseCaptions(i,j,function(b){b&&"length"in b?(e.readyState=2,a(d).triggerHandler("load"),a(c).triggerHandler("updatetrackdisplay")):g()})},error:g})},a.ajax&&a.ajaxSettings.xhr?l():(b.ready("jajax",l),b.loader.loadList(["jajax"]))}catch(n){g(),b.error(n)}}};e.readyState=0,j.shimActiveCues=null,j._shimActiveCues=null,j.activeCues=null,j.cues=null,a(c).on(i,k),h?(j.mode=g[j.kind]?"showing":"hidden",b.ready("WINDOWLOAD",k)):b.ready("WINDOWLOAD",function(){a(c).on("updatetrackdisplay",k)})},f.createTextTrack=function(c,d){var e,g;return d.nodeName&&(g=b.data(d,"trackData"),g&&(r(d,g),e=g.track)),e||(e=j(b.objectCreate(m)),i||n.forEach(function(b){var c=a.prop(d,b);c&&(e[o[b]||b]=c)}),d.nodeName?(i&&n.forEach(function(c){b.defineProperty(e,o[c]||c,{get:function(){return a.prop(d,c)}})}),e.id=a(d).prop("id"),g=b.data(d,"trackData",{track:e}),f.loadTextTrack(c,d,g,s(d))):(i&&n.forEach(function(a){b.defineProperty(e,o[a]||a,{value:d[a],writeable:!1})}),e.cues=f.createCueList(),e.activeCues=e._shimActiveCues=e.shimActiveCues=f.createCueList(),e.mode="hidden",e.readyState=2),"subtitles"!=e.kind||e.language||b.error("you must provide a language for track in subtitles state"),e.__wsmode=e.mode),e},f.parseCaptionChunk=function(){var a=/^(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s+\-\-\>\s+(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s*(.*)/,c=/^(DEFAULTS|DEFAULT)\s+\-\-\>\s+(.*)/g,d=/^(STYLE|STYLES)\s+\-\-\>\s*\n([\s\S]*)/g,f=/^(COMMENT|COMMENTS)\s+\-\-\>\s+(.*)/g;return function(g){var h,i,j,k,l,m,n,o,p,q;if(c.exec(g))return null;if(o=d.exec(g))return null;if(o=f.exec(g))return null;for(h=g.split(/\n/g);!h[0].replace(/\s+/gi,"").length&&h.length>0;)h.shift();for(h[0].match(/^\s*[a-z0-9-\_]+\s*$/gi)&&(n=String(h.shift().replace(/\s*/gi,""))),m=0;m<h.length;m++){var r=h[m];(p=a.exec(r))&&(l=p.slice(1),i=parseInt(60*(l[0]||0)*60,10)+parseInt(60*(l[1]||0),10)+parseInt(l[2]||0,10)+parseFloat("0."+(l[3]||0)),j=parseInt(60*(l[4]||0)*60,10)+parseInt(60*(l[5]||0),10)+parseInt(l[6]||0,10)+parseFloat("0."+(l[7]||0))),h=h.slice(0,m).concat(h.slice(m+1));break}return i||j?(k=h.join("\n"),q=new e(i,j,k),n&&(q.id=n),q):(b.warn("couldn't extract time information: "+[i,j,h.join("\n"),n].join(" ; ")),null)}}(),f.parseCaptions=function(a,c,d){var e,g,h,i,j;f.createCueList(),a?(h=/^WEBVTT(\s*FILE)?/gi,g=function(k,l){for(;l>k;k++){if(e=a[k],h.test(e))j=!0;else if(e.replace(/\s*/gi,"").length){if(!j){b.error("please use WebVTT format. This is the standard"),d(null);break}e=f.parseCaptionChunk(e,k),e&&c.addCue(e)}if(i<(new Date).getTime()-30){k++,setTimeout(function(){i=(new Date).getTime(),g(k,l)},90);break}}k>=l&&(j||b.error("please use WebVTT format. This is the standard"),d(c.cues))},a=a.replace(/\r\n/g,"\n"),setTimeout(function(){a=a.replace(/\r/g,"\n"),setTimeout(function(){i=(new Date).getTime(),a=a.split(/\n\n+/g),g(0,a.length)},9)},9)):b.error("Required parameter captionData not supplied.")},f.createTrackList=function(c,d){return d=d||b.data(c,"mediaelementBase")||b.data(c,"mediaelementBase",{}),d.textTracks||(d.textTracks=[],b.defineProperties(d.textTracks,{onaddtrack:{value:null},onremovetrack:{value:null},onchange:{value:null},getTrackById:{value:function(a){for(var b=null,c=0;c<d.textTracks.length;c++)if(a==d.textTracks[c].id){b=d.textTracks[c];break}return b}}}),j(d.textTracks),a(c).on("updatetrackdisplay",function(){for(var b,c=0;c<d.textTracks.length;c++)b=d.textTracks[c],b.__wsmode!=b.mode&&(b.__wsmode=b.mode,a([d.textTracks]).triggerHandler("change"))})),d.textTracks},Modernizr.track||(b.defineNodeNamesBooleanProperty(["track"],"default"),b.reflectProperties(["track"],["srclang","label"]),b.defineNodeNameProperties("track",{src:{reflect:!0,propType:"src"}})),b.defineNodeNameProperties("track",{kind:{attr:Modernizr.track?{set:function(a){var c=b.data(this,"trackData");this.setAttribute("data-kind",a),c&&(c.attrKind=a)},get:function(){var a=b.data(this,"trackData");return a&&"attrKind"in a?a.attrKind:this.getAttribute("kind")}}:{},reflect:!0,propType:"enumarated",defaultValue:"subtitles",limitedTo:["subtitles","captions","descriptions","chapters","metadata"]}}),a.each(n,function(c,d){var e=o[d]||d;b.onNodeNamesPropertyModify("track",d,function(){var c=b.data(this,"trackData");c&&("kind"==d&&r(this,c),i||(c.track[e]=a.prop(this,d)))})}),b.onNodeNamesPropertyModify("track","src",function(c){if(c){var d,e=b.data(this,"trackData");e&&(d=a(this).closest("video, audio"),d[0]&&f.loadTextTrack(d,this,e))}}),b.defineNodeNamesProperties(["track"],{ERROR:{value:3},LOADED:{value:2},LOADING:{value:1},NONE:{value:0},readyState:{get:function(){return(b.data(this,"trackData")||{readyState:0}).readyState},writeable:!1},track:{get:function(){return f.createTextTrack(a(this).closest("audio, video")[0],this)},writeable:!1}},"prop"),b.defineNodeNamesProperties(["audio","video"],{textTracks:{get:function(){var a=this,c=b.data(a,"mediaelementBase")||b.data(a,"mediaelementBase",{}),d=f.createTrackList(a,c);return c.blockTrackListUpdate||q.call(a,c,d),d},writeable:!1},addTextTrack:{value:function(a,c,d){var e=f.createTextTrack(this,{kind:h.prop("kind",a||"").prop("kind"),label:c||"",srclang:d||""}),g=b.data(this,"mediaelementBase")||b.data(this,"mediaelementBase",{});return g.scriptedTextTracks||(g.scriptedTextTracks=[]),g.scriptedTextTracks.push(e),q.call(this),e}}},"prop");var u=function(c){if(a(c.target).is("audio, video")){var d=b.data(c.target,"mediaelementBase");d&&(clearTimeout(d.updateTrackListTimer),d.updateTrackListTimer=setTimeout(function(){q.call(c.target,d)},0))}},v=function(a,b){return b.readyState||a.readyState},w=function(a){a.originalEvent&&a.stopImmediatePropagation()},x=function(){if(b.implement(this,"track")){var c,d=this.track;d&&(b.bugs.track||!d.mode&&!v(this,d)||(a.prop(this,"track").mode=l[d.mode]||d.mode),c=a.prop(this,"kind"),d.mode="string"==typeof d.mode?"disabled":0,this.kind="metadata",a(this).attr({kind:c})),a(this).on("load error",w)}};b.addReady(function(c,d){var e=d.filter("video, audio, track").closest("audio, video");a("video, audio",c).add(e).each(function(){q.call(this)}).on("emptied updatetracklist wsmediareload",u).each(function(){if(Modernizr.track){var c=a.prop(this,"textTracks"),d=this.textTracks;c.length!=d.length&&b.warn("textTracks couldn't be copied"),a("track",this).each(x)}}),e.each(function(){var a=this,c=b.data(a,"mediaelementBase");c&&(clearTimeout(c.updateTrackListTimer),c.updateTrackListTimer=setTimeout(function(){q.call(a,c)},9))})}),Modernizr.texttrackapi&&a("video, audio").trigger("trackapichange")});
+
+//this might was already extended by ES5 shim feature
+(function($){
+	"use strict";
+	var webshims = window.webshims;
+	if(webshims.defineProperties){return;}
+	var defineProperty = 'defineProperty';
+	var has = Object.prototype.hasOwnProperty;
+	var descProps = ['configurable', 'enumerable', 'writable'];
+	var extendUndefined = function(prop){
+		for(var i = 0; i < 3; i++){
+			if(prop[descProps[i]] === undefined && (descProps[i] !== 'writable' || prop.value !== undefined)){
+				prop[descProps[i]] = true;
+			}
+		}
+	};
+
+	var extendProps = function(props){
+		if(props){
+			for(var i in props){
+				if(has.call(props, i)){
+					extendUndefined(props[i]);
+				}
+			}
+		}
+	};
+
+	if(Object.create){
+		webshims.objectCreate = function(proto, props, opts){
+			extendProps(props);
+			var o = Object.create(proto, props);
+			if(opts){
+				o.options = $.extend(true, {}, o.options  || {}, opts);
+				opts = o.options;
+			}
+			if(o._create && $.isFunction(o._create)){
+				o._create(opts);
+			}
+			return o;
+		};
+	}
+
+	if(Object[defineProperty]){
+		webshims[defineProperty] = function(obj, prop, desc){
+			extendUndefined(desc);
+			return Object[defineProperty](obj, prop, desc);
+		};
+	}
+	if(Object.defineProperties){
+		webshims.defineProperties = function(obj, props){
+			extendProps(props);
+			return Object.defineProperties(obj, props);
+		};
+	}
+	webshims.getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+
+	webshims.getPrototypeOf = Object.getPrototypeOf;
+})(window.webshims.$);
+//DOM-Extension helper
+webshims.register('dom-extend', function($, webshims, window, document, undefined){
+	"use strict";
+	var supportHrefNormalized = !('hrefNormalized' in $.support) || $.support.hrefNormalized;
+	var supportGetSetAttribute = !('getSetAttribute' in $.support) || $.support.getSetAttribute;
+	var has = Object.prototype.hasOwnProperty;
+	webshims.assumeARIA = supportGetSetAttribute || Modernizr.canvas || Modernizr.video || Modernizr.boxsizing;
+	
+	if($('<input type="email" />').attr('type') == 'text' || $('<form />').attr('novalidate') === "" || ('required' in $('<input />')[0].attributes)){
+		webshims.error("IE browser modes are busted in IE10+. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
+	}
+	
+	if('debug' in webshims){
+		webshims.error('Use webshims.setOptions("debug", true||false||"noCombo"); to debug flag');
+	}
+	
+	if (!webshims.cfg.no$Switch) {
+		var switch$ = function(){
+			if (window.jQuery && (!window.$ || window.jQuery == window.$) && !window.jQuery.webshims) {
+				webshims.error("jQuery was included more than once. Make sure to include it only once or try the $.noConflict(extreme) feature! Webshims and other Plugins might not work properly. Or set webshims.cfg.no$Switch to 'true'.");
+				if (window.$) {
+					window.$ = webshims.$;
+				}
+				window.jQuery = webshims.$;
+			}
+			if(webshims.M != Modernizr){
+				webshims.error("Modernizr was included more than once. Make sure to include it only once! Webshims and other scripts might not work properly.");
+				for(var i in Modernizr){
+					if(!(i in webshims.M)){
+						webshims.M[i] = Modernizr[i];
+					}
+				}
+				Modernizr = webshims.M;
+			}
+		};
+		switch$();
+		setTimeout(switch$, 90);
+		webshims.ready('DOM', switch$);
+		$(switch$);
+		webshims.ready('WINDOWLOAD', switch$);
+		
+	}
+
+	//shortcus
+	var modules = webshims.modules;
+	var listReg = /\s*,\s*/;
+		
+	//proxying attribute
+	var olds = {};
+	var havePolyfill = {};
+	var hasPolyfillMethod = {};
+	var extendedProps = {};
+	var extendQ = {};
+	var modifyProps = {};
+	
+	var oldVal = $.fn.val;
+	var singleVal = function(elem, name, val, pass, _argless){
+		return (_argless) ? oldVal.call($(elem)) : oldVal.call($(elem), val);
+	};
+	
+	//jquery mobile and jquery ui
+	if(!$.widget){
+		(function(){
+			var _cleanData = $.cleanData;
+			$.cleanData = function( elems ) {
+				if(!$.widget){
+					for ( var i = 0, elem; (elem = elems[i]) != null; i++ ) {
+						try {
+							$( elem ).triggerHandler( "remove" );
+						// http://bugs.jquery.com/ticket/8235
+						} catch( e ) {}
+					}
+				}
+				_cleanData( elems );
+			};
+		})();
+	}
+	
+
+	$.fn.val = function(val){
+		var elem = this[0];
+		if(arguments.length && val == null){
+			val = '';
+		}
+		if(!arguments.length){
+			if(!elem || elem.nodeType !== 1){return oldVal.call(this);}
+			return $.prop(elem, 'value', val, 'val', true);
+		}
+		if($.isArray(val)){
+			return oldVal.apply(this, arguments);
+		}
+		var isFunction = $.isFunction(val);
+		return this.each(function(i){
+			elem = this;
+			if(elem.nodeType === 1){
+				if(isFunction){
+					var genVal = val.call( elem, i, $.prop(elem, 'value', undefined, 'val', true));
+					if(genVal == null){
+						genVal = '';
+					}
+					$.prop(elem, 'value', genVal, 'val') ;
+				} else {
+					$.prop(elem, 'value', val, 'val');
+				}
+			}
+		});
+	};
+	$.fn.onTrigger = function(evt, fn){
+		return this.on(evt, fn).each(fn);
+	};
+	
+	$.fn.onWSOff = function(evt, fn, trigger, evtDel){
+		if(!evtDel){
+			evtDel = document;
+		}
+		$(evtDel)[trigger ? 'onTrigger' : 'on'](evt, fn);
+		this.on('remove', function(e){
+			if(!e.originalEvent){
+				$(evtDel).off(evt, fn);
+			}
+		});
+		return this;
+	};
+	
+	var dataID = '_webshimsLib'+ (Math.round(Math.random() * 1000));
+	var elementData = function(elem, key, val){
+		elem = elem.jquery ? elem[0] : elem;
+		if(!elem){return val || {};}
+		var data = $.data(elem, dataID);
+		if(val !== undefined){
+			if(!data){
+				data = $.data(elem, dataID, {});
+			}
+			if(key){
+				data[key] = val;
+			}
+		}
+		
+		return key ? data && data[key] : data;
+	};
+
+
+	[{name: 'getNativeElement', prop: 'nativeElement'}, {name: 'getShadowElement', prop: 'shadowElement'}, {name: 'getShadowFocusElement', prop: 'shadowFocusElement'}].forEach(function(data){
+		$.fn[data.name] = function(){
+			var elems = [];
+			this.each(function(){
+				var shadowData = elementData(this, 'shadowData');
+				var elem = shadowData && shadowData[data.prop] || this;
+				if($.inArray(elem, elems) == -1){
+					elems.push(elem);
+				}
+			});
+			return this.pushStack(elems);
+		};
+	});
+	
+	//add support for $('video').trigger('play') in case extendNative is set to false
+	if(!webshims.cfg.extendNative && !webshims.cfg.noTriggerOverride){
+		(function(oldTrigger){
+			$.event.trigger = function(event, data, elem, onlyHandlers){
+				
+				if(!hasPolyfillMethod[event] || onlyHandlers || !elem || elem.nodeType !== 1){
+					return oldTrigger.apply(this, arguments);
+				}
+				var ret, isOrig, origName;
+				var origFn = elem[event];
+				var polyfilledFn = $.prop(elem, event);
+				var changeFn = polyfilledFn && origFn != polyfilledFn;
+				if(changeFn){
+					origName = '__ws'+event;
+					isOrig = (event in elem) && has.call(elem, event);
+					elem[event] = polyfilledFn;
+					elem[origName] = origFn;
+				}
+				
+				ret = oldTrigger.apply(this, arguments);
+				if (changeFn) {
+					if(isOrig){
+						elem[event] = origFn;
+					} else {
+						delete elem[event];
+					}
+					delete elem[origName];
+				}
+				
+				return ret;
+			};
+		})($.event.trigger);
+	}
+	
+	['removeAttr', 'prop', 'attr'].forEach(function(type){
+		olds[type] = $[type];
+		$[type] = function(elem, name, value, pass, _argless){
+			var isVal = (pass == 'val');
+			var oldMethod = !isVal ? olds[type] : singleVal;
+			if( !elem || !havePolyfill[name] || elem.nodeType !== 1 || (!isVal && pass && type == 'attr' && $.attrFn[name]) ){
+				return oldMethod(elem, name, value, pass, _argless);
+			}
+			
+			var nodeName = (elem.nodeName || '').toLowerCase();
+			var desc = extendedProps[nodeName];
+			var curType = (type == 'attr' && (value === false || value === null)) ? 'removeAttr' : type;
+			var propMethod;
+			var oldValMethod;
+			var ret;
+			
+			
+			if(!desc){
+				desc = extendedProps['*'];
+			}
+			if(desc){
+				desc = desc[name];
+			}
+			
+			if(desc){
+				propMethod = desc[curType];
+			}
+			
+			if(propMethod){
+				if(name == 'value'){
+					oldValMethod = propMethod.isVal;
+					propMethod.isVal = isVal;
+				}
+				if(curType === 'removeAttr'){
+					return propMethod.value.call(elem);	
+				} else if(value === undefined){
+					return (propMethod.get) ? 
+						propMethod.get.call(elem) : 
+						propMethod.value
+					;
+				} else if(propMethod.set) {
+					if(type == 'attr' && value === true){
+						value = name;
+					}
+					
+					ret = propMethod.set.call(elem, value);
+				}
+				if(name == 'value'){
+					propMethod.isVal = oldValMethod;
+				}
+			} else {
+				ret = oldMethod(elem, name, value, pass, _argless);
+			}
+			if((value !== undefined || curType === 'removeAttr') && modifyProps[nodeName] && modifyProps[nodeName][name]){
+				
+				var boolValue;
+				if(curType == 'removeAttr'){
+					boolValue = false;
+				} else if(curType == 'prop'){
+					boolValue = !!(value);
+				} else {
+					boolValue = true;
+				}
+				
+				modifyProps[nodeName][name].forEach(function(fn){
+					if(!fn.only || (fn.only = 'prop' && type == 'prop') || (fn.only == 'attr' && type != 'prop')){
+						fn.call(elem, value, boolValue, (isVal) ? 'val' : curType, type);
+					}
+				});
+			}
+			return ret;
+		};
+		
+		extendQ[type] = function(nodeName, prop, desc){
+			
+			if(!extendedProps[nodeName]){
+				extendedProps[nodeName] = {};
+			}
+			if(!extendedProps[nodeName][prop]){
+				extendedProps[nodeName][prop] = {};
+			}
+			var oldDesc = extendedProps[nodeName][prop][type];
+			var getSup = function(propType, descriptor, oDesc){
+				var origProp;
+				if(descriptor && descriptor[propType]){
+					return descriptor[propType];
+				}
+				if(oDesc && oDesc[propType]){
+					return oDesc[propType];
+				}
+				if(type == 'prop' && prop == 'value'){
+					return function(value){
+						var elem = this;
+						return (desc.isVal) ? 
+							singleVal(elem, prop, value, false, (arguments.length === 0)) : 
+							olds[type](elem, prop, value)
+						;
+					};
+				}
+				if(type == 'prop' && propType == 'value' && desc.value.apply){
+					origProp = '__ws'+prop;
+					hasPolyfillMethod[prop] = true;
+					return  function(value){
+						var sup = this[origProp] || olds[type](this, prop);
+						if(sup && sup.apply){
+							sup = sup.apply(this, arguments);
+						} 
+						return sup;
+					};
+				}
+				return function(value){
+					return olds[type](this, prop, value);
+				};
+			};
+			extendedProps[nodeName][prop][type] = desc;
+			if(desc.value === undefined){
+				if(!desc.set){
+					desc.set = desc.writeable ? 
+						getSup('set', desc, oldDesc) : 
+						(webshims.cfg.useStrict && prop == 'prop') ? 
+							function(){throw(prop +' is readonly on '+ nodeName);} : 
+							function(){webshims.info(prop +' is readonly on '+ nodeName);}
+					;
+				}
+				if(!desc.get){
+					desc.get = getSup('get', desc, oldDesc);
+				}
+				
+			}
+			
+			['value', 'get', 'set'].forEach(function(descProp){
+				if(desc[descProp]){
+					desc['_sup'+descProp] = getSup(descProp, oldDesc);
+				}
+			});
+		};
+		
+	});
+	
+	var extendNativeValue = (function(){
+		var UNKNOWN = webshims.getPrototypeOf(document.createElement('foobar'));
+		
+		//see also: https://github.com/lojjic/PIE/issues/40 | https://prototype.lighthouseapp.com/projects/8886/tickets/1107-ie8-fatal-crash-when-prototypejs-is-loaded-with-rounded-cornershtc
+		var isExtendNativeSave = Modernizr.advancedObjectProperties && Modernizr.objectAccessor;
+		return function(nodeName, prop, desc){
+			var elem , elemProto;
+			 if( isExtendNativeSave && (elem = document.createElement(nodeName)) && (elemProto = webshims.getPrototypeOf(elem)) && UNKNOWN !== elemProto && ( !elem[prop] || !has.call(elem, prop) ) ){
+				var sup = elem[prop];
+				desc._supvalue = function(){
+					if(sup && sup.apply){
+						return sup.apply(this, arguments);
+					}
+					return sup;
+				};
+				elemProto[prop] = desc.value;
+			} else {
+				desc._supvalue = function(){
+					var data = elementData(this, 'propValue');
+					if(data && data[prop] && data[prop].apply){
+						return data[prop].apply(this, arguments);
+					}
+					return data && data[prop];
+				};
+				initProp.extendValue(nodeName, prop, desc.value);
+			}
+			desc.value._supvalue = desc._supvalue;
+		};
+	})();
+		
+	var initProp = (function(){
+		
+		var initProps = {};
+		
+		webshims.addReady(function(context, contextElem){
+			var nodeNameCache = {};
+			var getElementsByName = function(name){
+				if(!nodeNameCache[name]){
+					nodeNameCache[name] = $(context.getElementsByTagName(name));
+					if(contextElem[0] && $.nodeName(contextElem[0], name)){
+						nodeNameCache[name] = nodeNameCache[name].add(contextElem);
+					}
+				}
+			};
+			
+			
+			$.each(initProps, function(name, fns){
+				getElementsByName(name);
+				if(!fns || !fns.forEach){
+					webshims.warn('Error: with '+ name +'-property. methods: '+ fns);
+					return;
+				}
+				fns.forEach(function(fn){
+					nodeNameCache[name].each(fn);
+				});
+			});
+			nodeNameCache = null;
+		});
+		
+		var tempCache;
+		var emptyQ = $([]);
+		var createNodeNameInit = function(nodeName, fn){
+			if(!initProps[nodeName]){
+				initProps[nodeName] = [fn];
+			} else {
+				initProps[nodeName].push(fn);
+			}
+			if($.isDOMReady){
+				(tempCache || $( document.getElementsByTagName(nodeName) )).each(fn);
+			}
+		};
+		
+		var elementExtends = {};
+		return {
+			createTmpCache: function(nodeName){
+				if($.isDOMReady){
+					tempCache = tempCache || $( document.getElementsByTagName(nodeName) );
+				}
+				return tempCache || emptyQ;
+			},
+			flushTmpCache: function(){
+				tempCache = null;
+			},
+			content: function(nodeName, prop){
+				createNodeNameInit(nodeName, function(){
+					var val =  $.attr(this, prop);
+					if(val != null){
+						$.attr(this, prop, val);
+					}
+				});
+			},
+			createElement: function(nodeName, fn){
+				createNodeNameInit(nodeName, fn);
+			},
+			extendValue: function(nodeName, prop, value){
+				createNodeNameInit(nodeName, function(){
+					$(this).each(function(){
+						var data = elementData(this, 'propValue', {});
+						data[prop] = this[prop];
+						this[prop] = value;
+					});
+				});
+			}
+		};
+	})();
+		
+	var createPropDefault = function(descs, removeType){
+		if(descs.defaultValue === undefined){
+			descs.defaultValue = '';
+		}
+		if(!descs.removeAttr){
+			descs.removeAttr = {
+				value: function(){
+					descs[removeType || 'prop'].set.call(this, descs.defaultValue);
+					descs.removeAttr._supvalue.call(this);
+				}
+			};
+		}
+		if(!descs.attr){
+			descs.attr = {};
+		}
+	};
+	
+	$.extend(webshims, {
+		getID: (function(){
+			var ID = new Date().getTime();
+			return function(elem){
+				elem = $(elem);
+				var id = elem.prop('id');
+				if(!id){
+					ID++;
+					id = 'ID-'+ ID;
+					elem.eq(0).prop('id', id);
+				}
+				return id;
+			};
+		})(),
+		implement: function(elem, type){
+			var data = elementData(elem, 'implemented') || elementData(elem, 'implemented', {});
+			if(data[type]){
+				webshims.warn(type +' already implemented for element #'+elem.id);
+				return false;
+			}
+			data[type] = true;
+			return true;
+		},
+		extendUNDEFProp: function(obj, props){
+			$.each(props, function(name, prop){
+				if( !(name in obj) ){
+					obj[name] = prop;
+				}
+			});
+		},
+		getOptions: (function(){
+			var normalName = /\-([a-z])/g;
+			var regs = {};
+			var nameRegs = {};
+			var regFn = function(f, upper){
+				return upper.toLowerCase();
+			};
+			var nameFn = function(f, dashed){
+				return dashed.toUpperCase();
+			};
+			return function(elem, name, bases, stringAllowed){
+				if(nameRegs[name]){
+					name = nameRegs[name];
+				} else {
+					nameRegs[name] = name.replace(normalName, nameFn);
+					name = nameRegs[name];
+				}
+				var data = elementData(elem, 'cfg'+name);
+				var dataName;
+				var cfg = {};
+				
+				if(data){
+					return data;
+				}
+				data = $(elem).data();
+				if(data && typeof data[name] == 'string'){
+					if(stringAllowed){
+						return elementData(elem, 'cfg'+name, data[name]);
+					}
+					webshims.error('data-'+ name +' attribute has to be a valid JSON, was: '+ data[name]);
+				}
+				if(!bases){
+					bases = [true, {}];
+				} else if(!Array.isArray(bases)){
+					bases = [true, {}, bases];
+				} else {
+					bases.unshift(true, {});
+				}
+				
+				if(data && typeof data[name] == 'object'){
+					bases.push(data[name]);
+				}
+				
+				if(!regs[name]){
+					regs[name] = new RegExp('^'+ name +'([A-Z])');
+				}
+				
+				for(dataName in data){
+					if(regs[name].test(dataName)){
+						cfg[dataName.replace(regs[name], regFn)] = data[dataName];
+					}
+				}
+				bases.push(cfg);
+				return elementData(elem, 'cfg'+name, $.extend.apply($, bases));
+			};
+		})(),
+		//http://www.w3.org/TR/html5/common-dom-interfaces.html#reflect
+		createPropDefault: createPropDefault,
+		data: elementData,
+		moveToFirstEvent: function(elem, eventType, bindType){
+			var events = ($._data(elem, 'events') || {})[eventType];
+			var fn;
+			
+			if(events && events.length > 1){
+				fn = events.pop();
+				if(!bindType){
+					bindType = 'bind';
+				}
+				if(bindType == 'bind' && events.delegateCount){
+					events.splice( events.delegateCount, 0, fn);
+				} else {
+					events.unshift( fn );
+				}
+				
+				
+			}
+			elem = null;
+		},
+		addShadowDom: (function(){
+			var resizeTimer;
+			var lastHeight;
+			var lastWidth;
+			var $window = $(window);
+			var docObserve = {
+				init: false,
+				runs: 0,
+				test: function(){
+					var height = docObserve.getHeight();
+					var width = docObserve.getWidth();
+					
+					if(height != docObserve.height || width != docObserve.width){
+						docObserve.height = height;
+						docObserve.width = width;
+						docObserve.handler({type: 'docresize'});
+						docObserve.runs++;
+						if(docObserve.runs < 9){
+							setTimeout(docObserve.test, 90);
+						}
+					} else {
+						docObserve.runs = 0;
+					}
+				},
+				handler: (function(){
+					var trigger = function(){
+						$(document).triggerHandler('updateshadowdom');
+					};
+					return function(e){
+						clearTimeout(resizeTimer);
+						resizeTimer = setTimeout(function(){
+							if(e.type == 'resize'){
+								var width = $window.width();
+								var height = $window.width();
+
+								if(height == lastHeight && width == lastWidth){
+									return;
+								}
+								lastHeight = height;
+								lastWidth = width;
+								
+								docObserve.height = docObserve.getHeight();
+								docObserve.width = docObserve.getWidth();
+							}
+
+							if(window.requestAnimationFrame){
+								requestAnimationFrame(trigger);
+							} else {
+								setTimeout(trigger, 0);
+							}
+							
+						}, (e.type == 'resize' && !window.requestAnimationFrame) ? 50 : 9);
+					};
+				})(),
+				_create: function(){
+					$.each({ Height: "getHeight", Width: "getWidth" }, function(name, type){
+						var body = document.body;
+						var doc = document.documentElement;
+						docObserve[type] = function (){
+							return Math.max(
+								body[ "scroll" + name ], doc[ "scroll" + name ],
+								body[ "offset" + name ], doc[ "offset" + name ],
+								doc[ "client" + name ]
+							);
+						};
+					});
+				},
+				start: function(){
+					if(!this.init && document.body){
+						this.init = true;
+						this._create();
+						this.height = docObserve.getHeight();
+						this.width = docObserve.getWidth();
+						setInterval(this.test, 999);
+						$(this.test);
+						webshims.ready('WINDOWLOAD', this.test);
+						$(document).on('updatelayout.webshim pageinit popupafteropen panelbeforeopen tabsactivate collapsibleexpand shown.bs.modal shown.bs.collapse slid.bs.carousel', this.handler);
+						$(window).on('resize', this.handler);
+					}
+				}
+			};
+			
+			
+			webshims.docObserve = function(){
+				webshims.ready('DOM', function(){
+					docObserve.start();
+					if($.support.boxSizing == null){
+						$(function(){
+							if($.support.boxSizing){
+								docObserve.handler({type: 'boxsizing'});
+							}
+						});
+					}
+				});
+			};
+			return function(nativeElem, shadowElem, opts){
+				if(nativeElem && shadowElem){
+					opts = opts || {};
+					if(nativeElem.jquery){
+						nativeElem = nativeElem[0];
+					}
+					if(shadowElem.jquery){
+						shadowElem = shadowElem[0];
+					}
+					var nativeData = $.data(nativeElem, dataID) || $.data(nativeElem, dataID, {});
+					var shadowData = $.data(shadowElem, dataID) || $.data(shadowElem, dataID, {});
+					var shadowFocusElementData = {};
+					if(!opts.shadowFocusElement){
+						opts.shadowFocusElement = shadowElem;
+					} else if(opts.shadowFocusElement){
+						if(opts.shadowFocusElement.jquery){
+							opts.shadowFocusElement = opts.shadowFocusElement[0];
+						}
+						shadowFocusElementData = $.data(opts.shadowFocusElement, dataID) || $.data(opts.shadowFocusElement, dataID, shadowFocusElementData);
+					}
+					
+					$(nativeElem).on('remove', function(e){
+						if (!e.originalEvent) {
+							setTimeout(function(){
+								$(shadowElem).remove();
+							}, 4);
+						}
+					});
+					
+					nativeData.hasShadow = shadowElem;
+					shadowFocusElementData.nativeElement = shadowData.nativeElement = nativeElem;
+					shadowFocusElementData.shadowData = shadowData.shadowData = nativeData.shadowData = {
+						nativeElement: nativeElem,
+						shadowElement: shadowElem,
+						shadowFocusElement: opts.shadowFocusElement
+					};
+					if(opts.shadowChilds){
+						opts.shadowChilds.each(function(){
+							elementData(this, 'shadowData', shadowData.shadowData);
+						});
+					}
+					
+					if(opts.data){
+						shadowFocusElementData.shadowData.data = shadowData.shadowData.data = nativeData.shadowData.data = opts.data;
+					}
+					opts = null;
+				}
+				webshims.docObserve();
+			};
+		})(),
+		propTypes: {
+			standard: function(descs, name){
+				createPropDefault(descs);
+				if(descs.prop){return;}
+				descs.prop = {
+					set: function(val){
+						descs.attr.set.call(this, ''+val);
+					},
+					get: function(){
+						return descs.attr.get.call(this) || descs.defaultValue;
+					}
+				};
+				
+			},
+			"boolean": function(descs, name){
+				
+				createPropDefault(descs);
+				if(descs.prop){return;}
+				descs.prop = {
+					set: function(val){
+						if(val){
+							descs.attr.set.call(this, "");
+						} else {
+							descs.removeAttr.value.call(this);
+						}
+					},
+					get: function(){
+						return descs.attr.get.call(this) != null;
+					}
+				};
+			},
+			"src": (function(){
+				var anchor = document.createElement('a');
+				anchor.style.display = "none";
+				return function(descs, name){
+					
+					createPropDefault(descs);
+					if(descs.prop){return;}
+					descs.prop = {
+						set: function(val){
+							descs.attr.set.call(this, val);
+						},
+						get: function(){
+							var href = this.getAttribute(name);
+							var ret;
+							if(href == null){return '';}
+							
+							anchor.setAttribute('href', href+'' );
+							
+							if(!supportHrefNormalized){
+								try {
+									$(anchor).insertAfter(this);
+									ret = anchor.getAttribute('href', 4);
+								} catch(er){
+									ret = anchor.getAttribute('href', 4);
+								}
+								$(anchor).detach();
+							}
+							return ret || anchor.href;
+						}
+					};
+				};
+			})(),
+			enumarated: function(descs, name){
+					
+					createPropDefault(descs);
+					if(descs.prop){return;}
+					descs.prop = {
+						set: function(val){
+							descs.attr.set.call(this, val);
+						},
+						get: function(){
+							var val = (descs.attr.get.call(this) || '').toLowerCase();
+							if(!val || descs.limitedTo.indexOf(val) == -1){
+								val = descs.defaultValue;
+							}
+							return val;
+						}
+					};
+				}
+			
+//			,unsignedLong: $.noop
+//			,"doubble": $.noop
+//			,"long": $.noop
+//			,tokenlist: $.noop
+//			,settableTokenlist: $.noop
+		},
+		reflectProperties: function(nodeNames, props){
+			if(typeof props == 'string'){
+				props = props.split(listReg);
+			}
+			props.forEach(function(prop){
+				webshims.defineNodeNamesProperty(nodeNames, prop, {
+					prop: {
+						set: function(val){
+							$.attr(this, prop, val);
+						},
+						get: function(){
+							return $.attr(this, prop) || '';
+						}
+					}
+				});
+			});
+		},
+		defineNodeNameProperty: function(nodeName, prop, descs){
+			havePolyfill[prop] = true;
+						
+			if(descs.reflect){
+				if(descs.propType && !webshims.propTypes[descs.propType]){
+					webshims.error('could not finde propType '+ descs.propType);
+				} else {
+					webshims.propTypes[descs.propType || 'standard'](descs, prop);
+				}
+				
+			}
+			
+			['prop', 'attr', 'removeAttr'].forEach(function(type){
+				var desc = descs[type];
+				if(desc){
+					if(type === 'prop'){
+						desc = $.extend({writeable: true}, desc);
+					} else {
+						desc = $.extend({}, desc, {writeable: true});
+					}
+						
+					extendQ[type](nodeName, prop, desc);
+					if(nodeName != '*' && webshims.cfg.extendNative && type == 'prop' && desc.value && $.isFunction(desc.value)){
+						extendNativeValue(nodeName, prop, desc);
+					}
+					descs[type] = desc;
+				}
+			});
+			if(descs.initAttr){
+				initProp.content(nodeName, prop);
+			}
+			return descs;
+		},
+		
+		defineNodeNameProperties: function(name, descs, propType, _noTmpCache){
+			var olddesc;
+			for(var prop in descs){
+				if(!_noTmpCache && descs[prop].initAttr){
+					initProp.createTmpCache(name);
+				}
+				if(propType){
+					if(descs[prop][propType]){
+						//webshims.log('override: '+ name +'['+prop +'] for '+ propType);
+					} else {
+						descs[prop][propType] = {};
+						['value', 'set', 'get'].forEach(function(copyProp){
+							if(copyProp in descs[prop]){
+								descs[prop][propType][copyProp] = descs[prop][copyProp];
+								delete descs[prop][copyProp];
+							}
+						});
+					}
+				}
+				descs[prop] = webshims.defineNodeNameProperty(name, prop, descs[prop]);
+			}
+			if(!_noTmpCache){
+				initProp.flushTmpCache();
+			}
+			return descs;
+		},
+		
+		createElement: function(nodeName, create, descs){
+			var ret;
+			if($.isFunction(create)){
+				create = {
+					after: create
+				};
+			}
+			initProp.createTmpCache(nodeName);
+			if(create.before){
+				initProp.createElement(nodeName, create.before);
+			}
+			if(descs){
+				ret = webshims.defineNodeNameProperties(nodeName, descs, false, true);
+			}
+			if(create.after){
+				initProp.createElement(nodeName, create.after);
+			}
+			initProp.flushTmpCache();
+			return ret;
+		},
+		onNodeNamesPropertyModify: function(nodeNames, props, desc, only){
+			if(typeof nodeNames == 'string'){
+				nodeNames = nodeNames.split(listReg);
+			}
+			if($.isFunction(desc)){
+				desc = {set: desc};
+			}
+			
+			nodeNames.forEach(function(name){
+				if(!modifyProps[name]){
+					modifyProps[name] = {};
+				}
+				if(typeof props == 'string'){
+					props = props.split(listReg);
+				}
+				if(desc.initAttr){
+					initProp.createTmpCache(name);
+				}
+				props.forEach(function(prop){
+					if(!modifyProps[name][prop]){
+						modifyProps[name][prop] = [];
+						havePolyfill[prop] = true;
+					}
+					if(desc.set){
+						if(only){
+							desc.set.only =  only;
+						}
+						modifyProps[name][prop].push(desc.set);
+					}
+					
+					if(desc.initAttr){
+						initProp.content(name, prop);
+					}
+				});
+				initProp.flushTmpCache();
+				
+			});
+		},
+		defineNodeNamesBooleanProperty: function(elementNames, prop, descs){
+			if(!descs){
+				descs = {};
+			}
+			if($.isFunction(descs)){
+				descs.set = descs;
+			}
+			webshims.defineNodeNamesProperty(elementNames, prop, {
+				attr: {
+					set: function(val){
+						if(descs.useContentAttribute){
+							webshims.contentAttr(this, prop, val);
+						} else {
+							this.setAttribute(prop, val);
+						}
+						if(descs.set){
+							descs.set.call(this, true);
+						}
+					},
+					get: function(){
+						var ret = (descs.useContentAttribute) ? webshims.contentAttr(this, prop) : this.getAttribute(prop);
+						return (ret == null) ? undefined : prop;
+					}
+				},
+				removeAttr: {
+					value: function(){
+						this.removeAttribute(prop);
+						if(descs.set){
+							descs.set.call(this, false);
+						}
+					}
+				},
+				reflect: true,
+				propType: 'boolean',
+				initAttr: descs.initAttr || false
+			});
+		},
+		contentAttr: function(elem, name, val){
+			if(!elem.nodeName){return;}
+			var attr;
+			if(val === undefined){
+				attr = (elem.attributes[name] || {});
+				val = attr.specified ? attr.value : null;
+				return (val == null) ? undefined : val;
+			}
+			
+			if(typeof val == 'boolean'){
+				if(!val){
+					elem.removeAttribute(name);
+				} else {
+					elem.setAttribute(name, name);
+				}
+			} else {
+				elem.setAttribute(name, val);
+			}
+		},
+		
+		activeLang: (function(){
+			var curLang = [];
+			var langDatas = [];
+			var loading = {};
+			var load = function(src, obj, loadingLang){
+				obj._isLoading = true;
+				if(loading[src]){
+					loading[src].push(obj);
+				} else {
+					loading[src] = [obj];
+					webshims.loader.loadScript(src, function(){
+						if(loadingLang == curLang.join()){
+							$.each(loading[src], function(i, obj){
+								select(obj);
+							});
+						}
+						delete loading[src];
+					});
+				}
+			};
+			
+			var select = function(obj){
+				var oldLang = obj.__active;
+				var selectLang = function(i, lang){
+					obj._isLoading = false;
+					if(obj[lang] || obj.availableLangs.indexOf(lang) != -1){
+						if(obj[lang]){
+							obj.__active = obj[lang];
+							obj.__activeName = lang;
+						} else {
+							load(obj.langSrc+lang, obj, curLang.join());
+						}
+						return false;
+					}
+				};
+				$.each(curLang, selectLang);
+				if(!obj.__active){
+					obj.__active = obj[''];
+					obj.__activeName = '';
+				}
+				if(oldLang != obj.__active){
+					$(obj).trigger('change');
+				}
+			};
+			return function(lang){
+				var shortLang;
+				if(typeof lang == 'string'){
+					if(curLang[0] != lang){
+						curLang = [lang];
+						shortLang = curLang[0].split('-')[0];
+						if(shortLang && shortLang != lang){
+							curLang.push(shortLang);
+						}
+						langDatas.forEach(select);
+					}
+				} else if(typeof lang == 'object'){
+					if(!lang.__active){
+						langDatas.push(lang);
+						select(lang);
+					}
+					return lang.__active;
+				}
+				return curLang[0];
+			};
+		})()
+	});
+	
+	$.each({
+		defineNodeNamesProperty: 'defineNodeNameProperty',
+		defineNodeNamesProperties: 'defineNodeNameProperties',
+		createElements: 'createElement'
+	}, function(name, baseMethod){
+		webshims[name] = function(names, a, b, c){
+			if(typeof names == 'string'){
+				names = names.split(listReg);
+			}
+			var retDesc = {};
+			names.forEach(function(nodeName){
+				retDesc[nodeName] = webshims[baseMethod](nodeName, a, b, c);
+			});
+			return retDesc;
+		};
+	});
+	
+	webshims.isReady('webshimLocalization', true);
+
+//html5a11y + hidden attribute
+(function(){
+	if(('content' in document.createElement('template'))){return;}
+	
+	$(function(){
+		var main = $('main').attr({role: 'main'});
+		if(main.length > 1){
+			webshims.error('only one main element allowed in document');
+		} else if(main.is('article *, section *')) {
+			webshims.error('main not allowed inside of article/section elements');
+		}
+	});
+	
+	if(('hidden' in document.createElement('a'))){
+		return;
+	}
+	
+	webshims.defineNodeNamesBooleanProperty(['*'], 'hidden');
+	
+	var elemMappings = {
+		article: "article",
+		aside: "complementary",
+		section: "region",
+		nav: "navigation",
+		address: "contentinfo"
+	};
+	var addRole = function(elem, role){
+		var hasRole = elem.getAttribute('role');
+		if (!hasRole) {
+			elem.setAttribute('role', role);
+		}
+	};
+	
+	
+	$.webshims.addReady(function(context, contextElem){
+		$.each(elemMappings, function(name, role){
+			var elems = $(name, context).add(contextElem.filter(name));
+			for (var i = 0, len = elems.length; i < len; i++) {
+				addRole(elems[i], role);
+			}
+		});
+		if (context === document) {
+			var header = document.getElementsByTagName('header')[0];
+			var footers = document.getElementsByTagName('footer');
+			var footerLen = footers.length;
+			
+			if (header && !$(header).closest('section, article')[0]) {
+				addRole(header, 'banner');
+			}
+			if (!footerLen) {
+				return;
+			}
+			var footer = footers[footerLen - 1];
+			if (!$(footer).closest('section, article')[0]) {
+				addRole(footer, 'contentinfo');
+			}
+		}
+	});
+	
+})();
+});
+;webshims.register('track', function($, webshims, window, document, undefined){
+	"use strict";
+	var mediaelement = webshims.mediaelement;
+	var id = new Date().getTime();
+	var ADDBACK = $.fn.addBack ? 'addBack' : 'andSelf';
+	//descriptions are not really shown, but they are inserted into the dom
+	var showTracks = {subtitles: 1, captions: 1, descriptions: 1};
+	var notImplemented = function(){
+		webshims.error('not implemented yet');
+	};
+	var dummyTrack = $('<track />');
+	var supportTrackMod = Modernizr.ES5 && Modernizr.objectAccessor;
+	var createEventTarget = function(obj){
+		var eventList = {};
+		obj.addEventListener = function(name, fn){
+			if(eventList[name]){
+				webshims.error('always use $.on to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
+			}
+			eventList[name] = fn;
+			
+		};
+		obj.removeEventListener = function(name, fn){
+			if(eventList[name] && eventList[name] != fn){
+				webshims.error('always use $.on/$.off to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
+			}
+			if(eventList[name]){
+				delete eventList[name];
+			}
+		};
+		return obj;
+	};
+	
+	var cueListProto = {
+		getCueById: function(id){
+			var cue = null;
+			for(var i = 0, len = this.length; i < len; i++){
+				if(this[i].id === id){
+					cue = this[i];
+					break;
+				}
+			}
+			return cue;
+		}
+	};
+	var numericModes = {
+		0: 'disabled',
+		1: 'hidden',
+		2: 'showing'
+	};
+	
+	var textTrackProto = {
+		shimActiveCues: null,
+		_shimActiveCues: null,
+		activeCues: null,
+		cues: null,
+		kind: 'subtitles',
+		label: '',
+		language: '',
+		id: '',
+		mode: 'disabled',
+		oncuechange: null,
+		toString: function() {
+			return "[object TextTrack]";
+		},
+		addCue: function(cue){
+			if(!this.cues){
+				this.cues = mediaelement.createCueList();
+			} else {
+				var lastCue = this.cues[this.cues.length-1];
+				if(lastCue && lastCue.startTime > cue.startTime){
+					webshims.error("cue startTime higher than previous cue's startTime");
+				}
+			}
+			if(cue.track && cue.track.removeCue){
+				cue.track.removeCue(cue);
+			}
+			cue.track = this;
+			this.cues.push(cue);
+		},
+		//ToDo: make it more dynamic
+		removeCue: function(cue){
+			var cues = this.cues || [];
+			var i = 0;
+			var len = cues.length;
+			if(cue.track != this){
+				webshims.error("cue not part of track");
+				return;
+			}
+			for(; i < len; i++){
+				if(cues[i] === cue){
+					cues.splice(i, 1);
+					cue.track = null;
+					break;
+				}
+			}
+			if(cue.track){
+				webshims.error("cue not part of track");
+				return;
+			}
+		}/*,
+		DISABLED: 'disabled',
+		OFF: 'disabled',
+		HIDDEN: 'hidden',
+		SHOWING: 'showing',
+		ERROR: 3,
+		LOADED: 2,
+		LOADING: 1,
+		NONE: 0*/
+	};
+	var copyProps = ['kind', 'label', 'srclang'];
+	var copyName = {srclang: 'language'};
+	
+	var owns = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
+	
+	var updateMediaTrackList = function(baseData, trackList){
+		var removed = [];
+		var added = [];
+		var newTracks = [];
+		var i, len;
+		if(!baseData){
+			baseData =  webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
+		}
+		
+		if(!trackList){
+			baseData.blockTrackListUpdate = true;
+			trackList = $.prop(this, 'textTracks');
+			baseData.blockTrackListUpdate = false;
+		}
+		
+		clearTimeout(baseData.updateTrackListTimer);
+		
+		$('track', this).each(function(){
+			var track = $.prop(this, 'track');
+			newTracks.push(track);
+			if(trackList.indexOf(track) == -1){
+				added.push(track);
+			}
+		});
+		
+		if(baseData.scriptedTextTracks){
+			for(i = 0, len = baseData.scriptedTextTracks.length; i < len; i++){
+				newTracks.push(baseData.scriptedTextTracks[i]);
+				if(trackList.indexOf(baseData.scriptedTextTracks[i]) == -1){
+					added.push(baseData.scriptedTextTracks[i]);
+				}
+			}
+		}
+		
+		for(i = 0, len = trackList.length; i < len; i++){
+			if(newTracks.indexOf(trackList[i]) == -1){
+				removed.push(trackList[i]);
+			}
+		}
+		
+		if(removed.length || added.length){
+			trackList.splice(0);
+			
+			for(i = 0, len = newTracks.length; i < len; i++){
+				trackList.push(newTracks[i]);
+			}
+			for(i = 0, len = removed.length; i < len; i++){
+				$([trackList]).triggerHandler($.Event({type: 'removetrack', track: removed[i]}));
+			}
+			for(i = 0, len = added.length; i < len; i++){
+				$([trackList]).triggerHandler($.Event({type: 'addtrack', track: added[i]}));
+			}
+			if(baseData.scriptedTextTracks || removed.length){
+				$(this).triggerHandler('updatetrackdisplay');
+			}
+		}
+	};
+	
+	var refreshTrack = function(track, trackData){
+		if(!trackData){
+			trackData = webshims.data(track, 'trackData');
+		}
+		
+		if(trackData && !trackData.isTriggering){
+			trackData.isTriggering = true;
+			setTimeout(function(){
+				$(track).closest('audio, video').triggerHandler('updatetrackdisplay');
+				trackData.isTriggering = false;
+			}, 1);
+		}
+	};
+	var isDefaultTrack = (function(){
+		var defaultKinds = {
+			subtitles: {
+				subtitles: 1,
+				captions: 1
+			},
+			descriptions: {descriptions: 1},
+			chapters: {chapters: 1}
+		};
+		defaultKinds.captions = defaultKinds.subtitles;
+		
+		return function(track){
+			var kind, firstDefaultTrack;
+			var isDefault = $.prop(track, 'default');
+			if(isDefault && (kind = $.prop(track, 'kind')) != 'metadata'){
+				firstDefaultTrack = $(track)
+					.parent()
+					.find('track[default]')
+					.filter(function(){
+						return !!(defaultKinds[kind][$.prop(this, 'kind')]);
+					})[0]
+				;
+				if(firstDefaultTrack != track){
+					isDefault = false;
+					webshims.error('more than one default track of a specific kind detected. Fall back to default = false');
+				}
+			}
+			return isDefault;
+		};
+	})();
+	var emptyDiv = $('<div />')[0];
+	function VTTCue(startTime, endTime, text){
+		if(arguments.length != 3){
+			webshims.error("wrong arguments.length for VTTCue.constructor");
+		}
+		
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.text = text;
+		
+		
+		createEventTarget(this);
+	}
+	
+	VTTCue.prototype = {
+		
+		onenter: null,
+		onexit: null,
+		pauseOnExit: false,
+		getCueAsHTML: function(){
+			var lastText = "";
+			var parsedText = "";
+			var fragment = document.createDocumentFragment();
+			var fn;
+			if(!owns(this, 'getCueAsHTML')){
+				fn = this.getCueAsHTML = function(){
+					var i, len;
+					if(lastText != this.text){
+						lastText = this.text;
+						parsedText = mediaelement.parseCueTextToHTML(lastText);
+						emptyDiv.innerHTML = parsedText;
+						
+						for(i = 0, len = emptyDiv.childNodes.length; i < len; i++){
+							fragment.appendChild(emptyDiv.childNodes[i].cloneNode(true));
+						}
+					}
+					return fragment.cloneNode(true);
+				};
+				
+			}
+			return fn ? fn.apply(this, arguments) : fragment.cloneNode(true);
+		},
+		track: null,
+		
+		
+		id: ''
+		//todo-->
+//			,
+//			snapToLines: true,
+//			line: 'auto',
+//			size: 100,
+//			position: 50,
+//			vertical: '',
+//			align: 'middle'
+	};
+	
+	window.VTTCue = VTTCue;
+	window.TextTrackCue = function(){
+		webshims.error("Use VTTCue constructor instead of abstract TextTrackCue constructor.");
+		VTTCue.apply(this, arguments);
+	};
+
+	window.TextTrackCue.prototype = VTTCue.prototype;
+
+	mediaelement.createCueList = function(){
+		return $.extend([], cueListProto);
+	};
+	
+	mediaelement.parseCueTextToHTML = (function(){
+		var tagSplits = /(<\/?[^>]+>)/ig;
+		var allowedTags = /^(?:c|v|ruby|rt|b|i|u)/;
+		var regEnd = /\<\s*\//;
+		var addToTemplate = function(localName, attribute, tag, html){
+			var ret;
+			if(regEnd.test(html)){
+				ret = '</'+ localName +'>';
+			} else {
+				tag.splice(0, 1);
+				ret =  '<'+ localName +' '+ attribute +'="'+ (tag.join(' ').replace(/\"/g, '&#34;')) +'">';
+			}
+			return ret;
+		};
+		var replacer = function(html){
+			var tag = html.replace(/[<\/>]+/ig,"").split(/[\s\.]+/);
+			if(tag[0]){
+				tag[0] = tag[0].toLowerCase();
+				if(allowedTags.test(tag[0])){
+					if(tag[0] == 'c'){
+						html = addToTemplate('span', 'class', tag, html);
+					} else if(tag[0] == 'v'){
+						html = addToTemplate('q', 'title', tag, html);
+					}
+				} else {
+					html = "";
+				}
+			}
+			return html;
+		};
+		
+		return function(cueText){
+			return cueText.replace(tagSplits, replacer);
+		};
+	})();
+	
+	mediaelement.loadTextTrack = function(mediaelem, track, trackData, _default){
+		var loadEvents = 'play playing';
+		var obj = trackData.track;
+		var load = function(){
+			var error, ajax, createAjax;
+			var src = obj.mode != 'disabled' && ($.attr(track, 'src') && $.prop(track, 'src'));
+
+			if(src){
+				$(mediaelem).off(loadEvents, load).off('updatetrackdisplay', load);
+
+				if(!trackData.readyState){
+					error = function(){
+						trackData.readyState = 3;
+						obj.cues = null;
+						obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = null;
+						$(track).triggerHandler('error');
+					};
+					trackData.readyState = 1;
+					try {
+						obj.cues = mediaelement.createCueList();
+						obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = mediaelement.createCueList();
+						createAjax = function(){
+							ajax = $.ajax({
+								dataType: 'text',
+								url: src,
+								success: function(text){
+									if(ajax.getResponseHeader('content-type') != 'text/vtt'){
+										webshims.error('set the mime-type of your WebVTT files to text/vtt. see: http://dev.w3.org/html5/webvtt/#text/vtt');
+									}
+									mediaelement.parseCaptions(text, obj, function(cues){
+										if(cues && 'length' in cues){
+											trackData.readyState = 2;
+											$(track).triggerHandler('load');
+											$(mediaelem).triggerHandler('updatetrackdisplay');
+										} else {
+											error();
+										}
+									});
+									
+								},
+								error: error
+							});
+						};
+						if($.ajax && $.ajaxSettings.xhr){
+							createAjax();
+						} else {
+							webshims.ready('jajax', createAjax);
+							webshims.loader.loadList(['jajax']);
+						}
+					} catch(er){
+						error();
+						webshims.error(er);
+					}
+				}
+			}
+		};
+		trackData.readyState = 0;
+		obj.shimActiveCues = null;
+		obj._shimActiveCues = null;
+		obj.activeCues = null;
+		obj.cues = null;
+
+		$(mediaelem).on(loadEvents, load);
+		if(_default){
+			obj.mode = showTracks[obj.kind] ? 'showing' : 'hidden';
+			webshims.ready('WINDOWLOAD', load);
+		} else {
+			webshims.ready('WINDOWLOAD', function(){
+				$(mediaelem).on('updatetrackdisplay', load);
+			});
+		}
+	};
+	
+	mediaelement.createTextTrack = function(mediaelem, track){
+		var obj, trackData;
+		if(track.nodeName){
+			trackData = webshims.data(track, 'trackData');
+			
+			if(trackData){
+				refreshTrack(track, trackData);
+				obj = trackData.track;
+			}
+		}
+		
+		if(!obj){
+			obj = createEventTarget(webshims.objectCreate(textTrackProto));
+			
+			if(!supportTrackMod){
+				copyProps.forEach(function(copyProp){
+					var prop = $.prop(track, copyProp);
+					if(prop){
+						obj[copyName[copyProp] || copyProp] = prop;
+					}
+				});
+			}
+			
+			
+			if(track.nodeName){
+				if(supportTrackMod){
+					copyProps.forEach(function(copyProp){
+						webshims.defineProperty(obj, copyName[copyProp] || copyProp, {
+							get: function(){
+								return $.prop(track, copyProp);
+							}
+						});
+					});
+				}
+				obj.id = $(track).prop('id');
+				trackData = webshims.data(track, 'trackData', {track: obj});
+				mediaelement.loadTextTrack(mediaelem, track, trackData, isDefaultTrack(track));
+			} else {
+				if(supportTrackMod){
+					copyProps.forEach(function(copyProp){
+						webshims.defineProperty(obj, copyName[copyProp] || copyProp, {
+							value: track[copyProp],
+							writeable: false
+						});
+					});
+				}
+				obj.cues = mediaelement.createCueList();
+				obj.activeCues = obj._shimActiveCues = obj.shimActiveCues = mediaelement.createCueList();
+				obj.mode = 'hidden';
+				obj.readyState = 2;
+			}
+			if(obj.kind == 'subtitles' && !obj.language){
+				webshims.error('you must provide a language for track in subtitles state');
+			}
+			obj.__wsmode = obj.mode;
+		}
+		
+		return obj;
+	};
+	
+	
+/*
+taken from:
+Captionator 0.5.1 [CaptionCrunch]
+Christopher Giffard, 2011
+Share and enjoy
+
+https://github.com/cgiffard/Captionator
+
+modified for webshims
+*/
+	mediaelement.parseCaptionChunk = (function(){
+		// Set up timestamp parsers
+		var WebVTTTimestampParser			= /^(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s+\-\-\>\s+(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s*(.*)/;
+		var WebVTTDEFAULTSCueParser		= /^(DEFAULTS|DEFAULT)\s+\-\-\>\s+(.*)/g;
+		var WebVTTSTYLECueParser		= /^(STYLE|STYLES)\s+\-\-\>\s*\n([\s\S]*)/g;
+		var WebVTTCOMMENTCueParser		= /^(COMMENT|COMMENTS)\s+\-\-\>\s+(.*)/g;
+		
+		return function(subtitleElement,objectCount){
+
+			var subtitleParts, timeIn, timeOut, html, timeData, subtitlePartIndex, id, specialCueData;
+			var timestampMatch, tmpCue;
+
+			// WebVTT Special Cue Logic
+			if (WebVTTDEFAULTSCueParser.exec(subtitleElement)) {
+//				cueDefaults = specialCueData.slice(2).join("");
+//				cueDefaults = cueDefaults.split(/\s+/g).filter(function(def) { return def && !!def.length; });
+				return null;
+			} else if ((specialCueData = WebVTTSTYLECueParser.exec(subtitleElement))) {
+				return null;
+			} else if ((specialCueData = WebVTTCOMMENTCueParser.exec(subtitleElement))) {
+				return null; // At this stage, we don't want to do anything with these.
+			}
+			
+			subtitleParts = subtitleElement.split(/\n/g);
+		
+			// Trim off any blank lines (logically, should only be max. one, but loop to be sure)
+			while (!subtitleParts[0].replace(/\s+/ig,"").length && subtitleParts.length > 0) {
+				subtitleParts.shift();
+			}
+		
+			if (subtitleParts[0].match(/^\s*[a-z0-9-\_]+\s*$/ig)) {
+				// The identifier becomes the cue ID (when *we* load the cues from file. Programatically created cues can have an ID of whatever.)
+				id = String(subtitleParts.shift().replace(/\s*/ig,""));
+			}
+		
+			for (subtitlePartIndex = 0; subtitlePartIndex < subtitleParts.length; subtitlePartIndex ++) {
+				var timestamp = subtitleParts[subtitlePartIndex];
+				
+				if ((timestampMatch = WebVTTTimestampParser.exec(timestamp))) {
+					
+					// WebVTT
+					
+					timeData = timestampMatch.slice(1);
+					
+					timeIn =	parseInt((timeData[0]||0) * 60 * 60,10) +	// Hours
+								parseInt((timeData[1]||0) * 60,10) +		// Minutes
+								parseInt((timeData[2]||0),10) +				// Seconds
+								parseFloat("0." + (timeData[3]||0));		// MS
+					
+					timeOut =	parseInt((timeData[4]||0) * 60 * 60,10) +	// Hours
+								parseInt((timeData[5]||0) * 60,10) +		// Minutes
+								parseInt((timeData[6]||0),10) +				// Seconds
+								parseFloat("0." + (timeData[7]||0));		// MS
+/*
+					if (timeData[8]) {
+						cueSettings = timeData[8];
+					}
+*/
+				}
+				
+				// We've got the timestamp - return all the other unmatched lines as the raw subtitle data
+				subtitleParts = subtitleParts.slice(0,subtitlePartIndex).concat(subtitleParts.slice(subtitlePartIndex+1));
+				break;
+			}
+
+			if (!timeIn && !timeOut) {
+				// We didn't extract any time information. Assume the cue is invalid!
+				webshims.warn("couldn't extract time information: "+[timeIn, timeOut, subtitleParts.join("\n"), id].join(' ; '));
+				return null;
+			}
+/*
+			// Consolidate cue settings, convert defaults to object
+			var compositeCueSettings =
+				cueDefaults
+					.reduce(function(previous,current,index,array){
+						previous[current.split(":")[0]] = current.split(":")[1];
+						return previous;
+					},{});
+			
+			// Loop through cue settings, replace defaults with cue specific settings if they exist
+			compositeCueSettings =
+				cueSettings
+					.split(/\s+/g)
+					.filter(function(set) { return set && !!set.length; })
+					// Convert array to a key/val object
+					.reduce(function(previous,current,index,array){
+						previous[current.split(":")[0]] = current.split(":")[1];
+						return previous;
+					},compositeCueSettings);
+			
+			// Turn back into string like the VTTCue constructor expects
+			cueSettings = "";
+			for (var key in compositeCueSettings) {
+				if (compositeCueSettings.hasOwnProperty(key)) {
+					cueSettings += !!cueSettings.length ? " " : "";
+					cueSettings += key + ":" + compositeCueSettings[key];
+				}
+			}
+*/
+			// The remaining lines are the subtitle payload itself (after removing an ID if present, and the time);
+			html = subtitleParts.join("\n");
+			tmpCue = new VTTCue(timeIn, timeOut, html);
+			if(id){
+				tmpCue.id = id;
+			}
+			return tmpCue;
+		};
+	})();
+	
+	mediaelement.parseCaptions = function(captionData, track, complete) {
+
+		var cue, lazyProcess, regWevVTT, startDate, isWEBVTT;
+
+		mediaelement.createCueList();
+		if (captionData) {
+			
+			regWevVTT = /^WEBVTT(\s*FILE)?/ig;
+			
+			lazyProcess = function(i, len){
+				
+				for(; i < len; i++){
+					cue = captionData[i];
+					if(regWevVTT.test(cue)){
+						isWEBVTT = true;
+					} else if(cue.replace(/\s*/ig,"").length){
+						if(!isWEBVTT){
+							webshims.error('please use WebVTT format. This is the standard');
+							complete(null);
+							break;
+						}
+						cue = mediaelement.parseCaptionChunk(cue, i);
+						if(cue){
+							track.addCue(cue);
+						}
+					}
+					if(startDate < (new Date().getTime()) - 30){
+						i++;
+						setTimeout(function(){
+							startDate = new Date().getTime();
+							lazyProcess(i, len);
+						}, 90);
+						
+						break;
+					}
+				}
+				if(i >= len){
+					if(!isWEBVTT){
+						webshims.error('please use WebVTT format. This is the standard');
+					}
+					complete(track.cues);
+				}
+			};
+			
+			captionData = captionData.replace(/\r\n/g,"\n");
+			
+			setTimeout(function(){
+				captionData = captionData.replace(/\r/g,"\n");
+				setTimeout(function(){
+					startDate = new Date().getTime();
+					captionData = captionData.split(/\n\n+/g);
+					lazyProcess(0, captionData.length);
+				}, 9);
+			}, 9);
+			
+		} else {
+			webshims.error("Required parameter captionData not supplied.");
+		}
+	};
+	
+	
+	mediaelement.createTrackList = function(mediaelem, baseData){
+		baseData = baseData || webshims.data(mediaelem, 'mediaelementBase') || webshims.data(mediaelem, 'mediaelementBase', {});
+		if(!baseData.textTracks){
+			baseData.textTracks = [];
+			webshims.defineProperties(baseData.textTracks, {
+				onaddtrack: {value: null},
+				onremovetrack: {value: null},
+				onchange: {value: null},
+				getTrackById: {
+					value: function(id){
+						var track = null;
+						for(var i = 0; i < baseData.textTracks.length; i++){
+							if(id == baseData.textTracks[i].id){
+								track = baseData.textTracks[i];
+								break;
+							}
+						}
+						return track;
+					}
+				}
+			});
+			createEventTarget(baseData.textTracks);
+			$(mediaelem).on('updatetrackdisplay', function(){
+				var track;
+				for(var i = 0; i < baseData.textTracks.length; i++){
+					track = baseData.textTracks[i];
+					if(track.__wsmode != track.mode){
+						track.__wsmode = track.mode;
+						$([ baseData.textTracks ]).triggerHandler('change');
+					}
+				}
+			});
+			
+		}
+		return baseData.textTracks;
+	};
+	
+	if(!Modernizr.track){
+		webshims.defineNodeNamesBooleanProperty(['track'], 'default');
+		webshims.reflectProperties(['track'], ['srclang', 'label']);
+		
+		webshims.defineNodeNameProperties('track', {
+			src: {
+				//attr: {},
+				reflect: true,
+				propType: 'src'
+			}
+		});
+	}
+	
+	webshims.defineNodeNameProperties('track', {
+		kind: {
+			attr: Modernizr.track ? {
+				set: function(value){
+					var trackData = webshims.data(this, 'trackData');
+					this.setAttribute('data-kind', value);
+					if(trackData){
+						trackData.attrKind = value;
+					}
+				},
+				get: function(){
+					var trackData = webshims.data(this, 'trackData');
+					if(trackData && ('attrKind' in trackData)){
+						return trackData.attrKind;
+					}
+					return this.getAttribute('kind');
+				}
+			} : {},
+			reflect: true,
+			propType: 'enumarated',
+			defaultValue: 'subtitles',
+			limitedTo: ['subtitles', 'captions', 'descriptions', 'chapters', 'metadata']
+		}
+	});
+	
+	$.each(copyProps, function(i, copyProp){
+		var name = copyName[copyProp] || copyProp;
+		webshims.onNodeNamesPropertyModify('track', copyProp, function(){
+			var trackData = webshims.data(this, 'trackData');
+			var track = this;
+			if(trackData){
+				if(copyProp == 'kind'){
+					refreshTrack(this, trackData);
+				}
+				if(!supportTrackMod){
+					trackData.track[name] = $.prop(this, copyProp);
+				}
+			}
+		});
+	});		
+	
+	
+	webshims.onNodeNamesPropertyModify('track', 'src', function(val){
+		if(val){
+			var data = webshims.data(this, 'trackData');
+			var media;
+			if(data){
+				media = $(this).closest('video, audio');
+				if(media[0]){
+					mediaelement.loadTextTrack(media, this, data);
+				}
+			}
+		}
+		
+	});
+	
+	//
+	
+	webshims.defineNodeNamesProperties(['track'], {
+		ERROR: {
+			value: 3
+		},
+		LOADED: {
+			value: 2
+		},
+		LOADING: {
+			value: 1
+		},
+		NONE: {
+			value: 0
+		},
+		readyState: {
+			get: function(){
+				return (webshims.data(this, 'trackData') || {readyState: 0}).readyState;
+			},
+			writeable: false
+		},
+		track: {
+			get: function(){
+				return mediaelement.createTextTrack($(this).closest('audio, video')[0], this);
+			},
+			writeable: false
+		}
+	}, 'prop');
+	
+	webshims.defineNodeNamesProperties(['audio', 'video'], {
+		textTracks: {
+			get: function(){
+				var media = this;
+				var baseData = webshims.data(media, 'mediaelementBase') || webshims.data(media, 'mediaelementBase', {});
+				var tracks = mediaelement.createTrackList(media, baseData);
+				if(!baseData.blockTrackListUpdate){
+					updateMediaTrackList.call(media, baseData, tracks);
+				}
+				return tracks;
+			},
+			writeable: false
+		},
+		addTextTrack: {
+			value: function(kind, label, lang){
+				var textTrack = mediaelement.createTextTrack(this, {
+					kind: dummyTrack.prop('kind', kind || '').prop('kind'),
+					label: label || '',
+					srclang: lang || ''
+				});
+				var baseData = webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
+				if (!baseData.scriptedTextTracks) {
+					baseData.scriptedTextTracks = [];
+				}
+				baseData.scriptedTextTracks.push(textTrack);
+				updateMediaTrackList.call(this);
+				return textTrack;
+			}
+		}
+	}, 'prop');
+
+	//wsmediareload
+	var thUpdateList = function(e){
+		if($(e.target).is('audio, video')){
+			var baseData = webshims.data(e.target, 'mediaelementBase');
+			if(baseData){
+				clearTimeout(baseData.updateTrackListTimer);
+				baseData.updateTrackListTimer = setTimeout(function(){
+					updateMediaTrackList.call(e.target, baseData);
+				}, 0);
+			}
+		}
+	};
+	
+	var getNativeReadyState = function(trackElem, textTrack){
+		return textTrack.readyState || trackElem.readyState;
+	};
+	var stopOriginalEvent = function(e){
+		if(e.originalEvent){
+			e.stopImmediatePropagation();
+		}
+	};
+	var hideNativeTracks = function(){
+		if(webshims.implement(this, 'track')){
+			var kind;
+			var origTrack = this.track;
+			if(origTrack){
+
+				if (!webshims.bugs.track && (origTrack.mode || getNativeReadyState(this, origTrack))) {
+					$.prop(this, 'track').mode = numericModes[origTrack.mode] || origTrack.mode;
+				}
+				//disable track from showing + remove UI
+				kind = $.prop(this, 'kind');
+				origTrack.mode = (typeof origTrack.mode == 'string') ? 'disabled' : 0;
+				this.kind = 'metadata';
+
+				$(this).attr({kind: kind});
+				
+			}
+			$(this).on('load error', stopOriginalEvent);
+		}
+	};
+
+	webshims.addReady(function(context, insertedElement){
+		var insertedMedia = insertedElement.filter('video, audio, track').closest('audio, video');
+		$('video, audio', context)
+			.add(insertedMedia)
+			.each(function(){
+				updateMediaTrackList.call(this);
+			})
+			.on('emptied updatetracklist wsmediareload', thUpdateList)
+			.each(function(){
+				if(Modernizr.track){
+					var shimedTextTracks = $.prop(this, 'textTracks');
+					var origTextTracks = this.textTracks;
+
+					if(shimedTextTracks.length != origTextTracks.length){
+						webshims.warn("textTracks couldn't be copied");
+					}
+					
+					$('track', this).each(hideNativeTracks);
+				}
+			})
+		;
+
+		insertedMedia.each(function(){
+			var media = this;
+			var baseData = webshims.data(media, 'mediaelementBase');
+			if(baseData){
+				clearTimeout(baseData.updateTrackListTimer);
+				baseData.updateTrackListTimer = setTimeout(function(){
+					updateMediaTrackList.call(media, baseData);
+				}, 9);
+			}
+		});
+	});
+	
+	if(Modernizr.texttrackapi){
+		$('video, audio').trigger('trackapichange');
+	}
+});

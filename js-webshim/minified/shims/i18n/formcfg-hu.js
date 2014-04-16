@@ -1,1 +1,65 @@
-webshims.validityMessages.hu={typeMismatch:{email:"\xcdrjon be egy e-mail c\xedmet.",url:"\xcdrjon be egy URL-t."},badInput:{number:"\xc9rv\xe9nytelen \xe9rt\xe9k.",date:"\xc9rv\xe9nytelen \xe9rt\xe9k.",time:"\xc9rv\xe9nytelen \xe9rt\xe9k.",range:"\xc9rv\xe9nytelen \xe9rt\xe9k.","datetime-local":"\xc9rv\xe9nytelen \xe9rt\xe9k."},tooLong:"\xc9rv\xe9nytelen \xe9rt\xe9k.",patternMismatch:"A k\xe9rt form\xe1tumban adja meg az adatot: {%title}.",valueMissing:{defaultMessage:"T\xf6ltse ki ezt a mez\u0151t.",checkbox:"Jel\xf6lje be ezt a n\xe9gyzetet a folytat\xe1shoz.",select:"Jel\xf6lj\xf6n ki egy elemet a list\xe1b\xf3l.",radio:"Jel\xf6lj\xf6n ki egyet a lehet\u0151s\xe9gek k\xf6z\xfcl."},rangeUnderflow:{defaultMessage:"Az \xe9rt\xe9k legyen nagyobb vagy egyenl\u0151, mint {%min}.",date:"Az \xe9rt\xe9k legyen nagyobb vagy egyenl\u0151, mint {%min}.",time:"Az \xe9rt\xe9k legyen nagyobb vagy egyenl\u0151, mint {%min}.","datetime-local":"Az \xe9rt\xe9k legyen nagyobb vagy egyenl\u0151, mint {%min}."},rangeOverflow:{defaultMessage:"Az \xe9rt\xe9k legyen kisebb vagy egyenl\u0151, mint {%max}.",date:"Az \xe9rt\xe9k legyen kisebb vagy egyenl\u0151, mint {%max}.",time:"Az \xe9rt\xe9k legyen kisebb vagy egyenl\u0151, mint {%max}.","datetime-local":"Az \xe9rt\xe9k legyen kisebb vagy egyenl\u0151, mint {%max}."},stepMismatch:"\xc9rv\xe9nytelen \xe9rt\xe9k."},webshims.formcfg.hu={numberFormat:{".":".",",":","},numberSigns:".",dateSigns:".",timeSigns:":. ",dFormat:".",patterns:{d:"yy.mm.dd"},date:{closeText:"bez\xe1r",prevText:"vissza",nextText:"el\u0151re",currentText:"ma",monthNames:["Janu\xe1r","Febru\xe1r","M\xe1rcius","\xc1prilis","M\xe1jus","J\xfanius","J\xfalius","Augusztus","Szeptember","Okt\xf3ber","November","December"],monthNamesShort:["Jan","Feb","M\xe1r","\xc1pr","M\xe1j","J\xfan","J\xfal","Aug","Szep","Okt","Nov","Dec"],dayNames:["Vas\xe1rnap","H\xe9tf\u0151","Kedd","Szerda","Cs\xfct\xf6rt\xf6k","P\xe9ntek","Szombat"],dayNamesShort:["Vas","H\xe9t","Ked","Sze","Cs\xfc","P\xe9n","Szo"],dayNamesMin:["V","H","K","Sze","Cs","P","Szo"],weekHeader:"H\xe9t",firstDay:1,isRTL:!1,showMonthAfterYear:!0,yearSuffix:""}};
+webshims.validityMessages.hu = {
+	"typeMismatch": {
+		"email": "Írjon be egy e-mail címet.",
+		"url": "Írjon be egy URL-t."
+	},
+	"badInput": {
+		"number": "Érvénytelen érték.",
+		"date": "Érvénytelen érték.",
+		"time": "Érvénytelen érték.",
+		"range": "Érvénytelen érték.",
+		"datetime-local": "Érvénytelen érték."
+	},
+	"tooLong": "Érvénytelen érték.",
+	"patternMismatch": "A kért formátumban adja meg az adatot: {%title}.",
+	"valueMissing": {
+		"defaultMessage": "Töltse ki ezt a mezőt.",
+		"checkbox": "Jelölje be ezt a négyzetet a folytatáshoz.",
+		"select": "Jelöljön ki egy elemet a listából.",
+		"radio": "Jelöljön ki egyet a lehetőségek közül."
+	},
+	"rangeUnderflow": {
+		"defaultMessage": "Az érték legyen nagyobb vagy egyenlő, mint {%min}.",
+		"date": "Az érték legyen nagyobb vagy egyenlő, mint {%min}.",
+		"time": "Az érték legyen nagyobb vagy egyenlő, mint {%min}.",
+		"datetime-local": "Az érték legyen nagyobb vagy egyenlő, mint {%min}."
+	},
+	"rangeOverflow": {
+		"defaultMessage": "Az érték legyen kisebb vagy egyenlő, mint {%max}.",
+		"date": "Az érték legyen kisebb vagy egyenlő, mint {%max}.",
+		"time": "Az érték legyen kisebb vagy egyenlő, mint {%max}.",
+		"datetime-local": "Az érték legyen kisebb vagy egyenlő, mint {%max}."
+	},
+	"stepMismatch": "Érvénytelen érték."
+};
+webshims.formcfg.hu = {
+	numberFormat: {
+		".": ".",
+		",": ","
+	},
+	numberSigns: '.',
+	dateSigns: '.',
+	timeSigns: ":. ",
+	dFormat: ".",
+	patterns: {
+		d: 'yy.mm.dd'
+	},
+	date: {
+		closeText: 'bezár',
+		prevText: 'vissza',
+		nextText: 'előre',
+		currentText: 'ma',
+		monthNames: ['Január', 'Február', 'Március', 'Április', 'Május', 'Június',
+		'Július', 'Augusztus', 'Szeptember', 'Október', 'November', 'December'],
+		monthNamesShort: ['Jan', 'Feb', 'Már', 'Ápr', 'Máj', 'Jún',
+		'Júl', 'Aug', 'Szep', 'Okt', 'Nov', 'Dec'],
+		dayNames: ['Vasárnap', 'Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat'],
+		dayNamesShort: ['Vas', 'Hét', 'Ked', 'Sze', 'Csü', 'Pén', 'Szo'],
+		dayNamesMin: ['V', 'H', 'K', 'Sze', 'Cs', 'P', 'Szo'],
+		weekHeader: 'Hét',
+		firstDay: 1,
+		isRTL: false,
+		showMonthAfterYear: true,
+		yearSuffix: ''
+	}
+};

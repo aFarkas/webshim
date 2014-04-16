@@ -129,8 +129,8 @@
 	
 	<script>
 		//polute unknown elements prototype with some used props currently output[value]
-		jQuery.webshims.ready('dom-extend', function($){
-			$.webshims.defineNodeNameProperty('foobar', 'value', {
+		webshims.ready('dom-extend', function($){
+			webshims.defineNodeNameProperty('foobar', 'value', {
 				prop: {
 					get: function(){
 						return 'jo da foobar';
