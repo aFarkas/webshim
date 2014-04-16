@@ -29,11 +29,11 @@
 				width: 100%;
 			}
 
-			.touch .mediaplayer {
+			.touchevents .mediaplayer {
 				font-size: 24px;
 			}
 
-			@media (pointer:coarse), (-moz-touch-enabled) {
+			@media (pointer:coarse), (-moz-touch-enabled), (-webkit-touch-enabled), (touch-enabled) {
 				.mediaplayer {
 					font-size: 24px;
 				}
@@ -87,7 +87,11 @@
 
 			webshims.polyfill('mediaelement');
 		</script>
-
+		<script>
+			if('ontouchstart' in window){
+				$('html').addClass('touchevents');
+			}
+		</script>
 		<script>
 			webshims.ready('playlist', function(){
 				var playlist = $('.mediaplayer')
@@ -176,11 +180,11 @@ webshims.polyfill('mediaelement');
 		width: 100%;
 	}
 
-	.touch .mediaplayer {
+	.touchevents .mediaplayer {
 		font-size: 24px;
 	}
 
-	@media (pointer:coarse), (-moz-touch-enabled) {
+	@media (pointer:coarse), (touch-enabled), (-moz-touch-enabled), (-webkit-touch-enabled) {
 		.mediaplayer {
 			font-size: 24px;
 		}
@@ -193,7 +197,9 @@ webshims.polyfill('mediaelement');
 &lt;/script&gt;
 
 &lt;div class="mediaplayer"&gt;
-	&lt;video poster="poster.jpg" src="http://www.youtube.com/watch?v=siOHh0uzcuY&vq=large"&gt;
+	&lt;video poster="poster.jpg" controls="" preload="none"&gt;
+		&lt;source src="my-video.mp4" type="video/mp4" /&gt;
+		&lt;source src="my-video.webm" /&gt;
 	&lt;/video&gt;
 &lt;/div&gt;
 </code></pre>
@@ -237,13 +243,17 @@ webshims.ready('playlist', function(){
 	*
 	* and returns the constructed playlist
 	*
-	* var playlist = $('.mediaplayer').eq(0).jmeFn('path-to-rss-fee.xml', {showcontrols: true, autoplay: true});
+	* var playlist = $('.mediaplayer').eq(0).jmeFn('addPlaylist', 'path-to-rss-fee.xml', {showcontrols: true, autoplay: true});
 	*/
 
 	//The Playlist in this site is done with the following code:
 	var playlist = $('.mediaplayer')
 		.eq(0)
-		.jmeFn('mediaelement/playlist.json', {showcontrols: true, autoplay: true, ajax: {dataType: 'json'}})
+		.jmeFn('addPlaylist', 'mediaelement/playlist.json', {
+			showcontrols: true,
+			autoplay: true,
+			ajax: {dataType: 'json'}
+		})
 	;
 
 	playlist.render(function($playlist, $player){

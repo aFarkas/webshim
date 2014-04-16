@@ -167,7 +167,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				$.jme.data(this, $.extend(true, {}, opts));
 			}
 
-			var mediaUpdateFn, canPlay, removeCanPlay, canplayTimer, lastState;
+			var mediaUpdateFn, canPlay, removeCanPlay, canplayTimer, lastState, stopEmptiedEvent;
 			var media = $('audio, video', this).eq(0);
 			var base = $(this);
 
@@ -195,6 +195,10 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					removeCanPlay();
 
 					if(unwaitingEvents[state] && lastState != 'waiting'){
+						return;
+					}
+
+					if(stopEmptiedEvent && state == 'emptied'){
 						return;
 					}
 
@@ -243,15 +247,22 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				media
 					.on('ended emptied play', (function(){
 						var timer;
+						var releaseEmptied = function(){
+							stopEmptiedEvent = false;
+						};
 						var ended = function(){
 							removeCanPlay();
 							media.jmeFn('pause');
 							if(!options.noReload && media.prop('ended') && media.prop('paused') && !media.prop('autoplay') && !media.prop('loop') && !media.hasClass('no-reload')){
+								stopEmptiedEvent = true;
 								media.jmeFn('load');
 								base.attr('data-state', 'ended');
+								setTimeout(releaseEmptied);
+
 							}
 						};
 						return function(e){
+
 							clearTimeout(timer);
 							if(e.type == 'ended' && !options.noReload && !media.prop('autoplay') && !media.prop('loop') && !media.hasClass('no-reload')){
 								timer = setTimeout(ended);

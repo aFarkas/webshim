@@ -1983,8 +1983,9 @@ modified for webshims
 				if(Modernizr.track){
 					var shimedTextTracks = $.prop(this, 'textTracks');
 					var origTextTracks = this.textTracks;
+
 					if(shimedTextTracks.length != origTextTracks.length){
-						webshims.error("textTracks couldn't be copied");
+						webshims.warn("textTracks couldn't be copied");
 					}
 					
 					$('track', this).each(hideNativeTracks);

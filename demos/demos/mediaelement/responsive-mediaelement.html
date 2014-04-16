@@ -4,17 +4,20 @@
 <head>
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	<meta name="viewport" content="width=device-width" />
 	
 	<style>
 		html,
 		body {
 			background: #000;
+			margin: 0;
+			padding: 0;
 		}
 
 		.wrapper {
 			position: relative;
 			margin: 15px auto;
-			min-width: 320px;
+			min-width: 300px;
 			max-width: 980px;
 			width: 80%;
 			background: rgba(255, 255, 255, 0.6);
@@ -23,12 +26,30 @@
 			z-index: 9;
 		}
 
+
+		@media (max-width: 400px){
+			.wrapper {
+				padding: 3px;
+			}
+		}
+
 		video {
 			display: inline-block;
 			width: 100%;
 		}
 		.mediaplayer {
 			width: 100%;
+		}
+
+
+		.touchevents .mediaplayer {
+			font-size: 24px;
+		}
+
+		@media (pointer:coarse), (touch-enabled), (-moz-touch-enabled), (-webkit-touch-enabled) {
+			.mediaplayer {
+				font-size: 24px;
+			}
 		}
 
 		.button-row button {
@@ -79,7 +100,11 @@
 		webshims.setOptions('mediaelement', {replaceUI: 'auto'});
 		webshims.polyfill('mediaelement');
 	</script>
-
+	<script>
+		if('ontouchstart' in window){
+			$('html').addClass('touchevents');
+		}
+	</script>
 	<title>Responsive Video with custom styleable controls with webshims</title>
 	<script>
 

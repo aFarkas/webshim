@@ -104,19 +104,30 @@
   .jme-cb-box .volume-container {
     padding-left: 0.0625em; }
 
-[data-playersize="x-small"] > .jme-controlbar {
+[data-playersize="x-small"] > .jme-controlbar,
+[data-playersize="xx-small"] > .jme-controlbar {
   padding-top: 0.25em; }
-  [data-playersize="x-small"] > .jme-controlbar .time-slider {
+  [data-playersize="x-small"] > .jme-controlbar .time-slider,
+  [data-playersize="xx-small"] > .jme-controlbar .time-slider {
     position: absolute;
     top: -0.125em;
     left: 0;
     right: 0; }
-  [data-playersize="x-small"] > .jme-controlbar .progress-container {
+  [data-playersize="x-small"] > .jme-controlbar .progress-container,
+  [data-playersize="xx-small"] > .jme-controlbar .progress-container {
     width: auto; }
-    [data-playersize="x-small"] > .jme-controlbar .progress-container:before {
+    [data-playersize="x-small"] > .jme-controlbar .progress-container:before,
+    [data-playersize="xx-small"] > .jme-controlbar .progress-container:before {
       content: "/"; }
-  [data-playersize="x-small"] > .jme-controlbar .duration-container {
+  [data-playersize="x-small"] > .jme-controlbar .duration-container,
+  [data-playersize="xx-small"] > .jme-controlbar .duration-container {
     width: 100%; }
+
+[data-playersize="xx-small"] > .jme-controlbar .progress-container:before {
+  content: ""; }
+[data-playersize="xx-small"] > .jme-controlbar .duration-display,
+[data-playersize="xx-small"] > .jme-controlbar .volume-container {
+  display: none; }
 
 .mediaplayer {
   position: relative;
@@ -139,7 +150,8 @@
   background: none;
   padding: 0;
   border: 0;
-  font-size: inherit; }
+  font-size: inherit;
+  outline: none; }
 .mediaplayer button::-moz-focus-inner {
   padding: 0;
   border: 0; }
@@ -167,6 +179,8 @@
   font-size: 350%; }
 .mediaplayer[data-playersize="x-small"] > .jme-media-overlay {
   font-size: 300%; }
+.mediaplayer[data-playersize="xx-small"] > .jme-media-overlay {
+  font-size: 240%; }
 .mediaplayer[data-state="idle"] {
   cursor: pointer; }
 .mediaplayer[data-state="ended"] {

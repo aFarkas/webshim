@@ -5,15 +5,22 @@
 			{"src": "http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.m4v", "type": "video/mp4"},
 			"http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.ogg"
 		],
-		"poster": ""
+		"poster": "http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.gif"
 	},
 	{
 		"title": "Sintel",
+		"description": "This item has a description and some subtitles",
 		"srces": [
 			{"src": "http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v", "type": "video/mp4"},
 			{"src": "http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm", "type": "video/webm"}
 		],
-		"poster": "http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg"
+		"poster": "http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg",
+		"tracks": [
+			{"src": "mediaelement/sintel-trailer_en.vtt", "srclang": "en", "label": "English subtitles"},
+			{"src": "mediaelement/sintel-trailer_de.vtt", "srclang": "de", "label": "German subtitles"},
+			{"src": "mediaelement/sintel-trailer_es.vtt", "srclang": "es", "label": "Spain subtitles"},
+			{"src": "mediaelement/sintel-trailer_fr.vtt", "srclang": "fr", "label": "French subtitles"}
+		]
 	},
 	{
 		"title": "yayQuery - Episode 23 | When Things Are Things",

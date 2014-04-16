@@ -108,6 +108,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 					playerSize = (function(){
 						var lastSize;
 						var sizes = [
+							{size: 290, name: 'xx-small'},
 							{size: 380, name: 'x-small'},
 							{size: 490, name: 'small'},
 							{size: 756, name: 'medium'},
@@ -119,12 +120,16 @@ webshims.register('mediacontrols', function($, webshims, window){
 							var size = 'x-large';
 							var i = 0;
 							var width = data.player.outerWidth();
+							var fSize = Math.max(parseInt(data.player.css('fontSize'), 10) || 16, 13);
+
+							width = width *  (16 / fSize);
 							for(; i < len; i++){
 								if(sizes[i].size >= width){
 									size = sizes[i].name;
 									break;
 								}
 							}
+
 							if(lastSize != size){
 								lastSize = size;
 								data.player.attr('data-playersize', size);
