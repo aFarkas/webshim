@@ -820,6 +820,7 @@
 	options.addZero = addZero;
 	webshims.loader.addModule('forms-picker', {
 		noAutoCallback: true,
+		css: 'styles/forms-picker.css',
 		options: options
 	});
 	webshims.loader.addModule('color-picker', {

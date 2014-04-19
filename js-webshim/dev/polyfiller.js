@@ -895,7 +895,8 @@
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
 	addPolyfill('es5', {
 		test: !!(Modernizr.ES5 && Function.prototype.bind),
-		c: [18, 19, 25, 20, 32]
+		c: [18, 19, 25, 20, 32],
+		d: ['sizzle']
 	});
 	
 	addPolyfill('dom-extend', {
@@ -1157,11 +1158,9 @@
 	//>
 	
 	//<details
-	if(!('details' in Modernizr)){
-		addTest('details', function(){
-			return ('open' in document.createElement('details'));
-		});
-	}
+	addTest('details', function(){
+		return ('open' in document.createElement('details'));
+	});
 	addPolyfill('details', {
 		test: Modernizr.details,
 		d: [DOMSUPPORT],

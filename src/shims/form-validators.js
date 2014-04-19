@@ -26,21 +26,28 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 	};
 	
 	webshims.customErrorMessages = {};
-	webshims.addCustomValidityRule = function(name, test, defaultMessage){
-		customValidityRules[name] = test;
-		if(!webshims.customErrorMessages[name]){
-			webshims.customErrorMessages[name] = [];
-			webshims.customErrorMessages[name][''] = defaultMessage || name;
-		}
-		if(formReady){
+	webshims.addCustomValidityRule = (function(){
+		var timer;
+		var reTest = function(){
 			$('input, select, textarea, fieldset[data-dependent-validation]')
 				.filter(noValidate)
 				.each(function(){
 					testValidityRules(this);
 				})
 			;
-		}
-	};
+		};
+		return function(name, test, defaultMessage){
+			customValidityRules[name] = test;
+			if(!webshims.customErrorMessages[name]){
+				webshims.customErrorMessages[name] = [];
+				webshims.customErrorMessages[name][''] = defaultMessage || name;
+			}
+			if(formReady){
+				clearTimeout(timer);
+				timer = setTimeout(reTest);
+			}
+		};
+	})();
 	webshims.refreshCustomValidityRules = function(elem){
 		if(!initTest){return;}
 		var val, setMessage;
@@ -132,7 +139,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 				formReady = true;
 			});
 			$(document).on('refreshCustomValidityRules', onEventTest);
-		}, 9);
+		}, 29);
 		
 	});
 	

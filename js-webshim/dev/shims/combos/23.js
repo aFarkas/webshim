@@ -238,7 +238,6 @@ webshims.isReady('swfmini', true);
 
 	var wsCfg = webshims.cfg;
 	var options = wsCfg.mediaelement;
-	var hasFullTrackSupport;
 	var hasSwf;
 	if(!options){
 		webshims.error("mediaelement wasn't implemented but loaded");
@@ -280,11 +279,9 @@ webshims.isReady('swfmini', true);
 			}
 		})();
 	}
-	hasFullTrackSupport = Modernizr.track && !bugs.track;
 
 webshims.register('mediaelement-core', function($, webshims, window, document, undefined, options){
 	hasSwf = swfmini.hasFlashPlayerVersion('10.0.3');
-	$('html').addClass(hasSwf ? 'swf' : 'no-swf');
 	var mediaelement = webshims.mediaelement;
 	
 	mediaelement.parseRtmp = function(data){

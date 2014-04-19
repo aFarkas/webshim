@@ -147,7 +147,7 @@
 			<h2 id="introduction" class="header">Introduction</h2>
 
 			<p>
-				There are many appealing HTML5 features such as form validation, geolocation, and FileReader which ease the burden of writing rich web applications.
+				There are many appealing HTML5 features such as form validation, geolocation and mediaelements which ease the burden of writing rich web applications.
 			</p>
 
 			<p>
@@ -160,6 +160,8 @@
 				<strong>Webshim is a polyfill solution.</strong> It adds these features in a way that is transparent to the end user and developer. It enables coding against the browser standards rather than learning and maintaining abstractions. It results
 				in less code that is simpler and easier to maintain.
 			</p>
+
+			<p><strong>Webshim is also more than a polyfill, it has become UI component and widget library</strong>. Webshim also enables a developer to also <strong>enhance</strong> HTML5 capable browsers with more <strong>highly customizable, extensible and flexible UI components and widgets</strong>. Its <strong>capability based loading system</strong> enables webshim to only load those files, which are needed for the specific browser/device and only when it is needed (deferred loading), to reduce especially the initial network payload.</p>
 <!--
 			<p>
 				Many of the examples that follow are runnable. Click the <i>play</i> button to execute them.
@@ -262,7 +264,13 @@
 					<em>default: true</em>
 				</li>
 				<li>
-					<strong>debug</strong> Setting to true enables debug info to be printed in the developer console. Note the polyfiller.js in the dev folder will have more debug information and pretty printed code.
+					<strong>loadStyles</strong> If <code>loadStyles</code> is set <code>false</code> webshims won't load any default styles. In this case a site has to provide all styles for the used widgets. A developer also can copy all used webshim styles into his stylesheet and minimize request/only use needed styles for used widgets.
+					<br>
+					<em>default: true</em>
+				</li>
+
+				<li>
+					<strong>debug</strong> Setting to true enables debug info to be printed in the developer console. Note the polyfiller.js in the dev folder will has more debug information and pretty printed code.
 					<br>
 					<em>default: false</em>
 				</li>
@@ -1461,6 +1469,9 @@ $(function(){
 			<p>
 				<em>This feature is based on code from <a href="https://github.com/Jahdrien/FileReader" target="_external">https://github.com/Jahdrien/FileReader</a>. </em>
 			</p>
+
+			<h2 id="#Enhancement-Strategy">Webshim's opinionated enhancement cross browser development strategy</h2>
+			<p></p>
 
 			<h2 id="Requirejs-setup">Typical project setup and JS optimizations (requirejs, concatination of JS files)</h2>
 

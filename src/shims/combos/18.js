@@ -2,7 +2,9 @@
 // vim: ts=4 sts=4 sw=4 expandtab
 
 (function () {
-
+setTimeout(function(){
+	webshims.isReady('es5', true);
+});
 /**
  * Brings an environment as close to ECMAScript 5 compliance
  * as is possible with the facilities of erstwhile engines.
@@ -1441,6 +1443,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
     };
 
 }
+webshims.isReady('es5', true);
 })(webshims.$, webshims);
 
 
@@ -2871,6 +2874,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 	options.addZero = addZero;
 	webshims.loader.addModule('forms-picker', {
 		noAutoCallback: true,
+		css: 'styles/forms-picker.css',
 		options: options
 	});
 	webshims.loader.addModule('color-picker', {

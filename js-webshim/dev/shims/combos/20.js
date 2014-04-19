@@ -2,7 +2,9 @@
 // vim: ts=4 sts=4 sw=4 expandtab
 
 (function () {
-
+setTimeout(function(){
+	webshims.isReady('es5', true);
+});
 /**
  * Brings an environment as close to ECMAScript 5 compliance
  * as is possible with the facilities of erstwhile engines.
@@ -1441,6 +1443,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
     };
 
 }
+webshims.isReady('es5', true);
 })(webshims.$, webshims);
 
 
@@ -2651,7 +2654,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 
 	var wsCfg = webshims.cfg;
 	var options = wsCfg.mediaelement;
-	var hasFullTrackSupport;
 	var hasSwf;
 	if(!options){
 		webshims.error("mediaelement wasn't implemented but loaded");
@@ -2693,11 +2695,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			}
 		})();
 	}
-	hasFullTrackSupport = Modernizr.track && !bugs.track;
 
 webshims.register('mediaelement-core', function($, webshims, window, document, undefined, options){
 	hasSwf = swfmini.hasFlashPlayerVersion('10.0.3');
-	$('html').addClass(hasSwf ? 'swf' : 'no-swf');
 	var mediaelement = webshims.mediaelement;
 	
 	mediaelement.parseRtmp = function(data){
