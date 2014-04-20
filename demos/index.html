@@ -1480,17 +1480,17 @@ $(function(){
 			<p>This way a developer can switch between polyfilled/enhanced and native widgets. While the appearance might be different the base functionality will work in all browsers. But if a certain feature is barley possible with HTML5 or a developer needs full control in all browsers/devices, he can always switch to a enhance all strategy.</p>
 
 			<h3>Webshim automatically scales your enhancements</h3>
-			<p>Webshim might in total load a bunch of files to implement or enhance features. This might look crazy at first glance. But due to the fact that webshim uses conditionally and deferred loading techniques, it turns out, that these techniques help to build large and fast responding websites and webapps. Webshim often initially loads only few (often only one file) and small files depending on the capabilities of the device and the requested feature set and then delays loading a bunch of other files either as soon as they are needed or after onload also depending on the capabilities of the device.</p>
+			<p>Webshim might in total load a bunch of files to implement or enhance features. This might look crazy at first glance. But due to the fact that webshim uses conditionally and deferred loading techniques, it turns out, that these techniques help to build large and fast responding websites and webapps. Webshim often initially loads only few (often only one file) and small files depending on the capabilities of the device and the requested features and then delays loading a bunch of other files either as soon as they are needed or after onload also depending on the capabilities of the device.</p>
 			<h3>Webshim's mobile strategy</h3>
 			<p>Often a developer might choose not to "enhance" a widget on smartphones and use built-in UI widgets, to create fast responding websites. In case a developer switches to Webshim's custom UI widgets, he gets fully responsive, font-size scalable and touch-optimized widgets.</p>
 			<p>Tip: Enlarge touch target size of UI widgets by using the font-size scalability:</p>
 <pre><code class="  language-css">
-//enlarge mediacontrols by factor 1.5 from 16px to 24px
+/* enlarge mediacontrols by factor 1.5 from 16px to 24px */
 .touchevents .mediaplayer {
 	font-size: 24px;
 }
 
-//enlarge rangeslider, datepicker by factor ~1.5 from 13px to 19px
+/* enlarge rangeslider, datepicker by factor ~1.5 from 13px to 19px */
 .touchevents .ws-popover,
 .touchevents .ws-range {
 	font-size: 19px;
