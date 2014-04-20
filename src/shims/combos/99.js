@@ -453,12 +453,12 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		if(!fn){
 			fn = '_create';
 		}
-		var rfn = function(){
+		var rfn = function(c, media){
 			var obj = this;
 			var args = arguments;
 			loadLazy();
 			webshims.ready('mediacontrols-lazy', function(){
-				if(rfn != obj[fn]){
+				if(rfn != obj[fn] && $.data(media[0])){
 					return obj[fn].apply(obj, args);
 				} else {
 					webshims.error('stop too much recursion');
@@ -539,7 +539,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					})();
 
 
-					userActivity._create(0, 0, data.player);
+					userActivity._create(data.player, data.media, data.player);
 
 					playerSize();
 					webshims.ready('dom-support', function(){

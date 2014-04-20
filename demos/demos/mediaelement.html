@@ -39,8 +39,9 @@
 				}
 			}
 
-			.media-playlist {
-				margin: 10px 0;
+			.media-playlist,
+			.container .media-playlist{
+				margin: 0 0 20px;
 				padding: 5px 0;
 				list-style: none;
 			}
@@ -91,6 +92,7 @@
 			if('ontouchstart' in window){
 				$('html').addClass('touchevents');
 			}
+
 		</script>
 		<script>
 			webshims.ready('playlist', function(){

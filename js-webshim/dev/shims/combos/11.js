@@ -568,6 +568,7 @@
 				this.dirs.left = 'right';
 				this.dirs.right = 'left';
 				this.dirs.marginLeft = 'marginRight';
+				this.dirs.posLeft = 'right';
 			}
 			this.element
 				[this.vertical ? 'addClass' : 'removeClass']('vertical-range')

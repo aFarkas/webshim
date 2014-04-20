@@ -97,6 +97,8 @@
 
 			<a class="toc_title" href="#FileReader"> FileReader </a>
 
+			<a class="toc_title" href="#Enhancement-Strategy">Webshim's opinionated enhancement cross browser / device development strategy</a>
+
 			<a class="toc_title" href="#Requirejs-setup">Setup with r.js or other JS optimization tasks</a>
 
 			<a class="toc_title" href="#Customizing"> Customizing </a>
@@ -1470,8 +1472,44 @@ $(function(){
 				<em>This feature is based on code from <a href="https://github.com/Jahdrien/FileReader" target="_external">https://github.com/Jahdrien/FileReader</a>. </em>
 			</p>
 
-			<h2 id="#Enhancement-Strategy">Webshim's opinionated enhancement cross browser development strategy</h2>
-			<p></p>
+			<h2 id="Enhancement-Strategy">Webshim's opinionated enhancement cross browser development strategy</h2>
+			<p>Webshim has evolved form a general polyfill library to a sophisticated UI component / UI widget library which makes it easy to create scalable, responsive and highly adaptable websites and webapps.</p>
+			<p>While webshim polyfills older browsers and automatically fixes a lot of bugs, it enables the developer to also enhance even modern browsers with highly customizable widgets (datepicker, form validation, slider, autosuggest, custom stylable controls for video/audio).</p>
+			<p>Webshim is opinionated, that a developer should always solve a problem the HTML5 way.</p>
+			<p>For example most datepickers have a direct configuration option to disable certain days to be picked from the control. This is not possible with current implementations of <code>input[type="date"]</code>, but it is possible to use the HTML 5 form validation API to constrain the user input to certain days. Therefore webshim offers a way to <a href="http://jsfiddle.net/trixta/zRGd9/embedded/js,html,result,css">constrain the user input and those constraints are used to decide whether certain days should be disabled in the pickercontrol.</a></p>
+			<p>This way a developer can switch between polyfilled/enhanced and native widgets. While the appearance might be different the base functionality will work in all browsers. But if a certain feature is barley possible with HTML5 or a developer needs full control in all browsers/devices, he can always switch to a enhance all strategy.</p>
+
+			<h3>Webshim automatically scales your enhancements</h3>
+			<p>Webshim might in total load a bunch of files to implement or enhance features. This might look crazy at first glance. But due to the fact that webshim uses conditionally and deferred loading techniques, it turns out, that these techniques help to build large and fast responding websites and webapps. Webshim often initially loads only few (often only one file) and small files depending on the capabilities of the device and the requested feature set and then delays loading a bunch of other files either as soon as they are needed or after onload also depending on the capabilities of the device.</p>
+			<h3>Webshim's mobile strategy</h3>
+			<p>Often a developer might choose not to "enhance" a widget on smartphones and use built-in UI widgets, to create fast responding websites. In case a developer switches to Webshim's custom UI widgets, he gets fully responsive, font-size scalable and touch-optimized widgets.</p>
+			<p>Tip: Enlarge touch target size of UI widgets by using the font-size scalability:</p>
+<pre><code class="  language-css">
+//enlarge mediacontrols by factor 1.5 from 16px to 24px
+.touchevents .mediaplayer {
+	font-size: 24px;
+}
+
+//enlarge rangeslider, datepicker by factor ~1.5 from 13px to 19px
+.touchevents .ws-popover,
+.touchevents .ws-range {
+	font-size: 19px;
+}
+
+
+@media (pointer:coarse), (-moz-touch-enabled), (-webkit-touch-enabled), (touch-enabled) {
+	.mediaplayer {
+		font-size: 24px;
+	}
+
+	.ws-popover,
+	.ws-range {
+		font-size: 19px;
+	}
+}
+</code></pre>
+			<h3>Webshim and accessibility</h3>
+			<p>All UI components of webshim are fully accessible and conform to WCAG 2.0 (Level A and AA) and are therefore also Section 508-compliant. Webshim not only adds some WAI-ARIA roles, but also conforms to the ARIA Best Practices and tests all widgets with real screenreaders.</p>
 
 			<h2 id="Requirejs-setup">Typical project setup and JS optimizations (requirejs, concatination of JS files)</h2>
 
