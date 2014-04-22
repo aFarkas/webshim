@@ -223,6 +223,10 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 
 				webshims.defineNodeNamesBooleanProperty(['fieldset'], 'disabled', {
 					set: function(value){
+						value = !!value;
+						var wasValue = !!webshims.data(this, 'fieldsetStoredDisabled');
+						if(wasValue == value){return;}
+						webshims.data(this, 'fieldsetStoredDisabled', value);
 
 						if(value){
 							$(disableElementsSel, this).each(groupControl.disable);
