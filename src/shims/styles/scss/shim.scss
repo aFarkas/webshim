@@ -25,11 +25,15 @@ video {
 }
 
 video,
-audio[controls],
-audio.webshims-controls {
+audio[controls] {
 	display: inline-block;
 	min-height: 45px;
 	min-width: 40px;
+
+}
+
+audio[controls] {
+	width: 300px;
 }
 
 video > *,

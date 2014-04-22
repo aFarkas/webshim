@@ -395,9 +395,13 @@ webshims.ready('jme DOM', function(){
 			return item;
 		},
 		playItem: function(item, e){
+			var media;
 			this.selectedItem(item, e);
 			if(item){
-				this.media.play();
+				media = this.media.play();
+				setTimeout(function(){
+					media.play();
+				}, 9);
 			}
 		},
 		selectedIndex: function(index, e){

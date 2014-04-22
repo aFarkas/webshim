@@ -214,15 +214,22 @@
 		})(),
 		_polyfill: function(features){
 			var toLoadFeatures = [];
-			
-			firstRun();
-			
-			if($.inArray('forms', features) == -1 && $.inArray('forms-ext', features) !== -1){
-				features.push('forms');
-				if(WSDEBUG){
-					webshims.error('need to load forms feature to use forms-ext feature.');
+			var hasFormsExt;
+
+			if(!firstRun.run){
+				hasFormsExt = $.inArray('forms-ext', features) !== -1;
+				firstRun();
+				if(hasFormsExt && $.inArray('forms', features) == -1){
+					features.push('forms');
+					if(WSDEBUG){
+						webshims.error('need to load forms feature to use forms-ext feature.');
+					}
+				}
+				if(webCFG.loadStyles){
+					loader.loadCSS('styles/shim'+((hasFormsExt && !modules["form-number-date-ui"].test()) ? '-ext' : '')+'.css');
 				}
 			}
+
 			
 			if (webCFG.waitReady) {
 				$.readyWait++;
@@ -244,9 +251,7 @@
 				}
 				toLoadFeatures = toLoadFeatures.concat(webshimsFeatures[feature]);
 			});
-			if(webCFG.loadStyles){
-				loader.loadCSS('styles/shim.css');
-			}
+
 			loadList(toLoadFeatures);
 
 
@@ -1125,7 +1130,6 @@
 				return !o.replaceUI && modules[fNuAPI].test();
 			},
 			d: ['forms', DOMSUPPORT, fNuAPI, 'range-ui'],
-			css: 'styles/forms-ext.css',
 			options: {
 				widgets: {
 					calculateWidth: true,
