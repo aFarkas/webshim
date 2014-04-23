@@ -24,8 +24,9 @@
 				margin-bottom: 9px;
 			}
 			  
-			  .polyfill-all {
-			  	font-size: 200%;
+			  p.polyfill-all {
+			  	font-size: 24px;
+				line-height: 30px;
 				font-weight: bold;
 			  }
 			  
@@ -45,7 +46,7 @@
 			//$('html').on('wspopoverbeforehide', false);
 		</script>
 	-->
-		
+
 		<script>
 			if((!Modernizr.input.list && !Modernizr.inputtypes.range) || location.search.indexOf('polyfillall') != -1){
 				$('html').addClass('custom-widgets');
@@ -58,11 +59,11 @@
 					replaceUI: true
 				});
 			}
-			
+
 			webshims.setOptions('forms-ext', {
 				types: 'range date time month color'
 			});
-			
+
 			//load form polyfills
 			webshims.polyfill('forms forms-ext');
 		</script>
@@ -116,12 +117,12 @@
 });
 webshims.setOptions('forms-ext', {
 	//replace all input type widgets with a custom styleable feature
-	replaceUI: true
+	replaceUI: true // 'auto' || true || false (default)
 });
 
 //load form polyfills
 webshims.polyfill('forms forms-ext');</pre>
-				<p class="polyfill-all"><a href="?polyfillall">Polyfill/Customize all browsers (including modern browsers like Chrome)</a></p>
+				<p class="polyfill-all"><a href="?polyfillall">Enhance/Polyfill/Customize all browsers (including modern browsers like Chrome)</a></p>
 			</div>
 			<h2>Examples</h2>
 			<div class="row">

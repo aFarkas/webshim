@@ -436,8 +436,7 @@ var rsubmittable = /^(?:select|textarea|input)/i;
 webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
 	set: function(value){
 		$(this).getShadowFocusElement().attr('aria-required', !!(value)+'');
-	},
-	initAttr: Modernizr.localstorage //only if we have aria-support
+	}
 });
 webshims.defineNodeNamesBooleanProperty(['input'], 'multiple');
 
@@ -853,15 +852,6 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 			// return undefined since we don't need an event listener
 		};
 	}
-
-
-
-	webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
-		set: function(value){
-			$(this).getShadowFocusElement().attr('aria-required', !!(value)+'');
-		},
-		initAttr: true
-	});
 
 	webshims.reflectProperties(['input'], ['pattern']);
 
@@ -1441,7 +1431,7 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 			webshims.onNodeNamesPropertyModify('select', 'value', selectChange);
 			webshims.onNodeNamesPropertyModify('select', 'selectedIndex', selectChange);
 			webshims.onNodeNamesPropertyModify('option', 'selected', function(){
-				$(this).closest('select').each(selectChange);
+				$(this.parentNode || this).closest('select').each(selectChange);
 			});
 			webshims.onNodeNamesPropertyModify('input', 'checked', function(value, boolVal){
 				var type = this.type;
@@ -1475,8 +1465,8 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 						} else if(this.nodeName.toLowerCase() == 'option'){
 							prop = 'selected';
 						}
-						if(prop){
-							$(this)[$.prop(this, prop) ? 'addClass' : 'removeClass']('prop-checked');
+						if(prop && $.prop(this, prop)){
+							$(this).addClass('prop-checked');
 						}
 
 					})

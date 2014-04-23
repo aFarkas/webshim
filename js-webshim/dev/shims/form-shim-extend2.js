@@ -59,15 +59,6 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 		};
 	}
 
-
-
-	webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
-		set: function(value){
-			$(this).getShadowFocusElement().attr('aria-required', !!(value)+'');
-		},
-		initAttr: true
-	});
-
 	webshims.reflectProperties(['input'], ['pattern']);
 
 
@@ -646,7 +637,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 			webshims.onNodeNamesPropertyModify('select', 'value', selectChange);
 			webshims.onNodeNamesPropertyModify('select', 'selectedIndex', selectChange);
 			webshims.onNodeNamesPropertyModify('option', 'selected', function(){
-				$(this).closest('select').each(selectChange);
+				$(this.parentNode || this).closest('select').each(selectChange);
 			});
 			webshims.onNodeNamesPropertyModify('input', 'checked', function(value, boolVal){
 				var type = this.type;
@@ -680,8 +671,8 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 						} else if(this.nodeName.toLowerCase() == 'option'){
 							prop = 'selected';
 						}
-						if(prop){
-							$(this)[$.prop(this, prop) ? 'addClass' : 'removeClass']('prop-checked');
+						if(prop && $.prop(this, prop)){
+							$(this).addClass('prop-checked');
 						}
 
 					})

@@ -311,7 +311,6 @@
 		},
 		ready: function(events, fn /*, _created*/){
 			var _created = arguments[2];
-			var evt = events;
 			if (typeof events == 'string') {
 				events = events.split(' ');
 			}
@@ -920,7 +919,6 @@
 			destroyWrite: true
 //			,confirmText: ''
 		},
-		d: ['json-storage'],
 		c: [21],
 		nM: 'geolocation'
 	});
@@ -950,7 +948,7 @@
 	
 	//<forms
 	(function(){
-		var formExtend, formOptions, formExtras;
+		var formExtend, formOptions;
 		var fShim = 'form-shim-extend';
 		var modernizrInputAttrs = Modernizr.input;
 		var modernizrInputTypes = Modernizr.inputtypes;
@@ -998,7 +996,7 @@
 		
 		webshims.validationMessages = webshims.validityMessages = {
 			langSrc: 'i18n/formcfg-', 
-			availableLangs: ['ar', 'cs', 'el', 'es', 'fr', 'he', 'hi', 'hu', 'it', 'ja', 'lt', 'nl', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ru', 'sv', 'zh-CN']
+			availableLangs: "ar cs el es fr he hi hu it ja lt nl pl pt pt-BR pt-PT ru sv zh-CN".split(' ')
 		};
 		webshims.formcfg = $.extend({}, webshims.validationMessages);
 		
@@ -1068,15 +1066,8 @@
 			d: [DOMSUPPORT],
 			c: [16, 7, 15, 30, 3, 8, 4, 14, 28]
 		});
-		
-		formExtras = {
-			noAutoCallback: true,
-			options: formOptions
-		};
-		addModule('form-validation', $.extend({d: ['form-message', 'form-core']}, formExtras));
-		
-		addModule('form-validators', $.extend({}, formExtras));
-				
+
+
 		addPolyfill(fNuAPI, {
 			f: 'forms-ext',
 			options: {

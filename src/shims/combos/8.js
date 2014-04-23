@@ -1537,27 +1537,36 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			};
 		}
 	};
-	
-	if($.expr.filters){
-		extendSels();
-	} else {
-		webshims.ready('sizzle', extendSels);
-	}
-	
-	
-	webshims.triggerInlineForm = function(elem, event){
-		$(elem).trigger(event);
+	var formExtras = {
+		noAutoCallback: true,
+		options: options
 	};
-	
+	var addModule = webshims.loader.addModule;
 	var lazyLoadProxy = function(obj, fn, args){
 		lazyLoad();
 		webshims.ready('form-validation', function(){
 			obj[fn].apply(obj, args);
 		});
 	};
-	
+
 	var transClass = ('transitionDelay' in document.documentElement.style) ?  '' : ' no-transition';
 	var poCFG = webshims.cfg.wspopover;
+
+	addModule('form-validation', $.extend({d: ['form-message']}, formExtras));
+
+	addModule('form-validators', $.extend({}, formExtras));
+	
+	if($.expr.filters){
+		extendSels();
+	} else {
+		webshims.ready('sizzle', extendSels);
+	}
+
+	webshims.triggerInlineForm = function(elem, event){
+		$(elem).trigger(event);
+	};
+	
+
 	if(!poCFG.position && poCFG.position !== false){
 		poCFG.position = {
 			at: 'left bottom',

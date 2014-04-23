@@ -436,8 +436,7 @@ var rsubmittable = /^(?:select|textarea|input)/i;
 webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
 	set: function(value){
 		$(this).getShadowFocusElement().attr('aria-required', !!(value)+'');
-	},
-	initAttr: Modernizr.localstorage //only if we have aria-support
+	}
 });
 webshims.defineNodeNamesBooleanProperty(['input'], 'multiple');
 
