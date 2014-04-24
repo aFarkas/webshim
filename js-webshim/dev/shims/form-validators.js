@@ -171,7 +171,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 		if(!val || !data.minlength){return;}
 
 		if($.nodeName(elem, 'input')){
-			webshims.warn('depreacated data-minlength usage: Use pattern=".{'+ data.minlength +'3,}" instead.');
+			webshims.warn('depreacated data-minlength usage: Use pattern=".{'+ data.minlength +',}" instead.');
 		}
 		return data.minlength > val.length;
 	}, 'Entered value is too short.');

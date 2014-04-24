@@ -1046,7 +1046,7 @@
 				return Modernizr[formvalidation] && !bustedValidity;
 			},
 			d: ['form-core', DOMSUPPORT, 'sizzle'],
-			c: [16, 15, 24, 28]
+			c: [16, 15, 28]
 		});
 		
 		addPolyfill(fShim+'2', {
@@ -1054,8 +1054,7 @@
 			test: function(){
 				return Modernizr[formvalidation] && !bustedWidgetUi;
 			},
-			d: [fShim],
-			c: [24]
+			d: [fShim]
 		});
 		
 		addPolyfill('form-message', {

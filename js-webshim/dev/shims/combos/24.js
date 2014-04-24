@@ -1009,9 +1009,6 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 				webshims.defineNodeNamesBooleanProperty(['fieldset'], 'disabled', {
 					set: function(value){
 						value = !!value;
-						var wasValue = !!webshims.data(this, 'fieldsetStoredDisabled');
-						if(wasValue == value){return;}
-						webshims.data(this, 'fieldsetStoredDisabled', value);
 
 						if(value){
 							$(disableElementsSel, this).each(groupControl.disable);
@@ -1116,14 +1113,26 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 					}
 				});
 
-
 				webshims.defineNodeNamesProperty(['form'], 'elements', {
 					prop: {
 						get: function(){
+							var sel, addElements, detachElements;
 							var id = this.id;
 							var elements = $.makeArray(this.elements);
 							if(id){
-								elements = $(elements).add('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]').not('.webshims-visual-hide > *').get();
+								detachElements = $.data(this, 'webshimsAddedElements');
+								if(detachElements){
+									detachElements.detach();
+								}
+								sel = 'input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]';
+								addElements = document.querySelectorAll(sel) || [];
+								if(addElements.length){
+									elements = $(elements).add(addElements).get();
+
+								}
+								if(detachElements){
+									detachElements.appendTo(this);
+								}
 							}
 							return elements;
 						},
@@ -1390,9 +1399,14 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 	} catch(er){
 		(function(){
 			$('html').addClass('no-csschecked');
+			var regChecked = /prop\-checked/;
 			var checkInputs = {
 				radio: 1,
 				checkbox: 1
+			};
+			var selectName = {
+				select: 1,
+				SELECT: 1
 			};
 			var lazySelectChange = function(elem){
 				var i, len, fn;
@@ -1400,10 +1414,11 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 				var index = elem.selectedIndex;
 				for(i = 0, len = options.length; i < len; i++){
 					fn = options[i].selected ? 'addClass' : 'removeClass';
-					if( ((options[i].className || '').indexOf('prop-checked') == -1) == (fn == 'addClass')){
+					if( regChecked.test(options[i].className || '') != (fn == 'addClass')){
 						$(options[i])[fn]('prop-checked');
 					}
 				}
+				$.removeData(elem, 'wsLazySelectChange');
 				return index;
 			};
 			var selectChange = function(){
@@ -1411,19 +1426,35 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 				clearTimeout($.data(this, 'wsLazySelectChange'));
 				$.data(this, 'wsLazySelectChange', setTimeout(function(){
 					lazySelectChange(elem);
-				}, 99));
+				}, 9));
 			};
-			var checkChange = function(){
-				var fn = this.checked  ? 'addClass' : 'removeClass';
+			var lazyCheckChange = function(elem){
+				var fn = elem.checked  ? 'addClass' : 'removeClass';
 				var className = this.className || '';
 				var parent;
 
 				//IE8- has problems to update styles, we help
-				if( (className.indexOf('prop-checked') == -1) == (fn == 'addClass')){
-					$(this)[fn]('prop-checked');
+				if( regChecked.test(className) != (fn == 'addClass')){
+					$(elem)[fn]('prop-checked');
 					if((parent = this.parentNode)){
 						parent.className = parent.className;
 					}
+				}
+				$.removeData(elem, 'wsLazyCheckedChange');
+			};
+			var checkChange = function(){
+				var elem = this;
+				clearTimeout($.data(this, 'wsLazyCheckedChange'));
+				$.data(this, 'wsLazyCheckedChange', setTimeout(function(){
+					lazyCheckChange(elem);
+				}, 99));
+			};
+			var onCheckChange = function(elem, boolVal){
+				var type = this.type;
+				if(type == 'radio' && boolVal){
+					getGroupElements(this).each(checkChange);
+				} else if(checkInputs[type]) {
+					$(this).each(checkChange);
 				}
 			};
 
@@ -1433,44 +1464,35 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 			webshims.onNodeNamesPropertyModify('option', 'selected', function(){
 				$(this.parentNode || this).closest('select').each(selectChange);
 			});
+
 			webshims.onNodeNamesPropertyModify('input', 'checked', function(value, boolVal){
-				var type = this.type;
-				if(type == 'radio' && boolVal){
-					getGroupElements(this).each(checkChange);
-				} else if(checkInputs[type]) {
-					$(this).each(checkChange);
-				}
+				onCheckChange(this, boolVal);
 			});
 
 			$(document).on('change', function(e){
-
-				if(checkInputs[e.target.type]){
-					if(e.target.type == 'radio'){
-						getGroupElements(e.target).each(checkChange);
-					} else {
-						$(e.target)[$.prop(e.target, 'checked') ? 'addClass' : 'removeClass']('prop-checked');
-					}
-				} else if(e.target.nodeName.toLowerCase() == 'select'){
+				var type = e.target.type;
+				if(checkInputs[type]){
+					onCheckChange(e.target, type == 'radio' && e.target.checked);
+				} else if(selectName[e.target.nodeName]){
 					$(e.target).each(selectChange);
 				}
 			});
 
-			webshims.addReady(function(context, contextElem){
-				$('option, input', context)
-					.add(contextElem.filter('option, input'))
-					.each(function(){
-						var prop;
-						if(checkInputs[this.type]){
-							prop = 'checked';
-						} else if(this.nodeName.toLowerCase() == 'option'){
-							prop = 'selected';
-						}
-						if(prop && $.prop(this, prop)){
-							$(this).addClass('prop-checked');
-						}
+			webshims.addReady(function(context){
+				var i, len, className;
+				var elems = context.getElementsByTagName('option');
+				for(i = 0, len = elems.length; i < len; i++){
+					if(elems[i].selected && !regChecked.test( (className = elems[i].className) )){
+						elems[i].className = className+' prop-checked';
+					}
+				}
 
-					})
-				;
+				elems = context.getElementsByTagName('input');
+				for(i = 0, len = elems.length; i < len; i++){
+					if(checkInputs[elems[i].type] && elems[i].checked && !regChecked.test( (className = elems[i].className) )){
+						elems[i].className = className+' prop-checked';
+					}
+				}
 			});
 		})();
 	}

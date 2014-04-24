@@ -1068,11 +1068,6 @@ webshims.setOptions("forms-ext", {
 					<strong>selectors for CSS/JS: .placeholder-visible</strong>: which work similar to <a href="https://developer.mozilla.org/en/CSS/%3A-moz-placeholder">:-moz-placeholder</a>, <a href="http://msdn.microsoft.com/en-us/ie/hh272905#_HTML5FormsVal">:-ms-input-placeholder</a> and <a href="http://css-tricks.com/snippets/css/style-placeholder-text/">::-webkit-input-placeholder</a>
 				</li>
 				<li>
-					<strong>selectors for CSS: .prop-checked</strong>: which work equal to <a href="http://www.w3.org/TR/selectors4/#checked">:checked</a> pseudoclass. This class is only added, if the browser does not support the <code class="i">
-						:checked</code>
-					pseudoclass (i.e. IE8-).
-				</li>
-				<li>
 					<strong>$().getErrorMessage</strong>: very similar to the standard validationMessage, but gives more control over the validationMessage.
 				</li>
 				<li>
@@ -1515,7 +1510,12 @@ $(function(){
 
 			<p>While most scripts only use one JS file to include the hole behavior, Webshims is using the polyfiller.js file, a <code>polyfiller</code> named AMD module, as an entry point and loads conditionally other resources. This means webshims needs to know, where those resources are.</p>
 			<p>The code inside of the polyfiller.js automatically detects the path to the script it is run from and assumes, that the <code class="i">shims</code> folder is in the same directory. This means, you have to make sure, that either the shims folder is placed parallel to the code of the polyfiller.js or to configure the path using the <code class="i">basePath</code> option.</p>
-
+			<h3>Configuring the path manually</h3>
+<pre><code class="language-javascript">//configure path manually
+webshims.setOptions('basePath', '/yourFolderTo/shims/');
+//polyfill
+webshims.polyfill('forms mediaelement');
+</code></pre>
 			<h3>Optimizing into the same folder</h3>
 
 			<p>The following example, shows a very simple setup where the shims folder is parallel to the normal polyfiller.js file and the optimized js file (i.e.: app.min.js):</p>
@@ -1540,7 +1540,7 @@ $(function(){
 <pre><code class="language-dir">
 |-- projectfolder
 	|-- index.html
-	+-- bower-components
+	+-- bower_components
 		|-- jquery
 		+-- js-webshim
 			+-- dev

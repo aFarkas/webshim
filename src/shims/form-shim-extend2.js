@@ -1,30 +1,9 @@
 webshims.register('form-shim-extend2', function($, webshims, window, document, undefined, options){
 	"use strict";
-	var emptyJ = $([]);
 	var isNumber = function(string){
 		return (typeof string == 'number' || (string && string == string * 1));
 	};
-	var getGroupElements = function(elem){
-		elem = $(elem);
-		var name;
-		var form;
-		var ret = emptyJ;
-		if(elem[0].type == 'radio'){
-			form = elem.prop('form');
-			name = elem[0].name;
-			if(!name){
-				ret = elem;
-			} else if(form){
-				ret = $(form[name]);
-			} else {
-				ret = $(document.getElementsByName(name)).filter(function(){
-					return !$.prop(this, 'form');
-				});
-			}
-			ret = ret.filter('[type="radio"]');
-		}
-		return ret;
-	};
+
 //support getSetAttribute
 	var supportGetSetAttribute = !(('getSetAttribute' in  $.support) && !$.support.getSetAttribute);
 //submitbubbles for IE6-IE8
@@ -177,15 +156,18 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 	if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled || !Modernizr.fieldsetelements){
 		(function(){
 			if(!Modernizr.fieldsetdisabled){
-				var isFieldsetGroup = /^(?:fieldset)$/i;
+				var isFieldsetGroup = {
+					fieldset: 1,
+					FIELDSET: 1
+				};
 				var disableElementsSel = 'input, textarea, select, button';
 				$.extend($.expr[":"], {
 					"enabled": function( elem ) {
-						return elem.disabled === false || (isFieldsetGroup.test(elem.nodeName) && webshims.contentAttr(elem, 'disabled') == null && !$(elem).is('fieldset[disabled] *')) ;
+						return elem.disabled === false || (isFieldsetGroup[elem.nodeName] && webshims.contentAttr(elem, 'disabled') == null && !$(elem).is('fieldset[disabled] *')) ;
 					},
 
 					"disabled": function( elem ) {
-						return elem.disabled === true || (isFieldsetGroup.test(elem.nodeName) && (webshims.contentAttr(elem, 'disabled') != null || $(elem).is('fieldset[disabled] *')));
+						return elem.disabled === true || (isFieldsetGroup[elem.nodeName] && (webshims.contentAttr(elem, 'disabled') != null || $(elem).is('fieldset[disabled] *')));
 					}
 				});
 
@@ -366,8 +348,8 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 
 							if(id){
 								removeAddedElements(form);
-
-								elements = $('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"]')
+								elements = document.querySelectorAll('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"]');
+								elements = $(elements)
 									.filter(function(){
 										return !this.disabled && this.name && this.form != form;
 									})
@@ -386,7 +368,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 
 
 					$(document).on('click', function(e){
-						if(submitters[e.target.type] && !e.isDefaultPrevented() && $(e.target).is('input[form], button[form]')){
+						if(submitters[e.target.type] && !e.isDefaultPrevented() && webshims.contentAttr(e.target, 'form')){
 							var trueForm = $.prop(e.target, 'form');
 							var formIn = e.target.form;
 							var clone;
@@ -446,7 +428,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 					prop: {
 						get: function(){
 							//add listed elements without keygen, object, output
-							return $('input, select, textarea, button, fieldset', this).get() || [];
+							return this.querySelectorAll('input, select, textarea, button, fieldset') || [];
 						},
 						writeable: false
 					}
@@ -597,109 +579,6 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 				desc
 			);
 
-		})();
-	}
-
-	try {
-		document.querySelector(':checked');
-	} catch(er){
-		(function(){
-			$('html').addClass('no-csschecked');
-			var regChecked = /prop\-checked/;
-			var checkInputs = {
-				radio: 1,
-				checkbox: 1
-			};
-			var selectName = {
-				select: 1,
-				SELECT: 1
-			};
-			var lazySelectChange = function(elem){
-				var i, len, fn;
-				var options = elem.options || [];
-				var index = elem.selectedIndex;
-				for(i = 0, len = options.length; i < len; i++){
-					fn = options[i].selected ? 'addClass' : 'removeClass';
-					if( regChecked.test(options[i].className || '') != (fn == 'addClass')){
-						$(options[i])[fn]('prop-checked');
-					}
-				}
-				$.removeData(elem, 'wsLazySelectChange');
-				return index;
-			};
-			var selectChange = function(){
-				var elem = this;
-				clearTimeout($.data(this, 'wsLazySelectChange'));
-				$.data(this, 'wsLazySelectChange', setTimeout(function(){
-					lazySelectChange(elem);
-				}, 9));
-			};
-			var lazyCheckChange = function(elem){
-				var fn = elem.checked  ? 'addClass' : 'removeClass';
-				var className = this.className || '';
-				var parent;
-
-				//IE8- has problems to update styles, we help
-				if( regChecked.test(className) != (fn == 'addClass')){
-					$(elem)[fn]('prop-checked');
-					if((parent = this.parentNode)){
-						parent.className = parent.className;
-					}
-				}
-				$.removeData(elem, 'wsLazyCheckedChange');
-			};
-			var checkChange = function(){
-				var elem = this;
-				clearTimeout($.data(this, 'wsLazyCheckedChange'));
-				$.data(this, 'wsLazyCheckedChange', setTimeout(function(){
-					lazyCheckChange(elem);
-				}, 99));
-			};
-			var onCheckChange = function(elem, boolVal){
-				var type = this.type;
-				if(type == 'radio' && boolVal){
-					getGroupElements(this).each(checkChange);
-				} else if(checkInputs[type]) {
-					$(this).each(checkChange);
-				}
-			};
-
-
-			webshims.onNodeNamesPropertyModify('select', 'value', selectChange);
-			webshims.onNodeNamesPropertyModify('select', 'selectedIndex', selectChange);
-			webshims.onNodeNamesPropertyModify('option', 'selected', function(){
-				$(this.parentNode || this).closest('select').each(selectChange);
-			});
-
-			webshims.onNodeNamesPropertyModify('input', 'checked', function(value, boolVal){
-				onCheckChange(this, boolVal);
-			});
-
-			$(document).on('change', function(e){
-				var type = e.target.type;
-				if(checkInputs[type]){
-					onCheckChange(e.target, type == 'radio' && e.target.checked);
-				} else if(selectName[e.target.nodeName]){
-					$(e.target).each(selectChange);
-				}
-			});
-
-			webshims.addReady(function(context){
-				var i, len, className;
-				var elems = context.getElementsByTagName('option');
-				for(i = 0, len = elems.length; i < len; i++){
-					if(elems[i].selected && !regChecked.test( (className = elems[i].className) )){
-						elems[i].className = className+' prop-checked';
-					}
-				}
-
-				elems = context.getElementsByTagName('input');
-				for(i = 0, len = elems.length; i < len; i++){
-					if(checkInputs[elems[i].type] && elems[i].checked && !regChecked.test( (className = elems[i].className) )){
-						elems[i].className = className+' prop-checked';
-					}
-				}
-			});
 		})();
 	}
 
@@ -961,13 +840,8 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 					hidePlaceholder(elem, data, value);
 				}
 			},
-			hasLabel = function(elem){
-				elem = $(elem);
-				return !!(elem.prop('title') || elem.attr('aria-labelledby') || elem.attr('aria-label') || elem.jProp('labels').length);
-			},
-			createPlaceholder = function(elem){
-				elem = $(elem);
-				return $( hasLabel(elem) ? '<span class="placeholder-text"></span>' : '<label for="'+ elem.prop('id') +'" class="placeholder-text"></label>');
+			createPlaceholder = function(){
+				return $('<span class="placeholder-text"></span>');
 			},
 			pHolder = (function(){
 				var allowedPlaceholder = {
@@ -1118,7 +992,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 			pHolder: pHolder
 		};
 		polyfillElements.forEach(function(nodeName){
-			var desc = webshims.defineNodeNameProperty(nodeName, 'placeholder', {
+			webshims.defineNodeNameProperty(nodeName, 'placeholder', {
 				attr: {
 					set: function(val){
 						var elem = this;
@@ -1205,13 +1079,12 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 		});
 
 		var outputCreate = function(elem){
-			if(elem.getAttribute('aria-live')){return;}
+			if($.data(elem, 'outputShim')){return;}
 			elem = $(elem);
 			var value = (elem.text() || '').trim();
 			var	id 	= elem.prop('id');
 			var	htmlFor = elem.attr('for');
 			var shim = $('<input class="output-shim" type="text" disabled name="'+ (elem.attr('name') || '')+'" value="'+value+'" style="display: none !important;" />').insertAfter(elem);
-			var form = shim[0].form || doc;
 			var setValue = function(val){
 				shim[0].value = val;
 				val = shim[0].value;
@@ -1223,6 +1096,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 			webshims.contentAttr(elem[0], 'value', value);
 
 			elem.attr({'aria-live': 'polite'});
+
 			if(id){
 				shim.attr('id', id);
 				elem.attr('aria-labelledby', elem.jProp('labels').map(function(){
