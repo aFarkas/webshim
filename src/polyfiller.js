@@ -740,7 +740,6 @@
 					$.ready = function(unwait){
 						if(unwait !== true && document.body){
 							onReady();
-							$.ready = $Ready;
 						}
 						return $Ready.apply(this, arguments);
 					};

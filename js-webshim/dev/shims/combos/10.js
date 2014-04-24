@@ -2185,7 +2185,34 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		
 		var formatVal = {
 			number: function(val, o){
-				return (val+'').replace(/\,/g, '').replace(/\./, curCfg.numberFormat['.']);
+				var parts, len, i, isNegative;
+				if(o && o.nogrouping){
+					return (val+'').replace(/\,/g, '').replace(/\./, curCfg.numberFormat['.']);
+				}
+				val += '';
+				if(val.charAt(0) == '-'){
+					isNegative = true;
+					val = val.replace('-', '');
+				}
+				parts = val.split('.');
+				len = parts[0].length;
+				i = len - 1;
+
+				val = "";
+				while(i >= 0) {
+					val = parts[0].charAt(i) + val;
+					if (i > 0 && (len - i) % 3 === 0) {
+						val = curCfg.numberFormat[','] + val;
+					}
+					--i;
+				}
+				if(parts[1]){
+					val += curCfg.numberFormat['.'] + parts[1];
+				}
+				if(isNegative){
+					val = '-'+val;
+				}
+				return val;
 			},
 			time: function(val){
 				var fVal;
@@ -2267,7 +2294,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		
 		var parseVal = {
 			number: function(val){
-				return (val+'').replace(curCfg.numberFormat[','], '').replace(curCfg.numberFormat['.'], '.');
+				return (val+'').split(curCfg.numberFormat[',']).join('').replace(curCfg.numberFormat['.'], '.');
 			},
 //			week: function(val){
 //				return val;
@@ -2769,7 +2796,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			},
 			toFixed: function(val, force){
 				var o = this.options;
-				if(o.toFixed && o.type == 'number' && val && this.valueAsNumber && (force || !this.element.is(':focus')) && (!o.fixOnlyFloat || (this.valueAsNumber % 1)) && !$(this.orig).is(':invalid')){
+				if(o.toFixed && o.type == 'number' && val && !isNaN(this.valueAsNumber) && (force || !this.element.is(':focus')) && (!o.fixOnlyFloat || (this.valueAsNumber % 1))){
 					val = formatVal[this.type](this.valueAsNumber.toFixed(o.toFixed), this.options);
 				}
 				return val;
@@ -2778,7 +2805,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		
 		['defaultValue', 'value'].forEach(function(name){
 			var isValue = name == 'value';
-			spinBtnProto[name] = function(val, force){
+			spinBtnProto[name] = function(val, force, isLive){
+				var selectionEnd;
 				if(!this._init || force || this.options[name] !== val){
 					if(isValue){
 						this._beforeValue(val);
@@ -2797,7 +2825,14 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 							}
 						});
 					} else {
-						this.element.prop(name, this.toFixed(val));
+						val = this.toFixed(val);
+						if(isLive && this._getSelectionEnd){
+							selectionEnd = this._getSelectionEnd(val);
+						}
+						this.element.prop(name, val);
+						if(selectionEnd){
+							this.element.prop('selectionEnd', selectionEnd);
+						}
 					}
 					this._propertyChange(name);
 					this.mirrorValidity();

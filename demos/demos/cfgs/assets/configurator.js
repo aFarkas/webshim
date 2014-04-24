@@ -229,7 +229,7 @@ $(function($){
 			});
 		};
 		var isChecked = function(elem){
-			return $.prop(elem, 'checked');
+			return elem && $.prop(elem, 'checked');
 		};
 		$('[data-needs]').each(function(){
 			var module = $(this);

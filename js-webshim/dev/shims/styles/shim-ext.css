@@ -553,6 +553,24 @@ div.ws-inline-picker {
     box-sizing: content-box; }
 
 /* style picker api */
+/* how to use: 
+*
+Markup (good to style one input different than other):
+<!-- simply use a placeholder as class on your input elment -->
+	<input type="date" class="show-week" />
+CSS:
+//replace the placeholder with .input-picker or (.input-date-picker)
+	.input-picker .ws-week {
+		display: table-cell;
+	}
+SASS:
+//use the placeholder(s) and go crazy
+	.input-picker {
+		@extend %show-week;
+		//@extend show-selectnav;
+	}
+*
+*/
 /* btn api */
 .hide-spinbtns + .input-buttons > .step-controls,
 .hide-spinbtns .input-buttons > .step-controls {

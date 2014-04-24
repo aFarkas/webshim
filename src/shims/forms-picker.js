@@ -394,7 +394,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					return true;
 				}
 			};
-			var callSplitChange = (function(){
+			(function(){
 				var timer;
 				
 				var call = function(e){
@@ -480,16 +480,18 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				},
 				ws__input: (this.type == 'color' && this.isValid) ? $.noop : (function(){
 					var timer;
+					var delay = that.type == 'number' && !o.nogrouping ? 99 : 199;
 					var check = function(){
 						var val = that.parseValue(true);
 						if (val && that.isValid(val)) {
-							that.setInput(val);
+							that.setInput(val, true);
 						}
 						
 					};
+
 					return function(){
 						clearTimeout(timer);
-						timer = setTimeout(check, 200);
+						timer = setTimeout(check, delay);
 					};
 				})(),
 				'ws__input keydown keypress': (function(){
@@ -566,8 +568,9 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			
 			this.buttonWrapper.on('mousedown', mouseDownInit);
 			
-			this.setInput = function(value){
-				that.value(value);
+			this.setInput = function(value, isLive){
+				console.log('input')
+				that.value(value, false, isLive);
 				eventTimer.call('input', value);
 			};
 			this.setChange = function(value){
@@ -655,6 +658,19 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					step.stepDown();
 				});
 				initChangeEvents();
+			}
+		},
+		_getSelectionEnd: function(val){
+			var oldVal, selectionEnd;
+			if(this.type == 'number' && (oldVal = this.element[0].value) && oldVal != val && this.element.is(':focus') && (selectionEnd = this.element.prop('selectionEnd')) < oldVal.length){
+				oldVal = oldVal.substr(0, selectionEnd).split(curCfg.numberFormat[',']);
+				val = val.substr(0, selectionEnd).split(curCfg.numberFormat[',']);
+				if(oldVal.length < val.length){
+					selectionEnd++;
+				} else if(oldVal.length > val.length){
+					selectionEnd--;
+				}
+				return selectionEnd;
 			}
 		},
 		initDataList: function(){
