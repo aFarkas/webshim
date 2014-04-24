@@ -569,7 +569,6 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			this.buttonWrapper.on('mousedown', mouseDownInit);
 			
 			this.setInput = function(value, isLive){
-				console.log('input')
 				that.value(value, false, isLive);
 				eventTimer.call('input', value);
 			};
