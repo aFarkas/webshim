@@ -999,7 +999,9 @@
 				if(o && o.nogrouping){
 					return (val+'').replace(/\,/g, '').replace(/\./, curCfg.numberFormat['.']);
 				}
+
 				val += '';
+
 				if(val.charAt(0) == '-'){
 					isNegative = true;
 					val = val.replace('-', '');
@@ -1016,7 +1018,7 @@
 					}
 					--i;
 				}
-				if(parts[1]){
+				if(parts[1] != null){
 					val += curCfg.numberFormat['.'] + parts[1];
 				}
 				if(isNegative){
@@ -1101,9 +1103,10 @@
 				return ret;
 			}
 		};
-		
+
 		var parseVal = {
 			number: function(val){
+
 				return (val+'').split(curCfg.numberFormat[',']).join('').replace(curCfg.numberFormat['.'], '.');
 			},
 //			week: function(val){

@@ -1140,49 +1140,51 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 					//pro forma
 					,color: 1
 				},
-				observe = function(input){
-					var timer,
-						lastVal = input.prop('value'),
-						trigger = function(e){
-							//input === null
-							if(!input){return;}
-							var newVal = input.prop('value');
-							if(newVal !== lastVal){
-								lastVal = newVal;
-								if(!e || !noInputTriggerEvts[e.type]){
-									webshims.triggerInlineForm && webshims.triggerInlineForm(input[0], 'input');
-								}
-							}
-						},
-						extraTimer,
-						extraTest = function(){
-							clearTimeout(extraTimer);
-							extraTimer = setTimeout(trigger, 9);
-						},
-						unbind = function(){
-							input.off('focusout', unbind).off('keyup keypress keydown paste cut', extraTest).off('input change updateInput triggerinput', trigger);
-							clearInterval(timer);
-							setTimeout(function(){
-								trigger();
-								input = null;
-							}, 1);
-
+				timer,
+				lastVal,
+				input,
+				trigger = function(e){
+					if(!input){return;}
+					var newVal = input.prop('value');
+					if(newVal !== lastVal){
+						lastVal = newVal;
+						if(!e || !noInputTriggerEvts[e.type]){
+							webshims.triggerInlineForm && webshims.triggerInlineForm(input[0], 'input');
 						}
-						;
-
+					}
+				},
+				extraTimer,
+				extraTest = function(){
+					clearTimeout(extraTimer);
+					extraTimer = setTimeout(trigger, 9);
+				},
+				unbind = function(){
+					clearTimeout(extraTimer);
 					clearInterval(timer);
-					timer = setInterval(trigger, 200);
-					extraTest();
-					input.on({
-						'keyup keypress keydown paste cut': extraTest,
-						focusout: unbind,
-						'input updateInput change triggerinput': trigger
-					});
+					if(input){
+						input.off('focusout', unbind).off('keyup keypress keydown paste cut', extraTest).off('input change updateInput triggerinput', trigger);
+					}
+
+
 				}
-				;
+			;
+			var observe = function(newInput){
+				unbind();
+
+				input = newInput;
+				lastVal = input.prop('value');
+				clearInterval(timer);
+				timer = setInterval(trigger, 200);
+				extraTest();
+				input.on({
+					'keyup keypress keydown paste cut': extraTest,
+					'focusout wswidgetfocusout': unbind,
+					'input updateInput change triggerinput': trigger
+				});
+			};
 
 			$(doc)
-				.on('focusin', function(e){
+				.on('focusin wswidgetfocusin', function(e){
 					if( e.target && !e.target.readOnly && !e.target.disabled && (e.target.nodeName || '').toLowerCase() == 'input' && !noInputTypes[e.target.type] && !(webshims.data(e.target, 'implemented') || {}).inputwidgets){
 						observe($(e.target));
 					}

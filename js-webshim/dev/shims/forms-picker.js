@@ -411,13 +411,14 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					}
 				};
 				
-				var onFocus = function(){
+				var onFocus = function(e){
 					clearTimeout(timer);
+					$(e.target).trigger('wswidgetfocusin');
 				};
 				var onBlur = function(e){
 					clearTimeout(timer);
 					timer = setTimeout(call, 0);
-					
+					$(e.target).trigger('wswidgetfocusout');
 					if (e.type == 'ws__change') {
 						stopPropagation(e);
 						if (!o.splitInput) {
@@ -661,6 +662,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		},
 		_getSelectionEnd: function(val){
 			var oldVal, selectionEnd;
+
 			if(this.type == 'number' && (oldVal = this.element[0].value) && oldVal != val && this.element.is(':focus') && (selectionEnd = this.element.prop('selectionEnd')) < oldVal.length){
 				oldVal = oldVal.substr(0, selectionEnd).split(curCfg.numberFormat[',']);
 				val = val.substr(0, selectionEnd).split(curCfg.numberFormat[',']);
