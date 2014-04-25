@@ -2296,7 +2296,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 
 		var parseVal = {
 			number: function(val){
-
 				return (val+'').split(curCfg.numberFormat[',']).join('').replace(curCfg.numberFormat['.'], '.');
 			},
 //			week: function(val){
@@ -3074,6 +3073,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		
 		
 		picker._common = function(data){
+			if(data.options.nopicker){return;}
 			var options = data.options;
 			var popover = webshims.objectCreate(options.inlinePicker ? webshims.inlinePopover : webshims.wsPopover, {}, $.extend(options.popover || {}, {prepareFor: options.inlinePicker ? data.buttonWrapper : data.element}));
 			var opener = $('<button type="button" class="ws-popover-opener"><span /></button>').appendTo(data.buttonWrapper);

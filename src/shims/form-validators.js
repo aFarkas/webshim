@@ -10,7 +10,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 	var formReady = false;
 	var blockCustom;
 	var initTest;
-
+	var elemSels = 'input, select, textarea, fieldset[data-dependent-validation]';
 	var onEventTest = function(e){
 		webshims.refreshCustomValidityRules(e.target);
 	};
@@ -29,7 +29,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 	webshims.addCustomValidityRule = (function(){
 		var timer;
 		var reTest = function(){
-			$('input, select, textarea, fieldset[data-dependent-validation]')
+			$(document.querySelectorAll(elemSels))
 				.filter(noValidate)
 				.each(function(){
 					testValidityRules(this);
@@ -124,12 +124,11 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 				return null;
 			}
 		};
-		
-		
+
 		setTimeout(function(){
 			webshims.addReady(function(context, selfElement){
 				initTest = true;
-				$('input, select, textarea, fieldset[data-dependent-validation]', context).add(selfElement.filter('input, select, textarea, fieldset[data-dependent-validation]'))
+				$(context.querySelectorAll(elemSels)).add(selfElement.filter(elemSels))
 					.filter(noValidate)
 					.each(function(){
 						testValidityRules(this);

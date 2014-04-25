@@ -30,8 +30,8 @@ var isNumber = function(string){
 			(function(){
 				var find = $.find;
 				var matchesSelector = $.find.matchesSelector;
-				
-				var regExp = /(\:valid|\:invalid|\:optional|\:required|\:in-range|\:out-of-range)(?=[\s\[\~\.\+\>\:\#*]|$)/ig;
+
+				var regExp = /(\:valid|\:invalid|\:optional|\:required)(?=[\s\[\~\.\+\>\:\#*]|$)/ig;
 				var regFn = function(sel){
 					return sel + '-element';
 				};
@@ -392,14 +392,13 @@ var rsubmittable = /^(?:select|textarea|input)/i;
 				if(validityState){
 					return validityState;
 				}
-				validityState 	= $.extend({}, validityPrototype);
+				validityState = $.extend({}, validityPrototype);
 				
 				if( !$.prop(elem, 'willValidate') || elem.type == 'submit' ){
 					return validityState;
 				}
-				var val 	= jElm.val(),
-					cache 	= {nodeName: elem.nodeName.toLowerCase()}
-				;
+				var val = jElm.val();
+				var cache = {nodeName: elem.nodeName.toLowerCase()};
 				
 				validityState.customError = !!(webshims.data(elem, 'customvalidationMessage'));
 				if( validityState.customError ){
@@ -426,7 +425,7 @@ var rsubmittable = /^(?:select|textarea|input)/i;
 				baseCheckValidity.unhandledInvalids = false;
 				return baseCheckValidity($(this).getNativeElement()[0], name);
 			}
-		}
+		};
 	});
 	
 	webshims.defineNodeNameProperties(nodeName, inputValidationAPI, 'prop');
@@ -436,7 +435,8 @@ var rsubmittable = /^(?:select|textarea|input)/i;
 webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
 	set: function(value){
 		$(this).getShadowFocusElement().attr('aria-required', !!(value)+'');
-	}
+	},
+	initAttr: true
 });
 webshims.defineNodeNamesBooleanProperty(['input'], 'multiple');
 
@@ -603,7 +603,7 @@ webshims.addReady(function(context, contextElem){
 	
 	try {
 		if(context == document && !('form' in (document.activeElement || {}))) {
-			focusElem = $('input[autofocus], select[autofocus], textarea[autofocus]', context).eq(0).getShadowFocusElement()[0];
+			focusElem = $(context.querySelector('input[autofocus], select[autofocus], textarea[autofocus]')).eq(0).getShadowFocusElement()[0];
 			if (focusElem && focusElem.offsetHeight && focusElem.offsetWidth) {
 				focusElem.focus();
 			}
@@ -624,7 +624,7 @@ if(!Modernizr.input.list){
 				if(select[0]){
 					options = $.makeArray(select[0].options || []);
 				} else {
-					options = $('option', elem).get();
+					options = elem.getElementsByTagName('option');
 					if(options.length){
 						webshims.warn('you should wrap your option-elements for a datalist in a select element to support IE and other old browsers.');
 					}

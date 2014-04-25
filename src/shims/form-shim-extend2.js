@@ -173,9 +173,6 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 
 
 				var groupControl = {
-					getElements: function(group){
-						$(disableElementsSel, group).each(groupControl.disable);
-					},
 					disable: function(){
 						if(!this.disabled){
 							webshims.data(this, 'groupedisabled', true);
@@ -201,10 +198,9 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 						if(value){
 							$(disableElementsSel, this).each(groupControl.disable);
 						} else if(!$(this).is('fieldset[disabled] *')){
-							var nested = $('fieldset[disabled]', this);
-							var elements = $(disableElementsSel, this);
+							var elements = $(this.querySelectorAll(disableElementsSel));
 
-							if(nested.length){
+							if( this.querySelector('fieldset[disabled]') ){
 								elements = elements.not('fieldset[disabled] *');
 							}
 
@@ -453,7 +449,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 						;
 
 					if(id) {
-						labels = labels.add('label[for="'+ id +'"]');
+						labels = labels.add(document.querySelectorAll('label[for="'+ id +'"]'));
 					}
 					return labels.get();
 				},
@@ -1118,7 +1114,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 		};
 
 		webshims.addReady(function(context, contextElem){
-			$('output', context).add(contextElem.filter('output')).each(function(){
+			$(context.getElementsByTagName('output')).add(contextElem.filter('output')).each(function(){
 				outputCreate(this);
 			});
 		});

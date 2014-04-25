@@ -257,6 +257,7 @@
 
 			$.each(features, function(i, feature){
 				var o = webCFG[feature];
+				if(!o){return;}
 				if(feature == 'mediaelement' && (o.replaceUI = getAutoEnhance(o.replaceUI))){
 					o.plugins.unshift('mediacontrols');
 				}
@@ -648,7 +649,7 @@
 	
 
 	webshims.activeLang = (function(){
-		var curLang = $('html').attr('lang') || navigator.browserLanguage || navigator.language || '';
+		var curLang = $.attr(document.documentElement, 'lang') || navigator.browserLanguage || navigator.language || '';
 		onReady('webshimLocalization', function(){
 			webshims.activeLang(curLang);
 		});
