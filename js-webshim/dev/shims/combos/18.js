@@ -4202,7 +4202,7 @@ webshims.isReady('es5', true);
 			var init, parent, lastWidth, left, right, isRtl, hasButtons;
 			var oriStyleO = data.orig.style;
 			var styleO = data.element[0].style;
-			if($.support.boxSizing == null && !$.isReady){
+			if($.support.boxSizing == null){
 				$(function(){
 					parent = data.orig.parentNode;
 				});

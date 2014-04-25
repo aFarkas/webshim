@@ -691,6 +691,13 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						this.width = docObserve.getWidth();
 						setInterval(this.test, 999);
 						$(this.test);
+						if($.support.boxSizing == null){
+							$(function(){
+								if($.support.boxSizing){
+									docObserve.handler({type: 'boxsizing'});
+								}
+							});
+						}
 						webshims.ready('WINDOWLOAD', this.test);
 						$(document).on('updatelayout.webshim pageinit popupafteropen panelbeforeopen tabsactivate collapsibleexpand shown.bs.modal shown.bs.collapse slid.bs.carousel', this.handler);
 						$(window).on('resize', this.handler);
@@ -702,13 +709,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			webshims.docObserve = function(){
 				webshims.ready('DOM', function(){
 					docObserve.start();
-					if($.support.boxSizing == null){
-						$(function(){
-							if($.support.boxSizing){
-								docObserve.handler({type: 'boxsizing'});
-							}
-						});
-					}
+
 				});
 			};
 			return function(nativeElem, shadowElem, opts){
@@ -3338,7 +3339,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			var init, parent, lastWidth, left, right, isRtl, hasButtons;
 			var oriStyleO = data.orig.style;
 			var styleO = data.element[0].style;
-			if($.support.boxSizing == null && !$.isReady){
+			if($.support.boxSizing == null){
 				$(function(){
 					parent = data.orig.parentNode;
 				});
