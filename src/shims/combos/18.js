@@ -3750,6 +3750,8 @@ webshims.isReady('es5', true);
 		};
 		
 		$.fn.spinbtnUI.wsProto = spinBtnProto;
+
+		webshims._format = formatVal;
 		
 	})();
 	

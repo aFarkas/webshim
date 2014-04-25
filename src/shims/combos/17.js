@@ -2301,6 +2301,8 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		};
 		
 		$.fn.spinbtnUI.wsProto = spinBtnProto;
+
+		webshims._format = formatVal;
 		
 	})();
 	

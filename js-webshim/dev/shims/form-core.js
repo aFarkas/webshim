@@ -49,27 +49,27 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	/*
 	 * Selectors for all browsers
 	 */
-	var rElementsGroup = /^(?:form|fieldset)$/i;
-	var hasInvalid = function(elem){
-		var ret = false;
-		$(elem).jProp('elements').each(function(){
-			if(!rElementsGroup.test(this.nodeName || '')){
-				ret = $(this).is(':invalid');
-				if(ret){
-					return false;
-				}
-			}
-			
-		});
-		return ret;
-	};
 	
 	var extendSels = function(){
 		var matches, matchesOverride;
 		var exp = $.expr[":"];
+		var rElementsGroup = /^(?:form|fieldset)$/i;
+		var hasInvalid = function(elem){
+			var ret = false;
+			$(elem).jProp('elements').each(function(){
+				if(!rElementsGroup.test(this.nodeName || '')){
+					ret = exp.invalid(this);
+					if(ret){
+						return false;
+					}
+				}
+
+			});
+			return ret;
+		};
 		$.extend(exp, {
 			"valid-element": function(elem){
-				return rElementsGroup.test(elem.nodeName || '') ? !hasInvalid(elem) :!!($.prop(elem, 'willValidate') && isValid(elem));
+				return rElementsGroup.test(elem.nodeName || '') ? !hasInvalid(elem) : !!($.prop(elem, 'willValidate') && isValid(elem));
 			},
 			"invalid-element": function(elem){
 				return rElementsGroup.test(elem.nodeName || '') ? hasInvalid(elem) : !!($.prop(elem, 'willValidate') && !isValid(elem));

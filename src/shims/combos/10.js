@@ -2886,6 +2886,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		};
 		
 		$.fn.spinbtnUI.wsProto = spinBtnProto;
+
+		webshims._format = formatVal;
 		
 	})();
 	

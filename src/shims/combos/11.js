@@ -1696,6 +1696,8 @@
 		};
 		
 		$.fn.spinbtnUI.wsProto = spinBtnProto;
+
+		webshims._format = formatVal;
 		
 	})();
 	

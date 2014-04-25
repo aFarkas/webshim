@@ -1607,6 +1607,19 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				return val;
 			}
 		};
+		var _toLocale = function(val, elem, attr){
+			var type, widget;
+			if(valueVals[attr]){
+				type = $.prop(elem, 'type');
+				widget = $(elem).getShadowElement().data('wsWidget'+ type );
+				if(widget && widget.formatValue){
+					val = widget.formatValue(val, false);
+				} else if(transforms[type]){
+					val = transforms[type](val);
+				}
+			}
+			return val;
+		};
 
 		[{n: 'date', f: 'toLocaleDateString'}, {n: 'time', f: 'toLocaleTimeString'}, {n: 'datetime-local', f: 'toLocaleString'}].forEach(function(desc){
 			transforms[desc.n] = function(val){
@@ -1631,19 +1644,27 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			}
 		}
 
-		return function(val, elem, attr){
-			var type, widget;
-			if(valueVals[attr]){
-				type = $.prop(elem, 'type');
-				widget = $(elem).getShadowElement().data('wsWidget'+ type );
-				if(widget && widget.formatValue){
-					val = widget.formatValue(val, false);
-				} else if(transforms[type]){
-					val = transforms[type](val);
+		webshims.format =  {};
+
+		['date', 'number', 'month', 'time', 'datetime-local'].forEach(function(name){
+			webshims.format[name] = function(val, opts){
+				if(opts && opts.nodeType){
+					return _toLocale(val, opts, name);
 				}
-			}
-			return val;
-		};
+				if(name == 'number' && opts && opts.toFixed ){
+					val = (val * 1);
+					if(!opts.fixOnlyFloat || val % 1){
+						val = val.toFixed(opts.toFixed);
+					}
+				}
+				if(webshims._format && webshims._format[name]){
+					return webshims._format[name](val, opts);
+				}
+				return transforms[name](val);
+			};
+		});
+
+		return _toLocale;
 	})();
 
 	webshims.replaceValidationplaceholder = function(elem, message, name){

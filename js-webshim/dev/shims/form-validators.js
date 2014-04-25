@@ -10,7 +10,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 	var formReady = false;
 	var blockCustom;
 	var initTest;
-
+	var elemSels = 'input, select, textarea, fieldset[data-dependent-validation]';
 	var onEventTest = function(e){
 		webshims.refreshCustomValidityRules(e.target);
 	};
@@ -29,7 +29,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 	webshims.addCustomValidityRule = (function(){
 		var timer;
 		var reTest = function(){
-			$('input, select, textarea, fieldset[data-dependent-validation]')
+			$(document.querySelectorAll(elemSels))
 				.filter(noValidate)
 				.each(function(){
 					testValidityRules(this);
@@ -124,12 +124,11 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 				return null;
 			}
 		};
-		
-		
+
 		setTimeout(function(){
 			webshims.addReady(function(context, selfElement){
 				initTest = true;
-				$('input, select, textarea, fieldset[data-dependent-validation]', context).add(selfElement.filter('input, select, textarea, fieldset[data-dependent-validation]'))
+				$(context.querySelectorAll(elemSels)).add(selfElement.filter(elemSels))
 					.filter(noValidate)
 					.each(function(){
 						testValidityRules(this);
@@ -315,6 +314,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 			if(!val || !data.ajaxvalidate){return;}
 			var opts;
 			if(!data.remoteValidate){
+				webshims.loader.loadList(['jajax']);
 				if(typeof data.ajaxvalidate == 'string'){
 					data.ajaxvalidate = {url: data.ajaxvalidate, depends: $([])};
 				} else {
@@ -342,15 +342,15 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 							this.restartAjax = false;
 							this.ajaxLoading = true;
 							$.ajax(
-								$.extend({}, opts, {
+								$.extend({dataType: 'json'}, opts, {
 									url: opts.url,
-									dataType: 'json',
 									depData: remoteData,
 									data: formCFG.fullRemoteForm || opts.fullForm ?
 										$(elem).jProp('form').serializeArray() :
 										remoteData,
 									success: this.getResponse,
-									complete: this._complete
+									complete: this._complete,
+									timeout: 3000
 								})
 							);
 						}
@@ -363,10 +363,15 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 						remoteValidate.restartAjax = false;
 					},
 					getResponse: function(data){
+						if(options.transformAjaxValidate){
+							data = options.transformAjaxValidate(data);
+						}
 						if(!data){
 							data = {message: '', valid: true};
 						} else if(typeof data == 'string'){
-							data = JSON.parse(data);
+							try {
+								data = JSON.parse(data);
+							} catch (er){}
 						}
 						
 						remoteValidate.message = ('message' in data) ? data.message : !data.valid;

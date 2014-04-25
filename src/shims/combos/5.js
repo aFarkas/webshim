@@ -2512,6 +2512,8 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		};
 		
 		$.fn.spinbtnUI.wsProto = spinBtnProto;
+
+		webshims._format = formatVal;
 		
 	})();
 	

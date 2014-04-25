@@ -1082,6 +1082,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		};
 		
 		$.fn.spinbtnUI.wsProto = spinBtnProto;
+
+		webshims._format = formatVal;
 		
 	})();
 	

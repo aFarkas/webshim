@@ -314,6 +314,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 			if(!val || !data.ajaxvalidate){return;}
 			var opts;
 			if(!data.remoteValidate){
+				webshims.loader.loadList(['jajax']);
 				if(typeof data.ajaxvalidate == 'string'){
 					data.ajaxvalidate = {url: data.ajaxvalidate, depends: $([])};
 				} else {
@@ -341,15 +342,15 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 							this.restartAjax = false;
 							this.ajaxLoading = true;
 							$.ajax(
-								$.extend({}, opts, {
+								$.extend({dataType: 'json'}, opts, {
 									url: opts.url,
-									dataType: 'json',
 									depData: remoteData,
 									data: formCFG.fullRemoteForm || opts.fullForm ?
 										$(elem).jProp('form').serializeArray() :
 										remoteData,
 									success: this.getResponse,
-									complete: this._complete
+									complete: this._complete,
+									timeout: 3000
 								})
 							);
 						}
@@ -362,10 +363,15 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 						remoteValidate.restartAjax = false;
 					},
 					getResponse: function(data){
+						if(options.transformAjaxValidate){
+							data = options.transformAjaxValidate(data);
+						}
 						if(!data){
 							data = {message: '', valid: true};
 						} else if(typeof data == 'string'){
-							data = JSON.parse(data);
+							try {
+								data = JSON.parse(data);
+							} catch (er){}
 						}
 						
 						remoteValidate.message = ('message' in data) ? data.message : !data.valid;
