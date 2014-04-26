@@ -380,7 +380,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		
 		
 		var formatVal = {
-			number: function(val, o){
+			number: function(val, o, noCorrect){
 				var parts, len, i, isNegative;
 				if(o && o.nogrouping){
 					return (val+'').replace(/\,/g, '').replace(/\./, curCfg.numberFormat['.']);
@@ -405,6 +405,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					--i;
 				}
 				if(parts[1] != null){
+					if(!noCorrect){
+						parts[1] = parts[1].replace(/\-/g, '0');
+					}
 					val += curCfg.numberFormat['.'] + parts[1];
 				}
 				if(isNegative){

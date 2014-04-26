@@ -620,7 +620,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		_create: function(){
 			var i;
 			
-			this.element.addClass(this.options.baseClass || 'ws-range').attr({role: 'slider'}).append('<span class="ws-range-rail ws-range-track"><span class="ws-range-min ws-range-progress" /><span class="ws-range-thumb"><span><span data-value="" data-valuetext="" /></span></span></span>');
+			this.element.addClass(this.options.baseClass || 'ws-range ws-input').attr({role: 'slider'}).append('<span class="ws-range-rail ws-range-track"><span class="ws-range-min ws-range-progress" /><span class="ws-range-thumb"><span><span data-value="" data-valuetext="" /></span></span></span>');
 			this.trail = $('.ws-range-track', this.element);
 			this.range = $('.ws-range-progress', this.element);
 			this.thumb = $('.ws-range-thumb', this.trail);
@@ -1599,7 +1599,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		
 		
 		var formatVal = {
-			number: function(val, o){
+			number: function(val, o, noCorrect){
 				var parts, len, i, isNegative;
 				if(o && o.nogrouping){
 					return (val+'').replace(/\,/g, '').replace(/\./, curCfg.numberFormat['.']);
@@ -1624,6 +1624,9 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 					--i;
 				}
 				if(parts[1] != null){
+					if(!noCorrect){
+						parts[1] = parts[1].replace(/\-/g, '0');
+					}
 					val += curCfg.numberFormat['.'] + parts[1];
 				}
 				if(isNegative){

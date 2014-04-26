@@ -127,7 +127,7 @@
 			wspopover: {appendTo: 'auto', hideOnBlur: true},
 			ajax: {},
 			loadScript: function(src, success){
-				if(!$.ajax){
+				if(!$.ajax && !$.ajaxSettings.xhr){
 					if(window.yepnope){
 						yepnope.injectJs(src, success);
 					} else if(window.require){
@@ -153,6 +153,20 @@
 			} else if (typeof name == 'object') {
 				$.extend(true, webCFG, name);
 			}
+		},
+		getLazyFn: function(fn, modules){
+			var load = function(){
+				loadList(modules);
+			};
+			onReady('WINDOWLOAD', load);
+			return function(){
+				var args = arguments;
+				var obj = this;
+				load();
+				onReady(modules, function(){
+					obj[fn].apply(obj, args);
+				});
+			};
 		},
 		_getAutoEnhance: getAutoEnhance,
 		addPolyfill: function(name, cfg){
