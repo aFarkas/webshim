@@ -279,12 +279,27 @@
 				<li>
 					<strong>enhanceAuto</strong> If set to <code>true</code> configuration values with the keyword '<code>auto</code>' are treated as true, if this is <code>false</code> the keyword '<code>auto</code>' is treated as <code>false</code>.
 					<br>
-					<em>default: dynamically computed (mainly false for mobile devices and IE8 otherwise true)</em>
+					<em>default: dynamically computed (mainly false for Smartphone devices and IE8 otherwise true: <code>window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches)</code>)</em>
 				</li>
 			</ul>
-			<pre><code class="language-javascript">
-webshims.setOptions('extendNative', true);
+<pre><code class="language-javascript">
+// enhanceAuto will be false for devices smaller than 720px (i.e. Smartphones or for devices smaller than 1024px and with touchevents (i.e.: Tablets)
+webshims.setOptions('enhanceAuto', !(matchMedia('(max-device-width: 720px)').matches || matchMedia('(max-device-width: 1024px)').matches && Modernizr.touchevents) );
+
+webshims.setOptions({
+	'forms-ext': {
+		replaceUI: 'auto'
+	},
+	'mediaelement', {
+		replaceUI: 'auto'
+	}
+});
+
+//webshims will implement those features in all browsers/devices
+// but will only enhance capable browsers on desktop with custom styleable mediaelement controls and form widgets
+webshims.polyfill('forms forms-ext mediaelement');
 </code></pre>
+
 			<p>
 				<code class="i">
 					setOptions</code>

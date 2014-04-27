@@ -253,6 +253,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	var rtlReplace = function(ret){
 		return ret == 'left' ? 'right' : 'left';
 	};
+
 	webshims.getRelOffset = function(posElem, relElem, opts){
 		var offset, bodyOffset, dirs;
 		posElem = $(posElem);
@@ -332,6 +333,11 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			element = $(element || this.options.prepareFor).getNativeElement() ;
 			
 			var that = this;
+			var closeOnOutSide = function(e){
+				if(that.options.hideOnBlur && !that.stopBlur && !that.isInElement([that.lastElement[0], element[0], that.element[0]], e.target)){
+					that.hide();
+				}
+			};
 			var visual = $(element).getShadowElement();
 			var delayedRepos = function(e){
 				clearTimeout(that.timers.repos);
@@ -352,12 +358,13 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					that.element.addClass('ws-po-visible').trigger('wspopovershow');
 				}, 14);
 			}, 4);
-			
-			$(document.body || document).on('focusin'+this.eventns+' mousedown'+this.eventns, function(e){
-				if(that.options.hideOnBlur && !that.stopBlur && !that.isInElement([that.lastElement[0], element[0], that.element[0]], e.target)){
-					that.hide();
-				}
-			});
+
+			$(document.body)
+				.on('focusin'+this.eventns+' mousedown'+this.eventns, closeOnOutSide)
+				//http://www.quirksmode.org/m/tests/eventdelegation2.html
+				.children(':not(script), :not(iframe), :not(noscript)')
+				.on('mousedown'+this.eventns, closeOnOutSide)
+			;
 			
 			this.element.off('pospopover').on('pospopover', delayedRepos);
 			$(window).on('resize'+this.eventns + ' pospopover'+this.eventns, delayedRepos);
@@ -431,7 +438,11 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		clear: function(){
 			$(window).off(this.eventns);
 			$(document).off(this.eventns);
-			$(document.body).off(this.eventns);
+			$(document.body)
+				.off(this.eventns)
+				.children(':not(script), :not(iframe), :not(noscript)')
+				.off(this.eventns)
+			;
 			this.element.off('transitionend'+this.eventns);
 			this.stopBlur = false;
 			this.lastOpts = false;
