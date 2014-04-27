@@ -89,10 +89,11 @@
 			webshims.polyfill('mediaelement');
 		</script>
 		<script>
-			if('ontouchstart' in window){
-				$('html').addClass('touchevents');
-			}
-
+			webshims.ready('jquery', function(){
+				if('ontouchstart' in window){
+					$('html').addClass('touchevents');
+				}
+			});
 		</script>
 		<script>
 			webshims.ready('playlist', function(){

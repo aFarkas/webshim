@@ -1625,9 +1625,9 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		popover.bodyElement = $('div.ws-picker-body', popover.contentElement);
 		popover.buttonRow = $('div.ws-button-row', popover.contentElement);
 		popover.element.on('updatepickercontent', updateContent);
-		
+
 		popover.contentElement
-			.on('click', 'button[data-action]', actionfn)
+			.wsTouchClick('button[data-action]', actionfn)
 			.on('change', 'select[data-action]', actionfn)
 		;
 		

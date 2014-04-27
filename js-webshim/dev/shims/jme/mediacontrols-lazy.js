@@ -31,6 +31,72 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	};
 
 
+	$.fn.wsTouchClick = (function(){
+		var supportsTouchaction = ('touchAction' in document.documentElement.style);
+		var addTouch = !supportsTouchaction && ('ontouchstart' in window) && document.addEventListener;
+		return function(target, handler){
+			var touchData, touchEnd, touchStart;
+
+			if(addTouch){
+
+				touchEnd = function(e){
+					var ret, touch;
+					e = e.originalEvent || {};
+					$(this).off('touchend', touchEnd);
+					var changedTouches = e.changedTouches || e.touches;
+					if(!touchData || !changedTouches || changedTouches.length != 1){
+						return;
+					}
+
+					touch = changedTouches[0];
+					if(Math.abs(touchData.x - touch.pageX) > 40 || Math.abs(touchData.y - touch.pageY) > 40 || Date.now() - touchData.now > 600){
+						return;
+					}
+					e.preventDefault();
+					ret = handler.apply(this, arguments);
+
+					return ret;
+				};
+
+				touchStart = function(e){
+					var touch, elemTarget;
+
+
+					if((!e || e.touches.length != 1)){
+						return;
+					}
+					touch = e.touches[0];
+					elemTarget = target ? $(touch.target).closest(target) : $(this);
+					if(!elemTarget.length){
+						return;
+					}
+					touchData = {
+						x: touch.pageX,
+						y: touch.pageY,
+						now: Date.now()
+					};
+					elemTarget.on('touchend', touchEnd);
+				};
+
+				this.each(function(){
+					this.addEventListener('touchstart', touchStart, true);
+				});
+			} else if(supportsTouchaction){
+				this.css('touch-action', 'manipulation');
+			}
+
+			if($.isFunction(target)){
+				handler = target;
+				target = false;
+				this.on('click', handler);
+			} else {
+				this.on('click', target, handler);
+			}
+			return this;
+		};
+	})();
+
+
 	function createGetSetHandler(fns){
 		var throttleTimer;
 		var blocked;
@@ -113,7 +179,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					})
 					.triggerHandler('updateJMEState')
 				;
-				control.on((control.is('select')) ? 'change' : 'click', function(e){
+				control.wsTouchClick(function(e){
 					media.jmeFn('togglePlay');
 					e.stopPropagation();
 				});
@@ -134,7 +200,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					.triggerHandler('updateJMEState')
 				;
 
-				control.on((control.is('select')) ? 'change' : 'click', function(e){
+				control.wsTouchClick(function(e){
 					media.prop('muted', !media.prop('muted'));
 					e.stopPropagation();
 				});
@@ -399,7 +465,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 
 				base.on('playerdimensionchange', updateControl);
 
-				control.on((control.is('select')) ? 'change' : 'click', function(){
+				control.wsTouchClick(function(){
 					var value = base.hasClass('player-fullscreen') ? false : options.fullscreen;
 					base.jmeProp('fullscreen', value);
 					if(value && options.autoplayfs){
@@ -463,7 +529,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 							};
 
 							menuObj = new $.jme.ButtonMenu(control, menu, menuClick);
-							checkbox.on('click', function(){
+							checkbox.wsTouchClick(function(){
 								menuClick(0, this);
 								return false;
 							});
@@ -896,7 +962,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 
 		this.addMenu(menu);
 		this._closeFocusOut();
-		this.button.on('click', this.toggle);
+		this.button.wsTouchClick(this.toggle);
 	};
 
 	$.jme.ButtonMenu.prototype = {
@@ -909,7 +975,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			this.menu.insertAfter(this.button);
 			this.menu
 				.on('keydown', this.keyIndex)
-				.delegate('button', 'click', this._buttonClick)
+				.wsTouchClick('button', this._buttonClick)
 			;
 		},
 		_closeFocusOut: function(){

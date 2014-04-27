@@ -1089,10 +1089,76 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		webshims._format = formatVal;
 		
 	})();
-	
+
+
+	$.fn.wsTouchClick = (function(){
+		var supportsTouchaction = ('touchAction' in document.documentElement.style);
+		var addTouch = !supportsTouchaction && ('ontouchstart' in window) && document.addEventListener;
+		return function(target, handler){
+			var touchData, touchEnd, touchStart;
+
+			if(addTouch){
+
+				touchEnd = function(e){
+					var ret, touch;
+					e = e.originalEvent || {};
+					$(this).off('touchend', touchEnd);
+					var changedTouches = e.changedTouches || e.touches;
+					if(!touchData || !changedTouches || changedTouches.length != 1){
+						return;
+					}
+
+					touch = changedTouches[0];
+					if(Math.abs(touchData.x - touch.pageX) > 40 || Math.abs(touchData.y - touch.pageY) > 40 || Date.now() - touchData.now > 600){
+						return;
+					}
+					e.preventDefault();
+					ret = handler.apply(this, arguments);
+
+					return ret;
+				};
+
+				touchStart = function(e){
+					var touch, elemTarget;
+
+
+					if((!e || e.touches.length != 1)){
+						return;
+					}
+					touch = e.touches[0];
+					elemTarget = target ? $(touch.target).closest(target) : $(this);
+					if(!elemTarget.length){
+						return;
+					}
+					touchData = {
+						x: touch.pageX,
+						y: touch.pageY,
+						now: Date.now()
+					};
+					elemTarget.on('touchend', touchEnd);
+				};
+
+				this.each(function(){
+					this.addEventListener('touchstart', touchStart, true);
+				});
+			} else if(supportsTouchaction){
+				this.css('touch-action', 'manipulation');
+			}
+
+			if($.isFunction(target)){
+				handler = target;
+				target = false;
+				this.on('click', handler);
+			} else {
+				this.on('click', target, handler);
+			}
+			return this;
+		};
+	})();
+
 	(function(){
 		var picker = {};
-
+		var assumeVirtualKeyBoard = Modernizr.touchevents || Modernizr.touch || (/android|iphone|ipad|ipod|blackberry|iemobile/i.test(navigator.userAgent.toLowerCase()));
 		webshims.inlinePopover = {
 			_create: function(){
 				this.element = $('<div class="ws-inline-picker"><div class="ws-po-box" /></div>').data('wspopover', this);
@@ -1183,7 +1249,11 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			cancel: function(val, popover, data){
 				if(!data.options.inlinePicker){
 					popover.stopOpen = true;
-					data.element.getShadowFocusElement().trigger('focus');
+					if(assumeVirtualKeyBoard){
+						$('button', data.buttonWrapper).trigger('focus');
+					} else {
+						data.element.getShadowFocusElement().trigger('focus');
+					}
 					setTimeout(function(){
 						popover.stopOpen = false;
 					}, 9);
@@ -1344,7 +1414,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			}
 			
 			
-			opener.on({click: open});
+			opener.wsTouchClick(open);
 			
 			if(options.inlinePicker){
 				popover.openedByFocus = true;

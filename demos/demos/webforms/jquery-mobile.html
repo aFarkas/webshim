@@ -43,9 +43,6 @@
 		}
 		
 		@media (min-width: 28em) {
-			.touch .input-picker {
-				font-size: 16px;
-			}
 			.ui-field-contain .ws-errorbox {
 				margin-left: 22%;
 			}
@@ -138,7 +135,9 @@
 	</script>
 	
 	<title>Webshims and jQuery Mobile</title>
-
+<script>
+	Modernizr.addTest('touchevents', Modernizr.touch);
+</script>
 </head>
 
 <body>
