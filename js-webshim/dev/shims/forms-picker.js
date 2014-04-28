@@ -372,9 +372,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 						if (events[name] && events[name].val != val) {
 							clearTimeout(events[name].timer);
 							events[name].val = val;
-							events[name].timer = setTimeout(function(){
-								events[name].fn(val, that);
-							}, 9);
+							events[name].fn(val, that);
 						}
 					}
 				};
