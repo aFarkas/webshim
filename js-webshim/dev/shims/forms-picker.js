@@ -650,24 +650,29 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 						role: 'spinbutton'
 					}).on(spinEvents);
 				}
-				$(this.buttonWrapper).on('mousepressstart mousepressend', '.step-up, .step-down', mousePress).on('mousedown mousepress', '.step-up', function(e){
-					step.stepUp();
-				}).on('mousedown mousepress', '.step-down', function(e){
-					step.stepDown();
-				});
+				$(this.buttonWrapper)
+					.on('mousepressstart mousepressend', '.step-up, .step-down', mousePress)
+					.on('mousedown mousepress', '.step-up', function(e){
+						step.stepUp();
+					})
+					.on('mousedown mousepress', '.step-down', function(e){
+						step.stepDown();
+					})
+				;
 				initChangeEvents();
 			}
 		},
 		_getSelectionEnd: function(val){
 			var oldVal, selectionEnd;
-
-			if(this.type == 'number' && (oldVal = this.element[0].value) && oldVal != val && this.element.is(':focus') && (selectionEnd = this.element.prop('selectionEnd')) < oldVal.length){
-				oldVal = oldVal.substr(0, selectionEnd).split(curCfg.numberFormat[',']);
-				val = val.substr(0, selectionEnd).split(curCfg.numberFormat[',']);
-				if(oldVal.length < val.length){
-					selectionEnd++;
-				} else if(oldVal.length > val.length){
-					selectionEnd--;
+			if((oldVal = this.element[0].value) && this.element.is(':focus') && (selectionEnd = this.element.prop('selectionEnd')) < oldVal.length){
+				if(this.type == 'number'){
+					oldVal = oldVal.substr(0, selectionEnd).split(curCfg.numberFormat[',']);
+					val = val.substr(0, selectionEnd).split(curCfg.numberFormat[',']);
+					if(oldVal.length < val.length){
+						selectionEnd++;
+					} else if(oldVal.length > val.length){
+						selectionEnd--;
+					}
 				}
 				return selectionEnd;
 			}

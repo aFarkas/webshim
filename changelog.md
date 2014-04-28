@@ -1,3 +1,11 @@
+Release 1.12.6
+----------
+- added thousand separator to input[type="number"]
+- several runtime performance improvements
+- improved responsive default mediaplayer theme
+- improved touch support / added fastclick / tab to mediaplayer controls and UI form widgets
+- added playlist plugin feature to mediaelement
+
 Release 1.12.5
 ----------
 - added custom styleable controls to mediaelement feature `webshims.setOptions('mediaelement', {replaceUI: true});`

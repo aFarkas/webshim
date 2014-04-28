@@ -116,7 +116,7 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.12.6-RC3',
+		version: '1.12.6',
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
 			//addCacheBuster: false,
@@ -127,7 +127,7 @@
 			wspopover: {appendTo: 'auto', hideOnBlur: true},
 			ajax: {},
 			loadScript: function(src, success){
-				if(!$.ajax && !$.ajaxSettings.xhr){
+				if(!$.ajax || !$.ajaxSettings.xhr){
 					if(window.yepnope){
 						yepnope.injectJs(src, success);
 					} else if(window.require){
