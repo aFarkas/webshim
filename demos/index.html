@@ -29,7 +29,7 @@
 
 		<div id="sidebar" class="interface">
 
-			<a class="toc_title"> Webshim <span class="version">(<span class="ws-version">1.12.6</span>)</span></a>
+			<a class="toc_title"> Webshim <span class="version">(<span class="ws-version">1.12.7</span>)</span></a>
 			<ul class="toc_section">
 				<li>
 					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
@@ -137,7 +137,7 @@
 
 			<table>
 				<tr>
-					<td><a href="http://corrupt-system.de/webshims-stable.zip" class="download-button"> <strong><i>Version <span class="ws-version">1.12.6</span></i></strong> </a></td>
+					<td><a href="http://corrupt-system.de/webshims-stable.zip" class="download-button"> <strong><i>Version <span class="ws-version">1.12.7</span></i></strong> </a></td>
 					<td class="text"></td>
 				</tr>
 			</table>
@@ -149,13 +149,7 @@
 			<h2 id="introduction" class="header">Introduction</h2>
 
 			<p>
-				There are many appealing HTML5 features such as form validation, geolocation and mediaelements which ease the burden of writing rich web applications.
-			</p>
-
-			<p>
-				Using these features responsibly requires supporting the browsers and versions that the audience is likely to use, without breaking usability. There are two common ways to support these new features. Abstractions declare a library or piece of code that
-				invents a new API which you can use to access the feature. jQuery is a good example; It defines an API that provides access to features that are buggy or incomplete, by coming up with it's own format. $.ajax is an abstraction over xmlhttprequest
-				which is a standard that has varying support. The other solution is called polyfilling, which fills in the gaps in a lacking browser rather than than designing a new API.
+				There are many appealing HTML5 features such as <a href="http://fiddle.jshell.net/trixta/WPpPy/show/light/">form validation</a>, geolocation, <a href="http://fiddle.jshell.net/trixta/VvmmC/show/light/">mediaelements</a> and <a hef="http://fiddle.jshell.net/trixta/VNuct/show/light/">UI widgets</a> which ease the burden of writing rich web applications.
 			</p>
 
 			<p>
@@ -935,7 +929,8 @@ webshims.setOptions("forms", {
 		"sel": ".ws-validate",
 		"handleBubble": "hide",
 		"recheckDelay": 400,
-		"fieldWrapper": ":not(span), :not(label), :not(em), :not(strong), :not(p)",
+		"fieldWrapper": ":not(span):not(label):not(em):not(strong):not(p)",
+		"events": "focusout change",
 		"errorClass": "user-error",
 		"errorWrapperClass": "ws-invalid",
 		"successWrapperClass": "ws-success",

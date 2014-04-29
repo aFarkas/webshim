@@ -9,7 +9,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	var iVal = options.iVal;
 
 	if(!iVal.fieldWrapper){
-		iVal.fieldWrapper = ':not(span), :not(label), :not(em), :not(strong), :not(p)'; 
+		iVal.fieldWrapper = ':not(span):not(label):not(em):not(strong):not(p)';
 	}
 	var invalidClass = iVal.errorClass || (iVal.errorClass = 'user-error');
 	var validClass = iVal.successClass || (iVal.successClass = 'user-success');

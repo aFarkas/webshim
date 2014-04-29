@@ -34,7 +34,7 @@
 
 		<div id="sidebar" class="interface">
 
-			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.12.6</span>)</span></a>
+			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.12.7</span>)</span></a>
 			<ul class="toc_section">
 				<li>
 					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
@@ -184,7 +184,7 @@ webshims.setOptions('forms', {
 		"handleBubble": "hide", 
 		
 		//selector or function to find the wrapper of the form field[s] (if there are more than one form field in the wrapper they will be handled as a group with one combined errormessage)
-		"fieldWrapper": ":not(span), :not(label), :not(em), :not(strong), :not(p)",
+		"fieldWrapper": ":not(span):not(label):not(em):not(strong):not(p)",
 		
 		//wether an invalid input should be re-checked while user types
 		"recheckDelay": 400,
