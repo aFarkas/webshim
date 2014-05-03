@@ -4350,11 +4350,11 @@ webshims.isReady('es5', true);
 			
 			var type = $.prop(this, 'type');
 			
-			var i, opts, data, optsName, labels, cNames;
+			var i, opts, data, optsName, labels, cNames, hasInitialFocus;
 			if(inputTypes[type] && webshims.implement(this, 'inputwidgets')){
 				data = {};
 				optsName = type;
-				
+				hasInitialFocus = $(this).is(':focus');
 				labels = $(this).jProp('labels');
 				opts = $.extend(webshims.getOptions(this, type, [options.widgets, options[type], $($.prop(this, 'form')).data(type)]), {
 					orig: this,
@@ -4478,6 +4478,9 @@ webshims.isReady('es5', true);
 					sizeInput(data.shim);
 				} else {
 					$(this).css('display', 'none');
+				}
+				if(hasInitialFocus){
+					$(this).getShadowFocusElement().trigger('focus');
 				}
 			}
 			

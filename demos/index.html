@@ -174,8 +174,9 @@
   
 &lt;script&gt;
   //webshims.setOptions('basePath', '/js-webshim/minified/shims/');
-  
-  webshims.polyfill();
+
+  //request the features you need:
+  webshims.polyfill('es5 mediaelement forms');
   
   $(function(){
     // use all implemented API-features on DOM-ready
@@ -243,7 +244,7 @@
 					<em>default: false</em>
 				</li>
 				<li>
-					<strong>basePath</strong> The shims folder is computed automatically. If the name of polyfiller.js is changed <strong>and</strong> the polyfill-script is loaded async, this computation can be wrong and you have to set the folder manually. Example:
+					<strong>basePath</strong> The path to your shims folder. This is computed dynamically. <a href="#Requirejs-setup">More information</a>. Example:
 					<br>
 					<code class="i">
 						webshims.setOptions('basePath', '/yourFolderTo/shims/');
