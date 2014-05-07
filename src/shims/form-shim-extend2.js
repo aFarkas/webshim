@@ -1136,6 +1136,12 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 					//pro forma
 					,color: 1
 				},
+				inputElements = {
+					input: 1,
+					INPUT: 1,
+					textarea: 1,
+					TEXTAREA: 1
+				},
 				timer,
 				lastVal,
 				input,
@@ -1181,7 +1187,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 
 			$(doc)
 				.on('focusin wswidgetfocusin', function(e){
-					if( e.target && !e.target.readOnly && !e.target.disabled && (e.target.nodeName || '').toLowerCase() == 'input' && !noInputTypes[e.target.type] && !(webshims.data(e.target, 'implemented') || {}).inputwidgets){
+					if( e.target && !e.target.readOnly && !e.target.disabled && inputElements[e.target.nodeName] && !noInputTypes[e.target.type] && !(webshims.data(e.target, 'implemented') || {}).inputwidgets){
 						observe($(e.target));
 					}
 				})
