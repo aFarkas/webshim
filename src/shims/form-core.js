@@ -208,6 +208,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	
 	
 	webshims.getContentValidationMessage = function(elem, validity, key){
+		var customRule;
 		if(webshims.errorbox && webshims.errorbox.initIvalContentMessage){
 			webshims.errorbox.initIvalContentMessage(elem);
 		}
@@ -222,7 +223,9 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		}
 		if(typeof message == 'object'){
 			validity = validity || $.prop(elem, 'validity') || {valid: 1};
-			if(!validity.valid){
+			if(validity.customError && (customRule = $.data(elem, 'customMismatchedRule')) && message[customRule] && typeof message[customRule] == 'string'){
+				message = message[customRule];
+			} else if(!validity.valid){
 				$.each(validity, function(name, prop){
 					if(prop && name != 'valid' && message[name]){
 						message = message[name];
