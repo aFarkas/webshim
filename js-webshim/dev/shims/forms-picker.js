@@ -595,15 +595,21 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 							if(o.stepfactor){
 								factor *= o.stepfactor;
 							}
-							try {
-								that.elemHelper[name](factor);
-								
-								ret = that.elemHelper.prop('value');
-								
-							} 
-							catch (er) {
-								if (!o.value && that.maxAsNumber >= that.minAsNumber) {
-									ret = o.defValue;
+
+							if(factor > 0 && !isNaN(that.minAsNumber) && (isNaN(that.valueAsNumber) || that.valueAsNumber < that.minAsNumber) && that.elemHelper.prop('valueAsNumber') <= that.minAsNumber){
+								ret = that.asValue(that.minAsNumber);
+							} else if(factor < 0 && !isNaN(that.maxAsNumber) && (isNaN(that.valueAsNumber) || that.valueAsNumber > that.minAsNumber) && that.elemHelper.prop('valueAsNumber') <= that.maxAsNumber){
+								ret = that.asValue(that.maxAsNumber);
+							}
+
+							if(ret === false){
+								try {
+									that.elemHelper[name](factor);
+									ret = that.elemHelper.prop('value');
+								} catch (er) {
+									if (!o.value && that.maxAsNumber >= that.minAsNumber) {
+										ret = o.defValue;
+									}
 								}
 							}
 							if (ret !== false && o.value != ret) {

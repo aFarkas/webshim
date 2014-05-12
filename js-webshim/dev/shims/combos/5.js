@@ -2406,7 +2406,6 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 				}
 				this.elemHelper.prop('valueAsNumber', start);
 				this.options.defValue = this.elemHelper.prop('value');
-				
 			},
 			reorderInputs: function(){
 				if(splitInputs[this.type]){
@@ -2488,6 +2487,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 			spinBtnProto[name] = function(val){
 				this.elemHelper.prop(name, val);
 				this[numName] = this.asNumber(val);
+
 				if(this.valueAsNumber != null && (isNaN(this.valueAsNumber) || (!isNaN(this[numName]) && (this.valueAsNumber * factor) < (this[numName] * factor)))){
 					this._setStartInRange();
 				}

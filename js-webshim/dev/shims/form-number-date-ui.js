@@ -964,7 +964,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				}
 				this.elemHelper.prop('valueAsNumber', start);
 				this.options.defValue = this.elemHelper.prop('value');
-				
 			},
 			reorderInputs: function(){
 				if(splitInputs[this.type]){
@@ -1046,6 +1045,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			spinBtnProto[name] = function(val){
 				this.elemHelper.prop(name, val);
 				this[numName] = this.asNumber(val);
+
 				if(this.valueAsNumber != null && (isNaN(this.valueAsNumber) || (!isNaN(this[numName]) && (this.valueAsNumber * factor) < (this[numName] * factor)))){
 					this._setStartInRange();
 				}
