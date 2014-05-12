@@ -1647,7 +1647,7 @@ webshims.isReady('es5', true);
 		var stepDescriptor = webshims.defineNodeNameProperty('input', name, {
 			prop: {
 				value: function(factor){
-					var step, val, dateVal, valModStep, alignValue, cache, base, attrVal;
+					var step, val, valModStep, alignValue, cache, base, attrVal;
 					var type = getType(this);
 					if(typeModels[type] && typeModels[type].asNumber){
 						cache = {type: type};
@@ -1657,12 +1657,9 @@ webshims.isReady('es5', true);
 						}
 						factor *= stepFactor;
 						
-						val = $.prop(this, 'valueAsNumber');
+
 						
-						if(isNaN(val)){
-							webshims.info("valueAsNumber is NaN can't apply stepUp/stepDown ");
-							throw('invalid state error');
-						}
+
 						
 						step = webshims.getStep(this, type);
 						
@@ -1673,7 +1670,21 @@ webshims.isReady('es5', true);
 						
 						webshims.addMinMaxNumberToCache('min', $(this), cache);
 						webshims.addMinMaxNumberToCache('max', $(this), cache);
-						
+
+						val = $.prop(this, 'valueAsNumber');
+
+						if(factor > 0 && !isNaN(cache.minAsNumber) && (isNaN(val) || cache.minAsNumber > val)){
+							$.prop(this, 'valueAsNumber', cache.minAsNumber);
+							return;
+						} else if(factor < 0 && !isNaN(cache.maxAsNumber) && (isNaN(val) || cache.maxAsNumber < val)){
+							$.prop(this, 'valueAsNumber', cache.maxAsNumber);
+							return;
+						}
+
+						if(isNaN(val)){
+							val = 0;
+						}
+
 						base = cache.minAsNumber;
 						
 						if(isNaN(base) && (attrVal = $.prop(this, 'defaultValue'))){
@@ -1698,7 +1709,7 @@ webshims.isReady('es5', true);
 						
 						if( (!isNaN(cache.maxAsNumber) && val > cache.maxAsNumber) || (!isNaN(cache.minAsNumber) && val < cache.minAsNumber) ){
 							webshims.info("max/min overflow can't apply stepUp/stepDown");
-							throw('invalid state error');
+							return;
 						}
 						
 						$.prop(this, 'valueAsNumber', val);
@@ -2052,7 +2063,8 @@ webshims.isReady('es5', true);
 		});
 	}
 	
-});;webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
+});
+;webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var lazyLoad = function(name){
 		if(!name || typeof name != 'string'){
