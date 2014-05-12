@@ -1434,7 +1434,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 		if(!message){
 			message = getMessageFromObj(validityMessages[''][name], elem) || $.prop(elem, 'validationMessage');
-			webshims.info('could not find errormessage for: '+ name +' / '+ $.prop(elem, 'type') +'. in language: '+webshims.activeLang());
+			if(name != 'customError'){
+				webshims.info('could not find errormessage for: '+ name +' / '+ $.prop(elem, 'type') +'. in language: '+webshims.activeLang());
+			}
 		}
 		message = webshims.replaceValidationplaceholder(elem, message, name);
 		

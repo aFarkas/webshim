@@ -114,7 +114,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					return;
 			}
 			if(webshims.refreshCustomValidityRules && webshims.refreshCustomValidityRules(elem) == 'async'){
-				$(elem).one('updatevalidation', switchValidityClass);
+				$(elem).one('updatevalidation.webshims', switchValidityClass);
 				return;
 			}
 			
