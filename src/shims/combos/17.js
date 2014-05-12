@@ -2250,7 +2250,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 							selectionEnd = this._getSelectionEnd(val);
 						}
 						this.element.prop(name, val);
-						if(selectionEnd){
+						if(selectionEnd != null){
 							this.element.prop('selectionEnd', selectionEnd);
 						}
 					}
