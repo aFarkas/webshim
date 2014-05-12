@@ -302,16 +302,15 @@
 										</div>
 									</div>
 									<div class="row form-group">
-										<div class="col-md-12 show-activevaluetooltip show-tickvalues">
-											
+										<div class="col-md-12 show-activelabeltooltip show-tickvalues">
 											<label class="form-label" for="widget-scale">
 												widget scale
 											</label>
 											<input type="range" class="form-control" min="13" value="13" max="19" id="widget-scale" list="save-scales" />
 											<datalist id="save-scales">
 												<select>
-													<option>13</option>
-													<option>19</option>
+													<option value="13" label="default"></option>
+													<option value="19" label="touch friendly"></option>
 												</select>
 											</datalist>
 										</div>
