@@ -166,7 +166,7 @@ span.has-input-buttons {
   overflow: hidden;
   display: inline-block;
   vertical-align: middle;
-  margin-left: -20px; }
+  margin-left: -18.5px; }
 
 .step-controls,
 .ws-popover-opener {
@@ -187,7 +187,9 @@ span.has-input-buttons {
   width: 19px;
   border-radius: 3px;
   cursor: pointer;
-  background: #ccc; }
+  background: #ccc;
+  font-size: 13px;
+  text-align: center; }
   .ws-is-rtl .ws-popover-opener {
     margin: 0 2px 0 0; }
   .ws-popover-opener span {
@@ -198,6 +200,8 @@ span.has-input-buttons {
     width: 16px;
     height: 16px;
     margin: -8px 0 0 -8px; }
+    .time-input-buttons .ws-popover-opener span {
+      margin: -7.5px 0 0 -7.5px; }
     .color-input-buttons .ws-popover-opener span {
       background: url(color-picker.png) no-repeat 0 0; }
       .color-input-buttons .ws-popover-opener span:before {
@@ -230,52 +234,60 @@ input[type="color"] {
   .input-button-size-2.ws-is-rtl {
     margin-left: 0;
     margin-right: -39px; }
+  .input-button-size-2 .step-controls {
+    visibility: hidden;
+    opacity: 0; }
+  :focus + .input-button-size-2 .step-controls, :hover + .input-button-size-2 .step-controls, :active + .input-button-size-2 .step-controls, .input-button-size-2:hover .step-controls {
+    opacity: 1;
+    visibility: visible; }
 
-.step-controls span {
-  position: absolute;
-  left: 0;
-  display: inline-block;
-  overflow: hidden;
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 15px;
-  height: 9px;
-  cursor: pointer;
-  font-size: 0;
-  line-height: 0;
-  text-align: center;
-  transition: border-color 300ms, background-color 300ms; }
-  .step-controls span.step-down {
-    bottom: 0; }
-  .step-controls span:before {
+.step-controls {
+  transition: all 300ms; }
+  .step-controls span {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    content: "";
+    left: 0;
     display: inline-block;
-    width: 0px;
-    height: 0px;
-    border-style: solid;
-    margin: -2px 0 0 -4px;
+    overflow: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 15px;
+    height: 9px;
+    cursor: pointer;
+    font-size: 0;
+    line-height: 0;
+    text-align: center;
     transition: border-color 300ms, background-color 300ms; }
-  .step-controls span.step-up:before {
-    border-width: 0 4px 4px;
-    border-color: transparent transparent #999 transparent; }
-  .step-controls span.step-up:hover:before {
-    border-color: transparent transparent #666 transparent; }
-  .step-controls span.step-up.mousepress-ui:before {
-    border-color: transparent transparent #000 transparent; }
-  .ws-disabled .step-controls span.step-up:before {
-    border-color: transparent transparent #aaa transparent; }
-  .step-controls span.step-down:before {
-    border-width: 4px 4px 0;
-    border-color: #999 transparent transparent transparent; }
-  .step-controls span.step-down:hover:before {
-    border-color: #666 transparent transparent transparent; }
-  .step-controls span.step-down.mousepress-ui:before {
-    border-color: #000 transparent transparent transparent; }
-  .ws-disabled .step-controls span.step-down:before {
-    border-color: #aaa transparent transparent transparent; }
+    .step-controls span.step-down {
+      bottom: 0; }
+    .step-controls span:before {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      content: "";
+      display: inline-block;
+      width: 0px;
+      height: 0px;
+      border-style: solid;
+      margin: -2px 0 0 -4px;
+      transition: border-color 300ms, background-color 300ms; }
+    .step-controls span.step-up:before {
+      border-width: 0 4px 4px;
+      border-color: transparent transparent #999 transparent; }
+    .step-controls span.step-up:hover:before {
+      border-color: transparent transparent #666 transparent; }
+    .step-controls span.step-up.mousepress-ui:before {
+      border-color: transparent transparent #000 transparent; }
+    .ws-disabled .step-controls span.step-up:before {
+      border-color: transparent transparent #aaa transparent; }
+    .step-controls span.step-down:before {
+      border-width: 4px 4px 0;
+      border-color: #999 transparent transparent transparent; }
+    .step-controls span.step-down:hover:before {
+      border-color: #666 transparent transparent transparent; }
+    .step-controls span.step-down.mousepress-ui:before {
+      border-color: #000 transparent transparent transparent; }
+    .ws-disabled .step-controls span.step-down:before {
+      border-color: #aaa transparent transparent transparent; }
 
 /* helper classes to hide show/hide specific btn features features */
 .ws-input {
