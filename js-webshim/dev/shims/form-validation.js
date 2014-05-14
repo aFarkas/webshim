@@ -158,12 +158,12 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				//jQuery 1.6.1 IE9 bug (doubble trigger bug)
 				setTimeout(function(){
 					$(elem).trigger(trigger);
-				}, 0);
+				});
 			}
 			if(generaltrigger){
 				setTimeout(function(){
 					$(elem).trigger(generaltrigger);
-				}, 0);
+				});
 			}
 			
 			$.removeData(elem, 'webshimsswitchvalidityclass');
@@ -178,7 +178,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				}
 				switchClass();
 			} else {
-				$.data(elem, 'webshimsswitchvalidityclass', setTimeout(switchClass, 9));
+				$.data(elem, 'webshimsswitchvalidityclass', setTimeout(switchClass));
 			}
 		}
 	};

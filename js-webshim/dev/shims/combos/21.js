@@ -1564,14 +1564,15 @@
 
 
 	if(hasNative && hasFlash && !options.preferFlash){
-		var noSwitch = {
-			1: 1
+		var switchErrors = {
+			3: 1,
+			4: 1
 		};
 		var switchOptions = function(e){
 			var media, error, parent;
 			if(!options.preferFlash &&
 				($(e.target).is('audio, video') || ((parent = e.target.parentNode) && $('source', parent).last()[0] == e.target)) &&
-				(media = $(e.target).closest('audio, video')) && (error = media.prop('error')) && !noSwitch[error.code]
+				(media = $(e.target).closest('audio, video')) && (error = media.prop('error')) && switchErrors[error.code]
 				){
 
 				if(!options.preferFlash){
@@ -1592,7 +1593,7 @@
 			document.addEventListener('error', switchOptions, true);
 			$('audio, video').each(function(){
 				var error = $.prop(this, 'error');
-				if(error && !noSwitch[error]){
+				if(error && switchErrors[error]){
 					switchOptions({target: this});
 					return false;
 				}
