@@ -1,13 +1,22 @@
-setTimeout(function(){
+(function(){
 	"use strict";
-	var sel = 'picture, img[srcset]';
-	webshims.addReady(function(context, insertedElement){
-		if(context == document){return;}
-		if(context.querySelector(sel) || insertedElement.filter(sel).length){
-			window.picturefill();
-		}
+	try {
+		new Image();
+	} catch(e){
+		window.Image = function(){
+			return document.createElement('img');
+		};
+	}
+	setTimeout(function(){
+		var sel = 'picture, img[srcset]';
+		webshims.addReady(function(context, insertedElement){
+			if(context == document){return;}
+			if(context.querySelector(sel) || insertedElement.filter(sel).length){
+				window.picturefill();
+			}
+		});
 	});
-});
+})();
 
 /*! Picturefill - v2.0.0-beta - 2014-05-02
 * http://scottjehl.github.io/picturefill
