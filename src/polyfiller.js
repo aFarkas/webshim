@@ -928,6 +928,12 @@
 	addPolyfill('picture', {
 		test: !!window.HTMLPictureElement
 	});
+
+
+	addPolyfill('promise', {
+		test: !!(window.Promise && Promise.all)
+	});
+
 	
 	
 	//<geolocation
