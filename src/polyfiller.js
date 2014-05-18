@@ -923,6 +923,11 @@
 		d: ['es5'],
 		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 25, 19, 20, 26, 31, 34]
 	});
+
+	document.createElement('picture');
+	addPolyfill('picture', {
+		test: !!window.HTMLPictureElement
+	});
 	
 	
 	//<geolocation
