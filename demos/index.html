@@ -54,15 +54,9 @@
 				</li>
 			</ul>
 
-			<a class="toc_title" href="#Shiv"> HTML5 shiv and innerShiv </a>
-			<ul class="toc_section">
-				<li>
-					– <a href="#Shiv-dynamic-html5">Dynamically adding HTML5 Markup</a>
-				</li>
-				<li>
-					– <a href="#Shiv-updatePolyfill">updatePolyfill</a>
-				</li>
-			</ul>
+			<a class="toc_title" href="#Canvas"> Canvas </a>
+
+			<a class="toc_title" href="#DetailsSummary"> Details &amp; Summary </a>
 
 			<a class="toc_title" href="#ES5"> ES5 </a>
 
@@ -79,7 +73,19 @@
 				</li>
 			</ul>
 
-			<a class="toc_title" href="#Canvas"> Canvas </a>
+			<a class="toc_title" href="#FileReader"> FileReader </a>
+
+			<a class="toc_title" href="#Geolocation"> Geolocation </a>
+
+			<a class="toc_title" href="#Shiv"> HTML5 shiv and innerShiv </a>
+			<ul class="toc_section">
+				<li>
+					– <a href="#Shiv-dynamic-html5">Dynamically adding HTML5 Markup</a>
+				</li>
+				<li>
+					– <a href="#Shiv-updatePolyfill">updatePolyfill</a>
+				</li>
+			</ul>
 
 			<a class="toc_title" href="#Media"> Media </a>
 			<ul class="toc_section">
@@ -91,11 +97,9 @@
 				</li>
 			</ul>
 
-			<a class="toc_title" href="#Geolocation"> Geolocation </a>
+			<a class="toc_title" href="#Promise"> Promise </a>
 
-			<a class="toc_title" href="#DetailsSummary"> Details &amp; Summary </a>
-
-			<a class="toc_title" href="#FileReader"> FileReader </a>
+			<a class="toc_title" href="#Picturefill"> Responsive Images (<code>picture</code>, <code>srcset</code>)</a>
 
 			<a class="toc_title" href="#Enhancement-Strategy">Webshim's opinionated enhancement cross browser / device development strategy</a>
 
@@ -195,13 +199,16 @@
 
 				<ul class="list">
 					<li>
+						canvas
+					</li>
+					<li>
+						details
+					</li>
+					<li>
 						es5
 					</li>
 					<li>
-						geolocation
-					</li>
-					<li>
-						canvas
+						filereader
 					</li>
 					<li>
 						forms
@@ -210,16 +217,19 @@
 						forms-ext
 					</li>
 					<li>
+						geolocation
+					</li>
+					<li>
 						mediaelement
 					</li>
 					<li>
+						promise
+					</li>
+					<li>
+						responsive images (picture,srcset)
+					</li>
+					<li>
 						track
-					</li>
-					<li>
-						filereader
-					</li>
-					<li>
-						details
 					</li>
 				</ul>
 
@@ -1477,6 +1487,40 @@ $(function(){
 			<p>
 				<em>This feature is based on code from <a href="https://github.com/Jahdrien/FileReader" target="_external">https://github.com/Jahdrien/FileReader</a>. </em>
 			</p>
+
+
+
+			<h2 id="Promise">Promise</h2>
+			<p>
+				A polyfill of
+				<a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-promise-objects" target="_external">ES6
+				Promises</a>.  For instructions on using promises and details of the API, read
+				<a href="http://www.html5rocks.com/en/tutorials/es6/promises/" target="_external">JavaScript
+					Promises at HTML5Rocks</a>.
+			</p>
+			<p>
+				<em>This feature is based on code from
+				<a href="https://github.com/jakearchibald/es6-promise" target="_external">https://github.com/jakearchibald/es6-promise</a>.</em>
+			</p>
+
+
+
+
+			<h2 id="Picturefill">Responsive Images</h2>
+			<p>
+				A strict polyfill of the
+					<a href="http://picture.responsiveimages.org/" target="_external"><code>picture</code>
+					element draft specification</a> from the Responsive Images Community Group, including
+					the <code>srcset</code> and <code>sizes</code> attributes.
+			</p>
+			<p>
+				<em>This feature is based on code from
+				<a href="http://scottjehl.github.io/picturefill/" target="_external">http://scottjehl.github.io/picturefill/</a>.</em>
+				Complete documentation is available there.
+			</p>
+
+
+
 
 			<h2 id="Enhancement-Strategy">Webshim's opinionated enhancement cross browser development strategy</h2>
 			<p>Webshim has evolved form a general polyfill library to a sophisticated UI component / UI widget library which makes it easy to create scalable, responsive and highly adaptable websites and webapps.</p>
