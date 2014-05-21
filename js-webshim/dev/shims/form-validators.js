@@ -147,7 +147,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 /*
  * adds support for HTML5 constraint validation
  * 	- partial pattern: <input data-partial-pattern="RegExp" />
- *  - creditcard-validation: <input data-creditcard="" />
+ *  - creditcard-validation: <input data-luhn="" />
  *  - several dependent-validation patterns (examples):
  *  	- <input type="email" id="mail" /> <input data-dependent-validation='mail' />
  *  	- <input type="date" id="start" data-dependent-validation='{"from": "end", "prop": "max"}' /> <input type="date" id="end" data-dependent-validation='{"from": "start", "prop": "min"}' />
@@ -196,8 +196,11 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 	}, 'Please check one of these checkboxes.');
 	
 	// based on https://sites.google.com/site/abapexamples/javascript/luhn-validation
-	addCustomValidityRule('creditcard', function(elem, value, data){
-		if(!value || (!data || !('creditcard' in data))){return;}
+	addCustomValidityRule('luhn', function(elem, value, data){
+		if(!value || (!data || (!('creditcard' in data) && !('luhn' in data)))){return;}
+		if(('creditcard' in data)){
+			webshims.error('data-creditcard was renamed to data-luhn!!!');
+		}
 		value = value.replace(/\-/g, "");
 		//if it's not numeric return true >- for invalid
 		if(value != value * 1){return true;}

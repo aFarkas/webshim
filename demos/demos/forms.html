@@ -27,14 +27,14 @@
 		</script>
 
 
-        <script src="../demo-js/demo.js" async=""></script>
+		<script src="../demo-js/demo.js" async=""></script>
 	</head>
 
 	<body>
 
 		<div id="sidebar" class="interface">
 
-			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.12.7</span>)</span></a>
+			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.13.0</span>)</span></a>
 			<ul class="toc_section">
 				<li>
 					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
@@ -77,6 +77,8 @@
 			<ul class="toc_section">
 				<li>
 					– <a href="#Custom-addValidators"><code>addValidators</code> option</a>
+				</li>
+				<li>
 					– <a href="#Custom-create">Creating new customErrors</a>
 				</li>
 			</ul>
@@ -242,8 +244,8 @@ $('input.foo').val('bar').trigger('updatevalidation');
 <pre><code class="language-javascript">
 webshims.setOptions('forms', { addValidators: true });
 </code></pre>
-			<h4><code>creditcard</code></h4>
-			<p>All elements with a <code class="i">data-creditcard</code> should have a valid credit card number following the Luhn algorithm.</p>
+			<h4><code>luhn</code></h4>
+			<p>All elements with a <code class="i">data-luhn</code> should have a valid credit card number following the Luhn algorithm.</p>
 <pre><code class="language-markup">
 &lt;input data-creditcard="" /&gt;
 </code></pre>

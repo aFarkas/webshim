@@ -1,4 +1,12 @@
-Release 1.12.6
+Release 1.13.0
+----------
+- added picture / img[srcset] element polyfill
+- added promise polyfill
+- implemented input event for textarea
+- fixed ajax custom validation
+- improved stepUp/stepDown methods
+
+Release 1.12.6/1.12.7
 ----------
 - added thousand separator to input[type="number"]
 - several runtime performance improvements

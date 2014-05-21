@@ -651,10 +651,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 						}
 					};
 					
-					spinElement.attr({
-						'autocomplete': 'off',
-						role: 'spinbutton'
-					}).on(spinEvents);
+					spinElement.on(spinEvents);
 				}
 				$(this.buttonWrapper)
 					.on('mousepressstart mousepressend', '.step-up, .step-down', mousePress)

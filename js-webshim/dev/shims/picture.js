@@ -10,7 +10,7 @@
 	setTimeout(function(){
 		var sel = 'picture, img[srcset]';
 		webshims.addReady(function(context, insertedElement){
-			if(context == document){return;}
+			if(context == document || !window.picturefill){return;}
 			if(context.querySelector(sel) || insertedElement.filter(sel).length){
 				window.picturefill();
 			}

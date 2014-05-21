@@ -13,7 +13,7 @@
 			if(hash.indexOf('legacyjquery') != -1){
 				document.write('<script src="http:\/\/ajax.googleapis.com\/ajax\/libs\/jquery\/1.8\/jquery.js"><\/script>');
 			} else if(Object.defineProperties && hash.indexOf('modernjquery') != -1) {
-				document.write('<script src="http:\/\/code.jquery.com\/jquery-2.0.3.js"><\/script>');
+				document.write('<script src="http:\/\/code.jquery.com\/jquery-2.1.1.js"><\/script>');
 			} else if(hash.indexOf('customjquery') != -1) {
 				document.write('<script src="test-ext\/yepnope.js"><\/script>');
 				
@@ -24,7 +24,7 @@
 				}
 			} else {
 				//code.jquery.com/jquery-2.0.3.js
-				document.write('<script src="http:\/\/code.jquery.com\/jquery-1.11.0.min.js"><\/script>');
+				document.write('<script src="http:\/\/code.jquery.com\/jquery-1.11.1.min.js"><\/script>');
 			}
 		})();
 	</script>
@@ -211,7 +211,7 @@
 	<input type="checkbox" id="noConflictExtreme" value="noConflictExtreme" class="webshim-config" /> <label for="noConflictExtreme">jQuery.noConflict(true)</label>
 	<input type="checkbox" id="bustedValidity" value="bustedValidity" class="webshim-config" /> <label for="bustedValidity">bustedValidity</label>
 	<select class="webshim-config" id="jq-version">
-		<option value="">jQuery 1.11.0</option>
+		<option value="">jQuery 1.11.x</option>
 		<option value="legacyjquery">jQuery 1.8.3</option>
 		<option value="modernjquery">jQuery 2.x</option>
 		<option value="customjquery">custom builds of jQuery 2.x/1.x</option>
