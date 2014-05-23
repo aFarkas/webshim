@@ -143,6 +143,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 					playerSize();
 					webshims.ready('dom-support', function(){
 						data.player.onWSOff('updateshadowdom', playerSize);
+						controls.add(data._controlbar).addClass(webshims.shadowClass);
 						webshims.addShadowDom();
 					});
 				}
@@ -150,8 +151,6 @@ webshims.register('mediacontrols', function($, webshims, window){
 			} else if(!value) {
 				controlBar.detach();
 			}
-			controlBar = null;
-			controls = null;
 			return value;
 		}
 	});

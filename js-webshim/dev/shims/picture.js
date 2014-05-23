@@ -18,9 +18,9 @@
 	});
 })();
 
-/*! Picturefill - v2.0.0-beta - 2014-05-02
-* http://scottjehl.github.io/picturefill
-* Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
+/*! Picturefill - v2.0.0 - 2014-05-08
+ * http://scottjehl.github.io/picturefill
+ * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */
 
 window.matchMedia || (window.matchMedia = function() {
@@ -68,10 +68,10 @@ window.matchMedia || (window.matchMedia = function() {
 	};
 }());
 /*! Picturefill - Responsive Images that work today.
-*  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
-*  License: MIT/GPLv2
-*  Spec: http://picture.responsiveimages.org/
-*/
+ *  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
+ *  License: MIT/GPLv2
+ *  Spec: http://picture.responsiveimages.org/
+ */
 (function( w, doc ) {
 	// Enable strict mode
 	"use strict";
@@ -121,32 +121,37 @@ window.matchMedia || (window.matchMedia = function() {
 	 * Get width in css pixel value from a "length" value
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 */
-pf.getWidthFromLength = function( length ) {
-	// If no length was specified, or it is 0, default to `100vw` (per the spec).
-	length = length && parseFloat( length ) > 0 ? length : "100vw";
+	pf.getWidthFromLength = function( length ) {
+		// If no length was specified, or it is 0, default to `100vw` (per the spec).
+		length = length && parseFloat( length ) > 0 ? length : "100vw";
 
-	/**
-	* If length is specified in  `vw` units, use `%` instead since the div we’re measuring
-	* is injected at the top of the document.
-	*
-	* TODO: maybe we should put this behind a feature test for `vw`?
-	*/
-	length = length.replace( "vw", "%" );
+		/**
+		 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
+		 * is injected at the top of the document.
+		 *
+		 * TODO: maybe we should put this behind a feature test for `vw`?
+		 */
+		length = length.replace( "vw", "%" );
 
-	// Create a cached element for getting length value widths
-	if( !pf.lengthEl ){
-		pf.lengthEl = doc.createElement( "div" );
-		doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
-	}
+		// Create a cached element for getting length value widths
+		if( !pf.lengthEl ){
+			pf.lengthEl = doc.createElement( "div" );
+			doc.documentElement.insertBefore( pf.lengthEl, doc.documentElement.firstChild );
+		}
 
-	// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
-	pf.lengthEl.style.cssText = "position: absolute; left: 0; width: " + length + ";";
-	// Using offsetWidth to get width from CSS
-	return pf.lengthEl.offsetWidth;
-};
+		// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
+		pf.lengthEl.style.cssText = "position: absolute; left: 0; width: " + length + ";";
+		// Using offsetWidth to get width from CSS
+		return pf.lengthEl.offsetWidth;
+	};
 
 	// container of supported mime types that one might need to qualify before using
 	pf.types =  {};
+
+	// Add support for standard mime types.
+	pf.types["image/jpeg"] = true;
+	pf.types["image/gif"] = true;
+	pf.types["image/png"] = true;
 
 	// test svg support
 	pf.types[ "image/svg+xml" ] = doc.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#Image', '1.1');
@@ -194,8 +199,8 @@ pf.getWidthFromLength = function( length ) {
 	};
 
 	/**
-	* Parses an individual `size` and returns the length, and optional media query
-	*/
+	 * Parses an individual `size` and returns the length, and optional media query
+	 */
 	pf.parseSize = function( sourceSizeStr ) {
 		var match = /(\([^)]+\))?\s*(.+)/g.exec( sourceSizeStr );
 		return {
@@ -216,13 +221,13 @@ pf.getWidthFromLength = function( length ) {
 		for ( var i=0, len=sourceSizeList.length; i < len; i++ ) {
 			// Match <media-condition>? length, ie ( min-width: 50em ) 100%
 			var sourceSize = sourceSizeList[ i ],
-				// Split "( min-width: 50em ) 100%" into separate strings
+			// Split "( min-width: 50em ) 100%" into separate strings
 				parsedSize = pf.parseSize( sourceSize ),
 				length = parsedSize.length,
 				media = parsedSize.media;
 
 			if ( !length ) {
-					continue;
+				continue;
 			}
 			if ( !media || pf.matchesMedia( media ) ) {
 				// if there is no media query or it matches, choose this as our winning length
@@ -378,8 +383,8 @@ pf.getWidthFromLength = function( length ) {
 
 				if ( currImg.parentNode.nodeName.toUpperCase() !== "PICTURE" &&
 					( ( pf.srcsetSupported && currImg.getAttribute( "sizes" ) ) ||
-					currImg.getAttribute( "srcset" ) !== null ) ) {
-						elems.push( currImg );
+						currImg.getAttribute( "srcset" ) !== null ) ) {
+					elems.push( currImg );
 				}
 			}
 		}
@@ -509,7 +514,7 @@ pf.getWidthFromLength = function( length ) {
 					// No sources matched, so we’re down to processing the inner `img` as a source.
 					candidates = pf.processSourceSet( picImg );
 
-					if( picImg.srcset === undefined || picImg.getAttribute( "sizes" ) ) {
+					if( picImg.srcset === undefined || ( picImg.getAttribute( "sizes" ) && picImg[ pf.ns ].srcset ) ) {
 						// Either `srcset` is completely unsupported, or we need to polyfill `sizes` functionality.
 						pf.applyBestCandidate( candidates, picImg );
 					} // Else, resolution-only `srcset` is supported natively.
@@ -568,3 +573,4 @@ pf.getWidthFromLength = function( length ) {
 	}
 
 } )( this, this.document );
+

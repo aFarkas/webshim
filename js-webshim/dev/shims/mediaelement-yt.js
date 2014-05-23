@@ -598,7 +598,7 @@ mediaelement.createSWF = function(mediaElem, src, data){
 	}
 	
 	
-	var box = $('<div class="polyfill-video polyfill-mediaelement" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
+	var box = $('<div class="polyfill-video polyfill-mediaelement '+ webshims.shadowClass +'" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
 		.css({
 			position: 'relative',
 			overflow: 'hidden'

@@ -701,7 +701,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			resetSwfProps(data);
 		} else {
 			$(document.getElementById('wrapper-'+ elemId )).remove();
-			box = $('<div class="polyfill-'+ (elemNodeName) +' polyfill-mediaelement" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
+			box = $('<div class="polyfill-'+ (elemNodeName) +' polyfill-mediaelement '+ webshims.shadowClass +'" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
 				.css({
 					position: 'relative',
 					overflow: 'hidden'

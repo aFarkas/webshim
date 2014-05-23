@@ -58,7 +58,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				if(!compareArray(baseData.displayedActiveCues, baseData.activeCues)){
 					baseData.displayedActiveCues = baseData.activeCues;
 					if(!baseData.trackDisplay){
-						baseData.trackDisplay = $('<div class="cue-display"><span class="description-cues" aria-live="assertive" /></div>').insertAfter(media);
+						baseData.trackDisplay = $('<div class="cue-display '+webshims.shadowClass+'"><span class="description-cues" aria-live="assertive" /></div>').insertAfter(media);
 						this.addEvents(baseData, media);
 						webshims.docObserve();
 					}

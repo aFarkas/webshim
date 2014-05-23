@@ -225,7 +225,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		if(deepDataAndEvents){
 			webshims.error('deepDataAndEvents is not supported for clonePolyfill');
 		}
-		var $elems = this
+
+
+		return this
 			.map(function() {
 				var cloned = clone( this, dataAndEvents );
 				setTimeout(function(){
@@ -234,10 +236,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					}
 				});
 				return cloned;
-			});
-
-
-		return $elems;
+			})
+		;
 	};
 	
 	//add support for $('video').trigger('play') in case extendNative is set to false

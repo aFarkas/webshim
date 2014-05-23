@@ -544,6 +544,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					playerSize();
 					webshims.ready('dom-support', function(){
 						data.player.onWSOff('updateshadowdom', playerSize);
+						controls.add(data._controlbar).addClass(webshims.shadowClass);
 						webshims.addShadowDom();
 					});
 				}
@@ -551,8 +552,6 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			} else if(!value) {
 				controlBar.detach();
 			}
-			controlBar = null;
-			controls = null;
 			return value;
 		}
 	});
