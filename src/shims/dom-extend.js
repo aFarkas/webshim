@@ -180,7 +180,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		return this;
 	};
 	
-	var dataID = '_webshimsLib'+ (Math.round(Math.random() * 1000));
+	var dataID = '_webshims'+ (Math.round(Math.random() * 1000));
 	var elementData = function(elem, key, val){
 		elem = elem.jquery ? elem[0] : elem;
 		if(!elem){return val || {};}
@@ -211,6 +211,34 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			return this.pushStack(elems);
 		};
 	});
+
+	function clone(elem, dataAndEvents){
+		var cloned = $.clone( elem, dataAndEvents, false );
+		$(cloned.querySelectorAll('.'+webshims.shadowClass)).detach();
+		$(cloned.querySelectorAll('audio[id^="ID-"], video[id^="ID-"]')).removeAttr('id');
+		return cloned;
+	}
+
+	$.fn.clonePolyfill = function(dataAndEvents, deepDataAndEvents){
+		dataAndEvents = dataAndEvents == null ? false : dataAndEvents;
+		deepDataAndEvents = deepDataAndEvents == null ? dataAndEvents : deepDataAndEvents;
+		if(deepDataAndEvents){
+			webshims.error('deepDataAndEvents is not supported for clonePolyfill');
+		}
+		var $elems = this
+			.map(function() {
+				var cloned = clone( this, dataAndEvents );
+				setTimeout(function(){
+					if($.contains(document.body, cloned)){
+						$(cloned).updatePolyfill();
+					}
+				});
+				return cloned;
+			});
+
+
+		return $elems;
+	};
 	
 	//add support for $('video').trigger('play') in case extendNative is set to false
 	if(!webshims.cfg.extendNative && !webshims.cfg.noTriggerOverride){
@@ -522,6 +550,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				return id;
 			};
 		})(),
+		shadowClass: 'wsshadow-'+(Date.now()),
 		implement: function(elem, type){
 			var data = elementData(elem, 'implemented') || elementData(elem, 'implemented', {});
 			if(data[type]){

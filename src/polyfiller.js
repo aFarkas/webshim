@@ -116,7 +116,7 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.13.0',
+		version: '1.13.1-pre',
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
 			//addCacheBuster: false,
@@ -624,6 +624,7 @@
 		warn: 1,
 		error: 1
 	};
+	var $fn = $.fn;
 	
 	webshims.addMethodName = function(name){
 		name = name.split(':');
@@ -635,12 +636,12 @@
 			name = name[0];
 		}
 		
-		$.fn[name] = function(){
+		$fn[name] = function(){
 			return this.callProp(prop, arguments);
 		};
 	};
 
-	$.fn.callProp = function(prop, args){
+	$fn.callProp = function(prop, args){
 		var ret;
 		if(!args){
 			args = []; 
@@ -810,23 +811,28 @@
 				});
 			}
 		});
-		
-		$.fn.htmlPolyfill = function(a){
-			var ret = $.fn.html.call(this,  a);
+
+		$fn.clonePolyfill = $fn.clone;
+
+		$fn.htmlPolyfill = function(a){
+			if(!arguments.length){
+				return $(this.clonePolyfill()).html();
+			}
+			var ret = $fn.html.call(this,  a);
 			if(ret === this && $.isDOMReady){
 				this.each(eachTrigger);
 			}
 			return ret;
 		};
 		
-		$.fn.jProp = function(){
-			return this.pushStack($($.fn.prop.apply(this, arguments) || []));
+		$fn.jProp = function(){
+			return this.pushStack($($fn.prop.apply(this, arguments) || []));
 		};
 		
 		$.each(['after', 'before', 'append', 'prepend', 'replaceWith'], function(i, name){
-			$.fn[name+'Polyfill'] = function(a){
+			$fn[name+'Polyfill'] = function(a){
 				a = $(a);
-				$.fn[name].call(this, a);
+				$fn[name].call(this, a);
 				if($.isDOMReady){
 					a.each(eachTrigger);
 				}
@@ -836,8 +842,8 @@
 		});
 		
 		$.each(['insertAfter', 'insertBefore', 'appendTo', 'prependTo', 'replaceAll'], function(i, name){
-			$.fn[name.replace(/[A-Z]/, function(c){return "Polyfill"+c;})] = function(){
-				$.fn[name].apply(this, arguments);
+			$fn[name.replace(/[A-Z]/, function(c){return "Polyfill"+c;})] = function(){
+				$fn[name].apply(this, arguments);
 				if($.isDOMReady){
 					webshims.triggerDomUpdate(this);
 				}
@@ -845,7 +851,7 @@
 			};
 		});
 		
-		$.fn.updatePolyfill = function(){
+		$fn.updatePolyfill = function(){
 			if($.isDOMReady){
 				webshims.triggerDomUpdate(this);
 			}
@@ -853,7 +859,7 @@
 		};
 		
 		$.each(['getNativeElement', 'getShadowElement', 'getShadowFocusElement'], function(i, name){
-			$.fn[name] = function(){
+			$fn[name] = function(){
 				return this.pushStack(this);
 			};
 		});
@@ -1124,7 +1130,7 @@
 			options: {},
 			noAutoCallback: true,
 			test: function(){
-				return !!$.fn.rangeUI;
+				return !!$fn.rangeUI;
 			},
 			d: ['es5'],
 			c: [6, 5, 9, 10, 18, 17, 11]

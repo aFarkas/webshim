@@ -330,6 +330,12 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			this.element.trigger(e);
 			if(e.isDefaultPrevented()){return;}
 			this.isVisible = true;
+
+			if(!this._shadowAdded && webshims.shadowClass){
+				this.element.addClass(webshims.shadowClass);
+				this._shadowAdded = true;
+			}
+
 			element = $(element || this.options.prepareFor).getNativeElement() ;
 			
 			var that = this;
