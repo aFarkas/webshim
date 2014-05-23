@@ -169,7 +169,7 @@
 -->
 			<h3 id="Guide-installation">Installation</h3>
 			<p>
-				Take the 'js-webshim' folder and add it to your project. (You will find a minified and a dev folder there. Put the hole folder, not only the polyfiller.js file into your project!) Here is an example showing how to include dependencies and load webshims:
+				Take the 'js-webshim' folder and add it to your project. (You will find a minified and a dev folder there. Put the whole folder, not only the polyfiller.js file into your project!) Here is an example showing how to include dependencies and load webshims:
 			</p>
 <pre><code class="language-markup">
 &lt;script src="js/jquery.js"&gt;&lt;/script&gt;
@@ -1564,7 +1564,7 @@ $(function(){
 
 			<h2 id="Requirejs-setup">Typical project setup and JS optimizations (requirejs, concatination of JS files)</h2>
 
-			<p>While most scripts only use one JS file to include the hole behavior, Webshims is using the polyfiller.js file, a <code>polyfiller</code> named AMD module, as an entry point and loads conditionally other resources. This means webshims needs to know, where those resources are.</p>
+			<p>While most scripts only use one JS file to include the whole behavior, Webshims is using the polyfiller.js file, a <code>polyfiller</code> named AMD module, as an entry point and loads conditionally other resources. This means webshims needs to know, where those resources are.</p>
 			<p>The code inside of the polyfiller.js automatically detects the path to the script it is run from and assumes, that the <code class="i">shims</code> folder is in the same directory. This means, you have to make sure, that either the shims folder is placed parallel to the code of the polyfiller.js or to configure the path using the <code class="i">basePath</code> option.</p>
 			<h3>Configuring the path manually</h3>
 <pre><code class="language-javascript">//configure path manually
