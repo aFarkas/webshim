@@ -14,6 +14,76 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 	var onEventTest = function(e){
 		webshims.refreshCustomValidityRules(e.target);
 	};
+	var autocompleteEvaluator = (function(){
+
+		function createEvaluator(form){
+			var noTest;
+			var elements = {};
+			var timer;
+			var reTest = function(){
+				var elem, val;
+
+				for(var id in elements){
+					elem = elements[id].elem;
+					if(elem != noTest && elements[id].val != (val = elem.value)){
+						elements[id].val = val;
+						if($(elem).hasClass(iValClasses)){
+							$(elem).trigger('updatevalidation.webshims');
+						} else {
+							testValidityRules(elem);
+						}
+					}
+				}
+			};
+
+			$(form).on('autocomplete change', function(e){
+				clearTimeout(timer);
+				noTest = e.target;
+				timer = setTimeout(reTest, 9);
+			});
+			return elements;
+		}
+
+		function addToForm(form, elem, id){
+			var autoCompleteElements = $.data(form, 'autocompleteElements') || $.data(form, 'autocompleteElements', createEvaluator(form));
+			autoCompleteElements[id] = {
+				elem: elem,
+				val: elem.value
+			};
+		}
+
+		function removeFromForm(form, id){
+			var autoCompleteElements = $.data(form, 'autocompleteElements');
+			if(autoCompleteElements && autoCompleteElements[id]){
+				delete autoCompleteElements[id];
+			}
+		}
+
+		return {
+			add: function(elem){
+				var id;
+				if((id = elem.id) && (elem.type == 'password' || elem.autocomplete != 'off')){
+					setTimeout(function(){
+						var form = $.prop(elem, 'form');
+						if(form){
+							addToForm(form, elem, id);
+						}
+					}, 9);
+				}
+			},
+			remove: function(elem){
+				var id;
+				if((id = elem.id)){
+					setTimeout(function(){
+						var form = $.prop(elem, 'form');
+						if(form){
+							removeFromForm(form, id);
+						}
+					}, 9);
+				}
+			}
+		};
+	})();
 	var noValidate = function(){
 		return !noValidate.types[this.type];
 	};
@@ -48,6 +118,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 			}
 		};
 	})();
+
 	webshims.refreshCustomValidityRules = function(elem){
 		if(!initTest){return;}
 		var val, setMessage;
@@ -57,6 +128,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 		var validity = data && $.prop(elem, 'validity') || {valid: 1};
 
 		if(data && (customMismatchedRule || validity.valid)){
+			val = $(elem).val();
 			setMessage = function(message, errorType){
 				blockCustom = true;
 
@@ -74,15 +146,17 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 							message = webshims.customErrorMessages[errorType][webshims.activeLang()] || webshims.customErrorMessages[errorType]['']  || message.customError || message.defaultMessage || '';
 						}
 					}
+					autocompleteEvaluator.add(elem);
 				} else {
 					message = '';
 					data.customMismatchedRule = '';
+					autocompleteEvaluator.remove(elem);
 				}
 
 				$(elem).setCustomValidity(message);
 				blockCustom = false;
 			};
-			val = $(elem).val();
+
 			$.each(customValidityRules, function(name, test){
 				message = test(elem, val, data, setMessage) || '';
 				customMismatchedRule = name;

@@ -1,4 +1,4 @@
-!function(){"use strict";try{new Image}catch(a){window.Image=function(){return document.createElement("img")}}setTimeout(function(){var a="picture, img[srcset]";webshims.addReady(function(b,c){b!=document&&window.picturefill&&(b.querySelector(a)||c.filter(a).length)&&window.picturefill()})})}(),/*! Picturefill - v2.0.0 - 2014-05-08
+!function(){"use strict";try{new Image}catch(a){window.Image=function(){return document.createElement("img")}}setTimeout(function(){if(window.picturefill){var a="picture, img[srcset]";webshims.addReady(function(b){b.querySelector(a)&&window.picturefill()})}})}(),/*! Picturefill - v2.0.0 - 2014-05-08
  * http://scottjehl.github.io/picturefill
  * Copyright (c) 2014 https://github.com/scottjehl/picturefill/blob/master/Authors.txt; Licensed MIT */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas, David Knight. Dual MIT/BSD license */

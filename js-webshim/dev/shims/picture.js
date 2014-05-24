@@ -8,13 +8,14 @@
 		};
 	}
 	setTimeout(function(){
-		var sel = 'picture, img[srcset]';
-		webshims.addReady(function(context, insertedElement){
-			if(context == document || !window.picturefill){return;}
-			if(context.querySelector(sel) || insertedElement.filter(sel).length){
-				window.picturefill();
-			}
-		});
+		if(window.picturefill){
+			var sel = 'picture, img[srcset]';
+			webshims.addReady(function(context){
+				if(context.querySelector(sel)){
+					window.picturefill();
+				}
+			});
+		}
 	});
 })();
 

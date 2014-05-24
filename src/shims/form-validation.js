@@ -874,7 +874,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			if(!firstEvent){
 				//trigger firstinvalid
 				firstEvent = $.Event('firstinvalid');
-				jElm.trigger(firstEvent);
+				jElm.addClass('first-invalid').trigger(firstEvent);
 			}
 
 			//if firstinvalid was prevented all invalids will be also prevented
@@ -887,10 +887,11 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			stopSubmitTimer = setTimeout(function(){
 				var lastEvent = {type: 'lastinvalid', cancelable: false, invalidlist: $(invalids)};
 				//reset firstinvalid
-				firstEvent = false;
 				invalids = [];
 				stop = true;
 				$(e.target).trigger(lastEvent, [lastEvent]);
+				$(firstEvent.target).removeClass('first-invalid');
+				firstEvent = false;
 				/*
 				if(hasNative && !$.nodeName(e.target, 'form')){
 					$(e.target).jProp('form').triggerHandler('invalid');
