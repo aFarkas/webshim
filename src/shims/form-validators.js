@@ -61,8 +61,8 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 
 		return {
 			add: function(elem){
-				var id;
-				if((id = elem.id) && (elem.type == 'password' || elem.autocomplete != 'off')){
+				var id, autocomplete;
+				if((id = elem.id) && (elem.type == 'password' || ((autocomplete = elem.autocomplete)  && autocomplete != 'off'))){
 					setTimeout(function(){
 						var form = $.prop(elem, 'form');
 						if(form){
