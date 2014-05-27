@@ -530,7 +530,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 						focusElem[0].focus();
 					} catch(e){}
 					if(!focusElem[0].offsetWidth && !focusElem[0].offsetHeight){
-						webshims.warn('invalid element seems to be hidden. Make element either visible or use disabled/readonly to bar elements from validation. With fieldset[disabled] a group of elements can be ignored.');
+						webshims.warn('invalid element seems to be hidden. Make element either visible or use disabled/readonly to bar elements from validation. With fieldset[disabled] a group of elements can be ignored! In case of select replacement see shims/form-combat.js to fix issue.');
 					}
 					api.element.triggerHandler('pospopover');
 				};
@@ -909,7 +909,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 
 	addModule('form-combat', {
 		d: ['dom-support'],
-		test: !(($.mobile && ($.mobile.selectmenu || $.mobile.checkboxradio)) || $.fn.select2 || $.fn.chosen || $.fn.selectpicker || $.fn.selectBoxIt)
+		test: !(($.mobile && ($.mobile.selectmenu || $.mobile.checkboxradio)) || ($.ui && $.ui.selectmenu) || $.fn.select2 || $.fn.chosen || $.fn.selectpicker || $.fn.selectBoxIt)
 	});
 	
 	addModule('position', {
