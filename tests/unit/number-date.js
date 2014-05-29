@@ -710,21 +710,21 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 	$.each([{
 		id: 'date',
 		value: function(){
-			return new Date(2010, 11, 31, 0, 0);
+			return new Date(Date.UTC(2010, 11, 31, 0, 0));
 		},
-		resultVal: '2010-12-30',
-		resultNumber: 1293667200000
+		resultVal: '2010-12-31',
+		resultNumber: 1293753600000
 	}, {
 		id: 'date',
 		value: function(){
-			return new Date(1999, 0, 1, 0, 0);
+			return new Date(Date.UTC(1999, 0, 1, 0, 0));
 		},
-		resultVal: '1998-12-31',
-		resultNumber: 915062400000
+		resultVal: '1999-01-01',
+		resultNumber: 915148800000
 	}, {
 		id: 'date',
 		value: function(){
-			return new Date(1999, 0, 1, 10, 10);
+			return new Date(Date.UTC(1999, 0, 1, 10, 10));
 		},
 		resultVal: '1999-01-01',
 		resultNumber: 915148800000
@@ -743,12 +743,12 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 	,{
 		id: 'time',
 		value: function(){
-			var date = new Date(1999, 0, 1, 20, 30);
+			var date = new Date(Date.UTC(1999, 0, 1, 20, 30));
 			date.setSeconds(1);
 			return date;
 		},
-		resultVal: '19:30:01',
-		resultNumber: 70201000
+		resultVal: '20:30:01',
+		resultNumber: 73801000
 	}
 	], function(i, data){
 		var elem = $('#' + data.id);
