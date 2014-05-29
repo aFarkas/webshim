@@ -105,7 +105,21 @@ asyncTest("general validity Modul", function(){
 		'in-f+a{t$o@cpt.de': 'valid',
 		'in\@fo@3com.com': 'valid',
 		'in@fo@3com.com': 'invalid',
-		'info.de': 'invalid'
+		'info.de': 'invalid',
+		'in-f+a{t$o@cpt.de, info@3com.com': 'invalid'
+	}, function(val, state){
+		$('#email').val(val);
+		ok($('#email').is(':'+state), val+' is '+state+' mail');
+	});
+
+	$('#email').prop('multiple', true).prop('pattern', '.+\\.[a-zA-Z]{2,}');
+	$.each({
+		'info@c-t.de': 'valid',
+		'info@3com.com': 'valid',
+		'info@3com': 'invalid',
+		'in-f+a{t$o@cpt.de, info@de': 'invalid',
+		'in-f+a{t$o@cpt.de, info@3com.com': 'valid',
+		'in-f+a{t$o@cpt.de,info@3com.com': 'valid'
 	}, function(val, state){
 		$('#email').val(val);
 		ok($('#email').is(':'+state), val+' is '+state+' mail');

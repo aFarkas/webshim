@@ -4,17 +4,21 @@ webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
 var cfg = webshims.cfg.forms;
 var bugs = webshims.bugs;
-
-var isNumber = function(string){
-		return (typeof string == 'number' || (string && string == string * 1));
-	},
-	typeModels = webshims.inputTypes,
+var splitReg = /\s*,\s*/g;
+var typeModels = webshims.inputTypes,
 	checkTypes = {
 		radio: 1,
 		checkbox: 1
 	},
-	getType = function(elem){
-		return (elem.getAttribute('type') || elem.type || '').toLowerCase();
+	getType = function(){
+		var elem = this;
+		var type = (elem.getAttribute('type') || '').toLowerCase();
+		return (webshims.inputTypes[type]) ? type : elem.type;
+	},
+	cacheType = function(cache, input){
+		if(!('type' in cache)){
+			cache.type = getType.call(input);
+		}
 	}
 ;
 
@@ -118,9 +122,7 @@ var validityRules = {
 		valueMissing: function(input, val, cache){
 			if(!input.prop('required')){return false;}
 			var ret = false;
-			if(!('type' in cache)){
-				cache.type = getType(input[0]);
-			}
+			cacheType(cache, input[0]);
 			if(cache.nodeName == 'select'){
 				ret = (!val && (input[0].selectedIndex < 0 || isPlaceholderOptionSelected(input[0]) ));
 			} else if(checkTypes[cache.type]){
@@ -131,21 +133,32 @@ var validityRules = {
 			return ret;
 		},
 		patternMismatch: function(input, val, cache) {
-			if(val === '' || cache.nodeName == 'select'){return false;}
-			if(!('type' in cache)){
-				cache.type = getType(input[0]);
-			}
-			if(!patternTypes[cache.type]){return false;}
+			var i;
+			var ret = false;
+			if(val === '' || cache.nodeName == 'select'){return ret;}
+
+			cacheType(cache, input[0]);
+
+			if(!patternTypes[cache.type]){return ret;}
 			var pattern = input.attr('pattern');
-			if(!pattern){return false;}
+			if(!pattern){return ret;}
 			try {
 				pattern = new RegExp('^(?:' + pattern + ')$');
 			} catch(er){
 				webshims.error('invalid pattern value: "'+ pattern +'" | '+ er);
-				pattern = false;
+				pattern = ret;
 			}
-			if(!pattern){return false;}
-			return !(pattern.test(val));
+			if(!pattern){return ret;}
+
+			val = cache.type == 'email' && input.prop('multiple') ? val.split(splitReg) : [val];
+
+			for(i = 0; i < val.length; i++){
+				if(!pattern.test(val[i])){
+					ret = true;
+					break;
+				}
+			}
+			return ret;
 		}
 	}
 ;
@@ -154,9 +167,9 @@ $.each({tooShort: ['minLength', -1], tooLong: ['maxLength', 1]}, function(name, 
 	validityRules[name] = function(input, val, cache){
 		//defaultValue is not the same as dirty flag, but very similiar
 		if(cache.nodeName == 'select' || input.prop('defaultValue') == val){return false;}
-		if(!('type' in cache)){
-			cache.type = getType(input[0]);
-		}
+
+		cacheType(cache, input[0]);
+
 		if(!lengthTypes[cache.type]){return false;}
 		var prop = input.prop(props[0]);
 		
@@ -168,9 +181,8 @@ $.each({typeMismatch: 'mismatch', badInput: 'bad'}, function(name, fn){
 	validityRules[name] = function (input, val, cache){
 		if(val === '' || cache.nodeName == 'select'){return false;}
 		var ret = false;
-		if(!('type' in cache)){
-			cache.type = getType(input[0]);
-		}
+
+		cacheType(cache, input[0]);
 		
 		if(typeModels[cache.type] && typeModels[cache.type][fn]){
 			ret = typeModels[cache.type][fn](val, input);
@@ -238,6 +250,7 @@ $.extend($.event.special.submit, {
 		return submitSetup.apply(this, arguments);
 	}
 });
+
 webshims.ready('form-shim-extend2 WINDOWLOAD', function(){
 	$(window).on('invalid', $.noop);
 });
@@ -247,15 +260,16 @@ webshims.addInputType('email', {
 	mismatch: (function(){
 		//taken from http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#valid-e-mail-address
 		var test = cfg.emailReg || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-		var splitReg = /\s*,\s*/g;
 		return function(val, input){
+			var i;
 			var ret = false;
-			val = $(input).prop('multiple') ? val.split(splitReg) : [val];
-			
-			for(var i = 0; i < val.length; i++){
-				if(!test.test(val[i])){
-					ret = true;
-					break;
+			if(val){
+				val = input.prop('multiple') ? val.split(splitReg) : [val];
+				for(i = 0; i < val.length; i++){
+					if(!test.test(val[i])){
+						ret = true;
+						break;
+					}
 				}
 			}
 			return ret;
@@ -268,18 +282,14 @@ webshims.addInputType('url', {
 		//taken from scott gonzales
 		var test = cfg.urlReg || /^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
 		return function(val){
-			return !test.test(val);
+			return val && !test.test(val);
 		};
 	})()
 });
 
 webshims.defineNodeNameProperty('input', 'type', {
 	prop: {
-		get: function(){
-			var elem = this;
-			var type = (elem.getAttribute('type') || '').toLowerCase();
-			return (webshims.inputTypes[type]) ? type : elem.type;
-		}
+		get: getType
 	}
 });
 
