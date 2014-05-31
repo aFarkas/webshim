@@ -3642,7 +3642,11 @@ webshims.isReady('es5', true);
 				} else if(!isNaN(this.maxAsNumber) && start > this.maxAsNumber){
 					start = this.maxAsNumber;
 				}
-				this.elemHelper.prop('valueAsNumber', start);
+				try {
+					this.elemHelper.prop('valueAsNumber', start);
+				} catch(e){
+					webshims.warn('valueAsNumber set: '+e);
+				}
 				this.options.defValue = this.elemHelper.prop('value');
 			},
 			reorderInputs: function(){
@@ -3666,7 +3670,7 @@ webshims.isReady('es5', true);
 			_beforeValue: function(val){
 				this.valueAsNumber = this.asNumber(val);
 				this.options.value = val;
-				
+
 				if(isNaN(this.valueAsNumber) || (!isNaN(this.minAsNumber) && this.valueAsNumber < this.minAsNumber) || (!isNaN(this.maxAsNumber) && this.valueAsNumber > this.maxAsNumber)){
 					this._setStartInRange();
 				} else {
@@ -4361,8 +4365,8 @@ webshims.isReady('es5', true);
 		var implementType = function(){
 			
 			var type = $.prop(this, 'type');
-			
 			var i, opts, data, optsName, labels, cNames, hasInitialFocus;
+
 			if(inputTypes[type] && !$(this).hasClass('ws-noreplace') && webshims.implement(this, 'inputwidgets')){
 				data = {};
 				optsName = type;
@@ -4401,6 +4405,7 @@ webshims.isReady('es5', true);
 						opts[optsName] = $.attr(this, copyAttrs[i]) || opts[optsName];
 					}
 				}
+
 				if(opts.formatMonthNames){
 					webshims.error('formatMonthNames was renamded to monthNames');
 				}
