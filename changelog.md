@@ -1,3 +1,13 @@
+Release 1.13.1
+----------
+- added clonePolyfill + htmlPolyfill can be used as getter
+- implemented pattern check for [type="email"][multiple]
+- fixed datalist bug for Android
+- fix wrong icon font path for IE8
+- added support for jQuery UI selectmenu
+- handle autocomplete/passwordmanager autofill with custom validation rules
+
+
 Release 1.13.0
 ----------
 - added picture / img[srcset] element polyfill
