@@ -987,6 +987,7 @@
 		var fNuAPI = 'form-number-date-api';
 		var bustedValidity = false;
 		var bustedWidgetUi = false;
+		var replaceBustedUI = false;
 		
 		var initialFormTest = function(){
 			var tmp, fieldset;
@@ -1010,6 +1011,7 @@
 				
 				if(Modernizr[formvalidation]){
 					bustedWidgetUi = !Modernizr.fieldsetdisabled ||!Modernizr.fieldsetelements || !('value' in document.createElement('progress')) || !('value' in document.createElement('output'));
+					replaceBustedUI = bustedWidgetUi && (/Android/i).test(navigator.userAgent);
 					bugs.bustedValidity = bustedValidity = window.opera || bugs.bustedValidity || bustedWidgetUi || !modernizrInputAttrs.list;
 				} else {
 					bugs.bustedValidity = false;
@@ -1145,7 +1147,7 @@
 				o.replaceUI = getAutoEnhance(o.replaceUI);
 
 				//input widgets on old androids can't be trusted
-				if(bustedWidgetUi && !o.replaceUI && (/Android/i).test(navigator.userAgent)){
+				if(!o.replaceUI && replaceBustedUI){
 					o.replaceUI = true;
 				}
 				return !o.replaceUI && modules[fNuAPI].test();
@@ -1165,6 +1167,9 @@
 			f: 'forms',
 			test: function(){
 				initialFormTest();
+				if(replaceBustedUI){
+					formOptions.customDatalist = true;
+				}
 				return modernizrInputAttrs.list && !formOptions.fD;
 			},
 			d: ['form-core', DOMSUPPORT],

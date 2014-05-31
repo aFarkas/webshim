@@ -669,6 +669,8 @@
 			;
 		}
 	};
+	var numericType = Modernizr.inputtypes.tel && navigator.userAgent.indexOf('Mobile') != -1 && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ?
+		'tel' : 'text';
 	var splitInputs = {
 		date: {
 			_create: function(opts){
@@ -679,18 +681,18 @@
 				if(opts.yearSelect){
 					obj.splits.push($('<select class="yy"></select>')[0]);
 				} else {
-					obj.splits.push($('<input type="text" class="yy" size="4" inputmode="numeric" maxlength="4" />')[0]);
+					obj.splits.push($('<input type="'+ numericType +'" class="yy" size="4" inputmode="numeric" maxlength="4" />')[0]);
 				}
 				
 				if(opts.monthSelect){
 					obj.splits.push($('<select class="mm">'+getMonthOptions(opts)+'</select>')[0]);
 				} else {
-					obj.splits.push($('<input type="text" class="mm" inputmode="numeric" maxlength="2" size="2" />')[0]);
+					obj.splits.push($('<input type="'+ numericType +'" class="mm" inputmode="numeric" maxlength="2" size="2" />')[0]);
 				}
 				if(opts.daySelect){
 					obj.splits.push($(daySelect)[0]);
 				} else {
-					obj.splits.push($('<input type="text" class="dd ws-spin" inputmode="numeric" maxlength="2" size="2" />')[0]);
+					obj.splits.push($('<input type="'+ numericType +'" class="dd ws-spin" inputmode="numeric" maxlength="2" size="2" />')[0]);
 				}
 				
 				obj.elements = [obj.splits[0], $('<span class="ws-input-seperator" />')[0], obj.splits[1], $('<span class="ws-input-seperator" />')[0], obj.splits[2]];
@@ -725,7 +727,7 @@
 				if(opts.yearSelect){
 					obj.splits.push($('<select class="yy"></select>')[0]);
 				} else {
-					obj.splits.push($('<input type="text" class="yy" size="4" inputmode="numeric" maxlength="4" />')[0]);
+					obj.splits.push($('<input type="'+ numericType +'" class="yy" size="4" inputmode="numeric" maxlength="4" />')[0]);
 				}
 				
 				if(opts.monthSelect){
@@ -733,7 +735,10 @@
 				} else {
 					obj.splits.push($('<input type="text" class="mm ws-spin" />')[0]);
 					if(opts.onlyMonthDigits){
-						$(obj.splits[1]).attr({inputmode: 'numeric', size: 2, maxlength: 2});
+						$().attr({inputmode: 'numeric', size: 2, maxlength: 2});
+						try {
+							obj.splits[1].setAttribute('type', numericType);
+						} catch(e){}
 					}
 				}
 				
@@ -756,7 +761,7 @@
 			}
 		}
 	};
-	
+
 	var nowDate = new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60 * 1000 ));
 	var nowYear = nowDate.getFullYear();
 	nowDate = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), nowDate.getHours()).getTime();
@@ -2292,6 +2297,7 @@
 				}
 
 			};
+			oriStyleO.webkitAppearance = 'none';
 			data.element.onWSOff('updateshadowdom', updateStyles, true);
 		};
 		

@@ -346,7 +346,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		});
 		return str.join('');
 	};
-	
+	var setJump = ('inputMode' in document.createElement('input')) || !((/ipad|iphone/i).test(navigator.userAgent));
 	var widgetProtos = {
 		_addBindings: function(){
 			var isFocused;
@@ -496,6 +496,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				'ws__input keydown keypress': (function(){
 					var timer;
 					var isStopped = false;
+
 					var releaseTab = function(){
 						if (isStopped === true) {
 							isStopped = 'semi';
@@ -561,7 +562,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				};
 			})();
 			
-			if(o.splitInput && o.jumpInputs == null){
+			if(o.splitInput && setJump && o.jumpInputs == null){
 				o.jumpInputs = true;
 			}
 			

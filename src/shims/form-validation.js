@@ -904,7 +904,11 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		});
 	})();
 
-	if( document.addEventListener && Modernizr.inputtypes && Modernizr.inputtypes.tel && navigator.userAgent.indexOf('Mobile') != -1 && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ){
+	if( options.fixInputMode && document.addEventListener && Modernizr.inputtypes && Modernizr.inputtypes.tel && navigator.userAgent.indexOf('Mobile') != -1 && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ){
+		var removeListener = function(elem){
+			elem.removeEventListener('blur', switchBack, true);
+			elem.removeEventListener('keydown', switchBack, true);
+		};
 		var switchBack = function(e){
 			setTimeout(function(){
 				var val = e.target.value;
@@ -913,6 +917,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					e.target.value = val;
 				}
 			});
+			removeListener(e.target);
 		};
 		var patternFix = {
 			"[0-9]*": 1
@@ -922,16 +927,19 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			if(e.target.type == 'text' && e.target.getAttribute('inputmode') == 'numeric' && !patternFix[e.target.getAttribute('pattern')]){
 				try{
 					val = e.target.value;
-					e.target.type = 'tel';
-					e.target.removeEventListener('blur', switchBack, true);
+					e.target.type = options.fixInputMode;
+					removeListener(e.target);
 					e.target.addEventListener('blur', switchBack, true);
+					e.target.addEventListener('keydown', switchBack, true);
 					if(val != e.target.value){
 						e.target.value = val;
 					}
 				} catch (e){}
 			}
 		};
-
+		if(typeof options.fixInputMode != 'string'){
+			options.fixInputMode = 'tel';
+		}
 		document.addEventListener('focus', addFix, true);
 		document.addEventListener('touchstart', addFix, true);
 	}
