@@ -185,6 +185,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	var eachReset = function(){
 		webshims.errorbox.reset(this);
 	};
+
 	if('validityUIEvents' in options){
 		webshims.warn('validityUIEvents was renamed to iVal.events');
 		iVal.events = options.validityUIEvents;
@@ -902,6 +903,38 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			jElm = null;
 		});
 	})();
+
+	if( document.addEventListener && Modernizr.inputtypes && Modernizr.inputtypes.tel && navigator.userAgent.indexOf('Mobile') != -1 && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ){
+		var switchBack = function(e){
+			setTimeout(function(){
+				var val = e.target.value;
+				e.target.type = 'text';
+				if(val != e.target.value){
+					e.target.value = val;
+				}
+			});
+		};
+		var patternFix = {
+			"[0-9]*": 1
+		};
+		var addFix = function(e){
+			var val;
+			if(e.target.type == 'text' && e.target.getAttribute('inputmode') == 'numeric' && !patternFix[e.target.getAttribute('pattern')]){
+				try{
+					val = e.target.value;
+					e.target.type = 'tel';
+					e.target.removeEventListener('blur', switchBack, true);
+					e.target.addEventListener('blur', switchBack, true);
+					if(val != e.target.value){
+						e.target.value = val;
+					}
+				} catch (e){}
+			}
+		};
+
+		document.addEventListener('focus', addFix, true);
+		document.addEventListener('touchstart', addFix, true);
+	}
 
 	addModule('form-fixrangechange', {
 		test: !(!$.event.special.change && !$.event.special.input && Modernizr.inputtypes && Modernizr.inputtypes.range && options.fixRangeChange)
