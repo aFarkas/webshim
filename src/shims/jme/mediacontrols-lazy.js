@@ -42,9 +42,9 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				touchEnd = function(e){
 					var ret, touch;
 					e = e.originalEvent || {};
-					$(this).off('touchend', touchEnd);
+					$(this).off('touchend touchcancel', touchEnd);
 					var changedTouches = e.changedTouches || e.touches;
-					if(!touchData || !changedTouches || changedTouches.length != 1){
+					if(e.type == 'touchcancel' || !touchData || !changedTouches || changedTouches.length != 1){
 						return;
 					}
 
@@ -75,7 +75,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 						y: touch.pageY,
 						now: Date.now()
 					};
-					elemTarget.on('touchend', touchEnd);
+					elemTarget.on('touchend touchcancel', touchEnd);
 				};
 
 				this.each(function(){

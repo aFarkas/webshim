@@ -1111,9 +1111,9 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				touchEnd = function(e){
 					var ret, touch;
 					e = e.originalEvent || {};
-					$(this).off('touchend', touchEnd);
+					$(this).off('touchend touchcancel', touchEnd);
 					var changedTouches = e.changedTouches || e.touches;
-					if(!touchData || !changedTouches || changedTouches.length != 1){
+					if(e.type == 'touchcancel' || !touchData || !changedTouches || changedTouches.length != 1){
 						return;
 					}
 
@@ -1144,7 +1144,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 						y: touch.pageY,
 						now: Date.now()
 					};
-					elemTarget.on('touchend', touchEnd);
+					elemTarget.on('touchend touchcancel', touchEnd);
 				};
 
 				this.each(function(){
@@ -1693,7 +1693,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			var type = $.prop(this, 'type');
 			var i, opts, data, optsName, labels, cNames, hasInitialFocus;
 
-			if(inputTypes[type] && !$(this).hasClass('ws-noreplace') && webshims.implement(this, 'inputwidgets')){
+			if(inputTypes[type] && webshims.implement(this, 'inputwidgets') && (!modernizrInputTypes[type] || !$(this).hasClass('ws-noreplace'))){
 				data = {};
 				optsName = type;
 				hasInitialFocus = $(this).is(':focus');

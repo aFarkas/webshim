@@ -380,7 +380,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 	}, 'The value of this field does not repeat the value of the other field');
 
 	addCustomValidityRule('valuevalidation', function(elem, val, data){
-		if(val && ('valuevalidation' in data)){
+		if(('valuevalidation' in data)){
 			//Todo allow markup params
 			return $(elem).triggerHandler('valuevalidation', [{value: val, valueAsDate: $.prop(elem, 'valueAsDate'), isPartial: false}]) || '';
 		}
