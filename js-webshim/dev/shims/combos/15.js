@@ -2525,7 +2525,7 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 		if(message && message.indexOf('{%') != -1){
 			['value', 'min', 'max', 'maxlength', 'minlength', 'label'].forEach(function(attr){
 				if(message.indexOf('{%'+attr) === -1){return;}
-				var val = ((attr == 'label') ? $.trim($('label[for="'+ elem.id +'"]', elem.form).text()).replace(/\*$|:$/, '') : $.prop(elem, attr)) || '';
+				var val = ((attr == 'label') ? $.trim($('label[for="'+ elem.id +'"]', elem.form).text()).replace(/\*$|:$/, '') : $.prop(elem, attr) || $.attr(elem, attr) || '') || '';
 				val = ''+val;
 
 

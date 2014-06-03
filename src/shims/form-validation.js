@@ -4,7 +4,8 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	var isWebkit = 'webkitURL' in window;
 	var hasNative = Modernizr.formvalidation && !webshims.bugs.bustedValidity;
 	var chromeBugs = isWebkit && hasNative;
-	var webkitVersion = chromeBugs && parseFloat((navigator.userAgent.match(/Safari\/([\d\.]+)/) || ['', '999999'])[1], 10);
+	var ua = navigator.userAgent;
+	var webkitVersion = chromeBugs && parseFloat((ua.match(/Safari\/([\d\.]+)/) || ['', '999999'])[1], 10);
 	
 	var iVal = options.iVal;
 
@@ -904,10 +905,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		});
 	})();
 
-	if( options.fixInputMode && document.addEventListener && Modernizr.inputtypes && Modernizr.inputtypes.tel && navigator.userAgent.indexOf('Mobile') != -1 && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ){
+	if( document.addEventListener && Modernizr.inputtypes && Modernizr.inputtypes.tel && ua.indexOf('Mobile') != -1 && !(/ipad|iphone/i).test(ua) && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ){
 		var removeListener = function(elem){
 			elem.removeEventListener('blur', switchBack, true);
-			elem.removeEventListener('keydown', switchBack, true);
 		};
 		var switchBack = function(e){
 			setTimeout(function(){
@@ -919,24 +919,22 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			});
 			removeListener(e.target);
 		};
-		var patternFix = {
-			"[0-9]*": 1
-		};
+
 		var addFix = function(e){
 			var val;
-			if(e.target.type == 'text' && e.target.getAttribute('inputmode') == 'numeric' && !patternFix[e.target.getAttribute('pattern')]){
+			if(e.target.type == 'text' && e.target.getAttribute('inputmode') == 'numeric' && "[0-9]*" == e.target.getAttribute('pattern')){
 				try{
 					val = e.target.value;
 					e.target.type = options.fixInputMode;
 					removeListener(e.target);
 					e.target.addEventListener('blur', switchBack, true);
-					e.target.addEventListener('keydown', switchBack, true);
 					if(val != e.target.value){
 						e.target.value = val;
 					}
-				} catch (e){}
+				} catch (er){}
 			}
 		};
+
 		if(typeof options.fixInputMode != 'string'){
 			options.fixInputMode = 'tel';
 		}

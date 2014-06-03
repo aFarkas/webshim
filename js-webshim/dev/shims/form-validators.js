@@ -239,15 +239,14 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 		return !(new RegExp('(' + pattern + ')', 'i').test(val));
 	}, 'This format is not allowed here.');
 	
-	
-	addCustomValidityRule('tooShort', function(elem, val, data){
-		if(!val || !data.minlength){return;}
-
-		if($.nodeName(elem, 'input')){
-			webshims.warn('depreacated data-minlength usage: Use pattern=".{'+ data.minlength +',}" instead.');
-		}
-		return data.minlength > val.length;
-	}, 'Entered value is too short.');
+	if(!('tooShort' in ($('<input />').prop('validity') || {}))){
+		addCustomValidityRule('tooShort', function(elem, val){
+			var minlength;
+			if(!val || val == elem.defaultValue || !(minlength = elem.getAttribute('minlength'))){return;}
+			minlength = parseInt(minlength, 10);
+			return minlength > 0 && minlength > val.length ? (webshims.validityMessages.__active || {}).tooShort || true : '';
+		}, 'Entered value is too short.');
+	}
 
 	addCustomValidityRule('grouprequired', function(elem, val, data){
 		var form;
@@ -385,127 +384,125 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 		}
 	}, 'This value is not allowed here');
 
-	if(window.JSON){
-		addCustomValidityRule('ajaxvalidate', function(elem, val, data){
-			if(!val || !data.ajaxvalidate){return;}
-			var opts;
-			if(!data.remoteValidate){
-				webshims.loader.loadList(['jajax']);
-				if(typeof data.ajaxvalidate == 'string'){
-					data.ajaxvalidate = {url: data.ajaxvalidate, depends: $([])};
-				} else {
-					data.ajaxvalidate.depends = data.ajaxvalidate.depends ?
-						$(typeof data.ajaxvalidate.depends == 'string' && data.ajaxvalidate.depends.split(' ') || data.ajaxvalidate.depends).map(getId) :
-						$([])
-					;
-				}
-				
-				data.ajaxvalidate.depends.on('refreshCustomValidityRules', function(){
-					webshims.refreshCustomValidityRules(elem);
-				});
-				
-				opts = data.ajaxvalidate;
-				
-				var remoteValidate = {
-					ajaxLoading: false,
-					restartAjax: false,
-					message: 'async',
-					cache: {},
-					update: function(remoteData){
-						if(this.ajaxLoading){
-							this.restartAjax = remoteData;
-						} else {
-							this.restartAjax = false;
-							this.ajaxLoading = true;
-							$.ajax(
-								$.extend({dataType: 'json'}, opts, {
-									url: opts.url,
-									depData: remoteData,
-									data: formCFG.fullRemoteForm || opts.fullForm ?
-										$(elem).jProp('form').serializeArray() :
-										remoteData,
-									success: this.getResponse,
-									complete: this._complete,
-									timeout: 3000
-								})
-							);
-						}
-					},
-					_complete: function(){
-						remoteValidate.ajaxLoading = false;
-						if(remoteValidate.restartAjax){
-							this.update(remoteValidate.restartAjax);
-						}
-						remoteValidate.restartAjax = false;
-					},
-					getResponse: function(data){
-						if(options.transformAjaxValidate){
-							data = options.transformAjaxValidate(data);
-						}
-						if(!data){
-							data = {message: '', valid: true};
-						} else if(typeof data == 'string'){
-							try {
-								data = JSON.parse(data);
-							} catch (er){}
-						}
-						
-						remoteValidate.message = ('message' in data) ? data.message : !data.valid;
-						remoteValidate.lastMessage = remoteValidate.message;
-						remoteValidate.blockUpdate = true;
-						$(elem).triggerHandler('updatevalidation.webshims');
-						remoteValidate.message = 'async';
-						remoteValidate.blockUpdate = false;
-					},
-					getData: function(){
-						var data;
-						data = {};
-						data[$.prop(elem, 'name') || $.prop(elem, 'id')] = $(elem).val();
-						opts.depends.each(function(){
-							if($(this).is(':invalid')){
-								data = false;
-								return false;
-							}
-							data[$.prop(this, 'name') || $.prop(this, 'id')] = $(this).val();
-						});
-						return data;
-					},
-					getTempMessage: function(){
-						var message = 'async';
-						var remoteData, dataStr;
-						if(!data.remoteValidate.blockUpdate){
-							remoteData = this.getData();
-							if(!remoteData){
-								message = '';
-							} else {
-								try {
-									dataStr = JSON.stringify(remoteData);
-								} catch(er){}
-								
-								if(dataStr === this.lastString){
-									message = this.ajaxLoading ? 'async' : this.lastMessage;
-								} else {
-									this.lastString = dataStr;
-									this.lastMessage = 'async';
-									clearTimeout(data.remoteValidate.timer);
-									data.remoteValidate.timer = setTimeout(function(){
-										data.remoteValidate.update(remoteData);
-									}, 9);
-								}
-								
-							}
-						} else {
-							message = remoteValidate.message;
-						}
-						return message;
-					}
-				};
-				data.remoteValidate = remoteValidate;
+	addCustomValidityRule('ajaxvalidate', function(elem, val, data){
+		if(!val || !data.ajaxvalidate){return;}
+		var opts;
+		if(!data.remoteValidate){
+			webshims.loader.loadList(['jajax']);
+			if(typeof data.ajaxvalidate == 'string'){
+				data.ajaxvalidate = {url: data.ajaxvalidate, depends: $([])};
+			} else {
+				data.ajaxvalidate.depends = data.ajaxvalidate.depends ?
+					$(typeof data.ajaxvalidate.depends == 'string' && data.ajaxvalidate.depends.split(' ') || data.ajaxvalidate.depends).map(getId) :
+					$([])
+				;
 			}
-			
-			return data.remoteValidate.getTempMessage();
-		}, 'remote error');
-	}
+
+			data.ajaxvalidate.depends.on('refreshCustomValidityRules', function(){
+				webshims.refreshCustomValidityRules(elem);
+			});
+
+			opts = data.ajaxvalidate;
+
+			var remoteValidate = {
+				ajaxLoading: false,
+				restartAjax: false,
+				message: 'async',
+				cache: {},
+				update: function(remoteData){
+					if(this.ajaxLoading){
+						this.restartAjax = remoteData;
+					} else {
+						this.restartAjax = false;
+						this.ajaxLoading = true;
+						$.ajax(
+							$.extend({dataType: 'json'}, opts, {
+								url: opts.url,
+								depData: remoteData,
+								data: formCFG.fullRemoteForm || opts.fullForm ?
+									$(elem).jProp('form').serializeArray() :
+									remoteData,
+								success: this.getResponse,
+								complete: this._complete,
+								timeout: 3000
+							})
+						);
+					}
+				},
+				_complete: function(){
+					remoteValidate.ajaxLoading = false;
+					if(remoteValidate.restartAjax){
+						this.update(remoteValidate.restartAjax);
+					}
+					remoteValidate.restartAjax = false;
+				},
+				getResponse: function(data){
+					if(options.transformAjaxValidate){
+						data = options.transformAjaxValidate(data);
+					}
+					if(!data){
+						data = {message: '', valid: true};
+					} else if(typeof data == 'string'){
+						try {
+							data = JSON.parse(data);
+						} catch (er){}
+					}
+
+					remoteValidate.message = ('message' in data) ? data.message : !data.valid;
+					remoteValidate.lastMessage = remoteValidate.message;
+					remoteValidate.blockUpdate = true;
+					$(elem).triggerHandler('updatevalidation.webshims');
+					remoteValidate.message = 'async';
+					remoteValidate.blockUpdate = false;
+				},
+				getData: function(){
+					var data;
+					data = {};
+					data[$.prop(elem, 'name') || $.prop(elem, 'id')] = $(elem).val();
+					opts.depends.each(function(){
+						if($(this).is(':invalid')){
+							data = false;
+							return false;
+						}
+						data[$.prop(this, 'name') || $.prop(this, 'id')] = $(this).val();
+					});
+					return data;
+				},
+				getTempMessage: function(){
+					var message = 'async';
+					var remoteData, dataStr;
+					if(!data.remoteValidate.blockUpdate){
+						remoteData = this.getData();
+						if(!remoteData){
+							message = '';
+						} else {
+							try {
+								dataStr = JSON.stringify(remoteData);
+							} catch(er){}
+
+							if(dataStr === this.lastString){
+								message = this.ajaxLoading ? 'async' : this.lastMessage;
+							} else {
+								this.lastString = dataStr;
+								this.lastMessage = 'async';
+								clearTimeout(data.remoteValidate.timer);
+								data.remoteValidate.timer = setTimeout(function(){
+									data.remoteValidate.update(remoteData);
+								}, 9);
+							}
+
+						}
+					} else {
+						message = remoteValidate.message;
+					}
+					return message;
+				}
+			};
+			data.remoteValidate = remoteValidate;
+		}
+
+		return data.remoteValidate.getTempMessage();
+	}, 'remote error');
 })();
 
 });
