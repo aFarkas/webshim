@@ -7,6 +7,7 @@
 	<meta name="viewport" content="width=device-width" />
 	
 	<link rel="stylesheet" href="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
+	<link rel="stylesheet" href="../../css/prism.css" />
 	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 
 	<script src="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
@@ -104,19 +105,19 @@
 
 		//jQM: set waitReady to false
 		webshims.setOptions('waitReady', false);
-		
+
 		//jQM: set wsdoc to active page or false
 		webshims.setOptions('wsdoc', $('.ui-page-active').updatePolyfill().get(0) || false);
 
 		//JQM: set ready event to pageinit
 		webshims.setOptions('readyEvt', 'pageinit');
-		
+
 		//jQM: update polyfills on pageinit and change active page
 		$(document).on('pageinit', function(e){
 			webshims.setOptions('wsdoc', e.target);
 			$(e.target).updatePolyfill();
 		});
-		
+
 		//load all polyfill features
 		//or load only a specific feature with webshims.polyfill('feature-name');
 		webshims.polyfill('forms forms-ext');
@@ -125,12 +126,10 @@
 		/**
 		 * jQM and webshims explanation
 		 *
-		 * 1. The easiest way to get both libraries work friendly side by side is to make sure, that jQM enhances all form elements before webshims does.
-		 * 	  This is done by setting webshims.setOptions('waitReady', false); and calling webshims.polyfill after jQM was included.
+		 * 1. This is done by setting webshims.setOptions('waitReady', false); and calling webshims.polyfill after jQM was included.
 		 * 2. JQM has the concept of pages while webshims normally works on the hole document. To make sure webshims is updating only the active page (only needed in case of multiple pages inside a document), the wsdoc option should be set to the active page
 		 * 3. JQM dynamically loads new content and creates new pages, the wsdoc has to change on pageinit and updatePolyfill has to be called on this [new] page element
 		 */
-
 
 	</script>
 	
@@ -146,10 +145,40 @@
 			<h1>
 				jQuery mobile and Webshims
 			</h1>
-			
+
 		</div> 
 		<div data-role="content">
 			<p>Webshims and jQuery mobile do a lot of tricks with form elements, which can conflict with each other. This page demonstrates how both libraries can be combined. Please read the source code and watch out for comments marked with <code>JQM:</code>.</p>
+			<p>The easiest way to get both libraries work friendly side by side is to make sure, that jQM enhances all form elements before webshims does.</p>
+			<ul>
+				<li>This is done by setting webshims.setOptions('waitReady', false); and calling webshims.polyfill after jQM was included.</li>
+				<li>JQM has the concept of pages while webshims normally works on the hole document. To make sure webshims is updating only the active page (only needed in case of multiple pages inside a document), the wsdoc option should be set to the active page</li>
+				<li>JQM dynamically loads new content and creates new pages, the wsdoc has to change on pageinit and updatePolyfill has to be called on this [new] page element</li>
+			</ul>
+
+<pre><code class="language-javascript">
+/*
+* JQM specific configuration of webshim:
+*/
+//JQM: set waitReady to false
+webshims.setOptions('waitReady', false);
+
+//jQM: set wsdoc to active page or false
+webshims.setOptions('wsdoc', $('.ui-page-active').updatePolyfill().get(0) || false);
+
+//JQM: set ready event to pageinit
+webshims.setOptions('readyEvt', 'pageinit');
+
+//jQM: update polyfills on pageinit and change active page
+$(document).on('pageinit', function(e){
+	webshims.setOptions('wsdoc', e.target);
+	$(e.target).updatePolyfill();
+});
+
+//load all polyfill features
+//or load only a specific feature with webshims.polyfill('feature-name');
+webshims.polyfill('forms forms-ext');
+</code></pre>
 			<form action="jquery-mobile.html" class="ws-validate">
 				<div data-role="fieldcontain">
 					<label for="textinput1">
@@ -265,7 +294,7 @@
 			</form>
 		</div>
 	</div>
-
+	<script src="../../demo-js/demo.js" async=""></script>
 	<script type="text/javascript">
 		//http://blog.jsdelivr.com/2013/06/jsdelivr-weekly-news.html
 		if(location.hostname == 'afarkas.github.io'){

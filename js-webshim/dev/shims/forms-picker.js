@@ -1284,6 +1284,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		var i = 0;
 		var rowNum = 0;
 		var len = 23;
+
 		var attrs = {
 			min: $.prop(data.orig, 'min'),
 			max: $.prop(data.orig, 'max'),
@@ -1328,7 +1329,8 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			if(value == iVal){
 				str += ' class="checked-value"';
 			}
-			str += '>'+ data.formatValue(iVal) +'</button></td>';
+
+			str += '>'+ webshims._format.time(iVal) +'</button></td>';
 		}
 		
 		

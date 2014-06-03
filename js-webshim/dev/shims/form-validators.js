@@ -381,7 +381,6 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 
 	addCustomValidityRule('valuevalidation', function(elem, val, data){
 		if(('valuevalidation' in data)){
-			//Todo allow markup params
 			return $(elem).triggerHandler('valuevalidation', [{value: val, valueAsDate: $.prop(elem, 'valueAsDate'), isPartial: false}]) || '';
 		}
 	}, 'This value is not allowed here');
