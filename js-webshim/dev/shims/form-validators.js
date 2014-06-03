@@ -146,6 +146,9 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 							message = webshims.customErrorMessages[errorType][webshims.activeLang()] || webshims.customErrorMessages[errorType]['']  || message.customError || message.defaultMessage || '';
 						}
 					}
+					if(webshims.replaceValidationplaceholder){
+						message = webshims.replaceValidationplaceholder(elem, message, errorType);
+					}
 					autocompleteEvaluator.add(elem);
 				} else {
 					message = '';
@@ -233,6 +236,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 	var getId = function(name){
 		return document.getElementById(name) || document.getElementsByName(name);
 	};
+
 	addCustomValidityRule('partialPattern', function(elem, val, pattern){
 		pattern = pattern.partialPattern;
 		if(!val || !pattern){return;}
@@ -249,11 +253,10 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 	}
 
 	addCustomValidityRule('grouprequired', function(elem, val, data){
-		var form;
-		var name = elem.name;
-		if(!name || elem.type !== 'checkbox' || !('grouprequired' in data)){return;}
+		var form, name;
+		if(!('grouprequired' in data) || elem.type !== 'checkbox' || !(name = elem.name)){return;}
 
-		if(!data.grouprequired || !data.grouprequired.checkboxes){
+		if(!data.grouprequired.checkboxes){
 			data.grouprequired.checkboxes = $( ((form = $.prop(elem, 'form')) && form[name]) || document.getElementsByName(name)).filter('[type="checkbox"]');
 			data.grouprequired.checkboxes
 				.off('click.groupRequired')
@@ -264,7 +267,6 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 			data.grouprequired.checkboxes.not(elem).removeData('grouprequired');
 		}
 
-		
 		return !(data.grouprequired.checkboxes.filter(':checked:enabled')[0]);
 	}, 'Please check one of these checkboxes.');
 	
