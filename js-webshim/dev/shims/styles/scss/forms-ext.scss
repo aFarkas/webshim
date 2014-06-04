@@ -93,7 +93,17 @@ span.has-input-buttons {
 	background: #ccc;
 	font-size: 13px;
 	text-align: center;
-	
+	outline-offset: -2px;
+
+
+	&:focus,
+	&:active {
+		outline: 1px dotted #666;
+	}
+
+	&:hover {
+		outline: none;
+	}
 	
 	.ws-is-rtl & {
 		margin: 0 2px 0 0;

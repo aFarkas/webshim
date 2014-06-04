@@ -730,7 +730,12 @@ span.has-input-buttons {
   cursor: pointer;
   background: #ccc;
   font-size: 13px;
-  text-align: center; }
+  text-align: center;
+  outline-offset: -2px; }
+  .ws-popover-opener:focus, .ws-popover-opener:active {
+    outline: 1px dotted #666; }
+  .ws-popover-opener:hover {
+    outline: none; }
   .ws-is-rtl .ws-popover-opener {
     margin: 0 2px 0 0; }
   .ws-popover-opener span {

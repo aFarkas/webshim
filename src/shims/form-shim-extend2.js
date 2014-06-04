@@ -196,7 +196,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 						value = !!value;
 
 						if(value){
-							$(disableElementsSel, this).each(groupControl.disable);
+							$(this.querySelectorAll(disableElementsSel)).each(groupControl.disable);
 						} else if(!$(this).is('fieldset[disabled] *')){
 							var elements = $(this.querySelectorAll(disableElementsSel));
 

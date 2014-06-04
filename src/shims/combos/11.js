@@ -1872,7 +1872,7 @@
 			cancel: function(val, popover, data){
 				if(!data.options.inlinePicker){
 					popover.stopOpen = true;
-					if(assumeVirtualKeyBoard){
+					if(!popover.openedByFocus && assumeVirtualKeyBoard){
 						$('button', data.buttonWrapper).trigger('focus');
 					} else {
 						data.element.getShadowFocusElement().trigger('focus');
@@ -1972,14 +1972,6 @@
 			var popover = webshims.objectCreate(options.inlinePicker ? webshims.inlinePopover : webshims.wsPopover, {}, $.extend(options.popover || {}, {prepareFor: options.inlinePicker ? data.buttonWrapper : data.element}));
 			var opener = $('<button type="button" class="ws-popover-opener"><span /></button>').appendTo(data.buttonWrapper);
 			
-			if(options.widgetPosition){
-				webshims.error('options.widgetPosition was removed use options.popover.position instead');
-			}
-			
-			if(options.openOnFocus && popover.options && (popover.options.appendTo == 'auto' || popover.options.appendTo == 'element')){
-				webshims.error('openOnFocus and popover.appendTo "auto/element" can prduce a11y problems try to change appendTo to body or similiar or use openOnMouseFocus instead');
-			}
-			
 			var showPickerContent = function(){
 				(picker[data.type].showPickerContent || picker.showPickerContent)(data, popover);
 			};
@@ -2048,9 +2040,28 @@
 							stopPropagation.apply(this, arguments);
 							popover.preventBlur();
 						},
-						focus: function(){
-							popover.preventBlur();
-						}
+						keydown: function(e){
+							if(e.keyCode == 40 && e.altKey){
+								open();
+							}
+						},
+						'focus mousedown': (function(){
+							var allowClose = true;
+							var reset = function(){
+								allowClose = true;
+							};
+							return function(e){
+								if(e.type  == 'mousedown'){
+									allowClose = false;
+									setTimeout(reset);
+								}
+								if(e.type == 'focus' && allowClose && options.openOnFocus && popover.openedByFocus && (popover.options.appendTo == 'auto' || popover.options.appendTo == 'element')){
+									popover.hide();
+								} else {
+									popover.preventBlur();
+								}
+							};
+						})()
 					})
 				;
 				
