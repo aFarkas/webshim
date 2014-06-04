@@ -607,7 +607,7 @@
 	/*
 	 * shortcuts
 	 */
-	$.webshims = webshims;
+
 	
 	var webCFG = webshims.cfg;
 	var webshimsFeatures = webshims.features;
@@ -1306,7 +1306,8 @@
 	
 	webshims.$ = $;
 	webshims.M = Modernizr;
-	window.webshims = webshims;
+	$.webshims = webshims;
+	$.webshim = webshim;
 
 	webshims.callAsync = function(){
 		webshims.callAsync = $.noop;
