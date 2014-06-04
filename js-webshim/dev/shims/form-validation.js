@@ -30,6 +30,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	var nonFormFilter = function(){
 		return !$.prop(this, 'form');
 	};
+	//TODO: cache + perftest
 	var getGroupElements = function(elem){
 		elem = $(elem);
 		var name;
@@ -175,7 +176,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			}
 			if(updateValidationEvents[e.type]){
 				if(e.type == 'refreshvalidityui'){
-					webshims.warn('refreshvalidityui was renamed to updatevalidation');
+					webshims.error('refreshvalidityui was renamed to updatevalidation');
 				}
 				switchClass();
 			} else {

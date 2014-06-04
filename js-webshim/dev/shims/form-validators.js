@@ -12,6 +12,9 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 	var initTest;
 	var elemSels = 'input, select, textarea, fieldset[data-dependent-validation]';
 	var onEventTest = function(e){
+		if(e.type == 'refreshCustomValidityRules'){
+			webshims.error('refreshCustomValidityRules event was renamed to updatecustomvalidity');
+		}
 		webshims.refreshCustomValidityRules(e.target);
 	};
 	var autocompleteEvaluator = (function(){
@@ -214,7 +217,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 				
 				formReady = true;
 			});
-			$(document).on('refreshCustomValidityRules', onEventTest);
+			$(document).on('refreshCustomValidityRules updatecustomvalidity', onEventTest);
 		}, 29);
 		
 	});
@@ -380,9 +383,9 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 		
 	}, 'The value of this field does not repeat the value of the other field');
 
-	addCustomValidityRule('valuevalidation', function(elem, val, data){
-		if(('valuevalidation' in data)){
-			return $(elem).triggerHandler('valuevalidation', [{value: val, valueAsDate: $.prop(elem, 'valueAsDate'), isPartial: false}]) || '';
+	addCustomValidityRule('validatevalue', function(elem, val, data){
+		if(('validatevalue' in data)){
+			return $(elem).triggerHandler('validatevalue', [{value: val, valueAsDate: $.prop(elem, 'valueAsDate'), isPartial: false}]) || '';
 		}
 	}, 'This value is not allowed here');
 
@@ -400,7 +403,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 				;
 			}
 
-			data.ajaxvalidate.depends.on('refreshCustomValidityRules', function(){
+			data.ajaxvalidate.depends.on('change', function(){
 				webshims.refreshCustomValidityRules(elem);
 			});
 

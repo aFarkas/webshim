@@ -98,6 +98,7 @@ var isPlaceholderOptionSelected = function(select){
 };
 
 var emptyJ = $([]);
+//TODO: cache + perftest
 var getGroupElements = function(elem){
 	elem = $(elem);
 	var name, form;

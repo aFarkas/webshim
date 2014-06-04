@@ -308,22 +308,31 @@ webshims.setOptions('forms', { addValidators: true });
 			<h3 id="Custom-create">Creating new customErrors</h3>
 			<p>While webshim allows the developer to use the native or polyfilled <code>setCustomValidity</code> method to add custom errors. Webshims provides two additional ways to add new constraints:</p>
 
-			<h4><code>valuevalidation</code> event</h4>
-			<p>The non-bubbling <code class="i">valuevalidation</code> event is the preferred way to add new custom constraints and is an easy to use API. Simply listen to the event and return a <code>truthy</code> value, if the form control does not satisfy the constraint. If the value is a string, this will be the errormessage.</p>
+			<h4><code>validatevalue</code> event</h4>
+			<p>The non-bubbling <code class="i">validatevalue</code> event is the preferred way to add new custom constraints and is an easy to use API. Simply listen to the event and return a <code>truthy</code> value, if the form control does not satisfy the constraint. If the value is a string, this will be the errormessage.</p>
 			<p>To get the <code>value</code>/<code>valueAsDate</code> for the given form control, do not use <code>.val()</code>, but use the provided extra event parameter.</p>
 <pre><code class="language-javascript">
-$('.only-foo').on('valuevalidation', function(e, extra){
+$('.only-foo').on('validatevalue', function(e, extra){
 	if(extra.value != 'foo'){
 		return 'Please enter foo.';
 	}
 });
 </code></pre>
-			<p>The <code>valuevalidation</code> event is also called while building input widgets like a datepicker:</p>
+			<p>The <code>validatevalue</code> event is also called while building input widgets like a datepicker:</p>
 			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/zRGd9/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+			<p>Note: The name <code>validatevalue</code> was renamed with version 1.13.2 it replaces the <code class="i">valuevalidation</code>.</p>
 
 			<h4>Adding constraints without adding events to each form control</h4>
 			<p>webshims also exposes the custom error helper to generate new custom constraints</p>
 			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/KdFB2/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+			<h4>Updating validation constraints without affecting the validation UI</h4>
+			<p>In case a script changes a value custom constraints might need to be updated. This can be done either with the <code class="i">updatevalidation</code> or <code class="i">updatecustomvalidity</code> event.</p>
+<pre><code class="language-javascript">
+	$('input.foo').val('bar').trigger('updatecustomvalidity');
+</code></pre>
+			<p>While the <code>updatecustomvalidity</code> event will update all custom rules on the target element, the <code>updatevalidation</code> event additionally also updates the validation UI.</p>
 
 			<h2 id="Datalist">Datalist</h2>
 			<p>The datalist element can be used to create autocomplete/combobox widgets. With the <code class="i">customDatalist</code> option the UI can be even replaced in supporting browsers to have more control over this widget.</p>

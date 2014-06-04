@@ -263,12 +263,21 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 
 	$.event.special.valuevalidation = {
 		setup: function(){
+			webshims.error('valuevalidation was renamed to validatevalue!');
+		}
+	};
+
+
+	$.event.special.validatevalue = {
+		setup: function(){
 			var data = $(this).data() || $.data(this, {});
-			if(!('valuevalidation' in data)){
-				data.valuevalidation = true;
+			if(!('validatevalue' in data)){
+				data.validatevalue = true;
 			}
 		}
 	};
+
+
 	
 	$(document).on('focusin.lazyloadvalidation', function(e){
 		if('form' in e.target){

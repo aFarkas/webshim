@@ -1484,12 +1484,21 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 
 	$.event.special.valuevalidation = {
 		setup: function(){
+			webshims.error('valuevalidation was renamed to validatevalue!');
+		}
+	};
+
+
+	$.event.special.validatevalue = {
+		setup: function(){
 			var data = $(this).data() || $.data(this, {});
-			if(!('valuevalidation' in data)){
-				data.valuevalidation = true;
+			if(!('validatevalue' in data)){
+				data.validatevalue = true;
 			}
 		}
 	};
+
+
 	
 	$(document).on('focusin.lazyloadvalidation', function(e){
 		if('form' in e.target){
@@ -1603,6 +1612,7 @@ var isPlaceholderOptionSelected = function(select){
 };
 
 var emptyJ = $([]);
+//TODO: cache + perftest
 var getGroupElements = function(elem){
 	elem = $(elem);
 	var name, form;
