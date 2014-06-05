@@ -260,6 +260,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 		if(!('grouprequired' in data) || elem.type !== 'checkbox' || !(name = elem.name)){return;}
 
 		if(!data.grouprequired.checkboxes){
+			data.grouprequired = {};
 			data.grouprequired.checkboxes = $( ((form = $.prop(elem, 'form')) && form[name]) || document.getElementsByName(name)).filter('[type="checkbox"]');
 			data.grouprequired.checkboxes
 				.off('click.groupRequired')
