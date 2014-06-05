@@ -906,7 +906,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		});
 	})();
 
-	if(document.addEventListener && Modernizr.inputtypes && Modernizr.inputtypes.tel && ua.indexOf('Mobile') != -1 && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ){
+	if(!options.noInputmodeFix && document.addEventListener && Modernizr.inputtypes && Modernizr.inputtypes.tel && ua.indexOf('Mobile') != -1 && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ){
 		var removeListener = function(elem){
 			elem.removeEventListener('blur', switchBack, true);
 		};
@@ -917,7 +917,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				'[0-9]*': 1,
 				'\\d*': 1
 			} :
-			{}
+			false
 		;
 		var switchBack = function(e){
 			removeListener(e.target);
@@ -927,19 +927,26 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			document.removeEventListener('focus', addFix, true);
 			document.removeEventListener('touchstart', addFix, true);
 		};
+		var allowSwitchByPattern = function(elem){
+			var pattern;
+			var switchAllowed = true;
+
+			if(stopPatterns){
+				pattern = elem.getAttribute('pattern') || '';
+				if(stopPatterns[pattern] || (needsPattern && (!pattern || !regPattern.test(pattern)))){
+					switchAllowed = false;
+				}
+			}
+
+			return switchAllowed;
+		};
 
 		var addFix = function(e){
-			var val, pattern;
-			if(e.target.type == 'text' && e.target.getAttribute('inputmode') == 'numeric' && !needsPattern ||
-				((pattern = e.target.getAttribute('pattern')) && !stopPatterns[pattern] &&
-					regPattern.test(pattern))){
-
+			if(e.target.type == 'text' && e.target.getAttribute('inputmode') == 'numeric' && allowSwitchByPattern(e.target)){
 				try{
 					removeListener(e.target);
 					e.target.addEventListener('blur', switchBack, true);
-
 					e.target.type = 'tel';
-
 				} catch (er){
 					removeDocListener();
 				}
