@@ -43,6 +43,9 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		if(options.addValidators){
 			toLoad.push('form-validators');
 		}
+		if(options.lazyReader && !window.FileReader){
+			toLoad.push('filereader');
+		}
 		webshims.reTest(toLoad);
 		$(document).off('.lazyloadvalidation');
 	};
@@ -289,5 +292,14 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 
 	if(modules['form-number-date-ui'].loaded && !options.customMessages && (modules['form-number-date-api'].test() || (Modernizr.inputtypes.range && Modernizr.inputtypes.color))){
 		webshims.isReady('form-number-date-ui', true);
+	}
+
+	if(options.lazyReader && !window.FileReader){
+		webshims.ready('DOM', function(){
+			var elem;
+			if(!window.FileReader && (elem = document.querySelector('input[type="file"].ws-filereader')) && !elem.disabled){
+				webshims._polyfill(['filereader']);
+			}
+		});
 	}
 });

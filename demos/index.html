@@ -881,10 +881,10 @@ var myCar = Object.create(carProto, {
 				</li>
 			</ul>
 			<ul class="list">
-				<li>
-					<small>1. You need to wrap the datalist options in a select element (datalist > select > option)!</small>
-					<small>2. multiple is only implemented for type=email (also works in conjunction with pattern). Implementation for type=file is comming soon!</small>
-				</li>
+
+
+				<li><small>1. You need to wrap the datalist options in a select element (datalist > select > option)!</small></li>
+				<li><small>2. multiple is only implemented for type=email (also works in conjunction with pattern). Implementation for [type="file"][multiple] see <a href="#FileReader">filereader</a>!</small></li>
 			</ul>
 
 			<h3>Implemented/fixed in <code class="i">
@@ -986,7 +986,11 @@ webshims.setOptions("forms", {
 	}
 });</code>
 </pre>
-
+				</li>
+				<li>
+					<strong>lazyReader</strong>  <em>boolean</em> If <code class="i">lazyReader</code> is set to <code>true</code> webshim will lazy load the <a href="#FileReader"><code class="i">FileReader</code></a> feature as soon as webshim detects an <code>input.ws-filereader</code> or after onload.
+					<br>
+					<em>default: false</em>
 				</li>
 			</ul>
 
@@ -1433,14 +1437,14 @@ webshims.setOptions('details', {animate: true});
 			</ul>
 
 			<h2 id="FileReader"> FileReader</h2>
-			<p>
-				An example of how to read a file as a base64 string from a form control:
-			</p>
+			<p>The <code>filereader</code> feature enables accessing and reading a file from an input[type="file"]. Additionally it can be processed over <code>AJAX</code> to a server. Due to its obtrusive nature an input as to have an additional class with the name <code class="i">ws-filereader</code>:</p>
+			<p>An example of how to read a file as a base64 string from a form control:</p>
 			<pre><code class="language-javascript">
 &lt;!-- add ws-filereader class to all shimable type="file" inputs --&gt;
-&lt;input type="file" class="ws-filereader" id="user-photo" /&gt;
+&lt;input type="file" class="ws-filereader" id="user-photo" multiple="" accept="image/*" /&gt;
 </code></pre>
 			<pre><code class="language-javascript">
+//load the filereader
 webshims.polyfill('filereader');
 
 //on DOM ready filereader is shimmed
@@ -1461,35 +1465,19 @@ $(function(){
 
 });
 </code></pre>
-			<h3>Options for the <code>
-				FileReader</code> feature</h3>
-			<ul>
-				<li>
-					<strong>debugMode</strong> <em>boolean</em> Turn on/off console logging
-				</li>
-				<li>
-					<strong>callback</strong> <em>function</em> Callback function triggered when Filereader is ready
-				</li>
-			</ul>
 
-			<h3>Element specific options</h3>
-			<ul>
-				<li>
-					<strong>multiple</strong> <em>boolean</em> Mutliple file select. Default: input file multiple property or false
-				</li>
-				<li>
-					<strong>accept</strong> <em>string</em> Mime type file restriction. Default: input file accept attribute or false
-				</li>
-				<li>
-					<strong>label</strong> <em>string</em> Label for the file type in file dialog if using extensions: example “Images (.jpg)”
-				</li>
-				<li>
-					<strong>extensions</strong> <em>string</em> File extensions in Flash format: "*.jpg;*.png;*.pdf", requires label option
-				</li>
-			</ul>
+			<p>Due to the fact, that this feature is quite big, webshim also supports lazy loading this feature over the <code>forms</code> feature:</p>
+<pre><code class="language-javascript">
+webshims.setOptions('forms', {
+	lazyReader: true
+});
+//load the forms feature
+webshims.polyfill('forms');
 
+//The forms feature will load the filereader as soon as its usage is detected or after onload.
+</code></pre>
 			<p>
-				<em>This feature is based on code from <a href="https://github.com/Jahdrien/FileReader" target="_external">https://github.com/Jahdrien/FileReader</a>. </em>
+				<em>This feature is based on code from <a href="https://github.com/moxiecode/moxie" target="_external">https://github.com/moxiecode/moxie</a>. </em>
 			</p>
 
 

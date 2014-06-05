@@ -906,7 +906,7 @@
 			}
 			return ('swfmini' in window);
 		},
-		c: [16, 7, 2, 8, 1, 12, 19, 25, 23, 27]
+		c: [16, 7, 2, 8, 1, 12, 19, 23]
 	});
 	modules.swfmini.test();
 	
@@ -919,7 +919,7 @@
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
 	addPolyfill('es5', {
 		test: !!(Modernizr.ES5 && Function.prototype.bind),
-		c: [18, 19, 25, 20, 32],
+		c: [18, 19, 20, 32],
 		d: ['sizzle']
 	});
 	
@@ -927,7 +927,7 @@
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		d: ['es5'],
-		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 25, 19, 20, 26, 31, 34]
+		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 19, 20, 31, 34]
 	});
 
 	document.createElement('picture');
@@ -1179,11 +1179,14 @@
 	//>
 	
 	//<filereader
+	webshim.loader.addModule('moxie', {
+		src: 'moxie/js/moxie',
+		c: [25]
+	});
 	addPolyfill('filereader', {
 		test: 'FileReader' in window,
-		d: ['swfmini', DOMSUPPORT],
-		c: [25, 26, 27]
-//		,nM: 'filereader'
+		d: ['moxie', 'dom-support'],
+		c: [25]
 	});
 	//>
 	

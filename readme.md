@@ -80,7 +80,7 @@ Webshims Lib uses many great third party scripts:
 | flashcanvaspro  | closed                                       | http://flashcanvas.net                                                        |
 | Jaris FLV       | GPL 3.0                                      | http://jarisflvplayer.org                                                     |
 | excanvas        | Apache License 2.0                           | http://excanvas.sourceforge.net                                               |
-| filereader      | MIT                                          | https://github.com/Jahdrien/FileReader                                        |
+| moxie           | GPL 3.0                                      | https://github.com/moxiecode/moxie                                            |
 | es5             | MIT                                          | https://github.com/280north/narwhal                                           |
 | swfmini         | MIT                                          | https://code.google.com/p/swfobject                                           |
 | track           | BSD 2 clause                                 | https://github.com/cgiffard/Captionator                                       |

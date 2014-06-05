@@ -290,4 +290,13 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	if(modules['form-number-date-ui'].loaded && !options.customMessages && (modules['form-number-date-api'].test() || (Modernizr.inputtypes.range && Modernizr.inputtypes.color))){
 		webshims.isReady('form-number-date-ui', true);
 	}
+
+	if(options.lazyReader && !window.FileReader){
+		webshims.addReady(function(context){
+			var elem;
+			if(!window.FileReader && (elem = context.querySelector('input[type="file"].ws-filereader')) && !elem.disabled){
+				webshims._polyfill(['filereader']);
+			}
+		});
+	}
 });
