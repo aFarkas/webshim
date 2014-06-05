@@ -1,4 +1,4 @@
-upcomming Release 1.13.1
+upcomming Release 1.13.2
 ----------
 - implement ``inputmode="numeric"`` for Smartphones ([see demo](http://fiddle.jshell.net/trixta/7NEBb/show/))
 - fixed ``data-groupriequired``
