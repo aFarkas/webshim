@@ -906,39 +906,46 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		});
 	})();
 
-	if( document.addEventListener && Modernizr.inputtypes && Modernizr.inputtypes.tel && ua.indexOf('Mobile') != -1 && !(/ipad|iphone/i).test(ua) && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ){
+	if(document.addEventListener && Modernizr.inputtypes && Modernizr.inputtypes.tel && ua.indexOf('Mobile') != -1 && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ){
 		var removeListener = function(elem){
 			elem.removeEventListener('blur', switchBack, true);
 		};
+		var needsPattern = (/iphone|ipod/i).test(ua);
+		var regPattern = /^[\\d\*|\[0\-9\]]*[\+|\{\d*\,\d*\}|*]*$/;
+		var stopPatterns = needsPattern || (/ipad|ios/i).test(ua) ?
+			{
+				'[0-9]*': 1,
+				'\\d*': 1
+			} :
+			{}
+		;
 		var switchBack = function(e){
-			setTimeout(function(){
-				var val = e.target.value;
-				e.target.type = 'text';
-				if(val != e.target.value){
-					e.target.value = val;
-				}
-			});
 			removeListener(e.target);
+			e.target.type = 'text';
+		};
+		var removeDocListener = function(){
+			document.removeEventListener('focus', addFix, true);
+			document.removeEventListener('touchstart', addFix, true);
 		};
 
 		var addFix = function(e){
-			var val;
-			if(e.target.type == 'text' && e.target.getAttribute('inputmode') == 'numeric' && "[0-9]*" == e.target.getAttribute('pattern')){
+			var val, pattern;
+			if(e.target.type == 'text' && e.target.getAttribute('inputmode') == 'numeric' && !needsPattern ||
+				((pattern = e.target.getAttribute('pattern')) && !stopPatterns[pattern] &&
+					regPattern.test(pattern))){
+
 				try{
-					val = e.target.value;
-					e.target.type = options.fixInputMode;
 					removeListener(e.target);
 					e.target.addEventListener('blur', switchBack, true);
-					if(val != e.target.value){
-						e.target.value = val;
-					}
-				} catch (er){}
+
+					e.target.type = 'tel';
+
+				} catch (er){
+					removeDocListener();
+				}
 			}
 		};
 
-		if(typeof options.fixInputMode != 'string'){
-			options.fixInputMode = 'tel';
-		}
 		document.addEventListener('focus', addFix, true);
 		document.addEventListener('touchstart', addFix, true);
 	}
