@@ -34,7 +34,7 @@
 
 		<div id="sidebar" class="interface">
 
-			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.13.1</span>)</span></a>
+			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.13.2-RC1</span>)</span></a>
 			<ul class="toc_section">
 				<li>
 					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
@@ -230,6 +230,10 @@ webshims.polyfill('forms');
 			<p>In case a value was changed, through script the validation UI can be updated by triggering the <code>updatevalidation</code> on the given element:</p>
 <pre><code class="language-javascript">
 $('input.foo').val('bar').trigger('updatevalidation');
+</code></pre>
+			<p>Often a developer wants to only update the validation UI, if the field already was marked as an invalid or valid. This can be done by the following code:</p>
+<pre><code class="language-javascript">
+$('input.foo').val('bar').filter('.user-error, .user-success').trigger('updatevalidation');
 </code></pre>
 			<p>Or reseted by triggering the <code>resetvalidation</code> event on the input or the form element.</p>
 			<h2 id="Custom-validity">Custom-validity</h2>

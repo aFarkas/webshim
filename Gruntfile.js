@@ -153,7 +153,7 @@ module.exports = function(grunt){
 	grunt.registerTask('versiontest', 'test the current version of build', function(){
 		var version = grunt.file.readJSON(DEVPATH+'/shims/combos/comboinfo.json').version;
 		var packageinfos = ['package.json', 'bower.json', 'webshims.jquery.json'];
-		if(!/^\d+\.\d+\.\d+$/.test(version)){
+		if(!/^\d+\.\d+\.\d+[\-RC\d]*$/.test(version)){
 			grunt.warn('version "'+ version +'" is not valid');
 		}
 		if(grunt.file.readJSON('webshims.jquery.json').download.indexOf('webshims-'+version+'.zip') == -1){

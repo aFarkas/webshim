@@ -1,3 +1,13 @@
+upcomming Release 1.13.1
+----------
+- implement ``inputmode="numeric"`` for Smartphones ([see demo](http://fiddle.jshell.net/trixta/7NEBb/show/))
+- fixed ``data-groupriequired``
+- improved a11y for popovers in conjunction with ``openOnFocus``
+- added minlength attribute to custom validators (only if minlength isn't implemented already)
+- added new alias ``$.webshim`` (Only for completeness and compatibility. Use the ``webshim`` namespace! For example: ``webshim.polyfill('mediaelement');``)
+- **renamed** ``valuevalidation`` to ``validatevalue``
+- **renamed** ``refreshCustomValidityRules`` event to ``updatecustomvalidity`` event (``webshim.refreshCustomValidityRules`` method is untouched)
+
 Release 1.13.1
 ----------
 - added clonePolyfill + htmlPolyfill can be used as getter

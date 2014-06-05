@@ -405,7 +405,9 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 			}
 
 			data.ajaxvalidate.depends.on('change', function(){
-				webshims.refreshCustomValidityRules(elem);
+				if($(this).is(':valid')){
+					webshims.refreshCustomValidityRules(elem);
+				}
 			});
 
 			opts = data.ajaxvalidate;
