@@ -10,7 +10,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	var iVal = options.iVal;
 
 	if(!iVal.fieldWrapper){
-		iVal.fieldWrapper = ':not(span):not(label):not(em):not(strong):not(p)';
+		iVal.fieldWrapper = ':not(span):not(label):not(em):not(strong):not(p):not(.ws-custom-file)';
 	}
 	var invalidClass = iVal.errorClass || (iVal.errorClass = 'user-error');
 	var validClass = iVal.successClass || (iVal.successClass = 'user-success');
@@ -956,6 +956,37 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		document.addEventListener('focus', addFix, true);
 		document.addEventListener('touchstart', addFix, true);
 	}
+
+	function getFileNames(file){
+		return file.name;
+	}
+
+
+
+	function customFile(){
+		if($.data(this, 'wsCustomFile')){return;}
+		var map = Array.prototype.map;
+		var $module = $(this);
+		var $file = $('input[type="file"]', $module);
+		var $valueDisplay = $('.ws-file-value', $module);
+
+		var showSelected = function(){
+			var files = $file.prop('files') || [];
+			var names = map.call(files, getFileNames).join(', ') || $file.val();
+			if(names){
+				$valueDisplay.text(names);
+			} else {
+				$valueDisplay.html('&#160;');
+			}
+		};
+		$.data(this, 'wsCustomFile', {showSelected: showSelected});
+		$('button', $module).attr('tabindex', '-1');
+		$file.on('change', showSelected).each(showSelected);
+	}
+
+	webshims.addReady(function(context, contextElem){
+		$(context.querySelectorAll('.ws-custom-file')).add($(contextElem).filter('.ws-custom-file')).each(customFile);
+	});
 
 	addModule('form-fixrangechange', {
 		test: !(!$.event.special.change && !$.event.special.input && Modernizr.inputtypes && Modernizr.inputtypes.range && options.fixRangeChange)

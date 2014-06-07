@@ -43,7 +43,6 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		if(options.addValidators){
 			toLoad.push('form-validators');
 		}
-
 		webshims.reTest(toLoad);
 		$(document).off('.lazyloadvalidation');
 	};
@@ -143,6 +142,8 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 	addModule('form-validation', $.extend({d: ['form-message']}, formExtras));
 
 	addModule('form-validators', $.extend({}, formExtras));
+
+
 	
 	if($.expr.filters){
 		extendSels();
@@ -294,6 +295,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 
 	$(function(){
 		var fileReaderReady = webshims.isReady('filereader');
+
 		if(!fileReaderReady){
 			webshims.addReady(function(context){
 				if(!fileReaderReady){
@@ -308,5 +310,10 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 				}
 			});
 		}
+		webshims.ready('DOM', function(){
+			if(document.querySelector('.ws-custom-file')){
+				webshims.reTest(['form-validation']);
+			}
+		});
 	});
 });

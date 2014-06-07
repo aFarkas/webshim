@@ -266,7 +266,6 @@ webshims.isReady('swfmini', true);
 		if(options.addValidators){
 			toLoad.push('form-validators');
 		}
-
 		webshims.reTest(toLoad);
 		$(document).off('.lazyloadvalidation');
 	};
@@ -366,6 +365,8 @@ webshims.isReady('swfmini', true);
 	addModule('form-validation', $.extend({d: ['form-message']}, formExtras));
 
 	addModule('form-validators', $.extend({}, formExtras));
+
+
 	
 	if($.expr.filters){
 		extendSels();
@@ -517,6 +518,7 @@ webshims.isReady('swfmini', true);
 
 	$(function(){
 		var fileReaderReady = webshims.isReady('filereader');
+
 		if(!fileReaderReady){
 			webshims.addReady(function(context){
 				if(!fileReaderReady){
@@ -531,6 +533,11 @@ webshims.isReady('swfmini', true);
 				}
 			});
 		}
+		webshims.ready('DOM', function(){
+			if(document.querySelector('.ws-custom-file')){
+				webshims.reTest(['form-validation']);
+			}
+		});
 	});
 });
 ;(function(Modernizr, webshims){

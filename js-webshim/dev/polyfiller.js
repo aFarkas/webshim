@@ -116,7 +116,7 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.13.2-RC1',
+		version: '1.13.2-RC2',
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
 			//addCacheBuster: false,
@@ -253,6 +253,9 @@
 			}
 			
 			$.each(features, function(i, feature){
+				if(feature == 'xhr2'){
+					feature = 'filereader';
+				}
 				if(!webshimsFeatures[feature]){
 					WSDEBUG && webshims.error("could not find webshims-feature (aborted): "+ feature);
 					isReady(feature, true);
@@ -1185,7 +1188,7 @@
 	});
 	addPolyfill('filereader', {
 		test: 'FileReader' in window && 'FormData' in window,
-		d: [DOMSUPPORT],
+		d: [DOMSUPPORT, 'jajax'],
 		c: [25, 26]
 	});
 	//>

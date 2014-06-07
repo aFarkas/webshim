@@ -1451,7 +1451,7 @@ webshims.setOptions('details', {animate: true});
 				<li><small>3. For full CORS support a crossdomain.xml has to be on the response server!</small></li>
 			</ul>
 			<p>An example of how to read a file as a base64 string from a form control:</p>
-			<pre><code class="language-javascript">
+			<pre><code class="language-markup">
 &lt;!-- add ws-filereader class to all shimable type="file" inputs --&gt;
 &lt;input type="file" class="ws-filereader" id="user-photo" multiple="" accept="image/*" /&gt;
 </code></pre>
@@ -1477,10 +1477,24 @@ $(function(){
 
 });
 </code></pre>
+			<p>The <code class="i">filereader</code> is also lazy loaded by webhsim's <code class="i">form</code> feature as soon as an element matching the <code>input.ws-filereader</code> selector is used. Additionally the forms features enables custom styleable [type=file] elements if it find a wrapper with the class <code class="i">ws-custom-file</code>:</p>
+<pre><code class="language-markup">
+&lt;script&gt;
+	//filereader is lazyLoaded no need to call feature
+	webshims.polyfill('forms');
+&lt;/script&gt;
+&lt;div class="ws-custom-file"&gt;
+	&lt;!-- add ws-filereader class to all shimable type="file" inputs --&gt;
+	&lt;input type="file" class="ws-filereader" id="user-photo" multiple="" accept="image/*" /&gt;
 
+	&lt;!-- button and .ws-file-value for custom filepicker UI --&gt;
+	&lt;button type="button"&gt;Browse&lt;/button&gt;
+	&lt;span class="ws-file-value"&gt;...&lt;/span&gt;
+&lt;/div&gt;
+</code></pre>
 
 			<p>
-				<em>This feature is based on code from <a href="https://github.com/moxiecode/moxie" target="_external">https://github.com/moxiecode/moxie</a>. </em>
+				<em>The <code class="i">filereader</code> feature is based on code from <a href="https://github.com/moxiecode/moxie" target="_external">https://github.com/moxiecode/moxie</a>. </em>
 			</p>
 
 

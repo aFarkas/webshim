@@ -1,7 +1,7 @@
-webshim.register('filereader', function($, webshim, window, document, undefined, options){
+webshim.register('filereader', function($, webshim, window, document, undefined, featureOptions){
 	"use strict";
 
-	var mOxie;
+	var mOxie, moxie;
 	var FormData = $.noop;
 	var sel = 'input[type="file"].ws-filereader';
 	var loadMoxie = function (){
@@ -10,7 +10,8 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 	var _createFilePicker = function(){
 		var $input, picker, $parent;
 		var input = this;
-		if(webshim.implement(input, 'inputwidgets')){
+
+		if(webshim.implement(input, 'filepicker')){
 
 			input = this;
 			$input = $(this);
@@ -35,15 +36,19 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 				$input.trigger('change');
 			};
 			picker.onmouseenter = function(){
+				$input.trigger('mouseover');
 				$parent.addClass('ws-mouseenter');
 			};
 			picker.onmouseleave = function(){
+				$input.trigger('mouseout');
 				$parent.removeClass('ws-mouseenter');
 			};
 			picker.onmousedown = function(){
+				$input.trigger('mousedown');
 				$parent.addClass('ws-active');
 			};
 			picker.onmouseup = function(){
+				$input.trigger('mouseup');
 				$parent.removeClass('ws-active');
 			};
 			webshim.data(input, 'filePicker', picker);
@@ -101,24 +106,61 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 			}
 		}
 	);
-	var createMoxieTransport = function (options, originalOptions, jqXHR){
-		if(options.wsType == 'moxie' || (options.data && options.data instanceof FormData)){
+	var testMoxie = function(options){
+		return (options.wsType == 'moxie' || (options.data && options.data instanceof mOxie.FormData) || (options.crossDomain && $.support.cors !== false));
+	};
+	var createMoxieTransport = function (options){
+
+		if(testMoxie(options)){
 			var ajax;
 			return {
 				send: function( headers, completeCallback ) {
+
+					var proressEvent = function(obj, name){
+						if(options[name]){
+							var called = false;
+							ajax.addEventListener('load', function(e){
+								if(!called){
+									options[name]({type: 'progress', lengthComputable: true, total: 1, loaded: 1});
+								} else if(called.lengthComputable && called.total > called.loaded){
+									options[name]({type: 'progress', lengthComputable: true, total: called.total, loaded: called.total});
+								}
+							});
+							obj.addEventListener('progress', function(e){
+								called = e;
+								options[name](e);
+							});
+						}
+					};
 					ajax = new moxie.xhr.XMLHttpRequest();
+
 					ajax.open(options.type, options.url, options.async, options.username, options.password);
-					ajax.send(options.data);
-					ajax.addEventListener('readystatechange', function(e){
+
+					proressEvent(ajax.upload, featureOptions.uploadprogress);
+					proressEvent(ajax.upload, featureOptions.progress);
+
+					ajax.addEventListener('load', function(e){
 						var responses = {
 							text: ajax.responseText,
 							xml: ajax.responseXML
 						};
-
-						if(ajax.readyState == 4){
-							completeCallback(ajax.status, ajax.statusText, responses);
-						}
+						completeCallback(ajax.status, ajax.statusText, responses, ajax.getAllResponseHeaders());
 					});
+
+					if(options.xhrFields && options.xhrFields.withCredentials){
+						ajax.withCredentials = true;
+					}
+
+					if(options.timeout){
+						ajax.timeout = options.timeout;
+					}
+
+					$.each(headers, function(name, value){
+						ajax.setRequestHeader(name, value);
+					});
+
+
+					ajax.send(options.data);
 
 				},
 				abort: function() {
@@ -131,40 +173,124 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 	};
 
 	var transports = {
-		xdomain: function (options, originalOptions, jqXHR){
-			if(options.wsType == 'xdomain'){
+		//based on script: https://github.com/MoonScript/jQuery-ajaxTransport-XDomainRequest
+		xdomain: (function(){
+			var httpRegEx = /^https?:\/\//i;
+			var getOrPostRegEx = /^get|post$/i;
+			var sameSchemeRegEx = new RegExp('^'+location.protocol, 'i');
+			return function(options, userOptions, jqXHR) {
 
-			}
-		},
-		moxie: function (options, originalOptions, jqXHR){
-			if(options.wsType == 'moxie' || (options.data && options.data instanceof FormData)){
-				var ajax;
+				// Only continue if the request is: asynchronous, uses GET or POST method, has HTTP or HTTPS protocol, and has the same scheme as the calling page
+				if (!options.crossDomain || options.username || (options.xhrFields && options.xhrFields.withCredentials) || !options.async || !getOrPostRegEx.test(options.type) || !httpRegEx.test(options.url) || !sameSchemeRegEx.test(options.url) || (options.data && options.data instanceof mOxie.FormData)) {
+					return;
+				}
+
+				var xdr = null;
+
 				return {
-					send: function( headers, completeCallback ) {
-						ajax = new moxie.xhr.XMLHttpRequest();
-						ajax.open(options.type, options.url, options.async, options.username, options.password);
-						ajax.send(options.data);
-						ajax.addEventListener('readystatechange', function(e){
-							var responses = {
-								text: ajax.responseText,
-								xml: ajax.responseXML
+					send: function(headers, complete) {
+						var postData = '';
+						var userType = (userOptions.dataType || '').toLowerCase();
+
+						xdr = new XDomainRequest();
+						if (/^\d+$/.test(userOptions.timeout)) {
+							xdr.timeout = userOptions.timeout;
+						}
+
+						xdr.ontimeout = function() {
+							complete(500, 'timeout');
+						};
+
+						xdr.onload = function() {
+							var allResponseHeaders = 'Content-Length: ' + xdr.responseText.length + '\r\nContent-Type: ' + xdr.contentType;
+							var status = {
+								code: xdr.status || 200,
+								message: xdr.statusText || 'OK'
 							};
+							var responses = {
+								text: xdr.responseText,
+								xml: xdr.responseXML
+							};
+							try {
+								if (userType === 'html' || /text\/html/i.test(xdr.contentType)) {
+									responses.html = xdr.responseText;
+								} else if (userType === 'json' || (userType !== 'text' && /\/json/i.test(xdr.contentType))) {
+									try {
+										responses.json = $.parseJSON(xdr.responseText);
+									} catch(e) {
 
-							if(ajax.readyState == 4){
-								completeCallback(ajax.status, ajax.statusText, responses);
-							}
-						});
+									}
+								} else if (userType === 'xml' && !xdr.responseXML) {
+									var doc;
+									try {
+										doc = new ActiveXObject('Microsoft.XMLDOM');
+										doc.async = false;
+										doc.loadXML(xdr.responseText);
+									} catch(e) {
 
+									}
+
+									responses.xml = doc;
+								}
+							} catch(parseMessage) {}
+							complete(status.code, status.message, responses, allResponseHeaders);
+						};
+
+						// set an empty handler for 'onprogress' so requests don't get aborted
+						xdr.onprogress = function(){};
+						xdr.onerror = function() {
+							complete(500, 'error', {
+								text: xdr.responseText
+							});
+						};
+
+						if (userOptions.data) {
+							postData = ($.type(userOptions.data) === 'string') ? userOptions.data : $.param(userOptions.data);
+						}
+						xdr.open(options.type, options.url);
+						xdr.send(postData);
 					},
 					abort: function() {
-						if(ajax){
-							ajax.abort();
+						if (xdr) {
+							xdr.abort();
 						}
 					}
 				};
+			};
+		})(),
+		moxie: function (options, originalOptions, jqXHR){
+			if(testMoxie(options)){
+				loadMoxie(options);
+				var ajax;
+
+				var tmpTransport = {
+					send: function( headers, completeCallback ) {
+						ajax = true;
+						webshim.ready('moxie', function(){
+							if(ajax){
+								ajax = createMoxieTransport(options, originalOptions, jqXHR);
+								tmpTransport.send = ajax.send;
+								tmpTransport.abort = ajax.abort;
+								ajax.send(headers, completeCallback);
+							}
+						});
+					},
+					abort: function() {
+						ajax = false;
+					}
+				};
+				return tmpTransport;
 			}
 		}
 	};
+
+	if(!featureOptions.progress){
+		featureOptions.progress = 'onprogress';
+	}
+
+	if(!featureOptions.uploadprogress){
+		featureOptions.uploadprogress = 'onuploadprogress';
+	}
 
 	if($.support.cors !== false || !window.XDomainRequest){
 		delete transports.xdomain;
@@ -173,6 +299,7 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 
 	$.ajaxTransport("+*", function( options, originalOptions, jqXHR ) {
 		var ajax, type;
+
 		if(options.wsType || transports[transports]){
 			ajax = transports[transports](options, originalOptions, jqXHR);
 		}
@@ -185,23 +312,6 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 		return ajax;
 	});
 
-	var readyForm = (function(){
-		var ready;
-		var addFormData = function(e){
-			if(!e.isDefaultPrevented()){
-
-			}
-		};
-		return function(){
-			if(ready){return;}
-			ready = true;
-			setTimeout(function(){
-				$(document).on('submit', addFormData);
-			});
-		};
-	})();
-
-	readyForm();
 	webshim.defineNodeNameProperty('input', 'files', {
 			prop: {
 				writeable: false,
@@ -232,13 +342,35 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 	window.FileReader = notReadyYet;
 	window.FormData = notReadyYet;
 	webshim.ready('moxie', function(){
+		moxie = window.moxie;
 		mOxie = window.mOxie;
 		mOxie.Env.swf_url = webshim.cfg.basePath+'moxie/flash/Moxie.cdn.swf';
 		mOxie.Env.xap_url = webshim.cfg.basePath+'moxie/flash/Moxie.cdn.xap';
 
 		window.FileReader = mOxie.FileReader;
-		window.FormData = mOxie.FormData;
-		FormData = mOxie.FormData;
+		window.FormData = function(form){
+			var appendData, i, len, files, fileI, fileLen, inputName;
+			var data = new mOxie.FormData();
+			if(form && $.nodeName(form, 'form')){
+				appendData = $(form).serializeArray();
+				for(i = 0; i < appendData.length; i++){
+					data.append(appendData[i].name, appendData[i].value);
+				}
+				appendData = form.querySelectorAll('input[type="file"][name]');
+				for(i = 0, len = appendData.length; i < appendData.length; i++){
+					inputName = appendData[i].name;
+					if(inputName && !$(appendData[i]).is(':disabled')){
+						files = $.prop(appendData[i], 'files') || [];
+						for(fileI = 0, fileLen = files.length; fileI < fileLen; fileI++){
+							data.append(inputName, files[fileI]);
+						}
+					}
+				}
+			}
+
+			return data;
+		};
+		FormData = window.FormData;
 
 		createFilePicker = _createFilePicker;
 		transports.moxie = createMoxieTransport;
@@ -248,6 +380,4 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 		$(context.querySelectorAll(sel)).add(contextElem.filter(sel)).each(createFilePicker);
 	});
 	webshim.ready('WINDOWLOAD', loadMoxie);
-
-
 });
