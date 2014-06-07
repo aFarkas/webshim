@@ -927,7 +927,7 @@
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		d: ['es5'],
-		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 19, 20, 31, 34]
+		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 19, 25, 20, 31, 34]
 	});
 
 	document.createElement('picture');
@@ -1181,12 +1181,12 @@
 	//<filereader
 	webshim.loader.addModule('moxie', {
 		src: 'moxie/js/moxie',
-		c: [25]
+		c: [26]
 	});
 	addPolyfill('filereader', {
-		test: 'FileReader' in window,
-		d: ['moxie', 'dom-support'],
-		c: [25]
+		test: 'FileReader' in window && 'FormData' in window,
+		d: [DOMSUPPORT],
+		c: [25, 26]
 	});
 	//>
 	

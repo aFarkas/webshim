@@ -1487,6 +1487,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		if(options.addValidators){
 			toLoad.push('form-validators');
 		}
+
 		webshims.reTest(toLoad);
 		$(document).off('.lazyloadvalidation');
 	};
@@ -1735,14 +1736,23 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		webshims.isReady('form-number-date-ui', true);
 	}
 
-	if(options.lazyReader && !window.FileReader){
-		webshims.addReady(function(context){
-			var elem;
-			if(!window.FileReader && (elem = context.querySelector('input[type="file"].ws-filereader')) && !elem.disabled){
-				webshims._polyfill(['filereader']);
-			}
-		});
-	}
+	$(function(){
+		var fileReaderReady = webshims.isReady('filereader');
+		if(!fileReaderReady){
+			webshims.addReady(function(context){
+				if(!fileReaderReady){
+					fileReaderReady = webshims.isReady('filereader');
+					if(context.querySelector('input.ws-filereader')){
+						webshims.reTest(['filereader', 'moxie']);
+						fileReaderReady = true;
+					} else if(webshims.cfg.debug !== false && context.querySelector('input[accept], input[type="file"][multiple]')){
+						webshims.warn('you might want to include the "filereader" feature, to enable accept and multiple attributes');
+					}
+
+				}
+			});
+		}
+	});
 });
 ;webshims.register('form-shim-extend', function($, webshims, window, document, undefined, options){
 "use strict";

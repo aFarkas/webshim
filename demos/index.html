@@ -884,7 +884,7 @@ var myCar = Object.create(carProto, {
 
 
 				<li><small>1. You need to wrap the datalist options in a select element (datalist > select > option)!</small></li>
-				<li><small>2. multiple is only implemented for type=email (also works in conjunction with pattern). Implementation for [type="file"][multiple] see <a href="#FileReader">filereader</a>!</small></li>
+				<li><small>2. multiple is only implemented for type=email (also works in conjunction with pattern). Implementation for [type="file"][multiple] or [accept] see <a href="#FileReader">filereader</a>!</small></li>
 			</ul>
 
 			<h3>Implemented/fixed in <code class="i">
@@ -986,11 +986,6 @@ webshims.setOptions("forms", {
 	}
 });</code>
 </pre>
-				</li>
-				<li>
-					<strong>lazyReader</strong>  <em>boolean</em> If <code class="i">lazyReader</code> is set to <code>true</code> webshim will lazy load the <a href="#FileReader"><code class="i">FileReader</code></a> feature as soon as webshim detects an <code>input.ws-filereader</code> or after onload.
-					<br>
-					<em>default: false</em>
 				</li>
 			</ul>
 
@@ -1436,8 +1431,25 @@ webshims.setOptions('details', {animate: true});
 				</li>
 			</ul>
 
-			<h2 id="FileReader"> FileReader</h2>
+			<h2 id="FileReader">FileReader</h2>
 			<p>The <code>filereader</code> feature enables accessing and reading a file from an input[type="file"]. Additionally it can be processed over <code>AJAX</code> to a server. Due to its obtrusive nature an input as to have an additional class with the name <code class="i">ws-filereader</code>:</p>
+			<h3>Implemented/fixed elements, attributes, properties, methods, events</h3>
+			<ul>
+				<li>
+					<strong>attributes and IDL/properties</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html">multiple for input[type="file"]</a><sup>1</sup>, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#attr-input-accept">accept</a><sup>1</sup>
+				</li>
+				<li>
+					<strong>properties</strong>: <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#dom-input-files">files for input[type="file"]</a>
+				</li>
+				<li>
+					<strong>corresponding interfaces</strong>: <a href="https://developer.mozilla.org/en-US/docs/Web/API/FileReader">FileReader</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/API/FormData">FormData</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS">XMLHttpRequest Level 2 (CORS and FormData)</a>
+				</li>
+			</ul>
+			<ul>
+				<li><small>1. [accept], [multiple] and the .files property is only polyfilled on input elements with the additional class 'ws-filereader'</small></li>
+				<li><small>2. For most of the features Flash or Silverliegt has to be installed. But webshim trys to fallback to other technologies, if those aren't.</small></li>
+				<li><small>3. For full CORS support a crossdomain.xml has to be on the response server!</small></li>
+			</ul>
 			<p>An example of how to read a file as a base64 string from a form control:</p>
 			<pre><code class="language-javascript">
 &lt;!-- add ws-filereader class to all shimable type="file" inputs --&gt;
@@ -1466,16 +1478,7 @@ $(function(){
 });
 </code></pre>
 
-			<p>Due to the fact, that this feature is quite big, webshim also supports lazy loading this feature over the <code>forms</code> feature:</p>
-<pre><code class="language-javascript">
-webshims.setOptions('forms', {
-	lazyReader: true
-});
-//load the forms feature
-webshims.polyfill('forms');
 
-//The forms feature will load the filereader as soon as its usage is detected or after onload.
-</code></pre>
 			<p>
 				<em>This feature is based on code from <a href="https://github.com/moxiecode/moxie" target="_external">https://github.com/moxiecode/moxie</a>. </em>
 			</p>
