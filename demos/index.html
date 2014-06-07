@@ -29,7 +29,7 @@
 
 		<div id="sidebar" class="interface">
 
-			<a class="toc_title"> Webshim <span class="version">(<span class="ws-version">1.13.2-RC1</span>)</span></a>
+			<a class="toc_title"> Webshim <span class="version">(<span class="ws-version">1.13.2-RC2</span>)</span></a>
 			<ul class="toc_section">
 				<li>
 					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
@@ -73,7 +73,7 @@
 				</li>
 			</ul>
 
-			<a class="toc_title" href="#FileReader"> FileReader </a>
+			<a class="toc_title" href="#FileReader"> FileReader / FormData / XHR2 / CORS </a>
 
 			<a class="toc_title" href="#Geolocation"> Geolocation </a>
 
@@ -141,7 +141,7 @@
 
 			<table>
 				<tr>
-					<td><a href="http://corrupt-system.de/webshims-stable.zip" class="download-button"> <strong><i>Version <span class="ws-version">1.13.2-RC1</span></i></strong> </a></td>
+					<td><a href="http://corrupt-system.de/webshims-stable.zip" class="download-button"> <strong><i>Version <span class="ws-version">1.13.2-RC2</span></i></strong> </a></td>
 					<td class="text"></td>
 				</tr>
 			</table>
@@ -208,7 +208,7 @@
 						es5
 					</li>
 					<li>
-						filereader
+						filereader (implements FileReader, XHR2 (CORS/FormData), FormData, and an input[type="file"] picker)
 					</li>
 					<li>
 						forms (form validation and form features: fieldset[disabled], &lt;input form="idref" /&gt;, placeholder...)
@@ -231,6 +231,10 @@
 
 					<li>
 						track (subtitles, catptions and textTrack API)
+					</li>
+
+					<li>
+						xhr2 (an alias for filereader)
 					</li>
 				</ul>
 
@@ -1431,8 +1435,8 @@ webshims.setOptions('details', {animate: true});
 				</li>
 			</ul>
 
-			<h2 id="FileReader">FileReader</h2>
-			<p>The <code>filereader</code> feature enables accessing and reading a file from an input[type="file"]. Additionally it can be processed over <code>AJAX</code> to a server. Due to its obtrusive nature an input as to have an additional class with the name <code class="i">ws-filereader</code>:</p>
+			<h2 id="FileReader">FileReader/FormData/CORS</h2>
+			<p>The <code>filereader</code> feature enables accessing and reading a file from an input[type="file"]. Additionally it can be processed over <code>AJAX</code> to a server. Due to its obtrusive nature an input has to have an additional class with the name <code class="i">ws-filereader</code>:</p>
 			<h3>Implemented/fixed elements, attributes, properties, methods, events</h3>
 			<ul>
 				<li>
@@ -1448,7 +1452,7 @@ webshims.setOptions('details', {animate: true});
 			<ul>
 				<li><small>1. [accept], [multiple] and the .files property is only polyfilled on input elements with the additional class 'ws-filereader'</small></li>
 				<li><small>2. For most of the features Flash or Silverliegt has to be installed. But webshim trys to fallback to other technologies, if those aren't.</small></li>
-				<li><small>3. For full CORS support a crossdomain.xml has to be on the response server!</small></li>
+				<li><small>3. For CORS webshim uses the combination of XDomainRequest and Flash. Therefore for full CORS support a crossdomain.xml has to be on the server!</small></li>
 			</ul>
 			<p>An example of how to read a file as a base64 string from a form control:</p>
 			<pre><code class="language-markup">
@@ -1477,6 +1481,30 @@ $(function(){
 
 });
 </code></pre>
+			<p>To get the file transferred to a server the <code>FormData</code> constructor in conjunction with AJAX can be used:</p>
+<pre><code class="language-javascript">
+$('form[data-action].ajax-form').on('submit', function(){
+	//FormData is similar to $.serializeArray, but can handle type="file" in AJAX
+	var data = new FormData(this);
+	$.ajax({
+		url: $form.data('action'),
+		success: function(data){
+			//success
+		},
+		error: function(){
+			//error
+		},
+		data: data,
+		processData: false,
+		contentType: false,
+		type: 'POST'
+	});
+
+	e.preventDefault();
+});
+</code></pre>
+			<p>For the code above to fully work it is important, that everything is either in the same origin or a crossdomain.xml is on the server. A featured example including php code can be found in the <a href="demos/filereader/">filereader directory</a>.</p>
+
 			<p>The <code class="i">filereader</code> is also lazy loaded by webhsim's <code class="i">form</code> feature as soon as an element matching the <code>input.ws-filereader</code> selector is used. Additionally the forms features enables custom styleable [type=file] elements if it find a wrapper with the class <code class="i">ws-custom-file</code>:</p>
 <pre><code class="language-markup">
 &lt;script&gt;

@@ -1,6 +1,8 @@
 upcomming Release 1.13.2
 ----------
 - implement ``inputmode="numeric"`` for Smartphones ([see demo](http://fiddle.jshell.net/trixta/7NEBb/show/))
+- re-implemented FileReader
+- implemented XHR2 and FormData (i.e. Sending FileData and Cross-Domain-Requests)
 - fixed ``data-groupriequired``
 - improved a11y for popovers in conjunction with ``openOnFocus``
 - added minlength attribute to custom validators (only if minlength isn't implemented already)

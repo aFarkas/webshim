@@ -156,9 +156,7 @@ module.exports = function(grunt){
 		if(!/^\d+\.\d+\.\d+[\-RC\d]*$/.test(version)){
 			grunt.warn('version "'+ version +'" is not valid');
 		}
-		if(grunt.file.readJSON('webshims.jquery.json').download.indexOf('webshims-'+version+'.zip') == -1){
-			grunt.warn('download in webshims manifest is not valid version');
-		}
+
 		for(var i = 0; i < packageinfos.length; i++){
 			if(grunt.file.readJSON(packageinfos[i]).version != version){
 				grunt.warn('version in"'+ packageinfos[i] +'" does not match file-version');
