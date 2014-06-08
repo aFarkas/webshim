@@ -19,7 +19,7 @@ Features
 * HTML5 form features including: constraint validation and form widgets (input[type="range"], input[type="date"], input[type="number"], input[type="time"], input[type="month"], output, progress, input[list]/datalist)
 * HTML5 audio/video/track implementation
 * interactive elements: summary/details
-* filereader
+* filereader (including, XHR2/AJAX CORS and FormData handling)
 * geolocation
 * ECMAScript 5 / JavaScript 1.8.5 features 
 

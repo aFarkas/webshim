@@ -1308,7 +1308,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			createFilePicker.call(elem);
 		});
 	};
-
+	var noxhr = /^(?:script|jsonp)$/i;
 	var notReadyYet = function(){
 		loadMoxie();
 		webshim.error('filereader/formdata not ready yet. please wait for moxie to load `webshim.ready("moxie", callbackFn);`` or wait for the first change event on input[type="file"].ws-filereader.')
@@ -1328,7 +1328,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 	);
 	var testMoxie = function(options){
-		return (options.wsType == 'moxie' || (options.data && options.data instanceof mOxie.FormData) || (options.crossDomain && $.support.cors !== false));
+		return (options.wsType == 'moxie' || (options.data && options.data instanceof mOxie.FormData) || (options.crossDomain && $.support.cors !== false && !noxhr.test(options.dataType || '')));
 	};
 	var createMoxieTransport = function (options){
 
@@ -1402,7 +1402,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			return function(options, userOptions, jqXHR) {
 
 				// Only continue if the request is: asynchronous, uses GET or POST method, has HTTP or HTTPS protocol, and has the same scheme as the calling page
-				if (!options.crossDomain || options.username || (options.xhrFields && options.xhrFields.withCredentials) || !options.async || !getOrPostRegEx.test(options.type) || !httpRegEx.test(options.url) || !sameSchemeRegEx.test(options.url) || (options.data && options.data instanceof mOxie.FormData)) {
+				if (!options.crossDomain || options.username || (options.xhrFields && options.xhrFields.withCredentials) || !options.async || !getOrPostRegEx.test(options.type) || !httpRegEx.test(options.url) || !sameSchemeRegEx.test(options.url) || (options.data && options.data instanceof mOxie.FormData) || noxhr.test(options.dataType || '')) {
 					return;
 				}
 

@@ -277,7 +277,7 @@ module.exports = function(grunt){
 
 	grunt.registerTask('dev', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'watch']);
 
-	grunt.registerTask('release', ['versiontest', 'clean', 'default', 'compress', 'copy:archive', 'bytesize']);
+	grunt.registerTask('release', ['versiontest', 'clean', 'default', 'bytesize']);
 
 
 	function getFiles(srcdir, destdir, wildcard, compareDir, compareMatch) {
