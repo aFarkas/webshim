@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+<title>Creating a ImageUpload using FileReader, FormData, Progress element and XHR2</title>
+
+<style>
+	.wrapper {
+		margin: 10px auto;
+		width: 80%;
+		min-width: 320px;
+		max-width: 800px;
+	}
+	form {
+		margin: 10px auto;
+		max-width: 500px;
+		min-width: 320px;
+		width: 80%;
+
+	}
+	.form-row {
+		padding: 5px 10px;
+	}
+	label {
+		display: block;
+		margin: 3px 0;
+	}
+	.form-row input {
+		padding: 3px;
+		border: 1px solid #ccc;
+		box-shadow: none;
+	}
+
+	.show-upload {
+		position: relative;
+		padding-right: 90px;
+		zoom: 1;
+	}
+
+	.upload-display {
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 75px;
+		height: 45px;
+		border: 1px solid #ccc;
+		padding: 3px;
+	}
+
+	.upload-display img {
+		display: block;
+		margin: auto;
+		max-width: 100%;
+		max-height: 100%;
+		height: auto;
+	}
+
+	.upload-progress progress {
+		width: 100%;
+	}
+
+	input, select, textarea {
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+		width: 100%;
+	}
+
+	div.ws-invalid input {
+		border-color: #c88;
+	}
+	.ws-invalid label {
+		color: #933;
+	}
+	div.ws-success input {
+		border-color: #8c8;
+	}
+</style>
+
+<script src="http://code.jquery.com/jquery-1.11.0.js"></script>
+<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
+<script src="../../../js-webshim/minified/polyfiller.js"></script>
+<script>
+	webshims.polyfill('forms filereader');
+
+	$(function(){
+		$('.show-upload').each(showUpload);
+		$('[data-action].ajax-form').each(loadAjaxForm);
+	});
+
+	function showUpload(){
+		var $image, reader;
+		var displaySel = '.upload-display';
+		var $module = $(this);
+		var $input = $(this).find('input[type="file"]');
+		var $display = $(displaySel, $module);
+
+		var showSelectedFile = function () {
+			var file = ($(this).prop('files') || [])[0];
+
+			//if there is no file or first file is not an image abort
+			if(!file || file.type.indexOf('image/')){return;}
+
+			if(!reader){
+				reader = new FileReader();
+			}
+
+			reader.onload = function (evt) {
+				var fileData = evt.target.result;
+				if(!$image){
+					$image = $('<img />').appendTo($display);
+				}
+				$image.attr('src', fileData);
+			};
+
+			//use $.prop to access files property
+
+			reader.readAsDataURL(file);
+		};
+
+		$input.on('change', showSelectedFile);
+
+		//polyfill if not already in markup
+		if(!$input.is('.ws-filereader')){
+			$input.addClass('ws-filereader').updatePolyfill();
+		}
+
+		showSelectedFile();
+	}
+
+	function loadAjaxForm(){
+		var $form = $(this);
+		var $progress = $('.upload-progress progress', $form);
+
+		var sendForm = function(e){
+
+			if(e && e.preventDefault){
+				e.preventDefault();
+			}
+			$progress.val(0);
+			var $input = $('input[type="file"]', this);
+			var inputName = $input.prop('name');
+			var files = $input.prop('files');
+			var action = $form.data('action');
+			var ajaxCalls = [];
+			var updateProgress = function(){
+				var progress = ajaxCalls.reduce(function(progress, ajax){
+					return progress + ajax._progress;
+				}, 0);
+				progress = progress / ajaxCalls.length;
+				$progress.val(progress);
+			};
+
+			//due to the fact that FormData/XHR2 shim can only handle one file per request, we create multiple ajax calls
+			$.each(files, function(indexId, file){
+				var ajax;
+				var data = new FormData();
+
+				data.append(inputName, file);
+
+				ajax = $.ajax({
+					url: $form.data('action'),
+					complete: function(){
+						ajax._progress = 1;
+						updateProgress();
+					},
+					data: data,
+					processData: false,
+					contentType: false,
+					type: 'POST',
+					//for onuploadprogress see below
+					onuploadprogress: function(e){
+						if(e.lengthComputable){
+							ajax._progress = e.loaded / e.total;
+							updateProgress();
+						}
+					}
+				});
+				ajax._progress = 0;
+				ajaxCalls.push(ajax);
+			});
+
+			$
+				.when.apply($.when, ajaxCalls)
+				.done(function(data){
+					if(window.console){
+						console.log(data);
+					}
+					alert('data was successfully transferred');
+				})
+				.fail(function(data){
+					if(window.console){
+						console.log(data);
+					}
+					alert('There was an error');
+				})
+			;
+
+		};
+
+		$form.on('submit', sendForm);
+	}
+
+	//unfortunatley jquery has no API to bind to progress and upload.progress
+	// This is a workaround for jquery to get progress event:
+
+	//names for polyfilled browsers can be configured here:
+	webshim.setOptions('filereader', {
+		progress: 'onprogress',
+		uploadprogress: 'onuploadprogress'
+	});
+	(function addXhrProgressEvent($) {
+		var originalXhr = $.ajaxSettings.xhr;
+		$.ajaxSetup({
+			xhr: function() {
+				var req = originalXhr(), that = this;
+				if (req) {
+					if (typeof req.addEventListener == "function" && that.onprogress !== undefined) {
+						req.addEventListener("progress", function(evt) {
+							that.onprogress(evt);
+						}, false);
+					}
+					if (typeof req.upload == "object" && that.onuploadprogress !== undefined) {
+						req.upload.addEventListener("progress", function(evt) {
+							that.onuploadprogress(evt);
+						}, false);
+					}
+				}
+				return req;
+			}
+		});
+	})(jQuery);
+</script>
+</head>
+<body>
+<div class="wrapper">
+	<p>Note: This demo needs php and doesn't fully work on github-pages.</p>
+	<form class="ajax-form" action="upload_html.php" data-action="upload_json.php" method="post" enctype="multipart/form-data">
+		<div class="form-row show-upload">
+			<label for="images">Your images</label>
+			<input id="images" type="file" name="pictures[]" class="ws-filereader" multiple="" required="" accept="image/*" />
+			<div class="upload-display"></div>
+		</div>
+
+		<div class="form-row">
+			<input name="send" type="submit" value="Upload" />
+		</div>
+		<div class="form-row upload-progress">
+			<progress value="0"></progress>
+		</div>
+	</form>
+	<hr />
+	<p>This is only slightly styled example:</p>
+	<form class="ws-validate ajax-form" action="upload_html.php" data-action="upload_json.php" method="post" enctype="multipart/form-data">
+		<div class="form-row show-upload">
+			<label for="images2">Your images</label>
+			<div class="ws-custom-file">
+				<input id="images2" type="file" name="pictures[]" class="ws-filereader" required="" multiple="" accept="image/*" />
+				<button type="button" tabindex="-1">Browse</button>
+				<span class="ws-file-value">No files selected</span>
+			</div>
+			<div class="upload-display"></div>
+		</div>
+
+		<div class="form-row">
+			<input name="send" type="submit" value="Upload" />
+		</div>
+		<div class="form-row upload-progress">
+			<progress class="ws-style" value="0"></progress>
+		</div>
+	</form>
+</div>
+</body>
+</html>
+
