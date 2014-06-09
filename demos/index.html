@@ -1453,6 +1453,7 @@ webshims.setOptions('details', {animate: true});
 				<li><small>1. [accept], [multiple] and the .files property is only polyfilled on input elements with the additional class 'ws-filereader'</small></li>
 				<li><small>2. For most of the features Flash or Silverliegt has to be installed. But webshim trys to fallback to other technologies, if those aren't.</small></li>
 				<li><small>3. For CORS webshim uses the combination of XDomainRequest and Flash. Therefore for full CORS support a crossdomain.xml has to be on the server!</small></li>
+				<li><small>4. FormData shim can currently only handle one file per AJAX request!</small></li>
 			</ul>
 			<p>An example of how to read a file as a base64 string from a form control:</p>
 			<pre><code class="language-markup">

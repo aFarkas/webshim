@@ -1286,11 +1286,12 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			});
 
 			webshim.addShadowDom();
+
 			picker.init();
 			if(input.disabled){
 				picker.disable(true);
 			}
-
+			$input.attr('tabindex', '-1');
 		}
 	};
 	var getFileNames = function(file){
@@ -1334,6 +1335,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 
 		if(testMoxie(options)){
 			var ajax;
+			webshim.info('moxie transfer used for $.ajax');
 			return {
 				send: function( headers, completeCallback ) {
 
@@ -1407,6 +1409,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				}
 
 				var xdr = null;
+				webshim.info('xdomain transfer used for $.ajax');
 
 				return {
 					send: function(headers, complete) {
@@ -1563,6 +1566,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	window.FileReader = notReadyYet;
 	window.FormData = notReadyYet;
 	webshim.ready('moxie', function(){
+		var regArray = /\[\]$/;
 		moxie = window.moxie;
 		mOxie = window.mOxie;
 		mOxie.Env.swf_url = webshim.cfg.basePath+'moxie/flash/Moxie.cdn.swf';
@@ -1582,8 +1586,18 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					inputName = appendData[i].name;
 					if(inputName && !$(appendData[i]).is(':disabled')){
 						files = $.prop(appendData[i], 'files') || [];
-						for(fileI = 0, fileLen = files.length; fileI < fileLen; fileI++){
-							data.append(inputName, files[fileI]);
+						if(files.length){
+							if(files.length > 1){
+								webshim.warn('FormData shim can only handle one file per ajax.');
+							}
+							if(regArray.test(inputName)){
+								inputName = inputName.replace(regArray, '');
+								data.append(inputName, files);
+							} else {
+								for(fileI = 0, fileLen = files.length; fileI < fileLen; fileI++){
+									data.append(inputName, files[fileI]);
+								}
+							}
 						}
 					}
 				}
