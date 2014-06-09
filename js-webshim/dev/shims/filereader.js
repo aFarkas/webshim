@@ -345,44 +345,47 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 	window.FileReader = notReadyYet;
 	window.FormData = notReadyYet;
 	webshim.ready('moxie', function(){
-		var regArray = /\[\]$/;
 		moxie = window.moxie;
 		mOxie = window.mOxie;
 		mOxie.Env.swf_url = webshim.cfg.basePath+'moxie/flash/Moxie.cdn.swf';
 		mOxie.Env.xap_url = webshim.cfg.basePath+'moxie/flash/Moxie.cdn.xap';
 
 		window.FileReader = mOxie.FileReader;
+
 		window.FormData = function(form){
 			var appendData, i, len, files, fileI, fileLen, inputName;
-			var data = new mOxie.FormData();
+			var moxieData = new mOxie.FormData();
 			if(form && $.nodeName(form, 'form')){
 				appendData = $(form).serializeArray();
 				for(i = 0; i < appendData.length; i++){
-					data.append(appendData[i].name, appendData[i].value);
+					if(Array.isArray(appendData[i].value)){
+						appendData[i].value.forEach(function(val){
+							moxieData.append(appendData[i].name, val);
+						});
+					} else {
+						moxieData.append(appendData[i].name, appendData[i].value);
+					}
 				}
+
 				appendData = form.querySelectorAll('input[type="file"][name]');
+
 				for(i = 0, len = appendData.length; i < appendData.length; i++){
 					inputName = appendData[i].name;
 					if(inputName && !$(appendData[i]).is(':disabled')){
 						files = $.prop(appendData[i], 'files') || [];
 						if(files.length){
 							if(files.length > 1){
-								webshim.warn('FormData shim can only handle one file per ajax.');
+								webshim.error('FormData shim can only handle one file per ajax. Use multiple ajax request. One per file.');
 							}
-							if(regArray.test(inputName)){
-								inputName = inputName.replace(regArray, '');
-								data.append(inputName, files);
-							} else {
-								for(fileI = 0, fileLen = files.length; fileI < fileLen; fileI++){
-									data.append(inputName, files[fileI]);
-								}
+							for(fileI = 0, fileLen = files.length; fileI < fileLen; fileI++){
+								moxieData.append(inputName, files[fileI]);
 							}
 						}
 					}
 				}
 			}
 
-			return data;
+			return moxieData;
 		};
 		FormData = window.FormData;
 
