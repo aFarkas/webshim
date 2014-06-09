@@ -969,6 +969,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		var $module = $(this);
 		var $file = $('input[type="file"]', $module);
 		var $valueDisplay = $('.ws-file-value', $module);
+		var emptyHtml = $.trim($valueDisplay.html()) || '&#160;';
 
 		var showSelected = function(){
 			var files = $file.prop('files') || [];
@@ -976,12 +977,17 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			if(names){
 				$valueDisplay.text(names);
 			} else {
-				$valueDisplay.html('&#160;');
+				$valueDisplay.html(emptyHtml);
 			}
 		};
+
 		$.data(this, 'wsCustomFile', {showSelected: showSelected});
 		$('button', $module).attr('tabindex', '-1');
-		$file.on('change', showSelected).each(showSelected);
+
+		$file.on('change.webshim', showSelected).each(showSelected);
+		$file.jProp('form').on('reset', function(){
+			setTimeout(showSelected);
+		});
 	}
 
 	webshims.addReady(function(context, contextElem){

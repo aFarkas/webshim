@@ -95,7 +95,10 @@
 			var $display = $(displaySel, $module);
 
 			var showSelectedFile = function () {
-				var file;
+				var file = ($(this).prop('files') || [])[0];
+
+				//if there is no file or first file is not an image abort
+				if(!file || file.type.indexOf('image/')){return;}
 
 				if(!reader){
 					reader = new FileReader();
@@ -110,18 +113,18 @@
 				};
 
 				//use $.prop to access files property
-				file = ($(this).prop('files') || [])[0];
-				if(file && !file.type.indexOf('image/')){
-					reader.readAsDataURL(file);
-				}
+
+				reader.readAsDataURL(file);
 			};
 
 			$input.on('change', showSelectedFile);
 
+			//polyfill if not already in markup
 			if(!$input.is('.ws-filereader')){
 				$input.addClass('ws-filereader').updatePolyfill();
 			}
 
+			showSelectedFile();
 		}
 
 		function loadAjaxForm(){
@@ -223,7 +226,7 @@
 			<div class="ws-custom-file">
 				<input id="images2" type="file" name="pictures[]" class="ws-filereader" multiple="" required="" accept="image/*" />
 				<button type="button" tabindex="-1">Browse</button>
-				<span class="ws-file-value">&#160;</span>
+				<span class="ws-file-value">No files selected</span>
 			</div>
 			<div class="upload-display"></div>
 		</div>

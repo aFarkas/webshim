@@ -293,27 +293,23 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		webshims.isReady('form-number-date-ui', true);
 	}
 
-	$(function(){
-		var fileReaderReady = webshims.isReady('filereader');
+	webshims.ready('DOM', function(){
+		if(document.querySelector('.ws-custom-file')){
+			webshims.reTest(['form-validation']);
+		}
+	});
 
+	$(function(){
+		var fileReaderReady = ('FileReader' in window && 'FormData' in window);
 		if(!fileReaderReady){
 			webshims.addReady(function(context){
-				if(!fileReaderReady){
-					fileReaderReady = webshims.isReady('filereader');
+				if(!fileReaderReady && !modules.filereader.loaded && !modules.moxie.loaded){
 					if(context.querySelector('input.ws-filereader')){
 						webshims.reTest(['filereader', 'moxie']);
 						fileReaderReady = true;
-					} else if(webshims.cfg.debug !== false && context.querySelector('input[accept], input[type="file"][multiple]')){
-						webshims.warn('you might want to include the "filereader" feature, to enable accept and multiple attributes');
 					}
-
 				}
 			});
 		}
-		webshims.ready('DOM', function(){
-			if(document.querySelector('.ws-custom-file')){
-				webshims.reTest(['form-validation']);
-			}
-		});
 	});
 });
