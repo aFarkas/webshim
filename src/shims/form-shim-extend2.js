@@ -1054,8 +1054,21 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 						return ret;
 					},
 					get: function(){
+						var placeholder;
 						var elem = this;
-						return $(elem).hasClass('placeholder-visible') ? '' : desc[propType]._supget.call(elem);
+						var curValue;
+
+						if($(elem).hasClass('placeholder-visible')){
+							if(webshims.cfg.debug && (curValue = desc[propType]._supget.call(elem)) && (placeholder = $.attr(elem, 'placeholder')) && placeholder !=  curValue){
+								webshims.error('value input[placeholder] was changed by input.value instead using $.val or $.prop.');
+								changePlaceholderVisibility(elem, curValue, placeholder);
+							} else {
+								curValue = '';
+							}
+						} else {
+							curValue = desc[propType]._supget.call(elem);
+						}
+						return curValue;
 					}
 				};
 			});

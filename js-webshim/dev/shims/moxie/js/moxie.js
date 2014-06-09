@@ -7987,8 +7987,8 @@ Globally exposed namespace with the most frequently used public classes and hand
 
 	// expose globally
 	exports.mOxie = o;
-	if (!exports.o) {
-		exports.o = o;
+	if (window != exports && !exports.o) {
+		//exports.o = o;
 	}
 	return o;
 })(this);
