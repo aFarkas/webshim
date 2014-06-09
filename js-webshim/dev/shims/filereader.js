@@ -8,7 +8,7 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 		webshim.loader.loadList(['moxie']);
 	};
 	var _createFilePicker = function(){
-		var $input, picker, $parent;
+		var $input, picker, $parent, onReset;
 		var input = this;
 
 		if(webshim.implement(input, 'filepicker')){
@@ -16,6 +16,11 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 			input = this;
 			$input = $(this);
 			$parent = $input.parent();
+			onReset = function(){
+				if(!input.value){
+					$input.prop('value', '');
+				}
+			};
 
 			$input.on('mousedown.filereaderwaiting click.filereaderwaiting', false);
 			$parent.addClass('ws-loading');
@@ -25,7 +30,9 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 				multiple: $.prop(this, 'multiple')
 			});
 
-
+			$input.jProp('form').on('reset', function(){
+				setTimeout(onReset);
+			});
 			picker.onready = function(){
 				$input.off('.fileraderwaiting');
 				$parent.removeClass('ws-waiting');
@@ -51,6 +58,7 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 				$input.trigger('mouseup');
 				$parent.removeClass('ws-active');
 			};
+
 			webshim.data(input, 'filePicker', picker);
 
 			webshim.ready('WINDOWLOAD', function(){
@@ -103,6 +111,12 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 					}
 
 					return inputValueDesc.prop._supget.call(this);
+				},
+				set: function(val){
+					if(val === '' && this.type == 'file' && $(this).hasClass('ws-filereader')){
+						webshim.data(this, 'fileList', []);
+					}
+					inputValueDesc.prop._supset.call(this);
 				}
 			}
 		}
@@ -321,9 +335,9 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 				get: function(){
 					if(this.type != 'file'){return null;}
 					if(!$(this).is('.ws-filereader')){
-						webshim.error("please add the 'ws-filereader' class to your input[type='file'] to implement files-property");
+						webshim.info("please add the 'ws-filereader' class to your input[type='file'] to implement files-property");
 					}
-					return webshim.data(this, 'fileList') || window.FileList && webshim.data(this, 'fileList', new FileList()) || [];
+					return webshim.data(this, 'fileList') || [];
 				}
 			}
 		}
