@@ -1,7 +1,6 @@
 webshim.register('filereader', function($, webshim, window, document, undefined, featureOptions){
 	"use strict";
-
-	var mOxie, moxie;
+	var mOxie, moxie, hasXDomain;
 	var FormData = $.noop;
 	var sel = 'input[type="file"].ws-filereader';
 	var loadMoxie = function (){
@@ -22,7 +21,7 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 				}
 			};
 
-			$input.on('mousedown.filereaderwaiting click.filereaderwaiting', false);
+			$input.attr('tabindex', '-1').on('mousedown.filereaderwaiting click.filereaderwaiting', false);
 			$parent.addClass('ws-loading');
 			picker = new mOxie.FileInput({
 				browse_button: this,
@@ -78,7 +77,6 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 			if(input.disabled){
 				picker.disable(true);
 			}
-			$input.attr('tabindex', '-1');
 		}
 	};
 	var getFileNames = function(file){
@@ -121,14 +119,19 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 			}
 		}
 	);
+	var shimMoxiePath = webshim.cfg.basePath+'moxie/';
+	var crossXMLMessage = 'You nedd a crossdomain.xml to get all "filereader" / "XHR2" / "CORS" features to work. Or host moxie.swf/moxie.xap on your server an configure filereader options: "swfpath"/"xappath"';
 	var testMoxie = function(options){
-		return (options.wsType == 'moxie' || (options.data && options.data instanceof mOxie.FormData) || (options.crossDomain && $.support.cors !== false && !noxhr.test(options.dataType || '')));
+		return (options.wsType == 'moxie' || (options.data && options.data instanceof mOxie.FormData) || (options.crossDomain && $.support.cors !== false && hasXDomain != 'no' && !noxhr.test(options.dataType || '')));
 	};
 	var createMoxieTransport = function (options){
 
 		if(testMoxie(options)){
 			var ajax;
 			webshim.info('moxie transfer used for $.ajax');
+			if(hasXDomain == 'no'){
+				webshim.error(crossXMLMessage);
+			}
 			return {
 				send: function( headers, completeCallback ) {
 
@@ -187,7 +190,6 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 			};
 		}
 	};
-
 	var transports = {
 		//based on script: https://github.com/MoonScript/jQuery-ajaxTransport-XDomainRequest
 		xdomain: (function(){
@@ -202,7 +204,7 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 				}
 
 				var xdr = null;
-				webshim.info('xdomain transfer used for $.ajax');
+				webshim.info('xdomain transport used.');
 
 				return {
 					send: function(headers, complete) {
@@ -309,6 +311,13 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 		featureOptions.uploadprogress = 'onuploadprogress';
 	}
 
+	if(!featureOptions.swfpath){
+		featureOptions.swfpath = shimMoxiePath+'flash/Moxie.cdn.swf';
+	}
+	if(!featureOptions.xappath){
+		featureOptions.xappath = shimMoxiePath+'silverlight/Moxie.cdn.xap';
+	}
+
 	if($.support.cors !== false || !window.XDomainRequest){
 		delete transports.xdomain;
 	}
@@ -359,10 +368,12 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 	window.FileReader = notReadyYet;
 	window.FormData = notReadyYet;
 	webshim.ready('moxie', function(){
+		var wsMimes = 'application/xml,xml';
 		moxie = window.moxie;
 		mOxie = window.mOxie;
-		mOxie.Env.swf_url = webshim.cfg.basePath+'moxie/flash/Moxie.cdn.swf';
-		mOxie.Env.xap_url = webshim.cfg.basePath+'moxie/flash/Moxie.cdn.xap';
+
+		mOxie.Env.swf_url = featureOptions.swfpath;
+		mOxie.Env.xap_url = featureOptions.xappath;
 
 		window.FileReader = mOxie.FileReader;
 
@@ -405,10 +416,53 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 
 		createFilePicker = _createFilePicker;
 		transports.moxie = createMoxieTransport;
+
+		featureOptions.mimeTypes = (featureOptions.mimeTypes) ? wsMimes+','+featureOptions.mimeTypes : wsMimes;
+		try {
+			mOxie.Mime.addMimeType(featureOptions.mimeTypes);
+		} catch(e){
+			webshim.warn('mimetype to moxie error: '+e);
+		}
+
 	});
 
 	webshim.addReady(function(context, contextElem){
 		$(context.querySelectorAll(sel)).add(contextElem.filter(sel)).each(createFilePicker);
 	});
 	webshim.ready('WINDOWLOAD', loadMoxie);
+
+	if(webshim.cfg.debug !== false && featureOptions.swfpath.indexOf((location.protocol+'//'+location.hostname)) && featureOptions.swfpath.indexOf(('https://'+location.hostname))){
+		webshim.ready('WINDOWLOAD', function(){
+
+			var printMessage = function(){
+				if(hasXDomain == 'no'){
+					webshim.error(crossXMLMessage);
+				}
+			};
+
+			try {
+				hasXDomain = sessionStorage.getItem('wsXdomain.xml');
+			} catch(e){}
+			printMessage();
+			if(hasXDomain == null){
+				$.ajax({
+					url: 'crossdomain.xml',
+					type: 'HEAD',
+					dataType: 'xml',
+					success: function(){
+						hasXDomain = 'yes';
+					},
+					error: function(){
+						hasXDomain = 'no';
+					},
+					complete: function(){
+						try {
+							sessionStorage.setItem('wsXdomain.xml', hasXDomain);
+						} catch(e){}
+						printMessage();
+					}
+				});
+			}
+		});
+	}
 });

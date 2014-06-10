@@ -1,3 +1,7 @@
+Release 1.14.1
+----------
+- Bugfixes for new FileReader feature (including better errorhandling in case of mis-configuration)
+
 Release 1.14.0
 ----------
 - implement ``inputmode="numeric"`` for Smartphones ([see demo](http://fiddle.jshell.net/trixta/7NEBb/show/))

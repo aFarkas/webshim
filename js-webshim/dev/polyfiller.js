@@ -116,7 +116,7 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.14.1-pre',
+		version: '1.14.1',
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
 			//addCacheBuster: false,
@@ -1090,7 +1090,8 @@
 			test: function(){
 				return Modernizr[formvalidation] && !bustedWidgetUi;
 			},
-			d: [fShim]
+			d: [fShim],
+			c: [27]
 		});
 		
 		addPolyfill('form-message', {
@@ -1189,7 +1190,7 @@
 	addPolyfill('filereader', {
 		test: 'FileReader' in window && 'FormData' in window,
 		d: [DOMSUPPORT, 'jajax'],
-		c: [25, 26]
+		c: [25, 26, 27]
 	});
 	//>
 	
@@ -1235,7 +1236,7 @@
 			},
 			methodNames: ['play', 'pause', 'canPlayType', 'mediaLoad:load'],
 			d: ['swfmini'],
-			c: [16, 7, 2, 8, 1, 12, 13, 19, 25, 20, 23],
+			c: [16, 7, 2, 8, 1, 12, 13, 19, 20, 23],
 			nM: 'audio video'
 		});
 		
