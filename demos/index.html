@@ -1543,22 +1543,22 @@ $('form[data-action].ajax-form').on('submit', function(){
 			<p>For the code above to fully work it is important, that everything is either in the same origin or a crossdomain.xml is on the server. A featured example including php code can be found in the <a href="demos/filereader/">filereader directory</a>.</p>
 			<p>In case webshim is not served from the same domain (for exmaple using a <a href="http://www.jsdelivr.com/#!webshim">CDN</a>) a crossdomain.xml like the following should be reachable on your server root:</p>
 <pre><code class="language-markup">
-<?xml version="1.0"?>
-<!DOCTYPE cross-domain-policy SYSTEM
-"http://www.macromedia.com/xml/dtds/cross-domain-policy.dtd">
-<cross-domain-policy>
-	<allow-access-from domain="*" secure="false" />
-</cross-domain-policy>
+&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE cross-domain-policy SYSTEM
+"http://www.macromedia.com/xml/dtds/cross-domain-policy.dtd"&gt;
+&lt;cross-domain-policy&gt;
+	&lt;allow-access-from domain="*" secure="false" /&gt;
+&lt;/cross-domain-policy&gt;
 </code>
 </pre>
-			<p>In case you don't have full access to do so, you can host Moxie.cdn.swf (Flash) and Moxie.cdn.xap (Silverlight) on your server a tell webshim to load them from there:</p>
+			<p>In case you don't have full access to your server's root to do so, you can host Moxie.cdn.swf (Flash) and Moxie.cdn.xap (Silverlight) on your server and tell webshim to load them from there:</p>
 <pre><code class="language-javascript">
 webshim.setOptions('filereader', {
 	swfpath: '/assests/Moxie.cdn.swf',
 	xappath: '/assets/Moxie.cdn.xap'
 });
 </code></pre>
-			<p>The <code class="i">filereader</code> is also lazy loaded by webhsim's <code class="i">form</code> feature as soon as an element matching the <code>input.ws-filereader</code> selector is used. Additionally the forms features enables custom styleable [type=file] elements if it find a wrapper with the class <code class="i">ws-custom-file</code>:</p>
+			<p>The <code class="i">filereader</code> feature is also lazy loaded by webhsim's <code class="i">form</code> feature as soon as an element matching the <code>input.ws-filereader</code> selector is used. Additionally the forms features enables custom styleable [type=file] elements if it finds a wrapper with the class <code class="i">ws-custom-file</code>:</p>
 <pre><code class="language-markup">
 &lt;script&gt;
 	//filereader is lazyLoaded no need to call feature
