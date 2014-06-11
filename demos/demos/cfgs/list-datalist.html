@@ -21,13 +21,34 @@
 			webshim.setOptions('forms', {
 				lazyCustomMessages: true,
 				replaceValidationUI: true,
-				addValidators: true,
-				customDatalist: true
+				addValidators: true
 			});
 
-			webshim.setOptions('forms-ext', {
-				replaceUI: true
-			});
+			(function(){
+				var stateMatches = {
+					'true': true,
+					'false': false,
+					'auto': 'auto'
+				};
+				var enhanceState = (location.search.match(/enhancelist\=([true|auto|false|nopolyfill]+)/) || ['', 'auto'])[1];
+
+				webshim.ready('jquery', function(){
+					$(function () {
+						$('.polyfill-type select')
+								.val(enhanceState)
+								.on('change', function () {
+									location.search = 'enhancelist=' + $(this).val();
+								})
+						;
+					});
+				});
+				webshim.setOptions('forms', {
+					customDatalist: stateMatches[enhanceState]
+				});
+				webshim.setOptions('forms-ext', {
+					replaceUI: stateMatches[enhanceState]
+				});
+			})();
 			
 			// load the forms polyfill
 			webshim.polyfill('forms forms-ext');
@@ -322,7 +343,14 @@
 				</div>
 			</div>
 		</div>
-
+		<label class="polyfill-type">
+			Polyfill/enhance strategy
+			<select>
+				<option value="auto" selected="">"auto" enhance non-mobile</option>
+				<option value="false">false: only polyfill</option>
+				<option value="true">true: enhance all</option>
+			</select>
+		</label>
 		<script type="text/javascript">
 			//http://blog.jsdelivr.com/2013/06/jsdelivr-weekly-news.html
 			if(location.hostname == 'afarkas.github.io'){

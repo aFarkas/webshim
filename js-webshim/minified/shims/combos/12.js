@@ -3,4 +3,1603 @@
  * based on SWFObject v2.2 <http://code.google.com/p/swfobject/> 
 	is released under the MIT License <http://www.opensource.org/licenses/mit-license.php> 
 */
-var swfmini=function(){function a(){if(!s){s=!0;for(var a=r.length,b=0;a>b;b++)r[b]()}}function b(a){s?a():r[r.length]=a}function c(){q&&d()}function d(){var a=o.getElementsByTagName("body")[0],b=e(i);b.setAttribute("type",m);var c=a.appendChild(b);if(c){var d=0;!function(){if(typeof c.GetVariable!=h){var e=c.GetVariable("$version");e&&(e=e.split(" ")[1].split(","),u.pv=[parseInt(e[0],10),parseInt(e[1],10),parseInt(e[2],10)])}else if(10>d)return d++,void setTimeout(arguments.callee,10);a.removeChild(b),c=null}()}}function e(a){return o.createElement(a)}function f(a){var b=u.pv,c=a.split(".");return c[0]=parseInt(c[0],10),c[1]=parseInt(c[1],10)||0,c[2]=parseInt(c[2],10)||0,b[0]>c[0]||b[0]==c[0]&&b[1]>c[1]||b[0]==c[0]&&b[1]==c[1]&&b[2]>=c[2]?!0:!1}var g=function(){j.error("This method was removed from swfmini")},h="undefined",i="object",j=window.webshims,k="Shockwave Flash",l="ShockwaveFlash.ShockwaveFlash",m="application/x-shockwave-flash",n=window,o=document,p=navigator,q=!1,r=[c],s=!1,t=!0,u=function(){var a=typeof o.getElementById!=h&&typeof o.getElementsByTagName!=h&&typeof o.createElement!=h,b=p.userAgent.toLowerCase(),c=p.platform.toLowerCase(),d=/win/.test(c?c:b),e=/mac/.test(c?c:b),f=/webkit/.test(b)?parseFloat(b.replace(/^.*webkit\/(\d+(\.\d+)?).*$/,"$1")):!1,g=!1,j=[0,0,0],r=null;if(typeof p.plugins!=h&&typeof p.plugins[k]==i)r=p.plugins[k].description,!r||typeof p.mimeTypes!=h&&p.mimeTypes[m]&&!p.mimeTypes[m].enabledPlugin||(q=!0,g=!1,r=r.replace(/^.*\s+(\S+\s+\S+$)/,"$1"),j[0]=parseInt(r.replace(/^(.*)\..*$/,"$1"),10),j[1]=parseInt(r.replace(/^.*\.(.*)\s.*$/,"$1"),10),j[2]=/[a-zA-Z]/.test(r)?parseInt(r.replace(/^.*[a-zA-Z]+(.*)$/,"$1"),10):0);else if(typeof n.ActiveXObject!=h)try{var s=new ActiveXObject(l);s&&(r=s.GetVariable("$version"),r&&(g=!0,r=r.split(" ")[1].split(","),j=[parseInt(r[0],10),parseInt(r[1],10),parseInt(r[2],10)]))}catch(t){}return{w3:a,pv:j,wk:f,ie:g,win:d,mac:e}}();j.ready("DOM",a),j.loader.addModule("swfmini-embed",{d:["swfmini"]});var v=f("9.0.0")?function(){return j.loader.loadList(["swfmini-embed"]),!0}:j.$.noop;return Modernizr.video?j.ready("WINDOWLOAD",v):v(),{registerObject:g,getObjectById:g,embedSWF:function(a,b,c,d,e,f,g,h,i,k){var l=arguments;v()?j.ready("swfmini-embed",function(){swfmini.embedSWF.apply(swfmini,l)}):k&&k({success:!1,id:b})},switchOffAutoHideShow:function(){t=!1},ua:u,getFlashPlayerVersion:function(){return{major:u.pv[0],minor:u.pv[1],release:u.pv[2]}},hasFlashPlayerVersion:f,createSWF:function(a,b,c){return u.w3?createSWF(a,b,c):void 0},showExpressInstall:g,removeSWF:g,createCSS:g,addDomLoadEvent:b,addLoadEvent:g,expressInstallCallback:g}}();webshims.isReady("swfmini",!0),function(a,b){"use strict";var c,d=a.audio&&a.video,e=!1,f=b.bugs,g="mediaelement-jaris",h=function(){b.ready(g,function(){b.mediaelement.createSWF||(b.mediaelement.loadSwf=!0,b.reTest([g],d))})},i=b.cfg,j=i.mediaelement;if(!j)return void b.error("mediaelement wasn't implemented but loaded");if(d){var k=document.createElement("video");a.videoBuffered="buffered"in k,a.mediaDefaultMuted="defaultMuted"in k,e="loop"in k,a.mediaLoop=e,b.capturingEvents(["play","playing","waiting","paused","ended","durationchange","loadedmetadata","canplay","volumechange"]),(!a.videoBuffered||!e||!a.mediaDefaultMuted&&-1!=navigator.userAgent.indexOf("MSIE")&&"ActiveXObject"in window)&&(b.addPolyfill("mediaelement-native-fix",{d:["dom-support"]}),b.loader.loadList(["mediaelement-native-fix"]))}a.track&&!f.track&&!function(){if(!f.track){window.VTTCue&&!window.TextTrackCue?window.TextTrackCue=window.VTTCue:window.VTTCue||(window.VTTCue=window.TextTrackCue);try{new VTTCue(2,3,"")}catch(a){f.track=!0}}}(),b.register("mediaelement-core",function(b,f,i,j,k,l){c=swfmini.hasFlashPlayerVersion("10.0.3");var m=f.mediaelement;m.parseRtmp=function(a){var b,c,d,e=a.src.split("://"),g=e[1].split("/");for(a.server=e[0]+"://"+g[0]+"/",a.streamId=[],b=1,c=g.length;c>b;b++)d||-1===g[b].indexOf(":")||(g[b]=g[b].split(":")[1],d=!0),d?a.streamId.push(g[b]):a.server+=g[b]+"/";a.streamId.length||f.error("Could not parse rtmp url"),a.streamId=a.streamId.join("/")};var n=function(a,c){a=b(a);var d,e={src:a.attr("src")||"",elem:a,srcProp:a.prop("src")};return e.src?(d=a.attr("data-server"),null!=d&&(e.server=d),d=a.attr("type")||a.attr("data-type"),d?(e.type=d,e.container=b.trim(d.split(";")[0])):(c||(c=a[0].nodeName.toLowerCase(),"source"==c&&(c=(a.closest("video, audio")[0]||{nodeName:"video"}).nodeName.toLowerCase())),e.server?(e.type=c+"/rtmp",e.container=c+"/rtmp"):(d=m.getTypeForSrc(e.src,c,e),d&&(e.type=d,e.container=d))),e.container||b(a).attr("data-wsrecheckmimetype",""),d=a.attr("media"),d&&(e.media=d),("audio/rtmp"==e.type||"video/rtmp"==e.type)&&(e.server?e.streamId=e.src:m.parseRtmp(e)),e):e},o=!c&&"postMessage"in i&&d,p=function(){p.loaded||(p.loaded=!0,l.noAutoTrack||f.ready("WINDOWLOAD",function(){r(),f.loader.loadList(["track-ui"])}))},q=function(){var a;return function(){!a&&o&&(a=!0,f.loader.loadScript("https://www.youtube.com/player_api"),b(function(){f._polyfill(["mediaelement-yt"])}))}}(),r=function(){c?h():q()};f.addPolyfill("mediaelement-yt",{test:!o,d:["dom-support"]}),m.mimeTypes={audio:{"audio/ogg":["ogg","oga","ogm"],'audio/ogg;codecs="opus"':"opus","audio/mpeg":["mp2","mp3","mpga","mpega"],"audio/mp4":["mp4","mpg4","m4r","m4a","m4p","m4b","aac"],"audio/wav":["wav"],"audio/3gpp":["3gp","3gpp"],"audio/webm":["webm"],"audio/fla":["flv","f4a","fla"],"application/x-mpegURL":["m3u8","m3u"]},video:{"video/ogg":["ogg","ogv","ogm"],"video/mpeg":["mpg","mpeg","mpe"],"video/mp4":["mp4","mpg4","m4v"],"video/quicktime":["mov","qt"],"video/x-msvideo":["avi"],"video/x-ms-asf":["asf","asx"],"video/flv":["flv","f4v"],"video/3gpp":["3gp","3gpp"],"video/webm":["webm"],"application/x-mpegURL":["m3u8","m3u"],"video/MP2T":["ts"]}},m.mimeTypes.source=b.extend({},m.mimeTypes.audio,m.mimeTypes.video),m.getTypeForSrc=function(a,c){if(-1!=a.indexOf("youtube.com/watch?")||-1!=a.indexOf("youtube.com/v/"))return"video/youtube";if(0===a.indexOf("rtmp"))return c+"/rtmp";a=a.split("?")[0].split("#")[0].split("."),a=a[a.length-1];var d;return b.each(m.mimeTypes[c],function(b,c){return-1!==c.indexOf(a)?(d=b,!1):void 0}),d},m.srces=function(a,c){if(a=b(a),!c){c=[];var d=a[0].nodeName.toLowerCase(),e=n(a,d);return e.src?c.push(e):b("source",a).each(function(){e=n(this,d),e.src&&c.push(e)}),c}f.error("setting sources was removed.")},b.fn.loadMediaSrc=function(){f.error("loadMediaSrc was removed.")},m.swfMimeTypes=["video/3gpp","video/x-msvideo","video/quicktime","video/x-m4v","video/mp4","video/m4p","video/x-flv","video/flv","audio/mpeg","audio/aac","audio/mp4","audio/x-m4a","audio/m4a","audio/mp3","audio/x-fla","audio/fla","youtube/flv","video/jarisplayer","jarisplayer/jarisplayer","video/youtube","video/rtmp","audio/rtmp"],m.canThirdPlaySrces=function(a,d){var e="";return(c||o)&&(a=b(a),d=d||m.srces(a),b.each(d,function(a,b){return b.container&&b.src&&(c&&-1!=m.swfMimeTypes.indexOf(b.container)||o&&"video/youtube"==b.container)?(e=b,!1):void 0})),e};var s={};m.canNativePlaySrces=function(a,c){var e="";if(d){a=b(a);var f=(a[0].nodeName||"").toLowerCase(),g=(s[f]||{prop:{_supvalue:!1}}).prop._supvalue||a[0].canPlayType;if(!g)return e;c=c||m.srces(a),b.each(c,function(b,c){return c.type&&g.call(a[0],c.type)?(e=c,!1):void 0})}return e};var t=/^\s*application\/octet\-stream\s*$/i,u=function(){var a=t.test(b.attr(this,"type")||"");return a&&b(this).removeAttr("type"),a};m.setError=function(a,c){if(b("source",a).filter(u).length){f.error('"application/octet-stream" is a useless mimetype for audio/video. Please change this attribute.');try{b(a).mediaLoad()}catch(d){}}else c||(c="can't play sources"),b(a).pause().data("mediaerror",c),f.error("mediaelementError: "+c),setTimeout(function(){b(a).data("mediaerror")&&b(a).addClass("media-error").trigger("mediaerror")},1)};var v=function(){var a,d=c?g:"mediaelement-yt";return function(c,e,g){f.ready(d,function(){m.createSWF&&b(c).parent()[0]?m.createSWF(c,e,g):a||(a=!0,r(),v(c,e,g))}),a||!o||m.createSWF||q()}}(),w=function(a,b,c,d,e){var f;c||c!==!1&&b&&"third"==b.isActive?(f=m.canThirdPlaySrces(a,d),f?v(a,f,b):e?m.setError(a,!1):w(a,b,!1,d,!0)):(f=m.canNativePlaySrces(a,d),f?b&&"third"==b.isActive&&m.setActive(a,"html5",b):e?(m.setError(a,!1),b&&"third"==b.isActive&&m.setActive(a,"html5",b)):w(a,b,!0,d,!0))},x=/^(?:embed|object|datalist)$/i,y=function(a,c){var d=f.data(a,"mediaelementBase")||f.data(a,"mediaelementBase",{}),e=m.srces(a),g=a.parentNode;clearTimeout(d.loadTimer),b(a).removeClass("media-error"),b.data(a,"mediaerror",!1),e.length&&g&&1==g.nodeType&&!x.test(g.nodeName||"")&&(c=c||f.data(a,"mediaelement"),m.sortMedia&&e.sort(m.sortMedia),w(a,c,l.preferFlash||k,e))};m.selectSource=y,b(j).on("ended",function(a){var c=f.data(a.target,"mediaelement");(!e||c&&"html5"!=c.isActive||b.prop(a.target,"loop"))&&setTimeout(function(){!b.prop(a.target,"paused")&&b.prop(a.target,"loop")&&b(a.target).prop("currentTime",0).play()},1)});var z=!1,A=function(){var g=function(){f.implement(this,"mediaelement")&&(y(this),a.mediaDefaultMuted||null==b.attr(this,"muted")||b.prop(this,"muted",!0))};f.ready("dom-support",function(){z=!0,e||f.defineNodeNamesBooleanProperty(["audio","video"],"loop"),["audio","video"].forEach(function(a){var e;e=f.defineNodeNameProperty(a,"load",{prop:{value:function(){var a=f.data(this,"mediaelement");y(this,a),!d||a&&"html5"!=a.isActive||!e.prop._supvalue||e.prop._supvalue.apply(this,arguments),!p.loaded&&b("track",this).length&&p(),b(this).triggerHandler("wsmediareload")}}}),s[a]=f.defineNodeNameProperty(a,"canPlayType",{prop:{value:function(e){var f="";return d&&s[a].prop._supvalue&&(f=s[a].prop._supvalue.call(this,e),"no"==f&&(f="")),!f&&c&&(e=b.trim((e||"").split(";")[0]),-1!=m.swfMimeTypes.indexOf(e)&&(f="maybe")),f}}})}),f.onNodeNamesPropertyModify(["audio","video"],["src","poster"],{set:function(){var a=this,b=f.data(a,"mediaelementBase")||f.data(a,"mediaelementBase",{});clearTimeout(b.loadTimer),b.loadTimer=setTimeout(function(){y(a),a=null},9)}}),f.addReady(function(a,c){var d=b("video, audio",a).add(c.filter("video, audio")).each(g);!p.loaded&&b("track",d).length&&p(),d=null})}),d&&!z&&f.addReady(function(a,c){z||b("video, audio",a).add(c.filter("video, audio")).each(function(){return m.canNativePlaySrces(this)?void 0:(r(),z=!0,!1)})})};d?(f.isReady("mediaelement-core",!0),A(),f.ready("WINDOWLOAD mediaelement",r)):f.ready(g,A),f.ready("track",p)})}(Modernizr,webshims),webshims.register("track",function(a,b,c,d){"use strict";function e(a,c,e){3!=arguments.length&&b.error("wrong arguments.length for VTTCue.constructor"),this.startTime=a,this.endTime=c,this.text=e,this.onenter=null,this.onexit=null,this.pauseOnExit=!1,this.track=null,this.id=null,this.getCueAsHTML=function(){var a,b="",c="";return function(){var e,g;if(a||(a=d.createDocumentFragment()),b!=this.text)for(b=this.text,c=f.parseCueTextToHTML(b),s.innerHTML=c,e=0,g=s.childNodes.length;g>e;e++)a.appendChild(s.childNodes[e].cloneNode(!0));return a.cloneNode(!0)}}()}var f=b.mediaelement,g=((new Date).getTime(),{subtitles:1,captions:1,descriptions:1}),h=a("<track />"),i=Modernizr.ES5&&Modernizr.objectAccessor,j=function(a){var c={};return a.addEventListener=function(a,d){c[a]&&b.error("always use $.on to the shimed event: "+a+" already bound fn was: "+c[a]+" your fn was: "+d),c[a]=d},a.removeEventListener=function(a,d){c[a]&&c[a]!=d&&b.error("always use $.on/$.off to the shimed event: "+a+" already bound fn was: "+c[a]+" your fn was: "+d),c[a]&&delete c[a]},a},k={getCueById:function(a){for(var b=null,c=0,d=this.length;d>c;c++)if(this[c].id===a){b=this[c];break}return b}},l={0:"disabled",1:"hidden",2:"showing"},m={shimActiveCues:null,_shimActiveCues:null,activeCues:null,cues:null,kind:"subtitles",label:"",language:"",id:"",mode:"disabled",oncuechange:null,toString:function(){return"[object TextTrack]"},addCue:function(a){if(this.cues){var c=this.cues[this.cues.length-1];c&&c.startTime>a.startTime&&b.error("cue startTime higher than previous cue's startTime")}else this.cues=f.createCueList();a.track&&a.track.removeCue&&a.track.removeCue(a),a.track=this,this.cues.push(a)},removeCue:function(a){var c=this.cues||[],d=0,e=c.length;if(a.track!=this)return void b.error("cue not part of track");for(;e>d;d++)if(c[d]===a){c.splice(d,1),a.track=null;break}return a.track?void b.error("cue not part of track"):void 0}},n=["kind","label","srclang"],o={srclang:"language"},p=function(c,d){var e,f,g=[],h=[],i=[];if(c||(c=b.data(this,"mediaelementBase")||b.data(this,"mediaelementBase",{})),d||(c.blockTrackListUpdate=!0,d=a.prop(this,"textTracks"),c.blockTrackListUpdate=!1),clearTimeout(c.updateTrackListTimer),a("track",this).each(function(){var b=a.prop(this,"track");i.push(b),-1==d.indexOf(b)&&h.push(b)}),c.scriptedTextTracks)for(e=0,f=c.scriptedTextTracks.length;f>e;e++)i.push(c.scriptedTextTracks[e]),-1==d.indexOf(c.scriptedTextTracks[e])&&h.push(c.scriptedTextTracks[e]);for(e=0,f=d.length;f>e;e++)-1==i.indexOf(d[e])&&g.push(d[e]);if(g.length||h.length){for(d.splice(0),e=0,f=i.length;f>e;e++)d.push(i[e]);for(e=0,f=g.length;f>e;e++)a([d]).triggerHandler(a.Event({type:"removetrack",track:g[e]}));for(e=0,f=h.length;f>e;e++)a([d]).triggerHandler(a.Event({type:"addtrack",track:h[e]}));(c.scriptedTextTracks||g.length)&&a(this).triggerHandler("updatetrackdisplay")}},q=function(c,d){d||(d=b.data(c,"trackData")),d&&!d.isTriggering&&(d.isTriggering=!0,setTimeout(function(){a(c).closest("audio, video").triggerHandler("updatetrackdisplay"),d.isTriggering=!1},1))},r=function(){var c={subtitles:{subtitles:1,captions:1},descriptions:{descriptions:1},chapters:{chapters:1}};return c.captions=c.subtitles,function(d){var e,f,g=a.prop(d,"default");return g&&"metadata"!=(e=a.prop(d,"kind"))&&(f=a(d).parent().find("track[default]").filter(function(){return!!c[e][a.prop(this,"kind")]})[0],f!=d&&(g=!1,b.error("more than one default track of a specific kind detected. Fall back to default = false"))),g}}(),s=a("<div />")[0];c.VTTCue=e,c.TextTrackCue=function(){b.error("Use VTTCue constructor instead of abstract TextTrackCue constructor."),e.apply(this,arguments)},c.TextTrackCue.prototype=e.prototype,f.createCueList=function(){return a.extend([],k)},f.parseCueTextToHTML=function(){var a=/(<\/?[^>]+>)/gi,b=/^(?:c|v|ruby|rt|b|i|u)/,c=/\<\s*\//,d=function(a,b,d,e){var f;return c.test(e)?f="</"+a+">":(d.splice(0,1),f="<"+a+" "+b+'="'+d.join(" ").replace(/\"/g,"&#34;")+'">'),f},e=function(a){var c=a.replace(/[<\/>]+/gi,"").split(/[\s\.]+/);return c[0]&&(c[0]=c[0].toLowerCase(),b.test(c[0])?"c"==c[0]?a=d("span","class",c,a):"v"==c[0]&&(a=d("q","title",c,a)):a=""),a};return function(b){return b.replace(a,e)}}(),f.loadTextTrack=function(c,d,e,h){var i="play playing",j=e.track,k=function(){var g,h,l,m="disabled"!=j.mode&&a.attr(d,"src")&&a.prop(d,"src");if(m&&(a(c).off(i,k).off("updatetrackdisplay",k),!e.readyState)){g=function(){e.readyState=3,j.cues=null,j.activeCues=j.shimActiveCues=j._shimActiveCues=null,a(d).triggerHandler("error")},e.readyState=1;try{j.cues=f.createCueList(),j.activeCues=j.shimActiveCues=j._shimActiveCues=f.createCueList(),l=function(){h=a.ajax({dataType:"text",url:m,success:function(i){"text/vtt"!=h.getResponseHeader("content-type")&&b.error("set the mime-type of your WebVTT files to text/vtt. see: http://dev.w3.org/html5/webvtt/#text/vtt"),f.parseCaptions(i,j,function(b){b&&"length"in b?(e.readyState=2,a(d).triggerHandler("load"),a(c).triggerHandler("updatetrackdisplay")):g()})},error:g})},a.ajax&&a.ajaxSettings.xhr?l():(b.ready("jajax",l),b.loader.loadList(["jajax"]))}catch(n){g(),b.error(n)}}};e.readyState=0,j.shimActiveCues=null,j._shimActiveCues=null,j.activeCues=null,j.cues=null,a(c).on(i,k),h?(j.mode=g[j.kind]?"showing":"hidden",b.ready("WINDOWLOAD",k)):b.ready("WINDOWLOAD",function(){a(c).on("updatetrackdisplay",k)})},f.createTextTrack=function(c,d){var e,g;return d.nodeName&&(g=b.data(d,"trackData"),g&&(q(d,g),e=g.track)),e||(e=j(b.objectCreate(m)),i||n.forEach(function(b){var c=a.prop(d,b);c&&(e[o[b]||b]=c)}),d.nodeName?(i&&n.forEach(function(c){b.defineProperty(e,o[c]||c,{get:function(){return a.prop(d,c)}})}),e.id=a(d).prop("id"),g=b.data(d,"trackData",{track:e}),f.loadTextTrack(c,d,g,r(d))):(i&&n.forEach(function(a){b.defineProperty(e,o[a]||a,{value:d[a],writeable:!1})}),e.cues=f.createCueList(),e.activeCues=e._shimActiveCues=e.shimActiveCues=f.createCueList(),e.mode="hidden",e.readyState=2),"subtitles"!=e.kind||e.language||b.error("you must provide a language for track in subtitles state"),e.__wsmode=e.mode),e},f.parseCaptionChunk=function(){var a=/^(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s+\-\-\>\s+(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s*(.*)/,c=/^(DEFAULTS|DEFAULT)\s+\-\-\>\s+(.*)/g,d=/^(STYLE|STYLES)\s+\-\-\>\s*\n([\s\S]*)/g,f=/^(COMMENT|COMMENTS)\s+\-\-\>\s+(.*)/g;return function(g){var h,i,j,k,l,m,n,o,p,q;if(c.exec(g))return null;if(o=d.exec(g))return null;if(o=f.exec(g))return null;for(h=g.split(/\n/g);!h[0].replace(/\s+/gi,"").length&&h.length>0;)h.shift();for(h[0].match(/^\s*[a-z0-9-\_]+\s*$/gi)&&(n=String(h.shift().replace(/\s*/gi,""))),m=0;m<h.length;m++){var r=h[m];(p=a.exec(r))&&(l=p.slice(1),i=parseInt(60*(l[0]||0)*60,10)+parseInt(60*(l[1]||0),10)+parseInt(l[2]||0,10)+parseFloat("0."+(l[3]||0)),j=parseInt(60*(l[4]||0)*60,10)+parseInt(60*(l[5]||0),10)+parseInt(l[6]||0,10)+parseFloat("0."+(l[7]||0))),h=h.slice(0,m).concat(h.slice(m+1));break}return i||j?(k=h.join("\n"),q=new e(i,j,k),n&&(q.id=n),q):(b.warn("couldn't extract time information: "+[i,j,h.join("\n"),n].join(" ; ")),null)}}(),f.parseCaptions=function(a,c,d){var e,g,h,i,j;f.createCueList(),a?(h=/^WEBVTT(\s*FILE)?/gi,g=function(k,l){for(;l>k;k++){if(e=a[k],h.test(e))j=!0;else if(e.replace(/\s*/gi,"").length){if(!j){b.error("please use WebVTT format. This is the standard"),d(null);break}e=f.parseCaptionChunk(e,k),e&&c.addCue(e)}if(i<(new Date).getTime()-30){k++,setTimeout(function(){i=(new Date).getTime(),g(k,l)},90);break}}k>=l&&(j||b.error("please use WebVTT format. This is the standard"),d(c.cues))},a=a.replace(/\r\n/g,"\n"),setTimeout(function(){a=a.replace(/\r/g,"\n"),setTimeout(function(){i=(new Date).getTime(),a=a.split(/\n\n+/g),g(0,a.length)},9)},9)):b.error("Required parameter captionData not supplied.")},f.createTrackList=function(c,d){return d=d||b.data(c,"mediaelementBase")||b.data(c,"mediaelementBase",{}),d.textTracks||(d.textTracks=[],b.defineProperties(d.textTracks,{onaddtrack:{value:null},onremovetrack:{value:null},onchange:{value:null},getTrackById:{value:function(a){for(var b=null,c=0;c<d.textTracks.length;c++)if(a==d.textTracks[c].id){b=d.textTracks[c];break}return b}}}),j(d.textTracks),a(c).on("updatetrackdisplay",function(){for(var b,c=0;c<d.textTracks.length;c++)b=d.textTracks[c],b.__wsmode!=b.mode&&(b.__wsmode=b.mode,a([d.textTracks]).triggerHandler("change"))})),d.textTracks},Modernizr.track||(b.defineNodeNamesBooleanProperty(["track"],"default"),b.reflectProperties(["track"],["srclang","label"]),b.defineNodeNameProperties("track",{src:{reflect:!0,propType:"src"}})),b.defineNodeNameProperties("track",{kind:{attr:Modernizr.track?{set:function(a){var c=b.data(this,"trackData");this.setAttribute("data-kind",a),c&&(c.attrKind=a)},get:function(){var a=b.data(this,"trackData");return a&&"attrKind"in a?a.attrKind:this.getAttribute("kind")}}:{},reflect:!0,propType:"enumarated",defaultValue:"subtitles",limitedTo:["subtitles","captions","descriptions","chapters","metadata"]}}),a.each(n,function(c,d){var e=o[d]||d;b.onNodeNamesPropertyModify("track",d,function(){var c=b.data(this,"trackData");c&&("kind"==d&&q(this,c),i||(c.track[e]=a.prop(this,d)))})}),b.onNodeNamesPropertyModify("track","src",function(c){if(c){var d,e=b.data(this,"trackData");e&&(d=a(this).closest("video, audio"),d[0]&&f.loadTextTrack(d,this,e))}}),b.defineNodeNamesProperties(["track"],{ERROR:{value:3},LOADED:{value:2},LOADING:{value:1},NONE:{value:0},readyState:{get:function(){return(b.data(this,"trackData")||{readyState:0}).readyState},writeable:!1},track:{get:function(){return f.createTextTrack(a(this).closest("audio, video")[0],this)},writeable:!1}},"prop"),b.defineNodeNamesProperties(["audio","video"],{textTracks:{get:function(){var a=this,c=b.data(a,"mediaelementBase")||b.data(a,"mediaelementBase",{}),d=f.createTrackList(a,c);return c.blockTrackListUpdate||p.call(a,c,d),d},writeable:!1},addTextTrack:{value:function(a,c,d){var e=f.createTextTrack(this,{kind:h.prop("kind",a||"").prop("kind"),label:c||"",srclang:d||""}),g=b.data(this,"mediaelementBase")||b.data(this,"mediaelementBase",{});return g.scriptedTextTracks||(g.scriptedTextTracks=[]),g.scriptedTextTracks.push(e),p.call(this),e}}},"prop");var t=function(c){if(a(c.target).is("audio, video")){var d=b.data(c.target,"mediaelementBase");d&&(clearTimeout(d.updateTrackListTimer),d.updateTrackListTimer=setTimeout(function(){p.call(c.target,d)},0))}},u=function(a,b){return b.readyState||a.readyState},v=function(a){a.originalEvent&&a.stopImmediatePropagation()},w=function(){if(b.implement(this,"track")){var c,d=this.track;d&&(b.bugs.track||!d.mode&&!u(this,d)||(a.prop(this,"track").mode=l[d.mode]||d.mode),c=a.prop(this,"kind"),d.mode="string"==typeof d.mode?"disabled":0,this.kind="metadata",a(this).attr({kind:c})),a(this).on("load error",v)}};b.addReady(function(c,d){var e=d.filter("video, audio, track").closest("audio, video");a("video, audio",c).add(e).each(function(){p.call(this)}).on("emptied updatetracklist wsmediareload",t).each(function(){if(Modernizr.track){var c=a.prop(this,"textTracks"),d=this.textTracks;c.length!=d.length&&b.warn("textTracks couldn't be copied"),a("track",this).each(w)}}),e.each(function(){var a=this,c=b.data(a,"mediaelementBase");c&&(clearTimeout(c.updateTrackListTimer),c.updateTrackListTimer=setTimeout(function(){p.call(a,c)},9))})}),Modernizr.texttrackapi&&a("video, audio").trigger("trackapichange")});
+
+var swfmini = function() {
+	var wasRemoved = function(){webshims.error('This method was removed from swfmini');};
+	var UNDEF = "undefined",
+		OBJECT = "object",
+		webshims = window.webshims,
+		SHOCKWAVE_FLASH = "Shockwave Flash",
+		SHOCKWAVE_FLASH_AX = "ShockwaveFlash.ShockwaveFlash",
+		FLASH_MIME_TYPE = "application/x-shockwave-flash",
+		
+		win = window,
+		doc = document,
+		nav = navigator,
+		
+		plugin = false,
+		domLoadFnArr = [main],
+
+		isDomLoaded = false,
+		autoHideShow = true,
+	
+	/* Centralized function for browser feature detection
+		- User agent string detection is only used when no good alternative is possible
+		- Is executed directly for optimal performance
+	*/	
+	ua = function() {
+		var w3cdom = typeof doc.getElementById != UNDEF && typeof doc.getElementsByTagName != UNDEF && typeof doc.createElement != UNDEF,
+			u = nav.userAgent.toLowerCase(),
+			p = nav.platform.toLowerCase(),
+			windows = p ? /win/.test(p) : /win/.test(u),
+			mac = p ? /mac/.test(p) : /mac/.test(u),
+			webkit = /webkit/.test(u) ? parseFloat(u.replace(/^.*webkit\/(\d+(\.\d+)?).*$/, "$1")) : false, // returns either the webkit version or false if not webkit
+			ie = !+"\v1", // feature detection based on Andrea Giammarchi's solution: http://webreflection.blogspot.com/2009/01/32-bytes-to-know-if-your-browser-is-ie.html
+			playerVersion = [0,0,0],
+			d = null;
+		if (typeof nav.plugins != UNDEF && typeof nav.plugins[SHOCKWAVE_FLASH] == OBJECT) {
+			d = nav.plugins[SHOCKWAVE_FLASH].description;
+			if (d && !(typeof nav.mimeTypes != UNDEF && nav.mimeTypes[FLASH_MIME_TYPE] && !nav.mimeTypes[FLASH_MIME_TYPE].enabledPlugin)) { // navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin indicates whether plug-ins are enabled or disabled in Safari 3+
+				plugin = true;
+				ie = false; // cascaded feature detection for Internet Explorer
+				d = d.replace(/^.*\s+(\S+\s+\S+$)/, "$1");
+				playerVersion[0] = parseInt(d.replace(/^(.*)\..*$/, "$1"), 10);
+				playerVersion[1] = parseInt(d.replace(/^.*\.(.*)\s.*$/, "$1"), 10);
+				playerVersion[2] = /[a-zA-Z]/.test(d) ? parseInt(d.replace(/^.*[a-zA-Z]+(.*)$/, "$1"), 10) : 0;
+			}
+		}
+		else if (typeof win.ActiveXObject != UNDEF) {
+			try {
+				var a = new ActiveXObject(SHOCKWAVE_FLASH_AX);
+				if (a) { // a will return null when ActiveX is disabled
+					d = a.GetVariable("$version");
+					if (d) {
+						ie = true; // cascaded feature detection for Internet Explorer
+						d = d.split(" ")[1].split(",");
+						playerVersion = [parseInt(d[0], 10), parseInt(d[1], 10), parseInt(d[2], 10)];
+					}
+				}
+			}
+			catch(e) {}
+		}
+		return { w3:w3cdom, pv:playerVersion, wk:webkit, ie:ie, win:windows, mac:mac };
+	}();
+	
+	
+	function callDomLoadFunctions() {
+		if (isDomLoaded) { return; }
+		isDomLoaded = true;
+		var dl = domLoadFnArr.length;
+		for (var i = 0; i < dl; i++) {
+			domLoadFnArr[i]();
+		}
+	}
+	
+	function addDomLoadEvent(fn) {
+		if (isDomLoaded) {
+			fn();
+		}
+		else { 
+			domLoadFnArr[domLoadFnArr.length] = fn; // Array.push() is only available in IE5.5+
+		}
+	}
+
+	
+	/* Main function
+		- Will preferably execute onDomLoad, otherwise onload (as a fallback)
+	*/
+	function main() { 
+		if (plugin) {
+			testPlayerVersion();
+		}
+	}
+	
+	/* Detect the Flash Player version for non-Internet Explorer browsers
+		- Detecting the plug-in version via the object element is more precise than using the plugins collection item's description:
+		  a. Both release and build numbers can be detected
+		  b. Avoid wrong descriptions by corrupt installers provided by Adobe
+		  c. Avoid wrong descriptions by multiple Flash Player entries in the plugin Array, caused by incorrect browser imports
+		- Disadvantage of this method is that it depends on the availability of the DOM, while the plugins collection is immediately available
+	*/
+	function testPlayerVersion() {
+		var b = doc.getElementsByTagName("body")[0];
+		var o = createElement(OBJECT);
+		o.setAttribute("type", FLASH_MIME_TYPE);
+		var t = b.appendChild(o);
+		if (t) {
+			var counter = 0;
+			(function(){
+				if (typeof t.GetVariable != UNDEF) {
+					var d = t.GetVariable("$version");
+					if (d) {
+						d = d.split(" ")[1].split(",");
+						ua.pv = [parseInt(d[0], 10), parseInt(d[1], 10), parseInt(d[2], 10)];
+					}
+				}
+				else if (counter < 10) {
+					counter++;
+					setTimeout(arguments.callee, 10);
+					return;
+				}
+				b.removeChild(o);
+				t = null;
+			})();
+		}
+	}
+
+	
+	function createElement(el) {
+		return doc.createElement(el);
+	}
+	
+
+	/* Flash Player and SWF content version matching
+	*/
+	function hasPlayerVersion(rv) {
+		var pv = ua.pv, v = rv.split(".");
+		v[0] = parseInt(v[0], 10);
+		v[1] = parseInt(v[1], 10) || 0; // supports short notation, e.g. "9" instead of "9.0.0"
+		v[2] = parseInt(v[2], 10) || 0;
+		return (pv[0] > v[0] || (pv[0] == v[0] && pv[1] > v[1]) || (pv[0] == v[0] && pv[1] == v[1] && pv[2] >= v[2])) ? true : false;
+	}
+	
+	
+
+
+
+	webshims.ready('DOM', callDomLoadFunctions);
+
+	webshims.loader.addModule('swfmini-embed', {d: ['swfmini']});
+	var loadEmbed = hasPlayerVersion('9.0.0') ?
+		function(){
+			webshims.loader.loadList(['swfmini-embed']);
+			return true;
+		} :
+		webshims.$.noop
+	;
+
+	if(!Modernizr.video){
+		loadEmbed();
+	} else {
+		webshims.ready('WINDOWLOAD', loadEmbed);
+	}
+
+	return {
+		/* Public API
+			- Reference: http://code.google.com/p/swfobject/wiki/documentation
+		*/ 
+		registerObject: wasRemoved,
+		
+		getObjectById: wasRemoved,
+		
+		embedSWF: function(swfUrlStr, replaceElemIdStr, widthStr, heightStr, swfVersionStr, xiSwfUrlStr, flashvarsObj, parObj, attObj, callbackFn) {
+			var args = arguments;
+			if(loadEmbed()){
+				webshims.ready('swfmini-embed', function(){
+					swfmini.embedSWF.apply(swfmini, args);
+				});
+			} else if(callbackFn) {
+				callbackFn({success:false, id:replaceElemIdStr});
+			}
+		},
+		
+		switchOffAutoHideShow: function() {
+			autoHideShow = false;
+		},
+		
+		ua: ua,
+		
+		getFlashPlayerVersion: function() {
+			return { major:ua.pv[0], minor:ua.pv[1], release:ua.pv[2] };
+		},
+		
+		hasFlashPlayerVersion: hasPlayerVersion,
+		
+		createSWF: function(attObj, parObj, replaceElemIdStr) {
+			if (ua.w3) {
+				return createSWF(attObj, parObj, replaceElemIdStr);
+			}
+			else {
+				return undefined;
+			}
+		},
+		
+		showExpressInstall: wasRemoved,
+		
+		removeSWF: wasRemoved,
+		
+		createCSS: wasRemoved,
+		
+		addDomLoadEvent: addDomLoadEvent,
+		
+		addLoadEvent: wasRemoved,
+		
+		
+		// For internal usage only
+		expressInstallCallback: wasRemoved
+	};
+}();
+
+webshims.isReady('swfmini', true);
+;(function(Modernizr, webshims){
+	"use strict";
+	var hasNative = Modernizr.audio && Modernizr.video;
+	var supportsLoop = false;
+	var bugs = webshims.bugs;
+	var swfType = 'mediaelement-jaris';
+	var loadSwf = function(){
+		webshims.ready(swfType, function(){
+			if(!webshims.mediaelement.createSWF){
+				webshims.mediaelement.loadSwf = true;
+				webshims.reTest([swfType], hasNative);
+			}
+		});
+	};
+
+	var wsCfg = webshims.cfg;
+	var options = wsCfg.mediaelement;
+	var hasSwf;
+	if(!options){
+		webshims.error("mediaelement wasn't implemented but loaded");
+		return;
+	}
+
+	if(hasNative){
+		var videoElem = document.createElement('video');
+		Modernizr.videoBuffered = ('buffered' in videoElem);
+		Modernizr.mediaDefaultMuted = ('defaultMuted' in videoElem);
+		supportsLoop = ('loop' in videoElem);
+		Modernizr.mediaLoop = supportsLoop;
+
+		webshims.capturingEvents(['play', 'playing', 'waiting', 'paused', 'ended', 'durationchange', 'loadedmetadata', 'canplay', 'volumechange']);
+		
+		if( !Modernizr.videoBuffered || !supportsLoop || (!Modernizr.mediaDefaultMuted && navigator.userAgent.indexOf('MSIE') != -1 && 'ActiveXObject' in window) ){
+			webshims.addPolyfill('mediaelement-native-fix', {
+				d: ['dom-support']
+			});
+			webshims.loader.loadList(['mediaelement-native-fix']);
+		}
+	}
+	
+	if(Modernizr.track && !bugs.track){
+		(function(){
+			if(!bugs.track){
+
+				if(window.VTTCue && !window.TextTrackCue){
+					window.TextTrackCue = window.VTTCue;
+				} else if(!window.VTTCue){
+					window.VTTCue = window.TextTrackCue;
+				}
+
+				try {
+					new VTTCue(2, 3, '');
+				} catch(e){
+					bugs.track = true;
+				}
+			}
+		})();
+	}
+
+webshims.register('mediaelement-core', function($, webshims, window, document, undefined, options){
+	hasSwf = swfmini.hasFlashPlayerVersion('10.0.3');
+	var mediaelement = webshims.mediaelement;
+	
+	mediaelement.parseRtmp = function(data){
+		var src = data.src.split('://');
+		var paths = src[1].split('/');
+		var i, len, found;
+		data.server = src[0]+'://'+paths[0]+'/';
+		data.streamId = [];
+		for(i = 1, len = paths.length; i < len; i++){
+			if(!found && paths[i].indexOf(':') !== -1){
+				paths[i] = paths[i].split(':')[1];
+				found = true;
+			}
+			if(!found){
+				data.server += paths[i]+'/';
+			} else {
+				data.streamId.push(paths[i]);
+			}
+		}
+		if(!data.streamId.length){
+			webshims.error('Could not parse rtmp url');
+		}
+		data.streamId = data.streamId.join('/');
+	};
+
+	var getSrcObj = function(elem, nodeName){
+		elem = $(elem);
+		var src = {src: elem.attr('src') || '', elem: elem, srcProp: elem.prop('src')};
+		var tmp;
+		
+		if(!src.src){return src;}
+		
+		tmp = elem.attr('data-server');
+		if(tmp != null){
+			src.server = tmp;
+		}
+		
+		tmp = elem.attr('type') || elem.attr('data-type');
+		if(tmp){
+			src.type = tmp;
+			src.container = $.trim(tmp.split(';')[0]);
+		} else {
+			if(!nodeName){
+				nodeName = elem[0].nodeName.toLowerCase();
+				if(nodeName == 'source'){
+					nodeName = (elem.closest('video, audio')[0] || {nodeName: 'video'}).nodeName.toLowerCase();
+				}
+			}
+			if(src.server){
+				src.type = nodeName+'/rtmp';
+				src.container = nodeName+'/rtmp';
+			} else {
+				
+				tmp = mediaelement.getTypeForSrc( src.src, nodeName, src );
+				
+				if(tmp){
+					src.type = tmp;
+					src.container = tmp;
+				}
+			}
+		}
+		
+		if(!src.container){
+			$(elem).attr('data-wsrecheckmimetype', '');
+		}
+		
+		tmp = elem.attr('media');
+		if(tmp){
+			src.media = tmp;
+		}
+		if(src.type == 'audio/rtmp' || src.type == 'video/rtmp'){
+			if(src.server){
+				src.streamId = src.src;
+			} else {
+				mediaelement.parseRtmp(src);
+			}
+		}
+		return src;
+	};
+	
+	
+	
+	var hasYt = !hasSwf && ('postMessage' in window) && hasNative;
+	
+	var loadTrackUi = function(){
+		if(loadTrackUi.loaded){return;}
+		loadTrackUi.loaded = true;
+		if(!options.noAutoTrack){
+			webshims.ready('WINDOWLOAD', function(){
+				loadThird();
+				webshims.loader.loadList(['track-ui']);
+			});
+		}
+	};
+
+	var loadYt = (function(){
+		var loaded;
+		return function(){
+			if(loaded || !hasYt){return;}
+			loaded = true;
+			webshims.loader.loadScript("https://www.youtube.com/player_api");
+			$(function(){
+				webshims._polyfill(["mediaelement-yt"]);
+			});
+		};
+	})();
+	var loadThird = function(){
+		if(hasSwf){
+			loadSwf();
+		} else {
+			loadYt();
+		}
+	};
+	
+	webshims.addPolyfill('mediaelement-yt', {
+		test: !hasYt,
+		d: ['dom-support']
+	});
+	
+
+	
+	mediaelement.mimeTypes = {
+		audio: {
+				//ogm shouldn´t be used!
+				'audio/ogg': ['ogg','oga', 'ogm'],
+				'audio/ogg;codecs="opus"': 'opus',
+				'audio/mpeg': ['mp2','mp3','mpga','mpega'],
+				'audio/mp4': ['mp4','mpg4', 'm4r', 'm4a', 'm4p', 'm4b', 'aac'],
+				'audio/wav': ['wav'],
+				'audio/3gpp': ['3gp','3gpp'],
+				'audio/webm': ['webm'],
+				'audio/fla': ['flv', 'f4a', 'fla'],
+				'application/x-mpegURL': ['m3u8', 'm3u']
+			},
+			video: {
+				//ogm shouldn´t be used!
+				'video/ogg': ['ogg','ogv', 'ogm'],
+				'video/mpeg': ['mpg','mpeg','mpe'],
+				'video/mp4': ['mp4','mpg4', 'm4v'],
+				'video/quicktime': ['mov','qt'],
+				'video/x-msvideo': ['avi'],
+				'video/x-ms-asf': ['asf', 'asx'],
+				'video/flv': ['flv', 'f4v'],
+				'video/3gpp': ['3gp','3gpp'],
+				'video/webm': ['webm'],
+				'application/x-mpegURL': ['m3u8', 'm3u'],
+				'video/MP2T': ['ts']
+			}
+		}
+	;
+	
+	mediaelement.mimeTypes.source =  $.extend({}, mediaelement.mimeTypes.audio, mediaelement.mimeTypes.video);
+	
+	mediaelement.getTypeForSrc = function(src, nodeName){
+		if(src.indexOf('youtube.com/watch?') != -1 || src.indexOf('youtube.com/v/') != -1){
+			return 'video/youtube';
+		}
+		if(src.indexOf('rtmp') === 0){
+			return nodeName+'/rtmp';
+		}
+		src = src.split('?')[0].split('#')[0].split('.');
+		src = src[src.length - 1];
+		var mt;
+		
+		$.each(mediaelement.mimeTypes[nodeName], function(mimeType, exts){
+			if(exts.indexOf(src) !== -1){
+				mt = mimeType;
+				return false;
+			}
+		});
+		return mt;
+	};
+	
+	
+	mediaelement.srces = function(mediaElem, srces){
+		mediaElem = $(mediaElem);
+		if(!srces){
+			srces = [];
+			var nodeName = mediaElem[0].nodeName.toLowerCase();
+			var src = getSrcObj(mediaElem, nodeName);
+			
+			if(!src.src){
+				$('source', mediaElem).each(function(){
+					src = getSrcObj(this, nodeName);
+					if(src.src){srces.push(src);}
+				});
+			} else {
+				srces.push(src);
+			}
+			return srces;
+		} else {
+			webshims.error('setting sources was removed.');
+		}
+	};
+	
+	
+	$.fn.loadMediaSrc = function(){
+		webshims.error('loadMediaSrc was removed.');
+	};
+	
+	mediaelement.swfMimeTypes = ['video/3gpp', 'video/x-msvideo', 'video/quicktime', 'video/x-m4v', 'video/mp4', 'video/m4p', 'video/x-flv', 'video/flv', 'audio/mpeg', 'audio/aac', 'audio/mp4', 'audio/x-m4a', 'audio/m4a', 'audio/mp3', 'audio/x-fla', 'audio/fla', 'youtube/flv', 'video/jarisplayer', 'jarisplayer/jarisplayer', 'video/youtube', 'video/rtmp', 'audio/rtmp'];
+	
+	mediaelement.canThirdPlaySrces = function(mediaElem, srces){
+		var ret = '';
+		if(hasSwf || hasYt){
+			mediaElem = $(mediaElem);
+			srces = srces || mediaelement.srces(mediaElem);
+			$.each(srces, function(i, src){
+				if(src.container && src.src && ((hasSwf && mediaelement.swfMimeTypes.indexOf(src.container) != -1) || (hasYt && src.container == 'video/youtube'))){
+					ret = src;
+					return false;
+				}
+			});
+			
+		}
+		
+		return ret;
+	};
+	
+	var nativeCanPlayType = {};
+	mediaelement.canNativePlaySrces = function(mediaElem, srces){
+		var ret = '';
+		if(hasNative){
+			mediaElem = $(mediaElem);
+			var nodeName = (mediaElem[0].nodeName || '').toLowerCase();
+			var nativeCanPlay = (nativeCanPlayType[nodeName] || {prop: {_supvalue: false}}).prop._supvalue || mediaElem[0].canPlayType;
+			if(!nativeCanPlay){return ret;}
+			srces = srces || mediaelement.srces(mediaElem);
+			
+			$.each(srces, function(i, src){
+				if(src.type && nativeCanPlay.call(mediaElem[0], src.type) ){
+					ret = src;
+					return false;
+				}
+			});
+		}
+		return ret;
+	};
+	var emptyType = (/^\s*application\/octet\-stream\s*$/i);
+	var getRemoveEmptyType = function(){
+		var ret = emptyType.test($.attr(this, 'type') || '');
+		if(ret){
+			$(this).removeAttr('type');
+		}
+		return ret;
+	};
+	mediaelement.setError = function(elem, message){
+		if($('source', elem).filter(getRemoveEmptyType).length){
+			webshims.error('"application/octet-stream" is a useless mimetype for audio/video. Please change this attribute.');
+			try {
+				$(elem).mediaLoad();
+			} catch(er){}
+		} else {
+			if(!message){
+				message = "can't play sources";
+			}
+			$(elem).pause().data('mediaerror', message);
+			webshims.error('mediaelementError: '+ message);
+			setTimeout(function(){
+				if($(elem).data('mediaerror')){
+					$(elem).addClass('media-error').trigger('mediaerror');
+				}
+			}, 1);
+		}
+		
+		
+	};
+	
+	var handleThird = (function(){
+		var requested;
+		var readyType = hasSwf ? swfType : 'mediaelement-yt';
+		return function( mediaElem, ret, data ){
+			//readd to ready
+
+			webshims.ready(readyType, function(){
+				if(mediaelement.createSWF && $(mediaElem).parent()[0]){
+					mediaelement.createSWF( mediaElem, ret, data );
+				} else if(!requested) {
+					requested = true;
+					loadThird();
+					
+					handleThird( mediaElem, ret, data );
+				}
+			});
+			if(!requested && hasYt && !mediaelement.createSWF){
+				loadYt();
+			}
+		};
+	})();
+	
+	var stepSources = function(elem, data, useSwf, _srces, _noLoop){
+		var ret;
+		if(useSwf || (useSwf !== false && data && data.isActive == 'third')){
+			ret = mediaelement.canThirdPlaySrces(elem, _srces);
+			if(!ret){
+				if(_noLoop){
+					mediaelement.setError(elem, false);
+				} else {
+					stepSources(elem, data, false, _srces, true);
+				}
+			} else {
+				handleThird(elem, ret, data);
+			}
+		} else {
+			ret = mediaelement.canNativePlaySrces(elem, _srces);
+			if(!ret){
+				if(_noLoop){
+					mediaelement.setError(elem, false);
+					if(data && data.isActive == 'third') {
+						mediaelement.setActive(elem, 'html5', data);
+					}
+				} else {
+					stepSources(elem, data, true, _srces, true);
+				}
+			} else if(data && data.isActive == 'third') {
+				mediaelement.setActive(elem, 'html5', data);
+			}
+		}
+	};
+	var stopParent = /^(?:embed|object|datalist)$/i;
+	var selectSource = function(elem, data){
+		var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
+		var _srces = mediaelement.srces(elem);
+		var parent = elem.parentNode;
+		
+		clearTimeout(baseData.loadTimer);
+		$(elem).removeClass('media-error');
+		$.data(elem, 'mediaerror', false);
+		
+		if(!_srces.length || !parent || parent.nodeType != 1 || stopParent.test(parent.nodeName || '')){return;}
+		data = data || webshims.data(elem, 'mediaelement');
+		if(mediaelement.sortMedia){
+			_srces.sort(mediaelement.sortMedia);
+		}
+		stepSources(elem, data, options.preferFlash || undefined, _srces);
+	};
+	mediaelement.selectSource = selectSource;
+	
+	
+	$(document).on('ended', function(e){
+		var data = webshims.data(e.target, 'mediaelement');
+		if( supportsLoop && (!data || data.isActive == 'html5') && !$.prop(e.target, 'loop')){return;}
+		setTimeout(function(){
+			if( $.prop(e.target, 'paused') || !$.prop(e.target, 'loop') ){return;}
+			$(e.target).prop('currentTime', 0).play();
+		}, 1);
+		
+	});
+	
+	var handleMedia = false;
+	var initMediaElements = function(){
+		var testFixMedia = function(){
+			if(webshims.implement(this, 'mediaelement')){
+				selectSource(this);
+				if(!Modernizr.mediaDefaultMuted && $.attr(this, 'muted') != null){
+					$.prop(this, 'muted', true);
+				}
+			}
+			
+		};
+		
+		webshims.ready('dom-support', function(){
+			handleMedia = true;
+			
+			if(!supportsLoop){
+				webshims.defineNodeNamesBooleanProperty(['audio', 'video'], 'loop');
+			}
+			
+			['audio', 'video'].forEach(function(nodeName){
+				var supLoad;
+				supLoad = webshims.defineNodeNameProperty(nodeName, 'load',  {
+					prop: {
+						value: function(){
+							var data = webshims.data(this, 'mediaelement');
+							selectSource(this, data);
+							if(hasNative && (!data || data.isActive == 'html5') && supLoad.prop._supvalue){
+								supLoad.prop._supvalue.apply(this, arguments);
+							}
+							if(!loadTrackUi.loaded && $('track', this).length){
+								loadTrackUi();
+							}
+							$(this).triggerHandler('wsmediareload');
+						}
+					}
+				});
+				nativeCanPlayType[nodeName] = webshims.defineNodeNameProperty(nodeName, 'canPlayType',  {
+					prop: {
+						value: function(type){
+							var ret = '';
+							if(hasNative && nativeCanPlayType[nodeName].prop._supvalue){
+								ret = nativeCanPlayType[nodeName].prop._supvalue.call(this, type);
+								if(ret == 'no'){
+									ret = '';
+								}
+							}
+							if(!ret && hasSwf){
+								type = $.trim((type || '').split(';')[0]);
+								if(mediaelement.swfMimeTypes.indexOf(type) != -1){
+									ret = 'maybe';
+								}
+							}
+							return ret;
+						}
+					}
+				});
+			});
+
+			
+			webshims.onNodeNamesPropertyModify(['audio', 'video'], ['src', 'poster'], {
+				set: function(){
+					var elem = this;
+					var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
+					clearTimeout(baseData.loadTimer);
+					baseData.loadTimer = setTimeout(function(){
+						selectSource(elem);
+						elem = null;
+					}, 9);
+				}
+			});
+			
+			
+			webshims.addReady(function(context, insertedElement){
+				var media = $('video, audio', context)
+					.add(insertedElement.filter('video, audio'))
+					.each(testFixMedia)
+				;
+				if(!loadTrackUi.loaded && $('track', media).length){
+					loadTrackUi();
+				}
+				media = null;
+			});
+		});
+		
+		if(hasNative && !handleMedia){
+			webshims.addReady(function(context, insertedElement){
+				if(!handleMedia){
+					$('video, audio', context)
+						.add(insertedElement.filter('video, audio'))
+						.each(function(){
+							if(!mediaelement.canNativePlaySrces(this)){
+								loadThird();
+								handleMedia = true;
+								return false;
+							}
+						})
+					;
+				}
+			});
+		}
+	};
+	
+
+	//set native implementation ready, before swf api is retested
+	if(hasNative){
+		webshims.isReady('mediaelement-core', true);
+		initMediaElements();
+		webshims.ready('WINDOWLOAD mediaelement', loadThird);
+	} else {
+		webshims.ready(swfType, initMediaElements);
+	}
+	webshims.ready('track', loadTrackUi);
+});
+
+})(Modernizr, webshims);
+;webshims.register('track', function($, webshims, window, document, undefined){
+	"use strict";
+	var mediaelement = webshims.mediaelement;
+	var id = new Date().getTime();
+	//descriptions are not really shown, but they are inserted into the dom
+	var showTracks = {subtitles: 1, captions: 1, descriptions: 1};
+	var dummyTrack = $('<track />');
+	var supportTrackMod = Modernizr.ES5 && Modernizr.objectAccessor;
+	var createEventTarget = function(obj){
+		var eventList = {};
+		obj.addEventListener = function(name, fn){
+			if(eventList[name]){
+				webshims.error('always use $.on to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
+			}
+			eventList[name] = fn;
+			
+		};
+		obj.removeEventListener = function(name, fn){
+			if(eventList[name] && eventList[name] != fn){
+				webshims.error('always use $.on/$.off to the shimed event: '+ name +' already bound fn was: '+ eventList[name] +' your fn was: '+ fn);
+			}
+			if(eventList[name]){
+				delete eventList[name];
+			}
+		};
+		return obj;
+	};
+	
+	var cueListProto = {
+		getCueById: function(id){
+			var cue = null;
+			for(var i = 0, len = this.length; i < len; i++){
+				if(this[i].id === id){
+					cue = this[i];
+					break;
+				}
+			}
+			return cue;
+		}
+	};
+	var numericModes = {
+		0: 'disabled',
+		1: 'hidden',
+		2: 'showing'
+	};
+	
+	var textTrackProto = {
+		shimActiveCues: null,
+		_shimActiveCues: null,
+		activeCues: null,
+		cues: null,
+		kind: 'subtitles',
+		label: '',
+		language: '',
+		id: '',
+		mode: 'disabled',
+		oncuechange: null,
+		toString: function() {
+			return "[object TextTrack]";
+		},
+		addCue: function(cue){
+			if(!this.cues){
+				this.cues = mediaelement.createCueList();
+			} else {
+				var lastCue = this.cues[this.cues.length-1];
+				if(lastCue && lastCue.startTime > cue.startTime){
+					webshims.error("cue startTime higher than previous cue's startTime");
+				}
+			}
+			if(cue.track && cue.track.removeCue){
+				cue.track.removeCue(cue);
+			}
+			cue.track = this;
+			this.cues.push(cue);
+		},
+		//ToDo: make it more dynamic
+		removeCue: function(cue){
+			var cues = this.cues || [];
+			var i = 0;
+			var len = cues.length;
+			if(cue.track != this){
+				webshims.error("cue not part of track");
+				return;
+			}
+			for(; i < len; i++){
+				if(cues[i] === cue){
+					cues.splice(i, 1);
+					cue.track = null;
+					break;
+				}
+			}
+			if(cue.track){
+				webshims.error("cue not part of track");
+				return;
+			}
+		}/*,
+		DISABLED: 'disabled',
+		OFF: 'disabled',
+		HIDDEN: 'hidden',
+		SHOWING: 'showing',
+		ERROR: 3,
+		LOADED: 2,
+		LOADING: 1,
+		NONE: 0*/
+	};
+	var copyProps = ['kind', 'label', 'srclang'];
+	var copyName = {srclang: 'language'};
+
+	var updateMediaTrackList = function(baseData, trackList){
+		var removed = [];
+		var added = [];
+		var newTracks = [];
+		var i, len;
+		if(!baseData){
+			baseData =  webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
+		}
+		
+		if(!trackList){
+			baseData.blockTrackListUpdate = true;
+			trackList = $.prop(this, 'textTracks');
+			baseData.blockTrackListUpdate = false;
+		}
+		
+		clearTimeout(baseData.updateTrackListTimer);
+		
+		$('track', this).each(function(){
+			var track = $.prop(this, 'track');
+			newTracks.push(track);
+			if(trackList.indexOf(track) == -1){
+				added.push(track);
+			}
+		});
+		
+		if(baseData.scriptedTextTracks){
+			for(i = 0, len = baseData.scriptedTextTracks.length; i < len; i++){
+				newTracks.push(baseData.scriptedTextTracks[i]);
+				if(trackList.indexOf(baseData.scriptedTextTracks[i]) == -1){
+					added.push(baseData.scriptedTextTracks[i]);
+				}
+			}
+		}
+		
+		for(i = 0, len = trackList.length; i < len; i++){
+			if(newTracks.indexOf(trackList[i]) == -1){
+				removed.push(trackList[i]);
+			}
+		}
+		
+		if(removed.length || added.length){
+			trackList.splice(0);
+			
+			for(i = 0, len = newTracks.length; i < len; i++){
+				trackList.push(newTracks[i]);
+			}
+			for(i = 0, len = removed.length; i < len; i++){
+				$([trackList]).triggerHandler($.Event({type: 'removetrack', track: removed[i]}));
+			}
+			for(i = 0, len = added.length; i < len; i++){
+				$([trackList]).triggerHandler($.Event({type: 'addtrack', track: added[i]}));
+			}
+			if(baseData.scriptedTextTracks || removed.length){
+				$(this).triggerHandler('updatetrackdisplay');
+			}
+		}
+	};
+	
+	var refreshTrack = function(track, trackData){
+		if(!trackData){
+			trackData = webshims.data(track, 'trackData');
+		}
+		
+		if(trackData && !trackData.isTriggering){
+			trackData.isTriggering = true;
+			setTimeout(function(){
+				$(track).closest('audio, video').triggerHandler('updatetrackdisplay');
+				trackData.isTriggering = false;
+			}, 1);
+		}
+	};
+	var isDefaultTrack = (function(){
+		var defaultKinds = {
+			subtitles: {
+				subtitles: 1,
+				captions: 1
+			},
+			descriptions: {descriptions: 1},
+			chapters: {chapters: 1}
+		};
+		defaultKinds.captions = defaultKinds.subtitles;
+		
+		return function(track){
+			var kind, firstDefaultTrack;
+			var isDefault = $.prop(track, 'default');
+			if(isDefault && (kind = $.prop(track, 'kind')) != 'metadata'){
+				firstDefaultTrack = $(track)
+					.parent()
+					.find('track[default]')
+					.filter(function(){
+						return !!(defaultKinds[kind][$.prop(this, 'kind')]);
+					})[0]
+				;
+				if(firstDefaultTrack != track){
+					isDefault = false;
+					webshims.error('more than one default track of a specific kind detected. Fall back to default = false');
+				}
+			}
+			return isDefault;
+		};
+	})();
+	var emptyDiv = $('<div />')[0];
+
+	function VTTCue(startTime, endTime, text){
+		if(arguments.length != 3){
+			webshims.error("wrong arguments.length for VTTCue.constructor");
+		}
+
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.text = text;
+		this.onenter = null;
+		this.onexit = null;
+		this.pauseOnExit = false;
+		this.track = null;
+		this.id = null;
+		this.getCueAsHTML = (function(){
+			var lastText = "";
+			var parsedText = "";
+			var fragment;
+
+			return function(){
+				var i, len;
+				if(!fragment){
+					fragment = document.createDocumentFragment();
+				}
+				if(lastText != this.text){
+					lastText = this.text;
+					parsedText = mediaelement.parseCueTextToHTML(lastText);
+					emptyDiv.innerHTML = parsedText;
+
+					for(i = 0, len = emptyDiv.childNodes.length; i < len; i++){
+						fragment.appendChild(emptyDiv.childNodes[i].cloneNode(true));
+					}
+				}
+				return fragment.cloneNode(true);
+			};
+
+		})();
+	}
+	
+	window.VTTCue = VTTCue;
+	window.TextTrackCue = function(){
+		webshims.error("Use VTTCue constructor instead of abstract TextTrackCue constructor.");
+		VTTCue.apply(this, arguments);
+	};
+
+	window.TextTrackCue.prototype = VTTCue.prototype;
+
+	mediaelement.createCueList = function(){
+		return $.extend([], cueListProto);
+	};
+	
+	mediaelement.parseCueTextToHTML = (function(){
+		var tagSplits = /(<\/?[^>]+>)/ig;
+		var allowedTags = /^(?:c|v|ruby|rt|b|i|u)/;
+		var regEnd = /\<\s*\//;
+		var addToTemplate = function(localName, attribute, tag, html){
+			var ret;
+			if(regEnd.test(html)){
+				ret = '</'+ localName +'>';
+			} else {
+				tag.splice(0, 1);
+				ret =  '<'+ localName +' '+ attribute +'="'+ (tag.join(' ').replace(/\"/g, '&#34;')) +'">';
+			}
+			return ret;
+		};
+		var replacer = function(html){
+			var tag = html.replace(/[<\/>]+/ig,"").split(/[\s\.]+/);
+			if(tag[0]){
+				tag[0] = tag[0].toLowerCase();
+				if(allowedTags.test(tag[0])){
+					if(tag[0] == 'c'){
+						html = addToTemplate('span', 'class', tag, html);
+					} else if(tag[0] == 'v'){
+						html = addToTemplate('q', 'title', tag, html);
+					}
+				} else {
+					html = "";
+				}
+			}
+			return html;
+		};
+		
+		return function(cueText){
+			return cueText.replace(tagSplits, replacer);
+		};
+	})();
+	
+	mediaelement.loadTextTrack = function(mediaelem, track, trackData, _default){
+		var loadEvents = 'play playing';
+		var obj = trackData.track;
+		var load = function(){
+			var error, ajax, createAjax;
+			var src = obj.mode != 'disabled' && ($.attr(track, 'src') && $.prop(track, 'src'));
+
+			if(src){
+				$(mediaelem).off(loadEvents, load).off('updatetrackdisplay', load);
+
+				if(!trackData.readyState){
+					error = function(){
+						trackData.readyState = 3;
+						obj.cues = null;
+						obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = null;
+						$(track).triggerHandler('error');
+					};
+					trackData.readyState = 1;
+					try {
+						obj.cues = mediaelement.createCueList();
+						obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = mediaelement.createCueList();
+						createAjax = function(){
+							ajax = $.ajax({
+								dataType: 'text',
+								url: src,
+								success: function(text){
+									if(ajax.getResponseHeader('content-type') != 'text/vtt'){
+										webshims.error('set the mime-type of your WebVTT files to text/vtt. see: http://dev.w3.org/html5/webvtt/#text/vtt');
+									}
+									mediaelement.parseCaptions(text, obj, function(cues){
+										if(cues && 'length' in cues){
+											trackData.readyState = 2;
+											$(track).triggerHandler('load');
+											$(mediaelem).triggerHandler('updatetrackdisplay');
+										} else {
+											error();
+										}
+									});
+									
+								},
+								error: error
+							});
+						};
+						if($.ajax && $.ajaxSettings.xhr){
+							createAjax();
+						} else {
+							webshims.ready('jajax', createAjax);
+							webshims.loader.loadList(['jajax']);
+						}
+					} catch(er){
+						error();
+						webshims.error(er);
+					}
+				}
+			}
+		};
+		trackData.readyState = 0;
+		obj.shimActiveCues = null;
+		obj._shimActiveCues = null;
+		obj.activeCues = null;
+		obj.cues = null;
+
+		$(mediaelem).on(loadEvents, load);
+		if(_default){
+			obj.mode = showTracks[obj.kind] ? 'showing' : 'hidden';
+			webshims.ready('WINDOWLOAD', load);
+		} else {
+			webshims.ready('WINDOWLOAD', function(){
+				$(mediaelem).on('updatetrackdisplay', load);
+			});
+		}
+	};
+	
+	mediaelement.createTextTrack = function(mediaelem, track){
+		var obj, trackData;
+		if(track.nodeName){
+			trackData = webshims.data(track, 'trackData');
+			
+			if(trackData){
+				refreshTrack(track, trackData);
+				obj = trackData.track;
+			}
+		}
+		
+		if(!obj){
+			obj = createEventTarget(webshims.objectCreate(textTrackProto));
+			
+			if(!supportTrackMod){
+				copyProps.forEach(function(copyProp){
+					var prop = $.prop(track, copyProp);
+					if(prop){
+						obj[copyName[copyProp] || copyProp] = prop;
+					}
+				});
+			}
+			
+			
+			if(track.nodeName){
+				if(supportTrackMod){
+					copyProps.forEach(function(copyProp){
+						webshims.defineProperty(obj, copyName[copyProp] || copyProp, {
+							get: function(){
+								return $.prop(track, copyProp);
+							}
+						});
+					});
+				}
+				obj.id = $(track).prop('id');
+				trackData = webshims.data(track, 'trackData', {track: obj});
+				mediaelement.loadTextTrack(mediaelem, track, trackData, isDefaultTrack(track));
+			} else {
+				if(supportTrackMod){
+					copyProps.forEach(function(copyProp){
+						webshims.defineProperty(obj, copyName[copyProp] || copyProp, {
+							value: track[copyProp],
+							writeable: false
+						});
+					});
+				}
+				obj.cues = mediaelement.createCueList();
+				obj.activeCues = obj._shimActiveCues = obj.shimActiveCues = mediaelement.createCueList();
+				obj.mode = 'hidden';
+				obj.readyState = 2;
+			}
+			if(obj.kind == 'subtitles' && !obj.language){
+				webshims.error('you must provide a language for track in subtitles state');
+			}
+			obj.__wsmode = obj.mode;
+		}
+		
+		return obj;
+	};
+
+
+/*
+taken from:
+Captionator 0.5.1 [CaptionCrunch]
+Christopher Giffard, 2011
+Share and enjoy
+
+https://github.com/cgiffard/Captionator
+
+modified for webshims
+*/
+	mediaelement.parseCaptionChunk = (function(){
+		// Set up timestamp parsers
+		var WebVTTTimestampParser			= /^(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s+\-\-\>\s+(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s*(.*)/;
+		var WebVTTDEFAULTSCueParser		= /^(DEFAULTS|DEFAULT)\s+\-\-\>\s+(.*)/g;
+		var WebVTTSTYLECueParser		= /^(STYLE|STYLES)\s+\-\-\>\s*\n([\s\S]*)/g;
+		var WebVTTCOMMENTCueParser		= /^(COMMENT|COMMENTS)\s+\-\-\>\s+(.*)/g;
+
+		return function(subtitleElement,objectCount){
+
+			var subtitleParts, timeIn, timeOut, html, timeData, subtitlePartIndex, id, specialCueData;
+			var timestampMatch, tmpCue;
+
+			// WebVTT Special Cue Logic
+			if (WebVTTDEFAULTSCueParser.exec(subtitleElement)) {
+//				cueDefaults = specialCueData.slice(2).join("");
+//				cueDefaults = cueDefaults.split(/\s+/g).filter(function(def) { return def && !!def.length; });
+				return null;
+			} else if ((specialCueData = WebVTTSTYLECueParser.exec(subtitleElement))) {
+				return null;
+			} else if ((specialCueData = WebVTTCOMMENTCueParser.exec(subtitleElement))) {
+				return null; // At this stage, we don't want to do anything with these.
+			}
+
+			subtitleParts = subtitleElement.split(/\n/g);
+
+			// Trim off any blank lines (logically, should only be max. one, but loop to be sure)
+			while (!subtitleParts[0].replace(/\s+/ig,"").length && subtitleParts.length > 0) {
+				subtitleParts.shift();
+			}
+
+			if (subtitleParts[0].match(/^\s*[a-z0-9-\_]+\s*$/ig)) {
+				// The identifier becomes the cue ID (when *we* load the cues from file. Programatically created cues can have an ID of whatever.)
+				id = String(subtitleParts.shift().replace(/\s*/ig,""));
+			}
+
+			for (subtitlePartIndex = 0; subtitlePartIndex < subtitleParts.length; subtitlePartIndex ++) {
+				var timestamp = subtitleParts[subtitlePartIndex];
+
+				if ((timestampMatch = WebVTTTimestampParser.exec(timestamp))) {
+
+					// WebVTT
+
+					timeData = timestampMatch.slice(1);
+
+					timeIn =	parseInt((timeData[0]||0) * 60 * 60,10) +	// Hours
+								parseInt((timeData[1]||0) * 60,10) +		// Minutes
+								parseInt((timeData[2]||0),10) +				// Seconds
+								parseFloat("0." + (timeData[3]||0));		// MS
+
+					timeOut =	parseInt((timeData[4]||0) * 60 * 60,10) +	// Hours
+								parseInt((timeData[5]||0) * 60,10) +		// Minutes
+								parseInt((timeData[6]||0),10) +				// Seconds
+								parseFloat("0." + (timeData[7]||0));		// MS
+/*
+					if (timeData[8]) {
+						cueSettings = timeData[8];
+					}
+*/
+				}
+
+				// We've got the timestamp - return all the other unmatched lines as the raw subtitle data
+				subtitleParts = subtitleParts.slice(0,subtitlePartIndex).concat(subtitleParts.slice(subtitlePartIndex+1));
+				break;
+			}
+
+			if (!timeIn && !timeOut) {
+				// We didn't extract any time information. Assume the cue is invalid!
+				webshims.warn("couldn't extract time information: "+[timeIn, timeOut, subtitleParts.join("\n"), id].join(' ; '));
+				return null;
+			}
+/*
+			// Consolidate cue settings, convert defaults to object
+			var compositeCueSettings =
+				cueDefaults
+					.reduce(function(previous,current,index,array){
+						previous[current.split(":")[0]] = current.split(":")[1];
+						return previous;
+					},{});
+
+			// Loop through cue settings, replace defaults with cue specific settings if they exist
+			compositeCueSettings =
+				cueSettings
+					.split(/\s+/g)
+					.filter(function(set) { return set && !!set.length; })
+					// Convert array to a key/val object
+					.reduce(function(previous,current,index,array){
+						previous[current.split(":")[0]] = current.split(":")[1];
+						return previous;
+					},compositeCueSettings);
+
+			// Turn back into string like the VTTCue constructor expects
+			cueSettings = "";
+			for (var key in compositeCueSettings) {
+				if (compositeCueSettings.hasOwnProperty(key)) {
+					cueSettings += !!cueSettings.length ? " " : "";
+					cueSettings += key + ":" + compositeCueSettings[key];
+				}
+			}
+*/
+			// The remaining lines are the subtitle payload itself (after removing an ID if present, and the time);
+			html = subtitleParts.join("\n");
+			tmpCue = new VTTCue(timeIn, timeOut, html);
+			if(id){
+				tmpCue.id = id;
+			}
+			return tmpCue;
+		};
+	})();
+
+	mediaelement.parseCaptions = function(captionData, track, complete) {
+
+		var cue, lazyProcess, regWevVTT, startDate, isWEBVTT;
+
+		mediaelement.createCueList();
+		if (captionData) {
+
+			regWevVTT = /^WEBVTT(\s*FILE)?/ig;
+
+			lazyProcess = function(i, len){
+
+				for(; i < len; i++){
+					cue = captionData[i];
+					if(regWevVTT.test(cue)){
+						isWEBVTT = true;
+					} else if(cue.replace(/\s*/ig,"").length){
+						if(!isWEBVTT){
+							webshims.error('please use WebVTT format. This is the standard');
+							complete(null);
+							break;
+						}
+						cue = mediaelement.parseCaptionChunk(cue, i);
+						if(cue){
+							track.addCue(cue);
+						}
+					}
+					if(startDate < (new Date().getTime()) - 30){
+						i++;
+						setTimeout(function(){
+							startDate = new Date().getTime();
+							lazyProcess(i, len);
+						}, 90);
+
+						break;
+					}
+				}
+				if(i >= len){
+					if(!isWEBVTT){
+						webshims.error('please use WebVTT format. This is the standard');
+					}
+					complete(track.cues);
+				}
+			};
+
+			captionData = captionData.replace(/\r\n/g,"\n");
+
+			setTimeout(function(){
+				captionData = captionData.replace(/\r/g,"\n");
+				setTimeout(function(){
+					startDate = new Date().getTime();
+					captionData = captionData.split(/\n\n+/g);
+					lazyProcess(0, captionData.length);
+				}, 9);
+			}, 9);
+
+		} else {
+			webshims.error("Required parameter captionData not supplied.");
+		}
+	};
+
+	
+	mediaelement.createTrackList = function(mediaelem, baseData){
+		baseData = baseData || webshims.data(mediaelem, 'mediaelementBase') || webshims.data(mediaelem, 'mediaelementBase', {});
+		if(!baseData.textTracks){
+			baseData.textTracks = [];
+			webshims.defineProperties(baseData.textTracks, {
+				onaddtrack: {value: null},
+				onremovetrack: {value: null},
+				onchange: {value: null},
+				getTrackById: {
+					value: function(id){
+						var track = null;
+						for(var i = 0; i < baseData.textTracks.length; i++){
+							if(id == baseData.textTracks[i].id){
+								track = baseData.textTracks[i];
+								break;
+							}
+						}
+						return track;
+					}
+				}
+			});
+			createEventTarget(baseData.textTracks);
+			$(mediaelem).on('updatetrackdisplay', function(){
+				var track;
+				for(var i = 0; i < baseData.textTracks.length; i++){
+					track = baseData.textTracks[i];
+					if(track.__wsmode != track.mode){
+						track.__wsmode = track.mode;
+						$([ baseData.textTracks ]).triggerHandler('change');
+					}
+				}
+			});
+			
+		}
+		return baseData.textTracks;
+	};
+	
+	if(!Modernizr.track){
+		webshims.defineNodeNamesBooleanProperty(['track'], 'default');
+		webshims.reflectProperties(['track'], ['srclang', 'label']);
+		
+		webshims.defineNodeNameProperties('track', {
+			src: {
+				//attr: {},
+				reflect: true,
+				propType: 'src'
+			}
+		});
+	}
+	
+	webshims.defineNodeNameProperties('track', {
+		kind: {
+			attr: Modernizr.track ? {
+				set: function(value){
+					var trackData = webshims.data(this, 'trackData');
+					this.setAttribute('data-kind', value);
+					if(trackData){
+						trackData.attrKind = value;
+					}
+				},
+				get: function(){
+					var trackData = webshims.data(this, 'trackData');
+					if(trackData && ('attrKind' in trackData)){
+						return trackData.attrKind;
+					}
+					return this.getAttribute('kind');
+				}
+			} : {},
+			reflect: true,
+			propType: 'enumarated',
+			defaultValue: 'subtitles',
+			limitedTo: ['subtitles', 'captions', 'descriptions', 'chapters', 'metadata']
+		}
+	});
+	
+	$.each(copyProps, function(i, copyProp){
+		var name = copyName[copyProp] || copyProp;
+		webshims.onNodeNamesPropertyModify('track', copyProp, function(){
+			var trackData = webshims.data(this, 'trackData');
+			var track = this;
+			if(trackData){
+				if(copyProp == 'kind'){
+					refreshTrack(this, trackData);
+				}
+				if(!supportTrackMod){
+					trackData.track[name] = $.prop(this, copyProp);
+				}
+			}
+		});
+	});		
+	
+	
+	webshims.onNodeNamesPropertyModify('track', 'src', function(val){
+		if(val){
+			var data = webshims.data(this, 'trackData');
+			var media;
+			if(data){
+				media = $(this).closest('video, audio');
+				if(media[0]){
+					mediaelement.loadTextTrack(media, this, data);
+				}
+			}
+		}
+		
+	});
+	
+	//
+	
+	webshims.defineNodeNamesProperties(['track'], {
+		ERROR: {
+			value: 3
+		},
+		LOADED: {
+			value: 2
+		},
+		LOADING: {
+			value: 1
+		},
+		NONE: {
+			value: 0
+		},
+		readyState: {
+			get: function(){
+				return (webshims.data(this, 'trackData') || {readyState: 0}).readyState;
+			},
+			writeable: false
+		},
+		track: {
+			get: function(){
+				return mediaelement.createTextTrack($(this).closest('audio, video')[0], this);
+			},
+			writeable: false
+		}
+	}, 'prop');
+	
+	webshims.defineNodeNamesProperties(['audio', 'video'], {
+		textTracks: {
+			get: function(){
+				var media = this;
+				var baseData = webshims.data(media, 'mediaelementBase') || webshims.data(media, 'mediaelementBase', {});
+				var tracks = mediaelement.createTrackList(media, baseData);
+				if(!baseData.blockTrackListUpdate){
+					updateMediaTrackList.call(media, baseData, tracks);
+				}
+				return tracks;
+			},
+			writeable: false
+		},
+		addTextTrack: {
+			value: function(kind, label, lang){
+				var textTrack = mediaelement.createTextTrack(this, {
+					kind: dummyTrack.prop('kind', kind || '').prop('kind'),
+					label: label || '',
+					srclang: lang || ''
+				});
+				var baseData = webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
+				if (!baseData.scriptedTextTracks) {
+					baseData.scriptedTextTracks = [];
+				}
+				baseData.scriptedTextTracks.push(textTrack);
+				updateMediaTrackList.call(this);
+				return textTrack;
+			}
+		}
+	}, 'prop');
+
+	//wsmediareload
+	var thUpdateList = function(e){
+		if($(e.target).is('audio, video')){
+			var baseData = webshims.data(e.target, 'mediaelementBase');
+			if(baseData){
+				clearTimeout(baseData.updateTrackListTimer);
+				baseData.updateTrackListTimer = setTimeout(function(){
+					updateMediaTrackList.call(e.target, baseData);
+				}, 0);
+			}
+		}
+	};
+	
+	var getNativeReadyState = function(trackElem, textTrack){
+		return textTrack.readyState || trackElem.readyState;
+	};
+	var stopOriginalEvent = function(e){
+		if(e.originalEvent){
+			e.stopImmediatePropagation();
+		}
+	};
+	var hideNativeTracks = function(){
+		if(webshims.implement(this, 'track')){
+			var kind;
+			var origTrack = this.track;
+			if(origTrack){
+
+				if (!webshims.bugs.track && (origTrack.mode || getNativeReadyState(this, origTrack))) {
+					$.prop(this, 'track').mode = numericModes[origTrack.mode] || origTrack.mode;
+				}
+				//disable track from showing + remove UI
+				kind = $.prop(this, 'kind');
+				origTrack.mode = (typeof origTrack.mode == 'string') ? 'disabled' : 0;
+				this.kind = 'metadata';
+
+				$(this).attr({kind: kind});
+				
+			}
+			$(this).on('load error', stopOriginalEvent);
+		}
+	};
+
+	webshims.addReady(function(context, insertedElement){
+		var insertedMedia = insertedElement.filter('video, audio, track').closest('audio, video');
+		$('video, audio', context)
+			.add(insertedMedia)
+			.each(function(){
+				updateMediaTrackList.call(this);
+			})
+			.on('emptied updatetracklist wsmediareload', thUpdateList)
+			.each(function(){
+				if(Modernizr.track){
+					var shimedTextTracks = $.prop(this, 'textTracks');
+					var origTextTracks = this.textTracks;
+
+					if(shimedTextTracks.length != origTextTracks.length){
+						webshims.warn("textTracks couldn't be copied");
+					}
+					
+					$('track', this).each(hideNativeTracks);
+				}
+			})
+		;
+
+		insertedMedia.each(function(){
+			var media = this;
+			var baseData = webshims.data(media, 'mediaelementBase');
+			if(baseData){
+				clearTimeout(baseData.updateTrackListTimer);
+				baseData.updateTrackListTimer = setTimeout(function(){
+					updateMediaTrackList.call(media, baseData);
+				}, 9);
+			}
+		});
+	});
+	
+	if(Modernizr.texttrackapi){
+		$('video, audio').trigger('trackapichange');
+	}
+});

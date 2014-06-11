@@ -919,7 +919,10 @@ webshim.setOptions("forms", {
 	list: {
 		"filter": "^"
 	}
-});</code></pre>
+});
+
+webshim.polyfill('forms');
+</code></pre>
 			<ul>
 				<li>
 					<strong><a href="demos/forms.html#Locale-customMessages">customMessages</a></strong> <em>boolean</em> If set to true, Webshims will implement a DOM-Property called customValidationMessage, which can be changed through the webshim.validityMessages-Array.
@@ -1058,7 +1061,38 @@ webshim.setOptions("forms-ext", {
 					<strong>datetime-local</strong> <em>object</em> Overrides widgets option object, can be also configured through data-color attribute (<a href="demos/cfgs/input-datetime-local.html">datetimepicker Configurator</a>)
 				</li>
 			</ul>
+			<p>A typical configuration would look like this:</p>
+<pre><code class="language-javascript">
+//configure forms features
+webshim.setOptions("forms", {
+	lazyCustomMessages: true,
+	replaceValidationUI: true,
+	customDatalist: "auto",
+	list: {
+		"filter": "^"
+	}
+});
 
+//configure forms-ext features
+webshim.setOptions("forms-ext", {
+	replaceUI: "auto",
+	types: "date range number",
+	date: {
+		startView: 2,
+		openOnFocus: true,
+		classes: "show-week"
+	},
+	number: {
+		calculateWidth: false
+	},
+	range: {
+		classes: "show-activevaluetooltip"
+	}
+});
+
+//load forms and forms-ext features
+webshim.polyfill('forms forms-ext');
+</code></pre>
 			<h3 id="Forms-extensions">Extensions</h3>
 			<ul>
 				<li>
@@ -1137,6 +1171,9 @@ window.FlashCanvasOptions = {
 webshim.setOptions('canvas', {
 	type: 'flashpro' // excanvas | flash | flashpro
 });
+
+//start polyfilling forms
+webshim.polyfill('forms');
 </code></pre>
 			<h3>Options for the <code class="i">
 				canvas</code> feature</h3>

@@ -21,13 +21,35 @@
 			webshim.setOptions('forms', {
 				lazyCustomMessages: true,
 				replaceValidationUI: true,
-				addValidators: true,
-				customDatalist: true
+				addValidators: true
 			});
-			
-			webshim.setOptions('forms-ext', {
-				replaceUI: true
-			});
+
+			(function(){
+				var stateMatches = {
+					'true': true,
+					'false': false,
+					'auto': 'auto'
+				};
+				var enhanceState = (location.search.match(/enhancelist\=([true|auto|false|nopolyfill]+)/) || ['', 'auto'])[1];
+
+				webshim.ready('jquery', function(){
+					$(function () {
+						$('.polyfill-type select')
+								.val(enhanceState)
+								.on('change', function () {
+									location.search = 'enhancelist=' + $(this).val();
+								})
+						;
+					});
+				});
+				webshim.setOptions('forms', {
+					customDatalist: stateMatches[enhanceState]
+				});
+				webshim.setOptions('forms-ext', {
+					replaceUI: stateMatches[enhanceState]
+				});
+			})();
+
 
 			// load the forms polyfill
 			webshim.polyfill('forms forms-ext');
@@ -85,6 +107,8 @@
 										<a href="http://jsfiddle.net/trixta/zRGd9/embedded/result,html,js,css/" class="list-group-item">disable specific dates in datepicker</a>
 										<a href="http://jsfiddle.net/trixta/fLBes/embedded/result,html,js,css/" class="list-group-item">Using datepicker for a birthdate</a>
 										<a href="http://jsfiddle.net/trixta/h7YdJ/embedded/result,html,js,css/" class="list-group-item">Dynamically setting min or max attribute to today's value</a>
+										<a href="http://jsfiddle.net/trixta/cc7Rt/embedded/result,html,js,css/" class="list-group-item">Creating inline calendars</a>
+										<a href="http://jsfiddle.net/trixta/sy2sM/embedded/result,html,js,css/" class="list-group-item">Using date + time input to create datetime-local input</a>
 									</div>
 								</div>
 							</div>
@@ -409,7 +433,14 @@
 		<option value="2013-11-11" label="labeled Option (2013-11-11)"></option>
 	</select>
 </datalist>
-
+		<label class="polyfill-type">
+			Polyfill/enhance strategy
+			<select>
+				<option value="auto" selected="">"auto" enhance non-mobile</option>
+				<option value="false">false: only polyfill</option>
+				<option value="true">true: enhance all</option>
+			</select>
+		</label>
 		<script type="text/javascript">
 			//http://blog.jsdelivr.com/2013/06/jsdelivr-weekly-news.html
 			if(location.hostname == 'afarkas.github.io'){

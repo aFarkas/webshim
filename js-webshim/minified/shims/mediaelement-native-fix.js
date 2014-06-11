@@ -1,1 +1,164 @@
-webshims.register("mediaelement-native-fix",function(a,b,c,d){var e=function(){if(Modernizr.videoBuffered)return a.noop;var c=function(a){var c=b.data(a,"mediaelementBuffered");return c||(c={buffered:{start:function(a){return a>=c.buffered.length?void b.error("buffered index size error"):0},end:function(a){return a>=c.buffered.length?void b.error("buffered index size error"):c.loaded},length:0},loaded:0},b.data(a,"mediaelementBuffered",c)),c},d=function(d){if(d=d.originalEvent,d&&"lengthComputable"in d){var e=b.data(d.target,"mediaelement");if((!e||"html5"==e.isActive)&&d.lengthComputable&&"loaded"in d){var f=d.target.duration,g=c(d.target);g.loaded=f?d.loaded/d.total*f:0,g.loaded&&(g.buffered.length=1),"load"==d.type&&a(d.target).triggerHandler("progress")}}},e=function(a){var b=c(a.target);b.buffered.length=0,b.loaded=0};return["audio","video"].forEach(function(a){var d=b.defineNodeNameProperty(a,"buffered",{prop:{get:function(){var a=b.data(this,"mediaelement");return a&&"flash"==a.isActive&&d.prop._supget?void d.prop._supget.apply(this):c(this).buffered}}})}),function(){a(this).off("load progress",d).off("emptied",e).on("load progress",d).on("emptied",e)}}();!function(){var a=d.createElement("video");if(!("preload"in a)&&"autobuffer"in a){var c={metadata:1,none:1};b.onNodeNamesPropertyModify(["audio","video"],["preload"],{set:function(a,d,e){c[a]||"removeAttr"==e?this.autobuffer=!1:"html5"==!(b.data(this,"mediaelement")||{}).isActive&&(this.autobuffer=!0)},initAttr:!0})}}();var f=function(){return Modernizr.mediaDefaultMuted?a.noop:function(){if(!a.data(this,"fixedMediaProgress")){var d,e,f=this,g=function(){var b=a.prop(f,"buffered");if(b){for(var c="",d=0,e=b.length;e>d;d++)c+=b.end(d);return c}},h=function(){var c=g();c!=e&&(e=c,b.error("needed to trigger progress manually"),a(f).triggerHandler("progress"))};a(this).data("fixedMediaProgress",!0).on({"play loadstart progress":function(a){"progress"==a.type&&(e=g(this)),clearTimeout(d),d=setTimeout(h,800)},"emptied stalled mediaerror abort suspend":function(a){"emptied"==a.type&&(e=!1),clearTimeout(d)}}),"ActiveXObject"in c&&a.prop(this,"paused")&&!a.prop(this,"readyState")&&a(this).is('audio[preload="none"][controls]:not([autoplay],.nonnative-api-active)')&&a(this).prop("preload","metadata").mediaLoad()}}}();b.addReady(function(b,c){a("video, audio",b).add(c.filter("video, audio")).each(e).each(f)})});
+webshims.register('mediaelement-native-fix', function($, webshims, window, document, undefined){
+
+
+	var fixBuffered = (function(){
+		if(Modernizr.videoBuffered){return $.noop;}
+
+		var getBufferedData = function(elem){
+			var data = webshims.data(elem, 'mediaelementBuffered');
+			if(!data){
+				data = {
+					buffered: {
+						start: function(index){
+							if(index >= data.buffered.length){
+								webshims.error('buffered index size error');
+								return;
+							}
+							return 0;
+						},
+						end: function(index){
+							if(index >= data.buffered.length){
+								webshims.error('buffered index size error');
+								return;
+							}
+							return data.loaded;
+						},
+						length: 0
+					},
+					loaded: 0
+				};
+				webshims.data(elem, 'mediaelementBuffered', data);
+			}
+			return data;
+		};
+
+		var loadProgessListener = function(e){
+			e = e.originalEvent;
+			if(!e || !('lengthComputable' in e)){return;}
+			var data = webshims.data(e.target, 'mediaelement');
+			if(data && data.isActive != 'html5'){return;}
+			if(e.lengthComputable && 'loaded' in e){
+				var duration = e.target.duration;
+				var bufferedData = getBufferedData(e.target);
+				bufferedData.loaded = (duration) ? e.loaded / e.total * duration : 0;
+				if(bufferedData.loaded){
+					bufferedData.buffered.length = 1;
+				}
+				if(e.type == 'load'){
+					$(e.target).triggerHandler('progress');
+				}
+			}
+		};
+		var removeProgress = function(e){
+			var data = getBufferedData(e.target);
+			data.buffered.length = 0;
+			data.loaded = 0;
+		};
+
+		['audio', 'video'].forEach(function(nodeName){
+			var sup = webshims.defineNodeNameProperty(nodeName, 'buffered',  {
+				prop: {
+					get: function(){
+						var data = webshims.data(this, 'mediaelement');
+
+						if(data && data.isActive == 'flash' && sup.prop._supget){
+							sup.prop._supget.apply(this);
+						} else {
+							return getBufferedData(this).buffered;
+						}
+					}
+				}
+			});
+		});
+
+		return function(){
+			$(this)
+				.off('load progress', loadProgessListener)
+				.off('emptied', removeProgress)
+				.on('load progress', loadProgessListener)
+				.on('emptied', removeProgress)
+			;
+		};
+	})();
+
+	(function(){
+		var videoElem = document.createElement('video');
+		if( !('preload' in videoElem) && ('autobuffer' in videoElem)){
+			var noBufferProps = {
+				metadata: 1,
+				none: 1
+			};
+			webshims.onNodeNamesPropertyModify(['audio', 'video'], ['preload'], {
+				set: function(value, boolValue, curType){
+					if(noBufferProps[value] || curType == 'removeAttr'){
+						this.autobuffer = false;
+					} else if( !(webshims.data(this, 'mediaelement') || {}).isActive == 'html5') {
+						this.autobuffer = true;
+					}
+				},
+				initAttr: true
+			});
+		}
+	})();
+
+	var fixProgressEvent = (function(){
+		if(Modernizr.mediaDefaultMuted){return $.noop;}
+
+
+		return function(){
+			if($.data(this, 'fixedMediaProgress')){return;}
+			var bufferTimer;
+			var lastBuffered;
+			var elem = this;
+			var getBufferedString = function(){
+				var buffered = $.prop(elem, 'buffered');
+				if(!buffered){return;}
+				var bufferString = "";
+				for(var i = 0, len = buffered.length; i < len;i++){
+					bufferString += buffered.end(i);
+				}
+				return bufferString;
+			};
+			var testBuffer = function(){
+				var buffered = getBufferedString();
+				if(buffered != lastBuffered){
+					lastBuffered = buffered;
+					webshims.error('needed to trigger progress manually');
+					$(elem).triggerHandler('progress');
+				}
+			};
+
+			$(this)
+				.data('fixedMediaProgress', true)
+				.on({
+					'play loadstart progress': function(e){
+						if(e.type == 'progress'){
+							lastBuffered = getBufferedString(this);
+						}
+						clearTimeout(bufferTimer);
+						bufferTimer = setTimeout(testBuffer, 800);
+					},
+					'emptied stalled mediaerror abort suspend': function(e){
+						if(e.type == 'emptied'){
+							lastBuffered = false;
+						}
+						clearTimeout(bufferTimer);
+					}
+				})
+			;
+			if('ActiveXObject' in window && $.prop(this, 'paused') && !$.prop(this, 'readyState') && $(this).is('audio[preload="none"][controls]:not([autoplay],.nonnative-api-active)')){
+				$(this).prop('preload', 'metadata').mediaLoad();
+			}
+		};
+	})();
+	
+	webshims.addReady(function(context, insertedElement){
+		$('video, audio', context)
+			.add(insertedElement.filter('video, audio'))
+			.each(fixBuffered)
+			.each(fixProgressEvent)
+		;
+		
+	 });
+
+});
