@@ -399,7 +399,7 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 					if(inputName && !$(appendData[i]).is(':disabled')){
 						files = $.prop(appendData[i], 'files') || [];
 						if(files.length){
-							if(files.length > 1){
+							if(files.length > 1 || (moxieData.hasBlob && moxieData.hasBlob())){
 								webshim.error('FormData shim can only handle one file per ajax. Use multiple ajax request. One per file.');
 							}
 							for(fileI = 0, fileLen = files.length; fileI < fileLen; fileI++){
