@@ -1451,7 +1451,7 @@ webshims.setOptions('details', {animate: true});
 			</ul>
 			<ul>
 				<li><small>1. [accept], [multiple] and the .files property is only polyfilled on input elements with the additional class 'ws-filereader'</small></li>
-				<li><small>2. For most of the features Flash or Silverliegt has to be installed. But webshim trys to fallback to other technologies (i.e.: iframe solution), if those aren't installed. Therefore for full CORS support a crossdomain.xml has to be on the server!</small></li>
+				<li><small>2. For full support of all features Flash or Silverliegt should be installed. But webshim falls back to other technologies (i.e.: iframe solutions), if those aren't installed. Therefore for full CORS support a crossdomain.xml has to be on the server!</small></li>
 				<li><small>3. FormData shim can currently only handle one file per AJAX request!</small></li>
 			</ul>
 			<p>An example of how to read a file as a base64 string from a form control:</p>
@@ -1504,7 +1504,23 @@ $('form[data-action].ajax-form').on('submit', function(){
 });
 </code></pre>
 			<p>For the code above to fully work it is important, that everything is either in the same origin or a crossdomain.xml is on the server. A featured example including php code can be found in the <a href="demos/filereader/">filereader directory</a>.</p>
-
+			<p>In case webshim is not served from the same domain (for exmaple using a <a href="http://www.jsdelivr.com/#!webshim">CDN</a>) a crossdomain.xml like the following should be reachable on your server root:</p>
+<pre><code class="language-markup">
+<?xml version="1.0"?>
+<!DOCTYPE cross-domain-policy SYSTEM
+"http://www.macromedia.com/xml/dtds/cross-domain-policy.dtd">
+<cross-domain-policy>
+	<allow-access-from domain="*" secure="false" />
+</cross-domain-policy>
+</code>
+</pre>
+			<p>In case you don't have full access to do so, you can host Moxie.cdn.swf (Flash) and Moxie.cdn.xap (Silverlight) on your server a tell webshim to load them from there:</p>
+<pre><code class="language-javascript">
+webshims.setOptions('filereader', {
+	swfpath: '/assests/Moxie.cdn.swf',
+	xappath: '/assets/Moxie.cdn.xap'
+});
+</code></pre>
 			<p>The <code class="i">filereader</code> is also lazy loaded by webhsim's <code class="i">form</code> feature as soon as an element matching the <code>input.ws-filereader</code> selector is used. Additionally the forms features enables custom styleable [type=file] elements if it find a wrapper with the class <code class="i">ws-custom-file</code>:</p>
 <pre><code class="language-markup">
 &lt;script&gt;
