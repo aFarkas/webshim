@@ -109,12 +109,6 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 					}
 
 					return inputValueDesc.prop._supget.call(this);
-				},
-				set: function(val){
-					if(val === '' && this.type == 'file' && $(this).hasClass('ws-filereader')){
-						webshim.data(this, 'fileList', []);
-					}
-					inputValueDesc.prop._supset.call(this);
 				}
 			}
 		}
@@ -364,6 +358,13 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 			picker.disable(boolVal);
 		}
 	});
+
+	webshim.onNodeNamesPropertyModify('input', 'value', function(value, boolVal, type){
+		if(value === '' && this.type == 'file' && $(this).hasClass('ws-filereader')){
+			webshim.data(this, 'fileList', []);
+		}
+	});
+
 
 	window.FileReader = notReadyYet;
 	window.FormData = notReadyYet;

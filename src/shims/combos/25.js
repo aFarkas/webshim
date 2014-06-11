@@ -1330,12 +1330,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					}
 
 					return inputValueDesc.prop._supget.call(this);
-				},
-				set: function(val){
-					if(val === '' && this.type == 'file' && $(this).hasClass('ws-filereader')){
-						webshim.data(this, 'fileList', []);
-					}
-					inputValueDesc.prop._supset.call(this);
 				}
 			}
 		}
@@ -1585,6 +1579,13 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			picker.disable(boolVal);
 		}
 	});
+
+	webshim.onNodeNamesPropertyModify('input', 'value', function(value, boolVal, type){
+		if(value === '' && this.type == 'file' && $(this).hasClass('ws-filereader')){
+			webshim.data(this, 'fileList', []);
+		}
+	});
+
 
 	window.FileReader = notReadyYet;
 	window.FormData = notReadyYet;
