@@ -81,22 +81,22 @@
 		<script src="../../js-webshim/minified/polyfiller.js"></script>
 
 		<script>
-			webshims.setOptions('mediaelement', {
+			webshim.setOptions('mediaelement', {
 				replaceUI: 'auto',
 				plugins: ['playlist']
 			});
 
-			webshims.polyfill('mediaelement');
+			webshim.polyfill('mediaelement');
 		</script>
 		<script>
-			webshims.ready('jquery', function(){
+			webshim.ready('jquery', function(){
 				if('ontouchstart' in window){
 					$('html').addClass('touchevents');
 				}
 			});
 		</script>
 		<script>
-			webshims.ready('playlist', function(){
+			webshim.ready('playlist', function(){
 				var playlist = $('.mediaplayer')
 					.eq(0)
 					.jmeFn('addPlaylist', 'mediaelement/playlist.json', {showcontrols: true, autoplay: true, ajax: {dataType: 'json'}})
@@ -159,8 +159,8 @@
 			<h2 id="Custom-ui-controls" class="header">Custom video controls for video and audio elements</h2>
 			<p>Custom controls for audio/video elements can controlled through the <code>replaceUI</code> option. This can be set to <code>true</code>, <code>false</code> or <code>"auto"</code>. If the string <code>"auto"</code> was used the custom controls are only loaded and replaced for devices with some CSS3 support (i.e.: not IE8) and where the following media query matches: <code>(min-device-width: 719px)</code> (i.e. not smartphones, but tablets).</p>
 <pre><code class="language-javascript">
-webshims.setOptions('mediaelement', {replaceUI: 'auto'});
-webshims.polyfill('mediaelement');
+webshim.setOptions('mediaelement', {replaceUI: 'auto'});
+webshim.polyfill('mediaelement');
 </code></pre>
 			<p>The controls are only added inside elements with a class <code>.mediaplayer</code> (This can be configured through the <code>selector</code> option).. While webshims might load basic styling for the custom controls. The basic styling of this wrapper element including the video element itself has to be done in the normal stylesheet:</p>
 
@@ -195,8 +195,8 @@ webshims.polyfill('mediaelement');
 &lt;/style&gt;
 
 &lt;script&gt;
-	webshims.setOptions('mediaelement', {replaceUI: 'auto'});
-	webshims.polyfill('mediaelement');
+	webshim.setOptions('mediaelement', {replaceUI: 'auto'});
+	webshim.polyfill('mediaelement');
 &lt;/script&gt;
 
 &lt;div class="mediaplayer"&gt;
@@ -210,13 +210,13 @@ webshims.polyfill('mediaelement');
 			<p>All controls option can be configured thorugh the <code>jme</code> option object (spelled Jamie = jQuery mediaelement).</p>
 			<p>For exmaple the <code>.mediaplayer</code> selector can be changed through the <code>selector</code> option.</p>
 <pre><code class="language-javascript">
-webshims.setOptions('mediaelement', {
+webshim.setOptions('mediaelement', {
 	jme: {
 		selector: '.myplayer' //.mediaplayer
 	}
 	replaceUI: 'auto'
 });
-webshims.polyfill('mediaelement');
+webshim.polyfill('mediaelement');
 </code></pre>
 			<p>While the controls are fully styleable through CSS, the markup can be controlled by changing the <code>barTemplate</code> option:</p>
 
@@ -227,17 +227,17 @@ webshims.polyfill('mediaelement');
 			<p>Webshims fully implements the mediaelement API, so that a developer can change the src attribute of a video element (using $.prop/$.attr) or creating new source elements and appending those (using $.appendPolyfill) after the ended event has occurred.</p>
 			<p>Webshims also comes with a playlist plugin, which makes it easy to create multiple playlist for a mediaplayer.</p>
 <pre><code class="language-javascript">
-webshims.setOptions('mediaelement', {
+webshim.setOptions('mediaelement', {
 	replaceUI: 'auto',
 	//request playlist plugin
 	plugins: ['playlist']
 });
 
 //start loading mediaelement including plugins
-webshims.polyfill('mediaelement');
+webshim.polyfill('mediaelement');
 
 //wait until the playlist feature + DOM is ready
-webshims.ready('playlist', function(){
+webshim.ready('playlist', function(){
 	/**
 	* Adding a playlist is done through the jmeFn's 'addPlaylist' method
 	* addPlaylist receives two arguments:

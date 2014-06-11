@@ -35,18 +35,18 @@
 			;
 		});
 
-		webshims.setOptions('forms', {
+		webshim.setOptions('forms', {
 			customDatalist: stateMatches[enhanceState]
 		});
 
-		webshims.setOptions('mediaelement', {
+		webshim.setOptions('mediaelement', {
 			replaceUI: stateMatches[enhanceState]
 		});
-		webshims.setOptions('track', {
+		webshim.setOptions('track', {
 			override: stateMatches[enhanceState]
 		});
 		if(enhanceState != 'nopolyfill'){
-			webshims.polyfill('mediaelement track forms');
+			webshim.polyfill('mediaelement track forms');
 		}
 	})();
 

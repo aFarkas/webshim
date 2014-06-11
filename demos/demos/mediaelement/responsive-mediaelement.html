@@ -96,9 +96,9 @@
 	<script src="../../../js-webshim/minified/polyfiller.js"></script>
 
 	<script>
-		webshims.setOptions('track', {override: 'auto'});
-		webshims.setOptions('mediaelement', {replaceUI: 'auto'});
-		webshims.polyfill('mediaelement');
+		webshim.setOptions('track', {override: 'auto'});
+		webshim.setOptions('mediaelement', {replaceUI: 'auto'});
+		webshim.polyfill('mediaelement');
 	</script>
 	<script>
 		if('ontouchstart' in window){
@@ -113,7 +113,7 @@
 				$('button.load-swf')
 					.prop('disabled', false)
 					.one('click', function(){
-						webshims.setOptions('mediaelement', {
+						webshim.setOptions('mediaelement', {
 							preferFlash: true
 						});
 						$('video').mediaLoad();
@@ -124,12 +124,12 @@
 				$('button.load-swf').remove();
 			}
 			$('button.load-jme').prop('disabled', false).one('click', function(){
-				webshims.loader.loadList(['mediacontrols']);
+				webshim.loader.loadList(['mediacontrols']);
 				$(this).prop('disabled', true);
 			});
 		});
 
-		webshims.ready('mediacontrols', function(){
+		webshim.ready('mediacontrols', function(){
 			$('button.load-jme').remove();
 		});
 	</script>

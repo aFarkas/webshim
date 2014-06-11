@@ -40,21 +40,21 @@
 				<label><input type="checkbox" class="include-initial" checked="" /> include initial fiels</label> 
 			</div>
 <textarea class="config">
-//webshims.setOptions
+//webshim.setOptions
 //for forms.customMessages and form-ext.replaceUI detection
-webshims.setOptions('waitReady', false);
-webshims.setOptions('forms', {
+webshim.setOptions('waitReady', false);
+webshim.setOptions('forms', {
 	lazyCustomMessages: true
 });
 
-webshims.setOptions('forms-ext', {
+webshim.setOptions('forms-ext', {
 	replaceUI: true
 });
 
-//webshims.activeLang
-webshims.activeLang('ar');
+//webshim.activeLang
+webshim.activeLang('ar');
 
-webshims.polyfill('forms forms-ext mediaelement');
+webshim.polyfill('forms forms-ext mediaelement');
 </textarea>
 			<button type="button" class="generate">generate</button>
 			<textarea class="output" name="js_code" readonly="">

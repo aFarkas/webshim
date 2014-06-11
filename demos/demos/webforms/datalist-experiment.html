@@ -41,7 +41,7 @@
 	<!--
 		<script src="../../../src/polyfiller.js"></script> 
 		<script>
-			webshims.setOptions('debug', 'noCombo');
+			webshim.setOptions('debug', 'noCombo');
 			//style calendar, datalist, validation bubble
 			//$('html').on('wspopoverbeforehide', false);
 		</script>
@@ -50,22 +50,22 @@
 		<script>
 			if((!Modernizr.input.list && !Modernizr.inputtypes.range) || location.search.indexOf('polyfillall') != -1){
 				$('html').addClass('custom-widgets');
-				webshims.setOptions('forms', {
+				webshim.setOptions('forms', {
 					//replace the default datalist feature with a custom styleable datalist
 					customDatalist: true
 				});
-				webshims.setOptions('forms-ext', {
+				webshim.setOptions('forms-ext', {
 					//replace all input type widgets with a custom styleable feature
 					replaceUI: true
 				});
 			}
 
-			webshims.setOptions('forms-ext', {
+			webshim.setOptions('forms-ext', {
 				types: 'range date time month color'
 			});
 
 			//load form polyfills
-			webshims.polyfill('forms forms-ext');
+			webshim.polyfill('forms forms-ext');
 		</script>
 
 	</head>
@@ -108,20 +108,20 @@
 				</p>
 				<p>This example is taken from <a href="http://demo.agektmr.com/datalist/">demo.agektmr.com/datalist/</a> and improved with webshims to make it cross browser.</p>
 				<p>With only one line of code, a developer can polyfill all incapable browsers:</p>
-				<pre>webshims.polyfill('forms forms-ext');</pre>
+				<pre>webshim.polyfill('forms forms-ext');</pre>
 				
 				<p>And with some small configuration. All input widgets can be turned into highly customizable form widgets in all browsers:</p>
-				<pre>webshims.setOptions('forms', {
+				<pre>webshim.setOptions('forms', {
 	//replace the default datalist feature with a custom styleable datalist
 	customDatalist: true
 });
-webshims.setOptions('forms-ext', {
+webshim.setOptions('forms-ext', {
 	//replace all input type widgets with a custom styleable feature
 	replaceUI: true // 'auto' || true || false (default)
 });
 
 //load form polyfills
-webshims.polyfill('forms forms-ext');</pre>
+webshim.polyfill('forms forms-ext');</pre>
 				<p class="polyfill-all"><a href="?polyfillall">Enhance/Polyfill/Customize all browsers (including modern browsers like Chrome)</a></p>
 			</div>
 			<h2>Examples</h2>

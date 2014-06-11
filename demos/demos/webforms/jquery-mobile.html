@@ -74,7 +74,7 @@
 	<script>
 		(function(){
 
-			webshims.setOptions('forms', {
+			webshim.setOptions('forms', {
 				//configure instantvalidation for jQuery mobile
 				iVal: {
 					// jQM; change iVal option for jQuery mobile
@@ -83,7 +83,7 @@
 				}
 			});
 			
-			webshims.setOptions('forms-ext', {
+			webshim.setOptions('forms-ext', {
 				//only use custom widgets if we do not see some mobile aspects
 				replaceUI: 'auto',
 				types: 'range date time number month',
@@ -104,29 +104,29 @@
 
 
 		//jQM: set waitReady to false
-		webshims.setOptions('waitReady', false);
+		webshim.setOptions('waitReady', false);
 
 		//jQM: set wsdoc to active page or false
-		webshims.setOptions('wsdoc', $('.ui-page-active').updatePolyfill().get(0) || false);
+		webshim.setOptions('wsdoc', $('.ui-page-active').updatePolyfill().get(0) || false);
 
 		//JQM: set ready event to pageinit
-		webshims.setOptions('readyEvt', 'pageinit');
+		webshim.setOptions('readyEvt', 'pageinit');
 
 		//jQM: update polyfills on pageinit and change active page
 		$(document).on('pageinit', function(e){
-			webshims.setOptions('wsdoc', e.target);
+			webshim.setOptions('wsdoc', e.target);
 			$(e.target).updatePolyfill();
 		});
 
 		//load all polyfill features
-		//or load only a specific feature with webshims.polyfill('feature-name');
-		webshims.polyfill('forms forms-ext');
+		//or load only a specific feature with webshim.polyfill('feature-name');
+		webshim.polyfill('forms forms-ext');
 
 
 		/**
 		 * jQM and webshims explanation
 		 *
-		 * 1. This is done by setting webshims.setOptions('waitReady', false); and calling webshims.polyfill after jQM was included.
+		 * 1. This is done by setting webshim.setOptions('waitReady', false); and calling webshim.polyfill after jQM was included.
 		 * 2. JQM has the concept of pages while webshims normally works on the hole document. To make sure webshims is updating only the active page (only needed in case of multiple pages inside a document), the wsdoc option should be set to the active page
 		 * 3. JQM dynamically loads new content and creates new pages, the wsdoc has to change on pageinit and updatePolyfill has to be called on this [new] page element
 		 */
@@ -151,7 +151,7 @@
 			<p>Webshims and jQuery mobile do a lot of tricks with form elements, which can conflict with each other. This page demonstrates how both libraries can be combined. Please read the source code and watch out for comments marked with <code>JQM:</code>.</p>
 			<p>The easiest way to get both libraries work friendly side by side is to make sure, that jQM enhances all form elements before webshims does.</p>
 			<ul>
-				<li>This is done by setting webshims.setOptions('waitReady', false); and calling webshims.polyfill after jQM was included.</li>
+				<li>This is done by setting webshim.setOptions('waitReady', false); and calling webshim.polyfill after jQM was included.</li>
 				<li>JQM has the concept of pages while webshims normally works on the hole document. To make sure webshims is updating only the active page (only needed in case of multiple pages inside a document), the wsdoc option should be set to the active page</li>
 				<li>JQM dynamically loads new content and creates new pages, the wsdoc has to change on pageinit and updatePolyfill has to be called on this [new] page element</li>
 			</ul>
@@ -161,23 +161,23 @@
 * JQM specific configuration of webshim:
 */
 //JQM: set waitReady to false
-webshims.setOptions('waitReady', false);
+webshim.setOptions('waitReady', false);
 
 //jQM: set wsdoc to active page or false
-webshims.setOptions('wsdoc', $('.ui-page-active').updatePolyfill().get(0) || false);
+webshim.setOptions('wsdoc', $('.ui-page-active').updatePolyfill().get(0) || false);
 
 //JQM: set ready event to pageinit
-webshims.setOptions('readyEvt', 'pageinit');
+webshim.setOptions('readyEvt', 'pageinit');
 
 //jQM: update polyfills on pageinit and change active page
 $(document).on('pageinit', function(e){
-	webshims.setOptions('wsdoc', e.target);
+	webshim.setOptions('wsdoc', e.target);
 	$(e.target).updatePolyfill();
 });
 
 //load all polyfill features
-//or load only a specific feature with webshims.polyfill('feature-name');
-webshims.polyfill('forms forms-ext');
+//or load only a specific feature with webshim.polyfill('feature-name');
+webshim.polyfill('forms forms-ext');
 </code></pre>
 			<form action="jquery-mobile.html" class="ws-validate">
 				<div data-role="fieldcontain">

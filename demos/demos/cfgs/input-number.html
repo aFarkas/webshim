@@ -17,25 +17,25 @@
 		<script src="../../../js-webshim/minified/polyfiller.js"></script>
 
 		<script>
-			webshims.setOptions('forms', {
+			webshim.setOptions('forms', {
 				lazyCustomMessages: true,
 				replaceValidationUI: true,
 				addValidators: true,
 				customDatalist: true
 			});
 			
-			webshims.setOptions('forms-ext', {
+			webshim.setOptions('forms-ext', {
 				replaceUI: true
 			});
 
 			// load the forms polyfill
-			webshims.polyfill('forms forms-ext');
+			webshim.polyfill('forms forms-ext');
 			
 		</script>
 		<script>
-			webshims.ready('jquery', function(){
-				webshims.loader.loadScript("../../demo-js/demo.js", false, false, true);
-				webshims.loader.loadScript("assets/cfg.js", false, false, true);
+			webshim.ready('jquery', function(){
+				webshim.loader.loadScript("../../demo-js/demo.js", false, false, true);
+				webshim.loader.loadScript("assets/cfg.js", false, false, true);
 			});
 		</script>
 	</head>
@@ -224,7 +224,7 @@
 										</div>
 										<div class="col-md-6">
 											<label class="form-label" for="lang">
-												webshims.activeLang();
+												webshim.activeLang();
 											</label>
 											<select class="active-lang form-control" id="lang"></select>
 										</div>
