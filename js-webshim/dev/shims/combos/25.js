@@ -1527,10 +1527,10 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	}
 
 	if(!featureOptions.swfpath){
-		featureOptions.swfpath = shimMoxiePath+'flash/Moxie.cdn.swf';
+		featureOptions.swfpath = shimMoxiePath+'flash/Moxie.min.swf';
 	}
 	if(!featureOptions.xappath){
-		featureOptions.xappath = shimMoxiePath+'silverlight/Moxie.cdn.xap';
+		featureOptions.xappath = shimMoxiePath+'silverlight/Moxie.min.xap';
 	}
 
 	if($.support.cors !== false || !window.XDomainRequest){
