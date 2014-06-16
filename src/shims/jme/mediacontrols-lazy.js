@@ -269,7 +269,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				var module = this;
 
 				var createFn = function(){
-					var time, durationChange, api, timeShow, wasPaused;
+					var time, durationChange, api, timeShow, wasPaused, hideTime;
 					var hasDuration = 'has-duration';
 					var duration = media.prop('duration');
 
@@ -325,7 +325,15 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 							base.addClass(module[pseudoClasses].no);
 						}
 					};
-
+					hideTime = function(){
+						setTimeout(function(){
+							timeShow.removeClass('show-time-select');
+							control.off('.jmetimeselect');
+							if(document.removeEventListener){
+								document.removeEventListener('touchend', hideTime, true);
+							}
+						});
+					};
 					api = control
 						.rangeUI({
 							min: 0,
@@ -345,8 +353,9 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 
 					control
 						.on({
-							'mouseenter': function(e){
-								if(hasDuration){
+							'mouseenter touchstart': function(e){
+								if(hasDuration && e.type != 'touchstart' || (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches.length == 1)){
+
 									var widgetLeft = (control.offset() || {left: 0}).left;
 									var widgetWidth = control.innerWidth();
 									var posLeft = function(x){
@@ -357,24 +366,24 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 										;
 									};
 
+									$.fn.rangeUI.normalizeTouch(e);
 									setTimeout(function(){
 										posLeft(e.pageX);
 										timeShow.addClass('show-time-select');
 									});
+									if(document.addEventListener){
+										document.addEventListener('touchend', hideTime, true);
+									}
 									control
 										.off('.jmetimeselect')
-										.on('mousemove.jmetimeselect', function(e){
+										.on('mousemove.jmetimeselect touchmove.jmetimeselect', function(e){
+											$.fn.rangeUI.normalizeTouch(e);
 											posLeft(e.pageX);
 										})
 									;
 								}
 							},
-							mouseleave: function(){
-								setTimeout(function(){
-									timeShow.removeClass('show-time-select');
-									control.off('.jmetimeselect');
-								});
-							}
+							'mouseleave touchend': hideTime
 						})
 					;
 

@@ -37,8 +37,8 @@ webshims.register('mediacontrols', function($, webshims, window){
 				cache[template] = template.replace(regTemplate, function(match, matchName){
 					var plugin = jme.plugins[matchName];
 					if(plugin){
-						webshims.warn('no structure option provided for plugin: '+ matchName +'. Fallback to standard div');
 						if(!plugin.structure){
+							webshims.warn('no structure option provided for plugin: '+ matchName +'. Fallback to standard div');
 							plugin.structure = unknowStructure;
 						}
 						return plugin.structure.replace('{%class%}', matchName).replace('{%text%}', plugin.text || '');
@@ -50,7 +50,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 			return cache[template] || '';
 		};
 	})();
-
+	var ios6 = /iP(hone|od|ad)/i.test(navigator.platform) && parseInt(((navigator.appVersion).match(/OS (\d+)_\d+/) || ['','8'])[1], 10) < 7;
 	var loadLazy = function(){
 		if(!loadLazy.loaded){
 			loadLazy.loaded = true;
@@ -96,8 +96,11 @@ webshims.register('mediacontrols', function($, webshims, window){
 				if(data._controlbar){
 					data._controlbar.appendTo(data.player);
 				} else {
+					if(ios6){
+						data.media.removeAttr('controls');
+						data.media.mediaLoad();
+					}
 					data.media.prop('controls', false);
-
 					structure = getBarHtml();
 					data._controlbar = $( options.barStructure );
 					controlBar = data._controlbar.find('div.jme-cb-box').addClass('media-controls');
