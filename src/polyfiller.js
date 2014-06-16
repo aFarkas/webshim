@@ -116,7 +116,7 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.14.2',
+		version: '1.14.3-pre',
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
 			//addCacheBuster: false,
@@ -1220,11 +1220,6 @@
 		addPolyfill('mediaelement-core', {
 			f: 'mediaelement',
 			noAutoCallback: true,
-			loadInit: function(){
-				//
-				var o = this.options;
-
-			},
 			options: {
 				//replaceUI: false,
 				jme: {},

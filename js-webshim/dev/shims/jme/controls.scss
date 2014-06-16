@@ -243,7 +243,7 @@ $browser-context: 16; // Default
 
 .jme-cb-box {
 	display: table-row;
-	> * {
+	> div {
 		display: table-cell;
 		padding: em(3.5);
 		vertical-align: middle;
@@ -307,9 +307,7 @@ $browser-context: 16; // Default
 }
 
 
-.audioplayer .media-controls .fullscreen-container,
-.mobile .media-controls .volume-container,
-.mobile.no-fullscreen .media-controls .fullscreen-container {
+.audioplayer .media-controls .fullscreen-container {
 	display: none;
 }
 
@@ -749,9 +747,6 @@ body.has-media-fullscreen {
 
 .mediaplayer[data-useractivity="false"][data-state="playing"].player-fullscreen {
 	cursor: none !important;
-	* {
-		cursor: none !important;
-	}
 }
 
 .media-fullscreen,

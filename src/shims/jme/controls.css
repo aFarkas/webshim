@@ -91,7 +91,7 @@
 
 .jme-cb-box {
   display: table-row; }
-  .jme-cb-box > * {
+  .jme-cb-box > div {
     display: table-cell;
     padding: 0.21875em;
     vertical-align: middle; }
@@ -137,9 +137,7 @@
     width: 100%;
     height: auto; }
 
-.audioplayer .media-controls .fullscreen-container,
-.mobile .media-controls .volume-container,
-.mobile.no-fullscreen .media-controls .fullscreen-container {
+.audioplayer .media-controls .fullscreen-container {
   display: none; }
 
 .mediaplayer button {
@@ -392,8 +390,6 @@ body.has-media-fullscreen {
 
 .mediaplayer[data-useractivity="false"][data-state="playing"].player-fullscreen {
   cursor: none !important; }
-  .mediaplayer[data-useractivity="false"][data-state="playing"].player-fullscreen * {
-    cursor: none !important; }
 
 .media-fullscreen,
 .player-fullscreen .polyfill-mediaelement,

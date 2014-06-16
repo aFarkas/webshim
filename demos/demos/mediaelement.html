@@ -137,6 +137,11 @@
 
 
 				<li>
+					- <a href="#Creating-Controls">Creating new controls</a>
+				</li>
+
+
+				<li>
 					- <a href="#Playlist">Creating a playlist</a>
 				</li>
 
@@ -183,7 +188,8 @@ webshim.polyfill('mediaelement');
 		width: 100%;
 	}
 
-	.touchevents .mediaplayer {
+	.touchevents .mediaplayer,
+	.touch .mediaplayer {
 		font-size: 24px;
 	}
 
@@ -206,7 +212,7 @@ webshim.polyfill('mediaelement');
 	&lt;/video&gt;
 &lt;/div&gt;
 </code></pre>
-			<h2 id="#Configuring-Controlbar">Configure the controlbar</h2>
+			<h2 id="Configuring-Controlbar">Configure the controlbar</h2>
 			<p>All controls option can be configured thorugh the <code>jme</code> option object (spelled Jamie = jQuery mediaelement).</p>
 			<p>For exmaple the <code>.mediaplayer</code> selector can be changed through the <code>selector</code> option.</p>
 <pre><code class="language-javascript">
@@ -221,6 +227,88 @@ webshim.polyfill('mediaelement');
 			<p>While the controls are fully styleable through CSS, the markup can be controlled by changing the <code>barTemplate</code> option:</p>
 
 			<iframe class="fiddle-example" width="100%" height="360" src="http://jsfiddle.net/trixta/5Jwhb/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<h2 id="Creating-Controls">Creating Controls</h2>
+			<p>Creating new controls for the jme mediaplayer is quite easy using the <code>$.jme.registerPlugin</code> method. Due to the fact, that jme is loaded async, the plugin regirstration has to be wrapped inside a <code>webshim.ready('jme', function(){});</code> call.</p>
+			<p>Let's create a control, which jumps the timeline by 10 seconds forward:</p>
+
+<pre><code class="language-javascript">
+webshim.setOptions('mediaelement', {
+	replaceUI: 'auto'
+});
+webshim.polyfill('mediaelement');
+
+webshim.ready('jme', function(){
+	//register a plugin named 'jump-10'
+	$.jme.registerPlugin('jump-10', {
+		_create: function($control, $media, $base){
+			$control.on('click', function(){
+				$media.prop('currentTime', $media.prop('currentTime') + 10);
+			});
+		}
+	});
+});
+</code></pre>
+			<p>The <code>_create</code> method of the plugin gets automatically passed your control element, the video/audio element and the .mediaplayer wrapper element. JME will automatically detect all elements with this class inside your mediaplayer and runs your create method on them. This means the code above will let your write the following HTML:</p>
+<pre><code class="language-markup">
+&lt;style&gt;
+	.jump-10 {
+		position: absolute;
+		top: 10px;
+		left: 10px;
+		background: #000;
+		color: #fff;
+		z-index: 99;
+		cursor: pointer;
+	}
+&lt;/style&gt;
+&lt;div class="mediaplayer videoplayer ratio-16-9"&gt;
+	&lt;button type="button" class="jump-10"&gt;jump&lt;/button&gt;
+	&lt;video controls preload="none" poster="/assets/media/sintel/sintel-trailer.jpg" style="height: 100%;"&gt;
+		&lt;source src="/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" /&gt;
+		&lt;source src="/assets/media/sintel/sintel-trailer.webm" type="video/webm" /&gt;
+	&lt;/video&gt;
+&lt;/div>
+</code></pre>
+			<p>To add your new control to the JME's controlbar, simply extend the <code>barTemplate</code> with your new named JME plugin.</p>
+
+<pre><code class="language-javascript">
+webshim.setOptions('mediaelement', {
+	replaceUI: 'auto',
+	jme: {
+		barTemplate: '&lt;div class="play-pause-container"&gt;{{play-pause}}&lt;/div&gt;' +
+		//here is your new jump-10 plugin:
+		'&lt;div class="jump-container"&gt;{{jump-10}}&lt;/div&gt;' +
+		'&lt;div class="playlist-container"&gt;&lt;div class="playlist-box"&gt;{{playlist-prev}}{{playlist-next}}&lt;/div&gt;&lt;/div&gt;' +
+		'&lt;div class="currenttime-container"&gt;{{currenttime-display}}&lt;/div&gt;' +
+		'&lt;div class="progress-container"&gt;{{time-slider}}&lt;/div&gt;' +
+		'&lt;div class="duration-container"&gt;{{duration-display}}&lt;/div&gt;' +
+		'&lt;div class="mute-container"&gt;{{mute-unmute}}&lt;/div&gt;' +
+		'&lt;div class="volume-container"&gt;{{volume-slider}}&lt;/div&gt;&lt;div class="subtitle-container"&gt;' +
+		'&lt;div class="subtitle-controls"&gt;{{captions}}&lt;/div&gt;&lt;/div&gt;' +
+		'&lt;div class="fullscreen-container"&gt;{{fullscreen}}&lt;/div&gt;'
+	}
+});
+
+webshim.polyfill('mediaelement');
+
+webshim.ready('jme', function(){
+	$.jme.registerPlugin('jump-10', {
+		//in most cases you also want to control the marup inside your controlbar
+		//therefore you need to add the 'structure' option:
+		structure: '&lt;button class="{%class%}" type="button"&gt;&amp;gt;&amp;gt;&lt;/button&gt;',
+		_create: function($control, $media, $base){
+			$control.on('click', function(){
+				$media.prop('currentTime', $media.prop('currentTime') + 10);
+			});
+		}
+	});
+});
+</code></pre>
+
+			<p>Here you find the full featured running example for a JME controlbar plugin:</p>
+
+			<iframe class="fiddle-example" width="100%" height="360" src="http://jsfiddle.net/trixta/tzg5Y/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
 
 
 			<h2 id="Playlist">Creating a playlist</h2>

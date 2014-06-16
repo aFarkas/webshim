@@ -49,7 +49,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					}
 
 					touch = changedTouches[0];
-					if(Math.abs(touchData.x - touch.pageX) > 40 || Math.abs(touchData.y - touch.pageY) > 40 || Date.now() - touchData.now > 600){
+					if(Math.abs(touchData.x - touch.pageX) > 40 || Math.abs(touchData.y - touch.pageY) > 40 || Date.now() - touchData.now > 300){
 						return;
 					}
 					e.preventDefault();
@@ -203,6 +203,19 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				control.wsTouchClick(function(e){
 					media.prop('muted', !media.prop('muted'));
 					e.stopPropagation();
+				});
+
+			}
+		},
+		'jme-media-overlay': {
+			_create: function(control, media, base){
+
+				control.wsTouchClick(function(e){
+					if(media.jmeProp('isPlaying') && base.attr('data-useractivity') != 'false'){
+						media.pause();
+					} else {
+						media.play();
+					}
 				});
 
 			}
@@ -1086,7 +1099,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				if(!data.bound){
 					jElm
 						.on('mouseleave.jmeuseractivity', setInactive)
-						.on('mousemove.jmeuseractivity focusin.jmeuseractivity mouseenter.jmeuseractivity keydown.jmeuseractivity keyup.jmeuseractivity mousedown.jmeuseractivity', setActive)
+						.on('touchend.jmeuseractivity setuseractive.jmeuseractivity mousemove.jmeuseractivity focusin.jmeuseractivity mouseenter.jmeuseractivity keydown.jmeuseractivity keyup.jmeuseractivity mousedown.jmeuseractivity', setActive)
 					;
 					data.bound = true;
 				}

@@ -3,19 +3,35 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	var props = {};
 	var fns = {};
 	var slice = Array.prototype.slice;
-
+	var readyLength = 0;
 	var options = $.extend({selector: '.mediaplayer'}, webshims.cfg.mediaelement.jme);
+	var baseSelector = options.selector;
+	
 	webshims.cfg.mediaelement.jme = options;
 
 
 	$.jme = {
+		pluginsClasses: [],
+		pluginsSel: '',
 		plugins: {},
+		props: props,
+		fns: fns,
 		data: function(elem, name, value){
 			var data = $(elem).data('jme') || $.data(elem, 'jme', {});
 			if(value === undefined){
 				return (name) ? data[name] : data;
 			} else {
 				data[name] = value;
+			}
+		},
+		runPlugin: function(sel){
+			if(readyLength){
+				$(document.querySelectorAll(baseSelector)).each(function(){
+					var controls = this.querySelectorAll(sel);
+					if(controls.length){
+						$(this).jmeFn('addControls', controls);
+					}
+				});
 			}
 		},
 		registerPlugin: function(name, plugin){
@@ -27,6 +43,10 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				plugin.className = name;
 			}
 
+			this.pluginsClasses.push('.'+plugin.className);
+
+			this.pluginsSel = this.pluginsClasses.join(', ');
+
 			options[name] = $.extend(plugin.options || {}, options[name]);
 
 			if(options[name] && options[name].text){
@@ -34,6 +54,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			} else if(options.i18n && options.i18n[name]){
 				plugin.text = options.i18n[name];
 			}
+			this.runPlugin('.'+plugin.className);
 		},
 		defineMethod: function(name, fn){
 			fns[name] = fn;
@@ -100,10 +121,8 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	};
 
 
-	var baseSelector = options.selector;
-
 	$.jme.initJME = function(context, insertedElement){
-		$(baseSelector, context).add(insertedElement.filter(baseSelector)).jmePlayer();
+		readyLength += $(context.querySelectorAll(baseSelector)).add(insertedElement.filter(baseSelector)).jmePlayer().length;
 	};
 
 
@@ -286,7 +305,9 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 						base.attr('data-volume', volume);
 					})
 				;
-
+				if($.jme.pluginsSel){
+					base.jmeFn('addControls', $(base[0].querySelectorAll($.jme.pluginsSel)));
+				}
 				if(mediaUpdateFn){
 					media.on('updateJMEState', mediaUpdateFn).triggerHandler('updateJMEState');
 				}
@@ -365,37 +386,43 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		if(!data.media){return;}
 		var oldControls = $.jme.data(data.player[0], 'controlElements') || $([]);
 		controls = $(controls);
-		$.each($.jme.plugins, function(name, plugin){
-			controls
-				.filter('.'+plugin.className)
-				.add(controls.find('.'+plugin.className))
-				.each(function(){
-					var control = $(this);
-					var options = $.jme.data(this);
+		if($.jme.pluginsSel){
+			controls = controls.find($.jme.pluginsSel).add(controls.filter($.jme.pluginsSel));
+		}
+		if(controls.length){
+			$.each($.jme.plugins, function(name, plugin){
+				var control, options, i, opt;
+				var pluginControls = controls.filter('.'+plugin.className);
+
+				for(i = 0; i < pluginControls.length; i++){
+					control = $(pluginControls[i]);
+					options = $.jme.data(pluginControls[i]);
 					options.player = data.player;
 					options.media = data.media;
-					if(options._rendered){return;}
-					options._rendered = true;
+					if(!options._rendered){
+						options._rendered = true;
 
-					if(plugin.options){
-						$.each(plugin.options, function(option, value){
-							if(!(option in options)){
-								options[option] = value;
+						if(plugin.options){
+							for(opt in plugin.options){
+								if(!(opt in options)){
+									options[opt] = plugin.options[opt];
+								}
 							}
-						});
+						}
+
+						plugin._create(control, data.media, data.player, options);
 					}
-					plugin._create(control, data.media, data.player, options);
-					control = null;
-				})
-			;
-		});
+				}
 
-		$.jme.data(data.player[0], 'controlElements', oldControls.add(controls));
+			});
 
-		data.player.triggerHandler('controlsadded');
+			$.jme.data(data.player[0], 'controlElements', oldControls.add(controls));
+
+			data.player.triggerHandler('controlsadded');
+		}
 	});
 
-
+	webshims.isReady('jme', true);
 	webshims.addReady($.jme.initJME);
 	webshims._polyfill(['mediaelement']);
 });
@@ -405,7 +432,8 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 
 	var options = webshims.cfg.mediaelement.jme;
 	var baseSelector = options.selector;
-
+	var jme = $.jme;
+	var unknowStructure = '<div class="{%class%}"></div>'
 	var btnStructure = '<button class="{%class%}" type="button" aria-label="{%text%}"></button>';
 	var slideStructure = '<div class="{%class%} media-range"></div>';
 	var timeStructure = '<div  class="{%class%}">00:00</div>';
@@ -413,10 +441,14 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	var noVolumeClass = (function(){
 		var audio;
 		var ret = '';
-		if(typeof window.Audio == 'function'){
-			audio = new Audio();
-			audio.volume = 0.55;
-			ret = audio.volume = 0.55 ? '' : ' no-volume-api';
+
+		if(window.Audio){
+			try {
+				audio = new Audio();
+				audio.volume = 0.55;
+				ret = audio.volume == 0.55 ? '' : ' no-volume-api';
+			} catch(e){}
+
 		}
 		return ret;
 	})();
@@ -431,8 +463,12 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			}
 			if(!cache[template] || invalidCache){
 				cache[template] = template.replace(regTemplate, function(match, matchName){
-					var plugin = $.jme.plugins[matchName];
-					if(plugin && plugin.structure){
+					var plugin = jme.plugins[matchName];
+					if(plugin){
+						webshims.warn('no structure option provided for plugin: '+ matchName +'. Fallback to standard div');
+						if(!plugin.structure){
+							plugin.structure = unknowStructure;
+						}
 						return plugin.structure.replace('{%class%}', matchName).replace('{%text%}', plugin.text || '');
 					}
 					return match;
@@ -468,13 +504,6 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		return rfn;
 	};
 
-	if(!options.barTemplate){
-		options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box">{{playlist-prev}}{{playlist-next}}</div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="subtitle-container"><div class="subtitle-controls">{{captions}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
-	}
-	if(!options.barStructure){
-		options.barStructure = '<div class="jme-media-overlay"></div><div class="jme-controlbar'+ noVolumeClass +'" tabindex="-1"><div class="jme-cb-box"></div></div>';
-	}
-
 	webshims.loader.addModule('mediacontrols-lazy', {
 		src: 'jme/mediacontrols-lazy'
 	});
@@ -482,13 +511,13 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	var userActivity = {
 		_create: lazyLoadPlugin()
 	};
-	$.jme.plugins.useractivity = userActivity;
+	jme.plugins.useractivity = userActivity;
 
-	$.jme.defineProp('controlbar', {
+	jme.defineProp('controlbar', {
 		set: function(elem, value){
 			value = !!value;
 			var controls, playerSize;
-			var data = $.jme.data(elem);
+			var data = jme.data(elem);
 			var controlBar = $('div.jme-mediaoverlay, div.jme-controlbar', data.player);
 			var structure = '';
 			if(value && !controlBar[0]){
@@ -500,7 +529,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					structure = getBarHtml();
 					data._controlbar = $( options.barStructure );
 					controlBar = data._controlbar.find('div.jme-cb-box').addClass('media-controls');
-					controls = data._controlbar.filter('.jme-media-overlay').addClass('play-pause');
+					controls = data._controlbar.filter('.jme-media-overlay');
 					controls =  controls.add( controlBar );
 					$(structure).appendTo(controlBar);
 					data._controlbar.appendTo(data.player);
@@ -556,28 +585,34 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		}
 	});
 
-	$.jme.registerPlugin('play-pause', {
+	jme.registerPlugin('play-pause', {
 
 		structure: btnStructure,
 		text: 'play / pause',
 		_create: lazyLoadPlugin()
 	});
 
-	$.jme.registerPlugin('mute-unmute', {
+	jme.registerPlugin('mute-unmute', {
 
 		structure: btnStructure,
 		text: 'mute / unmute',
 		_create: lazyLoadPlugin()
 	});
 
+	jme.registerPlugin('jme-media-overlay', {
+		_create: lazyLoadPlugin()
+	});
 
-	$.jme.registerPlugin('volume-slider', {
+
+
+
+	jme.registerPlugin('volume-slider', {
 		structure: slideStructure,
 
 		_create: lazyLoadPlugin()
 	});
 
-	$.jme.registerPlugin('time-slider', {
+	jme.registerPlugin('time-slider', {
 		structure: slideStructure,
 
 		options: {
@@ -587,12 +622,12 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	});
 
 
-	$.jme.defineProp('format', {
+	jme.defineProp('format', {
 		set: function(elem, format){
 			if(!$.isArray(format)){
 				format = format.split(':');
 			}
-			var data = $.jme.data(elem);
+			var data = jme.data(elem);
 			data.format = format;
 			$(elem).triggerHandler('updatetimeformat');
 			data.player.triggerHandler('updatetimeformat');
@@ -600,7 +635,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		}
 	});
 
-	$.jme.registerPlugin('duration-display', {
+	jme.registerPlugin('duration-display', {
 		structure: timeStructure,
 		options: {
 			format: "mm:ss"
@@ -608,10 +643,10 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		_create: lazyLoadPlugin()
 	});
 
-	$.jme.defineProp('countdown', {
+	jme.defineProp('countdown', {
 		set: function(elem, value){
 
-			var data = $.jme.data(elem);
+			var data = jme.data(elem);
 			data.countdown = !!value;
 			$(elem).triggerHandler('updatetimeformat');
 			data.player.triggerHandler('updatetimeformat');
@@ -619,7 +654,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		}
 	});
 
-	$.jme.registerPlugin('currenttime-display', {
+	jme.registerPlugin('currenttime-display', {
 		structure: timeStructure,
 		options: {
 			format: "mm:ss",
@@ -638,7 +673,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	 * the old technique wasn't fully bullet proof
 	 * beside this, jme2 adovactes to use the new improved state-classes to handle visual effect on specific state (see CSS change)
 	 */
-	$.jme.registerPlugin('poster-display', {
+	jme.registerPlugin('poster-display', {
 		structure: '<div />',
 		options: {
 		},
@@ -646,7 +681,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	});
 
 
-	$.jme.registerPlugin('fullscreen', {
+	jme.registerPlugin('fullscreen', {
 
 		options: {
 			fullscreen: true,
@@ -658,7 +693,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	});
 
 
-	$.jme.registerPlugin('captions', {
+	jme.registerPlugin('captions', {
 		structure: btnStructure,
 		text: 'subtitles',
 		_create: function(control, media, base){
@@ -671,6 +706,13 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	});
 
 	webshims.ready(webshims.cfg.mediaelement.plugins.concat(['mediaelement']), function(){
+		if(!options.barTemplate){
+			options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box">{{playlist-prev}}{{playlist-next}}</div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="subtitle-container"><div class="subtitle-controls">{{captions}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
+		}
+		if(!options.barStructure){
+			options.barStructure = '<div class="jme-media-overlay"></div><div class="jme-controlbar'+ noVolumeClass +'" tabindex="-1"><div class="jme-cb-box"></div></div>';
+		}
+
 		webshims.addReady(function(context, insertedElement){
 			$(baseSelector, context).add(insertedElement.filter(baseSelector)).jmeProp('controlbar', true);
 		});

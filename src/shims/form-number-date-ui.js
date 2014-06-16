@@ -1118,7 +1118,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					}
 
 					touch = changedTouches[0];
-					if(Math.abs(touchData.x - touch.pageX) > 40 || Math.abs(touchData.y - touch.pageY) > 40 || Date.now() - touchData.now > 600){
+					if(Math.abs(touchData.x - touch.pageX) > 40 || Math.abs(touchData.y - touch.pageY) > 40 || Date.now() - touchData.now > 300){
 						return;
 					}
 					e.preventDefault();

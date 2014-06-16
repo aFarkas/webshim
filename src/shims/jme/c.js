@@ -4,7 +4,8 @@ webshims.register('mediacontrols', function($, webshims, window){
 
 	var options = webshims.cfg.mediaelement.jme;
 	var baseSelector = options.selector;
-
+	var jme = $.jme;
+	var unknowStructure = '<div class="{%class%}"></div>'
 	var btnStructure = '<button class="{%class%}" type="button" aria-label="{%text%}"></button>';
 	var slideStructure = '<div class="{%class%} media-range"></div>';
 	var timeStructure = '<div  class="{%class%}">00:00</div>';
@@ -12,10 +13,14 @@ webshims.register('mediacontrols', function($, webshims, window){
 	var noVolumeClass = (function(){
 		var audio;
 		var ret = '';
-		if(typeof window.Audio == 'function'){
-			audio = new Audio();
-			audio.volume = 0.55;
-			ret = audio.volume = 0.55 ? '' : ' no-volume-api';
+
+		if(window.Audio){
+			try {
+				audio = new Audio();
+				audio.volume = 0.55;
+				ret = audio.volume == 0.55 ? '' : ' no-volume-api';
+			} catch(e){}
+
 		}
 		return ret;
 	})();
@@ -30,8 +35,12 @@ webshims.register('mediacontrols', function($, webshims, window){
 			}
 			if(!cache[template] || invalidCache){
 				cache[template] = template.replace(regTemplate, function(match, matchName){
-					var plugin = $.jme.plugins[matchName];
-					if(plugin && plugin.structure){
+					var plugin = jme.plugins[matchName];
+					if(plugin){
+						webshims.warn('no structure option provided for plugin: '+ matchName +'. Fallback to standard div');
+						if(!plugin.structure){
+							plugin.structure = unknowStructure;
+						}
 						return plugin.structure.replace('{%class%}', matchName).replace('{%text%}', plugin.text || '');
 					}
 					return match;
@@ -67,13 +76,6 @@ webshims.register('mediacontrols', function($, webshims, window){
 		return rfn;
 	};
 
-	if(!options.barTemplate){
-		options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box">{{playlist-prev}}{{playlist-next}}</div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="subtitle-container"><div class="subtitle-controls">{{captions}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
-	}
-	if(!options.barStructure){
-		options.barStructure = '<div class="jme-media-overlay"></div><div class="jme-controlbar'+ noVolumeClass +'" tabindex="-1"><div class="jme-cb-box"></div></div>';
-	}
-
 	webshims.loader.addModule('mediacontrols-lazy', {
 		src: 'jme/mediacontrols-lazy'
 	});
@@ -81,13 +83,13 @@ webshims.register('mediacontrols', function($, webshims, window){
 	var userActivity = {
 		_create: lazyLoadPlugin()
 	};
-	$.jme.plugins.useractivity = userActivity;
+	jme.plugins.useractivity = userActivity;
 
-	$.jme.defineProp('controlbar', {
+	jme.defineProp('controlbar', {
 		set: function(elem, value){
 			value = !!value;
 			var controls, playerSize;
-			var data = $.jme.data(elem);
+			var data = jme.data(elem);
 			var controlBar = $('div.jme-mediaoverlay, div.jme-controlbar', data.player);
 			var structure = '';
 			if(value && !controlBar[0]){
@@ -99,7 +101,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 					structure = getBarHtml();
 					data._controlbar = $( options.barStructure );
 					controlBar = data._controlbar.find('div.jme-cb-box').addClass('media-controls');
-					controls = data._controlbar.filter('.jme-media-overlay').addClass('play-pause');
+					controls = data._controlbar.filter('.jme-media-overlay');
 					controls =  controls.add( controlBar );
 					$(structure).appendTo(controlBar);
 					data._controlbar.appendTo(data.player);
@@ -155,28 +157,34 @@ webshims.register('mediacontrols', function($, webshims, window){
 		}
 	});
 
-	$.jme.registerPlugin('play-pause', {
+	jme.registerPlugin('play-pause', {
 
 		structure: btnStructure,
 		text: 'play / pause',
 		_create: lazyLoadPlugin()
 	});
 
-	$.jme.registerPlugin('mute-unmute', {
+	jme.registerPlugin('mute-unmute', {
 
 		structure: btnStructure,
 		text: 'mute / unmute',
 		_create: lazyLoadPlugin()
 	});
 
+	jme.registerPlugin('jme-media-overlay', {
+		_create: lazyLoadPlugin()
+	});
 
-	$.jme.registerPlugin('volume-slider', {
+
+
+
+	jme.registerPlugin('volume-slider', {
 		structure: slideStructure,
 
 		_create: lazyLoadPlugin()
 	});
 
-	$.jme.registerPlugin('time-slider', {
+	jme.registerPlugin('time-slider', {
 		structure: slideStructure,
 
 		options: {
@@ -186,12 +194,12 @@ webshims.register('mediacontrols', function($, webshims, window){
 	});
 
 
-	$.jme.defineProp('format', {
+	jme.defineProp('format', {
 		set: function(elem, format){
 			if(!$.isArray(format)){
 				format = format.split(':');
 			}
-			var data = $.jme.data(elem);
+			var data = jme.data(elem);
 			data.format = format;
 			$(elem).triggerHandler('updatetimeformat');
 			data.player.triggerHandler('updatetimeformat');
@@ -199,7 +207,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 		}
 	});
 
-	$.jme.registerPlugin('duration-display', {
+	jme.registerPlugin('duration-display', {
 		structure: timeStructure,
 		options: {
 			format: "mm:ss"
@@ -207,10 +215,10 @@ webshims.register('mediacontrols', function($, webshims, window){
 		_create: lazyLoadPlugin()
 	});
 
-	$.jme.defineProp('countdown', {
+	jme.defineProp('countdown', {
 		set: function(elem, value){
 
-			var data = $.jme.data(elem);
+			var data = jme.data(elem);
 			data.countdown = !!value;
 			$(elem).triggerHandler('updatetimeformat');
 			data.player.triggerHandler('updatetimeformat');
@@ -218,7 +226,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 		}
 	});
 
-	$.jme.registerPlugin('currenttime-display', {
+	jme.registerPlugin('currenttime-display', {
 		structure: timeStructure,
 		options: {
 			format: "mm:ss",
@@ -237,7 +245,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 	 * the old technique wasn't fully bullet proof
 	 * beside this, jme2 adovactes to use the new improved state-classes to handle visual effect on specific state (see CSS change)
 	 */
-	$.jme.registerPlugin('poster-display', {
+	jme.registerPlugin('poster-display', {
 		structure: '<div />',
 		options: {
 		},
@@ -245,7 +253,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 	});
 
 
-	$.jme.registerPlugin('fullscreen', {
+	jme.registerPlugin('fullscreen', {
 
 		options: {
 			fullscreen: true,
@@ -257,7 +265,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 	});
 
 
-	$.jme.registerPlugin('captions', {
+	jme.registerPlugin('captions', {
 		structure: btnStructure,
 		text: 'subtitles',
 		_create: function(control, media, base){
@@ -270,6 +278,13 @@ webshims.register('mediacontrols', function($, webshims, window){
 	});
 
 	webshims.ready(webshims.cfg.mediaelement.plugins.concat(['mediaelement']), function(){
+		if(!options.barTemplate){
+			options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box">{{playlist-prev}}{{playlist-next}}</div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="subtitle-container"><div class="subtitle-controls">{{captions}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
+		}
+		if(!options.barStructure){
+			options.barStructure = '<div class="jme-media-overlay"></div><div class="jme-controlbar'+ noVolumeClass +'" tabindex="-1"><div class="jme-cb-box"></div></div>';
+		}
+
 		webshims.addReady(function(context, insertedElement){
 			$(baseSelector, context).add(insertedElement.filter(baseSelector)).jmeProp('controlbar', true);
 		});
