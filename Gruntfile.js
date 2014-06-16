@@ -3,7 +3,7 @@ module.exports = function(grunt){
 	var DISTPATH = "js-webshim";
 	var MINPATH = DISTPATH+"/minified";
 	var DEVPATH = DISTPATH+"/dev";
-	
+
 	// Project configuration.
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
@@ -50,6 +50,22 @@ module.exports = function(grunt){
 			}
 		},
 		cssmin: getFiles('src', MINPATH, '**/*.css'),
+		csslint: {
+			css: {
+				options: {
+
+				},
+				src: ['src/**/*.css']
+			}
+		},
+		jshint: {
+			strict: {
+				options: {
+					eqnull: true
+				},
+				src: ['src/*.js', 'src/shims/*.js', 'src/jme/*.js', 'src/i18n/*.js', '!src/shims/promise.js', '!src/shims/sizzle.js', '!src/shims/picture.js']
+			}
+		},
 		sass: {
 			dist: { 
 				files:[{
@@ -251,10 +267,16 @@ module.exports = function(grunt){
 
 	grunt.registerTask('versionreplace', 'replace version', function() {
 		var reg = /<span class=\"ws-version\">[\d\.\-a-zA-Z]+<\/span>/g;
-		var replace = '<span class="ws-version">'+ grunt.config('pkg').version +'</span>';
-		grunt.file.expand({cwd: 'demos/', matchBase: true}, '*.html').forEach(function(path) {
+		var version = grunt.config('pkg').version;
+		var replace = '<span class="ws-version">'+ version +'</span>';
+
+		//var newUrl = 'https://github.com/aFarkas/webshim/archive/'+ version +'.zip';
+		//var regUrl = /https:\/\/github\.com\/aFarkas\/webshim\/archive\/(\d+\.\d+\.\d+[\-RC\d]*)\.zip/g;
+
+		grunt.file.expand({cwd: '/demos', matchBase: true}, '*.html').forEach(function(path) {
 			var code = grunt.file.read('demos/'+path);
 			code = code.replace(reg, replace);
+			//code = code.replace(regUrl, newUrl);
 			grunt.file.write('demos/'+path, code);
 
 		});
@@ -272,6 +294,8 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-contrib-compress');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-bytesize');
+	grunt.loadNpmTasks('grunt-contrib-csslint');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
 	
 	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'versionreplace', 'bytesize']);
 
