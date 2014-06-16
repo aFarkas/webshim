@@ -477,7 +477,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 						e.preventDefault();
 					}
 				},
-				ws__input: (this.type == 'color' && this.isValid) ? $.noop : (function(){
+				ws__input: (this.type == 'color' || !this.isValid) ? $.noop : (function(){
 					var timer;
 					var delay = that.type == 'number' && !o.nogrouping ? 99 : 199;
 					var check = function(){

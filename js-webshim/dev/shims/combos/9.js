@@ -2017,6 +2017,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			return webshims.getID(this);
 		};
 		return function(element, labels, noFocus){
+
 			$(element).attr({'aria-labelledby': labels.map(getId).get().join(' ')});
 			if(!noFocus){
 				labels.on('click', function(e){
@@ -3763,6 +3764,32 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				;
 			});
 		};
+
+
+		if($('<input />').prop('labels') == null){
+			webshims.defineNodeNamesProperty('button, input, keygen, meter, output, progress, select, textarea', 'labels', {
+				prop: {
+					get: function(){
+						if(this.type == 'hidden'){return null;}
+						var id = this.id;
+						var labels = $(this)
+								.closest('label')
+								.filter(function(){
+									var hFor = (this.attributes['for'] || {});
+									return (!hFor.specified || hFor.value == id);
+								})
+							;
+
+						if(id) {
+							labels = labels.add('label[for="'+ id +'"]');
+						}
+						return labels.get();
+					},
+					writeable: false
+				}
+			});
+		}
+
 		if(formcfg._isLoading){
 			$(formcfg).one('change', init);
 		} else {
