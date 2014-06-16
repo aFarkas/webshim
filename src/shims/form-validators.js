@@ -182,17 +182,28 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 	};
 	var testValidityRules = webshims.refreshCustomValidityRules;
 
-	if(typeof document.activeElement != 'unknown'){
-		$('body').on('click', function(e){
-			if(e.target.type == 'submit'){
-				var activeElement = document.activeElement;
 
-				if(activeElement != e.target && $.data(activeElement, 'webshimsswitchvalidityclass')){
-					$(activeElement).trigger('updatevalidation.webshims');
+	$('body').on('click', function(e){
+		if(e.target.type == 'submit' && !e.isDefaultPrevented()){
+			var activeElement, i, len;
+			var elements = $(e.target).jProp('form').prop('elements') || [];
+			try {
+				activeElement = document.activeElement;
+			} catch(e){}
+
+			for(i = 0, len = elements.length; i < len; i++){
+				if($.data(elements[i], 'customMismatchedRule')){
+					if(activeElement == elements[i]){
+						$(elements[i]).trigger('updatevalidation.webshims');
+					} else {
+						testValidityRules(elements[i]);
+					}
 				}
 			}
-		});
-	}
+
+		}
+	});
+
 	
 	webshims.ready('forms form-validation', function(){
 		
