@@ -1869,12 +1869,13 @@ var getGroupElements = function(elem){
 		} else {
 			form = elem.prop('form');
 			ret = $(document.getElementsByName(name)).filter(function(){
-				return this.type == 'radio' && this.name == name && $.prop(this, 'form') == form;
+				return this.type == 'radio' && $.prop(this, 'form') == form && this.name == name;
 			});
 		}
 	}
 	return ret;
 };
+
 var patternTypes = {url: 1, email: 1, text: 1, search: 1, tel: 1, password: 1};
 var lengthTypes = $.extend({textarea: 1}, patternTypes);
 
@@ -1952,6 +1953,8 @@ $.each({typeMismatch: 'mismatch', badInput: 'bad'}, function(name, fn){
 		return ret;
 	};
 });
+
+webshims.modules["form-core"].getGroupElements = getGroupElements;
 
 webshims.addValidityRule = function(type, fn){
 	validityRules[type] = fn;
@@ -3427,11 +3430,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		}
 	};
 	
-	
-	$.fn.loadMediaSrc = function(){
-		webshims.error('loadMediaSrc was removed.');
-	};
-	
 	mediaelement.swfMimeTypes = ['video/3gpp', 'video/x-msvideo', 'video/quicktime', 'video/x-m4v', 'video/mp4', 'video/m4p', 'video/x-flv', 'video/flv', 'audio/mpeg', 'audio/aac', 'audio/mp4', 'audio/x-m4a', 'audio/m4a', 'audio/mp3', 'audio/x-fla', 'audio/fla', 'youtube/flv', 'video/jarisplayer', 'jarisplayer/jarisplayer', 'video/youtube', 'video/rtmp', 'audio/rtmp'];
 	
 	mediaelement.canThirdPlaySrces = function(mediaElem, srces){
@@ -3489,7 +3487,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				message = "can't play sources";
 			}
 			$(elem).pause().data('mediaerror', message);
-			webshims.error('mediaelementError: '+ message);
+			webshims.error('mediaelementError: '+ message +'. Run the following line in your console to get more info: webshim.mediaelement.loadDebugger();');
 			setTimeout(function(){
 				if($(elem).data('mediaerror')){
 					$(elem).addClass('media-error').trigger('mediaerror');
@@ -3577,7 +3575,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		setTimeout(function(){
 			if( $.prop(e.target, 'paused') || !$.prop(e.target, 'loop') ){return;}
 			$(e.target).prop('currentTime', 0).play();
-		}, 1);
+		});
 		
 	});
 	
@@ -3617,6 +3615,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 						}
 					}
 				});
+
 				nativeCanPlayType[nodeName] = webshims.defineNodeNameProperty(nodeName, 'canPlayType',  {
 					prop: {
 						value: function(type){
@@ -3632,6 +3631,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 								if(mediaelement.swfMimeTypes.indexOf(type) != -1){
 									ret = 'maybe';
 								}
+							}
+							if(!ret && hasYt && type == 'video/youtube'){
+								ret = 'maybe';
 							}
 							return ret;
 						}
@@ -3682,7 +3684,16 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			});
 		}
 	};
-	
+
+	mediaelement.loadDebugger = function(){
+		webshims.ready('dom-support', function(){
+			webshims.loader.loadScript('mediaelement-debug');
+		});
+	};
+
+	if(webshims.cfg.debug){
+		webshims.ready('WINDOWLOAD', mediaelement.loadDebugger);
+	}
 
 	//set native implementation ready, before swf api is retested
 	if(hasNative){

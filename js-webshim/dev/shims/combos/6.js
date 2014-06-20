@@ -1624,7 +1624,6 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 			return webshims.getID(this);
 		};
 		return function(element, labels, noFocus){
-
 			$(element).attr({'aria-labelledby': labels.map(getId).get().join(' ')});
 			if(!noFocus){
 				labels.on('click', function(e){

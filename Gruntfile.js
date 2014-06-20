@@ -53,7 +53,16 @@ module.exports = function(grunt){
 		csslint: {
 			css: {
 				options: {
-
+					'adjoining-classes': false,
+					'outline-none': false,
+					'box-model': false,
+					'compatible-vendor-prefixes': false,
+					'box-sizing': false,
+					'overqualified-elements': false,
+					ids: false,
+					'qualified-headings': false,
+					'unique-headings': false,
+					important: false
 				},
 				src: ['src/**/*.css']
 			}
@@ -67,7 +76,10 @@ module.exports = function(grunt){
 			}
 		},
 		sass: {
-			dist: { 
+			options: {
+				style: 'expanded'
+			},
+			dist: {
 				files:[{
 					expand : true,
 					cwd : 'src/shims/styles/scss',

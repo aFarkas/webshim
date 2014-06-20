@@ -734,8 +734,7 @@ $browser-context: 16; // Default
 }
 
 
-html.has-media-fullscreen,
-body.has-media-fullscreen {
+.has-media-fullscreen {
 	overflow: hidden;
 }
 

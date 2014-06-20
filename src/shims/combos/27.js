@@ -281,46 +281,17 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 						$.removeData(form, 'webshimsAddedElements');
 					}
 				};
-				var formCache = (function(){
 
-					var prefix = '_wscache';
-					var cache = [];
-					return {
-						set: function(elem, name, value){
-							name = prefix+name;
-							elem[name] = value;
-							cache.push(function(){
-								if(name in elem){
-									delete elem[name];
-								}
-							});
-							setTimeout(formCache.clear, 9);
-							return value;
-						},
-						get: function(elem, name){
-							return elem[prefix+name];
-						},
-						clear: function(){
-							while(cache.length){
-								cache.shift()();
-							}
-						}
-					};
-				})();
 				var getAssociatedForm = function () {
-					var form = formCache.get(this, 'form');
-					if(form){return form;}
-					form = webshims.contentAttr(this, 'form');
+					var form = webshims.contentAttr(this, 'form');
 					if(form){
 						form = document.getElementById(form);
 						if(form && !$.nodeName(form, 'form')){
 							form = null;
 						}
 					}
-
-					return formCache.set(this, 'form', form || this.form);
+					return form || this.form;
 				};
-
 				webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'button', 'fieldset'], 'form', {
 					prop: {
 						get: getAssociatedForm,
@@ -328,19 +299,12 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 					}
 				});
 
-				webshims.onNodeNamesPropertyModify(['input', 'textarea', 'select'], 'form', formCache.clear);
-
-				webshims.addReady(formCache.clear);
-
 				webshims.defineNodeNamesProperty(['form'], 'elements', {
 					prop: {
 						get: function(){
-							var id = this.id;
-							var elementsId = 'elements'+id;
-							var cached = formCache.get(this, elementsId);
-							if(cached){return cached;}
+							//TODO: cache + perftest
 							var sel, addElements, detachElements, formElements, i, len;
-
+							var id = this.id;
 							var elements = [];
 							if(id){
 								detachElements = $.data(this, 'webshimsAddedElements');
@@ -372,8 +336,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 									detachElements.appendTo(this);
 								}
 							}
-
-							return formCache.set(this, elementsId, elements);
+							return elements;
 						},
 						writeable: false
 					}
@@ -1237,7 +1200,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 
 
 				}
-			;
+				;
 			var observe = function(newInput){
 				unbind();
 

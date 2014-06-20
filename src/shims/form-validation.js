@@ -9,9 +9,6 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	
 	var iVal = options.iVal;
 
-	if(!iVal.fieldWrapper){
-		iVal.fieldWrapper = ':not(span):not(label):not(em):not(strong):not(p):not(.ws-custom-file)';
-	}
 	var invalidClass = iVal.errorClass || (iVal.errorClass = 'user-error');
 	var validClass = iVal.successClass || (iVal.successClass = 'user-success');
 	
@@ -30,8 +27,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	var nonFormFilter = function(){
 		return !$.prop(this, 'form');
 	};
-	//TODO: cache + perftest
-	var getGroupElements = function(elem){
+	var getGroupElements = webshims.modules["form-core"].getGroupElements || function(elem){
 		elem = $(elem);
 		var name;
 		var form;
@@ -200,6 +196,14 @@ webshims.register('form-validation', function($, webshims, window, document, und
 
 	if(iVal.events){
 		iVal.events += ' ';
+	}
+
+	if(!iVal.fieldWrapper){
+		iVal.fieldWrapper = ':not(span):not(label):not(em):not(strong):not(p):not(.ws-custom-file)';
+	}
+
+	if(!webshims.modules["form-core"].getGroupElements){
+		webshims.modules["form-core"].getGroupElements = getGroupElements;
 	}
 
 	$(document.body || 'html')
@@ -843,7 +847,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		})
 	;
 	
-	webshims.modules["form-core"].getGroupElements = getGroupElements;
+
 	
 	if(/[\s\:\>\~\+]/.test(iVal.sel || '')){
 		webshims.error('please use a simple selector for iVal.sel: for example .validate');

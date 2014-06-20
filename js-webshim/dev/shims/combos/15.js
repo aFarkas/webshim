@@ -1646,12 +1646,13 @@ var getGroupElements = function(elem){
 		} else {
 			form = elem.prop('form');
 			ret = $(document.getElementsByName(name)).filter(function(){
-				return this.type == 'radio' && this.name == name && $.prop(this, 'form') == form;
+				return this.type == 'radio' && $.prop(this, 'form') == form && this.name == name;
 			});
 		}
 	}
 	return ret;
 };
+
 var patternTypes = {url: 1, email: 1, text: 1, search: 1, tel: 1, password: 1};
 var lengthTypes = $.extend({textarea: 1}, patternTypes);
 
@@ -1729,6 +1730,8 @@ $.each({typeMismatch: 'mismatch', badInput: 'bad'}, function(name, fn){
 		return ret;
 	};
 });
+
+webshims.modules["form-core"].getGroupElements = getGroupElements;
 
 webshims.addValidityRule = function(type, fn){
 	validityRules[type] = fn;

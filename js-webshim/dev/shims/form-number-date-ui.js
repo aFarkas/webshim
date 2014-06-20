@@ -180,7 +180,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			return webshims.getID(this);
 		};
 		return function(element, labels, noFocus){
-
 			$(element).attr({'aria-labelledby': labels.map(getId).get().join(' ')});
 			if(!noFocus){
 				labels.on('click', function(e){

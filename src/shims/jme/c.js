@@ -161,14 +161,12 @@ webshims.register('mediacontrols', function($, webshims, window){
 	});
 
 	jme.registerPlugin('play-pause', {
-
 		structure: btnStructure,
 		text: 'play / pause',
 		_create: lazyLoadPlugin()
 	});
 
 	jme.registerPlugin('mute-unmute', {
-
 		structure: btnStructure,
 		text: 'mute / unmute',
 		_create: lazyLoadPlugin()

@@ -1846,8 +1846,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				data.seeking = false;
 			}, 300);
 		},
-		onConnectionFailed: function(){
-			webshims.error('media error');
+		onConnectionFailed: function(jaris, data){
+			mediaelement.setError(data._elem, 'flash connection error');
 		},
 		onNotBuffering: function(jaris, data){
 			setReadyState(3, data);

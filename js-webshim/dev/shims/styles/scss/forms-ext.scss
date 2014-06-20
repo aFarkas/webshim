@@ -43,6 +43,20 @@
 	}
 }
 
+.ws-range,
+.ws-range span,
+.input-buttons,
+.step-controls,
+.ws-popover-opener,
+.step-up,
+.step-down {
+	margin: 0;
+	padding: 0;
+	border: none;
+	width: auto;
+	background: transparent none;
+}
+
 /* spinner control for time, number (usable for date, datetime-local) */
 .has-input-buttons,
 html > body input.ws-inputreplace.has-input-buttons,
@@ -288,15 +302,18 @@ input[type="color"] {
 
 
 
-	> * {
+	> select,
+	> input,
+	> .ws-input-seperator {
 		text-align: center;
 		letter-spacing: normal;
 		word-spacing: normal;
-		
-		> option {
-			text-align: left;
-		}
 	}
+
+	option {
+		text-align: left;
+	}
+
 	.ws-input-seperator {
 		vertical-align: middle;
 		width: 2%;

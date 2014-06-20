@@ -63,15 +63,6 @@ audio[controls] {
 	width: 300px;
 }
 
-video > *,
-audio > * {
-	visibility: hidden;
-
-	.no-swf & {
-		visibility: inherit;
-	}
-}
-
 .polyfill-mediaelement > iframe {
 	border: 0;
 	padding: 0;
@@ -162,14 +153,9 @@ mark {
 }
 
 /* reset */
-.ws-range,
-.ws-range *,
 .placeholder-box,
 .placeholder-text,
-.input-buttons,
-.input-buttons *,
 .details-open-indicator,
-.ws-input-seperator,
 progress span.progress-value {
 	margin: 0;
 	padding: 0;
@@ -191,9 +177,6 @@ output {
 	overflow: hidden !important;
 }
 
-.webshims-visual-hide * {
-	visibility: hidden !important;
-}
 
 /* placeholder */
 .placeholder-box {
@@ -562,10 +545,6 @@ progress {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	vertical-align: -0.2em;
-	
-	> * {
-		display: none !important;
-	}
 	
 	&[data-position],
 	&.ws-style {
