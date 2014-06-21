@@ -13,21 +13,32 @@
 					return (src.src && !reg.test(src.src));
 				};
 			})(),
-			srcTest: {poster: 1, srces: 1}
+			srcTest: {poster: 1, srces: 1},
+			message: "URL has invalid characters. Remove any special characters and mutated vowels."
+		},
+		noHeaderTest: {
+			level: 5,
+			test: function(src){
+				return src.computedContainer != 'video/youtube' && !src.ajax;
+			},
+			srcTest: {srces: 1},
+			message: "Could not run HTTP network tests (cross-domain) for all sources. Check manually."
 		},
 		hasNoTypeAttribute: {
-			level: 3.5,
+			level: 4,
 			test: function(src){
 				return !src.declaredType && !src.typeNotRequired;
 			},
-			srcTest: {srces: 1}
+			srcTest: {srces: 1},
+			message: "The source element has no type attribute specified. Browser needs to download file before testing compatibility. Add a proper type attribute."
 		},
 		couldNotComputeTypeDeclaredTypeAbsent: {
 			level: 1,
 			test: function(src){
 				return (!src.computedContainer && !src.declaredType);
 			},
-			srcTest: {srces: 1}
+			srcTest: {srces: 1},
+			message: "The source element has no type attribute specified and the extensions seems unknown. Add a proper type attribute."
 		},
 		httpError: {
 			level: 2.5,
@@ -39,7 +50,8 @@
 					return !!(src.httpError && !src.httpErrorText);
 				}
 			},
-			srcTest: {srces: 1}
+			srcTest: {srces: 1},
+			message: "There was an unknown http error. Check source/URL."
 		},
 		fileEncoding: {
 			test: function(){
@@ -56,7 +68,8 @@
 					return !!(src.httpErrorText);
 				}
 			},
-			srcTest: {srces: 1}
+			srcTest: {srces: 1},
+			message: "There was a http error. Check source/URL."
 		},
 		charsetInContentType: {
 			level: 2.5,
@@ -67,7 +80,8 @@
 					return src.headerType && (/charset=/i).test(src.headerType);
 				}
 			},
-			srcTest: {srces: 1}
+			srcTest: {srces: 1},
+			message: "Content-Type header of media file sends charset. Remove charset information."
 		},
 		explicitTypeMix: {
 			level: 3,
@@ -78,7 +92,8 @@
 					return 'not testable';
 				}
 			},
-			srcTest: {srces: 1}
+			srcTest: {srces: 1},
+			message: "Content-Type header and attribute type do not match. Set same and proper type value."
 		},
 		noContentType: {
 			level: 2.5,
@@ -89,7 +104,8 @@
 					return 'not testable';
 				}
 			},
-			srcTest: {srces: 1}
+			srcTest: {srces: 1},
+			message: "Content-Type header for media file is either empty or application/octet-stream."
 		},
 		noContentLength: {
 			level: 3,
@@ -100,10 +116,23 @@
 					return 'not testable';
 				}
 			},
-			srcTest: {srces: 1}
+			srcTest: {srces: 1},
+			message: "Content-Length header for media file does not send value."
 		},
 		noRange: {
 			level: 3,
+			test: function(src){
+				if(src.ajax){
+					return !(src.headers['Accept-Ranges']);
+				} else {
+					return 'not testable';
+				}
+			},
+			srcTest: {srces: 1},
+			message: "Accept-Ranges header for media file does not send value. Make sure server supports Range requests in bytes"
+		},
+		explicitNoRange: {
+			level: 2.5,
 			test: function(src){
 				if(src.ajax){
 					return (src.headers['Accept-Ranges'] == 'none');
@@ -111,7 +140,8 @@
 					return 'not testable';
 				}
 			},
-			srcTest: {srces: 1}
+			srcTest: {srces: 1},
+			message: "Server does not support Range requests. Make sure server supports Range requests in bytes"
 		},
 		doubleEncoded: {
 			level: 1,
@@ -122,7 +152,8 @@
 					return 'not testable';
 				}
 			},
-			srcTest: {srces: 1}
+			srcTest: {srces: 1},
+			message: "Content of media file is encoded with gzip/defalte. Make sure to not encode it. It's already encoded."
 		},
 		mediaAttachment: {
 			level: 1,
@@ -133,7 +164,8 @@
 					return 'not testable';
 				}
 			},
-			srcTest: {srces: 1}
+			srcTest: {srces: 1},
+			message: "Content-Disposition header wants media file to be downloaded, but not to be played."
 		},
 		badTypeMix: {
 			level: 1,
@@ -143,19 +175,21 @@
 				var isPlayableHtml, isPlayableHeader;
 				var htmlContainer = src.declaredContainer || src.computedContainer;
 				var headerContainer = src.headerContainer;
-				if(headerContainer && htmlContainer && headerContainer != htmlContainer){
-					isPlayableHtml = mediaelement.swfMimeTypes.indexOf(htmlContainer) != -1;
-					isPlayableHeader = mediaelement.swfMimeTypes.indexOf(headerContainer) != -1;
-					if(isPlayableHtml != isPlayableHeader){
-						ret = true;
-					}
-
-					if(!ret && infos.element.canPlayType){
-
-						isPlayableHtml = !!infos.element.canPlayType(htmlContainer);
-						isPlayableHeader = !!infos.element.canPlayType(headerContainer);
+				if(headerContainer && htmlContainer){
+					if(headerContainer != htmlContainer){
+						isPlayableHtml = mediaelement.swfMimeTypes.indexOf(htmlContainer) != -1;
+						isPlayableHeader = mediaelement.swfMimeTypes.indexOf(headerContainer) != -1;
 						if(isPlayableHtml != isPlayableHeader){
 							ret = true;
+						}
+
+						if(!ret && infos.element.canPlayType){
+
+							isPlayableHtml = !!infos.element.canPlayType(htmlContainer);
+							isPlayableHeader = !!infos.element.canPlayType(headerContainer);
+							if(isPlayableHtml != isPlayableHeader){
+								ret = true;
+							}
 						}
 					}
 				} else {
@@ -164,7 +198,36 @@
 
 				return ret;
 			},
-			srcTest: {srces: 1}
+			srcTest: {srces: 1},
+			message: "Content-Type header and attribute type do not match and are quite different. Set same and proper type value."
+		},
+		typeMix: {
+			level: 2.5,
+			test: function(src, infos){
+				var ret = false;
+
+				var isPlayableComputed, isPlayableDeclared;
+				if(!src.headerContainer && src.declaredContainer && src.computedContainer && src.computedContainer != src.declaredContainer){
+					isPlayableComputed = mediaelement.swfMimeTypes.indexOf(src.computedContainer) != -1;
+					isPlayableDeclared = mediaelement.swfMimeTypes.indexOf(src.declaredContainer) != -1;
+					if(isPlayableComputed != isPlayableDeclared){
+						ret = true;
+					}
+
+					if(!ret && infos.element.canPlayType){
+
+						isPlayableComputed = !!infos.element.canPlayType(src.computedContainer);
+						isPlayableDeclared = !!infos.element.canPlayType(src.declaredContainer);
+						if(isPlayableComputed != isPlayableDeclared){
+							ret = true;
+						}
+					}
+				}
+
+				return ret;
+			},
+			srcTest: {srces: 1},
+			message: "Computed type and declared type are different. Needs manual check."
 		},
 		hasNoPlayableSrc: {
 			level: 1,
@@ -187,7 +250,8 @@
 				});
 
 				return !hasPlayable;
-			}
+			},
+			message: "Mediaelement has no source to be played in browser or by plugin. Use at least a video/mp4 source."
 		},
 		needsFlashInstalled: {
 			level: 1,
@@ -211,7 +275,8 @@
 				}
 
 				return flashCanPlay && !nativeCanPlay;
-			}
+			},
+			message: "Mediaelement has no source to be played native or by plugin. Use at least a video/mp4 source."
 		},
 		hasNoSwfPlayableSrc: {
 			level: 1,
@@ -229,10 +294,11 @@
 				});
 
 				return !hasPlayable;
-			}
+			},
+			message: "Mediaelement has no source to be played by fallback plugin. Use at least a video/mp4 source."
 		},
 		hasNoNativePlayableSrc: {
-			level: 3,
+			level: 4,
 			test: function(infos){
 				var hasPlayable = false;
 
@@ -250,20 +316,23 @@
 				}
 
 				return !hasPlayable;
-			}
+			},
+			message: "Mediaelement has no source to be played native. Use at least a video/mp4 and a video/webm source."
 		},
 		misLeadingAttrMode: {
 			level: 2,
 			test: function(infos){
 				return (infos.srces.length > 1 && infos.srces[0].attrMode);
-			}
+			},
+			message: "Mediaelement has a src attribute and some source child elements. Only src attribute is used."
 		},
 		emptySrc: {
 			level: 2,
 			test: function(src){
 				return src.src && !src.attrSrc;
 			},
-			srcTest: {poster: 1, srces: 1}
+			srcTest: {poster: 1, srces: 1},
+			message: "The src or poster attribute is an empty string, which is not allowed."
 		}
 	};
 
@@ -298,7 +367,7 @@
 							src.errors.octetStream = 'octetStream';
 						}
 						src.headerContainer = $.trim(src.headerType.split(';')[0]);
-						['Content-Type', 'Content-Length', 'Accept-Ranges', 'Content-Disposition', 'Content-Encoding'].forEach(function(name){
+						['Location', 'Content-Type', 'Content-Length', 'Accept-Ranges', 'Content-Disposition', 'Content-Encoding'].forEach(function(name){
 							src.headers[name] = ajax.getResponseHeader(name) || '';
 						});
 
@@ -334,7 +403,7 @@
 
 		$sources.each(function(i){
 			var src = getSrcInfo(this, nodeName);
-			src.typeNotRequired = i >= $sources.length - 1;
+			src.typeNotRequired = !!(i && i >= $sources.length - 1);
 
 			srces.push(src);
 
@@ -352,6 +421,7 @@
 
 
 	function runTests(infos){
+
 		$.each(tests, function(name, obj){
 			var localMessage;
 			var failed = false;
@@ -390,7 +460,8 @@
 			if(failed){
 				infos.errors.push({
 					message: message,
-					level: obj.level
+					level: obj.level,
+					name: name
 				});
 			}
 		});
@@ -398,19 +469,24 @@
 		infos.errors.sort(function(a, b){
 			return a.level > b.level;
 		});
-
-		console.log('Testing mediaelement network + markup:', infos);
-		infos.errors.forEach(function(error){
-			var type = 'log';
-			if(console.error && console.warn){
-				if(error.level < 3){
-					type = 'error';
-				} else if(error.level < 4){
-					type = 'warn';
+		console.log('---- Media Test Start ----');
+		console.log('Testing results for mediaelement network + markup debugger. For detailed information expand the following object:', infos);
+		if(infos.errors.length){
+			infos.errors.forEach(function(error){
+				var type = 'log';
+				if(console.error && console.warn){
+					if(error.level < 3){
+						type = 'error';
+					} else if(error.level < 4){
+						type = 'warn';
+					}
 				}
-			}
-			console[type](error.message, error.level);
-		});
+				console[type](error.message, 'priority level: '+ error.level, error.name);
+			});
+		} else {
+			console.log('Congratulations: No errors found for video.');
+		}
+		console.log('---- Media Test End ----');
 	}
 
 	function getMediaInfo(elem){
@@ -444,9 +520,9 @@
 			getMediaInfo(elem);
 		});
 	};
-	console.log('running mediaelement debugger. Only run to test. Not in production. set webshim.setOptions("debug", false); to remove.');
+
 	if(webshim.cfg.extendNative){
-		console.log('Mediaelement debugger does not detect all problems with extendNative set to true. Please set webshim.setOptions("extendNative", false);');
+		console.log('mediaelement debugger does not detect all problems with extendNative set to true. Please set webshim.setOptions("extendNative", false);');
 	}
 	webshim.addReady(function(context, $insertedElement){
 		$('video, audio', context)

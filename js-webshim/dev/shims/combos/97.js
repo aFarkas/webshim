@@ -422,7 +422,6 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		}
 	});
 
-	webshims.isReady('jme', true);
 	webshims.addReady($.jme.initJME);
 	webshims._polyfill(['mediaelement']);
 });

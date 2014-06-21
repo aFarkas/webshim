@@ -15,6 +15,7 @@
 
 	var wsCfg = webshims.cfg;
 	var options = wsCfg.mediaelement;
+	var isIE = navigator.userAgent.indexOf('MSIE') != -1;
 	var hasSwf;
 	if(!options){
 		webshims.error("mediaelement wasn't implemented but loaded");
@@ -30,7 +31,7 @@
 
 		webshims.capturingEvents(['play', 'playing', 'waiting', 'paused', 'ended', 'durationchange', 'loadedmetadata', 'canplay', 'volumechange']);
 		
-		if( !Modernizr.videoBuffered || !supportsLoop || (!Modernizr.mediaDefaultMuted && navigator.userAgent.indexOf('MSIE') != -1 && 'ActiveXObject' in window) ){
+		if( !Modernizr.videoBuffered || !supportsLoop || (!Modernizr.mediaDefaultMuted && isIE && 'ActiveXObject' in window) ){
 			webshims.addPolyfill('mediaelement-native-fix', {
 				d: ['dom-support']
 			});
@@ -404,15 +405,21 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	});
 	
 	var handleMedia = false;
+	var allowedPreload = {'metadata': 1, 'auto': 1};
 	var initMediaElements = function(){
 		var testFixMedia = function(){
+			var preload;
 			if(webshims.implement(this, 'mediaelement')){
+				//todo test in android
+				if(this.getAttribute('preload') == 'none' && (preload = $(this).data('preload')) && allowedPreload[preload]){
+					$.attr(this, 'preload', preload);
+				}
 				selectSource(this);
 				if(!Modernizr.mediaDefaultMuted && $.attr(this, 'muted') != null){
 					$.prop(this, 'muted', true);
 				}
+
 			}
-			
 		};
 		
 		webshims.ready('dom-support', function(){
@@ -515,9 +522,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		});
 	};
 
-	if(webshims.cfg.debug){
-		webshims.ready('WINDOWLOAD', mediaelement.loadDebugger);
-	}
 
 	//set native implementation ready, before swf api is retested
 	if(hasNative){

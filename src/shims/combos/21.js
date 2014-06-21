@@ -1570,23 +1570,26 @@
 		};
 		var switchOptions = function(e){
 			var media, error, parent;
-			if(!options.preferFlash &&
+			if(
 				($(e.target).is('audio, video') || ((parent = e.target.parentNode) && $('source', parent).last()[0] == e.target)) &&
-				(media = $(e.target).closest('audio, video')) && (error = media.prop('error')) && switchErrors[error.code]
+				(media = $(e.target).closest('audio, video'))
 				){
-
-				if(!options.preferFlash){
+				error = media.prop('error');
+				setTimeout(function(){
 					if(!media.is('.nonnative-api-active')){
-						options.preferFlash = true;
-						document.removeEventListener('error', switchOptions, true);
-						$('audio, video').each(function(){
-							webshims.mediaelement.selectSource(this);
-						});
-						webshims.error("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error')+ 'first error: '+ error);
+						if(error && switchErrors[error.code]){
+							options.preferFlash = true;
+							document.removeEventListener('error', switchOptions, true);
+							$('audio, video').each(function(){
+								webshims.mediaelement.selectSource(this);
+							});
+							webshims.error("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error')+ 'first error: '+ error);
+						}
+						webshims.warn('There was a mediaelement error. Run the following line in your console to get more info: webshim.mediaelement.loadDebugger();')
 					}
-				} else{
-					document.removeEventListener('error', switchOptions, true);
-				}
+				});
+
+
 			}
 		};
 		setTimeout(function(){
@@ -2045,25 +2048,20 @@ modified for webshims
 */
 	mediaelement.parseCaptionChunk = (function(){
 		// Set up timestamp parsers
-		var WebVTTTimestampParser			= /^(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s+\-\-\>\s+(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s*(.*)/;
+		var WebVTTTimestampParser		= /^(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s+\-\-\>\s+(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s*(.*)/;
 		var WebVTTDEFAULTSCueParser		= /^(DEFAULTS|DEFAULT)\s+\-\-\>\s+(.*)/g;
 		var WebVTTSTYLECueParser		= /^(STYLE|STYLES)\s+\-\-\>\s*\n([\s\S]*)/g;
 		var WebVTTCOMMENTCueParser		= /^(COMMENT|COMMENTS)\s+\-\-\>\s+(.*)/g;
+		var SRTTimestampParser			= /^(\d{2})?:?(\d{2}):(\d{2})[\.\,](\d+)\s+\-\-\>\s+(\d{2})?:?(\d{2}):(\d{2})[\.\,](\d+)\s*(.*)/;
 
 		return function(subtitleElement,objectCount){
 
-			var subtitleParts, timeIn, timeOut, html, timeData, subtitlePartIndex, id, specialCueData;
+			var subtitleParts, timeIn, timeOut, html, timeData, subtitlePartIndex, id;
 			var timestampMatch, tmpCue;
 
 			// WebVTT Special Cue Logic
-			if (WebVTTDEFAULTSCueParser.exec(subtitleElement)) {
-//				cueDefaults = specialCueData.slice(2).join("");
-//				cueDefaults = cueDefaults.split(/\s+/g).filter(function(def) { return def && !!def.length; });
+			if (WebVTTDEFAULTSCueParser.exec(subtitleElement) || WebVTTCOMMENTCueParser.exec(subtitleElement) || WebVTTSTYLECueParser.exec(subtitleElement)) {
 				return null;
-			} else if ((specialCueData = WebVTTSTYLECueParser.exec(subtitleElement))) {
-				return null;
-			} else if ((specialCueData = WebVTTCOMMENTCueParser.exec(subtitleElement))) {
-				return null; // At this stage, we don't want to do anything with these.
 			}
 
 			subtitleParts = subtitleElement.split(/\n/g);
@@ -2081,7 +2079,7 @@ modified for webshims
 			for (subtitlePartIndex = 0; subtitlePartIndex < subtitleParts.length; subtitlePartIndex ++) {
 				var timestamp = subtitleParts[subtitlePartIndex];
 
-				if ((timestampMatch = WebVTTTimestampParser.exec(timestamp))) {
+				if ((timestampMatch = WebVTTTimestampParser.exec(timestamp)) || (timestampMatch = SRTTimestampParser.exec(timestamp))) {
 
 					// WebVTT
 
@@ -2168,11 +2166,6 @@ modified for webshims
 					if(regWevVTT.test(cue)){
 						isWEBVTT = true;
 					} else if(cue.replace(/\s*/ig,"").length){
-						if(!isWEBVTT){
-							webshims.error('please use WebVTT format. This is the standard');
-							complete(null);
-							break;
-						}
 						cue = mediaelement.parseCaptionChunk(cue, i);
 						if(cue){
 							track.addCue(cue);

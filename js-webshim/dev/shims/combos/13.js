@@ -15,6 +15,7 @@
 
 	var wsCfg = webshims.cfg;
 	var options = wsCfg.mediaelement;
+	var isIE = navigator.userAgent.indexOf('MSIE') != -1;
 	var hasSwf;
 	if(!options){
 		webshims.error("mediaelement wasn't implemented but loaded");
@@ -30,7 +31,7 @@
 
 		webshims.capturingEvents(['play', 'playing', 'waiting', 'paused', 'ended', 'durationchange', 'loadedmetadata', 'canplay', 'volumechange']);
 		
-		if( !Modernizr.videoBuffered || !supportsLoop || (!Modernizr.mediaDefaultMuted && navigator.userAgent.indexOf('MSIE') != -1 && 'ActiveXObject' in window) ){
+		if( !Modernizr.videoBuffered || !supportsLoop || (!Modernizr.mediaDefaultMuted && isIE && 'ActiveXObject' in window) ){
 			webshims.addPolyfill('mediaelement-native-fix', {
 				d: ['dom-support']
 			});
@@ -404,15 +405,21 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	});
 	
 	var handleMedia = false;
+	var allowedPreload = {'metadata': 1, 'auto': 1};
 	var initMediaElements = function(){
 		var testFixMedia = function(){
+			var preload;
 			if(webshims.implement(this, 'mediaelement')){
+				//todo test in android
+				if(this.getAttribute('preload') == 'none' && (preload = $(this).data('preload')) && allowedPreload[preload]){
+					$.attr(this, 'preload', preload);
+				}
 				selectSource(this);
 				if(!Modernizr.mediaDefaultMuted && $.attr(this, 'muted') != null){
 					$.prop(this, 'muted', true);
 				}
+
 			}
-			
 		};
 		
 		webshims.ready('dom-support', function(){
@@ -515,9 +522,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		});
 	};
 
-	if(webshims.cfg.debug){
-		webshims.ready('WINDOWLOAD', mediaelement.loadDebugger);
-	}
 
 	//set native implementation ready, before swf api is retested
 	if(hasNative){
@@ -974,25 +978,20 @@ modified for webshims
 */
 	mediaelement.parseCaptionChunk = (function(){
 		// Set up timestamp parsers
-		var WebVTTTimestampParser			= /^(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s+\-\-\>\s+(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s*(.*)/;
+		var WebVTTTimestampParser		= /^(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s+\-\-\>\s+(\d{2})?:?(\d{2}):(\d{2})\.(\d+)\s*(.*)/;
 		var WebVTTDEFAULTSCueParser		= /^(DEFAULTS|DEFAULT)\s+\-\-\>\s+(.*)/g;
 		var WebVTTSTYLECueParser		= /^(STYLE|STYLES)\s+\-\-\>\s*\n([\s\S]*)/g;
 		var WebVTTCOMMENTCueParser		= /^(COMMENT|COMMENTS)\s+\-\-\>\s+(.*)/g;
+		var SRTTimestampParser			= /^(\d{2})?:?(\d{2}):(\d{2})[\.\,](\d+)\s+\-\-\>\s+(\d{2})?:?(\d{2}):(\d{2})[\.\,](\d+)\s*(.*)/;
 
 		return function(subtitleElement,objectCount){
 
-			var subtitleParts, timeIn, timeOut, html, timeData, subtitlePartIndex, id, specialCueData;
+			var subtitleParts, timeIn, timeOut, html, timeData, subtitlePartIndex, id;
 			var timestampMatch, tmpCue;
 
 			// WebVTT Special Cue Logic
-			if (WebVTTDEFAULTSCueParser.exec(subtitleElement)) {
-//				cueDefaults = specialCueData.slice(2).join("");
-//				cueDefaults = cueDefaults.split(/\s+/g).filter(function(def) { return def && !!def.length; });
+			if (WebVTTDEFAULTSCueParser.exec(subtitleElement) || WebVTTCOMMENTCueParser.exec(subtitleElement) || WebVTTSTYLECueParser.exec(subtitleElement)) {
 				return null;
-			} else if ((specialCueData = WebVTTSTYLECueParser.exec(subtitleElement))) {
-				return null;
-			} else if ((specialCueData = WebVTTCOMMENTCueParser.exec(subtitleElement))) {
-				return null; // At this stage, we don't want to do anything with these.
 			}
 
 			subtitleParts = subtitleElement.split(/\n/g);
@@ -1010,7 +1009,7 @@ modified for webshims
 			for (subtitlePartIndex = 0; subtitlePartIndex < subtitleParts.length; subtitlePartIndex ++) {
 				var timestamp = subtitleParts[subtitlePartIndex];
 
-				if ((timestampMatch = WebVTTTimestampParser.exec(timestamp))) {
+				if ((timestampMatch = WebVTTTimestampParser.exec(timestamp)) || (timestampMatch = SRTTimestampParser.exec(timestamp))) {
 
 					// WebVTT
 
@@ -1097,11 +1096,6 @@ modified for webshims
 					if(regWevVTT.test(cue)){
 						isWEBVTT = true;
 					} else if(cue.replace(/\s*/ig,"").length){
-						if(!isWEBVTT){
-							webshims.error('please use WebVTT format. This is the standard');
-							complete(null);
-							break;
-						}
 						cue = mediaelement.parseCaptionChunk(cue, i);
 						if(cue){
 							track.addCue(cue);
