@@ -276,7 +276,7 @@
 
 				return flashCanPlay && !nativeCanPlay;
 			},
-			message: "Mediaelement has no source to be played native or by plugin. Use at least a video/mp4 source."
+			message: "While media file could be played by flash plugin, Browser has no flash installed. Use at least a video/mp4 source and install flash. Or add additionally a video/webm file."
 		},
 		hasNoSwfPlayableSrc: {
 			level: 1,
@@ -341,7 +341,7 @@
 		var src = {
 			src: $.prop(elem, 'src'),
 			attrSrc: $.trim($.attr(elem, 'src')),
-			declaredType: $.attr(elem, 'type') || $(elem).data('type') || '',
+			declaredType: $.attr(elem, 'type') || $(elem).attr('data-type') || '',
 			errors: {}
 		};
 		src.declaredContainer = src.declaredType.split(';')[0].trim();
@@ -472,6 +472,13 @@
 		console.log('---- Media Test Start ----');
 		console.log('Testing results for mediaelement network + markup debugger. For detailed information expand the following object:', infos);
 		if(infos.errors.length){
+			if(infos.errors[0].level < 3){
+				console.log('Found '+ infos.errors.length + ' errors/warnings with at least 1 critical issue.');
+			} else if(infos.errors[0].level < 4) {
+				console.log('Found '+ infos.errors.length + 'errors/warnings.');
+			} else {
+				console.log('Found '+ infos.errors.length + 'warnings but no critical issue.');
+			}
 			infos.errors.forEach(function(error){
 				var type = 'log';
 				if(console.error && console.warn){
@@ -520,6 +527,8 @@
 			getMediaInfo(elem);
 		});
 	};
+
+	console.log('Running mediaelement debugger. Only run these tests in development never in production. set webshim.setOptions("debug", false); to remove. Debugger only tests media on same domain and does not test file encoding issues.');
 
 	if(webshim.cfg.extendNative){
 		console.log('mediaelement debugger does not detect all problems with extendNative set to true. Please set webshim.setOptions("extendNative", false);');

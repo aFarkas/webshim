@@ -2871,11 +2871,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				}
 			}
 		}
-		
-		if(!src.container){
-			$(elem).attr('data-wsrecheckmimetype', '');
-		}
-		
+
 		tmp = elem.attr('media');
 		if(tmp){
 			src.media = tmp;
@@ -3094,36 +3090,39 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			}
 		};
 	})();
-	
-	var stepSources = function(elem, data, useSwf, _srces, _noLoop){
-		var ret;
-		if(useSwf || (useSwf !== false && data && data.isActive == 'third')){
-			ret = mediaelement.canThirdPlaySrces(elem, _srces);
-			if(!ret){
-				if(_noLoop){
-					mediaelement.setError(elem, false);
-				} else {
-					stepSources(elem, data, false, _srces, true);
-				}
-			} else {
-				handleThird(elem, ret, data);
+
+	var activate = {
+		native: function(elem, src, data){
+			if(data && data.isActive == 'third') {
+				mediaelement.setActive(elem, 'html5', data);
 			}
-		} else {
-			ret = mediaelement.canNativePlaySrces(elem, _srces);
-			if(!ret){
-				if(_noLoop){
-					mediaelement.setError(elem, false);
-					if(data && data.isActive == 'third') {
-						mediaelement.setActive(elem, 'html5', data);
-					}
-				} else {
-					stepSources(elem, data, true, _srces, true);
-				}
-			} else if(data && data.isActive == 'third') {
+		},
+		third: handleThird
+	};
+
+	var stepSources = function(elem, data, srces){
+		var i, src;
+		var testOrder = [{test: 'canNativePlaySrces', activate: 'native'}, {test: 'canThirdPlaySrces', activate: 'third'}];
+		if(options.preferFlash || (data && data.isActive == 'third') ){
+			testOrder.reverse();
+		}
+		for(i = 0; i < 2; i++){
+			src = mediaelement[testOrder[i].test](elem, srces);
+			if(src){
+				activate[testOrder[i].activate](elem, src, data);
+				break;
+			}
+		}
+
+		if(!src){
+			mediaelement.setError(elem, false);
+			if(data && data.isActive == 'third') {
 				mediaelement.setActive(elem, 'html5', data);
 			}
 		}
 	};
+	
+
 	var stopParent = /^(?:embed|object|datalist)$/i;
 	var selectSource = function(elem, data){
 		var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
@@ -3139,7 +3138,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		if(mediaelement.sortMedia){
 			_srces.sort(mediaelement.sortMedia);
 		}
-		stepSources(elem, data, options.preferFlash || undefined, _srces);
+		stepSources(elem, data, _srces);
 	};
 	mediaelement.selectSource = selectSource;
 	
@@ -3272,7 +3271,11 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		});
 	};
 
-
+	if(webshims.cfg.debug){
+		$(document).on('mediaerror', function(e){
+			mediaelement.loadDebugger();
+		});
+	}
 	//set native implementation ready, before swf api is retested
 	if(hasNative){
 		webshims.isReady('mediaelement-core', true);
@@ -4458,62 +4461,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	} else if(!('media' in document.createElement('source'))){
 		webshims.reflectProperties('source', ['media']);
 	}
-	if(options.experimentallyMimetypeCheck){
-		(function(){
-			var ADDBACK = $.fn.addBack ? 'addBack' : 'andSelf';
-			var getMimeType = function(){
-				var done;
-				var unknown = 'media/unknown please provide mime type';
-				var media = $(this);
-				var xhrs = [];
-				media
-					.not('.ws-after-check')
-					.find('source')
-					[ADDBACK]()
-					.filter('[data-wsrecheckmimetype]:not([type])')
-					.each(function(){
-						var source = $(this).removeAttr('data-wsrecheckmimetype');
-						var error = function(){
-							source.attr('data-type', unknown);
-						};
-						try {
-							xhrs.push(
-								$.ajax({
-									type: 'head',
-									url: $.attr(this, 'src'),
-									success: function(content, status, xhr){
-										var mime = xhr.getResponseHeader('Content-Type');
-										if(mime){
-											done = true;
-										}
-										source.attr('data-type', mime || unknown);
-									},
-									error: error
-								})
-							)
-							;
-						} catch(er){
-							error();
-						}
-					})
-				;
-				if(xhrs.length){
-					media.addClass('ws-after-check');
-					$.when.apply($, xhrs).always(function(){
-						media.mediaLoad();
-						setTimeout(function(){
-							media.removeClass('ws-after-check');
-						}, 9);
-					});
-				}
-			};
-			$('audio.media-error, video.media-error').each(getMimeType);
-			$(document).on('mediaerror', function(e){
-				getMimeType.call(e.target);
-			});
-		})();
-	}
-
 
 	if(hasNative && hasFlash && !options.preferFlash){
 		var switchErrors = {
@@ -4524,7 +4471,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			var media, error, parent;
 			if(
 				($(e.target).is('audio, video') || ((parent = e.target.parentNode) && $('source', parent).last()[0] == e.target)) &&
-				(media = $(e.target).closest('audio, video'))
+				(media = $(e.target).closest('audio, video') && !media.is('.nonnative-api-active'))
 				){
 				error = media.prop('error');
 				setTimeout(function(){
@@ -4544,16 +4491,16 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 
 			}
 		};
+
+		document.addEventListener('error', switchOptions, true);
 		setTimeout(function(){
-			document.addEventListener('error', switchOptions, true);
 			$('audio, video').each(function(){
 				var error = $.prop(this, 'error');
 				if(error && switchErrors[error]){
 					switchOptions({target: this});
-					return false;
 				}
 			});
-		}, 9);
+		});
 	}
 
 });

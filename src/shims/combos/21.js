@@ -1506,62 +1506,6 @@
 	} else if(!('media' in document.createElement('source'))){
 		webshims.reflectProperties('source', ['media']);
 	}
-	if(options.experimentallyMimetypeCheck){
-		(function(){
-			var ADDBACK = $.fn.addBack ? 'addBack' : 'andSelf';
-			var getMimeType = function(){
-				var done;
-				var unknown = 'media/unknown please provide mime type';
-				var media = $(this);
-				var xhrs = [];
-				media
-					.not('.ws-after-check')
-					.find('source')
-					[ADDBACK]()
-					.filter('[data-wsrecheckmimetype]:not([type])')
-					.each(function(){
-						var source = $(this).removeAttr('data-wsrecheckmimetype');
-						var error = function(){
-							source.attr('data-type', unknown);
-						};
-						try {
-							xhrs.push(
-								$.ajax({
-									type: 'head',
-									url: $.attr(this, 'src'),
-									success: function(content, status, xhr){
-										var mime = xhr.getResponseHeader('Content-Type');
-										if(mime){
-											done = true;
-										}
-										source.attr('data-type', mime || unknown);
-									},
-									error: error
-								})
-							)
-							;
-						} catch(er){
-							error();
-						}
-					})
-				;
-				if(xhrs.length){
-					media.addClass('ws-after-check');
-					$.when.apply($, xhrs).always(function(){
-						media.mediaLoad();
-						setTimeout(function(){
-							media.removeClass('ws-after-check');
-						}, 9);
-					});
-				}
-			};
-			$('audio.media-error, video.media-error').each(getMimeType);
-			$(document).on('mediaerror', function(e){
-				getMimeType.call(e.target);
-			});
-		})();
-	}
-
 
 	if(hasNative && hasFlash && !options.preferFlash){
 		var switchErrors = {
@@ -1572,7 +1516,7 @@
 			var media, error, parent;
 			if(
 				($(e.target).is('audio, video') || ((parent = e.target.parentNode) && $('source', parent).last()[0] == e.target)) &&
-				(media = $(e.target).closest('audio, video'))
+				(media = $(e.target).closest('audio, video') && !media.is('.nonnative-api-active'))
 				){
 				error = media.prop('error');
 				setTimeout(function(){
@@ -1592,16 +1536,16 @@
 
 			}
 		};
+
+		document.addEventListener('error', switchOptions, true);
 		setTimeout(function(){
-			document.addEventListener('error', switchOptions, true);
 			$('audio, video').each(function(){
 				var error = $.prop(this, 'error');
 				if(error && switchErrors[error]){
 					switchOptions({target: this});
-					return false;
 				}
 			});
-		}, 9);
+		});
 	}
 
 });
