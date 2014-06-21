@@ -594,8 +594,13 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			}
 		}
 	};
-	
-
+	var allowedPreload = {'metadata': 1, 'auto': 1, '': 1};
+	var fixPreload = function(elem){
+		var preload;
+		if(elem.getAttribute('preload') == 'none' && allowedPreload[(preload = $(elem).data('preload'))]){
+			$.attr(elem, 'preload', preload);
+		}
+	};
 	var stopParent = /^(?:embed|object|datalist)$/i;
 	var selectSource = function(elem, data){
 		var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
@@ -611,7 +616,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		if(mediaelement.sortMedia){
 			_srces.sort(mediaelement.sortMedia);
 		}
+		fixPreload(elem);
 		stepSources(elem, data, _srces);
+
 	};
 	mediaelement.selectSource = selectSource;
 	
@@ -627,15 +634,11 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	});
 	
 	var handleMedia = false;
-	var allowedPreload = {'metadata': 1, 'auto': 1};
+
 	var initMediaElements = function(){
 		var testFixMedia = function(){
-			var preload;
+
 			if(webshims.implement(this, 'mediaelement')){
-				//todo test in android
-				if(this.getAttribute('preload') == 'none' && (preload = $(this).data('preload')) && allowedPreload[preload]){
-					$.attr(this, 'preload', preload);
-				}
 				selectSource(this);
 				if(!Modernizr.mediaDefaultMuted && $.attr(this, 'muted') != null){
 					$.prop(this, 'muted', true);
@@ -657,6 +660,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 					prop: {
 						value: function(){
 							var data = webshims.data(this, 'mediaelement');
+
 							selectSource(this, data);
 							if(hasNative && (!data || data.isActive == 'html5') && supLoad.prop._supvalue){
 								supLoad.prop._supvalue.apply(this, arguments);
@@ -1057,6 +1061,26 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			return cueText.replace(tagSplits, replacer);
 		};
 	})();
+	var mapTtmlToVtt = function(i){
+		var content = i+'';
+		var begin = this.getAttribute('begin') || '';
+		var end = this.getAttribute('end') || '';
+		var text = $.trim($.text(this));
+		if(!/\./.test(begin)){
+			begin += '.000';
+		}
+		if(!/\./.test(end)){
+			end += '.000';
+		}
+		content += '\n';
+		content += begin +' --> '+end+'\n';
+		content += text;
+		return content;
+	};
+	var ttmlTextToVTT = function(ttml){
+		ttml = $.parseXML(ttml) || [];
+		return $(ttml).find('[begin][end]').map(mapTtmlToVtt).get().join('\n\n') || '';
+	};
 	
 	mediaelement.loadTextTrack = function(mediaelem, track, trackData, _default){
 		var loadEvents = 'play playing';
@@ -1084,7 +1108,11 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 								dataType: 'text',
 								url: src,
 								success: function(text){
-									if(ajax.getResponseHeader('content-type') != 'text/vtt'){
+									var contentType = ajax.getResponseHeader('content-type');
+
+									if(!contentType.indexOf('application/xml')){
+										text = ttmlTextToVTT(text);
+									} else if(contentType.indexOf('text/vtt')){
 										webshims.error('set the mime-type of your WebVTT files to text/vtt. see: http://dev.w3.org/html5/webvtt/#text/vtt');
 									}
 									mediaelement.parseCaptions(text, obj, function(cues){

@@ -371,8 +371,13 @@ $browser-context: 16; // Default
 
 	&[data-state="idle"] {
 		cursor: pointer;
+
 		> .jme-media-overlay {
 			@extend %icon-play-circle;
+		}
+
+		&.has-yt.no-poster > .jme-media-overlay:before {
+			content: "";
 		}
 	}
 

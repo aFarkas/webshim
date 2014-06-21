@@ -24,7 +24,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				var className = (track.kind == 'caption') ? 'caption-type' : 'subtitle-type';
 				var lang = track.language;
 				lang = (lang) ? ' <span class="track-lang">'+ lang +'</span>' : '';
-				return '<li class="'+ className +'" role="presentation"><button role="menuitemcheckbox">'+ track.label + lang +'</button></li>';
+				return '<li class="'+ className +'" role="presentation"><button role="menuitemcheckbox" type="button">'+ track.label + lang +'</button></li>';
 			})
 			;
 		return '<div><ul>' + items.join('') +'</ul></div>';

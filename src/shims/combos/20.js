@@ -3121,8 +3121,13 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			}
 		}
 	};
-	
-
+	var allowedPreload = {'metadata': 1, 'auto': 1, '': 1};
+	var fixPreload = function(elem){
+		var preload;
+		if(elem.getAttribute('preload') == 'none' && allowedPreload[(preload = $(elem).data('preload'))]){
+			$.attr(elem, 'preload', preload);
+		}
+	};
 	var stopParent = /^(?:embed|object|datalist)$/i;
 	var selectSource = function(elem, data){
 		var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
@@ -3138,7 +3143,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		if(mediaelement.sortMedia){
 			_srces.sort(mediaelement.sortMedia);
 		}
+		fixPreload(elem);
 		stepSources(elem, data, _srces);
+
 	};
 	mediaelement.selectSource = selectSource;
 	
@@ -3154,15 +3161,11 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	});
 	
 	var handleMedia = false;
-	var allowedPreload = {'metadata': 1, 'auto': 1};
+
 	var initMediaElements = function(){
 		var testFixMedia = function(){
-			var preload;
+
 			if(webshims.implement(this, 'mediaelement')){
-				//todo test in android
-				if(this.getAttribute('preload') == 'none' && (preload = $(this).data('preload')) && allowedPreload[preload]){
-					$.attr(this, 'preload', preload);
-				}
 				selectSource(this);
 				if(!Modernizr.mediaDefaultMuted && $.attr(this, 'muted') != null){
 					$.prop(this, 'muted', true);
@@ -3184,6 +3187,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 					prop: {
 						value: function(){
 							var data = webshims.data(this, 'mediaelement');
+
 							selectSource(this, data);
 							if(hasNative && (!data || data.isActive == 'html5') && supLoad.prop._supvalue){
 								supLoad.prop._supvalue.apply(this, arguments);

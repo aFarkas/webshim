@@ -568,11 +568,30 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 							}
 						};
 					})();
+					var posterState = (function(){
+						var lastPosterState, lastYoutubeState;
+						var regYt = /youtube\.com\/[watch\?|v\/]+/i;
+						return function(){
+							var hasPoster = !!data.media.attr('poster');
+							var hasYt = regYt.test(data.media.prop('currentSrc') || '');
+							if(lastPosterState !== hasPoster){
+								lastPosterState = hasPoster;
+								data.player[hasPoster ? 'removeClass' : 'addClass']('no-poster');
+							}
+							if(lastYoutubeState !== hasYt){
+								lastYoutubeState = hasYt;
+								data.player[hasYt ? 'addClass' : 'removeClass']('has-yt');
+							}
+						};
+					})();
 
 
 					userActivity._create(data.player, data.media, data.player);
 
+					data.media.on('emptied', posterState);
+
 					playerSize();
+					posterState();
 					webshims.ready('dom-support', function(){
 						data.player.onWSOff('updateshadowdom', playerSize);
 						controls.add(data._controlbar).addClass(webshims.shadowClass);
