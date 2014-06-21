@@ -228,6 +228,9 @@
 .mediaplayer[data-state="idle"] {
   cursor: pointer;
 }
+.mediaplayer[data-state="idle"].has-yt.no-poster > .jme-media-overlay:before {
+  content: "";
+}
 .mediaplayer[data-state="ended"] {
   cursor: pointer;
 }
