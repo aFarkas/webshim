@@ -294,6 +294,26 @@ webshims.register('track', function($, webshims, window, document, undefined){
 			return cueText.replace(tagSplits, replacer);
 		};
 	})();
+	var mapTtmlToVtt = function(i){
+		var content = i+'';
+		var begin = this.getAttribute('begin') || '';
+		var end = this.getAttribute('end') || '';
+		var text = $.trim($.text(this));
+		if(!/\./.test(begin)){
+			begin += '.000';
+		}
+		if(!/\./.test(end)){
+			end += '.000';
+		}
+		content += '\n';
+		content += begin +' --> '+end+'\n';
+		content += text;
+		return content;
+	};
+	var ttmlTextToVTT = function(ttml){
+		ttml = $.parseXML(ttml) || [];
+		return $(ttml).find('[begin][end]').map(mapTtmlToVtt).get().join('\n\n') || '';
+	};
 	
 	mediaelement.loadTextTrack = function(mediaelem, track, trackData, _default){
 		var loadEvents = 'play playing';
@@ -321,7 +341,11 @@ webshims.register('track', function($, webshims, window, document, undefined){
 								dataType: 'text',
 								url: src,
 								success: function(text){
-									if(ajax.getResponseHeader('content-type') != 'text/vtt'){
+									var contentType = ajax.getResponseHeader('content-type');
+
+									if(!contentType.indexOf('application/xml')){
+										text = ttmlTextToVTT(text);
+									} else if(contentType.indexOf('text/vtt')){
 										webshims.error('set the mime-type of your WebVTT files to text/vtt. see: http://dev.w3.org/html5/webvtt/#text/vtt');
 									}
 									mediaelement.parseCaptions(text, obj, function(cues){
