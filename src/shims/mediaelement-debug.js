@@ -8,7 +8,7 @@
 		urlInValid: {
 			level: 1,
 			test: (function(){
-				var reg = /^[a-z0-9\,\.\:\/\-_\;\?#\+\*\!\(\)\$\;\&\=]+$/i;
+				var reg = /^[a-z0-9\,\.\:\/\-_\;\?#\+\*\!\(\)\$\;\&\=\+]+$/i;
 				return function(src){
 					return (src.src && !reg.test(src.src));
 				};

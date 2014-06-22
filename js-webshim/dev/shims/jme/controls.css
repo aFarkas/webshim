@@ -479,7 +479,9 @@
   background: #000;
 }
 
-.mediaplayer[data-useractivity="false"][data-state="playing"].player-fullscreen {
+.mediaplayer[data-useractivity="false"][data-state="playing"].player-fullscreen,
+.mediaplayer[data-useractivity="false"][data-state="playing"].player-fullscreen .jme-media-overlay,
+.mediaplayer[data-useractivity="false"][data-state="playing"].player-fullscreen .cue-display {
   cursor: none !important;
 }
 

@@ -6,6 +6,7 @@ upcomming Release 1.14.3
 - improved selector performance
 - added srt and ttml subtitle support (but you really should still use vtt!)
 - improved touch support
+- fixed a change event bug in input[type="range"] polyfill
 
 Release 1.14.1/Release 1.14.2
 ----------

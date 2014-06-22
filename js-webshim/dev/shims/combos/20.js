@@ -4479,7 +4479,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			var media, error, parent;
 			if(
 				($(e.target).is('audio, video') || ((parent = e.target.parentNode) && $('source', parent).last()[0] == e.target)) &&
-				(media = $(e.target).closest('audio, video') && !media.is('.nonnative-api-active'))
+				(media = $(e.target).closest('audio, video')) && !media.is('.nonnative-api-active')
 				){
 				error = media.prop('error');
 				setTimeout(function(){

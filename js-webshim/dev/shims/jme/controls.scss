@@ -742,7 +742,11 @@ $browser-context: 16; // Default
 }
 
 .mediaplayer[data-useractivity="false"][data-state="playing"].player-fullscreen {
-	cursor: none !important;
+	&,
+	.jme-media-overlay,
+	.cue-display {
+		cursor: none !important;
+	}
 }
 
 .media-fullscreen,
