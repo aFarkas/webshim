@@ -223,7 +223,6 @@ span.has-input-buttons {
   overflow: visible;
   margin: 0 0 0 2px;
   width: 19px;
-  border-radius: 3px;
   cursor: pointer;
   background: #ccc;
   font-size: 13px;
@@ -447,14 +446,12 @@ span.ws-input {
   border: none;
   height: 0.61538em;
   width: 155px;
-  border-radius: 0.38462em;
   background: #ddd;
   cursor: pointer;
   font-size: 13px;
   outline: none;
   transition: background-color 400ms, border-color 400ms;
   background-color: #ddd;
-  box-shadow: 0 -0.07692em 0.11538em rgba(0, 0, 0, 0.2) inset;
   letter-spacing: normal;
   word-spacing: normal;
 }
@@ -466,10 +463,9 @@ span.ws-input {
   position: absolute;
   display: block;
   z-index: 4;
-  margin: -0.53846em 0 0 -0.84615em;
-  height: 1.69231em;
-  width: 1.69231em;
-  border-radius: 50%;
+  margin: -0.38462em 0 0 -1.15385em;
+  height: 1.38462em;
+  width: 2.30769em;
   background: #ccc;
   border: 0.07692em solid #aaaaaa;
   cursor: pointer;
@@ -481,7 +477,7 @@ span.ws-input {
   padding: 0;
   border: 0;
   left: 50%;
-  bottom: 1.76923em;
+  bottom: 1.46154em;
   visibility: hidden;
   width: 180px;
   text-align: center;
@@ -496,7 +492,6 @@ span.ws-input {
   text-align: center;
   background: #fff;
   border: 0.07692em solid #cccccc;
-  border-radius: 0.30769em;
   visibility: visible;
 }
 .ws-range.ws-focus .ws-range-thumb {
@@ -504,7 +499,8 @@ span.ws-input {
   border-color: #999;
 }
 .ws-range.ws-active .ws-range-thumb {
-  box-shadow: 0 0 0.69231em rgba(0, 75, 100, 0.2);
+  background: #efefef;
+  border-color: #666;
 }
 .ws-range[aria-disabled="true"], .ws-range[aria-readonly="true"] {
   cursor: default;
@@ -533,14 +529,11 @@ span.ws-input {
   margin: 0;
   padding: 0;
   top: 0;
-  border-radius: 0.38462em;
   height: 100%;
   left: 0;
   z-index: 1;
   overflow: hidden;
   background: #09c;
-  box-shadow: 0 0.11538em 0.26923em rgba(255, 255, 255, 0.2) inset;
-  -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
 .ws-range .ws-range-ticks {

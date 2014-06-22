@@ -102,7 +102,6 @@ span.has-input-buttons {
 	overflow: visible;
 	margin: 0 0 0 2px;
 	width: 19px;
-	border-radius: 3px;
 	cursor: pointer;
 	background: #ccc;
 	font-size: 13px;
@@ -391,14 +390,12 @@ span.ws-input {
 	border: none;
 	height: em(8);
 	width: 155px;
-	border-radius: em(5);
 	background: #ddd;
 	cursor: pointer;
 	font-size: 13px;
 	outline: none;
 	transition: background-color 400ms, border-color 400ms;
 	background-color: #ddd;
-	box-shadow: 0 em(-1) em(1.5) rgba(0, 0, 0, 0.2) inset;
 	letter-spacing: normal;
 	word-spacing: normal;
 	
@@ -407,15 +404,13 @@ span.ws-input {
 	}
 	
 	.ws-range-thumb {
-		$dim: 22;
 		top: 0;
 		position: absolute;
 		display: block;
 		z-index: 4;
-		margin: em(($dim - 8) / -2) 0 0 em($dim / -2);
-		height: em($dim);
-		width: em($dim);
-		border-radius: 50%;
+		margin: em((18 - 8) / -2) 0 0 em(30 / -2);
+		height: em(18);
+		width: em(30);
 		background: #ccc;
 		border: em(1) solid #aaa;
 		cursor: pointer;
@@ -427,7 +422,7 @@ span.ws-input {
 			padding: 0;
 			border: 0;
 			left: 50%;
-			bottom: em($dim + 1);
+			bottom: em(18 + 1);
 			visibility: hidden;
 			width: 180px;
 			text-align: center;
@@ -442,7 +437,6 @@ span.ws-input {
 					text-align: center;
 					background: #fff;
 					border: em(1) solid #ccc;
-					border-radius: em(4);
 					visibility: visible;
 				}
 			}
@@ -456,7 +450,8 @@ span.ws-input {
 	}
 	
 	&.ws-active .ws-range-thumb {
-		box-shadow: 0 0 em(9) rgba(0, 75, 100, 0.2);
+		background: #efefef;
+		border-color: #666;
 	}
 	
 	&[aria-disabled="true"],
@@ -492,14 +487,11 @@ span.ws-input {
 		margin: 0;
 		padding: 0;
 		top: 0;
-		border-radius: em(5);
 		height: 100%;
 		left: 0;
 		z-index: 1;
 		overflow: hidden;
 		background: #09c;
-		box-shadow: 0 em(1.5) em(3.5) rgba(255, 255, 255, 0.2) inset;
-		-moz-box-sizing: content-box;
 		box-sizing: content-box;
 	}
 

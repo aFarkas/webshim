@@ -5,7 +5,6 @@
 $border-light: 1px solid #ddd;
 $button-bgcolor: #f5f5f5;
 %ws-button {
-	border-radius: em(4);
 	background: #ccc;
 	padding: em(5) em(8);
 	display: inline-block;
@@ -82,8 +81,6 @@ $button-bgcolor: #f5f5f5;
 	.ws-po-box {
 		position: relative;
 		padding: em(15) em(20);
-		border-radius: em(5);
-		box-shadow: 0 0 2px rgba(0, 0, 0, .3);
 		direction: ltr;
 	}
 
@@ -94,7 +91,6 @@ $button-bgcolor: #f5f5f5;
 		> button {
 			box-sizing: content-box;
 			border: em(1) solid #ccc;
-			border-radius: em(5);
 			padding: 0;
 			width: em(24);
 			height: em(24);
@@ -211,12 +207,8 @@ $button-bgcolor: #f5f5f5;
 
 		> button {
 			@extend %ws-button;
-
 			border: em(1) solid #ccc;
-			border-radius: 5px;
-			box-shadow: 1px 1px 0 #fff;
 			background-color: #ddd;
-			background-image: -webkit-linear-gradient(top, #ececec 0%, #ddd 100%);
 			background-image: linear-gradient(to bottom, #ececec 0%, #ddd 100%);
 			transition: border-color 200ms linear;
 			float: left;
@@ -367,7 +359,6 @@ $button-bgcolor: #f5f5f5;
 			display: block;
 			padding: em(20.669) 0;
 			width: 100%;
-			border-radius: em(5);
 			color: #000;
 			background-color: #fff;
 
@@ -432,7 +423,6 @@ $button-bgcolor: #f5f5f5;
 			padding: em(4);
 			width: 100%;
 			text-align: left;
-			border-radius: em(4);
 
 			&.ws-focus,
 			&:focus,

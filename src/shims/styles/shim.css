@@ -291,8 +291,6 @@ output {
   border: 0.07692em solid #cccccc;
   background: #fff;
   padding: 0.38462em 0.38462em 0.23077em;
-  border-radius: 0.23077em;
-  box-shadow: 0 0.07692em 0.38462em rgba(0, 0, 0, 0.25);
 }
 
 .ws-po-arrow {
@@ -498,28 +496,20 @@ progress.ws-style {
   border: 0;
   border: 1px solid #ddd;
   background: #f0f0f0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
-  border-radius: 4px;
 }
 progress.ws-style::-webkit-progress-bar {
   border: 1px solid #ddd;
   background: #f0f0f0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
-  border-radius: 4px;
   border: 0 none;
 }
 progress.ws-style::-moz-progress-bar {
   border: 1px solid #ddd;
   background: #f0f0f0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
-  border-radius: 4px;
 }
 progress.ws-style::-ms-fill {
   animation-name: none;
   border: 1px solid #ddd;
   background: #f0f0f0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
-  border-radius: 4px;
 }
 progress.ws-style > span.progress-value {
   left: 0;
@@ -533,7 +523,6 @@ progress.ws-style::-webkit-progress-value {
   top: 0;
   bottom: 0;
   height: 100%;
-  box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
   background: #0063a6 url(progress.png);
   border: 0;
 }
@@ -542,7 +531,6 @@ progress.ws-style::-moz-progress-bar {
   top: 0;
   bottom: 0;
   height: 100%;
-  box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
   background: #0063a6 url(progress.png);
   border: 0;
 }
@@ -552,7 +540,6 @@ progress.ws-style::-ms-fill {
   top: 0;
   bottom: 0;
   height: 100%;
-  box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
   background: #0063a6 url(progress.png);
   border: 0;
 }
@@ -562,7 +549,6 @@ progress.ws-style > span.progress-value {
   top: 0;
   bottom: 0;
   height: 100%;
-  box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15) inset;
   background: #0063a6 url(progress.png);
   border: 0;
 }
@@ -622,7 +608,6 @@ summary.summary-has-focus {
 }
 .ws-custom-file > button,
 .ws-custom-file > input {
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   cursor: pointer;
 }

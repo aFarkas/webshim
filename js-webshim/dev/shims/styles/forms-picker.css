@@ -66,7 +66,6 @@ SASS:
 
 /* btn api */
 .input-picker .ws-button-row > button {
-  border-radius: 0.30769em;
   background: #ccc;
   padding: 0.38462em 0.61538em;
   display: inline-block;
@@ -130,8 +129,6 @@ SASS:
 .input-picker .ws-po-box {
   position: relative;
   padding: 1.15385em 1.53846em;
-  border-radius: 0.38462em;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
   direction: ltr;
 }
 .input-picker .ws-picker-controls {
@@ -141,7 +138,6 @@ SASS:
 .input-picker .ws-picker-controls > button {
   box-sizing: content-box;
   border: 0.07692em solid #cccccc;
-  border-radius: 0.38462em;
   padding: 0;
   width: 1.84615em;
   height: 1.84615em;
@@ -239,10 +235,7 @@ SASS:
 }
 .input-picker .ws-button-row > button {
   border: 0.07692em solid #cccccc;
-  border-radius: 5px;
-  box-shadow: 1px 1px 0 #fff;
   background-color: #ddd;
-  background-image: -webkit-linear-gradient(top, #ececec 0%, #dddddd 100%);
   background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
   transition: border-color 200ms linear;
   float: left;
@@ -357,7 +350,6 @@ SASS:
   display: block;
   padding: 1.58992em 0;
   width: 100%;
-  border-radius: 0.38462em;
   color: #000;
   background-color: #fff;
 }
@@ -410,7 +402,6 @@ SASS:
   padding: 0.30769em;
   width: 100%;
   text-align: left;
-  border-radius: 0.30769em;
 }
 .input-picker .ws-options button.ws-focus, .input-picker .ws-options button:focus, .input-picker .ws-options button:hover {
   color: #fff;
