@@ -1215,6 +1215,8 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 				$(document).off('mousemove touchmove', setValueFromPos).off('mouseup touchend', remove);
 				$(window).off('blur', removeWin);
 				if(!o.readonly && !o.disabled){
+					eventTimer.init('input', o.value);
+					eventTimer.init('change', o.value);
 					normalizeTouch(e);
 					that.element.trigger('focus');
 					that.addRemoveClass('ws-active', true);
@@ -1250,8 +1252,10 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 				'touchstart mousedown': add,
 				focus: function(e){
 					if(!o.disabled && !hasFocus){
-						eventTimer.init('input', o.value);
-						eventTimer.init('change', o.value);
+						if(!isActive){
+							eventTimer.init('input', o.value);
+							eventTimer.init('change', o.value);
+						}
 						that.addRemoveClass('ws-focus', true);
 						that.updateMetrics();
 					}
@@ -2379,7 +2383,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 				wsWidgetProto._create.apply(this, arguments);
 				this._init = false;
 				
-				this.buttonWrapper.html('<span unselectable="on" class="step-controls"><span class="step-up"></span><span class="step-down"></span></span>');
+				this.buttonWrapper.html('<span unselectable="on" class="step-controls"><span class="step-up step-control"></span><span class="step-down step-control"></span></span>');
 				
 				if(this.type == 'number'){
 					this.inputElements.attr('inputmode', 'numeric');

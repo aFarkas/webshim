@@ -228,14 +228,6 @@ $browser-context: 16; // Default
 }
 
 
-
-.jme-controlbar,
-.jme-controlbar * {
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-}
-
 .jme-controlbar {
 	display: table;
 	width: 100%;
@@ -376,7 +368,7 @@ $browser-context: 16; // Default
 			@extend %icon-play-circle;
 		}
 
-		&.has-yt.no-poster > .jme-media-overlay:before {
+		&.has-ytposter > .jme-media-overlay:before {
 			content: "";
 		}
 	}
@@ -703,8 +695,8 @@ $browser-context: 16; // Default
 		background: #f1f1f1;
 		cursor: pointer;
 		border-radius: 50%;
-		width: em(11);
-		height: em(11);
+		width: em(12);
+		height: em(12);
 	}
 
 	.ws-focus .ws-range-thumb {
@@ -714,8 +706,8 @@ $browser-context: 16; // Default
 	.time-slider {
 
 		.ws-range-thumb {
-			width: em(16);
-			height: em(11);
+			width: em(18);
+			height: em(13);
 			border-radius: em(3);
 		}
 	}

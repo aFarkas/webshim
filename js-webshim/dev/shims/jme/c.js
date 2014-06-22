@@ -143,17 +143,19 @@ webshims.register('mediacontrols', function($, webshims, window){
 					})();
 					var posterState = (function(){
 						var lastPosterState, lastYoutubeState;
+						var hasFlash = window.swfmini && swfmini.hasFlashPlayerVersion('10.0.3');
 						var regYt = /youtube\.com\/[watch\?|v\/]+/i;
 						return function(){
 							var hasPoster = !!data.media.attr('poster');
-							var hasYt = regYt.test(data.media.prop('currentSrc') || '');
+							var hasYt = (hasFlash && hasPoster) ? false : regYt.test(data.media.prop('currentSrc') || '');
 							if(lastPosterState !== hasPoster){
 								lastPosterState = hasPoster;
 								data.player[hasPoster ? 'removeClass' : 'addClass']('no-poster');
 							}
+
 							if(lastYoutubeState !== hasYt){
 								lastYoutubeState = hasYt;
-								data.player[hasYt ? 'addClass' : 'removeClass']('has-yt');
+								data.player[hasYt ? 'addClass' : 'removeClass']('has-ytposter');
 							}
 						};
 					})();

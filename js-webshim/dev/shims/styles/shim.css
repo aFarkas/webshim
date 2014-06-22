@@ -7,17 +7,6 @@
   content: ' ';
 }
 
-.ws-popover {
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
-.ws-popover *, .ws-popover:before, .ws-popover:after,
-.ws-popover :after,
-.ws-popover :before {
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
-
 .ws-important-hide {
   display: none !important;
   visibility: hidden !important;
@@ -259,6 +248,9 @@ output {
   direction: ltr;
   -webkit-tap-highlight-color: transparent;
 }
+.ws-popover.ws-popover-constrained-width {
+  box-sizing: content-box;
+}
 .ws-popover.ws-is-rtl {
   direction: rtl;
   margin: 0 0 0 0.92308em;
@@ -499,7 +491,7 @@ progress {
   box-sizing: border-box;
   vertical-align: -0.2em;
 }
-progress[data-position], progress.ws-style {
+progress.ws-style {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
@@ -509,34 +501,34 @@ progress[data-position], progress.ws-style {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
   border-radius: 4px;
 }
-progress[data-position]::-webkit-progress-bar, progress.ws-style::-webkit-progress-bar {
+progress.ws-style::-webkit-progress-bar {
   border: 1px solid #ddd;
   background: #f0f0f0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
   border-radius: 4px;
   border: 0 none;
 }
-progress[data-position]::-moz-progress-bar, progress.ws-style::-moz-progress-bar {
+progress.ws-style::-moz-progress-bar {
   border: 1px solid #ddd;
   background: #f0f0f0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
   border-radius: 4px;
 }
-progress[data-position]::-ms-fill, progress.ws-style::-ms-fill {
+progress.ws-style::-ms-fill {
   animation-name: none;
   border: 1px solid #ddd;
   background: #f0f0f0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
   border-radius: 4px;
 }
-progress[data-position] > span.progress-value, progress.ws-style > span.progress-value {
+progress.ws-style > span.progress-value {
   left: 0;
 }
-progress[data-position].ws-is-rtl > span.progress-value, progress.ws-style.ws-is-rtl > span.progress-value {
+progress.ws-style.ws-is-rtl > span.progress-value {
   left: auto;
   right: 0;
 }
-progress[data-position]::-webkit-progress-value, progress.ws-style::-webkit-progress-value {
+progress.ws-style::-webkit-progress-value {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -545,7 +537,7 @@ progress[data-position]::-webkit-progress-value, progress.ws-style::-webkit-prog
   background: #0063a6 url(progress.png);
   border: 0;
 }
-progress[data-position]::-moz-progress-bar, progress.ws-style::-moz-progress-bar {
+progress.ws-style::-moz-progress-bar {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -554,7 +546,7 @@ progress[data-position]::-moz-progress-bar, progress.ws-style::-moz-progress-bar
   background: #0063a6 url(progress.png);
   border: 0;
 }
-progress[data-position]::-ms-fill, progress.ws-style::-ms-fill {
+progress.ws-style::-ms-fill {
   animation-name: none;
   position: absolute;
   top: 0;
@@ -564,7 +556,7 @@ progress[data-position]::-ms-fill, progress.ws-style::-ms-fill {
   background: #0063a6 url(progress.png);
   border: 0;
 }
-progress[data-position] > span.progress-value, progress.ws-style > span.progress-value {
+progress.ws-style > span.progress-value {
   display: block !important;
   position: absolute;
   top: 0;
@@ -574,17 +566,17 @@ progress[data-position] > span.progress-value, progress.ws-style > span.progress
   background: #0063a6 url(progress.png);
   border: 0;
 }
-progress[data-position]:indeterminate::-webkit-progress-bar, progress.ws-style:indeterminate::-webkit-progress-bar {
+progress.ws-style:indeterminate::-webkit-progress-bar {
   background-image: url(progress.gif);
 }
-progress[data-position]:indeterminate::-moz-progress-bar, progress.ws-style:indeterminate::-moz-progress-bar {
+progress.ws-style:indeterminate::-moz-progress-bar {
   background-image: url(progress.gif);
 }
-progress[data-position]:indeterminate, progress.ws-style:indeterminate {
+progress.ws-style:indeterminate {
   animation-name: none;
   background-image: url(progress.gif);
 }
-progress[data-position].ws-indeterminate > span.progress-value, progress.ws-style.ws-indeterminate > span.progress-value {
+progress.ws-style.ws-indeterminate > span.progress-value {
   display: block !important;
   width: 100%;
   right: 0;

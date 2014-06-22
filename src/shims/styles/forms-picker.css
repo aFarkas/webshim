@@ -65,7 +65,7 @@ SASS:
 }
 
 /* btn api */
-.input-picker .ws-button-row button {
+.input-picker .ws-button-row > button {
   border-radius: 0.30769em;
   background: #ccc;
   padding: 0.38462em 0.61538em;
@@ -81,7 +81,7 @@ SASS:
   font-family: sans-serif;
   width: 27.69231em;
   min-width: 20.76923em;
-  max-width: 96vw;
+  max-width: 98vw;
   /* Selector API: */
 }
 .input-picker .ws-po-outerbox {
@@ -139,6 +139,7 @@ SASS:
   top: 1.15385em;
 }
 .input-picker .ws-picker-controls > button {
+  box-sizing: content-box;
   border: 0.07692em solid #cccccc;
   border-radius: 0.38462em;
   padding: 0;
@@ -156,9 +157,6 @@ SASS:
   border-style: solid;
   margin-top: 0.29231em;
 }
-.input-picker .ws-picker-controls > button span {
-  display: none;
-}
 .input-picker .ws-picker-controls > button:hover {
   border-color: #666;
   color: #000;
@@ -173,21 +171,21 @@ SASS:
   left: 1.53846em;
   right: auto;
 }
-.input-picker .prev-controls [class*="ws-super-"]:after,
-.input-picker .prev-controls button:before,
-.input-picker .ws-po-box[dir="rtl"] .next-controls [class*="ws-super-"]:after,
-.input-picker .ws-po-box[dir="rtl"] .next-controls button:before {
+.input-picker .prev-controls > .ws-year-btn:after,
+.input-picker .prev-controls > button:before,
+.input-picker .ws-po-box[dir="rtl"] .next-controls > .ws-year-btn:after,
+.input-picker .ws-po-box[dir="rtl"] .next-controls > button:before {
   border-width: 0.35em 0.6em 0.35em 0;
   border-color: transparent #333 transparent transparent;
   margin-left: -0.1em;
 }
-.input-picker .prev-controls [class*="ws-super-"],
-.input-picker .ws-po-box[dir="rtl"] .next-controls [class*="ws-super-"] {
+.input-picker .prev-controls > .ws-year-btn,
+.input-picker .ws-po-box[dir="rtl"] .next-controls > .ws-year-btn {
   margin-right: 0.23077em;
   margin-left: 0;
 }
-.input-picker .prev-controls [class*="ws-super-"][disabled],
-.input-picker .ws-po-box[dir="rtl"] .next-controls [class*="ws-super-"][disabled] {
+.input-picker .prev-controls > .ws-year-btn[disabled],
+.input-picker .ws-po-box[dir="rtl"] .next-controls > .ws-year-btn[disabled] {
   display: none;
 }
 .input-picker .next-controls,
@@ -195,28 +193,28 @@ SASS:
   right: 1.53846em;
   left: auto;
 }
-.input-picker .next-controls button:before,
-.input-picker .ws-po-box[dir="rtl"] .prev-controls button:before {
+.input-picker .next-controls > button:before,
+.input-picker .ws-po-box[dir="rtl"] .prev-controls > button:before {
   margin-left: 0.11538em;
 }
-.input-picker .next-controls [class*="ws-super-"]:after,
-.input-picker .next-controls button:before,
-.input-picker .ws-po-box[dir="rtl"] .prev-controls [class*="ws-super-"]:after,
-.input-picker .ws-po-box[dir="rtl"] .prev-controls button:before {
+.input-picker .next-controls > .ws-year-btn:after,
+.input-picker .next-controls > button:before,
+.input-picker .ws-po-box[dir="rtl"] .prev-controls > .ws-year-btn:after,
+.input-picker .ws-po-box[dir="rtl"] .prev-controls > button:before {
   border-width: 0.35em 0 0.35em 0.6em;
   border-color: transparent transparent transparent #333;
   margin-right: -0.1em;
 }
-.input-picker .next-controls [class*="ws-super-"],
-.input-picker .ws-po-box[dir="rtl"] .prev-controls [class*="ws-super-"] {
+.input-picker .next-controls > .ws-year-btn,
+.input-picker .ws-po-box[dir="rtl"] .prev-controls > .ws-year-btn {
   margin-left: 0.23077em;
   margin-right: 0;
 }
-.input-picker .next-controls [class*="ws-super-"][disabled],
-.input-picker .ws-po-box[dir="rtl"] .prev-controls [class*="ws-super-"][disabled] {
+.input-picker .next-controls > .ws-year-btn[disabled],
+.input-picker .ws-po-box[dir="rtl"] .prev-controls > .ws-year-btn[disabled] {
   display: none;
 }
-.input-picker.ws-po-visible .ws-picker-controls button:after, .input-picker.ws-po-visible .ws-picker-controls button:before {
+.input-picker.ws-po-visible .ws-picker-controls > button:after, .input-picker.ws-po-visible .ws-picker-controls > button:before {
   content: " ";
 }
 .input-picker .ws-po-box[dir="rtl"] {
@@ -239,7 +237,7 @@ SASS:
   text-align: left;
   z-index: 2;
 }
-.input-picker .ws-button-row button {
+.input-picker .ws-button-row > button {
   border: 0.07692em solid #cccccc;
   border-radius: 5px;
   box-shadow: 1px 1px 0 #fff;
@@ -249,13 +247,13 @@ SASS:
   transition: border-color 200ms linear;
   float: left;
 }
-.input-picker .ws-button-row button.ws-empty {
+.input-picker .ws-button-row > button.ws-empty {
   float: right;
 }
-.input-picker .ws-po-box[dir="rtl"] .ws-button-row button {
+.input-picker .ws-po-box[dir="rtl"] .ws-button-row > button {
   float: right;
 }
-.input-picker .ws-po-box[dir="rtl"] .ws-button-row button.ws-empty {
+.input-picker .ws-po-box[dir="rtl"] .ws-button-row > button.ws-empty {
   float: left;
 }
 .input-picker[data-currentview="setMonthList"] .ws-picker-header > select, .input-picker[data-currentview="setYearList"] .ws-picker-header > select {

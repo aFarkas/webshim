@@ -387,6 +387,8 @@
 				$(document).off('mousemove touchmove', setValueFromPos).off('mouseup touchend', remove);
 				$(window).off('blur', removeWin);
 				if(!o.readonly && !o.disabled){
+					eventTimer.init('input', o.value);
+					eventTimer.init('change', o.value);
 					normalizeTouch(e);
 					that.element.trigger('focus');
 					that.addRemoveClass('ws-active', true);
@@ -422,8 +424,10 @@
 				'touchstart mousedown': add,
 				focus: function(e){
 					if(!o.disabled && !hasFocus){
-						eventTimer.init('input', o.value);
-						eventTimer.init('change', o.value);
+						if(!isActive){
+							eventTimer.init('input', o.value);
+							eventTimer.init('change', o.value);
+						}
 						that.addRemoveClass('ws-focus', true);
 						that.updateMetrics();
 					}

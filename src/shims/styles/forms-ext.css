@@ -1,18 +1,3 @@
-.ws-range .ws-range-thumb, .ws-inline-picker,
-div.ws-inline-picker {
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
-.ws-range .ws-range-thumb *, .ws-inline-picker *,
-div.ws-inline-picker *, .ws-range .ws-range-thumb:before, .ws-inline-picker:before, .ws-range .ws-range-thumb:after, .ws-inline-picker:after,
-.ws-range .ws-range-thumb :after,
-.ws-inline-picker :after,
-.ws-range .ws-range-thumb :before,
-.ws-inline-picker :before {
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
-
 /* style picker api */
 /* how to use: 
 *
@@ -102,43 +87,43 @@ SASS:
 }
 
 .show-valuetooltip span.ws-range-thumb > span,
-.show-valuetooltip span.ws-range-thumb > span span:after {
+.show-valuetooltip span.ws-range-thumb > span > span:after {
   display: inline-block;
 }
-.show-valuetooltip span.ws-range-thumb > span span:after {
+.show-valuetooltip span.ws-range-thumb > span > span:after {
   content: attr(data-value) !important;
   visibility: visible !important;
 }
 
 .ws-active.show-activevaluetooltip span.ws-range-thumb > span,
-.ws-active.show-activevaluetooltip span.ws-range-thumb > span span:after,
+.ws-active.show-activevaluetooltip span.ws-range-thumb > span > span:after,
 .show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span,
-.show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span span:after {
+.show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span > span:after {
   display: inline-block;
 }
-.ws-active.show-activevaluetooltip span.ws-range-thumb > span span:after,
-.show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span span:after {
+.ws-active.show-activevaluetooltip span.ws-range-thumb > span > span:after,
+.show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span > span:after {
   content: attr(data-value) !important;
   visibility: visible !important;
 }
 
 .show-labeltooltip span.ws-range-thumb > span,
-.show-labeltooltip span.ws-range-thumb > span span:before {
+.show-labeltooltip span.ws-range-thumb > span > span:before {
   display: inline-block;
 }
-.show-labeltooltip span.ws-range-thumb > span span:before {
+.show-labeltooltip span.ws-range-thumb > span > span:before {
   content: attr(data-valuetext) !important;
   visibility: visible !important;
 }
 
 .ws-active.show-activelabeltooltip span.ws-range-thumb > span,
-.ws-active.show-activelabeltooltip span.ws-range-thumb > span span:before,
+.ws-active.show-activelabeltooltip span.ws-range-thumb > span > span:before,
 .show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span,
-.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span span:before {
+.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span > span:before {
   display: inline-block;
 }
-.ws-active.show-activelabeltooltip span.ws-range-thumb > span span:before,
-.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span span:before {
+.ws-active.show-activelabeltooltip span.ws-range-thumb > span > span:before,
+.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span > span:before {
   content: attr(data-valuetext) !important;
   visibility: visible !important;
 }
@@ -153,7 +138,9 @@ SASS:
   font-weight: normal;
   font-style: normal;
 }
-.ws-popover-opener span, .time-input-buttons .ws-popover-opener span {
+.ws-popover-opener > span,
+.ws-popover-opener .ws-color-indicator, .time-input-buttons .ws-popover-opener > span, .time-input-buttons
+.ws-popover-opener .ws-color-indicator {
   font-family: 'widget';
   speak: none;
   font-style: normal;
@@ -167,21 +154,23 @@ SASS:
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ws-popover-opener span:before {
+.ws-popover-opener > span:before,
+.ws-popover-opener .ws-color-indicator:before {
   content: "\f073";
 }
 
-.time-input-buttons .ws-popover-opener span:before {
+.time-input-buttons .ws-popover-opener > span:before, .time-input-buttons
+.ws-popover-opener .ws-color-indicator:before {
   content: "\f017";
 }
 
 .ws-range,
-.ws-range span,
+.ws-range-rail,
+.ws-range span > span,
 .input-buttons,
 .step-controls,
 .ws-popover-opener,
-.step-up,
-.step-down {
+.step-control {
   margin: 0;
   padding: 0;
   border: none;
@@ -250,7 +239,8 @@ span.has-input-buttons {
 .ws-is-rtl .ws-popover-opener {
   margin: 0 2px 0 0;
 }
-.ws-popover-opener span {
+.ws-popover-opener > span,
+.ws-popover-opener .ws-color-indicator {
   display: block;
   position: absolute;
   top: 50%;
@@ -259,19 +249,24 @@ span.has-input-buttons {
   height: 16px;
   margin: -8px 0 0 -8px;
 }
-.time-input-buttons .ws-popover-opener span {
+.time-input-buttons .ws-popover-opener > span, .time-input-buttons
+.ws-popover-opener .ws-color-indicator {
   margin: -7.5px 0 0 -7.5px;
 }
-.color-input-buttons .ws-popover-opener span {
+.color-input-buttons .ws-popover-opener > span, .color-input-buttons
+.ws-popover-opener .ws-color-indicator {
   background: url(color-picker.png) no-repeat 0 0;
 }
-.color-input-buttons .ws-popover-opener span:before {
+.color-input-buttons .ws-popover-opener > span:before, .color-input-buttons
+.ws-popover-opener .ws-color-indicator:before {
   content: "";
 }
-.ws-popover-opener span.ws-color-indicator-bg {
+.ws-popover-opener > span.ws-color-indicator-bg,
+.ws-popover-opener .ws-color-indicator.ws-color-indicator-bg {
   background: url(../jpicker/images/preview-opacity.png) no-repeat 0;
 }
-.ws-popover-opener span.ws-color-indicator {
+.ws-popover-opener > span.ws-color-indicator,
+.ws-popover-opener .ws-color-indicator.ws-color-indicator {
   background: none;
 }
 
@@ -288,7 +283,9 @@ input[type="color"] {
 .input-buttons.ws-disabled {
   opacity: 0.95;
 }
-.input-buttons.ws-disabled *, .input-buttons.ws-readonly * {
+.input-buttons.ws-disabled .ws-popover-opener,
+.input-buttons.ws-disabled .step-control, .input-buttons.ws-readonly .ws-popover-opener,
+.input-buttons.ws-readonly .step-control {
   cursor: default;
 }
 
@@ -319,7 +316,8 @@ input[type="color"] {
 .step-controls {
   transition: all 300ms;
 }
-.step-controls span {
+
+span.step-control {
   position: absolute;
   left: 0;
   display: inline-block;
@@ -334,10 +332,10 @@ input[type="color"] {
   text-align: center;
   transition: border-color 300ms, background-color 300ms;
 }
-.step-controls span.step-down {
+span.step-control.step-down {
   bottom: 0;
 }
-.step-controls span:before {
+span.step-control:before {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -349,30 +347,30 @@ input[type="color"] {
   margin: -2px 0 0 -4px;
   transition: border-color 300ms, background-color 300ms;
 }
-.step-controls span.step-up:before {
+span.step-control.step-up:before {
   border-width: 0 4px 4px;
   border-color: transparent transparent #999 transparent;
 }
-.step-controls span.step-up:hover:before {
+span.step-control.step-up:hover:before {
   border-color: transparent transparent #666 transparent;
 }
-.step-controls span.step-up.mousepress-ui:before {
+span.step-control.step-up.mousepress-ui:before {
   border-color: transparent transparent #000 transparent;
 }
-.ws-disabled .step-controls span.step-up:before {
+.ws-disabled span.step-control.step-up:before {
   border-color: transparent transparent #aaa transparent;
 }
-.step-controls span.step-down:before {
+span.step-control.step-down:before {
   border-width: 4px 4px 0;
   border-color: #999 transparent transparent transparent;
 }
-.step-controls span.step-down:hover:before {
+span.step-control.step-down:hover:before {
   border-color: #666 transparent transparent transparent;
 }
-.step-controls span.step-down.mousepress-ui:before {
+span.step-control.step-down.mousepress-ui:before {
   border-color: #000 transparent transparent transparent;
 }
-.ws-disabled .step-controls span.step-down:before {
+.ws-disabled span.step-control.step-down:before {
   border-color: #aaa transparent transparent transparent;
 }
 
@@ -457,6 +455,8 @@ span.ws-input {
   transition: background-color 400ms, border-color 400ms;
   background-color: #ddd;
   box-shadow: 0 -0.07692em 0.11538em rgba(0, 0, 0, 0.2) inset;
+  letter-spacing: normal;
+  word-spacing: normal;
 }
 [list] + .ws-range {
   margin: 0.19231em 0 0.96154em;
@@ -466,9 +466,9 @@ span.ws-input {
   position: absolute;
   display: block;
   z-index: 4;
-  margin: -0.46154em 0 0 -0.76923em;
-  height: 1.53846em;
-  width: 1.53846em;
+  margin: -0.53846em 0 0 -0.84615em;
+  height: 1.69231em;
+  width: 1.69231em;
   border-radius: 50%;
   background: #ccc;
   border: 0.07692em solid #aaaaaa;
@@ -481,16 +481,16 @@ span.ws-input {
   padding: 0;
   border: 0;
   left: 50%;
-  bottom: 1.61538em;
+  bottom: 1.76923em;
   visibility: hidden;
   width: 180px;
   text-align: center;
   background: none;
 }
-.ws-range .ws-range-thumb > span span {
+.ws-range .ws-range-thumb > span > span {
   visibility: visible;
 }
-.ws-range .ws-range-thumb > span span:after, .ws-range .ws-range-thumb > span span:before {
+.ws-range .ws-range-thumb > span > span:after, .ws-range .ws-range-thumb > span > span:before {
   content: "";
   padding: 0.07692em 0.26923em;
   text-align: center;
@@ -612,8 +612,8 @@ span.ws-input {
 }
 
 .ws-range-thumb > span,
-.ws-range-thumb > span span:after,
-.ws-range-thumb > span span:before {
+.ws-range-thumb > span > span:after,
+.ws-range-thumb > span > span:before {
   display: none;
 }
 

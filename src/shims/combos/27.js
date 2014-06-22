@@ -583,6 +583,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 					} else {
 						webshims.info("you should use label elements for your prgogress elements");
 					}
+					$(this).addClass('ws-style');
 					if($(this).css('direction') == 'rtl'){
 						$(this).addClass('ws-is-rtl');
 					}

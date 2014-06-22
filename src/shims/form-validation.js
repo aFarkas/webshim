@@ -246,10 +246,6 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			$(document.documentElement)
 		;
 	};
-	var minWidth = (Modernizr.boxSizing || Modernizr['display-table'] || $.support.getSetAttribute || $.support.boxSizing) ?
-		'minWidth' :
-		'width'
-	;
 	var hasTransition = ('transitionDelay' in document.documentElement.style);
 	var resetPos = {display: 'inline-block', left: 0, top: 0, marginTop: 0, marginLeft: 0, marginRight: 0, marginBottom: 0};
 	
@@ -424,11 +420,17 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				'data-class': element.prop('className'),
 				'data-id': element.prop('id')
 			});
-			
-			css[minWidth] = opts.constrainWidth ? visual.outerWidth() : '';
-			
+
+			if(opts.constrainWidth){
+				this.element.addClass('ws-popover-constrained-width');
+				css.minWidth = visual.outerWidth();
+			} else {
+				this.element.removeClass('ws-popover-constrained-width');
+				css.minWidth = '';
+			}
+
 			this.element.css(css);
-			
+
 			if(opts.hideOnBlur){
 				onBlur = function(e){
 					if(that.stopBlur){

@@ -935,7 +935,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				wsWidgetProto._create.apply(this, arguments);
 				this._init = false;
 				
-				this.buttonWrapper.html('<span unselectable="on" class="step-controls"><span class="step-up"></span><span class="step-down"></span></span>');
+				this.buttonWrapper.html('<span unselectable="on" class="step-controls"><span class="step-up step-control"></span><span class="step-down step-control"></span></span>');
 				
 				if(this.type == 'number'){
 					this.inputElements.attr('inputmode', 'numeric');

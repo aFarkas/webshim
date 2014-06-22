@@ -167,10 +167,10 @@ $rangeapis: show-ticklabels show-tickvalues hide-ticks show-valuetooltip show-la
 %show-valuetooltip {
 	span.ws-range-thumb > span {
 		&,
-		span:after {
+		> span:after {
 			display: inline-block;
 		}
-		span:after {
+		> span:after {
 			content: attr(data-value) !important;
 			visibility: visible !important;
 		}
@@ -182,10 +182,10 @@ $rangeapis: show-ticklabels show-tickvalues hide-ticks show-valuetooltip show-la
 	&.ws-active span.ws-range-thumb > span,
 	.ws-range.ws-active span.ws-range-thumb > span {
 		&,
-		span:after {
+		> span:after {
 			display: inline-block;
 		}
-		span:after {
+		> span:after {
 			content: attr(data-value) !important;
 			visibility: visible !important;
 		}
@@ -194,10 +194,10 @@ $rangeapis: show-ticklabels show-tickvalues hide-ticks show-valuetooltip show-la
 %show-labeltooltip {
 	span.ws-range-thumb > span {
 		&,
-		span:before {
+		> span:before {
 			display: inline-block;
 		}
-		span:before {
+		> span:before {
 			content: attr(data-valuetext) !important;
 			visibility: visible !important;
 		}
@@ -208,10 +208,10 @@ $rangeapis: show-ticklabels show-tickvalues hide-ticks show-valuetooltip show-la
 	&.ws-active span.ws-range-thumb > span,
 	.ws-range.ws-active span.ws-range-thumb > span {
 		&,
-		span:before {
+		> span:before {
 			display: inline-block;
 		}
-		span:before {
+		> span:before {
 			content: attr(data-valuetext) !important;
 			visibility: visible !important;
 		}

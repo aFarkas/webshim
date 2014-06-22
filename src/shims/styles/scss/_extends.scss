@@ -8,20 +8,6 @@
 		content: ' ';
 	}
 }
-%contentbox {
-	-moz-box-sizing: content-box;
-	box-sizing: content-box;
-	
-	*,
-	&:before,
-	&:after,
-	:after,
-	:before {
-		-moz-box-sizing: content-box;
-		box-sizing: content-box;
-	}
-
-}
 
 $browser-context: 13; // Default
 

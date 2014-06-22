@@ -229,8 +229,6 @@ output {
  * popovers
  */
 .ws-popover {
-	@extend %contentbox;
-	
 	font-size: 13px;
 	display: block;
 	visibility: hidden;
@@ -253,7 +251,10 @@ output {
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	direction: ltr;
 	-webkit-tap-highlight-color: transparent;
-	
+
+	&.ws-popover-constrained-width {
+		box-sizing: content-box;
+	}
 	&.ws-is-rtl {
 		direction: rtl;
 		margin: 0 0 0 em(12);
@@ -545,8 +546,7 @@ progress {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	vertical-align: -0.2em;
-	
-	&[data-position],
+
 	&.ws-style {
 	
 		@include progress {

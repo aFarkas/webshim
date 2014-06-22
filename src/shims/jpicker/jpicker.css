@@ -1,8 +1,5 @@
-﻿.jPicker,
-.jPicker *  {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+﻿.jPicker {
+  box-sizing: content-box;
 }
 .jPicker label {
     display: inline;
@@ -18,19 +15,20 @@
   background-position: 2px 2px;
   display: block;
   height: 100%;
-  left: 0px;
+  left: 0;
   position: absolute;
-  top: 0px;
+  top: 0;
   width: 100%;
+  box-sizing: border-box;
 }
 .jPicker .Icon span.Image {
   background-repeat: no-repeat;
   cursor: pointer;
   display: block;
   height: 100%;
-  left: 0px;
+  left: 0;
   position: absolute;
-  top: 0px;
+  top: 0;
   width: 100%;
 }
 .jPicker.Container {
@@ -40,7 +38,7 @@
 table.jPicker {
   font-family: Arial, Helvetica, Sans-Serif;
   font-size: 12px !important;
-  margin: 0px;
+  margin: 0;
   padding: 0;
   width: 545px;
   z-index: 20;
@@ -55,7 +53,8 @@ table.jPicker {
   border-width: 1px;
   cursor: move;
   height: 12px;
-  padding: 0px;
+  padding: 0;
+  box-sizing: border-box;
 }
 .jPicker .Title {
   display: none;
@@ -66,15 +65,17 @@ table.jPicker {
   border-right: 2px solid #fff;
   border-top: 2px solid #9a9a9a;
   cursor: crosshair;
-  height: 260px; /* IE 6 incorrectly draws border inside the width and height instead of outside - We will fix this to 256px later */
-  margin: 0px 10px 10px 10px;
+  height: 260px;
+  margin: 0 10px 10px 10px;
   overflow: hidden; /* hide the overdraw of the Color Map icon when at edge of viewing box */
-  padding: 0px;
+  padding: 0;
   position: relative; /* make this element an absolute positioning container */
-  width: 260px; /* IE 6 incorrectly draws border inside the width and height instead of outside - We will fix this to 256px later */
+  width: 260px;
+  box-sizing: border-box;
 }
 
 .jPicker div.Bar {
+  box-sizing: border-box;
   border-bottom: 2px solid #fff;
   border-left: 2px solid #9a9a9a;
   border-right: 2px solid #fff;
@@ -83,7 +84,7 @@ table.jPicker {
   height: 260px; /* IE 6 incorrectly draws border inside the width and height instead of outside - We will fix this to 256px later */
   margin: -11px 10px 0 5px;
   overflow: hidden;
-  padding: 0px;
+  padding: 0;
   position: relative;
   width: 24px; /* IE 6 incorrectly draws border inside the width and height instead of outside - We will fix this to 20px later */
 }
@@ -92,9 +93,9 @@ table.jPicker {
   background-color: transparent;
   background-image: none;
   display: block;
-  left: 0px;
+  left: 0;
   position: absolute;
-  top: 0px;
+  top: 0;
 }
 .jPicker .Map .Map1, .jPicker .Map .Map2, .jPicker .Map .Map3 {
   height: 2596px;
@@ -126,70 +127,74 @@ table.jPicker {
 }
 .jPicker .Bar .Arrow {
   display: block;
-  left: 0px; /* (arrow width / 2) - (element width / 2) - position arrows' center in elements' center */
+  left: 0; /* (arrow width / 2) - (element width / 2) - position arrows' center in elements' center */
   position: absolute;
 }
 .jPicker .Preview {
   font-size: 9px;
-  padding: 5px 0px 0px 0px;
+  padding: 5px 0 0 0;
   text-align: center;
 }
-.jPicker .Preview div {
+.jPicker .Preview > div {
+  box-sizing: border-box;
   border: 2px inset #eee;
   height: 62px;
-  margin: 0px auto;
-  padding: 0px;
+  margin: 0 auto;
+  padding: 0;
   width: 62px;
 }
-.jPicker .Preview div span {
+.jPicker .Preview > div > span {
+  box-sizing: border-box;
   border: 1px solid #000;
   display: block;
   height: 30px;
-  margin: 0px auto;
-  padding: 0px;
+  margin: 0 auto;
+  padding: 0;
   width: 60px;
 }
 .jPicker .Preview .Active {
-  border-bottom-width: 0px;
+  border-bottom-width: 0;
 }
 .jPicker .Preview .Current {
-  border-top-width: 0px;
+  border-top-width: 0;
   cursor: pointer;
 }
 .jPicker input {
   font-size: 13px;
 }
 .jPicker .Button {
+  box-sizing: border-box;
   text-align: center;
-  padding: 0px 4px;
+  padding: 0 4px;
   width: 115px;
 }
 .jPicker .Button input {
-  padding: 2px 0px;
+  box-sizing: border-box;
+  padding: 2px 0;
   width: 100px;
 }
 .jPicker .Button .Ok {
-  margin: 12px 0px 5px 0px;
+  margin: 12px 0 5px 0;
 }
 .jPicker td {
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
 }
 .jPicker td.Radio {
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   width: 32px;
 }
 .jPicker td.Radio input {
-  margin: 0px 5px 0px 0px;
-  padding: 0px;
+  margin: 0 5px 0 0;
+  padding: 0;
   display: inline-block;
 }
 .jPicker td.Text {
   font-size: 12px !important;
   height: 22px;
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   text-align: left;
   width: 70px;
 }
@@ -197,10 +202,11 @@ table.jPicker {
   width: 100px;
 }
 .jPicker td.Text input {
+  box-sizing: border-box;
   background-color: #fff;
   border: 1px inset #aaa;
   height: 19px;
-  margin: 0px 0px 0px 5px;
+  margin: 0 0 0 5px;
   text-align: left;
   width: 30px;
 }
@@ -231,24 +237,25 @@ table.jPicker {
   overflow: hidden;
 }
 .jPicker .Grid span.QuickColor {
+  box-sizing: border-box;
   border: 1px inset #aaa;
   cursor: pointer;
   display: inline-block;
   height: 15px;
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   width: 17px;
   float: left;
 }
 
-@media all 
+@media all
 {
-	#jPicker { margin: 0px 8px; text-align: left; }
-	#jPicker ul { font-size: 15px; margin: 0px 0px 0px 15px; padding: 0px; }
-	#jPicker ul li { list-style: disc; padding: 2px 0px; }
+	#jPicker { margin: 0 8px; text-align: left; }
+	#jPicker ul { font-size: 15px; margin: 0 0 0 15px; padding: 0; }
+	#jPicker ul li { list-style: disc; padding: 2px 0; }
 	#jPicker ul li ul { margin-bottom: 10px; }
 	#jPicker ul li ul li { list-style: circle; }
-	#jPicker p { font-size: 13px; padding: 0px 10px; }
+	#jPicker p { font-size: 13px; padding: 0 10px; }
 	#jPicker hr { clear: both; }
 	#jPicker h2.jPicker { font-size: 16px; padding: 20px 10px; }
 	#jPicker code { color: #8bd; font-size: 14px; font-weight: bold; }
@@ -256,5 +263,5 @@ table.jPicker {
 	#jPicker span { font-size: 13px; text-align: center; }
 	#jPicker a { color: #ff8050; }
 	#jPicker input { font-size: 13px; padding: 2px 5px; }
-	#jPicker h2 { font-size: 16px; margin: 10px 0px; }
+	#jPicker h2 { font-size: 16px; margin: 10px 0; }
 }

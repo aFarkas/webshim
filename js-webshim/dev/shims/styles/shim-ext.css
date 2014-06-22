@@ -7,23 +7,6 @@
   content: ' ';
 }
 
-.ws-popover, .ws-range .ws-range-thumb, .ws-inline-picker,
-div.ws-inline-picker {
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
-.ws-popover *, .ws-range .ws-range-thumb *, .ws-inline-picker *,
-div.ws-inline-picker *, .ws-popover:before, .ws-range .ws-range-thumb:before, .ws-inline-picker:before, .ws-popover:after, .ws-range .ws-range-thumb:after, .ws-inline-picker:after,
-.ws-popover :after,
-.ws-range .ws-range-thumb :after,
-.ws-inline-picker :after,
-.ws-popover :before,
-.ws-range .ws-range-thumb :before,
-.ws-inline-picker :before {
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
-
 .ws-important-hide {
   display: none !important;
   visibility: hidden !important;
@@ -265,6 +248,9 @@ output {
   direction: ltr;
   -webkit-tap-highlight-color: transparent;
 }
+.ws-popover.ws-popover-constrained-width {
+  box-sizing: content-box;
+}
 .ws-popover.ws-is-rtl {
   direction: rtl;
   margin: 0 0 0 0.92308em;
@@ -505,7 +491,7 @@ progress {
   box-sizing: border-box;
   vertical-align: -0.2em;
 }
-progress[data-position], progress.ws-style {
+progress.ws-style {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
@@ -515,34 +501,34 @@ progress[data-position], progress.ws-style {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
   border-radius: 4px;
 }
-progress[data-position]::-webkit-progress-bar, progress.ws-style::-webkit-progress-bar {
+progress.ws-style::-webkit-progress-bar {
   border: 1px solid #ddd;
   background: #f0f0f0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
   border-radius: 4px;
   border: 0 none;
 }
-progress[data-position]::-moz-progress-bar, progress.ws-style::-moz-progress-bar {
+progress.ws-style::-moz-progress-bar {
   border: 1px solid #ddd;
   background: #f0f0f0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
   border-radius: 4px;
 }
-progress[data-position]::-ms-fill, progress.ws-style::-ms-fill {
+progress.ws-style::-ms-fill {
   animation-name: none;
   border: 1px solid #ddd;
   background: #f0f0f0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
   border-radius: 4px;
 }
-progress[data-position] > span.progress-value, progress.ws-style > span.progress-value {
+progress.ws-style > span.progress-value {
   left: 0;
 }
-progress[data-position].ws-is-rtl > span.progress-value, progress.ws-style.ws-is-rtl > span.progress-value {
+progress.ws-style.ws-is-rtl > span.progress-value {
   left: auto;
   right: 0;
 }
-progress[data-position]::-webkit-progress-value, progress.ws-style::-webkit-progress-value {
+progress.ws-style::-webkit-progress-value {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -551,7 +537,7 @@ progress[data-position]::-webkit-progress-value, progress.ws-style::-webkit-prog
   background: #0063a6 url(progress.png);
   border: 0;
 }
-progress[data-position]::-moz-progress-bar, progress.ws-style::-moz-progress-bar {
+progress.ws-style::-moz-progress-bar {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -560,7 +546,7 @@ progress[data-position]::-moz-progress-bar, progress.ws-style::-moz-progress-bar
   background: #0063a6 url(progress.png);
   border: 0;
 }
-progress[data-position]::-ms-fill, progress.ws-style::-ms-fill {
+progress.ws-style::-ms-fill {
   animation-name: none;
   position: absolute;
   top: 0;
@@ -570,7 +556,7 @@ progress[data-position]::-ms-fill, progress.ws-style::-ms-fill {
   background: #0063a6 url(progress.png);
   border: 0;
 }
-progress[data-position] > span.progress-value, progress.ws-style > span.progress-value {
+progress.ws-style > span.progress-value {
   display: block !important;
   position: absolute;
   top: 0;
@@ -580,17 +566,17 @@ progress[data-position] > span.progress-value, progress.ws-style > span.progress
   background: #0063a6 url(progress.png);
   border: 0;
 }
-progress[data-position]:indeterminate::-webkit-progress-bar, progress.ws-style:indeterminate::-webkit-progress-bar {
+progress.ws-style:indeterminate::-webkit-progress-bar {
   background-image: url(progress.gif);
 }
-progress[data-position]:indeterminate::-moz-progress-bar, progress.ws-style:indeterminate::-moz-progress-bar {
+progress.ws-style:indeterminate::-moz-progress-bar {
   background-image: url(progress.gif);
 }
-progress[data-position]:indeterminate, progress.ws-style:indeterminate {
+progress.ws-style:indeterminate {
   animation-name: none;
   background-image: url(progress.gif);
 }
-progress[data-position].ws-indeterminate > span.progress-value, progress.ws-style.ws-indeterminate > span.progress-value {
+progress.ws-style.ws-indeterminate > span.progress-value {
   display: block !important;
   width: 100%;
   right: 0;
@@ -714,23 +700,6 @@ summary.summary-has-focus {
   content: ' ';
 }
 
-.ws-popover, .ws-range .ws-range-thumb, .ws-inline-picker,
-div.ws-inline-picker {
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
-.ws-popover *, .ws-range .ws-range-thumb *, .ws-inline-picker *,
-div.ws-inline-picker *, .ws-popover:before, .ws-range .ws-range-thumb:before, .ws-inline-picker:before, .ws-popover:after, .ws-range .ws-range-thumb:after, .ws-inline-picker:after,
-.ws-popover :after,
-.ws-range .ws-range-thumb :after,
-.ws-inline-picker :after,
-.ws-popover :before,
-.ws-range .ws-range-thumb :before,
-.ws-inline-picker :before {
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
-
 /* style picker api */
 /* how to use: 
 *
@@ -820,43 +789,43 @@ SASS:
 }
 
 .show-valuetooltip span.ws-range-thumb > span,
-.show-valuetooltip span.ws-range-thumb > span span:after {
+.show-valuetooltip span.ws-range-thumb > span > span:after {
   display: inline-block;
 }
-.show-valuetooltip span.ws-range-thumb > span span:after {
+.show-valuetooltip span.ws-range-thumb > span > span:after {
   content: attr(data-value) !important;
   visibility: visible !important;
 }
 
 .ws-active.show-activevaluetooltip span.ws-range-thumb > span,
-.ws-active.show-activevaluetooltip span.ws-range-thumb > span span:after,
+.ws-active.show-activevaluetooltip span.ws-range-thumb > span > span:after,
 .show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span,
-.show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span span:after {
+.show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span > span:after {
   display: inline-block;
 }
-.ws-active.show-activevaluetooltip span.ws-range-thumb > span span:after,
-.show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span span:after {
+.ws-active.show-activevaluetooltip span.ws-range-thumb > span > span:after,
+.show-activevaluetooltip .ws-range.ws-active span.ws-range-thumb > span > span:after {
   content: attr(data-value) !important;
   visibility: visible !important;
 }
 
 .show-labeltooltip span.ws-range-thumb > span,
-.show-labeltooltip span.ws-range-thumb > span span:before {
+.show-labeltooltip span.ws-range-thumb > span > span:before {
   display: inline-block;
 }
-.show-labeltooltip span.ws-range-thumb > span span:before {
+.show-labeltooltip span.ws-range-thumb > span > span:before {
   content: attr(data-valuetext) !important;
   visibility: visible !important;
 }
 
 .ws-active.show-activelabeltooltip span.ws-range-thumb > span,
-.ws-active.show-activelabeltooltip span.ws-range-thumb > span span:before,
+.ws-active.show-activelabeltooltip span.ws-range-thumb > span > span:before,
 .show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span,
-.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span span:before {
+.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span > span:before {
   display: inline-block;
 }
-.ws-active.show-activelabeltooltip span.ws-range-thumb > span span:before,
-.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span span:before {
+.ws-active.show-activelabeltooltip span.ws-range-thumb > span > span:before,
+.show-activelabeltooltip .ws-range.ws-active span.ws-range-thumb > span > span:before {
   content: attr(data-valuetext) !important;
   visibility: visible !important;
 }
@@ -871,7 +840,9 @@ SASS:
   font-weight: normal;
   font-style: normal;
 }
-.ws-popover-opener span, .time-input-buttons .ws-popover-opener span {
+.ws-popover-opener > span,
+.ws-popover-opener .ws-color-indicator, .time-input-buttons .ws-popover-opener > span, .time-input-buttons
+.ws-popover-opener .ws-color-indicator {
   font-family: 'widget';
   speak: none;
   font-style: normal;
@@ -885,21 +856,23 @@ SASS:
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ws-popover-opener span:before {
+.ws-popover-opener > span:before,
+.ws-popover-opener .ws-color-indicator:before {
   content: "\f073";
 }
 
-.time-input-buttons .ws-popover-opener span:before {
+.time-input-buttons .ws-popover-opener > span:before, .time-input-buttons
+.ws-popover-opener .ws-color-indicator:before {
   content: "\f017";
 }
 
 .ws-range,
-.ws-range span,
+.ws-range-rail,
+.ws-range span > span,
 .input-buttons,
 .step-controls,
 .ws-popover-opener,
-.step-up,
-.step-down {
+.step-control {
   margin: 0;
   padding: 0;
   border: none;
@@ -968,7 +941,8 @@ span.has-input-buttons {
 .ws-is-rtl .ws-popover-opener {
   margin: 0 2px 0 0;
 }
-.ws-popover-opener span {
+.ws-popover-opener > span,
+.ws-popover-opener .ws-color-indicator {
   display: block;
   position: absolute;
   top: 50%;
@@ -977,19 +951,24 @@ span.has-input-buttons {
   height: 16px;
   margin: -8px 0 0 -8px;
 }
-.time-input-buttons .ws-popover-opener span {
+.time-input-buttons .ws-popover-opener > span, .time-input-buttons
+.ws-popover-opener .ws-color-indicator {
   margin: -7.5px 0 0 -7.5px;
 }
-.color-input-buttons .ws-popover-opener span {
+.color-input-buttons .ws-popover-opener > span, .color-input-buttons
+.ws-popover-opener .ws-color-indicator {
   background: url(color-picker.png) no-repeat 0 0;
 }
-.color-input-buttons .ws-popover-opener span:before {
+.color-input-buttons .ws-popover-opener > span:before, .color-input-buttons
+.ws-popover-opener .ws-color-indicator:before {
   content: "";
 }
-.ws-popover-opener span.ws-color-indicator-bg {
+.ws-popover-opener > span.ws-color-indicator-bg,
+.ws-popover-opener .ws-color-indicator.ws-color-indicator-bg {
   background: url(../jpicker/images/preview-opacity.png) no-repeat 0;
 }
-.ws-popover-opener span.ws-color-indicator {
+.ws-popover-opener > span.ws-color-indicator,
+.ws-popover-opener .ws-color-indicator.ws-color-indicator {
   background: none;
 }
 
@@ -1006,7 +985,9 @@ input[type="color"] {
 .input-buttons.ws-disabled {
   opacity: 0.95;
 }
-.input-buttons.ws-disabled *, .input-buttons.ws-readonly * {
+.input-buttons.ws-disabled .ws-popover-opener,
+.input-buttons.ws-disabled .step-control, .input-buttons.ws-readonly .ws-popover-opener,
+.input-buttons.ws-readonly .step-control {
   cursor: default;
 }
 
@@ -1037,7 +1018,8 @@ input[type="color"] {
 .step-controls {
   transition: all 300ms;
 }
-.step-controls span {
+
+span.step-control {
   position: absolute;
   left: 0;
   display: inline-block;
@@ -1052,10 +1034,10 @@ input[type="color"] {
   text-align: center;
   transition: border-color 300ms, background-color 300ms;
 }
-.step-controls span.step-down {
+span.step-control.step-down {
   bottom: 0;
 }
-.step-controls span:before {
+span.step-control:before {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1067,30 +1049,30 @@ input[type="color"] {
   margin: -2px 0 0 -4px;
   transition: border-color 300ms, background-color 300ms;
 }
-.step-controls span.step-up:before {
+span.step-control.step-up:before {
   border-width: 0 4px 4px;
   border-color: transparent transparent #999 transparent;
 }
-.step-controls span.step-up:hover:before {
+span.step-control.step-up:hover:before {
   border-color: transparent transparent #666 transparent;
 }
-.step-controls span.step-up.mousepress-ui:before {
+span.step-control.step-up.mousepress-ui:before {
   border-color: transparent transparent #000 transparent;
 }
-.ws-disabled .step-controls span.step-up:before {
+.ws-disabled span.step-control.step-up:before {
   border-color: transparent transparent #aaa transparent;
 }
-.step-controls span.step-down:before {
+span.step-control.step-down:before {
   border-width: 4px 4px 0;
   border-color: #999 transparent transparent transparent;
 }
-.step-controls span.step-down:hover:before {
+span.step-control.step-down:hover:before {
   border-color: #666 transparent transparent transparent;
 }
-.step-controls span.step-down.mousepress-ui:before {
+span.step-control.step-down.mousepress-ui:before {
   border-color: #000 transparent transparent transparent;
 }
-.ws-disabled .step-controls span.step-down:before {
+.ws-disabled span.step-control.step-down:before {
   border-color: #aaa transparent transparent transparent;
 }
 
@@ -1175,6 +1157,8 @@ span.ws-input {
   transition: background-color 400ms, border-color 400ms;
   background-color: #ddd;
   box-shadow: 0 -0.07692em 0.11538em rgba(0, 0, 0, 0.2) inset;
+  letter-spacing: normal;
+  word-spacing: normal;
 }
 [list] + .ws-range {
   margin: 0.19231em 0 0.96154em;
@@ -1184,9 +1168,9 @@ span.ws-input {
   position: absolute;
   display: block;
   z-index: 4;
-  margin: -0.46154em 0 0 -0.76923em;
-  height: 1.53846em;
-  width: 1.53846em;
+  margin: -0.53846em 0 0 -0.84615em;
+  height: 1.69231em;
+  width: 1.69231em;
   border-radius: 50%;
   background: #ccc;
   border: 0.07692em solid #aaaaaa;
@@ -1199,16 +1183,16 @@ span.ws-input {
   padding: 0;
   border: 0;
   left: 50%;
-  bottom: 1.61538em;
+  bottom: 1.76923em;
   visibility: hidden;
   width: 180px;
   text-align: center;
   background: none;
 }
-.ws-range .ws-range-thumb > span span {
+.ws-range .ws-range-thumb > span > span {
   visibility: visible;
 }
-.ws-range .ws-range-thumb > span span:after, .ws-range .ws-range-thumb > span span:before {
+.ws-range .ws-range-thumb > span > span:after, .ws-range .ws-range-thumb > span > span:before {
   content: "";
   padding: 0.07692em 0.26923em;
   text-align: center;
@@ -1330,8 +1314,8 @@ span.ws-input {
 }
 
 .ws-range-thumb > span,
-.ws-range-thumb > span span:after,
-.ws-range-thumb > span span:before {
+.ws-range-thumb > span > span:after,
+.ws-range-thumb > span > span:before {
   display: none;
 }
 

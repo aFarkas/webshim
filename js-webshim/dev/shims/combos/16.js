@@ -3192,7 +3192,6 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 	var wsCfg = webshims.cfg;
 	var options = wsCfg.mediaelement;
 	var isIE = navigator.userAgent.indexOf('MSIE') != -1;
-	var hasSwf;
 	if(!options){
 		webshims.error("mediaelement wasn't implemented but loaded");
 		return;
@@ -3235,7 +3234,7 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 	}
 
 webshims.register('mediaelement-core', function($, webshims, window, document, undefined, options){
-	hasSwf = swfmini.hasFlashPlayerVersion('10.0.3');
+	var hasSwf = swfmini.hasFlashPlayerVersion('10.0.3');
 	var mediaelement = webshims.mediaelement;
 	
 	mediaelement.parseRtmp = function(data){
@@ -3549,9 +3548,14 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	};
 	var allowedPreload = {'metadata': 1, 'auto': 1, '': 1};
 	var fixPreload = function(elem){
-		var preload;
-		if(elem.getAttribute('preload') == 'none' && allowedPreload[(preload = $(elem).data('preload'))]){
-			$.attr(elem, 'preload', preload);
+		var preload, img;
+		if(elem.getAttribute('preload') == 'none'){
+			if(allowedPreload[(preload = $.attr(elem, 'data-preload'))]){
+				$.attr(elem, 'preload', preload);
+			} else if(hasNative && (preload = elem.getAttribute('poster'))){
+				img = document.createElement('img');
+				img.src = preload;
+			}
 		}
 	};
 	var stopParent = /^(?:embed|object|datalist)$/i;
