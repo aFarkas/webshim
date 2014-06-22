@@ -1,4 +1,13 @@
-Release 1.14.1
+upcomming Release 1.14.3
+----------
+- added new language files (zh-TW and fa)
+- improved styles for custom styleable mediaelement controls
+- added mediaelement debugger (just lunch with ``webshim.mediaelement.loadDebugger();``)
+- improved selector performance
+- added srt and ttml subtitle support (but you really should still use vtt!)
+- improved touch support
+
+Release 1.14.1/Release 1.14.2
 ----------
 - Bugfixes for new FileReader feature (including better errorhandling in case of mis-configuration)
 

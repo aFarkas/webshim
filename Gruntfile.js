@@ -281,14 +281,15 @@ module.exports = function(grunt){
 		var reg = /<span class=\"ws-version\">[\d\.\-a-zA-Z]+<\/span>/g;
 		var version = grunt.config('pkg').version;
 		var replace = '<span class="ws-version">'+ version +'</span>';
+console.log(version)
+		var newUrl = 'https://github.com/aFarkas/webshim/archive/'+ version +'.zip';
+		var regUrl = /https:\/\/github\.com\/aFarkas\/webshim\/archive\/(\d+\.\d+\.\d+[\-RC\d]*)\.zip/g;
 
-		//var newUrl = 'https://github.com/aFarkas/webshim/archive/'+ version +'.zip';
-		//var regUrl = /https:\/\/github\.com\/aFarkas\/webshim\/archive\/(\d+\.\d+\.\d+[\-RC\d]*)\.zip/g;
-
-		grunt.file.expand({cwd: '/demos', matchBase: true}, '*.html').forEach(function(path) {
+		grunt.file.expand({cwd: 'demos/', matchBase: true}, '*.html').forEach(function(path) {
 			var code = grunt.file.read('demos/'+path);
 			code = code.replace(reg, replace);
-			//code = code.replace(regUrl, newUrl);
+			code = code.replace(regUrl, newUrl);
+			console.log(path)
 			grunt.file.write('demos/'+path, code);
 
 		});

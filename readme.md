@@ -28,7 +28,7 @@ Features
 Installation and Usage
 ------------------
 
-1 - [Download the Webshim Lib](https://github.com/aFarkas/webshim/archive/gh-pages.zip) and put the `js-webshim-folder` in your project.
+1 - [Download the Webshim Lib](https://github.com/aFarkas/webshim/releases/latest) and put the `js-webshim-folder` in your project.
 
 2 - Include the JavaScript:
 
