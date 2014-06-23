@@ -104,6 +104,9 @@ progress.ws-style > span.progress-value {
   border-color: white;
   border-radius: 50%;
 }
+.input-picker .ws-picker-controls > button.ws-year-btn:after, .input-picker .ws-picker-controls > button:before {
+  margin-top: 0;
+}
 .input-picker .ws-picker-controls > button:hover {
   outline: none;
   border-color: white;
@@ -141,7 +144,7 @@ progress.ws-style > span.progress-value {
 
 .input-picker .ws-picker-body .picker-list th,
 .input-picker .ws-picker-body .picker-list td {
-  padding: 0.07692em;
+  padding: 0.07769em;
 }
 .input-picker .ws-picker-body .picker-list th > abbr,
 .input-picker .ws-picker-body .picker-list td > abbr {
@@ -261,4 +264,65 @@ progress.ws-style > span.progress-value {
 .datalist-polyfill .ws-po-box .active-item .option-label,
 .datalist-polyfill .ws-po-box .active-item .option-value {
   color: white;
+}
+
+.mediaplayer > .jme-controlbar {
+  background: rgba(0, 0, 0, 0.5);
+}
+.mediaplayer > .jme-controlbar button {
+  border: 1px solid #eee;
+  border-radius: 50%;
+  height: 2em;
+  width: 2em;
+}
+.mediaplayer > .jme-controlbar button:hover {
+  outline: none;
+  background: rgba(255, 255, 255, 0.6);
+}
+.mediaplayer > .jme-controlbar button.state-paused {
+  text-indent: 0.2em;
+}
+
+.mediaplayer .media-range {
+  height: 0.92308em;
+  border: none;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.4);
+}
+.mediaplayer .media-range .ws-range-progress {
+  border-radius: 0;
+  background: #a700ae;
+}
+.mediaplayer .media-range .ws-range-thumb {
+  border-radius: 0;
+  background: #fff;
+  height: 0.92308em;
+  width: 0.92308em;
+}
+.mediaplayer .media-range .buffer-progress-indicator {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-playersize="x-small"].mediaplayer .media-range,
+[data-playersize="xx-small"].mediaplayer .media-range {
+  display: none;
+}
+
+.mediaplayer .time-select {
+  background: rgba(0, 0, 0, 0.5);
+  bottom: 2.15385em;
+}
+
+.mediaplayer .currenttime-display, .mediaplayer .duration-display {
+  font-size: 1em;
+}
+
+.jme-cb-box > div {
+  padding: 0.38462em 0.61538em;
+}
+.jme-cb-box > div.mute-container {
+  padding-right: 0.23077em;
+}
+.jme-cb-box > div.volume-container {
+  padding-left: 0.23077em;
 }

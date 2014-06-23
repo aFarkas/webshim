@@ -1,6 +1,7 @@
 @import "../../../../js-webshim/dev/shims/styles/scss/_extends";
 @import "../../../../js-webshim/dev/shims/styles/scss/_api-shim";
 @import "../../../../js-webshim/dev/shims/styles/scss/_api-forms-ext";
+@import "../../../../js-webshim/dev/shims/jme/icons";
 
 $headerbg: #39f;
 $headerc: #fff;
@@ -103,6 +104,11 @@ $toppadding: 32;
 	border-color: $headerc;
 	border-radius: 50%;
 
+	&.ws-year-btn:after,
+	&:before {
+		margin-top: 0;
+	}
+
 	&:hover {
 		outline: none;
 		border-color: $headerc;
@@ -148,7 +154,7 @@ $toppadding: 32;
 
 .input-picker .ws-picker-body .picker-list th,
 .input-picker .ws-picker-body .picker-list td {
-	padding: em(1);
+	padding: em(1.01);
 
 	> abbr {
 		display: inline-block;
@@ -284,6 +290,77 @@ $toppadding: 32;
 		.option-value {
 			color: $action-cc;
 		}
+	}
+}
+.mediaplayer > .jme-controlbar {
+	background: rgba(0, 0, 0, 0.5);
+
+	button {
+		border: 1px solid #eee;
+		border-radius: 50%;
+		height: em(26);
+		width: em(26);
+
+		&:hover {
+			outline: none;
+			background: rgba(255, 255, 255, 0.6);
+		}
+
+		&.state-paused {
+			text-indent: 0.2em;
+		}
+	}
+}
+
+.mediaplayer .media-range {
+	height: em(12);
+	border: none;
+	border-radius: 0;
+	background: rgba(255, 255, 255, 0.4);
+
+	.ws-range-progress {
+		border-radius: 0;
+		background: #a700ae;
+	}
+
+	.ws-range-thumb {
+		border-radius: 0;
+		background: #fff;
+		height: em(12);
+		width: em(12);
+	}
+
+	.buffer-progress-indicator {
+		background: rgba(255, 255, 255, 0.1)
+	}
+}
+
+[data-playersize="x-small"].mediaplayer,
+[data-playersize="xx-small"].mediaplayer{
+	.media-range {
+		display: none;
+	}
+}
+
+.mediaplayer .time-select {
+	background: rgba(0, 0, 0, 0.5);
+	bottom: em(28);
+
+}
+
+.mediaplayer .currenttime-display, .mediaplayer .duration-display {
+	font-size: 1em;
+}
+
+
+.jme-cb-box > div {
+	padding: em(5) em(8);
+
+	&.mute-container {
+		padding-right: em(3);
+	}
+	&.volume-container {
+		padding-left: em(3);
 	}
 }
 

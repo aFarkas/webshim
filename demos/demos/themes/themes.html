@@ -6,18 +6,20 @@
 	<link rel="alternate stylesheet" href="metro/metro.css" title="metro" data-defaultstyle />
 	<link rel="alternate stylesheet" href="rounded-shadow/rounded-shadow.css" title="rounded shadow" />
 	<style>
-		body {
-			font-family: sans-serif;
-			margin: 10px auto;
-			max-width: 400px;
-			min-width: 220px;
-		}
+
 		* {
 			-moz-box-sizing: border-box;
 			box-sizing: border-box;
 		}
 
-
+		body {
+			font-family: sans-serif;
+		}
+		.wrapper {
+			margin: 10px auto;
+			max-width: 600px;
+			min-width: 220px;
+		}
 		.form-row {
 			padding: 5px 10px;
 		}
@@ -50,6 +52,23 @@
 			top: 5px;
 			right: 5px;;
 		}
+
+		.mediaplayer {
+			position: relative;
+			height: 0;
+			width: 100%;
+			padding-bottom: 56.25%;
+		}
+
+
+		.mediaplayer video,
+		.mediaplayer .polyfill-video {
+			position: absolute !important;
+			top: 0;
+			left: 0;
+			width: 100% !important;
+			height: 100% !important;
+		}
 	</style>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
@@ -77,59 +96,69 @@
 	</script>
 </head>
 <body>
-<!-- simply add .ws-validate to your form and you get nice inline form validation -->
-<form action="#">
-	<div class="form-row">
-		<label for="email">email with datalist*</label>
-		<input required="" type="email" id="email" list="contacts" />
-		<datalist id="contacts">
-			<select>
-				<option value="art@example.net" label="Arthur Dent"></option>
-				<option value="adamjosh@example.net" label="Adam Josh"></option>
-				<option value="hedral@damowmow.com"></option>
-				<option value="pillar@example.com"></option>
-				<option value="astrophy@cute.example"></option>
-				<option value="astronomy@science.example.org"></option>
-			</select>
-		</datalist>
-	</div>
-	<div class="form-row show-week show-yearbtns">
-		<label for="date">date as inline-calendar*</label>
-		<input required="" type="date" id="date" data-date-inline-picker="true" data-date-start-view="2" />
-	</div>
+<div class="wrapper">
+	<form action="#">
+		<div class="form-row">
+			<label for="email">email with datalist*</label>
+			<input required="" type="email" id="email" list="contacts" />
+			<datalist id="contacts">
+				<select>
+					<option value="art@example.net" label="Arthur Dent"></option>
+					<option value="adamjosh@example.net" label="Adam Josh"></option>
+					<option value="hedral@damowmow.com"></option>
+					<option value="pillar@example.com"></option>
+					<option value="astrophy@cute.example"></option>
+					<option value="astronomy@science.example.org"></option>
+				</select>
+			</datalist>
+		</div>
+		<div class="form-row show-week show-yearbtns">
+			<label for="date">date as inline-calendar*</label>
+			<input required="" type="date" id="date" data-date-inline-picker="true" data-date-start-view="2" />
+		</div>
 
-	<div class="form-row show-selectnav">
-		<label for="datetime-local">datetime-local*</label>
-		<input required="" type="datetime-local" id="datetime-local" />
-	</div>
-	<div class="form-row">
-		<label for="progress">pogress element</label>
-		<progress id="progress" class="ws-style"></progress>
-	</div>
+		<div class="form-row show-selectnav">
+			<label for="datetime-local">datetime-local*</label>
+			<input required="" type="datetime-local" id="datetime-local" />
+		</div>
+		<div class="form-row">
+			<label for="progress">pogress element</label>
+			<progress id="progress" class="ws-style"></progress>
+		</div>
 
-	<div class="form-row">
-		<label for="progress2">pogress element</label>
-		<progress id="progress2" value="0.26" class="ws-style"></progress>
-	</div>
-	<div class="form-row show-activevaluetooltip">
-		<label for="range">range</label>
-		<input type="range" id="range" />
-	</div>
-	<div class="form-row">
-		<input type="submit" />
-	</div>
-</form>
-<ul>
-	<li><a href="../cfgs/input-date.html">HTML5 Datepicker configurator</a></li>
-	<li><a href="../cfgs/input-datetime-local.html">HTML5 datetime-local configurator</a></li>
-	<li><a href="../cfgs/list-datalist.html">HTML5 autosuggest configurator</a></li>
-	<li><a href="../cfgs/input-range.html">HTML5 slider/range configurator</a></li>
-</ul>
-<label class="theme-wrapper" for="theme">
-	Style-/Themeswitcher
+		<div class="form-row">
+			<label for="progress2">pogress element</label>
+			<progress id="progress2" value="0.26" class="ws-style"></progress>
+		</div>
+		<div class="form-row show-activevaluetooltip">
+			<label for="range">range</label>
+			<input type="range" id="range" />
+		</div>
+		<div class="form-row">
+			<div class="mediaplayer videoplayer">
+				<video controls preload="none" poster="http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.gif">
+					<source src="http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.m4v" type="video/mp4" />
+					<source src="http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.ogg" />
+					<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
+				</video>
+			</div>
+		</div>
+		<div class="form-row">
+			<input type="submit" />
+		</div>
+	</form>
+	<ul>
+		<li><a href="../cfgs/input-date.html">HTML5 Datepicker configurator</a></li>
+		<li><a href="../cfgs/input-datetime-local.html">HTML5 datetime-local configurator</a></li>
+		<li><a href="../cfgs/list-datalist.html">HTML5 autosuggest configurator</a></li>
+		<li><a href="../cfgs/input-range.html">HTML5 slider/range configurator</a></li>
+	</ul>
+	<label class="theme-wrapper" for="theme">
+		Style-/Themeswitcher
 
-	<select class="theme-switcher" id="theme"></select>
-</label>
+		<select class="theme-switcher" id="theme"></select>
+	</label>
+</div>
 <script>
 	webshim.loader.loadScript("../cfgs/assets/cfg.js", false, false, true);
 </script>
