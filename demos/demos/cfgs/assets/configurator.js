@@ -291,10 +291,12 @@ $(function($){
 			if($(this).data('defaultstyle') != null){
 				$option.attr('selected', 'selected');
 			}
+			this.disabled = true;
 			$options.push($option[0]);
 		});
 		$options = $($options);
-		update();
+		setTimeout(update);
+		webshims.ready('WINDOWLOAD', update);
 		$(this).append($options).on('change', update);
 	});
 });

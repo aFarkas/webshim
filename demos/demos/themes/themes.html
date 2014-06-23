@@ -8,17 +8,16 @@
 	<style>
 		body {
 			font-family: sans-serif;
+			margin: 10px auto;
+			max-width: 400px;
+			min-width: 220px;
 		}
 		* {
 			-moz-box-sizing: border-box;
 			box-sizing: border-box;
 		}
 
-		form {
-			margin: 10px auto;
-			max-width: 400px;
-			min-width: 220px;
-		}
+
 		.form-row {
 			padding: 5px 10px;
 		}
@@ -57,7 +56,6 @@
 	<script src="../../../js-webshim/minified/polyfiller.js"></script>
 
 	<script>
-		webshims.setOptions('debug', 'noCombo')
 		webshim.setOptions('forms', {
 			lazyCustomMessages: true,
 			replaceValidationUI: true,
@@ -96,7 +94,7 @@
 		</datalist>
 	</div>
 	<div class="form-row show-week show-yearbtns">
-		<label for="date">date*</label>
+		<label for="date">date as inline-calendar*</label>
 		<input required="" type="date" id="date" data-date-inline-picker="true" data-date-start-view="2" />
 	</div>
 
@@ -121,6 +119,12 @@
 		<input type="submit" />
 	</div>
 </form>
+<ul>
+	<li><a href="../cfgs/input-date.html">HTML5 Datepicker configurator</a></li>
+	<li><a href="../cfgs/input-datetime-local.html">HTML5 datetime-local configurator</a></li>
+	<li><a href="../cfgs/list-datalist.html">HTML5 autosuggest configurator</a></li>
+	<li><a href="../cfgs/input-range.html">HTML5 slider/range configurator</a></li>
+</ul>
 <label class="theme-wrapper" for="theme">
 	Style-/Themeswitcher
 

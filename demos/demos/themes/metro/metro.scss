@@ -65,7 +65,7 @@ progress.ws-style {
 $toppadding: 32;
 
 .input-picker .ws-picker-header {
-	top: em(($toppadding - 1) * -1);
+	top: em(($toppadding - 2) * -1);
 }
 
 .input-picker .ws-picker-body {
