@@ -204,7 +204,6 @@
   top: 50%;
   left: 50%;
   margin: -0.5em 0 0 -0.5em;
-  text-shadow: 0 0 0.4em rgba(0, 0, 0, 0.6);
 }
 .mediaplayer[data-playersize="large"] > .jme-media-overlay {
   font-size: 450%;
@@ -268,7 +267,6 @@
   cursor: pointer;
   text-align: center;
   transition: color 400ms;
-  text-shadow: 0 0 0.1em #000;
 }
 .mediaplayer > .jme-controlbar button:hover, .mediaplayer > .jme-controlbar button:focus {
   color: #fefefe;

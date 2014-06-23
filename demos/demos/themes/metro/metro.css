@@ -1,0 +1,264 @@
+/* style picker api */
+/* how to use: 
+*
+Markup (good to style one input different than other):
+<!-- simply use a placeholder as class on your input elment -->
+	<input type="date" class="show-week" />
+CSS:
+//replace the placeholder with .input-picker or (.input-date-picker)
+	.input-picker .ws-week {
+		display: table-cell;
+	}
+SASS:
+//use the placeholder(s) and go crazy
+	.input-picker {
+		@extend %show-week;
+		//@extend show-selectnav;
+	}
+*
+*/
+/* btn api */
+.ws-po-arrow {
+  display: none;
+}
+
+.ws-po-outerbox {
+  padding-top: 0.15385em;
+}
+
+.ws-po-box {
+  border: 0.23077em solid #d4d4d4;
+}
+
+progress.ws-style {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 0;
+  border: none;
+  background: #d4d4d4;
+}
+progress.ws-style::-webkit-progress-bar {
+  border: none;
+  background: #d4d4d4;
+  border: 0 none;
+}
+progress.ws-style::-moz-progress-bar {
+  border: none;
+  background: #d4d4d4;
+}
+progress.ws-style::-ms-fill {
+  animation-name: none;
+  border: none;
+  background: #d4d4d4;
+}
+progress.ws-style::-webkit-progress-value {
+  background: #3399ff;
+}
+progress.ws-style::-moz-progress-bar {
+  background: #3399ff;
+}
+progress.ws-style::-ms-fill {
+  animation-name: none;
+  background: #3399ff;
+}
+progress.ws-style > span.progress-value {
+  display: block !important;
+  background: #3399ff;
+}
+
+.input-picker .ws-picker-header {
+  top: -2.38462em;
+}
+
+.input-picker .ws-picker-body {
+  padding-top: 2.46154em;
+  margin: 0;
+}
+
+.input-picker .picker-list {
+  margin: 0;
+}
+
+.input-picker .ws-po-box {
+  border-width: 0.15385em;
+  border-color: #3399ff;
+  background: #3399ff;
+  padding: 0.38462em 0 0;
+}
+
+.input-picker .ws-picker-header > button {
+  color: white;
+}
+.input-picker .ws-picker-header > button:after {
+  border-color: transparent transparent white;
+}
+
+.input-picker .ws-picker-controls {
+  margin: 0 0.23077em;
+  top: 0.38462em;
+}
+
+.input-picker .ws-picker-controls > button {
+  background: none;
+  border-color: white;
+  border-radius: 50%;
+}
+.input-picker .ws-picker-controls > button:hover {
+  outline: none;
+  border-color: white;
+  background-color: white;
+}
+
+.input-picker .prev-controls, .input-picker .ws-po-box[dir="rtl"] .next-controls {
+  left: 0;
+}
+.input-picker .prev-controls > .ws-year-btn:after,
+.input-picker .prev-controls > button:before, .input-picker .ws-po-box[dir="rtl"] .next-controls > .ws-year-btn:after,
+.input-picker .ws-po-box[dir="rtl"] .next-controls > button:before {
+  border-color: transparent white transparent transparent;
+}
+.input-picker .prev-controls > button:hover.ws-year-btn:after, .input-picker .prev-controls > button:hover:before, .input-picker .ws-po-box[dir="rtl"] .next-controls > button:hover.ws-year-btn:after, .input-picker .ws-po-box[dir="rtl"] .next-controls > button:hover:before {
+  border-color: transparent #3399ff transparent transparent;
+}
+
+.input-picker .next-controls, .input-picker .ws-po-box[dir="rtl"] .prev-controls {
+  right: 0;
+}
+.input-picker .next-controls > .ws-year-btn:after,
+.input-picker .next-controls > button:before, .input-picker .ws-po-box[dir="rtl"] .prev-controls > .ws-year-btn:after,
+.input-picker .ws-po-box[dir="rtl"] .prev-controls > button:before {
+  border-color: transparent transparent transparent white;
+}
+.input-picker .next-controls > button:hover.ws-year-btn:after, .input-picker .next-controls > button:hover:before, .input-picker .ws-po-box[dir="rtl"] .prev-controls > button:hover.ws-year-btn:after, .input-picker .ws-po-box[dir="rtl"] .prev-controls > button:hover:before {
+  border-color: transparent transparent transparent #3399ff;
+}
+
+.input-picker .picker-grid {
+  margin: 0;
+  background: #fefefe;
+}
+
+.input-picker .ws-picker-body .picker-list th,
+.input-picker .ws-picker-body .picker-list td {
+  padding: 0.07692em;
+}
+.input-picker .ws-picker-body .picker-list th > abbr,
+.input-picker .ws-picker-body .picker-list td > abbr {
+  display: inline-block;
+  border: none;
+  padding: 0.61538em 0.30769em;
+}
+.input-picker .ws-picker-body .picker-list th > button,
+.input-picker .ws-picker-body .picker-list td > button {
+  color: black;
+  background: #f9f9f9;
+}
+.input-picker .ws-picker-body .picker-list th > button.this-value,
+.input-picker .ws-picker-body .picker-list td > button.this-value {
+  color: white;
+  background: #66b3ff;
+}
+.input-picker .ws-picker-body .picker-list th > button.othermonth,
+.input-picker .ws-picker-body .picker-list td > button.othermonth {
+  color: #999999;
+  background: #f9f9f9;
+}
+.input-picker .ws-picker-body .picker-list th > button:hover,
+.input-picker .ws-picker-body .picker-list td > button:hover {
+  color: white;
+  background: #3399ff;
+}
+.input-picker .ws-picker-body .picker-list th > button.checked-value,
+.input-picker .ws-picker-body .picker-list td > button.checked-value {
+  color: white;
+  background: #3399ff;
+}
+.input-picker .ws-picker-body .picker-list th > button[disabled],
+.input-picker .ws-picker-body .picker-list td > button[disabled] {
+  color: #cccccc;
+  background: #f9f9f9;
+}
+
+.input-picker .picker-list.day-list td > button {
+  padding: 0.61538em 0.61538em 0.61538em 0;
+  text-align: right;
+}
+
+.input-picker .ws-options,
+.input-picker .ws-button-row {
+  margin: 0;
+  padding: 0.76923em;
+  background: #fefefe;
+  border-top-color: #3399ff;
+  border-top-width: 0.15385em;
+}
+
+.input-picker .ws-options button.ws-focus, .input-picker .ws-options button:focus, .input-picker .ws-options button:hover {
+  color: white;
+  background: #3399ff;
+}
+
+.input-picker.ws-size-2 {
+  width: 46.92308em;
+  min-width: 39.07692em;
+}
+.input-picker.ws-size-2 .ws-index-1 {
+  float: right;
+}
+
+.input-picker.ws-size-3 {
+  width: 69.38462em;
+  min-width: 69.23077em;
+}
+.input-picker.ws-size-3 .ws-index-1 {
+  margin: 0 0 0 0.15385em;
+}
+.input-picker.ws-size-3 .ws-index-2 {
+  float: right;
+}
+
+.input-picker .ws-button-row > button {
+  background-image: none;
+  border-color: none;
+}
+.input-picker .ws-button-row > button.ws-empty {
+  margin: 0 0.30769em;
+  float: left;
+}
+
+.ws-range {
+  background: #d4d4d4;
+  height: 0.92308em;
+}
+.ws-range .ws-range-thumb {
+  border: none;
+  height: 100%;
+  width: 0.92308em;
+  margin: 0 0 0 -0.46154em;
+  background: black;
+}
+.ws-range.ws-focus .ws-range-thumb {
+  background: #333333;
+}
+.ws-range.ws-active .ws-range-thumb {
+  background: #666666;
+}
+.ws-range .ws-range-progress {
+  background: #3399ff;
+}
+
+.datalist-polyfill .ws-po-box {
+  padding: 0;
+}
+.datalist-polyfill .ws-po-box li {
+  padding: 0.38462em 0.76923em;
+  background: #fefefe;
+}
+.datalist-polyfill .ws-po-box .active-item {
+  background: #3399ff;
+}
+.datalist-polyfill .ws-po-box .active-item .option-label,
+.datalist-polyfill .ws-po-box .active-item .option-value {
+  color: white;
+}

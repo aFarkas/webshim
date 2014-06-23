@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+	<title>Themeviewer for webshim</title>
+	<link rel="alternate stylesheet" href="metro/metro.css" title="metro" data-defaultstyle />
+	<link rel="alternate stylesheet" href="rounded-shadow/rounded-shadow.css" title="rounded shadow" />
+	<style>
+		body {
+			font-family: sans-serif;
+		}
+		* {
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+		}
+
+		form {
+			margin: 10px auto;
+			max-width: 400px;
+			min-width: 220px;
+		}
+		.form-row {
+			padding: 5px 10px;
+		}
+		label {
+			display: block;
+			margin: 3px 0;
+		}
+		.form-row progress,
+		.form-row .ws-input {
+			width: 100%;
+		}
+		.form-row input {
+			width: 100%;
+			padding: 6px 4px;
+			border: 1px solid #ccc;
+			box-shadow: none;
+		}
+
+		div.ws-invalid input {
+			border-color: #c88;
+		}
+		.ws-invalid label {
+			color: #933;
+		}
+		div.ws-success input {
+			border-color: #8c8;
+		}
+		.theme-wrapper {
+			position: fixed;
+			top: 5px;
+			right: 5px;;
+		}
+	</style>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
+	<script src="../../../js-webshim/minified/polyfiller.js"></script>
+
+	<script>
+		webshims.setOptions('debug', 'noCombo')
+		webshim.setOptions('forms', {
+			lazyCustomMessages: true,
+			replaceValidationUI: true,
+			customDatalist: 'auto'
+		});
+
+		webshim.setOptions('forms-ext', {
+			types: 'date range datetime-local',
+			replaceUI: 'auto',
+			widgets: {
+				calculateWidth: false
+			}
+		});
+
+		webshim.setOptions('mediaelement', {
+			replaceUI: 'auto'
+		});
+		webshim.polyfill('forms forms-ext mediaelement');
+	</script>
+</head>
+<body>
+<!-- simply add .ws-validate to your form and you get nice inline form validation -->
+<form action="#">
+	<div class="form-row">
+		<label for="email">email with datalist*</label>
+		<input required="" type="email" id="email" list="contacts" />
+		<datalist id="contacts">
+			<select>
+				<option value="art@example.net" label="Arthur Dent"></option>
+				<option value="adamjosh@example.net" label="Adam Josh"></option>
+				<option value="hedral@damowmow.com"></option>
+				<option value="pillar@example.com"></option>
+				<option value="astrophy@cute.example"></option>
+				<option value="astronomy@science.example.org"></option>
+			</select>
+		</datalist>
+	</div>
+	<div class="form-row show-week show-yearbtns">
+		<label for="date">date*</label>
+		<input required="" type="date" id="date" data-date-inline-picker="true" data-date-start-view="2" />
+	</div>
+
+	<div class="form-row show-selectnav">
+		<label for="datetime-local">datetime-local*</label>
+		<input required="" type="datetime-local" id="datetime-local" />
+	</div>
+	<div class="form-row">
+		<label for="progress">pogress element</label>
+		<progress id="progress" class="ws-style"></progress>
+	</div>
+
+	<div class="form-row">
+		<label for="progress2">pogress element</label>
+		<progress id="progress2" value="0.26" class="ws-style"></progress>
+	</div>
+	<div class="form-row show-activevaluetooltip">
+		<label for="range">range</label>
+		<input type="range" id="range" />
+	</div>
+	<div class="form-row">
+		<input type="submit" />
+	</div>
+</form>
+<label class="theme-wrapper" for="theme">
+	Style-/Themeswitcher
+
+	<select class="theme-switcher" id="theme"></select>
+</label>
+<script>
+	webshim.loader.loadScript("../cfgs/assets/cfg.js", false, false, true);
+</script>
+</body>
+</html>

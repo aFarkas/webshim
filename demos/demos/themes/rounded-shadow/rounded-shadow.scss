@@ -1,5 +1,6 @@
-@import "_extends.scss";
-@import "_api-shim.scss";
+@import "../../../../js-webshim/dev/shims/styles/scss/_extends";
+@import "../../../../js-webshim/dev/shims/styles/scss/_api-shim";
+@import "../../../../js-webshim/dev/shims/styles/scss/_api-forms-ext";
 
 .ws-po-box {
 	border-radius: em(4);
@@ -61,5 +62,3 @@ progress.ws-style {
 .input-picker button  {
 	border-radius: em(5);
 }
-
-

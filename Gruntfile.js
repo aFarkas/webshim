@@ -88,6 +88,15 @@ module.exports = function(grunt){
 					ext : '.css'
 				}]
 			},
+			themes: {
+				files:[{
+					expand : true,
+					cwd : 'demos/demos/themes/',
+					src : ['**/*.scss'],
+					dest : 'demos/demos/themes/',
+					ext : '.css'
+				}]
+			},
 			jme: {
 				files:[{
 					expand : true,
@@ -158,6 +167,10 @@ module.exports = function(grunt){
 			sass: {
 				files: ['src/**/*.scss'],
 				tasks: ['sass']
+			},
+			themes: {
+				files: ['demos/demos/themes/**/*.scss'],
+				tasks: ['sass:themes']
 			},
 			css: {
 				files: ['src/**/*.css'],
@@ -281,7 +294,7 @@ module.exports = function(grunt){
 		var reg = /<span class=\"ws-version\">[\d\.\-a-zA-Z]+<\/span>/g;
 		var version = grunt.config('pkg').version;
 		var replace = '<span class="ws-version">'+ version +'</span>';
-console.log(version)
+
 		var newUrl = 'https://github.com/aFarkas/webshim/archive/'+ version +'.zip';
 		var regUrl = /https:\/\/github\.com\/aFarkas\/webshim\/archive\/(\d+\.\d+\.\d+[\-RC\d]*)\.zip/g;
 
@@ -289,7 +302,6 @@ console.log(version)
 			var code = grunt.file.read('demos/'+path);
 			code = code.replace(reg, replace);
 			code = code.replace(regUrl, newUrl);
-			console.log(path)
 			grunt.file.write('demos/'+path, code);
 
 		});

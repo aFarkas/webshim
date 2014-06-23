@@ -1,0 +1,290 @@
+@import "../../../../js-webshim/dev/shims/styles/scss/_extends";
+@import "../../../../js-webshim/dev/shims/styles/scss/_api-shim";
+@import "../../../../js-webshim/dev/shims/styles/scss/_api-forms-ext";
+
+$headerbg: #39f;
+$headerc: #fff;
+$mainborder: #d4d4d4;
+
+$contentbg: #fefefe;
+
+
+
+//standard
+$action-bg: #f9f9f9;
+$action-c: #000;
+
+//hover
+$action-hoverbg: #39f;
+$action-hoverc: #fff;
+
+//checked
+$action-cbg: #39f;
+$action-cc: #fff;
+
+//today
+$action-tbg: #66b3ff;
+$action-tc: #fff;
+
+//other month
+$action-obg: #f9f9f9;
+$action-oc: #999;
+
+//disabled
+$action-dbg: #f9f9f9;
+$action-dc: #ccc;
+
+$slider-thumb: #000;
+$slider-thumbfocus: #333;
+$slider-thumbactive: #666;
+
+
+
+.ws-po-arrow {
+	display: none;
+}
+.ws-po-outerbox {
+	padding-top: em(2);
+}
+.ws-po-box {
+	border: em(3) solid $mainborder;
+}
+
+progress.ws-style {
+	@include progress {
+		border: none;
+		background: $mainborder;
+	}
+
+	@include progressbar {
+		background: $headerbg;
+	}
+}
+
+
+$toppadding: 32;
+
+.input-picker .ws-picker-header {
+	top: em(($toppadding - 1) * -1);
+}
+
+.input-picker .ws-picker-body {
+	padding-top: em($toppadding);
+	margin: 0;
+}
+
+.input-picker .picker-list {
+	margin: 0;
+}
+
+.input-picker .ws-po-box {
+	border-width: em(2);
+	border-color: $headerbg;
+	background: $headerbg;
+	padding: em(5) 0 0;
+}
+
+.input-picker .ws-picker-header > button {
+	color: $headerc;
+
+	&:after {
+		border-color: transparent transparent $headerc;
+	}
+}
+
+.input-picker .ws-picker-controls {
+	margin: 0 em(3);
+	top: em(5);
+}
+
+
+.input-picker .ws-picker-controls > button {
+	background: none;
+	border-color: $headerc;
+	border-radius: 50%;
+
+	&:hover {
+		outline: none;
+		border-color: $headerc;
+		background-color: $headerc;
+	}
+}
+
+.input-picker .prev-controls, .input-picker .ws-po-box[dir="rtl"] .next-controls {
+	left: 0;
+	> .ws-year-btn:after,
+	> button:before {
+		border-color: transparent $headerc transparent transparent;
+	}
+
+	> button:hover {
+		&.ws-year-btn:after,
+		&:before {
+			border-color: transparent $headerbg transparent transparent;
+		}
+	}
+}
+
+.input-picker .next-controls, .input-picker .ws-po-box[dir="rtl"] .prev-controls {
+	right: 0;
+	> .ws-year-btn:after,
+	> button:before {
+		border-color: transparent transparent transparent $headerc;
+
+
+	}
+	> button:hover {
+		&.ws-year-btn:after,
+		&:before {
+			border-color: transparent transparent transparent $headerbg;
+		}
+	}
+}
+
+.input-picker .picker-grid {
+	margin: 0;
+	background: $contentbg;
+}
+
+.input-picker .ws-picker-body .picker-list th,
+.input-picker .ws-picker-body .picker-list td {
+	padding: em(1);
+
+	> abbr {
+		display: inline-block;
+		border: none;
+		padding: em(8) em(4);
+	}
+	> button {
+		color: $action-c;
+		background: $action-bg;
+
+		&.this-value {
+			color: $action-tc;
+			background: $action-tbg;
+		}
+
+		&.othermonth {
+			color: $action-oc;
+			background: $action-obg;
+		}
+
+		&:hover {
+			color: $action-hoverc;
+			background: $action-hoverbg;
+		}
+
+		&.checked-value {
+			color: $action-cc;
+			background: $action-cbg;
+		}
+
+		&[disabled] {
+			color: $action-dc;
+			background: $action-dbg;
+		}
+	}
+}
+
+.input-picker .picker-list.day-list td {
+	> button {
+		padding: em(8) em(8) em(8) 0;
+		text-align: right;
+	}
+}
+
+
+.input-picker .ws-options,
+.input-picker .ws-button-row {
+	margin: 0;
+	padding: em(10);
+	background: $contentbg;
+	border-top-color: $headerbg;
+	border-top-width: em(2);
+}
+
+.input-picker .ws-options button {
+	&.ws-focus,
+	&:focus,
+	&:hover {
+		color: $action-hoverc;
+		background: $action-hoverbg;
+	}
+}
+
+.input-picker.ws-size-2 {
+	width: em(610);
+	min-width: em(508);
+
+	.ws-index-1 {
+		float: right;
+	}
+
+}
+
+.input-picker.ws-size-3 {
+	width: em(902);
+	min-width: em(900);
+
+	.ws-index-1 {
+		margin: 0 0 0 em(2);
+	}
+
+	.ws-index-2 {
+		float: right;
+	}
+}
+
+.input-picker .ws-button-row > button {
+	background-image: none;
+	border-color: none;
+
+	&.ws-empty {
+		margin: 0 em(4);
+		float: left;
+	}
+}
+
+.ws-range {
+	background: $mainborder;
+	height: em(12);
+
+	.ws-range-thumb {
+		border: none;
+		height: 100%;
+		width: em(12);
+		margin: 0 0 0  em(12 / -2);
+		background: $slider-thumb;
+	}
+
+	&.ws-focus .ws-range-thumb {
+		background: $slider-thumbfocus;
+	}
+
+	&.ws-active .ws-range-thumb {
+		background: $slider-thumbactive;
+	}
+
+	.ws-range-progress {
+		background: $action-hoverbg;
+	}
+}
+
+.datalist-polyfill .ws-po-box {
+	padding: 0;
+
+	li {
+		padding: em(5) em(10);
+		background: $contentbg;
+	}
+	.active-item {
+		background: $action-cbg;
+
+		.option-label,
+		.option-value {
+			color: $action-cc;
+		}
+	}
+}
+
+

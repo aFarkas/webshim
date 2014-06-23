@@ -46,13 +46,13 @@ $button-bgcolor: #f5f5f5;
 	}
 
 	&.ws-size-2 {
-		width: em(645);
-		min-width: em(643);
+		width: em(675);
+		min-width: em(670);
 	}
 
 	&.ws-size-3 {
-		width: em(960);
-		min-width: em(956);
+		width: em(985);
+		min-width: em(982);
 	}
 
 	&.color-popover {
@@ -301,6 +301,8 @@ $button-bgcolor: #f5f5f5;
 		position: relative;
 		zoom: 1;
 		overflow: hidden;
+		/* negative padding of td */
+		margin: 0 em(-2);
 
 		.monthname,
 		.month-digit {
@@ -328,7 +330,7 @@ $button-bgcolor: #f5f5f5;
 
 		th,
 		td {
-			padding: em(3) em(5);
+			padding: em(2);
 			text-align: center;
 		}
 

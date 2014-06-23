@@ -101,12 +101,12 @@ SASS:
   display: none;
 }
 .input-picker.ws-size-2 {
-  width: 49.61538em;
-  min-width: 49.46154em;
+  width: 51.92308em;
+  min-width: 51.53846em;
 }
 .input-picker.ws-size-3 {
-  width: 73.84615em;
-  min-width: 73.53846em;
+  width: 75.76923em;
+  min-width: 75.53846em;
 }
 .input-picker.color-popover {
   width: 590px;
@@ -306,6 +306,8 @@ SASS:
   position: relative;
   zoom: 1;
   overflow: hidden;
+  /* negative padding of td */
+  margin: 0 -0.15385em;
 }
 .input-picker .picker-grid .monthname,
 .input-picker .picker-grid .month-digit {
@@ -328,7 +330,7 @@ SASS:
 }
 .input-picker .picker-list th,
 .input-picker .picker-list td {
-  padding: 0.23077em 0.38462em;
+  padding: 0.15385em;
   text-align: center;
 }
 .input-picker .picker-list.day-list td {

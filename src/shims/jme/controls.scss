@@ -338,7 +338,6 @@ $browser-context: 16; // Default
 			top: 50%;
 			left: 50%;
 			margin: -0.5em 0 0 -0.5em;
-			text-shadow: 0 0 0.4em rgba(0, 0, 0, 0.6);
 		}
 	}
 
@@ -427,7 +426,6 @@ $browser-context: 16; // Default
 			cursor: pointer;
 			text-align: center;
 			transition: color 400ms;
-			text-shadow: 0 0 0.1em #000;
 
 			&:hover,
 			&:focus {
