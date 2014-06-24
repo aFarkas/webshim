@@ -125,22 +125,22 @@
   padding-left: 0.0625em;
 }
 
-[data-playersizes~="x-small"] > .jme-controlbar {
+[data-playersizes~="xs"] > .jme-controlbar {
   padding-top: 0.25em;
 }
-[data-playersizes~="x-small"] > .jme-controlbar .time-slider {
+[data-playersizes~="xs"] > .jme-controlbar .time-slider {
   position: absolute;
   top: -0.125em;
   left: 0;
   right: 0;
 }
-[data-playersizes~="x-small"] > .jme-controlbar .progress-container {
+[data-playersizes~="xs"] > .jme-controlbar .progress-container {
   width: auto;
 }
-[data-playersizes~="x-small"] > .jme-controlbar .progress-container:before {
+[data-playersizes~="xs"] > .jme-controlbar .progress-container:before {
   content: "/";
 }
-[data-playersizes~="x-small"] > .jme-controlbar .duration-container {
+[data-playersizes~="xs"] > .jme-controlbar .duration-container {
   width: 100%;
 }
 

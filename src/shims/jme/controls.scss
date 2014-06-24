@@ -67,7 +67,7 @@ $browser-context: 16; // Default
 	}
 }
 
-[data-playersizes~="x-small"] > .jme-controlbar {
+[data-playersizes~="xs"] > .jme-controlbar {
 	padding-top: em(4);
 
 	.time-slider {
