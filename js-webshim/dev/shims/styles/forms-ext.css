@@ -612,7 +612,9 @@ span.ws-input {
 
 /* helper classes to hide show/hide specific range features features */
 .ws-inline-picker,
-div.ws-inline-picker {
+div.ws-inline-picker,
+.ws-popinline,
+div.ws-popinline {
   position: relative;
   max-width: 100%;
   z-index: 99;

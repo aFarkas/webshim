@@ -270,6 +270,12 @@ output {
 	}
 }
 
+.ws-popinline {
+	position: relative;
+	visibility: visible;
+	display: none;
+}
+
 .ws-po-outerbox {
 	position: relative;
 	opacity: 0;
@@ -401,7 +407,7 @@ input[data-wslist]::-webkit-calendar-picker-indicator {
 }
 
 .datalist-polyfill {
-	position: absolute !important;
+	position: absolute;
 	
 	.ws-po-box {
 		padding: em(5) 0;

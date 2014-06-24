@@ -1617,8 +1617,28 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		
 		
 		popover.actionFn = function(obj){
+			var changeChangeBehavior;
 			if(actions[obj['data-action']]){
+				if(obj['data-action'] == 'changeInput' && o.inlinePicker && o.updateOnInput){
+					data._handledValue = true;
+					if(o.size > 1){
+						changeChangeBehavior = $('button[value="'+obj.value+'"]', popover.bodyElement);
+						if(changeChangeBehavior.filter(':not(.othermonth)').length){
+							$('button.checked-value', popover.bodyElement).removeClass('checked-value');
+							changeChangeBehavior.addClass('checked-value').trigger('focus');
+							o.updateOnInput = false;
+						} else {
+							changeChangeBehavior = false;
+						}
+					}
+				}
 				actions[obj['data-action']](obj.value, popover, data, 0);
+				if(data._handledValue){
+					delete data._handledValue;
+					if(changeChangeBehavior){
+						o.updateOnInput = true;
+					}
+				}
 			} else {
 				webshims.warn('no action for '+ obj['data-action']);
 			}

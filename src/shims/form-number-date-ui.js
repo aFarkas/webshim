@@ -1312,7 +1312,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					}
 				};
 				return function(prop){
-					if(prop == 'value' && !data.options.inlinePicker){return;}
+					if(prop == 'value' && (!data.options.inlinePicker || data._handledValue )){return;}
 					popover.isDirty = true;
 					
 					if(popover.isVisible){

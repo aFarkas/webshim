@@ -1938,11 +1938,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 				if( steps[this.type] && typeof steps[this.type].start == 'object'){
 					steps[this.type].start = this.asNumber(steps[this.type].start);
 				}
-				
-				if(!webshims.picker[this.type]){
-					o.buttonOnly = false;
-				}
-				
+
 				for(i = 0; i < createOpts.length; i++){
 					if(o[createOpts[i]] != null){
 						this[createOpts[i]](o[createOpts[i]], o[createOpts[i]]);
@@ -2553,7 +2549,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 					}
 				};
 				return function(prop){
-					if(prop == 'value' && !data.options.inlinePicker){return;}
+					if(prop == 'value' && (!data.options.inlinePicker || data._handledValue )){return;}
 					popover.isDirty = true;
 					
 					if(popover.isVisible){

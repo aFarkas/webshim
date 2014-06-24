@@ -134,19 +134,26 @@
 			<label for="range">range</label>
 			<input type="range" id="range" />
 		</div>
-		<div class="form-row">
-			<div class="mediaplayer videoplayer">
-				<video controls preload="none" poster="http://corrupt-system.de/assets/media/caminandes/caminandes.jpg">
-					<source src="http://corrupt-system.de/assets/media/caminandes/caminandes.mp4" type="video/mp4" />
-					<source src="http://corrupt-system.de/assets/media/caminandes/caminandes.webm" />
-					<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
-				</video>
+		<div class="form-row show-activevaluetooltip">
+			<label for="file">file* (TBD)</label>
+			<div class="ws-custom-file">
+				<input type="file" required="" id="file" />
+				<button type="button" tabindex="-1">browse</button>
+				<span class="ws-file-value">&#160;</span>
 			</div>
 		</div>
+
 		<div class="form-row">
 			<input type="submit" />
 		</div>
 	</form>
+	<div class="mediaplayer videoplayer">
+		<video controls preload="none" poster="http://corrupt-system.de/assets/media/caminandes/caminandes.jpg">
+			<source src="http://corrupt-system.de/assets/media/caminandes/caminandes.mp4" type="video/mp4" />
+			<source src="http://corrupt-system.de/assets/media/caminandes/caminandes.webm" />
+			<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
+		</video>
+	</div>
 	<ul>
 		<li><a href="../cfgs/input-date.html">HTML5 Datepicker configurator</a></li>
 		<li><a href="../cfgs/input-datetime-local.html">HTML5 datetime-local configurator</a></li>

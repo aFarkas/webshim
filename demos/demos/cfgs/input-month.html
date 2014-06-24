@@ -262,7 +262,7 @@
 											<fieldset>
 												<legend>popover</legend>
 												<div class="form-group">
-													<div class="col-sm-6">
+													<div class="col-sm-4">
 														<label for="position" class="form-label">popover.position</label>
 														<select name="popover" id="position" class="form-control">
 															<option value=''>"my": "left top", "at": "left bottom"</option>
@@ -270,12 +270,21 @@
 															<option value='{"position": {"my": "left middle", "at": "right middle"}}'>"my": "left middle", "at": "right middle"</option>
 														</select>
 													</div>
-													<div class="col-sm-6">
+													<div class="col-sm-4">
 														<label for="appendTo" class="form-label">popover.appendTo</label>
 														<select name="popover" id="appendTo" class="form-control">
 															<option value=''>auto (mostly = element)</option>
 															<option value='{"appendTo": "element"}'>element</option>
 															<option value='{"appendTo": "body"}'>body</option>
+														</select>
+													</div>
+													<div class="col-sm-4">
+														<label for="inline" class="form-label">popover.inline</label>
+														<select name="popover" id="inline" class="form-control">
+															<option value=''>false</option>
+															<option value='{"inline": true}'>true (same as "slide")</option>
+															<option value='{"inline": "fade"}'>"fade"</option>
+															<option value='{"inline": "no"}'>"no"</option>
 														</select>
 													</div>
 												</div>

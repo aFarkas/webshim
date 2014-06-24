@@ -593,7 +593,9 @@ span.ws-input {
 }
 
 .ws-inline-picker,
-div.ws-inline-picker {
+div.ws-inline-picker,
+.ws-popinline,
+div.ws-popinline {
 	position: relative;
 	max-width: 100%;
 	z-index: 99;

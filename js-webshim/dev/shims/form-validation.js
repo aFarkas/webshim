@@ -248,7 +248,21 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	};
 	var hasTransition = ('transitionDelay' in document.documentElement.style);
 	var resetPos = {display: 'inline-block', left: 0, top: 0, marginTop: 0, marginLeft: 0, marginRight: 0, marginBottom: 0};
-	
+	var fx = {
+		slide: {
+			show: 'slideDown',
+			hide: 'slideUp'
+		},
+		fade: {
+			show: 'fadeIn',
+			hide: 'fadeOut'
+		},
+		no: {
+			show: 'show',
+			hide: 'hide'
+		}
+	};
+
 	setRoot();
 	webshims.ready('DOM', setRoot);
 	
@@ -328,6 +342,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			return ret;
 		},
 		show: function(element){
+			var showAction;
 			if(this.isVisible){return;}
 			var e = $.Event('wspopoverbeforeshow');
 			this.element.trigger(e);
@@ -356,17 +371,25 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			};
 
 			this.clear();
-			this.element.removeClass('ws-po-visible').css('display', 'none');
+			this.element.css('display', 'none');
 			
 			this.prepareFor(element, visual);
 			
 			this.position(visual);
-			that.timers.show = setTimeout(function(){
-				that.element.css('display', '');
+
+			if(this.options.inline){
+				showAction = (fx[this.options.inline] || fx.slide).show;
+				that.element[showAction]().trigger('wspopovershow');
+			} else {
+				this.element.removeClass('ws-po-visible');
 				that.timers.show = setTimeout(function(){
-					that.element.addClass('ws-po-visible').trigger('wspopovershow');
-				}, 14);
-			}, 4);
+					that.element.css('display', '');
+					that.timers.show = setTimeout(function(){
+						that.element.addClass('ws-po-visible').trigger('wspopovershow');
+					}, 14);
+				}, 4);
+			}
+
 
 			$(document.body)
 				.on('focusin'+this.eventns+' mousedown'+this.eventns, closeOnOutSide)
@@ -404,7 +427,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			this.lastOpts = opts;
 			this.lastElement = $(element).getShadowFocusElement();
 			if(!this.prepared || !this.options.prepareFor){
-				if(opts.appendTo == 'element'){
+				if(opts.appendTo == 'element' || (opts.inline && opts.appendTo == 'auto')){
 					parentElem = element.parent();
 				} else if(opts.appendTo == 'auto'){
 					parentElem = this._getAutoAppendElement(element);
@@ -429,6 +452,12 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				css.minWidth = '';
 			}
 
+			if(opts.inline){
+				this.element.addClass('ws-popinline ws-po-visible');
+			} else {
+				this.element.removeClass('ws-popinline');
+			}
+
 			this.element.css(css);
 
 			if(opts.hideOnBlur){
@@ -444,8 +473,6 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					that.lastElement.off(that.eventns).on('focusout'+that.eventns + ' blur'+that.eventns, onBlur);
 					that.lastElement.getNativeElement().off(that.eventns);
 				}, 10);
-				
-				
 			}
 			
 			this.prepared = true;
@@ -466,6 +493,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			});
 		},
 		hide: function(){
+			var hideAction;
 			var e = $.Event('wspopoverbeforehide');
 			this.element.trigger(e);
 			if(e.isDefaultPrevented() || !this.isVisible){return;}
@@ -479,18 +507,30 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				}
 			};
 			this.clear();
-			this.element.removeClass('ws-po-visible').trigger('wspopoverhide');
-			$(window).on('resize'+this.eventns, forceHide);
-			if(hasTransition){
-				this.element.off('transitionend'+this.eventns).on('transitionend'+this.eventns, forceHide);
+
+			if(this.options.inline){
+				hideAction = (fx[this.options.inline] || fx.slide).hide;
+				this.element[hideAction]();
+			} else {
+				this.element.removeClass('ws-po-visible');
+				$(window).on('resize'+this.eventns, forceHide);
+				if(hasTransition){
+					this.element.off('transitionend'+this.eventns).on('transitionend'+this.eventns, forceHide);
+				}
+
+				that.timers.forcehide = setTimeout(forceHide, hasTransition ? 600 : 40);
 			}
-			
-			that.timers.forcehide = setTimeout(forceHide, hasTransition ? 600 : 40);
+			this.element.trigger('wspopoverhide');
+
 		},
 		position: function(element){
-			var offset = webshims.getRelOffset(this.element.removeAttr('hidden'), element, (this.lastOpts || this.options).position);
-			
-			this.element.css(offset);
+			var offset;
+			var opts = this.lastOpts || this.options;
+			if(!opts.inline){
+				offset = webshims.getRelOffset(this.element.removeAttr('hidden'), element, (this.lastOpts || this.options).position);
+
+				this.element.css(offset);
+			}
 		}
 	});
 	
@@ -575,20 +615,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		return api;
 	})();
 	
-	var fx = {
-		slide: {
-			show: 'slideDown',
-			hide: 'slideUp'
-		},
-		fade: {
-			show: 'fadeIn',
-			hide: 'fadeOut'
-		},
-		no: {
-			show: 'show',
-			hide: 'hide'
-		}
-	};
+
 	if(!iVal.fx || !fx[iVal.fx]){
 		iVal.fx = 'slide';
 	}
