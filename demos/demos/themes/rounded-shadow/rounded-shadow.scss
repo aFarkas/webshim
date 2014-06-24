@@ -1,6 +1,7 @@
 @import "../../../../js-webshim/dev/shims/styles/scss/_extends";
 @import "../../../../js-webshim/dev/shims/styles/scss/_api-shim";
 @import "../../../../js-webshim/dev/shims/styles/scss/_api-forms-ext";
+@import "../../../../js-webshim/dev/shims/jme/icons";
 
 .ws-po-box {
 	border-radius: em(4);
@@ -61,4 +62,35 @@ progress.ws-style {
 
 .input-picker button  {
 	border-radius: em(5);
+}
+
+.mediaplayer {
+	.buffer-progress,
+	.buffer-progress-indicator,
+	.media-range {
+		border-radius: em(3);
+	}
+
+	.ws-range-progress {
+		border-radius: em(3) 0 0 em(3);
+	}
+
+	.time-select {
+		border-radius: em(2);
+	}
+
+	.ws-range-thumb {
+		border-radius: 50%;
+		width: em(11);
+		height: em(11);
+	}
+
+	.time-slider {
+
+		.ws-range-thumb {
+			width: em(16);
+			height: em(11);
+			border-radius: em(3);
+		}
+	}
 }

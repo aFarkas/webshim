@@ -315,16 +315,13 @@ $toppadding: 32;
 .mediaplayer .media-range {
 	height: em(12);
 	border: none;
-	border-radius: 0;
 	background: rgba(255, 255, 255, 0.4);
 
 	.ws-range-progress {
-		border-radius: 0;
 		background: #a700ae;
 	}
 
 	.ws-range-thumb {
-		border-radius: 0;
 		background: #fff;
 		height: em(12);
 		width: em(12);

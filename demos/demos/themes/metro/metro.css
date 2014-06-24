@@ -286,15 +286,12 @@ progress.ws-style > span.progress-value {
 .mediaplayer .media-range {
   height: 0.92308em;
   border: none;
-  border-radius: 0;
   background: rgba(255, 255, 255, 0.4);
 }
 .mediaplayer .media-range .ws-range-progress {
-  border-radius: 0;
   background: #a700ae;
 }
 .mediaplayer .media-range .ws-range-thumb {
-  border-radius: 0;
   background: #fff;
   height: 0.92308em;
   width: 0.92308em;

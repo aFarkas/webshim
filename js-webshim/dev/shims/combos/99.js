@@ -538,18 +538,20 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					data.player.jmeFn('addControls', controls);
 
 					playerSize = (function(){
-						var lastSize;
+						var lastSize = {};
 						var sizes = [
-							{size: 290, name: 'xx-small'},
-							{size: 380, name: 'x-small'},
-							{size: 490, name: 'small'},
-							{size: 756, name: 'medium'},
-							{size: 1024, name: 'large'}
+							{size: 290, name: 'xx-small', names: 's xs xxs'},
+							{size: 380, name: 'x-small', names: 's xs'},
+							{size: 490, name: 'small', names: 's'},
+							{size: 756, name: 'medium', names: 'm'},
+							{size: 1024, name: 'large', names: 'l'},
+							{size: Number.MAX_VALUE, name: 'x-large', names: 'l xl'}
 						];
+
 
 						var len = sizes.length;
 						return function(){
-							var size = 'x-large';
+							var size;
 							var i = 0;
 							var width = data.player.outerWidth();
 							var fSize = Math.max(parseInt(data.player.css('fontSize'), 10) || 16, 13);
@@ -557,14 +559,15 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 							width = width *  (16 / fSize);
 							for(; i < len; i++){
 								if(sizes[i].size >= width){
-									size = sizes[i].name;
+									size = sizes[i];
 									break;
 								}
 							}
 
-							if(lastSize != size){
+							if(lastSize.name != size.name){
 								lastSize = size;
-								data.player.attr('data-playersize', size);
+								data.player.attr('data-playersize', size.name);
+								data.player.attr('data-playersizes', size.names);
 							}
 						};
 					})();

@@ -96,3 +96,25 @@ progress.ws-style > span.progress-value {
 .input-picker button {
   border-radius: 0.38462em;
 }
+
+.mediaplayer .buffer-progress,
+.mediaplayer .buffer-progress-indicator,
+.mediaplayer .media-range {
+  border-radius: 0.23077em;
+}
+.mediaplayer .ws-range-progress {
+  border-radius: 0.23077em 0 0 0.23077em;
+}
+.mediaplayer .time-select {
+  border-radius: 0.15385em;
+}
+.mediaplayer .ws-range-thumb {
+  border-radius: 50%;
+  width: 0.84615em;
+  height: 0.84615em;
+}
+.mediaplayer .time-slider .ws-range-thumb {
+  width: 1.23077em;
+  height: 0.84615em;
+  border-radius: 0.23077em;
+}

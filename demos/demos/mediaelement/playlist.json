@@ -1,5 +1,13 @@
 [
 	{
+		"title": "Caminandes: Gran Dillama",
+		"srces": [
+			{"src": "http://corrupt-system.de/assets/media/caminandes/caminandes.mp4", "type": "video/mp4"},
+			"http://corrupt-system.de/assets/media/caminandes/caminandes.webm"
+		],
+		"poster": "http://corrupt-system.de/assets/media/caminandes/caminandes.jpg"
+	},
+	{
 		"title": "Big Bug Bunny",
 		"srces": [
 			{"src": "http://corrupt-system.de/assets/media/bigbugbunny/bbb_trailer.m4v", "type": "video/mp4"},
