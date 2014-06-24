@@ -290,6 +290,7 @@ output {
 .ws-po-box {
   border: 0.07692em solid #cccccc;
   background: #fff;
+  color: #000;
   padding: 0.38462em 0.38462em 0.23077em;
 }
 
