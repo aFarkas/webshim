@@ -222,10 +222,10 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				});
 
 				base.on({
-					'tocuhstart touchend mousedown click': function(){
+					'touchstart touchend mousedown click mouseover': function(){
 						stopFocus = true;
 						clearTimeout(focusTimer);
-						focusTimer = setTimeout(unStop, 99);
+						focusTimer = setTimeout(unStop, 500);
 					},
 					focusin: function(e){
 						if(!stopFocus && e.originalEvent){

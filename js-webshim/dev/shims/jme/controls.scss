@@ -565,6 +565,10 @@ $browser-context: 16; // Default
 	.ws-a11y-focus {
 		outline: 1px dotted #eee;
 		outline: 1px dotted rgba(255, 255, 255, 0.8);
+
+		&:hover {
+			outline: none;
+		}
 	}
 }
 
