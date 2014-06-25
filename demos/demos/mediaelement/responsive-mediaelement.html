@@ -92,11 +92,7 @@
 		}
 
 		.theme-wrapper {
-			position: fixed;
-			top: 5px;
-			right: 5px;
-			background: #333;
-			color: #eee;
+			display: none;
 		}
 		.theme-wrapper select {
 			display: block;
@@ -145,6 +141,7 @@
 
 		webshim.ready('mediacontrols', function(){
 			$('button.load-jme').remove();
+			$('.theme-wrapper').css('display', 'inline-block');
 		});
 	</script>
 </head>
@@ -156,6 +153,12 @@
 		<button class="load-swf" disabled="">test flash fallback</button>
 
 		<button class="load-jme">test JME / customizable Controls</button>
+
+		<label class="theme-wrapper" for="theme">
+			Style-/Themeswitcher
+
+			<select class="theme-switcher" id="theme"></select>
+		</label>
 	</div>
 
 
@@ -239,11 +242,6 @@
 		}(window, document));
 	}
 </script>
-<label class="theme-wrapper" for="theme">
-	Style-/Themeswitcher
-
-	<select class="theme-switcher" id="theme"></select>
-</label>
 
 <script>
 	webshim.loader.loadScript("../cfgs/assets/cfg.js", false, false, true);

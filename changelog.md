@@ -3,6 +3,7 @@ upcomming Release 1.14.3
 - added new language files (zh-TW and fa)
 - removed box-shadows and border-radius and added new metro theme ([demo](http://afarkas.github.io/webshim/demos/demos/themes/themes.html))
 - improved styles for custom styleable mediaelement controls
+- added popinline feature for form widgets ([demo](afarkas.github.io/webshim/demos/demos/cfgs/input-date.html#popover={"inline"%3A+true})), don't confuse with inlinePicker feature ([demo](http://jsfiddle.net/trixta/cc7Rt/embedded/result,html,js,css/)), which is also great.
 - added mediaelement debugger (just lunch with ``webshim.mediaelement.loadDebugger();``)
 - improved selector performance
 - added srt and ttml subtitle support (but you really should still use vtt!)

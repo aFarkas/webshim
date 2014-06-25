@@ -2608,6 +2608,13 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 				}
 				show();
 			};
+			var toogle = function(){
+				if(popover.openedByFocus || !popover.isVisible){
+					open();
+				} else {
+					popover.hide();
+				}
+			}
 			
 			
 			options.containerElements.push(popover.element[0]);
@@ -2648,7 +2655,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			}
 			
 			
-			opener.wsTouchClick(open);
+			opener.wsTouchClick(toogle);
 			
 			if(options.inlinePicker){
 				popover.openedByFocus = true;
@@ -3000,8 +3007,9 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 				}
 				
 				data.shim.element.on('change input', stopPropagation).addClass(cNames+' '+webshims.shadowClass);
-				
+
 				if(data.shim.buttonWrapper){
+
 					data.shim.buttonWrapper.addClass('input-button-size-'+(data.shim.buttonWrapper.children().filter(isVisible).length)+' '+webshims.shadowClass);
 					
 					if(data.shim.buttonWrapper.filter(isVisible).length){

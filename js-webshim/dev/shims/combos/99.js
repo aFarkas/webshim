@@ -421,9 +421,18 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			data.player.triggerHandler('controlsadded');
 		}
 	});
-
+	webshims.isReady('jme', true);
 	webshims.addReady($.jme.initJME);
 	webshims._polyfill(['mediaelement']);
+	webshims.isReady('jme-base', true);
+
+	if(webshims.cfg.debug !== false){
+		$(function(){
+			if(document.getElementsByTagName('video').length && !document.querySelector(baseSelector)){
+				webshims.warn("found video element but video wasn't wrapped inside a ."+ baseSelector +" element. Will not add control UI");
+			}
+		});
+	}
 });
 ;webshims.register('mediacontrols', function($, webshims, window){
 	"use strict";
@@ -729,7 +738,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		}
 	});
 
-	webshims.ready(webshims.cfg.mediaelement.plugins.concat(['mediaelement']), function(){
+	webshims.ready(webshims.cfg.mediaelement.plugins.concat(['mediaelement', 'jme-base']), function(){
 		if(!options.barTemplate){
 			options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box">{{playlist-prev}}{{playlist-next}}</div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="subtitle-container"><div class="subtitle-controls">{{captions}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
 		}

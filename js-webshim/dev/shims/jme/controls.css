@@ -409,11 +409,9 @@
 }
 .mediaplayer .time-select {
   display: inline-block;
-  margin: 0 0 4px -1.55em;
-  padding: 0.25em 0.125em 0.125em;
-  min-width: 2.8em;
+  width: 0;
+  overflow: hidden;
   text-align: center;
-  bottom: 0.5625em;
   visibility: hidden;
   opacity: 0;
   transition: 400ms opacity, 400ms visibility;
@@ -422,8 +420,12 @@
   color: #eee;
 }
 .mediaplayer .time-select.show-time-select {
+  margin: 0 0 4px -1.55em;
+  padding: 0.25em 0.125em 0.125em;
+  min-width: 2.8em;
   opacity: 1;
   visibility: visible;
+  bottom: 1.25em;
 }
 .mediaplayer .ws-range-track {
   top: 0;
@@ -445,6 +447,9 @@
   height: 0.5625em;
   background: #f1f1f1;
   background: rgba(255, 255, 255, 0.9);
+}
+.mediaplayer [aria-disabled="true"] .ws-range-thumb {
+  cursor: default;
 }
 .mediaplayer .ws-focus .ws-range-thumb {
   background: #fff;
@@ -469,6 +474,10 @@
 }
 .mediaplayer.state-muted .volume-slider .ws-range-thumb {
   left: 0 !important;
+}
+.mediaplayer .ws-a11y-focus {
+  outline: 1px dotted #eee;
+  outline: 1px dotted rgba(255, 255, 255, 0.8);
 }
 
 .has-media-fullscreen {

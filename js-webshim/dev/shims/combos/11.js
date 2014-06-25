@@ -1991,6 +1991,13 @@
 				}
 				show();
 			};
+			var toogle = function(){
+				if(popover.openedByFocus || !popover.isVisible){
+					open();
+				} else {
+					popover.hide();
+				}
+			}
 			
 			
 			options.containerElements.push(popover.element[0]);
@@ -2031,7 +2038,7 @@
 			}
 			
 			
-			opener.wsTouchClick(open);
+			opener.wsTouchClick(toogle);
 			
 			if(options.inlinePicker){
 				popover.openedByFocus = true;
@@ -2383,8 +2390,9 @@
 				}
 				
 				data.shim.element.on('change input', stopPropagation).addClass(cNames+' '+webshims.shadowClass);
-				
+
 				if(data.shim.buttonWrapper){
+
 					data.shim.buttonWrapper.addClass('input-button-size-'+(data.shim.buttonWrapper.children().filter(isVisible).length)+' '+webshims.shadowClass);
 					
 					if(data.shim.buttonWrapper.filter(isVisible).length){

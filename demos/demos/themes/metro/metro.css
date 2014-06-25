@@ -327,6 +327,8 @@ progress.ws-style > span.progress-value {
 
 .mediaplayer .time-select {
   background: rgba(0, 0, 0, 0.5);
+}
+.mediaplayer .time-select.show-time-select {
   bottom: 2.15385em;
 }
 

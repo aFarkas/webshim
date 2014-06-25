@@ -476,11 +476,9 @@ $browser-context: 16; // Default
 
 	.time-select {
 		display: inline-block;
-		margin: 0 0 4px -1.55em;
-		padding: em(4) em(2) em(2);
-		min-width: 2.8em;
+		width: 0;
+		overflow: hidden;
 		text-align: center;
-		bottom: em(9);
 		visibility: hidden;
 		opacity: 0;
 		transition: 400ms opacity, 400ms visibility;
@@ -489,8 +487,12 @@ $browser-context: 16; // Default
 		color: #eee;
 
 		&.show-time-select {
+			margin: 0 0 4px -1.55em;
+			padding: em(4) em(2) em(2);
+			min-width: 2.8em;
 			opacity: 1;
 			visibility: visible;
+			bottom: em(20);
 		}
 	}
 
@@ -516,6 +518,10 @@ $browser-context: 16; // Default
 		height: em(9);
 		background: #f1f1f1;
 		background: rgba(255, 255, 255, 0.9);
+	}
+
+	[aria-disabled="true"] .ws-range-thumb {
+		cursor: default;
 	}
 
 	.ws-focus .ws-range-thumb {
@@ -554,6 +560,11 @@ $browser-context: 16; // Default
 		.ws-range-thumb {
 			left: 0 !important;
 		}
+	}
+
+	.ws-a11y-focus {
+		outline: 1px dotted #eee;
+		outline: 1px dotted rgba(255, 255, 255, 0.8);
 	}
 }
 

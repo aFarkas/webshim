@@ -421,7 +421,16 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			data.player.triggerHandler('controlsadded');
 		}
 	});
-
+	webshims.isReady('jme', true);
 	webshims.addReady($.jme.initJME);
 	webshims._polyfill(['mediaelement']);
+	webshims.isReady('jme-base', true);
+
+	if(webshims.cfg.debug !== false){
+		$(function(){
+			if(document.getElementsByTagName('video').length && !document.querySelector(baseSelector)){
+				webshims.warn("found video element but video wasn't wrapped inside a ."+ baseSelector +" element. Will not add control UI");
+			}
+		});
+	}
 });

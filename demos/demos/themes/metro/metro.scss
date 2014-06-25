@@ -361,7 +361,10 @@ $toppadding: 32;
 
 .mediaplayer .time-select {
 	background: rgba(0, 0, 0, 0.5);
-	bottom: em(28);
+
+	&.show-time-select{
+		bottom: em(28);
+	}
 }
 
 .mediaplayer .currenttime-display, .mediaplayer .duration-display {

@@ -322,9 +322,9 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-contrib-csslint');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	
-	grunt.registerTask('default', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'cssmin', 'uglify', 'versionreplace', 'bytesize']);
+	grunt.registerTask('default', ['webshimscombos', 'concat', 'cfgcopymin', 'copy:main', 'sass', 'cssmin', 'uglify', 'versionreplace', 'bytesize']);
 
-	grunt.registerTask('dev', ['webshimscombos', 'concat', 'sass', 'cfgcopymin', 'copy:main', 'watch']);
+	grunt.registerTask('dev', ['webshimscombos', 'concat', 'cfgcopymin', 'copy:main', 'sass', 'watch']);
 
 	grunt.registerTask('release', ['versiontest', 'clean', 'default', 'bytesize']);
 

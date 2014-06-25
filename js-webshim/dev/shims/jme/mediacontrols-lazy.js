@@ -209,7 +209,10 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		},
 		'jme-media-overlay': {
 			_create: function(control, media, base){
-
+				var stopFocus, focusTimer;
+				var unStop = function(){
+					stopFocus = false;
+				};
 				control.wsTouchClick(function(e){
 					if(media.jmeProp('isPlaying') && base.attr('data-useractivity') != 'false'){
 						media.pause();
@@ -218,6 +221,21 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					}
 				});
 
+				base.on({
+					'tocuhstart touchend mousedown click': function(){
+						stopFocus = true;
+						clearTimeout(focusTimer);
+						focusTimer = setTimeout(unStop, 99);
+					},
+					focusin: function(e){
+						if(!stopFocus && e.originalEvent){
+							$(e.target).addClass('ws-a11y-focus');
+						}
+					},
+					focusout: function(e){
+						$(e.target).removeClass('ws-a11y-focus');
+					}
+				});
 			}
 		},
 		'volume-slider': {
@@ -890,7 +908,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 
 				data.media.addClass('media-fullscreen');
 
-				$('button.play-pause', data.player).trigger('focus');
+				$('button.play-pause', data.player).trigger('focus').removeClass('ws-a11y-focus');
 
 				if($.jme.fullscreen.supportsFullScreen){
 					$(document)
