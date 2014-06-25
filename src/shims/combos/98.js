@@ -542,7 +542,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 						var sizes = [
 							{size: 290, name: 'xx-small', names: 's xs xxs'},
 							{size: 380, name: 'x-small', names: 's xs'},
-							{size: 490, name: 'small', names: 's'},
+							{size: 478, name: 'small', names: 's'},
 							{size: 756, name: 'medium', names: 'm'},
 							{size: 1024, name: 'large', names: 'l'},
 							{size: Number.MAX_VALUE, name: 'x-large', names: 'l xl'}

@@ -3213,7 +3213,6 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 				data.shim.element.on('change input', stopPropagation).addClass(cNames+' '+webshims.shadowClass);
 				
 				if(data.shim.buttonWrapper){
-					
 					data.shim.buttonWrapper.addClass('input-button-size-'+(data.shim.buttonWrapper.children().filter(isVisible).length)+' '+webshims.shadowClass);
 					
 					if(data.shim.buttonWrapper.filter(isVisible).length){

@@ -269,17 +269,20 @@ progress.ws-style > span.progress-value {
 .mediaplayer > .jme-controlbar {
   background: rgba(0, 0, 0, 0.5);
 }
-.mediaplayer > .jme-controlbar button {
+.mediaplayer > .jme-controlbar [class*="-container"] > button,
+.mediaplayer > .jme-controlbar .subtitle-controls > button {
   border: 1px solid #eee;
   border-radius: 50%;
   height: 2em;
   width: 2em;
 }
-.mediaplayer > .jme-controlbar button:hover {
+.mediaplayer > .jme-controlbar [class*="-container"] > button:hover,
+.mediaplayer > .jme-controlbar .subtitle-controls > button:hover {
   outline: none;
   background: rgba(255, 255, 255, 0.6);
 }
-.mediaplayer > .jme-controlbar button.state-paused {
+.mediaplayer > .jme-controlbar [class*="-container"] > button.state-paused,
+.mediaplayer > .jme-controlbar .subtitle-controls > button.state-paused {
   text-indent: 0.2em;
 }
 
@@ -300,9 +303,26 @@ progress.ws-style > span.progress-value {
   background: rgba(255, 255, 255, 0.1);
 }
 
-[data-playersize="x-small"].mediaplayer .media-range,
-[data-playersize="xx-small"].mediaplayer .media-range {
+[data-playersizes~="s"].mediaplayer .media-range {
   display: none;
+}
+[data-playersizes~="s"].mediaplayer .progress-container {
+  width: auto;
+}
+[data-playersizes~="s"].mediaplayer .progress-container:before {
+  content: "/";
+}
+[data-playersizes~="s"].mediaplayer .duration-container {
+  width: 100%;
+}
+
+[data-playersizes~="xs"] .currenttime-container,
+[data-playersizes~="xs"] .progress-container,
+[data-playersizes~="xs"] .duration-container {
+  display: none;
+}
+[data-playersizes~="xs"] .play-pause-container {
+  width: 100%;
 }
 
 .mediaplayer .time-select {
@@ -312,6 +332,17 @@ progress.ws-style > span.progress-value {
 
 .mediaplayer .currenttime-display, .mediaplayer .duration-display {
   font-size: 1em;
+}
+
+.mediaplayer .subtitle-menu {
+  bottom: 2.46154em;
+  right: -0.38462em;
+}
+.mediaplayer .subtitle-menu > div {
+  background: rgba(0, 0, 0, 0.5);
+}
+.mediaplayer .subtitle-menu > div:after {
+  display: none;
 }
 
 .jme-cb-box > div {

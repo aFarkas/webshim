@@ -78,19 +78,19 @@
 		webshim.setOptions('forms', {
 			lazyCustomMessages: true,
 			replaceValidationUI: true,
-			customDatalist: 'auto'
+			customDatalist: true
 		});
 
 		webshim.setOptions('forms-ext', {
 			types: 'date range datetime-local',
-			replaceUI: 'auto',
+			replaceUI: true,
 			widgets: {
 				calculateWidth: false
 			}
 		});
 
 		webshim.setOptions('mediaelement', {
-			replaceUI: 'auto'
+			replaceUI: true
 		});
 		webshim.polyfill('forms forms-ext mediaelement');
 	</script>

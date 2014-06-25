@@ -355,6 +355,7 @@
   float: right;
   padding: 0.1875em 0.3125em 0.3125em;
   background: #333;
+  background: rgba(0, 0, 0, 0.6);
   opacity: 0;
   transform: translateY(30%);
   transition: all 200ms;
@@ -370,6 +371,7 @@
   border-style: solid;
   border-width: 0.625em 0.5em 0 0.5em;
   border-color: #333 transparent transparent transparent;
+  border-color: rgba(0, 0, 0, 0.6) transparent transparent transparent;
 }
 .mediaplayer .subtitle-menu.visible-menu > div {
   visibility: visible;

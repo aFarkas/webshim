@@ -1765,7 +1765,6 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 				data.shim.element.on('change input', stopPropagation).addClass(cNames+' '+webshims.shadowClass);
 				
 				if(data.shim.buttonWrapper){
-					
 					data.shim.buttonWrapper.addClass('input-button-size-'+(data.shim.buttonWrapper.children().filter(isVisible).length)+' '+webshims.shadowClass);
 					
 					if(data.shim.buttonWrapper.filter(isVisible).length){

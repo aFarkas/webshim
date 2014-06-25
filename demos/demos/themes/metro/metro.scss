@@ -295,7 +295,8 @@ $toppadding: 32;
 .mediaplayer > .jme-controlbar {
 	background: rgba(0, 0, 0, 0.5);
 
-	button {
+	[class*="-container"] > button,
+	.subtitle-controls > button {
 		border: 1px solid #eee;
 		border-radius: 50%;
 		height: em(26);
@@ -332,21 +333,51 @@ $toppadding: 32;
 	}
 }
 
-[data-playersize="x-small"].mediaplayer,
-[data-playersize="xx-small"].mediaplayer{
+[data-playersizes~="s"].mediaplayer {
 	.media-range {
 		display: none;
+	}
+	.progress-container {
+		width: auto;
+		&:before {
+			content: "/";
+		}
+	}
+	.duration-container {
+		width: 100%;
+	}
+}
+
+[data-playersizes~="xs"] {
+	.currenttime-container,
+	.progress-container,
+	.duration-container {
+		display: none;
+	}
+	.play-pause-container {
+		width: 100%;
 	}
 }
 
 .mediaplayer .time-select {
 	background: rgba(0, 0, 0, 0.5);
 	bottom: em(28);
-
 }
 
 .mediaplayer .currenttime-display, .mediaplayer .duration-display {
 	font-size: 1em;
+}
+
+.mediaplayer .subtitle-menu {
+	bottom: em(32);
+	right: em(-5);
+
+	> div {
+		background: rgba(0, 0, 0, 0.5);
+		&:after {
+			display: none;
+		}
+	}
 }
 
 

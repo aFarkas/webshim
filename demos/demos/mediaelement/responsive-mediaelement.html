@@ -39,6 +39,7 @@
 		}
 		.mediaplayer {
 			width: 100%;
+			max-width: 100%;
 		}
 
 
@@ -84,13 +85,26 @@
 		}
 		
 		.media-left {
-			max-width: 480px;
 			min-width: 280px;
 			width: 50%;
 			float: left;
 			margin: 0 10px 5px 0;
 		}
+
+		.theme-wrapper {
+			position: fixed;
+			top: 5px;
+			right: 5px;
+			background: #333;
+			color: #eee;
+		}
+		.theme-wrapper select {
+			display: block;
+		}
 	</style>
+
+	<link rel="alternate stylesheet" href="../themes/metro/metro.css" title="metro" />
+	<link rel="alternate stylesheet" href="../themes/rounded-shadow/rounded-shadow.css" title="rounded shadow" />
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
 	<script src="../../../js-webshim/minified/polyfiller.js"></script>
@@ -225,6 +239,14 @@
 		}(window, document));
 	}
 </script>
+<label class="theme-wrapper" for="theme">
+	Style-/Themeswitcher
 
+	<select class="theme-switcher" id="theme"></select>
+</label>
+
+<script>
+	webshim.loader.loadScript("../cfgs/assets/cfg.js", false, false, true);
+</script>
 </body>
 </html>   

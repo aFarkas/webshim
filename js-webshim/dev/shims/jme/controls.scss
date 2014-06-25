@@ -403,6 +403,7 @@ $browser-context: 16; // Default
 			float: right;
 			padding: em(3) em(5) em(5);
 			background: #333;
+			background: rgba(0, 0, 0, 0.6);
 			opacity: 0;
 			transform: translateY(30%);
 			transition: all 200ms;
@@ -419,6 +420,7 @@ $browser-context: 16; // Default
 				border-style: solid;
 				border-width: em(10) em(8) 0 em(8);
 				border-color: #333 transparent transparent transparent;
+				border-color: rgba(0, 0, 0, 0.6) transparent transparent transparent;
 			}
 		}
 
