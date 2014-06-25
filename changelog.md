@@ -3,16 +3,18 @@ upcomming Release 1.14.3
 - added new language files (zh-TW and fa)
 - removed box-shadows and border-radius and added new metro theme ([demo](http://afarkas.github.io/webshim/demos/demos/themes/themes.html))
 - improved styles for custom styleable mediaelement controls
-- added popinline feature for form widgets ([demo](afarkas.github.io/webshim/demos/demos/cfgs/input-date.html#popover={"inline"%3A+true})), don't confuse with inlinePicker feature ([demo](http://jsfiddle.net/trixta/cc7Rt/embedded/result,html,js,css/)), which is also great.
+- added popinline feature for form widgets ([demo](http://afarkas.github.io/webshim/demos/demos/cfgs/input-date.html#popover={"inline"%3A+true})), don't confuse with inlinePicker feature ([demo](http://jsfiddle.net/trixta/cc7Rt/embedded/result,html,js,css/)), which is also great.
 - added mediaelement debugger (just lunch with ``webshim.mediaelement.loadDebugger();``)
 - improved selector performance
 - added srt and ttml subtitle support (but you really should still use vtt!)
 - improved touch support
 - fixed a change event bug in input[type="range"] polyfill
 
+
 Release 1.14.1/Release 1.14.2
 ----------
 - Bugfixes for new FileReader feature (including better errorhandling in case of mis-configuration)
+
 
 Release 1.14.0
 ----------
@@ -25,6 +27,7 @@ Release 1.14.0
 - added new alias ``$.webshim`` (Only for completeness and compatibility. Use the ``webshim`` namespace! For example: ``webshim.polyfill('mediaelement');``)
 - **renamed** ``valuevalidation`` to ``validatevalue``
 - **renamed** ``refreshCustomValidityRules`` event to ``updatecustomvalidity`` event (``webshim.refreshCustomValidityRules`` method is untouched)
+
 
 Release 1.13.1
 ----------
@@ -44,6 +47,7 @@ Release 1.13.0
 - fixed ajax custom validation
 - improved stepUp/stepDown methods
 
+
 Release 1.12.6/1.12.7
 ----------
 - added thousand separator to input[type="number"]
@@ -51,6 +55,7 @@ Release 1.12.6/1.12.7
 - improved responsive default mediaplayer theme
 - improved touch support / added fastclick / tab to mediaplayer controls and UI form widgets
 - added playlist plugin feature to mediaelement
+
 
 Release 1.12.5
 ----------
@@ -73,7 +78,8 @@ Release 1.12.3
 - fixed removeAttr 'disabled' for fieldset[disabled] elements (fix by @outdooricon)
 - Enable attribute placeholders for custom error elements in Instant Form Validation
 - fix CSS bugs for IE8 in datepicker and range
-- compile Jarisplayer as Flash 10.x (fixe youtube advertisement bug https://code.google.com/p/gdata-issues/issues/detail?id=5911)
+- compile Jarisplayer as Flash 10.x (fix youtube advertisement bug https://code.google.com/p/gdata-issues/issues/detail?id=5911)
+
 
 Release 1.12.2
 ----------
