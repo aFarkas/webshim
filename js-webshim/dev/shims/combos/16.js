@@ -3705,7 +3705,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		});
 	};
 
-	if(webshims.cfg.debug){
+	if(({noCombo: 1, media: 1})[webshims.cfg.debug]){
 		$(document).on('mediaerror', function(e){
 			mediaelement.loadDebugger();
 		});

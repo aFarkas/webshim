@@ -88,6 +88,7 @@ class Player extends EventDispatcher
 	private var _videoHeight:Float;
 	public var _naturalWidth:Float;
 	public var _naturalHeight:Float;
+	public var fullMetaData:Dynamic;
 	private var _videoMask:Sprite;
 	private var _videoQualityHigh:Bool;
 	private var _mediaDuration:Float;
@@ -434,6 +435,8 @@ class Player extends EventDispatcher
 	 */
 	private function onMetaData(data:Dynamic):Void
 	{
+		var i, fields;
+		
 		if (_firstLoad)
 		{
 			_isPlaying = _preLoading ? false:true;
@@ -489,10 +492,15 @@ class Player extends EventDispatcher
 				_aspectRatio = _originalAspectRatio;
 			}
 			
+			fields = Reflect.fields(data);
+			fullMetaData = { };
+			for (i in fields) {
+				Reflect.setField(fullMetaData, i, Reflect.field(data, i));
+			}
+			
 			callEvents(PlayerEvents.MEDIA_INITIALIZED);
 			
 			resizeAndCenterPlayer();
-			
 			//Retrieve the volume that user selected last time
 			setVolume(_userSettings.getVolume());
 		}

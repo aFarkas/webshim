@@ -117,7 +117,7 @@ class JsApi extends MovieClip {
 		
 	}
 		
-	public function getAttribute(attribute:String):Float {
+	public function getAttribute(attribute:String):Dynamic {
 			
 			switch (attribute) {
 				case 'isBuffering': 
@@ -133,7 +133,10 @@ class JsApi extends MovieClip {
 					return _player.getBytesLoaded();
 				
 				case 'volume': 
-					return (_player.getMute()==true) ? 0 : _player.getVolume();
+					return (_player.getMute() == true) ? 0 : _player.getVolume();
+					
+				case 'meta':
+					return _player.fullMetaData;
 			}
 			
 			return 0;

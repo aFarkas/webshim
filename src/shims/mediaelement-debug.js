@@ -1,8 +1,12 @@
 (function(webshim, $){
 	"use strict";
+	/*
+	 H.264, Baseline Profile (BP), Level 3.0, up to 640 x 480 / 720 x 404 (345600) at 30 fps
+	 */
 	if(!window.console){return;}
 	var mediaelement = webshim.mediaelement;
 	var hasFlash = swfmini.hasFlashPlayerVersion('10.0.3');
+	var hasNative = Modernizr.video;
 	var url = location.protocol+'//'+location.hostname;
 	var tests = {
 		urlInValid: {
@@ -19,7 +23,7 @@
 		noHeaderTest: {
 			level: 5,
 			test: function(src){
-				return src.computedContainer != 'video/youtube' && !src.ajax;
+				return src.computedContainer != 'video/youtube' && !src.ajax && !src.httpError;
 			},
 			srcTest: {srces: 1},
 			message: "Could not run HTTP network tests (cross-domain) for all sources. Check manually."
@@ -44,7 +48,7 @@
 			level: 2.5,
 			test: function(src){
 
-				if(!src.ajax){
+				if(!src.ajax || src.decode.swf.success || src.decode.native.success){
 					return 'not testable';
 				} else {
 					return !!(src.httpError && !src.httpErrorText);
@@ -59,10 +63,11 @@
 			},
 			srcTest: {srces: 1}
 		},
+
 		explicitHttpError: {
 			level: 1,
 			test: function(src){
-				if(!src.ajax){
+				if(!src.ajax || src.decode.swf.success || src.decode.native.success){
 					return 'not testable';
 				} else {
 					return !!(src.httpErrorText);
@@ -74,7 +79,7 @@
 		charsetInContentType: {
 			level: 2.5,
 			test: function(src){
-				if(!src.ajax){
+				if(!src.ajax || src.httpError){
 					return 'not testable';
 				} else {
 					return src.headerType && (/charset=/i).test(src.headerType);
@@ -98,7 +103,7 @@
 		noContentType: {
 			level: 2.5,
 			test: function(src){
-				if(src.ajax){
+				if(src.ajax && !src.httpError){
 					return !(src.headerType);
 				} else {
 					return 'not testable';
@@ -110,7 +115,7 @@
 		noContentLength: {
 			level: 3,
 			test: function(src){
-				if(src.ajax){
+				if(src.ajax && !src.httpError){
 					return !(src.headers['Content-Length']);
 				} else {
 					return 'not testable';
@@ -122,7 +127,7 @@
 		noRange: {
 			level: 3,
 			test: function(src){
-				if(src.ajax){
+				if(src.ajax && !src.httpError){
 					return !(src.headers['Accept-Ranges']);
 				} else {
 					return 'not testable';
@@ -134,7 +139,7 @@
 		explicitNoRange: {
 			level: 2.5,
 			test: function(src){
-				if(src.ajax){
+				if(src.ajax && !src.httpError){
 					return (src.headers['Accept-Ranges'] == 'none');
 				} else {
 					return 'not testable';
@@ -146,7 +151,7 @@
 		doubleEncoded: {
 			level: 1,
 			test: function(src){
-				if(src.ajax){
+				if(src.ajax && !src.httpError){
 					return ((/[defalte|gzip]/i).test(src.headers['Content-Encoding']));
 				} else {
 					return 'not testable';
@@ -158,7 +163,7 @@
 		mediaAttachment: {
 			level: 1,
 			test: function(src){
-				if(src.ajax){
+				if(src.ajax && !src.httpError){
 					return (/attach/i.test(src.headers['Content-Disposition']));
 				} else {
 					return 'not testable';
@@ -200,6 +205,16 @@
 			},
 			srcTest: {srces: 1},
 			message: "Content-Type header and attribute type do not match and are quite different. Set same and proper type value."
+		},
+		moovPosition: {
+			level: 2.5,
+			test: function(src){
+				if(src.decode.swf.moovposition){
+					return src.decode.swf.moovposition > 300;
+				}
+				return false;
+			},
+			srcTest: {srces: 1}
 		},
 		typeMix: {
 			level: 2.5,
@@ -252,6 +267,77 @@
 				return !hasPlayable;
 			},
 			message: "Mediaelement has no source to be played in browser or by plugin. Use at least a video/mp4 source."
+		},
+		tabletDecode: {
+			level: 2,
+			test: function(infos){
+				var hasSwfSuccess = false;
+				var hasPlayableh264 = false;
+				if(hasFlash){
+					$.each(infos.srces, function(i, src){
+						var swfDecode = src.decode.swf;
+
+						if(('videocodecid' in swfDecode)){
+							hasSwfSuccess = true;
+						}
+						if(swfDecode.videocodecid != 'avc1' || swfDecode.avclevel > 31 || swfDecode.height * swfDecode.width > 921600){
+							return;
+						}
+						hasPlayableh264 = true;
+						return false;
+					});
+				}
+
+				return (!hasSwfSuccess) ?  false : !hasPlayableh264;
+			}
+		},
+		noSmartphoneDecode: {
+			level: 2.99,
+			test: function(infos){
+				var hasSwfSuccess = false;
+				var hasPlayableh264 = false;
+				if(hasFlash){
+
+					$.each(infos.srces, function(i, src){
+						var swfDecode = src.decode.swf;
+
+						if(('videocodecid' in swfDecode)){
+							hasSwfSuccess = true;
+						}
+						if(swfDecode.videocodecid != 'avc1' || swfDecode.avcprofile > 77 || swfDecode.avclevel > 30 || swfDecode.height * swfDecode.width > 345600){
+							return;
+						}
+						hasPlayableh264 = true;
+						return false;
+					});
+				}
+
+				return (!hasSwfSuccess) ?  false : !hasPlayableh264;
+			}
+		},
+		notAllSmartphoneDecode: {
+			level: 3.5,
+			test: function(infos){
+				var hasSwfSuccess = false;
+				var hasPlayableh264 = false;
+
+				if(hasFlash){
+					$.each(infos.srces, function(i, src){
+						var swfDecode = src.decode.swf;
+						if(('videocodecid' in swfDecode)){
+							hasSwfSuccess = true;
+						}
+						if(swfDecode.videocodecid != 'avc1' || swfDecode.avcprofile > 66 || swfDecode.avclevel > 30 || swfDecode.height * swfDecode.width > 307200){
+							return;
+						}
+						hasPlayableh264 = true;
+						return false;
+					});
+				}
+
+
+				return (!hasSwfSuccess) ?  false : !hasPlayableh264;
+			}
 		},
 		needsFlashInstalled: {
 			level: 1,
@@ -336,17 +422,114 @@
 		}
 	};
 
-	function getSrcInfo(elem, nodeName){
+	function runMediaTest(src, container, provider, infos){
+		var timeoutTimer;
+		var promise = $.Deferred();
+		var $container = $('#wsmediatestcontainer');
+		var $element = $('<div />').css({width: 320, height: 120, float: 'left'});
+		var $media = $(document.createElement(infos.nodeName))
+			.attr({
+				src: src.src,
+				'data-type': container,
+				'autoplay': 'autoplay',
+				'muted': 'muted',
+				'controls': 'controls'
+			})
+		;
+		var resolve = function(e){
+			clearTimeout(timeoutTimer);
+			if(e){
+				if(e.type == 'loadedmetadata'){
+
+					if(provider == 'swf'){
+						try {
+							src.decode[provider] = 	$media.getShadowElement().find('object, embed')[0].api_get('meta');
+						} catch(e){}
+					}
+					if(!src.decode[provider]){
+						src.decode[provider] = {
+							duration: $media.prop('duration'),
+							height: $media.prop('videoHeight'),
+							width: $media.prop('videoWidth')
+						};
+					}
+					src.decode[provider].success = true;
+				} else {
+					src.decode[provider] = {
+						error: $media.prop('error'),
+						mediaError: $media.data('mediaerror'),
+						success: false
+					};
+				}
+
+			} else {
+				src.decode[provider] = {
+					success: false,
+					timeout: true
+				};
+			}
+			$element.remove();
+			if(!$('video, audio', $container).length){
+				$container.remove();
+			}
+			promise.resolve();
+		};
+
+		if(!$container.length){
+			$container = $('<div id="wsmediatestcontainer" />')
+				.css({position: 'fixed', top: 0, left: 0, right: 0, padding: 10, zIndex: 9999999999})
+				.prependTo('body')
+			;
+		}
+
+		$media
+			.on('mediaerror loadedmetadata', resolve)
+			.appendTo($element)
+		;
+		$element.appendTo($container);
+		timeoutTimer = setTimeout(resolve, 8000);
+		setTimeout(function(){
+			$media.play();
+		}, 200);
+		$media.mediaLoad();
+		return promise;
+	}
+
+	function runDecodeTest(src, infos){
+		var promises = [];
+		var type = src.declaredContainer || src.computedContainer || src.headerContainer || '';
+		var preferFlash = webshim.cfg.mediaelement.preferFlash;
+		if(hasNative && infos.element.canPlayType(type)){
+			webshim.cfg.mediaelement.preferFlash = false;
+			promises.push(runMediaTest(src, type, 'native', infos));
+		} else {
+			src.decode.native = {success: false, notsupported: true};
+		}
+		if(hasFlash && !(/youtube|rtmp/i.test(type)) && mediaelement.swfMimeTypes.indexOf(type) != -1){
+			webshim.cfg.mediaelement.preferFlash = true;
+			promises.push(runMediaTest(src, type, 'swf', infos));
+		} else {
+			src.decode.swf = {success: false, notsupported: type != 'video/youtube'};
+		}
+		webshim.cfg.mediaelement.preferFlash = preferFlash;
+		src.decode.promise = $.when.apply($, promises);
+	}
+
+	function getSrcInfo(elem, infos){
 		var ajax;
 		var src = {
 			src: $.prop(elem, 'src'),
 			attrSrc: $.trim($.attr(elem, 'src')),
 			declaredType: $.attr(elem, 'type') || $(elem).attr('data-type') || '',
-			errors: {}
+			errors: {},
+			decode: {
+				native: {},
+				swf: {}
+			}
 		};
 		src.declaredContainer = src.declaredType.split(';')[0].trim();
 		try {
-			src.computedContainer = mediaelement.getTypeForSrc( src.src, nodeName);
+			src.computedContainer = mediaelement.getTypeForSrc( src.src, infos.nodeName);
 		} catch(e){
 			src.computedContainer = '';
 		}
@@ -383,26 +566,35 @@
 			src.cors = true;
 		}
 
+		runDecodeTest(src, infos);
+
 		return src;
 	}
 
-	function resolveSrces(elem, infos){
+	function resolveSrces(infos){
 		var src;
 		var srces = [];
 		var ajaxes = [];
-		var nodeName = elem.nodeName.toLowerCase();
-		var $sources = $('source', elem);
+		var $sources = $('source', infos.element);
+		var promises = [];
+		var mainPromise = $.Deferred();
+		var i = 0;
+		var resolve = function(){
+			i++;
+			if(i > 1){
+				mainPromise.resolve();
+			}
+		};
 
-
-		if($.prop(elem, 'src')){
-			src = getSrcInfo(elem, nodeName);
+		if($.prop(infos.element, 'src')){
+			src = getSrcInfo(infos.element, infos);
 			src.attrMode = true;
 			src.typeNotRequired = true;
 			srces.push(src);
 		}
 
 		$sources.each(function(i){
-			var src = getSrcInfo(this, nodeName);
+			var src = getSrcInfo(this, infos);
 			src.typeNotRequired = !!(i && i >= $sources.length - 1);
 
 			srces.push(src);
@@ -410,12 +602,21 @@
 			if(src.ajax){
 				ajaxes.push(src.ajax);
 			}
+			if(src.decode.promise){
+				promises.push(src.decode.promise);
+			}
 		});
 
 		infos.srces = srces;
-
-
-		return $.when.apply($, ajaxes);
+		$.when.apply($, promises).always(resolve);
+		$.when.apply($, ajaxes).done(resolve).fail(function(){
+			setTimeout(resolve, 200);
+		});
+		setTimeout(function(){
+			i = 2;
+			resolve();
+		}, 9999);
+		return mainPromise.promise();
 	}
 
 
@@ -499,6 +700,7 @@
 	function getMediaInfo(elem){
 		var infos = {
 			element: elem,
+			nodeName: elem.nodeName.toLowerCase(),
 			errors: [],
 			poster: {
 				src: $.prop(elem, 'poster'),
@@ -508,17 +710,11 @@
 			mediaError: $.prop(elem, 'error'),
 			wsError: $(elem).data('mediaerror')
 		};
-		var promise = resolveSrces(elem, infos);
+		var promise = resolveSrces(infos);
 		var initTests = function(){
 			runTests(infos);
 		};
-
-		promise
-			.fail(function(){
-				setTimeout(initTests, 399);
-			})
-			.done(initTests)
-		;
+		promise.always(initTests);
 	}
 
 	var timedMediaInfo = function(){
