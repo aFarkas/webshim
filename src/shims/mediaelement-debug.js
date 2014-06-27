@@ -468,10 +468,13 @@
 					timeout: true
 				};
 			}
-			$element.remove();
-			if(!$('video, audio', $container).length){
-				$container.remove();
-			}
+			$media.pause();
+			setTimeout(function(){
+				$element.remove();
+				if(!$('video, audio', $container).length){
+					$container.remove();
+				}
+			});
 			promise.resolve();
 		};
 
