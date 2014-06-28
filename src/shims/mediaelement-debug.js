@@ -264,12 +264,13 @@
 			srcTest: {srces: 1},
 			message: 'src jumped to end too soon. Check negative timestamps: https://bugzilla.mozilla.org/show_bug.cgi?id=868797'
 		},
-		maybeMoovPosition: {
+		swfTimeout: {
 			level: 3,
 			test: function(src){
 				return src.decode.swf.timeout;
 			},
-			srcTest: {srces: 1}
+			srcTest: {srces: 1},
+			message: 'Could not run decode tests. Maybe moovposition is on end?'
 		},
 		moovPosition: {
 			level: 2,
@@ -471,26 +472,25 @@
 			.attr({
 				src: src.src,
 				'data-type': container,
-				'autoplay': 'autoplay',
-				'muted': 'muted',
 				'controls': 'controls'
 			})
 		;
 		var resolvePromise = function(){
 			$media.pause();
-
-			$element.remove();
-			if(!$('video, audio', $container).length){
-				$container.remove();
-			}
-			promise.resolve();
+			setTimeout(function(){
+				$element.remove();
+				if(!$('video, audio', $container).length){
+					$container.remove();
+				}
+			}, 9);
+			setTimeout(function(){
+				promise.resolve();
+			}, 99);
 		};
 		var runEnded = function(e){
 			var duration = $media.prop('duration');
 			var currentTime = $media.prop('currentTime');
-			if(e.type == 'loadedmetadata'){
-				$media.play();
-			}
+
 			if(duration && duration > 5){
 				if(currentTime > 0 && currentTime < 5){
 					resolvePromise();
@@ -534,6 +534,10 @@
 					timeout: true
 				};
 			}
+			setTimeout(function(){
+				$media.play();
+			}, 9);
+			$media.on('ended timeupdate', runEnded);
 			clearTimeout(playTimer);
 
 			setTimeout(resolvePromise, 300);
@@ -548,12 +552,12 @@
 
 		$media
 			.on('mediaerror loadedmetadata', resolve)
-			.on('loadedmetadata ended timeupdate', runEnded)
 			.appendTo($element)
 		;
 		$element.appendTo($container);
-		timeoutTimer = setTimeout(resolve, 8000);
+		timeoutTimer = setTimeout(resolve, 40000);
 		playTimer = setTimeout(function(){
+			$media.prop('muted', true);
 			$media.play();
 		}, 200);
 		$media.mediaLoad();
