@@ -1,8 +1,5 @@
 (function(webshim, $){
 	"use strict";
-	/*
-	 H.264, Baseline Profile (BP), Level 3.0, up to 640 x 480 / 720 x 404 (345600) at 30 fps
-	 */
 	if(!window.console){return;}
 	var mediaelement = webshim.mediaelement;
 	var hasFlash = swfmini.hasFlashPlayerVersion('10.0.3');
@@ -206,16 +203,7 @@
 			srcTest: {srces: 1},
 			message: "Content-Type header and attribute type do not match and are quite different. Set same and proper type value."
 		},
-		moovPosition: {
-			level: 2.5,
-			test: function(src){
-				if(src.decode.swf.moovposition){
-					return src.decode.swf.moovposition > 300;
-				}
-				return false;
-			},
-			srcTest: {srces: 1}
-		},
+
 		typeMix: {
 			level: 2.5,
 			test: function(src, infos){
@@ -268,6 +256,31 @@
 			},
 			message: "Mediaelement has no source to be played in browser or by plugin. Use at least a video/mp4 source."
 		},
+		endJump: {
+			level: 2.5,
+			test: function(src){
+				return src.decode.swf.endJump || src.decode.native.endJump;
+			},
+			srcTest: {srces: 1},
+			message: 'src jumped to end too soon. Check negative timestamps: https://bugzilla.mozilla.org/show_bug.cgi?id=868797'
+		},
+		maybeMoovPosition: {
+			level: 3,
+			test: function(src){
+				return src.decode.swf.timeout;
+			},
+			srcTest: {srces: 1}
+		},
+		moovPosition: {
+			level: 2,
+			test: function(src){
+				if(src.decode.swf.moovposition){
+					return src.decode.swf.moovposition > 300;
+				}
+				return false;
+			},
+			srcTest: {srces: 1}
+		},
 		tabletDecode: {
 			level: 2,
 			test: function(infos){
@@ -289,10 +302,35 @@
 				}
 
 				return (!hasSwfSuccess) ?  false : !hasPlayableh264;
-			}
+			},
+			message: 'Not playable on more than 25% of smartphone and more than 15% of tablet devices. In case you want to support 75% of smartphone- and 90% of tablet devices you need to provide a source encoded with H.264, High Profile (HP), Level 3.1, up to 1280 * 720.'
 		},
-		noSmartphoneDecode: {
-			level: 2.99,
+		allTabletDecode: {
+			level: 3,
+			test: function(infos){
+				var hasSwfSuccess = false;
+				var hasPlayableh264 = false;
+				if(hasFlash){
+					$.each(infos.srces, function(i, src){
+						var swfDecode = src.decode.swf;
+
+						if(('videocodecid' in swfDecode)){
+							hasSwfSuccess = true;
+						}
+						if(swfDecode.videocodecid != 'avc1' || swfDecode.avcprofile > 77 || swfDecode.avclevel > 31 || swfDecode.height * swfDecode.width > 921600){
+							return;
+						}
+						hasPlayableh264 = true;
+						return false;
+					});
+				}
+
+				return (!hasSwfSuccess) ?  false : !hasPlayableh264;
+			},
+			message: 'Not playable on more than 15% of smartphone and more than 5% of tablet devices. In case you want to support 90% of smartphone- and 99% of tablet devices you need to provide a source encoded with H.264, Main Profile (HP), Level 3.1, up to 1280 * 720.'
+		},
+		smartphoneDecode: {
+			level: 3.5,
 			test: function(infos){
 				var hasSwfSuccess = false;
 				var hasPlayableh264 = false;
@@ -313,10 +351,11 @@
 				}
 
 				return (!hasSwfSuccess) ?  false : !hasPlayableh264;
-			}
+			},
+			message: 'Not playable on more than 10% of smartphones: In case you want to support 90% of smartphone- and 99% of tablet devices you need to provide a source encoded with H.264, Main Profile (HP), Level 3.1, up to 720 * 404 / 640 * 480.'
 		},
 		notAllSmartphoneDecode: {
-			level: 3.5,
+			level: 4,
 			test: function(infos){
 				var hasSwfSuccess = false;
 				var hasPlayableh264 = false;
@@ -337,7 +376,8 @@
 
 
 				return (!hasSwfSuccess) ?  false : !hasPlayableh264;
-			}
+			},
+			message: 'Not playable on more than 1% of smartphones: In case you want to support 99% of all devices you need to provide a source encoded with H.264, Baseline Profile (BP), Level 3.0, up to 720 * 404 / 640 * 480. You might want to use multiple sources to satisfy quality and maximum device compatibility.'
 		},
 		needsFlashInstalled: {
 			level: 1,
@@ -423,7 +463,7 @@
 	};
 
 	function runMediaTest(src, container, provider, infos){
-		var timeoutTimer;
+		var timeoutTimer, playTimer;
 		var promise = $.Deferred();
 		var $container = $('#wsmediatestcontainer');
 		var $element = $('<div />').css({width: 320, height: 120, float: 'left'});
@@ -436,6 +476,32 @@
 				'controls': 'controls'
 			})
 		;
+		var resolvePromise = function(){
+			$media.pause();
+
+			$element.remove();
+			if(!$('video, audio', $container).length){
+				$container.remove();
+			}
+			promise.resolve();
+		};
+		var runEnded = function(e){
+			var duration = $media.prop('duration');
+			var currentTime = $media.prop('currentTime');
+			if(e.type == 'loadedmetadata'){
+				$media.play();
+			}
+			if(duration && duration > 5){
+				if(currentTime > 0 && currentTime < 5){
+					resolvePromise();
+				} else if(e.type == 'ended' || currentTime >= duration -1){
+					src.decode[provider].endJump = true;
+					resolvePromise();
+				}
+			} else {
+				resolvePromise();
+			}
+		};
 		var resolve = function(e){
 			clearTimeout(timeoutTimer);
 			if(e){
@@ -446,7 +512,7 @@
 							src.decode[provider] = 	$media.getShadowElement().find('object, embed')[0].api_get('meta');
 						} catch(e){}
 					}
-					if(!src.decode[provider]){
+					if(!src.decode[provider] || $.isEmptyObject(src.decode[provider])){
 						src.decode[provider] = {
 							duration: $media.prop('duration'),
 							height: $media.prop('videoHeight'),
@@ -468,14 +534,9 @@
 					timeout: true
 				};
 			}
-			$media.pause();
-			setTimeout(function(){
-				$element.remove();
-				if(!$('video, audio', $container).length){
-					$container.remove();
-				}
-			});
-			promise.resolve();
+			clearTimeout(playTimer);
+
+			setTimeout(resolvePromise, 300);
 		};
 
 		if(!$container.length){
@@ -487,11 +548,12 @@
 
 		$media
 			.on('mediaerror loadedmetadata', resolve)
+			.on('loadedmetadata ended timeupdate', runEnded)
 			.appendTo($element)
 		;
 		$element.appendTo($container);
 		timeoutTimer = setTimeout(resolve, 8000);
-		setTimeout(function(){
+		playTimer = setTimeout(function(){
 			$media.play();
 		}, 200);
 		$media.mediaLoad();
@@ -515,7 +577,33 @@
 			src.decode.swf = {success: false, notsupported: type != 'video/youtube'};
 		}
 		webshim.cfg.mediaelement.preferFlash = preferFlash;
-		src.decode.promise = $.when.apply($, promises);
+		return $.when.apply($, promises);
+	}
+
+	var runningDecodeTests = 0;
+	var decodeObj = {};
+	function runDeferredeDcodeTest(src, infos){
+
+		var promise = $.Deferred();
+		var onRun = function(){
+			if(!runningDecodeTests){
+				runningDecodeTests++;
+				$(decodeObj).off('finish', onRun);
+				runDecodeTest(src, infos).always(function(){
+					promise.resolve();
+					runningDecodeTests--;
+					$(decodeObj).trigger('finish');
+				});
+			}
+
+		};
+		if(runningDecodeTests){
+			$(decodeObj).on('finish', onRun);
+		} else {
+			onRun();
+		}
+
+		src.decode.promise = promise.promise();
 	}
 
 	function getSrcInfo(elem, infos){
@@ -569,7 +657,7 @@
 			src.cors = true;
 		}
 
-		runDecodeTest(src, infos);
+		runDeferredeDcodeTest(src, infos);
 
 		return src;
 	}
@@ -615,10 +703,7 @@
 		$.when.apply($, ajaxes).done(resolve).fail(function(){
 			setTimeout(resolve, 200);
 		});
-		setTimeout(function(){
-			i = 2;
-			resolve();
-		}, 9999);
+
 		return mainPromise.promise();
 	}
 
@@ -720,14 +805,15 @@
 		promise.always(initTests);
 	}
 
-	var timedMediaInfo = function(){
+	var timedMediaInfo = function(i){
 		var elem = this;
 		setTimeout(function(){
 			getMediaInfo(elem);
-		});
+		}, i * 100);
 	};
 
-	console.log('Running mediaelement debugger. Only run these tests in development never in production. set webshim.setOptions("debug", false); to remove. Debugger only tests media on same domain and does not test file encoding issues.');
+	console.log('Running mediaelement debugger. Only run these tests in development never in production. set webshim.setOptions("debug", false); to remove. Debugger only tests media on same domain and does not test all file encoding issues. So there is still room to fail!');
+
 
 	if(webshim.cfg.extendNative){
 		console.log('mediaelement debugger does not detect all problems with extendNative set to true. Please set webshim.setOptions("extendNative", false);');
@@ -738,4 +824,5 @@
 			.each(timedMediaInfo)
 		;
 	});
+	webshim.mediaelement.getMediaInfo = getMediaInfo;
 })(webshim, webshim.$);
