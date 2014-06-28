@@ -4371,6 +4371,13 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	
 	if(hasFlash && $.cleanData){
 		var oldClean = $.cleanData;
+		var objElem = document.createElement('object');
+		var noRemove = {
+			SetVariable: 1,
+			GetVariable: 1,
+			SetReturnValue: 1,
+			GetReturnValue: 1
+		};
 		var flashNames = {
 			object: 1,
 			OBJECT: 1
@@ -4378,6 +4385,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		
 		$.cleanData = function(elems){
 			var i, len, prop;
+			var ret = oldClean.apply(this, arguments);
 			if(elems && (len = elems.length) && loadedSwf){
 				
 				for(i = 0; i < len; i++){
@@ -4387,7 +4395,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 							elems[i].api_pause();
 							if(elems[i].readyState == 4){
 								for (prop in elems[i]) {
-									if (typeof elems[i][prop] == "function") {
+									if (!noRemove[prop] && !objElem[prop] && typeof elems[i][prop] == "function") {
 										elems[i][prop] = null;
 									}
 								}
@@ -4397,7 +4405,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				}
 				
 			}
-			return oldClean.apply(this, arguments);
+			return ret;
 		};
 	}
 
@@ -4490,7 +4498,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 							$('audio, video').each(function(){
 								webshims.mediaelement.selectSource(this);
 							});
-							webshims.error("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.src+" Mediaerror: "+ media.prop('error')+ 'first error: '+ error);
+							webshims.error("switching mediaelements option to 'preferFlash', due to an error with native player: "+e.target.currentSrc+" Mediaerror: "+ media.prop('error')+ ' error.code: '+ error.code);
 						}
 						webshims.warn('There was a mediaelement error. Run the following line in your console to get more info: webshim.mediaelement.loadDebugger();')
 					}

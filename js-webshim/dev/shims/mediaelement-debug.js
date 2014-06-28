@@ -768,9 +768,9 @@
 			if(infos.errors[0].level < 3){
 				console.log('Found '+ infos.errors.length + ' errors/warnings with at least 1 critical issue.');
 			} else if(infos.errors[0].level < 4) {
-				console.log('Found '+ infos.errors.length + 'errors/warnings.');
+				console.log('Found '+ infos.errors.length + ' errors/warnings.');
 			} else {
-				console.log('Found '+ infos.errors.length + 'warnings but no critical issue.');
+				console.log('Found '+ infos.errors.length + ' warnings but no critical issue.');
 			}
 			infos.errors.forEach(function(error){
 				var type = 'log';
@@ -787,6 +787,7 @@
 			console.log('Congratulations: No errors found for video.');
 		}
 		console.log('---- Media Test End ----');
+		console.log('----');
 	}
 
 	function getMediaInfo(elem){

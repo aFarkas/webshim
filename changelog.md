@@ -1,4 +1,4 @@
-upcomming Release 1.14.3
+Release 1.14.3
 ----------
 - added new language files (zh-TW and fa)
 - removed box-shadows and border-radius and added new metro theme ([demo](http://afarkas.github.io/webshim/demos/demos/themes/themes.html))
