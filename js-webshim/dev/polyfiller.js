@@ -1213,31 +1213,6 @@
 	});
 	//>
 
-	webshims.lazyLoad = function(fn, modules, load){
-		var loaded;
-		var runLoad = $.isFunction(load) ? load : function(){
-			if(load && !loaded){
-				loaded = true;
-				$(function(){
-					loadList(modules);
-				});
-			}
-		};
-		onReady('WINDOWLOAD', runLoad);
-		var rfn =function(c){
-			var obj = this;
-			var args = arguments;
-			runLoad();
-			onReady(modules, function(){
-				if(rfn != obj[fn]){
-					return obj[fn].apply(obj, args);
-				} else if(WSDEBUG) {
-					webshims.error('stop too much recursion');
-				}
-			});
-		};
-		return rfn;
-	};
 	//<mediaelement
 	(function(){
 		webshims.mediaelement = {};
@@ -1303,7 +1278,6 @@
 			c: [21, 12, 13, 22, 34]
 		});
 
-		$.jme = {registerPlugin: webshims.lazyLoad('registerPlugin', ['jmebase'])};
 		addModule('jmebase', {
 			src: 'jme/base',
 			c: [98, 99, 97]

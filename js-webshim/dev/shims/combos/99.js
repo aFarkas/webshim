@@ -8,7 +8,9 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 	var baseSelector = options.selector;
 	
 	webshims.cfg.mediaelement.jme = options;
-
+	if(!$.jme){
+		$.jme = {};
+	}
 
 	$.extend($.jme, {
 		pluginsClasses: [],

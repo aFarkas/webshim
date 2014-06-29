@@ -9,6 +9,9 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 	
 	webshims.cfg.mediaelement.jme = options;
 
+	if(!$.jme){
+		$.jme = {};
+	}
 
 	$.extend($.jme, {
 		pluginsClasses: [],
