@@ -1,4 +1,4 @@
-webshims.register('jme', function($, webshims, window, doc, undefined){
+webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undefined){
 	"use strict";
 	var plugins = $.jme.plugins;
 	var pseudoClasses = 'pseudoClasses';
@@ -24,10 +24,10 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				var className = (track.kind == 'caption') ? 'caption-type' : 'subtitle-type';
 				var lang = track.language;
 				lang = (lang) ? ' <span class="track-lang">'+ lang +'</span>' : '';
-				return '<li class="'+ className +'" role="presentation"><button role="menuitemcheckbox" type="button">'+ track.label + lang +'</button></li>';
+				return '<li class="'+ className +'" role="presentation"><button role="menuitemcheckbox" type="button" tabindex="-1">'+ track.label + lang +'</button></li>';
 			})
 			;
-		return '<div><ul>' + items.join('') +'</ul></div>';
+		return '<div><ul role="presentation">' + items.join('') +'</ul></div>';
 	};
 
 
@@ -236,7 +236,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 						focusTimer = setTimeout(unStop, delay);
 					},
 					focusin: function(e){
-						if(!stopFocus && e.originalEvent){
+						if(!stopFocus && e.originalEvent && ($.prop(e.target, 'tabIndex') > -1 || $.attr(e.target, 'role'))){
 							markedFocus = true;
 							$(e.target).addClass('ws-a11y-focus');
 						}
@@ -528,6 +528,63 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				updateControl();
 			}
 		},
+		chapters: {
+			_create: function(control, media, base){
+				control.attr('aria-haspopup', 'true');
+				webshims.ready('track', function(){
+					var menuObj;
+					var updateMenuItem = (function(){
+						var timer;
+						var update = function(){
+
+						};
+						return function(){
+							clearTimeout(timer);
+							timer = setTimeout(update);
+						};
+					})();
+					var buildMenu = function(currentTrack, chapterList, oldTrack){
+						if(oldTrack){
+							$(oldTrack).off('cuechange', updateMenuItem);
+						}
+
+						if(currentTrack && chapterList.length){
+							base.addClass('has-chapter-tracks');
+							var createList = function(chapter){
+								var item = '<li role="presentation">'+ (this.html.replace('{{startTime}}', chapter.startTime).replace('{{endTime}}', chapter.endTime).replace('{{title}}', chapter.title));
+								if(chapter.list && chapter.list.length){
+									item += '\n<ul role="presentation">'+ chapter.list.map(createList, this).join('\n\t') +'</ul>\n';
+								}
+								item += '</li>';
+								return item;
+							};
+							var chapters = chapterList.map(createList, {
+								html: '<button type="button" role="menuitemcheckbox" aria-checked="false" data-starttime="{{startTime}}" data-endtime="{{endTime}}">{{title}}</button>'
+							});
+							menuObj.addMenu('<div class="mediamenu chapter-menu"><div><ul role="presentation">'+ chapters.join('\n') +'</div></ul></div>')
+							$(currentTrack).on('cuechange', updateMenuItem);
+						} else {
+							base.removeClass('has-chapter-tracks');
+						}
+
+					};
+
+					menuObj = new $.jme.ButtonMenu(control, '<div class="mediamenu chapter-menu" />', function(e, button){
+						if(!media.prop('readyState') && media.prop('paused')){
+							media.play();
+							setTimeout(function(){
+								media.prop('currentTime', $(button).data('starttime'));
+							}, 100);
+						} else {
+							media.prop('currentTime', $(button).data('starttime'));
+						}
+
+					});
+					base.jmeFn('getMediaChapters', buildMenu);
+
+				});
+			}
+		},
 		captions: {
 			pseudoClasses: {
 				menu: 'subtitle-menu'
@@ -593,6 +650,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 					}
 
 					function updateMode(){
+						if(!menuObj || !menuObj.menu || !menuObj.menu.length){return;}
 						$('button', menuObj.menu).each(function(i){
 							var checked = (tracks[i].mode == 'showing') ? 'true' : 'false';
 							if(!i){
@@ -613,20 +671,16 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 						base.attr('data-tracks', tracks.length > 1 ? 'many' : tracks.length);
 
 						if(tracks.length){
-							createSubtitleMenu('<div class="'+that[pseudoClasses].menu +'" >'+ (getTrackMenu(tracks)) +'</div>');
+							createSubtitleMenu('<div class="mediamenu '+that[pseudoClasses].menu +'" >'+ (getTrackMenu(tracks)) +'</div>');
 
 							$('span.jme-text, label span.jme-text', checkbox).text((tracks[0].label || ' ') + (tracks[0].lang || ''));
 
 							if(!base.hasClass(that[pseudoClasses].hasTrack) || base.hasClass(that[pseudoClasses].noTrack)){
 								control.prop('disabled', false);
-								base.triggerHandler('controlschanged');
 							}
 
 						} else if(!base.hasClass(that[pseudoClasses].noTrack) || base.hasClass(that[pseudoClasses].hasTrack)){
 							control.prop('disabled', true);
-							base
-								.triggerHandler('controlschanged')
-							;
 						}
 					}
 
@@ -658,6 +712,165 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		}
 	});
 
+	var trackFilters = {
+		chapters: function(track){
+			return track.kind == 'chapters';
+		},
+		notDisabled: function(track){
+			return track.mode != 'disabled';
+		},
+		activeLang: function(track){
+			return track.language == webshims.activeLang();
+		},
+		activePartialLang: function(track){
+			return track.language == webshims.activeLang().split('-')[0];
+		}
+	};
+
+	function getBestChapterTrack(tracks){
+		var ret = $.grep(tracks, trackFilters.chapters);
+		var last = ret;
+		if(ret.length > 1){
+			ret = $.grep(ret, trackFilters.chapters);
+		}
+
+		if(!ret.length){
+			ret = last;
+		} else if(ret.length > 1){
+			ret = $.grep(ret, trackFilters.notDisabled);
+		}
+
+		if(!ret.length){
+			ret = last;
+		} else if(ret.length > 1){
+			ret = $.grep(ret, trackFilters.activeLang);
+		}
+
+		if(!ret.length){
+			ret = last;
+		} else if(ret.length > 1){
+			ret = $.grep(ret, trackFilters.activePartialLang);
+		}
+
+		return ret[0] || last[0] || null;
+	}
+
+	var showMode = {
+		captions: 'showing',
+		subtitles: 'showing'
+	};
+
+	$.jme.defineMethod('activateTrack', function(track, success){
+		var data = $.jme.data(this);
+		if(!data.media){return;}
+		var textTrack, timer;
+		var callIndex = 0;
+		var checkTrackState = function(){
+			clearTimeout(timer);
+			if(textTrack && textTrack.cues && textTrack.cues.length){
+				success(textTrack);
+				success = $.noop;
+				data.media.find('track').off('load', checkTrackState);
+			} else if(callIndex < 9){
+				timer = setTimeout(checkTrackState, 100 * callIndex);
+				callIndex++;
+			}
+		};
+		if(track.jquery){
+			track = track[0];
+		}
+		if(track.nodeName){
+			textTrack = $.prop(track, 'track');
+		} else {
+			textTrack = track;
+		}
+
+		if($.prop(textTrack, 'mode') == 'disabled'){
+			$.prop(textTrack, 'mode', showMode[$.prop(textTrack, 'mode')] || 'hidden');
+		}
+		data.media.prop('textTracks');
+		data.media.find('track').on('load', checkTrackState);
+		setTimeout(checkTrackState);
+	});
+
+	$.jme.defineMethod('getMediaChapters', function(success){
+		var data = $.jme.data(this);
+		if(!data.media){return;}
+		var currentChapterTrack;
+		var textTracks = data.media.prop('textTracks');
+
+		var updateChapterTrack = (function(){
+			var timer;
+
+			var update = function(){
+				var oldChapterTrack;
+				var selectedChapterTrack = getBestChapterTrack(textTracks);
+				if(currentChapterTrack === selectedChapterTrack){return;}
+				oldChapterTrack = currentChapterTrack;
+				currentChapterTrack = selectedChapterTrack;
+				if(selectedChapterTrack){
+					data.media.jmeFn('activateTrack', currentChapterTrack, function(){
+						var chapterTree = getChapterTree(currentChapterTrack);
+						success(currentChapterTrack, chapterTree, oldChapterTrack);
+
+					});
+				} else {
+					success(currentChapterTrack, [], oldChapterTrack);
+
+				}
+
+			};
+			return function(){
+				clearTimeout(timer);
+				timer = setTimeout(update);
+			};
+		})();
+
+		updateChapterTrack();
+		$([textTracks]).on('addtrack removetrack change', updateChapterTrack);
+		data.player.on('updatesubtitlestate', updateChapterTrack);
+		data.media.on('updatetrackdisplay emptied', updateChapterTrack);
+	});
+
+
+	function getChapterTree(track){
+		var name ='__chaptertree'+track.cues.length;
+		if(track[name]){return track[name];}
+		var cue, i, chapter;
+		var chapterList = [];
+		var currentChapter = null;
+		for(i = 0; i < track.cues.length; i++){
+			cue = track.cues[i];
+			if(currentChapter && currentChapter.startTime > cue.startTime){
+				continue;
+			}
+			if(currentChapter && cue.startTime >= currentChapter.endTime){
+				currentChapter = currentChapter.parent;
+			}
+
+			if(currentChapter && cue.endTime > currentChapter.endTime){
+				continue;
+			}
+			chapter = {
+				startTime: cue.startTime,
+				endTime: cue.endTime,
+				parent: currentChapter,
+				list: [],
+				title: cue.text,
+				cue: cue
+			};
+			if(currentChapter){
+				currentChapter.list.push(chapter);
+			} else {
+				currentChapter = chapter;
+				chapterList.push(chapter);
+			}
+		}
+		track[name] = chapterList;
+		return chapterList;
+	}
+
+	$.jme.defineMethod('getChapterTree', getChapterTree);
 
 	$.jme.defineMethod('concerningRange', function(type, time){
 		var elem = this;
@@ -1002,7 +1215,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 
 
 	$.jme.ButtonMenu = function(button, menu, clickHandler){
-
+		var that = this;
 		this.button = $(button).attr({'aria-haspopup': 'true'});
 
 		this.clickHandler = clickHandler;
@@ -1014,7 +1227,15 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 
 		this.addMenu(menu);
 		this._closeFocusOut();
-		this.button.wsTouchClick(this.toggle);
+		this.button
+			.wsTouchClick(this.toggle)
+			.on('keydown', function(e){
+				if(!that.isVisible && (e.keyCode == 38 || e.keyCode == 40)){
+					that.show();
+					return false;
+				}
+			})
+		;
 	};
 
 	$.jme.ButtonMenu.prototype = {
@@ -1022,7 +1243,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			if(this.menu){
 				this.menu.remove();
 			}
-			this.menu = $(menu);
+			this.menu = $(menu).attr('role', 'menu');
 			this.buttons = $('button', this.menu);
 			this.menu.insertAfter(this.button);
 			this.menu
@@ -1041,10 +1262,10 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			};
 			this.menu
 				.parent()
-				.on('focusin', stopFocusOut)
-				.on('mousedown', stopFocusOut)
+				.on('focusin mousedown click touchend', stopFocusOut)
 				.on('focusout', function(e){
 					timer = setTimeout(function(){
+						that.activeElement = false;
 						that.hide();
 					}, 40);
 				})
@@ -1056,6 +1277,9 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		},
 		keyIndex: function(e){
 			var dir = (e.keyCode == 40) ? 1 : (e.keyCode == 38) ? -1 : 0;
+			if(e.keyCode == 27){
+				this.hide();
+			}
 			if(dir){
 				var buttons = this.buttons.not(':disabled');
 				var activeButton = buttons.filter(':focus');
@@ -1077,7 +1301,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			}
 
 			setTimeout(function(){
-				$(buttons.filter('[aria-checked="true"]')[0] || buttons[0]).focus();
+				$(buttons.filter('[aria-checked="true"]').last()[0] || buttons[0]).focus();
 			}, 60);
 		},
 		toggle: function(){

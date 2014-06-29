@@ -12,6 +12,7 @@
 			background: #000;
 			margin: 0;
 			padding: 0;
+			font-family: sans-serif;
 		}
 
 		.wrapper {
@@ -97,6 +98,54 @@
 		.theme-wrapper select {
 			display: block;
 		}
+
+
+		.mediaplayer .title {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			padding: 3px 3px 1px;
+			background: rgba(0, 0, 0, 0.6);
+			color: #fff;
+			transition: all 400ms;
+			opacity: 0;
+			visibility: hidden;
+			font-size: 16px;
+		}
+
+		[data-playersizes~="l"].mediaplayer .title {
+			font-size: 20px;
+		}
+
+		[data-playersizes~="s"].mediaplayer .title {
+			font-size: 13px;
+		}
+
+		.mediaplayer ul.share-buttons {
+			position: absolute;
+			top: 5px;
+			right: 5px;
+			margin: 0;
+			padding: 3px 3px 1px;
+			background: rgba(0, 0, 0, 0.6);
+			color: #fff;
+			transition: all 400ms;
+			opacity: 0;
+			visibility: hidden;
+			list-style: none;
+			z-index: 9;
+		}
+		.mediaplayer ul.share-buttons li {
+			margin: 2px 0;
+			padding: 2px;
+		}
+
+		.mediaplayer[data-state="idle"] .title,
+		.mediaplayer[data-useractivity="true"] .share-buttons,
+		.mediaplayer[data-state="idle"] .share-buttons:hover {
+			visibility: visible;
+			opacity: 1;
+		}
 	</style>
 
 	<link rel="alternate stylesheet" href="../themes/metro/metro.css" title="metro" />
@@ -106,7 +155,6 @@
 	<script src="../../../js-webshim/minified/polyfiller.js"></script>
 
 	<script>
-		webshim.setOptions('debug', 'noCombo')
 		webshim.setOptions('track', {override: 'auto'});
 		webshim.setOptions('mediaelement', {replaceUI: 'auto'});
 		webshim.polyfill('mediaelement');
@@ -171,16 +219,16 @@
 		<video controls preload="none" poster="http://corrupt-system.de/assets/media/caminandes/caminandes.jpg" style="height: 100%;">
 			<source src="http://corrupt-system.de/assets/media/caminandes/caminandes.m4v" type="video/mp4" />
 			<source src="http://corrupt-system.de/assets/media/caminandes/caminandes.webm" type="video/webm" />
-
-			<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
+			<track kind="chapters" src="chapters.vtt" srclang="en" label="Chapters" />
 		</video>
+		<h2 class="title">Caminandes: Gran Dillama</h2>
 	</div>
 
 
 	<hr />
 
 	<h2>intrinsic ratio responsive/fluid video + multiple subtitles</h2>
-	<p>based on  http://www.alistapart.com/articles/creating-intrinsic-ratios-for-video/</p>
+	<p>This example uses multiple subtitles and a simple share menu</p>
 
 	<div class="mediaplayer videoplayer ratio-16-9">
 		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="height: 100%;">
@@ -194,6 +242,18 @@
 			<track kind="subtitles" src="sintel-trailer_fr.vtt" srclang="fr" label="French subtitles" />
 			<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
 		</video>
+		<ul class="share-buttons">
+			<li>
+				<div class="fb-share-button" data-href="http://afarkas.github.io/webshim/demos/index.html" data-type="button"></div>
+			</li>
+			<li>
+				<div class="g-plusone" data-annotation="none" data-href="http://afarkas.github.io/webshim/demos/index.html"></div>
+			</li>
+			<li>
+				<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://afarkas.github.io/webshim/demos/index.html" data-count="none">Tweet</a>
+
+			</li>
+		</ul>
 	</div>
 
 
@@ -206,32 +266,18 @@
 				<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
 				<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
 				<track src="subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
-				<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
 			</video>
 		</div>
-		<p>More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>.</p>
-		<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-		<p> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-		<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-		<p> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+		<p>More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>. More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>.</p>
+		<p>More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>. More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>. More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>.</p>
+		<p>More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>. More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>. More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>.</p>
+		<p>More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>. More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>.</p>
+		<p>More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>. More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>. More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>.</p>
+		<p>More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>. More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>. More information on webshims <a href="../mediaelement.html">mediaelement implementation</a>.</p>
 	</div>
-	<hr />
-	<h2>width: 100%; height: auto;</h2>
-	<p>Webshims supports setting width/height of a video in all units including the keyword auto (The auto keyword needs to be set inline to work with Flash Fallback).</p>
-	<div class="mediaplayer videoplayer">
-		<video controls preload="none" poster="http://corrupt-system.de/assets/media/sintel/sintel-trailer.jpg" style="height: auto;">
-			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v" type="video/mp4" />
-			<source src="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm" type="video/webm" />
-			<track src="subtitle.vtt" srclang="en" label="some description" kind="subtitles" default />
-			<p>You need a modern Browser or install the Flash Plugin or simply download the video (<a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.m4v">mp4</a>, <a href="http://corrupt-system.de/assets/media/sintel/sintel-trailer.webm">webm</a>)</p>
-		</video>
-	</div>
-	<p><small>In case you are using a poster you need to ensure, that the poster has the same aspect ration than the video.</small></p>
+
 
 </div>
-
-
-
 <script type="text/javascript">
 	//http://blog.jsdelivr.com/2013/06/jsdelivr-weekly-news.html
 	if(location.hostname == 'afarkas.github.io'){
@@ -243,9 +289,28 @@
 		}(window, document));
 	}
 </script>
-
 <script>
 	webshim.loader.loadScript("../cfgs/assets/cfg.js", false, false, true);
+</script>
+<div id="fb-root"></div>
+<script>
+$(window).on('load', function(){
+	(function(d, s, id) {
+		var js, fjs = d.getElementsByTagName(s)[0];
+		if (d.getElementById(id)) return;
+		js = d.createElement(s); js.id = id;
+		js.src = "//connect.facebook.net/de_DE/sdk.js#xfbml=1&appId=127610198929&version=v2.0";
+		fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
+	(function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs'));
+	window.___gcfg = {lang: 'de'};
+
+	(function() {
+		var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+		po.src = 'https://apis.google.com/js/platform.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+	})();
+});
 </script>
 </body>
 </html>   

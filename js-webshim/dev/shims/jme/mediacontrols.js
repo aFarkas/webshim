@@ -7,7 +7,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 	var jme = $.jme;
 	var unknowStructure = '<div class="{%class%}"></div>'
 	var btnStructure = '<button class="{%class%}" type="button" aria-label="{%text%}"></button>';
-	var slideStructure = '<div class="{%class%} media-range"></div>';
+	var slideStructure = '<div class="{%class%} media-range" aria-label="{%text%}"></div>';
 	var timeStructure = '<div  class="{%class%}">00:00</div>';
 
 	var noVolumeClass = (function(){
@@ -18,7 +18,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 			try {
 				audio = new Audio();
 				audio.volume = 0.55;
-				ret = ﻿((Math.round(audio.volume * 100) / 100) == 0.55) ? '' : ' no-volume-api';
+				ret = ((Math.round(audio.volume * 100) / 100) == 0.55) ? '' : ' no-volume-api';
 			} catch(e){}
 
 		}
@@ -205,7 +205,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 
 	jme.registerPlugin('volume-slider', {
 		structure: slideStructure,
-
+		text: 'volume level',
 		_create: lazyLoadPlugin()
 	});
 
@@ -215,6 +215,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 		options: {
 			format: ['mm', 'ss']
 		},
+		text: 'time position',
 		_create: lazyLoadPlugin()
 	});
 
@@ -294,7 +295,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 		structure: btnStructure,
 		text: 'subtitles',
 		_create: function(control, media, base){
-			var trackElems = media.find('track');
+			var trackElems = media.find('track').filter(':not([kind]), [kind="subtitles"], [data-kind="subtitles"], [kind="captions"], [data-kind="captions"]');
 			control.wsclonedcheckbox = $(control).clone().attr({role: 'checkbox'}).insertBefore(control);
 			base.attr('data-tracks', trackElems.length > 1 ? 'many' : trackElems.length);
 			control.attr('aria-haspopup', 'true');
@@ -302,9 +303,24 @@ webshims.register('mediacontrols', function($, webshims, window){
 		}
 	});
 
+
+	jme.registerPlugin('chapters', {
+		structure: btnStructure,
+		text: 'chapters',
+		_create: function(control, media, base){
+			var trackElems = media.find('track').filter('[kind="chapters"], [data-kind="chapters"]');
+			control.attr('aria-haspopup', 'true');
+			if(trackElems.length){
+				webshims._polyfill(['track']);
+				base.addClass('has-chapter-tracks');
+			}
+			lazyLoadPlugin().apply(this, arguments);
+		}
+	});
+
 	webshims.ready(webshims.cfg.mediaelement.plugins.concat(['mediaelement', 'jme-base']), function(){
 		if(!options.barTemplate){
-			options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box">{{playlist-prev}}{{playlist-next}}</div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="subtitle-container"><div class="subtitle-controls">{{captions}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
+			options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box">{{playlist-prev}}{{playlist-next}}</div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="chapters-container"><div class="chapters-controls mediamenu-wrapper">{{chapters}}</div></div><div class="subtitle-container mediamenu-wrapper"><div class="subtitle-controls">{{captions}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
 		}
 		if(!options.barStructure){
 			options.barStructure = '<div class="jme-media-overlay"></div><div class="jme-controlbar'+ noVolumeClass +'" tabindex="-1"><div class="jme-cb-box"></div></div>';

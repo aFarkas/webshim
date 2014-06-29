@@ -1,4 +1,4 @@
-webshims.register('jme', function($, webshims, window, doc, undefined){
+webshims.register('jmebase', function($, webshims, window, doc, undefined){
 	"use strict";
 	var props = {};
 	var fns = {};
@@ -10,7 +10,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	webshims.cfg.mediaelement.jme = options;
 
 
-	$.jme = {
+	$.extend($.jme, {
 		pluginsClasses: [],
 		pluginsSel: '',
 		plugins: {},
@@ -95,7 +95,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				}
 			}
 		}
-	};
+	});
 
 	$.fn.jmeProp = function(name, value){
 		return $.access( this, $.jme.prop, name, value, arguments.length > 1 );
@@ -421,18 +421,17 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			data.player.triggerHandler('controlsadded');
 		}
 	});
-	webshims.isReady('jme', true);
-	webshims.addReady($.jme.initJME);
-	webshims._polyfill(['mediaelement']);
-	webshims.isReady('jme-base', true);
 
-	if(webshims.cfg.debug !== false){
-		$(function(){
-			if(document.getElementsByTagName('video').length && !document.querySelector(baseSelector)){
-				webshims.warn("found video element but video wasn't wrapped inside a ."+ baseSelector +" element. Will not add control UI");
-			}
-		});
-	}
+	webshims.ready('DOM mediaelement', function(){
+		webshims.isReady('jme', true);
+		webshims.addReady($.jme.initJME);
+		webshims.isReady('jme-base', true);
+
+		if(webshims.cfg.debug !== false && document.getElementsByTagName('video').length && !document.querySelector(baseSelector)){
+			webshims.warn("found video element but video wasn't wrapped inside a ."+ baseSelector +" element. Will not add control UI");
+		}
+	});
+
 });
 ;webshims.register('mediacontrols', function($, webshims, window){
 	"use strict";
@@ -443,7 +442,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	var jme = $.jme;
 	var unknowStructure = '<div class="{%class%}"></div>'
 	var btnStructure = '<button class="{%class%}" type="button" aria-label="{%text%}"></button>';
-	var slideStructure = '<div class="{%class%} media-range"></div>';
+	var slideStructure = '<div class="{%class%} media-range" aria-label="{%text%}"></div>';
 	var timeStructure = '<div  class="{%class%}">00:00</div>';
 
 	var noVolumeClass = (function(){
@@ -454,7 +453,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			try {
 				audio = new Audio();
 				audio.volume = 0.55;
-				ret = ﻿((Math.round(audio.volume * 100) / 100) == 0.55) ? '' : ' no-volume-api';
+				ret = ((Math.round(audio.volume * 100) / 100) == 0.55) ? '' : ' no-volume-api';
 			} catch(e){}
 
 		}
@@ -641,7 +640,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 
 	jme.registerPlugin('volume-slider', {
 		structure: slideStructure,
-
+		text: 'volume level',
 		_create: lazyLoadPlugin()
 	});
 
@@ -651,6 +650,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		options: {
 			format: ['mm', 'ss']
 		},
+		text: 'time position',
 		_create: lazyLoadPlugin()
 	});
 
@@ -730,7 +730,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		structure: btnStructure,
 		text: 'subtitles',
 		_create: function(control, media, base){
-			var trackElems = media.find('track');
+			var trackElems = media.find('track').filter(':not([kind]), [kind="subtitles"], [data-kind="subtitles"], [kind="captions"], [data-kind="captions"]');
 			control.wsclonedcheckbox = $(control).clone().attr({role: 'checkbox'}).insertBefore(control);
 			base.attr('data-tracks', trackElems.length > 1 ? 'many' : trackElems.length);
 			control.attr('aria-haspopup', 'true');
@@ -738,9 +738,24 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 		}
 	});
 
+
+	jme.registerPlugin('chapters', {
+		structure: btnStructure,
+		text: 'chapters',
+		_create: function(control, media, base){
+			var trackElems = media.find('track').filter('[kind="chapters"], [data-kind="chapters"]');
+			control.attr('aria-haspopup', 'true');
+			if(trackElems.length){
+				webshims._polyfill(['track']);
+				base.addClass('has-chapter-tracks');
+			}
+			lazyLoadPlugin().apply(this, arguments);
+		}
+	});
+
 	webshims.ready(webshims.cfg.mediaelement.plugins.concat(['mediaelement', 'jme-base']), function(){
 		if(!options.barTemplate){
-			options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box">{{playlist-prev}}{{playlist-next}}</div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="subtitle-container"><div class="subtitle-controls">{{captions}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
+			options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box">{{playlist-prev}}{{playlist-next}}</div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="chapters-container"><div class="chapters-controls mediamenu-wrapper">{{chapters}}</div></div><div class="subtitle-container mediamenu-wrapper"><div class="subtitle-controls">{{captions}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
 		}
 		if(!options.barStructure){
 			options.barStructure = '<div class="jme-media-overlay"></div><div class="jme-controlbar'+ noVolumeClass +'" tabindex="-1"><div class="jme-cb-box"></div></div>';
@@ -752,7 +767,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	});
 	webshims.ready('WINDOWLOAD', loadLazy);
 });
-;webshims.ready('jme DOM', function(){
+;webshims.ready('jme-base DOM', function(){
 	"use strict";
 	var webshims = window.webshims;
 	var $ = webshims.$;
@@ -1139,7 +1154,9 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			$.each(item.tracks || [], function(i, track){
 				$('<track />').attr(track).appendTo(media);
 			});
-
+			if(!item.srces){
+				item.srces = item;
+			}
 			media.jmeProp('srces', item.srces);
 		},
 		_getItem: function(item){

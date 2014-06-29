@@ -1,4 +1,4 @@
-webshims.ready('jme DOM', function(){
+webshims.ready('jme-base DOM', function(){
 	"use strict";
 	var webshims = window.webshims;
 	var $ = webshims.$;
@@ -385,7 +385,9 @@ webshims.ready('jme DOM', function(){
 			$.each(item.tracks || [], function(i, track){
 				$('<track />').attr(track).appendTo(media);
 			});
-
+			if(!item.srces){
+				item.srces = item;
+			}
 			media.jmeProp('srces', item.srces);
 		},
 		_getItem: function(item){

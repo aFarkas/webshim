@@ -127,22 +127,26 @@
 			<ul class="toc_section">
 				
 				<li>
-					– <a href="#Custom-ui-controls">Custom controls for video element.</a>
+					– <a href="#Custom-ui-controls">Custom controls for audio/video element.</a>
 				</li>
 
 
 				<li>
 					- <a href="#Configuring-Controlbar">Configuring the controls</a>
 				</li>
-
-
 				<li>
-					- <a href="#Creating-Controls">Creating new controls</a>
+					- <a href="#Simple-Video-Overlays">Adding simple Overlays to the mediaplayer</a>
 				</li>
 
+			</ul>
+
+			<a class="toc_title" href="#Creating-Controls">Creating new mediaelement plugins and controls</a>
+
+			<a class="toc_title" href="#existing-plugins">Existing Plugins</a>
+			<ul class="toc_section">
 
 				<li>
-					- <a href="#Playlist">Creating a playlist</a>
+					- <a href="#Playlist">Playlist-Plugin</a>
 				</li>
 
 			</ul>
@@ -158,11 +162,11 @@
 
 			<h2 id="introduction" class="header">Introduction</h2>
 
-			<p>Webshim's <code class="i">mediaelement</code> feature implements the base features to view and control a video display and sound thorugh the video element and audio element. It also implements flv and streaming capabilities including youtube playback in all browsers.</p>
-			<p>This document does not describe how to use those native/polyfilled features. It only describes the extensions build on top of it.</p>
+			<p>Webshim's <code class="i">mediaelement</code> feature implements the base features to view and control video and audio elements using HTML5 markup and DOM properties/methods. It also implements flv and streaming capabilities including youtube playback in all browsers.</p>
+			<p>This document does not describe how to use those native/polyfilled features. It only describes the extensions build on top of the standard.</p>
 
 			<h2 id="Custom-ui-controls" class="header">Custom video controls for video and audio elements</h2>
-			<p>Custom controls for audio/video elements can controlled through the <code>replaceUI</code> option. This can be set to <code>true</code>, <code>false</code> or <code>"auto"</code>. If the string <code>"auto"</code> was used the custom controls are only loaded and replaced for devices with some CSS3 support (i.e.: not IE8) and where the following media query matches: <code>(min-device-width: 719px)</code> (i.e. not smartphones, but tablets).</p>
+			<p>Custom controls for audio/video elements can controlled through the <code>replaceUI</code> option. This option can be set to <code>true</code>, <code>false</code> or <code>"auto"</code>. If the string <code>"auto"</code> was used the custom controls are only loaded and replaced for devices with some CSS3 support (i.e.: not IE8) and where the following media query matches: <code>(min-device-width: 719px)</code> (i.e. not smartphones, but tablets).</p>
 <pre><code class="language-javascript">
 webshim.setOptions('mediaelement', {replaceUI: 'auto'});
 webshim.polyfill('mediaelement');
@@ -227,9 +231,39 @@ webshim.polyfill('mediaelement');
 			<p>While the controls are fully styleable through CSS, the markup can be controlled by changing the <code>barTemplate</code> option:</p>
 
 			<iframe class="fiddle-example" width="100%" height="360" src="http://jsfiddle.net/trixta/5Jwhb/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
-			<h2 id="Creating-Controls">Creating Controls</h2>
-			<p>Creating new controls for the jme mediaplayer is quite easy using the <code>$.jme.registerPlugin</code> method. Due to the fact, that jme is loaded async, the plugin regirstration has to be wrapped inside a <code>webshim.ready('jme', function(){});</code> call.</p>
+			<h2 id="Simple-Video-Overlays">Add overlays to the mediaplayer</h2>
+			<p>Adding new overlays to a mediaplayer, for example to add share buttons (like, twitter), a logo or title and credits for a given video or audio source is easy without writing any JS code.</p>
+<pre><code class="language-javascript">
+&lt;style&gt;
+	.mediaplayer .mylogo {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		transition: all 400ms;
+		opacity: 0;
+		visiblity: hidden;
+		/* add z-index, if needed */
+	}
+	.mediaplayer[data-state="idle"] .mylogo {
+		opacity: 1;
+		visibility: visible;
+	}
+&lt;/style&gt;
+&lt;div class="mediaplayer"&gt;
+	&lt;video poster="poster.jpg" controls="" preload="none"&gt;
+		&lt;source src="my-video.mp4" type="video/mp4" /&gt;
+		&lt;source src="my-video.webm" /&gt;
+	&lt;/video&gt;
+	&lt;img src="mylogo.jpg" class="logo" /&gt;
+&lt;/div&gt;
+</code></pre>
+
+			<p>Here is a simple example creating a title and a social bookmark/share menu:</p>
+			<iframe class="fiddle-example" width="100%" height="360" src="http://jsfiddle.net/trixta/k5WyV/embedded/result,html,css,js" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<h2 id="Creating-Controls">Creating new Plugins and Controls</h2>
+			<p>Creating new plugins/controls for the jme mediaplayer is quite easy using the <code>$.jme.registerPlugin</code> method. Due to the fact, that jme is loaded async, the plugin registration has to be wrapped inside a <code>webshim.ready('jme', function(){});</code> call.</p>
 			<p>Let's create a control, which jumps the timeline by 10 seconds forward:</p>
+			<p>First we will create a simple plugin and in the second step we will add it to the controlbar.</p>
 
 <pre><code class="language-javascript">
 webshim.setOptions('mediaelement', {
@@ -309,11 +343,71 @@ webshim.ready('jme', function(){
 
 			<iframe class="fiddle-example" width="100%" height="360" src="http://jsfiddle.net/trixta/tzg5Y/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
+			<h2 id="existing-plugins">Activating existing plugins</h2>
+			<p>Webshim also comes with some predefined plugins. All plugins can be loaded/activated thourgh the <code>plugins</code> option, which takes an array of plugins to be automatically loaded.</p>
+<pre><code class="language-javascript">
+webshim.setOptions('mediaelement', {
+	replaceUI: 'auto',
+	//request playlist plugin
+	plugins: ['playlist', 'alternate']
+});
 
+//start loading mediaelement including plugins
+webshim.polyfill('mediaelement');
+</code></pre>
 
+			<p>In case a mediaplayer plugin adds some JS APIs, the code using those has to be wrapper inside a <code>webshim.ready('plugin-name', function(){});</code></p>
+<pre><code class="language-javascript">
+webshim.setOptions('mediaelement', {
+	replaceUI: 'auto',
+	plugins: ['plugin-name']
+});
+
+//start loading mediaelement including plugins
+webshim.polyfill('mediaelement');
+
+//wait until plugin-name is ready
+webshim.ready('plugin-name', function(){
+	//call ``pluginMethod``
+	$('.mediaplayer').jmeFn('pluginMethod');
+});
+</code></pre>
 			<h2 id="Playlist">Creating a playlist</h2>
-			<p>Webshims fully implements the mediaelement API, so that a developer can change the src attribute of a video element (using $.prop/$.attr) or creating new source elements and appending those (using $.appendPolyfill) after the ended event has occurred.</p>
-			<p>Webshims also comes with a playlist plugin, which makes it easy to create multiple playlist for a mediaplayer.</p>
+			<p>Webshims fully implements the mediaelement API, so that a developer can dynamically change the src property of a video element (using $.prop/$.attr) or create new source elements after the ended event has occurred.</p>
+			<p>But Webshim also comes with a great <code>playlist</code> plugin, which makes it easy to create multiple playlist for a mediaplayer.</p>
+			<p>Activating the <code>playlist</code> is simple:</p>
+
+<pre><code class="language-javascript">
+webshim.setOptions('mediaelement', {
+	replaceUI: 'auto',
+	//request playlist plugin
+	plugins: ['playlist']
+});
+
+//start loading mediaelement including plugins
+webshim.polyfill('mediaelement');
+</code></pre>
+
+
+		<p>To create a new playlist for a mediaplayer simply call <code>$.jmeFn('addPlaylist')</code> on the mediaplayer object.</p>
+		<p>The <code>addPlaylist</code> method requires at least a valid data source and an option option object and returns the generated playlist instance:</p>
+<pre><code class="language-javascript">
+webshim.ready('playlist', function(){
+	$('.mediaplayer').jmeFn('addPlaylist',
+		[
+			{
+				"title": "Only mp4 item",
+				"srces": "play-item.mp4"
+			},
+			{
+				"title": "Only mp4 item",
+				"srces": {"src": "play-item.mp4", "type": "video/mp4"}
+			}
+		]
+	);
+});
+</code></pre>
+			<p>Another example:</p>
 <pre><code class="language-javascript">
 webshim.setOptions('mediaelement', {
 	replaceUI: 'auto',
@@ -334,7 +428,7 @@ webshim.ready('playlist', function(){
 	*
 	* and returns the constructed playlist
 	*
-	* var playlist = $('.mediaplayer').eq(0).jmeFn('addPlaylist', 'path-to-rss-fee.xml', {showcontrols: true, autoplay: true});
+	* var playlist = $('.mediaplayer').eq(0).jmeFn('addPlaylist', 'path-to-rss-feet.xml', {showcontrols: true, autoplay: true});
 	*/
 
 	//The Playlist in this site is done with the following code:

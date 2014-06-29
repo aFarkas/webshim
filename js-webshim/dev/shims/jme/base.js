@@ -1,4 +1,4 @@
-webshims.register('jme', function($, webshims, window, doc, undefined){
+webshims.register('jmebase', function($, webshims, window, doc, undefined){
 	"use strict";
 	var props = {};
 	var fns = {};
@@ -10,7 +10,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 	webshims.cfg.mediaelement.jme = options;
 
 
-	$.jme = {
+	$.extend($.jme, {
 		pluginsClasses: [],
 		pluginsSel: '',
 		plugins: {},
@@ -95,7 +95,7 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 				}
 			}
 		}
-	};
+	});
 
 	$.fn.jmeProp = function(name, value){
 		return $.access( this, $.jme.prop, name, value, arguments.length > 1 );
@@ -421,16 +421,15 @@ webshims.register('jme', function($, webshims, window, doc, undefined){
 			data.player.triggerHandler('controlsadded');
 		}
 	});
-	webshims.isReady('jme', true);
-	webshims.addReady($.jme.initJME);
-	webshims._polyfill(['mediaelement']);
-	webshims.isReady('jme-base', true);
 
-	if(webshims.cfg.debug !== false){
-		$(function(){
-			if(document.getElementsByTagName('video').length && !document.querySelector(baseSelector)){
-				webshims.warn("found video element but video wasn't wrapped inside a ."+ baseSelector +" element. Will not add control UI");
-			}
-		});
-	}
+	webshims.ready('DOM mediaelement', function(){
+		webshims.isReady('jme', true);
+		webshims.addReady($.jme.initJME);
+		webshims.isReady('jme-base', true);
+
+		if(webshims.cfg.debug !== false && document.getElementsByTagName('video').length && !document.querySelector(baseSelector)){
+			webshims.warn("found video element but video wasn't wrapped inside a ."+ baseSelector +" element. Will not add control UI");
+		}
+	});
+
 });

@@ -111,6 +111,7 @@
 		content: "\e610";
 	}
 }
+
 %icon-share {
 	@extend %iconbase;
 	&:before {
@@ -165,12 +166,14 @@
 		content: "\e602";
 	}
 }
+
 %icon-previous {
 	@extend %iconbase;
 	&:before {
 		content: "\e603";
 	}
 }
+
 %icon-olist {
 	@extend %iconbase;
 	&:before {

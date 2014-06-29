@@ -1155,11 +1155,9 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		$(mediaelem).on(loadEvents, load);
 		if(_default){
 			obj.mode = showTracks[obj.kind] ? 'showing' : 'hidden';
-			webshims.ready('WINDOWLOAD', load);
+			load();
 		} else {
-			webshims.ready('WINDOWLOAD', function(){
-				$(mediaelem).on('updatetrackdisplay', load);
-			});
+			$(mediaelem).on('updatetrackdisplay', load);
 		}
 	};
 	

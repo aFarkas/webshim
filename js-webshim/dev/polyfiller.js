@@ -116,7 +116,7 @@
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
 	$.extend(webshims, {
-		version: '1.14.3',
+		version: '1.14.4-pre',
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
 			//addCacheBuster: false,
@@ -667,7 +667,11 @@
 	
 
 	webshims.activeLang = (function(){
-		var curLang = $.attr(document.documentElement, 'lang') || navigator.browserLanguage || navigator.language || '';
+		var nav = navigator;
+		if(!('language' in nav)){
+			nav.language = nav.browserLanguage || '';
+		}
+		var curLang = $.attr(document.documentElement, 'lang') || nav.language;
 		onReady('webshimLocalization', function(){
 			webshims.activeLang(curLang);
 		});
@@ -1208,10 +1212,37 @@
 		c: [21, 22]
 	});
 	//>
-	
+
+	webshims.lazyLoad = function(fn, modules, load){
+		var loaded;
+		var runLoad = $.isFunction(load) ? load : function(){
+			if(load && !loaded){
+				loaded = true;
+				$(function(){
+					loadList(modules);
+				});
+			}
+		};
+		onReady('WINDOWLOAD', runLoad);
+		var rfn =function(c){
+			var obj = this;
+			var args = arguments;
+			runLoad();
+			onReady(modules, function(){
+				if(rfn != obj[fn]){
+					return obj[fn].apply(obj, args);
+				} else if(WSDEBUG) {
+					webshims.error('stop too much recursion');
+				}
+			});
+		};
+		return rfn;
+	};
 	//<mediaelement
 	(function(){
 		webshims.mediaelement = {};
+
+
 		addTest({
 			texttrackapi: ('addTextTrack' in document.createElement('video')),
 			// a more strict test for track including UI support: document.createElement('track').kind === 'subtitles'
@@ -1272,24 +1303,22 @@
 			c: [21, 12, 13, 22, 34]
 		});
 
-		addModule('jme', {
-			src: 'jme/b',
-			d: ['mediaelement'],
+		$.jme = {registerPlugin: webshims.lazyLoad('registerPlugin', ['jmebase'])};
+		addModule('jmebase', {
+			src: 'jme/base',
 			c: [98, 99, 97]
 		});
 
-		addModule('mediacontrols', {
-			src: 'jme/c',
-			css: 'jme/controls.css',
-			d: ['jme'],
-			c: [98, 99]
+		$.each([
+			['mediacontrols', {c: [98, 99], css: 'jme/controls.css'}],
+			['playlist', {c: [98, 97]}]
+		], function(i, plugin){
+			addModule(plugin[0], $.extend({
+				src: 'jme/'+plugin[0],
+				d: ['jmebase']
+			}, plugin[1]));
 		});
 
-		addModule('playlist', {
-			src: 'jme/p',
-			d: ['jme'],
-			c: [98, 97]
-		});
 
 		addModule('track-ui', {
 			d: ['track', DOMSUPPORT]

@@ -1,5 +1,5 @@
 /* thx to http://icomoon.io */
-.mediaplayer[data-state="waiting"] > .jme-media-overlay, .mediaplayer .fullscreen, .mediaplayer .fullscreen.state-exitfullscreen, .mediaplayer[data-state="idle"] > .jme-media-overlay, .mediaplayer button.play-pause, .mediaplayer button.play-pause.state-playing, .mediaplayer .mute-unmute, .mediaplayer[data-volume="medium"] .mute-unmute, .mediaplayer[data-volume="low"] .mute-unmute, .mediaplayer[data-volume="no"] .mute-unmute, .mediaplayer .state-unmute.mute-unmute, .mediaplayer .captions, .mediaplayer .subtitle-menu button[aria-checked="true"], .mediaplayer .subtitle-menu button, .mediaplayer .playlist-next, .mediaplayer .playlist-prev, .mediaplayer[data-state="ended"] > .jme-media-overlay {
+.mediaplayer[data-state="waiting"] > .jme-media-overlay, .mediaplayer .fullscreen, .mediaplayer .fullscreen.state-exitfullscreen, .mediaplayer[data-state="idle"] > .jme-media-overlay, .mediaplayer button.play-pause, .mediaplayer button.play-pause.state-playing, .mediaplayer .mute-unmute, .mediaplayer[data-volume="medium"] .mute-unmute, .mediaplayer[data-volume="low"] .mute-unmute, .mediaplayer[data-volume="no"] .mute-unmute, .mediaplayer .state-unmute.mute-unmute, .mediaplayer .captions, .mediaplayer .subtitle-menu button[aria-checked="true"], .mediaplayer .subtitle-menu button, .mediaplayer .playlist-next, .mediaplayer .playlist-prev, .mediaplayer .chapters, .mediaplayer[data-state="ended"] > .jme-media-overlay {
   font-family: 'jme';
   speak: none;
   font-style: normal;
@@ -75,6 +75,10 @@
 
 .mediaplayer .playlist-prev:before {
   content: "\e603";
+}
+
+.mediaplayer .chapters:before {
+  content: "\e615";
 }
 
 .mediaplayer[data-state="ended"] > .jme-media-overlay:before {
@@ -228,7 +232,7 @@
 .mediaplayer[data-state="waiting"] {
   cursor: default;
 }
-.mediaplayer[data-state="waiting"] > .jme-media-overlay {
+.mediaplayer[data-state="waiting"] > .jme-media-overlay:before {
   animation-name: jmespin;
   animation-iteration-count: infinite;
   animation-duration: 1100ms;
@@ -302,6 +306,12 @@
 .mediaplayer .no-volume-api .volume-slider {
   display: none;
 }
+.mediaplayer .chapters-container {
+  display: none;
+}
+.mediaplayer.has-chapter-tracks .chapters-container {
+  display: table-cell;
+}
 .mediaplayer .captions[role="checkbox"] {
   color: #999;
 }
@@ -318,11 +328,11 @@
 .mediaplayer[data-tracks="many"] .captions[role="checkbox"] {
   display: none;
 }
-.mediaplayer .subtitle-controls {
+.mediaplayer .mediamenu-wrapper {
   position: relative;
   zoom: 1;
 }
-.mediaplayer .subtitle-menu {
+.mediaplayer .mediamenu {
   position: absolute;
   bottom: 1.75em;
   margin-bottom: 10px;
@@ -330,25 +340,25 @@
   right: -0.625em;
   visibility: hidden;
 }
-.mediaplayer .subtitle-menu ul, .mediaplayer .subtitle-menu li {
+.mediaplayer .mediamenu ul, .mediaplayer .mediamenu li {
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.mediaplayer .subtitle-menu button {
+.mediaplayer .mediamenu li > ul {
+  margin-left: 10px;
+}
+.mediaplayer .mediamenu button {
   position: relative;
+  display: block;
   zoom: 1;
-  width: auto;
+  width: 100%;
+  text-align: left;
   height: auto;
   padding: 2px;
   font-size: 81.3%;
 }
-.mediaplayer .subtitle-menu button:before {
-  display: inline-block;
-  vertical-align: middle;
-  padding: 0 5px 0 0;
-}
-.mediaplayer .subtitle-menu > div {
+.mediaplayer .mediamenu > div {
   position: relative;
   zoom: 1;
   visibility: hidden;
@@ -359,8 +369,13 @@
   opacity: 0;
   transform: translateY(30%);
   transition: all 200ms;
+  overflow: auto;
+  max-height: 300px;
 }
-.mediaplayer .subtitle-menu > div:after {
+.mediaplayer .mediamenu > div iframe {
+  visibility: inherit !important;
+}
+.mediaplayer .mediamenu > div:after {
   content: " ";
   position: absolute;
   display: block;
@@ -373,10 +388,15 @@
   border-color: #333 transparent transparent transparent;
   border-color: rgba(0, 0, 0, 0.6) transparent transparent transparent;
 }
-.mediaplayer .subtitle-menu.visible-menu > div {
+.mediaplayer .mediamenu.visible-menu > div {
   visibility: visible;
   opacity: 1;
   transform: translateY(0);
+}
+.mediaplayer .subtitle-menu button:before {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0 5px 0 0;
 }
 .mediaplayer .buffer-progress {
   position: absolute;

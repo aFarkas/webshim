@@ -204,10 +204,13 @@ $browser-context: 16; // Default
 		cursor: default;
 		> .jme-media-overlay {
 			@extend %icon-spinner;
-			animation-name: jmespin;
-			animation-iteration-count: infinite;
-			animation-duration: 1100ms;
-			animation-timing-function: linear;
+
+			&:before {
+				animation-name: jmespin;
+				animation-iteration-count: infinite;
+				animation-duration: 1100ms;
+				animation-timing-function: linear;
+			}
 		}
 	}
 
@@ -333,8 +336,20 @@ $browser-context: 16; // Default
 		}
 	}
 
+	.chapters-container {
+		display: none;
+	}
+
+	&.has-chapter-tracks .chapters-container {
+		display: table-cell;
+	}
+
 	.captions {
 		@extend %icon-cc;
+	}
+
+	.chapters {
+		@extend %icon-olist;
 	}
 
 	.captions[role="checkbox"] {
@@ -361,12 +376,12 @@ $browser-context: 16; // Default
 
 	}
 
-	.subtitle-controls {
+	.mediamenu-wrapper {
 		position: relative;
 		zoom: 1;
 	}
 
-	.subtitle-menu {
+	.mediamenu {
 		position: absolute;
 		bottom: em(28);
 		margin-bottom: 10px;
@@ -376,24 +391,19 @@ $browser-context: 16; // Default
 
 		ul, li {margin: 0; padding: 0;list-style: none;}
 
+		li > ul {
+			margin-left: 10px;
+		}
+
 		button {
-			@extend %icon-checkbox-unchecked;
 			position: relative;
+			display: block;
 			zoom: 1;
-			width: auto;
+			width: 100%;
+			text-align: left;
 			height: auto;
 			padding: 2px;
 			font-size: 81.3%;
-
-			&:before {
-				display: inline-block;
-				vertical-align: middle;
-				padding: 0 5px 0 0;
-			}
-
-			&[aria-checked="true"] {
-				@extend %icon-checkbox-checked;
-			}
 		}
 
 		> div {
@@ -408,6 +418,12 @@ $browser-context: 16; // Default
 			transform: translateY(30%);
 			transition: all 200ms;
 
+			overflow: auto;
+			max-height: 300px;
+
+			iframe {
+				visibility: inherit !important;
+			}
 
 			&:after {
 				content: " ";
@@ -428,6 +444,23 @@ $browser-context: 16; // Default
 			visibility: visible;
 			opacity: 1;
 			transform:  translateY(0);
+		}
+	}
+
+	.subtitle-menu {
+		button {
+			@extend %icon-checkbox-unchecked;
+
+
+			&:before {
+				display: inline-block;
+				vertical-align: middle;
+				padding: 0 5px 0 0;
+			}
+
+			&[aria-checked="true"] {
+				@extend %icon-checkbox-checked;
+			}
 		}
 	}
 
