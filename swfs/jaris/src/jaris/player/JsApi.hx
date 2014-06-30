@@ -63,6 +63,9 @@ class JsApi extends MovieClip {
 	private var _isBuffering:Bool;
 	private var _percentLoaded:Float;
 	private var _externalListeners:Hash<String>;
+	private var _progressNow:Float;
+	private var _timeupdateNow:Float;
+	private var _lastPostion:Float;
 	
 	//}
 	
@@ -73,6 +76,10 @@ class JsApi extends MovieClip {
 		super();
 		var parameters:Dynamic<String> = flash.Lib.current.loaderInfo.parameters;
 		_externalListeners = new Hash<String>();
+		
+		_progressNow = Date.now().getTime();
+		_timeupdateNow = Date.now().getTime();
+		_lastPostion = -500;
 
 		Security.allowDomain("*");
 		
@@ -159,7 +166,9 @@ class JsApi extends MovieClip {
 	
 	public function onPlayerEvent(event:PlayerEvents):Void
 	{
-		if(!_player.noAPITrigger){
+		if (!_player.noAPITrigger) {
+			var now;
+			var allowCall = true;
 			var jsFunction = '';
 			var data = {
 					duration:		event.duration,
@@ -175,12 +184,30 @@ class JsApi extends MovieClip {
 					seekTime: event.seekTime
 			};
 			
-			if (_externalListeners.exists(event.name.toLowerCase()))
-			{		
-				ExternalInterface.call(_externalListeners.get(event.name.toLowerCase()), data);
-			} 
+			if (event.name == PlayerEvents.TIME || event.name == PlayerEvents.PROGRESS) {
+				now = Date.now().getTime();
+				
+				if (event.name == PlayerEvents.TIME) {
+					if (now - _timeupdateNow > 66 || Math.abs(_lastPostion - event.time) > 200) {
+						_timeupdateNow = now;
+						_lastPostion = event.time;
+					} else {
+						allowCall = false;
+					}
+				}
+				
+				if (event.name == PlayerEvents.PROGRESS) {
+					if (now - _progressNow > 66 || data.loaded / data.total > 0.95) {
+						_progressNow = now;
+					} else {
+						allowCall = false;
+					}
+				}
+			}
 			
-			if (_externalListeners.exists('on*'))
+			
+			
+			if (allowCall)
 			{		
 				ExternalInterface.call(_externalListeners.get('on*'), data);
 			} 
