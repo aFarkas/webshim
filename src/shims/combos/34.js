@@ -1562,7 +1562,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 								dataType: 'text',
 								url: src,
 								success: function(text){
-									var contentType = ajax.getResponseHeader('content-type');
+									var contentType = ajax.getResponseHeader('content-type') || '';
 
 									if(!contentType.indexOf('application/xml')){
 										text = ttmlTextToVTT(text);

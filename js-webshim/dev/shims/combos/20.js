@@ -3120,18 +3120,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			}
 		}
 	};
-	var allowedPreload = {'metadata': 1, 'auto': 1, '': 1};
-	var fixPreload = function(elem){
-		var preload, img;
-		if(elem.getAttribute('preload') == 'none'){
-			if(allowedPreload[(preload = $.attr(elem, 'data-preload'))]){
-				$.attr(elem, 'preload', preload);
-			} else if(hasNative && (preload = elem.getAttribute('poster'))){
-				img = document.createElement('img');
-				img.src = preload;
-			}
-		}
-	};
 	var stopParent = /^(?:embed|object|datalist)$/i;
 	var selectSource = function(elem, data){
 		var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
@@ -3147,7 +3135,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		if(mediaelement.sortMedia){
 			_srces.sort(mediaelement.sortMedia);
 		}
-		fixPreload(elem);
 		stepSources(elem, data, _srces);
 
 	};
@@ -3350,6 +3337,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		_bufferedEnd: 0,
 		_bufferedStart: 0,
 		currentTime: 0,
+		lastCalledTime: -500,
 		_ppFlag: undefined,
 		_calledMeta: false,
 		lastDuration: 0
@@ -3515,7 +3503,12 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			if(data.seeking){
 				callSeeked(data);
 			}
-			trigger(data._elem, 'timeupdate');
+			
+			if(data.currentTime - data.lastCalledTime > 0.19){
+				data.lastCalledTime = data.currentTime;
+				$.event.trigger('timeupdate', undefined, data._elem, true);
+			}
+			
 		},
 		onProgress: function(jaris, data){
 			if(data.ended){
@@ -3525,10 +3518,12 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				return;
 			}
 			var percentage = jaris.loaded / jaris.total;
+			
 			if(percentage > 0.02 && percentage < 0.2){
 				setReadyState(3, data);
 			} else if(percentage > 0.2){
-				if(percentage > 0.99){
+				if(percentage > 0.95){
+					percentage = 1;
 					data.networkState = 1;
 				}
 				setReadyState(4, data);
@@ -3730,7 +3725,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	
 	
 	var resetSwfProps = (function(){
-		var resetProtoProps = ['_calledMeta', 'lastDuration', '_bufferedEnd', '_bufferedStart', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'seeking', 'videoHeight', 'videoWidth'];
+		var resetProtoProps = ['_calledMeta', 'lastDuration', '_bufferedEnd', 'lastCalledTime', '_bufferedStart', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'seeking', 'videoHeight', 'videoWidth'];
 		var len = resetProtoProps.length;
 		return function(data){
 			

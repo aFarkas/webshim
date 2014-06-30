@@ -1,5 +1,5 @@
 /* thx to http://icomoon.io */
-.mediaplayer[data-state="waiting"] > .jme-media-overlay, .mediaplayer .fullscreen, .mediaplayer .fullscreen.state-exitfullscreen, .mediaplayer[data-state="idle"] > .jme-media-overlay, .mediaplayer button.play-pause, .mediaplayer button.play-pause.state-playing, .mediaplayer .mute-unmute, .mediaplayer[data-volume="medium"] .mute-unmute, .mediaplayer[data-volume="low"] .mute-unmute, .mediaplayer[data-volume="no"] .mute-unmute, .mediaplayer .state-unmute.mute-unmute, .mediaplayer .captions, .mediaplayer .subtitle-menu button[aria-checked="true"], .mediaplayer .subtitle-menu button, .mediaplayer .playlist-next, .mediaplayer .playlist-prev, .mediaplayer .chapters, .mediaplayer[data-state="ended"] > .jme-media-overlay {
+.mediaplayer[data-state="waiting"] > .jme-media-overlay, .mediaplayer .fullscreen, .mediaplayer .fullscreen.state-exitfullscreen, .mediaplayer .mediaconfigmenu, .mediaplayer[data-state="idle"] > .jme-media-overlay, .mediaplayer button.play-pause, .mediaplayer button.play-pause.state-playing, .mediaplayer .mute-unmute, .mediaplayer[data-volume="medium"] .mute-unmute, .mediaplayer[data-volume="low"] .mute-unmute, .mediaplayer[data-volume="no"] .mute-unmute, .mediaplayer .state-unmute.mute-unmute, .mediaplayer .captions, .mediaplayer .subtitle-menu button[aria-checked="true"], .mediaplayer .subtitle-menu button, .mediaplayer .playlist-next, .mediaplayer .playlist-prev, .mediaplayer .chapters, .mediaplayer[data-state="ended"] > .jme-media-overlay {
   font-family: 'jme';
   speak: none;
   font-style: normal;
@@ -23,6 +23,10 @@
 
 .mediaplayer .fullscreen.state-exitfullscreen:before {
   content: "\e605";
+}
+
+.mediaplayer .mediaconfigmenu:before {
+  content: "\e606";
 }
 
 .mediaplayer[data-state="idle"] > .jme-media-overlay:before {
@@ -340,6 +344,11 @@
   right: -0.625em;
   visibility: hidden;
 }
+.mediaplayer .mediamenu h5 {
+  font-size: 100%;
+  margin: 0.3125em 0;
+  padding: 0;
+}
 .mediaplayer .mediamenu ul, .mediaplayer .mediamenu li {
   margin: 0;
   padding: 0;
@@ -363,28 +372,25 @@
   zoom: 1;
   visibility: hidden;
   float: right;
-  padding: 0.1875em 0.3125em 0.3125em;
+  padding: 0.3125em;
   background: #333;
   background: rgba(0, 0, 0, 0.6);
   opacity: 0;
   transform: translateY(-10%);
   transition: all 200ms;
 }
+.mediaplayer .mediamenu > div > .media-submenu {
+  margin: 0.3125em 0;
+  padding: 0.3125em 0;
+  border-top: 0.0625em solid #eeeeee;
+  border-top: 0.0625em solid rgba(255, 255, 255, 0.4);
+}
+.mediaplayer .mediamenu > div > .media-submenu:first-child {
+  margin-top: 0;
+  border-top: none;
+}
 .mediaplayer .mediamenu > div iframe {
   visibility: inherit !important;
-}
-.mediaplayer .mediamenu > div:after {
-  content: " ";
-  position: absolute;
-  display: block;
-  bottom: -0.625em;
-  right: 0.8125em;
-  width: 0px;
-  height: 0px;
-  border-style: solid;
-  border-width: 0.625em 0.5em 0 0.5em;
-  border-color: #333 transparent transparent transparent;
-  border-color: rgba(0, 0, 0, 0.6) transparent transparent transparent;
 }
 .mediaplayer .mediamenu.visible-menu > div {
   visibility: visible;
@@ -395,6 +401,9 @@
   display: inline-block;
   vertical-align: middle;
   padding: 0 5px 0 0;
+}
+.mediaplayer .mediaconfig-container {
+  display: none !important;
 }
 .mediaplayer .buffer-progress {
   position: absolute;

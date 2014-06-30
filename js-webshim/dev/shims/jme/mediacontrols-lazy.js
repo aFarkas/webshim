@@ -530,59 +530,90 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 		},
 		chapters: {
 			_create: function(control, media, base){
-				control.attr('aria-haspopup', 'true');
+				var plugin = this;
 				webshims.ready('track', function(){
-					var menuObj;
-					var updateMenuItem = (function(){
-						var timer;
-						var update = function(){
+					var menuObj, wasPlayed, hasTrack, preloadTimer;
+					var timedPreload = function(){
+						clearTimeout(preloadTimer);
+						preloadTimer = setTimeout(setPreload, 999);
+					};
+					var setPreload = function(){
+						var preload;
+						if(hasTrack && !media.prop('readyState')){
+							preload = media.attr('preload');
+							if(preload != 'auto'){
+								if(!media.hasClass('nonnative-api-active')){
+									preload = (preload == 'none') ? 'metadata' : 'auto';
+								} else {
+									preload = 'auto';
+								}
+								media.prop('preload', preload);
+							}
 
-						};
-						return function(){
-							clearTimeout(timer);
-							timer = setTimeout(update);
-						};
-					})();
-					var buildMenu = function(currentTrack, chapterList, oldTrack){
-						if(oldTrack){
-							$(oldTrack).off('cuechange', updateMenuItem);
 						}
+					};
+					var createMenuButton = function(){
+						if(menuObj){return;}
+						menuObj = new $.jme.ButtonMenu(control, '<div class="mediamenu chapter-menu" />', function(e, button){
+							var paused = media.prop('paused');
+							var hasNothing = !media.prop('readyState');
+							if(!wasPlayed || hasNothing){
+								media.play();
+								if(paused){
+									media.pause();
+								}
+							}
+							if(hasNothing){
+								setTimeout(function(){
+									media.prop('currentTime', $(button).data('starttime'));
+								}, 99);
+							} else {
+
+								media.prop('currentTime', $(button).data('starttime'));
+							}
+
+						});
+					};
+
+					var buildMenu = function(currentTrack, chapterList){
 
 						if(currentTrack && chapterList.length){
-							base.addClass('has-chapter-tracks');
-							var createList = function(chapter){
-								var item = '<li role="presentation">'+ (this.html.replace('{{startTime}}', chapter.startTime).replace('{{endTime}}', chapter.endTime).replace('{{title}}', chapter.title));
-								if(chapter.list && chapter.list.length){
-									item += '\n<ul role="presentation">'+ chapter.list.map(createList, this).join('\n\t') +'</ul>\n';
-								}
-								item += '</li>';
-								return item;
-							};
-							var chapters = chapterList.map(createList, {
-								html: '<button type="button" role="menuitemcheckbox" aria-checked="false" data-starttime="{{startTime}}" data-endtime="{{endTime}}">{{title}}</button>'
+							var chapters = chapterList.map(createChapterList, {
+								html: '<button type="button" data-starttime="{{startTime}}" data-endtime="{{endTime}}">{{title}}</button>'
 							});
-							menuObj.addMenu('<div class="mediamenu chapter-menu"><div><ul role="presentation">'+ chapters.join('\n') +'</div></ul></div>')
-							$(currentTrack).on('cuechange', updateMenuItem);
+							var text = currentTrack.label || plugin.text;
+
+							hasTrack = true;
+							base.addClass('has-chapter-tracks');
+							createMenuButton();
+							control.attr('aria-label', text);
+							menuObj.addMenu('<div class="mediamenu chapter-menu"><div><h5>'+ text +'</h5><ul role="presentation">'+ chapters.join('\n') +'</div></ul></div>')
 						} else {
+							hasTrack = false;
+							control.attr('aria-label', plugin.text);
 							base.removeClass('has-chapter-tracks');
 						}
 
 					};
 
-					menuObj = new $.jme.ButtonMenu(control, '<div class="mediamenu chapter-menu" />', function(e, button){
-						if(!media.prop('readyState') && media.prop('paused')){
-							media.play();
-							setTimeout(function(){
-								media.prop('currentTime', $(button).data('starttime'));
-							}, 100);
-						} else {
-							media.prop('currentTime', $(button).data('starttime'));
+					media.on({
+						play: function(){
+							wasPlayed = true;
+						},
+						'emptied loadstart': function(){
+							wasPlayed = false;
+							timedPreload();
 						}
-
 					});
+					webshims.ready('WINDOWLOAD', timedPreload);
 					base.jmeFn('getMediaChapters', buildMenu);
 
 				});
+			}
+		},
+		mediaconfigmenu: {
+			_create: function(control, media, base){
+
 			}
 		},
 		captions: {
@@ -832,6 +863,14 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 		data.media.on('updatetrackdisplay emptied', updateChapterTrack);
 	});
 
+	function createChapterList(chapter){
+		var item = '<li role="presentation">'+ (this.html.replace('{{startTime}}', chapter.startTime).replace('{{endTime}}', chapter.endTime).replace('{{title}}', chapter.title));
+		if(chapter.list && chapter.list.length){
+			item += '\n<ul role="presentation">'+ chapter.list.map(createChapterList, this).join('\n\t') +'</ul>\n';
+		}
+		item += '</li>';
+		return item;
+	}
 
 	function getChapterTree(track){
 		var name ='__chaptertree'+track.cues.length;

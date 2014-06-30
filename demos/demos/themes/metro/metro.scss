@@ -296,7 +296,8 @@ $toppadding: 32;
 	background: rgba(0, 0, 0, 0.5);
 
 	[class*="-container"] > button,
-	.subtitle-controls > button {
+	.subtitle-controls > button,
+	.mediamenu-wrapper > button {
 		border: 1px solid #eee;
 		border-radius: 50%;
 		height: em(26);
@@ -371,7 +372,7 @@ $toppadding: 32;
 	font-size: 1em;
 }
 
-.mediaplayer .subtitle-menu {
+.mediaplayer .mediamenu {
 	bottom: em(32);
 	right: em(-5);
 

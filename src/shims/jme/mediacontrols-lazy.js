@@ -530,7 +530,7 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 		},
 		chapters: {
 			_create: function(control, media, base){
-				control.attr('aria-haspopup', 'true');
+				var plugin = this;
 				webshims.ready('track', function(){
 					var menuObj, wasPlayed, hasTrack, preloadTimer;
 					var timedPreload = function(){
@@ -552,41 +552,49 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 
 						}
 					};
-					var buildMenu = function(currentTrack, chapterList, oldTrack){
+					var createMenuButton = function(){
+						if(menuObj){return;}
+						menuObj = new $.jme.ButtonMenu(control, '<div class="mediamenu chapter-menu" />', function(e, button){
+							var paused = media.prop('paused');
+							var hasNothing = !media.prop('readyState');
+							if(!wasPlayed || hasNothing){
+								media.play();
+								if(paused){
+									media.pause();
+								}
+							}
+							if(hasNothing){
+								setTimeout(function(){
+									media.prop('currentTime', $(button).data('starttime'));
+								}, 99);
+							} else {
+
+								media.prop('currentTime', $(button).data('starttime'));
+							}
+
+						});
+					};
+
+					var buildMenu = function(currentTrack, chapterList){
 
 						if(currentTrack && chapterList.length){
+							var chapters = chapterList.map(createChapterList, {
+								html: '<button type="button" data-starttime="{{startTime}}" data-endtime="{{endTime}}">{{title}}</button>'
+							});
+							var text = currentTrack.label || plugin.text;
+
 							hasTrack = true;
 							base.addClass('has-chapter-tracks');
-							var chapters = chapterList.map(createChapterList, {
-								html: '<button type="button" role="menuitemcheckbox" aria-checked="false" data-starttime="{{startTime}}" data-endtime="{{endTime}}">{{title}}</button>'
-							});
-							menuObj.addMenu('<div class="mediamenu chapter-menu"><div><ul role="presentation">'+ chapters.join('\n') +'</div></ul></div>')
+							createMenuButton();
+							control.attr('aria-label', text);
+							menuObj.addMenu('<div class="mediamenu chapter-menu"><div><h5>'+ text +'</h5><ul role="presentation">'+ chapters.join('\n') +'</div></ul></div>')
 						} else {
 							hasTrack = false;
+							control.attr('aria-label', plugin.text);
 							base.removeClass('has-chapter-tracks');
 						}
 
 					};
-
-					menuObj = new $.jme.ButtonMenu(control, '<div class="mediamenu chapter-menu" />', function(e, button){
-						var paused = media.prop('paused');
-						var hasNothing = !media.prop('readyState');
-						if(!wasPlayed || hasNothing){
-							media.play();
-							if(paused){
-								media.pause();
-							}
-						}
-						if(hasNothing){
-							setTimeout(function(){
-								media.prop('currentTime', $(button).data('starttime'));
-							}, 99);
-						} else {
-
-							media.prop('currentTime', $(button).data('starttime'));
-						}
-
-					});
 
 					media.on({
 						play: function(){
@@ -601,6 +609,11 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 					base.jmeFn('getMediaChapters', buildMenu);
 
 				});
+			}
+		},
+		mediaconfigmenu: {
+			_create: function(control, media, base){
+
 			}
 		},
 		captions: {

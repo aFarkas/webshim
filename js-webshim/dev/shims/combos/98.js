@@ -8,6 +8,7 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 	var baseSelector = options.selector;
 	
 	webshims.cfg.mediaelement.jme = options;
+
 	if(!$.jme){
 		$.jme = {};
 	}
@@ -58,6 +59,10 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 			}
 			this.runPlugin('.'+plugin.className);
 		},
+		menuPlugins: {},
+		addToConfigMenu: function(name, create){
+			this.menuPlugins[name] = create;
+		},
 		defineMethod: function(name, fn){
 			fns[name] = fn;
 		},
@@ -107,6 +112,10 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 		var args = slice.call( arguments, 1 );
 		var ret;
 		this.each(function(){
+			if(!$.jme.data(this).media){
+				$(this).closest(baseSelector).jmePlayer();
+				webshims.warn('jmeFn called to early or on wrong element!');
+			}
 			ret = (fns[fn] || $.prop(this, fn)).apply(this, args);
 			if(ret !== undefined){
 				return false;
@@ -184,9 +193,7 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 	$.fn.jmePlayer = function(opts){
 
 		return this.each(function(){
-			if(opts){
-				$.jme.data(this, $.extend(true, {}, opts));
-			}
+
 
 			var mediaUpdateFn, canPlay, removeCanPlay, canplayTimer, lastState, stopEmptiedEvent;
 			var media = $('audio, video', this).eq(0);
@@ -727,6 +734,12 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 		_create: lazyLoadPlugin()
 	});
 
+	jme.registerPlugin('mediaconfigmenu', {
+		structure: btnStructure,
+		text: 'configuration',
+		_create: lazyLoadPlugin()
+	});
+
 
 	jme.registerPlugin('captions', {
 		structure: btnStructure,
@@ -755,9 +768,11 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 		}
 	});
 
+
+
 	webshims.ready(webshims.cfg.mediaelement.plugins.concat(['mediaelement', 'jme-base']), function(){
 		if(!options.barTemplate){
-			options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box">{{playlist-prev}}{{playlist-next}}</div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="chapters-container"><div class="chapters-controls mediamenu-wrapper">{{chapters}}</div></div><div class="subtitle-container mediamenu-wrapper"><div class="subtitle-controls">{{captions}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
+			options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box">{{playlist-prev}}{{playlist-next}}</div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="chapters-container"><div class="chapters-controls mediamenu-wrapper">{{chapters}}</div></div><div class="subtitle-container mediamenu-wrapper"><div class="subtitle-controls">{{captions}}</div></div><div class="mediaconfig-container"><div class="mediaconfig-controls mediamenu-wrapper">{{mediaconfigmenu}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
 		}
 		if(!options.barStructure){
 			options.barStructure = '<div class="jme-media-overlay"></div><div class="jme-controlbar'+ noVolumeClass +'" tabindex="-1"><div class="jme-cb-box"></div></div>';

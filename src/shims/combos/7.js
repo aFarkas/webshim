@@ -2738,18 +2738,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			}
 		}
 	};
-	var allowedPreload = {'metadata': 1, 'auto': 1, '': 1};
-	var fixPreload = function(elem){
-		var preload, img;
-		if(elem.getAttribute('preload') == 'none'){
-			if(allowedPreload[(preload = $.attr(elem, 'data-preload'))]){
-				$.attr(elem, 'preload', preload);
-			} else if(hasNative && (preload = elem.getAttribute('poster'))){
-				img = document.createElement('img');
-				img.src = preload;
-			}
-		}
-	};
 	var stopParent = /^(?:embed|object|datalist)$/i;
 	var selectSource = function(elem, data){
 		var baseData = webshims.data(elem, 'mediaelementBase') || webshims.data(elem, 'mediaelementBase', {});
@@ -2765,7 +2753,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		if(mediaelement.sortMedia){
 			_srces.sort(mediaelement.sortMedia);
 		}
-		fixPreload(elem);
 		stepSources(elem, data, _srces);
 
 	};

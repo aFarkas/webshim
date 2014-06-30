@@ -270,19 +270,22 @@ progress.ws-style > span.progress-value {
   background: rgba(0, 0, 0, 0.5);
 }
 .mediaplayer > .jme-controlbar [class*="-container"] > button,
-.mediaplayer > .jme-controlbar .subtitle-controls > button {
+.mediaplayer > .jme-controlbar .subtitle-controls > button,
+.mediaplayer > .jme-controlbar .mediamenu-wrapper > button {
   border: 1px solid #eee;
   border-radius: 50%;
   height: 2em;
   width: 2em;
 }
 .mediaplayer > .jme-controlbar [class*="-container"] > button:hover,
-.mediaplayer > .jme-controlbar .subtitle-controls > button:hover {
+.mediaplayer > .jme-controlbar .subtitle-controls > button:hover,
+.mediaplayer > .jme-controlbar .mediamenu-wrapper > button:hover {
   outline: none;
   background: rgba(255, 255, 255, 0.6);
 }
 .mediaplayer > .jme-controlbar [class*="-container"] > button.state-paused,
-.mediaplayer > .jme-controlbar .subtitle-controls > button.state-paused {
+.mediaplayer > .jme-controlbar .subtitle-controls > button.state-paused,
+.mediaplayer > .jme-controlbar .mediamenu-wrapper > button.state-paused {
   text-indent: 0.2em;
 }
 
@@ -336,14 +339,14 @@ progress.ws-style > span.progress-value {
   font-size: 1em;
 }
 
-.mediaplayer .subtitle-menu {
+.mediaplayer .mediamenu {
   bottom: 2.46154em;
   right: -0.38462em;
 }
-.mediaplayer .subtitle-menu > div {
+.mediaplayer .mediamenu > div {
   background: rgba(0, 0, 0, 0.5);
 }
-.mediaplayer .subtitle-menu > div:after {
+.mediaplayer .mediamenu > div:after {
   display: none;
 }
 

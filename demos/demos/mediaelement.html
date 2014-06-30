@@ -390,7 +390,7 @@ webshim.polyfill('mediaelement');
 
 
 		<p>To create a new playlist for a mediaplayer simply call <code>$.jmeFn('addPlaylist')</code> on the mediaplayer object.</p>
-		<p>The <code>addPlaylist</code> method requires at least a valid data source and an option option object and returns the generated playlist instance:</p>
+		<p>The <code>addPlaylist</code> method requires at least a valid data source and an optional option object and returns the generated playlist instance:</p>
 <pre><code class="language-javascript">
 webshim.ready('playlist', function(){
 	$('.mediaplayer').jmeFn('addPlaylist',
@@ -398,6 +398,10 @@ webshim.ready('playlist', function(){
 			{
 				"title": "Only mp4 item",
 				"srces": "play-item.mp4"
+			},
+			{
+				"title": "Only mp4 item",
+				"srces": {"src": "play-item.mp4", "type": "video/mp4"}
 			},
 			{
 				"title": "Only mp4 item",

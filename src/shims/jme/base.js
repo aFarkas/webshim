@@ -59,6 +59,10 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 			}
 			this.runPlugin('.'+plugin.className);
 		},
+		menuPlugins: {},
+		addToConfigMenu: function(name, create){
+			this.menuPlugins[name] = create;
+		},
 		defineMethod: function(name, fn){
 			fns[name] = fn;
 		},
@@ -108,6 +112,10 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 		var args = slice.call( arguments, 1 );
 		var ret;
 		this.each(function(){
+			if(!$.jme.data(this).media){
+				$(this).closest(baseSelector).jmePlayer();
+				webshims.warn('jmeFn called to early or on wrong element!');
+			}
 			ret = (fns[fn] || $.prop(this, fn)).apply(this, args);
 			if(ret !== undefined){
 				return false;
@@ -185,9 +193,7 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 	$.fn.jmePlayer = function(opts){
 
 		return this.each(function(){
-			if(opts){
-				$.jme.data(this, $.extend(true, {}, opts));
-			}
+
 
 			var mediaUpdateFn, canPlay, removeCanPlay, canplayTimer, lastState, stopEmptiedEvent;
 			var media = $('audio, video', this).eq(0);
