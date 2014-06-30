@@ -52,6 +52,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		_bufferedEnd: 0,
 		_bufferedStart: 0,
 		currentTime: 0,
+		lastCalledTime: -500,
 		_ppFlag: undefined,
 		_calledMeta: false,
 		lastDuration: 0
@@ -217,7 +218,12 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			if(data.seeking){
 				callSeeked(data);
 			}
-			trigger(data._elem, 'timeupdate');
+			
+			if(data.currentTime - data.lastCalledTime > 0.19){
+				data.lastCalledTime = data.currentTime;
+				$.event.trigger('timeupdate', undefined, data._elem, true);
+			}
+			
 		},
 		onProgress: function(jaris, data){
 			if(data.ended){
@@ -227,10 +233,12 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 				return;
 			}
 			var percentage = jaris.loaded / jaris.total;
+			
 			if(percentage > 0.02 && percentage < 0.2){
 				setReadyState(3, data);
 			} else if(percentage > 0.2){
-				if(percentage > 0.99){
+				if(percentage > 0.95){
+					percentage = 1;
 					data.networkState = 1;
 				}
 				setReadyState(4, data);
@@ -432,7 +440,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 	
 	
 	var resetSwfProps = (function(){
-		var resetProtoProps = ['_calledMeta', 'lastDuration', '_bufferedEnd', '_bufferedStart', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'seeking', 'videoHeight', 'videoWidth'];
+		var resetProtoProps = ['_calledMeta', 'lastDuration', '_bufferedEnd', 'lastCalledTime', '_bufferedStart', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'seeking', 'videoHeight', 'videoWidth'];
 		var len = resetProtoProps.length;
 		return function(data){
 			
