@@ -389,17 +389,18 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 									var widgetLeft = (control.offset() || {left: 0}).left;
 									var widgetWidth = control.innerWidth();
 									var posLeft = function(x){
-										var perc = (x - widgetLeft) / widgetWidth * 100;
-										timeShow
-											.html(media.jmeFn('formatTime', duration * perc / 100))
-											.css({left: perc+'%'})
-										;
+										var perc = ((x - widgetLeft) / widgetWidth * 100);
+										var marginLeft =  -(timeShow.outerWidth() / 2);
+										timeShow[0].innerHTML = media.jmeFn('formatTime', duration * perc / 100);
+
+										timeShow[0].style.left = perc+'%';
+										timeShow[0].style.marginLeft = marginLeft+'px';
 									};
 
 									$.fn.rangeUI.normalizeTouch(e);
 									setTimeout(function(){
-										posLeft(e.pageX);
 										timeShow.addClass('show-time-select');
+										posLeft(e.pageX);
 									});
 									if(document.addEventListener){
 										document.addEventListener('touchend', hideTime, true);
@@ -532,7 +533,7 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 			_create: function(control, media, base){
 				var plugin = this;
 				webshims.ready('track', function(){
-					var menuObj, wasPlayed, hasTrack, preloadTimer;
+					var menuObj, wasPlayed, hasTrack, preloadTimer, $bar;
 					var timedPreload = function(){
 						clearTimeout(preloadTimer);
 						preloadTimer = setTimeout(setPreload, 999);
@@ -577,17 +578,26 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 
 					var buildMenu = function(currentTrack, chapterList){
 
+						if($bar){
+							$bar.remove();
+							$bar = null;
+						}
+
 						if(currentTrack && chapterList.length){
 							var chapters = chapterList.map(createChapterList, {
-								html: '<button type="button" data-starttime="{{startTime}}" data-endtime="{{endTime}}">{{title}}</button>'
+								html: '<button type="button" data-starttime="{{startTime}}" data-endtime="{{endTime}}" role="menuitem" tabindex="-1">{{title}}</button>'
 							});
 							var text = currentTrack.label || plugin.text;
+
+							//$bar = chapterList.map(createChapterBar);
+
+							//$('.time-slider', base).append('<ul role="presentation" class="mediachapter-bar">'+ $bar.join('\n') + '</ul>');
 
 							hasTrack = true;
 							base.addClass('has-chapter-tracks');
 							createMenuButton();
 							control.attr('aria-label', text);
-							menuObj.addMenu('<div class="mediamenu chapter-menu"><div><h5>'+ text +'</h5><ul role="presentation">'+ chapters.join('\n') +'</div></ul></div>')
+							menuObj.addMenu('<div class="mediamenu chapter-menu" aria-label="'+ text +'"><div><h5>'+ text +'</h5><ul role="presentation">'+ chapters.join('\n') +'</div></ul></div>')
 						} else {
 							hasTrack = false;
 							control.attr('aria-label', plugin.text);
@@ -847,7 +857,6 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 					});
 				} else {
 					success(currentChapterTrack, [], oldChapterTrack);
-
 				}
 
 			};
@@ -872,10 +881,32 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 		return item;
 	}
 
+	function createChapterBar(chapter){
+		var item = '<li role="presentation" style="width: '+ chapter.rel +'%;" data-start="'+chapter.startTime+'" data-end="'+chapter.endTime+'"><span>'+chapter.title+'</span>';
+		if(chapter.list && chapter.list.length){
+			item += '\n<ul role="presentation">'+ chapter.list.map(createChapterBar).join('\n\t') +'</ul>\n';
+		}
+		item += '</li>';
+		return item;
+	}
+
+	function addChapterRelatives(chapterList){
+		var i, start, end, multi;
+		if(chapterList.length){
+			start = chapterList[0].startTime;
+			end = chapterList[chapterList.length - 1].endTime;
+			multi =  100 / (end - start);
+			for(i = 0; i < chapterList.length; i++){
+				chapterList[i].rel = (chapterList[i].endTime - chapterList[i].startTime) * multi;
+				addChapterRelatives(chapterList[i].list);
+			}
+		}
+	}
+
 	function getChapterTree(track){
 		var name ='__chaptertree'+track.cues.length;
 		if(track[name]){return track[name];}
-		var cue, i, chapter;
+		var cue, i, chapter, start, end;
 		var chapterList = [];
 		var currentChapter = null;
 		for(i = 0; i < track.cues.length; i++){
@@ -905,6 +936,9 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 				chapterList.push(chapter);
 			}
 		}
+
+		addChapterRelatives(chapterList);
+		console.log(chapterList)
 		track[name] = chapterList;
 		return chapterList;
 	}

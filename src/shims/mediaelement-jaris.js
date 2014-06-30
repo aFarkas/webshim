@@ -208,6 +208,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			trigger(data._elem, 'waiting');
 		},
 		onTimeUpdate: function(jaris, data){
+			var timeDif = data.currentTime - data.lastCalledTime;
 			if(data.ended){
 				data.ended = false;
 			}
@@ -219,7 +220,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 				callSeeked(data);
 			}
 			
-			if(data.currentTime - data.lastCalledTime > 0.19){
+			if(timeDif > 0.19 || timeDif < -0.19){
 				data.lastCalledTime = data.currentTime;
 				$.event.trigger('timeupdate', undefined, data._elem, true);
 			}

@@ -518,7 +518,6 @@ $browser-context: 16; // Default
 
 	.time-select {
 		display: inline-block;
-		width: 0;
 		overflow: hidden;
 		text-align: center;
 		visibility: hidden;
@@ -527,17 +526,48 @@ $browser-context: 16; // Default
 		background: #333;
 		background: rgba(0, 0, 0, 0.6);
 		color: #eee;
+		bottom: em(20);
+		margin: 0 0 4px 0;
+		padding: em(4) em(2) em(2);
+		min-width: 2.8em;
 
 		&.show-time-select {
-			margin: 0 0 4px -1.55em;
-			padding: em(4) em(2) em(2);
-			min-width: 2.8em;
 			opacity: 1;
 			visibility: visible;
-			bottom: em(20);
 		}
 	}
+/*
+	.mediachapter-bar {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		padding: 0;
+		margin: 0;
+		list-style: none;
 
+		ul, li {
+			position: relative;
+			padding: 0;
+			margin: 0;
+			height: 100%;
+			float: left;
+			list-style: none;
+		}
+		ul {
+			width: 100%;
+		}
+		li {
+			background: rgba(255, 255, 255, 0.2);
+		}
+
+
+		span {
+			display: none;
+		}
+	}
+*/
 	.ws-range-track {
 		top: 0;
 		left: 0;

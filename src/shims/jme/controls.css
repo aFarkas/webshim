@@ -176,6 +176,40 @@
   display: none;
 }
 
+.mediaplayer {
+  /*
+  	.mediachapter-bar {
+  		position: absolute;
+  		top: 0;
+  		left: 0;
+  		right: 0;
+  		bottom: 0;
+  		padding: 0;
+  		margin: 0;
+  		list-style: none;
+  
+  		ul, li {
+  			position: relative;
+  			padding: 0;
+  			margin: 0;
+  			height: 100%;
+  			float: left;
+  			list-style: none;
+  		}
+  		ul {
+  			width: 100%;
+  		}
+  		li {
+  			background: rgba(255, 255, 255, 0.2);
+  		}
+  
+  
+  		span {
+  			display: none;
+  		}
+  	}
+  */
+}
 .mediaplayer button {
   overflow: visible;
   -webkit-appearance: none;
@@ -436,7 +470,6 @@
 }
 .mediaplayer .time-select {
   display: inline-block;
-  width: 0;
   overflow: hidden;
   text-align: center;
   visibility: hidden;
@@ -445,14 +478,14 @@
   background: #333;
   background: rgba(0, 0, 0, 0.6);
   color: #eee;
-}
-.mediaplayer .time-select.show-time-select {
-  margin: 0 0 4px -1.55em;
+  bottom: 1.25em;
+  margin: 0 0 4px 0;
   padding: 0.25em 0.125em 0.125em;
   min-width: 2.8em;
+}
+.mediaplayer .time-select.show-time-select {
   opacity: 1;
   visibility: visible;
-  bottom: 1.25em;
 }
 .mediaplayer .ws-range-track {
   top: 0;
