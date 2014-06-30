@@ -415,11 +415,8 @@ $browser-context: 16; // Default
 			background: #333;
 			background: rgba(0, 0, 0, 0.6);
 			opacity: 0;
-			transform: translateY(30%);
+			transform: translateY(-10%);
 			transition: all 200ms;
-
-			overflow: auto;
-			max-height: 300px;
 
 			iframe {
 				visibility: inherit !important;
