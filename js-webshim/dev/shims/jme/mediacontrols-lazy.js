@@ -938,7 +938,6 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 		}
 
 		addChapterRelatives(chapterList);
-		console.log(chapterList)
 		track[name] = chapterList;
 		return chapterList;
 	}
