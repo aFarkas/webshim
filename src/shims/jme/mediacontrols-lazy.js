@@ -547,33 +547,29 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 						if(hasTrack && !media.prop('readyState')){
 							preload = media.attr('preload');
 							if(preload != 'auto'){
-								if(!media.hasClass('nonnative-api-active')){
-									preload = (preload == 'none') ? 'metadata' : 'auto';
-								} else {
-									preload = 'auto';
-								}
+								preload = 'auto';
 								media.prop('preload', preload);
 							}
-
 						}
 					};
 					var createMenuButton = function(){
 						if(menuObj){return;}
 						menuObj = new $.jme.ButtonMenu(control, '<div class="mediamenu chapter-menu" />', function(e, button){
 							var paused = media.prop('paused');
-							var hasNothing = !media.prop('readyState');
-							if(!wasPlayed || hasNothing){
+							var readyState = media.prop('readyState');
+							if(!wasPlayed || readyState < 2){
 								media.play();
 								if(paused){
 									media.pause();
 								}
 							}
-							if(hasNothing){
+							if(readyState < 2){
 								setTimeout(function(){
 									media.prop('currentTime', $(button).data('starttime'));
 								}, 99);
-							} else {
+							}
 
+							if(readyState){
 								media.prop('currentTime', $(button).data('starttime'));
 							}
 

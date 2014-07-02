@@ -943,7 +943,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 							});
 						}
 						webshims.ready('WINDOWLOAD', this.test);
-						$(document).on('updatelayout.webshim pageinit popupafteropen panelbeforeopen tabsactivate collapsibleexpand shown.bs.modal shown.bs.collapse slid.bs.carousel', this.handler);
+						$(document).on('updatelayout.webshim pageinit popupafteropen panelbeforeopen tabsactivate collapsibleexpand shown.bs.modal shown.bs.collapse slid.bs.carousel playerdimensionchange', this.handler);
 						$(window).on('resize', this.handler);
 					}
 				}

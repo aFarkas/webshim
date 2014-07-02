@@ -2249,7 +2249,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 							});
 						}
 						webshims.ready('WINDOWLOAD', this.test);
-						$(document).on('updatelayout.webshim pageinit popupafteropen panelbeforeopen tabsactivate collapsibleexpand shown.bs.modal shown.bs.collapse slid.bs.carousel', this.handler);
+						$(document).on('updatelayout.webshim pageinit popupafteropen panelbeforeopen tabsactivate collapsibleexpand shown.bs.modal shown.bs.collapse slid.bs.carousel playerdimensionchange', this.handler);
 						$(window).on('resize', this.handler);
 					}
 				}
@@ -4098,7 +4098,6 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 					}
 				} else {
 					data.currentTime = jaris.position;
-					
 					if(data.api){
 						if(!data._calledMeta && isNaN(jaris.duration) && data.duration != jaris.duration && isNaN(data.duration)){
 							onEvent.onDataInitialized(jaris, data);

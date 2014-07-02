@@ -5,7 +5,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 	var options = webshims.cfg.mediaelement.jme;
 	var baseSelector = options.selector;
 	var jme = $.jme;
-	var unknowStructure = '<div class="{%class%}"></div>'
+	var unknownStructure = '<div class="{%class%}"></div>';
 	var btnStructure = '<button class="{%class%}" type="button" aria-label="{%text%}"></button>';
 	var slideStructure = '<div class="{%class%} media-range" aria-label="{%text%}"></div>';
 	var timeStructure = '<div  class="{%class%}">00:00</div>';
@@ -39,7 +39,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 					if(plugin){
 						if(!plugin.structure){
 							webshims.warn('no structure option provided for plugin: '+ matchName +'. Fallback to standard div');
-							plugin.structure = unknowStructure;
+							plugin.structure = unknownStructure;
 						}
 						return plugin.structure.replace('{%class%}', matchName).replace('{%text%}', plugin.text || '');
 					}

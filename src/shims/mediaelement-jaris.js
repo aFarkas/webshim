@@ -821,7 +821,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 					}
 				} else {
 					data.currentTime = jaris.position;
-					
+
 					if(data.api){
 						if(!data._calledMeta && isNaN(jaris.duration) && data.duration != jaris.duration && isNaN(data.duration)){
 							onEvent.onDataInitialized(jaris, data);
