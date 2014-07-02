@@ -59,9 +59,9 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 			}
 			this.runPlugin('.'+plugin.className);
 		},
-		menuPlugins: {},
-		addToConfigMenu: function(name, create){
-			this.menuPlugins[name] = create;
+		configmenuPlugins: {},
+		addToConfigmenu: function(name, create){
+			this.configmenuPlugins[name] = create;
 		},
 		defineMethod: function(name, fn){
 			fns[name] = fn;
@@ -349,16 +349,16 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 				return [{src: src}];
 			}
 			srces = $.map($('source', data.media).get(), function(source){
+				var i, len;
 				var src = {
 					src: $.prop(source, 'src')
 				};
-				var tmp = $.attr(source, 'media');
-				if(tmp){
-					src.media = tmp;
-				}
-				tmp = $.attr(source, 'type');
-				if(tmp){
-					src.type = tmp;
+				var attributes = source.attributes;
+
+				for(i = 0, len = attributes.length; i < len; i++){
+					if(!('specified' in attributes[i]) || attributes[i].specified){
+						src[attributes[i].nodeName] = attributes[i].nodeValue;
+					}
 				}
 				return src;
 			});
@@ -588,16 +588,53 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 							}
 						};
 					})();
+					var $poster = $('<div class="ws-poster" />').insertAfter(data.media);
 					var posterState = (function(){
-						var lastPosterState, lastYoutubeState;
+						var lastPosterState, lastYoutubeState, lastPoster;
 						var hasFlash = window.swfmini && swfmini.hasFlashPlayerVersion('10.0.3');
 						var regYt = /youtube\.com\/[watch\?|v\/]+/i;
+
+						var isInitial = data.media.prop('paused');
+						if(isInitial){
+							data.player.addClass('initial-state');
+						}
+						if(!('backgroundSize' in $poster[0].style)){
+							data.player.addClass('no-backgroundsize');
+						}
+						data.media.on('playing waiting seeked seeking', function(){
+							if(isInitial){
+								isInitial = false;
+								data.player.removeClass('initial-state');
+							}
+						});
 						return function(){
-							var hasPoster = !!data.media.attr('poster');
-							var hasYt = (hasFlash && hasPoster) ? false : regYt.test(data.media.prop('currentSrc') || '');
+							var poster = data.media.attr('poster');
+							var hasPoster = !!poster;
+							var currentSrc = data.media.prop('currentSrc') || '';
+							var isYt = regYt.test(currentSrc);
+							var hasYt = (hasFlash && hasPoster) ? false : isYt;
+
+							if(!hasPoster && isYt){
+								poster =  currentSrc.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i) || '';
+								if(poster){
+									poster = 'https://img.youtube.com/vi/'+ poster[1] +'/0.jpg';
+									hasPoster = !!poster;
+								}
+							}
+
+							if(lastPoster !== poster){
+								lastPoster = poster;
+								$poster[0].style.backgroundImage = poster ? 'url('+poster+')' : '';
+							}
+
 							if(lastPosterState !== hasPoster){
 								lastPosterState = hasPoster;
 								data.player[hasPoster ? 'removeClass' : 'addClass']('no-poster');
+							}
+
+							if(data.media.prop('paused')){
+								data.player.addClass('initial-state');
+								isInitial = true;
 							}
 
 							if(lastYoutubeState !== hasYt){
@@ -610,13 +647,15 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 
 					userActivity._create(data.player, data.media, data.player);
 
-					data.media.on('emptied', posterState);
+					data.media.on('emptied loadstart', function(){
+						setTimeout(posterState);
+					});
 
 					playerSize();
 					posterState();
 					webshims.ready('dom-support', function(){
 						data.player.onWSOff('updateshadowdom', playerSize);
-						controls.add(data._controlbar).addClass(webshims.shadowClass);
+						controls.add(data._controlbar).add($poster).addClass(webshims.shadowClass);
 						webshims.addShadowDom();
 					});
 				}

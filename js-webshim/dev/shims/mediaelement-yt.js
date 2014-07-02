@@ -277,7 +277,7 @@ var addMediaToStopEvents = $.noop;
 		play: 1,
 		playing: 1
 	};
-	var hideEvtArray = ['play', 'pause', 'playing', 'canplay', 'progress', 'waiting', 'ended', 'loadedmetadata', 'durationchange', 'emptied'];
+	var hideEvtArray = ['play', 'pause', 'playing', 'canplay', 'progress', 'waiting', 'ended', 'loadedmetadata', 'loadstart', 'durationchange', 'emptied'];
 	var hidevents = hideEvtArray.map(function(evt){
 		return evt +'.webshimspolyfill';
 	}).join(' ');
@@ -581,6 +581,7 @@ mediaelement.createSWF = function(mediaElem, src, data){
 	
 	if(data){
 		mediaelement.setActive(mediaElem, 'third', data);
+		data.currentSrc = '';
 		resetSwfProps(data);
 		data.currentSrc = src.srcProp;
 		if(hasControls != data._hasControls){
@@ -594,6 +595,7 @@ mediaelement.createSWF = function(mediaElem, src, data){
 			});
 		}
 		data._hasControls = hasControls;
+		trigger(data._elem, 'loadstart');
 		return;
 	}
 	
@@ -658,6 +660,7 @@ mediaelement.createSWF = function(mediaElem, src, data){
 		.on('updatemediaelementdimensions loadedmetadata emptied', setDimension)
 		.onWSOff('updateshadowdom', setDimension)
 	;
+	trigger(data._elem, 'loadstart');
 };
 
 (function(){

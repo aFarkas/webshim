@@ -59,9 +59,9 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 			}
 			this.runPlugin('.'+plugin.className);
 		},
-		menuPlugins: {},
-		addToConfigMenu: function(name, create){
-			this.menuPlugins[name] = create;
+		configmenuPlugins: {},
+		addToConfigmenu: function(name, create){
+			this.configmenuPlugins[name] = create;
 		},
 		defineMethod: function(name, fn){
 			fns[name] = fn;
@@ -349,16 +349,16 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 				return [{src: src}];
 			}
 			srces = $.map($('source', data.media).get(), function(source){
+				var i, len;
 				var src = {
 					src: $.prop(source, 'src')
 				};
-				var tmp = $.attr(source, 'media');
-				if(tmp){
-					src.media = tmp;
-				}
-				tmp = $.attr(source, 'type');
-				if(tmp){
-					src.type = tmp;
+				var attributes = source.attributes;
+
+				for(i = 0, len = attributes.length; i < len; i++){
+					if(!('specified' in attributes[i]) || attributes[i].specified){
+						src[attributes[i].nodeName] = attributes[i].nodeValue;
+					}
 				}
 				return src;
 			});

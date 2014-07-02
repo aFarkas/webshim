@@ -231,14 +231,18 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 						stopFocus = true;
 						clearTimeout(focusTimer);
 						if(markedFocus && specialUnStop[e.type] && e.target.className.indexOf('ws-a11y-focus') != -1){
-							delay = 0;
+							delay = 1;
 						}
 						focusTimer = setTimeout(unStop, delay);
 					},
 					focusin: function(e){
 						if(!stopFocus && e.originalEvent && ($.prop(e.target, 'tabIndex') > -1 || $.attr(e.target, 'role'))){
-							markedFocus = true;
-							$(e.target).addClass('ws-a11y-focus');
+							setTimeout(function(){
+								if(!stopFocus){
+									markedFocus = true;
+									$(e.target).addClass('ws-a11y-focus');
+								}
+							}, 20);
 						}
 					},
 					focusout: function(e){
@@ -623,7 +627,22 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 		},
 		mediaconfigmenu: {
 			_create: function(control, media, base){
+				var timer;
+				var menu = new $.jme.ButtonMenu(control, '<div class="mediamenu" ><div /></div>');
+				var innerMenu = menu.menu.find('div');
+				var enableDisable = function(){
+					base[innerMenu[0].getElementsByTagName('*').length ? 'addClass' : 'removeClass']('has-config-menu');
+				};
+				var timedEnable = function(){
+					clearTimeout(timer);
+					timer = setTimeout(enableDisable);
+				};
+				$.each($.jme.configmenuPlugins, function(name, create){
+					create(innerMenu, media, base, menu);
+				});
 
+				enableDisable();
+				media.on('loadstart emptied loadedmetadata', timedEnable);
 			}
 		},
 		captions: {
@@ -693,6 +712,7 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 					function updateMode(){
 						if(!menuObj || !menuObj.menu || !menuObj.menu.length){return;}
 						$('button', menuObj.menu).each(function(i){
+							if(!tracks[i]){return false;}
 							var checked = (tracks[i].mode == 'showing') ? 'true' : 'false';
 							if(!i){
 								checkbox.attr('aria-checked', checked);
@@ -882,7 +902,7 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 	}
 
 	function createChapterBar(chapter){
-		var item = '<li role="presentation" style="width: '+ chapter.rel +'%;" data-start="'+chapter.startTime+'" data-end="'+chapter.endTime+'"><span>'+chapter.title+'</span>';
+		var item = '<li role="presentation" style="'+ chapter.style +'" data-start="'+chapter.startTime+'" data-end="'+chapter.endTime+'"><span>'+chapter.title+'</span>';
 		if(chapter.list && chapter.list.length){
 			item += '\n<ul role="presentation">'+ chapter.list.map(createChapterBar).join('\n\t') +'</ul>\n';
 		}
@@ -898,6 +918,12 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 			multi =  100 / (end - start);
 			for(i = 0; i < chapterList.length; i++){
 				chapterList[i].rel = (chapterList[i].endTime - chapterList[i].startTime) * multi;
+				if(i == chapterList.length - 1){
+					chapterList[i].last = true;
+					chapterList[i].style = 'overflow: hidden;';
+				} else {
+					chapterList[i].style = 'float: left; width: '+chapterList[i].rel+'%;';
+				}
 				addChapterRelatives(chapterList[i].list);
 			}
 		}
@@ -1299,6 +1325,7 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 
 		this.addMenu(menu);
 		this._closeFocusOut();
+
 		this.button
 			.wsTouchClick(this.toggle)
 			.on('keydown', function(e){
@@ -1315,13 +1342,18 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 			if(this.menu){
 				this.menu.remove();
 			}
-			this.menu = $(menu).attr('role', 'menu');
-			this.buttons = $('button', this.menu);
+			this.menu = $(menu);
+
 			this.menu.insertAfter(this.button);
-			this.menu
-				.on('keydown', this.keyIndex)
-				.wsTouchClick('button', this._buttonClick)
-			;
+			if(this.clickHandler){
+				this.buttons = $('button', this.menu);
+				this.menu
+					.attr('role', 'menu')
+					.on('keydown', this.keyIndex)
+					.wsTouchClick('button', this._buttonClick)
+				;
+
+			}
 		},
 		_closeFocusOut: function(){
 			var that  = this;
@@ -1344,8 +1376,10 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 			;
 		},
 		_buttonClick: function(e){
-			this.clickHandler(this.buttons.index(e.currentTarget), e.currentTarget);
-			this.hide();
+			if(this.clickHandler){
+				this.clickHandler(this.buttons.index(e.currentTarget), e.currentTarget);
+				this.hide();
+			}
 		},
 		keyIndex: function(e){
 			var dir = (e.keyCode == 40) ? 1 : (e.keyCode == 38) ? -1 : 0;
@@ -1363,7 +1397,7 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 		},
 		show: function(){
 			if(this.isVisible){return;}
-			var buttons = this.buttons.not(':disabled');
+			var buttons = $('button, select, input, textarea', this.menu).not(':disabled, [aria-diabled="true"]');
 			this.isVisible = true;
 			this.menu.addClass('visible-menu');
 			try {

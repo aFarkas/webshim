@@ -3889,7 +3889,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			play: 1,
 			playing: 1
 		};
-		var hideEvtArray = ['play', 'pause', 'playing', 'canplay', 'progress', 'waiting', 'ended', 'loadedmetadata', 'durationchange', 'emptied'];
+		var hideEvtArray = ['play', 'pause', 'playing', 'loadstart', 'canplay', 'progress', 'waiting', 'ended', 'loadedmetadata', 'durationchange', 'emptied'];
 		var hidevents = hideEvtArray.map(function(evt){
 			return evt +'.webshimspolyfill';
 		}).join(' ');
@@ -4208,7 +4208,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		if(data && data.swfCreated){
 			mediaelement.setActive(elem, 'third', data);
 			
-			data.currentSrc = canPlaySrc.srcProp;
+			data.currentSrc = '';
 			
 			data.shadowElem.html('<div id="'+ elemId +'">');
 			
@@ -4216,6 +4216,8 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			data.actionQueue = [];
 			box = data.shadowElem;
 			resetSwfProps(data);
+			data.currentSrc = canPlaySrc.srcProp;
+
 		} else {
 			$(document.getElementById('wrapper-'+ elemId )).remove();
 			box = $('<div class="polyfill-'+ (elemNodeName) +' polyfill-mediaelement '+ webshims.shadowClass +'" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
@@ -4401,7 +4403,8 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				}
 			}
 		});
-		
+
+		trigger(data._elem, 'loadstart');
 	};
 	
 	

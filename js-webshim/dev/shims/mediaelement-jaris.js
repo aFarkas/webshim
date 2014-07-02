@@ -381,7 +381,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			play: 1,
 			playing: 1
 		};
-		var hideEvtArray = ['play', 'pause', 'playing', 'canplay', 'progress', 'waiting', 'ended', 'loadedmetadata', 'durationchange', 'emptied'];
+		var hideEvtArray = ['play', 'pause', 'playing', 'loadstart', 'canplay', 'progress', 'waiting', 'ended', 'loadedmetadata', 'durationchange', 'emptied'];
 		var hidevents = hideEvtArray.map(function(evt){
 			return evt +'.webshimspolyfill';
 		}).join(' ');
@@ -700,7 +700,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		if(data && data.swfCreated){
 			mediaelement.setActive(elem, 'third', data);
 			
-			data.currentSrc = canPlaySrc.srcProp;
+			data.currentSrc = '';
 			
 			data.shadowElem.html('<div id="'+ elemId +'">');
 			
@@ -708,6 +708,8 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			data.actionQueue = [];
 			box = data.shadowElem;
 			resetSwfProps(data);
+			data.currentSrc = canPlaySrc.srcProp;
+
 		} else {
 			$(document.getElementById('wrapper-'+ elemId )).remove();
 			box = $('<div class="polyfill-'+ (elemNodeName) +' polyfill-mediaelement '+ webshims.shadowClass +'" id="wrapper-'+ elemId +'"><div id="'+ elemId +'"></div>')
@@ -893,7 +895,8 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 				}
 			}
 		});
-		
+
+		trigger(data._elem, 'loadstart');
 	};
 	
 	

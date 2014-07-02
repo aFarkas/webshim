@@ -187,11 +187,10 @@ $browser-context: 16; // Default
 			@extend %icon-play-circle;
 		}
 
-		&.has-ytposter > .jme-media-overlay:before {
+		&.has-ytposter.no-backgroundsize > .jme-media-overlay:before {
 			content: "";
 		}
 	}
-
 
 	&[data-state="ended"] {
 		cursor: pointer;
@@ -226,6 +225,25 @@ $browser-context: 16; // Default
 
 	&[data-state="playing"][data-useractivity="false"] .cue-display span.cue-wrapper {
 		bottom: -35px;
+	}
+
+	.ws-poster {
+		display: none;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: #000 no-repeat center / contain;
+	}
+
+	&.initial-state .ws-poster {
+		display: block;
+	}
+
+	&.no-poster .ws-poster,
+	&.no-backgroundsize div.ws-poster {
+		display: none;
 	}
 
 	> .jme-controlbar {
@@ -384,7 +402,7 @@ $browser-context: 16; // Default
 	.mediamenu {
 		position: absolute;
 		bottom: em(28);
-		margin-bottom: 10px;
+		margin-bottom: 3px;
 		width: 400px;
 		right: em(-10);
 		visibility: hidden;
@@ -423,7 +441,7 @@ $browser-context: 16; // Default
 			background: #333;
 			background: rgba(0, 0, 0, 0.6);
 			opacity: 0;
-			transform: translateY(-10%);
+			transform: translateY(-3%);
 			transition: all 200ms;
 
 			> .media-submenu {
@@ -468,7 +486,11 @@ $browser-context: 16; // Default
 	}
 
 	.mediaconfig-container {
-		display: none !important;
+		display: none;
+	}
+
+	&.has-config-menu .mediaconfig-container {
+		display: table-cell;
 	}
 
 	.mediaconfigmenu {

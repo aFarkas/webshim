@@ -1285,7 +1285,8 @@
 
 		$.each([
 			['mediacontrols', {c: [98, 99], css: 'jme/controls.css'}],
-			['playlist', {c: [98, 97]}]
+			['playlist', {c: [98, 97]}],
+			['alternate-media']
 		], function(i, plugin){
 			addModule(plugin[0], $.extend({
 				src: 'jme/'+plugin[0],
