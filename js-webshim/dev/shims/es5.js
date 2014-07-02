@@ -1408,9 +1408,9 @@ setTimeout(function(){
 			foo = null;
 		})();
 	}
-	
-	Modernizr.objectAccessor = !!((advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)));
-	Modernizr.advancedObjectProperties = advancedObjectProperties;
+	var support = webshims.support;
+	support.objectAccessor = !!((advancedObjectProperties || (Object.prototype.__defineGetter__ && Object.prototype.__lookupSetter__)));
+	support.advancedObjectProperties = advancedObjectProperties;
 	
 if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !Object.getOwnPropertyDescriptor  || !Object.defineProperty)){
 	var call = Function.prototype.call;
@@ -1424,7 +1424,7 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 		f.prototype = proto;
 		o = new f();
 		
-		if(!no__proto__ && !('__proto__' in o) && !Modernizr.objectAccessor){
+		if(!no__proto__ && !('__proto__' in o) && !support.objectAccessor){
 			o.__proto__ = proto;
 		}
 		

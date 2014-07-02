@@ -183,10 +183,6 @@ var getComputedDimension = (function(){
 					ret.height = ret.width / ratio;
 					
 				}
-				if(!Modernizr.video){
-					ret.width = data.shadowElem.width();
-					ret.height = data.shadowElem.height();
-				}
 			}
 		}
 		return ret;

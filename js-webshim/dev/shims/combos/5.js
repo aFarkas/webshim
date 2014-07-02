@@ -1,8 +1,7 @@
 webshims.register('form-native-extend', function($, webshims, window, doc, undefined, options){
 	"use strict";
-	var Modernizr = window.Modernizr;
-	var modernizrInputTypes = Modernizr.inputtypes;
-	if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){return;}
+	var support = webshims.support;
+	if(!support.formvalidation || webshims.bugs.bustedValidity){return;}
 	var typeModels = webshims.inputTypes;
 	var runTest = false;
 	var validityRules = {};
@@ -23,7 +22,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		typeModels[type] = obj;
 		runTest = true;
 		//update validity of all implemented input types
-		if($.isDOMReady && Modernizr.formvalidation && !webshims.bugs.bustedValidity){
+		if($.isDOMReady && support.formvalidation && !webshims.bugs.bustedValidity){
 			updateValidity();
 		}
 	};
@@ -209,7 +208,8 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 	});
 	
 	
-});;webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
+});
+;webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(!webshims.addInputType){
 		webshims.error("you can not call forms-ext feature after calling forms feature. call both at once instead: $.webshims.polyfill('forms forms-ext')");
@@ -1450,7 +1450,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 	"use strict";
 	var curCfg;
 	var formcfg = webshims.formcfg;
-	var hasFormValidation = Modernizr.formvalidation && !webshims.bugs.bustedValidity;
+	var hasFormValidation = webshims.support.formvalidation && !webshims.bugs.bustedValidity;
 	var monthDigits = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 	var stopPropagation = function(e){
 		e.stopImmediatePropagation();
@@ -1503,7 +1503,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 			;
 		}
 	};
-	var numericType = Modernizr.inputtypes.tel && navigator.userAgent.indexOf('Mobile') != -1 && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ?
+	var numericType = webshims.support.inputtypes.tel && navigator.userAgent.indexOf('Mobile') != -1 && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ?
 		'tel' : 'text';
 	var splitInputs = {
 		date: {
@@ -2611,7 +2611,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 
 	(function(){
 		var picker = {};
-		var assumeVirtualKeyBoard = Modernizr.touchevents || Modernizr.touch || (/android|iphone|ipad|ipod|blackberry|iemobile/i.test(navigator.userAgent.toLowerCase()));
+		var assumeVirtualKeyBoard = (window.Modernizr && (Modernizr.touchevents || Modernizr.touch)) || (/android|iphone|ipad|ipod|blackberry|iemobile/i.test(navigator.userAgent.toLowerCase()));
 		webshims.inlinePopover = {
 			_create: function(){
 				this.element = $('<div class="ws-inline-picker"><div class="ws-po-box" /></div>').data('wspopover', this);
@@ -3001,7 +3001,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		
 		var stopCircular, isCheckValidity;
 		
-		var modernizrInputTypes = Modernizr.inputtypes;
+		var supportInputTypes = webshims.support.inputtypes;
 		var inputTypes = {
 			
 		};
@@ -3155,7 +3155,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 			var type = $.prop(this, 'type');
 			var i, opts, data, optsName, labels, cNames, hasInitialFocus;
 
-			if(inputTypes[type] && webshims.implement(this, 'inputwidgets') && (!modernizrInputTypes[type] || !$(this).hasClass('ws-noreplace'))){
+			if(inputTypes[type] && webshims.implement(this, 'inputwidgets') && (!supportInputTypes[type] || !$(this).hasClass('ws-noreplace'))){
 				data = {};
 				optsName = type;
 				hasInitialFocus = $(this).is(':focus');
@@ -3326,11 +3326,11 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 				});
 			}
 		}
-		if(modernizrInputTypes.number && navigator.userAgent.indexOf('Touch') == -1 && ((/MSIE 1[0|1]\.\d/.test(navigator.userAgent)) || (/Trident\/7\.0/.test(navigator.userAgent)))){
+		if(supportInputTypes.number && navigator.userAgent.indexOf('Touch') == -1 && ((/MSIE 1[0|1]\.\d/.test(navigator.userAgent)) || (/Trident\/7\.0/.test(navigator.userAgent)))){
 			replace.number = 1;
 		}
 		
-		if(!modernizrInputTypes.range || replace.range){
+		if(!supportInputTypes.range || replace.range){
 			extendType('range', {
 				_create: function(opts, set){
 					var data = $('<span />').insertAfter(opts.orig).rangeUI(opts).data('rangeUi');
@@ -3341,7 +3341,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		
 		
 		['number', 'time', 'month', 'date', 'color', 'datetime-local'].forEach(function(name){
-			if(!modernizrInputTypes[name] || replace[name]){
+			if(!supportInputTypes[name] || replace[name]){
 				extendType(name, {
 					_create: function(opts, set){
 						if(opts.monthSelect || opts.daySelect || opts.yearSelect){

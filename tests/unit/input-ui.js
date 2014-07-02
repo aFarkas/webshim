@@ -22,7 +22,7 @@ asyncTest("widgets Modul", function(){
 	
 	
 	
-	if(replaceUI || !Modernizr.inputtypes.range){
+	if(replaceUI || !webshims.support.inputtypes.range){
 		shadow =  $('#range').next('.ws-range');
 		ok(!!shadow[0], "range has a shadow element");
 		ok($('#range').prop('value') == getRangeValueUI(shadow), "shadow slider reflects initial value");
@@ -32,7 +32,7 @@ asyncTest("widgets Modul", function(){
 		equals(getRangeValueUI(shadow), 20, "range valueAsNumber is reflected");
 	}
 	
-	if(replaceUI || !Modernizr.inputtypes.date){
+	if(replaceUI || !webshims.support.inputtypes.date){
 		shadow =  $('#date').next('.ws-date');
 		ok(!!shadow[0], "date has a shadow element");
 		ok(!!shadow.prop('value'), "date has an initial value");
@@ -50,7 +50,7 @@ asyncTest("widgets Modul", function(){
 		$.webshims.activeLang('de');
 	}
 	
-	if(replaceUI || !Modernizr.inputtypes.number){
+	if(replaceUI || !webshims.support.inputtypes.number){
 		$.webshims.activeLang('de');
 		shadow =  $('#number').next('.ws-number');
 		$('#number').prop('step', '0.1').val('0.1');

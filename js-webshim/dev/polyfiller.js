@@ -11,13 +11,13 @@
 		}
 	};
 	var start = function(){
-		if(window.jQuery && window.Modernizr){
+		if(window.jQuery){
 			factory(jQuery);
 			factory = function(){return window.webshims;};
 		}
 	};
 	
-	
+
 	window.webshims = {
 		setOptions: function(){
 			addAsync();
@@ -89,13 +89,14 @@
 }(function($){
 	"use strict";
 	var firstRun, path;
+	var navigator = window.navigator;
 	var webshims = window.webshims;
 	var DOMSUPPORT = 'dom-support';
 	var special = $.event.special;
 	var emptyJ = $([]);
-	var Modernizr = window.Modernizr;
+
 	var asyncWebshims = window.asyncWebshims;
-	var addTest = Modernizr.addTest;
+	var support = {};
 	var Object = window.Object;
 	var addSource = function(text){
 		return text +"\n//# sourceURL="+this.url;
@@ -105,18 +106,23 @@
 	};
 
 	clearInterval(webshims.timer);
-	Modernizr.advancedObjectProperties = Modernizr.objectAccessor = Modernizr.ES5 = !!('create' in Object && 'seal' in Object);
+	support.advancedObjectProperties = support.objectAccessor = support.ES5 = !!('create' in Object && 'seal' in Object);
 
-	if(Modernizr.ES5 && !('toJSON' in Date.prototype)){
-		Modernizr.ES5 = false;
+	if(support.ES5 && !('toJSON' in Date.prototype)){
+		support.ES5 = false;
 	}
 
 
 	path = ($.support.hrefNormalized === false) ? webshims._curScript.getAttribute("src", 4) : webshims._curScript.src;
 	path = path.split('?')[0].slice(0, path.lastIndexOf("/") + 1) + 'shims/';
 
+	function create(name){
+		return document.createElement(name);
+	}
+
 	$.extend(webshims, {
 		version: '1.14.4-pre',
+
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
 			//addCacheBuster: false,
@@ -139,7 +145,7 @@
 			},
 			basePath: path
 		},
-
+		support: support,
 		bugs: {},
 		/*
 		 * some data
@@ -177,22 +183,7 @@
 				webshims.featureList.push(feature);
 				webCFG[feature] = {};
 			}
-			
-			if(!webshimsFeatures[feature].failedM && cfg.nM){
-				$.each(cfg.nM.split(' '), function(i, name){
-					if(!(name in Modernizr)){
-						webshimsFeatures[feature].failedM = name;
-						return false;
-					}
-				});
-			}
-			
-			if(webshimsFeatures[feature].failedM){
-				cfg.test = WSDEBUG ? function(){
-					webshims.error('webshims needs Modernizr.'+webshimsFeatures[feature].failedM + ' to implement feature: '+ feature);
-					return true;
-				} : true;
-			}
+
 			webshimsFeatures[feature].push(name);
 			cfg.options = $.extend(webCFG[feature], cfg.options);
 			
@@ -255,6 +246,9 @@
 			$.each(features, function(i, feature){
 				if(feature == 'xhr2'){
 					feature = 'filereader';
+				}
+				if(feature == 'promise'){
+					feature = 'es6';
 				}
 				if(!webshimsFeatures[feature]){
 					WSDEBUG && webshims.error("could not find webshims-feature (aborted): "+ feature);
@@ -667,11 +661,11 @@
 	
 
 	webshims.activeLang = (function(){
-		var nav = navigator;
-		if(!('language' in nav)){
-			nav.language = nav.browserLanguage || '';
+
+		if(!('language' in navigator)){
+			navigator.language = navigator.browserLanguage || '';
 		}
-		var curLang = $.attr(document.documentElement, 'lang') || nav.language;
+		var curLang = $.attr(document.documentElement, 'lang') || navigator.language;
 		onReady('webshimLocalization', function(){
 			webshims.activeLang(curLang);
 		});
@@ -925,7 +919,7 @@
 	
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
 	addPolyfill('es5', {
-		test: !!(Modernizr.ES5 && Function.prototype.bind),
+		test: !!(support.ES5 && Function.prototype.bind),
 		c: [18, 19, 20, 32],
 		d: ['sizzle']
 	});
@@ -937,28 +931,29 @@
 		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 19, 25, 20, 31, 34]
 	});
 
-	document.createElement('picture');
+	//<picture
+	create('picture');
 	addPolyfill('picture', {
 		test: ('picturefill' in window) || !!window.HTMLPictureElement
 	});
+	//>
 
-
-	addPolyfill('promise', {
-		test: !!(window.Promise && Promise.all)
+	//<es6
+	addPolyfill('es6', {
+		test: !!(Math.imul && Number.MIN_SAFE_INTEGER && Object.is  && window.Promise && Promise.all),// && window.Map && Map.prototype && typeof Map.prototype.forEach !== 'function' && window.Set
+		d: ['es5']
 	});
-
-	
+	//>
 	
 	//<geolocation
 	
 	addPolyfill('geolocation', {
-		test: Modernizr.geolocation,
+		test: 'geolocation' in navigator,
 		options: {
 			destroyWrite: true
 //			,confirmText: ''
 		},
-		c: [21],
-		nM: 'geolocation'
+		c: [21]
 	});
 	//>
 	
@@ -966,7 +961,7 @@
 	(function(){
 		addPolyfill('canvas', {
 			src: 'excanvas',
-			test: Modernizr.canvas,
+			test: ('getContext' in create('canvas')),
 			options: {type: 'flash'}, //excanvas | flash | flashpro
 			noAutoCallback: true,
 			
@@ -977,8 +972,7 @@
 				}
 			},
 			methodNames: ['getContext'],
-			d: [DOMSUPPORT],
-			nM: 'canvas'
+			d: [DOMSUPPORT]
 		});
 	})();
 	//>
@@ -988,52 +982,60 @@
 	(function(){
 		var formExtend, formOptions;
 		var fShim = 'form-shim-extend';
-		var modernizrInputAttrs = Modernizr.input;
-		var modernizrInputTypes = Modernizr.inputtypes;
 		var formvalidation = 'formvalidation';
 		var fNuAPI = 'form-number-date-api';
 		var bustedValidity = false;
 		var bustedWidgetUi = false;
 		var replaceBustedUI = false;
-		
+		var inputtypes = {};
+
+
+		var progress = create('progress');
+		var output = create('output');
+
 		var initialFormTest = function(){
 			var tmp, fieldset;
-			if(!initialFormTest.run){
-				fieldset = $('<fieldset><textarea required="" /></fieldset>')[0];
-				addTest(formvalidation, !!(modernizrInputAttrs.required && modernizrInputAttrs.pattern));
-				
-				addTest('fieldsetelements', (tmp = 'elements' in fieldset));
-				
-				if(('disabled' in fieldset)){
-					if(!tmp) {
-						try {
-							if($('textarea', fieldset).is(':invalid')){
-								fieldset.disabled = true;
-								tmp = $('textarea', fieldset).is(':valid');
-							}
-						} catch(er){}
-					}
-					addTest('fieldsetdisabled', tmp);
-				}
-				
-				if(Modernizr[formvalidation]){
-					bustedWidgetUi = !Modernizr.fieldsetdisabled ||!Modernizr.fieldsetelements || !('value' in document.createElement('progress')) || !('value' in document.createElement('output'));
-					replaceBustedUI = bustedWidgetUi && (/Android/i).test(navigator.userAgent);
-					bugs.bustedValidity = bustedValidity = window.opera || bugs.bustedValidity || bustedWidgetUi || !modernizrInputAttrs.list;
-				} else {
-					bugs.bustedValidity = false;
-				}
+			var input = create('input');
+			fieldset = $('<fieldset><textarea required="" /></fieldset>')[0];
 
-				formExtend = Modernizr[formvalidation] && !bustedValidity ? 'form-native-extend' : fShim;
-				
+			support.inputtypes = inputtypes;
+
+			$.each(['number', 'range', 'date', 'datetime-local', 'month', 'color'], function(i, type){
+				input.setAttribute('type', type);
+				inputtypes[type] = (input.type == type && (input.value = '(') && input.value != '(');
+			});
+
+			support.datalist = !!(('options' in create('datalist')) && window.HTMLDataListElement);
+
+			support[formvalidation] = ('checkValidity' in input);
+
+			support.fieldsetelements = ('elements' in fieldset);
+
+
+			if((support.fieldsetdisabled = ('disabled' in fieldset))){
+				try {
+					if(fieldset.querySelector(':invalid')){
+						fieldset.disabled = true;
+						tmp = !fieldset.querySelector(':invalid');
+					}
+				} catch(er){}
+				support.fieldsetdisabled =  !!tmp;
 			}
-			initialFormTest.run = true;
+
+			if(support[formvalidation]){
+				bustedWidgetUi = !support.fieldsetdisabled || !support.fieldsetelements || !('value' in progress) || !('value' in output);
+				replaceBustedUI = bustedWidgetUi && (/Android/i).test(navigator.userAgent);
+				bugs.bustedValidity = bustedValidity = window.opera || bugs.bustedValidity || bustedWidgetUi || !support.datalist;
+			} else {
+				bugs.bustedValidity = false;
+			}
+
+			formExtend = support[formvalidation] && !bustedValidity ? 'form-native-extend' : fShim;
+			initialFormTest = $.noop;
 			return false;
 		};
 
-		document.createElement('datalist');
-				
-		
+
 		webshims.validationMessages = webshims.validityMessages = {
 			langSrc: 'i18n/formcfg-', 
 			availableLangs: "ar cs el es fa fr he hi hu it ja lt nl pl pt pt-BR pt-PT ru sv zh-CN zh-TW".split(' ')
@@ -1045,10 +1047,10 @@
 		addPolyfill('form-core', {
 			f: 'forms',
 			d: ['es5'],
-			test: initialFormTest,
 			options: {
 				placeholderType: 'value',
 				messagePopover: {},
+				test: initialFormTest,
 				list: {
 					popover: {
 						constrainWidth: true
@@ -1064,9 +1066,8 @@
 	//			overridePlaceholder: false, // might be good for IE10
 	//			replaceValidationUI: false
 			},
-			methodNames: ['setCustomValidity','checkValidity', 'setSelectionRange'],
-			c: [16, 7, 2, 8, 1, 15, 30, 3, 31],
-			nM: 'input'
+			methodNames: ['setCustomValidity', 'checkValidity', 'setSelectionRange'],
+			c: [16, 7, 2, 8, 1, 15, 30, 3, 31]
 		});
 		
 		formOptions = webCFG.forms;
@@ -1074,7 +1075,8 @@
 		addPolyfill('form-native-extend', {
 			f: 'forms',
 			test: function(toLoad){
-				return !Modernizr[formvalidation] || bustedValidity  || $.inArray(fNuAPI, toLoad  || []) == -1 || modules[fNuAPI].test();
+				initialFormTest();
+				return !support[formvalidation] || bustedValidity  || $.inArray(fNuAPI, toLoad  || []) == -1 || modules[fNuAPI].test();
 			},
 			d: ['form-core', DOMSUPPORT, 'form-message'],
 			c: [6, 5, 14, 29]
@@ -1083,7 +1085,8 @@
 		addPolyfill(fShim, {
 			f: 'forms',
 			test: function(){
-				return Modernizr[formvalidation] && !bustedValidity;
+				initialFormTest();
+				return support[formvalidation] && !bustedValidity;
 			},
 			d: ['form-core', DOMSUPPORT, 'sizzle'],
 			c: [16, 15, 28]
@@ -1092,7 +1095,8 @@
 		addPolyfill(fShim+'2', {
 			f: 'forms',
 			test: function(){
-				return Modernizr[formvalidation] && !bustedWidgetUi;
+				initialFormTest();
+				return support[formvalidation] && !bustedWidgetUi;
 			},
 			d: [fShim],
 			c: [27]
@@ -1101,7 +1105,8 @@
 		addPolyfill('form-message', {
 			f: 'forms',
 			test: function(toLoad){
-				return !( formOptions.customMessages || !Modernizr[formvalidation] || bustedValidity || !modules[formExtend].test(toLoad) );
+				initialFormTest();
+				return !( formOptions.customMessages || !support[formvalidation] || bustedValidity || !modules[formExtend].test(toLoad) );
 			},
 			d: [DOMSUPPORT],
 			c: [16, 7, 15, 30, 3, 8, 4, 14, 28]
@@ -1119,10 +1124,9 @@
 				if(!o._types){
 					o._types = o.types.split(' ');
 				}
-				
 				initialFormTest();
 				$.each(o._types, function(i, name){
-					if((name in modernizrInputTypes) && !modernizrInputTypes[name]){
+					if((name in inputtypes) && !inputtypes[name]){
 						ret = false;
 						return false;
 					}
@@ -1132,8 +1136,7 @@
 			},
 			methodNames: ['stepUp', 'stepDown'],
 			d: ['forms', DOMSUPPORT],
-			c: [6, 5, 18, 17, 14, 28, 29, 32, 33],
-			nM: 'input inputtypes'
+			c: [6, 5, 18, 17, 14, 28, 29, 32, 33]
 		});
 		
 		addModule('range-ui', {
@@ -1150,10 +1153,8 @@
 			f: 'forms-ext',
 			test: function(){
 				var o = this.options;
-				initialFormTest();
-
 				o.replaceUI = getAutoEnhance(o.replaceUI);
-
+				initialFormTest();
 				//input widgets on old androids can't be trusted
 				if(!o.replaceUI && replaceBustedUI){
 					o.replaceUI = true;
@@ -1178,7 +1179,7 @@
 				if(replaceBustedUI){
 					formOptions.customDatalist = true;
 				}
-				return modernizrInputAttrs.list && !formOptions.fD;
+				return support.datalist && !formOptions.fD;
 			},
 			d: ['form-core', DOMSUPPORT],
 			c: [16, 7, 6, 2, 9, 15, 30, 31, 28, 32, 33]
@@ -1199,11 +1200,8 @@
 	//>
 	
 	//<details
-	addTest('details', function(){
-		return ('open' in document.createElement('details'));
-	});
 	addPolyfill('details', {
-		test: Modernizr.details,
+		test: ('open' in create('details')),
 		d: [DOMSUPPORT],
 		options: {
 //			animate: false,
@@ -1216,13 +1214,13 @@
 	//<mediaelement
 	(function(){
 		webshims.mediaelement = {};
+		var video = create('video');
+		support.mediaelement = ('canPlayType' in video);
+		support.texttrackapi = ('addTextTrack' in video);
+		support.track = ('kind' in create('track'));
 
+		create('audio');
 
-		addTest({
-			texttrackapi: ('addTextTrack' in document.createElement('video')),
-			// a more strict test for track including UI support: document.createElement('track').kind === 'subtitles'
-			track: ('kind' in document.createElement('track'))
-		});
 		addPolyfill('mediaelement-core', {
 			f: 'mediaelement',
 			noAutoCallback: true,
@@ -1237,8 +1235,7 @@
 			},
 			methodNames: ['play', 'pause', 'canPlayType', 'mediaLoad:load'],
 			d: ['swfmini'],
-			c: [16, 7, 2, 8, 1, 12, 13, 19, 20, 23],
-			nM: 'audio video'
+			c: [16, 7, 2, 8, 1, 12, 13, 19, 20, 23]
 		});
 		
 		
@@ -1248,7 +1245,7 @@
 			test: function(){
 				var options = this.options;
 
-				if(!Modernizr.audio || !Modernizr.video || webshims.mediaelement.loadSwf){
+				if(!support.mediaelement || webshims.mediaelement.loadSwf){
 					return false;
 				}
 
@@ -1261,7 +1258,7 @@
 		});
 
 
-		bugs.track = !window.TextTrackCue || !Modernizr.texttrackapi;
+		bugs.track = !window.TextTrackCue || !support.texttrackapi;
 
 		addPolyfill('track', {
 			options: {
@@ -1311,25 +1308,12 @@
 	});
 	
 	webshims.$ = $;
-	webshims.M = Modernizr;
 	$.webshims = webshims;
 	$.webshim = webshim;
 
 	webshims.callAsync = function(){
 		webshims.callAsync = $.noop;
-		if(WSDEBUG){
-			$(document.scripts || 'script')
-				.filter('[data-polyfill-cfg]')
-				.each(function(){
-					webshims.error('script[data-polyfill-cfg] feature was removed')
-				})
-				.end()
-				.filter('[data-polyfill]')
-				.each(function(){
-					webshims.error('script[data-polyfill] feature was removed')
-				})
-			;
-		}
+
 		if(asyncWebshims){
 			if(asyncWebshims.cfg){
 				if(!asyncWebshims.cfg.length){

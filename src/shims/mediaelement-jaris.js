@@ -3,7 +3,8 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 	
 	var mediaelement = webshims.mediaelement;
 	var swfmini = window.swfmini;
-	var hasNative = Modernizr.audio && Modernizr.video;
+	var support = webshims.support;
+	var hasNative = support.mediaelement;
 	var hasFlash = swfmini.hasFlashPlayerVersion('9.0.115');
 	var loadedSwf = 0;
 	var needsLoadPreload = 'ActiveXObject' in window && hasNative;
@@ -561,7 +562,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 						ret.height = ret.width / ratio;
 						
 					}
-					if(!Modernizr.video){
+					if(!webshims.support.mediaelement){
 						ret.width = data.shadowElem.width();
 						ret.height = data.shadowElem.height();
 					}
@@ -1064,7 +1065,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		
 		mediaSup = webshims.defineNodeNameProperties(nodeName, descs, 'prop');
 		
-		if(!Modernizr.mediaDefaultMuted){
+		if(!support.mediaDefaultMuted){
 			webshims.defineNodeNameProperties(nodeName, {
 				defaultMuted: {
 					get: function(){

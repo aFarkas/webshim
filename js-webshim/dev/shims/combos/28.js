@@ -55,12 +55,11 @@ var typeModels = webshims.inputTypes,
 					}
 					return fn;
 				})();
-				if(!Modernizr.prefixed || Modernizr.prefixed("matchesSelector", document.documentElement)){
-					$.find.matchesSelector = function(node, expr){
-						expr = expr.replace(regExp, regFn);
-						return matchesSelector.call(this, node, expr);
-					};
-				}
+
+				$.find.matchesSelector = function(node, expr){
+					expr = expr.replace(regExp, regFn);
+					return matchesSelector.call(this, node, expr);
+				};
 				
 			})();
 		}
@@ -515,7 +514,7 @@ webshims.defineNodeNameProperty('form', 'noValidate', {
 	});
 });
 
-if(Modernizr.inputtypes.date && /webkit/i.test(navigator.userAgent)){
+if(webshims.support.inputtypes.date && /webkit/i.test(navigator.userAgent)){
 	(function(){
 		
 		var noInputTriggerEvts = {updateInput: 1, input: 1},
@@ -627,7 +626,7 @@ webshims.addReady(function(context, contextElem){
 	
 });
 
-if(!Modernizr.input.list){
+if(!webshims.support.datalist){
 	webshims.defineNodeNameProperty('datalist', 'options', {
 		prop: {
 			writeable: false,
@@ -1061,7 +1060,7 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 	};
 	
 	
-	if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){
+	if(!webshims.support.formvalidation || webshims.bugs.bustedValidity){
 		implementProperties.push('validationMessage');
 	}
 	
@@ -1097,7 +1096,7 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 						if(message){return message;}
 						
 						if(validity.customError && elem.nodeName){
-							message = (Modernizr.formvalidation && !webshims.bugs.bustedValidity && desc.prop._supget) ? desc.prop._supget.call(elem) : webshims.data(elem, 'customvalidationMessage');
+							message = (webshims.support.formvalidation && !webshims.bugs.bustedValidity && desc.prop._supget) ? desc.prop._supget.call(elem) : webshims.data(elem, 'customvalidationMessage');
 							if(message){return message;}
 						}
 						$.each(validity, function(name, prop){
@@ -1793,8 +1792,8 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 	 */
 	
 	(function(){
-		var formsCFG = $.webshims.cfg.forms;
-		var listSupport = Modernizr.input.list;
+		var formsCFG = webshims.cfg.forms;
+		var listSupport = webshims.support.datalist;
 		if(listSupport && !formsCFG.customDatalist){return;}
 		
 			var initializeDatalist =  function(){

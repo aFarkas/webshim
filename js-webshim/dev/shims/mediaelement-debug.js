@@ -3,7 +3,7 @@
 	if(!window.console){return;}
 	var mediaelement = webshim.mediaelement;
 	var hasFlash = swfmini.hasFlashPlayerVersion('10.0.3');
-	var hasNative = Modernizr.video;
+	var hasNative = webshim.support.mediaelement;
 	var url = location.protocol+'//'+location.hostname;
 	var tests = {
 		urlInValid: {

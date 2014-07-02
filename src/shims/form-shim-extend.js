@@ -55,12 +55,11 @@ var typeModels = webshims.inputTypes,
 					}
 					return fn;
 				})();
-				if(!Modernizr.prefixed || Modernizr.prefixed("matchesSelector", document.documentElement)){
-					$.find.matchesSelector = function(node, expr){
-						expr = expr.replace(regExp, regFn);
-						return matchesSelector.call(this, node, expr);
-					};
-				}
+
+				$.find.matchesSelector = function(node, expr){
+					expr = expr.replace(regExp, regFn);
+					return matchesSelector.call(this, node, expr);
+				};
 				
 			})();
 		}
@@ -515,7 +514,7 @@ webshims.defineNodeNameProperty('form', 'noValidate', {
 	});
 });
 
-if(Modernizr.inputtypes.date && /webkit/i.test(navigator.userAgent)){
+if(webshims.support.inputtypes.date && /webkit/i.test(navigator.userAgent)){
 	(function(){
 		
 		var noInputTriggerEvts = {updateInput: 1, input: 1},
@@ -627,7 +626,7 @@ webshims.addReady(function(context, contextElem){
 	
 });
 
-if(!Modernizr.input.list){
+if(!webshims.support.datalist){
 	webshims.defineNodeNameProperty('datalist', 'options', {
 		prop: {
 			writeable: false,

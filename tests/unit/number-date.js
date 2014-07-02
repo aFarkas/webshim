@@ -28,7 +28,7 @@ var createTestMethodA = function(id){
 		
 		//abort test in some cases
 		//todo make all test work also with value sanitation
-		if( Modernizr.formvalidation === true && obj.trueState[0] !== 'valid' && elem.val() != obj.attrs.value ){
+		if( webshims.support.formvalidation === true && obj.trueState[0] !== 'valid' && elem.val() != obj.attrs.value ){
 			return;
 		}
 		$.each(obj.trueState, function(i, trueState){
@@ -630,7 +630,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 		], function(i, data){
 			var elem = $('#'+data.id);
 			elem.prop('value', data.value);
-			if(Modernizr.formvalidation ===  true && data.value != elem.prop('value')){
+			if(webshims.support.formvalidation ===  true && data.value != elem.prop('value')){
 				return;
 			}
 			if(data.result === undefined){
@@ -661,7 +661,7 @@ asyncTest('valueAsDate/valueAsNumber', function(){
 			elem.prop('value', '');
 			elem.prop('valueAsNumber', data.value);
 			
-//			if (Modernizr.formvalidation === true && data.value != elem.prop('valueAsNumber')) {
+//			if (webshims.support.formvalidation === true && data.value != elem.prop('valueAsNumber')) {
 //				return;
 //			}
 			var val = elem.prop('value');

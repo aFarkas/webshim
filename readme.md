@@ -35,9 +35,6 @@ Installation and Usage
 ```html
 <script src="js/jquery.js"></script>
 
-<!-- 'Use your own' variant -->
-<script src="js/Modernizr-custom.js"></script> 
-
 <script src="js-webshim/minified/polyfiller.js"></script> 
 
 <script> 

@@ -23,7 +23,7 @@
 	
 	
 	module("form-submitters");
-	if (!Modernizr.formvalidation) {
+	if (!webshims.support.formvalidation) {
 		asyncTest("form-submitters API", function(){
 			var form = $('#form-buttons');
 			

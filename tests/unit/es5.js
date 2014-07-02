@@ -100,7 +100,7 @@
 	
 	
 		asyncTest("advanced Object (support.objectAccessor)", function(){	
-			if (Modernizr.objectAccessor) {
+			if (webshims.support.objectAccessor) {
 				var desc;
 				var obj = $.webshims.objectCreate({
 					foo: 'bar'
@@ -148,7 +148,7 @@
 	
 	
 		asyncTest("extreme advanced Object (support.advancedObjectProperties)", function(){	
-			if (Modernizr.advancedObjectProperties) {
+			if (webshims.support.advancedObjectProperties) {
 				var desc;
 				var keys = '';
 				var obj = Object.create({

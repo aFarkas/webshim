@@ -3,33 +3,34 @@
 //Todo test textarea + \n
 module("placeholder");
 var visibleStyle = $('<div style="display: inline-block" />').css('display');
+var supportPlaceholder = ('placeholder' in document.createElement('input'));
 var placeholder = {
 	isApplied: function(elem, state){
-		if(Modernizr.input.placeholder) {return;}
+		if(supportPlaceholder) {return;}
 		var parent = $(elem).parent();
 		equals(parent.is('span.placeholder-box'), state, 'placeholder-box is applied');
 		equals(!!(parent.find('.placeholder-text')[0]), state, 'placeholder-text is applied');
 		
 	},
 	isVisible: function(elem, state){
-		if(Modernizr.input.placeholder) {return;}
+		if(supportPlaceholder) {return;}
 		var parent = $(elem).parent();
 		equals(parent.hasClass('placeholder-visible'), state, 'placeholder visible class');
 		equals(parent.find('.placeholder-text').css('display'), state ? visibleStyle : 'none', 'placeholder-text is applied');
 	},
 	hasText: function(elem, text){
-		if(Modernizr.input.placeholder) {return;}
+		if(supportPlaceholder) {return;}
 		equals($(elem).parent().find('.placeholder-text').text(), text, 'placeholder has text: ');
 	}
 };
 
 var textPlaceholder = {
 	hasText: function(elem, text){
-		if(Modernizr.input.placeholder) {return;}
+		if(supportPlaceholder) {return;}
 		equals(elem.value, text, 'placeholder has placeholder text: ');
 	},
 	hasValue: function(elem, value){
-		if(Modernizr.input.placeholder) {return;}
+		if(supportPlaceholder) {return;}
 		strictEqual($(elem).prop('value'), value, 'placeholder has text ($.fn.attr): ');
 		strictEqual($(elem).prop('value'), value, 'placeholder has text ($.fn.prop): ');
 		strictEqual($(elem).val(), value, 'placeholder has text ($.fn.val): ');

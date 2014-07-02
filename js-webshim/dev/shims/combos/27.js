@@ -3,7 +3,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 	var isNumber = function(string){
 		return (typeof string == 'number' || (string && string == string * 1));
 	};
-
+	var support = webshims.support;
 //support getSetAttribute
 	var supportGetSetAttribute = !(('getSetAttribute' in  $.support) && !$.support.getSetAttribute);
 //submitbubbles for IE6-IE8
@@ -153,9 +153,9 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 	}
 
 
-	if(!Modernizr.formattribute || !Modernizr.fieldsetdisabled || !Modernizr.fieldsetelements){
+	if(!support.fieldsetdisabled || !support.fieldsetelements){
 		(function(){
-			if(!Modernizr.fieldsetdisabled){
+			if(!support.fieldsetdisabled){
 				var isFieldsetGroup = {
 					fieldset: 1,
 					FIELDSET: 1
@@ -250,194 +250,193 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 			}
 
 
-			if(!Modernizr.formattribute){
-				(function(prop, undefined){
-					var isForm = {form: 1, FORM: 1};
-					$.prop = function(elem, name, value){
-						var ret;
+			(function(prop, undefined){
+				var isForm = {form: 1, FORM: 1};
+				$.prop = function(elem, name, value){
+					var ret;
+					//TODO: cache + perftest
+					if(elem && elem.nodeType == 1 && value === undefined && isForm[elem.nodeName] && elem.id){
+						ret = document.getElementsByName(name);
+						if(!ret || !ret.length){
+							ret = document.getElementById(name);
+						}
+						if(ret){
+							ret = $(ret).filter(function(){
+								return $.prop(this, 'form') == elem;
+							}).get();
+							if(ret.length){
+								return ret.length == 1 ? ret[0] : ret;
+							}
+						}
+					}
+					return prop.apply(this, arguments);
+				};
+			})($.prop, undefined);
+
+			var removeAddedElements = function(form){
+				var elements = $.data(form, 'webshimsAddedElements');
+				if(elements){
+					elements.remove();
+					$.removeData(form, 'webshimsAddedElements');
+				}
+			};
+
+			var getAssociatedForm = function () {
+				var form = webshims.contentAttr(this, 'form');
+				if(form){
+					form = document.getElementById(form);
+					if(form && !$.nodeName(form, 'form')){
+						form = null;
+					}
+				}
+				return form || this.form;
+			};
+			webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'button', 'fieldset'], 'form', {
+				prop: {
+					get: getAssociatedForm,
+					writeable: false
+				}
+			});
+
+			webshims.defineNodeNamesProperty(['form'], 'elements', {
+				prop: {
+					get: function(){
 						//TODO: cache + perftest
-						if(elem && elem.nodeType == 1 && value === undefined && isForm[elem.nodeName] && elem.id){
-							ret = document.getElementsByName(name);
-							if(!ret || !ret.length){
-								ret = document.getElementById(name);
-							}
-							if(ret){
-								ret = $(ret).filter(function(){
-									return $.prop(this, 'form') == elem;
-								}).get();
-								if(ret.length){
-									return ret.length == 1 ? ret[0] : ret;
-								}
+						var sel, addElements, detachElements, formElements, i, len;
+						var id = this.id;
+						var elements = [];
+						if(id){
+							detachElements = $.data(this, 'webshimsAddedElements');
+							if(detachElements){
+								detachElements.detach();
 							}
 						}
-						return prop.apply(this, arguments);
-					};
-				})($.prop, undefined);
 
-				var removeAddedElements = function(form){
-					var elements = $.data(form, 'webshimsAddedElements');
-					if(elements){
-						elements.remove();
-						$.removeData(form, 'webshimsAddedElements');
-					}
+						formElements = this.elements;
+
+						if(this.querySelector('input[form], select[form], textarea[form]')){
+							for(i = 0, len = formElements.length; i < len; i++){
+								if(getAssociatedForm.call(formElements[i]) == this){
+									elements.push(formElements[i]);
+								}
+							}
+						} else {
+							elements = $.makeArray(formElements);
+						}
+
+						if(id){
+							sel = 'input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]';
+							addElements = document.querySelectorAll(sel) || [];
+							if(addElements.length){
+								elements = $(elements).add(addElements).get();
+
+							}
+							if(detachElements){
+								detachElements.appendTo(this);
+							}
+						}
+						return elements;
+					},
+					writeable: false
+				}
+			});
+
+
+
+			$(function(){
+				var stopPropagation = function(e){
+					e.stopPropagation();
 				};
-
-				var getAssociatedForm = function () {
-					var form = webshims.contentAttr(this, 'form');
-					if(form){
-						form = document.getElementById(form);
-						if(form && !$.nodeName(form, 'form')){
-							form = null;
-						}
-					}
-					return form || this.form;
+				var submitters = {
+					image: 1,
+					submit: 1
 				};
-				webshims.defineNodeNamesProperty(['input', 'textarea', 'select', 'button', 'fieldset'], 'form', {
-					prop: {
-						get: getAssociatedForm,
-						writeable: false
-					}
-				});
+				$(document).on('submit', function(e){
 
-				webshims.defineNodeNamesProperty(['form'], 'elements', {
-					prop: {
-						get: function(){
-							//TODO: cache + perftest
-							var sel, addElements, detachElements, formElements, i, len;
-							var id = this.id;
-							var elements = [];
-							if(id){
-								detachElements = $.data(this, 'webshimsAddedElements');
-								if(detachElements){
-									detachElements.detach();
-								}
-							}
-
-							formElements = this.elements;
-
-							if(this.querySelector('input[form], select[form], textarea[form]')){
-								for(i = 0, len = formElements.length; i < len; i++){
-									if(getAssociatedForm.call(formElements[i]) == this){
-										elements.push(formElements[i]);
-									}
-								}
-							} else {
-								elements = $.makeArray(formElements);
-							}
-
-							if(id){
-								sel = 'input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"], button[form="'+ id +'"], fieldset[form="'+ id +'"]';
-								addElements = document.querySelectorAll(sel) || [];
-								if(addElements.length){
-									elements = $(elements).add(addElements).get();
-
-								}
-								if(detachElements){
-									detachElements.appendTo(this);
-								}
-							}
-							return elements;
-						},
-						writeable: false
-					}
-				});
+					if(!e.isDefaultPrevented()){
+						var form = e.target;
+						var id = form.id;
+						var elements;
 
 
-
-				$(function(){
-					var stopPropagation = function(e){
-						e.stopPropagation();
-					};
-					var submitters = {
-						image: 1,
-						submit: 1
-					};
-					$(document).on('submit', function(e){
-
-						if(!e.isDefaultPrevented()){
-							var form = e.target;
-							var id = form.id;
-							var elements;
-
-
-							if(id){
-								removeAddedElements(form);
-								elements = document.querySelectorAll('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"]');
-								elements = $(elements)
-									.filter(function(){
-										return !this.disabled && this.name && this.form != form;
-									})
-									.clone()
-								;
-								if(elements.length){
-									$.data(form, 'webshimsAddedElements', $('<div class="webshims-visual-hide" />').append(elements).appendTo(form));
-									setTimeout(function(){
-										removeAddedElements(form);
-									}, 9);
-								}
-								elements = null;
-							}
-						}
-					});
-
-
-					$(document).on('click', function(e){
-						if(submitters[e.target.type] && !e.isDefaultPrevented() && webshims.contentAttr(e.target, 'form')){
-							var trueForm = $.prop(e.target, 'form');
-							var formIn = e.target.form;
-							var clone;
-							if(trueForm && trueForm != formIn){
-								clone = $(e.target)
-									.clone()
-									.removeAttr('form')
-									.addClass('webshims-visual-hide')
-									.on('click', stopPropagation)
-									.appendTo(trueForm)
-								;
-								if(formIn){
-									e.preventDefault();
-								}
-								addSubmitBubbles(trueForm);
-								clone.trigger('click');
+						if(id){
+							removeAddedElements(form);
+							elements = document.querySelectorAll('input[form="'+ id +'"], select[form="'+ id +'"], textarea[form="'+ id +'"]');
+							elements = $(elements)
+								.filter(function(){
+									return !this.disabled && this.name && this.form != form;
+								})
+								.clone()
+							;
+							if(elements.length){
+								$.data(form, 'webshimsAddedElements', $('<div class="webshims-visual-hide" />').append(elements).appendTo(form));
 								setTimeout(function(){
-									clone.remove();
-									clone = null;
+									removeAddedElements(form);
 								}, 9);
 							}
+							elements = null;
 						}
-					});
+					}
 				});
 
-				if(!$.fn.finish && parseFloat($.fn.jquery, 10) < 1.9){
-					var rCRLF = /\r?\n/g,
-						rinput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i,
-						rselectTextarea = /^(?:select|textarea)/i;
-					$.fn.serializeArray = function() {
-						return this.map(function(){
-							var elements = $.prop(this, 'elements');
-							return elements ? $.makeArray( elements ) : this;
-						})
-							.filter(function(){
-								return this.name && !$(this).is(':disabled') &&
-									( this.checked || rselectTextarea.test( this.nodeName ) ||
-										rinput.test( this.type ) );
-							})
-							.map(function( i, elem ){
-								var val = $( this ).val();
 
-								return val == null ?
-									null :
-									$.isArray( val ) ?
-										$.map( val, function( val, i ){
-											return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
-										}) :
-									{ name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
-							}).get();
-					};
-				}
+				$(document).on('click', function(e){
+					if(submitters[e.target.type] && !e.isDefaultPrevented() && webshims.contentAttr(e.target, 'form')){
+						var trueForm = $.prop(e.target, 'form');
+						var formIn = e.target.form;
+						var clone;
+						if(trueForm && trueForm != formIn){
+							clone = $(e.target)
+								.clone()
+								.removeAttr('form')
+								.addClass('webshims-visual-hide')
+								.on('click', stopPropagation)
+								.appendTo(trueForm)
+							;
+							if(formIn){
+								e.preventDefault();
+							}
+							addSubmitBubbles(trueForm);
+							clone.trigger('click');
+							setTimeout(function(){
+								clone.remove();
+								clone = null;
+							}, 9);
+						}
+					}
+				});
+			});
+
+			if(!$.fn.finish && parseFloat($.fn.jquery, 10) < 1.9){
+				var rCRLF = /\r?\n/g,
+					rinput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i,
+					rselectTextarea = /^(?:select|textarea)/i;
+				$.fn.serializeArray = function() {
+					return this.map(function(){
+						var elements = $.prop(this, 'elements');
+						return elements ? $.makeArray( elements ) : this;
+					})
+						.filter(function(){
+							return this.name && !$(this).is(':disabled') &&
+								( this.checked || rselectTextarea.test( this.nodeName ) ||
+									rinput.test( this.type ) );
+						})
+						.map(function( i, elem ){
+							var val = $( this ).val();
+
+							return val == null ?
+								null :
+								$.isArray( val ) ?
+									$.map( val, function( val, i ){
+										return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+									}) :
+								{ name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+						}).get();
+				};
 			}
 
-			if(!Modernizr.fieldsetelements){
+
+			if(!support.fieldsetelements){
 				webshims.defineNodeNamesProperty(['fieldset'], 'elements', {
 					prop: {
 						get: function(){
@@ -712,11 +711,13 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 	(function(){
 		if(options.noPlaceholderPolyfill){return;}
 		var bustedPlaceholder;
-		Modernizr.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
-		if(Modernizr.input.placeholder && options.overridePlaceholder){
+		support.textareaPlaceholder = !!('placeholder' in $('<textarea />')[0]);
+		support.placeholder = !!('placeholder' in $('<input />')[0]);
+
+		if(support.placeholder && options.overridePlaceholder){
 			bustedPlaceholder = true;
 		}
-		if(Modernizr.input.placeholder && Modernizr.textareaPlaceholder && !bustedPlaceholder){
+		if(support.placeholder && support.textareaPlaceholder && !bustedPlaceholder){
 			(function(){
 				var ua = navigator.userAgent;
 
@@ -745,7 +746,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 		var isOver = (webshims.cfg.forms.placeholderType == 'over');
 		var isResponsive = (webshims.cfg.forms.responsivePlaceholder);
 		var polyfillElements = ['textarea'];
-		if(!Modernizr.input.placeholder || bustedPlaceholder){
+		if(!support.placeholder || bustedPlaceholder){
 			polyfillElements.push('input');
 		}
 

@@ -4,7 +4,6 @@
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 	<title>Webshims Lib Test Suite</title>
-	<script src="../src/extras/modernizr-custom.js"></script>
 	<link rel="stylesheet" href="qunit/qunit.css" media="screen">
 	<script>
 		(function(){
@@ -46,7 +45,7 @@
 	<script src="../js-webshim/minified/polyfiller.js"></script>
 	<script>
 		(function($){
-			
+
 			window.omitTests = window.omitTests || {};
 			
 			
@@ -119,10 +118,10 @@
 				$.webshims.ready('DOM forms-ext forms canvas', start);
 			});
 			$.webshims.ready('forms-ext', function(){
-				omitTests.validity = Modernizr.formvalidation;
-				omitTests.output = Modernizr.output;
-				omitTests.numericDateProps = Modernizr.inputtypes.number;
-				omitTests.requiredSelect = Modernizr.formvalidation;
+				omitTests.validity = webshim.support.formvalidation;
+				omitTests.output = true;
+				omitTests.numericDateProps = webshim.support.inputtypes.number;
+				omitTests.requiredSelect = webshim.support.formvalidation;
 			});
 		})(jQuery);
 	</script>
@@ -224,7 +223,6 @@
 <div id="qunit-testrunner-toolbar"></div>
 <h2 id="qunit-userAgent"></h2>
 <ol id="qunit-tests"></ol>
-<p><a href="persistence.html#testsession">Test persistence</a></p>
 <div id="outside-test">
 	<canvas></canvas>
 </div>

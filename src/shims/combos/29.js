@@ -1,8 +1,7 @@
 webshims.register('form-native-extend', function($, webshims, window, doc, undefined, options){
 	"use strict";
-	var Modernizr = window.Modernizr;
-	var modernizrInputTypes = Modernizr.inputtypes;
-	if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){return;}
+	var support = webshims.support;
+	if(!support.formvalidation || webshims.bugs.bustedValidity){return;}
 	var typeModels = webshims.inputTypes;
 	var runTest = false;
 	var validityRules = {};
@@ -23,7 +22,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		typeModels[type] = obj;
 		runTest = true;
 		//update validity of all implemented input types
-		if($.isDOMReady && Modernizr.formvalidation && !webshims.bugs.bustedValidity){
+		if($.isDOMReady && support.formvalidation && !webshims.bugs.bustedValidity){
 			updateValidity();
 		}
 	};
@@ -209,7 +208,8 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 	});
 	
 	
-});;webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
+});
+;webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(!webshims.addInputType){
 		webshims.error("you can not call forms-ext feature after calling forms feature. call both at once instead: $.webshims.polyfill('forms forms-ext')");

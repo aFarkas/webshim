@@ -505,3 +505,7 @@ window.Modernizr = (function( window, document, undefined ) {
 
 })(this, this.document);
 ;
+if(window.console){
+	console.log('webshim no longer depends on Modernizr. You can still use for feature detection of course.');
+}
+

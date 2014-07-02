@@ -2,7 +2,8 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	"use strict";
 
 	var isWebkit = 'webkitURL' in window;
-	var hasNative = Modernizr.formvalidation && !webshims.bugs.bustedValidity;
+	var support = webshims.support;
+	var hasNative = support.formvalidation && !webshims.bugs.bustedValidity;
 	var chromeBugs = isWebkit && hasNative;
 	var ua = navigator.userAgent;
 	var webkitVersion = chromeBugs && parseFloat((ua.match(/Safari\/([\d\.]+)/) || ['', '999999'])[1], 10);
@@ -939,7 +940,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		});
 	})();
 
-	if(!options.noInputmodeFix && document.addEventListener && Modernizr.inputtypes && Modernizr.inputtypes.tel && ua.indexOf('Mobile') != -1 && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ){
+	if(!options.noInputmodeFix && document.addEventListener && support.inputtypes.number && ua.indexOf('Mobile') != -1 && !('inputMode' in document.createElement('input') && !('inputmode' in document.createElement('input'))) ){
 		var removeListener = function(elem){
 			elem.removeEventListener('blur', switchBack, true);
 		};
@@ -1028,7 +1029,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	});
 
 	addModule('form-fixrangechange', {
-		test: !(!$.event.special.change && !$.event.special.input && Modernizr.inputtypes && Modernizr.inputtypes.range && options.fixRangeChange)
+		test: !(!$.event.special.change && !$.event.special.input && support.inputtypes.range && options.fixRangeChange)
 	});
 
 	addModule('form-combat', {

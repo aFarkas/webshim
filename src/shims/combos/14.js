@@ -1,8 +1,7 @@
 webshims.register('form-native-extend', function($, webshims, window, doc, undefined, options){
 	"use strict";
-	var Modernizr = window.Modernizr;
-	var modernizrInputTypes = Modernizr.inputtypes;
-	if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){return;}
+	var support = webshims.support;
+	if(!support.formvalidation || webshims.bugs.bustedValidity){return;}
 	var typeModels = webshims.inputTypes;
 	var runTest = false;
 	var validityRules = {};
@@ -23,7 +22,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		typeModels[type] = obj;
 		runTest = true;
 		//update validity of all implemented input types
-		if($.isDOMReady && Modernizr.formvalidation && !webshims.bugs.bustedValidity){
+		if($.isDOMReady && support.formvalidation && !webshims.bugs.bustedValidity){
 			updateValidity();
 		}
 	};
@@ -209,7 +208,8 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 	});
 	
 	
-});;webshims.register('form-message', function($, webshims, window, document, undefined, options){
+});
+;webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(options.lazyCustomMessages){
 		options.customMessages = true;
@@ -464,7 +464,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 	};
 	
 	
-	if(!Modernizr.formvalidation || webshims.bugs.bustedValidity){
+	if(!webshims.support.formvalidation || webshims.bugs.bustedValidity){
 		implementProperties.push('validationMessage');
 	}
 	
@@ -500,7 +500,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 						if(message){return message;}
 						
 						if(validity.customError && elem.nodeName){
-							message = (Modernizr.formvalidation && !webshims.bugs.bustedValidity && desc.prop._supget) ? desc.prop._supget.call(elem) : webshims.data(elem, 'customvalidationMessage');
+							message = (webshims.support.formvalidation && !webshims.bugs.bustedValidity && desc.prop._supget) ? desc.prop._supget.call(elem) : webshims.data(elem, 'customvalidationMessage');
 							if(message){return message;}
 						}
 						$.each(validity, function(name, prop){

@@ -158,7 +158,7 @@ var swfmini = function() {
 		webshims.$.noop
 	;
 
-	if(!Modernizr.video){
+	if(!webshims.support.mediaelement){
 		loadEmbed();
 	} else {
 		webshims.ready('WINDOWLOAD', loadEmbed);

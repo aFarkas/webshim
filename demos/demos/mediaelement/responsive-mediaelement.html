@@ -151,7 +151,6 @@
 	<link rel="alternate stylesheet" href="../themes/metro/metro.css" title="metro" />
 	<link rel="alternate stylesheet" href="../themes/rounded-shadow/rounded-shadow.css" title="rounded shadow" />
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-	<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
 	<script src="../../../js-webshim/minified/polyfiller.js"></script>
 
 	<script>
@@ -168,7 +167,7 @@
 	<script>
 
 		$(function(){
-			if(Modernizr.video && swfmini.hasFlashPlayerVersion('9.0.115')){
+			if(webshim.support.mediaelement && swfmini.hasFlashPlayerVersion('9.0.115')){
 				$('button.load-swf')
 					.prop('disabled', false)
 					.one('click', function(){

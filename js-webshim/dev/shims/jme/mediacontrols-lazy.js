@@ -968,6 +968,27 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 		return chapterList;
 	}
 
+	var domPrefixes = ["webkit", "moz", "o", "ms"];
+
+	function prefixed(prop, obj){
+		var i, testProp;
+		var ret = false;
+		if(obj[prop]){
+			ret = prop;
+		}
+		if(!ret){
+			prop = prop.charAt(0).toUpperCase() + prop.slice(1);
+			for(i = 0; i < domPrefixes.length; i++){
+				testProp = domPrefixes[i]+prop;
+				if(testProp in obj){
+					ret = testProp;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+
 	$.jme.defineMethod('getChapterTree', getChapterTree);
 
 	$.jme.defineMethod('concerningRange', function(type, time){
@@ -1050,7 +1071,7 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 		var doc = document.documentElement;
 
 		var fullScreenApi = {
-			supportsFullScreen: Modernizr.prefixed('fullscreenEnabled', document, false) || Modernizr.prefixed('fullScreenEnabled', document, false),
+			supportsFullScreen: prefixed('fullscreenEnabled', document) || prefixed('fullScreenEnabled', document),
 			isFullScreen: function() { return false; },
 			requestFullScreen: function(elem){
 				var tmpData;
@@ -1133,11 +1154,11 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 		// update methods to do something useful
 		if (fullScreenApi.supportsFullScreen) {
 			fullScreenApi.enabledName = fullScreenApi.supportsFullScreen;
-			fullScreenApi.exitName = Modernizr.prefixed("exitFullscreen", document, false) || Modernizr.prefixed("cancelFullScreen", document, false);
-			fullScreenApi.elementName = Modernizr.prefixed("fullscreenElement", document, false) || Modernizr.prefixed("fullScreenElement", document, false);
+			fullScreenApi.exitName = prefixed("exitFullscreen", document) || prefixed("cancelFullScreen", document);
+			fullScreenApi.elementName = prefixed("fullscreenElement", document) || prefixed("fullScreenElement", document);
 			fullScreenApi.supportsFullScreen = !!fullScreenApi.supportsFullScreen;
 			if(fullScreenApi.elementName != 'fullscreenElement' || fullScreenApi.exitName != 'exitFullscreen' || fullScreenApi.enabledName != 'fullscreenEnabled'){
-				$.each(Modernizr._domPrefixes, function(i, prefix){
+				$.each(domPrefixes, function(i, prefix){
 					var requestName = prefix+'RequestFullscreen';
 					if((requestName in doc) || ((requestName = prefix+'RequestFullScreen') && (requestName in doc))){
 						fullScreenApi.eventName = prefix + 'fullscreenchange';
@@ -1391,7 +1412,7 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 				var activeButton = buttons.filter(':focus');
 
 				activeButton = buttons[buttons.index(activeButton) + dir] || buttons.filter(dir > 0 ? ':first' : ':last');
-				activeButton.focus();
+				activeButton.trigger('focus');
 				e.preventDefault();
 			}
 		},
@@ -1407,7 +1428,7 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 			}
 
 			setTimeout(function(){
-				$(buttons.filter('[aria-checked="true"]').last()[0] || buttons[0]).focus();
+				$(buttons.filter('[aria-checked="true"]').last()[0] || buttons[0]).trigger('focus');
 			}, 60);
 		},
 		toggle: function(){

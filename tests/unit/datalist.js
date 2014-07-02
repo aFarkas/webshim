@@ -17,7 +17,7 @@ asyncTest("datalist", function(){
 	
 	strictEqual($('#email').prop('list'), $('#dlist')[0], 'list property returns right datalist');
 	
-	if(!Modernizr.input.list || $.webshims.cfg.forms.customDatalist){
+	if(!webshims.support.datalist || $.webshims.cfg.forms.customDatalist){
 		$('#email').data('datalistWidget').showList();
 		var shadowListItems = $('div.datalist-polyfill li');
 		$.each(['yes aßäöâ', 'yes "2"', "yes '3'"], function(i, val){
@@ -34,14 +34,14 @@ asyncTest("datalist", function(){
 	$('#email').attr('list', 'range');
 	strictEqual($('#email').prop('list'), null, 'list property is null, if element is not a datalist');
 	
-	if(!Modernizr.input.list){
+	if(!webshims.support.datalist){
 		ok(!$('#email').attr('aria-haspopup'), 'aria was removed on input:not([list])');
 	}
 	
 	$('#email').attr('list', 'dlist2');
 	strictEqual($('#email').prop('list'), $('#dlist2')[0], 'list property changed through content attribute');
 	
-	if(!Modernizr.input.list || webshims.cfg.forms.customDatalist){
+	if(!webshims.support.datalist || webshims.cfg.forms.customDatalist){
 		strictEqual($('#email').attr('aria-haspopup'), 'true', 'input[list] has aria');
 		
 		$('#email').removeAttr('list');

@@ -12,7 +12,6 @@
 
 		<!-- don't use async if you don't know how to deal with it!!! -->
 		<script src="//code.jquery.com/jquery-1.11.0.min.js" async=""></script>
-		<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
 
 		<script src="../js-webshim/minified/polyfiller.js"></script>
 
@@ -108,9 +107,6 @@
 			<a class="toc_title" href="#Customizing"> Customizing </a>
 			<ul class="toc_section">
 				<li>
-					- <a href="#Customizing-modernizr">Modernizr</a>
-				</li>
-				<li>
 					- <a href="#Customizing-extending">Writing a New Polyfill</a>
 				</li>
 			</ul>
@@ -143,7 +139,7 @@
 			</p>
 
 			<p>
-				Webshim depends on <a href="http://jquery.com/">jQuery</a> and <a href="http://www.modernizr.com/">Modernizr</a>.
+				Webshim depends on <a href="http://jquery.com/">jQuery</a>.
 			</p>
 
 			<h2 id="introduction" class="header">Introduction</h2>
@@ -169,7 +165,6 @@
 			</p>
 <pre><code class="language-markup">
 &lt;script src="js/jquery.js"&gt;&lt;/script&gt;
-&lt;script src="js/modernizr-custom.js"&gt;&lt;/script&gt;
 &lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
   
 &lt;script&gt;
@@ -594,7 +589,7 @@ $(document).trigger('updateshadowdom');
 
 			<h2 id="Shiv">HTML5 shiv and innershiv</h2>
 			<p>
-				IE8- isn't capable of rendering HTML5 elements. Webshims lib in combination with Modernizr automatically fixes this issue and adds WAI-ARIA landmarks to enable accessibility of HTML5.
+				IE8- isn't capable of rendering HTML5 elements. Webshims lib in combination with Modernizr or HTML5shiv automatically fixes this issue and adds WAI-ARIA landmarks to enable accessibility of HTML5.
 			</p>
 
 			<h3 id="Shiv-dynamic-html5">Dynamically adding HTML5 markup</h3>
@@ -725,9 +720,9 @@ webshim.ready('es5', function(){
 				, <code class="i">
 					webshim.getOwnPropertyDescriptor</code>
 				and corresponding support flags: <code class="i">
-					Modernizr.objectAccessor</code>
+					webshim.support.objectAccessor</code>
 				(true in all modern Browsers including IE9, getters and setters can be used on all objects) and <code class="i">
-					Modernizr.advancedObjectProperties</code>
+				webshim.support.advancedObjectProperties</code>
 				(true in FF4, IE9, Chrome 10..., the full ES5 specification of defineProperty is implemented (including writeable, enumerable and configurable).
 			</p>
 			<h4>webshim.objectCreate(proto [, propertiesObject, options ])</h4>
@@ -1671,7 +1666,6 @@ webshim.polyfill('forms mediaelement');
 	+-- scripts
 		+-- vendor
 			|-- jquery.js
-			|-- modernizr.custom.js
 		+-- shims
 		|-- main.js
 		|-- require.js
@@ -1694,7 +1688,6 @@ webshim.polyfill('forms mediaelement');
 			|-- minified
 	+-- scripts
 		+-- vendor
-			|-- modernizr.custom.js
 	|-- main.js (requires polyfiller.js from the **dev** folder)
 	|-- require.js
 	+-- optimized-scripts (folder with optimized scripts)
@@ -1704,15 +1697,6 @@ webshim.polyfill('forms mediaelement');
 
 
 			<h2 id="Customizing"> Customizing Webshim</h2>
-
-			<h3 id="Customizing-modernizr">Modernizr</h3>
-			<p>
-				Webshims lib does not need every Modernizr test and supports creating a <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes">custom Modernizr build</a>. <!-- (Webshims lib uses <a href="http://requirejs.org/">requireJS</a> or <a href="https://gist.github.com/aFarkas/936413">sssl</a> as a script loader, if this is included, if not it uses Modernizr.load/yepnope.)-->
-			</p>
-
-			<p>
-				<small> <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes"> Modernizr detections used by webshim</a> </small>
-			</p>
 
 			<h3 id="Customizing-extending">Writing a New Polyfill</h3>
 

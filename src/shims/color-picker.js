@@ -15,9 +15,7 @@
  */ 
 (function ($, version) {
 	"use strict";
-	if(!window.Modernizr || !('opacity' in Modernizr) || !('csstransitions' in Modernizr)){
-		$('html').addClass(('opacity' in document.documentElement.style) ? 'opacity' : 'no-opacity');
-	}
+
 	var mPrecision = function (value, precision) {
 		if (precision === undefined) precision = 0;
 		return Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision);

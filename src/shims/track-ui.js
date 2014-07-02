@@ -1,5 +1,5 @@
 (function($){
-	if(Modernizr.texttrackapi && document.addEventListener){
+	if(webshims.support.texttrackapi && document.addEventListener){
 		var trackOptions = webshims.cfg.track;
 		var trackListener = function(e){
 			$(e.target).filter('track').each(changeApi);
@@ -41,13 +41,12 @@
 webshims.register('track-ui', function($, webshims, window, document, undefined){
 	"use strict";
 	var options = webshims.cfg.track;
-	var enterE = {type: 'enter'};
-	var exitE = {type: 'exit'};
+	var support = webshims.support;
 	//descriptions are not really shown, but they are inserted into the dom
 	var showTracks = {subtitles: 1, captions: 1, descriptions: 1};
 	var mediaelement = webshims.mediaelement;
 	var usesNativeTrack =  function(){
-		return !options.override && Modernizr.texttrackapi;
+		return !options.override && support.texttrackapi;
 	};
 	
 	var trackDisplay = {
@@ -176,7 +175,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 			track._lastFoundCue = {index: 0, time: 0};
 		}
 		
-		if(Modernizr.texttrackapi && !options.override && !track._shimActiveCues){
+		if(support.texttrackapi && !options.override && !track._shimActiveCues){
 			track._shimActiveCues = mediaelement.createCueList();
 		}
 		

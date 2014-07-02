@@ -1,8 +1,8 @@
 webshims.register('mediaelement-native-fix', function($, webshims, window, document, undefined){
 
-
+	var support = webshims.support;
 	var fixBuffered = (function(){
-		if(Modernizr.videoBuffered){return $.noop;}
+		if(support.videoBuffered){return $.noop;}
 
 		var getBufferedData = function(elem){
 			var data = webshims.data(elem, 'mediaelementBuffered');
@@ -102,7 +102,7 @@ webshims.register('mediaelement-native-fix', function($, webshims, window, docum
 	})();
 
 	var fixProgressEvent = (function(){
-		if(Modernizr.mediaDefaultMuted){return $.noop;}
+		if(support.mediaDefaultMuted){return $.noop;}
 
 
 		return function(){
