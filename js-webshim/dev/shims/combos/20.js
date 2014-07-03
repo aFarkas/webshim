@@ -3333,7 +3333,8 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		lastCalledTime: -500,
 		_ppFlag: undefined,
 		_calledMeta: false,
-		lastDuration: 0
+		lastDuration: 0,
+		_timeDif: 0.3
 	}, getProps, getSetProps);
 	
 	
@@ -3475,6 +3476,14 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				if(!data._calledMeta){
 					trigger(data._elem, 'loadedmetadata');
 				}
+
+				if(data.duration > 1 && data.duration < 140){
+					data._timeDif = 0.2;
+				} else if(data.duration < 600) {
+					data._timeDif = 0.25;
+				} else {
+					data._timeDif = 0.30;
+				}
 			}
 			data._calledMeta = true;
 		},
@@ -3497,8 +3506,8 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			if(data.seeking){
 				callSeeked(data);
 			}
-			
-			if(timeDif > 0.19 || timeDif < -0.19){
+
+			if(timeDif > data._timeDif || timeDif < -0.3){
 				data.lastCalledTime = data.currentTime;
 				$.event.trigger('timeupdate', undefined, data._elem, true);
 			}
