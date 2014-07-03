@@ -2502,6 +2502,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					}
 				} else {
 					data.currentTime = jaris.position;
+
 					if(data.api){
 						if(!data._calledMeta && isNaN(jaris.duration) && data.duration != jaris.duration && isNaN(data.duration)){
 							onEvent.onDataInitialized(jaris, data);
@@ -2784,10 +2785,10 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			if(elems && (len = elems.length) && loadedSwf){
 				
 				for(i = 0; i < len; i++){
-					if(flashNames[elems[i].nodeName] && 'api_pause' in elems[i]){
+					if(flashNames[elems[i].nodeName] && 'api_destroy' in elems[i]){
 						loadedSwf--;
 						try {
-							elems[i].api_pause();
+							elems[i].api_destroy();
 							if(elems[i].readyState == 4){
 								for (prop in elems[i]) {
 									if (!noRemove[prop] && !objElem[prop] && typeof elems[i][prop] == "function") {
@@ -2795,7 +2796,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 									}
 								}
 							}
-						} catch(er){}
+						} catch(er){console.log(er);}
 					}
 				}
 				

@@ -114,6 +114,8 @@ class Player extends EventDispatcher
 	public var _showLoader:Bool;
 	private var _preLoading:Bool;
 	private var _requestedPlay:Bool;
+	private var _requestedLoad:Bool;
+	private var _allowPreloadedPlay:Bool;
 	private var _hasPoster:Bool;
 	public var lastSeekTime:Float;
 	//}
@@ -133,6 +135,7 @@ class Player extends EventDispatcher
 		_bufferTime = 10;
 		_fullscreen = false;
 		_mediaLoaded = false;
+		_requestedLoad = false;
 		_hideMouseTimer = new Timer(1500);
 		_checkAudioTimer = new Timer(100);
 		_seekPoints = new Array();
@@ -157,7 +160,7 @@ class Player extends EventDispatcher
 		_hasPoster = false;
 		_showLoader = true;
 		lastSeekTime = 0;
-		
+		_allowPreloadedPlay = false;
 		_naturalWidth =  0;
 		_naturalHeight = 0;
 		//}
@@ -922,49 +925,23 @@ class Player extends EventDispatcher
 	 */
 	public function preload():Void
 	{
-		if (!_mediaLoaded && _mediaSource != "" && !_requestedPlay) {
+		if (!_requestedLoad && !_mediaLoaded && _mediaSource != "" && !_requestedPlay) {
 			var isVideo = (_type == InputType.VIDEO && (_streamType == StreamType.FILE || _streamType == StreamType.PSEUDOSTREAM));
 			var isAudio = (_type == InputType.AUDIO && _streamType == StreamType.FILE);
 			
 			if(isVideo || isAudio){
 				stopAndClose();
 				
+				load(_mediaSource, _type, _streamType, _server, true);
 				_stopped = false;
 				_mediaLoaded = false;
 				_firstLoad = true;
 				_startTime = 0;
-				_downloadCompleted = false;			
+				_downloadCompleted = false;
 				_preLoading = true;
+				_allowPreloadedPlay = true;
 			}
 			
-			
-			if (isVideo)
-			{	
-				_connection.connect(null);
-				_stream = new NetStream(_connection);
-				_stream.addEventListener(NetStatusEvent.NET_STATUS, onNetStatus);
-				_stream.bufferTime = _bufferTime;
-				_stream.play(_mediaSource);
-				_stream.client = this;
-				pause();
-				if (!_hasPoster) {
-					_video.attachNetStream(_stream);
-				}
-				
-			}else if(isAudio)
-			{
-				_sound.load(new URLRequest(_mediaSource));
-				
-				try {
-					_soundChannel = _sound.play();
-					_soundChannel.stop();
-					
-					_isPlaying = false;
-					_firstLoad = false;
-					_mediaLoaded = true;
-				
-				} catch (error:IOError) { }
-			}
 		}
 	}
 	
@@ -974,11 +951,12 @@ class Player extends EventDispatcher
 	 * Loads a video and starts playing it
 	 * @param	video video url to load
 	 */
-	public function load(source:String, type:String="video", streamType:String="file", server:String=""):Void
+	public function load(source:String, type:String="video", streamType:String="file", server:String="", preload:Bool=false):Void
 	{
 		
-		if(!_mediaLoaded && (_streamType != StreamType.YOUTUBE || !_loadedYoutube)){
+		if(!_requestedLoad && !_mediaLoaded && (_streamType != StreamType.YOUTUBE || !_loadedYoutube)){
 			stopAndClose();
+			
 			
 			_type = type;
 			_streamType = streamType;
@@ -990,8 +968,11 @@ class Player extends EventDispatcher
 			_downloadCompleted = false;
 			_seekPoints = new Array();
 			_server = server;
+			_requestedLoad = true;
 			
-			callEvents(PlayerEvents.BUFFERING);
+			if (!preload) {
+				callEvents(PlayerEvents.BUFFERING);
+			}
 			
 			if (_streamType == StreamType.YOUTUBE)
 			{
@@ -1016,6 +997,14 @@ class Player extends EventDispatcher
 				_stream.play(source);
 				_stream.client = this;
 				_video.attachNetStream(_stream);
+				
+				if (preload) {
+					pause();
+					_isPlaying = false;
+				}
+				if (!preload || !_hasPoster) {
+					_video.attachNetStream(_stream);
+				}
 			}
 			else if (_streamType == StreamType.RTMP)
 			{
@@ -1026,7 +1015,13 @@ class Player extends EventDispatcher
 				_sound.load(new URLRequest(source));
 				try {
 					_soundChannel = _sound.play();
-					_isPlaying = true;
+					
+					if (preload) {
+						_soundChannel.stop();
+						_isPlaying = false;	
+					} else {
+						_isPlaying = true;
+					}
 					
 					_firstLoad = false;
 					
@@ -1042,12 +1037,15 @@ class Player extends EventDispatcher
 	 */
 	public function stopAndClose():Void
 	{
-		if (_mediaLoaded)
+		if (_mediaLoaded || _requestedLoad)
 		{
+			_requestedLoad = false;
 			_mediaLoaded = false;
 			_isPlaying = false;
 			_stopped = true;
 			_startTime = 0;
+			_allowPreloadedPlay = false;
+			
 			
 			if (_streamType == StreamType.YOUTUBE)
 			{
@@ -1230,7 +1228,7 @@ class Player extends EventDispatcher
 		_preLoading = false;
 		_requestedPlay = true;
 		
-		if (_mediaLoaded)
+		if (_mediaLoaded || _allowPreloadedPlay)
 		{
 			if (_mediaEndReached)
 			{

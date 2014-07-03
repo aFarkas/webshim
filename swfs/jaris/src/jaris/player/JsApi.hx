@@ -117,6 +117,7 @@ class JsApi extends MovieClip {
 		ExternalInterface.addCallback("api_muted", setMuted);
 		ExternalInterface.addCallback("api_controls", setControls);
 		ExternalInterface.addCallback("api_preload", startLoading);
+		ExternalInterface.addCallback("api_destroy", destroy);
 	
 		
 		addJsListener('on*', 'jQuery.webshims.mediaelement.jarisEvent.' + parameters.evtId);
@@ -229,6 +230,12 @@ class JsApi extends MovieClip {
 	private function setPause():Void
 	{
 		_player.pause();
+	}
+	
+	private function destroy():Void
+	{
+		_player.pause();
+		_player.stopAndClose();
 	}
 	
 	/**
