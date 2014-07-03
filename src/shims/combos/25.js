@@ -1749,7 +1749,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			return null;
 		}
 		var data = webshims.data(elem, 'mediaelement');
-		return (data && data.isActive== 'third') ? data : null;
+		return (data && data.isActive == 'third') ? data : null;
 	};
 	
 	var trigger = function(elem, evt){

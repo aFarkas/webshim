@@ -68,7 +68,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			return null;
 		}
 		var data = webshims.data(elem, 'mediaelement');
-		return (data && data.isActive== 'third') ? data : null;
+		return (data && data.isActive == 'third') ? data : null;
 	};
 	
 	var trigger = function(elem, evt){

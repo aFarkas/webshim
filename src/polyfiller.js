@@ -907,7 +907,7 @@
 			}
 			return ('swfmini' in window);
 		},
-		c: [16, 7, 2, 8, 1, 12, 19, 23]
+		c: [16, 7, 2, 8, 1, 12, 23]
 	});
 	modules.swfmini.test();
 	
@@ -920,7 +920,6 @@
 	// webshims lib uses a of http://github.com/kriskowal/es5-shim/ to implement
 	addPolyfill('es5', {
 		test: !!(support.ES5 && Function.prototype.bind),
-		c: [18, 19, 20, 32],
 		d: ['sizzle']
 	});
 	
@@ -928,7 +927,7 @@
 		f: DOMSUPPORT,
 		noAutoCallback: true,
 		d: ['es5'],
-		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 19, 25, 20, 31, 34]
+		c: [16, 7, 2, 15, 30, 3, 8, 4, 9, 10, 25, 31, 34]
 	});
 
 	//<picture
@@ -1136,7 +1135,7 @@
 			},
 			methodNames: ['stepUp', 'stepDown'],
 			d: ['forms', DOMSUPPORT],
-			c: [6, 5, 18, 17, 14, 28, 29, 32, 33]
+			c: [6, 5, 17, 14, 28, 29, 33]
 		});
 		
 		addModule('range-ui', {
@@ -1146,7 +1145,7 @@
 				return !!$fn.rangeUI;
 			},
 			d: ['es5'],
-			c: [6, 5, 9, 10, 18, 17, 11]
+			c: [6, 5, 9, 10, 17, 11]
 		});
 		
 		addPolyfill('form-number-date-ui', {
@@ -1169,7 +1168,7 @@
 				}
 	//			,replaceUI: false
 			},
-			c: [6, 5, 9, 10, 18, 17, 11]
+			c: [6, 5, 9, 10, 17, 11]
 		});
 		
 		addPolyfill('form-datalist', {
@@ -1182,7 +1181,7 @@
 				return support.datalist && !formOptions.fD;
 			},
 			d: ['form-core', DOMSUPPORT],
-			c: [16, 7, 6, 2, 9, 15, 30, 31, 28, 32, 33]
+			c: [16, 7, 6, 2, 9, 15, 30, 31, 28, 33]
 		});
 	})();
 	//>
@@ -1235,7 +1234,7 @@
 			},
 			methodNames: ['play', 'pause', 'canPlayType', 'mediaLoad:load'],
 			d: ['swfmini'],
-			c: [16, 7, 2, 8, 1, 12, 13, 19, 20, 23]
+			c: [16, 7, 2, 8, 1, 12, 13, 23]
 		});
 		
 		
@@ -1254,7 +1253,7 @@
 				}
 				return !( options.preferFlash && swfmini.hasFlashPlayerVersion('10.0.3') );
 			},
-			c: [21, 19, 25, 20]
+			c: [21, 25]
 		});
 
 
