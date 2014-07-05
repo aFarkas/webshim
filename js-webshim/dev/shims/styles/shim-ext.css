@@ -834,9 +834,7 @@ SASS:
   font-weight: normal;
   font-style: normal;
 }
-.ws-popover-opener > span,
-.ws-popover-opener .ws-color-indicator, .time-input-buttons .ws-popover-opener > span, .time-input-buttons
-.ws-popover-opener .ws-color-indicator {
+.ws-popover-opener > span, .time-input-buttons .ws-popover-opener > span {
   font-family: 'widget';
   speak: none;
   font-style: normal;
@@ -850,13 +848,11 @@ SASS:
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ws-popover-opener > span:before,
-.ws-popover-opener .ws-color-indicator:before {
+.ws-popover-opener > span:before {
   content: "\f073";
 }
 
-.time-input-buttons .ws-popover-opener > span:before, .time-input-buttons
-.ws-popover-opener .ws-color-indicator:before {
+.time-input-buttons .ws-popover-opener > span:before {
   content: "\f017";
 }
 
@@ -944,25 +940,27 @@ span.has-input-buttons {
   height: 16px;
   margin: -8px 0 0 -8px;
 }
-.time-input-buttons .ws-popover-opener > span, .time-input-buttons
-.ws-popover-opener .ws-color-indicator {
-  margin: -7.5px 0 0 -7.5px;
-}
-.color-input-buttons .ws-popover-opener > span, .color-input-buttons
-.ws-popover-opener .ws-color-indicator {
-  background: url(color-picker.png) no-repeat 0 0;
-}
-.color-input-buttons .ws-popover-opener > span:before, .color-input-buttons
 .ws-popover-opener .ws-color-indicator:before {
   content: "";
 }
-.ws-popover-opener > span.ws-color-indicator-bg,
+.color-input-buttons .ws-popover-opener .ws-color-indicator {
+  background: url(color-picker.png) no-repeat 0 0;
+}
+.color-input-buttons .ws-popover-opener .ws-color-indicator:before {
+  content: "";
+}
 .ws-popover-opener .ws-color-indicator.ws-color-indicator-bg {
   background: url(../jpicker/images/preview-opacity.png) no-repeat 0;
 }
-.ws-popover-opener > span.ws-color-indicator,
 .ws-popover-opener .ws-color-indicator.ws-color-indicator {
   background: none;
+}
+.ws-popover-opener .ws-color-indicator.ws-color-indicator:before {
+  content: "";
+}
+
+.time-input-buttons .ws-popover-opener > span {
+  margin: -7.5px 0 0 -7.5px;
 }
 
 input[type="color"] {

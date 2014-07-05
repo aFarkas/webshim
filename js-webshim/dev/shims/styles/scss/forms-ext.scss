@@ -121,7 +121,7 @@ span.has-input-buttons {
 	.ws-is-rtl & {
 		margin: 0 2px 0 0;
 	}
-	
+
 	> span,
 	.ws-color-indicator {
 		display: block;
@@ -131,30 +131,36 @@ span.has-input-buttons {
 		width: 16px;
 		height: 16px;
 		margin: -8px 0 0 -8px;
-		@extend %icon-calendar;
-		
-
-		
-		.time-input-buttons & {
-			@extend %icon-clock;
-			margin: -7.5px 0 0 -7.5px;
-		}
-
-
-		.color-input-buttons & {
-			&:before {
-				content: "";
-			}
-			background: url(color-picker.png) no-repeat 0 0;
-		}
-
-		&.ws-color-indicator-bg {
-			background: url(../jpicker/images/preview-opacity.png) no-repeat 0;
-		}
-		&.ws-color-indicator {
-			background: none;
-		}
 	}
+
+	> span {
+		@extend %icon-calendar;
+	}
+}
+
+.color-input-buttons .ws-popover-opener > span {
+
+	background: url(color-picker.png) no-repeat 0 0;
+
+	&:before {
+		content: "";
+	}
+
+	.color-input-buttons & {
+		&:before {
+			content: "";
+		}
+
+	}
+
+	&.ws-color-indicator-bg {
+		background: url(../jpicker/images/preview-opacity.png) no-repeat 0;
+	}
+
+}
+.time-input-buttons .ws-popover-opener > span {
+	@extend %icon-clock;
+	margin: -7.5px 0 0 -7.5px;
 }
 
 input[type="color"] {
