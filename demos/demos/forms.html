@@ -2,8 +2,8 @@
 <html>
 
 	<head>
+		<meta http-equiv="x-ua-compatible" content="IE=edge" >
 		<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="chrome=1" />
 		<meta name="viewport" content="width=device-width" />
 		<title>Webshim - foms polyfill</title>
 		
@@ -33,7 +33,7 @@
 
 		<div id="sidebar" class="interface">
 
-			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.14.3</span>)</span></a>
+			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.14.4-RC1</span>)</span></a>
 			<ul class="toc_section">
 				<li>
 					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
@@ -232,9 +232,9 @@ $('input.foo').val('bar').trigger('updatevalidation');
 </code></pre>
 			<p>Often a developer wants to only update the validation UI, if the field already was marked as an invalid or valid. This can be done by the following code:</p>
 <pre><code class="language-javascript">
-$('input.foo').val('bar').filter('.user-error, .user-success').trigger('updatevalidation');
+$('input.foo').val('bar').getShadowElement().filter('.user-error, .user-success').trigger('updatevalidation');
 </code></pre>
-			<p>Or reseted by triggering the <code>resetvalidation</code> event on the input or the form element.</p>
+			<p>The UI can be reseted by triggering the <code>resetvalidation</code> event on the input or the form element.</p>
 			<h2 id="Custom-validity">Custom-validity</h2>
 			<p>There are 3 ways to add/use custom validation constraints with HTML5.</p>
 			<ul>
@@ -333,7 +333,7 @@ $('.only-foo').on('validatevalue', function(e, extra){
 			<h4>Updating validation constraints without affecting the validation UI</h4>
 			<p>In case a script changes a value custom constraints might need to be updated. This can be done either with the <code class="i">updatevalidation</code> or <code class="i">updatecustomvalidity</code> event.</p>
 <pre><code class="language-javascript">
-	$('input.foo').val('bar').trigger('updatecustomvalidity');
+$('input.foo').val('bar').trigger('updatecustomvalidity');
 </code></pre>
 			<p>While the <code>updatecustomvalidity</code> event will update all custom rules on the target element, the <code>updatevalidation</code> event additionally also updates the validation UI.</p>
 

@@ -195,7 +195,7 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 		return this.each(function(){
 
 
-			var mediaUpdateFn, canPlay, removeCanPlay, canplayTimer, lastState, stopEmptiedEvent;
+			var mediaUpdateFn, canPlay, removeCanPlay, canplayTimer, lastState, stopEmptiedEvent, forceRender;
 			var media = $('audio, video', this).eq(0);
 			var base = $(this);
 
@@ -207,7 +207,9 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 			mediaData.player = base;
 			mediaData.media = media;
 			if(!jmeData.media){
-
+				forceRender = function(){
+					base[0].className = base[0].className;
+				};
 				removeCanPlay = function(){
 					media.off('canplay', canPlay);
 					clearTimeout(canplayTimer);
@@ -266,6 +268,7 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 					if(state){
 						lastState = state;
 						base.attr('data-state', state);
+						setTimeout(forceRender);
 					}
 				};
 
@@ -811,7 +814,7 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 
 	webshims.ready(webshims.cfg.mediaelement.plugins.concat(['mediaelement', 'jme-base']), function(){
 		if(!options.barTemplate){
-			options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box">{{playlist-prev}}{{playlist-next}}</div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="chapters-container"><div class="chapters-controls mediamenu-wrapper">{{chapters}}</div></div><div class="subtitle-container mediamenu-wrapper"><div class="subtitle-controls">{{captions}}</div></div><div class="mediaconfig-container"><div class="mediaconfig-controls mediamenu-wrapper">{{mediaconfigmenu}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
+			options.barTemplate = '<div class="play-pause-container">{{play-pause}}</div><div class="playlist-container"><div class="playlist-box"><div class="playlist-button-container">{{playlist-prev}}</div><div class="playlist-button-container">{{playlist-next}}</div></div></div><div class="currenttime-container">{{currenttime-display}}</div><div class="progress-container">{{time-slider}}</div><div class="duration-container">{{duration-display}}</div><div class="mute-container">{{mute-unmute}}</div><div class="volume-container">{{volume-slider}}</div><div class="chapters-container"><div class="chapters-controls mediamenu-wrapper">{{chapters}}</div></div><div class="subtitle-container mediamenu-wrapper"><div class="subtitle-controls">{{captions}}</div></div><div class="mediaconfig-container"><div class="mediaconfig-controls mediamenu-wrapper">{{mediaconfigmenu}}</div></div><div class="fullscreen-container">{{fullscreen}}</div>';
 		}
 		if(!options.barStructure){
 			options.barStructure = '<div class="jme-media-overlay"></div><div class="jme-controlbar'+ noVolumeClass +'" tabindex="-1"><div class="jme-cb-box"></div></div>';

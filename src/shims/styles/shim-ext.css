@@ -1,12 +1,3 @@
-.ws-custom-file {
-  zoom: 1;
-}
-.ws-custom-file:before, .ws-custom-file:after {
-  display: table;
-  clear: both;
-  content: ' ';
-}
-
 .ws-important-hide {
   display: none !important;
   visibility: hidden !important;
@@ -611,7 +602,7 @@ summary.summary-has-focus {
 
 .ws-custom-file {
   position: relative;
-  zoom: 1;
+  overflow: hidden;
 }
 .ws-custom-file > button,
 .ws-custom-file > input {
@@ -663,33 +654,44 @@ summary.summary-has-focus {
   background: #eee;
   color: #999;
 }
-.ws-custom-file > input[type="file"] {
+.ws-custom-file > input[type="file"],
+.ws-custom-file .ws-coverfile {
   position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  height: 100%;
-  width: 100%;
+  top: -1%;
+  left: -3%;
+  bottom: -1%;
+  right: -1%;
+  height: 102%;
+  width: 104%;
+  z-index: 9;
+  padding: 0;
+  margin: 0;
+  border: 0px none;
+  color: transparent;
+  background: transparent;
+}
+.ws-custom-file > input[type="file"] {
   filter: alpha(opacity=0);
   opacity: 0.00001;
-  z-index: 9;
 }
 .ws-custom-file > input[type="file"][disabled] {
   cursor: default;
   cursor: not-allowed;
 }
+.ws-custom-file .ws-coverfile {
+  background: url(transparent.png);
+  z-index: 10;
+  cursor: pointer;
+}
+[readonly] + .ws-custom-file .ws-coverfile {
+  cursor: default;
+}
+[disabled] + .ws-custom-file .ws-coverfile {
+  cursor: default;
+  cursor: not-allowed;
+}
 .ws-custom-file > .moxie-shim {
   z-index: 20;
-}
-
-.ws-custom-file {
-  zoom: 1;
-}
-.ws-custom-file:before, .ws-custom-file:after {
-  display: table;
-  clear: both;
-  content: ' ';
 }
 
 /* style picker api */

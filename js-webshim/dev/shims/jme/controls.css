@@ -232,8 +232,10 @@
   font-size: 400%;
   color: #f6f6f6;
   text-align: center;
+  background: url(../styles/transparent.png) \9;
 }
 .mediaplayer > .jme-media-overlay:before {
+  content: '\0020';
   position: absolute;
   display: block;
   width: 1em;
@@ -241,6 +243,7 @@
   top: 50%;
   left: 50%;
   margin: -0.5em 0 0 -0.5em;
+  background: url(../styles/transparent.png) \9;
   text-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
 }
 .mediaplayer[data-playersize="x-large"] > .jme-media-overlay {
@@ -261,20 +264,31 @@
 .mediaplayer[data-state="idle"] {
   cursor: pointer;
 }
+.mediaplayer[data-state="idle"] > .jme-media-overlay {
+  background-position: 1px 1px;
+}
 .mediaplayer[data-state="idle"].has-ytposter.no-backgroundsize > .jme-media-overlay:before {
   content: "";
+  background-position: 2px 2px;
 }
 .mediaplayer[data-state="ended"] {
   cursor: pointer;
 }
+.mediaplayer[data-state="ended"] > .jme-media-overlay {
+  background-position: 3px 3px;
+}
 .mediaplayer[data-state="waiting"] {
   cursor: default;
+}
+.mediaplayer[data-state="waiting"] > .jme-media-overlay {
+  background-position: 4px 4px;
 }
 .mediaplayer[data-state="waiting"] > .jme-media-overlay:before {
   animation-name: jmespin;
   animation-iteration-count: infinite;
   animation-duration: 1100ms;
   animation-timing-function: linear;
+  background-position: 5px 5px;
 }
 .mediaplayer[data-state="playing"][data-useractivity="false"] .jme-controlbar {
   opacity: 0;
@@ -345,11 +359,9 @@
 .mediaplayer .playlist-container {
   display: none;
 }
-.mediaplayer.has-playlist .playlist-container {
+.mediaplayer .playlist-box,
+.mediaplayer .playlist-button-container, .mediaplayer.has-playlist .playlist-container {
   display: table-cell;
-}
-.mediaplayer .playlist-box {
-  width: 3.09em;
 }
 .mediaplayer .no-volume-api .volume-container,
 .mediaplayer .no-volume-api .mute-container {

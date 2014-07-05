@@ -6,12 +6,14 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	var hasNative = support.formvalidation && !webshims.bugs.bustedValidity;
 	var chromeBugs = isWebkit && hasNative;
 	var ua = navigator.userAgent;
+	var isIE = ua.indexOf('MSIE') != -1;
 	var webkitVersion = chromeBugs && parseFloat((ua.match(/Safari\/([\d\.]+)/) || ['', '999999'])[1], 10);
 	
 	var iVal = options.iVal;
 
 	var invalidClass = iVal.errorClass || (iVal.errorClass = 'user-error');
 	var validClass = iVal.successClass || (iVal.successClass = 'user-success');
+	var markedClases = '.'+validClass+', .'+invalidClass;
 	
 	var invalidWrapperClass = iVal.errorWrapperClass || (iVal.errorWrapperClass = 'ws-invalid');
 	var successWrapperClass = iVal.successWrapperClass || (iVal.successWrapperClass = 'ws-success');
@@ -186,7 +188,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	};
 
 	if('validityUIEvents' in options){
-		webshims.warn('validityUIEvents was renamed to iVal.events');
+		webshims.error('validityUIEvents was renamed to iVal.events');
 		iVal.events = options.validityUIEvents;
 	}
 	if('events' in iVal){
@@ -209,11 +211,16 @@ webshims.register('form-validation', function($, webshims, window, document, und
 
 	$(document.body || 'html')
 		.on(iVal.events+'refreshvalidityui updatevalidation.webshims invalid', switchValidityClass)
+		.on('refreshvalidationui.webshims', function(e){
+			if($(e.target).getShadowElement().is(markedClases)){
+				switchValidityClass({type: 'updatevalidation', target: e.target});
+			}
+		})
 		.on('reset resetvalidation.webshims resetvalui', function(e){
 			var noIValTrigger;
 			var elems = $(e.target);
 			if(e.type == 'resetvalui'){
-				webshims.warn('resetvalui was renamed to resetvalidation');
+				webshims.error('resetvalui was renamed to resetvalidation');
 			}
 			if(elems.is('form, fieldset')){
 				if(elems[0].nodeName.toLowerCase() == 'form'){
@@ -999,6 +1006,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 
 	function customFile(){
 		if($.data(this, 'wsCustomFile')){return;}
+
 		var map = Array.prototype.map;
 		var $module = $(this);
 		var $file = $('input[type="file"]', $module);
@@ -1015,13 +1023,28 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			}
 		};
 
+
 		$.data(this, 'wsCustomFile', {showSelected: showSelected});
 		$('button', $module).attr('tabindex', '-1');
 
-		$file.on('change.webshim', showSelected).each(showSelected);
-		$file.jProp('form').on('reset', function(){
-			setTimeout(showSelected);
-		});
+		$file
+			.on('change.webshim', showSelected)
+			.each(showSelected)
+			.jProp('form')
+			.on('reset', function(){
+				setTimeout(showSelected);
+			})
+		;
+		if(isIE){
+			$('<div class="ws-coverfile" />')
+				.insertAfter($file)
+				.on('click.webshim', function(e){
+					e.stopImmediatePropagation();
+					$file.trigger('click');
+				})
+			;
+		}
+
 	}
 
 	webshims.addReady(function(context, contextElem){

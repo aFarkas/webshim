@@ -1,3 +1,13 @@
+upcomming Release 1.14.4
+----------
+
+- replaced promise  with [es6-shim](https://github.com/paulmillr/es6-shim)(currently most things aren't feature detected, so only promise can be used safely)
+- removed dependency to Modernizr (still needed html5shiv or Modernizr to use semantic elements like section/article/main etc.), but not needed for video/audio/form and so on
+- improved runtime and network performance for mediaelement flash fallback
+- added track[kind="chapters"] support to mediaelement UI
+- added alternate-media plugin for mediaelement implementation use as quality switch or other alternative media sources (switch video with or without sign language or switch videos with different audiotracks and so on.)
+- fix IE issues with custom styleable filechooser
+
 Release 1.14.3
 ----------
 - added new language files (zh-TW and fa)

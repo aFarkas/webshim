@@ -75,7 +75,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 				return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required'));
 			},
 			"user-error": function(elem){
-				return ($.prop(elem, 'willValidate') && $(elem).hasClass('user-error'));
+				return ($.prop(elem, 'willValidate') && $(elem).getShadowElement().hasClass((options.iVal.errorClass || 'user-error')));
 			},
 			"optional-element": function(elem){
 				return !!($.prop(elem, 'willValidate') && $.prop(elem, 'required') === false);

@@ -620,9 +620,8 @@ summary.summary-has-focus {
 }
 
 .ws-custom-file {
-	@extend %clearfix;
 	position: relative;
-	zoom: 1;
+	overflow: hidden;
 
 	> button,
 	> input {
@@ -691,24 +690,46 @@ summary.summary-has-focus {
 		color: #999;
 	}
 
+	> input[type="file"],
+	.ws-coverfile {
+		position: absolute;
+		top: -1%;
+		left: -3%;
+		bottom: -1%;
+		right: -1%;
+		height: 102%;
+		width: 104%;
+		z-index: 9;
+		padding: 0;
+		margin: 0;
+		border: 0px none;
+		color: transparent;
+		background: transparent;
+	}
 
 	> input[type="file"] {
-		position: absolute;
-		top: 0;
-		left: 0;
-		bottom: 0;
-		right: 0;
-		height: 100%;
-		width: 100%;
 		filter: alpha(opacity=0);
 		opacity: 0.00001;
-		z-index: 9;
 
 		&[disabled] {
 			cursor: default;
 			cursor: not-allowed;
 		}
 	}
+	.ws-coverfile {
+		background: url(transparent.png);
+		z-index: 10;
+		cursor: pointer;
+
+		[readonly] + & {
+			cursor: default;
+		}
+		[disabled] + & {
+			cursor: default;
+			cursor: not-allowed;
+		}
+	}
+
 
 	> .moxie-shim {
 		z-index: 20;

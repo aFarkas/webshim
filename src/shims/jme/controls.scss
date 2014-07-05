@@ -144,8 +144,11 @@ $browser-context: 16; // Default
 		font-size: 400%;
 		color: #f6f6f6;
 		text-align: center;
+		background: url(../styles/transparent.png)\9;
+
 
 		&:before {
+			content: '\0020';
 			position: absolute;
 			display: block;
 			width: 1em;
@@ -153,6 +156,7 @@ $browser-context: 16; // Default
 			top: 50%;
 			left: 50%;
 			margin: -0.5em 0 0 -0.5em;
+			background: url(../styles/transparent.png)\9;
 			text-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
 		}
 	}
@@ -185,10 +189,12 @@ $browser-context: 16; // Default
 
 		> .jme-media-overlay {
 			@extend %icon-play-circle;
+			background-position: 1px 1px;
 		}
 
 		&.has-ytposter.no-backgroundsize > .jme-media-overlay:before {
 			content: "";
+			background-position: 2px 2px;
 		}
 	}
 
@@ -196,6 +202,7 @@ $browser-context: 16; // Default
 		cursor: pointer;
 		> .jme-media-overlay {
 			@extend %icon-loop;
+			background-position: 3px 3px;
 		}
 	}
 
@@ -203,12 +210,14 @@ $browser-context: 16; // Default
 		cursor: default;
 		> .jme-media-overlay {
 			@extend %icon-spinner;
+			background-position: 4px 4px;
 
 			&:before {
 				animation-name: jmespin;
 				animation-iteration-count: infinite;
 				animation-duration: 1100ms;
 				animation-timing-function: linear;
+				background-position: 5px 5px;
 			}
 		}
 	}
@@ -326,12 +335,10 @@ $browser-context: 16; // Default
 		display: none;
 	}
 
+	.playlist-box,
+	.playlist-button-container,
 	&.has-playlist .playlist-container {
 		display: table-cell;
-	}
-
-	.playlist-box {
-		width: 3.09em;
 	}
 
 	.playlist-prev {

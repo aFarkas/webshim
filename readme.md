@@ -65,6 +65,12 @@ Installation and Usage
  [More information and demos](http://aFarkas.github.com/webshim/demos/index.html).
 
 
+ Download via bower
+ ------------------
+
+ ``bower install webshim --save-dev``
+
+
 License
 ---------------------------------------
 

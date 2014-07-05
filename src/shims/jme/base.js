@@ -195,7 +195,7 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 		return this.each(function(){
 
 
-			var mediaUpdateFn, canPlay, removeCanPlay, canplayTimer, lastState, stopEmptiedEvent;
+			var mediaUpdateFn, canPlay, removeCanPlay, canplayTimer, lastState, stopEmptiedEvent, forceRender;
 			var media = $('audio, video', this).eq(0);
 			var base = $(this);
 
@@ -207,7 +207,9 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 			mediaData.player = base;
 			mediaData.media = media;
 			if(!jmeData.media){
-
+				forceRender = function(){
+					base[0].className = base[0].className;
+				};
 				removeCanPlay = function(){
 					media.off('canplay', canPlay);
 					clearTimeout(canplayTimer);
@@ -266,6 +268,7 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 					if(state){
 						lastState = state;
 						base.attr('data-state', state);
+						setTimeout(forceRender);
 					}
 				};
 

@@ -1,6 +1,6 @@
 {
   "name": "webshim",
-  "version": "1.14.3",
+  "version": "1.14.4-RC1",
   "homepage": "https://github.com/aFarkas/webshim",
   "authors": [
     "aFarkas <info@corrupt-system.de>"
@@ -37,6 +37,8 @@
     "build",
     "src",
     "demos",
+    "js-webshim/dev/extras",
+    "js-webshim/minified/extras",
     "Gruntfile.js",
     "webshims.jquery.json"
   ],

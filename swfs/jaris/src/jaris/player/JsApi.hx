@@ -120,8 +120,8 @@ class JsApi extends MovieClip {
 		ExternalInterface.addCallback("api_destroy", destroy);
 	
 		
-		addJsListener('on*', 'jQuery.webshims.mediaelement.jarisEvent.' + parameters.evtId);
-		ExternalInterface.call('jQuery.webshims.mediaelement.jarisEvent.' + parameters.evtId, { type: 'ready', id: parameters.id } );
+		addJsListener('on*', 'webshim.mediaelement.jarisEvent.' + parameters.evtId);
+		ExternalInterface.call('webshim.mediaelement.jarisEvent.' + parameters.evtId, { type: 'ready', id: parameters.id } );
 		
 	}
 		

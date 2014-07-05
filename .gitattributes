@@ -2,6 +2,8 @@ build/ export-ignore
 grunt-tasks/ export-ignore
 src/ export-ignore
 swfs/ export-ignore
+js-webshim/minified/extras/ export-ignore
+js-webshim/dev/extras/ export-ignore
 tests/ export-ignore
 Gruntfile.js export-ignore
 bower.json export-ignore

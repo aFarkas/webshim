@@ -43,12 +43,12 @@ $(function($){
 					obj[configType[1] == 'type' ? data.cfgtype : 'widgets'] = data.data;
 					code += '<script>\n';
 					code += '//configure before calling webshims.polyfill\n';
-					code += 'webshims.setOptions("'+cfgFeature+'", ';
+					code += 'webshim.setOptions("'+cfgFeature+'", ';
 					code += JSON.stringify(obj, null, '\t') +');';
 					if(cfgFeature == 'forms-ext'){
-						code += '\n\n//webshims.polyfill("forms forms-ext");';
+						code += '\n\n//webshim.polyfill("forms forms-ext");';
 					} else {
-						code += '\n\n//webshims.polyfill("'+ cfgFeature +'");';
+						code += '\n\n//webshim.polyfill("'+ cfgFeature +'");';
 					}
 					code += '\n<\/script>\n';
 				}
