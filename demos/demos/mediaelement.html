@@ -74,8 +74,7 @@
 				padding: 0;
 			}
 		</style>
-		<!-- don't use async if you don't know how to deal with it!!! -->
- 		<script src="//code.jquery.com/jquery-1.11.0.min.js" async=""></script>
+ 		<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 
 		<script src="../../js-webshim/minified/polyfiller.js"></script>
 
@@ -113,7 +112,7 @@
 
 		<div id="sidebar" class="interface">
 
-			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.14.4-RC1</span>)</span></a>
+			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.14.4-RC2</span>)</span></a>
 			<ul class="toc_section">
 				<li>
 					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
@@ -229,7 +228,7 @@ webshim.polyfill('mediaelement');
 </code></pre>
 			<p>While the controls are fully styleable through CSS, the markup can be controlled by changing the <code>barTemplate</code> option:</p>
 
-			<iframe class="fiddle-example" width="100%" height="360" src="http://jsfiddle.net/trixta/5Jwhb/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<div class="fiddle-example" style="height: 360px;" data-src="http://jsfiddle.net/trixta/5Jwhb/embedded/js,result,html,css"></div>
 			<h2 id="Simple-Video-Overlays">Add overlays to the mediaplayer</h2>
 			<p>Adding new overlays to a mediaplayer, for example to add share buttons (like, twitter), a logo or title and credits for a given video or audio source is easy without writing any JS code.</p>
 <pre><code class="language-javascript">
@@ -258,7 +257,7 @@ webshim.polyfill('mediaelement');
 </code></pre>
 
 			<p>Here is a simple example creating a title and a social bookmark/share menu:</p>
-			<iframe class="fiddle-example" width="100%" height="360" src="http://jsfiddle.net/trixta/k5WyV/embedded/result,html,css,js" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<div class="fiddle-example" style="height: 360px;" data-src="http://jsfiddle.net/trixta/k5WyV/embedded/result,html,css,js"></div>
 			<h2 id="Creating-Controls">Creating new Plugins and Controls</h2>
 			<p>Creating new plugins/controls for the jme mediaplayer is quite easy using the <code>$.jme.registerPlugin</code> method. Due to the fact, that jme is loaded async, the plugin registration has to be wrapped inside a <code>webshim.ready('jme', function(){});</code> call.</p>
 			<p>Let's create a control, which jumps the timeline by 10 seconds forward:</p>
@@ -340,7 +339,7 @@ webshim.ready('jme', function(){
 
 			<p>Here you find the full featured running example for a JME controlbar plugin:</p>
 
-			<iframe class="fiddle-example" width="100%" height="360" src="http://jsfiddle.net/trixta/tzg5Y/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<div class="fiddle-example" style="height: 360px;" data-src="http://jsfiddle.net/trixta/tzg5Y/embedded/js,result,html,css"></div>
 
 			<h2 id="existing-plugins">Activating existing plugins</h2>
 			<p>Webshim also comes with some predefined plugins. All plugins can be loaded/activated thourgh the <code>plugins</code> option, which takes an array of plugins to be automatically loaded.</p>

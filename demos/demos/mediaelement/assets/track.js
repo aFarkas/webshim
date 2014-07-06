@@ -153,9 +153,6 @@ if(!$.fn.callProp){
 	$.fn.callProp = $.fn.trigger;
 }
 
-$(window).on('load', function(){
-	$('video').eq(0).callProp('play');
-});
 
 
 

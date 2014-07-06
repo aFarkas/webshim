@@ -121,7 +121,7 @@
 	}
 
 	$.extend(webshims, {
-		version: '1.14.4-RC1',
+		version: '1.14.4-RC2',
 
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
@@ -1214,11 +1214,18 @@
 	(function(){
 		webshims.mediaelement = {};
 		var video = create('video');
+		var track = create('track');
 		support.mediaelement = ('canPlayType' in video);
 		support.texttrackapi = ('addTextTrack' in video);
-		support.track = ('kind' in create('track'));
+		support.track = ('kind' in track);
 
 		create('audio');
+
+		if(!(bugs.track = !support.texttrackapi)){
+			try {
+				bugs.track = !('oncuechange' in video.addTextTrack('metadata'));
+			} catch(e){}
+		}
 
 		addPolyfill('mediaelement-core', {
 			f: 'mediaelement',
@@ -1255,9 +1262,6 @@
 			},
 			c: [21, 25]
 		});
-
-
-		bugs.track = !window.TextTrackCue || !support.texttrackapi;
 
 		addPolyfill('track', {
 			options: {

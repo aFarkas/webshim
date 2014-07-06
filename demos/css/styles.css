@@ -85,7 +85,25 @@ a.download-button {
 	color: #fff;
 	font-family: Arial, serif;
 }
+.fiddle-example {
+    height: 200px;
+    width: 100%;
+    border: none;
+}
 
+div.fiddle-example {
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+div.fiddle-example:before {
+    content: "Click to load fiddle example";
+    display: block;
+    margin: 10px auto;
+    font-size: 120%;
+    font-weight: bold;
+    text-align: center;
+}
 
 div.container p, div.container ul {
 	margin: 20px 0;

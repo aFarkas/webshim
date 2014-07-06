@@ -10,8 +10,7 @@
 		
 		<link href="../css/styles.css" rel="stylesheet" />
 		<link rel="stylesheet" href="../css/prism.css" />
-		<!-- don't use async if you don't know how to deal with it!!! -->
- 		<script src="//code.jquery.com/jquery-1.11.0.min.js" async=""></script>
+ 		<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 
 		<script src="../../js-webshim/minified/polyfiller.js"></script>
 
@@ -33,7 +32,7 @@
 
 		<div id="sidebar" class="interface">
 
-			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.14.4-RC1</span>)</span></a>
+			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.14.4-RC2</span>)</span></a>
 			<ul class="toc_section">
 				<li>
 					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
@@ -153,26 +152,29 @@ webshim.polyfill('forms');
 			<h3 id="Locale-markupMessages"><code class="i">data-errormessage</code> attribute</h3>
 			<p>The used validation message can also be controlled by markup using the <code class="i">data-errormessage</code> attribute.</p>
 			<p>The value of the data-errormessage attribute is either a simple string containing the errormessage or a valid JSON with different keys representing the different HTML5 validity constraints (<code>["valueMissing", "typeMismatch", "patternMismatch", "customError", "tooLong",  "badInput", "rangeUnderflow", "rangeOverflow","stepMismatch"]</code>)</p>
-			<iframe class="fiddle-example" width="100%" height="270" src="http://jsfiddle.net/trixta/YPCQP/embedded/html,result,js" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<div class="fiddle-example" style="height: 270px;" data-src="http://jsfiddle.net/trixta/YPCQP/embedded/html,result,js"></div>
+
 			<p>In case <code class="i">customMessages</code> or <code class="i">lazyCustomMessages</code> are set to true the data-errormessage as a JSON can be also written as flattened data-errormessage-[dashed-key] attribute.</p>
-			<iframe class="fiddle-example" width="100%" height="200" src="http://jsfiddle.net/trixta/YT7m5/embedded/html,result,js" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
-			
+
+			<div class="fiddle-example" data-src="http://jsfiddle.net/trixta/YT7m5/embedded/html,result,js"></div>
+
 			<h3 id="Locale-getErrorMessage"><code class="i">$.getErrorMessage</code> method</h3>
 			<p><code class="i">.getErrorMessage</code> returns the validationMessage of an invalid form field. As an enhancement to the native <code>validationMessage</code> property the return value can be simpler controlled by the developer. It uses the first possible found message set by a) data-errormessage attribute, b) <code class="i">validityMessages</code> object or last c) native/polyfilled <code>validationMessage</code> property.</p>
 			<p><code class="language-javascript">$('input').getErrorMessage();</code></p>
-			<iframe class="fiddle-example" width="100%" height="350" src="http://jsfiddle.net/trixta/6ELuD/embedded/result,js,html" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
-			
+			<div class="fiddle-example" style="height: 350px" data-src="http://jsfiddle.net/trixta/6ELuD/embedded/result,js,html"></div>
+
 			<h2 id="UI-Settings">Customizing UI/UX of form validation</h2>
 			<p>HTML5 constraint form validation implements a very simple UI for form validation. In most cases developers want to enhance this UI. Webshim implementation allows this by using all native form features (<code>noValidate</code> or preventing default behavior of the <code>invalid</code> event), but also gives some pre-build configuration options to implement form validation with a very good user experience and great control over style and behavior.</p>
 			
 			<h3 id="UI-replaceValidationUI"><code class="i">replaceValidationUI</code> and <code class="i">.user-error</code>/<code class="i">.user-success</code></h3>
 			<p>With <code class="i">replaceValidationUI</code> set to true the validation bubble of the browser will be replaced with a webshims popover with the additional class <code>validity-alert</code>. Additionally all form fields can be styled using the classes <code>.user-error</code> and <code>.user-success</code></p>
-			<iframe class="fiddle-example" width="100%" height="200" src="http://jsfiddle.net/trixta/Xp3Vb/embedded/js,css,result,html" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
-			
+
+			<div class="fiddle-example" data-src="http://jsfiddle.net/trixta/Xp3Vb/embedded/js,css,result,html"></div>
+
 			
 			<h3 id="UI-ival">Live form validation <code class="i">iVal</code></h3>
 			<p>The instant form validation (<code class="i">iVal</code> = instant validation) feature of webshims is a simple to use but powerfull and UX enhanced feature. Simply put a <code class="i">ws-validate</code> class to your form element:</p>
-			<iframe class="fiddle-example" width="100%" height="200" src="http://jsfiddle.net/trixta/9859C/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<div class="fiddle-example" data-src="http://jsfiddle.net/trixta/9859C/embedded/html,result,js,css"></div>
 
 			<p>The instant validation feature can be controlled through the <code class="i">iVal</code> option object. The <code class="i">iVal</code> option has the following defaults.</p>
 <pre><code class="language-javascript">
@@ -212,19 +214,19 @@ webshim.setOptions('forms', {
 webshim.polyfill('forms');
 </code></pre>
 			<p>The iVal feature integrates well into different CSS-frameworks like bootstrap or jQuery mobile:</p>
-			<iframe  class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/T29Kx/embedded/result,js,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<div  class="fiddle-example" style="height: 300px;" data-src="http://jsfiddle.net/trixta/T29Kx/embedded/result,js,html,css"></div>
 
 			<h3 id="UI-ivalfieldWrapper">The <code class="i">iVal.fieldWrapper</code> option</h3>
 			<p><code class="i">iVal.fieldWrapper</code> defines a selector, which matches the closest ancestor element to a form field and gets the classes <code>ws-invalid</code> (<code>iVal.errorWrapperClass</code>) or <code>ws-success</code> (<code>iVal.successWrapperClass</code>).</p>
 			<p><code class="i">iVal.fieldWrapper</code> can be used to group multiple form fields to one "validation group" with one errormessage (i.e.: radio buttons or separated telephone fields) or to control the placement of errormessages.</p>
 			<p><strong>Grouping multiple form fields to one validation group</strong> can be achieved with the following code:</p>
-			<iframe  class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/uMA9d/embedded/js,html,result,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<div class="fiddle-example" style="height: 300px;" data-src="http://jsfiddle.net/trixta/uMA9d/embedded/js,html,result,css"></div>
 			<p><code class="i">iVal.fieldWrapper</code> in conjunction with <code class="i">iVal.errorBoxClass</code> (<code>ws-errorbox</code>) can be also used <strong>to place the errormessages</strong>.</p>
 			<p>Normally the <code>ws-errorbox</code> is automatically created and appended to the <code>fieldWrapper</code>. If a <code>ws-errorbox</code> already exists inside of <code>fieldWrapper</code> or is associated with a <code>fieldWrapper</code> using the <code>data-errorbox</code> attribute this <code>ws-errorbox</code> is used.</p>
-			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/SzbJV/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<div class="fiddle-example" style="height: 300px;" data-src="http://jsfiddle.net/trixta/SzbJV/embedded/html,result,js,css"></div>
 <a name="ival-messages" id="ival-messages"></a>
 			<p>Among other ways to <a href="#Locale-validityMessages">control errormessages</a>. Forms matching the <code>iVal.sel</code> can have a more descriptive way to define errormessages. Simply by adding one or more child elements to <code>ws-errorbox</code>. The <code>data-errortype</code> can be used to switch between the different error types. The value of the <code>data-errortype</code> attribute is case-sensitive. All standard <code>validity</code> properties als can be written as dashed classes (i.e.: .value-missing is treated as [data-errortype="valueMissing"]).</p>
-			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/82xUV/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<div class="fiddle-example" style="height: 300px;" data-src="http://jsfiddle.net/trixta/82xUV/embedded/html,result,js,css"></div>
 			<h3>Programatically updating or resetting the validation UI</h3>
 			<p>In case a value was changed, through script the validation UI can be updated by triggering the <code>updatevalidation</code> on the given element:</p>
 <pre><code class="language-javascript">
@@ -269,7 +271,8 @@ webshim.setOptions('forms', { addValidators: true });
 				<li>toggle (optional): reverts the prop-state (only if from-prop equals checked)</li>
 			</ul>
 			<p>Examples:</p>
-			<iframe class="fiddle-example"  width="100%" height="300" src="http://jsfiddle.net/trixta/Ev5G4/embedded/result,html,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+			<div class="fiddle-example" style="height: 300px;" data-src="http://jsfiddle.net/trixta/Ev5G4/embedded/result,html,js,css"></div>
 
 			<h4><code>ajaxvalidate</code></h4>
 			<p>An input with the attribute <code class="i">data-ajaxvalidate</code> referencing a validation service will start an AJAX validation.</p>
@@ -304,9 +307,9 @@ webshim.setOptions('forms', { addValidators: true });
 
 			<h4>Controlling the errormessages of custom errors</h4>
 			<p>The customError helper hook into the descriptive ways to define errormessage in webshim. Therefore the <code>data-errormessage</code> attribute and in case of the iVal feature the <code>data-errortype</code> can be used to define errormessages for the field.</p>
-			<iframe class="fiddle-example"  width="100%" height="300" src="http://jsfiddle.net/trixta/3A2DF/embedded/html,result,js,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<div class="fiddle-example"  style="height: 300px;" data-src="http://jsfiddle.net/trixta/3A2DF/embedded/html,result,js,css"></div>
 			<p>For a more general way the JS API can be used to change the errormessage for the given type:</p>
-			<iframe class="fiddle-example"  width="100%" height="260" src="http://jsfiddle.net/trixta/2CyEr/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<div class="fiddle-example" style="height: 260px;" data-src="http://jsfiddle.net/trixta/2CyEr/embedded/js,result,html,css"></div>
 
 			<h3 id="Custom-create">Creating new customErrors</h3>
 			<p>While webshim allows the developer to use the native or polyfilled <code>setCustomValidity</code> method to add custom errors. Webshims provides two additional ways to add new constraints:</p>
@@ -322,13 +325,13 @@ $('.only-foo').on('validatevalue', function(e, extra){
 });
 </code></pre>
 			<p>The <code>validatevalue</code> event is also called while building input widgets like a datepicker:</p>
-			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/zRGd9/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<div class="fiddle-example" style="height: 300px;" data-src="http://jsfiddle.net/trixta/zRGd9/embedded/js,result,html,css"></div>
 
 			<p>Note: The name <code>validatevalue</code> was renamed with version 1.13.2 it replaces the <code class="i">valuevalidation</code>.</p>
 
 			<h4>Adding constraints without adding events to each form control</h4>
 			<p>webshims also exposes the custom error helper to generate new custom constraints</p>
-			<iframe class="fiddle-example" width="100%" height="300" src="http://jsfiddle.net/trixta/KdFB2/embedded/js,result,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+			<div class="fiddle-example" style="height: 300px;" data-src="http://jsfiddle.net/trixta/KdFB2/embedded/js,result,html,css"></div>
 
 			<h4>Updating validation constraints without affecting the validation UI</h4>
 			<p>In case a script changes a value custom constraints might need to be updated. This can be done either with the <code class="i">updatevalidation</code> or <code class="i">updatecustomvalidity</code> event.</p>

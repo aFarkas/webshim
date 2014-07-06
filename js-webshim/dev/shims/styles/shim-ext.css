@@ -940,23 +940,18 @@ span.has-input-buttons {
   height: 16px;
   margin: -8px 0 0 -8px;
 }
-.ws-popover-opener .ws-color-indicator:before {
-  content: "";
-}
-.color-input-buttons .ws-popover-opener .ws-color-indicator {
+
+.color-input-buttons .ws-popover-opener > span {
   background: url(color-picker.png) no-repeat 0 0;
 }
-.color-input-buttons .ws-popover-opener .ws-color-indicator:before {
+.color-input-buttons .ws-popover-opener > span:before {
   content: "";
 }
-.ws-popover-opener .ws-color-indicator.ws-color-indicator-bg {
+.color-input-buttons .color-input-buttons .ws-popover-opener > span:before {
+  content: "";
+}
+.color-input-buttons .ws-popover-opener > span.ws-color-indicator-bg {
   background: url(../jpicker/images/preview-opacity.png) no-repeat 0;
-}
-.ws-popover-opener .ws-color-indicator.ws-color-indicator {
-  background: none;
-}
-.ws-popover-opener .ws-color-indicator.ws-color-indicator:before {
-  content: "";
 }
 
 .time-input-buttons .ws-popover-opener > span {

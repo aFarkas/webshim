@@ -56,6 +56,18 @@
 <style>
 	.mediaplayer {
 		width: 640px;
+		position: relative;
+		height: 0;
+		padding-bottom: 56.25%; /* 16/9 */
+	}
+
+	.mediaplayer video,
+	.mediaplayer .polyfill-video {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
 	}
 
 	.polyfill-type {
