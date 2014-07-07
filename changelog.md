@@ -6,6 +6,8 @@ upcomming Release 1.14.4
 - added track[kind="chapters"] support to mediaelement UI
 - added alternate-media plugin for mediaelement implementation use as quality switch or other alternative media sources (switch video with or without sign language or switch videos with different audiotracks and so on.)
 - fix IE issues with custom styleable filechooser
+- improved textTrack feature detection
+- load all track sources on loadstart (use preload="none" to optimize for performance)
 
 Release 1.14.3
 ----------

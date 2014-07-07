@@ -47,11 +47,9 @@
 		(function($){
 
 			window.omitTests = window.omitTests || {};
-			
-			
-			
+
 			var hash = location.hash.replace('#', '');
-			
+
 			if(hash.indexOf('customValidationMessage') !== -1){
 				webshims.cfg.forms.customMessages = true; 
 				webshims.setOptions({
