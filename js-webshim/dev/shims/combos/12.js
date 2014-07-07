@@ -1074,19 +1074,23 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		ttml = $.parseXML(ttml) || [];
 		return $(ttml).find('[begin][end]').map(mapTtmlToVtt).get().join('\n\n') || '';
 	};
-	
+	var loadingTracks = 0;
+
 	mediaelement.loadTextTrack = function(mediaelem, track, trackData, _default){
-		var loadEvents = 'play playing';
+		var loadEvents = 'play playing loadedmetadata loadstart';
 		var obj = trackData.track;
 		var load = function(){
 			var error, ajax, createAjax;
-			var src = obj.mode != 'disabled' && ($.attr(track, 'src') && $.prop(track, 'src'));
+			var isDisabled = obj.mode == 'disabled';
+			var videoState = !!($.prop(mediaelem, 'readyState') > 0 || $.prop(mediaelem, 'networkState') == 2 || !$.prop(mediaelem, 'paused'));
+			var src = (!isDisabled || videoState) && ($.attr(track, 'src') && $.prop(track, 'src'));
 
 			if(src){
 				$(mediaelem).off(loadEvents, load).off('updatetrackdisplay', load);
 
 				if(!trackData.readyState){
 					error = function(){
+						loadingTracks--;
 						trackData.readyState = 3;
 						obj.cues = null;
 						obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = null;
@@ -1097,10 +1101,12 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 						obj.cues = mediaelement.createCueList();
 						obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = mediaelement.createCueList();
 						createAjax = function(){
+							loadingTracks++;
 							ajax = $.ajax({
 								dataType: 'text',
 								url: src,
 								success: function(text){
+									loadingTracks--;
 									var contentType = ajax.getResponseHeader('content-type') || '';
 
 									if(!contentType.indexOf('application/xml')){
@@ -1117,13 +1123,16 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 											error();
 										}
 									});
-									
 								},
 								error: error
 							});
 						};
 						if($.ajax && $.ajaxSettings.xhr){
-							createAjax();
+							if(isDisabled){
+								setTimeout(createAjax, loadingTracks * 2);
+							} else {
+								createAjax();
+							}
 						} else {
 							webshims.ready('jajax', createAjax);
 							webshims.loader.loadList(['jajax']);
@@ -1142,6 +1151,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		obj.cues = null;
 
 		$(mediaelem).on(loadEvents, load);
+
 		if(_default){
 			obj.mode = showTracks[obj.kind] ? 'showing' : 'hidden';
 			load();
