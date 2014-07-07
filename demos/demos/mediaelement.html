@@ -228,7 +228,7 @@ webshim.polyfill('mediaelement');
 </code></pre>
 			<p>While the controls are fully styleable through CSS, the markup can be controlled by changing the <code>barTemplate</code> option:</p>
 
-			<div class="fiddle-example" style="height: 360px;" data-src="http://jsfiddle.net/trixta/5Jwhb/embedded/js,result,html,css"></div>
+			<iframe class="fiddle-example" style="height: 360px;" src="http://jsfiddle.net/trixta/5Jwhb/embedded/js,result,html,css"></iframe>
 			<h2 id="Simple-Video-Overlays">Add overlays to the mediaplayer</h2>
 			<p>Adding new overlays to a mediaplayer, for example to add share buttons (like, twitter), a logo or title and credits for a given video or audio source is easy without writing any JS code.</p>
 <pre><code class="language-javascript">
@@ -257,7 +257,7 @@ webshim.polyfill('mediaelement');
 </code></pre>
 
 			<p>Here is a simple example creating a title and a social bookmark/share menu:</p>
-			<div class="fiddle-example" style="height: 360px;" data-src="http://jsfiddle.net/trixta/k5WyV/embedded/result,html,css,js"></div>
+			<iframe class="fiddle-example" style="height: 360px;" src="http://jsfiddle.net/trixta/k5WyV/embedded/result,html,css,js"></iframe>
 			<h2 id="Creating-Controls">Creating new Plugins and Controls</h2>
 			<p>Creating new plugins/controls for the jme mediaplayer is quite easy using the <code>$.jme.registerPlugin</code> method. Due to the fact, that jme is loaded async, the plugin registration has to be wrapped inside a <code>webshim.ready('jme', function(){});</code> call.</p>
 			<p>Let's create a control, which jumps the timeline by 10 seconds forward:</p>
@@ -339,7 +339,7 @@ webshim.ready('jme', function(){
 
 			<p>Here you find the full featured running example for a JME controlbar plugin:</p>
 
-			<div class="fiddle-example" style="height: 360px;" data-src="http://jsfiddle.net/trixta/tzg5Y/embedded/js,result,html,css"></div>
+			<iframe class="fiddle-example" style="height: 360px;" src="http://jsfiddle.net/trixta/tzg5Y/embedded/js,result,html,css"></iframe>
 
 			<h2 id="existing-plugins">Activating existing plugins</h2>
 			<p>Webshim also comes with some predefined plugins. All plugins can be loaded/activated thourgh the <code>plugins</code> option, which takes an array of plugins to be automatically loaded.</p>

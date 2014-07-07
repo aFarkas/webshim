@@ -1922,8 +1922,8 @@
 					try {
 						obj.cues = mediaelement.createCueList();
 						obj.activeCues = obj.shimActiveCues = obj._shimActiveCues = mediaelement.createCueList();
+						loadingTracks++;
 						createAjax = function(){
-							loadingTracks++;
 							ajax = $.ajax({
 								dataType: 'text',
 								url: src,

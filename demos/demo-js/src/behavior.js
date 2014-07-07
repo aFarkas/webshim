@@ -63,56 +63,6 @@ webshims.ready('jquery', function($){
 		_onScroll();
 	});
 
-
-	$(function(){
-		var top = $(window).scrollTop();
-		var bottom = $(window).height() + top;
-		var runStep = function(){
-			var fiddle = document.querySelector('div.fiddle-example');
-			if(fiddle){
-				replaceFiddle(fiddle);
-			} else {
-				$(document).off('.fiddlereplace');
-			}
-		};
-
-		var replaceFiddle = function(fiddle){
-			var src = $(fiddle).data('src');
-			return $('<iframe class="fiddle-example" />')
-				.on('load', runStep)
-				.attr({
-					src: src,
-					frameborder: 0
-				})
-				.css({
-					width: '100%',
-					height: $(fiddle).height(),
-					allowfullscreen: ""
-				})
-				.replaceAll(fiddle)
-			;
-
-		};
-
-
-
-		$(document).on('click.fiddlereplace', function(e){
-			if($(e.target).is('div.fiddle-example')){
-				replaceFiddle(e.target);
-			}
-		});
-
-		$(document.querySelectorAll('div.fiddle-example')).each(function(){
-			var elemTop = ($(this).offset() || {top: 0}).top - 50;
-			if(elemTop > bottom){
-				return false;
-			} else if(Math.abs(elemTop - top) < 200){
-				replaceFiddle(this);
-			}
-		});
-
-		webshim.ready('WINDOWLOAD', runStep);
-	});
 	
 	
 	$(function(){
