@@ -121,7 +121,7 @@
 	}
 
 	$.extend(webshims, {
-		version: '1.14.4-RC3',
+		version: '1.14.4-RC4',
 
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
@@ -933,13 +933,25 @@
 	//<picture
 	create('picture');
 	addPolyfill('picture', {
-		test: ('picturefill' in window) || !!window.HTMLPictureElement
+		test: ('picturefill' in window) || !!window.HTMLPictureElement,
+		d: ['matchMedia'],
+		c: [18],
+		loadInit: function(){
+			isReady('picture', true);
+		}
+	});
+	//>
+
+	//<matchMedia
+	addPolyfill('matchMedia', {
+		test: !!(window.matchMedia && matchMedia('all').addListener),
+		c: [18]
 	});
 	//>
 
 	//<es6
 	addPolyfill('es6', {
-		test: !!(Math.imul && Number.MIN_SAFE_INTEGER && Object.is  && window.Promise && Promise.all),// && window.Map && Map.prototype && typeof Map.prototype.forEach !== 'function' && window.Set
+		test: !!(Math.imul && Number.MIN_SAFE_INTEGER && Object.is && window.Promise && Promise.all),// && window.Map && Map.prototype && typeof Map.prototype.forEach !== 'function' && window.Set
 		d: ['es5']
 	});
 	//>

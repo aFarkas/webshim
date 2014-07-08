@@ -8,6 +8,8 @@ upcomming Release 1.14.4
 - fix IE issues with custom styleable filechooser
 - improved textTrack feature detection
 - load all track sources on loadstart (use preload="none" to optimize for performance)
+- add matchMedia polyfill including addListener and removeListener interface
+- in case picture feature was requested, ready event of jQuery was delayed
 
 Release 1.14.3
 ----------

@@ -28,7 +28,7 @@
 
 		<div id="sidebar" class="interface">
 
-			<a class="toc_title"> Webshim <span class="version">(<span class="ws-version">1.14.4-RC3</span>)</span></a>
+			<a class="toc_title"> Webshim <span class="version">(<span class="ws-version">1.14.4-RC4</span>)</span></a>
 			<ul class="toc_section">
 				<li>
 					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
@@ -86,7 +86,7 @@
 				</li>
 			</ul>
 
-			<a class="toc_title" href="#Media"> Media </a>
+			<a class="toc_title" href="#Media"> Mediaelements </a>
 			<ul class="toc_section">
 				<li>
 					- <a href="#Media-elements">Audio / Video</a>
@@ -95,6 +95,8 @@
 					- <a href="#Media-track">Track Element</a>
 				</li>
 			</ul>
+
+			<a class="toc_title" href="#matchMedia"> matchMedia </a>
 
 			<a class="toc_title" href="#Promise"> Promise </a>
 
@@ -135,7 +137,7 @@
 			<h3 id="downloads">Downloads &amp; Dependencies</h3>
 			<span style="padding-left: 7px; font-size:11px; font-weight: normal;" class="interface">(Right-click, and use "Save As")</span>
 			<p>
-				<a href="https://github.com/aFarkas/webshim/archive/1.14.4-RC3.zip" class="download-button"> <strong><i>Download</i></strong> </a>
+				<a href="https://github.com/aFarkas/webshim/archive/1.14.4-RC4.zip" class="download-button"> <strong><i>Download</i></strong> </a>
 			</p>
 
 			<p>
@@ -209,6 +211,9 @@
 					</li>
 					<li>
 						geolocation
+					</li>
+					<li>
+						matchMedia (includes matchMedia and matchMedia.addListener polyfill)
 					</li>
 					<li>
 						mediaelement
@@ -1570,7 +1575,15 @@ webshim.setOptions('filereader', {
 				<em>The <code class="i">filereader</code> feature is based on code from <a href="https://github.com/moxiecode/moxie" target="_external">https://github.com/moxiecode/moxie</a>. </em>
 			</p>
 
-
+			<h2 id="matchMedia">matchMedia</h2>
+			<p>
+				The <code class="i">matchMedia</code> feature is a polyfill of
+				<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window.matchMedia" target="_external">matchMedia</a>.  It includes also a polyfill for <code>matchMedia('(max-width: 480px').addListener</code>.
+			</p>
+			<p>
+				<em>This feature is based on code from
+					<a href="https://github.com/paulirish/matchMedia.js" target="_external">https://github.com/paulirish/matchMedia.js</a>.</em>
+			</p>
 
 			<h2 id="Promise">Promise</h2>
 			<p>
