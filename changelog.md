@@ -5,11 +5,12 @@ upcomming Release 1.14.4
 - improved runtime and network performance for mediaelement flash fallback
 - added track[kind="chapters"] support to mediaelement UI
 - added alternate-media plugin for mediaelement implementation use as quality switch or other alternative media sources (switch video with or without sign language or switch videos with different audiotracks and so on.)
-- fix IE issues with custom styleable filechooser
+- fixed IE issue with custom styleable filechooser
 - improved textTrack feature detection
 - load all track sources on loadstart (use preload="none" to optimize for performance)
 - add matchMedia polyfill including addListener and removeListener interface
 - in case picture feature was requested, ready event of jQuery was delayed
+- improved touch support
 
 Release 1.14.3
 ----------
@@ -22,6 +23,7 @@ Release 1.14.3
 - added srt and ttml subtitle support (but you really should still use vtt!)
 - improved touch support
 - fixed a change event bug in input[type="range"] polyfill
+
 
 
 Release 1.14.1/Release 1.14.2
