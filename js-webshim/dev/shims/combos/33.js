@@ -30,7 +30,6 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 	}
 	
 	var nan = parseInt('NaN', 10),
-		doc = document,
 		typeModels = webshims.inputTypes,
 		isNumber = function(string){
 			return (typeof string == 'number' || (string && string == string * 1));

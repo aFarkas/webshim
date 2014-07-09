@@ -241,7 +241,6 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 	}
 	
 	var nan = parseInt('NaN', 10),
-		doc = document,
 		typeModels = webshims.inputTypes,
 		isNumber = function(string){
 			return (typeof string == 'number' || (string && string == string * 1));

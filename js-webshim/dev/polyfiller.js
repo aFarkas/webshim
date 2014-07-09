@@ -121,7 +121,7 @@
 	}
 
 	$.extend(webshims, {
-		version: '1.14.4',
+		version: '1.14.5-pre',
 
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
@@ -1010,7 +1010,7 @@
 
 			support.inputtypes = inputtypes;
 
-			$.each(['number', 'range', 'date', 'datetime-local', 'month', 'color'], function(i, type){
+			$.each(['range', 'date', 'datetime-local', 'month', 'color', 'number'], function(i, type){
 				input.setAttribute('type', type);
 				inputtypes[type] = (input.type == type && (input.value = '(') && input.value != '(');
 			});
@@ -1035,14 +1035,38 @@
 			if(support[formvalidation]){
 				bustedWidgetUi = !support.fieldsetdisabled || !support.fieldsetelements || !('value' in progress) || !('value' in output);
 				replaceBustedUI = bustedWidgetUi && (/Android/i).test(navigator.userAgent);
-				bugs.bustedValidity = bustedValidity = window.opera || bugs.bustedValidity || bustedWidgetUi || !support.datalist;
-			} else {
-				bugs.bustedValidity = false;
+				bustedValidity = window.opera || bugs.bustedValidity || bustedWidgetUi || !support.datalist;
+
+				if(!bustedValidity && inputtypes.number){
+					bustedValidity = true;
+					try {
+						input.type = 'number';
+						input.value = '';
+						input.stepUp();
+						bustedValidity = input.value != '1';
+					} catch(e){}
+				}
+
 			}
+
+			bugs.bustedValidity = bustedValidity;
 
 			formExtend = support[formvalidation] && !bustedValidity ? 'form-native-extend' : fShim;
 			initialFormTest = $.noop;
 			return false;
+		};
+		var typeTest = function(o){
+			var ret = true;
+			if(!o._types){
+				o._types = o.types.split(' ');
+			}
+			$.each(o._types, function(i, name){
+				if((name in inputtypes) && !inputtypes[name]){
+					ret = false;
+					return false;
+				}
+			});
+			return ret;
 		};
 
 
@@ -1129,19 +1153,13 @@
 				types: 'date time range number'
 			},
 			test: function(){
-				var ret = true;
-				var o = this.options;
-				if(!o._types){
-					o._types = o.types.split(' ');
-				}
 				initialFormTest();
-				$.each(o._types, function(i, name){
-					if((name in inputtypes) && !inputtypes[name]){
-						ret = false;
-						return false;
-					}
-				});
-				
+				var ret = !bustedValidity;
+
+				if(ret){
+					ret = typeTest(this.options);
+				}
+
 				return ret;
 			},
 			methodNames: ['stepUp', 'stepDown'],
@@ -1169,7 +1187,7 @@
 				if(!o.replaceUI && replaceBustedUI){
 					o.replaceUI = true;
 				}
-				return !o.replaceUI && modules[fNuAPI].test();
+				return !o.replaceUI && typeTest(o);
 			},
 			d: ['forms', DOMSUPPORT, fNuAPI, 'range-ui'],
 			options: {
@@ -1177,7 +1195,6 @@
 					calculateWidth: true,
 					animate: true
 				}
-	//			,replaceUI: false
 			},
 			c: [6, 5, 9, 10, 17, 11]
 		});

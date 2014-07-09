@@ -1149,7 +1149,6 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 	}
 	
 	var nan = parseInt('NaN', 10),
-		doc = document,
 		typeModels = webshims.inputTypes,
 		isNumber = function(string){
 			return (typeof string == 'number' || (string && string == string * 1));
