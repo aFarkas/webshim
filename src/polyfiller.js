@@ -121,7 +121,7 @@
 	}
 
 	$.extend(webshims, {
-		version: '1.14.4-RC4',
+		version: '1.14.4',
 
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
@@ -432,7 +432,6 @@
 						return true;
 					}
 					var module = modules[name];
-					var cfg = webCFG[module.f || name] || {};
 					var supported;
 					if (module) {
 						supported = (module.test && $.isFunction(module.test)) ? module.test(list) : module.test;

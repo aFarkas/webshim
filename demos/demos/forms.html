@@ -32,7 +32,7 @@
 
 		<div id="sidebar" class="interface">
 
-			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.14.4-RC4</span>)</span></a>
+			<a class="toc_title" href="../index.html"> Webshim <span class="version">(<span class="ws-version">1.14.4</span>)</span></a>
 			<ul class="toc_section">
 				<li>
 					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
@@ -232,9 +232,9 @@ webshim.polyfill('forms');
 <pre><code class="language-javascript">
 $('input.foo').val('bar').trigger('updatevalidation');
 </code></pre>
-			<p>Often a developer wants to only update the validation UI, if the field already was marked as an invalid or valid. This can be done by the following code:</p>
+			<p>Often a developer wants to only update the validation UI, if the field already was marked as invalid or valid. This can be done by the following code:</p>
 <pre><code class="language-javascript">
-$('input.foo').val('bar').getShadowElement().filter('.user-error, .user-success').trigger('updatevalidation');
+$('input.foo').val('bar').trigger('refreshvalidationui');
 </code></pre>
 			<p>The UI can be reseted by triggering the <code>resetvalidation</code> event on the input or the form element.</p>
 			<h2 id="Custom-validity">Custom-validity</h2>
