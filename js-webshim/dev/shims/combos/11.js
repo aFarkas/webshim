@@ -2339,7 +2339,7 @@
 			var type = $.prop(this, 'type');
 			var i, opts, data, optsName, labels, cNames, hasInitialFocus;
 
-			if(inputTypes[type] && webshims.implement(this, 'inputwidgets') && (!supportInputTypes[type] || !$(this).hasClass('ws-noreplace'))){
+			if(inputTypes[type] && webshims.implement(this, 'inputwidgets') && !$(this).hasClass('ws-nopolyfill') && (!supportInputTypes[type] || !$(this).hasClass('ws-noreplace'))){
 				data = {};
 				optsName = type;
 				hasInitialFocus = $(this).is(':focus');
@@ -2510,11 +2510,12 @@
 				});
 			}
 		}
+
 		if(supportInputTypes.number && navigator.userAgent.indexOf('Touch') == -1 && ((/MSIE 1[0|1]\.\d/.test(navigator.userAgent)) || (/Trident\/7\.0/.test(navigator.userAgent)))){
 			replace.number = 1;
 		}
 		
-		if(!supportInputTypes.range || replace.range){
+		if(replace.range !== false && (!supportInputTypes.range || replace.range)){
 			extendType('range', {
 				_create: function(opts, set){
 					var data = $('<span />').insertAfter(opts.orig).rangeUI(opts).data('rangeUi');
@@ -2525,7 +2526,7 @@
 		
 		
 		['number', 'time', 'month', 'date', 'color', 'datetime-local'].forEach(function(name){
-			if(!supportInputTypes[name] || replace[name]){
+			if(replace[name] !== false && (!supportInputTypes[name] || replace[name])){
 				extendType(name, {
 					_create: function(opts, set){
 						if(opts.monthSelect || opts.daySelect || opts.yearSelect){
