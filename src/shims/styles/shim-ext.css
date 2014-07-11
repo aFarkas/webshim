@@ -719,6 +719,9 @@ SASS:
 .hide-spinbtns .input-buttons > .step-controls {
   display: none;
 }
+.hide-spinbtns input[type="number"], [type="number"].hide-spinbtns {
+  -moz-appearance: textfield;
+}
 .hide-spinbtns::-webkit-inner-spin-button,
 .hide-spinbtns ::-webkit-inner-spin-button {
   display: none;
@@ -732,6 +735,9 @@ SASS:
 .hide-inputbtns + .input-buttons,
 .hide-inputbtns .input-buttons {
   display: none;
+}
+.hide-inputbtns input[type="number"], [type="number"].hide-inputbtns {
+  -moz-appearance: textfield;
 }
 .hide-inputbtns::-webkit-inner-spin-button,
 .hide-inputbtns ::-webkit-inner-spin-button {

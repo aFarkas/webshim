@@ -82,6 +82,11 @@ $btnapis: hide-spinbtns hide-dropdownbtn hide-inputbtns inputbtns-outside a11yhi
 		display: none;
 	}
 
+	input[type="number"],
+	&[type="number"], {
+		-moz-appearance: textfield;
+	}
+
 	&::-webkit-inner-spin-button,
 	::-webkit-inner-spin-button {
 		display: none;
@@ -99,6 +104,11 @@ $btnapis: hide-spinbtns hide-dropdownbtn hide-inputbtns inputbtns-outside a11yhi
 	+ .input-buttons,
 	.input-buttons {
 		display: none;
+	}
+
+	input[type="number"],
+	&[type="number"], {
+		-moz-appearance: textfield;
 	}
 
 	&::-webkit-inner-spin-button,
