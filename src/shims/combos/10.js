@@ -3677,7 +3677,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						});
 					});
 				}
-				
+
 				if(opts.calculateWidth){
 					sizeInput(data.shim);
 				} else {

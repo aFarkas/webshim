@@ -3292,7 +3292,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 						});
 					});
 				}
-				
+
 				if(opts.calculateWidth){
 					sizeInput(data.shim);
 				} else {

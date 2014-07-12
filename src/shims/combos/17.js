@@ -3081,7 +3081,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 						});
 					});
 				}
-				
+
 				if(opts.calculateWidth){
 					sizeInput(data.shim);
 				} else {

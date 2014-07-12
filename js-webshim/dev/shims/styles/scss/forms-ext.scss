@@ -73,6 +73,10 @@ span.has-input-buttons {
 	}
 }
 
+.ws-number[readonly][aria-readonly="false"] {
+	cursor: default;
+}
+
 .input-buttons,
 .step-controls,
 .ws-popover-opener {

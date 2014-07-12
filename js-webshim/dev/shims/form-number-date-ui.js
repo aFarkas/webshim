@@ -1845,7 +1845,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 						});
 					});
 				}
-				
+
 				if(opts.calculateWidth){
 					sizeInput(data.shim);
 				} else {

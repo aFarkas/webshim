@@ -104,6 +104,11 @@
 	var getAutoEnhance = function(prop){
 		return !webCFG.enhanceAuto && prop == 'auto' ? false : prop;
 	};
+	var featureAlias = {
+		matchmedia: 'matchMedia',
+		xhr2: 'filereader',
+		promise: 'es6'
+	};
 
 	clearInterval(webshims.timer);
 	support.advancedObjectProperties = support.objectAccessor = support.ES5 = !!('create' in Object && 'seal' in Object);
@@ -244,12 +249,9 @@
 			}
 			
 			$.each(features, function(i, feature){
-				if(feature == 'xhr2'){
-					feature = 'filereader';
-				}
-				if(feature == 'promise'){
-					feature = 'es6';
-				}
+
+				feature = featureAlias[feature] || feature;
+
 				if(!webshimsFeatures[feature]){
 					WSDEBUG && webshims.error("could not find webshims-feature (aborted): "+ feature);
 					isReady(feature, true);
