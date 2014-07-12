@@ -183,9 +183,11 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 			$(element).attr({'aria-labelledby': labels.map(getId).get().join(' ')});
 			if(!noFocus){
 				labels.on('click', function(e){
-					element.getShadowFocusElement().focus();
-					e.preventDefault();
-					return false;
+					if(!e.isDefaultPrevented()){
+						element.getShadowFocusElement().focus();
+						e.preventDefault();
+						return false;
+					}
 				});
 			}
 		};

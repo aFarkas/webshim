@@ -268,13 +268,17 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			this.popover.contentElement.html('<div class="datalist-box"><ul role="listbox">'+ list.join("\n") +'</ul></div>');
 			
 			$(this.input).removeAttr('aria-activedescendant').triggerHandler('datalistcreated', [{instance: this}]);
-			
+
 			if(_forceShow || this.popover.isVisible){
-				if(this.options.valueCompletion && this.lastCompletedValue && !$.prop(this.input, 'value').indexOf(this.lastCompletedValue)){
+
+				if(this.options.valueCompletion && this.lastCompletedValue && (value = $.prop(this.input, 'value')) && !value.indexOf(this.lastCompletedValue)){
 					$.prop(this.input, 'value', this.lastCompletedValue);
 					$(this.input).triggerHandler('updateInput');
 				}
-				this.lastCompletedValue = "";
+
+				if(value != this.lastCompletedValue){
+					this.lastCompletedValue = "";
+				}
 				this.showHideOptions();
 			} else {
 				this.lastCompletedValue = "";
@@ -545,7 +549,7 @@ webshims.register('form-datalist-lazy', function($, webshims, window, document, 
 			}
 			items.removeClass('active-item');
 			this.shadowList.addClass('list-item-active');
-			activeItem = items.filter(':eq('+ index +')').addClass('active-item');
+			activeItem = items.eq(index).addClass('active-item');
 
 			if(doValue){
 				if(doValue != 'onlyScroll'){

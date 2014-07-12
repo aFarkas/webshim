@@ -408,6 +408,7 @@ input[data-wslist]::-webkit-calendar-picker-indicator {
 
 .datalist-polyfill {
 	position: absolute;
+	text-align: left;
 	
 	.ws-po-box {
 		padding: em(5) 0;
@@ -437,7 +438,7 @@ input[data-wslist]::-webkit-calendar-picker-indicator {
 		
 		li {
 			margin: em(1) 0;
-			padding: em(2) em(10);
+			padding: em(4) em(10);
 			overflow: hidden;
 			white-space: nowrap;
 			cursor: default;
@@ -455,31 +456,26 @@ input[data-wslist]::-webkit-calendar-picker-indicator {
 		}
 
 		.option-value {
-			display: inline-block;
+			display: block;
 			text-overflow: ellipsis;
 			max-width: 100%;
 			color: #000;
-			float: left;
 			transition: color 400ms;
 		}
 		
 		.option-label {
 			display: none;
-			max-width: 100%;
-			float: right;
+
 			font-size: 90%;
 			color: #666;
 			text-overflow: ellipsis;
-			vertical-align: bottom;
-			margin-top: 0.15em;
-			margin-left: em(10);
-			text-align: right;
+			margin-top: 0.1em;
 			transition: color 400ms;
 		}
 		
 		.has-option-label  {
 			.option-label {
-				display: inline-block;
+				display: block;
 			}
 		}
 	
@@ -497,20 +493,6 @@ input[data-wslist]::-webkit-calendar-picker-indicator {
 			.option-label {
 				color: #eee;
 			}
-		}
-	}
-	
-	&.ws-is-rtl {
-		
-		.option-value {
-			float: right;
-		}
-		
-		.option-label {
-			float: left;
-			margin-right: em(10);
-			margin-left: 0;
-			text-align: left;
 		}
 	}
 }

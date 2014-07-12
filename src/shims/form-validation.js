@@ -438,9 +438,9 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			this.lastElement = $(element).getShadowFocusElement();
 			if(!this.prepared || !this.options.prepareFor){
 				if(opts.appendTo == 'element' || (opts.inline && opts.appendTo == 'auto')){
-					parentElem = element.parent();
+					parentElem = visual.parent();
 				} else if(opts.appendTo == 'auto'){
-					parentElem = this._getAutoAppendElement(element);
+					parentElem = this._getAutoAppendElement(visual);
 				} else {
 					parentElem = $(opts.appendTo);
 				}

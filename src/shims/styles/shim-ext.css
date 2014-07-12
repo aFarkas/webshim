@@ -366,6 +366,7 @@ input[data-wslist]::-webkit-calendar-picker-indicator {
 
 .datalist-polyfill {
   position: absolute;
+  text-align: left;
 }
 .datalist-polyfill .ws-po-box {
   padding: 0.38462em 0;
@@ -392,7 +393,7 @@ input[data-wslist]::-webkit-calendar-picker-indicator {
 }
 .datalist-polyfill .datalist-box li {
   margin: 0.07692em 0;
-  padding: 0.15385em 0.76923em;
+  padding: 0.30769em 0.76923em;
   overflow: hidden;
   white-space: nowrap;
   cursor: default;
@@ -408,28 +409,22 @@ input[data-wslist]::-webkit-calendar-picker-indicator {
   font-style: normal;
 }
 .datalist-polyfill .datalist-box .option-value {
-  display: inline-block;
+  display: block;
   text-overflow: ellipsis;
   max-width: 100%;
   color: #000;
-  float: left;
   transition: color 400ms;
 }
 .datalist-polyfill .datalist-box .option-label {
   display: none;
-  max-width: 100%;
-  float: right;
   font-size: 90%;
   color: #666;
   text-overflow: ellipsis;
-  vertical-align: bottom;
-  margin-top: 0.15em;
-  margin-left: 0.76923em;
-  text-align: right;
+  margin-top: 0.1em;
   transition: color 400ms;
 }
 .datalist-polyfill .datalist-box .has-option-label .option-label {
-  display: inline-block;
+  display: block;
 }
 .datalist-polyfill .datalist-box .hidden-item {
   display: none !important;
@@ -443,15 +438,6 @@ input[data-wslist]::-webkit-calendar-picker-indicator {
 }
 .datalist-polyfill .datalist-box .active-item .option-label {
   color: #eee;
-}
-.datalist-polyfill.ws-is-rtl .option-value {
-  float: right;
-}
-.datalist-polyfill.ws-is-rtl .option-label {
-  float: left;
-  margin-right: 0.76923em;
-  margin-left: 0;
-  text-align: left;
 }
 
 .validity-alert {
