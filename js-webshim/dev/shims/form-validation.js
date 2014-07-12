@@ -794,7 +794,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 					switchValidityClass({type: 'input', target: input});
 				};
 				$(input)
-					.filter('input:not([type="checkbox"]):not([type="radio"])')
+					.filter('input:not([type="checkbox"]):not([type="radio"]), textarea')
 					.off('.recheckinvalid')
 					.on('input.recheckinvalid', function(){
 						clearTimeout(timer);
