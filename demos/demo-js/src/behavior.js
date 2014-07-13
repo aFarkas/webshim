@@ -20,7 +20,7 @@ webshims.ready('jquery', function($){
 		
 		var headings = $('h2[id],h3[id]').map(function(i, el){
 			return {
-				top: $(el).offset().top,
+				top: $(el).offset().top - 10,
 				id: el.id
 			};
 		});
@@ -55,7 +55,7 @@ webshims.ready('jquery', function($){
 			};
 			return function(){
 				clearTimeout(timer);
-				timer = setTimeout(fn, 1);
+				timer = setTimeout(fn, 9);
 			};
 		})();
 		

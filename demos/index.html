@@ -1718,11 +1718,27 @@ webshim.polyfill('forms mediaelement');
 
 			<p>Webshim offers a lot of different config options to change the behavior of widgets and controls. The pre-defined styles loaded by webshim are just an offer. A developer is appealed to enhance/change those styles. Even all animation are done with CSS and can be changed.</p>
 			<p>Webshim pre-defined selectors are sometime overqualified to minimize conflicts with existing page styles.</p>
-			<p>There are two main different strategies to write custom styles. In case you only want to make small changes, you can simply override the styles with your own modification. But in case you either want to have full control or need to make more changes, it is wise to set <code class="i">loadStyles</code> to <code>false</code> and write you own styles.</p>
+			<p>There are two different main strategies to customize webshim widget's styles. In case you only want to make small changes, you can simply override the styles with your own modification. But in case you either want to have full control or need to make more changes, it is wise to set <code class="i">loadStyles</code> to <code>false</code> and write you own styles.</p>
 			<p>In case you are setting <code class="i">loadStyles</code> to <code>false</code> you can either start from scratch or grab/copy the default styles from webshim included in the <a href="../js-webshim/dev/">dev folder</a>.</p>
 
 <pre><code class="language-javascript">
 webshim.setOptions('loadStyles', false);
+</code></pre>
+
+			<p>Some widget's also use inline styles to calculate the position or the dimension of the widget. This can be turned off depending on the widget settings. (Pro Tip: This can also improve performance, especially in old IE8 or some mobile browsers.):</p>
+
+<pre><code class="language-javascript">
+webshim.setOptions({
+	loadStyles: false,
+	'forms-ext': {
+		widgets: {
+			calculateWidth: false
+		}
+	},
+	track: {
+		positionDisplay: false
+	}
+});
 </code></pre>
 
 			<p>In case you have made some nice changes and want to share those with the community, feel free to add those to the <a href="demos/themes/themes.html">themes-directory</a> and do start a <abbr title="pull request">pr</abbr>.</p>

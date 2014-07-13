@@ -1418,8 +1418,8 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 				var buttons = this.buttons.not(':disabled');
 				var activeButton = buttons.filter(':focus');
 
-				activeButton = buttons[buttons.index(activeButton) + dir] || buttons.filter(dir > 0 ? ':first' : ':last');
-				activeButton.trigger('focus');
+				activeButton = (activeButton[0] && buttons[buttons.index(activeButton) + dir]) || buttons[dir > 0 ? 'first' : 'last']();
+				$(activeButton).trigger('focus');
 				e.preventDefault();
 			}
 		},
