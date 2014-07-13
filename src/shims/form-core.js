@@ -314,4 +314,12 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 			});
 		}
 	});
+
+	if(options.addValidators && options.fastValidators){
+		webshims.reTest(['form-validators', 'form-validation']);
+	}
+
+	if(document.readyState == 'complete'){
+		webshims.isReady('WINDOWLOAD', true);
+	}
 });

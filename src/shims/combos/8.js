@@ -1749,6 +1749,14 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			});
 		}
 	});
+
+	if(options.addValidators && options.fastValidators){
+		webshims.reTest(['form-validators', 'form-validation']);
+	}
+
+	if(document.readyState == 'complete'){
+		webshims.isReady('WINDOWLOAD', true);
+	}
 });
 ;webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
@@ -2595,6 +2603,10 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		webshims.ready(swfType, initMediaElements);
 	}
 	webshims.ready('track', loadTrackUi);
+
+	if(document.readyState == 'complete'){
+		webshims.isReady('WINDOWLOAD', true);
+	}
 });
 
 })(webshims);

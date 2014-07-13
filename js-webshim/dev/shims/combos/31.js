@@ -1526,6 +1526,14 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			});
 		}
 	});
+
+	if(options.addValidators && options.fastValidators){
+		webshims.reTest(['form-validators', 'form-validation']);
+	}
+
+	if(document.readyState == 'complete'){
+		webshims.isReady('WINDOWLOAD', true);
+	}
 });
 ;webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";

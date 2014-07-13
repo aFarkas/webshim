@@ -1,6 +1,11 @@
 webshims.register('form-validators', function($, webshims, window, document, undefined, options){
 "use strict";
-var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
+
+var iValClasses;
+webshims.ready('form-validation', function(){
+	iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
+});
+
 (function(){
 	if(webshims.refreshCustomValidityRules){
 		webshims.error("form-validators already included. please remove custom-validity.js");
@@ -30,7 +35,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 					elem = elements[id].elem;
 					if(elem != noTest && elements[id].val != (val = elem.value)){
 						elements[id].val = val;
-						if($(elem).hasClass(iValClasses)){
+						if(iValClasses && $(elem).hasClass(iValClasses)){
 							$(elem).trigger('updatevalidation.webshims');
 						} else {
 							testValidityRules(elem);
@@ -337,7 +342,7 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 				val = !val;
 			}
 			$.prop( elem, data.prop, val);
-			if(e){
+			if(iValClasses && e){
 				$(elem).getShadowElement().filter(iValClasses).trigger('updatevalidation.webshims');
 			}
 		};
@@ -377,11 +382,13 @@ var iValClasses = '.'+ options.iVal.errorClass +', .'+options.iVal.successClass;
 			} else {
 				$(data.masterElement).on('change', function(){
 					webshims.refreshCustomValidityRules(elem);
-					$(elem)
-						.getShadowElement()
-						.filter(iValClasses)
-						.trigger('updatevalidation.webshims')
-					;
+					if(iValClasses){
+						$(elem)
+							.getShadowElement()
+							.filter(iValClasses)
+							.trigger('updatevalidation.webshims')
+						;
+					}
 				});
 			}
 		}
