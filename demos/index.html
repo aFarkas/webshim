@@ -107,7 +107,11 @@
 			<a class="toc_title" href="#Requirejs-setup">Setup with r.js or other JS optimization tasks</a>
 
 			<a class="toc_title" href="#Customizing"> Customizing </a>
+
 			<ul class="toc_section">
+				<li>
+					- <a href="#Changeing-UI">Customizing styles and UI</a>
+				</li>
 				<li>
 					- <a href="#Customizing-extending">Writing a New Polyfill</a>
 				</li>
@@ -272,7 +276,7 @@
 					<em>default: true</em>
 				</li>
 				<li>
-					<strong>loadStyles</strong> If <code>loadStyles</code> is set <code>false</code> webshims won't load any default styles. In this case a site has to provide all styles for the used widgets. A developer also can copy all used webshim styles into his own stylesheet and minimize requests/only use needed styles for used widgets.
+					<strong>loadStyles</strong> If <code>loadStyles</code> is set <code>false</code> webshims won't load any default styles. In this case a site has to provide all styles for the used widgets. A developer also can copy all used webshim styles into his own stylesheet and minimize requests/only use needed styles for used widgets. See also <a href="#Changeing-UI">Customizing styles and UI</a>
 					<br>
 					<em>default: true</em>
 				</li>
@@ -1710,6 +1714,18 @@ webshim.polyfill('forms mediaelement');
 
 
 			<h2 id="Customizing"> Customizing Webshim</h2>
+			<h3 id="Changeing-UI">Customizing styles and UI</h3>
+
+			<p>Webshim offers a lot of different config options to change the behavior of widgets and controls. The pre-defined styles loaded by webshim are just an offer. A developer is appealed to enhance/change those styles. Even all animation are done with CSS and can be changed.</p>
+			<p>Webshim pre-defined selectors are sometime overqualified to minimize conflicts with existing page styles.</p>
+			<p>There are two main different strategies to write custom styles. In case you only want to make small changes, you can simply override the styles with your own modification. But in case you either want to have full control or need to make more changes, it is wise to set <code class="i">loadStyles</code> to <code>false</code> and write you own styles.</p>
+			<p>In case you are setting <code class="i">loadStyles</code> to <code>false</code> you can either start from scratch or grab/copy the default styles from webshim included in the <a href="../js-webshim/dev/">dev folder</a>.</p>
+
+<pre><code class="language-javascript">
+webshim.setOptions('loadStyles', false);
+</code></pre>
+
+			<p>In case you have made some nice changes and want to share those with the community, feel free to add those to the <a href="demos/themes/themes.html">themes-directory</a> and do start a <abbr title="pull request">pr</abbr>.</p>
 
 			<h3 id="Customizing-extending">Writing a New Polyfill</h3>
 
