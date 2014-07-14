@@ -1495,7 +1495,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		data._commonDateInit = true;
 		var o = data.options;
 		var actionfn = function(e){
-			if(!$(this).is('.othermonth') || $(this).css('cursor') == 'pointer'){
+			if(!$(this).hasClass('othermonth') || $(this).css('cursor') == 'pointer'){
 				popover.actionFn({
 					'data-action': $.attr(this, 'data-action'),
 					value: $(this).val() || $.attr(this, 'value')
@@ -1550,13 +1550,13 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 				
 				$('button', popover.buttonRow).each(function(){
 					var text;
-					if($(this).is('.ws-empty')){
+					if($(this).hasClass('ws-empty')){
 						text = curCfg.date.clear;
 						if(!text){
 							text = formcfg[''].date.clear || 'clear';
 							webshims.warn("could not get clear text from form cfg");
 						}
-					} else if($(this).is('.ws-current')){
+					} else if($(this).hasClass('ws-current')){
 						text = (curCfg[data.type] || {}).currentText;
 						if(!text){
 							text = (formcfg[''][[data.type]] || {}).currentText || (curCfg.date || {}).currentText || 'current';

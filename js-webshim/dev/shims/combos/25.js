@@ -549,8 +549,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				webshims.warn(type +' already implemented for element #'+elem.id);
 				return false;
 			}
+
 			data[type] = true;
-			return true;
+			return !$(elem).hasClass('ws-nopolyfill');
 		},
 		extendUNDEFProp: function(obj, props){
 			$.each(props, function(name, prop){
@@ -1549,7 +1550,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				writeable: false,
 				get: function(){
 					if(this.type != 'file'){return null;}
-					if(!$(this).is('.ws-filereader')){
+					if(!$(this).hasClass('ws-filereader')){
 						webshim.info("please add the 'ws-filereader' class to your input[type='file'] to implement files-property");
 					}
 					return webshim.data(this, 'fileList') || [];
@@ -2892,11 +2893,11 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			var media, error, parent;
 			if(
 				($(e.target).is('audio, video') || ((parent = e.target.parentNode) && $('source', parent).last()[0] == e.target)) &&
-				(media = $(e.target).closest('audio, video')) && !media.is('.nonnative-api-active')
+				(media = $(e.target).closest('audio, video')) && !media.hasClass('nonnative-api-active')
 				){
 				error = media.prop('error');
 				setTimeout(function(){
-					if(!media.is('.nonnative-api-active')){
+					if(!media.hasClass('nonnative-api-active')){
 						if(error && switchErrors[error.code]){
 							options.preferFlash = true;
 							document.removeEventListener('error', switchOptions, true);

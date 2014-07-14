@@ -334,13 +334,13 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 					addTrackView();
 				} else {
 					
-					if(elem.is('.nonnative-api-active')){
+					if(elem.hasClass('nonnative-api-active')){
 						addTrackView();
 					}
 					elem
 						.on('mediaelementapichange trackapichange', function(){
 							
-							if(!usesNativeTrack() || elem.is('.nonnative-api-active')){
+							if(!usesNativeTrack() || elem.hasClass('nonnative-api-active')){
 								addTrackView();
 							} else {
 								clearTimeout(updateTimer);

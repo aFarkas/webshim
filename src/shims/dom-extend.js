@@ -549,8 +549,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				webshims.warn(type +' already implemented for element #'+elem.id);
 				return false;
 			}
+
 			data[type] = true;
-			return true;
+			return !$(elem).hasClass('ws-nopolyfill');
 		},
 		extendUNDEFProp: function(obj, props){
 			$.each(props, function(name, prop){

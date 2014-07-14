@@ -392,7 +392,7 @@ var rsubmittable = /^(?:select|textarea|input)/i;
 				;
 				return function(){
 					var elem = $(this).getNativeElement()[0];
-					return !!(!elem.readOnly && !types[elem.type] && !$(elem).is(':disabled') );
+					return !!(!elem.readOnly && !types[elem.type] && !$.find.matchesSelector(elem, ':disabled') );
 				};
 			})()
 		},

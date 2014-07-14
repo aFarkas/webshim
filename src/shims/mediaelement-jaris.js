@@ -1211,11 +1211,11 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 			var media, error, parent;
 			if(
 				($(e.target).is('audio, video') || ((parent = e.target.parentNode) && $('source', parent).last()[0] == e.target)) &&
-				(media = $(e.target).closest('audio, video')) && !media.is('.nonnative-api-active')
+				(media = $(e.target).closest('audio, video')) && !media.hasClass('nonnative-api-active')
 				){
 				error = media.prop('error');
 				setTimeout(function(){
-					if(!media.is('.nonnative-api-active')){
+					if(!media.hasClass('nonnative-api-active')){
 						if(error && switchErrors[error.code]){
 							options.preferFlash = true;
 							document.removeEventListener('error', switchOptions, true);

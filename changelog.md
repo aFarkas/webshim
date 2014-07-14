@@ -1,5 +1,18 @@
+upcoming Release 1.14.5
+----------
+
+- force all browser to use new stepUp/stepDown algorithm
+- improve readyState complete detection
+- don't polyfill elements with the class 'ws-nopolyfill'
+- improve support for custom jQuery builds
+- recheck validilty of invalid textarea using input event
+- updated plugins (sizzle and ui.position)
+- improved performance especially for IE's
+
+
 Release 1.14.4
 ----------
+
 - replaced promise  with [es6-shim](https://github.com/paulmillr/es6-shim) (currently most things aren't feature detected, so only promise can be used safely)
 - removed dependency to Modernizr (still needed html5shiv or Modernizr to use semantic elements like section/article/main etc.), but not needed for video/audio/form and so on
 - improved runtime and network performance for mediaelement flash fallback

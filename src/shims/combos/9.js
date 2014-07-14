@@ -549,8 +549,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				webshims.warn(type +' already implemented for element #'+elem.id);
 				return false;
 			}
+
 			data[type] = true;
-			return true;
+			return !$(elem).hasClass('ws-nopolyfill');
 		},
 		extendUNDEFProp: function(obj, props){
 			$.each(props, function(name, prop){
@@ -3553,7 +3554,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			var type = $.prop(this, 'type');
 			var i, opts, data, optsName, labels, cNames, hasInitialFocus;
 
-			if(inputTypes[type] && webshims.implement(this, 'inputwidgets') && !$(this).hasClass('ws-nopolyfill') && (!supportInputTypes[type] || !$(this).hasClass('ws-noreplace'))){
+			if(inputTypes[type] && webshims.implement(this, 'inputwidgets') && (!supportInputTypes[type] || !$(this).hasClass('ws-noreplace'))){
 				data = {};
 				optsName = type;
 				hasInitialFocus = $(this).is(':focus');

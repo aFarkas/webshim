@@ -156,18 +156,37 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 	if(!support.fieldsetdisabled || !support.fieldsetelements){
 		(function(){
 			if(!support.fieldsetdisabled){
+				var hasIsDisabled = 'isDisabled' in document.createElement('div');
 				var isFieldsetGroup = {
 					fieldset: 1,
 					FIELDSET: 1
 				};
 				var disableElementsSel = 'input, textarea, select, button';
+
+				var isDisabledChild = function(elem){
+					if(hasIsDisabled && !elem.isDisabled){
+						return false;
+					}
+					return $.find.matchesSelector(elem, 'fieldset[disabled] *' );
+				};
+				var isDisabledChildFilter = hasIsDisabled ?
+					function(){
+						return this.isDisabled && $.find.matchesSelector(this, 'fieldset[disabled] *' );
+					} :
+					'fieldset[disabled] *';
+				var isEnableChildFilter = hasIsDisabled ?
+					function(){
+						return !this.isDisabled && !$.find.matchesSelector(this, 'fieldset[disabled] *' );
+					} :
+					':not(fieldset[disabled] *)';
+
 				$.extend($.expr[":"], {
 					"enabled": function( elem ) {
-						return elem.disabled === false || (isFieldsetGroup[elem.nodeName] && webshims.contentAttr(elem, 'disabled') == null && !$(elem).is('fieldset[disabled] *')) ;
+						return isFieldsetGroup[elem.nodeName] ? (webshims.contentAttr(elem, 'disabled') == null && !isDisabledChild(elem)) : elem.disabled === false;
 					},
 
 					"disabled": function( elem ) {
-						return elem.disabled === true || (isFieldsetGroup[elem.nodeName] && (webshims.contentAttr(elem, 'disabled') != null || $(elem).is('fieldset[disabled] *')));
+						return isFieldsetGroup[elem.nodeName] ? (webshims.contentAttr(elem, 'disabled') != null || isDisabledChild(elem)) : elem.disabled === true;
 					}
 				});
 
@@ -197,11 +216,12 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 
 						if(value){
 							$(this.querySelectorAll(disableElementsSel)).each(groupControl.disable);
-						} else if(!$(this).is('fieldset[disabled] *')){
+
+						} else if(!isDisabledChild(this)){
 							var elements = $(this.querySelectorAll(disableElementsSel));
 
 							if( this.querySelector('fieldset[disabled]') ){
-								elements = elements.not('fieldset[disabled] *');
+								elements = elements.filter(isEnableChildFilter);
 							}
 
 							elements.each(groupControl.enable);
@@ -218,7 +238,8 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 								if(value){
 									webshims.data(this, 'groupedisabled', false);
 									desc.prop._supset.call(this, value);
-								} else if($(this).is('fieldset[disabled] *')){
+
+								} else if(isDisabledChild(this)){
 									webshims.data(this, 'groupedisabled', true);
 									desc.prop._supset.call(this, true);
 								} else {
@@ -242,7 +263,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 				webshims.addReady(function(context){
 
 					$(context)
-						.filter('fieldset[disabled], fieldset[disabled] *')
+						.filter(isDisabledChildFilter)
 						.find(disableElementsSel)
 						.each(groupControl.disable)
 					;
@@ -254,7 +275,6 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 				var isForm = {form: 1, FORM: 1};
 				$.prop = function(elem, name, value){
 					var ret;
-					//TODO: cache + perftest
 					if(elem && elem.nodeType == 1 && value === undefined && isForm[elem.nodeName] && elem.id){
 						ret = document.getElementsByName(name);
 						if(!ret || !ret.length){
@@ -896,7 +916,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 
 						if(elem.type == 'password' || isOver){
 							data.text = createPlaceholder(elem);
-							if(isResponsive || $(elem).is('.responsive-width') || (elem.currentStyle || {width: ''}).width.indexOf('%') != -1){
+							if(isResponsive || $(elem).hasClass('responsive-width') || (elem.currentStyle || {width: ''}).width.indexOf('%') != -1){
 								data.box = data.text;
 							} else {
 								data.box = $('<span class="placeholder-box placeholder-box-'+ (elem.nodeName || '').toLowerCase() +' placeholder-box-'+$.css(elem, 'float')+'" />')

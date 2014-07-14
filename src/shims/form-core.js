@@ -100,11 +100,11 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 			};
 			$.extend(exp, {
 				"enabled": function( elem ) {
-					return elem.disabled === false && !$(elem).is('fieldset[disabled] *');
+					return 'disabled' in elem && elem.disabled === false && !$.find.matchesSelector(elem, 'fieldset[disabled] *');
 				},
 		
 				"disabled": function( elem ) {
-					return elem.disabled === true || ('disabled' in elem && $(elem).is('fieldset[disabled] *'));
+					return elem.disabled === true || ('disabled' in elem && $.find.matchesSelector(elem, 'fieldset[disabled] *'));
 				}
 			});
 		}

@@ -111,7 +111,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				shadowType = shadowElem.prop('type');
 			}
 			if(
-				(chromeBugs && (e.type == 'change' || webkitVersion < 537.36) && noFocusWidgets[shadowType] && $(e.target).is(':focus')) ||
+				(chromeBugs && (e.type == 'change' || webkitVersion < 537.36) && noFocusWidgets[shadowType] && $.find.matchesSelector(e.target, ':focus')) ||
 				(e.type == 'focusout' && elem.type == 'radio' && isInGroup(elem.name))
 				){
 					return;
@@ -679,7 +679,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				var ret = $(elem).data('errortype');
 				if(!ret){
 					$.each(fields, function(errorName, cNames){
-						if($(elem).is(cNames)){
+						if($.find.matchesSelector(elem, cNames)){
 							ret = errorName;
 							return false;
 						}
@@ -724,7 +724,8 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			};
 		})(),
 		initIvalContentMessage: function(elem){
-			if($(elem).jProp('form').is(iVal.sel)){
+			var form;
+			if(iVal.sel && (form = $.prop(elem, 'form')) && $.find.matchesSelector(form, iVal.sel)){
 				this.get(elem);
 			}
 		},
@@ -840,7 +841,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			this.hideError(elem, true).removeClass(successWrapperClass);
 		},
 		toggle: function(elem){
-			if($(elem).is(':invalid')){
+			if($.find.matchesSelector(elem, ':invalid')){
 				this.showError(elem);
 			} else {
 				this.hideError(elem);
@@ -851,25 +852,21 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	$(document.body)
 		.on({
 			'changedvaliditystate': function(e){
-				if(iVal.sel){
-					var form = $(e.target).jProp('form');
-					if(form.is(iVal.sel)){
-						webshims.errorbox.toggle(e.target);
-					}
+				var form;
+				if(iVal.sel && (form = $.prop(e.target, 'form')) && $.find.matchesSelector(form, iVal.sel)){
+					webshims.errorbox.toggle(e.target);
 				}
 			},
 			'resetvalidityui.webshims': function(e){
-				if (iVal.sel) {
-					var form = $(e.target).jProp('form');
-					if (form.is(iVal.sel)) {
-						webshims.errorbox.reset(e.target);
-					}
+				var form;
+				if(iVal.sel && (form = $.prop(e.target, 'form')) && $.find.matchesSelector(form, iVal.sel)){
+					webshims.errorbox.reset(e.target);
 				}
 			},
 			firstinvalid: function(e){
+				var form;
 				if(iVal.sel && iVal.handleBubble){
-					var form = $(e.target).jProp('form');
-					if(form.is(iVal.sel)){
+					if(iVal.sel && (form = $.prop(e.target, 'form')) && $.find.matchesSelector(form, iVal.sel)){
 						e.preventDefault();
 						if(iVal.handleBubble != 'none'){
 							webshims.validityAlert.showFor( e.target, false, false, iVal.handleBubble == 'hide' );
@@ -878,7 +875,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				}
 			},
 			submit: function(e){
-				if(iVal.sel && iVal.submitCheck && $(e.target).is(iVal.sel) && $.prop(e.target, 'noValidate') && !$(e.target).checkValidity()){
+				if(iVal.sel && iVal.submitCheck && $.find.matchesSelector(e.target, iVal.sel) && $.prop(e.target, 'noValidate') && !$(e.target).checkValidity()){
 					e.stopImmediatePropagation();
 					return false;
 				}

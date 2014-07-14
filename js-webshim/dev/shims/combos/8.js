@@ -772,8 +772,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				webshims.warn(type +' already implemented for element #'+elem.id);
 				return false;
 			}
+
 			data[type] = true;
-			return true;
+			return !$(elem).hasClass('ws-nopolyfill');
 		},
 		extendUNDEFProp: function(obj, props){
 			$.each(props, function(name, prop){
@@ -1535,11 +1536,11 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			};
 			$.extend(exp, {
 				"enabled": function( elem ) {
-					return elem.disabled === false && !$(elem).is('fieldset[disabled] *');
+					return 'disabled' in elem && elem.disabled === false && !$.find.matchesSelector(elem, 'fieldset[disabled] *');
 				},
 		
 				"disabled": function( elem ) {
-					return elem.disabled === true || ('disabled' in elem && $(elem).is('fieldset[disabled] *'));
+					return elem.disabled === true || ('disabled' in elem && $.find.matchesSelector(elem, 'fieldset[disabled] *'));
 				}
 			});
 		}

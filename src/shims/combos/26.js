@@ -7570,7 +7570,7 @@ Globally exposed namespace with the most frequently used public classes and hand
 				writeable: false,
 				get: function(){
 					if(this.type != 'file'){return null;}
-					if(!$(this).is('.ws-filereader')){
+					if(!$(this).hasClass('ws-filereader')){
 						webshim.info("please add the 'ws-filereader' class to your input[type='file'] to implement files-property");
 					}
 					return webshim.data(this, 'fileList') || [];

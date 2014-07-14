@@ -1028,7 +1028,7 @@
 				try {
 					if(fieldset.querySelector(':invalid')){
 						fieldset.disabled = true;
-						tmp = !fieldset.querySelector(':invalid');
+						tmp = !fieldset.querySelector(':invalid') && fieldset.querySelector(':disabled');
 					}
 				} catch(er){}
 				support.fieldsetdisabled =  !!tmp;

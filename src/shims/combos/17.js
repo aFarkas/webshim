@@ -2957,7 +2957,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 			var type = $.prop(this, 'type');
 			var i, opts, data, optsName, labels, cNames, hasInitialFocus;
 
-			if(inputTypes[type] && webshims.implement(this, 'inputwidgets') && !$(this).hasClass('ws-nopolyfill') && (!supportInputTypes[type] || !$(this).hasClass('ws-noreplace'))){
+			if(inputTypes[type] && webshims.implement(this, 'inputwidgets') && (!supportInputTypes[type] || !$(this).hasClass('ws-noreplace'))){
 				data = {};
 				optsName = type;
 				hasInitialFocus = $(this).is(':focus');

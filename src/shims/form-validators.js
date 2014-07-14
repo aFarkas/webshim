@@ -35,7 +35,7 @@ webshims.ready('form-validation', function(){
 					elem = elements[id].elem;
 					if(elem != noTest && elements[id].val != (val = elem.value)){
 						elements[id].val = val;
-						if(iValClasses && $(elem).hasClass(iValClasses)){
+						if(iValClasses && $.find.matchesSelector(elem, iValClasses)){
 							$(elem).trigger('updatevalidation.webshims');
 						} else {
 							testValidityRules(elem);
@@ -423,7 +423,7 @@ webshims.ready('form-validation', function(){
 			}
 
 			data.ajaxvalidate.depends.on('change', function(){
-				if($(this).is(':valid')){
+				if($.find.matchesSelector(this, ':valid')){
 					webshims.refreshCustomValidityRules(elem);
 				}
 			});
@@ -486,7 +486,7 @@ webshims.ready('form-validation', function(){
 					data = {};
 					data[$.prop(elem, 'name') || $.prop(elem, 'id')] = $(elem).val();
 					opts.depends.each(function(){
-						if($(this).is(':invalid')){
+						if($.find.matchesSelector(this, ':invalid')){
 							data = false;
 							return false;
 						}
