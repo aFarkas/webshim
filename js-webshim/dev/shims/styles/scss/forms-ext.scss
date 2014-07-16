@@ -213,7 +213,6 @@ input[type="color"] {
 	}
 
 	.step-controls {
-		visibility: hidden;
 		opacity: 0;
 	}
 
@@ -223,7 +222,6 @@ input[type="color"] {
 	&:hover {
 		.step-controls {
 			opacity: 1;
-			visibility: visible;
 		}
 
 	}
