@@ -584,7 +584,7 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 						if(!('backgroundSize' in $poster[0].style)){
 							data.player.addClass('no-backgroundsize');
 						}
-						data.media.on('playing waiting seeked seeking', function(){
+						data.media.on('play playing waiting seeked seeking', function(){
 							if(isInitial){
 								isInitial = false;
 								data.player.removeClass('initial-state');
