@@ -99,6 +99,15 @@
   font-weight: normal;
   font-style: normal;
 }
+@-webkit-keyframes jmespin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
 @keyframes jmespin {
   0% {
     -webkit-transform: rotate(0deg);
@@ -284,6 +293,10 @@
   background-position: 4px 4px;
 }
 .mediaplayer[data-state="waiting"] > .jme-media-overlay:before {
+  -webkit-animation-name: jmespin;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-duration: 1100ms;
+  -webkit-animation-timing-function: linear;
   animation-name: jmespin;
   animation-iteration-count: infinite;
   animation-duration: 1100ms;
@@ -308,7 +321,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: #000 no-repeat center / contain;
+  background: #000 no-repeat center;
+  background-size: contain;
 }
 .mediaplayer.initial-state .ws-poster, .mediaplayer.ended-state .ws-poster {
   display: block;
