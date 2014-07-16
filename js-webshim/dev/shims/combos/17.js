@@ -3111,8 +3111,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 		}
 		
 		var replace = {};
-		
-		
+
 		if(options.replaceUI){
 			$.each($.extend(replace, $.isPlainObject(options.replaceUI) ? options.replaceUI : {
 				'range': 1,

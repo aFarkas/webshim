@@ -1,5 +1,5 @@
 /* thx to http://icomoon.io */
-.mediaplayer[data-state="waiting"] > .jme-media-overlay, .mediaplayer .fullscreen, .mediaplayer .fullscreen.state-exitfullscreen, .mediaplayer .mediaconfigmenu, .mediaplayer[data-state="idle"] > .jme-media-overlay, .mediaplayer button.play-pause, .mediaplayer button.play-pause.state-playing, .mediaplayer .mute-unmute, .mediaplayer[data-volume="medium"] .mute-unmute, .mediaplayer[data-volume="low"] .mute-unmute, .mediaplayer[data-volume="no"] .mute-unmute, .mediaplayer .state-unmute.mute-unmute, .mediaplayer .captions, .mediaplayer .subtitle-menu button[aria-checked="true"], .mediaplayer .subtitle-menu button, .mediaplayer .playlist-next, .mediaplayer .playlist-prev, .mediaplayer .chapters, .mediaplayer[data-state="ended"] > .jme-media-overlay {
+.mediaplayer[data-state="waiting"] > .jme-media-overlay, .mediaplayer .fullscreen, .mediaplayer .fullscreen.state-exitfullscreen, .mediaplayer .mediaconfigmenu, .mediaplayer.initial-state > .jme-media-overlay, .mediaplayer button.play-pause, .mediaplayer button.play-pause.state-playing, .mediaplayer .mute-unmute, .mediaplayer[data-volume="medium"] .mute-unmute, .mediaplayer[data-volume="low"] .mute-unmute, .mediaplayer[data-volume="no"] .mute-unmute, .mediaplayer .state-unmute.mute-unmute, .mediaplayer .captions, .mediaplayer .subtitle-menu button[aria-checked="true"], .mediaplayer .subtitle-menu button, .mediaplayer .playlist-next, .mediaplayer .playlist-prev, .mediaplayer .chapters, .mediaplayer.ended-state > .jme-media-overlay {
   font-family: 'jme';
   speak: none;
   font-style: normal;
@@ -29,7 +29,7 @@
   content: "\e606";
 }
 
-.mediaplayer[data-state="idle"] > .jme-media-overlay:before {
+.mediaplayer.initial-state > .jme-media-overlay:before {
   content: "\e608";
 }
 
@@ -85,7 +85,7 @@
   content: "\e615";
 }
 
-.mediaplayer[data-state="ended"] > .jme-media-overlay:before {
+.mediaplayer.ended-state > .jme-media-overlay:before {
   content: "\e601";
 }
 
@@ -264,17 +264,17 @@
 .mediaplayer[data-state="idle"] {
   cursor: pointer;
 }
-.mediaplayer[data-state="idle"] > .jme-media-overlay {
+.mediaplayer.initial-state > .jme-media-overlay {
   background-position: 1px 1px;
 }
-.mediaplayer[data-state="idle"].has-ytposter.no-backgroundsize > .jme-media-overlay:before {
+.mediaplayer.initial-state.has-ytposter.no-backgroundsize > .jme-media-overlay:before {
   content: "";
   background-position: 2px 2px;
 }
-.mediaplayer[data-state="ended"] {
+.mediaplayer.ended-state {
   cursor: pointer;
 }
-.mediaplayer[data-state="ended"] > .jme-media-overlay {
+.mediaplayer.ended-state > .jme-media-overlay {
   background-position: 3px 3px;
 }
 .mediaplayer[data-state="waiting"] {
@@ -310,7 +310,7 @@
   bottom: 0;
   background: #000 no-repeat center / contain;
 }
-.mediaplayer.initial-state .ws-poster {
+.mediaplayer.initial-state .ws-poster, .mediaplayer.ended-state .ws-poster {
   display: block;
 }
 .mediaplayer.no-poster .ws-poster, .mediaplayer.no-backgroundsize div.ws-poster {

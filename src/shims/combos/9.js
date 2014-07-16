@@ -3708,8 +3708,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 		
 		var replace = {};
-		
-		
+
 		if(options.replaceUI){
 			$.each($.extend(replace, $.isPlainObject(options.replaceUI) ? options.replaceUI : {
 				'range': 1,

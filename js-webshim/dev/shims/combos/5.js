@@ -3322,8 +3322,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		}
 		
 		var replace = {};
-		
-		
+
 		if(options.replaceUI){
 			$.each($.extend(replace, $.isPlainObject(options.replaceUI) ? options.replaceUI : {
 				'range': 1,

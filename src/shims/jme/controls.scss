@@ -186,7 +186,9 @@ $browser-context: 16; // Default
 
 	&[data-state="idle"] {
 		cursor: pointer;
+	}
 
+	&.initial-state {
 		> .jme-media-overlay {
 			@extend %icon-play-circle;
 			background-position: 1px 1px;
@@ -198,7 +200,7 @@ $browser-context: 16; // Default
 		}
 	}
 
-	&[data-state="ended"] {
+	&.ended-state {
 		cursor: pointer;
 		> .jme-media-overlay {
 			@extend %icon-loop;
@@ -246,7 +248,8 @@ $browser-context: 16; // Default
 		background: #000 no-repeat center / contain;
 	}
 
-	&.initial-state .ws-poster {
+	&.initial-state .ws-poster,
+	&.ended-state .ws-poster {
 		display: block;
 	}
 

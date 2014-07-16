@@ -151,8 +151,12 @@ webshims.register('mediacontrols', function($, webshims, window){
 						var regYt = /youtube\.com\/[watch\?|v\/]+/i;
 
 						var isInitial = data.media.prop('paused');
+						var isEnded = data.media.prop('ended');
 						if(isInitial){
 							data.player.addClass('initial-state');
+						}
+						if(isEnded){
+							data.player.addClass('ended-state');
 						}
 						if(!('backgroundSize' in $poster[0].style)){
 							data.player.addClass('no-backgroundsize');
@@ -161,6 +165,17 @@ webshims.register('mediacontrols', function($, webshims, window){
 							if(isInitial){
 								isInitial = false;
 								data.player.removeClass('initial-state');
+							}
+
+							if(isEnded){
+								isEnded = false;
+								data.player.removeClass('ended-state');
+							}
+						});
+						data.media.on('ended', function(){
+							if(!isEnded && !data.media.prop('loop')){
+								isEnded = true;
+								data.player.addClass('ended-state');
 							}
 						});
 						return function(){
@@ -191,6 +206,11 @@ webshims.register('mediacontrols', function($, webshims, window){
 							if(data.media.prop('paused')){
 								data.player.addClass('initial-state');
 								isInitial = true;
+							}
+
+							if(isEnded){
+								isEnded = false;
+								data.player.removeClass('ended-state');
 							}
 
 							if(lastYoutubeState !== hasYt){

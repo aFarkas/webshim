@@ -276,30 +276,6 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 				jmeData.media = media;
 				jmeData.player = base;
 				media
-					.on('ended emptied play', (function(){
-						var timer;
-						var releaseEmptied = function(){
-							stopEmptiedEvent = false;
-						};
-						var ended = function(){
-							removeCanPlay();
-							media.jmeFn('pause');
-							if(!options.noReload && media.prop('ended') && media.prop('paused') && !media.prop('autoplay') && !media.prop('loop') && !media.hasClass('no-reload')){
-								stopEmptiedEvent = true;
-								media.jmeFn('load');
-								base.attr('data-state', 'ended');
-								setTimeout(releaseEmptied);
-
-							}
-						};
-						return function(e){
-
-							clearTimeout(timer);
-							if(e.type == 'ended' && !options.noReload && !media.prop('autoplay') && !media.prop('loop') && !media.hasClass('no-reload')){
-								timer = setTimeout(ended);
-							}
-						};
-					})())
 					.on('emptied waiting canplay canplaythrough playing ended pause mediaerror', mediaUpdateFn)
 					.on('volumechange updateJMEState', function(){
 						var volume = $.prop(this, 'volume');
@@ -598,8 +574,12 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 						var regYt = /youtube\.com\/[watch\?|v\/]+/i;
 
 						var isInitial = data.media.prop('paused');
+						var isEnded = data.media.prop('ended');
 						if(isInitial){
 							data.player.addClass('initial-state');
+						}
+						if(isEnded){
+							data.player.addClass('ended-state');
 						}
 						if(!('backgroundSize' in $poster[0].style)){
 							data.player.addClass('no-backgroundsize');
@@ -608,6 +588,17 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 							if(isInitial){
 								isInitial = false;
 								data.player.removeClass('initial-state');
+							}
+
+							if(isEnded){
+								isEnded = false;
+								data.player.removeClass('ended-state');
+							}
+						});
+						data.media.on('ended', function(){
+							if(!isEnded && !data.media.prop('loop')){
+								isEnded = true;
+								data.player.addClass('ended-state');
 							}
 						});
 						return function(){
@@ -638,6 +629,11 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 							if(data.media.prop('paused')){
 								data.player.addClass('initial-state');
 								isInitial = true;
+							}
+
+							if(isEnded){
+								isEnded = false;
+								data.player.removeClass('ended-state');
 							}
 
 							if(lastYoutubeState !== hasYt){

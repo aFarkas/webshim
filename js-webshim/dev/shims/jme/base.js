@@ -276,30 +276,6 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 				jmeData.media = media;
 				jmeData.player = base;
 				media
-					.on('ended emptied play', (function(){
-						var timer;
-						var releaseEmptied = function(){
-							stopEmptiedEvent = false;
-						};
-						var ended = function(){
-							removeCanPlay();
-							media.jmeFn('pause');
-							if(!options.noReload && media.prop('ended') && media.prop('paused') && !media.prop('autoplay') && !media.prop('loop') && !media.hasClass('no-reload')){
-								stopEmptiedEvent = true;
-								media.jmeFn('load');
-								base.attr('data-state', 'ended');
-								setTimeout(releaseEmptied);
-
-							}
-						};
-						return function(e){
-
-							clearTimeout(timer);
-							if(e.type == 'ended' && !options.noReload && !media.prop('autoplay') && !media.prop('loop') && !media.hasClass('no-reload')){
-								timer = setTimeout(ended);
-							}
-						};
-					})())
 					.on('emptied waiting canplay canplaythrough playing ended pause mediaerror', mediaUpdateFn)
 					.on('volumechange updateJMEState', function(){
 						var volume = $.prop(this, 'volume');
