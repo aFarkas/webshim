@@ -353,6 +353,7 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 								delete base._seekpause;
 							}
 							wasPaused = null;
+							media.triggerHandler('updateprogress');
 						}
 					});
 
@@ -1316,10 +1317,11 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 
 	$.jme.registerPlugin('buffer-progress', {
 		_create: function(control, media, base, options){
+			var progressTimer;
 			var indicator = $('<div class="buffer-progress-indicator" />').appendTo(control);
 			var drawBufferProgress = function(){
 				var progress = media.jmeProp('progress');
-
+				clearTimeout(progressTimer);
 
 				if(options.progress !== progress){
 					options.progress = progress;
@@ -1332,7 +1334,14 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 					indicator.css('width', 0);
 					options.progress = 0;
 				},
-				playing: drawBufferProgress
+				playing: drawBufferProgress,
+				'seeked seeking updateprogress': function(e){
+					clearTimeout(progressTimer);
+					if(e.type != 'seeking'){
+						progressTimer = setTimeout(drawBufferProgress, 100);
+					}
+				}
+
 			});
 			drawBufferProgress();
 		}
