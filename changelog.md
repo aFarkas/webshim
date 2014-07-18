@@ -7,7 +7,10 @@ upcoming Release 1.14.5
 - improve support for custom jQuery builds
 - recheck validilty of invalid textarea using input event
 - updated plugins (sizzle and ui.position)
-- improved performance especially for IE's
+- improved performance for IE's
+- fixed several CSS issues for Android and iOS (especially input widgets sometimes not focusable on iOS5/6)
+- no restart of mediaelement after video ended
+- don't show main playbutton while in paused state (only on initial and ended state)
 
 
 Release 1.14.4
