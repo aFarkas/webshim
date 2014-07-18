@@ -217,6 +217,14 @@ $browser-context: 16; // Default
 		}
 	}
 
+	&.ios-ytbug.initial-state {
+		> .jme-media-overlay,
+		> .ws-poster,
+		>.jme-controlbar {
+			pointer-events: none;
+		}
+	}
+
 	&[data-state="waiting"] {
 		cursor: default;
 		> .jme-media-overlay {

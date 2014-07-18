@@ -286,6 +286,11 @@
 .mediaplayer.ended-state > .jme-media-overlay {
   background-position: 3px 3px;
 }
+.mediaplayer.ios-ytbug.initial-state > .jme-media-overlay,
+.mediaplayer.ios-ytbug.initial-state > .ws-poster,
+.mediaplayer.ios-ytbug.initial-state > .jme-controlbar {
+  pointer-events: none;
+}
 .mediaplayer[data-state="waiting"] {
   cursor: default;
 }

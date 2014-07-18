@@ -50,7 +50,8 @@ webshims.register('mediacontrols', function($, webshims, window){
 			return cache[template] || '';
 		};
 	})();
-	var ios6 = /iP(hone|od|ad)/i.test(navigator.platform) && parseInt(((navigator.appVersion).match(/OS (\d+)_\d+/) || ['','8'])[1], 10) < 7;
+	var ios = /iP(hone|od|ad)/i.test(navigator.platform);
+	var ios6 = ios && parseInt(((navigator.appVersion).match(/OS (\d+)_\d+/) || ['','8'])[1], 10) < 7;
 	var loadLazy = function(){
 		if(!loadLazy.loaded){
 			loadLazy.loaded = true;
@@ -212,6 +213,11 @@ webshims.register('mediacontrols', function($, webshims, window){
 							if(isEnded){
 								isEnded = false;
 								data.player.removeClass('ended-state');
+							}
+
+							//https://code.google.com/p/gdata-issues/issues/detail?id=5415
+							if(ios){
+								data.player[isYt ? 'addClass' : 'removeClass']('ios-ytbug');
 							}
 
 							if(lastYoutubeState !== hasYt){

@@ -217,6 +217,15 @@ $browser-context: 16; // Default
 		}
 	}
 
+	//remove as soon as possible: https://code.google.com/p/gdata-issues/issues/detail?id=5415
+	&.ios-ytbug.initial-state {
+		> .jme-media-overlay,
+		> .ws-poster,
+		>.jme-controlbar {
+			pointer-events: none;
+		}
+	}
+
 	&[data-state="waiting"] {
 		cursor: default;
 		> .jme-media-overlay {
