@@ -173,9 +173,10 @@ webshims.register('mediacontrols', function($, webshims, window){
 							}
 						});
 						data.media.on('ended', function(){
-							if(!isEnded && !data.media.prop('loop')){
+							if(!isEnded && !data.media.prop('loop') && data.media.prop('ended')){
 								isEnded = true;
 								data.player.addClass('ended-state');
+								data.media.prop('paused');
 							}
 						});
 						return function(){
