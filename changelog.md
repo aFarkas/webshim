@@ -1,4 +1,4 @@
-upcoming Release 1.14.5
+Release 1.14.5
 ----------
 
 - force all browser to use new stepUp/stepDown algorithm

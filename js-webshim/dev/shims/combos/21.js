@@ -462,6 +462,7 @@
 	var onEvent = {
 		onPlayPause: function(jaris, data, override){
 			var playing, type;
+			var idled = data.paused || data.ended;
 			if(override == null){
 				try {
 					playing = data.api.api_get("isPlaying");
@@ -469,7 +470,7 @@
 			} else {
 				playing = override;
 			}
-			if(playing == data.paused){
+			if(playing == idled || playing == null){
 				
 				data.paused = !playing;
 				type = data.paused ? 'pause' : 'play';
