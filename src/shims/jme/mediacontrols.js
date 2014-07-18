@@ -101,6 +101,11 @@ webshims.register('mediacontrols', function($, webshims, window){
 						data.media.removeAttr('controls');
 						data.media.mediaLoad();
 					}
+
+					if(ios){
+						data.player.addClass('is-ios');
+					}
+
 					data.media.prop('controls', false);
 					structure = getBarHtml();
 					data._controlbar = $( options.barStructure );
@@ -216,9 +221,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 							}
 
 							//https://code.google.com/p/gdata-issues/issues/detail?id=5415
-							if(ios){
-								data.player[isYt ? 'addClass' : 'removeClass']('ios-ytbug');
-							}
+							data.player[isYt ? 'addClass' : 'removeClass']('yt-video');
 
 							if(lastYoutubeState !== hasYt){
 								lastYoutubeState = hasYt;

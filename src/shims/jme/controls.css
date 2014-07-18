@@ -286,10 +286,16 @@
 .mediaplayer.ended-state > .jme-media-overlay {
   background-position: 3px 3px;
 }
-.mediaplayer.ios-ytbug.initial-state > .jme-media-overlay,
-.mediaplayer.ios-ytbug.initial-state > .ws-poster,
-.mediaplayer.ios-ytbug.initial-state > .jme-controlbar {
+.mediaplayer.yt-video.is-ios.initial-state > .jme-media-overlay,
+.mediaplayer.yt-video.is-ios.initial-state > .ws-poster,
+.mediaplayer.yt-video.is-ios.initial-state > .jme-controlbar {
   pointer-events: none;
+}
+.mediaplayer.yt-video.is-ios.initial-state .fullscreen-container,
+.mediaplayer.yt-video.is-ios.initial-state .playlist-container,
+.mediaplayer.yt-video.is-ios.initial-state .subtitle-container,
+.mediaplayer.yt-video.is-ios.initial-state .mediaconfig-container {
+  pointer-events: auto;
 }
 .mediaplayer[data-state="waiting"] {
   cursor: default;

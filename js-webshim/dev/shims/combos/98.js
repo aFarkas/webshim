@@ -524,6 +524,11 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 						data.media.removeAttr('controls');
 						data.media.mediaLoad();
 					}
+
+					if(ios){
+						data.player.addClass('is-ios');
+					}
+
 					data.media.prop('controls', false);
 					structure = getBarHtml();
 					data._controlbar = $( options.barStructure );
@@ -638,9 +643,8 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 								data.player.removeClass('ended-state');
 							}
 
-							if(ios){
-								data.player[isYt ? 'addClass' : 'removeClass']('ios-ytbug');
-							}
+							//https://code.google.com/p/gdata-issues/issues/detail?id=5415
+							data.player[isYt ? 'addClass' : 'removeClass']('yt-video');
 
 							if(lastYoutubeState !== hasYt){
 								lastYoutubeState = hasYt;

@@ -217,11 +217,19 @@ $browser-context: 16; // Default
 		}
 	}
 
-	&.ios-ytbug.initial-state {
+	//remove as soon as possible: https://code.google.com/p/gdata-issues/issues/detail?id=5415
+	&.yt-video.is-ios.initial-state {
 		> .jme-media-overlay,
 		> .ws-poster,
-		>.jme-controlbar {
+		> .jme-controlbar {
 			pointer-events: none;
+		}
+
+		.fullscreen-container,
+		.playlist-container,
+		.subtitle-container,
+		.mediaconfig-container {
+			pointer-events: auto;
 		}
 	}
 
