@@ -161,7 +161,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 						if(!('backgroundSize' in $poster[0].style)){
 							data.player.addClass('no-backgroundsize');
 						}
-						data.media.on('play playing waiting seeked seeking', function(){
+						data.media.on('play playing waiting seeked seeking timeupdate', function(){
 							if(isInitial){
 								isInitial = false;
 								data.player.removeClass('initial-state');
@@ -176,7 +176,6 @@ webshims.register('mediacontrols', function($, webshims, window){
 							if(!isEnded && !data.media.prop('loop') && data.media.prop('ended')){
 								isEnded = true;
 								data.player.addClass('ended-state');
-								data.media.prop('paused');
 							}
 						});
 						return function(){
