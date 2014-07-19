@@ -1007,6 +1007,7 @@
 
 		var initialFormTest = function(){
 			var tmp, fieldset;
+			var testValue = '1(';
 			var input = create('input');
 			fieldset = $('<fieldset><textarea required="" /></fieldset>')[0];
 
@@ -1014,7 +1015,7 @@
 
 			$.each(['range', 'date', 'datetime-local', 'month', 'color', 'number'], function(i, type){
 				input.setAttribute('type', type);
-				inputtypes[type] = (input.type == type && (input.value = '(') && input.value != '(');
+				inputtypes[type] = (input.type == type && (input.value = testValue) && input.value != testValue);
 			});
 
 			support.datalist = !!(('options' in create('datalist')) && window.HTMLDataListElement);
