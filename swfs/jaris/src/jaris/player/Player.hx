@@ -985,7 +985,7 @@ class Player extends EventDispatcher
 			
 				_youtubeLoader = new Loader();
 				_youtubeLoader.contentLoaderInfo.addEventListener(Event.INIT, onYouTubeLoaderInit);
-				_youtubeLoader.load(new URLRequest("http://www.youtube.com/apiplayer?version=3"));
+				_youtubeLoader.load(new URLRequest("https://www.youtube.com/apiplayer?version=3"));
 				_loadedYoutube = true;
 			}
 			else if (_type == InputType.VIDEO && (_streamType == StreamType.FILE || _streamType == StreamType.PSEUDOSTREAM))

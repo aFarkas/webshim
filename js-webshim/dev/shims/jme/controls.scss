@@ -218,7 +218,7 @@ $browser-context: 16; // Default
 	}
 
 	//remove as soon as possible: https://code.google.com/p/gdata-issues/issues/detail?id=5415
-	&.yt-video.is-ios.initial-state {
+	&.yt-video.has-yt-bug.initial-state {
 		> .jme-media-overlay,
 		> .ws-poster,
 		> .jme-controlbar {

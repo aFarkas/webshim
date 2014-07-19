@@ -52,6 +52,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 	})();
 	var ios = /iP(hone|od|ad)/i.test(navigator.platform);
 	var ios6 = ios && parseInt(((navigator.appVersion).match(/OS (\d+)_\d+/) || ['','8'])[1], 10) < 7;
+	var hasYtBug = (!window.Modernizr || !Modernizr.videoautoplay) && (ios || /android/i.test(navigator.userAgent));
 	var loadLazy = function(){
 		if(!loadLazy.loaded){
 			loadLazy.loaded = true;
@@ -102,8 +103,8 @@ webshims.register('mediacontrols', function($, webshims, window){
 						data.media.mediaLoad();
 					}
 
-					if(ios){
-						data.player.addClass('is-ios');
+					if(hasYtBug){
+						data.player.addClass('has-yt-bug');
 					}
 
 					data.media.prop('controls', false);

@@ -286,12 +286,15 @@
 .mediaplayer.ended-state > .jme-media-overlay {
   background-position: 3px 3px;
 }
-.mediaplayer.yt-video.is-ios.initial-state > .jme-media-overlay,
-.mediaplayer.yt-video.is-ios.initial-state > .ws-poster,
-.mediaplayer.yt-video.is-ios.initial-state > .jme-controlbar {
+.mediaplayer.yt-video.has-yt-bug.initial-state > .jme-media-overlay,
+.mediaplayer.yt-video.has-yt-bug.initial-state > .ws-poster,
+.mediaplayer.yt-video.has-yt-bug.initial-state > .jme-controlbar {
   pointer-events: none;
 }
-.mediaplayer.yt-video.is-ios.initial-state .fullscreen-container {
+.mediaplayer.yt-video.has-yt-bug.initial-state .fullscreen-container,
+.mediaplayer.yt-video.has-yt-bug.initial-state .playlist-container,
+.mediaplayer.yt-video.has-yt-bug.initial-state .subtitle-container,
+.mediaplayer.yt-video.has-yt-bug.initial-state .mediaconfig-container {
   pointer-events: auto;
 }
 .mediaplayer[data-state="waiting"] {
