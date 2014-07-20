@@ -203,6 +203,11 @@ input[type="color"] {
 			margin-right: -24px;
 		}
 	}
+
+	&.number-input-buttons.ws-is-rtl {
+		margin-left: 0;
+		margin-right: -19px;
+	}
 }
 .input-button-size-2 {
 	margin-left: -39px;
