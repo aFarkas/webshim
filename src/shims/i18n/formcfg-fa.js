@@ -48,7 +48,7 @@ webshims.formcfg.fa = {
     "timeSigns": ":. ",
     "dFormat": "/",
     "patterns": {
-        "d": "yyyy/mm/dd"
+        "d": "yy/mm/dd"
     },
     "meridian": [
 		"ب.ظ",
