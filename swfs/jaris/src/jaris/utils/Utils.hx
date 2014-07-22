@@ -22,6 +22,9 @@
 
 package jaris.utils;
 
+import haxe.BaseCode;
+import haxe.io.Bytes;
+import haxe.io.BytesData;
 import StringTools;
 using StringTools;
 
@@ -30,7 +33,8 @@ using StringTools;
  */
 class Utils 
 {
-
+	
+	
 	/**
 	 * Converts degrees to radians for easy rotation where applicable
 	 * @param	value A radian value to convert
@@ -40,6 +44,26 @@ class Utils
 	{
 		return (Math.PI / 180) * value;
 	}
+	
+	private static inline var BASE_64_ENCODINGS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	private static inline var BASE_64_PADDING = "=";
+	public static function enocdeBytesData( bytesData : BytesData ) : String {
+		var bytes = Bytes.ofData(bytesData);
+		var encodings = Bytes.ofString(BASE_64_ENCODINGS);
+		var base64 = new BaseCode(encodings).encodeBytes(bytes).toString();
+		var remainder = base64.length % 4;
+
+		if (remainder > 1) {
+			base64 += BASE_64_PADDING;
+		}
+
+		if (remainder == 2) {
+			base64 += BASE_64_PADDING;
+		}
+		return base64;
+	}
+
+
 	
 	/**
 	 * Converts a float value representing seconds to a readale string

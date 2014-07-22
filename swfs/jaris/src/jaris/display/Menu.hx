@@ -97,16 +97,8 @@ class Menu
 			_playMenuItem.caption = "Play (SPACE)";
 		}
 		
-		if (_player.isFullscreen())
-		{
-			_fullscreenMenuItem.caption = "Normal View";
-		}
-		else
-		{
-			_fullscreenMenuItem.caption = "Fullscreen View (F)";
-		}
 		
-		_muteMenuItem.caption = _player.isFullscreen()?"Mute/Unmute":"Mute/Unmute (M)";
+		_muteMenuItem.caption = "Mute/Unmute";
 		
 	}
 	

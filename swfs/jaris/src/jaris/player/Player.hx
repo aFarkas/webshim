@@ -26,6 +26,9 @@ import flash.display.Loader;
 import flash.display.MovieClip;
 import flash.display.Sprite;
 import flash.display.Stage;
+import flash.display.BitmapData;
+import flash.display.JPEGEncoderOptions;
+import flash.utils.ByteArray;
 import flash.display.StageDisplayState;
 import flash.events.AsyncErrorEvent;
 import flash.events.Event;
@@ -57,6 +60,7 @@ import jaris.utils.Utils;
 import jaris.player.AspectRatio;
 import jaris.player.UserSettings;
 import flash.errors.IOError;
+
 
 /**
  * Jaris main video player
@@ -217,6 +221,19 @@ class Player extends EventDispatcher
 			noAPITrigger = false;
 		}
 	}
+	
+	
+	public function createScreenShot()
+	{
+		var qImageData:BitmapData = new BitmapData(Std.int(_stage.width), Std.int(_stage.height), false, 0x00FF00);
+		var byteArray:ByteArray = new ByteArray();
+		
+		qImageData.draw(_video);
+		qImageData.encode(new Rectangle(0, 0, Std.int(_stage.width), Std.int(_stage.height)), new flash.display.JPEGEncoderOptions(), byteArray);
+		
+		return Utils.enocdeBytesData(byteArray);
+	}
+	
 	
 	//{Timers
 	/**

@@ -76,7 +76,7 @@ class NewControls extends MovieClip {
 	private var _percentLoaded:Float;
 	private var _controlsVisible:Bool;
 	private var _seekBar:Sprite;
-	private var _controlsBar:Sprite;
+	public var _controlsBar:Sprite;
 	private var _playControl:PlayIcon;
 	private var _pauseControl:PauseIcon;
 	private var _fullscreenControl:FullscreenIcon;

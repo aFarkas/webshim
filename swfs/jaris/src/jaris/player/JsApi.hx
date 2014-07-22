@@ -145,11 +145,12 @@ class JsApi extends MovieClip {
 					
 				case 'meta':
 					return _player.fullMetaData;
+					
+				case 'picture':
+					return _player.createScreenShot();
 			}
 			
 			return 0;
-
-
 	}	
 	
 	public function addJsListener(attribute:String, parameter:String):Void {		

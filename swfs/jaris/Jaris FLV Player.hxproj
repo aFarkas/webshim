@@ -8,8 +8,8 @@
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />
-    <movie version="10" />
-    <movie minorVersion="1" />
+    <movie version="11" />
+    <movie minorVersion="3" />
     <movie platform="Flash Player" />
     <movie background="#000000" />
     <movie preferredSDK="Haxe 2.10;2.10;" />
@@ -36,7 +36,8 @@
   </compileTargets>
   <!-- Assets to embed into the output SWF -->
   <library>
-    <!-- example: <asset path="..." id="..." update="..." glyphs="..." mode="..." place="..." sharepoint="..." /> -->
+    <asset path="src\jaris\utils\blooddy_crypto.swc" />
+    <asset path="src\jaris\utils\base64\library.swf" />
   </library>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>

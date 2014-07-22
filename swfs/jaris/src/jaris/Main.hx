@@ -166,6 +166,7 @@ class Main
 		movieClip.addChild(controls);
 		
 		
+		
 		if (ExternalInterface.available) {
 			
 			var jsAPI:JsApi = new JsApi(player, controls);
