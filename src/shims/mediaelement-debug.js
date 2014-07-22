@@ -472,7 +472,8 @@
 			.attr({
 				src: src.src,
 				'data-type': container,
-				'controls': 'controls'
+				'controls': 'controls',
+				preload: 'none'
 			})
 		;
 		var resolvePromise = function(){
@@ -517,6 +518,8 @@
 							duration: $media.prop('duration'),
 							height: $media.prop('videoHeight'),
 							width: $media.prop('videoWidth')
+							//todo at test for seekable
+							//,seekable: ($media.prop('seekable') || []).length
 						};
 					}
 					src.decode[provider].success = true;
@@ -554,6 +557,11 @@
 			.on('mediaerror loadedmetadata', resolve)
 			.appendTo($element)
 		;
+
+		if(provider == 'native'){
+			$media.on('error', resolve);
+		}
+
 		$element.appendTo($container);
 		timeoutTimer = setTimeout(resolve, 40000);
 		playTimer = setTimeout(function(){
