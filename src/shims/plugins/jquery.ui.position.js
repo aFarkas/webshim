@@ -9,15 +9,7 @@
  * http://api.jqueryui.com/position/
  */
 (function( factory ) {
-	if ( typeof define === "function" && define.amd ) {
-
-		// AMD. Register as an anonymous module.
-		define( [ "jquery" ], factory );
-	} else {
-
-		// Browser globals
-		factory( window.webshims && window.webshims.$ || jQuery );
-	}
+	factory( window.webshims && window.webshims.$ || jQuery );
 }(function( $ ) {
 	(function() {
 

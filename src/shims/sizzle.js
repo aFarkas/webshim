@@ -2031,14 +2031,7 @@
 	}
 
 // EXPOSE
-	if ( typeof define === "function" && define.amd ) {
-		define(function() { return Sizzle; });
-// Sizzle requires that there be a global window in Common-JS like environments
-	} else if ( typeof module !== "undefined" && module.exports ) {
-		module.exports = Sizzle;
-	} else {
-		window.Sizzle = Sizzle;
-	}
+	window.Sizzle = Sizzle;
 // EXPOSE
 
 

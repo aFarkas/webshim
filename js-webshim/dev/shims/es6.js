@@ -1878,10 +1878,6 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 		}
 	};
 
-	if (typeof define === 'function' && define.amd) {
-		define(main); // RequireJS
-	} else {
-		main(); // CommonJS and <script>
-	}
+	main(); // CommonJS and <script>
 });
 
