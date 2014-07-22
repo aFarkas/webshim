@@ -5,7 +5,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 	var swfmini = window.swfmini;
 	var support = webshims.support;
 	var hasNative = support.mediaelement;
-	var hasFlash = swfmini.hasFlashPlayerVersion('9.0.115');
+	var hasFlash = swfmini.hasFlashPlayerVersion('11.3');
 	var loadedSwf = 0;
 	var needsLoadPreload = 'ActiveXObject' in window && hasNative;
 	var getProps = {
@@ -1090,6 +1090,52 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 					}
 				}
 			}, 'prop');
+		}
+	});
+
+	webshims.ready('canvas', function(){
+		if(!window.CanvasRenderingContext2D){
+			webshim.error('canvas.drawImage feature is needed. In IE8 flashvanvas pro can be used');
+			return;
+		}
+		var _drawImage = CanvasRenderingContext2D.prototype.drawImage;
+		var slice = Array.prototype.slice;
+		var isVideo = {
+			video: 1,
+			VIDEO: 1
+		};
+		var tested = {};
+		CanvasRenderingContext2D.prototype.drawImage = function(elem){
+			var data, img, args, imgData;
+			var context = this;
+			if(isVideo[elem.nodeName] && (data = webshims.data(elem, 'mediaelement')) && data.isActive == 'third' && data.api.api_image){
+				if(!tested[data.currentSrc]){
+					tested[data.currentSrc] = true;
+					try {
+						imgData = data.api.api_image();
+					} catch (er){}
+					if(!imgData){
+						webshims.error('video has to be same origin or a crossdomain.xml has to be provided');
+					}
+				} else {
+					imgData = data.api.api_image();
+				}
+
+				args = slice.call(arguments, 1);
+				img = new Image();
+				img.onload = function(){
+					args.unshift(this);
+					_drawImage.apply(context, args);
+				};
+
+				img.src = 'data:image/jpeg;base64,'+imgData;
+				return;
+			}
+			return _drawImage.apply(this, arguments);
+		};
+
+		if(!_drawImage){
+			webshim.error('canvas.drawImage feature is needed. In IE8 flashvanvas pro can be used');
 		}
 	});
 	

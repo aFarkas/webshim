@@ -3236,7 +3236,7 @@ webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors
 	}
 
 webshims.register('mediaelement-core', function($, webshims, window, document, undefined, options){
-	var hasSwf = swfmini.hasFlashPlayerVersion('10.0.3');
+	var hasSwf = swfmini.hasFlashPlayerVersion('11.3');
 	var mediaelement = webshims.mediaelement;
 	
 	mediaelement.parseRtmp = function(data){

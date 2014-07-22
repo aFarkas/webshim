@@ -1289,7 +1289,7 @@
 				if(options.preferFlash && !modules.swfmini.test()){
 					options.preferFlash = false;
 				}
-				return !( options.preferFlash && swfmini.hasFlashPlayerVersion('10.0.3') );
+				return !( options.preferFlash && swfmini.hasFlashPlayerVersion('11.3') );
 			},
 			c: [21, 25]
 		});

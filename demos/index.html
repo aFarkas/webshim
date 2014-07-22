@@ -1175,6 +1175,7 @@ webshim.setOptions('canvas', {
 //start polyfilling forms
 webshim.polyfill('forms');
 </code></pre>
+			<p>If the <code>canvas</code> and the <code>mediaelement</code> features are requested, webshim will implement a bridge between the native/polyfilled drawImage canvas API and the polyfilled mediaelement API. To get this work in IE8 the flashpro option has to be used.</p>
 			<h3>Options for the <code class="i">
 				canvas</code> feature</h3>
 			<ul>
@@ -1303,7 +1304,9 @@ webshim.polyfill('forms');
 	&lt;/video&gt;
 &lt;/div&gt;
 </code></pre>
-			<p>Here you can find more informations about <a href="demos/mediaelement.html">customizing controls and extending the mediaplayer's behavior</a>.</p>
+
+			<p>If the <code>canvas</code> and the <code>mediaelement</code> features are requested, webshim will implement a bridge between the native/polyfilled drawImage canvas API and the polyfilled mediaelement API.</p>
+			<p>Here you can find more information about <a href="demos/mediaelement.html">customizing controls and extending the mediaplayer's behavior</a>.</p>
 			<h4>Examples/Demos</h4>
 			<ul>
 				<li><a href="http://fiddle.jshell.net/trixta/VvmmC/show/light/">Player with some custom controls using input[type="range"]</a></li>

@@ -118,6 +118,7 @@ class JsApi extends MovieClip {
 		ExternalInterface.addCallback("api_controls", setControls);
 		ExternalInterface.addCallback("api_preload", startLoading);
 		ExternalInterface.addCallback("api_destroy", destroy);
+		ExternalInterface.addCallback("api_image", image);
 	
 		
 		addJsListener('on*', 'webshim.mediaelement.jarisEvent.' + parameters.evtId);
@@ -145,13 +146,14 @@ class JsApi extends MovieClip {
 					
 				case 'meta':
 					return _player.fullMetaData;
-					
-				case 'picture':
-					return _player.createScreenShot();
 			}
 			
 			return 0;
-	}	
+	}
+	
+	public function image() {		
+		return _player.createScreenShot();
+	}
 	
 	public function addJsListener(attribute:String, parameter:String):Void {		
 		_externalListeners.set(attribute.toLowerCase(), parameter);

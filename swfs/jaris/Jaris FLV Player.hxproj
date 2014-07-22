@@ -22,6 +22,7 @@
   <build>
     <option directives="" />
     <option flashStrict="False" />
+    <option noInlineOnDebug="False" />
     <option mainClass="jaris.Main" />
     <option enabledebug="False" />
     <option additional="" />
@@ -36,12 +37,11 @@
   </compileTargets>
   <!-- Assets to embed into the output SWF -->
   <library>
-    <asset path="src\jaris\utils\blooddy_crypto.swc" />
     <asset path="src\jaris\utils\base64\library.swf" />
   </library>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
-    <!-- example: <hidden path="..." /> -->
+    <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
   <preBuildCommand />
@@ -51,6 +51,7 @@
   <options>
     <option showHiddenPaths="True" />
     <option testMovie="Default" />
+    <option testMovieCommand="" />
   </options>
   <!-- Plugin storage -->
   <storage />

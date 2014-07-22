@@ -225,11 +225,14 @@ class Player extends EventDispatcher
 	
 	public function createScreenShot()
 	{
-		var qImageData:BitmapData = new BitmapData(Std.int(_stage.width), Std.int(_stage.height), false, 0x00FF00);
+		var width = Std.int(_stage.width);
+		var height = Std.int(_stage.width);
+		
+		var qImageData:BitmapData = new BitmapData(width, height, false, 0x00FF00);
 		var byteArray:ByteArray = new ByteArray();
 		
 		qImageData.draw(_video);
-		qImageData.encode(new Rectangle(0, 0, Std.int(_stage.width), Std.int(_stage.height)), new flash.display.JPEGEncoderOptions(), byteArray);
+		qImageData.encode(new Rectangle(0, 0, width, height), new flash.display.JPEGEncoderOptions(), byteArray);
 		
 		return Utils.enocdeBytesData(byteArray);
 	}
