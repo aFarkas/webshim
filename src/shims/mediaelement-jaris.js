@@ -1108,6 +1108,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		CanvasRenderingContext2D.prototype.drawImage = function(elem){
 			var data, img, args, imgData;
 			var context = this;
+
 			if(isVideo[elem.nodeName] && (data = webshims.data(elem, 'mediaelement')) && data.isActive == 'third' && data.api.api_image){
 				if(!tested[data.currentSrc]){
 					tested[data.currentSrc] = true;
@@ -1123,12 +1124,18 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 
 				args = slice.call(arguments, 1);
 				img = new Image();
+
 				img.onload = function(){
 					args.unshift(this);
 					_drawImage.apply(context, args);
+					img.onload = null;
 				};
 
 				img.src = 'data:image/jpeg;base64,'+imgData;
+
+				if(img.complete){
+					img.onload();
+				}
 				return;
 			}
 			return _drawImage.apply(this, arguments);

@@ -1123,12 +1123,18 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 
 				args = slice.call(arguments, 1);
 				img = new Image();
+
 				img.onload = function(){
 					args.unshift(this);
 					_drawImage.apply(context, args);
+					img.onload = null;
 				};
 
 				img.src = 'data:image/jpeg;base64,'+imgData;
+
+				if(img.complete){
+					img.onload();
+				}
 				return;
 			}
 			return _drawImage.apply(this, arguments);

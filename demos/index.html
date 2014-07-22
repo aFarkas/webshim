@@ -1305,7 +1305,7 @@ webshim.polyfill('forms');
 &lt;/div&gt;
 </code></pre>
 
-			<p>If the <code>canvas</code> and the <code>mediaelement</code> features are requested, webshim will implement a bridge between the native/polyfilled drawImage canvas API and the polyfilled mediaelement API.</p>
+			<p>If the <code>canvas</code> and the <code>mediaelement</code> features are requested, webshim will implement a bridge between the native/polyfilled drawImage canvas API and the polyfilled mediaelement API. Even if the browser supports canvas the canvas feature needs to be requested to get this mediaelement bridge.</p>
 			<p>Here you can find more information about <a href="demos/mediaelement.html">customizing controls and extending the mediaplayer's behavior</a>.</p>
 			<h4>Examples/Demos</h4>
 			<ul>
