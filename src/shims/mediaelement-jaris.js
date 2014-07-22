@@ -1116,7 +1116,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 						imgData = data.api.api_image();
 					} catch (er){}
 					if(!imgData){
-						webshims.error('video has to be same origin or a crossdomain.xml has to be provided');
+						webshims.error('video has to be same origin or a crossdomain.xml has to be provided. Video has to be visible for flash API');
 					}
 				} else {
 					imgData = data.api.api_image();

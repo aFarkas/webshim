@@ -1306,6 +1306,55 @@ webshim.polyfill('forms');
 </code></pre>
 
 			<p>If the <code>canvas</code> and the <code>mediaelement</code> features are requested, webshim will implement a bridge between the native/polyfilled drawImage canvas API and the polyfilled mediaelement API. Even if the browser supports canvas the canvas feature needs to be requested to get this mediaelement bridge.</p>
+<pre><code class="language-markup">
+&lt;script&gt;
+	webshim.setOptions({
+		canvas: {
+			type: 'flashpro'
+		},
+		mediaelement: {
+			replaceUI: 'auto'
+		}
+	});
+
+	webshim.polyfill('mediaelement canvas');
+&lt;/script&gt;
+&lt;script&gt;
+	$(function(){
+		var context, $video;
+		function initCanvas() {
+			var $canvas = document.getElementsByTagName("canvas")[0];
+			$video = $("video");
+			context = $canvas.getContext("2d");
+			$video.on("timeupdate", paintFrame);
+		}
+
+		function paintFrame(e) {
+			context.drawImage($video[0], 0, 0);
+
+			//timeupdate is dispatched every 250ms, let's paint the frame more often,
+			//but only if a real timeupdate was dispatched
+			if(e){
+				setTimeout(paintFrame, 65);
+				setTimeout(paintFrame, 130);
+				setTimeout(paintFrame, 195);
+			}
+		}
+
+		initCanvas();
+	});
+&lt;/script&gt;
+
+&lt;div class="mediaplayer ratio-16-9"&gt;
+	&lt;video controls preload="none" poster="sintel-trailer.jpg">
+		&lt;source src="sintel-trailer.mp4" type="video/mp4" /&gt;
+	&lt;/video&gt;
+&lt;/div>
+&lt;canvas style="border: 1px solid black;" height="280" width="500"&gt;&lt;/canvas&gt;
+
+
+</code></pre>
+
 			<p>Here you can find more information about <a href="demos/mediaelement.html">customizing controls and extending the mediaplayer's behavior</a>.</p>
 			<h4>Examples/Demos</h4>
 			<ul>
