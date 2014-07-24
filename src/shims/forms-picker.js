@@ -324,10 +324,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 		e.stopImmediatePropagation();
 	};
 	var steps = options.steps;
-	
-	var mousePress = function(e){
-		$(this)[e.type == 'mousepressstart' ? 'addClass' : 'removeClass']('mousepress-ui');
-	};
+
 	var getMonthNameHTML = function(index, year, prefix){
 		var dateCfg = curCfg.date;
 		var str = [];
@@ -441,7 +438,7 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					}
 				}, 0);
 			})();
-			
+			var isDisabled = false;
 			var spinEvents = {};
 			var spinElement = o.splitInput ? this.inputElements.filter('.ws-spin') : this.inputElements.eq(0);
 			var elementEvts = {
@@ -655,12 +652,25 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 					spinElement.on(spinEvents);
 				}
 				$(this.buttonWrapper)
-					.on('mousepressstart mousepressend', '.step-up, .step-down', mousePress)
+					.on('mousepressstart mousepressend', '.step-up, .step-down', function(e){
+						var fn = 'removeClass';
+						if(e.type == 'mousepressstart' && !isDisabled){
+							fn = 'addClass';
+						}
+						$(this)[fn]('mousepress-ui');
+					})
 					.on('mousedown mousepress', '.step-up', function(e){
-						step.stepUp();
+						if(e.type == 'mousedown'){
+							isDisabled = (o.disabled || o.readOnly || $.find.matchesSelector(that.orig, ':disabled'));
+						}
+						if(!isDisabled){
+							step.stepUp();
+						}
 					})
 					.on('mousedown mousepress', '.step-down', function(e){
-						step.stepDown();
+						if(!isDisabled && !o.disabled && !o.readOnly){
+							step.stepDown();
+						}
 					})
 				;
 				initChangeEvents();

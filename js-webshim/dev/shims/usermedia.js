@@ -29,8 +29,8 @@ webshim.register('usermedia', function($, webshim, window, document, undefined, 
 			url = URL._nativeCreateObjectURL(stream);
 		} else if(stream._wsStream) {
 			url = stream._wsStreamId;
+			streams[url] = stream;
 		}
-		streams[url] = stream;
 		return url;
 	};
 
