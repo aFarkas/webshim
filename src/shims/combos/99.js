@@ -502,7 +502,8 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 	};
 
 	webshims.loader.addModule('mediacontrols-lazy', {
-		src: 'jme/mediacontrols-lazy'
+		src: 'jme/mediacontrols-lazy',
+		d: ['dom-support']
 	});
 
 	var userActivity = {

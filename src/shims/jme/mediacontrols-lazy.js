@@ -29,6 +29,8 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 			;
 		return '<div><ul role="presentation">' + items.join('') +'</ul></div>';
 	};
+	var domPrefixes = webshims.domPrefixes;
+	var prefixed = webshims.prefixed;
 
 
 	if(!$.fn.wsTouchClick){
@@ -976,26 +978,7 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 		return chapterList;
 	}
 
-	var domPrefixes = ["webkit", "moz", "o", "ms"];
 
-	function prefixed(prop, obj){
-		var i, testProp;
-		var ret = false;
-		if(obj[prop]){
-			ret = prop;
-		}
-		if(!ret){
-			prop = prop.charAt(0).toUpperCase() + prop.slice(1);
-			for(i = 0; i < domPrefixes.length; i++){
-				testProp = domPrefixes[i]+prop;
-				if(testProp in obj){
-					ret = testProp;
-					break;
-				}
-			}
-		}
-		return ret;
-	}
 
 	$.jme.defineMethod('getChapterTree', getChapterTree);
 

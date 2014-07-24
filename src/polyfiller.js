@@ -623,6 +623,7 @@
 		error: 1
 	};
 	var $fn = $.fn;
+	var video = create('video');
 	
 	webshims.addMethodName = function(name){
 		name = name.split(':');
@@ -1241,10 +1242,22 @@
 	});
 	//>
 
+	//<url
+	addPolyfill('url', {
+		test: function(){
+			var support = false;
+			try {
+				support = new URL('b', 'http://a').href == 'http://a/b';
+			} catch(e){}
+			return support;
+		},
+		d: ['es5']
+	});
+	//>
+
 	//<mediaelement
 	(function(){
 		webshims.mediaelement = {};
-		var video = create('video');
 		var track = create('track');
 		support.mediaelement = ('canPlayType' in video);
 		support.texttrackapi = ('addTextTrack' in video);
@@ -1274,7 +1287,7 @@
 			d: ['swfmini'],
 			c: [16, 7, 2, 8, 1, 12, 13, 23]
 		});
-		
+
 		
 		addPolyfill('mediaelement-jaris', {
 			f: 'mediaelement',

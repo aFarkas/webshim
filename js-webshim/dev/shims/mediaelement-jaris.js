@@ -92,6 +92,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 	webshims.extendUNDEFProp(options.attrs, {
 		bgcolor: '#000000'
 	});
+	options.playerPath = playerSwfPath;
 	
 	var setReadyState = function(readyState, data){
 		if(readyState < 3){
@@ -1125,6 +1126,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 				args = slice.call(arguments, 1);
 				img = new Image();
 
+				//todo find a performant sync way
 				img.onload = function(){
 					args.unshift(this);
 					_drawImage.apply(context, args);

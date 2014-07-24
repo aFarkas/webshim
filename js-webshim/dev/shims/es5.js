@@ -1455,7 +1455,9 @@ if((!advancedObjectProperties || !Object.create || !Object.defineProperties || !
 	var descProps = ['configurable', 'enumerable', 'writable'];
 	shims.defineProperty = function(proto, property, descriptor){
 		if(typeof descriptor != "object" || descriptor === null){return proto;}
-		
+		if(Object.defineProperty){
+			try { return Object.defineProperty(proto, property, descriptor); } catch (e) {}
+		}
 		if(owns(descriptor, "value")){
 			proto[property] = descriptor.value;
 			return proto;

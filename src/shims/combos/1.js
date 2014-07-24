@@ -717,6 +717,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			loadYt();
 		}
 	};
+
 	
 	webshims.addPolyfill('mediaelement-yt', {
 		test: !hasYt,
@@ -761,7 +762,16 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		if(src.indexOf('youtube.com/watch?') != -1 || src.indexOf('youtube.com/v/') != -1){
 			return 'video/youtube';
 		}
-		if(src.indexOf('rtmp') === 0){
+
+		if(!src.indexOf('mediastream:') || !src.indexOf('blob:http')){
+			return 'usermedia';
+		}
+
+		if(!src.indexOf('webshimstream')){
+			return 'jarisplayer/jarisplayer';
+		}
+
+		if(!src.indexOf('rtmp')){
 			return nodeName+'/rtmp';
 		}
 		src = src.split('?')[0].split('#')[0].split('.');
@@ -829,7 +839,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			srces = srces || mediaelement.srces(mediaElem);
 			
 			$.each(srces, function(i, src){
-				if(src.type && nativeCanPlay.call(mediaElem[0], src.type) ){
+				if(src.type == 'usermedia' || (src.type && nativeCanPlay.call(mediaElem[0], src.type)) ){
 					ret = src;
 					return false;
 				}

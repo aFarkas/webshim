@@ -79,7 +79,8 @@ webshims.register('mediacontrols', function($, webshims, window){
 	};
 
 	webshims.loader.addModule('mediacontrols-lazy', {
-		src: 'jme/mediacontrols-lazy'
+		src: 'jme/mediacontrols-lazy',
+		d: ['dom-support']
 	});
 
 	var userActivity = {

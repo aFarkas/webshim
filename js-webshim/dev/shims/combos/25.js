@@ -91,7 +91,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	}
 
 	//shortcus
-	var modules = webshims.modules;
 	var listReg = /\s*,\s*/;
 		
 	//proxying attribute
@@ -476,8 +475,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				(tempCache || $( document.getElementsByTagName(nodeName) )).each(fn);
 			}
 		};
-		
-		var elementExtends = {};
+
 		return {
 			createTmpCache: function(nodeName){
 				if($.isDOMReady){
@@ -542,6 +540,26 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				return id;
 			};
 		})(),
+		domPrefixes: ["webkit", "moz", "o", "ms", "ws"],
+
+		prefixed: function (prop, obj){
+			var i, testProp;
+			var ret = false;
+			if(obj[prop]){
+				ret = prop;
+			}
+			if(!ret){
+				prop = prop.charAt(0).toUpperCase() + prop.slice(1);
+				for(i = 0; i < webshims.domPrefixes.length; i++){
+					testProp = webshims.domPrefixes[i]+prop;
+					if(testProp in obj){
+						ret = testProp;
+						break;
+					}
+				}
+			}
+			return ret;
+		},
 		shadowClass: 'wsshadow-'+(Date.now()),
 		implement: function(elem, type){
 			var data = elementData(elem, 'implemented') || elementData(elem, 'implemented', {});
@@ -1774,6 +1792,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	webshims.extendUNDEFProp(options.attrs, {
 		bgcolor: '#000000'
 	});
+	options.playerPath = playerSwfPath;
 	
 	var setReadyState = function(readyState, data){
 		if(readyState < 3){
@@ -2807,6 +2826,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				args = slice.call(arguments, 1);
 				img = new Image();
 
+				//todo find a performant sync way
 				img.onload = function(){
 					args.unshift(this);
 					_drawImage.apply(context, args);

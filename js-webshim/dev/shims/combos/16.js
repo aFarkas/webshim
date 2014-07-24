@@ -314,7 +314,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	}
 
 	//shortcus
-	var modules = webshims.modules;
 	var listReg = /\s*,\s*/;
 		
 	//proxying attribute
@@ -699,8 +698,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				(tempCache || $( document.getElementsByTagName(nodeName) )).each(fn);
 			}
 		};
-		
-		var elementExtends = {};
+
 		return {
 			createTmpCache: function(nodeName){
 				if($.isDOMReady){
@@ -765,6 +763,26 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				return id;
 			};
 		})(),
+		domPrefixes: ["webkit", "moz", "o", "ms", "ws"],
+
+		prefixed: function (prop, obj){
+			var i, testProp;
+			var ret = false;
+			if(obj[prop]){
+				ret = prop;
+			}
+			if(!ret){
+				prop = prop.charAt(0).toUpperCase() + prop.slice(1);
+				for(i = 0; i < webshims.domPrefixes.length; i++){
+					testProp = webshims.domPrefixes[i]+prop;
+					if(testProp in obj){
+						ret = testProp;
+						break;
+					}
+				}
+			}
+			return ret;
+		},
 		shadowClass: 'wsshadow-'+(Date.now()),
 		implement: function(elem, type){
 			var data = elementData(elem, 'implemented') || elementData(elem, 'implemented', {});
@@ -3346,6 +3364,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			loadYt();
 		}
 	};
+
 	
 	webshims.addPolyfill('mediaelement-yt', {
 		test: !hasYt,
@@ -3390,7 +3409,16 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 		if(src.indexOf('youtube.com/watch?') != -1 || src.indexOf('youtube.com/v/') != -1){
 			return 'video/youtube';
 		}
-		if(src.indexOf('rtmp') === 0){
+
+		if(!src.indexOf('mediastream:') || !src.indexOf('blob:http')){
+			return 'usermedia';
+		}
+
+		if(!src.indexOf('webshimstream')){
+			return 'jarisplayer/jarisplayer';
+		}
+
+		if(!src.indexOf('rtmp')){
 			return nodeName+'/rtmp';
 		}
 		src = src.split('?')[0].split('#')[0].split('.');
@@ -3458,7 +3486,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			srces = srces || mediaelement.srces(mediaElem);
 			
 			$.each(srces, function(i, src){
-				if(src.type && nativeCanPlay.call(mediaElem[0], src.type) ){
+				if(src.type == 'usermedia' || (src.type && nativeCanPlay.call(mediaElem[0], src.type)) ){
 					ret = src;
 					return false;
 				}
