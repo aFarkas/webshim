@@ -1,4 +1,4 @@
-webshim.ready('matchMedia', function($, webshims, w, doc, undefined){
+webshim.ready('matchMedia', function($, webshim, w, doc, undefined){
 	try {
 		new Image();
 	} catch(e){
@@ -7,14 +7,7 @@ webshim.ready('matchMedia', function($, webshims, w, doc, undefined){
 		};
 	}
 	webshim.isReady('picture', true);
-
-/*! Picturefill - Responsive Images that work today.
- *  Author: Scott Jehl, Filament Group, 2012 ( new proposal implemented by Shawn Jansepar )
- *  License: MIT/GPLv2
- *  Spec: http://picture.responsiveimages.org/
- */
-
-	// Enable strict mode
+// Enable strict mode
 	"use strict";
 
 	// If picture is supported, well, that's awesome. Let's get outta here...
@@ -428,6 +421,10 @@ webshim.ready('matchMedia', function($, webshims, w, doc, undefined){
 			// ignore non-`source` nodes
 			if ( source.nodeName.toUpperCase() !== "SOURCE" ) {
 				continue;
+			}
+			// if it's a source element that has the `src` property set, throw a warning in the console
+			if ( source.getAttribute( "src" ) !== null && typeof console !== undefined ){
+				console.warn("The `src` attribute is invalid on `picture` `source` element; instead, use `srcset`.");
 			}
 
 			var media = source.getAttribute( "media" );

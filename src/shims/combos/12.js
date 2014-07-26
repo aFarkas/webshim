@@ -1229,11 +1229,29 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				webshims.error('you must provide a language for track in subtitles state');
 			}
 			obj.__wsmode = obj.mode;
+
+			webshims.defineProperty(obj, '_wsUpdateMode', {
+				value: function(){
+					$(mediaelem).triggerHandler('updatetrackdisplay');
+				},
+				enumerable: false
+			});
 		}
 		
 		return obj;
 	};
 
+	if(!$.propHooks.mode){
+		$.propHooks.mode = {
+			set: function(obj, value){
+				obj.mode = value;
+				if(obj._wsUpdateMode && obj._wsUpdateMode.call){
+					obj._wsUpdateMode();
+				}
+				return obj.mode;
+			}
+		};
+	}
 
 /*
 taken from:
@@ -1484,7 +1502,7 @@ modified for webshims
 		var name = copyName[copyProp] || copyProp;
 		webshims.onNodeNamesPropertyModify('track', copyProp, function(){
 			var trackData = webshims.data(this, 'trackData');
-			var track = this;
+
 			if(trackData){
 				if(copyProp == 'kind'){
 					refreshTrack(this, trackData);
