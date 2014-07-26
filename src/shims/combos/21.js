@@ -1454,11 +1454,10 @@
 				}
 				if(!tested[data.currentSrc]){
 					tested[data.currentSrc] = true;
-					if(!imgData){
+					if(imgData == null){
 						webshims.error('video has to be same origin or a crossdomain.xml has to be provided. Video has to be visible for flash API');
 					}
 				}
-
 
 				args = slice.call(arguments, 1);
 				img = new Image();

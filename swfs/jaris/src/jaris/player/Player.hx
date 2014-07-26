@@ -90,6 +90,8 @@ class Player extends EventDispatcher {
     private var _video:Video;
     private var _videoWidth:Float;
     private var _videoHeight:Float;
+    private var _scaleWidth:Int;
+    private var _scaleHeight:Int;
     public var _naturalWidth:Float;
     public var _naturalHeight:Float;
     public var fullMetaData:Dynamic;
@@ -206,6 +208,9 @@ class Player extends EventDispatcher {
         _checkAudioTimer.addEventListener(TimerEvent.TIMER, checkAudioTimer);
         _connection.addEventListener(NetStatusEvent.NET_STATUS, onNetStatus);
         _connection.addEventListener(AsyncErrorEvent.ASYNC_ERROR, onAsyncError);
+
+        _scaleWidth = Std.int(_stage.stageWidth);
+        _scaleHeight = Std.int(_stage.stageHeight);
 //}
     }
 //}
@@ -223,21 +228,24 @@ class Player extends EventDispatcher {
 
 
     public function createScreenShot() {
-        var swidth = Std.int(_stage.width);
-        var sheight = Std.int(_stage.height);
+        var ret = '';
+        if(_mediaLoaded){
+            var vwidth = Std.int(_videoWidth);
+            var vheight = Std.int(_videoHeight);
+            var matrix:Matrix = new Matrix();
 
-        var vwidth = Std.int(_videoWidth);
-        var vheight = Std.int(_videoHeight);
-        var matrix:Matrix = new Matrix();
-        matrix.scale(vwidth / swidth, vheight / sheight);
+            //return 'sw: '+ swidth+' sh: '+ sheight+' vw: '+ vwidth +' vh: '+ vheight;
+            matrix.scale(vwidth / _scaleWidth, vheight / _scaleHeight);
 
-        var qImageData:BitmapData = new BitmapData(vwidth, vheight, false, 0x00FF00);
-        var byteArray:ByteArray = new ByteArray();
+            var qImageData:BitmapData = new BitmapData(vwidth, vheight, false, 0x00FF00);
+            var byteArray:ByteArray = new ByteArray();
 
-        qImageData.draw(_video, matrix, null, null, null, true);
-        qImageData.encode(new Rectangle(0, 0, vwidth, vheight), new flash.display.JPEGEncoderOptions(), byteArray);
+            qImageData.draw(_video, matrix, null, null, null, true);
+            qImageData.encode(new Rectangle(0, 0, vwidth, vheight), new flash.display.JPEGEncoderOptions(), byteArray);
 
-        return Utils.enocdeBytesData(byteArray);
+            ret = Utils.enocdeBytesData(byteArray);
+        }
+        return ret;
     }
 
 
