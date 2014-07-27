@@ -4,6 +4,7 @@ webshim.register('usermedia-core', function($, webshim, window, document, undefi
 	var srcObjectName = webshim.prefixed('srcObject', document.createElement('video'));
 
 	if(srcObjectName != 'srcObject'){
+		var hasURL = !!(window.URL && URL.createObjectURL);
 		webshim.defineNodeNamesProperty(['audio', 'video'], 'srcObject', {
 			prop: {
 				get: function(){
@@ -13,7 +14,7 @@ webshim.register('usermedia-core', function($, webshim, window, document, undefi
 					if(srcObjectName){
 						$.prop(this, srcObjectName, stream);
 					} else {
-						$.prop(this, 'src', URL.createObjectURL(stream));
+						$.prop(this, 'src', hasURL ? URL.createObjectURL(stream) : stream);
 					}
 				}
 			}

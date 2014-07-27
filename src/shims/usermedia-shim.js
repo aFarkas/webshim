@@ -16,7 +16,6 @@ webshim.register('usermedia-shim', function($, webshim, window, document, undefi
 
 	function wsGetUserMedia(constraints, successCb, failCb){
 		if(hasSwf){
-			if(!successCb){return;}
 			if(!webshim.mediaelement.createSWF){
 				webshim.loader.loadList(['swfmini-embed']);
 				webshim.mediaelement.loadSwf = true;
@@ -27,9 +26,7 @@ webshim.register('usermedia-shim', function($, webshim, window, document, undefi
 			} else {
 				createMediaRequest(constraints, successCb, failCb);
 			}
-
-
-		} else if(failCb) {
+		} else {
 			failCb({name: 'NOT_SUPPORTED_ERROR'});
 		}
 	}
@@ -53,23 +50,15 @@ webshim.register('usermedia-shim', function($, webshim, window, document, undefi
 
 			if(!flashEvents[e.type]){return;}
 
-			if(e.type == 'NOT_SUPPORTED_ERROR'){
-				failCb({name: 'NOT_SUPPORTED_ERROR'});
-				$dom.remove();
-			} else if(e.type == 'PERMISSION_DENIED'){
-				failCb({name: 'PERMISSION_DENIED'});
-				$dom.remove();
-			} else if(e.type == 'MANDATORY_UNSATISFIED_ERROR'){
-				failCb({name: 'MANDATORY_UNSATISFIED_ERROR'});
-				$dom.remove();
-			} else {
+			if(e.type == 'onUserSuccess'){
 				$dom.addClass('hide-streamrequest');
 				successCb(new LocalMediaStream($dom, elemId, e));
+			} else {
+				$dom.remove();
+				failCb({name: e.type});
 			}
 		};
-		swfmini.embedSWF(mediaOptions.playerPath, elemId, "100%", "100%", "11.3", false, vars, params, attrs, function(swfData){
-
-		});
+		swfmini.embedSWF(mediaOptions.playerPath, elemId, "100%", "100%", "11.3", false, vars, params, attrs);
 	}
 
 

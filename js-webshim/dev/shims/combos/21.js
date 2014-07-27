@@ -1429,10 +1429,9 @@
 		}
 	});
 
-	webshims.ready('canvas', function(){
+	var addCanvasBridge = function(){
 		if(!window.CanvasRenderingContext2D){
-			webshim.error('canvas.drawImage feature is needed. In IE8 flashvanvas pro can be used');
-			return;
+			return false;
 		}
 		var _drawImage = CanvasRenderingContext2D.prototype.drawImage;
 		var slice = Array.prototype.slice;
@@ -1441,6 +1440,11 @@
 			VIDEO: 1
 		};
 		var tested = {};
+
+		if(!_drawImage){
+			webshim.error('canvas.drawImage feature is needed. In IE8 flashvanvas pro can be used');
+		}
+
 		CanvasRenderingContext2D.prototype.drawImage = function(elem){
 			var data, img, args, imgData;
 			var context = this;
@@ -1450,7 +1454,7 @@
 				try {
 					imgData = data.api.api_image();
 				} catch (er){
-					webshims.error('video has to be same origin or a crossdomain.xml has to be provided. Video has to be visible for flash API');
+					webshims.error(er);
 				}
 				if(!tested[data.currentSrc]){
 					tested[data.currentSrc] = true;
@@ -1478,12 +1482,13 @@
 			}
 			return _drawImage.apply(this, arguments);
 		};
+		return true;
+	};
 
-		if(!_drawImage){
-			webshim.error('canvas.drawImage feature is needed. In IE8 flashvanvas pro can be used');
-		}
-	});
-	
+	if(!addCanvasBridge()){
+		webshims.ready('canvas', addCanvasBridge);
+	}
+
 	
 	if(hasFlash && $.cleanData){
 		var oldClean = $.cleanData;
