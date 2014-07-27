@@ -107,7 +107,8 @@
 	var featureAlias = {
 		matchmedia: 'matchMedia',
 		xhr2: 'filereader',
-		promise: 'es6'
+		promise: 'es6',
+		URL: 'url'
 	};
 
 	clearInterval(webshims.timer);
@@ -126,7 +127,7 @@
 	}
 
 	$.extend(webshims, {
-		version: '1.14.6-pre',
+		version: '1.14.6-RC1',
 
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
@@ -1247,7 +1248,8 @@
 		test: function(){
 			var support = false;
 			try {
-				support = new URL('b', 'http://a').href == 'http://a/b';
+				support = new URL('b', 'http://a');
+				support = !!(support.searchParams && support.href == 'http://a/b');
 			} catch(e){}
 			return support;
 		},

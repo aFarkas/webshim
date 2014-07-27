@@ -28,7 +28,7 @@
 
 		<div id="sidebar" class="interface">
 
-			<a class="toc_title"> Webshim <span class="version">(<span class="ws-version">1.14.5</span>)</span></a>
+			<a class="toc_title"> Webshim <span class="version">(<span class="ws-version">1.14.6-RC1</span>)</span></a>
 			<ul class="toc_section">
 				<li>
 					&raquo; <a href="https://github.com/aFarkas/webshim">GitHub Repository</a>
@@ -100,6 +100,8 @@
 
 			<a class="toc_title" href="#Promise"> Promise </a>
 
+			<a class="toc_title" href="#url"> URL </a>
+
 			<a class="toc_title" href="#Picturefill"> Responsive Images (<code>picture</code>, <code>srcset</code>)</a>
 
 			<a class="toc_title" href="#Enhancement-Strategy">Webshim's opinionated enhancement cross browser / device development strategy</a>
@@ -141,7 +143,7 @@
 			<h3 id="downloads">Downloads &amp; Dependencies</h3>
 			<span style="padding-left: 7px; font-size:11px; font-weight: normal;" class="interface">(Right-click, and use "Save As")</span>
 			<p>
-				<a href="https://github.com/aFarkas/webshim/archive/1.14.5.zip" class="download-button"> <strong><i>Download</i></strong> </a>
+				<a href="https://github.com/aFarkas/webshim/archive/1.14.6-RC1.zip" class="download-button"> <strong><i>Download</i></strong> </a>
 			</p>
 
 			<p>
@@ -227,6 +229,9 @@
 					</li>
 					<li>
 						promise
+					</li>
+					<li>
+						url (<a href="http://url.spec.whatwg.org">window.URL</a>)
 					</li>
 
 					<li>
@@ -1639,6 +1644,16 @@ webshim.setOptions('filereader', {
 			<p>
 				<em>This feature is based on code from
 					<a href="https://github.com/paulirish/matchMedia.js" target="_external">https://github.com/paulirish/matchMedia.js</a>.</em>
+			</p>
+
+			<h2 id="url">url</h2>
+			<p>
+				The <code class="i">url</code> feature is a polyfill of
+				<a href="http://url.spec.whatwg.org" target="_external">WHATWG URL Spec</a>. It also includes the <code>searchParams</code> object.
+			</p>
+			<p>
+				<em>This feature is based on code from
+					<a href="https://github.com/inexorabletash/polyfill/blob/master/url.js" target="_external">https://github.com/inexorabletash/polyfill/blob/master/url.js</a>.</em>
 			</p>
 
 			<h2 id="Promise">Promise</h2>

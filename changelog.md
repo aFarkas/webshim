@@ -1,3 +1,13 @@
+upcoming Release 1.14.6
+----------
+
+- added URL polyfill
+- added canvas <-> mediaelement bridge ([demo](http://jsfiddle.net/trixta/Wvaca/))
+- fixed custom controls in conjunction with youtube API and iOS/Android
+- fix bug in conjunction with some AMD loading enviroments
+- improved type="number" detection
+- update picturefill polyfill
+
 Release 1.14.5
 ----------
 

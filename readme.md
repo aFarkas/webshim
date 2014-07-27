@@ -23,7 +23,8 @@ Features
 * XHR2 / filereader (including, XHR2/AJAX CORS and FormData handling)
 * promise
 * geolocation
-* ECMAScript 5 / JavaScript 1.8.5 features 
+* ECMAScript 5 / JavaScript 1.8.5 features
+* window.URL
 
 
 Installation and Usage
