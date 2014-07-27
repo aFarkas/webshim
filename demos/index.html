@@ -1651,6 +1651,40 @@ webshim.setOptions('filereader', {
 				The <code class="i">url</code> feature is a polyfill of
 				<a href="http://url.spec.whatwg.org" target="_external">WHATWG URL Spec</a>. It also includes the <code>searchParams</code> object.
 			</p>
+			<p>The <code>URL</code> object has the following properties:</p>
+			<ul>
+				<li><code>href</code></li>
+				<li><code>origin</code></li>
+				<li><code>protocol</code></li>
+				<li><code>username</code></li>
+				<li><code>password</code></li>
+				<li><code>host</code></li>
+				<li><code>hostname</code></li>
+				<li><code>port</code></li>
+				<li><code>pathname</code></li>
+				<li><code>search</code></li>
+				<li>
+					<code>searchParams</code>
+
+					<ul>
+						<li><code>append(name, value)</code></li>
+						<li><code>delete(name)</code></li>
+						<li><code>get(name)</code></li>
+						<li><code>getAll(name)</code></li>
+						<li><code>has(name)</code></li>
+						<li><code>set(name, value)</code></li>
+					</ul>
+				</li>
+				<li><code>hash</code></li>
+			</ul>
+			<p>Usage</p>
+<pre><code class="language-javascript">
+var link = new URL('http://afarkas.github.io/webshim/demos/index.html?param1=value1');
+link.protocol; // returns 'http:'
+link.searchParams.get('param1'); // returns 'value1'
+link.searchParams.append('param2', 'value2');
+link.href // returns 'http://afarkas.github.io/webshim/demos/index.html?param1=value1&param2=value2'
+</code></pre>
 			<p>
 				<em>This feature is based on code from
 					<a href="https://github.com/inexorabletash/polyfill/blob/master/url.js" target="_external">https://github.com/inexorabletash/polyfill/blob/master/url.js</a>.</em>
