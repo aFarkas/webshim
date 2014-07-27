@@ -31,4 +31,5 @@ class StreamType
 	public static var PSEUDOSTREAM:String = "http";
 	public static var RTMP:String = "rtmp";
 	public static var YOUTUBE = "youtube";
+    public static var USER = "usermedia";
 }

@@ -106,6 +106,9 @@ class JsApi extends MovieClip {
         _player.addEventListener(PlayerEvents.TIME, onPlayerEvent);
         _player.addEventListener(PlayerEvents.PROGRESS, onPlayerEvent);
         _player.addEventListener(PlayerEvents.SEEK, onPlayerEvent);
+        _player.addEventListener(PlayerEvents.USERNOTSUPPORTED, onPlayerEvent);
+        _player.addEventListener(PlayerEvents.USERDENIED, onPlayerEvent);
+        _player.addEventListener(PlayerEvents.USERSUCCESS, onPlayerEvent);
 
         ExternalInterface.addCallback("api_get", getAttribute);
         ExternalInterface.addCallback("api_addlistener", addJsListener);
@@ -213,6 +216,7 @@ class JsApi extends MovieClip {
             }
         }
     }
+
 
 
 /**

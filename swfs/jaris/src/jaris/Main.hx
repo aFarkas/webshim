@@ -119,20 +119,6 @@ class Main
 			
 			//player.preload(parameters.source, type, streamType);
 		}
-		else
-		{
-			//For development purposes
-			if(userSettings.isSet("aspectratio"))
-			{
-				player.setAspectRatio(userSettings.getAspectRatio());
-			}
-			
-			player.setVolume(userSettings.getVolume());
-			
-			player.load("http://jaris.sourceforge.net/files/jaris-intro.flv", InputType.VIDEO, StreamType.FILE);
-			//player.preload("http://jaris.sourceforge.net/files/jaris-intro.flv", InputType.VIDEO, StreamType.FILE);
-			//player.load("http://jaris.sourceforge.net/files/audio.mp3", InputType.AUDIO, StreamType.FILE);
-		}
 		
 		//Draw preview image
 		if (parameters.poster != null && parameters.poster != '')

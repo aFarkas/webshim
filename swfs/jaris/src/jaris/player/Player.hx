@@ -40,6 +40,7 @@ import flash.events.MouseEvent;
 import flash.events.NetStatusEvent;
 import flash.events.ProgressEvent;
 import flash.events.TimerEvent;
+import flash.events.StatusEvent;
 import flash.geom.Rectangle;
 import flash.Lib;
 import flash.media.ID3Info;
@@ -47,6 +48,7 @@ import flash.media.Sound;
 import flash.media.SoundChannel;
 import flash.media.SoundTransform;
 import flash.media.Video;
+import flash.media.Camera;
 import flash.net.NetConnection;
 import flash.net.NetStream;
 import flash.net.URLRequest;
@@ -223,6 +225,30 @@ class Player extends EventDispatcher {
             noAPITrigger = true;
             load(_mediaSource, _type, _streamType, _server);
             noAPITrigger = false;
+        } else if(_streamType == StreamType.USER){
+            getUserMedia();
+        }
+    }
+
+    private function getUserMedia():Void {
+        var cam:Camera = Camera.getCamera();
+
+        if(Camera.names.length > 0){
+            cam.addEventListener(StatusEvent.STATUS, userStatusHandler);
+
+            _video.attachCamera(cam);
+            _video.visible = false;
+        } else {
+            callEvents(PlayerEvents.USERNOTSUPPORTED);
+        }
+    }
+
+    private function userStatusHandler(event){
+        Utils.log(event);
+        if(event.code == 'Camera.Unmuted'){
+            callEvents(PlayerEvents.USERSUCCESS);
+        } else {
+            callEvents(PlayerEvents.USERDENIED);
         }
     }
 
@@ -500,7 +526,7 @@ class Player extends EventDispatcher {
             _originalAspectRatio = AspectRatio.getAspectRatio(_videoWidth, _videoHeight);
 
             if (_aspectRatio <= 0) {
-            _aspectRatio = _originalAspectRatio;
+                _aspectRatio = _originalAspectRatio;
             }
 
             fields = Reflect.fields(data);

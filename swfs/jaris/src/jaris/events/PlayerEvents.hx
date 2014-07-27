@@ -30,57 +30,58 @@ import flash.net.NetStream;
 /**
  * Implements the player events
  */
-class PlayerEvents extends Event
-{
-	public static var ASPECT_RATIO = "onAspectRatio";
-	public static var MOUSE_SHOW = "onMouseShow";
-	public static var MOUSE_HIDE = "onMouseHide";
-	public static var FULLSCREEN = "onFullscreen";
-	public static var VOLUME_UP = "onVolumeUp";
-	public static var VOLUME_DOWN = "onVolumeDown";
-	public static var VOLUME_CHANGE= "onVolumeChange"; //Nuevo
-	public static var MUTE = "onMute";
-	public static var FORWARD = "onForward";
-	public static var REWIND = "onRewind";
-	public static var PLAY_PAUSE = "onPlayPause";
-	public static var SEEK = "onSeek";
-	public static var TIME = "onTimeUpdate";	
-	public static var PROGRESS = "onProgress";
-	public static var BUFFERING = "onBuffering";
-	public static var NOT_BUFFERING = "onNotBuffering";
-	public static var CONNECTION_FAILED = "onConnectionFailed";
-	public static var CONNECTION_SUCCESS = "onConnectionSuccess";
-	public static var MEDIA_INITIALIZED = "onDataInitialized";
-	public static var PLAYBACK_FINISHED = "onPlaybackFinished";
-	public static var STOP_CLOSE = "onStopAndClose";
-	public static var RESIZE = "onResize";
-	
-	public var name:String;
-	public var aspectRatio:Float;
-	public var duration:Float;
-	public var fullscreen:Bool;
-	public var mute:Bool;
-	public var volume:Float;
-	public var width:Float;
-	public var height:Float;
-	public var stream:NetStream;
-	public var sound:Sound;
-	public var time:Float;	
-	public var id3Info:ID3Info;
-	public var seekTime:Float;
-	
-	public function new(type:String, bubbles:Bool=false, cancelable:Bool=false) 
-	{
-		super(type, bubbles, cancelable);
-		
-		fullscreen = false;
-		mute = false;
-		volume = 1.0;
-		duration = 0;
-		width = 0;
-		height = 0;
-		time = 0;
-		name = type;
-		seekTime = 0;
-	}
+class PlayerEvents extends Event {
+    public static var ASPECT_RATIO = "onAspectRatio";
+    public static var MOUSE_SHOW = "onMouseShow";
+    public static var MOUSE_HIDE = "onMouseHide";
+    public static var FULLSCREEN = "onFullscreen";
+    public static var VOLUME_UP = "onVolumeUp";
+    public static var VOLUME_DOWN = "onVolumeDown";
+    public static var VOLUME_CHANGE = "onVolumeChange"; //Nuevo
+    public static var MUTE = "onMute";
+    public static var FORWARD = "onForward";
+    public static var REWIND = "onRewind";
+    public static var PLAY_PAUSE = "onPlayPause";
+    public static var SEEK = "onSeek";
+    public static var TIME = "onTimeUpdate";
+    public static var PROGRESS = "onProgress";
+    public static var BUFFERING = "onBuffering";
+    public static var NOT_BUFFERING = "onNotBuffering";
+    public static var CONNECTION_FAILED = "onConnectionFailed";
+    public static var CONNECTION_SUCCESS = "onConnectionSuccess";
+    public static var MEDIA_INITIALIZED = "onDataInitialized";
+    public static var PLAYBACK_FINISHED = "onPlaybackFinished";
+    public static var STOP_CLOSE = "onStopAndClose";
+    public static var RESIZE = "onResize";
+    public static var USERNOTSUPPORTED = "NOT_SUPPORTED_ERROR";
+    public static var USERDENIED = "PERMISSION_DENIED";
+    public static var USERSUCCESS = "onUserSuccess";
+
+    public var name:String;
+    public var aspectRatio:Float;
+    public var duration:Float;
+    public var fullscreen:Bool;
+    public var mute:Bool;
+    public var volume:Float;
+    public var width:Float;
+    public var height:Float;
+    public var stream:NetStream;
+    public var sound:Sound;
+    public var time:Float;
+    public var id3Info:ID3Info;
+    public var seekTime:Float;
+
+    public function new(type:String, bubbles:Bool = false, cancelable:Bool = false) {
+        super(type, bubbles, cancelable);
+
+        fullscreen = false;
+        mute = false;
+        volume = 1.0;
+        duration = 0;
+        width = 0;
+        height = 0;
+        time = 0;
+        name = type;
+        seekTime = 0;
+    }
 }
