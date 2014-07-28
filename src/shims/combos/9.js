@@ -540,7 +540,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				return id;
 			};
 		})(),
-		domPrefixes: ["webkit", "moz", "o", "ms", "ws"],
+		domPrefixes: ["ws", "webkit", "moz", "ms", "o"],
 
 		prefixed: function (prop, obj){
 			var i, testProp;
@@ -2273,22 +2273,35 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				}
 				return val;
 			},
-			time: function(val){
-				var fVal;
-				if(val && curCfg.meridian){
+			time: function(val, o, noCorrect){
+				var fVal, i;
+				if(val){
 					val = val.split(':');
-					fVal = (val[0] * 1);
-					if(fVal && fVal >= 12){
-						val[0] = addZero(fVal - 12+'');
-						fVal = 1;
-						
-					} else {
-						fVal = 0;
+					if(curCfg.meridian){
+						fVal = (val[0] * 1);
+						if(fVal && fVal >= 12){
+							val[0] = addZero(fVal - 12+'');
+							fVal = 1;
+						} else {
+							fVal = 0;
+						}
+						if(val[0] === '00'){
+							val[0] = '12';
+						}
 					}
-					if(val[0] === '00'){ 
-						val[0] = '12';
+					if(!noCorrect){
+						for(i = 0; i < val.length; i++){
+							val[i] = addZero(val[i]);
+						}
+
+						if(!val[1]){
+							val[1] = '00';
+						}
 					}
-					val = $.trim(val.join(':')) + ' '+ curCfg.meridian[fVal];
+					val = $.trim(val.join(':'));
+					if(fVal != null && curCfg.meridian){
+						val += ' '+curCfg.meridian[fVal];
+					}
 				}
 				return val;
 			},
@@ -2375,13 +2388,14 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			},
 			time: function(val){
 				var fVal;
+
 				if(val && curCfg.meridian){
 					val = val.toUpperCase();
-					if(val.substr(0,2) === "12"){ 
+					if(val.substr(0,2) === "12"){
 						val = "00" + val.substr(2);
 					}
 					if(val.indexOf(curCfg.meridian[1]) != -1){
-						val = val.split(':');
+
 						fVal = (val[0] * 1);
 						if(!isNaN(fVal)){
 							val[0] = fVal + 12;
