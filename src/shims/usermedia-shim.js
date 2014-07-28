@@ -151,4 +151,5 @@ webshim.register('usermedia-shim', function($, webshim, window, document, undefi
 
 	webshim.getUserMedia = wsGetUserMedia;
 	navigator.wsGetUserMedia = wsGetUserMedia;
+	webshim.isReady('usermedia-api', true);
 });

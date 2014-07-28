@@ -2,7 +2,9 @@ webshim.register('usermedia-core', function($, webshim, window, document, undefi
 	"use strict";
 
 	var srcObjectName = webshim.prefixed('srcObject', document.createElement('video'));
-
+	var addUnPrefixed = function(){
+		navigator.getUserMedia = navigator[webshim.prefixed('getUserMedia', navigator)];
+	};
 	if(srcObjectName != 'srcObject'){
 		var hasURL = !!(window.URL && URL.createObjectURL);
 		webshim.defineNodeNamesProperty(['audio', 'video'], 'srcObject', {
@@ -22,8 +24,5 @@ webshim.register('usermedia-core', function($, webshim, window, document, undefi
 	}
 
 
-
-	webshim.ready('usermedia-shim', function(){
-		navigator.getUserMedia = navigator[webshim.prefixed('getUserMedia', navigator)];
-	});
+	webshim.ready(webshim.modules["usermedia-shim"].loaded ? 'usermedia-api' : 'usermedia-shim', addUnPrefixed);
 });
