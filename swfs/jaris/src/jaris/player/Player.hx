@@ -237,15 +237,22 @@ class Player extends EventDispatcher {
             cam.addEventListener(StatusEvent.STATUS, userStatusHandler);
 
             _video.attachCamera(cam);
-            _video.visible = false;
+            //_video.visible = false;
         } else {
             callEvents(PlayerEvents.USERNOTSUPPORTED);
         }
     }
 
     private function userStatusHandler(event){
-        Utils.log(event);
+
         if(event.code == 'Camera.Unmuted'){
+            _videoHeight = event.target.height;
+            _videoWidth = event.target.width;
+            _originalAspectRatio = AspectRatio.getAspectRatio(_videoWidth, _videoHeight);
+
+            if (_aspectRatio <= 0) {
+                _aspectRatio = _originalAspectRatio;
+            }
             callEvents(PlayerEvents.USERSUCCESS);
         } else {
             callEvents(PlayerEvents.USERDENIED);
@@ -532,7 +539,7 @@ class Player extends EventDispatcher {
             fields = Reflect.fields(data);
             fullMetaData = { };
             for (i in fields) {
-            Reflect.setField(fullMetaData, i, Reflect.field(data, i));
+                Reflect.setField(fullMetaData, i, Reflect.field(data, i));
             }
 
             callEvents(PlayerEvents.MEDIA_INITIALIZED);

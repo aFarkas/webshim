@@ -51,7 +51,7 @@ webshim.register('usermedia-shim', function($, webshim, window, document, undefi
 			if(!flashEvents[e.type]){return;}
 
 			if(e.type == 'onUserSuccess'){
-				$dom.addClass('hide-streamrequest');
+				//$dom.addClass('hide-streamrequest');
 				successCb(new LocalMediaStream($dom, elemId, e));
 			} else {
 				$dom.remove();
@@ -79,11 +79,49 @@ webshim.register('usermedia-shim', function($, webshim, window, document, undefi
 		});
 	}
 
+
+
 	LocalMediaStream.prototype = {
 		currentTime: 0,
 		stop: $.noop,
 		getAudioTracks: $.noop,
 		getVideoTracks: $.noop
+	};
+
+	webshim.getStreamElemId = function(canPlaySrc, data){
+		var id = streams[canPlaySrc.srcProp] && streams[canPlaySrc.srcProp]._id;
+		if(data && data.swfCreated){
+			mediaelement.resetSwfProps();
+			data.currentSrc = '';
+			data.shadowElem.remove();
+			data.swfCreated = false;
+
+			data.swfOverride = true;
+			//
+			if(mediaelement.jarisEvent[data.id]){
+				delete mediaelement.jarisEvent[data.id];
+			}
+		}
+
+
+		if(mediaelement.jarisEvent[id]){
+			delete mediaelement.jarisEvent[id];
+		}
+
+		return id;
+	};
+
+	webshim.attachStreamObject = function(elem, canPlaySrc, data){
+		var stream = streams[canPlaySrc.srcProp];
+		var $oldParent = $(stream._swf).parent('.ws-mediastreamrequest-overlay');
+		data.api = stream._swf;
+
+		data.shadowElem.html(data.api);
+		$oldParent.remove();
+		data.currentSrc = '';
+		if($.prop(elem, 'controls')){
+			//$.prop(elem, 'controls', true);
+		}
 	};
 
 	URL._nativeCreateObjectURL = URL.createObjectURL;
