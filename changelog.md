@@ -7,6 +7,7 @@ Release 1.14.6
 - fixed bug in conjunction with some AMD loading environments
 - improved type="number" detection
 - update picturefill polyfill
+- improve input type=time formatting
 
 Release 1.14.5
 ----------
