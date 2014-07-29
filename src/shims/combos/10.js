@@ -2276,6 +2276,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			time: function(val, o, noCorrect){
 				var fVal, i;
 				if(val){
+
 					val = val.split(':');
 					if(curCfg.meridian){
 						fVal = (val[0] * 1);
@@ -2393,9 +2394,12 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					if(val.substr(0,2) === "12"){
 						val = "00" + val.substr(2);
 					}
+
 					if(val.indexOf(curCfg.meridian[1]) != -1){
+
 						val = val.split(':');
-						fVal = (val[0] * 1);
+						fVal = (val[0].replace(curCfg.meridian[1], '') * 1);
+
 						if(!isNaN(fVal)){
 							val[0] = fVal + 12;
 						}
