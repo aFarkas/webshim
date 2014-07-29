@@ -35,7 +35,7 @@
 			  }
 		</style>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-		<script src="../../../js-webshim/minified/extras/modernizr-custom.js"></script>
+
 		<script src="../../../js-webshim/minified/polyfiller.js"></script>
 
 	<!--
@@ -48,7 +48,7 @@
 	-->
 
 		<script>
-			if((!Modernizr.input.list && !Modernizr.inputtypes.range) || location.search.indexOf('polyfillall') != -1){
+			if(location.search.indexOf('polyfillall') != -1){
 				$('html').addClass('custom-widgets');
 				webshim.setOptions('forms', {
 					//replace the default datalist feature with a custom styleable datalist
