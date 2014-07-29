@@ -21,6 +21,7 @@ Features
 * matchMedia
 * interactive elements: summary/details
 * XHR2 / filereader (including, XHR2/AJAX CORS and FormData handling)
+* picture / img[srcset]
 * promise
 * geolocation
 * ECMAScript 5 / JavaScript 1.8.5 features
@@ -93,6 +94,8 @@ Webshims Lib uses many great third party scripts:
 | color-picker    | MIT                                          | http://johndyer.name/post/2007/09/PhotoShop-like-JavaScript-Color-Picker.aspx |
 | forms-picker    | MIT                                          | https://github.com/brandonaaron/jquery-mousewheel                             |
 | jme.woff        | GPL / CC BY 3.0                              | http://icomoon.io/#preview-free                                               |
+| picture         | MIT                                          | https://github.com/scottjehl/picturefill                                      |
+| url             | any (OSI approved) Open Source licence       | https://github.com/inexorabletash/polyfill                                    |
 
 
 

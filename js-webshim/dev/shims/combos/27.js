@@ -1698,24 +1698,29 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 			} catch(e){}
 			printMessage();
 			if(hasXDomain == null){
-				$.ajax({
-					url: 'crossdomain.xml',
-					type: 'HEAD',
-					dataType: 'xml',
-					success: function(){
-						hasXDomain = 'yes';
-					},
-					error: function(){
-						hasXDomain = 'no';
-					},
-					complete: function(){
-						try {
-							sessionStorage.setItem('wsXdomain.xml', hasXDomain);
-						} catch(e){}
-						printMessage();
-					}
-				});
+				try {
+					$.ajax({
+						url: 'crossdomain.xml',
+						type: 'HEAD',
+						dataType: 'xml',
+						success: function(){
+							hasXDomain = 'yes';
+						},
+						error: function(){
+							hasXDomain = 'no';
+						},
+						complete: function(){
+							try {
+								sessionStorage.setItem('wsXdomain.xml', hasXDomain);
+							} catch(e){}
+							printMessage();
+						}
+					});
+				} catch(e){}
 			}
 		});
+	}
+	if(document.readyState == 'complete'){
+		webshims.isReady('WINDOWLOAD', true);
 	}
 });

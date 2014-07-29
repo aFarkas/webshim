@@ -1166,7 +1166,7 @@ ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
 ctx.fillRect(30, 30, 55, 50);
 </code></pre>
 			<p>
-				Webshim Lib can implement <a href="http://code.google.com/p/explorercanvas/">excanvas</a> or <a href="http://flashcanvas.net/">FlashCanvas (default)/FlashCanvas Pro</a>:
+				Webshim Lib can implement <a href="http://code.google.com/p/explorercanvas/">excanvas</a> or <a href="http://flashcanvas.net/">FlashCanvas/FlashCanvas Pro</a>:
 			</p>
 			<pre><code class="language-javascript">
 // always run configuration before calling webshim.polyfill();
@@ -1180,7 +1180,7 @@ webshim.setOptions('canvas', {
 //start polyfilling forms
 webshim.polyfill('forms');
 </code></pre>
-			<p>If the <code>canvas</code> and the <code>mediaelement</code> features are requested, webshim will implement a bridge between the native/polyfilled drawImage canvas API and the polyfilled mediaelement API. To get this work in IE8 the flashpro option has to be used.</p>
+			<p>Webshim will implement a bridge between the native/polyfilled drawImage canvas API and the polyfilled mediaelement API. To get this work in IE8 the 'flashpro' option type for the <code>canvas</code> feature has to be used.</p>
 			<h3>Options for the <code class="i">
 				canvas</code> feature</h3>
 			<ul>
@@ -1310,7 +1310,7 @@ webshim.polyfill('forms');
 &lt;/div&gt;
 </code></pre>
 
-			<p>If the <code>canvas</code> and the <code>mediaelement</code> features are requested, webshim will implement a bridge between the native/polyfilled drawImage canvas API and the polyfilled mediaelement API. Even if the browser supports canvas the canvas feature needs to be requested to get this mediaelement bridge.</p>
+			<p>Webshim will implement a bridge between the native/polyfilled <code>canvas.drawImage</code> API and the polyfilled mediaelement API (flash).</p>
 <pre><code class="language-markup">
 &lt;script&gt;
 	webshim.setOptions({
@@ -1609,11 +1609,10 @@ $('form[data-action].ajax-form').on('submit', function(){
 &lt;/cross-domain-policy&gt;
 </code>
 </pre>
-			<p>In case you don't have full access to your server's root to do so, you can host Moxie.min.swf (Flash) and Moxie.min.xap (Silverlight) on your server and tell webshim to load them from there:</p>
+			<p>In case you don't have full access to your server's root to do so, you can host Moxie.min.swf (Flash) on your server and tell webshim to load them from there:</p>
 <pre><code class="language-javascript">
 webshim.setOptions('filereader', {
-	swfpath: '/assests/Moxie.min.swf',
-	xappath: '/assets/Moxie.min.xap'
+	swfpath: '/assests/Moxie.min.swf'
 });
 </code></pre>
 			<p>The <code class="i">filereader</code> feature is also lazy loaded by webhsim's <code class="i">form</code> feature as soon as an element matching the <code>input.ws-filereader</code> selector is used. Additionally the forms features enables custom styleable [type=file] elements if it finds a wrapper with the class <code class="i">ws-custom-file</code>:</p>

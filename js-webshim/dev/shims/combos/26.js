@@ -7679,24 +7679,29 @@ Globally exposed namespace with the most frequently used public classes and hand
 			} catch(e){}
 			printMessage();
 			if(hasXDomain == null){
-				$.ajax({
-					url: 'crossdomain.xml',
-					type: 'HEAD',
-					dataType: 'xml',
-					success: function(){
-						hasXDomain = 'yes';
-					},
-					error: function(){
-						hasXDomain = 'no';
-					},
-					complete: function(){
-						try {
-							sessionStorage.setItem('wsXdomain.xml', hasXDomain);
-						} catch(e){}
-						printMessage();
-					}
-				});
+				try {
+					$.ajax({
+						url: 'crossdomain.xml',
+						type: 'HEAD',
+						dataType: 'xml',
+						success: function(){
+							hasXDomain = 'yes';
+						},
+						error: function(){
+							hasXDomain = 'no';
+						},
+						complete: function(){
+							try {
+								sessionStorage.setItem('wsXdomain.xml', hasXDomain);
+							} catch(e){}
+							printMessage();
+						}
+					});
+				} catch(e){}
 			}
 		});
+	}
+	if(document.readyState == 'complete'){
+		webshims.isReady('WINDOWLOAD', true);
 	}
 });

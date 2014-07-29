@@ -1677,25 +1677,30 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			} catch(e){}
 			printMessage();
 			if(hasXDomain == null){
-				$.ajax({
-					url: 'crossdomain.xml',
-					type: 'HEAD',
-					dataType: 'xml',
-					success: function(){
-						hasXDomain = 'yes';
-					},
-					error: function(){
-						hasXDomain = 'no';
-					},
-					complete: function(){
-						try {
-							sessionStorage.setItem('wsXdomain.xml', hasXDomain);
-						} catch(e){}
-						printMessage();
-					}
-				});
+				try {
+					$.ajax({
+						url: 'crossdomain.xml',
+						type: 'HEAD',
+						dataType: 'xml',
+						success: function(){
+							hasXDomain = 'yes';
+						},
+						error: function(){
+							hasXDomain = 'no';
+						},
+						complete: function(){
+							try {
+								sessionStorage.setItem('wsXdomain.xml', hasXDomain);
+							} catch(e){}
+							printMessage();
+						}
+					});
+				} catch(e){}
 			}
 		});
+	}
+	if(document.readyState == 'complete'){
+		webshims.isReady('WINDOWLOAD', true);
 	}
 });
 ;webshims.register('mediaelement-jaris', function($, webshims, window, document, undefined, options){
