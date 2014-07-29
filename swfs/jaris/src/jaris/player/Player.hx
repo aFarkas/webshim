@@ -54,6 +54,7 @@ import flash.net.NetStream;
 import flash.net.URLRequest;
 import flash.system.Capabilities;
 import flash.system.Security;
+import flash.system.SecurityPanel;
 import flash.ui.Keyboard;
 import flash.ui.Mouse;
 import flash.utils.Timer;
@@ -231,13 +232,19 @@ class Player extends EventDispatcher {
     }
 
     private function getUserMedia():Void {
+        var status;
         var cam:Camera = Camera.getCamera();
-
         if(Camera.names.length > 0){
             cam.addEventListener(StatusEvent.STATUS, userStatusHandler);
 
             _video.attachCamera(cam);
-            //_video.visible = false;
+
+            if(!cam.muted){
+                status = new StatusEvent('status', false, false, 'Camera.Unmuted');
+
+                userStatusHandler(status);
+
+            }
         } else {
             callEvents(PlayerEvents.USERNOTSUPPORTED);
         }
@@ -245,11 +252,12 @@ class Player extends EventDispatcher {
 
     private function userStatusHandler(event){
 
+        Utils.log(event.code);
         if(event.code == 'Camera.Unmuted'){
             _videoHeight = event.target.height;
             _videoWidth = event.target.width;
             _originalAspectRatio = AspectRatio.getAspectRatio(_videoWidth, _videoHeight);
-
+            _mediaLoaded = true;
             if (_aspectRatio <= 0) {
                 _aspectRatio = _originalAspectRatio;
             }

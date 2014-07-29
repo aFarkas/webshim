@@ -178,7 +178,7 @@ class Utils {
         return reg.match(source) ? reg.matched(1) : 'default';
     }
 
-    public static function log(message) {
-        ExternalInterface.call('console.log', message);
+    public static function log(message:Dynamic) {
+        ExternalInterface.call('webshims.log', message);
     }
 }
