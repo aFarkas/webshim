@@ -62,7 +62,9 @@ webshim.register('usermedia-shim', function($, webshim, window, document, undefi
 		if(!$media.length){
 			$media = $media.end();
 		}
-		$media = $media.filter(noSource);
+		if($media.length != 1){
+			$media = $media.filter(noSource);
+		}
 		if($media.length != 1){
 			webshim.error('for getUserMedia an empty video element has to be already in the DOM. If you provide multiple empty videos. please mark your suggested video using the "ws-usermedia" class.');
 		}
@@ -111,7 +113,9 @@ webshim.register('usermedia-shim', function($, webshim, window, document, undefi
 		request: function(elem, canPlaySrc, data){
 			data._usermedia = canPlaySrc.srcProp;
 			if(!options.inline && !$(elem).hasClass('ws-inlineusermedia')){
-				$(data.api).css({position: 'fixed', top: 0, left: 0, width: '100%', height: 150});
+				$(data.api).css({position: 'fixed', top: 0, left: 0, width: '100%', height: 150, zIndex: '999999'});
+			} else {
+				$(data.api).css({position: 'relative', zIndex: '999999'});
 			}
 		}
 	};
@@ -144,13 +148,13 @@ webshim.register('usermedia-shim', function($, webshim, window, document, undefi
 	addMediaAPI = function(){
 		if(!webshim.mediaelement.createSWF){return;}
 		addMediaAPI = $.noop;
-		var revert = function(data, fast){
+		var revert = function(data){
 			setTimeout(function(){
-				$(data.api).css({position: '', top: '', left: '', width: '', height: ''});
+				$(data.api).css({position: '', top: '', left: '', width: '', height: '', zIndex: ''});
 				if($.prop(data._elem, 'controls')){
 					$.prop(data._elem, 'controls', true);
 				}
-			}, fast ? 0 : 30);
+			}, 50);
 		};
 		var fail = function(jaris, data){
 			revert(data);
