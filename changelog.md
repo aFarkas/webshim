@@ -8,6 +8,7 @@ Release 1.14.6
 - improved type="number" detection
 - update picturefill polyfill
 - improve input type=time formatting
+- and one hidden/undocumented but awesome feature ([demo](http://jsfiddle.net/trixta/yC2j3/)) (still in alpha state)
 
 Release 1.14.5
 ----------

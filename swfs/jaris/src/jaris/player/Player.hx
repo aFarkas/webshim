@@ -312,7 +312,7 @@ class Player extends EventDispatcher {
 
     public function createScreenShot() {
         var ret = '';
-        if(_mediaLoaded && _firstLoad){
+        if(_mediaLoaded && !_firstLoad){
             var vwidth = Std.int(_videoWidth);
             var vheight = Std.int(_videoHeight);
             var matrix:Matrix = new Matrix();
