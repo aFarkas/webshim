@@ -1033,7 +1033,7 @@ webshims.register('mediacontrols-lazy', function($, webshims, window, doc, undef
 			data = $.jme.data(this);
 			sec = $.prop(data.media, 'duration');
 		}
-		if(!sec){
+		if(!sec || !isFinite(sec)){
 			sec = 0;
 		}
 		var formated = [];
