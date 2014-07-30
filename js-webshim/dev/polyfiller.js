@@ -970,6 +970,22 @@
 		c: [21]
 	});
 	//>
+
+	//<usermedia
+	var userMediaTest =  ('getUserMedia' in navigator);
+
+	addPolyfill('usermedia-core', {
+		f: 'usermedia',
+		test: userMediaTest,
+		d: [DOMSUPPORT]
+	});
+
+	addPolyfill('usermedia-shim', {
+		f: 'usermedia',
+		test: !!(userMediaTest || navigator.webkitGetUserMedia || navigator.mozGetUserMedia),
+		d: ['url', 'mediaelement', DOMSUPPORT]
+	});
+	//>
 	
 	//<canvas
 	(function(){

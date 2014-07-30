@@ -127,6 +127,7 @@ class Player extends EventDispatcher {
     private var _allowPreloadedPlay:Bool;
     private var _hasPoster:Bool;
     public var lastSeekTime:Float;
+    private var _cam:Camera;
 //}
 
 
@@ -233,27 +234,67 @@ class Player extends EventDispatcher {
 
     private function getUserMedia():Void {
         var status;
-        var cam:Camera = Camera.getCamera();
+        var aspect;
+        _cam = Camera.getCamera();
+
+        _mediaSource = '';
+
         if(Camera.names.length > 0){
-            cam.addEventListener(StatusEvent.STATUS, userStatusHandler);
+            _cam.addEventListener(StatusEvent.STATUS, userStatusHandler);
+            _video.visible = false;
+            aspect = _cam.height / _cam.width;
+            _cam.setMode(640, Std.int(640 * aspect), 25, true);
 
-            _video.attachCamera(cam);
+            _video.attachCamera(_cam);
 
-            if(!cam.muted){
+            if(!_cam.muted){
                 status = new StatusEvent('status', false, false, 'Camera.Unmuted');
-
                 userStatusHandler(status);
-
             }
         } else {
             callEvents(PlayerEvents.USERNOTSUPPORTED);
         }
     }
 
+    public function attachUsermedia():Void {
+        if(_streamType == StreamType.USER){
+            addEventListener(PlayerEvents.PLAY_PAUSE, onUserPlayPause);
+            if(_isPlaying){
+                onUserPlayPause();
+            }
+        }
+    }
+
+    public function detachUsermedia():Void {
+        if(_streamType == StreamType.USER){
+            removeEventListener(PlayerEvents.PLAY_PAUSE, onUserPlayPause);
+            _video.attachCamera(null);
+        }
+    }
+
+    private function onUserPlayPause(event = null){
+        var data;
+
+        if(_isPlaying){
+            data = {
+                width: _cam.width,
+                height: _cam.height,
+                duration: Math.POSITIVE_INFINITY
+            };
+            _video.attachCamera(_cam);
+            _video.visible = true;
+            if(_firstLoad){
+                onMetaData(data);
+            }
+        } else {
+            _video.attachCamera(null);
+        }
+    }
+
     private function userStatusHandler(event){
 
-        Utils.log(event.code);
         if(event.code == 'Camera.Unmuted'){
+
             _videoHeight = event.target.height;
             _videoWidth = event.target.width;
             _originalAspectRatio = AspectRatio.getAspectRatio(_videoWidth, _videoHeight);
@@ -261,6 +302,7 @@ class Player extends EventDispatcher {
             if (_aspectRatio <= 0) {
                 _aspectRatio = _originalAspectRatio;
             }
+            _video.attachCamera(null);
             callEvents(PlayerEvents.USERSUCCESS);
         } else {
             callEvents(PlayerEvents.USERDENIED);
@@ -270,7 +312,7 @@ class Player extends EventDispatcher {
 
     public function createScreenShot() {
         var ret = '';
-        if(_mediaLoaded){
+        if(_mediaLoaded && _firstLoad){
             var vwidth = Std.int(_videoWidth);
             var vheight = Std.int(_videoHeight);
             var matrix:Matrix = new Matrix();
@@ -1228,9 +1270,12 @@ class Player extends EventDispatcher {
 	 */
 
     public function play():Bool {
-        _video.attachNetStream(_stream);
+        if(_streamType != StreamType.USER){
+            _video.attachNetStream(_stream);
+        }
         _preLoading = false;
         _requestedPlay = true;
+
 
         if (_mediaLoaded || _allowPreloadedPlay) {
             if (_mediaEndReached) {

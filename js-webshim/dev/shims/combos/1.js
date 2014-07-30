@@ -788,25 +788,21 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	};
 	
 	
-	mediaelement.srces = function(mediaElem, srces){
+	mediaelement.srces = function(mediaElem){
+		var srces = [];
 		mediaElem = $(mediaElem);
-		if(!srces){
-			srces = [];
-			var nodeName = mediaElem[0].nodeName.toLowerCase();
-			var src = getSrcObj(mediaElem, nodeName);
-			
-			if(!src.src){
-				$('source', mediaElem).each(function(){
-					src = getSrcObj(this, nodeName);
-					if(src.src){srces.push(src);}
-				});
-			} else {
-				srces.push(src);
-			}
-			return srces;
+		var nodeName = mediaElem[0].nodeName.toLowerCase();
+		var src = getSrcObj(mediaElem, nodeName);
+
+		if(!src.src){
+			$('source', mediaElem).each(function(){
+				src = getSrcObj(this, nodeName);
+				if(src.src){srces.push(src);}
+			});
 		} else {
-			webshims.error('setting sources was removed.');
+			srces.push(src);
 		}
+		return srces;
 	};
 	
 	mediaelement.swfMimeTypes = ['video/3gpp', 'video/x-msvideo', 'video/quicktime', 'video/x-m4v', 'video/mp4', 'video/m4p', 'video/x-flv', 'video/flv', 'audio/mpeg', 'audio/aac', 'audio/mp4', 'audio/x-m4a', 'audio/m4a', 'audio/mp3', 'audio/x-fla', 'audio/fla', 'youtube/flv', 'video/jarisplayer', 'jarisplayer/jarisplayer', 'jarisplayer/stream', 'video/youtube', 'video/rtmp', 'audio/rtmp'];

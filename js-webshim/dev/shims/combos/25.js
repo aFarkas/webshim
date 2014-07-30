@@ -1755,6 +1755,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		isActive: 'html5',
 		activating: 'html5',
 		wasSwfReady: false,
+		_usermedia: null,
 		_bufferedEnd: 0,
 		_bufferedStart: 0,
 		currentTime: 0,
@@ -2047,7 +2048,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	};
 
 	onEvent.onMute = onEvent.onVolumeChange;
-
+	mediaelement.onEvent = onEvent;
 
 	var workActionQueue = function(data){
 		var actionLen = data.actionQueue.length;
@@ -2158,7 +2159,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 
 
 	var resetSwfProps = (function(){
-		var resetProtoProps = ['_calledMeta', 'lastDuration', '_bufferedEnd', 'lastCalledTime', '_bufferedStart', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'seeking', 'videoHeight', 'videoWidth'];
+		var resetProtoProps = ['_calledMeta', 'lastDuration', '_bufferedEnd', 'lastCalledTime', '_usermedia', '_bufferedStart', '_ppFlag', 'currentSrc', 'currentTime', 'duration', 'ended', 'networkState', 'paused', 'seeking', 'videoHeight', 'videoWidth'];
 		var len = resetProtoProps.length;
 		return function(data){
 
@@ -2236,7 +2237,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			return hasMinMax;
 		};
 		var retFn = function(data){
-			var videoDims, ratio, hasMinMax;
+			var videoDims, ratio;
 			var elem = data._elem;
 			var autos = {
 				width: getCssStyle(elem, 'width') == 'auto',
@@ -2354,6 +2355,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 	}
 
+	mediaelement.resetSwfProps = resetSwfProps;
 	mediaelement.createSWF = function( elem, canPlaySrc, data ){
 		if(!hasFlash){
 			setTimeout(function(){
@@ -2377,42 +2379,27 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			$(elem).css(attrStyle);
 			webshims.warn("width or height content attributes used. Webshims prefers the usage of CSS (computed styles or inline styles) to detect size of a video/audio. It's really more powerfull.");
 		}
-
-		var isRtmp = canPlaySrc.type == 'audio/rtmp' || canPlaySrc.type == 'video/rtmp';
-		var vars = $.extend({}, options.vars, {
-			poster: replaceVar($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
-			source: replaceVar(canPlaySrc.streamId || canPlaySrc.srcProp),
-			server: replaceVar(canPlaySrc.server || '')
-		});
-		var elemVars = $(elem).data('vars') || {};
-
+		var box;
+		var streamRequest = canPlaySrc.streamrequest;
+		var isStream = canPlaySrc.type == 'jarisplayer/stream';
 
 
 		var hasControls = $.prop(elem, 'controls');
 		var elemId = 'jarisplayer-'+ webshims.getID(elem);
 
-		var params = $.extend(
-			{},
-			options.params,
-			$(elem).data('params')
-		);
+
 		var elemNodeName = elem.nodeName.toLowerCase();
-		var attrs = $.extend(
-			{},
-			options.attrs,
-			{
-				name: elemId,
-				id: elemId
-			},
-			$(elem).data('attrs')
-		);
+
 		var setDimension = function(){
 			if(data.isActive == 'third'){
 				setElementDimension(data, $.prop(elem, 'controls'));
 			}
 		};
 
-		var box;
+		if(isStream && !streamRequest){
+			webshim.usermedia.attach(elem, canPlaySrc, data);
+			return;
+		}
 
 		if(data && data.swfCreated){
 			mediaelement.setActive(elem, 'third', data);
@@ -2449,7 +2436,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					value: elem
 				},
 				currentSrc: {
-					value: canPlaySrc.srcProp
+					value: streamRequest ? '' : canPlaySrc.srcProp
 				},
 				swfCreated: {
 					value: true
@@ -2497,6 +2484,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			setElementDimension(data, hasControls);
 
 			$(elem)
+
 				.on({
 					'updatemediaelementdimensions loadedmetadata emptied': setDimension,
 					'remove': function(e){
@@ -2517,7 +2505,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		} else if(!mediaelement.jarisEvent[data.id]){
 
 			mediaelement.jarisEvent[data.id] = function(jaris){
-
 				if(jaris.type == 'ready'){
 					var onReady = function(){
 						if(data.api){
@@ -2557,11 +2544,31 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			mediaelement.jarisEvent[data.id].elem = elem;
 		}
 
+		createSwf(elem, canPlaySrc, data, elemId, hasControls, elemNodeName);
+
+		if(!streamRequest){
+			trigger(data._elem, 'loadstart');
+		}
+	};
+
+	var createSwf = function(elem, canPlaySrc, data, elemId, hasControls, elemNodeName){
+		var vars, elemVars, params, attrs;
+		var isRtmp = canPlaySrc.type == 'audio/rtmp' || canPlaySrc.type == 'video/rtmp';
+		var isUserStream = canPlaySrc.type == 'jarisplayer/stream';
+
+		vars = $.extend({}, options.vars, {
+			poster: replaceVar($.attr(elem, 'poster') && $.prop(elem, 'poster') || ''),
+			source: replaceVar(canPlaySrc.streamId || canPlaySrc.srcProp),
+			server: replaceVar(canPlaySrc.server || '')
+		});
+
+		elemVars = $(elem).data('vars') || {};
+
 		$.extend(vars,
 			{
 				id: elemId,
 				evtId: data.id,
-				controls: ''+hasControls,
+				controls: ''+(!isUserStream && hasControls),
 				autostart: 'false',
 				nodename: elemNodeName
 			},
@@ -2570,12 +2577,31 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 
 		if(isRtmp){
 			vars.streamtype = 'rtmp';
+		} else if(isUserStream){
+			vars.streamtype = 'usermedia';
 		} else if(canPlaySrc.type == 'audio/mpeg' || canPlaySrc.type == 'audio/mp3'){
 			vars.type = 'audio';
 			vars.streamtype = 'file';
 		} else if(canPlaySrc.type == 'video/youtube'){
 			vars.streamtype = 'youtube';
 		}
+
+		attrs = $.extend(
+			{},
+			options.attrs,
+			{
+				name: elemId,
+				id: elemId
+			},
+			$(elem).data('attrs')
+		);
+
+		params = $.extend(
+			{},
+			options.params,
+			$(elem).data('params')
+		);
+
 		options.changeSWF(vars, elem, canPlaySrc, data, 'embed');
 		clearTimeout(data.flashBlock);
 
@@ -2610,10 +2636,11 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						flash = null;
 					}, 8000);
 				}
+				if(isUserStream){
+					webshim.usermedia.request(elem, canPlaySrc, data);
+				}
 			}
 		});
-
-		trigger(data._elem, 'loadstart');
 	};
 
 
@@ -2639,6 +2666,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 		return false;
 	};
+	mediaelement.queueSwfMethod = queueSwfMethod;
 
 	['audio', 'video'].forEach(function(nodeName){
 		var descs = {};

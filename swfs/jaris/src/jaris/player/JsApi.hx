@@ -122,6 +122,8 @@ class JsApi extends MovieClip {
         ExternalInterface.addCallback("api_preload", startLoading);
         ExternalInterface.addCallback("api_destroy", destroy);
         ExternalInterface.addCallback("api_image", image);
+        ExternalInterface.addCallback("api_attach", attach);
+        ExternalInterface.addCallback("api_detach", detach);
 
 
         addJsListener('on*', 'webshim.mediaelement.jarisEvent.' + parameters.evtId);
@@ -176,17 +178,17 @@ class JsApi extends MovieClip {
             var allowCall = true;
             var jsFunction = '';
             var data = {
-            duration: event.duration,
-            fullscreen: event.fullscreen,
-            mute: event.mute,
-            volume: event.volume,
-            position: event.time,
-            height: _player._naturalHeight,
-            width: _player._naturalWidth,
-            type: event.name,
-            loaded: _player.getBytesLoaded(),
-            total: _player.getBytesTotal(),
-            seekTime: event.seekTime
+                duration: event.duration,
+                fullscreen: event.fullscreen,
+                mute: event.mute,
+                volume: event.volume,
+                position: event.time,
+                height: _player._naturalHeight,
+                width: _player._naturalWidth,
+                type: event.name,
+                loaded: _player.getBytesLoaded(),
+                total: _player.getBytesTotal(),
+                seekTime: event.seekTime
             };
 
             if (event.name == PlayerEvents.TIME || event.name == PlayerEvents.PROGRESS) {
@@ -218,6 +220,13 @@ class JsApi extends MovieClip {
     }
 
 
+    private function attach(){
+        _player.attachUsermedia();
+    }
+
+    private function detach(){
+        _player.detachUsermedia();
+    }
 
 /**
 	 * Toggles pause or play
