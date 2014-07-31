@@ -154,7 +154,7 @@ webshims.register('mediacontrols', function($, webshims, window){
 					})();
 					var $poster = $('<div class="ws-poster" />').insertAfter(data.media);
 					var posterState = (function(){
-						var lastPosterState, lastYoutubeState, lastPoster;
+						var lastPosterState, lastYoutubeState, lastPoster, isYt;
 						var hasFlash = window.swfmini && swfmini.hasFlashPlayerVersion('10.0.3');
 						var regYt = /youtube\.com\/[watch\?|v\/]+/i;
 
@@ -170,8 +170,10 @@ webshims.register('mediacontrols', function($, webshims, window){
 							data.player.addClass('no-backgroundsize');
 						}
 						data.media.on('play playing waiting seeked seeking', function(e){
-
-							if(isInitial){
+							if(!e){
+								e.type = 'playing';
+							}
+							if(isInitial && (!isYt || !hasYtBug || e.type == 'playing' || data.media.prop('readyState') > 1)){
 								isInitial = false;
 								data.player.removeClass('initial-state');
 							}
@@ -187,12 +189,16 @@ webshims.register('mediacontrols', function($, webshims, window){
 								data.player.addClass('ended-state');
 							}
 						});
+
 						return function(){
+							var hasYt;
 							var poster = data.media.attr('poster');
 							var hasPoster = !!poster;
 							var currentSrc = data.media.prop('currentSrc') || '';
-							var isYt = regYt.test(currentSrc);
-							var hasYt = (hasFlash && hasPoster) ? false : isYt;
+
+							isYt = regYt.test(currentSrc);
+
+							hasYt = (hasFlash && hasPoster) ? false : isYt;
 
 							if(!hasPoster && isYt){
 								poster =  currentSrc.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i) || '';

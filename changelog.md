@@ -2,13 +2,13 @@ Release 1.14.6
 ----------
 
 - added URL polyfill
-- added canvas <-> mediaelement bridge ([demo](http://jsfiddle.net/trixta/Wvaca/))
+- added canvas <-> mediaelement bridge ([demo](http://jsfiddle.net/trixta/Wvaca/embedded/result/))
 - fixed custom controls in conjunction with youtube API and iOS/Android
 - fixed bug in conjunction with some AMD loading environments
 - improved type="number" detection
 - update picturefill polyfill
 - improve input type=time formatting
-- and one hidden/undocumented but awesome feature ([demo](http://jsfiddle.net/trixta/yC2j3/)) (still in alpha state)
+- and one hidden/undocumented but awesome feature ([demo](http://jsfiddle.net/trixta/yC2j3/embedded/result/)) (still in alpha state)
 
 Release 1.14.5
 ----------
