@@ -2,13 +2,19 @@ webshims.register('mediaelement-yt', function($, webshims, window, document, und
 "use strict";
 var mediaelement = webshims.mediaelement;
 var ytAPI = $.Deferred();
+var loadYTAPI = function(){
+	if(!window.YT){
+		webshims.loader.loadScript("https://www.youtube.com/player_api");
+	}
+	loadYTAPI = $.noop;
+};
 window.onYouTubePlayerAPIReady = function() {
 	ytAPI.resolve();
+	loadYTAPI = $.noop;
 };
 if(window.YT && YT.Player){
 	window.onYouTubePlayerAPIReady();
 }
-
 var getProps = {
 	paused: true,
 	ended: false,
@@ -193,7 +199,6 @@ var getComputedDimension = (function(){
 
 var setElementDimension = function(data){
 	var dims;
-	var elem = data._elem;
 	var box = data.shadowElem;
 	if(data.isActive == 'third'){
 		if(data && data._ytAPI && data._ytAPI.getPlaybackQuality){
@@ -569,7 +574,9 @@ mediaelement.createSWF = function(mediaElem, src, data){
 	var ytParams = getYtParams(src.src);
 	var hasControls = $.prop(mediaElem, 'controls');
 	var attrStyle = {};
-	
+
+	loadYTAPI();
+
 	if((attrStyle.height = $.attr(mediaElem, 'height') || '') || (attrStyle.width = $.attr(mediaElem, 'width') || '')){
 		$(mediaElem).css(attrStyle);
 		webshims.warn("width or height content attributes used. Webshims prefers the usage of CSS (computed styles or inline styles) to detect size of a video/audio. It's really more powerfull.");
