@@ -919,15 +919,10 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 								error: error
 							});
 						};
-						if($.ajax && $.ajaxSettings.xhr){
-							if(isDisabled){
-								setTimeout(createAjax, loadingTracks * 2);
-							} else {
-								createAjax();
-							}
+						if(isDisabled){
+							setTimeout(createAjax, loadingTracks * 2);
 						} else {
-							webshims.ready('jajax', createAjax);
-							webshims.loader.loadList(['jajax']);
+							createAjax();
 						}
 					} catch(er){
 						error();

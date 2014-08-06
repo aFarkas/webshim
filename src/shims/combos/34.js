@@ -1604,15 +1604,10 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 								error: error
 							});
 						};
-						if($.ajax && $.ajaxSettings.xhr){
-							if(isDisabled){
-								setTimeout(createAjax, loadingTracks * 2);
-							} else {
-								createAjax();
-							}
+						if(isDisabled){
+							setTimeout(createAjax, loadingTracks * 2);
 						} else {
-							webshims.ready('jajax', createAjax);
-							webshims.loader.loadList(['jajax']);
+							createAjax();
 						}
 					} catch(er){
 						error();

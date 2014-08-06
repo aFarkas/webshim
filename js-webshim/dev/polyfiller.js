@@ -139,15 +139,7 @@
 			wspopover: {appendTo: 'auto', hideOnBlur: true},
 			ajax: {},
 			loadScript: function(src, success){
-				if(!$.ajax || !$.ajaxSettings.xhr){
-					if(window.yepnope){
-						yepnope.injectJs(src, success);
-					} else if(window.require){
-						require([src], success);
-					}
-				} else {
-					$.ajax($.extend({}, webCFG.ajax, {url: src, success: success, dataType: 'script', cache: true, global: false, dataFilter: addSource}));
-				}
+				$.ajax($.extend({}, webCFG.ajax, {url: src, success: success, dataType: 'script', cache: true, global: false, dataFilter: addSource}));
 			},
 			basePath: path
 		},
@@ -915,7 +907,6 @@
 	modules.swfmini.test();
 	
 	addModule('sizzle', {test: $.expr.filters});
-	addModule('jajax', {test: $.ajax && $.ajaxSettings.xhr});
 	/* 
 	 * polyfill-Modules 
 	 */
@@ -1239,7 +1230,7 @@
 
 	addPolyfill('filereader', {
 		test: 'FileReader' in window && 'FormData' in window,
-		d: [DOMSUPPORT, 'jajax', 'swfmini'],
+		d: [DOMSUPPORT, 'swfmini'],
 		c: [25, 27]
 	});
 	//>

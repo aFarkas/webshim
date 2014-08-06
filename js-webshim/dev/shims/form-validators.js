@@ -412,7 +412,6 @@ webshims.ready('form-validation', function(){
 		if(!val || !data.ajaxvalidate){return;}
 		var opts;
 		if(!data.remoteValidate){
-			webshims.loader.loadList(['jajax']);
 			if(typeof data.ajaxvalidate == 'string'){
 				data.ajaxvalidate = {url: data.ajaxvalidate, depends: $([])};
 			} else {
