@@ -904,33 +904,38 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					}
 				},
 				handler: (function(){
+					var evt;
 					var trigger = function(){
 						$(document).triggerHandler('updateshadowdom');
 					};
+					var timed = function(){
+						if(evt.type == 'resize'){
+							var width = $window.width();
+							var height = $window.width();
+
+							if(height == lastHeight && width == lastWidth){
+								return;
+							}
+							lastHeight = height;
+							lastWidth = width;
+						}
+
+						if(evt.type != 'docresize'){
+							docObserve.height = docObserve.getHeight();
+							docObserve.width = docObserve.getWidth();
+						}
+
+						if(window.requestAnimationFrame){
+							requestAnimationFrame(trigger);
+						} else {
+							setTimeout(trigger, 0);
+						}
+						evt = null;
+					};
 					return function(e){
 						clearTimeout(resizeTimer);
-						resizeTimer = setTimeout(function(){
-							if(e.type == 'resize'){
-								var width = $window.width();
-								var height = $window.width();
-
-								if(height == lastHeight && width == lastWidth){
-									return;
-								}
-								lastHeight = height;
-								lastWidth = width;
-								
-								docObserve.height = docObserve.getHeight();
-								docObserve.width = docObserve.getWidth();
-							}
-
-							if(window.requestAnimationFrame){
-								requestAnimationFrame(trigger);
-							} else {
-								setTimeout(trigger, 0);
-							}
-							
-						}, (e.type == 'resize' && !window.requestAnimationFrame) ? 50 : 9);
+						evt = e;
+						resizeTimer = setTimeout(timed, (e.type == 'resize' && !window.requestAnimationFrame) ? 50 : 9);
 					};
 				})(),
 				_create: function(){

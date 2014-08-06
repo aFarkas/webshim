@@ -1253,8 +1253,8 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 ;webshim.register('filereader', function($, webshim, window, document, undefined, featureOptions){
 	"use strict";
 	var mOxie, moxie, hasXDomain;
-	var FormData = $.noop;
-	var sel = 'input[type="file"].ws-filereader';
+	var sel = 'input[type="file"].ws-filereader, input[type="file"].ws-capture';
+	var hasFlash = swfmini.hasFlashPlayerVersion('10.3');
 	var loadMoxie = function (){
 		webshim.loader.loadList(['moxie']);
 	};
@@ -1366,7 +1366,7 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 		}
 	);
 	var shimMoxiePath = webshim.cfg.basePath+'moxie/';
-	var crossXMLMessage = 'You nedd a crossdomain.xml to get all "filereader" / "XHR2" / "CORS" features to work. Or host moxie.swf/moxie.xap on your server an configure filereader options: "swfpath"/"xappath"';
+	var crossXMLMessage = 'You nedd a crossdomain.xml to get all "filereader" / "XHR2" / "CORS" features to work. Or host moxie.swf on your server an configure filereader options: "swfpath"';
 	var testMoxie = function(options){
 		return (options.wsType == 'moxie' || (options.data && options.data instanceof mOxie.FormData) || (options.crossDomain && $.support.cors !== false && hasXDomain != 'no' && !noxhr.test(options.dataType || '')));
 	};
@@ -1549,6 +1549,10 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 		}
 	};
 
+	webshim.loader.addModule('moxie', {
+		src: 'moxie/js/moxie-'+ (hasFlash ? 'swf' : 'html4')
+	});
+
 	if(!featureOptions.progress){
 		featureOptions.progress = 'onprogress';
 	}
@@ -1559,9 +1563,6 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 
 	if(!featureOptions.swfpath){
 		featureOptions.swfpath = shimMoxiePath+'flash/Moxie.min.swf';
-	}
-	if(!featureOptions.xappath){
-		featureOptions.xappath = shimMoxiePath+'silverlight/Moxie.min.xap';
 	}
 
 	if($.support.cors !== false || !window.XDomainRequest){
@@ -1589,8 +1590,8 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 				writeable: false,
 				get: function(){
 					if(this.type != 'file'){return null;}
-					if(!$(this).hasClass('ws-filereader')){
-						webshim.info("please add the 'ws-filereader' class to your input[type='file'] to implement files-property");
+					if(!$(this).is('.ws-filereader, .ws-capture')){
+						webshim.info("please add the 'ws-filereader'/'ws-capture' class to your input[type='file'] to implement files-property");
 					}
 					return webshim.data(this, 'fileList') || [];
 				}
@@ -1612,11 +1613,37 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 	});
 
 	webshim.onNodeNamesPropertyModify('input', 'value', function(value, boolVal, type){
-		if(value === '' && this.type == 'file' && $(this).hasClass('ws-filereader')){
+		if(value === '' && this.type == 'file' && $(this).is('.ws-filereader, .ws-capture')){
 			webshim.data(this, 'fileList', []);
 		}
 	});
 
+	webshim.defineNodeNameProperty('canvas', 'toBlob', {
+		prop: {
+			value: function(cb, type, qualitiy){
+				var dataURL;
+
+				if(!type){
+					type = 'image/jpeg';
+				}
+				if(type == 'image/jpeg' && !qualitiy){
+					qualitiy = 0.8;
+				}
+				dataURL = $(this).callProp('getAsDataURL', [type, qualitiy]);
+				loadMoxie();
+
+				webshim.ready('moxie', function(){
+					var img = new mOxie.Image();
+
+					img.onload = function() {
+						cb(img.getAsBlob());
+					};
+					img.load(dataURL);
+
+				});
+			}
+		}
+	});
 
 	window.FileReader = notReadyYet;
 	window.FormData = notReadyYet;
@@ -1626,7 +1653,6 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 		mOxie = window.mOxie;
 
 		mOxie.Env.swf_url = featureOptions.swfpath;
-		mOxie.Env.xap_url = featureOptions.xappath;
 
 		window.FileReader = mOxie.FileReader;
 
@@ -1665,7 +1691,6 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 
 			return moxieData;
 		};
-		FormData = window.FormData;
 
 		createFilePicker = _createFilePicker;
 		transports.moxie = createMoxieTransport;

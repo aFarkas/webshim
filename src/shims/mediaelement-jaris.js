@@ -124,12 +124,13 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 	};
 
 
-	mediaelement.jarisEvent = {};
+	mediaelement.jarisEvent = mediaelement.jarisEvent || {};
 	var localConnectionTimer;
 	var onEvent = {
 		onPlayPause: function(jaris, data, override){
 			var playing, type;
 			var idled = data.paused || data.ended;
+
 			if(override == null){
 				try {
 					playing = data.api.api_get("isPlaying");
@@ -143,12 +144,15 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 				type = data.paused ? 'pause' : 'play';
 				data._ppFlag = true;
 				trigger(data._elem, type);
+
+			}
+			if(!data.paused || playing == idled || playing == null){
 				if(data.readyState < 3){
 					setReadyState(3, data);
 				}
-				if(!data.paused){
-					trigger(data._elem, 'playing');
-				}
+			}
+			if(!data.paused){
+				trigger(data._elem, 'playing');
 			}
 		},
 		onSeek: function(jaris, data){
@@ -900,7 +904,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		options.changeSWF(vars, elem, canPlaySrc, data, 'embed');
 		clearTimeout(data.flashBlock);
 
-		swfmini.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.115", false, vars, params, attrs, function(swfData){
+		swfmini.embedSWF(playerSwfPath, elemId, "100%", "100%", "11.3", false, vars, params, attrs, function(swfData){
 			if(swfData.success){
 				var fBlocker = function(){
 					if((!swfData.ref.parentNode && box[0].parentNode) || swfData.ref.style.display == "none"){

@@ -15,7 +15,9 @@
 
 		body {
 			font-family: sans-serif;
+			margin-top: 60px;
 		}
+
 		.wrapper {
 			margin: 10px auto;
 			max-width: 600px;
@@ -48,10 +50,22 @@
 		div.ws-success input {
 			border-color: #8c8;
 		}
+
 		.theme-wrapper {
-			position: fixed;
+			position: absolute;
 			top: 5px;
-			right: 5px;;
+			right: 5px;
+		}
+
+		.polyfill-type {
+			position: absolute;
+			top: 5px;
+			left: 5px;
+		}
+
+		.polyfill-type select,
+		.theme-wrapper select {
+			display: block;
 		}
 
 		.mediaplayer {
@@ -77,21 +91,46 @@
 	<script>
 		webshim.setOptions('forms', {
 			lazyCustomMessages: true,
-			replaceValidationUI: true,
-			customDatalist: true
+			replaceValidationUI: true
 		});
 
 		webshim.setOptions('forms-ext', {
 			types: 'date range datetime-local',
-			replaceUI: true,
 			widgets: {
 				calculateWidth: false
 			}
 		});
 
-		webshim.setOptions('mediaelement', {
-			replaceUI: true
-		});
+		(function(){
+			var stateMatches = {
+				'true': true,
+				'false': false,
+				'auto': 'auto'
+			};
+			var enhanceState = (location.search.match(/enhancelist\=([true|auto|false|nopolyfill]+)/) || ['', 'auto'])[1];
+
+			webshim.ready('jquery', function(){
+				$(function () {
+					$('.polyfill-type select')
+							.val(enhanceState)
+							.on('change', function () {
+								location.search = 'enhancelist=' + $(this).val();
+							})
+					;
+				});
+			});
+			webshim.setOptions('forms', {
+				customDatalist: stateMatches[enhanceState]
+			});
+			webshim.setOptions('forms-ext', {
+				replaceUI: stateMatches[enhanceState]
+			});
+
+			webshim.setOptions('mediaelement', {
+				replaceUI: stateMatches[enhanceState]
+			});
+		})();
+
 		webshim.polyfill('forms forms-ext mediaelement');
 	</script>
 </head>
@@ -164,6 +203,14 @@
 		Style-/Themeswitcher
 
 		<select class="theme-switcher" id="theme"></select>
+	</label>
+	<label class="polyfill-type">
+		Polyfill/enhance strategy
+		<select>
+			<option value="auto" selected="">"auto" enhance non-mobile</option>
+			<option value="false">false: only polyfill</option>
+			<option value="true">true: enhance all</option>
+		</select>
 	</label>
 </div>
 <script>

@@ -5131,436 +5131,6 @@ define("moxie/xhr/XMLHttpRequest", [
 	return XMLHttpRequest;
 });
 
-// Included from: src/javascript/runtime/flash/Runtime.js
-
-/**
- * Runtime.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/*global ActiveXObject:true */
-
-/**
-Defines constructor for Flash runtime.
-
-@class moxie/runtime/flash/Runtime
-@private
-*/
-define("moxie/runtime/flash/Runtime", [
-	"moxie/core/utils/Basic",
-	"moxie/core/utils/Env",
-	"moxie/core/utils/Dom",
-	"moxie/core/Exceptions",
-	"moxie/runtime/Runtime"
-], function(Basic, Env, Dom, x, Runtime) {
-	
-	var type = 'flash', extensions = {};
-
-	/**
-	Get the version of the Flash Player
-
-	@method getShimVersion
-	@private
-	@return {Number} Flash Player version
-	*/
-	function getShimVersion() {
-		var version;
-
-		try {
-			version = navigator.plugins['Shockwave Flash'];
-			version = version.description;
-		} catch (e1) {
-			try {
-				version = new ActiveXObject('ShockwaveFlash.ShockwaveFlash').GetVariable('$version');
-			} catch (e2) {
-				version = '0.0';
-			}
-		}
-		version = version.match(/\d+/g);
-		return parseFloat(version[0] + '.' + version[1]);
-	}
-
-	/**
-	Constructor for the Flash Runtime
-
-	@class FlashRuntime
-	@extends Runtime
-	*/
-	function FlashRuntime(options) {
-		var I = this, initTimer;
-
-		options = Basic.extend({ swf_url: Env.swf_url }, options);
-
-		Runtime.call(this, options, type, {
-			access_binary: function(value) {
-				return value && I.mode === 'browser';
-			},
-			access_image_binary: function(value) {
-				return value && I.mode === 'browser';
-			},
-			display_media: Runtime.capTrue,
-			do_cors: Runtime.capTrue,
-			drag_and_drop: false,
-			report_upload_progress: function() {
-				return I.mode === 'client';
-			},
-			resize_image: Runtime.capTrue,
-			return_response_headers: false,
-			return_response_type: function(responseType) {
-				if (responseType === 'json' && !!window.JSON) {
-					return true;
-				} 
-				return !Basic.arrayDiff(responseType, ['', 'text', 'document']) || I.mode === 'browser';
-			},
-			return_status_code: function(code) {
-				return I.mode === 'browser' || !Basic.arrayDiff(code, [200, 404]);
-			},
-			select_file: Runtime.capTrue,
-			select_multiple: Runtime.capTrue,
-			send_binary_string: function(value) {
-				return value && I.mode === 'browser';
-			},
-			send_browser_cookies: function(value) {
-				return value && I.mode === 'browser';
-			},
-			send_custom_headers: function(value) {
-				return value && I.mode === 'browser';
-			},
-			send_multipart: Runtime.capTrue,
-			slice_blob: function(value) {
-				return value && I.mode === 'browser';
-			},
-			stream_upload: function(value) {
-				return value && I.mode === 'browser';
-			},
-			summon_file_dialog: false,
-			upload_filesize: function(size) {
-				return Basic.parseSizeStr(size) <= 2097152 || I.mode === 'client';
-			},
-			use_http_method: function(methods) {
-				return !Basic.arrayDiff(methods, ['GET', 'POST']);
-			}
-		}, { 
-			// capabilities that require specific mode
-			access_binary: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			access_image_binary: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			report_upload_progress: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			return_response_type: function(responseType) {
-				return Basic.arrayDiff(responseType, ['', 'text', 'json', 'document']) ? 'browser' : ['client', 'browser'];
-			},
-			return_status_code: function(code) {
-				return Basic.arrayDiff(code, [200, 404]) ? 'browser' : ['client', 'browser'];
-			},
-			send_binary_string: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			send_browser_cookies: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			send_custom_headers: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			stream_upload: function(value) {
-				return value ? 'client' : 'browser';
-			},
-			upload_filesize: function(size) {
-				return Basic.parseSizeStr(size) >= 2097152 ? 'client' : 'browser';
-			}
-		}, 'client');
-
-
-		// minimal requirement for Flash Player version
-		if (getShimVersion() < 10) {
-			this.mode = false; // with falsy mode, runtime won't operable, no matter what the mode was before
-		}
-
-
-		Basic.extend(this, {
-
-			getShim: function() {
-				return Dom.get(this.uid);
-			},
-
-			shimExec: function(component, action) {
-				var args = [].slice.call(arguments, 2);
-				return I.getShim().exec(this.uid, component, action, args);
-			},
-
-			init: function() {
-				var html, el, container;
-
-				container = this.getShimContainer();
-
-				// if not the minimal height, shims are not initialized in older browsers (e.g FF3.6, IE6,7,8, Safari 4.0,5.0, etc)
-				Basic.extend(container.style, {
-					position: 'absolute',
-					top: '-8px',
-					left: '-8px',
-					width: '9px',
-					height: '9px',
-					overflow: 'hidden'
-				});
-
-				// insert flash object
-				html = '<object id="' + this.uid + '" type="application/x-shockwave-flash" data="' +  options.swf_url + '" ';
-
-				if (Env.browser === 'IE') {
-					html += 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" ';
-				}
-
-				html += 'width="100%" height="100%" style="outline:0">'  +
-					'<param name="movie" value="' + options.swf_url + '" />' +
-					'<param name="flashvars" value="uid=' + escape(this.uid) + '&target=' + Env.global_event_dispatcher + '" />' +
-					'<param name="wmode" value="transparent" />' +
-					'<param name="allowscriptaccess" value="always" />' +
-				'</object>';
-
-				if (Env.browser === 'IE') {
-					el = document.createElement('div');
-					container.appendChild(el);
-					el.outerHTML = html;
-					el = container = null; // just in case
-				} else {
-					container.innerHTML = html;
-				}
-
-				// Init is dispatched by the shim
-				initTimer = setTimeout(function() {
-					if (I && !I.initialized) { // runtime might be already destroyed by this moment
-						I.trigger("Error", new x.RuntimeError(x.RuntimeError.NOT_INIT_ERR));
-					}
-				}, 5000);
-			},
-
-			destroy: (function(destroy) { // extend default destroy method
-				return function() {
-					destroy.call(I);
-					clearTimeout(initTimer); // initialization check might be still onwait
-					options = initTimer = destroy = I = null;
-				};
-			}(this.destroy))
-
-		}, extensions);
-	}
-
-	Runtime.addConstructor(type, FlashRuntime);
-
-	return extensions;
-});
-
-// Included from: src/javascript/runtime/flash/file/Blob.js
-
-/**
- * Blob.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/flash/file/Blob
-@private
-*/
-define("moxie/runtime/flash/file/Blob", [
-	"moxie/runtime/flash/Runtime",
-	"moxie/file/Blob"
-], function(extensions, Blob) {
-
-	var FlashBlob = {
-		slice: function(blob, start, end, type) {
-			var self = this.getRuntime();
-
-			if (start < 0) {
-				start = Math.max(blob.size + start, 0);
-			} else if (start > 0) {
-				start = Math.min(start, blob.size);
-			}
-
-			if (end < 0) {
-				end = Math.max(blob.size + end, 0);
-			} else if (end > 0) {
-				end = Math.min(end, blob.size);
-			}
-
-			blob = self.shimExec.call(this, 'Blob', 'slice', start, end, type || '');
-
-			if (blob) {
-				blob = new Blob(self.uid, blob);
-			}
-			return blob;
-		}
-	};
-
-	return (extensions.Blob = FlashBlob);
-});
-
-// Included from: src/javascript/runtime/flash/file/FileInput.js
-
-/**
- * FileInput.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/flash/file/FileInput
-@private
-*/
-define("moxie/runtime/flash/file/FileInput", [
-	"moxie/runtime/flash/Runtime"
-], function(extensions) {
-	
-	var FileInput = {		
-		init: function(options) {
-			this.getRuntime().shimExec.call(this, 'FileInput', 'init', {
-				name: options.name,
-				accept: options.accept,
-				multiple: options.multiple
-			});
-			this.trigger('ready');
-		}
-	};
-
-	return (extensions.FileInput = FileInput);
-});
-
-// Included from: src/javascript/runtime/flash/file/FileReader.js
-
-/**
- * FileReader.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/flash/file/FileReader
-@private
-*/
-define("moxie/runtime/flash/file/FileReader", [
-	"moxie/runtime/flash/Runtime",
-	"moxie/core/utils/Encode"
-], function(extensions, Encode) {
-
-	var _result = '';
-
-	function _formatData(data, op) {
-		switch (op) {
-			case 'readAsText':
-				return Encode.atob(data, 'utf8');
-			case 'readAsBinaryString':
-				return Encode.atob(data);
-			case 'readAsDataURL':
-				return data;
-		}
-		return null;
-	}
-
-	var FileReader = {
-		read: function(op, blob) {
-			var target = this, self = target.getRuntime();
-
-			// special prefix for DataURL read mode
-			if (op === 'readAsDataURL') {
-				_result = 'data:' + (blob.type || '') + ';base64,';
-			}
-
-			target.bind('Progress', function(e, data) {
-				if (data) {
-					_result += _formatData(data, op);
-				}
-			});
-
-			return self.shimExec.call(this, 'FileReader', 'readAsBase64', blob.uid);
-		},
-
-		getResult: function() {
-			return _result;
-		},
-
-		destroy: function() {
-			_result = null;
-		}
-	};
-
-	return (extensions.FileReader = FileReader);
-});
-
-// Included from: src/javascript/runtime/flash/file/FileReaderSync.js
-
-/**
- * FileReaderSync.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/flash/file/FileReaderSync
-@private
-*/
-define("moxie/runtime/flash/file/FileReaderSync", [
-	"moxie/runtime/flash/Runtime",
-	"moxie/core/utils/Encode"
-], function(extensions, Encode) {
-	
-	function _formatData(data, op) {
-		switch (op) {
-			case 'readAsText':
-				return Encode.atob(data, 'utf8');
-			case 'readAsBinaryString':
-				return Encode.atob(data);
-			case 'readAsDataURL':
-				return data;
-		}
-		return null;
-	}
-
-	var FileReaderSync = {
-		read: function(op, blob) {
-			var result, self = this.getRuntime();
-
-			result = self.shimExec.call(this, 'FileReaderSync', 'readAsBase64', blob.uid);
-			if (!result) {
-				return null; // or throw ex
-			}
-
-			// special prefix for DataURL read mode
-			if (op === 'readAsDataURL') {
-				result = 'data:' + (blob.type || '') + ';base64,' + result;
-			}
-
-			return _formatData(result, op, blob.type);
-		}
-	};
-
-	return (extensions.FileReaderSync = FileReaderSync);
-});
-
 // Included from: src/javascript/runtime/Transporter.js
 
 /**
@@ -5698,10 +5268,10 @@ define("moxie/runtime/Transporter", [
 	return Transporter;
 });
 
-// Included from: src/javascript/runtime/flash/xhr/XMLHttpRequest.js
+// Included from: src/javascript/image/Image.js
 
 /**
- * XMLHttpRequest.js
+ * Image.js
  *
  * Copyright 2013, Moxiecode Systems AB
  * Released under GPL License.
@@ -5710,141 +5280,598 @@ define("moxie/runtime/Transporter", [
  * Contributing: http://www.plupload.com/contributing
  */
 
-/**
-@class moxie/runtime/flash/xhr/XMLHttpRequest
-@private
-*/
-define("moxie/runtime/flash/xhr/XMLHttpRequest", [
-	"moxie/runtime/flash/Runtime",
+define("moxie/image/Image", [
 	"moxie/core/utils/Basic",
+	"moxie/core/utils/Dom",
+	"moxie/core/Exceptions",
+	"moxie/file/FileReaderSync",
+	"moxie/xhr/XMLHttpRequest",
+	"moxie/runtime/Runtime",
+	"moxie/runtime/RuntimeClient",
+	"moxie/runtime/Transporter",
+	"moxie/core/utils/Env",
+	"moxie/core/EventTarget",
 	"moxie/file/Blob",
 	"moxie/file/File",
-	"moxie/file/FileReaderSync",
-	"moxie/xhr/FormData",
-	"moxie/runtime/Transporter"
-], function(extensions, Basic, Blob, File, FileReaderSync, FormData, Transporter) {
-	
-	var XMLHttpRequest = {
+	"moxie/core/utils/Encode"
+], function(Basic, Dom, x, FileReaderSync, XMLHttpRequest, Runtime, RuntimeClient, Transporter, Env, EventTarget, Blob, File, Encode) {
+	/**
+	Image preloading and manipulation utility. Additionally it provides access to image meta info (Exif, GPS) and raw binary data.
 
-		send: function(meta, data) {
-			var target = this, self = target.getRuntime();
+	@class Image
+	@constructor
+	@extends EventTarget
+	*/
+	var dispatches = [
+		'progress',
 
-			function send() {
-				meta.transport = self.mode;
-				self.shimExec.call(target, 'XMLHttpRequest', 'send', meta, data);
-			}
+		/**
+		Dispatched when loading is complete.
 
+		@event load
+		@param {Object} event
+		*/
+		'load',
 
-			function appendBlob(name, blob) {
-				self.shimExec.call(target, 'XMLHttpRequest', 'appendBlob', name, blob.uid);
-				data = null;
-				send();
-			}
+		'error',
 
+		/**
+		Dispatched when resize operation is complete.
+		
+		@event resize
+		@param {Object} event
+		*/
+		'resize',
 
-			function attachBlob(blob, cb) {
-				var tr = new Transporter();
+		/**
+		Dispatched when visual representation of the image is successfully embedded
+		into the corresponsing container.
 
-				tr.bind("TransportingComplete", function() {
-					cb(this.result);
-				});
+		@event embedded
+		@param {Object} event
+		*/
+		'embedded'
+	];
 
-				tr.transport(blob.getSource(), blob.type, {
-					ruid: self.uid
-				});
-			}
+	function Image() {
+		RuntimeClient.call(this);
 
-			// copy over the headers if any
-			if (!Basic.isEmptyObj(meta.headers)) {
-				Basic.each(meta.headers, function(value, header) {
-					self.shimExec.call(target, 'XMLHttpRequest', 'setRequestHeader', header, value.toString()); // Silverlight doesn't accept integers into the arguments of type object
-				});
-			}
+		Basic.extend(this, {
+			/**
+			Unique id of the component
 
-			// transfer over multipart params and blob itself
-			if (data instanceof FormData) {
-				var blobField;
-				data.each(function(value, name) {
-					if (value instanceof Blob) {
-						blobField = name;
-					} else {
-						self.shimExec.call(target, 'XMLHttpRequest', 'append', name, value);
-					}
-				});
+			@property uid
+			@type {String}
+			*/
+			uid: Basic.guid('uid_'),
 
-				if (!data.hasBlob()) {
-					data = null;
-					send();
+			/**
+			Unique id of the connected runtime, if any.
+
+			@property ruid
+			@type {String}
+			*/
+			ruid: null,
+
+			/**
+			Name of the file, that was used to create an image, if available. If not equals to empty string.
+
+			@property name
+			@type {String}
+			@default ""
+			*/
+			name: "",
+
+			/**
+			Size of the image in bytes. Actual value is set only after image is preloaded.
+
+			@property size
+			@type {Number}
+			@default 0
+			*/
+			size: 0,
+
+			/**
+			Width of the image. Actual value is set only after image is preloaded.
+
+			@property width
+			@type {Number}
+			@default 0
+			*/
+			width: 0,
+
+			/**
+			Height of the image. Actual value is set only after image is preloaded.
+
+			@property height
+			@type {Number}
+			@default 0
+			*/
+			height: 0,
+
+			/**
+			Mime type of the image. Currently only image/jpeg and image/png are supported. Actual value is set only after image is preloaded.
+
+			@property type
+			@type {String}
+			@default ""
+			*/
+			type: "",
+
+			/**
+			Holds meta info (Exif, GPS). Is populated only for image/jpeg. Actual value is set only after image is preloaded.
+
+			@property meta
+			@type {Object}
+			@default {}
+			*/
+			meta: {},
+
+			/**
+			Alias for load method, that takes another mOxie.Image object as a source (see load).
+
+			@method clone
+			@param {Image} src Source for the image
+			@param {Boolean} [exact=false] Whether to activate in-depth clone mode
+			*/
+			clone: function() {
+				this.load.apply(this, arguments);
+			},
+
+			/**
+			Loads image from various sources. Currently the source for new image can be: mOxie.Image, mOxie.Blob/mOxie.File, 
+			native Blob/File, dataUrl or URL. Depending on the type of the source, arguments - differ. When source is URL, 
+			Image will be downloaded from remote destination and loaded in memory.
+
+			@example
+				var img = new mOxie.Image();
+				img.onload = function() {
+					var blob = img.getAsBlob();
+					
+					var formData = new mOxie.FormData();
+					formData.append('file', blob);
+
+					var xhr = new mOxie.XMLHttpRequest();
+					xhr.onload = function() {
+						// upload complete
+					};
+					xhr.open('post', 'upload.php');
+					xhr.send(formData);
+				};
+				img.load("http://www.moxiecode.com/images/mox-logo.jpg"); // notice file extension (.jpg)
+			
+
+			@method load
+			@param {Image|Blob|File|String} src Source for the image
+			@param {Boolean|Object} [mixed]
+			*/
+			load: function() {
+				// this is here because to bind properly we need an uid first, which is created above
+				this.bind('Load Resize', function() {
+					_updateInfo.call(this);
+				}, 999);
+
+				this.convertEventPropsToHandlers(dispatches);
+
+				_load.apply(this, arguments);
+			},
+
+			/**
+			Downsizes the image to fit the specified width/height. If crop is supplied, image will be cropped to exact dimensions.
+
+			@method downsize
+			@param {Number} width Resulting width
+			@param {Number} [height=width] Resulting height (optional, if not supplied will default to width)
+			@param {Boolean} [crop=false] Whether to crop the image to exact dimensions
+			@param {Boolean} [preserveHeaders=true] Whether to preserve meta headers (on JPEGs after resize)
+			*/
+			downsize: function(opts) {
+				var defaults = {
+					width: this.width,
+					height: this.height,
+					crop: false,
+					preserveHeaders: true
+				};
+
+				if (typeof(opts) === 'object') {
+					opts = Basic.extend(defaults, opts);
 				} else {
-					var blob = data.getBlob();
-					if (blob.isDetached()) {
-						attachBlob(blob, function(attachedBlob) {
-							blob.destroy();
-							appendBlob(blobField, attachedBlob);		
-						});
-					} else {
-						appendBlob(blobField, blob);
-					}
-				}
-			} else if (data instanceof Blob) {
-				if (data.isDetached()) {
-					attachBlob(data, function(attachedBlob) {
-						data.destroy();
-						data = attachedBlob.uid;
-						send();
+					opts = Basic.extend(defaults, {
+						width: arguments[0],
+						height: arguments[1],
+						crop: arguments[2],
+						preserveHeaders: arguments[3]
 					});
-				} else {
-					data = data.uid;
-					send();
-				}
-			} else {
-				send();
-			}
-		},
-
-		getResponse: function(responseType) {
-			var frs, blob, self = this.getRuntime();
-
-			blob = self.shimExec.call(this, 'XMLHttpRequest', 'getResponseAsBlob');
-
-			if (blob) {
-				blob = new File(self.uid, blob);
-
-				if ('blob' === responseType) {
-					return blob;
 				}
 
-				try { 
-					frs = new FileReaderSync();
-
-					if (!!~Basic.inArray(responseType, ["", "text"])) {
-						return frs.readAsText(blob);
-					} else if ('json' === responseType && !!window.JSON) {
-						return JSON.parse(frs.readAsText(blob));
+				try {
+					if (!this.size) { // only preloaded image objects can be used as source
+						throw new x.DOMException(x.DOMException.INVALID_STATE_ERR);
 					}
-				} finally {
-					blob.destroy();
+
+					// no way to reliably intercept the crash due to high resolution, so we simply avoid it
+					if (this.width > Image.MAX_RESIZE_WIDTH || this.height > Image.MAX_RESIZE_HEIGHT) {
+						throw new x.ImageError(x.ImageError.MAX_RESOLUTION_ERR);
+					}
+
+					this.getRuntime().exec.call(this, 'Image', 'downsize', opts.width, opts.height, opts.crop, opts.preserveHeaders);
+				} catch(ex) {
+					// for now simply trigger error event
+					this.trigger('error', ex.code);
 				}
+			},
+
+			/**
+			Alias for downsize(width, height, true). (see downsize)
+			
+			@method crop
+			@param {Number} width Resulting width
+			@param {Number} [height=width] Resulting height (optional, if not supplied will default to width)
+			@param {Boolean} [preserveHeaders=true] Whether to preserve meta headers (on JPEGs after resize)
+			*/
+			crop: function(width, height, preserveHeaders) {
+				this.downsize(width, height, true, preserveHeaders);
+			},
+
+			getAsCanvas: function() {
+				if (!Env.can('create_canvas')) {
+					throw new x.RuntimeError(x.RuntimeError.NOT_SUPPORTED_ERR);
+				}
+
+				var runtime = this.connectRuntime(this.ruid);
+				return runtime.exec.call(this, 'Image', 'getAsCanvas');
+			},
+
+			/**
+			Retrieves image in it's current state as mOxie.Blob object. Cannot be run on empty or image in progress (throws
+			DOMException.INVALID_STATE_ERR).
+
+			@method getAsBlob
+			@param {String} [type="image/jpeg"] Mime type of resulting blob. Can either be image/jpeg or image/png
+			@param {Number} [quality=90] Applicable only together with mime type image/jpeg
+			@return {Blob} Image as Blob
+			*/
+			getAsBlob: function(type, quality) {
+				if (!this.size) {
+					throw new x.DOMException(x.DOMException.INVALID_STATE_ERR);
+				}
+
+				if (!type) {
+					type = 'image/jpeg';
+				}
+
+				if (type === 'image/jpeg' && !quality) {
+					quality = 90;
+				}
+
+				return this.getRuntime().exec.call(this, 'Image', 'getAsBlob', type, quality);
+			},
+
+			/**
+			Retrieves image in it's current state as dataURL string. Cannot be run on empty or image in progress (throws
+			DOMException.INVALID_STATE_ERR).
+
+			@method getAsDataURL
+			@param {String} [type="image/jpeg"] Mime type of resulting blob. Can either be image/jpeg or image/png
+			@param {Number} [quality=90] Applicable only together with mime type image/jpeg
+			@return {String} Image as dataURL string
+			*/
+			getAsDataURL: function(type, quality) {
+				if (!this.size) {
+					throw new x.DOMException(x.DOMException.INVALID_STATE_ERR);
+				}
+				return this.getRuntime().exec.call(this, 'Image', 'getAsDataURL', type, quality);
+			},
+
+			/**
+			Retrieves image in it's current state as binary string. Cannot be run on empty or image in progress (throws
+			DOMException.INVALID_STATE_ERR).
+
+			@method getAsBinaryString
+			@param {String} [type="image/jpeg"] Mime type of resulting blob. Can either be image/jpeg or image/png
+			@param {Number} [quality=90] Applicable only together with mime type image/jpeg
+			@return {String} Image as binary string
+			*/
+			getAsBinaryString: function(type, quality) {
+				var dataUrl = this.getAsDataURL(type, quality);
+				return Encode.atob(dataUrl.substring(dataUrl.indexOf('base64,') + 7));
+			},
+
+			/**
+			Embeds a visual representation of the image into the specified node. Depending on the runtime, 
+			it might be a canvas, an img node or a thrid party shim object (Flash or SilverLight - very rare, 
+			can be used in legacy browsers that do not have canvas or proper dataURI support).
+
+			@method embed
+			@param {DOMElement} el DOM element to insert the image object into
+			@param {Object} [options]
+				@param {Number} [options.width] The width of an embed (defaults to the image width)
+				@param {Number} [options.height] The height of an embed (defaults to the image height)
+				@param {String} [type="image/jpeg"] Mime type
+				@param {Number} [quality=90] Quality of an embed, if mime type is image/jpeg
+				@param {Boolean} [crop=false] Whether to crop an embed to the specified dimensions
+			*/
+			embed: function(el) {
+				var self = this
+				, imgCopy
+				, type, quality, crop
+				, options = arguments[1] || {}
+				, width = this.width
+				, height = this.height
+				, runtime // this has to be outside of all the closures to contain proper runtime
+				;
+
+				function onResize() {
+					// if possible, embed a canvas element directly
+					if (Env.can('create_canvas')) {
+						var canvas = imgCopy.getAsCanvas();
+						if (canvas) {
+							el.appendChild(canvas);
+							canvas = null;
+							imgCopy.destroy();
+							self.trigger('embedded');
+							return;
+						}
+					}
+
+					var dataUrl = imgCopy.getAsDataURL(type, quality);
+					if (!dataUrl) {
+						throw new x.ImageError(x.ImageError.WRONG_FORMAT);
+					}
+
+					if (Env.can('use_data_uri_of', dataUrl.length)) {
+						el.innerHTML = '<img src="' + dataUrl + '" width="' + imgCopy.width + '" height="' + imgCopy.height + '" />';
+						imgCopy.destroy();
+						self.trigger('embedded');
+					} else {
+						var tr = new Transporter();
+
+						tr.bind("TransportingComplete", function() {
+							runtime = self.connectRuntime(this.result.ruid);
+
+							self.bind("Embedded", function() {
+								// position and size properly
+								Basic.extend(runtime.getShimContainer().style, {
+									//position: 'relative',
+									top: '0px',
+									left: '0px',
+									width: imgCopy.width + 'px',
+									height: imgCopy.height + 'px'
+								});
+
+								// some shims (Flash/SilverLight) reinitialize, if parent element is hidden, reordered or it's
+								// position type changes (in Gecko), but since we basically need this only in IEs 6/7 and
+								// sometimes 8 and they do not have this problem, we can comment this for now
+								/*tr.bind("RuntimeInit", function(e, runtime) {
+									tr.destroy();
+									runtime.destroy();
+									onResize.call(self); // re-feed our image data
+								});*/
+
+								runtime = null;
+							}, 999);
+
+							runtime.exec.call(self, "ImageView", "display", this.result.uid, width, height);
+							imgCopy.destroy();
+						});
+
+						tr.transport(Encode.atob(dataUrl.substring(dataUrl.indexOf('base64,') + 7)), type, Basic.extend({}, options, {
+							required_caps: {
+								display_media: true
+							},
+							runtime_order: 'flash,silverlight',
+							container: el
+						}));
+					}
+				}
+
+				try {
+					if (!(el = Dom.get(el))) {
+						throw new x.DOMException(x.DOMException.INVALID_NODE_TYPE_ERR);
+					}
+
+					if (!this.size) { // only preloaded image objects can be used as source
+						throw new x.DOMException(x.DOMException.INVALID_STATE_ERR);
+					}
+
+					if (this.width > Image.MAX_RESIZE_WIDTH || this.height > Image.MAX_RESIZE_HEIGHT) {
+						throw new x.ImageError(x.ImageError.MAX_RESOLUTION_ERR);
+					}
+
+					type = options.type || this.type || 'image/jpeg';
+					quality = options.quality || 90;
+					crop = Basic.typeOf(options.crop) !== 'undefined' ? options.crop : false;
+
+					// figure out dimensions for the thumb
+					if (options.width) {
+						width = options.width;
+						height = options.height || width;
+					} else {
+						// if container element has measurable dimensions, use them
+						var dimensions = Dom.getSize(el);
+						if (dimensions.w && dimensions.h) { // both should be > 0
+							width = dimensions.w;
+							height = dimensions.h;
+						}
+					}
+
+					imgCopy = new Image();
+
+					imgCopy.bind("Resize", function() {
+						onResize.call(self);
+					});
+
+					imgCopy.bind("Load", function() {
+						imgCopy.downsize(width, height, crop, false);
+					});
+
+					imgCopy.clone(this, false);
+
+					return imgCopy;
+				} catch(ex) {
+					// for now simply trigger error event
+					this.trigger('error', ex.code);
+				}
+			},
+
+			/**
+			Properly destroys the image and frees resources in use. If any. Recommended way to dispose mOxie.Image object.
+
+			@method destroy
+			*/
+			destroy: function() {
+				if (this.ruid) {
+					this.getRuntime().exec.call(this, 'Image', 'destroy');
+					this.disconnectRuntime();
+				}
+				this.unbindAll();
 			}
-			return null;
-		},
+		});
 
-		abort: function(upload_complete_flag) {
-			var self = this.getRuntime();
 
-			self.shimExec.call(this, 'XMLHttpRequest', 'abort');
+		function _updateInfo(info) {
+			if (!info) {
+				info = this.getRuntime().exec.call(this, 'Image', 'getInfo');
+			}
 
-			this.dispatchEvent('readystatechange');
-			// this.dispatchEvent('progress');
-			this.dispatchEvent('abort');
+			this.size = info.size;
+			this.width = info.width;
+			this.height = info.height;
+			this.type = info.type;
+			this.meta = info.meta;
 
-			//if (!upload_complete_flag) {
-				// this.dispatchEvent('uploadprogress');
-			//}
+			// update file name, only if empty
+			if (this.name === '') {
+				this.name = info.name;
+			}
 		}
-	};
+		
 
-	return (extensions.XMLHttpRequest = XMLHttpRequest);
+		function _load(src) {
+			var srcType = Basic.typeOf(src);
+
+			try {
+				// if source is Image
+				if (src instanceof Image) {
+					if (!src.size) { // only preloaded image objects can be used as source
+						throw new x.DOMException(x.DOMException.INVALID_STATE_ERR);
+					}
+					_loadFromImage.apply(this, arguments);
+				}
+				// if source is o.Blob/o.File
+				else if (src instanceof Blob) {
+					if (!~Basic.inArray(src.type, ['image/jpeg', 'image/png'])) {
+						throw new x.ImageError(x.ImageError.WRONG_FORMAT);
+					}
+					_loadFromBlob.apply(this, arguments);
+				}
+				// if native blob/file
+				else if (Basic.inArray(srcType, ['blob', 'file']) !== -1) {
+					_load.call(this, new File(null, src), arguments[1]);
+				}
+				// if String
+				else if (srcType === 'string') {
+					// if dataUrl String
+					if (/^data:[^;]*;base64,/.test(src)) {
+						_load.call(this, new Blob(null, { data: src }), arguments[1]);
+					}
+					// else assume Url, either relative or absolute
+					else {
+						_loadFromUrl.apply(this, arguments);
+					}
+				}
+				// if source seems to be an img node
+				else if (srcType === 'node' && src.nodeName.toLowerCase() === 'img') {
+					_load.call(this, src.src, arguments[1]);
+				}
+				else {
+					throw new x.DOMException(x.DOMException.TYPE_MISMATCH_ERR);
+				}
+			} catch(ex) {
+				// for now simply trigger error event
+				this.trigger('error', ex.code);
+			}
+		}
+
+
+		function _loadFromImage(img, exact) {
+			var runtime = this.connectRuntime(img.ruid);
+			this.ruid = runtime.uid;
+			runtime.exec.call(this, 'Image', 'loadFromImage', img, (Basic.typeOf(exact) === 'undefined' ? true : exact));
+		}
+
+
+		function _loadFromBlob(blob, options) {
+			var self = this;
+
+			self.name = blob.name || '';
+
+			function exec(runtime) {
+				self.ruid = runtime.uid;
+				runtime.exec.call(self, 'Image', 'loadFromBlob', blob);
+			}
+
+			if (blob.isDetached()) {
+				this.bind('RuntimeInit', function(e, runtime) {
+					exec(runtime);
+				});
+
+				// convert to object representation
+				if (options && typeof(options.required_caps) === 'string') {
+					options.required_caps = Runtime.parseCaps(options.required_caps);
+				}
+
+				this.connectRuntime(Basic.extend({
+					required_caps: {
+						access_image_binary: true,
+						resize_image: true
+					}
+				}, options));
+			} else {
+				exec(this.connectRuntime(blob.ruid));
+			}
+		}
+
+
+		function _loadFromUrl(url, options) {
+			var self = this, xhr;
+
+			xhr = new XMLHttpRequest();
+
+			xhr.open('get', url);
+			xhr.responseType = 'blob';
+
+			xhr.onprogress = function(e) {
+				self.trigger(e);
+			};
+
+			xhr.onload = function() {
+				_loadFromBlob.call(self, xhr.response, true);
+			};
+
+			xhr.onerror = function(e) {
+				self.trigger(e);
+			};
+
+			xhr.onloadend = function() {
+				xhr.destroy();
+			};
+
+			xhr.bind('RuntimeError', function(e, err) {
+				self.trigger('RuntimeError', err);
+			});
+
+			xhr.send(null, options);
+		}
+	}
+
+	// virtual world will crash on you if image has a resolution higher than this:
+	Image.MAX_RESIZE_WIDTH = 6500;
+	Image.MAX_RESIZE_HEIGHT = 6500; 
+
+	Image.prototype = EventTarget.instance;
+
+	return Image;
 });
 
 // Included from: src/javascript/runtime/html4/Runtime.js
@@ -6836,10 +6863,10 @@ define("moxie/runtime/html4/xhr/XMLHttpRequest", [
 	return (extensions.XMLHttpRequest = XMLHttpRequest);
 });
 
-// Included from: src/javascript/runtime/silverlight/Runtime.js
+// Included from: src/javascript/runtime/html5/utils/BinaryReader.js
 
 /**
- * RunTime.js
+ * BinaryReader.js
  *
  * Copyright 2013, Moxiecode Systems AB
  * Released under GPL License.
@@ -6848,207 +6875,1630 @@ define("moxie/runtime/html4/xhr/XMLHttpRequest", [
  * Contributing: http://www.plupload.com/contributing
  */
 
-/*global ActiveXObject:true */
-
 /**
-Defines constructor for Silverlight runtime.
-
-@class moxie/runtime/silverlight/Runtime
+@class moxie/runtime/html5/utils/BinaryReader
 @private
 */
-define("moxie/runtime/silverlight/Runtime", [
-	"moxie/core/utils/Basic",
-	"moxie/core/utils/Env",
-	"moxie/core/utils/Dom",
-	"moxie/core/Exceptions",
-	"moxie/runtime/Runtime"
-], function(Basic, Env, Dom, x, Runtime) {
-	
-	var type = "silverlight", extensions = {};
+define("moxie/runtime/html5/utils/BinaryReader", [], function() {
+	return function() {
+		var II = false, bin;
 
-	function isInstalled(version) {
-		var isVersionSupported = false, control = null, actualVer,
-			actualVerArray, reqVerArray, requiredVersionPart, actualVersionPart, index = 0;
+		// Private functions
+		function read(idx, size) {
+			var mv = II ? 0 : -8 * (size - 1), sum = 0, i;
 
-		try {
-			try {
-				control = new ActiveXObject('AgControl.AgControl');
+			for (i = 0; i < size; i++) {
+				sum |= (bin.charCodeAt(idx + i) << Math.abs(mv + i*8));
+			}
 
-				if (control.IsVersionSupported(version)) {
-					isVersionSupported = true;
+			return sum;
+		}
+
+		function putstr(segment, idx, length) {
+			length = arguments.length === 3 ? length : bin.length - idx - 1;
+			bin = bin.substr(0, idx) + segment + bin.substr(length + idx);
+		}
+
+		function write(idx, num, size) {
+			var str = '', mv = II ? 0 : -8 * (size - 1), i;
+
+			for (i = 0; i < size; i++) {
+				str += String.fromCharCode((num >> Math.abs(mv + i*8)) & 255);
+			}
+
+			putstr(str, idx, size);
+		}
+
+		// Public functions
+		return {
+			II: function(order) {
+				if (order === undefined) {
+					return II;
+				} else {
+					II = order;
+				}
+			},
+
+			init: function(binData) {
+				II = false;
+				bin = binData;
+			},
+
+			SEGMENT: function(idx, length, segment) {
+				switch (arguments.length) {
+					case 1:
+						return bin.substr(idx, bin.length - idx - 1);
+					case 2:
+						return bin.substr(idx, length);
+					case 3:
+						putstr(segment, idx, length);
+						break;
+					default: return bin;
+				}
+			},
+
+			BYTE: function(idx) {
+				return read(idx, 1);
+			},
+
+			SHORT: function(idx) {
+				return read(idx, 2);
+			},
+
+			LONG: function(idx, num) {
+				if (num === undefined) {
+					return read(idx, 4);
+				} else {
+					write(idx, num, 4);
+				}
+			},
+
+			SLONG: function(idx) { // 2's complement notation
+				var num = read(idx, 4);
+
+				return (num > 2147483647 ? num - 4294967296 : num);
+			},
+
+			STRING: function(idx, size) {
+				var str = '';
+
+				for (size += idx; idx < size; idx++) {
+					str += String.fromCharCode(read(idx, 1));
 				}
 
-				control = null;
-			} catch (e) {
-				var plugin = navigator.plugins["Silverlight Plug-In"];
+				return str;
+			}
+		};
+	};
+});
 
-				if (plugin) {
-					actualVer = plugin.description;
+// Included from: src/javascript/runtime/html5/image/JPEGHeaders.js
 
-					if (actualVer === "1.0.30226.2") {
-						actualVer = "2.0.30226.2";
+/**
+ * JPEGHeaders.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+ 
+/**
+@class moxie/runtime/html5/image/JPEGHeaders
+@private
+*/
+define("moxie/runtime/html5/image/JPEGHeaders", [
+	"moxie/runtime/html5/utils/BinaryReader"
+], function(BinaryReader) {
+	
+	return function JPEGHeaders(data) {
+		var headers = [], read, idx, marker, length = 0;
+
+		read = new BinaryReader();
+		read.init(data);
+
+		// Check if data is jpeg
+		if (read.SHORT(0) !== 0xFFD8) {
+			return;
+		}
+
+		idx = 2;
+
+		while (idx <= data.length) {
+			marker = read.SHORT(idx);
+
+			// omit RST (restart) markers
+			if (marker >= 0xFFD0 && marker <= 0xFFD7) {
+				idx += 2;
+				continue;
+			}
+
+			// no headers allowed after SOS marker
+			if (marker === 0xFFDA || marker === 0xFFD9) {
+				break;
+			}
+
+			length = read.SHORT(idx + 2) + 2;
+
+			// APPn marker detected
+			if (marker >= 0xFFE1 && marker <= 0xFFEF) {
+				headers.push({
+					hex: marker,
+					name: 'APP' + (marker & 0x000F),
+					start: idx,
+					length: length,
+					segment: read.SEGMENT(idx, length)
+				});
+			}
+
+			idx += length;
+		}
+
+		read.init(null); // free memory
+
+		return {
+			headers: headers,
+
+			restore: function(data) {
+				var max, i;
+
+				read.init(data);
+
+				idx = read.SHORT(2) == 0xFFE0 ? 4 + read.SHORT(4) : 2;
+
+				for (i = 0, max = headers.length; i < max; i++) {
+					read.SEGMENT(idx, 0, headers[i].segment);
+					idx += headers[i].length;
+				}
+
+				data = read.SEGMENT();
+				read.init(null);
+				return data;
+			},
+
+			strip: function(data) {
+				var headers, jpegHeaders, i;
+
+				jpegHeaders = new JPEGHeaders(data);
+				headers = jpegHeaders.headers;
+				jpegHeaders.purge();
+
+				read.init(data);
+
+				i = headers.length;
+				while (i--) {
+					read.SEGMENT(headers[i].start, headers[i].length, '');
+				}
+				
+				data = read.SEGMENT();
+				read.init(null);
+				return data;
+			},
+
+			get: function(name) {
+				var array = [];
+
+				for (var i = 0, max = headers.length; i < max; i++) {
+					if (headers[i].name === name.toUpperCase()) {
+						array.push(headers[i].segment);
 					}
+				}
+				return array;
+			},
 
-					actualVerArray = actualVer.split(".");
+			set: function(name, segment) {
+				var array = [], i, ii, max;
 
-					while (actualVerArray.length > 3) {
-						actualVerArray.pop();
+				if (typeof(segment) === 'string') {
+					array.push(segment);
+				} else {
+					array = segment;
+				}
+
+				for (i = ii = 0, max = headers.length; i < max; i++) {
+					if (headers[i].name === name.toUpperCase()) {
+						headers[i].segment = array[ii];
+						headers[i].length = array[ii].length;
+						ii++;
 					}
-
-					while ( actualVerArray.length < 4) {
-						actualVerArray.push(0);
+					if (ii >= array.length) {
+						break;
 					}
+				}
+			},
 
-					reqVerArray = version.split(".");
+			purge: function() {
+				headers = [];
+				read.init(null);
+				read = null;
+			}
+		};
+	};
+});
 
-					while (reqVerArray.length > 4) {
-						reqVerArray.pop();
-					}
+// Included from: src/javascript/runtime/html5/image/ExifParser.js
 
-					do {
-						requiredVersionPart = parseInt(reqVerArray[index], 10);
-						actualVersionPart = parseInt(actualVerArray[index], 10);
-						index++;
-					} while (index < reqVerArray.length && requiredVersionPart === actualVersionPart);
+/**
+ * ExifParser.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
 
-					if (requiredVersionPart <= actualVersionPart && !isNaN(requiredVersionPart)) {
-						isVersionSupported = true;
+/**
+@class moxie/runtime/html5/image/ExifParser
+@private
+*/
+define("moxie/runtime/html5/image/ExifParser", [
+	"moxie/core/utils/Basic",
+	"moxie/runtime/html5/utils/BinaryReader"
+], function(Basic, BinaryReader) {
+	
+	return function ExifParser() {
+		// Private ExifParser fields
+		var data, tags, Tiff, offsets = {}, tagDescs;
+
+		data = new BinaryReader();
+
+		tags = {
+			tiff : {
+				/*
+				The image orientation viewed in terms of rows and columns.
+
+				1 = The 0th row is at the visual top of the image, and the 0th column is the visual left-hand side.
+				2 = The 0th row is at the visual top of the image, and the 0th column is the visual right-hand side.
+				3 = The 0th row is at the visual bottom of the image, and the 0th column is the visual right-hand side.
+				4 = The 0th row is at the visual bottom of the image, and the 0th column is the visual left-hand side.
+				5 = The 0th row is the visual left-hand side of the image, and the 0th column is the visual top.
+				6 = The 0th row is the visual right-hand side of the image, and the 0th column is the visual top.
+				7 = The 0th row is the visual right-hand side of the image, and the 0th column is the visual bottom.
+				8 = The 0th row is the visual left-hand side of the image, and the 0th column is the visual bottom.
+				*/
+				0x0112: 'Orientation',
+				0x010E: 'ImageDescription',
+				0x010F: 'Make',
+				0x0110: 'Model',
+				0x0131: 'Software',
+				0x8769: 'ExifIFDPointer',
+				0x8825:	'GPSInfoIFDPointer'
+			},
+			exif : {
+				0x9000: 'ExifVersion',
+				0xA001: 'ColorSpace',
+				0xA002: 'PixelXDimension',
+				0xA003: 'PixelYDimension',
+				0x9003: 'DateTimeOriginal',
+				0x829A: 'ExposureTime',
+				0x829D: 'FNumber',
+				0x8827: 'ISOSpeedRatings',
+				0x9201: 'ShutterSpeedValue',
+				0x9202: 'ApertureValue'	,
+				0x9207: 'MeteringMode',
+				0x9208: 'LightSource',
+				0x9209: 'Flash',
+				0x920A: 'FocalLength',
+				0xA402: 'ExposureMode',
+				0xA403: 'WhiteBalance',
+				0xA406: 'SceneCaptureType',
+				0xA404: 'DigitalZoomRatio',
+				0xA408: 'Contrast',
+				0xA409: 'Saturation',
+				0xA40A: 'Sharpness'
+			},
+			gps : {
+				0x0000: 'GPSVersionID',
+				0x0001: 'GPSLatitudeRef',
+				0x0002: 'GPSLatitude',
+				0x0003: 'GPSLongitudeRef',
+				0x0004: 'GPSLongitude'
+			}
+		};
+
+		tagDescs = {
+			'ColorSpace': {
+				1: 'sRGB',
+				0: 'Uncalibrated'
+			},
+
+			'MeteringMode': {
+				0: 'Unknown',
+				1: 'Average',
+				2: 'CenterWeightedAverage',
+				3: 'Spot',
+				4: 'MultiSpot',
+				5: 'Pattern',
+				6: 'Partial',
+				255: 'Other'
+			},
+
+			'LightSource': {
+				1: 'Daylight',
+				2: 'Fliorescent',
+				3: 'Tungsten',
+				4: 'Flash',
+				9: 'Fine weather',
+				10: 'Cloudy weather',
+				11: 'Shade',
+				12: 'Daylight fluorescent (D 5700 - 7100K)',
+				13: 'Day white fluorescent (N 4600 -5400K)',
+				14: 'Cool white fluorescent (W 3900 - 4500K)',
+				15: 'White fluorescent (WW 3200 - 3700K)',
+				17: 'Standard light A',
+				18: 'Standard light B',
+				19: 'Standard light C',
+				20: 'D55',
+				21: 'D65',
+				22: 'D75',
+				23: 'D50',
+				24: 'ISO studio tungsten',
+				255: 'Other'
+			},
+
+			'Flash': {
+				0x0000: 'Flash did not fire.',
+				0x0001: 'Flash fired.',
+				0x0005: 'Strobe return light not detected.',
+				0x0007: 'Strobe return light detected.',
+				0x0009: 'Flash fired, compulsory flash mode',
+				0x000D: 'Flash fired, compulsory flash mode, return light not detected',
+				0x000F: 'Flash fired, compulsory flash mode, return light detected',
+				0x0010: 'Flash did not fire, compulsory flash mode',
+				0x0018: 'Flash did not fire, auto mode',
+				0x0019: 'Flash fired, auto mode',
+				0x001D: 'Flash fired, auto mode, return light not detected',
+				0x001F: 'Flash fired, auto mode, return light detected',
+				0x0020: 'No flash function',
+				0x0041: 'Flash fired, red-eye reduction mode',
+				0x0045: 'Flash fired, red-eye reduction mode, return light not detected',
+				0x0047: 'Flash fired, red-eye reduction mode, return light detected',
+				0x0049: 'Flash fired, compulsory flash mode, red-eye reduction mode',
+				0x004D: 'Flash fired, compulsory flash mode, red-eye reduction mode, return light not detected',
+				0x004F: 'Flash fired, compulsory flash mode, red-eye reduction mode, return light detected',
+				0x0059: 'Flash fired, auto mode, red-eye reduction mode',
+				0x005D: 'Flash fired, auto mode, return light not detected, red-eye reduction mode',
+				0x005F: 'Flash fired, auto mode, return light detected, red-eye reduction mode'
+			},
+
+			'ExposureMode': {
+				0: 'Auto exposure',
+				1: 'Manual exposure',
+				2: 'Auto bracket'
+			},
+
+			'WhiteBalance': {
+				0: 'Auto white balance',
+				1: 'Manual white balance'
+			},
+
+			'SceneCaptureType': {
+				0: 'Standard',
+				1: 'Landscape',
+				2: 'Portrait',
+				3: 'Night scene'
+			},
+
+			'Contrast': {
+				0: 'Normal',
+				1: 'Soft',
+				2: 'Hard'
+			},
+
+			'Saturation': {
+				0: 'Normal',
+				1: 'Low saturation',
+				2: 'High saturation'
+			},
+
+			'Sharpness': {
+				0: 'Normal',
+				1: 'Soft',
+				2: 'Hard'
+			},
+
+			// GPS related
+			'GPSLatitudeRef': {
+				N: 'North latitude',
+				S: 'South latitude'
+			},
+
+			'GPSLongitudeRef': {
+				E: 'East longitude',
+				W: 'West longitude'
+			}
+		};
+
+		function extractTags(IFD_offset, tags2extract) {
+			var length = data.SHORT(IFD_offset), i, ii,
+				tag, type, count, tagOffset, offset, value, values = [], hash = {};
+
+			for (i = 0; i < length; i++) {
+				// Set binary reader pointer to beginning of the next tag
+				offset = tagOffset = IFD_offset + 12 * i + 2;
+
+				tag = tags2extract[data.SHORT(offset)];
+
+				if (tag === undefined) {
+					continue; // Not the tag we requested
+				}
+
+				type = data.SHORT(offset+=2);
+				count = data.LONG(offset+=2);
+
+				offset += 4;
+				values = [];
+
+				switch (type) {
+					case 1: // BYTE
+					case 7: // UNDEFINED
+						if (count > 4) {
+							offset = data.LONG(offset) + offsets.tiffHeader;
+						}
+
+						for (ii = 0; ii < count; ii++) {
+							values[ii] = data.BYTE(offset + ii);
+						}
+
+						break;
+
+					case 2: // STRING
+						if (count > 4) {
+							offset = data.LONG(offset) + offsets.tiffHeader;
+						}
+
+						hash[tag] = data.STRING(offset, count - 1);
+
+						continue;
+
+					case 3: // SHORT
+						if (count > 2) {
+							offset = data.LONG(offset) + offsets.tiffHeader;
+						}
+
+						for (ii = 0; ii < count; ii++) {
+							values[ii] = data.SHORT(offset + ii*2);
+						}
+
+						break;
+
+					case 4: // LONG
+						if (count > 1) {
+							offset = data.LONG(offset) + offsets.tiffHeader;
+						}
+
+						for (ii = 0; ii < count; ii++) {
+							values[ii] = data.LONG(offset + ii*4);
+						}
+
+						break;
+
+					case 5: // RATIONAL
+						offset = data.LONG(offset) + offsets.tiffHeader;
+
+						for (ii = 0; ii < count; ii++) {
+							values[ii] = data.LONG(offset + ii*4) / data.LONG(offset + ii*4 + 4);
+						}
+
+						break;
+
+					case 9: // SLONG
+						offset = data.LONG(offset) + offsets.tiffHeader;
+
+						for (ii = 0; ii < count; ii++) {
+							values[ii] = data.SLONG(offset + ii*4);
+						}
+
+						break;
+
+					case 10: // SRATIONAL
+						offset = data.LONG(offset) + offsets.tiffHeader;
+
+						for (ii = 0; ii < count; ii++) {
+							values[ii] = data.SLONG(offset + ii*4) / data.SLONG(offset + ii*4 + 4);
+						}
+
+						break;
+
+					default:
+						continue;
+				}
+
+				value = (count == 1 ? values[0] : values);
+
+				if (tagDescs.hasOwnProperty(tag) && typeof value != 'object') {
+					hash[tag] = tagDescs[tag][value];
+				} else {
+					hash[tag] = value;
+				}
+			}
+
+			return hash;
+		}
+
+		function getIFDOffsets() {
+			var idx = offsets.tiffHeader;
+
+			// Set read order of multi-byte data
+			data.II(data.SHORT(idx) == 0x4949);
+
+			// Check if always present bytes are indeed present
+			if (data.SHORT(idx+=2) !== 0x002A) {
+				return false;
+			}
+
+			offsets.IFD0 = offsets.tiffHeader + data.LONG(idx += 2);
+			Tiff = extractTags(offsets.IFD0, tags.tiff);
+
+			if ('ExifIFDPointer' in Tiff) {
+				offsets.exifIFD = offsets.tiffHeader + Tiff.ExifIFDPointer;
+				delete Tiff.ExifIFDPointer;
+			}
+
+			if ('GPSInfoIFDPointer' in Tiff) {
+				offsets.gpsIFD = offsets.tiffHeader + Tiff.GPSInfoIFDPointer;
+				delete Tiff.GPSInfoIFDPointer;
+			}
+			return true;
+		}
+
+		// At the moment only setting of simple (LONG) values, that do not require offset recalculation, is supported
+		function setTag(ifd, tag, value) {
+			var offset, length, tagOffset, valueOffset = 0;
+
+			// If tag name passed translate into hex key
+			if (typeof(tag) === 'string') {
+				var tmpTags = tags[ifd.toLowerCase()];
+				for (var hex in tmpTags) {
+					if (tmpTags[hex] === tag) {
+						tag = hex;
+						break;
 					}
 				}
 			}
-		} catch (e2) {
-			isVersionSupported = false;
+			offset = offsets[ifd.toLowerCase() + 'IFD'];
+			length = data.SHORT(offset);
+
+			for (var i = 0; i < length; i++) {
+				tagOffset = offset + 12 * i + 2;
+
+				if (data.SHORT(tagOffset) == tag) {
+					valueOffset = tagOffset + 8;
+					break;
+				}
+			}
+
+			if (!valueOffset) {
+				return false;
+			}
+
+			data.LONG(valueOffset, value);
+			return true;
 		}
 
-		return isVersionSupported;
+
+		// Public functions
+		return {
+			init: function(segment) {
+				// Reset internal data
+				offsets = {
+					tiffHeader: 10
+				};
+
+				if (segment === undefined || !segment.length) {
+					return false;
+				}
+
+				data.init(segment);
+
+				// Check if that's APP1 and that it has EXIF
+				if (data.SHORT(0) === 0xFFE1 && data.STRING(4, 5).toUpperCase() === "EXIF\0") {
+					return getIFDOffsets();
+				}
+				return false;
+			},
+
+			TIFF: function() {
+				return Tiff;
+			},
+
+			EXIF: function() {
+				var Exif;
+
+				// Populate EXIF hash
+				Exif = extractTags(offsets.exifIFD, tags.exif);
+
+				// Fix formatting of some tags
+				if (Exif.ExifVersion && Basic.typeOf(Exif.ExifVersion) === 'array') {
+					for (var i = 0, exifVersion = ''; i < Exif.ExifVersion.length; i++) {
+						exifVersion += String.fromCharCode(Exif.ExifVersion[i]);
+					}
+					Exif.ExifVersion = exifVersion;
+				}
+
+				return Exif;
+			},
+
+			GPS: function() {
+				var GPS;
+
+				GPS = extractTags(offsets.gpsIFD, tags.gps);
+
+				// iOS devices (and probably some others) do not put in GPSVersionID tag (why?..)
+				if (GPS.GPSVersionID && Basic.typeOf(GPS.GPSVersionID) === 'array') {
+					GPS.GPSVersionID = GPS.GPSVersionID.join('.');
+				}
+
+				return GPS;
+			},
+
+			setExif: function(tag, value) {
+				// Right now only setting of width/height is possible
+				if (tag !== 'PixelXDimension' && tag !== 'PixelYDimension') {return false;}
+
+				return setTag('exif', tag, value);
+			},
+
+
+			getBinary: function() {
+				return data.SEGMENT();
+			},
+
+			purge: function() {
+				data.init(null);
+				data = Tiff = null;
+				offsets = {};
+			}
+		};
+	};
+});
+
+// Included from: src/javascript/runtime/html5/image/JPEG.js
+
+/**
+ * JPEG.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+/**
+@class moxie/runtime/html5/image/JPEG
+@private
+*/
+define("moxie/runtime/html5/image/JPEG", [
+	"moxie/core/utils/Basic",
+	"moxie/core/Exceptions",
+	"moxie/runtime/html5/image/JPEGHeaders",
+	"moxie/runtime/html5/utils/BinaryReader",
+	"moxie/runtime/html5/image/ExifParser"
+], function(Basic, x, JPEGHeaders, BinaryReader, ExifParser) {
+	
+	function JPEG(binstr) {
+		var _binstr, _br, _hm, _ep, _info, hasExif;
+
+		function _getDimensions() {
+			var idx = 0, marker, length;
+
+			// examine all through the end, since some images might have very large APP segments
+			while (idx <= _binstr.length) {
+				marker = _br.SHORT(idx += 2);
+
+				if (marker >= 0xFFC0 && marker <= 0xFFC3) { // SOFn
+					idx += 5; // marker (2 bytes) + length (2 bytes) + Sample precision (1 byte)
+					return {
+						height: _br.SHORT(idx),
+						width: _br.SHORT(idx += 2)
+					};
+				}
+				length = _br.SHORT(idx += 2);
+				idx += length - 2;
+			}
+			return null;
+		}
+
+		_binstr = binstr;
+
+		_br = new BinaryReader();
+		_br.init(_binstr);
+
+		// check if it is jpeg
+		if (_br.SHORT(0) !== 0xFFD8) {
+			throw new x.ImageError(x.ImageError.WRONG_FORMAT);
+		}
+
+		// backup headers
+		_hm = new JPEGHeaders(binstr);
+
+		// extract exif info
+		_ep = new ExifParser();
+		hasExif = !!_ep.init(_hm.get('app1')[0]);
+
+		// get dimensions
+		_info = _getDimensions.call(this);
+
+		Basic.extend(this, {
+			type: 'image/jpeg',
+
+			size: _binstr.length,
+
+			width: _info && _info.width || 0,
+
+			height: _info && _info.height || 0,
+
+			setExif: function(tag, value) {
+				if (!hasExif) {
+					return false; // or throw an exception
+				}
+
+				if (Basic.typeOf(tag) === 'object') {
+					Basic.each(tag, function(value, tag) {
+						_ep.setExif(tag, value);
+					});
+				} else {
+					_ep.setExif(tag, value);
+				}
+
+				// update internal headers
+				_hm.set('app1', _ep.getBinary());
+			},
+
+			writeHeaders: function() {
+				if (!arguments.length) {
+					// if no arguments passed, update headers internally
+					return (_binstr = _hm.restore(_binstr));
+				}
+				return _hm.restore(arguments[0]);
+			},
+
+			stripHeaders: function(binstr) {
+				return _hm.strip(binstr);
+			},
+
+			purge: function() {
+				_purge.call(this);
+			}
+		});
+
+		if (hasExif) {
+			this.meta = {
+				tiff: _ep.TIFF(),
+				exif: _ep.EXIF(),
+				gps: _ep.GPS()
+			};
+		}
+
+		function _purge() {
+			if (!_ep || !_hm || !_br) { 
+				return; // ignore any repeating purge requests
+			}
+			_ep.purge();
+			_hm.purge();
+			_br.init(null);
+			_binstr = _info = _hm = _ep = _br = null;
+		}
+	}
+
+	return JPEG;
+});
+
+// Included from: src/javascript/runtime/html5/image/PNG.js
+
+/**
+ * PNG.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+/**
+@class moxie/runtime/html5/image/PNG
+@private
+*/
+define("moxie/runtime/html5/image/PNG", [
+	"moxie/core/Exceptions",
+	"moxie/core/utils/Basic",
+	"moxie/runtime/html5/utils/BinaryReader"
+], function(x, Basic, BinaryReader) {
+	
+	function PNG(binstr) {
+		var _binstr, _br, _hm, _ep, _info;
+
+		_binstr = binstr;
+
+		_br = new BinaryReader();
+		_br.init(_binstr);
+
+		// check if it's png
+		(function() {
+			var idx = 0, i = 0
+			, signature = [0x8950, 0x4E47, 0x0D0A, 0x1A0A]
+			;
+
+			for (i = 0; i < signature.length; i++, idx += 2) {
+				if (signature[i] != _br.SHORT(idx)) {
+					throw new x.ImageError(x.ImageError.WRONG_FORMAT);
+				}
+			}
+		}());
+
+		function _getDimensions() {
+			var chunk, idx;
+
+			chunk = _getChunkAt.call(this, 8);
+
+			if (chunk.type == 'IHDR') {
+				idx = chunk.start;
+				return {
+					width: _br.LONG(idx),
+					height: _br.LONG(idx += 4)
+				};
+			}
+			return null;
+		}
+
+		function _purge() {
+			if (!_br) {
+				return; // ignore any repeating purge requests
+			}
+			_br.init(null);
+			_binstr = _info = _hm = _ep = _br = null;
+		}
+
+		_info = _getDimensions.call(this);
+
+		Basic.extend(this, {
+			type: 'image/png',
+
+			size: _binstr.length,
+
+			width: _info.width,
+
+			height: _info.height,
+
+			purge: function() {
+				_purge.call(this);
+			}
+		});
+
+		// for PNG we can safely trigger purge automatically, as we do not keep any data for later
+		_purge.call(this);
+
+		function _getChunkAt(idx) {
+			var length, type, start, CRC;
+
+			length = _br.LONG(idx);
+			type = _br.STRING(idx += 4, 4);
+			start = idx += 4;
+			CRC = _br.LONG(idx + length);
+
+			return {
+				length: length,
+				type: type,
+				start: start,
+				CRC: CRC
+			};
+		}
+	}
+
+	return PNG;
+});
+
+// Included from: src/javascript/runtime/html5/image/ImageInfo.js
+
+/**
+ * ImageInfo.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+/**
+@class moxie/runtime/html5/image/ImageInfo
+@private
+*/
+define("moxie/runtime/html5/image/ImageInfo", [
+	"moxie/core/utils/Basic",
+	"moxie/core/Exceptions",
+	"moxie/runtime/html5/image/JPEG",
+	"moxie/runtime/html5/image/PNG"
+], function(Basic, x, JPEG, PNG) {
+	/**
+	Optional image investigation tool for HTML5 runtime. Provides the following features:
+	- ability to distinguish image type (JPEG or PNG) by signature
+	- ability to extract image width/height directly from it's internals, without preloading in memory (fast)
+	- ability to extract APP headers from JPEGs (Exif, GPS, etc)
+	- ability to replace width/height tags in extracted JPEG headers
+	- ability to restore APP headers, that were for example stripped during image manipulation
+
+	@class ImageInfo
+	@constructor
+	@param {String} binstr Image source as binary string
+	*/
+	return function(binstr) {
+		var _cs = [JPEG, PNG], _img;
+
+		// figure out the format, throw: ImageError.WRONG_FORMAT if not supported
+		_img = (function() {
+			for (var i = 0; i < _cs.length; i++) {
+				try {
+					return new _cs[i](binstr);
+				} catch (ex) {
+					// console.info(ex);
+				}
+			}
+			throw new x.ImageError(x.ImageError.WRONG_FORMAT);
+		}());
+
+		Basic.extend(this, {
+			/**
+			Image Mime Type extracted from it's depths
+
+			@property type
+			@type {String}
+			@default ''
+			*/
+			type: '',
+
+			/**
+			Image size in bytes
+
+			@property size
+			@type {Number}
+			@default 0
+			*/
+			size: 0,
+
+			/**
+			Image width extracted from image source
+
+			@property width
+			@type {Number}
+			@default 0
+			*/
+			width: 0,
+
+			/**
+			Image height extracted from image source
+
+			@property height
+			@type {Number}
+			@default 0
+			*/
+			height: 0,
+
+			/**
+			Sets Exif tag. Currently applicable only for width and height tags. Obviously works only with JPEGs.
+
+			@method setExif
+			@param {String} tag Tag to set
+			@param {Mixed} value Value to assign to the tag
+			*/
+			setExif: function() {},
+
+			/**
+			Restores headers to the source.
+
+			@method writeHeaders
+			@param {String} data Image source as binary string
+			@return {String} Updated binary string
+			*/
+			writeHeaders: function(data) {
+				return data;
+			},
+
+			/**
+			Strip all headers from the source.
+
+			@method stripHeaders
+			@param {String} data Image source as binary string
+			@return {String} Updated binary string
+			*/
+			stripHeaders: function(data) {
+				return data;
+			},
+
+			/**
+			Dispose resources.
+
+			@method purge
+			*/
+			purge: function() {}
+		});
+
+		Basic.extend(this, _img);
+
+		this.purge = function() {
+			_img.purge();
+			_img = null;
+		};
+	};
+});
+
+// Included from: src/javascript/runtime/html5/image/MegaPixel.js
+
+/**
+(The MIT License)
+
+Copyright (c) 2012 Shinichi Tomita <shinichi.tomita@gmail.com>;
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+/**
+ * Mega pixel image rendering library for iOS6 Safari
+ *
+ * Fixes iOS6 Safari's image file rendering issue for large size image (over mega-pixel),
+ * which causes unexpected subsampling when drawing it in canvas.
+ * By using this library, you can safely render the image with proper stretching.
+ *
+ * Copyright (c) 2012 Shinichi Tomita <shinichi.tomita@gmail.com>
+ * Released under the MIT license
+ */
+
+/**
+@class moxie/runtime/html5/image/MegaPixel
+@private
+*/
+define("moxie/runtime/html5/image/MegaPixel", [], function() {
+
+	/**
+	 * Rendering image element (with resizing) into the canvas element
+	 */
+	function renderImageToCanvas(img, canvas, options) {
+		var iw = img.naturalWidth, ih = img.naturalHeight;
+		var width = options.width, height = options.height;
+		var x = options.x || 0, y = options.y || 0;
+		var ctx = canvas.getContext('2d');
+		if (detectSubsampling(img)) {
+			iw /= 2;
+			ih /= 2;
+		}
+		var d = 1024; // size of tiling canvas
+		var tmpCanvas = document.createElement('canvas');
+		tmpCanvas.width = tmpCanvas.height = d;
+		var tmpCtx = tmpCanvas.getContext('2d');
+		var vertSquashRatio = detectVerticalSquash(img, iw, ih);
+		var sy = 0;
+		while (sy < ih) {
+			var sh = sy + d > ih ? ih - sy : d;
+			var sx = 0;
+			while (sx < iw) {
+				var sw = sx + d > iw ? iw - sx : d;
+				tmpCtx.clearRect(0, 0, d, d);
+				tmpCtx.drawImage(img, -sx, -sy);
+				var dx = (sx * width / iw + x) << 0;
+				var dw = Math.ceil(sw * width / iw);
+				var dy = (sy * height / ih / vertSquashRatio + y) << 0;
+				var dh = Math.ceil(sh * height / ih / vertSquashRatio);
+				ctx.drawImage(tmpCanvas, 0, 0, sw, sh, dx, dy, dw, dh);
+				sx += d;
+			}
+			sy += d;
+		}
+		tmpCanvas = tmpCtx = null;
 	}
 
 	/**
-	Constructor for the Silverlight Runtime
+	 * Detect subsampling in loaded image.
+	 * In iOS, larger images than 2M pixels may be subsampled in rendering.
+	 */
+	function detectSubsampling(img) {
+		var iw = img.naturalWidth, ih = img.naturalHeight;
+		if (iw * ih > 1024 * 1024) { // subsampling may happen over megapixel image
+			var canvas = document.createElement('canvas');
+			canvas.width = canvas.height = 1;
+			var ctx = canvas.getContext('2d');
+			ctx.drawImage(img, -iw + 1, 0);
+			// subsampled image becomes half smaller in rendering size.
+			// check alpha channel value to confirm image is covering edge pixel or not.
+			// if alpha value is 0 image is not covering, hence subsampled.
+			return ctx.getImageData(0, 0, 1, 1).data[3] === 0;
+		} else {
+			return false;
+		}
+	}
 
-	@class SilverlightRuntime
-	@extends Runtime
-	*/
-	function SilverlightRuntime(options) {
-		var I = this, initTimer;
 
-		options = Basic.extend({ xap_url: Env.xap_url }, options);
+	/**
+	 * Detecting vertical squash in loaded image.
+	 * Fixes a bug which squash image vertically while drawing into canvas for some images.
+	 */
+	function detectVerticalSquash(img, iw, ih) {
+		var canvas = document.createElement('canvas');
+		canvas.width = 1;
+		canvas.height = ih;
+		var ctx = canvas.getContext('2d');
+		ctx.drawImage(img, 0, 0);
+		var data = ctx.getImageData(0, 0, 1, ih).data;
+		// search image edge pixel position in case it is squashed vertically.
+		var sy = 0;
+		var ey = ih;
+		var py = ih;
+		while (py > sy) {
+			var alpha = data[(py - 1) * 4 + 3];
+			if (alpha === 0) {
+				ey = py;
+			} else {
+			sy = py;
+			}
+			py = (ey + sy) >> 1;
+		}
+		canvas = null;
+		var ratio = (py / ih);
+		return (ratio === 0) ? 1 : ratio;
+	}
 
-		Runtime.call(this, options, type, {
-			access_binary: Runtime.capTrue,
-			access_image_binary: Runtime.capTrue,
-			display_media: Runtime.capTrue,
-			do_cors: Runtime.capTrue,
-			drag_and_drop: false,
-			report_upload_progress: Runtime.capTrue,
-			resize_image: Runtime.capTrue,
-			return_response_headers: function(value) {
-				return value && I.mode === 'client';
-			},
-			return_response_type: function(responseType) {
-				if (responseType !== 'json') {
-					return true;
+	return {
+		isSubsampled: detectSubsampling,
+		renderTo: renderImageToCanvas
+	};
+});
+
+// Included from: src/javascript/runtime/html5/image/Image.js
+
+/**
+ * Image.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+/**
+@class moxie/runtime/html5/image/Image
+@private
+*/
+define("moxie/runtime/html5/image/Image", [
+	"moxie/runtime/html5/Runtime",
+	"moxie/core/utils/Basic",
+	"moxie/core/Exceptions",
+	"moxie/core/utils/Encode",
+	"moxie/file/File",
+	"moxie/runtime/html5/image/ImageInfo",
+	"moxie/runtime/html5/image/MegaPixel",
+	"moxie/core/utils/Mime",
+	"moxie/core/utils/Env"
+], function(extensions, Basic, x, Encode, File, ImageInfo, MegaPixel, Mime, Env) {
+	
+	function HTML5Image() {
+		var me = this
+		, _img, _imgInfo, _canvas, _binStr, _blob
+		, _modified = false // is set true whenever image is modified
+		, _preserveHeaders = true
+		;
+
+		Basic.extend(this, {
+			loadFromBlob: function(blob) {
+				var comp = this, I = comp.getRuntime()
+				, asBinary = arguments.length > 1 ? arguments[1] : true
+				;
+
+				if (!I.can('access_binary')) {
+					throw new x.RuntimeError(x.RuntimeError.NOT_SUPPORTED_ERR);
+				}
+
+				_blob = blob;
+
+				if (blob.isDetached()) {
+					_binStr = blob.getSource();
+					_preload.call(this, _binStr);
+					return;
 				} else {
-					return !!window.JSON;
+					_readAsDataUrl.call(this, blob.getSource(), function(dataUrl) {
+						if (asBinary) {
+							_binStr = _toBinary(dataUrl);
+						}
+						_preload.call(comp, dataUrl);
+					});
 				}
 			},
-			return_status_code: function(code) {
-				return I.mode === 'client' || !Basic.arrayDiff(code, [200, 404]);
+
+			loadFromImage: function(img, exact) {
+				this.meta = img.meta;
+
+				_blob = new File(null, {
+					name: img.name,
+					size: img.size,
+					type: img.type
+				});
+
+				_preload.call(this, exact ? (_binStr = img.getAsBinaryString()) : img.getAsDataURL());
 			},
-			select_file: Runtime.capTrue,
-			select_multiple: Runtime.capTrue,
-			send_binary_string: Runtime.capTrue,
-			send_browser_cookies: function(value) {
-				return value && I.mode === 'browser';
+
+			getInfo: function() {
+				var I = this.getRuntime(), info;
+
+				if (!_imgInfo && _binStr && I.can('access_image_binary')) {
+					_imgInfo = new ImageInfo(_binStr);
+				}
+
+				info = {
+					width: _getImg().width || 0,
+					height: _getImg().height || 0,
+					type: _blob.type || Mime.getFileMime(_blob.name),
+					size: _binStr && _binStr.length || _blob.size || 0,
+					name: _blob.name || '',
+					meta: _imgInfo && _imgInfo.meta || this.meta || {}
+				};
+
+				return info;
 			},
-			send_custom_headers: function(value) {
-				return value && I.mode === 'client';
+
+			downsize: function() {
+				_downsize.apply(this, arguments);
 			},
-			send_multipart: Runtime.capTrue,
-			slice_blob: Runtime.capTrue,
-			stream_upload: true,
-			summon_file_dialog: false,
-			upload_filesize: Runtime.capTrue,
-			use_http_method: function(methods) {
-				return I.mode === 'client' || !Basic.arrayDiff(methods, ['GET', 'POST']);
-			}
-		}, { 
-			// capabilities that require specific mode
-			return_response_headers: function(value) {
-				return value ? 'client' : 'browser';
+
+			getAsCanvas: function() {
+				if (_canvas) {
+					_canvas.id = this.uid + '_canvas';
+				}
+				return _canvas;
 			},
-			return_status_code: function(code) {
-				return Basic.arrayDiff(code, [200, 404]) ? 'client' : ['client', 'browser'];
+
+			getAsBlob: function(type, quality) {
+				if (type !== this.type) {
+					// if different mime type requested prepare image for conversion
+					_downsize.call(this, this.width, this.height, false);
+				}
+				return new File(null, {
+					name: _blob.name || '',
+					type: type,
+					data: me.getAsBinaryString.call(this, type, quality)
+				});
 			},
-			send_browser_cookies: function(value) {
-				return value ? 'browser' : 'client';
+
+			getAsDataURL: function(type) {
+				var quality = arguments[1] || 90;
+
+				// if image has not been modified, return the source right away
+				if (!_modified) {
+					return _img.src;
+				}
+
+				if ('image/jpeg' !== type) {
+					return _canvas.toDataURL('image/png');
+				} else {
+					try {
+						// older Geckos used to result in an exception on quality argument
+						return _canvas.toDataURL('image/jpeg', quality/100);
+					} catch (ex) {
+						return _canvas.toDataURL('image/jpeg');
+					}
+				}
 			},
-			send_custom_headers: function(value) {
-				return value ? 'client' : 'browser';
+
+			getAsBinaryString: function(type, quality) {
+				// if image has not been modified, return the source right away
+				if (!_modified) {
+					// if image was not loaded from binary string
+					if (!_binStr) {
+						_binStr = _toBinary(me.getAsDataURL(type, quality));
+					}
+					return _binStr;
+				}
+
+				if ('image/jpeg' !== type) {
+					_binStr = _toBinary(me.getAsDataURL(type, quality));
+				} else {
+					var dataUrl;
+
+					// if jpeg
+					if (!quality) {
+						quality = 90;
+					}
+
+					try {
+						// older Geckos used to result in an exception on quality argument
+						dataUrl = _canvas.toDataURL('image/jpeg', quality/100);
+					} catch (ex) {
+						dataUrl = _canvas.toDataURL('image/jpeg');
+					}
+
+					_binStr = _toBinary(dataUrl);
+
+					if (_imgInfo) {
+						_binStr = _imgInfo.stripHeaders(_binStr);
+
+						if (_preserveHeaders) {
+							// update dimensions info in exif
+							if (_imgInfo.meta && _imgInfo.meta.exif) {
+								_imgInfo.setExif({
+									PixelXDimension: this.width,
+									PixelYDimension: this.height
+								});
+							}
+
+							// re-inject the headers
+							_binStr = _imgInfo.writeHeaders(_binStr);
+						}
+
+						// will be re-created from fresh on next getInfo call
+						_imgInfo.purge();
+						_imgInfo = null;
+					}
+				}
+
+				_modified = false;
+
+				return _binStr;
 			},
-			use_http_method: function(methods) {
-				return Basic.arrayDiff(methods, ['GET', 'POST']) ? 'client' : ['client', 'browser'];
+
+			destroy: function() {
+				me = null;
+				_purge.call(this);
+				this.getRuntime().getShim().removeInstance(this.uid);
 			}
 		});
 
 
-		// minimal requirement
-		if (!isInstalled('2.0.31005.0') || Env.browser === 'Opera') {
-			this.mode = false;
+		function _getImg() {
+			if (!_canvas && !_img) {
+				throw new x.ImageError(x.DOMException.INVALID_STATE_ERR);
+			}
+			return _canvas || _img;
 		}
 
 
-		Basic.extend(this, {
-			getShim: function() {
-				return Dom.get(this.uid).content.Moxie;
-			},
+		function _toBinary(str) {
+			return Encode.atob(str.substring(str.indexOf('base64,') + 7));
+		}
 
-			shimExec: function(component, action) {
-				var args = [].slice.call(arguments, 2);
-				return I.getShim().exec(this.uid, component, action, args);
-			},
 
-			init : function() {
-				var container;
+		function _toDataUrl(str, type) {
+			return 'data:' + (type || '') + ';base64,' + Encode.btoa(str);
+		}
 
-				container = this.getShimContainer();
 
-				container.innerHTML = '<object id="' + this.uid + '" data="data:application/x-silverlight," type="application/x-silverlight-2" width="100%" height="100%" style="outline:none;">' +
-					'<param name="source" value="' + options.xap_url + '"/>' +
-					'<param name="background" value="Transparent"/>' +
-					'<param name="windowless" value="true"/>' +
-					'<param name="enablehtmlaccess" value="true"/>' +
-					'<param name="initParams" value="uid=' + this.uid + ',target=' + Env.global_event_dispatcher + '"/>' +
-				'</object>';
+		function _preload(str) {
+			var comp = this;
 
-				// Init is dispatched by the shim
-				initTimer = setTimeout(function() {
-					if (I && !I.initialized) { // runtime might be already destroyed by this moment
-						I.trigger("Error", new x.RuntimeError(x.RuntimeError.NOT_INIT_ERR));
-					}
-				}, Env.OS !== 'Windows'? 10000 : 5000); // give it more time to initialize in non Windows OS (like Mac)
-			},
+			_img = new Image();
+			_img.onerror = function() {
+				_purge.call(this);
+				comp.trigger('error', x.ImageError.WRONG_FORMAT);
+			};
+			_img.onload = function() {
+				comp.trigger('load');
+			};
 
-			destroy: (function(destroy) { // extend default destroy method
-				return function() {
-					destroy.call(I);
-					clearTimeout(initTimer); // initialization check might be still onwait
-					options = initTimer = destroy = I = null;
+			_img.src = /^data:[^;]*;base64,/.test(str) ? str : _toDataUrl(str, _blob.type);
+		}
+
+
+		function _readAsDataUrl(file, callback) {
+			var comp = this, fr;
+
+			// use FileReader if it's available
+			if (window.FileReader) {
+				fr = new FileReader();
+				fr.onload = function() {
+					callback(this.result);
 				};
-			}(this.destroy))
+				fr.onerror = function() {
+					comp.trigger('error', x.ImageError.WRONG_FORMAT);
+				};
+				fr.readAsDataURL(file);
+			} else {
+				return callback(file.getAsDataURL());
+			}
+		}
 
-		}, extensions);
+		function _downsize(width, height, crop, preserveHeaders) {
+			var self = this
+			, scale
+			, mathFn
+			, x = 0
+			, y = 0
+			, img
+			, destWidth
+			, destHeight
+			, orientation
+			;
+
+			_preserveHeaders = preserveHeaders; // we will need to check this on export (see getAsBinaryString())
+
+			// take into account orientation tag
+			orientation = (this.meta && this.meta.tiff && this.meta.tiff.Orientation) || 1;
+
+			if (Basic.inArray(orientation, [5,6,7,8]) !== -1) { // values that require 90 degree rotation
+				// swap dimensions
+				var tmp = width;
+				width = height;
+				height = tmp;
+			}
+
+			img = _getImg();
+
+			// unify dimensions
+			if (!crop) {
+				scale = Math.min(width/img.width, height/img.height);
+			} else {
+				// one of the dimensions may exceed the actual image dimensions - we need to take the smallest value
+				width = Math.min(width, img.width);
+				height = Math.min(height, img.height);
+
+				scale = Math.max(width/img.width, height/img.height);
+			}
+		
+			// we only downsize here
+			if (scale > 1 && !crop && preserveHeaders) {
+				this.trigger('Resize');
+				return;
+			}
+
+			// prepare canvas if necessary
+			if (!_canvas) {
+				_canvas = document.createElement("canvas");
+			}
+
+			// calculate dimensions of proportionally resized image
+			destWidth = Math.round(img.width * scale);	
+			destHeight = Math.round(img.height * scale);
+
+			// scale image and canvas
+			if (crop) {
+				_canvas.width = width;
+				_canvas.height = height;
+
+				// if dimensions of the resulting image still larger than canvas, center it
+				if (destWidth > width) {
+					x = Math.round((destWidth - width) / 2);
+				}
+
+				if (destHeight > height) {
+					y = Math.round((destHeight - height) / 2);
+				}
+			} else {
+				_canvas.width = destWidth;
+				_canvas.height = destHeight;
+			}
+
+			// rotate if required, according to orientation tag
+			if (!_preserveHeaders) {
+				_rotateToOrientaion(_canvas.width, _canvas.height, orientation);
+			}
+
+			_drawToCanvas.call(this, img, _canvas, -x, -y, destWidth, destHeight);
+
+			this.width = _canvas.width;
+			this.height = _canvas.height;
+
+			_modified = true;
+			self.trigger('Resize');
+		}
+
+
+		function _drawToCanvas(img, canvas, x, y, w, h) {
+			if (Env.OS === 'iOS') { 
+				// avoid squish bug in iOS6
+				MegaPixel.renderTo(img, canvas, { width: w, height: h, x: x, y: y });
+			} else {
+				var ctx = canvas.getContext('2d');
+				ctx.drawImage(img, x, y, w, h);
+			}
+		}
+
+
+		/**
+		* Transform canvas coordination according to specified frame size and orientation
+		* Orientation value is from EXIF tag
+		* @author Shinichi Tomita <shinichi.tomita@gmail.com>
+		*/
+		function _rotateToOrientaion(width, height, orientation) {
+			switch (orientation) {
+				case 5:
+				case 6:
+				case 7:
+				case 8:
+					_canvas.width = height;
+					_canvas.height = width;
+					break;
+				default:
+					_canvas.width = width;
+					_canvas.height = height;
+			}
+
+			/**
+			1 = The 0th row is at the visual top of the image, and the 0th column is the visual left-hand side.
+			2 = The 0th row is at the visual top of the image, and the 0th column is the visual right-hand side.
+			3 = The 0th row is at the visual bottom of the image, and the 0th column is the visual right-hand side.
+			4 = The 0th row is at the visual bottom of the image, and the 0th column is the visual left-hand side.
+			5 = The 0th row is the visual left-hand side of the image, and the 0th column is the visual top.
+			6 = The 0th row is the visual right-hand side of the image, and the 0th column is the visual top.
+			7 = The 0th row is the visual right-hand side of the image, and the 0th column is the visual bottom.
+			8 = The 0th row is the visual left-hand side of the image, and the 0th column is the visual bottom.
+			*/
+
+			var ctx = _canvas.getContext('2d');
+			switch (orientation) {
+				case 2:
+					// horizontal flip
+					ctx.translate(width, 0);
+					ctx.scale(-1, 1);
+					break;
+				case 3:
+					// 180 rotate left
+					ctx.translate(width, height);
+					ctx.rotate(Math.PI);
+					break;
+				case 4:
+					// vertical flip
+					ctx.translate(0, height);
+					ctx.scale(1, -1);
+					break;
+				case 5:
+					// vertical flip + 90 rotate right
+					ctx.rotate(0.5 * Math.PI);
+					ctx.scale(1, -1);
+					break;
+				case 6:
+					// 90 rotate right
+					ctx.rotate(0.5 * Math.PI);
+					ctx.translate(0, -height);
+					break;
+				case 7:
+					// horizontal flip + 90 rotate right
+					ctx.rotate(0.5 * Math.PI);
+					ctx.translate(width, -height);
+					ctx.scale(-1, 1);
+					break;
+				case 8:
+					// 90 rotate left
+					ctx.rotate(-0.5 * Math.PI);
+					ctx.translate(-width, 0);
+					break;
+			}
+		}
+
+
+		function _purge() {
+			if (_imgInfo) {
+				_imgInfo.purge();
+				_imgInfo = null;
+			}
+			_binStr = _img = _canvas = _blob = null;
+			_modified = false;
+		}
 	}
 
-	Runtime.addConstructor(type, SilverlightRuntime); 
-
-	return extensions;
+	return (extensions.Image = HTML5Image);
 });
 
-// Included from: src/javascript/runtime/silverlight/file/Blob.js
+// Included from: src/javascript/runtime/html4/image/Image.js
 
 /**
- * Blob.js
+ * Image.js
  *
  * Copyright 2013, Moxiecode Systems AB
  * Released under GPL License.
@@ -7058,129 +8508,17 @@ define("moxie/runtime/silverlight/Runtime", [
  */
 
 /**
-@class moxie/runtime/silverlight/file/Blob
+@class moxie/runtime/html4/image/Image
 @private
 */
-define("moxie/runtime/silverlight/file/Blob", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/flash/file/Blob"
-], function(extensions, Basic, Blob) {
-	return (extensions.Blob = Basic.extend({}, Blob));
+define("moxie/runtime/html4/image/Image", [
+	"moxie/runtime/html4/Runtime",
+	"moxie/runtime/html5/image/Image"
+], function(extensions, Image) {
+	return (extensions.Image = Image);
 });
 
-// Included from: src/javascript/runtime/silverlight/file/FileInput.js
-
-/**
- * FileInput.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/file/FileInput
-@private
-*/
-define("moxie/runtime/silverlight/file/FileInput", [
-	"moxie/runtime/silverlight/Runtime"
-], function(extensions) {
-	
-	var FileInput = {
-		init: function(options) {
-
-			function toFilters(accept) {
-				var filter = '';
-				for (var i = 0; i < accept.length; i++) {
-					filter += (filter !== '' ? '|' : '') + accept[i].title + " | *." + accept[i].extensions.replace(/,/g, ';*.');
-				}
-				return filter;
-			}
-			
-			this.getRuntime().shimExec.call(this, 'FileInput', 'init', toFilters(options.accept), options.name, options.multiple);
-			this.trigger('ready');
-		}
-	};
-
-	return (extensions.FileInput = FileInput);
-});
-
-// Included from: src/javascript/runtime/silverlight/file/FileReader.js
-
-/**
- * FileReader.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/file/FileReader
-@private
-*/
-define("moxie/runtime/silverlight/file/FileReader", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/flash/file/FileReader"
-], function(extensions, Basic, FileReader) {
-	return (extensions.FileReader = Basic.extend({}, FileReader));
-});
-
-// Included from: src/javascript/runtime/silverlight/file/FileReaderSync.js
-
-/**
- * FileReaderSync.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/file/FileReaderSync
-@private
-*/
-define("moxie/runtime/silverlight/file/FileReaderSync", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/flash/file/FileReaderSync"
-], function(extensions, Basic, FileReaderSync) {
-	return (extensions.FileReaderSync = Basic.extend({}, FileReaderSync));
-});
-
-// Included from: src/javascript/runtime/silverlight/xhr/XMLHttpRequest.js
-
-/**
- * XMLHttpRequest.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/xhr/XMLHttpRequest
-@private
-*/
-define("moxie/runtime/silverlight/xhr/XMLHttpRequest", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/flash/xhr/XMLHttpRequest"
-], function(extensions, Basic, XMLHttpRequest) {
-	return (extensions.XMLHttpRequest = Basic.extend({}, XMLHttpRequest));
-});
-
-expose(["moxie/core/utils/Basic","moxie/core/I18n","moxie/core/utils/Mime","moxie/core/utils/Env","moxie/core/utils/Dom","moxie/core/Exceptions","moxie/core/EventTarget","moxie/core/utils/Encode","moxie/runtime/Runtime","moxie/runtime/RuntimeClient","moxie/file/Blob","moxie/file/File","moxie/file/FileInput","moxie/runtime/RuntimeTarget","moxie/file/FileReader","moxie/core/utils/Url","moxie/file/FileReaderSync","moxie/xhr/FormData","moxie/xhr/XMLHttpRequest","moxie/runtime/Transporter","moxie/core/utils/Events"]);
+expose(["moxie/core/utils/Basic","moxie/core/I18n","moxie/core/utils/Mime","moxie/core/utils/Env","moxie/core/utils/Dom","moxie/core/Exceptions","moxie/core/EventTarget","moxie/core/utils/Encode","moxie/runtime/Runtime","moxie/runtime/RuntimeClient","moxie/file/Blob","moxie/file/File","moxie/file/FileInput","moxie/runtime/RuntimeTarget","moxie/file/FileReader","moxie/core/utils/Url","moxie/file/FileReaderSync","moxie/xhr/FormData","moxie/xhr/XMLHttpRequest","moxie/runtime/Transporter","moxie/image/Image","moxie/core/utils/Events"]);
 })(this);/**
  * o.js
  *

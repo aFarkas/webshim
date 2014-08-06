@@ -103,7 +103,7 @@ class Player extends EventDispatcher {
     private var _mediaDuration:Float;
     private var _lastTime:Float;
     private var _lastProgress:Float;
-    private var _isPlaying:Bool;
+    public var _isPlaying:Bool;
     private var _aspectRatio:Float;
     private var _currentAspectRatio:String;
     private var _originalAspectRatio:Float;
@@ -128,6 +128,7 @@ class Player extends EventDispatcher {
     private var _hasPoster:Bool;
     public var lastSeekTime:Float;
     private var _cam:Camera;
+	public var camLength:Int;
 //}
 
 
@@ -173,6 +174,7 @@ class Player extends EventDispatcher {
         _allowPreloadedPlay = false;
         _naturalWidth = 0;
         _naturalHeight = 0;
+		camLength = Camera.names.length;
 //}
 
 //{Initialize sound object
@@ -239,7 +241,7 @@ class Player extends EventDispatcher {
 
         _mediaSource = '';
 
-        if(Camera.names.length > 0){
+        if(camLength > 0){
             _cam.addEventListener(StatusEvent.STATUS, userStatusHandler);
             _video.visible = false;
             aspect = _cam.height / _cam.width;

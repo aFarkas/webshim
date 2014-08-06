@@ -709,7 +709,7 @@
 	/*
 	 * jQuery-plugins for triggering dom updates can be also very usefull in conjunction with non-HTML5 DOM-Changes (AJAX)
 	 * Example:
-	 * $.webshims.addReady(function(context, insertedElement){
+	 * webshim.addReady(function(context, insertedElement){
 	 * 		$('div.tabs', context).add(insertedElement.filter('div.tabs')).tabs();
 	 * });
 	 * 
@@ -976,13 +976,13 @@
 
 	addPolyfill('usermedia-core', {
 		f: 'usermedia',
-		test: userMediaTest,
-		d: [DOMSUPPORT]
+		test: userMediaTest && window.URL,
+		d: ['url', DOMSUPPORT]
 	});
 
 	addPolyfill('usermedia-shim', {
 		f: 'usermedia',
-		test: !!(userMediaTest || navigator.webkitGetUserMedia || navigator.mozGetUserMedia),
+		test: !!(userMediaTest || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia),
 		d: ['url', 'mediaelement', DOMSUPPORT]
 	});
 	//>
@@ -1236,14 +1236,11 @@
 	//>
 	
 	//<filereader
-	webshim.loader.addModule('moxie', {
-		src: 'moxie/js/moxie',
-		c: [26]
-	});
+
 	addPolyfill('filereader', {
 		test: 'FileReader' in window && 'FormData' in window,
-		d: [DOMSUPPORT, 'jajax'],
-		c: [25, 26, 27]
+		d: [DOMSUPPORT, 'jajax', 'swfmini'],
+		c: [25, 27]
 	});
 	//>
 	

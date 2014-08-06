@@ -53,8 +53,8 @@ class PlayerEvents extends Event {
     public static var PLAYBACK_FINISHED = "onPlaybackFinished";
     public static var STOP_CLOSE = "onStopAndClose";
     public static var RESIZE = "onResize";
-    public static var USERNOTSUPPORTED = "NOT_SUPPORTED_ERROR";
-    public static var USERDENIED = "PERMISSION_DENIED";
+    public static var USERNOTSUPPORTED = "NotSupportedError";
+    public static var USERDENIED = "PermissionDeniedError";
     public static var USERSUCCESS = "onUserSuccess";
 
     public var name:String;

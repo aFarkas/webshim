@@ -127,7 +127,7 @@ class JsApi extends MovieClip {
 
 
         addJsListener('on*', 'webshim.mediaelement.jarisEvent.' + parameters.evtId);
-        ExternalInterface.call('webshim.mediaelement.jarisEvent.' + parameters.evtId, { type: 'ready', id: parameters.id });
+        ExternalInterface.call('webshim.mediaelement.jarisEvent.' + parameters.evtId, { type: 'ready', id: parameters.id, cameras: _player.camLength });
 
     }
 
@@ -188,7 +188,9 @@ class JsApi extends MovieClip {
                 type: event.name,
                 loaded: _player.getBytesLoaded(),
                 total: _player.getBytesTotal(),
-                seekTime: event.seekTime
+                seekTime: event.seekTime,
+                playing: _player._isPlaying,
+                cameras: _player.camLength
             };
 
             if (event.name == PlayerEvents.TIME || event.name == PlayerEvents.PROGRESS) {
@@ -220,11 +222,11 @@ class JsApi extends MovieClip {
     }
 
 
-    private function attach(){
+    private function attach() {
         _player.attachUsermedia();
     }
 
-    private function detach(){
+    private function detach() {
         _player.detachUsermedia();
     }
 

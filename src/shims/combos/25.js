@@ -681,33 +681,38 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					}
 				},
 				handler: (function(){
+					var evt;
 					var trigger = function(){
 						$(document).triggerHandler('updateshadowdom');
 					};
+					var timed = function(){
+						if(evt.type == 'resize'){
+							var width = $window.width();
+							var height = $window.width();
+
+							if(height == lastHeight && width == lastWidth){
+								return;
+							}
+							lastHeight = height;
+							lastWidth = width;
+						}
+
+						if(evt.type != 'docresize'){
+							docObserve.height = docObserve.getHeight();
+							docObserve.width = docObserve.getWidth();
+						}
+
+						if(window.requestAnimationFrame){
+							requestAnimationFrame(trigger);
+						} else {
+							setTimeout(trigger, 0);
+						}
+						evt = null;
+					};
 					return function(e){
 						clearTimeout(resizeTimer);
-						resizeTimer = setTimeout(function(){
-							if(e.type == 'resize'){
-								var width = $window.width();
-								var height = $window.width();
-
-								if(height == lastHeight && width == lastWidth){
-									return;
-								}
-								lastHeight = height;
-								lastWidth = width;
-								
-								docObserve.height = docObserve.getHeight();
-								docObserve.width = docObserve.getWidth();
-							}
-
-							if(window.requestAnimationFrame){
-								requestAnimationFrame(trigger);
-							} else {
-								setTimeout(trigger, 0);
-							}
-							
-						}, (e.type == 'resize' && !window.requestAnimationFrame) ? 50 : 9);
+						evt = e;
+						resizeTimer = setTimeout(timed, (e.type == 'resize' && !window.requestAnimationFrame) ? 50 : 9);
 					};
 				})(),
 				_create: function(){
@@ -1232,8 +1237,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 ;webshim.register('filereader', function($, webshim, window, document, undefined, featureOptions){
 	"use strict";
 	var mOxie, moxie, hasXDomain;
-	var FormData = $.noop;
-	var sel = 'input[type="file"].ws-filereader';
+	var sel = 'input[type="file"].ws-filereader, input[type="file"].ws-capture';
+	var hasFlash = swfmini.hasFlashPlayerVersion('10.3');
 	var loadMoxie = function (){
 		webshim.loader.loadList(['moxie']);
 	};
@@ -1345,7 +1350,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 	);
 	var shimMoxiePath = webshim.cfg.basePath+'moxie/';
-	var crossXMLMessage = 'You nedd a crossdomain.xml to get all "filereader" / "XHR2" / "CORS" features to work. Or host moxie.swf/moxie.xap on your server an configure filereader options: "swfpath"/"xappath"';
+	var crossXMLMessage = 'You nedd a crossdomain.xml to get all "filereader" / "XHR2" / "CORS" features to work. Or host moxie.swf on your server an configure filereader options: "swfpath"';
 	var testMoxie = function(options){
 		return (options.wsType == 'moxie' || (options.data && options.data instanceof mOxie.FormData) || (options.crossDomain && $.support.cors !== false && hasXDomain != 'no' && !noxhr.test(options.dataType || '')));
 	};
@@ -1528,6 +1533,10 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 	};
 
+	webshim.loader.addModule('moxie', {
+		src: 'moxie/js/moxie-'+ (hasFlash ? 'swf' : 'html4')
+	});
+
 	if(!featureOptions.progress){
 		featureOptions.progress = 'onprogress';
 	}
@@ -1538,9 +1547,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 
 	if(!featureOptions.swfpath){
 		featureOptions.swfpath = shimMoxiePath+'flash/Moxie.min.swf';
-	}
-	if(!featureOptions.xappath){
-		featureOptions.xappath = shimMoxiePath+'silverlight/Moxie.min.xap';
 	}
 
 	if($.support.cors !== false || !window.XDomainRequest){
@@ -1568,8 +1574,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				writeable: false,
 				get: function(){
 					if(this.type != 'file'){return null;}
-					if(!$(this).hasClass('ws-filereader')){
-						webshim.info("please add the 'ws-filereader' class to your input[type='file'] to implement files-property");
+					if(!$(this).is('.ws-filereader, .ws-capture')){
+						webshim.info("please add the 'ws-filereader'/'ws-capture' class to your input[type='file'] to implement files-property");
 					}
 					return webshim.data(this, 'fileList') || [];
 				}
@@ -1591,11 +1597,37 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	});
 
 	webshim.onNodeNamesPropertyModify('input', 'value', function(value, boolVal, type){
-		if(value === '' && this.type == 'file' && $(this).hasClass('ws-filereader')){
+		if(value === '' && this.type == 'file' && $(this).is('.ws-filereader, .ws-capture')){
 			webshim.data(this, 'fileList', []);
 		}
 	});
 
+	webshim.defineNodeNameProperty('canvas', 'toBlob', {
+		prop: {
+			value: function(cb, type, qualitiy){
+				var dataURL;
+
+				if(!type){
+					type = 'image/jpeg';
+				}
+				if(type == 'image/jpeg' && !qualitiy){
+					qualitiy = 0.8;
+				}
+				dataURL = $(this).callProp('getAsDataURL', [type, qualitiy]);
+				loadMoxie();
+
+				webshim.ready('moxie', function(){
+					var img = new mOxie.Image();
+
+					img.onload = function() {
+						cb(img.getAsBlob());
+					};
+					img.load(dataURL);
+
+				});
+			}
+		}
+	});
 
 	window.FileReader = notReadyYet;
 	window.FormData = notReadyYet;
@@ -1605,7 +1637,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		mOxie = window.mOxie;
 
 		mOxie.Env.swf_url = featureOptions.swfpath;
-		mOxie.Env.xap_url = featureOptions.xappath;
 
 		window.FileReader = mOxie.FileReader;
 
@@ -1644,7 +1675,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 
 			return moxieData;
 		};
-		FormData = window.FormData;
 
 		createFilePicker = _createFilePicker;
 		transports.moxie = createMoxieTransport;
@@ -1829,12 +1859,13 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	};
 
 
-	mediaelement.jarisEvent = {};
+	mediaelement.jarisEvent = mediaelement.jarisEvent || {};
 	var localConnectionTimer;
 	var onEvent = {
 		onPlayPause: function(jaris, data, override){
 			var playing, type;
 			var idled = data.paused || data.ended;
+
 			if(override == null){
 				try {
 					playing = data.api.api_get("isPlaying");
@@ -1848,12 +1879,15 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				type = data.paused ? 'pause' : 'play';
 				data._ppFlag = true;
 				trigger(data._elem, type);
+
+			}
+			if(!data.paused || playing == idled || playing == null){
 				if(data.readyState < 3){
 					setReadyState(3, data);
 				}
-				if(!data.paused){
-					trigger(data._elem, 'playing');
-				}
+			}
+			if(!data.paused){
+				trigger(data._elem, 'playing');
 			}
 		},
 		onSeek: function(jaris, data){
@@ -2605,7 +2639,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		options.changeSWF(vars, elem, canPlaySrc, data, 'embed');
 		clearTimeout(data.flashBlock);
 
-		swfmini.embedSWF(playerSwfPath, elemId, "100%", "100%", "9.0.115", false, vars, params, attrs, function(swfData){
+		swfmini.embedSWF(playerSwfPath, elemId, "100%", "100%", "11.3", false, vars, params, attrs, function(swfData){
 			if(swfData.success){
 				var fBlocker = function(){
 					if((!swfData.ref.parentNode && box[0].parentNode) || swfData.ref.style.display == "none"){

@@ -5131,6 +5131,749 @@ define("moxie/xhr/XMLHttpRequest", [
 	return XMLHttpRequest;
 });
 
+// Included from: src/javascript/runtime/Transporter.js
+
+/**
+ * Transporter.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+define("moxie/runtime/Transporter", [
+	"moxie/core/utils/Basic",
+	"moxie/core/utils/Encode",
+	"moxie/runtime/RuntimeClient",
+	"moxie/core/EventTarget"
+], function(Basic, Encode, RuntimeClient, EventTarget) {
+	function Transporter() {
+		var mod, _runtime, _data, _size, _pos, _chunk_size;
+
+		RuntimeClient.call(this);
+
+		Basic.extend(this, {
+			uid: Basic.guid('uid_'),
+
+			state: Transporter.IDLE,
+
+			result: null,
+
+			transport: function(data, type, options) {
+				var self = this;
+
+				options = Basic.extend({
+					chunk_size: 204798
+				}, options);
+
+				// should divide by three, base64 requires this
+				if ((mod = options.chunk_size % 3)) {
+					options.chunk_size += 3 - mod;
+				}
+
+				_chunk_size = options.chunk_size;
+
+				_reset.call(this);
+				_data = data;
+				_size = data.length;
+
+				if (Basic.typeOf(options) === 'string' || options.ruid) {
+					_run.call(self, type, this.connectRuntime(options));
+				} else {
+					// we require this to run only once
+					var cb = function(e, runtime) {
+						self.unbind("RuntimeInit", cb);
+						_run.call(self, type, runtime);
+					};
+					this.bind("RuntimeInit", cb);
+					this.connectRuntime(options);
+				}
+			},
+
+			abort: function() {
+				var self = this;
+
+				self.state = Transporter.IDLE;
+				if (_runtime) {
+					_runtime.exec.call(self, 'Transporter', 'clear');
+					self.trigger("TransportingAborted");
+				}
+
+				_reset.call(self);
+			},
+
+
+			destroy: function() {
+				this.unbindAll();
+				_runtime = null;
+				this.disconnectRuntime();
+				_reset.call(this);
+			}
+		});
+
+		function _reset() {
+			_size = _pos = 0;
+			_data = this.result = null;
+		}
+
+		function _run(type, runtime) {
+			var self = this;
+
+			_runtime = runtime;
+
+			//self.unbind("RuntimeInit");
+
+			self.bind("TransportingProgress", function(e) {
+				_pos = e.loaded;
+
+				if (_pos < _size && Basic.inArray(self.state, [Transporter.IDLE, Transporter.DONE]) === -1) {
+					_transport.call(self);
+				}
+			}, 999);
+
+			self.bind("TransportingComplete", function() {
+				_pos = _size;
+				self.state = Transporter.DONE;
+				_data = null; // clean a bit
+				self.result = _runtime.exec.call(self, 'Transporter', 'getAsBlob', type || '');
+			}, 999);
+
+			self.state = Transporter.BUSY;
+			self.trigger("TransportingStarted");
+			_transport.call(self);
+		}
+
+		function _transport() {
+			var self = this,
+				chunk,
+				bytesLeft = _size - _pos;
+
+			if (_chunk_size > bytesLeft) {
+				_chunk_size = bytesLeft;
+			}
+
+			chunk = Encode.btoa(_data.substr(_pos, _chunk_size));
+			_runtime.exec.call(self, 'Transporter', 'receive', chunk, _size);
+		}
+	}
+
+	Transporter.IDLE = 0;
+	Transporter.BUSY = 1;
+	Transporter.DONE = 2;
+
+	Transporter.prototype = EventTarget.instance;
+
+	return Transporter;
+});
+
+// Included from: src/javascript/image/Image.js
+
+/**
+ * Image.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+define("moxie/image/Image", [
+	"moxie/core/utils/Basic",
+	"moxie/core/utils/Dom",
+	"moxie/core/Exceptions",
+	"moxie/file/FileReaderSync",
+	"moxie/xhr/XMLHttpRequest",
+	"moxie/runtime/Runtime",
+	"moxie/runtime/RuntimeClient",
+	"moxie/runtime/Transporter",
+	"moxie/core/utils/Env",
+	"moxie/core/EventTarget",
+	"moxie/file/Blob",
+	"moxie/file/File",
+	"moxie/core/utils/Encode"
+], function(Basic, Dom, x, FileReaderSync, XMLHttpRequest, Runtime, RuntimeClient, Transporter, Env, EventTarget, Blob, File, Encode) {
+	/**
+	Image preloading and manipulation utility. Additionally it provides access to image meta info (Exif, GPS) and raw binary data.
+
+	@class Image
+	@constructor
+	@extends EventTarget
+	*/
+	var dispatches = [
+		'progress',
+
+		/**
+		Dispatched when loading is complete.
+
+		@event load
+		@param {Object} event
+		*/
+		'load',
+
+		'error',
+
+		/**
+		Dispatched when resize operation is complete.
+		
+		@event resize
+		@param {Object} event
+		*/
+		'resize',
+
+		/**
+		Dispatched when visual representation of the image is successfully embedded
+		into the corresponsing container.
+
+		@event embedded
+		@param {Object} event
+		*/
+		'embedded'
+	];
+
+	function Image() {
+		RuntimeClient.call(this);
+
+		Basic.extend(this, {
+			/**
+			Unique id of the component
+
+			@property uid
+			@type {String}
+			*/
+			uid: Basic.guid('uid_'),
+
+			/**
+			Unique id of the connected runtime, if any.
+
+			@property ruid
+			@type {String}
+			*/
+			ruid: null,
+
+			/**
+			Name of the file, that was used to create an image, if available. If not equals to empty string.
+
+			@property name
+			@type {String}
+			@default ""
+			*/
+			name: "",
+
+			/**
+			Size of the image in bytes. Actual value is set only after image is preloaded.
+
+			@property size
+			@type {Number}
+			@default 0
+			*/
+			size: 0,
+
+			/**
+			Width of the image. Actual value is set only after image is preloaded.
+
+			@property width
+			@type {Number}
+			@default 0
+			*/
+			width: 0,
+
+			/**
+			Height of the image. Actual value is set only after image is preloaded.
+
+			@property height
+			@type {Number}
+			@default 0
+			*/
+			height: 0,
+
+			/**
+			Mime type of the image. Currently only image/jpeg and image/png are supported. Actual value is set only after image is preloaded.
+
+			@property type
+			@type {String}
+			@default ""
+			*/
+			type: "",
+
+			/**
+			Holds meta info (Exif, GPS). Is populated only for image/jpeg. Actual value is set only after image is preloaded.
+
+			@property meta
+			@type {Object}
+			@default {}
+			*/
+			meta: {},
+
+			/**
+			Alias for load method, that takes another mOxie.Image object as a source (see load).
+
+			@method clone
+			@param {Image} src Source for the image
+			@param {Boolean} [exact=false] Whether to activate in-depth clone mode
+			*/
+			clone: function() {
+				this.load.apply(this, arguments);
+			},
+
+			/**
+			Loads image from various sources. Currently the source for new image can be: mOxie.Image, mOxie.Blob/mOxie.File, 
+			native Blob/File, dataUrl or URL. Depending on the type of the source, arguments - differ. When source is URL, 
+			Image will be downloaded from remote destination and loaded in memory.
+
+			@example
+				var img = new mOxie.Image();
+				img.onload = function() {
+					var blob = img.getAsBlob();
+					
+					var formData = new mOxie.FormData();
+					formData.append('file', blob);
+
+					var xhr = new mOxie.XMLHttpRequest();
+					xhr.onload = function() {
+						// upload complete
+					};
+					xhr.open('post', 'upload.php');
+					xhr.send(formData);
+				};
+				img.load("http://www.moxiecode.com/images/mox-logo.jpg"); // notice file extension (.jpg)
+			
+
+			@method load
+			@param {Image|Blob|File|String} src Source for the image
+			@param {Boolean|Object} [mixed]
+			*/
+			load: function() {
+				// this is here because to bind properly we need an uid first, which is created above
+				this.bind('Load Resize', function() {
+					_updateInfo.call(this);
+				}, 999);
+
+				this.convertEventPropsToHandlers(dispatches);
+
+				_load.apply(this, arguments);
+			},
+
+			/**
+			Downsizes the image to fit the specified width/height. If crop is supplied, image will be cropped to exact dimensions.
+
+			@method downsize
+			@param {Number} width Resulting width
+			@param {Number} [height=width] Resulting height (optional, if not supplied will default to width)
+			@param {Boolean} [crop=false] Whether to crop the image to exact dimensions
+			@param {Boolean} [preserveHeaders=true] Whether to preserve meta headers (on JPEGs after resize)
+			*/
+			downsize: function(opts) {
+				var defaults = {
+					width: this.width,
+					height: this.height,
+					crop: false,
+					preserveHeaders: true
+				};
+
+				if (typeof(opts) === 'object') {
+					opts = Basic.extend(defaults, opts);
+				} else {
+					opts = Basic.extend(defaults, {
+						width: arguments[0],
+						height: arguments[1],
+						crop: arguments[2],
+						preserveHeaders: arguments[3]
+					});
+				}
+
+				try {
+					if (!this.size) { // only preloaded image objects can be used as source
+						throw new x.DOMException(x.DOMException.INVALID_STATE_ERR);
+					}
+
+					// no way to reliably intercept the crash due to high resolution, so we simply avoid it
+					if (this.width > Image.MAX_RESIZE_WIDTH || this.height > Image.MAX_RESIZE_HEIGHT) {
+						throw new x.ImageError(x.ImageError.MAX_RESOLUTION_ERR);
+					}
+
+					this.getRuntime().exec.call(this, 'Image', 'downsize', opts.width, opts.height, opts.crop, opts.preserveHeaders);
+				} catch(ex) {
+					// for now simply trigger error event
+					this.trigger('error', ex.code);
+				}
+			},
+
+			/**
+			Alias for downsize(width, height, true). (see downsize)
+			
+			@method crop
+			@param {Number} width Resulting width
+			@param {Number} [height=width] Resulting height (optional, if not supplied will default to width)
+			@param {Boolean} [preserveHeaders=true] Whether to preserve meta headers (on JPEGs after resize)
+			*/
+			crop: function(width, height, preserveHeaders) {
+				this.downsize(width, height, true, preserveHeaders);
+			},
+
+			getAsCanvas: function() {
+				if (!Env.can('create_canvas')) {
+					throw new x.RuntimeError(x.RuntimeError.NOT_SUPPORTED_ERR);
+				}
+
+				var runtime = this.connectRuntime(this.ruid);
+				return runtime.exec.call(this, 'Image', 'getAsCanvas');
+			},
+
+			/**
+			Retrieves image in it's current state as mOxie.Blob object. Cannot be run on empty or image in progress (throws
+			DOMException.INVALID_STATE_ERR).
+
+			@method getAsBlob
+			@param {String} [type="image/jpeg"] Mime type of resulting blob. Can either be image/jpeg or image/png
+			@param {Number} [quality=90] Applicable only together with mime type image/jpeg
+			@return {Blob} Image as Blob
+			*/
+			getAsBlob: function(type, quality) {
+				if (!this.size) {
+					throw new x.DOMException(x.DOMException.INVALID_STATE_ERR);
+				}
+
+				if (!type) {
+					type = 'image/jpeg';
+				}
+
+				if (type === 'image/jpeg' && !quality) {
+					quality = 90;
+				}
+
+				return this.getRuntime().exec.call(this, 'Image', 'getAsBlob', type, quality);
+			},
+
+			/**
+			Retrieves image in it's current state as dataURL string. Cannot be run on empty or image in progress (throws
+			DOMException.INVALID_STATE_ERR).
+
+			@method getAsDataURL
+			@param {String} [type="image/jpeg"] Mime type of resulting blob. Can either be image/jpeg or image/png
+			@param {Number} [quality=90] Applicable only together with mime type image/jpeg
+			@return {String} Image as dataURL string
+			*/
+			getAsDataURL: function(type, quality) {
+				if (!this.size) {
+					throw new x.DOMException(x.DOMException.INVALID_STATE_ERR);
+				}
+				return this.getRuntime().exec.call(this, 'Image', 'getAsDataURL', type, quality);
+			},
+
+			/**
+			Retrieves image in it's current state as binary string. Cannot be run on empty or image in progress (throws
+			DOMException.INVALID_STATE_ERR).
+
+			@method getAsBinaryString
+			@param {String} [type="image/jpeg"] Mime type of resulting blob. Can either be image/jpeg or image/png
+			@param {Number} [quality=90] Applicable only together with mime type image/jpeg
+			@return {String} Image as binary string
+			*/
+			getAsBinaryString: function(type, quality) {
+				var dataUrl = this.getAsDataURL(type, quality);
+				return Encode.atob(dataUrl.substring(dataUrl.indexOf('base64,') + 7));
+			},
+
+			/**
+			Embeds a visual representation of the image into the specified node. Depending on the runtime, 
+			it might be a canvas, an img node or a thrid party shim object (Flash or SilverLight - very rare, 
+			can be used in legacy browsers that do not have canvas or proper dataURI support).
+
+			@method embed
+			@param {DOMElement} el DOM element to insert the image object into
+			@param {Object} [options]
+				@param {Number} [options.width] The width of an embed (defaults to the image width)
+				@param {Number} [options.height] The height of an embed (defaults to the image height)
+				@param {String} [type="image/jpeg"] Mime type
+				@param {Number} [quality=90] Quality of an embed, if mime type is image/jpeg
+				@param {Boolean} [crop=false] Whether to crop an embed to the specified dimensions
+			*/
+			embed: function(el) {
+				var self = this
+				, imgCopy
+				, type, quality, crop
+				, options = arguments[1] || {}
+				, width = this.width
+				, height = this.height
+				, runtime // this has to be outside of all the closures to contain proper runtime
+				;
+
+				function onResize() {
+					// if possible, embed a canvas element directly
+					if (Env.can('create_canvas')) {
+						var canvas = imgCopy.getAsCanvas();
+						if (canvas) {
+							el.appendChild(canvas);
+							canvas = null;
+							imgCopy.destroy();
+							self.trigger('embedded');
+							return;
+						}
+					}
+
+					var dataUrl = imgCopy.getAsDataURL(type, quality);
+					if (!dataUrl) {
+						throw new x.ImageError(x.ImageError.WRONG_FORMAT);
+					}
+
+					if (Env.can('use_data_uri_of', dataUrl.length)) {
+						el.innerHTML = '<img src="' + dataUrl + '" width="' + imgCopy.width + '" height="' + imgCopy.height + '" />';
+						imgCopy.destroy();
+						self.trigger('embedded');
+					} else {
+						var tr = new Transporter();
+
+						tr.bind("TransportingComplete", function() {
+							runtime = self.connectRuntime(this.result.ruid);
+
+							self.bind("Embedded", function() {
+								// position and size properly
+								Basic.extend(runtime.getShimContainer().style, {
+									//position: 'relative',
+									top: '0px',
+									left: '0px',
+									width: imgCopy.width + 'px',
+									height: imgCopy.height + 'px'
+								});
+
+								// some shims (Flash/SilverLight) reinitialize, if parent element is hidden, reordered or it's
+								// position type changes (in Gecko), but since we basically need this only in IEs 6/7 and
+								// sometimes 8 and they do not have this problem, we can comment this for now
+								/*tr.bind("RuntimeInit", function(e, runtime) {
+									tr.destroy();
+									runtime.destroy();
+									onResize.call(self); // re-feed our image data
+								});*/
+
+								runtime = null;
+							}, 999);
+
+							runtime.exec.call(self, "ImageView", "display", this.result.uid, width, height);
+							imgCopy.destroy();
+						});
+
+						tr.transport(Encode.atob(dataUrl.substring(dataUrl.indexOf('base64,') + 7)), type, Basic.extend({}, options, {
+							required_caps: {
+								display_media: true
+							},
+							runtime_order: 'flash,silverlight',
+							container: el
+						}));
+					}
+				}
+
+				try {
+					if (!(el = Dom.get(el))) {
+						throw new x.DOMException(x.DOMException.INVALID_NODE_TYPE_ERR);
+					}
+
+					if (!this.size) { // only preloaded image objects can be used as source
+						throw new x.DOMException(x.DOMException.INVALID_STATE_ERR);
+					}
+
+					if (this.width > Image.MAX_RESIZE_WIDTH || this.height > Image.MAX_RESIZE_HEIGHT) {
+						throw new x.ImageError(x.ImageError.MAX_RESOLUTION_ERR);
+					}
+
+					type = options.type || this.type || 'image/jpeg';
+					quality = options.quality || 90;
+					crop = Basic.typeOf(options.crop) !== 'undefined' ? options.crop : false;
+
+					// figure out dimensions for the thumb
+					if (options.width) {
+						width = options.width;
+						height = options.height || width;
+					} else {
+						// if container element has measurable dimensions, use them
+						var dimensions = Dom.getSize(el);
+						if (dimensions.w && dimensions.h) { // both should be > 0
+							width = dimensions.w;
+							height = dimensions.h;
+						}
+					}
+
+					imgCopy = new Image();
+
+					imgCopy.bind("Resize", function() {
+						onResize.call(self);
+					});
+
+					imgCopy.bind("Load", function() {
+						imgCopy.downsize(width, height, crop, false);
+					});
+
+					imgCopy.clone(this, false);
+
+					return imgCopy;
+				} catch(ex) {
+					// for now simply trigger error event
+					this.trigger('error', ex.code);
+				}
+			},
+
+			/**
+			Properly destroys the image and frees resources in use. If any. Recommended way to dispose mOxie.Image object.
+
+			@method destroy
+			*/
+			destroy: function() {
+				if (this.ruid) {
+					this.getRuntime().exec.call(this, 'Image', 'destroy');
+					this.disconnectRuntime();
+				}
+				this.unbindAll();
+			}
+		});
+
+
+		function _updateInfo(info) {
+			if (!info) {
+				info = this.getRuntime().exec.call(this, 'Image', 'getInfo');
+			}
+
+			this.size = info.size;
+			this.width = info.width;
+			this.height = info.height;
+			this.type = info.type;
+			this.meta = info.meta;
+
+			// update file name, only if empty
+			if (this.name === '') {
+				this.name = info.name;
+			}
+		}
+		
+
+		function _load(src) {
+			var srcType = Basic.typeOf(src);
+
+			try {
+				// if source is Image
+				if (src instanceof Image) {
+					if (!src.size) { // only preloaded image objects can be used as source
+						throw new x.DOMException(x.DOMException.INVALID_STATE_ERR);
+					}
+					_loadFromImage.apply(this, arguments);
+				}
+				// if source is o.Blob/o.File
+				else if (src instanceof Blob) {
+					if (!~Basic.inArray(src.type, ['image/jpeg', 'image/png'])) {
+						throw new x.ImageError(x.ImageError.WRONG_FORMAT);
+					}
+					_loadFromBlob.apply(this, arguments);
+				}
+				// if native blob/file
+				else if (Basic.inArray(srcType, ['blob', 'file']) !== -1) {
+					_load.call(this, new File(null, src), arguments[1]);
+				}
+				// if String
+				else if (srcType === 'string') {
+					// if dataUrl String
+					if (/^data:[^;]*;base64,/.test(src)) {
+						_load.call(this, new Blob(null, { data: src }), arguments[1]);
+					}
+					// else assume Url, either relative or absolute
+					else {
+						_loadFromUrl.apply(this, arguments);
+					}
+				}
+				// if source seems to be an img node
+				else if (srcType === 'node' && src.nodeName.toLowerCase() === 'img') {
+					_load.call(this, src.src, arguments[1]);
+				}
+				else {
+					throw new x.DOMException(x.DOMException.TYPE_MISMATCH_ERR);
+				}
+			} catch(ex) {
+				// for now simply trigger error event
+				this.trigger('error', ex.code);
+			}
+		}
+
+
+		function _loadFromImage(img, exact) {
+			var runtime = this.connectRuntime(img.ruid);
+			this.ruid = runtime.uid;
+			runtime.exec.call(this, 'Image', 'loadFromImage', img, (Basic.typeOf(exact) === 'undefined' ? true : exact));
+		}
+
+
+		function _loadFromBlob(blob, options) {
+			var self = this;
+
+			self.name = blob.name || '';
+
+			function exec(runtime) {
+				self.ruid = runtime.uid;
+				runtime.exec.call(self, 'Image', 'loadFromBlob', blob);
+			}
+
+			if (blob.isDetached()) {
+				this.bind('RuntimeInit', function(e, runtime) {
+					exec(runtime);
+				});
+
+				// convert to object representation
+				if (options && typeof(options.required_caps) === 'string') {
+					options.required_caps = Runtime.parseCaps(options.required_caps);
+				}
+
+				this.connectRuntime(Basic.extend({
+					required_caps: {
+						access_image_binary: true,
+						resize_image: true
+					}
+				}, options));
+			} else {
+				exec(this.connectRuntime(blob.ruid));
+			}
+		}
+
+
+		function _loadFromUrl(url, options) {
+			var self = this, xhr;
+
+			xhr = new XMLHttpRequest();
+
+			xhr.open('get', url);
+			xhr.responseType = 'blob';
+
+			xhr.onprogress = function(e) {
+				self.trigger(e);
+			};
+
+			xhr.onload = function() {
+				_loadFromBlob.call(self, xhr.response, true);
+			};
+
+			xhr.onerror = function(e) {
+				self.trigger(e);
+			};
+
+			xhr.onloadend = function() {
+				xhr.destroy();
+			};
+
+			xhr.bind('RuntimeError', function(e, err) {
+				self.trigger('RuntimeError', err);
+			});
+
+			xhr.send(null, options);
+		}
+	}
+
+	// virtual world will crash on you if image has a resolution higher than this:
+	Image.MAX_RESIZE_WIDTH = 6500;
+	Image.MAX_RESIZE_HEIGHT = 6500; 
+
+	Image.prototype = EventTarget.instance;
+
+	return Image;
+});
+
 // Included from: src/javascript/runtime/flash/Runtime.js
 
 /**
@@ -5561,143 +6304,6 @@ define("moxie/runtime/flash/file/FileReaderSync", [
 	return (extensions.FileReaderSync = FileReaderSync);
 });
 
-// Included from: src/javascript/runtime/Transporter.js
-
-/**
- * Transporter.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-define("moxie/runtime/Transporter", [
-	"moxie/core/utils/Basic",
-	"moxie/core/utils/Encode",
-	"moxie/runtime/RuntimeClient",
-	"moxie/core/EventTarget"
-], function(Basic, Encode, RuntimeClient, EventTarget) {
-	function Transporter() {
-		var mod, _runtime, _data, _size, _pos, _chunk_size;
-
-		RuntimeClient.call(this);
-
-		Basic.extend(this, {
-			uid: Basic.guid('uid_'),
-
-			state: Transporter.IDLE,
-
-			result: null,
-
-			transport: function(data, type, options) {
-				var self = this;
-
-				options = Basic.extend({
-					chunk_size: 204798
-				}, options);
-
-				// should divide by three, base64 requires this
-				if ((mod = options.chunk_size % 3)) {
-					options.chunk_size += 3 - mod;
-				}
-
-				_chunk_size = options.chunk_size;
-
-				_reset.call(this);
-				_data = data;
-				_size = data.length;
-
-				if (Basic.typeOf(options) === 'string' || options.ruid) {
-					_run.call(self, type, this.connectRuntime(options));
-				} else {
-					// we require this to run only once
-					var cb = function(e, runtime) {
-						self.unbind("RuntimeInit", cb);
-						_run.call(self, type, runtime);
-					};
-					this.bind("RuntimeInit", cb);
-					this.connectRuntime(options);
-				}
-			},
-
-			abort: function() {
-				var self = this;
-
-				self.state = Transporter.IDLE;
-				if (_runtime) {
-					_runtime.exec.call(self, 'Transporter', 'clear');
-					self.trigger("TransportingAborted");
-				}
-
-				_reset.call(self);
-			},
-
-
-			destroy: function() {
-				this.unbindAll();
-				_runtime = null;
-				this.disconnectRuntime();
-				_reset.call(this);
-			}
-		});
-
-		function _reset() {
-			_size = _pos = 0;
-			_data = this.result = null;
-		}
-
-		function _run(type, runtime) {
-			var self = this;
-
-			_runtime = runtime;
-
-			//self.unbind("RuntimeInit");
-
-			self.bind("TransportingProgress", function(e) {
-				_pos = e.loaded;
-
-				if (_pos < _size && Basic.inArray(self.state, [Transporter.IDLE, Transporter.DONE]) === -1) {
-					_transport.call(self);
-				}
-			}, 999);
-
-			self.bind("TransportingComplete", function() {
-				_pos = _size;
-				self.state = Transporter.DONE;
-				_data = null; // clean a bit
-				self.result = _runtime.exec.call(self, 'Transporter', 'getAsBlob', type || '');
-			}, 999);
-
-			self.state = Transporter.BUSY;
-			self.trigger("TransportingStarted");
-			_transport.call(self);
-		}
-
-		function _transport() {
-			var self = this,
-				chunk,
-				bytesLeft = _size - _pos;
-
-			if (_chunk_size > bytesLeft) {
-				_chunk_size = bytesLeft;
-			}
-
-			chunk = Encode.btoa(_data.substr(_pos, _chunk_size));
-			_runtime.exec.call(self, 'Transporter', 'receive', chunk, _size);
-		}
-	}
-
-	Transporter.IDLE = 0;
-	Transporter.BUSY = 1;
-	Transporter.DONE = 2;
-
-	Transporter.prototype = EventTarget.instance;
-
-	return Transporter;
-});
-
 // Included from: src/javascript/runtime/flash/xhr/XMLHttpRequest.js
 
 /**
@@ -5847,10 +6453,10 @@ define("moxie/runtime/flash/xhr/XMLHttpRequest", [
 	return (extensions.XMLHttpRequest = XMLHttpRequest);
 });
 
-// Included from: src/javascript/runtime/html4/Runtime.js
+// Included from: src/javascript/runtime/flash/runtime/Transporter.js
 
 /**
- * Runtime.js
+ * Transporter.js
  *
  * Copyright 2013, Moxiecode Systems AB
  * Released under GPL License.
@@ -5859,273 +6465,34 @@ define("moxie/runtime/flash/xhr/XMLHttpRequest", [
  * Contributing: http://www.plupload.com/contributing
  */
 
-/*global File:true */
-
 /**
-Defines constructor for HTML4 runtime.
-
-@class moxie/runtime/html4/Runtime
+@class moxie/runtime/flash/runtime/Transporter
 @private
 */
-define("moxie/runtime/html4/Runtime", [
-	"moxie/core/utils/Basic",
-	"moxie/core/Exceptions",
-	"moxie/runtime/Runtime",
-	"moxie/core/utils/Env"
-], function(Basic, x, Runtime, Env) {
-	
-	var type = 'html4', extensions = {};
+define("moxie/runtime/flash/runtime/Transporter", [
+	"moxie/runtime/flash/Runtime",
+	"moxie/file/Blob"
+], function(extensions, Blob) {
 
-	function Html4Runtime(options) {
-		var I = this
-		, Test = Runtime.capTest
-		, True = Runtime.capTrue
-		;
-
-		Runtime.call(this, options, type, {
-			access_binary: Test(window.FileReader || window.File && File.getAsDataURL),
-			access_image_binary: false,
-			display_media: Test(extensions.Image && (Env.can('create_canvas') || Env.can('use_data_uri_over32kb'))),
-			do_cors: false,
-			drag_and_drop: false,
-			filter_by_extension: Test(function() { // if you know how to feature-detect this, please suggest
-				return (Env.browser === 'Chrome' && Env.version >= 28) || (Env.browser === 'IE' && Env.version >= 10);
-			}()),
-			resize_image: function() {
-				return extensions.Image && I.can('access_binary') && Env.can('create_canvas');
-			},
-			report_upload_progress: false,
-			return_response_headers: false,
-			return_response_type: function(responseType) {
-				if (responseType === 'json' && !!window.JSON) {
-					return true;
-				} 
-				return !!~Basic.inArray(responseType, ['text', 'document', '']);
-			},
-			return_status_code: function(code) {
-				return !Basic.arrayDiff(code, [200, 404]);
-			},
-			select_file: function() {
-				return Env.can('use_fileinput');
-			},
-			select_multiple: false,
-			send_binary_string: false,
-			send_custom_headers: false,
-			send_multipart: true,
-			slice_blob: false,
-			stream_upload: function() {
-				return I.can('select_file');
-			},
-			summon_file_dialog: Test(function() { // yeah... some dirty sniffing here...
-				return (Env.browser === 'Firefox' && Env.version >= 4) ||
-					(Env.browser === 'Opera' && Env.version >= 12) ||
-					!!~Basic.inArray(Env.browser, ['Chrome', 'Safari']);
-			}()),
-			upload_filesize: True,
-			use_http_method: function(methods) {
-				return !Basic.arrayDiff(methods, ['GET', 'POST']);
+	var Transporter = {
+		getAsBlob: function(type) {
+			var self = this.getRuntime()
+			, blob = self.shimExec.call(this, 'Transporter', 'getAsBlob', type)
+			;
+			if (blob) {
+				return new Blob(self.uid, blob);
 			}
-		});
-
-
-		Basic.extend(this, {
-			init : function() {
-				this.trigger("Init");
-			},
-
-			destroy: (function(destroy) { // extend default destroy method
-				return function() {
-					destroy.call(I);
-					destroy = I = null;
-				};
-			}(this.destroy))
-		});
-
-		Basic.extend(this.getShim(), extensions);
-	}
-
-	Runtime.addConstructor(type, Html4Runtime);
-
-	return extensions;
-});
-
-// Included from: src/javascript/core/utils/Events.js
-
-/**
- * Events.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-define('moxie/core/utils/Events', [
-	'moxie/core/utils/Basic'
-], function(Basic) {
-	var eventhash = {}, uid = 'moxie_' + Basic.guid();
-	
-	// IE W3C like event funcs
-	function preventDefault() {
-		this.returnValue = false;
-	}
-
-	function stopPropagation() {
-		this.cancelBubble = true;
-	}
-
-	/**
-	Adds an event handler to the specified object and store reference to the handler
-	in objects internal Plupload registry (@see removeEvent).
-	
-	@method addEvent
-	@for Utils
-	@static
-	@param {Object} obj DOM element like object to add handler to.
-	@param {String} name Name to add event listener to.
-	@param {Function} callback Function to call when event occurs.
-	@param {String} [key] that might be used to add specifity to the event record.
-	*/
-	var addEvent = function(obj, name, callback, key) {
-		var func, events;
-					
-		name = name.toLowerCase();
-
-		// Add event listener
-		if (obj.addEventListener) {
-			func = callback;
-			
-			obj.addEventListener(name, func, false);
-		} else if (obj.attachEvent) {
-			func = function() {
-				var evt = window.event;
-
-				if (!evt.target) {
-					evt.target = evt.srcElement;
-				}
-
-				evt.preventDefault = preventDefault;
-				evt.stopPropagation = stopPropagation;
-
-				callback(evt);
-			};
-
-			obj.attachEvent('on' + name, func);
-		}
-		
-		// Log event handler to objects internal mOxie registry
-		if (!obj[uid]) {
-			obj[uid] = Basic.guid();
-		}
-		
-		if (!eventhash.hasOwnProperty(obj[uid])) {
-			eventhash[obj[uid]] = {};
-		}
-		
-		events = eventhash[obj[uid]];
-		
-		if (!events.hasOwnProperty(name)) {
-			events[name] = [];
-		}
-				
-		events[name].push({
-			func: func,
-			orig: callback, // store original callback for IE
-			key: key
-		});
-	};
-	
-	
-	/**
-	Remove event handler from the specified object. If third argument (callback)
-	is not specified remove all events with the specified name.
-	
-	@method removeEvent
-	@static
-	@param {Object} obj DOM element to remove event listener(s) from.
-	@param {String} name Name of event listener to remove.
-	@param {Function|String} [callback] might be a callback or unique key to match.
-	*/
-	var removeEvent = function(obj, name, callback) {
-		var type, undef;
-		
-		name = name.toLowerCase();
-		
-		if (obj[uid] && eventhash[obj[uid]] && eventhash[obj[uid]][name]) {
-			type = eventhash[obj[uid]][name];
-		} else {
-			return;
-		}
-			
-		for (var i = type.length - 1; i >= 0; i--) {
-			// undefined or not, key should match
-			if (type[i].orig === callback || type[i].key === callback) {
-				if (obj.removeEventListener) {
-					obj.removeEventListener(name, type[i].func, false);
-				} else if (obj.detachEvent) {
-					obj.detachEvent('on'+name, type[i].func);
-				}
-				
-				type[i].orig = null;
-				type[i].func = null;
-				type.splice(i, 1);
-				
-				// If callback was passed we are done here, otherwise proceed
-				if (callback !== undef) {
-					break;
-				}
-			}
-		}
-		
-		// If event array got empty, remove it
-		if (!type.length) {
-			delete eventhash[obj[uid]][name];
-		}
-		
-		// If mOxie registry has become empty, remove it
-		if (Basic.isEmptyObj(eventhash[obj[uid]])) {
-			delete eventhash[obj[uid]];
-			
-			// IE doesn't let you remove DOM object property with - delete
-			try {
-				delete obj[uid];
-			} catch(e) {
-				obj[uid] = undef;
-			}
+			return null;
 		}
 	};
-	
-	
-	/**
-	Remove all kind of events from the specified object
-	
-	@method removeAllEvents
-	@static
-	@param {Object} obj DOM element to remove event listeners from.
-	@param {String} [key] unique key to match, when removing events.
-	*/
-	var removeAllEvents = function(obj, key) {		
-		if (!obj || !obj[uid]) {
-			return;
-		}
-		
-		Basic.each(eventhash[obj[uid]], function(events, name) {
-			removeEvent(obj, name, key);
-		});
-	};
 
-	return {
-		addEvent: addEvent,
-		removeEvent: removeEvent,
-		removeAllEvents: removeAllEvents
-	};
+	return (extensions.Transporter = Transporter);
 });
 
-// Included from: src/javascript/runtime/html4/file/FileInput.js
+// Included from: src/javascript/runtime/flash/image/Image.js
 
 /**
- * FileInput.js
+ * Image.js
  *
  * Copyright 2013, Moxiecode Systems AB
  * Released under GPL License.
@@ -6135,1052 +6502,69 @@ define('moxie/core/utils/Events', [
  */
 
 /**
-@class moxie/runtime/html4/file/FileInput
+@class moxie/runtime/flash/image/Image
 @private
 */
-define("moxie/runtime/html4/file/FileInput", [
-	"moxie/runtime/html4/Runtime",
+define("moxie/runtime/flash/image/Image", [
+	"moxie/runtime/flash/Runtime",
 	"moxie/core/utils/Basic",
-	"moxie/core/utils/Dom",
-	"moxie/core/utils/Events",
-	"moxie/core/utils/Mime",
-	"moxie/core/utils/Env"
-], function(extensions, Basic, Dom, Events, Mime, Env) {
-	
-	function FileInput() {
-		var _uid, _files = [], _mimes = [], _options;
-
-		function addInput() {
-			var comp = this, I = comp.getRuntime(), shimContainer, browseButton, currForm, form, input, uid;
-
-			uid = Basic.guid('uid_');
-
-			shimContainer = I.getShimContainer(); // we get new ref everytime to avoid memory leaks in IE
-
-			if (_uid) { // move previous form out of the view
-				currForm = Dom.get(_uid + '_form');
-				if (currForm) {
-					Basic.extend(currForm.style, { top: '100%' });
-				}
-			}
-
-			// build form in DOM, since innerHTML version not able to submit file for some reason
-			form = document.createElement('form');
-			form.setAttribute('id', uid + '_form');
-			form.setAttribute('method', 'post');
-			form.setAttribute('enctype', 'multipart/form-data');
-			form.setAttribute('encoding', 'multipart/form-data');
-
-			Basic.extend(form.style, {
-				overflow: 'hidden',
-				position: 'absolute',
-				top: 0,
-				left: 0,
-				width: '100%',
-				height: '100%'
-			});
-
-			input = document.createElement('input');
-			input.setAttribute('id', uid);
-			input.setAttribute('type', 'file');
-			input.setAttribute('name', _options.name || 'Filedata');
-			input.setAttribute('accept', _mimes.join(','));
-
-			Basic.extend(input.style, {
-				fontSize: '999px',
-				opacity: 0
-			});
-
-			form.appendChild(input);
-			shimContainer.appendChild(form);
-
-			// prepare file input to be placed underneath the browse_button element
-			Basic.extend(input.style, {
-				position: 'absolute',
-				top: 0,
-				left: 0,
-				width: '100%',
-				height: '100%'
-			});
-
-			if (Env.browser === 'IE' && Env.version < 10) {
-				Basic.extend(input.style, {
-					filter : "progid:DXImageTransform.Microsoft.Alpha(opacity=0)"
-				});
-			}
-
-			input.onchange = function() { // there should be only one handler for this
-				var file;
-
-				if (!this.value) {
-					return;
-				}
-
-				if (this.files) {
-					file = this.files[0];
-				} else {
-					file = {
-						name: this.value
-					};
-				}
-
-				_files = [file];
-
-				this.onchange = function() {}; // clear event handler
-				addInput.call(comp);
-
-				// after file is initialized as o.File, we need to update form and input ids
-				comp.bind('change', function onChange() {
-					var input = Dom.get(uid), form = Dom.get(uid + '_form'), file;
-
-					comp.unbind('change', onChange);
-
-					if (comp.files.length && input && form) {
-						file = comp.files[0];
-
-						input.setAttribute('id', file.uid);
-						form.setAttribute('id', file.uid + '_form');
-
-						// set upload target
-						form.setAttribute('target', file.uid + '_iframe');
-					}
-					input = form = null;
-				}, 998);
-
-				input = form = null;
-				comp.trigger('change');
-			};
-
-
-			// route click event to the input
-			if (I.can('summon_file_dialog')) {
-				browseButton = Dom.get(_options.browse_button);
-				Events.removeEvent(browseButton, 'click', comp.uid);
-				Events.addEvent(browseButton, 'click', function(e) {
-					if (input && !input.disabled) { // for some reason FF (up to 8.0.1 so far) lets to click disabled input[type=file]
-						input.click();
-					}
-					e.preventDefault();
-				}, comp.uid);
-			}
-
-			_uid = uid;
-
-			shimContainer = currForm = browseButton = null;
-		}
-
-		Basic.extend(this, {
-			init: function(options) {
-				var comp = this, I = comp.getRuntime(), shimContainer;
-
-				// figure out accept string
-				_options = options;
-				_mimes = options.accept.mimes || Mime.extList2mimes(options.accept, I.can('filter_by_extension'));
-
-				shimContainer = I.getShimContainer();
-
-				(function() {
-					var browseButton, zIndex, top;
-
-					browseButton = Dom.get(options.browse_button);
-
-					// Route click event to the input[type=file] element for browsers that support such behavior
-					if (I.can('summon_file_dialog')) {
-						if (Dom.getStyle(browseButton, 'position') === 'static') {
-							browseButton.style.position = 'relative';
-						}
-
-						zIndex = parseInt(Dom.getStyle(browseButton, 'z-index'), 10) || 1;
-
-						browseButton.style.zIndex = zIndex;
-						shimContainer.style.zIndex = zIndex - 1;
-					}
-
-					/* Since we have to place input[type=file] on top of the browse_button for some browsers,
-					browse_button loses interactivity, so we restore it here */
-					top = I.can('summon_file_dialog') ? browseButton : shimContainer;
-
-					Events.addEvent(top, 'mouseover', function() {
-						comp.trigger('mouseenter');
-					}, comp.uid);
-
-					Events.addEvent(top, 'mouseout', function() {
-						comp.trigger('mouseleave');
-					}, comp.uid);
-
-					Events.addEvent(top, 'mousedown', function() {
-						comp.trigger('mousedown');
-					}, comp.uid);
-
-					Events.addEvent(Dom.get(options.container), 'mouseup', function() {
-						comp.trigger('mouseup');
-					}, comp.uid);
-
-					browseButton = null;
-				}());
-
-				addInput.call(this);
-
-				shimContainer = null;
-
-				// trigger ready event asynchronously
-				comp.trigger({
-					type: 'ready',
-					async: true
-				});
-			},
-
-			getFiles: function() {
-				return _files;
-			},
-
-			disable: function(state) {
-				var input;
-
-				if ((input = Dom.get(_uid))) {
-					input.disabled = !!state;
-				}
-			},
-
-			destroy: function() {
-				var I = this.getRuntime()
-				, shim = I.getShim()
-				, shimContainer = I.getShimContainer()
-				;
-				
-				Events.removeAllEvents(shimContainer, this.uid);
-				Events.removeAllEvents(_options && Dom.get(_options.container), this.uid);
-				Events.removeAllEvents(_options && Dom.get(_options.browse_button), this.uid);
-				
-				if (shimContainer) {
-					shimContainer.innerHTML = '';
-				}
-
-				shim.removeInstance(this.uid);
-
-				_uid = _files = _mimes = _options = shimContainer = shim = null;
-			}
-		});
-	}
-
-	return (extensions.FileInput = FileInput);
-});
-
-// Included from: src/javascript/runtime/html5/Runtime.js
-
-/**
- * Runtime.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/*global File:true */
-
-/**
-Defines constructor for HTML5 runtime.
-
-@class moxie/runtime/html5/Runtime
-@private
-*/
-define("moxie/runtime/html5/Runtime", [
-	"moxie/core/utils/Basic",
-	"moxie/core/Exceptions",
-	"moxie/runtime/Runtime",
-	"moxie/core/utils/Env"
-], function(Basic, x, Runtime, Env) {
-	
-	var type = "html5", extensions = {};
-	
-	function Html5Runtime(options) {
-		var I = this
-		, Test = Runtime.capTest
-		, True = Runtime.capTrue
-		;
-
-		var caps = Basic.extend({
-				access_binary: Test(window.FileReader || window.File && window.File.getAsDataURL),
-				access_image_binary: function() {
-					return I.can('access_binary') && !!extensions.Image;
-				},
-				display_media: Test(Env.can('create_canvas') || Env.can('use_data_uri_over32kb')),
-				do_cors: Test(window.XMLHttpRequest && 'withCredentials' in new XMLHttpRequest()),
-				drag_and_drop: Test(function() {
-					// this comes directly from Modernizr: http://www.modernizr.com/
-					var div = document.createElement('div');
-					// IE has support for drag and drop since version 5, but doesn't support dropping files from desktop
-					return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && (Env.browser !== 'IE' || Env.version > 9);
-				}()),
-				filter_by_extension: Test(function() { // if you know how to feature-detect this, please suggest
-					return (Env.browser === 'Chrome' && Env.version >= 28) || (Env.browser === 'IE' && Env.version >= 10);
-				}()),
-				return_response_headers: True,
-				return_response_type: function(responseType) {
-					if (responseType === 'json' && !!window.JSON) { // we can fake this one even if it's not supported
-						return true;
-					} 
-					return Env.can('return_response_type', responseType);
-				},
-				return_status_code: True,
-				report_upload_progress: Test(window.XMLHttpRequest && new XMLHttpRequest().upload),
-				resize_image: function() {
-					return I.can('access_binary') && Env.can('create_canvas');
-				},
-				select_file: function() {
-					return Env.can('use_fileinput') && window.File;
-				},
-				select_folder: function() {
-					return I.can('select_file') && Env.browser === 'Chrome' && Env.version >= 21;
-				},
-				select_multiple: function() {
-					// it is buggy on Safari Windows and iOS
-					return I.can('select_file') && 
-						!(Env.browser === 'Safari' && Env.os === 'Windows') && 
-						!(Env.os === 'iOS' && Env.verComp(Env.osVersion, "7.0.4", '<'));
-				},
-				send_binary_string: Test(window.XMLHttpRequest && (new XMLHttpRequest().sendAsBinary || (window.Uint8Array && window.ArrayBuffer))),
-				send_custom_headers: Test(window.XMLHttpRequest),
-				send_multipart: function() {
-					return !!(window.XMLHttpRequest && new XMLHttpRequest().upload && window.FormData) || I.can('send_binary_string');
-				},
-				slice_blob: Test(window.File && (File.prototype.mozSlice || File.prototype.webkitSlice || File.prototype.slice)),
-				stream_upload: function(){
-					return I.can('slice_blob') && I.can('send_multipart');
-				},
-				summon_file_dialog: Test(function() { // yeah... some dirty sniffing here...
-					return (Env.browser === 'Firefox' && Env.version >= 4) ||
-						(Env.browser === 'Opera' && Env.version >= 12) ||
-						(Env.browser === 'IE' && Env.version >= 10) ||
-						!!~Basic.inArray(Env.browser, ['Chrome', 'Safari']);
-				}()),
-				upload_filesize: True
-			}, 
-			arguments[2]
-		);
-
-		Runtime.call(this, options, (arguments[1] || type), caps);
-
-
-		Basic.extend(this, {
-
-			init : function() {
-				this.trigger("Init");
-			},
-
-			destroy: (function(destroy) { // extend default destroy method
-				return function() {
-					destroy.call(I);
-					destroy = I = null;
-				};
-			}(this.destroy))
-		});
-
-		Basic.extend(this.getShim(), extensions);
-	}
-
-	Runtime.addConstructor(type, Html5Runtime);
-
-	return extensions;
-});
-
-// Included from: src/javascript/runtime/html5/file/FileReader.js
-
-/**
- * FileReader.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/html5/file/FileReader
-@private
-*/
-define("moxie/runtime/html5/file/FileReader", [
-	"moxie/runtime/html5/Runtime",
-	"moxie/core/utils/Encode",
-	"moxie/core/utils/Basic"
-], function(extensions, Encode, Basic) {
-	
-	function FileReader() {
-		var _fr, _convertToBinary = false;
-
-		Basic.extend(this, {
-
-			read: function(op, blob) {
-				var target = this;
-
-				_fr = new window.FileReader();
-
-				_fr.addEventListener('progress', function(e) {
-					target.trigger(e);
-				});
-
-				_fr.addEventListener('load', function(e) {
-					target.trigger(e);
-				});
-
-				_fr.addEventListener('error', function(e) {
-					target.trigger(e, _fr.error);
-				});
-
-				_fr.addEventListener('loadend', function() {
-					_fr = null;
-				});
-
-				if (Basic.typeOf(_fr[op]) === 'function') {
-					_convertToBinary = false;
-					_fr[op](blob.getSource());
-				} else if (op === 'readAsBinaryString') { // readAsBinaryString is depricated in general and never existed in IE10+
-					_convertToBinary = true;
-					_fr.readAsDataURL(blob.getSource());
-				}
-			},
-
-			getResult: function() {
-				return _fr && _fr.result ? (_convertToBinary ? _toBinary(_fr.result) : _fr.result) : null;
-			},
-
-			abort: function() {
-				if (_fr) {
-					_fr.abort();
-				}
-			},
-
-			destroy: function() {
-				_fr = null;
-			}
-		});
-
-		function _toBinary(str) {
-			return Encode.atob(str.substring(str.indexOf('base64,') + 7));
-		}
-	}
-
-	return (extensions.FileReader = FileReader);
-});
-
-// Included from: src/javascript/runtime/html4/file/FileReader.js
-
-/**
- * FileReader.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/html4/file/FileReader
-@private
-*/
-define("moxie/runtime/html4/file/FileReader", [
-	"moxie/runtime/html4/Runtime",
-	"moxie/runtime/html5/file/FileReader"
-], function(extensions, FileReader) {
-	return (extensions.FileReader = FileReader);
-});
-
-// Included from: src/javascript/runtime/html4/xhr/XMLHttpRequest.js
-
-/**
- * XMLHttpRequest.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/html4/xhr/XMLHttpRequest
-@private
-*/
-define("moxie/runtime/html4/xhr/XMLHttpRequest", [
-	"moxie/runtime/html4/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/core/utils/Dom",
-	"moxie/core/utils/Url",
-	"moxie/core/Exceptions",
-	"moxie/core/utils/Events",
+	"moxie/runtime/Transporter",
 	"moxie/file/Blob",
-	"moxie/xhr/FormData"
-], function(extensions, Basic, Dom, Url, x, Events, Blob, FormData) {
+	"moxie/file/FileReaderSync"
+], function(extensions, Basic, Transporter, Blob, FileReaderSync) {
 	
-	function XMLHttpRequest() {
-		var _status, _response, _iframe;
+	var Image = {
+		loadFromBlob: function(blob) {
+			var comp = this, self = comp.getRuntime();
 
-		function cleanup(cb) {
-			var target = this, uid, form, inputs, i, hasFile = false;
-
-			if (!_iframe) {
-				return;
+			function exec(srcBlob) {
+				self.shimExec.call(comp, 'Image', 'loadFromBlob', srcBlob.uid);
+				comp = self = null;
 			}
 
-			uid = _iframe.id.replace(/_iframe$/, '');
-
-			form = Dom.get(uid + '_form');
-			if (form) {
-				inputs = form.getElementsByTagName('input');
-				i = inputs.length;
-
-				while (i--) {
-					switch (inputs[i].getAttribute('type')) {
-						case 'hidden':
-							inputs[i].parentNode.removeChild(inputs[i]);
-							break;
-						case 'file':
-							hasFile = true; // flag the case for later
-							break;
-					}
-				}
-				inputs = [];
-
-				if (!hasFile) { // we need to keep the form for sake of possible retries
-					form.parentNode.removeChild(form);
-				}
-				form = null;
-			}
-
-			// without timeout, request is marked as canceled (in console)
-			setTimeout(function() {
-				Events.removeEvent(_iframe, 'load', target.uid);
-				if (_iframe.parentNode) { // #382
-					_iframe.parentNode.removeChild(_iframe);
-				}
-
-				// check if shim container has any other children, if - not, remove it as well
-				var shimContainer = target.getRuntime().getShimContainer();
-				if (!shimContainer.children.length) {
-					shimContainer.parentNode.removeChild(shimContainer);
-				}
-
-				shimContainer = _iframe = null;
-				cb();
-			}, 1);
-		}
-
-		Basic.extend(this, {
-			send: function(meta, data) {
-				var target = this, I = target.getRuntime(), uid, form, input, blob;
-
-				_status = _response = null;
-
-				function createIframe() {
-					var container = I.getShimContainer() || document.body
-					, temp = document.createElement('div')
-					;
-
-					// IE 6 won't be able to set the name using setAttribute or iframe.name
-					temp.innerHTML = '<iframe id="' + uid + '_iframe" name="' + uid + '_iframe" src="javascript:&quot;&quot;" style="display:none"></iframe>';
-					_iframe = temp.firstChild;
-					container.appendChild(_iframe);
-
-					/* _iframe.onreadystatechange = function() {
-						console.info(_iframe.readyState);
-					};*/
-
-					Events.addEvent(_iframe, 'load', function() { // _iframe.onload doesn't work in IE lte 8
-						var el;
-
-						try {
-							el = _iframe.contentWindow.document || _iframe.contentDocument || window.frames[_iframe.id].document;
-
-							// try to detect some standard error pages
-							if (/^4(0[0-9]|1[0-7]|2[2346])\s/.test(el.title)) { // test if title starts with 4xx HTTP error
-								_status = el.title.replace(/^(\d+).*$/, '$1');
-							} else {
-								_status = 200;
-								// get result
-								_response = Basic.trim(el.body.innerHTML);
-
-								// we need to fire these at least once
-								target.trigger({
-									type: 'progress',
-									loaded: _response.length,
-									total: _response.length
-								});
-
-								if (blob) { // if we were uploading a file
-									target.trigger({
-										type: 'uploadprogress',
-										loaded: blob.size || 1025,
-										total: blob.size || 1025
-									});
-								}
-							}
-						} catch (ex) {
-							if (Url.hasSameOrigin(meta.url)) {
-								// if response is sent with error code, iframe in IE gets redirected to res://ieframe.dll/http_x.htm
-								// which obviously results to cross domain error (wtf?)
-								_status = 404;
-							} else {
-								cleanup.call(target, function() {
-									target.trigger('error');
-								});
-								return;
-							}
-						}	
-					
-						cleanup.call(target, function() {
-							target.trigger('load');
-						});
-					}, target.uid);
-				} // end createIframe
-
-				// prepare data to be sent and convert if required
-				if (data instanceof FormData && data.hasBlob()) {
-					blob = data.getBlob();
-					uid = blob.uid;
-					input = Dom.get(uid);
-					form = Dom.get(uid + '_form');
-					if (!form) {
-						throw new x.DOMException(x.DOMException.NOT_FOUND_ERR);
-					}
-				} else {
-					uid = Basic.guid('uid_');
-
-					form = document.createElement('form');
-					form.setAttribute('id', uid + '_form');
-					form.setAttribute('method', meta.method);
-					form.setAttribute('enctype', 'multipart/form-data');
-					form.setAttribute('encoding', 'multipart/form-data');
-					form.setAttribute('target', uid + '_iframe');
-
-					I.getShimContainer().appendChild(form);
-				}
-
-				if (data instanceof FormData) {
-					data.each(function(value, name) {
-						if (value instanceof Blob) {
-							if (input) {
-								input.setAttribute('name', name);
-							}
-						} else {
-							var hidden = document.createElement('input');
-
-							Basic.extend(hidden, {
-								type : 'hidden',
-								name : name,
-								value : value
-							});
-
-							// make sure that input[type="file"], if it's there, comes last
-							if (input) {
-								form.insertBefore(hidden, input);
-							} else {
-								form.appendChild(hidden);
-							}
-						}
-					});
-				}
-
-				// set destination url
-				form.setAttribute("action", meta.url);
-
-				createIframe();
-				form.submit();
-				target.trigger('loadstart');
-			},
-
-			getStatus: function() {
-				return _status;
-			},
-
-			getResponse: function(responseType) {
-				if ('json' === responseType) {
-					// strip off <pre>..</pre> tags that might be enclosing the response
-					if (Basic.typeOf(_response) === 'string' && !!window.JSON) {
-						try {
-							return JSON.parse(_response.replace(/^\s*<pre[^>]*>/, '').replace(/<\/pre>\s*$/, ''));
-						} catch (ex) {
-							return null;
-						}
-					} 
-				} else if ('document' === responseType) {
-
-				}
-				return _response;
-			},
-
-			abort: function() {
-				var target = this;
-
-				if (_iframe && _iframe.contentWindow) {
-					if (_iframe.contentWindow.stop) { // FireFox/Safari/Chrome
-						_iframe.contentWindow.stop();
-					} else if (_iframe.contentWindow.document.execCommand) { // IE
-						_iframe.contentWindow.document.execCommand('Stop');
-					} else {
-						_iframe.src = "about:blank";
-					}
-				}
-
-				cleanup.call(this, function() {
-					// target.dispatchEvent('readystatechange');
-					target.dispatchEvent('abort');
+			if (blob.isDetached()) { // binary string
+				var tr = new Transporter();
+				tr.bind("TransportingComplete", function() {
+					exec(tr.result.getSource());
 				});
+				tr.transport(blob.getSource(), blob.type, { ruid: self.uid });
+			} else {
+				exec(blob.getSource());
 			}
-		});
-	}
+		},
 
-	return (extensions.XMLHttpRequest = XMLHttpRequest);
-});
+		loadFromImage: function(img) {
+			var self = this.getRuntime();
+			return self.shimExec.call(this, 'Image', 'loadFromImage', img.uid);
+		},
 
-// Included from: src/javascript/runtime/silverlight/Runtime.js
-
-/**
- * RunTime.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/*global ActiveXObject:true */
-
-/**
-Defines constructor for Silverlight runtime.
-
-@class moxie/runtime/silverlight/Runtime
-@private
-*/
-define("moxie/runtime/silverlight/Runtime", [
-	"moxie/core/utils/Basic",
-	"moxie/core/utils/Env",
-	"moxie/core/utils/Dom",
-	"moxie/core/Exceptions",
-	"moxie/runtime/Runtime"
-], function(Basic, Env, Dom, x, Runtime) {
-	
-	var type = "silverlight", extensions = {};
-
-	function isInstalled(version) {
-		var isVersionSupported = false, control = null, actualVer,
-			actualVerArray, reqVerArray, requiredVersionPart, actualVersionPart, index = 0;
-
-		try {
-			try {
-				control = new ActiveXObject('AgControl.AgControl');
-
-				if (control.IsVersionSupported(version)) {
-					isVersionSupported = true;
-				}
-
-				control = null;
-			} catch (e) {
-				var plugin = navigator.plugins["Silverlight Plug-In"];
-
-				if (plugin) {
-					actualVer = plugin.description;
-
-					if (actualVer === "1.0.30226.2") {
-						actualVer = "2.0.30226.2";
-					}
-
-					actualVerArray = actualVer.split(".");
-
-					while (actualVerArray.length > 3) {
-						actualVerArray.pop();
-					}
-
-					while ( actualVerArray.length < 4) {
-						actualVerArray.push(0);
-					}
-
-					reqVerArray = version.split(".");
-
-					while (reqVerArray.length > 4) {
-						reqVerArray.pop();
-					}
-
-					do {
-						requiredVersionPart = parseInt(reqVerArray[index], 10);
-						actualVersionPart = parseInt(actualVerArray[index], 10);
-						index++;
-					} while (index < reqVerArray.length && requiredVersionPart === actualVersionPart);
-
-					if (requiredVersionPart <= actualVersionPart && !isNaN(requiredVersionPart)) {
-						isVersionSupported = true;
-					}
-				}
+		getAsBlob: function(type, quality) {
+			var self = this.getRuntime()
+			, blob = self.shimExec.call(this, 'Image', 'getAsBlob', type, quality)
+			;
+			if (blob) {
+				return new Blob(self.uid, blob);
 			}
-		} catch (e2) {
-			isVersionSupported = false;
-		}
+			return null;
+		},
 
-		return isVersionSupported;
-	}
-
-	/**
-	Constructor for the Silverlight Runtime
-
-	@class SilverlightRuntime
-	@extends Runtime
-	*/
-	function SilverlightRuntime(options) {
-		var I = this, initTimer;
-
-		options = Basic.extend({ xap_url: Env.xap_url }, options);
-
-		Runtime.call(this, options, type, {
-			access_binary: Runtime.capTrue,
-			access_image_binary: Runtime.capTrue,
-			display_media: Runtime.capTrue,
-			do_cors: Runtime.capTrue,
-			drag_and_drop: false,
-			report_upload_progress: Runtime.capTrue,
-			resize_image: Runtime.capTrue,
-			return_response_headers: function(value) {
-				return value && I.mode === 'client';
-			},
-			return_response_type: function(responseType) {
-				if (responseType !== 'json') {
-					return true;
-				} else {
-					return !!window.JSON;
-				}
-			},
-			return_status_code: function(code) {
-				return I.mode === 'client' || !Basic.arrayDiff(code, [200, 404]);
-			},
-			select_file: Runtime.capTrue,
-			select_multiple: Runtime.capTrue,
-			send_binary_string: Runtime.capTrue,
-			send_browser_cookies: function(value) {
-				return value && I.mode === 'browser';
-			},
-			send_custom_headers: function(value) {
-				return value && I.mode === 'client';
-			},
-			send_multipart: Runtime.capTrue,
-			slice_blob: Runtime.capTrue,
-			stream_upload: true,
-			summon_file_dialog: false,
-			upload_filesize: Runtime.capTrue,
-			use_http_method: function(methods) {
-				return I.mode === 'client' || !Basic.arrayDiff(methods, ['GET', 'POST']);
+		getAsDataURL: function() {
+			var self = this.getRuntime()
+			, blob = self.Image.getAsBlob.apply(this, arguments)
+			, frs
+			;
+			if (!blob) {
+				return null;
 			}
-		}, { 
-			// capabilities that require specific mode
-			return_response_headers: function(value) {
-				return value ? 'client' : 'browser';
-			},
-			return_status_code: function(code) {
-				return Basic.arrayDiff(code, [200, 404]) ? 'client' : ['client', 'browser'];
-			},
-			send_browser_cookies: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			send_custom_headers: function(value) {
-				return value ? 'client' : 'browser';
-			},
-			use_http_method: function(methods) {
-				return Basic.arrayDiff(methods, ['GET', 'POST']) ? 'client' : ['client', 'browser'];
-			}
-		});
-
-
-		// minimal requirement
-		if (!isInstalled('2.0.31005.0') || Env.browser === 'Opera') {
-			this.mode = false;
-		}
-
-
-		Basic.extend(this, {
-			getShim: function() {
-				return Dom.get(this.uid).content.Moxie;
-			},
-
-			shimExec: function(component, action) {
-				var args = [].slice.call(arguments, 2);
-				return I.getShim().exec(this.uid, component, action, args);
-			},
-
-			init : function() {
-				var container;
-
-				container = this.getShimContainer();
-
-				container.innerHTML = '<object id="' + this.uid + '" data="data:application/x-silverlight," type="application/x-silverlight-2" width="100%" height="100%" style="outline:none;">' +
-					'<param name="source" value="' + options.xap_url + '"/>' +
-					'<param name="background" value="Transparent"/>' +
-					'<param name="windowless" value="true"/>' +
-					'<param name="enablehtmlaccess" value="true"/>' +
-					'<param name="initParams" value="uid=' + this.uid + ',target=' + Env.global_event_dispatcher + '"/>' +
-				'</object>';
-
-				// Init is dispatched by the shim
-				initTimer = setTimeout(function() {
-					if (I && !I.initialized) { // runtime might be already destroyed by this moment
-						I.trigger("Error", new x.RuntimeError(x.RuntimeError.NOT_INIT_ERR));
-					}
-				}, Env.OS !== 'Windows'? 10000 : 5000); // give it more time to initialize in non Windows OS (like Mac)
-			},
-
-			destroy: (function(destroy) { // extend default destroy method
-				return function() {
-					destroy.call(I);
-					clearTimeout(initTimer); // initialization check might be still onwait
-					options = initTimer = destroy = I = null;
-				};
-			}(this.destroy))
-
-		}, extensions);
-	}
-
-	Runtime.addConstructor(type, SilverlightRuntime); 
-
-	return extensions;
-});
-
-// Included from: src/javascript/runtime/silverlight/file/Blob.js
-
-/**
- * Blob.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/file/Blob
-@private
-*/
-define("moxie/runtime/silverlight/file/Blob", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/flash/file/Blob"
-], function(extensions, Basic, Blob) {
-	return (extensions.Blob = Basic.extend({}, Blob));
-});
-
-// Included from: src/javascript/runtime/silverlight/file/FileInput.js
-
-/**
- * FileInput.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/file/FileInput
-@private
-*/
-define("moxie/runtime/silverlight/file/FileInput", [
-	"moxie/runtime/silverlight/Runtime"
-], function(extensions) {
-	
-	var FileInput = {
-		init: function(options) {
-
-			function toFilters(accept) {
-				var filter = '';
-				for (var i = 0; i < accept.length; i++) {
-					filter += (filter !== '' ? '|' : '') + accept[i].title + " | *." + accept[i].extensions.replace(/,/g, ';*.');
-				}
-				return filter;
-			}
-			
-			this.getRuntime().shimExec.call(this, 'FileInput', 'init', toFilters(options.accept), options.name, options.multiple);
-			this.trigger('ready');
+			frs = new FileReaderSync();
+			return frs.readAsDataURL(blob);
 		}
 	};
 
-	return (extensions.FileInput = FileInput);
+	return (extensions.Image = Image);
 });
 
-// Included from: src/javascript/runtime/silverlight/file/FileReader.js
-
-/**
- * FileReader.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/file/FileReader
-@private
-*/
-define("moxie/runtime/silverlight/file/FileReader", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/flash/file/FileReader"
-], function(extensions, Basic, FileReader) {
-	return (extensions.FileReader = Basic.extend({}, FileReader));
-});
-
-// Included from: src/javascript/runtime/silverlight/file/FileReaderSync.js
-
-/**
- * FileReaderSync.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/file/FileReaderSync
-@private
-*/
-define("moxie/runtime/silverlight/file/FileReaderSync", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/flash/file/FileReaderSync"
-], function(extensions, Basic, FileReaderSync) {
-	return (extensions.FileReaderSync = Basic.extend({}, FileReaderSync));
-});
-
-// Included from: src/javascript/runtime/silverlight/xhr/XMLHttpRequest.js
-
-/**
- * XMLHttpRequest.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/xhr/XMLHttpRequest
-@private
-*/
-define("moxie/runtime/silverlight/xhr/XMLHttpRequest", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/flash/xhr/XMLHttpRequest"
-], function(extensions, Basic, XMLHttpRequest) {
-	return (extensions.XMLHttpRequest = Basic.extend({}, XMLHttpRequest));
-});
-
-expose(["moxie/core/utils/Basic","moxie/core/I18n","moxie/core/utils/Mime","moxie/core/utils/Env","moxie/core/utils/Dom","moxie/core/Exceptions","moxie/core/EventTarget","moxie/core/utils/Encode","moxie/runtime/Runtime","moxie/runtime/RuntimeClient","moxie/file/Blob","moxie/file/File","moxie/file/FileInput","moxie/runtime/RuntimeTarget","moxie/file/FileReader","moxie/core/utils/Url","moxie/file/FileReaderSync","moxie/xhr/FormData","moxie/xhr/XMLHttpRequest","moxie/runtime/Transporter","moxie/core/utils/Events"]);
+expose(["moxie/core/utils/Basic","moxie/core/I18n","moxie/core/utils/Mime","moxie/core/utils/Env","moxie/core/utils/Dom","moxie/core/Exceptions","moxie/core/EventTarget","moxie/core/utils/Encode","moxie/runtime/Runtime","moxie/runtime/RuntimeClient","moxie/file/Blob","moxie/file/File","moxie/file/FileInput","moxie/runtime/RuntimeTarget","moxie/file/FileReader","moxie/core/utils/Url","moxie/file/FileReaderSync","moxie/xhr/FormData","moxie/xhr/XMLHttpRequest","moxie/runtime/Transporter","moxie/image/Image"]);
 })(this);/**
  * o.js
  *
@@ -7231,477 +6615,3 @@ Globally exposed namespace with the most frequently used public classes and hand
 	}
 	return o;
 })(this);
-;webshim.register('filereader', function($, webshim, window, document, undefined, featureOptions){
-	"use strict";
-	var mOxie, moxie, hasXDomain;
-	var FormData = $.noop;
-	var sel = 'input[type="file"].ws-filereader';
-	var loadMoxie = function (){
-		webshim.loader.loadList(['moxie']);
-	};
-	var _createFilePicker = function(){
-		var $input, picker, $parent, onReset;
-		var input = this;
-
-		if(webshim.implement(input, 'filepicker')){
-
-			input = this;
-			$input = $(this);
-			$parent = $input.parent();
-			onReset = function(){
-				if(!input.value){
-					$input.prop('value', '');
-				}
-			};
-
-			$input.attr('tabindex', '-1').on('mousedown.filereaderwaiting click.filereaderwaiting', false);
-			$parent.addClass('ws-loading');
-			picker = new mOxie.FileInput({
-				browse_button: this,
-				accept: $.prop(this, 'accept'),
-				multiple: $.prop(this, 'multiple')
-			});
-
-			$input.jProp('form').on('reset', function(){
-				setTimeout(onReset);
-			});
-			picker.onready = function(){
-				$input.off('.fileraderwaiting');
-				$parent.removeClass('ws-waiting');
-			};
-
-			picker.onchange = function(e){
-				webshim.data(input, 'fileList', e.target.files);
-				$input.trigger('change');
-			};
-			picker.onmouseenter = function(){
-				$input.trigger('mouseover');
-				$parent.addClass('ws-mouseenter');
-			};
-			picker.onmouseleave = function(){
-				$input.trigger('mouseout');
-				$parent.removeClass('ws-mouseenter');
-			};
-			picker.onmousedown = function(){
-				$input.trigger('mousedown');
-				$parent.addClass('ws-active');
-			};
-			picker.onmouseup = function(){
-				$input.trigger('mouseup');
-				$parent.removeClass('ws-active');
-			};
-
-			webshim.data(input, 'filePicker', picker);
-
-			webshim.ready('WINDOWLOAD', function(){
-				var lastWidth;
-				$input.onWSOff('updateshadowdom', function(){
-					var curWitdth = input.offsetWidth;
-					if(curWitdth && lastWidth != curWitdth){
-						lastWidth = curWitdth;
-						picker.refresh();
-					}
-				});
-			});
-
-			webshim.addShadowDom();
-
-			picker.init();
-			if(input.disabled){
-				picker.disable(true);
-			}
-		}
-	};
-	var getFileNames = function(file){
-		return file.name;
-	};
-	var createFilePicker = function(){
-		var elem = this;
-		loadMoxie();
-		$(elem)
-			.on('mousedown.filereaderwaiting click.filereaderwaiting', false)
-			.parent()
-			.addClass('ws-loading')
-		;
-		webshim.ready('moxie', function(){
-			createFilePicker.call(elem);
-		});
-	};
-	var noxhr = /^(?:script|jsonp)$/i;
-	var notReadyYet = function(){
-		loadMoxie();
-		webshim.error('filereader/formdata not ready yet. please wait for moxie to load `webshim.ready("moxie", callbackFn);`` or wait for the first change event on input[type="file"].ws-filereader.')
-	};
-	var inputValueDesc = webshim.defineNodeNameProperty('input', 'value', {
-			prop: {
-				get: function(){
-					var fileList = webshim.data(this, 'fileList');
-
-					if(fileList && fileList.map){
-						return fileList.map(getFileNames).join(', ');
-					}
-
-					return inputValueDesc.prop._supget.call(this);
-				}
-			}
-		}
-	);
-	var shimMoxiePath = webshim.cfg.basePath+'moxie/';
-	var crossXMLMessage = 'You nedd a crossdomain.xml to get all "filereader" / "XHR2" / "CORS" features to work. Or host moxie.swf/moxie.xap on your server an configure filereader options: "swfpath"/"xappath"';
-	var testMoxie = function(options){
-		return (options.wsType == 'moxie' || (options.data && options.data instanceof mOxie.FormData) || (options.crossDomain && $.support.cors !== false && hasXDomain != 'no' && !noxhr.test(options.dataType || '')));
-	};
-	var createMoxieTransport = function (options){
-
-		if(testMoxie(options)){
-			var ajax;
-			webshim.info('moxie transfer used for $.ajax');
-			if(hasXDomain == 'no'){
-				webshim.error(crossXMLMessage);
-			}
-			return {
-				send: function( headers, completeCallback ) {
-
-					var proressEvent = function(obj, name){
-						if(options[name]){
-							var called = false;
-							ajax.addEventListener('load', function(e){
-								if(!called){
-									options[name]({type: 'progress', lengthComputable: true, total: 1, loaded: 1});
-								} else if(called.lengthComputable && called.total > called.loaded){
-									options[name]({type: 'progress', lengthComputable: true, total: called.total, loaded: called.total});
-								}
-							});
-							obj.addEventListener('progress', function(e){
-								called = e;
-								options[name](e);
-							});
-						}
-					};
-					ajax = new moxie.xhr.XMLHttpRequest();
-
-					ajax.open(options.type, options.url, options.async, options.username, options.password);
-
-					proressEvent(ajax.upload, featureOptions.uploadprogress);
-					proressEvent(ajax.upload, featureOptions.progress);
-
-					ajax.addEventListener('load', function(e){
-						var responses = {
-							text: ajax.responseText,
-							xml: ajax.responseXML
-						};
-						completeCallback(ajax.status, ajax.statusText, responses, ajax.getAllResponseHeaders());
-					});
-
-					if(options.xhrFields && options.xhrFields.withCredentials){
-						ajax.withCredentials = true;
-					}
-
-					if(options.timeout){
-						ajax.timeout = options.timeout;
-					}
-
-					$.each(headers, function(name, value){
-						ajax.setRequestHeader(name, value);
-					});
-
-
-					ajax.send(options.data);
-
-				},
-				abort: function() {
-					if(ajax){
-						ajax.abort();
-					}
-				}
-			};
-		}
-	};
-	var transports = {
-		//based on script: https://github.com/MoonScript/jQuery-ajaxTransport-XDomainRequest
-		xdomain: (function(){
-			var httpRegEx = /^https?:\/\//i;
-			var getOrPostRegEx = /^get|post$/i;
-			var sameSchemeRegEx = new RegExp('^'+location.protocol, 'i');
-			return function(options, userOptions, jqXHR) {
-
-				// Only continue if the request is: asynchronous, uses GET or POST method, has HTTP or HTTPS protocol, and has the same scheme as the calling page
-				if (!options.crossDomain || options.username || (options.xhrFields && options.xhrFields.withCredentials) || !options.async || !getOrPostRegEx.test(options.type) || !httpRegEx.test(options.url) || !sameSchemeRegEx.test(options.url) || (options.data && options.data instanceof mOxie.FormData) || noxhr.test(options.dataType || '')) {
-					return;
-				}
-
-				var xdr = null;
-				webshim.info('xdomain transport used.');
-
-				return {
-					send: function(headers, complete) {
-						var postData = '';
-						var userType = (userOptions.dataType || '').toLowerCase();
-
-						xdr = new XDomainRequest();
-						if (/^\d+$/.test(userOptions.timeout)) {
-							xdr.timeout = userOptions.timeout;
-						}
-
-						xdr.ontimeout = function() {
-							complete(500, 'timeout');
-						};
-
-						xdr.onload = function() {
-							var allResponseHeaders = 'Content-Length: ' + xdr.responseText.length + '\r\nContent-Type: ' + xdr.contentType;
-							var status = {
-								code: xdr.status || 200,
-								message: xdr.statusText || 'OK'
-							};
-							var responses = {
-								text: xdr.responseText,
-								xml: xdr.responseXML
-							};
-							try {
-								if (userType === 'html' || /text\/html/i.test(xdr.contentType)) {
-									responses.html = xdr.responseText;
-								} else if (userType === 'json' || (userType !== 'text' && /\/json/i.test(xdr.contentType))) {
-									try {
-										responses.json = $.parseJSON(xdr.responseText);
-									} catch(e) {
-
-									}
-								} else if (userType === 'xml' && !xdr.responseXML) {
-									var doc;
-									try {
-										doc = new ActiveXObject('Microsoft.XMLDOM');
-										doc.async = false;
-										doc.loadXML(xdr.responseText);
-									} catch(e) {
-
-									}
-
-									responses.xml = doc;
-								}
-							} catch(parseMessage) {}
-							complete(status.code, status.message, responses, allResponseHeaders);
-						};
-
-						// set an empty handler for 'onprogress' so requests don't get aborted
-						xdr.onprogress = function(){};
-						xdr.onerror = function() {
-							complete(500, 'error', {
-								text: xdr.responseText
-							});
-						};
-
-						if (userOptions.data) {
-							postData = ($.type(userOptions.data) === 'string') ? userOptions.data : $.param(userOptions.data);
-						}
-						xdr.open(options.type, options.url);
-						xdr.send(postData);
-					},
-					abort: function() {
-						if (xdr) {
-							xdr.abort();
-						}
-					}
-				};
-			};
-		})(),
-		moxie: function (options, originalOptions, jqXHR){
-			if(testMoxie(options)){
-				loadMoxie(options);
-				var ajax;
-
-				var tmpTransport = {
-					send: function( headers, completeCallback ) {
-						ajax = true;
-						webshim.ready('moxie', function(){
-							if(ajax){
-								ajax = createMoxieTransport(options, originalOptions, jqXHR);
-								tmpTransport.send = ajax.send;
-								tmpTransport.abort = ajax.abort;
-								ajax.send(headers, completeCallback);
-							}
-						});
-					},
-					abort: function() {
-						ajax = false;
-					}
-				};
-				return tmpTransport;
-			}
-		}
-	};
-
-	if(!featureOptions.progress){
-		featureOptions.progress = 'onprogress';
-	}
-
-	if(!featureOptions.uploadprogress){
-		featureOptions.uploadprogress = 'onuploadprogress';
-	}
-
-	if(!featureOptions.swfpath){
-		featureOptions.swfpath = shimMoxiePath+'flash/Moxie.min.swf';
-	}
-	if(!featureOptions.xappath){
-		featureOptions.xappath = shimMoxiePath+'silverlight/Moxie.min.xap';
-	}
-
-	if($.support.cors !== false || !window.XDomainRequest){
-		delete transports.xdomain;
-	}
-
-
-	$.ajaxTransport("+*", function( options, originalOptions, jqXHR ) {
-		var ajax, type;
-
-		if(options.wsType || transports[transports]){
-			ajax = transports[transports](options, originalOptions, jqXHR);
-		}
-		if(!ajax){
-			for(type in transports){
-				ajax = transports[type](options, originalOptions, jqXHR);
-				if(ajax){break;}
-			}
-		}
-		return ajax;
-	});
-
-	webshim.defineNodeNameProperty('input', 'files', {
-			prop: {
-				writeable: false,
-				get: function(){
-					if(this.type != 'file'){return null;}
-					if(!$(this).hasClass('ws-filereader')){
-						webshim.info("please add the 'ws-filereader' class to your input[type='file'] to implement files-property");
-					}
-					return webshim.data(this, 'fileList') || [];
-				}
-			}
-		}
-	);
-
-	webshim.reflectProperties(['input'], ['accept']);
-
-	if($('<input />').prop('multiple') == null){
-		webshim.defineNodeNamesBooleanProperty(['input'], ['multiple']);
-	}
-
-	webshim.onNodeNamesPropertyModify('input', 'disabled', function(value, boolVal, type){
-		var picker = webshim.data(this, 'filePicker');
-		if(picker){
-			picker.disable(boolVal);
-		}
-	});
-
-	webshim.onNodeNamesPropertyModify('input', 'value', function(value, boolVal, type){
-		if(value === '' && this.type == 'file' && $(this).hasClass('ws-filereader')){
-			webshim.data(this, 'fileList', []);
-		}
-	});
-
-
-	window.FileReader = notReadyYet;
-	window.FormData = notReadyYet;
-	webshim.ready('moxie', function(){
-		var wsMimes = 'application/xml,xml';
-		moxie = window.moxie;
-		mOxie = window.mOxie;
-
-		mOxie.Env.swf_url = featureOptions.swfpath;
-		mOxie.Env.xap_url = featureOptions.xappath;
-
-		window.FileReader = mOxie.FileReader;
-
-		window.FormData = function(form){
-			var appendData, i, len, files, fileI, fileLen, inputName;
-			var moxieData = new mOxie.FormData();
-			if(form && $.nodeName(form, 'form')){
-				appendData = $(form).serializeArray();
-				for(i = 0; i < appendData.length; i++){
-					if(Array.isArray(appendData[i].value)){
-						appendData[i].value.forEach(function(val){
-							moxieData.append(appendData[i].name, val);
-						});
-					} else {
-						moxieData.append(appendData[i].name, appendData[i].value);
-					}
-				}
-
-				appendData = form.querySelectorAll('input[type="file"][name]');
-
-				for(i = 0, len = appendData.length; i < appendData.length; i++){
-					inputName = appendData[i].name;
-					if(inputName && !$(appendData[i]).is(':disabled')){
-						files = $.prop(appendData[i], 'files') || [];
-						if(files.length){
-							if(files.length > 1 || (moxieData.hasBlob && moxieData.hasBlob())){
-								webshim.error('FormData shim can only handle one file per ajax. Use multiple ajax request. One per file.');
-							}
-							for(fileI = 0, fileLen = files.length; fileI < fileLen; fileI++){
-								moxieData.append(inputName, files[fileI]);
-							}
-						}
-					}
-				}
-			}
-
-			return moxieData;
-		};
-		FormData = window.FormData;
-
-		createFilePicker = _createFilePicker;
-		transports.moxie = createMoxieTransport;
-
-		featureOptions.mimeTypes = (featureOptions.mimeTypes) ? wsMimes+','+featureOptions.mimeTypes : wsMimes;
-		try {
-			mOxie.Mime.addMimeType(featureOptions.mimeTypes);
-		} catch(e){
-			webshim.warn('mimetype to moxie error: '+e);
-		}
-
-	});
-
-	webshim.addReady(function(context, contextElem){
-		$(context.querySelectorAll(sel)).add(contextElem.filter(sel)).each(createFilePicker);
-	});
-	webshim.ready('WINDOWLOAD', loadMoxie);
-
-	if(webshim.cfg.debug !== false && featureOptions.swfpath.indexOf((location.protocol+'//'+location.hostname)) && featureOptions.swfpath.indexOf(('https://'+location.hostname))){
-		webshim.ready('WINDOWLOAD', function(){
-
-			var printMessage = function(){
-				if(hasXDomain == 'no'){
-					webshim.error(crossXMLMessage);
-				}
-			};
-
-			try {
-				hasXDomain = sessionStorage.getItem('wsXdomain.xml');
-			} catch(e){}
-			printMessage();
-			if(hasXDomain == null){
-				try {
-					$.ajax({
-						url: 'crossdomain.xml',
-						type: 'HEAD',
-						dataType: 'xml',
-						success: function(){
-							hasXDomain = 'yes';
-						},
-						error: function(){
-							hasXDomain = 'no';
-						},
-						complete: function(){
-							try {
-								sessionStorage.setItem('wsXdomain.xml', hasXDomain);
-							} catch(e){}
-							printMessage();
-						}
-					});
-				} catch(e){}
-			}
-		});
-	}
-	if(document.readyState == 'complete'){
-		webshims.isReady('WINDOWLOAD', true);
-	}
-});
