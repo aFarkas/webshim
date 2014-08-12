@@ -301,20 +301,6 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		}
 	});
 
-	$(function(){
-		var fileReaderReady = ('FileReader' in window && 'FormData' in window);
-		if(!fileReaderReady){
-			webshims.addReady(function(context){
-				if(!fileReaderReady && !modules.filereader.loaded && !modules.moxie.loaded){
-					if(context.querySelector('input.ws-filereader')){
-						webshims.reTest(['filereader', 'moxie']);
-						fileReaderReady = true;
-					}
-				}
-			});
-		}
-	});
-
 	if(options.addValidators && options.fastValidators){
 		webshims.reTest(['form-validators', 'form-validation']);
 	}
