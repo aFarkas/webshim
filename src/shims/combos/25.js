@@ -1620,13 +1620,39 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					var img = new mOxie.Image();
 
 					img.onload = function() {
-						cb(img.getAsBlob());
+						var blob = img.getAsBlob();
+						webshim.defineProperty(blob, '_wsDataURL', {
+							value: dataURL,
+							enumerable: false
+						});
+						cb(blob);
 					};
 					img.load(dataURL);
 
 				});
 			}
 		}
+	});
+
+	webshim.ready('url', function(){
+		var _nativeCreateObjectURL = URL.createObjectURL;
+		var _nativeRevokeObjectURL = URL.revokeObjectURL;
+
+		URL.createObjectURL = function(obj){
+			var url = obj;
+			if(obj._wsimgDataURL) {
+				url = obj._wsimgDataURL;
+			} else if(_nativeCreateObjectURL){
+				return _nativeCreateObjectURL.apply(this, arguments);
+			}
+			return url;
+		};
+
+		URL.revokeObjectURL = function(url){
+			if (_nativeRevokeObjectURL){
+				return _nativeRevokeObjectURL.apply(this, arguments);
+			}
+		};
 	});
 
 	window.FileReader = notReadyYet;

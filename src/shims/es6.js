@@ -1,7 +1,8 @@
-// ES6-shim 0.8.0 (c) 2013 Paul Miller (paulmillr.com)
+// ES6-shim 0.15.0 (c) 2013-2014 Paul Miller (http://paulmillr.com)
 // ES6-shim may be freely distributed under the MIT license.
 // For more details and documentation:
 // https://github.com/paulmillr/es6-shim/
+
 webshim.register('es6', function($, webshim, window, document, undefined){
 
 	'use strict';

@@ -1,10 +1,12 @@
-// ES6-shim 0.8.0 (c) 2013 Paul Miller (paulmillr.com)
+// ES6-shim 0.15.0 (c) 2013-2014 Paul Miller (http://paulmillr.com)
 // ES6-shim may be freely distributed under the MIT license.
 // For more details and documentation:
 // https://github.com/paulmillr/es6-shim/
+
 webshim.register('es6', function($, webshim, window, document, undefined){
 
 	'use strict';
+
 
 	var isCallableWithoutNew = function(func) {
 		try { func(); }
@@ -99,7 +101,7 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 		// work properly with each other, even though we don't have full Iterator
 		// support.  That is, `Array.from(map.keys())` will work, but we don't
 		// pretend to export a "real" Iterator interface.
-		var $iterator$ = (typeof Symbol === 'object' && Symbol.iterator) ||
+		var $iterator$ = (typeof Symbol === 'function' && Symbol.iterator) ||
 			'_es6shim_iterator_';
 		// Firefox ships a partial implementation using the name @@iterator.
 		// https://bugzilla.mozilla.org/show_bug.cgi?id=907077#c14
@@ -328,8 +330,8 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 				// Bits to bytes
 				bytes = [];
 				while (str.length) {
-					bytes.push(parseInt(str.substring(0, 8), 2));
-					str = str.substring(8);
+					bytes.push(parseInt(str.slice(0, 8), 2));
+					str = str.slice(8);
 				}
 				return bytes;
 			}
@@ -351,9 +353,9 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 
 				// Unpack sign, exponent, fraction
 				bias = (1 << (ebits - 1)) - 1;
-				s = parseInt(str.substring(0, 1), 2) ? -1 : 1;
-				e = parseInt(str.substring(1, 1 + ebits), 2);
-				f = parseInt(str.substring(1 + ebits), 2);
+				s = parseInt(str.slice(0, 1), 2) ? -1 : 1;
+				e = parseInt(str.slice(1, 1 + ebits), 2);
+				f = parseInt(str.slice(1 + ebits), 2);
 
 				// Produce number
 				if (e === (1 << ebits) - 1) {
@@ -388,7 +390,7 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 		}());
 
 		defineProperties(String, {
-			fromCodePoint: function() {
+			fromCodePoint: function(_) { // length = 1
 				var points = _slice.call(arguments, 0, arguments.length);
 				var result = [];
 				var next;
@@ -677,15 +679,17 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 			},
 
 			fill: function(value) {
-				var start = arguments[1], end = arguments[2]; // fill.length===1
+				var start = arguments.length > 1 ? arguments[1] : undefined;
+				var end = arguments.length > 2 ? arguments[2] : undefined;
 				var O = ES.ToObject(this);
 				var len = ES.ToLength(O.length);
-				start = ES.ToInteger(start===undefined ? 0 : start);
-				end = ES.ToInteger(end===undefined ? len : end);
+				start = ES.ToInteger(start === undefined ? 0 : start);
+				end = ES.ToInteger(end === undefined ? len : end);
 
 				var relativeStart = start < 0 ? Math.max(len + start, 0) : Math.min(start, len);
+				var relativeEnd = end < 0 ? len + end : end;
 
-				for (var i = relativeStart; i < len && i < end; ++i) {
+				for (var i = relativeStart; i < len && i < relativeEnd; ++i) {
 					O[i] = value;
 				}
 				return O;
@@ -755,9 +759,7 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 			},
 
 			isInteger: function(value) {
-				return typeof value === 'number' &&
-					!Number.isNaN(value) &&
-					Number.isFinite(value) &&
+				return Number.isFinite(value) &&
 					ES.ToInteger(value) === value;
 			},
 
@@ -813,18 +815,11 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 						throw new TypeError('target must be an object');
 					}
 					return Array.prototype.reduce.call(arguments, function(target, source) {
-						if (!ES.TypeIsObject(source)) {
-							throw new TypeError('source must be an object');
-						}
-						return Object.keys(source).reduce(function(target, key) {
+						return Object.keys(Object(source)).reduce(function(target, key) {
 							target[key] = source[key];
 							return target;
 						}, target);
 					});
-				},
-
-				getOwnPropertyKeys: function(subject) {
-					return Object.keys(subject);
 				},
 
 				is: function(a, b) {
@@ -955,7 +950,6 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 			clz32: function(value) {
 				// See https://bugs.ecmascript.org/show_bug.cgi?id=2465
 				value = Number(value);
-				if (Number.isNaN(value)) return NaN;
 				var number = ES.ToUint32(value);
 				if (number === 0) {
 					return 32;
@@ -1064,6 +1058,8 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 
 			imul: function(x, y) {
 				// taken from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/imul
+				x = ES.ToUint32(x);
+				y = ES.ToUint32(y);
 				var ah  = (x >>> 16) & 0xffff;
 				var al = x & 0xffff;
 				var bh  = (y >>> 16) & 0xffff;
@@ -1523,7 +1519,7 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 					};
 					addIterator(MapIterator.prototype);
 
-					function Map() {
+					function Map(iterable) {
 						var map = this;
 						map = emulateES6construct(map);
 						if (!map._es6map) {
@@ -1541,7 +1537,6 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 						});
 
 						// Optionally initialize map from iterable
-						var iterable = arguments[0];
 						if (iterable !== undefined && iterable !== null) {
 							var it = ES.GetIterator(iterable);
 							var adder = map.set;
@@ -1709,7 +1704,7 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 					// Sets containing only string or numeric keys, we use an object
 					// as backing storage and lazily create a full Map only when
 					// required.
-					var SetShim = function Set() {
+					var SetShim = function Set(iterable) {
 						var set = this;
 						set = emulateES6construct(set);
 						if (!set._es6set) {
@@ -1722,7 +1717,6 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 						});
 
 						// Optionally initialize map from iterable
-						var iterable = arguments[0];
 						if (iterable !== undefined && iterable !== null) {
 							var it = ES.GetIterator(iterable);
 							var adder = set.add;
@@ -1754,7 +1748,7 @@ webshim.register('es6', function($, webshim, window, document, undefined){
 							Object.keys(set._storage).forEach(function(k) {
 								// fast check for leading '$'
 								if (k.charCodeAt(0) === 36) {
-									k = k.substring(1);
+									k = k.slice(1);
 								} else {
 									k = +k;
 								}

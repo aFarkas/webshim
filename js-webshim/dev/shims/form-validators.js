@@ -281,9 +281,10 @@ webshims.ready('form-validation', function(){
 			data.grouprequired.checkboxes
 				.off('click.groupRequired')
 				.on('click.groupRequired', function(){
-					webshims.refreshCustomValidityRules(elem);
+					$(elem).trigger('updatevalidation.webshims');
 				})
 			;
+
 			data.grouprequired.checkboxes.not(elem).removeData('grouprequired');
 		}
 

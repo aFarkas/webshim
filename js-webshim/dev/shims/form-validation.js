@@ -32,7 +32,8 @@ webshims.register('form-validation', function($, webshims, window, document, und
 	var nonFormFilter = function(){
 		return !$.prop(this, 'form');
 	};
-	var getGroupElements = webshims.modules["form-core"].getGroupElements || function(elem){
+	var modules = webshims.modules;
+	var getGroupElements = modules["form-core"].getGroupElements || function(elem){
 		elem = $(elem);
 		var name;
 		var form;
@@ -207,8 +208,8 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		iVal.fieldWrapper = ':not(span):not(label):not(em):not(strong):not(p):not(.ws-custom-file)';
 	}
 
-	if(!webshims.modules["form-core"].getGroupElements){
-		webshims.modules["form-core"].getGroupElements = getGroupElements;
+	if(!modules["form-core"].getGroupElements){
+		modules["form-core"].getGroupElements = getGroupElements;
 	}
 
 	$(document.body || 'html')
@@ -992,6 +993,18 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		}
 
 	}
+
+	$(function(){
+		var fileReaderReady = ('FileReader' in window && 'FormData' in window);
+		if(!fileReaderReady){
+			webshims.addReady(function(context){
+				if(!fileReaderReady && !modules.filereader.loaded && context.querySelector('input.ws-filereader')){
+					webshims.reTest(['filereader']);
+					fileReaderReady = true;
+				}
+			});
+		}
+	});
 
 	webshims.addReady(function(context, contextElem){
 		$(context.querySelectorAll('.ws-custom-file')).add($(contextElem).filter('.ws-custom-file')).each(customFile);

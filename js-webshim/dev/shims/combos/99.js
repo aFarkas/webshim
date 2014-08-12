@@ -596,6 +596,7 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 							if(!e){
 								e.type = 'playing';
 							}
+
 							if(isInitial && (!isYt || !hasYtBug || e.type == 'playing' || data.media.prop('readyState') > 1)){
 								isInitial = false;
 								data.player.removeClass('initial-state');
