@@ -97,7 +97,6 @@ var isPlaceholderOptionSelected = function(select){
 };
 
 var emptyJ = $([]);
-//TODO: cache + perftest
 var getGroupElements = function(elem){
 	elem = $(elem);
 	var name, form;
@@ -167,7 +166,7 @@ var validityRules = {
 $.each({tooShort: ['minLength', -1], tooLong: ['maxLength', 1]}, function(name, props){
 	validityRules[name] = function(input, val, cache){
 		//defaultValue is not the same as dirty flag, but very similiar
-		if(cache.nodeName == 'select' || input.prop('defaultValue') == val){return false;}
+		if(!val || cache.nodeName == 'select' || input.prop('defaultValue') == val){return false;}
 
 		cacheType(cache, input[0]);
 
