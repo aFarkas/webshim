@@ -1,6 +1,6 @@
 {
 	"name": "webshims",
-	"version": "1.15.0-RC1",
+	"version": "1.15.0-RC2",
 	"title": "Webshim - polyfills jQuery with many HTML5 features",
 	"licenses" : [
 		{
@@ -16,7 +16,7 @@
 		"url": "https://github.com/aFarkas/"
 	},
 	
-	"keywords": ["webshims", "polyfill", "HTML5", "forms", "FormData", "Promises", "Promise", "matchMedia", "responsive", "XHR2", "xhr2", "CORS", "cross-doamin", "file", "upload", "multiple", "progress", "AJAX", "form", "audio", "video", "validation", "formvalidation", "colorpicker", "input", "form", "slider", "canvas", "geolocation", "ui", "widgets", "datepicker", "timepicker", "slider", "range"],
+	"keywords": ["webshims", "polyfill", "HTML5", "forms", "FormData", "Promises", "Promise", "matchMedia", "responsive", "XHR2", "xhr2", "CORS", "cross-doamin", "file", "upload", "multiple", "progress", "AJAX", "form", "audio", "video", "validation", "formvalidation", "colorpicker", "input", "form", "slider", "canvas", "geolocation", "ui", "widgets", "datepicker", "timepicker", "slider", "range", "webshim", "getUserMedia", "usermedia", "camera"],
 	"homepage": "http://afarkas.github.io/webshim/demos/index.html",
 	"description": "modular capability-based polyfill loading libary, which extends jQuery with HTML5 features in legacy browsers",
 	"docs": "http://afarkas.github.io/webshim/demos/index.html",

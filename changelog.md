@@ -1,3 +1,14 @@
+upcomming Release 1.15.0
+----------
+
+- implemented ``getUserMedia`` feature ([demo](http://jsfiddle.net/trixta/yC2j3/embedded/result/))
+- fixed data-grouprequired bug
+- improved youtube iframe lazy loading
+- added ``canvas.toBlob`` in browsers without native FormData (to be used with FormData/FileReader shim)
+- improved loading of xhr2/filereader feature
+- update es6-shim
+- improved youtube play bug on iOS and Android browsers
+
 Release 1.14.6
 ----------
 

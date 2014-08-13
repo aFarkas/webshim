@@ -1,6 +1,6 @@
 {
   "name": "webshim",
-  "version": "1.15.0-RC1",
+  "version": "1.15.0-RC2",
   "title": "Webshims - polyfills jQuery with many HTML5 features",
   "licenses": [
     {
@@ -25,7 +25,8 @@
     "localstorage",
     "geolocation",
     "ui",
-    "widgets"
+    "widgets",
+	"getUserMedia"
   ],
   "homepage": "http://afarkas.github.com/webshim/demos/index.html",
   "description": "modular capability-based polyfill loading libary, which extends jQuery with HTML5 features in legacy browsers",

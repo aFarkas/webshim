@@ -26,6 +26,7 @@ Features
 * geolocation
 * ECMAScript 5 / JavaScript 1.8.5 features
 * window.URL
+* getUserMedia ('usermedia' currently only access to user's camera, not microphone)
 
 
 Installation and Usage

@@ -1,6 +1,6 @@
 {
   "name": "webshim",
-  "version": "1.15.0-RC1",
+  "version": "1.15.0-RC2",
   "homepage": "https://github.com/aFarkas/webshim",
   "authors": [
     "aFarkas <info@corrupt-system.de>"
@@ -24,7 +24,8 @@
     "canvas",
     "HTML5",
     "UI",
-    "geolocation"
+    "geolocation",
+	"getUserMedia"
   ],
   "license": "MIT",
   "ignore": [
