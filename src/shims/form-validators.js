@@ -281,7 +281,9 @@ webshims.ready('form-validation', function(){
 			data.grouprequired.checkboxes
 				.off('click.groupRequired')
 				.on('click.groupRequired', function(){
-					$(elem).trigger('updatevalidation.webshims');
+					if((data.customMismatchedRule == 'grouprequired') == this.checked){
+						$(elem).trigger('updatevalidation.webshims');
+					}
 				})
 			;
 
