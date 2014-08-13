@@ -8,6 +8,8 @@ var loadYTAPI = function(){
 	}
 	loadYTAPI = $.noop;
 };
+var modern = window.Modernizr;
+var assumeYTBug = (!modern || !modern.videoautoplay) && /iP(hone|od|ad)|android/i.test(navigator.userAgent);
 window.onYouTubePlayerAPIReady = function() {
 	ytAPI.resolve();
 	loadYTAPI = $.noop;
@@ -51,7 +53,6 @@ var getSetProps = {
 	volume: 1,
 	muted: false
 };
-var getSetPropKeys = Object.keys(getSetProps);
 
 var playerStateObj = $.extend({
 	isActive: 'html5',
@@ -746,8 +747,12 @@ mediaelement.createSWF = function(mediaElem, src, data){
 				var data = getYtDataFromElem(this);
 				if(data){
 					if(data._ytAPI && data._ytAPI[ytName]){
-						data._ytAPI[ytName]();
-						handlePlayPauseState(name, data);
+						if(assumeYTBug && !data.readyState && !data.networkState && data._ppFlag === undefined){
+							webshims.warn('youtube video play needs to be directly activated by user, if you use a video overlay set pointer-events to none.');
+						} else {
+							data._ytAPI[ytName]();
+							handlePlayPauseState(name, data);
+						}
 					}
 				} else {
 					return mediaSup[name].prop._supvalue.apply(this, arguments);

@@ -475,7 +475,8 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 	})();
 	var ios = /iP(hone|od|ad)/i.test(navigator.platform);
 	var ios6 = ios && parseInt(((navigator.appVersion).match(/OS (\d+)_\d+/) || ['','8'])[1], 10) < 7;
-	var hasYtBug = (!window.Modernizr || !Modernizr.videoautoplay) && (ios || /android/i.test(navigator.userAgent));
+	var modern = window.Modernizr;
+	var hasYtBug = (!modern || !modern.videoautoplay) && (ios || /android/i.test(navigator.userAgent));
 	var loadLazy = function(){
 		if(!loadLazy.loaded){
 			loadLazy.loaded = true;
@@ -597,7 +598,7 @@ webshims.register('jmebase', function($, webshims, window, doc, undefined){
 								e.type = 'playing';
 							}
 
-							if(isInitial && (!isYt || !hasYtBug || e.type == 'playing' || data.media.prop('readyState') > 1)){
+							if(isInitial && (!isYt || !hasYtBug || e.type == 'playing' || data.media.prop('readyState') || data.media.prop('networkState'))){
 								isInitial = false;
 								data.player.removeClass('initial-state');
 							}

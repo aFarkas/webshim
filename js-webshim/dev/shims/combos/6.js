@@ -2641,7 +2641,8 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 
 	(function(){
 		var picker = {};
-		var assumeVirtualKeyBoard = (window.Modernizr && (Modernizr.touchevents || Modernizr.touch)) || (/android|iphone|ipad|ipod|blackberry|iemobile/i.test(navigator.userAgent.toLowerCase()));
+		var modern = window.Modernizr;
+		var assumeVirtualKeyBoard = (modern && (modern.touchevents || modern.touch)) || (/android|iphone|ipad|ipod|blackberry|iemobile/i.test(navigator.userAgent.toLowerCase()));
 		webshims.inlinePopover = {
 			_create: function(){
 				this.element = $('<div class="ws-inline-picker"><div class="ws-po-box" /></div>').data('wspopover', this);
