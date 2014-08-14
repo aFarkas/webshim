@@ -365,7 +365,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				this._shadowAdded = true;
 			}
 
-			element = $(element || this.options.prepareFor).getNativeElement() ;
+			element = $(element || this.options.prepareFor).getNativeElement();
 
 			var that = this;
 			var closeOnOutSide = function(e){
@@ -972,7 +972,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 
 
 		$.data(this, 'wsCustomFile', {showSelected: showSelected});
-		$('button', $module).attr('tabindex', '-1');
+		$('button:not(.ws-capture-button)', $module).attr('tabindex', '-1');
 
 		$file
 			.on('change.webshim', showSelected)

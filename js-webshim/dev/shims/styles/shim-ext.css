@@ -5,7 +5,8 @@
   top: -999999px;
 }
 
-.ws-po-box button, .ws-custom-file > button {
+.ws-po-box button, .ws-custom-file > button,
+.ws-capture-file > button {
   display: inline-block;
   overflow: visible;
   position: relative;
@@ -21,11 +22,13 @@
   line-height: inherit;
   touch-action: none;
 }
-.ws-po-box button::-moz-focus-inner, .ws-custom-file > button::-moz-focus-inner {
+.ws-po-box button::-moz-focus-inner, .ws-custom-file > button::-moz-focus-inner,
+.ws-capture-file > button::-moz-focus-inner {
   border: 0;
   padding: 0;
 }
-.ws-po-box button[disabled], .ws-custom-file > button[disabled] {
+.ws-po-box button[disabled], .ws-custom-file > button[disabled],
+.ws-capture-file > button[disabled] {
   cursor: default;
   color: #888;
 }
@@ -587,17 +590,22 @@ summary.summary-has-focus {
   outline-offset: -1px;
 }
 
-.ws-custom-file {
+.ws-custom-file,
+.ws-capture-file {
   position: relative;
   overflow: hidden;
 }
 .ws-custom-file > button,
-.ws-custom-file > input {
+.ws-custom-file > input,
+.ws-capture-file > button,
+.ws-capture-file > input {
   box-sizing: border-box;
   cursor: pointer;
 }
 .ws-custom-file > button,
-.ws-custom-file > .ws-file-value {
+.ws-custom-file > .ws-file-value,
+.ws-capture-file > button,
+.ws-capture-file > .ws-file-value {
   position: relative;
   z-index: 0;
   display: inline-block;
@@ -607,39 +615,17 @@ summary.summary-has-focus {
   color: #333;
   transition: 400ms all;
 }
-.ws-custom-file > button {
+.ws-custom-file > button,
+.ws-capture-file > button {
   margin-right: 0.4em;
   float: left;
 }
+
 .ws-custom-file .ws-file-value {
   display: block;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-.ws-custom-file:hover > button, .ws-custom-file.ws-mouseenter > button,
-.ws-custom-file > input[type="file"]:focus ~ button {
-  background: #fff;
-  border-color: #999;
-  background: #eeeeee linear-gradient(transparent, rgba(0, 0, 0, 0.05) 40%, rgba(0, 0, 0, 0.1));
-}
-.ws-custom-file:hover > .ws-file-value, .ws-custom-file.ws-mouseenter > .ws-file-value,
-.ws-custom-file > input[type="file"]:focus ~ .ws-file-value {
-  border-color: #999;
-}
-.ws-custom-file.ws-active > button,
-.ws-custom-file > input[type="file"]:active ~ button {
-  border-color: #000;
-}
-.ws-custom-file.ws-active > .ws-file-value,
-.ws-custom-file > input[type="file"]:active ~ .ws-file-value {
-  border-color: #000;
-}
-.ws-custom-file > input[type="file"][disabled] ~ .ws-file-value,
-.ws-custom-file > input[type="file"][disabled] ~ button {
-  border-color: #bbb;
-  background: #eee;
-  color: #999;
 }
 .ws-custom-file > input[type="file"],
 .ws-custom-file .ws-coverfile {
@@ -679,6 +665,30 @@ summary.summary-has-focus {
 }
 .ws-custom-file > .moxie-shim {
   z-index: 20;
+}
+.ws-custom-file:hover > button, .ws-custom-file.ws-mouseenter > button,
+.ws-custom-file > input[type="file"]:focus ~ button {
+  background: #fff;
+  border-color: #999;
+  background: #eeeeee linear-gradient(transparent, rgba(0, 0, 0, 0.05) 40%, rgba(0, 0, 0, 0.1));
+}
+.ws-custom-file:hover > .ws-file-value, .ws-custom-file.ws-mouseenter > .ws-file-value,
+.ws-custom-file > input[type="file"]:focus ~ .ws-file-value {
+  border-color: #999;
+}
+.ws-custom-file.ws-active > button,
+.ws-custom-file > input[type="file"]:active ~ button {
+  border-color: #000;
+}
+.ws-custom-file.ws-active > .ws-file-value,
+.ws-custom-file > input[type="file"]:active ~ .ws-file-value {
+  border-color: #000;
+}
+.ws-custom-file > input[type="file"][disabled] ~ .ws-file-value,
+.ws-custom-file > input[type="file"][disabled] ~ button {
+  border-color: #bbb;
+  background: #eee;
+  color: #999;
 }
 
 /* style picker api */

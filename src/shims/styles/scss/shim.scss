@@ -602,7 +602,8 @@ summary.summary-has-focus {
 	outline-offset: -1px;
 }
 
-.ws-custom-file {
+.ws-custom-file,
+.ws-capture-file {
 	position: relative;
 	overflow: hidden;
 
@@ -632,45 +633,14 @@ summary.summary-has-focus {
 		margin-right: 0.4em;
 		float: left;
 	}
+}
 
+.ws-custom-file {
 	.ws-file-value {
 		display: block;
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
-	}
-
-	&:hover > button,
-	&.ws-mouseenter > button,
-	> input[type="file"]:focus ~ button {
-		background: #fff;
-		border-color: #999;
-		background: #eee linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.05) 40%, rgba(0, 0, 0, 0.1));
-	}
-
-
-	&:hover > .ws-file-value,
-	&.ws-mouseenter > .ws-file-value,
-	> input[type="file"]:focus ~ .ws-file-value {
-		border-color: #999;
-	}
-
-	&.ws-active > button,
-	> input[type="file"]:active ~ button {
-		border-color: #000;
-	}
-
-
-	&.ws-active > .ws-file-value,
-	> input[type="file"]:active ~ .ws-file-value {
-		border-color: #000;
-	}
-
-	> input[type="file"][disabled] ~ .ws-file-value,
-	> input[type="file"][disabled] ~ button {
-		border-color: #bbb;
-		background: #eee;
-		color: #999;
 	}
 
 	> input[type="file"],
@@ -716,5 +686,38 @@ summary.summary-has-focus {
 
 	> .moxie-shim {
 		z-index: 20;
+	}
+
+	&:hover > button,
+	&.ws-mouseenter > button,
+	> input[type="file"]:focus ~ button {
+		background: #fff;
+		border-color: #999;
+		background: #eee linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.05) 40%, rgba(0, 0, 0, 0.1));
+	}
+
+
+	&:hover > .ws-file-value,
+	&.ws-mouseenter > .ws-file-value,
+	> input[type="file"]:focus ~ .ws-file-value {
+		border-color: #999;
+	}
+
+	&.ws-active > button,
+	> input[type="file"]:active ~ button {
+		border-color: #000;
+	}
+
+
+	&.ws-active > .ws-file-value,
+	> input[type="file"]:active ~ .ws-file-value {
+		border-color: #000;
+	}
+
+	> input[type="file"][disabled] ~ .ws-file-value,
+	> input[type="file"][disabled] ~ button {
+		border-color: #bbb;
+		background: #eee;
+		color: #999;
 	}
 }

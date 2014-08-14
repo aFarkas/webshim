@@ -2,10 +2,10 @@ webshim.register('mediacapture', function($, webshim, window, document, undefine
 	"use strict";
 	var hasCamera = -1;
 	var checkCameras = $.noop;
-	var sel = 'input[type="file"][accept*="image"]';
+	var sel = 'input[type="file"].ws-filereader, input[type="file"].ws-capture';
 	var cameraListPromise = $.Deferred();
 
-	//webshim.loader.addModule('mediacapture-picker');
+	//
 
 	(function(){
 		var tmp;
@@ -81,8 +81,37 @@ webshim.register('mediacapture', function($, webshim, window, document, undefine
 			resolve();
 		}
 	})();
-	var _createPhotoPicker = function(){
+	var loadPicker = function(){
+		webshim.ready('WINDOWLOAD', function(){
+			webshim.loader.loadList(['mediacapture-picker']);
+		});
+		loadPicker = $.noop;
+	};
 
+
+	var _createPhotoPicker = function(){
+		if($(this).is('[capture].ws-filereader, .ws-capture') && webshim.implement(this, 'capture')){
+			var $wrapper, $customFile;
+			var $fileinput = $(this);
+			var $button = $('<button type="button" class="ws-capture-button">photo</button>');
+			var popover = webshim.objectCreate(webshim.wsPopover, {}, $.extend({prepareFor: $button}));
+			popover.element.addClass('capture-popover input-picker');
+
+			if($fileinput.is('.ws-custom-file > *')){
+				$customFile = $fileinput.closest('.ws-custom-file');
+				$wrapper = $('<div class="ws-capture-file" />').insertAfter($customFile);
+				$wrapper.append($button).append($customFile);
+			} else {
+				$fileinput.before($button);
+			}
+			popover.element.insertAfter($button);
+
+			$button.on('click', function(){
+				webshim.mediacapture.showContent($fileinput, $button, popover);
+				popover.show();
+			});
+			loadPicker();
+		}
 	};
 	var createPhotoPicker = function (){
 		var elem = this;
@@ -93,14 +122,31 @@ webshim.register('mediacapture', function($, webshim, window, document, undefine
 		});
 	};
 
+	webshim.mediacapture = {
+		showContent: function($fileinput, $button, popover){
+			webshim.loader.loadList(['mediacapture-picker']);
+			webshim.ready('mediacapture-picker', function(){
+				webshim.mediacapture.showContent($fileinput, $button, popover);
+			});
+		}
+	};
+	webshim.defineNodeNamesBooleanProperty('input', 'capture');
+
 	if(hasCamera){
 
 		cameraListPromise.done(function(){
 			createPhotoPicker = _createPhotoPicker;
+			webshim.loader.addModule('mediacapture-picker', {
+				noAutoCallback: true,
+				css: 'styles/forms-picker.css',
+				options: featureOptions
+			});
+
 		});
+
 		webshim.addReady(function(context, insertedElement){
 			$(sel, context).add(insertedElement.filter(sel))
-				.filter('.ws-filereader, .ws-capture')
+				.filter('[accept*="image"], :not([accept]), [accept=""]')
 				.each(createPhotoPicker)
 			;
 		});

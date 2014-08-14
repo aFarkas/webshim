@@ -977,7 +977,7 @@
 		d: ['url', 'mediaelement', DOMSUPPORT]
 	});
 	//>
-	
+
 	//<canvas
 	(function(){
 		addPolyfill('canvas', {

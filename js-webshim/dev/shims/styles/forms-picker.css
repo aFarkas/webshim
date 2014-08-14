@@ -439,3 +439,23 @@ SASS:
 }
 
 /* helper classes to hide show/hide specific picker features */
+.capture-popover .ws-po-box {
+  padding-left: 0.30769em;
+  padding-right: 0.30769em;
+}
+
+.ws-videocapture-view {
+  position: relative;
+  height: 0;
+  width: 100%;
+  padding-bottom: 70%;
+}
+.ws-videocapture-view .ws-video-overlay,
+.ws-videocapture-view video,
+.ws-videocapture-view .polyfill-video {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}

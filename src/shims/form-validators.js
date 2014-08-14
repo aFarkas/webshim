@@ -261,8 +261,8 @@ webshims.ready('form-validation', function(){
 		if(!val || !pattern){return;}
 		return !(new RegExp('(' + pattern + ')', 'i').test(val));
 	}, 'This format is not allowed here.');
-	
-	if(!('tooShort' in ($('<input />').prop('validity') || {}))){
+
+	if($('<input />').prop('minLength') === undefined || !('tooShort' in ($('<input />').prop('validity') || {}))){
 		addCustomValidityRule('tooShort', function(elem, val){
 			var minlength;
 			if(!val || val == elem.defaultValue || !(minlength = elem.getAttribute('minlength'))){return;}
