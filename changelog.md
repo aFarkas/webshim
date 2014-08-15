@@ -1,4 +1,4 @@
-upcomming Release 1.15.0
+Release 1.15.0
 ----------
 
 - implemented ``getUserMedia`` feature ([demo](http://jsfiddle.net/trixta/yC2j3/embedded/result/))
