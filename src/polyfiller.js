@@ -158,20 +158,6 @@
 				$.extend(true, webCFG, name);
 			}
 		},
-		getLazyFn: function(fn, modules){
-			var load = function(){
-				loadList(modules);
-			};
-			onReady('WINDOWLOAD', load);
-			return function(){
-				var args = arguments;
-				var obj = this;
-				load();
-				onReady(modules, function(){
-					obj[fn].apply(obj, args);
-				});
-			};
-		},
 		_getAutoEnhance: getAutoEnhance,
 		addPolyfill: function(name, cfg){
 			cfg = cfg || {};
@@ -225,7 +211,7 @@
 				if(hasFormsExt && $.inArray('forms', features) == -1){
 					features.push('forms');
 					if(WSDEBUG){
-						webshims.error('need to load forms feature to use forms-ext feature.');
+						webshims.warn('need to load forms feature to use forms-ext feature.');
 					}
 				}
 				if(webCFG.loadStyles){
@@ -1227,11 +1213,25 @@
 	//>
 	
 	//<filereader
-
-	addPolyfill('filereader', {
-		test: 'FileReader' in window && 'FormData' in window,
+	var supportFileReader = 'FileReader' in window && 'FormData' in window;
+	addPolyfill('filereader-xhr', {
+		f: 'filereader',
+		test: supportFileReader,
 		d: [DOMSUPPORT, 'swfmini'],
 		c: [25, 27]
+	});
+
+	addPolyfill('canvas-blob', {
+		f: 'filereader',
+		methodNames: ['toBlob'],
+		test: !(supportFileReader && !create('canvas').toBlob)
+	});
+	//>
+
+	//<mediacapture
+	addPolyfill('mediacapture', {
+		test: 'capture' in create('input'),
+		d: ['swfmini', 'usermedia', DOMSUPPORT, 'filereader', 'forms', 'canvas']
 	});
 	//>
 	

@@ -64,11 +64,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	webshims.assumeARIA = true;
 	
 	if($('<input type="email" />').attr('type') == 'text' || $('<form />').attr('novalidate') === "" || ('required' in $('<input />')[0].attributes)){
-		webshims.error("IE browser modes are busted in IE10+. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
-	}
-	
-	if('debug' in webshims){
-		webshims.error('Use webshims.setOptions("debug", true||false||"noCombo"); to debug flag');
+		webshims.error("IE browser modes are busted in IE10+. Make sure to run IE in edge mode (X-UA-Compatible). Please test your HTML/CSS/JS with a real IE version or at least IETester or similar tools. ");
 	}
 	
 	if (!webshims.cfg.no$Switch) {
@@ -1234,7 +1230,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	
 })();
 });
-;webshim.register('filereader', function($, webshim, window, document, undefined, featureOptions){
+;webshim.register('filereader-xhr', function($, webshim, window, document, undefined, featureOptions){
 	"use strict";
 	var mOxie, moxie, hasXDomain;
 	var sel = 'input[type="file"].ws-filereader, input[type="file"].ws-capture';
@@ -1602,58 +1598,62 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 	});
 
-	webshim.defineNodeNameProperty('canvas', 'toBlob', {
-		prop: {
-			value: function(cb, type, qualitiy){
-				var dataURL;
+	if(!document.createElement('canvas').toBlob){
 
-				if(!type){
-					type = 'image/jpeg';
-				}
-				if(type == 'image/jpeg' && !qualitiy){
-					qualitiy = 0.8;
-				}
-				dataURL = $(this).callProp('getAsDataURL', [type, qualitiy]);
-				loadMoxie();
+		webshim.defineNodeNameProperty('canvas', 'toBlob', {
+			prop: {
+				value: function(cb, type, qualitiy){
+					var dataURL;
+					var $canvas = $(this);
+					if(!type){
+						type = 'image/jpeg';
+					}
+					if(type == 'image/jpeg' && !qualitiy){
+						qualitiy = 0.8;
+					}
+					loadMoxie();
+					setTimeout(function(){
+						dataURL = $canvas.callProp('getAsDataURL', [type, qualitiy]);
+						webshim.ready('moxie', function(){
+							var img = new mOxie.Image();
 
-				webshim.ready('moxie', function(){
-					var img = new mOxie.Image();
+							img.onload = function() {
+								var blob = img.getAsBlob();
+								webshim.defineProperty(blob, '_wsDataURL', {
+									value: dataURL,
+									enumerable: false
+								});
+								cb(blob);
+							};
+							img.load(dataURL);
 
-					img.onload = function() {
-						var blob = img.getAsBlob();
-						webshim.defineProperty(blob, '_wsDataURL', {
-							value: dataURL,
-							enumerable: false
 						});
-						cb(blob);
-					};
-					img.load(dataURL);
-
-				});
+					}, 9);
+				}
 			}
-		}
-	});
+		});
 
-	webshim.ready('url', function(){
-		var _nativeCreateObjectURL = URL.createObjectURL;
-		var _nativeRevokeObjectURL = URL.revokeObjectURL;
+		webshim.ready('url', function(){
+			var _nativeCreateObjectURL = URL.createObjectURL;
+			var _nativeRevokeObjectURL = URL.revokeObjectURL;
 
-		URL.createObjectURL = function(obj){
-			var url = obj;
-			if(obj._wsimgDataURL) {
-				url = obj._wsimgDataURL;
-			} else if(_nativeCreateObjectURL){
-				return _nativeCreateObjectURL.apply(this, arguments);
-			}
-			return url;
-		};
+			URL.createObjectURL = function(obj){
+				var url = obj;
+				if(obj._wsimgDataURL) {
+					url = obj._wsimgDataURL;
+				} else if(_nativeCreateObjectURL){
+					return _nativeCreateObjectURL.apply(this, arguments);
+				}
+				return url;
+			};
 
-		URL.revokeObjectURL = function(url){
-			if (_nativeRevokeObjectURL){
-				return _nativeRevokeObjectURL.apply(this, arguments);
-			}
-		};
-	});
+			URL.revokeObjectURL = function(url){
+				if (_nativeRevokeObjectURL){
+					return _nativeRevokeObjectURL.apply(this, arguments);
+				}
+			};
+		});
+	}
 
 	window.FileReader = notReadyYet;
 	window.FormData = notReadyYet;
