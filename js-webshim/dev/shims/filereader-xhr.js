@@ -1,4 +1,4 @@
-webshim.register('filereader', function($, webshim, window, document, undefined, featureOptions){
+webshim.register('filereader-xhr', function($, webshim, window, document, undefined, featureOptions){
 	"use strict";
 	var mOxie, moxie, hasXDomain;
 	var sel = 'input[type="file"].ws-filereader, input[type="file"].ws-capture';
@@ -366,58 +366,62 @@ webshim.register('filereader', function($, webshim, window, document, undefined,
 		}
 	});
 
-	webshim.defineNodeNameProperty('canvas', 'toBlob', {
-		prop: {
-			value: function(cb, type, qualitiy){
-				var dataURL;
+	if(!document.createElement('canvas').toBlob){
 
-				if(!type){
-					type = 'image/jpeg';
-				}
-				if(type == 'image/jpeg' && !qualitiy){
-					qualitiy = 0.8;
-				}
-				dataURL = $(this).callProp('getAsDataURL', [type, qualitiy]);
-				loadMoxie();
+		webshim.defineNodeNameProperty('canvas', 'toBlob', {
+			prop: {
+				value: function(cb, type, qualitiy){
+					var dataURL;
+					var $canvas = $(this);
+					if(!type){
+						type = 'image/jpeg';
+					}
+					if(type == 'image/jpeg' && !qualitiy){
+						qualitiy = 0.8;
+					}
+					loadMoxie();
+					setTimeout(function(){
+						dataURL = $canvas.callProp('getAsDataURL', [type, qualitiy]);
+						webshim.ready('moxie', function(){
+							var img = new mOxie.Image();
 
-				webshim.ready('moxie', function(){
-					var img = new mOxie.Image();
+							img.onload = function() {
+								var blob = img.getAsBlob();
+								webshim.defineProperty(blob, '_wsDataURL', {
+									value: dataURL,
+									enumerable: false
+								});
+								cb(blob);
+							};
+							img.load(dataURL);
 
-					img.onload = function() {
-						var blob = img.getAsBlob();
-						webshim.defineProperty(blob, '_wsDataURL', {
-							value: dataURL,
-							enumerable: false
 						});
-						cb(blob);
-					};
-					img.load(dataURL);
-
-				});
+					}, 9);
+				}
 			}
-		}
-	});
+		});
 
-	webshim.ready('url', function(){
-		var _nativeCreateObjectURL = URL.createObjectURL;
-		var _nativeRevokeObjectURL = URL.revokeObjectURL;
+		webshim.ready('url', function(){
+			var _nativeCreateObjectURL = URL.createObjectURL;
+			var _nativeRevokeObjectURL = URL.revokeObjectURL;
 
-		URL.createObjectURL = function(obj){
-			var url = obj;
-			if(obj._wsimgDataURL) {
-				url = obj._wsimgDataURL;
-			} else if(_nativeCreateObjectURL){
-				return _nativeCreateObjectURL.apply(this, arguments);
-			}
-			return url;
-		};
+			URL.createObjectURL = function(obj){
+				var url = obj;
+				if(obj._wsimgDataURL) {
+					url = obj._wsimgDataURL;
+				} else if(_nativeCreateObjectURL){
+					return _nativeCreateObjectURL.apply(this, arguments);
+				}
+				return url;
+			};
 
-		URL.revokeObjectURL = function(url){
-			if (_nativeRevokeObjectURL){
-				return _nativeRevokeObjectURL.apply(this, arguments);
-			}
-		};
-	});
+			URL.revokeObjectURL = function(url){
+				if (_nativeRevokeObjectURL){
+					return _nativeRevokeObjectURL.apply(this, arguments);
+				}
+			};
+		});
+	}
 
 	window.FileReader = notReadyYet;
 	window.FormData = notReadyYet;

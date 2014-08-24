@@ -691,6 +691,34 @@ summary.summary-has-focus {
   color: #999;
 }
 
+.ws-sticky {
+  top: auto;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto;
+  position: static;
+  position: -webkit-sticky;
+  position: -moz-sticky;
+  position: -ms-sticky;
+  position: -o-sticky;
+  position: sticky;
+}
+
+.ws-sticky-on {
+  position: fixed;
+}
+
+.ws-fixedsticky-placeholder {
+  padding: 0;
+  border: 0;
+  margin: 0;
+  display: none;
+}
+
+.ws-sticky-on + .ws-fixedsticky-placeholder {
+  display: block;
+}
+
 /* style picker api */
 /* how to use: 
 *

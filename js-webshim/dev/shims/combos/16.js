@@ -287,11 +287,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	webshims.assumeARIA = true;
 	
 	if($('<input type="email" />').attr('type') == 'text' || $('<form />').attr('novalidate') === "" || ('required' in $('<input />')[0].attributes)){
-		webshims.error("IE browser modes are busted in IE10+. Please test your HTML/CSS/JS with a real IE version or at least IETester or similiar tools");
-	}
-	
-	if('debug' in webshims){
-		webshims.error('Use webshims.setOptions("debug", true||false||"noCombo"); to debug flag');
+		webshims.error("IE browser modes are busted in IE10+. Make sure to run IE in edge mode (X-UA-Compatible). Please test your HTML/CSS/JS with a real IE version or at least IETester or similar tools. ");
 	}
 	
 	if (!webshims.cfg.no$Switch) {
@@ -906,7 +902,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				handler: (function(){
 					var evt;
 					var trigger = function(){
-						$(document).triggerHandler('updateshadowdom');
+						$(document).triggerHandler('updateshadowdom', [evt]);
+
+						evt = null;
 					};
 					var timed = function(){
 						if(evt.type == 'resize'){
@@ -930,7 +928,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						} else {
 							setTimeout(trigger, 0);
 						}
-						evt = null;
 					};
 					return function(e){
 						clearTimeout(resizeTimer);

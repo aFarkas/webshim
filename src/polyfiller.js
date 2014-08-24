@@ -929,6 +929,12 @@
 	});
 	//>
 
+	//<sticky
+	addPolyfill('sticky', {
+		test: $(create('div')).attr('style', 'position: -webkit-sticky; position: sticky').css('position').indexOf('sticky') != -1
+	});
+	//>
+
 	//<es6
 	addPolyfill('es6', {
 		test: !!(Math.imul && Number.MIN_SAFE_INTEGER && Object.is && window.Promise && Promise.all),// && window.Map && Map.prototype && typeof Map.prototype.forEach !== 'function' && window.Set

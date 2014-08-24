@@ -902,7 +902,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				handler: (function(){
 					var evt;
 					var trigger = function(){
-						$(document).triggerHandler('updateshadowdom');
+						$(document).triggerHandler('updateshadowdom', [evt]);
+
+						evt = null;
 					};
 					var timed = function(){
 						if(evt.type == 'resize'){
@@ -926,7 +928,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						} else {
 							setTimeout(trigger, 0);
 						}
-						evt = null;
 					};
 					return function(e){
 						clearTimeout(resizeTimer);
