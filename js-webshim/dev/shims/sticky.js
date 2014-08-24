@@ -56,7 +56,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 		stickys++;
 
 		this.evtid = '.wsstickyid' + uid;
-		this.$el = $(dom).data('wsSticky', this);
+		this.$el = $(dom).addClass('ws-sticky').data('wsSticky', this);
 		this.$parent = this.$el.parent();
 		this.elStyle = dom.style;
 
@@ -288,6 +288,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 	};
 
 	if (!support.sticky && support.fixed) {
+		$(document).on('wssticky', addSticky);
 		$(function(){
 			webshim.addReady(function(context, insertedElement){
 				$('.ws-sticky', context).add(insertedElement.filter('.ws-sticky')).each(addSticky);

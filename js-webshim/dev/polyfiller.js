@@ -931,7 +931,8 @@
 
 	//<sticky
 	addPolyfill('sticky', {
-		test: $(create('div')).attr('style', 'position: -webkit-sticky; position: sticky').css('position').indexOf('sticky') != -1
+		test: (($(create('b')).attr('style', 'position: -webkit-sticky; position: sticky').css('position') || '').indexOf('sticky') != -1),
+		d: ['es5']
 	});
 	//>
 
