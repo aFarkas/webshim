@@ -1,7 +1,3 @@
-/**
- * this polyfill is based on https://github.com/filamentgroup/fixed-sticky, but it's heavily optimized
- */
-
 webshim.register('sticky', function($, webshim, window, document, undefined){
 
 	"use strict";
@@ -56,7 +52,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 		stickys++;
 
 		this.evtid = '.wsstickyid' + uid;
-		this.$el = $(dom).addClass('ws-sticky').data('wsSticky', this);
+		this.$el = $(dom).data('wsSticky', this);
 		this.$parent = this.$el.parent();
 		this.elStyle = dom.style;
 
@@ -98,7 +94,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 				$(document).off(that.evtid);
 
 				that.$el.off(that.evtid);
-				that.$el.removeData('wsSticky');
+				that.$el.removeData('wsSticky').removeClass('ws-sticky');
 
 				if (that.$placeholder) {
 					that.$el.removeClass('ws-sticky-on');
@@ -112,12 +108,15 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 				that.update(true);
 			});
 
+			this.$el.on('changesticky'+ this.evtid, function(){
+				that.trashPosition(true);
+			});
+
 		},
 		hasOverflowVisibleContainer: function(){
 			return (this.$parent.css('overflowY') || this.$parent.css('overflow') || 'visible') == 'visible';
 		},
 		trashPosition: function(){
-
 			if(this.isSticky){
 				this.removeSticky();
 			}
@@ -185,10 +184,10 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 			}
 
 			if(!noPos){
-				this.updatePos();
+				this.updatePos(true);
 			}
 		},
-		updatePos: function () {
+		updatePos: function (fromDimension) {
 
 			var offset, shouldSticky, shouldMoveWith;
 			var scroll = getWinScroll();
@@ -196,7 +195,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 				offset = scroll + this.position.top;
 				if(this.elTop < offset && offset - (this.elMargins + 9) <= this.parentBottom){
 					shouldMoveWith = offset + this.elOuterHeight - this.parentBottom + this.elMargins;
-					if(shouldMoveWith > 0){
+					if(shouldMoveWith >= 0){
 						shouldMoveWith *= -1;
 					} else {
 						shouldMoveWith = false;
@@ -212,7 +211,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 					offset + (this.elMargins + 9) >= this.viewportTopAnker){
 					shouldSticky =  true;
 					shouldMoveWith = offset - this.elMargins - this.viewportTopAnker - this.elOuterHeight;
-					if(shouldMoveWith > 0){
+					if(shouldMoveWith >= 0){
 						shouldMoveWith = false;
 					}
 				}
@@ -222,16 +221,17 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 				if (!this.isSticky) {
 
 					//updateDimension before layout trashing
-					this.updateDimension(true);
+					if(!fromDimension){
+						this.updateDimension(true);
+					}
 
 					if (!this.$placeholder) {
 						this.$placeholder = this.$el
 							.clone()
 							.addClass('ws-fixedsticky-placeholder')
-							.insertAfter(this.$el)
 						;
 					}
-					this.$placeholder.outerHeight(this.elOuterHeight);
+					this.$placeholder.insertAfter(this.$el).outerHeight(this.elOuterHeight);
 
 					this.isSticky = true;
 					this.$el.addClass('ws-sticky-on');
@@ -258,6 +258,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 				top: this.inlineTop || '',
 				bottom: this.inlineBottom || ''
 			});
+			this.$placeholder.detach();
 			this.isSticky = false;
 		},
 		update: function (full) {
@@ -282,13 +283,16 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 
 	var addSticky = function(){
 		if(!$.data(this, 'wsSticky')){
+			$(this).addClass('ws-sticky');
 			new Sticky(this);
 			loadDomSupport();
 		}
 	};
 
 	if (!support.sticky && support.fixed) {
-		$(document).on('wssticky', addSticky);
+		$(document).on('wssticky', function(e){
+			addSticky.call(e.target);
+		});
 		$(function(){
 			webshim.addReady(function(context, insertedElement){
 				$('.ws-sticky', context).add(insertedElement.filter('.ws-sticky')).each(addSticky);
@@ -296,5 +300,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 		});
 	}
 
-
+	if(document.readyState == 'complete'){
+		webshim.isReady('WINDOWLOAD', true);
+	}
 });
