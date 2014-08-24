@@ -709,12 +709,14 @@ summary.summary-has-focus {
 }
 
 .ws-fixedsticky-placeholder {
+  position: static !important;
+  display: none !important;
+  visibility: hidden !important;
   padding: 0;
-  border: 0;
+  border: none;
   margin: 0;
-  display: none;
 }
 
 .ws-sticky-on + .ws-fixedsticky-placeholder {
-  display: block;
+  display: block !important;
 }

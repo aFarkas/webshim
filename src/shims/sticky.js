@@ -7,6 +7,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 	"use strict";
 
 	var uid = 0;
+	var stickys = 0;
 	var $window = $(window);
 
 	function getCssValue(property, value, noPrefixes) {
@@ -21,6 +22,13 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 		}
 
 		return mStyle[ property ];
+	}
+
+	function getPos() {
+		return {
+			top: $.css(this, 'top'),
+			bottom: $.css(this, 'bottom')
+		};
 	}
 
 	var getWinScroll = (function () {
@@ -45,17 +53,22 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 	function Sticky(dom) {
 
 		uid++;
+		stickys++;
 
-		this.evtid = '.stickyid' + uid;
+		this.evtid = '.wsstickyid' + uid;
 		this.$el = $(dom).data('wsSticky', this);
 		this.$parent = this.$el.parent();
+		this.elStyle = dom.style;
 
 
 		this.ankered = '';
 		this.isSticky = false;
 		this.$placeholder = null;
+
+		this.testParentOverflow();
 		this.addEvents();
 		this.update(true);
+
 	}
 
 	Sticky.prototype = {
@@ -68,7 +81,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 
 			$window
 				.on('scroll' + this.evtid, function () {
-					if (that.$el[0].offsetWidth) {
+					if (that.ankered && that.$el[0].offsetWidth) {
 						that.updatePos();
 					}
 				})
@@ -77,18 +90,19 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 
 			$(document).on('updateshadowdom' + this.evtid, update);
 
-
-
 			this.$el.on('remove'+ this.evtid+' destroysticky'+ this.evtid, function () {
 				$window.off(that.evtid);
 				$(document).off(that.evtid);
 
-				this.$el.off(that.evtid);
+				that.$el.off(that.evtid);
+				that.$el.removeData('wsSticky');
 
 				if (that.$placeholder) {
 					that.$el.removeClass('ws-sticky-on');
 					that.$placeholder.remove();
 				}
+
+				stickys--;
 			});
 
 			this.$el.on('updatesticky'+ this.evtid, function(){
@@ -96,84 +110,155 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 			});
 
 		},
+		testParentOverflow: function(){
+			var overflow = this.$parent.css('overflowY') || this.$parent.css('overflow') || 'visible';
+			if(overflow !== 'visible'){
+				this.scrollMode = 'element';
+				this.$scrollContainer = this.$parent;
+			} else {
+				this.scrollMode = 'window';
+				this.getScrollTop = getWinScroll;
+				this.$scrollContainer = $window;
+			}
+		},
+		getScrollTop: function(){
+			return this.$parent[0].scrollTop;
+		},
+		trashPosition: function(){
+			var wasMoving = this.isMoving;
+			this.isMoving = false;
+			this.getPosition();
+			this.isMoving = wasMoving;
+			this.updateDimension(true);
+			this.updatePos();
+		},
 		getPosition: function () {
-			this.position = {
-				top: this.$el.css('top'),
-				bottom: this.$el.css('bottom')
-			};
 
-			if (this.position.top !== 'auto' || this.position.top !== 'auto') {
-				this.position = $.swap(this.$el[0], {position: 'absolute'}, function () {
-					return {
-						top: $(this).css('top'),
-						bottom: $(this).css('bottom')
-					};
-				});
+			if(!this.isMoving){
+				this.position = {
+					top: this.$el.css('top'),
+					bottom: this.$el.css('bottom')
+				};
+
+				if (!this.isSticky && (
+					(this.position.top != 'auto' && this.position.bottom != 'auto') ||
+						this.position.top == 'auto' && this.position.bottom == 'auto')) {
+					this.position = $.swap(this.$el[0], {position: 'absolute'}, getPos);
+				}
+
+				if (this.position.top !== 'auto') {
+					delete this.position.bottom;
+					this.ankered = 'top';
+				} else if (this.position.bottom !== 'auto') {
+					delete this.position.top;
+					this.ankered = 'bottom';
+				}
+
+				if(this.ankered == 'top'){
+					this.position.top = parseFloat(this.position.top, 10) || 0;
+				} else if(this.ankered == 'bottom'){
+					this.position.bottom = parseFloat(this.position.bottom, 10) || 0;
+				}
+
+				this.inlineTop = this.elStyle.top;
+				this.inlineBottom = this.elStyle.bottom;
 			}
-
-			if (this.position.top !== 'auto') {
-				this.position.top = parseFloat(this.position.top, 10) || 0;
-				delete this.position.bottom;
-				this.ankered = 'top';
-			} else if (this.position.bottom !== 'auto') {
-				this.position.bottom = parseFloat(this.position.bottom, 10) || 0;
-				delete this.position.top;
-				this.ankered = 'bottom';
-			}
-
 		},
 		updateDimension: function (full) {
-			this.height = this.$el.outerHeight();
-			this.parentOffset = this.$parent.offset().top;
+			this.elOuterHeight = this.$el.outerHeight();
+			var parentOffset = this.$parent.offset().top;
 
-			if (this.ankered == 'bottom') {
-				this.viewportHeight = $window.height();
-			} else {
-				this.parentHeight = this.$parent.outerHeight();
-			}
+
 
 			if (!this.isSticky) {
 				this.elTop = this.$el.offset().top;
 				this.elWidth = this.$el.width();
-			} else if(full && this.$parent.innerWidth() < this.elWidth){
-				this.$el.removeClass('ws-sticky-on');
-				this.$el.css('width', this.elOldWidth || '');
-				this.elTop = this.$el.offset().top;
-				this.elWidth = this.$el.width();
-				this.$el.addClass('ws-sticky-on');
-				this.$el.css('width', this.elWidth);
+				this.inlineWidth = this.elStyle.width;
+			} else if(this.$parent.innerWidth() < this.elWidth){
+				this.elWidth = this.$el.width(this.$placeholder.width()).width();
+			}
+
+
+			if (this.ankered == 'bottom') {
+				this.viewportBottomAnker = $window.height() - this.position.bottom;
+				this.viewportTopAnker = parentOffset + (parseFloat(this.$parent.css('borderTopWidth'), 10) || 0) + (parseFloat(this.$parent.css('paddingTop'), 10) || 0);
+				this.elBottom = this.elTop + this.elOuterHeight;
+			} else {
+				this.parentBottom = parentOffset + this.$parent.innerHeight() - (parseFloat(this.$parent.css('paddingBottom'), 10) || 0)  + (parseFloat(this.$parent.css('borderBottomWidth'), 10) || 0);
 			}
 		},
 		updatePos: function () {
 
-			var offset, shouldSticky;
-			var scroll = getWinScroll();
+			var offset, shouldSticky, shouldMoveWith;
+			var scroll = this.getScrollTop();
 
 			if (this.ankered == 'top') {
 				offset = scroll + this.position.top;
-				shouldSticky = this.elTop < offset && offset + this.height <= this.parentOffset + this.parentHeight;
+				if(this.elTop < offset && offset - 9 <= this.parentBottom){
+					shouldMoveWith = offset + this.elOuterHeight - this.parentBottom;
+					if(shouldMoveWith > 0){
+						shouldMoveWith *= -1;
+					} else {
+						shouldMoveWith = false;
+					}
 
+					shouldSticky =  true;
+				}
 			} else if (this.ankered == 'bottom') {
-				shouldSticky = (this.elTop + this.height > scroll + this.viewportHeight - this.position.bottom &&
-					scroll + this.viewportHeight - this.position.bottom >= this.parentOffset + this.height)
+				offset = scroll + this.viewportBottomAnker;
+
+
+				if(this.elBottom > offset &&
+					offset >= this.viewportTopAnker){
+					shouldSticky =  true;
+					shouldMoveWith = offset - this.viewportTopAnker - this.elOuterHeight;
+					if(shouldMoveWith > 0){
+						shouldMoveWith = false;
+					}
+				}
 			}
 
 			if (shouldSticky) {
 				if (!this.isSticky) {
+
+					//updateDimension before layout trashing
+					this.updateDimension();
+
+					if (!this.$placeholder) {
+						this.$placeholder = this.$el
+							.clone()
+							.addClass('ws-fixedsticky-placeholder')
+							.insertAfter(this.$el)
+						;
+					}
+					this.$placeholder.outerHeight(this.elOuterHeight);
+
 					this.isSticky = true;
 					this.$el.addClass('ws-sticky-on');
+
 					if(this.elWidth != this.$el.width()){
-						this.elOldWidth = this.$el[0].style.width;
+
 						this.$el.width(this.elWidth);
 					}
-					if (!this.$placeholder) {
-						this.$placeholder = $('<span class="ws-fixedsticky-placeholder" />').insertAfter(this.$el).css('height', this.height);
+				}
+				if(shouldMoveWith){
+					this.isMoving = true;
+					if(this.ankered == 'top'){
+						this.elStyle.top = this.position.top + shouldMoveWith +'px';
+					} else if(this.ankered == 'bottom'){
+						this.elStyle.bottom = this.position.bottom + shouldMoveWith +'px';
 					}
 				}
 			} else if (this.isSticky) {
-				this.isSticky = false;
+
 				this.$el.removeClass('ws-sticky-on');
-				this.$el.css('width', this.elOldWidth || '');
+				this.$el.css({
+					width: this.inlineWidth || '',
+					top: this.inlineTop || '',
+					bottom: this.inlineBottom || ''
+				});
+				this.isSticky = false;
+				this.isMoving = false;
 			}
 		},
 		update: function (full) {
