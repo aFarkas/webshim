@@ -159,7 +159,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 			if(this.isSticky){
 				this.removeSticky();
 			}
-			var elMargins;
+
 			var parentOffset = this.$parent.offset().top;
 			this.elOuterHeight = this.$el.outerHeight();
 
@@ -169,10 +169,10 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 			this.inlineWidth = this.elStyle.width;
 
 			if(this.ankered == 'top'){
-				this.elMargins = ( parseFloat(this.$el.css('marginTop'), 10) || 0);
+				this.elMargins = ( parseFloat(this.$el.css('borderTopWidth'), 10) || 0) + ( parseFloat(this.$el.css('marginTop'), 10) || 0);
 				this.elTop -= this.elMargins;
 			} else {
-				this.elMargins = ( parseFloat(this.$el.css('marginBottom'), 10) || 0);
+				this.elMargins = ( parseFloat(this.$el.css('borderBottomWidth'), 10) || 0) + ( parseFloat(this.$el.css('marginBottom'), 10) || 0);
 				this.elTop += this.elMargins;
 			}
 
@@ -195,7 +195,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 			if (this.ankered == 'top') {
 				offset = scroll + this.position.top;
 				if(this.elTop < offset && offset - (this.elMargins + 9) <= this.parentBottom){
-					shouldMoveWith = offset + this.elOuterHeight - this.parentBottom;
+					shouldMoveWith = offset + this.elOuterHeight - this.parentBottom + this.elMargins;
 					if(shouldMoveWith > 0){
 						shouldMoveWith *= -1;
 					} else {
@@ -211,7 +211,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 				if(this.elBottom > offset &&
 					offset + (this.elMargins + 9) >= this.viewportTopAnker){
 					shouldSticky =  true;
-					shouldMoveWith = offset - this.viewportTopAnker - this.elOuterHeight;
+					shouldMoveWith = offset - this.elMargins - this.viewportTopAnker - this.elOuterHeight;
 					if(shouldMoveWith > 0){
 						shouldMoveWith = false;
 					}
@@ -241,7 +241,6 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 					}
 				}
 				if(shouldMoveWith){
-					this.isMoving = true;
 					if(this.ankered == 'top'){
 						this.elStyle.top = this.position.top + shouldMoveWith +'px';
 					} else if(this.ankered == 'bottom'){
@@ -260,7 +259,6 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 				bottom: this.inlineBottom || ''
 			});
 			this.isSticky = false;
-			this.isMoving = false;
 		},
 		update: function (full) {
 			if (this.$el[0].offsetWidth || !this.ankered) {
