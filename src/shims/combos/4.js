@@ -680,11 +680,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					var evt;
 					var trigger = function(){
 						$(document).triggerHandler('updateshadowdom', [evt]);
-
-						evt = null;
 					};
 					var timed = function(){
-						if(evt.type == 'resize'){
+						if(evt && evt.type == 'resize'){
 							var width = $window.width();
 							var height = $window.width();
 
@@ -695,7 +693,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 							lastWidth = width;
 						}
 
-						if(evt.type != 'docresize'){
+						if(evt && evt.type != 'docresize'){
 							docObserve.height = docObserve.getHeight();
 							docObserve.width = docObserve.getWidth();
 						}

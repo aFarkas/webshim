@@ -65,9 +65,12 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 		this.isSticky = false;
 		this.$placeholder = null;
 
-		this.testParentOverflow();
-		this.addEvents();
-		this.update(true);
+		if(this.hasOverflowVisibleContainer()){
+			this.addEvents();
+			this.update(true);
+		} else {
+			webshim.warn('we currently only support sticky with overflow visible containers');
+		}
 
 	}
 
@@ -110,37 +113,25 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 			});
 
 		},
-		testParentOverflow: function(){
-			var overflow = this.$parent.css('overflowY') || this.$parent.css('overflow') || 'visible';
-			if(overflow !== 'visible'){
-				this.scrollMode = 'element';
-				this.$scrollContainer = this.$parent;
-			} else {
-				this.scrollMode = 'window';
-				this.getScrollTop = getWinScroll;
-				this.$scrollContainer = $window;
-			}
-		},
-		getScrollTop: function(){
-			return this.$parent[0].scrollTop;
+		hasOverflowVisibleContainer: function(){
+			return (this.$parent.css('overflowY') || this.$parent.css('overflow') || 'visible') == 'visible';
 		},
 		trashPosition: function(){
-			var wasMoving = this.isMoving;
-			this.isMoving = false;
-			this.getPosition();
-			this.isMoving = wasMoving;
-			this.updateDimension(true);
-			this.updatePos();
+
+			if(this.isSticky){
+				this.removeSticky();
+			}
+			this.update(true);
 		},
 		getPosition: function () {
 
-			if(!this.isMoving){
+			if(!this.isSticky){
 				this.position = {
 					top: this.$el.css('top'),
 					bottom: this.$el.css('bottom')
 				};
 
-				if (!this.isSticky && (
+				if ((
 					(this.position.top != 'auto' && this.position.bottom != 'auto') ||
 						this.position.top == 'auto' && this.position.bottom == 'auto')) {
 					this.position = $.swap(this.$el[0], {position: 'absolute'}, getPos);
@@ -164,37 +155,46 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 				this.inlineBottom = this.elStyle.bottom;
 			}
 		},
-		updateDimension: function (full) {
-			this.elOuterHeight = this.$el.outerHeight();
-			var parentOffset = this.$parent.offset().top;
-
-
-
-			if (!this.isSticky) {
-				this.elTop = this.$el.offset().top;
-				this.elWidth = this.$el.width();
-				this.inlineWidth = this.elStyle.width;
-			} else if(this.$parent.innerWidth() < this.elWidth){
-				this.elWidth = this.$el.width(this.$placeholder.width()).width();
+		updateDimension: function (noPos) {
+			if(this.isSticky){
+				this.removeSticky();
 			}
+			var elMargins;
+			var parentOffset = this.$parent.offset().top;
+			this.elOuterHeight = this.$el.outerHeight();
 
+
+			this.elTop = this.$el.offset().top;
+			this.elWidth = this.$el.width();
+			this.inlineWidth = this.elStyle.width;
+
+			if(this.ankered == 'top'){
+				this.elMargins = ( parseFloat(this.$el.css('marginTop'), 10) || 0);
+				this.elTop -= this.elMargins;
+			} else {
+				this.elMargins = ( parseFloat(this.$el.css('marginBottom'), 10) || 0);
+				this.elTop += this.elMargins;
+			}
 
 			if (this.ankered == 'bottom') {
 				this.viewportBottomAnker = $window.height() - this.position.bottom;
-				this.viewportTopAnker = parentOffset + (parseFloat(this.$parent.css('borderTopWidth'), 10) || 0) + (parseFloat(this.$parent.css('paddingTop'), 10) || 0);
+				this.viewportTopAnker = parentOffset + (parseFloat(this.$parent.css('borderTopWidth'), 10) || 0) + (parseFloat(this.$parent.css('paddingTop'), 10) || 0) + this.elMargins;
 				this.elBottom = this.elTop + this.elOuterHeight;
 			} else {
-				this.parentBottom = parentOffset + this.$parent.innerHeight() - (parseFloat(this.$parent.css('paddingBottom'), 10) || 0)  + (parseFloat(this.$parent.css('borderBottomWidth'), 10) || 0);
+				this.parentBottom = parentOffset + this.$parent.innerHeight() - (parseFloat(this.$parent.css('paddingBottom'), 10) || 0)  + (parseFloat(this.$parent.css('borderBottomWidth'), 10) || 0) - this.elMargins;
+			}
+
+			if(!noPos){
+				this.updatePos();
 			}
 		},
 		updatePos: function () {
 
 			var offset, shouldSticky, shouldMoveWith;
-			var scroll = this.getScrollTop();
-
+			var scroll = getWinScroll();
 			if (this.ankered == 'top') {
 				offset = scroll + this.position.top;
-				if(this.elTop < offset && offset - 9 <= this.parentBottom){
+				if(this.elTop < offset && offset - (this.elMargins + 9) <= this.parentBottom){
 					shouldMoveWith = offset + this.elOuterHeight - this.parentBottom;
 					if(shouldMoveWith > 0){
 						shouldMoveWith *= -1;
@@ -209,7 +209,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 
 
 				if(this.elBottom > offset &&
-					offset >= this.viewportTopAnker){
+					offset + (this.elMargins + 9) >= this.viewportTopAnker){
 					shouldSticky =  true;
 					shouldMoveWith = offset - this.viewportTopAnker - this.elOuterHeight;
 					if(shouldMoveWith > 0){
@@ -222,7 +222,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 				if (!this.isSticky) {
 
 					//updateDimension before layout trashing
-					this.updateDimension();
+					this.updateDimension(true);
 
 					if (!this.$placeholder) {
 						this.$placeholder = this.$el
@@ -237,7 +237,6 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 					this.$el.addClass('ws-sticky-on');
 
 					if(this.elWidth != this.$el.width()){
-
 						this.$el.width(this.elWidth);
 					}
 				}
@@ -250,24 +249,25 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 					}
 				}
 			} else if (this.isSticky) {
-
-				this.$el.removeClass('ws-sticky-on');
-				this.$el.css({
-					width: this.inlineWidth || '',
-					top: this.inlineTop || '',
-					bottom: this.inlineBottom || ''
-				});
-				this.isSticky = false;
-				this.isMoving = false;
+				this.removeSticky();
 			}
+		},
+		removeSticky: function(){
+			this.$el.removeClass('ws-sticky-on');
+			this.$el.css({
+				width: this.inlineWidth || '',
+				top: this.inlineTop || '',
+				bottom: this.inlineBottom || ''
+			});
+			this.isSticky = false;
+			this.isMoving = false;
 		},
 		update: function (full) {
 			if (this.$el[0].offsetWidth || !this.ankered) {
 				if (full) {
 					this.getPosition();
 				}
-				this.updateDimension(full);
-				this.updatePos(full);
+				this.updateDimension();
 			}
 		}
 	};
