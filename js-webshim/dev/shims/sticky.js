@@ -54,6 +54,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 
 		this.evtid = '.wsstickyid' + uid;
 		this.$el = $(dom).data('wsSticky', this);
+		this.isTable = this.$el.is('thead, tr, tbody');
 		this.$parent = this.$el.parent();
 		this.elStyle = dom.style;
 
@@ -154,8 +155,6 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 					this.position.bottom = parseFloat(this.position.bottom, 10) || 0;
 				}
 
-				this.inlineTop = this.elStyle.top;
-				this.inlineBottom = this.elStyle.bottom;
 			}
 		},
 		getStickyData: function(){
@@ -243,6 +242,9 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 							.addClass('ws-fixedsticky-placeholder')
 						;
 					}
+
+					this.setTdWidth();
+
 					this.$placeholder.insertAfter(this.$el).outerHeight(this.elOuterHeight);
 
 					this.isSticky = true;
@@ -264,11 +266,28 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 				this.removeSticky();
 			}
 		},
+		setTdWidth: function(){
+			if(this.isTable){
+				this.$el.find('td, th').each(this._setInlineWidth);
+			}
+		},
+		_setInlineWidth: function(){
+			$.data(this, 'inlineWidth', this.style.width);
+			$(this).width($(this).width());
+		},
+		_restoreInlineWidth: function(){
+			this.style.width = $.data(this, 'inlineWidth') || '';
+			$.removeData(this, 'inlineWidth');
+		},
 		removeSticky: function(){
 			this.$el.removeClass('ws-sticky-on');
 			this.$el.css(this.stickyData.inline);
 			this.$placeholder.detach();
 			this.isSticky = false;
+
+			if(this.isTable){
+				this.$el.find('td, th').each(this._restoreInlineWidth);
+			}
 		},
 		update: function (full) {
 			if (this.$el[0].offsetWidth || !this.ankered) {

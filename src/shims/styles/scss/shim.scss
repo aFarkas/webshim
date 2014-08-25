@@ -740,14 +740,14 @@ summary.summary-has-focus {
 }
 
 .ws-fixedsticky-placeholder {
-	position: static !important;
-	display: none !important;
+	position: absolute !important;
 	visibility: hidden !important;
 	padding: 0;
 	border: none;
 	margin: 0;
+	left: -999px;
 }
 
 .ws-sticky-on + .ws-fixedsticky-placeholder {
-	display: block !important;
+	position: static !important;
 }
