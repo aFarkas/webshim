@@ -36,7 +36,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 				return window[ prop ];
 			} :
 			((docElem = document.documentElement), function () {
-				return docElem.scrollTop();
+				return docElem.scrollTop;
 			})
 			;
 	})();
@@ -45,6 +45,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 		fixed: getCssValue('position', 'fixed', true),
 		sticky: getCssValue('position', 'sticky')
 	};
+
 
 	function Sticky(dom) {
 
@@ -60,6 +61,9 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 		this.ankered = '';
 		this.isSticky = false;
 		this.$placeholder = null;
+
+		this.stickyData = {inline: {}};
+		this.parentData = {};
 
 		if(this.hasOverflowVisibleContainer()){
 			this.addEvents();
@@ -154,47 +158,54 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 				this.inlineBottom = this.elStyle.bottom;
 			}
 		},
-		updateDimension: function (noPos) {
+		getStickyData: function(){
+			this.stickyData.top = this.$el.offset().top;
+
+			this.stickyData.scrollTop = this.stickyData.top - (parseFloat(this.$el.css('marginTop'), 10) || 0);
+			this.stickyData.outerHeight = this.$el.outerHeight(true);
+
+			this.stickyData.bottom = this.stickyData.top + this.stickyData.outerHeight - (parseFloat(this.$el.css('marginTop'), 10) || 0);
+
+			this.stickyData.width = this.$el.width();
+			this.stickyData.inline.width = this.elStyle.width;
+
+			if(this.ankered == 'top'){
+				this.stickyData.inline.top = this.elStyle.top;
+			} else if(this.ankered == 'bottom'){
+				this.stickyData.inline.bottom = this.elStyle.bottom;
+			}
+
+		},
+		getParentData: function(){
+
+			this.parentData.top = this.$parent.offset().top + (parseFloat(this.$parent.css('borderTopWidth'), 10) || 0) + (parseFloat(this.$parent.css('paddingTop'), 10) || 0);
+			this.parentData.height = this.$parent.height();
+			this.parentData.bottom = this.parentData.top + this.parentData.height;
+
+		},
+		updateDimension: function(fromPos){
 			if(this.isSticky){
 				this.removeSticky();
 			}
-
-			var parentOffset = this.$parent.offset().top;
-			this.elOuterHeight = this.$el.outerHeight();
-
-
-			this.elTop = this.$el.offset().top;
-			this.elWidth = this.$el.width();
-			this.inlineWidth = this.elStyle.width;
-
-			if(this.ankered == 'top'){
-				this.elMargins = ( parseFloat(this.$el.css('borderTopWidth'), 10) || 0) + ( parseFloat(this.$el.css('marginTop'), 10) || 0);
-				this.elTop -= this.elMargins;
-			} else {
-				this.elMargins = ( parseFloat(this.$el.css('borderBottomWidth'), 10) || 0) + ( parseFloat(this.$el.css('marginBottom'), 10) || 0);
-				this.elTop += this.elMargins;
-			}
+			this.getParentData();
+			this.getStickyData();
 
 			if (this.ankered == 'bottom') {
 				this.viewportBottomAnker = $window.height() - this.position.bottom;
-				this.viewportTopAnker = parentOffset + (parseFloat(this.$parent.css('borderTopWidth'), 10) || 0) + (parseFloat(this.$parent.css('paddingTop'), 10) || 0) + this.elMargins;
-				this.elBottom = this.elTop + this.elOuterHeight;
-			} else {
-				this.parentBottom = parentOffset + this.$parent.innerHeight() - (parseFloat(this.$parent.css('paddingBottom'), 10) || 0)  + (parseFloat(this.$parent.css('borderBottomWidth'), 10) || 0) - this.elMargins;
 			}
 
-			if(!noPos){
+			if(!fromPos){
 				this.updatePos(true);
 			}
 		},
-		updatePos: function (fromDimension) {
-
+		updatePos: function(fromDimension){
 			var offset, shouldSticky, shouldMoveWith;
 			var scroll = getWinScroll();
+
 			if (this.ankered == 'top') {
 				offset = scroll + this.position.top;
-				if(this.elTop < offset && offset - (this.elMargins + 9) <= this.parentBottom){
-					shouldMoveWith = offset + this.elOuterHeight - this.parentBottom + this.elMargins;
+				if(this.stickyData.scrollTop < offset && scroll - 9 <= this.parentData.bottom){
+					shouldMoveWith = (offset + this.stickyData.outerHeight) - this.parentData.bottom;
 					if(shouldMoveWith >= 0){
 						shouldMoveWith *= -1;
 					} else {
@@ -207,10 +218,11 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 				offset = scroll + this.viewportBottomAnker;
 
 
-				if(this.elBottom > offset &&
-					offset + (this.elMargins + 9) >= this.viewportTopAnker){
+				if(this.stickyData.bottom > offset &&
+					offset + 9 >= this.parentData.top){
 					shouldSticky =  true;
-					shouldMoveWith = offset - this.elMargins - this.viewportTopAnker - this.elOuterHeight;
+
+					shouldMoveWith = offset - this.parentData.top - this.stickyData.outerHeight;
 					if(shouldMoveWith >= 0){
 						shouldMoveWith = false;
 					}
@@ -236,8 +248,8 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 					this.isSticky = true;
 					this.$el.addClass('ws-sticky-on');
 
-					if(this.elWidth != this.$el.width()){
-						this.$el.width(this.elWidth);
+					if(this.stickyData.width != this.$el.width()){
+						this.$el.width(this.stickyData.width);
 					}
 				}
 				if(shouldMoveWith){
@@ -248,16 +260,13 @@ webshim.register('sticky', function($, webshim, window, document, undefined){
 					}
 				}
 			} else if (this.isSticky) {
+
 				this.removeSticky();
 			}
 		},
 		removeSticky: function(){
 			this.$el.removeClass('ws-sticky-on');
-			this.$el.css({
-				width: this.inlineWidth || '',
-				top: this.inlineTop || '',
-				bottom: this.inlineBottom || ''
-			});
+			this.$el.css(this.stickyData.inline);
 			this.$placeholder.detach();
 			this.isSticky = false;
 		},
