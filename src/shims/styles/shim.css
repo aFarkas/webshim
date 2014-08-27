@@ -702,21 +702,28 @@ summary.summary-has-focus {
   position: -ms-sticky;
   position: -o-sticky;
   position: sticky;
+  float: none !important;
+  margin-left: 0;
+  margin-right: 0;
 }
 
-.ws-sticky-on {
-  position: fixed;
+thead.ws-sticky,
+tbody.ws-sticky,
+tfoot.ws-sticky {
+  left: 0 !important;
+  right: 0 !important;
+}
+
+.ws-sticky.ws-sticky-on {
+  position: fixed !important;
 }
 
 .ws-fixedsticky-placeholder {
-  position: absolute !important;
+  position: static !important;
   visibility: hidden !important;
   padding: 0;
   border: none;
   margin: 0;
   left: -999px;
-}
-
-.ws-sticky-on + .ws-fixedsticky-placeholder {
-  position: static !important;
+  zoom: 1;
 }

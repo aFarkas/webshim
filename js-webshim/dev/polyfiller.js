@@ -932,7 +932,7 @@
 	//<sticky
 	addPolyfill('sticky', {
 		test: (($(create('b')).attr('style', 'position: -webkit-sticky; position: sticky').css('position') || '').indexOf('sticky') != -1),
-		d: ['es5']
+		d: ['es5', 'matchMedia']
 	});
 	//>
 
@@ -1235,13 +1235,15 @@
 	});
 	//>
 
+	/*
 	//<mediacapture
 	addPolyfill('mediacapture', {
 		test: 'capture' in create('input'),
 		d: ['swfmini', 'usermedia', DOMSUPPORT, 'filereader', 'forms', 'canvas']
 	});
 	//>
-	
+	*/
+
 	//<details
 	addPolyfill('details', {
 		test: ('open' in create('details')),
