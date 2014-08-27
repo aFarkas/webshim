@@ -693,6 +693,8 @@ summary.summary-has-focus {
 
 .ws-sticky {
   top: auto;
+  left: auto !important;
+  right: auto !important;
   bottom: auto;
   position: static;
   position: -webkit-sticky;
@@ -700,16 +702,20 @@ summary.summary-has-focus {
   position: -ms-sticky;
   position: -o-sticky;
   position: sticky;
+  float: none !important;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 thead.ws-sticky,
+tbody.ws-sticky,
 tfoot.ws-sticky {
   left: 0 !important;
   right: 0 !important;
 }
 
-.ws-sticky-on {
-  position: fixed;
+.ws-sticky.ws-sticky-on {
+  position: fixed !important;
 }
 
 .ws-fixedsticky-placeholder {
