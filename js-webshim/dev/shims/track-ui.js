@@ -175,7 +175,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 			track._lastFoundCue = {index: 0, time: 0};
 		}
 		
-		if(support.texttrackapi && !options.override && !track._shimActiveCues){
+		if(!track._shimActiveCues && support.texttrackapi && !options.override){
 			track._shimActiveCues = mediaelement.createCueList();
 		}
 		
@@ -232,7 +232,96 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 			}
 		}
 	};
-	
+	var filterTrackImplementation = function(){
+		return webshims.implement(this, 'trackui');
+	};
+	var implementTrackUi = function(){
+		var baseData, trackList, updateTimer, lastDelay;
+
+		var elem = $(this);
+		var getDisplayCues = function(e){
+			var track, time;
+			if(!trackList || !baseData){
+				trackList = elem.prop('textTracks');
+				baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
+				if(!baseData.displayedActiveCues){
+					baseData.displayedActiveCues = [];
+				}
+			}
+
+			if (!trackList){return;}
+			time = elem.prop('currentTime');
+
+			if(!time && time !== 0){return;}
+			lastDelay = baseData.nextUpdateDelay;
+			baseData.nextUpdateDelay = 0.26;
+			baseData.activeCues = [];
+			for(var i = 0, len = trackList.length; i < len; i++){
+				track = trackList[i];
+				if(track.mode != 'disabled' && track.cues && track.cues.length){
+					mediaelement.getActiveCue(track, elem, time, baseData);
+				}
+			}
+
+			trackDisplay.update(baseData, elem);
+
+			if(baseData.nextUpdateDelay < 0.26 && (e || lastDelay != baseData.nextUpdateDelay)){
+				lastDelay = baseData.nextUpdateDelay;
+				updateTimer = setTimeout(getDisplayCues, Math.ceil((baseData.nextUpdateDelay * 1000.5) + 17));
+			}
+		};
+
+		var addTrackView = function(){
+			if(!trackList) {
+				trackList = elem.prop('textTracks');
+			}
+			//as soon as change on trackList is implemented in all browsers we do not need to have 'updatetrackdisplay' anymore
+			$( [trackList] ).on('change', getDisplayCues);
+			elem
+				.off('.trackview')
+				.on('play.trackview timeupdate.trackview updatetrackdisplay.trackview', getDisplayCues)
+			;
+		};
+
+		elem.on('remove', function(e){
+			if(!e.originalEvent && baseData && baseData.trackDisplay){
+				setTimeout(function(){
+					baseData.trackDisplay.remove();
+				}, 4);
+			}
+		});
+
+		if(!usesNativeTrack()){
+			addTrackView();
+		} else {
+
+			if(elem.hasClass('nonnative-api-active')){
+				addTrackView();
+			}
+			elem
+				.on('mediaelementapichange trackapichange', function(){
+
+					if(!usesNativeTrack() || elem.hasClass('nonnative-api-active')){
+						addTrackView();
+					} else {
+						clearTimeout(updateTimer);
+
+						trackList = elem.prop('textTracks');
+						baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
+
+						$.each(trackList, function(i, track){
+							if(track._shimActiveCues){
+								delete track._shimActiveCues;
+							}
+						});
+						trackDisplay.hide(baseData);
+						elem.off('.trackview');
+					}
+				})
+			;
+		}
+	};
+
 	if(usesNativeTrack()){
 		(function(){
 			var block;
@@ -274,95 +363,8 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 	webshims.addReady(function(context, insertedElement){
 		$('video, audio', context)
 			.add(insertedElement.filter('video, audio'))
-			.filter(function(){
-				return webshims.implement(this, 'trackui');
-			})
-			.each(function(){
-				var baseData, trackList, updateTimer, lastDelay;
-				
-				var elem = $(this);
-				var getDisplayCues = function(e){
-					var track, time;
-					if(!trackList || !baseData){
-						trackList = elem.prop('textTracks');
-						baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
-						if(!baseData.displayedActiveCues){
-							baseData.displayedActiveCues = [];
-						}
-					}
-					
-					if (!trackList){return;}
-					time = elem.prop('currentTime');
-					
-					if(!time && time !== 0){return;}
-					lastDelay = baseData.nextUpdateDelay;
-					baseData.nextUpdateDelay = 0.26;
-					baseData.activeCues = [];
-					for(var i = 0, len = trackList.length; i < len; i++){
-						track = trackList[i];
-						if(track.mode != 'disabled' && track.cues && track.cues.length){
-							mediaelement.getActiveCue(track, elem, time, baseData);
-						}
-					}
-					
-					trackDisplay.update(baseData, elem);
-
-					if(baseData.nextUpdateDelay < 0.26 && (e || lastDelay != baseData.nextUpdateDelay)){
-						lastDelay = baseData.nextUpdateDelay;
-						updateTimer = setTimeout(getDisplayCues, Math.ceil((baseData.nextUpdateDelay * 1000.5) + 17));
-					}
-				};
-
-				var addTrackView = function(){
-					if(!trackList) {
-						trackList = elem.prop('textTracks');
-					}
-					//as soon as change on trackList is implemented in all browsers we do not need to have 'updatetrackdisplay' anymore
-					$( [trackList] ).on('change', getDisplayCues);
-					elem
-						.off('.trackview')
-						.on('play.trackview timeupdate.trackview updatetrackdisplay.trackview', getDisplayCues)
-					;
-				};
-				
-				elem.on('remove', function(e){
-					if(!e.originalEvent && baseData && baseData.trackDisplay){
-						setTimeout(function(){
-							baseData.trackDisplay.remove();
-						}, 4);
-					}
-				});
-				
-				if(!usesNativeTrack()){
-					addTrackView();
-				} else {
-					
-					if(elem.hasClass('nonnative-api-active')){
-						addTrackView();
-					}
-					elem
-						.on('mediaelementapichange trackapichange', function(){
-							
-							if(!usesNativeTrack() || elem.hasClass('nonnative-api-active')){
-								addTrackView();
-							} else {
-								clearTimeout(updateTimer);
-								
-								trackList = elem.prop('textTracks');
-								baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
-								
-								$.each(trackList, function(i, track){
-									if(track._shimActiveCues){
-										delete track._shimActiveCues;
-									}
-								});
-								trackDisplay.hide(baseData);
-								elem.off('.trackview');
-							}
-						})
-					;
-				}
-			})
+			.filter(filterTrackImplementation)
+			.each(implementTrackUi)
 		;
 	});
 });
