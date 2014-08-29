@@ -1747,7 +1747,11 @@
 				var lastCue = this.cues[this.cues.length-1];
 				if(lastCue && lastCue.startTime > cue.startTime){
 					webshims.error("cue startTime higher than previous cue's startTime");
+					return;
 				}
+			}
+			if(cue.startTime >= cue.endTime ){
+				webshim.error('startTime >= endTime of cue: '+ cue.text);
 			}
 			if(cue.track && cue.track.removeCue){
 				cue.track.removeCue(cue);

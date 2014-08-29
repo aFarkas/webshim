@@ -217,10 +217,14 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				}
 				$(track).triggerHandler('cuechange');
 				$(cue).triggerHandler('enter');
-				
+
 				track._lastFoundCue.time = time;
 				track._lastFoundCue.index = i;
-				
+
+				delay = cue.endTime - time;
+				if(baseData.nextUpdateDelay > delay){
+					baseData.nextUpdateDelay = delay;
+				}
 				
 			}
 			if(cue.startTime > time){
@@ -265,21 +269,25 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 
 			trackDisplay.update(baseData, elem);
 
-			if(baseData.nextUpdateDelay < 0.3 && (e || lastDelay != baseData.nextUpdateDelay)){
+			if(baseData.nextUpdateDelay < 0.3 && (e || lastDelay != baseData.nextUpdateDelay) && baseData.nextUpdateDelay > 0){
 				lastDelay = baseData.nextUpdateDelay;
-				updateTimer = setTimeout(getDisplayCues, Math.ceil((baseData.nextUpdateDelay * 1000) + 40));
+				setTimeout(getDisplayCues, Math.ceil((baseData.nextUpdateDelay * 1000) + 70));
 			}
 		};
-
+		var onUpdatCues = function(){
+			clearTimeout(updateTimer);
+			updateTimer = setTimeout(getDisplayCues, 17);
+		};
 		var addTrackView = function(){
 			if(!trackList) {
 				trackList = elem.prop('textTracks');
 			}
 			//as soon as change on trackList is implemented in all browsers we do not need to have 'updatetrackdisplay' anymore
-			$( [trackList] ).on('change', getDisplayCues);
+			$( [trackList] ).on('change', onUpdatCues);
 			elem
 				.off('.trackview')
-				.on('play.trackview timeupdate.trackview updatetrackdisplay.trackview', getDisplayCues)
+				.on('updatetrackdisplay.trackview', onUpdatCues)
+				.on('play.trackview timeupdate.trackview', getDisplayCues)
 			;
 		};
 
