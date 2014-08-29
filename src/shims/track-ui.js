@@ -254,7 +254,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 
 			if(!time && time !== 0){return;}
 			lastDelay = baseData.nextUpdateDelay;
-			baseData.nextUpdateDelay = 0.26;
+			baseData.nextUpdateDelay = 0.3;
 			baseData.activeCues = [];
 			for(var i = 0, len = trackList.length; i < len; i++){
 				track = trackList[i];
@@ -265,9 +265,9 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 
 			trackDisplay.update(baseData, elem);
 
-			if(baseData.nextUpdateDelay < 0.26 && (e || lastDelay != baseData.nextUpdateDelay)){
+			if(baseData.nextUpdateDelay < 0.3 && (e || lastDelay != baseData.nextUpdateDelay)){
 				lastDelay = baseData.nextUpdateDelay;
-				updateTimer = setTimeout(getDisplayCues, Math.ceil((baseData.nextUpdateDelay * 1000.5) + 17));
+				updateTimer = setTimeout(getDisplayCues, Math.ceil((baseData.nextUpdateDelay * 1000) + 40));
 			}
 		};
 
