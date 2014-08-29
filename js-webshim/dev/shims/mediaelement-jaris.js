@@ -1143,7 +1143,7 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 		}
 
 		CanvasRenderingContext2D.prototype.drawImage = function(elem){
-			var data, img, args, imgData;
+			var data, img, args, imgData, hadCachedImg;
 			var context = this;
 
 			if(isVideo[elem.nodeName] && (data = webshims.data(elem, 'mediaelement')) && data.isActive == 'third' && data.api.api_image){
@@ -1161,18 +1161,33 @@ webshims.register('mediaelement-jaris', function($, webshims, window, document, 
 				}
 
 				args = slice.call(arguments, 1);
-				img = new Image();
+
+				if(options.canvasSync && data.canvasImg){
+					args.unshift(data.canvasImg);
+					_drawImage.apply(context, args);
+					args = slice.call(arguments, 1);
+					hadCachedImg = true;
+				}
+
+				img = document.createElement('img');
 
 				//todo find a performant sync way
 				img.onload = function(){
 					args.unshift(this);
-					_drawImage.apply(context, args);
 					img.onload = null;
+
+					if(options.canvasSync){
+						data.canvasImg = img;
+						if(hadCachedImg && options.noDoubbleDraw){
+							return;
+						}
+					}
+					_drawImage.apply(context, args);
 				};
 
 				img.src = 'data:image/jpeg;base64,'+imgData;
 
-				if(img.complete){
+				if(img.complete && img.onload){
 					img.onload();
 				}
 				return;
