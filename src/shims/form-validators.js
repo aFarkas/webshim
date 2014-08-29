@@ -335,14 +335,14 @@ webshims.ready('form-validation', function(){
 	addCustomValidityRule('dependent', function(elem, val, data){
 		data = data.dependentValidation;
 		if( !data ){return;}
-		var specialVal;
 		var depFn = function(e){
 			var val = $.prop(data.masterElement, data["from-prop"]);
-			if(specialVal){
-				val = $.inArray(val, specialVal) !== -1;
-			}
-			if(data.toggle){
+			if(data.specialVal){
+				val = $.inArray(val, data.specialVal) !== -1;
+			} if(data.toggle){
 				val = !val;
+			} else {
+				val = !!val;
 			}
 			$.prop( elem, data.prop, val);
 			if(iValClasses && e){
@@ -373,14 +373,13 @@ webshims.ready('form-validation', function(){
 			}
 			
 			if(data["from-prop"].indexOf('value:') === 0){
-				specialVal = data["from-prop"].replace('value:', '').split('||');
+				data.specialVal = data["from-prop"].replace('value:', '').split('||');
 				data["from-prop"] = 'value';
-				
 			}
-			
+
 			data = $.data(elem, 'dependentValidation', $.extend({_init: true}, dependentDefaults, data));
 
-			if(data.prop !== "value" || specialVal){
+			if(data.prop !== "value" || data.specialVal){
 				$(data.masterElement.type === 'radio' && getGroupElements(data.masterElement) || data.masterElement).on('change', depFn);
 			} else {
 				$(data.masterElement).on('change', function(){
