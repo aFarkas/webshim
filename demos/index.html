@@ -105,6 +105,8 @@
 
 			<a class="toc_title" href="#Picturefill"> Responsive Images (<code>picture</code>, <code>srcset</code>)</a>
 
+			<a class="toc_title" href="#sticky"> sticky (<code>position</code>: <code>sticky</code>)</a>
+
 			<a class="toc_title" href="#Enhancement-Strategy">Webshim's opinionated enhancement cross browser / device development strategy</a>
 
 			<a class="toc_title" href="#Requirejs-setup">Setup with r.js or other JS optimization tasks</a>
@@ -237,7 +239,9 @@
 					<li>
 						usermedia (navigator.getUserMedia)
 					</li>
-
+					<li>
+						sticky (<code>position</code>: <code>sticky</code>)
+					</li>
 					<li>
 						track (subtitles, catptions and textTrack API)
 					</li>
@@ -569,7 +573,7 @@ fieldset > div {
 &lt;/div&gt;
 </code></pre>
 					<p>This could be also fixed by adding those styles to the polyfilled component:</p>
-<pre><code class="  language-css">/* do not use */
+<pre><code class="language-css">/* do not use */
 video {
 	margin: 0 10px 5px 0;
 	float: left;
@@ -1734,10 +1738,70 @@ webshim.polyfill('picture'):
 				<a href="http://scottjehl.github.io/picturefill/" target="_external">http://scottjehl.github.io/picturefill/</a>.</em>
 				Complete documentation is available there.
 			</p>
+			<h2 id="sticky">sticky (position: sticky)</h2>
+			<p>
+				The <code class="i">sticky</code> feature is a polyfill for the CSS <code>position</code> value <code>sticky</code> (<a href="http://jsfiddle.net/trixta/5kjrtLvw/embedded/result/">position sticky demo</a>).
+			</p>
+			<h3>Descriptive/Markup Usage</h3>
+			<p>Simply add the class <code>ws-sticky</code> to all elements, which should become sticky and define either a <code>top</code> or <code>bottom</code> value:</p>
+<pre><code class="language-markup">
+&lt;section&gt;
+	&lt;header class="ws-sticky"&gt;
+		&lt;!-- ... --&gt;
+	&lt;/header&gt;
+	&lt;!-- ... --&gt;
 
+	&lt;footer class="ws-sticky"&gt;
+		&lt;!-- ... --&gt;
+	&lt;/footer&gt;
+&lt;/section&gt;
+</code></pre>
+			<p>Sticky and responsive webdesign. The sticky position can be also used in conjunction with mediaqueries. Simply add a <code>data-stickymedia</code> attribute with your mediaquery to your element:</p>
 
+<pre><code class="language-markup">
+&lt;section&gt;
+	&lt;header class="ws-sticky" data-stickymedia="(max-width: 480px)"&gt;
+		&lt;!-- ... --&gt;
+	&lt;/header&gt;
+	&lt;!-- ... --&gt;
+&lt;/section&gt;
+</code></pre>
+			<h3>JS Usage</h3>
 
+			<p>Often you don't want to add the class 'ws-sticky' directly into your HTML, in this case you can use the JS-API. Simply trigger the event 'wssticky' on all elements, which should become sticky:</p>
+<pre><code class="language-javascript">
+$('table.long-table > thead')
+	.addClass('ws-sticky')
+	.trigger('wssticky')
+;
+</code></pre>
 
+			<p>Example with mediaqueries:</p>
+<pre><code class="language-javascript">
+$('table.long-table > thead')
+	.addClass('ws-sticky')
+	.data('stickymedia', '(max-width: 480px)')
+	.trigger('wssticky')
+;
+</code></pre>
+			<p>The stickyness of an element, can also be removed or updated with the JS API:</p>
+<pre><code class="language-javascript">
+//use destroysticky to remove sticky
+$('dl.list-view > dt')
+	.removeClass('ws-sticky')
+	.trigger('destroysticky')
+;
+
+//use updatesticky to remove sticky
+$('dl.list-view > dt').trigger('updatesticky');
+</code></pre>
+
+			<p>Webshim sticky implementation supports sticky in conjunction with either top or bottom properties and on most elements including table headers (thead) and table footer (tfoot). It also implements "local" sticky areas, where the parent element of the 'sticky element' has set the overflow value to 'auto/scroll'.</p>
+			<h3>Known restrictions:</h3>
+			<ul>
+				<li>Don't set the margin-left and margin-right value of the sticky element to 'auto'</li>
+				<li>The left and the right value of the sticky element has to be 'auto'.</li>
+			</ul>
 			<h2 id="Enhancement-Strategy">Webshim's opinionated enhancement cross browser development strategy</h2>
 			<p>Webshim has evolved form a general polyfill library to a sophisticated UI component / UI widget library which makes it easy to create scalable, responsive and highly adaptable websites and webapps.</p>
 			<p>While webshim polyfills older browsers and automatically fixes a lot of bugs, it enables the developer to also enhance even modern browsers with highly customizable widgets (datepicker, form validation, slider, autosuggest, custom stylable controls for video/audio).</p>
