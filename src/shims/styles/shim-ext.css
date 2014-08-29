@@ -710,8 +710,8 @@ summary.summary-has-focus {
 thead.ws-sticky,
 tbody.ws-sticky,
 tfoot.ws-sticky {
-  margin-left: -0.6px;
-  margin-right: -2.4px;
+  margin-left: -0.8px;
+  margin-right: -1px;
 }
 
 .ws-sticky.ws-sticky-on {
