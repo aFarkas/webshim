@@ -48,7 +48,10 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 	var usesNativeTrack =  function(){
 		return !options.override && support.texttrackapi;
 	};
-	
+	var requestAnimationFrame = window.cancelAnimationFrame && window.requestAnimationFrame || function(fn){
+		setTimeout(fn, 17);
+	};
+	var cancelAnimationFrame = window.cancelAnimationFrame || window.clearTimeout;
 	var trackDisplay = {
 		update: function(baseData, media){
 			if(!baseData.activeCues.length){
@@ -193,9 +196,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				$(track).triggerHandler('cuechange');
 				$(cue).triggerHandler('exit');
 
-				if(baseData.nextEvent == cue.endTime && baseData.nextUpdateDelay >= Number.MAX_VALUE){
-					baseData.nextEvent = Number.MAX_VALUE;
-				}
+
 			} else {
 				delay = cue.endTime - time;
 				if(baseData.nextUpdateDelay > delay){
@@ -247,9 +248,27 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 		return webshims.implement(this, 'trackui');
 	};
 	var implementTrackUi = function(){
-		var baseData, trackList, updateTimer, updateTimer2, lastDelay, delayPadding, lastTime;
+		var baseData, trackList, updateTimer, updateTimer2, lastDelay, lastTime;
 		var treshHold = 0.27;
 		var elem = $(this);
+		var recheckI = 0;
+		var recheckId;
+		var reCheck = function(){
+			recheckI++;
+
+			//if recheckI is over 30 video might be paused, stalled or waiting,
+			//in this case abort and wait for the next play, playing or timeupdate event
+			if(recheckI < 30){
+				if(elem.prop('currentTime') > baseData.nextEvent){
+					recheckI = undefined;
+					getDisplayCues();
+				} else {
+					recheckId = requestAnimationFrame(reCheck);
+				}
+			} else {
+				recheckI = undefined;
+			}
+		};
 		var getDisplayCues = function(e){
 			var track, time;
 			if(!trackList || !baseData){
@@ -279,19 +298,23 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 					mediaelement.getActiveCue(track, elem, time, baseData);
 				}
 			}
-
 			trackDisplay.update(baseData, elem);
+
+			clearTimeout(updateTimer);
 
 			if(baseData.nextUpdateDelay <= treshHold && (e || lastDelay != baseData.nextUpdateDelay) && baseData.nextUpdateDelay > 0){
 
 				lastDelay = baseData.nextUpdateDelay;
-				if(lastDelay < 0.01 || lastDelay > 0.17){
-					delayPadding = 34;
-				} else {
-					delayPadding = 68;
-				}
+
 				clearTimeout(updateTimer2);
-				updateTimer2 = setTimeout(getDisplayCues, (baseData.nextUpdateDelay * 1000) + delayPadding);
+
+				if(recheckId){
+					cancelAnimationFrame(recheckId);
+				}
+				recheckI = 0;
+				updateTimer2 = setTimeout(reCheck, Math.max((baseData.nextUpdateDelay * 1000) - 100, 0));
+			} else if(baseData.nextUpdateDelay >= Number.MAX_VALUE){
+				baseData.nextEvent = Number.MAX_VALUE;
 			}
 		};
 		var onUpdatCues = function(){
@@ -306,8 +329,8 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 			$( [trackList] ).on('change', onUpdatCues);
 			elem
 				.off('.trackview')
-				.on('updatetrackdisplay.trackview', onUpdatCues)
-				.on('play.trackview timeupdate.trackview', getDisplayCues)
+				.on('play.trackview playing.trackview updatetrackdisplay.trackview seeked.trackview', onUpdatCues)
+				.on('timeupdate.trackview', getDisplayCues)
 			;
 		};
 
@@ -333,6 +356,10 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 						addTrackView();
 					} else {
 						clearTimeout(updateTimer);
+						clearTimeout(updateTimer2);
+						if(recheckId){
+							cancelAnimationFrame(recheckId);
+						}
 
 						trackList = elem.prop('textTracks');
 						baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
