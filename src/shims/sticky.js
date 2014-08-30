@@ -62,10 +62,8 @@ webshim.register('sticky', function($, webshim, window, document, undefined, fea
 				}
 
 				if (this.position.top !== 'auto') {
-					delete this.position.bottom;
 					this.ankered = 'top';
 				} else if (this.position.bottom !== 'auto') {
-					delete this.position.top;
 					this.ankered = 'bottom';
 				}
 
@@ -418,6 +416,9 @@ webshim.register('sticky', function($, webshim, window, document, undefined, fea
 			} else if(this.ankered == 'bottom') {
 				add = Math.abs(this.position.bottom) + 9;
 				this.viewportBottomAnker = this.viewport - this.parentData.bottom;
+				this.compareBottom = this.stickyData.bottom + this.position.bottom;
+
+				this.addBottom = (this.parentData.bottom - this.parentData.paddingTop) - this.viewport;
 			}
 
 			this.viewPortMax = this.parentData.offsetBottom + add + 10;
@@ -437,7 +438,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined, fea
 					shouldSticky =  true;
 				}
 			} else if (this.ankered == 'bottom') {
-				if(scroll + this.parentData.height < this.stickyData.bottom){
+				if(scroll + this.parentData.height < this.compareBottom){
 					shouldSticky =  true;
 				}
 			}
@@ -473,7 +474,7 @@ webshim.register('sticky', function($, webshim, window, document, undefined, fea
 						this.elStyle.top = this.position.top + this.parentData.top - scrollTop +'px';
 					}
 				} else if(this.ankered == 'bottom'){
-					this.elStyle.bottom = this.position.bottom + (scrollTop - (this.parentData.bottom - this.viewport)) +'px';
+					this.elStyle.bottom = this.position.bottom + (scrollTop - this.addBottom) +'px';
 				}
 			}
 		}
