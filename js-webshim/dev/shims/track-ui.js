@@ -192,10 +192,15 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 
 				$(track).triggerHandler('cuechange');
 				$(cue).triggerHandler('exit');
+
+				if(baseData.nextEvent == cue.endTime && baseData.nextUpdateDelay >= Number.MAX_VALUE){
+					baseData.nextEvent = Number.MAX_VALUE;
+				}
 			} else {
 				delay = cue.endTime - time;
 				if(baseData.nextUpdateDelay > delay){
 					baseData.nextUpdateDelay = delay;
+					baseData.nextEvent = cue.endTime;
 				}
 				if(track.mode == 'showing' && showTracks[track.kind] && $.inArray(cue, baseData.activeCues) == -1){
 					baseData.activeCues.push(cue);
@@ -224,6 +229,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				delay = cue.endTime - time;
 				if(baseData.nextUpdateDelay > delay){
 					baseData.nextUpdateDelay = delay;
+					baseData.nextEvent = cue.endTime;
 				}
 				
 			}
@@ -231,6 +237,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				delay = cue.startTime - time;
 				if(baseData.nextUpdateDelay > delay){
 					baseData.nextUpdateDelay = delay;
+					baseData.nextEvent = cue.startTime;
 				}
 				break;
 			}
@@ -240,8 +247,8 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 		return webshims.implement(this, 'trackui');
 	};
 	var implementTrackUi = function(){
-		var baseData, trackList, updateTimer, lastDelay;
-
+		var baseData, trackList, updateTimer, updateTimer2, lastDelay, delayPadding, lastTime;
+		var treshHold = 0.27;
 		var elem = $(this);
 		var getDisplayCues = function(e){
 			var track, time;
@@ -257,8 +264,14 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 			time = elem.prop('currentTime');
 
 			if(!time && time !== 0){return;}
+
+			if(baseData.nextEvent && e && e.type == 'timeupdate' && time >= lastTime && baseData.nextEvent - time > treshHold && time - lastTime < 9){
+				return;
+			}
+
+			lastTime = time;
 			lastDelay = baseData.nextUpdateDelay;
-			baseData.nextUpdateDelay = 0.3;
+			baseData.nextUpdateDelay = Number.MAX_VALUE;
 			baseData.activeCues = [];
 			for(var i = 0, len = trackList.length; i < len; i++){
 				track = trackList[i];
@@ -269,9 +282,16 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 
 			trackDisplay.update(baseData, elem);
 
-			if(baseData.nextUpdateDelay < 0.3 && (e || lastDelay != baseData.nextUpdateDelay) && baseData.nextUpdateDelay > 0){
+			if(baseData.nextUpdateDelay <= treshHold && (e || lastDelay != baseData.nextUpdateDelay) && baseData.nextUpdateDelay > 0){
+
 				lastDelay = baseData.nextUpdateDelay;
-				setTimeout(getDisplayCues, Math.ceil((baseData.nextUpdateDelay * 1000) + 70));
+				if(lastDelay < 0.01 || lastDelay > 0.17){
+					delayPadding = 34;
+				} else {
+					delayPadding = 68;
+				}
+				clearTimeout(updateTimer2);
+				updateTimer2 = setTimeout(getDisplayCues, (baseData.nextUpdateDelay * 1000) + delayPadding);
 			}
 		};
 		var onUpdatCues = function(){

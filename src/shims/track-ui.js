@@ -48,7 +48,10 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 	var usesNativeTrack =  function(){
 		return !options.override && support.texttrackapi;
 	};
-	
+	var requestAnimationFrame = window.cancelAnimationFrame && window.requestAnimationFrame || function(fn){
+		setTimeout(fn, 17);
+	};
+	var cancelAnimationFrame = window.cancelAnimationFrame || window.clearTimeout;
 	var trackDisplay = {
 		update: function(baseData, media){
 			if(!baseData.activeCues.length){
@@ -192,10 +195,13 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 
 				$(track).triggerHandler('cuechange');
 				$(cue).triggerHandler('exit');
+
+
 			} else {
 				delay = cue.endTime - time;
 				if(baseData.nextUpdateDelay > delay){
 					baseData.nextUpdateDelay = delay;
+					baseData.nextEvent = cue.endTime;
 				}
 				if(track.mode == 'showing' && showTracks[track.kind] && $.inArray(cue, baseData.activeCues) == -1){
 					baseData.activeCues.push(cue);
@@ -224,6 +230,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				delay = cue.endTime - time;
 				if(baseData.nextUpdateDelay > delay){
 					baseData.nextUpdateDelay = delay;
+					baseData.nextEvent = cue.endTime;
 				}
 				
 			}
@@ -231,6 +238,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				delay = cue.startTime - time;
 				if(baseData.nextUpdateDelay > delay){
 					baseData.nextUpdateDelay = delay;
+					baseData.nextEvent = cue.startTime;
 				}
 				break;
 			}
@@ -240,9 +248,21 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 		return webshims.implement(this, 'trackui');
 	};
 	var implementTrackUi = function(){
-		var baseData, trackList, updateTimer, lastDelay;
-
+		var baseData, trackList, updateTimer, updateTimer2, lastDelay, delayPadding, lastTime;
+		var treshHold = 0.27;
 		var elem = $(this);
+		var recheckI = 0;
+		var recheckId;
+		var reCheck = function(){
+			recheckI++;
+			if(recheckI < 33){
+				if(elem.prop('currentTime') > baseData.nextEvent){
+					getDisplayCues();
+				} else {
+					recheckId = requestAnimationFrame(reCheck);
+				}
+			}
+		};
 		var getDisplayCues = function(e){
 			var track, time;
 			if(!trackList || !baseData){
@@ -257,8 +277,14 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 			time = elem.prop('currentTime');
 
 			if(!time && time !== 0){return;}
+
+			if(baseData.nextEvent && e && e.type == 'timeupdate' && time >= lastTime && baseData.nextEvent - time > treshHold && time - lastTime < 9){
+				return;
+			}
+
+			lastTime = time;
 			lastDelay = baseData.nextUpdateDelay;
-			baseData.nextUpdateDelay = 0.3;
+			baseData.nextUpdateDelay = Number.MAX_VALUE;
 			baseData.activeCues = [];
 			for(var i = 0, len = trackList.length; i < len; i++){
 				track = trackList[i];
@@ -269,9 +295,18 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 
 			trackDisplay.update(baseData, elem);
 
-			if(baseData.nextUpdateDelay < 0.3 && (e || lastDelay != baseData.nextUpdateDelay) && baseData.nextUpdateDelay > 0){
+			if(baseData.nextUpdateDelay <= treshHold && (e || lastDelay != baseData.nextUpdateDelay) && baseData.nextUpdateDelay > 0){
+
 				lastDelay = baseData.nextUpdateDelay;
-				setTimeout(getDisplayCues, Math.ceil((baseData.nextUpdateDelay * 1000) + 70));
+				recheckI = 0;
+				clearTimeout(updateTimer2);
+
+				if(recheckId){
+					cancelAnimationFrame(recheckId);
+				}
+				updateTimer2 = setTimeout(reCheck, Math.max((baseData.nextUpdateDelay * 1000) - 100, 0));
+			} else if(baseData.nextUpdateDelay >= Number.MAX_VALUE){
+				baseData.nextEvent = Number.MAX_VALUE;
 			}
 		};
 		var onUpdatCues = function(){
@@ -313,6 +348,10 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 						addTrackView();
 					} else {
 						clearTimeout(updateTimer);
+						clearTimeout(updateTimer2);
+						if(recheckId){
+							cancelAnimationFrame(recheckId);
+						}
 
 						trackList = elem.prop('textTracks');
 						baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
