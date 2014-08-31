@@ -172,8 +172,32 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 			return $.extend([], cueListProto);
 		};
 	}
+
+	function triggerCueEvent(cue, type, baseData, media, trackIndex){
+		var trackElem, compareTrack;
+		var cueChange = $.Event('cuechange');
+		if(!baseData.trackElements){
+			baseData.trackElements = media[0].getElementsByTagName('track');
+		}
+
+		trackElem = baseData.trackElements[trackIndex];
+
+		if(trackElem){
+			compareTrack = (webshims.data(trackElem, 'trackData') || {track: $.prop(trackElem, 'track')}).track;
+			if(compareTrack != cue.track){
+				trackElem = null;
+			}
+		}
+		$.event.trigger(cueChange, null, cue.track, true);
+
+		if(trackElem){
+			$.event.trigger(cueChange, null, trackElem, true);
+		}
+
+		$.event.trigger(type, null, cue, true);
+	}
 	
-	mediaelement.getActiveCue = function(track, media, time, baseData){
+	mediaelement.getActiveCue = function(track, media, time, baseData, trackIndex){
 		if(!track._lastFoundCue){
 			track._lastFoundCue = {index: 0, time: 0};
 		}
@@ -193,8 +217,8 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 					$(media).pause();
 				}
 
-				$(track).triggerHandler('cuechange');
-				$(cue).triggerHandler('exit');
+
+				triggerCueEvent(cue, 'exit', baseData, media, trackIndex);
 
 
 			} else {
@@ -221,8 +245,8 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				if(track.mode == 'showing' && showTracks[track.kind]){
 					baseData.activeCues.push(cue);
 				}
-				$(track).triggerHandler('cuechange');
-				$(cue).triggerHandler('enter');
+
+				triggerCueEvent(cue, 'enter', baseData, media, trackIndex);
 
 				track._lastFoundCue.time = time;
 				track._lastFoundCue.index = i;
@@ -248,7 +272,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 		return webshims.implement(this, 'trackui');
 	};
 	var implementTrackUi = function(){
-		var baseData, trackList, updateTimer, updateTimer2, lastDelay, lastTime;
+		var baseData, trackList, updateTimer, updateTimer2, lastDelay, lastTime, invalidTracksTimer;
 		var treshHold = 0.27;
 		var elem = $(this);
 		var recheckI = 0;
@@ -274,6 +298,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 			if(!trackList || !baseData){
 				trackList = elem.prop('textTracks');
 				baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
+
 				if(!baseData.displayedActiveCues){
 					baseData.displayedActiveCues = [];
 				}
@@ -295,7 +320,7 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 			for(var i = 0, len = trackList.length; i < len; i++){
 				track = trackList[i];
 				if(track.mode != 'disabled' && track.cues && track.cues.length){
-					mediaelement.getActiveCue(track, elem, time, baseData);
+					mediaelement.getActiveCue(track, elem, time, baseData, i);
 				}
 			}
 			trackDisplay.update(baseData, elem);
@@ -317,18 +342,38 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 				baseData.nextEvent = Number.MAX_VALUE;
 			}
 		};
-		var onUpdatCues = function(){
+		var invalidateTrackElems = function(){
+			if(baseData && baseData.trackElements){
+				delete baseData.trackElements;
+			}
+		};
+		var onUpdatCues = function(e){
+
+			if(baseData && e && (e.type == 'addtrack' || e.type == 'removetrack')){
+				clearTimeout(invalidTracksTimer);
+				invalidTracksTimer = setTimeout(invalidateTrackElems, 30);
+			}
 			clearTimeout(updateTimer);
-			updateTimer = setTimeout(getDisplayCues, 17);
+			updateTimer = setTimeout(getDisplayCues, 40);
 		};
 		var addTrackView = function(){
 			if(!trackList) {
+				if(baseData && 'blockTrackListUpdate' in baseData){
+					baseData.blockTrackListUpdate = true;
+				}
 				trackList = elem.prop('textTracks');
+				if(baseData && baseData.blockTrackListUpdate){
+					baseData.blockTrackListUpdate = false;
+				}
 			}
 			//as soon as change on trackList is implemented in all browsers we do not need to have 'updatetrackdisplay' anymore
-			$( [trackList] ).on('change', onUpdatCues);
+			$( [trackList] )
+				.off('.trackview')
+				.on('change.trackview addtrack.trackview removetrack.trackview', onUpdatCues)
+			;
 			elem
 				.off('.trackview')
+				.on('emptied.trackview', invalidateTrackElems)
 				.on('play.trackview playing.trackview updatetrackdisplay.trackview seeked.trackview', onUpdatCues)
 				.on('timeupdate.trackview', getDisplayCues)
 			;
@@ -363,12 +408,12 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 
 						trackList = elem.prop('textTracks');
 						baseData = webshims.data(elem[0], 'mediaelementBase') || webshims.data(elem[0], 'mediaelementBase', {});
-
 						$.each(trackList, function(i, track){
 							if(track._shimActiveCues){
 								delete track._shimActiveCues;
 							}
 						});
+						$( [trackList] ).off('.trackview');
 						trackDisplay.hide(baseData);
 						elem.off('.trackview');
 					}
