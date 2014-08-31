@@ -1231,7 +1231,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 });
 ;webshims.register('track', function($, webshims, window, document, undefined){
 	"use strict";
-
 	var mediaelement = webshims.mediaelement;
 	var id = new Date().getTime();
 	//descriptions are not really shown, but they are inserted into the dom
@@ -1412,7 +1411,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			setTimeout(function(){
 				$(track).closest('audio, video').triggerHandler('updatetrackdisplay');
 				trackData.isTriggering = false;
-			});
+			}, 9);
 		}
 	};
 	var isDefaultTrack = (function(){
@@ -1669,7 +1668,6 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				}
 				obj.id = $(track).prop('id');
 				trackData = webshims.data(track, 'trackData', {track: obj});
-
 				mediaelement.loadTextTrack(mediaelem, track, trackData, isDefaultTrack(track));
 			} else {
 				if(supportTrackMod){
