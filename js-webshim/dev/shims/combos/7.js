@@ -2432,6 +2432,12 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		})();
 	}
 
+	if(window.CanvasRenderingContext2D && CanvasRenderingContext2D.prototype){
+		CanvasRenderingContext2D.prototype.wsImageComplete = function(cb){
+			cb.call(this, this);
+		};
+	}
+
 webshims.register('mediaelement-core', function($, webshims, window, document, undefined, options){
 	var hasSwf = swfmini.hasFlashPlayerVersion('11.3');
 	var mediaelement = webshims.mediaelement;
@@ -2907,6 +2913,7 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			mediaelement.loadDebugger();
 		});
 	}
+
 	//set native implementation ready, before swf api is retested
 	if(hasNative){
 		webshims.isReady('mediaelement-core', true);

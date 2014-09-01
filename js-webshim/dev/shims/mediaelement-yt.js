@@ -445,9 +445,9 @@ var addYtAPI = function(mediaElm, elemId, data, ytParams){
 				var currentTime = data._ytAPI.getCurrentTime();
 				if(data.currentTime != currentTime){
 					data.currentTime = currentTime;
-					$(mediaElm).trigger('timeupdate');
+					$.event.trigger('timeupdate', null, mediaElm, true);
 				}
-			}, 350);
+			}, 270);
 		};
 		
 		data._metatrys = 0;

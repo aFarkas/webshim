@@ -280,9 +280,9 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 		var reCheck = function(){
 			recheckI++;
 
-			//if recheckI is over 30 video might be paused, stalled or waiting,
+			//if recheckI is over 5 video might be paused, stalled or waiting,
 			//in this case abort and wait for the next play, playing or timeupdate event
-			if(recheckI < 30){
+			if(recheckI < 9){
 				if(elem.prop('currentTime') > baseData.nextEvent){
 					recheckI = undefined;
 					getDisplayCues();
@@ -337,9 +337,9 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 					cancelAnimationFrame(recheckId);
 				}
 				recheckI = 0;
-				updateTimer2 = setTimeout(reCheck, Math.max((baseData.nextUpdateDelay * 1000) - 100, 0));
+				updateTimer2 = setTimeout(reCheck, (baseData.nextUpdateDelay * 1000) + 9);
 			} else if(baseData.nextUpdateDelay >= Number.MAX_VALUE){
-				baseData.nextEvent = Number.MAX_VALUE;
+				baseData.nextEvent = time + 2;
 			}
 		};
 		var invalidateTrackElems = function(){
@@ -348,10 +348,9 @@ webshims.register('track-ui', function($, webshims, window, document, undefined)
 			}
 		};
 		var onUpdatCues = function(e){
-
 			if(baseData && e && (e.type == 'addtrack' || e.type == 'removetrack')){
 				clearTimeout(invalidTracksTimer);
-				invalidTracksTimer = setTimeout(invalidateTrackElems, 30);
+				invalidTracksTimer = setTimeout(invalidateTrackElems, 39);
 			}
 			clearTimeout(updateTimer);
 			updateTimer = setTimeout(getDisplayCues, 40);

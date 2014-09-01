@@ -394,7 +394,6 @@ webshim.register('filereader-xhr', function($, webshim, window, document, undefi
 								cb(blob);
 							};
 							img.load(dataURL);
-
 						});
 					}, 9);
 				}
