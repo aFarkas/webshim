@@ -1646,7 +1646,6 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 								cb(blob);
 							};
 							img.load(dataURL);
-
 						});
 					}, 9);
 				}

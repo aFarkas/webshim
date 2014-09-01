@@ -1233,8 +1233,8 @@
 		swfmini.embedSWF(playerSwfPath, elemId, "100%", "100%", "11.3", false, vars, params, attrs, function(swfData){
 			if(swfData.success){
 				var fBlocker = function(){
-					if((!swfData.ref.parentNode && box[0].parentNode) || swfData.ref.style.display == "none"){
-						box.addClass('flashblocker-assumed');
+					if((!swfData.ref.parentNode) || swfData.ref.style.display == "none"){
+
 						$(elem).trigger('flashblocker');
 						webshims.warn("flashblocker assumed");
 					}
@@ -1468,6 +1468,17 @@
 			webshim.error('canvas.drawImage feature is needed. In IE8 flashvanvas pro can be used');
 		}
 
+		CanvasRenderingContext2D.prototype.wsImageComplete = function(cb){
+			if(this._wsIsLoading){
+				if(!this._wsLoadingCbs){
+					this._wsLoadingCbs = [];
+				}
+				this._wsLoadingCbs.push(cb);
+			} else {
+				cb.call(this, this);
+			}
+		};
+
 		CanvasRenderingContext2D.prototype.drawImage = function(elem){
 			var data, img, args, imgData, hadCachedImg;
 			var context = this;
@@ -1509,10 +1520,16 @@
 						}
 					}
 					_drawImage.apply(context, args);
+					context._wsIsLoading = false;
+					if(context._wsLoadingCbs && context._wsLoadingCbs.length){
+						while(context._wsLoadingCbs.length){
+							context._wsLoadingCbs.shift().call(context, context);
+						}
+					}
 				};
 
 				img.src = 'data:image/jpeg;base64,'+imgData;
-
+				this._wsIsLoading = true;
 				if(img.complete && img.onload){
 					img.onload();
 				}
