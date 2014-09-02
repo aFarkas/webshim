@@ -1,6 +1,5 @@
 Release 1.15.2
 ----------
-
 - fix regression bug in custom validators
 
 Release 1.15.1

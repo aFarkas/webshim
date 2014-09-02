@@ -136,7 +136,7 @@
 	}
 
 	$.extend(webshims, {
-		version: '1.15.2',
+		version: '1.15.3-pre',
 
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
@@ -1094,11 +1094,11 @@
 
 		addPolyfill('form-core', {
 			f: 'forms',
+			test: initialFormTest,
 			d: ['es5'],
 			options: {
 				placeholderType: 'value',
 				messagePopover: {},
-				test: initialFormTest,
 				list: {
 					popover: {
 						constrainWidth: true
