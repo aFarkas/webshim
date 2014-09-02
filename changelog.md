@@ -1,3 +1,8 @@
+Release 1.15.2
+----------
+
+- fix regression bug in custom validators
+
 Release 1.15.1
 ----------
 - added postion: ``sticky`` polyfill ([demo](http://fiddle.jshell.net/trixta/5kjrtLvw/show/light/))
