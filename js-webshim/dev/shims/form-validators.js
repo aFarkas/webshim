@@ -395,7 +395,7 @@ webshims.ready('form-validation', function(){
 			}
 		}
 
-		if(data.prop == "value" && !specialVal){
+		if(data.prop == "value" && !data.specialVal){
 			return ($.prop(data.masterElement, 'value') != val);
 		} else {
 			depFn();
