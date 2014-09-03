@@ -998,7 +998,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 		var fileReaderReady = ('FileReader' in window && 'FormData' in window);
 		if(!fileReaderReady){
 			webshims.addReady(function(context){
-				if(!fileReaderReady && !modules.filereader.loaded && context.querySelector('input.ws-filereader')){
+				if(!fileReaderReady && modules['filereader-xhr'] && !modules['filereader-xhr'].loaded && context.querySelector('input.ws-filereader')){
 					webshims.reTest(['filereader']);
 					fileReaderReady = true;
 				}
