@@ -1,6 +1,12 @@
+Release 1.15.3
+----------
+- fix regression bug with filereader introduced with 1.15.1
+
+
 Release 1.15.2
 ----------
 - fix regression bug in custom validators
+
 
 Release 1.15.1
 ----------
