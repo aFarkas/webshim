@@ -2979,6 +2979,13 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						return handler.apply(this, arguments);
 					}
 				};
+				if($.isFunction(target)){
+					handler = target;
+					target = false;
+					this.on('click', runHandler);
+				} else {
+					this.on('click', target, runHandler);
+				}
 				if(addTouch){
 					allowClick = function(){
 						stopClick = false;
@@ -3027,17 +3034,11 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					this.each(function(){
 						this.addEventListener('touchstart', touchStart, true);
 					});
-				} else if(supportsTouchaction){
+				} else if(supportsTouchaction && !target){
 					this.css('touch-action', 'manipulation');
 				}
 
-				if($.isFunction(target)){
-					handler = target;
-					target = false;
-					this.on('click', runHandler);
-				} else {
-					this.on('click', target, runHandler);
-				}
+
 				return this;
 			};
 		})();

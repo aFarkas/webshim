@@ -2575,6 +2575,13 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 						return handler.apply(this, arguments);
 					}
 				};
+				if($.isFunction(target)){
+					handler = target;
+					target = false;
+					this.on('click', runHandler);
+				} else {
+					this.on('click', target, runHandler);
+				}
 				if(addTouch){
 					allowClick = function(){
 						stopClick = false;
@@ -2623,17 +2630,11 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 					this.each(function(){
 						this.addEventListener('touchstart', touchStart, true);
 					});
-				} else if(supportsTouchaction){
+				} else if(supportsTouchaction && !target){
 					this.css('touch-action', 'manipulation');
 				}
 
-				if($.isFunction(target)){
-					handler = target;
-					target = false;
-					this.on('click', runHandler);
-				} else {
-					this.on('click', target, runHandler);
-				}
+
 				return this;
 			};
 		})();
