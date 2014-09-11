@@ -1463,6 +1463,25 @@
 			VIDEO: 1
 		};
 		var tested = {};
+		var addToBlob = function(){
+			var desc = webshim.defineNodeNameProperty('canvas', 'toBlob', {
+				prop: {
+					value: function(){
+						var context = $(this).callProp('getContext', ['2d']);
+						var that = this;
+						var args = arguments;
+						var cb = function(){
+							return desc.prop._supvalue.apply(that, args);
+						};
+						if(context.wsImageComplete && context._wsIsLoading){
+							context.wsImageComplete(cb);
+						} else {
+							return cb();
+						}
+					}
+				}
+			});
+		};
 
 		if(!_drawImage){
 			webshim.error('canvas.drawImage feature is needed. In IE8 flashvanvas pro can be used');
@@ -1537,6 +1556,12 @@
 			}
 			return _drawImage.apply(this, arguments);
 		};
+
+		if(!document.createElement('canvas').toBlob){
+			webshims.ready('filereader', addToBlob);
+		} else {
+			addToBlob();
+		}
 		return true;
 	};
 
@@ -1810,10 +1835,11 @@
 	var copyName = {srclang: 'language'};
 
 	var updateMediaTrackList = function(baseData, trackList){
+		var i, len;
+		var callChange = false;
 		var removed = [];
 		var added = [];
 		var newTracks = [];
-		var i, len;
 		if(!baseData){
 			baseData =  webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
 		}
@@ -1848,12 +1874,13 @@
 				removed.push(trackList[i]);
 			}
 		}
-		
+
 		if(removed.length || added.length){
 			trackList.splice(0);
 			
 			for(i = 0, len = newTracks.length; i < len; i++){
 				trackList.push(newTracks[i]);
+
 			}
 			for(i = 0, len = removed.length; i < len; i++){
 				$([trackList]).triggerHandler($.Event({type: 'removetrack', track: removed[i]}));
@@ -1865,6 +1892,16 @@
 			if(baseData.scriptedTextTracks || removed.length){
 				$(this).triggerHandler('updatetrackdisplay');
 			}
+		}
+
+		for(i = 0, len = trackList.length; i < len; i++){
+			if(trackList[i].__wsmode != trackList[i].mode){
+				trackList[i].__wsmode = trackList[i].mode;
+				callChange = true;
+			}
+		}
+		if(callChange){
+			$([trackList]).triggerHandler('change');
 		}
 	};
 	

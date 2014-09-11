@@ -587,8 +587,7 @@ summary {
 	border-style: solid;
 	border-width: em(10) em(5) 0 em(5);
 	border-color: #000 transparent transparent transparent;
-	
-	
+
 	vertical-align: middle;
 
 	.closed-details-summary & {
@@ -622,7 +621,7 @@ summary.summary-has-focus {
 		position: relative;
 		z-index: 0;
 		display: inline-block;
-		padding: 5px;
+		padding: em(5);
 		border: 1px solid #ccc;
 		background: #eee;
 		color: #333;
@@ -633,6 +632,11 @@ summary.summary-has-focus {
 		margin-right: 0.4em;
 		float: left;
 	}
+}
+
+.ws-capture-file > button {
+	padding-bottom: em(4);
+	padding-top: em(4);
 }
 
 .ws-custom-file {
@@ -729,9 +733,7 @@ summary.summary-has-focus {
 	bottom: auto;
 	position: static;
 	position: -webkit-sticky;
-	position: -moz-sticky;
 	position: -ms-sticky;
-	position: -o-sticky;
 	position: sticky;
 	float: none !important;
 	margin-left: 0;

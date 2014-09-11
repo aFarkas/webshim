@@ -77,7 +77,8 @@ module.exports = function(grunt){
 		},
 		sass: {
 			options: {
-				style: 'expanded'
+				style: 'expanded',
+				sourcemap: 'none'
 			},
 			dist: {
 				files:[{
@@ -262,7 +263,7 @@ module.exports = function(grunt){
 		var copyTask = {};
 		var minTask = {};
 		var minPath, file, found;
-		var exclude = /(\.scss|config\.rb|\.txt|\.php)$/;
+		var exclude = /(\.scss|config\.rb|\.txt|\.php|\.zip)$/;
 		
 		for(var i in files){
 			file = files[i];

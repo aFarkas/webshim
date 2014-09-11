@@ -607,22 +607,25 @@ if(webshims.support.inputtypes.date && /webkit/i.test(navigator.userAgent)){
 
 webshims.addReady(function(context, contextElem){
 	//start constrain-validation
-	var focusElem;
+
 	$('form', context)
 		.add(contextElem.filter('form'))
 		.on('invalid', $.noop)
 	;
-	
-	try {
-		if(context == document && !('form' in (document.activeElement || {}))) {
-			focusElem = $(context.querySelector('input[autofocus], select[autofocus], textarea[autofocus]')).eq(0).getShadowFocusElement()[0];
-			if (focusElem && focusElem.offsetHeight && focusElem.offsetWidth) {
-				focusElem.focus();
+
+	setTimeout(function(){
+		var focusElem;
+		try {
+			if(!('form' in (document.activeElement || {}))) {
+				focusElem = $(context.querySelector('input[autofocus], select[autofocus], textarea[autofocus]')).eq(0).getShadowFocusElement()[0];
+				if (focusElem && (focusElem.offsetHeight || focusElem.offsetWidth)) {
+					focusElem.focus();
+				}
 			}
 		}
-	} 
-	catch (er) {}
-	
+		catch (er) {}
+	}, 9);
+
 });
 
 if(!webshims.support.datalist){

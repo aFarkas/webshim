@@ -893,10 +893,11 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 	var copyName = {srclang: 'language'};
 
 	var updateMediaTrackList = function(baseData, trackList){
+		var i, len;
+		var callChange = false;
 		var removed = [];
 		var added = [];
 		var newTracks = [];
-		var i, len;
 		if(!baseData){
 			baseData =  webshims.data(this, 'mediaelementBase') || webshims.data(this, 'mediaelementBase', {});
 		}
@@ -931,12 +932,13 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 				removed.push(trackList[i]);
 			}
 		}
-		
+
 		if(removed.length || added.length){
 			trackList.splice(0);
 			
 			for(i = 0, len = newTracks.length; i < len; i++){
 				trackList.push(newTracks[i]);
+
 			}
 			for(i = 0, len = removed.length; i < len; i++){
 				$([trackList]).triggerHandler($.Event({type: 'removetrack', track: removed[i]}));
@@ -948,6 +950,16 @@ webshims.register('mediaelement-core', function($, webshims, window, document, u
 			if(baseData.scriptedTextTracks || removed.length){
 				$(this).triggerHandler('updatetrackdisplay');
 			}
+		}
+
+		for(i = 0, len = trackList.length; i < len; i++){
+			if(trackList[i].__wsmode != trackList[i].mode){
+				trackList[i].__wsmode = trackList[i].mode;
+				callChange = true;
+			}
+		}
+		if(callChange){
+			$([trackList]).triggerHandler('change');
 		}
 	};
 	

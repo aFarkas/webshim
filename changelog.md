@@ -14,6 +14,7 @@ Release 1.15.1
 - added canvas.toBlob feature as part of the ``filereader`` feature
 - improved cuechange event in performance and precision
 
+
 Release 1.15.0
 ----------
 

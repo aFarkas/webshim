@@ -81,6 +81,7 @@ webshim.register('mediacapture', function($, webshim, window, document, undefine
 			resolve();
 		}
 	})();
+	var regImage = /image\/\*|image\/jp/i;
 	var loadPicker = function(){
 		webshim.ready('WINDOWLOAD', function(){
 			webshim.loader.loadList(['mediacapture-picker']);
@@ -91,10 +92,15 @@ webshim.register('mediacapture', function($, webshim, window, document, undefine
 
 	var _createPhotoPicker = function(){
 		if($(this).is('[capture].ws-filereader, .ws-capture') && webshim.implement(this, 'capture')){
-			var $wrapper, $customFile;
+			var $wrapper, $customFile, $button, popover;
 			var $fileinput = $(this);
-			var $button = $('<button type="button" class="ws-capture-button">photo</button>');
-			var popover = webshim.objectCreate(webshim.wsPopover, {}, $.extend({prepareFor: $button}));
+			var accept = $fileinput.prop('accept') || 'image/*';
+
+			if(!regImage.test(accept)){return;}
+
+			$button = $('<button type="button" class="ws-capture-button" />');
+			popover = webshim.objectCreate(webshim.wsPopover, {}, $.extend({prepareFor: $button}));
+
 			popover.element.addClass('capture-popover input-picker');
 
 			if($fileinput.is('.ws-custom-file > *')){

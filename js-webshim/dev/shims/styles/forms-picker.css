@@ -137,7 +137,7 @@ SASS:
 }
 .input-picker .ws-picker-controls > button {
   box-sizing: content-box;
-  border: 0.07692em solid #cccccc;
+  border: 0.07692em solid #ccc;
   padding: 0;
   width: 1.84615em;
   height: 1.84615em;
@@ -228,15 +228,15 @@ SASS:
 .input-picker .ws-button-row {
   position: relative;
   margin: 0.76923em 0 0;
-  border-top: 0.07692em solid #eeeeee;
+  border-top: 0.07692em solid #eee;
   padding: 0.76923em 0 0;
   text-align: left;
   z-index: 2;
 }
 .input-picker .ws-button-row > button {
-  border: 0.07692em solid #cccccc;
+  border: 0.07692em solid #ccc;
   background-color: #ddd;
-  background-image: linear-gradient(to bottom, #ececec 0%, #dddddd 100%);
+  background-image: linear-gradient(to bottom, #ececec 0%, #ddd 100%);
   transition: border-color 200ms linear;
   float: left;
 }
@@ -383,7 +383,7 @@ SASS:
 }
 .input-picker .ws-options {
   margin: 0.76923em 0 0;
-  border-top: 0.07692em solid #eeeeee;
+  border-top: 0.07692em solid #eee;
   padding: 0.76923em 0 0;
   text-align: left;
 }

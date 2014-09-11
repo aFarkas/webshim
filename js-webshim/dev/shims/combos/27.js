@@ -1632,22 +1632,19 @@ webshims.register('form-shim-extend2', function($, webshims, window, document, u
 						qualitiy = 0.8;
 					}
 					loadMoxie();
-					setTimeout(function(){
+					webshim.ready('moxie', function(){
+						var img = new mOxie.Image();
 						dataURL = $canvas.callProp('getAsDataURL', [type, qualitiy]);
-						webshim.ready('moxie', function(){
-							var img = new mOxie.Image();
-
-							img.onload = function() {
-								var blob = img.getAsBlob();
-								webshim.defineProperty(blob, '_wsDataURL', {
-									value: dataURL,
-									enumerable: false
-								});
-								cb(blob);
-							};
-							img.load(dataURL);
-						});
-					}, 9);
+						img.onload = function() {
+							var blob = img.getAsBlob();
+							webshim.defineProperty(blob, '_wsDataURL', {
+								value: dataURL,
+								enumerable: false
+							});
+							cb(blob);
+						};
+						img.load(dataURL);
+					});
 				}
 			}
 		});

@@ -536,7 +536,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				return id;
 			};
 		})(),
-		domPrefixes: ["ws", "webkit", "moz", "ms", "o"],
+		domPrefixes: ["webkit", "moz", "ms", "o", "ws"],
 
 		prefixed: function (prop, obj){
 			var i, testProp;
@@ -1611,22 +1611,19 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 						qualitiy = 0.8;
 					}
 					loadMoxie();
-					setTimeout(function(){
+					webshim.ready('moxie', function(){
+						var img = new mOxie.Image();
 						dataURL = $canvas.callProp('getAsDataURL', [type, qualitiy]);
-						webshim.ready('moxie', function(){
-							var img = new mOxie.Image();
-
-							img.onload = function() {
-								var blob = img.getAsBlob();
-								webshim.defineProperty(blob, '_wsDataURL', {
-									value: dataURL,
-									enumerable: false
-								});
-								cb(blob);
-							};
-							img.load(dataURL);
-						});
-					}, 9);
+						img.onload = function() {
+							var blob = img.getAsBlob();
+							webshim.defineProperty(blob, '_wsDataURL', {
+								value: dataURL,
+								enumerable: false
+							});
+							cb(blob);
+						};
+						img.load(dataURL);
+					});
 				}
 			}
 		});
@@ -2896,6 +2893,25 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			VIDEO: 1
 		};
 		var tested = {};
+		var addToBlob = function(){
+			var desc = webshim.defineNodeNameProperty('canvas', 'toBlob', {
+				prop: {
+					value: function(){
+						var context = $(this).callProp('getContext', ['2d']);
+						var that = this;
+						var args = arguments;
+						var cb = function(){
+							return desc.prop._supvalue.apply(that, args);
+						};
+						if(context.wsImageComplete && context._wsIsLoading){
+							context.wsImageComplete(cb);
+						} else {
+							return cb();
+						}
+					}
+				}
+			});
+		};
 
 		if(!_drawImage){
 			webshim.error('canvas.drawImage feature is needed. In IE8 flashvanvas pro can be used');
@@ -2970,6 +2986,12 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			}
 			return _drawImage.apply(this, arguments);
 		};
+
+		if(!document.createElement('canvas').toBlob){
+			webshims.ready('filereader', addToBlob);
+		} else {
+			addToBlob();
+		}
 		return true;
 	};
 

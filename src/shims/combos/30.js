@@ -536,7 +536,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				return id;
 			};
 		})(),
-		domPrefixes: ["ws", "webkit", "moz", "ms", "o"],
+		domPrefixes: ["webkit", "moz", "ms", "o", "ws"],
 
 		prefixed: function (prop, obj){
 			var i, testProp;

@@ -119,6 +119,7 @@
 		promise: 'es6',
 		URL: 'url'
 	};
+	var supportCapture = 'capture' in create('input');
 
 	clearInterval(webshims.timer);
 	support.advancedObjectProperties = support.objectAccessor = support.ES5 = !!('create' in Object && 'seal' in Object);
@@ -212,11 +213,13 @@
 		})(),
 		_polyfill: function(features){
 			var toLoadFeatures = [];
-			var hasFormsExt;
+			var hasFormsExt, needExtStyles;
 
 			if(!firstRun.run){
 				hasFormsExt = $.inArray('forms-ext', features) !== -1;
 				firstRun();
+				needExtStyles = (hasFormsExt && !modules["form-number-date-ui"].test()) || (!supportCapture && $.inArray('mediacapture', features) !== -1);
+
 				if(hasFormsExt && $.inArray('forms', features) == -1){
 					features.push('forms');
 					if(WSDEBUG){
@@ -224,7 +227,7 @@
 					}
 				}
 				if(webCFG.loadStyles){
-					loader.loadCSS('styles/shim'+((hasFormsExt && !modules["form-number-date-ui"].test()) ? '-ext' : '')+'.css');
+					loader.loadCSS('styles/shim'+(needExtStyles ? '-ext' : '')+'.css');
 				}
 			}
 
@@ -964,22 +967,6 @@
 	});
 	//>
 
-	//<usermedia
-	var userMediaTest =  ('getUserMedia' in navigator);
-
-	addPolyfill('usermedia-core', {
-		f: 'usermedia',
-		test: userMediaTest && window.URL,
-		d: ['url', DOMSUPPORT]
-	});
-
-	addPolyfill('usermedia-shim', {
-		f: 'usermedia',
-		test: !!(userMediaTest || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia),
-		d: ['url', 'mediaelement', DOMSUPPORT]
-	});
-	//>
-
 	//<canvas
 	(function(){
 		addPolyfill('canvas', {
@@ -998,6 +985,30 @@
 			d: [DOMSUPPORT]
 		});
 	})();
+	//>
+
+
+	//<usermedia
+	var userMediaTest =  ('getUserMedia' in navigator);
+
+	addPolyfill('usermedia-core', {
+		f: 'usermedia',
+		test: userMediaTest && window.URL,
+		d: ['url', DOMSUPPORT]
+	});
+
+	addPolyfill('usermedia-shim', {
+		f: 'usermedia',
+		test: !!(userMediaTest || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia),
+		d: ['url', 'mediaelement', DOMSUPPORT]
+	});
+	//>
+
+	//<mediacapture
+	addPolyfill('mediacapture', {
+		test: supportCapture,
+		d: ['swfmini', 'usermedia', DOMSUPPORT, 'filereader', 'forms', 'canvas']
+	});
 	//>
 
 
@@ -1243,15 +1254,6 @@
 		test: !(supportFileReader && !create('canvas').toBlob)
 	});
 	//>
-
-	/*
-	//<mediacapture
-	addPolyfill('mediacapture', {
-		test: 'capture' in create('input'),
-		d: ['swfmini', 'usermedia', DOMSUPPORT, 'filereader', 'forms', 'canvas']
-	});
-	//>
-	*/
 
 	//<details
 	addPolyfill('details', {

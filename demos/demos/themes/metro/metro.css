@@ -53,18 +53,18 @@ progress.ws-style::-ms-fill {
   background: #d4d4d4;
 }
 progress.ws-style::-webkit-progress-value {
-  background: #3399ff;
+  background: #39f;
 }
 progress.ws-style::-moz-progress-bar {
-  background: #3399ff;
+  background: #39f;
 }
 progress.ws-style::-ms-fill {
   animation-name: none;
-  background: #3399ff;
+  background: #39f;
 }
 progress.ws-style > span.progress-value {
   display: block !important;
-  background: #3399ff;
+  background: #39f;
 }
 
 .input-picker .ws-picker-header {
@@ -82,16 +82,16 @@ progress.ws-style > span.progress-value {
 
 .input-picker .ws-po-box {
   border-width: 0.15385em;
-  border-color: #3399ff;
-  background: #3399ff;
+  border-color: #39f;
+  background: #39f;
   padding: 0.38462em 0 0;
 }
 
 .input-picker .ws-picker-header > button {
-  color: white;
+  color: #fff;
 }
 .input-picker .ws-picker-header > button:after {
-  border-color: transparent transparent white;
+  border-color: transparent transparent #fff;
 }
 
 .input-picker .ws-picker-controls {
@@ -101,7 +101,7 @@ progress.ws-style > span.progress-value {
 
 .input-picker .ws-picker-controls > button {
   background: none;
-  border-color: white;
+  border-color: #fff;
   border-radius: 50%;
 }
 .input-picker .ws-picker-controls > button.ws-year-btn:after, .input-picker .ws-picker-controls > button:before {
@@ -109,8 +109,8 @@ progress.ws-style > span.progress-value {
 }
 .input-picker .ws-picker-controls > button:hover {
   outline: none;
-  border-color: white;
-  background-color: white;
+  border-color: #fff;
+  background-color: #fff;
 }
 
 .input-picker .prev-controls, .input-picker .ws-po-box[dir="rtl"] .next-controls {
@@ -119,10 +119,10 @@ progress.ws-style > span.progress-value {
 .input-picker .prev-controls > .ws-year-btn:after,
 .input-picker .prev-controls > button:before, .input-picker .ws-po-box[dir="rtl"] .next-controls > .ws-year-btn:after,
 .input-picker .ws-po-box[dir="rtl"] .next-controls > button:before {
-  border-color: transparent white transparent transparent;
+  border-color: transparent #fff transparent transparent;
 }
 .input-picker .prev-controls > button:hover.ws-year-btn:after, .input-picker .prev-controls > button:hover:before, .input-picker .ws-po-box[dir="rtl"] .next-controls > button:hover.ws-year-btn:after, .input-picker .ws-po-box[dir="rtl"] .next-controls > button:hover:before {
-  border-color: transparent #3399ff transparent transparent;
+  border-color: transparent #39f transparent transparent;
 }
 
 .input-picker .next-controls, .input-picker .ws-po-box[dir="rtl"] .prev-controls {
@@ -131,10 +131,10 @@ progress.ws-style > span.progress-value {
 .input-picker .next-controls > .ws-year-btn:after,
 .input-picker .next-controls > button:before, .input-picker .ws-po-box[dir="rtl"] .prev-controls > .ws-year-btn:after,
 .input-picker .ws-po-box[dir="rtl"] .prev-controls > button:before {
-  border-color: transparent transparent transparent white;
+  border-color: transparent transparent transparent #fff;
 }
 .input-picker .next-controls > button:hover.ws-year-btn:after, .input-picker .next-controls > button:hover:before, .input-picker .ws-po-box[dir="rtl"] .prev-controls > button:hover.ws-year-btn:after, .input-picker .ws-po-box[dir="rtl"] .prev-controls > button:hover:before {
-  border-color: transparent transparent transparent #3399ff;
+  border-color: transparent transparent transparent #39f;
 }
 
 .input-picker .picker-grid {
@@ -154,32 +154,32 @@ progress.ws-style > span.progress-value {
 }
 .input-picker .ws-picker-body .picker-list th > button,
 .input-picker .ws-picker-body .picker-list td > button {
-  color: black;
+  color: #000;
   background: #f9f9f9;
 }
 .input-picker .ws-picker-body .picker-list th > button.this-value,
 .input-picker .ws-picker-body .picker-list td > button.this-value {
-  color: white;
+  color: #fff;
   background: #66b3ff;
 }
 .input-picker .ws-picker-body .picker-list th > button.othermonth,
 .input-picker .ws-picker-body .picker-list td > button.othermonth {
-  color: #999999;
+  color: #999;
   background: #f9f9f9;
 }
 .input-picker .ws-picker-body .picker-list th > button:hover,
 .input-picker .ws-picker-body .picker-list td > button:hover {
-  color: white;
-  background: #3399ff;
+  color: #fff;
+  background: #39f;
 }
 .input-picker .ws-picker-body .picker-list th > button.checked-value,
 .input-picker .ws-picker-body .picker-list td > button.checked-value {
-  color: white;
-  background: #3399ff;
+  color: #fff;
+  background: #39f;
 }
 .input-picker .ws-picker-body .picker-list th > button[disabled],
 .input-picker .ws-picker-body .picker-list td > button[disabled] {
-  color: #cccccc;
+  color: #ccc;
   background: #f9f9f9;
 }
 
@@ -193,13 +193,13 @@ progress.ws-style > span.progress-value {
   margin: 0;
   padding: 0.76923em;
   background: #fefefe;
-  border-top-color: #3399ff;
+  border-top-color: #39f;
   border-top-width: 0.15385em;
 }
 
 .input-picker .ws-options button.ws-focus, .input-picker .ws-options button:focus, .input-picker .ws-options button:hover {
-  color: white;
-  background: #3399ff;
+  color: #fff;
+  background: #39f;
 }
 
 .input-picker.ws-size-2 {
@@ -239,16 +239,16 @@ progress.ws-style > span.progress-value {
   height: 100%;
   width: 0.92308em;
   margin: 0 0 0 -0.46154em;
-  background: black;
+  background: #000;
 }
 .ws-range.ws-focus .ws-range-thumb {
-  background: #333333;
+  background: #333;
 }
 .ws-range.ws-active .ws-range-thumb {
-  background: #666666;
+  background: #666;
 }
 .ws-range .ws-range-progress {
-  background: #3399ff;
+  background: #39f;
 }
 
 .datalist-polyfill .ws-po-box {
@@ -259,11 +259,11 @@ progress.ws-style > span.progress-value {
   background: #fefefe;
 }
 .datalist-polyfill .ws-po-box .active-item {
-  background: #3399ff;
+  background: #39f;
 }
 .datalist-polyfill .ws-po-box .active-item .option-label,
 .datalist-polyfill .ws-po-box .active-item .option-value {
-  color: white;
+  color: #fff;
 }
 
 .mediaplayer > .jme-controlbar {

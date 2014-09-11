@@ -85,13 +85,7 @@
 			};
 		}
 	}
-	if (typeof define === 'function' && define.amd) {
-		define(function () {
-			return dataURLtoBlob;
-		});
-	} else {
-		window.dataURLtoBlob = dataURLtoBlob;
-	}
+	window.dataURLtoBlob = dataURLtoBlob;
 }(this));
 
 webshim.isReady('canvas-blob', true);

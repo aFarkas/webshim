@@ -288,7 +288,7 @@ output {
 }
 
 .ws-po-box {
-  border: 0.07692em solid #cccccc;
+  border: 0.07692em solid #ccc;
   background: #fff;
   color: #000;
   padding: 0.38462em 0.38462em 0.23077em;
@@ -303,7 +303,7 @@ output {
   height: 0;
   border-left: 0.61538em solid transparent;
   border-right: 0.61538em solid transparent;
-  border-bottom: 0.61538em solid #cccccc;
+  border-bottom: 0.61538em solid #ccc;
   border-top: none;
   zoom: 1;
 }
@@ -323,7 +323,7 @@ output {
   top: auto;
   bottom: 0.30769em;
   border-bottom: none;
-  border-top: 0.61538em solid #cccccc;
+  border-top: 0.61538em solid #ccc;
 }
 html .ws-po-arrow {
   border-left-color: transparent;
@@ -609,7 +609,7 @@ summary.summary-has-focus {
   position: relative;
   z-index: 0;
   display: inline-block;
-  padding: 5px;
+  padding: 0.38462em;
   border: 1px solid #ccc;
   background: #eee;
   color: #333;
@@ -619,6 +619,11 @@ summary.summary-has-focus {
 .ws-capture-file > button {
   margin-right: 0.4em;
   float: left;
+}
+
+.ws-capture-file > button {
+  padding-bottom: 0.30769em;
+  padding-top: 0.30769em;
 }
 
 .ws-custom-file .ws-file-value {
@@ -670,7 +675,7 @@ summary.summary-has-focus {
 .ws-custom-file > input[type="file"]:focus ~ button {
   background: #fff;
   border-color: #999;
-  background: #eeeeee linear-gradient(transparent, rgba(0, 0, 0, 0.05) 40%, rgba(0, 0, 0, 0.1));
+  background: #eee linear-gradient(transparent, rgba(0, 0, 0, 0.05) 40%, rgba(0, 0, 0, 0.1));
 }
 .ws-custom-file:hover > .ws-file-value, .ws-custom-file.ws-mouseenter > .ws-file-value,
 .ws-custom-file > input[type="file"]:focus ~ .ws-file-value {
@@ -698,9 +703,7 @@ summary.summary-has-focus {
   bottom: auto;
   position: static;
   position: -webkit-sticky;
-  position: -moz-sticky;
   position: -ms-sticky;
-  position: -o-sticky;
   position: sticky;
   float: none !important;
   margin-left: 0;
