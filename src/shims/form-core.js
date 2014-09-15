@@ -256,6 +256,8 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		}
 		return message || '';
 	};
+
+	webshims.refreshCustomValidityRules = $.noop;
 	
 	$.fn.getErrorMessage = function(key){
 		var message = '';
