@@ -1188,12 +1188,12 @@ webshims.register('forms-picker', function($, webshims, window, document, undefi
 			
 			str.push('<th class="week-header ws-week">'+ dateCfg.weekHeader +'</th>');
 			
-			for(k = dateCfg.firstDay; k < dateCfg.dayNamesShort.length; k++){
-				str.push('<th class="day-'+ k +'"><abbr title="'+ dateCfg.dayNames[k] +'">'+ dateCfg.dayNamesShort[k] +'</abbr></th>');
+			for(k = dateCfg.firstDay; k < dateCfg.dayNamesMin.length; k++){
+				str.push('<th class="day-'+ k +'"><abbr title="'+ dateCfg.dayNames[k] +'">'+ dateCfg.dayNamesMin[k] +'</abbr></th>');
 			}
 			k = dateCfg.firstDay;
 			while(k--){
-				str.push('<th class="day-'+ k +'"><abbr title="'+ dateCfg.dayNames[k] +'">'+ dateCfg.dayNamesShort[k] +'</abbr></th>');
+				str.push('<th class="day-'+ k +'"><abbr title="'+ dateCfg.dayNames[k] +'">'+ dateCfg.dayNamesMin[k] +'</abbr></th>');
 			}
 			str.push('</tr></thead><tbody><tr class="ws-row-0">');
 			
