@@ -416,14 +416,14 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			var invalidParent = /^(?:span|i|label|b|p|tr|thead|tbody|table|strong|em|ul|ol|dl|html)$/i;
 			return function(element){
 
-				var appendElement;
+				var appendElement, overflow;
 				var parent = element[0];
 				var body = document.body;
 				while((parent = parent[appendElement ? 'offsetParent' : 'parentNode']) && parent.nodeType == 1  && parent != body){
 					if(!appendElement && !invalidParent.test(parent.nodeName)){
 						appendElement = parent;
 					}
-					if(appendElement && $.css(parent, 'overflow') == 'hidden' && $.css(parent, 'position') != 'static'){
+					if(appendElement && (overflow = $.css(parent, 'overflow')) && overflow != 'visible' && (overflow != 'hidden' || $.css(parent, 'position') != 'static')){
 						appendElement = false;
 					}
 				}
