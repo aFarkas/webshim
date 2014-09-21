@@ -7,10 +7,6 @@ webshims.ready('form-validation', function(){
 });
 
 (function(){
-	if(webshims.refreshCustomValidityRules){
-		webshims.error("form-validators already included. please remove custom-validity.js");
-	}
-
 	var customValidityRules = {};
 	var formReady = false;
 	var blockCustom;
