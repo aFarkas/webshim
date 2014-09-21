@@ -1710,6 +1710,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		}
 		return message || '';
 	};
+
+	webshims.refreshCustomValidityRules = $.noop;
 	
 	$.fn.getErrorMessage = function(key){
 		var message = '';

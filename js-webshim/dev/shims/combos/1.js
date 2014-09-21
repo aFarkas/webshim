@@ -479,6 +479,8 @@ webshims.isReady('swfmini', true);
 		}
 		return message || '';
 	};
+
+	webshims.refreshCustomValidityRules = $.noop;
 	
 	$.fn.getErrorMessage = function(key){
 		var message = '';
