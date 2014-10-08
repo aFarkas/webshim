@@ -14,7 +14,6 @@ General Principles
 
 Features
 ------------------
-* HTML5 shiv and innerShiv solution including basic CSS-support
 * canvas
 * HTML5 form features including: constraint validation and form widgets (input[type="range"], input[type="date"], input[type="number"], input[type="time"], input[type="month"], output, progress, input[list]/datalist)
 * HTML5 audio/video/track implementation

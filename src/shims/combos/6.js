@@ -2352,9 +2352,11 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 		};
 		
 		['defaultValue', 'value'].forEach(function(name){
+			var formatName = 'format'+name;
 			wsWidgetProto[name] = function(val, force){
-				if(!this._init || force || val !== this.options[name]){
-					this.element.prop(name, this.formatValue(val));
+				if(!this._init || force || val !== this.options[name] || this.options[formatName] != this.element.prop(name)){
+					this.options[formatName] = this.formatValue(val);
+					this.element.prop(name, this.options[formatName]);
 					this.options[name] = val;
 					this._propertyChange(name);
 					this.mirrorValidity();
@@ -2478,36 +2480,34 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 			var isValue = name == 'value';
 			spinBtnProto[name] = function(val, force, isLive){
 				var selectionEnd;
-				if(!this._init || force || this.options[name] !== val){
-					if(isValue){
-						this._beforeValue(val);
-					} else {
-						this.elemHelper.prop(name, val);
-					}
-
-					val = formatVal[this.type](val, this.options);
-					if(this.options.splitInput){
-						$.each(this.splits, function(i, elem){
-							var setOption;
-							if(!(name in elem) && !isValue && $.nodeName(elem, 'select')){
-								$('option[value="'+ val[i] +'"]', elem).prop('defaultSelected', true);
-							} else {
-								$.prop(elem, name, val[i]);
-							}
-						});
-					} else {
-						val = this.toFixed(val);
-						if(isLive && this._getSelectionEnd){
-							selectionEnd = this._getSelectionEnd(val);
-						}
-						this.element.prop(name, val);
-						if(selectionEnd != null){
-							this.element.prop('selectionEnd', selectionEnd);
-						}
-					}
-					this._propertyChange(name);
-					this.mirrorValidity();
+				if(isValue){
+					this._beforeValue(val);
+				} else {
+					this.elemHelper.prop(name, val);
 				}
+
+				val = formatVal[this.type](val, this.options);
+				if(this.options.splitInput){
+					$.each(this.splits, function(i, elem){
+						var setOption;
+						if(!(name in elem) && !isValue && $.nodeName(elem, 'select')){
+							$('option[value="'+ val[i] +'"]', elem).prop('defaultSelected', true);
+						} else {
+							$.prop(elem, name, val[i]);
+						}
+					});
+				} else {
+					val = this.toFixed(val);
+					if(isLive && this._getSelectionEnd){
+						selectionEnd = this._getSelectionEnd(val);
+					}
+					this.element.prop(name, val);
+					if(selectionEnd != null){
+						this.element.prop('selectionEnd', selectionEnd);
+					}
+				}
+				this._propertyChange(name);
+				this.mirrorValidity();
 			};
 		});
 		

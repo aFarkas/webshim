@@ -137,7 +137,7 @@
 	}
 
 	$.extend(webshims, {
-		version: '1.15.3',
+		version: '1.15.4-pre',
 
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
@@ -1097,7 +1097,7 @@
 
 		webshims.validationMessages = webshims.validityMessages = {
 			langSrc: 'i18n/formcfg-',
-			availableLangs: "ar cs el es fa fr he hi hu it ja lt nl pl pt pt-BR pt-PT ru sv zh-CN zh-TW".split(' ')
+			availableLangs: "ar ca cs el es fa fr he hi hu it ja lt nl pl pt pt-BR pt-PT ru sv zh-CN zh-TW".split(' ')
 		};
 		webshims.formcfg = $.extend({}, webshims.validationMessages);
 
