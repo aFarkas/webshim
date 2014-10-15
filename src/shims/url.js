@@ -99,8 +99,8 @@ webshim.register('url', function($, webshims, window, document, undefined, optio
 						name = bytes;
 						value = '';
 					}
-					name = name.replace('+', ' ');
-					value = value.replace('+', ' ');
+					name = name.replace(/\+/g, ' ');
+					value = value.replace(/\+/g, ' ');
 					pairs.push({ name: name, value: value });
 				});
 				var output = [];
@@ -110,7 +110,7 @@ webshim.register('url', function($, webshims, window, document, undefined, optio
 						value: decodeURIComponent(pair.value)
 					});
 				});
-				return output; // Spec bug?
+				return output;
 			}
 
 			function URLSearchParams(url_object, init) {
@@ -142,10 +142,10 @@ webshim.register('url', function($, webshims, window, document, undefined, optio
 						output += name + '=' + value;
 						first = false;
 					});
-					return output;
+					return output.replace(/%20/g, '+');
 				}
 
-				webshim.defineProperties(this, {
+				Object.defineProperties(this, {
 					append: {
 						value: function (name, value) {
 							pairs.push({ name: name, value: value });
@@ -203,6 +203,7 @@ webshim.register('url', function($, webshims, window, document, undefined, optio
 								if (pairs[i].name === name) {
 									if (!found) {
 										pairs[i].value = value;
+										found = true;
 										++i;
 									} else {
 										pairs.splice(i, 1);
@@ -211,6 +212,10 @@ webshim.register('url', function($, webshims, window, document, undefined, optio
 									++i;
 								}
 							}
+
+							if (!found)
+								pairs.push({ name: name, value: value });
+
 							updateSteps();
 						}
 					},
@@ -226,7 +231,7 @@ webshim.register('url', function($, webshims, window, document, undefined, optio
 			var queryObject = new URLSearchParams(
 				self, instance.search ? instance.search.substring(1) : null);
 
-			webshim.defineProperties(self, {
+			Object.defineProperties(self, {
 				href: {
 					get: function () { return instance.href; },
 					set: function (v) { instance.href = v; tidy_instance(); update_steps(); }
@@ -287,6 +292,12 @@ webshim.register('url', function($, webshims, window, document, undefined, optio
 				hash: {
 					get: function () { return instance.hash; },
 					set: function (v) { instance.hash = v; tidy_instance(); }
+				},
+				toString: {
+					value: function() { return instance.toString(); }
+				},
+				valueOf: {
+					value: function() { return instance.valueOf(); }
 				}
 			});
 
@@ -299,7 +310,7 @@ webshim.register('url', function($, webshims, window, document, undefined, optio
 			function update_steps() {
 				queryObject._setPairs(instance.search ? parse(instance.search.substring(1)) : []);
 				queryObject._updateSteps();
-			}
+			};
 
 			return self;
 		};
