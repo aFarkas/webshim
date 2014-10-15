@@ -337,8 +337,6 @@ webshims.ready('form-validation', function(){
 				val = $.inArray(val, data.specialVal) !== -1;
 			} if(data.toggle){
 				val = !val;
-			} else {
-				val = !!val;
 			}
 			$.prop( elem, data.prop, val);
 			if(iValClasses && e){

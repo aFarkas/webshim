@@ -325,20 +325,25 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	};
 	
 	//jquery mobile and jquery ui
-	if(!$.widget){
+	if(!$.widget && (!$.pluginFactory || !$.pluginFactory.mixin)){
 		(function(){
 			var _cleanData = $.cleanData;
-			$.cleanData = function( elems ) {
-				if(!$.widget){
-					for ( var i = 0, elem; (elem = elems[i]) != null; i++ ) {
+			$.cleanData = (function( orig ) {
+				return function( elems ) {
+					var events, elem, i;
+					for ( i = 0; (elem = elems[i]) != null; i++ ) {
 						try {
-							$( elem ).triggerHandler( "remove" );
-						// http://bugs.jquery.com/ticket/8235
-						} catch( e ) {}
+							// Only trigger remove when necessary to save time
+							events = $._data( elem, "events" );
+							if ( events && events.remove ) {
+								$( elem ).triggerHandler( "remove" );
+							}
+							// http://bugs.jquery.com/ticket/8235
+						} catch ( e ) {}
 					}
-				}
-				_cleanData( elems );
-			};
+					orig( elems );
+				};
+			})( $.cleanData );
 		})();
 	}
 	
