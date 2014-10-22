@@ -2280,9 +2280,13 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			},
 			time: function(val, o, noCorrect){
 				var fVal, i;
+
 				if(val){
 
 					val = val.split(':');
+					if(val.length != 2 || isNaN(parseInt(val[0] || '', 10)) || isNaN(parseInt(val[1] || '', 10))){
+						return val.join(':');
+					}
 					if(curCfg.meridian){
 						fVal = (val[0] * 1);
 						if(fVal && fVal >= 12){
@@ -2437,6 +2441,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				createFormat('d');
 				var tmp, obj;
 				var ret = '';
+
 				if(opts.splitInput){
 					obj = {yy: 0, mm: 1, dd: 2};
 				} else {
@@ -2458,8 +2463,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					}
 					ret = ([addZero(val[obj.yy]), addZero(val[obj.mm]), addZero(val[obj.dd])]).join('-');
 				}
-				return ret
-				;
+				return ret;
 			},
 			color: function(val, opts){
 				var ret = '#000000';

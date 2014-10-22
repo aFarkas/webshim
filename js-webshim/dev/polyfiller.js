@@ -137,7 +137,7 @@
 	}
 
 	$.extend(webshims, {
-		version: '1.15.4-pre',
+		version: '1.15.4',
 
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
@@ -925,7 +925,7 @@
 	//<picture
 	create('picture');
 	addPolyfill('picture', {
-		test: ('picturefill' in window) || !!window.HTMLPictureElement,
+		test: ('picturefill' in window) || !!window.HTMLPictureElement || ('respimage' in window),
 		d: ['matchMedia'],
 		c: [18],
 		loadInit: function(){

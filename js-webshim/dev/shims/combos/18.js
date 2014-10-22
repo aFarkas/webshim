@@ -1,4 +1,4 @@
-/*! respimage - v0.9.3 - 2014-10-13
+/*! respimage - v0.9.5 - 2014-10-22
  Licensed MIT */
 !function(window, document, undefined) {
 	"use strict";
@@ -89,7 +89,7 @@
 		tLow: .1,
 		tHigh: .5,
 		tLazy: .1,
-		greed: .4
+		greed: .32
 	}, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set";
 	ri.ns = ("ri" + new Date().getTime()).substr(0, 9), currentSrcSupported = "currentSrc" in image,
 		curSrcProp = currentSrcSupported ? "currentSrc" : "src", ri.supSrcset = "srcset" in image,
@@ -192,7 +192,7 @@
 	};
 	var sizeLengthCache = {};
 	ri.calcListLength = function(sourceSizeListStr) {
-		if (!(sourceSizeListStr in sizeLengthCache) || cfg.noCache) {
+		if (!(sourceSizeListStr in sizeLengthCache) || cfg.uT) {
 			var sourceSize, parsedSize, length, media, i, len, sourceSizeList = trim(sourceSizeListStr).split(/\s*,\s*/), winningLength = !1;
 			for (i = 0, len = sourceSizeList.length; len > i && (sourceSize = sourceSizeList[i],
 				parsedSize = ri.parseSize(sourceSize), length = parsedSize.length, media = parsedSize.media,
@@ -209,13 +209,13 @@
 		}
 		return candidates;
 	};
-	var dprM, tLow, greed, tLazy, tHigh, isWinComplete;
+	var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete;
 	ri.applySetCandidate = function(candidates, img) {
 		if (candidates.length) {
 			var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, imageData = img[ri.ns], evaled = !0;
 			if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set),
 					dpr = ri.getX(candidates, curCan), curSrc && (curCan && (curCan.res += tLazy), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set,
-					curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : img.complete || imageData.src != getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !isWinComplete && !inView(img)) && (bestCandidate = curCan,
+					curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ? bestCandidate = curCan : img.complete || imageData.src != getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !isWinComplete && !inView(img)) && (bestCandidate = curCan,
 						candidateSrc = curSrc, evaled = "lazy", isWinComplete && reevaluateAfterLoad(img))),
 					!bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length,
 											 bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i],
@@ -223,11 +223,13 @@
 				j = i - 1, bestCandidate = candidates[j] && (diff = candidate.res - dpr) && curSrc != ri.makeUrl(candidate.url) && chooseLowRes(candidates[j].res, diff, dpr) ? candidates[j] : candidate;
 				break;
 			}
-			return bestCandidate && (candidateSrc = ri.makeUrl(bestCandidate.url), currentSrcSupported || (img.currentSrc = candidateSrc),
-				imageData.curSrc = candidateSrc, imageData.curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img)),
+			return curSrc && curCan && (curCan.res -= tLazy), bestCandidate && (candidateSrc = ri.makeUrl(bestCandidate.url),
+			currentSrcSupported || (img.currentSrc = candidateSrc), imageData.curSrc = candidateSrc,
+				imageData.curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img)),
 				evaled;
 		}
-	}, ri.getX = function() {
+	};
+	ri.getX = function() {
 		return ri.DPR * cfg.xQuant;
 	}, ri.setSrc = function(img, bestCandidate) {
 		var origWidth;
@@ -293,8 +295,9 @@
 	};
 	var resizeThrottle;
 	ri.setupRun = function(options) {
-		(!alreadyRun || options.reevaluate || isVwDirty) && (dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 2),
-			tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, tHigh = cfg.tHigh),
+		(!alreadyRun || options.reevaluate || isVwDirty) && (cfg.uT || (ri.DPR = window.devicePixelRatio || 1),
+			dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 2.5), tLow = cfg.tLow * dprM,
+			tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = .6 + .4 * dprM + tLazy),
 		isVwDirty && (lengthCache = {}, sizeLengthCache = {}, updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
 	}, ri.teardownRun = function() {
 		var parent;
@@ -328,10 +331,100 @@
 		alreadyRun && ri.fillImgs({
 			reevaluate: !0
 		});
-	}, window.respimage = respimage, "object" == typeof module && "object" == typeof module.exports ? module.exports = respimage : "function" == typeof define && define.amd && define(function() {
-		return respimage;
-	});
+	}, window.respimage = respimage;
 }(window, document);
+(function( factory ) {
+	"use strict";
+	var interValId;
+	var intervalIndex = 0;
+	var run = function(){
+		if ( window.respimage ) {
+			factory( window.respimage );
+		}
+		if(window.respimage || intervalIndex > 9999){
+			clearInterval(interValId);
+		}
+		intervalIndex++;
+	};
+	interValId = setInterval(run, 8);
+
+	run();
+
+}( function( respimage ) {
+	"use strict";
+
+	var ri = respimage._;
+	var runningTests = 0;
+	var setTypeValue = function(types, value){
+		var i;
+		for(i = 0; i < types.length; i++){
+			ri.types[types[i]] = value;
+		}
+	};
+
+	if(window.HTMLPictureElement && !ri.cfg.uT){
+		respimage.testTypeSupport = function(){};
+		return;
+	}
+
+	ri.types["image/bmp"] = true;
+	ri.types["image/x-bmp"] = true;
+
+	respimage.testTypeSupport = function(types, url, width, useCanvas){
+		if(typeof types == "string"){
+			types = types.split(/\s*\,*\s+/g);
+		}
+		var canvas;
+		var supports = "pending";
+		var img = document.createElement('img');
+		var onComplete = function(){
+			runningTests--;
+			setTypeValue(types, supports);
+			if(runningTests < 1){
+				respimage({reevaluate: true});
+			}
+		};
+
+		if(useCanvas){
+			canvas = document.createElement('canvas');
+			if(!canvas.getContext){
+				setTypeValue(types, false);
+				return;
+			}
+		}
+
+		img.onload = function(){
+			var ctx;
+			supports = true;
+			if(width){
+				supports = img.width == width;
+			}
+
+			if(useCanvas){
+				ctx = canvas.getContext('2d');
+				ctx.drawImage(img, 0, 0);
+				supports = ctx.getImageData(0, 0, 1, 1).data[3] === 0;
+			}
+			onComplete();
+		};
+
+		img.onerror = function(){
+			supports = false;
+			onComplete();
+		};
+		runningTests++;
+		setTypeValue(types, "pending");
+		img.src = url;
+	};
+
+
+	respimage.testTypeSupport("image/webp", "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQADADQlpAADcAD++/1QAA==", 1);
+	respimage.testTypeSupport("image/jp2 image/jpx image/jpm", "data:image/jp2;base64,AAAADGpQICANCocKAAAAFGZ0eXBqcDIgAAAAAGpwMiAAAABHanAyaAAAABZpaGRyAAAAAQAAAAEAAQAHAAAAAAAPY29scgEAAAAAABEAAAAacmVzIAAAABJyZXNjAGAA/gBgAP4EBAAAAABqcDJj/0//UQApAAAAAAABAAAAAQAAAAAAAAAAAAAAAQAAAAEAAAAAAAAAAAABAAEB/1wADUAIEBAYEBAYEBAY/1IADAAAAAEAAwQEAAH/ZAAPAAFMV0ZfSlAyXzIxMf+QAAoAAAAAABIAAf+TgICAgP/Z", 1);
+	respimage.testTypeSupport("image/vnd.ms-photo", "data:image/vnd.ms-photo;base64,SUm8AQgAAAAFAAG8AQAQAAAASgAAAIC8BAABAAAAAQAAAIG8BAABAAAAAQAAAMC8BAABAAAAWgAAAMG8BAABAAAAHwAAAAAAAAAkw91vA07+S7GFPXd2jckNV01QSE9UTwAZAYBxAAAAABP/gAAEb/8AAQAAAQAAAA==", 1);
+	respimage.testTypeSupport("video/png video/apng video/x-mng video/x-png", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACGFjVEwAAAABAAAAAcMq2TYAAAANSURBVAiZY2BgYPgPAAEEAQB9ssjfAAAAGmZjVEwAAAAAAAAAAQAAAAEAAAAAAAAAAAD6A+gBAbNU+2sAAAARZmRBVAAAAAEImWNgYGBgAAAABQAB6MzFdgAAAABJRU5ErkJggg==", false, true);
+
+}));
+
 (function(){
 
 	webshim.isReady('picture', true);
