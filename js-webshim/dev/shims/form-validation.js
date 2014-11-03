@@ -762,9 +762,12 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			var invalid, errorBox, afterHide;
 			var fieldWrapper = this.getFieldWrapper(elem);
 
+			if(!reset){
+				invalid = $('input:invalid, select:invalid, textarea:invalid', fieldWrapper);
+			}
 			if(fieldWrapper.hasClass(invalidWrapperClass)){
 				$(elem).filter('input').off('.recheckinvalid');
-				if(!reset && (invalid = $('input:invalid, select:invalid, textarea:invalid', fieldWrapper)[0])){
+				if(!reset && invalid && invalid[0]){
 					$(invalid).trigger('updatevalidation.webshims');
 				} else {
 					errorBox = this.get(elem, fieldWrapper);
@@ -784,7 +787,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 				}
 
 			}
-			if(!reset && !invalid){
+			if(!reset && (!invalid || !invalid.length)){
 				this.addSuccess(elem, fieldWrapper);
 			}
 			return fieldWrapper;
