@@ -185,20 +185,24 @@ webshims.ready('form-validation', function(){
 
 
 	$('body').on('click', function(e){
+
 		if(e.target.type == 'submit' && !e.isDefaultPrevented()){
-			var activeElement, i, len;
-			var elements = $(e.target).jProp('form').prop('elements') || [];
+			var activeElement, i, len, elements;
+
 			try {
 				activeElement = document.activeElement;
-			} catch(e){}
+			} catch(er){}
+
+			if(!activeElement || activeElement == e.target){return;}
+			elements = $(e.target).jProp('form').prop('elements') || [];
+
+			if(activeElement && 'form' in activeElement && $.prop(activeElement, 'willValidate')){
+				$(activeElement).trigger('updatevalidation.webshims');
+			}
 
 			for(i = 0, len = elements.length; i < len; i++){
 				if($.data(elements[i], 'customMismatchedRule')){
-					if(activeElement == elements[i]){
-						$(elements[i]).trigger('updatevalidation.webshims');
-					} else {
-						testValidityRules(elements[i]);
-					}
+					testValidityRules(elements[i]);
 				}
 			}
 
