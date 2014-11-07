@@ -1,0 +1,21 @@
+{
+    "name": "components/befound/webshim",
+    "type": "component",
+    "license" : "MIT",
+    "require": {
+        "robloach/component-installer": "*",
+        "components/jquery" : "*"
+    },
+    "extra": {
+        "component": {
+			"scripts" : [
+				"js-webshim/minified/polyfiller.js"
+			],
+			"styles" : [
+			],
+            "files": [
+                "js-webshim/*",
+            ]
+        }
+    }
+}
