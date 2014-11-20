@@ -1,13 +1,20 @@
-/*! respimage - v0.9.5 - 2014-10-22
+/*! respimage - v1.1.6 - 2014-11-20
  Licensed MIT */
 !function(window, document, undefined) {
 	"use strict";
 	function trim(str) {
 		return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, "");
 	}
-	function updateView() {
-		isVwDirty = !1, ri.vW = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0),
-			vH = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0);
+	function updateMetrics() {
+		var dprM;
+		(isVwDirty || DPR != window.devicePixelRatio) && (isVwDirty = !1, DPR = window.devicePixelRatio,
+			cssCache = {}, sizeLengthCache = {}, dprM = (DPR || 1) * cfg.xQuant, cfg.uT || (dprM = Math.min(dprM, 3),
+		dprM > 1.4 && (dprM = Math.round(dprM / (1 + (dprM - 1.4) / 12) * 100) / 100), ri.DPR = dprM),
+			tLow = cfg.tLow * dprM, greed = cfg.greed / 2, greed += greed * dprM, tHigh = cfg.tHigh,
+			tMemory = 2 + dprM, units.width = Math.max(window.innerWidth || 0, docElem.clientWidth),
+			units.height = Math.max(window.innerHeight || 0, docElem.clientHeight), isLandscape = units.width > units.height,
+			units.vw = units.width / 100, units.vh = units.height / 100, units.em = ri.getEmValue(),
+			units.rem = units.em);
 	}
 	function parseDescriptor(descriptor) {
 		if (!(descriptor in memDescriptor)) {
@@ -15,19 +22,21 @@
 				val: 1,
 				type: "x"
 			}, parsedDescriptor = trim(descriptor || "");
-			parsedDescriptor && (parsedDescriptor.match(regDescriptor) ? (descriptorObj.val = 1 * RegExp.$1,
-				descriptorObj.type = RegExp.$2) : descriptorObj = !1), memDescriptor[descriptor] = descriptorObj;
+			parsedDescriptor && (parsedDescriptor = parsedDescriptor.replace(regHDesc, ""),
+				parsedDescriptor.match(regDescriptor) ? (descriptorObj.val = 1 * RegExp.$1, descriptorObj.type = RegExp.$2) : descriptorObj = !1),
+				memDescriptor[descriptor] = descriptorObj;
 		}
 		return memDescriptor[descriptor];
 	}
 	function chooseLowRes(lowRes, diff, dpr) {
-		return lowRes / dpr > .2 && (lowRes += diff * greed, diff > tHigh && (lowRes += tLow)),
+		var add = diff * greed * lowRes;
+		return isLandscape || (add /= 1.5), lowRes += add, diff > tHigh && (lowRes += tLow),
 		lowRes > dpr;
 	}
 	function inView(el) {
 		if (!el.getBoundingClientRect) return !0;
 		var bottom, right, left, top, rect = el.getBoundingClientRect();
-		return !!((bottom = rect.bottom) >= -9 && (top = rect.top) <= vH + 9 && (right = rect.right) >= -9 && (left = rect.left) <= ri.vW + 9 && (bottom || right || left || top));
+		return !!((bottom = rect.bottom) >= -9 && (top = rect.top) <= units.height + 9 && (right = rect.right) >= -9 && (left = rect.left) <= units.height + 9 && (bottom || right || left || top));
 	}
 	function applyBestCandidate(img) {
 		var srcSetCandidates, matchingSet = ri.getSet(img), evaluated = !1;
@@ -41,7 +50,7 @@
 		var candidate;
 		return !set && src && (set = img[ri.ns].sets, set = set && set[set.length - 1]),
 			candidate = getCandidateForSrc(src, set), candidate && (src = ri.makeUrl(src), img[ri.ns].curSrc = src,
-			img[ri.ns].curCan = candidate, currentSrcSupported || (img.currentSrc = src), candidate.res || setResolution(candidate, candidate.set.sizes)),
+			img[ri.ns].curCan = candidate, candidate.res || setResolution(candidate, candidate.set.sizes)),
 			candidate;
 	}
 	function getCandidateForSrc(src, set) {
@@ -83,18 +92,16 @@
 			candidate;
 	}
 	document.createElement("picture");
-	var lengthElInstered, lengthEl, currentSrcSupported, curSrcProp, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
-		addSize: !1,
+	var ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
 		xQuant: 1,
 		tLow: .1,
-		tHigh: .5,
-		tLazy: .1,
-		greed: .32
-	}, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set";
-	ri.ns = ("ri" + new Date().getTime()).substr(0, 9), currentSrcSupported = "currentSrc" in image,
-		curSrcProp = currentSrcSupported ? "currentSrc" : "src", ri.supSrcset = "srcset" in image,
-		ri.supSizes = "sizes" in image, ri.selShort = "picture > img, img[srcset]", ri.sel = ri.selShort,
-		ri.cfg = cfg, ri.supSrcset && (ri.sel += ", img[" + srcsetAttr + "]");
+		tHigh: .6,
+		tLazy: .33,
+		greed: .5
+	}, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", supportAbort = /rident/.test(navigator.userAgent), curSrcProp = "currentSrc";
+	ri.ns = ("ri" + new Date().getTime()).substr(0, 9), curSrcProp in image || (curSrcProp = "src"),
+		ri.supSrcset = "srcset" in image, ri.supSizes = "sizes" in image, ri.selShort = "picture>img,img[srcset]",
+		ri.sel = ri.selShort, ri.cfg = cfg, ri.supSrcset && (ri.sel += ",img[" + srcsetAttr + "]");
 	var anchor = document.createElement("a");
 	ri.makeUrl = function(src) {
 		return anchor.href = src, anchor.href;
@@ -102,11 +109,9 @@
 		return context.querySelectorAll(sel);
 	};
 	{
-		var on = (window.console && "function" == typeof console.warn ? function(message) {
-			console.warn(message);
-		} : noop, function(obj, evt, fn, capture) {
+		var on = function(obj, evt, fn, capture) {
 			obj.addEventListener ? obj.addEventListener(evt, fn, capture || !1) : obj.attachEvent && obj.attachEvent("on" + evt, fn);
-		}), off = function(obj, evt, fn, capture) {
+		}, off = function(obj, evt, fn, capture) {
 			obj.removeEventListener ? obj.removeEventListener(evt, fn, capture || !1) : obj.detachEvent && obj.detachEvent("on" + evt, fn);
 		};
 		"https:" == location.protocol;
@@ -115,41 +120,33 @@
 		return ri.matchesMedia = window.matchMedia && (matchMedia("(min-width: 0.1em)") || {}).matches ? function(media) {
 			return !media || matchMedia(media).matches;
 		} : ri.mMQ, ri.matchesMedia.apply(this, arguments);
-	}, ri.vW = 0;
-	var vH, isVwDirty = !0, regex = {
-		minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
-		maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/
-	}, mediaCache = {};
-	ri.mMQ = function(media) {
-		var min, max, ret = !1;
-		return media ? (mediaCache[media] || (min = media.match(regex.minw) && parseFloat(RegExp.$1) + (RegExp.$2 || ""),
-			max = media.match(regex.maxw) && parseFloat(RegExp.$1) + (RegExp.$2 || ""), min && (min = parseFloat(min, 10) * (min.indexOf("em") > 0 ? ri.getEmValue() : 1)),
-		max && (max = parseFloat(max, 10) * (max.indexOf("em") > 0 ? ri.getEmValue() : 1)),
-			mediaCache[media] = {
-				min: min,
-				max: max
-			}), min = mediaCache[media].min, max = mediaCache[media].max, (min && ri.vW >= min || max && ri.vW <= max) && (ret = !0),
-			ret) : !0;
-	}, ri.DPR = window.devicePixelRatio || 1;
-	var lengthCache = {}, regLength = /^([\d\.]+)(em|vw|px)$/, baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;";
+	};
+	var tLow, greed, tHigh, tMemory, isWinComplete, isLandscape, isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
+		px: 1,
+		"in": 96
+	};
+	ri.DPR = DPR || 1, ri.u = units, ri.mMQ = function(media) {
+		return media ? evalCSS(media) : !0;
+	};
+	var evalCSS = function() {
+		var cache = {}, regLength = /^([\d\.]+)(em|vw|px)$/, replace = function() {
+			for (var args = arguments, index = 0, string = args[0]; ++index in args; ) string = string.replace(args[index], args[++index]);
+			return string;
+		}, buidlStr = function(css) {
+			return cache[css] || (cache[css] = "return " + replace((css || "").toLowerCase(), /\band\b/g, "&&", /,/g, "||", /min-([a-z-\s]+):/g, "e.$1>=", /max-([a-z-\s]+):/g, "e.$1<=", /calc([^)]+)/g, "($1)", /(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)", /^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/gi, "") + ";"),
+				cache[css];
+		};
+		return function(css, length) {
+			var parsedLength;
+			if (!(css in cssCache)) if (cssCache[css] = !1, length && (parsedLength = css.match(regLength))) cssCache[css] = parsedLength[1] * units[parsedLength[2]]; else try {
+				cssCache[css] = new Function("e", buidlStr(css))(units);
+			} catch (e) {}
+			return cssCache[css];
+		};
+	}();
 	ri.calcLength = function(sourceSizeValue) {
-		var failed, parsedLength, orirgValue = sourceSizeValue, value = !1;
-		if (!(orirgValue in lengthCache)) {
-			if (parsedLength = sourceSizeValue.match(regLength)) parsedLength[1] = parseFloat(parsedLength[1], 10),
-				value = parsedLength[1] ? "vw" == parsedLength[2] ? ri.vW * parsedLength[1] / 100 : "em" == parsedLength[2] ? ri.getEmValue() * parsedLength[1] : parsedLength[1] : !1; else if (sourceSizeValue.indexOf("calc") > -1 || parseInt(sourceSizeValue, 10)) {
-				sourceSizeValue = sourceSizeValue.replace("vw", "%"), lengthEl || (lengthEl = document.createElement("div"),
-					lengthEl.style.cssText = baseStyle), lengthElInstered || (lengthElInstered = !0,
-					docElem.insertBefore(lengthEl, docElem.firstChild)), lengthEl.style.width = "0px";
-				try {
-					lengthEl.style.width = sourceSizeValue;
-				} catch (e) {
-					failed = !0;
-				}
-				value = lengthEl.offsetWidth, failed && (value = !1);
-			}
-			0 >= value && (value = !1), lengthCache[orirgValue] = value;
-		}
-		return lengthCache[orirgValue];
+		var value = evalCSS(sourceSizeValue, !0) || !1;
+		return 0 > value && (value = !1), value;
 	}, ri.types = types, types["image/jpeg"] = !0, types["image/gif"] = !0, types["image/png"] = !0,
 		types["image/svg+xml"] = document.implementation.hasFeature("http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1"),
 		ri.supportsType = function(type) {
@@ -179,7 +176,7 @@
 		}
 		return set.cands;
 	};
-	var eminpx, memDescriptor = {}, regDescriptor = /^([\+eE\d\.]+)(w|x)$/, fsCss = "font-size:100% !important;";
+	var eminpx, memDescriptor = {}, regDescriptor = /^([\+eE\d\.]+)(w|x)$/, regHDesc = /\s*\d+h\s*/, baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)", fsCss = "font-size:100%!important;";
 	ri.getEmValue = function() {
 		var body;
 		if (!eminpx && (body = document.body)) {
@@ -189,15 +186,13 @@
 				docElem.style.cssText = originalHTMLCSS, body.style.cssText = originalBodyCSS;
 		}
 		return eminpx || 16;
-	};
-	var sizeLengthCache = {};
-	ri.calcListLength = function(sourceSizeListStr) {
+	}, ri.calcListLength = function(sourceSizeListStr) {
 		if (!(sourceSizeListStr in sizeLengthCache) || cfg.uT) {
 			var sourceSize, parsedSize, length, media, i, len, sourceSizeList = trim(sourceSizeListStr).split(/\s*,\s*/), winningLength = !1;
 			for (i = 0, len = sourceSizeList.length; len > i && (sourceSize = sourceSizeList[i],
 				parsedSize = ri.parseSize(sourceSize), length = parsedSize.length, media = parsedSize.media,
 			!length || !ri.matchesMedia(media) || (winningLength = ri.calcLength(length)) === !1); i++) ;
-			sizeLengthCache[sourceSizeListStr] = winningLength ? winningLength : ri.vW;
+			sizeLengthCache[sourceSizeListStr] = winningLength ? winningLength : units.width;
 		}
 		return sizeLengthCache[sourceSizeListStr];
 	}, ri.setRes = function(set) {
@@ -208,83 +203,70 @@
 			candidate.descriptor || setResolution(candidate, set.sizes);
 		}
 		return candidates;
-	};
-	var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete;
-	ri.applySetCandidate = function(candidates, img) {
+	}, ri.applySetCandidate = function(candidates, img) {
 		if (candidates.length) {
-			var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, imageData = img[ri.ns], evaled = !0;
+			var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, oldRes, imageData = img[ri.ns], evaled = !0;
 			if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set),
-					dpr = ri.getX(candidates, curCan), curSrc && (curCan && (curCan.res += tLazy), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set,
-					curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ? bestCandidate = curCan : img.complete || imageData.src != getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !isWinComplete && !inView(img)) && (bestCandidate = curCan,
-						candidateSrc = curSrc, evaled = "lazy", isWinComplete && reevaluateAfterLoad(img))),
-					!bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length,
-											 bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i],
-				candidate.res >= dpr) {
+					dpr = ri.DPR, curSrc && (curCan && curCan.res < dpr && (oldRes = curCan.res, curCan.res += cfg.tLazy * Math.pow(curCan.res - .1, isLandscape ? 2.2 : 1.9)),
+					isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, curCan && isSameSet && curCan.res >= dpr && (oldRes || tMemory > curCan.res) ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan,
+					candidateSrc = curSrc, evaled = "L", isWinComplete && reevaluateAfterLoad(img))),
+					!bestCandidate) for (oldRes && (curCan.res = curCan.res - (curCan.res - oldRes) / 2),
+											 candidates.sort(ascendingSort), length = candidates.length, bestCandidate = candidates[length - 1],
+											 i = 0; length > i; i++) if (candidate = candidates[i], candidate.res >= dpr) {
 				j = i - 1, bestCandidate = candidates[j] && (diff = candidate.res - dpr) && curSrc != ri.makeUrl(candidate.url) && chooseLowRes(candidates[j].res, diff, dpr) ? candidates[j] : candidate;
 				break;
 			}
-			return curSrc && curCan && (curCan.res -= tLazy), bestCandidate && (candidateSrc = ri.makeUrl(bestCandidate.url),
-			currentSrcSupported || (img.currentSrc = candidateSrc), imageData.curSrc = candidateSrc,
-				imageData.curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img)),
+			return oldRes && (curCan.res = oldRes), bestCandidate && (candidateSrc = ri.makeUrl(bestCandidate.url),
+				imageData.curSrc = candidateSrc, imageData.curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img)),
 				evaled;
 		}
 	};
-	ri.getX = function() {
-		return ri.DPR * cfg.xQuant;
-	}, ri.setSrc = function(img, bestCandidate) {
+	ri.setSrc = function(img, bestCandidate) {
 		var origWidth;
 		img.src = bestCandidate.url, "image/svg+xml" == bestCandidate.set.type && (origWidth = img.style.width,
-			img.style.width = img.offsetWidth + 1 + "px", img.offsetWidth + 1 && (img.style.width = origWidth));
+			img.style.width = img.offsetWidth + 1 + "px", img.offsetWidth + 1 && (img.style.width = origWidth)),
+			ri.setSize(img);
+	}, ri.setSize = noop, ri.getSet = function(img) {
+		var i, set, supportsType, match = !1, sets = img[ri.ns].sets;
+		for (i = 0; i < sets.length && !match; i++) if (set = sets[i], set.srcset && ri.matchesMedia(set.media) && (supportsType = ri.supportsType(set.type))) {
+			"pending" == supportsType && (set = supportsType), match = set;
+			break;
+		}
+		return match;
 	};
-	var intrinsicSizeHandler = function() {
-		off(this, "load", intrinsicSizeHandler), ri.setSize(this);
-	};
-	ri.setSize = function(img) {
-		var width, curCandidate = img[ri.ns].curCan;
-		cfg.addSize && curCandidate && !img[ri.ns].dims && (img.complete || (off(img, "load", intrinsicSizeHandler),
-			on(img, "load", intrinsicSizeHandler)), width = img.naturalWidth, width && ("x" == curCandidate.desc.type ? setImgAttr.call(img, "width", parseInt(width / curCandidate.res / cfg.xQuant, 10)) : "w" == curCandidate.desc.type && setImgAttr.call(img, "width", parseInt(curCandidate.cWidth * (width / curCandidate.desc.val), 10))));
-	}, document.addEventListener && "naturalWidth" in image && "complete" in image || (ri.setSize = noop),
-		ri.getSet = function(img) {
-			var i, set, supportsType, match = !1, sets = img[ri.ns].sets;
-			for (i = 0; i < sets.length && !match; i++) if (set = sets[i], set.srcset && ri.matchesMedia(set.media) && (supportsType = ri.supportsType(set.type))) {
-				"pending" == supportsType && (set = supportsType), match = set;
-				break;
-			}
-			return match;
-		};
 	var alwaysCheckWDescriptor = ri.supSrcset && !ri.supSizes;
 	ri.parseSets = function(element, parent) {
 		var srcsetAttribute, fallbackCandidate, isWDescripor, srcsetParsed, hasPicture = "PICTURE" == parent.nodeName.toUpperCase(), imageData = element[ri.ns];
 		imageData.src === undefined && (imageData.src = getImgAttr.call(element, "src"),
 			imageData.src ? setImgAttr.call(element, srcAttr, imageData.src) : removeImgAttr.call(element, srcAttr)),
 		imageData.srcset === undefined && (srcsetAttribute = getImgAttr.call(element, "srcset"),
-			imageData.srcset = srcsetAttribute, srcsetParsed = !0), imageData.dims === undefined && (imageData.dims = getImgAttr.call(element, "height") && getImgAttr.call(element, "width")),
-			imageData.sets = [], hasPicture && (imageData.pic = !0, getAllSourceElements(parent, imageData.sets)),
-			imageData.srcset ? (fallbackCandidate = {
-				srcset: imageData.srcset,
-				sizes: getImgAttr.call(element, "sizes")
-			}, imageData.sets.push(fallbackCandidate), isWDescripor = alwaysCheckWDescriptor || imageData.src ? hasWDescripor(fallbackCandidate) : !1,
-			isWDescripor || !imageData.src || getCandidateForSrc(imageData.src, fallbackCandidate) || hasOneX(fallbackCandidate) || (fallbackCandidate.srcset += ", " + imageData.src,
-				fallbackCandidate.cands = !1)) : imageData.src && imageData.sets.push({
-				srcset: imageData.src,
-				sizes: null
-			}), imageData.curCan = null, imageData.supported = !(hasPicture || fallbackCandidate && !ri.supSrcset || isWDescripor),
+			imageData.srcset = srcsetAttribute, srcsetParsed = !0), imageData.sets = [], hasPicture && (imageData.pic = !0,
+			getAllSourceElements(parent, imageData.sets)), imageData.srcset ? (fallbackCandidate = {
+			srcset: imageData.srcset,
+			sizes: getImgAttr.call(element, "sizes")
+		}, imageData.sets.push(fallbackCandidate), isWDescripor = alwaysCheckWDescriptor || imageData.src ? hasWDescripor(fallbackCandidate) : !1,
+		isWDescripor || !imageData.src || getCandidateForSrc(imageData.src, fallbackCandidate) || hasOneX(fallbackCandidate) || (fallbackCandidate.srcset += ", " + imageData.src,
+			fallbackCandidate.cands = !1)) : imageData.src && imageData.sets.push({
+			srcset: imageData.src,
+			sizes: null
+		}), imageData.curCan = null, imageData.supported = !(hasPicture || fallbackCandidate && !ri.supSrcset || isWDescripor),
 		srcsetParsed && ri.supSrcset && !imageData.supported && (srcsetAttribute ? (setImgAttr.call(element, srcsetAttr, srcsetAttribute),
-			element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), imageData.parsed = !0;
+			element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), imageData.supported && !imageData.srcset && (!imageData.src && element.src || element.src != ri.makeUrl(imageData.src)) && (null == imageData.src ? element.removeAttribute("src") : element.src = imageData.src),
+			imageData.parsed = !0;
 	};
 	var reevaluateAfterLoad = function() {
 		var onload = function() {
-			off(this, "load", onload), ri.fillImgs({
+			off(this, "load", onload), off(this, "error", onload), ri.fillImgs({
 				elements: [ this ]
 			});
 		};
 		return function(img) {
-			off(img, "load", onload), on(img, "load", onload);
+			off(img, "load", onload), off(img, "error", onload), on(img, "error", onload), on(img, "load", onload);
 		};
 	}();
 	ri.fillImg = function(element, options) {
 		var parent, imageData, extreme = options.reparse || options.reevaluate;
-		if (element[ri.ns] || (element[ri.ns] = {}), imageData = element[ri.ns], "lazy" == imageData.evaled && (isWinComplete || element.complete) && (imageData.evaled = !1),
+		if (element[ri.ns] || (element[ri.ns] = {}), imageData = element[ri.ns], "L" == imageData.evaled && element.complete && (imageData.evaled = !1),
 			extreme || !imageData.evaled) {
 			if (!imageData.parsed || options.reparse) {
 				if (parent = element.parentNode, !parent) return;
@@ -295,14 +277,8 @@
 	};
 	var resizeThrottle;
 	ri.setupRun = function(options) {
-		(!alreadyRun || options.reevaluate || isVwDirty) && (cfg.uT || (ri.DPR = window.devicePixelRatio || 1),
-			dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 2.5), tLow = cfg.tLow * dprM,
-			tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = .6 + .4 * dprM + tLazy),
-		isVwDirty && (lengthCache = {}, sizeLengthCache = {}, updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
-	}, ri.teardownRun = function() {
-		var parent;
-		lengthElInstered && (lengthElInstered = !1, parent = lengthEl.parentNode, parent && parent.removeChild(lengthEl));
-	};
+		(!alreadyRun || options.reevaluate || isVwDirty) && (updateMetrics(), options.elements || options.context || clearTimeout(resizeThrottle));
+	}, ri.teardownRun = noop;
 	var alreadyRun = !1, respimage = function(opt) {
 		var elements, i, plen, options = opt || {};
 		if (options.elements && 1 == options.elements.nodeType && ("IMG" == options.elements.nodeName.toUpperCase() ? options.elements = [ options.elements ] : (options.context = options.elements,
@@ -313,9 +289,13 @@
 		}
 	};
 	ri.fillImgs = respimage, window.HTMLPictureElement ? (respimage = noop, ri.fillImg = noop) : !function() {
-		var regWinComplete = /^loade|^c/, run = function() {
-			clearTimeout(timerId), timerId = setTimeout(run, 3e3), document.body && (regWinComplete.test(document.readyState || "") && (isWinComplete = !0,
-				clearTimeout(timerId), off(document, "readystatechange", run)), ri.fillImgs());
+		var lDelay;
+		lDelay = supportAbort ? 180 : 400;
+		var run = function() {
+			var readyState = document.readyState || "";
+			clearTimeout(timerId), timerId = setTimeout(run, "loading" == readyState ? lDelay : 2e3),
+			document.body && (/d$|^c/.test(readyState) && (isWinComplete = !0, clearTimeout(timerId),
+				off(document, "readystatechange", run)), ri.fillImgs());
 		}, resizeEval = function() {
 			ri.fillImgs({
 				reevaluate: !0
@@ -333,6 +313,125 @@
 		});
 	}, window.respimage = respimage;
 }(window, document);
+
+(function( factory ) {
+	"use strict";
+	var interValId;
+	var intervalIndex = 0;
+	var run = function(){
+		if ( window.respimage ) {
+			factory( window.respimage );
+		}
+		if(window.respimage || intervalIndex > 9999){
+			clearInterval(interValId);
+		}
+		intervalIndex++;
+	};
+	interValId = setInterval(run, 8);
+
+	run();
+
+}( function( respimage, undefined ) {
+	"use strict";
+
+	var ri = respimage._;
+	var knownWidths = {};
+	var cfg = ri.cfg;
+	var curSrcProp = "currentSrc";
+	var setSize = function(width, img, data){
+		var curCandidate = data.curCan;
+
+		if ( width ) {
+			if ( curCandidate.desc.type == "x" ) {
+				img.setAttribute( "width", parseInt( (width / curCandidate.res) / cfg.xQuant, 10) );
+			} else if ( curCandidate.desc.type == "w" ) {
+				img.setAttribute( "width", parseInt( curCandidate.cWidth * (width / curCandidate.desc.val), 10) );
+			}
+		}
+	};
+	var loadBg = function(url, img, data){
+		var bgImg;
+		var curCandidate;
+		if(knownWidths[url]){
+			setSize(knownWidths[url], img, data);
+		} else {
+			curCandidate = data.curCan;
+			if(curCandidate.desc.type == 'w'){
+				setSize(curCandidate.desc.val, img, data);
+			}
+
+			bgImg = document.createElement('img');
+			bgImg.onload = function(){
+				knownWidths[url] = bgImg.naturalWidth || bgImg.width;
+				if(url == img[curSrcProp]){
+					setSize(knownWidths[url], img, data);
+				}
+				bgImg.onload = null;
+				bgImg.onerror = null;
+				img = null;
+				bgImg = null;
+			};
+			bgImg.onerror = function(){
+				img = null;
+				bgImg.onload = null;
+				bgImg.onerror = null;
+				bgImg = null;
+			};
+			bgImg.src = url;
+
+			if(bgImg && bgImg.complete){
+				bgImg.onload();
+			}
+		}
+
+	};
+	var reeval = (function(){
+		var running, timer;
+		var run = function(){
+			running = false;
+			clearTimeout(timer);
+			respimage({reevaluate: true});
+		};
+
+		return function(){
+			if(!running && cfg.addSize){
+				running = true;
+				clearTimeout(timer);
+				timer = setTimeout(run, 33);
+			}
+		};
+
+	})();
+
+	if( !(curSrcProp in document.createElement("img")) ){
+		curSrcProp = "src";
+	}
+
+	cfg.addSize = true;
+
+	ri.setSize = function( img ) {
+		var url;
+		var data = img[ ri.ns ];
+		var curCandidate = data.curCan;
+
+		if ( data.dims === undefined ) {
+			data.dims = img.getAttribute( "height" ) && img.getAttribute( "width" );
+		}
+
+		if ( !cfg.addSize || !curCandidate || data.dims ) {return;}
+		url = ri.makeUrl(curCandidate.url);
+		if(url == img[curSrcProp]){
+			loadBg(url, img, data);
+		}
+	};
+
+
+	if(window.addEventListener){
+		addEventListener('resize', reeval, false);
+	}
+	respimage({reevaluate: true});
+}));
+
 (function( factory ) {
 	"use strict";
 	var interValId;
@@ -419,11 +518,12 @@
 
 
 	respimage.testTypeSupport("image/webp", "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQADADQlpAADcAD++/1QAA==", 1);
-	respimage.testTypeSupport("image/jp2 image/jpx image/jpm", "data:image/jp2;base64,AAAADGpQICANCocKAAAAFGZ0eXBqcDIgAAAAAGpwMiAAAABHanAyaAAAABZpaGRyAAAAAQAAAAEAAQAHAAAAAAAPY29scgEAAAAAABEAAAAacmVzIAAAABJyZXNjAGAA/gBgAP4EBAAAAABqcDJj/0//UQApAAAAAAABAAAAAQAAAAAAAAAAAAAAAQAAAAEAAAAAAAAAAAABAAEB/1wADUAIEBAYEBAYEBAY/1IADAAAAAEAAwQEAAH/ZAAPAAFMV0ZfSlAyXzIxMf+QAAoAAAAAABIAAf+TgICAgP/Z", 1);
+	respimage.testTypeSupport("image/jp2 image/jpx image/jpm", "data:image/jp2;base64,/0//UQAyAAAAAAABAAAAAgAAAAAAAAAAAAAABAAAAAQAAAAAAAAAAAAEBwEBBwEBBwEBBwEB/1IADAAAAAEAAAQEAAH/XAAEQED/ZAAlAAFDcmVhdGVkIGJ5IE9wZW5KUEVHIHZlcnNpb24gMi4wLjD/kAAKAAAAAABYAAH/UwAJAQAABAQAAf9dAAUBQED/UwAJAgAABAQAAf9dAAUCQED/UwAJAwAABAQAAf9dAAUDQED/k8+kEAGvz6QQAa/PpBABr994EAk//9k=", 1);
 	respimage.testTypeSupport("image/vnd.ms-photo", "data:image/vnd.ms-photo;base64,SUm8AQgAAAAFAAG8AQAQAAAASgAAAIC8BAABAAAAAQAAAIG8BAABAAAAAQAAAMC8BAABAAAAWgAAAMG8BAABAAAAHwAAAAAAAAAkw91vA07+S7GFPXd2jckNV01QSE9UTwAZAYBxAAAAABP/gAAEb/8AAQAAAQAAAA==", 1);
 	respimage.testTypeSupport("video/png video/apng video/x-mng video/x-png", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACGFjVEwAAAABAAAAAcMq2TYAAAANSURBVAiZY2BgYPgPAAEEAQB9ssjfAAAAGmZjVEwAAAAAAAAAAQAAAAEAAAAAAAAAAAD6A+gBAbNU+2sAAAARZmRBVAAAAAEImWNgYGBgAAAABQAB6MzFdgAAAABJRU5ErkJggg==", false, true);
 
 }));
+
 
 (function(){
 

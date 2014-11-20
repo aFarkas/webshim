@@ -1097,7 +1097,7 @@
 
 		webshims.validationMessages = webshims.validityMessages = {
 			langSrc: 'i18n/formcfg-',
-			availableLangs: "ar ca cs el es fa fr he hi hu it ja lt nl pl pt pt-BR pt-PT ru sv zh-CN zh-TW".split(' ')
+			availableLangs: "ar ca cs el es fa fr he hi hu it ja lt nl no pl pt pt-BR pt-PT ru sv zh-CN zh-TW".split(' ')
 		};
 		webshims.formcfg = $.extend({}, webshims.validationMessages);
 
