@@ -28,8 +28,8 @@ webshims.validityMessages.nl = {
 		"month": "Maand moet op of voor {%max} zijn."
 	},
 	"stepMismatch": "Ongeldige invoer.",
-	"tooLong": "Voer maximaal {%maxLength} karakter(s) in. {%valueLen} is te lang.",
-	"tooShort": "Voer minimaal {%minLength} karakter(s) in. {%valueLen} is te kort.",
+	"tooLong": "Voer maximaal {%maxlength} karakter(s) in. {%valueLen} is te lang.",
+	"tooShort": "Voer minimaal {%minlength} karakter(s) in. {%valueLen} is te kort.",
 	"patternMismatch": "Voer een waarde in met de gevraagde opmaak: {%title}.",
 	"valueMissing": {
 		"defaultMessage": "Vul dit veld in.",
