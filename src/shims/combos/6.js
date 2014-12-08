@@ -3284,7 +3284,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 					$(data.shim.options.containerElements)
 						.on({
 							'focusin focus focusout blur': function(e){
-								e.stopImmediatePropagation();
+								e.stopPropagation();
 								hasFocus = has[e.type];
 								clearTimeout(timer);
 								timer = setTimeout(function(){

@@ -3693,7 +3693,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 					$(data.shim.options.containerElements)
 						.on({
 							'focusin focus focusout blur': function(e){
-								e.stopImmediatePropagation();
+								e.stopPropagation();
 								hasFocus = has[e.type];
 								clearTimeout(timer);
 								timer = setTimeout(function(){

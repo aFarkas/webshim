@@ -3073,7 +3073,7 @@ webshims.register('form-number-date-api', function($, webshims, window, document
 					$(data.shim.options.containerElements)
 						.on({
 							'focusin focus focusout blur': function(e){
-								e.stopImmediatePropagation();
+								e.stopPropagation();
 								hasFocus = has[e.type];
 								clearTimeout(timer);
 								timer = setTimeout(function(){
