@@ -1,0 +1,39 @@
+{
+  "name": "webshim",
+  "repository": "brendanator/webshim",
+  "description": "Webshims Lib is a modular capability-based polyfill-loading library",
+  "version": "master",
+  "keywords": [
+    "polyfill",
+    "shim",
+    "ES5",
+    "forms",
+    "widgets",
+    "datepicker",
+    "colorpicker",
+    "slider",
+    "formvalidation",
+    "validation",
+    "mediaelement",
+    "video",
+    "audio",
+    "canvas",
+    "HTML5",
+    "UI",
+    "geolocation",
+    "getUserMedia"
+  ],
+  "dependencies": {
+    "components/jquery": ">=1.8.2",
+    "components/modernizr": ">=2.8.3"
+  },
+  "main": "js-webshim/minified/polyfiller.js",
+  "scripts": ["js-webshim/minified/polyfiller.js"],
+  "files": ["js-webshim/minified/shims/**/*.*"],
+  "development": {
+    "main": "js-webshim/dev/polyfiller.js",
+    "scripts": ["js-webshim/dev/polyfiller.js"],
+    "files": ["js-webshim/dev/shims/**/*.*"]
+  },
+  "license": "MIT"
+}
