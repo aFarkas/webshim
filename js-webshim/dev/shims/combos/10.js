@@ -2419,9 +2419,9 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 				return val;
 			},
 			month: function(val, opts, noCorrect){
-				
-				var p = (!opts.splitInput) ? val.trim().split(/[\.\s-\/\\]+/) : val;
-				
+				var regSplit = opts.monthNames == 'monthNamesShort' ? /[\s-\/\\]+/ : /[\.\s-\/\\]+/;
+				var p = (!opts.splitInput) ? val.trim().split(regSplit) : val;
+
 				if(p.length == 2 && p[0] && p[1]){
 					p[0] = !noCorrect && curCfg.date.monthkeys[p[0]] || p[0];
 					p[1] = !noCorrect && curCfg.date.monthkeys[p[1]] || p[1];
