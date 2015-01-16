@@ -199,7 +199,11 @@ webshim.setOptions('forms', {
 		"events": "focusout change", //Note: The 'invalid' and 'updatevalidation' events will be always used
 		
 		//the class of the errorbox, which is normally appended to the fieldWrapper
-		"errorBoxClass": "ws-errorbox", 
+		"errorBoxClass": "ws-errorbox",
+		//the html tag used for error boxes, to adjust to your page structure / semantics
+		"errorBoxWrapper": "div",
+		//the html tag used for messages in error boxes, to adjust to your page structure / semantics
+    	"errorMessageWrapper": "p",
 		
 		//classes to adjust to your CSS/CSS-framework
 		"errorMessageClass": "ws-errormessage",
