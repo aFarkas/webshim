@@ -643,7 +643,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			var errorBox = $('.'+errorBoxClass, fieldWrapper);
 
 			if(!errorBox.length){
-				errorBox = $('<'+errorBoxWrapper+' class="'+ errorBoxClass +'" hidden="hidden" style="display: none;">');
+				errorBox = $('<'+errorBoxWrapper+' class="'+ errorBoxClass +'" hidden="hidden" style="display: none;" />');
 				fieldWrapper.append(errorBox);
 			}
 			if(!errorBox.prop('id')){
