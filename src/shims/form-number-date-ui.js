@@ -1521,7 +1521,7 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 									popover.activeElement.focus();
 								}, 4);
 							}
-							if(data.element.is(':focus')  && !$.nodeName(e.target, 'select')){
+							if(data.element.is(':focus') && !$.nodeName(e.target, 'select')){
 								popover.openedByFocus = options.buttonOnly ? false : !options.noInput;
 								show();
 							}
@@ -1838,7 +1838,11 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 					$(data.shim.options.containerElements)
 						.on({
 							'focusin focus focusout blur': function(e){
-								e.stopPropagation();
+								if(e.type == 'focus'){
+									e.stopPropagation();
+								} else {
+									e.stopImmediatePropagation();
+								}
 								hasFocus = has[e.type];
 								clearTimeout(timer);
 								timer = setTimeout(function(){
