@@ -1,6 +1,6 @@
 (function($){
 	var remove;
-	var regStart = /\/\/<([A-Za-z]+)/;
+	var regStart = /\/\/<([A-Za-z0-9\-_]+)/;
 	var regEnd = /\/\/>/;
 	var initialAll = {
 		forms: {
