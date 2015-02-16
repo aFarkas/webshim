@@ -38,8 +38,8 @@ webshims.validityMessages.fr = {
 };
 webshims.formcfg.fr = {
 	numberFormat: {
-		".": ".",
-		",": ","
+		".": ",",
+		",": " "
 	},
 	numberSigns: '.',
 	dateSigns: '/',
