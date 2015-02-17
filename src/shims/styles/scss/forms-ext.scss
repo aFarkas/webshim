@@ -252,20 +252,6 @@ input[type="color"] {
 		margin-left: 0;
 		margin-right: -39px;
 	}
-
-	.step-controls {
-		opacity: 0;
-	}
-
-	:focus + &,
-	:hover + &,
-	:active + &,
-	&:hover {
-		.step-controls {
-			opacity: 1;
-		}
-
-	}
 }
 
 .step-controls {
