@@ -318,12 +318,6 @@ input[type="color"] {
   margin-left: 0;
   margin-right: -39px;
 }
-.input-button-size-2 .step-controls {
-  opacity: 0;
-}
-:focus + .input-button-size-2 .step-controls, :hover + .input-button-size-2 .step-controls, :active + .input-button-size-2 .step-controls, .input-button-size-2:hover .step-controls {
-  opacity: 1;
-}
 
 .step-controls {
   transition: all 300ms;

@@ -1,4 +1,4 @@
-/*! respimage - v1.2.1 - 2014-12-23
+/*! respimage - v1.3.0 - 2015-01-29
  Licensed MIT */
 !function(window, document, undefined) {
 	"use strict";
@@ -191,7 +191,7 @@
 					dpr = ri.DPR, oldRes = curCan && curCan.res, !bestCandidate && curSrc && (abortCurSrc = supportAbort && !img.complete && curCan && oldRes > dpr,
 				abortCurSrc || curCan && !(tMemory > oldRes) || (curCan && dpr > oldRes && oldRes > lowTreshHold && (partialLowTreshHold > oldRes && (lazyF *= .87,
 					sub += .04 * dpr), curCan.res += lazyF * Math.pow(oldRes - sub, 2)), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set,
-					curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : supportNativeLQIP || img.complete || !getImgAttr.call(img, "src") || img.lazyload || supportAbort && !(5 > imgAbortCount) || !isSameSet && inView(img) || (bestCandidate = curCan,
+					curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : supportNativeLQIP || img.complete || !getImgAttr.call(img, "src") || img.lazyload || supportAbort && !(4 > imgAbortCount) || !isSameSet && inView(img) || (bestCandidate = curCan,
 						candidateSrc = curSrc, evaled = "L", reevaluateAfterLoad(img)))), !bestCandidate) for (oldRes && (curCan.res = curCan.res - (curCan.res - oldRes) / 2),
 																												   candidates.sort(ascendingSort), length = candidates.length, bestCandidate = candidates[length - 1],
 																												   i = 0; length > i; i++) if (candidate = candidates[i], candidate.res >= dpr) {
@@ -213,11 +213,11 @@
 			break;
 		}
 		return match;
-	}, ri.parseSets = function(element, parent) {
+	}, ri.parseSets = function(element, parent, options) {
 		var srcsetAttribute, imageSet, isWDescripor, srcsetParsed, hasPicture = "PICTURE" == parent.nodeName.toUpperCase(), imageData = element[ri.ns];
-		imageData.src === undefined && (imageData.src = getImgAttr.call(element, "src"),
+		(imageData.src === undefined || options.src) && (imageData.src = getImgAttr.call(element, "src"),
 			imageData.src ? setImgAttr.call(element, srcAttr, imageData.src) : removeImgAttr.call(element, srcAttr)),
-		imageData.srcset === undefined && (srcsetAttribute = getImgAttr.call(element, "srcset"),
+		(imageData.srcset === undefined || !ri.supSrcset || element.srcset || options.srcset) && (srcsetAttribute = getImgAttr.call(element, "srcset"),
 			imageData.srcset = srcsetAttribute, srcsetParsed = !0), imageData.sets = [], hasPicture && (imageData.pic = !0,
 			getAllSourceElements(parent, imageData.sets)), imageData.srcset ? (imageSet = {
 			srcset: imageData.srcset,
@@ -231,7 +231,7 @@
 			}))) : imageData.src && imageData.sets.push({
 			srcset: imageData.src,
 			sizes: null
-		}), imageData.curCan = null, imageData.supported = !(hasPicture || imageSet && !ri.supSrcset || isWDescripor),
+		}), imageData.curCan = null, imageData.curSrc = undefined, imageData.supported = !(hasPicture || imageSet && !ri.supSrcset || isWDescripor),
 		srcsetParsed && ri.supSrcset && !imageData.supported && (srcsetAttribute ? (setImgAttr.call(element, srcsetAttr, srcsetAttribute),
 			element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), imageData.supported && !imageData.srcset && (!imageData.src && element.src || element.src != ri.makeUrl(imageData.src)) && (null == imageData.src ? element.removeAttribute("src") : element.src = imageData.src),
 			imageData.parsed = !0;
@@ -273,6 +273,7 @@
 	};
 	for (;setOptions && setOptions.length; ) window.respimgCFG.push(setOptions.shift());
 }(window, document);
+
 (function( factory ) {
 	"use strict";
 	var interValId;
@@ -364,6 +365,7 @@
 	respimage.testTypeSupport("video/png video/apng video/x-mng video/x-png", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACGFjVEwAAAABAAAAAcMq2TYAAAANSURBVAiZY2BgYPgPAAEEAQB9ssjfAAAAGmZjVEwAAAAAAAAAAQAAAAEAAAAAAAAAAAD6A+gBAbNU+2sAAAARZmRBVAAAAAEImWNgYGBgAAAABQAB6MzFdgAAAABJRU5ErkJggg==", false, true);
 
 }));
+
 
 (function( factory ) {
 	"use strict";
@@ -506,6 +508,7 @@
 
 	reeval();
 }));
+
 
 
 (function(){
