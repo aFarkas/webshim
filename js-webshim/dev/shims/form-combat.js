@@ -15,30 +15,32 @@ webshims.register('form-combat', function($,webshims){
 			webshims.info('detected use of '+ pName +' try to add support.');
 		}
 	};
-	
-	addReplacement('select2', {
-		shadow: 'container',
-		shadowFocus: 'focusser',
-		_create: function(elem, shadow, shadowFocus, widgetData){
-			
-			if(('container' in widgetData) && $.isFunction(widgetData.opened)){
-				var onValidate = function(e){
-					if (!webshims.wsPopover.isInElement([elem, shadow, shadowFocus, $(widgetData.container)], e.target)) {
-						$(elem).trigger('updatevalidation.webshims');
-					}
-				};
-				
-				$(shadow).on('wsallowinstantvalidation', function(e, data){
-					$(document).off('focusin', onValidate);
-					if(data.type == 'focusout' && data.target != elem && widgetData.opened()){
-						$(document).on('focusin', onValidate);
-						return false;
-					}
-				});
+
+	if($.fn.select2){
+
+		addReplacement('select2', {
+			shadow: $.fn.select2.amd ? '$container' : 'container',
+			shadowFocus: $.fn.select2.amd ? '$selection' : 'focusser',
+			_create: function(elem, shadow, shadowFocus, widgetData){
+				if(('container' in widgetData) && $.isFunction(widgetData.opened)){
+					var onValidate = function(e){
+						if (!webshims.wsPopover.isInElement([elem, shadow, shadowFocus, $(widgetData.container)], e.target)) {
+							$(elem).trigger('updatevalidation.webshims');
+						}
+					};
+
+					$(shadow).on('wsallowinstantvalidation', function(e, data){
+						$(document).off('focusin', onValidate);
+						if(data.type == 'focusout' && data.target != elem && widgetData.opened()){
+							$(document).on('focusin', onValidate);
+							return false;
+						}
+					});
+				}
 			}
-		}
-	});
-	
+		});
+	}
+
 	addReplacement('chosen', {
 		shadow: 'container',
 		shadowFocus: 'search_field'
@@ -120,6 +122,7 @@ webshims.register('form-combat', function($,webshims){
 	find.register = function(elem, data, pluginDescriptor, plugin){
 		var shadow = typeof pluginDescriptor.shadow == 'string' ? data[pluginDescriptor.shadow] : pluginDescriptor.shadow(data, elem);
 		var shadowFocus = typeof pluginDescriptor.shadowFocus == 'string' ? data[pluginDescriptor.shadowFocus] : pluginDescriptor.shadowFocus(data, elem);
+		console.log(data, arguments);
 		if(!shadowFocus){
 			shadowFocus = shadow;
 		}
