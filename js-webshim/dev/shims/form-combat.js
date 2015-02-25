@@ -22,8 +22,22 @@ webshims.register('form-combat', function($,webshims){
 			shadow: $.fn.select2.amd ? '$container' : 'container',
 			shadowFocus: $.fn.select2.amd ? '$selection' : 'focusser',
 			_create: function(elem, shadow, shadowFocus, widgetData){
-				if(('container' in widgetData) && $.isFunction(widgetData.opened)){
-					var onValidate = function(e){
+				var onValidate;
+				if(('$dropdown' in widgetData)){
+					onValidate = function(e){
+						if (!webshims.wsPopover.isInElement([elem, shadow, shadowFocus, $(widgetData.$dropdown)], e.target)) {
+							$(elem).trigger('updatevalidation.webshims');
+						}
+					};
+					$(shadow).on('wsallowinstantvalidation', function(e, data){
+						$(document).off('focusin', onValidate);
+						if(data.type == 'focusout' && data.target != elem){
+							$(document).on('focusin', onValidate);
+							return false;
+						}
+					});
+				} else if(('container' in widgetData) && $.isFunction(widgetData.opened)){
+					onValidate = function(e){
 						if (!webshims.wsPopover.isInElement([elem, shadow, shadowFocus, $(widgetData.container)], e.target)) {
 							$(elem).trigger('updatevalidation.webshims');
 						}
@@ -122,10 +136,10 @@ webshims.register('form-combat', function($,webshims){
 	find.register = function(elem, data, pluginDescriptor, plugin){
 		var shadow = typeof pluginDescriptor.shadow == 'string' ? data[pluginDescriptor.shadow] : pluginDescriptor.shadow(data, elem);
 		var shadowFocus = typeof pluginDescriptor.shadowFocus == 'string' ? data[pluginDescriptor.shadowFocus] : pluginDescriptor.shadowFocus(data, elem);
-		console.log(data, arguments);
 		if(!shadowFocus){
 			shadowFocus = shadow;
 		}
+
 		if(shadow && (replacementDatas.success || ($(shadowFocus).attr('tabindex') || $(shadowFocus).prop('tabIndex') > -1))){
 			webshims.addShadowDom(elem, shadow, {shadowFocusElement: shadowFocus});
 			if(pluginDescriptor._create){
