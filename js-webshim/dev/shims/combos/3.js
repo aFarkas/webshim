@@ -1234,7 +1234,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	
 })();
 });
-;webshims.register('form-core', function($, webshims, window, document, undefined, options){
+webshims.register('form-core', function ($, webshims, window, document, undefined, options) {
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -1373,6 +1373,8 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 
 	var transClass = ('transitionDelay' in document.documentElement.style) ?  '' : ' no-transition';
 	var poCFG = webshims.cfg.wspopover;
+	var lReg = /</g;
+	var gReg = />/g;
 
 	addModule('form-validation', $.extend({d: ['form-message']}, formExtras));
 
@@ -1499,7 +1501,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		var message = '';
 		var elem = this[0];
 		if(elem){
-			message = webshims.getContentValidationMessage(elem, false, key) || $.prop(elem, 'customValidationMessage') || $.prop(elem, 'validationMessage');
+			message = webshims.getContentValidationMessage(elem, false, key) || $.prop(elem, 'customValidationMessage') || ($.prop(elem, 'validationMessage') || '').replace(lReg, '&lt;').replace(gReg, '&gt;');
 		}
 		return message;
 	};
@@ -1547,7 +1549,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 		webshims.isReady('WINDOWLOAD', true);
 	}
 });
-;webshims.register('form-message', function($, webshims, window, document, undefined, options){
+webshims.register('form-message', function ($, webshims, window, document, undefined, options) {
 	"use strict";
 	if(options.lazyCustomMessages){
 		options.customMessages = true;
@@ -1791,7 +1793,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			message = getMessageFromObj(currentValidationMessage.badInput, elem);
 		}
 		if(!message){
-			message = getMessageFromObj(validityMessages[''][name], elem) || $.prop(elem, 'validationMessage');
+			message = getMessageFromObj(validityMessages[''][name], elem) || ($.prop(elem, 'validationMessage') || '').replace(lReg, '&lt;').replace(gReg, '&gt;');
 			if(name != 'customError'){
 				webshims.info('could not find errormessage for: '+ name +' / '+ $.prop(elem, 'type') +'. in language: '+webshims.activeLang());
 			}

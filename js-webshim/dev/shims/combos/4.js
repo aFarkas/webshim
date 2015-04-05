@@ -1234,7 +1234,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	
 })();
 });
-;webshims.register('form-message', function($, webshims, window, document, undefined, options){
+webshims.register('form-message', function ($, webshims, window, document, undefined, options) {
 	"use strict";
 	if(options.lazyCustomMessages){
 		options.customMessages = true;
@@ -1478,7 +1478,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 			message = getMessageFromObj(currentValidationMessage.badInput, elem);
 		}
 		if(!message){
-			message = getMessageFromObj(validityMessages[''][name], elem) || $.prop(elem, 'validationMessage');
+			message = getMessageFromObj(validityMessages[''][name], elem) || ($.prop(elem, 'validationMessage') || '').replace(lReg, '&lt;').replace(gReg, '&gt;');
 			if(name != 'customError'){
 				webshims.info('could not find errormessage for: '+ name +' / '+ $.prop(elem, 'type') +'. in language: '+webshims.activeLang());
 			}

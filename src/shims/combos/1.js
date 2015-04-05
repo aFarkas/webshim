@@ -221,7 +221,7 @@ var swfmini = function() {
 }();
 
 webshims.isReady('swfmini', true);
-;webshims.register('form-core', function($, webshims, window, document, undefined, options){
+webshims.register('form-core', function ($, webshims, window, document, undefined, options) {
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -360,6 +360,8 @@ webshims.isReady('swfmini', true);
 
 	var transClass = ('transitionDelay' in document.documentElement.style) ?  '' : ' no-transition';
 	var poCFG = webshims.cfg.wspopover;
+	var lReg = /</g;
+	var gReg = />/g;
 
 	addModule('form-validation', $.extend({d: ['form-message']}, formExtras));
 
@@ -486,7 +488,7 @@ webshims.isReady('swfmini', true);
 		var message = '';
 		var elem = this[0];
 		if(elem){
-			message = webshims.getContentValidationMessage(elem, false, key) || $.prop(elem, 'customValidationMessage') || $.prop(elem, 'validationMessage');
+			message = webshims.getContentValidationMessage(elem, false, key) || $.prop(elem, 'customValidationMessage') || ($.prop(elem, 'validationMessage') || '').replace(lReg, '&lt;').replace(gReg, '&gt;');
 		}
 		return message;
 	};
@@ -534,7 +536,7 @@ webshims.isReady('swfmini', true);
 		webshims.isReady('WINDOWLOAD', true);
 	}
 });
-;(function(webshims){
+(function (webshims) {
 	"use strict";
 	var support = webshims.support;
 	var hasNative = support.mediaelement;
