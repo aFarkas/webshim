@@ -32,7 +32,7 @@
  * @link       http://code.google.com/p/flashcanvas/
  */
 
-function getHostName() {
+function FCgetHostName() {
     if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
         return $_SERVER['HTTP_X_FORWARDED_HOST'];
     } else if (isset($_SERVER['HTTP_HOST'])) {
@@ -56,7 +56,7 @@ if (CHECK_REFERRER) {
     if (SWF_HOST_NAME) {
         $host = SWF_HOST_NAME;
     } else {
-        $host = getHostName();
+        $host = FCgetHostName();
     }
     $pattern = '#^https?://' . str_replace('.', '\.', $host) . '(:\d*)?/#';
     if (!preg_match($pattern, $_SERVER['HTTP_REFERER'])) {
