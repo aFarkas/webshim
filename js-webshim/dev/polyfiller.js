@@ -203,7 +203,7 @@
 				if(WSDEBUG){
 					for(var i = 0; i < features.length; i++){
 						if(loaded[features[i]]){
-							webshims.error(features[i] +' already loaded, you might want to use updatePolyfill instead? see: bit.ly/12BtXX3');
+							webshims.error(features[i] +' already loaded, you might want to use updatePolyfill instead? see: afarkas.github.io/webshim/demos/#Shiv-dynamic-html5');
 						}
 						loaded[features[i]] = true;
 					}
