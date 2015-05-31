@@ -193,8 +193,8 @@ webshims.register('form-number-date-ui', function($, webshims, window, document,
 		};
 	})();
 	var addZero = function(val){
-		if(!val){return "";}
 		val = val+'';
+		if(!val){return "";}
 		return val.length == 1 ? '0'+val : val;
 	};
 	
