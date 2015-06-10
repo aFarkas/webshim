@@ -923,7 +923,7 @@ webshims.register('form-validation', function($, webshims, window, document, und
 			var jElm = $(e.target);
 
 
-			if(!firstEvent){
+			if(!firstEvent && !$.find.matchesSelector(e.target, 'form, fieldset') ){
 				//trigger firstinvalid
 				firstEvent = $.Event('firstinvalid');
 				jElm.addClass('first-invalid').trigger(firstEvent);
