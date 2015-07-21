@@ -37,7 +37,7 @@
     "type": "git",
     "url": "https://github.com/aFarkas/webshim.git"
   },
-  "main": "js-webshim",
+  "main": "./js-webshim/minified/polyfiller.js",
   "devDependencies": {
     "phantomjs": ">=1.8.2",
     "grunt-css": ">=0.5.4",
