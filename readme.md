@@ -1,3 +1,5 @@
+**Important note: Webshim is not compatible with upcoming jQuery 3.x and I do not plan to work on a new version. I will still fix critical bugs in the future though.**
+
 [Webshim](http://aFarkas.github.com/webshim/demos/index.html)
 ================================
 
