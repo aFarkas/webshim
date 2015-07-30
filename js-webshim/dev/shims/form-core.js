@@ -137,8 +137,6 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 
 	var transClass = ('transitionDelay' in document.documentElement.style) ?  '' : ' no-transition';
 	var poCFG = webshims.cfg.wspopover;
-	var lReg = /</g;
-	var gReg = />/g;
 
 	addModule('form-validation', $.extend({d: ['form-message']}, formExtras));
 
@@ -265,7 +263,7 @@ webshims.register('form-core', function($, webshims, window, document, undefined
 		var message = '';
 		var elem = this[0];
 		if(elem){
-			message = webshims.getContentValidationMessage(elem, false, key) || $.prop(elem, 'customValidationMessage') || ($.prop(elem, 'validationMessage') || '').replace(lReg, '&lt;').replace(gReg, '&gt;');
+			message = webshims.getContentValidationMessage(elem, false, key) || $.prop(elem, 'customValidationMessage') || ($.prop(elem, 'validationMessage') || '');
 		}
 		return message;
 	};
