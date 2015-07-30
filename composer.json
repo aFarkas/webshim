@@ -1,0 +1,45 @@
+{
+    "name": "afarkas/webshim",
+    "description": "The polyfilling, capability based loading JavaScript Library",
+    "type": "component",
+    "minimum-stability": "dev",
+    "license": "MIT",
+    "homepage": "http://afarkas.github.com/webshim/demos/index.html",
+    "keywords": [
+        "webshims",
+        "webshim",
+        "polyfill",
+        "HTML5",
+        "forms",
+        "audio",
+        "video",
+        "validation",
+        "canvas",
+        "localstorage",
+        "geolocation",
+        "ui",
+        "widgets",
+        "getUserMedia"
+    ],
+    "authors": [
+        {
+            "name": "Alexander Farkas",
+            "homepage": "https://github.com/aFarkas/"
+        }
+    ],
+    "extra": {
+        "component": {
+            "scripts": [
+                "js-webshim/minified/polyfiller.js"
+            ],
+            "files": [
+                "js-webshim/minified/shims/**"
+            ]
+        }
+    },
+    "require": {
+        "components/jquery": ">=1.8.2 <3.0",
+        "components/modernizr": "^2.8.3",
+        "robloach/component-installer": "^0.2"
+    }
+}
