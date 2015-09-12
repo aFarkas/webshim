@@ -221,6 +221,7 @@ var swfmini = function() {
 }();
 
 webshims.isReady('swfmini', true);
+;
 //this might was already extended by ES5 shim feature
 (function($){
 	"use strict";
@@ -1456,7 +1457,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	
 })();
 });
-webshims.register('form-core', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -1769,8 +1770,8 @@ webshims.register('form-core', function ($, webshims, window, document, undefine
 		webshims.isReady('WINDOWLOAD', true);
 	}
 });
-webshims.register('form-shim-extend', function ($, webshims, window, document, undefined, options) {
-	"use strict";
+;webshims.register('form-shim-extend', function($, webshims, window, document, undefined, options){
+"use strict";
 webshims.inputTypes = webshims.inputTypes || {};
 //some helper-functions
 var cfg = webshims.cfg.forms;
@@ -2578,7 +2579,7 @@ switch(desc.proptype) {
 webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors);
 
 }); //webshims.ready end
-webshims.register('form-message', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(options.lazyCustomMessages){
 		options.customMessages = true;
@@ -2890,7 +2891,7 @@ webshims.register('form-message', function ($, webshims, window, document, undef
 		
 	});
 });
-webshims.register('form-datalist', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var lazyLoad = function(name){
 		if(!name || typeof name != 'string'){
@@ -3187,7 +3188,7 @@ webshims.register('form-datalist', function ($, webshims, window, document, unde
 	})();
 	
 });
-(function (webshims) {
+;(function(webshims){
 	"use strict";
 	var support = webshims.support;
 	var hasNative = support.mediaelement;

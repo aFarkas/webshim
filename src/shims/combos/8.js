@@ -221,6 +221,7 @@ var swfmini = function() {
 }();
 
 webshims.isReady('swfmini', true);
+;
 //this might was already extended by ES5 shim feature
 (function($){
 	"use strict";
@@ -1456,7 +1457,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	
 })();
 });
-webshims.register('form-core', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -1769,7 +1770,7 @@ webshims.register('form-core', function ($, webshims, window, document, undefine
 		webshims.isReady('WINDOWLOAD', true);
 	}
 });
-webshims.register('form-message', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(options.lazyCustomMessages){
 		options.customMessages = true;
@@ -2081,7 +2082,7 @@ webshims.register('form-message', function ($, webshims, window, document, undef
 		
 	});
 });
-(function (webshims) {
+;(function(webshims){
 	"use strict";
 	var support = webshims.support;
 	var hasNative = support.mediaelement;

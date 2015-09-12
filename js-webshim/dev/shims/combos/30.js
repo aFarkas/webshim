@@ -1234,7 +1234,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	
 })();
 });
-webshims.register('form-core', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -1547,7 +1547,7 @@ webshims.register('form-core', function ($, webshims, window, document, undefine
 		webshims.isReady('WINDOWLOAD', true);
 	}
 });
-webshims.register('form-message', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(options.lazyCustomMessages){
 		options.customMessages = true;
@@ -1859,7 +1859,7 @@ webshims.register('form-message', function ($, webshims, window, document, undef
 		
 	});
 });
-webshims.register('form-datalist', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var lazyLoad = function(name){
 		if(!name || typeof name != 'string'){

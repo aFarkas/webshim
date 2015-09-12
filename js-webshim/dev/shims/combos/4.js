@@ -1234,7 +1234,7 @@ webshims.register('dom-extend', function($, webshims, window, document, undefine
 	
 })();
 });
-webshims.register('form-message', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(options.lazyCustomMessages){
 		options.customMessages = true;

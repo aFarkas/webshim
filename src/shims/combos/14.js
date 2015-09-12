@@ -209,7 +209,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 	
 	
 });
-webshims.register('form-message', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(options.lazyCustomMessages){
 		options.customMessages = true;
@@ -521,7 +521,7 @@ webshims.register('form-message', function ($, webshims, window, document, undef
 		
 	});
 });
-webshims.register('form-number-date-api', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(!webshims.addInputType){
 		webshims.error("you can not call forms-ext feature after calling forms feature. call both at once instead: $.webshims.polyfill('forms forms-ext')");

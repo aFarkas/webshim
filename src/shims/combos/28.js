@@ -807,7 +807,7 @@ switch(desc.proptype) {
 webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors);
 
 }); //webshims.ready end
-webshims.register('form-message', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-message', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(options.lazyCustomMessages){
 		options.customMessages = true;
@@ -1119,7 +1119,7 @@ webshims.register('form-message', function ($, webshims, window, document, undef
 		
 	});
 });
-webshims.register('form-number-date-api', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(!webshims.addInputType){
 		webshims.error("you can not call forms-ext feature after calling forms feature. call both at once instead: $.webshims.polyfill('forms forms-ext')");
@@ -1735,7 +1735,7 @@ webshims.register('form-number-date-api', function ($, webshims, window, documen
 	}
 	
 });
-webshims.register('form-datalist', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var lazyLoad = function(name){
 		if(!name || typeof name != 'string'){

@@ -221,7 +221,7 @@ var swfmini = function() {
 }();
 
 webshims.isReady('swfmini', true);
-webshims.register('form-core', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-core', function($, webshims, window, document, undefined, options){
 	"use strict";
 
 	webshims.capturingEventPrevented = function(e){
@@ -534,7 +534,7 @@ webshims.register('form-core', function ($, webshims, window, document, undefine
 		webshims.isReady('WINDOWLOAD', true);
 	}
 });
-(function (webshims) {
+;(function(webshims){
 	"use strict";
 	var support = webshims.support;
 	var hasNative = support.mediaelement;

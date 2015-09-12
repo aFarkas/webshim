@@ -209,7 +209,7 @@ webshims.register('form-native-extend', function($, webshims, window, doc, undef
 	
 	
 });
-webshims.register('form-number-date-api', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-number-date-api', function($, webshims, window, document, undefined, options){
 	"use strict";
 	if(!webshims.addInputType){
 		webshims.error("you can not call forms-ext feature after calling forms feature. call both at once instead: $.webshims.polyfill('forms forms-ext')");
@@ -825,7 +825,7 @@ webshims.register('form-number-date-api', function ($, webshims, window, documen
 	}
 	
 });
-(function ($) {
+;(function($){
 	"use strict";
 
 	var isNumber = function(string){
@@ -1445,7 +1445,7 @@ webshims.register('form-number-date-api', function ($, webshims, window, documen
 		webshims.isReady('range-ui', true);
 	}
 })(window.webshims ? webshims.$ : jQuery);
-webshims.register('form-number-date-ui', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-number-date-ui', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var curCfg;
 	var formcfg = webshims.formcfg;
@@ -1755,8 +1755,8 @@ webshims.register('form-number-date-ui', function ($, webshims, window, document
 			formcfg['en-US'] = $.extend(true, {}, formcfg.en, {
 				date: {firstDay: 0},
 				patterns: {d: "mm/dd/yy"},
-				dateSigns: '-',
-			  dFormat: "/",
+				dateSigns: '/',
+				dFormat: "/",
 				meridian: ['AM', 'PM']
 				
 			});
@@ -1765,8 +1765,8 @@ webshims.register('form-number-date-ui', function ($, webshims, window, document
 			formcfg['en-GB'] = $.extend(true, {}, formcfg.en, {
 				date: {firstDay: 1},
 				patterns: {d: "dd/mm/yy"},
-				dateSigns: '-',
-			  dFormat: "/",
+				dateSigns: '/',
+				dFormat: "/",
 				meridian: ['AM', 'PM']
 			});
 		}
@@ -3463,7 +3463,7 @@ webshims.register('form-number-date-ui', function ($, webshims, window, document
 	})();
 });
 
-webshims.register('form-datalist', function ($, webshims, window, document, undefined, options) {
+;webshims.register('form-datalist', function($, webshims, window, document, undefined, options){
 	"use strict";
 	var lazyLoad = function(name){
 		if(!name || typeof name != 'string'){
