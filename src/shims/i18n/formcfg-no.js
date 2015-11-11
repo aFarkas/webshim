@@ -44,16 +44,12 @@ webshims.formcfg['no'] = {
 		",": ","
 	},
 	"numberSigns": ".",
-	"dateSigns": "/",
+	"dateSigns": ".",
 	"timeSigns": ":. ",
-	"dFormat": "/",
+	"dFormat": ".",
 	"patterns": {
-		"d": "dd/mm/yy"
+		"d": "dd.mm.yy"
 	},
-	"meridian": [
-		"AM",
-		"PM"
-	],
 	"month": {
 		"currentText": "Denne måned"
 	},
