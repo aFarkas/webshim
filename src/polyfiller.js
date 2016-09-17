@@ -989,7 +989,7 @@
 
 	addPolyfill('usermedia-core', {
 		f: 'usermedia',
-		test: userMediaTest && window.URL,
+		test: userMediaTest && !!window.URL,
 		d: ['url', DOMSUPPORT]
 	});
 
