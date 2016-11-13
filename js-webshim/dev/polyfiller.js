@@ -137,7 +137,7 @@
 	}
 
 	$.extend(webshims, {
-		version: '1.15.10',
+		version: '1.15.11',
 
 		cfg: {
 			enhanceAuto: window.Audio && (!window.matchMedia || matchMedia('(min-device-width: 721px)').matches),
@@ -989,7 +989,7 @@
 
 	addPolyfill('usermedia-core', {
 		f: 'usermedia',
-		test: userMediaTest && window.URL,
+		test: userMediaTest && !!window.URL,
 		d: ['url', DOMSUPPORT]
 	});
 

@@ -1,3 +1,7 @@
+Release 1.15.11
+---------------
+- fixes critical error in userMedia feature detection (`URL` constructor fix, fixed by @outdooricon, [PR](https://github.com/aFarkas/webshim/pull/576)).
+
 Release 1.15.3
 ----------
 - fix regression bug with filereader introduced with 1.15.1
