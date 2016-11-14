@@ -413,12 +413,15 @@ webshims.ready('form-validation', function(){
 		var opts;
 		if(!data.remoteValidate){
 			if(typeof data.ajaxvalidate == 'string'){
-				data.ajaxvalidate = {url: data.ajaxvalidate, depends: $([])};
+				data.ajaxvalidate = {url: data.ajaxvalidate, depends: $([]), fieldName: ''}; // new property to makes server process be independent from input[name|id]
 			} else {
 				data.ajaxvalidate.depends = data.ajaxvalidate.depends ?
 					$(typeof data.ajaxvalidate.depends == 'string' && data.ajaxvalidate.depends.split(' ') || data.ajaxvalidate.depends).map(getId) :
 					$([])
 				;
+				
+				if(!data.ajaxvalidate.fieldName)
+					data.ajaxvalidate.fieldName = data.ajaxvalidatefield || ''; // new data-* attribute => [data-ajaxvalidatefield]
 			}
 
 			data.ajaxvalidate.depends.on('change', function(){
@@ -483,7 +486,8 @@ webshims.ready('form-validation', function(){
 				getData: function(){
 					var data;
 					data = {};
-					data[$.prop(elem, 'name') || $.prop(elem, 'id')] = $(elem).val();
+					// usage of new fieldName property
+					data[opts.fieldName || $.prop(elem, 'name') || $.prop(elem, 'id')] = $(elem).val();
 					opts.depends.each(function(){
 						if($.find.matchesSelector(this, ':invalid')){
 							data = false;
