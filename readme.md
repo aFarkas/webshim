@@ -71,10 +71,10 @@ Installation and Usage
  [More information and demos](http://aFarkas.github.com/webshim/demos/index.html).
 
 
- Download via bower
+ Download via Bower
  ------------------
 
- ``bower install webshim --save-dev``
+ ``bower install webshim --save``
 
 
 License
